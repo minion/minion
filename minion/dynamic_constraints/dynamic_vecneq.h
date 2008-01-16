@@ -1,0 +1,238 @@
+/* Minion
+* Copyright (C) 2006
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+
+
+template<typename VarArray1, typename VarArray2>
+struct VecNeqDynamic : public DynamicConstraint
+{
+  typedef typename VarArray1::value_type VarRef1;
+  typedef typename VarArray2::value_type VarRef2;
+  
+  VarArray1 var_array1;
+  VarArray2 var_array2;
+
+  int watched_index0;
+  int watched_index1;
+  
+  bool only_one_possible_pair;
+  
+  VecNeqDynamic(const VarArray1& _array1,
+				const VarArray2& _array2) :
+				var_array1(_array1), var_array2(_array2)
+  { D_ASSERT(var_array1.size() == var_array2.size()); }
+  
+  int dynamic_trigger_count()
+  { return 4; }
+    
+  template<typename Var>
+  void remove_value(int val, Var& var)
+  {
+    if(var.isBound())
+	{
+	  if(var.getMin() == val)
+	    var.setMin(val + 1);
+	  else
+	    if(var.getMax() == val)
+		  var.setMax(val - 1);
+	}
+	else
+	{ var.removeFromDomain(val); }
+  }
+  
+  virtual void full_propogate()
+  {
+    D_INFO(2, DI_VECNEQ, "Starting full propogate");
+	DynamicTrigger* dt = dynamic_trigger_start();
+	int size = var_array1.size();
+    int index = 0;
+	
+	// Find first pair we could watch.
+	
+	while(index < size &&
+		  var_array1[index].isAssigned() && var_array2[index].isAssigned() &&
+		  var_array1[index].getAssignedValue() == 
+		  var_array2[index].getAssignedValue())
+	  ++index;
+	
+	// Vectors are assigned and equal.
+	if(index == size)
+	{
+	  Controller::fail();
+	  return;
+	}
+	
+	watched_index0 = index;
+	
+	++index; 
+	
+	// Now, is there another fine pair?
+	while(index < size &&
+		  var_array1[index].isAssigned() && var_array2[index].isAssigned() &&
+		  var_array1[index].getAssignedValue() == 
+		  var_array2[index].getAssignedValue())
+	  ++index;
+	
+	// There is only one possible pair allowed...
+	if(index == size)
+	{
+	  D_INFO(2, DI_VECNEQ, "Only found one possible: " + to_string(watched_index0));
+	  if(var_array1[watched_index0].isAssigned())
+	    remove_value(var_array1[watched_index0].getAssignedValue(),
+					 var_array2[watched_index0]);
+	  if(var_array2[watched_index0].isAssigned())
+	    remove_value(var_array2[watched_index0].getAssignedValue(),
+					 var_array1[watched_index0]);
+	  only_one_possible_pair = true;
+	  var_array1[watched_index0].addDynamicTrigger(dt, Assigned);
+	  var_array2[watched_index0].addDynamicTrigger(dt + 1, Assigned);
+	  return;
+	}
+	
+	only_one_possible_pair = false;
+	
+	watched_index1 = index;
+
+	D_INFO(2, DI_VECNEQ, "Found two indices: " + to_string(watched_index0) +
+						 " and " + to_string(watched_index1));
+	
+	var_array1[watched_index0].addDynamicTrigger(dt, Assigned);
+	var_array2[watched_index0].addDynamicTrigger(dt + 1, Assigned);
+	var_array1[watched_index1].addDynamicTrigger(dt + 2, Assigned);
+	var_array2[watched_index1].addDynamicTrigger(dt + 3, Assigned);
+  }
+  
+  // XXX : I'm not sure this gets GAC, but it does some pruning, and is fast.
+  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  {
+    D_INFO(2, DI_VECNEQ, "Starting propagate");
+    if(only_one_possible_pair)
+	{
+	  D_INFO(2, DI_VECNEQ, "Only one pair: "+to_string(watched_index0));
+	  if(var_array1[watched_index0].isAssigned())
+	    remove_value(var_array1[watched_index0].getAssignedValue(),
+					 var_array2[watched_index0]);
+	  if(var_array2[watched_index0].isAssigned())
+	    remove_value(var_array2[watched_index0].getAssignedValue(),
+					 var_array1[watched_index0]);
+	  return;
+	}
+
+    int trigger_activated = dt - dynamic_trigger_start();
+	int triggerpair = trigger_activated / 2;
+	//int othertriggerpair = 1 - triggerpair;
+	D_ASSERT(triggerpair == 0 || triggerpair == 1);
+	//D_ASSERT(othertriggerpair == 0 || othertriggerpair == 1);
+
+	int original_index;
+	int other_index;
+
+	if(triggerpair == 0)
+	{ 
+	  original_index = watched_index0;
+	  other_index = watched_index1;
+	}
+	else
+	{
+	  original_index = watched_index1;
+	  other_index = watched_index0;
+	}
+
+    D_INFO(2, DI_VECNEQ, "Triggerpair: " + to_string(triggerpair) + 
+						 " original:" + to_string(original_index) + 
+						 " other:" + to_string(other_index));
+						 
+    int index = original_index; // XXX +1?;
+	
+	
+		   
+	
+		   
+	int size = var_array1.size();
+	
+	while( (index < size &&
+		    var_array1[index].isAssigned() && var_array2[index].isAssigned() &&
+			var_array1[index].getAssignedValue() == 
+		    var_array2[index].getAssignedValue()) ||  index == other_index )
+	  ++index;
+	  
+	if(index == size)
+	{
+	  index = 0;
+	  while( (index < original_index &&
+		      var_array1[index].isAssigned() && var_array2[index].isAssigned() &&
+		      var_array1[index].getAssignedValue() == 
+		      var_array2[index].getAssignedValue()) || index == other_index )
+	  ++index;
+	
+	  if(index == original_index)
+	  {// This is the only possible non-equal index.
+	    D_INFO(2, DI_VECNEQ, "Cannot find another index");
+	    if(var_array1[other_index].isAssigned() && 
+		   var_array2[other_index].isAssigned() &&
+		   var_array1[other_index].getAssignedValue() ==
+		   var_array2[other_index].getAssignedValue())
+		{
+		  D_INFO(2, DI_VECNEQ, "Index " + to_string(other_index) + " is assigned & equal" +
+							   " so propogating " + to_string(original_index));
+		  if(var_array2[original_index].isAssigned())
+		    remove_value(var_array2[original_index].getAssignedValue(),
+						 var_array1[original_index]);
+		  if(var_array1[original_index].isAssigned())
+		    remove_value(var_array1[original_index].getAssignedValue(),
+						 var_array2[original_index]);
+		}
+		return;
+	  }
+	}
+	
+	D_INFO(2, DI_VECNEQ, "Now going to watch " + to_string(index));
+	
+	if(triggerpair == 0)
+	  watched_index0 = index;
+	else
+	  watched_index1 = index;
+
+    D_ASSERT(watched_index0 != watched_index1);
+	DynamicTrigger* trigs = dynamic_trigger_start();
+	var_array1[index].addDynamicTrigger(trigs + triggerpair * 2, Assigned);
+	var_array2[index].addDynamicTrigger(trigs + 1 + triggerpair * 2, Assigned);
+  }
+  
+  virtual bool check_assignment(vector<int> v)
+  {
+    int v_size1 = var_array1.size();
+	return !std::equal(v.begin(), v.begin() + v_size1, v.begin() + v_size1);
+  }
+  
+  virtual vector<AnyVarRef> get_vars()
+  { 
+    vector<AnyVarRef> vars;
+	vars.reserve(var_array1.size() * var_array2.size());
+	for(unsigned i = 0; i < var_array1.size(); ++i)
+	  vars.push_back(AnyVarRef(var_array1[i]));
+	for(unsigned i = 0; i < var_array2.size(); ++i)
+	  vars.push_back(AnyVarRef(var_array2[i]));
+	return vars;  
+  }
+};
+
+template<typename VarArray1,  typename VarArray2>
+DynamicConstraint*
+VecNeqConDynamic(const VarArray1& varray1, const VarArray2& varray2)
+{ return new VecNeqDynamic<VarArray1,VarArray2>(varray1, varray2); }
