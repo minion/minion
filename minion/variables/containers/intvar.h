@@ -319,8 +319,9 @@ struct RangeVarContainer {
 	  // TODO : Optimise this function to only check values in domain.
 	  for(int loop = raw_new_upper + 1 + var_min; loop <i; ++loop)
 	  {
-	    if(inDomain_noBoundCheck(d, loop))
-	      trigger_list.push_domain_removal(d.var_num, loop);
+		D_ASSERT(!inDomain_noBoundCheck(d, loop));
+	    //if(inDomain_noBoundCheck(d, loop))
+	    //  trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif
 
@@ -364,8 +365,9 @@ struct RangeVarContainer {
 	  for(int loop = i; loop < raw_new_lower + var_min; ++loop)
 	  {
 		// XXX : Can this loop ever trigger??
-	    if(inDomain_noBoundCheck(d, loop))
-	      trigger_list.push_domain_removal(d.var_num, loop);
+		D_ASSERT(!inDomain_noBoundCheck(d, loop))
+	    //if(inDomain_noBoundCheck(d, loop))
+		//trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif
       raw_lower_bound(d) = raw_new_lower;

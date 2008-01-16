@@ -363,8 +363,9 @@ struct BigRangeVarContainer {
 	  // TODO : Optimise this function to only check values in domain.
 	  for(int loop = new_upper + 1; loop <= offset; ++loop)
 	  {
-	    if(inDomain_noBoundCheck(d, loop))
-	      trigger_list.push_domain_removal(d.var_num, loop);
+		D_ASSERT(!inDomain_noBoundCheck(d, loop));
+//	    if(inDomain_noBoundCheck(d, loop))
+//	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif
 
@@ -425,8 +426,9 @@ struct BigRangeVarContainer {
 	  // TODO : Optimise this function to only check values in domain.
 	  for(int loop = offset; loop < new_lower; ++loop)
 	  {
-	    if(inDomain_noBoundCheck(d, loop))
-	      trigger_list.push_domain_removal(d.var_num, loop);
+		D_ASSERT(!inDomain_noBoundCheck(d, loop));
+//	    if(inDomain_noBoundCheck(d, loop))
+//	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif
 	  
