@@ -76,7 +76,7 @@
 	   }
 	   else
 	   {
-		 D_ASSERT(var_order[pos].getMin() <= var_order[pos].getMin() - 1);
+		 D_ASSERT(var_order[pos].getMax() >= var_order[pos].getMin() + 1);
 		 var_order[pos].setMax(var_order[pos].getMax() - 1);
 	   }
 	}
