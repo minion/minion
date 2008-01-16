@@ -100,4 +100,4 @@ echo $(($j - $pass - $expectedfail)) tests failed due to unexpected errors.
 echo $expectedfail tests failed due to expected errors.
 echo $unexpectedpass tests passed unexpectedly.
 
-./do_random_tests $exec $*
+./do_random_tests.sh $exec $*

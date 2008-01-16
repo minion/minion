@@ -210,5 +210,10 @@ namespace Controller
 	} // while(true)
   } // end Function
 
+  // This just allows SAC (which wants a list of vars)
+  // and normal propagate to have the same input method.
+  template<typename Vars>
+  inline void propogate_queue_vars(Vars& vars)
+  { propogate_queue(); }
 } // namespace Controller
 

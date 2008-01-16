@@ -33,8 +33,8 @@ using namespace ProbSpec;
 struct MinionArguments
 {
   VarOrder order;
-  bool preprocess;
-  MinionArguments() : order(ORDER_ORIGINAL), preprocess(false)
+  int preprocess;
+  MinionArguments() : order(ORDER_ORIGINAL), preprocess(0)
   { }
 };
 
@@ -57,6 +57,7 @@ void print_info()
     << "   These flags is not optimised and using them" << endl
     << "   can cause a severe performance drop." << endl
     << "         [-preprocess]				 Perform SAC at the first node of search" << endl
+    << "         [-preprocess2]              Perform SSAC at first node of search (can take a LONG time)" << endl
     << "         [-varorder] order			 Change variable ordering strategy" << endl
 	<< "		   order = sdf               Smallest Domain First (static breaks ties)" << endl
 	<< "		   order = sdf-random        SDF (randomly break ties)" << endl
@@ -101,7 +102,7 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 {
  for(int i = 1; i < argc - 1; ++i)
   {
-    string command(argv[i]);
+    const string command(argv[i]);
 	if(command == string("-findallsols"))
 	{ Controller::find_all_solutions(); }
 	else if(command == string("-quiet"))
@@ -115,7 +116,9 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 	else if(command == string("-verbose"))
 	{ reader.parser_verbose = true; }
 	else if(command == string("-preprocess"))
-	{ args.preprocess = true; }
+	{ args.preprocess = 1; }
+	else if(command == string("-preprocess2"))
+	{ args.preprocess = 2; }
 	else if(command == string("-fullprop"))
 	{
 #ifndef NO_DEBUG
@@ -401,13 +404,23 @@ int main(int argc, char** argv) {
   Controller::initalise_search();
   if(!Controller::failed)
   {
-	if(args.preprocess)
+	if(args.preprocess > 0)
 	{
 	  long long lits = lit_count(var_val_order.first);
 	  clock_t start_SAC_time = clock();
-      propogateSAC(var_val_order.first);
+	  PropogateSAC prop;
+      prop(var_val_order.first);
       cout << "Preprocess Time: " << (clock() - start_SAC_time) / (1.0 * CLOCKS_PER_SEC) << endl;
 	  cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;
+	  if(args.preprocess > 1)
+	  {
+		long long lits = lit_count(var_val_order.first);
+		clock_t start_SAC_time = clock();
+		PropogateSSAC prop;
+		prop(var_val_order.first);
+		cout << "Preprocess 2 Time: " << (clock() - start_SAC_time) / (1.0 * CLOCKS_PER_SEC) << endl;
+		cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;
+	  }
 	}  
 	if(!Controller::failed)
       solve(args.order, var_val_order);

@@ -4,12 +4,12 @@
    For Licence Information see file LICENSE.txt 
 */
 
-template<typename Var>
-bool inline check_fail(Var& var, int val)
+template<typename Var, typename Vars, typename Prop>
+bool inline check_fail(Var& var, int val, Vars vars, Prop prop)
 {
   Controller::world_push();
   var.propogateAssign(val);
-  Controller::propogate_queue();
+  prop(vars);
   
   bool check_failed = Controller::failed;
   Controller::failed = false;
@@ -19,8 +19,9 @@ bool inline check_fail(Var& var, int val)
   return check_failed;
 }
 
-template <typename Var>
-void propogateSAC(vector<Var>& vararray)
+template <typename Var, typename Prop>
+void propogateSAC_internal(vector<Var>& vararray, 
+				  Prop prop)
 {
   bool reduced = true;
   while(reduced)
@@ -31,7 +32,7 @@ void propogateSAC(vector<Var>& vararray)
       Var& var = vararray[i];
       if(var.isBound())
       {
-        while(check_fail(var,var.getMax()))
+        while(check_fail(var,var.getMax(), vararray, prop))
         {
           reduced = true;
           var.setMax(var.getMax() - 1);
@@ -40,7 +41,7 @@ void propogateSAC(vector<Var>& vararray)
             return;
         }
         
-        while(check_fail(var,var.getMin()))
+        while(check_fail(var,var.getMin(), vararray, prop))
         {
           reduced = true;
           var.setMin(var.getMin() + 1);
@@ -53,7 +54,7 @@ void propogateSAC(vector<Var>& vararray)
       {
         for(int val = var.getMin(); val <= var.getMax(); ++val)
         {
-          if(var.inDomain(val) && check_fail(var, val))
+          if(var.inDomain(val) && check_fail(var, val, vararray, prop))
           {
             reduced = true;
             var.removeFromDomain(val);
@@ -66,3 +67,22 @@ void propogateSAC(vector<Var>& vararray)
     }
   }
 }
+
+
+struct PropogateSAC
+{
+  template<typename Vars>
+  void operator()(Vars& vars)
+  {propogateSAC_internal(vars, Controller::propogate_queue_vars<Vars>);}
+};
+
+
+struct PropogateSSAC
+{
+  template<typename Vars>
+  void operator()(Vars& vars)
+  {
+	PropogateSAC sac;
+	propogateSAC_internal(vars, sac);
+  }
+};

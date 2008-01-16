@@ -69,5 +69,12 @@ namespace Controller
     backtrackable_memory.world_pop();
     big_rangevar_container.bms_array->undo();
   }
+  
+  inline void world_pop_all()
+  {
+	int depth = backtrackable_memory.current_depth();
+	for(int i = 0; i < depth; ++i)
+	  world_pop(); 
+  }
 }
 

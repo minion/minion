@@ -279,6 +279,11 @@ struct BacktrackableMemory
     memcpy(current_data, backtrack_cache + backtrack_cache_offset, allocated_bytes);
   }
   
+  int current_depth()
+  { 
+	D_ASSERT(backtrack_cache_offset % allocated_bytes == 0);
+	return backtrack_cache_offset / allocated_bytes;
+  }
 };
 
 VARDEF(BacktrackableMemory backtrackable_memory);
