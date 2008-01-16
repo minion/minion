@@ -1,4 +1,4 @@
-11/08/2006 - Chris
+11/10/2006 - Chris
 	* Going to try to start to keep changelog up to date!
 	* Replaced many occurrences of bool with BOOL. BOOL is defined to be
 	  int. This is used because in most cases bool and int are 

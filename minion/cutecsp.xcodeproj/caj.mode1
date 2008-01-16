@@ -270,13 +270,13 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>16</integer>
-									<integer>1</integer>
+									<integer>78</integer>
+									<integer>56</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {281, 705}}</string>
+							<string>{{0, 816}, {281, 705}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -376,9 +376,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>26C89C330ADC45FF00F2B065</string>
+				<string>26C89C720ADC619B00F2B065</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>26C89C340ADC45FF00F2B065</string>
+				<string>26C89C730ADC619B00F2B065</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -502,7 +502,7 @@
 	<key>PerspectivesBarVisible</key>
 	<true/>
 	<key>PinnedNavigatorIdentifier</key>
-	<string>26C89C300ADC445B00F2B065</string>
+	<string>26C89C690ADC4DDF00F2B065</string>
 	<key>ShelfIsVisible</key>
 	<false/>
 	<key>SourceDescription</key>
@@ -524,10 +524,7 @@
 	<key>WindowJustification</key>
 	<integer>5</integer>
 	<key>WindowOrderList</key>
-	<array>
-		<string>1C530D57069F1CE1000CFCEE</string>
-		<string>/Users/caj/minion/trunk/minion/cutecsp.xcodeproj</string>
-	</array>
+	<array/>
 	<key>WindowString</key>
 	<string>191 114 800 764 0 0 1440 878 </string>
 	<key>WindowTools</key>

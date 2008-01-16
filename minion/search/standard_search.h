@@ -95,10 +95,11 @@ namespace Controller
 	  {
 		for(unsigned i = 0; i < print_matrix.size(); ++i)
 		{
+		  cout << "Sol: ";  
 		  for(unsigned j = 0; j < print_matrix[i].size(); ++j)
 		  {
 			if(!print_matrix[i][j].isAssigned())
-			  cout << "[" << print_matrix[i][j].getMin() << "," << 
+			  cout  << "[" << print_matrix[i][j].getMin() << "," << 
 			                 print_matrix[i][j].getMax() << "]";
 			else
 			  cout << print_matrix[i][j].getAssignedValue() << " ";

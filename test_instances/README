@@ -15,8 +15,7 @@ following:
      statement).
    #TEST SOLCOUNT x
      There will be x solutions found in the whole search
-   #TEST NOSOLS
-     There will be no solutions found (use SOLCOUNT 0, this will be removed).
+
  
  
 If any line of the file is:

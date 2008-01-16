@@ -4,30 +4,26 @@ reify=0
 pass=0
 expectedfail=0
 for i in *.minion; do
-echo -n .
-j=$(($j + 1))
-if grep "#FAIL" $i > /dev/null;
-then
-  if $1 -test $2 $i &> /dev/null;
-    then echo "$i should have failed";
-  else
-    expectedfail=$(($expectedfail + 1));
-    echo "Expected failure occurred - $i"
+  echo -n .
+  j=$(($j + 1))
+
+  if grep -q "#FAIL" $i;
+    then fail=1
+    else fail=0
   fi
-else
-  if $1 -test $2 $i &> /dev/null;
-    then pass=$(($pass + 1));
-  else 
-    $1 -test $2 $i &> test_output;
-    if grep -q "Reification is not" test_output;
-    then
-      echo "Reification failure - $i";
-      reify=$(($reify + 1));
-    else    
-      echo "Fail $i";
-    fi
+
+  if grep -q "#TEST SOLCOUNT" $i;
+  then
+    sols=`$1 -findallsols $2 $i | ../mini-scripts/solutions.sh`
+    testsols=`grep "#TEST SOLCOUNT" $i | awk '{print $3}'`
+	echo $i . $sols . $testsols
+	if [[ "$sols" != "$testsols" ]]; then
+	  echo Got $testsols instead of $sols solutions in $2
+	else
+	  pass=$(($pass + 1))
+	fi
   fi
-fi
+  
 done
 echo
 echo "$pass of $j tests successful."
@@ -37,6 +33,8 @@ if [[ ! ($expectedfail -eq 0) ]]
 then 
    echo $expectedfail tests failed due to other expected errors,  e.g. known bugs
 fi
+
+
 
 echo Doing randomised tests.
 j=0
