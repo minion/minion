@@ -233,7 +233,7 @@ struct TupleTrie
 
   
   template<typename VarArray>
-	bool search_trie(const VarArray& _vars, __restrict TrieObj* __restrict * obj_list, int depth)
+	bool search_trie(const VarArray& _vars, TrieObj** obj_list, int depth)
   {
 	  VarArray& vars = const_cast<VarArray&>(_vars);
 	if(depth == arity)
