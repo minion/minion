@@ -3,8 +3,8 @@ these may or may not be working or in use. The following is a list of defines
 you might see.
 
 
-Special Defines
----------------
+Special Defines used in the code - not to be redefined
+------------------------------------------------------
 
 NO_MAIN - In any executable using Minion, this flag must be turned on for
 		  the compilation of exactly one flags. It makes sure global variables
@@ -27,7 +27,11 @@ D_DATA    - statement removed in non-debug mode. Allows extra data to be stored
 		    in debug mode.
 FAIL_EXIT - this differs from exit() in that it causes a crash, which will
 			activate a debugger if present.
-		   
+		  
+
+Flags which can be turned on and off
+************************************
+
 Normally turned on
 ------------------
 
@@ -55,6 +59,15 @@ FUNCTIONPOINTER_TRIGGER - Avoids using virtual functions. Faster on some
 USE_SETJMP - Uses setjmp / longjmp when constraints fail. May be slightly
 			 faster in some cases but is generally slower.
 						  
+
+NO_SPECIALISATIONS - Remove specialised implementations of constraints.
+
+QUICK_COMPILE - Build all constraints with virtual rather than static calls.
+
+NO_DOUBLE_MEMORY_COPY - Allow the base of variables to be moved around rather
+						than statically allocated.
+
+SLOW_TRIGGERS		  - Don't attempt to compress the set of triggers.
 
 In the near future, one of the follow 3 will be blessed as "offical" and turned
 on.
