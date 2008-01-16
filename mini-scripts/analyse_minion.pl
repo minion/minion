@@ -52,8 +52,15 @@ for($arg=0;$arg < @ARGV; $arg++) {
                   $resbin = 0;
                   $res = "";
                   $timeout = "Completed";
-
                   $version = $field[3] ;
+                  @parsing_time = -1;
+                  @setup_time = -1;
+                  @first_node_time = -1;
+                  $solve_time = 0;
+                  $total_time = 0;
+                  @bytes_used = -1;
+                  @total_nodes = -1;
+                  @num_solutions = -1;
               } 
               if ($line =~ /^# Input filename/) 
               { $instance_fullname =  $field[3] ; 
