@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ver=`svn info | grep Revision | cut -b11-`
 date=`svn info | grep "Last Changed Date" | cut -b20-`
 if [ "X$ver" == "X" ]; then
