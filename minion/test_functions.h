@@ -58,6 +58,7 @@ string get_dom_as_string(vector<T>& vec)
   return output;
 }
 
+// Count number of literals present in an array of variables.
 template<typename Vars>
 long long lit_count(Vars& v)
 {
