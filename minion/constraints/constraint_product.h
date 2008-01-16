@@ -156,7 +156,7 @@ ProductCon(const vector<BoolVarRef>& vars, const vector<BoolVarRef>& var2)
 {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
-  return AndCon(vars[0], vars[1], vars[0]);
+  return AndCon(vars[0], vars[1], var2[0]);
 }
 
 template<typename VarRef1, typename VarRef2>
