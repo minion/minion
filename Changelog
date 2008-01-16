@@ -1,3 +1,8 @@
+15/10/2006 - Chris
+	* I should probably be writing my Phd :)
+	* Fixed 0/1 product constraint. We still don't get any decent level
+	  of propagation on non-0/1 product constraints. Anyone want to try?
+
 14/10/2006 - Chris
 	* There was a bug with reading large number ( > 65000 ). Fixed that, at the
 	  same time sped up parsing numbers.
