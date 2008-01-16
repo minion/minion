@@ -131,10 +131,10 @@ struct BooleanContainer
   { 
     D_ASSERT(!lock_m);
     lock_m = true;
-    // The "+sizeof(data_type)" is because I can't be bothered to think about endian issues.
-	// It's only a single int overhead, so I won't worry.
-    assign_offset.request_bytes((var_count_m) + sizeof(data_type));
-    values_mem.request_bytes((var_count_m) + sizeof(data_type));
+	int required_mem = var_count_m / 8 + 1;
+	required_mem += (required_mem % sizeof(data_type));
+    assign_offset.request_bytes(required_mem);
+    values_mem.request_bytes(required_mem);
 	// Min domain value = 0, max domain val = 1.
     trigger_list.lock(var_count_m, 0, 1);
   }
