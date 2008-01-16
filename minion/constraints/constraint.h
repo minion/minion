@@ -46,17 +46,18 @@ struct Constraint
   /** This function shouldn't do any propagation. That is full_propagate's job.*/
   virtual triggerCollection setup_internal() = 0;
 
+  
   // In function_defs.hpp
-  virtual Constraint* get_table_constraint();
+  //virtual Constraint* get_table_constraint();
 
   /// Performs a full round of propagation and sets up any data needs by propogate().
   /** This function can be called during search if the function is reified */
-  virtual void full_propogate()
-  { 
+  virtual void full_propogate() = 0;
+/*  { 
     Constraint* c(get_table_constraint());
     c->full_propogate(); 
 	delete c;
-  }
+  }*/
   
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */

@@ -27,5 +27,7 @@ inline void Trigger::full_propogate()
     constraint->full_propogate(); 
 }
 
+/*
 inline Constraint* Constraint::get_table_constraint()
 { return new TableConstraint<vector<AnyVarRef> >(this->get_vars(), this); }
+*/
