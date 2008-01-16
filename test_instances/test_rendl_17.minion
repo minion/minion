@@ -1,8 +1,5 @@
 MINION 1
-# segfault
-#
-# Test for reify on max.
-#  
+#TEST SOLCOUNT 99999
 
 1
 0

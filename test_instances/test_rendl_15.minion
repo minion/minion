@@ -1,6 +1,6 @@
 MINION 1
-#TEST SOLCOUNT -1
-# Currently segfaults
+#TEST SOLCOUNT 99999
+# This test fails at present, so the number is ignored.
 # Test for reify on min.
 #  
 

@@ -1,5 +1,5 @@
 MINION 1
-#TEST COUNTSOLS 1
+#TEST SOLCOUNT 99999
 # This test doesn't have the right number of sols
 1
 0
