@@ -173,7 +173,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	
 	BOOL found_new_support = false;
 	
-	int j;
+	int j = 0;
 	
 	for(int loop = 0 ; (!found_new_support) && loop < num_unwatched ; )
 	{
