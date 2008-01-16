@@ -61,7 +61,10 @@ FULLFLAGS=$(DEBUG_FLAGS) $(FLAGS) $(CPU) $(WATCHED) $(QUICK_COMPILE) $(MORE_INFO
 
 OBJFILES=$(patsubst minion/%.cpp,$(OBJDIR)/%.o,$(SRC))
 
-all: minion generate
+all: svn_version minion generate
+
+svn_version:
+	./get_svn_version.sh minion/svn_header.h
 
 $(OBJDIR)/%.o: minion/%.cpp
 	$(CXX) $(FULLFLAGS) -c -o $@ $<

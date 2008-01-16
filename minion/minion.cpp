@@ -26,6 +26,8 @@ using namespace ProbSpec;
 #include "BuildConstraint.h"
 #include "MinionInputReader.h"
 
+#include "svn_header.h"
+
 void print_info()
 {
  cout << "Usage: minion {options}* nameofprob.minion" << endl
@@ -76,7 +78,7 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
     string command(argv[i]);
 	if(command == string("-findallsols"))
 	{ Controller::find_all_solutions(); }
-	else if(command = string("-sdf"))
+	else if(command == string("-sdf"))
 	{ Controller::use_sdf = true; }
 	else if(command == string("-quiet"))
 	{ reader.parser_verbose = false; }
@@ -229,6 +231,8 @@ int main(int argc, char** argv) {
  
   
   cout << "# " << VERSION << endl ;
+  cout << "# Svn version: " << SVN_VER << endl;
+  cout << "# Svn last changed date: " << SVN_DATE << endl;
 	// << REVISION << endl  // Sadly only gives revision number of minion.h
 	
   time_t rawtime;

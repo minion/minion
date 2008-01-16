@@ -47,12 +47,6 @@
 	  return pos == v_size;
 	}
 		
-	BOOL cur_var_not_assigned()
-	{ return !var_order[pos].isAssigned(); }
-	
-	BOOL all_assigned()
-	{ return pos == var_order.size(); }
-	
 	BOOL finished_search()
 	{ return branches.size() == 0; }
 	
@@ -82,7 +76,7 @@
   };
 
 
-  bool is_boolean(const AnyVarRef& var)
+  inline bool is_boolean(const AnyVarRef& var)
   { return (var.getInitialMax() - var.getInitialMin()) == 1; } 
 
   struct SDFVariableOrder
@@ -145,12 +139,6 @@
 	  return false;
 	}
 		
-	BOOL cur_var_not_assigned()
-	{ return !var_order[pos].isAssigned(); }
-	
-	BOOL all_assigned()
-	{ return pos == var_order.size(); }
-	
 	BOOL finished_search()
 	{ return branches.size() == 0; }
 	

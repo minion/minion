@@ -79,7 +79,7 @@ struct SwitchNeg
 	  return -data.getMax(); 
   }
   
-  int getInitialMax()
+  int getInitialMax() const
   { 
 	if(multiplier == 1)
 	  return data.getInitialMax();
@@ -87,7 +87,7 @@ struct SwitchNeg
 	  return -data.getInitialMin(); 
   }
   
-  int getInitialMin()
+  int getInitialMin() const
   { 
 	if(multiplier == 1)
 	  return data.getInitialMin();

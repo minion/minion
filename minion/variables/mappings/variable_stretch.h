@@ -140,7 +140,7 @@ struct MultiplyVar
 	  return data.getMax() * Multiply;  
   }
 
-  int getInitialMax()
+  int getInitialMax() const
   {  
     if(Multiply >= 0)
       return data.getInitialMax() * Multiply; 
@@ -148,7 +148,7 @@ struct MultiplyVar
 	  return data.getInitialMin() * Multiply;
   }
   
-  int getInitialMin()
+  int getInitialMin() const
   { 
     if(Multiply >= 0)
 	  return data.getInitialMin() * Multiply; 

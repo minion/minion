@@ -37,9 +37,10 @@ const int big_constant = 999999;
 template<int i>
 struct compiletime_val
 { 
-  int val() {return i; }
+  int val() const {return i; } 
+  
   template<int j>
-  compiletime_val<i+j> add()
+  compiletime_val<i+j> add() const
 { return compiletime_val<i+j>(); }
 };
 
@@ -51,10 +52,10 @@ struct runtime_val
   int i;
   runtime_val(int _i) : i(_i)
   {}
-  int val() { return i; }
+  int val() const { return i; }
   
   template<int j>
-    runtime_val add()
+    runtime_val add() const
   { return runtime_val(i+j); }
 };
 

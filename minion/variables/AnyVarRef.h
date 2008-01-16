@@ -36,8 +36,8 @@ struct AnyVarRef_Abstract
   virtual BOOL inDomain_noBoundCheck(int b) = 0;
   virtual int getMax() = 0;
   virtual int getMin() = 0;
-  virtual int getInitialMax() = 0;
-  virtual int getInitialMin() = 0;
+  virtual int getInitialMax() const = 0;
+  virtual int getInitialMin() const = 0;
   virtual void setMax(int i) = 0;
   virtual void setMin(int i) = 0;
   virtual void uncheckedAssign(int b) = 0;
@@ -95,10 +95,10 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   virtual int getMin()
   { return data.getMin(); }
 
-  virtual int getInitialMax()
+  virtual int getInitialMax() const
   { return data.getInitialMax(); }
   
-  virtual int getInitialMin()
+  virtual int getInitialMin() const
   { return data.getInitialMin(); }
   
   virtual void setMax(int i)
@@ -178,10 +178,10 @@ struct AnyVarRef
   int getMin()
   { return data->getMin(); }
 
-  int getInitialMax()
+  int getInitialMax() const
   { return data->getInitialMax(); }
   
-  int getInitialMin()
+  int getInitialMin() const
   { return data->getInitialMin(); }
   
   void setMax(int i)

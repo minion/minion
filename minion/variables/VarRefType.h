@@ -74,10 +74,10 @@ struct VarRefType
   int getMin()
   { return GetContainer::con().getMin(data); }
 
-  int getInitialMax()
+  int getInitialMax() const
   { return GetContainer::con().getInitialMax(data); }
   
-  int getInitialMin()
+  int getInitialMin() const
   { return GetContainer::con().getInitialMin(data); }
   
   void setMax(int i)
@@ -154,10 +154,10 @@ struct QuickVarRefType
   int getMin()
   { return data.getMin(); }
 
-  int getInitialMax()
+  int getInitialMax() const
   { return data.getInitialMax(); }
   
-  int getInitialMin()
+  int getInitialMin() const
   { return data.getInitialMin(); }
   
   void setMax(int i)
@@ -224,10 +224,10 @@ struct CompleteVarRefType
   int getMin()
   { return (data.getCon()).getMin(data); }
 
-  int getInitialMax()
+  int getInitialMax() const
   { return (data.getCon()).getInitialMax(data); }
   
-  int getInitialMin()
+  int getInitialMin() const
   { return (data.getCon()).getInitialMin(data); }
   
   void setMax(int i)

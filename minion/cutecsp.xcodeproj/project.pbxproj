@@ -32,7 +32,7 @@
 		2616D2900995430000644F18 /* test_weightedsum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_weightedsum.cpp; path = tests/test_weightedsum.cpp; sourceTree = "<group>"; };
 		2618160B097FA1F500E04FBD /* constraint_lex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_lex.h; path = constraints/constraint_lex.h; sourceTree = "<group>"; };
 		26181684097FE5D900E04FBD /* test05_lex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test05_lex.cpp; path = tests/test05_lex.cpp; sourceTree = "<group>"; };
-		261C44E2099A0B4A00FFBDCA /* Minion */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Minion; sourceTree = BUILT_PRODUCTS_DIR; };
+		261C44E2099A0B4A00FFBDCA /* Minion */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = Minion; sourceTree = BUILT_PRODUCTS_DIR; };
 		261E01FA09F7F57E004F8C91 /* tries.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tries.h; path = constraints/tries.h; sourceTree = "<group>"; };
 		2623020E0AB82F1200375F37 /* tuple_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tuple_container.h; sourceTree = "<group>"; };
 		2626D75609751DCD002AC405 /* intvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intvar.h; path = variables/containers/intvar.h; sourceTree = "<group>"; };
@@ -177,11 +177,11 @@
 			isa = PBXGroup;
 			children = (
 				26CFEBEC0AA64E5A00A35D56 /* VariableOrders.h */,
+				2644ACC70A1929F2002BD572 /* standard_search.h */,
 				26CD0D9D0A1B8665007D8889 /* test_functions.cpp */,
 				26CD0D5C0A1B810E007D8889 /* standard_queue.h */,
 				2644ACE40A192B90002BD572 /* minion.cpp */,
 				266E8D4D0AAB13EB0066DA57 /* time_keeping.h */,
-				2644ACC70A1929F2002BD572 /* standard_search.h */,
 				265557720A5B280000B9A732 /* linked_ptr.h */,
 				265557730A5B280000B9A732 /* local_array.h */,
 				264C604D09F029DD00000D7F /* BuildConstraintConstructs.h */,

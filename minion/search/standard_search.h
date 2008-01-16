@@ -200,7 +200,6 @@ namespace Controller
 		}
 		else
 		{
-		  D_ASSERT(order.cur_var_not_assigned());
 #ifdef MORE_SEARCH_INFO
 		  if(commandlineoption_dumptree)
 			cout << "Node: " << nodes << "," << get_dom_as_string(v) << endl;

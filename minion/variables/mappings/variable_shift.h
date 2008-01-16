@@ -66,10 +66,10 @@ struct ShiftVar
   int getMin()
   { return data.getMin() + shift.val(); }
 
-  int getInitialMax()
+  int getInitialMax() const
   { return data.getInitialMax() + shift.val(); }
   
-  int getInitialMin()
+  int getInitialMin() const
   { return data.getInitialMin() + shift.val(); }
   
   void setMax(int i)

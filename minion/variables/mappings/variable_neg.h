@@ -67,10 +67,10 @@ struct VarNeg
   int getMin()
   { return -(int)data.getMax(); }
 
-  int getInitialMax()
+  int getInitialMax() const
   { return -(int)data.getInitialMin(); }
   
-  int getInitialMin()
+  int getInitialMin() const
   { return -data.getInitialMax(); }
   
   void setMax(int i)

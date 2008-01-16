@@ -28,6 +28,8 @@
 #ifndef MINION_H
 #define MINION_H
 
+#include "svn_header.h"
+
 #include "system.h"
 
 #include "system/time_keeping.h"

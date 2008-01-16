@@ -54,7 +54,7 @@ struct VarNot
   // There is a good reason this is like this. It is because the 'neg' of an BOOL var
   // might be used in arithmetic. This is an extension to all of the integers which
   // swaps 0 and 1.
-  int swap(int i)
+  int swap(int i) const
   { return -i+1; }
 
   BOOL isAssigned()
@@ -81,10 +81,10 @@ struct VarNot
   int getMin()
   { return swap(data.getMax()); }
 
-  int getInitialMax()
+  int getInitialMax() const
   { return swap(data.getInitialMin()); }
   
-  int getInitialMin()
+  int getInitialMin() const
   { return swap(data.getInitialMax()); }
   
   void setMax(int i)
