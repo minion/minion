@@ -61,8 +61,11 @@ struct Constraint
   
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
+#ifdef FUNCTIONPOINTER_TRIGGER
+  PROPAGATE_FUNCTION(int, DomainDelta) {}
+#else
   PROPAGATE_FUNCTION(int, DomainDelta) = 0;
-
+#endif
   // Returns a table constraint which implements this constraint
   /** The main reason for this function is to make the constraint package up all its variables */
   virtual vector<AnyVarRef> get_vars() = 0;  

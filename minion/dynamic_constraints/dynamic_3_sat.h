@@ -28,7 +28,7 @@
 
 // VarToCount = 1 means leq, = 0 means geq.
 template<typename VarArray>
-struct BoolSATConstraintDynamic : public DynamicConstraint
+struct BoolThreeSATConstraintDynamic : public DynamicConstraint
 {
   virtual string constraint_name()
   { return "BoolSATDynamic"; }
@@ -37,24 +37,22 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
   
   VarArray var_array;
 
-  int last;
-  
-  BoolSATConstraintDynamic(const VarArray& _var_array) :
+  BoolThreeSATConstraintDynamic(const VarArray& _var_array) :
 	var_array(_var_array)
   { 
+	D_ASSERT(var_array.size() == 3);
 #ifndef WATCHEDLITERALS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
   }
   
   int dynamic_trigger_count()
-  {
-	last = 0;
-	
+  {	
 	D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BOOLSATConstraintDynamic");
 	return 2;
   }
-    
+  
+  // Not specialised for 3 sat
   virtual void full_propogate()
   {
 	DynamicTrigger* dt = dynamic_trigger_start();
@@ -97,7 +95,19 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 	
 	return;
   }
-    
+  
+  /// Finds the value out of 0,1 and 2 which is not a or b.
+  inline int other_val(int a, int b)
+  {
+	if(a != 0 && b != 0)
+	  return 0;
+  
+	if(a != 1 && b != 1)
+	  return 1;
+	
+	return 2;
+  }
+  
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
 	int propval = dt->trigger_info();
@@ -111,47 +121,19 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 	else
 	  other_propval = base_dt->trigger_info();
 	
-	if(var_array[other_propval].isAssignedValue(1))
-	  return;
 	
     D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
 
-	bool found_new_support = false;
-
-	int loop = last;
+	int unchecked_val = other_val(propval, other_propval);
 	
-	while(loop < var_size && !found_new_support)
+	if(var_array[unchecked_val].inDomain(1))
 	{
-	  if(loop != other_propval && var_array[loop].inDomain(1))
-	    found_new_support = true;
-	  else
-		++loop;
+	  // Found new value to watch
+	  dt->trigger_info() = unchecked_val;
+	  var_array[unchecked_val].addDynamicTrigger(dt, UpperBound);
 	}
-	
-	
-	if(!found_new_support)
-	{
-	  loop = 0;
-	  
-	  while(loop < last && !found_new_support)
-	  {
-		if(loop != other_propval && var_array[loop].inDomain(1))
-		  found_new_support = true;
-		else
-		  ++loop;
-	  }
-	
-	  if(!found_new_support)
-	  {  // Have to propagate!
-        var_array[other_propval].propogateAssign(1);
-	    return;
-	  }
-	}
-	
-	// Found new value to watch
-	dt->trigger_info() = loop;
-	last = loop;
-	var_array[loop].addDynamicTrigger(dt, UpperBound);
+	else
+	{ var_array[other_propval].propogateAssign(1); }
   }
   
   virtual BOOL check_assignment(vector<int> v)
@@ -176,5 +158,5 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 
 template<typename VarArray>
 DynamicConstraint*
-BoolSATConDynamic(const VarArray& _var_array)
-{ return new BoolSATConstraintDynamic<VarArray>(_var_array); }
+BoolThreeSATConDynamic(const VarArray& _var_array)
+{ return new BoolThreeSATConstraintDynamic<VarArray>(_var_array); }

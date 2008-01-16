@@ -30,6 +30,7 @@
 		2616CED00994EB5C00644F18 /* test_boolvar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_boolvar.cpp; path = tests/test_boolvar.cpp; sourceTree = "<group>"; };
 		2616D09E09950EA200644F18 /* constraint_weightedboolsum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_weightedboolsum.h; path = constraints/constraint_weightedboolsum.h; sourceTree = "<group>"; };
 		2616D2900995430000644F18 /* test_weightedsum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_weightedsum.cpp; path = tests/test_weightedsum.cpp; sourceTree = "<group>"; };
+		26177F7E0B0669EC00C946CF /* dynamic_3_sat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dynamic_3_sat.h; path = dynamic_constraints/dynamic_3_sat.h; sourceTree = "<group>"; };
 		2618160B097FA1F500E04FBD /* constraint_lex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_lex.h; path = constraints/constraint_lex.h; sourceTree = "<group>"; };
 		26181684097FE5D900E04FBD /* test05_lex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test05_lex.cpp; path = tests/test05_lex.cpp; sourceTree = "<group>"; };
 		261C44E2099A0B4A00FFBDCA /* Minion */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = Minion; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -225,6 +226,7 @@
 				26B4A05609F42A1D00C7E8A2 /* dynamic_element.h */,
 				2689210909DBB5C500D0472B /* dynamic_sum.h */,
 				264EB89D0AFFD11D0018A3BD /* dynamic_sum_sat.h */,
+				26177F7E0B0669EC00C946CF /* dynamic_3_sat.h */,
 				264EB9080B0095750018A3BD /* dynamic_binary_sat.h */,
 				261E01FA09F7F57E004F8C91 /* tries.h */,
 				266E8DE60AAB3C530066DA57 /* constraint_GACtable_nightingale.h */,

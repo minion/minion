@@ -362,6 +362,7 @@ BoolGreaterEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
 
 #include "dynamic_sum_sat.h"
 #include "dynamic_binary_sat.h"
+#include "dynamic_3_sat.h"
 
 inline DynamicConstraint*
 BuildCT_WATCHED_LEQSUM(const vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
@@ -394,15 +395,31 @@ BuildCT_WATCHED_GEQSUM(const vector<BoolVarRef>& t1, BOOL reify, const BoolVarRe
   else 
   {
 	int sum = b.vars[1][0].pos;
+#ifndef SATSPECIAL1
 	if(sum == 1)
 	{
+#ifndef SATSPECIAL2
 	  if(t1.size() == 2)
+	  {
 		return BoolBinarySATConDynamic(t1);
+	  }
+#ifndef SATSPECIAL3
+	  else if(t1.size() == 3)
+	  {
+		return BoolThreeSATConDynamic(t1);
+	  }
+#endif
 	  else
+#endif
+	  {
 	    return BoolSATConDynamic(t1);
+	  }
 	}
 	else
+#endif
+	{
 	  return BoolGreaterEqualSumConDynamic(t1, runtime_val(sum)); 
+	}
   }
 }
 
