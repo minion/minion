@@ -40,7 +40,7 @@ struct BoolBinarySATConstraintDynamic : public DynamicConstraint
   
   BoolBinarySATConstraintDynamic(const VarArray& _var_array) :
 	var1(_var_array[0]), var2(_var_array[1])
-  { D_ASSERT(var_array.size() == 2); }
+  { D_ASSERT(_var_array.size() == 2); }
   
   int dynamic_trigger_count()
   {

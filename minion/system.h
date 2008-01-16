@@ -31,6 +31,16 @@
 #define USE_HASHTABLE
 #endif
 
+// On linux systems, _longjmp and _setjmp are faster versions that ignore
+// system signals, which Minion doesn't use.
+#ifdef __GNUC__
+#define LONGJMP _longjmp
+#define SETJMP  _setjmp
+#else
+#define LONGJMP longjmp
+#define SETJMP  setjmp
+#endif
+
 // Stupid visual C++ needs a little hacking
 #ifdef _MSC_VER
 // We don't want no stupid safe library warnings

@@ -1,5 +1,5 @@
 MINION 1
-#TEST SOLCOUNT 15
+#TEST SOLCOUNT 31
 #
 #test of watched sum propagator
 

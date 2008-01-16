@@ -47,7 +47,7 @@ namespace Controller
   { 
     D_INFO(1,DI_SOLVER,"Failed!");
 #ifdef USE_SETJMP
-   _longjmp(g_env,1);
+   LONGJMP(g_env,1);
 #else
     failed = true;
 #endif

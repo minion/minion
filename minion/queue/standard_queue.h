@@ -151,7 +151,7 @@ namespace Controller
   {
     D_INFO(2, DI_QUEUE, "Starting Propogation");
 #ifdef USE_SETJMP
-    int setjmp_return = _setjmp(g_env);
+    int setjmp_return = SETJMP(g_env);
 	if(setjmp_return != 0)
 	{ // Failure has occured
 	  D_ASSERT(!Controller::failed);
