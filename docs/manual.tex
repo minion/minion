@@ -463,10 +463,12 @@ equal to a another vector (\texttt{vector2}), using watched literals:\\
               & ineq($<$var$>$, $<$var$>$, $<$const$>$) $|$\\
               & $<$lexConstraint$>$ ($<$varVectorExpression$>$, $<$varVectorExpression$>$) $|$\\
               & $<$MinOrMaxConstraint$>$ ($<$varVectorExpression$>$, $<$var$>$) $|$\\
-              & occurrence($<$varVectorExpression$>$, $<$const$>$, $<$var$>$) $|$\\
+              & occurrence($<$varVectorExpression$>$, $<$const$>$, $<$const$>$) $|$\\ 
+                       % used to be occurrence(varVectorexpression, const, var) but is different in source-code
               & product($<$varVectorExpression$>$, $<$var$>$) $|$\\
               & product($<$varVectorExpression$>$, $<$literalConstVector$>$, $<$var$>$) $|$\\
-              & sum($<$varVectorExpression$>$, $<$var$>$)
+              & sum($<$varVectorExpression$>$, $<$var$>$) $|$ \\
+              & $<$weightedsum$>$($<$varVectorExpression$>$, $<$constVectorExpression$>$, $<$var$>$)  
 \end{tabular}
 
 \noindent
@@ -492,13 +494,13 @@ equal to a another vector (\texttt{vector2}), using watched literals:\\
 The following \textbf{bugs} are known to {\sc MINION}.
 \begin{enumerate}
 
-\item \textbf{Reification using \texttt{reifyimply}} \\
-There are problems with the reification of the constraints: 
-allDifferent, diseq
+%\item \textbf{Reification using \texttt{reifyimply}} \\
+%There are problems with the reification of the constraints: 
+%allDifferent, diseq, occurence, weightedsumleq, weightedsumgeq, sumleq, sumgeq
 
 \item \textbf{Reification using \texttt{reify}} \\
  There are problems with the reification of the constraints: 
-element, gacelement, max, min, diseq, ineq, product
+diseq, element, gacelement, ineq, max, min, occurence, product
 
 \end{enumerate}
 
