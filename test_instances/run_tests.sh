@@ -44,7 +44,7 @@ for i in *.minion; do
     testnumsols=`grep "#TEST SOLCOUNT" $i  | awk '{print $3}' | tr -d '\015' `
 	if [[ "$numsols" != "$testnumsols" ]]; then
 	  testpass=0
-	  errormess="Got '${testnumsols}' instead of '{$numsols}' solutions in $i"
+	  errormess="Got '${numsols}' instead of '${testnumsols}' solutions in $i"
 	else
 	  testpass=1
 	fi
