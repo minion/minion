@@ -1,3 +1,11 @@
+/* Minion Constraint Solver
+   http://minion.sourceforge.net
+   
+   For Licence Information see file LICENSE.txt 
+
+   $Id$
+*/
+
 #include "BuildStart.h"
 DynamicConstraint* build_dynamic_constraint(ConstraintBlob& b) {
 switch(b.constraint.type) {

@@ -1,3 +1,11 @@
+/* Minion Constraint Solver
+   http://minion.sourceforge.net
+   
+   For Licence Information see file LICENSE.txt 
+
+   $Id$
+*/
+
 // class template array -*- C++ -*-
 
 // Copyright (C) 2004 Free Software Foundation, Inc.

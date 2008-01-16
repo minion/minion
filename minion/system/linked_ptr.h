@@ -1,3 +1,11 @@
+/* Minion Constraint Solver
+   http://minion.sourceforge.net
+   
+   For Licence Information see file LICENSE.txt 
+
+   $Id$
+*/
+
 /*
  * linked_ptr - simple reference linked pointer
  * (like reference counting, just using a linked list of the references

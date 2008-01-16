@@ -1,3 +1,11 @@
+/* Minion Constraint Solver
+   http://minion.sourceforge.net
+   
+   For Licence Information see file LICENSE.txt 
+
+   $Id$
+*/
+
 
 /*
  Chris, note there is a bit where I comment out how I really want to propagate instead
