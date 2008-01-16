@@ -1,6 +1,7 @@
 #!/bin/bash
 j=0
 for i in *.minion; do
+echo -n .
 j=$(($j + 1))
 if grep "#FAIL" $i > /dev/null;
 then
@@ -17,6 +18,7 @@ else
   fi
 fi
 done
+echo
 echo $pass of $j tests successful.
 echo Doing randomised tests.
 j=0
@@ -41,5 +43,6 @@ for i in `grep -l "#TEST NOSOLS\|#TEST SOLCOUNT" *.minion`; do
     fi
   echo -n .
 done
+echo
 echo $pass of $j randomised tests successful.
 rm test_output
