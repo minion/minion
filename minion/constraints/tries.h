@@ -305,6 +305,11 @@ struct TupleTrieArray {
 	  
 	  // create	one trie for each element of scope.
 	  tupleTries = (TupleTrie*) malloc(sizeof(TupleTrie) * arity);
+	  if(!tupleTries)
+	  {
+		cerr << "Out of memory in TupleTrie construction" << endl;
+		FAIL_EXIT();
+	  }
 	  for (unsigned varIndex = 0; varIndex < arity; varIndex++)
 		new (tupleTries + varIndex) TupleTrie(varIndex, tuplelist);
   }

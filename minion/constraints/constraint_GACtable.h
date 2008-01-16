@@ -25,6 +25,7 @@
 */
 
 
+
 template<typename VarArray>
 struct GACTableConstraint : public DynamicConstraint
 {
@@ -33,6 +34,46 @@ struct GACTableConstraint : public DynamicConstraint
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
+  
+#ifdef BINARY_SEARCH
+  int find_first_inconsistency(const vector<int>& v)
+  {
+	for(unsigned i = 0; i < v.size(); ++i)
+	{
+	  if(!vars[i].inDomain(v[i]))
+		return i;
+	}
+	return -1;
+  }
+  
+  void setFirstValid(vector<int>& support)
+  {
+	for(int i = 0; i < support.size(); ++i)
+	  support[i] = vars[i].getMin();
+  }
+  
+  int setNextValid(vector<int>& support, int var_considered, int first_broken_val)
+  {
+	for(int i = first_broken_val; i >= 0; --i)
+	{
+	  if(i != var_considered)
+	  {
+		int pos = support[i];
+		pos++;
+		if(pos > vars[i].getMax())
+		  support[i] = vars[i].getMin();
+		else
+		{
+		  while(!vars[i].inDomain(pos))
+			pos++;
+		  support[i] = pos;
+		  return i;
+		}
+	  }
+	}
+	return -1;
+  }
+#endif
   
   LiteralSpecificLists* lists;
   
@@ -51,7 +92,7 @@ struct GACTableConstraint : public DynamicConstraint
   { return (lists->literal_specific_tuples)[i][current_support()[i]]; }
   
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
-  BOOL check_tuple(const vector<int>& v)
+  bool check_tuple(const vector<int>& v)
   {
 	for(unsigned i = 0; i < v.size(); ++i)
 	{
@@ -72,12 +113,41 @@ struct GACTableConstraint : public DynamicConstraint
   int dynamic_trigger_count()
   { return (lists->tuples->literal_num) * ( vars.size() - 1) ; }
   
+
   
-  BOOL find_new_support(int literal)
+  bool find_new_support(int literal, int var)
   {
 	int support = current_support()[literal];
 	vector<vector<int> >& tuples = (lists->literal_specific_tuples)[literal];
 	int support_size = tuples.size();
+	
+	// These slightly nasty lines get us some nice raw pointers to the list of tuples.
+	vector<int>* start_position = &*(tuples.begin());
+	vector<int>* end_position = &*(tuples.begin()) + tuples.size();
+
+	
+#ifdef BINARY_SEARCH
+	vector<int> new_support_tuple(vars.size());
+	setFirstValid(new_support_tuple);
+	while(true)
+	{
+	  vector<int>* new_pos = upper_bound(start_position, end_position, new_support_tuple);
+	  if(new_pos == end_position)
+		return false;
+	  
+	  int problem_pos = find_first_inconsistency(*new_pos);
+	
+	  if(problem_pos == -1)
+	  { // Found new support.
+		current_support()[literal] = new_pos - start_position;
+		return true;
+	  }
+	  
+	  new_support_tuple = *new_pos;
+	  if(setNextValid(new_support_tuple, var, problem_pos) == -1)
+		return false;
+	}
+#else		 
 	for(int i = support; i < support_size; ++i)
 	{
 	  if(check_tuple(tuples[i]))
@@ -87,7 +157,7 @@ struct GACTableConstraint : public DynamicConstraint
 	  }
 	}
 	
-#ifdef WATCHEDLITERALS
+  #ifdef WATCHEDLITERALS
 	for(int i = 0; i < support; ++i)
 	{
 	  if(check_tuple(tuples[i]))
@@ -96,10 +166,11 @@ struct GACTableConstraint : public DynamicConstraint
 		return true;
 	  }
 	}
-#endif
+  #endif
 	return false;
+#endif
   }
-  
+
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propogated_trig)
   {
 	PROP_INFO_ADDONE(DynGACTable);
@@ -108,9 +179,9 @@ struct GACTableConstraint : public DynamicConstraint
 	DynamicTrigger* dt = dynamic_trigger_start();
 	int trigger_pos = propogated_trig - dt;
 	int propogated_literal = trigger_pos / (vars.size() - 1);
-	
-	BOOL is_new_support = find_new_support(propogated_literal);
+
 	pair<int,int> varval = (lists->tuples->get_varval_from_literal)(propogated_literal);
+	BOOL is_new_support = find_new_support(propogated_literal, varval.first);
 	if(is_new_support)
 	{
 	  D_INFO(1, DI_TABLECON, "Found new support!");
@@ -168,7 +239,7 @@ struct GACTableConstraint : public DynamicConstraint
 		else
 		{
 		  current_support()[literal] = 0;
-		  BOOL is_new_support = find_new_support(literal);
+		  BOOL is_new_support = find_new_support(literal, i);
 		  
 		  if(!is_new_support)
 		  {

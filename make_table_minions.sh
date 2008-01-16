@@ -18,3 +18,8 @@ find bin/* | grep TABLE | xargs rm
 make minion MYFLAGS="-DREGINLHOMME" -j 2 $*
 cp bin/minion* bin/min-regin
 rm bin/minion*
+find bin/* | grep TABLE | xargs rm
+make minion MYFLAGS="-DBINARY_SEARCH" -j 2 $*
+cp bin/minion* bin/min-lecoutre
+rm bin/minion*
+

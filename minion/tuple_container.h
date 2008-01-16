@@ -42,7 +42,7 @@ class TupleList
   int* tuple_data;
   int tuple_length;
   int number_of_tuples;
-  BOOL tuples_locked;
+  bool tuples_locked;
  
   
   public:
@@ -73,7 +73,7 @@ class TupleList
   }
   
   TupleList(const vector<vector<int> >& tuple_list) : litlists(NULL), 
-    nightingale(NULL) , tuples_locked(false)
+    nightingale(NULL), triearray(NULL), tuples_locked(false)
   {
     number_of_tuples = tuple_list.size();
 	tuple_length = tuple_list[0].size();
@@ -81,10 +81,11 @@ class TupleList
     for(int i = 0; i < number_of_tuples; ++i)
 	  for(int j = 0; j < tuple_length; ++j)
 	  { tuple_data[i * tuple_length + j] = tuple_list[i][j]; }
+	finalise_tuples();
   }
   
   TupleList(int _numtuples, int _tuplelength) : litlists(NULL),
-     nightingale(NULL), tuple_length(_tuplelength),
+     nightingale(NULL), triearray(NULL), tuple_length(_tuplelength),
     number_of_tuples(_numtuples),  tuples_locked(false)
   { tuple_data = new int[number_of_tuples * tuple_length]; }
   

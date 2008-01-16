@@ -615,6 +615,7 @@ void MinionInputReader::readTuples(InputFileReader* infile) {
 	  {
 	    tuple_ptr[i * tuple_length + j] = infile->read_num();
 	  }
+	tuplelist->finalise_tuples();
   }
 }
 

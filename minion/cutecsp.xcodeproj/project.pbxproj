@@ -201,6 +201,10 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */,
+				26E63C820B137198009C8B64 /* get_info.cpp */,
+				2644ACE40A192B90002BD572 /* minion.cpp */,
+				26131D1209CB1D1F00ACF137 /* BuildConstraint2.cpp */,
 				26CFEBEC0AA64E5A00A35D56 /* VariableOrders.h */,
 				2644ACC70A1929F2002BD572 /* standard_search.h */,
 				269206E70B2F26A10042AC2B /* common_search.h */,
@@ -212,14 +216,10 @@
 				26CD0D9D0A1B8665007D8889 /* test_functions.cpp */,
 				26E63C840B1371A5009C8B64 /* get_info.h */,
 				26E63C850B1371A5009C8B64 /* info_var_wrapper.h */,
-				26E63C820B137198009C8B64 /* get_info.cpp */,
-				2644ACE40A192B90002BD572 /* minion.cpp */,
 				266E8D4D0AAB13EB0066DA57 /* time_keeping.h */,
 				265557720A5B280000B9A732 /* linked_ptr.h */,
 				265557730A5B280000B9A732 /* local_array.h */,
 				264C604D09F029DD00000D7F /* BuildConstraintConstructs.h */,
-				26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */,
-				26131D1209CB1D1F00ACF137 /* BuildConstraint2.cpp */,
 				26CDE8F7099BF9C500C985F3 /* BuildConstraint.h */,
 				26A857BC099B6A6200ECA923 /* CSPSpec.h */,
 				26CA01FF0998C43C0064B996 /* MinionInputReader.h */,
