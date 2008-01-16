@@ -35,15 +35,16 @@
 \vfill
 {\large Ian P. Gent,\\
 Christopher A. Jefferson,\\
-Ian Miguel and\\
-Karen E. Petrie}
+Ian Miguel\\
+Karen E. Petrie and\\
+Andrea M. Rendl}
 \vfill
 {\Large {\sc Minion} Version 0.3.0}\\
 ~\\
 {\Large {\sc Minion} Input Language 1}
 %{\Large Manual Version 0.2}
 \vfill
-{\large 30 August 2006}
+{\large  6 October  2006}
 \vfill
 \end{center}
 
@@ -63,8 +64,64 @@ Karen E. Petrie}
 \pagestyle{headings}
 \pagenumbering{arabic}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Matrix Modelling in {\sc Minion}}\label{sect_matrix}
+\section{Overview}\label{sect_introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+This manual introduces {\sc Minion}, a general-purpose solver for CSP/COP instances. 
+It will cover installation issues (chapter ~\ref{sect_installation})  and give detailed information on how to model problems demonstrated by an example (chapter  ~\ref{sect_matrix}, ~\ref{sect_example}). The variable types and available
+constraints are presented in chapter ~\ref{sect_variables} and ~\ref{sect_constraints}, respectively. The BNF of the input language can be found in chapter ~\ref{sect_input}. Important notes (containing bugs) about the current version are given in chapter ~\ref{sect_notes} and updated on a regularly basis. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Obtaining and Installing {\sc Minion}}\label{sect_installation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{\sc Minion} can be obtained from:
+
+\begin{small}
+\begin{itemize}
+\item \texttt{http://sourceforge.net/projects/minion}
+\end{itemize}
+
+To compile {\sc minion}:
+
+\begin{verbatim}
+On Linux: Make sure g++ is installed, type "./build-all.sh"
+On Mac: Install the latest version of xcode, type "./build-all.sh"
+On Windows: Install cygwin with g++, type "./build-all.sh"
+\end{verbatim}
+{\bf Warning:} Compilation can take around 30 minutes. It requires g++
+version 3.2 or above (type \texttt{g++ -v} to
+check version). 
+
+In the {\tt bin} directory, there are two executables:
+
+\begin{description}
+\item[minion-debug] Debugging version. Does a range of extra consistency
+checks and can be run through a debugger.
+\item[minion] Optimised version.
+\end{description}
+
+Command-line arguments: the filename must appear last, but the other arguments may appear in any oder.   Behaviour if contradictory arguments are given (e.g. quiet and verbose) is not defined.
+When run with no arguments, a brief help message is displayed.
+
+\begin{itemize}
+\item\ [-findallsols].   Find all solutions and count them.   This option is ignored if the problem contains any minimising or maximising objective.
+\item\ [-timelimit] N. Stop after N seconds.
+\item\ [-sollimit] N. Stop after finding N solutions.
+\item\ [-nodelimit] N. Stop after N nodes are searched.
+\item\ [-quiet]. Switch off output from instance parser.  (Default depends on compile-time options).
+\item\ [-verbose]. Switch on output from instance parser.  (Default again depends on compile-time options.)
+\item\ [-printsols].   Print each solution when it is found, including each improved solution when optimising.  This is the default.
+\item\ [-noprintsols].   Do not print solutions.
+\item\ [-dumptree]. Output the search tree. If you want details on how to use this, or if you want more information, please ask.
+\item\ [-test].  A test option for checking and regression testing.   Example test instances which this can be run on are in the directory {\tt test\_instances}.   
+\item\ [-fullprop]. Disable incremental propagation. This should always slow down search while producing exactly the same search tree.
+\item\ filename.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Modelling in {\sc Minion}}\label{sect_matrix}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 {\sc Minion} is a general-purpose solver for CSP/COP {\em instances},
@@ -118,56 +175,9 @@ constraints on them.
 By focusing on matrix models {\sc Minion} is a lean, highly-optimised
 constraint programming solver.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Obtaining and Installing {\sc Minion}}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-{\sc Minion} can be obtained from:
-
-\begin{small}
-\begin{itemize}
-\item \texttt{http://sourceforge.net/projects/minion}
-\end{itemize}
-
-To compile {\sc minion}:
-
-\begin{verbatim}
-On Linux: Make sure g++ is installed, type "./build-all.sh"
-On Mac: Install the latest version of xcode, type "./build-all.sh"
-On Windows: Install cygwin with g++, type "./build-all.sh"
-\end{verbatim}
-{\bf Warning:} Compilation can take around 30 minutes. It requires g++
-version 3.2 or above (type \texttt{g++ -v} to
-check version). 
-
-In the {\tt bin} directory, there are two executables:
-
-\begin{description}
-\item[minion-debug] Debugging version. Does a range of extra consistency
-checks and can be run through a debugger.
-\item[minion] Optimised version.
-\end{description}
-
-Command-line arguments: the filename must appear last, but the other arguments may appear in any oder.   Behaviour if contradictory arguments are given (e.g. quiet and verbose) is not defined.
-When run with no arguments, a brief help message is displayed.
-
-\begin{itemize}
-\item\ [-findallsols].   Find all solutions and count them.   This option is ignored if the problem contains any minimising or maximising objective.
-\item\ [-timelimit] N. Stop after N seconds.
-\item\ [-sollimit] N. Stop after finding N solutions.
-\item\ [-nodelimit] N. Stop after N nodes are searched.
-\item\ [-quiet]. Switch off output from instance parser.  (Default depends on compile-time options).
-\item\ [-verbose]. Switch on output from instance parser.  (Default again depends on compile-time options.)
-\item\ [-printsols].   Print each solution when it is found, including each improved solution when optimising.  This is the default.
-\item\ [-noprintsols].   Do not print solutions.
-\item\ [-dumptree]. Output the search tree. If you want details on how to use this, or if you want more information, please ask.
-\item\ [-test].  A test option for checking and regression testing.   Example test instances which this can be run on are in the directory {\tt test\_instances}.   
-\item\ [-fullprop]. Disable incremental propagation. This should always slow down search while producing exactly the same search tree.
-\item\ filename.
-\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Variables}
+\section{Variables}\label{sect_variables}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 {\sc Minion} supports 5 variable types. These are: 
@@ -195,7 +205,7 @@ be put in the domain of these variables.
 Sub-dividing the variable types in this manner affords the greatest opportunity for optimisation. In general, we recommend thinking of the variable types as a hierarchy, where 1 (0/1 variables) is the most efficient type, and 5 (Discrete Sparse Variables) is the least. The user should use the variable which is the highest in the hierarchy, yet encompasses enough information to provide a full model for the problem they are attempting to solve.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Constraints}
+\section{Constraints}\label{sect_constraints}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 {\sc Minion} supports the following constraints. Note that it does NOT
 support nesting of constraints. In all cases, a variable may be
@@ -203,9 +213,34 @@ replaced with a constant. {\sc Minion} supports a variety of
 expressions on matrices (e.g. row, and column), and will automatically
 flatten matrices of higher arity. See BNF in next section for details.
 
+
+\subsection*{Reification}
+
+There are two different constraints imposing reification.
+
+\begin{description}
+\item \textbf{Reify} states that the assignment of a 0/1 variable
+is 1 iff the constraint is satisfied:\\
+\texttt{reify($\langle$constraint$\rangle$, $\langle$01var$\rangle$)}.
+
+\item \textbf{Guide} states that  the reified constraint is entailed if the 
+assignment to the 0/1 variable is 1. If otherwise, there will be no propagation done 
+on the constraint. Please note that in upcoming versions of Minion the guide-constraint will be known as 
+\texttt{guide}. %instead of \texttt{reifyimply}.
+\\
+\texttt{reifyimply($\langle$constraint$\rangle$, $\langle$01var$\rangle$)}.
+
+\end{description}
+
+
+\subsection*{Reifiable constraints}
+
+The following list presents constraints that are reifiable - mostly with
+ \texttt{reifyimply}.  
+
 \begin{description}
 \item[All-Different] states that all the variables in a matrix are
-assigned different variables:\\ 
+assigned different variables/values.\\ 
 \texttt{alldiff($\langle$matrix of
 variables$\rangle$)}.
 
@@ -220,6 +255,11 @@ another variable (\texttt{var2}):\\
 \item[Element] states that the variable at the index of the matrix
 specified by the assignment to \texttt{var1} is equal to the
 assignment of \texttt{var2}:\\ \texttt{element($\langle$matrix of
+variables$\rangle$, $\langle$var1$\rangle$, $\langle$var2$\rangle$)}.
+
+\item[GACelement] states that the variable at the index of the matrix
+specified by the assignment to \texttt{var1} is equal to the
+assignment of \texttt{var2} preserving GAC:\\ \texttt{element($\langle$matrix of
 variables$\rangle$, $\langle$var1$\rangle$, $\langle$var2$\rangle$)}.
 
 \item[$\mathbf{\leq}$] states that a variable (\texttt{var1}) is less
@@ -287,32 +327,59 @@ equal to the assignment of a single variable:\\
 \texttt{weightedsumgeq($\langle$matrix of variables$\rangle$,
 $\langle$matrix of constants$\rangle$, $\langle$variable$\rangle$)}.
 
-\item[Strong Reification] states that the assignment of a 0/1 variable
-is 1 iff the reified constraint is entailed:\\
-\texttt{reify($\langle$constraint$\rangle$, $\langle$01var$\rangle$)}.
 
-\item[Weak Reification] states that the assignment of a 0/1 variable
-is 1 if the reified constraint is entailed:\\
-\texttt{reifyimplies($\langle$constraint$\rangle$, $\langle$01var$\rangle$)}.
+\subsection*{Non-reifiable constraints}
+
+\item[MinusEq] states that a variable equals the negation of another variable.
+\\
+\texttt{minuseq($\langle$variable$\rangle$, $\langle$variable$\rangle$)}
+
+\item[Element (watched literals)] states that the variable at the index of the matrix
+specified by the assignment to \texttt{var1} is equal to the
+assignment of \texttt{var2} using watched literals:\\ 
+\texttt{watchelement($\langle$matrix of
+variables$\rangle$, $\langle$var1$\rangle$, $\langle$var2$\rangle$)}.
+
+\item[Sum $\mathbf{=}$ (watched literals)] states that the sum of the variables in a
+matrix is equal to the assignment of a single variable, using watched literals. \\
+\texttt{litsumeq($\langle$matrix of variables$\rangle$, $\langle$matrix of constants$\rangle$)}
+
+
+\item[Sum $\mathbf{\geq}$ (watched literals)] states that the sum of the variables in a
+matrix is greater than or equal to the assignment of a single
+variable, using watched literals:\\ \texttt{watchsumgeq($\langle$matrix of variables$\rangle$,
+$\langle$var$\rangle$)}.
+
+\item[Sum $\mathbf{\leq}$ (watched literals)] states that the sum of the variables in a
+matrix is less than or equal to the assignment of a single variable, using watched literals:\\
+\texttt{watchsumleq($\langle$matrix of variables$\rangle$,
+$\langle$var$\rangle$)}.
 
 \item[Table] allows the specification of an extensional constraint. The
 set of tuples should be given in strictly increasing lexicographic order:\\
 \texttt{table($\langle$matrix of variables$\rangle$, $\langle$tuples$\rangle$)}
 
+\item[Vector $ \mathbf{\neq}$ (watched literals)] states that a vector (\texttt{vector1}) is not
+equal to a another vector (\texttt{vector2}), using watched literals:\\
+\texttt{watchvecneq($\langle$vector1$\rangle$, $\langle$vector2$\rangle$)}.
+
+
 \end{description}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
-\section{Input format}
+\section{Input format}\label{sect_input}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-A formal outline of the input format for Input Format Version 1 is shown below.
+%A formal outline of the input format for Input Format Version 1 is shown below.
 
 \noindent
 \setlength{\tabcolsep}{0mm}
 \begin{tabular}{ll}
 \multicolumn{2}{l}{$<$MinionInput$>$ ::=} \\
-\hspace*{2mm} &MINION 1\\
+\hspace*{2mm} &MINION $<$versionnumber$>$ \\
               &$<$comments$>$\\
               &$<$noOf01Vars$>$\\
               &$<$noOfBoundsVars$>$ \{$<$lb$>$ $<$ub$>$ $<$number$>$\}\\
@@ -324,11 +391,30 @@ A formal outline of the input format for Input Format Version 1 is shown below.
               &$<$noOf1dMatrices$>$ \{$<$literalVar1dMatrix$>$\}\\
               &$<$noOf2dMatrices$>$ \{$<$literalVar2dMatrix$>$\}\\
               &$<$noOf3dMatrices$>$ \{$<$literalVar3dMatrix$>$\}\\
+              &tuplelists $<$tuplelistsExpression$>$ \\
               &objective $<$objectiveExpression$>$\\
               &print $<$printExpression$>$\\
               &\{$<$constraint$>$\}
 \end{tabular}
 \vspace*{1mm}
+
+\noindent
+\setlength{\tabcolsep}{0mm}
+\begin{tabular}{ll}
+\multicolumn{2}{l}{$<$tuplelistsExpression$>$ ::=}\\
+\hspace*{2mm} &   tuplelists $<$num\_of\_tuplelists$>$   \\
+\hspace*{2mm} &   $<$num\_tuples$>$ \ $<$tuplelength$>$\  $<$tuplevalues$> $ \ $<$tuplelist$>$ \\
+\end{tabular}
+\vspace*{1mm}
+
+\noindent
+\setlength{\tabcolsep}{0mm}
+\begin{tabular}{ll}
+\multicolumn{2}{l}{$<$tuplelist$>$ ::=}\\
+\hspace*{2mm} &   $<$num\_tuples$>$ \ $<$tuplelength$>$\  $<$tuplevalues$> $ \  $|$ \\
+\end{tabular}
+\vspace*{1mm}
+
 
 \noindent
 \setlength{\tabcolsep}{0mm}
@@ -351,10 +437,15 @@ A formal outline of the input format for Input Format Version 1 is shown below.
 \begin{tabular}{ll}
 \multicolumn{2}{l}{$<$constraint$>$ ::=}\\
 \hspace*{2mm} & $<$reifiableConstraint$>$ $|$\\
-              & allDiff($<$varVectorExpression$>$) $|$\\
-              & reify($<$reifiableConstraint$>$, $<$var$>$) $|$\\
+               & reify($<$reifiableConstraint$>$, $<$var$>$) $|$\\
               & reifyimplies($<$reifiableConstraint$>$, $<$var$>$) $|$\\
-              & table($<$varVectorExpression$>$, $<$tuples$>$)\\
+              & table($<$varVectorExpression$>$, $<$tuples$>$) $|$\\
+              & $<$watchSumConstraints$>$($<$varVectorExpression$>$, $<$varVectorExpression$>$) $|$\\
+              & watchelement($<$varVectorExpression$>$, $<$var$>$, $<$var$>$) $|$\\
+              & watchvecneq($<$varVectorExpression$>$, $<$varVectorExpression$>$) $|$\\
+              & minusequal ($<$var$>$, $<$var$>$) $|$\\
+             & litsumequal($<$varVectorExpression$>$, $<$literalConstVector$>$, $<$var$>$) \\
+             
 \end{tabular}
 \vspace*{1mm}
 
@@ -362,8 +453,10 @@ A formal outline of the input format for Input Format Version 1 is shown below.
 \setlength{\tabcolsep}{0mm}
 \begin{tabular}{ll}
 \multicolumn{2}{l}{$<$reifiableConstraint$>$ ::=}\\
-\hspace*{2mm} & $<$eqOrDiseqConstraint$>$ ($<$var$>$, $<$var$>$) $|$\\
+\hspace*{2mm}              & allDiff($<$varVectorExpression$>$) $|$\\
+             & $<$eqOrDiseqConstraint$>$ ($<$var$>$, $<$var$>$) $|$\\
               & element($<$varVectorExpression$>$, $<$var$>$, $<$var$>$) $|$\\
+              & gacelement($<$varVectorExpression$>$, $<$var$>$, $<$var$>$) $|$\\
               & ineq($<$var$>$, $<$var$>$, $<$const$>$) $|$\\
               & $<$lexConstraint$>$ ($<$varVectorExpression$>$, $<$varVectorExpression$>$) $|$\\
               & $<$MinOrMaxConstraint$>$ ($<$varVectorExpression$>$, $<$var$>$) $|$\\
@@ -383,7 +476,34 @@ A formal outline of the input format for Input Format Version 1 is shown below.
 \end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Example}
+\section{Important Notes and Bugs}\label{sect_notes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{Notes}
+
+\begin{description}
+  \item[Sparse discrete variables] are not implemented yet. 
+\end{description}
+
+\subsection*{Bugs}
+The following \textbf{bugs} are known to {\sc MINION}.
+\begin{enumerate}
+
+\item \textbf{Reification using \texttt{reifyimply}} \\
+There are problems with the reification of the constraints: 
+allDifferent, diseq
+
+\item \textbf{Reification using \texttt{reify}} \\
+ There are problems with the reification of the constraints: 
+element, gacelement, max, min, diseq, ineq, product
+
+\end{enumerate}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Example}\label{sect_example}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In Section~\ref{sect_matrix} we introduced, the $\langle 7, 7, 3, 3,
@@ -740,6 +860,8 @@ lexleq(col(m0, 5), col(m0, 6))
 \emph{these are symmetry breaking constraints - double lex}
 \end{small}
 
+
+
 \end{document}
 
 \section{Introduction}
@@ -766,6 +888,7 @@ exactly $r$ different blocks and every two distinct objects occur
 together in exactly $\lambda$ blocks. Despite its simplicity, the BIBD
 has important practical applications, such as cryptography and
 experimental design.
+
 
 
 

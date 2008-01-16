@@ -1,0 +1,23 @@
+MINION 1
+#TEST SOLCOUNT 8820
+
+1
+0
+0
+5
+2 5 1
+0 4 1
+1 7 1
+0 6 1
+0 8 1
+0
+[x1,x2,x3,x4,x5]
+[a,a,a,a,a]
+0
+1
+[[x0,x1,x2,x3,x4,x5]]
+0
+objective none
+print m0
+
+reifyimply(gacelement([x1,x2,x3],x4,x5),x0)
