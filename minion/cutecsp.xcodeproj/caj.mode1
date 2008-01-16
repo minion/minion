@@ -221,8 +221,6 @@
 			<key>Layout</key>
 			<array>
 				<dict>
-					<key>BecomeActive</key>
-					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -276,7 +274,7 @@
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 837}, {281, 716}}</string>
+							<string>{{0, 0}, {281, 716}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -295,7 +293,7 @@
 							<real>281</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>545 103 1148 775 0 0 1440 878 </string>
+						<string>868 103 1148 775 0 0 1440 878 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -332,7 +330,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {845, 0}}</string>
 								<key>RubberWindowFrame</key>
-								<string>545 103 1148 775 0 0 1440 878 </string>
+								<string>868 103 1148 775 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -340,6 +338,8 @@
 							<string>0pt</string>
 						</dict>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -352,7 +352,7 @@
 								<key>Frame</key>
 								<string>{{0, 5}, {845, 729}}</string>
 								<key>RubberWindowFrame</key>
-								<string>545 103 1148 775 0 0 1440 878 </string>
+								<string>868 103 1148 775 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -524,9 +524,10 @@
 	<key>WindowOrderList</key>
 	<array>
 		<string>1C530D57069F1CE1000CFCEE</string>
+		<string>/Users/caj/minion/trunk/minion/cutecsp.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>545 103 1148 775 0 0 1440 878 </string>
+	<string>868 103 1148 775 0 0 1440 878 </string>
 	<key>WindowTools</key>
 	<array>
 		<dict>
