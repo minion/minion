@@ -43,12 +43,23 @@
 
 
 /// A pointer to some backtrackable memory.
-struct BackTrackOffset
+class BackTrackOffset
 {
-  BackTrackOffset(const BackTrackOffset& b);
-  //void operator=(const BackTrackOffset& b);
   void* ptr;
-  void* get_ptr() const { return ptr; }
+public:
+  BackTrackOffset(const BackTrackOffset& b);
+
+  void set_ptr(void* new_ptr)
+  { 
+	D_ASSERT((size_t)(new_ptr) % sizeof(void*) == 0);
+	ptr = new_ptr;
+  }
+  
+  void* get_ptr() const 
+  { 
+	D_ASSERT((size_t)(ptr) % sizeof(void*) == 0);
+	return ptr;
+  }
   void request_bytes(int i);
   BackTrackOffset();
   ~BackTrackOffset();  
@@ -70,7 +81,6 @@ struct VirtualBackTrackOffset
 struct BacktrackableMemory
 {
   char* current_data;
-//  vector<char*> backtrack_data;
   char* backtrack_cache;
   unsigned backtrack_cache_size;
   unsigned backtrack_cache_offset;
@@ -87,10 +97,12 @@ struct BacktrackableMemory
   /// Get a block of backtrack memory
   BackTrackOffset get_bytes(unsigned byte_count)
   { 
+	D_ASSERT(byte_count % sizeof(void*) == 0);
     D_ASSERT(!lock_m);
     BackTrackOffset new_mem;
     // :(
     char* ptr = new char[byte_count];
+	D_ASSERT((size_t) ptr % sizeof(void*) == 0);
     std::fill(ptr, ptr + byte_count, 0);
     offset_positions[ptr] = make_pair(allocated_bytes, byte_count);
     new_mem.ptr = ptr;
@@ -171,18 +183,20 @@ struct BacktrackableMemory
     D_ASSERT(!final_lock_m);
     lock_m = true;
     current_data = new char[allocated_bytes];
+	D_ASSERT( (size_t)current_data % sizeof(void*) == 0);
     MAP_TYPE<void*, pair<int,int> > offset_positions_backup(offset_positions);
     // Code like this makes baby Jesus cry, but is suprisingly legal C++
     // The apparently equivalent "offsets[i]->ptr = (int)offset" isn't.
     for(set<BackTrackOffset*>::iterator it=offsets.begin();it!=offsets.end();++it)
     {
-      char* old_ptr = static_cast<char*>((*it)->ptr);
+      char* old_ptr = static_cast<char*>((*it)->get_ptr());
 	  if(old_ptr != NULL)
 	  {
         D_ASSERT(offset_positions.count(old_ptr) == 1);
-        (*it)->ptr = current_data + offset_positions[old_ptr].first;
+        (*it)->set_ptr(current_data + offset_positions[old_ptr].first);
+		D_ASSERT( (size_t)((*it)->get_ptr()) % sizeof(void*) == 0);
         copy(old_ptr, old_ptr + offset_positions[old_ptr].second,
-	     static_cast<char*>((*it)->ptr));
+	     static_cast<char*>((*it)->get_ptr()));
         delete[] old_ptr;
 	  }
       D_DATA(offset_positions.erase(old_ptr));

@@ -22,19 +22,23 @@ class ReversibleInt
 public:
   void set(int newval)
 {
+    D_ASSERT((size_t)(backtrack_ptr.get_ptr()) % sizeof(void*) == 0);
     int* int_ptr = (int*)(backtrack_ptr.get_ptr());
     *int_ptr = newval;
 }
 
   int get()
 {
-    D_ASSERT((size_t)(backtrack_ptr.get_ptr()) % 4 == 0);
+    D_ASSERT((size_t)(backtrack_ptr.get_ptr()) % sizeof(void*) == 0);
     int* int_ptr = (int*)(backtrack_ptr.get_ptr());
     return *int_ptr;
 };
 
 ReversibleInt()
-{ backtrack_ptr.request_bytes(sizeof(int)); }
+{ 
+   backtrack_ptr.request_bytes(sizeof(int));
+   D_ASSERT( (size_t)(backtrack_ptr.get_ptr()) % sizeof(void*) == 0);
+}
 
 };
 
