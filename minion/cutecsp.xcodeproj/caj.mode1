@@ -396,7 +396,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>26C0FF1F0AE51FEF005C6895</string>
+										<string>26C0FF230AE54090005C6895</string>
 										<key>history</key>
 										<array>
 											<string>26C0FF1D0AE51FEF005C6895</string>
@@ -610,6 +610,7 @@
 	<key>WindowOrderList</key>
 	<array>
 		<string>1C530D57069F1CE1000CFCEE</string>
+		<string>/Users/caj/minion/trunk/minion/cutecsp.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
 	<string>169 103 1148 775 0 0 1440 878 </string>
