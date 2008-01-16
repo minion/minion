@@ -52,9 +52,6 @@ struct ConcreteFileReader : public InputFileReader
     throw new parse_exception("Problem parsing number");
 	return i;
 	*/
-	char string_buffer[100];
-	char* bufptr = string_buffer;
-	//string s;
 	char next_char = infile.get();
 	while(isspace(next_char))
 	  next_char = infile.get();
