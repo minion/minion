@@ -259,6 +259,7 @@
 				26177F7E0B0669EC00C946CF /* dynamic_3_sat.h */,
 				264EB9080B0095750018A3BD /* dynamic_binary_sat.h */,
 				261E01FA09F7F57E004F8C91 /* tries.h */,
+				2623A3CB0B0E23C500E574BC /* constraint_GACtable_master.h */,
 				266E8DE60AAB3C530066DA57 /* constraint_GACtable_nightingale.h */,
 				266E8DE70AAB3C530066DA57 /* constraint_GACtable_reginlhomme.h */,
 				266E8DE80AAB3C530066DA57 /* constraint_GACtable_trie.h */,
@@ -271,7 +272,6 @@
 		26F697FC0986D78E00D3B93B /* constraints */ = {
 			isa = PBXGroup;
 			children = (
-				2623A3CB0B0E23C500E574BC /* constraint_GACtable_master.h */,
 				2623A3CC0B0E23C500E574BC /* constraint_pow.h */,
 				26FC06F409CB68D500153DA6 /* constraint_dynamic.h */,
 				26AAF876096D3BC300AD8C1A /* constraint.h */,

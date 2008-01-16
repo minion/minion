@@ -108,6 +108,8 @@ struct GACTableConstraint : public DynamicConstraint
   int get_val_from_literal(int literal) 
   { return _map_literal_to_val[literal]; }
   
+  TupleList* tupleList;
+  
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
   BOOL check_tuple(const vector<int>& v)
   {
@@ -154,15 +156,22 @@ struct GACTableConstraint : public DynamicConstraint
   int * upperboundtuple;
   
   
-  GACTableConstraint(const VarArray& _vars, const vector<vector<int> >& _tuples) :
+  GACTableConstraint(const VarArray& _vars, TupleList* _tuples) :
 	vars(_vars),
-    tuples(_tuples)
+    tupleList(_tuples)
   {
-	  arity = tuples[0].size();	  
+	  tupleList->finalise_tuples();
+	  arity = tupleList->tuple_size();
 	  D_ASSERT(_vars.size() == arity);
-	  noTuples=tuples.size();
+	  noTuples = tupleList->size();
       //current_support.resize(arity); 
       
+	  tuples.resize(tupleList->size());
+	  
+	  // Need a copy so we can sort it and such things.
+	  for(int i = 0; i < tupleList->size(); ++i)
+		tuples[i] = tupleList->get_vector(i);
+	  
       // sort, required for correctness.
       sort(tuples.begin(), tuples.end(), TupleComparator(0, arity));
       
@@ -583,6 +592,6 @@ struct GACTableConstraint : public DynamicConstraint
 
 template<typename VarArray>
 DynamicConstraint*
-GACTableCon(const VarArray& vars, const vector<vector<int> >& tuples)
+GACTableCon(const VarArray& vars, TupleList* tuples)
 { return new GACTableConstraint<VarArray>(vars, tuples); }
 

@@ -270,13 +270,13 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>64</integer>
-									<integer>53</integer>
+									<integer>72</integer>
+									<integer>61</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {281, 717}}</string>
+							<string>{{0, 1174}, {281, 717}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -295,7 +295,7 @@
 							<real>281</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>19 98 884 776 0 0 1440 878 </string>
+						<string>-5 102 884 776 0 0 1440 878 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -311,7 +311,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>tuple_container.h</string>
+								<string>constraint_GACtable_master.h</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -319,11 +319,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>tuple_container.h</string>
+										<string>constraint_GACtable_master.h</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>26FB01F80B63D1550062AD1B</string>
+										<string>26FB02910B63ED280062AD1B</string>
 										<key>history</key>
 										<array>
 											<string>26D30F260AE6BEA900E87DA8</string>
@@ -346,7 +346,6 @@
 											<string>2667A8720B0F0D11000F7215</string>
 											<string>26ABFB2C0B0FCA9B00599E67</string>
 											<string>26ABFB2D0B0FCA9B00599E67</string>
-											<string>26ABFB2F0B0FCA9B00599E67</string>
 											<string>26F3C3000B0FCAC400F416DF</string>
 											<string>267671010B105C4E0013A544</string>
 											<string>2658A3AE0B134E5700E68A76</string>
@@ -380,7 +379,11 @@
 											<string>269207C80B30523C0042AC2B</string>
 											<string>26B20E660B5A47CB00F55A1C</string>
 											<string>26F2BE5F0B5AA16E00F8A229</string>
-											<string>26F55CC40B5ED3280091E703</string>
+											<string>26FB024E0B63E8650062AD1B</string>
+											<string>26FB024F0B63E8650062AD1B</string>
+											<string>26FB02500B63E8650062AD1B</string>
+											<string>26FB02510B63E8650062AD1B</string>
+											<string>26ABFB2F0B0FCA9B00599E67</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -439,6 +442,10 @@
 											<string>269207070B2F2D9A0042AC2B</string>
 											<string>269207600B2F38350042AC2B</string>
 											<string>269207980B2F3AD10042AC2B</string>
+											<string>26FB02520B63E8650062AD1B</string>
+											<string>26FB02530B63E8650062AD1B</string>
+											<string>26FB02540B63E8650062AD1B</string>
+											<string>26FB02550B63E8650062AD1B</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -452,7 +459,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {581, 573}}</string>
 								<key>RubberWindowFrame</key>
-								<string>19 98 884 776 0 0 1440 878 </string>
+								<string>-5 102 884 776 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -472,7 +479,7 @@
 								<key>Frame</key>
 								<string>{{0, 578}, {581, 157}}</string>
 								<key>RubberWindowFrame</key>
-								<string>19 98 884 776 0 0 1440 878 </string>
+								<string>-5 102 884 776 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -647,7 +654,7 @@
 		<string>/Users/caj/minion/trunk/minion/cutecsp.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>19 98 884 776 0 0 1440 878 </string>
+	<string>-5 102 884 776 0 0 1440 878 </string>
 	<key>WindowTools</key>
 	<array>
 		<dict>
