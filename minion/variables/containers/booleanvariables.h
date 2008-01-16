@@ -65,7 +65,7 @@ struct BoolVarRef_internal
   int getAssignedValue() const
   {
     D_ASSERT(isAssigned());
-    return value_ptr() & shift_offset;
+    return (bool)(value_ptr() & shift_offset);
   }
   
   bool inDomain(int b) const
