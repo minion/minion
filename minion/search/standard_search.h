@@ -72,21 +72,6 @@ namespace Controller
 	  }
   }
   
-
-  template<typename VarOrder, typename VarArray>
-  inline void solve(VarOrder& order, VarArray& vars)
-  {
-	  solutions = 0;  
-	  nodes = 0;
-	  lock();
-	  print_timestep_without_reset("First node time: ");
-	  /// Failed initially propagating constraints!
-	  if(Controller::failed)
-		return;
-	  if(optimise)
-		current_optimise_position = optimise_var->getMin(); 
-	  solve_loop(order, vars);
-  }
 }
 
 

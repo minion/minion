@@ -77,6 +77,8 @@
 		266E8DE80AAB3C530066DA57 /* constraint_GACtable_trie.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = constraint_GACtable_trie.h; path = constraints/constraint_GACtable_trie.h; sourceTree = "<group>"; };
 		266F5EAA097C0AA200D9CC72 /* backtrackable_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = backtrackable_memory.h; path = memory_management/backtrackable_memory.h; sourceTree = "<group>"; };
 		2672CD0D0975702400A7C51D /* constraint_and.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_and.h; path = constraints/constraint_and.h; sourceTree = "<group>"; };
+		267889060B79D9D5007B2152 /* search_control.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = search_control.h; path = search/search_control.h; sourceTree = "<group>"; };
+		267889880B79EB6B007B2152 /* preprocess.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = preprocess.h; path = preprocess/preprocess.h; sourceTree = "<group>"; };
 		26790A870975DCC9006C6C00 /* reify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = reify.h; path = constraints/reify.h; sourceTree = "<group>"; };
 		26808AB709D5FD8B0025DA04 /* triggers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = triggers.h; path = constraints/triggers.h; sourceTree = "<group>"; };
 		26808B0B09D5FF820025DA04 /* function_defs.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = function_defs.hpp; path = constraints/function_defs.hpp; sourceTree = "<group>"; };
@@ -88,7 +90,6 @@
 		269206DC0B2F24A40042AC2B /* recursive_search.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = recursive_search.h; path = search/recursive_search.h; sourceTree = "<group>"; };
 		269206E70B2F26A10042AC2B /* common_search.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = common_search.h; path = search/common_search.h; sourceTree = "<group>"; };
 		269206E80B2F26C40042AC2B /* slow_queue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = slow_queue.h; path = queue/slow_queue.h; sourceTree = "<group>"; };
-		2692077F0B2F39390042AC2B /* sdf_search.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sdf_search.h; path = search/sdf_search.h; sourceTree = "<group>"; };
 		269DC8DA098451AA00F52AF2 /* trigger_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trigger_list.h; sourceTree = "<group>"; };
 		26A83EEF097A923F009DD39A /* VarRefType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VarRefType.h; path = variables/VarRefType.h; sourceTree = "<group>"; };
 		26A857BC099B6A6200ECA923 /* CSPSpec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSPSpec.h; sourceTree = "<group>"; };
@@ -132,6 +133,7 @@
 		26EF146D099807D500D13443 /* variable_not.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = variable_not.h; path = variables/mappings/variable_not.h; sourceTree = "<group>"; };
 		26F697350986C15200D3B93B /* intboundvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intboundvar.h; path = variables/containers/intboundvar.h; sourceTree = "<group>"; };
 		26F698170986D88000D3B93B /* sparse_intboundvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sparse_intboundvar.h; path = variables/containers/sparse_intboundvar.h; sourceTree = "<group>"; };
+		26F9065B0B793B340080F506 /* search_methods.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = search_methods.h; path = search/search_methods.h; sourceTree = "<group>"; };
 		26F9C71E09E703D000F2865A /* README */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		26FB01FF0B63D2230062AD1B /* build_helper.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = build_helper.h; path = build_constraints/build_helper.h; sourceTree = "<group>"; };
 		26FB02000B63D2230062AD1B /* BuildConstraintsStart.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BuildConstraintsStart.h; path = build_constraints/BuildConstraintsStart.h; sourceTree = "<group>"; };
@@ -201,6 +203,9 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				267889880B79EB6B007B2152 /* preprocess.h */,
+				26F9065B0B793B340080F506 /* search_methods.h */,
+				267889060B79D9D5007B2152 /* search_control.h */,
 				26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */,
 				26E63C820B137198009C8B64 /* get_info.cpp */,
 				2644ACE40A192B90002BD572 /* minion.cpp */,
@@ -210,7 +215,6 @@
 				269206E70B2F26A10042AC2B /* common_search.h */,
 				2640F4670B32DD050075FB8C /* to_string.h */,
 				269206DC0B2F24A40042AC2B /* recursive_search.h */,
-				2692077F0B2F39390042AC2B /* sdf_search.h */,
 				269206E80B2F26C40042AC2B /* slow_queue.h */,
 				26CD0D5C0A1B810E007D8889 /* standard_queue.h */,
 				26CD0D9D0A1B8665007D8889 /* test_functions.cpp */,

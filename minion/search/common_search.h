@@ -206,6 +206,18 @@ void maybe_print_search_state(string name, T& vars)
   #endif	
   }
 
+  void inline initalise_search()
+  {
+	solutions = 0;  
+	nodes = 0;
+	lock();
+	print_timestep_without_reset("First node time: ");
+	/// Failed initially propagating constraints!
+	if(Controller::failed)
+	  return;
+	if(optimise)
+	  current_optimise_position = optimise_var->getMin(); 
+  }
 }
 
 #endif

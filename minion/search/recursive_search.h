@@ -58,28 +58,6 @@ namespace Controller
 	if(!failed)
 	  solve_loop_recursive(order, v);
 }
-
-
-
-template<typename VarOrder, typename VarArray>
-inline void solve_recursive(VarOrder& order, VarArray& vars)
-{
-  solutions = 0;  
-  nodes = 0;
-  lock();
-  print_timestep_without_reset("First node time: ");
-  /// Failed initially propagating constraints!
-  if(Controller::failed)
-	return;
-  if(optimise)
-	current_optimise_position = optimise_var->getMin(); 
-  // This is just to provide a way of exiting the search procedure.
-  try
-  { solve_loop(order, vars); }
-  catch(...)
-  {}
-}
-
 }
 
 

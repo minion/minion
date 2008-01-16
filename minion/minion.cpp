@@ -28,10 +28,13 @@ using namespace ProbSpec;
 
 #include "svn_header.h"
 
+
+
 struct MinionArguments
 {
-  bool use_sdf;
-  MinionArguments() : use_sdf(false)
+  VarOrder order;
+  bool preprocess;
+  MinionArguments() : order(ORDER_ORIGINAL), preprocess(false)
   { }
 };
 
@@ -42,13 +45,24 @@ void print_info()
 	<< "Options: [-findallsols]              Find all solutions" << endl 
 	<< "         [-quiet] [-verbose]         Don't/do print parser progress" << endl
 	<< "         [-printsols] [-noprintsols] Do/don't print solutions" << endl
-        << "         [-printsolsonly]            Print only solutions and end summary" << endl
+	<< "         [-printsolsonly]            Print only solutions and end summary" << endl
 	<< "         [-test]                     Run in test mode" << endl
 	<< "         [-timelimit] N              Stop after N seconds" << endl
 	<< "         [-sollimit] N               Stop after N solutions have been found" << endl
     << "                                   ( Automatically activates \"-findallsols\")" << endl
     << "         [-nodelimit] N              Stop after N nodes searched" << endl
-    << "         [-randomiseorder]           Randomises the variable ordering" << endl
+  << endl
+    << "   The following flags are experimental." << endl
+    << "   These flags may changed or removed in future versions." << endl
+    << "   These flags is not optimised and using them" << endl
+    << "   can cause a severe performance drop." << endl
+    << "         [-preprocess]				 Perform SAC at the first node of search" << endl
+    << "         [-varorder] order			 Change variable ordering strategy" << endl
+	<< "		   order = sdf               Smallest Domain First" << endl
+    << "           order = random            Random variable ordering" << endl
+    << "           order = static            Standard static (but slower)" << endl
+    << "            Note: These orderings do not cache any information between" << endl
+    << "            nodes, so will perform poorly on problem with many variables." << endl
 
 #ifndef NO_DEBUG
 	<< "         [-dumptree]                 Dumps the search tree" << endl
@@ -87,8 +101,6 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
     string command(argv[i]);
 	if(command == string("-findallsols"))
 	{ Controller::find_all_solutions(); }
-	else if(command == string("-sdf"))
-	{ args.use_sdf = true; }
 	else if(command == string("-quiet"))
 	{ reader.parser_verbose = false; }
 	else if(command == string("-printsols"))
@@ -99,6 +111,8 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 	{ Controller::print_only_solution = true; }
 	else if(command == string("-verbose"))
 	{ reader.parser_verbose = true; }
+	else if(command == string("-preprocess"))
+	{ args.preprocess = true; }
 	else if(command == string("-fullprop"))
 	{
 #ifndef NO_DEBUG
@@ -156,6 +170,25 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 	  if(time_limit == 0)
 	  {
 	    cout << "Did not understand the parameter to timelimit:" << argv[i] << endl;
+		FAIL_EXIT();
+	  }
+	}
+	else if(command == string("-varorder"))
+	{ 
+	  cout << "# -varorder is experimental and slower than minion's standard branching." << endl;
+	  ++i;
+	  
+	  string order(argv[i]);
+	  
+	  if(order == "static")
+		args.order = ORDER_STATIC;
+	  else if(order == "sdf")
+		args.order = ORDER_SDF;
+	  else if(order == "random")
+		randomise_valvaroder = true;
+	  else
+	  {
+		cerr << "I do not understand the order:" << order << endl;
 		FAIL_EXIT();
 	  }
 	}
@@ -350,23 +383,16 @@ int main(int argc, char** argv) {
   }
   // Solve!
   
-  if(args.use_sdf)
+  Controller::initalise_search();
+  if(!Controller::failed)
   {
-	try 
-	{ Controller::solve_sdf(var_val_order.first); }
-	catch(...)
-	{ }
+	if(args.preprocess)
+      preprocess_SAC(var_val_order.first);
+    if(!Controller::failed)
+      solve(args.order, var_val_order);
   }
-  else
-  {  
-	Controller::StaticVariableOrder<AnyVarRef> order(var_val_order.first, 
-													 var_val_order.second);
-    try
-	{ Controller::solve(order, var_val_order.first); }
-	catch(...)
-	{ }
-  }
-    
+ 
+  
   if(Controller::test_mode)
   {
     if(test_solcount != -1987)

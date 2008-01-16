@@ -148,7 +148,10 @@ namespace Controller
 
 #include "search/standard_search.h"
 #include "search/recursive_search.h"
-#include "search/sdf_search.h"
+
+#include "search/search_control.h"
+
+#include "preprocess/preprocess.h"
 
 #include "constraint_setup.h"
 
