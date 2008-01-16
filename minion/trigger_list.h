@@ -108,6 +108,8 @@ public:
   {
 	D_ASSERT(lock_first && !lock_second);
 	lock_second = true;
+
+#ifndef SLOW_TRIGGERS
 	Trigger** trigger_ranges = (Trigger**)(mem_start);
 	trigger_data_m = trigger_ranges;
 	Trigger* trigger_data = (Trigger*)(mem_start + 4 * (triggers[UpperBound].size() + 1) * sizeof(Trigger*));
@@ -131,12 +133,14 @@ public:
 	D_ASSERT(static_cast<void*>(mem_start + 4 * (var_count_m + 1) * sizeof(Trigger*)) ==
 			 static_cast<void*>(trigger_ranges));
 	
-	
+
 	// This is a common C++ trick to completely free the memory of an object.
 	{ 
 	  vector<vector<vector<Trigger> > > t; 
-	  triggers = t;
+	  triggers.swap(t);
 	}
+#endif
+	
 #ifdef DYNAMICTRIGGERS
 	DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr());
 	for(unsigned i = 0; i < var_count_m * (4 + vars_domain_size); ++i)
@@ -154,6 +158,13 @@ public:
 	first_trig++;
 	Trigger* trig_range_end = *first_trig;
 	return pair<Trigger*,Trigger*>(trig_range_start, trig_range_end);
+  }
+  
+  void slow_trigger_push(int var_num, TrigType type, int delta)
+  {
+    if(!triggers[type][var_num].empty())
+      Controller::push_triggers(TriggerRange(&triggers[type][var_num].front(),
+      (&triggers[type][var_num].front()) + triggers[type][var_num].size(), delta));
   }
   
 #ifdef DYNAMICTRIGGERS
@@ -186,10 +197,14 @@ public:
 #endif
 	D_ASSERT(lock_second);
     D_ASSERT(upper_delta > 0 || Controller::failed);
+	
+#ifdef SLOW_TRIGGERS
+	slow_trigger_push(var_num, UpperBound, upper_delta);
+#else
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
 	if (range.first != range.second)
 	  Controller::push_triggers(TriggerRange(range.first, range.second, upper_delta));
-	
+#endif	
   }
   
   void push_lower(int var_num, int lower_delta)
@@ -199,9 +214,13 @@ public:
 #endif
 	D_ASSERT(lock_second);
 	D_ASSERT(lower_delta > 0 || Controller::failed);
+#ifdef SLOW_TRIGGERS
+	slow_trigger_push(var_num, LowerBound, lower_delta);
+#else
 	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
 	if (range.first != range.second)
 	  Controller::push_triggers(TriggerRange(range.first, range.second, lower_delta));
+#endif
   }
   
   
@@ -211,10 +230,14 @@ public:
     if (dynamic_triggers_used) dynamic_propogate(var_num, Assigned);
 #endif
     D_ASSERT(lock_second);
-	
+
+#ifdef SLOW_TRIGGERS
+	slow_trigger_push(var_num, Assigned, -1);
+#else	
 	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
 	if (range.first != range.second)
 	  Controller::push_triggers(TriggerRange(range.first, range.second, -1));
+#endif
   }
   
   void push_domain(int var_num)
@@ -222,10 +245,15 @@ public:
 #ifdef DYNAMICTRIGGERS
     if (dynamic_triggers_used) dynamic_propogate(var_num, DomainChanged);
 #endif
+	
+#ifdef SLOW_TRIGGERS
+	slow_trigger_push(var_num, DomainChanged, -1);
+#else
 	D_ASSERT(lock_second);
 	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
 	if (range.first != range.second)	  
 	  Controller::push_triggers(TriggerRange(range.first, range.second, -1)); 
+#endif
   }
   
   void push_domain_removal(int var_num, int val_removed)

@@ -159,6 +159,8 @@ struct ProductConstraint : public Constraint
   }
 };
 
+#ifndef NO_SPECIALISATIONS
+
 inline Constraint*
 ProductCon(const vector<BoolVarRef>& vars, const vector<BoolVarRef>& var2)
 {
@@ -166,6 +168,8 @@ ProductCon(const vector<BoolVarRef>& vars, const vector<BoolVarRef>& var2)
   D_ASSERT(var2.size() == 1);
   return AndCon(vars[0], vars[1], var2[0]);
 }
+
+#endif
 
 template<typename VarRef1, typename VarRef2>
 Constraint*
