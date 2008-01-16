@@ -20,8 +20,7 @@ bool inline check_fail(Var& var, int val, Vars vars, Prop prop)
 }
 
 template <typename Var, typename Prop>
-void propogateSAC_internal(vector<Var>& vararray, 
-				  Prop prop)
+void propogateSAC_internal(vector<Var>& vararray, Prop prop)
 {
   bool reduced = true;
   while(reduced)
@@ -36,7 +35,7 @@ void propogateSAC_internal(vector<Var>& vararray,
         {
           reduced = true;
           var.setMax(var.getMax() - 1);
-          Controller::propogate_queue();
+          prop();
           if(Controller::failed)
             return;
         }
@@ -45,7 +44,7 @@ void propogateSAC_internal(vector<Var>& vararray,
         {
           reduced = true;
           var.setMin(var.getMin() + 1);
-          Controller::propogate_queue();
+          prop();
           if(Controller::failed)
             return;
         }
@@ -58,7 +57,7 @@ void propogateSAC_internal(vector<Var>& vararray,
           {
             reduced = true;
             var.removeFromDomain(val);
-            Controller::propogate_queue();
+            prop();
             if(Controller::failed)
               return;          
           }
