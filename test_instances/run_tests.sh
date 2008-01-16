@@ -1,4 +1,10 @@
 #!/bin/bash
+if [ ! -x $1 ]
+then
+  echo $1 either doesn\'t exist, or isn\'t executable.
+  exit 0
+fi
+
 stripsols= 
 j=0
 reify=0
