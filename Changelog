@@ -1,3 +1,8 @@
+14/10/2006 - Chris
+	* There was a bug with reading large number ( > 65000 ). Fixed that, at the
+	  same time sped up parsing numbers.
+	* Hopefully the testsuite works again now :)
+
 11/10/2006 - Chris
 	* Going to try to start to keep changelog up to date!
 	* Replaced many occurrences of bool with BOOL. BOOL is defined to be
