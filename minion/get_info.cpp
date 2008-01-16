@@ -151,23 +151,13 @@ string pad_start(string s, int length = 12)
 }
 
 void VarInfoAddone(VarType type, VarEvent event)
-{ 
-  D_ASSERT(type >= 0 && type < VarTypeCount);
-  D_ASSERT(event >= 0 && event < VarEventCount);
-  var_info.counters[type][event]++; 
-}
+{ var_info.counters[type][event]++; }
 
 void ConInfoAddone(ConEvent type)
-{ 
-  D_ASSERT(type >= 0 && type < ConEventCount);
-  var_info.concount[type]++; 
-}
+{ var_info.concount[type]++; }
 
 void PropInfoAddone(PropEvent type)
-{
-  D_ASSERT(type >= 0 && type < PropEventCount);
-  var_info.propcount[type]++;
-}
+{ var_info.propcount[type]++; }
 
 void print_search_info()
 {
