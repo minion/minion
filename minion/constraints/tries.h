@@ -61,6 +61,11 @@ struct TupleComparator
   }
 };
 
+struct TrieObj
+{
+  int val;
+  TrieObj* offset_ptr;
+};
 
 struct TupleTrie
 {
@@ -111,11 +116,7 @@ struct TupleTrie
   
   vector<EarlyTrieObj> initial_trie;
   
-  struct TrieObj
-  {
-	int val;
-	TrieObj* offset_ptr;
-  };
+
   
   TrieObj* trie_data;
   
@@ -235,10 +236,10 @@ struct TupleTrie
   template<typename VarArray>
 	bool search_trie(const VarArray& _vars, TrieObj** obj_list, int depth)
   {
-	  VarArray& vars = const_cast<VarArray&>(_vars);
+	VarArray& vars = const_cast<VarArray&>(_vars);
 	if(depth == arity)
 	  return true;
-
+	
 	obj_list[depth] = obj_list[depth - 1]->offset_ptr;  
 	while(obj_list[depth]->val != MAXINT)
 	{
@@ -251,32 +252,97 @@ struct TupleTrie
 	}
 	return false;
   }
-
-  TrieObj* obj_list[max_arity];
   
-  void reconstructTuple(int* array, int check)
+  void reconstructTuple(int* array, TrieObj** obj_list)
   {
-	D_ASSERT(check == obj_list[arity - 1] - obj_list[0]);
+	//D_ASSERT(check == obj_list[arity - 1] - obj_list[0]);
 	for(int i = 0; i < arity; ++i)
 	  array[map_depth(i)] = obj_list[i]->val;
   }
   
+  template<typename VarArray>
+	bool loop_search_trie(const VarArray& _vars, TrieObj** obj_list, int depth)
+  {
+	  VarArray& vars = const_cast<VarArray&>(_vars);
+	  if(depth == arity)
+		return true;
+	  
+	  if(obj_list[depth]->val == MAXINT)
+	    return search_trie(_vars, obj_list, depth);
+		  
+	  if(vars[map_depth(depth)].inDomain(obj_list[depth]->val))
+	  {
+		if(loop_search_trie(_vars, obj_list, depth + 1))
+		  return true;
+	  }
+	  
+	  TrieObj* initial_pos = obj_list[depth]; 
+	  
+	  obj_list[depth]++;
+	  while(obj_list[depth]->val != MAXINT)
+	  {
+		if(vars[map_depth(depth)].inDomain(obj_list[depth]->val))
+		{
+		  if(search_trie(_vars, obj_list, depth + 1))
+			return true;
+		}
+		obj_list[depth]++;
+	  }
+	  
+	  obj_list[depth] = obj_list[depth - 1]->offset_ptr;  
+	  
+	  while(obj_list[depth] != initial_pos)
+	  {
+		if(vars[map_depth(depth)].inDomain(obj_list[depth]->val))
+		{
+		  if(search_trie(_vars, obj_list, depth + 1))
+			return true;
+		}
+		obj_list[depth]++;
+	  }
+	  return false;
+  }
+  
+  
   // Find support for domain value i. This will be the value used by
   // the first variable.
   template<typename VarArray>
-    int nextSupportingTuple(int domain_val, const VarArray& vars)
+    int nextSupportingTuple(int domain_val, const VarArray& _vars, TrieObj** obj_list)
   {
-	TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
-	if(first_ptr == NULL)
-	  return -1;
-	
-	obj_list[0] = first_ptr;
-    if(search_trie(vars, obj_list, 1))
+	VarArray& vars = const_cast<VarArray&>(_vars);
+	  
+    if(obj_list[0] == NULL)
 	{
-	  return obj_list[arity-1] - obj_list[0];  
+	  TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
+	  if(first_ptr == NULL)
+	    return -1;
+	
+	  obj_list[0] = first_ptr;
+      if(search_trie(vars, obj_list, 1))
+	    return obj_list[arity-1] - obj_list[0];  
+	  else
+	    return -1;
 	}
 	else
-	  return -1;
+	{
+	  if(loop_search_trie(vars, obj_list, 1))
+	    return obj_list[arity-1] - obj_list[0];  
+	  else
+	    return -1;
+/*	  D_ASSERT(obj_list[0] == get_next_ptr(trie_data, domain_val));
+	  int OK_depth = 1;
+	  while(OK_depth < arity && vars[map_depth(OK_depth)].inDomain(obj_list[OK_depth]->val))
+		OK_depth++;
+	  if(search_trie(vars,obj_list, OK_depth))
+		return obj_list[arity-1] - obj_list[0];
+	  else
+	  {
+		if(search_trie(vars, obj_list, 1))
+		  return obj_list[arity-1] - obj_list[0];  
+		else
+		  return -1;
+	  }*/
+	}
   }
 };
 

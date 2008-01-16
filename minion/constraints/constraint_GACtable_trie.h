@@ -42,7 +42,7 @@ struct GACTableConstraint : public DynamicConstraint
   
   /// For each literal, the number of the tuple that supports it.
   //   renamed off from current_support in case both run in parallel
-  vector<int> trie_current_support;
+  vector<TrieObj**> trie_current_support;
   
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
   BOOL check_tuple(const vector<int>& v)
@@ -65,6 +65,12 @@ struct GACTableConstraint : public DynamicConstraint
 	D_ASSERT(_vars.size() == arity);
 	  
 	trie_current_support.resize(tuples->literal_num); 
+	for(int i = 0; i < tuples->literal_num; ++i)
+	{
+	  trie_current_support[i] = new TrieObj*[arity];
+	  for(int j = 0; j < arity; j++)
+		trie_current_support[i][j] = NULL;
+	}
 	// initialise supportting tuple for recycle
 	recyclableTuple = new int[arity] ;
   }
@@ -79,13 +85,13 @@ struct GACTableConstraint : public DynamicConstraint
 	 int val = varval.second;
          int new_support = 
            tupleTrieArrayptr->getTrie(varIndex).
-                                nextSupportingTuple(val, vars);
+                                nextSupportingTuple(val, vars, trie_current_support[literal]);
          if (new_support < 0)
          { // cout << "find_new_support failed literal: " << literal << " var: " << varIndex << " val: " << get_val_from_literal(literal) << endl ;
              return false;
          }
          // cout << "find_new_support sup= "<< new_support << " literal: " << literal << " var: " << varIndex << " val: " << get_val_from_literal(literal) << endl;
-         trie_current_support[literal] = new_support; 
+         //trie_current_support[literal] = new_support; 
          return true;
   }
   
@@ -150,10 +156,10 @@ struct GACTableConstraint : public DynamicConstraint
         int max = vars[varIndex].getMax();
         for(int i = vars[varIndex].getMin(); i <= max; ++i) 
         { 
+		    int literal = tuples->get_literal(varIndex, i);
             int sup = tupleTrieArrayptr->getTrie(varIndex).       
-                            nextSupportingTuple(i, vars);
-			int literal = tuples->get_literal(varIndex, i);
-            trie_current_support[literal] = sup;
+                            nextSupportingTuple(i, vars, trie_current_support[literal]);
+            //trie_current_support[literal] = sup;
             // cout << "    var " << varIndex << " val: " << i << " sup " << sup << " " << endl;
             if(sup < 0)
             {
