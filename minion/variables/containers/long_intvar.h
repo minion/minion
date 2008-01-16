@@ -285,6 +285,13 @@ struct BigRangeVarContainer {
 	int upper = upper_bound(d);
     if(offset == upper && offset == lower)
       return;
+	
+	if(offset > upper || offset < lower)
+	{
+	  Controller::fail();
+	  return;
+	}
+	
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
 	  for(int loop = lower; loop <= upper; ++loop)
@@ -331,7 +338,14 @@ struct BigRangeVarContainer {
 
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     int up_bound = upper_bound(d);
-    
+    int low_bound = lower_bound(d);
+	
+	if(offset < low_bound)
+	{
+	  Controller::fail();
+	  return;
+    }
+	
     if(offset < up_bound)
     {
 #ifdef FULL_DOMAIN_TRIGGERS
@@ -342,7 +356,7 @@ struct BigRangeVarContainer {
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif	 
-          upper_bound(d) = offset;      
+      upper_bound(d) = offset;      
 	  int new_upper = find_new_upper_bound(d);
 
 #ifdef FULL_DOMAIN_TRIGGERS
@@ -382,7 +396,15 @@ struct BigRangeVarContainer {
 #endif
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
-    int low_bound = lower_bound(d);    
+	int up_bound = upper_bound(d);
+    int low_bound = lower_bound(d);
+    
+	if(offset > up_bound)
+	{
+	  Controller::fail();
+	  return;
+	}
+	
     if(offset > low_bound)
     {
 #ifdef FULL_DOMAIN_TRIGGERS
@@ -455,6 +477,7 @@ VARDEF(BigRangeCon big_rangevar_container);
 struct GetBigRangeVarContainer
 {
   static BigRangeCon& con() { return big_rangevar_container; }
+  static string name() { return "BigRangeVar"; }
 };
 
 template<typename T>

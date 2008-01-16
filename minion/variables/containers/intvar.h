@@ -246,8 +246,17 @@ struct RangeVarContainer {
     int offset = i - var_min;
     if(!inDomain(d,i))
       {Controller::fail(); return;}
-    if(offset == raw_lower_bound(d) && offset == raw_upper_bound(d))
+	
+	int raw_lower = raw_lower_bound(d);
+	int raw_upper = raw_upper_bound(d);
+	
+    if(offset == raw_lower && offset == raw_upper)
       return;
+	if(offset < raw_lower || offset > raw_upper)
+	{
+	  Controller::fail();
+	  return;
+	}
     trigger_list.push_domain(d.var_num);
     trigger_list.push_assign(d.var_num, i);
 #ifdef FULL_DOMAIN_TRIGGERS
@@ -260,17 +269,15 @@ struct RangeVarContainer {
 	    trigger_list.push_domain_removal(d.var_num, loop);
 	}
 #endif
-    int low_bound = raw_lower_bound(d);
     if(offset != low_bound)
     {
-      trigger_list.push_lower(d.var_num, offset - low_bound);
+      trigger_list.push_lower(d.var_num, offset - raw_lower);
       raw_lower_bound(d) = offset;
     }
     
-    int up_bound = raw_upper_bound(d);
     if(offset != up_bound)
     {
-      trigger_list.push_upper(d.var_num, up_bound - offset);
+      trigger_list.push_upper(d.var_num, raw_upper - offset);
       raw_upper_bound(d) = offset;
     }
   }
@@ -310,7 +317,7 @@ struct RangeVarContainer {
 
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-	  for(int loop = raw_new_upper + 1 + var_min; loop <= i; ++loop)
+	  for(int loop = raw_new_upper + 1 + var_min; loop <i; ++loop)
 	  {
 	    if(inDomain_noBoundCheck(d, loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
@@ -356,6 +363,8 @@ struct RangeVarContainer {
 	  // TODO : Optimise this function to only check values in domain.
 	  for(int loop = i; loop < raw_new_lower + var_min; ++loop)
 	  {
+		D_ASSERT(!inDomain_noBoundCheck(d, loop));
+		// XXX : Can this loop ever trigger??
 	    if(inDomain_noBoundCheck(d, loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
@@ -363,7 +372,7 @@ struct RangeVarContainer {
       raw_lower_bound(d) = raw_new_lower;
 
       trigger_list.push_domain(d.var_num);
-      trigger_list.push_lower(d.var_num, raw_lower_bound(d) - low_bound);
+      trigger_list.push_lower(d.var_num, raw_new_lower - low_bound);
 
       if(raw_lower_bound(d) == raw_upper_bound(d))
 	    trigger_list.push_assign(d.var_num, getAssignedValue(d));
@@ -398,6 +407,7 @@ VARDEF(LRVCon rangevar_container);
 struct GetRangeVarContainer
 {
   static LRVCon& con() { return rangevar_container; }
+  static string name() { return "RangeVar:"; }
 };
 
 template<int var_min, typename T>

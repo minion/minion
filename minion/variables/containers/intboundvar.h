@@ -275,6 +275,8 @@ struct GetBoundVarContainer
 {
   static BoundVarContainer<>& con() 
   { return boundvar_container; }
+  static string name()
+  { return "Bound"; }
 };
 
 template<typename T>

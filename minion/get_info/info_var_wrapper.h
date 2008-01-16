@@ -109,7 +109,7 @@ struct InfoRefType
   }
   
   operator string()
-  { return "VarRef:" + string(data); }
+  { return "InfoRef:" + string(data); }
   
   int getDomainChange(DomainDelta d)
   { 

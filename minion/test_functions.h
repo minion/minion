@@ -15,7 +15,6 @@
  *
  */
 
-void test_check_solution();
 
 template<typename Var>
 string get_dom_as_string(Var& v)

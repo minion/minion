@@ -5,7 +5,7 @@
 */
 
 template<typename Var, typename Vars, typename Prop>
-bool inline check_fail(Var& var, int val, Vars vars, Prop prop)
+bool inline check_fail(Var& var, int val, Vars& vars, Prop prop)
 {
   Controller::world_push();
   var.propogateAssign(val);
@@ -31,7 +31,7 @@ void propogateSAC_internal(vector<Var>& vararray, Prop prop)
       Var& var = vararray[i];
       if(var.isBound())
       {
-        while(check_fail(var,var.getMax(), vararray, prop))
+        while(check_fail(var, var.getMax(), vararray, prop))
         {
           reduced = true;
           var.setMax(var.getMax() - 1);
@@ -40,7 +40,7 @@ void propogateSAC_internal(vector<Var>& vararray, Prop prop)
             return;
         }
         
-        while(check_fail(var,var.getMin(), vararray, prop))
+        while(check_fail(var, var.getMin(), vararray, prop))
         {
           reduced = true;
           var.setMin(var.getMin() + 1);

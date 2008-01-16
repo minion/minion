@@ -27,6 +27,9 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+// If true, "-crash" was used and execution will crash on error (for debugging)
+VARDEF_ASSIGN(bool debug_crash, false);
+
 struct parse_exception : public exception
 {
   string error;
@@ -54,23 +57,31 @@ void inline D_FATAL_ERROR2(string s, string file, string line)
   cerr << endl;
   cerr << "The generated error message was: " << s << endl;
   cerr << "The error was in the file " << file << " on line " << line << endl;
-#ifdef CRASH_ERROR
-   int* i = NULL;
-   *i = 0;
-#endif
-  exit(1);
+  if(debug_crash)
+  {
+	int* i = NULL;
+    *i = 0;
+    return;
+  }
+  else
+    exit(1);
 }
 
 
-
+void inline FAIL_EXIT() 
+{ 
+  cerr << "Unrecoverable error. Exiting" << endl;
+  cerr.flush();
+  if(debug_crash)
+  {
+    int* nullvar = NULL;
+	*nullvar = 0;
+  }
+  else
+	exit(1); 
+}
 
 #ifndef NO_DEBUG
-
-#ifdef CRASH_ERROR
-#define FAIL_EXIT() { int* nullvar = NULL; *nullvar = 0; exit(1); }
-#else
-#define FAIL_EXIT() { exit(1); }
-#endif
 
 struct assert_fail {};
 
@@ -139,7 +150,6 @@ enum debug_types
 #define D_INFO(x,y,z)
 #define D_DATA(x)
 #define D_ASSERT(x)
-#define FAIL_EXIT() { exit(1); }
 #endif
 
 #endif //DEBUG_H

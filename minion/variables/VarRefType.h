@@ -100,7 +100,7 @@ struct VarRefType
 
   /// XXX : Change 'VarRef' to correct type.
   operator string()
-  { return "VarRef:" + to_string(data.var_num); }
+  { return GetContainer::name() + to_string(data.var_num); }
   
   int getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
@@ -249,7 +249,7 @@ struct CompleteVarRefType
   { (data.getCon()).addTrigger(data, t, type); }
   
   operator string()
-  { return "VarRef:" + to_string(data.var_num); }
+  { return "CompleteCon:" + to_string(data.var_num); }
   
   int getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }

@@ -148,6 +148,8 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 	  FAIL_EXIT();
 #endif
 	}
+	else if(command == string("-crash"))
+	{ debug_crash = true; }
 	else if(command == string("-nodelimit"))
 	{
 	  ++i;
@@ -209,10 +211,6 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 		cerr << "I do not understand the order:" << order << endl;
 		FAIL_EXIT();
 	  }
-	}
-	else if(command == string("-test"))
-	{ 
-	  Controller::test_mode = true; 
 	}
 	else if(command == string("-randomiseorder"))
 	{
@@ -315,62 +313,10 @@ int main(int argc, char** argv) {
   
   
   if (!Controller::print_only_solution) { print_timestep("Parsing Time: ");} 
-  // Used by test mode.
-  BOOL test_checkonesol = false, test_nosols = false;
-  // Just a number no-one would ever type :)
-  int test_solcount = -1987;
- 
-  if(Controller::test_mode)
-  {  // Now we read the solution!
-    string s;
-	ifstream infile(argv[argc - 1]);
-	
-	// Grab the first line, which we don't want.
-	char* buf = new char[10000];
-	infile.getline(buf,10000);
-	delete[] buf;
-	
-	infile >> s;
-	if(s != "#TEST")
-	{
-	  cout << "Test files must begin with '#TEST' after the version number" << endl;
-	  cout << "Instead got '" << s << "'" << endl;
-	  FAIL_EXIT();
-	}
-	
-	infile >> s;
-	if(s == "CHECKONESOL")
-	{
-	  test_checkonesol = true;
-	    for(unsigned i = 0; i < reader.instance.print_matrix[0].size(); ++i)
-	  { 
-		int val;
-		infile >> val;
-		Controller::test_solution.push_back(val);
-	  }
-	  cout << Controller::test_solution.size() << endl;
-    }
-	else if(s == "NOSOLS")
-	  test_nosols = true;
-	else if(s == "SOLCOUNT")
-	{
-	  infile >> test_solcount;
-	  Controller::find_all_solutions();
-	}
-	else
-	{ 
-	  cout << "I don't understand" << s << endl;
-	  FAIL_EXIT();
-	}
-	
-  }
   
   BuildCSP(reader);
   
   if (!Controller::print_only_solution) print_timestep("Setup Time: ");
-
-  if(test_checkonesol)
-    Controller::set_solution_check_function(&test_check_solution);
   
   if(randomise_valvaroder)
   {
@@ -426,34 +372,6 @@ int main(int argc, char** argv) {
       solve(args.order, var_val_order);
   }
  
-  
-  if(Controller::test_mode)
-  {
-    if(test_solcount != -1987)
-	{
-	  if(Controller::solutions != test_solcount)
-	  {
-	   cerr << "Error! Expected " << test_solcount << " solutions, but got ";
-	   cerr << Controller::solutions << " solutions!" << endl;
-	   FAIL_EXIT();
-	  }
-	}
-	
-    if(test_checkonesol)
-	  if(Controller::solutions == 0)
-	  {
-	    cerr << "Error! Should be a solution!" << endl;
-		FAIL_EXIT();
-	  }
-	
-	if(test_nosols)
-	  if(Controller::solutions != 0)
-	  {
-		cerr << "Error! Should be no solutions!" << endl;
-		FAIL_EXIT();
-	  }
-  }
-   
   print_finaltimestep("Solve Time: ");
   cout << "Total Nodes: " << nodes << endl;
   cout << "Problem solvable?: " 

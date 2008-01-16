@@ -46,13 +46,11 @@ namespace Controller
   VARDEF(int solutions);
   VARDEF(vector<vector<AnyVarRef> > print_matrix);
   VARDEF_ASSIGN(BOOL print_only_solution, false);
-  VARDEF_ASSIGN(BOOL test_mode, false);
   VARDEF_ASSIGN(BOOL commandlineoption_dumptree, false);
   VARDEF_ASSIGN(int commandlineoption_sollimit, -1);
   VARDEF_ASSIGN(BOOL commandlineoption_fullpropogate, false);
   VARDEF_ASSIGN(BOOL commandlineoption_nocheck, false);
   VARDEF_ASSIGN(unsigned long long commandlineoption_nodelimit, 0);
-  VARDEF(vector<int> test_solution);
   
   
   /// Pushes the state of the whole world.

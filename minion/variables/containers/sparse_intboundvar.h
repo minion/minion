@@ -331,6 +331,9 @@ struct GetSparseBoundVarContainer
 {
   static SparseBoundVarContainer<>& con() 
   { return sparse_boundvar_container; }
+  
+  static string name()
+  { return "SparseBound:"; }
 };
 
 

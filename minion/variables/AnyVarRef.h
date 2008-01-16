@@ -203,7 +203,7 @@ struct AnyVarRef
   { data->addTrigger(t, type); }
   
   operator string()
-  { return "VRef:" + data->virtual_to_string(); }
+  { return "AnyVRef:" + data->virtual_to_string(); }
   
   int getDomainChange(DomainDelta d)
   { return data->getDomainChange(d); }

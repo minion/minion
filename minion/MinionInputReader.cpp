@@ -777,6 +777,12 @@ void MinionInputReader::readVars(InputFileReader* infile) {
     while (delim != '}') {
       domainElem = infile->read_num();
       domainElements.push_back(domainElem) ;
+	  size_t dom_size = domainElements.size();
+	  if(dom_size > 1)
+	  {
+		if(domainElements[dom_size-1] <= domainElements[dom_size-2])
+		  throw new parse_exception("Domains must be ordered!");
+	  }
       delim = infile->get_char();                               // , or }
     }
     count = infile->read_num();
@@ -796,6 +802,8 @@ void MinionInputReader::readVars(InputFileReader* infile) {
     lb = infile->read_num();
 	ub = infile->read_num();
 	count = infile->read_num();
+	if(lb > ub)
+	  throw new parse_exception("Lower bound must be less than upper bound!");
 	if(parser_verbose)
       cout << count << " of " << lb << ", " << ub << endl ;
     var_obj.discrete.push_back(make_pair(count, ProbSpec::Bounds(lb, ub)));

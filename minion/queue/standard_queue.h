@@ -169,6 +169,7 @@ namespace Controller
 	  D_ASSERT(!Controller::failed);
 	  Controller::failed = true;
 	  clear_queues();
+	  printf("!\n");
 	  return;
 	}
 #endif
@@ -208,12 +209,16 @@ namespace Controller
 	  trig->special_check();
 
 	} // while(true)
+	
   } // end Function
 
   // This just allows SAC (which wants a list of vars)
   // and normal propagate to have the same input method.
   template<typename Vars>
   inline void propogate_queue_vars(Vars& vars)
-  { propogate_queue(); }
+  {
+	propogate_queue(); 
+    printf(".%d\n", failed);
+  }
 } // namespace Controller
 
