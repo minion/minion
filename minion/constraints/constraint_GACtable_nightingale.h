@@ -51,22 +51,23 @@ struct TupleN
   // tuple class for nightingale's
   int id;  // global array index (can also be used for lex comparison of two tuples.)
 		   // no need for nextPointer
-  int arity;
   
   int * values;
   int * nextDifferent;    // int index into global array, pointing to the next 
   
-  TupleN(int * _values, int _id, int _arity, int* _nD) : 
-	id(_id), arity(_arity), values(_values), nextDifferent(_nD)
+  TupleN(int * _values, int _id, int arity, int* _nD) : 
+	id(_id), values(_values), nextDifferent(_nD)
   {
-	for(int i=0; i<arity; i++)
-	  nextDifferent[i]=-1;
+	for(int i = 0; i < arity; i++)
+	  nextDifferent[i] = -1;
   }
   
+  TupleN() : id(-1), values(NULL), nextDifferent(NULL)
+  { }
 };
 
 #ifdef LISTPERLIT
-#define listperliteral  true
+#define listperliteral true
 #else
 #define listperliteral false
 #endif
@@ -77,8 +78,8 @@ struct Nightingale
  /// Total number of literals in the variables at the start of search.
   int literal_num;
   
-  TupleN ** tuplelist;
-  TupleN **** tuplelistperlit;
+  TupleN * tuplelist;
+  TupleN *** tuplelistperlit;
   
   int ** tuplelistlengths;
 
@@ -94,24 +95,24 @@ struct Nightingale
     noTuples = tuples->size();
 	if(listperliteral)
 	{
-	  tuplelistperlit=new TupleN***[arity];
+	  tuplelistperlit=new TupleN**[arity];
 	  
 	  vector<vector<vector<vector<int> > > > goods;
 	  // Pass goods to splittuples just to avoid copying it on return.
 	  splittuples(tuples, goods);
-	  tuplelistlengths=new int*[arity];
+	  tuplelistlengths = new int*[arity];
 	  
-	  for(int i=0; i<arity; i++)
+	  for(int i = 0; i < arity; i++)
 	  {
 		int varmin = (tuples->dom_smallest)[i];
 		int varmax = (tuples->dom_smallest)[i] + (tuples->dom_size)[i];
 		int domsize = (tuples->dom_size)[i];
-		tuplelistperlit[i]=new TupleN**[domsize];
+		tuplelistperlit[i]=new TupleN*[domsize];
 		tuplelistlengths[i]=new int[domsize];
 		
-		for(int val=varmin; val < varmax ; val++)
+		for(int val = varmin; val < varmax; val++)
 		{   
-		  TupleN** tlpl=buildhologram(goods[i][val-varmin]);
+		  TupleN* tlpl=buildhologram(goods[i][val-varmin]);
 		  tuplelistperlit[i][val-varmin]=tlpl;
 		  tuplelistlengths[i][val-varmin]=goods[i][val-varmin].size();
 		}
@@ -119,25 +120,28 @@ struct Nightingale
 	}
 	else
 	{
-	  tuplelist=buildhologram(*tuples);
+	  tuplelist = buildhologram(*tuples);
 	}  
   }
   
   template<typename T>
-  TupleN ** buildhologram(T& tupleref)
+  TupleN* buildhologram(T& tupleref)
   {
 	// turn a list of int [] into an n-holo
-	TupleN ** tlist=new TupleN*[tupleref.size()];
+	TupleN* tlist=new TupleN[tupleref.size()];
 	
+	int* mem_block = new int[arity * 2 * tupleref.size()];
 	for(int tupleIndex = 0; tupleIndex < tupleref.size(); tupleIndex++)
 	{
-	  int * _values=new int[arity];
+	  int* _values = mem_block + arity * (tupleIndex * 2) ;
+	  
 	  // This line is messy, but is here because we want this code to work
 	  // for both vector<vector<int> >s and tuple containers. I'll clean it up
 	  // sometime.
 	  std::copy(&tupleref[tupleIndex][0], &tupleref[tupleIndex][0] + arity, _values);
 	  
-	  tlist[tupleIndex]=new TupleN(_values, tupleIndex, arity, new int[arity]);
+	  tlist[tupleIndex] = TupleN(_values, tupleIndex, arity,
+								 mem_block + arity * (tupleIndex * 2 + 1) );
 	  // Now iterate backwards through the tuplelist, setting the appropriate forward pointers
 	  int numproc=arity;
 	  
@@ -146,14 +150,14 @@ struct Nightingale
 	  {
 		for(int valIndex=0; valIndex<arity; valIndex++)
 		{
-		  if(_values[valIndex]==tlist[tupleIndex-1]->values[valIndex])
+		  if(_values[valIndex]==tlist[tupleIndex-1].values[valIndex])
 			numproc--;
 		}
 	  }
 	  
 	  for(int i = tupleIndex - 1; i >= 0; i--)
 	  {
-		TupleN* backtuple = tlist[i];
+		TupleN* backtuple = &tlist[i];
 		// if backtuple has a value i which is different to curtuple, make the forward link.
 		
 		// fill in any entries in nextDifferent
@@ -166,10 +170,10 @@ struct Nightingale
 			  numproc--;
 			  backtuple->nextDifferent[valIndex]=tupleIndex;
 			  // now iterate backwards and fill in any others in the same column
-			  for(int j=i-1; j>=0; j--)
+			  for(int j = i - 1; j >= 0; j--)
 			  {
-				if(tlist[j]->nextDifferent[valIndex]==-1)
-				  tlist[j]->nextDifferent[valIndex]=tupleIndex;
+				if(tlist[j].nextDifferent[valIndex]==-1)
+				  tlist[j].nextDifferent[valIndex]=tupleIndex;
 				else
 				  break;
 			  }
@@ -191,18 +195,23 @@ struct Nightingale
   {
 	int arity = tuples->tuple_size();	
 	goods.resize(arity);
-	for(int var=0; var<arity; var++)
+	for(int var = 0; var < arity; var++)
 	{
 	  goods[var].resize((tuples->dom_size)[var]);
 	  for(int val = (tuples->dom_smallest)[var];
 		  val <= (tuples->dom_smallest)[var] + (tuples->dom_size)[var]; val++)
 	  {
-		for(int tupleindex=0; tupleindex<tuples->size(); tupleindex++)
+		for(int tupleindex = 0; tupleindex < tuples->size(); tupleindex++)
 		{
-		  if((*tuples)[tupleindex][var]==val)
+		  if((*tuples)[tupleindex][var] == val)
 			goods[var][val-(tuples->dom_smallest)[var]].push_back(tuples->get_vector(tupleindex));
 		}
 	  }
+	  
+	  int tuple_sum = 0;
+	  for(int i = 0; i < goods[var].size(); ++i)
+		tuple_sum += goods[var][i].size();
+	  D_ASSERT(tuple_sum == tuples->size());
 	}
   }
   
@@ -249,9 +258,9 @@ struct GACTableConstraint : public DynamicConstraint
   {
 	for(int i = 0; i < arity; i++)
 	{
-	  if(t1[i]>t2[i])
+	  if(t1[i] > t2[i])
 		return 1;
-	  if(t1[i]<t2[i])
+	  if(t1[i] < t2[i])
 		return -1;
 	}
 	return 0;
@@ -282,76 +291,70 @@ struct GACTableConstraint : public DynamicConstraint
     
   TupleN* seekNextSupport(int var, int val)
   {
-    // find a support which conforms to var and val, and the current domains,
-    // and is after the support in watches unless we reach the end and wrap.
-    // Else return null.
-    
+	// find a support which conforms to var and val, and the current domains,
+	// and is after the support in watches unless we reach the end and wrap.
+	// Else return null.
+	
 	int domain_min = (nightingale->tuples->dom_smallest)[var];
 	int domain_max = domain_min + (nightingale->tuples->dom_size)[var];
 	if(val >= domain_max)
 	  return 0;
-    int ltp=current_support[var][val-domain_min];  // watches must be indexed by the actual value.
-    
-    int index=ltp; 
-    if(index==-1){ index=0;}
-    
-    // select the list to search through.
-    TupleN ** tuplelisthere;
-    int listlength;
-    if(listperliteral){
-        tuplelisthere=nightingale->tuplelistperlit[var][val-domain_min];
-        listlength=nightingale->tuplelistlengths[var][val-domain_min];
-    }
-    else {
-        tuplelisthere=nightingale->tuplelist;
-        listlength=nightingale->noTuples;
-    }
-    
-    for(int pass=0; pass<2; pass++)
-    {
-        bool firstpass=(pass==0)?true:false;
-        if(!firstpass) index=0;
-        while((firstpass && index<listlength && index!=-1) || (!firstpass && index<=ltp && index!=-1))
-        {
-            TupleN* curtuple=tuplelisthere[index];
-            // iterate from most to least significant digit
-            // because most sig digit probably allows greatest jump.
-            // Remember that var gets treated specially, as if its domain is just {val}
-            
-            bool matchAll=true;
-            for(int valIndex=0; valIndex<arity; valIndex++)
-            {
-                int curvalue=curtuple->values[valIndex];
-                
-                if( (valIndex!=var && !vars[valIndex].inDomain(curvalue)) || 
-                    (valIndex==var && curvalue!=val))
-                {
-                    matchAll=false;
-                    if(true)  // hologramlist
-                    {
-                        // attempt to jump forward
-                        index=curtuple->nextDifferent[valIndex];
-                    }
-                    else
-                    {
-                        index++;
-                    }
-                    break;
-                }
-            }
-            
-            if(matchAll)
-            {
-                // success
-                // set watch
-                current_support[var][val-domain_min]=index;
-                //System.out.println("Support found:"+new tuple(curtuple.values));
-                return curtuple;
-            }
-        }
-    }
-    
-    return 0;
+	int ltp = current_support[var][val-domain_min];  // watches must be indexed by the actual value.
+	
+	int index = ltp; 
+	if(index == -1)
+	  index=0;
+	
+	// select the list to search through.
+	TupleN * tuplelisthere;
+	int listlength;
+	if(listperliteral){
+	  tuplelisthere=nightingale->tuplelistperlit[var][val-domain_min];
+	  listlength=nightingale->tuplelistlengths[var][val-domain_min];
+	}
+	else {
+	  tuplelisthere=nightingale->tuplelist;
+	  listlength=nightingale->noTuples;
+	}
+	
+	for(int pass = 0; pass < 2; pass++)
+	{
+	  bool firstpass=(pass==0)?true:false;
+	  if(!firstpass) 
+		index = 0;
+	  while((firstpass && index<listlength && index!=-1) || (!firstpass && index<=ltp && index!=-1))
+	  {
+		TupleN& curtuple=tuplelisthere[index];
+		// iterate from most to least significant digit
+		// because most sig digit probably allows greatest jump.
+		// Remember that var gets treated specially, as if its domain is just {val}
+		
+		bool matchAll=true;
+		for(int valIndex=0; valIndex<arity; valIndex++)
+		{
+		  int curvalue=curtuple.values[valIndex];
+		  
+		  if( (valIndex!=var && !vars[valIndex].inDomain(curvalue)) || 
+			  (valIndex==var && curvalue!=val))
+		  {
+			matchAll=false;
+			index=curtuple.nextDifferent[valIndex];
+			break;
+		  }
+		}
+		
+		if(matchAll)
+		{
+		  // success
+		  // set watch
+		  current_support[var][val-domain_min]=index;
+		  //System.out.println("Support found:"+new tuple(curtuple.values));
+		  return &curtuple;
+		}
+	  }
+	}
+	
+	return 0;
   }
   
   // Below is shared with regin-lhomme file.
@@ -398,11 +401,11 @@ struct GACTableConstraint : public DynamicConstraint
   void setup_watches(int var, int val, int lit)
   {
     int domain_min = (nightingale->tuples->dom_smallest)[var];
-	int * tuple;
+	int* tuple;
 	if(!listperliteral)
-	  tuple=nightingale->tuplelist[current_support[var][val-domain_min]]->values;
+	  tuple=nightingale->tuplelist[current_support[var][val-domain_min]].values;
 	else
-	  tuple=nightingale->tuplelistperlit[var][val-domain_min][current_support[var][val-domain_min]]->values;
+	  tuple=nightingale->tuplelistperlit[var][val-domain_min][current_support[var][val-domain_min]].values;
     
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
