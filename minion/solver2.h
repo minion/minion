@@ -45,6 +45,7 @@ namespace Controller
 #endif
   VARDEF(int solutions);
   VARDEF(vector<vector<AnyVarRef> > print_matrix);
+  VARDEF_ASSIGN(BOOL print_only_solution, false);
   VARDEF_ASSIGN(BOOL test_mode, false);
   VARDEF_ASSIGN(BOOL commandlineoption_dumptree, false);
   VARDEF_ASSIGN(int commandlineoption_sollimit, -1);

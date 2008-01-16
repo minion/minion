@@ -99,7 +99,7 @@ namespace Controller
 	  {
 		for(unsigned i = 0; i < print_matrix.size(); ++i)
 		{
-		  cout << "Sol: ";  
+	          if (!Controller::print_only_solution) cout << "Sol: ";  
 		  for(unsigned j = 0; j < print_matrix[i].size(); ++j)
 		  {
 			if(!print_matrix[i][j].isAssigned())
@@ -110,13 +110,16 @@ namespace Controller
 		  }
 		  cout << endl;
 		}
-		cout << endl;
+		if (!Controller::print_only_solution) cout << endl;
 	  }
   
 	  // TODO : Make this more easily changable.
-	  cout << "Solution Number: " << solutions << endl;
-	  print_timestep_without_reset("Time:");
-	  cout << "Nodes: " << nodes << endl << endl;
+          if (!Controller::print_only_solution) 
+          {
+	    cout << "Solution Number: " << solutions << endl;
+	    print_timestep_without_reset("Time:");
+	    cout << "Nodes: " << nodes << endl << endl;
+          }
     }
 #ifdef MORE_SEARCH_INFO
   if(!commandlineoption_nocheck)

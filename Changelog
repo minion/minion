@@ -1,3 +1,10 @@
+02/11/2006 - Ian G
+        * Added -printsolsonly option to reduce size of output
+          This will be useful if you want all solutions printed and there might be 
+          very many or you want to avoid grep'ing to eliminate other lines. 
+          It still prints out Minion version info at the start and summary info at 
+          the end, and a couple of other lines I didn't notice to disable.
+
 15/10/2006 - Chris
 	* Really fixed the product constraint this time. The non-binary case
 	  could still be improved when some of the variables can be negative.

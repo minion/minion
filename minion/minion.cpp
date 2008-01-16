@@ -35,6 +35,7 @@ void print_info()
 	<< "Options: [-findallsols]              Find all solutions" << endl 
 	<< "         [-quiet] [-verbose]         Don't/do print parser progress" << endl
 	<< "         [-printsols] [-noprintsols] Do/don't print solutions" << endl
+        << "         [-printsolsonly]            Print only solutions and end summary" << endl
 	<< "         [-test]                     Run in test mode" << endl
 	<< "         [-timelimit] N              Stop after N seconds" << endl
 	<< "         [-sollimit] N               Stop after N solutions have been found" << endl
@@ -87,6 +88,8 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 	{ Controller::print_solution = true; }
 	else if(command == string("-noprintsols"))
 	{ Controller::print_solution = false; }
+	else if(command == string("-printsolsonly"))
+	{ Controller::print_only_solution = true; }
 	else if(command == string("-verbose"))
 	{ reader.parser_verbose = true; }
 	else if(command == string("-fullprop"))
@@ -231,25 +234,30 @@ int main(int argc, char** argv) {
   
   cout << "# " << VERSION << endl ;
   cout << "# Svn version: " << SVN_VER << endl;
-  cout << "# Svn last changed date: " << SVN_DATE << endl;
-	// << REVISION << endl  // Sadly only gives revision number of minion.h
-	
-  time_t rawtime;
-  time(&rawtime);
-  cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
-  cout << "#    http://minion.sourceforge.net" << endl;
-  cout << "#  Minion is still very new and in active development." << endl;
-  cout << "#  If you have problems with Minion or find any bugs, please tell us!" << endl;
-  cout << "#  Either at the bug reporter at the website, or 'chris@bubblescope.net'" << endl;
-  cout << "# Input filename: " << argv[argc-1] << endl;
-  cout << "# Command line: " ;
-  for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; } 
-  cout << endl;
+
+  if (!Controller::print_only_solution) 
+  { 
+
+    cout << "# Svn last changed date: " << SVN_DATE << endl;
+          
+    time_t rawtime;
+    time(&rawtime);
+    cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
+    cout << "#    http://minion.sourceforge.net" << endl;
+    cout << "#  Minion is still very new and in active development." << endl;
+    cout << "#  If you have problems with Minion or find any bugs, please tell us!" << endl;
+    cout << "#  Either at the bug reporter at the website, or 'chris@bubblescope.net'" << endl;
+    cout << "# Input filename: " << argv[argc-1] << endl;
+    cout << "# Command line: " ;
+    for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; } 
+    cout << endl;
+  
+  }
 
   reader.read(argv[argc - 1]) ;
   
   
-  print_timestep("Parsing Time: ");
+  if (!Controller::print_only_solution) { print_timestep("Parsing Time: ");} 
   // Used by test mode.
   BOOL test_checkonesol = false, test_nosols = false;
   // Just a number no-one would ever type :)
@@ -302,7 +310,7 @@ int main(int argc, char** argv) {
   
   BuildCSP(reader);
   
-  print_timestep("Setup Time: ");
+  if (!Controller::print_only_solution) print_timestep("Setup Time: ");
 
   if(test_checkonesol)
     Controller::set_solution_check_function(&test_check_solution);
