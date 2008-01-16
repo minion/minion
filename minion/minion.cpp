@@ -387,8 +387,12 @@ int main(int argc, char** argv) {
   if(!Controller::failed)
   {
 	if(args.preprocess)
-      preprocess_SAC(var_val_order.first);
-    if(!Controller::failed)
+	{
+	  clock_t start_SAC_time = clock();
+      propogateSAC(var_val_order.first);
+      cout << "Preprocess Time: " << (clock() - start_SAC_time) / (1.0 * CLOCKS_PER_SEC) << endl;
+	}  
+	if(!Controller::failed)
       solve(args.order, var_val_order);
   }
  
