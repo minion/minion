@@ -211,8 +211,7 @@ int main(int argc, char** argv) {
   start_clock();
   
   if (argc == 1)
-   print_info();
-  
+    print_info();
 
   MinionInputReader reader;
   
