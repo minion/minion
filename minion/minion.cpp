@@ -106,8 +106,9 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 #ifdef MORE_SEARCH_INFO
 	  Controller::commandlineoption_nocheck = true; 
 #else
-	  cout << "This version of minion was not built to support the '-nocheck' command. Sorry" << endl;
-	  FAIL_EXIT();
+	  cout << "# WARNING: This version of minion was not built to support the '-nocheck' command." << endl;
+	  cout << "# WARNING: Solutions will not be checked in this version." << endl;
+	  cout << "# WARNING: This is probably the behaviour you want but this option does nothing." << endl;
 #endif
 	}
 	
