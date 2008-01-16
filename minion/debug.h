@@ -70,17 +70,16 @@ void inline D_FATAL_ERROR2(string s, string file, string line)
 }
 
 
-void inline FAIL_EXIT() 
+void inline _NORETURN FAIL_EXIT() 
 { 
   cerr << "Unrecoverable error. Exiting" << endl;
   cerr.flush();
   if(debug_crash)
   {
-    int* nullvar = NULL;
+    volatile int* nullvar = NULL;
 	*nullvar = 0;
   }
-  else
-	exit(1); 
+  exit(1); 
 }
 
 #ifndef NO_DEBUG
