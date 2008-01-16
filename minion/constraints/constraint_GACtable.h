@@ -54,18 +54,22 @@ struct GACTableConstraint : public DynamicConstraint
   
   int setNextValid(vector<int>& support, int var_considered, int first_broken_val)
   {
+	for(int i = first_broken_val + 1; i < support.size(); ++i)
+	  support[i] = vars[i].getMin();
+	
 	for(int i = first_broken_val; i >= 0; --i)
 	{
 	  if(i != var_considered)
 	  {
-		int pos = support[i];
-		pos++;
+		int pos = std::max(support[i] + 1, vars[i].getMin());
+		
+		while(pos <= vars[i].getMax() && !vars[i].inDomain(pos))
+		  pos++;
+
 		if(pos > vars[i].getMax())
 		  support[i] = vars[i].getMin();
 		else
 		{
-		  while(!vars[i].inDomain(pos))
-			pos++;
 		  support[i] = pos;
 		  return i;
 		}
@@ -131,7 +135,7 @@ struct GACTableConstraint : public DynamicConstraint
 	setFirstValid(new_support_tuple);
 	while(true)
 	{
-	  vector<int>* new_pos = upper_bound(start_position, end_position, new_support_tuple);
+	  vector<int>* new_pos = lower_bound(start_position, end_position, new_support_tuple);
 	  if(new_pos == end_position)
 		return false;
 	  
