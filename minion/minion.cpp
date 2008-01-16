@@ -56,8 +56,8 @@ void print_info()
     << "   These flags may changed or removed in future versions." << endl
     << "   These flags is not optimised and using them" << endl
     << "   can cause a severe performance drop." << endl
-    << "         [-preprocess]				 Perform SAC at the first node of search" << endl
-    << "         [-preprocess2]              Perform SSAC at first node of search (can take a LONG time)" << endl
+    << "         [-sac-root]				 Perform SAC at the first node of search" << endl
+    << "         [-ssac-root]              Perform SSAC at first node of search (can take a LONG time)" << endl
     << "         [-varorder] order			 Change variable ordering strategy" << endl
 	<< "		   order = sdf               Smallest Domain First (static breaks ties)" << endl
 	<< "		   order = sdf-random        SDF (randomly break ties)" << endl
@@ -115,9 +115,9 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 	{ Controller::print_only_solution = true; }
 	else if(command == string("-verbose"))
 	{ reader.parser_verbose = true; }
-	else if(command == string("-preprocess"))
+	else if(command == string("-sac-root"))
 	{ args.preprocess = 1; }
-	else if(command == string("-preprocess2"))
+	else if(command == string("-ssac-root"))
 	{ args.preprocess = 2; }
 	else if(command == string("-fullprop"))
 	{
