@@ -66,7 +66,7 @@ CPU=
 #CPU=-march=pentium4
 #CPU=-march=pentium-m
 
-FULLFLAGS=-W -Wno-sign-compare $(DEBUG_FLAGS) $(FLAGS) $(CPU) $(WATCHED) $(QUICK_COMPILE) $(MORE_INFO_FLAGS) $(MYFLAGS)
+FULLFLAGS=-Wextra -Wno-sign-compare -Wno-missing-field-initializers $(DEBUG_FLAGS) $(FLAGS) $(CPU) $(WATCHED) $(QUICK_COMPILE) $(MORE_INFO_FLAGS) $(MYFLAGS)
 
 OBJFILES=$(patsubst minion/%.cpp,$(OBJDIR)/%.o,$(SRC))
 
