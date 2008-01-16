@@ -48,6 +48,8 @@
 		264C604D09F029DD00000D7F /* BuildConstraintConstructs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuildConstraintConstructs.h; sourceTree = "<group>"; };
 		264E03FB09C4A7F200CCB830 /* constraint_GACtable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_GACtable.h; path = constraints/constraint_GACtable.h; sourceTree = "<group>"; };
 		264E044509C4BEF000CCB830 /* test_gactable_1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_gactable_1.cpp; path = tests/test_gactable_1.cpp; sourceTree = "<group>"; };
+		264EB89D0AFFD11D0018A3BD /* dynamic_sum_sat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dynamic_sum_sat.h; path = dynamic_constraints/dynamic_sum_sat.h; sourceTree = "<group>"; };
+		264EB9080B0095750018A3BD /* dynamic_binary_sat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dynamic_binary_sat.h; path = dynamic_constraints/dynamic_binary_sat.h; sourceTree = "<group>"; };
 		265557720A5B280000B9A732 /* linked_ptr.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = linked_ptr.h; path = system/linked_ptr.h; sourceTree = "<group>"; };
 		265557730A5B280000B9A732 /* local_array.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = local_array.h; path = system/local_array.h; sourceTree = "<group>"; };
 		265CA10B097DC24800D5A6F4 /* test_intvar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_intvar.cpp; path = tests/test_intvar.cpp; sourceTree = "<group>"; };
@@ -222,6 +224,8 @@
 				26CD8B000ACA639B00688A66 /* dynamic_literalwatch.h */,
 				26B4A05609F42A1D00C7E8A2 /* dynamic_element.h */,
 				2689210909DBB5C500D0472B /* dynamic_sum.h */,
+				264EB89D0AFFD11D0018A3BD /* dynamic_sum_sat.h */,
+				264EB9080B0095750018A3BD /* dynamic_binary_sat.h */,
 				261E01FA09F7F57E004F8C91 /* tries.h */,
 				266E8DE60AAB3C530066DA57 /* constraint_GACtable_nightingale.h */,
 				266E8DE70AAB3C530066DA57 /* constraint_GACtable_reginlhomme.h */,
