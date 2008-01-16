@@ -1,0 +1,22 @@
+MINION 1
+#TEST SOLCOUNT 2
+#
+# Minion Constraint Solver Input
+#    http://sourceforge.net/projects/minion
+
+2
+0
+0
+0
+0
+[]
+[]
+0
+1
+[[x0, x1]]
+0
+objective none
+print m0
+
+
+alldiff([x0,x1])
