@@ -27,7 +27,7 @@ inline void start_clock()
   _last_check_time = _internal_start_time;
 }
 
-inline bool check_timeout(int seconds)
+inline bool check_timeout(unsigned seconds)
 { return (clock() - _internal_start_time) >= (seconds * CLOCKS_PER_SEC); }
 
 inline void print_timestep_without_reset(char* time_name)

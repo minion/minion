@@ -297,7 +297,7 @@ int main(int argc, char** argv) {
 	srand( seed );
   
     std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());
-    for(int i = 0; i < var_val_order.second.size(); ++i)
+    for(unsigned i = 0; i < var_val_order.second.size(); ++i)
       var_val_order.second[i] = (rand() % 100) > 50;
 	  
 	if(reader.parser_verbose)

@@ -127,11 +127,11 @@ class TupleList
     int arity = tuple_size();	
     
    	  // Set up the table of tuples.
-	  for(unsigned i = 0; i < arity; ++i)
+	  for(int i = 0; i < arity; ++i)
 	  {
 		int min_val = get_tupleptr(0)[i];
 		int max_val = get_tupleptr(0)[i];
-		for(unsigned j = 1; j < size(); ++j)
+		for(int j = 1; j < size(); ++j)
 		{
 		  min_val = mymin(min_val, get_tupleptr(j)[i]);
 		  max_val = mymax(max_val, get_tupleptr(j)[i]);
@@ -140,13 +140,12 @@ class TupleList
 		dom_size.push_back(max_val - min_val + 1);
 	  }
 	  
-	 
-
-
-	_map_vars_to_literal.resize(dom_size.size());
+	int dom_size_size = dom_size.size();
+	_map_vars_to_literal.resize(dom_size_size);
 	// For each variable / value pair, get a literal
 	int literal_count = 0;
-	for(unsigned i = 0; i < dom_size.size(); ++i)
+	
+	for(int i = 0; i < dom_size_size; ++i)
 	{
 	  _map_vars_to_literal[i].resize(dom_size[i] + 1);
 	  for(int j = 0; j <= dom_size[i]; ++j)
@@ -208,7 +207,7 @@ struct LiteralSpecificLists
 				 ++j)
 		{
 		  vector<vector<int> > specific_tuples;
-		  for(unsigned k = 0; k < (*tuples).size(); ++k)
+		  for(int k = 0; k < (*tuples).size(); ++k)
 		  {
 			if((*tuples)[k][i] == j)
 			  specific_tuples.push_back((*tuples).get_vector(k));

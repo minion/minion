@@ -90,6 +90,7 @@
 		269BD2B40975A8CD0018E178 /* test_functions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = test_functions.h; path = tests/test_functions.h; sourceTree = "<group>"; };
 		269BD2ED0975AB9D0018E178 /* test06.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test06.cpp; path = tests/test06.cpp; sourceTree = "<group>"; };
 		269DC8DA098451AA00F52AF2 /* trigger_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trigger_list.h; sourceTree = "<group>"; };
+		269EEBE60AC3D8B400FCF4DB /* BMSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BMSet.h; path = variables/containers/BMSet.h; sourceTree = "<group>"; };
 		26A83EEF097A923F009DD39A /* VarRefType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VarRefType.h; path = variables/VarRefType.h; sourceTree = "<group>"; };
 		26A857BC099B6A6200ECA923 /* CSPSpec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSPSpec.h; sourceTree = "<group>"; };
 		26AAF876096D3BC300AD8C1A /* constraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint.h; path = constraints/constraint.h; sourceTree = "<group>"; };
@@ -348,6 +349,7 @@
 		26F697FD0986D79A00D3B93B /* variables */ = {
 			isa = PBXGroup;
 			children = (
+				269EEBE60AC3D8B400FCF4DB /* BMSet.h */,
 				26C1B86309D04F4100DF3026 /* variable_switch_neg.h */,
 				26EF146D099807D500D13443 /* variable_not.h */,
 				26EECB070988D316008A73CF /* variable_stretch.h */,

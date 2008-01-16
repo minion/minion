@@ -56,11 +56,9 @@ struct GACTableConstraint : public DynamicConstraint
   
   GACTableConstraint(const VarArray& _vars, TupleList* _tuples) :
 	vars(_vars), lists(_tuples->getLitLists())
-  { 
-	  int arity = lists->tuples->tuple_size();	  
-	  D_ASSERT(_vars.size() == arity);
-	  
-      _current_support.request_bytes(lists->tuples->literal_num * sizeof(int));
+  {
+    D_ASSERT((int)_vars.size() == lists->tuples->tuple_size());
+	_current_support.request_bytes(lists->tuples->literal_num * sizeof(int));
   }
   
   int dynamic_trigger_count()
@@ -176,7 +174,7 @@ struct GACTableConstraint : public DynamicConstraint
   
    virtual bool check_assignment(vector<int> v)
   {
-    for(unsigned i = 0; i < (lists->tuples)->size(); ++i)
+    for(int i = 0; i < (lists->tuples)->size(); ++i)
 	{
 	    if( std::equal(v.begin(), v.end(), (*lists->tuples)[i]) )
 	    return true;
