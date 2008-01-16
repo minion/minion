@@ -52,27 +52,38 @@ struct ConcreteFileReader : public InputFileReader
     throw new parse_exception("Problem parsing number");
 	return i;
 	*/
-	string s;
+	char string_buffer[100];
+	char* bufptr = string_buffer;
+	//string s;
 	char next_char = infile.get();
 	while(isspace(next_char))
 	  next_char = infile.get();
 	
+	bool negative = false;
+	
 	if(next_char == '-')
 	{
-	  s+= next_char;
+	  negative = true;
 	  next_char = infile.get();
 	}
 	
+	if(!(next_char >= '0' && next_char <= '9') )
+	  throw new parse_exception("Problem parsing number");  
+	
+	int num=0;
+	
 	while( (next_char >= '0' && next_char <= '9'))
 	{
-	  s += next_char;
+	  num *= 10;
+	  num += (next_char - '0');
 	  next_char = infile.get();
 	}
 	
 	infile.putback(next_char);
-	if(infile.fail() || s == "" || s == "-")
-	  throw new parse_exception("Problem parsing number. Read '"+s+"'.");
-	return atoi(s.c_str());
+    if(negative)
+	  num*= -1;
+	
+	return num;
   }
   
   virtual char peek_char()
@@ -154,8 +165,8 @@ class MinionInputReader {
   Var readIdentifier(InputFileReader* infile) ;
   vector< vector<Var> > readLiteralMatrix(InputFileReader* infile) ;
   vector<Var> readLiteralVector(InputFileReader* infile) ;
-  void readObjective(InputFileReader* infile);
-  void readTuples(InputFileReader* infile); 
+  void readObjective(InputFileReader* infile) ;
+  void readTuples(InputFileReader* infile) ;
   void readMatrices(InputFileReader* infile) ;
   void readValOrder(InputFileReader* infile) ;
   void readVarOrder(InputFileReader* infile) ;
@@ -163,11 +174,12 @@ class MinionInputReader {
   void readVars(InputFileReader* infile) ;
   vector<Var> readVectorExpression(InputFileReader* infile) ;
   
-  void readGeneralConstraint(InputFileReader*, const ConstraintDef&);
+  void readGeneralConstraint(InputFileReader*, const ConstraintDef&) ;
+  InputFileReader* infile ;
  public:
   void read(char* fn) ;
-  ProbSpec::CSPInstance instance;
-  BOOL parser_verbose;
+  ProbSpec::CSPInstance instance ;
+  BOOL parser_verbose ;
   
   MinionInputReader() : parser_verbose(false)
   {}
