@@ -106,7 +106,6 @@ struct Nightingale
 
  int noTuples;
   int arity;
-  
 
   TupleList* tuples;
   Nightingale(TupleList* _tuples) : tuples(_tuples)
@@ -114,7 +113,7 @@ struct Nightingale
     tuples->finalise_tuples();
     arity = tuples->tuple_size();	
     noTuples = tuples->size();
-    /* if(listperliteral)
+     if(listperliteral)
         {
             tuplelistperlit=new TupleN***[arity];
             
@@ -139,22 +138,25 @@ struct Nightingale
                 }
             }
         }
-        else*/
+        else
         {
-            tuplelist=buildhologram(tuples);
+            tuplelist=buildhologram(*tuples);
         }
   
   }
   
-  TupleN ** buildhologram(TupleList* _input_tuples)
+  template<typename T>
+  TupleN ** buildhologram(T& tupleref)
   {
-    TupleList& tupleref = *_input_tuples;
     // turn a list of int [] into an n-holo
     TupleN ** tlist=new TupleN*[tupleref.size()];
         
         for(int tupleIndex = 0; tupleIndex < tupleref.size(); tupleIndex++)
         {
-            const vector<int>& values = tupleref.get_vector(tupleIndex);
+		  // This line is messy, but is here because we want this code to work
+		  // for both vector<vector<int> >s and tuple containers. We'll clean it up
+		  // sometime.
+            const vector<int> values(&tupleref[tupleIndex][0], &tupleref[tupleIndex][0] + arity);
             
             int * _values=new int[arity];
 			std::copy(values.begin(), values.begin() + arity, _values);
@@ -220,28 +222,29 @@ struct Nightingale
         }
         return tlist;
   }
-  /*
-     void splittuples(TupleList* alltuples, vector<vector<vector<vector<int> > > >& goods)
+  
+     void splittuples(TupleList* tuples, vector<vector<vector<vector<int> > > >& goods)
     {
-	    int arity = tupleslist->tuple_size();	
+	    int arity = tuples->tuple_size();	
         goods.resize(arity);
         for(int var=0; var<arity; var++)
         {
-            goods[var].resize(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
-            for(int val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++)
+            goods[var].resize((tuples->dom_size)[var]);
+            for(int val = (tuples->dom_smallest)[var];
+				val <= (tuples->dom_smallest)[var] + (tuples->dom_size)[var]; val++)
             {
-                for(int tupleindex=0; tupleindex<alltuples.size(); tupleindex++)
+                for(int tupleindex=0; tupleindex<tuples->size(); tupleindex++)
                 {
-                    if(alltuples[tupleindex][var]==val)
+                    if((*tuples)[tupleindex][var]==val)
                     {
                         // matching tuple
-                        goods[var][val+offset[var]].push_back(alltuples[tupleindex]);
+                        goods[var][val-(tuples->dom_smallest)[var]].push_back(tuples->get_vector(tupleindex));
                     }
                 }
             }
         }
     }
-	*/
+	
 };
 
 
@@ -259,8 +262,6 @@ struct GACTableConstraint : public DynamicConstraint
   // This is bad because it might have holes in it, i.e. revints that are not used.
   
   int ** current_support;
-  
-  //BOOL listperliteral;
   
   //vector<int> offset;
   
@@ -333,12 +334,6 @@ struct GACTableConstraint : public DynamicConstraint
 	  //noTuples=tuples.size();
       //current_support.resize(arity);
       
-     // #ifdef LISTPERLIT
-     //   listperliteral=true;
-     // #else
-     //   listperliteral=false;
-     // #endif  
-      
       // sort, required for correctness.
       //sort(tuplesbackup.begin(), tuplesbackup.end(), TupleComparator(0, arity));
       
@@ -366,137 +361,12 @@ struct GACTableConstraint : public DynamicConstraint
             current_support[i][j]=-1;
         }
       }
-      /*
-      if(listperliteral)
-        {
-            tuplelistperlit=new TupleN***[arity];
-            
-            vector<vector<vector<vector<int> > > > goods;
-			// Pass goods to splittuples just to avoid copying it on return.
-			splittuples(tuplesbackup, goods);
-            tuplelistlengths=new int*[arity];
-            
-            for(int i=0; i<arity; i++)
-            {
-                tuplelistperlit[i]=new TupleN**[vars[i].getInitialMax()-vars[i].getInitialMin()+1];
-                tuplelistlengths[i]=new int[vars[i].getInitialMax()-vars[i].getInitialMin()+1];
-                
-                for(int val=vars[i].getInitialMin(); val<=vars[i].getInitialMax(); val++)
-                {   
-                    TupleN** tlpl=buildhologram(goods[i][val+offset[i]]);
-                    tuplelistperlit[i][val+offset[i]]=tlpl;
-                    tuplelistlengths[i][val+offset[i]]=goods[i][val+offset[i]].size();
-                }
-            }
-        }
-        else
-        {
-            tuplelist=buildhologram(tuplesbackup);
-        }*/
         
   }
   
   int dynamic_trigger_count()
   { return (nightingale->tuples->literal_num) * ( vars.size() - 1) ; }
-  
-  /*
-  TupleN ** buildhologram(const vector<vector<int> >& tuples)
-  {
-    // turn a list of int [] into an n-holo
-    TupleN ** tlist=new TupleN*[tuples.size()];
-        
-        for(int tupleIndex = 0; tupleIndex < tuples.size(); tupleIndex++)
-        {
-            const vector<int>& values = tuples[tupleIndex];
-            
-            int * _values=new int[arity];
-			std::copy(values.begin(), values.begin() + arity, _values);
-//            for(int i=0; i<arity; i++){
-//              _values[i]=values[i];
-//            }
-            
-            tlist[tupleIndex]=new TupleN(_values, tupleIndex, arity);
-            if(true)
-            {
-                // Now iterate backwards through the tuplelist, setting the appropriate forward pointers
-                int numproc=arity;
-                
-                // check how many are the same for the last tuple.
-                if(tupleIndex>=1)
-                {
-                for(int valIndex=0; valIndex<arity; valIndex++)
-                {
-                    if(values[valIndex]==tlist[tupleIndex-1]->values[valIndex])
-                    {
-                        numproc--;
-                    }
-                }
-                }
-                
-                for(int i=tupleIndex-1; i>=0; i--)
-                {
-                    TupleN* backtuple=tlist[i];
-                    // if backtuple has a value i which is different to curtuple, make the forward link.
-                    
-                    // fill in any entries in nextDifferent
-                    for(int valIndex=0; valIndex<arity; valIndex++)
-                    {
-                        if(backtuple->nextDifferent[valIndex]==-1)
-                        {
-                            if(backtuple->values[valIndex]!=values[valIndex])
-                            {
-                                numproc--;
-                                backtuple->nextDifferent[valIndex]=tupleIndex;
-                                // now iterate backwards and fill in any others in the same column
-                                for(int j=i-1; j>=0; j--)
-                                {
-                                    if(tlist[j]->nextDifferent[valIndex]==-1)
-                                    {
-                                        tlist[j]->nextDifferent[valIndex]=tupleIndex;
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    if(numproc==0)//allfilled)
-                    {
-                        break;  // suspicious about this. 
-                        //What about 1 1 5, 1 2 5, 1 2 6. var 3, nextD only set for second tuple, not first.
-                    }
-                }
-            }
-        }
-        return tlist;
-  }
-  */
-  
-  /*
-   void splittuples(const vector<vector<int> >& alltuples, vector<vector<vector<vector<int> > > >& goods)
-    {
-        goods.resize(arity);
-        for(int var=0; var<arity; var++)
-        {
-            goods[var].resize(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
-            for(int val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++)
-            {
-                for(int tupleindex=0; tupleindex<alltuples.size(); tupleindex++)
-                {
-                    if(alltuples[tupleindex][var]==val)
-                    {
-                        // matching tuple
-                        goods[var][val+offset[var]].push_back(alltuples[tupleindex]);
-                    }
-                }
-            }
-        }
-    }
-  */
-  
+    
   TupleN* seekNextSupport(int var, int val)
   {
     //System.out.println("Finding support for var:"+var+" val:"+val);
@@ -505,6 +375,9 @@ struct GACTableConstraint : public DynamicConstraint
     // Else return null.
     
 	int domain_min = (nightingale->tuples->dom_smallest)[var];
+	int domain_max = domain_min + (nightingale->tuples->dom_size)[var];
+	if(val >= domain_max)
+	  return 0;
     int ltp=current_support[var][val-domain_min];  // watches must be indexed by the actual value.
     
     int index=ltp; 
@@ -522,10 +395,9 @@ struct GACTableConstraint : public DynamicConstraint
         listlength=nightingale->noTuples;
     }
     
-    BOOL firstpass=true;
     for(int pass=0; pass<2; pass++)
     {
-        firstpass=(pass==0)?true:false;
+        bool firstpass=(pass==0)?true:false;
         if(!firstpass) index=0;
         while((firstpass && index<listlength && index!=-1) || (!firstpass && index<=ltp && index!=-1))
         {
