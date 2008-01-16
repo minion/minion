@@ -7,6 +7,8 @@
 
 using namespace std;
 
+// Global varible representing the seed given to the program.
+int seed;
 
 struct sum_function
 {
@@ -177,10 +179,12 @@ int main(int argc, char** argv)
   k = atoi(argv[4]);
   l = atoi(argv[5]);
   
+  seed = atoi(argv[6]);
   srand(atoi(argv[6]));
   
   Rep rep(v);
-  rep.randomise();
+  if(seed != 0)
+    rep.randomise();
   
   cout << "MINION 1" << endl;
   cout << "# Random generated BIBD examples" << endl;
@@ -259,12 +263,12 @@ int main(int argc, char** argv)
   for(int i = 0; i < v; ++i)
   {
     cout << "sumleq([x" << var_pos(i,0) + v*b;
-    for(int j = 0; j < b; ++j)
+    for(int j = 1; j < b; ++j)
       cout << ",x" << var_pos(i,j) + v*b;
     cout << "], " << k << ")" << endl;
 
     cout << "sumgeq([x" << var_pos(i,0) + v*b;
-    for(int j = 0; j < b; ++j)
+    for(int j = 1; j < b; ++j)
       cout << ",x" << var_pos(i,j) + v*b;
     cout << "], " << k << ")" << endl;
   }
