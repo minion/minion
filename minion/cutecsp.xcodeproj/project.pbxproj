@@ -191,8 +191,6 @@
 			isa = PBXGroup;
 			children = (
 				26CFEBEC0AA64E5A00A35D56 /* VariableOrders.h */,
-				26FC06F409CB68D500153DA6 /* constraint_dynamic.h */,
-				26AAF876096D3BC300AD8C1A /* constraint.h */,
 				26CD0D9D0A1B8665007D8889 /* test_functions.cpp */,
 				26CD0D5C0A1B810E007D8889 /* standard_queue.h */,
 				2644ACE40A192B90002BD572 /* minion.cpp */,
@@ -318,6 +316,8 @@
 		26F697FC0986D78E00D3B93B /* constraints */ = {
 			isa = PBXGroup;
 			children = (
+				26FC06F409CB68D500153DA6 /* constraint_dynamic.h */,
+				26AAF876096D3BC300AD8C1A /* constraint.h */,
 				26808B0B09D5FF820025DA04 /* function_defs.hpp */,
 				26790A870975DCC9006C6C00 /* reify.h */,
 				26B99BD609979C0E009D27F0 /* reify_true.h */,

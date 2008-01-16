@@ -185,48 +185,7 @@
 	<key>Notifications</key>
 	<array/>
 	<key>OpenEditors</key>
-	<array>
-		<dict>
-			<key>Content</key>
-			<dict>
-				<key>PBXProjectModuleGUID</key>
-				<string>26E5631E0AD1A61300D53D3A</string>
-				<key>PBXProjectModuleLabel</key>
-				<string>constraint_setup.h</string>
-				<key>PBXSplitModuleInNavigatorKey</key>
-				<dict>
-					<key>Split0</key>
-					<dict>
-						<key>PBXProjectModuleGUID</key>
-						<string>26E5631F0AD1A61300D53D3A</string>
-						<key>PBXProjectModuleLabel</key>
-						<string>constraint_setup.h</string>
-						<key>_historyCapacity</key>
-						<integer>0</integer>
-						<key>bookmark</key>
-						<string>260715510AD1A96600F3F2F8</string>
-						<key>history</key>
-						<array>
-							<string>26E563200AD1A61300D53D3A</string>
-						</array>
-					</dict>
-					<key>SplitCount</key>
-					<string>1</string>
-				</dict>
-				<key>StatusBarVisibility</key>
-				<true/>
-			</dict>
-			<key>Geometry</key>
-			<dict>
-				<key>Frame</key>
-				<string>{{0, 20}, {892, 658}}</string>
-				<key>PBXModuleWindowStatusBarHidden2</key>
-				<false/>
-				<key>RubberWindowFrame</key>
-				<string>849 179 892 699 0 0 1440 878 </string>
-			</dict>
-		</dict>
-	</array>
+	<array/>
 	<key>PerspectiveWidths</key>
 	<array>
 		<integer>1011</integer>
@@ -311,13 +270,13 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>60</integer>
-									<integer>49</integer>
+									<integer>65</integer>
+									<integer>63</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 501}, {279, 705}}</string>
+							<string>{{0, 894}, {279, 705}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -417,9 +376,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>2607153D0AD1A83800F3F2F8</string>
+				<string>26CA5D350AD693F50089B360</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>2607153E0AD1A83800F3F2F8</string>
+				<string>26CA5D360AD693F50089B360</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -564,7 +523,6 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>1C530D57069F1CE1000CFCEE</string>
 		<string>/Users/caj/minion/trunk/minion/cutecsp.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
@@ -787,12 +745,14 @@
 							<key>Dock</key>
 							<array>
 								<dict>
+									<key>BecomeActive</key>
+									<true/>
 									<key>ContentConfiguration</key>
 									<dict>
 										<key>PBXProjectModuleGUID</key>
 										<string>1CDD528C0622207200134675</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>backtrackable_memory.h</string>
+										<string>booleanvariables.h</string>
 										<key>StatusBarVisibility</key>
 										<true/>
 									</dict>
@@ -813,8 +773,6 @@
 							<string>477pt</string>
 						</dict>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -850,8 +808,8 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C530D57069F1CE1000CFCEE</string>
-				<string>260715490AD1A95900F3F2F8</string>
-				<string>2607154A0AD1A95900F3F2F8</string>
+				<string>26033DD20AD4F18D003E0623</string>
+				<string>26033DD30AD4F18D003E0623</string>
 				<string>1CDD528C0622207200134675</string>
 				<string>1CD0528E0623707200166675</string>
 			</array>

@@ -52,11 +52,7 @@ struct Constraint
   
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
-#ifndef FUNCTIONPOINTER_TRIGGER
   PROPAGATE_FUNCTION(int, DomainDelta) = 0;
-#else
-  PROPAGATE_FUNCTION(int, DomainDelta) {}
-#endif
 
   // Returns a table constraint which implements this constraint
   /** The main reason for this function is to make the constraint package up all its variables */
@@ -70,34 +66,45 @@ struct Constraint
   /// Returns TRUE if constraint cannot be satisfied.
   /** This function is used by rarification */
   virtual bool full_check_unsat()
-  { FAIL_EXIT(); }
+  { 
+	cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+	FAIL_EXIT(); 
+  }
     
   /// Checks incrementaly if constraint cannot be satisfied.
   /// Returns TRUE if constraint cannot be satisfied.
   /** This function should not be called unless check_unsat_full is called first. This is used by rarification */
   virtual bool check_unsat(int,DomainDelta)
-  { FAIL_EXIT(); }
+  { 
+	cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+	FAIL_EXIT(); 
+  }
   
   /// Allows functions to activate a special kind of trigger, run only
   /// after the normal queue is empty.
   virtual void special_check()
-  { FAIL_EXIT(); }
+  { 
+	cerr << "Serious internal error" << endl;
+	FAIL_EXIT(); 
+  }
   
   virtual void special_unlock()
-  { FAIL_EXIT(); }
+  { 
+	cerr << "Serious internal error" << endl;
+	FAIL_EXIT(); 
+  }
   
   
   /// Returns the reverse of the current constraint
   /** Used by rarification */
   virtual Constraint* reverse_constraint()
   { 
+	cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
     FAIL_EXIT();
   }
   
   virtual ~Constraint()
   {}
-  
-
 };
 
 
