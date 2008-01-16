@@ -69,6 +69,8 @@ NO_DOUBLE_MEMORY_COPY - Allow the base of variables to be moved around rather
 
 SLOW_TRIGGERS		  - Don't attempt to compress the set of triggers.
 
+SLOW_QUEUE			  - Don't attempt to compress the queue.
+
 In the near future, one of the follow 3 will be blessed as "offical" and turned
 on.
 

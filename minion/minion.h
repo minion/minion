@@ -110,7 +110,7 @@ VARDEF_ASSIGN(BOOL dynamic_triggers_used, false);
 namespace Controller
 {
   /// Add a new list of triggers to the queue.
-  inline void push_triggers(const TriggerRange& new_triggers);
+  inline void push_triggers(TriggerRange new_triggers);
   inline void push_special_trigger(Constraint* trigger);
 #ifdef DYNAMICTRIGGERS
   inline void push_dynamic_triggers(DynamicTrigger* trigs);
@@ -178,7 +178,12 @@ namespace Controller
 
 #include "constraints/function_defs.hpp"
 
+#ifndef SLOW_QUEUE
 #include "queue/standard_queue.h"
+#else
+#include "queue/slow_queue.h"
+#endif
+
 #include "search/standard_search.h"
 #include "constraint_setup.h"
 

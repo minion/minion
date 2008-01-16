@@ -27,7 +27,7 @@ namespace Controller
 #endif
   
 
-  
+ /* 
 /// This is a special limited version of the normal propagation,
 /// that takes a list of constraints that are allowed to be propagated
 /// at present.
@@ -55,7 +55,7 @@ inline bool special_limit_propogate_static_queue(const set<Constraint*>& constra
 	}
 	
 	return false;
-}
+}*/
 
 /// Lists all structures that must be locked before search.
 // @todo This could be done more neatly... 
