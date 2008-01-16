@@ -1,44 +1,42 @@
-The following is a list of things it would be nice to have for
-Minion 1.0, each marked:
-A (vital) to E (unimportant)
-1 (easy) to 5 (very hard)
+15/10/2006 - Cheaning up this file a bit.
 
-Symmetry
---------
-(A4) Provide GAP <-> Minion tunnel
-(A3) GAP-SBDD : How well written is the code for this?
-(A2) GAP-LEX : Easy after tunnel built
-(C5) GAP-SBDS : Doesn't fit well with current framework unfortunatly.
-(C5+) GAP-SBDS+D : Would be nice to have, requires above to
-(A3) Automatically detect symmetry of a specification
-(C2) Provide method to give group in Minion specification
+Tiny tasks
+----------
+* Rewrite memory_management, and merge the two files.
+* Don't include all constraints in all files
+* Write a proper Make file
+* Rewrite test suite in something which isn't bash?
+
+
+
+Symmetry - None a the moment. Would be difficult to justify as research?
+------------------------------------------------------------------------
+* Provide GAP <-> Minion tunnel
+* GAP-LEX (easy) SBDD (harder) SBDS (possible?) SBDS+D (???)
+* Automatically detect symmetry of a specification - steal someone else's?
+  Need to talk to a group person about this...
+* Provide method to give group in Minion specification
 
 Easier specification language
 -----------------------------
-(A5) Essence' converter
-(B5) OPL converter
-(A?) Clean up current parser, add test cases that are supposed to not parse
-(B3) Provide something like minion-helper in more portable language (Perl?)
+* Essence' converter
+* Provide something like minion-helper in more portable language (Perl?)
 
 
 Minion internals
 ----------------
-(C2) Clean up the trigger system
-	Use only addTrigger and addDynamicTrigger.
-(B5) Get at least BC-AllDiff
+* Get at least BC-AllDiff
 	Can we do a new, better GAC-AllDiff?
-(C5) Global Cardinality Constraint
-(??) Different var / val orderings
-(D3) Create specification -> C++ program convertor
-(C3) Parallel Minion
-	There is an early hacky version of this.
-(B2) Allow reusing tuple vectors in table constraint
+* Global Cardinality Constraint
+* Different var / val orderings
+* Create specification -> C++ program convertor
+* Parallel Minion 
+
 
 Things we'd like, but probably won't get
 ----------------------------------------
 A gui.
 A really nice thing to let you explore the search space.
-
 
 Things we won't try to do for 1.0 (open to debate)
 --------------------------------------------------
@@ -46,3 +44,19 @@ Things we won't try to do for 1.0 (open to debate)
 Hybrids (possibly SAT + learning, but later)
 Explicit set variables
 Minion as GAP package
+
+
+
+Done
+----
+
+* Clean up the trigger system. Use only addTrigger and addDynamicTrigger.
+* Allow reusing tuple vectors in table constraint
+	
+
+Abandoned (at least by Chris)
+-----------------------------
+Hopefully Essence' -> Minion convertor will be finished soon, so give up
+  *  OPL converter
+  *  Rewrite parser
+  
