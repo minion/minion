@@ -1,4 +1,4 @@
-del bin/*
+del bin\*
 del *.obj
 cl /EHsc /O2 /Ot /GL /w /DWATCHEDLITERALS  /DNO_PRINT /DMORE_SEARCH_INFO minion\*.cpp /link /OUT:bin\minion-debug.exe
 cl /EHsc /O2 /Ot /GL /w /DWATCHEDLITERALS  /DNO_DEBUG /DMORE_SEARCH_INFO minion\*.cpp /link /OUT:bin\minion.exe
