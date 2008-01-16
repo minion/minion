@@ -67,6 +67,10 @@
 
 #include "reversible_vals.h"
 
+#include "memory_management/trailed_monotonic_set.h"
+
+typedef TrailedMonotonicSet MonotonicSet;
+
 #include "tuple_container.h"
 
 /** @brief Represents a change in domain. 

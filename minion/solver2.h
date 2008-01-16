@@ -66,6 +66,7 @@ namespace Controller
   {
     D_INFO(0,DI_SOLVER,"World Pop");
     backtrackable_memory.world_pop();
+    big_rangevar_container.bms_array->undo();
   }
 }
 
