@@ -151,7 +151,6 @@ namespace Controller
 	  while(true)
 	  {
 		nodes++;
-#ifdef MORE_SEARCH_INFO
 		if(nodes == commandlineoption_nodelimit)
 		  return;
 		if((nodes & 1023) == 0)
@@ -159,7 +158,6 @@ namespace Controller
 		  if(do_checks())
 			return;
 		}
-#endif
 		
 		// order.find_next_unassigned returns true if all variables assigned.
 		if(order.find_next_unassigned())

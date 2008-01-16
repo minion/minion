@@ -118,7 +118,6 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 	}
 	else if(command == string("-nodelimit"))
 	{
-#ifdef MORE_SEARCH_INFO
 	  ++i;
 	  Controller::commandlineoption_nodelimit = atoi(argv[i]);
 	  if(Controller::commandlineoption_nodelimit == 0)
@@ -126,10 +125,8 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 		cout << "Did not understand parameter to nodelimit:" << argv[i] << endl;
 		FAIL_EXIT();
 	  }
-#else
 	  cout << "This version of minion was not built to support the '-nodelimit' command. Sorry" << endl;
 	  FAIL_EXIT();
-#endif
 	}
 	else if(command == string("-sollimit"))
 	{
