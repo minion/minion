@@ -1,0 +1,3 @@
+The things in this directory construct the auto-building of constraints.
+You should edit ConstraintList, then run both build_ConstraintDefs.sh and
+build_constraints.sh. Don't touch any other files!
