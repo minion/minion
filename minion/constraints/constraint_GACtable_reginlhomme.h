@@ -287,7 +287,7 @@ struct GACTableConstraint : public DynamicConstraint
         
         int nxvalid=0;
         bool testmode=false;
-        D_ASSERT( testmode=true);  // Ha! Only tests when assertions are enabled.
+        D_ASSERT(testmode=true);  // Ha! Only tests when assertions are enabled.
         if(testmode)
         {
             while(nxvalid<tuples.size() && (!check_tuple(tuplelist[nxvalid]->values) || tuplelist[nxvalid]->values[var]!=val))

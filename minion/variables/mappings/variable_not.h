@@ -35,7 +35,7 @@ struct VarNot
   { return data.isBound();}
   
   VarNot(const VarRef& _data) : data(_data)
-  { D_ASSERT(VarRef::isBool == true); }
+  { D_ASSERT(VarRef::isBool); }
   
   VarNot()
   {}

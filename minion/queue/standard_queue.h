@@ -146,7 +146,7 @@ namespace Controller
     int setjmp_return = _setjmp(g_env);
 	if(setjmp_return != 0)
 	{ // Failure has occured
-	  D_ASSERT(Controller::failed == false);
+	  D_ASSERT(!Controller::failed);
 	  Controller::failed = true;
 	  clear_queues();
 	  return;

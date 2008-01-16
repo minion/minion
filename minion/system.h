@@ -93,3 +93,5 @@ using namespace std;
 #define VARDEF_ASSIGN(x,y) x = y
 #define VARDEF(x) x
 #endif
+
+#define BOOL int

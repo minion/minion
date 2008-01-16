@@ -253,7 +253,7 @@ struct TupleTrie {
                         break;
                     }
                 }
-                D_ASSERT(found==true);
+                D_ASSERT(found);
                 //System.out.println("Resetting and returning to the start. index="+index);
                 trieLevel=1; continue;
           }

@@ -316,7 +316,7 @@ bool MinionInputReader::readConstraint(InputFileReader* infile, bool reified) {
 	case CT_REIFY:
 	case CT_REIFYIMPLY:
 	  { 
-	  if(reified == true)
+	  if(reified)
 		throw new parse_exception("Can't reify a reified constraint!");
 	  readConstraint(infile, true);
 	  

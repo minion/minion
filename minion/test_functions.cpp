@@ -31,7 +31,7 @@ void test_check_solution()
   if(sol != test_solution)
 	match = false;
   
-  if(match == false)
+  if(!match)
   {
 	cerr << "Test failed!" << endl;
 	cerr << "Generated sol:";
