@@ -28,6 +28,7 @@
 #define CSPSPEC_H
 
 #include <vector>
+#include <list>
 #include <utility>
 using namespace std;
 
@@ -154,6 +155,11 @@ struct ConstraintBlob
   BOOL reified;
   BOOL implied_reified;
   Var reify_var;
+  
+  ConstraintBlob(ConstraintDef _con) :
+	constraint(_con), reified(false), implied_reified(false)
+  {}
+  
   ConstraintBlob(ConstraintDef _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars), reified(false), implied_reified(false)
   {}
   
@@ -255,7 +261,7 @@ struct ConstraintBlob
   struct CSPInstance
 {
   VarContainer vars;
-  vector<ConstraintBlob> constraints;
+  list<ConstraintBlob> constraints;
   vector<Var> var_order;
   vector<char> val_order;
   

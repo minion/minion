@@ -196,12 +196,13 @@ void BuildCSP(MinionInputReader& reader)
   }
   
   // Impose Constraints
-  for(unsigned i = 0; i < reader.instance.constraints.size(); ++i)
+  for(list<ConstraintBlob>::iterator it = reader.instance.constraints.begin();
+	  it != reader.instance.constraints.end(); ++it)
   {
-    if(reader.instance.constraints[i].is_dynamic())
+    if(it->is_dynamic())
     {
 #ifdef DYNAMICTRIGGERS
-      Controller::add_constraint(build_dynamic_constraint(reader.instance.constraints[i]));
+      Controller::add_constraint(build_dynamic_constraint(*it));
       dynamic_triggers_used = true;
 #else
       cout << "Sorry, cannot process this constraint as it needs dynamic triggers or watched literals." << endl ;
@@ -210,7 +211,7 @@ void BuildCSP(MinionInputReader& reader)
 #endif
     }
     else
-      Controller::add_constraint(build_constraint(reader.instance.constraints[i]));
+      Controller::add_constraint(build_constraint(*it));
   }
 
 

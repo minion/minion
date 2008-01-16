@@ -49,6 +49,9 @@
  * itself.
  */
 
+#ifdef NO_DOUBLE_MEMORY_COPY
+VARDEF_ASSIGN(void* memory_base_ptr, NULL);
+#endif
 
 /// A pointer to some backtrackable memory.
 class BackTrackOffset
@@ -66,7 +69,11 @@ public:
   void* get_ptr() const 
   { 
 	D_ASSERT((size_t)(ptr) % sizeof(int) == 0);
+#ifdef NO_DOUBLE_MEMORY_COPY
+	return (char*)memory_base_ptr + (int)ptr;
+#else
 	return ptr;
+#endif
   }
   void request_bytes(int i);
   BackTrackOffset();
@@ -77,7 +84,14 @@ public:
 struct VirtualBackTrackOffset
 {
   void* ptr;
-  void* get_ptr() const { return ptr; }
+  void* get_ptr() const 
+  {
+#ifdef NO_DOUBLE_MEMORY_COPY
+	return (char*)memory_base_ptr + (int)ptr;
+#else
+	return ptr; 
+#endif
+  }
   VirtualBackTrackOffset();
   VirtualBackTrackOffset(BackTrackOffset& b, int offset);
   VirtualBackTrackOffset(const VirtualBackTrackOffset&);
@@ -100,7 +114,7 @@ struct BacktrackableMemory
   MAP_TYPE<VirtualBackTrackOffset*, pair<BackTrackOffset*, int> > virtual_ptrs;
   
   BacktrackableMemory() : allocated_bytes(0), lock_m(false), final_lock_m(false)
-  {}
+  { }
   
   /// Get a block of backtrack memory
   BackTrackOffset get_bytes(unsigned byte_count)
@@ -195,6 +209,7 @@ struct BacktrackableMemory
     D_ASSERT(!final_lock_m);
     lock_m = true;
     current_data = new char[allocated_bytes];
+	
 	D_ASSERT( (size_t)current_data % sizeof(int) == 0);
     MAP_TYPE<void*, pair<int,int> > offset_positions_backup(offset_positions);
     // Code like this makes baby Jesus cry, but is suprisingly legal C++
@@ -205,11 +220,19 @@ struct BacktrackableMemory
 	  if(old_ptr != NULL)
 	  {
         D_ASSERT(offset_positions.count(old_ptr) == 1);
-        (*it)->set_ptr(current_data + offset_positions[old_ptr].first);
+
+#ifdef NO_DOUBLE_MEMORY_COPY
+		(*it)->set_ptr(((char*)0) + offset_positions[old_ptr].first);
+#else
+		(*it)->set_ptr(current_data + offset_positions[old_ptr].first);
+#endif
+		
 		D_ASSERT( (size_t)((*it)->get_ptr()) % sizeof(int) == 0);
-        copy(old_ptr, old_ptr + offset_positions[old_ptr].second,
-	     static_cast<char*>((*it)->get_ptr()));
-        delete[] old_ptr;
+        
+		copy(old_ptr, old_ptr + offset_positions[old_ptr].second,
+	     current_data + offset_positions[old_ptr].first);
+        
+		delete[] old_ptr;
 	  }
       D_DATA(offset_positions.erase(old_ptr));
     }
@@ -221,9 +244,12 @@ struct BacktrackableMemory
       VirtualBackTrackOffset* ptr = it->first;
       const BackTrackOffset* master = it->second.first;
       int offset_val = it->second.second;
+
       ptr->ptr = static_cast<char*>(master->get_ptr()) + offset_val;
     }
-    
+#ifdef NO_DOUBLE_MEMORY_COPY
+	memory_base_ptr = current_data;
+#endif    
     backtrack_cache = new char[allocated_bytes * 100];
     backtrack_cache_size = allocated_bytes * 100;
     backtrack_cache_offset = 0;
@@ -258,7 +284,7 @@ struct BacktrackableMemory
 VARDEF(BacktrackableMemory backtrackable_memory);
 
 inline  BackTrackOffset::BackTrackOffset() : ptr(NULL)
-  {backtrackable_memory.addToTracker(this);}
+{backtrackable_memory.addToTracker(this);}
 
 inline VirtualBackTrackOffset::VirtualBackTrackOffset() : ptr(NULL)
 { }
@@ -278,8 +304,8 @@ inline VirtualBackTrackOffset::VirtualBackTrackOffset(const VirtualBackTrackOffs
 inline VirtualBackTrackOffset::VirtualBackTrackOffset(BackTrackOffset& b, int offset) : ptr(b.get_ptr())
 { backtrackable_memory.addToVirtualTracker(this, &b, offset); }
 
- inline  BackTrackOffset::~BackTrackOffset()
-  { backtrackable_memory.removeFromTracker(this); }
+inline  BackTrackOffset::~BackTrackOffset()
+{ backtrackable_memory.removeFromTracker(this); }
   
 inline VirtualBackTrackOffset::~VirtualBackTrackOffset()
 { backtrackable_memory.removeFromVirtualTracker(this); }

@@ -17,11 +17,11 @@ struct InputFileReader
   
   /// Check if the next character from @infile is @sym.
   virtual void check_sym(char sym) = 0;
-  virtual string getline() = 0;
+
   
   /// Cleans rubbish off start of string.
   virtual void clean_string(string& s) = 0;
-  
+  virtual string getline() = 0;  
   virtual string getline(char deliminator) = 0;
   virtual char get_char() = 0;
   virtual BOOL eof() = 0;
@@ -113,12 +113,13 @@ struct ConcreteFileReader : public InputFileReader
   
   virtual string getline()
   {
-	string s;
-	char* buf = new char[10000];
+	char buf[10000];
 	infile.getline(buf,10000);
-	s = buf;
-	delete[] buf;
-	return s;
+	char* buf_start = buf;
+	while(buf_start < buf + 10000 && isspace(*buf_start))
+	  buf_start++;
+	
+	return string(buf_start);
   }
   
   /// Cleans rubbish off start of string.
@@ -130,13 +131,14 @@ struct ConcreteFileReader : public InputFileReader
   
   virtual string getline(char deliminator)
   {
-	string s;
-	char* buf = new char[10000];
+	char buf[10000];
 	infile.getline(buf,10000, deliminator);
-	s = buf;
-	delete[] buf;
-	clean_string(s);
-	return s;
+
+	char* buf_start = buf;
+	while(buf_start < buf + 10000 && isspace(*buf_start))
+	  buf_start++;
+	
+	return string(buf_start);
   }
   
   virtual char get_char()

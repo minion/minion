@@ -76,46 +76,46 @@
   };
 
 
+  // Just a little helper function used in SDFVariableOrder
   inline bool is_boolean(const AnyVarRef& var)
   { return (var.getInitialMax() - var.getInitialMin()) == 1; } 
 
   struct SDFVariableOrder
   {
     vector<AnyVarRef> var_order;
+	vector<BOOL> val_order;
 	vector<int> branches;
+	int bool_end;
 	unsigned pos;
 	
-	SDFVariableOrder(vector<AnyVarRef>& _varorder, vector<BOOL>&)
-    : var_order(_varorder)
+	SDFVariableOrder(vector<AnyVarRef>& _varorder, vector<BOOL>& _valorder)
+    : var_order(_varorder), val_order(_valorder)
 	{
 	  branches.reserve(1000);
 	  pos = 0; 
-	  std::stable_partition(var_order.begin(), var_order.end(), is_boolean);
+	  bool_end = std::stable_partition(var_order.begin(), var_order.end(), is_boolean) - var_order.begin();
 	}
 	
 	// Returns true if all variables assigned
 	BOOL find_next_unassigned()
 	{
+	  // A special initial check just for Booleans.
+	  while(pos < bool_end && var_order[pos].isAssigned())
+	    ++pos;
+	  if (pos < bool_end)
+		return pos;
+	  
 	  // IMPORTANT:
 	  // Remember, when there are two values remaining in the domain,
 	  // max - min will equal ONE. When the domain is a single value,
 	  // max - min will equal ZERO.
+	  
 	  unsigned v_size = var_order.size();
-	  unsigned loop = 0;
-	  while(loop < v_size && var_order[loop].isAssigned())
-	    ++loop;
-	  if(loop == v_size)
-	    return true;
+	  unsigned loop = bool_end;
 	
-	  unsigned var_pos = loop;	
-	  int dom_size = var_order[var_pos].getMax() - var_order[var_pos].getMin();
-	  D_ASSERT(dom_size > 0)
-	  // Optimise for 2 values in domain.
-	  if(dom_size == 1)
-	  {
-		pos = var_pos;
-		return false;
-	  }
+	  // Set up values
+	  unsigned dom_size = INT_MAX;
+	  unsigned var_pos = -1;	
 		
 	  while(loop < v_size)
 	  {
@@ -135,17 +135,26 @@
 	    ++loop;		
 	  }
 	  
-	  pos = var_pos;
-	  return false;
+	  if(var_pos == -1)
+		return true;
+	  else
+	  {
+	    pos = var_pos;
+	    return false;
+	  }
 	}
 		
 	BOOL finished_search()
 	{ return branches.size() == 0; }
 	
-	void branch_left()
+    void branch_left()
 	{
 	  D_ASSERT(!var_order[pos].isAssigned()) 
-      int assign_val = var_order[pos].getMin();
+      int assign_val;
+	  if(val_order[pos])
+	    assign_val = var_order[pos].getMin();
+	  else
+		assign_val = var_order[pos].getMax();
 	  var_order[pos].uncheckedAssign(assign_val);
 	  
 	  branches.push_back(pos);
@@ -153,9 +162,13 @@
 	
 	void branch_right()
 	{  
-	   pos = branches.back();
-	   branches.pop_back();
-	   var_order[pos].setMin(var_order[pos].getMin() + 1);
+	  pos = branches.back();
+	  branches.pop_back();
+	  
+	  if(val_order[pos])
+		var_order[pos].setMin(var_order[pos].getMin() + 1);
+	  else
+		var_order[pos].setMax(var_order[pos].getMax() - 1);
 	}
   };
  

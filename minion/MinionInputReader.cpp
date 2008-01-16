@@ -70,8 +70,8 @@ ConstraintDef& get_constraint(ConstraintType t)
 template<typename T>
 vector<T> make_vec(const T& t)
 {
-  vector<T> vec;
-  vec.push_back(t);
+  vector<T> vec(1);
+  vec[0] = t;
   return vec;
 }
 
@@ -351,7 +351,11 @@ BOOL MinionInputReader::readConstraint(InputFileReader* infile, BOOL reified) {
 
 void MinionInputReader::readGeneralConstraint(InputFileReader* infile, const ConstraintDef& def)
 {
-  vector<vector<Var> > varsblob;
+  // This slightly strange code is to save copying the ConstraintBlob as much as possible.
+  instance.add_constraint(ConstraintBlob(def));
+  vector<vector<Var> >& varsblob = instance.constraints.back().vars;
+  varsblob.reserve(def.number_of_params);
+  
   for(int i = 0; i < def.number_of_params; ++i)
   {
     switch(def.read_types[i])
@@ -364,10 +368,10 @@ void MinionInputReader::readGeneralConstraint(InputFileReader* infile, const Con
 		break;
 	  case read_2_vars:
 	  {
-	    vector<Var> vars;
-	    vars.push_back(readIdentifier(infile));
+	    vector<Var> vars(2);
+	    vars[0] = readIdentifier(infile);
 	    infile->check_sym(',');
-	    vars.push_back(readIdentifier(infile));
+	    vars[1] = readIdentifier(infile);
             varsblob.push_back(vars);
 	  }
 		break;
@@ -395,8 +399,6 @@ void MinionInputReader::readGeneralConstraint(InputFileReader* infile, const Con
 	  infile->check_sym(',');
   }
   infile->check_sym(')');
-  
-  instance.add_constraint(ConstraintBlob(def, varsblob));
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
