@@ -49,7 +49,7 @@
 		2616D09E09950EA200644F18 /* constraint_weightedboolsum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_weightedboolsum.h; path = constraints/constraint_weightedboolsum.h; sourceTree = "<group>"; };
 		26177F7E0B0669EC00C946CF /* dynamic_3_sat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dynamic_3_sat.h; path = dynamic_constraints/dynamic_3_sat.h; sourceTree = "<group>"; };
 		2618160B097FA1F500E04FBD /* constraint_lex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_lex.h; path = constraints/constraint_lex.h; sourceTree = "<group>"; };
-		261C44E2099A0B4A00FFBDCA /* Minion */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = Minion; sourceTree = BUILT_PRODUCTS_DIR; };
+		261C44E2099A0B4A00FFBDCA /* Minion */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Minion; sourceTree = BUILT_PRODUCTS_DIR; };
 		261E01FA09F7F57E004F8C91 /* tries.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tries.h; path = constraints/tries.h; sourceTree = "<group>"; };
 		2623020E0AB82F1200375F37 /* tuple_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tuple_container.h; sourceTree = "<group>"; };
 		2623A3CB0B0E23C500E574BC /* constraint_GACtable_master.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = constraint_GACtable_master.h; path = constraints/constraint_GACtable_master.h; sourceTree = "<group>"; };

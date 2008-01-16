@@ -269,13 +269,13 @@ struct RangeVarContainer {
 	    trigger_list.push_domain_removal(d.var_num, loop);
 	}
 #endif
-    if(offset != low_bound)
+    if(offset != raw_lower)
     {
       trigger_list.push_lower(d.var_num, offset - raw_lower);
       raw_lower_bound(d) = offset;
     }
     
-    if(offset != up_bound)
+    if(offset != raw_upper)
     {
       trigger_list.push_upper(d.var_num, raw_upper - offset);
       raw_upper_bound(d) = offset;

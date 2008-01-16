@@ -52,11 +52,14 @@ namespace Controller
   VARDEF_ASSIGN(BOOL commandlineoption_nocheck, false);
   VARDEF_ASSIGN(unsigned long long commandlineoption_nodelimit, 0);
   
+  // Forward decleration.
+  inline BOOL are_queues_empty();
   
   /// Pushes the state of the whole world.
   inline void world_push()
   {
     D_INFO(0,DI_SOLVER,"World Push");
+	D_ASSERT(are_queues_empty());
     backtrackable_memory.world_push();
   }
   
@@ -64,6 +67,7 @@ namespace Controller
   inline void world_pop()
   {
     D_INFO(0,DI_SOLVER,"World Pop");
+	D_ASSERT(are_queues_empty());
     backtrackable_memory.world_pop();
     big_rangevar_container.bms_array->undo();
   }

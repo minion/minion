@@ -22,6 +22,10 @@ bool inline check_fail(Var& var, int val, Vars& vars, Prop prop)
 template <typename Var, typename Prop>
 void propogateSAC_internal(vector<Var>& vararray, Prop prop)
 {
+  Controller::propogate_queue();
+  if(Controller::failed)
+	return;
+  
   bool reduced = true;
   while(reduced)
   {

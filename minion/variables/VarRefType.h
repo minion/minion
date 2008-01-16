@@ -98,7 +98,6 @@ struct VarRefType
   void addTrigger(Trigger t, TrigType type)
   { GetContainer::con().addTrigger(data, t, type); }
 
-  /// XXX : Change 'VarRef' to correct type.
   operator string()
   { return GetContainer::name() + to_string(data.var_num); }
   

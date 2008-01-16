@@ -151,9 +151,9 @@ namespace Controller
 
 #include "search/search_control.h"
 
-#include "preprocess/preprocess.h"
-
 #include "constraint_setup.h"
+
+#include "preprocess/preprocess.h"
 
 #include "test_functions.h"
 

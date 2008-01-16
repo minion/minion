@@ -94,8 +94,6 @@ struct LessEqualSumConstraint : public Constraint
     }
 	
 	var_sum.setMin(sum);
-	if(sum != get_real_min_sum())
-       printf("%d,%d,%d\n",this,sum,get_real_min_sum());
 	D_ASSERT(sum <= get_real_min_sum());
 	
 	int looseness = var_sum.getMax() - sum;

@@ -27,6 +27,8 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include "system/to_string.h"
+
 // If true, "-crash" was used and execution will crash on error (for debugging)
 VARDEF_ASSIGN(bool debug_crash, false);
 

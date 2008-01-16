@@ -216,9 +216,6 @@ namespace Controller
   // and normal propagate to have the same input method.
   template<typename Vars>
   inline void propogate_queue_vars(Vars& vars)
-  {
-	propogate_queue(); 
-    printf(".%d\n", failed);
-  }
+  {	propogate_queue(); }
 } // namespace Controller
 
