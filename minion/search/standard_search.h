@@ -227,9 +227,27 @@ void maybe_print_search_state(string name, T& vars)
 		  maybe_print_search_state("Node: ", v);		  
 		  world_pop();
 		  order.branch_right();
+#ifdef USE_SETJMP
 		  if(optimise)
-			optimise_var->setMin(current_optimise_position);
+		  {
+// Must check if this setMin will fail before doing it, else
+// The setjmp will throw us off. It's cheaper to check than set up
+// a new setjmp point here.
+			if(optimise_var->getMax() > current_optimise_position)
+			{ failed = true; }
+			else
+			{
+			  optimise_var->setMin(current_optimise_position);
+			  propogate_queue();
+			}
+		  }
+		  else
+		  { propogate_queue();}
+#else
+		  if(optimise)
+		  	optimise_var->setMin(current_optimise_position);
 		  propogate_queue();
+#endif
 		}
 	  }
   }

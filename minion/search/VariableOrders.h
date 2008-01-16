@@ -68,11 +68,17 @@
 	{  
 	   pos = branches.back();
 	   branches.pop_back();
-	
+	   
 	   if(val_order[pos])
-		var_order[pos].setMin(var_order[pos].getMin() + 1);
+	   {
+		 D_ASSERT(var_order[pos].getMax() >= var_order[pos].getMin() + 1);
+		 var_order[pos].setMin(var_order[pos].getMin() + 1);
+	   }
 	   else
-		var_order[pos].setMax(var_order[pos].getMax() - 1);
+	   {
+		 D_ASSERT(var_order[pos].getMin() <= var_order[pos].getMin() - 1);
+		 var_order[pos].setMax(var_order[pos].getMax() - 1);
+	   }
 	}
   };
 
@@ -168,9 +174,15 @@
 	  branches.pop_back();
 	  
 	  if(val_order[pos])
+	  {
+		D_ASSERT(var_order[pos].getMax() >= var_order[pos].getMin() + 1);
 		var_order[pos].setMin(var_order[pos].getMin() + 1);
+	  }
 	  else
+	  {
+		D_ASSERT(var_order[pos].getMin() <= var_order[pos].getMin() - 1);
 		var_order[pos].setMax(var_order[pos].getMax() - 1);
+	  }
 	}
   };
  
