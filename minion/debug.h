@@ -119,7 +119,12 @@ inline void assert_function(BOOL x, string a, string f, int line)
   }
 }
 
+#ifdef CRASH_ERROR
 #define FAIL_EXIT() { int* nullvar = NULL; *nullvar = 0; exit(1); }
+#else
+#define FAIL_EXIT() { exit(1); }
+#endif
+
 #define D_ASSERT(x) {assert_function(x, #x, __FILE__, __LINE__);}
 
 
