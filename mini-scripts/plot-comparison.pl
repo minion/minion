@@ -1,7 +1,9 @@
 #! /usr/bin/perl
 
 use Getopt::Long;
-use File::Spec;
+use File::Basename;
+
+my $scriptdir = dirname($0);  # $0 = $PROGRAM_NAME
 
 my $dir = ".";
 my $help = '';
@@ -55,8 +57,10 @@ my $referencename = $ARGV[1];
 my $newdir = "$basedir/$ARGV[0]";
 my $referencedir = "$basedir/$ARGV[1]";
 
-system "analyse_minion.pl $newdir/* > $tmpdir/1.$$";
-system "analyse_minion.pl $referencedir/* > $tmpdir/2.$$";
+# $^X = perl executable
+
+system "$^X $scriptdir/analyse_minion.pl $newdir/* > $tmpdir/1.$$";
+system "$^X $scriptdir/analyse_minion.pl $referencedir/* > $tmpdir/2.$$";
 
 
 if ((-e $dir) and not (-d $dir) )
