@@ -105,9 +105,17 @@ struct ProductConstraint : public Constraint
   }
 };
 
+inline Constraint*
+ProductCon(const vector<BoolVarRef>& vars, const vector<BoolVarRef>& var2)
+{
+  D_ASSERT(vars.size() == 2);
+  D_ASSERT(var2.size() == 1);
+  return AndCon(vars[0], vars[1], vars[0]);
+}
+
 template<typename VarRef1, typename VarRef2>
 Constraint*
-ProductCon(vector<VarRef1> vars, vector<VarRef2> var2)
+ProductCon(const vector<VarRef1>& vars, const vector<VarRef2>& var2)
 { 
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
@@ -115,5 +123,3 @@ ProductCon(vector<VarRef1> vars, vector<VarRef2> var2)
 }
 
 BUILD_CONSTRAINT2(CT_PRODUCT2, ProductCon);
-
-

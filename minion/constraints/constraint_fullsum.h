@@ -177,8 +177,6 @@ struct LessEqualSumConstraint : public Constraint
   
 };
 
-
-
 template<typename VarArray,  typename VarSum>
 Constraint*
 LessEqualSumCon(const VarArray& _var_array, const vector<VarSum>& _var_sum)
@@ -196,7 +194,6 @@ LessEqualSumCon(const VarArray& _var_array, const vector<VarSum>& _var_sum)
   }
 }
 
-// XXX : Check this is getting activated.
 inline Constraint*
 LessEqualSumCon(const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum)
 { 
@@ -205,8 +202,6 @@ LessEqualSumCon(const vector<BoolVarRef>& var_array, const vector<ConstantVar>& 
 }
 
 BUILD_CONSTRAINT2(CT_LEQSUM, LessEqualSumCon);
-
-
 
 template<typename VarArray,  typename VarSum>
 Constraint*
@@ -225,7 +220,6 @@ GreaterEqualSumCon(const VarArray& _var_array, const vector<VarSum>& _var_sum)
 			typename NegType<VarSum>::type>(VarNegRef(_var_array), VarNegRef(_var_sum[0]))); 
   }
 }
-
 
 inline Constraint*
 GreaterEqualSumCon(const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum)
