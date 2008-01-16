@@ -39,12 +39,13 @@ Ian Miguel\\
 Karen E. Petrie and\\
 Andrea M. Rendl}
 \vfill
-{\Large {\sc Minion} Version 0.3.3}\\
+%{\Large {\sc Minion} Version 0.3.3}\\
+{\Large {\sc Minion} Version 0.3.4}\\
 ~\\
 {\Large {\sc Minion} Input Language 1}
 %{\Large Manual Version 0.2}
 \vfill
-{\large  17 October  2006}
+{\large{\today}}
 \vfill
 \end{center}
 
@@ -215,7 +216,7 @@ expressions on matrices (e.g. row, and column), and will automatically
 flatten matrices of higher arity. See BNF in next section for details.
 
 
-\subsection*{Reification}
+\subsection{Reification}
 
 There are two different constraints imposing reification.
 
@@ -234,7 +235,7 @@ on the constraint. Please note that in upcoming versions of Minion the guide-con
 \end{description}
 
 
-\subsection*{Reifiable constraints}
+\subsection{Reifiable constraints}
 
 The following list presents constraints that are reifiable - mostly with
  \texttt{reifyimply}.  
@@ -321,17 +322,17 @@ Sum$\mathbf{\geq}$.}
 \item[Weighted Sum $\mathbf{\leq}$] states that the scalar product of
 a matrix of variables and a matrix of constants is less than or equal
 to the assignment of a single variabl:\\
-\texttt{weightedsumleq($\langle$matrix of variables$\rangle$,
-$\langle$matrix constants$\rangle$, $\langle$variable$\rangle$)}.
+\texttt{weightedsumleq($\langle$matrix of constants$\rangle$,
+$\langle$matrix of variables$\rangle$, $\langle$variable$\rangle$)}.
 
 \item[Weighted Sum $\mathbf{\geq}$] states that the scalar product of
 a matrix of variables and a matrix of constants is greater than or
 equal to the assignment of a single variable:\\
-\texttt{weightedsumgeq($\langle$matrix of variables$\rangle$,
-$\langle$matrix of constants$\rangle$, $\langle$variable$\rangle$)}.
+\texttt{weightedsumgeq($\langle$matrix of constants$\rangle$,
+$\langle$matrix of variables$\rangle$, $\langle$variable$\rangle$)}.
 
 
-\subsection*{Non-reifiable constraints}
+\subsection{Non-reifiable constraints}
 
 \item[MinusEq] states that a variable equals the negation of another variable.
 \\
@@ -358,21 +359,25 @@ matrix is less than or equal to the assignment of a single variable, using watch
 \texttt{watchsumleq($\langle$matrix of variables$\rangle$,
 $\langle$var$\rangle$)}.
 
-\item[Table] allows the specification of an extensional constraint. The
-set of tuples should be given in strictly increasing lexicographic order:\\
+\item[Table] allows the specification of an extensional constraint. 
+The set of tuples should be given in strictly increasing lexicographic order.\\
+\textbf{Note}: The implementation has been changed and details can be found in the CPPOD-technical
+report\footnote{http://www.dcs.st-and.ac.uk/~cppod/publications/reports/cppod-19-2006.pdf}.\\
 \texttt{table($\langle$matrix of variables$\rangle$, $\langle$tuples$\rangle$)}
 
 \item[Vector $ \mathbf{\neq}$ (watched literals)] states that a vector (\texttt{vector1}) is not
 equal to a another vector (\texttt{vector2}), using watched literals:\\
 \texttt{watchvecneq($\langle$vector1$\rangle$, $\langle$vector2$\rangle$)}.
 
+\item[Power] the power constraint, with variables in the following order $x^y = z$. It is only available for positive domains.\\
+\texttt{pow( $\langle$variable$\rangle$,  $\langle$variable$\rangle$,  $\langle$variable$\rangle$ ) }
 
 \end{description}
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
+%\clearpage
 \section{Input format}\label{sect_input}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -481,32 +486,41 @@ equal to a another vector (\texttt{vector2}), using watched literals:\\
 \end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Important Notes and Bugs}\label{sect_notes}
+\section{Important Notes and Changes}\label{sect_notes}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection*{Notes}
+\subsection*{Changes}
 
-\begin{description}
-  \item[Sparse discrete variables] are not implemented yet. 
-\end{description}
+The following changes have been made since the last version:
 
-\subsection*{Bugs}
-The following \textbf{bugs} are known to {\sc MINION}.
 \begin{enumerate}
-
-%\item \textbf{Reification using \texttt{reifyimply}} \\
-%There are problems with the reification of the constraints: 
-%allDifferent, diseq, occurence, weightedsumleq, weightedsumgeq, sumleq, sumgeq
-
-\item \textbf{Reification using \texttt{reify}} \\
- There are problems with the reification of the constraints: 
-diseq, element, gacelement, ineq, max, min, occurence, product
-
+  \item \textbf{power constraint}: the \texttt{pow} constraint has been added.
+  \item \textbf{table constraint}: there is a new implementation of the \texttt{table}
+   constraint where new data structures are used. Details can be found 
+   in the CPPOD-technical report\footnote{http://www.dcs.st-and.ac.uk/~cppod/publications/reports/cppod-19-2006.pdf}.
+ \item bug fixes
 \end{enumerate}
 
 
 
+\subsection*{Notes}
+\begin{enumerate}
+ \item \textbf{Sparse discrete variables} are not implemented yet. 
+   %\item \textbf{Reification using \texttt{reifyimply}} \\
+   %There are problems with the reification of the constraints: 
+   %allDifferent, diseq, occurence, weightedsumleq, weightedsumgeq, sumleq, sumgeq
 
+  \item \textbf{Reification using \texttt{reify}} \\
+    There are problems with the reification of the constraints: 
+    diseq, element, gacelement, ineq, max, min, occurence, product
+
+\end{enumerate}
+
+%\subsection*{Known Bugs}
+%The following \textbf{bugs} are known to {\sc MINION}.
+
+
+\clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Example}\label{sect_example}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
