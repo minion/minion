@@ -1,0 +1,64 @@
+Minion has a large range of compile-time flags and defines. At different points
+these may or may not be working or in use. The following is a list of defines
+you might see.
+
+
+Special Defines
+---------------
+
+NO_MAIN - In any executable using Minion, this flag must be turned on for
+		  the compilation of exactly one flags. It makes sure global variables
+		  are defined correctly in that file.
+		  
+_CRT_NONSTDC_NO_DEPRECATE
+_CRT_SECURE_NO_DEPRECATE  - These two flags get around Visual C++ problems.
+
+PROPOGATE_FUNCTION 
+DYNAMIC_PROPOGATE_FUNCTION - These add or remove "virtual" from the definition
+							 of propagate, connected to FUNCTIONPOINTER_TRIGGER
+							 
+VARDEF
+VARDEF_ASSIGN - These get around the annoying problems of defining global
+				variables. If NO_MAIN is defined, these are normal variable
+				definitions, else they have an "extern" on them.
+
+D_ASSERT  - just like assert, but removed in non-debug mode.
+D_DATA    - statement removed in non-debug mode. Allows extra data to be stored
+		    in debug mode.
+FAIL_EXIT - this differs from exit() in that it causes a crash, which will
+			activate a debugger if present.
+		   
+Normally turned on
+------------------
+
+WATCHEDLITERALS - enables watched literal support (requires DYNAMICTRIGGERS)
+DYNAMICTRIGGERS - enables backtracked watches support
+				  NOTE : This probably won't work without WATCHEDLITERALS
+				  
+USE_HASHTABLE   - Makes some internal constructs use hash tables instead of
+				  red-black trees. May need turning off on some compilers
+MORE_SEARCH_INFO - Adds a few more command line options and some internal
+				   checking. Should be turned off for benchmarks.
+
+NO_DEBUG		- Turn off debug mode (implies NO_PRINT)
+NO_PRINT		- Turn off verbose debug mode (prints a lot!)
+
+FULL_DOMAIN_TRIGGERS - Allows triggers to be attached to any domain value.
+
+Normally turned off
+-------------------
+
+
+FUNCTIONPOINTER_TRIGGER - Avoids using virtual functions. Faster on some
+						  architectures (although the advantage is small).
+				
+USE_SETJMP - Uses setjmp / longjmp when constraints fail. May be slightly
+			 faster in some cases but is generally slower.
+						  
+
+In the near future, one of the follow 3 will be blessed as "offical" and turned
+on.
+
+TRIES - Changes table constraints to use tries.
+NIGHTINGALE - Changes table constraints to use nightingales.
+REGINLHOMME - Changes table constraints to use Regin Homme's structure.
