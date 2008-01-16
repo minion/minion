@@ -251,14 +251,14 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	// should generalise
 	// and will need to loop round for watched lits	
 
-        BOOL found_new_support = false;
+	bool found_new_support = false;
         
 #ifdef WATCHEDLITERALS
 
         int loop;
         int j;
 
-        for(loop = 0 ; (!found_new_support) && loop < num_unwatched ; )
+        for(loop = 0 ; (!found_new_support) && loop < num_unwatched ; ++loop )
         {
           D_ASSERT(num_unwatched > 0);
 
@@ -267,30 +267,19 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
           {
             found_new_support = true;
           }
-          {
-            ++loop;
-          } 
         }
 
 	if (found_new_support)         // so we have found a new literal to watch
 	{
-
-          int& unwatched_index = unwatched(j);
-
-                                  // propval gives array index of old watched lit
-	  // values_watched(propval) = false;
-	  // D_ASSERT(!values_watched(unwatched_index) and 
-            //        var_array[unwatched_index].inDomain(1 - VarToCount));    
+      int& unwatched_index = unwatched(j);
 
 	  dt->trigger_info() = unwatched_index;
 	  var_array[unwatched_index].addDynamicTrigger(
               dt, 
               VarToCount ? LowerBound : UpperBound); 
 
-	  // values_watched(unwatched_index) = true;
-
-          unwatched_index = propval;       
-          last = j;
+	  unwatched_index = propval;       
+	  last = j;
 
 	  return;
 	}
@@ -319,7 +308,6 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 
 	D_INFO(1,DI_DYSUMCON,"Limit Reached in WL sum (0/1) constraint");	
 	// there is no literal to watch, we need to propagate
-	
 	
 	DynamicTrigger* dt2 = dynamic_trigger_start();
 	
@@ -371,7 +359,10 @@ BoolGreaterEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
   return new BoolLessSumConstraintDynamic<VarArray,VarSum,0>(_var_array, _var_sum); 
 }
 
- 
+
+#include "dynamic_sum_sat.h"
+#include "dynamic_binary_sat.h"
+
 inline DynamicConstraint*
 BuildCT_WATCHED_LEQSUM(const vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
@@ -401,7 +392,18 @@ BuildCT_WATCHED_GEQSUM(const vector<BoolVarRef>& t1, BOOL reify, const BoolVarRe
 	exit(0); 
   } 
   else 
-  { return BoolGreaterEqualSumConDynamic(t1, runtime_val(b.vars[1][0].pos)); } \
+  {
+	int sum = b.vars[1][0].pos;
+	if(sum == 1)
+	{
+	  if(t1.size() == 2)
+		return BoolSATBinaryConDynamic(t1);
+	  else
+	    return BoolSATConDynamic(t1);
+	}
+	else
+	  return BoolGreaterEqualSumConDynamic(t1, runtime_val(sum)); 
+  }
 }
 
 template<typename T>
