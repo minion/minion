@@ -1,9 +1,9 @@
 /* Minion Constraint Solver
-   http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
+http://minion.sourceforge.net
 
-   $Id$
+For Licence Information see file LICENSE.txt 
+
+$Id$
 */
 
 /* Minion
@@ -31,53 +31,150 @@ struct TupleComparator
   
   TupleComparator(int i, int a)
   {
-    significantIndex = i;
-    arity = a; 
+	significantIndex = i;
+	arity = a; 
   }
   
   // returns tuple1 <= tuple2 under our ordering.
   BOOL operator()(const vector<int>& tuple1, const vector<int>& tuple2)
   {
-    if(tuple1[significantIndex] != tuple2[significantIndex])
+	if(tuple1[significantIndex] != tuple2[significantIndex])
 	  return tuple1[significantIndex] < tuple2[significantIndex];
-    for(int tupleIndex = 0; tupleIndex < arity; tupleIndex++)
-    {
-      if(tuple1[tupleIndex] != tuple2[tupleIndex])
-        return tuple1[tupleIndex] < tuple2[tupleIndex];
-    }
+	for(int tupleIndex = 0; tupleIndex < arity; tupleIndex++)
+	{
+	  if(tuple1[tupleIndex] != tuple2[tupleIndex])
+		return tuple1[tupleIndex] < tuple2[tupleIndex];
+	}
 	return true;
   }
 };
 
 struct TupleH
+{
+  // tuple class for Regin/Lhomme's bounding and jumping algorithm
+  int id;  // global array index (can also be used for lex comparison of two tuples.)
+		   // no need for nextPointer
+  int arity;
+  
+  int * values;
+  int * nextValue;    // int index into global array, pointing to the next 
+  
+  int * redundantValues;
+  int * redundantNextValue;
+  
+  TupleH(int * _values, int * _redundantValues, int _id, int _arity)
   {
-    // tuple class for Regin/Lhomme's bounding and jumping algorithm
-    int id;  // global array index (can also be used for lex comparison of two tuples.)
-    // no need for nextPointer
-    int arity;
-    
-    int * values;
-    int * nextValue;    // int index into global array, pointing to the next 
-    
-    int * redundantValues;
-    int * redundantNextValue;
-    
-    TupleH(int * _values, int * _redundantValues, int _id, int _arity)
-    {
-        values=_values;
-        redundantValues=_redundantValues;
-        id=_id;
-        arity=_arity;
-        
-        nextValue=new int[arity];
-        redundantNextValue=new int[arity];
-        for(int i=0; i<arity; i++)
-        {
-            nextValue[i]=-1;
-            redundantNextValue[i]=-1;
-        }
-    }
-  };
+	values=_values;
+	redundantValues=_redundantValues;
+	id=_id;
+	arity=_arity;
+	
+	nextValue=new int[arity];
+	redundantNextValue=new int[arity];
+	for(int i=0; i<arity; i++)
+	{
+	  nextValue[i]=-1;
+	  redundantNextValue[i]=-1;
+	}
+  }
+};
+
+struct Regin
+{
+  int literal_num;
+  int noTuples;
+  int arity;
+  
+  TupleList* tupleList;
+  
+  Regin(TupleList* _tuples) : tupleList(_tuples)
+  {
+	tupleList->finalise_tuples();
+	arity = tupleList->tuple_size();	
+    noTuples = tupleList->size();
+	
+		  tuples.resize(tupleList->size());
+		  
+		  // Need a copy so we can sort it and such things.
+		  for(int i = 0; i < tupleList->size(); ++i)
+			tuples[i] = tupleList->get_vector(i);
+		  
+		  // sort, required for correctness.
+		  sort(tuples.begin(), tuples.end(), TupleComparator(0, arity));
+		  
+		  	  tuplelist=new TupleH*[tuples.size()];
+			  setuplist();
+  }
+  
+  TupleH ** tuplelist;
+  vector<vector<int> > tuples;
+
+  // set up the list
+  void setuplist()
+  {
+	
+	int * redvalues=new int[arity];
+	for(int i=0; i<arity; i++){ 
+	  redvalues[i]=(tupleList->dom_smallest)[i];
+	}
+	
+	for(int i=0; i<tuples.size(); i++)
+	{
+	  // copy redvalues
+	  int * newredvalues= new int[arity]; 
+	  for(int j=0; j<arity; j++)
+		newredvalues[j]=redvalues[j];
+	  
+	  int * valuesarray= new int[arity];
+	  for(int j=0; j<arity; j++)
+		valuesarray[j]=tuples[i][j];
+	  
+	  TupleH * t=new TupleH(valuesarray, newredvalues, i, arity);
+	  tuplelist[i]=t;
+	  
+	  // cross-link with previous tuples.
+	  int valcountlocal=arity;  // for each value in this tuple, there is one forward reference in nextValue.
+	  
+	  for(int j = i - 1; j >= 0; j--)
+	  {
+		TupleH* prev=tuplelist[j];
+		BOOL breakflag=false;
+		
+		for(int var=0; var<arity; var++)
+		{
+		  if((prev->values[var])==(t->values[var]) && prev->nextValue[var]==-1)
+		  {
+			prev->nextValue[var]=i;
+			valcountlocal--;
+		  }
+		  if(prev->redundantValues[var]==t->values[var] && prev->redundantNextValue[var]==-1)
+			prev->redundantNextValue[var]=i;
+		  if(valcountlocal==0){
+			breakflag=true;
+			break;
+		  }
+		}
+		if(breakflag){
+		  break;
+		}
+	  }
+	  
+	  // increment redvalues
+	  for(int var=0; var<arity; var++)
+	  {
+		redvalues[var]++;
+		int max = (tupleList->dom_smallest)[var] + (tupleList->dom_size)[var];
+		while(!(redvalues[var]>max))
+		  redvalues[var]++;
+		if(redvalues[var] > max)
+		  redvalues[var] = (tupleList->dom_smallest)[var];
+	  }
+	}
+  }
+  
+  
+  
+};
 
 template<typename VarArray>
 struct GACTableConstraint : public DynamicConstraint
@@ -95,18 +192,6 @@ struct GACTableConstraint : public DynamicConstraint
   //vector<vector<ReversibleInt> > current_support;  // current_support[var][val+offset[var]];
   
   vector<int> offset;
-  
-  /// Total number of literals in the variables at the start of search.
-  int literal_num;
-  
-  vector<int> _map_literal_to_var;
-  vector<int> _map_literal_to_val;
-
-  int get_var_from_literal(int literal) 
-  { return _map_literal_to_var[literal]; }
-
-  int get_val_from_literal(int literal) 
-  { return _map_literal_to_val[literal]; }
   
   TupleList* tupleList;
   
@@ -133,353 +218,190 @@ struct GACTableConstraint : public DynamicConstraint
   
   int comparetuples(int * t1, int * t2)
   {
-    for(int i=0; i<arity; i++)
-    {
-        if(t1[i]>t2[i])
-        {
-            return 1;
-        }
-        if(t1[i]<t2[i])
-        {
-            return -1;
-        }
-    }
-    return 0;
+	for(int i=0; i<arity; i++)
+	{
+	  if(t1[i]>t2[i])
+		return 1;
+	  if(t1[i]<t2[i])
+		return -1;
+	}
+	return 0;
   }
   
-  TupleH ** tuplelist;
-  vector<vector<int> > tuples;
   BOOL listdone;
   
   int noTuples;
   int arity;
   int * upperboundtuple;
   
+  Regin* regin;
   
   GACTableConstraint(const VarArray& _vars, TupleList* _tuples) :
 	vars(_vars),
-    tupleList(_tuples)
+	tupleList(_tuples)
   {
 	  tupleList->finalise_tuples();
+	  regin = tupleList->getRegin();
 	  arity = tupleList->tuple_size();
 	  D_ASSERT(_vars.size() == arity);
 	  noTuples = tupleList->size();
-      //current_support.resize(arity); 
-      
-	  tuples.resize(tupleList->size());
+	  //current_support.resize(arity); 
 	  
-	  // Need a copy so we can sort it and such things.
-	  for(int i = 0; i < tupleList->size(); ++i)
-		tuples[i] = tupleList->get_vector(i);
 	  
-      // sort, required for correctness.
-      sort(tuples.begin(), tuples.end(), TupleComparator(0, arity));
-      
-      current_support=new ReversibleInt**[arity];
-      
-      listdone=false;
-      literal_num = 0;
-      
-      for(unsigned i = 0; i < arity; ++i)
-      {
-        literal_num += (vars[i].getInitialMax() - vars[i].getInitialMin() + 1);
-        // cout << "initialMax: " << vars[i].getInitialMax() ;
-        // cout << "initialMin: " << vars[i].getInitialMin() << endl;
-      }
-      
-      offset.resize(arity);
-      for(int i=0; i<arity; i++)
-      {
-        offset[i]=-vars[i].getInitialMin();
-        
-        current_support[i]= new ReversibleInt*[vars[i].getInitialMax()+offset[i]+1];
-        
-        //current_support[i].resize(vars[i].getInitialMax()+offset[i]+1);  // do the reversibleints get set up properly???
-        
-        for(int j=0; j<vars[i].getInitialMax()+offset[i]+1; j++){
-            current_support[i][j]=new ReversibleInt();
-            current_support[i][j]->set(-1);
-        }
-      }
-      upperboundtuple=new int[arity];
-      
-      tuplelist=new TupleH*[tuples.size()];
+	  current_support=new ReversibleInt**[arity];
+	  
+	  listdone=false;
+	  
+	  offset.resize(arity);
+	  for(int i=0; i<arity; i++)
+	  {
+		offset[i]=-vars[i].getInitialMin();
+		
+		current_support[i]= new ReversibleInt*[vars[i].getInitialMax()+offset[i]+1];
+		
+		for(int j=0; j<vars[i].getInitialMax()+offset[i]+1; j++){
+		  current_support[i][j]=new ReversibleInt();
+		  current_support[i][j]->set(-1);
+		}
+	  }
+	  upperboundtuple=new int[arity];      
+
   }
   
   int dynamic_trigger_count()
-  { return literal_num * ( vars.size() - 1) ; }
+  { return tupleList->literal_num * ( vars.size() - 1) ; }
   
-  // set up the list
-  void setuplist()
+   TupleH* seekNextSupport(int var, int val)
   {
-    
-    listdone=true;
-    
-    int * redvalues=new int[arity];
-        for(int i=0; i<arity; i++){ 
-            redvalues[i]=vars[i].getInitialMin();
-        }
-        
-        for(int i=0; i<tuples.size(); i++)
-        {
-            // copy redvalues
-            int * newredvalues= new int[arity]; 
-            for(int j=0; j<arity; j++){ 
-                newredvalues[j]=redvalues[j];
-            }
-            
-            int * valuesarray= new int[arity];
-            for(int j=0; j<arity; j++){
-                valuesarray[j]=tuples[i][j];
-            }
-            
-            TupleH * t=new TupleH(valuesarray, newredvalues, i, arity);
-            tuplelist[i]=t;
-            
-            // cross-link with previous tuples.
-            int valcountlocal=arity;  // for each value in this tuple, there is one forward reference in nextValue.
-            
-            for(int j=i-1; j>=0; j--)
-            {
-                TupleH* prev=tuplelist[j];
-                BOOL breakflag=false;
-                
-                for(int var=0; var<arity; var++)
-                {
-                    if((prev->values[var])==(t->values[var]) && prev->nextValue[var]==-1)
-                    {
-                        prev->nextValue[var]=i;
-                        valcountlocal--;
-                    }
-                    if(prev->redundantValues[var]==t->values[var] && prev->redundantNextValue[var]==-1)
-                    {
-                        prev->redundantNextValue[var]=i;
-                    }
-                    if(valcountlocal==0){
-                        breakflag=true;
-                        break;
-                    }
-                }
-                if(breakflag){
-                    break;
-                }
-            }
-            
-            // increment redvalues
-            for(int var=0; var<arity; var++)
-            {
-                redvalues[var]++;
-                
-                while(!(redvalues[var]>vars[var].getMax()) && !vars[var].inDomain(redvalues[var]))
-                {
-                    redvalues[var]++;
-                }
-                if(redvalues[var]>vars[var].getMax())
-                {
-                    redvalues[var]=vars[var].getMin();
-                }
-            }
-        }
-    /*cout << "List of tuples" <<endl;
-    for(int i=0; i<tuples.size(); i++)
-    {
-        TupleH* temp=tuplelist[i];
-        for(int j=0; j<arity; j++)
-        {
-            cout << temp->values[j] << ",";
-        }
-        cout <<endl << "nextValue: ";
-        for(int j=0; j<arity; j++)
-        {
-            cout << temp->nextValue[j] << ",";
-        }
-    }*/
+	int last_pointer=current_support[var][val+offset[var]]->get();
+	
+	// for other variables, compute the max (over vars) of the min (over vals)
+	// which gives the min lower bound of tuples that have been checked already.
+	int lowerbound=last_pointer;
+	for(int i=0; i<arity; i++)
+	{
+	  if(i!=var)
+	  {
+		int minlb=current_support[i][vars[i].getMin()+offset[i]]->get();
+		
+		for(int valIndex=vars[i].getMin()+1; valIndex<=vars[i].getMax(); valIndex++)
+		{
+		  if(vars[i].inDomain(valIndex))
+		  {
+			int thisbound=current_support[i][valIndex+offset[i]]->get();			
+			if(thisbound<minlb) minlb=thisbound;  // even if thisbound==-1.
+		  }
+		}
+		if(minlb>lowerbound)
+		  lowerbound=minlb;
+	  }
+	}  // can't do this because we don't use tuples from the checking of other variables to support this one.??
+	
+	
+	for(int i=0; i<arity; i++)
+	{
+	  if(i!=var)
+		upperboundtuple[i]=vars[i].getMax();
+	  else
+		upperboundtuple[i]=val;
+	}
+	
+	// now find the next one from lowerbound which contains (var, val)
+	int curtupleIndex;
+	
+	if(lowerbound==-1)
+	  curtupleIndex=nextin(var, val, 0);
+	else
+	  curtupleIndex=nextin(var, val, lowerbound);
+
+	if(curtupleIndex==-1)
+	{   // off the end of the list
+	  return 0;
+	}
+	
+	TupleH* curtuple=regin->tuplelist[curtupleIndex];
+	
+	if(comparetuples(curtuple->values, upperboundtuple)>0)
+	 return 0;
+	
+	while(!check_tuple(curtuple->values))
+	{
+	  curtupleIndex=curtuple->nextValue[var];  //  curtuple=NEXT((x,a), curtuple);
+	  if(curtupleIndex==-1)
+		return 0;
+	  
+	  int maxjump=curtupleIndex;
+	  for(int y = 0; y < arity; y++)
+	  {
+		if(y!=var)
+		{
+		  int b=vars[y].getMin();
+		  int off=offset[y];
+		  int ltp=current_support[y][b+off]->get();
+		  int nextinminallvals=nextin(y, b, (ltp>curtupleIndex)?ltp:curtupleIndex);
+		  for(b=vars[y].getMin()+1; b<=vars[y].getMax(); b++)
+		  {
+			if(vars[y].inDomain(b))
+			{
+			  ltp=current_support[y][b+off]->get();
+			  int temp=nextin(y, b, (ltp>curtupleIndex)?ltp:curtupleIndex);
+			  if(temp<nextinminallvals) nextinminallvals=temp;
+			}
+		  }
+		  
+		  if(nextinminallvals>maxjump) maxjump=nextinminallvals;
+		}
+	  }
+	  
+	  maxjump=nextin(var, val, maxjump);
+	  
+	  if(maxjump>curtupleIndex)
+	  {
+		D_ASSERT( !check_tuple(curtuple->values)); // for some reason the pseudocode assumes this.
+		curtupleIndex=maxjump;
+	  }
+	  
+	  curtuple=regin->tuplelist[curtupleIndex];
+	  
+	  if(comparetuples(curtuple->values, upperboundtuple)>0)  // this wouldn't be necessary if I got an index for upperboundtuple.
+		return 0;
+	}
+	current_support[var][val+offset[var]]->set(curtupleIndex);
+	return curtuple;
   }
-  
-  TupleH* seekNextSupport(int var, int val)
-    {
-        int last_pointer=current_support[var][val+offset[var]]->get();
-        //System.out.println("Finding support for var:"+var+" val:"+val);
-        //cout << "seekNextSupport var:" <<var << " val:" <<val <<endl;
-        
-        int nxvalid=0;
-        BOOL testmode=false;
-        D_ASSERT(testmode=true);  // Ha! Only tests when assertions are enabled.
-        if(testmode)
-        {
-            while(nxvalid<tuples.size() && (!check_tuple(tuplelist[nxvalid]->values) || tuplelist[nxvalid]->values[var]!=val))
-                nxvalid++;
-            if(nxvalid==tuples.size())
-                nxvalid=-1;
-        }
-        
-        // for other variables, compute the max (over vars) of the min (over vals)
-        // which gives the min lower bound of tuples that have been checked already.
-        int lowerbound=last_pointer;
-        for(int i=0; i<arity; i++)
-        {
-            if(i!=var)
-            {
-                int minlb=current_support[i][vars[i].getMin()+offset[i]]->get();
-                
-                for(int valIndex=vars[i].getMin()+1; valIndex<=vars[i].getMax(); valIndex++)
-                {
-                    if(vars[i].inDomain(valIndex))
-                    {
-                        int thisbound=current_support[i][valIndex+offset[i]]->get();
-                        
-                        if(thisbound<minlb) minlb=thisbound;  // even if thisbound==-1.
-                    }
-                }
-                if(minlb>lowerbound)
-                {
-                    lowerbound=minlb;
-                }
-            }
-        }  // can't do this because we don't use tuples from the checking of other variables to support this one.??
-        
-        // now lowerbound contains the index of the tuple which is the greatest checked so far.
-        //System.out.println("lowerbound:"+lowerbound);
-        // compute the upperbound -- there has to be a better upper bound than this.
-        
-        for(int i=0; i<arity; i++)
-        {
-            if(i!=var)
-            {
-                upperboundtuple[i]=vars[i].getMax();
-            }
-            else
-            {
-                upperboundtuple[i]=val;
-            }
-        }
-        
-        /*cout <<"Upperboundtuple:" ;
-        for(int i=0; i<arity; i++)
-        {
-            cout << upperboundtuple[i] << ", ";
-        }cout <<endl;*/
-        
-        // now find the next one from lowerbound which contains (var, val)
-        int curtupleIndex;
-        
-        if(lowerbound==-1)
-        {
-            curtupleIndex=nextin(var, val, 0);
-        }
-        else
-        {
-            curtupleIndex=nextin(var, val, lowerbound);
-        }
-        if(curtupleIndex==-1)
-        {   // off the end of the list
-            D_ASSERT(nxvalid==-1);
-            return 0;
-        }
-        
-        TupleH* curtuple=tuplelist[curtupleIndex];
-        
-        if(comparetuples(curtuple->values, upperboundtuple)>0)
-        {
-            //System.out.println("Bigger than upperboundtuple");
-            D_ASSERT(nxvalid==-1);
-            return 0;
-        }
-        
-        while(!check_tuple(curtuple->values))
-        {
-            curtupleIndex=curtuple->nextValue[var];  //  curtuple=NEXT((x,a), curtuple);
-            if(curtupleIndex==-1){
-                D_ASSERT(nxvalid==-1);
-                return 0;
-            }
-            
-            int maxjump=curtupleIndex;
-            for(int y=0; y<arity; y++)
-            {
-                if(y!=var)
-                {
-                    int b=vars[y].getMin();
-                    int off=offset[y];
-                    int ltp=current_support[y][b+off]->get();
-                    //ltp=0; // surely we can't jump based on other current_supports??
-                    int nextinminallvals=nextin(y, b, (ltp>curtupleIndex)?ltp:curtupleIndex);
-                    for(b=vars[y].getMin()+1; b<=vars[y].getMax(); b++)
-                    {
-                        if(vars[y].inDomain(b))
-                        {
-                            ltp=current_support[y][b+off]->get();
-                            //ltp=0;
-                            int temp=nextin(y, b, (ltp>curtupleIndex)?ltp:curtupleIndex);
-                            if(temp<nextinminallvals) nextinminallvals=temp;
-                        }
-                    }
-                    
-                    if(nextinminallvals>maxjump) maxjump=nextinminallvals;
-                }
-            }
-            
-            maxjump=nextin(var, val, maxjump);
-            
-            if(maxjump>curtupleIndex)
-            {
-                D_ASSERT( !check_tuple(curtuple->values)); // for some reason the pseudocode assumes this.
-                //System.out.println("Jumping forward to: "+maxjump);
-                curtupleIndex=maxjump;
-            }
-            
-            curtuple=tuplelist[curtupleIndex];
-            
-            if(comparetuples(curtuple->values, upperboundtuple)>0)  // this wouldn't be necessary if I got an index for upperboundtuple.
-            {
-                D_ASSERT(nxvalid==-1);
-                return 0;
-            }
-        }
-        current_support[var][val+offset[var]]->set(curtupleIndex);
-        
-        /*cout << "Support for var:"<<var<< " and value:"<<val << " found:";
-        for(int i=0; i<arity; i++){
-            cout<<curtuple->values[i] <<", ";
-        } cout<<endl;*/
-        
-        //System.out.println("Support found:"+new tuple(curtuple.values));
-        D_ASSERT(curtupleIndex==nxvalid);
-        return curtuple;
-    }
   
   int nextin(int var, int val, int curtuple)
   { // returns curtuple if curtuple contains var,val. So not strictly 'next'. If there is not one, returns -1.
-    TupleH* temp=tuplelist[curtuple];
-    
-    while(temp->values[var]!=val)
-    {
-        if(temp->redundantValues[var]==val)
-        {
-            D_ASSERT( temp->redundantNextValue[var]==-1 || tuplelist[temp->redundantNextValue[var]]->values[var]==val);
-            return temp->redundantNextValue[var];
-        }
-        curtuple++;
-        if(curtuple>=noTuples) return -1;
-        temp=tuplelist[curtuple];
-    }
-    D_ASSERT( curtuple==-1 || tuplelist[curtuple]->values[var]==val);
-    return curtuple;
+	TupleH* temp=regin->tuplelist[curtuple];
+	
+	while(temp->values[var]!=val)
+	{
+	  if(temp->redundantValues[var]==val)
+	  {
+		D_ASSERT( temp->redundantNextValue[var]==-1 || regin->tuplelist[temp->redundantNextValue[var]]->values[var]==val);
+		return temp->redundantNextValue[var];
+	  }
+	  curtuple++;
+	  if(curtuple>=noTuples) return -1;
+	  temp=regin->tuplelist[curtuple];
+	}
+	D_ASSERT( curtuple==-1 || regin->tuplelist[curtuple]->values[var]==val);
+	return curtuple;
   }
   
   // End of regin-lhomme code.
   
-  BOOL find_new_support(int literal)
+  bool find_new_support(int literal)
   {
-	 TupleH* new_support = seekNextSupport(get_var_from_literal(literal), get_val_from_literal(literal));
-           
-         if (new_support == 0)
-         { // cout << "find_new_support failed literal: " << literal << " var: " << varIndex << " val: " << get_val_from_literal(literal) << endl ;
-           
-             return false;
-         }
-         // cout << "find_new_support sup= "<< new_support << " literal: " << literal << " var: " << varIndex << " val: " << get_val_from_literal(literal) << endl;
-         return true;
+	pair<int,int> varval = tupleList->get_varval_from_literal(literal);
+	int var = varval.first;
+	int val = varval.second;
+	TupleH* new_support = seekNextSupport(var,val);
+	
+	if (new_support == 0)
+	  return false;
+	else
+	  return true;
   }
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propogated_trig)
@@ -491,27 +413,27 @@ struct GACTableConstraint : public DynamicConstraint
 	int propogated_literal = trigger_pos / (vars.size() - 1);
 	
 	BOOL is_new_support = find_new_support(propogated_literal);
-	int varIndex = get_var_from_literal(propogated_literal);
+	
+	pair<int,int> varval = tupleList->get_varval_from_literal(propogated_literal);
+	int varIndex = varval.first;
+	int val = varval.second;
+	
 	if(is_new_support)
 	{
 	  D_INFO(1, DI_TABLECON, "Found new support!");
-      // cout << "Found new support:" << get_var_from_literal(propogated_literal) << " val:" << get_val_from_literal(propogated_literal) <<endl;
-	  setup_watches(varIndex, propogated_literal);
+	  setup_watches(varIndex, val, propogated_literal);
 	}
 	else
 	{
 	  D_INFO(1, DI_TABLECON, "Failed to find new support");
-      //cout << "Did not find new support:" << get_var_from_literal(propogated_literal) << " val:" << get_val_from_literal(propogated_literal) <<endl;
-	  vars[varIndex].removeFromDomain(get_val_from_literal(propogated_literal));
+	  vars[varIndex].removeFromDomain(val);
 	}
   }
   
-  void setup_watches(int var, int lit)
+  void setup_watches(int var, int val, int lit)
   {
-        // cout << "setup_watches lit= "<< lit << endl ; cout << "calling reconstructTuple from setup_watches" << endl ; 
-        //cout << "current_support entry:" << current_support[var][get_val_from_literal(lit)+offset[var]]->get() << endl;
-        
-        int * tuple=tuplelist[current_support[var][get_val_from_literal(lit)+offset[var]]->get()]->values;
+    int domain_min = (tupleList->dom_smallest)[var];
+	int * tuple=regin->tuplelist[current_support[var][val+offset[var]]->get()]->values;
     
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
@@ -527,62 +449,54 @@ struct GACTableConstraint : public DynamicConstraint
 	}
   }
   
+  
   virtual void full_propogate()
   { 
-      int literal = 0;
-      //cout << "full propagate: " ;
-      if(!listdone){
-            // compute the list
-            setuplist();
-      }
-      
-      _map_literal_to_var.resize(literal_num);      // may not need this many (see comment below)
-      _map_literal_to_val.resize(literal_num);
-      for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
-      {
-        int max = vars[varIndex].getMax();
-        for(int i = vars[varIndex].getMin(); i <= max; ++i) 
-        { 
-            TupleH * _tuple=seekNextSupport(varIndex, i);
-            
-            int sup=current_support[varIndex][i+offset[varIndex]]->get();
-            //cout <<sup<<endl;
-            // cout << "    var " << varIndex << " val: " << i << " sup " << sup << " " << endl;
-            if(_tuple==0)
-            {
-                D_INFO(2, DI_TABLECON, "No valid support for " + to_string(x) + " in var " + to_string(i));
-                //cout <<"no support found for var:"<<varIndex<< " and val:"<< i <<endl ;
-                vars[varIndex].removeFromDomain(i);
-            }
-            else
-            {
-                
-                _map_literal_to_var[literal] = varIndex;
-                _map_literal_to_val[literal] = i;
-                //cout<<"calling setup_watches with var "<< varIndex << " val:" << i << "and literal:"<<literal<<" with lookup:"<<get_val_from_literal(literal) << endl;
-                setup_watches(varIndex, literal);
-                
-            }
-            ++literal;   // would like to put this inside else to save space, but can lead 
-                      // to bugs I don't want to cope with just now.
-        }
-      }
-      // cout << endl; cout << "  fp: finished finding supports: " << endl ;
+	for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
+	{
+	  // Propagate variables so they fit inside domains. This is a minor fix
+	  int tuple_domain_min = (tupleList->dom_smallest)[varIndex];
+	  int tuple_domain_size = (tupleList->dom_size)[varIndex];
+	  
+	  vars[varIndex].setMin(tuple_domain_min);
+	  vars[varIndex].setMax(tuple_domain_min + tuple_domain_size);
+	  
+	  if(Controller::failed) 
+		return;
+	  
+	  int max = vars[varIndex].getMax();
+	  
+	  for(int i = vars[varIndex].getMin(); i <= max; ++i) 
+	  { 
+		TupleH* _tuple=seekNextSupport(varIndex, i);
+		
+		int sup=current_support[varIndex][i - tuple_domain_min]->get();
+		if(_tuple==0)
+		{
+		  vars[varIndex].removeFromDomain(i);
+		}
+		else
+		{
+		  setup_watches(varIndex, i, tupleList->get_literal(varIndex, i));
+		}
+	  }
+	}
   }
   
   virtual BOOL check_assignment(vector<int> v)
   {
-   for(unsigned i = 0; i < tuples.size(); ++i)
-    {
-      if(v == tuples[i]) return true;
-    }
-    return false;
+    for(unsigned i = 0; i < (tupleList)->size(); ++i)
+	{
+	  if( std::equal(v.begin(), v.end(), (*tupleList)[i]) )
+	    return true;
+	}
+	return false;
   }
   
   virtual vector<AnyVarRef> get_vars()
   { 
-    vector<AnyVarRef> anyvars;
-    for(unsigned i = 0; i < vars.size(); ++i)
+	vector<AnyVarRef> anyvars;
+	for(unsigned i = 0; i < vars.size(); ++i)
 	  anyvars.push_back(vars[i]);
 	return anyvars;
   }
@@ -595,3 +509,9 @@ DynamicConstraint*
 GACTableCon(const VarArray& vars, TupleList* tuples)
 { return new GACTableConstraint<VarArray>(vars, tuples); }
 
+inline Regin* TupleList::getRegin()
+{
+  if(regin == NULL)
+    regin = new Regin(this);
+  return regin;
+}

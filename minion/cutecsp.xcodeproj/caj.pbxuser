@@ -198,6 +198,8 @@
 			2670FA9D0B77ACCB00735780 /* PBXTextBookmark */ = 2670FA9D0B77ACCB00735780 /* PBXTextBookmark */;
 			2670FAA00B77AD2C00735780 /* PBXTextBookmark */ = 2670FAA00B77AD2C00735780 /* PBXTextBookmark */;
 			2670FAA30B77AD2E00735780 /* PBXTextBookmark */ = 2670FAA30B77AD2E00735780 /* PBXTextBookmark */;
+			2670FB190B77E22000735780 /* PBXBookmark */ = 2670FB190B77E22000735780 /* PBXBookmark */;
+			2670FB1C0B77E22600735780 /* PBXTextBookmark */ = 2670FB1C0B77E22600735780 /* PBXTextBookmark */;
 		};
 		sourceControlManager = 26AAF872096D3BAC00AD8C1A /* Source Control */;
 		userBuildSettings = {
@@ -371,10 +373,10 @@
 	};
 	2623020E0AB82F1200375F37 /* tuple_container.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {775, 3332}}";
-			sepNavSelRange = "{2568, 0}";
-			sepNavVisRect = "{{0, 771}, {775, 683}}";
-			sepNavWindowFrame = "{{608, -32}, {820, 812}}";
+			sepNavIntBoundsRect = "{{0, 0}, {775, 3374}}";
+			sepNavSelRange = "{3477, 11}";
+			sepNavVisRect = "{{0, 1191}, {775, 683}}";
+			sepNavWindowFrame = "{{586, 66}, {820, 812}}";
 		};
 	};
 	2623A3CB0B0E23C500E574BC /* constraint_GACtable_master.h */ = {
@@ -589,17 +591,17 @@
 	266E8DE60AAB3C530066DA57 /* constraint_GACtable_nightingale.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {689, 6916}}";
-			sepNavSelRange = "{12982, 14}";
-			sepNavVisRect = "{{0, 5728}, {689, 698}}";
-			sepNavWindowFrame = "{{6, 51}, {734, 827}}";
+			sepNavSelRange = "{5581, 53}";
+			sepNavVisRect = "{{0, 2715}, {689, 698}}";
+			sepNavWindowFrame = "{{701, 51}, {734, 827}}";
 		};
 	};
 	266E8DE70AAB3C530066DA57 /* constraint_GACtable_reginlhomme.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {752, 4046}}";
-			sepNavSelRange = "{4104, 0}";
-			sepNavVisRect = "{{0, 670}, {675, 702}}";
-			sepNavWindowFrame = "{{-9, 47}, {720, 831}}";
+			sepNavIntBoundsRect = "{{0, 0}, {800, 7252}}";
+			sepNavSelRange = "{6370, 0}";
+			sepNavVisRect = "{{0, 3198}, {727, 702}}";
+			sepNavWindowFrame = "{{-3, 47}, {772, 831}}";
 		};
 	};
 	266E8DE80AAB3C530066DA57 /* constraint_GACtable_trie.h */ = {
@@ -657,6 +659,20 @@
 		rType = 0;
 		vrLen = 1079;
 		vrLoc = 1315;
+	};
+	2670FB190B77E22000735780 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = 266E8DE60AAB3C530066DA57 /* constraint_GACtable_nightingale.h */;
+	};
+	2670FB1C0B77E22600735780 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 266E8DE60AAB3C530066DA57 /* constraint_GACtable_nightingale.h */;
+		name = "(tuples->dom_smallest)[var] + (tuples->dom_size)[var]";
+		rLen = 53;
+		rLoc = 5581;
+		rType = 0;
+		vrLen = 1388;
+		vrLoc = 5289;
 	};
 	2672CD0D0975702400A7C51D /* constraint_and.h */ = {
 		uiCtxt = {
@@ -830,9 +846,9 @@
 	};
 	26AAF8A4096D438700AD8C1A /* debug.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {842, 2016}}";
-			sepNavSelRange = "{2051, 0}";
-			sepNavVisRect = "{{0, 766}, {615, 696}}";
+			sepNavIntBoundsRect = "{{0, 0}, {842, 2058}}";
+			sepNavSelRange = "{2271, 12}";
+			sepNavVisRect = "{{0, 626}, {615, 696}}";
 			sepNavWindowFrame = "{{530, 53}, {660, 825}}";
 		};
 	};
