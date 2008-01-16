@@ -138,15 +138,17 @@ struct MinConstraint : public Constraint
 
 template<typename VarArray, typename VarRef>
 Constraint*
-MinCon(const VarArray& _var_array, const VarRef& _var_ref)
-{ return (new MinConstraint<VarArray,VarRef>(_var_array, _var_ref)); }
+MinCon(const VarArray& _var_array, const vector<VarRef>& _var_ref)
+{ return (new MinConstraint<VarArray,VarRef>(_var_array, _var_ref[0])); }
 
 template<typename VarArray, typename VarRef>
 Constraint*
-MaxCon(const VarArray& _var_array, const VarRef& _var_ref)
+MaxCon(const VarArray& _var_array, const vector<VarRef>& _var_ref)
 { return (new MinConstraint<typename NegType<VarArray>::type, typename NegType<VarRef>::type>(VarNegRef(_var_array),
-																					          VarNegRef(_var_ref))); 
+																					          VarNegRef(_var_ref[0]))); 
 }
 
 
+BUILD_CONSTRAINT2(CT_MAX, MaxCon)
 
+BUILD_CONSTRAINT2(CT_MIN, MinCon)

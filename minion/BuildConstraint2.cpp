@@ -14,8 +14,6 @@
 
 using namespace ProbSpec;
 
-#include "BuildConstraintConstructs.h"
-
 namespace BuildCon
 {  
 
@@ -129,40 +127,6 @@ get_AnyVarRef_from_Var(Var v)
 	{ D_FATAL_ERROR("Sparse discrete disabled at present due to bugs. Sorry."); }
   }
 	
-/// Starts the constraint building process.
-Constraint*
-build_constraint(ConstraintBlob& b)
-{
-  switch(b.constraint.type)
-  {
-	case CT_MAX:
-	case CT_MIN:
-	case CT_EQ:
-	case CT_MINUSEQ:
-	case CT_INEQ:
-	case CT_DISEQ:
-	  return build_constraint_binary2(b);
-	case CT_LEQSUM:
-	case CT_GEQSUM:
-	case CT_PRODUCT2:
-	case CT_LEXLEQ:
-	case CT_LEXLESS:
-	case CT_ELEMENT:
-	case CT_GACELEMENT:
-	  return build_constraint_binary(b);
-		  		
-	case CT_WEIGHTLEQSUM:
-	case CT_WEIGHTGEQSUM:
-	  return build_constraint_weighted_sum(b);
-	  
-	case CT_ALLDIFF:
-	case CT_OCCURRENCE:
-	  return build_constraint_unary(b);
-	default:
-	  D_FATAL_ERROR( "unsupported constraint");
-  }
-}
-
 }
 
 

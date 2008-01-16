@@ -363,3 +363,43 @@ BoolGreaterEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
   return new BoolLessSumConstraintDynamic<VarArray,VarSum,0>(_var_array, _var_sum); 
 }
 
+ 
+inline DynamicConstraint*
+BuildCT_WATCHED_LEQSUM(const vector<BoolVarRef>& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+{ 
+  if(reify) 
+  { 
+    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
+	  exit(0); 
+  } 
+  else 
+  { return BoolLessEqualSumConDynamic(t1, runtime_val(b.vars[1][0].pos)); } \
+}
+
+template<typename T>
+DynamicConstraint*
+BuildCT_WATCHED_LEQSUM(const T& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+{ 
+  cerr << "Watched LeqSum only works on Boolean variables at present. Sorry!" << endl;
+  exit(1);
+}
+
+inline DynamicConstraint*
+BuildCT_WATCHED_GEQSUM(const vector<BoolVarRef>& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+{ 
+  if(reify) 
+  { 
+    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
+	exit(0); 
+  } 
+  else 
+  { return BoolGreaterEqualSumConDynamic(t1, runtime_val(b.vars[1][0].pos)); } \
+}
+
+template<typename T>
+DynamicConstraint*
+BuildCT_WATCHED_GEQSUM(const T& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+{ 
+  cerr << "Watched GeqSum only works on Boolean variables at present. Sorry!" << endl;
+  exit(1);
+}

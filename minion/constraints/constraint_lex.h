@@ -309,3 +309,6 @@ Constraint*
 LexLessCon(const VarArray1& x, const VarArray2& y)
 { return new LexLeqConstraint<VarArray1, VarArray2,true>(x,y); }
 
+BUILD_CONSTRAINT2(CT_LEXLEQ, LexLeqCon)
+
+BUILD_CONSTRAINT2(CT_LEXLESS, LexLessCon)

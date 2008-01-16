@@ -194,6 +194,19 @@ OccEqualCon(const VarArray& _var_array,  const Val& _value,const ValCount& _val_
   (new OccurrenceEqualConstraint<VarArray,Val, ValCount>(_var_array,  _value,_val_count)); 
 }
 
+template<typename T1>
+Constraint*
+BuildCT_OCCURRENCE(const T1& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+{
+  int val_to_count = b.vars[1][0].pos;
+  int occs = b.vars[2][0].pos;
+  if(reify) 
+  { return reifyCon(OccEqualCon(t1, runtime_val(val_to_count), runtime_val(occs)), reifyVar); } 
+  else 
+  { return OccEqualCon(t1, runtime_val(val_to_count), runtime_val(occs)); } 
+}
+
+
 
 // The rest of this file is an implementation of LeqOccurrence. This isn't currently used, and
 // probably doesn't work properly. Be warned!

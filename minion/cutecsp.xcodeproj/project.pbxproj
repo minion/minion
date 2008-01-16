@@ -8,15 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		26131D1409CB1D2000ACF137 /* BuildConstraint2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26131D1209CB1D1F00ACF137 /* BuildConstraint2.cpp */; };
-		26131D2C09CB1F6200ACF137 /* BuildConstraint_weightedsum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26131D2B09CB1F6200ACF137 /* BuildConstraint_weightedsum.cpp */; };
-		26131D3109CB1F7800ACF137 /* BuildConstraint_unaryconstraints.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26131D3009CB1F7800ACF137 /* BuildConstraint_unaryconstraints.cpp */; };
-		26131D3609CB1F8500ACF137 /* BuildConstraint_binarycons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26131D3509CB1F8500ACF137 /* BuildConstraint_binarycons.cpp */; };
 		261C44E4099A0B6600FFBDCA /* MinionInputReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */; };
 		2644ACE50A192B90002BD572 /* minion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644ACE40A192B90002BD572 /* minion.cpp */; };
-		264C601A09F021FA00000D7F /* BuildDynamicConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264C601909F021FA00000D7F /* BuildDynamicConstraint.cpp */; };
-		264C602209F0267100000D7F /* BuildDynamicConstraint_binarycons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264C602109F0267100000D7F /* BuildDynamicConstraint_binarycons.cpp */; };
-		26CB902309F1947C0053A3C2 /* BuildDynamicConstraint_GACTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB902209F1947C0053A3C2 /* BuildDynamicConstraint_GACTable.cpp */; };
-		26CB906509F19CA00053A3C2 /* BuildConstraint_binarycons2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB906409F19CA00053A3C2 /* BuildConstraint_binarycons2.cpp */; };
 		26CD0D9E0A1B8666007D8889 /* test_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CD0D9D0A1B8665007D8889 /* test_functions.cpp */; };
 /* End PBXBuildFile section */
 
@@ -32,9 +25,6 @@
 		2612359F098D6740003B2E40 /* test05_equal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test05_equal.cpp; path = tests/test05_equal.cpp; sourceTree = "<group>"; };
 		261308660AA765C6009D3F1A /* dynamic_vecneq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynamic_vecneq.h; path = dynamic_constraints/dynamic_vecneq.h; sourceTree = "<group>"; };
 		26131D1209CB1D1F00ACF137 /* BuildConstraint2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BuildConstraint2.cpp; sourceTree = "<group>"; };
-		26131D2B09CB1F6200ACF137 /* BuildConstraint_weightedsum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BuildConstraint_weightedsum.cpp; sourceTree = "<group>"; };
-		26131D3009CB1F7800ACF137 /* BuildConstraint_unaryconstraints.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BuildConstraint_unaryconstraints.cpp; sourceTree = "<group>"; };
-		26131D3509CB1F8500ACF137 /* BuildConstraint_binarycons.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BuildConstraint_binarycons.cpp; sourceTree = "<group>"; };
 		26133F97098A9BD900A2D4EC /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constants.h; sourceTree = "<group>"; };
 		26133FA3098A9FB500A2D4EC /* test_optimise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_optimise.cpp; path = tests/test_optimise.cpp; sourceTree = "<group>"; };
 		2616CED00994EB5C00644F18 /* test_boolvar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_boolvar.cpp; path = tests/test_boolvar.cpp; sourceTree = "<group>"; };
@@ -55,8 +45,6 @@
 		2644ACC70A1929F2002BD572 /* standard_search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = standard_search.h; path = search/standard_search.h; sourceTree = "<group>"; };
 		2644ACE40A192B90002BD572 /* minion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = minion.cpp; sourceTree = "<group>"; };
 		2644AD550A19318D002BD572 /* variables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = variables.h; path = variables/variables.h; sourceTree = "<group>"; };
-		264C601909F021FA00000D7F /* BuildDynamicConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BuildDynamicConstraint.cpp; sourceTree = "<group>"; };
-		264C602109F0267100000D7F /* BuildDynamicConstraint_binarycons.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BuildDynamicConstraint_binarycons.cpp; sourceTree = "<group>"; };
 		264C604D09F029DD00000D7F /* BuildConstraintConstructs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuildConstraintConstructs.h; sourceTree = "<group>"; };
 		264E03FB09C4A7F200CCB830 /* constraint_GACtable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_GACtable.h; path = constraints/constraint_GACtable.h; sourceTree = "<group>"; };
 		264E044509C4BEF000CCB830 /* test_gactable_1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_gactable_1.cpp; path = tests/test_gactable_1.cpp; sourceTree = "<group>"; };
@@ -109,8 +97,6 @@
 		26C815EA0AA6CD9600B265B3 /* constraint_checkassign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_checkassign.h; path = constraints/constraint_checkassign.h; sourceTree = "<group>"; };
 		26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = MinionInputReader.cpp; sourceTree = "<group>"; };
 		26CA01FF0998C43C0064B996 /* MinionInputReader.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MinionInputReader.h; sourceTree = "<group>"; };
-		26CB902209F1947C0053A3C2 /* BuildDynamicConstraint_GACTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BuildDynamicConstraint_GACTable.cpp; sourceTree = "<group>"; };
-		26CB906409F19CA00053A3C2 /* BuildConstraint_binarycons2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BuildConstraint_binarycons2.cpp; sourceTree = "<group>"; };
 		26CC1877098D542B001FC8DE /* test05_lexless.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test05_lexless.cpp; path = tests/test05_lexless.cpp; sourceTree = "<group>"; };
 		26CD0D5C0A1B810E007D8889 /* standard_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = standard_queue.h; path = queue/standard_queue.h; sourceTree = "<group>"; };
 		26CD0D650A1B8210007D8889 /* constraint_setup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constraint_setup.h; sourceTree = "<group>"; };
@@ -177,9 +163,9 @@
 		08FB7794FE84155DC02AAC07 /* cutecsp */ = {
 			isa = PBXGroup;
 			children = (
-				2689211009DBB65000D0472B /* Dynamic Constraints */,
 				08FB7795FE84155DC02AAC07 /* Source */,
 				26F697FD0986D79A00D3B93B /* variables */,
+				2689211009DBB65000D0472B /* Dynamic Constraints */,
 				26F697FC0986D78E00D3B93B /* constraints */,
 				26E34DA909702A5600058E70 /* tests */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
@@ -199,13 +185,6 @@
 				265557720A5B280000B9A732 /* linked_ptr.h */,
 				265557730A5B280000B9A732 /* local_array.h */,
 				264C604D09F029DD00000D7F /* BuildConstraintConstructs.h */,
-				264C602109F0267100000D7F /* BuildDynamicConstraint_binarycons.cpp */,
-				26CB902209F1947C0053A3C2 /* BuildDynamicConstraint_GACTable.cpp */,
-				264C601909F021FA00000D7F /* BuildDynamicConstraint.cpp */,
-				26131D3509CB1F8500ACF137 /* BuildConstraint_binarycons.cpp */,
-				26CB906409F19CA00053A3C2 /* BuildConstraint_binarycons2.cpp */,
-				26131D3009CB1F7800ACF137 /* BuildConstraint_unaryconstraints.cpp */,
-				26131D2B09CB1F6200ACF137 /* BuildConstraint_weightedsum.cpp */,
 				26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */,
 				26131D1209CB1D1F00ACF137 /* BuildConstraint2.cpp */,
 				26CDE8F7099BF9C500C985F3 /* BuildConstraint.h */,
@@ -410,13 +389,6 @@
 			files = (
 				261C44E4099A0B6600FFBDCA /* MinionInputReader.cpp in Sources */,
 				26131D1409CB1D2000ACF137 /* BuildConstraint2.cpp in Sources */,
-				26131D2C09CB1F6200ACF137 /* BuildConstraint_weightedsum.cpp in Sources */,
-				26131D3109CB1F7800ACF137 /* BuildConstraint_unaryconstraints.cpp in Sources */,
-				26131D3609CB1F8500ACF137 /* BuildConstraint_binarycons.cpp in Sources */,
-				264C601A09F021FA00000D7F /* BuildDynamicConstraint.cpp in Sources */,
-				264C602209F0267100000D7F /* BuildDynamicConstraint_binarycons.cpp in Sources */,
-				26CB902309F1947C0053A3C2 /* BuildDynamicConstraint_GACTable.cpp in Sources */,
-				26CB906509F19CA00053A3C2 /* BuildConstraint_binarycons2.cpp in Sources */,
 				2644ACE50A192B90002BD572 /* minion.cpp in Sources */,
 				26CD0D9E0A1B8666007D8889 /* test_functions.cpp in Sources */,
 			);

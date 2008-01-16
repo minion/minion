@@ -96,4 +96,14 @@ Constraint*
 ImpliesCon(VarRef v1, VarRef v2)
 { return new LeqConstraint<VarRef,VarRef,compiletime_val<0> >(v1,v2,compiletime_val<0>()); }
 
-
+template<typename T1, typename T2>
+Constraint*
+BuildCT_INEQ(const T1& t1, const T2& t2, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+{
+  D_ASSERT(b.vars[2].size() == 1 && b.vars[2][0].type == VAR_CONSTANT);
+  
+  if(reify)
+  { return reifyCon(LeqCon(t1[0], t2[0], runtime_val(b.vars[2][0].pos)), reifyVar); }
+  else
+  { return LeqCon(t1[0], t2[0], runtime_val(b.vars[2][0].pos)); }
+}

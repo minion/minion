@@ -16,11 +16,18 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+
+#ifndef MINION_H
+#define MINION_H
+
 #include "system.h"
 
 #include "system/time_keeping.h"
 
+// XXX These could possibly be turned off, but it's possible it will require
+// Some small amount of work to make them work.
 #define FULL_DOMAIN_TRIGGERS
+#define DYNAMICTRIGGERS
 
 #ifdef WATCHEDLITERALS
 #define DYNAMICTRIGGERS
@@ -102,6 +109,9 @@ namespace Controller
 
 #include "solver2.h"
 
+
+#include "build_constraints/build_helper.h"
+
 // This constraint must be listed early so that it can
 // be called by all constraints.
 #include "constraints/constraint_checkassign.h"
@@ -159,3 +169,5 @@ namespace Controller
 #include "constraint_setup.h"
 
 #include "test_functions.h"
+
+#endif

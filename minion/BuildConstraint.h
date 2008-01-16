@@ -16,7 +16,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
+#ifndef BUILDCONSTRAINT_H
+#define BUILDCONSTRAINT_H
 
 namespace BuildCon
 {  
@@ -32,36 +33,6 @@ namespace BuildCon
 AnyVarRef
 get_AnyVarRef_from_Var(Var v);
 
-Constraint*
-build_constraint(ConstraintBlob& b);
-
-#ifdef DYNAMICTRIGGERS
-DynamicConstraint*
-build_dynamic_constraint(ConstraintBlob& b);
-
-DynamicConstraint*
-build_dynamic_constraint_binary(ConstraintBlob& b);
-
-DynamicConstraint*
-build_dynamic_constraint_unary(ConstraintBlob& b);
-
-#endif
-
-// The following functions are put in seperate files to reduce
-// compiler pain.
-
-Constraint*
-build_constraint_binary(ConstraintBlob& b);
-
-Constraint*
-build_constraint_binary2(ConstraintBlob& b);
-
-Constraint*
-build_constraint_weighted_sum(ConstraintBlob& b);
-
-Constraint*
-build_constraint_unary(ConstraintBlob& b);
-
 /// Create all the variables used in the CSP.
 void build_variables(const ProbSpec::VarContainer& vars);
 
@@ -71,3 +42,12 @@ void build_variables(const ProbSpec::VarContainer& vars);
 pair<vector<AnyVarRef>, vector<bool> > build_val_and_var_order( ProbSpec::CSPInstance& instance);
 
 }
+#ifdef DYNAMICTRIGGERS
+DynamicConstraint*
+build_dynamic_constraint(ConstraintBlob& b);
+#endif
+
+Constraint*
+build_constraint(ConstraintBlob& b);
+
+#endif

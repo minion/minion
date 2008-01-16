@@ -209,17 +209,15 @@ struct NeqConstraintBinary : public Constraint
 
 template<typename VarArray>
 Constraint*
-NeqCon(const VarArray& _var_array)
-{ 
-  return (new NeqConstraint<VarArray>(_var_array)); 
-}
+NeqCon(const VarArray& var_array)
+{ return new NeqConstraint<VarArray>(var_array); }
 
 
 template<typename VarRef1, typename VarRef2>
 Constraint*
-NeqCon(VarRef1 var1, VarRef2 var2)
-{ 
-  return (new NeqConstraintBinary<VarRef1,VarRef2>(var1,var2)); 
-}
+NeqConBinary(const vector<VarRef1>& var1, const vector<VarRef2>& var2)
+{ return new NeqConstraintBinary<VarRef1, VarRef2>(var1[0], var2[0]); }
 
+BUILD_CONSTRAINT2(CT_DISEQ, NeqConBinary)
 
+BUILD_CONSTRAINT1(CT_ALLDIFF, NeqCon)

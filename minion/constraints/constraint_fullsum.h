@@ -181,39 +181,57 @@ struct LessEqualSumConstraint : public Constraint
 
 template<typename VarArray,  typename VarSum>
 Constraint*
-LessEqualSumCon(const VarArray& _var_array,  const VarSum& _var_sum)
+LessEqualSumCon(const VarArray& _var_array, const vector<VarSum>& _var_sum)
 { 
   if(_var_array.size() == 2)
   {
     array<typename VarArray::value_type, 2> v_array;
 	for(int i = 0; i < 2; ++i)
 	  v_array[i] = _var_array[i];
-	return LightLessEqualSumCon(v_array, _var_sum);
+	return LightLessEqualSumCon(v_array, _var_sum[0]);
   }
   else
   {
-	return (new LessEqualSumConstraint<VarArray,VarSum>(_var_array,_var_sum)); 
+	return new LessEqualSumConstraint<VarArray, VarSum>(_var_array, _var_sum[0]); 
   }
 }
+
+// XXX : Check this is getting activated.
+inline Constraint*
+LessEqualSumCon(const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum)
+{ 
+  runtime_val t2(var_sum[0].getAssignedValue());
+  return BoolLessEqualSumCon(var_array, t2);
+}
+
+BUILD_CONSTRAINT2(CT_LEQSUM, LessEqualSumCon);
+
 
 
 template<typename VarArray,  typename VarSum>
 Constraint*
-GreaterEqualSumCon(const VarArray& _var_array, const VarSum& _var_sum)
+GreaterEqualSumCon(const VarArray& _var_array, const vector<VarSum>& _var_sum)
 { 
   if(_var_array.size() == 2)
   {
     array<typename VarArray::value_type, 2> v_array;
 	for(int i = 0; i < 2; ++i)
 	  v_array[i] = _var_array[i];
-	return LightGreaterEqualSumCon(v_array, _var_sum);
+	return LightGreaterEqualSumCon(v_array, _var_sum[0]);
   }
   else
   {
 	return (new LessEqualSumConstraint<typename NegType<VarArray>::type, 
-			typename NegType<VarSum>::type>(VarNegRef(_var_array), VarNegRef(_var_sum))); 
+			typename NegType<VarSum>::type>(VarNegRef(_var_array), VarNegRef(_var_sum[0]))); 
   }
 }
 
 
+inline Constraint*
+GreaterEqualSumCon(const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum)
+{ 
+  runtime_val t2(var_sum[0].getAssignedValue());
+  return BoolGreaterEqualSumCon(var_array, t2);
+}
 
+BUILD_CONSTRAINT2(CT_GEQSUM, GreaterEqualSumCon);

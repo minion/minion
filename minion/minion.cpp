@@ -189,7 +189,7 @@ void BuildCSP(MinionInputReader& reader)
     if(reader.instance.constraints[i].is_dynamic())
     {
 #ifdef DYNAMICTRIGGERS
-      Controller::add_constraint(BuildCon::build_dynamic_constraint(reader.instance.constraints[i]));
+      Controller::add_constraint(build_dynamic_constraint(reader.instance.constraints[i]));
       dynamic_triggers_used = true;
 #else
       cout << "Sorry, cannot process this constraint as it needs dynamic triggers or watched literals." << endl ;
@@ -198,7 +198,7 @@ void BuildCSP(MinionInputReader& reader)
 #endif
     }
     else
-      Controller::add_constraint(BuildCon::build_constraint(reader.instance.constraints[i]));
+      Controller::add_constraint(build_constraint(reader.instance.constraints[i]));
   }
 
 
@@ -240,7 +240,8 @@ int main(int argc, char** argv) {
   print_timestep("Parsing Time: ");
   // Used by test mode.
   bool test_checkonesol = false, test_nosols = false;
-  int test_solcount = -1;
+  // Just a number no-one would ever type :)
+  int test_solcount = -1987;
  
   if(Controller::test_mode)
   {  // Now we read the solution!
@@ -328,7 +329,7 @@ int main(int argc, char** argv) {
     
   if(Controller::test_mode)
   {
-    if(test_solcount != -1)
+    if(test_solcount != -1987)
 	{
 	  if(Controller::solutions != test_solcount)
 	  {

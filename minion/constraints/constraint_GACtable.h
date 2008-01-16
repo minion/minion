@@ -197,3 +197,16 @@ template<typename VarArray>
 DynamicConstraint*
 GACTableCon(const VarArray& vars, TupleList* tuples)
 { return new GACTableConstraint<VarArray>(vars, tuples); }
+
+template <typename T>
+DynamicConstraint*
+BuildCT_WATCHED_TABLE(const T& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+{ 
+  if(reify) 
+  { 
+    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
+	exit(0); 
+  } 
+  else 
+  { return GACTableCon(t1, b.tuples); } 
+}

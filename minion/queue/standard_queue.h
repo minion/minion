@@ -142,8 +142,6 @@ namespace Controller
   inline void propogate_queue()
   {
     D_INFO(2, DI_QUEUE, "Starting Propogation");
-	// Grab this into a local pointer for speed.
-	bool* fail_ptr = &Controller::failed;
 #ifdef USE_SETJMP
     int setjmp_return = _setjmp(g_env);
 	if(setjmp_return != 0)

@@ -65,7 +65,7 @@ class TupleList
   }
   
   TupleList(const vector<vector<int> >& tuple_list) : litlists(NULL), 
-    tuples_locked(false), nightingale(NULL)
+    nightingale(NULL) , tuples_locked(false)
   {
     number_of_tuples = tuple_list.size();
 	tuple_length = tuple_list[0].size();
@@ -76,8 +76,8 @@ class TupleList
   }
   
   TupleList(int _numtuples, int _tuplelength) : litlists(NULL),
-    tuples_locked(false), nightingale(NULL),
-    number_of_tuples(_numtuples), tuple_length(_tuplelength)
+     nightingale(NULL), tuple_length(_tuplelength),
+    number_of_tuples(_numtuples),  tuples_locked(false)
   { tuple_data = new int[number_of_tuples * tuple_length]; }
   
   const int* operator[](int pos) const

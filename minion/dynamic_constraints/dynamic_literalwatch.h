@@ -237,11 +237,23 @@ template<typename VarArray,  typename ValArray, typename VarSum>
 DynamicConstraint*
 LiteralSumConDynamic(const VarArray& _var_array,  const ValArray& _val_array, VarSum _var_sum)
 { return new LiteralSumConstraintDynamic<VarArray,ValArray,VarSum>(_var_array, _val_array, _var_sum); }
-/*
-template<typename VarArray,  typename VarSum>
-DynamicConstraint*
-BoolGreaterEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
-{ 
-  return new BoolLessSumConstraintDynamic<VarArray,VarSum,0>(_var_array, _var_sum); 
-}*/
+
+template<typename T1>
+DynamicConstraint* 
+BuildCT_WATCHED_LITSUM(const T1& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+{
+  if(reify)
+  {
+    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
+	  exit(0);
+  }
+  else
+  { 
+	vector<int> values;
+	for(unsigned i = 0; i < b.vars[1].size(); ++i)
+	  values.push_back(b.vars[1][i].pos);
+	return LiteralSumConDynamic(t1, values, runtime_val(b.vars[2][0].pos)); 
+  }
+}
+
 

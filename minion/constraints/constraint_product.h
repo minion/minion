@@ -105,8 +105,14 @@ struct ProductConstraint : public Constraint
   }
 };
 
-template<typename VarRef1, typename VarRef2, typename VarRef3>
+template<typename VarRef1, typename VarRef2>
 Constraint*
-ProductCon(VarRef1 var1, VarRef2 var2, VarRef3 var3)
-{ return (new ProductConstraint<VarRef1,VarRef2,VarRef3>(var1,var2,var3)); }
+ProductCon(vector<VarRef1> vars, vector<VarRef2> var2)
+{ 
+  D_ASSERT(vars.size() == 2);
+  D_ASSERT(var2.size() == 1);
+  return new ProductConstraint<VarRef1,VarRef1,VarRef2>(vars[0],vars[1],var2[0]); 
+}
+
+BUILD_CONSTRAINT2(CT_PRODUCT2, ProductCon);
 

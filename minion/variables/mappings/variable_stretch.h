@@ -51,7 +51,7 @@ static inline int divide_exact(int val, int divisor)
   return val / divisor;
 }
 };
-
+/*
 template<>
 struct MultiplyHelp<BoolVarRef>
 {
@@ -63,7 +63,12 @@ struct MultiplyHelp<BoolVarRef>
       return 1;
   }
   
-};
+  static inline int round_up(int val, int divisor)
+  {
+	if(
+  }
+  
+};*/
 
 template<typename VarRef>
 struct MultiplyVar

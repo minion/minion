@@ -150,10 +150,18 @@ struct ElementConstraint : public Constraint
   }
 };
 
-template<typename VarArray, typename VarRef1, typename VarRef2>
+// Note: we pass into the first vector into this function by value rather
+// than by const reference because we want to change it.
+template<typename VarRef1, typename VarRef2>
 Constraint*
-ElementCon(const VarArray& vararray, const VarRef1& v1, const VarRef2& v2)
+ElementCon(vector<VarRef1> vararray, const vector<VarRef2>& v1)
 { 
-  return new ElementConstraint<VarArray, VarRef1>(vararray, v1, v2); 
+  // Because we can only have two things which are parsed at the moment, we do
+  // a dodgy hack and store the last variable on the end of the vararray
+  // during parsing. Now we must pop it back off.
+  VarRef1 assignval = vararray.back();
+  vararray.pop_back();
+  return new ElementConstraint<vector<VarRef1>, VarRef2>(vararray, v1[0], assignval);  
 }
 
+BUILD_CONSTRAINT2(CT_ELEMENT, ElementCon);

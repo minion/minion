@@ -24,7 +24,7 @@ struct CheckAssignConstraint : public Constraint
   
  
   CheckAssignConstraint(VarArray& vars, OriginalConstraint& con)
-  : variables(vars), originalcon(con), assignment(variables.size())
+  : originalcon(con),variables(vars), assignment(variables.size())
   { D_INFO(2, DI_CHECKCON, "Constructing"); }
   
   virtual triggerCollection setup_internal()

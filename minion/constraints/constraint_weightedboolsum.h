@@ -140,22 +140,93 @@ struct LeqWeightBoolSumConstraint : public Constraint
 template<typename VarArray, typename WeightArray, typename VarSum>
 Constraint*
 LeqWeightBoolSumCon(const VarArray& _var_array, const WeightArray& w_array, const VarSum& _var_sum)
+{ return new LeqWeightBoolSumConstraint<VarArray, WeightArray, VarSum>(_var_array, w_array, _var_sum); }
+
+
+template<typename VarArray, typename WeightArray, typename VarSum>
+Constraint*
+GeqWeightBoolSumCon(const VarArray& _var_array, const WeightArray& w_array, const VarSum& _var_sum)
 { 
-  return 
-  (new LeqWeightBoolSumConstraint<VarArray, WeightArray, VarSum>(_var_array, w_array, _var_sum)); 
+  WeightArray rev_w_array(w_array.size());
+  for(unsigned int i = 0; i < w_array.size(); ++i)
+	rev_w_array[i] = -w_array[i];
+	 
+  return new LeqWeightBoolSumConstraint<VarArray, WeightArray, VarNeg<VarSum> >
+	(_var_array, rev_w_array, VarNegRef(_var_sum)); 
+}
+ 
+template<typename T1, typename T2>
+Constraint*
+LeqWeightedSum(const vector<int>& scale, const vector<T1>& vec, const vector<T2>& t2)
+{
+  bool multipliers_size_one = true;
+  for(unsigned i = 0; i < scale.size(); ++i)
+  {
+	if(scale[i] != 1 && scale[i] != -1)
+	{
+	  multipliers_size_one = false;
+	  i = scale.size();
+	}
+  }
+  
+  if(multipliers_size_one)
+  {
+	vector<SwitchNeg<T1> > mult_vars;
+	for(unsigned int i = 0; i < vec.size(); ++i)
+	  mult_vars.push_back(SwitchNeg<T1>(vec[i], scale[i]));
+	return LessEqualSumCon(mult_vars, t2);
+  }
+  else
+  {
+	vector<MultiplyVar<T1> > mult_vars;
+	for(unsigned int i = 0; i < vec.size(); ++i)
+	  mult_vars.push_back(MultiplyVar<T1>(vec[i], scale[i]));
+	return LessEqualSumCon(mult_vars, t2);
+  }
 }
 
+template<typename T1, typename T2>
+Constraint*
+GeqWeightedSum(const vector<int>& scale, const vector<T1>& vec, const vector<T2>& t2)
+{
+  bool multipliers_size_one = true;
+  for(unsigned i = 0; i < scale.size(); ++i)
+  {
+	if(scale[i] != 1 && scale[i] != -1)
+	{
+	  multipliers_size_one = false;
+	  i = scale.size();
+	}
+  }
+  
+  if(multipliers_size_one)
+  {
+	vector<SwitchNeg<T1> > mult_vars;
+	for(unsigned int i = 0; i < vec.size(); ++i)
+	  mult_vars.push_back(SwitchNeg<T1>(vec[i], scale[i]));
+	return GreaterEqualSumCon(mult_vars, t2);
+  }
+  else
+  {
+	vector<MultiplyVar<T1> > mult_vars;
+	for(unsigned int i = 0; i < vec.size(); ++i)
+	  mult_vars.push_back(MultiplyVar<T1>(vec[i], scale[i]));
+	return GreaterEqualSumCon(mult_vars, t2);
+  }
+}
 
- template<typename VarArray, typename WeightArray, typename VarSum>
- Constraint*
- GeqWeightBoolSumCon(const VarArray& _var_array, const WeightArray& w_array, const VarSum& _var_sum)
- { 
-   WeightArray rev_w_array(w_array.size());
-   for(unsigned int i = 0; i < w_array.size(); ++i)
-     rev_w_array[i] = -w_array[i];
-	 
-   return
-   (new LeqWeightBoolSumConstraint<VarArray, WeightArray, VarNeg<VarSum> >
-   (_var_array, rev_w_array, VarNegRef(_var_sum))); 
- }
- 
+// XXX : This doesn't work at present. Just use general case.
+/*
+template<typename T1>
+Constraint*
+LeqWeightedSum(const vector<int>& scale, const vector<BoolVarRef>& vec, const vector<T1>& t2)
+{ return LeqWeightBoolSumCon(vec, scale, t2[0]); }
+
+template<typename T1>
+Constraint*
+GeqWeightedSum(const vector<int>& scale, const vector<BoolVarRef>& vec, const vector<T1>& t2)
+{ return GeqWeightBoolSumCon(vec, scale, t2[0]); }
+*/
+
+BUILD_CONSTRAINT3(CT_WEIGHTLEQSUM, LeqWeightedSum)
+BUILD_CONSTRAINT3(CT_WEIGHTGEQSUM, GeqWeightedSum)

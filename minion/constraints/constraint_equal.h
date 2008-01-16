@@ -216,3 +216,24 @@ template<typename EqualVarRef1, typename EqualVarRef2>
 Constraint*
 EqualMinusCon(EqualVarRef1 var1, EqualVarRef2 var2)
 { return new EqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2> >(var1,VarNegRef(var2)); }
+
+
+template<typename T1, typename T2>
+Constraint*
+BuildCT_EQ(const T1& t1, const T2& t2, bool reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
+{
+  if(reify)
+  { return ReifiedEqualCon(t1[0],t2[0], reifyVar); }
+  else
+  { return EqualCon(t1[0],t2[0]); }
+}
+
+template<typename T1, typename T2>
+Constraint*
+BuildCT_MINUSEQ(const T1& t1, const T2& t2, bool reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
+{
+  if(reify)
+  { return ReifiedEqualMinusCon(t1[0],t2[0], reifyVar); }
+  else
+  { return EqualMinusCon(t1[0],t2[0]); }
+}

@@ -18,6 +18,8 @@ struct InputFileReader
   virtual char get_char() = 0;
   virtual bool eof() = 0;
   virtual void putback(char c) = 0;
+  
+  virtual ~InputFileReader() {}
 };
 
 template<typename StreamType>
@@ -135,6 +137,7 @@ struct ConcreteFileReader : public InputFileReader
   virtual void putback(char c)
   { infile.putback(c); }
   
+  virtual ~ConcreteFileReader() {}
 };
 
 class MinionInputReader {

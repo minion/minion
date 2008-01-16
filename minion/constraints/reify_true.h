@@ -118,3 +118,13 @@ reify_true<BoolVar>*
 truereifyCon(Constraint* c, BoolVar var)
 { return new reify_true<BoolVar>(&*c, var); }
 
+// Just a placeholder.
+template<typename BoolVar>
+DynamicConstraint*
+truereifyCon(DynamicConstraint* c, BoolVar var)
+{ 
+  cerr << "Reification is not supported on dynamic constraints. Sorry." << endl;
+  exit(1);
+}
+
+
