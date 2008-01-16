@@ -110,6 +110,12 @@ to_string(T1 t1, T2 t2, T3 t3)
 
 #ifndef NO_DEBUG
 
+#ifdef CRASH_ERROR
+#define FAIL_EXIT() { int* nullvar = NULL; *nullvar = 0; exit(1); }
+#else
+#define FAIL_EXIT() { exit(1); }
+#endif
+
 struct assert_fail {};
 
 inline void assert_function(BOOL x, const char* a, const char* f, int line)
@@ -123,22 +129,13 @@ inline void assert_function(BOOL x, const char* a, const char* f, int line)
 	cout << "\n";
     cout.flush();
 	cerr.flush();
-    throw new assert_fail;
+    FAIL_EXIT();
   }
 }
 
-#ifdef CRASH_ERROR
-#define FAIL_EXIT() { int* nullvar = NULL; *nullvar = 0; exit(1); }
-#else
-#define FAIL_EXIT() { exit(1); }
-#endif
-
 #define D_ASSERT(x) {assert_function(x, #x, __FILE__, __LINE__);}
 
-
-
 #define D_DATA(x) x
-
 
 enum debug_types
 { DI_SOLVER, DI_SUMCON, DI_BOOLCON, DI_ANDCON, DI_ARRAYAND, DI_QUEUE, DI_REIFY,

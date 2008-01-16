@@ -28,6 +28,13 @@ using namespace ProbSpec;
 
 #include "svn_header.h"
 
+struct MinionArguments
+{
+  bool use_sdf;
+  MinionArguments() : use_sdf(false)
+  { }
+};
+
 void print_info()
 {
  cout << "Usage: minion {options}* nameofprob.minion" << endl
@@ -73,7 +80,7 @@ void print_info()
   
 BOOL randomise_valvaroder = false;
 
-void parse_command_line(MinionInputReader& reader, int argc, char** argv)
+void parse_command_line(MinionInputReader& reader, MinionArguments& args, int argc, char** argv)
 {
  for(int i = 1; i < argc - 1; ++i)
   {
@@ -81,7 +88,7 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 	if(command == string("-findallsols"))
 	{ Controller::find_all_solutions(); }
 	else if(command == string("-sdf"))
-	{ Controller::use_sdf = true; }
+	{ args.use_sdf = true; }
 	else if(command == string("-quiet"))
 	{ reader.parser_verbose = false; }
 	else if(command == string("-printsols"))
@@ -227,8 +234,8 @@ int main(int argc, char** argv) {
     print_info();
 
   MinionInputReader reader;
-  
-  parse_command_line(reader, argc, argv);
+  MinionArguments args;
+  parse_command_line(reader, args, argc, argv);
  
   
   cout << "# " << VERSION << endl ;
@@ -343,17 +350,21 @@ int main(int argc, char** argv) {
   }
   // Solve!
   
-  if(Controller::use_sdf)
+  if(args.use_sdf)
   {
-	Controller::SDFVariableOrder<AnyVarRef> order(var_val_order.first, 
-												  var_val_order.second);
-	Controller::solve(order, var_val_order.first);
+	try 
+	{ Controller::solve_sdf(var_val_order.first); }
+	catch(...)
+	{ }
   }
   else
   {  
 	Controller::StaticVariableOrder<AnyVarRef> order(var_val_order.first, 
 													 var_val_order.second);
-    Controller::solve(order, var_val_order.first);
+    try
+	{ Controller::solve(order, var_val_order.first); }
+	catch(...)
+	{ }
   }
     
   if(Controller::test_mode)
