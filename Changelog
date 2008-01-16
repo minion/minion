@@ -1,3 +1,10 @@
+07/02/2006 - Chris
+    * Lots of changes. 
+    * Added different variable orders.
+    * Added ability to perform SAC on first node (-preprocess)
+    * Changed default table method to tries.
+    * Fixed bug where Minion stops automatically after 2^32 nodes.
+
 15/11/2006 - Chris
 	* Made big changes in lots of files to change the standard domain size
 	  from short to int. Might slow things down a little, but should keep
