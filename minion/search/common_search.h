@@ -211,7 +211,7 @@ void maybe_print_search_state(string name, T& vars)
 	solutions = 0;  
 	nodes = 0;
 	lock();
-	print_timestep_without_reset("First Constraint Loop: ");
+	print_timestep_without_reset("First Node Time: ");
 	/// Failed initially propagating constraints!
 	if(Controller::failed)
 	  return;

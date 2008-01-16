@@ -9,6 +9,7 @@ enum VarOrder
 {
   ORDER_STATIC,
   ORDER_SDF,
+  ORDER_LDF,
   ORDER_ORIGINAL
 };
 
@@ -38,7 +39,19 @@ enum VarOrder
 		   catch(...)
 		   { }
 	  }
+	  break;
+	  case ORDER_LDF:
+	  {
+		Controller::VariableOrder<AnyVarRef, Controller::LDFBranch> 
+		order(var_val_order.first, var_val_order.second);
+		
+		try 
+		{ Controller::solve_loop(order, var_val_order.first); }
+		catch(...)
+		{ }
+	  }
 		break;
+		
 	  case ORDER_ORIGINAL:
 	  {  
 		Controller::VariableOrder<AnyVarRef, Controller::StaticBranch>

@@ -51,3 +51,36 @@ struct SDFBranch
 	return smallest_dom;
   }
 };
+
+struct LDFBranch
+{
+  template<typename VarType>
+  int operator()(vector<VarType>& var_order, int pos)
+  {
+	int length = var_order.size();
+	
+	pos = 0;
+	while(pos < length && var_order[pos].isAssigned())
+	  ++pos;
+	if(pos == length)
+	  return length;
+	
+	int largest_dom = pos;
+	int dom_size = var_order[pos].getMax() - var_order[pos].getMin();
+	
+	++pos;
+	
+	for(; pos < length; ++pos)
+	{
+	  int maxval = var_order[pos].getMax();
+	  int minval = var_order[pos].getMin();
+	  
+	  if(maxval - minval > dom_size)
+	  {
+		dom_size = maxval - minval;
+		largest_dom = pos;
+	  }
+	}
+	return largest_dom;
+  }
+};

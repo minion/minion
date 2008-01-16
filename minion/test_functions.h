@@ -58,3 +58,22 @@ string get_dom_as_string(vector<T>& vec)
   return output;
 }
 
+template<typename Vars>
+long long lit_count(Vars& v)
+{
+  long long lits = 0;
+  for(int i = 0; i < v.size(); ++i)
+  {
+    if(v[i].isBound())
+    {
+      lits += v[i].getMax() - v[i].getMin() + 1;
+    }
+    else
+    {
+      for(int j = v[i].getMin(); j <= v[i].getMax(); ++j)
+        if(v[i].inDomain(j))
+          lits++;
+    }
+  }
+  return lits;
+}
