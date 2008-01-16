@@ -46,11 +46,11 @@ void inline D_FATAL_ERROR2(string s, string file, string line)
   cerr << endl;
   cerr << "The generated error message was: " << s << endl;
   cerr << "The error was in the file " << file << " on line " << line << endl;
-#ifndef NO_DEBUG 
+#ifdef CRASH_ERROR
    int* i = NULL;
    *i = 0;
 #endif
-  abort();
+  exit(1);
 }
 
 template<typename T>
