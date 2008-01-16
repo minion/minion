@@ -57,7 +57,7 @@ CPU=
 #CPU=-march=pentium4
 #CPU=-march=pentium-m
 
-FULLFLAGS=$(DEBUG_FLAGS) $(FLAGS) $(CPU) $(WATCHED) $(QUICK_COMPILE) $(MORE_INFO_FLAGS) $(MYFLAGS)
+FULLFLAGS=-W $(DEBUG_FLAGS) $(FLAGS) $(CPU) $(WATCHED) $(QUICK_COMPILE) $(MORE_INFO_FLAGS) $(MYFLAGS)
 
 OBJFILES=$(patsubst minion/%.cpp,$(OBJDIR)/%.o,$(SRC))
 
