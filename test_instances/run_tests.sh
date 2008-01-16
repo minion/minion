@@ -1,5 +1,6 @@
 #!/bin/bash
 j=0
+reify=0
 for i in *.minion; do
 echo -n .
 j=$(($j + 1))
@@ -14,12 +15,22 @@ else
   if $1 -test $2 $i &> /dev/null;
     then pass=$(($pass + 1));
   else 
-    echo Fail $i;
+    $1 -test $2 $i &> test_output;
+    if grep -q "Reification is not" test_output;
+    then
+      echo Reification failure - $i;
+      reify=$(($reify + 1));
+    else    
+      echo Fail $i;
+    fi
   fi
 fi
 done
 echo
 echo $pass of $j tests successful.
+echo $(($j - $pass - $reify)) tests failed due to errors.
+echo $reify tests failed due to unimplemented reification.
+
 echo Doing randomised tests.
 j=0
 pass=0
