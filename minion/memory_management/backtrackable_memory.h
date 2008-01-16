@@ -51,13 +51,13 @@ public:
 
   void set_ptr(void* new_ptr)
   { 
-	D_ASSERT((size_t)(new_ptr) % sizeof(void*) == 0);
+	D_ASSERT((size_t)(new_ptr) % sizeof(int) == 0);
 	ptr = new_ptr;
   }
   
   void* get_ptr() const 
   { 
-	D_ASSERT((size_t)(ptr) % sizeof(void*) == 0);
+	D_ASSERT((size_t)(ptr) % sizeof(int) == 0);
 	return ptr;
   }
   void request_bytes(int i);
@@ -97,12 +97,16 @@ struct BacktrackableMemory
   /// Get a block of backtrack memory
   BackTrackOffset get_bytes(unsigned byte_count)
   { 
-	D_ASSERT(byte_count % sizeof(void*) == 0);
+	// XXX for now, will pad this up. If people ask for lots of tiny blocks,
+	// this could be bad.
+	if(byte_count % sizeof(int) != 0)
+	  byte_count += sizeof(int) - (byte_count % sizeof(int));
+	D_ASSERT(byte_count % sizeof(int) == 0);
     D_ASSERT(!lock_m);
     BackTrackOffset new_mem;
     // :(
     char* ptr = new char[byte_count];
-	D_ASSERT((size_t) ptr % sizeof(void*) == 0);
+	D_ASSERT((size_t) ptr % sizeof(int) == 0);
     std::fill(ptr, ptr + byte_count, 0);
     offset_positions[ptr] = make_pair(allocated_bytes, byte_count);
     new_mem.ptr = ptr;
@@ -183,7 +187,7 @@ struct BacktrackableMemory
     D_ASSERT(!final_lock_m);
     lock_m = true;
     current_data = new char[allocated_bytes];
-	D_ASSERT( (size_t)current_data % sizeof(void*) == 0);
+	D_ASSERT( (size_t)current_data % sizeof(int) == 0);
     MAP_TYPE<void*, pair<int,int> > offset_positions_backup(offset_positions);
     // Code like this makes baby Jesus cry, but is suprisingly legal C++
     // The apparently equivalent "offsets[i]->ptr = (int)offset" isn't.
@@ -194,7 +198,7 @@ struct BacktrackableMemory
 	  {
         D_ASSERT(offset_positions.count(old_ptr) == 1);
         (*it)->set_ptr(current_data + offset_positions[old_ptr].first);
-		D_ASSERT( (size_t)((*it)->get_ptr()) % sizeof(void*) == 0);
+		D_ASSERT( (size_t)((*it)->get_ptr()) % sizeof(int) == 0);
         copy(old_ptr, old_ptr + offset_positions[old_ptr].second,
 	     static_cast<char*>((*it)->get_ptr()));
         delete[] old_ptr;

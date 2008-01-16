@@ -111,7 +111,7 @@ struct RangeVarContainer {
   { 
     D_ASSERT(!lock_m);
     lock_m = true;
-	
+
     bound_data.request_bytes(var_count_m*2);
     char* bound_ptr = static_cast<char*>(bound_data.get_ptr());
     for(unsigned int i = 0; i < var_count_m; ++i)
