@@ -5,6 +5,9 @@
 
 #use Descriptive;
 
+use File::Basename;
+
+
 if ((@ARGV < 1) or ($ARGV[0] =~ /^--help$/)) 
 { 
   print "usage: analyse_minion.pl {--headers} filename*\n" ;
@@ -52,7 +55,10 @@ for($arg=0;$arg < @ARGV; $arg++) {
 
                   $version = $field[3] ;
               } 
-              if ($line =~ /^# Input filename/) { $instance_name =  $field[3] ; }
+              if ($line =~ /^# Input filename/) 
+              { $instance_fullname =  $field[3] ; 
+                $instance_name = fileparse($instance_fullname) ;
+              }
               if ($line =~ /^Time out/) { $timeout = "Timeout"; } 
               if ($line =~ /^Problem solvable.*yes/) 
               { 
