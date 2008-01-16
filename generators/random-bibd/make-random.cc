@@ -153,22 +153,19 @@ int var_pos(int i, int j)
 
 void print_tuple(const vector<bool>& vec)
 {
- cout << "<" << vec[0];
- for(int i = 1; i < vec.size(); ++i)
-   cout << "," << vec[i];
- cout << "> ";
+ for(int i = 0; i < vec.size(); ++i)
+   cout << vec[i] << " ";
+ cout << endl;
 }
 
-void print_tuple_list(const vector<vector<bool> >& vecs)
+void print_tuple_list(vector<vector<bool> > vecs)
 {
-  cout << "{";
-  print_tuple(vecs[0]);
-  for(int i = 1; i < vecs.size(); ++i)
+  sort(vecs.begin(),vecs.end());
+  cout << vecs.size() << " " << vecs[0].size() << endl;
+  for(int i = 0; i < vecs.size(); ++i)
   {
-    cout << ",";
     print_tuple(vecs[i]);
   }
-  cout << "}" << endl;
 }
 
 int main(int argc, char** argv)
@@ -193,19 +190,43 @@ int main(int argc, char** argv)
   cout << v*b*2 << endl;
   cout << "0 0 0 0" << endl;
   // We only want the basic matrix in the variable ordering
-  cout << "[x0";
-  for(int i = 1; i < v * b; ++i)
-    cout << ",x" << i;
-  cout << "]" << endl;
+  cout << "[] []" << endl;
   
-  cout << "[a";
-  for(int i = 1; i < v * b; ++i)
-    cout << ",a";
-  cout << "]" << endl;
   cout << "0 0 0" << endl;
+  
+  cout << "tuplelists " << 2 + b << endl;
+    
+  {
+  Rep scalar_rep(rep);
+    scalar_rep.join(rep);
+    vector<vector<bool> > scalar_tuples = 
+      scalar_rep.get_satisfying_tuples(scalar_product(l));
+              print_tuple_list(scalar_tuples);
+  }
+      
+      {
+          print_tuple_list(rep.get_satisfying_tuples(sum_function(r)));
+      
+      }
+    
+ 
+   for(int j = 0; j < b; ++j)
+   {
+  vector<vector<bool> > true_tuples = rep.get_satisfying_tuples(in_set(j));
+      for(int loop = 0; loop < true_tuples.size(); ++loop)
+        true_tuples[loop].push_back(1);
+        
+      vector<vector<bool> > false_tuples = rep.get_satisfying_tuples(not_in_set(j));
+      for(int loop = 0; loop < false_tuples.size(); ++loop)
+        false_tuples[loop].push_back(0);
+        
+      true_tuples.insert(true_tuples.end(), false_tuples.begin(), false_tuples.end());
+      
+      print_tuple_list(true_tuples);
+  }
+  
   cout << "objective none" << endl;
   cout << "print none" << endl;
-  cout << "eq(x0,x1)" << endl;
   
   // Sum constraints on rows
   for(int i = 0; i < v; ++i)
@@ -214,9 +235,9 @@ int main(int argc, char** argv)
     
     for(int j = 1; j < b; ++j)
       cout << ",x" << var_pos(i,j);
-    cout << "],";
+    cout << "],t1";
     
-    print_tuple_list(rep.get_satisfying_tuples(sum_function(r)));
+
     cout << ")" << endl;
   }
   
@@ -229,21 +250,7 @@ int main(int argc, char** argv)
       for(int loop = 1; loop < b; ++loop)
         cout << ",x" << var_pos(i,loop);
       cout << ",x" << var_pos(i,j) + v*b;
-      cout << "],";
-      
-      
-      vector<vector<bool> > true_tuples = rep.get_satisfying_tuples(in_set(j));
-      for(int loop = 0; loop < true_tuples.size(); ++loop)
-        true_tuples[loop].push_back(1);
-        
-      vector<vector<bool> > false_tuples = rep.get_satisfying_tuples(not_in_set(j));
-      for(int loop = 0; loop < false_tuples.size(); ++loop)
-        false_tuples[loop].push_back(0);
-        
-      true_tuples.insert(true_tuples.end(), false_tuples.begin(), false_tuples.end());
-      
-      print_tuple_list(true_tuples);
-      cout << ")" << endl;
+      cout << "],t" << 2 + j << ")" << endl;
     }
   }
   
@@ -264,10 +271,7 @@ int main(int argc, char** argv)
   
   // Finally, scalar product.
   {
-    Rep scalar_rep(rep);
-    scalar_rep.join(rep);
-    vector<vector<bool> > scalar_tuples = 
-      scalar_rep.get_satisfying_tuples(scalar_product(l));
+    
     for(int i = 0; i < v; ++i)
       for(int j = i + 1; j < v; ++j)
       {
@@ -276,9 +280,7 @@ int main(int argc, char** argv)
           cout << ",x" << var_pos(i,k);
         for(int k = 0; k < b; ++k)
           cout << ",x" << var_pos(j,k);
-        cout << "]," << endl;
-        print_tuple_list(scalar_tuples);
-        cout << ")" << endl;
+        cout << "],t0)" << endl;
       }
   }
   
