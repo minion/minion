@@ -1,4 +1,11 @@
 #!/bin/bash
+
+if [ $# -lt 1 ]; then
+  echo Must give a minion binary to test.
+  echo Likely values are ../bin/minion or ../bin/minion-debug
+  exit 0
+fi
+
 if [ ! -x $1 ]
 then
   echo $1 either doesn\'t exist, or isn\'t executable.
