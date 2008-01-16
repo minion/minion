@@ -201,6 +201,7 @@ lower bound to the upper bound specified, but the deletion of any
 domain element in this range is permitted. This means that holes can
 be put in the domain of these variables.
 \item \emph{Discrete Sparse} variables, where the domain is composed of discrete values, and any domain element may be removed. This is the most general variable type, it allows any integer value to be in the domain at specification time, and it allows any variable to be removed during the search process.
+{\emph{Unfortunately this type of variable is not yet implemented.}}
 \end{enumerate}
 Sub-dividing the variable types in this manner affords the greatest opportunity for optimisation. In general, we recommend thinking of the variable types as a hierarchy, where 1 (0/1 variables) is the most efficient type, and 5 (Discrete Sparse Variables) is the least. The user should use the variable which is the highest in the hierarchy, yet encompasses enough information to provide a full model for the problem they are attempting to solve.
 
@@ -260,11 +261,13 @@ variables$\rangle$, $\langle$var1$\rangle$, $\langle$var2$\rangle$)}.
 \item[GACelement] states that the variable at the index of the matrix
 specified by the assignment to \texttt{var1} is equal to the
 assignment of \texttt{var2} preserving GAC:\\ \texttt{element($\langle$matrix of
-variables$\rangle$, $\langle$var1$\rangle$, $\langle$var2$\rangle$)}.
+variables$\rangle$, $\langle$var1$\rangle$, $\langle$var2$\rangle$)}.\\
+\emph{Note that you may find that the constraint \texttt{watchelement} works faster: these two constraints should always perform the same propagations as each other.}
+ 
 
 \item[$\mathbf{\leq}$] states that a variable (\texttt{var1}) is less
 than or equal to another variable (\texttt{var2}) plus a constant (to
-obtain $<$ use 1 for the constant):\\
+obtain $<$ use $-1$ for the constant):\\
 \texttt{ineq($\langle$var1$\rangle$, $\langle$var2$\rangle$,
 $\langle$const$\rangle$)}.
 
@@ -336,7 +339,7 @@ $\langle$matrix of constants$\rangle$, $\langle$variable$\rangle$)}.
 
 \item[Element (watched literals)] states that the variable at the index of the matrix
 specified by the assignment to \texttt{var1} is equal to the
-assignment of \texttt{var2} using watched literals:\\ 
+assignment of \texttt{var2} using watched literals.  Like \texttt{gacelement}, this constraint preserves GAC:\\ 
 \texttt{watchelement($\langle$matrix of
 variables$\rangle$, $\langle$var1$\rangle$, $\langle$var2$\rangle$)}.
 
