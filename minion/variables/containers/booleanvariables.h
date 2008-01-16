@@ -60,12 +60,12 @@ struct BoolVarRef_internal
   { return *static_cast<data_type*>(value_position.get_ptr()); }
   
   bool isAssigned() const
-  { return (bool)(assign_ptr() & shift_offset); }
+  { return assign_ptr() & shift_offset; }
   
   int getAssignedValue() const
   {
     D_ASSERT(isAssigned());
-    return (bool)(value_ptr() & shift_offset);
+    return value_ptr() & shift_offset;
   }
   
   bool inDomain(int b) const
