@@ -109,7 +109,7 @@ struct BacktrackableMemory
 	D_ASSERT((size_t) ptr % sizeof(int) == 0);
     std::fill(ptr, ptr + byte_count, 0);
     offset_positions[ptr] = make_pair(allocated_bytes, byte_count);
-    new_mem.ptr = ptr;
+    new_mem.set_ptr(ptr);
     allocated_bytes += byte_count; 
     return new_mem;
   }
@@ -213,7 +213,7 @@ struct BacktrackableMemory
       VirtualBackTrackOffset* ptr = it->first;
       const BackTrackOffset* master = it->second.first;
       int offset_val = it->second.second;
-      ptr->ptr = static_cast<char*>(master->ptr) + offset_val;
+      ptr->ptr = static_cast<char*>(master->get_ptr()) + offset_val;
     }
     
     backtrack_cache = new char[allocated_bytes * 100];
@@ -267,7 +267,7 @@ inline void VirtualBackTrackOffset::operator=(const VirtualBackTrackOffset& b)
 inline VirtualBackTrackOffset::VirtualBackTrackOffset(const VirtualBackTrackOffset& b) : ptr(b.ptr)
 {  backtrackable_memory.addToVirtualTracker(this, &b); }
 
-inline VirtualBackTrackOffset::VirtualBackTrackOffset(BackTrackOffset& b, int offset) : ptr(b.ptr)
+inline VirtualBackTrackOffset::VirtualBackTrackOffset(BackTrackOffset& b, int offset) : ptr(b.get_ptr())
 { backtrackable_memory.addToVirtualTracker(this, &b, offset); }
 
  inline  BackTrackOffset::~BackTrackOffset()
