@@ -124,6 +124,20 @@ struct Nightingale
 	}  
   }
   
+  void printhologram(TupleN* tlpl, int size)
+  {
+	for(int i = 0; i < size; ++i)
+	{
+	  for(int j = 0; j < arity; ++j)
+		printf("%d,",tlpl[i].values[j]);
+	  printf("\n");
+	  
+	  for(int j = 0; j < arity; ++j)
+		printf("%d,",tlpl[i].nextDifferent[j]);
+	  printf("\n\n");	  
+	}
+  }
+  	
   template<typename T>
   TupleN* buildhologram(T& tupleref)
   {
@@ -317,43 +331,71 @@ struct GACTableConstraint : public DynamicConstraint
 	  listlength=nightingale->noTuples;
 	}
 	
-	for(int pass = 0; pass < 2; pass++)
+	
+	while(index<listlength && index!=-1)
 	{
-	  bool firstpass=(pass==0)?true:false;
-	  if(!firstpass) 
-		index = 0;
-	  while((firstpass && index<listlength && index!=-1) || (!firstpass && index<=ltp && index!=-1))
+	  TupleN& curtuple=tuplelisthere[index];
+	  // iterate from most to least significant digit
+	  // because most sig digit probably allows greatest jump.
+	  // Remember that var gets treated specially, as if its domain is just {val}
+	  
+	  bool matchAll=true;
+	  for(int valIndex=0; valIndex<arity; valIndex++)
 	  {
-		TupleN& curtuple=tuplelisthere[index];
-		// iterate from most to least significant digit
-		// because most sig digit probably allows greatest jump.
-		// Remember that var gets treated specially, as if its domain is just {val}
+		int curvalue=curtuple.values[valIndex];
 		
-		bool matchAll=true;
-		for(int valIndex=0; valIndex<arity; valIndex++)
+		if( (valIndex!=var && !vars[valIndex].inDomain(curvalue)) || 
+			(valIndex==var && curvalue!=val))
 		{
-		  int curvalue=curtuple.values[valIndex];
-		  
-		  if( (valIndex!=var && !vars[valIndex].inDomain(curvalue)) || 
-			  (valIndex==var && curvalue!=val))
-		  {
-			matchAll=false;
-			index=curtuple.nextDifferent[valIndex];
-			break;
-		  }
+		  matchAll=false;
+		  index=curtuple.nextDifferent[valIndex];
+		  break;
 		}
-		
-		if(matchAll)
-		{
-		  // success
-		  // set watch
-		  current_support[var][val-domain_min]=index;
-		  //System.out.println("Support found:"+new tuple(curtuple.values));
-		  return &curtuple;
-		}
+	  }
+	  
+	  if(matchAll)
+	  {
+		// success
+		// set watch
+		current_support[var][val-domain_min]=index;
+		//System.out.println("Support found:"+new tuple(curtuple.values));
+		return &curtuple;
 	  }
 	}
 	
+	
+	index = 0;
+	
+	while(index<=ltp && index!=-1)
+	{
+	  TupleN& curtuple=tuplelisthere[index];
+	  // iterate from most to least significant digit
+	  // because most sig digit probably allows greatest jump.
+	  // Remember that var gets treated specially, as if its domain is just {val}
+	  
+	  bool matchAll=true;
+	  for(int valIndex=0; valIndex<arity; valIndex++)
+	  {
+		int curvalue=curtuple.values[valIndex];
+		
+		if( (valIndex!=var && !vars[valIndex].inDomain(curvalue)) || 
+			(valIndex==var && curvalue!=val))
+		{
+		  matchAll=false;
+		  index=curtuple.nextDifferent[valIndex];
+		  break;
+		}
+	  }
+	  
+	  if(matchAll)
+	  {
+		// success
+		// set watch
+		current_support[var][val-domain_min]=index;
+		//System.out.println("Support found:"+new tuple(curtuple.values));
+		return &curtuple;
+	  }
+	}
 	return 0;
   }
   
