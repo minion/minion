@@ -45,5 +45,5 @@ foreach i (qg1-07 qg1-08 qg2-07 qg2-08 qg3-08 qg3-09 qg4-08 qg4-09 qg5-09 qg5-10
 	
 # Then run the comparison 
 
-./plot-comparison.csh $instancedir $comparisondir $instancedir
+./plot-comparison.csh $dir $comparisondir $dir
 
