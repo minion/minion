@@ -15,17 +15,14 @@ following:
      statement).
    #TEST SOLCOUNT x
      There will be x solutions found in the whole search
+   #TEST JUSTPARSE
+     Minion will exit after just parsing the input file.
 
- 
- 
-If any line of the file is:
+There are two other important poss options #FAIL and #BUG, which act the same,
+but have different intentions.
+   #BUG
+	 This test currently fails due to a bug in Minion.
+	
    #FAIL
-   
-Then the test script will instead check to see if the solver fails rather
-than succeds. Note this is done in the test script, not in the solver itself,
-which will ignore the #FAIL as a comment.
-
-You should try to be careful if using #FAIL that the file can only fail for
-the reason you want, for example if you want to test a parsing failure,
-put in #TEST SOLCOUNT 0, then a constraint eq(x0,-999) (assuming -999 is not in
-the domain of x0).
+     This test is supposed to fail (for example, checking parsing rejects
+     incorrect input).
