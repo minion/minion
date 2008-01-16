@@ -338,12 +338,14 @@ int main(int argc, char** argv) {
   
   if(Controller::use_sdf)
   {
-	Controller::SDFVariableOrder order(var_val_order.first, var_val_order.second);
+	Controller::SDFVariableOrder<AnyVarRef> order(var_val_order.first, 
+												  var_val_order.second);
 	Controller::solve(order, var_val_order.first);
   }
   else
   {  
-	Controller::StaticVariableOrder order(var_val_order.first, var_val_order.second);
+	Controller::StaticVariableOrder<AnyVarRef> order(var_val_order.first, 
+													 var_val_order.second);
     Controller::solve(order, var_val_order.first);
   }
     

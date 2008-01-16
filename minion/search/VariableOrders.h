@@ -24,14 +24,15 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+  template<typename VarType = AnyVarRef>
   struct StaticVariableOrder
   {
-    vector<AnyVarRef> var_order;
+    vector<VarType> var_order;
 	vector<BOOL> val_order;
 	vector<int> branches;
 	unsigned pos;
 	
-	StaticVariableOrder(vector<AnyVarRef>& _varorder, vector<BOOL>& _valorder)
+	StaticVariableOrder(vector<VarType>& _varorder, vector<BOOL>& _valorder)
     : var_order(_varorder), val_order(_valorder)
 	{
 	  branches.reserve(1000);
@@ -80,9 +81,10 @@
   inline bool is_boolean(const AnyVarRef& var)
   { return (var.getInitialMax() - var.getInitialMin()) == 1; } 
 
+  template<typename VarType = AnyVarRef>
   struct SDFVariableOrder
   {
-    vector<AnyVarRef> var_order;
+    vector<VarType> var_order;
 	vector<BOOL> val_order;
 	vector<int> branches;
 	int bool_end;

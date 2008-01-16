@@ -25,11 +25,14 @@
 */
 
 
+#define NO_DEBUG
+#define WATCHEDLITERALS
+
 #include "minion.h"
 
 
-const int height = 7;
-const int width = 7;
+const int height = 8;
+const int width = 8;
 const int widthsum = 3;
 const int heightsum = 3;
 const int scalarsum = 1;
@@ -54,7 +57,7 @@ void print_sol(void)
 
 int main (int argc, char * const argv[]) {
   Controller::find_all_solutions();
- // set_solution_function(&print_sol);
+
   for(int i=0;i<height;i++)
     for(int j=0;j<width;j++)
     {
@@ -79,9 +82,11 @@ int main (int argc, char * const argv[]) {
   }
   
   vector<vector<BoolVarRef> > scalar((height*(height-1))/2);
+  
   for(unsigned int i=0;i<scalar.size();i++)
     for(int j=0;j<width;j++)
       scalar[i].push_back(boolean_container.get_new_var());
+      
   int count = 0;
   for(int i=0;i<height;i++)
   {
@@ -92,6 +97,7 @@ int main (int argc, char * const argv[]) {
       ++count;
     }
   }
+  
   D_ASSERT(count == ((height*(height-1))/2));
   
   for(int i=0;i<(height*(height-1))/2;i++)
@@ -102,13 +108,21 @@ int main (int argc, char * const argv[]) {
     add_constraint(BoolGreaterEqualSumCon(col,compiletime_val<scalarsum>()));
   }
   
-  //vector<AnyVarRefBox> var_order;
-  for(int i=0;i<height;++i)
-    add_to_var_order(vars[i]);
+  pair<vector<BoolVarRef>, vector<BOOL> > var_val_order;
   
-  Controller::solve();
-  D_ASSERT(Controller::solutions == 151200);
-  D_ASSERT(nodes == 314079);
+  var_val_order.first.resize(height*width);
+  var_val_order.second.resize(height*width, false);
+  
+  for(int i = 0; i < height; ++i)
+    for(int j = 0; j < width; ++j)
+    {
+      var_val_order.first[i*height+j] = vars[i][j];
+     }
+    
+     Controller::print_solution = false;
+  Controller::StaticVariableOrder<BoolVarRef> order(var_val_order.first, var_val_order.second);
+  Controller::solve(order, var_val_order.first);
+  printf("%d, %d\n", nodes, Controller::solutions);
   Controller::finish();
 }
 
