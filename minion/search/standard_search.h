@@ -78,7 +78,7 @@ namespace Controller
 		  cerr << values[loop] << ",";
 		cerr << endl;
 		cerr << "This is an internal bug. It shouldn't happen!!" << endl;
-		cerr << "It was a " << typeid(con).name() << " constraint" << endl;
+		cerr << "Please report this instance to the developers." << endl;
 		FAIL_EXIT();
 	  }
   }
@@ -209,6 +209,10 @@ namespace Controller
 		else
 		{
 		  D_ASSERT(order.cur_var_not_assigned());
+#ifdef MORE_SEARCH_INFO
+		  if(commandlineoption_dumptree)
+			cout << "Node: " << nodes << "," << get_dom_as_string(v) << endl;
+#endif
 		  world_push();
 		  order.branch_left();
 		  propogate_queue();
@@ -220,18 +224,15 @@ namespace Controller
 		  
 		  if(order.finished_search())
 			return;
-		  
+#ifdef MORE_SEARCH_INFO
+		  if(commandlineoption_dumptree)
+			cout << "Node: " << nodes << "," << get_dom_as_string(v) << endl;
+#endif
 		  world_pop();
 		  order.branch_right();
 		  if(optimise)
 			optimise_var->setMin(current_optimise_position);
 		  propogate_queue();
-		  
-#ifdef MORE_SEARCH_INFO
-		  if(commandlineoption_dumptree)
-			cout << "Node: " << nodes << "," << get_dom_as_string(v) << endl;
-#endif	
-		  
 		}
 		
 	  }

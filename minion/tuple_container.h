@@ -110,14 +110,14 @@ class TupleList
   {
      D_ASSERT(var_num >= 0 && var_num < tuple_size());
 	 D_ASSERT(dom_num >= dom_smallest[var_num] && 
-			  dom_num < dom_smallest[var_num] + dom_size[var_num]);
+			  dom_num <= dom_smallest[var_num] + dom_size[var_num]);
     return _map_vars_to_literal[var_num][dom_num - dom_smallest[var_num]]; 
   }
   
   pair<int,int> get_varval_from_literal(int literal)
   { return _map_literal_to_vars[literal]; }
 
-   /// Sets up the variable/value pair to literal mapping, used by @get_literal.
+  /// Sets up the variable/value pair to literal mapping, used by @get_literal.
   void finalise_tuples()
   {
     if(tuples_locked)
@@ -148,8 +148,8 @@ class TupleList
 	int literal_count = 0;
 	for(unsigned i = 0; i < dom_size.size(); ++i)
 	{
-	  _map_vars_to_literal[i].resize(dom_size[i]);
-	  for(int j = 0; j < dom_size[i]; ++j)
+	  _map_vars_to_literal[i].resize(dom_size[i] + 1);
+	  for(int j = 0; j <= dom_size[i]; ++j)
 	  {
 		_map_vars_to_literal[i][j] = literal_count;
 		_map_literal_to_vars.push_back(make_pair(i, j + dom_smallest[i]));
@@ -199,12 +199,12 @@ struct LiteralSpecificLists
   
   LiteralSpecificLists(TupleList* _tuples) : tuples(_tuples)
   { 
-	tuples->finalise_tuples();
+	  tuples->finalise_tuples();
 	  // For each literal, store the set of tuples which it allows.
 	  for(unsigned i = 0; i < tuples->dom_size.size(); ++i)
 	  {
 		for(int j = tuples->dom_smallest[i]; 
-				j < tuples->dom_smallest[i] + tuples->dom_size[i];
+				j <= tuples->dom_smallest[i] + tuples->dom_size[i];
 				 ++j)
 		{
 		  vector<vector<int> > specific_tuples;

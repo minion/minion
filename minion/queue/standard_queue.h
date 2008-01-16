@@ -57,7 +57,14 @@ namespace Controller
   {
   	  propogate_trigger_list.clear();
 	  dynamic_trigger_list.clear();
-	  special_triggers.clear();
+	  
+	  if(!special_triggers.empty())
+	  {
+	    int size = special_triggers.size();
+		for(int i = 0; i < size; ++i)
+		  special_triggers[i]->special_unlock();
+		special_triggers.clear();
+	  }
   }
   
   // next_queue_ptr is defined in constraint_dynamic.
@@ -167,6 +174,7 @@ namespace Controller
   if(special_triggers.empty())
     return;
 	
+  D_INFO(1, DI_QUEUE, string("Doing a special trigger!"));
   Constraint* trig = special_triggers.back();
   special_triggers.pop_back();
   trig->special_check();

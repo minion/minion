@@ -43,7 +43,7 @@ struct BoolLessSumConstraint : public Constraint
 	
     count.set(0);    
     
-    for(int i=0; i < array_size; ++i)
+    for(int i = 0; i < array_size; ++i)
       if(VarToCount)
 	  	t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
       else

@@ -20,7 +20,7 @@
 // Note: The whole constraint_locked thing is for the following case:
 // Consider the following events are on the queue:
 // "rareify boolean is assigned, Y is assigned"
-// Now "rareify boolean is assigned causes full_propogate to be called for
+// Now "rareify boolean is assigned" causes full_propogate to be called for
 // the constraint. It will set up it's data structures based on the current
 // assignment. Then later it will be given Y is assigned, but have already
 // possibly used that. Confusion follows. Therefore when we want to propogate
@@ -117,6 +117,12 @@ struct reify : public Constraint
 	  poscon->full_propogate();
     else
 	  negcon->full_propogate();
+  }
+  
+  virtual void special_unlock()
+  {
+    D_ASSERT(constraint_locked);
+	constraint_locked = false;
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)

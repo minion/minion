@@ -83,6 +83,10 @@ struct Constraint
   virtual void special_check()
   { FAIL_EXIT(); }
   
+  virtual void special_unlock()
+  { FAIL_EXIT(); }
+  
+  
   /// Returns the reverse of the current constraint
   /** Used by rarification */
   virtual Constraint* reverse_constraint()

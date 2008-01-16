@@ -299,6 +299,23 @@ int main(int argc, char** argv) {
     std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());
     for(int i = 0; i < var_val_order.second.size(); ++i)
       var_val_order.second[i] = (rand() % 100) > 50;
+	  
+	if(reader.parser_verbose)
+	{
+	  int size = var_val_order.first.size();
+	  if(size != 0)
+	  {
+	    cout << "Var Order: <" << string(var_val_order.first[0]);
+	    for(int i = 1; i < size; ++i)
+	      cout << "," << string(var_val_order.first[i]);
+	    cout << ">" << endl;
+	  
+	    cout << "Val Order: <" << var_val_order.second[0];
+	    for(int i = 1; i < size; ++i)
+	      cout << "," << var_val_order.second[i];
+	    cout << ">" << endl;
+	  }
+	}
   }
   // Solve!
   

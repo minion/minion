@@ -73,6 +73,12 @@ struct reify_true : public Constraint
 	constraint_locked = false;
   }
   
+  virtual void special_unlock()
+  {
+    D_ASSERT(constraint_locked);
+	constraint_locked = false;
+  }
+  
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
     D_INFO(1,DI_REIFY,"Propogation Start");

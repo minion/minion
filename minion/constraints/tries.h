@@ -172,15 +172,17 @@ struct TupleTrie {
       
       // added by pn, make a new array for the place we got up to,
       // index into the bottom level of the trie.
-      last_tuple_pointer=new int[(tuplelist->dom_size)[significantIndex]];
-      for(int i=0; i< (tuplelist->dom_size)[significantIndex]; i++) 
+      last_tuple_pointer=new int[(tuplelist->dom_size)[significantIndex] + 1];
+      for(int i = 0; i <= (tuplelist->dom_size)[significantIndex]; i++) 
 	    last_tuple_pointer[i]=-1; 
       // can safely start at ltp+1
       minlevel=new int[arity];
   }
   
-    int nextSupportingTuple(int valToSupport)
+    template<typename VarArray>
+    int nextSupportingTuple(int valToSupport, VarArray& vars)
     {
+	    
         int valPtr=last_tuple_pointer[valToSupport-(tuplelist->dom_smallest)[significantIndex]];
         int highestLevel = arity, highestIndex = -1;
         if(valPtr==-1)
@@ -203,7 +205,7 @@ struct TupleTrie {
         {
             int index=valPtr;
             for (int trieLevel = arity-1; trieLevel > 0; trieLevel--) {
-              if (!inDomain(trie[trieLevel][index], trieLevel))
+              if (!inDomain(trie[trieLevel][index], trieLevel, vars))
               {
 	            highestLevel = trieLevel ;
 		        highestIndex = index ;
@@ -214,7 +216,7 @@ struct TupleTrie {
 	        if (highestLevel == arity) return valPtr;
 	        // search for next supporting tuple
         }
-        int st= searchTrie(highestLevel, highestIndex, valToSupport);
+        int st= searchTrie(highestLevel, highestIndex, valToSupport, vars);
         return st;
     }
     
@@ -223,7 +225,9 @@ struct TupleTrie {
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
     int * minlevel;
     // Another total replacement by pn
-    int searchTrie(int trieLevel, int index, int valToSupport) {
+    
+    template<typename VarArray>
+    int searchTrie(int trieLevel, int index, int valToSupport, VarArray& vars) {
         // First search from startIndex to the
         // end, then from baseIndex to the old support.
         
@@ -269,7 +273,7 @@ struct TupleTrie {
               continue;
 		  }
           
-          if (inDomain(trie[trieLevel][index], trieLevel)) {
+          if (inDomain(trie[trieLevel][index], trieLevel, vars)) {
 	        // value is in domain. We might be done?
 	        if (trieLevel == (arity - 1)){
               last_tuple_pointer[valToSupport-(tuplelist->dom_smallest)[significantIndex]]=index;
@@ -314,9 +318,11 @@ void reconstructTuple(int*& supportingTuple, int valPtr) {
 	*/
   
 private: 
-bool inDomain(int val, int trieLevel) {
+template<typename VarArray>
+bool inDomain(int val, int trieLevel, VarArray& vars) {
   int componentIndex = ((trieLevel <= significantIndex) ?  
 						trieLevel - 1 : trieLevel) ;
+  return vars[componentIndex].inDomain(val);
   // This should be the CSP Var?
   // XXX return scope_vars[componentIndex].inDomain(val);
 }

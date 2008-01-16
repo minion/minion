@@ -95,7 +95,7 @@ struct GACTableConstraint : public DynamicConstraint
 	 int val = varval.second;
          int new_support = 
            tupleTrieArrayptr->getTrie(varIndex).
-                                nextSupportingTuple(val);
+                                nextSupportingTuple(val, vars);
          if (new_support < 0)
          { // cout << "find_new_support failed literal: " << literal << " var: " << varIndex << " val: " << get_val_from_literal(literal) << endl ;
            
@@ -156,24 +156,27 @@ struct GACTableConstraint : public DynamicConstraint
   
   virtual void full_propogate()
   { 
-      // cout << "full propagate: " ;
+    D_INFO(2, DI_TABLECON, "Full prop");
 //      _map_literal_to_var.resize(literal_num);      // may not need this many (see comment below)
 //      _map_literal_to_val.resize(literal_num);
       for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
       { 
 	    vars[varIndex].setMin((tuples->dom_smallest)[varIndex]);
 	    vars[varIndex].setMax((tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]);
+		
+		if(Controller::failed) return;
+		
         int max = vars[varIndex].getMax();
         for(int i = vars[varIndex].getMin(); i <= max; ++i) 
         { 
             int sup = tupleTrieArrayptr->getTrie(varIndex).       
-                            nextSupportingTuple(i);
+                            nextSupportingTuple(i, vars);
 			int literal = tuples->get_literal(varIndex, i);
             trie_current_support[literal] = sup;
             // cout << "    var " << varIndex << " val: " << i << " sup " << sup << " " << endl;
             if(sup < 0)
             {
-                D_INFO(2, DI_TABLECON, "No valid support for " + to_string(x) + " in var " + to_string(i));
+                D_INFO(2, DI_TABLECON, "No valid support for " + to_string(i) + " in var " + to_string(varIndex));
                 vars[varIndex].removeFromDomain(i);
             }
             else
@@ -191,11 +194,12 @@ struct GACTableConstraint : public DynamicConstraint
   
   virtual bool check_assignment(vector<int> v)
   {
-  // for(unsigned i = 0; i < tuple_backup.size(); ++i)
-  //  {
-  //    if(v == tuple_backup[i]) return true;
-  //  }
-    return false;
+    for(unsigned i = 0; i < tuples->size(); ++i)
+	{
+	  if( std::equal(v.begin(), v.end(), (*tuples)[i]) )
+	    return true;
+	}
+	return false;
   }
   
   virtual vector<AnyVarRef> get_vars()
