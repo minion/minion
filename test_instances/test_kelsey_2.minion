@@ -1,5 +1,5 @@
 MINION 1
-#TEST NOSOLS
+#TEST SOLCOUNT 0
 # Semigroups with 6 elements.
 # 6x6 multiplication table.
 # 36 search vars (all AB combinations).

@@ -1,5 +1,5 @@
 MINION 1
-#TEST NOSOLS
+#TEST SOLCOUNT 0
 # Minion Quasigroup Instance
 # Kind: QG3 Size: 6
 # Idempotent

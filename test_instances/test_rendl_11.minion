@@ -1,5 +1,7 @@
 MINION 1
 #TEST SOLCOUNT 99999
+#BUG
+# This test fails due to unimplemented reification.
 # This test doesn't have the right number of sols
 1
 0

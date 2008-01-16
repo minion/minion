@@ -1,5 +1,5 @@
 MINION 1
-#TEST NOSOLS
+#TEST SOLCOUNT 0
 #
 # Minion Constraint Solver Input
 #    http://sourceforge.net/projects/minion
