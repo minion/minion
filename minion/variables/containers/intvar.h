@@ -32,8 +32,8 @@ struct RangeVarRef_internal
   { return false;}
   
   int var_num;
-  RangeVarRef_internal()
-  { D_DATA(var_num = -1;) }
+  RangeVarRef_internal() : var_num(-1)
+  { }
   
   explicit RangeVarRef_internal(int i) : var_num(i)
   {}

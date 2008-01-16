@@ -33,8 +33,8 @@ struct SparseBoundVarRef_internal
   { return true;}
   
   int var_num;
-  SparseBoundVarRef_internal()
-  { D_DATA(var_num = -1;) }
+  SparseBoundVarRef_internal() : var_num(-1)
+  { }
   
   explicit SparseBoundVarRef_internal(int i) : var_num(i)
   {}

@@ -91,7 +91,7 @@ struct MultiplyVar
   MultiplyVar(const VarRef& _data, int _Multiply) : data(_data), Multiply(_Multiply)
   { }
   
-  MultiplyVar() 
+  MultiplyVar() : data()
   { Multiply = 0;}
   
   MultiplyVar(const MultiplyVar& b) : data(b.data), Multiply(b.Multiply)

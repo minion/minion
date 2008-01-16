@@ -56,8 +56,8 @@ struct BoolVarRef_internal
     value_position(b.value_position)
   {}
   
-  BoolVarRef_internal()
-  { D_DATA(shift_offset = data_offset = var_num = ~1); }
+  BoolVarRef_internal() : shift_offset(~1), data_offset(~1), var_num(~1)
+  { }
   
   data_type& assign_ptr() const
   { return *static_cast<data_type*>(data_position.get_ptr()); }

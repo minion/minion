@@ -32,8 +32,8 @@ struct BoundVarRef_internal
   { return true;}
   
   int var_num;
-  BoundVarRef_internal()
-  { D_DATA(var_num = -1;) }
+  BoundVarRef_internal() : var_num(-1)
+  { }
   
   explicit BoundVarRef_internal(int i) : var_num(i)
   {}

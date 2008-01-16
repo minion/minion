@@ -39,7 +39,7 @@ struct SwitchNeg
   SwitchNeg(Var _data, int _multiplier) : data(_data), multiplier(_multiplier)
   { D_ASSERT(multiplier == -1 || multiplier == 1); }
   
-  SwitchNeg() 
+  SwitchNeg() : data()
   {}
   
   SwitchNeg(const SwitchNeg& b) : data(b.data), multiplier(b.multiplier)

@@ -25,8 +25,8 @@ struct BigRangeVarRef_internal
   { return false;}
   
   int var_num;
-  BigRangeVarRef_internal()
-  { D_DATA(var_num = -1;) }
+  BigRangeVarRef_internal() : var_num(-1)
+  { }
   
   explicit BigRangeVarRef_internal(int i) : var_num(i)
   {}

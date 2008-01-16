@@ -39,7 +39,7 @@ struct ShiftVar
   ShiftVar(const VarRef& _data, ShiftType _shift) : data(_data), shift(_shift)
   { }
   
-  ShiftVar() 
+  ShiftVar() : data(), shift()
   { }
   
   ShiftVar(const ShiftVar& b) : data(b.data), shift(b.shift)

@@ -37,7 +37,7 @@ struct VarNeg
   VarNeg(Var _data) : data(_data)
   {}
   
-  VarNeg() 
+  VarNeg() : data()
   {}
   
   VarNeg(const VarNeg& b) : data(b.data)

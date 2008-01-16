@@ -44,7 +44,7 @@ struct VarRefType
   VarRefType(const InternalRefType& _data) : data(_data)
   {}
   
-  VarRefType() 
+  VarRefType() : data()
   {}
   
   VarRefType(const VarRefType& b) : data(b.data)
@@ -124,7 +124,7 @@ struct QuickVarRefType
   QuickVarRefType(const InternalRefType& _data) : data(_data)
   {}
   
-  QuickVarRefType() 
+  QuickVarRefType() : data()
   {}
   
   QuickVarRefType(const QuickVarRefType& b) : data(b.data)
