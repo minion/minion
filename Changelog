@@ -1,4 +1,8 @@
 15/10/2006 - Chris
+	* Really fixed the product constraint this time. The non-binary case
+	  could still be improved when some of the variables can be negative.
+
+15/10/2006 - Chris
 	* I should probably be writing my Phd :)
 	* Fixed 0/1 product constraint. We still don't get any decent level
 	  of propagation on non-0/1 product constraints. Anyone want to try?
