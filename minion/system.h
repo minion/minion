@@ -36,9 +36,13 @@
 #ifdef __GNUC__
 #define SYSTEM_LONGJMP _longjmp
 #define SYSTEM_SETJMP  _setjmp
+
+#define _NORETURN __attribute__ ((noreturn))
 #else
 #define SYSTEM_LONGJMP longjmp
 #define SYSTEM_SETJMP  setjmp
+
+#define _NORETURN
 #endif
 
 // Stupid visual C++ needs a little hacking
