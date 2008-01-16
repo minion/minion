@@ -233,7 +233,7 @@ void maybe_print_search_state(string name, T& vars)
 // Must check if this setMin will fail before doing it, else
 // The setjmp will throw us off. It's cheaper to check than set up
 // a new setjmp point here.
-			if(optimise_var->getMax() > current_optimise_position)
+			if(optimise_var->getMax() >= current_optimise_position)
 			{ 
 			  optimise_var->setMin(current_optimise_position);
 			  propogate_queue();
