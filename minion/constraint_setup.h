@@ -58,17 +58,25 @@ inline void lock()
 	// have been setup, so this slightly messy loop is necessary
 	// To propagate the first node.
 	for(size_t i = 0; i < size; ++i)
+	{
 	  constraints[i]->full_propogate();
-
-#ifdef DYNAMICTRIGGERS
-	for(int i = 0; i < dynamic_size; ++i)
-	  dynamic_constraints[i]->full_propogate();
-#endif
-	
+	  if(Controller::failed) 
+		return;
+	}
 	if(are_queues_empty())
-	  return;
+	  break;
 	clear_queues();
   }
-}
-}
+  
+#ifdef DYNAMICTRIGGERS
+  for(int i = 0; i < dynamic_size; ++i)
+  {
+	dynamic_constraints[i]->full_propogate();
+	propogate_queue();
+	if(Controller::failed) 
+	  return;
+  }
+#endif
+} // lock()
 
+} // namespace Controller
