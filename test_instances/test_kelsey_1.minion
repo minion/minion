@@ -1,0 +1,57 @@
+MINION 1
+#TEST CHECKONESOL 1 1 3 4 4 4 3 3 2 3 4 2 2 2 1 1 
+#Old eclipse model for enumerating crystal structures.
+#1st attempt at net enumeration for Chris Pickard.
+#Quotient graphs with 4 vertices, each of degree 4.
+#Modelled by 5x8 matrix; each col is [Start,End,Coord i, Coord j, Coord k].
+#No symmetry breaking (yet)
+#Tom Kelsey, May 2006
+0
+
+0
+
+0
+
+16
+1 4 16
+
+0
+
+[x0,x1,x2,x3,x4,x5,x6,x7,
+x8,x9,x10,x11,x12,x13,x14,x15]
+
+[d,d,d,d,d,d,d,d,
+d,d,d,d,d,d,d,d]
+
+1
+[x0,x1,x2,x3,x4,x5,x6,x7,
+x8,x9,x10,x11,x12,x13,x14,x15]
+
+1
+[[x0,x1,x2,x3,x4,x5,x6,x7,
+x8,x9,x10,x11,x12,x13,x14,x15]]
+
+0
+
+objective none
+
+print m0
+
+eq(x0,1)
+eq(x1,1)
+eq(x2,3)
+eq(x8,2)
+eq(x9,3)
+eq(x10,4)
+
+
+occurrence(v0,1,4)
+occurrence(v0,2,4)
+occurrence(v0,3,4)
+occurrence(v0,4,4)
+
+
+
+
+
+

@@ -1,0 +1,51 @@
+MINION 1
+#TEST NOSOLS
+#
+# Minion Constraint Solver Input
+#    http://sourceforge.net/projects/minion
+0
+0
+0
+13
+4 4 1
+0 8 8
+0 4 4
+0
+[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12]
+[a,a,a,a,a,a,a,a,a,a,a,a,a]
+0
+1
+[[x9,x10,x11,x12]]
+0
+objective none
+print m0
+
+alldiff([x12,x11,x10,x9])
+
+weightedsumleq([1,1,1],[x0,x9,x1],x10)
+
+weightedsumgeq([1,1,1],[x0,x9,x1],x10)
+
+weightedsumleq([1,1,1],[x0,x9,x2],x11)
+
+weightedsumgeq([1,1,1],[x0,x9,x2],x11)
+
+weightedsumleq([1,1,1],[x0,x11,x3],x9)
+
+weightedsumgeq([1,1,1],[x0,x11,x3],x9)
+
+weightedsumleq([1,1,1],[x0,x10,x4],x9)
+
+weightedsumgeq([1,1,1],[x0,x10,x4],x9)
+
+weightedsumleq([1,1,1],[x0,x10,x5],x12)
+
+weightedsumgeq([1,1,1],[x0,x10,x5],x12)
+
+weightedsumleq([1,1,1],[x0,x12,x6],x10)
+
+alldiff([x0,x8,x7,x6,x5,x4,x3,x2,x1])
+
+occurrence([x10,x11],4,1)
+
+occurrence([x10,x11],3,1)
