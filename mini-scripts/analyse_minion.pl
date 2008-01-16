@@ -50,7 +50,7 @@ for($arg=0;$arg < @ARGV; $arg++) {
 
               # initialisation for this instance
                   $resbin = 0;
-                  $res = "Unknown";
+                  $res = "";
                   $timeout = "Completed";
 
                   $version = $field[3] ;
@@ -99,11 +99,12 @@ sub print_line
   $nodesper_solving = ($total_nodes/$solve_time) unless ($solve_time==0);
 
   #if changing this remember to update print_headers!
-  print "$instance_name $version $res $num_solutions $total_time $total_nodes $nodesper $timeout @parsing_time @setup_time @first_node_time $solve_time $nodesper_solving $filename \n" 
+
+  print "$instance_name $version $res $num_solutions $total_time $total_nodes $nodesper $timeout @parsing_time @setup_time @first_node_time $solve_time $nodesper_solving @bytes_used $filename \n" 
     if (!($res eq ""));
 }  
 
 sub print_headers
 {
-  print "instance_filename minion_version solvable_or_unsolvable num_solutions total_time total_nodes nodes_per_sec completed_or_timeout parsing_time setup_time first_node_time solve_time nodes_per_sec_solving data_filename\n" ;
+  print "instance_filename minion_version solvable_or_unsolvable num_solutions total_time total_nodes nodes_per_sec completed_or_timeout parsing_time setup_time first_node_time solve_time nodes_per_sec_solving bytes_in_bt_memory data_filename\n" ;
 }  

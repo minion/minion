@@ -22,10 +22,11 @@ set title "Comparison of $1 with $2"
 set term png
 set output "$dir/comparison.$1.$2.png"
 set log x
+set log y
 set xlabel "run time of $2 in secs"
-set ylabel "percentage improvement in $1 in nodes per sec"
+set ylabel "100 * ratio of nodes/sec $1 to $2 "
 set grid
 unset key
-plot "$dir/comparison.$1.$2.txt" using 18:((\$7/\$20-1)*100)
+plot "$dir/comparison.$1.$2.txt" using 19:((\$7/\$21)*100)
 EOF
 
