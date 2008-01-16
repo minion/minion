@@ -449,8 +449,8 @@ void MinionInputReader::readConstraintTable(InputFileReader* infile, const Const
 	  delim = infile->get_char();                          // ',' or '}'
 	  if(delim != ',' && delim!= '}')
 		throw new parse_exception("Expected ',' or '}'");
-	  tuplelist = getNewTupleList(tuples);
 	}
+	tuplelist = getNewTupleList(tuples);
   }
 	
 	infile->check_sym(')');
