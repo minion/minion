@@ -42,7 +42,7 @@
 		2616D2900995430000644F18 /* test_weightedsum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_weightedsum.cpp; path = tests/test_weightedsum.cpp; sourceTree = "<group>"; };
 		2618160B097FA1F500E04FBD /* constraint_lex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_lex.h; path = constraints/constraint_lex.h; sourceTree = "<group>"; };
 		26181684097FE5D900E04FBD /* test05_lex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test05_lex.cpp; path = tests/test05_lex.cpp; sourceTree = "<group>"; };
-		261C44E2099A0B4A00FFBDCA /* Minion */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Minion; sourceTree = BUILT_PRODUCTS_DIR; };
+		261C44E2099A0B4A00FFBDCA /* Minion */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = Minion; sourceTree = BUILT_PRODUCTS_DIR; };
 		261E01FA09F7F57E004F8C91 /* tries.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tries.h; path = constraints/tries.h; sourceTree = "<group>"; };
 		2623020E0AB82F1200375F37 /* tuple_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tuple_container.h; sourceTree = "<group>"; };
 		2626D75609751DCD002AC405 /* intvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intvar.h; path = variables/containers/intvar.h; sourceTree = "<group>"; };

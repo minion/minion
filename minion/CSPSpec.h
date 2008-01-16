@@ -44,7 +44,9 @@ enum ConstraintType {
   CT_WATCHED_LEQSUM,
   CT_WATCHED_GEQSUM,
   CT_WATCHED_VECNEQ,
-  CT_MINUSEQ
+  CT_MINUSEQ,
+  CT_REIFY,
+  CT_REIFYIMPLY
 };
 
 enum ReadTypes

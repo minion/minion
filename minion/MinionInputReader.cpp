@@ -19,9 +19,9 @@ int inputFileVersionNumber;
 
 ConstraintDef constraint_list[] =
 {
-  { "element",  CT_ELEMENT, 2, { read_list, read_var }, STATIC_CT },
-  { "watchelement", CT_WATCHED_ELEMENT, 2, { read_list, read_var }, DYNAMIC_CT },
-  { "gacelement", CT_GACELEMENT, 2, { read_list, read_var }, STATIC_CT },
+{ "element",  CT_ELEMENT, 2, { read_list, read_var }, STATIC_CT },
+{ "watchelement", CT_WATCHED_ELEMENT, 2, { read_list, read_var }, DYNAMIC_CT },
+{ "gacelement", CT_GACELEMENT, 2, { read_list, read_var }, STATIC_CT },
 { "alldiff", CT_ALLDIFF, 1, { read_list }, STATIC_CT },
 { "diseq",   CT_DISEQ,   2, { read_var, read_var }, STATIC_CT },
 { "eq",      CT_EQ,      2, { read_var, read_var }, STATIC_CT },
@@ -40,7 +40,9 @@ ConstraintDef constraint_list[] =
 { "watchsumleq", CT_WATCHED_LEQSUM, 2, {read_list, read_var}, DYNAMIC_CT },
 { "table", CT_WATCHED_TABLE, 2, {read_list, read_tuples}, DYNAMIC_CT },
 { "watchvecneq", CT_WATCHED_VECNEQ, 2, {read_list, read_list}, DYNAMIC_CT },
-{ "minuseq", CT_MINUSEQ, 2, { read_var, read_var }, STATIC_CT }
+{ "minuseq", CT_MINUSEQ, 2, { read_var, read_var }, STATIC_CT },
+{ "reify", CT_REIFY, 0, {}, STATIC_CT },
+{ "reifyimply", CT_REIFYIMPLY, 0, {}, STATIC_CT }
 };
 
 const int num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);
@@ -311,72 +313,74 @@ bool MinionInputReader::readConstraint(ifstream& infile, bool reified) {
   string id(char_id);
   clean_string(id);
   
-  if(id == "element")
-	readConstraintElement(infile, get_constraint(CT_ELEMENT)) ;
-  else if(id == "watchelement")
+  int constraint_num = -1;
+  for(int i = 0; i < num_of_constraints; ++i)
   {
-#ifdef WATCHEDLITERALS
-    readConstraintElement(infile, get_constraint(CT_WATCHED_ELEMENT));
-    dynamic_triggers_used = false;
-#else
-    cout << "Sorry, cannot process watchelement constraint." << endl ;
-    cout << "use element or gacelement or recompile with -DWATCHEDLITERALS in command line" << endl;
-    exit(1);
-#endif
-  }
-  else if(id == "gacelement")
-    readConstraintElement(infile, get_constraint(CT_GACELEMENT));  
-  else if(id == "reify")
-  { 
-    if(reified == true)
-	  throw new parse_exception("Can't reify a reified constraint!");
-    readConstraint(infile, true);
-	
-	check_sym(infile, ',');
-    Var reifyVar = readIdentifier(infile);
-	check_sym(infile, ')');
-	instance.last_constraint_reify(reifyVar);
-  }
-  else if(id == "reifyimply")
-  {
-    if(reified == true)
-	  throw new parse_exception("Can't reify a reified constraint!");
-	readConstraint(infile, true);
-	
-	check_sym(infile, ',');
-	Var reifyVar = readIdentifier(infile);
-	check_sym(infile, ')');
-	instance.last_constraint_reifyimply(reifyVar);
-  }
-  else if(id == "table")
-  {
-#ifdef DYNAMICTRIGGERS
-      readConstraintTable(infile, get_constraint(CT_WATCHED_TABLE));
-      dynamic_triggers_used = true;
-#else
-      cout << "Sorry, cannot process table constraint as it needs dynamic triggers or watched literals." << endl ;
-      cout << "use an alternative encoding or recompile with -DWATCHEDLITERALS or -DDYNAMICTRIGGERS in command line" << endl;
-      exit(1);
-#endif
-  }
-  else 
-  {
-	for(int i = 0; i < num_of_constraints; ++i)
+	if(constraint_list[i].name == id)
 	{
-	  if(constraint_list[i].name == id)
-	  {
-		readGeneralConstraint(infile, constraint_list[i]);
-		return true;
-	  }
+	  constraint_num = i;
+	  break;
 	}
-	
-    if (infile.eof()) 
-    {
-      parser_info("Done.") ;
-      return false;
-    }
-    else
-    { throw new parse_exception(string("Unknown Constraint:") + id); }
+  }
+  
+  if(constraint_num == -1) 
+  {
+	if (infile.eof()) 
+	{
+	  parser_info("Done.") ;
+	  return false;
+	}
+	else
+	{ throw new parse_exception(string("Unknown Constraint:") + id); }
+  }
+  ConstraintDef constraint = constraint_list[constraint_num];
+ 
+  if( constraint.trig_type == DYNAMIC_CT )
+  {
+#ifndef WATCHEDLITERALS
+	cerr << "This version of Minion was not complied with -WATCHEDLITERALS" << endl;
+	cerr << "So there is not support for the " << constraint.name << "." << endl;
+	exit(1);
+#else
+	dynamic_triggers_used = true;
+	if(reified)
+	{
+	  cerr << "Cannot reify a watched constraint!" << endl;
+	  exit(1);
+	}
+#endif
+  }
+
+  switch(constraint.type)
+  {
+	case CT_ELEMENT:
+	case CT_WATCHED_ELEMENT:
+	case CT_GACELEMENT:
+	  readConstraintElement(infile, constraint) ;
+	  break;
+	case CT_REIFY:
+	case CT_REIFYIMPLY:
+	  { 
+	  if(reified == true)
+		throw new parse_exception("Can't reify a reified constraint!");
+	  readConstraint(infile, true);
+	  
+	  check_sym(infile, ',');
+	  Var reifyVar = readIdentifier(infile);
+	  check_sym(infile, ')');
+	  if(constraint.type == CT_REIFY)
+	    instance.last_constraint_reify(reifyVar);
+	  else
+	    instance.last_constraint_reifyimply(reifyVar);
+	  }
+	  break;
+
+	case CT_WATCHED_TABLE:
+	  readConstraintTable(infile, get_constraint(CT_WATCHED_TABLE));
+	  break;
+
+	default:
+	  readGeneralConstraint(infile, constraint);
   }
   return true ;
 }

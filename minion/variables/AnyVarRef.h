@@ -37,7 +37,7 @@ struct AnyVarRef_Abstract
   virtual void removeFromDomain(int b) = 0;
   virtual void addTrigger(Trigger t, TrigType type, int val = -999) = 0;
 
-  virtual operator string() = 0;
+  virtual string virtual_to_string() = 0;
   
   virtual ~AnyVarRef_Abstract()
   {}
@@ -111,13 +111,8 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   virtual void addTrigger(Trigger t, TrigType type, int val = -999)
   { data.addTrigger(t, type, val); }
   
-  virtual operator string()
-  {
-    ostringstream s;
-    s << "VirtualRef:";
-    s << string(data);
-    return s.str();
-  }
+  virtual string virtual_to_string()
+  { return string(data); }
   
   virtual ~AnyVarRef_Concrete()
   {}
@@ -151,64 +146,56 @@ struct AnyVarRef
   AnyVarRef(const AnyVarRef& b) : data(b.data)
   {}
   
-  virtual bool isAssigned()
+  bool isAssigned()
   { return data->isAssigned(); }
   
-  virtual int getAssignedValue()
+  int getAssignedValue()
   { return data->getAssignedValue(); }
   
-  virtual bool isAssignedValue(int i)
+  bool isAssignedValue(int i)
   { 
     return data->isAssigned() &&
     data->getAssignedValue() == i;
   }
   
-  virtual bool inDomain(int b)
+  bool inDomain(int b)
   { return data->inDomain(b); }
 
-  virtual bool inDomain_noBoundCheck(int b)
+  bool inDomain_noBoundCheck(int b)
   { return data->inDomain_noBoundCheck(b); }
   
-  virtual int getMax()
+  int getMax()
   { return data->getMax(); }
   
-  virtual int getMin()
+  int getMin()
   { return data->getMin(); }
 
-  virtual int getInitialMax()
+  int getInitialMax()
   { return data->getInitialMax(); }
   
-  virtual int getInitialMin()
+  int getInitialMin()
   { return data->getInitialMin(); }
   
-  virtual void setMax(int i)
+  void setMax(int i)
   { data->setMax(i); }
   
-  virtual void setMin(int i)
+  void setMin(int i)
   { data->setMin(i); }
   
-  virtual void uncheckedAssign(int b)
+  void uncheckedAssign(int b)
   { data->uncheckedAssign(b); }
   
-  virtual void propogateAssign(int b)
+  void propogateAssign(int b)
   { data->propogateAssign(b); }
   
-  virtual void removeFromDomain(int b)
+  void removeFromDomain(int b)
   { data->removeFromDomain(b); }
 
-  virtual void addTrigger(Trigger t, TrigType type, int val = -999)
+  void addTrigger(Trigger t, TrigType type, int val = -999)
   { data->addTrigger(t, type, val); }
   
-  virtual operator string()
-  {
-    ostringstream s;
-    s << "VirtualRef:";
-    //s << string(data);
-    return s.str();
-  }
-  
-  virtual ~AnyVarRef()
-  {}
+  operator string()
+  { return "VRef:" + data->virtual_to_string(); }
   
   int getDomainChange(DomainDelta d)
   { return data->getDomainChange(d); }
