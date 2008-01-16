@@ -1,5 +1,6 @@
 #!/bin/sh
 
+echo > BuildConstraintsStart.h
 echo \#define NO_MAIN > BuildStart.h
 echo \#include \"../minion.h\" >> BuildStart.h
 
