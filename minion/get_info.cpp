@@ -247,6 +247,4 @@ void print_search_info()
               setiosflags(ios::right) << setw(12) <<
               var_info.concount[i] << endl;
   }
-  
-  
 }
