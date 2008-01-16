@@ -17,5 +17,6 @@
 	else
 	  echo BUILD_$1\($3, $5\) >> $3.cpp
 	fi
+	echo >> $3.cpp
 	
 	

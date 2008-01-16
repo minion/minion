@@ -15,6 +15,7 @@ echo switch\(b.constraint.type\) \{ >> BuildDynamicStart.cpp
 
 while read f
 do
+    echo Building $f
 	./build_constraints_2.sh $f
 done < ConstraintList
 
