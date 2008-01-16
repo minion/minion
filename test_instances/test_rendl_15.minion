@@ -1,6 +1,6 @@
 MINION 1
-# segfault
-#
+#TEST SOLCOUNT -1
+# Currently segfaults
 # Test for reify on min.
 #  
 

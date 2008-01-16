@@ -1,5 +1,6 @@
 MINION 1
-# Segfault
+#TEST SOLCOUNT -1
+# Current segfaults
 1
 0
 0
