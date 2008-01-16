@@ -93,7 +93,7 @@
     vector<VarType> var_order;
 	vector<BOOL> val_order;
 	vector<int> branches;
-	int bool_end;
+	unsigned bool_end;
 	unsigned pos;
 	
 	SDFVariableOrder(vector<AnyVarRef>& _varorder, vector<BOOL>& _valorder)

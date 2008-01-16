@@ -44,7 +44,7 @@ struct GetSparseBoundVarContainer;
 
 typedef VarRefType<GetSparseBoundVarContainer, SparseBoundVarRef_internal> SparseBoundVarRef;
 
-template<typename BoundType = short>
+template<typename BoundType = int>
 struct SparseBoundVarContainer {
   BackTrackOffset bound_data;
   TriggerList trigger_list;

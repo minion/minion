@@ -42,7 +42,7 @@ struct BoundVarRef_internal
 struct GetBoundVarContainer;
 typedef VarRefType<GetBoundVarContainer, BoundVarRef_internal> BoundVarRef;
 
-template<typename BoundType = short>
+template<typename BoundType = int>
 struct BoundVarContainer {
   BackTrackOffset bound_data;
   TriggerList trigger_list;

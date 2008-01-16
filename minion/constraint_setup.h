@@ -37,7 +37,7 @@ inline bool special_limit_propogate_static_queue(const set<Constraint*>& constra
 	while(!propogate_trigger_list.empty())
 	{
 	  TriggerRange t = propogate_trigger_list.back();
-	  short data_val = t.data;
+	  int data_val = t.data;
 	  propogate_trigger_list.pop_back();
 	  
 	  for(Trigger* it = t.begin(); it != t.end(); it++)

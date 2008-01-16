@@ -37,7 +37,7 @@ typedef VarRefType<GetBigRangeVarContainer, BigRangeVarRef_internal> BigRangeVar
 
 template<typename d_type>
 struct BigRangeVarContainer {
-  typedef short domain_bound_type;
+  typedef int domain_bound_type;
   static const int var_step = sizeof(d_type) * 8;
   static const d_type one = static_cast<d_type>(1);
   BackTrackOffset bound_data;
@@ -437,7 +437,7 @@ struct BigRangeVarContainer {
 #endif
 
   ~BigRangeVarContainer() { 
-    for(int i=0; i < var_count_m ; i++) {
+    for(unsigned i=0; i < var_count_m ; i++) {
       // delete(bms_pointer(i));                // should delete space really!
     } ;
   }

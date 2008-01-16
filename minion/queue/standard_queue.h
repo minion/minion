@@ -46,8 +46,7 @@ namespace Controller
   
   inline void push_triggers(TriggerRange new_triggers)
   { 
-    D_INFO(1, DI_QUEUE, string("Adding ") + to_string(new_triggers.end - new_triggers.start)
-		   + string(" new triggers. Trigger list size is ") + 
+    D_INFO(1, DI_QUEUE, string("Adding new triggers. Trigger list size is ") + 
 		   to_string(propogate_trigger_list.size()) + ".");
 	propogate_trigger_list.push_back(new_triggers); 
   }
@@ -123,7 +122,7 @@ namespace Controller
 	while(!propogate_trigger_list.empty())
 	{
 	  TriggerRange t = propogate_trigger_list.back();
-	  short data_val = t.data;
+	  int data_val = t.data;
 	  propogate_trigger_list.pop_back();
 	  
 	  for(Trigger* it = t.begin(); it != t.end(); it++)
