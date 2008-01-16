@@ -27,6 +27,14 @@ $Id$
 
 #include <numeric>
 
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+using namespace std;
+
+int MAXINT = 99999;
+
 struct TupleComparator
 {
   int significantIndex;
@@ -34,12 +42,13 @@ struct TupleComparator
   
   TupleComparator(int i, int a)
   {
+	
 	significantIndex = i;
 	arity = a; 
   }
   
   // returns tuple1 <= tuple2 under our ordering.
-  BOOL operator()(const vector<int>& tuple1, const vector<int>& tuple2)
+  bool operator()(const vector<int>& tuple1, const vector<int>& tuple2)
   {
 	if(tuple1[significantIndex] != tuple2[significantIndex])
 	  return tuple1[significantIndex] < tuple2[significantIndex];
@@ -53,290 +62,223 @@ struct TupleComparator
 };
 
 
-//template<typename VarArray>
-struct TupleTrie {
-  //VarArray scope_vars;
-  int arity ;
-  int significantIndex ;
-  int delim ;
-  //vector<int> dom_size;
-  //vector<int> offset;   // index array of values with [val+offset[var]]
-  
-  int* levelLengths ;
-  int** trie ;
-  
-  int* last_tuple_pointer;
-  
-  TupleList* tuplelist;
-  
-  /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	Constructor
-	Assumes tuples is non-empty and each tuple has same length.
-WCase: each level of trie has |tuples| elements.
-	Tuples are first sorted lexicographically, then added to trie.
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-  TupleTrie(/*const VarArray& _vars,*/
-	const int _significantIndex, const int _delim, 
-	/*vector<vector<int> > __tuples,
-	const vector<int>& __dom_size,
-	const vector<int>& __offset,*/ TupleList* _tuplelist) : 
-//scope_vars(_vars),
-significantIndex(_significantIndex), 
-delim(_delim),
-//dom_size(_dom_size),
-//offset(_offset),
-tuplelist(_tuplelist)
+struct TupleTrie
 {
-  int componentIndex, trieLevel, tupleIndex ;
-  int noTuples = tuplelist->size() ;
-  arity = tuplelist->tuple_size() ;
-  // Sort tuples for ease of addition to trie
-  //sort(tuples.begin(), tuples.end(), TupleComparator(significantIndex, arity));
+  static const int max_arity = 100;
+  int arity;
+  int sigIndex;
+  TupleList* tuplelist;
+  // A temporary tuple to store the most recently found
+  // complete assignment.
+  int current_tuple[max_arity];
   
-  // JAVA was:
-  //      int[][] initTrie = new int[arity][tuples.length*4] ;       //val+2ptr+del
+  vector<vector<int> > tuples_vector;
   
-  int** initTrie = new int*[arity];
-  for(int i = 0;i < arity ; i++)
+  int map_depth(int depth)
   {
-	initTrie[i] = new int[noTuples*4]; //val+2ptr+del
-									   // this next line is prob.not necessary
-	for(int j = 0; j < noTuples*4; j++) 
-	  initTrie[i][j]=delim; 
+    if(depth==0) return sigIndex;
+	if(depth < sigIndex) return depth - 1;
+	return depth;
+  }
+  
+  int tuples(int num, int depth)
+  { return tuples_vector[num][map_depth(depth)]; }
+  
+  
+  TupleTrie(int _significantIndex, TupleList* tuplelist) :
+	arity(tuplelist->tuple_size()), sigIndex(_significantIndex)
+  {
+	  // TODO : Fix this hard limit.
+	  D_ASSERT(arity < 100);
+	  
+	  tuples_vector.resize(tuplelist->size());
+	  
+	  // Need a copy so we can sort it and such things.
+	  for(int i = 0; i < tuplelist->size(); ++i)
+		tuples_vector[i] = tuplelist->get_vector(i);
+	  
+	  std::sort(tuples_vector.begin(), tuples_vector.end(), TupleComparator(sigIndex, arity));
+	  build_trie(0, tuplelist->size());
+	  build_final_trie();
+  }
+  
+  struct EarlyTrieObj
+  {
+	int val;
+	int depth;
+	int offset_ptr;
   };
   
-  // currElement, levelLengths(=currIndices in Java). Indexed by trie level.
-  int* currElement = new int[arity] ;
-  levelLengths = new int[arity] ;
-  for (int index = 0; index < arity; index++) {
-	currElement[index] = delim ;
-	levelLengths[index] = 0 ;
-  }
-  // Iterate over tuples, adding each to the trie.
-  for (tupleIndex = 0; tupleIndex < noTuples; tupleIndex++) {
-	vector<int> tuple = tuplelist->get_vector(tupleIndex) ;
-	// lev 0 = signif idx. No delimiters/back ptrs on level 0
-	D_ASSERT(tuple[significantIndex] != delim);
-	if (tuple[significantIndex] != currElement[0]) {
-	  currElement[0] = tuple[significantIndex] ;
-	  initTrie[0][levelLengths[0]++] = tuple[significantIndex] ;
-	  if (arity > 1) {
-		// Start new block at next level
-		if (levelLengths[1] > 0)
-		  initTrie[1][levelLengths[1]++] = delim ;
-		// point to new block at next level
-		initTrie[0][levelLengths[0]++] = levelLengths[1] ;
-		// reset currElement at next level
-		currElement[1] = delim ;
-	  }
-	}
-	// Now look at rest of tuple
-	for (trieLevel = 1; trieLevel < arity; trieLevel++) { 
-	  componentIndex = ((trieLevel <= significantIndex) ?  
-						trieLevel - 1 : trieLevel) ;
-	  D_ASSERT(tuple[componentIndex] != delim);
-	  // Only modify this level if this is a new prefix
-	  if (tuple[componentIndex] != currElement[trieLevel]) {
-		currElement[trieLevel] = tuple[componentIndex] ;
-		initTrie[trieLevel][levelLengths[trieLevel]++] =
-		  tuple[componentIndex] ;
-		if (trieLevel < (arity - 1)) {
-		  // Start new block at next level
-		  if (levelLengths[trieLevel+1] > 0)
-			initTrie[trieLevel+1][levelLengths[trieLevel+1]++] = delim ;
-		  // point to new block at next level
-		  initTrie[trieLevel][levelLengths[trieLevel]++] =
-			levelLengths[trieLevel+1] ;
-		  // reset currElement at next level
-		  currElement[trieLevel+1] = delim ;
-		}
-		// Point back to parent
-		initTrie[trieLevel][levelLengths[trieLevel]++] =
-		  levelLengths[trieLevel-1] - ((trieLevel==1) ? 2 : 3) ;
-	  } // end of modified prefix test 
-	} // end of trieLevel loop
-  } // end of tuple loop
-	// Create final, immutable trie.
+  vector<EarlyTrieObj> initial_trie;
   
-  trie = new int*[arity] ;
-  for (trieLevel = 0; trieLevel < arity; trieLevel++) 
+  struct TrieObj
   {
-	trie[trieLevel] = new int[levelLengths[trieLevel]] ;
-	// JAVA Was: 
-	// System.arraycopy(initTrie[trieLevel], 0, trie[trieLevel], 0, trie[trieLevel].size()) ;
+	int val;
+	TrieObj* offset_ptr;
+  };
+  
+  TrieObj* trie_data;
+  
+  void build_final_trie()
+  {
+	int size = initial_trie.size();
+	trie_data = new TrieObj[size];
+	for(int i = 0; i < size; ++i)
+	{
+	  trie_data[i].val = initial_trie[i].val;
+	  if(initial_trie[i].offset_ptr == -1)
+		trie_data[i].offset_ptr = NULL;
+	  else
+		trie_data[i].offset_ptr = trie_data + initial_trie[i].offset_ptr;
+	}
 	
-	for (int i=0; i < levelLengths[trieLevel]; ++i) 
-	{
-	  trie[trieLevel][i] = initTrie[trieLevel][i];
-	}
+	// Little C++ trick to remove all the memory used by the initial_trie vector.
+	vector<EarlyTrieObj> v;
+	initial_trie.swap(v);
   }
-  // COULD BE WRONG BELOW
   
-  for(int i=0; i < arity; i++)
-  { delete[] (initTrie[i]); };
-  delete[] (initTrie);           
-  // Just incantations, sorry if I have it wrong.    Obviously this is not necessarily 
-  // optimal as we could keep this around for other constructs.  Not to worry.
-  
-  // added by pn, make a new array for the place we got up to,
-  // index into the bottom level of the trie.
-  last_tuple_pointer=new int[(tuplelist->dom_size)[significantIndex] + 1];
-  for(int i = 0; i <= (tuplelist->dom_size)[significantIndex]; i++) 
-	last_tuple_pointer[i]=-1; 
-  // can safely start at ltp+1
-  minlevel=new int[arity];
-}
-
-template<typename VarArray>
-int nextSupportingTuple(int valToSupport, VarArray& vars)
-{
-  
-  int valPtr=last_tuple_pointer[valToSupport-(tuplelist->dom_smallest)[significantIndex]];
-  int highestLevel = arity, highestIndex = -1;
-  if(valPtr==-1)
+  void print_trie()
   {
-	highestLevel=1;
-	// search along top level to 
-	int found=0; 
-	for(int i=0; i<levelLengths[0]; i=i+2)
+	for(int i = 0; i < initial_trie.size(); ++i)
 	{
-	  if(trie[0][i]==valToSupport)
-	  {
-		highestIndex=trie[0][i+1];
-		found=1;
-		break;
-	  }
+	  printf("%d,%d,%d\n", initial_trie[i].depth, initial_trie[i].val, initial_trie[i].offset_ptr);
 	}
-	if(found==0) return -1;
   }
-  else
+  
+  void build_trie(const int start_pos, const int end_pos, int depth = 0)
   {
-	int index=valPtr;
-	for (int trieLevel = arity-1; trieLevel > 0; trieLevel--) {
-	  if (!inDomain(trie[trieLevel][index], trieLevel, vars))
+	const bool last_stage = (depth == arity - 1);
+	if(depth == arity)
+	  return;
+	
+	assert(start_pos < end_pos);
+	int values = get_distinct_values(start_pos, end_pos, depth);
+	
+	int start_section = initial_trie.size();
+	// Make space for this list of values.
+	// '+1' is for end marker.
+	initial_trie.resize(initial_trie.size() + values + 1);
+	
+	int current_val = tuples(start_pos, depth);
+	int current_start = start_pos;
+	int num_of_val = 0;
+	
+	for(int i = start_pos ; i < end_pos; ++i)
+	{
+	  if(current_val != tuples(i, depth))
 	  {
-		highestLevel = trieLevel ;
-		highestIndex = index ;
-	  }
-	  index = trie[trieLevel][index+((trieLevel == arity-1)? 1:2)];
-	}
-	// still supported
-	if (highestLevel == arity) return valPtr;
-	// search for next supporting tuple
-  }
-  int st= searchTrie(highestLevel, highestIndex, valToSupport, vars);
-  return st;
-}
-
-/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-searchTrie
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-int * minlevel;
-// Another total replacement by pn
-
-template<typename VarArray>
-int searchTrie(int trieLevel, int index, int valToSupport, VarArray& vars) {
-  // First search from startIndex to the
-  // end, then from baseIndex to the old support.
-  
-  // search from index to the end
-  bool searchUpTo=false;  // while false, store min level for each level. if true, search up to the min level.
-  
-  for(int i=0; i<arity; i++) minlevel[i]=2000000000;  // should be the biggest +ve integer.
-  
-  while(true)
-  {  // all ending conditions tested first.
-	 //System.out.println("trieLevel:"+trieLevel+" index:"+index);
-	if(searchUpTo && (trieLevel==0 || index>minlevel[trieLevel] || index==levelLengths[trieLevel])) 
-	  return -1;
-	if(trieLevel==0 || index==levelLengths[trieLevel])
-	{     // and not searchUpTo. 
-	  searchUpTo=true; 
-	  bool found=false;
-	  for(int i=0; i<levelLengths[0]; i=i+2) // should be a binary search.
-	  {
-		if(trie[0][i]==valToSupport)
+		initial_trie[start_section + num_of_val].val = current_val;
+		initial_trie[start_section + num_of_val].depth = depth;
+		if(last_stage)
 		{
-		  index=trie[0][i+1];
-		  found=true;
-		  break;
+		  initial_trie[start_section + num_of_val].offset_ptr = -1;
 		}
+		else
+		{
+		  initial_trie[start_section + num_of_val].offset_ptr = initial_trie.size();
+		  build_trie(current_start, i, depth + 1);
+		}
+		current_val = tuples(i, depth);
+		current_start = i;
+		num_of_val++;
 	  }
-	  D_ASSERT(found);
-	  //System.out.println("Resetting and returning to the start. index="+index);
-	  trieLevel=1; continue;
 	}
 	
-	if(!searchUpTo && minlevel[trieLevel]>index){
-	  //System.out.println("Changing minlevel["+trieLevel+"] to "+index);
-	  minlevel[trieLevel]=index;
-	}
+	// Also have to cover last stretch of values.
+	initial_trie[start_section + num_of_val].val = current_val;
+	initial_trie[start_section + num_of_val].depth = depth;
+	if(last_stage)
+	  initial_trie[start_section + num_of_val].offset_ptr = -1;
+	else  
+	  initial_trie[start_section + num_of_val].offset_ptr = initial_trie.size();
 	
-	// Done testing end conditions, now change index and/or trieLevel.
-	if (trie[trieLevel][index] == delim)
-	{   // Block end, so backtrack.
-		// Point to value after parent of previous value.
-	  int parent=trie[trieLevel][index-1];
-	  trieLevel--;
-	  index = parent+(trieLevel == (arity-1)? 2:3);
-	  continue;
-	}
+	build_trie(current_start, end_pos, depth + 1);
 	
-	if (inDomain(trie[trieLevel][index], trieLevel, vars)) {
-	  // value is in domain. We might be done?
-	  if (trieLevel == (arity - 1)){
-		last_tuple_pointer[valToSupport-(tuplelist->dom_smallest)[significantIndex]]=index;
-		return index;
+	assert(num_of_val + 1 == values);
+	initial_trie[start_section + values].val = MAXINT;
+	initial_trie[start_section + values].depth = depth;
+	initial_trie[start_section + values].offset_ptr = -1;
+  }
+  
+  // Find how many values there are for index 'depth' between tuples
+  // start_pos and end_pos.
+  int get_distinct_values(const int start_pos, const int end_pos, int depth)
+  {
+	int current_val = tuples(start_pos, depth);
+	int found_values = 1;
+	for(int i = start_pos; i < end_pos; ++i)
+	{
+	  if(current_val != tuples(i, depth))
+	  {
+		current_val = tuples(i, depth);
+		found_values++;
 	  }
-	  // Move down to next level.
-	  index = trie[trieLevel][index+1];
-	  trieLevel++;
-	  continue;
+	}
+	return found_values;
+  }
+
+  
+  // Starting from the start of an array of TrieObjs, find the
+  // values which is find_val
+  TrieObj* get_next_ptr(TrieObj* obj, int find_val)
+  {
+    while(obj->val < find_val)
+	  ++obj;
+	if(obj->val == find_val)
+	  return obj;
+	else
+	  return NULL;
+  }
+ 
+
+  
+  template<typename VarArray>
+	bool search_trie(const VarArray& _vars, __restrict TrieObj* __restrict * obj_list, int depth)
+  {
+	  VarArray& vars = const_cast<VarArray&>(_vars);
+	if(depth == arity)
+	  return true;
+
+	obj_list[depth] = obj_list[depth - 1]->offset_ptr;  
+	while(obj_list[depth]->val != MAXINT)
+	{
+	  if(vars[map_depth(depth)].inDomain(obj_list[depth]->val))
+	  {
+	    if(search_trie(_vars, obj_list, depth + 1))
+		  return true;
+	  }
+	  obj_list[depth]++;
+	}
+	return false;
+  }
+
+  TrieObj* obj_list[max_arity];
+  
+  void reconstructTuple(int* array, int check)
+  {
+	D_ASSERT(check == obj_list[arity - 1] - obj_list[0]);
+	for(int i = 0; i < arity; ++i)
+	  array[i] = obj_list[i]->val;
+  }
+  
+  // Find support for domain value i. This will be the value used by
+  // the first variable.
+  template<typename VarArray>
+    int nextSupportingTuple(int domain_val, const VarArray& vars)
+  {
+	TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
+	if(first_ptr == NULL)
+	  return -1;
+	
+	obj_list[0] = first_ptr;
+    if(search_trie(vars, obj_list, 1))
+	{
+	  return obj_list[arity-1] - obj_list[0];  
 	}
 	else
-	{  // Value not in domain, move on to next value.
-	  index += ((trieLevel == (arity-1)? 2:3)) ;
-	  continue;
-	}
-  } // end of trie search
-}
-
-
-
-/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-reconstructTuple
-Follow back ptrs up the tree.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-void reconstructTuple(int*& supportingTuple, int valPtr) {
-  int componentIndex ;
-  for (int trieLevel = arity-1; trieLevel > 0; trieLevel--) {
-	componentIndex = ((trieLevel <= significantIndex) ?  
-					  trieLevel - 1 : trieLevel) ;
-	supportingTuple[componentIndex] = trie[trieLevel][valPtr] ;
-	// get back ptr
-	valPtr = trie[trieLevel][valPtr+((trieLevel == arity-1)? 1:2)] ;
+	  return -1;
   }
-  supportingTuple[significantIndex] = trie[0][valPtr] ;
-}
-
-/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-inDomain
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-/*					 
-return true iff val is in domain scope[componentIndex]
-*/
-
-private: 
-template<typename VarArray>
-BOOL inDomain(int val, int trieLevel, VarArray& vars) {
-  int componentIndex = ((trieLevel <= significantIndex) ?  
-						trieLevel - 1 : trieLevel) ;
-  return vars[componentIndex].inDomain(val);
-  // This should be the CSP Var?
-  // XXX return scope_vars[componentIndex].inDomain(val);
-}
-};       // end of TupleTrie struct
-
+};
 
 //template<typename VarArray>
 struct TupleTrieArray {
@@ -365,27 +307,14 @@ struct TupleTrieArray {
 	  arity = tuplelist->tuple_size();
 	  vector<int> dom_size(arity);
 	  vector<int> offset(arity);
-	  int delim=-2000000000;
 	  
-	  
-	  for(int i = 0; i < arity; ++i)
-	  {
-		// getInitial* should be a const function, but fixing constness of all of minion is a major undertaking
-		// I'm not going to get into right now, so for now we'll get rid of the constness. This isn't illegal
-		// C++ or anything, just a bit nasty looking.
-		// XXX VarArray& non_const_vars = const_cast<VarArray&>(vars);
-		//dom_size[i] = non_const_vars[i].getInitialMax() - non_const_vars[i].getInitialMin() + 1;
-		//offset[i] = -non_const_vars[i].getInitialMin();
-	  }
 	  // create	one trie for each element of scope.
 	  tupleTries = (TupleTrie*) malloc(sizeof(TupleTrie) * arity);
 	  //new TupleTrie[arity];
 	  for (unsigned varIndex = 0; varIndex < arity; varIndex++)
 	  {
-		new (tupleTries + varIndex) TupleTrie(/*vars,*/ varIndex, delim,/* tuples, dom_size, offset,*/ tuplelist);
-		//tupleTries[varIndex] = new TupleTrie(vars, varIndex, delim, tuples, dom_size) ;
+		new (tupleTries + varIndex) TupleTrie(varIndex, tuplelist);
 	  };
-	  //
   }
 };
 
