@@ -78,8 +78,8 @@ struct reify_true : public Constraint
   virtual void special_check()
   {
     D_ASSERT(constraint_locked);
-	poscon->full_propogate();
 	constraint_locked = false;
+	poscon->full_propogate();
   }
   
   virtual void special_unlock()

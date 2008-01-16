@@ -86,6 +86,15 @@ inline void lock()
   memory_block.final_lock();  
   
   bool prop_to_do = true;
+#ifdef USE_SETJMP
+  int setjmp_return = SYSTEM_SETJMP(g_env);
+  if(setjmp_return != 0)
+  {
+	Controller::failed = true;
+	clear_queues();
+	return;
+  }
+#endif
   while(prop_to_do)
   {
 	prop_to_do = false;

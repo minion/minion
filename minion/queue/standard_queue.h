@@ -193,6 +193,7 @@ namespace Controller
 	  Constraint* trig = special_triggers.back();
 	  special_triggers.pop_back();
 	  trig->special_check();
+
 	} // while(true)
   } // end Function
 
