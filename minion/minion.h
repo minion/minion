@@ -49,14 +49,6 @@
 // above line will work but only gives revision of this file,
 //  not the current global revision 
 
-
-
-
-/// Time at which search starts.
-//VARDEF(clock_t setup_time);
-//extern int setup_time;
-
-
 #include "constants.h"
 #include "debug.h"
 
@@ -137,45 +129,6 @@ namespace Controller
 #include "constraints/reify.h"
 #include "constraints/reify_true.h"
 
-#include "constraints/constraint_occurrance.h"
-#include "constraints/constraint_min.h"
-#include "constraints/constraint_lex.h"
-#include "constraints/constraint_neq.h"
-#include "constraints/constraint_sum.h"
-#include "constraints/constraint_less.h"
-#include "constraints/constraint_and.h"
-#include "constraints/constraint_lightsum.h"
-#include "constraints/constraint_fullsum.h"
-#include "constraints/constraint_element.h"
-#include "constraints/constraint_GACelement.h"
-#include "constraints/constraint_equal.h"
-#include "constraints/constraint_weightedboolsum.h"
-#include "constraints/constraint_unaryequals.h"
-#include "constraints/constraint_unaryneq.h"
-#include "constraints/constraint_product.h"
-
-#ifdef DYNAMICTRIGGERS
-#ifdef TRIES
-#include "constraints/constraint_GACtable_trie.h"
-#else
-
-#ifdef REGINLHOMME
-#include "constraints/constraint_GACtable_reginlhomme.h"
-#else
-#ifdef NIGHTINGALE
-#include "constraints/constraint_GACtable_nightingale.h"
-#else
-#include "constraints/constraint_GACtable.h"
-#endif 
-#endif
-#endif
-
-#include "dynamic_constraints/dynamic_sum.h"
-#include "dynamic_constraints/dynamic_element.h"
-#include "dynamic_constraints/dynamic_vecneq.h"
-#include "dynamic_constraints/dynamic_literalwatch.h"
-#endif
-
 #include "constraints/function_defs.hpp"
 
 #ifndef SLOW_QUEUE
@@ -190,4 +143,3 @@ namespace Controller
 #include "test_functions.h"
 
 #endif
-

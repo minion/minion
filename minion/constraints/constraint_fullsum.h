@@ -25,6 +25,13 @@
 */
 
 
+// This is the "primary" implement of sum, so it has to include headers for the
+// other specialised implementations.
+
+#include "constraint_lightsum.h"
+#include "constraint_sum.h"
+
+
 /// V1 + ... Vn <= X
 /// is_reversed checks if we are in the case where reverse_constraint was previously called.
 template<typename VarArray, typename VarSum, BOOL is_reversed = false>

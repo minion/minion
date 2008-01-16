@@ -8,5 +8,6 @@
 
 #define NO_MAIN
 #include "../minion.h"
+#include "../constraints/constraint_lex.h"
 BUILD_STATIC_CT(CT_LEXLESS, 2)
 

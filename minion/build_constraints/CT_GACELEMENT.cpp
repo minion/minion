@@ -8,5 +8,6 @@
 
 #define NO_MAIN
 #include "../minion.h"
+#include "../constraints/constraint_GACelement.h"
 BUILD_STATIC_CT(CT_GACELEMENT, 2)
 

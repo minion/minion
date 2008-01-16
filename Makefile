@@ -106,3 +106,5 @@ clean:
 
 veryclean:
 	rm -rf bin/*
+
+include Makefile.dep

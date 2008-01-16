@@ -8,5 +8,6 @@
 
 #define NO_MAIN
 #include "../minion.h"
+#include "../constraints/constraint_occurrance.h"
 BUILD_STATIC_CT(CT_OCCURRENCE, 1)
 

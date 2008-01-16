@@ -8,5 +8,7 @@
 
 #define NO_MAIN
 #include "../minion.h"
+#include "../constraints/constraint_equal.h"
+#include "../constraints/constraint_min.h"
 BUILD_STATIC_CT(CT_MIN, 2)
 

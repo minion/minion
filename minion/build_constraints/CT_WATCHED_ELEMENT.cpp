@@ -8,5 +8,6 @@
 
 #define NO_MAIN
 #include "../minion.h"
+#include "../dynamic_constraints/dynamic_element.h"
 BUILD_DYNAMIC_CT(CT_WATCHED_ELEMENT, 2)
 

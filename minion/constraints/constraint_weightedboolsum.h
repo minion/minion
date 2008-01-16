@@ -24,6 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "constraint_fullsum.h"
+
 template<typename VarArray, typename WeightArray, typename VarSum>
 struct LeqWeightBoolSumConstraint : public Constraint
 {

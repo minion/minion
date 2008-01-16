@@ -24,6 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "constraint_and.h"
+
 /// var1 * var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct ProductConstraint : public Constraint
