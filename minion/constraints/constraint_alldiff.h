@@ -12,6 +12,7 @@
  *  on the alldiff constraint.
  */
 
+/*
 typedef struct {
   int min, max;		// start, end of interval
   int minrank, maxrank; // rank of min & max in bounds[] of an adcsp
@@ -65,7 +66,7 @@ AllDiffCon(VarArray _var_array)
   return 
   (new AllDiffConstraint<VarArray>(_var_array,WithValueRemoval)); 
 }
-
+*/
 
 //IlcConstraint IlcNewAllDiff( IlcIntVarArray vars, PropType prop );
 
