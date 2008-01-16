@@ -38,7 +38,18 @@ struct ProductConstraint : public Constraint
   VarRef3 var3;
   ProductConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
 	var1(_var1), var2(_var2), var3(_var3)
-  {}
+  {
+	  long long int max1 = max(abs(var1.getInitialMin()),abs(var1.getInitialMax()));
+	  long long int max2 = max(abs(var2.getInitialMin()),abs(var2.getInitialMax()));
+	  long long int bound = numeric_limits<int>::max();
+	  if(max1 * max2 >= bound)
+	  {
+	    cerr << "Fatal error." << endl;
+	    cerr << "Product([a,b],c) must satisfy the condition:" << endl;
+	    cerr << "For all assigments to a and b, |a*b| < 2^31" << endl;
+		FAIL_EXIT();
+	  }
+  }
   
   virtual triggerCollection setup_internal()
   {

@@ -46,9 +46,11 @@ class TriggerList
 {
   TriggerList(const TriggerList&);
   void operator=(const TriggerList&);
+  bool only_bounds;
   
 public:
-	TriggerList()
+	TriggerList(bool _only_bounds = false) :
+	only_bounds(_only_bounds)
   { 
 	  var_count_m = 0;
 	  lock_first = lock_second = 0; 
@@ -63,6 +65,7 @@ public:
   BackTrackOffset dynamic_triggers;
 #endif
 #endif
+  
   Trigger** trigger_data_m;
   
   int var_count_m;
@@ -87,7 +90,10 @@ public:
 	  triggers[i].resize(var_count_m);
 	
 #ifdef DYNAMICTRIGGERS
-	dynamic_triggers.request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
+	if(only_bounds)
+  	  dynamic_triggers.request_bytes(size * sizeof(DynamicTrigger) * 4);  
+	else
+	  dynamic_triggers.request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
 #endif
 	TriggerSpace::addTriggerList(this);
   }
@@ -143,7 +149,9 @@ public:
 	
 #ifdef DYNAMICTRIGGERS
 	DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr());
-	for(unsigned i = 0; i < var_count_m * (4 + vars_domain_size); ++i)
+	
+	int trigger_types = ( only_bounds ? (4 + vars_domain_size) : 4 );
+	for(unsigned i = 0; i < var_count_m * trigger_types; ++i)
 	{
 	  new (trigger_ptr + i) DynamicTrigger;
 	  D_ASSERT((trigger_ptr + i)->sanity_check_list());
@@ -179,6 +187,7 @@ public:
 	}
 	else
 	{
+	  D_ASSERT(!only_bounds);
 	  D_ASSERT(vars_min_domain_val <= val_removed);
 	  D_ASSERT(vars_max_domain_val >= val_removed);
 	  trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
@@ -258,6 +267,7 @@ public:
   
   void push_domain_removal(int var_num, int val_removed)
   { 
+	D_ASSERT(!only_bounds);
 #ifdef DYNAMICTRIGGERS
     dynamic_propogate(var_num, DomainRemoval, val_removed);
 #endif
@@ -265,7 +275,11 @@ public:
   }
   
   void add_domain_trigger(int b, Trigger t)
-  { D_ASSERT(lock_first && !lock_second); triggers[DomainChanged][b].push_back(t); }
+  { 
+	D_ASSERT(!only_bounds);
+	D_ASSERT(lock_first && !lock_second); 
+	triggers[DomainChanged][b].push_back(t); 
+  }
   
   void add_trigger(int b, Trigger t, TrigType type)
   {
@@ -295,6 +309,7 @@ public:
 	}
 	else
 	{
+	  D_ASSERT(!only_bounds);
 	  D_ASSERT(vars_min_domain_val <= val);
 	  D_ASSERT(vars_max_domain_val >= val);
 	  queue = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())

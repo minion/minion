@@ -44,18 +44,6 @@ struct GACTableConstraint : public DynamicConstraint
   //   renamed off from current_support in case both run in parallel
   vector<int> trie_current_support;
   
-  /// Total number of literals in the variables at the start of search.
-  
- // int literal_num;
- // vector<int> _map_literal_to_var;
- // vector<int> _map_literal_to_val;
-
- // int get_var_from_literal(int literal) 
- // { return _map_literal_to_var[literal]; }
-
- // int get_val_from_literal(int literal) 
- // { return _map_literal_to_val[literal]; }
-  
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
   BOOL check_tuple(const vector<int>& v)
   {
@@ -66,31 +54,19 @@ struct GACTableConstraint : public DynamicConstraint
 	}
 	return true;
   }
-  
-  vector<vector<int> > tuple_backup;
-  
+    
   TupleList* tuples;
   
   GACTableConstraint(const VarArray& _vars, TupleList* _tuples) :
 	vars(_vars), tuples(_tuples)
-	//,tupleTrieArray(tuple)
   { 
     tupleTrieArrayptr = tuples->getTries();
-	  int arity = tuples->tuple_size();	  
-	  D_ASSERT(_vars.size() == arity);
+	int arity = tuples->tuple_size();	  
+	D_ASSERT(_vars.size() == arity);
 	  
-    /*  literal_num = 0;
-      
-      for(unsigned i = 0; i < arity; ++i) 
-      {
-        literal_num += (vars[i].getInitialMax() - vars[i].getInitialMin() + 1);
-        // cout << "initialMax: " << vars[i].getInitialMax() ;
-        // cout << "initialMin: " << vars[i].getInitialMin() << endl;
-      }*/
-        
-      trie_current_support.resize(tuples->literal_num); 
-	  // initialise supportting tuple for recycle
-      recyclableTuple = new int[arity] ;
+	trie_current_support.resize(tuples->literal_num); 
+	// initialise supportting tuple for recycle
+	recyclableTuple = new int[arity] ;
   }
   
   int dynamic_trigger_count()
@@ -106,7 +82,6 @@ struct GACTableConstraint : public DynamicConstraint
                                 nextSupportingTuple(val, vars);
          if (new_support < 0)
          { // cout << "find_new_support failed literal: " << literal << " var: " << varIndex << " val: " << get_val_from_literal(literal) << endl ;
-           
              return false;
          }
          // cout << "find_new_support sup= "<< new_support << " literal: " << literal << " var: " << varIndex << " val: " << get_val_from_literal(literal) << endl;
@@ -164,8 +139,6 @@ struct GACTableConstraint : public DynamicConstraint
   virtual void full_propogate()
   { 
     D_INFO(2, DI_TABLECON, "Full prop");
-//      _map_literal_to_var.resize(literal_num);      // may not need this many (see comment below)
-//      _map_literal_to_val.resize(literal_num);
       for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
       { 
 	    vars[varIndex].setMin((tuples->dom_smallest)[varIndex]);
@@ -183,17 +156,13 @@ struct GACTableConstraint : public DynamicConstraint
             // cout << "    var " << varIndex << " val: " << i << " sup " << sup << " " << endl;
             if(sup < 0)
             {
-                D_INFO(2, DI_TABLECON, "No valid support for " + to_string(i) + " in var " + to_string(varIndex));
-                vars[varIndex].removeFromDomain(i);
+			  D_INFO(2, DI_TABLECON, "No valid support for " + to_string(i) + " in var " + to_string(varIndex));
+			  vars[varIndex].removeFromDomain(i);
             }
             else
             {
-                //_map_literal_to_var[literal] = varIndex;
-                //_map_literal_to_val[literal] = i;
-                setup_watches(varIndex, literal);
+			  setup_watches(varIndex, literal);
             }
-            //++literal;   // would like to put this inside else to save space, but can lead 
-                      // to bugs I don't want to cope with just now.
         }
       }
       // cout << endl; cout << "  fp: finished finding supports: " << endl ;
@@ -225,9 +194,6 @@ template<typename VarArray>
 DynamicConstraint*
 GACTableCon(const VarArray& vars, TupleList* tuples)
 { return new GACTableConstraint<VarArray>(vars, tuples); }
-
-
-
 
 inline TupleTrieArray* TupleList::getTries()
 {

@@ -289,18 +289,13 @@ struct TupleTrieArray {
   TupleTrie* tupleTries;
   
   TupleTrie & getTrie(int varIndex) 
-  {
-	return tupleTries[varIndex];
-  };
+  { return tupleTries[varIndex]; };
   
   /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	Constructor
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
   
-  TupleTrieArray(//const VarArray& vars,
-				 //const vector<vector<int> >& tuples,
-				 TupleList* _tuplelist
-				 ) :
+  TupleTrieArray(TupleList* _tuplelist) :
 	tuplelist(_tuplelist)
   {
 	  tuplelist->finalise_tuples();
@@ -310,11 +305,8 @@ struct TupleTrieArray {
 	  
 	  // create	one trie for each element of scope.
 	  tupleTries = (TupleTrie*) malloc(sizeof(TupleTrie) * arity);
-	  //new TupleTrie[arity];
 	  for (unsigned varIndex = 0; varIndex < arity; varIndex++)
-	  {
 		new (tupleTries + varIndex) TupleTrie(varIndex, tuplelist);
-	  };
   }
 };
 

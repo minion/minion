@@ -25,5 +25,5 @@ ConstraintDef constraint_list[] = {
 { "litsumgeq" , CT_WATCHED_LITSUM, 3 ,{ read_list , read_constant_list , read_constant }, DYNAMIC_CT },
 { "pow" , CT_POW, 2 ,{ read_2_vars , read_var }, STATIC_CT },
 { "reify", CT_REIFY, 0, {}, STATIC_CT },
-{ "reifyimply", CT_REIFYIMPLY, 0, {}, STATIC_CT },
+{ "reifyimply", CT_REIFYIMPLY, 0, {}, STATIC_CT }
 };

@@ -151,7 +151,7 @@ struct BoundVarContainer {
   { return initial_bounds[d.var_num].first; }
   
   int getInitialMax(BoundVarRef_internal d) const
-  { return initial_bounds[d.var_num].first; }
+  { return initial_bounds[d.var_num].second; }
    
   void removeFromDomain(BoundVarRef_internal, int )
   {
