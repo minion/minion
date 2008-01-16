@@ -1,5 +1,5 @@
 make veryclean
-nice make minion -j 2 $*
+nice make minion MYFLAGS="-DOLDTABLE" -j 2 $* 
 cp bin/minion* bin/min-original
 rm bin/minion*
 find bin/* | grep TABLE | xargs rm

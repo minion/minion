@@ -24,17 +24,16 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifdef TRIES
-#include "constraint_GACtable_trie.h"
+#ifdef OLDTABLE
+#include "constraint_GACtable.h"
 #else
-
 #ifdef REGINLHOMME
 #include "constraint_GACtable_reginlhomme.h"
 #else
 #ifdef NIGHTINGALE
 #include "constraint_GACtable_nightingale.h"
 #else
-#include "constraint_GACtable.h"
+#include "constraint_GACtable_trie.h"
 #endif 
 #endif
 #endif
