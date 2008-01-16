@@ -39,7 +39,7 @@ enum ConstraintType {
   CT_INEQ ,
   CT_MAX ,
   CT_MIN ,
- // CT_EQSUM ,
+  CT_POW ,
   CT_LEQSUM ,
   CT_GEQSUM ,
   CT_PRODUCT2 ,

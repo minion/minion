@@ -36,6 +36,8 @@
 		261C44E2099A0B4A00FFBDCA /* Minion */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = Minion; sourceTree = BUILT_PRODUCTS_DIR; };
 		261E01FA09F7F57E004F8C91 /* tries.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tries.h; path = constraints/tries.h; sourceTree = "<group>"; };
 		2623020E0AB82F1200375F37 /* tuple_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tuple_container.h; sourceTree = "<group>"; };
+		2623A3CB0B0E23C500E574BC /* constraint_GACtable_master.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = constraint_GACtable_master.h; path = constraints/constraint_GACtable_master.h; sourceTree = "<group>"; };
+		2623A3CC0B0E23C500E574BC /* constraint_pow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = constraint_pow.h; path = constraints/constraint_pow.h; sourceTree = "<group>"; };
 		2626D75609751DCD002AC405 /* intvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intvar.h; path = variables/containers/intvar.h; sourceTree = "<group>"; };
 		2629CE0109CEC331008CC8CD /* test05_fullsumgeq.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test05_fullsumgeq.cpp; path = tests/test05_fullsumgeq.cpp; sourceTree = "<group>"; };
 		262C59E009C785EE0027E72E /* long_intvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = long_intvar.h; path = variables/containers/long_intvar.h; sourceTree = "<group>"; };
@@ -301,6 +303,8 @@
 		26F697FC0986D78E00D3B93B /* constraints */ = {
 			isa = PBXGroup;
 			children = (
+				2623A3CB0B0E23C500E574BC /* constraint_GACtable_master.h */,
+				2623A3CC0B0E23C500E574BC /* constraint_pow.h */,
 				26FC06F409CB68D500153DA6 /* constraint_dynamic.h */,
 				26AAF876096D3BC300AD8C1A /* constraint.h */,
 				26808B0B09D5FF820025DA04 /* function_defs.hpp */,

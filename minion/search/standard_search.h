@@ -147,7 +147,7 @@ namespace Controller
 	return false;
   }
 
-#ifdef MORE_SEARCH_INFO
+#ifndef MORE_SEARCH_INFO
 #define maybe_print_search_state(x,y)
 #else
 template<typename T>

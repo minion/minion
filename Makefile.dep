@@ -836,6 +836,58 @@ $(OBJDIR)/build_constraints/CT_OCCURRENCE.o:  \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_occurrance.h
+$(OBJDIR)/build_constraints/CT_POW.o:  \
+ minion/./build_constraints/CT_POW.cpp \
+  minion/./build_constraints/../minion.h \
+  minion/./build_constraints/../svn_header.h \
+  minion/./build_constraints/../system.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../constants.h \
+  minion/./build_constraints/../debug.h \
+  minion/./build_constraints/../solver.h \
+  minion/./build_constraints/../memory_management/backtrackable_memory.h \
+  minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
+  minion/./build_constraints/../reversible_vals.h \
+  minion/./build_constraints/../memory_management/trailed_monotonic_set.h \
+  minion/./build_constraints/../tuple_container.h \
+  minion/./build_constraints/../constraints/triggers.h \
+  minion/./build_constraints/../variables/VarRefType.h \
+  minion/./build_constraints/../variables/AnyVarRef.h \
+  minion/./build_constraints/../constraints/constraint.h \
+  minion/./build_constraints/../constraints/constraint_dynamic.h \
+  minion/./build_constraints/../trigger_list.h \
+  minion/./build_constraints/../variables/variables.h \
+  minion/./build_constraints/../variables/containers/booleanvariables.h \
+  minion/./build_constraints/../variables/containers/intvar.h \
+  minion/./build_constraints/../variables/containers/long_intvar.h \
+  minion/./build_constraints/../variables/containers/intboundvar.h \
+  minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
+  minion/./build_constraints/../variables/mappings/variable_neg.h \
+  minion/./build_constraints/../variables/mappings/variable_switch_neg.h \
+  minion/./build_constraints/../variables/mappings/variable_stretch.h \
+  minion/./build_constraints/../variables/mappings/variable_constant.h \
+  minion/./build_constraints/../variables/mappings/variable_not.h \
+  minion/./build_constraints/../variables/mappings/variable_shift.h \
+  minion/./build_constraints/../variables/iterators.h \
+  minion/./build_constraints/../solver2.h \
+  minion/./build_constraints/../build_constraints/build_helper.h \
+  minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
+  minion/./build_constraints/../build_constraints/../BuildConstraint.h \
+  minion/./build_constraints/../constraints/constraint_checkassign.h \
+  minion/./build_constraints/../constraints/constraint_table.h \
+  minion/./build_constraints/../constraints/constraint_boundtable.h \
+  minion/./build_constraints/../constraints/reify.h \
+  minion/./build_constraints/../constraints/reify_true.h \
+  minion/./build_constraints/../constraints/function_defs.hpp \
+  minion/./build_constraints/../queue/standard_queue.h \
+  minion/./build_constraints/../search/standard_search.h \
+  minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../constraint_setup.h \
+  minion/./build_constraints/../test_functions.h \
+  minion/./build_constraints/../constraints/constraint_pow.h
 $(OBJDIR)/build_constraints/CT_PRODUCT2.o:  \
  minion/./build_constraints/CT_PRODUCT2.cpp \
   minion/./build_constraints/../minion.h \

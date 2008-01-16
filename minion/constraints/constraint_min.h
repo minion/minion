@@ -116,7 +116,7 @@ struct MinConstraint : public Constraint
   virtual void full_propogate()
   {
 	int array_size = var_array.size();
-	for(int i = 1;i <= array_size; ++i)
+	for(int i = 1;i <= array_size + 1; ++i)
 	{
 	  propogate(i,0);
 	  propogate(-i,0);
