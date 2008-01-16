@@ -27,6 +27,8 @@
 
 #include <math.h>
 
+#define LRINT(x) static_cast<long>(x + 0.5)
+
 /// var1 ^ var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct PowConstraint : public Constraint
@@ -80,44 +82,44 @@ struct PowConstraint : public Constraint
 	{
 	  case -1:
 	  {
-		var3.setMin(lrint(my_pow(var1.getMin(),var2.getMin())));
+		var3.setMin(LRINT(my_pow(var1.getMin(),var2.getMin())));
 		int var1_min = var1.getMin();
 		if(var1_min > 1)
-		  var2.setMax(lrint(my_y(var1_min, var3.getMax())));
+		  var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
 		break;
 	  }
 	  case -2:
-	    var3.setMin(lrint(my_pow(var1.getMin(), var2.getMin())));
-		var1.setMax(lrint(my_x(var2.getMin(), var3.getMax())));
+	    var3.setMin(LRINT(my_pow(var1.getMin(), var2.getMin())));
+		var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
 		break;
 		
 	  case -3:
 	  {
-		var1.setMin(lrint(my_x(var2.getMax(), var3.getMin())));
+		var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
 		int var1_max = var1.getMax();
 		if(var1_max > 1)
-		  var2.setMin(lrint(my_y(var1_max, var3.getMin())));
+		  var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
 		break;
 	  }
 	  case 1:
 	  {
-		var3.setMax(lrint(my_pow(var1.getMax(),var2.getMax())));
+		var3.setMax(LRINT(my_pow(var1.getMax(),var2.getMax())));
 		int var1_max = var1.getMax();
 		if(var1_max > 1)
-		  var2.setMin(lrint(my_y(var1_max, var3.getMin())));
+		  var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
 		break;
 	  }
 	  case 2:
-	    var3.setMax(lrint(my_pow(var1.getMax(), var2.getMax())));
-		var1.setMin(lrint(my_x(var2.getMax(), var3.getMin())));
+	    var3.setMax(LRINT(my_pow(var1.getMax(), var2.getMax())));
+		var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
 		break;
 		
 	  case 3:
 	  {
-		var1.setMax(lrint(my_x(var2.getMin(), var3.getMax())));
+		var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
 		int var1_min = var1.getMin();
 		if(var1_min > 1)
-		  var2.setMax(lrint(my_y(var1_min, var3.getMax())));
+		  var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
 		break;
 	  }
 	}
