@@ -256,7 +256,7 @@ struct RangeVarContainer {
 	int max_val = getMax(d);
 	for(int loop = min_val; loop <= max_val; ++loop)
 	{
-	  if(inDomain(d, loop) && i != loop)
+	  if(inDomain_noBoundCheck(d, loop) && i != loop)
 	    trigger_list.push_domain_removal(d.var_num, loop);
 	}
 #endif
@@ -300,7 +300,7 @@ struct RangeVarContainer {
 	  // TODO : Optimise this function to only check values in domain.
 	  for(int loop = i + 1; loop <= up_bound + var_min; ++loop)
 	  {
-	    if(inDomain(d, loop))
+	    if(inDomain_noBoundCheck(d, loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif	 
@@ -312,7 +312,7 @@ struct RangeVarContainer {
 	  // TODO : Optimise this function to only check values in domain.
 	  for(int loop = raw_new_upper + 1 + var_min; loop <= i; ++loop)
 	  {
-	    if(inDomain(d, loop))
+	    if(inDomain_noBoundCheck(d, loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif
@@ -344,7 +344,7 @@ struct RangeVarContainer {
 	  // TODO : Optimise this function to only check values in domain.
 	  for(int loop = low_bound + var_min; loop < i; ++loop)
 	  {
-	    if(inDomain(d, loop))
+	    if(inDomain_noBoundCheck(d, loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif	 	  
@@ -356,7 +356,7 @@ struct RangeVarContainer {
 	  // TODO : Optimise this function to only check values in domain.
 	  for(int loop = i; loop < raw_new_lower + var_min; ++loop)
 	  {
-	    if(inDomain(d, loop))
+	    if(inDomain_noBoundCheck(d, loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif
