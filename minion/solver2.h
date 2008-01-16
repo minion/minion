@@ -29,7 +29,7 @@
 
 VARDEF_ASSIGN(clock_t time_limit, 0);
 
-VARDEF(unsigned nodes);
+VARDEF(unsigned long long nodes);
 
 
 namespace Controller
@@ -51,7 +51,7 @@ namespace Controller
   VARDEF_ASSIGN(int commandlineoption_sollimit, -1);
   VARDEF_ASSIGN(BOOL commandlineoption_fullpropogate, false);
   VARDEF_ASSIGN(BOOL commandlineoption_nocheck, false);
-  VARDEF_ASSIGN(unsigned commandlineoption_nodelimit, 0);
+  VARDEF_ASSIGN(unsigned long long commandlineoption_nodelimit, 0);
   VARDEF(vector<int> test_solution);
   
   
