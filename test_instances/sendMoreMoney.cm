@@ -1,0 +1,8 @@
+ESSENCE' 1.0
+letting D1 be domain int(0..9)
+letting D2 be domain int(1..9)
+find s:D2, e:D1, n:D1, d:D1, m:D2, o:D1, r:D1, y:D1
+such that
+          1000*s + 100*e + 10*n + d 
+        + 1000*m + 100*o + 10*r + e =
+10000*m + 1000*o + 100*n + 10*e + y
