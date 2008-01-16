@@ -86,3 +86,6 @@ minion-quasigroup:
 
 clean:
 	rm -rf bin/minion bin/minion-* bin/objdir-minion* bin/bibd bin/golomb bin/solitaire bin/steelmill bin/sports
+
+veryclean:
+	rm -rf bin/*
