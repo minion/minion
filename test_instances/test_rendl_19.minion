@@ -1,0 +1,18 @@
+MINION 1
+# Segfault
+1
+0
+0
+5
+0 8 5
+0
+[x1,x2,x3,x4,x5,x0]
+[a,a,a,a,a,a]
+0
+1
+[[x0,x1,x2,x3,x4,x5]]
+0
+objective none
+print m0
+
+reify(occurrence([x1,x2,x3,x4,x5],3,4),x0)

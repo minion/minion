@@ -1,0 +1,20 @@
+MINION 1
+# segfault
+
+4
+0
+0
+0
+0
+
+[x0,x1,x2,x3]
+[a,a,a,a]
+
+0 
+1
+[ [ x0,x1,x2,x3] ]
+0
+objective none
+print m0
+
+reify(weightedsumgeq([1,1,1],[x0,x1,x2],1),x3)
