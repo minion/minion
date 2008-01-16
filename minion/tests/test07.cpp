@@ -31,8 +31,8 @@
 #include "minion.h"
 
 
-const int height = 8;
-const int width = 8;
+const int height = 9;
+const int width = 9;
 const int widthsum = 3;
 const int heightsum = 3;
 const int scalarsum = 1;
@@ -63,8 +63,10 @@ int main (int argc, char * const argv[]) {
     {
       vars[i].push_back(boolean_container.get_new_var());
     }
+    
   array<BoolVarRef,height> row;
   array<BoolVarRef,width> col;
+  
   for(int i=0;i<height;i++)
   {
     for(int j=0;j<width;j++)
