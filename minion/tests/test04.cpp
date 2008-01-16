@@ -38,3 +38,4 @@ int main(void)
   throw new assert_fail;
   
 }
+

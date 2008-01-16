@@ -225,3 +225,4 @@ inline LiteralSpecificLists* TupleList::getLitLists()
     litlists = new LiteralSpecificLists(this);
   return litlists;
 }
+

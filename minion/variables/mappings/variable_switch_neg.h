@@ -186,3 +186,4 @@ SwitchNegRef(const array<VarRef, i>& var_array)
 	neg_array[l] = SwitchNegRef(var_array[l]);
   return neg_array;
 }
+

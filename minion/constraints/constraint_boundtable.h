@@ -122,3 +122,4 @@ end_check_upper:
   virtual void full_propogate()
   { propogate(0,0); }
 };
+

@@ -74,3 +74,4 @@ UnaryEqualCon(VarRef v1,  Offset o)
   return (new UnaryEqualConstraint<VarRef,Offset>(v1,o)); 
 }
 
+

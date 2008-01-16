@@ -241,3 +241,4 @@ VecNeqConDynamic(const VarArray1& varray1, const VarArray2& varray2)
 { return new VecNeqDynamic<VarArray1,VarArray2>(varray1, varray2); }
 
 BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_VECNEQ, VecNeqConDynamic)
+

@@ -293,3 +293,4 @@ namespace TriggerSpace
 }
 
 #endif //TRIGGERLIST_H
+

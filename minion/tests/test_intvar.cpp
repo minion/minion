@@ -143,3 +143,4 @@ int main(void)
   D_ASSERT(a.getMin() == 1);
   Controller::finish();
 }
+

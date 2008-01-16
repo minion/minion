@@ -255,3 +255,4 @@ struct CompleteVarRefType
 
 
 #endif
+

@@ -47,3 +47,4 @@ inline void print_finaltimestep(char* time_name)
   cout << "Total Time: " << (_last_check_time - _internal_start_time) / (1.0 * CLOCKS_PER_SEC) << endl;
   
 }
+

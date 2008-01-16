@@ -428,3 +428,4 @@ BigRangeVarContainer<T>::get_var_num(int i)
   D_ASSERT(!lock_m);
   return BigRangeVarRef(BigRangeVarRef_internal(i));
 }
+

@@ -230,3 +230,4 @@ GeqWeightedSum(const vector<int>& scale, const vector<BoolVarRef>& vec, const ve
 
 BUILD_CONSTRAINT3(CT_WEIGHTLEQSUM, LeqWeightedSum)
 BUILD_CONSTRAINT3(CT_WEIGHTGEQSUM, GeqWeightedSum)
+

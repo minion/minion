@@ -225,3 +225,4 @@ inline TupleTrieArray* TupleList::getTries()
     triearray = new TupleTrieArray(this);
   return triearray;
 }
+

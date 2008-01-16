@@ -19,3 +19,4 @@ case CT_GEQSUM : return build_constraint_CT_GEQSUM(b);
 case CT_LEQSUM : return build_constraint_CT_LEQSUM(b);
 case CT_MINUSEQ : return build_constraint_CT_MINUSEQ(b);
 }}
+

@@ -137,3 +137,4 @@ AndCon(VarRef1 var1, VarRef2 var2, VarRef3 var3)
 { 
   return (new AndConstraint<VarRef1,VarRef2,VarRef3>(var1,var2,var3)); 
 }
+

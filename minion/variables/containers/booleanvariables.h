@@ -281,3 +281,4 @@ inline BoolVarRef_internal::BoolVarRef_internal(int value, BooleanContainer* b_c
   value_position(b_con->values_mem, data_offset*sizeof(data_type))
 { shift_offset = one << (value % (sizeof(data_type)*8)); }
 
+

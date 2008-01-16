@@ -279,3 +279,4 @@ inline VirtualBackTrackOffset::~VirtualBackTrackOffset()
 inline void BackTrackOffset::request_bytes(int i)
 { *this = backtrackable_memory.get_bytes(i); }
 
+

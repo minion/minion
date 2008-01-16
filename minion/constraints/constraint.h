@@ -116,3 +116,4 @@ inline void Constraint::setup()
     (*it)->post_trigger();
   }
 }
+

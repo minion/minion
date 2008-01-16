@@ -361,3 +361,4 @@ int main(int argc, char** argv) {
   cout << "Solutions Found: " << Controller::solutions << endl;
   return 0;
 }
+

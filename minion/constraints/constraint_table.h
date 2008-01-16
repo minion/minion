@@ -96,3 +96,4 @@ struct TableConstraint : public Constraint
   virtual void full_propogate()
   { propogate(0,0); }
 };
+

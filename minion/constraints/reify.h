@@ -208,3 +208,4 @@ reify<BoolVar>*
 reifyCon(Constraint* c, BoolVar var)
 { return new reify<BoolVar>(&*c, var); }
 
+

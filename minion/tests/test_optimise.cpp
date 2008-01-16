@@ -42,3 +42,4 @@ int main(void)
   Controller::solve();
   D_ASSERT(Controller::solutions == 7);
 }
+

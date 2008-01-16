@@ -576,3 +576,4 @@ template<typename VarArray>
 DynamicConstraint*
 GACTableCon(const VarArray& vars, const vector<vector<int> >& tuples)
 { return new GACTableConstraint<VarArray>(vars, tuples); }
+

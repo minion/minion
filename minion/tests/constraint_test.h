@@ -87,3 +87,4 @@ TestCon(VarRef var1)
 { 
   return (new TestConstraint<VarRef>(var1)); 
 }
+

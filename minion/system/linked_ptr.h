@@ -106,3 +106,4 @@ private:
 };
 
 #endif // LINKED_PTR_H
+

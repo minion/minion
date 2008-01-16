@@ -29,3 +29,4 @@ int main(void)
   D_ASSERT(b1.getAssignedValue() == 1);
   Controller::finish();
 }
+

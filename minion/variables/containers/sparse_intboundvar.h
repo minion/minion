@@ -377,3 +377,4 @@ SparseBoundVarContainer<T>::get_var_num(int i)
   D_ASSERT(!lock_m);
   return SparseBoundVarRef(SparseBoundVarRef_internal(i));
 }
+

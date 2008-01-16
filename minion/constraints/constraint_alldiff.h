@@ -61,3 +61,4 @@ AllDiffCon(VarArray _var_array)
 
 //IlcConstraint IlcNewAllDiff( IlcIntVarArray vars, PropType prop );
 
+

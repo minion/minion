@@ -142,3 +142,4 @@ ShiftVarRef(const array<VarRef, i>& var_array, const Shift& shift)
     shift_array[l] = ShiftVarRef(var_array[l], shift);
   return shift_array;
 }
+

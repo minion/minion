@@ -1,15 +1,18 @@
 #!/bin/bash
 j=0
 reify=0
+pass=0
+expectedfail=0
 for i in *.minion; do
 echo -n .
 j=$(($j + 1))
 if grep "#FAIL" $i > /dev/null;
 then
   if $1 -test $2 $i &> /dev/null;
-    then echo $i should have failed;
+    then echo "$i should have failed";
   else
-    pass=$(($pass + 1));
+    expectedfail=$(($expectedfail + 1));
+    echo "Expected failure occurred - $i"
   fi
 else
   if $1 -test $2 $i &> /dev/null;
@@ -18,18 +21,22 @@ else
     $1 -test $2 $i &> test_output;
     if grep -q "Reification is not" test_output;
     then
-      echo Reification failure - $i;
+      echo "Reification failure - $i";
       reify=$(($reify + 1));
     else    
-      echo Fail $i;
+      echo "Fail $i";
     fi
   fi
 fi
 done
 echo
-echo $pass of $j tests successful.
-echo $(($j - $pass - $reify)) tests failed due to errors.
+echo "$pass of $j tests successful."
+echo $(($j - $pass - $reify - $expectedfail)) tests failed due to unexpected errors.
 echo $reify tests failed due to unimplemented reification.
+if [[ ! ($expectedfail -eq 0) ]]
+then 
+   echo $expectedfail tests failed due to other expected errors,  e.g. known bugs
+fi
 
 echo Doing randomised tests.
 j=0

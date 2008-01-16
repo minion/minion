@@ -104,3 +104,4 @@ struct VarIterator_looping
   int val()
   { return current_val; }
 };
+

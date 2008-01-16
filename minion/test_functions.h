@@ -49,3 +49,4 @@ string get_dom_as_string(vector<T>& vec)
   output += ">";
   return output;
 }
+

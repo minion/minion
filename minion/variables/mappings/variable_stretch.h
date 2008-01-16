@@ -248,3 +248,4 @@ MultiplyVarRef(const array<VarRef, i>& var_array, const array<int, i>& multiplie
     Multiply_array[l] = MultiplyVarRef(var_array[l], multiplies[i]);
   return Multiply_array;
 }
+

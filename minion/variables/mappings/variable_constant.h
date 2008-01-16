@@ -97,3 +97,4 @@ struct ConstantVar
   operator string()
   { return "Constant:" + to_string(val); }
 };
+

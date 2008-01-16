@@ -159,3 +159,4 @@ VarNegRef(const array<VarRef, i>& var_array)
     neg_array[l] = VarNegRef(var_array[l]);
   return neg_array;
 }
+

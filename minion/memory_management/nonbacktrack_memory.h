@@ -185,3 +185,4 @@ inline VirtualMemOffset::~VirtualMemOffset()
 
 inline void MemOffset::request_bytes(int i)
 { *this = memory_block.get_bytes(i); }
+

@@ -56,3 +56,4 @@ int main(void)
   D_ASSERT(a.getMax() == 31);
   Controller::finish();
 }
+

@@ -29,3 +29,4 @@ int main(void)
   D_ASSERT(!b1.inDomain(1));
   Controller::finish();
 }
+

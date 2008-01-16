@@ -235,3 +235,4 @@ GreaterEqualSumCon(const vector<BoolVarRef>& var_array, const vector<ConstantVar
 }
 
 BUILD_CONSTRAINT2(CT_GEQSUM, GreaterEqualSumCon);
+

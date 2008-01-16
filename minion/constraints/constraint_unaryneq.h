@@ -69,3 +69,4 @@ Constraint*
 UnaryNeqCon(VarRef v1,  Offset o)
 { return new UnaryNeqConstraint<VarRef,Offset>(v1,o); }
 
+

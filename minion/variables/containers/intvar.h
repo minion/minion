@@ -405,3 +405,4 @@ RangeVarContainer<var_min,T>::get_var_num(int i)
   D_ASSERT(!lock_m);
   return LRangeVarRef(RangeVarRef_internal(i));
 }
+

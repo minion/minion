@@ -195,3 +195,4 @@ inline void DynamicTrigger::propogate()
   constraint->propogate(this); 
 }
 
+

@@ -161,3 +161,4 @@ VarNotRef(const array<VarRef, i>& var_array)
     Not_array[l] = VarNotRef(var_array[l]);
   return Not_array;
 }
+

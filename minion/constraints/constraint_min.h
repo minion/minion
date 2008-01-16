@@ -152,3 +152,4 @@ MaxCon(const VarArray& _var_array, const vector<VarRef>& _var_ref)
 BUILD_CONSTRAINT2(CT_MAX, MaxCon)
 
 BUILD_CONSTRAINT2(CT_MIN, MinCon)
+

@@ -8,3 +8,4 @@ case CT_WATCHED_TABLE : return build_constraint_CT_WATCHED_TABLE(b);
 case CT_WATCHED_VECNEQ : return build_constraint_CT_WATCHED_VECNEQ(b);
 case CT_WATCHED_LITSUM : return build_constraint_CT_WATCHED_LITSUM(b);
 }}
+

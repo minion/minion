@@ -44,3 +44,4 @@ int main(void)
   Controller::lock();
   test_equal(var1,var2);
 }
+

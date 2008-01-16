@@ -121,3 +121,4 @@ struct CheckAssignConstraint : public Constraint
 	return vars;
   }
 };
+

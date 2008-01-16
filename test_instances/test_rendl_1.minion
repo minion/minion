@@ -1,5 +1,6 @@
 MINION 1
 #TEST SOLCOUNT 185
+#FAIL
 #
 # Minion Constraint Solver Input
 #    http://sourceforge.net/projects/minion

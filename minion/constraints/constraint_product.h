@@ -116,3 +116,4 @@ ProductCon(vector<VarRef1> vars, vector<VarRef2> var2)
 
 BUILD_CONSTRAINT2(CT_PRODUCT2, ProductCon);
 
+

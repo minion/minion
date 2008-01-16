@@ -210,3 +210,4 @@ BuildCT_WATCHED_TABLE(const T& t1, BOOL reify, const BoolVarRef& reifyVar, Const
   else 
   { return GACTableCon(t1, b.tuples); } 
 }
+

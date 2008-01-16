@@ -24,3 +24,4 @@ int main(void)
   BoolVarRef b2 = boolean_container.get_new_var();
   boolean_container.lock();
 }
+

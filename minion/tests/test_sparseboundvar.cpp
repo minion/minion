@@ -91,3 +91,4 @@ int main(void)
   D_ASSERT(a.getMin() == 10);
   Controller::finish();
 }
+
