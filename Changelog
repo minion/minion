@@ -1,3 +1,14 @@
+11/08/2006 - Chris
+	* Going to try to start to keep changelog up to date!
+	* Replaced many occurrences of bool with BOOL. BOOL is defined to be
+	  int. This is used because in most cases bool and int are interchangable.
+	  (except when you want true to be equal 1), but can interfere with
+	  optimisation.
+	* Removed the ability to add static triggers to domain values, as only
+	  one constraint (GACElement) was using it, it's faster without, and the
+	  GeCode people agree it only makes things slower.
+	  
+	  
 17/03/2006 - Chris
 	* Release 0.2.1
 16/03/2006 - Chris
