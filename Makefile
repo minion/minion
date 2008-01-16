@@ -10,7 +10,7 @@ ifdef DEBUG
  endif
 
 else
- DEBUG_FLAGS = -DNO_DEBUG -DMORE_SEARCH_INFO
+ DEBUG_FLAGS = -DNO_DEBUG
  ifdef PROFILE
    FLAGS = -O2 -g -fno-inline -fno-inline-functions
  else
