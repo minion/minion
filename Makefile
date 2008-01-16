@@ -91,15 +91,15 @@ mkdirectory:
 generate: bibd golomb solitaire steelmill sports
 
 bibd:
-	g++ generators/Bibd/MinionBIBDInstanceGenerator.cpp -O2 -o bin/bibd
+	g++ generators/Bibd/MinionBIBDInstanceGenerator.cpp -O2 -o bin/bibd $(FULLFLAGS)
 golomb:
-	g++ generators/Golomb/GolombMinionGenerator.cpp -O2 -o bin/golomb
+	g++ generators/Golomb/GolombMinionGenerator.cpp -O2 -o bin/golomb $(FULLFLAGS)
 solitaire:
-	g++ generators/Solitaire/solitaire-solver.cpp -O2 -o bin/solitaire
+	g++ generators/Solitaire/solitaire-solver.cpp -O2 -o bin/solitaire $(FULLFLAGS)
 steelmill:
-	g++ generators/Steelmill/steelmill-solver.cpp -O2 -o  bin/steelmill
+	g++ generators/Steelmill/steelmill-solver.cpp -O2 -o  bin/steelmill $(FULLFLAGS)
 sports:
-	g++ generators/SportsSchedule/MinionSportsInstanceGenerator.cpp -O2 -o bin/sports
+	g++ generators/SportsSchedule/MinionSportsInstanceGenerator.cpp -O2 -o bin/sports $(FULLFLAGS)
 
 lisp-generate: minion-helper minion-sat minion-quasigroup
 
