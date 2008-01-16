@@ -68,6 +68,11 @@ objective maximising x9
 
 print m1
 
+eq(x10,0)
+eq(x11,7)
+eq(x33,17)
+eq(x34,24)
+
 alldiff(v0)
 
 sumleq(col(m0, 2), x9)
