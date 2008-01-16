@@ -27,8 +27,8 @@ for i in *.minion; do
   
   if grep -q "#TEST SOLCOUNT" $i;
   then
-    numsols=`$1 -findallsols $2 $i | ../mini-scripts/solutions.sh`
-    testnumsols=`grep "#TEST SOLCOUNT" $i 2>nul | awk '{print $3}' | tr -d '\015' `
+    numsols=`$1 -findallsols $2 $i 2>/dev/null | ../mini-scripts/solutions.sh`
+    testnumsols=`grep "#TEST SOLCOUNT" $i  | awk '{print $3}' | tr -d '\015' `
 	if [[ "$numsols" != "$testnumsols" ]]; then
 	  testpass=0
 	  errormess="Got '${testnumsols}' instead of '{$numsols}' solutions in $i"
@@ -37,8 +37,12 @@ for i in *.minion; do
 	fi
   else
     if grep -q "#TEST CHECKONESOL" $i; then
-      sol=`$1 $2 $i | ../mini-scripts/print_sol.sh`
+      sol=`$1 $2 $i 2>/dev/null | ../mini-scripts/print_sol.sh`
+      # That "tr" is just to deal with line ending problems.
       testsol=`grep "#TEST CHECKONESOL" $i | awk '{$1 = ""; $2 = ""; print }' | tr -d '\015' `
+      
+      # This horrible mess just strips the given solutions into a comparable
+      # format. It turns " 1   2   3   4 " into "1,2,3,4". 
       sol=`echo $sol | sed -e "s/^ \{1,\}//;s/ \{1,\}$//;s/ \{1,\}/,/g;"`
       testsol=`echo $testsol | sed -e "s/^ \{1,\}//;s/ \{1,\}$//;s/ \{1,\}/,/g;"`
       if [[ "$sol" = "$testsol" ]]; then
@@ -103,4 +107,4 @@ for i in `grep -l "#TEST SOLCOUNT" *.minion`; do
 done
 echo
 echo $pass of $j randomised tests successful.
-rm test_output
+
