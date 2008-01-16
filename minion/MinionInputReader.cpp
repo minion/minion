@@ -76,62 +76,6 @@ typename T::value_type& index(T& container, int index_pos)
   return container[index_pos];
 }
 
-/// Check if the next character from @infile is @sym.
-void check_sym(ifstream& infile, char sym)
-{
-  char idChar;
-  infile >> idChar ;
-  if(idChar != sym)
-  {
-    throw new parse_exception(string("Expected '") + sym + "'. Recieved '" + idChar + "'.");
-  }
-}
-
-/// A 'better' peek, which ignores whitespace.
-char peek_char(ifstream& infile)
-{
-  while(infile.peek() == ' ' || infile.peek() == '\n')
-    infile.get();
-
-  return infile.peek();
-}
-
-int read_num(ifstream& infile)
-{
-  // This function should just be "infile >> i;", however that is parsed differently in windows and linux
-  // So we'll have to do it manually.
-  
- /* int i;
-  infile >> i;
-  if(infile.fail())
-    throw new parse_exception("Problem parsing number");
-  return i;
-  */
-  string s;
-  char next_char = infile.get();
-  while(isspace(next_char))
-	 next_char = infile.get();
-
-  if(next_char == '-')
-  {
-	 s+= next_char;
-	 next_char = infile.get();
-  }
-
-  while( (next_char >= '0' && next_char <= '9'))
-  {
-	 s += next_char;
-	 next_char = infile.get();
-  }
-
-  infile.putback(next_char);
-  if(infile.fail() || s == "" || s == "-")
-    throw new parse_exception("Problem parsing number");
-  return atoi(s.c_str());
-}
-
-
-
 void MinionInputReader::parser_info(string s)
 {
   if(parser_verbose)
@@ -198,46 +142,46 @@ vector<Var> MinionInputReader::getRowThroughTensor(
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // read
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::read(char* fn) {
-  // general purpose buffer
-  char* buf = new char[10000];
-  ifstream infile(fn) ;
-  if (!infile) {
-    D_FATAL_ERROR("Can't open given input file");
-  }
+void MinionInputReader::read(char* fn) {  
   
-  string test_name;
-  infile >> test_name;
+  InputFileReader* infile;
+  
+  if(fn != string("--"))
+  {
+    infile = new ConcreteFileReader<ifstream>(fn);
+	if (infile->failed_open()) {
+	  D_FATAL_ERROR("Can't open given input file '" + string(fn) + "'.");
+	}
+  }
+  else
+	infile = new ConcreteFileReader<std::basic_istream<char, std::char_traits<char> >&>(cin);
+  
+  string test_name = infile->get_string();
+  
   if(test_name != "MINION")
   {
     D_FATAL_ERROR("Error! All Minion input files must begin 'MINION <input version num>");
   }
   
-  inputFileVersionNumber = read_num(infile);
+  inputFileVersionNumber = infile->read_num();
   
   if(parser_verbose)
     cout << "Input file has version num " << inputFileVersionNumber << endl;
   
   // Just swallow the rest of this line, in particular the return. Extra stuff could be added on the line
   // later without breaking this version of the parser..
-  infile.getline(buf, 10000);
+  infile->getline();
   
   if(inputFileVersionNumber != 1 && inputFileVersionNumber != 2)
-  {
-   	D_FATAL_ERROR("This version of Minion only reads files with input format 1 or 2.");
-  }
+    D_FATAL_ERROR("This version of Minion only reads files with input format 1 or 2."); 
   
-  while(peek_char(infile) == '#')
-  {
-	infile.getline(buf, 10000);
-	parser_info(string("Read comment line:") + buf);
-  }
-  
-  // After this, we don't want the buffer any more.
-  delete[] buf;
-  
+  while(infile->peek_char() == '#')
+    parser_info(string("Read comment line:") + infile->getline());
+
+#ifndef NOCATCH  
   try
   {
+#endif
 	readVars(infile) ;
 	readVarOrder(infile) ;
 	readValOrder(infile) ;
@@ -245,12 +189,11 @@ void MinionInputReader::read(char* fn) {
 	
 	// At this point, may or may not have a tuples entry
 	{
-	  string s;
-	  infile >> s;
+	  string s = infile->get_string();
 	  if(s == "tuplelists")
 	  {
 	    readTuples(infile);
-		infile >> s;
+		s = infile->get_string();
 	  }
 	  if(s == "objective")
 	    readObjective(infile);
@@ -263,56 +206,67 @@ void MinionInputReader::read(char* fn) {
 	readPrint(infile);
 	
 	while(readConstraint(infile, false)) ;
+
+#ifndef NOCATCH
   }
   catch(parse_exception* s)
   {
     cerr << "Error in input." << endl;
 	cerr << s->what() << endl;
-	// This nasty line will tell us the current position in the file even if a parse fail has occurred.
-	int error_pos =  infile.rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
 	
-	//cerr << "It was at character number:" << infile.tellg() << endl;
-	int line_num = 0;
-	int end_prev_line = 0;
-	buf = new char[1000000];
-    infile.close();
-	// Open a new stream, because we don't know what kind of a mess the old one might be in.
-	ifstream error_file(fn);
-	while(error_pos > error_file.tellg())
-	{ 
-	  end_prev_line = error_file.tellg();
-	  error_file.getline(buf,1000000);
-	  line_num++;
+	ConcreteFileReader<ifstream>* stream_cast = 
+	   dynamic_cast<ConcreteFileReader<ifstream>*>(infile);
+	if(stream_cast)
+	{
+	  // This nasty line will tell us the current position in the file 
+	  // even if a parse fail has occurred.
+	  int error_pos =  stream_cast->infile.rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
+	  int line_num = 0;
+	  int end_prev_line = 0;
+	  char* buf = new char[1000000];
+      stream_cast->infile.close();
+	  // Open a new stream, because we don't know what kind of a mess
+	  // the old one might be in.
+	  ifstream error_file(fn);
+	  while(error_pos > error_file.tellg())
+	  { 
+	    end_prev_line = error_file.tellg();
+	    error_file.getline(buf,1000000);
+	    line_num++;
+	  }
+	  cerr << "Error on line:" << line_num << ". Gave up parsing somewhere around here:" << endl;
+	  cerr << string(buf) << endl;
+	  for(int i = 0; i < (error_pos - end_prev_line); ++i)
+	    cerr << "-";
+	  cerr << "^" << endl;
+    }
+    else
+	{
+	  // Had an input stream.
+	  cerr << "At the moment we can't show where a problem occured in the input stream." << endl;
+	  char* buf = new char[100000];
+	  buf[0]='\0';
+	  cin.getline(buf, 100000);
+	  cerr << "The rest of the line that went wrong is:" << endl;
+	  cerr << buf << endl;
+	  cerr << "Try saving your output to a temporary file." << endl;
 	}
-	cerr << "Error on line:" << line_num << ". Gave up parsing somewhere around here:" << endl;
-	cerr << string(buf) << endl;
-	for(int i = 0; i < (error_pos - end_prev_line); ++i)
-	  cerr << "-";
-	cerr << "^" << endl;
+	
 	cerr << "Sorry it didn't work out." << endl;
-	// This is so we can catch things in the debugger.
     exit(1);
   }
-
+#endif
 }
 
-/// Cleans rubbish off start of string.
-void clean_string(string& s)
-{
-  while(!s.empty() && isspace(s[0]))
-    s.erase(s.begin());
-}
+
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readConstraint
 // Recognise constraint by its name, read past name and leading '('
 // Return false if eof or unknown ct. Else true.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-bool MinionInputReader::readConstraint(ifstream& infile, bool reified) {
-  char char_id[1000];
-  infile.getline(char_id, 1000, '(');
-  string id(char_id);
-  clean_string(id);
+bool MinionInputReader::readConstraint(InputFileReader* infile, bool reified) {
+  string id = infile->getline('(');
   
   int constraint_num = -1;
   for(int i = 0; i < num_of_constraints; ++i)
@@ -326,7 +280,7 @@ bool MinionInputReader::readConstraint(ifstream& infile, bool reified) {
   
   if(constraint_num == -1) 
   {
-	if (infile.eof()) 
+	if (infile->eof()) 
 	{
 	  parser_info("Done.") ;
 	  return false;
@@ -366,9 +320,9 @@ bool MinionInputReader::readConstraint(ifstream& infile, bool reified) {
 		throw new parse_exception("Can't reify a reified constraint!");
 	  readConstraint(infile, true);
 	  
-	  check_sym(infile, ',');
+	  infile->check_sym(',');
 	  Var reifyVar = readIdentifier(infile);
-	  check_sym(infile, ')');
+	  infile->check_sym(')');
 	  if(constraint.type == CT_REIFY)
 	    instance.last_constraint_reify(reifyVar);
 	  else
@@ -387,7 +341,7 @@ bool MinionInputReader::readConstraint(ifstream& infile, bool reified) {
 }
 
 
-void MinionInputReader::readGeneralConstraint(ifstream& infile, const ConstraintDef& def)
+void MinionInputReader::readGeneralConstraint(InputFileReader* infile, const ConstraintDef& def)
 {
   vector<vector<Var> > varsblob;
   for(int i = 0; i < def.number_of_params; ++i)
@@ -404,7 +358,7 @@ void MinionInputReader::readGeneralConstraint(ifstream& infile, const Constraint
 	  {
 	    vector<Var> vars;
 	    vars.push_back(readIdentifier(infile));
-	    check_sym(infile,',');
+	    infile->check_sym(',');
 	    vars.push_back(readIdentifier(infile));
             varsblob.push_back(vars);
 	  }
@@ -430,9 +384,9 @@ void MinionInputReader::readGeneralConstraint(ifstream& infile, const Constraint
 	    D_FATAL_ERROR("Internal Error!");
 	}
 	if(i != def.number_of_params - 1)
-	  check_sym(infile, ',');
+	  infile->check_sym(',');
   }
-  check_sym(infile, ')');
+  infile->check_sym(')');
   
   instance.add_constraint(ConstraintBlob(def, varsblob));
 }
@@ -441,20 +395,20 @@ void MinionInputReader::readGeneralConstraint(ifstream& infile, const Constraint
 // readConstraintElement
 // element(vectorofvars, indexvar, var)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readConstraintElement(ifstream& infile, const ConstraintDef& ctype) {
+void MinionInputReader::readConstraintElement(InputFileReader* infile, const ConstraintDef& ctype) {
   parser_info("reading an element ct. " ) ;
   vector<vector<Var> > vars;
   // vectorofvars
   vars.push_back(readVectorExpression(infile));
-  check_sym(infile, ',');
+  infile->check_sym(',');
   // indexvar
   vars.push_back(make_vec(readIdentifier(infile)));
-  check_sym(infile, ',');
+  infile->check_sym(',');
   // The final var is shoved on the end of the vector of vars as it should
   // be of a similar type.
   // final var
   vars[0].push_back(readIdentifier(infile));
-  check_sym(infile, ')');
+  infile->check_sym(')');
   instance.add_constraint(ConstraintBlob(ctype, vars));
 }
 
@@ -463,7 +417,7 @@ void MinionInputReader::readConstraintElement(ifstream& infile, const Constraint
 // table(<vectorOfVars>, {<tuple> [, <tuple>]})
 // Tuples represented as a vector of int arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readConstraintTable(ifstream& infile, const ConstraintDef& def) 
+void MinionInputReader::readConstraintTable(InputFileReader* infile, const ConstraintDef& def) 
 {
   parser_info( "reading a table ct (unreifiable)" ) ;
   
@@ -472,9 +426,9 @@ void MinionInputReader::readConstraintTable(ifstream& infile, const ConstraintDe
   vector<Var> vectorOfVars = readVectorExpression(infile) ;
   int tupleSize = vectorOfVars.size() ;
   
-  check_sym(infile,',');
+  infile->check_sym(',');
   
-  char next_char = peek_char(infile);
+  char next_char = infile->peek_char();
   if(next_char != 't' && next_char != '{')
 	throw new parse_exception("Expected either 't' or a tuple list");
   
@@ -482,8 +436,8 @@ void MinionInputReader::readConstraintTable(ifstream& infile, const ConstraintDe
   
   if(next_char == 't')
   {
-	check_sym(infile,'t');
-	int tuple_num = read_num(infile);
+	infile->check_sym('t');
+	int tuple_num = infile->read_num();
 	if(tuple_num >= getNumOfTupleLists())
 	{
 	  throw new parse_exception("There are only " + to_string(getNumOfTupleLists) +
@@ -494,29 +448,29 @@ void MinionInputReader::readConstraintTable(ifstream& infile, const ConstraintDe
   else
   {
 	vector<vector<int> > tuples ;
-	check_sym(infile,'{');
+	infile->check_sym('{');
 	while (delim != '}') 
 	{
-	  check_sym(infile,'<');
+	  infile->check_sym('<');
 	  vector<int> tuple(tupleSize);
-	  elem = read_num(infile) ;
+	  elem = infile->read_num() ;
 	  tuple[0] = elem ;
 	  for (count = 1; count < tupleSize; count++) 
 	  {
-		check_sym(infile, ',');
-		elem = read_num(infile) ;
+		infile->check_sym(',');
+		elem = infile->read_num() ;
 		tuple[count] = elem ;
 	  }
-	  check_sym(infile, '>');
+	  infile->check_sym('>');
 	  tuples.push_back(tuple) ;
-	  infile >> delim ;                                          // ',' or '}'
+	  delim = infile->get_char();                          // ',' or '}'
 	  if(delim != ',' && delim!= '}')
 		throw new parse_exception("Expected ',' or '}'");
 	  tuplelist = getNewTupleList(tuples);
 	}
   }
 	
-	check_sym(infile,')');
+	infile->check_sym(')');
 	ConstraintBlob tableCon(def, vectorOfVars);
 	tableCon.tuples = tuplelist;
 	instance.add_constraint(tableCon);
@@ -529,12 +483,10 @@ void MinionInputReader::readConstraintTable(ifstream& infile, const ConstraintDe
 // Returns an object of type Var.
 // NB peek() does not ignore whitespace, >> does. Hence use of putBack()
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Var MinionInputReader::readIdentifier(ifstream& infile) {
-  char idChar ;
-  infile >> idChar ;
+Var MinionInputReader::readIdentifier(InputFileReader* infile) {
+  char idChar = infile->peek_char();
   if ((('0' <= idChar) && ('9' >= idChar)) || idChar == '-') {
-    infile.putback(idChar) ;
-    int i = read_num(infile);
+    int i = infile->read_num();
 	return Var(VAR_CONSTANT, i);
   }
   int index = -1 ;
@@ -545,13 +497,19 @@ Var MinionInputReader::readIdentifier(ifstream& infile) {
 	s[7] = idChar;
     throw new parse_exception(s);
   }
+  
   if(idChar == 'x')
   {
-    index = read_num(infile);
+	// Eat the 'x'.
+	infile->check_sym('x');
+	index = infile->read_num();
     return instance.vars.get_var(idChar, index);
   }
-  check_sym(infile, 'x');
-  index = read_num(infile);
+  
+  // Must have found an 'n'.
+  infile->check_sym('n');
+  infile->check_sym('x');
+  index = infile->read_num();
   Var var = instance.vars.get_var(idChar, index);
   if(var.type != VAR_BOOL)
     throw new parse_exception("Can only 'not' a Boolean variable!");
@@ -562,26 +520,26 @@ Var MinionInputReader::readIdentifier(ifstream& infile) {
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readLiteralMatrix
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vector< vector<Var> > MinionInputReader::readLiteralMatrix(ifstream& infile) {
+vector< vector<Var> > MinionInputReader::readLiteralMatrix(InputFileReader* infile) {
 
-  check_sym(infile, '[');
+  infile->check_sym('[');
   
   // Delim here might end up being "x" or something similar. The reason
   // that we peek it is in case whis is an empty vector.
-  char delim = peek_char(infile);
+  char delim = infile->peek_char();
   vector< vector<Var> > newMatrix ;
 
   if(delim == ']')
   {
     // Eat the ']'
-    infile.get();
+    infile->get_char();
     parser_info("Read empty matrix");
   }
   else
   {
     while(delim != ']') {
       newMatrix.push_back(readLiteralVector(infile)) ;
-      infile >> delim ;                                        // , or ]
+      delim = infile->get_char();            // , or ]
     }
   }
   return newMatrix ;
@@ -592,26 +550,26 @@ vector< vector<Var> > MinionInputReader::readLiteralMatrix(ifstream& infile) {
 // of vars or consts. Checks 1st elem of vect (empty vects not expected)
 //  to see which.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vector<Var> MinionInputReader::readLiteralVector(ifstream& infile) {
+vector<Var> MinionInputReader::readLiteralVector(InputFileReader* infile) {
   vector<Var> newVector ;
-  check_sym(infile, '[');
+  infile->check_sym('[');
  
   // Delim here might end up being "x" or something similar. The reason
   // that we peek it is in case whis is an empty vector.
   
-  char delim = peek_char(infile);
+  char delim = infile->peek_char();
     	
   if(delim == ']')
   {
     // Eat the ']'
-    infile.get();
+    infile->get_char();
     parser_info("Read empty vector.");
   }
   else
   {
     while (delim != ']') {
 	  newVector.push_back(readIdentifier(infile)) ;
-	  infile >> delim ;
+	  delim = infile->get_char();
 	     if(delim != ',' && delim != ']')
 	     {
 		   // replace X with the character we got.
@@ -628,31 +586,31 @@ vector<Var> MinionInputReader::readLiteralVector(ifstream& infile) {
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readMatrices
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readMatrices(ifstream& infile) {
+void MinionInputReader::readMatrices(InputFileReader* infile) {
   char delim ;
   int count1 ;
   // Read Vectors%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  int noOfMatrixType = read_num(infile);
+  int noOfMatrixType = infile->read_num();
   if(parser_verbose)
     cout << "Number of 1d vectors: " << noOfMatrixType << endl ;
   for (count1 = 0; count1 < noOfMatrixType; count1++)
     Vectors.push_back(readLiteralVector(infile)) ;
   // Read 2dMatrices%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  noOfMatrixType = read_num(infile);
+  noOfMatrixType = infile->read_num();
   if(parser_verbose)
     cout << "Number of 2d matrices: " << noOfMatrixType << endl ;
   for (count1 = 0; count1 < noOfMatrixType; count1++)
     Matrices.push_back(readLiteralMatrix(infile)) ;
   // Read 3dMatrices%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  noOfMatrixType = read_num(infile);
+  noOfMatrixType = infile->read_num();
   if(parser_verbose)
     cout << "Number of 3d tensors: " << noOfMatrixType << endl ;
   for (count1 = 0; count1 < noOfMatrixType; count1++) {
     vector< vector< vector <Var> > > newTensor ;
-    infile >> delim ;                                               // [
+    delim = infile->get_char();                                           // [
     while (delim != ']') {
       newTensor.push_back(readLiteralMatrix(infile)) ;
-      infile >> delim ;                                        // , or ]
+      delim = infile->get_char();                                    // , or ]
     }
     Tensors.push_back(newTensor) ;
   }
@@ -661,18 +619,18 @@ void MinionInputReader::readMatrices(ifstream& infile) {
 //%%%%
 // readTuples
 // 'tuplelists' <val>  ( <num_tuples> <tuple_length> <vals> ...
-void MinionInputReader::readTuples(ifstream& infile) {
-  int tuple_count = read_num(infile);
+void MinionInputReader::readTuples(InputFileReader* infile) {
+  int tuple_count = infile->read_num();
   for(int counter = 0; counter < tuple_count; counter++)
   {
-    int num_of_tuples = read_num(infile);
-	int tuple_length = read_num(infile);
+    int num_of_tuples = infile->read_num();
+	int tuple_length = infile->read_num();
 	TupleList* tuplelist = getNewTupleList(num_of_tuples, tuple_length);
 	int* tuple_ptr = tuplelist->getPointer();
 	for(int i = 0; i < num_of_tuples; ++i)
 	  for(int j = 0; j < tuple_length; ++j)
 	  {
-	    tuple_ptr[i * tuple_length + j] = read_num(infile);
+	    tuple_ptr[i * tuple_length + j] = infile->read_num();
 	  }
   }
 }
@@ -681,10 +639,9 @@ void MinionInputReader::readTuples(ifstream& infile) {
 // readObjective
 // 'objective' 'none' | 'minimising' <var> | 'maximising' <var>
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readObjective(ifstream& infile) {
+void MinionInputReader::readObjective(InputFileReader* infile) {
   // Note that we will have read "objective" before entering this function.
-  string s;
-  infile >> s;
+  string s = infile->get_string();
   if(s == "none")
   {
     parser_info( "objective none" );
@@ -704,17 +661,15 @@ void MinionInputReader::readObjective(ifstream& infile) {
   instance.set_optimise(minimising, var);
 }
 
-void MinionInputReader::readPrint(ifstream& infile) {
-  string s;
-  infile >> s;
+void MinionInputReader::readPrint(InputFileReader* infile) {
+  string s = infile->get_string();
   if(s != "print")
     throw new parse_exception(string("Expected 'print', recieved '")+s+"'");
   
-  char letter;
-  infile >> letter;
+  char letter = infile->get_char();
   if(letter == 'n')
   {
-    infile >> s;
+    s = infile->get_string();
 	if(s != "one")
 	  throw new parse_exception(string("I don't understand '")+s+"'");
 	parser_info( "print none" );
@@ -722,7 +677,7 @@ void MinionInputReader::readPrint(ifstream& infile) {
   }
   else if(letter == 'm')
   {
-    int matrix_num = read_num(infile);
+    int matrix_num = infile->read_num();
 	instance.print_matrix = index(Matrices, matrix_num);
 	if(parser_verbose)
 	  cout << "print m" << matrix_num << endl;
@@ -730,7 +685,7 @@ void MinionInputReader::readPrint(ifstream& infile) {
   }
   else if(letter == 'v')
   {
-    int vec_num = read_num(infile);
+    int vec_num = infile->read_num();
 	instance.print_matrix = make_vec(index(Vectors, vec_num));
 	if(parser_verbose)
 	  cout << "print v" << vec_num << endl;
@@ -745,20 +700,20 @@ void MinionInputReader::readPrint(ifstream& infile) {
 // '[' <valOrderIdentifier> [, <valOrderIdentifier>]* ']'
 // <valOrderIdentifier> := 'a' | 'd' --- for ascending/descending
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readValOrder(ifstream& infile) {
+void MinionInputReader::readValOrder(InputFileReader* infile) {
   parser_info( "Reading val order" ) ;
   
-  check_sym(infile, '[');
+  infile->check_sym('[');
   
   // Delim here might end up being "x" or something similar. The reason
   // that we peek it is in case whis is an empty vector.
   
-  char delim = peek_char(infile);
+  char delim = infile->peek_char();
   
   if(delim == ']')
   {
     // Eat the ']'
-    infile.get();
+    infile->get_char();
     parser_info("No val order");
   }
   else
@@ -766,12 +721,11 @@ void MinionInputReader::readValOrder(ifstream& infile) {
     vector<char> valOrder ;
   
     while (delim != ']') {
-      char valOrderIdentifier;
-	  infile >> valOrderIdentifier ;
+      char valOrderIdentifier = infile->get_char();
 	  if(valOrderIdentifier != 'a' && valOrderIdentifier != 'd')
 	    throw new parse_exception("Expected 'a' or 'd'");
 	  valOrder.push_back(valOrderIdentifier == 'a');
-      infile >> delim ;                                          // , or ]
+      delim = infile->get_char();                                 // , or ]
     }
     instance.val_order = valOrder;
     ostringstream s;
@@ -784,7 +738,7 @@ void MinionInputReader::readValOrder(ifstream& infile) {
 // readVarOrder
 // '[' <var> [, <var>]* ']'
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readVarOrder(ifstream& infile) {
+void MinionInputReader::readVarOrder(InputFileReader* infile) {
   parser_info( "Reading var order" ) ;
   vector<Var> varOrder = readLiteralVector(infile);
 
@@ -796,13 +750,13 @@ void MinionInputReader::readVarOrder(ifstream& infile) {
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readVars(ifstream& infile) {
+void MinionInputReader::readVars(InputFileReader* infile) {
   int lb, ub, count ;
   int total_var_count = 0;
   char delim ;
   ProbSpec::VarContainer var_obj;
   // Read 01Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  int noOfVarType = read_num(infile);
+  int noOfVarType = infile->read_num();
   total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of 01 Vars: " << noOfVarType << endl ;
@@ -811,16 +765,16 @@ void MinionInputReader::readVars(ifstream& infile) {
   
   // **** Construct this many 01Vars
   // Read Bounds Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  noOfVarType = read_num(infile);
+  noOfVarType = infile->read_num();
   total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of Bounds Vars: " << noOfVarType << endl ;
   while (noOfVarType > 0) {
-    lb = read_num(infile);
-	ub = read_num(infile);
+    lb = infile->read_num();
+	ub = infile->read_num();
 	if(lb > ub)
 	  throw new parse_exception("Lower bound must be less than upper bound!");
-	count = read_num(infile);
+	count = infile->read_num();
 	if(parser_verbose)
       cout << count << " of " << lb << ", " << ub << endl ;
     var_obj.bound.push_back(make_pair(count, ProbSpec::Bounds(lb, ub)));
@@ -828,20 +782,20 @@ void MinionInputReader::readVars(ifstream& infile) {
   }
   
   // Read Sparse Bounds Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  noOfVarType = read_num(infile);
+  noOfVarType = infile->read_num();
   total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of Sparse Bounds Vars: " << noOfVarType << endl ;
   int domainElem ;
   while (noOfVarType > 0) {
     vector<int> domainElements ;
-    infile >> delim ;                                               // {
+    delim = infile->get_char();                                 // {
     while (delim != '}') {
-      domainElem = read_num(infile);
+      domainElem = infile->read_num();
       domainElements.push_back(domainElem) ;
-      infile >> delim ;                                        // , or }
+      delim = infile->get_char();                               // , or }
     }
-    count = read_num(infile);
+    count = infile->read_num();
 	if(parser_verbose)
       cout << count << " of these " << endl ;
     // **** Construct this many discrete vars.
@@ -850,14 +804,14 @@ void MinionInputReader::readVars(ifstream& infile) {
   }
   
   // Read Discrete Bounds Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  noOfVarType = read_num(infile);
+  noOfVarType = infile->read_num();
   total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of Discrete Vars: " << noOfVarType << endl ;
   while (noOfVarType > 0) {
-    lb = read_num(infile);
-	ub = read_num(infile);
-	count = read_num(infile);
+    lb = infile->read_num();
+	ub = infile->read_num();
+	count = infile->read_num();
 	if(parser_verbose)
       cout << count << " of " << lb << ", " << ub << endl ;
     var_obj.discrete.push_back(make_pair(count, ProbSpec::Bounds(lb, ub)));
@@ -865,19 +819,19 @@ void MinionInputReader::readVars(ifstream& infile) {
     noOfVarType -= count ;
   }
   // Read Discrete Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  noOfVarType = read_num(infile);
+  noOfVarType = infile->read_num();
   total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of Sparse Discrete Vars: " << noOfVarType << endl ;
   while (noOfVarType > 0) {
     vector<int> domainElements ;
-    infile >> delim ;                                               // {
+    delim = infile->get_char();                                 // {
     while (delim != '}') {
-      domainElem = read_num(infile);
+      domainElem = infile->read_num();
       domainElements.push_back(domainElem) ;
-      infile >> delim ;                                        // , or }
+      delim = infile->get_char();                             // , or }
     }
-    count = read_num(infile);
+    count = infile->read_num();
     if(parser_verbose)
       cout << count << " of these " << endl ;
     // **** Construct this many discrete vars.
@@ -896,69 +850,69 @@ void MinionInputReader::readVars(ifstream& infile) {
 // NB Expects caller knows whether vars or consts expected for lit vect.
 // NB peek does not ignore wspace, >> does. Hence use of putback
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vector<Var> MinionInputReader::readVectorExpression(ifstream& infile) {
-  char idChar, delim ;
+vector<Var> MinionInputReader::readVectorExpression(InputFileReader* infile) {
+  char  delim ;
   int row, col, plane ;
   int input_val;
-  infile >> idChar ;
+  char idChar = infile->get_char();
   switch (idChar) {
     case '[':
       parser_info( "Reading Literal Vector of vars or consts" ) ;
-      infile.putback(idChar) ;
+      infile->putback(idChar) ;
       return readLiteralVector(infile) ;      
     case 'v':                                        // vector identifier
       parser_info( "Reading vector identifier" ) ;
-      //infile.putback(idChar) ;
-	  input_val = read_num(infile);
+      //infile->putback(idChar) ;
+	  input_val = infile->read_num();
 	  return Vectors.at(input_val) ;
     case 'm':                                       // matrix identifier
       parser_info( "Reading matrix identifier (will flatten)" ) ;
-      //infile.putback(idChar) ;
-	  input_val = read_num(infile);
+      //infile->putback(idChar) ;
+	  input_val = infile->read_num();
 	  return flatten('m', input_val) ;
     case 't':                                        // matrix identifier
       parser_info( "Reading tensor identifier (will flatten)" ) ;
-      //infile.putback(idChar) ;
-	  input_val = read_num(infile);
+      //infile->putback(idChar) ;
+	  input_val = infile->read_num();
 	  return flatten('t', input_val) ;
     case 'r':                                       // row of a mx/tensor
-	  check_sym(infile,'o');
-	  check_sym(infile,'w');
-      infile >> idChar ;            // o w [( x or z]
+	  infile->check_sym('o');
+	  infile->check_sym('w');
+      idChar = infile->get_char();            // o w [( x or z]
       switch(idChar) {
 		case '(':                                        // row of a matrix
 		{parser_info( "Reading row of a matrix" ) ;
-		  check_sym(infile,'m');
-		  input_val = read_num(infile);
+		  infile->check_sym('m');
+		  input_val = infile->read_num();
 		  vector< vector<Var> > matrix = Matrices.at(input_val) ;
-		  infile >> delim;
-		  row = read_num(infile);
-		  infile >> delim ;
+		  delim = infile->get_char();
+		  row = infile->read_num();
+		  delim = infile->get_char();
 		  return matrix.at(row) ;}
 		case 'x':                             // row of a plane of a tensor
 		{parser_info( "Reading row of a plane of a tensor" ) ;
-		  check_sym(infile,'(');
-		  check_sym(infile,'t');
-		  input_val = read_num(infile);
+		  infile->check_sym('(');
+		  infile->check_sym('t');
+		  input_val = infile->read_num();
 		  vector< vector< vector<Var> > >& tensor = Tensors.at(input_val) ;
-		  check_sym(infile, ',');
-		  input_val = read_num(infile);
+		  infile->check_sym(',');
+		  input_val = infile->read_num();
 		  vector< vector <Var> >& tensorPlane = tensor.at(input_val) ;
-		  check_sym(infile, ',');
-		  input_val = read_num(infile);
-		  check_sym(infile, ')');
+		  infile->check_sym(',');
+		  input_val = infile->read_num();
+		  infile->check_sym(')');
 		  return tensorPlane.at(input_val);
 		}
 		case 'z':                         // Row through planes of a tensor
 		{parser_info( "Reading row through planes of a tensor" ) ;
-		  check_sym(infile, '(');
-		  input_val = read_num(infile);
+		  infile->check_sym('(');
+		  input_val = infile->read_num();
 		  vector< vector< vector<Var> > >& tensor = Tensors.at(input_val) ;
-		  check_sym(infile, ',');
-		  row = read_num(infile);
-		  check_sym(infile, ',');
-		  col = read_num(infile);
-		  check_sym(infile, ')');
+		  infile->check_sym(',');
+		  row = infile->read_num();
+		  infile->check_sym(',');
+		  col = infile->read_num();
+		  infile->check_sym(')');
 		  return getRowThroughTensor(tensor, row, col) ;}
 		default:
 		  throw new parse_exception("Malformed Row Expression");
@@ -967,29 +921,29 @@ vector<Var> MinionInputReader::readVectorExpression(ifstream& infile) {
 		break ;
       //col(mi, c), col(ti, p, c)
     case 'c':                                        // col of a mx/tensor
-	  check_sym(infile, 'o');
-	  check_sym(infile, 'l');
-	  check_sym(infile, '(');
-      if(peek_char(infile) == 'm') {
+	  infile->check_sym('o');
+	  infile->check_sym('l');
+	  infile->check_sym('(');
+      if(infile->peek_char() == 'm') {
 		parser_info( "Reading col of matrix" ) ;
-		check_sym(infile, 'm');
-		input_val = read_num(infile);
+		infile->check_sym('m');
+		input_val = infile->read_num();
 		vector< vector<Var> >& matrix = Matrices.at(input_val) ;
-		check_sym(infile, ',');
-		col = read_num(infile);
-		check_sym(infile, ')');
+		infile->check_sym(',');
+		col = infile->read_num();
+		infile->check_sym(')');
 		return getColOfMatrix(matrix, col) ;
       }
 		else {
 		  parser_info( "Reading col of tensor" ) ;
-		  check_sym(infile, 't');
-		  input_val = read_num(infile);
+		  infile->check_sym('t');
+		  input_val = infile->read_num();
 		  vector< vector< vector<Var> > >& tensor = Tensors.at(input_val);
-		  check_sym(infile, ',');
-		  plane = read_num(infile);
-		  check_sym(infile, ',');
-		  col = read_num(infile);
-		  check_sym(infile, ')');
+		  infile->check_sym(',');
+		  plane = infile->read_num();
+		  infile->check_sym(',');
+		  col = infile->read_num();
+		  infile->check_sym(')');
 		  return getColOfMatrix(tensor.at(plane), col) ;
 		}
       default:
