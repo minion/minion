@@ -118,6 +118,18 @@ When run with no arguments, a brief help message is displayed.
 \item\ [-dumptree]. Output the search tree. If you want details on how to use this, or if you want more information, please ask.
 \item\ [-test].  A test option for checking and regression testing.   Example test instances which this can be run on are in the directory {\tt test\_instances}.   
 \item\ [-fullprop]. Disable incremental propagation. This should always slow down search while producing exactly the same search tree.
+\item\  [-varorder = ORDER]. Enables variable order ORDER. Please note that this flag is still in an experimental state, so 
+        { \sc Minion}'s default variable ordering might be faster. ORDER can be any of the following : 
+      \begin{itemize}
+	\item\ [sdf].  Smallest domain first, then break ties with lex 
+	\item\ [sdf-random]. Smallest domain first, break ties randomly
+        \item\ [ldf]. Largest domain first
+        \item\ [ldf-random]. Largest domain first, break ties randomly
+	\item\ [random]. Random variable ordering
+	\item\ [static]. Normal ordering without caching 
+      \end{itemize}
+\item\ [-sac-root]. Perform SGAC at the first node. 
+\item\ [-ssac-root]. Perform SSGAC at the first node. 
 \item\ filename.
 \end{itemize}
 
@@ -389,20 +401,15 @@ equal to a another vector (\texttt{vector2}), using watched literals:\\
 % how do variables get to their names?
 % variableName can be substutued by constants
 
-This is the grammar of the input format of Minion. Expressions written
-in \textit{italic} font are non-terminals and those written in 
-\texttt{typesetter} are terminals. Any expression written in neither
-of these fonts correspond to integer values whose purpose are
-described by the expressions. Here are some important notes concerning
-modelling in the input format.
+
+Here are some important notes concerning modelling in the input format.
 
 \begin{description}
 
-  \item[Variable names]  every variable's name starts with a specific letter 
-  (\texttt{x} for variables, \texttt{v} for 1-dimensional matrices
-  (vectors) and \texttt{m} for 2-dimensional matrices, \texttt{t} for
-  tuples), followed by
-   the order in which it was defined  (staring with \texttt{0}). 
+  \item[Variable names]  variable names start with a specific letter 
+  (\texttt{x} for simple variables, \texttt{v} for 1-dimensional matrices
+  (vectors), \texttt{m} for 2-dimensional matrices and \texttt{t} for
+  tuples), followed by the order in which they were defined  (staring with \texttt{0}). 
   For example, if there are 4 boolean variables, 5 bounds variables,
   and 3 1-dimensional matrices(vectors) declared, 
   the first boolean variable has the name \texttt{x0} and the second
@@ -425,6 +432,14 @@ modelling in the input format.
 
 
 \subsection{Notation}
+
+This is the grammar of the input format of Minion. Expressions written
+in \textit{italic} font are non-terminals and those written in 
+\texttt{typesetter} are terminals. Any expression written in neither
+of these fonts correspond to integer values whose purpose are
+described by the expressions. The non-terminal \textit{Variable} stands for a 
+variable name as described above.
+
  
 \begin{center}
 \begin{itemize}
@@ -471,10 +486,10 @@ modelling in the input format.
 
  \textit{Bounds}& ::= & lowerBound upperBound amountOfVariables\\ 
 
- \textit{SparseBounds}& ::= & \{ \textit{domainElements} \} amountOfVariables \\
+ \textit{SparseBounds}& ::= & \{ \textit{DomainElements} \} amountOfVariables \\
 
 \textit{DomainElements}& ::= & value $\mid$ \\
-                       &   & \textit{DomainElements} value \\
+                       &   & \textit{DomainElements} , value \\
 
 \textit{VariableOrder} & ::= & [ \textit{VariableList} ] $\mid$ [ ]\\
 
@@ -503,8 +518,8 @@ modelling in the input format.
                             &     & \texttt{maximising} \textit{Variable} \\
 
 \textit{PrintExpression} & ::= & \texttt{none} $\mid$ \\
-                         &     & \textit{Defined1DimensionalMatrix} $\mid$ \\
-                         &     & \textit{Defined2DimensionalMatrix}  \\
+                         &     & \textit{Defined1DimensionalMatrixName} $\mid$ \\
+                         &     & \textit{Defined2DimensionalMatrixName}  \\
 
 \textit{ConstantList}  & ::= & constant $\mid$\\
                        &     & \textit{ConstantList} \texttt{,} constant \\     
@@ -512,11 +527,11 @@ modelling in the input format.
 \textit{VariableList}& ::= & \textit{Variable} $\mid$ \\   
                        &   & \textit{VariableList} \texttt{,} \textit{Variable} \\
 
-\textit{1DimensionalMatrix} & ::= & [ \textit{ConstantList} ] \\
+\textit{1DimensionalMatrix} & ::= & [ \textit{ConstantList} ] $\mid$ [ ] \\
 
-\textit{2DimensionalMatrix} & ::= & [ \textit{1DimensionalMatrix}+ ]\\
+\textit{2DimensionalMatrix} & ::= & [ \textit{1DimensionalMatrix}+ ] $\mid$ [ ]\\
 
-\textit{3DimensionalMatrix} & ::= & [ \textit{2DimensionalMatrix}+ ]\\
+\textit{3DimensionalMatrix} & ::= & [ \textit{2DimensionalMatrix}+ ] $\mid$ [ ] \\
 
 \end{tabular}
 
