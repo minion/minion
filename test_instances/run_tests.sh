@@ -12,6 +12,10 @@ then
   exit 0
 fi
 
+exec=$1
+#Remove exec from $*, so it only contains parameters
+shift
+echo Testing $exec with options .$*.
 stripsols= 
 j=0
 reify=0
@@ -40,7 +44,7 @@ for i in *.minion; do
   
   if grep -q "#TEST SOLCOUNT" $i;
   then
-    numsols=`$1 -findallsols $2 $i 2>/dev/null | ../mini-scripts/solutions.sh`
+    numsols=`$exec -findallsols $* $i 2>/dev/null | ../mini-scripts/solutions.sh`
     testnumsols=`grep "#TEST SOLCOUNT" $i  | awk '{print $3}' | tr -d '\015' `
 	if [[ "$numsols" != "$testnumsols" ]]; then
 	  testpass=0
@@ -50,7 +54,7 @@ for i in *.minion; do
 	fi
   else
     if grep -q "#TEST CHECKONESOL" $i; then
-      sol=`$1 $2 $i 2>/dev/null | ../mini-scripts/print_sol.sh`
+      sol=`$exec $* $i 2>/dev/null | ../mini-scripts/print_sol.sh`
       # That "tr" is just to deal with line ending problems.
       testsol=`grep "#TEST CHECKONESOL" $i | awk '{$1 = ""; $2 = ""; print }' | tr -d '\015' `
       
@@ -107,7 +111,7 @@ for i in `grep -l "#TEST SOLCOUNT" *.minion`; do
   else
     while [ $LOOP -lt 10 ]; do
       j=$(($j + 1));
-      if $1 $2 -randomiseorder $i &> /dev/null
+      if $exec $* -randomiseorder $i &> /dev/null
       then
         pass=$(($pass + 1));
       else
