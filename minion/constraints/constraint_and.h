@@ -28,7 +28,14 @@ struct AndConstraint : public Constraint
   VarRef3 var3;
   AndConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
     var1(_var1), var2(_var2), var3(_var3)
-  {}
+  {
+	D_ASSERT(var1.getInitialMin() == 0);
+    D_ASSERT(var1.getInitialMax() == 1);
+	D_ASSERT(var2.getInitialMin() == 0);
+	D_ASSERT(var2.getInitialMax() == 1);
+	D_ASSERT(var3.getInitialMin() == 0);
+	D_ASSERT(var3.getInitialMax() == 1);
+  }
   
   virtual triggerCollection setup_internal()
   {
@@ -134,7 +141,5 @@ struct AndConstraint : public Constraint
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 Constraint*
 AndCon(VarRef1 var1, VarRef2 var2, VarRef3 var3)
-{ 
-  return (new AndConstraint<VarRef1,VarRef2,VarRef3>(var1,var2,var3)); 
-}
+{ return (new AndConstraint<VarRef1,VarRef2,VarRef3>(var1,var2,var3)); }
 
