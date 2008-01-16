@@ -40,7 +40,7 @@ Karen E. Petrie and\\
 Andrea M. Rendl}
 \vfill
 %{\Large {\sc Minion} Version 0.3.3}\\
-{\Large {\sc Minion} Version 0.3.4}\\
+{\Large {\sc Minion} Version 0.4}\\
 ~\\
 {\Large {\sc Minion} Input Language 1}
 %{\Large Manual Version 0.2}
@@ -122,7 +122,7 @@ When run with no arguments, a brief help message is displayed.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Modelling in {\sc Minion}}\label{sect_matrix}
+\section{Matrix Models in {\sc Minion}}\label{sect_matrix}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 {\sc Minion} is a general-purpose solver for CSP/COP {\em instances},
@@ -377,13 +377,219 @@ equal to a another vector (\texttt{vector2}), using watched literals:\\
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\clearpage
+\clearpage
 \section{Input format}\label{sect_input}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %A formal outline of the input format for Input Format Version 1 is shown below.
 
+
+% the order of constraints does not matter
+% what are variablevectors, names and tuples?
+% how do variables get to their names?
+% variableName can be substutued by constants
+
+This is the grammar of the input format of Minion. Expressions written
+in \textit{italic} font are non-terminals and those written in 
+\texttt{typesetter} are terminals. Any expression written in neither
+of these fonts correspond to integer values whose purpose are
+described by the expressions. Here are some important notes concerning
+modelling in the input format.
+
+\begin{description}
+
+  \item[Variable names]  every variable's name starts with a specific letter 
+  (\texttt{x} for variables, \texttt{v} for 1-dimensional matrices
+  (vectors) and \texttt{m} for 2-dimensional matrices, \texttt{t} for
+  tuples), followed by
+   the order in which it was defined  (staring with \texttt{0}). 
+  For example, if there are 4 boolean variables, 5 bounds variables,
+  and 3 1-dimensional matrices(vectors) declared, 
+  the first boolean variable has the name \texttt{x0} and the second
+  bounds variable has the name \texttt{x5} and the third vector the
+  name \texttt{v2}.  
+  \item[Constraint order] the order in which constraints are stated does not matter
+  \item[Printing variables] the expression to be printed in the \texttt{print} statement
+  has to be a defined 1- or 2-dimensional matrix.    
+  \item[Constants] a variable can always be substitued by a constant (in constraints)
+  \item[Variable orders] when applying a variable order, the variables defined in the
+  \textit{variableOrder} will be put under the order  that was imposed in the
+  textit{valueOrder} (\texttt{a} for acending
+  and \texttt{d} for descending). Empty lists \texttt{[] []} correspond to no ordering.
+  \item[Comments] comments are only allowed in the header
+  \item[Tuplelists] defined tuplelists can be referenced by their name which is
+  composed by \texttt{t} followed by the order (beginning from 0) in which they were
+  defined. For example \texttt{t2} stands for the third tuple.  
+\end{description}
+
+
+
+\subsection{Notation}
+ 
+\begin{center}
+\begin{itemize}
+  \item $a *$ stands for zero or more occurences of $a$
+  \item $a +$ stands for one or more occurences of $a$
+  \item $a \mid b$ stands for $a$ or $b$
+
+\end{itemize}
+\end{center}
+
 \noindent
+
+\subsection{Model}
+\begin{tabular}{rcl}
+\textit{MinionInput}& ::= & \textit{MinionHeader} \\
+                    &     & \textit{VariableDeclarations} \\
+                    &     & \textit{VariableOrder} \\
+                    &     & \textit{ValueOrder} \\
+                    &     & \textit{MatrixDeclarations} \\
+                    &     & \textit{TupleLists} \\
+                    &     & \texttt{objective} \textit{ObjectiveExpression} \\ 
+		    &     & \texttt{print} \textit{PrintExpression} \\
+                    &     & \textit{Constraints} \\
+
+
+\end{tabular}
+
+
+\subsection{Declarations}
+\begin{tabular}{rcl}
+\textit{MinionHeader} & ::= & \texttt{MINION} inputVersionNumber\\
+                     &     &  \# \textit{comments}  \\
+
+\textit{VariableDeclarations}& ::=  
+                    &  amountOf01Variables  \\
+               &     &  amountOfBoundsVariables \\
+               &     &  \textit{Bounds}*  \\
+               &     &  amountOfSparseBoundsVariables \\
+               &     &  \textit{SparseBounds}* \\
+               &     &  amountOfDiscreteVariables \\
+               &     & \textit{Bounds}* \\
+               &     & amountOfSparseDiscreteVariables \\
+               &     & \textit{SparseBounds}* \\
+
+ \textit{Bounds}& ::= & lowerBound upperBound amountOfVariables\\ 
+
+ \textit{SparseBounds}& ::= & \{ \textit{domainElements} \} amountOfVariables \\
+
+\textit{DomainElements}& ::= & value $\mid$ \\
+                       &   & \textit{DomainElements} value \\
+
+\textit{VariableOrder} & ::= & [ \textit{VariableList} ] $\mid$ [ ]\\
+
+\textit{ValueOrder} & ::= & [ \textit{OrderList} ]  $\mid$ [ ]\\
+
+\textit{OrderList} & ::= & \textit{Order} $\mid$ \\
+                   &      & \textit{OrderList} \texttt{,} \textit{Order} \\
+
+\textit{Order} &  ::= & \texttt{a}  $\mid$ \texttt{d} \\
+
+\textit{MatrixDeclarations} & ::= & amountOf1DimensionalMatrices \\
+                           &     & \textit{1DimensionalMatrix}+ \\
+                           &     & amountOf2DimensionalMatrices \\
+                           &     & \textit{2DimensionalMatrix}+ \\
+                           &     & amountOf3DimensionalMatrices \\
+                           &     & \textit{3DimensionalMatrix}+ \\
+
+\textit{TupleListsDefintion}& ::= & \texttt{tuplelists} amountOfTupleLists \\
+                            &     & \textit{TupleDefinitions}+ $\mid$ $\epsilon$\\
+
+\textit{TupleDefinitions} & ::= & amountOfTuples tupleLength  \\
+                          &     & tupleValues+  \\
+
+\textit{ObjectiveExpression}& ::= & \texttt{none} $\mid$ \\
+                            &     & \texttt{minimising} \textit{Variable} $\mid$ \\
+                            &     & \texttt{maximising} \textit{Variable} \\
+
+\textit{PrintExpression} & ::= & \texttt{none} $\mid$ \\
+                         &     & \textit{Defined1DimensionalMatrix} $\mid$ \\
+                         &     & \textit{Defined2DimensionalMatrix}  \\
+
+\textit{ConstantList}  & ::= & constant $\mid$\\
+                       &     & \textit{ConstantList} \texttt{,} constant \\     
+
+\textit{VariableList}& ::= & \textit{Variable} $\mid$ \\   
+                       &   & \textit{VariableList} \texttt{,} \textit{Variable} \\
+
+\textit{1DimensionalMatrix} & ::= & [ \textit{ConstantList} ] \\
+
+\textit{2DimensionalMatrix} & ::= & [ \textit{1DimensionalMatrix}+ ]\\
+
+\textit{3DimensionalMatrix} & ::= & [ \textit{2DimensionalMatrix}+ ]\\
+
+\end{tabular}
+
+
+\subsection{Constraints}
+\begin{tabular}{rcl}
+
+
+\textit{Constraints}  & ::= & \textit{ReifiableConstraint} $\mid$ \\
+                      &     & \texttt{reify(} \textit{ReifiableConstraint} \texttt{,} \textit{Variable} \texttt{)} $\mid$ \\
+                      &     & \texttt{reifyImplies(} \textit{ReifiableConstraint}  \texttt{,} \textit{Variable} \texttt{)} $\mid$\\
+                      &     & \texttt{table(} \textit{VariableVector} \texttt{,} \textit{tuples} \texttt{)} $\mid$ \\        
+                      &     & \texttt{watchsumleq(} \textit{VariableVector} \texttt{,} \textit{VariableVector} \texttt{)}  $\mid$\\
+                      &     & \texttt{watchsumgeq(} \textit{VariableVector} \texttt{,} \textit{VariableVector} \texttt{)}  $\mid$\\
+                      &     & \texttt{watchvecneq(} \textit{VariableVector} \texttt{,} \textit{VariableVector} \texttt{)} $\mid$ \\
+                      &     & \texttt{watchelement(} \textit{VariableVector} \texttt{,} \textit{Variable} \texttt{,} \textit{Variable} \texttt{)} $\mid$ \\
+                      &     & \texttt{minusequal(} \textit{Variable} \texttt{,} \textit{Variable} \texttt{)}  $\mid$\\
+                      &     & \texttt{litsumequal(} \textit{VariableVector} \texttt{,} [ \textit{ConstantList} ] \texttt{)} $\mid$ \\
+                      &     & \texttt{pow(} \textit{Variable} \texttt{,} \textit{Variable} \texttt{,} \textit{Variable}\texttt{)} $\mid$ \\
+
+
+\textit{ReifiableConstraints} & ::= &  \texttt{allDiff(} \textit{VariableVector} \texttt{)} $\mid$ \\
+                &     & \texttt{eq(} \textit{Variable} \texttt{,} \textit{Variable} \texttt{)} $\mid$ \\
+                &     & \texttt{diseq(} \textit{Variable} \texttt{,} \textit{Variable} \texttt{)} $\mid$ \\
+                &     & \texttt{ineq(} \textit{Variable} \texttt{,} \textit{Variable} \texttt{,} constant \texttt{)} $\mid$ \\
+                &     & \texttt{element(} \textit{VariableVector} \texttt{,} \textit{Variable} \texttt{,} \textit{Variable}\texttt{)} $\mid$ \\
+                &     & \texttt{gacelement(} \textit{VariableVector} \texttt{,} \textit{Variable} \texttt{,} \textit{Variable}\texttt{)} $\mid$ \\
+                &     & \texttt{min(} \textit{VariableVector} \texttt{,} \textit{Variable} \texttt{)} $\mid$ \\
+                &     & \texttt{max(} \textit{VariableVector} \texttt{,} \textit{Variable} \texttt{)} $\mid$ \\
+                &     & \texttt{lexleq(} \textit{VariableVector} \texttt{,} \textit{VariableVector} \texttt{)} $\mid$ \\
+                &     & \texttt{lexless(} \textit{VariableVector} \texttt{,} \textit{VariableVector} \texttt{)} $\mid$ \\
+                &     & \texttt{occurence(} \textit{VariableVector} \texttt{,} constant \texttt{,} constant\texttt{)} $\mid$ \\
+                &     & \texttt{product(} \textit{VariableVector} \texttt{,} \textit{Variable} \texttt{)} $\mid$ \\
+                &     & \texttt{product(} \textit{VariableVector} \texttt{,} [ \textit{ConstantList} ] \texttt{,} \textit{Variable}\texttt{)} $\mid$ \\
+                &     & \texttt{sum(} \textit{VariableVector} \texttt{,} \textit{Variable} \texttt{)}  $\mid$\\
+                &     & \texttt{weightedsumleq(} \textit{VariableVector} \texttt{,} [ \textit{ConstantList} ] \texttt{,} \textit{Variable}\texttt{)} $\mid$ \\
+                &     & \texttt{weightedsumgeq(} \textit{VariableVector} \texttt{,} [ \textit{ConstantList} ] \texttt{,} \textit{Variable}\texttt{)} \\
+
+
+
+\textit{VariableVector}  & ::= & [ \textit{ConstantList} ] $\mid$\\
+                         &     & [ \textit{VariableList}  ] $\mid$ \\
+                         &     & \textit{1DimensionalMatrix} $\mid$\\
+                         &     & \textit{2DimensionalMatrix} $\mid$\\
+                         &     & \textit{3DimensionalMatrix} $\mid$\\
+                         &     & \texttt{row(}\textit{2DimensionalMatrix} \texttt{,} index \texttt{)} $\mid$\\
+                         &     & \texttt{col(}\textit{2DimensionalMatrix} \texttt{,} index \texttt{)} $\mid$\\
+                         &     & \texttt{rowX(}\textit{3DimensionalMatrix} \texttt{,} index \texttt{,} index \texttt{)} $\mid$\\
+                         &     & \texttt{rowY(}\textit{3DimensionalMatrix} \texttt{,} index \texttt{,} index \texttt{)} $\mid$\\
+                         &     & \texttt{colX(}\textit{3DimensionalMatrix} \texttt{,} index \texttt{,} index \texttt{)} $\mid$\\
+                         &     & \texttt{colY(}\textit{3DimensionalMatrix} \texttt{,} index \texttt{,} index \texttt{)} \\
+
+
+
+
+\end{tabular}
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Comment{
+
+
 \setlength{\tabcolsep}{0mm}
 \begin{tabular}{ll}
 \multicolumn{2}{l}{$<$MinionInput$>$ ::=} \\
@@ -484,7 +690,13 @@ equal to a another vector (\texttt{vector2}), using watched literals:\\
               & $<$3dMatrixId$>$ $|$ $<$rowOrCol$>$($<$2dMatrixId$>$, $<$index$>$) $|$\\
               & $<$colOrRowXOrRowY$>$($<$3dMatrixId$>$, $<$index$>$, $<$index$>$)
 \end{tabular}
+}  % end of comment out region
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+
+\clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Important Notes and Changes}\label{sect_notes}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -497,8 +709,37 @@ The following changes have been made since the last version:
   \item \textbf{power constraint}: the \texttt{pow} constraint has been added.
   \item \textbf{table constraint}: there is a new implementation of the \texttt{table}
    constraint where new data structures are used. Details can be found 
-   in the CPPOD-technical report\footnote{http://www.dcs.st-and.ac.uk/~cppod/publications/reports/cppod-19-2006.pdf}.
- \item bug fixes
+   in the CPPOD-technical
+   report\footnote{http://www.dcs.st-and.ac.uk/~cppod/publications/reports/cppod-19-2006.pdf}.
+ \item \textbf{flags for variable ordering and preprocessing}
+   Some flags have been added for preprocessing and variable
+   ordering. Please note, that these flags are still in an
+   experimental stage and are not optimised yet, so the default settings
+   might solve your problems faster.
+   \begin{itemize}
+      \item \texttt{-varorder = <order>}\\
+	{ \sc Minion}'s normal variable ordering uses information from  
+        previous search nodes to avoid rechecking the same variable at later  
+        search nodes. The variable orderings generated by \texttt{varorder} do not  
+        do this, so are likely to be much slower for large numbers of  
+        variables. This effect can be measured using the \texttt{static} varorder,  
+        which is the same as the normal ordering except not using state from  
+        previous nodes. \texttt{<order>} can be:\\
+      \begin{tabular}{ll}
+	& \\
+	\texttt{sdf} & smallest domain first, then break ties with lex \\
+	\texttt{sdf-random} & smallest domain first, break ties randomly\\
+        \texttt{ldf} & Largest domain first\\
+        \texttt{ldf-random} & largest domain first, break ties randomly\\
+	\texttt{random} & random variable ordering\\
+	\texttt{static} & normal ordering without caching \\
+        & \\
+      \end{tabular}
+      \item \texttt{-sac-root}\\
+	Perform SGAC at the first node. 
+      \item \texttt{-ssac-root}\\
+	Perform SSGAC at the first node. 
+   \end{itemize}
 \end{enumerate}
 
 
@@ -541,10 +782,11 @@ is not guaranteed.
 
 \begin{verbatim}
 MINION 1
-#Comments appear in consecutive lines after the first, starting with # character
-#Each comment line starts with a #
-#You can have as many as you like (including 0)
-#But as soon as a line does not start with #, no more comments may appear in the input
+# Comments appear in consecutive lines after the first, starting 
+# with # character. Each comment line starts with a #
+# You can have as many as you like (including 0)
+# But as soon as a line does not start with #, no more comments 
+# may appear in the input
 196
 \end{verbatim}
 \emph{there are 196 Boolean variables}
@@ -564,6 +806,8 @@ MINION 1
 0
 \end{verbatim}
 \emph{there are 0 discrete sparse variables}
+
+\emph{these are the variables to be searched upon...}
 \begin{verbatim}
 [x0,x1,x2,x3,x4,x5,x6,
 x7,x8,x9,x10,x11,x12,x13,
@@ -574,7 +818,7 @@ x35,x36,x37,x38,x39,x40,x41,
 x42,x43,x44,x45,x46,x47,x48
 ]
 \end{verbatim}
-\emph{these are the variables to be searched upon, in the order in which the should be searched}
+\emph{...in the order in which the should be searched}
 \begin{verbatim}
 [a,a,a,a,a,a,a,
 a,a,a,a,a,a,a,
@@ -585,11 +829,12 @@ a,a,a,a,a,a,a,
 a,a,a,a,a,a,a
 ]
 \end{verbatim}
-\emph{this means that the value ordering to be applied to each search variable is ascending. The options are a, ascending and d, descending}
+
+\emph{there are twenty-one 1-Dimensional matrices}
 \begin{verbatim}
 21
 \end{verbatim}
-\emph{there are 21 1-Dimensional matrices}
+\emph{this is the specification of which variables are in each matrix}
 \begin{verbatim}
 [x49, x50, x51, x52, x53, x54, x55]
 [x56, x57, x58, x59, x60, x61, x62]
@@ -613,11 +858,11 @@ a,a,a,a,a,a,a
 [x182, x183, x184, x185, x186, x187, x188]
 [x189, x190, x191, x192, x193, x194, x195]
 \end{verbatim}
-\emph{this is the specification of which variables are in each matrix}
+\emph{there is one 2-dimensional matrix}
 \begin{verbatim}
 1
 \end{verbatim}
-\emph{there is 1 2-dimensional matrix}
+\emph{the structure of the 2-dimensional matrix, and the veariables involved}
 \begin{verbatim}
 [[x0, x1, x2, x3, x4, x5, x6],
 [x7, x8, x9, x10, x11, x12, x13],
@@ -627,21 +872,21 @@ a,a,a,a,a,a,a
 [x35, x36, x37, x38, x39, x40, x41],
 [x42, x43, x44, x45, x46, x47, x48]]
 \end{verbatim}
-\emph{the structure of the 2-dimensional matrix, and the veariables involved}
+\emph{there are 0 3-dimensional matrices}
 \begin{verbatim}
 0
 \end{verbatim}
-\emph{there are 0 3-dimensional matrices}
-\begin{verbatim}
-objective none
-\end{verbatim}
 \emph{there is no objective function}
 \begin{verbatim}
-print m0
+objective none
 \end{verbatim}
 \emph{display the BIBD when a solution is found. NB Generally, an arbitrary
 `display' matrix can be defined to display the output in the manner of the
 user's choice.}
+\begin{verbatim}
+print m0
+\end{verbatim}
+\emph{these are all the problem constraints}
 \begin{verbatim}
 sumleq(row(m0, 0), 3)
 sumgeq(row(m0, 0), 3)
@@ -861,7 +1106,7 @@ product(x41, x48, x195)
 sumleq(v20, 1)
 sumgeq(v20, 1)
 \end{verbatim}
-\emph{these are all the problem constraints}
+\emph{these are symmetry breaking constraints - double lex}
 \begin{verbatim}
 lexleq(row(m0, 0), row(m0, 1))
 lexleq(row(m0, 1), row(m0, 2))
@@ -876,7 +1121,7 @@ lexleq(col(m0, 3), col(m0, 4))
 lexleq(col(m0, 4), col(m0, 5))
 lexleq(col(m0, 5), col(m0, 6))
 \end{verbatim}
-\emph{these are symmetry breaking constraints - double lex}
+
 \end{small}
 
 
