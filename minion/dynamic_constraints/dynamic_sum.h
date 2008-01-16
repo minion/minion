@@ -397,7 +397,7 @@ BuildCT_WATCHED_GEQSUM(const vector<BoolVarRef>& t1, BOOL reify, const BoolVarRe
 	if(sum == 1)
 	{
 	  if(t1.size() == 2)
-		return BoolSATBinaryConDynamic(t1);
+		return BoolBinarySATConDynamic(t1);
 	  else
 	    return BoolSATConDynamic(t1);
 	}

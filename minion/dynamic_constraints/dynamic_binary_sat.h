@@ -102,5 +102,5 @@ struct BoolBinarySATConstraintDynamic : public DynamicConstraint
 
 template<typename VarArray>
 DynamicConstraint*
-BoolSATBinaryConDynamic(const VarArray& _var_array)
-{ return new BoolSATConstraintDynamic<VarArray>(_var_array); }
+BoolBinarySATConDynamic(const VarArray& _var_array)
+{ return new BoolBinarySATConstraintDynamic<VarArray>(_var_array); }

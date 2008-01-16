@@ -37,6 +37,8 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
   
   VarArray var_array;
 
+  int last;
+  
   BoolSATConstraintDynamic(const VarArray& _var_array) :
 	var_array(_var_array)
   { 
@@ -47,6 +49,8 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
   
   int dynamic_trigger_count()
   {
+	last = 0;
+	
 	D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BOOLSATConstraintDynamic");
 	return 2;
   }
@@ -107,18 +111,18 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 	else
 	  other_propval = base_dt->trigger_info();
 	
-	if(var_array[other_propval].isAssignedValue(1))
-	  return;
+	//if(var_array[other_propval].isAssignedValue(1))
+	//  return;
 	
     D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
 
 	bool found_new_support = false;
 
-	int loop = 0;
+	int loop = last;
 	
-	while(loop < other_propval && !found_new_support)
+	while(loop < var_size && !found_new_support)
 	{
-	  if(var_array[loop].inDomain(1))
+	  if(var_array[loop].inDomain(1) && loop != other_propval)
 	    found_new_support = true;
 	  else
 		++loop;
@@ -127,11 +131,11 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 	
 	if(!found_new_support)
 	{
-	  loop = other_propval + 1;
+	  loop = 0;
 	  
-	  while(loop < var_size && !found_new_support)
+	  while(loop < last && !found_new_support)
 	  {
-		if(var_array[loop].inDomain(1))
+		if(var_array[loop].inDomain(1) && loop != other_propval)
 		  found_new_support = true;
 		else
 		  ++loop;
@@ -146,6 +150,7 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 	
 	// Found new value to watch
 	dt->trigger_info() = loop;
+	last = loop;
 	var_array[loop].addDynamicTrigger(dt, UpperBound);
   }
   
