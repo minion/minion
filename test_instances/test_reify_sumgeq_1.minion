@@ -1,0 +1,24 @@
+MINION 1
+#TEST SOLCOUNT 1  
+6
+0
+0
+0
+0
+[x1,x0,x4,x2,x5,x3]
+[a,a,d,a,d,a]
+
+1
+[x0,x1,x2,x3,x4,x5]
+0
+0
+objective none
+print v0
+
+reify(sumgeq([x5, x2],    1), x0)
+reify(sumgeq([x4, x3, x2],1), x5)
+reify(sumgeq([x5, x4],1), x1)
+sumgeq([x0, x3], 1)
+
+sumleq([x5,x2],1)
+sumleq([x5,x4],1)
