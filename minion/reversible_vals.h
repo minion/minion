@@ -32,7 +32,15 @@ public:
     D_ASSERT((size_t)(backtrack_ptr.get_ptr()) % sizeof(int) == 0);
     int* int_ptr = (int*)(backtrack_ptr.get_ptr());
     return *int_ptr;
-};
+}
+
+  int decrement()
+{
+      int* int_ptr = (int*)(backtrack_ptr.get_ptr());
+      return --(*int_ptr)  ;
+}
+
+
 
 ReversibleInt()
 { 
