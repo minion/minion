@@ -84,7 +84,7 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 	  FAIL_EXIT();
 #endif
 	}
-	else if(command == string("-fullprop"))
+	else if(command == string("-nocheck"))
 	{
 #ifdef MORE_SEARCH_INFO
 	  Controller::commandlineoption_nocheck = true; 
