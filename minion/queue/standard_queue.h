@@ -104,7 +104,7 @@ namespace Controller
 		}
 #endif
 		D_INFO(1, DI_QUEUE, string("Checking ") + to_string(it));
-#ifndef NO_DYN_CHECK
+#ifdef NO_DYN_CHECK
 		DynamicTrigger* next_queue_ptr;
 #endif
 		next_queue_ptr = it->next;
