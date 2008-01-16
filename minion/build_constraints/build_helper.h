@@ -194,3 +194,10 @@ MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME, DynamicConstraint)
 #define BUILD_STATIC_CT_INITIAL_LIST(CT_NAME, COUNT) \
 START_BUILDCON_INITIAL_LIST(CT_NAME, COUNT, Constraint) \
 MERGE(TERMINATE_BUILDCON,COUNT)(CT_NAME, Constraint)
+
+#define BUILD_DEF_STATIC_CT(CT_NAME) \
+Constraint* build_constraint_ ## CT_NAME(ConstraintBlob&);
+
+#define BUILD_DEF_DYNAMIC_CT(CT_NAME) \
+DynamicConstraint* build_constraint_ ## CT_NAME(ConstraintBlob&);
+
