@@ -26,6 +26,6 @@ set xlabel "run time of $2 in secs"
 set ylabel "percentage improvement in $1 in nodes per sec"
 set grid
 unset key
-plot "comparison.$1.$2.txt" using 18:((\$7/\$20-1)*100)
+plot "$dir/comparison.$1.$2.txt" using 18:((\$7/\$20-1)*100)
 EOF
 
