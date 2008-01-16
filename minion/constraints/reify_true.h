@@ -60,6 +60,7 @@ struct reify_true : public Constraint
     for(unsigned int i=0;i<postrig.size();i++)
     {
       postrig[i]->trigger.constraint = this;
+	  D_ASSERT(postrig[i]->trigger.info != -99999);
       triggers.push_back(postrig[i]);
     }
     triggers.push_back(make_trigger(rar_var, Trigger(this, -99999), LowerBound));
