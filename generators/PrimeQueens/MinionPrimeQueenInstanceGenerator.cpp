@@ -11,6 +11,7 @@ void MinionPrimeQueenInstanceGenerator::generate(int n) {
   generateVarOrder(n) ;
   generateValOrder(n) ;
   generateMatrices(n) ;
+  generateTuples(n) ;
   cout << endl << "objective maximising x" 
        << indexOfFirstBoundsVar <<  endl ;
   cout << endl << "print m1" << endl;
@@ -163,18 +164,23 @@ void MinionPrimeQueenInstanceGenerator::generateConstraints(int n) {
   // Table ct on adjacent values
   for (int val = 1; val < n*n; val++) {
     cout << endl ;
-    cout << "table( v" << val << "," ;
-    generateTuplesAdjacentVals(n) ;
-    cout << ")" << endl ;
+    cout << "table( v" << val << ", t0)" << endl ;
   }
 
   // Table ct on queens & primes
   for (int prime = 0; prime < noPrimesInThisInstance; prime++) {
     cout << endl ;
-    cout << "table( row(m0, " << prime << "), " ;
-    generateTuplesQueenPrimes(n) ;
-    cout << ")" << endl ;
+    cout << "table( row(m0, " << prime << "), t1)" << endl ;
   }
+}
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//generateTuples
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void MinionPrimeQueenInstanceGenerator::generateTuples(int n) {
+  cout << "tuplelists 2\n" << endl ;
+  generateTuplesAdjacentVals(n) ;
+  generateTuplesQueenPrimes(n) ;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,76 +191,83 @@ void MinionPrimeQueenInstanceGenerator::generateConstraints(int n) {
 //Have to generate in lex order.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void MinionPrimeQueenInstanceGenerator::generateTuplesAdjacentVals(int n) {
-  cout << "{" ;
   int newPos ;
-  bool needComma = false ;
+  vector<int> adjacentTuples ;
   for (int pos = 0; pos < n*n; pos++) {
     // Left 1, Up 2.
     if ((pos % n) > 0) {                     //don't move left off board
       newPos = pos - 1 - (2*n) ;
       if (newPos >= 0) {
-        generateTupleBinary(needComma, pos, newPos) ;
-        needComma = true ;
+	    adjacentTuples.push_back(pos) ;
+		adjacentTuples.push_back(newPos) ;
       }
     }
     // Right 1, Up 2.
     if ((pos % n) < n-1) {                 // don't move right off board
       newPos = pos + 1 - (2*n) ;
       if (newPos >= 0) {
-        generateTupleBinary(needComma, pos, newPos) ;
-        needComma = true ;
+	    adjacentTuples.push_back(pos) ;
+		adjacentTuples.push_back(newPos) ;
       }
     }
     // Left 2, Up 1.
     if (pos % n > 1) {                       //don't move left off board
       newPos = pos - 2 - n ;
       if (newPos >= 0) {
-        generateTupleBinary(needComma, pos, newPos) ;
-        needComma = true ;
+	    adjacentTuples.push_back(pos) ;
+		adjacentTuples.push_back(newPos) ;
       }
     }
     // Right 2, Up 1.
     if (pos % n < n-2) {
       newPos = pos + 2 - n ;
       if (newPos >= 0) {
-        generateTupleBinary(needComma, pos, newPos) ;
-        needComma = true ;
+	    adjacentTuples.push_back(pos) ;
+		adjacentTuples.push_back(newPos) ;
       }
     }
     // Left 2, Down 1.
     if (pos % n > 1) {                       //don't move left off board
       newPos = pos - 2 + n ;
       if (newPos < n*n) {
-        generateTupleBinary(needComma, pos, newPos) ;
-        needComma = true ;
+	    adjacentTuples.push_back(pos) ;
+		adjacentTuples.push_back(newPos) ;
       }
     }
     // Right 2, Down 1.
     if (pos % n < n-2) {
       newPos = pos + 2 + n ;
       if (newPos < n*n) {
-        generateTupleBinary(needComma, pos, newPos) ;
-        needComma = true ;
+	    adjacentTuples.push_back(pos) ;
+		adjacentTuples.push_back(newPos) ;
       }
     }
     // Left 1, Down 2.
     if ((pos % n) > 0) {
       newPos = pos - 1 + (2*n) ;
       if (newPos < n*n) {
-        generateTupleBinary(needComma, pos, newPos) ;
-        needComma = true ;
+	    adjacentTuples.push_back(pos) ;
+		adjacentTuples.push_back(newPos) ;
       }      
     }
     // Right 1, Down 2.
     if ((pos % n) < n-1) {
       newPos = pos + 1 + (2*n) ;
       if (newPos < n*n) {
-        generateTupleBinary(needComma, pos, newPos) ;
-        needComma = true ;
+	    adjacentTuples.push_back(pos) ;
+		adjacentTuples.push_back(newPos) ;
       } 
     }
   }
-  cout << "}" ;
+  //no of tuples, binary.
+  int adjTupleIdx = 0 ;
+  int adjTupleSize = adjacentTuples.size()/2 ;
+  cout << adjTupleSize << " 2" << endl ;
+  for (adjTupleIdx; adjTupleIdx < adjTupleSize; adjTupleIdx++) {
+    cout << adjacentTuples.at(2*adjTupleIdx) << " " 
+		 << adjacentTuples.at(2*adjTupleIdx+1) << endl ;
+  }
+  cout << endl ;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -264,67 +277,88 @@ void MinionPrimeQueenInstanceGenerator::generateTuplesAdjacentVals(int n) {
 //Have to generate in lex order.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void MinionPrimeQueenInstanceGenerator::generateTuplesQueenPrimes(int n) {
-  cout << "{" ;
   int attackedPos, diff ;
-  bool needComma = false ;
+  vector<int> queenTuples ;
   for (int queenPos = 0; queenPos < n*n; queenPos++) {
     for (attackedPos = 0; attackedPos < queenPos; attackedPos++) {
       diff = queenPos - attackedPos ;
       // is diagonally up-left?
       if (((queenPos % n) > (attackedPos % n)) &&
-          (diff % (n+1) == 0))
-        generateTupleTernary(needComma, queenPos, attackedPos, 1) ;
+          (diff % (n+1) == 0)) {
+	    queenTuples.push_back(queenPos) ;
+	    queenTuples.push_back(attackedPos) ;
+	    queenTuples.push_back(1) ;				  
+	  }
       // is straight up?
-      else if (diff % n == 0)
-        generateTupleTernary(needComma, queenPos, attackedPos, 1) ;
+      else if (diff % n == 0) {
+	    queenTuples.push_back(queenPos) ;
+	    queenTuples.push_back(attackedPos) ;
+	    queenTuples.push_back(1) ;				  
+      }
       // is diagonally up-right?
       else if (((queenPos % n) < (attackedPos % n)) &&
-               (diff % (n-1) == 0))
-        generateTupleTernary(needComma, queenPos, attackedPos, 1) ;
+               (diff % (n-1) == 0)) {
+		queenTuples.push_back(queenPos) ;
+	    queenTuples.push_back(attackedPos) ;
+	    queenTuples.push_back(1) ;				  
+      }
       // is left?
-      else if (diff <= queenPos % n)
-        generateTupleTernary(needComma, queenPos, attackedPos, 1) ;
-      else generateTupleTernary(needComma, queenPos, attackedPos, 0) ;
+      else if (diff <= queenPos % n) {
+		queenTuples.push_back(queenPos) ;
+	    queenTuples.push_back(attackedPos) ;
+	    queenTuples.push_back(1) ;
+	  }
+      else {
+		queenTuples.push_back(queenPos) ;
+	    queenTuples.push_back(attackedPos) ;
+	    queenTuples.push_back(0) ;
+      }
     } // end of attackedPos < queenPos loop
     for (attackedPos = queenPos+1; attackedPos < n*n; attackedPos++) {
       diff = attackedPos - queenPos ;
       // is right?
-      if (diff <= attackedPos % n)
-        generateTupleTernary(needComma, queenPos, attackedPos, 1) ;
+      if (diff <= attackedPos % n) {
+		queenTuples.push_back(queenPos) ;
+	    queenTuples.push_back(attackedPos) ;
+	    queenTuples.push_back(1) ;				  
+      }
       // is diagonally down-left?
       else if (((queenPos % n) > (attackedPos % n)) &&
-	       (diff % (n-1) == 0))
-        generateTupleTernary(needComma, queenPos, attackedPos, 1) ;
+	       (diff % (n-1) == 0)) {
+	    queenTuples.push_back(queenPos) ;
+	    queenTuples.push_back(attackedPos) ;
+	    queenTuples.push_back(1) ;				  
+      }
       // is down?
-      else if (diff % n == 0)
-        generateTupleTernary(needComma, queenPos, attackedPos, 1) ;
+      else if (diff % n == 0) {
+	    queenTuples.push_back(queenPos) ;
+	    queenTuples.push_back(attackedPos) ;
+	    queenTuples.push_back(1) ;				  
+      }
       // is down-right?
       else if (((queenPos % n) < (attackedPos % n)) &&
-               (diff % (n+1) == 0))
-        generateTupleTernary(needComma, queenPos, attackedPos, 1) ;
-      else generateTupleTernary(needComma, queenPos, attackedPos, 0) ;
-      needComma = true ;
+               (diff % (n+1) == 0)) {
+	    queenTuples.push_back(queenPos) ;
+	    queenTuples.push_back(attackedPos) ;
+	    queenTuples.push_back(1) ;				  
+      }
+      else {
+	    queenTuples.push_back(queenPos) ;
+	    queenTuples.push_back(attackedPos) ;
+	    queenTuples.push_back(0) ;
+	  }
     } // end of attackedPos > queenPos loop
   } // end of queenPos loop
-  cout << "}" ;
-}
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//generateTupleBinary
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionPrimeQueenInstanceGenerator::generateTupleBinary(
-  bool needComma, int c1, int c2) {
-  if (needComma) cout << ", " ;
-  cout << "< " << c1 << ", " << c2 << ">" ;
-}
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//generateTupleTernary
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionPrimeQueenInstanceGenerator::generateTupleTernary(
-  bool needComma, int c1, int c2, int c3) {
-  if (needComma) cout << ", " ;
-  cout << "< " << c1 << ", " << c2 << ", " << c3 << ">" ;
+  int qnTupleIdx = 0 ;
+  int qnTupleSize = queenTuples.size()/3 ;
+  //no of tuples, ternary.
+  cout << qnTupleSize << " 3" << endl ;
+  for (qnTupleIdx; qnTupleIdx < qnTupleSize; qnTupleIdx++) {
+    cout << queenTuples.at(3*qnTupleIdx) << " " 
+         << queenTuples.at(3*qnTupleIdx+1) << " "
+		 << queenTuples.at(3*qnTupleIdx+2) << endl ;
+  }
+  cout << endl ;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

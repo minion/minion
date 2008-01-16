@@ -21,6 +21,7 @@ class MinionPrimeQueenInstanceGenerator {
   void generateVarOrder(int n) ;
   void generateValOrder(int n) ;
   void generateMatrices(int n) ;
+  void generateTuples(int n) ;
   void generateObjective(int n) ;
   void generateConstraints(int n) ;
   void generateTuplesAdjacentVals(int n) ;
