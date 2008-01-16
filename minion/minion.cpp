@@ -76,6 +76,8 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
     string command(argv[i]);
 	if(command == string("-findallsols"))
 	{ Controller::find_all_solutions(); }
+	else if(command = string("-sdf"))
+	{ Controller::use_sdf = true; }
 	else if(command == string("-quiet"))
 	{ reader.parser_verbose = false; }
 	else if(command == string("-printsols"))
@@ -331,8 +333,16 @@ int main(int argc, char** argv) {
   }
   // Solve!
   
-  Controller::StaticVariableOrder order(var_val_order.first, var_val_order.second);
-  Controller::solve(order, var_val_order.first);
+  if(Controller::use_sdf)
+  {
+	Controller::SDFVariableOrder order(var_val_order.first, var_val_order.second);
+	Controller::solve(order, var_val_order.first);
+  }
+  else
+  {  
+	Controller::StaticVariableOrder order(var_val_order.first, var_val_order.second);
+    Controller::solve(order, var_val_order.first);
+  }
     
   if(Controller::test_mode)
   {
