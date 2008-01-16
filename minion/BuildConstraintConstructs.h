@@ -22,6 +22,8 @@
 #undef CONSTRAINT_TYPE
 #endif
 #ifdef DYNAMIC_BUILD_CONSTRAINT
+// QUICK_COMPILE doesn't work on dynamic constraints.
+#undef QUICK_COMPILE
 #define CONSTRAINT_TYPE DynamicConstraint
 #else
 #ifdef STATIC_BUILD_CONSTRAINT

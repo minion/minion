@@ -34,11 +34,11 @@
 // On linux systems, _longjmp and _setjmp are faster versions that ignore
 // system signals, which Minion doesn't use.
 #ifdef __GNUC__
-#define LONGJMP _longjmp
-#define SETJMP  _setjmp
+#define SYSTEM_LONGJMP _longjmp
+#define SYSTEM_SETJMP  _setjmp
 #else
-#define LONGJMP longjmp
-#define SETJMP  setjmp
+#define SYSTEM_LONGJMP longjmp
+#define SYSTEM_SETJMP  setjmp
 #endif
 
 // Stupid visual C++ needs a little hacking

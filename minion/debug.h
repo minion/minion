@@ -112,7 +112,7 @@ to_string(T1 t1, T2 t2, T3 t3)
 
 struct assert_fail {};
 
-inline void assert_function(BOOL x, string a, string f, int line)
+inline void assert_function(BOOL x, const char* a, const char* f, int line)
 { 
   if(!x) 
   {
