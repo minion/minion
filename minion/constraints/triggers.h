@@ -34,11 +34,11 @@ public:
   /// The domain delta from the domain change.
   /** This may not contain the actual delta, but contains data from which a variable can
    construct it, by passing it to getDomainChange. */
-  short data;
+  int data;
   TriggerRange(Trigger* s, Trigger* e, int _data) : start(s), finish(e), data(_data)
   { 
-    D_ASSERT(data >= std::numeric_limits<short>::min());
-    D_ASSERT(data <= std::numeric_limits<short>::max());
+    D_ASSERT(data >= std::numeric_limits<int>::min());
+    D_ASSERT(data <= std::numeric_limits<int>::max());
   }
 };
 

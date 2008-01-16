@@ -177,7 +177,7 @@ struct GACElementConstraint : public Constraint
   {
     indexvar.setMin(0);
 	indexvar.setMax(var_array.size() - 1);
-	for(int i = 0; i < var_array.size() + 2; ++i)
+	for(unsigned i = 0; i < var_array.size() + 2; ++i)
 	  propogate(i,0);
   }
   
