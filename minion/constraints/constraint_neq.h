@@ -38,7 +38,7 @@ struct NeqConstraint : public Constraint
     D_INFO(2,DI_SUMCON,"Setting up Constraint");
     triggerCollection t;
     int array_size = var_array.size();
-    for(int i=0; i < array_size; ++i)
+    for(int i = 0; i < array_size; ++i)
 	  t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
     return t;
   }
@@ -50,7 +50,7 @@ struct NeqConstraint : public Constraint
   {
     int remove_val = var_array[prop_val].getAssignedValue();
     int array_size = var_array.size();
-    for(int i=0; i < array_size; ++i)
+    for(int i = 0; i < array_size; ++i)
     {
       if(i != prop_val)
 		var_array[i].removeFromDomain(remove_val);
