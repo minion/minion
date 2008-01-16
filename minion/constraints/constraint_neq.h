@@ -61,7 +61,17 @@ struct NeqConstraint : public Constraint
     for(int i = 0; i < array_size; ++i)
     {
       if(i != prop_val)
-		var_array[i].removeFromDomain(remove_val);
+	  {
+		if(var_array[i].isBound())
+	    {
+		  if(var_array[i].getMin() == remove_val)
+		    var_array[i].setMin(remove_val + 1);
+		  if(var_array[i].getMax() == remove_val)
+		    var_array[i].setMax(remove_val - 1);
+	    }
+		else
+		  var_array[i].removeFromDomain(remove_val);
+	  }
     }
 	
   }
@@ -171,13 +181,29 @@ struct NeqConstraintBinary : public Constraint
   {
     if (prop_val == 1) {
       int remove_val = var1.getAssignedValue();
-      var2.removeFromDomain(remove_val);
-    }
+	  if(var2.isBound())
+	  {
+		if(var2.getMin() == remove_val)
+		  var2.setMin(remove_val + 1);
+		if(var2.getMax() == remove_val)
+		  var2.setMax(remove_val - 1);
+	  }
+	  else
+        var2.removeFromDomain(remove_val);
+	}
     else
     {
       D_ASSERT(prop_val == 2);
       int remove_val = var2.getAssignedValue();
-      var1.removeFromDomain(remove_val);
+	  if(var1.isBound())
+	  {
+		if(var1.getMin() == remove_val)
+		  var1.setMin(remove_val + 1);
+		if(var1.getMax() == remove_val)
+		  var1.setMax(remove_val - 1);
+	  }
+	  else
+        var1.removeFromDomain(remove_val);
     }
   }
   
