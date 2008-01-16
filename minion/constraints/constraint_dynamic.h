@@ -102,7 +102,10 @@ public:
 	  D_INFO(1, DI_DYNAMICTRIG, "Must remove trigger from existing queue.");
 #ifndef NO_DYN_CHECK
 	  if(this == next_queue_ptr)
+	  {
+		CON_INFO_ADDONE(DynamicMovePtr);
 	    next_queue_ptr = next;
+	  }
 #endif
 	  remove();
 	}

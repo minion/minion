@@ -11,6 +11,7 @@
 		261C44E4099A0B6600FFBDCA /* MinionInputReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */; };
 		2644ACE50A192B90002BD572 /* minion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644ACE40A192B90002BD572 /* minion.cpp */; };
 		26CD0D9E0A1B8666007D8889 /* test_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CD0D9D0A1B8665007D8889 /* test_functions.cpp */; };
+		26E63C830B137198009C8B64 /* get_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E63C820B137198009C8B64 /* get_info.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -127,6 +128,9 @@
 		26E34ED509703F0B00058E70 /* test05.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test05.cpp; path = tests/test05.cpp; sourceTree = "<group>"; };
 		26E34F010970430000058E70 /* constraint_table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_table.h; path = constraints/constraint_table.h; sourceTree = "<group>"; };
 		26E5836209BCA68A0054CB5E /* constraint_product.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = constraint_product.h; path = constraints/constraint_product.h; sourceTree = "<group>"; };
+		26E63C820B137198009C8B64 /* get_info.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = get_info.cpp; sourceTree = "<group>"; };
+		26E63C840B1371A5009C8B64 /* get_info.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = get_info.h; path = get_info/get_info.h; sourceTree = "<group>"; };
+		26E63C850B1371A5009C8B64 /* info_var_wrapper.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = info_var_wrapper.h; path = get_info/info_var_wrapper.h; sourceTree = "<group>"; };
 		26E67A00097EFB4200D77BA8 /* constraint_fullsum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_fullsum.h; path = constraints/constraint_fullsum.h; sourceTree = "<group>"; };
 		26E67A43097F0ABA00D77BA8 /* test05_fullsum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test05_fullsum.cpp; path = tests/test05_fullsum.cpp; sourceTree = "<group>"; };
 		26EECAFD0988D2C9008A73CF /* variable_neg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = variable_neg.h; path = variables/mappings/variable_neg.h; sourceTree = "<group>"; };
@@ -185,6 +189,9 @@
 				2644ACC70A1929F2002BD572 /* standard_search.h */,
 				26CD0D9D0A1B8665007D8889 /* test_functions.cpp */,
 				26CD0D5C0A1B810E007D8889 /* standard_queue.h */,
+				26E63C840B1371A5009C8B64 /* get_info.h */,
+				26E63C850B1371A5009C8B64 /* info_var_wrapper.h */,
+				26E63C820B137198009C8B64 /* get_info.cpp */,
 				2644ACE40A192B90002BD572 /* minion.cpp */,
 				266E8D4D0AAB13EB0066DA57 /* time_keeping.h */,
 				265557720A5B280000B9A732 /* linked_ptr.h */,
@@ -401,6 +408,7 @@
 				26131D1409CB1D2000ACF137 /* BuildConstraint2.cpp in Sources */,
 				2644ACE50A192B90002BD572 /* minion.cpp in Sources */,
 				26CD0D9E0A1B8666007D8889 /* test_functions.cpp in Sources */,
+				26E63C830B137198009C8B64 /* get_info.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

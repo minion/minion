@@ -43,7 +43,7 @@ void print_info()
     << "         [-nodelimit] N              Stop after N nodes searched" << endl
     << "         [-randomiseorder]           Randomises the variable ordering" << endl
 
-#ifdef MORE_SEARCH_INFO
+#ifndef NO_DEBUG
 	<< "         [-dumptree]                 Dumps the search tree" << endl
 	<< "  Note: The following tags should never change the results produced." << endl
 	<< "        If they do, this is a bug." << endl
@@ -94,7 +94,7 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 	{ reader.parser_verbose = true; }
 	else if(command == string("-fullprop"))
 	{
-#ifdef MORE_SEARCH_INFO
+#ifndef NO_DEBUG
 	  Controller::commandlineoption_fullpropogate = true; 
 #else
 	  cout << "This version of minion was not built to support the '-fullprop' command. Sorry" << endl;
@@ -103,7 +103,7 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 	}
 	else if(command == string("-nocheck"))
 	{
-#ifdef MORE_SEARCH_INFO
+#ifndef NO_DEBUG
 	  Controller::commandlineoption_nocheck = true; 
 #else
 	  cout << "# WARNING: This version of minion was not built to support the '-nocheck' command." << endl;
@@ -114,7 +114,7 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 	
 	else if(command == string("-dumptree"))
 	{
-#ifdef MORE_SEARCH_INFO
+#ifndef NO_DEBUG
 	  Controller::commandlineoption_dumptree = true; 
 #else
 	  cout << "This version of minion was not built to support the '-dumptree' command. Sorry" << endl;
@@ -388,6 +388,11 @@ int main(int argc, char** argv) {
   cout << "Problem solvable?: " 
 	<< (Controller::solutions == 0 ? "no" : "yes") << endl;
   cout << "Solutions Found: " << Controller::solutions << endl;
+  
+  
+#ifdef MORE_SEARCH_INFO
+  print_search_info();
+#endif
   return 0;
 }
 

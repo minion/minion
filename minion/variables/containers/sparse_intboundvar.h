@@ -42,7 +42,11 @@ struct SparseBoundVarRef_internal
 
 struct GetSparseBoundVarContainer;
 
+#ifdef MORE_SEARCH_INFO
+typedef InfoRefType<VarRefType<GetSparseBoundVarContainer, SparseBoundVarRef_internal>, VAR_INFO_SPARSEBOUND> SparseBoundVarRef;
+#else
 typedef VarRefType<GetSparseBoundVarContainer, SparseBoundVarRef_internal> SparseBoundVarRef;
+#endif
 
 template<typename BoundType = int>
 struct SparseBoundVarContainer {

@@ -108,7 +108,12 @@ struct BoolVarRef_internal
 };
 
 struct GetBooleanContainer;
+
+#ifdef MORE_SEARCH_INFO
+typedef InfoRefType<QuickVarRefType<GetBooleanContainer, BoolVarRef_internal>, VAR_INFO_BOOL> BoolVarRef;
+#else
 typedef QuickVarRefType<GetBooleanContainer, BoolVarRef_internal> BoolVarRef;
+#endif
 
 /// Container for boolean variables
 struct BooleanContainer

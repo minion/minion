@@ -18,6 +18,12 @@ else
  endif
 endif
 
+ifdef INFO
+  MORE_INFO_FLAGS = -DMORE_SEARCH_INFO
+else
+  MORE_INFO_FLAGS =
+endif
+
 ifdef NOWATCHED
   WATCHED=
 else
@@ -43,6 +49,9 @@ ifndef NAME
   endif
   ifdef PROFILE
     NAME:=$(NAME)-profile
+  endif
+  ifdef INFO
+    NAME:=$(NAME)-info
   endif
 endif
 

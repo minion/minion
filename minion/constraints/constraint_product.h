@@ -79,6 +79,7 @@ struct ProductConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int, DomainDelta)
   {
+	PROP_INFO_ADDONE(Product);
 	int var1_min = var1.getMin();
 	int var1_max = var1.getMax();
 	int var2_min = var2.getMin();

@@ -248,6 +248,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* trig)
   {
+	PROP_INFO_ADDONE(DynElement);
     D_INFO(2, DI_DYELEMENT, "Start Propagation");
 	DynamicTrigger* dt = dynamic_trigger_start();
 	unsigned pos = trig - dt;

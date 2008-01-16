@@ -49,7 +49,7 @@ struct UnaryNeqConstraint : public Constraint
   //  virtual Constraint* reverse_constraint()
   
   PROPAGATE_FUNCTION(int,DomainDelta)
-  { }
+  { D_ASSERT(0); }
   
   
   virtual BOOL check_unsat(int,DomainDelta)

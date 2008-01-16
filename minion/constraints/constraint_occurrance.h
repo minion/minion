@@ -101,6 +101,7 @@ struct OccurrenceEqualConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
+	PROP_INFO_ADDONE(OccEqual);
     if( var_array[i].getAssignedValue() == value.val() )
     {
       int c = occurrences_count.get() + 1;

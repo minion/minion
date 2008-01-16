@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifdef MORE_SEARCH_INFO
+#include "../get_info/info_var_wrapper.h"
+#endif
 
 #include "containers/booleanvariables.h"
 #include "containers/intvar.h"

@@ -33,7 +33,12 @@ struct BigRangeVarRef_internal
 };
 
 struct GetBigRangeVarContainer;
+
+#ifdef MORE_SEARCH_INFO
+typedef InfoRefType<VarRefType<GetBigRangeVarContainer, BigRangeVarRef_internal>, VAR_INFO_BIGRANGEVAR> BigRangeVarRef;
+#else
 typedef VarRefType<GetBigRangeVarContainer, BigRangeVarRef_internal> BigRangeVarRef;
+#endif
 
 template<typename d_type>
 struct BigRangeVarContainer {

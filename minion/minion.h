@@ -52,6 +52,14 @@
 #include "constants.h"
 #include "debug.h"
 
+#ifdef MORE_SEARCH_INFO
+#include "get_info/get_info.h"
+#else
+#define CON_INFO_ADDONE(ConEvent)
+#define VAR_INFO_ADDONE(VarType, VarEvent)
+#define PROP_INFO_ADDONE(PropType)
+#endif
+
 #include "solver.h"
 
 #include "memory_management/backtrackable_memory.h"

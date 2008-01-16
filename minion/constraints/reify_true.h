@@ -90,6 +90,7 @@ struct reify_true : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
+	PROP_INFO_ADDONE(ReifyTrue);
     D_INFO(1,DI_REIFY,"Propogation Start");
     if(constraint_locked)
 	  return;

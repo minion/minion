@@ -40,7 +40,12 @@ struct BoundVarRef_internal
 };
 
 struct GetBoundVarContainer;
+
+#ifdef MORE_SEARCH_INFO
+typedef InfoRefType<VarRefType<GetBoundVarContainer, BoundVarRef_internal>, VAR_INFO_BOUNDVAR> BoundVarRef;
+#else
 typedef VarRefType<GetBoundVarContainer, BoundVarRef_internal> BoundVarRef;
+#endif
 
 template<typename BoundType = int>
 struct BoundVarContainer {

@@ -87,6 +87,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
 
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
+	PROP_INFO_ADDONE(WeightBoolSum);
     int min_sum = var_array_min_sum.get();
     if(prop_val != -1)
     {

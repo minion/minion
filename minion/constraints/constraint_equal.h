@@ -69,6 +69,7 @@ struct ReifiedEqualConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
+	PROP_INFO_ADDONE(ReifyEqual);
     switch(i)
     {
       case 1:
@@ -168,6 +169,7 @@ struct EqualConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
+	PROP_INFO_ADDONE(Equal);
     switch(i)
 	{
 	  case 1:

@@ -121,7 +121,7 @@ namespace Controller
 	    cout << "Nodes: " << nodes << endl << endl;
           }
     }
-#ifdef MORE_SEARCH_INFO
+#ifndef NO_DEBUG
   if(!commandlineoption_nocheck)
   {
     for(unsigned i = 0; i < dynamic_constraints.size(); ++i)
@@ -147,7 +147,7 @@ namespace Controller
 	return false;
   }
 
-#ifndef MORE_SEARCH_INFO
+#ifndef NO_DEBUG
 #define maybe_print_search_state(x,y)
 #else
 template<typename T>

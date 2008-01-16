@@ -41,11 +41,13 @@ namespace Controller
   
   inline void push_special_trigger(Constraint* trigger)
   {
+	CON_INFO_ADDONE(AddSpecialToQueue);
     special_triggers.push_back(trigger);
   }
   
   inline void push_triggers(TriggerRange new_triggers)
   { 
+	CON_INFO_ADDONE(AddConToQueue);
     D_INFO(1, DI_QUEUE, string("Adding new triggers. Trigger list size is ") + 
 		   to_string(propogate_trigger_list.size()) + ".");
 	propogate_trigger_list.push_back(new_triggers); 
@@ -54,6 +56,7 @@ namespace Controller
 #ifdef DYNAMICTRIGGERS
   inline void push_dynamic_triggers(DynamicTrigger* new_dynamic_trig_range)
   { 
+	CON_INFO_ADDONE(AddDynToQueue);
     D_ASSERT(new_dynamic_trig_range->sanity_check_list());
     dynamic_trigger_list.push_back(new_dynamic_trig_range);   
   }
@@ -108,6 +111,7 @@ namespace Controller
 #endif
 		next_queue_ptr = it->next;
 		D_INFO(1, DI_QUEUE, string("Will do ") + to_string(next_queue_ptr) + " next");
+		CON_INFO_ADDONE(DynamicTrigger);
 		it->propogate();  
 
 		it = next_queue_ptr;
@@ -135,15 +139,20 @@ namespace Controller
 		}
 #endif
 		
-#ifdef MORE_SEARCH_INFO
+#ifndef NO_DEBUG
 		if(commandlineoption_fullpropogate)
 		  it->full_propogate();
 		else
+		{
+		  CON_INFO_ADDONE(StaticTrigger);
 		  it->propogate(data_val);
+		}
 #else
-		it->propogate(data_val);
+		{
+		  CON_INFO_ADDONE(StaticTrigger);
+		  it->propogate(data_val);
+		}
 #endif
-		
 	  }
 	}
 	
@@ -195,6 +204,7 @@ namespace Controller
 	  D_INFO(1, DI_QUEUE, string("Doing a special trigger!"));
 	  Constraint* trig = special_triggers.back();
 	  special_triggers.pop_back();
+	  CON_INFO_ADDONE(SpecialTrigger);
 	  trig->special_check();
 
 	} // while(true)

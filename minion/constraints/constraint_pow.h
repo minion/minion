@@ -75,7 +75,7 @@ struct PowConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
-	
+	PROP_INFO_ADDONE(Pow);
 	switch(flag)
 	{
 	  case -1:

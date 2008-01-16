@@ -45,6 +45,7 @@ struct MinConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
    {
+	PROP_INFO_ADDONE(Min);
 	if(prop_val > 0)
 	{// Lower Bound Changed
 	  

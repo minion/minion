@@ -56,6 +56,7 @@ struct NeqConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
+	PROP_INFO_ADDONE(ArrayNeq);
     int remove_val = var_array[prop_val].getAssignedValue();
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
@@ -127,7 +128,17 @@ struct NeqConstraint : public Constraint
 		for(int j = 0; j < array_size;++j)
 		{
 		  if(i != j)
-			var_array[j].removeFromDomain(remove_val);
+		  {
+			if(var_array[j].isBound())
+			{
+			  if(var_array[j].getMin() == remove_val)
+				var_array[j].setMin(remove_val + 1);
+			  if(var_array[j].getMax() == remove_val)
+				var_array[j].setMax(remove_val - 1);
+			}
+			else
+			  var_array[j].removeFromDomain(remove_val);
+		  }
 		}
       }
   }
@@ -179,6 +190,7 @@ struct NeqConstraintBinary : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
+	PROP_INFO_ADDONE(BinaryNeq);
     if (prop_val == 1) {
       int remove_val = var1.getAssignedValue();
 	  if(var2.isBound())
@@ -215,12 +227,28 @@ struct NeqConstraintBinary : public Constraint
     if(var1.isAssigned())
     { 
       int remove_val = var1.getAssignedValue();
-      var2.removeFromDomain(remove_val);
+	  if(var2.isBound())
+	  {
+		if(var2.getMin() == remove_val)
+		  var2.setMin(remove_val + 1);
+		if(var2.getMax() == remove_val)
+		  var2.setMax(remove_val - 1);
+	  }
+	  else
+        var2.removeFromDomain(remove_val);
     }
     if(var2.isAssigned())
     { 
       int remove_val = var2.getAssignedValue();
-      var1.removeFromDomain(remove_val);
+	  if(var1.isBound())
+	  {
+		if(var1.getMin() == remove_val)
+		  var1.setMin(remove_val + 1);
+		if(var1.getMax() == remove_val)
+		  var1.setMax(remove_val - 1);
+	  }
+	  else
+        var1.removeFromDomain(remove_val);
     }
   }
 	

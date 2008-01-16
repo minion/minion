@@ -1407,6 +1407,10 @@ $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
   minion/./search/standard_search.h minion/./search/VariableOrders.h \
   minion/./constraint_setup.h minion/./test_functions.h \
   minion/./CSPSpec.h
+$(OBJDIR)/get_info.o: minion/./get_info.cpp minion/./system.h \
+  minion/./system/linked_ptr.h minion/./system/local_array.h \
+  minion/./system/time_keeping.h minion/./constants.h minion/./debug.h \
+  minion/./get_info/get_info.h
 $(OBJDIR)/minion.o: minion/./minion.cpp minion/./minion.h \
   minion/./svn_header.h minion/./system.h minion/./system/linked_ptr.h \
   minion/./system/local_array.h minion/./system/time_keeping.h \

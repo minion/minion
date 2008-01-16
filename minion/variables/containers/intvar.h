@@ -40,7 +40,12 @@ struct RangeVarRef_internal
 };
 
 struct GetRangeVarContainer;
+
+#ifdef MORE_SEARCH_INFO
+typedef InfoRefType<VarRefType<GetRangeVarContainer, RangeVarRef_internal>, VAR_INFO_RANGEVAR> LRangeVarRef;
+#else
 typedef VarRefType<GetRangeVarContainer, RangeVarRef_internal> LRangeVarRef;
+#endif
 
 template<int var_min, typename d_type>
 struct RangeVarContainer {
