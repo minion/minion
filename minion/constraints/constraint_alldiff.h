@@ -14,8 +14,11 @@ enum PropType { WithOutValueRemoval, WithValueRemoval };
 template<typename VarArray>
 class AllDiffConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "AllDiff"; }
+  
   typedef typename VarArray::value_type VarRef;
-  public:
+  
   AllDiffConstraint(const VarArray& vars, PropType& prop ) : _vars(vars), _prop(prop)
   {}
   virtual triggerCollection setup_internal();

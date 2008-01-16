@@ -29,6 +29,9 @@
 template<typename VarArray, typename VarSum, int VarToCount = 1 >
 struct BoolLessSumConstraintDynamic : public DynamicConstraint
 {
+  virtual string constraint_name()
+  { if(VarToCount) return "Bool<=SumDynamic"; else return "Bool>=SumDynamic"; }
+  
   typedef BoolLessSumConstraintDynamic<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   

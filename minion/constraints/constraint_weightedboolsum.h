@@ -19,6 +19,9 @@
 template<typename VarArray, typename WeightArray, typename VarSum>
 struct LeqWeightBoolSumConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "LeqWeightBoolSum"; }
+  
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   

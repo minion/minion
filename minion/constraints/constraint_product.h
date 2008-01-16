@@ -21,6 +21,9 @@
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct ProductConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "Product"; }
+  
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;

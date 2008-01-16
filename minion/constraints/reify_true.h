@@ -21,6 +21,9 @@
 template<typename BoolVar>
 struct reify_true : public Constraint
 {
+  virtual string constraint_name()
+  { return "ReifyTrue:" + poscon->constraint_name(); }
+  
   Constraint* poscon;
   BoolVar rar_var;
   bool constraint_locked;

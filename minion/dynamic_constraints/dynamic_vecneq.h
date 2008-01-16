@@ -21,6 +21,9 @@
 template<typename VarArray1, typename VarArray2>
 struct VecNeqDynamic : public DynamicConstraint
 {
+  virtual string constraint_name()
+  { return "VecNeqDynamic"; }
+  
   typedef typename VarArray1::value_type VarRef1;
   typedef typename VarArray2::value_type VarRef2;
   

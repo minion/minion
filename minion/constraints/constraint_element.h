@@ -20,6 +20,9 @@
 template<typename VarArray, typename IndexRef>
 struct ElementConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "Element"; }
+  
   typedef typename VarArray::value_type VarRef;
   VarArray var_array;
   IndexRef index_ref;

@@ -21,6 +21,9 @@
 template<typename VarArray>
 struct NeqConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "Neq"; }
+  
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   
@@ -134,6 +137,9 @@ struct NeqConstraint : public Constraint
 template<typename VarRef1, typename VarRef2>
 struct NeqConstraintBinary : public Constraint
 {
+  virtual string constraint_name()
+  { return "Neq(Binary)"; }
+  
   VarRef1 var1;
   VarRef2 var2;
   

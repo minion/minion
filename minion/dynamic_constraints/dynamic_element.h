@@ -40,6 +40,9 @@
 template<typename VarArray, typename Index, typename Result>
 struct ElementConstraintDynamic : public DynamicConstraint
 {
+  virtual string constraint_name()
+  { return "ElementDynamic"; }
+  
   //  typedef BoolLessSumConstraintDynamic<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   

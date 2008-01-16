@@ -90,13 +90,9 @@ struct VarRefType
   void addTrigger(Trigger t, TrigType type, int val = -999)
   { GetContainer::con().addTrigger(data, t, type, val); }
 
+  /// XXX : Change 'VarRef' to correct type.
   operator string()
-  {
-    ostringstream s;
-    s << "Bool";
-    s << data.var_num;
-    return s.str();
-  }
+  { return "VarRef:" + to_string(data.var_num); }
   
   int getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
@@ -175,12 +171,7 @@ struct QuickVarRefType
   { GetContainer::con().addTrigger(data, t, type, val); }
   
   operator string()
-  {
-    ostringstream s;
-    s << "Bool";
-    s << data.var_num;
-    return s.str();
-  }
+  { return "Bool:" + to_string(data.var_num); }
   
   int getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
@@ -250,12 +241,7 @@ struct CompleteVarRefType
   { (data.getCon()).addTrigger(data, t, type, val); }
   
   operator string()
-  {
-    ostringstream s;
-    s << "Bool";
-    s << data.var_num;
-    return s.str();
-  }
+  { return "VarRef:" + to_string(data.var_num); }
   
   int getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }

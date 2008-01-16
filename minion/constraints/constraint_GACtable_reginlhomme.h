@@ -74,6 +74,9 @@ struct TupleH
 template<typename VarArray>
 struct GACTableConstraint : public DynamicConstraint
 {
+  virtual string constraint_name()
+  { return "TableRegin"; }
+  
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
   

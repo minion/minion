@@ -13,6 +13,9 @@
 template<typename VarArray, typename OriginalConstraint>
 struct CheckAssignConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "CheckAssign"; }
+  
   OriginalConstraint& originalcon;
   VarArray variables;
   ReversibleInt assigned_vars;

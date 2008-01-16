@@ -138,6 +138,9 @@ public:
 /// Base type from which all dynamic constraints are derived.
 struct DynamicConstraint
 {
+  /// Method to get constraint name for debugging.
+  virtual string constraint_name() = 0;
+  
   /// Private member of the base class.
 #ifdef WATCHEDLITERALS
   MemOffset _DynamicTriggerCache;

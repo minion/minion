@@ -35,6 +35,9 @@ void check_trigger_count(int i, int j, int k, int l)
 template<typename VarRef>
 struct TestConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "TestConstraint"; }
+  
   VarRef var1;
   TestConstraint(VarRef _var1) :
     var1(_var1)

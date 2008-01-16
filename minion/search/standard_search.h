@@ -68,10 +68,14 @@ namespace Controller
 	  
 	  if(!con->check_assignment(values))
 	  {
-		cerr << "Some constraint is not satisfied by this solution!" << endl;
-		cerr << "The constraint is over the following varibles:" << endl;
+	    cerr << "A " << con->constraint_name() << " constraint is not satisfied by this sol!" << endl;
+		cerr << "The constraint is over the following variables:" << endl;
 		for(unsigned loop = 0; loop < vec_size; ++loop)
 		  cerr << string(variables[loop]) << ",";
+		cerr << endl;
+		cerr << "Variables were assigned:" << endl;
+	    for(unsigned loop = 0; loop < vec_size; ++loop)
+		  cerr << values[loop] << ",";
 		cerr << endl;
 		cerr << "This is an internal bug. It shouldn't happen!!" << endl;
 		cerr << "It was a " << typeid(con).name() << " constraint" << endl;

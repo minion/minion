@@ -141,6 +141,7 @@ namespace Controller
 	  }
 	}
 	else
+	{
 #endif
 	  while(!propogate_trigger_list.empty())
 	  {
@@ -161,13 +162,15 @@ namespace Controller
 		  it->propogate(data_val);
 		}
 	  }
-	  
+	}
+	
   if(special_triggers.empty())
     return;
 	
   Constraint* trig = special_triggers.back();
   special_triggers.pop_back();
   trig->special_check();
-  }
-  }
-}
+  } // while(true)
+  } // end Function
+  
+} // namespace Controller

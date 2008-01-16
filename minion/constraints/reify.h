@@ -30,6 +30,9 @@
 template<typename BoolVar>
 struct reify : public Constraint
 {
+  virtual string constraint_name()
+  { return "Reify:" + poscon->constraint_name(); }
+	
   Constraint* poscon;
   Constraint* negcon;
   BoolVar rar_var;

@@ -21,6 +21,9 @@
 template<typename VarRef, typename Offset>
 struct UnaryNeqConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "Unary="; }
+  
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   Offset offset;
   VarRef x;

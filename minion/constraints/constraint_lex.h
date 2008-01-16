@@ -21,6 +21,9 @@
 template<typename VarArray1, typename VarArray2, bool Less = false>
 struct LexLeqConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { if(Less) return "LexLess"; else return "LexLeq"; }
+  
   typedef LexLeqConstraint<VarArray2, VarArray1,!Less> NegConstraintType;
   typedef typename VarArray1::value_type ArrayVarRef1;
   typedef typename VarArray2::value_type ArrayVarRef2;

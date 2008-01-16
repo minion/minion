@@ -20,6 +20,9 @@
 template<typename VarArray, typename VarSum, int VarToCount = 1 >
 struct BoolLessSumConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { if(VarToCount) return "Bool<=Sum"; else return "Bool>=Sum"; }
+  
   typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   

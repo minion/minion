@@ -21,6 +21,9 @@
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
 struct ReifiedEqualConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "ReifiedEqual"; }
+  
   EqualVarRef1 var1;
   EqualVarRef2 var2;
   BoolVarRef var3;
@@ -127,6 +130,9 @@ struct ReifiedEqualConstraint : public Constraint
 template<typename EqualVarRef1, typename EqualVarRef2>
 struct EqualConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "Equal"; }
+  
   EqualVarRef1 var1;
   EqualVarRef2 var2;
   EqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2) :

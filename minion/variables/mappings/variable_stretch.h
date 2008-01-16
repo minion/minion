@@ -203,12 +203,7 @@ struct MultiplyVar
 
   
   operator string()
-  {
-    ostringstream s;
-    s << "BoundsPassThrough:";
-    s << string(data);
-    return s.str();
-  }
+  { return "Mult " + to_string(Multiply) + ":" + string(data); }
   
   int getDomainChange(DomainDelta d)
   { return Multiply * data.getDomainChange(d); }

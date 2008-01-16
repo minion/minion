@@ -19,6 +19,9 @@
 template<typename VarArray>
 struct BoundsTableConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "BoundTable"; }
+  
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
   Constraint* constraint;

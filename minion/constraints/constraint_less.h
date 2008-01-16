@@ -21,6 +21,9 @@
 template<typename VarRef1, typename VarRef2, typename Offset>
 struct LeqConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "Leq"; }
+  
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   Offset offset;
   VarRef1 x;

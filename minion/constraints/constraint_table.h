@@ -19,6 +19,9 @@
 template<typename VarArray>
 struct TableConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "Table"; }
+  
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
   Constraint* constraint;

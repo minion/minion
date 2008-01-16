@@ -115,12 +115,7 @@ struct VarNot
 
   
   operator string()
-  {
-    ostringstream s;
-    s << "Not:";
-    s << string(data);
-    return s.str();
-  }
+  { return "Not:" + string(data); }
   
   int getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }

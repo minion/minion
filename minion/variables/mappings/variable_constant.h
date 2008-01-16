@@ -95,10 +95,5 @@ struct ConstantVar
   }
   
   operator string()
-  {
-    ostringstream s;
-    s << "Constant:";
-    s << val;
-    return s.str();
-  }
+  { return "Constant:" + to_string(val); }
 };

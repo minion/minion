@@ -23,6 +23,9 @@
 template<typename VarArray, typename Val, typename ValCount>
 struct OccurrenceEqualConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "OccurrenceEqual"; }
+  
   // typedef BoolLessSumConstraint<VarArray, Val, runtime_val> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   
@@ -208,6 +211,9 @@ OccLeqCon(const VarArray& _var_array, const Val& _value, const ValCount& _val_co
 template<typename VarArray, typename Val, typename ValCount>
 struct OccurrenceLeqConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "OccurrenceLeq"; }
+  
  // typedef BoolLessSumConstraint<VarArray, Val, runtime_val> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   

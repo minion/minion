@@ -20,6 +20,9 @@
 template<typename VarRef, std::size_t size, typename VarSum, bool is_reversed = false>
 struct LightLessEqualSumConstraint : public Constraint
 {
+  virtual string constraint_name()
+  { return "Light<=Sum"; }
+  
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
  
   

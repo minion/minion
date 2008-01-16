@@ -141,7 +141,7 @@ struct SwitchNeg
   }
   
   operator string()
-  { return string(data); }
+  { return "SwitchNeg " + to_string(multiplier) + ":" + string(data); }
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)

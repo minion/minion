@@ -101,12 +101,7 @@ struct ShiftVar
 #endif
 
   operator string()
-  {
-    ostringstream s;
-    s << "BoundsPassThrough:";
-    s << string(data);
-    return s.str();
-  }
+  { return "Shift " + to_string(shift.val()) + ":" + string(data); }
   
   int getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
