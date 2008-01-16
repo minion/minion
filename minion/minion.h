@@ -33,6 +33,7 @@
 #include "system.h"
 
 #include "system/time_keeping.h"
+#include "system/to_string.h"
 
 // XXX These could possibly be turned off, but it's possible it will require
 // Some small amount of work to make them work.

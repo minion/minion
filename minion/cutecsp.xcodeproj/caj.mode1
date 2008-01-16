@@ -266,17 +266,17 @@
 								<string>1C37FBAC04509CD000000102</string>
 								<string>1C37FAAC04509CD000000102</string>
 								<string>1C37FABC05509CD000000102</string>
-								<string>E2644B35053B69B200211256</string>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>1</integer>
+									<integer>45</integer>
+									<integer>36</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {281, 717}}</string>
+							<string>{{0, 1425}, {281, 717}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -295,7 +295,7 @@
 							<real>281</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>57 102 884 776 0 0 1440 878 </string>
+						<string>-2 -17 884 776 0 0 1440 878 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -311,7 +311,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>common_search.h</string>
+								<string>sdf_search.h</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -319,11 +319,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>common_search.h</string>
+										<string>sdf_search.h</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>269207C30B2F445A0042AC2B</string>
+										<string>269207CE0B30523C0042AC2B</string>
 										<key>history</key>
 										<array>
 											<string>26D30F260AE6BEA900E87DA8</string>
@@ -370,17 +370,17 @@
 											<string>263367BA0B149E12004DE22E</string>
 											<string>263367D20B14A9E1004DE22E</string>
 											<string>269206F40B2F2D9A0042AC2B</string>
-											<string>269206F70B2F2D9A0042AC2B</string>
 											<string>269206F80B2F2D9A0042AC2B</string>
 											<string>269206F90B2F2D9A0042AC2B</string>
 											<string>269206FA0B2F2D9A0042AC2B</string>
 											<string>269206FB0B2F2D9A0042AC2B</string>
 											<string>269206FC0B2F2D9A0042AC2B</string>
 											<string>269206FD0B2F2D9A0042AC2B</string>
-											<string>2692078B0B2F39D60042AC2B</string>
-											<string>2692078C0B2F39D60042AC2B</string>
+											<string>269207C50B30523C0042AC2B</string>
+											<string>269207C60B30523C0042AC2B</string>
+											<string>269207C70B30523C0042AC2B</string>
+											<string>269207C80B30523C0042AC2B</string>
 											<string>269207960B2F3AD10042AC2B</string>
-											<string>269207970B2F3AD10042AC2B</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -449,6 +449,11 @@
 											<string>2692078E0B2F39D60042AC2B</string>
 											<string>2692078F0B2F39D60042AC2B</string>
 											<string>269207980B2F3AD10042AC2B</string>
+											<string>269207C90B30523C0042AC2B</string>
+											<string>269207CA0B30523C0042AC2B</string>
+											<string>269207CB0B30523C0042AC2B</string>
+											<string>269207CC0B30523C0042AC2B</string>
+											<string>269207CD0B30523C0042AC2B</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -462,7 +467,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {581, 573}}</string>
 								<key>RubberWindowFrame</key>
-								<string>57 102 884 776 0 0 1440 878 </string>
+								<string>-2 -17 884 776 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -482,7 +487,7 @@
 								<key>Frame</key>
 								<string>{{0, 578}, {581, 157}}</string>
 								<key>RubberWindowFrame</key>
-								<string>57 102 884 776 0 0 1440 878 </string>
+								<string>-2 -17 884 776 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -657,7 +662,7 @@
 		<string>/Users/caj/minion/trunk/minion/cutecsp.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>57 102 884 776 0 0 1440 878 </string>
+	<string>-2 -17 884 776 0 0 1440 878 </string>
 	<key>WindowTools</key>
 	<array>
 		<dict>
