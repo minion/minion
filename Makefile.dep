@@ -8,6 +8,7 @@ $(OBJDIR)/build_constraints/BuildDynamicStart.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -50,8 +51,10 @@ $(OBJDIR)/build_constraints/BuildDynamicStart.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h
 $(OBJDIR)/build_constraints/BuildStaticStart.o:  \
@@ -63,6 +66,7 @@ $(OBJDIR)/build_constraints/BuildStaticStart.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -105,8 +109,10 @@ $(OBJDIR)/build_constraints/BuildStaticStart.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h
 $(OBJDIR)/build_constraints/CT_ALLDIFF.o:  \
@@ -117,6 +123,7 @@ $(OBJDIR)/build_constraints/CT_ALLDIFF.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -159,8 +166,10 @@ $(OBJDIR)/build_constraints/CT_ALLDIFF.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_neq.h
@@ -172,6 +181,7 @@ $(OBJDIR)/build_constraints/CT_DISEQ.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -214,8 +224,10 @@ $(OBJDIR)/build_constraints/CT_DISEQ.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_neq.h
@@ -227,6 +239,7 @@ $(OBJDIR)/build_constraints/CT_ELEMENT.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -269,8 +282,10 @@ $(OBJDIR)/build_constraints/CT_ELEMENT.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_element.h
@@ -282,6 +297,7 @@ $(OBJDIR)/build_constraints/CT_EQ.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -324,8 +340,10 @@ $(OBJDIR)/build_constraints/CT_EQ.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_equal.h
@@ -337,6 +355,7 @@ $(OBJDIR)/build_constraints/CT_GACELEMENT.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -379,8 +398,10 @@ $(OBJDIR)/build_constraints/CT_GACELEMENT.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_GACelement.h
@@ -392,6 +413,7 @@ $(OBJDIR)/build_constraints/CT_GEQSUM.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -434,8 +456,10 @@ $(OBJDIR)/build_constraints/CT_GEQSUM.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_fullsum.h \
@@ -449,6 +473,7 @@ $(OBJDIR)/build_constraints/CT_INEQ.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -491,8 +516,10 @@ $(OBJDIR)/build_constraints/CT_INEQ.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_less.h
@@ -504,6 +531,7 @@ $(OBJDIR)/build_constraints/CT_LEQSUM.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -546,8 +574,10 @@ $(OBJDIR)/build_constraints/CT_LEQSUM.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_fullsum.h \
@@ -561,6 +591,7 @@ $(OBJDIR)/build_constraints/CT_LEXLEQ.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -603,8 +634,10 @@ $(OBJDIR)/build_constraints/CT_LEXLEQ.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_lex.h
@@ -616,6 +649,7 @@ $(OBJDIR)/build_constraints/CT_LEXLESS.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -658,8 +692,10 @@ $(OBJDIR)/build_constraints/CT_LEXLESS.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_lex.h
@@ -671,6 +707,7 @@ $(OBJDIR)/build_constraints/CT_MAX.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -713,8 +750,10 @@ $(OBJDIR)/build_constraints/CT_MAX.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_min.h
@@ -726,6 +765,7 @@ $(OBJDIR)/build_constraints/CT_MIN.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -768,8 +808,10 @@ $(OBJDIR)/build_constraints/CT_MIN.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_equal.h \
@@ -782,6 +824,7 @@ $(OBJDIR)/build_constraints/CT_MINUSEQ.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -824,8 +867,10 @@ $(OBJDIR)/build_constraints/CT_MINUSEQ.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_equal.h
@@ -837,6 +882,7 @@ $(OBJDIR)/build_constraints/CT_OCCURRENCE.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -879,8 +925,10 @@ $(OBJDIR)/build_constraints/CT_OCCURRENCE.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_occurrance.h
@@ -892,6 +940,7 @@ $(OBJDIR)/build_constraints/CT_POW.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -934,8 +983,10 @@ $(OBJDIR)/build_constraints/CT_POW.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_pow.h
@@ -947,6 +998,7 @@ $(OBJDIR)/build_constraints/CT_PRODUCT2.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -989,8 +1041,10 @@ $(OBJDIR)/build_constraints/CT_PRODUCT2.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_product.h \
@@ -1003,6 +1057,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_ELEMENT.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -1045,8 +1100,10 @@ $(OBJDIR)/build_constraints/CT_WATCHED_ELEMENT.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../dynamic_constraints/dynamic_element.h
@@ -1058,6 +1115,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_GEQSUM.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -1100,8 +1158,10 @@ $(OBJDIR)/build_constraints/CT_WATCHED_GEQSUM.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../dynamic_constraints/dynamic_sum.h \
@@ -1116,6 +1176,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LEQSUM.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -1158,8 +1219,10 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LEQSUM.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../dynamic_constraints/dynamic_sum.h \
@@ -1174,6 +1237,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LITSUM.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -1216,8 +1280,10 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LITSUM.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../dynamic_constraints/dynamic_literalwatch.h
@@ -1229,6 +1295,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_TABLE.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -1271,8 +1338,10 @@ $(OBJDIR)/build_constraints/CT_WATCHED_TABLE.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_GACtable_master.h \
@@ -1285,6 +1354,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_VECNEQ.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -1327,8 +1397,10 @@ $(OBJDIR)/build_constraints/CT_WATCHED_VECNEQ.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../dynamic_constraints/dynamic_vecneq.h
@@ -1340,6 +1412,7 @@ $(OBJDIR)/build_constraints/CT_WEIGHTGEQSUM.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -1382,8 +1455,10 @@ $(OBJDIR)/build_constraints/CT_WEIGHTGEQSUM.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_weightedboolsum.h \
@@ -1398,6 +1473,7 @@ $(OBJDIR)/build_constraints/CT_WEIGHTLEQSUM.o:  \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../constants.h \
   minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
@@ -1440,8 +1516,10 @@ $(OBJDIR)/build_constraints/CT_WEIGHTLEQSUM.o:  \
   minion/./build_constraints/../search/standard_search.h \
   minion/./build_constraints/../search/common_search.h \
   minion/./build_constraints/../search/VariableOrders.h \
+  minion/./build_constraints/../search/search_methods.h \
   minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/sdf_search.h \
+  minion/./build_constraints/../search/search_control.h \
+  minion/./build_constraints/../preprocess/preprocess.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../constraints/constraint_weightedboolsum.h \
@@ -1451,8 +1529,9 @@ $(OBJDIR)/build_constraints/CT_WEIGHTLEQSUM.o:  \
 $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
   minion/./minion.h minion/./svn_header.h minion/./system.h \
   minion/./system/linked_ptr.h minion/./system/local_array.h \
-  minion/./system/time_keeping.h minion/./constants.h minion/./debug.h \
-  minion/./solver.h minion/./memory_management/backtrackable_memory.h \
+  minion/./system/time_keeping.h minion/./system/to_string.h \
+  minion/./constants.h minion/./debug.h minion/./solver.h \
+  minion/./memory_management/backtrackable_memory.h \
   minion/./memory_management/nonbacktrack_memory.h \
   minion/./reversible_vals.h \
   minion/./memory_management/trailed_monotonic_set.h \
@@ -1483,8 +1562,9 @@ $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
   minion/./constraints/reify.h minion/./constraints/reify_true.h \
   minion/./constraints/function_defs.hpp minion/./queue/standard_queue.h \
   minion/./search/standard_search.h minion/./search/common_search.h \
-  minion/./search/VariableOrders.h minion/./search/recursive_search.h \
-  minion/./search/sdf_search.h minion/./constraint_setup.h \
+  minion/./search/VariableOrders.h minion/./search/search_methods.h \
+  minion/./search/recursive_search.h minion/./search/search_control.h \
+  minion/./preprocess/preprocess.h minion/./constraint_setup.h \
   minion/./test_functions.h minion/./CSPSpec.h
 $(OBJDIR)/get_info.o: minion/./get_info.cpp minion/./system.h \
   minion/./system/linked_ptr.h minion/./system/local_array.h \
@@ -1493,46 +1573,7 @@ $(OBJDIR)/get_info.o: minion/./get_info.cpp minion/./system.h \
 $(OBJDIR)/minion.o: minion/./minion.cpp minion/./minion.h \
   minion/./svn_header.h minion/./system.h minion/./system/linked_ptr.h \
   minion/./system/local_array.h minion/./system/time_keeping.h \
-  minion/./constants.h minion/./debug.h minion/./solver.h \
-  minion/./memory_management/backtrackable_memory.h \
-  minion/./memory_management/nonbacktrack_memory.h \
-  minion/./reversible_vals.h \
-  minion/./memory_management/trailed_monotonic_set.h \
-  minion/./tuple_container.h minion/./constraints/triggers.h \
-  minion/./variables/VarRefType.h minion/./variables/AnyVarRef.h \
-  minion/./constraints/constraint.h \
-  minion/./constraints/constraint_dynamic.h minion/./trigger_list.h \
-  minion/./variables/variables.h \
-  minion/./variables/containers/booleanvariables.h \
-  minion/./variables/containers/intvar.h \
-  minion/./variables/containers/long_intvar.h \
-  minion/./variables/containers/intboundvar.h \
-  minion/./variables/containers/sparse_intboundvar.h \
-  minion/./variables/mappings/variable_neg.h \
-  minion/./variables/mappings/variable_switch_neg.h \
-  minion/./variables/mappings/variable_stretch.h \
-  minion/./variables/mappings/variable_constant.h \
-  minion/./variables/mappings/variable_not.h \
-  minion/./variables/mappings/variable_shift.h \
-  minion/./variables/iterators.h minion/./solver2.h \
-  minion/./build_constraints/build_helper.h \
-  minion/./build_constraints/../CSPSpec.h \
-  minion/./build_constraints/../BuildConstraintConstructs.h \
-  minion/./build_constraints/../BuildConstraint.h \
-  minion/./constraints/constraint_checkassign.h \
-  minion/./constraints/constraint_table.h \
-  minion/./constraints/constraint_boundtable.h \
-  minion/./constraints/reify.h minion/./constraints/reify_true.h \
-  minion/./constraints/function_defs.hpp minion/./queue/standard_queue.h \
-  minion/./search/standard_search.h minion/./search/common_search.h \
-  minion/./search/VariableOrders.h minion/./search/recursive_search.h \
-  minion/./search/sdf_search.h minion/./constraint_setup.h \
-  minion/./test_functions.h minion/./CSPSpec.h minion/./BuildConstraint.h \
-  minion/./MinionInputReader.h
-$(OBJDIR)/MinionInputReader.o: minion/./MinionInputReader.cpp \
-  minion/./minion.h minion/./svn_header.h minion/./system.h \
-  minion/./system/linked_ptr.h minion/./system/local_array.h \
-  minion/./system/time_keeping.h minion/./constants.h minion/./debug.h \
+  minion/./system/to_string.h minion/./constants.h minion/./debug.h \
   minion/./solver.h minion/./memory_management/backtrackable_memory.h \
   minion/./memory_management/nonbacktrack_memory.h \
   minion/./reversible_vals.h \
@@ -1564,14 +1605,15 @@ $(OBJDIR)/MinionInputReader.o: minion/./MinionInputReader.cpp \
   minion/./constraints/reify.h minion/./constraints/reify_true.h \
   minion/./constraints/function_defs.hpp minion/./queue/standard_queue.h \
   minion/./search/standard_search.h minion/./search/common_search.h \
-  minion/./search/VariableOrders.h minion/./search/recursive_search.h \
-  minion/./search/sdf_search.h minion/./constraint_setup.h \
-  minion/./test_functions.h minion/./CSPSpec.h \
-  minion/./MinionInputReader.h \
-  minion/./build_constraints/constraint_defs.h
-$(OBJDIR)/test_functions.o: minion/./test_functions.cpp minion/./minion.h \
-  minion/./svn_header.h minion/./system.h minion/./system/linked_ptr.h \
-  minion/./system/local_array.h minion/./system/time_keeping.h \
+  minion/./search/VariableOrders.h minion/./search/search_methods.h \
+  minion/./search/recursive_search.h minion/./search/search_control.h \
+  minion/./preprocess/preprocess.h minion/./constraint_setup.h \
+  minion/./test_functions.h minion/./CSPSpec.h minion/./BuildConstraint.h \
+  minion/./MinionInputReader.h
+$(OBJDIR)/MinionInputReader.o: minion/./MinionInputReader.cpp \
+  minion/./minion.h minion/./svn_header.h minion/./system.h \
+  minion/./system/linked_ptr.h minion/./system/local_array.h \
+  minion/./system/time_keeping.h minion/./system/to_string.h \
   minion/./constants.h minion/./debug.h minion/./solver.h \
   minion/./memory_management/backtrackable_memory.h \
   minion/./memory_management/nonbacktrack_memory.h \
@@ -1604,6 +1646,48 @@ $(OBJDIR)/test_functions.o: minion/./test_functions.cpp minion/./minion.h \
   minion/./constraints/reify.h minion/./constraints/reify_true.h \
   minion/./constraints/function_defs.hpp minion/./queue/standard_queue.h \
   minion/./search/standard_search.h minion/./search/common_search.h \
-  minion/./search/VariableOrders.h minion/./search/recursive_search.h \
-  minion/./search/sdf_search.h minion/./constraint_setup.h \
+  minion/./search/VariableOrders.h minion/./search/search_methods.h \
+  minion/./search/recursive_search.h minion/./search/search_control.h \
+  minion/./preprocess/preprocess.h minion/./constraint_setup.h \
+  minion/./test_functions.h minion/./CSPSpec.h \
+  minion/./MinionInputReader.h \
+  minion/./build_constraints/constraint_defs.h
+$(OBJDIR)/test_functions.o: minion/./test_functions.cpp minion/./minion.h \
+  minion/./svn_header.h minion/./system.h minion/./system/linked_ptr.h \
+  minion/./system/local_array.h minion/./system/time_keeping.h \
+  minion/./system/to_string.h minion/./constants.h minion/./debug.h \
+  minion/./solver.h minion/./memory_management/backtrackable_memory.h \
+  minion/./memory_management/nonbacktrack_memory.h \
+  minion/./reversible_vals.h \
+  minion/./memory_management/trailed_monotonic_set.h \
+  minion/./tuple_container.h minion/./constraints/triggers.h \
+  minion/./variables/VarRefType.h minion/./variables/AnyVarRef.h \
+  minion/./constraints/constraint.h \
+  minion/./constraints/constraint_dynamic.h minion/./trigger_list.h \
+  minion/./variables/variables.h \
+  minion/./variables/containers/booleanvariables.h \
+  minion/./variables/containers/intvar.h \
+  minion/./variables/containers/long_intvar.h \
+  minion/./variables/containers/intboundvar.h \
+  minion/./variables/containers/sparse_intboundvar.h \
+  minion/./variables/mappings/variable_neg.h \
+  minion/./variables/mappings/variable_switch_neg.h \
+  minion/./variables/mappings/variable_stretch.h \
+  minion/./variables/mappings/variable_constant.h \
+  minion/./variables/mappings/variable_not.h \
+  minion/./variables/mappings/variable_shift.h \
+  minion/./variables/iterators.h minion/./solver2.h \
+  minion/./build_constraints/build_helper.h \
+  minion/./build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../BuildConstraintConstructs.h \
+  minion/./build_constraints/../BuildConstraint.h \
+  minion/./constraints/constraint_checkassign.h \
+  minion/./constraints/constraint_table.h \
+  minion/./constraints/constraint_boundtable.h \
+  minion/./constraints/reify.h minion/./constraints/reify_true.h \
+  minion/./constraints/function_defs.hpp minion/./queue/standard_queue.h \
+  minion/./search/standard_search.h minion/./search/common_search.h \
+  minion/./search/VariableOrders.h minion/./search/search_methods.h \
+  minion/./search/recursive_search.h minion/./search/search_control.h \
+  minion/./preprocess/preprocess.h minion/./constraint_setup.h \
   minion/./test_functions.h
