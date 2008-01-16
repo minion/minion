@@ -110,7 +110,7 @@ VARDEF_ASSIGN(BOOL dynamic_triggers_used, false);
 namespace Controller
 {
   /// Add a new list of triggers to the queue.
-  inline void push_triggers(TriggerRange new_triggers);
+  inline void push_triggers(const TriggerRange& new_triggers);
   inline void push_special_trigger(Constraint* trigger);
 #ifdef DYNAMICTRIGGERS
   inline void push_dynamic_triggers(DynamicTrigger* trigs);

@@ -44,9 +44,9 @@ namespace Controller
     special_triggers.push_back(trigger);
   }
   
-  inline void push_triggers(TriggerRange new_triggers)
+  inline void push_triggers(const TriggerRange& new_triggers)
   { 
-    D_INFO(1, DI_QUEUE, string("Adding ") + to_string(new_triggers.end - new_triggers.start)
+    D_INFO(1, DI_QUEUE, string("Adding ") + to_string(new_triggers.end() - new_triggers.begin())
 		   + string(" new triggers. Trigger list size is ") + 
 		   to_string(propogate_trigger_list.size()) + ".");
 	propogate_trigger_list.push_back(new_triggers); 
@@ -118,11 +118,10 @@ namespace Controller
 	BOOL* fail_ptr = &Controller::failed;
 	while(!propogate_trigger_list.empty())
 	{
-	  TriggerRange t = propogate_trigger_list.back();
+	  TriggerRange& t = propogate_trigger_list.back();
 	  short data_val = t.data;
-	  propogate_trigger_list.pop_back();
 	  
-	  for(Trigger* it = t.start; it != t.end ; it++)
+	  for(Trigger* it = t.begin(); it != t.end() ; it++)
 	  {
 #ifndef USE_SETJMP
 		if(*fail_ptr) 
@@ -142,6 +141,7 @@ namespace Controller
 #endif
 		
 	  }
+	  propogate_trigger_list.pop_back();
 	}
 	
 	return false;

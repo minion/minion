@@ -36,11 +36,9 @@ inline bool special_limit_propogate_static_queue(const set<Constraint*>& constra
 	BOOL* fail_ptr = &Controller::failed;
 	while(!propogate_trigger_list.empty())
 	{
-	  TriggerRange t = propogate_trigger_list.back();
-	  short data_val = t.data;
-	  propogate_trigger_list.pop_back();
-	  
-	  for(Trigger* it = t.start; it != t.end ; it++)
+	  TriggerRange& t = propogate_trigger_list.back();
+	  short data_val = t.data;	  
+	  for(Trigger* it = t.begin(); it != t.end() ; it++)
 	  {
 #ifndef USE_SETJMP
 		if(*fail_ptr) 
@@ -52,6 +50,8 @@ inline bool special_limit_propogate_static_queue(const set<Constraint*>& constra
 		
 		it->propogate(data_val);		
 	  }
+	  propogate_trigger_list.pop_back();
+	  
 	}
 	
 	return false;

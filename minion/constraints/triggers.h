@@ -16,17 +16,26 @@
  */
 
 /// Container for a range of triggers
-struct TriggerRange
+class TriggerRange
 {
   /// Start of triggers
   Trigger* start;
   /// End of triggers
-  Trigger* end;
+  Trigger* finish;
+
+public:
+	
+  Trigger* begin() const
+  { return start; }
+  
+  Trigger* end() const
+  { return finish; }
+  
   /// The domain delta from the domain change.
   /** This may not contain the actual delta, but contains data from which a variable can
    construct it, by passing it to getDomainChange. */
   short data;
-  TriggerRange(Trigger* s, Trigger* e, int _data) : start(s), end(e), data(_data)
+  TriggerRange(Trigger* s, Trigger* e, int _data) : start(s), finish(e), data(_data)
   { 
     D_ASSERT(data >= std::numeric_limits<short>::min());
     D_ASSERT(data <= std::numeric_limits<short>::max());
