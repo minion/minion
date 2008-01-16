@@ -285,6 +285,10 @@
 			269073420B7B2F12004AF08E /* PBXTextBookmark */ = 269073420B7B2F12004AF08E /* PBXTextBookmark */;
 			269073430B7B2F12004AF08E /* PBXTextBookmark */ = 269073430B7B2F12004AF08E /* PBXTextBookmark */;
 			269073440B7B2F12004AF08E /* PBXTextBookmark */ = 269073440B7B2F12004AF08E /* PBXTextBookmark */;
+			269073490B7B3C32004AF08E /* PBXTextBookmark */ = 269073490B7B3C32004AF08E /* PBXTextBookmark */;
+			2690734A0B7B3C32004AF08E /* PBXTextBookmark */ = 2690734A0B7B3C32004AF08E /* PBXTextBookmark */;
+			2690734B0B7B3C32004AF08E /* PBXTextBookmark */ = 2690734B0B7B3C32004AF08E /* PBXTextBookmark */;
+			2690734C0B7B3C32004AF08E /* PBXTextBookmark */ = 2690734C0B7B3C32004AF08E /* PBXTextBookmark */;
 		};
 		sourceControlManager = 26AAF872096D3BAC00AD8C1A /* Source Control */;
 		userBuildSettings = {
@@ -724,8 +728,8 @@
 	267889880B79EB6B007B2152 /* preprocess.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {488, 1232}}";
-			sepNavSelRange = "{530, 0}";
-			sepNavVisRect = "{{0, 169}, {488, 682}}";
+			sepNavSelRange = "{880, 0}";
+			sepNavVisRect = "{{0, 264}, {488, 682}}";
 			sepNavWindowFrame = "{{790, 67}, {533, 811}}";
 		};
 	};
@@ -811,7 +815,7 @@
 		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
 		name = "preprocess.h: 57";
 		rLen = 0;
-		rLoc = 1383;
+		rLoc = 1346;
 		rType = 0;
 		vrLen = 1256;
 		vrLoc = 384;
@@ -915,7 +919,7 @@
 		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
 		name = "preprocess.h: 24";
 		rLen = 0;
-		rLoc = 546;
+		rLoc = 539;
 		rType = 0;
 		vrLen = 1248;
 		vrLoc = 0;
@@ -955,7 +959,7 @@
 		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
 		name = "preprocess.h: 24";
 		rLen = 0;
-		rLoc = 546;
+		rLoc = 539;
 		rType = 0;
 		vrLen = 1248;
 		vrLoc = 0;
@@ -999,7 +1003,7 @@
 		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
 		name = "preprocess.h: 24";
 		rLen = 0;
-		rLoc = 546;
+		rLoc = 539;
 		rType = 0;
 		vrLen = 1198;
 		vrLoc = 0;
@@ -1049,7 +1053,7 @@
 		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
 		name = "preprocess.h: 82";
 		rLen = 0;
-		rLoc = 1827;
+		rLoc = 1775;
 		rType = 0;
 		vrLen = 1018;
 		vrLoc = 904;
@@ -1099,7 +1103,7 @@
 		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
 		name = "preprocess.h: operator ()";
 		rLen = 0;
-		rLoc = 1845;
+		rLoc = 1793;
 		rType = 0;
 		vrLen = 1022;
 		vrLoc = 904;
@@ -1149,7 +1153,7 @@
 		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
 		name = "preprocess.h: 85";
 		rLen = 0;
-		rLoc = 1880;
+		rLoc = 1828;
 		rType = 0;
 		vrLen = 1018;
 		vrLoc = 904;
@@ -1199,7 +1203,7 @@
 		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
 		name = "preprocess.h: PropogateSSAC";
 		rLen = 0;
-		rLoc = 1787;
+		rLoc = 1735;
 		rType = 0;
 		vrLen = 1018;
 		vrLoc = 904;
@@ -1249,7 +1253,7 @@
 		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
 		name = "preprocess.h: 85";
 		rLen = 0;
-		rLoc = 1864;
+		rLoc = 1812;
 		rType = 0;
 		vrLen = 1018;
 		vrLoc = 904;
@@ -1309,7 +1313,7 @@
 		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
 		name = "preprocess.h: 85";
 		rLen = 0;
-		rLoc = 1864;
+		rLoc = 1812;
 		rType = 0;
 		vrLen = 1018;
 		vrLoc = 904;
@@ -1694,6 +1698,46 @@
 		vrLen = 1135;
 		vrLoc = 1211;
 	};
+	269073490B7B3C32004AF08E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 267889880B79EB6B007B2152 /* preprocess.h */;
+		name = "preprocess.h: 38";
+		rLen = 0;
+		rLoc = 880;
+		rType = 0;
+		vrLen = 1154;
+		vrLoc = 415;
+	};
+	2690734A0B7B3C32004AF08E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 26CD0D5C0A1B810E007D8889 /* standard_queue.h */;
+		name = "standard_queue.h: 220";
+		rLen = 0;
+		rLoc = 5397;
+		rType = 0;
+		vrLen = 1046;
+		vrLoc = 4351;
+	};
+	2690734B0B7B3C32004AF08E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 266F5EAA097C0AA200D9CC72 /* backtrackable_memory.h */;
+		name = "backtrackable_memory.h: 322";
+		rLen = 0;
+		rLoc = 10141;
+		rType = 0;
+		vrLen = 1485;
+		vrLoc = 7822;
+	};
+	2690734C0B7B3C32004AF08E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 26BA221E0974427C0044D9C1 /* solver2.h */;
+		name = "solver2.h: 81";
+		rLen = 0;
+		rLoc = 2346;
+		rType = 0;
+		vrLen = 1135;
+		vrLoc = 1211;
+	};
 	269174BC097EA1D400B88B0E /* constraint_min.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1032, 2310}}";
@@ -1899,7 +1943,7 @@
 	26CD0D5C0A1B810E007D8889 /* standard_queue.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {702, 3080}}";
-			sepNavSelRange = "{5332, 0}";
+			sepNavSelRange = "{5397, 0}";
 			sepNavVisRect = "{{0, 2389}, {702, 691}}";
 			sepNavWindowFrame = "{{80, 58}, {747, 820}}";
 		};

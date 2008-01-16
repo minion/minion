@@ -35,7 +35,7 @@ void propogateSAC_internal(vector<Var>& vararray, Prop prop)
         {
           reduced = true;
           var.setMax(var.getMax() - 1);
-          prop();
+          prop(vararray);
           if(Controller::failed)
             return;
         }
@@ -44,7 +44,7 @@ void propogateSAC_internal(vector<Var>& vararray, Prop prop)
         {
           reduced = true;
           var.setMin(var.getMin() + 1);
-          prop();
+          prop(vararray);
           if(Controller::failed)
             return;
         }
@@ -57,7 +57,7 @@ void propogateSAC_internal(vector<Var>& vararray, Prop prop)
           {
             reduced = true;
             var.removeFromDomain(val);
-            prop();
+            prop(vararray);
             if(Controller::failed)
               return;          
           }
