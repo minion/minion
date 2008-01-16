@@ -67,6 +67,11 @@ namespace Controller
 	  }
   }
   
+  inline bool are_queues_empty()
+  { 
+	return propogate_trigger_list.empty() && dynamic_trigger_list.empty() &&
+		   special_triggers.empty();
+  }
   // next_queue_ptr is defined in constraint_dynamic.
   // It is used if pointers are moved around.
   

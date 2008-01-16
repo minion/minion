@@ -21,13 +21,7 @@ namespace Controller
 /// Setups up and does a first propagation of the constraints
 inline void setup_constraints()
 {
-  size_t size = constraints.size();
-  for(size_t i = 0 ; i < size;i++)
-  {
-	constraints[i]->setup();
-	constraints[i]->full_propogate();
-	propogate_queue();
-  }
+
 }
 
 /// Lists all structures that must be locked before search.
@@ -48,17 +42,33 @@ inline void lock()
   backtrackable_memory.lock();
   memory_block.lock();
   atexit(Controller::finish);
-  setup_constraints();
+  
+  size_t size = constraints.size();
+  for(size_t i = 0 ; i < size;i++)
+	constraints[i]->setup();
+  
   TriggerSpace::finaliseTriggerLists();
+  
   backtrackable_memory.final_lock();
-  memory_block.final_lock();    
-#ifdef DYNAMICTRIGGERS
-  for(int i = 0; i < dynamic_size; ++i)
+  memory_block.final_lock();  
+  
+  while(true)
   {
-	dynamic_constraints[i]->full_propogate();
-	propogate_queue();
-  }
+	// We can't use incremental propagate until all constraints
+	// have been setup, so this slightly messy loop is necessary
+	// To propagate the first node.
+	for(size_t i = 0; i < size; ++i)
+	  constraints[i]->full_propogate();
+
+#ifdef DYNAMICTRIGGERS
+	for(int i = 0; i < dynamic_size; ++i)
+	  dynamic_constraints[i]->full_propogate();
 #endif
+	
+	if(are_queues_empty())
+	  return;
+	clear_queues();
+  }
 }
 }
 

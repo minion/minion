@@ -43,7 +43,7 @@ DynamicConstraint*
 build_dynamic_constraint_binary(ConstraintBlob& b);
 
 DynamicConstraint*
-build_dynamic_constraint_table(ConstraintBlob& b);
+build_dynamic_constraint_unary(ConstraintBlob& b);
 
 #endif
 

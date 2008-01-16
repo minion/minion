@@ -42,7 +42,8 @@ ConstraintDef constraint_list[] =
 { "watchvecneq", CT_WATCHED_VECNEQ, 2, {read_list, read_list}, DYNAMIC_CT },
 { "minuseq", CT_MINUSEQ, 2, { read_var, read_var }, STATIC_CT },
 { "reify", CT_REIFY, 0, {}, STATIC_CT },
-{ "reifyimply", CT_REIFYIMPLY, 0, {}, STATIC_CT }
+{ "reifyimply", CT_REIFYIMPLY, 0, {}, STATIC_CT },
+{ "litsumgeq", CT_WATCHED_LITSUM, 3, {read_list, read_constant_list, read_constant}, DYNAMIC_CT }
 };
 
 const int num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);

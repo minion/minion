@@ -46,7 +46,16 @@ struct BuildDynamicConstraint<1, 0>
 	{
 	  case CT_WATCHED_TABLE:
 		return GACTableCon(*(vars.second), b.tuples);
-		
+	  case CT_WATCHED_LITSUM:
+	  {
+		// Build a vector of constants
+		vector<int> literals;
+		for(int i = 0; i < b.vars[1].size(); ++i)
+		  literals.push_back(b.vars[1][i].pos);
+		D_ASSERT(literals.size() == (*vars.second).size());
+		runtime_val sum = runtime_val(b.vars[2][0].pos);
+		return LiteralSumConDynamic((*vars.second), literals, sum);
+	  }
 	  default:
 		D_FATAL_ERROR( "unsupported constraint");						
 	}
@@ -54,7 +63,7 @@ struct BuildDynamicConstraint<1, 0>
 };
 
 DynamicConstraint*
-build_dynamic_constraint_table(ConstraintBlob& b)
+build_dynamic_constraint_unary(ConstraintBlob& b)
 { return BuildDynamicConstraint<1, 1>::build(EmptyType(), b, 0); }
 }
 

@@ -33,7 +33,8 @@ build_dynamic_constraint(ConstraintBlob& b)
 	case CT_WATCHED_VECNEQ:
 	  return build_dynamic_constraint_binary(b);
 	case CT_WATCHED_TABLE:
-	  return build_dynamic_constraint_table(b);
+	case CT_WATCHED_LITSUM:
+	  return build_dynamic_constraint_unary(b);
 	default:
 	  D_FATAL_ERROR( "unsupported constraint");
   }

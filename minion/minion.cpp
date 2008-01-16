@@ -28,6 +28,7 @@ void print_info()
 	<< "         [-test]                     Run in test mode" << endl
 	<< "         [-timelimit] N              Stop after N seconds" << endl
 	<< "         [-sollimit] N               Stop after N solutions have been found" << endl
+    << "                                   ( Automatically activates \"-findallsols\")" << endl
 #ifdef MORE_SEARCH_INFO
 	<< "         [-nodelimit] N              Stop after N nodes searched" << endl
 	<< "         [-dumptree]                 Dumps the search tree" << endl
@@ -35,13 +36,13 @@ void print_info()
 	<< "  Note: The following tags should never change the results produced." << endl
 	<< "        If they do, this is a bug." << endl
 	<< "        -fullprop will always slow search down." << endl
-	<< "        -nocheck will only speed up search, but not much." << endl
+	<< "        -nocheck will only speed up search." << endl
 	<< "         [-fullprop]                 Used for debugging" << endl
 	<< "         [-nocheck]                  Don't sanity check solutions" << endl
 
 #endif
 	<< endl
-	<< "Notes: In problems with an optimisation function, -findallsols is ignored" << endl;
+	<< "Notes: In problems with an optimisation function, -findallsols is ignored." << endl;
 	
     cout << "This version of Minion was built with internal checking " <<
 #ifdef NO_DEBUG
@@ -122,6 +123,7 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 	{
 	  ++i;
 	  Controller::commandlineoption_sollimit = atoi(argv[i]);
+	  Controller::find_all_solutions(); 
 	  if(Controller::commandlineoption_sollimit == 0)
 	  {
 	    cout << "Did not understand the parameter to sollimit:" << argv[i] << endl;
@@ -224,7 +226,9 @@ int main(int argc, char** argv) {
   time(&rawtime);
   cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
   cout << "#    http://minion.sourceforge.net" << endl;
-  
+  cout << "#  Minion is still very new and in active development." << endl;
+  cout << "#  If you have problems with Minion or find any bugs, please tell us!" << endl;
+  cout << "#  Either at the bug reporter at the website, or 'chris@bubblescope.net'" << endl;
   cout << "# Input filename: " << argv[argc-1] << endl;
   cout << "# Command line: " ;
   for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; } 

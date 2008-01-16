@@ -152,12 +152,12 @@ public:
 	return pair<Trigger*,Trigger*>(trig_range_start, trig_range_end);
   }
   
-  void slow_trigger_push(int var_num, TrigType type, int delta)
+/*  void slow_trigger_push(int var_num, TrigType type, int delta)
   {
 	if(!triggers[type][var_num].empty())
 	  Controller::push_triggers(TriggerRange(&triggers[type][var_num].front(), 
                 (&triggers[type][var_num].front()) + triggers[type][var_num].size(), delta));
-  }
+  }*/
   
 #ifdef DYNAMICTRIGGERS
   void dynamic_propogate(int var_num, TrigType type, int val_removed = -999)
@@ -187,15 +187,12 @@ public:
 #ifdef DYNAMICTRIGGERS
     if (dynamic_triggers_used) dynamic_propogate(var_num, UpperBound);
 #endif
-	if(lock_second)
-	{
-	  D_ASSERT(upper_delta > 0 || Controller::failed);
-	  pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
-	  if (range.first != range.second)
-		Controller::push_triggers(TriggerRange(range.first, range.second, upper_delta)); 
-	}
-	else
-	  slow_trigger_push(var_num, UpperBound, upper_delta);
+	D_ASSERT(lock_second);
+    D_ASSERT(upper_delta > 0 || Controller::failed);
+    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
+	if (range.first != range.second)
+	  Controller::push_triggers(TriggerRange(range.first, range.second, upper_delta));
+	
   }
   
   void push_lower(int var_num, int lower_delta)
@@ -203,15 +200,11 @@ public:
 #ifdef DYNAMICTRIGGERS
     if (dynamic_triggers_used) dynamic_propogate(var_num, LowerBound);
 #endif
-	if(lock_second)
-	{
-	  D_ASSERT(lower_delta > 0 || Controller::failed);
-	  pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
-	  if (range.first != range.second)
-		Controller::push_triggers(TriggerRange(range.first, range.second, lower_delta)); 
-	}
-	else
-	  slow_trigger_push(var_num, LowerBound, lower_delta);
+	D_ASSERT(lock_second);
+	D_ASSERT(lower_delta > 0 || Controller::failed);
+	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
+	if (range.first != range.second)
+	  Controller::push_triggers(TriggerRange(range.first, range.second, lower_delta));
   }
   
   
@@ -220,14 +213,11 @@ public:
 #ifdef DYNAMICTRIGGERS
     if (dynamic_triggers_used) dynamic_propogate(var_num, Assigned);
 #endif
-	if(lock_second)
-	{
-	  pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
-	  if (range.first != range.second)
-		Controller::push_triggers(TriggerRange(range.first, range.second, -1));
-	}
-	else
-	  slow_trigger_push(var_num, Assigned, -1);
+    D_ASSERT(lock_second);
+	
+	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
+	if (range.first != range.second)
+	  Controller::push_triggers(TriggerRange(range.first, range.second, -1));
   }
   
   void push_domain(int var_num)
@@ -235,14 +225,10 @@ public:
 #ifdef DYNAMICTRIGGERS
     if (dynamic_triggers_used) dynamic_propogate(var_num, DomainChanged);
 #endif
-	if(lock_second)
-	{
-	  pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
-	  if (range.first != range.second)	  
-		Controller::push_triggers(TriggerRange(range.first, range.second, -1)); 
-	}
-	else
-	  slow_trigger_push(var_num, DomainChanged, -1);
+	D_ASSERT(lock_second);
+	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
+	if (range.first != range.second)	  
+	  Controller::push_triggers(TriggerRange(range.first, range.second, -1)); 
   }
   
   void push_domain_removal(int var_num, int val_removed)
@@ -250,12 +236,10 @@ public:
 #ifdef DYNAMICTRIGGERS
     dynamic_propogate(var_num, DomainRemoval, val_removed);
 #endif
-    if(lock_second)
-    {
-      pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainRemoval, val_removed);
-	  if(range.first != range.second)
-	    Controller::push_triggers(TriggerRange(range.first, range.second, val_removed));
-    }
+	D_ASSERT(lock_second);
+    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainRemoval, val_removed);
+	if(range.first != range.second)
+	  Controller::push_triggers(TriggerRange(range.first, range.second, val_removed));
   }
   
   /*

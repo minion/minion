@@ -149,6 +149,7 @@ namespace Controller
 #include "dynamic_constraints/dynamic_sum.h"
 #include "dynamic_constraints/dynamic_element.h"
 #include "dynamic_constraints/dynamic_vecneq.h"
+#include "dynamic_constraints/dynamic_literalwatch.h"
 #endif
 
 #include "constraints/function_defs.hpp"
