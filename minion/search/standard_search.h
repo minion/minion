@@ -11,18 +11,28 @@ namespace Controller
 
 #include "VariableOrders.h"
   
+  /// This variable contains the name of a function which should be called
+  /// Wherever a solution is found.
   VARDEF_ASSIGN(void (*_solution_check)(void), NULL);
   
+  /// Sets the function to be called when a solution is found.
   inline void set_solution_check_function(void(*fun_ptr)(void))
   { _solution_check = fun_ptr; }
 
+  /// Global variable to denote if only one solution should be found.
   VARDEF_ASSIGN(BOOL _find_one_sol,true);
+  
+  /// Global variable to denote if solutions should be printed.
   VARDEF_ASSIGN(BOOL print_solution, true);
+  
+  /// Global variable to denote if SDF should be used.
   VARDEF_ASSIGN(BOOL use_sdf, false);
   
+  /// Makes solver find all solutions.
   inline void find_all_solutions()
   { _find_one_sol = false; }
   
+  /// Sets optimisation variable.
   template<typename VarRef>
 	void optimise_maximise_var(VarRef var)
   {
@@ -31,6 +41,7 @@ namespace Controller
 	  optimise = true;
   }
   
+  /// Sets optimisation variable.
   template<typename VarRef>
 	void optimise_minimise_var(VarRef var)
   {
@@ -39,6 +50,7 @@ namespace Controller
 	  optimise = true;
   }
   
+  /// Ensures a particular constraint is satisfied by the solution.
   template<typename T>
 	void check_constraint(T* con)
   {
@@ -74,7 +86,8 @@ namespace Controller
 	  }
   }
 
-
+  /// All operations to be performed when a solution is found.
+  /// This function checks the solution is correct, and prints it if required.
   inline void check_sol()
   {
     if(_solution_check != NULL)
@@ -117,7 +130,7 @@ namespace Controller
 #endif
   }
   
-  
+  /// Check if timelimit has been exceeded.
   inline BOOL do_checks()
   {
 	if(time_limit != 0)
@@ -130,23 +143,29 @@ namespace Controller
 	}
 	return false;
   }
-  
+
+#ifdef MORE_SEARCH_INFO
+#define maybe_print_search_state(x,y)
+#else
+template<typename T>
+void maybe_print_search_state(string name, T& vars)
+{
+  if(commandlineoption_dumptree)
+	cout << name << nodes << "," << get_dom_as_string(vars) << endl;
+}
+#endif
   
   /// Variable Order objects
   // These need the following functions:
   // Constructor that takes existing variable and value ordering
   // (Feel free to ignore the value ordering!)
-  // find_next_unassigned() : gets 
 
   template<typename VarOrder, typename Variables>
 	inline void solve_loop(VarOrder& order, Variables& v)
   {
 	  D_INFO(0, DI_SOLVER, "Non-Boolean Search");
 	  
-#ifdef MORE_SEARCH_INFO
-	  if(commandlineoption_dumptree)
-		cout << "Node: " << nodes << "," << get_dom_as_string(v) << endl;
-#endif
+	  maybe_print_search_state("Node: ", v);
 	  
 	  while(true)
 	  {
@@ -162,68 +181,53 @@ namespace Controller
 		// order.find_next_unassigned returns true if all variables assigned.
 		if(order.find_next_unassigned())
 		{  
-		  
-#ifdef MORE_SEARCH_INFO
-		  if(commandlineoption_dumptree)
-			cout << "Sol: " << nodes << "," << get_dom_as_string(v) << endl;
-#endif
+		  maybe_print_search_state("Sol: ", v);
 		  
 		  // We have found a solution!
 		  check_sol();
 		  if(optimise)
 		  {
-			
-#ifdef MORE_SEARCH_INFO
-		    if(!optimise_var->isAssigned())
+			if(!optimise_var->isAssigned())
 			{
 			  cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
 			  cerr << "Put it in the variable ordering?" << endl;
 			  FAIL_EXIT();
 			}
-#endif
 			
 			cout << "Solution found with Value: " 
-			<< optimise_var->getAssignedValue() << endl;
+ 			     << optimise_var->getAssignedValue() << endl;
 			
-			current_optimise_position = optimise_var->getAssignedValue() + 1;
-			cout << "New optimisation Value: " << current_optimise_position << endl;
-			
+			current_optimise_position = optimise_var->getAssignedValue() + 1;			
 		  }
 		  if(_find_one_sol || solutions == commandlineoption_sollimit)
 			return;
 		  
-	
 		  // fail here to force backtracking.
 		  failed = true;
 		}
 		else
 		{
-#ifdef MORE_SEARCH_INFO
-		  if(commandlineoption_dumptree)
-			cout << "Node: " << nodes << "," << get_dom_as_string(v) << endl;
-#endif
+		  maybe_print_search_state("Node: ", v);
 		  world_push();
 		  order.branch_left();
 		  propogate_queue();
 		}
 		
+		// Either search failed, or a solution was found.
 		while(failed)
 		{
 		  failed = false;
 		  
 		  if(order.finished_search())
 			return;
-#ifdef MORE_SEARCH_INFO
-		  if(commandlineoption_dumptree)
-			cout << "Node: " << nodes << "," << get_dom_as_string(v) << endl;
-#endif
+		  
+		  maybe_print_search_state("Node: ", v);		  
 		  world_pop();
 		  order.branch_right();
 		  if(optimise)
 			optimise_var->setMin(current_optimise_position);
 		  propogate_queue();
 		}
-		
 	  }
   }
   

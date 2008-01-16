@@ -114,8 +114,8 @@
 	  unsigned loop = bool_end;
 	
 	  // Set up values
-	  unsigned dom_size = INT_MAX;
-	  unsigned var_pos = -1;	
+	  int dom_size = INT_MAX;
+	  int var_pos = -1;	
 		
 	  while(loop < v_size)
 	  {

@@ -39,10 +39,11 @@ void print_info()
 	<< "         [-timelimit] N              Stop after N seconds" << endl
 	<< "         [-sollimit] N               Stop after N solutions have been found" << endl
     << "                                   ( Automatically activates \"-findallsols\")" << endl
+    << "         [-nodelimit] N              Stop after N nodes searched" << endl
+    << "         [-randomiseorder]           Randomises the variable ordering" << endl
+
 #ifdef MORE_SEARCH_INFO
-	<< "         [-nodelimit] N              Stop after N nodes searched" << endl
 	<< "         [-dumptree]                 Dumps the search tree" << endl
-	<< "         [-randomiseorder]           Randomises the variable ordering" << endl
 	<< "  Note: The following tags should never change the results produced." << endl
 	<< "        If they do, this is a bug." << endl
 	<< "        -fullprop will always slow search down." << endl
