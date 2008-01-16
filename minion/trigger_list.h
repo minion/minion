@@ -150,7 +150,7 @@ public:
 #ifdef DYNAMICTRIGGERS
 	DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr());
 	
-	int trigger_types = ( only_bounds ? (4 + vars_domain_size) : 4 );
+	int trigger_types = ( only_bounds ? 4 : (4 + vars_domain_size));
 	for(unsigned i = 0; i < var_count_m * trigger_types; ++i)
 	{
 	  new (trigger_ptr + i) DynamicTrigger;

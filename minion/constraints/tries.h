@@ -77,7 +77,7 @@ struct TupleTrie
   int map_depth(int depth)
   {
     if(depth==0) return sigIndex;
-	if(depth < sigIndex) return depth - 1;
+	if(depth <= sigIndex) return depth - 1;
 	return depth;
   }
   
@@ -258,7 +258,7 @@ struct TupleTrie
   {
 	D_ASSERT(check == obj_list[arity - 1] - obj_list[0]);
 	for(int i = 0; i < arity; ++i)
-	  array[i] = obj_list[i]->val;
+	  array[map_depth(i)] = obj_list[i]->val;
   }
   
   // Find support for domain value i. This will be the value used by

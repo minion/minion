@@ -130,6 +130,7 @@ struct GACTableConstraint : public DynamicConstraint
 	{
 	  if(v != var)
 	  {
+		D_ASSERT(vars[v].inDomain(recyclableTuple[v]));
 		vars[v].addDynamicTrigger(dt, DomainRemoval, recyclableTuple[v]);
 		++dt;
 	  }
