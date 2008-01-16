@@ -1,4 +1,4 @@
-MINION 1
+MINION 2
 #TEST CHECKONESOL 2 4 5
 # Minion Graceful Graph Instance
 #   Version with alldiff from -Q to Q
@@ -20,8 +20,19 @@ MINION 1
 1
 [[x0,x1,x2]]
 0
+
+tuplelists 2
+
+2 3 
+1 2 3
+2 4 5
+
+2 2
+3 4
+4 5
+
 objective none
 print m0
 
-table([x0,x1,x2],{<1,2,3>,<2,4,5>})
-table([x1,x2],{<3,4>,<4,5>})
+table([x0,x1,x2],t0)
+table([x1,x2],t1)
