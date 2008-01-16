@@ -2,6 +2,8 @@
 
 echo $1 $2
 
+set tmpdir = $HOME/tmp
+
 if ($3 == "") set dir = "."
 if ($3 != "") set dir = $3 
 echo $dir
@@ -10,15 +12,15 @@ echo $dir
 # perl analyse_minion.pl $1/* > /tmp/$1.$$
 # perl analyse_minion.pl $2/* > /tmp/$2.$$
 
-analyse_minion.pl $1/* > /tmp/$1.$$
-analyse_minion.pl $2/* > /tmp/$2.$$
+analyse_minion.pl $1/* > $tmpdir/$1.$$
+analyse_minion.pl $2/* > $tmpdir/$2.$$
 
 
 if (! -e $dir) mkdir $dir
 
-join /tmp/$1.$$ /tmp/$2.$$ > $dir/comparison.$1.$2.txt
-rm /tmp/$1.$$
-rm /tmp/$2.$$
+join $tmpdir/$1.$$ $tmpdir/$2.$$ > $dir/comparison.$1.$2.txt
+rm $tmpdir/$1.$$
+rm $tmpdir/$2.$$
 
 
 gnuplot << EOF
@@ -46,7 +48,7 @@ set prefixes = `cat $dir/comparison.$1.$2.txt | awk -F'[ 0-9]' '{print $1}' | so
 
 echo $prefixes
 
-cat << EOF > /tmp/$1.$2.$$.gnu
+cat << EOF > $tmpdir/$1.$2.$$.gnu
 set title "Comparison of $1 with $2"
 set term png
 set output "$dir/breakdown.$1.$2.png"
@@ -65,14 +67,14 @@ plot 1 not, \
 EOF
 
 foreach i ($prefixes)
-     egrep "^${i}[ 0-9]" $dir/comparison.$1.$2.txt > /tmp/$1.$2.$$.$i
-     cat << EOF >> /tmp/$1.$2.$$.gnu
-"/tmp/$1.$2.$$.$i" using 19:((\$7/\$21)) t "$i", \
+     egrep "^${i}[ 0-9]" $dir/comparison.$1.$2.txt > $tmpdir/$1.$2.$$.$i
+     cat << EOF >> $tmpdir/$1.$2.$$.gnu
+"$tmpdir/$1.$2.$$.$i" using 19:((\$7/\$21)) t "$i", \
 EOF
      end
 
-echo "1 not" >> /tmp/$1.$2.$$.gnu 
-gnuplot < /tmp/$1.$2.$$.gnu
+echo "1 not" >> $tmpdir/$1.$2.$$.gnu 
+gnuplot < $tmpdir/$1.$2.$$.gnu
 
-rm /tmp/$1.$2.$$.*
+rm $tmpdir/$1.$2.$$.*
 

@@ -59,8 +59,10 @@ my $referencedir = "$basedir/$ARGV[1]";
 
 # $^X = perl executable
 
-system "$^X $scriptdir/analyse_minion.pl $newdir/* > $tmpdir/1.$$";
-system "$^X $scriptdir/analyse_minion.pl $referencedir/* > $tmpdir/2.$$";
+# join requires input to be in sorted order with -b flag (who knew?)
+
+system "$^X $scriptdir/analyse_minion.pl $newdir/* | $sortexe -b  > $tmpdir/1.$$";
+system "$^X $scriptdir/analyse_minion.pl $referencedir/* | $sortexe -b > $tmpdir/2.$$";
 
 
 if ((-e $dir) and not (-d $dir) )

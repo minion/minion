@@ -8,9 +8,11 @@ my $benchdir = "$homedir/myminion/MinionBenchmarks";
 my $exe = "";
 my $exedefault = "minion";
 my $timelimit = 1200;
+my $interval = 5;
 my $help = "";
 my $resultdir ;
 my $filelist = "regression.filelist";
+my $xgrid = "";
 
 GetOptions(
 	    'filelist=s' => \$filelist,
@@ -18,6 +20,7 @@ GetOptions(
             'minion=s' => \$exe,
             'instancedir=s' => \$benchdir,
             'bindir=s' => \$bindir,
+            'xgrid!' => \$xgrid,
 	    'help' => \$help
 	  );
 
@@ -45,6 +48,7 @@ if (! -d $resultdir)
 
 open DATA, "< $filelist";
 
+print "\#! /bin/sh\n";
 while (<DATA>)
 {
   if (not ( /^\s*\#/ or /^\s*$/))	# nothing to see here, move along
@@ -53,11 +57,15 @@ while (<DATA>)
 # whitespace non-whitespace=$1 whitespace command-options-if-any=$2 #ignore anything after # character
 
        if ( /^\s*(\S+)\s*(.*?)(\#.*)?$/) { $file = $1 ; $options = $2; }
-       # ($command, $options) = split /\s+/, $_, 2; 
-       print "$minionexe -timelimit $timelimit $options $benchdir/$file\n";
+       $command =  "$minionexe -timelimit $timelimit $options $benchdir/$file";
+       if ($xgrid) 
+       { print "xgrid -job run -se $resultdir/tmperr.$file.\$\$ -so $resultdir/out.$file.\$\$ $command &\n";
+         print "sleep $interval\n";
+       }
+       else 
+       { print "$command\n";}
   }
 }
 
 exit;
 
- print "xgrid -job run -se $1/tmp.$i.err -so $1/$i.out $minionexe -timelimit $timelimit $benchdir/$i.minion ";
