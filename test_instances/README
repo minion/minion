@@ -8,13 +8,11 @@ following:
    
 3) Put one of the following as the very first line, after "MINION x"
 
-   #TEST NOSOLS
-     There are no solutions
    #TEST CHECKONESOL x x x ...
      The first solution found will be x x x ... (as given by the "print" 
      statement).
    #TEST SOLCOUNT x
-     There will be x solutions found in the whole search
+     There will be x solutions found in the whole search (can be 0)
    #TEST JUSTPARSE
      Minion will exit after just parsing the input file.
 
