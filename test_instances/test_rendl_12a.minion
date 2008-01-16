@@ -1,6 +1,6 @@
 MINION 1
-#TEST SOLCOUNT 9240
-
+#TEST SOLCOUNT 840
+#
 1
 0
 0
@@ -20,4 +20,4 @@ MINION 1
 objective none
 print m0
 
-reifyimply(element([x1,x2,x3],x4,x5),x0)
+element([x1,x2,x3],x4,x5)

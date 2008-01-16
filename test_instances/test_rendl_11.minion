@@ -1,5 +1,6 @@
 MINION 1
-# ends in a segfault
+#TEST COUNTSOLS 1
+# This test doesn't have the right number of sols
 1
 0
 0
