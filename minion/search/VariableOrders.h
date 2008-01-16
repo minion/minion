@@ -81,6 +81,10 @@
 	}
   };
 
+
+  bool is_boolean(const AnyVarRef& var)
+  { return (var.getInitialMax() - var.getInitialMin()) == 1; } 
+
   struct SDFVariableOrder
   {
     vector<AnyVarRef> var_order;
@@ -92,6 +96,7 @@
 	{
 	  branches.reserve(1000);
 	  pos = 0; 
+	  std::stable_partition(var_order.begin(), var_order.end(), is_boolean);
 	}
 	
 	// Returns true if all variables assigned
