@@ -1,0 +1,4 @@
+17/03/2006 - Chris
+	* Release 0.2.1
+16/03/2006 - Chris
+	* Fix variables of domain size > 32. Add a few files

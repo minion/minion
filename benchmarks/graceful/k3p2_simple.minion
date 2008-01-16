@@ -1,0 +1,58 @@
+MINION 1
+# Input file for Minion built for Version 0.2
+#    http://sourceforge.net/projects/minion
+# Graceful Graph instance for input to Minion
+#  k = 3
+#  p = 2
+#  Created: UTC Sun Mar 26 10:03:19 2006
+#  Generator program written by Ian Gent
+#  
+
+0
+0
+0
+30
+0 0 1
+1 9 11
+0 9 18
+0
+[x0,x1,x2,x3,x4,x15,x24,x6,x18,x27,x9,x5,x16,x25,x7,x19,x28,x10,x20,x29,x11]
+[a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+0
+1
+[[x0,x1,x2],
+[x3,x4,x5],
+[x0,x1,x2,x3,x4,x15,x24,x6,x18,x27,x9,x5,x16,x25,x7,x19,x28,x10,x20,x29,x11]]
+0
+objective none
+print m0
+eq(x0,0)
+alldiff([x0,x1,x2,x3,x4,x5])
+alldiff([x3,x1,x2,x6,x8,x7,x9,x10,x11])
+occurrence([x1,x2,x3],9,1)
+occurrence([x1,x2,x3],8,1)
+ineq(x1,x2,-1)
+sumleq([x15,x6],x24)
+sumgeq([x15,x6],x24)
+min([x1,x4],x15)
+max([x1,x4],x24)
+sumleq([x17,x8],x26)
+sumgeq([x17,x8],x26)
+min([x1,x2],x17)
+max([x1,x2],x26)
+sumleq([x16,x7],x25)
+sumgeq([x16,x7],x25)
+min([x2,x5],x16)
+max([x2,x5],x25)
+sumleq([x18,x9],x27)
+sumgeq([x18,x9],x27)
+min([x3,x4],x18)
+max([x3,x4],x27)
+sumleq([x19,x10],x28)
+sumgeq([x19,x10],x28)
+min([x3,x5],x19)
+max([x3,x5],x28)
+sumleq([x20,x11],x29)
+sumgeq([x20,x11],x29)
+min([x4,x5],x20)
+max([x4,x5],x29)
