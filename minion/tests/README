@@ -1,0 +1,14 @@
+This directory used to contain tests for the internals of Minion, but
+they have all decayed beyond compiling some time ago. A single test
+has been left as an example of how to link directly into Minion.
+
+Note that this is NOT SUPPORTED, NOT TESTED, and it's HIGHLY LIKELY if
+you try basing any code on this it a) won't work, b) will be broken even more
+by next week, and c) not compile in a month. This is only here as a sanity
+test for if the parser gets badly broken / rewriten that the internals
+are still reasonably working.
+
+If you want to try compiling it, you'll have to add a " -I.. " to the command
+line.
+
+Chris
