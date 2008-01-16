@@ -58,7 +58,10 @@ void print_info()
     << "   can cause a severe performance drop." << endl
     << "         [-preprocess]				 Perform SAC at the first node of search" << endl
     << "         [-varorder] order			 Change variable ordering strategy" << endl
-	<< "		   order = sdf               Smallest Domain First" << endl
+	<< "		   order = sdf               Smallest Domain First (static breaks ties)" << endl
+	<< "		   order = sdf-random        SDF (randomly break ties)" << endl
+    << "           order = ldf               Largest Domain First (static breaks ties)" << endl
+    << "           order = ldf-random        LDF (randomly break ties)" << endl
     << "           order = random            Random variable ordering" << endl
     << "           order = static            Standard static (but slower)" << endl
     << "            Note: These orderings do not cache any information between" << endl
@@ -184,6 +187,18 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 		args.order = ORDER_STATIC;
 	  else if(order == "sdf")
 		args.order = ORDER_SDF;
+	  else if(order == "sdf-random")
+	  {
+		args.order = ORDER_SDF;
+		randomise_valvaroder = true;
+	  }
+	  else if(order == "ldf")
+		args.order = ORDER_LDF;
+	  else if(order == "ldf-random")
+	  {
+		args.order = ORDER_LDF;
+		randomise_valvaroder = true;
+	  }
 	  else if(order == "random")
 		randomise_valvaroder = true;
 	  else
@@ -388,9 +403,11 @@ int main(int argc, char** argv) {
   {
 	if(args.preprocess)
 	{
+	  long long lits = lit_count(var_val_order.first);
 	  clock_t start_SAC_time = clock();
       propogateSAC(var_val_order.first);
       cout << "Preprocess Time: " << (clock() - start_SAC_time) / (1.0 * CLOCKS_PER_SEC) << endl;
+	  cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;
 	}  
 	if(!Controller::failed)
       solve(args.order, var_val_order);
