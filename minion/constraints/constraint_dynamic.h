@@ -31,8 +31,9 @@ struct DynamicTrigger;
 
 #define DYNAMIC_PROPAGATE_FUNCTION virtual void propogate
 
-
+#ifndef NO_DYN_CHECK
 VARDEF_ASSIGN(DynamicTrigger* next_queue_ptr, NULL);
+#endif
 
 /// This is a trigger to a constraint, which can be dynamically moved around.
 struct DynamicTrigger
@@ -99,8 +100,10 @@ public:
     if(prev != NULL)
 	{
 	  D_INFO(1, DI_DYNAMICTRIG, "Must remove trigger from existing queue.");
+#ifndef NO_DYN_CHECK
 	  if(this == next_queue_ptr)
 	    next_queue_ptr = next;
+#endif
 	  remove();
 	}
 	DynamicTrigger* new_next = new_prev->next;

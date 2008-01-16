@@ -111,9 +111,6 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 	else
 	  other_propval = base_dt->trigger_info();
 	
-	//if(var_array[other_propval].isAssignedValue(1))
-	//  return;
-	
     D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
 
 	bool found_new_support = false;
