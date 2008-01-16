@@ -16,6 +16,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CSPSPEC_H
+#define CSPSPEC_H
+
 #include <vector>
 #include <utility>
 using namespace std;
@@ -277,3 +280,5 @@ struct ConstraintBlob
 };
 
 }
+
+#endif
