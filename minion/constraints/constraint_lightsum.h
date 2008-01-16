@@ -17,7 +17,7 @@
 */
 
 /// V1 + ... Vn <= X
-template<typename VarRef, std::size_t size, typename VarSum, bool is_reversed = false>
+template<typename VarRef, std::size_t size, typename VarSum, BOOL is_reversed = false>
 struct LightLessEqualSumConstraint : public Constraint
 {
   virtual string constraint_name()
@@ -59,10 +59,10 @@ struct LightLessEqualSumConstraint : public Constraint
       var_array[i].setMax(var_array[i].getMin() + slack);
   }
   
-  virtual bool full_check_unsat()
+  virtual BOOL full_check_unsat()
   { return check_unsat(0, 0); }
   
-  virtual bool check_unsat(int, DomainDelta)
+  virtual BOOL check_unsat(int, DomainDelta)
   {
     int min_sum = 0;
     for(unsigned i = 0; i < size; ++i)
@@ -76,7 +76,7 @@ struct LightLessEqualSumConstraint : public Constraint
     propogate(0,0);
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == var_array.size() + 1);
     int sum = 0;
@@ -104,7 +104,7 @@ struct LightLessEqualSumConstraint : public Constraint
 
 /// These classes are just here to avoid infinite recursion when calculating the reverse of the reverse
 /// of a constraint.
-  template<bool reversed, typename T>
+  template<BOOL reversed, typename T>
     struct reverse_constraint_helper    
   {
     static Constraint* fun(LightLessEqualSumConstraint& con)

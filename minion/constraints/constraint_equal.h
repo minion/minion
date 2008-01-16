@@ -109,7 +109,7 @@ struct ReifiedEqualConstraint : public Constraint
     }
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == 3);
     D_ASSERT(v[2] == 0 || v[2] == 1);
@@ -178,7 +178,7 @@ struct EqualConstraint : public Constraint
   }
   
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == 2);
     return (v[0] == v[1]);
@@ -220,7 +220,7 @@ EqualMinusCon(EqualVarRef1 var1, EqualVarRef2 var2)
 
 template<typename T1, typename T2>
 Constraint*
-BuildCT_EQ(const T1& t1, const T2& t2, bool reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
+BuildCT_EQ(const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
 {
   if(reify)
   { return ReifiedEqualCon(t1[0],t2[0], reifyVar); }
@@ -230,7 +230,7 @@ BuildCT_EQ(const T1& t1, const T2& t2, bool reify, const BoolVarRef& reifyVar, C
 
 template<typename T1, typename T2>
 Constraint*
-BuildCT_MINUSEQ(const T1& t1, const T2& t2, bool reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
+BuildCT_MINUSEQ(const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
 {
   if(reify)
   { return ReifiedEqualMinusCon(t1[0],t2[0], reifyVar); }

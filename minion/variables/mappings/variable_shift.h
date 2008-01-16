@@ -20,11 +20,11 @@
 template<typename VarRef, typename ShiftType>
 struct ShiftVar
 {
-  static const bool isBool = false;
+  static const BOOL isBool = false;
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
   
-  bool isBound()
+  BOOL isBound()
   { return data.isBound();}
   
   ShiftType shift;
@@ -37,19 +37,19 @@ struct ShiftVar
   ShiftVar(const ShiftVar& b) : data(b.data), shift(b.shift)
   { }
   
-  bool isAssigned()
+  BOOL isAssigned()
   { return data.isAssigned(); }
   
   int getAssignedValue()
   { return data.getAssignedValue() + shift.val(); }
   
-  bool isAssignedValue(int i)
+  BOOL isAssignedValue(int i)
   { return data.getAssignedValue() == i - shift.val(); }
   
-  bool inDomain(int i)
+  BOOL inDomain(int i)
   { return data.inDomain(i - shift.val()); }
 
-  bool inDomain_noBoundCheck(int i)
+  BOOL inDomain_noBoundCheck(int i)
   { return data.inDomain(i - shift.val()); }
   
   int getMax()
@@ -79,13 +79,10 @@ struct ShiftVar
   void removeFromDomain(int b)
   { data.removeFromDomain(b - shift.val()); }
     
- void addTrigger(Trigger t, TrigType type, int val = -999)
+ void addTrigger(Trigger t, TrigType type)
   { 
     switch(type)
 	{
-	  case DomainRemoval:
-		data.addTrigger(t, DomainRemoval, val - shift.val());
-		break;
 	  case UpperBound:
 	  case LowerBound:
 	  case Assigned:

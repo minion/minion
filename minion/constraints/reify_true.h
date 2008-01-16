@@ -26,7 +26,7 @@ struct reify_true : public Constraint
   
   Constraint* poscon;
   BoolVar rar_var;
-  bool constraint_locked;
+  BOOL constraint_locked;
   
   reify_true(Constraint* _poscon, BoolVar v) : poscon(_poscon), rar_var(v),
 											   constraint_locked(false)
@@ -35,7 +35,7 @@ struct reify_true : public Constraint
   virtual Constraint* reverse_constraint()
   { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     int back_val = v.back();
     v.pop_back();

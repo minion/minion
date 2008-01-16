@@ -49,7 +49,7 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 {
   const vector<Var>& vars = b.vars[pos];
   int type = vars[0].type;
-  bool same_type = true;
+  BOOL same_type = true;
   for(unsigned i = 1; i < vars.size(); ++i)
   {
 	if(vars[i].type != type)

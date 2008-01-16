@@ -29,10 +29,10 @@ struct BooleanContainer;
 /// A reference to a boolean variable
 struct BoolVarRef_internal
 {
-  static const bool isBool = true;
+  static const BOOL isBool = true;
   static const BoundType isBoundConst = Bound_No;
   
-  bool isBound()
+  BOOL isBound()
   { return false;}
   
   data_type shift_offset;
@@ -49,9 +49,7 @@ struct BoolVarRef_internal
   {}
   
   BoolVarRef_internal()
-  { 
-    D_DATA(shift_offset = data_offset = var_num = ~1); 
-  }
+  { D_DATA(shift_offset = data_offset = var_num = ~1); }
   
   data_type& assign_ptr() const
   { return *static_cast<data_type*>(data_position.get_ptr()); }
@@ -59,7 +57,7 @@ struct BoolVarRef_internal
   data_type& value_ptr() const
   { return *static_cast<data_type*>(value_position.get_ptr()); }
   
-  bool isAssigned() const
+  BOOL isAssigned() const
   { return assign_ptr() & shift_offset; }
   
   int getAssignedValue() const
@@ -68,14 +66,14 @@ struct BoolVarRef_internal
     return (bool)(value_ptr() & shift_offset);
   }
   
-  bool inDomain(int b) const
+  BOOL inDomain(int b) const
   {
     if(b < 0 || b > 1) 
 	  return false;
     return (!isAssigned()) || (b == getAssignedValue());
   }
   
-  bool inDomain_noBoundCheck(int b) const
+  BOOL inDomain_noBoundCheck(int b) const
   {
     D_ASSERT(b == 0 || b == 1);
 	return (!isAssigned()) || (b == getAssignedValue());
@@ -93,7 +91,7 @@ struct BoolVarRef_internal
     return getAssignedValue();
   }
  
-   int getInitialMin() const
+  int getInitialMin() const
   { return 0; }
   
   int getInitialMax() const
@@ -113,7 +111,7 @@ struct BooleanContainer
   unsigned var_count_m;
   TriggerList trigger_list;
   /// When false, no variable can be altered. When true, no variables can be created.
-  bool lock_m;
+  BOOL lock_m;
   
   data_type* value_ptr()
   { return static_cast<data_type*>(values_mem.get_ptr()); }
@@ -223,8 +221,8 @@ struct BooleanContainer
     }
   }
 
-  void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type, int val)
-  { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type, val); }
+  void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type)
+  { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type); }
     
   
 #ifdef DYNAMICTRIGGERS
@@ -259,9 +257,7 @@ struct BooleanContainer
 VARDEF(BooleanContainer boolean_container);
 
 struct GetBooleanContainer
-{
-  static BooleanContainer& con() { return boolean_container; }
-};
+{ static BooleanContainer& con() { return boolean_container; } };
 
 
 

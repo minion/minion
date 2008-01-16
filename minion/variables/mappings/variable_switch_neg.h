@@ -19,11 +19,11 @@
 template<typename Var>
 struct SwitchNeg
 {
-  static const bool isBool = false;
+  static const BOOL isBool = false;
   static const BoundType isBoundConst = Var::isBoundConst;
   Var data;
 	
-  bool isBound()
+  BOOL isBound()
   { return data.isBound();}
   
 
@@ -37,22 +37,22 @@ struct SwitchNeg
   SwitchNeg(const SwitchNeg& b) : data(b.data), multiplier(b.multiplier)
   {}
   
-  bool isAssigned()
+  BOOL isAssigned()
   { return data.isAssigned(); }
   
   int getAssignedValue()
   { return multiplier * data.getAssignedValue(); }
   
-  bool isAssignedValue(int i)
+  BOOL isAssignedValue(int i)
   { 
 	return data.isAssigned() &&
 	data.getAssignedValue() == i * multiplier;
   }
   
-  bool inDomain(int b)
+  BOOL inDomain(int b)
   { return data.inDomain(b * multiplier); }
   
-  bool inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(int b)
   { return data.inDomain(b * multiplier); }
   
   int getMax()
@@ -116,11 +116,11 @@ struct SwitchNeg
   int getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
 
-  void addTrigger(Trigger t, TrigType type, int val = -999)
+  void addTrigger(Trigger t, TrigType type)
   { 
     if(multiplier == 1)
 	{
-	  data.addTrigger(t, type, val);
+	  data.addTrigger(t, type);
 	  return;
 	}
     switch(type)
@@ -130,9 +130,6 @@ struct SwitchNeg
 		break;
 	  case LowerBound:
 		data.addTrigger(t, UpperBound);
-		break;
-	  case DomainRemoval:
-		data.addTrigger(t, DomainRemoval, -val);
 		break;
 	  case Assigned:
 	  case DomainChanged:

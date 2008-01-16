@@ -36,7 +36,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
   
   struct compare_object
   {
-    bool operator()(pair_val a, pair_val b)
+    BOOL operator()(pair_val a, pair_val b)
   { return *(a.first) > *(b.first); }
   };
   
@@ -97,7 +97,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
     min_vals_weight_pos.set(weight_pos);
   }
   
-  virtual bool check_unsat(int, DomainDelta)
+  virtual BOOL check_unsat(int, DomainDelta)
   {
     FAIL_EXIT();
   }
@@ -115,7 +115,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
     propogate(-1,0);
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == var_array.size() + 1);
     int sum = 0;
@@ -159,7 +159,7 @@ template<typename T1, typename T2>
 Constraint*
 LeqWeightedSum(const vector<int>& scale, const vector<T1>& vec, const vector<T2>& t2)
 {
-  bool multipliers_size_one = true;
+  BOOL multipliers_size_one = true;
   for(unsigned i = 0; i < scale.size(); ++i)
   {
 	if(scale[i] != 1 && scale[i] != -1)
@@ -189,7 +189,7 @@ template<typename T1, typename T2>
 Constraint*
 GeqWeightedSum(const vector<int>& scale, const vector<T1>& vec, const vector<T2>& t2)
 {
-  bool multipliers_size_one = true;
+  BOOL multipliers_size_one = true;
   for(unsigned i = 0; i < scale.size(); ++i)
   {
 	if(scale[i] != 1 && scale[i] != -1)

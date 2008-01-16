@@ -33,7 +33,7 @@ struct TableConstraint : public Constraint
   virtual vector<AnyVarRef> get_vars()
   { return vars; }
   
-  virtual bool check_assignment(vector<int> vals)
+  virtual BOOL check_assignment(vector<int> vals)
   { return constraint->check_assignment(vals); }
   
   virtual triggerCollection setup_internal()
@@ -47,7 +47,7 @@ struct TableConstraint : public Constraint
   }
   
   
-  bool increment(vector<int>& v, unsigned int check_var)
+  BOOL increment(vector<int>& v, unsigned int check_var)
   {
     for(unsigned int i=0;i<v.size();i++)
     {
@@ -75,7 +75,7 @@ struct TableConstraint : public Constraint
         for(unsigned int i=0;i<vars.size();i++)
 	  v[i] = vars[i].getMin();
         v[check_var] = check_dom;
-	bool satisfied = false;
+	BOOL satisfied = false;
 	do
 	{
 	  if(constraint->check_assignment(v))

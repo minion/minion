@@ -115,7 +115,7 @@ struct AndConstraint : public Constraint
     
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == 3);
     return (v[0] && v[1]) == v[2];

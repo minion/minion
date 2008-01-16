@@ -59,7 +59,7 @@ void print_info()
 	exit(0);
 }
   
-bool randomise_valvaroder = false;
+BOOL randomise_valvaroder = false;
 
 void parse_command_line(MinionInputReader& reader, int argc, char** argv)
 {
@@ -156,7 +156,7 @@ void parse_command_line(MinionInputReader& reader, int argc, char** argv)
   }
 }
 
-pair<vector<AnyVarRef>, vector<bool> > var_val_order;
+pair<vector<AnyVarRef>, vector<BOOL> > var_val_order;
 
 void BuildCSP(MinionInputReader& reader)
 {
@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
   
   print_timestep("Parsing Time: ");
   // Used by test mode.
-  bool test_checkonesol = false, test_nosols = false;
+  BOOL test_checkonesol = false, test_nosols = false;
   // Just a number no-one would ever type :)
   int test_solcount = -1987;
  

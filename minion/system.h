@@ -33,7 +33,7 @@
 // I don't even get this warning.
 #pragma warning(disable: 4244)
 // I'll buy a pint for anyone who can figure how to fix this..
-// 'unsigned long' : forcing value to bool 'true' or 'false'. Of course I am, that's what I want to test!
+// 'unsigned long' : forcing value to BOOL 'true' or 'false'. Of course I am, that's what I want to test!
 #pragma warning(disable: 4800)
 // At some point I might fix these "signed/unsigned mismatch" warnings...
 #pragma warning(disable: 4018)

@@ -152,7 +152,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
   //
   //  NOT updated for new type of watched data structure
   //  
-  bool check_consistency()
+  BOOL check_consistency()
   {	return true; }
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
@@ -163,7 +163,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 
 	D_ASSERT(!var_array[propval].inDomain(value_array[propval]));
 	
-	bool found_new_support = false;
+	BOOL found_new_support = false;
 	
 	int j;
 	
@@ -213,7 +213,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	}
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == var_array.size());
     int v_size = v.size();
@@ -240,7 +240,7 @@ LiteralSumConDynamic(const VarArray& _var_array,  const ValArray& _val_array, Va
 
 template<typename T1>
 DynamicConstraint* 
-BuildCT_WATCHED_LITSUM(const T1& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_LITSUM(const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 {
   if(reify)
   {

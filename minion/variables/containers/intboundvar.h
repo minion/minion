@@ -18,9 +18,9 @@
 
 struct BoundVarRef_internal
 {
-  static const bool isBool = false;
+  static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Yes;
-  bool isBound()
+  BOOL isBound()
   { return true;}
   
   int var_num;
@@ -40,7 +40,7 @@ struct BoundVarContainer {
   TriggerList trigger_list;
   vector<pair<BoundType, BoundType> > initial_bounds;
   unsigned var_count_m;
-  bool lock_m;
+  BOOL lock_m;
   
 
   const BoundType& lower_bound(BoundVarRef_internal i) const
@@ -91,7 +91,7 @@ struct BoundVarContainer {
   BoundVarContainer() : lock_m(0)
   {}
   
-  bool isAssigned(BoundVarRef_internal d) const
+  BOOL isAssigned(BoundVarRef_internal d) const
   { 
     D_ASSERT(lock_m);
     return lower_bound(d) == upper_bound(d); 
@@ -104,7 +104,7 @@ struct BoundVarContainer {
     return lower_bound(d);
   }
   
-  bool inDomain(BoundVarRef_internal d, int i) const
+  BOOL inDomain(BoundVarRef_internal d, int i) const
   {
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
@@ -112,7 +112,7 @@ struct BoundVarContainer {
     return true;
   }
   
-  bool inDomain_noBoundCheck(BoundVarRef_internal d, int i) const
+  BOOL inDomain_noBoundCheck(BoundVarRef_internal d, int i) const
   {
     D_ASSERT(lock_m);
 	D_ASSERT(i >= lower_bound(d));
@@ -226,8 +226,8 @@ struct BoundVarContainer {
   BoundVarRef get_new_var(int i, int j);
   BoundVarRef get_var_num(int i);
 
-  void addTrigger(BoundVarRef_internal b, Trigger t, TrigType type, int val)
-  { D_ASSERT(lock_m);  trigger_list.add_trigger(b.var_num, t, type, val); }
+  void addTrigger(BoundVarRef_internal b, Trigger t, TrigType type)
+  { D_ASSERT(lock_m);  trigger_list.add_trigger(b.var_num, t, type); }
 
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(BoundVarRef_internal& b, DynamicTrigger* t, TrigType type, int pos = -999)

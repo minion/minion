@@ -19,9 +19,9 @@
 
 struct BigRangeVarRef_internal
 {
-  static const bool isBool = false;
+  static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_No;
-  bool isBound()
+  BOOL isBound()
   { return false;}
   
   int var_num;
@@ -49,7 +49,7 @@ struct BigRangeVarContainer {
   /// Position in the variable data (in counts of d_type) of where each variable starts
   vector<int> var_offset;
   unsigned var_count_m;
-  bool lock_m;
+  BOOL lock_m;
   
     BigRangeVarContainer() : var_count_m(0), lock_m(0)
   { 
@@ -178,7 +178,7 @@ struct BigRangeVarContainer {
     trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
   }
   
-  bool isAssigned(BigRangeVarRef_internal d) const
+  BOOL isAssigned(BigRangeVarRef_internal d) const
   { 
     D_ASSERT(lock_m);
     return lower_bound(d) == upper_bound(d); 
@@ -191,7 +191,7 @@ struct BigRangeVarContainer {
     return getMin(d);
   }
   
-  bool inDomain(BigRangeVarRef_internal d, int i) const
+  BOOL inDomain(BigRangeVarRef_internal d, int i) const
   {
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
@@ -199,7 +199,7 @@ struct BigRangeVarContainer {
     return in_bitarray(d,i - initial_bounds[d.var_num].first);
   }
   
-  bool inDomain_noBoundCheck(BigRangeVarRef_internal d, int i) const
+  BOOL inDomain_noBoundCheck(BigRangeVarRef_internal d, int i) const
   {
     D_ASSERT(lock_m);
 	D_ASSERT(i >= lower_bound(d));
@@ -382,8 +382,8 @@ struct BigRangeVarContainer {
   BigRangeVarRef get_var_num(int i);
   BigRangeVarRef get_new_var(int i, int j);
 
-  void addTrigger(BigRangeVarRef_internal b, Trigger t, TrigType type, int val)
-  { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type, val);  }
+  void addTrigger(BigRangeVarRef_internal b, Trigger t, TrigType type)
+  { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type);  }
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(BigRangeVarRef_internal b, DynamicTrigger* t, TrigType type, int pos = -999)

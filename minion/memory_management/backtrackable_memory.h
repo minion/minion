@@ -85,8 +85,8 @@ struct BacktrackableMemory
   unsigned backtrack_cache_size;
   unsigned backtrack_cache_offset;
   unsigned allocated_bytes;
-  bool lock_m;
-  bool final_lock_m;
+  BOOL lock_m;
+  BOOL final_lock_m;
   set<BackTrackOffset*> offsets;
   MAP_TYPE<void*, pair<int,int> > offset_positions;
   MAP_TYPE<VirtualBackTrackOffset*, pair<BackTrackOffset*, int> > virtual_ptrs;

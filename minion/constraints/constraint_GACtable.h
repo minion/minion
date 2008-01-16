@@ -43,7 +43,7 @@ struct GACTableConstraint : public DynamicConstraint
   { return (lists->literal_specific_tuples)[i][current_support()[i]]; }
   
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
-  bool check_tuple(const vector<int>& v)
+  BOOL check_tuple(const vector<int>& v)
   {
 	for(unsigned i = 0; i < v.size(); ++i)
 	{
@@ -65,7 +65,7 @@ struct GACTableConstraint : public DynamicConstraint
   { return (lists->tuples->literal_num) * ( vars.size() - 1) ; }
   
   
-  bool find_new_support(int literal)
+  BOOL find_new_support(int literal)
   {
 	int support = current_support()[literal];
 	vector<vector<int> >& tuples = (lists->literal_specific_tuples)[literal];
@@ -99,7 +99,7 @@ struct GACTableConstraint : public DynamicConstraint
 	int trigger_pos = propogated_trig - dt;
 	int propogated_literal = trigger_pos / (vars.size() - 1);
 	
-	bool is_new_support = find_new_support(propogated_literal);
+	BOOL is_new_support = find_new_support(propogated_literal);
 	pair<int,int> varval = (lists->tuples->get_varval_from_literal)(propogated_literal);
 	if(is_new_support)
 	{
@@ -158,7 +158,7 @@ struct GACTableConstraint : public DynamicConstraint
 		else
 		{
 		  current_support()[literal] = 0;
-		  bool is_new_support = find_new_support(literal);
+		  BOOL is_new_support = find_new_support(literal);
 		  
 		  if(!is_new_support)
 		  {
@@ -172,7 +172,7 @@ struct GACTableConstraint : public DynamicConstraint
 	}
   }
   
-   virtual bool check_assignment(vector<int> v)
+   virtual BOOL check_assignment(vector<int> v)
   {
     for(int i = 0; i < (lists->tuples)->size(); ++i)
 	{
@@ -200,7 +200,7 @@ GACTableCon(const VarArray& vars, TupleList* tuples)
 
 template <typename T>
 DynamicConstraint*
-BuildCT_WATCHED_TABLE(const T& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_TABLE(const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   if(reify) 
   { 

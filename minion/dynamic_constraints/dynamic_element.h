@@ -284,7 +284,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	deal_with_assigned_index();
   }
   
-    virtual bool check_assignment(vector<int> v)
+    virtual BOOL check_assignment(vector<int> v)
 	{
 	  D_ASSERT(v.size() == var_array.size() + 2);
 	  int resultvariable = v[v.size() - 1];

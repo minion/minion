@@ -32,9 +32,9 @@ inline long long ipow(long long x, long long y)
 }
 
 template<typename VarRef>
-inline void test_prop(vector<pair<int,bool> >& prop_pairs,
+inline void test_prop(vector<pair<int,BOOL> >& prop_pairs,
 					  unsigned long i, unsigned long i2,
-					  vector<VarRef>& v1, vector<VarRef>& v2, bool checkGAC)
+					  vector<VarRef>& v1, vector<VarRef>& v2, BOOL checkGAC)
 {
   Controller::world_push();
   for(unsigned int loop=0;loop<prop_pairs.size();loop++)
@@ -55,7 +55,7 @@ inline void test_prop(vector<pair<int,bool> >& prop_pairs,
   
   Controller::propogate_queue();
   
-  bool first_fail = Controller::failed;
+  BOOL first_fail = Controller::failed;
   Controller::failed = false;
   
   for(unsigned int loop=0;loop < prop_pairs.size();loop++)
@@ -83,9 +83,9 @@ inline void test_prop(vector<pair<int,bool> >& prop_pairs,
   
   Controller::propogate_queue();
   
-  bool second_fail = Controller::failed;
+  BOOL second_fail = Controller::failed;
   
-  bool total_prop = true;
+  BOOL total_prop = true;
   for(unsigned int loop = 0; loop < v1.size(); ++loop)
   {
     if(! ( ((1<<loop)&i) || ((1<<loop)&i2) ) )
@@ -132,7 +132,7 @@ inline void test_prop(vector<pair<int,bool> >& prop_pairs,
 }
 
 template<typename VarRef>
-void test_equal(vector<VarRef>& v1, vector<VarRef>& v2, bool checkGAC = true)
+void test_equal(vector<VarRef>& v1, vector<VarRef>& v2, BOOL checkGAC = true)
 {
   D_ASSERT(v1.size() == v2.size());
   Controller::propogate_queue();
@@ -143,7 +143,7 @@ void test_equal(vector<VarRef>& v1, vector<VarRef>& v2, bool checkGAC = true)
     { D_ASSERT(v1[j].inDomain(k) == v2[j].inDomain(k)); }
   }
   
-  vector<pair<int,bool> > prop_pairs;
+  vector<pair<int,BOOL> > prop_pairs;
 
   for(unsigned int i=0;i<v1.size();++i)
   {
@@ -161,7 +161,7 @@ void test_equal(vector<VarRef>& v1, vector<VarRef>& v2, bool checkGAC = true)
       if(!(i&i2))
       {
 		test_prop(prop_pairs,i,i2,v1,v2, checkGAC);
-		vector<pair<int,bool> > prop_copy(prop_pairs);
+		vector<pair<int,BOOL> > prop_copy(prop_pairs);
 		for(int loop = 0;loop < 20; ++loop)
 		{
 		  random_shuffle(prop_copy.begin(),prop_copy.end());

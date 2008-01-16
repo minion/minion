@@ -34,7 +34,7 @@ class TupleList
   int* tuple_data;
   int tuple_length;
   int number_of_tuples;
-  bool tuples_locked;
+  BOOL tuples_locked;
  
   
   public:

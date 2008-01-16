@@ -39,7 +39,7 @@ void build_variables(const ProbSpec::VarContainer& vars);
 
 /// Build the variable and value ordering used.
 /// The var order is placed, the val order is returned.
-pair<vector<AnyVarRef>, vector<bool> > build_val_and_var_order( ProbSpec::CSPInstance& instance);
+pair<vector<AnyVarRef>, vector<BOOL> > build_val_and_var_order( ProbSpec::CSPInstance& instance);
 
 }
 #ifdef DYNAMICTRIGGERS

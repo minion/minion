@@ -18,10 +18,10 @@
 
 struct ConstantVar
 {
-  static const bool isBool = false;
+  static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Yes;
   
-  bool isBound()
+  BOOL isBound()
   { return true;}
   
   int val;
@@ -34,19 +34,19 @@ struct ConstantVar
   ConstantVar(const ConstantVar& b) : val(b.val)
   {}
   
-  bool isAssigned() const
+  BOOL isAssigned() const
   { return true;}
   
   int getAssignedValue() const
   { return val;}
   
-  bool isAssignedValue(int i) const
+  BOOL isAssignedValue(int i) const
   { return i == val; }
   
-  bool inDomain(int b) const
+  BOOL inDomain(int b) const
   { return b == val; }
 
-  bool inDomain_noBoundCheck(int b) const
+  BOOL inDomain_noBoundCheck(int b) const
   { 
     D_ASSERT(b == val);
 	return true;
@@ -79,7 +79,7 @@ struct ConstantVar
   void removeFromDomain(int b)
   { if(b==val) Controller::fail(); }
  
-  void addTrigger(Trigger, TrigType, int = -999)
+  void addTrigger(Trigger, TrigType)
   { }
 
   

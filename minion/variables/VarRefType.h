@@ -26,11 +26,11 @@
 template<typename GetContainer, typename InternalRefType>
 struct VarRefType
 {
-  static const bool isBool = InternalRefType::isBool;
+  static const BOOL isBool = InternalRefType::isBool;
   static const BoundType isBoundConst = InternalRefType::isBoundConst;
   InternalRefType data;
   
-  bool isBound()
+  BOOL isBound()
   { return data.isBound();}
   
   VarRefType(const InternalRefType& _data) : data(_data)
@@ -42,22 +42,22 @@ struct VarRefType
   VarRefType(const VarRefType& b) : data(b.data)
   {}
   
-  bool isAssigned()
+  BOOL isAssigned()
   { return GetContainer::con().isAssigned(data); }
   
   int getAssignedValue()
   { return GetContainer::con().getAssignedValue(data); }
   
-  bool isAssignedValue(int i)
+  BOOL isAssignedValue(int i)
   { 
     return GetContainer::con().isAssigned(data) &&
     GetContainer::con().getAssignedValue(data) == i;
   }
   
-  bool inDomain(int b)
+  BOOL inDomain(int b)
   { return GetContainer::con().inDomain(data, b); }
 
-  bool inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(int b)
   { return GetContainer::con().inDomain_noBoundCheck(data, b); }
   
   int getMax()
@@ -87,8 +87,8 @@ struct VarRefType
   void removeFromDomain(int b)
   { GetContainer::con().removeFromDomain(data, b); }
   
-  void addTrigger(Trigger t, TrigType type, int val = -999)
-  { GetContainer::con().addTrigger(data, t, type, val); }
+  void addTrigger(Trigger t, TrigType type)
+  { GetContainer::con().addTrigger(data, t, type); }
 
   /// XXX : Change 'VarRef' to correct type.
   operator string()
@@ -107,11 +107,11 @@ struct VarRefType
 template<typename GetContainer, typename InternalRefType>
 struct QuickVarRefType
 {
-  static const bool isBool = InternalRefType::isBool;
+  static const BOOL isBool = InternalRefType::isBool;
   static const BoundType isBoundConst = InternalRefType::isBoundConst;
   InternalRefType data;
   
-  bool isBound()
+  BOOL isBound()
   { return data.isBound();}
   
   QuickVarRefType(const InternalRefType& _data) : data(_data)
@@ -123,21 +123,21 @@ struct QuickVarRefType
   QuickVarRefType(const QuickVarRefType& b) : data(b.data)
   {}
   
-  bool isAssigned()
+  BOOL isAssigned()
   { return data.isAssigned(); }
   
   int getAssignedValue()
   { return data.getAssignedValue(); }
   
-  bool isAssignedValue(int i)
+  BOOL isAssignedValue(int i)
   { 
     return data.isAssigned() &&
     data.getAssignedValue() == i;
   }
-  bool inDomain(int b)
+  BOOL inDomain(int b)
   { return data.inDomain(b); }
   
-  bool inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(int b)
   { return data.inDomain_noBoundCheck(b); }
 
   int getMax()
@@ -167,8 +167,8 @@ struct QuickVarRefType
   void removeFromDomain(int b)
   { GetContainer::con().removeFromDomain(data, b); }
   
-  void addTrigger(Trigger t, TrigType type, int val = -999)
-  { GetContainer::con().addTrigger(data, t, type, val); }
+  void addTrigger(Trigger t, TrigType type)
+  { GetContainer::con().addTrigger(data, t, type); }
   
   operator string()
   { return "Bool:" + to_string(data.var_num); }
@@ -196,18 +196,18 @@ struct CompleteVarRefType
   CompleteVarRefType(const CompleteVarRefType& b) : data(b.data)
   {}
   
-  bool isAssigned()
+  BOOL isAssigned()
   { return (data.getCon()).isAssigned(data); }
   
   int getAssignedValue()
   { return (data.getCon()).getAssignedValue(data); }
   
-  bool isAssignedValue(int i)
+  BOOL isAssignedValue(int i)
   { 
     return (data.getCon()).isAssigned(data) &&
     (data.getCon()).getAssignedValue(data) == i;
   }
-  bool inDomain(int b)
+  BOOL inDomain(int b)
   { return (data.getCon()).inDomain(data, b); }
   
   int getMax()
@@ -237,8 +237,8 @@ struct CompleteVarRefType
   void removeFromDomain(int b)
   { (data.getCon()).removeFromDomain(data, b); }
   
-  void addTrigger(Trigger t, TrigType type, int val = -999)
-  { (data.getCon()).addTrigger(data, t, type, val); }
+  void addTrigger(Trigger t, TrigType type)
+  { (data.getCon()).addTrigger(data, t, type); }
   
   operator string()
   { return "VarRef:" + to_string(data.var_num); }

@@ -48,7 +48,7 @@ struct CheckAssignConstraint : public Constraint
 	  Controller::fail();
   }
   
-  virtual bool check_unsat(int,DomainDelta)
+  virtual BOOL check_unsat(int,DomainDelta)
   {
   
 	int count = assigned_vars.get();
@@ -79,7 +79,7 @@ struct CheckAssignConstraint : public Constraint
 	return false;
   }
   
-  virtual bool full_check_unsat()
+  virtual BOOL full_check_unsat()
   {
     D_INFO(2, DI_CHECKCON, "Checking full unsat");
 	unsigned counter = 0;
@@ -106,7 +106,7 @@ struct CheckAssignConstraint : public Constraint
 	  Controller::fail();
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
 	D_ASSERT(v.size() == variables.size());
     return !originalcon.check_assignment(v);

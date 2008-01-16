@@ -219,9 +219,9 @@
 			isa = PBXGroup;
 			children = (
 				261308660AA765C6009D3F1A /* dynamic_vecneq.h */,
-				2689210909DBB5C500D0472B /* dynamic_sum.h */,
 				26CD8B000ACA639B00688A66 /* dynamic_literalwatch.h */,
 				26B4A05609F42A1D00C7E8A2 /* dynamic_element.h */,
+				2689210909DBB5C500D0472B /* dynamic_sum.h */,
 				261E01FA09F7F57E004F8C91 /* tries.h */,
 				266E8DE60AAB3C530066DA57 /* constraint_GACtable_nightingale.h */,
 				266E8DE70AAB3C530066DA57 /* constraint_GACtable_reginlhomme.h */,

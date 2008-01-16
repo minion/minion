@@ -46,9 +46,9 @@ get_AnyVarRef_from_Var(Var v)
 
     /// Build the variable and value ordering used.
 	/// The var order is placed, the val order is returned.
-	pair<vector<AnyVarRef>, vector<bool> > build_val_and_var_order(ProbSpec::CSPInstance& instance)
+	pair<vector<AnyVarRef>, vector<BOOL> > build_val_and_var_order(ProbSpec::CSPInstance& instance)
   {
-	  vector<bool> final_val_order;
+	  vector<BOOL> final_val_order;
 	  vector<AnyVarRef> final_var_order;
 	  if(instance.var_order.size() != instance.val_order.size())
 	  {
@@ -65,7 +65,7 @@ get_AnyVarRef_from_Var(Var v)
 	  else
 	  {
 	    int var_count = 0;
-		var_count += instance.vars.bools;
+		var_count += instance.vars.BOOLs;
 		for(unsigned i = 0; i < instance.vars.bound.size(); ++i)
 		  var_count += instance.vars.bound[i].first;
 		for(unsigned i = 0; i < instance.vars.sparse_bound.size(); ++i)
@@ -89,7 +89,7 @@ get_AnyVarRef_from_Var(Var v)
   /// Create all the variables used in the CSP.
   void build_variables(const ProbSpec::VarContainer& vars)
   {
-	for(int i = 0; i < vars.bools; ++i)
+	for(int i = 0; i < vars.BOOLs; ++i)
 	{
 	  BoolVarRef b = boolean_container.get_new_var();
 	}

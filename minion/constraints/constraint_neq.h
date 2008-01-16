@@ -58,7 +58,7 @@ struct NeqConstraint : public Constraint
 	
   }
   
-  virtual bool full_check_unsat()
+  virtual BOOL full_check_unsat()
   { 
     int v_size = var_array.size();
     for(int i = 0; i < v_size; ++i)
@@ -81,7 +81,7 @@ struct NeqConstraint : public Constraint
 	return false;
   }
   
-  virtual bool check_unsat(int i, DomainDelta)
+  virtual BOOL check_unsat(int i, DomainDelta)
   {
     int v_size = var_array.size();
 	D_ASSERT(var_array[i].isAssigned());
@@ -114,7 +114,7 @@ struct NeqConstraint : public Constraint
       }
   }
 	
-	virtual bool check_assignment(vector<int> v)
+	virtual BOOL check_assignment(vector<int> v)
 	{
 	  D_ASSERT(v.size() == var_array.size());
 	  int array_size = v.size();
@@ -173,7 +173,7 @@ struct NeqConstraintBinary : public Constraint
     }
   }
   
-  //  virtual bool check_unsat(int i, DomainDelta)
+  //  virtual BOOL check_unsat(int i, DomainDelta)
   
   
   virtual void full_propogate()
@@ -190,7 +190,7 @@ struct NeqConstraintBinary : public Constraint
     }
   }
 	
-	virtual bool check_assignment(vector<int> v)
+	virtual BOOL check_assignment(vector<int> v)
 	{
 	  D_ASSERT(v.size() == 2); 
 	  if(v[0]==v[1]) return false;

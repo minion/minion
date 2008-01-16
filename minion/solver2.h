@@ -29,7 +29,7 @@ namespace Controller
 
   VARDEF_ASSIGN(AnyVarRef* optimise_var, NULL);
   VARDEF(int current_optimise_position);
-  VARDEF_ASSIGN(bool optimise, false);
+  VARDEF_ASSIGN(BOOL optimise, false);
 
   VARDEF(vector<Constraint*> constraints);
 #ifdef DYNAMICTRIGGERS
@@ -37,11 +37,11 @@ namespace Controller
 #endif
   VARDEF(int solutions);
   VARDEF(vector<vector<AnyVarRef> > print_matrix);
-  VARDEF_ASSIGN(bool test_mode, false);
-  VARDEF_ASSIGN(bool commandlineoption_dumptree, false);
+  VARDEF_ASSIGN(BOOL test_mode, false);
+  VARDEF_ASSIGN(BOOL commandlineoption_dumptree, false);
   VARDEF_ASSIGN(int commandlineoption_sollimit, -1);
-  VARDEF_ASSIGN(bool commandlineoption_fullpropogate, false);
-  VARDEF_ASSIGN(bool commandlineoption_nocheck, false);
+  VARDEF_ASSIGN(BOOL commandlineoption_fullpropogate, false);
+  VARDEF_ASSIGN(BOOL commandlineoption_nocheck, false);
   VARDEF_ASSIGN(unsigned commandlineoption_nodelimit, 0);
   VARDEF(vector<int> test_solution);
   

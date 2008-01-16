@@ -211,7 +211,7 @@ By: John Tromp
 	sortmin( interval *v[], int n )
   {
 	  int i, current;
-	  bool sorted;
+	  BOOL sorted;
 	  interval *t;
 	  
 	  current = n-1;
@@ -234,7 +234,7 @@ By: John Tromp
 	sortmax( interval *v[], int n )
   {
 	  int i, current;
-	  bool sorted;
+	  BOOL sorted;
 	  interval *t;
 	  
 	  current = 0;

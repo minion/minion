@@ -130,7 +130,7 @@ struct ElementConstraint : public Constraint
     }
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     int length = v.size();
     if(v[length-2] < 0 || v[length-2] > length - 3)

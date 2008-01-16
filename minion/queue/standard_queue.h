@@ -67,18 +67,18 @@ namespace Controller
 	}
   }
   
-  inline bool are_queues_empty()
+  inline BOOL are_queues_empty()
   { 
 	return propogate_trigger_list.empty() && dynamic_trigger_list.empty() &&
-	special_triggers.empty();
+	       special_triggers.empty();
   }
   // next_queue_ptr is defined in constraint_dynamic.
   // It is used if pointers are moved around.
   
   
-  inline bool propogate_dynamic_trigger_lists()
+  inline BOOL propogate_dynamic_trigger_lists()
   {
-	bool* fail_ptr = &Controller::failed;
+	BOOL* fail_ptr = &Controller::failed;
 	while(!dynamic_trigger_list.empty())
 	{
 	  DynamicTrigger* t = dynamic_trigger_list.back();
@@ -105,9 +105,9 @@ namespace Controller
 	return false;
   }
   
-  inline bool propogate_static_trigger_lists()
+  inline BOOL propogate_static_trigger_lists()
   {
-	bool* fail_ptr = &Controller::failed;
+	BOOL* fail_ptr = &Controller::failed;
 	while(!propogate_trigger_list.empty())
 	{
 	  TriggerRange t = propogate_trigger_list.back();

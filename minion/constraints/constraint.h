@@ -60,12 +60,12 @@ struct Constraint
 
   /// Checks if an assignment is satisfied.
   /** This takes the variable order returned by, and is mainly only used by, get_table_constraint() */
-  virtual bool check_assignment(vector<int>) = 0;
+  virtual BOOL check_assignment(vector<int>) = 0;
     
   /// Checks if a constraint cannot be satisfied, and sets up any data structures for future incremental checks.
   /// Returns TRUE if constraint cannot be satisfied.
   /** This function is used by rarification */
-  virtual bool full_check_unsat()
+  virtual BOOL full_check_unsat()
   { 
 	cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
 	FAIL_EXIT(); 
@@ -74,7 +74,7 @@ struct Constraint
   /// Checks incrementaly if constraint cannot be satisfied.
   /// Returns TRUE if constraint cannot be satisfied.
   /** This function should not be called unless check_unsat_full is called first. This is used by rarification */
-  virtual bool check_unsat(int,DomainDelta)
+  virtual BOOL check_unsat(int,DomainDelta)
   { 
 	cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
 	FAIL_EXIT(); 

@@ -2,7 +2,7 @@
 
 struct InputFileReader
 {  
-  virtual bool failed_open() = 0;
+  virtual BOOL failed_open() = 0;
   virtual string get_string() = 0;
   virtual int read_num() = 0;
   virtual char peek_char() = 0;
@@ -16,7 +16,7 @@ struct InputFileReader
   
   virtual string getline(char deliminator) = 0;
   virtual char get_char() = 0;
-  virtual bool eof() = 0;
+  virtual BOOL eof() = 0;
   virtual void putback(char c) = 0;
   
   virtual ~InputFileReader() {}
@@ -31,7 +31,7 @@ struct ConcreteFileReader : public InputFileReader
   ConcreteFileReader(InputType& name) : infile(name)
   {}
   
-  virtual bool failed_open()
+  virtual BOOL failed_open()
   { return !infile; }
   
   virtual string get_string()
@@ -131,7 +131,7 @@ struct ConcreteFileReader : public InputFileReader
   }
   
   
-  virtual bool eof()
+  virtual BOOL eof()
   { return infile.eof(); }
   
   virtual void putback(char c)
@@ -148,7 +148,7 @@ class MinionInputReader {
   vector<Var> flatten(char type, int index) ;
   vector<Var> getColOfMatrix(vector<vector<Var> >& m, int c) ;
   vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,int r,int c) ;
-  bool readConstraint(InputFileReader* infile, bool reified) ;
+  BOOL readConstraint(InputFileReader* infile, BOOL reified) ;
   void readConstraintElement(InputFileReader* infile, const ConstraintDef&) ;
   void readConstraintTable(InputFileReader* infile, const ConstraintDef&) ;
   Var readIdentifier(InputFileReader* infile) ;
@@ -167,7 +167,7 @@ class MinionInputReader {
  public:
   void read(char* fn) ;
   ProbSpec::CSPInstance instance;
-  bool parser_verbose;
+  BOOL parser_verbose;
   
   MinionInputReader() : parser_verbose(false)
   {}

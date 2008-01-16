@@ -129,7 +129,7 @@ struct Var
    return s.str();
    }
    
-   bool operator==(const Var& var)
+   BOOL operator==(const Var& var)
    { return type == var.type && pos == var.pos; }
 };
 
@@ -143,8 +143,8 @@ struct ConstraintBlob
   vector<vector<Var> > vars;
   ///Pointer to list of tuples. Only used in Table Constraints.
   TupleList* tuples;
-  bool reified;
-  bool implied_reified;
+  BOOL reified;
+  BOOL implied_reified;
   Var reify_var;
   ConstraintBlob(ConstraintDef _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars), reified(false), implied_reified(false)
   {}
@@ -165,7 +165,7 @@ struct ConstraintBlob
 	reify_var = _reify_var;
   }
   
-  bool is_dynamic()
+  BOOL is_dynamic()
   { return constraint.trig_type == DYNAMIC_CT; }
   
 };
@@ -176,7 +176,7 @@ struct ConstraintBlob
 {
   int total_var_count;
 
-  int bools;
+  int BOOLs;
   vector<pair<int, Bounds> > bound;
   vector<pair<int, vector<int> > > sparse_bound;
   vector<pair<int, Bounds> > discrete;
@@ -187,9 +187,9 @@ struct ConstraintBlob
   
   Var get_var(char, int i)
   {
-    if(i < bools)
+    if(i < BOOLs)
 	  return Var(VAR_BOOL, i);
-    i -= bools;
+    i -= BOOLs;
     {
     int bound_size = 0;
     for(unsigned int x = 0; x < bound.size(); ++x)
@@ -251,8 +251,8 @@ struct ConstraintBlob
   vector<Var> var_order;
   vector<char> val_order;
   
-  bool is_optimisation_problem;
-  bool optimise_minimising;
+  BOOL is_optimisation_problem;
+  BOOL optimise_minimising;
   Var optimise_variable;
   
     vector<vector<Var> > print_matrix;
@@ -261,7 +261,7 @@ struct ConstraintBlob
   CSPInstance() : is_optimisation_problem(false)
   {}
   
-  void set_optimise(bool _minimising, Var var)
+  void set_optimise(BOOL _minimising, Var var)
   { 
     is_optimisation_problem = true;
     optimise_minimising = _minimising;

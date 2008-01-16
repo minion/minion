@@ -73,9 +73,9 @@ struct MultiplyHelp<BoolVarRef>
 template<typename VarRef>
 struct MultiplyVar
 {
-  static const bool isBool = true;
+  static const BOOL isBool = true;
   static const BoundType isBoundConst = Bound_Yes;
-  bool isBound()
+  BOOL isBound()
   { return true; }
   
   VarRef data;
@@ -89,27 +89,27 @@ struct MultiplyVar
   MultiplyVar(const MultiplyVar& b) : data(b.data), Multiply(b.Multiply)
   { }
   
-  bool isAssigned()
+  BOOL isAssigned()
   { return data.isAssigned(); }
   
   int getAssignedValue()
   { return data.getAssignedValue() * Multiply; }
   
-  bool isAssignedValue(int i)
+  BOOL isAssignedValue(int i)
   { 
     if(data.isAssigned()) return false;
 	
 	return data.getAssignedValue() == i * Multiply;
   }
   
-  bool inDomain(int b)
+  BOOL inDomain(int b)
   { 
     if(b % Multiply != 0)
 	  return false;
 	return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
   
-  bool inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(int b)
   { 
     if(b % Multiply != 0)
 	  return false;
@@ -176,7 +176,7 @@ struct MultiplyVar
   void removeFromDomain(int)
   { FAIL_EXIT(); }
 
-  void addTrigger(Trigger t, TrigType type, int = -999)
+  void addTrigger(Trigger t, TrigType type)
   { 
     switch(type)
 	{
@@ -192,9 +192,6 @@ struct MultiplyVar
 		else
 		  data.addTrigger(t, UpperBound);
 		break;
-	  case DomainRemoval:
-	      D_FATAL_ERROR( "Cannot attach DomainRemoval trigger to stretch var");
-		  break;
 	  case Assigned:
 	  case DomainChanged:
 	    data.addTrigger(t, type);

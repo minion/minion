@@ -109,7 +109,7 @@ struct OccurrenceEqualConstraint : public Constraint
     }
   }
   
-  virtual bool check_unsat(int i, DomainDelta)
+  virtual BOOL check_unsat(int i, DomainDelta)
   {
     if( var_array[i].getAssignedValue() == value.val() )
     {
@@ -164,7 +164,7 @@ struct OccurrenceEqualConstraint : public Constraint
       not_occurrence_limit_reached();
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == var_array.size());
     int count = 0;  
@@ -196,7 +196,7 @@ OccEqualCon(const VarArray& _var_array,  const Val& _value,const ValCount& _val_
 
 template<typename T1>
 Constraint*
-BuildCT_OCCURRENCE(const T1& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+BuildCT_OCCURRENCE(const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   int val_to_count = b.vars[1][0].pos;
   int occs = b.vars[2][0].pos;
@@ -282,7 +282,7 @@ struct OccurrenceLeqConstraint : public Constraint
     }
   }
   
-  virtual bool check_unsat(int i, DomainDelta)
+  virtual BOOL check_unsat(int i, DomainDelta)
   {
     if( var_array[i].getAssignedValue() == value.val() )
     {
@@ -306,7 +306,7 @@ struct OccurrenceLeqConstraint : public Constraint
       limit_reached();  
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == var_array.size());
     int c = 0;  

@@ -74,8 +74,8 @@ public:
 	vars_max_domain_val = max_domain_val;
 	vars_domain_size = max_domain_val - min_domain_val + 1;
 	
-	triggers.resize(4 + vars_domain_size);
-	for(unsigned i = 0; i < 4 + vars_domain_size; ++i)
+	triggers.resize(4);
+	for(unsigned i = 0; i < 4; ++i)
 	  triggers[i].resize(var_count_m);
 	
 #ifdef DYNAMICTRIGGERS
@@ -88,12 +88,12 @@ public:
   {
 	D_ASSERT(lock_first && !lock_second);
 	size_t storage = 0;
-	for(unsigned i = 0; i < 4 + vars_domain_size; ++i)
+	for(unsigned i = 0; i < 4; ++i)
 	{
 	  for(unsigned j = 0; j < triggers[i].size(); ++j)
 	    storage += triggers[i][j].size();
 	}
-	return storage * sizeof(Trigger) + (4 + vars_domain_size) * (var_count_m + 1) * sizeof(Trigger*);
+	return storage * sizeof(Trigger) + 4 * (var_count_m + 1) * sizeof(Trigger*);
   }
   
   void allocateMem(char* mem_start)
@@ -102,9 +102,9 @@ public:
 	lock_second = true;
 	Trigger** trigger_ranges = (Trigger**)(mem_start);
 	trigger_data_m = trigger_ranges;
-	Trigger* trigger_data = (Trigger*)(mem_start + (4 + vars_domain_size) * (triggers[UpperBound].size() + 1) * sizeof(Trigger*));
+	Trigger* trigger_data = (Trigger*)(mem_start + 4 * (triggers[UpperBound].size() + 1) * sizeof(Trigger*));
 	
-	for(unsigned int type = 0; type < 4 + vars_domain_size; ++type)
+	for(unsigned int type = 0; type < 4; ++type)
 	{
 	  for(unsigned int i = 0; i < triggers[type].size(); ++i)
 	  {
@@ -120,7 +120,7 @@ public:
 	  ++trigger_ranges;
 	}
 	
-	D_ASSERT(static_cast<void*>(mem_start + (4 + vars_domain_size) * (var_count_m + 1) * sizeof(Trigger*)) ==
+	D_ASSERT(static_cast<void*>(mem_start + 4 * (var_count_m + 1) * sizeof(Trigger*)) ==
 			 static_cast<void*>(trigger_ranges));
 	
 	
@@ -139,25 +139,14 @@ public:
 #endif
   }
   
-  pair<Trigger*, Trigger*> get_trigger_range(int var_num, TrigType type, int val_removed = -999)
+  pair<Trigger*, Trigger*> get_trigger_range(int var_num, TrigType type)
   {
-    D_ASSERT( (type != DomainRemoval && val_removed == -999) || (type == DomainRemoval) );
-	int offset = type;
-	if(type == DomainRemoval)
-	  offset += val_removed - vars_min_domain_val;
-    Trigger** first_trig = trigger_data_m + var_num + (var_count_m + 1) * offset;
+    Trigger** first_trig = trigger_data_m + var_num + (var_count_m + 1) * type;
 	Trigger* trig_range_start = *first_trig;
 	first_trig++;
 	Trigger* trig_range_end = *first_trig;
 	return pair<Trigger*,Trigger*>(trig_range_start, trig_range_end);
   }
-  
-/*  void slow_trigger_push(int var_num, TrigType type, int delta)
-  {
-	if(!triggers[type][var_num].empty())
-	  Controller::push_triggers(TriggerRange(&triggers[type][var_num].front(), 
-                (&triggers[type][var_num].front()) + triggers[type][var_num].size(), delta));
-  }*/
   
 #ifdef DYNAMICTRIGGERS
   void dynamic_propogate(int var_num, TrigType type, int val_removed = -999)
@@ -237,32 +226,19 @@ public:
     dynamic_propogate(var_num, DomainRemoval, val_removed);
 #endif
 	D_ASSERT(lock_second);
-    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainRemoval, val_removed);
-	if(range.first != range.second)
-	  Controller::push_triggers(TriggerRange(range.first, range.second, val_removed));
   }
-  
-  /*
-  void add_lower_trigger(int b, Trigger t)
-  { D_ASSERT(lock_first && !lock_second); triggers[LowerBound][b].push_back(t); }
-  
-  void add_upper_trigger(int b, Trigger t)
-  { D_ASSERT(lock_first && !lock_second); triggers[UpperBound][b].push_back(t); }
-  
-  void add_assign_trigger(int b, Trigger t)
-  { D_ASSERT(lock_first && !lock_second); triggers[Assigned][b].push_back(t); }
-  */
   
   void add_domain_trigger(int b, Trigger t)
   { D_ASSERT(lock_first && !lock_second); triggers[DomainChanged][b].push_back(t); }
   
-  void add_trigger(int b, Trigger t, TrigType type, int val)
+  void add_trigger(int b, Trigger t, TrigType type)
   {
+	D_ASSERT(type != DomainRemoval)
 	D_ASSERT(lock_first && !lock_second);
-	if(type != DomainRemoval)
+	//if(type != DomainRemoval)
   	  triggers[type][b].push_back(t);
-	else
-	  triggers[type + val - vars_min_domain_val][b].push_back(t);
+	//else
+	//  triggers[type + val - vars_min_domain_val][b].push_back(t);
   }
   
 #ifdef DYNAMICTRIGGERS

@@ -15,7 +15,7 @@ using Controller::test_solution;
 void test_check_solution()
 {
   vector<int> sol;
-  bool match = true;
+  BOOL match = true;
   for(unsigned i = 0; i < print_matrix[0].size(); ++i)
   {
 	if(!print_matrix[0][i].isAssigned())

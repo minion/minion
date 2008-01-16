@@ -39,7 +39,7 @@ struct VarIterator
     D_ASSERT(current_val <= var_max);
   }
   
-  bool step()
+  BOOL step()
   {
     ++current_val;
 	while(current_val <= var_max && !var.inDomain(current_val))
@@ -58,7 +58,7 @@ struct VarIterator_looping
   int var_max;
   int current_val;
   int start_val;
-  bool first_step;
+  BOOL first_step;
   
   VarIterator_looping(VarType _var) 
   : var(_var), var_max(_var.getMax()), current_val(_var.getMin()), start_val(current_val), first_step(true)
@@ -82,7 +82,7 @@ struct VarIterator_looping
     D_ASSERT(current_val < start_val);
   };
   
-  bool step()
+  BOOL step()
   {
     ++current_val;
     if(first_step)

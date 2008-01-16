@@ -28,7 +28,7 @@ struct TupleComparator
   }
   
   // returns tuple1 <= tuple2 under our ordering.
-  bool operator()(const vector<int>& tuple1, const vector<int>& tuple2)
+  BOOL operator()(const vector<int>& tuple1, const vector<int>& tuple2)
   {
     if(tuple1[significantIndex] != tuple2[significantIndex])
 	  return tuple1[significantIndex] < tuple2[significantIndex];
@@ -101,7 +101,7 @@ struct GACTableConstraint : public DynamicConstraint
   { return _map_literal_to_val[literal]; }
   
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
-  bool check_tuple(const vector<int>& v)
+  BOOL check_tuple(const vector<int>& v)
   {
 	for(unsigned i = 0; i < v.size(); ++i)
 	{
@@ -111,7 +111,7 @@ struct GACTableConstraint : public DynamicConstraint
 	return true;
   }
   
-  bool check_tuple(int * v)
+  BOOL check_tuple(int * v)
   {
 	for(unsigned i = 0; i < arity; ++i)
 	{
@@ -139,7 +139,7 @@ struct GACTableConstraint : public DynamicConstraint
   
   TupleH ** tuplelist;
   vector<vector<int> > tuples;
-  bool listdone;
+  BOOL listdone;
   
   int noTuples;
   int arity;
@@ -225,7 +225,7 @@ struct GACTableConstraint : public DynamicConstraint
             for(int j=i-1; j>=0; j--)
             {
                 TupleH* prev=tuplelist[j];
-                bool breakflag=false;
+                BOOL breakflag=false;
                 
                 for(int var=0; var<arity; var++)
                 {
@@ -286,7 +286,7 @@ struct GACTableConstraint : public DynamicConstraint
         //cout << "seekNextSupport var:" <<var << " val:" <<val <<endl;
         
         int nxvalid=0;
-        bool testmode=false;
+        BOOL testmode=false;
         D_ASSERT(testmode=true);  // Ha! Only tests when assertions are enabled.
         if(testmode)
         {
@@ -452,7 +452,7 @@ struct GACTableConstraint : public DynamicConstraint
   
   // End of regin-lhomme code.
   
-  bool find_new_support(int literal)
+  BOOL find_new_support(int literal)
   {
 	 TupleH* new_support = seekNextSupport(get_var_from_literal(literal), get_val_from_literal(literal));
            
@@ -472,7 +472,7 @@ struct GACTableConstraint : public DynamicConstraint
 	int trigger_pos = propogated_trig - dt;
 	int propogated_literal = trigger_pos / (vars.size() - 1);
 	
-	bool is_new_support = find_new_support(propogated_literal);
+	BOOL is_new_support = find_new_support(propogated_literal);
 	int varIndex = get_var_from_literal(propogated_literal);
 	if(is_new_support)
 	{
@@ -552,7 +552,7 @@ struct GACTableConstraint : public DynamicConstraint
       // cout << endl; cout << "  fp: finished finding supports: " << endl ;
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
    for(unsigned i = 0; i < tuples.size(); ++i)
     {

@@ -44,13 +44,13 @@ struct UnaryNeqConstraint : public Constraint
   { }
   
   
-  virtual bool check_unsat(int,DomainDelta)
+  virtual BOOL check_unsat(int,DomainDelta)
   { return !x.inDomain(offset.val()); }
   
   virtual void full_propogate()
   { x.removeFromDomain(offset.val()); }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == 1);
     return v[0] != offset.val();

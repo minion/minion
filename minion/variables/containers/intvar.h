@@ -18,9 +18,9 @@
 
 struct RangeVarRef_internal
 {
-  static const bool isBool = false;
+  static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_No;
-  bool isBound()
+  BOOL isBound()
   { return false;}
   
   int var_num;
@@ -45,7 +45,7 @@ struct RangeVarContainer {
   
   vector<pair<int,int> > initial_bounds;
   unsigned var_count_m;
-  bool lock_m;
+  BOOL lock_m;
   
   domain_type& raw_lower_bound(RangeVarRef_internal i) const
   { return static_cast<domain_type*>(bound_data.get_ptr())[i.var_num*2]; }
@@ -59,7 +59,7 @@ struct RangeVarContainer {
   d_type& __data(RangeVarRef_internal i) const
   { return static_cast<d_type*>(val_data.get_ptr())[i.var_num]; }
   
-   bool in_bitarray(RangeVarRef_internal d, int val) const
+  bool in_bitarray(RangeVarRef_internal d, int val) const
   { return __data(d) & (one << val); }
   
   void remove_from_bitarray(RangeVarRef_internal d, int offset) const
@@ -147,7 +147,7 @@ struct RangeVarContainer {
   RangeVarContainer() : lock_m(0)
   {}
   
-  bool isAssigned(RangeVarRef_internal d) const
+  BOOL isAssigned(RangeVarRef_internal d) const
   { 
     D_ASSERT(lock_m);
     return lower_bound(d) == upper_bound(d); 
@@ -160,7 +160,7 @@ struct RangeVarContainer {
     return lower_bound(d);
   }
   
-  bool inDomain(RangeVarRef_internal d, int i) const
+  BOOL inDomain(RangeVarRef_internal d, int i) const
   {
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
@@ -168,7 +168,7 @@ struct RangeVarContainer {
     return in_bitarray(d,i - var_min);
   }
   
-  bool inDomain_noBoundCheck(RangeVarRef_internal d, int i) const
+  BOOL inDomain_noBoundCheck(RangeVarRef_internal d, int i) const
   {
     D_ASSERT(lock_m);
 	D_ASSERT(i >= lower_bound(d));
@@ -360,8 +360,8 @@ struct RangeVarContainer {
   LRangeVarRef get_var_num(int i);
   LRangeVarRef get_new_var(int i, int j);
 
-  void addTrigger(RangeVarRef_internal b, Trigger t, TrigType type, int val)
-  { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type, val);  }
+  void addTrigger(RangeVarRef_internal b, Trigger t, TrigType type)
+  { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type);  }
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(RangeVarRef_internal& b, DynamicTrigger* t, TrigType type, int pos = -999)
@@ -374,7 +374,7 @@ struct RangeVarContainer {
   }
 #endif
   
-  bool valid_range(int lower, int upper)
+  BOOL valid_range(int lower, int upper)
   { return (lower >= var_min && upper <= var_max); }
 };
 

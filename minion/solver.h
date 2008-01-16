@@ -19,8 +19,8 @@
 
 namespace Controller
 {
-  VARDEF_ASSIGN(bool finished, false);
-  VARDEF_ASSIGN(bool failed, false);
+  VARDEF_ASSIGN(BOOL finished, false);
+  VARDEF_ASSIGN(BOOL failed, false);
   
   /// Called when search is finished. 
   /// This is mainly here so that any debugging instructions which watch for memory problems

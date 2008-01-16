@@ -56,7 +56,7 @@ struct LeqConstraint : public Constraint
     }
   }
   
-  virtual bool check_unsat(int,DomainDelta)
+  virtual BOOL check_unsat(int,DomainDelta)
   { return (x.getMin() > y.getMax() + offset.val()); }
   
   virtual void full_propogate()
@@ -65,7 +65,7 @@ struct LeqConstraint : public Constraint
     propogate(1,0);
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
 	D_ASSERT(v.size() == 2);
 	return ((int)(v[0]) <= ((int)v[1] + offset.val()));
@@ -98,7 +98,7 @@ ImpliesCon(VarRef v1, VarRef v2)
 
 template<typename T1, typename T2>
 Constraint*
-BuildCT_INEQ(const T1& t1, const T2& t2, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+BuildCT_INEQ(const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   D_ASSERT(b.vars[2].size() == 1 && b.vars[2][0].type == VAR_CONSTANT);
   

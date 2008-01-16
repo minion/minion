@@ -89,7 +89,7 @@ struct DynamicTrigger;
 #include "constraints/constraint.h"
 
 #ifdef DYNAMICTRIGGERS
-VARDEF_ASSIGN(bool dynamic_triggers_used, false);
+VARDEF_ASSIGN(BOOL dynamic_triggers_used, false);
 #include "constraints/constraint_dynamic.h"
 #endif 
 
@@ -135,7 +135,7 @@ namespace Controller
 #include "constraints/constraint_element.h"
 #include "constraints/constraint_GACelement.h"
 #include "constraints/constraint_equal.h"
-#include "constraints/constraint_weightedboolsum.h"
+#include "constraints/constraint_weightedBOOLsum.h"
 #include "constraints/constraint_unaryequals.h"
 #include "constraints/constraint_unaryneq.h"
 #include "constraints/constraint_product.h"

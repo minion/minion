@@ -20,12 +20,12 @@
 /// Internal type used by AnyVarRef.
 struct AnyVarRef_Abstract
 {
-  virtual bool isBound() = 0;
-  virtual bool isAssigned() = 0;  
+  virtual BOOL isBound() = 0;
+  virtual BOOL isAssigned() = 0;  
   virtual int getAssignedValue() = 0;
-  virtual bool isAssignedValue(int i) = 0;
-  virtual bool inDomain(int b) = 0;
-  virtual bool inDomain_noBoundCheck(int b) = 0;
+  virtual BOOL isAssignedValue(int i) = 0;
+  virtual BOOL inDomain(int b) = 0;
+  virtual BOOL inDomain_noBoundCheck(int b) = 0;
   virtual int getMax() = 0;
   virtual int getMin() = 0;
   virtual int getInitialMax() = 0;
@@ -35,7 +35,7 @@ struct AnyVarRef_Abstract
   virtual void uncheckedAssign(int b) = 0;
   virtual void propogateAssign(int b) = 0;
   virtual void removeFromDomain(int b) = 0;
-  virtual void addTrigger(Trigger t, TrigType type, int val = -999) = 0;
+  virtual void addTrigger(Trigger t, TrigType type) = 0;
 
   virtual string virtual_to_string() = 0;
   
@@ -53,7 +53,7 @@ template<typename VarRef>
 struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 {
 
-  virtual bool isBound()
+  virtual BOOL isBound()
   { return data.isBound();}
   
   VarRef data;
@@ -66,19 +66,19 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   AnyVarRef_Concrete(const AnyVarRef_Concrete& b) : data(b.data)
   {}
   
-  virtual bool isAssigned()
+  virtual BOOL isAssigned()
   { return data.isAssigned(); }
   
   virtual int getAssignedValue()
   { return data.getAssignedValue(); }
   
-  virtual bool isAssignedValue(int i)
+  virtual BOOL isAssignedValue(int i)
   { return data.isAssignedValue(i); }
   
-  virtual bool inDomain(int b)
+  virtual BOOL inDomain(int b)
   { return data.inDomain(b); }
   
-  virtual bool inDomain_noBoundCheck(int b)
+  virtual BOOL inDomain_noBoundCheck(int b)
   { return data.inDomain_noBoundCheck(b); }
   
   virtual int getMax()
@@ -108,8 +108,8 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   virtual void removeFromDomain(int b)
   { data.removeFromDomain(b); }
   
-  virtual void addTrigger(Trigger t, TrigType type, int val = -999)
-  { data.addTrigger(t, type, val); }
+  virtual void addTrigger(Trigger t, TrigType type)
+  { data.addTrigger(t, type); }
   
   virtual string virtual_to_string()
   { return string(data); }
@@ -129,11 +129,11 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 /// Provides a method of wrapping any variable type in a general wrapper.
 struct AnyVarRef
 {
-  static const bool isBool = false;
+  static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Maybe;
   shared_ptr<AnyVarRef_Abstract> data;
   
-  bool isBound()
+  BOOL isBound()
   { return data->isBound();}
   
   template<typename VarRef>
@@ -146,22 +146,22 @@ struct AnyVarRef
   AnyVarRef(const AnyVarRef& b) : data(b.data)
   {}
   
-  bool isAssigned()
+  BOOL isAssigned()
   { return data->isAssigned(); }
   
   int getAssignedValue()
   { return data->getAssignedValue(); }
   
-  bool isAssignedValue(int i)
+  BOOL isAssignedValue(int i)
   { 
     return data->isAssigned() &&
     data->getAssignedValue() == i;
   }
   
-  bool inDomain(int b)
+  BOOL inDomain(int b)
   { return data->inDomain(b); }
 
-  bool inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(int b)
   { return data->inDomain_noBoundCheck(b); }
   
   int getMax()
@@ -191,8 +191,8 @@ struct AnyVarRef
   void removeFromDomain(int b)
   { data->removeFromDomain(b); }
 
-  void addTrigger(Trigger t, TrigType type, int val = -999)
-  { data->addTrigger(t, type, val); }
+  void addTrigger(Trigger t, TrigType type)
+  { data->addTrigger(t, type); }
   
   operator string()
   { return "VRef:" + data->virtual_to_string(); }

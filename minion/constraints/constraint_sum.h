@@ -97,7 +97,7 @@ struct BoolLessSumConstraint : public Constraint
       limit_reached();
   }
   
-  virtual bool full_check_unsat()
+  virtual BOOL full_check_unsat()
   {
     int occs = 0;
     int array_size = var_array.size();
@@ -110,7 +110,7 @@ struct BoolLessSumConstraint : public Constraint
     return false;
   }
   
-  virtual bool check_unsat(int, DomainDelta)
+  virtual BOOL check_unsat(int, DomainDelta)
   {
     int i = count.get() + 1;
     D_INFO(1,DI_SUMCON,to_string("Checking unsat, count",i));
@@ -136,7 +136,7 @@ struct BoolLessSumConstraint : public Constraint
       limit_reached();  
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == var_array.size());
     int v_size = v.size();

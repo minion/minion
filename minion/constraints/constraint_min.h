@@ -101,7 +101,7 @@ struct MinConstraint : public Constraint
 	
   }
   
-  //  virtual bool check_unsat(int i, DomainDelta)
+  //  virtual BOOL check_unsat(int i, DomainDelta)
   //  {
   
   
@@ -115,7 +115,7 @@ struct MinConstraint : public Constraint
 	}
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
 	D_ASSERT(v.size() == var_array.size() + 1);
 	int min_val = big_constant;

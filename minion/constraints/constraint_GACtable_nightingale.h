@@ -31,7 +31,7 @@ struct TupleComparator
   }
   
   // returns tuple1 <= tuple2 under our ordering.
-  bool operator()(const vector<int>& tuple1, const vector<int>& tuple2)
+  BOOL operator()(const vector<int>& tuple1, const vector<int>& tuple2)
   {
     if(tuple1[significantIndex] != tuple2[significantIndex])
 	  return tuple1[significantIndex] < tuple2[significantIndex];
@@ -252,7 +252,7 @@ struct GACTableConstraint : public DynamicConstraint
   
   int ** current_support;
   
-  //bool listperliteral;
+  //BOOL listperliteral;
   
   //vector<int> offset;
   
@@ -269,7 +269,7 @@ struct GACTableConstraint : public DynamicConstraint
   //{ return _map_literal_to_val[literal]; }
   
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
-  bool check_tuple(const vector<int>& v)
+  BOOL check_tuple(const vector<int>& v)
   {
 	for(unsigned i = 0; i < v.size(); ++i)
 	{
@@ -279,7 +279,7 @@ struct GACTableConstraint : public DynamicConstraint
 	return true;
   }
   
-  bool check_tuple(int * v)
+  BOOL check_tuple(int * v)
   {
 	for(unsigned i = 0; i < arity; ++i)
 	{
@@ -514,7 +514,7 @@ struct GACTableConstraint : public DynamicConstraint
         listlength=nightingale->noTuples;
     }
     
-    bool firstpass=true;
+    BOOL firstpass=true;
     for(int pass=0; pass<2; pass++)
     {
         firstpass=(pass==0)?true:false;
@@ -527,7 +527,7 @@ struct GACTableConstraint : public DynamicConstraint
             // because most sig digit probably allows greatest jump.
             // Remember that var gets treated specially, as if its domain is just {val}
             
-            bool matchAll=true;
+            BOOL matchAll=true;
             for(int valIndex=0; valIndex<arity; valIndex++)
             {
                 int curvalue=curtuple->values[valIndex];
@@ -565,7 +565,7 @@ struct GACTableConstraint : public DynamicConstraint
   
   // Below is shared with regin-lhomme file.
   
-  bool find_new_support(int literal)
+  BOOL find_new_support(int literal)
   {
      pair<int,int> varval = nightingale->tuples->get_varval_from_literal(literal);
 	 int var = varval.first;
@@ -588,7 +588,7 @@ struct GACTableConstraint : public DynamicConstraint
 	int trigger_pos = propogated_trig - dt;
 	int propogated_literal = trigger_pos / (vars.size() - 1);
 	
-	bool is_new_support = find_new_support(propogated_literal);
+	BOOL is_new_support = find_new_support(propogated_literal);
 	
 	pair<int,int> varval = nightingale->tuples->get_varval_from_literal(propogated_literal);
 	int varIndex = varval.first;
@@ -688,7 +688,7 @@ struct GACTableConstraint : public DynamicConstraint
       // cout << endl; cout << "  fp: finished finding supports: " << endl ;
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     for(unsigned i = 0; i < (nightingale->tuples)->size(); ++i)
 	{

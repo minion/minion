@@ -31,7 +31,7 @@ struct TupleComparator
   }
   
   // returns tuple1 <= tuple2 under our ordering.
-  bool operator()(const vector<int>& tuple1, const vector<int>& tuple2)
+  BOOL operator()(const vector<int>& tuple1, const vector<int>& tuple2)
   {
     if(tuple1[significantIndex] != tuple2[significantIndex])
 	  return tuple1[significantIndex] < tuple2[significantIndex];
@@ -232,7 +232,7 @@ struct TupleTrie {
         // end, then from baseIndex to the old support.
         
         // search from index to the end
-        bool searchUpTo=false;  // while false, store min level for each level. if true, search up to the min level.
+        BOOL searchUpTo=false;  // while false, store min level for each level. if true, search up to the min level.
         
         for(int i=0; i<arity; i++) minlevel[i]=2000000000;  // should be the biggest +ve integer.
         
@@ -243,7 +243,7 @@ struct TupleTrie {
           if(trieLevel==0 || index==levelLengths[trieLevel])
           {     // and not searchUpTo. 
               searchUpTo=true; 
-              bool found=false;
+              BOOL found=false;
                 for(int i=0; i<levelLengths[0]; i=i+2) // should be a binary search.
                 {
                     if(trie[0][i]==valToSupport)
@@ -319,7 +319,7 @@ void reconstructTuple(int*& supportingTuple, int valPtr) {
   
 private: 
 template<typename VarArray>
-bool inDomain(int val, int trieLevel, VarArray& vars) {
+BOOL inDomain(int val, int trieLevel, VarArray& vars) {
   int componentIndex = ((trieLevel <= significantIndex) ?  
 						trieLevel - 1 : trieLevel) ;
   return vars[componentIndex].inDomain(val);

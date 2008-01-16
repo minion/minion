@@ -33,7 +33,7 @@ struct VecNeqDynamic : public DynamicConstraint
   int watched_index0;
   int watched_index1;
   
-  bool only_one_possible_pair;
+  BOOL only_one_possible_pair;
   
   VecNeqDynamic(const VarArray1& _array1,
 				const VarArray2& _array2) :
@@ -217,7 +217,7 @@ struct VecNeqDynamic : public DynamicConstraint
 	var_array2[index].addDynamicTrigger(trigs + 1 + triggerpair * 2, Assigned);
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     int v_size1 = var_array1.size();
 	return !std::equal(v.begin(), v.begin() + v_size1, v.begin() + v_size1);

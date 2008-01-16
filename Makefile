@@ -1,13 +1,21 @@
 # To make a universal mac build add: -arch ppc -arch i686 to flags
 
 ifdef DEBUG
- DEBUG_FLAGS = -D_GLIBCXX_DEBUG -DNO_PRINT -g -DMORE_SEARCH_INFO
- FLAGS =
+ ifdef PRINT
+   DEBUG_FLAGS = -D_GLIBCXX_DEBUG -g -DMORE_SEARCH_INFO
+   FLAGS =
+ else
+   DEBUG_FLAGS = -D_GLIBCXX_DEBUG -DNO_PRINT -g -DMORE_SEARCH_INFO
+   FLAGS = 
+ endif
 
 else
  DEBUG_FLAGS = -DNO_DEBUG -DMORE_SEARCH_INFO
- FLAGS = -O2
-
+ ifdef PROFILE
+   FLAGS = -O2 -g -fno-inline
+ else
+   FLAGS = -O2
+ endif
 endif
 
 ifdef NOWATCHED
@@ -32,6 +40,9 @@ ifndef NAME
   endif
   ifdef QUICK
     NAME:=$(NAME)-quick
+  endif
+  ifdef PROFILE
+    NAME:=$(NAME)-profile
   endif
 endif
 

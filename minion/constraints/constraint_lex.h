@@ -18,7 +18,7 @@
 
 
 
-template<typename VarArray1, typename VarArray2, bool Less = false>
+template<typename VarArray1, typename VarArray2, BOOL Less = false>
 struct LexLeqConstraint : public Constraint
 {
   virtual string constraint_name()
@@ -162,7 +162,7 @@ struct LexLeqConstraint : public Constraint
     }
   }
   
-  virtual bool check_unsat(int unsat_val, DomainDelta)
+  virtual BOOL check_unsat(int unsat_val, DomainDelta)
   {
     D_INFO(0,DI_LEXCON,string("Checking Unsat")+to_string(Less));
     int a = alpha.get();
@@ -202,13 +202,13 @@ struct LexLeqConstraint : public Constraint
     FAIL_EXIT();
   }
   
-  virtual bool full_check_unsat()
+  virtual BOOL full_check_unsat()
   {
     alpha.set(0);
 	return check_unsat(0, 0);
   }
   
-  bool checkLex(int i) {
+  BOOL checkLex(int i) {
     if(Less)
     {
       return x[i].getMax() < y[i].getMin();
@@ -267,7 +267,7 @@ struct LexLeqConstraint : public Constraint
     }
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == x.size() + y.size());
     size_t x_size = x.size();

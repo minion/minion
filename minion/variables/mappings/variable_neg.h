@@ -19,11 +19,11 @@
 template<typename Var>
 struct VarNeg
 {
-  static const bool isBool = false;
+  static const BOOL isBool = false;
   static const BoundType isBoundConst = Var::isBoundConst;
   Var data;
   
-  bool isBound()
+  BOOL isBound()
   { return data.isBound();}
   
   VarNeg(Var _data) : data(_data)
@@ -35,22 +35,22 @@ struct VarNeg
   VarNeg(const VarNeg& b) : data(b.data)
   {}
   
-  bool isAssigned()
+  BOOL isAssigned()
   { return data.isAssigned(); }
   
   int getAssignedValue()
   { return -(int)data.getAssignedValue(); }
   
-  bool isAssignedValue(int i)
+  BOOL isAssignedValue(int i)
   { 
     return data.isAssigned() &&
     data.getAssignedValue() == -i;
   }
   
-  bool inDomain(int b)
+  BOOL inDomain(int b)
   { return data.inDomain(-b); }
 
-  bool inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(int b)
   { return data.inDomain(-b); }
   
   int getMax()
@@ -84,7 +84,7 @@ struct VarNeg
   int getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
   
- void addTrigger(Trigger t, TrigType type, int val = -999)
+ void addTrigger(Trigger t, TrigType type)
   { 
     switch(type)
 	{
@@ -93,9 +93,6 @@ struct VarNeg
 		break;
 	  case LowerBound:
 		data.addTrigger(t, UpperBound);
-		break;
-	  case DomainRemoval:
-		data.addTrigger(t, DomainRemoval, -val);
 		break;
 	  case Assigned:
 	  case DomainChanged:

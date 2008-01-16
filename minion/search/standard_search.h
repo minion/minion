@@ -26,8 +26,8 @@ namespace Controller
   inline void set_solution_check_function(void(*fun_ptr)(void))
   { _solution_check = fun_ptr; }
 
-  VARDEF_ASSIGN(bool _find_one_sol,true);
-  VARDEF_ASSIGN(bool print_solution, true);
+  VARDEF_ASSIGN(BOOL _find_one_sol,true);
+  VARDEF_ASSIGN(BOOL print_solution, true);
   
   inline void find_all_solutions()
   { _find_one_sol = false; }
@@ -126,7 +126,7 @@ namespace Controller
   }
   
   
-  inline bool do_checks()
+  inline BOOL do_checks()
   {
 	if(time_limit != 0)
 	{

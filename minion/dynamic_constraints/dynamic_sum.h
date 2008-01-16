@@ -50,8 +50,8 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   BackTrackOffset vals_watched;
   BackTrackOffset unwatched_indexes;     // no promise this will work in this case
   //ReversibleInt last;
-  bool& values_watched(int i)
-  { return static_cast<bool*>(vals_watched.get_ptr())[i]; }
+  BOOL& values_watched(int i)
+  { return static_cast<BOOL*>(vals_watched.get_ptr())[i]; }
 #endif
 
 
@@ -96,8 +96,8 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
         {
           
 #ifndef WATCHEDLITERALS
-          // Note that this bool array could be compacted using masks for lookup
-          vals_watched.request_bytes(sizeof(bool) * array_size);
+          // Note that this BOOL array could be compacted using masks for lookup
+          vals_watched.request_bytes(sizeof(BOOL) * array_size);
           for(int i = 0; i < array_size; i++) 
             values_watched(i) = false;
 #endif
@@ -206,7 +206,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   //
   //  NOT updated for new type of watched data structure
   //  
-  bool check_consistency()
+  BOOL check_consistency()
   {
 #ifndef WATCHEDLITERALS 
     DynamicTrigger* start = dynamic_trigger_start();
@@ -243,7 +243,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	// should generalise
 	// and will need to loop round for watched lits	
 
-        bool found_new_support = false;
+        BOOL found_new_support = false;
         
 #ifdef WATCHEDLITERALS
 
@@ -328,7 +328,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	}
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == var_array.size());
     int v_size = v.size();
@@ -365,7 +365,7 @@ BoolGreaterEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
 
  
 inline DynamicConstraint*
-BuildCT_WATCHED_LEQSUM(const vector<BoolVarRef>& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_LEQSUM(const vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   if(reify) 
   { 
@@ -378,14 +378,14 @@ BuildCT_WATCHED_LEQSUM(const vector<BoolVarRef>& t1, bool reify, const BoolVarRe
 
 template<typename T>
 DynamicConstraint*
-BuildCT_WATCHED_LEQSUM(const T& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_LEQSUM(const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   cerr << "Watched LeqSum only works on Boolean variables at present. Sorry!" << endl;
   exit(1);
 }
 
 inline DynamicConstraint*
-BuildCT_WATCHED_GEQSUM(const vector<BoolVarRef>& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_GEQSUM(const vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   if(reify) 
   { 
@@ -398,7 +398,7 @@ BuildCT_WATCHED_GEQSUM(const vector<BoolVarRef>& t1, bool reify, const BoolVarRe
 
 template<typename T>
 DynamicConstraint*
-BuildCT_WATCHED_GEQSUM(const T& t1, bool reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_GEQSUM(const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   cerr << "Watched GeqSum only works on Boolean variables at present. Sorry!" << endl;
   exit(1);

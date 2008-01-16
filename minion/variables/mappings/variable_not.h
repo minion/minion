@@ -27,11 +27,11 @@
 template<typename VarRef>
 struct VarNot
 {
-  static const bool isBool = true;
+  static const BOOL isBool = true;
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
   
-  bool isBound()
+  BOOL isBound()
   { return data.isBound();}
   
   VarNot(const VarRef& _data) : data(_data)
@@ -43,28 +43,28 @@ struct VarNot
   VarNot(const VarNot& b) : data(b.data)
   {}
   
-  // There is a good reason this is like this. It is because the 'neg' of an bool var
+  // There is a good reason this is like this. It is because the 'neg' of an BOOL var
   // might be used in arithmetic. This is an extension to all of the integers which
   // swaps 0 and 1.
   int swap(int i)
   { return -i+1; }
 
-  bool isAssigned()
+  BOOL isAssigned()
   { return data.isAssigned(); }
   
   int getAssignedValue()
   { return swap(data.getAssignedValue()); }
   
-  bool isAssignedValue(int i)
+  BOOL isAssignedValue(int i)
   { 
     return data.isAssigned() &&
     swap(data.getAssignedValue()) == i;
   }
   
-  bool inDomain(int b)
+  BOOL inDomain(int b)
   { return data.inDomain(swap(b)); }
 
-  bool inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(int b)
   { return data.inDomain(swap(b)); }
   
   int getMax()
@@ -94,7 +94,7 @@ struct VarNot
   void removeFromDomain(int b)
   { data.removeFromDomain(swap(b)); }
  
-  void addTrigger(Trigger t, TrigType type, int val = -999)
+  void addTrigger(Trigger t, TrigType type)
   { 
     switch(type)
 	{
@@ -103,9 +103,6 @@ struct VarNot
 		break;
 	  case LowerBound:
 		data.addTrigger(t, UpperBound);
-		break;
-	  case DomainRemoval:
-		data.addTrigger(t, DomainRemoval, swap(val));
 		break;
 	  case Assigned:
 	  case DomainChanged:

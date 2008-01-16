@@ -43,8 +43,8 @@ struct MemoryBlock
 {
   char* current_data;
   unsigned allocated_bytes;
-  bool lock_m;
-  bool final_lock_m;
+  BOOL lock_m;
+  BOOL final_lock_m;
   set<MemOffset*> offsets;
   MAP_TYPE<void*, pair<int,int> > offset_positions;
   MAP_TYPE<VirtualMemOffset*, pair<MemOffset*, int> > virtual_ptrs;

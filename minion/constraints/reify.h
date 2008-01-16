@@ -38,8 +38,8 @@ struct reify : public Constraint
   BoolVar rar_var;
   
   // These two variables are only used in special cases.
-  bool constraint_locked;
-  bool value_assigned;
+  BOOL constraint_locked;
+  BOOL value_assigned;
   
   reify(Constraint* _poscon, BoolVar v) : poscon(_poscon), rar_var(v),
 										  constraint_locked(false)
@@ -51,7 +51,7 @@ struct reify : public Constraint
     FAIL_EXIT();
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     // This function is very slow compared to what it could be.
 	// This is unfortunate, but hopefully not important.

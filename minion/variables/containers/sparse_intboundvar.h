@@ -18,10 +18,10 @@
 
 struct SparseBoundVarRef_internal
 {
-  static const bool isBool = true;
+  static const BOOL isBool = true;
   static const BoundType isBoundConst = Bound_Yes;
   
-  bool isBound()
+  BOOL isBound()
   { return true;}
   
   int var_num;
@@ -43,7 +43,7 @@ struct SparseBoundVarContainer {
   vector<vector<BoundType> > domains;
   vector<int> domain_reference;
   unsigned var_count_m;
-  bool lock_m;
+  BOOL lock_m;
   
   vector<BoundType>& get_domain(SparseBoundVarRef_internal i)
   { return domains[domain_reference[i.var_num]]; }
@@ -132,7 +132,7 @@ struct SparseBoundVarContainer {
   SparseBoundVarContainer() : lock_m(0)
   {}
   
-  bool isAssigned(SparseBoundVarRef_internal d) const
+  BOOL isAssigned(SparseBoundVarRef_internal d) const
   { 
     D_ASSERT(lock_m);
     return lower_bound(d) == upper_bound(d); 
@@ -146,11 +146,11 @@ struct SparseBoundVarContainer {
   }
   
   /// This function is provided just to make life simpler. It should never be called.
-  bool inDomain(SparseBoundVarRef_internal, int) const
+  BOOL inDomain(SparseBoundVarRef_internal, int) const
   { D_FATAL_ERROR( "sparse bound ints do not allow 'inDomain' checks"); }
 
   /// This function is provided just to make life simpler. It should never be called.
-  bool inDomain_noBoundCheck(SparseBoundVarRef_internal, int) const
+  BOOL inDomain_noBoundCheck(SparseBoundVarRef_internal, int) const
   { D_FATAL_ERROR("sparse bound ints do not allow 'inDomain_noBoundCheck' checks"); }
   
   int getMin(SparseBoundVarRef_internal d) const
@@ -200,7 +200,7 @@ struct SparseBoundVarContainer {
     trigger_list.push_domain(d.var_num);
     trigger_list.push_assign(d.var_num, i);
     
-#if 0//#ifdef FULL_DOMAIN_TRIGGERS
+#ifdef FULL_DOMAIN_TRIGGERS
     // TODO : Optimise this function to only check values in domain.
     for(int loop = min_val; loop <= max_val; ++loop)
     {
@@ -246,7 +246,7 @@ struct SparseBoundVarContainer {
       
       trigger_list.push_upper(d.var_num, up_bound - i);
       trigger_list.push_domain(d.var_num);
-#if 0//#ifdef FULL_DOMAIN_TRIGGERS
+#ifdef FULL_DOMAIN_TRIGGERS
       // TODO : Optimise this function to only check values in domain.
       for(int loop = i + 1; loop <= up_bound; ++loop)
       {
@@ -279,7 +279,7 @@ struct SparseBoundVarContainer {
     {
       trigger_list.push_lower(d.var_num, i - low_bound);
       trigger_list.push_domain(d.var_num);
-#if 0//#ifdef FULL_DOMAIN_TRIGGERS
+#ifdef FULL_DOMAIN_TRIGGERS
       // TODO : Optimise this function to only check values in domain.
       for(int loop = low_bound; loop < i; ++loop)
       {
@@ -298,15 +298,10 @@ struct SparseBoundVarContainer {
   SparseBoundVarRef get_new_var(const vector<T>&);
   SparseBoundVarRef get_var_num(int i);
 
-  void addTrigger(SparseBoundVarRef_internal b, Trigger t, TrigType type, int val)
+  void addTrigger(SparseBoundVarRef_internal b, Trigger t, TrigType type)
   { 
-    if(type == DomainRemoval)
-    {
-      cout << "Sparse Bounds variables cannot be triggered on removal of a value." << endl;
-      cout << "Fatal internal error." << endl;
-      FAIL_EXIT();
-    }
-    D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type, val); 
+    D_ASSERT(lock_m); 
+	trigger_list.add_trigger(b.var_num, t, type); 
   }
   
 #ifdef DYNAMICTRIGGERS

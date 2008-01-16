@@ -265,7 +265,7 @@ void MinionInputReader::read(char* fn) {
 // Recognise constraint by its name, read past name and leading '('
 // Return false if eof or unknown ct. Else true.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-bool MinionInputReader::readConstraint(InputFileReader* infile, bool reified) {
+BOOL MinionInputReader::readConstraint(InputFileReader* infile, BOOL reified) {
   string id = infile->getline('(');
   
   int constraint_num = -1;
@@ -654,7 +654,7 @@ void MinionInputReader::readObjective(InputFileReader* infile) {
 							  string("or 'minimising'. Got '") + s + "'");
   }
   
-  bool minimising = (s == "minimising");
+  BOOL minimising = (s == "minimising");
   Var var = readIdentifier(infile) ;
   if(parser_verbose)
     cout << ((minimising) ? "minimising" : "maximising") << string(var) << endl ;
@@ -760,7 +760,7 @@ void MinionInputReader::readVars(InputFileReader* infile) {
   total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of 01 Vars: " << noOfVarType << endl ;
-  var_obj.bools = noOfVarType;
+  var_obj.BOOLs = noOfVarType;
   
   
   // **** Construct this many 01Vars

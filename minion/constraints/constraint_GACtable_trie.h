@@ -49,7 +49,7 @@ struct GACTableConstraint : public DynamicConstraint
  // { return _map_literal_to_val[literal]; }
   
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
-  bool check_tuple(const vector<int>& v)
+  BOOL check_tuple(const vector<int>& v)
   {
 	for(unsigned i = 0; i < v.size(); ++i)
 	{
@@ -88,7 +88,7 @@ struct GACTableConstraint : public DynamicConstraint
   int dynamic_trigger_count()
   { return tuples->literal_num * ( vars.size() - 1) ; }
   
-  bool find_new_support(int literal)
+  BOOL find_new_support(int literal)
   {
      pair<int,int> varval = tuples->get_varval_from_literal(literal);
 	 int varIndex = varval.first;
@@ -115,7 +115,7 @@ struct GACTableConstraint : public DynamicConstraint
 	int trigger_pos = propogated_trig - dt;
 	int propogated_literal = trigger_pos / (vars.size() - 1);
 	
-	bool is_new_support = find_new_support(propogated_literal);
+	BOOL is_new_support = find_new_support(propogated_literal);
 
     pair<int,int> varval = tuples->get_varval_from_literal(propogated_literal);
 	int varIndex = varval.first;
@@ -192,7 +192,7 @@ struct GACTableConstraint : public DynamicConstraint
       // cout << endl; cout << "  fp: finished finding supports: " << endl ;
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     for(unsigned i = 0; i < tuples->size(); ++i)
 	{

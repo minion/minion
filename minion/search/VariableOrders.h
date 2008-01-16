@@ -19,11 +19,11 @@
   struct StaticVariableOrder
   {
     vector<AnyVarRef> var_order;
-	vector<bool> val_order;
+	vector<BOOL> val_order;
 	vector<int> branches;
 	unsigned pos;
 	
-	StaticVariableOrder(vector<AnyVarRef>& _varorder, vector<bool>& _valorder)
+	StaticVariableOrder(vector<AnyVarRef>& _varorder, vector<BOOL>& _valorder)
     : var_order(_varorder), val_order(_valorder)
 	{
 	  branches.reserve(1000);
@@ -31,7 +31,7 @@
 	}
 	
 	// Returns true if all variables assigned
-	bool find_next_unassigned()
+	BOOL find_next_unassigned()
 	{
 	  unsigned v_size = var_order.size();
 	  while(pos < v_size && var_order[pos].isAssigned())
@@ -39,18 +39,14 @@
 	  return pos == v_size;
 	}
 		
-	bool cur_var_not_assigned()
+	BOOL cur_var_not_assigned()
 	{ return !var_order[pos].isAssigned(); }
 	
-	bool all_assigned()
-	{ 
-	  return pos == var_order.size(); 
-	}
+	BOOL all_assigned()
+	{ return pos == var_order.size(); }
 	
-	bool finished_search()
-	{ 
-	  return branches.size() == 0; 
-	}
+	BOOL finished_search()
+	{ return branches.size() == 0; }
 	
 	void branch_left()
 	{
@@ -83,7 +79,7 @@
 	vector<int> branches;
 	unsigned pos;
 	
-	SDFVariableOrder(vector<AnyVarRef>& _varorder, vector<bool>&)
+	SDFVariableOrder(vector<AnyVarRef>& _varorder, vector<BOOL>&)
     : var_order(_varorder)
 	{
 	  branches.reserve(1000);
@@ -91,7 +87,7 @@
 	}
 	
 	// Returns true if all variables assigned
-	bool find_next_unassigned()
+	BOOL find_next_unassigned()
 	{
 	  // IMPORTANT:
 	  // Remember, when there are two values remaining in the domain,
@@ -136,18 +132,14 @@
 	  return false;
 	}
 		
-	bool cur_var_not_assigned()
+	BOOL cur_var_not_assigned()
 	{ return !var_order[pos].isAssigned(); }
 	
-	bool all_assigned()
-	{ 
-	  return pos == var_order.size(); 
-	}
+	BOOL all_assigned()
+	{ return pos == var_order.size(); }
 	
-	bool finished_search()
-	{ 
-	  return branches.size() == 0; 
-	}
+	BOOL finished_search()
+	{ return branches.size() == 0; }
 	
 	void branch_left()
 	{

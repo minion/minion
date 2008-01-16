@@ -52,24 +52,14 @@ struct GACElementConstraint : public Constraint
 	int domain_size = var_array_max_val - var_array_min_val + 1;
 	for(int i = 0; i < array_size; ++i)
 	{
-	  for(int j = var_array_min_val; j <= var_array_max_val; ++j)
-	  {
-	    t.push_back(make_trigger(var_array[i], 
-								 Trigger(this, i * domain_size + j - var_array_min_val), DomainRemoval, j));
-	  }
+	  t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
 	}
 	
-	int base_trig = (array_size + 1) * domain_size;
-	for(int i = indexvar.getInitialMin(); i <= indexvar.getInitialMax(); ++i)
-	{
-	  t.push_back(make_trigger(indexvar,
-							   Trigger(this, base_trig + i - indexvar.getInitialMin()), DomainRemoval, i));
-	}
+	t.push_back(make_trigger(indexvar,
+							 Trigger(this, array_size), DomainChanged));
 	
-	base_trig += indexvar.getInitialMax() - indexvar.getInitialMin() + 1;
-	for(int i = resultvar.getInitialMin(); i <= resultvar.getInitialMax(); ++i)
-	  t.push_back(make_trigger(resultvar,
-							   Trigger(this, base_trig + i - resultvar.getInitialMin()), DomainRemoval, i));
+	t.push_back(make_trigger(resultvar,
+							 Trigger(this, array_size + 1), DomainChanged));
     return t;
   }
   
@@ -97,7 +87,7 @@ struct GACElementConstraint : public Constraint
 	}
   }
   
-  bool support_for_val_in_result(int val)
+  BOOL support_for_val_in_result(int val)
   {
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
@@ -108,7 +98,7 @@ struct GACElementConstraint : public Constraint
     return false;
   }
   
-  bool support_for_val_in_index(int index)
+  BOOL support_for_val_in_index(int index)
   {
     int min_val = max(var_array[index].getMin(), resultvar.getMin());
 	int max_val = min(var_array[index].getMax(), resultvar.getMax());
@@ -124,34 +114,35 @@ struct GACElementConstraint : public Constraint
   {
     int array_size = var_array.size();
 	int domain_size = (var_array_max_val - var_array_min_val + 1);
+	
 	if(indexvar.isAssigned())
 	{ index_assigned(); }
 	
-    if(prop_val < (array_size + 1) * domain_size)
+    if(prop_val < array_size)
 	{
-	  int raw_val = prop_val % domain_size;
-	  int var = (prop_val - raw_val) / domain_size;
-	  int val = raw_val + var_array_min_val;
-	  
-	  D_INFO(2, DI_GACELEMENT, "From array, var " + to_string(var) + ", val " + to_string(val));
-	  
-	  if(indexvar.inDomain(var) && !support_for_val_in_index(var))
+	  if(indexvar.inDomain(prop_val) && !support_for_val_in_index(prop_val))
 	  {
 	    D_INFO(2, DI_GACELEMENT, "No support for var in index");
-		indexvar.removeFromDomain(var);
+		indexvar.removeFromDomain(prop_val);
 	  }
 	  
-	  if(resultvar.inDomain(val) && !support_for_val_in_result(val))
+	  VarRef& var = var_array[prop_val];
+	  
+	  int min_val = var.getMin();
+	  int max_val = var.getMax();
+	  for(int val = min_val; val <= max_val; ++val)
 	  {
-	    D_INFO(2, DI_GACELEMENT, "No support for val in result var");
-	    resultvar.removeFromDomain(val);
+	    if(!var.inDomain(val) && resultvar.inDomain(val) &&
+		   !support_for_val_in_result(val))
+	    {
+	      D_INFO(2, DI_GACELEMENT, "No support for val in result var");
+	      resultvar.removeFromDomain(val);
+	    }
 	  }
 	  return;
 	}
 	
-	prop_val -= (array_size + 1) * domain_size ;
-	
-	if(prop_val < indexvar.getInitialMax() - indexvar.getInitialMin() + 1)
+	if(prop_val == array_size)
 	{ // Value got removed from index. Basically have to check everything.
 	  
 	  for(int i = var_array_min_val; i <= var_array_max_val; ++i)
@@ -161,9 +152,8 @@ struct GACElementConstraint : public Constraint
 	  }
 	  return;
 	}
-	prop_val -= indexvar.getInitialMax() - indexvar.getInitialMin() + 1;
 	
-	D_ASSERT(prop_val < resultvar.getInitialMax() - resultvar.getInitialMin() + 1);
+	D_ASSERT(prop_val == array_size + 1);
 	
 	for(int var = 0; var < array_size; ++var)
 	{
@@ -179,15 +169,11 @@ struct GACElementConstraint : public Constraint
   {
     indexvar.setMin(0);
 	indexvar.setMax(var_array.size() - 1);
-	int total_trigger_count = (var_array.size() + 1) * 
-	(var_array_max_val - var_array_max_val + 1) +
-	indexvar.getInitialMax() - indexvar.getInitialMin() + 1 +
-	resultvar.getInitialMax() - resultvar.getInitialMin() + 1;
-	for(int i = 0; i < total_trigger_count; ++i)
+	for(int i = 0; i < var_array.size() + 2; ++i)
 	  propogate(i,0);
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
 	int length = v.size();
 	if(v[length-2] < 0 || v[length-2] > length - 3)

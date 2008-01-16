@@ -19,7 +19,7 @@
 
 /// V1 + ... Vn <= X
 /// is_reversed checks if we are in the case where reverse_constraint was previously called.
-template<typename VarArray, typename VarSum, bool is_reversed = false>
+template<typename VarArray, typename VarSum, BOOL is_reversed = false>
 struct LessEqualSumConstraint : public Constraint
 {
   virtual string constraint_name()
@@ -77,7 +77,7 @@ struct LessEqualSumConstraint : public Constraint
 	}
   }
   
-  virtual bool check_unsat(int prop_val, DomainDelta domain_change)
+  virtual BOOL check_unsat(int prop_val, DomainDelta domain_change)
   {
     int sum = var_array_min_sum.get();
     if(prop_val != -1)
@@ -88,7 +88,7 @@ struct LessEqualSumConstraint : public Constraint
     return var_sum.getMax() < sum;
   }
   
-  virtual bool full_check_unsat()
+  virtual BOOL full_check_unsat()
   {
    int min_sum = 0;
     int max_diff = 0;
@@ -118,7 +118,7 @@ struct LessEqualSumConstraint : public Constraint
     propogate(0,0);
   }
   
-  virtual bool check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<int> v)
   {
     D_ASSERT(v.size() == var_array.size() + 1);
     int sum = 0;
@@ -146,7 +146,7 @@ struct LessEqualSumConstraint : public Constraint
 
 /// These classes are just here to avoid infinite recursion when calculating the reverse of the reverse
 /// of a constraint.
-  template<bool reversed, typename T>
+  template<BOOL reversed, typename T>
 	struct reverse_constraint_helper	
   {
     static Constraint* fun(LessEqualSumConstraint& con)

@@ -112,7 +112,7 @@ public:
   ~DynamicTrigger()
   { D_DATA(sanity_check = -1); }
   
-  bool sanity_check_list(bool is_head_of_list = true)
+  BOOL sanity_check_list(BOOL is_head_of_list = true)
   {
     if(is_head_of_list)
 	{
@@ -182,7 +182,7 @@ struct DynamicConstraint
   
   /// Checks if an assignment is satisfied.
   /** This takes the variable order returned by, and is mainly only used by, get_table_constraint() */
-  virtual bool check_assignment(vector<int>) = 0;
+  virtual BOOL check_assignment(vector<int>) = 0;
     
   virtual ~DynamicConstraint()
   {}

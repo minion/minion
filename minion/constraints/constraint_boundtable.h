@@ -43,7 +43,7 @@ struct BoundsTableConstraint : public Constraint
   }
   
   
-  bool increment(vector<int>& v, unsigned int check_var)
+  BOOL increment(vector<int>& v, unsigned int check_var)
   {
     for(unsigned int i=0;i<v.size();i++)
     {
@@ -75,7 +75,7 @@ struct BoundsTableConstraint : public Constraint
         for(unsigned int i=0;i<vars.size();i++)
 	  v[i] = vars[i].getMin();
         v[check_var] = check_dom;
-	bool satisfied = false;
+	BOOL satisfied = false;
 	do
 	{
 	  if(constraint->check_assignment(v))
@@ -98,7 +98,7 @@ end_check_lower:
         for(unsigned int i=0;i<vars.size();i++)
 	  v[i] = vars[i].getMin();
         v[check_var] = check_dom;
-	bool satisfied = false;
+	BOOL satisfied = false;
 	do
 	{
 	  if(constraint->check_assignment(v))
