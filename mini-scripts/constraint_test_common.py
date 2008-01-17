@@ -387,15 +387,15 @@ class testgacelement:
         return out
     
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("gacelement", False, reify, reifyimply, [6,1,1], ["smallnum", "num", "num"], [6,1,1], self, True)
+        return runtestgeneral("gacelement", False, reify, reifyimply, [5,1,1], ["smallnum", "num", "num"], [5,1,1], self, True)
 
 class testwatchelement(testgacelement):
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("watchelement", False, reify, reifyimply, [6,1,1], ["smallnum", "num", "num"], [6,1,1], self, True)
+        return runtestgeneral("watchelement", False, reify, reifyimply, [5,1,1], ["smallnum", "num", "num"], [5,1,1], self, True)
 
 class testelement(testgacelement):
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("element", False, reify, reifyimply, [6,1,1], ["smallnum", "num", "num"], [6,1,1], self, False)
+        return runtestgeneral("element", False, reify, reifyimply, [5,1,1], ["smallnum", "num", "num"], [5,1,1], self, False)
 
 class testalldiff:
     def printtable(self, domains):
