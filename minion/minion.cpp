@@ -448,11 +448,22 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
 	  ++i;
 	  args.random_seed = atoi(argv[i]);
 	}
-    else if(command == string("-tableout"))
+    else if(command == string("-tableout") || command == string("-tableout0"))
     {
         getOptions(stateObj).tableout=true;
         ++i;
         tableout.set_filename(argv[i]);
+    }
+    else if(command == string("-solsout") || command == string("-solsout0"))
+    {
+      getOptions(stateObj).solsoutWrite=true;
+      ++i;
+      solsoutFile.open(argv[i], ios::app);
+      if(!solsoutFile)
+      {
+        cerr << "Cannot open '" << argv[i] << "' for writing." << endl;
+        exit(0);
+      }
     }
 	else
 	{ 
@@ -576,38 +587,43 @@ void readInput(InputReader* infile, int argc, char** argv, StateObj* stateObj, C
 // From help/help.cpp
 void help(string request);
 
+void print_default_help_and_exit()
+{
+  cout << "Type '" << argv[0] << " help' for usage." << endl;
+  cout << endl << "Usage: " << argv[0] << " {switch}* [input file]" << endl;
+  help("switches");
+  cout << endl;
+  cout << "This version of Minion was built with internal checking " <<
+#ifdef NO_DEBUG
+  "off" <<
+#else
+  "on" << 
+#endif
+  endl << "    and verbose debug info "
+#ifdef NO_PRINT
+  "off" << endl;
+#else
+  "on" << endl;
+#endif
+  cout << "The following preprocessor flags were active:" << endl;
+  print_macros();
+  exit(EXIT_SUCCESS);  
+}
+
 int main(int argc, char** argv) {
 // Wrap main in a try/catch just to stop exceptions leaving main,
 // as windows gets really annoyed when that happens.
+  
 try {
   StateObj* stateObj = new StateObj();
 
-  
   getState(stateObj).getTimer().startClock();
   
   cout << "# " << VERSION << endl ;
   cout << "# Svn version: " << SVN_VER << endl; 
 
   if (argc == 1) {
-    cout << "Type '" << argv[0] << " help' for usage." << endl;
-    cout << endl << "Usage: " << argv[0] << " {switch}* [input file]" << endl;
-    help("switches");
-    cout << endl;
-    cout << "This version of Minion was built with internal checking " <<
-#ifdef NO_DEBUG
-      "off" <<
-#else
-      "on" << 
-#endif
-      endl << "    and verbose debug info "
-#ifdef NO_PRINT
-      "off" << endl;
-#else
-      "on" << endl;
-#endif
-    cout << "The following preprocessor flags were active:" << endl;
-    print_macros();
-    return EXIT_SUCCESS;
+    print_default_help_and_exit();
   }
 
   if(!strcmp(argv[1], "help")) {

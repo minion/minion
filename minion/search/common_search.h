@@ -73,6 +73,18 @@ namespace Controller
     //if(solution_check != NULL)
 	//  solution_check();
 	getState(stateObj).incrementSolutionCount();
+    if(getOptions(stateObj).solsoutWrite)
+    {
+      for(unsigned i = 0; i < print_matrix.size(); ++i)
+        for(unsigned j = 0; j < print_matrix.size(); ++j)
+        {
+          if(!print_matrix[i][j].isAssigned())
+            D_FATAL_ERROR("Some variable was unassigned while writing solution to file.");
+          solsoutFile << print_matrix[i][j].getAssignedValue() << " ";
+        }
+      solsoutFile << "\n";
+    }
+    
 	if(getOptions(stateObj).print_solution)
 	{
 	  if(!print_matrix.empty())

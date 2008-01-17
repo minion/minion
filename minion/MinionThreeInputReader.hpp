@@ -653,7 +653,7 @@ void MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile
   parser_info( "Reading a gadget constraint" ) ;
   
   vector<Var> vectorOfVars = readLiteralVector(infile) ;
-  int tupleSize = vectorOfVars.size() ;
+  //int tupleSize = vectorOfVars.size() ;
   
   infile->check_sym(',');
   

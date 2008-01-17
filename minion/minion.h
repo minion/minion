@@ -70,6 +70,7 @@
 #include "solver.h"
 
 VARDEF(TableOut tableout);
+VARDEF(ofstream solsoutFile);
 
 #include "memory_management/backtrackable_memory.h"
 #include "memory_management/nonbacktrack_memory.h"

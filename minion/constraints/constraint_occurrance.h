@@ -211,9 +211,7 @@ struct OccurrenceEqualConstraint : public Constraint
     val_count.setMin(0);
     val_count.setMax(var_array.size());
     setup_counters();
-    int i = occurrences_count;
-    int j = not_occurrences_count;
-    D_INFO(1,DI_SUMCON,to_string("Full Propagate, count",i));
+    D_INFO(1,DI_SUMCON,to_string("Full Propagate, count", occurrences_count));
     val_count.setMin(occurrences_count);
     val_count.setMax(static_cast<int>(var_array.size()) - not_occurrences_count);
     

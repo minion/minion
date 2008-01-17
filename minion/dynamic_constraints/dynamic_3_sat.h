@@ -112,7 +112,7 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
   {
 	PROP_INFO_ADDONE(Dyn3SAT);
 	int propval = dt->trigger_info();
-	int var_size = var_array.size();
+	//int var_size = var_array.size();
 	
 	DynamicTrigger* base_dt = dynamic_trigger_start();
 	int other_propval;

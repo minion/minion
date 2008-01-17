@@ -151,6 +151,9 @@ public:
   unsigned long long nodelimit;
   /// Dentoes if information about search should be printed to a file.
   bool tableout;
+  
+  /// Denotes if solutions should be printed to a seperate file.
+  bool solsoutWrite;
     
   /// Denotes if solutions should be printed.
   /// Initialised to true.
@@ -164,7 +167,7 @@ public:
   bool randomise_valvarorder;
   
   SearchOptions() : print_only_solution(false), dumptree(false), sollimit(1), fullpropagate(false), 
-	nocheck(false), nodelimit(0), tableout(false), randomise_valvarorder(false), 
+	nocheck(false), nodelimit(0), tableout(false), solsoutWrite(false), randomise_valvarorder(false), 
     print_solution(true), time_limit(0)
   {}
   

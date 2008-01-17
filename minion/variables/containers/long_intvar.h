@@ -101,7 +101,7 @@ struct BigRangeVarContainer {
     DomainInt lower = lower_bound(d); 
     DomainInt old_up_bound = upper_bound(d);
     DomainInt loopvar = old_up_bound; 
-    DomainInt low_bound = initial_bounds[d.var_num].first; 
+    //DomainInt low_bound = initial_bounds[d.var_num].first; 
     if(loopvar < lower)
 	{
 	  getState(stateObj).setFailed(true);
@@ -128,7 +128,7 @@ struct BigRangeVarContainer {
     DomainInt upper = upper_bound(d); 
     DomainInt old_low_bound = lower_bound(d);
     DomainInt loopvar = old_low_bound; 
-    DomainInt low_bound = initial_bounds[d.var_num].first; 
+    //DomainInt low_bound = initial_bounds[d.var_num].first; 
     if(loopvar > upper)
 	{
 	  getState(stateObj).setFailed(true);
