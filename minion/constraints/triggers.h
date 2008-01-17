@@ -102,13 +102,13 @@ struct AbstractTriggerCreator
 template<typename VarRef>
 struct TriggerCreator : public AbstractTriggerCreator
 {
-  VarRef ref;
+  VarRef* ref;
   TriggerCreator(VarRef& v, Trigger t, TrigType _type) :
-    AbstractTriggerCreator(t, _type),  ref(v)
+    AbstractTriggerCreator(t, _type),  ref(&v)
   {}
   
   virtual void post_trigger()
-  { ref.addTrigger(trigger, type); }
+  { ref->addTrigger(trigger, type); }
   
   virtual ~TriggerCreator()
   { }
@@ -116,7 +116,7 @@ struct TriggerCreator : public AbstractTriggerCreator
 
 template<typename VarRef>
 inline shared_ptr<AbstractTriggerCreator> 
-make_trigger(VarRef v, Trigger t, TrigType trigger_type)
+make_trigger(VarRef& v, Trigger t, TrigType trigger_type)
 { return shared_ptr<AbstractTriggerCreator>(new TriggerCreator<VarRef>(v,t, trigger_type));}
 
 

@@ -173,7 +173,7 @@ struct NeqConstraintBinary : public Constraint
   VarRef2 var2;
   
   
-  NeqConstraintBinary(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2 ) :
+  NeqConstraintBinary(StateObj* _stateObj, const VarRef1& _var1, const VarRef2& _var2 ) :
     Constraint(_stateObj), var1(_var1), var2(_var2)
   { }
   
