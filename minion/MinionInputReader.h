@@ -77,7 +77,7 @@ struct ConcreteFileReader : public InputFileReader
 	check_for_comments();
 	string s;
     char next_char = simpleget_char();
-    while(isalnum(next_char))
+    while(isalnum(next_char) || next_char == '_')
     {
       s += next_char;
       next_char = infile.get();
@@ -158,8 +158,7 @@ struct ConcreteFileReader : public InputFileReader
   
   virtual char simplepeek_char()
   {
-	while(infile.peek() == ' ' || infile.peek() == '\n' || 
-		  infile.peek() == '\r')
+	while(isspace(infile.peek()))
 	  infile.get();
 	
 	return infile.peek();
@@ -296,7 +295,7 @@ class MinionThreeInputReader {
   void readConstraintTable(InputFileReader* infile, const ConstraintDef&) ;
   void readConstraintGadget(InputFileReader* infile);
   Var readIdentifier(InputFileReader* infile) ;
-  vector<Var> readPossibleMatrixIdentifier(InputFileReader* infile);
+  vector<Var> readPossibleMatrixIdentifier(InputFileReader* infile, bool mustBeMatrix = false);
   vector< vector<Var> > readLiteralMatrix(InputFileReader* infile) ;
   vector<Var> readLiteralVector(InputFileReader* infile) ;
   vector<int> readConstantVector(InputFileReader* infile, char start = '[', char end = ']', bool = false);

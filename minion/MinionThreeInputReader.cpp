@@ -258,7 +258,7 @@ void MinionThreeInputReader::readGeneralConstraint(InputFileReader* infile, cons
     switch(def.read_types[i])
 	{
 	  case read_list:
-	    varsblob.push_back(readVectorExpression(infile));
+	    varsblob.push_back(readLiteralVector(infile));
 		break;
 	  case read_var:
 	    varsblob.push_back(make_vec(readIdentifier(infile)));
@@ -280,7 +280,7 @@ void MinionThreeInputReader::readGeneralConstraint(InputFileReader* infile, cons
 	  case read_constant_list:
 	  {
 		vector<Var> vectorOfConst ;
-		vectorOfConst = readVectorExpression(infile) ;
+		vectorOfConst = readLiteralVector(infile) ;
 		for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
 		{
 		  if(vectorOfConst[loop].type != VAR_CONSTANT)
@@ -306,7 +306,7 @@ void MinionThreeInputReader::readConstraintElement(InputFileReader* infile, cons
   parser_info("reading an element ct. " ) ;
   vector<vector<Var> > vars;
   // vectorofvars
-  vars.push_back(readVectorExpression(infile));
+  vars.push_back(readLiteralVector(infile));
   infile->check_sym(',');
   // indexvar
   vars.push_back(make_vec(readIdentifier(infile)));
@@ -330,7 +330,7 @@ void MinionThreeInputReader::readConstraintTable(InputFileReader* infile, const 
   
   char delim = ' ';
   int count, elem ;
-  vector<Var> vectorOfVars = readVectorExpression(infile) ;
+  vector<Var> vectorOfVars = readLiteralVector(infile) ;
   int tupleSize = vectorOfVars.size() ;
   
   infile->check_sym(',');
@@ -385,7 +385,7 @@ void MinionThreeInputReader::readConstraintGadget(InputFileReader* infile)
 {
   parser_info( "Reading a gadget constraint" ) ;
   
-  vector<Var> vectorOfVars = readVectorExpression(infile) ;
+  vector<Var> vectorOfVars = readLiteralVector(infile) ;
   int tupleSize = vectorOfVars.size() ;
   
   infile->check_sym(',');
@@ -402,13 +402,7 @@ void MinionThreeInputReader::readConstraintGadget(InputFileReader* infile)
 }
 
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// readIdentifier
-// Expects "<idChar><index>", where <idChar> is 'x', 'v', 'm', 't'.
-// Assumes caller knows what idChar should be.
-// Returns an object of type Var.
-// NB peek() does not ignore whitespace, >> does. Hence use of putBack()
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/// Reads an identifier which represents a single variable or constant.
 Var MinionThreeInputReader::readIdentifier(InputFileReader* infile) {
   char idChar = infile->peek_char();
   
@@ -455,18 +449,19 @@ Var MinionThreeInputReader::readIdentifier(InputFileReader* infile) {
   return var;
 }
 
-
-
 // This function reads an identifier which might be a single variable,
 // which includes a fully derefenced matrix, or might be a partially or
 // not-at-all dereferenced matrix. It could also just be a number!
 // The code shares a lot with readIdentifier, and at some point the two
 // should probably merge
-vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader* infile) {
+vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader* infile, bool mustBeMatrix) {
   char idChar = infile->peek_char();
   
   vector<Var> returnVec;
+
   if ((('0' <= idChar) && ('9' >= idChar)) || idChar == '-') {
+    if(mustBeMatrix)
+      throw parse_exception("Must be matrix here, not constant");
     int i = infile->read_num();
 	returnVec.push_back(Var(VAR_CONSTANT, i));
     return returnVec;
@@ -477,9 +472,11 @@ vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader
   if(infile->peek_char() == '!')
   {
     negVar = true;
+    // Swallow the '!'
     infile->get_char();
   }
   
+  // Get name of variable.
   string name = infile->get_string();
   
   Var var = instance.vars.getSymbol(name);
@@ -501,6 +498,8 @@ vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader
   }
   else
   { 
+    if(mustBeMatrix)
+      throw parse_exception("Must give matrix here, not single variable!");
     if(negVar)
     {
       if(var.type != VAR_BOOL)
@@ -514,13 +513,18 @@ vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader
   return returnVec;  
 }
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// readLiteralVector
-// of vars or consts. Checks 1st elem of vect (empty vects not expected)
-//  to see which.
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/// Reads a vector of variables (which can include constants).
+/// Accepts:
+/// M (for matrix identifer M)
+/// [ M,B,.. ] (for matrix identifers M and variables B)
 vector<Var> MinionThreeInputReader::readLiteralVector(InputFileReader* infile) {
   vector<Var> newVector;
+  
+  if(infile->peek_char() != '[')
+  { // Must just be a matrix identifier
+    return readPossibleMatrixIdentifier(infile, true);
+  }
+  
   infile->check_sym('[');
  
   // Delim here might end up being "x" or something similar. The reason
@@ -786,7 +790,7 @@ void MinionThreeInputReader::readSearch(InputFileReader* infile) {
       parser_info("Read construction site, size " + to_string(instance.constructionSite.size()));
     }
     else
-    {  throw parse_exception("Don't understand '" + var_type + "'"); }
+    {  throw parse_exception("Don't understand '" + var_type + "' as a variable type."); }
   }
   
 
@@ -929,18 +933,3 @@ void MinionThreeInputReader::readVars(InputFileReader* infile) {
   }
   
 }
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// readVectorExpression
-// literal vector (of vars or consts), vi, mi(flattened), ti(flattened),
-// row(mi, r), col(mi, c), col(ti, p, c), rowx(ti, p, r), rowz(ti, r, c)
-// NB Expects caller knows whether vars or consts expected for lit vect.
-// NB peek does not ignore wspace, >> does. Hence use of putback
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vector<Var> MinionThreeInputReader::readVectorExpression(InputFileReader* infile) {
-      parser_info( "Reading Literal Vector of vars or consts" ) ;
-      return readLiteralVector(infile) ;      
-}
-
-
-

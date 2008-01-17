@@ -329,7 +329,9 @@ catch(parse_exception& s)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //Entrance:
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#include "help/help.cpp"
+
+// From help/help.cpp
+void help(string request);
 
 int main(int argc, char** argv) {
   

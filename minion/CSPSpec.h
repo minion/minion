@@ -246,6 +246,8 @@ struct ConstraintBlob
   
   void addSymbol(const string& name, Var variable)
   {
+    if(name == "")
+      throw parse_exception("Cannot have an empty name!");
     if(name[0] >= 0 && name[0] <= 9)
       throw parse_exception("Names cannot start with a number!:" + name);
     if(symbol_table.count(name) != 0)
