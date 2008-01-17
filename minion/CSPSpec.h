@@ -198,6 +198,8 @@ struct ConstraintBlob
   VarContainer() : BOOLs(0)
   {}
 
+  /// Given a matrix variable and a parameter list, returns a slice of the matrix.
+  /// Params can either be wildcards (denoted -999), or a value for the matrix.
   vector<Var> buildVarList(const string& name, vector<int> params)
   {
      vector<Var> return_list;
@@ -241,6 +243,32 @@ struct ConstraintBlob
           
     return return_list;
   }
+  
+  vector<vector<Var> > flattenTo2DMatrix(string name)
+  {
+    // The following code looks a bit weird, but aims to maximise code reuse.
+    // The idea is that we use buildVarList with all but the last parameter wild to get
+    // out 'slices' of the matrix for each value to the last index. Then glue these together
+    // and for any sized matrix, we get a list of vectors, with all but the last dimension flattened!
+    vector<int> indices = getMatrixSymbol(name);
+    vector<int> loop_indices(indices.size());
+    for(int i = 0; i < indices.size() - 1; ++i)
+      loop_indices[i] = -999;
+    
+    vector<vector<Var> > terms;
+    
+    for(int i = 0; i < indices.back(); ++i)
+    {
+      loop_indices.back() = i;
+      vector<Var> slice = buildVarList(name, loop_indices);
+      terms.resize(slice.size());
+      for(int i = 0; i < slice.size(); ++i)
+        terms[i].push_back(slice[i]);
+    }
+    return terms;
+    
+  }
+  
   
   void addSymbol(const string& name, Var variable)
   {
@@ -375,26 +403,7 @@ struct ConstraintBlob
 	throw parse_exception("Var Out of Range!");   
   }
   
-  vector<Var> get_all_vars()
-  {
-    int total_var_count = 0;
-    total_var_count += BOOLs;
-    
-    for(unsigned int x = 0; x < bound.size(); ++x)
-      total_var_count += bound[x].first;
-    for(unsigned int x=0;x<sparse_bound.size();++x)
-      total_var_count += sparse_bound[x].first;
-    for(unsigned int x=0;x<discrete.size();++x)
-      total_var_count += discrete[x].first;
-    for(unsigned int x=0;x<sparse_discrete.size();++x)
-      total_var_count += sparse_discrete[x].first;
-      
-	vector<Var> all_vars(total_var_count);
-	for(int i = 0; i < total_var_count; ++i)
-	  all_vars[i] = get_var('x',i);
-	return all_vars;
-  }
-  
+
   Var getNewVar(VariableType type, vector<int> bounds)
   {
     switch(type)
@@ -456,6 +465,9 @@ struct ConstraintBlob
   Var optimise_variable;
   
   vector<vector<Var> > print_matrix;
+  
+  /// A complete list of variables in the order they are defined.
+  vector<vector<Var> > all_vars_list;
   
   CSPInstance() : is_optimisation_problem(false), tupleListContainer(new TupleListContainer)
   {}

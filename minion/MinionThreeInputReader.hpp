@@ -36,25 +36,6 @@ ConstraintDef& get_constraint(ConstraintType t)
   D_FATAL_ERROR("Constraint not found");
 }
 
-/*
-template<typename T>
-vector<T> make_vec(const T& t)
-{
-  vector<T> vec(1);
-  vec[0] = t;
-  return vec;
-}
-
-template<typename T>
-typename T::value_type& index(T& container, int index_pos)
-{
-  if(index_pos < 0 || index_pos >= (int)container.size())
-    throw parse_exception("Index position " + to_string(index_pos) + 
-							  " out of range");
-  return container[index_pos];
-}
-*/
-
 template<typename FileReader>
 void MinionThreeInputReader<FileReader>::parser_info(string s)
 {
@@ -139,7 +120,7 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
   
   // This has to be delayed unless not all variables are defined yet.
   if(print_all_vars)
-    instance.print_matrix = make_vec(instance.vars.get_all_vars());
+    instance.print_matrix = instance.all_vars_list;
 }
 
 template<typename FileReader>
@@ -635,10 +616,8 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrixVariable(Fi
   // Check it is a matrix
   if(var.type != VAR_MATRIX)
     throw parse_exception("Expected matrix");
-  // Check it is 1 or 2d.
+  // Get dimension of matrix.
   vector<int> indices = instance.vars.getMatrixSymbol(name);
-  if(indices.size() != 1 && indices.size() != 2)
-    throw parse_exception("Only support 1 or 2D matrices here.");
   // Make sure the matrix doesn't have an index after it. This is to produce better error messages.
   if(infile->peek_char() != ',' && infile->peek_char() != ']')
      throw parse_exception("Only accept raw matrix names here, expected ',' next.");
@@ -653,15 +632,7 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrixVariable(Fi
   }
   else
   {
-    vector<vector<Var> > terms;
-    for(int i = 0; i < indices[0]; ++i)
-    {
-      vector<Var> row;
-      for(int j = 0; j < indices[1]; ++j)
-        row.push_back(instance.vars.getSymbol(name+"["+to_string(i)+" , "+to_string(j)+"]"));
-      terms.push_back(row);
-    }
-    return terms;
+    return instance.vars.flattenTo2DMatrix(name);
   }
 }
 
@@ -802,8 +773,6 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
     }
     else if(var_type == "PRINT")
     {
-      if(!instance.print_matrix.empty())
-        throw parse_exception("Can only have one PRINT statement!");
       if(infile->peek_char() == 'A')
       {
         string in = infile->get_string();
@@ -821,7 +790,9 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
       else
       {
         print_all_vars = false;
-        instance.print_matrix = read2DMatrix(infile);
+        vector<vector<Var> > new_matrix = read2DMatrix(infile);
+        for(int i = 0; i < new_matrix.size(); ++i)
+          instance.print_matrix.push_back(new_matrix[i]);
       }
     }
     else if(var_type == "CONSTRUCTION")
@@ -835,9 +806,6 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
     else
     {  throw parse_exception("Don't understand '" + var_type + "' as a variable type."); }
   }
-  
-
-  
 }
 
 
@@ -898,9 +866,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
 
     string varname = infile->get_string();
     parser_info("Name:" + varname);
-    
 
-      
     bool isArray = false;
     vector<int> indices;
       
@@ -968,11 +934,16 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
           instance.vars.addSymbol(varname + to_string(current_index),
                                   instance.vars.getNewVar(variable_type, domain));
         }
+        
+        vector<vector<Var> > matrix_list = instance.vars.flattenTo2DMatrix(varname);
+        for(int i = 0; i < matrix_list.size(); ++i)
+          instance.all_vars_list.push_back(matrix_list[i]);
       }
       else
       {
-        instance.vars.addSymbol(varname,
-                                instance.vars.getNewVar(variable_type, domain));
+        Var v = instance.vars.getNewVar(variable_type, domain);
+        instance.vars.addSymbol(varname, v);
+        instance.all_vars_list.push_back(make_vec(v));
       }
     }
   }
