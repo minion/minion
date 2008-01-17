@@ -233,9 +233,12 @@ struct BooleanContainer
 	  return;
 	}
     assign_ptr()[d.data_offset] |= d.shift_offset;
+    
     trigger_list.push_domain(d.var_num);
+#ifndef FEW_BOOLEAN_TRIGGERS
     trigger_list.push_assign(d.var_num, b);
 	trigger_list.push_domain_removal(d.var_num, 1 - b);
+#endif
     
     if(b == 1)
     {
@@ -261,7 +264,16 @@ struct BooleanContainer
   }
 
   void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type)
-  { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type); }
+  { 
+    D_ASSERT(lock_m); 
+#ifdef FEW_BOOLEAN_TRIGGERS
+    if(type == Assigned)
+      type = DomainChanged;
+    // Static triggers should never be of this type!
+    D_ASSERT(type != DomainRemoval);
+#endif
+    trigger_list.add_trigger(b.var_num, t, type); 
+  }
     
   
 #ifdef DYNAMICTRIGGERS
@@ -269,28 +281,24 @@ struct BooleanContainer
   { 
     D_ASSERT(pos == -999 || ( type == DomainRemoval && pos != -999 ) );
     D_ASSERT(lock_m);
+    
+#ifdef FEW_BOOLEAN_TRIGGERS
+    TrigType new_type = type;
+    switch(type)
+    {
+      case Assigned:
+        new_type = DomainChanged; break;
+      case DomainRemoval:
+        if(pos == 0)
+          new_type = LowerBound;
+        else
+          new_type = UpperBound;
+    }
+    pos = -999;
+#endif    
 	trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
   }
 #endif
-  
-  /*  operator std::string()
-  {
-    D_ASSERT(lock_m);
-    stringstream s;
-    int char_count = 0;
-    for(unsigned int i=0;i<var_count_m;i++)
-    {
-      if(!isAssigned(BoolVarRef_internal(i,this)))
-	s << "X";
-      else
-      {
-	s << (getAssignedValue(BoolVarRef_internal(i,this))?1:0); 
-      }
-      char_count++;
-      if(char_count%width==0) s << endl;
-    }
-    return s.str();
-  }*/
 };
 
 inline BoolVarRef BooleanContainer::get_var_num(int i)
