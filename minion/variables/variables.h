@@ -40,7 +40,7 @@
 #endif
 
 #include "containers/booleanvariables.h"
-#include "containers/intvar.h"
+//#include "containers/intvar.h"
 #include "containers/long_intvar.h"
 #include "containers/intboundvar.h"
 #include "containers/sparse_intboundvar.h"
@@ -53,35 +53,21 @@ class VariableContainer
 public:
   BoundVarContainer<> boundvarContainer; 
   BooleanContainer booleanContainer;
-  LRVCon rangevarContainer;
   BigRangeCon bigRangevarContainer;
   SparseBoundVarContainer<> sparseBoundvarContainer;
 
 
-    VariableContainer(StateObj* _stateObj) :
+  VariableContainer(StateObj* _stateObj) :
     boundvarContainer(_stateObj),
     booleanContainer(_stateObj),
-    rangevarContainer(_stateObj),
     bigRangevarContainer(_stateObj),
     sparseBoundvarContainer(_stateObj)
   {}
   
   BoundVarContainer<>& getBoundvarContainer() { return boundvarContainer; }
   BooleanContainer& getBooleanContainer() { return booleanContainer; }
-  LRVCon& getRangevarContainer() { return rangevarContainer; }
   BigRangeCon& getBigRangevarContainer() { return bigRangevarContainer; }
   SparseBoundVarContainer<>& getSparseBoundvarContainer() { return sparseBoundvarContainer; }
-};
-
-struct SmallDiscreteCheck
-{
-  StateObj* stateObj;
-  SmallDiscreteCheck(StateObj* _stateObj) : stateObj(_stateObj)
-  {}
-
-  template<typename T>
-  bool operator()(const T& lower, const T& upper) const
-  { return getVars(stateObj).getRangevarContainer().valid_range(lower, upper); }
 };
 
 #include "mappings/variable_neg.h"

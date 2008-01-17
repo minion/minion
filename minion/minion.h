@@ -221,10 +221,6 @@ template<typename DomType>
 inline BoundVarContainer<DomType>& BoundVarRef_internal<DomType>::getCon_Static()
 { return varContainer_m.boundvarContainer; }
 
-template<int var_min, typename d_type>
-inline RangeVarContainer<var_min, d_type>& RangeVarRef_internal_template<var_min, d_type>::getCon_Static()
-{ return varContainer_m.rangevarContainer; }
-
 inline BooleanContainer& BoolVarRef_internal::getCon_Static()
 { return varContainer_m.booleanContainer; }
 

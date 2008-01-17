@@ -31,7 +31,6 @@ $(OBJDIR)/build_constraints/BuildDynamicStart.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -56,13 +55,6 @@ $(OBJDIR)/build_constraints/BuildDynamicStart.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h
@@ -98,7 +90,6 @@ $(OBJDIR)/build_constraints/BuildStaticStart.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -123,13 +114,6 @@ $(OBJDIR)/build_constraints/BuildStaticStart.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h
@@ -164,7 +148,6 @@ $(OBJDIR)/build_constraints/CT_ALLDIFF.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -189,13 +172,6 @@ $(OBJDIR)/build_constraints/CT_ALLDIFF.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -233,7 +209,6 @@ $(OBJDIR)/build_constraints/CT_ALLDIFF_GACSLOW.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -258,13 +233,6 @@ $(OBJDIR)/build_constraints/CT_ALLDIFF_GACSLOW.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -300,7 +268,6 @@ $(OBJDIR)/build_constraints/CT_DISEQ.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -325,13 +292,6 @@ $(OBJDIR)/build_constraints/CT_DISEQ.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -368,7 +328,6 @@ $(OBJDIR)/build_constraints/CT_DIV.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -393,13 +352,6 @@ $(OBJDIR)/build_constraints/CT_DIV.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -435,7 +387,6 @@ $(OBJDIR)/build_constraints/CT_ELEMENT.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -460,13 +411,6 @@ $(OBJDIR)/build_constraints/CT_ELEMENT.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -502,7 +446,6 @@ $(OBJDIR)/build_constraints/CT_EQ.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -527,13 +470,6 @@ $(OBJDIR)/build_constraints/CT_EQ.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -569,7 +505,6 @@ $(OBJDIR)/build_constraints/CT_GACELEMENT.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -594,13 +529,6 @@ $(OBJDIR)/build_constraints/CT_GACELEMENT.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -636,7 +564,6 @@ $(OBJDIR)/build_constraints/CT_GADGET.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -661,13 +588,6 @@ $(OBJDIR)/build_constraints/CT_GADGET.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -703,7 +623,6 @@ $(OBJDIR)/build_constraints/CT_GEQ_OCCURRENCE.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -728,13 +647,6 @@ $(OBJDIR)/build_constraints/CT_GEQ_OCCURRENCE.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -770,7 +682,6 @@ $(OBJDIR)/build_constraints/CT_GEQSUM.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -795,13 +706,6 @@ $(OBJDIR)/build_constraints/CT_GEQSUM.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -839,7 +743,6 @@ $(OBJDIR)/build_constraints/CT_INEQ.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -864,13 +767,6 @@ $(OBJDIR)/build_constraints/CT_INEQ.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -906,7 +802,6 @@ $(OBJDIR)/build_constraints/CT_LEQ_OCCURRENCE.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -931,13 +826,6 @@ $(OBJDIR)/build_constraints/CT_LEQ_OCCURRENCE.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -973,7 +861,6 @@ $(OBJDIR)/build_constraints/CT_LEQSUM.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -998,13 +885,6 @@ $(OBJDIR)/build_constraints/CT_LEQSUM.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1042,7 +922,6 @@ $(OBJDIR)/build_constraints/CT_LEXLEQ.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1067,13 +946,6 @@ $(OBJDIR)/build_constraints/CT_LEXLEQ.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1109,7 +981,6 @@ $(OBJDIR)/build_constraints/CT_LEXLESS.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1134,13 +1005,6 @@ $(OBJDIR)/build_constraints/CT_LEXLESS.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1176,7 +1040,6 @@ $(OBJDIR)/build_constraints/CT_MAX.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1201,13 +1064,6 @@ $(OBJDIR)/build_constraints/CT_MAX.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1243,7 +1099,6 @@ $(OBJDIR)/build_constraints/CT_MIN.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1268,13 +1123,6 @@ $(OBJDIR)/build_constraints/CT_MIN.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1311,7 +1159,6 @@ $(OBJDIR)/build_constraints/CT_MINUSEQ.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1336,13 +1183,6 @@ $(OBJDIR)/build_constraints/CT_MINUSEQ.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1378,7 +1218,6 @@ $(OBJDIR)/build_constraints/CT_MODULO.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1403,13 +1242,6 @@ $(OBJDIR)/build_constraints/CT_MODULO.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1445,7 +1277,6 @@ $(OBJDIR)/build_constraints/CT_OCCURRENCE.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1470,13 +1301,6 @@ $(OBJDIR)/build_constraints/CT_OCCURRENCE.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1512,7 +1336,6 @@ $(OBJDIR)/build_constraints/CT_POW.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1537,13 +1360,6 @@ $(OBJDIR)/build_constraints/CT_POW.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1579,7 +1395,6 @@ $(OBJDIR)/build_constraints/CT_PRODUCT2.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1604,13 +1419,6 @@ $(OBJDIR)/build_constraints/CT_PRODUCT2.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1647,7 +1455,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_ELEMENT.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1672,13 +1479,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_ELEMENT.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1714,7 +1514,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_GEQSUM.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1739,13 +1538,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_GEQSUM.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1784,7 +1576,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LEQSUM.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1809,13 +1600,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LEQSUM.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1854,7 +1638,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LITSUM.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1879,13 +1662,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LITSUM.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1921,7 +1697,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_TABLE.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -1946,13 +1721,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_TABLE.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -1990,7 +1758,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_VECNEQ.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -2015,13 +1782,6 @@ $(OBJDIR)/build_constraints/CT_WATCHED_VECNEQ.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -2057,7 +1817,6 @@ $(OBJDIR)/build_constraints/CT_WEIGHTGEQSUM.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -2082,13 +1841,6 @@ $(OBJDIR)/build_constraints/CT_WEIGHTGEQSUM.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -2127,7 +1879,6 @@ $(OBJDIR)/build_constraints/CT_WEIGHTLEQSUM.o:  \
   minion/./build_constraints/../variables/variables.h \
   minion/./build_constraints/../variables/VarRefType.h \
   minion/./build_constraints/../variables/containers/booleanvariables.h \
-  minion/./build_constraints/../variables/containers/intvar.h \
   minion/./build_constraints/../variables/containers/long_intvar.h \
   minion/./build_constraints/../variables/containers/intboundvar.h \
   minion/./build_constraints/../variables/containers/sparse_intboundvar.h \
@@ -2152,13 +1903,6 @@ $(OBJDIR)/build_constraints/CT_WEIGHTLEQSUM.o:  \
   minion/./build_constraints/../constraints/reify_true.h \
   minion/./build_constraints/../constraints/function_defs.hpp \
   minion/./build_constraints/../preprocess.h \
-  minion/./build_constraints/../search/standard_search.h \
-  minion/./build_constraints/../search/common_search.h \
-  minion/./build_constraints/../search/VariableOrders.h \
-  minion/./build_constraints/../search/search_methods.h \
-  minion/./build_constraints/../search/recursive_search.h \
-  minion/./build_constraints/../search/conflict_search.h \
-  minion/./build_constraints/../search/search_control.h \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
@@ -2184,7 +1928,6 @@ $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
   minion/./queue/standard_queue.h minion/./trigger_list.h \
   minion/./variables/variables.h minion/./variables/VarRefType.h \
   minion/./variables/containers/booleanvariables.h \
-  minion/./variables/containers/intvar.h \
   minion/./variables/containers/long_intvar.h \
   minion/./variables/containers/intboundvar.h \
   minion/./variables/containers/sparse_intboundvar.h \
@@ -2206,11 +1949,8 @@ $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
   minion/./constraints/constraint_boundtable.h \
   minion/./constraints/reify.h minion/./constraints/reify_true.h \
   minion/./constraints/function_defs.hpp minion/./preprocess.h \
-  minion/./search/standard_search.h minion/./search/common_search.h \
-  minion/./search/VariableOrders.h minion/./search/search_methods.h \
-  minion/./search/recursive_search.h minion/./search/conflict_search.h \
-  minion/./search/search_control.h minion/./constraint_setup.h \
-  minion/./test_functions.h minion/./BuildCSP.h minion/./CSPSpec.h
+  minion/./constraint_setup.h minion/./test_functions.h \
+  minion/./BuildCSP.h minion/./CSPSpec.h
 $(OBJDIR)/BuildCSP.o: minion/./BuildCSP.cpp minion/./minion.h \
   minion/./svn_header.h minion/./system/system.h \
   minion/./system/wrapper.h minion/./system/to_string.h \
@@ -2229,7 +1969,6 @@ $(OBJDIR)/BuildCSP.o: minion/./BuildCSP.cpp minion/./minion.h \
   minion/./queue/standard_queue.h minion/./trigger_list.h \
   minion/./variables/variables.h minion/./variables/VarRefType.h \
   minion/./variables/containers/booleanvariables.h \
-  minion/./variables/containers/intvar.h \
   minion/./variables/containers/long_intvar.h \
   minion/./variables/containers/intboundvar.h \
   minion/./variables/containers/sparse_intboundvar.h \
@@ -2251,11 +1990,12 @@ $(OBJDIR)/BuildCSP.o: minion/./BuildCSP.cpp minion/./minion.h \
   minion/./constraints/constraint_boundtable.h \
   minion/./constraints/reify.h minion/./constraints/reify_true.h \
   minion/./constraints/function_defs.hpp minion/./preprocess.h \
-  minion/./search/standard_search.h minion/./search/common_search.h \
-  minion/./search/VariableOrders.h minion/./search/search_methods.h \
-  minion/./search/recursive_search.h minion/./search/conflict_search.h \
-  minion/./search/search_control.h minion/./constraint_setup.h \
-  minion/./test_functions.h minion/./BuildCSP.h minion/./CSPSpec.h
+  minion/./constraint_setup.h minion/./test_functions.h \
+  minion/./BuildCSP.h minion/./search/standard_search.h \
+  minion/./search/common_search.h minion/./search/VariableOrders.h \
+  minion/./search/search_methods.h minion/./search/recursive_search.h \
+  minion/./search/conflict_search.h minion/./search/search_control.h \
+  minion/./CSPSpec.h
 $(OBJDIR)/constraint_setup.o: minion/./constraint_setup.cpp \
   minion/./minion.h minion/./svn_header.h minion/./system/system.h \
   minion/./system/wrapper.h minion/./system/to_string.h \
@@ -2274,7 +2014,6 @@ $(OBJDIR)/constraint_setup.o: minion/./constraint_setup.cpp \
   minion/./queue/standard_queue.h minion/./trigger_list.h \
   minion/./variables/variables.h minion/./variables/VarRefType.h \
   minion/./variables/containers/booleanvariables.h \
-  minion/./variables/containers/intvar.h \
   minion/./variables/containers/long_intvar.h \
   minion/./variables/containers/intboundvar.h \
   minion/./variables/containers/sparse_intboundvar.h \
@@ -2296,11 +2035,8 @@ $(OBJDIR)/constraint_setup.o: minion/./constraint_setup.cpp \
   minion/./constraints/constraint_boundtable.h \
   minion/./constraints/reify.h minion/./constraints/reify_true.h \
   minion/./constraints/function_defs.hpp minion/./preprocess.h \
-  minion/./search/standard_search.h minion/./search/common_search.h \
-  minion/./search/VariableOrders.h minion/./search/search_methods.h \
-  minion/./search/recursive_search.h minion/./search/conflict_search.h \
-  minion/./search/search_control.h minion/./constraint_setup.h \
-  minion/./test_functions.h minion/./BuildCSP.h
+  minion/./constraint_setup.h minion/./test_functions.h \
+  minion/./BuildCSP.h
 $(OBJDIR)/debug_functions.o: minion/./debug_functions.cpp \
   minion/./system/system.h minion/./system/wrapper.h \
   minion/./system/to_string.h minion/./system/local_array.h \
@@ -2314,6 +2050,7 @@ $(OBJDIR)/get_info.o: minion/./get_info.cpp minion/./system/system.h \
   minion/./system/sys_constants.h minion/./system/debug.h \
   minion/./system/array_functions.h minion/./constants.h \
   minion/./get_info/get_info.h
+$(OBJDIR)/help/help.o: minion/./help/help.cpp
 $(OBJDIR)/minion.o: minion/./minion.cpp minion/./minion.h \
   minion/./svn_header.h minion/./system/system.h \
   minion/./system/wrapper.h minion/./system/to_string.h \
@@ -2332,7 +2069,6 @@ $(OBJDIR)/minion.o: minion/./minion.cpp minion/./minion.h \
   minion/./queue/standard_queue.h minion/./trigger_list.h \
   minion/./variables/variables.h minion/./variables/VarRefType.h \
   minion/./variables/containers/booleanvariables.h \
-  minion/./variables/containers/intvar.h \
   minion/./variables/containers/long_intvar.h \
   minion/./variables/containers/intboundvar.h \
   minion/./variables/containers/sparse_intboundvar.h \
@@ -2354,30 +2090,12 @@ $(OBJDIR)/minion.o: minion/./minion.cpp minion/./minion.h \
   minion/./constraints/constraint_boundtable.h \
   minion/./constraints/reify.h minion/./constraints/reify_true.h \
   minion/./constraints/function_defs.hpp minion/./preprocess.h \
-  minion/./search/standard_search.h minion/./search/common_search.h \
-  minion/./search/VariableOrders.h minion/./search/search_methods.h \
-  minion/./search/recursive_search.h minion/./search/conflict_search.h \
-  minion/./search/search_control.h minion/./constraint_setup.h \
-  minion/./test_functions.h minion/./BuildCSP.h minion/./CSPSpec.h \
-  minion/./BuildConstraint.h minion/./MinionInputReader.h \
+  minion/./constraint_setup.h minion/./test_functions.h \
+  minion/./BuildCSP.h minion/./CSPSpec.h minion/./BuildConstraint.h \
+  minion/./MinionInputReader.h minion/./MinionInputReader.hpp \
+  minion/./MinionThreeInputReader.hpp \
+  minion/./build_constraints/constraint_defs.h \
   minion/./system/defined_macros.h
-$(OBJDIR)/MinionInputReader.o: minion/./MinionInputReader.cpp \
-  minion/./system/system.h minion/./system/wrapper.h \
-  minion/./system/to_string.h minion/./system/local_array.h \
-  minion/./system/tableout.h minion/./system/time_keeping.h \
-  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
-  minion/./system/debug.h minion/./system/array_functions.h \
-  minion/./CSPSpec.h minion/./tuple_container.h \
-  minion/./MinionInputReader.h
-$(OBJDIR)/MinionThreeInputReader.o: minion/./MinionThreeInputReader.cpp \
-  minion/./system/system.h minion/./system/wrapper.h \
-  minion/./system/to_string.h minion/./system/local_array.h \
-  minion/./system/tableout.h minion/./system/time_keeping.h \
-  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
-  minion/./system/debug.h minion/./system/array_functions.h \
-  minion/./CSPSpec.h minion/./tuple_container.h \
-  minion/./MinionInputReader.h \
-  minion/./build_constraints/constraint_defs.h
 $(OBJDIR)/preprocess.o: minion/./preprocess.cpp minion/./minion.h \
   minion/./svn_header.h minion/./system/system.h \
   minion/./system/wrapper.h minion/./system/to_string.h \
@@ -2396,7 +2114,6 @@ $(OBJDIR)/preprocess.o: minion/./preprocess.cpp minion/./minion.h \
   minion/./queue/standard_queue.h minion/./trigger_list.h \
   minion/./variables/variables.h minion/./variables/VarRefType.h \
   minion/./variables/containers/booleanvariables.h \
-  minion/./variables/containers/intvar.h \
   minion/./variables/containers/long_intvar.h \
   minion/./variables/containers/intboundvar.h \
   minion/./variables/containers/sparse_intboundvar.h \
@@ -2418,8 +2135,5 @@ $(OBJDIR)/preprocess.o: minion/./preprocess.cpp minion/./minion.h \
   minion/./constraints/constraint_boundtable.h \
   minion/./constraints/reify.h minion/./constraints/reify_true.h \
   minion/./constraints/function_defs.hpp minion/./preprocess.h \
-  minion/./search/standard_search.h minion/./search/common_search.h \
-  minion/./search/VariableOrders.h minion/./search/search_methods.h \
-  minion/./search/recursive_search.h minion/./search/conflict_search.h \
-  minion/./search/search_control.h minion/./constraint_setup.h \
-  minion/./test_functions.h minion/./BuildCSP.h
+  minion/./constraint_setup.h minion/./test_functions.h \
+  minion/./BuildCSP.h

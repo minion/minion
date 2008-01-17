@@ -19,11 +19,6 @@ using namespace ProbSpec;
 /// Builds the CSP given by instance into stateObj.
 void BuildCSP(StateObj* stateObj, CSPInstance& instance)
 {
-  // Fix up Bound / Sparse Bound
-  
-  // Fix up discrete variables.
-  instance.fixDiscrete(SmallDiscreteCheck(stateObj));
-  
   // Set up variables
   BuildCon::build_variables(stateObj, instance.vars);
   

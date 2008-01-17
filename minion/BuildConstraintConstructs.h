@@ -105,18 +105,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 		return BUILDCON<initial_size, size - 1>::
 		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }
-	  case VAR_DISCRETE_BASE:
-		D_FATAL_ERROR("Serious internal error");
-		
-	  case VAR_DISCRETE_SHORT:
-	  {
-		light_vector<LRangeVarRef> v(vars.size());
-		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = getVars(stateObj).getRangevarContainer().get_var_num(vars[i].pos);
-		return BUILDCON<initial_size, size - 1>::
-		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
-	  }		
-	  case VAR_DISCRETE_LONG:
+      case VAR_DISCRETE:
 	  {
 		light_vector<BigRangeVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)

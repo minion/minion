@@ -13,7 +13,6 @@ namespace Controller
 void lock(StateObj* stateObj)
 {
   D_INFO(2, DI_SOLVER, "Starting Locking process");
-  getVars(stateObj).getRangevarContainer().lock();
   getVars(stateObj).getBigRangevarContainer().lock();
   getVars(stateObj).getSparseBoundvarContainer().lock();
   getVars(stateObj).getBooleanContainer().lock(); 

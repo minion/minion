@@ -912,7 +912,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
     }
     else if(var_type == "DISCRETE")
     {
-      variable_type = VAR_DISCRETE_BASE;
+      variable_type = VAR_DISCRETE;
       domain = readRange(infile);
       if(domain.size() != 2)
         throw parse_exception("Ranges contain 2 numbers!");

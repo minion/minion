@@ -37,9 +37,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
 			return AnyVarRef(getVars(stateObj).getBoundvarContainer().get_var_num(v.pos));
 		  case VAR_SPARSEBOUND:
 			return AnyVarRef(getVars(stateObj).getSparseBoundvarContainer().get_var_num(v.pos));
-		  case VAR_DISCRETE_SHORT:
-			return AnyVarRef(getVars(stateObj).getRangevarContainer().get_var_num(v.pos));
-		  case VAR_DISCRETE_LONG:
+		  case VAR_DISCRETE:
 			return AnyVarRef(getVars(stateObj).getBigRangevarContainer().get_var_num(v.pos));
 		  case VAR_SPARSEDISCRETE:	
 			D_FATAL_ERROR("Sparse Discrete not supported at present");
@@ -74,7 +72,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
 	getVars(stateObj).getBoundvarContainer().addVariables(vars.bound);
     getVars(stateObj).getSparseBoundvarContainer().addVariables(vars.sparse_bound);
 
-
+/*
     vector<pair<int, Bounds> > smallRange;
     vector<pair<int, Bounds> > largeRange;
 
@@ -87,7 +85,8 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
     }
 	
     getVars(stateObj).getRangevarContainer().addVariables(smallRange);
-    getVars(stateObj).getBigRangevarContainer().addVariables(largeRange);
+ */
+    getVars(stateObj).getBigRangevarContainer().addVariables(vars.discrete);
 	
 	for(unsigned int i = 0; i < vars.sparse_discrete.size(); ++i)
 	{ D_FATAL_ERROR("Sparse discrete disabled at present due to bugs. Sorry."); }

@@ -108,9 +108,7 @@ enum VariableType
   VAR_NOTBOOL,
   VAR_BOUND,
   VAR_SPARSEBOUND,
-  VAR_DISCRETE_BASE,
-  VAR_DISCRETE_SHORT,
-  VAR_DISCRETE_LONG,
+  VAR_DISCRETE,
   VAR_SPARSEDISCRETE,
   VAR_CONSTANT,
   VAR_MATRIX,
@@ -310,7 +308,7 @@ struct ConstraintBlob
         }
         throw parse_exception("Internal Error - SparseBound OverFlow");
       }
-    case VAR_DISCRETE_BASE: 
+    case VAR_DISCRETE: 
     {
       int discrete_size = 0;
       for(unsigned int x = 0; x < discrete.size(); ++x)
@@ -363,7 +361,7 @@ struct ConstraintBlob
 	  for(unsigned int x=0;x<discrete.size();++x)
 		discrete_size += discrete[x].first;
 	  if(i < discrete_size)
-		return Var(VAR_DISCRETE_BASE, i);
+		return Var(VAR_DISCRETE, i);
 	  i -= discrete_size;
 	}
 	{
@@ -407,10 +405,10 @@ struct ConstraintBlob
         return getNewBoundVar(bounds[0], bounds[1]);
       case VAR_SPARSEBOUND:
         return getNewSparseBoundVar(bounds);
-      case VAR_DISCRETE_BASE:
+      case VAR_DISCRETE:
         return getNewDiscreteVar(bounds[0], bounds[1]);
-			default:
-			  D_FATAL_ERROR("Internal error");
+      default:
+        D_FATAL_ERROR("Internal error");
     }
   }
   
@@ -436,7 +434,7 @@ struct ConstraintBlob
   Var getNewDiscreteVar(int lower, int upper)
   {
     discrete.push_back(make_pair(1, Bounds(lower, upper)));
-    return Var(VAR_DISCRETE_BASE, discrete.size() - 1);
+    return Var(VAR_DISCRETE, discrete.size() - 1);
   }
     
 };
@@ -477,76 +475,7 @@ struct ConstraintBlob
   
   void last_constraint_reifyimply(Var reifyVar)
   { constraints.back().reifyimply(reifyVar); }
-  
-  template<typename Map>
-  void VarReplace(Var& v, Map& new_map)
-  {
-	if(v.type == VAR_DISCRETE_BASE)
-	{
-	  D_ASSERT(new_map.count(v.pos) == 1);
-	  v = new_map[v.pos]; 
-	}
-  }
-  
-  template<typename Element, typename Map>
-  void VarReplace(std::vector<Element>& v, Map& new_map)
-  {
-    for(int i = 0; i < v.size(); ++i)
-	  VarReplace(v[i], new_map);
-  }
-  
-  template<typename SmallBoundCheck>
-	void fixDiscrete(SmallBoundCheck check)
-  {
-	  // Right, this is horrible, but necessary. We need to:
-	  // a) Look for VAR_DISCRETEs whose bounds don't satisfy check
-	  //    and turn them into VAR_DISCRETE_LONG
-	  // b) Go through and fix all the constraints to satisfy the
-	  //    new numbering order.
-	  
-	  // We'll do that in two steps:
-	  // 1) Go through variables, and build a map between old and new vars
-	  // 2) Go through all the occurrences of variables (including in constraints)
-	  //    and change them.
-	  
-	  // Will map the int part of VAR_DISCRETE vars to whole new vars
-	  std::map<int, Var> new_map;
-	  
-	  vector<pair<int, Bounds> >& discrete = vars.discrete;
-	  int short_discrete_size = 0;
-	  int long_discrete_size = 0;
-	  for(unsigned int x = 0; x < discrete.size(); ++x)
-	  {
-		int var_length = discrete[x].first;
-		if(check(discrete[x].second.lower_bound, discrete
-				 [x].second.upper_bound))
-		{
-		  for(int i = 0; i < var_length; i++)
-		  {
-			new_map[short_discrete_size + long_discrete_size + i] = 
-			Var(VAR_DISCRETE_SHORT, short_discrete_size + i);
-		  }
-		  short_discrete_size += var_length;
-		}
-		else
-		{
-		  for(int i = 0; i < var_length; i++)
-		  {
-			new_map[short_discrete_size + long_discrete_size + i] = 
-			Var(VAR_DISCRETE_LONG, long_discrete_size + i);
-		  }
-		  long_discrete_size += var_length;
-		}
-	  }
-      VarReplace(optimise_variable, new_map);
-	  
-	  VarReplace(var_order, new_map);
-	  VarReplace(print_matrix, new_map);
-	  for(list<ConstraintBlob>::iterator it = constraints.begin(); 
-		  it != constraints.end(); ++it)
-		VarReplace(it->vars, new_map);
-  }
-  
+    
   // Perform a simple check to ensure the constraint will not cause integer overflow.
   bool bounds_check_last_constraint()
   {
