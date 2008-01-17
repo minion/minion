@@ -32,7 +32,6 @@
 #define MANY_VAR_CONTAINERS
 #endif
 
-#include "svn_header.h"
 #include "system/system.h"
 
 #include "constants.h"
