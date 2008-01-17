@@ -42,6 +42,23 @@ typedef vector<shared_ptr<AbstractTriggerCreator> > triggerCollection;
 // \addtogroup Constraints
 // @{
 
+/** @help constraints Description
+Minion supports many constraints and these are regularly being
+improved and added to. In some cases multiple implementations of the
+same constraints are provided and we would appreciate additional
+feedback on their relative merits in your problem.
+
+Minion does not support nesting of constraints, however this can be
+achieved by auxiliary variables and reification.
+
+Variables can be replaced by constants. You can find out more on
+expressions for variables, vectors, etc. in the section on variables.
+*/
+
+/** @help constraints References 
+help variables
+*/
+
 /// Base type from which all constraints are derived.
 class Constraint
 {

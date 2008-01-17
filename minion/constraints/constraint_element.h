@@ -24,6 +24,26 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;element Description
+The constraint 
+
+   element(vec, i, e)
+
+specifies that, in any solution, vec[i] = e.
+*/
+
+/** @help constraints;element Reifiability
+This constraint is reifiable.
+*/
+
+/** @help constraints;element References 
+See the entry 
+
+   constraints watchelement
+
+for details of an identical constraint that enforces generalised arc
+consistency.
+*/
 
 template<typename VarArray, typename IndexRef>
 struct ElementConstraint : public Constraint

@@ -24,7 +24,21 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;diseq Description
+Constrain two variables to take different values.
+*/
 
+/** @help constraints;diseq Notes
+Achieves arc consistency.
+*/
+
+/** @help constraints;diseq Example
+diseq(v0,v1)
+*/
+
+/** @help constraints;diseq Reifiability
+This constraint is reifiable.
+*/
 
 template<typename VarArray>
 struct NeqConstraint : public Constraint

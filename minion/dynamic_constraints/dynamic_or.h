@@ -106,7 +106,7 @@ struct BoolOrConstraintDynamic : public DynamicConstraint
 	last = j;
 	watched[watched[0] == prev_var ? 0 : 1] = j;
 	return;
-      }
+      } 
     }
     //if we get here, we couldn't find a place to put the watch, do UP
     var_array[other_var].propagateAssign(negs[other_var]);

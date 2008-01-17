@@ -31,6 +31,31 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;watchelement Description
+The constraint 
+
+   watchelement(vec, i, e)
+
+specifies that, in any solution, vec[i] = e.
+*/
+
+/** @help constraints;watchelement Reifiability
+This constraint is reifiable.
+*/
+
+/** @help constraints;watchelement Notes
+Enforces generalised arc consistency.
+*/
+
+/** @help constraints;watchelement References
+See entry
+
+   help constraints element
+
+for details of an identical constraint that enforces a lower level of
+consistency.
+*/
+
 // The triggers in this constraint are set up as follows:
 // If the length of the vector is L.
 
@@ -41,7 +66,6 @@
 // After this there are 2 * Dom(Index) literals are, for some j
 // literal 2 * i : attached to j in V[i]
 // literal 2 * i + 1 : attached to j in Result
-
 
 
 template<typename VarArray, typename Index, typename Result>

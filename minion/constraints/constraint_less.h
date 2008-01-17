@@ -24,6 +24,28 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;ineq Description
+The constraint
+
+   ineq(x, y, k)
+
+ensures that 
+
+   x <= y + k 
+
+in any solution.
+*/
+
+/** @help constraints;ineq Notes
+Minion has no strict inequality (<) constraints. However x < y can be
+achieved by
+
+   ineq(x, y, -1)
+*/
+
+/** @help constraints;ineq Reifiability
+This constraint is reifiable.
+*/
 
 // x <= y + offset
 template<typename VarRef1, typename VarRef2, typename Offset>

@@ -24,6 +24,22 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;eq Description
+Constrain two variables to take equal values.
+*/
+
+/** @help constraints;eq Example
+eq(x0,x1)
+*/
+
+/** @help constraints;eq Notes
+Achieves bounds consistency.
+*/
+
+/** @help constraints;eq Reifiability
+This constraint is reifiable.
+*/
+
 
 /// (var1 = var2) = var3
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>

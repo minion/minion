@@ -24,7 +24,47 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;lexless Description
+The constraint
 
+   lexless(vec0, vec1)
+
+takes two vectors vec0 and vec1 of the same length and ensures that
+vec0 is lexicographically less than vec1 in any solution.
+*/
+
+/** @help constraints;lexless Reifiability
+This constraint is reifiable.
+*/
+
+/** @help constraints;lexless References
+See also
+
+   help constraints lexleq
+
+for a similar constraint with non-strict lexicographic inequality.
+*/
+
+/** @help constraints;lexleq Description
+The constraint
+
+   lexleq(vec0, vec1)
+
+takes two vectors vec0 and vec1 of the same length and ensures that
+vec0 is lexicographically less than or equal to vec1 in any solution.
+*/
+
+/** @help constraints;lexleq Reifiability
+This constraint is reifiable.
+*/
+
+/** @help constraints;lexleq References
+See also
+
+   help constraints lexless
+
+for a similar constraint with strict lexicographic inequality.
+*/
 
 template<typename VarArray1, typename VarArray2, BOOL Less = false>
 struct LexLeqConstraint : public Constraint
