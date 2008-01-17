@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef _CONSTANTS_H
+#define _CONSTANTS_H
+
 /// A placeholder type.
 struct EmptyType
 {};
@@ -99,3 +102,4 @@ enum BoundType
   Bound_Maybe
 };
 
+#endif // _CONSTANTS_H
