@@ -141,7 +141,7 @@ struct SparseBoundVarContainer {
     trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
   }
   
-  SparseBoundVarContainer() : lock_m(0)
+  SparseBoundVarContainer() : lock_m(0), trigger_list(true)
   {}
   
   BOOL isAssigned(SparseBoundVarRef_internal d) const
@@ -300,7 +300,11 @@ struct SparseBoundVarContainer {
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(SparseBoundVarRef_internal b, DynamicTrigger* t, TrigType type, int pos = -999)
-  { D_ASSERT(lock_m); trigger_list.addDynamicTrigger(b.var_num, t, type, pos); }
+  { 
+	D_ASSERT(lock_m); 
+	D_ASSERT(type != DomainRemoval);
+	trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
+  }
 #endif
 
   operator std::string()

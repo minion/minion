@@ -59,7 +59,7 @@ struct BigRangeVarContainer {
   unsigned var_count_m;
   BOOL lock_m;
   
-    BigRangeVarContainer() : var_count_m(0), lock_m(0)
+    BigRangeVarContainer() : var_count_m(0), lock_m(0), trigger_list(false)
   { 
     // Store where the first variable will go.
     var_offset.push_back(0);

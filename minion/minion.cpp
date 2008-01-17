@@ -68,7 +68,7 @@ void print_info()
     << "           order = static            Standard static (but slower)" << endl
     << "            Note: These orderings do not cache any information between" << endl
     << "            nodes, so will perform poorly on problem with many variables." << endl
-
+    << "         [-randomseed] N             Set the random seed used to N." << endl
 #ifndef NO_DEBUG
 	<< "         [-dumptree]                 Dumps the search tree" << endl
 	<< "  Note: The following tags should never change the results produced." << endl
@@ -326,7 +326,7 @@ int main(int argc, char** argv) {
   
   if(randomise_valvaroder)
   {
-	cerr << "Using seed: " << args.random_seed << endl;
+	cout << "Using seed: " << args.random_seed << endl;
 	srand( args.random_seed );
   
     std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());

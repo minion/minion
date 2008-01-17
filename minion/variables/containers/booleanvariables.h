@@ -143,14 +143,15 @@ struct BooleanContainer
     D_ASSERT(!lock_m);
     lock_m = true;
 	int required_mem = var_count_m / 8 + 1;
-	required_mem += (required_mem % sizeof(data_type));
+	// Round up to nearest data_type block
+	required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
     assign_offset.request_bytes(required_mem);
     values_mem.request_bytes(required_mem);
 	// Min domain value = 0, max domain val = 1.
     trigger_list.lock(var_count_m, 0, 1);
   }
   
-  BooleanContainer() :  var_count_m(0), lock_m(false)
+  BooleanContainer() :  var_count_m(0), lock_m(false), trigger_list(false)
   {}
   
   /// Returns a new Boolean Variable.

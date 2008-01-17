@@ -10,7 +10,6 @@
 		26131D1409CB1D2000ACF137 /* BuildConstraint2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26131D1209CB1D1F00ACF137 /* BuildConstraint2.cpp */; };
 		261C44E4099A0B6600FFBDCA /* MinionInputReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */; };
 		2644ACE50A192B90002BD572 /* minion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644ACE40A192B90002BD572 /* minion.cpp */; };
-		26CD0D9E0A1B8666007D8889 /* test_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CD0D9D0A1B8665007D8889 /* test_functions.cpp */; };
 		26E63C830B137198009C8B64 /* get_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E63C820B137198009C8B64 /* get_info.cpp */; };
 		26FB021E0B63D2230062AD1B /* BuildDynamicStart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FB02010B63D2230062AD1B /* BuildDynamicStart.cpp */; };
 		26FB021F0B63D2230062AD1B /* BuildStaticStart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FB02030B63D2230062AD1B /* BuildStaticStart.cpp */; };
@@ -111,7 +110,6 @@
 		26CD0D5C0A1B810E007D8889 /* standard_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = standard_queue.h; path = queue/standard_queue.h; sourceTree = "<group>"; };
 		26CD0D650A1B8210007D8889 /* constraint_setup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constraint_setup.h; sourceTree = "<group>"; };
 		26CD0D980A1B8590007D8889 /* test_functions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_functions.h; sourceTree = "<group>"; };
-		26CD0D9D0A1B8665007D8889 /* test_functions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_functions.cpp; sourceTree = "<group>"; };
 		26CD8B000ACA639B00688A66 /* dynamic_literalwatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynamic_literalwatch.h; path = dynamic_constraints/dynamic_literalwatch.h; sourceTree = "<group>"; };
 		26CDE8F7099BF9C500C985F3 /* BuildConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuildConstraint.h; sourceTree = "<group>"; };
 		26CE28F00A234F8400110C21 /* AnyVarRef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnyVarRef.h; path = variables/AnyVarRef.h; sourceTree = "<group>"; };
@@ -185,13 +183,6 @@
 			isa = PBXGroup;
 			children = (
 				26FB02380B63D22C0062AD1B /* Auto */,
-				26FB01FF0B63D2230062AD1B /* build_helper.h */,
-				26FB02000B63D2230062AD1B /* BuildConstraintsStart.h */,
-				26FB02010B63D2230062AD1B /* BuildDynamicStart.cpp */,
-				26FB02020B63D2230062AD1B /* BuildStart.h */,
-				26FB02030B63D2230062AD1B /* BuildStaticStart.cpp */,
-				26FB02040B63D2230062AD1B /* constraint_defs.h */,
-				26DFA2ED0B919A0F003A2B4E /* light_vector.h */,
 				08FB7795FE84155DC02AAC07 /* Source */,
 				26F697FD0986D79A00D3B93B /* variables */,
 				2689211009DBB65000D0472B /* Dynamic Constraints */,
@@ -204,44 +195,21 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				260A0A4F0C3BB39A00CFEEE1 /* FrontEnd */,
+				260A0A490C3BB32600CFEEE1 /* Queue */,
+				260A0A420C3BB28700CFEEE1 /* BuildConstraints */,
+				260A0A400C3BB25A00CFEEE1 /* MemoryManagement */,
+				260A0A3C0C3BB20A00CFEEE1 /* System */,
+				260A0A3B0C3BB1D400CFEEE1 /* SearchMethods */,
 				267889880B79EB6B007B2152 /* preprocess.h */,
 				26FB02050B63D2230062AD1B /* ConstraintList */,
-				26F9065B0B793B340080F506 /* search_methods.h */,
-				267889060B79D9D5007B2152 /* search_control.h */,
-				26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */,
-				26E63C820B137198009C8B64 /* get_info.cpp */,
-				2644ACE40A192B90002BD572 /* minion.cpp */,
-				26131D1209CB1D1F00ACF137 /* BuildConstraint2.cpp */,
-				26CFEBEC0AA64E5A00A35D56 /* VariableOrders.h */,
-				2644ACC70A1929F2002BD572 /* standard_search.h */,
-				269206E70B2F26A10042AC2B /* common_search.h */,
-				2640F4670B32DD050075FB8C /* to_string.h */,
-				269206DC0B2F24A40042AC2B /* recursive_search.h */,
-				269206E80B2F26C40042AC2B /* slow_queue.h */,
-				26CD0D5C0A1B810E007D8889 /* standard_queue.h */,
-				26CD0D9D0A1B8665007D8889 /* test_functions.cpp */,
-				26E63C840B1371A5009C8B64 /* get_info.h */,
-				26E63C850B1371A5009C8B64 /* info_var_wrapper.h */,
-				266E8D4D0AAB13EB0066DA57 /* time_keeping.h */,
-				265557720A5B280000B9A732 /* linked_ptr.h */,
-				265557730A5B280000B9A732 /* local_array.h */,
-				264C604D09F029DD00000D7F /* BuildConstraintConstructs.h */,
-				26CDE8F7099BF9C500C985F3 /* BuildConstraint.h */,
-				26A857BC099B6A6200ECA923 /* CSPSpec.h */,
-				26CA01FF0998C43C0064B996 /* MinionInputReader.h */,
 				269DC8DA098451AA00F52AF2 /* trigger_list.h */,
 				26E34D160970235600058E70 /* minion.h */,
-				2644ACAD0A1927BE002BD572 /* system.h */,
 				26F9C71E09E703D000F2865A /* README */,
-				26133F97098A9BD900A2D4EC /* constants.h */,
-				266F5EAA097C0AA200D9CC72 /* backtrackable_memory.h */,
-				26ABEEF0099415F400F94E03 /* nonbacktrack_memory.h */,
 				26AAF933096D64D200AD8C1A /* solver.h */,
 				26BA221E0974427C0044D9C1 /* solver2.h */,
 				26CD0D980A1B8590007D8889 /* test_functions.h */,
 				26CD0D650A1B8210007D8889 /* constraint_setup.h */,
-				26E34DE009702EE500058E70 /* reversible_vals.h */,
-				26AAF8A4096D438700AD8C1A /* debug.h */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -252,6 +220,82 @@
 				261C44E2099A0B4A00FFBDCA /* Minion */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		260A0A3B0C3BB1D400CFEEE1 /* SearchMethods */ = {
+			isa = PBXGroup;
+			children = (
+				267889060B79D9D5007B2152 /* search_control.h */,
+				2644ACC70A1929F2002BD572 /* standard_search.h */,
+				269206E70B2F26A10042AC2B /* common_search.h */,
+				269206DC0B2F24A40042AC2B /* recursive_search.h */,
+				26F9065B0B793B340080F506 /* search_methods.h */,
+				26CFEBEC0AA64E5A00A35D56 /* VariableOrders.h */,
+			);
+			name = SearchMethods;
+			sourceTree = "<group>";
+		};
+		260A0A3C0C3BB20A00CFEEE1 /* System */ = {
+			isa = PBXGroup;
+			children = (
+				26AAF8A4096D438700AD8C1A /* debug.h */,
+				26DFA2ED0B919A0F003A2B4E /* light_vector.h */,
+				266E8D4D0AAB13EB0066DA57 /* time_keeping.h */,
+				2640F4670B32DD050075FB8C /* to_string.h */,
+				265557720A5B280000B9A732 /* linked_ptr.h */,
+				265557730A5B280000B9A732 /* local_array.h */,
+				2644ACAD0A1927BE002BD572 /* system.h */,
+				26133F97098A9BD900A2D4EC /* constants.h */,
+				26E63C820B137198009C8B64 /* get_info.cpp */,
+				26E63C840B1371A5009C8B64 /* get_info.h */,
+			);
+			name = System;
+			sourceTree = "<group>";
+		};
+		260A0A400C3BB25A00CFEEE1 /* MemoryManagement */ = {
+			isa = PBXGroup;
+			children = (
+				266F5EAA097C0AA200D9CC72 /* backtrackable_memory.h */,
+				26ABEEF0099415F400F94E03 /* nonbacktrack_memory.h */,
+				26E34DE009702EE500058E70 /* reversible_vals.h */,
+			);
+			name = MemoryManagement;
+			sourceTree = "<group>";
+		};
+		260A0A420C3BB28700CFEEE1 /* BuildConstraints */ = {
+			isa = PBXGroup;
+			children = (
+				26FB01FF0B63D2230062AD1B /* build_helper.h */,
+				26FB02000B63D2230062AD1B /* BuildConstraintsStart.h */,
+				26FB02010B63D2230062AD1B /* BuildDynamicStart.cpp */,
+				26FB02020B63D2230062AD1B /* BuildStart.h */,
+				264C604D09F029DD00000D7F /* BuildConstraintConstructs.h */,
+				26CDE8F7099BF9C500C985F3 /* BuildConstraint.h */,
+				26FB02030B63D2230062AD1B /* BuildStaticStart.cpp */,
+				26FB02040B63D2230062AD1B /* constraint_defs.h */,
+				26131D1209CB1D1F00ACF137 /* BuildConstraint2.cpp */,
+			);
+			name = BuildConstraints;
+			sourceTree = "<group>";
+		};
+		260A0A490C3BB32600CFEEE1 /* Queue */ = {
+			isa = PBXGroup;
+			children = (
+				269206E80B2F26C40042AC2B /* slow_queue.h */,
+				26CD0D5C0A1B810E007D8889 /* standard_queue.h */,
+			);
+			name = Queue;
+			sourceTree = "<group>";
+		};
+		260A0A4F0C3BB39A00CFEEE1 /* FrontEnd */ = {
+			isa = PBXGroup;
+			children = (
+				26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */,
+				2644ACE40A192B90002BD572 /* minion.cpp */,
+				26CA01FF0998C43C0064B996 /* MinionInputReader.h */,
+				26A857BC099B6A6200ECA923 /* CSPSpec.h */,
+			);
+			name = FrontEnd;
 			sourceTree = "<group>";
 		};
 		2689211009DBB65000D0472B /* Dynamic Constraints */ = {
@@ -314,6 +358,7 @@
 			isa = PBXGroup;
 			children = (
 				26C1B86309D04F4100DF3026 /* variable_switch_neg.h */,
+				26E63C850B1371A5009C8B64 /* info_var_wrapper.h */,
 				26EF146D099807D500D13443 /* variable_not.h */,
 				26EECB070988D316008A73CF /* variable_stretch.h */,
 				26EECB030988D2F4008A73CF /* variable_constant.h */,
@@ -405,7 +450,6 @@
 				261C44E4099A0B6600FFBDCA /* MinionInputReader.cpp in Sources */,
 				26131D1409CB1D2000ACF137 /* BuildConstraint2.cpp in Sources */,
 				2644ACE50A192B90002BD572 /* minion.cpp in Sources */,
-				26CD0D9E0A1B8666007D8889 /* test_functions.cpp in Sources */,
 				26E63C830B137198009C8B64 /* get_info.cpp in Sources */,
 				26FB021E0B63D2230062AD1B /* BuildDynamicStart.cpp in Sources */,
 				26FB021F0B63D2230062AD1B /* BuildStaticStart.cpp in Sources */,

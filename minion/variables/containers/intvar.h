@@ -157,7 +157,7 @@ struct RangeVarContainer {
     trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
   }
   
-  RangeVarContainer() : lock_m(0)
+  RangeVarContainer() : lock_m(0), trigger_list(false)
   {}
   
   BOOL isAssigned(RangeVarRef_internal d) const

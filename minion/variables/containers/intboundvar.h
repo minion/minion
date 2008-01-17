@@ -101,7 +101,7 @@ struct BoundVarContainer {
     
   }
   
-  BoundVarContainer() : lock_m(0)
+  BoundVarContainer() : lock_m(0), trigger_list(true)
   {}
   
   BOOL isAssigned(BoundVarRef_internal d) const
@@ -231,7 +231,7 @@ struct BoundVarContainer {
       trigger_list.push_domain(d.var_num);
       lower_bound(d) = i;
       if(up_bound == i)
-	trigger_list.push_assign(d.var_num, i);
+	    trigger_list.push_assign(d.var_num, i);
     }
   }
   
@@ -240,11 +240,18 @@ struct BoundVarContainer {
   BoundVarRef get_var_num(int i);
 
   void addTrigger(BoundVarRef_internal b, Trigger t, TrigType type)
-  { D_ASSERT(lock_m);  trigger_list.add_trigger(b.var_num, t, type); }
+  { 
+	D_ASSERT(lock_m);  
+	trigger_list.add_trigger(b.var_num, t, type); 
+  }
 
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(BoundVarRef_internal& b, DynamicTrigger* t, TrigType type, int pos = -999)
-  {  D_ASSERT(lock_m); trigger_list.addDynamicTrigger(b.var_num, t, type, pos); }
+  {
+	D_ASSERT(lock_m); 
+	D_ASSERT(type != DomainRemoval);
+	trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
+  }
 #endif
 
   operator std::string()

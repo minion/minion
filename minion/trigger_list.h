@@ -41,7 +41,6 @@ namespace TriggerSpace
 }
 
 
-
 class TriggerList
 {
   TriggerList(const TriggerList&);
@@ -49,7 +48,7 @@ class TriggerList
   bool only_bounds;
   
 public:
-	TriggerList(bool _only_bounds = false) :
+	TriggerList(bool _only_bounds) :
 	only_bounds(_only_bounds)
   { 
 	  var_count_m = 0;
@@ -179,6 +178,7 @@ public:
   void dynamic_propogate(int var_num, TrigType type, int val_removed = -999)
   {
     D_ASSERT(val_removed == -999 || ( type == DomainRemoval && val_removed != -999) );
+	D_ASSERT(!only_bounds || type != DomainRemoval);
 	DynamicTrigger* trig;
 	if(type != DomainRemoval)
 	{
@@ -296,6 +296,7 @@ public:
   {
     D_INFO(1, DI_QUEUE, "Adding Dynamic Trigger");
 	D_ASSERT(lock_second);
+	D_ASSERT(!only_bounds || type != DomainRemoval);
 	D_ASSERT(t->constraint != NULL);
 	D_ASSERT(t->sanity_check == 1234);
 	// This variable is only use in debug mode, and will be optimised away at any optimisation level.
