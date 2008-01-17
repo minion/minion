@@ -112,12 +112,41 @@ struct ElementConstraint : public Constraint
       result_var.setMax(val_max);
       var_array[index].setMax(val_max);
     }  
-    //
-    // need to do the other cases too, surely
-    //
-	
+    
     int array_size = var_array.size();
-	
+	// Constrain the index variable to have only indices in range.
+    if(index_ref.getMin()<0)
+    {
+        index_ref.setMin(0);
+    }
+    if(index_ref.getMax()>=array_size)
+    {
+        index_ref.setMax(array_size-1);
+    }
+    if(Controller::failed) return;
+    
+    // Should use the new iterators here. Check each value of result_var to see 
+    // if it's in one of var_array. 
+    // Only done at root, so who cares that it takes a while?
+    for(DomainInt i=result_var.getMin(); i<=result_var.getMax(); i++)
+    {
+        if(result_var.inDomain(i))
+        {
+            BOOL supported=false;
+            for(int j=0; j<array_size; j++)
+            {
+                if(var_array[j].inDomain(i))
+                {
+                    supported=true;
+                    break;
+                }
+            }
+            if(!supported)
+                result_var.removeFromDomain(i);
+        }
+    }
+    if(Controller::failed) return;
+    
     for(int i = 0;i < array_size; i++)
 	{
 	  if(var_array[i].isAssigned())
