@@ -28,6 +28,7 @@
 #define DEBUG_H
 
 #include "system/to_string.h"
+#include "constants.h"
 
 // If true, "-crash" was used and execution will crash on error (for debugging)
 VARDEF_ASSIGN(bool debug_crash, false);
@@ -55,8 +56,7 @@ void _NORETURN FAIL_EXIT();
 struct assert_fail {};
 
 void assert_function(BOOL x, const char* a, const char* f, int line);
-
-#define M_ASSERT(x) {assert_function(x, #x, __FILE__, __LINE__);}
+#define CHECK(x, y) {assert_function(x, y, __FILE__, __LINE__);}
 
 #ifndef NO_DEBUG
 
@@ -106,13 +106,23 @@ enum debug_types
     std::cerr << ": " << s << std::endl;
   }
 #endif
-  
+
   
 #else
 #define D_INFO(x,y,z)
 #define D_DATA(x)
 #define D_ASSERT(x)
 #endif
+    
+    
+inline bool DOMAIN_CHECK(BigInt v)
+{ return v < DomainInt_Max && v > DomainInt_Min; }
 
+// These are just to catch cases where the user didn't cast to BigInt
+// themselves, which makes the function useless.
+inline void DOMAIN_CHECK(DomainInt);
+inline void DOMAIN_CHECK(int);
+inline void DOMAIN_CHECK(unsigned int);
+        
 #endif //DEBUG_H
 

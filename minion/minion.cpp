@@ -69,8 +69,11 @@ void print_info()
     << "            Note: These orderings do not cache any information between" << endl
     << "            nodes, so will perform poorly on problem with many variables." << endl
     << "         [-randomseed] N             Set the random seed used to N." << endl
+#ifdef DUMP_TREE
+   << "         [-dumptree]                 Dumps the search tree" << endl
+#endif
+  
 #ifndef NO_DEBUG
-	<< "         [-dumptree]                 Dumps the search tree" << endl
 	<< "  Note: The following tags should never change the results produced." << endl
 	<< "        If they do, this is a bug." << endl
 	<< "        -fullprop will always slow search down." << endl
@@ -142,7 +145,7 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 	
 	else if(command == string("-dumptree"))
 	{
-#ifndef NO_DEBUG
+#ifndef DUMP_TREE
 	  Controller::commandlineoption_dumptree = true; 
 #else
 	  cout << "This version of minion was not built to support the '-dumptree' command. Sorry" << endl;

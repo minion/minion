@@ -27,6 +27,9 @@
 #ifndef _CONSTANTS_H
 #define _CONSTANTS_H
 
+// This needs to be declared as early as possible, as it is used a lot.
+typedef long long int BigInt;
+
 #include "system/wrapper.h"
 
 /// A placeholder type.
@@ -103,8 +106,6 @@ enum BoundType
   Bound_No,
   Bound_Maybe
 };
-
-typedef long long int BigInt;
 
 #ifdef BOUNDS_CHECK
 typedef int DomainInt;

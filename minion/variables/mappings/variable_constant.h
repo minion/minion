@@ -32,8 +32,8 @@ struct ConstantVar
   BOOL isBound()
   { return true;}
   
-  int val;
-  explicit ConstantVar(int _val) : val(_val)
+  DomainInt val;
+  explicit ConstantVar(DomainInt _val) : val(_val)
   {}
   
   ConstantVar() 

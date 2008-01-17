@@ -150,7 +150,7 @@ namespace Controller
   }
   
   
-#ifdef NO_DEBUG
+#ifdef DUMP_TREE
 #define maybe_print_search_state(x,y)
 #else
 template<typename T>

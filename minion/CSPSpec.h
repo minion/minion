@@ -186,7 +186,7 @@ struct ConstraintBlob
 	reify_var = _reify_var;
   }
   
-  BOOL is_dynamic()
+  bool is_dynamic()
   { return constraint.trig_type == DYNAMIC_CT; }
   
 };
@@ -205,6 +205,61 @@ struct ConstraintBlob
   VarContainer()
   {}
   
+  
+  Bounds get_bounds(Var v)
+  {
+    switch(v.type)
+    {
+    case VAR_BOOL:
+      return Bounds(0,1);
+    case VAR_BOUND:  
+      {
+        int bound_size = 0;
+        for(unsigned int x = 0; x < bound.size(); ++x)
+        {
+          bound_size += bound[x].first;
+          if(v.pos < bound_size)
+            return bound[x].second;
+        }
+        throw parse_exception("Internal Error.");
+      }
+      
+    case VAR_SPARSEBOUND:
+      {
+        int sparse_bound_size = 0;
+        for(unsigned int x=0;x<sparse_bound.size();++x)
+        {
+          sparse_bound_size += sparse_bound[x].first;
+          if(v.pos < sparse_bound_size)
+            return Bounds(sparse_bound[x].second.front(), sparse_bound[x].second.back());
+        }
+        throw parse_exception("Internal Error.");
+      }
+    case VAR_DISCRETE_BASE: 
+    {
+      int discrete_size = 0;
+      for(unsigned int x = 0; x < discrete.size(); ++x)
+      {
+        discrete_size += discrete[x].first;
+        if(v.pos < discrete_size)
+          return discrete[x].second;
+      }
+      throw parse_exception("Internal Error.");
+    }
+    case VAR_SPARSEDISCRETE:
+    {
+      int sparse_discrete_size = 0;
+      for(unsigned int x=0;x<sparse_discrete.size();++x)
+      {
+        sparse_discrete_size += sparse_discrete[x].first;
+        if(v.pos < sparse_discrete_size)
+          return Bounds(sparse_discrete[x].second.front(), sparse_discrete[x].second.back());
+      }
+      throw parse_exception("Internal Error.");
+    }
+    }
+      throw parse_exception("Internal Error.");
+  }
   
   Var get_var(char, int i)
   {
@@ -357,6 +412,67 @@ struct ConstraintBlob
 		  it != constraints.end(); ++it)
 		VarReplace(it->vars, new_map);
   }
+  
+  bool bounds_check_last_constraint()
+  {
+    const ConstraintBlob& con = constraints.back();
+    switch(con.constraint.type)
+    {
+      case CT_PRODUCT2:
+        return DOMAIN_CHECK(checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound)*
+                     checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound))
+        &&
+        DOMAIN_CHECK(checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound)*
+                     checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound));
+      case CT_POW:
+      {
+        BigInt a = checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound);
+        BigInt b = checked_cast<BigInt>(vars.get_bounds(con.vars[0][1]).upper_bound);
+        BigInt out = 1;
+        for(int i = 0; i < b; ++i)
+        { 
+          out *= a;
+          if(!DOMAIN_CHECK(out))
+            return false;
+        }
+        return true;
+      }
+        // XXX : Todo : Check these constraints!
+      case CT_WEIGHTLEQSUM:
+      case CT_WEIGHTGEQSUM:
+      case CT_LEQSUM:
+      case CT_GEQSUM:
+      case CT_WATCHED_GEQSUM:
+      case CT_WATCHED_LEQSUM:
+        
+      // The following constraints can't cause failure!
+      case CT_ELEMENT:
+      case CT_WATCHED_ELEMENT:
+      case CT_GACELEMENT:
+      case CT_ALLDIFF:
+      case CT_DISEQ:
+      case CT_EQ:
+      case CT_INEQ:
+      case CT_LEXLEQ:
+      case CT_LEXLESS:
+      case CT_MAX:
+      case CT_MIN:
+      case CT_OCCURRENCE:
+      case CT_WATCHED_TABLE:
+      case CT_WATCHED_VECNEQ:
+      case CT_MINUSEQ:
+      case CT_WATCHED_LITSUM:
+      case CT_MODULO:
+      case CT_DIV:
+        break;
+      case CT_REIFY:
+      case CT_REIFYIMPLY:
+        throw parse_exception("Internal Error.");
+    }
+    throw parse_exception("Internal Error.");
+
+  }
+  
 };
 
 }

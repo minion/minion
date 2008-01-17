@@ -321,6 +321,8 @@ BOOL MinionInputReader::readConstraint(InputFileReader* infile, BOOL reified) {
 	default:
 	  readGeneralConstraint(infile, constraint);
   }
+  
+  instance.bounds_check_last_constraint();
   return true ;
 }
 

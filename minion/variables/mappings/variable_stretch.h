@@ -89,7 +89,11 @@ struct MultiplyVar
   VarRef data;
   int Multiply;
   MultiplyVar(const VarRef& _data, int _Multiply) : data(_data), Multiply(_Multiply)
-  { D_ASSERT(Multiply != 0); }
+  { 
+    D_ASSERT(DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMax()) * Multiply));
+    D_ASSERT(DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMin()) * Multiply));
+    D_ASSERT(Multiply != 0); 
+  }
   
   MultiplyVar() : data()
   { Multiply = 0;}
