@@ -1,3 +1,5 @@
+/* $Id$ */
+
 /* Minion
 * Copyright (C) 2006
 *
@@ -16,14 +18,13 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-typedef int value_type;
+typedef bool value_type;
 
 class TrailedMonotonicSet
 {
   StateObj* stateObj;
 
-  static const value_type one = 1;
-  static const int _num_sweeps = 0;
+  static const value_type tms_in_set = 1;
 
   int _size;
   int _max_undos;
@@ -33,13 +34,9 @@ class TrailedMonotonicSet
   ReversibleInt _backtrack_depth;
 
   MemOffset _array;
-  // MemOffset _undo_values;
   MemOffset _undo_indexes;
   
   MoveablePointer backtrack_ptr;
-
-  // value_type& undo_values(int i)
-  // { return static_cast<value_type*>(_undo_values.get_ptr())[i]; }
 
   int& undo_indexes(int i)
   { 
@@ -74,7 +71,7 @@ public:
   {
     int bt_depth = _backtrack_depth;
 
-#ifdef DEBUG
+#ifdef DEBUG_TMS
     cout << "About to undo: " ; print_state(); 
 #endif
     D_ASSERT( _local_depth < (_max_depth+1) && _local_depth >= bt_depth && bt_depth >=0);
@@ -82,54 +79,59 @@ public:
     for(; _local_depth > bt_depth; ) 
     {
       -- _local_depth;
-      array(undo_indexes(_local_depth)) = one ; // undo_values(_local_depth);
+      array(undo_indexes(_local_depth)) = tms_in_set ;
     }
 
-#ifdef DEBUG
+#ifdef DEBUG_TMS
     cout << "Just undone: " ; print_state(); 
 #endif
 
     D_ASSERT(_local_depth == bt_depth);
   }
 
-  void remove(DomainInt index)
+  bool ifMember_remove(DomainInt index)
   {
-    // cout << "index: " << index << " value: " << newval << " local: " << _local_depth << " bt: " << _backtrack_depth.get() << endl; 
 
-    // Assumes index is currently in the set.  Use checked_remove if this is not correct assumption.
- 
-    D_ASSERT( !needs_undoing() && 0 <= index && index < size());
+         D_ASSERT( 0 <= index && index < size());
+    	  if (array(index)) 
+	  { 
+		  undo_indexes(_local_depth) = checked_cast<int>(index);
+		  ++_local_depth;
+		 array(index) = 0;	  
+		 return 1;
+	  }
+	  return 0;
+  }
+  
+    bool isMember(DomainInt index) const
+  {
+    return (bool)array(index);
+  }
+
+  void unchecked_remove(DomainInt index)
+  {
+    D_ASSERT( 0 <= index && index < size());
     undo_indexes(_local_depth) = checked_cast<int>(index);
-
     ++_local_depth;
-    ++_backtrack_depth;
-    
     array(index) = 0;
   }
-
-  void checked_remove(DomainInt index) 
-  {
-    // check for membership to reduce amount of trailing 
-    // or to ensure correctness
   
-    if (isMember(index)) { remove(index); }
-  }
   
   int size() const
   {
     return _size;    
   }
-  
 
-  bool isMember(DomainInt index) const
-  {
-    return (bool)array(index);
-  }
-
-void branch_left()  // nothing to do
+void before_branch_left()
+  { _backtrack_depth = _local_depth;
+    return ; }
+    
+ void after_branch_left()  // nothing to do
   { return ; }
   
-void branch_right()  // nothing to do
+void  before_branch_right()  // nothing to do
+  { return ; }
+void after_branch_right()  // nothing to do
   { return ; }
 
 void initialise(const int& new_size, const int& max_undos)
@@ -140,24 +142,20 @@ void initialise(const int& new_size, const int& max_undos)
     // should put in a D_ASSERT on MAXINT here
     // D_ASSERT( max_undos < MAXINT - size);
     
-    _max_depth = max_undos;             // remember this is a set now
+    _max_depth = max_undos;             
     _local_depth = 0;
     _backtrack_depth = 0;
 
     _array = getMemory(stateObj).nonBackTrack().request_bytes(_size*sizeof(value_type)); 
-    // _undo_values.request_bytes(_max_depth*sizeof(value_type));
     _undo_indexes = getMemory(stateObj).nonBackTrack().request_bytes(_max_depth*sizeof(int));
 
-#ifdef DEBUG
+#ifdef DEBUG_TMS
     cout << "initialising TrailedMonotonicSet with value of size= " << size << endl;
-#endif
-
-#ifdef DEBUG
     // print_state();
 #endif
     
     for(int i=0; i< new_size; i++) {
-      array(i) = one;
+      array(i) = tms_in_set;
     };
   }
 
@@ -165,8 +163,6 @@ void initialise(const int& new_size, const int& max_undos)
   
   TrailedMonotonicSet(StateObj* _stateObj) : stateObj(_stateObj), _backtrack_depth(_stateObj)
   { } 
-
-int num_sweeps() { return _num_sweeps ; } 
 
 void print_state()
 {

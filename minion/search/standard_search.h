@@ -49,9 +49,12 @@ namespace Controller
 		else
 		{
 		  maybe_print_search_state(stateObj, "Node: ", v);
+		  getVars(stateObj).getBigRangevarContainer().bms_array.before_branch_left();
 		  world_push(stateObj);
 		  order.branch_left();
-          prop(stateObj, v);
+		  getVars(stateObj).getBigRangevarContainer().bms_array.after_branch_left();
+
+                 prop(stateObj, v);
 		//  getQueue(stateObj).propagateQueue();
 		}
 		
@@ -65,7 +68,12 @@ namespace Controller
 
 		  world_pop(stateObj);
           maybe_print_search_action(stateObj, "bt");
+	  
+	         getVars(stateObj).getBigRangevarContainer().bms_array.before_branch_right();
+
 		  order.branch_right();
+		  getVars(stateObj).getBigRangevarContainer().bms_array.after_branch_right();
+
 		  set_optimise_and_propagate_queue(stateObj);
 		}
 	  }

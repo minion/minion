@@ -1,3 +1,5 @@
+/* $Id$ */ 
+
 /* Minion
 * Copyright (C) 2006
 *
@@ -71,10 +73,8 @@ struct BigRangeVarContainer {
   }
   
   typedef DomainInt domain_bound_type;
-  static const int var_step = sizeof(d_type) * 8;
   static const d_type one = static_cast<d_type>(1);
   MoveablePointer bound_data;
-  // MemOffset bms_pointers;
   MonotonicSet bms_array;
   TriggerList trigger_list;
 
@@ -108,15 +108,12 @@ struct BigRangeVarContainer {
 	  /// Here just remove the value which should lead to the least work.
 	  return upper_bound(d);
 	}
-    /// Note: before calling isMember, remove the lower initial bound from the offset.
-    //if(bms_pointer(d)->isMember(loopvar - low_bound) && (loopvar >= lower))
-    if(bms_array.isMember(var_offset[d.var_num] + loopvar - low_bound) && (loopvar >= lower))
+    if(bms_array.isMember(var_offset[d.var_num] + loopvar) && (loopvar >= lower))
       return upper_bound(d);
     --loopvar;
     for(; loopvar >= lower; --loopvar)
     {
-      //if(bms_pointer(d)->isMember(loopvar - low_bound)) 
-      if(bms_array.isMember(var_offset[d.var_num] + loopvar - low_bound)) 
+      if(bms_array.isMember(var_offset[d.var_num] + loopvar)) 
         return loopvar;
     }
     getState(stateObj).setFailed(true);
@@ -138,14 +135,12 @@ struct BigRangeVarContainer {
 	  /// Here just remove the value which should lead to the least work.
 	  return lower_bound(d);
 	}
-  /// Note: before calling isMember, remove the lower initial bound from the offset.
-    //if(bms_pointer(d)->isMember(loopvar - low_bound) && (loopvar <= upper))
-    if(bms_array.isMember(var_offset[d.var_num] + loopvar - low_bound) && (loopvar <= upper))
+    if(bms_array.isMember(var_offset[d.var_num] + loopvar) && (loopvar <= upper))
       return lower_bound(d);
     ++loopvar;
     for(; loopvar <= upper; ++loopvar)
     {
-      if(bms_array.isMember(var_offset[d.var_num] + loopvar - low_bound)) 
+      if(bms_array.isMember(var_offset[d.var_num] + loopvar)) 
         return loopvar;
     }
     getState(stateObj).setFailed(true);
@@ -178,15 +173,11 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
  
     bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m * 2 * sizeof(domain_bound_type));
     bms_array.initialise(var_offset.back(), var_offset.back());
+    for(DomainInt j = 0; j < var_count_m; j++) {
+	       var_offset[j] = var_offset[j] - initial_bounds[j].first;  
+    };
+    
     domain_bound_type* bound_ptr = static_cast<domain_bound_type*>(bound_data.get_ptr());
-    for(unsigned int i = 0; i < var_count_m; ++i)
-    {
-      bound_ptr[2*i] = initial_bounds[i].first;
-      bound_ptr[2*i+1] = initial_bounds[i].second;
-#ifdef DEBUG 
-      cout << "About to create new BMS " << endl;
-#endif
-    }
     
 	int min_domain_val = 0;
 	int max_domain_val = 0;
@@ -196,8 +187,8 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
 	  max_domain_val = initial_bounds[0].second;
 	  for(unsigned int i = 0; i < var_count_m; ++i)
       {
-        bound_ptr[2*i] = initial_bounds[i].first;
-        bound_ptr[2*i+1] = initial_bounds[i].second;
+           bound_ptr[2*i] = initial_bounds[i].first;
+           bound_ptr[2*i+1] = initial_bounds[i].second;
 	  
 	    min_domain_val = mymin(initial_bounds[i].first, min_domain_val);
 	    max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
@@ -224,7 +215,7 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
       return false;
-    return bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
+    return bms_array.isMember(var_offset[d.var_num] + i);
   }
   
   // Warning: If this is ever changed, be sure to check through the code for other places
@@ -234,7 +225,7 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
     D_ASSERT(lock_m);
     D_ASSERT(i >= lower_bound(d));
     D_ASSERT(i <= upper_bound(d));
-    return bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
+    return bms_array.isMember(var_offset[d.var_num] + i );
   }
   
   DomainInt getMin(BigRangeVarRef_internal d) const
@@ -269,30 +260,30 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
 #endif
     D_ASSERT(lock_m);
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
-    if(!inDomain(d,i)) 
+if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array.ifMember_remove(var_offset[d.var_num] + i) ))
     {
 #ifdef DEBUG
       cout << "Exiting removeFromDomain: " << d.var_num << " nothing to do" << endl;
 #endif
       return;
     }
-    DomainInt offset = i;
 #ifdef FULL_DOMAIN_TRIGGERS
 	trigger_list.push_domain_removal(d.var_num, i);
 #endif
-    trigger_list.push_domain(d.var_num);
-    //bms_pointer(d)->remove(offset - initial_bounds[d.var_num].first);
-    bms_array.remove(var_offset[d.var_num] + offset - initial_bounds[d.var_num].first);
-    D_ASSERT( ! bms_array.isMember(var_offset[d.var_num] + offset - initial_bounds[d.var_num].first));
+#ifndef NO_DOMAIN_TRIGGERS
+	trigger_list.push_domain(d.var_num);
+#endif
+    D_ASSERT( ! bms_array.isMember(var_offset[d.var_num] + i));
+    
     domain_bound_type up_bound = upper_bound(d);
-    if(offset == up_bound)
+    if(i == up_bound)
     {
       upper_bound(d) = find_new_upper_bound(d);
       trigger_list.push_upper(d.var_num, up_bound - upper_bound(d));
     }
     
     domain_bound_type low_bound = lower_bound(d);
-    if(offset == low_bound)
+    if(i == low_bound)
     {
       lower_bound(d) = find_new_lower_bound(d);
       trigger_list.push_lower(d.var_num, lower_bound(d) - low_bound);
@@ -300,6 +291,7 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
     
     if(upper_bound(d) == lower_bound(d))
       trigger_list.push_assign(d.var_num, getAssignedValue(d));
+
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
 #ifdef DEBUG
@@ -408,8 +400,10 @@ public:
 	  DomainInt new_upper = find_new_upper_bound(d);
 	  upper_bound(d) = new_upper;
       
-      trigger_list.push_domain(d.var_num);
-      trigger_list.push_upper(d.var_num, up_bound - upper_bound(d));
+#ifndef NO_DOMAIN_TRIGGERS
+	trigger_list.push_domain(d.var_num);
+#endif
+       trigger_list.push_upper(d.var_num, up_bound - upper_bound(d));
 	  
       if(lower_bound(d) == upper_bound(d)) 
         trigger_list.push_assign(d.var_num, getAssignedValue(d));
@@ -462,7 +456,9 @@ public:
     DomainInt new_lower = find_new_lower_bound(d);    
     lower_bound(d) = new_lower; 
     
-    trigger_list.push_domain(d.var_num); 
+#ifndef NO_DOMAIN_TRIGGERS
+	trigger_list.push_domain(d.var_num);
+#endif
     trigger_list.push_lower(d.var_num, lower_bound(d) - low_bound);
     if(lower_bound(d) == upper_bound(d)) 
       trigger_list.push_assign(d.var_num, getAssignedValue(d)); 
@@ -496,7 +492,7 @@ public:
 
   ~BigRangeVarContainer() { 
     for(unsigned i=0; i < var_count_m ; i++) {
-      // delete(bms_pointer(i));                // should delete space really!
+         // should delete space really!
     } ;
   }
 };
