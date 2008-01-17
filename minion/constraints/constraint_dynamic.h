@@ -156,11 +156,8 @@ public:
   virtual string constraint_name() = 0;
   
   /// Private member of the base class.
-#ifdef WATCHEDLITERALS
   MemOffset _DynamicTriggerCache;
-#else
-  MoveablePointer _DynamicTriggerCache;
-#endif
+  
   /// Returns a point to the first dynamic trigger of the constraint.
   DynamicTrigger* dynamic_trigger_start()
   { return static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }
@@ -174,11 +171,8 @@ public:
   {
     int trigs = dynamic_trigger_count();
     D_ASSERT(trigs >= 0);
-#ifdef WATCHEDLITERALS
     _DynamicTriggerCache = getMemory(stateObj).nonBackTrack().request_bytes((sizeof(DynamicTrigger) * trigs));
-#else
-	_DynamicTriggerCache = getMemory(stateObj).backTrack().request_bytes(sizeof(DynamicTrigger) * trigs);
-#endif
+    
 	DynamicTrigger* start = dynamic_trigger_start();
 	for(int i = 0 ; i < trigs; ++i)
 	  new (start+i) DynamicTrigger(this);

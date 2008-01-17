@@ -81,13 +81,8 @@ struct GACTableConstraint : public DynamicConstraint
   
   LiteralSpecificLists* lists;
   
-  
-#ifdef WATCHEDLITERALS
   MemOffset _current_support;
-#else
-  MoveablePointer _current_support;
-#endif
-
+  
   int* current_support()
   { return (int*)(_current_support.get_ptr()); }
   
@@ -165,8 +160,7 @@ struct GACTableConstraint : public DynamicConstraint
 	  }
 	}
 	
-  #ifdef WATCHEDLITERALS
-	for(int i = 0; i < support; ++i)
+  for(int i = 0; i < support; ++i)
 	{
 	  if(check_tuple(tuples[i]))
 	  {
@@ -174,7 +168,7 @@ struct GACTableConstraint : public DynamicConstraint
 		return true;
 	  }
 	}
-  #endif
+    
 	return false;
 #endif
   }
