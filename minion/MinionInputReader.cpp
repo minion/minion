@@ -659,6 +659,15 @@ void MinionInputReader::readPrint(InputFileReader* infile) {
 	parser_info( "print none" );
 	return;
   }
+  else if(letter == 'a')
+  {
+	s = infile->get_string();
+	if(s != "ll")
+	  throw new parse_exception(string("I don't understand '" + s + "'"));
+							  
+	instance.print_matrix = make_vec(instance.vars.get_all_vars());
+	return;
+  }
   else if(letter == 'm')
   {
     int matrix_num = infile->read_num();
@@ -675,7 +684,7 @@ void MinionInputReader::readPrint(InputFileReader* infile) {
 	  cout << "print v" << vec_num << endl;
     return;
   }
-  
+
   throw new parse_exception(string("I don't understand this print statement"));
 }
 

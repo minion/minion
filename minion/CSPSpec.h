@@ -255,6 +255,13 @@ struct ConstraintBlob
     throw new parse_exception("Var Out of Range!");   
   }
   
+  vector<Var> get_all_vars()
+  {
+	vector<Var> all_vars(total_var_count);
+	for(int i = 0; i < total_var_count; ++i)
+	  all_vars[i] = get_var('x',i);
+	return all_vars;
+  }
 };
 
 
