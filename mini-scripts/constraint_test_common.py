@@ -420,6 +420,11 @@ class testalldiffgacslow(testalldiff):
         treesame= not reify and not reifyimply
         return runtestgeneral("alldiffgacslow", False, reify, reifyimply, [5], ["quitesmallnum"], [5], self, treesame)
 
+class testwatchedalldiff(testalldiff):
+    def runtest(self, reify=False, reifyimply=False):
+        treesame= not reify and not reifyimply
+        return runtestgeneral("watchedalldiff", False, reify, reifyimply, [5], ["quitesmallnum"], [5], self, treesame)
+
 class testdiseq(testalldiff):
     def runtest(self, reify=False, reifyimply=False):
         return runtestgeneral("diseq", True, reify, reifyimply, [2], ["num"], [1,1], self, False)

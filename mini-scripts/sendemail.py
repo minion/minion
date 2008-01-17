@@ -4,7 +4,7 @@ import smtplib
 # Import the email modules we'll need
 from email.MIMEText import MIMEText
 
-def mail(txt):
+def mail(txt, subject="Minion testing error report"):
     # Create a text/plain message
     print "Attempting to send email."
     succeeded=False
@@ -14,7 +14,7 @@ def mail(txt):
             
             # me == the sender's email address
             # you == the recipient's email address
-            msg['Subject'] = 'Minion testing error report'
+            msg['Subject'] = subject
             msg['From'] = "pn@cs.st-and.ac.uk"
             msg['To'] = "pn@cs.st-and.ac.uk"
             

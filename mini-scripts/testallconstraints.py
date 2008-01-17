@@ -33,7 +33,7 @@ conslist+=["occurrenceleq", "occurrencegeq"]
 
 #conslist+=["weightedsumleq"...
 
-numtests=50
+numtests=100
 minionbin="bin/minion"
 email=False
 for i in optargs:
@@ -79,6 +79,6 @@ if email:
     mailstring+="Using binary %s\n"%minionbin
     mailstring+="Tested the following constraints with no errors.\n"
     mailstring+=str(conslist)
-    mail(mailstring)
+    mail(mailstring, subject="Minion test successful.")
     
 
