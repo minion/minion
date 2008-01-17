@@ -60,6 +60,9 @@ void assert_function(BOOL x, const char* a, const char* f, int line);
 
 #ifndef NO_DEBUG
 
+#define BOUNDS_CHECK
+#define DUMP_TREE
+
 #define D_ASSERT(x) M_ASSERT(x)
 #define D_DATA(x) x
 

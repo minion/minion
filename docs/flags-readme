@@ -43,7 +43,8 @@ USE_HASHTABLE   - Makes some internal constructs use hash tables instead of
 				  red-black trees. May need turning off on some compilers
 MORE_SEARCH_INFO - Adds a few more command line options and some internal
 				   checking. Should be turned off for benchmarks.
-
+BOUNDS_CHECK	- (Experimental) - adds a number of bounds checks.
+					Enabled by default in debug mode.
 NO_DEBUG		- Turn off debug mode (implies NO_PRINT)
 NO_PRINT		- Turn off verbose debug mode (prints a lot!)
 

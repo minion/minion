@@ -106,7 +106,11 @@ enum BoundType
 
 typedef long long int BigInt;
 
+#ifdef BOUNDS_CHECK
+typedef int DomainInt;
+#else
 typedef Wrapper<int> DomainInt;
+#endif
 
 #ifndef CONTAINER_TYPE
 typedef unsigned int BitContainerType;
