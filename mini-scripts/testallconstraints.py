@@ -7,10 +7,10 @@ from constraint_test_common import *
 import random
 from sendemail import *
 
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests="])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email"])
 
 if len(other)>1:
-    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...]"
+    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email]"
     sys.exit(1)
 
 # This one tests all the constraints in the following list.
@@ -35,12 +35,15 @@ conslist+=["occurrenceleq", "occurrencegeq"]
 
 numtests=50
 minionbin="bin/minion"
+email=False
 for i in optargs:
     (a1, a2)=i
     if a1=="--minion":
         minionbin=a2
     elif a1=="--numtests":
         numtests=int(a2)
+    elif a1=="--email":
+        email=True
 
 for consname1 in conslist:
     random.seed(12345)   # stupid seed but at least it makes the test repeatable.
@@ -63,10 +66,19 @@ for consname1 in conslist:
     for testnum in range(numtests):
         print "Test number %d"%(testnum)
         if not testobj.runtest(reify=reify, reifyimply=reifyimply):
-            mailstring="Mail from testallconstraints.py.\n"
-            mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)
-            mailstring+="Using binary %s\n"%minionbin
-            mail(mailstring)
+            if email:
+                mailstring="Mail from testallconstraints.py.\n"
+                mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)
+                mailstring+="Using binary %s\n"%minionbin
+                mail(mailstring)
             sys.exit(1)
 
+# if we got here, send an email indicating success.
+if email:
+    mailstring="Mail from testallconstraints.py.\n"
+    mailstring+="Using binary %s\n"%minionbin
+    mailstring+="Tested the following constraints with no errors.\n"
+    mailstring+=str(conslist)
+    mail(mailstring)
+    
 

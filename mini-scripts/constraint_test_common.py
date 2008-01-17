@@ -764,8 +764,6 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
     
     # tablegen, an object with a printtable function.
     
-    # will shortly be adapted to do optimization problems at random.
-    
     if reify or reifyimply:
         # add extra bool variable.
         varnums=[1]+varnums
@@ -865,6 +863,23 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
     for i in range(1,sum(varnums)):
         constrainttable+=",x%d"%i
     constrainttable+="], modtable)"
+    
+    # add some other constraints at random into the constraint and constrainttable strings
+    if random.randint(0,1)==0:
+        for i in range(sum(varnums)-2):
+            var1=random.randint(0, sum(varnums)-1)
+            var2=random.randint(0, sum(varnums)-1)
+            while var1==var2: 
+                var2=random.randint(0, sum(varnums)-1)
+            ctype=random.randint(0,2)
+            if ctype==0:
+                c="diseq(x%d, x%d)"%(var1, var2)
+            elif ctype==1:
+                c="eq(x%d, x%d)"%(var1, var2)
+            elif ctype==2:
+                c="ineq(x%d, x%d, 0)"%(var1, var2)
+            constraint+="\n"+c
+            constrainttable+="\n"+c
     
     retval1=runminion("infile1.minion", "outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline)
     retval2=runminion("infile2.minion", "outfile2", tablegen.solver, modvars, constraint, opt=optline)
