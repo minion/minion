@@ -235,7 +235,7 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
   }
 }
 
-pair<vector<AnyVarRef>, vector<BOOL> > var_val_order;
+pair<vector<AnyVarRef>, vector<int> > var_val_order;
 
 void BuildCSP(MinionInputReader& reader)
 {

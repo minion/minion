@@ -54,9 +54,9 @@ get_AnyVarRef_from_Var(Var v)
 
     /// Build the variable and value ordering used.
 	/// The var order is placed, the val order is returned.
-	pair<vector<AnyVarRef>, vector<BOOL> > build_val_and_var_order(ProbSpec::CSPInstance& instance)
+	pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order(ProbSpec::CSPInstance& instance)
   {
-	  vector<BOOL> final_val_order;
+	  vector<int> final_val_order;
 	  vector<AnyVarRef> final_var_order;
 	  if(instance.var_order.size() != instance.val_order.size())
 	    D_FATAL_ERROR("Variable order and value order must be same size.");

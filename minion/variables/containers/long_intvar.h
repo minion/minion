@@ -193,6 +193,8 @@ struct BigRangeVarContainer {
     return bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
   }
   
+  // Warning: If this is ever changed, be sure to check through the code for other places
+  // where bms_array is used directly.
   BOOL inDomain_noBoundCheck(BigRangeVarRef_internal d, DomainInt i) const
   {
     D_ASSERT(lock_m);
@@ -291,14 +293,29 @@ struct BigRangeVarContainer {
 	  Controller::fail();
 	  return;
 	}
-	
+    commonAssign(d, offset, lower, upper);
+  }
+
+  void uncheckedAssign(BigRangeVarRef_internal d, DomainInt i)
+  { 
+    D_ASSERT(inDomain(d,i));
+    D_ASSERT(!isAssigned(d));
+    commonAssign(d,i, lower_bound(d), upper_bound(d)); 
+  }
+    
+private:
+  // This function just unifies part of propogateAssign and uncheckedAssign
+  void commonAssign(BigRangeVarRef_internal d, DomainInt offset, DomainInt lower, DomainInt upper)
+  {
 #ifdef FULL_DOMAIN_TRIGGERS
-	  // TODO : Optimise this function to only check values in domain.
-	  for(DomainInt loop = lower; loop <= upper; ++loop)
-	  {
-	    if(inDomain_noBoundCheck(d, loop) && loop != offset)
-	      trigger_list.push_domain_removal(d.var_num, loop);
-	  }
+    // TODO : Optimise this function to only check values in domain.
+    int domainOffset = var_offset[d.var_num] - initial_bounds[d.var_num].first;
+    for(DomainInt loop = lower; loop <= upper; ++loop)
+    {
+      // def of inDomain: bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
+      if(bms_array.isMember(loop + domainOffset) && loop != offset)
+        trigger_list.push_domain_removal(d.var_num, loop);
+    }
 #endif
     trigger_list.push_domain(d.var_num);
     trigger_list.push_assign(d.var_num, offset);
@@ -317,14 +334,9 @@ struct BigRangeVarContainer {
       upper_bound(d) = offset;
     }
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
-  }
-  
-  // TODO : Optimise
-  void uncheckedAssign(BigRangeVarRef_internal d, DomainInt i)
-  { 
-    D_ASSERT(inDomain(d,i));
-    propogateAssign(d,i); 
-  }
+  }    
+public:
+
   
   void setMax(BigRangeVarRef_internal d, DomainInt offset)
   {
@@ -350,26 +362,18 @@ struct BigRangeVarContainer {
     {
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
+      int domainOffset = var_offset[d.var_num] - initial_bounds[d.var_num].first;
 	  for(DomainInt loop = offset + 1; loop <= up_bound; ++loop)
 	  {
-	    if(inDomain_noBoundCheck(d, loop))
+        // Def of inDomain: bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
+	    if(bms_array.isMember(domainOffset + loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif	 
       upper_bound(d) = offset;      
 	  DomainInt new_upper = find_new_upper_bound(d);
-
-#ifdef FULL_DOMAIN_TRIGGERS
-	  // TODO : Optimise this function to only check values in domain.
-	  for(DomainInt loop = new_upper + 1; loop <= offset; ++loop)
-	  {
-		D_ASSERT(!inDomain_noBoundCheck(d, loop));
-//	    if(inDomain_noBoundCheck(d, loop))
-//	      trigger_list.push_domain_removal(d.var_num, loop);
-	  }
-#endif
-
 	  upper_bound(d) = new_upper;
+      
       trigger_list.push_domain(d.var_num);
       trigger_list.push_upper(d.var_num, up_bound - upper_bound(d));
 	  
@@ -410,33 +414,24 @@ struct BigRangeVarContainer {
     {
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
+      int domainOffset = var_offset[d.var_num] - initial_bounds[d.var_num].first;
 	  for(DomainInt loop = low_bound; loop < offset; ++loop)
 	  {
-	    if(inDomain_noBoundCheck(d, loop))
+        // def of inDomain: bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
+	    if(bms_array.isMember(loop + domainOffset))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
-
-          lower_bound(d) = offset;
-          DomainInt new_lower = find_new_lower_bound(d);
-	  
-#ifdef FULL_DOMAIN_TRIGGERS
-	  // TODO : Optimise this function to only check values in domain.
-	  for(DomainInt loop = offset; loop < new_lower; ++loop)
-	  {
-		D_ASSERT(!inDomain_noBoundCheck(d, loop));
-//	    if(inDomain_noBoundCheck(d, loop))
-//	      trigger_list.push_domain_removal(d.var_num, loop);
-	  }
-#endif
-	  
-	  lower_bound(d) = new_lower; 
-          trigger_list.push_domain(d.var_num); 
-          trigger_list.push_lower(d.var_num, lower_bound(d) - low_bound);
-	  if(lower_bound(d) == upper_bound(d)) 
-            trigger_list.push_assign(d.var_num, getAssignedValue(d)); 
+    lower_bound(d) = offset;
+    DomainInt new_lower = find_new_lower_bound(d);    
+    lower_bound(d) = new_lower; 
+    
+    trigger_list.push_domain(d.var_num); 
+    trigger_list.push_lower(d.var_num, lower_bound(d) - low_bound);
+    if(lower_bound(d) == upper_bound(d)) 
+      trigger_list.push_assign(d.var_num, getAssignedValue(d)); 
     }
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 #ifdef DEBUG

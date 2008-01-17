@@ -33,18 +33,20 @@ template<typename VarType = AnyVarRef, typename BranchType = StaticBranch>
 struct VariableOrder
 {
   vector<VarType> var_order;
-  vector<BOOL> val_order;
+  vector<int> val_order;
   vector<int> branches;
   unsigned pos;
   
   BranchType branch_method;
   
   
-  VariableOrder(vector<VarType>& _varorder, vector<BOOL>& _valorder)
+  VariableOrder(vector<VarType>& _varorder, vector<int>& _valorder)
   : var_order(_varorder), val_order(_valorder)
   {
-	branches.reserve(1000);
-	pos = 0; 
+    // if this isn't enough room, the vector will autoresize. While that can be slow,
+    // it only has to happen at most the log of the maximum search depth.
+	  branches.reserve(var_order.size());
+	  pos = 0; 
   }
   
   

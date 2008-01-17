@@ -406,7 +406,7 @@ struct RangeVarContainer {
   }
 #endif
   
-  BOOL valid_range(DomainInt lower, DomainInt upper)
+  bool valid_range(DomainInt lower, DomainInt upper)
   { return (lower >= var_min && upper <= var_max); }
 };
 
