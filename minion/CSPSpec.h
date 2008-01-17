@@ -464,7 +464,7 @@ struct ConstraintBlob
       case CT_WATCHED_LITSUM:
       case CT_MODULO:
       case CT_DIV:
-        break;
+        return true;
       case CT_REIFY:
       case CT_REIFYIMPLY:
         throw parse_exception("Internal Error.");

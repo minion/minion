@@ -56,6 +56,7 @@ void _NORETURN FAIL_EXIT();
 struct assert_fail {};
 
 void assert_function(BOOL x, const char* a, const char* f, int line);
+// Unlike Asserts, Checks are always enabled.
 #define CHECK(x, y) {assert_function(x, y, __FILE__, __LINE__);}
 
 #ifndef NO_DEBUG
@@ -63,7 +64,7 @@ void assert_function(BOOL x, const char* a, const char* f, int line);
 #define BOUNDS_CHECK
 #define DUMP_TREE
 
-#define D_ASSERT(x) M_ASSERT(x)
+#define D_ASSERT(x) assert_function(x, #x, __FILE__, __LINE__);
 #define D_DATA(x) x
 
 enum debug_types
