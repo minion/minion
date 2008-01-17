@@ -52,8 +52,8 @@ struct OccurrenceEqualConstraint : public Constraint
   {
     D_INFO(2,DI_SUMCON,"Setting up Constraint");
     triggerCollection t;
-    occurrences_count.set(0); 
-    not_occurrences_count.set(0);
+    occurrences_count = 0; 
+    not_occurrences_count = 0;
     for(unsigned int i=0; i < var_array.size(); ++i)
 		  t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
     return t;
@@ -104,15 +104,15 @@ struct OccurrenceEqualConstraint : public Constraint
 	PROP_INFO_ADDONE(OccEqual);
     if( var_array[i].getAssignedValue() == value )
     {
-      int c = occurrences_count.get() + 1;
-      occurrences_count.set(c);
+      int c = occurrences_count + 1;
+      occurrences_count = c;
       if(c == val_count)
         occurrence_limit_reached();
     }
     else
     {
-      int c = not_occurrences_count.get() + 1;
-      not_occurrences_count.set(c);
+      int c = not_occurrences_count + 1;
+      not_occurrences_count = c;
       if(c == (static_cast<int>(var_array.size()) - val_count))
 	not_occurrence_limit_reached();
     }
@@ -122,15 +122,15 @@ struct OccurrenceEqualConstraint : public Constraint
   {
     if( var_array[i].getAssignedValue() == value )
     {
-      int c = occurrences_count.get() + 1;
-      occurrences_count.set(c);
+      int c = occurrences_count + 1;
+      occurrences_count = c;
       if(c > val_count)
         return true;    
     }
     else
     {
-      int c = not_occurrences_count.get() + 1;
-      not_occurrences_count.set(c);
+      int c = not_occurrences_count + 1;
+      not_occurrences_count = c;
       if(c > (static_cast<int>(var_array.size()) - val_count))
 	return true;
     }
@@ -153,15 +153,15 @@ struct OccurrenceEqualConstraint : public Constraint
 	      ++not_occs;
       }
     }
-    occurrences_count.set(occs);
-	not_occurrences_count.set(not_occs);
+    occurrences_count = occs;
+	not_occurrences_count = not_occs;
   }
   
   virtual void full_propogate()
   {
     setup_counters();
-    int i = occurrences_count.get();
-    int j = not_occurrences_count.get();
+    int i = occurrences_count;
+    int j = not_occurrences_count;
     D_INFO(1,DI_SUMCON,to_string("Full Propogate, count",i));
     if(i > val_count)
       Controller::fail();

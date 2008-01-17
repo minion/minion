@@ -65,9 +65,9 @@ struct LexLeqConstraint : public Constraint
 	  t.push_back(make_trigger(y[i], Trigger(this, i), LowerBound));
 	  t.push_back(make_trigger(y[i], Trigger(this, i), UpperBound));
     }
-    alpha.set(0);
-    beta.set(100000);
-    F.set(0);
+    alpha = 0;
+    beta = 100000;
+    F = 0;
     return t;
   }
   
@@ -80,14 +80,14 @@ struct LexLeqConstraint : public Constraint
     int n = x.size();
     if(Less)
     {
-      if(i == n || i == beta.get())
+      if(i == n || i == beta)
       {
 		Controller::fail();
 		return;
       }
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
 		  x[i].getAssignedValue() != y[i].getAssignedValue())  {
-		alpha.set(i);
+		alpha = i;
 		propogate(i,0);
       }
       else updateAlpha(i+1);
@@ -97,13 +97,13 @@ struct LexLeqConstraint : public Constraint
       while (i < n) {
 		if (!x[i].isAssigned() || !y[i].isAssigned() ||
 			x[i].getAssignedValue() != y[i].getAssignedValue())  {
-		  alpha.set(i) ;
+		  alpha = i ;
 		  propogate(i,0) ;
 		  return ;
 		}
 		i++ ;
       }
-      F.set(true) ;
+      F = true ;
     }
     
   }
@@ -111,10 +111,10 @@ struct LexLeqConstraint : public Constraint
   ///////////////////////////////////////////////////////////////////////////////
   // updateBeta()
   void updateBeta(int i) {
-    int a = alpha.get() ;
+    int a = alpha ;
     while (i >= a) {
       if (x[i].getMin() < y[i].getMax()) {
-		beta.set(i+1) ;
+		beta = i+1 ;
 		if (!(x[i].getMax() < y[i].getMin())) propogate(i,0) ;
 		return ;
       }
@@ -128,12 +128,12 @@ struct LexLeqConstraint : public Constraint
   {
 	PROP_INFO_ADDONE(Lex);
     D_INFO(0,DI_LEXCON,"Begin Propogation");
-    if (F.get())
+    if (F)
     {
       D_INFO(0,DI_LEXCON,"Already True");
       return ;
     }
-    int a = alpha.get(), b = beta.get();
+    int a = alpha, b = beta;
     
 	//Not sure why we need this, but we seem to.
 	if(b <= a)
@@ -151,7 +151,7 @@ struct LexLeqConstraint : public Constraint
       x[i].setMax(y[i].getMax()-1) ;
       y[i].setMin(x[i].getMin()+1) ;
       if (checkLex(i)) {
-		F.set(true) ;
+		F = true ;
 		return ;
       }
     }
@@ -159,7 +159,7 @@ struct LexLeqConstraint : public Constraint
       x[i].setMax(y[i].getMax()) ;
       y[i].setMin(x[i].getMin()) ;
       if (checkLex(i)) {
-		F.set(true) ;
+		F = true ;
 		return ;
       }
       if (x[i].isAssigned() && y[i].isAssigned() && x[i].getAssignedValue() == y[i].getAssignedValue())
@@ -174,7 +174,7 @@ struct LexLeqConstraint : public Constraint
   virtual BOOL check_unsat(int unsat_val, DomainDelta)
   {
     D_INFO(0,DI_LEXCON,string("Checking Unsat")+to_string(Less));
-    int a = alpha.get();
+    int a = alpha;
     if(unsat_val >= a)
     {
       int x_size = x.size();
@@ -184,7 +184,7 @@ struct LexLeqConstraint : public Constraint
 		DomainInt yval = y[i].getMax();
 		if(xval < yval) 
 		{
-		  alpha.set(i);
+		  alpha = i;
 		  return false;
 		}
 		if(xval > yval)
@@ -194,7 +194,7 @@ struct LexLeqConstraint : public Constraint
 		return true;
       else
       {
-		alpha.set(x.size());
+		alpha = x.size();
 		return false;
       }
       
@@ -213,7 +213,7 @@ struct LexLeqConstraint : public Constraint
   
   virtual BOOL full_check_unsat()
   {
-    alpha.set(0);
+    alpha = 0;
 	return check_unsat(0, 0);
   }
   
@@ -240,9 +240,9 @@ struct LexLeqConstraint : public Constraint
       if (x[i].getAssignedValue() != y[i].getAssignedValue()) break ;
     }
     if (i < n) {
-      alpha.set(i) ;
+      alpha = i ;
       if (checkLex(i)) {
-		F.set(true) ;
+		F = true ;
 		return ;
       }
       int betaBound = -1 ;
@@ -255,24 +255,24 @@ struct LexLeqConstraint : public Constraint
       }
       if(!Less)
       {
-		if (i == n) beta.set(1000000) ;
-		else if (betaBound == -1) beta.set(i) ;
-		else beta.set(betaBound) ;
+		if (i == n) beta = 1000000 ;
+		else if (betaBound == -1) beta = i ;
+		else beta = betaBound ;
       }
       else
       {
-		if (betaBound == -1)  beta.set(i);
-		else if (betaBound == -1) beta.set(betaBound) ;
+		if (betaBound == -1)  beta = i;
+		else if (betaBound == -1) beta = betaBound ;
       }
-      if (alpha.get() >= beta.get()) Controller::fail() ;
-      propogate(alpha.get(),0) ;             //initial propagation, if necessary.
+      if (alpha >= beta) Controller::fail() ;
+      propogate(alpha,0) ;             //initial propagation, if necessary.
     }
     else 
     {
       if(Less)
 		Controller::fail();
       else
-		F.set(true);
+		F = true;
     }
   }
   

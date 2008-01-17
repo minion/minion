@@ -64,14 +64,14 @@ public:
 
   bool needs_undoing()
   {
-    D_ASSERT( _local_depth < _max_depth && _local_depth >= _backtrack_depth.get());
+    D_ASSERT( _local_depth < _max_depth && _local_depth >= _backtrack_depth);
 
-    return _local_depth > _backtrack_depth.get();
+    return _local_depth > _backtrack_depth;
   }
 
   void undo()
   {
-    int bt_depth = _backtrack_depth.get();
+    int bt_depth = _backtrack_depth;
 
 #ifdef DEBUG
     cout << "About to undo: " ; print_state(); 
@@ -99,8 +99,8 @@ public:
     undo_indexes(_local_depth) = checked_cast<int>(index);
     // undo_values(_local_depth) = array(index);
 
-    _local_depth++;
-    _backtrack_depth.increment();
+    ++_local_depth;
+    ++_backtrack_depth;
     
     array(index) = newval;
   }
@@ -131,7 +131,7 @@ void initialise(const int& size, const int& max_undos)
     
     _max_depth = max_undos;             // remember this is a set now
     _local_depth = 0;
-    _backtrack_depth.set(0);
+    _backtrack_depth = 0;
 
     _array.request_bytes(_size*sizeof(value_type)); 
     // _undo_values.request_bytes(_max_depth*sizeof(value_type));
@@ -161,7 +161,7 @@ void print_state()
   cout << "printing state of TrailedMonotonicSet: " ;
   cout << "array size: " << _size;
   cout << " local depth: " << _local_depth;
-  cout << " backtracking depth: " << _backtrack_depth.get() ; 
+  cout << " backtracking depth: " << _backtrack_depth ; 
   cout << " max depth: " << _max_depth; 
   cout << endl << "   values: " ;
   for(int i = 0; i < _size; ++i) 

@@ -49,7 +49,7 @@ struct BoolLessSumConstraint : public Constraint
     triggerCollection t;
 	int array_size = var_array.size();
 	
-    count.set(0);    
+    count = 0;    
     
     for(int i = 0; i < array_size; ++i)
       if(VarToCount)
@@ -99,9 +99,9 @@ struct BoolLessSumConstraint : public Constraint
 	PROP_INFO_ADDONE(BoolSum);
     D_ASSERT(var_array[i].getAssignedValue() == 0 ||
 			 var_array[i].getAssignedValue() == 1);
-    int c = count.get() + 1;
+    int c = count + 1;
     D_INFO(1,DI_SUMCON,to_string("Propogating Constraint, count",c));
-    count.set(c);
+    count = c;
     if(c == occ_count())
       limit_reached();
   }
@@ -113,7 +113,7 @@ struct BoolLessSumConstraint : public Constraint
     for(int i = 0; i < array_size; ++i)
       if(var_array[i].isAssignedValue(VarToCount))
 		occs++;
-    count.set(occs);
+    count = occs;
     if(occs > occ_count())
       return true;
     return false;
@@ -121,9 +121,9 @@ struct BoolLessSumConstraint : public Constraint
   
   virtual BOOL check_unsat(int, DomainDelta)
   {
-    int i = count.get() + 1;
+    int i = count + 1;
     D_INFO(1,DI_SUMCON,to_string("Checking unsat, count",i));
-    count.set(i);
+    count = i;
     if(i > occ_count())
       return true;
     else
@@ -137,7 +137,7 @@ struct BoolLessSumConstraint : public Constraint
     for(int i = 0; i < array_size; ++i)
       if(var_array[i].isAssignedValue(VarToCount))
 		occs++;
-    count.set(occs);
+    count = occs;
     D_INFO(1,DI_SUMCON,to_string("Full Propogate, count:",occs));
     if(occs > occ_count())
       Controller::fail();

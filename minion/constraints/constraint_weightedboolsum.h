@@ -66,7 +66,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
       }
       for(int i = 0; i < array_size - 1; ++i)
 	D_ASSERT(weight_array[i] >= weight_array[i+1]);
-      min_vals_weight_pos.set(0);
+      min_vals_weight_pos = 0;
   }
   
   virtual triggerCollection setup_internal()
@@ -88,16 +88,16 @@ struct LeqWeightBoolSumConstraint : public Constraint
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
 	PROP_INFO_ADDONE(WeightBoolSum);
-    int min_sum = var_array_min_sum.get();
+    int min_sum = var_array_min_sum;
     if(prop_val != -1)
     {
       min_sum += weight_array[prop_val];	
       var_sum.setMin(min_sum);
-      var_array_min_sum.set(min_sum);
+      var_array_min_sum = min_sum;
     }
     
     int slack_on_mins = var_sum.getMax() - min_sum;
-    int weight_pos = min_vals_weight_pos.get();
+    int weight_pos = min_vals_weight_pos;
     int weight_length = weight_array.size();
     while(weight_pos != weight_length && weight_array[weight_pos] > slack_on_mins)
     {
@@ -105,7 +105,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
 	var_array[weight_pos].uncheckedAssign(0);
       weight_pos++;
     }
-    min_vals_weight_pos.set(weight_pos);
+    min_vals_weight_pos = weight_pos;
   }
   
   virtual BOOL check_unsat(int, DomainDelta)
@@ -122,7 +122,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
     {
       min_sum += var_array[i].getMin() * weight_array[i];
     }
-    var_array_min_sum.set(min_sum);
+    var_array_min_sum = min_sum;
     propogate(-1,0);
   }
   

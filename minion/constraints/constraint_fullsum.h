@@ -84,13 +84,13 @@ struct LessEqualSumConstraint : public Constraint
   PROPAGATE_FUNCTION(int prop_val, DomainDelta domain_change)
   {
 	PROP_INFO_ADDONE(FullSum);
-    DomainInt sum = var_array_min_sum.get();
+    DomainInt sum = var_array_min_sum;
     if(prop_val != -1)
     { // One of the array changed
       int change = var_array[prop_val].getDomainChange(domain_change);
 	  D_ASSERT(change >= 0);
 	  sum += change;
-      var_array_min_sum.set(sum);
+      var_array_min_sum = sum;
     }
 	
 	var_sum.setMin(sum);
@@ -103,7 +103,7 @@ struct LessEqualSumConstraint : public Constraint
 	  return;
 	}
 
-	if(looseness < max_looseness.get())
+	if(looseness < max_looseness)
 	{
 	  // max_looseness.set(looseness);
 	  for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
@@ -113,11 +113,11 @@ struct LessEqualSumConstraint : public Constraint
   
   virtual BOOL check_unsat(int prop_val, DomainDelta domain_change)
   {
-    DomainInt sum = var_array_min_sum.get();
+    DomainInt sum = var_array_min_sum;
     if(prop_val != -1)
     { // One of the array changed
       sum += var_array[prop_val].getDomainChange(domain_change);
-      var_array_min_sum.set(sum);
+      var_array_min_sum = sum;
     }
     return var_sum.getMax() < sum;
   }
@@ -127,8 +127,8 @@ struct LessEqualSumConstraint : public Constraint
     DomainInt min_sum = get_real_min_sum();
     DomainInt max_diff = get_real_max_diff();
  	
-    var_array_min_sum.set(min_sum);
-    max_looseness.set(max_diff);
+    var_array_min_sum = min_sum;
+    max_looseness = max_diff;
 	D_ASSERT(var_array[0].getDomainChange(0) == 0);
     return check_unsat(0,0);
   }
@@ -143,8 +143,8 @@ struct LessEqualSumConstraint : public Constraint
       max_diff = max(max_diff, it->getMax() - it->getMin());
     }
 	
-    var_array_min_sum.set(min_sum);
-    max_looseness.set(max_diff);
+    var_array_min_sum = min_sum;
+    max_looseness = max_diff;
 	D_ASSERT(var_array[0].getDomainChange(0) == 0);
     propogate(0,0);
   }

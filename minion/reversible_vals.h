@@ -30,36 +30,35 @@ class Reversible
   BackTrackOffset backtrack_ptr;
   
 public:
-  void set(Type newval)
+  
+  
+  operator Type() const
+{  
+  Type* ptr = (Type*)(backtrack_ptr.get_ptr());
+  return *ptr;
+}
+
+  void operator=(const Type& newval)
   {
-    Type* int_ptr = (Type*)(backtrack_ptr.get_ptr());
-    *int_ptr = newval;
+    Type* ptr = (Type*)(backtrack_ptr.get_ptr());
+    *ptr = newval;
   }
 
-  Type get()
-  {
-    Type* int_ptr = (Type*)(backtrack_ptr.get_ptr());
-    return *int_ptr;
-  }
+  void operator++()
+  { *this = *this + 1; }
 
-  Type decrement()
-  {
-      Type* int_ptr = (Type*)(backtrack_ptr.get_ptr());
-      return --(*int_ptr)  ;
-  }
-
-  Type increment()
-  {
-      Type* int_ptr = (Type*)(backtrack_ptr.get_ptr());
-      return ++(*int_ptr)  ;
-  }
-
+  void operator--()
+  { *this = *this - 1; }
+  
 
 Reversible()
 { 
    backtrack_ptr.request_bytes(sizeof(Type));
    D_ASSERT( (size_t)(backtrack_ptr.get_ptr()) % sizeof(Type) == 0);
 }
+
+  friend std::ostream& operator<<(std::ostream& o, const Reversible& v)
+  { return o << Type(v); }
 
 };
 

@@ -60,7 +60,7 @@ struct CheckAssignConstraint : public Constraint
   virtual BOOL check_unsat(int,DomainDelta)
   {
   
-	int count = assigned_vars.get();
+	int count = assigned_vars;
     D_INFO(2, DI_CHECKCON, "Checking unsat. Count=" + to_string(count));
 	++count;
 	int v_size = variables.size();
@@ -84,7 +84,7 @@ struct CheckAssignConstraint : public Constraint
 	  if(!check_assignment(assignment))
 	    return true;
 	}
-	assigned_vars.set(count); 
+	assigned_vars = count; 
 	return false;
   }
   
@@ -94,7 +94,7 @@ struct CheckAssignConstraint : public Constraint
 	unsigned counter = 0;
     for(unsigned i = 0; i < variables.size(); ++i)
 	  if(variables[i].isAssigned()) ++counter;
-	assigned_vars.set(counter);
+	assigned_vars = counter;
 	
 	D_INFO(1, DI_CHECKCON, "Vars assigned:"+to_string(counter));
 	if(counter == variables.size())
