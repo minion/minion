@@ -1567,6 +1567,50 @@ $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
   minion/./search/recursive_search.h minion/./search/search_control.h \
   minion/./constraint_setup.h minion/./preprocess/preprocess.h \
   minion/./test_functions.h minion/./CSPSpec.h
+$(OBJDIR)/constraint_setup.o: minion/./constraint_setup.cpp \
+  minion/./minion.h minion/./svn_header.h minion/./system.h \
+  minion/./system/linked_ptr.h minion/./system/local_array.h \
+  minion/./system/time_keeping.h minion/./system/to_string.h \
+  minion/./constants.h minion/./debug.h minion/./solver.h \
+  minion/./memory_management/backtrackable_memory.h \
+  minion/./memory_management/nonbacktrack_memory.h \
+  minion/./reversible_vals.h \
+  minion/./memory_management/trailed_monotonic_set.h \
+  minion/./tuple_container.h minion/./constraints/triggers.h \
+  minion/./variables/VarRefType.h minion/./variables/AnyVarRef.h \
+  minion/./constraints/constraint.h \
+  minion/./constraints/constraint_dynamic.h minion/./trigger_list.h \
+  minion/./variables/variables.h \
+  minion/./variables/containers/booleanvariables.h \
+  minion/./variables/containers/intvar.h \
+  minion/./variables/containers/long_intvar.h \
+  minion/./variables/containers/intboundvar.h \
+  minion/./variables/containers/sparse_intboundvar.h \
+  minion/./variables/mappings/variable_neg.h \
+  minion/./variables/mappings/variable_switch_neg.h \
+  minion/./variables/mappings/variable_stretch.h \
+  minion/./variables/mappings/variable_constant.h \
+  minion/./variables/mappings/variable_not.h \
+  minion/./variables/mappings/variable_shift.h \
+  minion/./variables/iterators.h minion/./solver2.h \
+  minion/./build_constraints/build_helper.h \
+  minion/./build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../BuildConstraintConstructs.h \
+  minion/./build_constraints/../BuildConstraint.h \
+  minion/./constraints/constraint_checkassign.h \
+  minion/./constraints/constraint_table.h \
+  minion/./constraints/constraint_boundtable.h \
+  minion/./constraints/reify.h minion/./constraints/reify_true.h \
+  minion/./constraints/function_defs.hpp minion/./queue/standard_queue.h \
+  minion/./search/standard_search.h minion/./search/common_search.h \
+  minion/./search/VariableOrders.h minion/./search/search_methods.h \
+  minion/./search/recursive_search.h minion/./search/search_control.h \
+  minion/./constraint_setup.h minion/./preprocess/preprocess.h \
+  minion/./test_functions.h
+$(OBJDIR)/debug_functions.o: minion/./debug_functions.cpp \
+  minion/./system.h minion/./system/linked_ptr.h \
+  minion/./system/local_array.h minion/./system/time_keeping.h \
+  minion/./constants.h minion/./debug.h minion/./system/to_string.h
 $(OBJDIR)/get_info.o: minion/./get_info.cpp minion/./system.h \
   minion/./system/linked_ptr.h minion/./system/local_array.h \
   minion/./system/time_keeping.h minion/./constants.h minion/./debug.h \
