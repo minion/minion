@@ -24,20 +24,30 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <vector>
+
+template<typename VarArray>
 struct BoolOrConstraintDynamic : public DynamicConstraint
 {
+  typedef typename VarArray::value_type VarRef;
+
   virtual string constraint_name()
   { return "BoolOr"; }
   
-  BoolVarRef[] var_array;
-  int[] neg_array; //neg_array[i]==0 iff var_array[i] is negated,
-		   //NB. this is also the value that must be watched
-  size_t[] watched = {-1, -1};
-  
-  BoolLessSumConstraintDynamic(StateObj* _stateObj, const BoolVarRef[] _var_array,
-			       const bool[] _neg_array) :
-    DynamicConstraint(_stateObj), var_array(_var_array), neg_array(_neg_array)
+  VarArray var_array;
+  vector<int> negs; //negs[i]==0 iff var_array[i] is negated, NB. this
+		    //is also the value that must be watched
+  size_t no_vars;
+  int watched[2];
+  int last;
+
+  BoolOrConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array,
+			       const vector<int>& _negs) :
+    DynamicConstraint(_stateObj), var_array(_var_array), negs(_negs), last(0)
   { 
+    D_INFO(2, DI_OR, "Constructor for OR constraint");
+    watched[0] = watched[1] = -2;
+    no_vars = _var_array.size();
 #ifndef WATCHEDLITERALS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
@@ -45,62 +55,68 @@ struct BoolOrConstraintDynamic : public DynamicConstraint
   
   int dynamic_trigger_count()
   {
+    D_INFO(2, DI_OR, "OR constraint: dynamic_trigger_count");
     return 2;
   }
 
   virtual void full_propagate()
   {
     DynamicTrigger* dt = dynamic_trigger_start();
-
-    int found = 0; //number of vars found to watch
-    for(int i = 0; i < var_array.size(); i++) {
-      BoolVarRef v = var_array[i];
-      if(v.getMin() == v.getMax() && v.getAssignedValue()) {
-	return; //already satisfied (literal=T), don't do any more setup
-      }
-      if(v.inDomain(neg_array[i])) {
-	v.addDynamicTrigger(dt, neg_array[i]);
-	dt->trigger_info() = i; //note what var trigger is watching
-	watching[found] = i; //make record of all watched vars
+    int found = 0; //num literals that can be T found so far
+    int first_found = -1;
+    int next_found = -1;
+    for(int i = 0; i < no_vars; i++) {
+      if(var_array[i].inDomain(negs[i])) { //can literal be T?
 	found++;
-	dt++;
-	if(found == 2)
+	if(found == 1) 
+	  first_found = i;
+	else {
+	  next_found = i;
 	  break;
+	}
       }
     }
-    if(found != 2) { //couldn't watch at least 2, propagate
-      if(found == 0) //couldn't watch any
-	getState(stateObj).setFailed(true); 
-      else //found one literal to watch, do unit prop to make this T
-	neg_array[i] == 1 ? 
-	  var_array[watched[0]].setMin(1) : 
-	  var_array[watched[0]].setMax(0);
+    if(found == 0)
+      getState(stateObj).setFailed(true);
+    if(found == 1) { //detect unit clause
+      var_array[first_found].propagateAssign(negs[first_found]);
+      return; //don't bother placing any watches on unit clause
     }
+    //not failed or unit, place watches
+    var_array[first_found].addDynamicTrigger(dt, DomainRemoval, negs[first_found]);
+    dt->trigger_info() = first_found;
+    watched[0] = first_found;
+    dt++;
+    var_array[next_found].addDynamicTrigger(dt, DomainRemoval, negs[next_found]);
+    dt->trigger_info() = next_found;
+    watched[1] = next_found;
   }
-  
+
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
     size_t prev_var = dt->trigger_info();
     size_t other_var = watched[0] == prev_var ? watched[1] : watched[0];
-    for(int i = 1; i < var_array.size(); i++) {
-      size_t j = (prev_var + i) % var_array.size();
-      BoolVarRef cv = var_array[j];
-      if(j != other_var && cv.inDomain(neg_array[j])) { //replace trigger
-	cv.addDynamicTrigger(dt, neg_array[j]);
-	vc->trigger_info() = j;
+    for(int i = 1; i < no_vars; i++) {
+      size_t j = (last + i) % no_vars;
+      VarRef& v = var_array[j];
+      int neg = negs[j];
+      if(j != other_var && v.inDomain(neg)) {
+	v.addDynamicTrigger(dt, DomainRemoval, neg);
+	dt->trigger_info() = j;
+	last = j;
 	watched[watched[0] == prev_var ? 0 : 1] = j;
 	return;
       }
     }
-    //failed to find another var to watch, do unit propagation
-    if(neg_array[other_var]) var_array[other_var].setMin(1);
-    else var_array[other_var].setMax(0);
+    //if we get here, we couldn't find a place to put the watch, do UP
+    var_array[other_var].propagateAssign(negs[other_var]);
   }
-  
+
   virtual BOOL check_assignment(vector<DomainInt> v)
   {
-    for(int i = 0; i < var_array.size(); i++)
-      if(var_array[i].inDomain(neg_array[i]))
+    D_INFO(2, DI_OR, "Checking soln in or constraint");
+    for(int i = 0; i < no_vars; i++)
+      if(v[i])
 	return true;
     return false;
   }
@@ -108,14 +124,28 @@ struct BoolOrConstraintDynamic : public DynamicConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;
-    vars.reserve(var_array.size());
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    vars.reserve(no_vars);
+    for(unsigned i = 0; i < no_vars; ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     return vars;  
   }
 };
 
-/* Want only to be able to create this constraint only with boolean
-   variables, but when it is called it must be supplied with an array
-   of int where arr[i] == 1 iff var_array[i] is not negated in the
-   clause. */
+template<typename T>
+inline DynamicConstraint*
+BuildCT_WATCHED_OR(StateObj* stateObj, const light_vector<T>& vs, BOOL reify,
+		   const BoolVarRef& reifyVar, ConstraintBlob& bl)
+{
+  size_t vs_s = vs.size();
+  for(int i = 0; i < vs_s; i++)
+    if(vs[i].getInitialMin() != 0 || vs[i].getInitialMax() != 1)
+      cerr << "watched or only works on Boolean variables!" << endl;
+
+  if(reify) {
+    cerr << "Cannot reify 'watched or' constraint." << endl;
+    exit(0);
+  } else {
+      return new BoolOrConstraintDynamic<light_vector<T> >(stateObj, vs, bl.negs);
+  }
+}
+

@@ -61,6 +61,7 @@ enum ConstraintType {
   CT_WATCHED_TABLE,
   CT_WATCHED_LEQSUM,
   CT_WATCHED_GEQSUM,
+  CT_WATCHED_OR,
   CT_WATCHED_VECNEQ,
   CT_WATCHED_LITSUM, 
   CT_MINUSEQ,
@@ -149,7 +150,9 @@ struct ConstraintBlob
   vector<vector<Var> > vars;
   ///Pointer to list of tuples. Only used in Table Constraints.
   TupleList* tuples;
-  
+  ///A vector of signs. Only used for SAT clause "or" constraint.
+  vector<int> negs;
+
   shared_ptr<CSPInstance> gadget;
   
   BOOL reified;
@@ -162,7 +165,7 @@ struct ConstraintBlob
   
   ConstraintBlob(ConstraintDef _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars), reified(false), implied_reified(false)
   {}
-  
+
   /// A helper constructor for when only a SingleVar is passed.
   ConstraintBlob(ConstraintDef _con, vector<Var>& _var) : constraint(_con), reified(false), implied_reified(false)
   { vars.push_back(_var); }

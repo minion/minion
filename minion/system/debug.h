@@ -68,7 +68,9 @@ void assert_function(BOOL x, const char* a, const char* f, int line);
 enum DebugTypes
 { DI_SOLVER, DI_SUMCON, DI_BOOLCON, DI_ANDCON, DI_ARRAYAND, DI_QUEUE, DI_REIFY,
   DI_LEXCON, DI_TABLECON, DI_TEST, DI_DYSUMCON, DI_DYNAMICTRIG, DI_DYELEMENT, DI_INTCON, DI_LONGINTCON,
-  DI_INTCONTAINER, DI_BOUNDCONTAINER, DI_GACELEMENT, DI_CHECKCON, DI_VECNEQ, DI_MEMBLOCK, DI_POINTER };
+  DI_INTCONTAINER, DI_BOUNDCONTAINER, DI_GACELEMENT, DI_CHECKCON, DI_VECNEQ, DI_MEMBLOCK, DI_POINTER,
+  DI_OR 
+};
   
 #define DEBUG_CASE(x) case x: std::cerr << #x; break;
 
@@ -81,6 +83,7 @@ enum DebugTypes
     std::cerr << importance << ",";
     switch(x)
     {
+      DEBUG_CASE(DI_OR);
       DEBUG_CASE(DI_SOLVER);
       DEBUG_CASE(DI_SUMCON);
       DEBUG_CASE(DI_BOOLCON);

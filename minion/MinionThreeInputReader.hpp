@@ -218,6 +218,10 @@ BOOL MinionThreeInputReader<FileReader>::readConstraint(FileReader* infile, BOOL
 	case CT_WATCHED_TABLE:
 	  readConstraintTable(infile, get_constraint(CT_WATCHED_TABLE));
 	  break;
+
+  case CT_WATCHED_OR:
+    readConstraintOr(infile, get_constraint(CT_WATCHED_OR));
+    break;
       
     case CT_GADGET:
       readConstraintGadget(infile);
@@ -396,23 +400,32 @@ void MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile
 // SAT clauses represented as literals and negated literals
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-void MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* infile)
+void MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* infile, 
+							  const ConstraintDef& ct)
 {
   parser_info("Reading a SAT clause");
-  vector<Var> vars;
-  while(infile->peek_char() != ')')
-    vars.push_back(infile->readIdentifier());
-  infile->get_char();
-  bool negs[vars.size()];
-  for(int i = 0; i < negs.size(); i++) {
-    if(vars[i].type == VAR_NOTBOOL) {
-      negs[i] = 0;
-      vars[i].type == VAR_BOOL;
+  infile->check_sym('[');
+  vector<int> negs;
+  vector<Var> clause_vars;
+  if(infile->peek_char() != ']')
+    clause_vars.push_back(readIdentifier(infile));
+  while(infile->peek_char() != ']') {
+    infile->check_sym(',');
+    clause_vars.push_back(readIdentifier(infile));
+  }
+  infile->check_sym(']');
+  infile->check_sym(')');
+  for(int i = 0; i < clause_vars.size(); i++) {
+    if(clause_vars[i].type == VAR_NOTBOOL) {
+      negs.push_back(0);
+      clause_vars[i].type = VAR_BOOL;
     } else {
-      negs[i] = 1;
+      negs.push_back(1);
     }
   }
-  //now do something with this data to create the new constraint
+  ConstraintBlob cb(ct, clause_vars);
+  cb.negs = negs;
+  instance.add_constraint(cb);
 }
 
 /// Reads an identifier which represents a single variable or constant.
