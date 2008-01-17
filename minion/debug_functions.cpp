@@ -11,26 +11,13 @@ void D_FATAL_ERROR2(string s, string file, string line)
   cerr << endl;
   cerr << "The generated error message was: " << s << endl;
   cerr << "The error was in the file " << file << " on line " << line << endl;
-  //if(debug_crash)
-  {
-	int* i = NULL;
-    *i = 0;
-    return;
-  }
-//  else
-    exit(9);
 }
 
 void _NORETURN FAIL_EXIT() 
 { 
   cerr << "Unrecoverable error. Exiting" << endl;
   cerr.flush();
-  if(debug_crash)
-  {
-    volatile int* nullvar = NULL;
-	*nullvar = 0;
-  }
-  exit(1); 
+  throw 9;
 }
 
 void assert_function(BOOL x, const char* a, const char* f, int line)

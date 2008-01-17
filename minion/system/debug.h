@@ -27,11 +27,6 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-// If true, "-crash" was used and execution will crash on error (for debugging)
-// This is a global setting rather than an instance-specific flag, as whatever
-// happens minion will stop.
-VARDEF_ASSIGN(bool debug_crash, false);
-
 struct parse_exception : public std::exception
 {
   string error;
@@ -69,7 +64,7 @@ enum DebugTypes
 { DI_SOLVER, DI_SUMCON, DI_BOOLCON, DI_ANDCON, DI_ARRAYAND, DI_QUEUE, DI_REIFY,
   DI_LEXCON, DI_TABLECON, DI_TEST, DI_DYSUMCON, DI_DYNAMICTRIG, DI_DYELEMENT, DI_INTCON, DI_LONGINTCON,
   DI_INTCONTAINER, DI_BOUNDCONTAINER, DI_GACELEMENT, DI_CHECKCON, DI_VECNEQ, DI_MEMBLOCK, DI_POINTER,
-  DI_OR 
+  DI_OR, DI_GADGET
 };
   
 #define DEBUG_CASE(x) case x: std::cerr << #x; break;
@@ -84,6 +79,7 @@ enum DebugTypes
     switch(x)
     {
       DEBUG_CASE(DI_OR);
+      DEBUG_CASE(DI_GADGET);
       DEBUG_CASE(DI_SOLVER);
       DEBUG_CASE(DI_SUMCON);
       DEBUG_CASE(DI_BOOLCON);

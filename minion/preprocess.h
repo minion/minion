@@ -7,6 +7,7 @@
 template<typename Var, typename Vars, typename Prop>
 bool inline check_fail(StateObj* stateObj, Var& var, DomainInt val, Vars& vars, Prop prop)
 {
+  getVars(stateObj).getBigRangevarContainer().bms_array.before_branch_left();
   Controller::world_push(stateObj);
   var.propagateAssign(val);
   prop(stateObj, vars);
@@ -25,7 +26,6 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
   getQueue(stateObj).propagateQueue();
   if(getState(stateObj).isFailed())
 	return;
-  
   bool reduced = true;
   while(reduced)
   {
@@ -69,6 +69,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
       }
     }
   }
+  
 }
 
 struct PropogateGAC

@@ -200,6 +200,8 @@ struct OccurrenceEqualConstraint : public Constraint
   
   virtual void full_propagate()
   {
+    val_count.setMin(0);
+    val_count.setMax(var_array.size());
     setup_counters();
     int i = occurrences_count;
     int j = not_occurrences_count;

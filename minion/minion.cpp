@@ -384,8 +384,6 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
 	
 	else if(command == string("-dumptree"))
 	{ getOptions(stateObj).dumptree = true; }
-	else if(command == string("-crash"))
-	{ debug_crash = true; }
 	else if(command == string("-nodelimit"))
 	{
 	  ++i;

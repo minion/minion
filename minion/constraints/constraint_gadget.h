@@ -3,7 +3,7 @@
    
    For Licence Information see file LICENSE.txt 
 
-   $Id$
+   $Id:$
 */
 
 /* Minion
@@ -97,7 +97,6 @@ struct GadgetConstraint : public Constraint
   {
     D_ASSERT(constraint_locked);
 	constraint_locked = false;
-    do_prop();
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
@@ -113,13 +112,17 @@ struct GadgetConstraint : public Constraint
   virtual void full_propagate()
   {
     if(getState(gadget_stateObj).isFailed())
+    {
       getState(stateObj).setFailed(true);
+      return;
+    }
     do_prop();
   }
 
   void do_prop()
   { 
     D_ASSERT(!getState(gadget_stateObj).isFailed());
+    getVars(gadget_stateObj).getBigRangevarContainer().bms_array.before_branch_left();
     Controller::world_push(gadget_stateObj);
     
     for(int i = 0; i < var_array.size(); ++i)
@@ -134,7 +137,6 @@ struct GadgetConstraint : public Constraint
           construction_vars[i].removeFromDomain(j);
     }
     
-    
     PropogateCSP(gadget_stateObj, gadget_prop_type, construction_vars);
 
     if(getState(gadget_stateObj).isFailed())
@@ -147,7 +149,6 @@ struct GadgetConstraint : public Constraint
         
     for(int i = 0; i < var_array.size(); ++i)
     {
-
       DomainInt min_val = construction_vars[i].getMin();
       DomainInt max_val = construction_vars[i].getMax();
       var_array[i].setMin(min_val);
@@ -157,8 +158,11 @@ struct GadgetConstraint : public Constraint
       {
         if(!construction_vars[i].inDomain(j))
         { 
+          D_INFO(0, DI_GADGET, "Remove " + to_string(j) + " from var " + to_string(i));
           var_array[i].removeFromDomain(j);
         }
+        else
+          D_INFO(0, DI_GADGET, "Leave " + to_string(j) + " in var " + to_string(i));
       }
     }
     
