@@ -26,6 +26,9 @@
 
 // This file deals with general C++ things which aren't specific to Minion.
 
+#ifndef _MINION_SYSTEM_H
+#define _MINION_SYSTEM_H
+
 // Only GCC has hashtables
 #ifdef __GNUC__
 #define USE_HASHTABLE
@@ -137,3 +140,4 @@ using namespace std;
 #include "array_functions.h"
 //#include "light_vector.h"
 
+#endif

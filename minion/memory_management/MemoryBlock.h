@@ -167,7 +167,7 @@ public:
 
   void registerNewMemoryBlock(NewMemoryBlock* mb)
   { 
-    D_ASSERT(find(NewMemoryBlockCache.begin(), NewMemoryBlockCache.end(), mb) != NewMemoryBlockCache.end());
+    D_ASSERT(find(NewMemoryBlockCache.begin(), NewMemoryBlockCache.end(), mb) == NewMemoryBlockCache.end());
     NewMemoryBlockCache.push_back(mb); 
   }
 

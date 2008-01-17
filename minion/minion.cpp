@@ -27,6 +27,9 @@ using namespace ProbSpec;
 #include "BuildConstraint.h"
 #include "MinionInputReader.h"
 
+#include "MinionInputReader.hpp"
+#include "MinionThreeInputReader.hpp"
+
 #include "svn_header.h"
 
 #include "system/defined_macros.h"
@@ -265,8 +268,8 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
 /** Most of the code in this function related to trying to provide nice
   * output in the case when a parsing error occurs
   */
-template<typename Reader>
-void ReadCSP(Reader& reader, InputFileReader* infile, char* filename)
+template<typename Reader, typename FileReader>
+void ReadCSP(Reader& reader, FileReader* infile, char* filename)
 {
 #ifndef NOCATCH  
   try
@@ -282,8 +285,7 @@ catch(parse_exception& s)
   cerr << "Error in input." << endl;
   cerr << s.what() << endl;
   
-  ConcreteFileReader<ifstream>* stream_cast = 
-	   dynamic_cast<ConcreteFileReader<ifstream>*>(infile);
+  ConcreteFileReader<ifstream>* stream_cast = reinterpret_cast<ConcreteFileReader<ifstream>*>(infile);
   if(stream_cast)
   {
     // This nasty line will tell us the current position in the file 
@@ -324,6 +326,37 @@ catch(parse_exception& s)
   exit(1);
 }
 #endif
+}
+
+template<typename InputReader>
+void readInput(InputReader* infile, int argc, char** argv, StateObj* stateObj, CSPInstance& instance, MinionArguments& args)
+{  
+  string test_name = infile->get_string();
+  if(test_name != "MINION")
+    D_FATAL_ERROR("All Minion input files must begin 'MINION'");
+  
+  int inputFileVersionNumber = infile->read_num();
+  
+  if(inputFileVersionNumber > 3)
+    D_FATAL_ERROR("This version of Minion only supports formats up to 3");
+  
+
+  
+  if(inputFileVersionNumber == 3)
+  {
+    MinionThreeInputReader<InputReader> reader;
+    parse_command_line(stateObj, reader, args, argc, argv);
+    ReadCSP(reader, infile, argv[argc - 1]);
+    instance = reader.instance;
+  } 
+  else
+  {
+    MinionInputReader<InputReader> reader;
+    parse_command_line(stateObj, reader, args, argc, argv);
+    ReadCSP(reader, infile, argv[argc - 1]);
+    instance = reader.instance;
+  }  
+
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -377,45 +410,26 @@ int main(int argc, char** argv) {
     cout << endl;
   }
   
- 
-  InputFileReader* infile;
-  
-  if( argv[argc - 1] != string("--") )
-  {
-    infile = new ConcreteFileReader<ifstream>(argv[argc - 1]);
-	if (infile->failed_open()) {
-	  D_FATAL_ERROR("Can't open given input file '" + string(argv[argc - 1]) + "'.");
-	}    
-  }
-  else
-    infile = new ConcreteFileReader<std::basic_istream<char, std::char_traits<char> >&>(cin);
-  
-  string test_name = infile->get_string();
-  if(test_name != "MINION")
-    D_FATAL_ERROR("All Minion input files must begin 'MINION'");
-  
-  int inputFileVersionNumber = infile->read_num();
-  
-  if(inputFileVersionNumber > 3)
-    D_FATAL_ERROR("This version of Minion only supports formats up to 3");
-  
   CSPInstance instance;
   MinionArguments args;
   
-  if(inputFileVersionNumber == 3)
+  if( argv[argc - 1] != string("--") )
   {
-    MinionThreeInputReader reader;
-    parse_command_line(stateObj, reader, args, argc, argv);
-    ReadCSP(reader, infile, argv[argc - 1]);
-    instance = reader.instance;
-  } 
+    ConcreteFileReader<ifstream> infile(argv[argc - 1]);
+	if (infile.failed_open()) {
+	  D_FATAL_ERROR("Can't open given input file '" + string(argv[argc - 1]) + "'.");
+	}    
+    readInput(&infile, argc,argv,stateObj,instance,args);
+  }
   else
   {
-    MinionInputReader reader;
-    parse_command_line(stateObj, reader, args, argc, argv);
-    ReadCSP(reader, infile, argv[argc - 1]);
-    instance = reader.instance;
-  }  
+    ConcreteFileReader<std::basic_istream<char, std::char_traits<char> >&> infile(cin);
+    readInput(&infile, argc,argv,stateObj,instance,args);
+  }
+
+  
+  
+ 
   
   getState(stateObj).setTupleListContainer(instance.tupleListContainer);
   
@@ -444,7 +458,6 @@ int main(int argc, char** argv) {
   BuildCSP(stateObj, instance);
   SolveCSP(stateObj, instance, args);
   
-  delete infile;
   delete stateObj;
   
   return 0;

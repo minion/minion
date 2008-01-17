@@ -3,12 +3,12 @@
    
    For Licence Information see file LICENSE.txt 
 
-   $Id$
+   $Id: MinionInputReader.cpp 745 2007-11-02 13:37:26Z azumanga $
 */
 
 // MinionInputReader.cpp
 //
-// Subversion Identity $Id$
+// Subversion Identity $Id: MinionInputReader.cpp 745 2007-11-02 13:37:26Z azumanga $
 //
 // Plan here is to generate an instance of a problem (or whatever you have)
 // and return that.
@@ -50,7 +50,8 @@ typename T::value_type& index(T& container, int index_pos)
   return container[index_pos];
 }
 
-void MinionInputReader::parser_info(string s)
+template<typename FileReader>
+void MinionInputReader<FileReader>::parser_info(string s)
 {
   if(parser_verbose)
     cout << s << endl;
@@ -61,7 +62,8 @@ void MinionInputReader::parser_info(string s)
 // type: m (2d matrix), t (3d matrix)
 // Flattening is row-wise (2d), plane-wise row-wise (3d).
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vector<Var> MinionInputReader::flatten(char type, int index) {
+template<typename FileReader>
+vector<Var> MinionInputReader<FileReader>::flatten(char type, int index) {
   unsigned int rowIndex, colIndex, planeIndex ;
   vector<Var> flattened ;
   // flatten row-wise
@@ -91,7 +93,8 @@ vector<Var> MinionInputReader::flatten(char type, int index) {
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // getColOfMatrix
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vector<Var> MinionInputReader::getColOfMatrix(vector<vector<Var> >& matrix, int colNo) {
+template<typename FileReader>
+vector<Var> MinionInputReader<FileReader>::getColOfMatrix(vector<vector<Var> >& matrix, int colNo) {
   vector<Var> result ;
   for (unsigned int rowIndex = 0; rowIndex < matrix.size(); rowIndex++) {
 	result.push_back(matrix.at(rowIndex).at(colNo)) ;
@@ -102,7 +105,8 @@ vector<Var> MinionInputReader::getColOfMatrix(vector<vector<Var> >& matrix, int 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // getRowThroughTensor
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vector<Var> MinionInputReader::getRowThroughTensor(
+template<typename FileReader>
+vector<Var> MinionInputReader<FileReader>::getRowThroughTensor(
 												   vector< vector< vector<Var> > >& tensor, int rowNo, int colNo) {
   vector<Var> result ;
   for (unsigned int planeIndex = 0; planeIndex < tensor.size() ; planeIndex ++) {
@@ -116,7 +120,8 @@ vector<Var> MinionInputReader::getRowThroughTensor(
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // read
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::read(InputFileReader* infile) {  
+template<typename FileReader>
+void MinionInputReader<FileReader>::read(FileReader* infile) {  
   
   while(infile->peek_char() == '#')
     parser_info(string("Read comment line:") + infile->getline());
@@ -156,7 +161,8 @@ void MinionInputReader::read(InputFileReader* infile) {
 // Recognise constraint by its name, read past name and leading '('
 // Return false if eof or unknown ct. Else true.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-BOOL MinionInputReader::readConstraint(InputFileReader* infile, BOOL reified) {
+template<typename FileReader>
+BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reified) {
   string id = infile->getline('(');
   
   int constraint_num = -1;
@@ -233,7 +239,8 @@ BOOL MinionInputReader::readConstraint(InputFileReader* infile, BOOL reified) {
 }
 
 
-void MinionInputReader::readGeneralConstraint(InputFileReader* infile, const ConstraintDef& def)
+template<typename FileReader>
+void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, const ConstraintDef& def)
 {
   // This slightly strange code is to save copying the ConstraintBlob as much as possible.
   instance.add_constraint(ConstraintBlob(def));
@@ -289,7 +296,8 @@ void MinionInputReader::readGeneralConstraint(InputFileReader* infile, const Con
 // readConstraintElement
 // element(vectorofvars, indexvar, var)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readConstraintElement(InputFileReader* infile, const ConstraintDef& ctype) {
+template<typename FileReader>
+void MinionInputReader<FileReader>::readConstraintElement(FileReader* infile, const ConstraintDef& ctype) {
   parser_info("reading an element ct. " ) ;
   vector<vector<Var> > vars;
   // vectorofvars
@@ -311,7 +319,8 @@ void MinionInputReader::readConstraintElement(InputFileReader* infile, const Con
 // table(<vectorOfVars>, {<tuple> [, <tuple>]})
 // Tuples represented as a vector of int arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readConstraintTable(InputFileReader* infile, const ConstraintDef& def) 
+template<typename FileReader>
+void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, const ConstraintDef& def) 
 {
   parser_info( "reading a table ct (unreifiable)" ) ;
   
@@ -377,7 +386,8 @@ void MinionInputReader::readConstraintTable(InputFileReader* infile, const Const
 // Returns an object of type Var.
 // NB peek() does not ignore whitespace, >> does. Hence use of putBack()
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Var MinionInputReader::readIdentifier(InputFileReader* infile) {
+template<typename FileReader>
+Var MinionInputReader<FileReader>::readIdentifier(FileReader* infile) {
   char idChar = infile->peek_char();
   if ((('0' <= idChar) && ('9' >= idChar)) || idChar == '-') {
     int i = infile->read_num();
@@ -414,7 +424,8 @@ Var MinionInputReader::readIdentifier(InputFileReader* infile) {
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readLiteralMatrix
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vector< vector<Var> > MinionInputReader::readLiteralMatrix(InputFileReader* infile) {
+template<typename FileReader>
+vector< vector<Var> > MinionInputReader<FileReader>::readLiteralMatrix(FileReader* infile) {
 
   infile->check_sym('[');
   
@@ -444,7 +455,8 @@ vector< vector<Var> > MinionInputReader::readLiteralMatrix(InputFileReader* infi
 // of vars or consts. Checks 1st elem of vect (empty vects not expected)
 //  to see which.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vector<Var> MinionInputReader::readLiteralVector(InputFileReader* infile) {
+template<typename FileReader>
+vector<Var> MinionInputReader<FileReader>::readLiteralVector(FileReader* infile) {
   vector<Var> newVector ;
   infile->check_sym('[');
  
@@ -480,7 +492,8 @@ vector<Var> MinionInputReader::readLiteralVector(InputFileReader* infile) {
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readMatrices
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readMatrices(InputFileReader* infile) {
+template<typename FileReader>
+void MinionInputReader<FileReader>::readMatrices(FileReader* infile) {
   char delim ;
   int count1 ;
   // Read Vectors%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -513,7 +526,8 @@ void MinionInputReader::readMatrices(InputFileReader* infile) {
 //%%%%
 // readTuples
 // 'tuplelists' <val>  ( <num_tuples> <tuple_length> <vals> ...
-void MinionInputReader::readTuples(InputFileReader* infile) {
+template<typename FileReader>
+void MinionInputReader<FileReader>::readTuples(FileReader* infile) {
   int tuple_count = infile->read_num();
   for(int counter = 0; counter < tuple_count; counter++)
   {
@@ -534,7 +548,8 @@ void MinionInputReader::readTuples(InputFileReader* infile) {
 // readObjective
 // 'objective' 'none' | 'minimising' <var> | 'maximising' <var>
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readObjective(InputFileReader* infile) {
+template<typename FileReader>
+void MinionInputReader<FileReader>::readObjective(FileReader* infile) {
   // Note that we will have read "objective" before entering this function.
   string s = infile->get_string();
   if(s == "none")
@@ -556,7 +571,8 @@ void MinionInputReader::readObjective(InputFileReader* infile) {
   instance.set_optimise(minimising, var);
 }
 
-void MinionInputReader::readPrint(InputFileReader* infile) {
+template<typename FileReader>
+void MinionInputReader<FileReader>::readPrint(FileReader* infile) {
   string s = infile->get_string();
   if(s != "print")
     throw parse_exception(string("Expected 'print', recieved '")+s+"'");
@@ -604,7 +620,8 @@ void MinionInputReader::readPrint(InputFileReader* infile) {
 // '[' <valOrderIdentifier> [, <valOrderIdentifier>]* ']'
 // <valOrderIdentifier> := 'a' | 'd' --- for ascending/descending
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readValOrder(InputFileReader* infile) {
+template<typename FileReader>
+void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   parser_info( "Reading val order" ) ;
   
   infile->check_sym('[');
@@ -649,7 +666,8 @@ void MinionInputReader::readValOrder(InputFileReader* infile) {
 // readVarOrder
 // '[' <var> [, <var>]* ']'
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readVarOrder(InputFileReader* infile) {
+template<typename FileReader>
+void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
   parser_info( "Reading var order" ) ;
   vector<Var> varOrder = readLiteralVector(infile);
 
@@ -681,7 +699,8 @@ void MinionInputReader::readVarOrder(InputFileReader* infile) {
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::readVars(InputFileReader* infile) {
+template<typename FileReader>
+void MinionInputReader<FileReader>::readVars(FileReader* infile) {
   int lb, ub, count ;
   char delim ;
   ProbSpec::VarContainer var_obj;
@@ -782,7 +801,8 @@ void MinionInputReader::readVars(InputFileReader* infile) {
 // NB Expects caller knows whether vars or consts expected for lit vect.
 // NB peek does not ignore wspace, >> does. Hence use of putback
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vector<Var> MinionInputReader::readVectorExpression(InputFileReader* infile) {
+template<typename FileReader>
+vector<Var> MinionInputReader<FileReader>::readVectorExpression(FileReader* infile) {
   char  delim ;
   int row, col, plane ;
   int input_val;

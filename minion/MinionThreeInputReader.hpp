@@ -38,6 +38,7 @@ ConstraintDef& get_constraint(ConstraintType t)
   D_FATAL_ERROR("Constraint not found");
 }
 
+/*
 template<typename T>
 vector<T> make_vec(const T& t)
 {
@@ -54,8 +55,10 @@ typename T::value_type& index(T& container, int index_pos)
 							  " out of range");
   return container[index_pos];
 }
+*/
 
-void MinionThreeInputReader::parser_info(string s)
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::parser_info(string s)
 {
   if(parser_verbose)
     cout << s << endl;
@@ -64,7 +67,8 @@ void MinionThreeInputReader::parser_info(string s)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // read
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionThreeInputReader::read(InputFileReader* infile) {  
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::read(FileReader* infile) {  
     string s = infile->get_asciistring();
     parser_info("Read: '" + s + "'");
     
@@ -140,7 +144,8 @@ void MinionThreeInputReader::read(InputFileReader* infile) {
     instance.print_matrix = make_vec(instance.vars.get_all_vars());
 }
 
-void MinionThreeInputReader::readGadget(InputFileReader* infile)
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
 {
   parser_info("Entering gadget parsing");
   if(isGadgetReader())
@@ -167,7 +172,8 @@ void MinionThreeInputReader::readGadget(InputFileReader* infile)
 // Recognise constraint by its name, read past name and leading '('
 // Return false if eof or unknown ct. Else true.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-BOOL MinionThreeInputReader::readConstraint(InputFileReader* infile, BOOL reified) {
+template<typename FileReader>
+BOOL MinionThreeInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reified) {
   string id = infile->getline('(');
   
   int constraint_num = -1;
@@ -246,7 +252,8 @@ BOOL MinionThreeInputReader::readConstraint(InputFileReader* infile, BOOL reifie
 }
 
 
-void MinionThreeInputReader::readGeneralConstraint(InputFileReader* infile, const ConstraintDef& def)
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readGeneralConstraint(FileReader* infile, const ConstraintDef& def)
 {
   // This slightly strange code is to save copying the ConstraintBlob as much as possible.
   instance.add_constraint(ConstraintBlob(def));
@@ -302,7 +309,8 @@ void MinionThreeInputReader::readGeneralConstraint(InputFileReader* infile, cons
 // readConstraintElement
 // element(vectorofvars, indexvar, var)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionThreeInputReader::readConstraintElement(InputFileReader* infile, const ConstraintDef& ctype) {
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readConstraintElement(FileReader* infile, const ConstraintDef& ctype) {
   parser_info("reading an element ct. " ) ;
   vector<vector<Var> > vars;
   // vectorofvars
@@ -324,7 +332,8 @@ void MinionThreeInputReader::readConstraintElement(InputFileReader* infile, cons
 // table(<vectorOfVars>, {<tuple> [, <tuple>]})
 // Tuples represented as a vector of int arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionThreeInputReader::readConstraintTable(InputFileReader* infile, const ConstraintDef& def) 
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readConstraintTable(FileReader* infile, const ConstraintDef& def) 
 {
   parser_info( "reading a table ct (unreifiable)" ) ;
   
@@ -381,7 +390,8 @@ void MinionThreeInputReader::readConstraintTable(InputFileReader* infile, const 
 // table(<vectorOfVars>, {<tuple> [, <tuple>]})
 // Tuples represented as a vector of int arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionThreeInputReader::readConstraintGadget(InputFileReader* infile) 
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile) 
 {
   parser_info( "Reading a gadget constraint" ) ;
   
@@ -403,7 +413,8 @@ void MinionThreeInputReader::readConstraintGadget(InputFileReader* infile)
 
 
 /// Reads an identifier which represents a single variable or constant.
-Var MinionThreeInputReader::readIdentifier(InputFileReader* infile) {
+template<typename FileReader>
+Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
   char idChar = infile->peek_char();
   
   if ((('0' <= idChar) && ('9' >= idChar)) || idChar == '-') {
@@ -454,7 +465,8 @@ Var MinionThreeInputReader::readIdentifier(InputFileReader* infile) {
 // not-at-all dereferenced matrix. It could also just be a number!
 // The code shares a lot with readIdentifier, and at some point the two
 // should probably merge
-vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader* infile, bool mustBeMatrix) {
+template<typename FileReader>
+vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(FileReader* infile, bool mustBeMatrix) {
   char idChar = infile->peek_char();
   
   vector<Var> returnVec;
@@ -517,7 +529,8 @@ vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader
 /// Accepts:
 /// M (for matrix identifer M)
 /// [ M,B,.. ] (for matrix identifers M and variables B)
-vector<Var> MinionThreeInputReader::readLiteralVector(InputFileReader* infile) {
+template<typename FileReader>
+vector<Var> MinionThreeInputReader<FileReader>::readLiteralVector(FileReader* infile) {
   vector<Var> newVector;
   
   if(infile->peek_char() != '[')
@@ -558,7 +571,8 @@ vector<Var> MinionThreeInputReader::readLiteralVector(InputFileReader* infile) {
 }
 
 
-vector<vector<Var> > MinionThreeInputReader::read2DMatrix(InputFileReader* infile)
+template<typename FileReader>
+vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrix(FileReader* infile)
 {
   vector<vector<Var> > return_vals; 
   
@@ -590,7 +604,8 @@ vector<vector<Var> > MinionThreeInputReader::read2DMatrix(InputFileReader* infil
 
 // This function reads the next identifier, which should be a 1D or 2D matrix,
 // and returns it (if it was 1D, it returns it as a 1 row 2D matrix.
-vector<vector<Var> > MinionThreeInputReader::read2DMatrixVariable(InputFileReader* infile) {
+template<typename FileReader>
+vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrixVariable(FileReader* infile) {
   string name = infile->get_string();
   Var var = instance.vars.getSymbol(name);
   // Check it is a matrix
@@ -629,8 +644,9 @@ vector<vector<Var> > MinionThreeInputReader::read2DMatrixVariable(InputFileReade
 // Note: allowNulls maps '_' to -999 (a horrible hack I know).
 // That last parameter defaults to false.
 // The start and end default to '[' and ']'
-vector<int> MinionThreeInputReader::readConstantVector
-          (InputFileReader* infile, char start, char end, bool allowNulls) 
+template<typename FileReader>
+vector<int> MinionThreeInputReader<FileReader>::readConstantVector
+          (FileReader* infile, char start, char end, bool allowNulls) 
 {
   vector<int> newVector;
   infile->check_sym(start);
@@ -665,7 +681,8 @@ vector<int> MinionThreeInputReader::readConstantVector
 }
 
 /// Read an expression of the type ' {<num>..<num>} '
-vector<int> MinionThreeInputReader::readRange(InputFileReader* infile) 
+template<typename FileReader>
+vector<int> MinionThreeInputReader<FileReader>::readRange(FileReader* infile) 
 {
   vector<int> newVector;
   infile->check_sym('{');
@@ -682,7 +699,8 @@ vector<int> MinionThreeInputReader::readRange(InputFileReader* infile)
 
 
 /// Read a list of tuples
-void MinionThreeInputReader::readTuples(InputFileReader* infile)
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile)
 {
   while(infile->peek_char() != '*')
   {
@@ -704,7 +722,8 @@ void MinionThreeInputReader::readTuples(InputFileReader* infile)
   
 }
 
-void MinionThreeInputReader::readSearch(InputFileReader* infile) {  
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {  
   while(infile->peek_char() != '*')
   {
     string var_type = infile->get_string();
@@ -798,7 +817,8 @@ void MinionThreeInputReader::readSearch(InputFileReader* infile) {
 }
 
 
-void MinionThreeInputReader::readAliasMatrix(InputFileReader* infile, const vector<int>& max_indices, vector<int> indices, string name)
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readAliasMatrix(FileReader* infile, const vector<int>& max_indices, vector<int> indices, string name)
 {
   if(infile->peek_char() == '[')
   {
@@ -841,7 +861,8 @@ void MinionThreeInputReader::readAliasMatrix(InputFileReader* infile, const vect
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionThreeInputReader::readVars(InputFileReader* infile) {
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
   while(infile->peek_char() != '*')
   {
     parser_info("Begin reading variables");
