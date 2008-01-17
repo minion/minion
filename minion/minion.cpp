@@ -103,7 +103,7 @@ void print_info()
   
 BOOL randomise_valvaroder = false;
 
-TableOut tableout= TableOut();
+TableOut tableout;
 
 template<typename Reader>
 void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** argv)
@@ -312,7 +312,7 @@ template<typename Reader>
 void SolveCSP(Reader& reader, MinionArguments args)
 {
     // Copy args into tableout
-    tableout.set("RandomSeed", toString(args.random_seed));
+    tableout.set("RandomSeed", to_string(args.random_seed));
     {   char * b;
         if(args.preprocess == MinionArguments::None) b="None";
         if(args.preprocess == MinionArguments::SAC) b="SAC";
@@ -395,7 +395,7 @@ if (!Controller::print_only_solution) { print_timestep_store("Parsing Time: ", "
 	<< (Controller::solutions == 0 ? "no" : "yes") << endl;
   cout << "Solutions Found: " << Controller::solutions << endl;
   
-  tableout.set("Nodes", toString(nodes));
+  tableout.set("Nodes", to_string(nodes));
   tableout.set("Satisfiable", (Controller::solutions==0 ? 0 : 1));
   tableout.set("SolutionsFound", Controller::solutions);
   

@@ -15,14 +15,6 @@ using namespace std;
 // This is a v.simple logging component.
 // Call tableout.set("PropertyName", 127)
 
-struct ltstr
-{
-  bool operator()(string s1, string s2) const
-  {
-    return s1 < s2;
-  }
-};
-
 // A small container which contains an integer or a string.
 struct datum
 {
@@ -81,29 +73,16 @@ struct datum
         }
         else
         {
-            // This is complete garbage, but apparently the 'best' way to do it in C++, according to Bjarne Stroustrup no less.
-            stringstream blah;
-            blah << i;
-            return blah.str();
+            return to_string(i);
         }
     }
-    
-    
 };
-
-template<class ValType>
-string toString(ValType value)
-{
-    stringstream blah;
-    blah<< value;   // clearly ValType must have <<
-    return blah.str();
-}
 
 class TableOut
 {
     private:
     // All the data for this run is kept in the map    
-    map<string, datum, ltstr> data;
+    map<string, datum> data;
     string filename;
     
     public:
@@ -125,7 +104,7 @@ class TableOut
     
     void debug_printall()
     {
-        std::map<string, datum, ltstr>::iterator it;
+        std::map<string, datum>::iterator it;
         
         for(it = data.begin(); it != data.end(); it++)
         {
@@ -155,7 +134,7 @@ class TableOut
         {
             f << "#";
             
-            map<string, datum, ltstr>::iterator it;
+            map<string, datum>::iterator it;
             for(it = data.begin(); it != data.end(); it++)
             {
                 f<<  "\"" << (*it).first << "\" " ;
@@ -165,7 +144,7 @@ class TableOut
         
         // This doesn't work with strings that have spaces in them. Fix in datum probably.
         
-        map<string, datum, ltstr>::iterator it;
+        map<string, datum>::iterator it;
         for(it = data.begin(); it != data.end(); it++)
         {
             f << (*it).second.get_print() << " " ;
@@ -175,19 +154,9 @@ class TableOut
         f.close();
     }
     
-    TableOut()
-    {
-        data=map<string, datum, ltstr>();
-    }
-    
     void set_filename(string file)
     {
         filename=file;
-    }
-    
-    ~TableOut()
-    {
-        // Don't care
     }
 };
 
