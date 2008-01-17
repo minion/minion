@@ -71,21 +71,6 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
     getVars(stateObj).getBooleanContainer().setVarCount(vars.BOOLs);
 	getVars(stateObj).getBoundvarContainer().addVariables(vars.bound);
     getVars(stateObj).getSparseBoundvarContainer().addVariables(vars.sparse_bound);
-
-/*
-    vector<pair<int, Bounds> > smallRange;
-    vector<pair<int, Bounds> > largeRange;
-
-	for(unsigned int i = 0; i < vars.discrete.size(); ++i)
-	{
-        if(getVars(stateObj).getRangevarContainer().valid_range(vars.discrete[i].second.lower_bound, vars.discrete[i].second.upper_bound))
-          smallRange.push_back(vars.discrete[i]);
-        else
-          largeRange.push_back(vars.discrete[i]);
-    }
-	
-    getVars(stateObj).getRangevarContainer().addVariables(smallRange);
- */
     getVars(stateObj).getBigRangevarContainer().addVariables(vars.discrete);
 	
 	for(unsigned int i = 0; i < vars.sparse_discrete.size(); ++i)
