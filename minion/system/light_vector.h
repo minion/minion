@@ -32,7 +32,7 @@ public:
   {
 	if(&t == this)
 	  return;
-	delete data;
+	delete[] data;
 	vec_size = t.vec_size;
 	data = new T[vec_size];
 	for(int i = 0; i < vec_size; ++i)
