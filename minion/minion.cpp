@@ -38,6 +38,7 @@ struct MinionArguments
   unsigned random_seed;
   MinionArguments() : order(ORDER_ORIGINAL), preprocess(None), random_seed((unsigned)time(NULL))
   { }
+
 };
 
 void print_info()
@@ -180,8 +181,8 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
 	else if(command == string("-timelimit"))
 	{
 	  ++i;
-	  time_limit = atoi(argv[i]);
-	  if(time_limit == 0)
+	  options->time_limit = atoi(argv[i]);
+	  if(options->time_limit == 0)
 	  {
 	    cout << "Did not understand the parameter to timelimit:" << argv[i] << endl;
 		FAIL_EXIT();
@@ -322,6 +323,8 @@ void SolveCSP(Reader& reader, MinionArguments args)
     tableout.set("MinionVersion", SVN_VER);
     tableout.set("TimeOut", 0); // will be set to 1 if a timeout occurs.
     state->getTimer().maybePrintTimestepStore("Parsing Time: ", "ParsingTime", tableout, !options->print_only_solution);
+    
+    state->setTupleListContainer(reader.tupleListContainer);
     
     BuildCSP(reader);
     
@@ -481,6 +484,7 @@ catch(parse_exception& s)
 int main(int argc, char** argv) {
   
   state = new SearchState();
+//  searchstate->setTupleListContainer(new TupleListContainer);
   options = new SearchOptions();
   queues = new Queues();
   varContainer = new VariableContainer();
@@ -538,8 +542,9 @@ int main(int argc, char** argv) {
     MinionThreeInputReader reader;
     MinionArguments args;
     parse_command_line(reader, args, argc, argv);
+    
     ReadCSP(reader, infile, argv[argc - 1]);
-
+    
     SolveCSP(reader, args);
   }
   else

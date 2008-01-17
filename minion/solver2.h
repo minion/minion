@@ -25,10 +25,6 @@
 */
 // This header is designed to be included after all other headers
 
-VARDEF_ASSIGN(clock_t time_limit, 0);
-
-
-
 namespace Controller
 {
   VARDEF(vector<vector<AnyVarRef> > print_matrix);

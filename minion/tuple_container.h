@@ -178,29 +178,31 @@ class TupleList
   
 };
 
-
-
-VARDEF(std::vector<TupleList*> Internal_TupleList);
-
-inline TupleList* getNewTupleList(int numtuples, int tuplelength)
+class TupleListContainer
 {
-  TupleList* tuplelist_ptr = new TupleList(numtuples, tuplelength);
-  Internal_TupleList.push_back(tuplelist_ptr);
-  return tuplelist_ptr;
-}
+  std::vector<TupleList*> Internal_TupleList;
 
-inline TupleList* getNewTupleList(const vector<vector<int> >& tuples)
-{ 
-  TupleList* tuplelist_ptr = new TupleList(tuples);
-  Internal_TupleList.push_back(tuplelist_ptr);
-  return tuplelist_ptr;
-}
+public:
+  TupleList* getNewTupleList(int numtuples, int tuplelength)
+  {
+    TupleList* tuplelist_ptr = new TupleList(numtuples, tuplelength);
+    Internal_TupleList.push_back(tuplelist_ptr);
+    return tuplelist_ptr;
+  }
 
-inline TupleList* getTupleList(int num)
-{ return Internal_TupleList[num]; }
+  TupleList* getNewTupleList(const vector<vector<int> >& tuples)
+  { 
+    TupleList* tuplelist_ptr = new TupleList(tuples);
+    Internal_TupleList.push_back(tuplelist_ptr);
+    return tuplelist_ptr;
+  }
 
-inline int getNumOfTupleLists()
-{ return Internal_TupleList.size(); }
+  TupleList* getTupleList(int num)
+  { return Internal_TupleList[num]; }
+
+  int size()
+  { return Internal_TupleList.size(); }
+};
 
 
 /// The first GACtable implementation.

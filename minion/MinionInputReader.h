@@ -252,10 +252,13 @@ class MinionInputReader {
  public:
   void read(InputFileReader* infile) ;
   ProbSpec::CSPInstance instance ;
+  
   BOOL parser_verbose ;
   
-  MinionInputReader() : parser_verbose(false)
+  MinionInputReader() : parser_verbose(false), tupleListContainer(new TupleListContainer)
   {}
+  
+   TupleListContainer* tupleListContainer;
 };
 
 class MinionThreeInputReader {
@@ -294,7 +297,9 @@ public:
   
   bool print_all_vars;
   
-  MinionThreeInputReader() : parser_verbose(false), print_all_vars(true)
+  MinionThreeInputReader() : parser_verbose(false), print_all_vars(true), tupleListContainer(new TupleListContainer)
   {}
+  
+   TupleListContainer* tupleListContainer;
 };
 

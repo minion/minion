@@ -322,7 +322,7 @@ void MinionThreeInputReader::readConstraintTable(InputFileReader* infile, const 
 	  if(delim != ',' && delim!= '}')
 		throw parse_exception("Expected ',' or '}'");
 	}
-	tuplelist = getNewTupleList(tuples);
+	tuplelist = tupleListContainer->getNewTupleList(tuples);
   }
 	
 	infile->check_sym(')');
@@ -513,7 +513,7 @@ void MinionThreeInputReader::readTuples(InputFileReader* infile)
 	int tuple_length = infile->read_num();
     parser_info("Reading tuplelist '" + name + "', length " + to_string(num_of_tuples) +
                 ", arity " + to_string(tuple_length) );
-	TupleList* tuplelist = getNewTupleList(num_of_tuples, tuple_length);
+	TupleList* tuplelist = tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
     int* tuple_ptr = tuplelist->getPointer();
     for(int i = 0; i < num_of_tuples; ++i)
       for(int j = 0; j < tuple_length; ++j)

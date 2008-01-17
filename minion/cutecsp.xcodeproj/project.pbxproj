@@ -15,6 +15,7 @@
 		2643EA760C4573E7004231DE /* CT_DIV.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2643EA740C4573E7004231DE /* CT_DIV.cpp */; };
 		2643EA770C4573E7004231DE /* CT_MODULO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2643EA750C4573E7004231DE /* CT_MODULO.cpp */; };
 		2644ACE50A192B90002BD572 /* minion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644ACE40A192B90002BD572 /* minion.cpp */; };
+		26D83D000CAFF4DB00625B8C /* CT_ALLDIFF_GACSLOW.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D83CFF0CAFF4DB00625B8C /* CT_ALLDIFF_GACSLOW.cpp */; };
 		26E63C830B137198009C8B64 /* get_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E63C820B137198009C8B64 /* get_info.cpp */; };
 		26FB021E0B63D2230062AD1B /* BuildDynamicStart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FB02010B63D2230062AD1B /* BuildDynamicStart.cpp */; };
 		26FB021F0B63D2230062AD1B /* BuildStaticStart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FB02030B63D2230062AD1B /* BuildStaticStart.cpp */; };
@@ -135,6 +136,10 @@
 		26CDE8F7099BF9C500C985F3 /* BuildConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuildConstraint.h; sourceTree = "<group>"; };
 		26CE28F00A234F8400110C21 /* AnyVarRef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnyVarRef.h; path = variables/AnyVarRef.h; sourceTree = "<group>"; };
 		26CFEBEC0AA64E5A00A35D56 /* VariableOrders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VariableOrders.h; path = search/VariableOrders.h; sourceTree = "<group>"; };
+		26D83CAF0CAFB92000625B8C /* constraint_alldiff_gac_slow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = constraint_alldiff_gac_slow.h; path = constraints/constraint_alldiff_gac_slow.h; sourceTree = "<group>"; };
+		26D83CB00CAFB94800625B8C /* array_functions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = array_functions.h; path = system/array_functions.h; sourceTree = "<group>"; };
+		26D83CB10CAFB94800625B8C /* tableout.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tableout.h; path = system/tableout.h; sourceTree = "<group>"; };
+		26D83CFF0CAFF4DB00625B8C /* CT_ALLDIFF_GACSLOW.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CT_ALLDIFF_GACSLOW.cpp; path = build_constraints/CT_ALLDIFF_GACSLOW.cpp; sourceTree = "<group>"; };
 		26DB943709F84BE1001A1230 /* constraint_GACelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_GACelement.h; path = constraints/constraint_GACelement.h; sourceTree = "<group>"; };
 		26DFA2ED0B919A0F003A2B4E /* light_vector.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = light_vector.h; path = system/light_vector.h; sourceTree = "<group>"; };
 		26E1C004098401610061B982 /* constraint_occurrance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_occurrance.h; path = constraints/constraint_occurrance.h; sourceTree = "<group>"; };
@@ -217,6 +222,7 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				26D83CFF0CAFF4DB00625B8C /* CT_ALLDIFF_GACSLOW.cpp */,
 				260A0A4F0C3BB39A00CFEEE1 /* FrontEnd */,
 				260A0A490C3BB32600CFEEE1 /* Queue */,
 				260A0A420C3BB28700CFEEE1 /* BuildConstraints */,
@@ -260,6 +266,8 @@
 		260A0A3C0C3BB20A00CFEEE1 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				26D83CB00CAFB94800625B8C /* array_functions.h */,
+				26D83CB10CAFB94800625B8C /* tableout.h */,
 				26DFA2ED0B919A0F003A2B4E /* light_vector.h */,
 				266E8D4D0AAB13EB0066DA57 /* time_keeping.h */,
 				2640F4670B32DD050075FB8C /* to_string.h */,
@@ -361,6 +369,7 @@
 		26F697FC0986D78E00D3B93B /* constraints */ = {
 			isa = PBXGroup;
 			children = (
+				26D83CAF0CAFB92000625B8C /* constraint_alldiff_gac_slow.h */,
 				2623A3CC0B0E23C500E574BC /* constraint_pow.h */,
 				26FC06F409CB68D500153DA6 /* constraint_dynamic.h */,
 				26AAF876096D3BC300AD8C1A /* constraint.h */,
@@ -527,6 +536,7 @@
 				2643EA760C4573E7004231DE /* CT_DIV.cpp in Sources */,
 				2643EA770C4573E7004231DE /* CT_MODULO.cpp in Sources */,
 				263ACB500C75B3DC00AE5947 /* MinionThreeInputReader.cpp in Sources */,
+				26D83D000CAFF4DB00625B8C /* CT_ALLDIFF_GACSLOW.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

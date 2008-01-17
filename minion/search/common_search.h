@@ -119,9 +119,9 @@ namespace Controller
   {
   	if((state->getNodeCount() & 1023) == 0)
 	{
-	  if(time_limit != 0)
+	  if(options->time_limit != 0)
 	  {
-	    if(state->getTimer().checkTimeout(time_limit))
+	    if(state->getTimer().checkTimeout(options->time_limit))
 	    {
 		  cout << "Time out." << endl;
           tableout.set("TimeOut", 1);

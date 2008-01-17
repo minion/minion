@@ -30,6 +30,7 @@
 class Constraint;
 class DynamicConstraint;
 class AnyVarRef;
+class TupleListContainer;
 
 class SearchState
 {
@@ -52,6 +53,8 @@ class SearchState
   jmp_buf g_env;
   
   TimerClass timer;
+  
+  TupleListContainer* tupleListContainer;
 public:
 	
 	unsigned long long getNodeCount() { return nodes; }
@@ -94,11 +97,22 @@ public:
   TimerClass& getTimer() { return timer; }
   
   jmp_buf* getJmpBufPtr() { return &g_env; }
+  
+  TupleListContainer* getTupleListContainer() { return tupleListContainer; }
+  
+  void setTupleListContainer(TupleListContainer* _tupleList) 
+  { 
+    D_ASSERT(tupleListContainer == NULL);
+    tupleListContainer = _tupleList; 
+  }
+                          
   SearchState() : nodes(0), optimise_var(NULL), current_optimise_position(0), optimise(false), solutions(0),
-	dynamic_triggers_used(false)
+	dynamic_triggers_used(false), tupleListContainer(NULL)
   {}
   
 };
+
+
 
 VARDEF(SearchState* state);
 
@@ -124,9 +138,12 @@ public:
   /// Denotes if solutions should be printed.
   bool print_solution;
   
+  /// Stores the timelimit, 0 if none given
+  clock_t time_limit;
+  
   SearchOptions() : print_only_solution(false), dumptree(false), sollimit(-1), fullpropagate(false), 
 	nocheck(false), nodelimit(0), tableout(false),  find_one_sol(true), 
-    print_solution(true)
+    print_solution(true), time_limit(0)
     //,solution_check(NULL)
   {}
   
