@@ -8,6 +8,7 @@ import sendemail
 
 # of course this is bad. The minion directory should be a command line option.
 chdir("/home/pn/minion-svn/minion")   #cd /home/pn/minion-svn/minion
+system("rm Makefile*")   # get rid of stale makefiles that were causing problems.
 
 retval=0
 retval+=system("svn update")
