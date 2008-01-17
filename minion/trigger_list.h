@@ -193,8 +193,9 @@ public:
 	  trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
 			 + checked_cast<int>(var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m);
 	}
-	// TODO: This shouldn't require next != NULL.
-    if(trig->next != trig && trig->next != NULL)
+    D_ASSERT(trig->next != NULL);
+    // This is an optimisation, no need to push empty lists.
+    if(trig->next != trig)
 	  Controller::push_dynamic_triggers(trig);
   }
 #endif
