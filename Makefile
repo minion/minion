@@ -116,4 +116,7 @@ clean:
 veryclean:
 	rm -rf bin/*
 
+depend:
+	mini-scripts/make_depend.sh
+	
 include Makefile.dep
