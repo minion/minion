@@ -587,7 +587,7 @@ void readInput(InputReader* infile, int argc, char** argv, StateObj* stateObj, C
 // From help/help.cpp
 void help(string request);
 
-void print_default_help_and_exit()
+void print_default_help(char** argv)
 {
   cout << "Type '" << argv[0] << " help' for usage." << endl;
   cout << endl << "Usage: " << argv[0] << " {switch}* [input file]" << endl;
@@ -606,8 +606,7 @@ void print_default_help_and_exit()
   "on" << endl;
 #endif
   cout << "The following preprocessor flags were active:" << endl;
-  print_macros();
-  exit(EXIT_SUCCESS);  
+  print_macros(); 
 }
 
 int main(int argc, char** argv) {
@@ -623,7 +622,8 @@ try {
   cout << "# Svn version: " << SVN_VER << endl; 
 
   if (argc == 1) {
-    print_default_help_and_exit();
+    print_default_help(argv);
+    return EXIT_SUCCESS;
   }
 
   if(!strcmp(argv[1], "help")) {

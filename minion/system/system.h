@@ -87,6 +87,7 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<memory.h>
 #include<setjmp.h>
 
 // Note: The hash table (unordered_map) is broken in many versions of g++,
