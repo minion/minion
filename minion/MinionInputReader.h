@@ -75,12 +75,14 @@ struct ConcreteFileReader : public InputFileReader
 	if(!(next_char >= '0' && next_char <= '9') )
 	  throw parse_exception("Problem parsing number");  
 	
-	int num=0;
+	BigInt num=0;
 	
 	while( (next_char >= '0' && next_char <= '9'))
 	{
 	  num *= 10;
 	  num += (next_char - '0');
+	  if(num > DomainInt_Max)
+		parse_exception("Number out of bounds");
 	  next_char = infile.get();
 	}
 	
