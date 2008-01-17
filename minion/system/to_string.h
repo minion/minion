@@ -23,6 +23,15 @@ to_string(T t)
   return streamOut.str();
 }
 
+template<typename T1, typename T2>
+std::string
+to_string(T1 t1, T2 t2)
+{
+  std::ostringstream streamOut;
+  streamOut << t1 << " " << t2;
+  return streamOut.str();
+}
+
 template<typename T>
 void output_container(std::ostream& o, const T& t)
 {
