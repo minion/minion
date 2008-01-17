@@ -200,7 +200,8 @@ $(OBJDIR)/build_constraints/CT_ALLDIFF.o:  \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
   minion/./build_constraints/../constraints/constraint_alldiff_gac_slow.h \
-  minion/./build_constraints/../constraints/constraint_neq.h
+  minion/./build_constraints/../constraints/constraint_neq.h \
+  minion/./build_constraints/../constraints/constraint_equal.h
 $(OBJDIR)/build_constraints/CT_ALLDIFF_GACSLOW.o:  \
  minion/./build_constraints/CT_ALLDIFF_GACSLOW.cpp \
   minion/./build_constraints/../minion.h \
@@ -334,7 +335,8 @@ $(OBJDIR)/build_constraints/CT_DISEQ.o:  \
   minion/./build_constraints/../constraint_setup.h \
   minion/./build_constraints/../test_functions.h \
   minion/./build_constraints/../BuildCSP.h \
-  minion/./build_constraints/../constraints/constraint_neq.h
+  minion/./build_constraints/../constraints/constraint_neq.h \
+  minion/./build_constraints/../constraints/constraint_equal.h
 $(OBJDIR)/build_constraints/CT_DIV.o:  \
  minion/./build_constraints/CT_DIV.cpp \
   minion/./build_constraints/../minion.h \
