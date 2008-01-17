@@ -249,6 +249,18 @@ To add statistics about solving myproblem.minion to mystats.txt do
    minion -tableout mystats.txt myproblem.minion
 */
 
+/** @help switches;-solsout Description 
+Append all solutionsto a named file.
+Each solution is placed on a line, with no extra formatting.
+*/
+
+/** @help switches;-solsout Example
+To add the solutions of myproblem.minion to mysols.txt do
+
+   minion -solsout mysols.txt myproblem.minion
+*/
+
+
 /** @help switches;-randomiseorder Description 
 Randomises the ordering of the decision variables. If the input file
 specifies as ordering it will randomly permute this. If no ordering is
