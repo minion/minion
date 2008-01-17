@@ -259,6 +259,7 @@ void BuildCSP(Reader& reader)
 {
   // Fix up Bound / Sparse Bound
   
+  // Fix up discrete variables.
   reader.instance.fixDiscrete(SmallDiscreteCheck());
   
   // Set up variables

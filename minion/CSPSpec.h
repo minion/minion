@@ -535,6 +535,7 @@ struct ConstraintBlob
 		  long_discrete_size += var_length;
 		}
 	  }
+      VarReplace(optimise_variable, new_map);
 	  
 	  VarReplace(var_order, new_map);
 	  VarReplace(print_matrix, new_map);
