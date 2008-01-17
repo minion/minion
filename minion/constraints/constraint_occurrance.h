@@ -212,7 +212,7 @@ BuildCT_LEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolV
   if(reify) 
     { return reifyCon(stateObj, OccEqualCon(stateObj, t1, runtime_val(val_to_count), TrivialBoundVar(stateObj,0,occs)), reifyVar); } 
   else 
-    { return OccEqualCon(stateObj, t1, runtime_val(val_to_count), TrivialBoundVar(stateObj,0,occs)); } 
+    { return OccEqualCon(stateObj, t1, runtime_val(val_to_count), TrivialBoundVar(stateObj, 0, occs)); } 
 }
 
 template<typename T1>
