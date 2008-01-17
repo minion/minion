@@ -71,7 +71,8 @@ namespace Controller
         // Either search failed, or a solution was found.
         while(getState(stateObj).isFailed())
         {
-          if(last_conflict_var == -1)
+          // the order.get_current_pos() != v.size() is in case we just got a soln.
+          if(last_conflict_var == -1 && order.get_current_pos() != v.size())
             last_conflict_var = order.get_current_pos();
           
           getState(stateObj).setFailed(false);

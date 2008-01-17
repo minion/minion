@@ -457,6 +457,8 @@ vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader
   
   if(var.type == VAR_MATRIX)
   {
+    if(negVar)
+      throw parse_exception("Sorry, can't negate a matrix");
     vector<int> params;
     if(infile->peek_char() == '[')
       params = readConstantVector(infile,'[',']',true);
@@ -465,7 +467,6 @@ vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader
       vector<int> maxterms = instance.vars.getMatrixSymbol(name);
       params = vector<int>(maxterms.size(), -999);
     }
-    throw parse_exception("Sorry, can't negate a matrix");
     returnVec = instance.vars.buildVarList(name, params);
     parser_info("Got matrix:" + to_string(returnVec));
   }
@@ -524,20 +525,38 @@ vector<Var> MinionThreeInputReader::readLiteralVector(InputFileReader* infile) {
 }
 
 
-/// Reads a 1D or 2D matrix of variables.
-
-
-
-// This function allows a number of special cases:
-// 1) If only a 1-D matrix is given, it is mapped to a 2-D matrix with only one row
-// 2) If a n-D matrix is given mid-row, it is flattened.
-// 3) If an n-D matrix is given not in a row, then if it 1-D or 2-D, it is placed inline.
-//    Higher dimensions are an error.
-vector<vector<Var> > MinionThreeInputReader::readLiteralMatrix(InputFileReader* infile) {
-  vector<vector<Var> > newVector;
+vector<vector<Var> > MinionThreeInputReader::read2DMatrix(InputFileReader* infile)
+{
+  vector<vector<Var> > return_vals; 
+  
+  if(infile->peek_char() != '[')
+    return read2DMatrixVariable(infile);
   
   infile->check_sym('[');
+  
+  while(infile->peek_char() != ']')
+  {
+    // See if there is an array, or just a variable.
+    if(infile->peek_char() == '[') 
+      return_vals.push_back(readLiteralVector(infile));
+    else
+    {
+      vector<vector<Var> > vars = read2DMatrixVariable(infile);
+      for(int i = 0; i < vars.size(); ++i)
+        return_vals.push_back(vars[i]);
+    }
+    // Eat a comma if there is one there.
+    if(infile->peek_char() == ',')
+      infile->check_sym(',');
+  }
+  
+  infile->check_sym(']');
+  return return_vals;
+}
 
+// This function reads the next identifier, which should be a 1D or 2D matrix,
+// and returns it (if it was 1D, it returns it as a 1 row 2D matrix.
+vector<vector<Var> > MinionThreeInputReader::read2DMatrixVariable(InputFileReader* infile) {
   string name = infile->get_string();
   Var var = instance.vars.getSymbol(name);
   // Check it is a matrix
@@ -569,10 +588,10 @@ vector<vector<Var> > MinionThreeInputReader::readLiteralMatrix(InputFileReader* 
         row.push_back(instance.vars.getSymbol(name+"["+to_string(i)+","+to_string(j)+"]"));
       terms.push_back(row);
     }
-    infile->check_sym(']');
     return terms;
   }
 }
+
 // Note: allowNulls maps '_' to -999 (a horrible hack I know).
 // That last parameter defaults to false.
 // The start and end default to '[' and ']'
@@ -725,7 +744,7 @@ void MinionThreeInputReader::readSearch(InputFileReader* infile) {
       else
       {
         print_all_vars = false;
-        instance.print_matrix = make_vec(readLiteralVector(infile));
+        instance.print_matrix = read2DMatrix(infile);
       }
     }
     else if(var_type == "CONSTRUCTION")
@@ -745,6 +764,48 @@ void MinionThreeInputReader::readSearch(InputFileReader* infile) {
 }
 
 
+void MinionThreeInputReader::readAliasMatrix(InputFileReader* infile, const vector<int>& max_indices, vector<int> indices, string name)
+{
+  if(infile->peek_char() == '[')
+  {
+    infile->check_sym('[');
+    // Have another level of reading to do..
+    indices.push_back(0);
+    readAliasMatrix(infile, max_indices, indices, name);
+    infile->check_sym(']');
+    while(infile->peek_char() == ',')
+    {
+      infile->check_sym(',');
+      indices.back()++;
+      infile->check_sym('[');
+      readAliasMatrix(infile, max_indices, indices, name);
+      infile->check_sym(']');
+    }
+    if(indices.back() + 1 != max_indices[indices.size() - 1])
+      throw parse_exception("Incorrectly sized matrix!, expected index " +
+                            to_string(indices.size() - 1) + " to have " + to_string(max_indices[indices.size() - 1]) +
+                            " terms, got " + to_string(indices.back() + 1));
+  }
+  else
+  {
+    // Have reached the bottom level!
+    indices.push_back(0);
+    Var v = readIdentifier(infile);
+    instance.vars.addSymbol(name + to_string(indices), v);
+    while(infile->peek_char() == ',')
+    {
+      infile->check_sym(',');
+      indices.back()++;
+      Var v = readIdentifier(infile);
+      instance.vars.addSymbol(name + to_string(indices), v);
+    }
+    if(indices.back() + 1 != max_indices[indices.size() - 1])
+      throw parse_exception("Incorrectly sized matrix!, expected index " +
+                            to_string(indices.size() - 1) + " to have " + to_string(max_indices[indices.size() - 1]) +
+                            " terms, got " + to_string(indices.back() + 1));
+  }
+}
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void MinionThreeInputReader::readVars(InputFileReader* infile) {
   while(infile->peek_char() != '*')
@@ -759,7 +820,7 @@ void MinionThreeInputReader::readVars(InputFileReader* infile) {
     string varname = infile->get_string();
     parser_info("Name:" + varname);
     
-    // XXX
+
       
     bool isArray = false;
     vector<int> indices;
@@ -775,7 +836,17 @@ void MinionThreeInputReader::readVars(InputFileReader* infile) {
     VariableType variable_type;
     vector<int> domain;
     
-    if(var_type == "BOOL")
+    if(var_type == "ALIAS")
+    {
+      if(isArray == false)
+        throw parse_exception("ALIAS must always be a matrix!");
+      instance.vars.addMatrixSymbol(varname, indices);
+      infile->check_sym('=');
+      infile->check_sym('[');
+      readAliasMatrix(infile, indices, vector<int>(), varname);
+      infile->check_sym(']');
+    }
+    else if(var_type == "BOOL")
     {
       variable_type = VAR_BOOL;
     }
@@ -803,24 +874,27 @@ void MinionThreeInputReader::readVars(InputFileReader* infile) {
     else
       throw parse_exception("I don't know about var_type '" + var_type + "'");
       
-    if(isArray)
+    if(var_type != "ALIAS")
     {
-      instance.vars.addMatrixSymbol(varname, indices);
-      vector<int> current_index(indices.size(), 0);
-      parser_info("New Var: " + varname + to_string(current_index));
-      instance.vars.addSymbol(varname + to_string(current_index),
-                              instance.vars.getNewVar(variable_type, domain));
-      while(increment_vector(current_index, indices))
+      if(isArray)
       {
+        instance.vars.addMatrixSymbol(varname, indices);
+        vector<int> current_index(indices.size(), 0);
         parser_info("New Var: " + varname + to_string(current_index));
         instance.vars.addSymbol(varname + to_string(current_index),
                                 instance.vars.getNewVar(variable_type, domain));
+        while(increment_vector(current_index, indices))
+        {
+          parser_info("New Var: " + varname + to_string(current_index));
+          instance.vars.addSymbol(varname + to_string(current_index),
+                                  instance.vars.getNewVar(variable_type, domain));
+        }
       }
-    }
-    else
-    {
-      instance.vars.addSymbol(varname,
-                              instance.vars.getNewVar(variable_type, domain));
+      else
+      {
+        instance.vars.addSymbol(varname,
+                                instance.vars.getNewVar(variable_type, domain));
+      }
     }
   }
   

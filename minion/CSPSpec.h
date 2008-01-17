@@ -243,7 +243,7 @@ struct ConstraintBlob
       throw parse_exception("Names cannot start with a number!:" + name);
     if(symbol_table.count(name) != 0)
       throw parse_exception("Name already in table:" + name);
-    
+    cout << "Add '" << name << "'" << endl;
     symbol_table[name] = variable;
   
   }

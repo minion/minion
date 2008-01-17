@@ -308,6 +308,9 @@ class MinionThreeInputReader {
   void readPrint(InputFileReader* infile) ;
   void readVars(InputFileReader* infile) ;
   void readSearch(InputFileReader* infile) ;
+  vector<vector<Var> > read2DMatrix(InputFileReader* infile); 
+  vector<vector<Var> > read2DMatrixVariable(InputFileReader* infile);
+  void readAliasMatrix(InputFileReader* infile, const vector<int>& max_indices, vector<int> indices, string name);
   vector<Var> readVectorExpression(InputFileReader* infile) ;
   void readGeneralConstraint(InputFileReader*, const ConstraintDef&) ;
 public:
