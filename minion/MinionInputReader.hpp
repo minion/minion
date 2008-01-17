@@ -590,7 +590,7 @@ void MinionInputReader<FileReader>::readPrint(FileReader* infile) {
 	if(s != "ll")
 	  throw parse_exception(string("I don't understand '" + s + "'"));
 							  
-	instance.print_matrix = instance.all_vars_list;
+	instance.print_matrix = make_vec(instance.vars.get_all_vars());
 	return;
   }
   else if(letter == 'm')

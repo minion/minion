@@ -448,7 +448,25 @@ struct ConstraintBlob
     discrete.push_back(make_pair(1, Bounds(lower, upper)));
     return Var(VAR_DISCRETE, discrete.size() - 1);
   }
+  
+  vector<Var> get_all_vars()
+  {
+    int total_var_count = 0;
+    total_var_count += BOOLs;
     
+    for(unsigned int x = 0; x < bound.size(); ++x)
+      total_var_count += bound[x].first;
+    for(unsigned int x=0;x<sparse_bound.size();++x)
+      total_var_count += sparse_bound[x].first;
+    for(unsigned int x=0;x<discrete.size();++x)
+      total_var_count += discrete[x].first;
+    for(unsigned int x=0;x<sparse_discrete.size();++x)
+      total_var_count += sparse_discrete[x].first;
+    vector<Var> all_vars(total_var_count);
+    for(int i = 0; i < total_var_count; ++i)
+      all_vars[i] = get_var('x',i);
+    return all_vars;
+  }  
 };
 
 
@@ -571,9 +589,8 @@ struct ConstraintBlob
       throw parse_exception("Undefined gadget name '" + name + "'");
     return it->second;
   }
-  
 };
-
+  
 }
 
 #endif

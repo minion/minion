@@ -118,7 +118,7 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
   if(instance.val_order.empty())
     instance.val_order = vector<char>(instance.var_order.size(), 'a');
   
-  // This has to be delayed unless not all variables are defined yet.
+  // This has to be delayed unless not all variables are defined where 'PRINT ALL' occurs.
   if(print_all_vars)
     instance.print_matrix = instance.all_vars_list;
 }
