@@ -19,7 +19,7 @@ if len(other)>1:
 conslist=["alldiff", "reifyalldiff",  "reifyimplyalldiff", "alldiffgacslow", "reifyalldiffgacslow", "reifyimplyalldiffgacslow"]
 
 #element constraints
-conslist+=["gacelement-deprecated", "reifyimplygacelement", "element", "reifyimplyelement", "watchelement"]
+conslist+=["gacelement-deprecated", "reifyimplygacelement-deprecated", "element", "reifyimplyelement", "watchelement"]
 
 #non-reifiable arithmetic constraints
 conslist+=["modulo", "pow", "minuseq", "watchsumleq", "watchsumgeq", "watchvecneq"]
