@@ -13,8 +13,9 @@ struct ConcreteFileReader
 {
   StreamType infile;
   
-  /// Removes all comments after the current place in the file
-  void check_for_comments()
+  /// Removes all comments after the current place in the file.
+  // Returns peeked char.
+  char check_for_comments()
   {
     char peek = simplepeek_char();
     while(peek == '#')
@@ -22,6 +23,19 @@ struct ConcreteFileReader
       simplegetline();
       peek = simplepeek_char();
     }
+    return peek;
+  }
+ 
+  /// Removes all comments after the current place in the file
+  char check_for_comments_and_get_char()
+  {
+    char peek = simpleget_char();
+    while(peek == '#')
+    {
+      simplegetline();
+      peek = simpleget_char();
+    }
+    return peek;
   }
   
   template<typename InputType>
@@ -34,9 +48,8 @@ struct ConcreteFileReader
   
    string get_string()
   { 
-	check_for_comments();
 	string s;
-    char next_char = simpleget_char();
+    char next_char = check_for_comments_and_get_char();
     while(isalnum(next_char) || next_char == '_')
     {
       s += next_char;
@@ -56,9 +69,8 @@ struct ConcreteFileReader
   
    string get_asciistring()
   {
-	check_for_comments();
-	string s;
-    char next_char = simpleget_char();
+    string s;
+    char next_char = check_for_comments_and_get_char();
     while(!isspace(next_char) && !infile.eof())
     {
       s +=  next_char;
@@ -73,7 +85,6 @@ struct ConcreteFileReader
   
    int read_num()
   {
-	check_for_comments();
 	// This function should just be "infile >> i;", however that is parsed differently in windows and linux
 	// So we'll have to do it manually.
 	
@@ -83,7 +94,7 @@ struct ConcreteFileReader
     throw parse_exception("Problem parsing number");
 	return i;
 	*/
-	char next_char = infile.get();
+	char next_char = check_for_comments_and_get_char();
 	while(isspace(next_char))
 	  next_char = infile.get();
 	
@@ -133,9 +144,7 @@ struct ConcreteFileReader
   /// Check if the next character from infile is sym.
    void check_sym(char sym)
   {
-    check_for_comments();
-	char idChar;
-	infile >> idChar ;
+    char idChar = check_for_comments_and_get_char();
 	if(idChar != sym)
 	{
 	  throw parse_exception(string("Expected '") + sym + "'. Recieved '" + idChar + "'.");

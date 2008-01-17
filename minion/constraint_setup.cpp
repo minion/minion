@@ -3,8 +3,6 @@
    
    For Licence Information see file LICENSE.txt 
 */
-#define NO_MAIN
-
 #include "minion.h"
 
 namespace Controller

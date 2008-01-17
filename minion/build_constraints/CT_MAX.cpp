@@ -1,3 +1,4 @@
+#include "../minion.h"
 /* Minion Constraint Solver
    http://minion.sourceforge.net
    
@@ -6,8 +7,6 @@
    $Id$
 */
 
-#define NO_MAIN
-#include "../minion.h"
 #include "../constraints/constraint_min.h"
 BUILD_STATIC_CT(CT_MAX, 2)
 

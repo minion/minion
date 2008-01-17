@@ -13,8 +13,6 @@
 // Plan here is to generate an instance of a problem (or whatever you have)
 // and return that.
 
-#define NO_MAIN
-
 #include <string>
 #include "system/system.h"
 

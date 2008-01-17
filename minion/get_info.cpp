@@ -1,4 +1,3 @@
-#define NO_MAIN
 
 #include <string>
 #include <iostream>

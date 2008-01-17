@@ -7,7 +7,6 @@
  *
  */
 
-#define NO_MAIN
 #include "minion.h"
 
 /// Apply a high level of consistency to a CSP.

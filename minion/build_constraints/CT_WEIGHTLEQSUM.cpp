@@ -1,3 +1,4 @@
+#include "../minion.h"
 /* Minion Constraint Solver
    http://minion.sourceforge.net
    
@@ -6,8 +7,6 @@
    $Id$
 */
 
-#define NO_MAIN
-#include "../minion.h"
 #include "../constraints/constraint_weightedboolsum.h"
 BUILD_STATIC_CT_INITIAL_LIST(CT_WEIGHTLEQSUM, 3)
 

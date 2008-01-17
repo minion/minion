@@ -1,3 +1,4 @@
+#include "../minion.h"
 /* Minion Constraint Solver
    http://minion.sourceforge.net
    
@@ -6,8 +7,6 @@
    $Id$
 */
 
-#define NO_MAIN
-#include "../minion.h"
 #include "../dynamic_constraints/dynamic_literalwatch.h"
 BUILD_DYNAMIC_CT(CT_WATCHED_LITSUM, 1)
 

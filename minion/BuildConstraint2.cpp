@@ -15,8 +15,6 @@
  *
  */
 
-#define NO_MAIN
-
 #include "minion.h"
 #include "CSPSpec.h"
 

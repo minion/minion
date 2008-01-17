@@ -15,8 +15,6 @@
 
 /// TODO: We need somewhere better to put these things.
 
-#define NO_MAIN
-
 #include <string>
 #include "system/system.h"
 

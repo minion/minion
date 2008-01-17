@@ -1,3 +1,4 @@
+#include "../minion.h"
 /* Minion Constraint Solver
    http://minion.sourceforge.net
    
@@ -6,8 +7,6 @@
    $Id$
 */
 
-#define NO_MAIN
-#include "../minion.h"
 #include "../constraints/constraint_GACtable_master.h"
 BUILD_DYNAMIC_CT(CT_WATCHED_TABLE, 1)
 

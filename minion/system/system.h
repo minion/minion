@@ -118,7 +118,7 @@ template<typename T>
 using namespace std;
 
 
-#ifdef NO_MAIN
+#ifndef IN_MAIN
 #define VARDEF_ASSIGN(x,y) extern x
 #define VARDEF(x) extern x
 #else

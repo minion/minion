@@ -1,5 +1,3 @@
-#define NO_MAIN
-
 #include "system/system.h"
 
 using namespace std;

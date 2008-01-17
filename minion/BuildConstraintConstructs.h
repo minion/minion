@@ -47,7 +47,7 @@ struct BUILDCON
 {
   template<typename ConData>
   static 
-  CONSTRAINT_TYPE* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos);
+  CONSTRAINT_TYPE* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos) __attribute__((noinline));
 };
 
 
