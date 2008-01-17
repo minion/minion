@@ -271,6 +271,7 @@
 				266F5EAA097C0AA200D9CC72 /* backtrackable_memory.h */,
 				26ABEEF0099415F400F94E03 /* nonbacktrack_memory.h */,
 				26E34DE009702EE500058E70 /* reversible_vals.h */,
+				261F572A0C450EFE0016D625 /* trailed_monotonic_set.h */,
 			);
 			name = MemoryManagement;
 			sourceTree = "<group>";
@@ -383,7 +384,6 @@
 				26CE28F00A234F8400110C21 /* AnyVarRef.h */,
 				2626D75609751DCD002AC405 /* intvar.h */,
 				262C59E009C785EE0027E72E /* long_intvar.h */,
-				261F572A0C450EFE0016D625 /* trailed_monotonic_set.h */,
 				26F697350986C15200D3B93B /* intboundvar.h */,
 				2644AD550A19318D002BD572 /* variables.h */,
 				2684BF1C09E6EBFF003279F3 /* iterators.h */,

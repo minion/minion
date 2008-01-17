@@ -69,7 +69,7 @@ namespace Controller
     D_INFO(0,DI_SOLVER,"World Pop");
 	D_ASSERT(are_queues_empty());
     backtrackable_memory.world_pop();
-    big_rangevar_container.bms_array->undo();
+    big_rangevar_container.bms_array.undo();
   }
   
   inline void world_pop_all()

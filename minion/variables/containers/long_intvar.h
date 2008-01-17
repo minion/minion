@@ -47,7 +47,7 @@ struct BigRangeVarContainer {
   static const d_type one = static_cast<d_type>(1);
   BackTrackOffset bound_data;
   // MemOffset bms_pointers;
-  MonotonicSet* bms_array;
+  MonotonicSet bms_array;
   TriggerList trigger_list;
 
   
@@ -94,13 +94,13 @@ struct BigRangeVarContainer {
 	}
     /// Note: before calling isMember, remove the lower initial bound from the offset.
     //if(bms_pointer(d)->isMember(loopvar - low_bound) && (loopvar >= lower))
-    if(bms_array->isMember(var_offset[d.var_num] + loopvar - low_bound) && (loopvar >= lower))
+    if(bms_array.isMember(var_offset[d.var_num] + loopvar - low_bound) && (loopvar >= lower))
       return upper_bound(d);
     --loopvar;
     for(; loopvar >= lower; --loopvar)
     {
       //if(bms_pointer(d)->isMember(loopvar - low_bound)) 
-      if(bms_array->isMember(var_offset[d.var_num] + loopvar - low_bound)) 
+      if(bms_array.isMember(var_offset[d.var_num] + loopvar - low_bound)) 
         return loopvar;
     }
     Controller::fail();
@@ -124,12 +124,12 @@ struct BigRangeVarContainer {
 	}
   /// Note: before calling isMember, remove the lower initial bound from the offset.
     //if(bms_pointer(d)->isMember(loopvar - low_bound) && (loopvar <= upper))
-    if(bms_array->isMember(var_offset[d.var_num] + loopvar - low_bound) && (loopvar <= upper))
+    if(bms_array.isMember(var_offset[d.var_num] + loopvar - low_bound) && (loopvar <= upper))
       return lower_bound(d);
     ++loopvar;
     for(; loopvar <= upper; ++loopvar)
     {
-      if(bms_array->isMember(var_offset[d.var_num] + loopvar - low_bound)) 
+      if(bms_array.isMember(var_offset[d.var_num] + loopvar - low_bound)) 
         return loopvar;
     }
     Controller::fail();
@@ -142,7 +142,7 @@ struct BigRangeVarContainer {
     D_ASSERT(!lock_m);
     lock_m = true;
     bound_data.request_bytes(var_count_m * 2 * sizeof(domain_bound_type));
-    bms_array = new MonotonicSet(var_offset.back());
+    bms_array.initialise(var_offset.back(), var_offset.back());
     domain_bound_type* bound_ptr = static_cast<domain_bound_type*>(bound_data.get_ptr());
     for(unsigned int i = 0; i < var_count_m; ++i)
     {
@@ -190,7 +190,7 @@ struct BigRangeVarContainer {
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
       return false;
-    return bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
+    return bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
   }
   
   BOOL inDomain_noBoundCheck(BigRangeVarRef_internal d, DomainInt i) const
@@ -198,7 +198,7 @@ struct BigRangeVarContainer {
     D_ASSERT(lock_m);
     D_ASSERT(i >= lower_bound(d));
     D_ASSERT(i <= upper_bound(d));
-    return bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
+    return bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
   }
   
   DomainInt getMin(BigRangeVarRef_internal d) const
@@ -229,7 +229,7 @@ struct BigRangeVarContainer {
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
     //bms_pointer(d)->print_state();
-    bms_array->print_state();
+    bms_array.print_state();
 #endif
     D_ASSERT(lock_m);
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
@@ -246,8 +246,8 @@ struct BigRangeVarContainer {
 #endif
     trigger_list.push_domain(d.var_num);
     //bms_pointer(d)->remove(offset - initial_bounds[d.var_num].first);
-    bms_array->remove(var_offset[d.var_num] + offset - initial_bounds[d.var_num].first);
-    D_ASSERT( ! bms_array->isMember(var_offset[d.var_num] + offset - initial_bounds[d.var_num].first));
+    bms_array.remove(var_offset[d.var_num] + offset - initial_bounds[d.var_num].first);
+    D_ASSERT( ! bms_array.isMember(var_offset[d.var_num] + offset - initial_bounds[d.var_num].first));
     domain_bound_type up_bound = upper_bound(d);
     if(offset == up_bound)
     {
@@ -271,7 +271,7 @@ struct BigRangeVarContainer {
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
-    bms_array->print_state();
+    bms_array.print_state();
 #endif
     return;
   }
@@ -333,7 +333,7 @@ struct BigRangeVarContainer {
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
-    bms_array->print_state();
+    bms_array.print_state();
 #endif
 
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
@@ -382,7 +382,7 @@ struct BigRangeVarContainer {
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
-    bms_array->print_state();
+    bms_array.print_state();
 #endif
   }
   
@@ -393,7 +393,7 @@ struct BigRangeVarContainer {
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
-    bms_array->print_state();
+    bms_array.print_state();
 #endif
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
@@ -444,7 +444,7 @@ struct BigRangeVarContainer {
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
-    bms_array->print_state();
+    bms_array.print_state();
 #endif
   }
   

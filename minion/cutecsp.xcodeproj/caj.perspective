@@ -222,6 +222,8 @@
 			<key>Layout</key>
 			<array>
 				<dict>
+					<key>BecomeActive</key>
+					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -262,6 +264,8 @@
 								<string>08FB7795FE84155DC02AAC07</string>
 								<string>260A0A4F0C3BB39A00CFEEE1</string>
 								<string>260A0A490C3BB32600CFEEE1</string>
+								<string>260A0A420C3BB28700CFEEE1</string>
+								<string>260A0A400C3BB25A00CFEEE1</string>
 								<string>260A0A3C0C3BB20A00CFEEE1</string>
 								<string>26F697FD0986D79A00D3B93B</string>
 								<string>26F697FC0986D78E00D3B93B</string>
@@ -269,14 +273,13 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>5</integer>
-									<integer>3</integer>
+									<integer>45</integer>
 									<integer>2</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {205, 725}}</string>
+							<string>{{0, 633}, {205, 725}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -293,7 +296,7 @@
 							<real>205</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>506 94 923 784 0 0 1440 878 </string>
+						<string>477 94 923 784 0 0 1440 878 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -304,14 +307,12 @@
 					<key>Dock</key>
 					<array>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
 								<string>266B6E350B6BF72A00564E0D</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>minion.cpp</string>
+								<string>trailed_monotonic_set.h</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -319,11 +320,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>266B6E360B6BF72A00564E0D</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>minion.cpp</string>
+										<string>trailed_monotonic_set.h</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>264BD2230C469737006E39B8</string>
+										<string>260CE1E70C46D19400BEB071</string>
 										<key>history</key>
 										<array>
 											<string>261F57F30C4514E60016D625</string>
@@ -389,13 +390,13 @@
 											<string>264BD1D10C466BD9006E39B8</string>
 											<string>264BD1E70C467F7C006E39B8</string>
 											<string>264BD1E80C467F7C006E39B8</string>
-											<string>264BD1E90C467F7C006E39B8</string>
 											<string>264BD1EA0C467F7C006E39B8</string>
 											<string>264BD1EB0C467F7C006E39B8</string>
 											<string>264BD1FD0C468140006E39B8</string>
 											<string>264BD2150C4684B9006E39B8</string>
 											<string>264BD2160C4684B9006E39B8</string>
-											<string>264BD21E0C468A65006E39B8</string>
+											<string>260CE1E40C46D19400BEB071</string>
+											<string>260CE1E50C46D19400BEB071</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -468,23 +469,8 @@
 											<string>2654E5A20C464F90003A11EC</string>
 											<string>2654E5EE0C465565003A11EC</string>
 											<string>2654E6150C4658C9003A11EC</string>
-											<string>264BD1D30C466BD9006E39B8</string>
-											<string>264BD1D40C466BD9006E39B8</string>
-											<string>264BD1D50C466BD9006E39B8</string>
-											<string>264BD1ED0C467F7C006E39B8</string>
-											<string>264BD1EE0C467F7C006E39B8</string>
 											<string>264BD1EF0C467F7C006E39B8</string>
-											<string>264BD1F00C467F7C006E39B8</string>
-											<string>264BD1F10C467F7C006E39B8</string>
-											<string>264BD1F20C467F7C006E39B8</string>
-											<string>264BD1F30C467F7C006E39B8</string>
-											<string>264BD1FF0C468140006E39B8</string>
-											<string>264BD2000C468140006E39B8</string>
-											<string>264BD2010C468140006E39B8</string>
-											<string>264BD20B0C4681CD006E39B8</string>
-											<string>264BD2180C4684B9006E39B8</string>
-											<string>264BD2190C4684B9006E39B8</string>
-											<string>264BD21A0C4684B9006E39B8</string>
+											<string>260CE1E60C46D19400BEB071</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -500,7 +486,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {696, 432}}</string>
 								<key>RubberWindowFrame</key>
-								<string>506 94 923 784 0 0 1440 878 </string>
+								<string>477 94 923 784 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -523,7 +509,7 @@
 									<key>GeometryConfiguration</key>
 									<dict>
 										<key>Frame</key>
-										<string>{{10, 27}, {801, 318}}</string>
+										<string>{{10, 27}, {696, 279}}</string>
 									</dict>
 									<key>Module</key>
 									<string>XCDetailModule</string>
@@ -541,7 +527,7 @@
 										<key>Frame</key>
 										<string>{{10, 27}, {696, 279}}</string>
 										<key>RubberWindowFrame</key>
-										<string>506 94 923 784 0 0 1440 878 </string>
+										<string>477 94 923 784 0 0 1440 878 </string>
 									</dict>
 									<key>Module</key>
 									<string>PBXProjectFindModule</string>
@@ -584,11 +570,11 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>264BD1CA0C466A69006E39B8</string>
+				<string>260CE1E80C46D19400BEB071</string>
 				<string>1CA23ED40692098700951B8B</string>
-				<string>264BD1CB0C466A69006E39B8</string>
+				<string>260CE1E90C46D19400BEB071</string>
 				<string>266B6E350B6BF72A00564E0D</string>
-				<string>264BD1CC0C466A69006E39B8</string>
+				<string>260CE1EA0C46D19400BEB071</string>
 				<string>1CA23EDF0692099D00951B8B</string>
 				<string>1CA23EE00692099D00951B8B</string>
 				<string>1CA23EE10692099D00951B8B</string>
@@ -1113,7 +1099,7 @@
 		<string>/Users/caj/minion/trunk/minion/cutecsp.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>506 94 923 784 0 0 1440 878 </string>
+	<string>477 94 923 784 0 0 1440 878 </string>
 	<key>WindowTools</key>
 	<array>
 		<dict>

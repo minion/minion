@@ -54,6 +54,13 @@ public:
 	int val = checked_cast<int>(i);
     return static_cast<value_type*>(_array.get_ptr())[val]; 
   }
+  
+  const value_type& array(DomainInt i) const
+  { 
+    D_ASSERT( i >= 0 && i < size());
+	int val = checked_cast<int>(i);
+    return static_cast<const value_type*>(_array.get_ptr())[val]; 
+  }
 
   bool needs_undoing()
   {
@@ -98,7 +105,7 @@ public:
     array(index) = newval;
   }
 
-  int size()
+  int size() const
   {
     return _size;    
   }
@@ -109,7 +116,7 @@ public:
     if (array(index)) { set(index,0); }
   }
 
-  bool isMember(DomainInt index)
+  bool isMember(DomainInt index) const
   {
     return (bool)array(index);
   }
@@ -137,15 +144,16 @@ void initialise(const int& size, const int& max_undos)
 #ifdef DEBUG
     // print_state();
 #endif
+    
+    for(int i=0; i<size; i++) {
+      array(i) = one;
+    };
   }
 
-TrailedMonotonicSet(const int& size)
-{
-  initialise(size,size) ;       // max number of removals = size
-  for(int i=0; i<size; i++) {
-     array(i) = one;
-  };
-}
+  
+  
+TrailedMonotonicSet()
+{ } 
 
 
 void print_state()
