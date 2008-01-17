@@ -1,5 +1,6 @@
 18/09/2006 - Chris
 	* - Fix bug parsing Sparse Bound variables in new parser
+    * - Add more propagation to the gacelement constraint
 
 ... - Chris
 	* - Didn't bother keeping changelog for a while. Lots of changes.
