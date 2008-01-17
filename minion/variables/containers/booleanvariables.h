@@ -192,6 +192,9 @@ struct BooleanContainer
   void removeFromDomain(const BoolVarRef_internal& d, DomainInt b)
   {
     D_ASSERT(lock_m && d.var_num < var_count_m);
+    if(b != 0 && b != 1)
+      return;
+      
     if(d.isAssigned())
     {
       if(b == d.getAssignedValue()) 
