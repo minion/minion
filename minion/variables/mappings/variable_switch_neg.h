@@ -114,8 +114,8 @@ struct SwitchNeg
   void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(b * multiplier); }
   
-  void propogateAssign(DomainInt b)
-  { data.propogateAssign(b * multiplier); }
+  void propagateAssign(DomainInt b)
+  { data.propagateAssign(b * multiplier); }
   
   void removeFromDomain(DomainInt b)
   { data.removeFromDomain(b * multiplier); }

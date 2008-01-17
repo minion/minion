@@ -56,7 +56,7 @@ void lock()
 	// To propagate the first node.
 	for(int i = 0; i < size; ++i)
 	{
-	  constraints[i]->full_propogate();
+	  constraints[i]->full_propagate();
 	  if(Controller::failed) 
 		return;
 	  // If queues not empty, more work to do.
@@ -71,8 +71,8 @@ void lock()
 #ifdef DYNAMICTRIGGERS
   for(int i = 0; i < dynamic_size; ++i)
   {
-	dynamic_constraints[i]->full_propogate();
-	propogate_queue();
+	dynamic_constraints[i]->full_propagate();
+	propagate_queue();
 	if(Controller::failed) 
 	  return;
   }

@@ -11,19 +11,19 @@
 // everything else. In an ideal world, this would live in a
 // .c file, but we want them to be inlinable.
 
-inline void Trigger::propogate(DomainDelta domain_data)
+inline void Trigger::propagate(DomainDelta domain_data)
 {
     D_INFO(0,DI_SOLVER,"Trigger Activated");
 #ifdef FUNCTIONPOINTER_TRIGGER
     constraint_function_ptr(constraint, info, domain_data);
 #else
-    constraint->propogate(info, domain_data); 
+    constraint->propagate(info, domain_data); 
 #endif
 }
 
-inline void Trigger::full_propogate()
+inline void Trigger::full_propagate()
 {
-    D_INFO(0,DI_SOLVER,"Trigger Full Propogated");
-    constraint->full_propogate(); 
+    D_INFO(0,DI_SOLVER,"Trigger Full Propagated");
+    constraint->full_propagate(); 
 }
 

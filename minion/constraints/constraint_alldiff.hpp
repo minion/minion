@@ -119,7 +119,7 @@ By: John Tromp
   
   template<typename VarArray>
 	void
-    AllDiffConstraint<VarArray>::propogate(int prop_val,int)
+    AllDiffConstraint<VarArray>::propagate(int prop_val,int)
   {
       if(prop_val<0)
       {

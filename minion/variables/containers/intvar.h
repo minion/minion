@@ -250,7 +250,7 @@ struct RangeVarContainer {
     return;
   }
   
-  void propogateAssign(RangeVarRef_internal d, DomainInt i)
+  void propagateAssign(RangeVarRef_internal d, DomainInt i)
   {
     DomainInt offset = i - var_min;
     if(!inDomain(d,i))
@@ -295,7 +295,7 @@ struct RangeVarContainer {
   void uncheckedAssign(RangeVarRef_internal d, DomainInt i)
   { 
     D_ASSERT(inDomain(d,i));
-    propogateAssign(d,i); 
+    propagateAssign(d,i); 
   }
   
   void setMax(RangeVarRef_internal d, DomainInt i)

@@ -133,7 +133,7 @@ struct LessEqualSumConstraint : public Constraint
     return check_unsat(0,0);
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     DomainInt min_sum = 0;
     DomainInt max_diff = 0;
@@ -146,7 +146,7 @@ struct LessEqualSumConstraint : public Constraint
     var_array_min_sum = min_sum;
     max_looseness = max_diff;
 	D_ASSERT(var_array[0].getDomainChange(0) == 0);
-    propogate(0,0);
+    propagate(0,0);
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)

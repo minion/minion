@@ -66,9 +66,9 @@ struct VecNeqDynamic : public DynamicConstraint
 	{ var.removeFromDomain(val); }
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
-    D_INFO(2, DI_VECNEQ, "Starting full propogate");
+    D_INFO(2, DI_VECNEQ, "Starting full propagate");
 	DynamicTrigger* dt = dynamic_trigger_start();
 	int size = var_array1.size();
     int index = 0;
@@ -201,7 +201,7 @@ struct VecNeqDynamic : public DynamicConstraint
 		   var_array2[other_index].getAssignedValue())
 		{
 		  D_INFO(2, DI_VECNEQ, "Index " + to_string(other_index) + " is assigned & equal" +
-							   " so propogating " + to_string(original_index));
+							   " so ping " + to_string(original_index));
 		  if(var_array2[original_index].isAssigned())
 		    remove_value(var_array2[original_index].getAssignedValue(),
 						 var_array1[original_index]);

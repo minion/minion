@@ -28,7 +28,7 @@
 namespace Controller
 {
   
-  VARDEF(vector<TriggerRange> propogate_trigger_list);
+  VARDEF(vector<TriggerRange> propagate_trigger_list);
 #ifdef DYNAMICTRIGGERS
   VARDEF(vector<DynamicTrigger*> dynamic_trigger_list);
 #endif  
@@ -49,8 +49,8 @@ namespace Controller
   { 
 	CON_INFO_ADDONE(AddConToQueue);
     D_INFO(1, DI_QUEUE, string("Adding new triggers. Trigger list size is ") + 
-		   to_string(propogate_trigger_list.size()) + ".");
-	propogate_trigger_list.push_back(new_triggers); 
+		   to_string(propagate_trigger_list.size()) + ".");
+	propagate_trigger_list.push_back(new_triggers); 
   }
   
 #ifdef DYNAMICTRIGGERS
@@ -65,7 +65,7 @@ namespace Controller
   
   inline void clear_queues()
   {
-	propogate_trigger_list.clear();
+	propagate_trigger_list.clear();
 	dynamic_trigger_list.clear();
 	
 	if(!special_triggers.empty())
@@ -79,14 +79,14 @@ namespace Controller
   
   inline BOOL are_queues_empty()
   { 
-	return propogate_trigger_list.empty() && dynamic_trigger_list.empty() &&
+	return propagate_trigger_list.empty() && dynamic_trigger_list.empty() &&
 	       special_triggers.empty();
   }
   // next_queue_ptr is defined in constraint_dynamic.
   // It is used if pointers are moved around.
   
   
-  inline BOOL propogate_dynamic_trigger_lists()
+  inline BOOL propagate_dynamic_trigger_lists()
   {
 	BOOL* fail_ptr = &Controller::failed;
 	while(!dynamic_trigger_list.empty())
@@ -112,7 +112,7 @@ namespace Controller
 		next_queue_ptr = it->next;
 		D_INFO(1, DI_QUEUE, string("Will do ") + to_string(next_queue_ptr) + " next");
 		CON_INFO_ADDONE(DynamicTrigger);
-		it->propogate();  
+		it->propagate();  
 
 		it = next_queue_ptr;
 	  }
@@ -120,14 +120,14 @@ namespace Controller
 	return false;
   }
   
-  inline BOOL propogate_static_trigger_lists()
+  inline BOOL propagate_static_trigger_lists()
   {
 	BOOL* fail_ptr = &Controller::failed;
-	while(!propogate_trigger_list.empty())
+	while(!propagate_trigger_list.empty())
 	{
-	  TriggerRange t = propogate_trigger_list.back();
+	  TriggerRange t = propagate_trigger_list.back();
 	  int data_val = t.data;
-	  propogate_trigger_list.pop_back();
+	  propagate_trigger_list.pop_back();
 	  
 	  for(Trigger* it = t.begin(); it != t.end(); it++)
 	  {
@@ -140,17 +140,17 @@ namespace Controller
 #endif
 		
 #ifndef NO_DEBUG
-		if(commandlineoption_fullpropogate)
-		  it->full_propogate();
+		if(commandlineoption_fullpropagate)
+		  it->full_propagate();
 		else
 		{
 		  CON_INFO_ADDONE(StaticTrigger);
-		  it->propogate(data_val);
+		  it->propagate(data_val);
 		}
 #else
 		{
 		  CON_INFO_ADDONE(StaticTrigger);
-		  it->propogate(data_val);
+		  it->propagate(data_val);
 		}
 #endif
 	  }
@@ -159,9 +159,9 @@ namespace Controller
 	return false;
   }
   
-  inline void propogate_queue()
+  inline void propagate_queue()
   {
-    D_INFO(2, DI_QUEUE, "Starting Propogation");
+    D_INFO(2, DI_QUEUE, "Starting Propagation");
 #ifdef USE_SETJMP
     int setjmp_return = SYSTEM_SETJMP(g_env);
 	if(setjmp_return != 0)
@@ -179,23 +179,23 @@ namespace Controller
 #ifdef DYNAMICTRIGGERS
 	  if (dynamic_triggers_used) 
 	  {
-		while(!propogate_trigger_list.empty() || !dynamic_trigger_list.empty())
+		while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
 		{
-		  if(propogate_dynamic_trigger_lists())
+		  if(propagate_dynamic_trigger_lists())
 			return;
 		  
 		  /* Don't like code duplication here but a slight efficiency gain */
-		  if(propogate_static_trigger_lists())
+		  if(propagate_static_trigger_lists())
 			return;
 		}
 	  }
 	  else
 	  {
-		if(propogate_static_trigger_lists())
+		if(propagate_static_trigger_lists())
 		  return;
 	  }
 #else
-	  if(propogate_static_trigger_lists())
+	  if(propagate_static_trigger_lists())
 		return;
 #endif
 	  
@@ -216,7 +216,7 @@ namespace Controller
   // and normal propagate to have the same input method.
   // Just checking the bounds doesn't make sense here, so we ignore it.
   template<typename Vars>
-  inline void propogate_queue_vars(Vars& vars, bool /*CheckBounds*/)
-  {	propogate_queue(); }
+  inline void propagate_queue_vars(Vars& vars, bool /*CheckBounds*/)
+  {	propagate_queue(); }
 } // namespace Controller
 

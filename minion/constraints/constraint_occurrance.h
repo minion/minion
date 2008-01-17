@@ -24,10 +24,6 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
-
-
-
 template<typename VarArray, typename Val, typename ValCount>
 struct OccurrenceEqualConstraint : public Constraint
 {
@@ -92,7 +88,7 @@ struct OccurrenceEqualConstraint : public Constraint
         ++occs; 
       }
       else
-      { it->propogateAssign(value); }
+      { it->propagateAssign(value); }
     }
     //D_ASSERT(occs >= oalc_count());
     if(occs > (static_cast<int>(var_array.size()) - val_count))
@@ -157,12 +153,12 @@ struct OccurrenceEqualConstraint : public Constraint
 	not_occurrences_count = not_occs;
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     setup_counters();
     int i = occurrences_count;
     int j = not_occurrences_count;
-    D_INFO(1,DI_SUMCON,to_string("Full Propogate, count",i));
+    D_INFO(1,DI_SUMCON,to_string("Full Propagate, count",i));
     if(i > val_count)
       Controller::fail();
     if(i == val_count)
@@ -305,10 +301,10 @@ struct OccurrenceLeqConstraint : public Constraint
     }
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     int i = count.get();
-    D_INFO(1,DI_SUMCON,to_string("Full Propogate, count",i));
+    D_INFO(1,DI_SUMCON,to_string("Full Propagate, count",i));
     if(i > val_count)
       Controller::fail();
     if(i == val_count)

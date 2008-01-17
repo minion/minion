@@ -62,7 +62,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	if (var_sum == array_size)
 	{
 	  // In this case every var will be set to 1
-	  // This will happen before triggers set up in full_propogate
+	  // This will happen before triggers set up in full_propagate
 	  // Thus zero triggers are needed
 	  // However we will say that 1 is needed 
 	  //     because I don't know if setup code will work when 0 triggers requested
@@ -83,7 +83,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	}
   }
     
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
@@ -114,7 +114,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 		if(var_array[i].inDomain(value_array[i]))
 		{
 		  D_INFO(1, DI_DYSUMCON, to_string(i) + " watched, so pruning.");
-		  var_array[i].propogateAssign(value_array[i]);
+		  var_array[i].propagateAssign(value_array[i]);
 		}
 	  }
 	}
@@ -216,7 +216,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	{
 	  if(dt != dt2)       // that one has just been set the other way
 	  {
-		var_array[dt2->trigger_info()].propogateAssign(value_array[dt2->trigger_info()]);
+		var_array[dt2->trigger_info()].propagateAssign(value_array[dt2->trigger_info()]);
 	  }
 	  dt2++;
 	}

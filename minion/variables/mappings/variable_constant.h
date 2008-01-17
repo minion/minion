@@ -81,7 +81,7 @@ struct ConstantVar
   void uncheckedAssign(DomainInt)
   { FAIL_EXIT(); }
   
-  void propogateAssign(DomainInt b)
+  void propagateAssign(DomainInt b)
   {if(b != val) Controller::fail(); }
   
   void removeFromDomain(DomainInt b)

@@ -206,7 +206,7 @@ struct SparseBoundVarContainer {
   }
   
   
-  void propogateAssign(SparseBoundVarRef_internal d, DomainInt i)
+  void propagateAssign(SparseBoundVarRef_internal d, DomainInt i)
   {
     vector<BoundType>& bounds = get_domain(d);
     if(!binary_search(bounds.begin(), bounds.end(), i))
@@ -244,7 +244,7 @@ struct SparseBoundVarContainer {
   
   // TODO : Optimise
   void uncheckedAssign(SparseBoundVarRef_internal d, DomainInt i)
-  { propogateAssign(d,i); }
+  { propagateAssign(d,i); }
   
   void setMax(SparseBoundVarRef_internal d, DomainInt i)
   {

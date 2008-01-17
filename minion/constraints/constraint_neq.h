@@ -118,7 +118,7 @@ struct NeqConstraint : public Constraint
   }
   
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
@@ -222,7 +222,7 @@ struct NeqConstraintBinary : public Constraint
   //  virtual BOOL check_unsat(int i, DomainDelta)
   
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     if(var1.isAssigned())
     { 

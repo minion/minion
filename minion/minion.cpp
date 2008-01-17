@@ -134,7 +134,7 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
 	else if(command == string("-fullprop"))
 	{
 #ifndef NO_DEBUG
-	  Controller::commandlineoption_fullpropogate = true; 
+	  Controller::commandlineoption_fullpropagate = true; 
 #else
 	  cout << "This version of minion was not built to support the '-fullprop' command. Sorry" << endl;
 	  FAIL_EXIT();
@@ -371,7 +371,7 @@ void SolveCSP(Reader& reader, MinionArguments args)
 	  long long lits = lit_count(var_val_order.first);
       cout << "Initial GAC loop literal removal:" << initial_lit_count - lits << endl;
 	  clock_t start_SAC_time = clock();
-	  PropogateSAC prop;
+	  PropagateSAC prop;
       prop(var_val_order.first, bounds_check);
       cout << "Preprocess Time: " << (clock() - start_SAC_time) / (1.0 * CLOCKS_PER_SEC) << endl;
 	  cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;
@@ -379,7 +379,7 @@ void SolveCSP(Reader& reader, MinionArguments args)
 	  {
 		long long lits = lit_count(var_val_order.first);
 		clock_t start_SAC_time = clock();
-		PropogateSSAC prop;
+		PropagateSSAC prop;
 		prop(var_val_order.first, bounds_check);
 		cout << "Preprocess 2 Time: " << (clock() - start_SAC_time) / (1.0 * CLOCKS_PER_SEC) << endl;
 		cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;

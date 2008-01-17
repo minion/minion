@@ -175,22 +175,22 @@ struct GACTableConstraint : public DynamicConstraint
 #endif
   }
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propogated_trig)
+  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
   {
 	PROP_INFO_ADDONE(DynGACTable);
 
-	D_INFO(1, DI_TABLECON, "Propogation Triggered: " + to_string(propogated_trig));
+	D_INFO(1, DI_TABLECON, "Propagation Triggered: " + to_string(propagated_trig));
 	DynamicTrigger* dt = dynamic_trigger_start();
-	int trigger_pos = propogated_trig - dt;
-	int propogated_literal = trigger_pos / (vars.size() - 1);
+	int trigger_pos = propagated_trig - dt;
+	int propagated_literal = trigger_pos / (vars.size() - 1);
 
-	pair<int,int> varval = (lists->tuples->get_varval_from_literal)(propogated_literal);
-	BOOL is_new_support = find_new_support(propogated_literal, varval.first);
+	pair<int,int> varval = (lists->tuples->get_varval_from_literal)(propagated_literal);
+	BOOL is_new_support = find_new_support(propagated_literal, varval.first);
 	if(is_new_support)
 	{
 	  D_INFO(1, DI_TABLECON, "Found new support!");
 	  setup_watches(varval.first, varval.second);
-                // better to just pass in varval.first and propogated_literal
+                // better to just pass in varval.first and propagated_literal
                 // setup_watches does not need value and recomputes lit
 	}
 	else
@@ -219,7 +219,7 @@ struct GACTableConstraint : public DynamicConstraint
 	}
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   { 
 	for(unsigned i = 0; i < vars.size(); ++i)
 	{

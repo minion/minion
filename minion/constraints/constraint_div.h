@@ -70,14 +70,14 @@ struct DivConstraint : public Constraint
 	PROP_INFO_ADDONE(Pow);
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   { 
-	propogate(1,0); 
-    propogate(2,0);
-    propogate(3,0);
-    propogate(-1,0);
-    propogate(-2,0);
-    propogate(-3,0);
+	propagate(1,0); 
+    propagate(2,0);
+    propagate(3,0);
+    propagate(-1,0);
+    propagate(-2,0);
+    propagate(-3,0);
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)

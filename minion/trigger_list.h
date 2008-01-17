@@ -175,7 +175,7 @@ public:
   }
   
 #ifdef DYNAMICTRIGGERS
-  void dynamic_propogate(int var_num, TrigType type, DomainInt val_removed = -999)
+  void dynamic_propagate(int var_num, TrigType type, DomainInt val_removed = -999)
   {
     D_ASSERT(val_removed == -999 || ( type == DomainRemoval && val_removed != -999) );
 	D_ASSERT(!only_bounds || type != DomainRemoval);
@@ -203,7 +203,7 @@ public:
   void push_upper(int var_num, DomainInt upper_delta)
   {
 #ifdef DYNAMICTRIGGERS
-    if (dynamic_triggers_used) dynamic_propogate(var_num, UpperBound);
+    if (dynamic_triggers_used) dynamic_propagate(var_num, UpperBound);
 #endif
 	D_ASSERT(lock_second);
     D_ASSERT(upper_delta > 0 || Controller::failed);
@@ -221,7 +221,7 @@ public:
   void push_lower(int var_num, DomainInt lower_delta)
   { 
 #ifdef DYNAMICTRIGGERS
-    if (dynamic_triggers_used) dynamic_propogate(var_num, LowerBound);
+    if (dynamic_triggers_used) dynamic_propagate(var_num, LowerBound);
 #endif
 	D_ASSERT(lock_second);
 	D_ASSERT(lower_delta > 0 || Controller::failed);
@@ -239,7 +239,7 @@ public:
   void push_assign(int var_num, DomainInt)
   { 
 #ifdef DYNAMICTRIGGERS
-    if (dynamic_triggers_used) dynamic_propogate(var_num, Assigned);
+    if (dynamic_triggers_used) dynamic_propagate(var_num, Assigned);
 #endif
     D_ASSERT(lock_second);
 
@@ -255,7 +255,7 @@ public:
   void push_domain(int var_num)
   { 
 #ifdef DYNAMICTRIGGERS
-    if (dynamic_triggers_used) dynamic_propogate(var_num, DomainChanged);
+    if (dynamic_triggers_used) dynamic_propagate(var_num, DomainChanged);
 #endif
 	
 #ifdef SLOW_TRIGGERS
@@ -272,7 +272,7 @@ public:
   { 
 	D_ASSERT(!only_bounds);
 #ifdef DYNAMICTRIGGERS
-    dynamic_propogate(var_num, DomainRemoval, val_removed);
+    dynamic_propagate(var_num, DomainRemoval, val_removed);
 #endif
 	D_ASSERT(lock_second);
   }

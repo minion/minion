@@ -159,7 +159,7 @@ struct BoundVarContainer {
     FAIL_EXIT();
   }
   
-  void propogateAssign(BoundVarRef_internal d, DomainInt i)
+  void propagateAssign(BoundVarRef_internal d, DomainInt i)
   {
     DomainInt min_val = getMin(d);
     DomainInt max_val = getMax(d);
@@ -189,7 +189,7 @@ struct BoundVarContainer {
   void uncheckedAssign(BoundVarRef_internal d, DomainInt i)
   { 
     D_ASSERT(inDomain(d,i));
-    propogateAssign(d,i); 
+    propagateAssign(d,i); 
   }
   
   void setMax(BoundVarRef_internal d, DomainInt i)

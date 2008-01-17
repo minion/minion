@@ -154,8 +154,8 @@ struct ProductConstraint : public Constraint
 	}
   }
   
-  virtual void full_propogate()
-  { propogate(0,0); }
+  virtual void full_propagate()
+  { propagate(0,0); }
   
   virtual BOOL check_assignment(vector<DomainInt> v)
   {

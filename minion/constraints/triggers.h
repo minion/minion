@@ -61,7 +61,7 @@ struct Trigger
 #ifdef FUNCTIONPOINTER_TRIGGER
   { 
     typedef void(T::*prop_ptr_type)(int, DomainDelta);
-	prop_ptr_type ptr = &T::propogate;
+	prop_ptr_type ptr = &T::propagate;
     memcpy(&constraint_function_ptr,&ptr,sizeof(fun_ptr)); 
 	D_ASSERT(constraint_function_ptr != NULL);
   }
@@ -78,8 +78,8 @@ struct Trigger
   Trigger() : constraint(NULL)
   {}
   
-  void propogate(DomainDelta domain_data);
-  void full_propogate();
+  void propagate(DomainDelta domain_data);
+  void full_propagate();
   // In function_defs.hpp.
 };
 

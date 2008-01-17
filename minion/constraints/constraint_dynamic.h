@@ -29,7 +29,7 @@ struct DynamicConstraint;
 struct DynamicTrigger;
 
 
-#define DYNAMIC_PROPAGATE_FUNCTION virtual void propogate
+#define DYNAMIC_PROPAGATE_FUNCTION virtual void propagate
 
 #ifndef NO_DYN_CHECK
 VARDEF_ASSIGN(DynamicTrigger* next_queue_ptr, NULL);
@@ -119,9 +119,9 @@ public:
     D_ASSERT(new_prev->sanity_check_list());
   }
   
-  /// Propogates the constraint stored in the trigger.
+  /// Propagates the constraint stored in the trigger.
   /** Out of line as it needs the full definition of DynamicConstraint */
-  void propogate();
+  void propagate();
   
   ~DynamicTrigger()
   { D_DATA(sanity_check = -1); }
@@ -182,9 +182,9 @@ struct DynamicConstraint
   /// Defines the number of dynamic triggers the constraint wants.
   virtual int dynamic_trigger_count() = 0;
   
-  /// Performs a full round of propagation and sets up any data needs by propogate().
+  /// Performs a full round of propagation and sets up any data needs by propagate().
   /** This function can be called during search if the function is reified */
-  virtual void full_propogate() = 0;
+  virtual void full_propagate() = 0;
   
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
@@ -203,10 +203,10 @@ struct DynamicConstraint
 };
 
 
-inline void DynamicTrigger::propogate()
+inline void DynamicTrigger::propagate()
 { 
   D_ASSERT(sanity_check == 1234);
-  constraint->propogate(this); 
+  constraint->propagate(this); 
 }
 
 

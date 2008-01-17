@@ -182,8 +182,8 @@ struct MultiplyVar
     data.uncheckedAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); 
   }
   
-  void propogateAssign(DomainInt b)
-  { data.propogateAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); }
+  void propagateAssign(DomainInt b)
+  { data.propagateAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); }
   
   void removeFromDomain(DomainInt)
   { FAIL_EXIT(); }

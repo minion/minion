@@ -116,7 +116,7 @@ struct ElementConstraint : public Constraint
     }
   }
 
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     if(index_ref.isAssigned())
     {

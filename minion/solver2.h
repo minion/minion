@@ -46,7 +46,7 @@ namespace Controller
   VARDEF_ASSIGN(BOOL print_only_solution, false);
   VARDEF_ASSIGN(BOOL commandlineoption_dumptree, false);
   VARDEF_ASSIGN(int commandlineoption_sollimit, -1);
-  VARDEF_ASSIGN(BOOL commandlineoption_fullpropogate, false);
+  VARDEF_ASSIGN(BOOL commandlineoption_fullpropagate, false);
   VARDEF_ASSIGN(BOOL commandlineoption_nocheck, false);
   VARDEF_ASSIGN(unsigned long long commandlineoption_nodelimit, 0);
   

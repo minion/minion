@@ -55,7 +55,7 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 	return 2;
   }
     
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
@@ -83,7 +83,7 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 	
 	if(index >= array_size)
 	{ // Only one valid variable.
-	  var_array[trig1].propogateAssign(1);
+	  var_array[trig1].propagateAssign(1);
 	  return;
 	}
 	
@@ -145,7 +145,7 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 	
 	  if(!found_new_support)
 	  {  // Have to propagate!
-        var_array[other_propval].propogateAssign(1);
+        var_array[other_propval].propagateAssign(1);
 	    return;
 	  }
 	}

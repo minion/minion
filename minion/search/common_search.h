@@ -184,7 +184,7 @@ void inline maybe_print_search_action(char* action)
 	  throw 0;
   }
 
-  void inline set_optimise_and_propogate_queue()
+  void inline set_optimise_and_propagate_queue()
   {
   #ifdef USE_SETJMP
 	if(optimise)
@@ -195,17 +195,17 @@ void inline maybe_print_search_action(char* action)
 	  if(optimise_var->getMax() >= current_optimise_position)
 	  { 
 		optimise_var->setMin(current_optimise_position);
-		propogate_queue();
+		propagate_queue();
 	  }
 	  else
 	  {failed = true; }
 	}
 	else
-	{ propogate_queue();}
+	{ propagate_queue();}
   #else
 	if(optimise)
 	  optimise_var->setMin(current_optimise_position);
-	propogate_queue();
+	propagate_queue();
   #endif	
   }
 

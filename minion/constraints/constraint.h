@@ -29,9 +29,9 @@ struct AbstractTriggerCreator;
 typedef vector<shared_ptr<AbstractTriggerCreator> > triggerCollection;
 
 #ifdef  FUNCTIONPOINTER_TRIGGER
-#define PROPAGATE_FUNCTION void propogate
+#define PROPAGATE_FUNCTION void propagate
 #else
-#define PROPAGATE_FUNCTION virtual void propogate
+#define PROPAGATE_FUNCTION virtual void propagate
 #endif
 
 /// Base type from which all constraints are derived.
@@ -50,12 +50,12 @@ struct Constraint
   // In function_defs.hpp
   //virtual Constraint* get_table_constraint();
 
-  /// Performs a full round of propagation and sets up any data needs by propogate().
+  /// Performs a full round of propagation and sets up any data needs by propagate().
   /** This function can be called during search if the function is reified */
-  virtual void full_propogate() = 0;
+  virtual void full_propagate() = 0;
 /*  { 
     Constraint* c(get_table_constraint());
-    c->full_propogate(); 
+    c->full_propagate(); 
 	delete c;
   }*/
   

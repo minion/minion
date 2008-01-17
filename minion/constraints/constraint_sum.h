@@ -100,7 +100,7 @@ struct BoolLessSumConstraint : public Constraint
     D_ASSERT(var_array[i].getAssignedValue() == 0 ||
 			 var_array[i].getAssignedValue() == 1);
     int c = count + 1;
-    D_INFO(1,DI_SUMCON,to_string("Propogating Constraint, count",c));
+    D_INFO(1,DI_SUMCON,to_string("Ping Constraint, count",c));
     count = c;
     if(c == occ_count())
       limit_reached();
@@ -130,7 +130,7 @@ struct BoolLessSumConstraint : public Constraint
       return false;
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     int occs = 0;
     int array_size = var_array.size();
@@ -138,7 +138,7 @@ struct BoolLessSumConstraint : public Constraint
       if(var_array[i].isAssignedValue(VarToCount))
 		occs++;
     count = occs;
-    D_INFO(1,DI_SUMCON,to_string("Full Propogate, count:",occs));
+    D_INFO(1,DI_SUMCON,to_string("Full Propagate, count:",occs));
     if(occs > occ_count())
       Controller::fail();
     if(occs == occ_count())

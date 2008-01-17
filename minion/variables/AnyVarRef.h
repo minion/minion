@@ -41,7 +41,7 @@ struct AnyVarRef_Abstract
   virtual void setMax(DomainInt i) = 0;
   virtual void setMin(DomainInt i) = 0;
   virtual void uncheckedAssign(DomainInt b) = 0;
-  virtual void propogateAssign(DomainInt b) = 0;
+  virtual void propagateAssign(DomainInt b) = 0;
   virtual void removeFromDomain(DomainInt b) = 0;
   virtual void addTrigger(Trigger t, TrigType type) = 0;
 
@@ -110,8 +110,8 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   virtual void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(b); }
   
-  virtual void propogateAssign(DomainInt b)
-  { data.propogateAssign(b); }
+  virtual void propagateAssign(DomainInt b)
+  { data.propagateAssign(b); }
   
   virtual void removeFromDomain(DomainInt b)
   { data.removeFromDomain(b); }
@@ -193,8 +193,8 @@ struct AnyVarRef
   void uncheckedAssign(DomainInt b)
   { data->uncheckedAssign(b); }
   
-  void propogateAssign(DomainInt b)
-  { data->propogateAssign(b); }
+  void propagateAssign(DomainInt b)
+  { data->propagateAssign(b); }
   
   void removeFromDomain(DomainInt b)
   { data->removeFromDomain(b); }

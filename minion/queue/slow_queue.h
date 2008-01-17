@@ -29,7 +29,7 @@ namespace Controller
 {
   
   typedef  vector<pair<Trigger, short> > triglisttype;
-  VARDEF(triglisttype propogate_trigger_list);
+  VARDEF(triglisttype propagate_trigger_list);
   
 #ifdef DYNAMICTRIGGERS
   VARDEF(vector<DynamicTrigger*> dynamic_trigger_list);
@@ -50,10 +50,10 @@ namespace Controller
   { 
     D_INFO(1, DI_QUEUE, string("Adding ") + to_string(new_triggers.end() - new_triggers.begin())
 		   + string(" new triggers. Trigger list size is ") + 
-		   to_string(propogate_trigger_list.size()) + ".");
+		   to_string(propagate_trigger_list.size()) + ".");
 		   
     for(Trigger* it = new_triggers.begin(); it != new_triggers.end(); ++it)
-      propogate_trigger_list.push_back(make_pair(*it, new_triggers.data));
+      propagate_trigger_list.push_back(make_pair(*it, new_triggers.data));
   }
   
 #ifdef DYNAMICTRIGGERS
@@ -67,7 +67,7 @@ namespace Controller
   
   inline void clear_queues()
   {
-	propogate_trigger_list.clear();
+	propagate_trigger_list.clear();
 	dynamic_trigger_list.clear();
 	
 	if(!special_triggers.empty())
@@ -81,14 +81,14 @@ namespace Controller
   
   inline BOOL are_queues_empty()
   { 
-	return propogate_trigger_list.empty() && dynamic_trigger_list.empty() &&
+	return propagate_trigger_list.empty() && dynamic_trigger_list.empty() &&
 	       special_triggers.empty();
   }
   // next_queue_ptr is defined in constraint_dynamic.
   // It is used if pointers are moved around.
   
   
-  inline BOOL propogate_dynamic_trigger_lists()
+  inline BOOL propagate_dynamic_trigger_lists()
   {
 	BOOL* fail_ptr = &Controller::failed;
 	while(!dynamic_trigger_list.empty())
@@ -110,20 +110,20 @@ namespace Controller
 		D_INFO(1, DI_QUEUE, string("Checking ") + to_string(it));
 		next_queue_ptr = it->next;
 		D_INFO(1, DI_QUEUE, string("Will do ") + to_string(next_queue_ptr) + " next");
-		it->propogate();  
+		it->propagate();  
 		it = next_queue_ptr;
 	  }
 	}
 	return false;
   }
   
-  inline BOOL propogate_static_trigger_lists()
+  inline BOOL propagate_static_trigger_lists()
   {
 	BOOL* fail_ptr = &Controller::failed;
-	while(!propogate_trigger_list.empty())
+	while(!propagate_trigger_list.empty())
 	{
-	  pair<Trigger,short> t = propogate_trigger_list.back();
- 	  propogate_trigger_list.pop_back();
+	  pair<Trigger,short> t = propagate_trigger_list.back();
+ 	  propagate_trigger_list.pop_back();
 #ifndef USE_SETJMP
 		if(*fail_ptr) 
 		{
@@ -133,12 +133,12 @@ namespace Controller
 #endif
 		
 #ifdef MORE_SEARCH_INFO
-		if(commandlineoption_fullpropogate)
-		  t.first.full_propogate();
+		if(commandlineoption_fullpropagate)
+		  t.first.full_propagate();
 		else
-		  t.first.propogate(t.second);
+		  t.first.propagate(t.second);
 #else
-		t.first.propogate(t.second);
+		t.first.propagate(t.second);
 #endif
 
 
@@ -147,9 +147,9 @@ namespace Controller
 	return false;
   }
   
-  inline void propogate_queue()
+  inline void propagate_queue()
   {
-    D_INFO(2, DI_QUEUE, "Starting Propogation");
+    D_INFO(2, DI_QUEUE, "Starting Propagation");
 #ifdef USE_SETJMP
     int setjmp_return = _setjmp(g_env);
 	if(setjmp_return != 0)
@@ -166,23 +166,23 @@ namespace Controller
 #ifdef DYNAMICTRIGGERS
 	  if (dynamic_triggers_used) 
 	  {
-		while(!propogate_trigger_list.empty() || !dynamic_trigger_list.empty())
+		while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
 		{
-		  if(propogate_dynamic_trigger_lists())
+		  if(propagate_dynamic_trigger_lists())
 			return;
 		  
 		  /* Don't like code duplication here but a slight efficiency gain */
-		  if(propogate_static_trigger_lists())
+		  if(propagate_static_trigger_lists())
 			return;
 		}
 	  }
 	  else
 	  {
-		if(propogate_static_trigger_lists())
+		if(propagate_static_trigger_lists())
 		  return;
 	  }
 #else
-	  if(propogate_static_trigger_lists())
+	  if(propagate_static_trigger_lists())
 		return;
 #endif
 	  

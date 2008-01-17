@@ -79,10 +79,10 @@ struct LightLessEqualSumConstraint : public Constraint
     return min_sum > var_sum.getMax();
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
-    propogate(-1,0);
-    propogate(0,0);
+    propagate(-1,0);
+    propagate(0,0);
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)

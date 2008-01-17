@@ -53,7 +53,7 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
   }
   
   // Not specialised for 3 sat
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
@@ -81,7 +81,7 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
 	
 	if(index >= array_size)
 	{ // Only one valid variable.
-	  var_array[trig1].propogateAssign(1);
+	  var_array[trig1].propagateAssign(1);
 	  return;
 	}
 	
@@ -134,7 +134,7 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
 	  var_array[unchecked_val].addDynamicTrigger(dt, UpperBound);
 	}
 	else
-	{ var_array[other_propval].propogateAssign(1); }
+	{ var_array[other_propval].propagateAssign(1); }
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)

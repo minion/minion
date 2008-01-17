@@ -201,7 +201,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
     }
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
 	D_INFO(2, DI_DYELEMENT, "Setup Triggers");
     for(int i=0; i<var_array.size(); i++) 

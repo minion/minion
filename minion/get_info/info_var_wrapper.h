@@ -90,10 +90,10 @@ struct InfoRefType
     data.uncheckedAssign( b); 
   }
   
-  void propogateAssign(DomainInt b)
+  void propagateAssign(DomainInt b)
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, propogateAssign);
-    data.propogateAssign( b); 
+    VAR_INFO_ADDONE(VAR_TYPE, propagateAssign);
+    data.propagateAssign( b); 
   }
   
   void removeFromDomain(DomainInt b)

@@ -89,8 +89,8 @@ struct VarRefType
   void uncheckedAssign(DomainInt b)
   { GetContainer::con().uncheckedAssign(data, b); }
   
-  void propogateAssign(DomainInt b)
-  { GetContainer::con().propogateAssign(data, b); }
+  void propagateAssign(DomainInt b)
+  { GetContainer::con().propagateAssign(data, b); }
   
   void removeFromDomain(DomainInt b)
   { GetContainer::con().removeFromDomain(data, b); }
@@ -168,8 +168,8 @@ struct QuickVarRefType
   void uncheckedAssign(DomainInt b)
   { GetContainer::con().uncheckedAssign(data, b); }
   
-  void propogateAssign(DomainInt b)
-  { GetContainer::con().propogateAssign(data, b); }
+  void propagateAssign(DomainInt b)
+  { GetContainer::con().propagateAssign(data, b); }
   
   void removeFromDomain(DomainInt b)
   { GetContainer::con().removeFromDomain(data, b); }
@@ -238,8 +238,8 @@ struct CompleteVarRefType
   void uncheckedAssign(DomainInt b)
   { (data.getCon()).uncheckedAssign(data, b); }
   
-  void propogateAssign(DomainInt b)
-  { (data.getCon()).propogateAssign(data, b); }
+  void propagateAssign(DomainInt b)
+  { (data.getCon()).propagateAssign(data, b); }
   
   void removeFromDomain(DomainInt b)
   { (data.getCon()).removeFromDomain(data, b); }

@@ -92,7 +92,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
         if (var_sum == array_size)
         {
           // In this case every var will be set to 1
-          // This will happen before triggers set up in full_propogate
+          // This will happen before triggers set up in full_propagate
           // Thus zero triggers are needed
           // However we will say that 1 is needed 
           //     because I don't know if setup code will work when 0 triggers requested
@@ -131,7 +131,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   }
   */
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
 	DynamicTrigger* dt = dynamic_trigger_start();
 	

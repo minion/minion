@@ -56,9 +56,9 @@ struct UnaryEqualConstraint : public Constraint
   virtual BOOL check_unsat(int,DomainDelta)
   { return (x.getMin() <= offset) && (x.getMax() >= offset); }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
-    x.propogateAssign(offset);
+    x.propagateAssign(offset);
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)

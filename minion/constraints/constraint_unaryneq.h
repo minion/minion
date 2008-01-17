@@ -55,7 +55,7 @@ struct UnaryNeqConstraint : public Constraint
   virtual BOOL check_unsat(int,DomainDelta)
   { return !x.inDomain(offset); }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   { x.removeFromDomain(offset); }
   
   virtual BOOL check_assignment(vector<DomainInt> v)

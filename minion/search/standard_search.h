@@ -51,7 +51,7 @@ namespace Controller
 		  maybe_print_search_state("Node: ", v);
 		  world_push();
 		  order.branch_left();
-		  propogate_queue();
+		  propagate_queue();
 		}
 		
 		// Either search failed, or a solution was found.
@@ -65,7 +65,7 @@ namespace Controller
 		  world_pop();
           maybe_print_search_action("bt");
 		  order.branch_right();
-		  set_optimise_and_propogate_queue();
+		  set_optimise_and_propagate_queue();
 		}
 	  }
   }

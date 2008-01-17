@@ -128,7 +128,7 @@ end_check_upper:
     }
   }  
   
-  virtual void full_propogate()
-  { propogate(0,0); }
+  virtual void full_propagate()
+  { propagate(0,0); }
 };
 

@@ -109,7 +109,7 @@ struct CheckAssignConstraint : public Constraint
 	return false;
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     if(full_check_unsat())
 	  Controller::fail();

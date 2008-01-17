@@ -31,7 +31,7 @@ string EventNames[] = {
   "setMax",
   "setMin",
   "uncheckedAssign",
-  "propogateAssign",
+  "propagateAssign",
   "RemoveFromDomain",
   "addTrigger",
   "getDomainChange",

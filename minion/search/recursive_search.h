@@ -43,7 +43,7 @@ namespace Controller
 	maybe_print_search_state("Node: ", v);
 	world_push();
 	order.branch_left();
-	propogate_queue();
+	propagate_queue();
 	if(!failed)
 	  solve_loop_recursive(order, v);
 	
@@ -51,7 +51,7 @@ namespace Controller
 	
 	world_pop();
 	order.branch_right();
-    set_optimise_and_propogate_queue();
+    set_optimise_and_propagate_queue();
 	
 	if(!failed)
 	  solve_loop_recursive(order, v);

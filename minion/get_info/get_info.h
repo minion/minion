@@ -14,7 +14,7 @@
   VAR_INFO_setMax,
   VAR_INFO_setMin,
   VAR_INFO_uncheckedAssign,
-  VAR_INFO_propogateAssign,
+  VAR_INFO_propagateAssign,
   VAR_INFO_RemoveFromDomain,
   VAR_INFO_addTrigger,
   VAR_INFO_getDomainChange,

@@ -50,21 +50,21 @@ struct ReifiedEqualConstraint : public Constraint
 	return t;
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     if(var3.isAssigned())
     {
       if(var3.getAssignedValue() == 1)
-		propogate(3,0);
+		propagate(3,0);
       else
-		propogate(-3,0);
+		propagate(-3,0);
     }
     
     if(var1.isAssigned())
-      propogate(1,0);
+      propagate(1,0);
     
     if(var2.isAssigned())
-      propogate(2,0);
+      propagate(2,0);
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
@@ -74,37 +74,37 @@ struct ReifiedEqualConstraint : public Constraint
     {
       case 1:
 		if(var2.isAssigned())
-		{ var3.propogateAssign(var1.getAssignedValue() == var2.getAssignedValue()); }
+		{ var3.propagateAssign(var1.getAssignedValue() == var2.getAssignedValue()); }
 		else
 		{
 		  if(var3.isAssigned())
 		  {
 			if(var3.getAssignedValue() == 1)
-			{ var2.propogateAssign(var1.getAssignedValue()); }
+			{ var2.propagateAssign(var1.getAssignedValue()); }
 		  }
 		}
 		break;
         
       case 2:
         if(var1.isAssigned())
-		{ var3.propogateAssign(var1.getAssignedValue() == var2.getAssignedValue()); }
+		{ var3.propagateAssign(var1.getAssignedValue() == var2.getAssignedValue()); }
 		else
 		{
 		  if(var3.isAssigned())
 		  {
 			if(var3.getAssignedValue() == 1)
-			{ var1.propogateAssign(var2.getAssignedValue()); }
+			{ var1.propagateAssign(var2.getAssignedValue()); }
 		  }
 		}
 		break;        
 		
       case 3:
 		if(var1.isAssigned())
-		{ var2.propogateAssign(var1.getAssignedValue()); }
+		{ var2.propagateAssign(var1.getAssignedValue()); }
 		else
 		{
 		  if(var2.isAssigned())
-		  { var1.propogateAssign(var2.getAssignedValue()); }
+		  { var1.propagateAssign(var2.getAssignedValue()); }
 		}
 		break;
 		
@@ -159,12 +159,12 @@ struct EqualConstraint : public Constraint
 	return t;
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
-	propogate(1,0);
-	propogate(2,0);
-	propogate(3,0);
-	propogate(4,0);
+	propagate(1,0);
+	propagate(2,0);
+	propagate(3,0);
+	propagate(4,0);
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta)

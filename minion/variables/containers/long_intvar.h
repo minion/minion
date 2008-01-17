@@ -278,7 +278,7 @@ struct BigRangeVarContainer {
     return;
   }
   
-  void propogateAssign(BigRangeVarRef_internal d, DomainInt offset)
+  void propagateAssign(BigRangeVarRef_internal d, DomainInt offset)
   {
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     if(!inDomain(d,offset))
@@ -304,7 +304,7 @@ struct BigRangeVarContainer {
   }
     
 private:
-  // This function just unifies part of propogateAssign and uncheckedAssign
+  // This function just unifies part of propagateAssign and uncheckedAssign
   void commonAssign(BigRangeVarRef_internal d, DomainInt offset, DomainInt lower, DomainInt upper)
   {
 #ifdef FULL_DOMAIN_TRIGGERS

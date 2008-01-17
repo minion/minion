@@ -8,7 +8,7 @@ template<typename Var, typename Vars, typename Prop>
 bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop, bool checkBounds)
 {
   Controller::world_push();
-  var.propogateAssign(val);
+  var.propagateAssign(val);
   prop(vars, checkBounds);
   
   bool check_failed = Controller::failed;
@@ -20,9 +20,9 @@ bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop, bool chec
 }
 
 template <typename Var, typename Prop>
-void propogateSAC_internal(vector<Var>& vararray, Prop prop, bool checkBounds)
+void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool checkBounds)
 {
-  Controller::propogate_queue();
+  Controller::propagate_queue();
   if(Controller::failed)
 	return;
   
@@ -72,20 +72,20 @@ void propogateSAC_internal(vector<Var>& vararray, Prop prop, bool checkBounds)
 }
 
 
-struct PropogateSAC
+struct PropagateSAC
 {
   template<typename Vars>
   void operator()(Vars& vars, bool checkBounds)
-  {propogateSAC_internal(vars, Controller::propogate_queue_vars<Vars>, checkBounds);}
+  {propagateSAC_internal(vars, Controller::propagate_queue_vars<Vars>, checkBounds);}
 };
 
 
-struct PropogateSSAC
+struct PropagateSSAC
 {
   template<typename Vars>
   void operator()(Vars& vars, bool checkBounds)
   {
-	PropogateSAC sac;
-	propogateSAC_internal(vars, sac, checkBounds);
+	PropagateSAC sac;
+	propagateSAC_internal(vars, sac, checkBounds);
   }
 };

@@ -72,10 +72,10 @@ struct LeqConstraint : public Constraint
   virtual BOOL full_check_unsat()
   { return (x.getMin() > y.getMax() + offset); }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
-    propogate(0,0);
-    propogate(1,0);
+    propagate(0,0);
+    propagate(1,0);
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)

@@ -113,7 +113,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
     FAIL_EXIT();
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     int min_sum = 0;
     
@@ -123,7 +123,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
       min_sum += var_array[i].getMin() * weight_array[i];
     }
     var_array_min_sum = min_sum;
-    propogate(-1,0);
+    propagate(-1,0);
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)

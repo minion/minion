@@ -88,7 +88,7 @@ struct LexLeqConstraint : public Constraint
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
 		  x[i].getAssignedValue() != y[i].getAssignedValue())  {
 		alpha = i;
-		propogate(i,0);
+		propagate(i,0);
       }
       else updateAlpha(i+1);
     }
@@ -98,7 +98,7 @@ struct LexLeqConstraint : public Constraint
 		if (!x[i].isAssigned() || !y[i].isAssigned() ||
 			x[i].getAssignedValue() != y[i].getAssignedValue())  {
 		  alpha = i ;
-		  propogate(i,0) ;
+		  propagate(i,0) ;
 		  return ;
 		}
 		i++ ;
@@ -115,7 +115,7 @@ struct LexLeqConstraint : public Constraint
     while (i >= a) {
       if (x[i].getMin() < y[i].getMax()) {
 		beta = i+1 ;
-		if (!(x[i].getMax() < y[i].getMin())) propogate(i,0) ;
+		if (!(x[i].getMax() < y[i].getMin())) propagate(i,0) ;
 		return ;
       }
       i-- ;    
@@ -127,7 +127,7 @@ struct LexLeqConstraint : public Constraint
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
 	PROP_INFO_ADDONE(Lex);
-    D_INFO(0,DI_LEXCON,"Begin Propogation");
+    D_INFO(0,DI_LEXCON,"Begin Propagation");
     if (F)
     {
       D_INFO(0,DI_LEXCON,"Already True");
@@ -230,9 +230,9 @@ struct LexLeqConstraint : public Constraint
     }
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
-    D_INFO(1, DI_LEXCON, "Begin Full Propogate");
+    D_INFO(1, DI_LEXCON, "Begin Full Propagate");
     int i, n = x.size() ;
     for (i = 0; i < n; i++) {
       if (!x[i].isAssigned()) break ;	
@@ -265,7 +265,7 @@ struct LexLeqConstraint : public Constraint
 		else if (betaBound == -1) beta = betaBound ;
       }
       if (alpha >= beta) Controller::fail() ;
-      propogate(alpha,0) ;             //initial propagation, if necessary.
+      propagate(alpha,0) ;             //initial propagation, if necessary.
     }
     else 
     {

@@ -79,7 +79,7 @@ struct reify_true : public Constraint
   {
     D_ASSERT(constraint_locked);
 	constraint_locked = false;
-	poscon->full_propogate();
+	poscon->full_propagate();
   }
   
   virtual void special_unlock()
@@ -91,32 +91,32 @@ struct reify_true : public Constraint
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
 	PROP_INFO_ADDONE(ReifyTrue);
-    D_INFO(1,DI_REIFY,"Propogation Start");
+    D_INFO(1,DI_REIFY,"Propagation Start");
     if(constraint_locked)
 	  return;
 	  
 	if(i == -99999)
     {
-      D_INFO(1,DI_REIFY,"Full Pos Propogation");
+      D_INFO(1,DI_REIFY,"Full Pos Propagation");
 	  constraint_locked = true;
 	  Controller::push_special_trigger(this);
-	  //poscon->full_propogate();
+	  //poscon->full_propagate();
       return;
     }
     
     if(rar_var.isAssigned())
     {
       if(rar_var.getAssignedValue() == 1)
-      { poscon->propogate(i, domain); }
+      { poscon->propagate(i, domain); }
     }
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     if(rar_var.isAssigned())
     {
       if(rar_var.getAssignedValue() != 0)
-	    poscon->full_propogate();
+	    poscon->full_propagate();
     }
   }
 };

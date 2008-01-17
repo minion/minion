@@ -65,68 +65,68 @@ struct AndConstraint : public Constraint
     {
       case 1:
         if(var2.isAssignedValue(true))
-          var3.propogateAssign(true);
+          var3.propagateAssign(true);
         else
         {
           if(var3.isAssignedValue(false))
-            var2.propogateAssign(false);
+            var2.propagateAssign(false);
         }
           break;
         
       case 2:
         if(var1.isAssignedValue(true))
-          var3.propogateAssign(true);
+          var3.propagateAssign(true);
         else
         {
           if(var3.isAssignedValue(false))
-            var1.propogateAssign(false);
+            var1.propagateAssign(false);
         }
           break;
         
       case 3:
-        var1.propogateAssign(true);
-        var2.propogateAssign(true);
+        var1.propagateAssign(true);
+        var2.propagateAssign(true);
         break;
         
         
       case -1:
       case -2:
-        var3.propogateAssign(false);
+        var3.propagateAssign(false);
         break;
         
       case -3:
         if(var1.isAssignedValue(true))
-          var2.propogateAssign(false);
+          var2.propagateAssign(false);
         else
         {
           if(var2.isAssignedValue(true))
-            var1.propogateAssign(false);
+            var1.propagateAssign(false);
         }
           break;
     }
     
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     if(var1.isAssignedValue(false) || var2.isAssignedValue(false))
-      var3.propogateAssign(false);
+      var3.propagateAssign(false);
     
     if(var1.isAssignedValue(true) && var2.isAssignedValue(true))
-      var3.propogateAssign(true);
+      var3.propagateAssign(true);
     
     if(var3.isAssignedValue(false))
     {
       if(var1.isAssignedValue(true))
-		var2.propogateAssign(false);
+		var2.propagateAssign(false);
       if(var2.isAssignedValue(true))
-		var1.propogateAssign(false);
+		var1.propagateAssign(false);
     }
     
     if(var3.isAssignedValue(true))
     {
-      var1.propogateAssign(true);
-      var2.propogateAssign(true);
+      var1.propagateAssign(true);
+      var2.propagateAssign(true);
     }
     
   }

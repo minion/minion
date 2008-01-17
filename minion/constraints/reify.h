@@ -28,11 +28,11 @@
 // Note: The whole constraint_locked thing is for the following case:
 // Consider the following events are on the queue:
 // "rareify boolean is assigned, Y is assigned"
-// Now "rareify boolean is assigned" causes full_propogate to be called for
+// Now "rareify boolean is assigned" causes full_propagate to be called for
 // the constraint. It will set up it's data structures based on the current
 // assignment. Then later it will be given Y is assigned, but have already
-// possibly used that. Confusion follows. Therefore when we want to propogate
-// the function, we "lock" it until the queue empties, then start propogating
+// possibly used that. Confusion follows. Therefore when we want to propagate
+// the function, we "lock" it until the queue empties, then start ping
 // the constraint.
 
 template<typename BoolVar>
@@ -122,9 +122,9 @@ struct reify : public Constraint
     D_ASSERT(constraint_locked);
 	constraint_locked = false;
 	if(value_assigned)
-	  poscon->full_propogate();
+	  poscon->full_propagate();
     else
-	  negcon->full_propogate();
+	  negcon->full_propagate();
   }
   
   virtual void special_unlock()
@@ -136,7 +136,7 @@ struct reify : public Constraint
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
 	PROP_INFO_ADDONE(Reify);
-    D_INFO(1,DI_REIFY,"Propogation Start");
+    D_INFO(1,DI_REIFY,"Propagation Start");
 	if(constraint_locked)
 	  return;
 	  
@@ -147,15 +147,15 @@ struct reify : public Constraint
 	  
       if(i==-99999)
       {
-		D_INFO(1,DI_REIFY,"Full Pos Propogation");
+		D_INFO(1,DI_REIFY,"Full Pos Propagation");
 		value_assigned = true;
-		//poscon->full_propogate();
+		//poscon->full_propagate();
       }
       else
       {
-		D_INFO(1,DI_REIFY,"Full Neg Propogation");
+		D_INFO(1,DI_REIFY,"Full Neg Propagation");
 		value_assigned = false;
-		//negcon->full_propogate();
+		//negcon->full_propagate();
       }
       return;
     }
@@ -163,9 +163,9 @@ struct reify : public Constraint
     if(rar_var.isAssigned())
     {
       if(rar_var.getAssignedValue() == 1)
-      { if(i%2 == 0) poscon->propogate(i/2, domain); }
+      { if(i%2 == 0) poscon->propagate(i/2, domain); }
       else
-      { if(i%2 == 1) negcon->propogate((i-1)/2, domain); }
+      { if(i%2 == 1) negcon->propagate((i-1)/2, domain); }
     }
     else
     {
@@ -188,26 +188,26 @@ struct reify : public Constraint
     }
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     if(poscon->full_check_unsat())
 	{
 	  D_INFO(1,DI_REIFY,"Pos full_check_unsat true!");
-      rar_var.propogateAssign(false);
+      rar_var.propagateAssign(false);
 	}
 	
     if(negcon->full_check_unsat())
 	{
 	  D_INFO(1,DI_REIFY,"False full_check_unsat true!");
-      rar_var.propogateAssign(true);
+      rar_var.propagateAssign(true);
 	}
     
     if(rar_var.isAssigned())
     {
       if(rar_var.getAssignedValue() == 1)
-		poscon->full_propogate();
+		poscon->full_propagate();
       else
-		negcon->full_propogate();
+		negcon->full_propagate();
     }
   }
 };

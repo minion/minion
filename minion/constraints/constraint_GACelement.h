@@ -175,7 +175,7 @@ struct GACElementConstraint : public Constraint
 	}
   }
   
-  virtual void full_propogate()
+  virtual void full_propagate()
   {
     for(int i=0; i<var_array.size(); i++) 
         if(var_array[i].isBound()) 
@@ -187,7 +187,7 @@ struct GACElementConstraint : public Constraint
 	resultvar.setMin(var_array_min_val);
 	resultvar.setMax(var_array_max_val);
 	for(unsigned i = 0; i < var_array.size() + 2; ++i)
-	  propogate(i,0);
+	  propagate(i,0);
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)
