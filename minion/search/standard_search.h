@@ -27,8 +27,8 @@ namespace Controller
 	  
 	  while(true)
 	  {
-		state->incrementNodeCount();
-		if(state->getNodeCount() == options->nodelimit)
+		state.incrementNodeCount();
+		if(state.getNodeCount() == options->nodelimit)
 		  return;
 	
 		if(do_checks())
@@ -44,20 +44,20 @@ namespace Controller
 		  deal_with_solution();
 
 		  // fail here to force backtracking.
-		  state->setFailed(true);
+		  state.setFailed(true);
 		}
 		else
 		{
 		  maybe_print_search_state("Node: ", v);
 		  world_push();
 		  order.branch_left();
-		  queues->propagateQueue();
+		  queues.propagateQueue();
 		}
 		
 		// Either search failed, or a solution was found.
-		while(state->isFailed())
+		while(state.isFailed())
 		{
-		  state->setFailed(false);
+		  state.setFailed(false);
 		  
 		  if(order.finished_search())
 			return;

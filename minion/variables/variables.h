@@ -50,32 +50,32 @@ public:
   SparseBoundVarContainer<>& getSparseBoundvarContainer() { return sparseBoundvarContainer; }
 };
 
-VARDEF(VariableContainer* varContainer);
+VARDEF(VariableContainer varContainer);
 
 struct GetBoundVarContainer
 {
   static BoundVarContainer<>& con() 
-  { return varContainer->getBoundvarContainer(); }
+  { return varContainer.getBoundvarContainer(); }
   static string name()
   { return "Bound"; }
 };
 
 struct GetBooleanContainer
 { 
-  static BooleanContainer& con() { return varContainer->getBooleanContainer(); } 
+  static BooleanContainer& con() { return varContainer.getBooleanContainer(); } 
   static string name()
   { return "Bool:"; }
 };
 
 struct GetRangeVarContainer
 {
-  static LRVCon& con() { return varContainer->getRangevarContainer(); }
+  static LRVCon& con() { return varContainer.getRangevarContainer(); }
   static string name() { return "RangeVar:"; }
 };
 
 struct GetBigRangeVarContainer
 {
-  static BigRangeCon& con() { return varContainer->getBigRangevarContainer(); }
+  static BigRangeCon& con() { return varContainer.getBigRangevarContainer(); }
   static string name() { return "BigRangeVar"; }
 };
 
@@ -83,7 +83,7 @@ struct GetBigRangeVarContainer
 struct GetSparseBoundVarContainer
 {
   static SparseBoundVarContainer<>& con() 
-  { return varContainer->getSparseBoundvarContainer(); }
+  { return varContainer.getSparseBoundvarContainer(); }
   
   static string name()
   { return "SparseBound:"; }
@@ -93,7 +93,7 @@ struct SmallDiscreteCheck
 {
   template<typename T>
   bool operator()(const T& lower, const T& upper) const
-  { return varContainer->getRangevarContainer().valid_range(lower, upper); }
+  { return varContainer.getRangevarContainer().valid_range(lower, upper); }
 };
 
 #include "mappings/variable_neg.h"

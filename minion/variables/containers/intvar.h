@@ -203,14 +203,14 @@ struct RangeVarContainer {
   DomainInt getMin(RangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
-    D_ASSERT(state->isFailed() || inDomain(d,lower_bound(d)));
+    D_ASSERT(state.isFailed() || inDomain(d,lower_bound(d)));
     return lower_bound(d);
   }
   
   DomainInt getMax(RangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
-    D_ASSERT(state->isFailed() || inDomain(d,upper_bound(d)));
+    D_ASSERT(state.isFailed() || inDomain(d,upper_bound(d)));
     return upper_bound(d);
   }
 

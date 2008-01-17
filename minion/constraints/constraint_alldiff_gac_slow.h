@@ -368,7 +368,7 @@ struct AlldiffGacSlow : public Constraint
                 {
                     //cout<<"Adding "<<tempval<<endl;
                     var_array[tempvar].removeFromDomain(tempval);
-                    if(state->isFailed()) return;
+                    if(state.isFailed()) return;
                 }
             }
         }

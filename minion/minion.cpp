@@ -291,8 +291,8 @@ void BuildCSP(Reader& reader)
     if(it->is_dynamic())
     {
 #ifdef DYNAMICTRIGGERS
-      state->addDynamicConstraint(build_dynamic_constraint(*it));
-      state->setDynamicTriggersUsed(true);
+      state.addDynamicConstraint(build_dynamic_constraint(*it));
+      state.setDynamicTriggersUsed(true);
 #else
       cout << "Sorry, cannot process this constraint as it needs dynamic triggers or watched literals." << endl ;
       cout << "use an alternative encoding or recompile with -DWATCHEDLITERALS or -DDYNAMICTRIGGERS in command line" << endl;
@@ -300,7 +300,7 @@ void BuildCSP(Reader& reader)
 #endif
     }
     else
-      state->addConstraint(build_constraint(*it));
+      state.addConstraint(build_constraint(*it));
   }
 
 
@@ -322,9 +322,9 @@ void SolveCSP(Reader& reader, MinionArguments args)
     // should be one for varorder as well.
     tableout.set("MinionVersion", SVN_VER);
     tableout.set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-    state->getTimer().maybePrintTimestepStore("Parsing Time: ", "ParsingTime", tableout, !options->print_only_solution);
+    state.getTimer().maybePrintTimestepStore("Parsing Time: ", "ParsingTime", tableout, !options->print_only_solution);
     
-    state->setTupleListContainer(reader.tupleListContainer);
+    state.setTupleListContainer(reader.tupleListContainer);
     
     BuildCSP(reader);
     
@@ -355,7 +355,7 @@ void SolveCSP(Reader& reader, MinionArguments args)
         }
     }
   // Solve!
-  state->getTimer().maybePrintTimestepStore("Setup Time: ", "SetupTime", tableout, !options->print_only_solution);
+  state.getTimer().maybePrintTimestepStore("Setup Time: ", "SetupTime", tableout, !options->print_only_solution);
   
   long long initial_lit_count = 0;
   
@@ -364,7 +364,7 @@ void SolveCSP(Reader& reader, MinionArguments args)
   
   Controller::initalise_search();
   
-  if(!state->isFailed())
+  if(!state.isFailed())
   {
 	if(args.preprocess != MinionArguments::None)
 	{
@@ -387,24 +387,24 @@ void SolveCSP(Reader& reader, MinionArguments args)
 		cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;
 	  }
 	}
-    state->getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !options->print_only_solution);
-	if(!state->isFailed())
-        solve(args.order, var_val_order);   // add a state->getTimer().maybePrintTimestepStore to search..
+    state.getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !options->print_only_solution);
+	if(!state.isFailed())
+        solve(args.order, var_val_order);   // add a state.getTimer().maybePrintTimestepStore to search..
   }
   else
   {
-      state->getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !options->print_only_solution);
+      state.getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !options->print_only_solution);
   }
   
-  state->getTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", tableout, !options->print_only_solution);
-  cout << "Total Nodes: " << state->getNodeCount() << endl;
+  state.getTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", tableout, !options->print_only_solution);
+  cout << "Total Nodes: " << state.getNodeCount() << endl;
   cout << "Problem solvable?: " 
-	<< (state->getSolutionCount() == 0 ? "no" : "yes") << endl;
-  cout << "Solutions Found: " << state->getSolutionCount() << endl;
+	<< (state.getSolutionCount() == 0 ? "no" : "yes") << endl;
+  cout << "Solutions Found: " << state.getSolutionCount() << endl;
   
-  tableout.set("Nodes", to_string(state->getNodeCount()));
-  tableout.set("Satisfiable", (state->getSolutionCount()==0 ? 0 : 1));
-  tableout.set("SolutionsFound", state->getSolutionCount());
+  tableout.set("Nodes", to_string(state.getNodeCount()));
+  tableout.set("Satisfiable", (state.getSolutionCount()==0 ? 0 : 1));
+  tableout.set("SolutionsFound", state.getSolutionCount());
   
   if(options->tableout)
   {
@@ -483,14 +483,14 @@ catch(parse_exception& s)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 int main(int argc, char** argv) {
   
-  state = new SearchState();
-//  searchstate->setTupleListContainer(new TupleListContainer);
+//  state = new SearchState();
+//  searchstate.setTupleListContainer(new TupleListContainer);
   options = new SearchOptions();
-  queues = new Queues();
-  varContainer = new VariableContainer();
+ // queues = new Queues();
+//  varContainer = new VariableContainer();
   triggerMem = new TriggerMem();
   
-  state->getTimer().startClock();
+  state.getTimer().startClock();
   
   cout << "# " << VERSION << endl ;
   cout << "# Svn version: " << SVN_VER << endl; 

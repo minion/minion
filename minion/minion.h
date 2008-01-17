@@ -116,7 +116,7 @@ struct DynamicTrigger;
 namespace Controller
 {
   /// Add a new list of triggers to the queue.
-  inline void queues->pushTriggers(TriggerRange new_triggers);
+  inline void queues.pushTriggers(TriggerRange new_triggers);
   inline void push_special_trigger(Constraint* trigger);
 #ifdef DYNAMICTRIGGERS
   inline void push_dynamic_triggers(DynamicTrigger* trigs);

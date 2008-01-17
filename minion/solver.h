@@ -114,7 +114,7 @@ public:
 
 
 
-VARDEF(SearchState* state);
+VARDEF(SearchState state);
 
 class SearchOptions
 {
@@ -172,7 +172,7 @@ namespace Controller
   inline void finish()
   { 
     D_INFO(0,DI_SOLVER,"Cleanup starts");
-    state->setFinished(true);
+    state.setFinished(true);
   }
   
 
@@ -183,9 +183,9 @@ namespace Controller
   { 
     D_INFO(1,DI_SOLVER,"Failed!");
 #ifdef USE_SETJMP
-   SYSTEM_LONGJMP(*(state->getJmpBufPtr()),1);
+   SYSTEM_LONGJMP(*(state.getJmpBufPtr()),1);
 #else
-   state->setFailed(true);
+   state.setFailed(true);
 #endif
   }
   

@@ -33,7 +33,7 @@ namespace Controller
   inline void world_push()
   {
     D_INFO(0,DI_SOLVER,"World Push");
-	D_ASSERT(queues->isQueuesEmpty());
+	D_ASSERT(queues.isQueuesEmpty());
     backtrackable_memory.world_push();
   }
   
@@ -41,9 +41,9 @@ namespace Controller
   inline void world_pop()
   {
     D_INFO(0,DI_SOLVER,"World Pop");
-	D_ASSERT(queues->isQueuesEmpty());
+	D_ASSERT(queues.isQueuesEmpty());
     backtrackable_memory.world_pop();
-    varContainer->getBigRangevarContainer().bms_array.undo();
+    varContainer.getBigRangevarContainer().bms_array.undo();
   }
   
   inline void world_pop_all()

@@ -156,7 +156,7 @@ struct GACTableConstraint : public DynamicConstraint
 	    vars[varIndex].setMin((tuples->dom_smallest)[varIndex]);
 	    vars[varIndex].setMax((tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]);
 		
-		if(state->isFailed()) return;
+		if(state.isFailed()) return;
 		
         DomainInt max = vars[varIndex].getMax();
         for(DomainInt i = vars[varIndex].getMin(); i <= max; ++i) 

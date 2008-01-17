@@ -101,7 +101,7 @@ public:
   
   bool propagateDynamicTriggerLists()
   {
-	bool* fail_ptr = state->getFailedPtr();
+	bool* fail_ptr = state.getFailedPtr();
 	while(!dynamic_trigger_list.empty())
 	{
 	  DynamicTrigger* t = dynamic_trigger_list.back();
@@ -136,7 +136,7 @@ public:
   
   bool propagateStaticTriggerLists()
   {
-	bool* fail_ptr = state->getFailedPtr();
+	bool* fail_ptr = state.getFailedPtr();
 	while(!propagate_trigger_list.empty())
 	{
 	  TriggerRange t = propagate_trigger_list.back();
@@ -177,12 +177,12 @@ public:
   {
     D_INFO(2, DI_QUEUE, "Starting Propagation");
 #ifdef USE_SETJMP
-    int setjmp_return = SYSTEM_SETJMP(*(state->getJmpBufPtr()));
+    int setjmp_return = SYSTEM_SETJMP(*(state.getJmpBufPtr()));
 	if(setjmp_return != 0)
 	{ // Failure has occured
-	  D_ASSERT(!state->isFailed());
-	  state->setFailed(true);
-	  queues->clearQueues();
+	  D_ASSERT(!state.isFailed());
+	  state.setFailed(true);
+	  queues.clearQueues();
 	  printf("!\n");
 	  return;
 	}
@@ -191,7 +191,7 @@ public:
 	while(true)
 	{
 #ifdef DYNAMICTRIGGERS
-	  if (state->isDynamicTriggersUsed()) 
+	  if (state.isDynamicTriggersUsed()) 
 	  {
 		while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
 		{
@@ -229,11 +229,11 @@ public:
   
 };  
 
-VARDEF(Queues* queues);
+VARDEF(Queues queues);
 
 // This just allows SAC (which wants a list of vars)
 // and normal propagate to have the same input method.
 // Just checking the bounds doesn't make sense here, so we ignore it.
 template<typename Vars>
 inline void propagate_queue_vars(Vars& vars, bool /*CheckBounds*/)
-{	queues->propagateQueue(); }
+{	queues.propagateQueue(); }

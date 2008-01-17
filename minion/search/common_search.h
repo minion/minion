@@ -17,8 +17,8 @@ namespace Controller
 	void optimise_maximise_var(VarRef var)
   {
 	  options->setFindAllSolutions();
-	  state->setOptimiseVar(new AnyVarRef(var));
-	  state->setOptimisationProblem(true);
+	  state.setOptimiseVar(new AnyVarRef(var));
+	  state.setOptimisationProblem(true);
   }
   
   /// Sets optimisation variable.
@@ -26,8 +26,8 @@ namespace Controller
 	void optimise_minimise_var(VarRef var)
   {
 	  options->setFindAllSolutions();
-	  state->setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
-	  state->setOptimisationProblem(true);
+	  state.setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
+	  state.setOptimisationProblem(true);
   }
   
   /// Ensures a particular constraint is satisfied by the solution.
@@ -72,7 +72,7 @@ namespace Controller
   {
     //if(solution_check != NULL)
 	//  solution_check();
-	state->incrementSolutionCount();
+	state.incrementSolutionCount();
 	if(options->print_solution)
 	{
 	  if(!print_matrix.empty())
@@ -96,19 +96,19 @@ namespace Controller
 	  // TODO : Make this more easily changable.
           if (!options->print_only_solution) 
           {
-	    cout << "Solution Number: " << state->getSolutionCount() << endl;
-	    state->getTimer().printTimestepWithoutReset("Time:");
-	    cout << "Nodes: " << state->getNodeCount() << endl << endl;
+	    cout << "Solution Number: " << state.getSolutionCount() << endl;
+	    state.getTimer().printTimestepWithoutReset("Time:");
+	    cout << "Nodes: " << state.getNodeCount() << endl << endl;
           }
     }
 #ifndef NO_DEBUG
   if(!options->nocheck)
   {
-    for(unsigned i = 0; i < state->getDynamicConstraintList().size(); ++i)
-      check_constraint(state->getDynamicConstraintList()[i]);
+    for(unsigned i = 0; i < state.getDynamicConstraintList().size(); ++i)
+      check_constraint(state.getDynamicConstraintList()[i]);
   
-    for(unsigned i = 0 ; i < state->getConstraintList().size();i++)
-      check_constraint(state->getConstraintList()[i]);
+    for(unsigned i = 0 ; i < state.getConstraintList().size();i++)
+      check_constraint(state.getConstraintList()[i]);
   }
 #endif
   }
@@ -117,11 +117,11 @@ namespace Controller
   /// Check if timelimit has been exceeded.
   inline BOOL do_checks()
   {
-  	if((state->getNodeCount() & 1023) == 0)
+  	if((state.getNodeCount() & 1023) == 0)
 	{
 	  if(options->time_limit != 0)
 	  {
-	    if(state->getTimer().checkTimeout(options->time_limit))
+	    if(state.getTimer().checkTimeout(options->time_limit))
 	    {
 		  cout << "Time out." << endl;
           tableout.set("TimeOut", 1);
@@ -137,7 +137,7 @@ template<typename T>
 void inline maybe_print_search_state(char* name, T& vars)
 {
   if(options->dumptree)
-	cout << name << state->getNodeCount() << "," << get_dom_as_string(vars) << endl;
+	cout << name << state.getNodeCount() << "," << get_dom_as_string(vars) << endl;
 }
 
 void inline maybe_print_search_action(char* action)
@@ -149,9 +149,9 @@ void inline maybe_print_search_action(char* action)
 
   void inline deal_with_solution()
   {
-	if(state->isOptimisationProblem())
+	if(state.isOptimisationProblem())
 	{
-	  if(!state->getOptimiseVar()->isAssigned())
+	  if(!state.getOptimiseVar()->isAssigned())
 	  {
 		cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
 		cerr << "Put it in the variable ordering?" << endl;
@@ -159,50 +159,50 @@ void inline maybe_print_search_action(char* action)
 	  }
 	  
 	  cout << "Solution found with Value: " 
-	  << state->getOptimiseVar()->getAssignedValue() << endl;
+	  << state.getOptimiseVar()->getAssignedValue() << endl;
 	  
-	  state->setOptimiseValue(state->getOptimiseVar()->getAssignedValue() + 1);			
+	  state.setOptimiseValue(state.getOptimiseVar()->getAssignedValue() + 1);			
 	}
-	if(options->lookingForOneSolution() || state->getSolutionCount() == options->sollimit)
+	if(options->lookingForOneSolution() || state.getSolutionCount() == options->sollimit)
 	  throw 0;
   }
 
   void inline set_optimise_and_propagate_queue()
   {
   #ifdef USE_SETJMP
-	if(state->isOptimisationProblem())
+	if(state.isOptimisationProblem())
 	{
 	  // Must check if this setMin will fail before doing it, else
 	  // The setjmp will throw us off. It's cheaper to check than set up
 	  // a new setjmp point here.
-	  if(state->getOptimiseVar()->getMax() >= state->getOptimiseVar())
+	  if(state.getOptimiseVar()->getMax() >= state.getOptimiseVar())
 	  { 
-		state->getOptimiseVar()->setMin(state->getOptimiseVar());
-		queues->propagateQueue();
+		state.getOptimiseVar()->setMin(state.getOptimiseVar());
+		queues.propagateQueue();
 	  }
 	  else
 	  {failed = true; }
 	}
 	else
-	{ queues->propagateQueue();}
+	{ queues.propagateQueue();}
   #else
-	if(state->isOptimisationProblem())
-	  state->getOptimiseVar()->setMin(state->getOptimiseValue());
-	queues->propagateQueue();
+	if(state.isOptimisationProblem())
+	  state.getOptimiseVar()->setMin(state.getOptimiseValue());
+	queues.propagateQueue();
   #endif	
   }
 
   void inline initalise_search()
   {
-	state->setSolutionCount(0);  
-	state->setNodeCount(0);
+	state.setSolutionCount(0);  
+	state.setNodeCount(0);
 	lock();
-	state->getTimer().printTimestepWithoutReset("First Node Time: ");
+	state.getTimer().printTimestepWithoutReset("First Node Time: ");
 	/// Failed initially propagating constraints!
-	if(state->isFailed())
+	if(state.isFailed())
 	  return;
-	if(state->isOptimisationProblem())
-	  state->setOptimiseValue(state->getOptimiseVar()->getMin()); 
+	if(state.isOptimisationProblem())
+	  state.setOptimiseValue(state.getOptimiseVar()->getMin()); 
   }
 }
 

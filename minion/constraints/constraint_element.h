@@ -144,7 +144,7 @@ struct ElementConstraint : public Constraint
     {
         index_ref.setMax(array_size-1);
     }
-    if(state->isFailed()) return;
+    if(state.isFailed()) return;
     
     // Should use the new iterators here. Check each value of result_var to see 
     // if it's in one of var_array. 
@@ -174,7 +174,7 @@ struct ElementConstraint : public Constraint
     else
     {// result_var is a bound variable
         // iterate up from the minimum
-        while(!state->isFailed())
+        while(!state.isFailed())
         {
             DomainInt i=result_var.getMin();
             BOOL supported=false;
@@ -194,7 +194,7 @@ struct ElementConstraint : public Constraint
                 break;
         }
         // now iterate down from the top.
-        while(!state->isFailed())
+        while(!state.isFailed())
         {
             DomainInt i=result_var.getMax();
             BOOL supported=false;
@@ -215,7 +215,7 @@ struct ElementConstraint : public Constraint
         }
     }
     
-    if(state->isFailed()) return;
+    if(state.isFailed()) return;
     
     for(int i = index_ref.getMin();i <= index_ref.getMax(); i++)
 	{

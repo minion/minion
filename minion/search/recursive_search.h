@@ -23,8 +23,8 @@ namespace Controller
 	
 	maybe_print_search_state("Node: ", v);
 	
-	state->incrementNodeCount();
-	if(state->getNodeCount() == options->nodelimit)
+	state.incrementNodeCount();
+	if(state.getNodeCount() == options->nodelimit)
 	  return;
 	if(do_checks())
 		return;
@@ -43,17 +43,17 @@ namespace Controller
 	maybe_print_search_state("Node: ", v);
 	world_push();
 	order.branch_left();
-	queues->propagateQueue();
-	if(!state->isFailed())
+	queues.propagateQueue();
+	if(!state.isFailed())
 	  solve_loop_recursive(order, v);
 	
-	state->setFailed(false);
+	state.setFailed(false);
 	
 	world_pop();
 	order.branch_right();
     set_optimise_and_propagate_queue();
 	
-	if(!state->isFailed())
+	if(!state.isFailed())
 	  solve_loop_recursive(order, v);
 }
 }
