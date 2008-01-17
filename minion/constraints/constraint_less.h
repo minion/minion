@@ -49,9 +49,9 @@ struct LeqConstraint : public Constraint
 	t.push_back(make_trigger(y, Trigger(this, 1), UpperBound));
 	return t;
   }
-  
-  virtual Constraint* reverse_constraint()
-  { return new LeqConstraint(y,x, offset.negminusone()); }
+
+  // Needs to be at end of file
+  virtual Constraint* reverse_constraint();
   
   PROPAGATE_FUNCTION(int prop_val,DomainDelta)
   {
@@ -121,3 +121,7 @@ BuildCT_INEQ(const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar,
   { return LeqCon(t1[0], t2[0], runtime_val(b.vars[2][0].pos)); }
 }
 
+// This is mainly inline to avoid multiple definitions.
+template<typename VarRef1, typename VarRef2, typename Offset>
+inline Constraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint()
+{ return LeqCon(y,x, offset.negminusone()); }
