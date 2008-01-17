@@ -21,6 +21,9 @@
 
 #include "minion.h"
 #include "CSPSpec.h"
+
+#include "help/help.cpp"
+
 using namespace ProbSpec;
 
 #include "BuildConstraint.h"
@@ -335,10 +338,24 @@ int main(int argc, char** argv) {
   
   getState(stateObj).getTimer().startClock();
   
-  cout << "# " << VERSION << endl ;
-  cout << "# Svn version: " << SVN_VER << endl; 
-  if (argc == 1)
-    print_info();
+  //cout << "# " << VERSION << endl ;
+  //cout << "# Svn version: " << SVN_VER << endl; 
+  if (argc == 1) {
+    cout << "Type '" << argv[0] << " help' for usage." << endl;
+    return EXIT_SUCCESS;
+  }
+
+  if(!strcmp(argv[1], "help")) {
+    std::string sect("");
+    if(argc != 2) {
+      for(size_t i = 2; i < argc - 1; i++) 
+	sect.append(argv[i]).append(" ");
+      sect.append(argv[argc - 1]);
+    }
+    help(sect);
+    return EXIT_SUCCESS;
+  } 
+    
   
   if (!getOptions(stateObj).print_only_solution) 
   { 

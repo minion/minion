@@ -24,6 +24,25 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help variables;sparsebounds Description
+In sparse bounds variables the domain is composed of discrete values
+(e.g. {1, 5, 36, 92}), but only the upper and lower bounds of the
+domain may be updated during search. Although the domain of these
+variables is not a continuous range, any holes in the domains must be
+there at time of specification, as they can not be added during the
+solving process.
+*/
+
+/** @help variables;sparsebounds Notes 
+Declaration of a sparse bounds variable called myvar containing values
+{1,3,4,6,7,9,11} in input file:
+
+SPARSEBOUND myvar {1,3,4,6,7,9,11}
+
+Use of this variable in a constraint:
+eq(myvar, 3) #myvar equals 3
+*/
+
 template<typename T>
 struct SparseBoundVarContainer;
 

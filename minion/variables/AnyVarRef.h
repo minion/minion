@@ -24,6 +24,30 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help variables General
+Minion nominally supports 5 different variable types, namely
+
+- 0/1 variables,
+- bounds variables,
+- sparse bounds variables,
+- discrete variables, and
+- discrete sparse variables.
+
+Sub-dividing the variable types in this manner affords the greatest
+opportunity for optimisation. In general, we recommend thinking of the
+variable types as a hierarchy, where 1 (0/1 variables) is the most
+efficient type, and 5 (Discrete Sparse Variables) is the least. The
+user should use the variable which is the highest in the hierarchy,
+yet encompasses enough information to provide a full model for the
+problem they are attempting to solve.
+*/
+
+/** @help variables Notes
+Discrete sparse variables are not yet implemented, and some of the
+others only work with certain constraints (particularly bounds
+variables). See entries for individual constraints for any problematic
+variable types.
+*/
 
 /// Internal type used by AnyVarRef.
 struct AnyVarRef_Abstract

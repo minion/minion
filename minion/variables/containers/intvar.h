@@ -24,6 +24,23 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help variables;discrete Description
+In discrete variables the domain ranges from the lower bound to the
+upper bound specified, but the deletion of any domain element in this
+range is permitted. This means that holes can be put in the domain of
+these variables.
+*/
+
+/** @help variables;discrete Example
+Declaration of a discrete variable called myvar containing values
+1 through to 10 inclusive in input file:
+
+DISCRETE myvar {1..10}
+
+Use of this variable in a constraint:
+eq(bool, 3)
+*/
+
 template<int var_min, typename d_type>
 struct RangeVarContainer;
 

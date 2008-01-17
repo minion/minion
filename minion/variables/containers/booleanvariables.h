@@ -24,6 +24,24 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help variables;01 Description
+01 variables, which are used very commonly for logical
+expressions, and for encoding the characteristic functions of sets and
+relations. Note that wherever a 01 variable can appear, the negation
+of that variable can also appear. For instance, the first Boolean
+variable (if any) is always x0. Its negation is identified by nx0.
+*/
+
+/** @help variables;01 Example 
+Declaration of a 01 variable called bool in input file:
+
+BOOL bool
+
+Use of this variable in a constraint:
+
+eq(bool, 0) #variable bool equals 0
+*/
+
 /// Standard data type used for storing compressed booleans 
 typedef unsigned long data_type;
 static const data_type one = 1;

@@ -65,7 +65,7 @@ $(OBJDIR)/%.o: minion/%.cpp
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
 
-minion: svn_version mkdirectory $(OBJFILES)
+minion: svn_version help mkdirectory $(OBJFILES)
 	
 	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES)
 	
@@ -85,6 +85,9 @@ steelmill:
 	g++ generators/Steelmill/steelmill-solver.cpp -O2 -o  bin/steelmill $(FULLFLAGS)
 sports:
 	g++ generators/SportsSchedule/MinionSportsInstanceGenerator.cpp -O2 -o bin/sports $(FULLFLAGS)
+
+help:
+	sh minion/help/genhelp.sh minion/ > minion/help/help.cpp
 
 lisp-generate: minion-helper minion-sat minion-quasigroup
 
