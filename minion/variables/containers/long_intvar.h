@@ -472,7 +472,7 @@ struct BigRangeVarContainer {
   }
 };
 
-typedef BigRangeVarContainer<unsigned long long> BigRangeCon;
+typedef BigRangeVarContainer<BitContainerType> BigRangeCon;
 
 VARDEF(BigRangeCon big_rangevar_container);
 

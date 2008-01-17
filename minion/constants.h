@@ -108,6 +108,12 @@ typedef long long int BigInt;
 
 typedef Wrapper<int> DomainInt;
 
+#ifndef CONTAINER_TYPE
+typedef unsigned int BitContainerType;
+#else
+typedef CONTAINER_TYPE BitContainerType;
+#endif
+
 template<typename To, typename From>
 To checked_cast(const From& t)
 { return static_cast<To>(t); }

@@ -410,7 +410,7 @@ struct RangeVarContainer {
   { return (lower >= var_min && upper <= var_max); }
 };
 
-typedef RangeVarContainer<0,unsigned long long> LRVCon;
+typedef RangeVarContainer<0, BitContainerType> LRVCon;
 
 VARDEF(LRVCon rangevar_container);
 
