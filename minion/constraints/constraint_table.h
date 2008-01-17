@@ -90,7 +90,7 @@ struct TableConstraint : public Constraint
           if(constraint->check_assignment(v))
           { 
             satisfied = true; 
-            // D_INFO(0,DI_TABLECON,to_string(check_var,check_dom)+print_vec(v));
+            // D_INFO(0,DI_TABLECON,to_string(check_var,check_dom)+to_string(v));
           }
         } while(!satisfied && increment(v, check_var));
         if(!satisfied)
