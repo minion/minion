@@ -231,16 +231,12 @@ LessEqualSumCon(StateObj* stateObj, const VarArray& _var_array, const light_vect
   }
 }
 
-#ifndef NO_SPECIALISATIONS
-
 inline Constraint*
 LessEqualSumCon(StateObj* stateObj, const light_vector<BoolVarRef>& var_array, const light_vector<ConstantVar>& var_sum)
 { 
   runtime_val t2(checked_cast<int>(var_sum[0].getAssignedValue()));
   return BoolLessEqualSumCon(stateObj, var_array, t2);
 }
-
-#endif
 
 BUILD_CONSTRAINT2(CT_LEQSUM, LessEqualSumCon);
 
@@ -264,17 +260,12 @@ GreaterEqualSumCon(StateObj* stateObj, const VarArray& _var_array, const light_v
   }
 }
 
-#ifndef NO_SPECIALISATIONS
-
-
 inline Constraint*
 GreaterEqualSumCon(StateObj* stateObj, const light_vector<BoolVarRef>& var_array, const light_vector<ConstantVar>& var_sum)
 { 
   runtime_val t2(checked_cast<int>(var_sum[0].getAssignedValue()));
   return BoolGreaterEqualSumCon(stateObj, var_array, t2);
 }
-
-#endif
 
 BUILD_CONSTRAINT2(CT_GEQSUM, GreaterEqualSumCon);
 

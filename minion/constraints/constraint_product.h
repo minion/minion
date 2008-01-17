@@ -173,7 +173,7 @@ struct ProductConstraint : public Constraint
   }
 };
 
-#ifndef NO_SPECIALISATIONS
+
 
 inline Constraint*
 ProductCon(StateObj* stateObj,const light_vector<BoolVarRef>& vars, const light_vector<BoolVarRef>& var2)
@@ -182,8 +182,6 @@ ProductCon(StateObj* stateObj,const light_vector<BoolVarRef>& vars, const light_
   D_ASSERT(var2.size() == 1);
   return AndCon(stateObj, vars[0], vars[1], var2[0]);
 }
-
-#endif
 
 template<typename VarRef1, typename VarRef2>
 Constraint*
