@@ -1,3 +1,9 @@
+18/09/2006 - Chris
+	* - Fix bug parsing Sparse Bound variables in new parser
+
+... - Chris
+	* - Didn't bother keeping changelog for a while. Lots of changes.
+
 03/04/2006 - Chris
 	* - Fix bug with weighted sum weights = 0
 
