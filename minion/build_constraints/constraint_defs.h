@@ -29,6 +29,7 @@ ConstraintDef constraint_list[] = {
 { "pow" , CT_POW, 2 ,{ read_2_vars , read_var }, STATIC_CT },
 { "div" , CT_DIV, 2 ,{ read_2_vars , read_var }, STATIC_CT },
 { "modulo" , CT_MODULO, 2 ,{ read_2_vars , read_var }, STATIC_CT },
+{ "gadget" , CT_GADGET, 1 ,{ read_list }, STATIC_CT },
 { "reify", CT_REIFY, 0, {}, STATIC_CT },
 { "reifyimply", CT_REIFYIMPLY, 0, {}, STATIC_CT },
 };

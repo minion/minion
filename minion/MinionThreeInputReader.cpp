@@ -235,7 +235,7 @@ BOOL MinionThreeInputReader::readConstraint(InputFileReader* infile, BOOL reifie
 	  break;
       
     case CT_GADGET:
-      readConstraintGadget(infile, get_constraint(CT_GADGET));
+      readConstraintGadget(infile);
 
 	default:
 	  readGeneralConstraint(infile, constraint);
@@ -392,12 +392,12 @@ void MinionThreeInputReader::readConstraintGadget(InputFileReader* infile)
   
   string s = infile->get_string();
   
-  shared_ptr<CSPInstance> in_gadget = getGadgetSymbol(s);
+  shared_ptr<CSPInstance> in_gadget = instance.getGadgetSymbol(s);
   ConstraintBlob gadgetCon( get_constraint(CT_GADGET) , vectorOfVars);
   gadgetCon.gadget = in_gadget;
   infile->check_sym(')');
   
-  instance.add_constraint(tableCon);
+  instance.add_constraint(gadgetCon);
 }
 
 

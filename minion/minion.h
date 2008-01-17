@@ -28,6 +28,9 @@
 #ifndef MINION_H
 #define MINION_H
 
+#ifdef REENTER
+#define MANY_VAR_CONTAINERS
+#endif
 
 #include "svn_header.h"
 #include "system/system.h"

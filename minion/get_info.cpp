@@ -111,6 +111,7 @@ string PropEventNames[] = {
  "DynElement",
  "DynVecNeq",
  "DynGACTable",
+ "Gadget",
  "Mod"
  };
 

@@ -38,8 +38,6 @@
 template<typename BoolVar>
 struct reify : public Constraint
 {
-  StateObj* stateObj;
-  
   virtual string constraint_name()
   { return "Reify:" + poscon->constraint_name(); }
 	
@@ -51,7 +49,7 @@ struct reify : public Constraint
   BOOL constraint_locked;
   BOOL value_assigned;
   
-  reify(StateObj* _stateObj, Constraint* _poscon, BoolVar v) : Constraint(_stateObj), stateObj(_stateObj), poscon(_poscon),
+  reify(StateObj* _stateObj, Constraint* _poscon, BoolVar v) : Constraint(_stateObj), poscon(_poscon),
                                                                rar_var(v),  constraint_locked(false)
   { negcon = poscon->reverse_constraint();}
   

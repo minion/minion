@@ -74,10 +74,8 @@ ConEvent_END
  PROP_INFO_DynVecNeq,
  PROP_INFO_DynGACTable,
  PROP_INFO_Mod,
+ PROP_INFO_Gadget,
  PropEvent_END
- 
-
-
  };
  
 const int VarEventCount=VarEvent_END;

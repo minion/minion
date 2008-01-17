@@ -24,4 +24,5 @@ case CT_MINUSEQ : return build_constraint_CT_MINUSEQ(stateObj, b);
 case CT_POW : return build_constraint_CT_POW(stateObj, b);
 case CT_DIV : return build_constraint_CT_DIV(stateObj, b);
 case CT_MODULO : return build_constraint_CT_MODULO(stateObj, b);
+case CT_GADGET : return build_constraint_CT_GADGET(stateObj, b);
 }}

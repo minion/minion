@@ -48,6 +48,7 @@ struct LeqConstraint : public Constraint
 	t.push_back(make_trigger(x, Trigger(this, 0), LowerBound));
 	t.push_back(make_trigger(y, Trigger(this, 1), UpperBound));
 	return t;
+    
   }
 
   // Needs to be at end of file
