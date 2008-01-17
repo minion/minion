@@ -49,7 +49,7 @@ namespace Controller
   inline void world_pop_all(StateObj* stateObj)
   {
 	int depth = getMemory(stateObj).backTrack().current_depth();
-	for(int i = 0; i < depth; ++i)
+	for(; depth > 0; depth--)
 	  world_pop(stateObj); 
   }
 }

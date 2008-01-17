@@ -27,6 +27,13 @@ echo "void help(string request)";
 echo "{";
 previous_entry=hjkhasdkjfhsdkbfs76f87sdf; #doesn't match any entry
 firsttime=true;
+echo "if(\"\" == request) {";
+echo "cout << \"To use this help feature run the minion executable followed by help followed by the\" << NEWLINE;";
+echo "cout << \"entry you wish to see. For example to see documentation on variables you should type:\" << NEWLINE << NEWLINE;";
+echo "cout << \"   minion help variables\" << NEWLINE << NEWLINE;";
+echo "cout << \"You can find out what other entries are available, if any, by looking at the 'subentries'\" << NEWLINE;";
+echo "cout << \"section at the end of an entry.\" << NEWLINE << NEWLINE;";
+echo "} else";
 find . \( ! -regex '.*/\..*' \) -iname "*.cpp" -or -iname "*.hpp" -or -iname "*.h" -type f -exec grep -H -n "/\*\* @help" {} \; | while read entry ; do
     match_file=`echo $entry | cut -d: -f1`; #file comment is in
     match_line=`echo $entry | cut -d: -f2`; #line comment begins on
