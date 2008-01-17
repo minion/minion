@@ -45,7 +45,7 @@ struct parse_exception : public std::exception
   {}
 };
 
-#define D_FATAL_ERROR(s) { D_FATAL_ERROR2(s,  __FILE__, to_string(__LINE__)); abort(); }
+#define D_FATAL_ERROR(s) { D_FATAL_ERROR2(s,  __FILE__, to_string(__LINE__)); throw 0; }
 
 // These functions are defined in debug_functions.cpp
 
@@ -65,10 +65,10 @@ void assert_function(BOOL x, const char* a, const char* f, int line);
 #define D_ASSERT(x) assert_function(x, #x, __FILE__, __LINE__);
 #define D_DATA(x) x
 
-enum debug_types
+enum DebugTypes
 { DI_SOLVER, DI_SUMCON, DI_BOOLCON, DI_ANDCON, DI_ARRAYAND, DI_QUEUE, DI_REIFY,
-  DI_LEXCON, DI_TABLECON, DI_TEST, DI_DYSUMCON, DI_DYNAMICTRIG, DI_DYELEMENT, 
-  DI_INTCONTAINER, DI_GACELEMENT, DI_CHECKCON, DI_VECNEQ };
+  DI_LEXCON, DI_TABLECON, DI_TEST, DI_DYSUMCON, DI_DYNAMICTRIG, DI_DYELEMENT, DI_INTCON, DI_LONGINTCON,
+  DI_INTCONTAINER, DI_BOUNDCONTAINER, DI_GACELEMENT, DI_CHECKCON, DI_VECNEQ, DI_MEMBLOCK, DI_POINTER };
   
 #define DEBUG_CASE(x) case x: std::cerr << #x; break;
 
@@ -76,7 +76,7 @@ enum debug_types
 #define D_INFO(x,y,z)
 #else
 // importance: 0 = trivial, 1 = important, 2 = v. important.
-  inline void D_INFO(int importance, debug_types x, std::string s)
+  inline void D_INFO(int importance, DebugTypes x, std::string s)
   {
     std::cerr << importance << ",";
     switch(x)
@@ -94,10 +94,15 @@ enum debug_types
 	  DEBUG_CASE(DI_DYSUMCON);
 	  DEBUG_CASE(DI_DYNAMICTRIG);
 	  DEBUG_CASE(DI_DYELEMENT);
+      DEBUG_CASE(DI_INTCON);
+      DEBUG_CASE(DI_LONGINTCON);
 	  DEBUG_CASE(DI_INTCONTAINER);
+      DEBUG_CASE(DI_BOUNDCONTAINER);
 	  DEBUG_CASE(DI_GACELEMENT);
 	  DEBUG_CASE(DI_CHECKCON);
 	  DEBUG_CASE(DI_VECNEQ);
+      DEBUG_CASE(DI_MEMBLOCK);
+      DEBUG_CASE(DI_POINTER);
       default:
 	D_FATAL_ERROR("Missing debug case. Go add it to line 125(ish) in debug.h");
     };

@@ -15,3 +15,12 @@ bool increment_vector(Container& vals, const Container& maxvals)
   }
   return !carry;
 }
+
+/// A simple wrapper for a pair of bounds.
+struct Bounds
+{
+  int lower_bound;
+  int upper_bound;
+  Bounds(int _lower, int _upper) : lower_bound(_lower), upper_bound(_upper)
+  { }
+};
