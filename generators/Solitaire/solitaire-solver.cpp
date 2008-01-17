@@ -172,7 +172,15 @@ int main (int argc, char * const argv[]) {
 	for(int j = 0; j < NOTRANSITIONS; ++j)
 	  unchanged[i].push_back(Var(Bool, unchanged_vars_start + i*NOTRANSITIONS + j));
   
+
+  
+  CSP.discrete.push_back(BoundsList(0, NOTRANSITIONS, NOMOVES));
+  //  int single_transition_vars = CSP.bool;
+  
   cout << "# Solitaire reverse, based from position:" << start_boardpos << endl;
+    
+  for(int v = 0; v < NOTRANSITIONS; ++v)
+    printf("#%d:(%d,%d),(%d,%d)\n", v, transitions[v][0], transitions[v][1], transitions[v][2], transitions[v][3]);
   
   CSP.print_vars();
   
@@ -189,12 +197,19 @@ int main (int argc, char * const argv[]) {
   }
   CSP.print_var_order(var_order);
   CSP.print_val_order(val_order);  
-  // No matrices at the moment
-  cout << "0 0 0" << endl;
+  
+  cout << "1" << endl;
+  cout << "[x" << CSP.bools << endl;
+  for(int i = CSP.bools + 1; i < CSP.bools + NOMOVES; ++i)
+    cout << ",x" << i;
+    cout << "]" << endl;
+    
+
+  cout << "0 0" << endl;
   
   CSP.optimise_none();
   
-  cout << "print none" << endl;
+  cout << "print v0" << endl;
   
   for(int i=0;i<NOMOVES;++i)
   {
@@ -293,5 +308,21 @@ int main (int argc, char * const argv[]) {
 	  }
   }
   
-}
+  for(int i = 0; i < NOMOVES; ++i)
+    for(int j = 0; j < NOTRANSITIONS; ++j)
+    {
+      CSP.constraintReify(transition_vars[i][j], Eq, Var(Discrete, i), Var(Constant, j));
+    }
+  //CSP.constraint(Eq, transition_vars[1][getTransitionNum(3,3,3,5)], Var(Constant, 1));
+
+  CSP.constraint(Eq, Var(Discrete, 0), Var(Constant, 68));
+  CSP.constraint(Eq, Var(Discrete, 1), Var(Constant, 62));
+  CSP.constraint(Eq, Var(Discrete, 2), Var(Constant, 24));
+  CSP.constraint(Eq, Var(Discrete, 3), Var(Constant, 15));
+  CSP.constraint(Eq, Var(Discrete, 4), Var(Constant, 51));
+  
+  
+  
+
+ }
 

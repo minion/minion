@@ -1,0 +1,23 @@
+MINION 3
+#TEST CHECKONESOL 0
+#This just sanity checks a number of products, to make sure
+#we deal with negative numbers correctly.
+
+
+**VARIABLES**
+
+BOOL b
+
+**CONSTRAINTS**
+
+product(1,2,2)
+product(0,10,0)
+product(-1,0,0)
+product(-1,-1,1)
+product(-1,1,-1)
+product(-2,-2,4)
+product(-10,10,-100)
+product(10,-10,-100)
+product(-10,-10,100)
+
+**EOF**

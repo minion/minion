@@ -26,22 +26,11 @@ using namespace ProbSpec;
 
 #include "MinionInputReader.h"
 
-int inputFileVersionNumber;
+//ConstraintDef* constraint_list;
 
-#include "build_constraints/constraint_defs.h"
+const int num_of_constraints = 28;// = sizeof(constraint_list) / sizeof(ConstraintDef);
 
-const int num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);
-
-ConstraintDef& get_constraint(ConstraintType t)
-{
-  for(int i = 0; i < num_of_constraints; ++i)
-  {
-    if(constraint_list[i].type == t)
-	  return constraint_list[i];
-  }
-  
-  D_FATAL_ERROR( "Constraint not found");
-}
+ConstraintDef& get_constraint(ConstraintType t);
 
 template<typename T>
 vector<T> make_vec(const T& t)
@@ -126,46 +115,12 @@ vector<Var> MinionInputReader::getRowThroughTensor(
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // read
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void MinionInputReader::read(char* fn) {  
-  
-  InputFileReader* infile;
-  
-  if(fn != string("--"))
-  {
-    infile = new ConcreteFileReader<ifstream>(fn);
-	if (infile->failed_open()) {
-	  D_FATAL_ERROR("Can't open given input file '" + string(fn) + "'.");
-	}
-  }
-  else
-	infile = new ConcreteFileReader<std::basic_istream<char, std::char_traits<char> >&>(cin);
-  
-  string test_name = infile->get_string();
-  
-  if(test_name != "MINION")
-  {
-    D_FATAL_ERROR("Error! All Minion input files must begin 'MINION <input version num>");
-  }
-  
-  inputFileVersionNumber = infile->read_num();
-  
-  if(parser_verbose)
-    cout << "Input file has version num " << inputFileVersionNumber << endl;
-  
-  // Just swallow the rest of this line, in particular the return. Extra stuff could be added on the line
-  // later without breaking this version of the parser..
-  infile->getline();
-  
-  if(inputFileVersionNumber != 1 && inputFileVersionNumber != 2)
-    D_FATAL_ERROR("This version of Minion only reads files with input format 1 or 2."); 
+void MinionInputReader::read(InputFileReader* infile) {  
   
   while(infile->peek_char() == '#')
     parser_info(string("Read comment line:") + infile->getline());
 
-#ifndef NOCATCH  
-  try
-  {
-#endif
+
 	readVars(infile) ;
 	readVarOrder(infile) ;
 	readValOrder(infile) ;
@@ -191,55 +146,6 @@ void MinionInputReader::read(char* fn) {
 	
 	while(readConstraint(infile, false)) ;
 
-#ifndef NOCATCH
-  }
-  catch(parse_exception& s)
-  {
-    cerr << "Error in input." << endl;
-	cerr << s.what() << endl;
-	
-	ConcreteFileReader<ifstream>* stream_cast = 
-	   dynamic_cast<ConcreteFileReader<ifstream>*>(infile);
-	if(stream_cast)
-	{
-	  // This nasty line will tell us the current position in the file 
-	  // even if a parse fail has occurred.
-	  int error_pos =  stream_cast->infile.rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
-	  int line_num = 0;
-	  int end_prev_line = 0;
-	  char* buf = new char[1000000];
-      stream_cast->infile.close();
-	  // Open a new stream, because we don't know what kind of a mess
-	  // the old one might be in.
-	  ifstream error_file(fn);
-	  while(error_pos > error_file.tellg())
-	  { 
-	    end_prev_line = error_file.tellg();
-	    error_file.getline(buf,1000000);
-	    line_num++;
-	  }
-	  cerr << "Error on line:" << line_num << ". Gave up parsing somewhere around here:" << endl;
-	  cerr << string(buf) << endl;
-	  for(int i = 0; i < (error_pos - end_prev_line); ++i)
-	    cerr << "-";
-	  cerr << "^" << endl;
-    }
-    else
-	{
-	  // Had an input stream.
-	  cerr << "At the moment we can't show where a problem occured in the input stream." << endl;
-	  char* buf = new char[100000];
-	  buf[0]='\0';
-	  cin.getline(buf, 100000);
-	  cerr << "The rest of the line that went wrong is:" << endl;
-	  cerr << buf << endl;
-	  cerr << "Try saving your output to a temporary file." << endl;
-	}
-	
-	cerr << "Sorry it didn't work out." << endl;
-    exit(1);
-  }
-#endif
 }
 
 
@@ -776,12 +682,10 @@ void MinionInputReader::readVarOrder(InputFileReader* infile) {
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void MinionInputReader::readVars(InputFileReader* infile) {
   int lb, ub, count ;
-  int total_var_count = 0;
   char delim ;
   ProbSpec::VarContainer var_obj;
   // Read 01Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   int noOfVarType = infile->read_num();
-  total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of 01 Vars: " << noOfVarType << endl ;
   var_obj.BOOLs = noOfVarType;
@@ -790,7 +694,6 @@ void MinionInputReader::readVars(InputFileReader* infile) {
   // **** Construct this many 01Vars
   // Read Bounds Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   noOfVarType = infile->read_num();
-  total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of Bounds Vars: " << noOfVarType << endl ;
   while (noOfVarType > 0) {
@@ -807,7 +710,6 @@ void MinionInputReader::readVars(InputFileReader* infile) {
   
   // Read Sparse Bounds Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   noOfVarType = infile->read_num();
-  total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of Sparse Bounds Vars: " << noOfVarType << endl ;
   int domainElem ;
@@ -835,7 +737,6 @@ void MinionInputReader::readVars(InputFileReader* infile) {
   
   // Read Discrete Bounds Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   noOfVarType = infile->read_num();
-  total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of Discrete Vars: " << noOfVarType << endl ;
   while (noOfVarType > 0) {
@@ -852,7 +753,6 @@ void MinionInputReader::readVars(InputFileReader* infile) {
   }
   // Read Discrete Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   noOfVarType = infile->read_num();
-  total_var_count += noOfVarType;
   if(parser_verbose)
     cout << "Number of Sparse Discrete Vars: " << noOfVarType << endl ;
   while (noOfVarType > 0) {
@@ -871,7 +771,6 @@ void MinionInputReader::readVars(InputFileReader* infile) {
     noOfVarType -= count ;
   }
   
-  var_obj.total_var_count = total_var_count;
   instance.vars = var_obj;
 }
 

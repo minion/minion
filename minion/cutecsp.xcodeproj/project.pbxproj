@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		26131D1409CB1D2000ACF137 /* BuildConstraint2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26131D1209CB1D1F00ACF137 /* BuildConstraint2.cpp */; };
 		261C44E4099A0B6600FFBDCA /* MinionInputReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */; };
+		263ACB500C75B3DC00AE5947 /* MinionThreeInputReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263ACB4F0C75B3DC00AE5947 /* MinionThreeInputReader.cpp */; };
 		2643EA720C4573CD004231DE /* constraint_setup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2643EA700C4573CD004231DE /* constraint_setup.cpp */; };
 		2643EA730C4573CD004231DE /* debug_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2643EA710C4573CD004231DE /* debug_functions.cpp */; };
 		2643EA760C4573E7004231DE /* CT_DIV.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2643EA740C4573E7004231DE /* CT_DIV.cpp */; };
@@ -62,6 +63,7 @@
 		2626D75609751DCD002AC405 /* intvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intvar.h; path = variables/containers/intvar.h; sourceTree = "<group>"; };
 		262C59E009C785EE0027E72E /* long_intvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = long_intvar.h; path = variables/containers/long_intvar.h; sourceTree = "<group>"; };
 		26376D8A09884D07006D13DE /* constraint_boundtable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_boundtable.h; path = constraints/constraint_boundtable.h; sourceTree = "<group>"; };
+		263ACB4F0C75B3DC00AE5947 /* MinionThreeInputReader.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = MinionThreeInputReader.cpp; sourceTree = "<group>"; };
 		2640F4670B32DD050075FB8C /* to_string.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = to_string.h; path = system/to_string.h; sourceTree = "<group>"; };
 		2643AA9509D1BCBB002E40A7 /* variable_shift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = variable_shift.h; path = variables/mappings/variable_shift.h; sourceTree = "<group>"; };
 		2643EA700C4573CD004231DE /* constraint_setup.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = constraint_setup.cpp; sourceTree = "<group>"; };
@@ -313,6 +315,7 @@
 				26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */,
 				2644ACE40A192B90002BD572 /* minion.cpp */,
 				26CA01FF0998C43C0064B996 /* MinionInputReader.h */,
+				263ACB4F0C75B3DC00AE5947 /* MinionThreeInputReader.cpp */,
 				26A857BC099B6A6200ECA923 /* CSPSpec.h */,
 			);
 			name = FrontEnd;
@@ -523,6 +526,7 @@
 				2643EA730C4573CD004231DE /* debug_functions.cpp in Sources */,
 				2643EA760C4573E7004231DE /* CT_DIV.cpp in Sources */,
 				2643EA770C4573E7004231DE /* CT_MODULO.cpp in Sources */,
+				263ACB500C75B3DC00AE5947 /* MinionThreeInputReader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

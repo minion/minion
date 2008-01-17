@@ -109,6 +109,7 @@ enum VariableType
   VAR_DISCRETE_LONG,
   VAR_SPARSEDISCRETE,
   VAR_CONSTANT,
+  VAR_MATRIX,
   VAR_INVALID = -999
 };
 
@@ -191,16 +192,93 @@ struct ConstraintBlob
 /// Contains all the variables in a CSP instance.
   struct VarContainer
 {
-  int total_var_count;
-
   int BOOLs;
+  map<string, Var> symbol_table;
   vector<pair<int, Bounds> > bound;
   vector<pair<int, vector<int> > > sparse_bound;
   vector<pair<int, Bounds> > discrete;
   vector<pair<int, vector<int> > > sparse_discrete;
-  VarContainer()
+  map<string, vector<int> > matrix_table;
+  VarContainer() : BOOLs(0)
   {}
+
+  vector<Var> buildVarList(const string& name, vector<int> params)
+  {
+     vector<Var> return_list;
+    
+     vector<int> max_index = getMatrixSymbol(name);
+     if(params.size() != max_index.size())
+      throw parse_exception("Can't index a " + to_string(max_index.size()) + 
+                            "-d matrix with " + to_string(params.size()) +
+                            " indices.");
+    for(int i = 0; i < params.size(); ++i)
+    {
+      // Horrible hack: -999 means it was an _
+      if(params[i] != -999 && (params[i] < 0 || params[i] >= max_index[i]))
+        throw parse_exception(to_string(i) + string("th index is invalid"));
+    }
+    
+    // Set all fixed indices to 1, so they won't move.
+    // Set all variable indices to their max value.
+    vector<int> modified_max(params.size());
+    for(int i = 0; i < max_index.size(); i++)
+    {
+      if(params[i] == -999)
+        modified_max[i] = max_index[i];
+      else
+        modified_max[i] = 1;
+    }
+    
+    // Iterates through the variable indices
+    vector<int> current_index(params.size());
+    
+    // Vector which actually contains the output
+    vector<int> output(params);
+    do
+    {
+      for(int i = 0; i < max_index.size(); i++)
+        if(params[i] == -999)
+          output[i] = current_index[i];
+      return_list.push_back(getSymbol(name + to_string(output)));
+    }
+    while(increment_vector(current_index, modified_max));
+          
+    return return_list;
+  }
   
+  void addSymbol(const string& name, Var variable)
+  {
+    if(name[0] >= 0 && name[0] <= 9)
+      throw parse_exception("Names cannot start with a number!:" + name);
+    if(symbol_table.count(name) != 0)
+      throw parse_exception("Name already in table:" + name);
+    
+    symbol_table[name] = variable;
+  
+  }
+  
+  void addMatrixSymbol(const string& name, const vector<int>& indices)
+  {
+    Var var(VAR_MATRIX, matrix_table.size());
+    addSymbol(name, var);
+    matrix_table[name] = indices;
+  }
+  
+  Var getSymbol(const string& name)
+  {
+    map<string, Var>::iterator it = symbol_table.find(name);
+    if(it == symbol_table.end())
+      throw parse_exception("Undefined name: '" + name + "'");
+    return it->second;
+  }
+  
+  vector<int> getMatrixSymbol(const string& name)
+  {
+    map<string, vector<int> >::iterator it = matrix_table.find(name);
+    if(it == matrix_table.end())
+      throw parse_exception("Undefined matrix: '" + name + "'");
+    return it->second;
+  }
   
   Bounds get_bounds(Var v)
   {
@@ -302,11 +380,66 @@ struct ConstraintBlob
   
   vector<Var> get_all_vars()
   {
+    int total_var_count = 0;
+    total_var_count += BOOLs;
+    
+    for(unsigned int x = 0; x < bound.size(); ++x)
+      total_var_count += bound[x].first;
+    for(unsigned int x=0;x<sparse_bound.size();++x)
+      total_var_count += sparse_bound[x].first;
+    for(unsigned int x=0;x<discrete.size();++x)
+      total_var_count += discrete[x].first;
+    for(unsigned int x=0;x<sparse_discrete.size();++x)
+      total_var_count += sparse_discrete[x].first;
+      
 	vector<Var> all_vars(total_var_count);
 	for(int i = 0; i < total_var_count; ++i)
 	  all_vars[i] = get_var('x',i);
 	return all_vars;
   }
+  
+  Var getNewVar(VariableType type, vector<int> bounds)
+  {
+    switch(type)
+    {
+      case VAR_BOOL:
+        return getNewBoolVar();
+      case VAR_BOUND:
+        return getNewBoundVar(bounds[0], bounds[1]);
+      case VAR_SPARSEBOUND:
+        return getNewSparseBoundVar(bounds);
+      case VAR_DISCRETE_BASE:
+        return getNewDiscreteVar(bounds[0], bounds[1]);
+			default:
+			  D_FATAL_ERROR("Internal error");
+    }
+  }
+  
+  Var getNewBoolVar()
+  {
+    Var newBool(VAR_BOOL, BOOLs);
+    BOOLs++;
+    return newBool;
+  }
+  
+  Var getNewBoundVar(int lower, int upper)
+  {
+     bound.push_back(make_pair(1, ProbSpec::Bounds(lower, upper)));
+     return Var(VAR_BOUND, bound.size() - 1);
+  }
+  
+  Var getNewSparseBoundVar(const vector<int>& vals)
+  {
+    sparse_bound.push_back(make_pair(1, vals));
+    return Var(VAR_SPARSEBOUND, sparse_bound.size() - 1);
+  }
+  
+  Var getNewDiscreteVar(int lower, int upper)
+  {
+    discrete.push_back(make_pair(1, ProbSpec::Bounds(lower, upper)));
+    return Var(VAR_DISCRETE_BASE, discrete.size() - 1);
+  }
+    
 };
 
 
@@ -316,13 +449,11 @@ struct ConstraintBlob
   list<ConstraintBlob> constraints;
   vector<Var> var_order;
   vector<char> val_order;
-  
   bool is_optimisation_problem;
   bool optimise_minimising;
   Var optimise_variable;
   
   vector<vector<Var> > print_matrix;
-	
   
   CSPInstance() : is_optimisation_problem(false)
   {}
@@ -471,6 +602,22 @@ struct ConstraintBlob
 
   }
   
+  map<string, TupleList*> table_symboltable;
+
+  void addTableSymbol(string name, TupleList* tuplelist)
+  {
+    if(table_symboltable.count(name) != 0)
+      throw parse_exception("Tuplename '"+name+"' already in use");
+    table_symboltable[name] = tuplelist;
+  }
+  
+  TupleList* getTableSymbol(string name)
+  {
+    map<string, TupleList*>::iterator it = table_symboltable.find(name);
+    if(it == table_symboltable.end())
+      throw parse_exception("Undefined tuplelist: '" + name + "'");
+    return it->second;
+  }
 };
 
 }

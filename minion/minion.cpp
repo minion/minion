@@ -104,7 +104,8 @@ void print_info()
   
 BOOL randomise_valvaroder = false;
 
-void parse_command_line(MinionInputReader& reader, MinionArguments& args, int argc, char** argv)
+template<typename Reader>
+void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** argv)
 {
  for(int i = 1; i < argc - 1; ++i)
   {
@@ -237,7 +238,8 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 
 pair<vector<AnyVarRef>, vector<int> > var_val_order;
 
-void BuildCSP(MinionInputReader& reader)
+template<typename Reader>
+void BuildCSP(Reader& reader)
 {
   // Fix up Bound / Sparse Bound
   
@@ -288,45 +290,10 @@ void BuildCSP(MinionInputReader& reader)
 
 }
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//Entrance:
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-int main(int argc, char** argv) {
-  start_clock();
-  
-  if (argc == 1)
-    print_info();
 
-  MinionInputReader reader;
-  MinionArguments args;
-  parse_command_line(reader, args, argc, argv);
- 
-  
-  cout << "# " << VERSION << endl ;
-  cout << "# Svn version: " << SVN_VER << endl;
-
-  if (!Controller::print_only_solution) 
-  { 
-
-    cout << "# Svn last changed date: " << SVN_DATE << endl;
-          
-    time_t rawtime;
-    time(&rawtime);
-    cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
-    cout << "#    http://minion.sourceforge.net" << endl;
-    cout << "#  Minion is still very new and in active development." << endl;
-    cout << "#  If you have problems with Minion or find any bugs, please tell us!" << endl;
-    cout << "#  Either at the bug reporter at the website, or 'chris@bubblescope.net'" << endl;
-    cout << "# Input filename: " << argv[argc-1] << endl;
-    cout << "# Command line: " ;
-    for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; } 
-    cout << endl;
-  
-  }
-
-  reader.read(argv[argc - 1]) ;
-  
-  
+template<typename Reader>
+void SolveCSP(Reader& reader, MinionArguments args)
+{
   if (!Controller::print_only_solution) { print_timestep("Parsing Time: ");} 
   
   BuildCSP(reader);
@@ -337,11 +304,11 @@ int main(int argc, char** argv) {
   {
 	cout << "Using seed: " << args.random_seed << endl;
 	srand( args.random_seed );
-  
+    
     std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());
     for(unsigned i = 0; i < var_val_order.second.size(); ++i)
       var_val_order.second[i] = (rand() % 100) > 50;
-	  
+    
 	if(reader.parser_verbose)
 	{
 	  int size = var_val_order.first.size();
@@ -351,7 +318,7 @@ int main(int argc, char** argv) {
 	    for(int i = 1; i < size; ++i)
 	      cout << "," << var_val_order.first[i];
 	    cout << ">" << endl;
-	  
+        
 	    cout << "Val Order: <" << var_val_order.second[0];
 	    for(int i = 1; i < size; ++i)
 	      cout << "," << var_val_order.second[i];
@@ -362,7 +329,7 @@ int main(int argc, char** argv) {
   // Solve!
   
   long long initial_lit_count = 0;
-    
+  
   if(args.preprocess != MinionArguments::None)
     initial_lit_count = lit_count(var_val_order.first);
   
@@ -372,7 +339,7 @@ int main(int argc, char** argv) {
 	if(args.preprocess != MinionArguments::None)
 	{
       bool bounds_check = (args.preprocess == MinionArguments::SACBounds) ||
-                          (args.preprocess == MinionArguments::SSACBounds);
+      (args.preprocess == MinionArguments::SSACBounds);
 	  long long lits = lit_count(var_val_order.first);
       cout << "Initial GAC loop literal removal:" << initial_lit_count - lits << endl;
 	  clock_t start_SAC_time = clock();
@@ -393,7 +360,7 @@ int main(int argc, char** argv) {
 	if(!Controller::failed)
       solve(args.order, var_val_order);
   }
- 
+  
   print_finaltimestep("Solve Time: ");
   cout << "Total Nodes: " << nodes << endl;
   cout << "Problem solvable?: " 
@@ -404,6 +371,140 @@ int main(int argc, char** argv) {
 #ifdef MORE_SEARCH_INFO
   print_search_info();
 #endif
+  
+}
+
+template<typename Reader>
+void ReadCSP(Reader& reader,  InputFileReader* infile, char* filename)
+{
+#ifndef NOCATCH  
+  try
+{
+#endif
+  
+  reader.read(infile) ;
+  
+#ifndef NOCATCH
+}
+catch(parse_exception& s)
+{
+  cerr << "Error in input." << endl;
+  cerr << s.what() << endl;
+  
+  ConcreteFileReader<ifstream>* stream_cast = 
+	   dynamic_cast<ConcreteFileReader<ifstream>*>(infile);
+  if(stream_cast)
+  {
+    // This nasty line will tell us the current position in the file 
+    // even if a parse fail has occurred.
+    int error_pos = stream_cast->infile.rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
+    int line_num = 0;
+    int end_prev_line = 0;
+    char* buf = new char[1000000];
+    stream_cast->infile.close();
+    // Open a new stream, because we don't know what kind of a mess
+    // the old one might be in.
+    ifstream error_file(filename);
+    while(error_pos > error_file.tellg())
+    { 
+      end_prev_line = error_file.tellg();
+      error_file.getline(buf,1000000);
+      line_num++;
+    }
+    cerr << "Error on line:" << line_num << ". Gave up parsing somewhere around here:" << endl;
+    cerr << string(buf) << endl;
+    for(int i = 0; i < (error_pos - end_prev_line); ++i)
+      cerr << "-";
+    cerr << "^" << endl;
+  }
+  else
+  {
+    // Had an input stream.
+    cerr << "At the moment we can't show where a problem occured in the input stream." << endl;
+    char* buf = new char[100000];
+    buf[0]='\0';
+    cin.getline(buf, 100000);
+    cerr << "The rest of the line that went wrong is:" << endl;
+    cerr << buf << endl;
+    cerr << "Try saving your output to a temporary file." << endl;
+  }
+  
+  cerr << "Sorry it didn't work out." << endl;
+  exit(1);
+}
+#endif
+}
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//Entrance:
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+int main(int argc, char** argv) {
+  start_clock();
+  
+  if (argc == 1)
+    print_info();
+  
+  cout << "# " << VERSION << endl ;
+  cout << "# Svn version: " << SVN_VER << endl;
+  
+  if (!Controller::print_only_solution) 
+  { 
+    
+    cout << "# Svn last changed date: " << SVN_DATE << endl;
+    
+    time_t rawtime;
+    time(&rawtime);
+    cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
+    cout << "#    http://minion.sourceforge.net" << endl;
+    cout << "#  Minion is still very new and in active development." << endl;
+    cout << "#  If you have problems with Minion or find any bugs, please tell us!" << endl;
+    cout << "#  Either at the bug reporter at the website, or 'chris@bubblescope.net'" << endl;
+    cout << "# Input filename: " << argv[argc-1] << endl;
+    cout << "# Command line: " ;
+    for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; } 
+    cout << endl;
+  }
+  
+ 
+  InputFileReader* infile;
+  
+  if( argv[argc - 1] != string("--") )
+  {
+    infile = new ConcreteFileReader<ifstream>(argv[argc - 1]);
+	if (infile->failed_open()) {
+	  D_FATAL_ERROR("Can't open given input file '" + string(argv[argc - 1]) + "'.");
+	}    
+  }
+  else
+    infile = new ConcreteFileReader<std::basic_istream<char, std::char_traits<char> >&>(cin);
+  
+  string test_name = infile->get_string();
+  if(test_name != "MINION")
+    D_FATAL_ERROR("All Minion input files must begin 'MINION'");
+  
+  int inputFileVersionNumber = infile->read_num();
+  
+  if(inputFileVersionNumber > 3)
+    D_FATAL_ERROR("This version of Minion only supports formats up to 3");
+  
+  if(inputFileVersionNumber == 3)
+  {
+    MinionThreeInputReader reader;
+    MinionArguments args;
+    parse_command_line(reader, args, argc, argv);
+    ReadCSP(reader, infile, argv[argc - 1]);
+
+    SolveCSP(reader, args);
+  }
+  else
+  {
+    MinionInputReader reader;
+    MinionArguments args;
+    parse_command_line(reader, args, argc, argv);
+     ReadCSP(reader, infile, argv[argc - 1]);
+    SolveCSP(reader, args);
+  }
+  
   return 0;
 }
 
