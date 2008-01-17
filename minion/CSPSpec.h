@@ -116,16 +116,6 @@ enum VariableType
 
 namespace ProbSpec
 {
-  
-  
-  /// A simple wrapper for a pair of bounds.
-  struct Bounds
-{
-  int lower_bound;
-  int upper_bound;
-  Bounds(int _lower, int _upper) : lower_bound(_lower), upper_bound(_upper)
-  { }
-};
 
 struct Var
 {
@@ -425,7 +415,7 @@ struct ConstraintBlob
   
   Var getNewBoundVar(int lower, int upper)
   {
-     bound.push_back(make_pair(1, ProbSpec::Bounds(lower, upper)));
+     bound.push_back(make_pair(1, Bounds(lower, upper)));
      return Var(VAR_BOUND, bound.size() - 1);
   }
   
@@ -437,7 +427,7 @@ struct ConstraintBlob
   
   Var getNewDiscreteVar(int lower, int upper)
   {
-    discrete.push_back(make_pair(1, ProbSpec::Bounds(lower, upper)));
+    discrete.push_back(make_pair(1, Bounds(lower, upper)));
     return Var(VAR_DISCRETE_BASE, discrete.size() - 1);
   }
     
