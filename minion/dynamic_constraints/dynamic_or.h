@@ -116,7 +116,7 @@ struct BoolOrConstraintDynamic : public DynamicConstraint
   {
     D_INFO(2, DI_OR, "Checking soln in or constraint");
     for(int i = 0; i < no_vars; i++)
-      if(v[i])
+      if(v[i] == negs[i])
 	return true;
     return false;
   }
