@@ -233,6 +233,9 @@ BOOL MinionThreeInputReader::readConstraint(InputFileReader* infile, BOOL reifie
 	case CT_WATCHED_TABLE:
 	  readConstraintTable(infile, get_constraint(CT_WATCHED_TABLE));
 	  break;
+      
+    case CT_GADGET:
+      readConstraintGadget(infile, get_constraint(CT_GADGET));
 
 	default:
 	  readGeneralConstraint(infile, constraint);
@@ -372,6 +375,31 @@ void MinionThreeInputReader::readConstraintTable(InputFileReader* infile, const 
 	tableCon.tuples = tuplelist;
 	instance.add_constraint(tableCon);
 }
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// readConstraintTable
+// table(<vectorOfVars>, {<tuple> [, <tuple>]})
+// Tuples represented as a vector of int arrays.
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+void MinionThreeInputReader::readConstraintGadget(InputFileReader* infile) 
+{
+  parser_info( "Reading a gadget constraint" ) ;
+  
+  vector<Var> vectorOfVars = readVectorExpression(infile) ;
+  int tupleSize = vectorOfVars.size() ;
+  
+  infile->check_sym(',');
+  
+  string s = infile->get_string();
+  
+  shared_ptr<CSPInstance> in_gadget = getGadgetSymbol(s);
+  ConstraintBlob gadgetCon( get_constraint(CT_GADGET) , vectorOfVars);
+  gadgetCon.gadget = in_gadget;
+  infile->check_sym(')');
+  
+  instance.add_constraint(tableCon);
+}
+
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readIdentifier

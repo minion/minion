@@ -67,7 +67,8 @@ enum ConstraintType {
   CT_DIV,
   CT_MODULO,
   CT_REIFY,
-  CT_REIFYIMPLY
+  CT_REIFYIMPLY,
+  CT_GADGET
 };
 
 enum ReadTypes
@@ -139,7 +140,8 @@ struct Var
    { return type == var.type && pos == var.pos; }
 };
 
- 
+struct CSPInstance;
+  
 /// Constructed by the parser. Suitable for holding any kind of constraint.
 struct ConstraintBlob
 {
@@ -149,6 +151,9 @@ struct ConstraintBlob
   vector<vector<Var> > vars;
   ///Pointer to list of tuples. Only used in Table Constraints.
   TupleList* tuples;
+  
+  shared_ptr<CSPInstance> gadget;
+  
   BOOL reified;
   BOOL implied_reified;
   Var reify_var;
