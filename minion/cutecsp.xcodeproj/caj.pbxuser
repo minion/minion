@@ -420,8 +420,8 @@
 	};
 	26133F97098A9BD900A2D4EC /* constants.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {766, 1806}}";
-			sepNavSelRange = "{2384, 12}";
+			sepNavIntBoundsRect = "{{0, 0}, {766, 1862}}";
+			sepNavSelRange = "{2735, 0}";
 			sepNavVisRect = "{{0, 1492}, {766, 244}}";
 			sepNavWindowFrame = "{{387, 165}, {514, 709}}";
 		};

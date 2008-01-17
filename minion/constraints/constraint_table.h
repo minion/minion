@@ -55,17 +55,17 @@ struct TableConstraint : public Constraint
   }
   
   
-  BOOL increment(vector<int>& v, unsigned int check_var)
+  bool increment(vector<int>& v, unsigned int check_var)
   {
     for(unsigned int i=0;i<v.size();i++)
     {
       if(i == check_var)
-	continue;
-        ++v[i];
+        continue;
+      ++v[i];
       while(v[i] != vars[i].getMax()+1 && !vars[i].inDomain(v[i]))
         ++v[i];
       if(v[i] != vars[i].getMax()+1)
-	return true;
+        return true;
       v[i] = vars[i].getMin();
     }
     return false;
@@ -73,31 +73,31 @@ struct TableConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int, DomainDelta)
   {
-	PROP_INFO_ADDONE(Table);
+    PROP_INFO_ADDONE(Table);
     for(unsigned int check_var = 0; check_var < vars.size(); check_var++)
     {
       //cerr << vars[check_var].data.var_num << vars[check_var].getMin() << "```" << vars[check_var].getMax() << vars[check_var].inDomain(0) <<  endl;
       for(int check_dom = vars[check_var].getMin();
-	  check_dom <= vars[check_var].getMax(); check_dom++)
+          check_dom <= vars[check_var].getMax(); check_dom++)
       {
-	vector<int> v(vars.size());
+        vector<DomainInt> v(vars.size());
         for(unsigned int i=0;i<vars.size();i++)
-	  v[i] = vars[i].getMin();
+          v[i] = vars[i].getMin();
         v[check_var] = check_dom;
-	BOOL satisfied = false;
-	do
-	{
-	  if(constraint->check_assignment(v))
-	  { 
-	    satisfied = true; 
-	   // D_INFO(0,DI_TABLECON,to_string(check_var,check_dom)+print_vec(v));
-	  }
-	} while(!satisfied && increment(v, check_var));
-	if(!satisfied)
-	{
-	  D_INFO(0,DI_TABLECON,string("Removing:")+to_string(check_var,check_dom));
-	  vars[check_var].removeFromDomain(check_dom);
-	}
+        BOOL satisfied = false;
+        do
+        {
+          if(constraint->check_assignment(v))
+          { 
+            satisfied = true; 
+            // D_INFO(0,DI_TABLECON,to_string(check_var,check_dom)+print_vec(v));
+          }
+        } while(!satisfied && increment(v, check_var));
+        if(!satisfied)
+        {
+          D_INFO(0,DI_TABLECON,string("Removing:")+to_string(check_var,check_dom));
+          vars[check_var].removeFromDomain(check_dom);
+        }
       }
     }
   }  
