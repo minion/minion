@@ -168,8 +168,22 @@ GeqWeightBoolSumCon(const VarArray& _var_array, const WeightArray& w_array, cons
  
 template<typename T1, typename T2>
 Constraint*
-LeqWeightedSum(const light_vector<int>& scale, const light_vector<T1>& vec, const light_vector<T2>& t2)
+LeqWeightedSum(light_vector<int> scale, light_vector<T1> vec, const light_vector<T2>& t2)
 {
+  
+  // Preprocess to remove any multiplications by 0, both for efficency
+  // and correctness
+  
+  for(unsigned i = 0; i < scale.size(); ++i)
+  {
+    if(scale[i] == 0)
+	{
+	  scale.erase(scale.begin() + i);
+	  vec.erase(vec.begin() + i);
+	  --i; // So we don't miss an element.
+	}
+  }
+  
   BOOL multipliers_size_one = true;
   for(unsigned i = 0; i < scale.size(); ++i)
   {
@@ -196,11 +210,26 @@ LeqWeightedSum(const light_vector<int>& scale, const light_vector<T1>& vec, cons
   }
 }
 
+// Don't pass in the vectors by reference, as we might need to copy them.
 template<typename T1, typename T2>
 Constraint*
-GeqWeightedSum(const light_vector<int>& scale, const light_vector<T1>& vec, const light_vector<T2>& t2)
+GeqWeightedSum(light_vector<int> scale, light_vector<T1> vec, const light_vector<T2>& t2)
 {
-  BOOL multipliers_size_one = true;
+  
+  // Preprocess to remove any multiplications by 0, both for efficency
+  // and correctness
+  
+  for(unsigned i = 0; i < scale.size(); ++i)
+  {
+    if(scale[i] == 0)
+	{
+	  scale.erase(scale.begin() + i);
+	  vec.erase(vec.begin() + i);
+	  --i; // So we don't miss an element.
+	}
+  }
+  
+  BOOL multipliers_size_one = true;  
   for(unsigned i = 0; i < scale.size(); ++i)
   {
 	if(scale[i] != 1 && scale[i] != -1)

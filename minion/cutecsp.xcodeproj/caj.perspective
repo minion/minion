@@ -190,6 +190,46 @@
 			<key>Content</key>
 			<dict>
 				<key>PBXProjectModuleGUID</key>
+				<string>26D054D40BE9FF2B00D2FEF2</string>
+				<key>PBXProjectModuleLabel</key>
+				<string>constraint_weightedboolsum.h</string>
+				<key>PBXSplitModuleInNavigatorKey</key>
+				<dict>
+					<key>Split0</key>
+					<dict>
+						<key>PBXProjectModuleGUID</key>
+						<string>26D054D50BE9FF2B00D2FEF2</string>
+						<key>PBXProjectModuleLabel</key>
+						<string>constraint_weightedboolsum.h</string>
+						<key>_historyCapacity</key>
+						<integer>0</integer>
+						<key>bookmark</key>
+						<string>26D054E70BEA022D00D2FEF2</string>
+						<key>history</key>
+						<array>
+							<string>26D054E00BEA01C100D2FEF2</string>
+						</array>
+					</dict>
+					<key>SplitCount</key>
+					<string>1</string>
+				</dict>
+				<key>StatusBarVisibility</key>
+				<true/>
+			</dict>
+			<key>Geometry</key>
+			<dict>
+				<key>Frame</key>
+				<string>{{0, 20}, {697, 696}}</string>
+				<key>PBXModuleWindowStatusBarHidden2</key>
+				<false/>
+				<key>RubberWindowFrame</key>
+				<string>748 135 697 737 0 0 1440 878 </string>
+			</dict>
+		</dict>
+		<dict>
+			<key>Content</key>
+			<dict>
+				<key>PBXProjectModuleGUID</key>
 				<string>26A4CE0E0BE7885700160A9E</string>
 				<key>PBXProjectModuleLabel</key>
 				<string>constraint_div.h</string>
@@ -204,10 +244,10 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>26A4CE120BE7885700160A9E</string>
+						<string>26D054E80BEA022D00D2FEF2</string>
 						<key>history</key>
 						<array>
-							<string>26A4CE100BE7885700160A9E</string>
+							<string>26A4CE120BE7885700160A9E</string>
 						</array>
 					</dict>
 					<key>SplitCount</key>
@@ -399,6 +439,8 @@
 									<string>XCDetailModule</string>
 								</dict>
 								<dict>
+									<key>BecomeActive</key>
+									<true/>
 									<key>ContentConfiguration</key>
 									<dict>
 										<key>PBXProjectModuleGUID</key>
@@ -454,11 +496,11 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>26A4CE0B0BE7856E00160A9E</string>
+				<string>26D054D10BE9FF2B00D2FEF2</string>
 				<string>1CA23ED40692098700951B8B</string>
-				<string>26A4CE0C0BE7856E00160A9E</string>
+				<string>26D054D20BE9FF2B00D2FEF2</string>
 				<string>266B6E350B6BF72A00564E0D</string>
-				<string>26A4CE0D0BE7856E00160A9E</string>
+				<string>26D054D30BE9FF2B00D2FEF2</string>
 				<string>1CA23EDF0692099D00951B8B</string>
 				<string>1CA23EE00692099D00951B8B</string>
 				<string>1CA23EE10692099D00951B8B</string>
@@ -861,6 +903,7 @@
 	<array>
 		<string>26A4CE0E0BE7885700160A9E</string>
 		<string>/Users/caj/minion/trunk/minion/cutecsp.xcodeproj</string>
+		<string>26D054D40BE9FF2B00D2FEF2</string>
 	</array>
 	<key>WindowString</key>
 	<string>2 104 1077 774 0 0 1440 878 </string>
