@@ -33,14 +33,15 @@ class TriggerMem
 {
   vector<TriggerList*> trigger_lists;
   char* triggerlist_data;
-
+  StateObj* stateObj;
+  
 public:
   void addTriggerList(TriggerList* t) 
   { trigger_lists.push_back(t); }
   
   void finaliseTriggerLists();
   
-  TriggerMem() : triggerlist_data(NULL)
+  TriggerMem(StateObj* _stateObj) : triggerlist_data(NULL), stateObj(_stateObj)
   {}
   
   void allocateTriggerListData(unsigned mem)
@@ -54,17 +55,16 @@ public:
   { delete[] triggerlist_data; }
 };
 
-VARDEF(TriggerMem* triggerMem);
-
-
 class TriggerList
 {
+  StateObj* stateObj;
+  
   TriggerList(const TriggerList&);
   void operator=(const TriggerList&);
   bool only_bounds;
   
 public:
-	TriggerList(bool _only_bounds) :
+	TriggerList(StateObj* _stateObj, bool _only_bounds) : stateObj(_stateObj), 
 	only_bounds(_only_bounds)
   { 
 	  var_count_m = 0;
@@ -105,12 +105,17 @@ public:
 	  triggers[i].resize(var_count_m);
 	
 #ifdef DYNAMICTRIGGERS
+    if(only_bounds)
+      dynamic_triggers = getMemory(stateObj).nonBackTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);
+    else
+      dynamic_triggers = getMemory(stateObj).nonBackTrack().request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
+#else
 	if(only_bounds)
-  	  dynamic_triggers.request_bytes(size * sizeof(DynamicTrigger) * 4);  
+  	  dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);  
 	else
-	  dynamic_triggers.request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
+	  dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
 #endif
-	triggerMem->addTriggerList(this);
+	getTriggerMem(stateObj).addTriggerList(this);
   }
   
   size_t memRequirement()
@@ -186,7 +191,7 @@ public:
   void slow_trigger_push(int var_num, TrigType type, int delta)
   {
     if(!triggers[type][var_num].empty())
-      queues.pushTriggers(TriggerRange(&triggers[type][var_num].front(),
+      getQueue(stateObj).pushTriggers(TriggerRange(&triggers[type][var_num].front(),
       (&triggers[type][var_num].front()) + triggers[type][var_num].size(), delta));
   }
   
@@ -212,24 +217,24 @@ public:
     D_ASSERT(trig->next != NULL);
     // This is an optimisation, no need to push empty lists.
     if(trig->next != trig)
-	  queues.pushDynamicTriggers(trig);
+	  getQueue(stateObj).pushDynamicTriggers(trig);
   }
 #endif
   
   void push_upper(int var_num, DomainInt upper_delta)
   {
 #ifdef DYNAMICTRIGGERS
-    if (state.isDynamicTriggersUsed()) dynamic_propagate(var_num, UpperBound);
+    if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, UpperBound);
 #endif
 	D_ASSERT(lock_second);
-    D_ASSERT(upper_delta > 0 || state.isFailed());
+    D_ASSERT(upper_delta > 0 || getState(stateObj).isFailed());
 	
 #ifdef SLOW_TRIGGERS
 	slow_trigger_push(var_num, UpperBound, upper_delta);
 #else
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
 	if (range.first != range.second)
-	  queues.pushTriggers(TriggerRange(range.first, range.second, 
+	  getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, 
 											 checked_cast<int>(upper_delta)));
 #endif	
   }
@@ -237,16 +242,16 @@ public:
   void push_lower(int var_num, DomainInt lower_delta)
   { 
 #ifdef DYNAMICTRIGGERS
-    if (state.isDynamicTriggersUsed()) dynamic_propagate(var_num, LowerBound);
+    if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, LowerBound);
 #endif
 	D_ASSERT(lock_second);
-	D_ASSERT(lower_delta > 0 || state.isFailed());
+	D_ASSERT(lower_delta > 0 || getState(stateObj).isFailed());
 #ifdef SLOW_TRIGGERS
 	slow_trigger_push(var_num, LowerBound, lower_delta);
 #else
 	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
 	if (range.first != range.second)
-	  queues.pushTriggers(TriggerRange(range.first, range.second, 
+	  getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, 
 											 checked_cast<int>(lower_delta)));
 #endif
   }
@@ -255,7 +260,7 @@ public:
   void push_assign(int var_num, DomainInt)
   { 
 #ifdef DYNAMICTRIGGERS
-    if (state.isDynamicTriggersUsed()) dynamic_propagate(var_num, Assigned);
+    if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, Assigned);
 #endif
     D_ASSERT(lock_second);
 
@@ -264,14 +269,14 @@ public:
 #else	
 	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
 	if (range.first != range.second)
-	  queues.pushTriggers(TriggerRange(range.first, range.second, -1));
+	  getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1));
 #endif
   }
   
   void push_domain(int var_num)
   { 
 #ifdef DYNAMICTRIGGERS
-    if (state.isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);
+    if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);
 #endif
 	
 #ifdef SLOW_TRIGGERS
@@ -280,7 +285,7 @@ public:
 	D_ASSERT(lock_second);
 	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
 	if (range.first != range.second)	  
-	  queues.pushTriggers(TriggerRange(range.first, range.second, -1)); 
+	  getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1)); 
 #endif
   }
   
@@ -337,7 +342,7 @@ public:
 	}
 	D_ASSERT(queue->sanity_check_list());
     
-	t->add_after(queue, queues.getNextQueuePtrRef());
+	t->add_after(queue, getQueue(stateObj).getNextQueuePtrRef());
 	D_ASSERT(old_list == NULL || old_list->sanity_check_list(false));
   }
 #endif
@@ -349,9 +354,9 @@ void inline TriggerMem::finaliseTriggerLists()
 	size_t trigger_size = 0;
 	for(unsigned int i = 0;i < trigger_lists.size(); i++)
 	  trigger_size += trigger_lists[i]->memRequirement();
-	triggerMem->allocateTriggerListData(trigger_size);
+	getTriggerMem(stateObj).allocateTriggerListData(trigger_size);
 	
-	char* triggerlist_offset = triggerMem->getTriggerListDataPtr();
+	char* triggerlist_offset = getTriggerMem(stateObj).getTriggerListDataPtr();
     
 	for(unsigned int i=0;i<trigger_lists.size();i++)
 	{
@@ -359,7 +364,7 @@ void inline TriggerMem::finaliseTriggerLists()
 	  trigger_lists[i]->allocateMem(triggerlist_offset);
 	  triggerlist_offset += offset;
 	}
-	D_ASSERT(triggerlist_offset - triggerMem->getTriggerListDataPtr() == (int)trigger_size);
+	D_ASSERT(triggerlist_offset - getTriggerMem(stateObj).getTriggerListDataPtr() == (int)trigger_size);
   }
 
 

@@ -47,7 +47,7 @@ struct BUILDCON
 {
   template<typename ConData>
   static 
-  CONSTRAINT_TYPE* build(const ConData& partial_build, ConstraintBlob& b, int pos);
+  CONSTRAINT_TYPE* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos);
 };
 
 
@@ -55,11 +55,11 @@ template<int initial_size, int size>
 template<typename ConData>
 CONSTRAINT_TYPE* 
 BUILDCON<initial_size, size>::
-build(const ConData& partial_build, ConstraintBlob& b, int pos)
+build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos)
 {
   const vector<Var>& vars = b.vars[pos];
   int type = vars[0].type;
-  BOOL same_type = true;
+  bool same_type = true;
   for(unsigned i = 1; i < vars.size(); ++i)
   {
 	if(vars[i].type != type)
@@ -77,33 +77,33 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 	  {
 		light_vector<BoolVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = varContainer.getBooleanContainer().get_var_num(vars[i].pos);
+		  v[i] = getVars(stateObj).getBooleanContainer().get_var_num(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
-		  build(make_pair(partial_build, &v), b, pos + 1);
+		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }
 	  case VAR_NOTBOOL:
 	  {
 		light_vector<VarNot<BoolVarRef> > v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = VarNotRef(varContainer.getBooleanContainer().get_var_num(vars[i].pos));
+		  v[i] = VarNotRef(getVars(stateObj).getBooleanContainer().get_var_num(vars[i].pos));
 		return BUILDCON<initial_size, size - 1>::
-		  build(make_pair(partial_build, &v), b, pos + 1);
+		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }
 	  case VAR_BOUND:
 	  {
 		light_vector<BoundVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = varContainer.getBoundvarContainer().get_var_num(vars[i].pos);
+		  v[i] = getVars(stateObj).getBoundvarContainer().get_var_num(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
-		  build(make_pair(partial_build, &v), b, pos + 1);
+		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }		
 	  case VAR_SPARSEBOUND:
 	  {
 		light_vector<SparseBoundVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = varContainer.getSparseBoundvarContainer().get_var_num(vars[i].pos);
+		  v[i] = getVars(stateObj).getSparseBoundvarContainer().get_var_num(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
-		  build(make_pair(partial_build, &v), b, pos + 1);
+		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }
 	  case VAR_DISCRETE_BASE:
 		D_FATAL_ERROR("Serious internal error");
@@ -112,17 +112,17 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 	  {
 		light_vector<LRangeVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = varContainer.getRangevarContainer().get_var_num(vars[i].pos);
+		  v[i] = getVars(stateObj).getRangevarContainer().get_var_num(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
-		  build(make_pair(partial_build, &v), b, pos + 1);
+		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }		
 	  case VAR_DISCRETE_LONG:
 	  {
 		light_vector<BigRangeVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = varContainer.getBigRangevarContainer().get_var_num(vars[i].pos);
+		  v[i] = getVars(stateObj).getBigRangevarContainer().get_var_num(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
-		  build(make_pair(partial_build, &v), b, pos + 1);
+		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }
 	  case VAR_SPARSEDISCRETE:	
 		D_FATAL_ERROR( "Sparse Discrete Variables current broken. Sorry");
@@ -131,9 +131,9 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 	  {
 		light_vector<ConstantVar> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = ConstantVar(vars[i].pos);
+		  v[i] = ConstantVar(stateObj, vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
-		  build(make_pair(partial_build, &v), b, pos + 1);
+		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }
 	}
   }
@@ -142,10 +142,10 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
   {
 	light_vector<AnyVarRef> v(vars.size());
 	for(unsigned i = 0; i < vars.size(); ++i)
-	  v[i] = get_AnyVarRef_from_Var(vars[i]);
+	  v[i] = get_AnyVarRef_from_Var(stateObj, vars[i]);
 	
 	return BUILDCON<initial_size, size - 1>::
-	  build(make_pair(partial_build, &v), b, pos + 1);
+	  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
   }
   // This FAIL_EXIT is here to stop a "no return in non-void function" warning. It should never be reached.
   D_FATAL_ERROR( "This should never be reached..");

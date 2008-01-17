@@ -132,7 +132,7 @@ class TupleList
   pair<int,int> get_varval_from_literal(int literal)
   { return _map_literal_to_vars[literal]; }
 
-  /// Sets up the variable/value pair to literal mapping, used by @get_literal.
+  /// Sets up the variable/value pair to literal mapping, used by get_literal.
   void finalise_tuples()
   {
     if(tuples_locked)

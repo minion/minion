@@ -50,8 +50,9 @@ struct LeqWeightBoolSumConstraint : public Constraint
   { return *(a.first) > *(b.first); }
   };
   
-  LeqWeightBoolSumConstraint(const VarArray& _var_array, const WeightArray& _weight_array, const VarSum& _var_sum) :
-    var_sum(_var_sum), var_array(_var_array.size()), weight_array(_weight_array.size())
+  LeqWeightBoolSumConstraint(StateObj* _stateObj,const VarArray& _var_array, const WeightArray& _weight_array, const VarSum& _var_sum) :
+    Constraint(_stateObj), var_sum(_var_sum), var_array(_var_array.size()), weight_array(_weight_array.size()),
+      var_array_min_sum(stateObj), min_vals_weight_pos(stateObj)
   { 
       D_ASSERT(_var_array.size() == _weight_array.size());
       int array_size = _var_array.size();
@@ -87,7 +88,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
 
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PropInfoAddone("WeightBoolSum");
+	PROP_INFO_ADDONE(WeightBoolSum);
     int min_sum = var_array_min_sum;
     if(prop_val != -1)
     {
@@ -150,25 +151,25 @@ struct LeqWeightBoolSumConstraint : public Constraint
 
 template<typename VarArray, typename WeightArray, typename VarSum>
 Constraint*
-LeqWeightBoolSumCon(const VarArray& _var_array, const WeightArray& w_array, const VarSum& _var_sum)
-{ return new LeqWeightBoolSumConstraint<VarArray, WeightArray, VarSum>(_var_array, w_array, _var_sum); }
+LeqWeightBoolSumCon(StateObj* stateObj,const VarArray& _var_array, const WeightArray& w_array, const VarSum& _var_sum)
+{ return new LeqWeightBoolSumConstraint<VarArray, WeightArray, VarSum>(stateObj, _var_array, w_array, _var_sum); }
 
 
 template<typename VarArray, typename WeightArray, typename VarSum>
 Constraint*
-GeqWeightBoolSumCon(const VarArray& _var_array, const WeightArray& w_array, const VarSum& _var_sum)
+GeqWeightBoolSumCon(StateObj* stateObj,const VarArray& _var_array, const WeightArray& w_array, const VarSum& _var_sum)
 { 
   WeightArray rev_w_array(w_array.size());
   for(unsigned int i = 0; i < w_array.size(); ++i)
 	rev_w_array[i] = -w_array[i];
 	 
   return new LeqWeightBoolSumConstraint<VarArray, WeightArray, VarNeg<VarSum> >
-	(_var_array, rev_w_array, VarNegRef(_var_sum)); 
+	(stateObj, _var_array, rev_w_array, VarNegRef(_var_sum)); 
 }
  
 template<typename T1, typename T2>
 Constraint*
-LeqWeightedSum(light_vector<int> scale, light_vector<T1> vec, const light_vector<T2>& t2)
+LeqWeightedSum(StateObj* stateObj, light_vector<int> scale, light_vector<T1> vec, const light_vector<T2>& t2)
 {
   
   // Preprocess to remove any multiplications by 0, both for efficency
@@ -203,21 +204,21 @@ LeqWeightedSum(light_vector<int> scale, light_vector<T1> vec, const light_vector
 	light_vector<SwitchNeg<T1> > mult_vars(vec.size());
 	for(unsigned int i = 0; i < vec.size(); ++i)
 	  mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
-	return LessEqualSumCon(mult_vars, t2);
+	return LessEqualSumCon(stateObj, mult_vars, t2);
   }
   else
   {
 	light_vector<MultiplyVar<T1> > mult_vars(vec.size());
 	for(unsigned int i = 0; i < vec.size(); ++i)
 	  mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
-	return LessEqualSumCon(mult_vars, t2);
+	return LessEqualSumCon(stateObj, mult_vars, t2);
   }
 }
 
 // Don't pass in the vectors by reference, as we might need to copy them.
 template<typename T1, typename T2>
 Constraint*
-GeqWeightedSum(light_vector<int> scale, light_vector<T1> vec, const light_vector<T2>& t2)
+GeqWeightedSum(StateObj* stateObj,light_vector<int> scale, light_vector<T1> vec, const light_vector<T2>& t2)
 {
   
   // Preprocess to remove any multiplications by 0, both for efficency
@@ -252,14 +253,14 @@ GeqWeightedSum(light_vector<int> scale, light_vector<T1> vec, const light_vector
 	light_vector<SwitchNeg<T1> > mult_vars(vec.size());
 	for(unsigned int i = 0; i < vec.size(); ++i)
 	  mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
-	return GreaterEqualSumCon(mult_vars, t2);
+	return GreaterEqualSumCon(stateObj, mult_vars, t2);
   }
   else
   {
 	light_vector<MultiplyVar<T1> > mult_vars(vec.size());
 	for(unsigned int i = 0; i < vec.size(); ++i)
 	  mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
-	return GreaterEqualSumCon(mult_vars, t2);
+	return GreaterEqualSumCon(stateObj, mult_vars, t2);
   }
 }
 

@@ -40,7 +40,7 @@ struct DivConstraint : public Constraint
   VarRef2 var2;
   VarRef3 var3;
 
-  DivConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
+  DivConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) : Constraint(_stateObj),
 	var1(_var1), var2(_var2), var3(_var3)
   {
   
@@ -67,7 +67,7 @@ struct DivConstraint : public Constraint
     
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
-	PropInfoAddone("Pow");
+	PROP_INFO_ADDONE(Pow);
   }
   
   virtual void full_propagate()
@@ -98,12 +98,12 @@ struct DivConstraint : public Constraint
 
 template<typename V1, typename V2>
 inline Constraint*
-DivCon(const V1& vars, const V2& var2)
+DivCon(StateObj* stateObj, const V1& vars, const V2& var2)
 {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   return new DivConstraint<typename V1::value_type, typename V1::value_type,
-						   typename V2::value_type>(vars[0], vars[1], var2[0]);
+						   typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
 }
 
 

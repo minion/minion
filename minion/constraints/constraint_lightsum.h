@@ -36,8 +36,8 @@ struct LightLessEqualSumConstraint : public Constraint
   
   array<VarRef, size> var_array;  
   VarSum var_sum;
-  LightLessEqualSumConstraint(const array<VarRef, size>& _var_array, const VarSum& _var_sum) :
-    var_array(_var_array), var_sum(_var_sum)
+  LightLessEqualSumConstraint(StateObj* _stateObj, const array<VarRef, size>& _var_array, const VarSum& _var_sum) :
+    Constraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
   { }
   
   virtual triggerCollection setup_internal()
@@ -55,7 +55,7 @@ struct LightLessEqualSumConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PropInfoAddone("LightSum");
+	PROP_INFO_ADDONE(LightSum);
     DomainInt min_sum = 0;
     for(unsigned i = 0; i < size; ++i)
       min_sum += var_array[i].getMin();
@@ -106,7 +106,7 @@ struct LightLessEqualSumConstraint : public Constraint
   }
 
  virtual Constraint* reverse_constraint()
-  { return reverse_constraint_helper<is_reversed,int>::fun(*this); }
+  { return reverse_constraint_helper<is_reversed,int>::fun(stateObj, *this); }
 
 // BUGFIX: The following two class definitions have a 'T=int' just to get around a really stupid parsing bug
 // in g++ 4.0.x. Hopefully eventually we'll be able to get rid of it.
@@ -116,7 +116,7 @@ struct LightLessEqualSumConstraint : public Constraint
   template<BOOL reversed, typename T>
     struct reverse_constraint_helper    
   {
-    static Constraint* fun(LightLessEqualSumConstraint& con)
+    static Constraint* fun(StateObj* stateObj,LightLessEqualSumConstraint& con)
     {
       typedef array<typename NegType<VarRef>::type, size> VarArray;
       VarArray new_var_array;
@@ -127,14 +127,14 @@ struct LightLessEqualSumConstraint : public Constraint
       SumType new_sum = ShiftVarRef(VarNegRef(con.var_sum), compiletime_val<-1>());
       
       return new LightLessEqualSumConstraint<typename NegType<VarRef>::type, size, SumType, true>
-        (new_var_array, new_sum);   
+        (stateObj, new_var_array, new_sum);   
     }
   };
   
   template<typename T>
     struct reverse_constraint_helper<true, T>
   {
-    static Constraint* fun(LightLessEqualSumConstraint&)
+    static Constraint* fun(StateObj*, LightLessEqualSumConstraint&)
     { 
       // This should never be reached, unless we try reversing an already reversed constraint.
       // We have this code here as the above case makes templates, which if left would keep instansiating
@@ -147,19 +147,19 @@ struct LightLessEqualSumConstraint : public Constraint
 
 template<typename VarRef, std::size_t size, typename VarSum>
 Constraint*
-LightLessEqualSumCon(const array<VarRef,size>& _var_array,  const VarSum& _var_sum)
+LightLessEqualSumCon(StateObj* stateObj, const array<VarRef,size>& _var_array,  const VarSum& _var_sum)
 { 
-  return (new LightLessEqualSumConstraint<VarRef, size, VarSum>(_var_array,_var_sum)); 
+  return (new LightLessEqualSumConstraint<VarRef, size, VarSum>(stateObj, _var_array,_var_sum)); 
 }
 
 
 template<typename VarRef, std::size_t size, typename VarSum>
 Constraint*
-LightGreaterEqualSumCon(const array<VarRef,size>& _var_array, const VarSum& _var_sum)
+LightGreaterEqualSumCon(StateObj* stateObj, const array<VarRef,size>& _var_array, const VarSum& _var_sum)
 { 
   return 
   (new LightLessEqualSumConstraint<typename NegType<VarRef>::type, size, 
-   typename NegType<VarSum>::type>(VarNegRef(_var_array), VarNegRef(_var_sum))); 
+   typename NegType<VarSum>::type>(stateObj, VarNegRef(_var_array), VarNegRef(_var_sum))); 
 }
 
 

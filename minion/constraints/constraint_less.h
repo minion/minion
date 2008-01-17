@@ -37,8 +37,8 @@ struct LeqConstraint : public Constraint
   VarRef1 x;
   VarRef2 y;
   
-  LeqConstraint(VarRef1 _x, VarRef2 _y, Offset _o) :
-    offset(_o), x(_x), y(_y)
+  LeqConstraint(StateObj* _stateObj,VarRef1 _x, VarRef2 _y, Offset _o) :
+    Constraint(_stateObj), offset(_o), x(_x), y(_y)
   { }
   
   virtual triggerCollection setup_internal()
@@ -55,7 +55,7 @@ struct LeqConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val,DomainDelta)
   {
-	PropInfoAddone("BinaryLeq");
+	PROP_INFO_ADDONE(BinaryLeq);
     if(prop_val)
     {// y changed
       x.setMax(y.getMax() + offset);
@@ -96,32 +96,32 @@ struct LeqConstraint : public Constraint
 
 template<typename VarRef1, typename VarRef2, typename Offset>
 Constraint*
-LeqCon(VarRef1 v1, VarRef2 v2, Offset o)
-{ return new LeqConstraint<VarRef1,VarRef2,Offset>(v1,v2,o); }
+LeqCon(StateObj* stateObj, VarRef1 v1, VarRef2 v2, Offset o)
+{ return new LeqConstraint<VarRef1,VarRef2,Offset>(stateObj,v1,v2,o); }
 
 template<typename VarRef1, typename VarRef2>
 Constraint*
-LeqCon(VarRef1 v1, VarRef2 v2)
-{ return new LeqConstraint<VarRef1,VarRef2,compiletime_val<0> >(v1,v2,compiletime_val<0>()); }
+LeqCon(StateObj* stateObj,VarRef1 v1, VarRef2 v2)
+{ return new LeqConstraint<VarRef1,VarRef2,compiletime_val<0> >(stateObj,v1,v2,compiletime_val<0>()); }
 
 template<typename VarRef>
 Constraint*
-ImpliesCon(VarRef v1, VarRef v2)
-{ return new LeqConstraint<VarRef,VarRef,compiletime_val<0> >(v1,v2,compiletime_val<0>()); }
+ImpliesCon(StateObj* stateObj, VarRef v1, VarRef v2)
+{ return new LeqConstraint<VarRef,VarRef,compiletime_val<0> >(stateObj,v1,v2,compiletime_val<0>()); }
 
 template<typename T1, typename T2>
 Constraint*
-BuildCT_INEQ(const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+BuildCT_INEQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   D_ASSERT(b.vars[2].size() == 1 && b.vars[2][0].type == VAR_CONSTANT);
   
   if(reify)
-  { return reifyCon(LeqCon(t1[0], t2[0], runtime_val(b.vars[2][0].pos)), reifyVar); }
+  { return reifyCon(stateObj, LeqCon(stateObj, t1[0], t2[0], runtime_val(b.vars[2][0].pos)), reifyVar); }
   else
-  { return LeqCon(t1[0], t2[0], runtime_val(b.vars[2][0].pos)); }
+  { return LeqCon(stateObj, t1[0], t2[0], runtime_val(b.vars[2][0].pos)); }
 }
 
 // This is mainly inline to avoid multiple definitions.
 template<typename VarRef1, typename VarRef2, typename Offset>
 inline Constraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint()
-{ return LeqCon(y,x, offset.negminusone()); }
+{ return LeqCon(stateObj,y,x, offset.negminusone()); }

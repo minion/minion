@@ -28,6 +28,7 @@
 #ifndef MINION_H
 #define MINION_H
 
+
 #include "svn_header.h"
 #include "system/system.h"
 
@@ -59,9 +60,9 @@
 #ifdef MORE_SEARCH_INFO
 #include "get_info/get_info.h"
 #else
-#define ConInfoAddone(ConEvent)
-#define VarInfoAddone(VarType, VarEvent)
-#define PropInfoAddone(PropType)
+#define CON_INFO_ADDONE(ConEvent)
+#define VAR_INFO_ADDONE(VarType, VarEvent)
+#define PROP_INFO_ADDONE(PropType)
 #endif
 
 #include "solver.h"
@@ -70,9 +71,7 @@ VARDEF(TableOut tableout);
 
 #include "memory_management/backtrackable_memory.h"
 #include "memory_management/nonbacktrack_memory.h"
-
 #include "reversible_vals.h"
-
 #include "memory_management/trailed_monotonic_set.h"
 
 typedef TrailedMonotonicSet MonotonicSet;
@@ -104,7 +103,6 @@ class DynamicTrigger;
 
 #include "constraints/triggers.h"
 
-#include "variables/VarRefType.h"
 #include "variables/AnyVarRef.h"
 #include "constraints/constraint.h"
 
@@ -112,21 +110,10 @@ class DynamicTrigger;
 #include "constraints/constraint_dynamic.h"
 #endif 
 
-/*
-namespace Controller
-{
-  /// Add a new list of triggers to the queue.
-  inline void queues.pushTriggers(TriggerRange new_triggers);
-  inline void push_special_trigger(Constraint* trigger);
-#ifdef DYNAMICTRIGGERS
-  inline void push_dynamic_triggers(DynamicTrigger* trigs);
-#endif
-}
-*/
-
 #include "queue/standard_queue.h"
 
 #include "trigger_list.h"
+
 
 #include "variables/variables.h"
 
@@ -148,6 +135,7 @@ namespace Controller
 #include "constraints/function_defs.hpp"
 
 
+#include "preprocess.h"
 
 #include "search/standard_search.h"
 #include "search/recursive_search.h"
@@ -156,8 +144,102 @@ namespace Controller
 
 #include "constraint_setup.h"
 
-#include "preprocess/preprocess.h"
-
 #include "test_functions.h"
+
+#include "BuildCSP.h"
+
+#ifdef REENTER
+struct StateObj
+{
+  // Forbid copying this type!
+  StateObj(const StateObj&);
+  void operator=(const StateObj&);
+  
+  Memory* searchMem_m;
+  SearchOptions* options_m;
+  SearchState state_m;
+  Queues* queues_m;
+  TriggerMem* triggerMem_m;
+  VariableContainer* varContainer_m;
+public:
+  StateObj() :
+    searchMem_m(new Memory),
+    options_m(new SearchOptions),
+    state_m(),
+    queues_m(new Queues(this)),
+    triggerMem_m(new TriggerMem(this)),
+    varContainer_m(new VariableContainer(this))
+  { }
+
+  ~StateObj()
+  { 
+    delete varContainer_m;
+    delete triggerMem_m;
+    delete queues_m;
+    delete options_m;
+    delete searchMem_m;    
+  }
+};
+
+inline SearchOptions& getOptions(StateObj* stateObj)
+{ return *(stateObj->options_m); }
+inline SearchState& getState(StateObj* stateObj)
+{ return stateObj->state_m; }
+inline Queues& getQueue(StateObj* stateObj)
+{ return *(stateObj->queues_m); }
+inline Memory& getMemory(StateObj* stateObj)
+{ return *(stateObj->searchMem_m); }
+inline TriggerMem& getTriggerMem(StateObj* stateObj)
+{ return *(stateObj->triggerMem_m); }
+inline VariableContainer& getVars(StateObj* stateObj)
+{ return *(stateObj->varContainer_m); }
+
+#else
+
+struct StateObj {};
+VARDEF(StateObj _noreenter_stateObj);
+VARDEF(Memory searchMem_m);
+VARDEF(SearchOptions options_m);
+VARDEF(SearchState state_m);
+VARDEF_ASSIGN(Queues queues_m, &_noreenter_stateObj);
+VARDEF_ASSIGN(TriggerMem triggerMem_m, &_noreenter_stateObj);
+VARDEF_ASSIGN(VariableContainer varContainer_m, &_noreenter_stateObj);
+
+inline SearchOptions& getOptions(StateObj* stateObj)
+{ return options_m; }
+inline SearchState& getState(StateObj* stateObj)
+{ return state_m; }
+inline Queues& getQueue(StateObj* stateObj)
+{ return queues_m; }
+inline Memory& getMemory(StateObj* stateObj)
+{ return searchMem_m; }
+inline TriggerMem& getTriggerMem(StateObj* stateObj)
+{ return triggerMem_m; }
+inline VariableContainer& getVars(StateObj* stateObj)
+{ return varContainer_m; }
+#endif
+
+#ifndef MANY_VAR_CONTAINERS
+template<typename DomType>
+inline BoundVarContainer<DomType>& BoundVarRef_internal<DomType>::getCon_Static()
+{ return varContainer_m.boundvarContainer; }
+
+template<int var_min, typename d_type>
+inline RangeVarContainer<var_min, d_type>& RangeVarRef_internal_template<var_min, d_type>::getCon_Static()
+{ return varContainer_m.rangevarContainer; }
+
+inline BooleanContainer& BoolVarRef_internal::getCon_Static()
+{ return varContainer_m.booleanContainer; }
+
+template<typename DomType>
+inline SparseBoundVarContainer<DomType>& SparseBoundVarRef_internal<DomType>::getCon_Static()
+{ return varContainer_m.sparseBoundvarContainer; }
+
+template<typename d_type>
+inline BigRangeVarContainer<d_type>& BigRangeVarRef_internal_template<d_type>::getCon_Static()
+{ return varContainer_m.bigRangevarContainer; }
+
+#endif
+
 
 #endif

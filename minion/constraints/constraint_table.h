@@ -73,7 +73,7 @@ struct TableConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int, DomainDelta)
   {
-    PropInfoAddone("Table");
+    PROP_INFO_ADDONE(Table);
     for(unsigned int check_var = 0; check_var < vars.size(); check_var++)
     {
       //cerr << vars[check_var].data.var_num << vars[check_var].getMin() << "```" << vars[check_var].getMax() << vars[check_var].inDomain(0) <<  endl;

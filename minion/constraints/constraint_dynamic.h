@@ -95,7 +95,7 @@ public:
 #ifndef NO_DYN_CHECK
 	  if(this == next_queue_ptr)
 	  {
-		ConInfoAddone("DynamicMovePtr");
+		CON_INFO_ADDONE(DynamicMovePtr);
 	    next_queue_ptr = next;
 	  }
       
@@ -146,6 +146,12 @@ public:
 class DynamicConstraint
 {
 public:
+  
+  StateObj* stateObj;
+  
+  DynamicConstraint(StateObj* _stateObj) : stateObj(_stateObj)
+  { }
+  
   /// Method to get constraint name for debugging.
   virtual string constraint_name() = 0;
   
@@ -153,7 +159,7 @@ public:
 #ifdef WATCHEDLITERALS
   MemOffset _DynamicTriggerCache;
 #else
-  BackTrackOffset _DynamicTriggerCache;
+  MoveablePointer _DynamicTriggerCache;
 #endif
   /// Returns a point to the first dynamic trigger of the constraint.
   DynamicTrigger* dynamic_trigger_start()
@@ -167,7 +173,11 @@ public:
   void setup()
   {
     int trigs = dynamic_trigger_count();
-	_DynamicTriggerCache.request_bytes(sizeof(DynamicTrigger) * trigs);
+#ifdef WATCHEDLITERALS
+    _DynamicTriggerCache = getMemory(stateObj).nonBackTrack().request_bytes((sizeof(DynamicTrigger) * trigs));
+#else
+	_DynamicTriggerCache = getMemory(stateObj).backTrack().request_bytes(sizeof(DynamicTrigger) * trigs);
+#endif
 	DynamicTrigger* start = dynamic_trigger_start();
 	for(int i = 0 ; i < trigs; ++i)
 	  new (start+i) DynamicTrigger(this);

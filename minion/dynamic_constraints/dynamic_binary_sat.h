@@ -25,8 +25,7 @@
 */
 
 
-
-// VarToCount = 1 means leq, = 0 means geq.
+//! Specialised SAT implementation for just 2 variables
 template<typename VarArray>
 struct BoolBinarySATConstraintDynamic : public DynamicConstraint
 {
@@ -38,8 +37,8 @@ struct BoolBinarySATConstraintDynamic : public DynamicConstraint
   VarRef var1;
   VarRef var2;
   
-  BoolBinarySATConstraintDynamic(const VarArray& _var_array) :
-	var1(_var_array[0]), var2(_var_array[1])
+  BoolBinarySATConstraintDynamic(StateObj* _stateObj,const VarArray& _var_array) :
+	DynamicConstraint(_stateObj), var1(_var_array[0]), var2(_var_array[1])
   { D_ASSERT(_var_array.size() == 2); }
   
   int dynamic_trigger_count()
@@ -77,7 +76,7 @@ struct BoolBinarySATConstraintDynamic : public DynamicConstraint
     
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PropInfoAddone("Dyn2SAT");
+	PROP_INFO_ADDONE(Dyn2SAT);
 	int propval = dt->trigger_info();
 	
 	if(propval)
@@ -103,5 +102,5 @@ struct BoolBinarySATConstraintDynamic : public DynamicConstraint
 
 template<typename VarArray>
 DynamicConstraint*
-BoolBinarySATConDynamic(const VarArray& _var_array)
-{ return new BoolBinarySATConstraintDynamic<VarArray>(_var_array); }
+BoolBinarySATConDynamic(StateObj* stateObj, const VarArray& _var_array)
+{ return new BoolBinarySATConstraintDynamic<VarArray>(stateObj, _var_array); }

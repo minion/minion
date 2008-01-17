@@ -63,8 +63,8 @@ struct ElementConstraintDynamic : public DynamicConstraint
   
   vector<DomainInt> current_support;
   
-  ElementConstraintDynamic(const VarArray& _var_array, const Index& _index, const Result& _result) :
-	var_array(_var_array), indexvar(_index), resultvar(_result)
+  ElementConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, const Index& _index, const Result& _result) :
+	DynamicConstraint(_stateObj), var_array(_var_array), indexvar(_index), resultvar(_result)
   { 
 	  initial_result_dom_min = resultvar.getInitialMin();
 	  initial_result_dom_max = resultvar.getInitialMax();
@@ -178,7 +178,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
   {
     D_ASSERT(indexvar.isAssigned());
     int indexval = checked_cast<int>(indexvar.getAssignedValue());
-    VarRef var = var_array[indexval];
+    VarRef& var = var_array[indexval];
 	
     DomainInt lower = resultvar.getMin(); 
     if( lower > var.getMin() ) 
@@ -221,7 +221,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	// We define UNDEF = false ;)
 	indexvar.setMin(0);
 	indexvar.setMax(array_size - 1);
-    if(state.isFailed()) return;
+    if(getState(stateObj).isFailed()) return;
 	for(int i = 0; i < array_size; ++i)
 	{
 	  current_support[i] = initial_result_dom_min-1;        // will be incremented if support sought
@@ -256,7 +256,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* trig)
   {
-	PropInfoAddone("DynElement");
+	PROP_INFO_ADDONE(DynElement);
     D_INFO(2, DI_DYELEMENT, "Start Propagation");
 	DynamicTrigger* dt = dynamic_trigger_start();
 	unsigned pos = trig - dt;
@@ -331,7 +331,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
 // than by const reference because we want to change it.
 template<typename Var1, typename Var2>
 DynamicConstraint*
-DynamicElementCon(Var1 vararray, const Var2& v1)
+DynamicElementCon(StateObj* stateObj,Var1 vararray, const Var2& v1)
 { 
   // Because we can only have two things which are parsed at the moment, we do
   // a dodgy hack and store the last variable on the end of the vararray
@@ -340,7 +340,7 @@ DynamicElementCon(Var1 vararray, const Var2& v1)
   typedef typename Var2::value_type VarRef2;
   VarRef1 assignval = vararray.back();
   vararray.pop_back();
-  return new ElementConstraintDynamic<Var1, VarRef2, VarRef1>(vararray, v1[0], assignval);  
+  return new ElementConstraintDynamic<Var1, VarRef2, VarRef1>(stateObj, vararray, v1[0], assignval);  
 }
 
 BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_ELEMENT, DynamicElementCon);

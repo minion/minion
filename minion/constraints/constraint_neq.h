@@ -37,7 +37,7 @@ struct NeqConstraint : public Constraint
   
   VarArray var_array;
   
-  NeqConstraint(const VarArray& _var_array) :
+  NeqConstraint(StateObj* _stateObj, const VarArray& _var_array) : Constraint(_stateObj),
     var_array(_var_array)
   { }
   
@@ -52,11 +52,11 @@ struct NeqConstraint : public Constraint
   }
   
   virtual Constraint* reverse_constraint()
-  { return new CheckAssignConstraint<VarArray, NeqConstraint>(var_array, *this); }
+  { return new CheckAssignConstraint<VarArray, NeqConstraint>(stateObj, var_array, *this); }
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PropInfoAddone("ArrayNeq");
+	PROP_INFO_ADDONE(ArrayNeq);
     DomainInt remove_val = var_array[prop_val].getAssignedValue();
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
@@ -173,8 +173,8 @@ struct NeqConstraintBinary : public Constraint
   VarRef2 var2;
   
   
-  NeqConstraintBinary(VarRef1 _var1, VarRef2 _var2 ) :
-    var1(_var1), var2(_var2)
+  NeqConstraintBinary(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2 ) :
+    Constraint(_stateObj), var1(_var1), var2(_var2)
   { }
   
   virtual triggerCollection setup_internal()
@@ -190,7 +190,7 @@ struct NeqConstraintBinary : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PropInfoAddone("BinaryNeq");
+	PROP_INFO_ADDONE(BinaryNeq);
     if (prop_val == 1) {
       DomainInt remove_val = var1.getAssignedValue();
 	  if(var2.isBound())
@@ -271,17 +271,17 @@ struct NeqConstraintBinary : public Constraint
 
 template<typename VarArray>
 Constraint*
-NeqCon(const VarArray& var_array)
-{ return new NeqConstraint<VarArray>(var_array); }
+NeqCon(StateObj* stateObj, const VarArray& var_array)
+{ return new NeqConstraint<VarArray>(stateObj, var_array); }
 
 
 template<typename Var1, typename Var2>
 Constraint*
-NeqConBinary(const Var1& var1, const Var2& var2)
+NeqConBinary(StateObj* stateObj, const Var1& var1, const Var2& var2)
 {
   typedef typename Var1::value_type VarRef1;
   typedef typename Var2::value_type VarRef2;
-  return new NeqConstraintBinary<VarRef1, VarRef2>(var1[0], var2[0]); 
+  return new NeqConstraintBinary<VarRef1, VarRef2>(stateObj, var1[0], var2[0]); 
 }
 
 BUILD_CONSTRAINT2(CT_DISEQ, NeqConBinary)

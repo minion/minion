@@ -39,8 +39,8 @@ struct BoolLessSumConstraint : public Constraint
   
   VarSum var_sum;
   
-  BoolLessSumConstraint(const VarArray& _var_array, VarSum _var_sum) :
-    var_array(_var_array), var_sum(_var_sum)
+  BoolLessSumConstraint(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
+    Constraint(_stateObj), count(_stateObj), var_array(_var_array), var_sum(_var_sum)
   { D_ASSERT((VarToCount == 0) || (VarToCount == 1)); }
   
   virtual triggerCollection setup_internal()
@@ -62,9 +62,9 @@ struct BoolLessSumConstraint : public Constraint
   virtual Constraint* reverse_constraint()
   { 
     if(VarToCount)
-      return new BoolLessSumConstraint<VarArray, runtime_val, 0>(var_array, runtime_val(var_sum + 1)); 
+      return new BoolLessSumConstraint<VarArray, runtime_val, 0>(stateObj, var_array, runtime_val(var_sum + 1)); 
     else
-      return new BoolLessSumConstraint<VarArray, runtime_val, 1>(var_array, runtime_val(var_sum - 1));
+      return new BoolLessSumConstraint<VarArray, runtime_val, 1>(stateObj, var_array, runtime_val(var_sum - 1));
   }
   
   int occ_count()
@@ -91,12 +91,12 @@ struct BoolLessSumConstraint : public Constraint
     }
     //D_ASSERT(one_vars >= occ_count());
     if(one_vars > occ_count())
-      Controller::fail();
+      getState(stateObj).setFailed(true);
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PropInfoAddone("BoolSum");
+	PROP_INFO_ADDONE(BoolSum);
     D_ASSERT(var_array[i].getAssignedValue() == 0 ||
 			 var_array[i].getAssignedValue() == 1);
     int c = count + 1;
@@ -140,7 +140,7 @@ struct BoolLessSumConstraint : public Constraint
     count = occs;
     D_INFO(1,DI_SUMCON,to_string("Full Propagate, count:",occs));
     if(occs > occ_count())
-      Controller::fail();
+      getState(stateObj).setFailed(true);
     if(occs == occ_count())
       limit_reached();  
   }
@@ -169,16 +169,16 @@ struct BoolLessSumConstraint : public Constraint
 
 template<typename VarArray,  typename VarSum>
 Constraint*
-BoolLessEqualSumCon(const VarArray& _var_array,  VarSum _var_sum)
+BoolLessEqualSumCon(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 { 
-  return (new BoolLessSumConstraint<VarArray,VarSum>(_var_array,_var_sum)); 
+  return (new BoolLessSumConstraint<VarArray,VarSum>(stateObj, _var_array,_var_sum)); 
 }
 
 template<typename VarArray,  typename VarSum>
 Constraint*
-BoolGreaterEqualSumCon(const VarArray& _var_array,  VarSum _var_sum)
+BoolGreaterEqualSumCon(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 { 
-  return (new BoolLessSumConstraint<VarArray,VarSum,0>(_var_array,_var_sum)); 
+  return (new BoolLessSumConstraint<VarArray,VarSum,0>(stateObj, _var_array,_var_sum)); 
 }
 
 

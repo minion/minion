@@ -36,25 +36,39 @@ struct BoolVarRef_internal
 {
   static const BOOL isBool = true;
   static const BoundType isBoundConst = Bound_No;
-  
+  static string name() { return "Bool"; }
   BOOL isBound()
   { return false;}
   
   data_type shift_offset;
   unsigned data_offset;
   unsigned var_num;
-  VirtualBackTrackOffset data_position;
-  VirtualMemOffset value_position;
+  MoveablePointer data_position;
+  MemOffset value_position;
   
-  BoolVarRef_internal(int value, BooleanContainer* b_con);
-  
+#ifdef MANY_VAR_CONTAINERS
+  BooleanContainer* boolCon;
+  BooleanContainer& getCon() const { return *boolCon; }
+
   BoolVarRef_internal(const BoolVarRef_internal& b) :
-    shift_offset(b.shift_offset), data_offset(b.data_offset), var_num(b.var_num), data_position(b.data_position),
-    value_position(b.value_position)
-  {}
+  shift_offset(b.shift_offset), data_offset(b.data_offset), var_num(b.var_num), data_position(b.data_position),
+  value_position(b.value_position) ,boolCon(b.boolCon)
+  { }
+  
+  BoolVarRef_internal() : shift_offset(~1), data_offset(~1), var_num(~1), boolCon(NULL)
+  { }  
+#else
+  static BooleanContainer& getCon_Static();
+  BoolVarRef_internal(const BoolVarRef_internal& b) :
+  shift_offset(b.shift_offset), data_offset(b.data_offset), var_num(b.var_num), data_position(b.data_position),
+  value_position(b.value_position)
+  { }
   
   BoolVarRef_internal() : shift_offset(~1), data_offset(~1), var_num(~1)
   { }
+#endif
+  
+  BoolVarRef_internal(int value, BooleanContainer* b_con);
   
   data_type& assign_ptr() const
   { return *static_cast<data_type*>(data_position.get_ptr()); }
@@ -118,8 +132,13 @@ typedef QuickVarRefType<GetBooleanContainer, BoolVarRef_internal> BoolVarRef;
 /// Container for boolean variables
 struct BooleanContainer
 {
+  StateObj* stateObj;
+  BooleanContainer(StateObj* _stateObj) : stateObj(_stateObj), var_count_m(0), lock_m(false), 
+                                          trigger_list(stateObj, false)
+  {}
+  
   static const int width = 7;
-  BackTrackOffset assign_offset;
+  MoveablePointer assign_offset;
   MemOffset values_mem;
   unsigned var_count_m;
   TriggerList trigger_list;
@@ -140,22 +159,25 @@ struct BooleanContainer
   
   void lock()
   { 
-    D_ASSERT(!lock_m);
-    lock_m = true;
-	int required_mem = var_count_m / 8 + 1;
-	// Round up to nearest data_type block
-	required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
-    assign_offset.request_bytes(required_mem);
-    values_mem.request_bytes(required_mem);
+   lock_m = true;
 	// Min domain value = 0, max domain val = 1.
     trigger_list.lock(var_count_m, 0, 1);
   }
   
-  BooleanContainer() :  var_count_m(0), lock_m(false), trigger_list(false)
-  {}
-  
   /// Returns a new Boolean Variable.
-  BoolVarRef get_new_var();
+  //BoolVarRef get_new_var();
+
+  void setVarCount(int bool_count)
+  {
+    D_ASSERT(!lock_m);
+    var_count_m = bool_count;
+
+	int required_mem = var_count_m / 8 + 1;
+	// Round up to nearest data_type block
+	required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
+    assign_offset = getMemory(stateObj).backTrack().request_bytes(required_mem);
+    values_mem = getMemory(stateObj).nonBackTrack().request_bytes(required_mem);
+  }
   
   /// Returns a reference to the ith Boolean variable which was previously created.
   BoolVarRef get_var_num(int i);
@@ -165,7 +187,7 @@ struct BooleanContainer
   {
     if(i < 0)
 	{
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
 
@@ -178,7 +200,7 @@ struct BooleanContainer
   {
     if(i > 1)
 	{
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
     D_ASSERT(i <= 1);
@@ -195,7 +217,7 @@ struct BooleanContainer
     if(d.isAssigned())
     {
       if(b == d.getAssignedValue()) 
-	    Controller::fail();
+	    getState(stateObj).setFailed(true);
     }
     else
       uncheckedAssign(d,1-b);
@@ -207,7 +229,7 @@ struct BooleanContainer
     D_ASSERT(!d.isAssigned());
 	if(b!=0 && b!=1)
     {
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
     assign_ptr()[d.data_offset] |= d.shift_offset;
@@ -234,7 +256,7 @@ struct BooleanContainer
     else
     {
       if(d.getAssignedValue() != b)
-	Controller::fail();
+	getState(stateObj).setFailed(true);
     }
   }
 
@@ -271,20 +293,8 @@ struct BooleanContainer
   }*/
 };
 
-
-
-
-
-
-inline BoolVarRef BooleanContainer::get_new_var()
-{ 
-  D_ASSERT(!lock_m);
-  return BoolVarRef(BoolVarRef_internal(var_count_m++, this));
-}
-
 inline BoolVarRef BooleanContainer::get_var_num(int i)
 {
-  D_ASSERT(!lock_m);
   D_ASSERT(i < (int)var_count_m);
   return BoolVarRef(BoolVarRef_internal(i, this));
 }
@@ -293,6 +303,9 @@ inline BoolVarRef_internal::BoolVarRef_internal(int value, BooleanContainer* b_c
   data_offset(value / (sizeof(data_type)*8)), var_num(value),  
   data_position(b_con->assign_offset, data_offset*sizeof(data_type)),
   value_position(b_con->values_mem, data_offset*sizeof(data_type))
+#ifdef MANY_VAR_CONTAINERS
+, boolCon(b_con)
+#endif
 { shift_offset = one << (value % (sizeof(data_type)*8)); }
 
 

@@ -55,8 +55,8 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   int num_unwatched;
   int last;
 
-  BackTrackOffset vals_watched;
-  BackTrackOffset unwatched_indexes;     // no promise this will work in this case
+  MoveablePointer vals_watched;
+  MoveablePointer unwatched_indexes;     // no promise this will work in this case
   //ReversibleInt last;
   BOOL& values_watched(int i)
   { return static_cast<BOOL*>(vals_watched.get_ptr())[i]; }
@@ -68,8 +68,8 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   
   VarSum var_sum;
   
-  BoolLessSumConstraintDynamic(const VarArray& _var_array, VarSum _var_sum) :
-	var_array(_var_array), var_sum(_var_sum)
+  BoolLessSumConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
+	DynamicConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
   { 
     D_ASSERT((VarToCount == 0) || (VarToCount == 1));
 #ifndef WATCHEDLITERALS
@@ -105,7 +105,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
           
 #ifndef WATCHEDLITERALS
           // Note that this BOOL array could be compacted using masks for lookup
-          vals_watched.request_bytes(sizeof(BOOL) * array_size);
+          vals_watched.getMemory(stateObj).backTrack()(request_bytes(sizeof(BOOL) * array_size));
           for(int i = 0; i < array_size; i++) 
             values_watched(i) = false;
 #endif
@@ -113,7 +113,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
           num_unwatched = array_size - var_sum - 1 ;
           D_ASSERT(num_unwatched >= 0);
 
-          unwatched_indexes.request_bytes(sizeof(unsigned) * num_unwatched);
+          unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(unsigned) * num_unwatched);
           // above line might request 0 bytes
           last = 0;
 
@@ -154,7 +154,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	
 	if(triggers_wanted > 1)    // Then we have failed, forget it.
 	{
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
 	else if(triggers_wanted == 1)      // Then we can propagate 
@@ -240,7 +240,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PropInfoAddone("DynSum");
+	PROP_INFO_ADDONE(DynSum);
     D_ASSERT(check_consistency());
 	int propval = dt->trigger_info();
     D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
@@ -347,17 +347,17 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 
 template<typename VarArray,  typename VarSum>
 DynamicConstraint*
-BoolLessEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
+BoolLessEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 { 
-  return new BoolLessSumConstraintDynamic<VarArray,VarSum>(_var_array,
+  return new BoolLessSumConstraintDynamic<VarArray,VarSum>(stateObj, _var_array,
 		  runtime_val(_var_array.size() - _var_sum)); 
 }
 
 template<typename VarArray,  typename VarSum>
 DynamicConstraint*
-BoolGreaterEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
+BoolGreaterEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 { 
-  return new BoolLessSumConstraintDynamic<VarArray,VarSum,0>(_var_array, _var_sum); 
+  return new BoolLessSumConstraintDynamic<VarArray,VarSum,0>(stateObj, _var_array, _var_sum); 
 }
 
 
@@ -366,7 +366,7 @@ BoolGreaterEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
 #include "dynamic_3_sat.h"
 
 inline DynamicConstraint*
-BuildCT_WATCHED_LEQSUM(const light_vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   if(reify) 
   { 
@@ -374,19 +374,19 @@ BuildCT_WATCHED_LEQSUM(const light_vector<BoolVarRef>& t1, BOOL reify, const Boo
 	  exit(0); 
   } 
   else 
-  { return BoolLessEqualSumConDynamic(t1, runtime_val(b.vars[1][0].pos)); } \
+  { return BoolLessEqualSumConDynamic(stateObj, t1, runtime_val(b.vars[1][0].pos)); } \
 }
 
 template<typename T>
 DynamicConstraint*
-BuildCT_WATCHED_LEQSUM(const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_LEQSUM(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   cerr << "Watched LeqSum only works on Boolean variables at present. Sorry!" << endl;
   exit(1);
 }
 
 inline DynamicConstraint*
-BuildCT_WATCHED_GEQSUM(const light_vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const light_vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   if(reify) 
   { 
@@ -402,31 +402,31 @@ BuildCT_WATCHED_GEQSUM(const light_vector<BoolVarRef>& t1, BOOL reify, const Boo
 #ifndef SATSPECIAL2
 	  if(t1.size() == 2)
 	  {
-		return BoolBinarySATConDynamic(t1);
+		return BoolBinarySATConDynamic(stateObj, t1);
 	  }
 #ifndef SATSPECIAL3
 	  else if(t1.size() == 3)
 	  {
-		return BoolThreeSATConDynamic(t1);
+		return BoolThreeSATConDynamic(stateObj, t1);
 	  }
 #endif
 	  else
 #endif
 	  {
-	    return BoolSATConDynamic(t1);
+	    return BoolSATConDynamic(stateObj, t1);
 	  }
 	}
 	else
 #endif
 	{
-	  return BoolGreaterEqualSumConDynamic(t1, runtime_val(sum)); 
+	  return BoolGreaterEqualSumConDynamic(stateObj, t1, runtime_val(sum)); 
 	}
   }
 }
 
 template<typename T>
 DynamicConstraint*
-BuildCT_WATCHED_GEQSUM(const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   cerr << "Watched GeqSum only works on Boolean variables at present. Sorry!" << endl;
   exit(1);

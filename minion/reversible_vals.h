@@ -24,43 +24,54 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+// \addtogroup Memory
+// @{
+
+/// Provides a wrapper around a single backtrackable value.
+/** This class aims to act like a normal isntance of 'Type', but is
+ *  backtracked.
+ */
 template<typename Type>
 class Reversible
 {
-  BackTrackOffset backtrack_ptr;
+  MoveablePointer backtrack_ptr;
   
 public:
   
-  
+  /// Automatic conversion to the type.
   operator Type() const
-{  
-  Type* ptr = (Type*)(backtrack_ptr.get_ptr());
-  return *ptr;
-}
+  {  
+    Type* ptr = (Type*)(backtrack_ptr.get_ptr());
+    return *ptr;
+  }
 
+  /// Assignment operator.
   void operator=(const Type& newval)
   {
     Type* ptr = (Type*)(backtrack_ptr.get_ptr());
     *ptr = newval;
   }
-
+  
   void operator++()
   { *this = *this + 1; }
 
   void operator--()
   { *this = *this - 1; }
   
+  /// Constructs a new backtrackable type connected to stateObj.
+  Reversible(StateObj* stateObj)
+  { 
+     backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(Type));
+     D_ASSERT( (size_t)(backtrack_ptr.get_ptr()) % sizeof(Type) == 0);
+  }
 
-Reversible()
-{ 
-   backtrack_ptr.request_bytes(sizeof(Type));
-   D_ASSERT( (size_t)(backtrack_ptr.get_ptr()) % sizeof(Type) == 0);
-}
-
+  /// Provide output.
   friend std::ostream& operator<<(std::ostream& o, const Reversible& v)
   { return o << Type(v); }
 
 };
 
+/// Specialisation for backwards compatability.
 typedef Reversible<int> ReversibleInt;
 
+// @}

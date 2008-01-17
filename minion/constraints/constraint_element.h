@@ -35,8 +35,8 @@ struct ElementConstraint : public Constraint
   VarArray var_array;
   IndexRef index_ref;
   VarRef result_var;
-  ElementConstraint(const VarArray& _var_array, const IndexRef& _index_ref, const VarRef& _result_var) :
-    var_array(_var_array), index_ref(_index_ref), result_var(_result_var)
+  ElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexRef& _index_ref, const VarRef& _result_var) :
+    Constraint(_stateObj), var_array(_var_array), index_ref(_index_ref), result_var(_result_var)
   { }
   
   virtual triggerCollection setup_internal()
@@ -57,13 +57,13 @@ struct ElementConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PropInfoAddone("NonGACElement");
+	PROP_INFO_ADDONE(NonGACElement);
     if(index_ref.isAssigned())
     {
       int index = checked_cast<int>(index_ref.getAssignedValue());
 	  if(index < 0 || index >= (int)var_array.size())
 	  {
-	    Controller::fail();
+	    getState(stateObj).setFailed(true);
 		return;
 	  }
 	  DomainInt val_min = max(result_var.getMin(), var_array[index].getMin());
@@ -123,7 +123,7 @@ struct ElementConstraint : public Constraint
       int index = checked_cast<int>(index_ref.getAssignedValue());
 	  if(index < 0 || index >= (int)var_array.size())
 	  {
-	    Controller::fail();
+	    getState(stateObj).setFailed(true);
 		return;
 	  }
       DomainInt val_min = max(result_var.getMin(), var_array[index].getMin());
@@ -144,7 +144,7 @@ struct ElementConstraint : public Constraint
     {
         index_ref.setMax(array_size-1);
     }
-    if(state.isFailed()) return;
+    if(getState(stateObj).isFailed()) return;
     
     // Should use the new iterators here. Check each value of result_var to see 
     // if it's in one of var_array. 
@@ -174,7 +174,7 @@ struct ElementConstraint : public Constraint
     else
     {// result_var is a bound variable
         // iterate up from the minimum
-        while(!state.isFailed())
+        while(!getState(stateObj).isFailed())
         {
             DomainInt i=result_var.getMin();
             BOOL supported=false;
@@ -194,7 +194,7 @@ struct ElementConstraint : public Constraint
                 break;
         }
         // now iterate down from the top.
-        while(!state.isFailed())
+        while(!getState(stateObj).isFailed())
         {
             DomainInt i=result_var.getMax();
             BOOL supported=false;
@@ -215,7 +215,7 @@ struct ElementConstraint : public Constraint
         }
     }
     
-    if(state.isFailed()) return;
+    if(getState(stateObj).isFailed()) return;
     
     for(int i = index_ref.getMin();i <= index_ref.getMax(); i++)
 	{
@@ -284,7 +284,7 @@ struct ElementConstraint : public Constraint
 // than by const reference because we want to change it.
 template<typename Var1, typename Var2>
 Constraint*
-ElementCon(Var1 vararray, const Var2& v1)
+ElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1)
 { 
   // Because we can only have two things which are parsed at the moment, we do
   // a dodgy hack and store the last variable on the end of the vararray
@@ -293,7 +293,7 @@ ElementCon(Var1 vararray, const Var2& v1)
   typedef typename Var2::value_type VarRef2;
   VarRef1 assignval = vararray.back();
   vararray.pop_back();
-  return new ElementConstraint<Var1, VarRef2>(vararray, v1[0], assignval);  
+  return new ElementConstraint<Var1, VarRef2>(stateObj, vararray, v1[0], assignval);  
 }
 
 BUILD_CONSTRAINT2(CT_ELEMENT, ElementCon);

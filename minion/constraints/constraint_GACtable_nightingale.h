@@ -416,7 +416,7 @@ struct GACTableConstraint : public DynamicConstraint
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
   {
-	PropInfoAddone("DynGACTable");
+	PROP_INFO_ADDONE(DynGACTable);
 	D_INFO(1, DI_TABLECON, "Propagation Triggered: " + to_string(propagated_trig));
 	DynamicTrigger* dt = dynamic_trigger_start();
 	int trigger_pos = propagated_trig - dt;
@@ -475,7 +475,7 @@ struct GACTableConstraint : public DynamicConstraint
 	  vars[varIndex].setMin(tuple_domain_min);
 	  vars[varIndex].setMax(tuple_domain_min + tuple_domain_size);
 	  
-	  if(state.isFailed()) 
+	  if(getState(stateObj).isFailed()) 
 		return;
 	  
 	  int max = vars[varIndex].getMax();

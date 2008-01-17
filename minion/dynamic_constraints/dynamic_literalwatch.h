@@ -47,8 +47,8 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
   
   VarSum var_sum;
   
-  LiteralSumConstraintDynamic(const VarArray& _var_array, ValueArray _val_array, VarSum _var_sum) :
-	var_array(_var_array), value_array(_val_array), var_sum(_var_sum)
+  LiteralSumConstraintDynamic(StateObj* _stateObj,const VarArray& _var_array, ValueArray _val_array, VarSum _var_sum) :
+	DynamicConstraint(_stateObj), var_array(_var_array), value_array(_val_array), var_sum(_var_sum)
   { }
   
   int dynamic_trigger_count()
@@ -75,7 +75,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	  num_unwatched = array_size - var_sum - 1 ;
 	  D_ASSERT(num_unwatched >= 0);
 	  
-	  unwatched_indexes.request_bytes(sizeof(unsigned) * num_unwatched);
+	  unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(unsigned) * num_unwatched);
 	  // above line might request 0 bytes
 	  last = 0;
 	  
@@ -104,7 +104,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	
 	if(triggers_wanted > 1)    // Then we have failed, forget it.
 	{
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
 	else if(triggers_wanted == 1)      // Then we can propagate 
@@ -165,7 +165,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PropInfoAddone("DynLitWatch");
+	PROP_INFO_ADDONE(DynLitWatch);
     D_ASSERT(check_consistency());
 	int propval = dt->trigger_info();
     D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
@@ -244,12 +244,12 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 
 template<typename VarArray,  typename ValArray, typename VarSum>
 DynamicConstraint*
-LiteralSumConDynamic(const VarArray& _var_array,  const ValArray& _val_array, VarSum _var_sum)
-{ return new LiteralSumConstraintDynamic<VarArray,ValArray,VarSum>(_var_array, _val_array, _var_sum); }
+LiteralSumConDynamic(StateObj* stateObj,const VarArray& _var_array,  const ValArray& _val_array, VarSum _var_sum)
+{ return new LiteralSumConstraintDynamic<VarArray,ValArray,VarSum>(stateObj, _var_array, _val_array, _var_sum); }
 
 template<typename T1>
 DynamicConstraint* 
-BuildCT_WATCHED_LITSUM(const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_LITSUM(StateObj* stateObj,const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 {
   if(reify)
   {
@@ -261,7 +261,7 @@ BuildCT_WATCHED_LITSUM(const T1& t1, BOOL reify, const BoolVarRef& reifyVar, Con
 	vector<int> values;
 	for(unsigned i = 0; i < b.vars[1].size(); ++i)
 	  values.push_back(b.vars[1][i].pos);
-	return LiteralSumConDynamic(t1, values, runtime_val(b.vars[2][0].pos)); 
+	return LiteralSumConDynamic(stateObj, t1, values, runtime_val(b.vars[2][0].pos)); 
   }
 }
 

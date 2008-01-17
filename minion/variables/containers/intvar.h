@@ -24,63 +24,210 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-struct RangeVarRef_internal
+template<int var_min, typename d_type>
+struct RangeVarContainer;
+
+template<int var_min, typename d_type>
+struct RangeVarRef_internal_template
 {
+  static const d_type one = static_cast<d_type>(1);
+  typedef unsigned char domain_type;
+
+  MoveablePointer bound_ptr;
+  MoveablePointer data_ptr;
+  int var_num;
+  
+#ifdef MANY_VAR_CONTAINERS
+  RangeVarContainer<var_min, d_type>* rangeCon;
+  RangeVarContainer<var_min, d_type>& getCon() const { return *rangeCon; }
+
+  explicit RangeVarRef_internal_template(RangeVarContainer<var_min, d_type>* con, int i, domain_type* _bound_ptr,
+                                         d_type* _data_ptr) : 
+  rangeCon(con), var_num(i), bound_ptr(_bound_ptr), data_ptr(_data_ptr)
+  {}
+  
+  void operator=(const RangeVarRef_internal_template& var) 
+  {
+    rangeCon = var.rangeCon;
+    var_num = var.var_num;
+    bound_ptr = var.bound_ptr;
+    data_ptr = var.data_ptr;
+  }
+#else
+  static RangeVarContainer<var_min, d_type>& getCon_Static();
+  explicit RangeVarRef_internal_template(RangeVarContainer<var_min, d_type>* con, int i, domain_type* _bound_ptr,
+                                         d_type* _data_ptr) : 
+  var_num(i), bound_ptr(_bound_ptr), data_ptr(_data_ptr)
+  {}
+  
+  void operator=(const RangeVarRef_internal_template& var) 
+  {
+    var_num = var.var_num;
+    bound_ptr = var.bound_ptr;
+    data_ptr = var.data_ptr;
+  }
+#endif
+  
+ // The following methods are lifted from the container below, to try to simplify copying methods from there.
+  const domain_type& raw_lower_bound() const
+  { return *static_cast<domain_type*>(bound_ptr.get_ptr()); }
+  int lower_bound() const
+  { return raw_lower_bound() + var_min; }
+
+  const domain_type& raw_upper_bound() const
+  { return *(static_cast<domain_type*>(bound_ptr.get_ptr()) + 1); }
+  int upper_bound() const
+  { return raw_upper_bound() + var_min; }
+  
+  const d_type& __data() const
+  { return *static_cast<d_type*>(data_ptr.get_ptr()); }
+
+   bool in_bitarray(DomainInt dom_val) const
+  { 
+	int val = checked_cast<int>(dom_val);
+	D_ASSERT(val >= 0 && val < sizeof(d_type) * 8);
+	return __data() & (one << val); 
+  }
+
+
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_No;
+  static string name() { return "Range"; }
   BOOL isBound()
   { return false;}
   
-  int var_num;
-  RangeVarRef_internal() : var_num(-1)
+  RangeVarRef_internal_template() : var_num(-1)
   { }
+
+  BOOL isAssigned() const
+  { return raw_lower_bound() == raw_upper_bound(); }
   
-  explicit RangeVarRef_internal(int i) : var_num(i)
-  {}
+  DomainInt getAssignedValue() const
+  {
+    D_ASSERT(isAssigned());
+    return lower_bound();
+  }
+  
+  BOOL isAssignedValue(DomainInt i)
+  { 
+    return isAssigned() &&
+    getAssignedValue() == i;
+  }
+  
+   BOOL inDomain(DomainInt i) const
+  {
+    if (i < lower_bound() || i > upper_bound())
+      return false;
+    return in_bitarray(i - var_min);
+  }
+  
+  BOOL inDomain_noBoundCheck(DomainInt i) const
+  {
+	D_ASSERT(i >= lower_bound());
+	D_ASSERT(i <= upper_bound());
+    return in_bitarray(i - var_min);
+  }
+
+  DomainInt getMin() const
+  { return lower_bound(); }
+  
+  DomainInt getMax() const
+  { return upper_bound(); }
+
+  DomainInt getInitialMax() const
+  { return GET_LOCAL_CON().getInitialMax(*this); }
+  
+  DomainInt getInitialMin() const
+  { return GET_LOCAL_CON().getInitialMin(*this); }
+  
+  void setMax(DomainInt i)
+  { GET_LOCAL_CON().setMax(*this,i); }
+  
+  void setMin(DomainInt i)
+  { GET_LOCAL_CON().setMin(*this,i); }
+  
+  void uncheckedAssign(DomainInt b)
+  { GET_LOCAL_CON().uncheckedAssign(*this, b); }
+  
+  void propagateAssign(DomainInt b)
+  { GET_LOCAL_CON().propagateAssign(*this, b); }
+  
+  void removeFromDomain(DomainInt b)
+  { GET_LOCAL_CON().removeFromDomain(*this, b); }
+  
+  void addTrigger(Trigger t, TrigType type)
+  { GET_LOCAL_CON().addTrigger(*this, t, type); }
+
+  friend std::ostream& operator<<(std::ostream& o, const RangeVarRef_internal_template& v)
+  { return o << "RangeVar:" << v.var_num; }
+    
+  int getDomainChange(DomainDelta d)
+  { return d.XXX_get_domain_diff(); }
+  
+#ifdef DYNAMICTRIGGERS
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  {  GET_LOCAL_CON().addDynamicTrigger(*this, t, type, pos); }
+#endif
+
 };
 
-struct GetRangeVarContainer;
+//typedef RangeVarRef_internal_template<0, BitContainerType> RangeVarRef_internal;
 
 #ifdef MORE_SEARCH_INFO
-typedef InfoRefType<VarRefType<GetRangeVarContainer, RangeVarRef_internal>, VAR_INFO_RANGEVAR> LRangeVarRef;
+typedef InfoRefType<RangeVarRef_internal_template<0, BitContainerType>, VAR_INFO_RANGEVAR> LRangeVarRef;
 #else
-typedef VarRefType<GetRangeVarContainer, RangeVarRef_internal> LRangeVarRef;
+typedef RangeVarRef_internal_template<0, BitContainerType> LRangeVarRef;
 #endif
 
 template<int var_min, typename d_type>
 struct RangeVarContainer {
+  typedef RangeVarRef_internal_template<0, BitContainerType> RangeVarRef_internal;
+
+  StateObj* stateObj;
+  
+  RangeVarContainer(StateObj* _stateObj) : stateObj(_stateObj), lock_m(0), 
+                                           trigger_list(stateObj, false), var_count_m(0)
+  {}
+  
   typedef unsigned char domain_type;
 // In C++, defining constants in enums avoids some linkage issues.
   enum Constant { var_max = var_min + sizeof(d_type) * 8 - 1 };
   static const d_type one = static_cast<d_type>(1);
-  BackTrackOffset bound_data;
-  BackTrackOffset val_data;
+  MoveableArray<domain_type> bound_data;
+  MoveableArray<d_type> val_data;
   TriggerList trigger_list;
   
   vector<pair<int,int> > initial_bounds;
   unsigned var_count_m;
   BOOL lock_m;
   
-  domain_type& raw_lower_bound(RangeVarRef_internal i) const
-  { return static_cast<domain_type*>(bound_data.get_ptr())[i.var_num*2]; }
-  int lower_bound(RangeVarRef_internal i) const
+  const domain_type& raw_lower_bound(const RangeVarRef_internal& i) const
+  { return bound_data[i.var_num * 2]; }
+  domain_type& raw_lower_bound(const RangeVarRef_internal& i)
+  { return bound_data[i.var_num * 2]; }
+  int lower_bound(const RangeVarRef_internal& i) const
   { return raw_lower_bound(i) + var_min; }
-  domain_type& raw_upper_bound(RangeVarRef_internal i) const
-  { return static_cast<domain_type*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
-  int upper_bound(RangeVarRef_internal i) const
+
+  const domain_type& raw_upper_bound(const RangeVarRef_internal& i) const
+  { return bound_data[i.var_num*2 + 1]; }
+  domain_type& raw_upper_bound(const RangeVarRef_internal& i)
+  { return bound_data[i.var_num*2 + 1]; }
+  int upper_bound(const RangeVarRef_internal& i) const
   { return raw_upper_bound(i) + var_min; }
   
-  d_type& __data(RangeVarRef_internal i) const
-  { return static_cast<d_type*>(val_data.get_ptr())[i.var_num]; }
-  
-  bool in_bitarray(RangeVarRef_internal d, DomainInt dom_val) const
+  const d_type& __data(const RangeVarRef_internal& i) const
+  { return val_data[i.var_num]; }
+  d_type& __data(const RangeVarRef_internal& i)
+  { return val_data[i.var_num]; }
+
+  bool in_bitarray(const RangeVarRef_internal& d, DomainInt dom_val) const
   { 
 	int val = checked_cast<int>(dom_val);
 	D_ASSERT(val >= 0 && val < sizeof(d_type) * 8);
 	return __data(d) & (one << val); 
   }
   
-  void remove_from_bitarray(RangeVarRef_internal d, DomainInt dom_offset) const
+  void remove_from_bitarray(const RangeVarRef_internal& d, DomainInt dom_offset)
   { 
 	int offset = checked_cast<int>(dom_offset);
 	D_ASSERT(offset >= 0 && offset < sizeof(d_type) * 8);
@@ -88,7 +235,7 @@ struct RangeVarContainer {
   }
   
   /// Returns new upper bound.
-  int find_new_raw_upper_bound(RangeVarRef_internal d)
+  int find_new_raw_upper_bound(const RangeVarRef_internal& d)
   {
     int lower = raw_lower_bound(d);
 	// d_type val = data(d);
@@ -104,12 +251,12 @@ struct RangeVarContainer {
 	    return loopvar;
       }
     }
-    Controller::fail();
+    getState(stateObj).setFailed(true);
 	return old_loopvar;
   }
   
   /// Returns true if lower bound is changed.
-  int find_new_raw_lower_bound(RangeVarRef_internal d)
+  int find_new_raw_lower_bound(const RangeVarRef_internal& d)
   {
     int upper = raw_upper_bound(d);
     //d_type val = data(d);
@@ -125,64 +272,34 @@ struct RangeVarContainer {
 	    return loopvar;
       }
     }
-    Controller::fail();
+    getState(stateObj).setFailed(true);
 	return old_loopvar;
   }
-    
+     
   void lock()
   { 
     D_ASSERT(!lock_m);
     lock_m = true;
-
-    bound_data.request_bytes(var_count_m*2);
-    char* bound_ptr = static_cast<char*>(bound_data.get_ptr());
-    for(unsigned int i = 0; i < var_count_m; ++i)
-    {
-      bound_ptr[2*i] = initial_bounds[i].first;
-      bound_ptr[2*i+1] = initial_bounds[i].second;
-	}
-    
-	
-	int min_domain_val = 0;
-	int max_domain_val = 0;
-	if(!initial_bounds.empty())
-	{
-	  min_domain_val = initial_bounds[0].first;
-	  max_domain_val = initial_bounds[0].second;
-	  for(unsigned int i = 0; i < var_count_m; ++i)
-      {
-        bound_ptr[2*i] = initial_bounds[i].first;
-        bound_ptr[2*i+1] = initial_bounds[i].second;
-	  
-	    min_domain_val = mymin(initial_bounds[i].first, min_domain_val);
-	    max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
-      }
-    }
-	
-    val_data.request_bytes(var_count_m*sizeof(d_type));  
-    d_type* val_ptr = static_cast<d_type*>(val_data.get_ptr());
-    fill(val_ptr, val_ptr + var_count_m, ~static_cast<d_type>(0));
-	
-    trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
   }
-  
-  RangeVarContainer() : lock_m(0), trigger_list(false)
-  {}
-  
-  BOOL isAssigned(RangeVarRef_internal d) const
+
+
+  // These 'const' functions are all declared in RangeVarRef_internal, so long term
+  // they could be removed from here. At the moment they are left here as the modifing
+  // members use them, so it makes things easier.
+  BOOL isAssigned(const RangeVarRef_internal& d) const
   { 
     D_ASSERT(lock_m);
     return lower_bound(d) == upper_bound(d); 
   }
   
-  DomainInt getAssignedValue(RangeVarRef_internal d) const
+  DomainInt getAssignedValue(const RangeVarRef_internal& d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return lower_bound(d);
   }
-  
-  BOOL inDomain(RangeVarRef_internal d, DomainInt i) const
+
+  BOOL inDomain(const RangeVarRef_internal& d, DomainInt i) const
   {
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
@@ -190,7 +307,7 @@ struct RangeVarContainer {
     return in_bitarray(d,i - var_min);
   }
   
-  BOOL inDomain_noBoundCheck(RangeVarRef_internal d, DomainInt i) const
+  BOOL inDomain_noBoundCheck(const RangeVarRef_internal& d, DomainInt i) const
   {
     D_ASSERT(lock_m);
 	D_ASSERT(i >= lower_bound(d));
@@ -198,29 +315,28 @@ struct RangeVarContainer {
     return in_bitarray(d,i - var_min);
   }
 
-  
-  
-  DomainInt getMin(RangeVarRef_internal d) const
+
+  DomainInt getMin(const RangeVarRef_internal& d) const
   {
     D_ASSERT(lock_m);
-    D_ASSERT(state.isFailed() || inDomain(d,lower_bound(d)));
+    D_ASSERT(getState(stateObj).isFailed() || inDomain(d,lower_bound(d)));
     return lower_bound(d);
   }
   
-  DomainInt getMax(RangeVarRef_internal d) const
+  DomainInt getMax(const RangeVarRef_internal& d) const
   {
     D_ASSERT(lock_m);
-    D_ASSERT(state.isFailed() || inDomain(d,upper_bound(d)));
+    D_ASSERT(getState(stateObj).isFailed() || inDomain(d,upper_bound(d)));
     return upper_bound(d);
   }
 
-  DomainInt getInitialMin(RangeVarRef_internal d) const
+  DomainInt getInitialMin(const RangeVarRef_internal& d) const
   { return initial_bounds[d.var_num].first; }
   
-  DomainInt getInitialMax(RangeVarRef_internal d) const
+  DomainInt getInitialMax(const RangeVarRef_internal& d) const
   { return initial_bounds[d.var_num].second; }
     
-  void removeFromDomain(RangeVarRef_internal d, DomainInt i)
+  void removeFromDomain(const RangeVarRef_internal& d, DomainInt i)
   {
     D_ASSERT(lock_m);
     if(!inDomain(d,i)) 
@@ -250,11 +366,11 @@ struct RangeVarContainer {
     return;
   }
   
-  void propagateAssign(RangeVarRef_internal d, DomainInt i)
+  void propagateAssign(const RangeVarRef_internal& d, DomainInt i)
   {
     DomainInt offset = i - var_min;
     if(!inDomain(d,i))
-      {Controller::fail(); return;}
+      {getState(stateObj).setFailed(true); return;}
 	
 	int raw_lower = raw_lower_bound(d);
 	int raw_upper = raw_upper_bound(d);
@@ -263,7 +379,7 @@ struct RangeVarContainer {
       return;
 	if(offset < raw_lower || offset > raw_upper)
 	{
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
     trigger_list.push_domain(d.var_num);
@@ -292,13 +408,13 @@ struct RangeVarContainer {
   }
   
   // TODO : Optimise
-  void uncheckedAssign(RangeVarRef_internal d, DomainInt i)
+  void uncheckedAssign(const RangeVarRef_internal& d, DomainInt i)
   { 
     D_ASSERT(inDomain(d,i));
     propagateAssign(d,i); 
   }
   
-  void setMax(RangeVarRef_internal d, DomainInt i)
+  void setMax(const RangeVarRef_internal& d, DomainInt i)
   {
     DomainInt offset = i - var_min;
     DomainInt up_bound = raw_upper_bound(d);
@@ -306,7 +422,7 @@ struct RangeVarContainer {
 	
 	if(offset < low_bound)
 	{
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
 	
@@ -327,11 +443,7 @@ struct RangeVarContainer {
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
 	  for(int loop = raw_new_upper + 1 + var_min; loop <i; ++loop)
-	  {
 		D_ASSERT(!inDomain_noBoundCheck(d, loop));
-	    //if(inDomain_noBoundCheck(d, loop))
-	    //  trigger_list.push_domain_removal(d.var_num, loop);
-	  }
 #endif
 
       raw_upper_bound(d) = raw_new_upper;
@@ -343,7 +455,7 @@ struct RangeVarContainer {
     }
   }
   
-  void setMin(RangeVarRef_internal d, DomainInt i)
+  void setMin(const RangeVarRef_internal& d, DomainInt i)
   {
     DomainInt offset = i - var_min;
     DomainInt low_bound = raw_lower_bound(d);   
@@ -351,7 +463,7 @@ struct RangeVarContainer {
 	
 	if(offset > up_bound)
 	{
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
 	
@@ -392,11 +504,11 @@ struct RangeVarContainer {
   LRangeVarRef get_var_num(int i);
   LRangeVarRef get_new_var(int i, int j);
 
-  void addTrigger(RangeVarRef_internal b, Trigger t, TrigType type)
+  void addTrigger(const RangeVarRef_internal& b, Trigger t, TrigType type)
   { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type);  }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(RangeVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  void addDynamicTrigger(const RangeVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   { 
     D_ASSERT(lock_m);
     D_ASSERT(b.var_num >= 0);
@@ -408,28 +520,69 @@ struct RangeVarContainer {
   
   bool valid_range(DomainInt lower, DomainInt upper)
   { return (lower >= var_min && upper <= var_max); }
+
+void addVariables(const vector<pair<int, Bounds> >& new_domains)
+{
+  D_ASSERT(!lock_m);
+
+  int min_domain_val = 0;
+  int max_domain_val = 0;
+
+  if(!new_domains.empty())
+  {
+    min_domain_val = new_domains[0].second.lower_bound;
+    max_domain_val = new_domains[0].second.upper_bound;
+  }
+
+  for(int i = 0; i < new_domains.size(); ++i)
+  {
+    D_ASSERT(new_domains[i].second.lower_bound >= var_min);
+    D_ASSERT(new_domains[i].second.upper_bound <= var_max);
+
+    for(int j = 0; j < new_domains[i].first; ++j)
+    {
+      var_count_m++;
+      initial_bounds.push_back(make_pair(new_domains[i].second.lower_bound,
+                                         new_domains[i].second.upper_bound));
+      D_INFO(0,DI_INTCON,"Adding var of domain: (" + to_string(new_domains[i].second.lower_bound) + "," +
+                                                     to_string(new_domains[i].second.upper_bound) + ")");
+    }
+
+    min_domain_val = mymin(new_domains[i].second.lower_bound, min_domain_val);
+	max_domain_val = mymax(new_domains[i].second.upper_bound, max_domain_val);
+  }
+
+
+   // I am not storing 'btm' in a seperate object here for any kind of efficency reason.
+   // In theory, I should be able to put the definitions of bound_data and val_data on one
+   // line, but for some reason g++ produces the most bizarre compile-time error when I try.
+   // One day, I might figure out why...
+   BackTrackMemory& btm = getMemory(stateObj).backTrack();
+
+   bound_data = btm.requestArray<domain_type>(var_count_m*2);
+   val_data = btm.requestArray<d_type>(var_count_m);  
+  
+    for(unsigned int i = 0; i < var_count_m; ++i)
+    {
+      bound_data[2*i] = initial_bounds[i].first;
+      bound_data[2*i+1] = initial_bounds[i].second;
+	}
+    	
+
+    d_type* val_ptr = val_data.get_ptr();
+    fill(val_ptr, val_ptr + var_count_m, ~static_cast<d_type>(0));
+	
+    trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
+  }
 };
 
 typedef RangeVarContainer<0, BitContainerType> LRVCon;
-
-
-
-template<int var_min, typename T>
-inline LRangeVarRef
-RangeVarContainer<var_min,T>::get_new_var(int i, int j)
-{
-  D_ASSERT(!lock_m);
-  D_ASSERT(i >= var_min && j <= var_max);
-  D_INFO(2, DI_INTCONTAINER, "Adding int var, domain [" + to_string(i) + "," + to_string(j) + "]");
-  initial_bounds.push_back(make_pair(i,j));
-  return LRangeVarRef(RangeVarRef_internal(var_count_m++));
-}
 
 template<int var_min, typename T>
 inline LRangeVarRef
 RangeVarContainer<var_min,T>::get_var_num(int i)
 {
-  D_ASSERT(!lock_m);
-  return LRangeVarRef(RangeVarRef_internal(i));
+  D_ASSERT(i < var_count_m);
+  return LRangeVarRef(RangeVarRef_internal(this, i, &bound_data[i * 2], &val_data[i]));
 }
 

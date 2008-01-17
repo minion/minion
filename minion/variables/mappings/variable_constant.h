@@ -26,6 +26,9 @@
 
 struct ConstantVar
 {
+  // TODO: This really only needs enough to get 'fail'
+  StateObj* stateObj;
+  
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Yes;
   
@@ -33,13 +36,14 @@ struct ConstantVar
   { return true;}
   
   DomainInt val;
-  explicit ConstantVar(DomainInt _val) : val(_val)
+  
+  explicit ConstantVar(StateObj* _stateObj, DomainInt _val) : stateObj(_stateObj), val(_val)
   {}
   
   ConstantVar() 
   {}
   
-  ConstantVar(const ConstantVar& b) : val(b.val)
+  ConstantVar(const ConstantVar& b) : stateObj(b.stateObj), val(b.val)
   {}
   
   BOOL isAssigned() const
@@ -73,19 +77,19 @@ struct ConstantVar
   { return val; }
   
   void setMax(DomainInt i)
-  { if(i<val) Controller::fail(); }
+  { if(i<val) getState(stateObj).setFailed(true); }
   
   void setMin(DomainInt i)
-  { if(i>val) Controller::fail(); }
+  { if(i>val) getState(stateObj).setFailed(true); }
   
   void uncheckedAssign(DomainInt)
   { FAIL_EXIT(); }
   
   void propagateAssign(DomainInt b)
-  {if(b != val) Controller::fail(); }
+  {if(b != val) getState(stateObj).setFailed(true); }
   
   void removeFromDomain(DomainInt b)
-  { if(b==val) Controller::fail(); }
+  { if(b==val) getState(stateObj).setFailed(true); }
  
   void addTrigger(Trigger, TrigType)
   { }

@@ -31,8 +31,8 @@ struct CheckAssignConstraint : public Constraint
   vector<DomainInt> assignment;
   
  
-  CheckAssignConstraint(VarArray& vars, OriginalConstraint& con)
-  : originalcon(con),variables(vars), assignment(variables.size())
+  CheckAssignConstraint(StateObj* _stateObj, VarArray& vars, OriginalConstraint& con)
+  : Constraint(_stateObj), originalcon(con),variables(vars), assigned_vars(stateObj), assignment(variables.size())
   { D_INFO(2, DI_CHECKCON, "Constructing"); }
   
   virtual triggerCollection setup_internal()
@@ -52,9 +52,9 @@ struct CheckAssignConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val,DomainDelta delta)
   {
-	PropInfoAddone("CheckAssign");
+	PROP_INFO_ADDONE(CheckAssign);
     if(check_unsat(prop_val, delta))
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
   }
   
   virtual BOOL check_unsat(int,DomainDelta)
@@ -112,7 +112,7 @@ struct CheckAssignConstraint : public Constraint
   virtual void full_propagate()
   {
     if(full_check_unsat())
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)

@@ -80,7 +80,7 @@ inline bool operator<(const vertex& a, const vertex& b)
 
 class vertexlt {
 public:
-inline bool operator()(const vertex& a, const vertex& b)
+inline bool operator()(const vertex& a, const vertex& b) const
 {
     return a<b;
 }
@@ -121,7 +121,7 @@ struct AlldiffGacSlow : public Constraint
   
   VarArray var_array;
   
-  AlldiffGacSlow(const VarArray& _var_array) :
+  AlldiffGacSlow(StateObj* _stateObj, const VarArray& _var_array) : Constraint(_stateObj),
     var_array(_var_array)
   { }
   
@@ -136,11 +136,11 @@ struct AlldiffGacSlow : public Constraint
   }
   
   virtual Constraint* reverse_constraint()
-  { return new CheckAssignConstraint<VarArray, AlldiffGacSlow>(var_array, *this); }
+  { return new CheckAssignConstraint<VarArray, AlldiffGacSlow>(stateObj, var_array, *this); }
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PropInfoAddone("AlldiffGacSlow");
+	PROP_INFO_ADDONE(AlldiffGacSlow);
     
     unsigned int numvars=var_array.size();  // number of variables in the constraint
     
@@ -192,7 +192,7 @@ struct AlldiffGacSlow : public Constraint
       {
         // The constraint is unsatisfiable (no matching).
         //cout<<"Fail."<<endl;
-        Controller::fail();
+        getState(stateObj).setFailed(true);
         return;
       }
     }
@@ -382,7 +382,7 @@ struct AlldiffGacSlow : public Constraint
                 {
                     //cout<<"Adding "<<tempval<<endl;
                     var_array[tempvar].removeFromDomain(tempval);
-                    if(state.isFailed()) return;
+                    if(getState(stateObj).isFailed()) return;
                 }
             }
         }
@@ -814,8 +814,8 @@ struct AlldiffGacSlow : public Constraint
 
 template<typename VarArray>
 Constraint*
-AlldiffGacSlowCon(const VarArray& var_array)
-{ return new AlldiffGacSlow<VarArray>(var_array); }
+AlldiffGacSlowCon(StateObj* stateObj, const VarArray& var_array)
+{ return new AlldiffGacSlow<VarArray>(stateObj, var_array); }
 
 BUILD_CONSTRAINT1(CT_ALLDIFF_GACSLOW, AlldiffGacSlowCon)
 

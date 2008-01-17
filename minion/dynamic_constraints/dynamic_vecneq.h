@@ -25,7 +25,10 @@
 */
 
 
-
+/** Constraints two vectors of variables to be not equal.
+ *
+ *  \ingroup Constraints
+ */
 template<typename VarArray1, typename VarArray2>
 struct VecNeqDynamic : public DynamicConstraint
 {
@@ -43,9 +46,9 @@ struct VecNeqDynamic : public DynamicConstraint
   
   BOOL only_one_possible_pair;
   
-  VecNeqDynamic(const VarArray1& _array1,
+  VecNeqDynamic(StateObj* _stateObj,const VarArray1& _array1,
 				const VarArray2& _array2) :
-				var_array1(_array1), var_array2(_array2)
+				DynamicConstraint(_stateObj), var_array1(_array1), var_array2(_array2)
   { D_ASSERT(var_array1.size() == var_array2.size()); }
   
   int dynamic_trigger_count()
@@ -84,7 +87,7 @@ struct VecNeqDynamic : public DynamicConstraint
 	// Vectors are assigned and equal.
 	if(index == size)
 	{
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
 	
@@ -131,7 +134,7 @@ struct VecNeqDynamic : public DynamicConstraint
   // XXX : I'm not sure this gets GAC, but it does some pruning, and is fast.
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PropInfoAddone("DynVecNeq");
+	PROP_INFO_ADDONE(DynVecNeq);
     D_INFO(2, DI_VECNEQ, "Starting propagate");
     if(only_one_possible_pair)
 	{
@@ -246,8 +249,8 @@ struct VecNeqDynamic : public DynamicConstraint
 
 template<typename VarArray1,  typename VarArray2>
 DynamicConstraint*
-VecNeqConDynamic(const VarArray1& varray1, const VarArray2& varray2)
-{ return new VecNeqDynamic<VarArray1,VarArray2>(varray1, varray2); }
+VecNeqConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2)
+{ return new VecNeqDynamic<VarArray1,VarArray2>(stateObj, varray1, varray2); }
 
 BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_VECNEQ, VecNeqConDynamic)
 

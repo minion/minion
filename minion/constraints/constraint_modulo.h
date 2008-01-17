@@ -35,8 +35,8 @@ struct ModConstraint : public Constraint
   VarRef2 var2;
   VarRef3 var3;
 
-  ModConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
-	var1(_var1), var2(_var2), var3(_var3)
+  ModConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
+	Constraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
   
 	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
@@ -62,7 +62,7 @@ struct ModConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
-	PropInfoAddone("Mod");
+	PROP_INFO_ADDONE(Mod);
     // aiming at bounds(D)-consistency. 
     // Not achieved because we don't trigger on the supporting values, only bounds.
     
@@ -73,7 +73,7 @@ struct ModConstraint : public Constraint
         // While no support for upperbound, reduce upperbound
         var1.setMax(var1val-1);
         var1val=var1.getMax();
-        if(state.isFailed()) return;
+        if(getState(stateObj).isFailed()) return;
     }
     
     var1val=var1.getMin();
@@ -81,7 +81,7 @@ struct ModConstraint : public Constraint
     {
         var1.setMin(var1val+1);
         var1val=var1.getMin();
-        if(state.isFailed()) return;
+        if(getState(stateObj).isFailed()) return;
     }
     
     DomainInt var2val=var2.getMax();
@@ -90,7 +90,7 @@ struct ModConstraint : public Constraint
         // While no support for upperbound, reduce upperbound
         var2.setMax(var2val-1);  // Is this the right function for pruning the upperbound?
         var2val=var2.getMax();
-        if(state.isFailed()) return;
+        if(getState(stateObj).isFailed()) return;
     }
     
     var2val=var2.getMin();
@@ -98,7 +98,7 @@ struct ModConstraint : public Constraint
     {
         var2.setMin(var2val+1);
         var2val=var2.getMin();
-        if(state.isFailed()) return;
+        if(getState(stateObj).isFailed()) return;
     }
     
     DomainInt var3val=var3.getMax();
@@ -107,7 +107,7 @@ struct ModConstraint : public Constraint
         // While no support for upperbound, reduce upperbound
         var3.setMax(var3val-1);  // Is this the right function for pruning the upperbound?
         var3val=var3.getMax();
-        if(state.isFailed()) return;
+        if(getState(stateObj).isFailed()) return;
     }
     
     var3val=var3.getMin();
@@ -115,7 +115,7 @@ struct ModConstraint : public Constraint
     {
         var3.setMin(var3val+1);
         var3val=var3.getMin();
-        if(state.isFailed()) return;
+        if(getState(stateObj).isFailed()) return;
     }
     
   }
@@ -221,12 +221,12 @@ struct ModConstraint : public Constraint
 
 template<typename V1, typename V2>
 inline Constraint*
-ModuloCon(const V1& vars, const V2& var2)
+ModuloCon(StateObj* stateObj, const V1& vars, const V2& var2)
 {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   return new ModConstraint<typename V1::value_type, typename V1::value_type,
-						   typename V2::value_type>(vars[0], vars[1], var2[0]);
+						   typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
 }
 
 

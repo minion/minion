@@ -29,6 +29,7 @@
 // Only GCC has hashtables
 #ifdef __GNUC__
 #define USE_HASHTABLE
+#define USE_HASHSET
 #endif
 
 // On linux systems, _longjmp and _setjmp are faster versions that ignore
@@ -61,6 +62,8 @@
 #pragma warning(disable: 4018)
 // Why can't you realise that abort() means the function doesn't have to return?
 #pragma warning(disable: 4716)
+// Another annoying warning. I'm not sure why Microsoft want to warn about this, it's perfectly common
+#pragma warning(disable: 4355)
 #else
 #define DEFAULT_CALL
 #endif // _MSC_VER
@@ -101,6 +104,14 @@ template<typename T>
 #define MAP_TYPE map
 #endif
 
+#ifdef USE_HASHSET
+#include <ext/hash_set>
+#define SET_TYPE __gnu_cxx::hash_set
+#else
+#include <set>
+#define SET_TYPE set
+#endif
+
 using namespace std;
 
 
@@ -108,7 +119,7 @@ using namespace std;
 #define VARDEF_ASSIGN(x,y) extern x
 #define VARDEF(x) extern x
 #else
-#define VARDEF_ASSIGN(x,y) x = y
+#define VARDEF_ASSIGN(x,y) x(y)
 #define VARDEF(x) x
 #endif
 

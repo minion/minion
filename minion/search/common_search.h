@@ -14,25 +14,25 @@ namespace Controller
   
   /// Sets optimisation variable.
   template<typename VarRef>
-	void optimise_maximise_var(VarRef var)
+	void optimise_maximise_var(StateObj* stateObj, VarRef var)
   {
-	  options->setFindAllSolutions();
-	  state.setOptimiseVar(new AnyVarRef(var));
-	  state.setOptimisationProblem(true);
+	  getOptions(stateObj).findAllSolutions();
+	  getState(stateObj).setOptimiseVar(new AnyVarRef(var));
+	  getState(stateObj).setOptimisationProblem(true);
   }
   
   /// Sets optimisation variable.
   template<typename VarRef>
-	void optimise_minimise_var(VarRef var)
+	void optimise_minimise_var(StateObj* stateObj, VarRef var)
   {
-	  options->setFindAllSolutions();
-	  state.setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
-	  state.setOptimisationProblem(true);
+	  getOptions(stateObj).findAllSolutions();
+	  getState(stateObj).setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
+	  getState(stateObj).setOptimisationProblem(true);
   }
   
   /// Ensures a particular constraint is satisfied by the solution.
   template<typename T>
-	void check_constraint(T* con)
+	void check_constraint(StateObj* stateObj, T* con)
   {
 	  vector<AnyVarRef> variables = con->get_vars();
 	  unsigned vec_size = variables.size();	  
@@ -68,18 +68,18 @@ namespace Controller
 
   /// All operations to be performed when a solution is found.
   /// This function checks the solution is correct, and prints it if required.
-  inline void check_sol_is_correct()
+  inline void check_sol_is_correct(StateObj* stateObj)
   {
     //if(solution_check != NULL)
 	//  solution_check();
-	state.incrementSolutionCount();
-	if(options->print_solution)
+	getState(stateObj).incrementSolutionCount();
+	if(getOptions(stateObj).print_solution)
 	{
 	  if(!print_matrix.empty())
 	  {
 		for(unsigned i = 0; i < print_matrix.size(); ++i)
 		{
-	          if (!options->print_only_solution) cout << "Sol: ";  
+	          if (!getOptions(stateObj).print_only_solution) cout << "Sol: ";  
 		  for(unsigned j = 0; j < print_matrix[i].size(); ++j)
 		  {
 			if(!print_matrix[i][j].isAssigned())
@@ -90,38 +90,38 @@ namespace Controller
 		  }
 		  cout << endl;
 		}
-		if (!options->print_only_solution) cout << endl;
+		if (!getOptions(stateObj).print_only_solution) cout << endl;
 	  }
   
 	  // TODO : Make this more easily changable.
-          if (!options->print_only_solution) 
+          if (!getOptions(stateObj).print_only_solution) 
           {
-	    cout << "Solution Number: " << state.getSolutionCount() << endl;
-	    state.getTimer().printTimestepWithoutReset("Time:");
-	    cout << "Nodes: " << state.getNodeCount() << endl << endl;
+	    cout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
+	    getState(stateObj).getTimer().printTimestepWithoutReset("Time:");
+	    cout << "Nodes: " << getState(stateObj).getNodeCount() << endl << endl;
           }
     }
 #ifndef NO_DEBUG
-  if(!options->nocheck)
+  if(!getOptions(stateObj).nocheck)
   {
-    for(unsigned i = 0; i < state.getDynamicConstraintList().size(); ++i)
-      check_constraint(state.getDynamicConstraintList()[i]);
+    for(unsigned i = 0; i < getState(stateObj).getDynamicConstraintList().size(); ++i)
+      check_constraint(stateObj, getState(stateObj).getDynamicConstraintList()[i]);
   
-    for(unsigned i = 0 ; i < state.getConstraintList().size();i++)
-      check_constraint(state.getConstraintList()[i]);
+    for(unsigned i = 0 ; i < getState(stateObj).getConstraintList().size();i++)
+      check_constraint(stateObj, getState(stateObj).getConstraintList()[i]);
   }
 #endif
   }
   
    
   /// Check if timelimit has been exceeded.
-  inline BOOL do_checks()
+  inline bool do_checks(StateObj* stateObj)
   {
-  	if((state.getNodeCount() & 1023) == 0)
+  	if((getState(stateObj).getNodeCount() & 1023) == 0)
 	{
-	  if(options->time_limit != 0)
+	  if(getOptions(stateObj).time_limit != 0)
 	  {
-	    if(state.getTimer().checkTimeout(options->time_limit))
+	    if(getState(stateObj).getTimer().checkTimeout(getOptions(stateObj).time_limit))
 	    {
 		  cout << "Time out." << endl;
           tableout.set("TimeOut", 1);
@@ -134,24 +134,24 @@ namespace Controller
   
   
 template<typename T>
-void inline maybe_print_search_state(char* name, T& vars)
+void inline maybe_print_search_state(StateObj* stateObj, const char* name, T& vars)
 {
-  if(options->dumptree)
-	cout << name << state.getNodeCount() << "," << get_dom_as_string(vars) << endl;
+  if(getOptions(stateObj).dumptree)
+	cout << name << getState(stateObj).getNodeCount() << "," << get_dom_as_string(vars) << endl;
 }
 
-void inline maybe_print_search_action(char* action)
+void inline maybe_print_search_action(StateObj* stateObj, const char* action)
 {
     // used to print "bt" usually
-    if(options->dumptree)
+    if(getOptions(stateObj).dumptree)
         cout << "SearchAction:" << action << endl;
 }
 
-  void inline deal_with_solution()
+  void inline deal_with_solution(StateObj* stateObj)
   {
-	if(state.isOptimisationProblem())
+	if(getState(stateObj).isOptimisationProblem())
 	{
-	  if(!state.getOptimiseVar()->isAssigned())
+	  if(!getState(stateObj).getOptimiseVar()->isAssigned())
 	  {
 		cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
 		cerr << "Put it in the variable ordering?" << endl;
@@ -159,50 +159,51 @@ void inline maybe_print_search_action(char* action)
 	  }
 	  
 	  cout << "Solution found with Value: " 
-	  << state.getOptimiseVar()->getAssignedValue() << endl;
+	  << getState(stateObj).getOptimiseVar()->getAssignedValue() << endl;
 	  
-	  state.setOptimiseValue(state.getOptimiseVar()->getAssignedValue() + 1);			
+	  getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getAssignedValue() + 1);			
 	}
-	if(options->lookingForOneSolution() || state.getSolutionCount() == options->sollimit)
+    // Note that sollimit = -1 if all solutions should be found.
+	if(getState(stateObj).getSolutionCount() == getOptions(stateObj).sollimit)
 	  throw 0;
   }
 
-  void inline set_optimise_and_propagate_queue()
+  void inline set_optimise_and_propagate_queue(StateObj* stateObj )
   {
   #ifdef USE_SETJMP
-	if(state.isOptimisationProblem())
+	if(getState(stateObj).isOptimisationProblem())
 	{
 	  // Must check if this setMin will fail before doing it, else
 	  // The setjmp will throw us off. It's cheaper to check than set up
 	  // a new setjmp point here.
-	  if(state.getOptimiseVar()->getMax() >= state.getOptimiseVar())
+	  if(getState(stateObj).getOptimiseVar()->getMax() >= getState(stateObj).getOptimiseVar())
 	  { 
-		state.getOptimiseVar()->setMin(state.getOptimiseVar());
-		queues.propagateQueue();
+		getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseVar());
+		getQueue(stateObj).propagateQueue();
 	  }
 	  else
 	  {failed = true; }
 	}
 	else
-	{ queues.propagateQueue();}
+	{ getQueue(stateObj).propagateQueue();}
   #else
-	if(state.isOptimisationProblem())
-	  state.getOptimiseVar()->setMin(state.getOptimiseValue());
-	queues.propagateQueue();
+	if(getState(stateObj).isOptimisationProblem())
+	  getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseValue());
+	getQueue(stateObj).propagateQueue();
   #endif	
   }
 
-  void inline initalise_search()
+  void inline initalise_search(StateObj* stateObj)
   {
-	state.setSolutionCount(0);  
-	state.setNodeCount(0);
-	lock();
-	state.getTimer().printTimestepWithoutReset("First Node Time: ");
+	getState(stateObj).setSolutionCount(0);  
+	getState(stateObj).setNodeCount(0);
+	lock(stateObj);
+	getState(stateObj).getTimer().printTimestepWithoutReset("First Node Time: ");
 	/// Failed initially propagating constraints!
-	if(state.isFailed())
+	if(getState(stateObj).isFailed())
 	  return;
-	if(state.isOptimisationProblem())
-	  state.setOptimiseValue(state.getOptimiseVar()->getMin()); 
+	if(getState(stateObj).isOptimisationProblem())
+	  getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getMin()); 
   }
 }
 

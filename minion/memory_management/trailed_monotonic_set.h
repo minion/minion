@@ -20,7 +20,7 @@ typedef int value_type;
 
 class TrailedMonotonicSet
 {
-
+  StateObj* stateObj;
 
   static const value_type one = 1;
   static const int _num_sweeps = 0;
@@ -36,7 +36,7 @@ class TrailedMonotonicSet
   // MemOffset _undo_values;
   MemOffset _undo_indexes;
   
-  BackTrackOffset backtrack_ptr;
+  MoveablePointer backtrack_ptr;
 
   // value_type& undo_values(int i)
   // { return static_cast<value_type*>(_undo_values.get_ptr())[i]; }
@@ -132,9 +132,9 @@ void branch_left()  // nothing to do
 void branch_right()  // nothing to do
   { return ; }
 
-void initialise(const int& size, const int& max_undos)
+void initialise(const int& new_size, const int& max_undos)
   { 
-    _size = size;
+    _size = new_size;
     _max_undos = max_undos;
 
     // should put in a D_ASSERT on MAXINT here
@@ -144,9 +144,9 @@ void initialise(const int& size, const int& max_undos)
     _local_depth = 0;
     _backtrack_depth = 0;
 
-    _array.request_bytes(_size*sizeof(value_type)); 
+    _array = getMemory(stateObj).nonBackTrack().request_bytes(_size*sizeof(value_type)); 
     // _undo_values.request_bytes(_max_depth*sizeof(value_type));
-    _undo_indexes.request_bytes(_max_depth*sizeof(int));
+    _undo_indexes = getMemory(stateObj).nonBackTrack().request_bytes(_max_depth*sizeof(int));
 
 #ifdef DEBUG
     cout << "initialising TrailedMonotonicSet with value of size= " << size << endl;
@@ -156,15 +156,15 @@ void initialise(const int& size, const int& max_undos)
     // print_state();
 #endif
     
-    for(int i=0; i<size; i++) {
+    for(int i=0; i< new_size; i++) {
       array(i) = one;
     };
   }
 
   
   
-TrailedMonotonicSet()
-{ } 
+  TrailedMonotonicSet(StateObj* _stateObj) : stateObj(_stateObj), _backtrack_depth(_stateObj)
+  { } 
 
 int num_sweeps() { return _num_sweeps ; } 
 

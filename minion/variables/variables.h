@@ -24,6 +24,17 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+
+#ifdef MANY_VAR_CONTAINERS
+#define GET_CONTAINER() data.getCon()
+#define GET_LOCAL_CON() getCon()
+#else
+#define GET_CONTAINER() InternalRefType::getCon_Static()
+#define GET_LOCAL_CON() getCon_Static()
+#endif
+
+#include "VarRefType.h"
+
 #ifdef MORE_SEARCH_INFO
 #include "../get_info/info_var_wrapper.h"
 #endif
@@ -36,12 +47,24 @@
 
 class VariableContainer
 {
+  // Stop copying!
+  VariableContainer(const VariableContainer&);
+  void operator=(const VariableContainer&);
+public:
   BoundVarContainer<> boundvarContainer; 
   BooleanContainer booleanContainer;
   LRVCon rangevarContainer;
   BigRangeCon bigRangevarContainer;
   SparseBoundVarContainer<> sparseBoundvarContainer;
-public:
+
+
+    VariableContainer(StateObj* _stateObj) :
+    boundvarContainer(_stateObj),
+    booleanContainer(_stateObj),
+    rangevarContainer(_stateObj),
+    bigRangevarContainer(_stateObj),
+    sparseBoundvarContainer(_stateObj)
+  {}
   
   BoundVarContainer<>& getBoundvarContainer() { return boundvarContainer; }
   BooleanContainer& getBooleanContainer() { return booleanContainer; }
@@ -50,50 +73,15 @@ public:
   SparseBoundVarContainer<>& getSparseBoundvarContainer() { return sparseBoundvarContainer; }
 };
 
-VARDEF(VariableContainer varContainer);
-
-struct GetBoundVarContainer
-{
-  static BoundVarContainer<>& con() 
-  { return varContainer.getBoundvarContainer(); }
-  static string name()
-  { return "Bound"; }
-};
-
-struct GetBooleanContainer
-{ 
-  static BooleanContainer& con() { return varContainer.getBooleanContainer(); } 
-  static string name()
-  { return "Bool:"; }
-};
-
-struct GetRangeVarContainer
-{
-  static LRVCon& con() { return varContainer.getRangevarContainer(); }
-  static string name() { return "RangeVar:"; }
-};
-
-struct GetBigRangeVarContainer
-{
-  static BigRangeCon& con() { return varContainer.getBigRangevarContainer(); }
-  static string name() { return "BigRangeVar"; }
-};
-
-
-struct GetSparseBoundVarContainer
-{
-  static SparseBoundVarContainer<>& con() 
-  { return varContainer.getSparseBoundvarContainer(); }
-  
-  static string name()
-  { return "SparseBound:"; }
-};
-
 struct SmallDiscreteCheck
 {
+  StateObj* stateObj;
+  SmallDiscreteCheck(StateObj* _stateObj) : stateObj(_stateObj)
+  {}
+
   template<typename T>
   bool operator()(const T& lower, const T& upper) const
-  { return varContainer.getRangevarContainer().valid_range(lower, upper); }
+  { return getVars(stateObj).getRangevarContainer().valid_range(lower, upper); }
 };
 
 #include "mappings/variable_neg.h"

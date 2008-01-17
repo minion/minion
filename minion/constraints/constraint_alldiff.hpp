@@ -189,7 +189,7 @@ By: John Tromp
 		}
 		
 		if( (status_lower == INCONSISTENT) || (status_upper == INCONSISTENT) ) {
-		  Controller::fail();
+		  getState(stateObj).setFailed(true);
 		}
 		else
 		  if( (status_lower == CHANGES) || (status_upper == CHANGES) ) {

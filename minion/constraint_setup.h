@@ -20,7 +20,7 @@ namespace Controller
     
 /// Lists all structures that must be locked before search.
 // @todo This could be done more neatly... 
-  void lock();
+  void lock(StateObj*);
 
 } // namespace Controller
 

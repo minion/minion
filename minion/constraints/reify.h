@@ -38,6 +38,8 @@
 template<typename BoolVar>
 struct reify : public Constraint
 {
+  StateObj* stateObj;
+  
   virtual string constraint_name()
   { return "Reify:" + poscon->constraint_name(); }
 	
@@ -49,8 +51,8 @@ struct reify : public Constraint
   BOOL constraint_locked;
   BOOL value_assigned;
   
-  reify(Constraint* _poscon, BoolVar v) : poscon(_poscon), rar_var(v),
-										  constraint_locked(false)
+  reify(StateObj* _stateObj, Constraint* _poscon, BoolVar v) : Constraint(_stateObj), stateObj(_stateObj), poscon(_poscon),
+                                                               rar_var(v),  constraint_locked(false)
   { negcon = poscon->reverse_constraint();}
   
   virtual Constraint* reverse_constraint()
@@ -135,7 +137,7 @@ struct reify : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
-	PropInfoAddone("Reify");
+	PROP_INFO_ADDONE(Reify);
     D_INFO(1,DI_REIFY,"Propagation Start");
 	if(constraint_locked)
 	  return;
@@ -143,7 +145,7 @@ struct reify : public Constraint
     if(i == -99998 || i == -99999)
     {
 	  constraint_locked = true;
-	  queues.pushSpecialTrigger(this);
+	  getQueue(stateObj).pushSpecialTrigger(this);
 	  
       if(i==-99999)
       {
@@ -214,7 +216,7 @@ struct reify : public Constraint
 
 template<typename BoolVar>
 reify<BoolVar>*
-reifyCon(Constraint* c, BoolVar var)
-{ return new reify<BoolVar>(&*c, var); }
+reifyCon(StateObj* stateObj, Constraint* c, BoolVar var)
+{ return new reify<BoolVar>(stateObj, &*c, var); }
 
 

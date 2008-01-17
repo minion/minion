@@ -41,7 +41,7 @@
 
 template <typename T>
 DynamicConstraint*
-BuildCT_WATCHED_TABLE(const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   if(reify) 
   { 
@@ -49,5 +49,5 @@ BuildCT_WATCHED_TABLE(const T& t1, BOOL reify, const BoolVarRef& reifyVar, Const
 	exit(0); 
   } 
   else 
-  { return GACTableCon(t1, b.tuples); } 
+  { return GACTableCon(stateObj, t1, b.tuples); } 
 }

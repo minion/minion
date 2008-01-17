@@ -37,8 +37,8 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
   
   VarArray var_array;
 
-  BoolThreeSATConstraintDynamic(const VarArray& _var_array) :
-	var_array(_var_array)
+  BoolThreeSATConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array) :
+	DynamicConstraint(_stateObj), var_array(_var_array)
   { 
 	D_ASSERT(var_array.size() == 3);
 #ifndef WATCHEDLITERALS
@@ -68,7 +68,7 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
 
 	if(index == array_size)
 	{ // Not enough triggers
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
 	
@@ -110,7 +110,7 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PropInfoAddone("Dyn3SAT");
+	PROP_INFO_ADDONE(Dyn3SAT);
 	int propval = dt->trigger_info();
 	int var_size = var_array.size();
 	
@@ -159,5 +159,5 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
 
 template<typename VarArray>
 DynamicConstraint*
-BoolThreeSATConDynamic(const VarArray& _var_array)
-{ return new BoolThreeSATConstraintDynamic<VarArray>(_var_array); }
+BoolThreeSATConDynamic(StateObj* stateObj, const VarArray& _var_array)
+{ return new BoolThreeSATConstraintDynamic<VarArray>(stateObj, _var_array); }

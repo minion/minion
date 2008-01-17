@@ -39,8 +39,8 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 
   int last;
   
-  BoolSATConstraintDynamic(const VarArray& _var_array) :
-	var_array(_var_array)
+  BoolSATConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array) :
+	DynamicConstraint(_stateObj), var_array(_var_array)
   { 
 #ifndef WATCHEDLITERALS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
@@ -70,7 +70,7 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 
 	if(index == array_size)
 	{ // Not enough triggers
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
 	
@@ -100,7 +100,7 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
     
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PropInfoAddone("DynSumSat");
+	PROP_INFO_ADDONE(DynSumSat);
 	int propval = dt->trigger_info();
 	int var_size = var_array.size();
 	
@@ -178,5 +178,5 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 
 template<typename VarArray>
 DynamicConstraint*
-BoolSATConDynamic(const VarArray& _var_array)
-{ return new BoolSATConstraintDynamic<VarArray>(_var_array); }
+BoolSATConDynamic(StateObj* stateObj, const VarArray& _var_array)
+{ return new BoolSATConstraintDynamic<VarArray>(stateObj, _var_array); }

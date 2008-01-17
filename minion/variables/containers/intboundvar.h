@@ -24,48 +24,150 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+template<typename BoundType>
+struct BoundVarContainer;
+
+template<typename DomType = DomainInt>
 struct BoundVarRef_internal
 {
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Yes;
+  static string name() { return "BoundVar"; }
   BOOL isBound()
   { return true;}
-  
+
+  MoveablePointer var_bound_data;
   int var_num;
-  BoundVarRef_internal() : var_num(-1)
+  
+  const DomType& lower_bound() const
+  { return *static_cast<DomType*>(var_bound_data.get_ptr()); }
+  
+  const DomType& upper_bound() const
+  { return *(static_cast<DomType*>(var_bound_data.get_ptr())+ 1); }
+
+#ifdef MANY_VAR_CONTAINERS
+  BoundVarContainer<DomType>* boundCon;
+  BoundVarContainer<DomType>& getCon() const { return *boundCon; }
+  
+  BoundVarRef_internal() : var_num(-1), boundCon(NULL)
   { }
   
-  explicit BoundVarRef_internal(int i) : var_num(i)
-  {}
+  explicit BoundVarRef_internal(BoundVarContainer<DomType>* con, int i, DomType* ptr) : 
+  var_num(i), boundCon(con), var_bound_data(ptr)
+  { }
+  
+#else
+  static BoundVarContainer<DomType>& getCon_Static();
+  BoundVarRef_internal() : var_num(-1)
+  { }
+
+  explicit BoundVarRef_internal(BoundVarContainer<DomType>*, int i, DomType* ptr) : 
+  var_num(i), var_bound_data(ptr)
+  { }
+#endif
+
+  BOOL isAssigned() const
+  { return lower_bound() == upper_bound(); }
+  
+   BOOL isAssignedValue(DomainInt i)
+  { 
+    return isAssigned() &&
+    getAssignedValue() == i;
+  }
+
+  DomainInt getAssignedValue() const
+  {
+    D_ASSERT(isAssigned());
+    return lower_bound();
+  }
+  
+  BOOL inDomain(DomainInt i) const
+  {
+    if (i < lower_bound() || i > upper_bound())
+      return false;
+    return true;
+  }
+  
+  BOOL inDomain_noBoundCheck(DomainInt i) const
+  {
+	D_ASSERT(i >= lower_bound());
+	D_ASSERT(i <= upper_bound());
+    return true;
+  }
+  
+  DomainInt getMin() const
+  { return lower_bound(); }
+  
+  DomainInt getMax() const
+  { return upper_bound(); }
+
+   DomainInt getInitialMax() const
+  { return GET_LOCAL_CON().getInitialMax(*this); }
+  
+  DomainInt getInitialMin() const
+  { return GET_LOCAL_CON().getInitialMin(*this); }
+  
+  void setMax(DomainInt i)
+  { GET_LOCAL_CON().setMax(*this,i); }
+  
+  void setMin(DomainInt i)
+  { GET_LOCAL_CON().setMin(*this,i); }
+  
+  void uncheckedAssign(DomainInt b)
+  { GET_LOCAL_CON().uncheckedAssign(*this, b); }
+  
+  void propagateAssign(DomainInt b)
+  { GET_LOCAL_CON().propagateAssign(*this, b); }
+  
+  void removeFromDomain(DomainInt b)
+  { GET_LOCAL_CON().removeFromDomain(*this, b); }
+  
+  void addTrigger(Trigger t, TrigType type)
+  { GET_LOCAL_CON().addTrigger(*this, t, type); }
+
+  friend std::ostream& operator<<(std::ostream& o, const BoundVarRef_internal& v)
+  { return o << "BoundVar:" << v.var_num; }
+    
+  int getDomainChange(DomainDelta d)
+  { return d.XXX_get_domain_diff(); }
+  
+#ifdef DYNAMICTRIGGERS
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  {  GET_LOCAL_CON().addDynamicTrigger(*this, t, type, pos); }
+#endif
+
 };
 
-struct GetBoundVarContainer;
-
 #ifdef MORE_SEARCH_INFO
-typedef InfoRefType<VarRefType<GetBoundVarContainer, BoundVarRef_internal>, VAR_INFO_BOUNDVAR> BoundVarRef;
+typedef InfoRefType<BoundVarRef_internal<>, VAR_INFO_BOUNDVAR> BoundVarRef;
 #else
-typedef VarRefType<GetBoundVarContainer, BoundVarRef_internal> BoundVarRef;
+typedef BoundVarRef_internal<> BoundVarRef;
 #endif
 
 template<typename BoundType = DomainInt>
 struct BoundVarContainer {
-  BackTrackOffset bound_data;
+  StateObj* stateObj;
+  BoundVarContainer(StateObj* _stateObj) : stateObj(_stateObj), lock_m(0), 
+                                           trigger_list(stateObj, true), var_count_m(0)
+  {}
+    
+  MoveablePointer bound_data;
   TriggerList trigger_list;
   vector<pair<BoundType, BoundType> > initial_bounds;
   unsigned var_count_m;
   BOOL lock_m;
   
 
-  const BoundType& lower_bound(BoundVarRef_internal i) const
+  const BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i) const
   { return static_cast<const BoundType*>(bound_data.get_ptr())[i.var_num*2]; }
   
-  const BoundType& upper_bound(BoundVarRef_internal i) const
+  const BoundType& upper_bound(const BoundVarRef_internal<BoundType>& i) const
   { return static_cast<const BoundType*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
 
-  BoundType& lower_bound(BoundVarRef_internal i)
+  BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i)
   { return static_cast<BoundType*>(bound_data.get_ptr())[i.var_num*2]; }
   
-  BoundType& upper_bound(BoundVarRef_internal i)
+  BoundType& upper_bound(const BoundVarRef_internal<BoundType>& i)
   { return static_cast<BoundType*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
 
   
@@ -73,7 +175,160 @@ struct BoundVarContainer {
   { 
     D_ASSERT(!lock_m);
     lock_m = true;
-    bound_data.request_bytes(var_count_m*2*sizeof(BoundType));
+  }
+
+  BOOL isAssigned(const BoundVarRef_internal<BoundType>& d) const
+  { 
+    D_ASSERT(lock_m);
+    return lower_bound(d) == upper_bound(d); 
+  }
+  
+  DomainInt getAssignedValue(const BoundVarRef_internal<BoundType>& d) const
+  {
+    D_ASSERT(lock_m);
+    D_ASSERT(isAssigned(d));
+    return lower_bound(d);
+  }
+  
+  BOOL inDomain(const BoundVarRef_internal<BoundType>& d, DomainInt i) const
+  {
+    D_ASSERT(lock_m);
+    if (i < lower_bound(d) || i > upper_bound(d))
+      return false;
+    return true;
+  }
+  
+  BOOL inDomain_noBoundCheck(const BoundVarRef_internal<BoundType>& d, DomainInt i) const
+  {
+    D_ASSERT(lock_m);
+	D_ASSERT(i >= lower_bound(d));
+	D_ASSERT(i <= upper_bound(d));
+    return true;
+  }
+  
+  DomainInt getMin(const BoundVarRef_internal<BoundType>& d) const
+  {
+    D_ASSERT(lock_m);
+    D_ASSERT(getState(stateObj).isFailed() || inDomain(d,lower_bound(d)));
+    return lower_bound(d);
+  }
+  
+  DomainInt getMax(const BoundVarRef_internal<BoundType>& d) const
+  {
+    D_ASSERT(lock_m);
+    D_ASSERT(getState(stateObj).isFailed() || inDomain(d,upper_bound(d)));
+    return upper_bound(d);
+  }
+ 
+  DomainInt getInitialMin(const BoundVarRef_internal<BoundType>& d) const
+  { return initial_bounds[d.var_num].first; }
+  
+  DomainInt getInitialMax(const BoundVarRef_internal<BoundType>& d) const
+  { return initial_bounds[d.var_num].second; }
+   
+  void removeFromDomain(const BoundVarRef_internal<BoundType>&, DomainInt )
+  {
+    D_FATAL_ERROR( "Cannot Remove Value from domain of a bound var");
+    FAIL_EXIT();
+  }
+  
+  void propagateAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
+  {
+    DomainInt min_val = getMin(d);
+    DomainInt max_val = getMax(d);
+    if(min_val > i || max_val < i)
+    {
+      getState(stateObj).setFailed(true);
+      return;
+    }
+    
+    if(min_val == max_val)
+      return;
+    
+    trigger_list.push_domain(d.var_num);
+    trigger_list.push_assign(d.var_num, i);
+
+    if(min_val != i)
+      trigger_list.push_lower(d.var_num, i - min_val);
+    
+    if(max_val != i)
+      trigger_list.push_upper(d.var_num, max_val - i);
+    
+    upper_bound(d) = i;
+    lower_bound(d) = i;
+  }
+  
+  // TODO : Optimise
+  void uncheckedAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
+  { 
+    D_ASSERT(inDomain(d,i));
+    propagateAssign(d,i); 
+  }
+  
+  void setMax(const BoundVarRef_internal<BoundType>& d, DomainInt i)
+  {
+    DomainInt low_bound = lower_bound(d);
+    DomainInt up_bound = upper_bound(d);
+    
+    if(i < low_bound)
+    {
+       getState(stateObj).setFailed(true);
+       return;
+    }
+    
+    
+    if(i < up_bound)
+    {
+      trigger_list.push_upper(d.var_num, up_bound - i);
+      trigger_list.push_domain(d.var_num);
+      upper_bound(d) = i;
+      if(low_bound == i)
+	trigger_list.push_assign(d.var_num, i);
+    }
+  }
+  
+  void setMin(const BoundVarRef_internal<BoundType>& d, DomainInt i)
+  {
+    DomainInt low_bound = lower_bound(d);
+    DomainInt up_bound = upper_bound(d);
+    
+    if(i > up_bound)
+    {
+      getState(stateObj).setFailed(true);
+      return;
+    }
+    
+    if(i > low_bound)
+    {
+      trigger_list.push_lower(d.var_num, i - low_bound);
+      trigger_list.push_domain(d.var_num);
+      lower_bound(d) = i;
+      if(up_bound == i)
+	    trigger_list.push_assign(d.var_num, i);
+    }
+  }
+  
+//  BoundVarRef get_new_var();
+//  BoundVarRef get_new_var(int i, int j);
+  BoundVarRef get_var_num(int i);
+  
+  void addVariables(const vector<pair<int, Bounds > >& vars)
+  {
+    D_ASSERT(!lock_m);
+    for(int i = 0; i < vars.size(); ++i)
+    {
+      D_ASSERT(vars[i].second.lower_bound >= DomainInt_Min);
+      D_ASSERT(vars[i].second.upper_bound <= DomainInt_Max);
+      for(int j = 0; j < vars[i].first; ++j)
+      {
+        var_count_m++;
+        initial_bounds.push_back(make_pair(vars[i].second.lower_bound, vars[i].second.upper_bound));
+        D_INFO(0,DI_BOUNDCONTAINER,"Adding var of domain: (" + to_string(vars[i].second.lower_bound) + "," +
+                                                               to_string(vars[i].second.upper_bound) + ")");
+      }
+    }
+
+    bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
     BoundType* bound_ptr = static_cast<BoundType*>(bound_data.get_ptr());
     for(unsigned int i = 0; i < var_count_m; ++i)
     {
@@ -96,157 +351,17 @@ struct BoundVarContainer {
 	    max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
       }
     }
-    
-    trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
-    
+    trigger_list.lock(var_count_m, min_domain_val, max_domain_val);    
   }
-  
-  BoundVarContainer() : lock_m(0), trigger_list(true)
-  {}
-  
-  BOOL isAssigned(BoundVarRef_internal d) const
-  { 
-    D_ASSERT(lock_m);
-    return lower_bound(d) == upper_bound(d); 
-  }
-  
-  DomainInt getAssignedValue(BoundVarRef_internal d) const
-  {
-    D_ASSERT(lock_m);
-    D_ASSERT(isAssigned(d));
-    return lower_bound(d);
-  }
-  
-  BOOL inDomain(BoundVarRef_internal d, DomainInt i) const
-  {
-    D_ASSERT(lock_m);
-    if (i < lower_bound(d) || i > upper_bound(d))
-      return false;
-    return true;
-  }
-  
-  BOOL inDomain_noBoundCheck(BoundVarRef_internal d, DomainInt i) const
-  {
-    D_ASSERT(lock_m);
-	D_ASSERT(i >= lower_bound(d));
-	D_ASSERT(i <= upper_bound(d));
-    return true;
-  }
-  
-  DomainInt getMin(BoundVarRef_internal d) const
-  {
-    D_ASSERT(lock_m);
-    D_ASSERT(state.isFailed() || inDomain(d,lower_bound(d)));
-    return lower_bound(d);
-  }
-  
-  DomainInt getMax(BoundVarRef_internal d) const
-  {
-    D_ASSERT(lock_m);
-    D_ASSERT(state.isFailed() || inDomain(d,upper_bound(d)));
-    return upper_bound(d);
-  }
- 
-  DomainInt getInitialMin(BoundVarRef_internal d) const
-  { return initial_bounds[d.var_num].first; }
-  
-  DomainInt getInitialMax(BoundVarRef_internal d) const
-  { return initial_bounds[d.var_num].second; }
-   
-  void removeFromDomain(BoundVarRef_internal, DomainInt )
-  {
-    D_FATAL_ERROR( "Cannot Remove Value from domain of a bound var");
-    FAIL_EXIT();
-  }
-  
-  void propagateAssign(BoundVarRef_internal d, DomainInt i)
-  {
-    DomainInt min_val = getMin(d);
-    DomainInt max_val = getMax(d);
-    if(min_val > i || max_val < i)
-    {
-      Controller::fail();
-      return;
-    }
-    
-    if(min_val == max_val)
-      return;
-    
-    trigger_list.push_domain(d.var_num);
-    trigger_list.push_assign(d.var_num, i);
 
-    if(min_val != i)
-      trigger_list.push_lower(d.var_num, i - min_val);
-    
-    if(max_val != i)
-      trigger_list.push_upper(d.var_num, max_val - i);
-    
-    upper_bound(d) = i;
-    lower_bound(d) = i;
-  }
-  
-  // TODO : Optimise
-  void uncheckedAssign(BoundVarRef_internal d, DomainInt i)
-  { 
-    D_ASSERT(inDomain(d,i));
-    propagateAssign(d,i); 
-  }
-  
-  void setMax(BoundVarRef_internal d, DomainInt i)
-  {
-    DomainInt low_bound = lower_bound(d);
-    DomainInt up_bound = upper_bound(d);
-    
-    if(i < low_bound)
-    {
-       Controller::fail();
-       return;
-    }
-    
-    
-    if(i < up_bound)
-    {
-      trigger_list.push_upper(d.var_num, up_bound - i);
-      trigger_list.push_domain(d.var_num);
-      upper_bound(d) = i;
-      if(low_bound == i)
-	trigger_list.push_assign(d.var_num, i);
-    }
-  }
-  
-  void setMin(BoundVarRef_internal d, DomainInt i)
-  {
-    DomainInt low_bound = lower_bound(d);
-    DomainInt up_bound = upper_bound(d);
-    
-    if(i > up_bound)
-    {
-      Controller::fail();
-      return;
-    }
-    
-    if(i > low_bound)
-    {
-      trigger_list.push_lower(d.var_num, i - low_bound);
-      trigger_list.push_domain(d.var_num);
-      lower_bound(d) = i;
-      if(up_bound == i)
-	    trigger_list.push_assign(d.var_num, i);
-    }
-  }
-  
-  BoundVarRef get_new_var();
-  BoundVarRef get_new_var(int i, int j);
-  BoundVarRef get_var_num(int i);
-
-  void addTrigger(BoundVarRef_internal b, Trigger t, TrigType type)
+  void addTrigger(const BoundVarRef_internal<BoundType>& b, Trigger t, TrigType type)
   { 
 	D_ASSERT(lock_m);  
 	trigger_list.add_trigger(b.var_num, t, type); 
   }
 
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(BoundVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {
 	D_ASSERT(lock_m); 
 	D_ASSERT(type != DomainRemoval);
@@ -261,11 +376,11 @@ struct BoundVarContainer {
     int char_count = 0;
     for(unsigned int i=0;i<var_count_m;i++)
     {
-      if(!isAssigned(BoundVarRef_internal(i)))
+      if(!isAssigned(BoundVarRef_internal<BoundType>(i)))
 	s << "X";
       else
       {
-	s << (getAssignedValue(BoundVarRef_internal(i))?1:0); 
+	s << (getAssignedValue(BoundVarRef_internal<BoundType>(i))?1:0); 
       }
       char_count++;
       if(char_count%7==0) s << endl;
@@ -278,24 +393,22 @@ struct BoundVarContainer {
 
 
 
-
+/*
 template<typename T>
 inline BoundVarRef
 BoundVarContainer<T>::get_new_var(int i, int j)
 {
-  D_ASSERT(!lock_m);
-  D_ASSERT(i >= DomainInt_Min);
-  D_ASSERT(j <= DomainInt_Max);
- // D_ASSERT(i >= var_min && j <= var_max);
-  initial_bounds.push_back(make_pair(i,j));
-  return BoundVarRef(BoundVarRef_internal(var_count_m++));
+
+  return BoundVarRef(BoundVarRef_internal<BoundType>(var_count_m++));
 }
+*/
 
 template<typename T>
 inline BoundVarRef
 BoundVarContainer<T>::get_var_num(int i)
 {
-  D_ASSERT(!lock_m);
-  return BoundVarRef(BoundVarRef_internal(i));
+  D_ASSERT(i < var_count_m);
+  // Note we assume in BoundVarRef_internal that upper_bound(i) is just after lower_bound(i)...
+  return BoundVarRef(BoundVarRef_internal<>(this, i, static_cast<DomainInt*>(bound_data.get_ptr()) + i*2));
 }
 

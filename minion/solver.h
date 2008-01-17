@@ -54,10 +54,13 @@ class SearchState
   
   TimerClass timer;
   
-  TupleListContainer* tupleListContainer;
+  shared_ptr<TupleListContainer> tupleListContainer;
+
+  bool is_locked;
+
 public:
 	
-	unsigned long long getNodeCount() { return nodes; }
+  unsigned long long getNodeCount() { return nodes; }
   void setNodeCount(unsigned long long _nodes) { nodes = _nodes; }
   void incrementNodeCount() { nodes++; }
   
@@ -85,10 +88,16 @@ public:
   void setDynamicTriggersUsed(bool b) { dynamic_triggers_used = b; }
   
   bool isFinished() { return finished; }
-  bool setFinished(bool b) { finished = b; }
+  void setFinished(bool b) { finished = b; }
   
   bool isFailed() { return failed; }
-  bool setFailed(bool f) { failed = f; }
+  void setFailed(bool f) {
+#ifdef USE_SETJMP
+    if(f)
+      SYSTEM_LONGJMP(*(getState(stateObj).getJmpBufPtr()),1);
+#endif
+    failed = f; 
+  }
   // This function is here because a number of pieces of code want a raw reference to the 'failed' variable.
   // Long term, this may get removed, but it is added for now to minimise changes while removing global
   // variables.
@@ -98,97 +107,87 @@ public:
   
   jmp_buf* getJmpBufPtr() { return &g_env; }
   
-  TupleListContainer* getTupleListContainer() { return tupleListContainer; }
+  TupleListContainer* getTupleListContainer() { return &*tupleListContainer; }
   
-  void setTupleListContainer(TupleListContainer* _tupleList) 
-  { 
-    D_ASSERT(tupleListContainer == NULL);
-    tupleListContainer = _tupleList; 
-  }
+  void setTupleListContainer(shared_ptr<TupleListContainer> _tupleList) 
+  { tupleListContainer = _tupleList; }
                           
   SearchState() : nodes(0), optimise_var(NULL), current_optimise_position(0), optimise(false), solutions(0),
-	dynamic_triggers_used(false), tupleListContainer(NULL)
+	dynamic_triggers_used(false), finished(false), failed(false), tupleListContainer(NULL), is_locked(false)
   {}
+  
+  void markLocked()
+  { is_locked = true; }
+
+  bool isLocked()
+  { return is_locked; }
+  
   
 };
 
-
-
-VARDEF(SearchState state);
-
+/// Stored all the options related to search. This item should not
+/// be changed during search.
 class SearchOptions
 {
 public:
   
+  /// Denotes if only solutions should be printed.
   bool print_only_solution;
+  /// Denotes if the search tree should be printed.
   bool dumptree;
-  int sollimit;
+  /// Gives the solutions which should be found. 
+  /// -1 denotes finding all solutions.
+  long long sollimit;
+  /// Denotes if non-incremental propagation should be used. 
+  /// Only for debugging.
   bool fullpropagate;
+  /// Denotes if solutions should be checked it they satisfy constraints.
+  /// Only for debugging.
   bool nocheck;
+  /// Denotes to nodelimit, 0 if none given.
   unsigned long long nodelimit;
+  /// Dentoes if information about search should be printed to a file.
   bool tableout;
-  
-  /// This variable contains the name of a function which should be called
-  /// Wherever a solution is found.
-  //void (*solution_check)(void);
-  
-  /// Denotes if only one solution should be found.
-  bool find_one_sol;
-  
+    
   /// Denotes if solutions should be printed.
+  /// Initialised to true.
   bool print_solution;
   
-  /// Stores the timelimit, 0 if none given
+  /// Stores the timelimit, 0 if none given.
   clock_t time_limit;
   
-  SearchOptions() : print_only_solution(false), dumptree(false), sollimit(-1), fullpropagate(false), 
-	nocheck(false), nodelimit(0), tableout(false),  find_one_sol(true), 
+  /// Denotes if the variable and value orderings should be randomised.
+  /// Initialised to false.
+  bool randomise_valvarorder;
+  
+  SearchOptions() : print_only_solution(false), dumptree(false), sollimit(1), fullpropagate(false), 
+	nocheck(false), nodelimit(0), tableout(false), randomise_valvarorder(false), 
     print_solution(true), time_limit(0)
-    //,solution_check(NULL)
   {}
   
-//  void setSolutionCheckFunction(void(*fun_ptr)(void))
-//  { solution_check = fun_ptr; }
-  
-  void setFindAllSolutions()
-  { find_one_sol = false; }
-  
-  void setFindOneSolution()
-  { find_one_sol = true; }
-
-  bool lookingForOneSolution()
-  { return find_one_sol; }
+  /// Denotes all solutions should be found, by setting sollimit to -1.
+  void findAllSolutions()
+  { sollimit = -1; }
 };
 
-VARDEF(SearchOptions* options);
 
+class Queues;
+class MemBlockCache;
+class Memory;
+class TriggerMem;
+class VariableContainer;
+
+class StateObj;
+
+inline SearchOptions& getOptions(StateObj* stateObj);
+inline SearchState& getState(StateObj* stateObj);
+inline Queues& getQueue(StateObj* stateObj);
+inline Memory& getMemory(StateObj* stateObj);
+inline TriggerMem& getTriggerMem(StateObj* stateObj);
+inline VariableContainer& getVars(StateObj* stateObj);
 
 namespace Controller
 {
-  
-  /// Called when search is finished. 
-  /// This is mainly here so that any debugging instructions which watch for memory problems
-  /// don't trigger when search is finished and memory is being cleaned up.
-  inline void finish()
-  { 
-    D_INFO(0,DI_SOLVER,"Cleanup starts");
-    state.setFinished(true);
-  }
-  
-
-  
-  /// Called whenever search fails.
-  /// Anyone can call this at any time. Once the current propagator is left, search will backtrack.
-  inline void fail()
-  { 
-    D_INFO(1,DI_SOLVER,"Failed!");
-#ifdef USE_SETJMP
-   SYSTEM_LONGJMP(*(state.getJmpBufPtr()),1);
-#else
-   state.setFailed(true);
-#endif
-  }
-  
-  void lock();
+  void lock(StateObj*);
 }
 

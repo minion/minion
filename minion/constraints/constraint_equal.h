@@ -35,8 +35,8 @@ struct ReifiedEqualConstraint : public Constraint
   EqualVarRef1 var1;
   EqualVarRef2 var2;
   BoolVarRef var3;
-  ReifiedEqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
-    var1(_var1), var2(_var2), var3(_var3)
+  ReifiedEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
+    Constraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {}
   
   virtual triggerCollection setup_internal()
@@ -69,7 +69,7 @@ struct ReifiedEqualConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PropInfoAddone("ReifyEqual");
+	PROP_INFO_ADDONE(ReifyEqual);
     switch(i)
     {
       case 1:
@@ -112,7 +112,7 @@ struct ReifiedEqualConstraint : public Constraint
         if(var1.isAssigned() && var2.isAssigned())
 		{ 
 		  if(var1.getAssignedValue() == var2.getAssignedValue())
-			Controller::fail();
+			getState(stateObj).setFailed(true);
 		}
 		break;
     }
@@ -144,7 +144,7 @@ struct EqualConstraint : public Constraint
   
   EqualVarRef1 var1;
   EqualVarRef2 var2;
-  EqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2) :
+  EqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2) : Constraint(_stateObj),
     var1(_var1), var2(_var2)
   {}
   
@@ -169,7 +169,7 @@ struct EqualConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PropInfoAddone("Equal");
+	PROP_INFO_ADDONE(Equal);
     switch(i)
 	{
 	  case 1:
@@ -208,42 +208,42 @@ struct EqualConstraint : public Constraint
 
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
 Constraint*
-ReifiedEqualCon(EqualVarRef1 var1, EqualVarRef2 var2, BoolVarRef var3)
-{ return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, BoolVarRef>(var1,var2,var3); }
+ReifiedEqualCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2, BoolVarRef var3)
+{ return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, BoolVarRef>(stateObj,var1,var2,var3); }
 
 template<typename EqualVarRef1, typename EqualVarRef2>
 Constraint*
-EqualCon(EqualVarRef1 var1, EqualVarRef2 var2)
-{ return new EqualConstraint<EqualVarRef1, EqualVarRef2>(var1,var2); }
+EqualCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
+{ return new EqualConstraint<EqualVarRef1, EqualVarRef2>(stateObj, var1,var2); }
 
 
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
 Constraint*
-ReifiedEqualMinusCon(EqualVarRef1 var1, EqualVarRef2 var2, BoolVarRef var3)
-{ return new ReifiedEqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2>, BoolVarRef>(var1,VarNegRef(var2),var3); }
+ReifiedEqualMinusCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2, BoolVarRef var3)
+{ return new ReifiedEqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2>, BoolVarRef>(stateObj, var1,VarNegRef(var2),var3); }
 
 template<typename EqualVarRef1, typename EqualVarRef2>
 Constraint*
-EqualMinusCon(EqualVarRef1 var1, EqualVarRef2 var2)
-{ return new EqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2> >(var1,VarNegRef(var2)); }
+EqualMinusCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
+{ return new EqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2> >(stateObj, var1,VarNegRef(var2)); }
 
 
 template<typename T1, typename T2>
 Constraint*
-BuildCT_EQ(const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
+BuildCT_EQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
 {
   if(reify)
-  { return ReifiedEqualCon(t1[0],t2[0], reifyVar); }
+  { return ReifiedEqualCon(stateObj, t1[0],t2[0], reifyVar); }
   else
-  { return EqualCon(t1[0],t2[0]); }
+  { return EqualCon(stateObj, t1[0],t2[0]); }
 }
 
 template<typename T1, typename T2>
 Constraint*
-BuildCT_MINUSEQ(const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
+BuildCT_MINUSEQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
 {
   if(reify)
-  { return ReifiedEqualMinusCon(t1[0],t2[0], reifyVar); }
+  { return ReifiedEqualMinusCon(stateObj, t1[0],t2[0], reifyVar); }
   else
-  { return EqualMinusCon(t1[0],t2[0]); }
+  { return EqualMinusCon(stateObj, t1[0],t2[0]); }
 }

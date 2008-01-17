@@ -332,12 +332,12 @@ void MinionInputReader::readConstraintTable(InputFileReader* infile, const Const
   {
 	infile->check_sym('t');
 	int tuple_num = infile->read_num();
-	if(tuple_num >= tupleListContainer->size())
+	if(tuple_num >= instance.tupleListContainer->size())
 	{
-	  throw parse_exception("There are only " + to_string(tupleListContainer->size()) +
+	  throw parse_exception("There are only " + to_string(instance.tupleListContainer->size()) +
 								" tuplelists, requested " + to_string(tuple_num) + ".");
 	}
-	tuplelist = tupleListContainer->getTupleList(tuple_num);
+	tuplelist = instance.tupleListContainer->getTupleList(tuple_num);
   }
   else
   {
@@ -361,7 +361,7 @@ void MinionInputReader::readConstraintTable(InputFileReader* infile, const Const
 	  if(delim != ',' && delim!= '}')
 		throw parse_exception("Expected ',' or '}'");
 	}
-	tuplelist = tupleListContainer->getNewTupleList(tuples);
+	tuplelist = instance.tupleListContainer->getNewTupleList(tuples);
   }
 	
 	infile->check_sym(')');
@@ -519,7 +519,7 @@ void MinionInputReader::readTuples(InputFileReader* infile) {
   {
     int num_of_tuples = infile->read_num();
 	int tuple_length = infile->read_num();
-	TupleList* tuplelist = tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
+	TupleList* tuplelist = instance.tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
 	int* tuple_ptr = tuplelist->getPointer();
 	for(int i = 0; i < num_of_tuples; ++i)
 	  for(int j = 0; j < tuple_length; ++j)

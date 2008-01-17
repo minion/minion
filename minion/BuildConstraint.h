@@ -39,24 +39,24 @@ namespace BuildCon
 
 /// Helper function used in a few places.
 AnyVarRef
-get_AnyVarRef_from_Var(Var v);
+get_AnyVarRef_from_Var(StateObj* stateObj, Var v);
 
 /// Create all the variables used in the CSP.
-void build_variables(const ProbSpec::VarContainer& vars);
+void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars);
 
 
 /// Build the variable and value ordering used.
 /// The var order is placed, the val order is returned.
-pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order( ProbSpec::CSPInstance& instance);
+pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order(StateObj* stateObj, ProbSpec::CSPInstance& instance);
 
 }
 #ifdef DYNAMICTRIGGERS
 DynamicConstraint*
-build_dynamic_constraint(ConstraintBlob& b);
+build_dynamic_constraint(StateObj* stateObj, ConstraintBlob& b);
 #endif
 
 Constraint*
-build_constraint(ConstraintBlob& b);
+build_constraint(StateObj* stateObj, ConstraintBlob& b);
 
 #endif
 

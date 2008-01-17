@@ -57,8 +57,8 @@ struct GACTableConstraint : public DynamicConstraint
     
   TupleList* tuples;
   
-  GACTableConstraint(const VarArray& _vars, TupleList* _tuples) :
-	vars(_vars), tuples(_tuples)
+  GACTableConstraint(StateObj* _stateObj,const VarArray& _vars, TupleList* _tuples) :
+	DynamicConstraint(_stateObj), vars(_vars), tuples(_tuples)
   { 
     tupleTrieArrayptr = tuples->getTries();
 	int arity = tuples->tuple_size();	  
@@ -97,7 +97,7 @@ struct GACTableConstraint : public DynamicConstraint
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
   {
-	PropInfoAddone("DynGACTable");
+	PROP_INFO_ADDONE(DynGACTable);
 	D_INFO(1, DI_TABLECON, "Propagation Triggered: " + to_string(propagated_trig));
 	DynamicTrigger* dt = dynamic_trigger_start();
 	int trigger_pos = propagated_trig - dt;
@@ -148,7 +148,7 @@ struct GACTableConstraint : public DynamicConstraint
       D_INFO(2, DI_TABLECON, "Full prop");
       if(tuples->size()==0)
       {   // it seems to work without this explicit check, but I put it in anyway.
-          Controller::fail();
+          getState(stateObj).setFailed(true);
           return;
       }
       for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
@@ -156,7 +156,7 @@ struct GACTableConstraint : public DynamicConstraint
 	    vars[varIndex].setMin((tuples->dom_smallest)[varIndex]);
 	    vars[varIndex].setMax((tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]);
 		
-		if(state.isFailed()) return;
+		if(getState(stateObj).isFailed()) return;
 		
         DomainInt max = vars[varIndex].getMax();
         for(DomainInt i = vars[varIndex].getMin(); i <= max; ++i) 
@@ -204,8 +204,8 @@ struct GACTableConstraint : public DynamicConstraint
 
 template<typename VarArray>
 DynamicConstraint*
-GACTableCon(const VarArray& vars, TupleList* tuples)
-{ return new GACTableConstraint<VarArray>(vars, tuples); }
+GACTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
+{ return new GACTableConstraint<VarArray>(stateObj, vars, tuples); }
 
 inline TupleTrieArray* TupleList::getTries()
 {

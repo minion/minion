@@ -85,7 +85,7 @@ struct GACTableConstraint : public DynamicConstraint
 #ifdef WATCHEDLITERALS
   MemOffset _current_support;
 #else
-  BackTrackOffset _current_support;
+  MoveablePointer _current_support;
 #endif
 
   int* current_support()
@@ -181,7 +181,7 @@ struct GACTableConstraint : public DynamicConstraint
 
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
   {
-	PropInfoAddone("DynGACTable");
+	PROP_INFO_ADDONE(DynGACTable);
 
 	D_INFO(1, DI_TABLECON, "Propagation Triggered: " + to_string(propagated_trig));
 	DynamicTrigger* dt = dynamic_trigger_start();
@@ -234,7 +234,7 @@ struct GACTableConstraint : public DynamicConstraint
 	  vars[i].setMin(dom_min);
 	  vars[i].setMax(dom_max - 1);
 	  
-	  if(state.isFailed()) return;
+	  if(getState(stateObj).isFailed()) return;
 	  
 	  for(int x = vars[i].getMin(); x <= vars[i].getMax(); ++x)
 	  {

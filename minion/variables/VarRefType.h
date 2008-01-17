@@ -27,15 +27,15 @@
 #ifndef VARREFTYPE_H
 #define VARREFTYPE_H
 
-
 // The follow three types are designed to allow turning a variable type which
 // must be fed to a container, into a stand-alone class which is ready to be
 // used as a variable.
-template<typename GetContainer, typename InternalRefType>
+template<typename InternalRefType>
 struct VarRefType
 {
   static const BOOL isBool = InternalRefType::isBool;
   static const BoundType isBoundConst = InternalRefType::isBoundConst;
+
   InternalRefType data;
   
   BOOL isBound()
@@ -51,62 +51,62 @@ struct VarRefType
   {}
   
   BOOL isAssigned()
-  { return GetContainer::con().isAssigned(data); }
+  { return GET_CONTAINER().isAssigned(data); }
   
   DomainInt getAssignedValue()
-  { return GetContainer::con().getAssignedValue(data); }
+  { return GET_CONTAINER().getAssignedValue(data); }
   
   BOOL isAssignedValue(DomainInt i)
   { 
-    return GetContainer::con().isAssigned(data) &&
-    GetContainer::con().getAssignedValue(data) == i;
+    return GET_CONTAINER().isAssigned(data) &&
+    GET_CONTAINER().getAssignedValue(data) == i;
   }
   
   BOOL inDomain(DomainInt b)
-  { return GetContainer::con().inDomain(data, b); }
+  { return GET_CONTAINER().inDomain(data, b); }
 
   BOOL inDomain_noBoundCheck(DomainInt b)
-  { return GetContainer::con().inDomain_noBoundCheck(data, b); }
+  { return GET_CONTAINER().inDomain_noBoundCheck(data, b); }
   
   DomainInt getMax()
-  { return GetContainer::con().getMax(data); }
+  { return GET_CONTAINER().getMax(data); }
   
   DomainInt getMin()
-  { return GetContainer::con().getMin(data); }
+  { return GET_CONTAINER().getMin(data); }
 
   DomainInt getInitialMax() const
-  { return GetContainer::con().getInitialMax(data); }
+  { return GET_CONTAINER().getInitialMax(data); }
   
   DomainInt getInitialMin() const
-  { return GetContainer::con().getInitialMin(data); }
+  { return GET_CONTAINER().getInitialMin(data); }
   
   void setMax(DomainInt i)
-  { GetContainer::con().setMax(data,i); }
+  { GET_CONTAINER().setMax(data,i); }
   
   void setMin(DomainInt i)
-  { GetContainer::con().setMin(data,i); }
+  { GET_CONTAINER().setMin(data,i); }
   
   void uncheckedAssign(DomainInt b)
-  { GetContainer::con().uncheckedAssign(data, b); }
+  { GET_CONTAINER().uncheckedAssign(data, b); }
   
   void propagateAssign(DomainInt b)
-  { GetContainer::con().propagateAssign(data, b); }
+  { GET_CONTAINER().propagateAssign(data, b); }
   
   void removeFromDomain(DomainInt b)
-  { GetContainer::con().removeFromDomain(data, b); }
+  { GET_CONTAINER().removeFromDomain(data, b); }
   
   void addTrigger(Trigger t, TrigType type)
-  { GetContainer::con().addTrigger(data, t, type); }
+  { GET_CONTAINER().addTrigger(data, t, type); }
 
   friend std::ostream& operator<<(std::ostream& o, const VarRefType& v)
-  { return o << GetContainer::name() << v.data.var_num; }
+  { return o << InternalRefType::name() << v.data.var_num; }
     
   int getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
-  {  GetContainer::con().addDynamicTrigger(data, t, type, pos); }
+  {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos); }
 #endif
 };
 
@@ -160,22 +160,22 @@ struct QuickVarRefType
   { return data.getInitialMin(); }
   
   void setMax(DomainInt i)
-  { GetContainer::con().setMax(data,i); }
+  { GET_CONTAINER().setMax(data,i); }
   
   void setMin(DomainInt i)
-  { GetContainer::con().setMin(data,i); }
+  { GET_CONTAINER().setMin(data,i); }
   
   void uncheckedAssign(DomainInt b)
-  { GetContainer::con().uncheckedAssign(data, b); }
+  { GET_CONTAINER().uncheckedAssign(data, b); }
   
   void propagateAssign(DomainInt b)
-  { GetContainer::con().propagateAssign(data, b); }
+  { GET_CONTAINER().propagateAssign(data, b); }
   
   void removeFromDomain(DomainInt b)
-  { GetContainer::con().removeFromDomain(data, b); }
+  { GET_CONTAINER().removeFromDomain(data, b); }
   
   void addTrigger(Trigger t, TrigType type)
-  { GetContainer::con().addTrigger(data, t, type); }
+  { GET_CONTAINER().addTrigger(data, t, type); }
 
   friend std::ostream& operator<<(std::ostream& o, const QuickVarRefType& b)
   { return o << "Bool:" << b.data; }
@@ -185,7 +185,7 @@ struct QuickVarRefType
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
-  {  GetContainer::con().addDynamicTrigger(data, t, type, pos); }
+  {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos); }
 #endif
 };
 

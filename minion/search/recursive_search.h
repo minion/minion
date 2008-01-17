@@ -18,42 +18,42 @@ namespace Controller
   // (Feel free to ignore the value ordering!)
   
   template<typename VarOrder, typename Variables>
-  inline void solve_loop_recursive(VarOrder& order, Variables& v)
+  inline void solve_loop_recursive(StateObj* stateObj, VarOrder& order, Variables& v)
   {
 	
-	maybe_print_search_state("Node: ", v);
+	maybe_print_search_state(stateObj, "Node: ", v);
 	
-	state.incrementNodeCount();
-	if(state.getNodeCount() == options->nodelimit)
+	getState(stateObj).incrementNodeCount();
+	if(getState(stateObj).getNodeCount() == getOptions(stateObj).nodelimit)
 	  return;
-	if(do_checks())
+	if(do_checks(stateObj))
 		return;
 	
 	// order.find_next_unassigned returns true if all variables assigned.
 	if(order.find_next_unassigned())
 	{  	  
 	  // We have found a solution!
-	  check_sol_is_correct();
-	  deal_with_solution();
+	  check_sol_is_correct(stateObj);
+	  deal_with_solution(stateObj);
 	  
 	  // fail here to force backtracking.
 	  return;
 	}
 	
-	maybe_print_search_state("Node: ", v);
-	world_push();
+	maybe_print_search_state(stateObj, "Node: ", v);
+	world_push(stateObj);
 	order.branch_left();
-	queues.propagateQueue();
-	if(!state.isFailed())
+	getQueue(stateObj).propagateQueue();
+	if(!getState(stateObj).isFailed())
 	  solve_loop_recursive(order, v);
 	
-	state.setFailed(false);
+	getState(stateObj).setFailed(false);
 	
-	world_pop();
+	world_pop(stateObj);
 	order.branch_right();
-    set_optimise_and_propagate_queue();
+    set_optimise_and_propagate_queue(stateObj);
 	
-	if(!state.isFailed())
+	if(!getState(stateObj).isFailed())
 	  solve_loop_recursive(order, v);
 }
 }

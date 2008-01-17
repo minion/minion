@@ -36,8 +36,8 @@ struct ProductConstraint : public Constraint
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;
-  ProductConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
-	var1(_var1), var2(_var2), var3(_var3)
+  ProductConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
+	Constraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
 	  BigInt max1 = checked_cast<BigInt>(max(abs(var1.getInitialMin()),abs(var1.getInitialMax())));
 	  BigInt max2 = checked_cast<BigInt>(max(abs(var2.getInitialMin()),abs(var2.getInitialMax())));
@@ -90,7 +90,7 @@ struct ProductConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int, DomainDelta)
   {
-	PropInfoAddone("Product");
+	PROP_INFO_ADDONE(Product);
 	DomainInt var1_min = var1.getMin();
 	DomainInt var1_max = var1.getMax();
 	DomainInt var2_min = var2.getMin();
@@ -176,22 +176,22 @@ struct ProductConstraint : public Constraint
 #ifndef NO_SPECIALISATIONS
 
 inline Constraint*
-ProductCon(const light_vector<BoolVarRef>& vars, const light_vector<BoolVarRef>& var2)
+ProductCon(StateObj* stateObj,const light_vector<BoolVarRef>& vars, const light_vector<BoolVarRef>& var2)
 {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
-  return AndCon(vars[0], vars[1], var2[0]);
+  return AndCon(stateObj, vars[0], vars[1], var2[0]);
 }
 
 #endif
 
 template<typename VarRef1, typename VarRef2>
 Constraint*
-ProductCon(const light_vector<VarRef1>& vars, const light_vector<VarRef2>& var2)
+ProductCon(StateObj* stateObj,const light_vector<VarRef1>& vars, const light_vector<VarRef2>& var2)
 { 
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
-  return new ProductConstraint<VarRef1,VarRef1,VarRef2>(vars[0],vars[1],var2[0]); 
+  return new ProductConstraint<VarRef1,VarRef1,VarRef2>(stateObj, vars[0],vars[1],var2[0]); 
 }
 
 BUILD_CONSTRAINT2(CT_PRODUCT2, ProductCon);

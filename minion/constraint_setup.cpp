@@ -12,39 +12,36 @@ namespace Controller
 /// Lists all structures that must be locked before search.
 // @todo This could be done more neatly... 
 
-void lock()
+void lock(StateObj* stateObj)
 {
   D_INFO(2, DI_SOLVER, "Starting Locking process");
-  varContainer.getRangevarContainer().lock();
-  varContainer.getBigRangevarContainer().lock();
-  varContainer.getSparseBoundvarContainer().lock();
-  varContainer.getBooleanContainer().lock(); 
-  varContainer.getBoundvarContainer().lock();
+  getVars(stateObj).getRangevarContainer().lock();
+  getVars(stateObj).getBigRangevarContainer().lock();
+  getVars(stateObj).getSparseBoundvarContainer().lock();
+  getVars(stateObj).getBooleanContainer().lock(); 
+  getVars(stateObj).getBoundvarContainer().lock();
 #ifdef DYNAMICTRIGGERS
-  int dynamic_size = state.getDynamicConstraintList().size();
+  int dynamic_size = getState(stateObj).getDynamicConstraintList().size();
   for(int i = 0; i < dynamic_size; ++i)
-	state.getDynamicConstraintList()[i]->setup();
+	getState(stateObj).getDynamicConstraintList()[i]->setup();
 #endif
-  backtrackable_memory.lock();
-  memory_block.lock();
-  atexit(Controller::finish);
+  getMemory(stateObj).backTrack().lock();
+  getMemory(stateObj).nonBackTrack().lock();
+//  atexit(Controller::finish);
   
-  int size = state.getConstraintList().size();
+  int size = getState(stateObj).getConstraintList().size();
   for(int i = 0 ; i < size;i++)
-	state.getConstraintList()[i]->setup();
+	getState(stateObj).getConstraintList()[i]->setup();
   
-  triggerMem->finaliseTriggerLists();
-  
-  backtrackable_memory.final_lock();
-  memory_block.final_lock();  
+  getTriggerMem(stateObj).finaliseTriggerLists();
   
   bool prop_to_do = true;
 #ifdef USE_SETJMP
-  int setjmp_return = SYSTEM_SETJMP(*(state.getJmpBufPtr()));
+  int setjmp_return = SYSTEM_SETJMP(*(getState(stateObj).getJmpBufPtr()));
   if(setjmp_return != 0)
   {
-	state.setFailed(true);
-	queues.clearQueues();
+	getState(stateObj).setFailed(true);
+	getQueue(stateObj).clearQueues();
 	return;
   }
 #endif
@@ -56,13 +53,13 @@ void lock()
 	// To propagate the first node.
 	for(int i = 0; i < size; ++i)
 	{
-	  state.getConstraintList()[i]->full_propagate();
-	  if(state.isFailed()) 
+	  getState(stateObj).getConstraintList()[i]->full_propagate();
+	  if(getState(stateObj).isFailed()) 
 		return;
 	  // If queues not empty, more work to do.
-	  if(!queues.isQueuesEmpty())
+	  if(!getQueue(stateObj).isQueuesEmpty())
 	  {
-		queues.clearQueues();
+		getQueue(stateObj).clearQueues();
 		prop_to_do = true;
 	  }
 	}
@@ -71,11 +68,14 @@ void lock()
 #ifdef DYNAMICTRIGGERS
   for(int i = 0; i < dynamic_size; ++i)
   {
-	state.getDynamicConstraintList()[i]->full_propagate();
-	queues.propagateQueue();
-	if(state.isFailed()) 
+	getState(stateObj).getDynamicConstraintList()[i]->full_propagate();
+	getQueue(stateObj).propagateQueue();
+	if(getState(stateObj).isFailed()) 
 	  return;
   }
 #endif
+
+  getState(stateObj).markLocked();
+
 } // lock()
 }

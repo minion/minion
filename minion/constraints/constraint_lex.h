@@ -43,8 +43,8 @@ struct LexLeqConstraint : public Constraint
   VarArray1 x;
   VarArray2 y;
   
-  LexLeqConstraint(const VarArray1& _x, const VarArray2& _y) :
-    x(_x), y(_y)
+  LexLeqConstraint(StateObj* _stateObj,const VarArray1& _x, const VarArray2& _y) :
+    Constraint(_stateObj), alpha(_stateObj), beta(_stateObj), F(_stateObj), x(_x), y(_y)
   { D_ASSERT(x.size() == y.size()); }
   
   virtual triggerCollection setup_internal()
@@ -73,7 +73,7 @@ struct LexLeqConstraint : public Constraint
   
   virtual Constraint* reverse_constraint()
   {
-    return new LexLeqConstraint<VarArray2, VarArray1,!Less>(y,x);
+    return new LexLeqConstraint<VarArray2, VarArray1,!Less>(stateObj,y,x);
   }
   
   void updateAlpha(int i) {
@@ -82,7 +82,7 @@ struct LexLeqConstraint : public Constraint
     {
       if(i == n || i == beta)
       {
-		Controller::fail();
+		getState(stateObj).setFailed(true);
 		return;
       }
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
@@ -120,13 +120,13 @@ struct LexLeqConstraint : public Constraint
       }
       i-- ;    
     }
-    Controller::fail() ;
+    getState(stateObj).setFailed(true);
     
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PropInfoAddone("Lex");
+	PROP_INFO_ADDONE(Lex);
     D_INFO(0,DI_LEXCON,"Begin Propagation");
     if (F)
     {
@@ -138,7 +138,7 @@ struct LexLeqConstraint : public Constraint
 	//Not sure why we need this, but we seem to.
 	if(b <= a)
 	{
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
 	
@@ -264,13 +264,13 @@ struct LexLeqConstraint : public Constraint
 		if (betaBound == -1)  beta = i;
 		else if (betaBound == -1) beta = betaBound ;
       }
-      if (alpha >= beta) Controller::fail() ;
+      if (alpha >= beta) getState(stateObj).setFailed(true);
       propagate(alpha,0) ;             //initial propagation, if necessary.
     }
     else 
     {
       if(Less)
-		Controller::fail();
+		getState(stateObj).setFailed(true);
       else
 		F = true;
     }
@@ -310,13 +310,13 @@ struct LexLeqConstraint : public Constraint
 
 template<typename VarArray1, typename VarArray2>
 Constraint*
-LexLeqCon(const VarArray1& x, const VarArray2& y)
-{ return new LexLeqConstraint<VarArray1, VarArray2>(x,y); }
+LexLeqCon(StateObj* stateObj, const VarArray1& x, const VarArray2& y)
+{ return new LexLeqConstraint<VarArray1, VarArray2>(stateObj,x,y); }
 
 template<typename VarArray1, typename VarArray2>
 Constraint*
-LexLessCon(const VarArray1& x, const VarArray2& y)
-{ return new LexLeqConstraint<VarArray1, VarArray2,true>(x,y); }
+LexLessCon(StateObj* stateObj,const VarArray1& x, const VarArray2& y)
+{ return new LexLeqConstraint<VarArray1, VarArray2,true>(stateObj, x,y); }
 
 BUILD_CONSTRAINT2(CT_LEXLEQ, LexLeqCon)
 

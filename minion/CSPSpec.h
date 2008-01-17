@@ -438,15 +438,20 @@ struct ConstraintBlob
 {
   VarContainer vars;
   list<ConstraintBlob> constraints;
+  shared_ptr<TupleListContainer> tupleListContainer;
   vector<Var> var_order;
   vector<char> val_order;
+
+  /// Only used for gadgets.
+  vector<Var> constructionSite;
+  
   bool is_optimisation_problem;
   bool optimise_minimising;
   Var optimise_variable;
   
   vector<vector<Var> > print_matrix;
   
-  CSPInstance() : is_optimisation_problem(false)
+  CSPInstance() : is_optimisation_problem(false), tupleListContainer(new TupleListContainer)
   {}
   
   void set_optimise(BOOL _minimising, Var var)
@@ -596,6 +601,25 @@ struct ConstraintBlob
       throw parse_exception("Undefined tuplelist: '" + name + "'");
     return it->second;
   }
+  
+  /// We make these shared_ptrs so they automatically clear up after themselves.
+  map<string, shared_ptr<CSPInstance> > gadgetMap;
+  
+  void addGadgetSymbol(string name, shared_ptr<CSPInstance> gadget)
+  {
+    if(gadgetMap.count(name) != 0)
+      throw parse_exception("Gadget name "+ name + " already in use.");
+    gadgetMap[name] = gadget;
+  }
+  
+  shared_ptr<CSPInstance> getGadgetSymbol(string name)
+  {
+    map<string, shared_ptr<CSPInstance> >::iterator it = gadgetMap.find(name);
+    if(it == gadgetMap.end())
+      throw parse_exception("Undefined gadget name '" + name + "'");
+    return it->second;
+  }
+  
 };
 
 }

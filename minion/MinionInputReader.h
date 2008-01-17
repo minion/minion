@@ -7,19 +7,26 @@
 */
 
 
-
+/// Abstract base class for file readers
 struct InputFileReader
 {  
+  /// Returns if opening the file failed.
   virtual BOOL failed_open() = 0;
+  /// Read a string, up to the first non-alphabetic character.
   virtual string get_string() = 0;
-    virtual string get_asciistring() = 0;
+  /// Read a string up to the first space or end of line.
+  virtual string get_asciistring() = 0;
+  /// Read a number.
   virtual int read_num() = 0;
+  /// Peeks at the next character, ignoring whitespace and comments.
   virtual char peek_char() = 0;
+  /// Peeks at the next character, including whitespace and comments.
   virtual char simplepeek_char() = 0;
   
-  /// Check if the next character from @infile is @sym.
+  /// Check if the next character from the file is sym.
   virtual void check_sym(char sym) = 0;
 
+  /// Removes all comments after the current place in the file
   void check_for_comments()
   {
     char peek = simplepeek_char();
@@ -32,12 +39,21 @@ struct InputFileReader
   
   /// Cleans rubbish off start of string.
   virtual void clean_string(string& s) = 0;
+  /// Checks the next string in the file is s.
+  virtual void check_string(const string& s) = 0;
+  /// Get the next line, ignoring comments.
   virtual string getline() = 0;  
+  /// Get a line, including comments.
   virtual string simplegetline() = 0;
+  /// Get the line up until the first occurrence of deliminator.
   virtual string getline(char deliminator) = 0;
+  /// Get a single character, ignoring whitespace and comments.
   virtual char get_char() = 0;
+  /// Get next character, including white space and comments.
   virtual char simpleget_char() = 0;
+  /// Check if end of file has been reached.
   virtual BOOL eof() = 0;
+  /// Put back a single character.
   virtual void putback(char c) = 0;
   
   virtual ~InputFileReader() {}
@@ -69,6 +85,13 @@ struct ConcreteFileReader : public InputFileReader
     
     putback(next_char);
     return s;
+  }
+  
+  virtual void check_string(const string& string_in)
+  {
+    string s = get_string();
+    if(s != string_in)
+    { throw parse_exception("Expected " + string_in + ", recieved '" + s + "'"); }
   }
   
   virtual string get_asciistring()
@@ -148,7 +171,7 @@ struct ConcreteFileReader : public InputFileReader
     return simplepeek_char();
   }
   
-  /// Check if the next character from @infile is @sym.
+  /// Check if the next character from infile is sym.
   virtual void check_sym(char sym)
   {
     check_for_comments();
@@ -255,10 +278,8 @@ class MinionInputReader {
   
   BOOL parser_verbose ;
   
-  MinionInputReader() : parser_verbose(false), tupleListContainer(new TupleListContainer)
+  MinionInputReader() : parser_verbose(false)
   {}
-  
-   TupleListContainer* tupleListContainer;
 };
 
 class MinionThreeInputReader {
@@ -270,13 +291,14 @@ class MinionThreeInputReader {
   vector<Var> getColOfMatrix(vector<vector<Var> >& m, int c) ;
   vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,int r,int c) ;
   BOOL readConstraint(InputFileReader* infile, BOOL reified) ;
+  void readGadget(InputFileReader* infile) ;
   void readConstraintElement(InputFileReader* infile, const ConstraintDef&) ;
   void readConstraintTable(InputFileReader* infile, const ConstraintDef&) ;
   Var readIdentifier(InputFileReader* infile) ;
   vector<Var> readPossibleMatrixIdentifier(InputFileReader* infile);
   vector< vector<Var> > readLiteralMatrix(InputFileReader* infile) ;
   vector<Var> readLiteralVector(InputFileReader* infile) ;
-  vector<int> readConstantVector(InputFileReader* infile, char start, char end, bool = false);
+  vector<int> readConstantVector(InputFileReader* infile, char start = '[', char end = ']', bool = false);
   vector<int> readRange(InputFileReader* infile);
   void readObjective(InputFileReader* infile) ;
   void readTuples(InputFileReader* infile) ;
@@ -287,19 +309,22 @@ class MinionThreeInputReader {
   void readVars(InputFileReader* infile) ;
   void readSearch(InputFileReader* infile) ;
   vector<Var> readVectorExpression(InputFileReader* infile) ;
-  
   void readGeneralConstraint(InputFileReader*, const ConstraintDef&) ;
-  //InputFileReader* infile ;
 public:
   void read(InputFileReader* infile) ;
+
   ProbSpec::CSPInstance instance ;
-  BOOL parser_verbose ;
-  
+  bool parser_verbose;
   bool print_all_vars;
   
-  MinionThreeInputReader() : parser_verbose(false), print_all_vars(true), tupleListContainer(new TupleListContainer)
-  {}
+  bool isGadgetReader_m;
   
-   TupleListContainer* tupleListContainer;
+  void setGadgetReader()
+  { isGadgetReader_m = true; }
+  bool isGadgetReader()
+  { return isGadgetReader_m; }
+  
+  MinionThreeInputReader() : parser_verbose(false), print_all_vars(true),
+    isGadgetReader_m(false)
+  {}
 };
-

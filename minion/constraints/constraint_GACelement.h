@@ -37,8 +37,8 @@ struct GACElementConstraint : public Constraint
   VarRef resultvar;
   DomainInt var_array_min_val;
   DomainInt var_array_max_val;
-  GACElementConstraint(const VarArray& _var_array, const IndexRef& _indexvar, const VarRef& _resultvar) :
-    var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar)
+  GACElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexRef& _indexvar, const VarRef& _resultvar) :
+    Constraint(_stateObj), var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar)
   { }
   
   virtual triggerCollection setup_internal()
@@ -57,7 +57,7 @@ struct GACElementConstraint : public Constraint
 	var_array_min_val = min_val;
 	var_array_max_val = max_val;
 	
-	DomainInt domain_size = var_array_max_val - var_array_min_val + 1;
+	// DomainInt domain_size = var_array_max_val - var_array_min_val + 1;
 	for(int i = 0; i < array_size; ++i)
 	{
 	  t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
@@ -78,7 +78,7 @@ struct GACElementConstraint : public Constraint
 	
 	if(index < 0 || index >= array_size)
 	{
-	  Controller::fail();
+	  getState(stateObj).setFailed(true);
 	  return;
 	}
 	
@@ -121,9 +121,9 @@ struct GACElementConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PropInfoAddone("GACElement");
+	PROP_INFO_ADDONE(GACElement);
     int array_size = var_array.size();
-	DomainInt domain_size = (var_array_max_val - var_array_min_val + 1);
+	// DomainInt domain_size = (var_array_max_val - var_array_min_val + 1);
 	
 	if(indexvar.isAssigned())
 	{ index_assigned(); }
@@ -216,7 +216,7 @@ struct GACElementConstraint : public Constraint
 // than by const reference because we want to change it.
 template<typename Var1, typename Var2>
 Constraint*
-GACElementCon(Var1 vararray, const Var2& v1)
+GACElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1)
 { 
   // Because we can only have two things which are parsed at the moment, we do
   // a dodgy hack and store the last variable on the end of the vararray
@@ -225,7 +225,7 @@ GACElementCon(Var1 vararray, const Var2& v1)
   typedef typename Var2::value_type VarRef2;
   VarRef1 assignval = vararray.back();
   vararray.pop_back();
-  return new GACElementConstraint<Var1, VarRef2>(vararray, v1[0], assignval);  
+  return new GACElementConstraint<Var1, VarRef2>(stateObj, vararray, v1[0], assignval);  
 }
 
 BUILD_CONSTRAINT2(CT_GACELEMENT, GACElementCon);

@@ -29,6 +29,8 @@
   
 class Queues
 {
+  StateObj* stateObj;
+  
   vector<TriggerRange> propagate_trigger_list;
   vector<DynamicTrigger*> dynamic_trigger_list;
   
@@ -46,19 +48,19 @@ public:
     
   DynamicTrigger*& getNextQueuePtrRef() { return next_queue_ptr; }
   
-  Queues() : next_queue_ptr(NULL)
+  Queues(StateObj* _stateObj) : next_queue_ptr(NULL), stateObj(_stateObj)
   {}
   
   void pushSpecialTrigger(Constraint* trigger)
   {
-      ConInfoAddone("AddSpecialToQueue");
+      CON_INFO_ADDONE(AddSpecialToQueue);
       special_triggers.push_back(trigger);
   }
   
   
   inline void pushTriggers(TriggerRange new_triggers)
   { 
-	ConInfoAddone("AddConToQueue");
+	CON_INFO_ADDONE(AddConToQueue);
     D_INFO(1, DI_QUEUE, string("Adding new triggers. Trigger list size is ") + 
 		   to_string(propagate_trigger_list.size()) + ".");
 	propagate_trigger_list.push_back(new_triggers); 
@@ -67,7 +69,7 @@ public:
 #ifdef DYNAMICTRIGGERS
   void pushDynamicTriggers(DynamicTrigger* new_dynamic_trig_range)
   { 
-	ConInfoAddone("AddDynToQueue");
+	CON_INFO_ADDONE(AddDynToQueue);
     D_ASSERT(new_dynamic_trig_range->sanity_check_list());
     dynamic_trigger_list.push_back(new_dynamic_trig_range);   
   }
@@ -101,7 +103,7 @@ public:
   
   bool propagateDynamicTriggerLists()
   {
-	bool* fail_ptr = state.getFailedPtr();
+	bool* fail_ptr = getState(stateObj).getFailedPtr();
 	while(!dynamic_trigger_list.empty())
 	{
 	  DynamicTrigger* t = dynamic_trigger_list.back();
@@ -125,7 +127,7 @@ public:
 #endif
 		next_queue_ptr = it->next;
 		D_INFO(1, DI_QUEUE, string("Will do ") + to_string(next_queue_ptr) + " next");
-		ConInfoAddone("DynamicTrigger");
+		CON_INFO_ADDONE(DynamicTrigger);
 		it->propagate();  
 
 		it = next_queue_ptr;
@@ -136,7 +138,7 @@ public:
   
   bool propagateStaticTriggerLists()
   {
-	bool* fail_ptr = state.getFailedPtr();
+	bool* fail_ptr = getState(stateObj).getFailedPtr();
 	while(!propagate_trigger_list.empty())
 	{
 	  TriggerRange t = propagate_trigger_list.back();
@@ -154,16 +156,16 @@ public:
 #endif
 		
 #ifndef NO_DEBUG
-		if(options->fullpropagate)
+		if(getOptions(stateObj).fullpropagate)
 		  it->full_propagate();
 		else
 		{
-		  ConInfoAddone("StaticTrigger");
+		  CON_INFO_ADDONE(StaticTrigger);
 		  it->propagate(data_val);
 		}
 #else
 		{
-		  ConInfoAddone("StaticTrigger");
+		  CON_INFO_ADDONE(StaticTrigger);
 		  it->propagate(data_val);
 		}
 #endif
@@ -177,12 +179,12 @@ public:
   {
     D_INFO(2, DI_QUEUE, "Starting Propagation");
 #ifdef USE_SETJMP
-    int setjmp_return = SYSTEM_SETJMP(*(state.getJmpBufPtr()));
+    int setjmp_return = SYSTEM_SETJMP(*(getState(stateObj).getJmpBufPtr()));
 	if(setjmp_return != 0)
 	{ // Failure has occured
-	  D_ASSERT(!state.isFailed());
-	  state.setFailed(true);
-	  queues.clearQueues();
+	  D_ASSERT(!getState(stateObj).isFailed());
+	  getState(stateObj).setFailed(true);
+	  getQueue(stateObj).clearQueues();
 	  printf("!\n");
 	  return;
 	}
@@ -191,7 +193,7 @@ public:
 	while(true)
 	{
 #ifdef DYNAMICTRIGGERS
-	  if (state.isDynamicTriggersUsed()) 
+	  if (getState(stateObj).isDynamicTriggersUsed()) 
 	  {
 		while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
 		{
@@ -219,7 +221,7 @@ public:
 	  D_INFO(1, DI_QUEUE, string("Doing a special trigger!"));
 	  Constraint* trig = special_triggers.back();
 	  special_triggers.pop_back();
-	  ConInfoAddone("SpecialTrigger");
+	  CON_INFO_ADDONE(SpecialTrigger);
 	  trig->special_check();
 
 	} // while(true)
@@ -229,11 +231,9 @@ public:
   
 };  
 
-VARDEF(Queues queues);
-
 // This just allows SAC (which wants a list of vars)
 // and normal propagate to have the same input method.
 // Just checking the bounds doesn't make sense here, so we ignore it.
-template<typename Vars>
-inline void propagate_queue_vars(Vars& vars, bool /*CheckBounds*/)
-{	queues.propagateQueue(); }
+//template<typename Vars>
+//inline void propagate_queue_vars(StateObj* stateObj, Vars& vars, bool /*CheckBounds*/)
+//{	getQueue(stateObj).propagateQueue(); }

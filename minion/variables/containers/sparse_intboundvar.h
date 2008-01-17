@@ -24,75 +24,97 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+template<typename T>
+struct SparseBoundVarContainer;
+
+template<typename DomType = DomainInt>
 struct SparseBoundVarRef_internal
 {
   static const BOOL isBool = true;
   static const BoundType isBoundConst = Bound_Yes;
-  
+  static string name() { return "SparseBound"; }
   BOOL isBound()
   { return true;}
   
   int var_num;
-  SparseBoundVarRef_internal() : var_num(-1)
+
+  
+#ifdef MANY_VAR_CONTAINERS
+  SparseBoundVarContainer<DomType>* sparseCon;
+  SparseBoundVarContainer<DomType>& getCon() const { return *sparseCon; }
+  SparseBoundVarRef_internal() : var_num(-1), sparseCon(NULL)
+  { }
+
+  explicit SparseBoundVarRef_internal(SparseBoundVarContainer<DomType>* con, int i) : 
+  var_num(i), sparseCon(con)
   { }
   
-  explicit SparseBoundVarRef_internal(int i) : var_num(i)
-  {}
+#else
+  static SparseBoundVarContainer<DomType>& getCon_Static();
+  SparseBoundVarRef_internal() : var_num(-1)
+  { }
+
+  explicit SparseBoundVarRef_internal(SparseBoundVarContainer<DomType>*, int i) : 
+  var_num(i)
+  { }
+#endif
 };
 
-struct GetSparseBoundVarContainer;
-
 #ifdef MORE_SEARCH_INFO
-typedef InfoRefType<VarRefType<GetSparseBoundVarContainer, SparseBoundVarRef_internal>, VAR_INFO_SPARSEBOUND> SparseBoundVarRef;
+typedef InfoRefType<VarRefType<SparseBoundVarRef_internal<> >, VAR_INFO_SPARSEBOUND> SparseBoundVarRef;
 #else
-typedef VarRefType<GetSparseBoundVarContainer, SparseBoundVarRef_internal> SparseBoundVarRef;
+typedef VarRefType<SparseBoundVarRef_internal<> > SparseBoundVarRef;
 #endif
 
 template<typename BoundType = DomainInt>
 struct SparseBoundVarContainer {
-  BackTrackOffset bound_data;
+  StateObj* stateObj;
+  MoveablePointer bound_data;
   TriggerList trigger_list;
   vector<vector<BoundType> > domains;
   vector<int> domain_reference;
   unsigned var_count_m;
   BOOL lock_m;
+
+  SparseBoundVarContainer(StateObj* _stateObj) : stateObj(_stateObj), lock_m(false), trigger_list(stateObj, true), var_count_m(0)
+  { }
   
-  vector<BoundType>& get_domain(SparseBoundVarRef_internal i)
+  vector<BoundType>& get_domain(SparseBoundVarRef_internal<BoundType> i)
   { return domains[domain_reference[i.var_num]]; }
  
   vector<BoundType>& get_domain_from_int(int i)
   { return domains[domain_reference[i]]; }
   
-  const BoundType& lower_bound(SparseBoundVarRef_internal i) const
+  const BoundType& lower_bound(SparseBoundVarRef_internal<BoundType> i) const
   { return static_cast<const BoundType*>(bound_data.get_ptr())[i.var_num*2]; }
   
-  const BoundType& upper_bound(SparseBoundVarRef_internal i) const
+  const BoundType& upper_bound(SparseBoundVarRef_internal<BoundType> i) const
   { return static_cast<const BoundType*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
   
-  BoundType& lower_bound(SparseBoundVarRef_internal i)
+  BoundType& lower_bound(SparseBoundVarRef_internal<BoundType> i)
   { return static_cast<BoundType*>(bound_data.get_ptr())[i.var_num*2]; }
   
-  BoundType& upper_bound(SparseBoundVarRef_internal i)
+  BoundType& upper_bound(SparseBoundVarRef_internal<BoundType> i)
   { return static_cast<BoundType*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
   
-  /// find the small possible lower bound above @new_lower_bound.
+  /// find the small possible lower bound above new_lower_bound.
   /// Does not actually change the lower bound.  
-  DomainInt find_lower_bound(SparseBoundVarRef_internal d, DomainInt new_lower_bound)
+  DomainInt find_lower_bound(SparseBoundVarRef_internal<BoundType> d, DomainInt new_lower_bound)
   {
     vector<BoundType>& bounds = get_domain(d);
     typename vector<BoundType>::iterator it = std::lower_bound(bounds.begin(), bounds.end(), new_lower_bound);
     if(it == bounds.end())
     {
-      Controller::fail();
+      getState(stateObj).setFailed(true);
       return *(it - 1);
     }
     
     return *it;
   }
   
-  /// find the largest possible upper bound below @new_upper_bound.
+  /// find the largest possible upper bound below new_upper_bound.
   /// Does not actually change the upper bound.
-  DomainInt find_upper_bound(SparseBoundVarRef_internal& d, DomainInt new_upper_bound)
+  DomainInt find_upper_bound(SparseBoundVarRef_internal<BoundType>& d, DomainInt new_upper_bound)
   {
     vector<BoundType>& bounds = get_domain(d);
 
@@ -105,59 +127,81 @@ struct SparseBoundVarContainer {
     
     if(it == bounds.begin())
     {
-      Controller::fail();
+      getState(stateObj).setFailed(true);
       return bounds.front();
     }
     
     return *(it - 1);
   }
   
-  void lock()
+ void lock()
   { 
     D_ASSERT(!lock_m);
     lock_m = true;
-    
-    DomainInt min_domain_val = 0;
-    DomainInt max_domain_val = 0;
-    if(var_count_m != 0)
-    {
-      min_domain_val = get_domain_from_int(0).front();
-      max_domain_val = get_domain_from_int(0).back();
-      for(unsigned int i = 0; i < var_count_m; ++i)
-      {   
-        min_domain_val = mymin(get_domain_from_int(i).front(), min_domain_val);
-        max_domain_val = mymax(get_domain_from_int(i).back(), max_domain_val);
-      }
-    }
-    
-    bound_data.request_bytes(var_count_m*2*sizeof(BoundType));
-    BoundType* bound_ptr = static_cast<BoundType*>(bound_data.get_ptr());
-    for(unsigned int i = 0; i < var_count_m; ++i)
-    {
-      bound_ptr[2*i] = get_domain_from_int(i).front();
-      bound_ptr[2*i+1] = get_domain_from_int(i).back();
-    }
-    
-    trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
+ }
+
+  void addVariables(const vector<pair<int, vector<int> > >& new_domains)
+{
+  D_ASSERT(!lock_m);
+  
+  if(new_domains.empty())
+  {
+    trigger_list.lock(0,0,0);
+    return;
   }
+
+  DomainInt min_domain_val = DomainInt_Min;
+  DomainInt max_domain_val = DomainInt_Max;
+
+  for(int i = 0; i < new_domains.size(); ++i)
+  {
+    D_ASSERT(new_domains[i].second.front() >= DomainInt_Min);
+    D_ASSERT(new_domains[i].second.back() <= DomainInt_Max);
+    
+    for(int loop=0;loop<(int)(new_domains[i].second.size()) - 1; ++loop) 
+    { D_ASSERT(new_domains[i].second[loop] < new_domains[i].second[loop+1]); }
   
-  SparseBoundVarContainer() : lock_m(false), trigger_list(true)
-  {}
+    vector<BoundType> t_dom(new_domains[i].second.size());
+    for(unsigned int j = 0; j < new_domains[i].second.size(); ++j)
+      t_dom[j] = new_domains[i].second[j];
+          
+    domains.push_back(t_dom);
+    for(int j = 0; j < new_domains[i].first; ++j)
+      domain_reference.push_back(i);
+
+    min_domain_val = mymin(t_dom.front(), min_domain_val);
+    max_domain_val = mymax(t_dom.back(), max_domain_val);
+  }
+
+  // TODO: Setting var_count_m to avoid changing other code.. long term, do
+  // we need it?
+  var_count_m = domain_reference.size();
+
+  bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
+  BoundType* bound_ptr = static_cast<BoundType*>(bound_data.get_ptr());
+  for(unsigned int i = 0; i < var_count_m; ++i)
+  {
+    bound_ptr[2*i] = get_domain_from_int(i).front();
+    bound_ptr[2*i+1] = get_domain_from_int(i).back();
+  }
+    
+  trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
+}
   
-  BOOL isAssigned(SparseBoundVarRef_internal d) const
+  BOOL isAssigned(SparseBoundVarRef_internal<BoundType> d) const
   { 
     D_ASSERT(lock_m);
     return lower_bound(d) == upper_bound(d); 
   }
   
-  DomainInt getAssignedValue(SparseBoundVarRef_internal d) const
+  DomainInt getAssignedValue(SparseBoundVarRef_internal<BoundType> d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return lower_bound(d);
   }
   
-  BOOL inDomain(SparseBoundVarRef_internal d, DomainInt i) const
+  BOOL inDomain(SparseBoundVarRef_internal<BoundType> d, DomainInt i) const
   { 
       D_ASSERT(lock_m);
       // First check against bounds
@@ -171,7 +215,7 @@ struct SparseBoundVarContainer {
       }
   }
   
-  BOOL inDomain_noBoundCheck(SparseBoundVarRef_internal ref, DomainInt i) const
+  BOOL inDomain_noBoundCheck(SparseBoundVarRef_internal<BoundType> ref, DomainInt i) const
   {
       D_ASSERT(lock_m);
       // use binary search to find if the value is in the domain vector.
@@ -181,45 +225,45 @@ struct SparseBoundVarContainer {
       return std::binary_search( dom.begin(), dom.end(), i );
   }
   
-  DomainInt getMin(SparseBoundVarRef_internal d) const
+  DomainInt getMin(SparseBoundVarRef_internal<BoundType> d) const
   {
     D_ASSERT(lock_m);
     return lower_bound(d);
   }
   
-  DomainInt getMax(SparseBoundVarRef_internal d) const
+  DomainInt getMax(SparseBoundVarRef_internal<BoundType> d) const
   {
     D_ASSERT(lock_m);
     return upper_bound(d);
   }
 
-  DomainInt getInitialMin(SparseBoundVarRef_internal d)
+  DomainInt getInitialMin(SparseBoundVarRef_internal<BoundType> d)
   { return get_domain_from_int(d.var_num).front(); }
   
-  DomainInt getInitialMax(SparseBoundVarRef_internal d)
+  DomainInt getInitialMax(SparseBoundVarRef_internal<BoundType> d)
   { return get_domain_from_int(d.var_num).back(); }
   
   /// This function is provided for convience. It should never be called.
-  void removeFromDomain(SparseBoundVarRef_internal, DomainInt)
+  void removeFromDomain(SparseBoundVarRef_internal<BoundType>, DomainInt)
   {
     D_FATAL_ERROR("Cannot Remove Value from domain of a bound var");
     FAIL_EXIT();
   }
   
   
-  void propagateAssign(SparseBoundVarRef_internal d, DomainInt i)
+  void propagateAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
   {
     vector<BoundType>& bounds = get_domain(d);
     if(!binary_search(bounds.begin(), bounds.end(), i))
     {
-      Controller::fail();
+      getState(stateObj).setFailed(true);
       return;
     }
     DomainInt min_val = getMin(d);
     DomainInt max_val = getMax(d);
     if(min_val > i || max_val < i)
     {
-      Controller::fail();
+      getState(stateObj).setFailed(true);
       return;
     }
     
@@ -244,10 +288,10 @@ struct SparseBoundVarContainer {
   }
   
   // TODO : Optimise
-  void uncheckedAssign(SparseBoundVarRef_internal d, DomainInt i)
+  void uncheckedAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
   { propagateAssign(d,i); }
   
-  void setMax(SparseBoundVarRef_internal d, DomainInt i)
+  void setMax(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
   {
     // Note, this just finds a new upper bound, it doesn't set it.
     i = find_upper_bound(d, i);
@@ -256,7 +300,7 @@ struct SparseBoundVarContainer {
     
     if(i < low_bound)
     {
-      Controller::fail();
+      getState(stateObj).setFailed(true);
       return;
     }
     
@@ -276,7 +320,7 @@ struct SparseBoundVarContainer {
     }
   }
   
-  void setMin(SparseBoundVarRef_internal d, DomainInt i)
+  void setMin(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
   {
     i = find_lower_bound(d,i);
     
@@ -284,7 +328,7 @@ struct SparseBoundVarContainer {
     
     if(i > up_bound)
     {
-      Controller::fail();
+      getState(stateObj).setFailed(true);
       return;
     }
     
@@ -308,14 +352,14 @@ struct SparseBoundVarContainer {
   SparseBoundVarRef get_new_var(const vector<T>&);
   SparseBoundVarRef get_var_num(int i);
 
-  void addTrigger(SparseBoundVarRef_internal b, Trigger t, TrigType type)
+  void addTrigger(SparseBoundVarRef_internal<BoundType> b, Trigger t, TrigType type)
   { 
     D_ASSERT(lock_m); 
 	trigger_list.add_trigger(b.var_num, t, type); 
   }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(SparseBoundVarRef_internal b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   { 
 	D_ASSERT(lock_m); 
 	D_ASSERT(type != DomainRemoval);
@@ -330,11 +374,11 @@ struct SparseBoundVarContainer {
     int char_count = 0;
     for(unsigned int i=0;i<var_count_m;i++)
     {
-      if(!isAssigned(SparseBoundVarRef_internal(i)))
+      if(!isAssigned(SparseBoundVarRef_internal<BoundType>(i)))
     s << "X";
       else
       {
-    s << (getAssignedValue(SparseBoundVarRef_internal(i))?1:0); 
+    s << (getAssignedValue(SparseBoundVarRef_internal<BoundType>(i))?1:0); 
       }
       char_count++;
       if(char_count%7==0) s << endl;
@@ -345,44 +389,11 @@ struct SparseBoundVarContainer {
 };
 
 
-
-
-
-template<typename T>
-template<typename U>
-inline SparseBoundVarRef
-SparseBoundVarContainer<T>::get_new_var(const vector<U>& new_domain)
-{
-  D_ASSERT(!lock_m);
-  // D_ASSERT(i >= var_min && j <= var_max);
-  D_ASSERT(new_domain.front() >= DomainInt_Min);
-  D_ASSERT(new_domain.back() <= DomainInt_Max);
-  
-  D_DATA(for(int loop=0;loop<(int)(new_domain.size()) - 1; ++loop) 
-     { D_ASSERT(new_domain[loop] < new_domain[loop+1]); } );
-  
-  vector<T> t_dom(new_domain.size());
-  for(unsigned int i = 0; i < new_domain.size(); ++i)
-    t_dom[i] = new_domain[i];
-          
-  int i=0;
-  while(i < (int)(domains.size()) && domains[i] != t_dom)
-    i++;
-  
-  if(i == (int)domains.size())
-    domains.push_back(t_dom);
-    
-  domain_reference.push_back(i);
-  
-  
-  return SparseBoundVarRef(SparseBoundVarRef_internal(var_count_m++));
-}
-
 template<typename T>
 inline SparseBoundVarRef
 SparseBoundVarContainer<T>::get_var_num(int i)
 {
-  D_ASSERT(!lock_m);
-  return SparseBoundVarRef(SparseBoundVarRef_internal(i));
+  D_ASSERT(i < var_count_m);
+  return SparseBoundVarRef(SparseBoundVarRef_internal<T>(this, i));
 }
 

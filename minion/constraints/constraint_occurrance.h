@@ -40,7 +40,8 @@ struct OccurrenceEqualConstraint : public Constraint
   ValCount val_count;
   Val value;
   
-  OccurrenceEqualConstraint(const VarArray& _var_array, const Val& _value, const ValCount& _val_count) :
+  OccurrenceEqualConstraint(StateObj* _stateObj, const VarArray& _var_array, const Val& _value, const ValCount& _val_count) :
+    Constraint(_stateObj), occurrences_count(_stateObj), not_occurrences_count(_stateObj),
     var_array(_var_array), val_count(_val_count), value(_value)
   { }
   
@@ -74,7 +75,7 @@ struct OccurrenceEqualConstraint : public Constraint
     }
     //D_ASSERT(occs >= oalc_count());
     if(occs > val_count)
-      Controller::fail();
+      getState(stateObj).setFailed(true);
   }
   
   void not_occurrence_limit_reached()
@@ -94,12 +95,12 @@ struct OccurrenceEqualConstraint : public Constraint
     }
     //D_ASSERT(occs >= oalc_count());
     if(occs > (static_cast<int>(var_array.size()) - val_count))
-      Controller::fail();
+      getState(stateObj).setFailed(true);
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PropInfoAddone("OccEqual");
+	PROP_INFO_ADDONE(OccEqual);
     if( var_array[i].getAssignedValue() == value )
     {
       int c = occurrences_count + 1;
@@ -162,12 +163,12 @@ struct OccurrenceEqualConstraint : public Constraint
     int j = not_occurrences_count;
     D_INFO(1,DI_SUMCON,to_string("Full Propagate, count",i));
     if(i > val_count)
-      Controller::fail();
+      getState(stateObj).setFailed(true);
     if(i == val_count)
       occurrence_limit_reached();
     if(j > (static_cast<int>(var_array.size() - val_count)))
     {
-      Controller::fail();
+      getState(stateObj).setFailed(true);
     }
     if(j == (static_cast<int>(var_array.size() - val_count)))
       not_occurrence_limit_reached();
@@ -197,22 +198,22 @@ struct OccurrenceEqualConstraint : public Constraint
 
 template<typename VarArray, typename Val, typename ValCount>
 Constraint*
-OccEqualCon(const VarArray& _var_array,  const Val& _value,const ValCount& _val_count)
+OccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& _value,const ValCount& _val_count)
 { 
   return 
-  (new OccurrenceEqualConstraint<VarArray,Val, ValCount>(_var_array,  _value,_val_count)); 
+  (new OccurrenceEqualConstraint<VarArray,Val, ValCount>(stateObj, _var_array,  _value,_val_count)); 
 }
 
 template<typename T1>
 Constraint*
-BuildCT_OCCURRENCE(const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   int val_to_count = b.vars[1][0].pos;
   int occs = b.vars[2][0].pos;
   if(reify) 
-  { return reifyCon(OccEqualCon(t1, runtime_val(val_to_count), runtime_val(occs)), reifyVar); } 
+  { return reifyCon(stateObj, OccEqualCon(stateObj, t1, runtime_val(val_to_count), runtime_val(occs)), reifyVar); } 
   else 
-  { return OccEqualCon(t1, runtime_val(val_to_count), runtime_val(occs)); } 
+  { return OccEqualCon(stateObj, t1, runtime_val(val_to_count), runtime_val(occs)); } 
 }
 
 
@@ -277,7 +278,7 @@ struct OccurrenceLeqConstraint : public Constraint
       { it->removeFromDomain(value); }
     }
     if(occs > val_count)
-      Controller::fail();
+      getState(stateObj).setFailed(true);
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
@@ -310,7 +311,7 @@ struct OccurrenceLeqConstraint : public Constraint
     int i = count.get();
     D_INFO(1,DI_SUMCON,to_string("Full Propagate, count",i));
     if(i > val_count)
-      Controller::fail();
+      getState(stateObj).setFailed(true);
     if(i == val_count)
       limit_reached();  
   }

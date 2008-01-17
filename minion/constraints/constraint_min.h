@@ -21,8 +21,8 @@ struct MinConstraint : public Constraint
   VarArray var_array;
   MinVarRef min_var;
   
-  MinConstraint(const VarArray& _var_array, const MinVarRef& _min_var) :
-	var_array(_var_array), min_var(_min_var)
+  MinConstraint(StateObj* _stateObj, const VarArray& _var_array, const MinVarRef& _min_var) :
+	Constraint(_stateObj), var_array(_var_array), min_var(_min_var)
   { }
   
   virtual triggerCollection setup_internal()
@@ -45,7 +45,7 @@ struct MinConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
    {
-	PropInfoAddone("Min");
+	PROP_INFO_ADDONE(Min);
 	if(prop_val > 0)
 	{// Lower Bound Changed
 	  
@@ -86,7 +86,7 @@ struct MinConstraint : public Constraint
 		  ++it;
 		if(it == var_array.end())
 		{
-		  Controller::fail();
+		  getState(stateObj).setFailed(true);
 		  return;
 		}
 		
@@ -147,13 +147,14 @@ struct MinConstraint : public Constraint
 
 template<typename VarArray, typename VarRef>
 Constraint*
-MinCon(const VarArray& _var_array, const light_vector<VarRef>& _var_ref)
-{ return (new MinConstraint<VarArray,VarRef>(_var_array, _var_ref[0])); }
+MinCon(StateObj* stateObj, const VarArray& _var_array, const light_vector<VarRef>& _var_ref)
+{ return (new MinConstraint<VarArray,VarRef>(stateObj, _var_array, _var_ref[0])); }
 
 template<typename VarArray, typename VarRef>
 Constraint*
-MaxCon(const VarArray& _var_array, const light_vector<VarRef>& _var_ref)
-{ return (new MinConstraint<typename NegType<VarArray>::type, typename NegType<VarRef>::type>(VarNegRef(_var_array),
+MaxCon(StateObj* stateObj, const VarArray& _var_array, const light_vector<VarRef>& _var_ref)
+{ return (new MinConstraint<typename NegType<VarArray>::type, typename NegType<VarRef>::type>(stateObj,
+                                                                                              VarNegRef(_var_array),
 																					          VarNegRef(_var_ref[0]))); 
 }
 

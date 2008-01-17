@@ -29,6 +29,7 @@
 template<typename BoolVar>
 struct reify_true : public Constraint
 {
+  StateObj* stateObj;
   virtual string constraint_name()
   { return "ReifyTrue:" + poscon->constraint_name(); }
   
@@ -36,8 +37,9 @@ struct reify_true : public Constraint
   BoolVar rar_var;
   BOOL constraint_locked;
   
-  reify_true(Constraint* _poscon, BoolVar v) : poscon(_poscon), rar_var(v),
-											   constraint_locked(false)
+  reify_true(StateObj* _stateObj, Constraint* _poscon, BoolVar v) : Constraint(_stateObj), stateObj(_stateObj), 
+                                                                    poscon(_poscon), 
+                                                                    rar_var(v), constraint_locked(false)
   { }
   
   virtual Constraint* reverse_constraint()
@@ -90,7 +92,7 @@ struct reify_true : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
-	PropInfoAddone("ReifyTrue");
+	PROP_INFO_ADDONE(ReifyTrue);
     D_INFO(1,DI_REIFY,"Propagation Start");
     if(constraint_locked)
 	  return;
@@ -99,7 +101,7 @@ struct reify_true : public Constraint
     {
       D_INFO(1,DI_REIFY,"Full Pos Propagation");
 	  constraint_locked = true;
-	  queues.pushSpecialTrigger(this);
+	  getQueue(stateObj).pushSpecialTrigger(this);
 	  //poscon->full_propagate();
       return;
     }
@@ -124,13 +126,13 @@ struct reify_true : public Constraint
 
 template<typename BoolVar>
 reify_true<BoolVar>*
-truereifyCon(Constraint* c, BoolVar var)
-{ return new reify_true<BoolVar>(&*c, var); }
+truereifyCon(StateObj* stateObj, Constraint* c, BoolVar var)
+{ return new reify_true<BoolVar>(stateObj, &*c, var); }
 
 // Just a placeholder.
 template<typename BoolVar>
 DynamicConstraint*
-truereifyCon(DynamicConstraint* c, BoolVar var)
+truereifyCon(StateObj* stateObj, DynamicConstraint* c, BoolVar var)
 { 
   cerr << "Reification is not supported on dynamic constraints. Sorry." << endl;
   exit(1);

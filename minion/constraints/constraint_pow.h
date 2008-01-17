@@ -45,8 +45,8 @@ struct PowConstraint : public Constraint
   VarRef2 var2;
   VarRef3 var3;
 
-  PowConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
-	var1(_var1), var2(_var2), var3(_var3)
+  PowConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
+	Constraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
   
 	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
@@ -72,29 +72,30 @@ struct PowConstraint : public Constraint
   
   inline DomainInt roundup(double x)
   {
-      // remember no numbers are non-negative in here, so
-      // how are we going to hit the lower limit for ints?
-      if(x<std::numeric_limits<DomainInt>::min())
-      {
-          return std::numeric_limits<DomainInt>::min();
-      }
-      else
-      {
-          return static_cast<DomainInt>(x);  // Actually this should round up!
-      }
-  }
-  
+    // remember no numbers are non-negative in here, so
+    // how are we going to hit the lower limit for ints?
+    if(x<std::numeric_limits<DomainInt>::min())
+    {
+      return std::numeric_limits<DomainInt>::min();
+    }
+    else
+    {
+      return static_cast<DomainInt>(x);  // Actually this should round up!
+    }
+}
+    
   inline DomainInt rounddown(double x)
   {
-      if(x>std::numeric_limits<DomainInt>::max())
-      {
-          return std::numeric_limits<DomainInt>::max();
-      }
-      else
-      {
-          return static_cast<DomainInt>(x);  
-      }
+    if(x>std::numeric_limits<DomainInt>::max())
+    {
+      return std::numeric_limits<DomainInt>::max();
+    }
+    else
+    {
+      return static_cast<DomainInt>(x);  
+    }
   }
+  
   
   double my_pow(DomainInt x, DomainInt y)
   { return pow((double)checked_cast<int>(x), checked_cast<int>(y));}
@@ -107,13 +108,12 @@ struct PowConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
-	PropInfoAddone("Pow");
+	PROP_INFO_ADDONE(Pow);
 	switch(flag)
 	{
 	  case -1:
 	  {
         // var3 >= min(var1) ^ min(var2)
-        
 		var3.setMin(LRINT(my_pow(var1.getMin(),var2.getMin())));
 		DomainInt var1_min = var1.getMin();
 		if(var1_min > 1)
@@ -137,12 +137,10 @@ struct PowConstraint : public Constraint
 	  }
 	  case 1:
 	  {
-        var3.setMax(rounddown(my_pow(var1.getMax(),var2.getMax())));  // wraparound was occurring here, so use rounddown
+		var3.setMax(rounddown(my_pow(var1.getMax(),var2.getMax())));  // wraparound was occurring here, so use rounddown
 		DomainInt var1_max = var1.getMax();
 		if(var1_max > 1)
-        {
-          var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
-        }
+		  var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
 		break;
 	  }
 	  case 2:
@@ -189,12 +187,12 @@ struct PowConstraint : public Constraint
 
 template<typename V1, typename V2>
 inline Constraint*
-PowCon(const V1& vars, const V2& var2)
+PowCon(StateObj* stateObj, const V1& vars, const V2& var2)
 {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   return new PowConstraint<typename V1::value_type, typename V1::value_type,
-						   typename V2::value_type>(vars[0], vars[1], var2[0]);
+						   typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
 }
 
 
