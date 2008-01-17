@@ -168,7 +168,7 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
 	  throw 0;
   }
 
-  void inline set_optimise_and_propagate_queue(StateObj* stateObj )
+  void inline set_optimise_and_propagate_queue(StateObj* stateObj)
   {
   #ifdef USE_SETJMP
 	if(getState(stateObj).isOptimisationProblem())

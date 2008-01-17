@@ -713,7 +713,7 @@ void MinionThreeInputReader::readSearch(InputFileReader* infile) {
 
       Var var = readIdentifier(infile);
       parser_info("Maximising " + to_string(var));
-      instance.set_optimise(true, var);
+      instance.set_optimise(false, var);
     }
     else if(var_type == "MINIMISING" || var_type == "MINIMIZING")
     {
@@ -722,7 +722,7 @@ void MinionThreeInputReader::readSearch(InputFileReader* infile) {
 
       Var var = readIdentifier(infile);
       parser_info("Minimising " + to_string(var));
-      instance.set_optimise(false, var);
+      instance.set_optimise(true, var);
     }
     else if(var_type == "PRINT")
     {
