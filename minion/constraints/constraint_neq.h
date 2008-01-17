@@ -268,22 +268,39 @@ struct NeqConstraintBinary : public Constraint
 	}
   };
 
+// For reified Not Equals.
+#include "constraint_equal.h"
 
 template<typename VarArray>
 Constraint*
 NeqCon(StateObj* stateObj, const VarArray& var_array)
 { return new NeqConstraint<VarArray>(stateObj, var_array); }
 
+template<typename VarRef1, typename VarRef2, typename BoolVarRef>
+Constraint*
+ReifiedNeqConBinary(StateObj* stateObj, VarRef1 var1, VarRef2 var2, BoolVarRef var3)
+{ return new ReifiedEqualConstraint<VarRef1, VarRef2, VarNot<BoolVarRef> >
+                                   (stateObj,var1,var2, VarNotRef(var3)); }
+
+BUILD_CONSTRAINT1(CT_ALLDIFF, NeqCon)
 
 template<typename Var1, typename Var2>
 Constraint*
 NeqConBinary(StateObj* stateObj, const Var1& var1, const Var2& var2)
 {
-  typedef typename Var1::value_type VarRef1;
-  typedef typename Var2::value_type VarRef2;
-  return new NeqConstraintBinary<VarRef1, VarRef2>(stateObj, var1[0], var2[0]); 
+  return new NeqConstraintBinary<Var1, Var2>(stateObj, var1, var2); 
 }
 
-BUILD_CONSTRAINT2(CT_DISEQ, NeqConBinary)
 
-BUILD_CONSTRAINT1(CT_ALLDIFF, NeqCon)
+template<typename T1, typename T2>
+Constraint*
+BuildCT_DISEQ(StateObj* stateObj, const T1& t1, const T2& t2, bool reify,
+const BoolVarRef& reifyVar, ConstraintBlob& b)
+{
+  if(reify)
+    return ReifiedNeqConBinary(stateObj, t1[0], t2[0], reifyVar);
+  else
+    return NeqConBinary(stateObj, t1[0], t2[0]);
+}
+
+
