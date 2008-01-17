@@ -43,7 +43,7 @@ endif
 
 OBJDIR=$(OUTDIR)/objdir-$(NAME)
 
-SRC=$(wildcard minion/*.cpp) $(wildcard minion/build_constraints/*.cpp)
+SRC=$(wildcard minion/*.cpp) $(wildcard minion/build_constraints/*.cpp) minion/help/help.cpp
 EXE=bin/$(NAME)
 
 
@@ -61,17 +61,21 @@ all: svn_version minion generate
 svn_version:
 	mini-scripts/get_svn_version.sh minion/svn_header.h
 
-$(OBJDIR)/%.o: minion/%.cpp svn_version help mkdirectory
+
+# Special cases
+$(OBJDIR)/minion.o: svn_version
+$(OBJDIR)/help/help.o: help
+
+$(OBJDIR)/%.o: minion/%.cpp 
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
-
-minion: svn_version help mkdirectory $(OBJFILES)
-	
+minion: svn_version mkdirectory $(OBJFILES)	
 	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES)
 	
 mkdirectory:
 	if [ ! -d $(OBJDIR) ]; then mkdir $(OBJDIR); fi
 	if [ ! -d $(OBJDIR)/build_constraints ]; then mkdir $(OBJDIR)/build_constraints; fi
+	if [ ! -d $(OBJDIR)/help ]; then mkdir $(OBJDIR)/help; fi
 
 generate: bibd golomb solitaire steelmill sports
 
