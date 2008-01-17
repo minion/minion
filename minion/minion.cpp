@@ -34,7 +34,8 @@ struct MinionArguments
 {
   VarOrder order;
   int preprocess;
-  MinionArguments() : order(ORDER_ORIGINAL), preprocess(0)
+  unsigned random_seed;
+  MinionArguments() : order(ORDER_ORIGINAL), preprocess(0), random_seed((unsigned)time(NULL))
   { }
 };
 
@@ -216,6 +217,11 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 	{
 	  randomise_valvaroder = true;
 	}
+	else if(command == string("-randomseed"))
+	{
+	  ++i;
+	  args.random_seed = atoi(argv[i]);
+	}
 	else
 	{ 
 	  cout << "I don't understand '" << command << "'. Sorry." << endl;
@@ -320,9 +326,8 @@ int main(int argc, char** argv) {
   
   if(randomise_valvaroder)
   {
-    unsigned seed = (unsigned)time(NULL);
-	cerr << "Using seed: " << seed << endl;
-	srand( seed );
+	cerr << "Using seed: " << args.random_seed << endl;
+	srand( args.random_seed );
   
     std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());
     for(unsigned i = 0; i < var_val_order.second.size(); ++i)

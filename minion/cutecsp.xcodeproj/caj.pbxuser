@@ -186,15 +186,17 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 194606110;
-			PBXWorkspaceStateSaveDate = 194606110;
+			PBXPerProjectTemplateStateSaveDate = 195565501;
+			PBXWorkspaceStateSaveDate = 195565501;
 		};
 		perUserProjectItems = {
+			266F35D50BA817C7005582BB /* PBXBookmark */ = 266F35D50BA817C7005582BB /* PBXBookmark */;
+			266F35DB0BA832FB005582BB /* PBXTextBookmark */ = 266F35DB0BA832FB005582BB /* PBXTextBookmark */;
+			266F35DC0BA832FB005582BB /* PBXTextBookmark */ = 266F35DC0BA832FB005582BB /* PBXTextBookmark */;
+			266F35DD0BA832FB005582BB /* PBXTextBookmark */ = 266F35DD0BA832FB005582BB /* PBXTextBookmark */;
 			2685C7920B9975CB00DB0862 /* PBXTextBookmark */ = 2685C7920B9975CB00DB0862 /* PBXTextBookmark */;
-			2685C79A0B9975E700DB0862 /* PBXTextBookmark */ = 2685C79A0B9975E700DB0862 /* PBXTextBookmark */;
 			2685C79C0B9975FE00DB0862 /* PBXTextBookmark */ = 2685C79C0B9975FE00DB0862 /* PBXTextBookmark */;
 			2685C79D0B9975FE00DB0862 /* PBXTextBookmark */ = 2685C79D0B9975FE00DB0862 /* PBXTextBookmark */;
-			2685C7A50B9989BE00DB0862 /* PBXTextBookmark */ = 2685C7A50B9989BE00DB0862 /* PBXTextBookmark */;
 		};
 		sourceControlManager = 26AAF872096D3BAC00AD8C1A /* Source Control */;
 		userBuildSettings = {
@@ -434,9 +436,9 @@
 	};
 	2644ACE40A192B90002BD572 /* minion.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {770, 5432}}";
-			sepNavSelRange = "{4385, 9}";
-			sepNavVisRect = "{{0, 4614}, {662, 702}}";
+			sepNavIntBoundsRect = "{{0, 0}, {770, 5502}}";
+			sepNavSelRange = "{10386, 0}";
+			sepNavVisRect = "{{0, 4152}, {652, 664}}";
 			sepNavWindowFrame = "{{638, 47}, {707, 831}}";
 		};
 	};
@@ -565,6 +567,40 @@
 			sepNavWindowFrame = "{{701, 47}, {720, 831}}";
 		};
 	};
+	266F35D50BA817C7005582BB /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = 2644ACE40A192B90002BD572 /* minion.cpp */;
+	};
+	266F35DB0BA832FB005582BB /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */;
+		name = "MinionInputReader.cpp: 669";
+		rLen = 0;
+		rLoc = 19823;
+		rType = 0;
+		vrLen = 1266;
+		vrLoc = 19140;
+	};
+	266F35DC0BA832FB005582BB /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */;
+		name = "MinionInputReader.cpp: 669";
+		rLen = 0;
+		rLoc = 19823;
+		rType = 0;
+		vrLen = 1266;
+		vrLoc = 19140;
+	};
+	266F35DD0BA832FB005582BB /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2644ACE40A192B90002BD572 /* minion.cpp */;
+		name = "minion.cpp: 330";
+		rLen = 0;
+		rLoc = 10386;
+		rType = 0;
+		vrLen = 1585;
+		vrLoc = 9284;
+	};
 	266F5EAA097C0AA200D9CC72 /* backtrackable_memory.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {961, 4508}}";
@@ -659,25 +695,6 @@
 		vrLen = 1388;
 		vrLoc = 19058;
 	};
-	2685C7990B9975E700DB0862 /* MinionInputReader.cpp */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.cpp.cpp;
-		name = MinionInputReader.cpp;
-		path = /Users/caj/minion/trunk/minion/MinionInputReader.cpp;
-		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {710, 13426}}";
-			sepNavSelRange = "{19823, 0}";
-			sepNavVisRect = "{{0, 9013}, {652, 664}}";
-		};
-	};
-	2685C79A0B9975E700DB0862 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 2685C7990B9975E700DB0862 /* MinionInputReader.cpp */;
-		rLen = 1;
-		rLoc = 667;
-		rType = 1;
-	};
 	2685C79C0B9975FE00DB0862 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = 26A857BC099B6A6200ECA923 /* CSPSpec.h */;
@@ -697,16 +714,6 @@
 		rType = 0;
 		vrLen = 1105;
 		vrLoc = 5192;
-	};
-	2685C7A50B9989BE00DB0862 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */;
-		name = "MinionInputReader.cpp: 669";
-		rLen = 0;
-		rLoc = 19823;
-		rType = 0;
-		vrLen = 1348;
-		vrLoc = 19058;
 	};
 	2689210909DBB5C500D0472B /* dynamic_sum.h */ = {
 		uiCtxt = {
@@ -915,7 +922,7 @@
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {710, 13426}}";
 			sepNavSelRange = "{19823, 0}";
-			sepNavVisRect = "{{0, 9013}, {652, 664}}";
+			sepNavVisRect = "{{0, 9024}, {652, 664}}";
 			sepNavWindowFrame = "{{15, 80}, {697, 793}}";
 		};
 	};

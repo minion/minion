@@ -29,7 +29,8 @@
 #define WATCHEDLITERALS
 
 #include "minion.h"
-
+#include "constraints/constraint_sum.h"
+#include "constraints/constraint_and.h"
 
 const int height = 9;
 const int width = 9;
@@ -41,29 +42,18 @@ using namespace Controller;
 
 vector<vector<BoolVarRef> > vars(height);
 
-void print_sol(void)
+void setup_variables()
 {
-  for(int i=0;i<height;++i)
-  {
-    for(int j=0;j<width;++j)
-    {
-      D_ASSERT(vars[i][j].isAssigned());
-      printf("%d",vars[i][j].getAssignedValue());
-    }
-    printf("\n");
-  }
-  printf("\n");
-}
-
-int main (int argc, char * const argv[]) {
-  Controller::find_all_solutions();
-
   for(int i=0;i<height;i++)
     for(int j=0;j<width;j++)
     {
       vars[i].push_back(boolean_container.get_new_var());
     }
-    
+}
+
+
+void setup_constraints()
+{
   array<BoolVarRef,height> row;
   array<BoolVarRef,width> col;
   
@@ -109,6 +99,12 @@ int main (int argc, char * const argv[]) {
     add_constraint(BoolLessEqualSumCon(col,compiletime_val<scalarsum>()));
     add_constraint(BoolGreaterEqualSumCon(col,compiletime_val<scalarsum>()));
   }
+}
+
+int main (int argc, char * const argv[]) {
+  
+  setup_variables();
+  setup_constraints();
   
   pair<vector<BoolVarRef>, vector<BOOL> > var_val_order;
   
@@ -117,13 +113,17 @@ int main (int argc, char * const argv[]) {
   
   for(int i = 0; i < height; ++i)
     for(int j = 0; j < width; ++j)
-    {
       var_val_order.first[i*height+j] = vars[i][j];
-     }
     
-     Controller::print_solution = false;
-  Controller::StaticVariableOrder<BoolVarRef> order(var_val_order.first, var_val_order.second);
-  Controller::solve(order, var_val_order.first);
+  Controller::print_solution = false;
+  
+  Controller::find_all_solutions();
+  
+  Controller::initalise_search();
+  
+  if(!Controller::failed)
+    solve(ORDER_STATIC, var_val_order);
+  
   printf("%d, %d\n", nodes, Controller::solutions);
   Controller::finish();
 }

@@ -192,7 +192,7 @@
 				<key>PBXProjectModuleGUID</key>
 				<string>2685C7780B99750600DB0862</string>
 				<key>PBXProjectModuleLabel</key>
-				<string>MinionInputReader.cpp</string>
+				<string>minion.cpp</string>
 				<key>PBXSplitModuleInNavigatorKey</key>
 				<dict>
 					<key>Split0</key>
@@ -200,20 +200,22 @@
 						<key>PBXProjectModuleGUID</key>
 						<string>2685C7900B9975CB00DB0862</string>
 						<key>PBXProjectModuleLabel</key>
-						<string>MinionInputReader.cpp</string>
+						<string>minion.cpp</string>
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>2685C7A50B9989BE00DB0862</string>
+						<string>266F35DD0BA832FB005582BB</string>
 						<key>history</key>
 						<array>
 							<string>2685C79C0B9975FE00DB0862</string>
-							<string>2685C79A0B9975E700DB0862</string>
+							<string>266F35DB0BA832FB005582BB</string>
+							<string>266F35D50BA817C7005582BB</string>
 						</array>
 						<key>prevStack</key>
 						<array>
 							<string>2685C7920B9975CB00DB0862</string>
 							<string>2685C79D0B9975FE00DB0862</string>
+							<string>266F35DC0BA832FB005582BB</string>
 						</array>
 					</dict>
 					<key>SplitCount</key>
@@ -269,6 +271,8 @@
 			<key>Layout</key>
 			<array>
 				<dict>
+					<key>BecomeActive</key>
+					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -314,11 +318,13 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>111</integer>
+									<integer>16</integer>
+									<integer>9</integer>
+									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 1305}, {263, 718}}</string>
+							<string>{{0, 103}, {263, 718}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -387,8 +393,6 @@
 							<key>Tabs</key>
 							<array>
 								<dict>
-									<key>BecomeActive</key>
-									<true/>
 									<key>ContentConfiguration</key>
 									<dict>
 										<key>PBXProjectModuleGUID</key>
@@ -460,11 +464,11 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>2685C7820B9975CB00DB0862</string>
+				<string>266F35D80BA832FB005582BB</string>
 				<string>1CA23ED40692098700951B8B</string>
-				<string>2685C7830B9975CB00DB0862</string>
+				<string>266F35D90BA832FB005582BB</string>
 				<string>266B6E350B6BF72A00564E0D</string>
-				<string>2685C7840B9975CB00DB0862</string>
+				<string>266F35DA0BA832FB005582BB</string>
 				<string>1CA23EDF0692099D00951B8B</string>
 				<string>1CA23EE00692099D00951B8B</string>
 				<string>1CA23EE10692099D00951B8B</string>
@@ -867,7 +871,7 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>2685C78F0B9975CB00DB0862</string>
+		<string>/Users/caj/minion/trunk/minion/cutecsp.xcodeproj</string>
 		<string>2685C7780B99750600DB0862</string>
 	</array>
 	<key>WindowString</key>
