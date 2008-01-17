@@ -107,6 +107,7 @@ class DynamicTrigger;
 #include "constraints/triggers.h"
 
 #include "variables/AnyVarRef.h"
+
 #include "constraints/constraint.h"
 
 #ifdef DYNAMICTRIGGERS
@@ -116,7 +117,6 @@ class DynamicTrigger;
 #include "queue/standard_queue.h"
 
 #include "trigger_list.h"
-
 
 #include "variables/variables.h"
 
@@ -137,14 +137,7 @@ class DynamicTrigger;
 
 #include "constraints/function_defs.hpp"
 
-
 #include "preprocess.h"
-
-#include "search/standard_search.h"
-#include "search/recursive_search.h"
-#include "search/conflict_search.h"
-
-#include "search/search_control.h"
 
 #include "constraint_setup.h"
 
