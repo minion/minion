@@ -130,7 +130,7 @@ set xrange [0.01:*]
 set xlabel "run time of $referencename in secs"
 set ytics (0.001,0.01,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,1,1.01,1.05,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,3,4,5,10,100,1000)
 set autoscale yfix
-set ylabel "Proportion improvement  in $newname from $referencename "
+set ylabel "Ratio of nodes/sec $newname to $referencename "
 set grid
 set size 1.5,1.2
 set pointsize 2
@@ -156,7 +156,45 @@ EOF
 }
 close PREFIXES;
 
-print GNUPLOT2 "1 not" ;
+print GNUPLOT2 "1 not\n" ;
+
+print GNUPLOT2 << "EOF";
+set title "Runtime Comparison of $newname with $referencename"
+set term png
+set output "$dir/timecomparison.$newname.$referencename.png"
+set log x
+set log y
+set xrange [0.01:*]
+set xlabel "run time of $referencename in secs"
+set ytics (0.001,0.01,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,1,1.01,1.05,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,3,4,5,10,100,1000)
+set autoscale yfix
+set ylabel "Ratio of time $referencename to $newname "
+set grid
+set size 1.5,1.2
+set pointsize 2
+set key outside box 
+plot 1 not, \\
+EOF
+
+my @field;
+my $i;
+
+
+open PREFIXES, "cat $dir/comparison.$newname.$referencename.txt | $awkexe -F '[ 0-9]' '{print \$1}' | $sortexe | $uniqexe |" ;
+
+
+while (<PREFIXES>) 
+{
+     @field = split(/\s+/,$_);
+     $i = @field[0];
+     system "$egrepexe \"^$i\[ 0-9\]\" $dir/comparison.$newname.$referencename.txt > $tmpdir/$newname.$referencename.$$.$i";
+     print GNUPLOT2 << "EOF" 
+"$tmpdir/$newname.$referencename.$$.$i" using 19:((\$19/\$5)) t "$i", \\
+EOF
+}
+close PREFIXES;
+
+print GNUPLOT2 "1 not\n" ;
 close GNUPLOT2;
 
 system "$gnuplotexe < $tmpdir/$newname.$referencename.$$.gnu";
