@@ -28,7 +28,8 @@ conslist+=["product", "reifyimplyproduct"]
 conslist+=["sumgeq", "reifysumgeq", "reifyimplysumgeq"]
 conslist+=["sumleq", "reifysumleq", "reifyimplysumleq"]
 
-conslist+=["occurrence", "reifyoccurrence", "reifyimplyoccurrence"]
+conslist+=["occurrence", "reifyimplyoccurrence"]
+conslist+=["occurrenceleq", "occurrencegeq"]
 
 #conslist+=["weightedsumleq"...
 
