@@ -22,6 +22,7 @@ const int ShowUnused = 0;
 class initvectors
 {
     public:
+    vector<string> VarEvents;
     vector<string> VarNames;
     vector<string> Checks;
     vector<string> Changes;
@@ -38,12 +39,42 @@ class initvectors
         
         Changes.push_back("removeFromDomain"); Changes.push_back("setMin"); Changes. push_back("setMax");
         Changes.push_back("uncheckedAssign"); Changes.push_back("propagateAssign");
+        if(VarNames.size()!=VarTypeSize)
+        {
+            cout << "Enum for VarType in get_info.h does not match VarNames in get_info.cpp"<<endl;
+            exit(1);
+        }
+        
+        VarEvents.push_back("construct");
+        VarEvents.push_back("copy");
+        VarEvents.push_back("isAssigned");
+        VarEvents.push_back("getAssignedValue");
+        VarEvents.push_back("isAssignedValue");
+        VarEvents.push_back("inDomain");
+        VarEvents.push_back("inDomain_noBoundCheck");
+        VarEvents.push_back("getMax");
+        VarEvents.push_back("getMin");
+        VarEvents.push_back("getInitialMax");
+        VarEvents.push_back("getInitialMin");
+        VarEvents.push_back("setMax");
+        VarEvents.push_back("setMin");
+        VarEvents.push_back("uncheckedAssign");
+        VarEvents.push_back("propagateAssign");
+        VarEvents.push_back("removeFromDomain");
+        VarEvents.push_back("addTrigger");
+        VarEvents.push_back("getDomainChange");
+        VarEvents.push_back("addDynamicTrigger");
+        if(VarEvents.size()!=VarEventSize)
+        {
+            cout << "Enum for VarEvent in get_info.h does not match VarEvents in get_info.cpp"<<endl;
+            exit(1);
+        }
     }
 };
 
 initvectors init;
 
-map<pair<string, string>, long long int> vareventcounters;
+long long int vareventcounters[VarTypeSize][VarEventSize];
 map<string, long long int> concount;
 map<string, long long int> propcount;
 
@@ -61,17 +92,12 @@ string pad_start(string s, int length = 12)
   return output + s;
 }
 
-void VarInfoAddone(VarType type, string event)
+inline void VarInfoAddone(VarType type, VarEvent event)
 {
-    D_ASSERT( type>=0 && type<init.VarNames.size() );
-    pair<string, string> key=pair<string, string>(init.VarNames[type], event);
-    if(vareventcounters.find(key) == vareventcounters.end())
-        vareventcounters[key]=1;
-    else
-        vareventcounters[key]++;
+    vareventcounters[type][event]++;
 }
 
-void ConInfoAddone(string type)
+inline void ConInfoAddone(string type)
 { 
     if(concount.find(type) == concount.end())
         concount[type]=1;
@@ -79,7 +105,7 @@ void ConInfoAddone(string type)
         concount[type]++;
 }
 
-void PropInfoAddone(string type)
+inline void PropInfoAddone(string type)
 {
     if(propcount.find(type) == propcount.end())
         propcount[type]=1;
@@ -89,25 +115,27 @@ void PropInfoAddone(string type)
 
 void print_search_info()
 {
-    // Collect event names from the vareventcounters map.
-    map<pair<string, string>, long long int>::iterator it1;
+    // Collect event names which are in use.
     vector<string> EventNames;
     vector<string> Other;  // All the events in EventNames which are not in Changes or Checks.
     // First put some in in a standard order.
     EventNames.push_back("inDomain");EventNames.push_back("removeFromDomain");
     EventNames.push_back("getMin");EventNames.push_back("getMax");
     EventNames.push_back("setMin");EventNames.push_back("setMax");
-    
-    for(it1=vareventcounters.begin(); it1 != vareventcounters.end(); it1 ++)
+    for(int i=0; i<VarTypeSize; i++)
     {
-        string name=(*it1).first.second;
-        if(find(EventNames.begin(), EventNames.end(), name)==EventNames.end())
+        for(int j=0; j<VarEventSize; j++)
         {
-            EventNames.push_back(name);
-            if(find(init.Checks.begin(), init.Checks.end(), name)==init.Checks.end() &&
-                find(init.Changes.begin(), init.Changes.end(), name)==init.Changes.end())
+            string name=init.VarEvents[j];
+            if(find(EventNames.begin(), EventNames.end(), name)==EventNames.end()
+                && vareventcounters[i][j]!=0)
             {
-                Other.push_back(name);
+                EventNames.push_back(name);
+                if(find(init.Checks.begin(), init.Checks.end(), name)==init.Checks.end() &&
+                    find(init.Changes.begin(), init.Changes.end(), name)==init.Changes.end())
+                {
+                    Other.push_back(name);
+                }
             }
         }
     }
@@ -117,7 +145,7 @@ void print_search_info()
     // Print the table heading.
     
    cout << pad("");
-   for(int i = 0; i < init.VarNames.size(); ++i)
+   for(int i = 0; i < VarTypeSize; ++i)
    {
      cout << pad_start(init.VarNames[i]);
    }
@@ -128,24 +156,18 @@ void print_search_info()
    for(int j = 0; j < EventNames.size(); ++j)
    {
      string varevent=EventNames[j];
+     
+     int vareventindex=distance(EventNames.begin(), find(EventNames.begin(), EventNames.end(), varevent));
      long long int total = 0;
-     for(int i = 0; i < init.VarNames.size(); ++i)
+     for(int i = 0; i < VarTypeSize; ++i)
      {
-         string vartype= string(init.VarNames[i]);
-         pair<string, string> key=pair<string, string>(vartype, varevent);
-       if(vareventcounters.find(key)!=vareventcounters.end())
-           total += vareventcounters[key];
+         total += vareventcounters[i][vareventindex];
      }
      
-    cout << pad(varevent);
-    for(int i = 0; i < init.VarNames.size(); ++i)
+     cout << pad(varevent);
+    for(int i = 0; i < VarTypeSize; ++i)
     {
-       string vartype= string(init.VarNames[i]);
-       pair<string, string> key=pair<string, string>(vartype, varevent);
-     if(vareventcounters.find(key)!=vareventcounters.end())
-         cout << setiosflags(ios::right) << setw(12) <<vareventcounters[key];
-     else
-         cout << setiosflags(ios::right) << setw(12) <<0;
+       cout << setiosflags(ios::right) << setw(12) <<vareventcounters[i][vareventindex];
     }
     cout << setiosflags(ios::right) << setw(12) << total;
     cout << endl;
@@ -179,12 +201,13 @@ void print_search_info()
             
             for(int j = 0; j < EventNames.size(); ++j)
             {
+                string varevent=EventNames[j];
+                int vareventindex=distance(EventNames.begin(), find(EventNames.begin(), EventNames.end(), varevent));
                 pair<string, string> key=pair<string, string>(init.VarNames[i], EventNames[j]);
-                if(vareventcounters.find(key)!=vareventcounters.end() && 
-                    find(eventstosum.begin(), eventstosum.end(), EventNames[j])!=eventstosum.end() )
+                if(find(eventstosum.begin(), eventstosum.end(), EventNames[j])!=eventstosum.end() )
                 {
-                     minortotal+= vareventcounters[key];
-                     total += vareventcounters[key];
+                     minortotal+= vareventcounters[i][vareventindex];
+                     total += vareventcounters[i][vareventindex];
                 }
             }
             
