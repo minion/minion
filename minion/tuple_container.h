@@ -206,8 +206,9 @@ public:
 
 
 /// The first GACtable implementation.
-struct LiteralSpecificLists
+class LiteralSpecificLists
 {
+public:
   TupleList* tuples;
   
   /// For each literal, a list of the tuples it is present in.  

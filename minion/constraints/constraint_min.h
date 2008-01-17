@@ -30,7 +30,7 @@ struct MinConstraint : public Constraint
 	D_INFO(2,DI_SUMCON,"Setting up Constraint");
 	triggerCollection t;
 	
-	for(unsigned i = 0; i < var_array.size(); ++i)
+	for(int i = 0; i < var_array.size(); ++i)
 	{ // Have to add 1 else the 0th element will be lost.
 	  t.push_back(make_trigger(var_array[i], Trigger(this, i + 1), LowerBound));
 	  t.push_back(make_trigger(var_array[i], Trigger(this, -(i + 1)), UpperBound));

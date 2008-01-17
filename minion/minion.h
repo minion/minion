@@ -98,9 +98,9 @@ public:
 };
 
 
-struct Trigger;
-struct Constraint;
-struct DynamicTrigger;
+class Trigger;
+class Constraint;
+class DynamicTrigger;
 
 #include "constraints/triggers.h"
 

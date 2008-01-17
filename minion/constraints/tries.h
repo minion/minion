@@ -352,8 +352,8 @@ struct TupleTrie
 };
 
 //template<typename VarArray>
-struct TupleTrieArray {
-  
+class TupleTrieArray {
+public:
   TupleList* tuplelist;
   
   int arity; 

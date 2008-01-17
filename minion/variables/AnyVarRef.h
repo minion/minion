@@ -135,8 +135,9 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 };
 
 /// Provides a method of wrapping any variable type in a general wrapper.
-struct AnyVarRef
+class AnyVarRef
 {
+public:
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Maybe;
   shared_ptr<AnyVarRef_Abstract> data;

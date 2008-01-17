@@ -298,7 +298,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	if (found_new_support)         // so we have found a new literal to watch
 	{
 	  values_watched(propval) = false;
-	  D_ASSERT(!values_watched(i) and var_array[i].inDomain(1 - VarToCount));    
+	  D_ASSERT(!values_watched(i) && var_array[i].inDomain(1 - VarToCount));    
 	  dt->trigger_info() = i;
 	  var_array[i].addDynamicTrigger(dt, VarToCount ? LowerBound : UpperBound); 
 

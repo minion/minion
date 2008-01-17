@@ -45,8 +45,9 @@ public:
 
 
 ///The classes which are used to build the queue.
-struct Trigger
+class Trigger
 { 
+public:
   /// The constraint to be propagated.
   Constraint* constraint;
 #ifdef FUNCTIONPOINTER_TRIGGER

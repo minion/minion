@@ -24,17 +24,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-struct DynamicConstraint;
-
-struct DynamicTrigger;
-
-
 #define DYNAMIC_PROPAGATE_FUNCTION virtual void propagate
 
-
-
 /// This is a trigger to a constraint, which can be dynamically moved around.
-struct DynamicTrigger
+class DynamicTrigger
 {
 private:
   /// Hidden, as copying a DynamicTrigger is almost certainly an error.
@@ -150,8 +143,9 @@ public:
 };
 
 /// Base type from which all dynamic constraints are derived.
-struct DynamicConstraint
+class DynamicConstraint
 {
+public:
   /// Method to get constraint name for debugging.
   virtual string constraint_name() = 0;
   
