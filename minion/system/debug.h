@@ -27,13 +27,10 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include "system/to_string.h"
-#include "constants.h"
-
 // If true, "-crash" was used and execution will crash on error (for debugging)
 VARDEF_ASSIGN(bool debug_crash, false);
 
-struct parse_exception : public exception
+struct parse_exception : public std::exception
 {
   string error;
   parse_exception(string s) : error(s)

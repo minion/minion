@@ -81,10 +81,6 @@
 #include<stdlib.h>
 #include<setjmp.h>
 
-#include "system/linked_ptr.h"
-#include "system/local_array.h"
-
-
 // Note: The hash table (unordered_map) is broken in many versions of g++,
 // so this can't be activated safely.
 #ifdef USE_HASHTABLE
@@ -117,3 +113,14 @@ using namespace std;
 #endif
 
 #define BOOL int
+
+
+#include "wrapper.h"
+#include "to_string.h"
+#include "local_array.h"
+#include "time_keeping.h"
+#include "linked_ptr.h"
+#include "sys_constants.h"
+#include "debug.h"
+//#include "light_vector.h"
+

@@ -1,9 +1,6 @@
 #define NO_MAIN
 
-#include "system.h"
-#include "system/time_keeping.h"
-#include "constants.h"
-#include "debug.h"
+#include "system/system.h"
 
 using namespace std;
 

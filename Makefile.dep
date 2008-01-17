@@ -4,13 +4,15 @@ $(OBJDIR)/build_constraints/BuildDynamicStart.o:  \
   minion/./build_constraints/BuildStart.h \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -39,6 +41,7 @@ $(OBJDIR)/build_constraints/BuildDynamicStart.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -62,13 +65,15 @@ $(OBJDIR)/build_constraints/BuildStaticStart.o:  \
   minion/./build_constraints/BuildStart.h \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -97,6 +102,7 @@ $(OBJDIR)/build_constraints/BuildStaticStart.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -119,13 +125,15 @@ $(OBJDIR)/build_constraints/CT_ALLDIFF.o:  \
  minion/./build_constraints/CT_ALLDIFF.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -154,6 +162,7 @@ $(OBJDIR)/build_constraints/CT_ALLDIFF.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -177,13 +186,15 @@ $(OBJDIR)/build_constraints/CT_DISEQ.o:  \
  minion/./build_constraints/CT_DISEQ.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -212,6 +223,7 @@ $(OBJDIR)/build_constraints/CT_DISEQ.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -235,13 +247,15 @@ $(OBJDIR)/build_constraints/CT_DIV.o:  \
  minion/./build_constraints/CT_DIV.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -270,6 +284,7 @@ $(OBJDIR)/build_constraints/CT_DIV.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -293,13 +308,15 @@ $(OBJDIR)/build_constraints/CT_ELEMENT.o:  \
  minion/./build_constraints/CT_ELEMENT.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -328,6 +345,7 @@ $(OBJDIR)/build_constraints/CT_ELEMENT.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -351,13 +369,15 @@ $(OBJDIR)/build_constraints/CT_EQ.o:  \
  minion/./build_constraints/CT_EQ.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -386,6 +406,7 @@ $(OBJDIR)/build_constraints/CT_EQ.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -409,13 +430,15 @@ $(OBJDIR)/build_constraints/CT_GACELEMENT.o:  \
  minion/./build_constraints/CT_GACELEMENT.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -444,6 +467,7 @@ $(OBJDIR)/build_constraints/CT_GACELEMENT.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -467,13 +491,15 @@ $(OBJDIR)/build_constraints/CT_GEQSUM.o:  \
  minion/./build_constraints/CT_GEQSUM.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -502,6 +528,7 @@ $(OBJDIR)/build_constraints/CT_GEQSUM.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -527,13 +554,15 @@ $(OBJDIR)/build_constraints/CT_INEQ.o:  \
  minion/./build_constraints/CT_INEQ.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -562,6 +591,7 @@ $(OBJDIR)/build_constraints/CT_INEQ.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -585,13 +615,15 @@ $(OBJDIR)/build_constraints/CT_LEQSUM.o:  \
  minion/./build_constraints/CT_LEQSUM.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -620,6 +652,7 @@ $(OBJDIR)/build_constraints/CT_LEQSUM.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -645,13 +678,15 @@ $(OBJDIR)/build_constraints/CT_LEXLEQ.o:  \
  minion/./build_constraints/CT_LEXLEQ.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -680,6 +715,7 @@ $(OBJDIR)/build_constraints/CT_LEXLEQ.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -703,13 +739,15 @@ $(OBJDIR)/build_constraints/CT_LEXLESS.o:  \
  minion/./build_constraints/CT_LEXLESS.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -738,6 +776,7 @@ $(OBJDIR)/build_constraints/CT_LEXLESS.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -761,13 +800,15 @@ $(OBJDIR)/build_constraints/CT_MAX.o:  \
  minion/./build_constraints/CT_MAX.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -796,6 +837,7 @@ $(OBJDIR)/build_constraints/CT_MAX.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -819,13 +861,15 @@ $(OBJDIR)/build_constraints/CT_MIN.o:  \
  minion/./build_constraints/CT_MIN.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -854,6 +898,7 @@ $(OBJDIR)/build_constraints/CT_MIN.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -878,13 +923,15 @@ $(OBJDIR)/build_constraints/CT_MINUSEQ.o:  \
  minion/./build_constraints/CT_MINUSEQ.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -913,6 +960,7 @@ $(OBJDIR)/build_constraints/CT_MINUSEQ.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -936,13 +984,15 @@ $(OBJDIR)/build_constraints/CT_MODULO.o:  \
  minion/./build_constraints/CT_MODULO.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -971,6 +1021,7 @@ $(OBJDIR)/build_constraints/CT_MODULO.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -994,13 +1045,15 @@ $(OBJDIR)/build_constraints/CT_OCCURRENCE.o:  \
  minion/./build_constraints/CT_OCCURRENCE.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1029,6 +1082,7 @@ $(OBJDIR)/build_constraints/CT_OCCURRENCE.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1052,13 +1106,15 @@ $(OBJDIR)/build_constraints/CT_POW.o:  \
  minion/./build_constraints/CT_POW.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1087,6 +1143,7 @@ $(OBJDIR)/build_constraints/CT_POW.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1110,13 +1167,15 @@ $(OBJDIR)/build_constraints/CT_PRODUCT2.o:  \
  minion/./build_constraints/CT_PRODUCT2.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1145,6 +1204,7 @@ $(OBJDIR)/build_constraints/CT_PRODUCT2.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1169,13 +1229,15 @@ $(OBJDIR)/build_constraints/CT_WATCHED_ELEMENT.o:  \
  minion/./build_constraints/CT_WATCHED_ELEMENT.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1204,6 +1266,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_ELEMENT.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1227,13 +1290,15 @@ $(OBJDIR)/build_constraints/CT_WATCHED_GEQSUM.o:  \
  minion/./build_constraints/CT_WATCHED_GEQSUM.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1262,6 +1327,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_GEQSUM.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1288,13 +1354,15 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LEQSUM.o:  \
  minion/./build_constraints/CT_WATCHED_LEQSUM.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1323,6 +1391,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LEQSUM.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1349,13 +1418,15 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LITSUM.o:  \
  minion/./build_constraints/CT_WATCHED_LITSUM.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1384,6 +1455,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LITSUM.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1407,13 +1479,15 @@ $(OBJDIR)/build_constraints/CT_WATCHED_TABLE.o:  \
  minion/./build_constraints/CT_WATCHED_TABLE.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1442,6 +1516,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_TABLE.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1467,13 +1542,15 @@ $(OBJDIR)/build_constraints/CT_WATCHED_VECNEQ.o:  \
  minion/./build_constraints/CT_WATCHED_VECNEQ.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1502,6 +1579,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_VECNEQ.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1525,13 +1603,15 @@ $(OBJDIR)/build_constraints/CT_WEIGHTGEQSUM.o:  \
  minion/./build_constraints/CT_WEIGHTGEQSUM.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1560,6 +1640,7 @@ $(OBJDIR)/build_constraints/CT_WEIGHTGEQSUM.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1586,13 +1667,15 @@ $(OBJDIR)/build_constraints/CT_WEIGHTLEQSUM.o:  \
  minion/./build_constraints/CT_WEIGHTLEQSUM.cpp \
   minion/./build_constraints/../minion.h \
   minion/./build_constraints/../svn_header.h \
-  minion/./build_constraints/../system.h \
-  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/system.h \
+  minion/./build_constraints/../system/wrapper.h \
+  minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
   minion/./build_constraints/../system/time_keeping.h \
-  minion/./build_constraints/../system/to_string.h \
+  minion/./build_constraints/../system/linked_ptr.h \
+  minion/./build_constraints/../system/sys_constants.h \
+  minion/./build_constraints/../system/debug.h \
   minion/./build_constraints/../constants.h \
-  minion/./build_constraints/../debug.h \
   minion/./build_constraints/../solver.h \
   minion/./build_constraints/../memory_management/backtrackable_memory.h \
   minion/./build_constraints/../memory_management/nonbacktrack_memory.h \
@@ -1621,6 +1704,7 @@ $(OBJDIR)/build_constraints/CT_WEIGHTLEQSUM.o:  \
   minion/./build_constraints/../solver2.h \
   minion/./build_constraints/../build_constraints/build_helper.h \
   minion/./build_constraints/../build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../build_constraints/../tuple_container.h \
   minion/./build_constraints/../build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../build_constraints/../BuildConstraint.h \
   minion/./build_constraints/../constraints/constraint_checkassign.h \
@@ -1644,10 +1728,11 @@ $(OBJDIR)/build_constraints/CT_WEIGHTLEQSUM.o:  \
   minion/./build_constraints/../constraints/constraint_lightsum.h \
   minion/./build_constraints/../constraints/constraint_sum.h
 $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
-  minion/./minion.h minion/./svn_header.h minion/./system.h \
-  minion/./system/linked_ptr.h minion/./system/local_array.h \
-  minion/./system/time_keeping.h minion/./system/to_string.h \
-  minion/./constants.h minion/./debug.h minion/./solver.h \
+  minion/./minion.h minion/./svn_header.h minion/./system/system.h \
+  minion/./system/wrapper.h minion/./system/to_string.h \
+  minion/./system/local_array.h minion/./system/time_keeping.h \
+  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
+  minion/./system/debug.h minion/./constants.h minion/./solver.h \
   minion/./memory_management/backtrackable_memory.h \
   minion/./memory_management/nonbacktrack_memory.h \
   minion/./reversible_vals.h \
@@ -1671,6 +1756,7 @@ $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
   minion/./variables/iterators.h minion/./solver2.h \
   minion/./build_constraints/build_helper.h \
   minion/./build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../tuple_container.h \
   minion/./build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../BuildConstraint.h \
   minion/./constraints/constraint_checkassign.h \
@@ -1684,10 +1770,11 @@ $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
   minion/./constraint_setup.h minion/./preprocess/preprocess.h \
   minion/./test_functions.h minion/./CSPSpec.h
 $(OBJDIR)/constraint_setup.o: minion/./constraint_setup.cpp \
-  minion/./minion.h minion/./svn_header.h minion/./system.h \
-  minion/./system/linked_ptr.h minion/./system/local_array.h \
-  minion/./system/time_keeping.h minion/./system/to_string.h \
-  minion/./constants.h minion/./debug.h minion/./solver.h \
+  minion/./minion.h minion/./svn_header.h minion/./system/system.h \
+  minion/./system/wrapper.h minion/./system/to_string.h \
+  minion/./system/local_array.h minion/./system/time_keeping.h \
+  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
+  minion/./system/debug.h minion/./constants.h minion/./solver.h \
   minion/./memory_management/backtrackable_memory.h \
   minion/./memory_management/nonbacktrack_memory.h \
   minion/./reversible_vals.h \
@@ -1711,6 +1798,7 @@ $(OBJDIR)/constraint_setup.o: minion/./constraint_setup.cpp \
   minion/./variables/iterators.h minion/./solver2.h \
   minion/./build_constraints/build_helper.h \
   minion/./build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../tuple_container.h \
   minion/./build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../BuildConstraint.h \
   minion/./constraints/constraint_checkassign.h \
@@ -1724,18 +1812,23 @@ $(OBJDIR)/constraint_setup.o: minion/./constraint_setup.cpp \
   minion/./constraint_setup.h minion/./preprocess/preprocess.h \
   minion/./test_functions.h
 $(OBJDIR)/debug_functions.o: minion/./debug_functions.cpp \
-  minion/./system.h minion/./system/linked_ptr.h \
+  minion/./system/system.h minion/./system/wrapper.h \
+  minion/./system/to_string.h minion/./system/local_array.h \
+  minion/./system/time_keeping.h minion/./system/linked_ptr.h \
+  minion/./system/sys_constants.h minion/./system/debug.h
+$(OBJDIR)/get_info.o: minion/./get_info.cpp minion/./system/system.h \
+  minion/./system/wrapper.h minion/./system/to_string.h \
   minion/./system/local_array.h minion/./system/time_keeping.h \
-  minion/./constants.h minion/./debug.h minion/./system/to_string.h
-$(OBJDIR)/get_info.o: minion/./get_info.cpp minion/./system.h \
-  minion/./system/linked_ptr.h minion/./system/local_array.h \
-  minion/./system/time_keeping.h minion/./constants.h minion/./debug.h \
-  minion/./system/to_string.h minion/./get_info/get_info.h
+  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
+  minion/./system/debug.h minion/./constants.h \
+  minion/./get_info/get_info.h
 $(OBJDIR)/minion.o: minion/./minion.cpp minion/./minion.h \
-  minion/./svn_header.h minion/./system.h minion/./system/linked_ptr.h \
+  minion/./svn_header.h minion/./system/system.h \
+  minion/./system/wrapper.h minion/./system/to_string.h \
   minion/./system/local_array.h minion/./system/time_keeping.h \
-  minion/./system/to_string.h minion/./constants.h minion/./debug.h \
-  minion/./solver.h minion/./memory_management/backtrackable_memory.h \
+  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
+  minion/./system/debug.h minion/./constants.h minion/./solver.h \
+  minion/./memory_management/backtrackable_memory.h \
   minion/./memory_management/nonbacktrack_memory.h \
   minion/./reversible_vals.h \
   minion/./memory_management/trailed_monotonic_set.h \
@@ -1758,6 +1851,7 @@ $(OBJDIR)/minion.o: minion/./minion.cpp minion/./minion.h \
   minion/./variables/iterators.h minion/./solver2.h \
   minion/./build_constraints/build_helper.h \
   minion/./build_constraints/../CSPSpec.h \
+  minion/./build_constraints/../tuple_container.h \
   minion/./build_constraints/../BuildConstraintConstructs.h \
   minion/./build_constraints/../BuildConstraint.h \
   minion/./constraints/constraint_checkassign.h \
@@ -1772,45 +1866,10 @@ $(OBJDIR)/minion.o: minion/./minion.cpp minion/./minion.h \
   minion/./test_functions.h minion/./CSPSpec.h minion/./BuildConstraint.h \
   minion/./MinionInputReader.h
 $(OBJDIR)/MinionInputReader.o: minion/./MinionInputReader.cpp \
-  minion/./minion.h minion/./svn_header.h minion/./system.h \
-  minion/./system/linked_ptr.h minion/./system/local_array.h \
-  minion/./system/time_keeping.h minion/./system/to_string.h \
-  minion/./constants.h minion/./debug.h minion/./solver.h \
-  minion/./memory_management/backtrackable_memory.h \
-  minion/./memory_management/nonbacktrack_memory.h \
-  minion/./reversible_vals.h \
-  minion/./memory_management/trailed_monotonic_set.h \
-  minion/./tuple_container.h minion/./constraints/triggers.h \
-  minion/./variables/VarRefType.h minion/./variables/AnyVarRef.h \
-  minion/./constraints/constraint.h \
-  minion/./constraints/constraint_dynamic.h minion/./trigger_list.h \
-  minion/./variables/variables.h \
-  minion/./variables/containers/booleanvariables.h \
-  minion/./variables/containers/intvar.h \
-  minion/./variables/containers/long_intvar.h \
-  minion/./variables/containers/intboundvar.h \
-  minion/./variables/containers/sparse_intboundvar.h \
-  minion/./variables/mappings/variable_neg.h \
-  minion/./variables/mappings/variable_switch_neg.h \
-  minion/./variables/mappings/variable_stretch.h \
-  minion/./variables/mappings/variable_constant.h \
-  minion/./variables/mappings/variable_not.h \
-  minion/./variables/mappings/variable_shift.h \
-  minion/./variables/iterators.h minion/./solver2.h \
-  minion/./build_constraints/build_helper.h \
-  minion/./build_constraints/../CSPSpec.h \
-  minion/./build_constraints/../BuildConstraintConstructs.h \
-  minion/./build_constraints/../BuildConstraint.h \
-  minion/./constraints/constraint_checkassign.h \
-  minion/./constraints/constraint_table.h \
-  minion/./constraints/constraint_boundtable.h \
-  minion/./constraints/reify.h minion/./constraints/reify_true.h \
-  minion/./constraints/function_defs.hpp minion/./queue/standard_queue.h \
-  minion/./search/standard_search.h minion/./search/common_search.h \
-  minion/./search/VariableOrders.h minion/./search/search_methods.h \
-  minion/./search/recursive_search.h minion/./search/search_control.h \
-  minion/./constraint_setup.h minion/./preprocess/preprocess.h \
-  minion/./test_functions.h minion/./CSPSpec.h \
+  minion/./system/system.h minion/./system/wrapper.h \
+  minion/./system/to_string.h minion/./system/local_array.h \
+  minion/./system/time_keeping.h minion/./system/linked_ptr.h \
+  minion/./system/sys_constants.h minion/./system/debug.h \
+  minion/./CSPSpec.h minion/./tuple_container.h minion/./constants.h \
   minion/./MinionInputReader.h \
   minion/./build_constraints/constraint_defs.h
-$(OBJDIR)/test_functions.o: minion/./test_functions.cpp

@@ -6,10 +6,8 @@
 #include <istream>
 #include <iomanip>
 
-#include "system.h"
-#include "system/time_keeping.h"
+#include "system/system.h"
 #include "constants.h"
-#include "debug.h"
 
 using namespace std;
 

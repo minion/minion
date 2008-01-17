@@ -18,8 +18,7 @@
 #define NO_MAIN
 
 #include <string>
-#include "system.h"
-#include "debug.h"
+#include "system/system.h"
 
 //#include "minion.h"
 #include "CSPSpec.h"

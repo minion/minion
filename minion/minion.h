@@ -30,15 +30,9 @@
 
 #include "svn_header.h"
 
-#include "system/wrapper.h"
-
-#include "system.h"
-
-#include "system/time_keeping.h"
-#include "system/to_string.h"
+#include "system/system.h"
 
 #include "constants.h"
-#include "debug.h"
 
 #ifdef USELIGHTVECTOR
 #include "system/light_vector.h"

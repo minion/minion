@@ -27,79 +27,6 @@
 #ifndef _CONSTANTS_H
 #define _CONSTANTS_H
 
-// This needs to be declared as early as possible, as it is used a lot.
-typedef long long int BigInt;
-
-#include "system/wrapper.h"
-
-/// A placeholder type.
-struct EmptyType
-{};
-
-/// A big constant, when such a thing is needed.
-const int big_constant = 999999;
-
-
-/// A constant chosen at compile time.
-/// Create with the notation compiletime_val<6>().
-template<int i>
-struct compiletime_val
-{ 
-  operator int() const
-{ return i; }
-  
-  compiletime_val<-i-1> negminusone() const
-{ return compiletime_val<-i-1>(); }
-  
-  compiletime_val<-i> neg() const
-{ return compiletime_val<-i>(); }
-  
-  friend std::ostream& operator<<(std::ostream& o, const compiletime_val& v)
-{ return o << "CompiletimeConst:" << i; }
-  
-};
-
-
-/// A constant chosen at run time.
-/// Create with the notation runtime_val(6).
-struct runtime_val
-{
-  int i;
-  runtime_val(int _i) : i(_i)
-  {}
-  
-  operator int() const
-  { return i; }
-  
-  runtime_val negminusone() const
-  { return runtime_val(-i-1); }
-  
-  template<int j>
-  runtime_val neg() const
-  { return runtime_val(-i); }
-  
-  friend std::ostream& operator<<(std::ostream& o, const runtime_val& v)
-  { return o << v.i; }
-
-};
-
-template<typename T>
-inline T mymin(T t1, T t2)
-{
-  if(t1 <= t2)
-    return t1;
-  else
-    return t2;
-}
-
-template<typename T>
-inline T mymax(T t1, T t2)
-{
-  if(t1 <= t2)
-    return t2;
-  else
-    return t1;
-}
 
 enum TrigType
 { 
@@ -117,11 +44,7 @@ enum BoundType
   Bound_Maybe
 };
 
-#ifdef BOUNDS_CHECK
-typedef Wrapper<int> DomainInt;
-#else
-typedef int DomainInt;
-#endif
+
 
 #ifndef CONTAINER_TYPE
 typedef unsigned int BitContainerType;
@@ -129,19 +52,6 @@ typedef unsigned int BitContainerType;
 typedef CONTAINER_TYPE BitContainerType;
 #endif
 
-template<typename To, typename From>
-To checked_cast(const From& t)
-{ return static_cast<To>(t); }
 
-template<typename To, typename From>
-To checked_cast(const Wrapper<From>& t)
-{ return static_cast<To>(t.t); }
-
-
-
-
-// Put a ' -1, +1 ' just to have some slack
-const BigInt DomainInt_Max = std::numeric_limits<int>::max() - 1;
-const BigInt DomainInt_Min = std::numeric_limits<int>::min() + 1;
 
 #endif // _CONSTANTS_H
