@@ -6,6 +6,8 @@
    $Id$
 */
 
+#ifndef _TUPLE_CONTAINER_H
+#define _TUPLE_CONTAINER_H
 /* Minion
 * Copyright (C) 2006
 *
@@ -23,6 +25,8 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+
+#include "constants.h"
 
 // This file contains lists of tuples, as required by table constraints. This
 // is required as these tuples can get big, and it's important to keep them
@@ -238,3 +242,4 @@ inline LiteralSpecificLists* TupleList::getLitLists()
   return litlists;
 }
 
+#endif
