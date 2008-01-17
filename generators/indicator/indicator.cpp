@@ -51,7 +51,13 @@ bool not_equal(const vector<int>& x, const vector<int>& y)
 
 int main(int argc, char** argv)
 {
-
+  if(argc != 3)
+  {
+    printf("Usage: indicator <domain> <k>\n");
+    printf("Generates the k-ary indicator problem on not equals, domain size <domain>\n");
+    exit(0);
+  }
+  
 domain = atoi(argv[1]);
 k = atoi(argv[2]);
 
