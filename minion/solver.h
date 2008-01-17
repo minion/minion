@@ -116,6 +116,9 @@ public:
 	dynamic_triggers_used(false), finished(false), failed(false), tupleListContainer(NULL), is_locked(false)
   {}
   
+  // Must be defined later.
+  ~SearchState();
+  
   void markLocked()
   { is_locked = true; }
 
