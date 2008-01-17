@@ -6,6 +6,7 @@ from os import *
 from sys import exit
 import sendemail
 
+# of course this is bad. The minion directory should be a command line option.
 chdir("/home/pn/minion-svn/minion")   #cd /home/pn/minion-svn/minion
 
 retval=0
@@ -28,18 +29,20 @@ if retval!=0:
     sendemail.mail("An error occurred when building minion-debug.")
     exit(1)
 
-retval+=system("cd test_instances; run-tests.sh ../bin/minion")
+chdir("test_instances")
+retval+=system("./run_tests.sh ../bin/minion")
 
 if retval!=0:
-    sendemail.mail("An error occurred when running test_instances/run-tests.sh for minion")
+    sendemail.mail("An error occurred when running test_instances/run_tests.sh for minion")
     exit(1)
 
-retval+=system("cd test_instances; run-tests.sh ../bin/minion-debug")
+retval+=system("./run_tests.sh ../bin/minion-debug")
 
 if retval!=0:
-    sendemail.mail("An error occurred when running test_instances/run-tests.sh for minion-debug")
+    sendemail.mail("An error occurred when running test_instances/run_tests.sh for minion-debug")
     exit(1)
 
+chdir("/home/pn/minion-svn/minion")
 # This sends its own email when a test fails, so no need to. 
 system("mini-scripts/testallconstraints.py --numtests=50 --minion=bin/minion") # just do 50 random tests for each constraint.
 
