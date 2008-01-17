@@ -21,7 +21,7 @@ def mail(txt):
             # Send the message via our own SMTP server, but don't include the
             # envelope header.
             s = smtplib.SMTP("mail.cs.st-and.ac.uk")
-            sendto=["pn@cs.st-and.ac.uk", "ipg@cs.st-and.ac.uk", "chris.jefferson@comlab.ox.ac.uk"]
+            sendto=["pn@cs.st-and.ac.uk", "ipg@cs.st-and.ac.uk", "chris@bubblescope.net"]
             s.sendmail("pn@cs.st-and.ac.uk", sendto, msg.as_string())
             s.close()
             succeeded=True
