@@ -102,8 +102,7 @@ void print_info()
 }
   
 BOOL randomise_valvaroder = false;
-
-TableOut tableout;
+VARDEF(TableOut tableout);
 
 template<typename Reader>
 void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** argv)
@@ -323,39 +322,38 @@ void SolveCSP(Reader& reader, MinionArguments args)
     // should be one for varorder as well.
     tableout.set("MinionVersion", SVN_VER);
     
-if (!Controller::print_only_solution) { print_timestep_store("Parsing Time: ", "ParsingTime", tableout);} 
-  
-  BuildCSP(reader);
-  
-  if (!Controller::print_only_solution) print_timestep_store("Setup Time: ", "SetupTime", tableout);
-  
-  if(randomise_valvaroder)
-  {
-	cout << "Using seed: " << args.random_seed << endl;
-	srand( args.random_seed );
+    maybe_print_timestep_store("Parsing Time: ", "ParsingTime", tableout, !Controller::print_only_solution);
     
-    std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());
-    for(unsigned i = 0; i < var_val_order.second.size(); ++i)
-      var_val_order.second[i] = (rand() % 100) > 50;
+    BuildCSP(reader);
     
-	if(reader.parser_verbose)
-	{
-	  int size = var_val_order.first.size();
-	  if(size != 0)
-	  {
-	    cout << "Var Order: <" << var_val_order.first[0];
-	    for(int i = 1; i < size; ++i)
-	      cout << "," << var_val_order.first[i];
-	    cout << ">" << endl;
+    if(randomise_valvaroder)
+    {
+        cout << "Using seed: " << args.random_seed << endl;
+        srand( args.random_seed );
         
-	    cout << "Val Order: <" << var_val_order.second[0];
-	    for(int i = 1; i < size; ++i)
-	      cout << "," << var_val_order.second[i];
-	    cout << ">" << endl;
-	  }
-	}
-  }
+        std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());
+        for(unsigned i = 0; i < var_val_order.second.size(); ++i)
+          var_val_order.second[i] = (rand() % 100) > 50;
+        
+        if(reader.parser_verbose)
+        {
+          int size = var_val_order.first.size();
+          if(size != 0)
+          {
+            cout << "Var Order: <" << var_val_order.first[0];
+            for(int i = 1; i < size; ++i)
+              cout << "," << var_val_order.first[i];
+            cout << ">" << endl;
+            
+            cout << "Val Order: <" << var_val_order.second[0];
+            for(int i = 1; i < size; ++i)
+              cout << "," << var_val_order.second[i];
+            cout << ">" << endl;
+          }
+        }
+    }
   // Solve!
+  maybe_print_timestep_store("Setup Time: ", "SetupTime", tableout, !Controller::print_only_solution);
   
   long long initial_lit_count = 0;
   
@@ -363,6 +361,7 @@ if (!Controller::print_only_solution) { print_timestep_store("Parsing Time: ", "
     initial_lit_count = lit_count(var_val_order.first);
   
   Controller::initalise_search();
+  
   if(!Controller::failed)
   {
 	if(args.preprocess != MinionArguments::None)
@@ -385,12 +384,17 @@ if (!Controller::print_only_solution) { print_timestep_store("Parsing Time: ", "
 		cout << "Preprocess 2 Time: " << (clock() - start_SAC_time) / (1.0 * CLOCKS_PER_SEC) << endl;
 		cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;
 	  }
-	}  
+	}
+    maybe_print_timestep_store("First node time: ", "FirstNodeTime", tableout, !Controller::print_only_solution);
 	if(!Controller::failed)
-      solve(args.order, var_val_order);
+        solve(args.order, var_val_order);   // add a maybe_print_timestep_store to search..
+  }
+  else
+  {
+      maybe_print_timestep_store("First node time: ", "FirstNodeTime", tableout, !Controller::print_only_solution);
   }
   
-  print_finaltimestep_store("Solve Time: ", "SolveTime", tableout);
+  maybe_print_finaltimestep_store("Solve Time: ", "SolveTime", tableout, !Controller::print_only_solution);
   cout << "Total Nodes: " << nodes << endl;
   cout << "Problem solvable?: " 
 	<< (Controller::solutions == 0 ? "no" : "yes") << endl;

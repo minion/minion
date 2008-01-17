@@ -53,6 +53,8 @@
 VARDEF_ASSIGN(void* memory_base_ptr, NULL);
 #endif
 
+extern TableOut tableout;
+
 /// A pointer to some backtrackable memory.
 class BackTrackOffset
 {
@@ -201,6 +203,7 @@ struct BacktrackableMemory
     offsets.clear();
     virtual_ptrs.clear();
     cout << "Bytes used in Backtrackable Memory = " << allocated_bytes << endl;
+    tableout.set("BacktrackableMemoryBytes", allocated_bytes);
   }
   
   void lock()

@@ -79,7 +79,18 @@ struct ElementConstraint : public Constraint
       {
 		DomainInt assigned_val = var_array[prop_val].getAssignedValue();
 		if(!result_var.inDomain(assigned_val))
-		  index_ref.removeFromDomain(prop_val);
+        {
+            if(index_ref.isBound())
+            {
+                if(prop_val==index_ref.getMax()) index_ref.setMax(prop_val-1);
+                if(prop_val==index_ref.getMin()) index_ref.setMin(prop_val+1);
+            }
+            else
+            {
+                index_ref.removeFromDomain(prop_val);
+            }
+        }
+        
       }
       else
       {
@@ -89,7 +100,17 @@ struct ElementConstraint : public Constraint
 		for(int i = 0; i < array_size; ++i)
 		{
 		  if(!var_array[i].inDomain(assigned_val))
-			index_ref.removeFromDomain(i);
+          {
+              if(index_ref.isBound())
+                {
+                    if(i==index_ref.getMax()) index_ref.setMax(i-1);
+                    if(i==index_ref.getMin()) index_ref.setMin(i+1);
+                }
+                else
+                {
+                    index_ref.removeFromDomain(i);
+                }
+          }
 		}
       }
     }
@@ -111,7 +132,7 @@ struct ElementConstraint : public Constraint
       var_array[index].setMin(val_min);
       result_var.setMax(val_max);
       var_array[index].setMax(val_max);
-    }  
+    }
     
     int array_size = var_array.size();
 	// Constrain the index variable to have only indices in range.
@@ -128,12 +149,35 @@ struct ElementConstraint : public Constraint
     // Should use the new iterators here. Check each value of result_var to see 
     // if it's in one of var_array. 
     // Only done at root, so who cares that it takes a while?
-    for(DomainInt i=result_var.getMin(); i<=result_var.getMax(); i++)
+    if(!result_var.isBound())
     {
-        if(result_var.inDomain(i))
+        for(DomainInt i=result_var.getMin(); i<=result_var.getMax(); i++)
+        {
+            if(result_var.inDomain(i))
+            {
+                BOOL supported=false;
+                for(DomainInt j=index_ref.getMin(); j<=index_ref.getMax(); j++)
+                {
+                    if(var_array[j].inDomain(i))
+                    {
+                        supported=true;
+                        break;
+                    }
+                }
+                if(!supported)
+                {
+                    result_var.removeFromDomain(i);
+                }
+            }
+        }
+    }
+    else
+    {// result_var is a bound variable
+        // iterate up from the minimum
+        for(DomainInt i=result_var.getMin(); i<=result_var.getMax(); i++)
         {
             BOOL supported=false;
-            for(int j=0; j<array_size; j++)
+            for(DomainInt j=index_ref.getMin(); j<=index_ref.getMax(); j++)
             {
                 if(var_array[j].inDomain(i))
                 {
@@ -142,7 +186,30 @@ struct ElementConstraint : public Constraint
                 }
             }
             if(!supported)
-                result_var.removeFromDomain(i);
+            {
+                result_var.setMin(i+1);
+            }
+            else
+                break;
+        }
+        // now iterate down from the top.
+        for(DomainInt i=result_var.getMax(); i>=result_var.getMin(); i--)
+        {
+            BOOL supported=false;
+            for(DomainInt j=index_ref.getMin(); j<=index_ref.getMax(); j++)
+            {
+                if(var_array[j].inDomain(i))
+                {
+                    supported=true;
+                    break;
+                }
+            }
+            if(!supported)
+            {
+                result_var.setMax(i-1);
+            }
+            else
+                break;
         }
     }
     if(Controller::failed) return;
@@ -152,8 +219,18 @@ struct ElementConstraint : public Constraint
 	  if(var_array[i].isAssigned())
 	  {
 		DomainInt assigned_val = var_array[i].getAssignedValue();
-		if(!result_var.inDomain(assigned_val)) 
-		  index_ref.removeFromDomain(i);
+		if(!result_var.inDomain(assigned_val))
+        {
+            if(index_ref.isBound())
+            {
+                if(i==index_ref.getMax()) index_ref.setMax(i-1);
+                if(i==index_ref.getMin()) index_ref.setMin(i+1);
+            }
+            else
+            {
+                index_ref.removeFromDomain(i);
+            }
+        }
 	  }
 	}
 	
@@ -163,7 +240,17 @@ struct ElementConstraint : public Constraint
       for(int i = 0; i < array_size; ++i)
       {
         if(!var_array[i].inDomain(assigned_val))
-          index_ref.removeFromDomain(i); 
+        {
+            if(index_ref.isBound())
+            {
+                if(i==index_ref.getMax()) index_ref.setMax(i-1);
+                if(i==index_ref.getMin()) index_ref.setMin(i+1);
+            }
+            else
+            {
+                index_ref.removeFromDomain(i);
+            }
+        }
       }
     }
   }
