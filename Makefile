@@ -64,6 +64,7 @@ all: minion generate
 
 minion/svn_header.h: .DUMMY
 	mini-scripts/get_svn_version.sh minion/svn_header.h
+	
 minion/help/help.cpp: .DUMMY
 	bash minion/help/genhelp.sh minion/ > minion/help/help.cpp
 	
@@ -114,7 +115,7 @@ veryclean:
 	rm -rf bin/*
 
 # Make sure these things get constructed before doing a make depend.
-depend: minion/svn_header.h minion/help/help.cpp
+depend: minion/svn_header.h
 	mini-scripts/make_depend.sh
 
 .DUMMY:
