@@ -69,7 +69,8 @@ enum ReadTypes
   read_2_vars,
   read_constant,
   read_constant_list,
-  read_tuples
+  read_tuples,
+  read_nothing
 };
 
 enum ConstraintTriggerType
