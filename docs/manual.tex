@@ -417,7 +417,7 @@ Here are some important notes concerning modelling in the input format.
   name \texttt{v2}.  
   \item[Constraint order] the order in which constraints are stated does not matter
   \item[Printing variables] the expression to be printed in the \texttt{print} statement
-  has to be a defined 1- or 2-dimensional matrix.    
+  has to be a defined 1- or 2-dimensional matrix, or all variables.
   \item[Constants] a variable can always be substitued by a constant (in constraints)
   \item[Variable orders] when applying a variable order, the variables defined in the
   \textit{variableOrder} will be put under the order  that was imposed in the
@@ -518,8 +518,10 @@ variable name as described above.
                             &     & \texttt{maximising} \textit{Variable} \\
 
 \textit{PrintExpression} & ::= & \texttt{none} $\mid$ \\
+						 &     & \texttt{all}  $\mid$ \\
                          &     & \textit{Defined1DimensionalMatrixName} $\mid$ \\
                          &     & \textit{Defined2DimensionalMatrixName}  \\
+                         
 
 \textit{ConstantList}  & ::= & constant $\mid$\\
                        &     & \textit{ConstantList} \texttt{,} constant \\     
@@ -767,9 +769,9 @@ The following changes have been made since the last version:
    %allDifferent, diseq, occurence, weightedsumleq, weightedsumgeq, sumleq, sumgeq
 
   \item \textbf{Reification using \texttt{reify}} \\
-    There are problems with the reification of the constraints: 
-    diseq, element, gacelement, ineq, max, min, occurence, product
-
+    Reification has not been implemented for the follow constraints:
+    diseq, element, gacelement, ineq, max, min, occurence, product. If you would
+    like to be able to reify any of these constraints, please e-mail us.
 \end{enumerate}
 
 %\subsection*{Known Bugs}
