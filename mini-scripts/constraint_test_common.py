@@ -369,7 +369,7 @@ class testmodulo:
     def runtest(self, reify=False, reifyimply=False):
         return runtestgeneral("modulo", True, reify, reifyimply, [3], ["posnum"], [1,1,1], self, False)
 
-class testgacelement:
+class testgacelement__minus__deprecated:
     def printtable(self, domains): 
         out=[]
         # given a list of lists for the domains, generate the table for gacelement 
@@ -387,7 +387,7 @@ class testgacelement:
         return out
     
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("gacelement", False, reify, reifyimply, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, True)
+        return runtestgeneral("gacelement-deprecated", False, reify, reifyimply, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, True)
 
 class testwatchelement(testgacelement):
     def runtest(self, reify=False, reifyimply=False):

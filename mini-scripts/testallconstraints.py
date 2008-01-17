@@ -19,7 +19,7 @@ if len(other)>1:
 conslist=["alldiff", "reifyalldiff",  "reifyimplyalldiff", "alldiffgacslow", "reifyalldiffgacslow", "reifyimplyalldiffgacslow"]
 
 #element constraints
-conslist+=["gacelement", "reifyimplygacelement", "element", "reifyimplyelement", "watchelement"]
+conslist+=["gacelement-deprecated", "reifyimplygacelement", "element", "reifyimplyelement", "watchelement"]
 
 #non-reifiable arithmetic constraints
 conslist+=["modulo", "pow", "minuseq", "watchsumleq", "watchsumgeq", "watchvecneq"]
@@ -55,6 +55,7 @@ for consname1 in conslist:
     if consname[0:5]=="reify":
         reify=True
         consname=consname[5:]
+    consname=consname.replace("-", "__minus__")
     
     testobj=eval("test"+consname+"()")
     testobj.solver=minionbin

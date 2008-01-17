@@ -35,6 +35,7 @@ if consname[0:5]=="reify":
     reify=True
     consname=consname[5:]
 
+consname=consname.replace("-", "__minus__")
 testobj=eval("test"+consname+"()")
 testobj.solver=minionbin
 for testnum in range(numtests):
