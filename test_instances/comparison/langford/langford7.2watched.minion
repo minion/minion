@@ -1,0 +1,43 @@
+MINION 1
+# Langford's problem : L(7,2)
+0 0 0
+28
+1 7 14
+0 14 14
+0
+[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27]
+[a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+0
+1
+[[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27]]
+0
+objective none
+print m0
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x14,1)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x15,1)
+sumleq([x14, 2], x15)
+sumgeq([x14, 2], x15)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x16,2)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x17,2)
+sumleq([x16, 3], x17)
+sumgeq([x16, 3], x17)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x18,3)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x19,3)
+sumleq([x18, 4], x19)
+sumgeq([x18, 4], x19)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x20,4)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x21,4)
+sumleq([x20, 5], x21)
+sumgeq([x20, 5], x21)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x22,5)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x23,5)
+sumleq([x22, 6], x23)
+sumgeq([x22, 6], x23)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x24,6)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x25,6)
+sumleq([x24, 7], x25)
+sumgeq([x24, 7], x25)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x26,7)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13],x27,7)
+sumleq([x26, 8], x27)
+sumgeq([x26, 8], x27)

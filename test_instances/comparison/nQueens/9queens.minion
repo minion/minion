@@ -1,0 +1,73 @@
+MINION 1
+# 9 n queen test, model by JFP
+0 0 0
+27
+0 8 9
+0 8 1
+-1 7 1
+-2 6 1
+-3 5 1
+-4 4 1
+-5 3 1
+-6 2 1
+-7 1 1
+-8 0 1
+0 8 1
+1 9 1
+2 10 1
+3 11 1
+4 12 1
+5 13 1
+6 14 1
+7 15 1
+8 16 1
+0
+[x0,x2,x4,x6,x8,x1,x3,x5,x7]
+[a,a,a,a,a,a,a,a,a]
+0
+3
+[[x0,x1,x2,x3,x4,x5,x6,x7,x8]]
+[[x9,x10,x11,x12,x13,x14,x15,x16,x17]]
+[[x18,x19,x20,x21,x22,x23,x24,x25,x26]]
+0
+objective none
+print m0
+alldiff(m0)
+alldiff(m1)
+alldiff(m2)
+ineq(x0,x9,0)
+ineq(x9,x0,0)
+ineq(x0,x18,0)
+ineq(x18,x0,0)
+ineq(x1,x10,1)
+ineq(x10,x1,-1)
+ineq(x1,x19,-1)
+ineq(x19,x1,1)
+ineq(x2,x11,2)
+ineq(x11,x2,-2)
+ineq(x2,x20,-2)
+ineq(x20,x2,2)
+ineq(x3,x12,3)
+ineq(x12,x3,-3)
+ineq(x3,x21,-3)
+ineq(x21,x3,3)
+ineq(x4,x13,4)
+ineq(x13,x4,-4)
+ineq(x4,x22,-4)
+ineq(x22,x4,4)
+ineq(x5,x14,5)
+ineq(x14,x5,-5)
+ineq(x5,x23,-5)
+ineq(x23,x5,5)
+ineq(x6,x15,6)
+ineq(x15,x6,-6)
+ineq(x6,x24,-6)
+ineq(x24,x6,6)
+ineq(x7,x16,7)
+ineq(x16,x7,-7)
+ineq(x7,x25,-7)
+ineq(x25,x7,7)
+ineq(x8,x17,8)
+ineq(x17,x8,-8)
+ineq(x8,x26,-8)
+ineq(x26,x8,8)

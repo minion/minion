@@ -1,0 +1,47 @@
+MINION 1
+# Langford's problem : L(8,2)
+0 0 0
+32
+1 8 16
+0 16 16
+0
+[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31]
+[a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+0
+1
+[[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31]]
+0
+objective none
+print m0
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x16,1)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x17,1)
+sumleq([x16, 2], x17)
+sumgeq([x16, 2], x17)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x18,2)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x19,2)
+sumleq([x18, 3], x19)
+sumgeq([x18, 3], x19)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x20,3)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x21,3)
+sumleq([x20, 4], x21)
+sumgeq([x20, 4], x21)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x22,4)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x23,4)
+sumleq([x22, 5], x23)
+sumgeq([x22, 5], x23)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x24,5)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x25,5)
+sumleq([x24, 6], x25)
+sumgeq([x24, 6], x25)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x26,6)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x27,6)
+sumleq([x26, 7], x27)
+sumgeq([x26, 7], x27)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x28,7)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x29,7)
+sumleq([x28, 8], x29)
+sumgeq([x28, 8], x29)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x30,8)
+element([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15],x31,8)
+sumleq([x30, 9], x31)
+sumgeq([x30, 9], x31)

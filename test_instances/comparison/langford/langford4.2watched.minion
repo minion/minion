@@ -1,0 +1,31 @@
+MINION 1
+# Langford's problem : L(4,2)
+0 0 0
+16
+1 4 8
+0 8 8
+0
+[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15]
+[a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+0
+1
+[[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15]]
+0
+objective none
+print m0
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7],x8,1)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7],x9,1)
+sumleq([x8, 2], x9)
+sumgeq([x8, 2], x9)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7],x10,2)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7],x11,2)
+sumleq([x10, 3], x11)
+sumgeq([x10, 3], x11)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7],x12,3)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7],x13,3)
+sumleq([x12, 4], x13)
+sumgeq([x12, 4], x13)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7],x14,4)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7],x15,4)
+sumleq([x14, 5], x15)
+sumgeq([x14, 5], x15)

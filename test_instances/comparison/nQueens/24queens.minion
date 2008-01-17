@@ -1,0 +1,163 @@
+MINION 1
+# 24 n queen test, model by JFP
+0 0 0
+72
+0 23 24
+0 23 1
+-1 22 1
+-2 21 1
+-3 20 1
+-4 19 1
+-5 18 1
+-6 17 1
+-7 16 1
+-8 15 1
+-9 14 1
+-10 13 1
+-11 12 1
+-12 11 1
+-13 10 1
+-14 9 1
+-15 8 1
+-16 7 1
+-17 6 1
+-18 5 1
+-19 4 1
+-20 3 1
+-21 2 1
+-22 1 1
+-23 0 1
+0 23 1
+1 24 1
+2 25 1
+3 26 1
+4 27 1
+5 28 1
+6 29 1
+7 30 1
+8 31 1
+9 32 1
+10 33 1
+11 34 1
+12 35 1
+13 36 1
+14 37 1
+15 38 1
+16 39 1
+17 40 1
+18 41 1
+19 42 1
+20 43 1
+21 44 1
+22 45 1
+23 46 1
+0
+[]
+[]
+0
+3
+[[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23]]
+[[x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47]]
+[[x48,x49,x50,x51,x52,x53,x54,x55,x56,x57,x58,x59,x60,x61,x62,x63,x64,x65,x66,x67,x68,x69,x70,x71]]
+0
+objective none
+print m0
+alldiff(m0)
+alldiff(m1)
+alldiff(m2)
+ineq(x0,x24,0)
+ineq(x24,x0,0)
+ineq(x0,x48,0)
+ineq(x48,x0,0)
+ineq(x1,x25,1)
+ineq(x25,x1,-1)
+ineq(x1,x49,-1)
+ineq(x49,x1,1)
+ineq(x2,x26,2)
+ineq(x26,x2,-2)
+ineq(x2,x50,-2)
+ineq(x50,x2,2)
+ineq(x3,x27,3)
+ineq(x27,x3,-3)
+ineq(x3,x51,-3)
+ineq(x51,x3,3)
+ineq(x4,x28,4)
+ineq(x28,x4,-4)
+ineq(x4,x52,-4)
+ineq(x52,x4,4)
+ineq(x5,x29,5)
+ineq(x29,x5,-5)
+ineq(x5,x53,-5)
+ineq(x53,x5,5)
+ineq(x6,x30,6)
+ineq(x30,x6,-6)
+ineq(x6,x54,-6)
+ineq(x54,x6,6)
+ineq(x7,x31,7)
+ineq(x31,x7,-7)
+ineq(x7,x55,-7)
+ineq(x55,x7,7)
+ineq(x8,x32,8)
+ineq(x32,x8,-8)
+ineq(x8,x56,-8)
+ineq(x56,x8,8)
+ineq(x9,x33,9)
+ineq(x33,x9,-9)
+ineq(x9,x57,-9)
+ineq(x57,x9,9)
+ineq(x10,x34,10)
+ineq(x34,x10,-10)
+ineq(x10,x58,-10)
+ineq(x58,x10,10)
+ineq(x11,x35,11)
+ineq(x35,x11,-11)
+ineq(x11,x59,-11)
+ineq(x59,x11,11)
+ineq(x12,x36,12)
+ineq(x36,x12,-12)
+ineq(x12,x60,-12)
+ineq(x60,x12,12)
+ineq(x13,x37,13)
+ineq(x37,x13,-13)
+ineq(x13,x61,-13)
+ineq(x61,x13,13)
+ineq(x14,x38,14)
+ineq(x38,x14,-14)
+ineq(x14,x62,-14)
+ineq(x62,x14,14)
+ineq(x15,x39,15)
+ineq(x39,x15,-15)
+ineq(x15,x63,-15)
+ineq(x63,x15,15)
+ineq(x16,x40,16)
+ineq(x40,x16,-16)
+ineq(x16,x64,-16)
+ineq(x64,x16,16)
+ineq(x17,x41,17)
+ineq(x41,x17,-17)
+ineq(x17,x65,-17)
+ineq(x65,x17,17)
+ineq(x18,x42,18)
+ineq(x42,x18,-18)
+ineq(x18,x66,-18)
+ineq(x66,x18,18)
+ineq(x19,x43,19)
+ineq(x43,x19,-19)
+ineq(x19,x67,-19)
+ineq(x67,x19,19)
+ineq(x20,x44,20)
+ineq(x44,x20,-20)
+ineq(x20,x68,-20)
+ineq(x68,x20,20)
+ineq(x21,x45,21)
+ineq(x45,x21,-21)
+ineq(x21,x69,-21)
+ineq(x69,x21,21)
+ineq(x22,x46,22)
+ineq(x46,x22,-22)
+ineq(x22,x70,-22)
+ineq(x70,x22,22)
+ineq(x23,x47,23)
+ineq(x47,x23,-23)
+ineq(x23,x71,-23)
+ineq(x71,x23,23)
