@@ -61,7 +61,7 @@ table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})
 */
 
 /** @help constraints;table References
-help tuplelists
+help input tuplelist
 */
 
 template<typename VarArray>

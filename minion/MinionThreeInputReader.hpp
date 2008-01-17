@@ -13,6 +13,153 @@
 // Plan here is to generate an instance of a problem (or whatever you have)
 // and return that.
 
+/** @help input Description
+
+Minion expects to be provided with the name of an input file as an
+argument. This file contains a specification of the CSP to be solved
+as well as settings that the search process should use.
+
+The format is
+
+Minion3Input::= MINION 3
+                <InputSection>+
+                **EOF**
+
+InputSection::= <VariablesSection> 
+              | <SearchSection>
+              | <ConstraintsSection> 
+              | <TuplelistSection>
+
+i.e. 'MINION 3' followed by any number of variable, search,
+constraints and tuplelists sections (can repeat) followed by
+'**EOF**', the end of file marker.
+
+All text from a '#' character to the end of the line is ignored.
+
+See the associated help entries below for information on each section.
+*/
+
+/** @help input;variables Description
+The variables section consists of any number of variable declarations
+on separate lines.
+
+VariablesSection::= **VARIABLES**
+                    <VarDeclaration>*
+*/
+
+/** @help input;variables Example
+ **VARIABLES**
+
+BOOL bool                          #boolean var
+BOUND b {1..3}                     #bounds var
+SPARSEBOUND myvar {1,3,4,6,7,9,11} #sparse bounds var
+DISCRETE d[3] {1..3}               #array of discrete vars
+*/
+
+/** @help input;variables References
+See the help section
+
+   help variables
+
+for detailed information on variable declarations.
+*/
+
+/** @help input;constraints Description 
+
+The constraints section consists of any number of constraint
+declarations on separate lines.
+
+ConstraintsSection::= **CONSTRAINTS**
+                      <ConstraintDeclaration>*
+*/
+
+/** @help input;constraints Example
+**CONSTRAINTS**
+eq(bool,0)
+alldiff(d)
+*/
+
+/** @help input;constraints References
+See help entries for individual constraints under
+
+   help constraints
+
+for details on constraint declarations.
+*/
+
+/** @help input;tuplelist Description
+In a tuplelist section lists of allowed tuples for table constraints
+can be specified. This technique is preferable to specifying the
+tuples in the constraint declaration, since the tuplelists can be
+shared between constraints and named for readability.
+
+The required format is
+
+TuplelistSection::= **TUPLELIST**
+                    <Tuplelist>*
+
+Tuplelist::= <name> <num_tuples> <tuple_length> <numbers>+
+*/
+
+/** @help input;tuplelist Example
+**TUPLELIST**
+AtMostOne 4 3
+0 0 0
+0 0 1
+0 1 0
+1 0 0
+*/
+
+/** @help input;tuplelist References
+help constraints table
+*/
+
+/** @help input;search Description 
+
+Inside the search section one can specify
+
+- variable orderings, 
+- value orderings,
+- optimisation function, and
+- details of how to print out solutions.
+
+SearchSection::= <VariableOrdering>?
+                 <ValueOrdering>?
+                 <OptimisationFn>?
+                 <PrintFormat>?
+
+In the variable ordering a fixed ordering can be specified on any
+subset of variables. These are the search variables that will be
+instantiated in every solution. If none is specified some other fixed
+ordering of all the variables will be used.
+
+   VariableOrdering::= VARORDER[ <varname>+ ]
+
+The value ordering allows the user to specify an instantiation order
+for the variables involved in the variable order, either ascending (a)
+or descending (d) for each. When no value ordering is specified, the
+default is to use ascending order for every search variable.
+
+   ValueOrdering::= VALORDER[ (a|d)+ ]
+
+To model an optimisation problem the user can specify to minimise
+or maximise a variable's value.
+
+   OptimisationFn::= MAXIMISING <varname>
+                   | MINIMISING <varname>
+
+Finally, the user can control some aspects of the way solutions are
+printed. By default (no PrintFormat specified) all the variables are
+printed in declaration order. Alternatively a custom vector, or ALL
+variables, or no (NONE) variables can be printed. If a matrix or, more
+generally, a tensor is given instead of a vector, it is automatically
+flattened into a vector as described in 'help variables vectors'.
+
+   PrintFormat::= PRINT <vector>
+                | PRINT ALL
+                | PRINT NONE
+*/
+
 #include <string>
 #include "system/system.h"
 

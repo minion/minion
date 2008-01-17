@@ -37,15 +37,8 @@ using namespace ProbSpec;
 #include "system/defined_macros.h"
 
 /** @help switches Description 
-Minion supports a number of switches to augment default behaviour.
-
-These can generally be combined arbitrarily. To use them type the name
-of your minion executable, followed by a space, followed by your chosen
-switches separated by spaces, followed by the input file's name, e.g.
-
-   minion -fullprop -quiet myinput.minion
-
-To see more information on any switch, use the help system. The list
+Minion supports a number of switches to augment default behaviour.  To
+see more information on any switch, use the help system. The list
 below contains all available switches. For example to see help on
 -quiet type something similar to
 
