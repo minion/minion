@@ -705,7 +705,7 @@ void MinionInputReader::readVars(InputFileReader* infile) {
 	count = infile->read_num();
 	if(parser_verbose)
       cout << count << " of " << lb << ", " << ub << endl ;
-    var_obj.bound.push_back(make_pair(count, ProbSpec::Bounds(lb, ub)));
+    var_obj.bound.push_back(make_pair(count, Bounds(lb, ub)));
     noOfVarType -= count ;
   }
   
@@ -748,7 +748,7 @@ void MinionInputReader::readVars(InputFileReader* infile) {
 	  throw parse_exception("Lower bound must be less than upper bound!");
 	if(parser_verbose)
       cout << count << " of " << lb << ", " << ub << endl ;
-    var_obj.discrete.push_back(make_pair(count, ProbSpec::Bounds(lb, ub)));
+    var_obj.discrete.push_back(make_pair(count, Bounds(lb, ub)));
     // **** Construct this many discrete bounds vars.
     noOfVarType -= count ;
   }
