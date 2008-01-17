@@ -314,13 +314,14 @@ void SolveCSP(Reader& reader, MinionArguments args)
     // Copy args into tableout
     tableout.set("RandomSeed", to_string(args.random_seed));
     {   char * b;
-        if(args.preprocess == MinionArguments::None) b="None";
+        if(args.preprocess == MinionArguments::None) b="None";  // All this junk is because of C++'s lousy enums.
         if(args.preprocess == MinionArguments::SAC) b="SAC";
         if(args.preprocess == MinionArguments::SSAC) b="SSAC";
         if(args.preprocess == MinionArguments::SACBounds) b="SACBounds";
         if(args.preprocess == MinionArguments::SSACBounds) b="SSACBounds";
         tableout.set("Preprocess", string(b));}
     // should be one for varorder as well.
+    tableout.set("MinionVersion", SVN_VER);
     
 if (!Controller::print_only_solution) { print_timestep_store("Parsing Time: ", "ParsingTime", tableout);} 
   
