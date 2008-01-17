@@ -26,7 +26,7 @@
 
 
 
-// VarToCount = 1 means leq, = 0 means geq.
+
 template<typename VarArray>
 struct BoolSATConstraintDynamic : public DynamicConstraint
 {
