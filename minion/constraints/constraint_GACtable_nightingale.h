@@ -502,7 +502,7 @@ struct GACTableConstraint : public DynamicConstraint
 	// cout << endl; cout << "  fp: finished finding supports: " << endl ;
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     for(unsigned i = 0; i < (nightingale->tuples)->size(); ++i)
 	{

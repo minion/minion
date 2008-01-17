@@ -46,46 +46,46 @@ struct VarNeg
   BOOL isAssigned()
   { return data.isAssigned(); }
   
-  int getAssignedValue()
-  { return -(int)data.getAssignedValue(); }
+  DomainInt getAssignedValue()
+  { return -data.getAssignedValue(); }
   
-  BOOL isAssignedValue(int i)
+  BOOL isAssignedValue(DomainInt i)
   { 
     return data.isAssigned() &&
     data.getAssignedValue() == -i;
   }
   
-  BOOL inDomain(int b)
+  BOOL inDomain(DomainInt b)
   { return data.inDomain(-b); }
 
-  BOOL inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(DomainInt b)
   { return data.inDomain(-b); }
   
-  int getMax()
-  { return -(int)data.getMin(); }
+  DomainInt getMax()
+  { return -data.getMin(); }
   
-  int getMin()
-  { return -(int)data.getMax(); }
+  DomainInt getMin()
+  { return -data.getMax(); }
 
-  int getInitialMax() const
-  { return -(int)data.getInitialMin(); }
+  DomainInt getInitialMax() const
+  { return -data.getInitialMin(); }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { return -data.getInitialMax(); }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { data.setMin(-i); }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { data.setMax(-i); }
   
-  void uncheckedAssign(int b)
+  void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(-b); }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   { data.propogateAssign(-b); }
   
-  void removeFromDomain(int b)
+  void removeFromDomain(DomainInt b)
   { data.removeFromDomain(-b); }
   
   /// There isn't a minus sign here as domain changes from both the top and bottom of the domain are positive numbers.
@@ -112,7 +112,7 @@ struct VarNeg
   { return "Neg:" + string(data); }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  data.addDynamicTrigger(t, type, pos); }
 #endif
 };

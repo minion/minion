@@ -118,7 +118,7 @@ struct ReifiedEqualConstraint : public Constraint
     }
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == 3);
     D_ASSERT(v[2] == 0 || v[2] == 1);
@@ -188,7 +188,7 @@ struct EqualConstraint : public Constraint
   }
   
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == 2);
     return (v[0] == v[1]);

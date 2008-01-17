@@ -60,14 +60,14 @@ struct ElementConstraint : public Constraint
 	PROP_INFO_ADDONE(NonGACElement);
     if(index_ref.isAssigned())
     {
-      int index = index_ref.getAssignedValue();
+      int index = checked_cast<int>(index_ref.getAssignedValue());
 	  if(index < 0 || index >= (int)var_array.size())
 	  {
 	    Controller::fail();
 		return;
 	  }
-	  int val_min = max(result_var.getMin(), var_array[index].getMin());
-	  int val_max = min(result_var.getMax(), var_array[index].getMax());
+	  DomainInt val_min = max(result_var.getMin(), var_array[index].getMin());
+	  DomainInt val_max = min(result_var.getMax(), var_array[index].getMax());
 	  result_var.setMin(val_min);
 	  var_array[index].setMin(val_min);
 	  result_var.setMax(val_max);
@@ -77,14 +77,14 @@ struct ElementConstraint : public Constraint
     {
       if(prop_val>=0)
       {
-		int assigned_val = var_array[prop_val].getAssignedValue();
+		DomainInt assigned_val = var_array[prop_val].getAssignedValue();
 		if(!result_var.inDomain(assigned_val))
 		  index_ref.removeFromDomain(prop_val);
       }
       else
       {
 		D_ASSERT(prop_val == -2);
-		int assigned_val = result_var.getAssignedValue();
+		DomainInt assigned_val = result_var.getAssignedValue();
 		int array_size = var_array.size();
 		for(int i = 0; i < array_size; ++i)
 		{
@@ -99,14 +99,14 @@ struct ElementConstraint : public Constraint
   {
     if(index_ref.isAssigned())
     {
-      int index = index_ref.getAssignedValue();
+      int index = checked_cast<int>(index_ref.getAssignedValue());
 	  if(index < 0 || index >= (int)var_array.size())
 	  {
 	    Controller::fail();
 		return;
 	  }
-      int val_min = max(result_var.getMin(), var_array[index].getMin());
-      int val_max = min(result_var.getMax(), var_array[index].getMax());
+      DomainInt val_min = max(result_var.getMin(), var_array[index].getMin());
+      DomainInt val_max = min(result_var.getMax(), var_array[index].getMax());
       result_var.setMin(val_min);
       var_array[index].setMin(val_min);
       result_var.setMax(val_max);
@@ -122,7 +122,7 @@ struct ElementConstraint : public Constraint
 	{
 	  if(var_array[i].isAssigned())
 	  {
-		int assigned_val = var_array[i].getAssignedValue();
+		DomainInt assigned_val = var_array[i].getAssignedValue();
 		if(!result_var.inDomain(assigned_val)) 
 		  index_ref.removeFromDomain(i);
 	  }
@@ -130,7 +130,7 @@ struct ElementConstraint : public Constraint
 	
     if(result_var.isAssigned())
     {
-      int assigned_val = result_var.getAssignedValue();
+      DomainInt assigned_val = result_var.getAssignedValue();
       for(int i = 0; i < array_size; ++i)
       {
         if(!var_array[i].inDomain(assigned_val))
@@ -139,12 +139,12 @@ struct ElementConstraint : public Constraint
     }
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     int length = v.size();
     if(v[length-2] < 0 || v[length-2] > length - 3)
 	  return false;
-    return v[v[length-2]] == v[length-1];
+    return v[checked_cast<int>(v[length-2])] == v[length-1];
   }
   
   virtual vector<AnyVarRef> get_vars()

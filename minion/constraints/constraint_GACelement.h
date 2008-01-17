@@ -35,8 +35,8 @@ struct GACElementConstraint : public Constraint
   VarArray var_array;
   IndexRef indexvar;
   VarRef resultvar;
-  int var_array_min_val;
-  int var_array_max_val;
+  DomainInt var_array_min_val;
+  DomainInt var_array_max_val;
   GACElementConstraint(const VarArray& _var_array, const IndexRef& _indexvar, const VarRef& _resultvar) :
     var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar)
   { }
@@ -46,8 +46,8 @@ struct GACElementConstraint : public Constraint
     D_INFO(2,DI_GACELEMENT,"Setting up Constraint");
     triggerCollection t;
     int array_size = var_array.size();
-	int min_val = var_array[0].getInitialMin();
-	int max_val = var_array[0].getInitialMax();
+	DomainInt min_val = var_array[0].getInitialMin();
+	DomainInt max_val = var_array[0].getInitialMax();
 	for(int i = 1; i < array_size; ++i)
 	{
 	  min_val = min(min_val, var_array[i].getInitialMin());
@@ -57,7 +57,7 @@ struct GACElementConstraint : public Constraint
 	var_array_min_val = min_val;
 	var_array_max_val = max_val;
 	
-	int domain_size = var_array_max_val - var_array_min_val + 1;
+	DomainInt domain_size = var_array_max_val - var_array_min_val + 1;
 	for(int i = 0; i < array_size; ++i)
 	{
 	  t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
@@ -73,7 +73,7 @@ struct GACElementConstraint : public Constraint
   
   void index_assigned()
   {
-    int index = indexvar.getAssignedValue();
+    int index = checked_cast<int>(indexvar.getAssignedValue());
 	int array_size = var_array.size();
 	
 	if(index < 0 || index >= array_size)
@@ -85,17 +85,17 @@ struct GACElementConstraint : public Constraint
 	var_array[index].setMin(resultvar.getMin());
 	var_array[index].setMax(resultvar.getMax());
 	
-	int min_val = max(var_array[index].getMin(), resultvar.getMin());
-	int max_val = min(var_array[index].getMax(), resultvar.getMax());
+	DomainInt min_val = max(var_array[index].getMin(), resultvar.getMin());
+	DomainInt max_val = min(var_array[index].getMax(), resultvar.getMax());
 	
-	for(int i = min_val; i <= max_val; ++i)
+	for(DomainInt i = min_val; i <= max_val; ++i)
 	{
 	  if(!resultvar.inDomain(i))
 	    var_array[index].removeFromDomain(i);
 	}
   }
   
-  BOOL support_for_val_in_result(int val)
+  BOOL support_for_val_in_result(DomainInt val)
   {
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
@@ -106,11 +106,12 @@ struct GACElementConstraint : public Constraint
     return false;
   }
   
-  BOOL support_for_val_in_index(int index)
+  BOOL support_for_val_in_index(DomainInt dom_index)
   {
-    int min_val = max(var_array[index].getMin(), resultvar.getMin());
-	int max_val = min(var_array[index].getMax(), resultvar.getMax());
-	for(int i = min_val; i <= max_val; ++i)
+	int index = checked_cast<int>(dom_index);
+    DomainInt min_val = max(var_array[index].getMin(), resultvar.getMin());
+	DomainInt max_val = min(var_array[index].getMax(), resultvar.getMax());
+	for(DomainInt i = min_val; i <= max_val; ++i)
 	{
 	  if(var_array[index].inDomain(i) && resultvar.inDomain(i))
 	    return true;
@@ -122,7 +123,7 @@ struct GACElementConstraint : public Constraint
   {
 	PROP_INFO_ADDONE(GACElement);
     int array_size = var_array.size();
-	int domain_size = (var_array_max_val - var_array_min_val + 1);
+	DomainInt domain_size = (var_array_max_val - var_array_min_val + 1);
 	
 	if(indexvar.isAssigned())
 	{ index_assigned(); }
@@ -137,9 +138,9 @@ struct GACElementConstraint : public Constraint
 	  
 	  VarRef& var = var_array[prop_val];
 	  
-	  int min_val = var.getMin();
-	  int max_val = var.getMax();
-	  for(int val = min_val; val <= max_val; ++val)
+	  DomainInt min_val = var.getMin();
+	  DomainInt max_val = var.getMax();
+	  for(DomainInt val = min_val; val <= max_val; ++val)
 	  {
 	    if(!var.inDomain(val) && resultvar.inDomain(val) &&
 		   !support_for_val_in_result(val))
@@ -154,7 +155,7 @@ struct GACElementConstraint : public Constraint
 	if(prop_val == array_size)
 	{ // Value got removed from index. Basically have to check everything.
 	  
-	  for(int i = var_array_min_val; i <= var_array_max_val; ++i)
+	  for(DomainInt i = var_array_min_val; i <= var_array_max_val; ++i)
 	  {
 		if(resultvar.inDomain(i) && !support_for_val_in_result(i))
 		  resultvar.removeFromDomain(i);
@@ -182,12 +183,13 @@ struct GACElementConstraint : public Constraint
 	  propogate(i,0);
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
 	int length = v.size();
-	if(v[length-2] < 0 || v[length-2] > length - 3)
+	if(v[length-2] < 0 ||
+	   v[length-2] > length - 3)
 	  return false;
-	return v[v[length-2]] == v[length-1];
+	return v[checked_cast<int>(v[length-2])] == v[length-1];
   }
   
   virtual vector<AnyVarRef> get_vars()

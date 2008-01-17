@@ -52,7 +52,7 @@ struct VecNeqDynamic : public DynamicConstraint
   { return 4; }
     
   template<typename Var>
-  void remove_value(int val, Var& var)
+  void remove_value(DomainInt val, Var& var)
   {
     if(var.isBound())
 	{
@@ -226,7 +226,7 @@ struct VecNeqDynamic : public DynamicConstraint
 	var_array2[index].addDynamicTrigger(trigs + 1 + triggerpair * 2, Assigned);
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     int v_size1 = var_array1.size();
 	return !std::equal(v.begin(), v.begin() + v_size1, v.begin() + v_size1);

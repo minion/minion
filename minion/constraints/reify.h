@@ -59,14 +59,14 @@ struct reify : public Constraint
     FAIL_EXIT();
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     // This function is very slow compared to what it could be.
 	// This is unfortunate, but hopefully not important.
 	int vec1size = poscon->get_vars().size();
-    int back_val = v.back();
+    DomainInt back_val = v.back();
     v.pop_back();
-    if(back_val)
+    if(back_val != 0)
 	{
 	  v.erase(v.begin() + vec1size, v.end());
       return poscon->check_assignment(v);
@@ -162,7 +162,7 @@ struct reify : public Constraint
     
     if(rar_var.isAssigned())
     {
-      if(rar_var.getAssignedValue())
+      if(rar_var.getAssignedValue() == 1)
       { if(i%2 == 0) poscon->propogate(i/2, domain); }
       else
       { if(i%2 == 1) negcon->propogate((i-1)/2, domain); }
@@ -204,7 +204,7 @@ struct reify : public Constraint
     
     if(rar_var.isAssigned())
     {
-      if(rar_var.getAssignedValue())
+      if(rar_var.getAssignedValue() == 1)
 		poscon->full_propogate();
       else
 		negcon->full_propogate();

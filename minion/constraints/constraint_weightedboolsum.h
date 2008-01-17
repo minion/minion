@@ -126,7 +126,7 @@ struct LeqWeightBoolSumConstraint : public Constraint
     propogate(-1,0);
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == var_array.size() + 1);
     int sum = 0;

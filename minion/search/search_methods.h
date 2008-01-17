@@ -30,13 +30,13 @@ struct SDFBranch
   {
 	int length = var_order.size();
 	int smallest_dom = length;
-	int dom_size = numeric_limits<int>::max();
+	DomainInt dom_size = DomainInt_Max;
 	
 	
 	for(int i = 0; i < length; ++i)
 	{
-	  int maxval = var_order[i].getMax();
-	  int minval = var_order[i].getMin();
+	  DomainInt maxval = var_order[i].getMax();
+	  DomainInt minval = var_order[i].getMin();
 	  
 	  if((maxval != minval) && ((maxval - minval) < dom_size) )
 	  {
@@ -66,14 +66,14 @@ struct LDFBranch
 	  return length;
 	
 	int largest_dom = pos;
-	int dom_size = var_order[pos].getMax() - var_order[pos].getMin();
+	DomainInt dom_size = var_order[pos].getMax() - var_order[pos].getMin();
 	
 	++pos;
 	
 	for(; pos < length; ++pos)
 	{
-	  int maxval = var_order[pos].getMax();
-	  int minval = var_order[pos].getMin();
+	  DomainInt maxval = var_order[pos].getMax();
+	  DomainInt minval = var_order[pos].getMin();
 	  
 	  if(maxval - minval > dom_size)
 	  {

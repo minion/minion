@@ -41,15 +41,18 @@ class TrailedMonotonicSet
   // { return static_cast<value_type*>(_undo_values.get_ptr())[i]; }
 
   int& undo_indexes(int i)
-  { return static_cast<int*>(_undo_indexes.get_ptr())[i]; }
+  { 
+	return static_cast<int*>(_undo_indexes.get_ptr())[i]; 
+  }
 
 public:
   // following allows external types destructive changes to array 
   // but we probably do not want to allow this to force them to use set()
-  value_type& array(int i)
+  value_type& array(DomainInt i)
   { 
     D_ASSERT( i >= 0 && i < size());
-    return static_cast<value_type*>(_array.get_ptr())[i]; 
+	int val = checked_cast<int>(i);
+    return static_cast<value_type*>(_array.get_ptr())[val]; 
   }
 
   bool needs_undoing()
@@ -81,12 +84,12 @@ public:
     D_ASSERT(_local_depth == bt_depth);
   }
 
-  void set(const int& index, const value_type& newval)
+  void set(DomainInt index, const value_type& newval)
   {
     // cout << "index: " << index << " value: " << newval << " local: " << _local_depth << " bt: " << _backtrack_depth.get() << endl; 
 
     D_ASSERT( !needs_undoing() && 0 <= index && index < size());
-    undo_indexes(_local_depth) = index;
+    undo_indexes(_local_depth) = checked_cast<int>(index);
     // undo_values(_local_depth) = array(index);
 
     _local_depth++;
@@ -100,13 +103,13 @@ public:
     return _size;    
   }
 
-  void remove(const int& index) 
+  void remove(DomainInt index) 
   {
     // check for membership to reduce amount of trailing 
     if (array(index)) { set(index,0); }
   }
 
-  bool isMember(const int& index)
+  bool isMember(DomainInt index)
   {
     return (bool)array(index);
   }

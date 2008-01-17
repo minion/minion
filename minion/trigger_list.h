@@ -71,18 +71,18 @@ public:
   int lock_first;
   int lock_second;
   
-  int vars_min_domain_val;
-  int vars_max_domain_val;
+  DomainInt vars_min_domain_val;
+  DomainInt vars_max_domain_val;
   unsigned vars_domain_size;
   
-  void lock(int size, int min_domain_val, int max_domain_val)
+  void lock(int size, DomainInt min_domain_val, DomainInt max_domain_val)
   {
 	D_ASSERT(!lock_first && !lock_second);
 	lock_first = true;
 	var_count_m = size;
 	vars_min_domain_val = min_domain_val;
 	vars_max_domain_val = max_domain_val;
-	vars_domain_size = max_domain_val - min_domain_val + 1;
+	vars_domain_size = checked_cast<unsigned>(max_domain_val - min_domain_val + 1);
 	
 	triggers.resize(4);
 	for(unsigned i = 0; i < 4; ++i)
@@ -175,7 +175,7 @@ public:
   }
   
 #ifdef DYNAMICTRIGGERS
-  void dynamic_propogate(int var_num, TrigType type, int val_removed = -999)
+  void dynamic_propogate(int var_num, TrigType type, DomainInt val_removed = -999)
   {
     D_ASSERT(val_removed == -999 || ( type == DomainRemoval && val_removed != -999) );
 	D_ASSERT(!only_bounds || type != DomainRemoval);
@@ -191,7 +191,7 @@ public:
 	  D_ASSERT(vars_min_domain_val <= val_removed);
 	  D_ASSERT(vars_max_domain_val >= val_removed);
 	  trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
-			 + var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m;
+			 + checked_cast<int>(var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m);
 	}
 	// TODO: This shouldn't require next != NULL.
     if(trig->next != trig && trig->next != NULL)
@@ -199,7 +199,7 @@ public:
   }
 #endif
   
-  void push_upper(int var_num, int upper_delta)
+  void push_upper(int var_num, DomainInt upper_delta)
   {
 #ifdef DYNAMICTRIGGERS
     if (dynamic_triggers_used) dynamic_propogate(var_num, UpperBound);
@@ -212,11 +212,12 @@ public:
 #else
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
 	if (range.first != range.second)
-	  Controller::push_triggers(TriggerRange(range.first, range.second, upper_delta));
+	  Controller::push_triggers(TriggerRange(range.first, range.second, 
+											 checked_cast<int>(upper_delta)));
 #endif	
   }
   
-  void push_lower(int var_num, int lower_delta)
+  void push_lower(int var_num, DomainInt lower_delta)
   { 
 #ifdef DYNAMICTRIGGERS
     if (dynamic_triggers_used) dynamic_propogate(var_num, LowerBound);
@@ -228,12 +229,13 @@ public:
 #else
 	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
 	if (range.first != range.second)
-	  Controller::push_triggers(TriggerRange(range.first, range.second, lower_delta));
+	  Controller::push_triggers(TriggerRange(range.first, range.second, 
+											 checked_cast<int>(lower_delta)));
 #endif
   }
   
   
-  void push_assign(int var_num, int)
+  void push_assign(int var_num, DomainInt)
   { 
 #ifdef DYNAMICTRIGGERS
     if (dynamic_triggers_used) dynamic_propogate(var_num, Assigned);
@@ -265,7 +267,7 @@ public:
 #endif
   }
   
-  void push_domain_removal(int var_num, int val_removed)
+  void push_domain_removal(int var_num, DomainInt val_removed)
   { 
 	D_ASSERT(!only_bounds);
 #ifdef DYNAMICTRIGGERS
@@ -292,7 +294,7 @@ public:
   }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(int b, DynamicTrigger* t, TrigType type, int val)
+  void addDynamicTrigger(int b, DynamicTrigger* t, TrigType type, DomainInt val)
   {
     D_INFO(1, DI_QUEUE, "Adding Dynamic Trigger");
 	D_ASSERT(lock_second);
@@ -314,7 +316,7 @@ public:
 	  D_ASSERT(vars_min_domain_val <= val);
 	  D_ASSERT(vars_max_domain_val >= val);
 	  queue = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
-			  + b + (DomainRemoval + (val - vars_min_domain_val)) * var_count_m;
+			  + checked_cast<int>(b + (DomainRemoval + (val - vars_min_domain_val)) * var_count_m);
 	}
 	D_ASSERT(queue->sanity_check_list());
 	t->add_after(queue);

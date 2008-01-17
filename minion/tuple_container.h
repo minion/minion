@@ -122,12 +122,12 @@ class TupleList
   vector<pair<int,int> > _map_literal_to_vars;
   
   /// Maps a variable/value pair to a literal.
-  int get_literal(int var_num, int dom_num)
+  int get_literal(int var_num, DomainInt dom_num)
   {
      D_ASSERT(var_num >= 0 && var_num < tuple_size());
 	 D_ASSERT(dom_num >= dom_smallest[var_num] && 
 			  dom_num <= dom_smallest[var_num] + dom_size[var_num]);
-    return _map_vars_to_literal[var_num][dom_num - dom_smallest[var_num]]; 
+    return _map_vars_to_literal[var_num][checked_cast<int>(dom_num - dom_smallest[var_num])]; 
   }
   
   pair<int,int> get_varval_from_literal(int literal)

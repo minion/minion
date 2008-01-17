@@ -48,7 +48,7 @@ typedef InfoRefType<VarRefType<GetSparseBoundVarContainer, SparseBoundVarRef_int
 typedef VarRefType<GetSparseBoundVarContainer, SparseBoundVarRef_internal> SparseBoundVarRef;
 #endif
 
-template<typename BoundType = int>
+template<typename BoundType = DomainInt>
 struct SparseBoundVarContainer {
   BackTrackOffset bound_data;
   TriggerList trigger_list;
@@ -77,7 +77,7 @@ struct SparseBoundVarContainer {
 
   /// find the small possible lower bound above @new_lower_bound.
   /// Does not actually change the lower bound.  
-  int find_lower_bound(SparseBoundVarRef_internal d, int new_lower_bound)
+  DomainInt find_lower_bound(SparseBoundVarRef_internal d, DomainInt new_lower_bound)
   {
     vector<BoundType>& bounds = get_domain(d);
     typename vector<BoundType>::iterator it = std::lower_bound(bounds.begin(), bounds.end(), new_lower_bound);
@@ -92,7 +92,7 @@ struct SparseBoundVarContainer {
   
   /// find the largest possible upper bound below @new_upper_bound.
   /// Does not actually change the upper bound.
-  int find_upper_bound(SparseBoundVarRef_internal& d, int new_upper_bound)
+  DomainInt find_upper_bound(SparseBoundVarRef_internal& d, DomainInt new_upper_bound)
   {
     vector<BoundType>& bounds = get_domain(d);
 
@@ -117,8 +117,8 @@ struct SparseBoundVarContainer {
     D_ASSERT(!lock_m);
     lock_m = true;
     
-    int min_domain_val = 0;
-    int max_domain_val = 0;
+    DomainInt min_domain_val = 0;
+    DomainInt max_domain_val = 0;
     if(var_count_m != 0)
     {
       min_domain_val = get_domain_from_int(0).front();
@@ -150,7 +150,7 @@ struct SparseBoundVarContainer {
     return lower_bound(d) == upper_bound(d); 
   }
   
-  int getAssignedValue(SparseBoundVarRef_internal d) const
+  DomainInt getAssignedValue(SparseBoundVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
@@ -158,39 +158,39 @@ struct SparseBoundVarContainer {
   }
   
   /// This function is provided just to make life simpler. It should never be called.
-  BOOL inDomain(SparseBoundVarRef_internal, int) const
+  BOOL inDomain(SparseBoundVarRef_internal, DomainInt) const
   { D_FATAL_ERROR( "sparse bound ints do not allow 'inDomain' checks"); }
 
   /// This function is provided just to make life simpler. It should never be called.
-  BOOL inDomain_noBoundCheck(SparseBoundVarRef_internal, int) const
+  BOOL inDomain_noBoundCheck(SparseBoundVarRef_internal, DomainInt) const
   { D_FATAL_ERROR("sparse bound ints do not allow 'inDomain_noBoundCheck' checks"); }
   
-  int getMin(SparseBoundVarRef_internal d) const
+  DomainInt getMin(SparseBoundVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     return lower_bound(d);
   }
   
-  int getMax(SparseBoundVarRef_internal d) const
+  DomainInt getMax(SparseBoundVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     return upper_bound(d);
   }
 
-  int getInitialMin(SparseBoundVarRef_internal d)
+  DomainInt getInitialMin(SparseBoundVarRef_internal d)
   { return get_domain_from_int(d.var_num).front(); }
   
-  int getInitialMax(SparseBoundVarRef_internal d)
+  DomainInt getInitialMax(SparseBoundVarRef_internal d)
   { return get_domain_from_int(d.var_num).back(); }
   
   /// This function is provided for convience. It should never be called.
-  void removeFromDomain(SparseBoundVarRef_internal, int)
+  void removeFromDomain(SparseBoundVarRef_internal, DomainInt)
   {
     FAIL_EXIT();
   }
   
   
-  void propogateAssign(SparseBoundVarRef_internal d, int i)
+  void propogateAssign(SparseBoundVarRef_internal d, DomainInt i)
   {
     vector<BoundType>& bounds = get_domain(d);
     if(!binary_search(bounds.begin(), bounds.end(), i))
@@ -198,8 +198,8 @@ struct SparseBoundVarContainer {
       Controller::fail();
       return;
     }
-    int min_val = getMin(d);
-    int max_val = getMax(d);
+    DomainInt min_val = getMin(d);
+    DomainInt max_val = getMax(d);
     if(min_val > i || max_val < i)
     {
       Controller::fail();
@@ -227,15 +227,15 @@ struct SparseBoundVarContainer {
   }
   
   // TODO : Optimise
-  void uncheckedAssign(SparseBoundVarRef_internal d, int i)
+  void uncheckedAssign(SparseBoundVarRef_internal d, DomainInt i)
   { propogateAssign(d,i); }
   
-  void setMax(SparseBoundVarRef_internal d, int i)
+  void setMax(SparseBoundVarRef_internal d, DomainInt i)
   {
     // Note, this just finds a new upper bound, it doesn't set it.
     i = find_upper_bound(d, i);
     
-    int low_bound = lower_bound(d);
+    DomainInt low_bound = lower_bound(d);
     
     if(i < low_bound)
     {
@@ -243,11 +243,10 @@ struct SparseBoundVarContainer {
       return;
     }
     
-    int up_bound = upper_bound(d);
+    DomainInt up_bound = upper_bound(d);
     
     if(i < up_bound)
     {
-      
       trigger_list.push_upper(d.var_num, up_bound - i);
       trigger_list.push_domain(d.var_num);
 #ifdef FULL_DOMAIN_TRIGGERS
@@ -260,11 +259,11 @@ struct SparseBoundVarContainer {
     }
   }
   
-  void setMin(SparseBoundVarRef_internal d, int i)
+  void setMin(SparseBoundVarRef_internal d, DomainInt i)
   {
     i = find_lower_bound(d,i);
     
-    int up_bound = upper_bound(d);
+    DomainInt up_bound = upper_bound(d);
     
     if(i > up_bound)
     {
@@ -272,7 +271,7 @@ struct SparseBoundVarContainer {
       return;
     }
     
-    int low_bound = lower_bound(d);
+    DomainInt low_bound = lower_bound(d);
     
     if(i > low_bound)
     {
@@ -299,7 +298,7 @@ struct SparseBoundVarContainer {
   }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(SparseBoundVarRef_internal b, DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(SparseBoundVarRef_internal b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   { 
 	D_ASSERT(lock_m); 
 	D_ASSERT(type != DomainRemoval);
@@ -348,8 +347,8 @@ SparseBoundVarContainer<T>::get_new_var(const vector<U>& new_domain)
 {
   D_ASSERT(!lock_m);
   // D_ASSERT(i >= var_min && j <= var_max);
-  D_ASSERT(new_domain.front() >= std::numeric_limits<T>::min());
-  D_ASSERT(new_domain.back() <= std::numeric_limits<T>::max());
+  D_ASSERT(new_domain.front() >= DomainInt_Min);
+  D_ASSERT(new_domain.back() <= DomainInt_Max);
   
   D_DATA(for(int loop=0;loop<(int)(new_domain.size()) - 1; ++loop) 
      { D_ASSERT(new_domain[loop] < new_domain[loop+1]); } );

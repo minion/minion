@@ -53,46 +53,46 @@ struct VarRefType
   BOOL isAssigned()
   { return GetContainer::con().isAssigned(data); }
   
-  int getAssignedValue()
+  DomainInt getAssignedValue()
   { return GetContainer::con().getAssignedValue(data); }
   
-  BOOL isAssignedValue(int i)
+  BOOL isAssignedValue(DomainInt i)
   { 
     return GetContainer::con().isAssigned(data) &&
     GetContainer::con().getAssignedValue(data) == i;
   }
   
-  BOOL inDomain(int b)
+  BOOL inDomain(DomainInt b)
   { return GetContainer::con().inDomain(data, b); }
 
-  BOOL inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(DomainInt b)
   { return GetContainer::con().inDomain_noBoundCheck(data, b); }
   
-  int getMax()
+  DomainInt getMax()
   { return GetContainer::con().getMax(data); }
   
-  int getMin()
+  DomainInt getMin()
   { return GetContainer::con().getMin(data); }
 
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   { return GetContainer::con().getInitialMax(data); }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { return GetContainer::con().getInitialMin(data); }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { GetContainer::con().setMax(data,i); }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { GetContainer::con().setMin(data,i); }
   
-  void uncheckedAssign(int b)
+  void uncheckedAssign(DomainInt b)
   { GetContainer::con().uncheckedAssign(data, b); }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   { GetContainer::con().propogateAssign(data, b); }
   
-  void removeFromDomain(int b)
+  void removeFromDomain(DomainInt b)
   { GetContainer::con().removeFromDomain(data, b); }
   
   void addTrigger(Trigger t, TrigType type)
@@ -105,7 +105,7 @@ struct VarRefType
   { return d.XXX_get_domain_diff(); }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  GetContainer::con().addDynamicTrigger(data, t, type, pos); }
 #endif
 };
@@ -133,45 +133,45 @@ struct QuickVarRefType
   BOOL isAssigned()
   { return data.isAssigned(); }
   
-  int getAssignedValue()
+  DomainInt getAssignedValue()
   { return data.getAssignedValue(); }
   
-  BOOL isAssignedValue(int i)
+  BOOL isAssignedValue(DomainInt i)
   { 
     return data.isAssigned() &&
     data.getAssignedValue() == i;
   }
-  BOOL inDomain(int b)
+  BOOL inDomain(DomainInt b)
   { return data.inDomain(b); }
   
-  BOOL inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(DomainInt b)
   { return data.inDomain_noBoundCheck(b); }
 
-  int getMax()
+  DomainInt getMax()
   { return data.getMax(); }
   
-  int getMin()
+  DomainInt getMin()
   { return data.getMin(); }
 
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   { return data.getInitialMax(); }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { return data.getInitialMin(); }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { GetContainer::con().setMax(data,i); }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { GetContainer::con().setMin(data,i); }
   
-  void uncheckedAssign(int b)
+  void uncheckedAssign(DomainInt b)
   { GetContainer::con().uncheckedAssign(data, b); }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   { GetContainer::con().propogateAssign(data, b); }
   
-  void removeFromDomain(int b)
+  void removeFromDomain(DomainInt b)
   { GetContainer::con().removeFromDomain(data, b); }
   
   void addTrigger(Trigger t, TrigType type)
@@ -184,7 +184,7 @@ struct QuickVarRefType
   { return d.XXX_get_domain_diff(); }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  GetContainer::con().addDynamicTrigger(data, t, type, pos); }
 #endif
 };
@@ -206,42 +206,42 @@ struct CompleteVarRefType
   BOOL isAssigned()
   { return (data.getCon()).isAssigned(data); }
   
-  int getAssignedValue()
+  DomainInt getAssignedValue()
   { return (data.getCon()).getAssignedValue(data); }
   
-  BOOL isAssignedValue(int i)
+  BOOL isAssignedValue(DomainInt i)
   { 
     return (data.getCon()).isAssigned(data) &&
     (data.getCon()).getAssignedValue(data) == i;
   }
-  BOOL inDomain(int b)
+  BOOL inDomain(DomainInt b)
   { return (data.getCon()).inDomain(data, b); }
   
-  int getMax()
+  DomainInt getMax()
   { return (data.getCon()).getMax(data); }
   
-  int getMin()
+  DomainInt getMin()
   { return (data.getCon()).getMin(data); }
 
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   { return (data.getCon()).getInitialMax(data); }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { return (data.getCon()).getInitialMin(data); }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { (data.getCon()).setMax(data,i); }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { (data.getCon()).setMin(data,i); }
   
-  void uncheckedAssign(int b)
+  void uncheckedAssign(DomainInt b)
   { (data.getCon()).uncheckedAssign(data, b); }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   { (data.getCon()).propogateAssign(data, b); }
   
-  void removeFromDomain(int b)
+  void removeFromDomain(DomainInt b)
   { (data.getCon()).removeFromDomain(data, b); }
   
   void addTrigger(Trigger t, TrigType type)
@@ -254,7 +254,7 @@ struct CompleteVarRefType
   { return d.XXX_get_domain_diff(); }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  (data.getCon()).addDynamicTrigger(data, t, type, pos); }
 #endif
 };

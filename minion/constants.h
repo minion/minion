@@ -70,8 +70,8 @@ struct runtime_val
   { return runtime_val(-i); }
 };
 
-template<typename T1, typename T2>
-inline int mymin(T1 t1, T2 t2)
+template<typename T>
+inline T mymin(T t1, T t2)
 {
   if(t1 <= t2)
     return t1;
@@ -79,8 +79,8 @@ inline int mymin(T1 t1, T2 t2)
     return t2;
 }
 
-template<typename T1, typename T2>
-inline int mymax(T1 t1, T2 t2)
+template<typename T>
+inline T mymax(T t1, T t2)
 {
   if(t1 <= t2)
     return t2;
@@ -108,8 +108,19 @@ typedef long long int BigInt;
 
 typedef Wrapper<int> DomainInt;
 
+template<typename To, typename From>
+To checked_cast(const From& t)
+{ return static_cast<To>(t); }
+
+template<typename To, typename From>
+To checked_cast(const Wrapper<From>& t)
+{ return static_cast<To>(t.t); }
+
+
+
+
 // Put a ' -1, +1 ' just to have some slack
-BigInt DomainInt_Max = std::numeric_limits<int>::max() - 1;
-BigInt DomainInt_Min = std::numeric_limits<int>::min() + 1;
+const BigInt DomainInt_Max = std::numeric_limits<int>::max() - 1;
+const BigInt DomainInt_Min = std::numeric_limits<int>::min() + 1;
 
 #endif // _CONSTANTS_H

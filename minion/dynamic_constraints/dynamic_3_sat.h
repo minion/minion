@@ -137,7 +137,7 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
 	{ var_array[other_propval].propogateAssign(1); }
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == var_array.size());
     int v_size = v.size();

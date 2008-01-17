@@ -221,7 +221,7 @@ struct TupleTrie
   
   // Starting from the start of an array of TrieObjs, find the
   // values which is find_val
-  TrieObj* get_next_ptr(TrieObj* obj, int find_val)
+  TrieObj* get_next_ptr(TrieObj* obj, DomainInt find_val)
   {
     while(obj->val < find_val)
 	  ++obj;
@@ -307,7 +307,7 @@ struct TupleTrie
   // Find support for domain value i. This will be the value used by
   // the first variable.
   template<typename VarArray>
-    int nextSupportingTuple(int domain_val, const VarArray& _vars, TrieObj** obj_list)
+    int nextSupportingTuple(DomainInt domain_val, const VarArray& _vars, TrieObj** obj_list)
   {
 	VarArray& vars = const_cast<VarArray&>(_vars);
 	  

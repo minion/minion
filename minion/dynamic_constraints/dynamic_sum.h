@@ -325,7 +325,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	}
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == var_array.size());
     int v_size = v.size();

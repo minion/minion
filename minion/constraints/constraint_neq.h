@@ -57,7 +57,7 @@ struct NeqConstraint : public Constraint
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
 	PROP_INFO_ADDONE(ArrayNeq);
-    int remove_val = var_array[prop_val].getAssignedValue();
+    DomainInt remove_val = var_array[prop_val].getAssignedValue();
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
     {
@@ -104,7 +104,7 @@ struct NeqConstraint : public Constraint
   {
     int v_size = var_array.size();
 	D_ASSERT(var_array[i].isAssigned());
-	int assign_val = var_array[i].getAssignedValue();
+	DomainInt assign_val = var_array[i].getAssignedValue();
     for(int loop = 0; loop < v_size; ++loop)
 	{
 	  if(loop != i)
@@ -124,7 +124,7 @@ struct NeqConstraint : public Constraint
     for(int i = 0; i < array_size; ++i)
       if(var_array[i].isAssigned())
       {
-		int remove_val = var_array[i].getAssignedValue();
+		DomainInt remove_val = var_array[i].getAssignedValue();
 		for(int j = 0; j < array_size;++j)
 		{
 		  if(i != j)
@@ -143,7 +143,7 @@ struct NeqConstraint : public Constraint
       }
   }
 	
-	virtual BOOL check_assignment(vector<int> v)
+	virtual BOOL check_assignment(vector<DomainInt> v)
 	{
 	  D_ASSERT(v.size() == var_array.size());
 	  int array_size = v.size();
@@ -192,7 +192,7 @@ struct NeqConstraintBinary : public Constraint
   {
 	PROP_INFO_ADDONE(BinaryNeq);
     if (prop_val == 1) {
-      int remove_val = var1.getAssignedValue();
+      DomainInt remove_val = var1.getAssignedValue();
 	  if(var2.isBound())
 	  {
 		if(var2.getMin() == remove_val)
@@ -206,7 +206,7 @@ struct NeqConstraintBinary : public Constraint
     else
     {
       D_ASSERT(prop_val == 2);
-      int remove_val = var2.getAssignedValue();
+      DomainInt remove_val = var2.getAssignedValue();
 	  if(var1.isBound())
 	  {
 		if(var1.getMin() == remove_val)
@@ -226,7 +226,7 @@ struct NeqConstraintBinary : public Constraint
   {
     if(var1.isAssigned())
     { 
-      int remove_val = var1.getAssignedValue();
+      DomainInt remove_val = var1.getAssignedValue();
 	  if(var2.isBound())
 	  {
 		if(var2.getMin() == remove_val)
@@ -239,7 +239,7 @@ struct NeqConstraintBinary : public Constraint
     }
     if(var2.isAssigned())
     { 
-      int remove_val = var2.getAssignedValue();
+      DomainInt remove_val = var2.getAssignedValue();
 	  if(var1.isBound())
 	  {
 		if(var1.getMin() == remove_val)
@@ -252,7 +252,7 @@ struct NeqConstraintBinary : public Constraint
     }
   }
 	
-	virtual BOOL check_assignment(vector<int> v)
+	virtual BOOL check_assignment(vector<DomainInt> v)
 	{
 	  D_ASSERT(v.size() == 2); 
 	  if(v[0]==v[1]) return false;

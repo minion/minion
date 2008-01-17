@@ -131,10 +131,10 @@ struct AndConstraint : public Constraint
     
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == 3);
-    return (v[0] && v[1]) == v[2];
+    return ((v[0] != 0) && (v[1] != 0)) == (v[2] != 0);
   }
   
   virtual vector<AnyVarRef> get_vars()

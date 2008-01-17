@@ -35,7 +35,7 @@ struct SwitchNeg
   { return data.isBound();}
   
 
-  signed char multiplier;
+  DomainInt multiplier;
   SwitchNeg(Var _data, int _multiplier) : data(_data), multiplier(_multiplier)
   { D_ASSERT(multiplier == -1 || multiplier == 1); }
   
@@ -48,22 +48,22 @@ struct SwitchNeg
   BOOL isAssigned()
   { return data.isAssigned(); }
   
-  int getAssignedValue()
+  DomainInt getAssignedValue()
   { return multiplier * data.getAssignedValue(); }
   
-  BOOL isAssignedValue(int i)
+  BOOL isAssignedValue(DomainInt i)
   { 
 	return data.isAssigned() &&
 	data.getAssignedValue() == i * multiplier;
   }
   
-  BOOL inDomain(int b)
+  BOOL inDomain(DomainInt b)
   { return data.inDomain(b * multiplier); }
   
-  BOOL inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(DomainInt b)
   { return data.inDomain(b * multiplier); }
   
-  int getMax()
+  DomainInt getMax()
   { 
 	if(multiplier == 1)
 	  return data.getMax();
@@ -71,7 +71,7 @@ struct SwitchNeg
 	  return -data.getMin(); 
   }
   
-  int getMin()
+  DomainInt getMin()
   { 
 	if(multiplier == 1)
 	  return data.getMin();
@@ -79,7 +79,7 @@ struct SwitchNeg
 	  return -data.getMax(); 
   }
   
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   { 
 	if(multiplier == 1)
 	  return data.getInitialMax();
@@ -87,7 +87,7 @@ struct SwitchNeg
 	  return -data.getInitialMin(); 
   }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { 
 	if(multiplier == 1)
 	  return data.getInitialMin();
@@ -95,7 +95,7 @@ struct SwitchNeg
 	  return -data.getInitialMax(); 
   }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { 
 	if(multiplier == 1)
 	  data.setMax(i);
@@ -103,7 +103,7 @@ struct SwitchNeg
 	  data.setMin(-i); 
   }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { 
 	if(multiplier == 1)
 	  data.setMin(i);
@@ -111,13 +111,13 @@ struct SwitchNeg
 	  data.setMax(-i); 
   }
   
-  void uncheckedAssign(int b)
+  void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(b * multiplier); }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   { data.propogateAssign(b * multiplier); }
   
-  void removeFromDomain(int b)
+  void removeFromDomain(DomainInt b)
   { data.removeFromDomain(b * multiplier); }
   
   /// There isn't a minus sign here as domain changes from both the top and bottom of the domain are positive numbers.
@@ -149,7 +149,7 @@ struct SwitchNeg
   { return "SwitchNeg " + to_string(multiplier) + ":" + string(data); }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  data.addDynamicTrigger(t, type, pos); }
 #endif
 };

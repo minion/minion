@@ -196,7 +196,7 @@ struct DynamicConstraint
   
   /// Checks if an assignment is satisfied.
   /** This takes the variable order returned by, and is mainly only used by, get_table_constraint() */
-  virtual BOOL check_assignment(vector<int>) = 0;
+  virtual BOOL check_assignment(vector<DomainInt>) = 0;
     
   virtual ~DynamicConstraint()
   {}

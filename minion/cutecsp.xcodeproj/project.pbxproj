@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		26131D1409CB1D2000ACF137 /* BuildConstraint2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26131D1209CB1D1F00ACF137 /* BuildConstraint2.cpp */; };
 		261C44E4099A0B6600FFBDCA /* MinionInputReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CA01FE0998C43C0064B996 /* MinionInputReader.cpp */; };
+		2643EA720C4573CD004231DE /* constraint_setup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2643EA700C4573CD004231DE /* constraint_setup.cpp */; };
+		2643EA730C4573CD004231DE /* debug_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2643EA710C4573CD004231DE /* debug_functions.cpp */; };
+		2643EA760C4573E7004231DE /* CT_DIV.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2643EA740C4573E7004231DE /* CT_DIV.cpp */; };
+		2643EA770C4573E7004231DE /* CT_MODULO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2643EA750C4573E7004231DE /* CT_MODULO.cpp */; };
 		2644ACE50A192B90002BD572 /* minion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644ACE40A192B90002BD572 /* minion.cpp */; };
 		26E63C830B137198009C8B64 /* get_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E63C820B137198009C8B64 /* get_info.cpp */; };
 		26FB021E0B63D2230062AD1B /* BuildDynamicStart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FB02010B63D2230062AD1B /* BuildDynamicStart.cpp */; };
@@ -49,8 +53,9 @@
 		2616D09E09950EA200644F18 /* constraint_weightedboolsum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_weightedboolsum.h; path = constraints/constraint_weightedboolsum.h; sourceTree = "<group>"; };
 		26177F7E0B0669EC00C946CF /* dynamic_3_sat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dynamic_3_sat.h; path = dynamic_constraints/dynamic_3_sat.h; sourceTree = "<group>"; };
 		2618160B097FA1F500E04FBD /* constraint_lex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_lex.h; path = constraints/constraint_lex.h; sourceTree = "<group>"; };
-		261C44E2099A0B4A00FFBDCA /* Minion */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = Minion; sourceTree = BUILT_PRODUCTS_DIR; };
+		261C44E2099A0B4A00FFBDCA /* Minion */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Minion; sourceTree = BUILT_PRODUCTS_DIR; };
 		261E01FA09F7F57E004F8C91 /* tries.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tries.h; path = constraints/tries.h; sourceTree = "<group>"; };
+		261F572A0C450EFE0016D625 /* trailed_monotonic_set.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trailed_monotonic_set.h; path = memory_management/trailed_monotonic_set.h; sourceTree = "<group>"; };
 		2623020E0AB82F1200375F37 /* tuple_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tuple_container.h; sourceTree = "<group>"; };
 		2623A3CB0B0E23C500E574BC /* constraint_GACtable_master.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = constraint_GACtable_master.h; path = constraints/constraint_GACtable_master.h; sourceTree = "<group>"; };
 		2623A3CC0B0E23C500E574BC /* constraint_pow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = constraint_pow.h; path = constraints/constraint_pow.h; sourceTree = "<group>"; };
@@ -59,6 +64,12 @@
 		26376D8A09884D07006D13DE /* constraint_boundtable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_boundtable.h; path = constraints/constraint_boundtable.h; sourceTree = "<group>"; };
 		2640F4670B32DD050075FB8C /* to_string.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = to_string.h; path = system/to_string.h; sourceTree = "<group>"; };
 		2643AA9509D1BCBB002E40A7 /* variable_shift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = variable_shift.h; path = variables/mappings/variable_shift.h; sourceTree = "<group>"; };
+		2643EA700C4573CD004231DE /* constraint_setup.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = constraint_setup.cpp; sourceTree = "<group>"; };
+		2643EA710C4573CD004231DE /* debug_functions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = debug_functions.cpp; sourceTree = "<group>"; };
+		2643EA740C4573E7004231DE /* CT_DIV.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CT_DIV.cpp; path = build_constraints/CT_DIV.cpp; sourceTree = "<group>"; };
+		2643EA750C4573E7004231DE /* CT_MODULO.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CT_MODULO.cpp; path = build_constraints/CT_MODULO.cpp; sourceTree = "<group>"; };
+		2643EA780C4573F6004231DE /* constraint_div.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = constraint_div.h; path = constraints/constraint_div.h; sourceTree = "<group>"; };
+		2643EA790C4573F6004231DE /* constraint_modulo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = constraint_modulo.h; path = constraints/constraint_modulo.h; sourceTree = "<group>"; };
 		2644ACAD0A1927BE002BD572 /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = system.h; sourceTree = "<group>"; };
 		2644ACC70A1929F2002BD572 /* standard_search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = standard_search.h; path = search/standard_search.h; sourceTree = "<group>"; };
 		2644ACE40A192B90002BD572 /* minion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = minion.cpp; sourceTree = "<group>"; };
@@ -372,6 +383,7 @@
 				26CE28F00A234F8400110C21 /* AnyVarRef.h */,
 				2626D75609751DCD002AC405 /* intvar.h */,
 				262C59E009C785EE0027E72E /* long_intvar.h */,
+				261F572A0C450EFE0016D625 /* trailed_monotonic_set.h */,
 				26F697350986C15200D3B93B /* intboundvar.h */,
 				2644AD550A19318D002BD572 /* variables.h */,
 				2684BF1C09E6EBFF003279F3 /* iterators.h */,
@@ -382,6 +394,12 @@
 		26FB02380B63D22C0062AD1B /* Auto */ = {
 			isa = PBXGroup;
 			children = (
+				2643EA780C4573F6004231DE /* constraint_div.h */,
+				2643EA790C4573F6004231DE /* constraint_modulo.h */,
+				2643EA740C4573E7004231DE /* CT_DIV.cpp */,
+				2643EA750C4573E7004231DE /* CT_MODULO.cpp */,
+				2643EA700C4573CD004231DE /* constraint_setup.cpp */,
+				2643EA710C4573CD004231DE /* debug_functions.cpp */,
 				26FB02060B63D2230062AD1B /* CT_ALLDIFF.cpp */,
 				26FB02070B63D2230062AD1B /* CT_DISEQ.cpp */,
 				26FB02080B63D2230062AD1B /* CT_ELEMENT.cpp */,
@@ -479,6 +497,10 @@
 				26FB02350B63D2230062AD1B /* CT_WATCHED_VECNEQ.cpp in Sources */,
 				26FB02360B63D2230062AD1B /* CT_WEIGHTGEQSUM.cpp in Sources */,
 				26FB02370B63D2230062AD1B /* CT_WEIGHTLEQSUM.cpp in Sources */,
+				2643EA720C4573CD004231DE /* constraint_setup.cpp in Sources */,
+				2643EA730C4573CD004231DE /* debug_functions.cpp in Sources */,
+				2643EA760C4573E7004231DE /* CT_DIV.cpp in Sources */,
+				2643EA770C4573E7004231DE /* CT_MODULO.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -180,8 +180,8 @@ struct LexLeqConstraint : public Constraint
       int x_size = x.size();
       for(int i = a; i < x_size; ++i)
       {
-		int xval = x[i].getMin();
-		int yval = y[i].getMax();
+		DomainInt xval = x[i].getMin();
+		DomainInt yval = y[i].getMax();
 		if(xval < yval) 
 		{
 		  alpha.set(i);
@@ -201,8 +201,8 @@ struct LexLeqConstraint : public Constraint
     }
     else
     {
-      int xval = x[unsat_val].getMin();
-      int yval = y[unsat_val].getMax();
+      DomainInt xval = x[unsat_val].getMin();
+      DomainInt yval = y[unsat_val].getMax();
       if (xval > yval)
 		return true;
       else
@@ -276,7 +276,7 @@ struct LexLeqConstraint : public Constraint
     }
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == x.size() + y.size());
     size_t x_size = x.size();

@@ -54,7 +54,7 @@ struct MinConstraint : public Constraint
 	  
 	  if(prop_val == (int)(var_array.size()))  
 	  {
-		int new_min = min_var.getMin();
+		DomainInt new_min = min_var.getMin();
 		typename VarArray::iterator end = var_array.end();
 		for(typename VarArray::iterator it = var_array.begin(); it < end; ++it)
 		  (*it).setMin(new_min);
@@ -63,11 +63,11 @@ struct MinConstraint : public Constraint
 	  {
 	    typename VarArray::iterator it = var_array.begin();
 		typename VarArray::iterator end = var_array.end();
-		int min = it->getMin();
+		DomainInt min = it->getMin();
 		++it;
 		for(; it < end; ++it)
 		{
-		  int it_min = it->getMin();
+		  DomainInt it_min = it->getMin();
 		  if(it_min < min)
 			min = it_min;
 		}
@@ -81,7 +81,7 @@ struct MinConstraint : public Constraint
 	  if(prop_val == (int)(var_array.size()))
 	  {
 		typename VarArray::iterator it = var_array.begin();
-		int minvar_max = min_var.getMax();
+		DomainInt minvar_max = min_var.getMax();
 		while(it != var_array.end() && (*it).getMin() > minvar_max)
 		  ++it;
 		if(it == var_array.end())
@@ -124,10 +124,10 @@ struct MinConstraint : public Constraint
 	}
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
 	D_ASSERT(v.size() == var_array.size() + 1);
-	int min_val = big_constant;
+	DomainInt min_val = big_constant;
 	int array_size = v.size();
 	for(int i=0;i < array_size - 1;i++)
 	  min_val = min(min_val, v[i]);

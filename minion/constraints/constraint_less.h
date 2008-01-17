@@ -78,10 +78,10 @@ struct LeqConstraint : public Constraint
     propogate(1,0);
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
 	D_ASSERT(v.size() == 2);
-	return ((int)(v[0]) <= ((int)v[1] + offset.val()));
+	return v[0] <= (v[1] + offset.val());
   }
   
   virtual vector<AnyVarRef> get_vars()

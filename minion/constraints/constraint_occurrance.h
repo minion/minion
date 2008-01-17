@@ -173,12 +173,12 @@ struct OccurrenceEqualConstraint : public Constraint
       not_occurrence_limit_reached();
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == var_array.size());
-    int count = 0;  
-    typename vector<int>::iterator end_it(v.end());
-    for( typename vector<int>::iterator it=v.begin(); it < end_it; ++it)
+    DomainInt count = 0;  
+    typename vector<DomainInt>::iterator end_it(v.end());
+    for( typename vector<DomainInt>::iterator it=v.begin(); it < end_it; ++it)
       count += (*it == value.val());
     return count == val_count.val();
   }
@@ -315,7 +315,7 @@ struct OccurrenceLeqConstraint : public Constraint
       limit_reached();  
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == var_array.size());
     int c = 0;  

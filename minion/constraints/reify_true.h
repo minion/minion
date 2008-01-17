@@ -43,11 +43,11 @@ struct reify_true : public Constraint
   virtual Constraint* reverse_constraint()
   { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
-    int back_val = v.back();
+    DomainInt back_val = v.back();
     v.pop_back();
-    if(back_val)
+    if(back_val != 0)
       return poscon->check_assignment(v);
     else
       return true;
@@ -106,7 +106,7 @@ struct reify_true : public Constraint
     
     if(rar_var.isAssigned())
     {
-      if(rar_var.getAssignedValue())
+      if(rar_var.getAssignedValue() == 1)
       { poscon->propogate(i, domain); }
     }
   }
@@ -115,7 +115,7 @@ struct reify_true : public Constraint
   {
     if(rar_var.isAssigned())
     {
-      if(rar_var.getAssignedValue())
+      if(rar_var.getAssignedValue() != 0)
 	    poscon->full_propogate();
     }
   }

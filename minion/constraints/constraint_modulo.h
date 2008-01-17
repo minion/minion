@@ -64,65 +64,10 @@ struct ModConstraint : public Constraint
 	t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
 	return t;
   }
-    
-  
-  double my_pow(double x, double y)
-  { return pow(x,y);}
-  
-  double my_y(double x, double z)
-  { return log(z) / log(x); }
-  
-  double my_x(double y, double z)
-  { return exp(log(z) / y); }
   
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
 	PROP_INFO_ADDONE(Pow);
-	switch(flag)
-	{
-	  case -1:
-	  {
-		var3.setMin(LRINT(my_pow(var1.getMin(),var2.getMin())));
-		int var1_min = var1.getMin();
-		if(var1_min > 1)
-		  var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
-		break;
-	  }
-	  case -2:
-	    var3.setMin(LRINT(my_pow(var1.getMin(), var2.getMin())));
-		var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
-		break;
-		
-	  case -3:
-	  {
-		var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
-		int var1_max = var1.getMax();
-		if(var1_max > 1)
-		  var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
-		break;
-	  }
-	  case 1:
-	  {
-		var3.setMax(LRINT(my_pow(var1.getMax(),var2.getMax())));
-		int var1_max = var1.getMax();
-		if(var1_max > 1)
-		  var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
-		break;
-	  }
-	  case 2:
-	    var3.setMax(LRINT(my_pow(var1.getMax(), var2.getMax())));
-		var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
-		break;
-		
-	  case 3:
-	  {
-		var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
-		int var1_min = var1.getMin();
-		if(var1_min > 1)
-		  var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
-		break;
-	  }
-	}
   }
   
   virtual void full_propogate()
@@ -135,10 +80,10 @@ struct ModConstraint : public Constraint
     propogate(-3,0);
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
 	D_ASSERT(v.size() == 3);
-	return my_pow(v[0],v[1]) == v[2];
+	return v[0] % v[1] == v[2];
   }
   
   virtual vector<AnyVarRef> get_vars()

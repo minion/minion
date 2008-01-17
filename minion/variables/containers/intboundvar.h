@@ -47,7 +47,7 @@ typedef InfoRefType<VarRefType<GetBoundVarContainer, BoundVarRef_internal>, VAR_
 typedef VarRefType<GetBoundVarContainer, BoundVarRef_internal> BoundVarRef;
 #endif
 
-template<typename BoundType = int>
+template<typename BoundType = DomainInt>
 struct BoundVarContainer {
   BackTrackOffset bound_data;
   TriggerList trigger_list;
@@ -81,8 +81,8 @@ struct BoundVarContainer {
       bound_ptr[2*i+1] = initial_bounds[i].second;
     }
 	
-	int min_domain_val = 0;
-	int max_domain_val = 0;
+	DomainInt min_domain_val = 0;
+	DomainInt max_domain_val = 0;
 	if(!initial_bounds.empty())
 	{
 	  min_domain_val = initial_bounds[0].first;
@@ -110,14 +110,14 @@ struct BoundVarContainer {
     return lower_bound(d) == upper_bound(d); 
   }
   
-  int getAssignedValue(BoundVarRef_internal d) const
+  DomainInt getAssignedValue(BoundVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return lower_bound(d);
   }
   
-  BOOL inDomain(BoundVarRef_internal d, int i) const
+  BOOL inDomain(BoundVarRef_internal d, DomainInt i) const
   {
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
@@ -125,7 +125,7 @@ struct BoundVarContainer {
     return true;
   }
   
-  BOOL inDomain_noBoundCheck(BoundVarRef_internal d, int i) const
+  BOOL inDomain_noBoundCheck(BoundVarRef_internal d, DomainInt i) const
   {
     D_ASSERT(lock_m);
 	D_ASSERT(i >= lower_bound(d));
@@ -133,36 +133,36 @@ struct BoundVarContainer {
     return true;
   }
   
-  int getMin(BoundVarRef_internal d) const
+  DomainInt getMin(BoundVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(Controller::failed || inDomain(d,lower_bound(d)));
     return lower_bound(d);
   }
   
-  int getMax(BoundVarRef_internal d) const
+  DomainInt getMax(BoundVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(Controller::failed || inDomain(d,upper_bound(d)));
     return upper_bound(d);
   }
  
-  int getInitialMin(BoundVarRef_internal d) const
+  DomainInt getInitialMin(BoundVarRef_internal d) const
   { return initial_bounds[d.var_num].first; }
   
-  int getInitialMax(BoundVarRef_internal d) const
+  DomainInt getInitialMax(BoundVarRef_internal d) const
   { return initial_bounds[d.var_num].second; }
    
-  void removeFromDomain(BoundVarRef_internal, int )
+  void removeFromDomain(BoundVarRef_internal, DomainInt )
   {
     D_FATAL_ERROR( "Cannot Remove Value from domain of a bound var");
     FAIL_EXIT();
   }
   
-  void propogateAssign(BoundVarRef_internal d, int i)
+  void propogateAssign(BoundVarRef_internal d, DomainInt i)
   {
-    int min_val = getMin(d);
-    int max_val = getMax(d);
+    DomainInt min_val = getMin(d);
+    DomainInt max_val = getMax(d);
     if(min_val > i || max_val < i)
     {
       Controller::fail();
@@ -186,16 +186,16 @@ struct BoundVarContainer {
   }
   
   // TODO : Optimise
-  void uncheckedAssign(BoundVarRef_internal d, int i)
+  void uncheckedAssign(BoundVarRef_internal d, DomainInt i)
   { 
     D_ASSERT(inDomain(d,i));
     propogateAssign(d,i); 
   }
   
-  void setMax(BoundVarRef_internal d, int i)
+  void setMax(BoundVarRef_internal d, DomainInt i)
   {
-    int low_bound = lower_bound(d);
-    int up_bound = upper_bound(d);
+    DomainInt low_bound = lower_bound(d);
+    DomainInt up_bound = upper_bound(d);
     
     if(i < low_bound)
     {
@@ -214,10 +214,10 @@ struct BoundVarContainer {
     }
   }
   
-  void setMin(BoundVarRef_internal d, int i)
+  void setMin(BoundVarRef_internal d, DomainInt i)
   {
-    int low_bound = lower_bound(d);
-    int up_bound = upper_bound(d);
+    DomainInt low_bound = lower_bound(d);
+    DomainInt up_bound = upper_bound(d);
     
     if(i > up_bound)
     {
@@ -246,7 +246,7 @@ struct BoundVarContainer {
   }
 
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(BoundVarRef_internal& b, DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(BoundVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {
 	D_ASSERT(lock_m); 
 	D_ASSERT(type != DomainRemoval);
@@ -291,8 +291,8 @@ inline BoundVarRef
 BoundVarContainer<T>::get_new_var(int i, int j)
 {
   D_ASSERT(!lock_m);
-  D_ASSERT(i >= std::numeric_limits<T>::min());
-  D_ASSERT(j <= std::numeric_limits<T>::max());
+  D_ASSERT(i >= DomainInt_Min);
+  D_ASSERT(j <= DomainInt_Max);
  // D_ASSERT(i >= var_min && j <= var_max);
   initial_bounds.push_back(make_pair(i,j));
   return BoundVarRef(BoundVarRef_internal(var_count_m++));

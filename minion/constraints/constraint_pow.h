@@ -66,14 +66,14 @@ struct PowConstraint : public Constraint
   }
     
   
-  double my_pow(double x, double y)
-  { return pow(x,y);}
+  double my_pow(DomainInt x, DomainInt y)
+  { return pow(checked_cast<int>(x), checked_cast<int>(y));}
   
-  double my_y(double x, double z)
-  { return log(z) / log(x); }
+  double my_y(DomainInt x, DomainInt z)
+  { return log(checked_cast<int>(z)) / log(checked_cast<int>(x)); }
   
-  double my_x(double y, double z)
-  { return exp(log(z) / y); }
+  double my_x(DomainInt y, DomainInt z)
+  { return exp(log(checked_cast<int>(z)) / checked_cast<int>(y)); }
   
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
@@ -83,7 +83,7 @@ struct PowConstraint : public Constraint
 	  case -1:
 	  {
 		var3.setMin(LRINT(my_pow(var1.getMin(),var2.getMin())));
-		int var1_min = var1.getMin();
+		DomainInt var1_min = var1.getMin();
 		if(var1_min > 1)
 		  var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
 		break;
@@ -96,7 +96,7 @@ struct PowConstraint : public Constraint
 	  case -3:
 	  {
 		var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
-		int var1_max = var1.getMax();
+		DomainInt var1_max = var1.getMax();
 		if(var1_max > 1)
 		  var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
 		break;
@@ -104,7 +104,7 @@ struct PowConstraint : public Constraint
 	  case 1:
 	  {
 		var3.setMax(LRINT(my_pow(var1.getMax(),var2.getMax())));
-		int var1_max = var1.getMax();
+		DomainInt var1_max = var1.getMax();
 		if(var1_max > 1)
 		  var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
 		break;
@@ -117,7 +117,7 @@ struct PowConstraint : public Constraint
 	  case 3:
 	  {
 		var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
-		int var1_min = var1.getMin();
+		DomainInt var1_min = var1.getMin();
 		if(var1_min > 1)
 		  var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
 		break;
@@ -135,7 +135,7 @@ struct PowConstraint : public Constraint
     propogate(-3,0);
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
 	D_ASSERT(v.size() == 3);
 	return my_pow(v[0],v[1]) == v[2];

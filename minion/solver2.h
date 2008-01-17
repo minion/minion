@@ -36,7 +36,7 @@ namespace Controller
 {
 
   VARDEF_ASSIGN(AnyVarRef* optimise_var, NULL);
-  VARDEF(int current_optimise_position);
+  VARDEF(DomainInt current_optimise_position);
   VARDEF_ASSIGN(BOOL optimise, false);
 
   VARDEF(vector<Constraint*> constraints);

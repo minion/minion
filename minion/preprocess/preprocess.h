@@ -5,7 +5,7 @@
 */
 
 template<typename Var, typename Vars, typename Prop>
-bool inline check_fail(Var& var, int val, Vars& vars, Prop prop)
+bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop)
 {
   Controller::world_push();
   var.propogateAssign(val);
@@ -55,7 +55,7 @@ void propogateSAC_internal(vector<Var>& vararray, Prop prop)
       }
       else
       {
-        for(int val = var.getMin(); val <= var.getMax(); ++val)
+        for(DomainInt val = var.getMin(); val <= var.getMax(); ++val)
         {
           if(var.inDomain(val) && check_fail(var, val, vararray, prop))
           {

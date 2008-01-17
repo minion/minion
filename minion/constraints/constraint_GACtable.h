@@ -257,7 +257,7 @@ struct GACTableConstraint : public DynamicConstraint
 	}
   }
   
-   virtual BOOL check_assignment(vector<int> v)
+   virtual BOOL check_assignment(vector<DomainInt> v)
   {
     for(int i = 0; i < (lists->tuples)->size(); ++i)
 	{

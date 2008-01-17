@@ -50,7 +50,8 @@ typedef VarRefType<GetRangeVarContainer, RangeVarRef_internal> LRangeVarRef;
 template<int var_min, typename d_type>
 struct RangeVarContainer {
   typedef unsigned char domain_type;
-  static const int var_max = var_min + sizeof(d_type) * 8 - 1;
+// In C++, defining constants in enums avoids some linkage issues.
+  enum Constant { var_max = var_min + sizeof(d_type) * 8 - 1 };
   static const d_type one = static_cast<d_type>(1);
   BackTrackOffset bound_data;
   BackTrackOffset val_data;
@@ -72,11 +73,19 @@ struct RangeVarContainer {
   d_type& __data(RangeVarRef_internal i) const
   { return static_cast<d_type*>(val_data.get_ptr())[i.var_num]; }
   
-  bool in_bitarray(RangeVarRef_internal d, int val) const
-  { return __data(d) & (one << val); }
+  bool in_bitarray(RangeVarRef_internal d, DomainInt dom_val) const
+  { 
+	int val = checked_cast<int>(dom_val);
+	D_ASSERT(val >= 0 && val < sizeof(d_type) * 8);
+	return __data(d) & (one << val); 
+  }
   
-  void remove_from_bitarray(RangeVarRef_internal d, int offset) const
-  { __data(d) &= ~(one << offset); }
+  void remove_from_bitarray(RangeVarRef_internal d, DomainInt dom_offset) const
+  { 
+	int offset = checked_cast<int>(dom_offset);
+	D_ASSERT(offset >= 0 && offset < sizeof(d_type) * 8);
+	__data(d) &= ~(one << offset); 
+  }
   
   /// Returns new upper bound.
   int find_new_raw_upper_bound(RangeVarRef_internal d)
@@ -166,14 +175,14 @@ struct RangeVarContainer {
     return lower_bound(d) == upper_bound(d); 
   }
   
-  int getAssignedValue(RangeVarRef_internal d) const
+  DomainInt getAssignedValue(RangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return lower_bound(d);
   }
   
-  BOOL inDomain(RangeVarRef_internal d, int i) const
+  BOOL inDomain(RangeVarRef_internal d, DomainInt i) const
   {
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
@@ -181,7 +190,7 @@ struct RangeVarContainer {
     return in_bitarray(d,i - var_min);
   }
   
-  BOOL inDomain_noBoundCheck(RangeVarRef_internal d, int i) const
+  BOOL inDomain_noBoundCheck(RangeVarRef_internal d, DomainInt i) const
   {
     D_ASSERT(lock_m);
 	D_ASSERT(i >= lower_bound(d));
@@ -191,32 +200,32 @@ struct RangeVarContainer {
 
   
   
-  int getMin(RangeVarRef_internal d) const
+  DomainInt getMin(RangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(Controller::failed || inDomain(d,lower_bound(d)));
     return lower_bound(d);
   }
   
-  int getMax(RangeVarRef_internal d) const
+  DomainInt getMax(RangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(Controller::failed || inDomain(d,upper_bound(d)));
     return upper_bound(d);
   }
 
-  int getInitialMin(RangeVarRef_internal d) const
+  DomainInt getInitialMin(RangeVarRef_internal d) const
   { return initial_bounds[d.var_num].first; }
   
-  int getInitialMax(RangeVarRef_internal d) const
+  DomainInt getInitialMax(RangeVarRef_internal d) const
   { return initial_bounds[d.var_num].second; }
     
-  void removeFromDomain(RangeVarRef_internal d, int i)
+  void removeFromDomain(RangeVarRef_internal d, DomainInt i)
   {
     D_ASSERT(lock_m);
     if(!inDomain(d,i)) 
       return;
-    int offset = i - var_min;
+    DomainInt offset = i - var_min;
     trigger_list.push_domain(d.var_num);
 #ifdef FULL_DOMAIN_TRIGGERS
 	trigger_list.push_domain_removal(d.var_num, i);
@@ -241,9 +250,9 @@ struct RangeVarContainer {
     return;
   }
   
-  void propogateAssign(RangeVarRef_internal d, int i)
+  void propogateAssign(RangeVarRef_internal d, DomainInt i)
   {
-    int offset = i - var_min;
+    DomainInt offset = i - var_min;
     if(!inDomain(d,i))
       {Controller::fail(); return;}
 	
@@ -261,9 +270,9 @@ struct RangeVarContainer {
     trigger_list.push_assign(d.var_num, i);
 #ifdef FULL_DOMAIN_TRIGGERS
 	// TODO : Optimise this function to only check values in domain.
-	int min_val = getMin(d);
-	int max_val = getMax(d);
-	for(int loop = min_val; loop <= max_val; ++loop)
+	DomainInt min_val = getMin(d);
+	DomainInt max_val = getMax(d);
+	for(DomainInt loop = min_val; loop <= max_val; ++loop)
 	{
 	  if(inDomain_noBoundCheck(d, loop) && i != loop)
 	    trigger_list.push_domain_removal(d.var_num, loop);
@@ -272,28 +281,28 @@ struct RangeVarContainer {
     if(offset != raw_lower)
     {
       trigger_list.push_lower(d.var_num, offset - raw_lower);
-      raw_lower_bound(d) = offset;
+      raw_lower_bound(d) = checked_cast<unsigned char>(offset);
     }
     
     if(offset != raw_upper)
     {
       trigger_list.push_upper(d.var_num, raw_upper - offset);
-      raw_upper_bound(d) = offset;
+      raw_upper_bound(d) = checked_cast<unsigned char>(offset);
     }
   }
   
   // TODO : Optimise
-  void uncheckedAssign(RangeVarRef_internal d, int i)
+  void uncheckedAssign(RangeVarRef_internal d, DomainInt i)
   { 
     D_ASSERT(inDomain(d,i));
     propogateAssign(d,i); 
   }
   
-  void setMax(RangeVarRef_internal d, int i)
+  void setMax(RangeVarRef_internal d, DomainInt i)
   {
-    int offset = i - var_min;
-    int up_bound = raw_upper_bound(d);
-    int low_bound = raw_lower_bound(d);
+    DomainInt offset = i - var_min;
+    DomainInt up_bound = raw_upper_bound(d);
+    DomainInt low_bound = raw_lower_bound(d);
 	
 	if(offset < low_bound)
 	{
@@ -305,14 +314,14 @@ struct RangeVarContainer {
     {
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-	  for(int loop = i + 1; loop <= up_bound + var_min; ++loop)
+	  for(DomainInt loop = i + 1; loop <= up_bound + var_min; ++loop)
 	  {
 	    if(inDomain_noBoundCheck(d, loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif	 
  
-      raw_upper_bound(d) = offset;
+      raw_upper_bound(d) = checked_cast<unsigned char>(offset);
       int raw_new_upper = find_new_raw_upper_bound(d);
 
 #ifdef FULL_DOMAIN_TRIGGERS
@@ -334,11 +343,11 @@ struct RangeVarContainer {
     }
   }
   
-  void setMin(RangeVarRef_internal d, int i)
+  void setMin(RangeVarRef_internal d, DomainInt i)
   {
-    int offset = i - var_min;
-    int low_bound = raw_lower_bound(d);   
-	int up_bound = raw_upper_bound(d);
+    DomainInt offset = i - var_min;
+    DomainInt low_bound = raw_lower_bound(d);   
+	DomainInt up_bound = raw_upper_bound(d);
 	
 	if(offset > up_bound)
 	{
@@ -350,19 +359,19 @@ struct RangeVarContainer {
     {
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-	  for(int loop = low_bound + var_min; loop < i; ++loop)
+	  for(DomainInt loop = low_bound + var_min; loop < i; ++loop)
 	  {
 	    if(inDomain_noBoundCheck(d, loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif	 	  
 	  
-	  raw_lower_bound(d) = offset;
+	  raw_lower_bound(d) = checked_cast<unsigned char>(offset);
 	  int raw_new_lower = find_new_raw_lower_bound(d);
 
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-	  for(int loop = i; loop < raw_new_lower + var_min; ++loop)
+	  for(DomainInt loop = i; loop < raw_new_lower + var_min; ++loop)
 	  {
 		// XXX : Can this loop ever trigger??
 		D_ASSERT(!inDomain_noBoundCheck(d, loop))
@@ -370,7 +379,7 @@ struct RangeVarContainer {
 		//trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif
-      raw_lower_bound(d) = raw_new_lower;
+      raw_lower_bound(d) = checked_cast<unsigned char>(raw_new_lower);
 
       trigger_list.push_domain(d.var_num);
       trigger_list.push_lower(d.var_num, raw_new_lower - low_bound);
@@ -387,7 +396,7 @@ struct RangeVarContainer {
   { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type);  }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(RangeVarRef_internal& b, DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(RangeVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   { 
     D_ASSERT(lock_m);
     D_ASSERT(b.var_num >= 0);
@@ -397,13 +406,20 @@ struct RangeVarContainer {
   }
 #endif
   
-  BOOL valid_range(int lower, int upper)
+  BOOL valid_range(DomainInt lower, DomainInt upper)
   { return (lower >= var_min && upper <= var_max); }
 };
 
 typedef RangeVarContainer<0,unsigned long long> LRVCon;
 
 VARDEF(LRVCon rangevar_container);
+
+struct SmallDiscreteCheck
+{
+  template<typename T>
+  bool operator()(const T& lower, const T& upper) const
+  { return rangevar_container.valid_range(lower, upper); }
+};
 
 struct GetRangeVarContainer
 {

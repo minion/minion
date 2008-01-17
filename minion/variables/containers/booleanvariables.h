@@ -68,41 +68,41 @@ struct BoolVarRef_internal
   BOOL isAssigned() const
   { return assign_ptr() & shift_offset; }
   
-  int getAssignedValue() const
+  DomainInt getAssignedValue() const
   {
     D_ASSERT(isAssigned());
     return (bool)(value_ptr() & shift_offset);
   }
   
-  BOOL inDomain(int b) const
+  BOOL inDomain(DomainInt b) const
   {
     if(b < 0 || b > 1) 
 	  return false;
     return (!isAssigned()) || (b == getAssignedValue());
   }
   
-  BOOL inDomain_noBoundCheck(int b) const
+  BOOL inDomain_noBoundCheck(DomainInt b) const
   {
     D_ASSERT(b == 0 || b == 1);
 	return (!isAssigned()) || (b == getAssignedValue());
   }
   
-  int getMin() const
+  DomainInt getMin() const
   {
     if(!isAssigned()) return 0;
     return getAssignedValue();
   }
   
-  int getMax() const
+  DomainInt getMax() const
   {
     if(!isAssigned()) return 1;
     return getAssignedValue();
   }
  
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { return 0; }
   
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   { return 1; }
  
 };
@@ -161,7 +161,7 @@ struct BooleanContainer
   BoolVarRef get_var_num(int i);
   
   
-  void setMax(const BoolVarRef_internal& d, int i) 
+  void setMax(const BoolVarRef_internal& d, DomainInt i) 
   {
     if(i < 0)
 	{
@@ -174,7 +174,7 @@ struct BooleanContainer
       propogateAssign(d,0);
   }
   
-  void setMin(const BoolVarRef_internal& d, int i) 
+  void setMin(const BoolVarRef_internal& d, DomainInt i) 
   {
     if(i > 1)
 	{
@@ -186,7 +186,7 @@ struct BooleanContainer
       propogateAssign(d,1);
   }
   
-  void removeFromDomain(const BoolVarRef_internal& d, int b)
+  void removeFromDomain(const BoolVarRef_internal& d, DomainInt b)
   {
     D_ASSERT(lock_m && d.var_num < var_count_m);
     if(d.isAssigned())
@@ -198,7 +198,7 @@ struct BooleanContainer
       uncheckedAssign(d,1-b);
   }
   
-  void uncheckedAssign(const BoolVarRef_internal& d, int b)
+  void uncheckedAssign(const BoolVarRef_internal& d, DomainInt b)
   {
     D_ASSERT(lock_m && d.var_num < var_count_m);
     D_ASSERT(!d.isAssigned());
@@ -212,7 +212,7 @@ struct BooleanContainer
     trigger_list.push_assign(d.var_num, b);
 	trigger_list.push_domain_removal(d.var_num, 1 - b);
     
-    if(b)
+    if(b == 1)
     {
       trigger_list.push_lower(d.var_num, 1);
       value_ptr()[d.data_offset] |= d.shift_offset;
@@ -224,7 +224,7 @@ struct BooleanContainer
     }
   }
   
-  void propogateAssign(const BoolVarRef_internal& d, int b)
+  void propogateAssign(const BoolVarRef_internal& d, DomainInt b)
   {
     if(!d.isAssigned()) 
       uncheckedAssign(d,b);
@@ -240,7 +240,7 @@ struct BooleanContainer
     
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(BoolVarRef_internal& b, DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(BoolVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   { 
     D_ASSERT(pos == -999 || ( type == DomainRemoval && pos != -999 ) );
     D_ASSERT(lock_m);

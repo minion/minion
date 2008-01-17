@@ -28,7 +28,7 @@ struct CheckAssignConstraint : public Constraint
   VarArray variables;
   ReversibleInt assigned_vars;
   // To avoid allocating many vectors.
-  vector<int> assignment;
+  vector<DomainInt> assignment;
   
  
   CheckAssignConstraint(VarArray& vars, OriginalConstraint& con)
@@ -115,7 +115,7 @@ struct CheckAssignConstraint : public Constraint
 	  Controller::fail();
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
 	D_ASSERT(v.size() == variables.size());
     return !originalcon.check_assignment(v);

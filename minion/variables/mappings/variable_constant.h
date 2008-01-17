@@ -45,46 +45,46 @@ struct ConstantVar
   BOOL isAssigned() const
   { return true;}
   
-  int getAssignedValue() const
+  DomainInt getAssignedValue() const
   { return val;}
   
-  BOOL isAssignedValue(int i) const
+  BOOL isAssignedValue(DomainInt i) const
   { return i == val; }
   
-  BOOL inDomain(int b) const
+  BOOL inDomain(DomainInt b) const
   { return b == val; }
 
-  BOOL inDomain_noBoundCheck(int b) const
+  BOOL inDomain_noBoundCheck(DomainInt b) const
   { 
     D_ASSERT(b == val);
 	return true;
   }
   
-  int getMax() const
+  DomainInt getMax() const
   { return val; }
   
-  int getMin() const
+  DomainInt getMin() const
   { return val; }
 
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   { return val; }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { return val; }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { if(i<val) Controller::fail(); }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { if(i>val) Controller::fail(); }
   
-  void uncheckedAssign(int)
+  void uncheckedAssign(DomainInt)
   { FAIL_EXIT(); }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   {if(b != val) Controller::fail(); }
   
-  void removeFromDomain(int b)
+  void removeFromDomain(DomainInt b)
   { if(b==val) Controller::fail(); }
  
   void addTrigger(Trigger, TrigType)
@@ -92,7 +92,7 @@ struct ConstantVar
 
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* dt, TrigType, int = -999)
+  void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = -999)
   { dt->remove(); }
 #endif
 

@@ -153,8 +153,8 @@ struct GACTableConstraint : public DynamicConstraint
 		
 		if(Controller::failed) return;
 		
-        int max = vars[varIndex].getMax();
-        for(int i = vars[varIndex].getMin(); i <= max; ++i) 
+        DomainInt max = vars[varIndex].getMax();
+        for(DomainInt i = vars[varIndex].getMin(); i <= max; ++i) 
         { 
 		    int literal = tuples->get_literal(varIndex, i);
             int sup = tupleTrieArrayptr->getTrie(varIndex).       
@@ -175,7 +175,7 @@ struct GACTableConstraint : public DynamicConstraint
       // cout << endl; cout << "  fp: finished finding supports: " << endl ;
   }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
     for(unsigned i = 0; i < tuples->size(); ++i)
 	{

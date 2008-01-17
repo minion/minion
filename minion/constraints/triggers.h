@@ -37,8 +37,8 @@ public:
   int data;
   TriggerRange(Trigger* s, Trigger* e, int _data) : start(s), finish(e), data(_data)
   { 
-    D_ASSERT(data >= std::numeric_limits<int>::min());
-    D_ASSERT(data <= std::numeric_limits<int>::max());
+    D_ASSERT(data >= DomainInt_Min);
+    D_ASSERT(data <= DomainInt_Max);
   }
 };
 

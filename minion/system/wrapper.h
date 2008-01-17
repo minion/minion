@@ -1,6 +1,8 @@
 #ifndef _WRAPPER_H
 #define _WRAPPER_H
 
+#include <ostream>
+
 template<typename T>
 struct Wrapper
 { 
@@ -8,6 +10,9 @@ struct Wrapper
   
   Wrapper(const T& _t) : t(_t)
   { }
+  
+  Wrapper() : t()
+  {}
   
   Wrapper& operator+=(const Wrapper& w)
   { 
@@ -38,6 +43,16 @@ struct Wrapper
 	t = -t;
 	return *this;
   }
+  
+  void operator++()
+  { t++; }
+  
+  void operator--()
+  { t--; }
+  
+  friend std::ostream& operator<<(std::ostream& o, Wrapper v)
+  { return o << v.t; }
+  
 };
 
 #define WRAP_BOOL_OPS(op) \
@@ -45,12 +60,12 @@ template<typename T> \
 bool operator op (const Wrapper<T>& t1, const Wrapper<T>& t2) \
 { return t1.t op t2.t; } \
 \
-template<typename T> \
-bool operator op (const T& t1, const Wrapper<T>& t2) \
+template<typename T, typename U> \
+bool operator op (const U& t1, const Wrapper<T>& t2) \
 { return t1 op t2.t; } \
 \
-template<typename T> \
-bool operator op (const Wrapper<T>& t1, const T& t2) \
+template<typename T, typename U> \
+bool operator op (const Wrapper<T>& t1, const U& t2) \
 { return t1.t op t2; } 
 
 WRAP_BOOL_OPS(==)
@@ -65,12 +80,12 @@ template<typename T> \
 Wrapper<T> operator op (const Wrapper<T>& t1, const Wrapper<T>& t2) \
 { return t1.t op t2.t; } \
 \
-template<typename T> \
-Wrapper<T> operator op(const T& t1, const Wrapper<T>& t2) \
+template<typename T, typename U> \
+Wrapper<T> operator op(const U& t1, const Wrapper<T>& t2) \
 { return t1 op t2.t; } \
 \
-template<typename T> \
-Wrapper<T> operator op(const Wrapper<T>& t1, const T& t2) \
+template<typename T, typename U> \
+Wrapper<T> operator op(const Wrapper<T>& t1, const U& t2) \
 { return t1.t op t2; } \
 
 WRAP_ARITHMETIC_OPS(+)

@@ -30,19 +30,19 @@ struct AnyVarRef_Abstract
 {
   virtual BOOL isBound() = 0;
   virtual BOOL isAssigned() = 0;  
-  virtual int getAssignedValue() = 0;
-  virtual BOOL isAssignedValue(int i) = 0;
-  virtual BOOL inDomain(int b) = 0;
-  virtual BOOL inDomain_noBoundCheck(int b) = 0;
-  virtual int getMax() = 0;
-  virtual int getMin() = 0;
-  virtual int getInitialMax() const = 0;
-  virtual int getInitialMin() const = 0;
-  virtual void setMax(int i) = 0;
-  virtual void setMin(int i) = 0;
-  virtual void uncheckedAssign(int b) = 0;
-  virtual void propogateAssign(int b) = 0;
-  virtual void removeFromDomain(int b) = 0;
+  virtual DomainInt getAssignedValue() = 0;
+  virtual BOOL isAssignedValue(DomainInt i) = 0;
+  virtual BOOL inDomain(DomainInt b) = 0;
+  virtual BOOL inDomain_noBoundCheck(DomainInt b) = 0;
+  virtual DomainInt getMax() = 0;
+  virtual DomainInt getMin() = 0;
+  virtual DomainInt getInitialMax() const = 0;
+  virtual DomainInt getInitialMin() const = 0;
+  virtual void setMax(DomainInt i) = 0;
+  virtual void setMin(DomainInt i) = 0;
+  virtual void uncheckedAssign(DomainInt b) = 0;
+  virtual void propogateAssign(DomainInt b) = 0;
+  virtual void removeFromDomain(DomainInt b) = 0;
   virtual void addTrigger(Trigger t, TrigType type) = 0;
 
   virtual string virtual_to_string() = 0;
@@ -52,7 +52,7 @@ struct AnyVarRef_Abstract
   
   virtual int getDomainChange(DomainDelta d) = 0;
 #ifdef DYNAMICTRIGGERS
-  virtual void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999) = 0;
+  virtual void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999) = 0;
 #endif
 };
 
@@ -77,43 +77,43 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   virtual BOOL isAssigned()
   { return data.isAssigned(); }
   
-  virtual int getAssignedValue()
+  virtual DomainInt getAssignedValue()
   { return data.getAssignedValue(); }
   
-  virtual BOOL isAssignedValue(int i)
+  virtual BOOL isAssignedValue(DomainInt i)
   { return data.isAssignedValue(i); }
   
-  virtual BOOL inDomain(int b)
+  virtual BOOL inDomain(DomainInt b)
   { return data.inDomain(b); }
   
-  virtual BOOL inDomain_noBoundCheck(int b)
+  virtual BOOL inDomain_noBoundCheck(DomainInt b)
   { return data.inDomain_noBoundCheck(b); }
   
-  virtual int getMax()
+  virtual DomainInt getMax()
   { return data.getMax(); }
   
-  virtual int getMin()
+  virtual DomainInt getMin()
   { return data.getMin(); }
 
-  virtual int getInitialMax() const
+  virtual DomainInt getInitialMax() const
   { return data.getInitialMax(); }
   
-  virtual int getInitialMin() const
+  virtual DomainInt getInitialMin() const
   { return data.getInitialMin(); }
   
-  virtual void setMax(int i)
+  virtual void setMax(DomainInt i)
   { data.setMax(i); }
   
-  virtual void setMin(int i)
+  virtual void setMin(DomainInt i)
   { data.setMin(i); }
   
-  virtual void uncheckedAssign(int b)
+  virtual void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(b); }
   
-  virtual void propogateAssign(int b)
+  virtual void propogateAssign(DomainInt b)
   { data.propogateAssign(b); }
   
-  virtual void removeFromDomain(int b)
+  virtual void removeFromDomain(DomainInt b)
   { data.removeFromDomain(b); }
   
   virtual void addTrigger(Trigger t, TrigType type)
@@ -129,7 +129,7 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   { return data.getDomainChange(d); }
 
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  data.addDynamicTrigger(t, type, pos); }
 #endif
 };
@@ -157,46 +157,46 @@ struct AnyVarRef
   BOOL isAssigned()
   { return data->isAssigned(); }
   
-  int getAssignedValue()
+  DomainInt getAssignedValue()
   { return data->getAssignedValue(); }
   
-  BOOL isAssignedValue(int i)
+  BOOL isAssignedValue(DomainInt i)
   { 
     return data->isAssigned() &&
     data->getAssignedValue() == i;
   }
   
-  BOOL inDomain(int b)
+  BOOL inDomain(DomainInt b)
   { return data->inDomain(b); }
 
-  BOOL inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(DomainInt b)
   { return data->inDomain_noBoundCheck(b); }
   
-  int getMax()
+  DomainInt getMax()
   { return data->getMax(); }
   
-  int getMin()
+  DomainInt getMin()
   { return data->getMin(); }
 
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   { return data->getInitialMax(); }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { return data->getInitialMin(); }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { data->setMax(i); }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { data->setMin(i); }
   
-  void uncheckedAssign(int b)
+  void uncheckedAssign(DomainInt b)
   { data->uncheckedAssign(b); }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   { data->propogateAssign(b); }
   
-  void removeFromDomain(int b)
+  void removeFromDomain(DomainInt b)
   { data->removeFromDomain(b); }
 
   void addTrigger(Trigger t, TrigType type)
@@ -209,7 +209,7 @@ struct AnyVarRef
   { return data->getDomainChange(d); }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  data->addDynamicTrigger(t, type, pos); }
 #endif
 };

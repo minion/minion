@@ -42,7 +42,7 @@ typedef VarRefType<GetBigRangeVarContainer, BigRangeVarRef_internal> BigRangeVar
 
 template<typename d_type>
 struct BigRangeVarContainer {
-  typedef int domain_bound_type;
+  typedef DomainInt domain_bound_type;
   static const int var_step = sizeof(d_type) * 8;
   static const d_type one = static_cast<d_type>(1);
   BackTrackOffset bound_data;
@@ -80,12 +80,12 @@ struct BigRangeVarContainer {
   /// Find new "true" upper bound.
   /// This should be used by first setting the value of upper_bound(d), then calling
   /// this function to move this value past any removed values.
-  int find_new_upper_bound(BigRangeVarRef_internal d)
+  DomainInt find_new_upper_bound(BigRangeVarRef_internal d)
   {
-    int lower = lower_bound(d); 
-    int old_up_bound = upper_bound(d);
-    int loopvar = old_up_bound; 
-    int low_bound = initial_bounds[d.var_num].first; 
+    DomainInt lower = lower_bound(d); 
+    DomainInt old_up_bound = upper_bound(d);
+    DomainInt loopvar = old_up_bound; 
+    DomainInt low_bound = initial_bounds[d.var_num].first; 
     if(loopvar < lower)
 	{
 	  Controller::fail();
@@ -96,7 +96,7 @@ struct BigRangeVarContainer {
     //if(bms_pointer(d)->isMember(loopvar - low_bound) && (loopvar >= lower))
     if(bms_array->isMember(var_offset[d.var_num] + loopvar - low_bound) && (loopvar >= lower))
       return upper_bound(d);
-    loopvar--;
+    --loopvar;
     for(; loopvar >= lower; --loopvar)
     {
       //if(bms_pointer(d)->isMember(loopvar - low_bound)) 
@@ -110,12 +110,12 @@ struct BigRangeVarContainer {
   /// Find new "true" lower bound.
   /// This should be used by first setting the value of lower_bound(d), then calling
   /// this function to move this value past any removed values.
-  int find_new_lower_bound(BigRangeVarRef_internal d)
+  DomainInt find_new_lower_bound(BigRangeVarRef_internal d)
   {
-    int upper = upper_bound(d); 
-    int old_low_bound = lower_bound(d);
-    int loopvar = old_low_bound; 
-    int low_bound = initial_bounds[d.var_num].first; 
+    DomainInt upper = upper_bound(d); 
+    DomainInt old_low_bound = lower_bound(d);
+    DomainInt loopvar = old_low_bound; 
+    DomainInt low_bound = initial_bounds[d.var_num].first; 
     if(loopvar > upper)
 	{
 	  Controller::fail();
@@ -126,7 +126,7 @@ struct BigRangeVarContainer {
     //if(bms_pointer(d)->isMember(loopvar - low_bound) && (loopvar <= upper))
     if(bms_array->isMember(var_offset[d.var_num] + loopvar - low_bound) && (loopvar <= upper))
       return lower_bound(d);
-    loopvar++;
+    ++loopvar;
     for(; loopvar <= upper; ++loopvar)
     {
       if(bms_array->isMember(var_offset[d.var_num] + loopvar - low_bound)) 
@@ -178,14 +178,14 @@ struct BigRangeVarContainer {
     return lower_bound(d) == upper_bound(d); 
   }
   
-  int getAssignedValue(BigRangeVarRef_internal d) const
+  DomainInt getAssignedValue(BigRangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return getMin(d);
   }
   
-  BOOL inDomain(BigRangeVarRef_internal d, int i) const
+  BOOL inDomain(BigRangeVarRef_internal d, DomainInt i) const
   {
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
@@ -193,7 +193,7 @@ struct BigRangeVarContainer {
     return bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
   }
   
-  BOOL inDomain_noBoundCheck(BigRangeVarRef_internal d, int i) const
+  BOOL inDomain_noBoundCheck(BigRangeVarRef_internal d, DomainInt i) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(i >= lower_bound(d));
@@ -201,27 +201,27 @@ struct BigRangeVarContainer {
     return bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
   }
   
-  int getMin(BigRangeVarRef_internal d) const
+  DomainInt getMin(BigRangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     return lower_bound(d);
   }
   
-  int getMax(BigRangeVarRef_internal d) const
+  DomainInt getMax(BigRangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     return upper_bound(d);
   }
   
-  int getInitialMin(BigRangeVarRef_internal d) const
+  DomainInt getInitialMin(BigRangeVarRef_internal d) const
   { return initial_bounds[d.var_num].first; }
   
-  int getInitialMax(BigRangeVarRef_internal d) const
+  DomainInt getInitialMax(BigRangeVarRef_internal d) const
   { return initial_bounds[d.var_num].second; }
    
-  void removeFromDomain(BigRangeVarRef_internal d, int i)
+  void removeFromDomain(BigRangeVarRef_internal d, DomainInt i)
   {
 #ifdef DEBUG
     cout << "Calling removeFromDomain: " << d.var_num << " " << i << " [" 
@@ -240,7 +240,7 @@ struct BigRangeVarContainer {
 #endif
       return;
     }
-    int offset = i;
+    DomainInt offset = i;
 #ifdef FULL_DOMAIN_TRIGGERS
 	trigger_list.push_domain_removal(d.var_num, i);
 #endif
@@ -276,13 +276,13 @@ struct BigRangeVarContainer {
     return;
   }
   
-  void propogateAssign(BigRangeVarRef_internal d, int offset)
+  void propogateAssign(BigRangeVarRef_internal d, DomainInt offset)
   {
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     if(!inDomain(d,offset))
 	  {Controller::fail(); return;}
-	int lower = lower_bound(d);
-	int upper = upper_bound(d);
+	DomainInt lower = lower_bound(d);
+	DomainInt upper = upper_bound(d);
     if(offset == upper && offset == lower)
       return;
 	
@@ -294,7 +294,7 @@ struct BigRangeVarContainer {
 	
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-	  for(int loop = lower; loop <= upper; ++loop)
+	  for(DomainInt loop = lower; loop <= upper; ++loop)
 	  {
 	    if(inDomain_noBoundCheck(d, loop) && loop != offset)
 	      trigger_list.push_domain_removal(d.var_num, loop);
@@ -303,14 +303,14 @@ struct BigRangeVarContainer {
     trigger_list.push_domain(d.var_num);
     trigger_list.push_assign(d.var_num, offset);
     
-    int low_bound = lower_bound(d);
+    DomainInt low_bound = lower_bound(d);
     if(offset != low_bound)
     {
       trigger_list.push_lower(d.var_num, offset - low_bound);
       lower_bound(d) = offset;
     }
     
-    int up_bound = upper_bound(d);
+    DomainInt up_bound = upper_bound(d);
     if(offset != up_bound)
     {
       trigger_list.push_upper(d.var_num, up_bound - offset);
@@ -320,13 +320,13 @@ struct BigRangeVarContainer {
   }
   
   // TODO : Optimise
-  void uncheckedAssign(BigRangeVarRef_internal d, int i)
+  void uncheckedAssign(BigRangeVarRef_internal d, DomainInt i)
   { 
     D_ASSERT(inDomain(d,i));
     propogateAssign(d,i); 
   }
   
-  void setMax(BigRangeVarRef_internal d, int offset)
+  void setMax(BigRangeVarRef_internal d, DomainInt offset)
   {
 #ifdef DEBUG
     cout << "Calling setMax: " << d.var_num << " " << offset << " [" 
@@ -337,8 +337,8 @@ struct BigRangeVarContainer {
 #endif
 
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
-    int up_bound = upper_bound(d);
-    int low_bound = lower_bound(d);
+    DomainInt up_bound = upper_bound(d);
+    DomainInt low_bound = lower_bound(d);
 	
 	if(offset < low_bound)
 	{
@@ -350,18 +350,18 @@ struct BigRangeVarContainer {
     {
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-	  for(int loop = offset + 1; loop <= up_bound; ++loop)
+	  for(DomainInt loop = offset + 1; loop <= up_bound; ++loop)
 	  {
 	    if(inDomain_noBoundCheck(d, loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif	 
       upper_bound(d) = offset;      
-	  int new_upper = find_new_upper_bound(d);
+	  DomainInt new_upper = find_new_upper_bound(d);
 
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-	  for(int loop = new_upper + 1; loop <= offset; ++loop)
+	  for(DomainInt loop = new_upper + 1; loop <= offset; ++loop)
 	  {
 		D_ASSERT(!inDomain_noBoundCheck(d, loop));
 //	    if(inDomain_noBoundCheck(d, loop))
@@ -386,7 +386,7 @@ struct BigRangeVarContainer {
 #endif
   }
   
-  void setMin(BigRangeVarRef_internal d, int offset)
+  void setMin(BigRangeVarRef_internal d, DomainInt offset)
   {
 #ifdef DEBUG
     cout << "Calling setMin: " << d.var_num << " " << offset << " [" 
@@ -397,8 +397,8 @@ struct BigRangeVarContainer {
 #endif
     D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
-	int up_bound = upper_bound(d);
-    int low_bound = lower_bound(d);
+	DomainInt up_bound = upper_bound(d);
+    DomainInt low_bound = lower_bound(d);
     
 	if(offset > up_bound)
 	{
@@ -410,7 +410,7 @@ struct BigRangeVarContainer {
     {
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-	  for(int loop = low_bound; loop < offset; ++loop)
+	  for(DomainInt loop = low_bound; loop < offset; ++loop)
 	  {
 	    if(inDomain_noBoundCheck(d, loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
@@ -420,11 +420,11 @@ struct BigRangeVarContainer {
 
 
           lower_bound(d) = offset;
-          int new_lower = find_new_lower_bound(d);
+          DomainInt new_lower = find_new_lower_bound(d);
 	  
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-	  for(int loop = offset; loop < new_lower; ++loop)
+	  for(DomainInt loop = offset; loop < new_lower; ++loop)
 	  {
 		D_ASSERT(!inDomain_noBoundCheck(d, loop));
 //	    if(inDomain_noBoundCheck(d, loop))
@@ -455,7 +455,7 @@ struct BigRangeVarContainer {
   { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type);  }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(BigRangeVarRef_internal b, DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(BigRangeVarRef_internal b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  
     D_ASSERT(lock_m);
 	D_ASSERT(b.var_num >= 0);

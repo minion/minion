@@ -27,33 +27,33 @@
 template<typename T>
 struct MultiplyHelp
 {
-static inline int round_down(int val, int divisor)
+static inline DomainInt round_down(DomainInt val, DomainInt divisor)
 {
  // D_ASSERT(divisor > 0);
   if(val > 0)
     return val / divisor;
   
-  int newval = val / divisor;
+  DomainInt newval = val / divisor;
   if(newval * divisor == val)
     return newval;
   
   return newval - 1;
 }
 
-static inline int round_up(int val, int divisor)
+static inline DomainInt round_up(DomainInt val, DomainInt divisor)
 {
   D_ASSERT(divisor > 0);
   if(val < 0)
     return val / divisor;
   
-  int newval = val / divisor;
+  DomainInt newval = val / divisor;
   if(newval*divisor == val)
     return newval;
   
   return newval + 1;
 }
 
-static inline int divide_exact(int val, int divisor)
+static inline DomainInt divide_exact(DomainInt val, DomainInt divisor)
 { 
   D_ASSERT(val % divisor == 0);
   return val / divisor;
@@ -100,31 +100,31 @@ struct MultiplyVar
   BOOL isAssigned()
   { return data.isAssigned(); }
   
-  int getAssignedValue()
+  DomainInt getAssignedValue()
   { return data.getAssignedValue() * Multiply; }
   
-  BOOL isAssignedValue(int i)
+  BOOL isAssignedValue(DomainInt i)
   { 
     if(!data.isAssigned()) return false;
 	
 	return data.getAssignedValue() == i * Multiply;
   }
   
-  BOOL inDomain(int b)
+  BOOL inDomain(DomainInt b)
   { 
     if(b % Multiply != 0)
 	  return false;
 	return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
   
-  BOOL inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(DomainInt b)
   { 
     if(b % Multiply != 0)
 	  return false;
 	return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
   
-  int getMax()
+  DomainInt getMax()
   {  
     if(Multiply >= 0)
       return data.getMax() * Multiply; 
@@ -132,7 +132,7 @@ struct MultiplyVar
 	  return data.getMin() * Multiply;
   }
   
-  int getMin()
+  DomainInt getMin()
   { 
     if(Multiply >= 0)
 	  return data.getMin() * Multiply; 
@@ -140,7 +140,7 @@ struct MultiplyVar
 	  return data.getMax() * Multiply;  
   }
 
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   {  
     if(Multiply >= 0)
       return data.getInitialMax() * Multiply; 
@@ -148,7 +148,7 @@ struct MultiplyVar
 	  return data.getInitialMin() * Multiply;
   }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { 
     if(Multiply >= 0)
 	  return data.getInitialMin() * Multiply; 
@@ -156,7 +156,7 @@ struct MultiplyVar
 	  return data.getInitialMax() * Multiply;  
   }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { 
     if(Multiply >= 0)
       data.setMax(MultiplyHelp<VarRef>::round_down(i, Multiply)); 
@@ -164,7 +164,7 @@ struct MultiplyVar
 	  data.setMin(MultiplyHelp<VarRef>::round_up(-i, -Multiply));  
   }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { 
     if(Multiply >= 0)
 	  data.setMin(MultiplyHelp<VarRef>::round_up(i, Multiply));
@@ -172,16 +172,16 @@ struct MultiplyVar
 	  data.setMax(MultiplyHelp<VarRef>::round_down(-i, -Multiply));  
   }
   
-  void uncheckedAssign(int b)
+  void uncheckedAssign(DomainInt b)
   { 
     D_ASSERT(b % Multiply == 0);
     data.uncheckedAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); 
   }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   { data.propogateAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); }
   
-  void removeFromDomain(int)
+  void removeFromDomain(DomainInt)
   { FAIL_EXIT(); }
 
   void addTrigger(Trigger t, TrigType type)
@@ -207,7 +207,7 @@ struct MultiplyVar
   }
 
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  data.addDynamicTrigger(t, type, pos); }
 #endif
 

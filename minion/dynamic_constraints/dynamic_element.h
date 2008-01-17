@@ -58,10 +58,10 @@ struct ElementConstraintDynamic : public DynamicConstraint
   Index indexvar;
   Result resultvar;
   
-  int initial_result_dom_min;
-  int initial_result_dom_max;
+  DomainInt initial_result_dom_min;
+  DomainInt initial_result_dom_max;
   
-  vector<int> current_support;
+  vector<DomainInt> current_support;
   
   ElementConstraintDynamic(const VarArray& _var_array, const Index& _index, const Result& _result) :
 	var_array(_var_array), indexvar(_index), resultvar(_result)
@@ -73,7 +73,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
   int dynamic_trigger_count()
   {
 	int count = var_array.size() * 2 + 
-	(initial_result_dom_max - initial_result_dom_min + 1) * 2 
+	checked_cast<int>(initial_result_dom_max - initial_result_dom_min + 1) * 2 
 	+ 1 
 	+ 1; 
 	current_support.resize(count / 2);           // is int the right type?
@@ -82,7 +82,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
   
   void find_new_support_for_result(int j)
   {
-	int realj = j + initial_result_dom_min;
+	DomainInt realj = j + initial_result_dom_min;
 	
     if(!resultvar.inDomain(realj))
 	  return;
@@ -90,21 +90,23 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	int array_size = var_array.size();
     
     // support is value of index
-    int oldsupport = max(current_support[j + array_size], indexvar.getMin());  // old support probably just removed
-    int maxsupport = indexvar.getMax();
+    DomainInt oldsupport = max(current_support[j + array_size], indexvar.getMin());  // old support probably just removed
+    DomainInt maxsupport = indexvar.getMax();
     
-	int support = oldsupport;
+	DomainInt support = oldsupport;
 	
     DynamicTrigger* dt = dynamic_trigger_start();
     while(support <= maxsupport && 
-		  !(indexvar.inDomain_noBoundCheck(support) && var_array[support].inDomain(realj)))
+		  !(indexvar.inDomain_noBoundCheck(support) && 
+			var_array[checked_cast<int>(support)].inDomain(realj)))
       ++support;
     if(support > maxsupport)
     { 
       support = indexvar.getMin();
-	  int max_check = min(oldsupport, maxsupport + 1);
+	  DomainInt max_check = min(oldsupport, maxsupport + 1);
       while(support < max_check && 
-			!(indexvar.inDomain_noBoundCheck(support) && var_array[support].inDomain(realj)))
+			!(indexvar.inDomain_noBoundCheck(support) &&
+			  var_array[checked_cast<int>(support)].inDomain(realj)))
         ++support;
       if (support == max_check) 
       {
@@ -113,7 +115,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
         return;
       }
     }
-    var_array[support].addDynamicTrigger(dt + 2*j, DomainRemoval, realj);
+    var_array[checked_cast<int>(support)].addDynamicTrigger(dt + 2*j, DomainRemoval, realj);
     indexvar.addDynamicTrigger(dt + 2*j + 1, DomainRemoval, support);
     current_support[j + array_size] = support;
   }
@@ -123,10 +125,10 @@ struct ElementConstraintDynamic : public DynamicConstraint
     if(!indexvar.inDomain(i))
 	  return;
 	
-	int resultvarmin = resultvar.getMin();
-	int resultvarmax = resultvar.getMax();
+	DomainInt resultvarmin = resultvar.getMin();
+	DomainInt resultvarmax = resultvar.getMax();
 	DynamicTrigger* dt = dynamic_trigger_start() + 
-	                     (initial_result_dom_max - initial_result_dom_min + 1) * 2;
+	                     checked_cast<int>((initial_result_dom_max - initial_result_dom_min + 1) * 2);
 						 
 	if(resultvarmin == resultvarmax)
 	{
@@ -143,9 +145,9 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	
 
     // support is value of result
-    int oldsupport = max(current_support[i], resultvarmin); // old support probably just removed
-    int maxsupport = resultvarmax;
-    int support = oldsupport;
+    DomainInt oldsupport = max(current_support[i], resultvarmin); // old support probably just removed
+    DomainInt maxsupport = resultvarmax;
+    DomainInt support = oldsupport;
 	
     //int support = initial_result_dom_min;
 	while(support <= maxsupport &&
@@ -155,7 +157,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	if(support > maxsupport)
 	{ 
 	  support = resultvarmin;
-	  int max_check = min(oldsupport, maxsupport + 1);
+	  DomainInt max_check = min(oldsupport, maxsupport + 1);
 	  while(support < max_check &&     
 			!(resultvar.inDomain_noBoundCheck(support) && var_array[i].inDomain(support)))
 		++support;
@@ -175,24 +177,24 @@ struct ElementConstraintDynamic : public DynamicConstraint
   void deal_with_assigned_index()
   {
     D_ASSERT(indexvar.isAssigned());
-    int indexval = indexvar.getAssignedValue();
+    int indexval = checked_cast<int>(indexvar.getAssignedValue());
     VarRef var = var_array[indexval];
 	
-    int lower = resultvar.getMin(); 
+    DomainInt lower = resultvar.getMin(); 
     if( lower > var.getMin() ) 
     {
       var.setMin(lower);
       ++lower;                      // do not need to check lower bound, we know it's in resultvar
     }
 	
-    int upper = resultvar.getMax(); 
+    DomainInt upper = resultvar.getMax(); 
     if( upper < var.getMax() ) 
     {
       var.setMax(upper);
       --upper;                      // do not need to check upper bound, we know it's in resultvar
     }
     
-    for(int i = lower; i <= upper; ++i)
+    for(DomainInt i = lower; i <= upper; ++i)
     {
       if(!(resultvar.inDomain(i)))
         var.removeFromDomain(i); 
@@ -203,7 +205,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
   {
 	D_INFO(2, DI_DYELEMENT, "Setup Triggers");
 	int array_size = var_array.size(); 
-	int result_dom_size = initial_result_dom_max - initial_result_dom_min + 1;
+	DomainInt result_dom_size = initial_result_dom_max - initial_result_dom_min + 1;
 	
 	// Setup SupportLostForIndexValue(i,j)
 	// Here we are supporting values in the index variable
@@ -230,7 +232,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
 	dt += var_array.size() * 2 +
-	  (initial_result_dom_max - initial_result_dom_min + 1) * 2;
+	  checked_cast<int>((initial_result_dom_max - initial_result_dom_min + 1) * 2);
 	
 	// for(int i = initial_result_dom_min; i <= initial_result_dom_max; ++i)
 	// {
@@ -252,7 +254,8 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	DynamicTrigger* dt = dynamic_trigger_start();
 	unsigned pos = trig - dt;
 	unsigned array_size = var_array.size();
-	unsigned result_support_triggers = (initial_result_dom_max - initial_result_dom_min + 1) * 2;
+	unsigned result_support_triggers = 
+	  checked_cast<unsigned int>((initial_result_dom_max - initial_result_dom_min + 1) * 2);
 	unsigned index_support_triggers =  array_size * 2;
 	// int when_index_assigned_triggers = (initial_result_dom_max - initial_result_dom_min + 1);
 	if(pos < result_support_triggers)
@@ -292,14 +295,14 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	deal_with_assigned_index();
   }
   
-    virtual BOOL check_assignment(vector<int> v)
+    virtual BOOL check_assignment(vector<DomainInt> v)
 	{
 	  D_ASSERT(v.size() == var_array.size() + 2);
-	  int resultvariable = v[v.size() - 1];
-	  int indexvariable = v[v.size() - 2];
+	  DomainInt resultvariable = v[v.size() - 1];
+	  DomainInt indexvariable = v[v.size() - 2];
 	  if(indexvariable < 0 || indexvariable >= (int)v.size() - 2)
 	    return false;
-	  return v[indexvariable] == resultvariable;
+	  return v[checked_cast<int>(indexvariable)] == resultvariable;
 	}
 	
     virtual vector<AnyVarRef> get_vars()

@@ -24,79 +24,79 @@ struct InfoRefType
     return data.isAssigned(); 
   }
   
-  int getAssignedValue()
+  DomainInt getAssignedValue()
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getAssignedValue);
     return data.getAssignedValue(); }
   
-  BOOL isAssignedValue(int i)
+  BOOL isAssignedValue(DomainInt i)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, isAssignedValue);
     return data.isAssignedValue(i);
   }
   
-  BOOL inDomain(int b)
+  BOOL inDomain(DomainInt b)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, inDomain);
     return data.inDomain( b); 
   }
   
-  BOOL inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(DomainInt b)
   {
     VAR_INFO_ADDONE(VAR_TYPE, inDomain_noBoundCheck);
     return data.inDomain_noBoundCheck(b);
   }
   
   
-  int getMax()
+  DomainInt getMax()
   {
     VAR_INFO_ADDONE(VAR_TYPE, getMax);
     return data.getMax(); 
   }
   
-  int getMin()
+  DomainInt getMin()
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getMin);
     return data.getMin(); 
   }
 
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   {
     VAR_INFO_ADDONE(VAR_TYPE, getInitialMax);
     return data.getInitialMax(); 
   }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getInitialMin);
     return data.getInitialMin(); 
   }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, setMax);
     data.setMax(i); 
   }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, setMin);
     data.setMin(i); 
   }
   
-  void uncheckedAssign(int b)
+  void uncheckedAssign(DomainInt b)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, uncheckedAssign);
     data.uncheckedAssign( b); 
   }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, propogateAssign);
     data.propogateAssign( b); 
   }
   
-  void removeFromDomain(int b)
+  void removeFromDomain(DomainInt b)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, RemoveFromDomain);
     data.removeFromDomain( b); 
@@ -118,7 +118,7 @@ struct InfoRefType
   }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, addDynamicTrigger);
     data.addDynamicTrigger( t, type, pos); 

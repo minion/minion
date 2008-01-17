@@ -48,43 +48,43 @@ struct ShiftVar
   BOOL isAssigned()
   { return data.isAssigned(); }
   
-  int getAssignedValue()
+  DomainInt getAssignedValue()
   { return data.getAssignedValue() + shift.val(); }
   
-  BOOL isAssignedValue(int i)
+  BOOL isAssignedValue(DomainInt i)
   { return data.getAssignedValue() == i - shift.val(); }
   
-  BOOL inDomain(int i)
+  BOOL inDomain(DomainInt i)
   { return data.inDomain(i - shift.val()); }
 
-  BOOL inDomain_noBoundCheck(int i)
+  BOOL inDomain_noBoundCheck(DomainInt i)
   { return data.inDomain(i - shift.val()); }
   
-  int getMax()
+  DomainInt getMax()
   { return data.getMax() + shift.val(); }
   
-  int getMin()
+  DomainInt getMin()
   { return data.getMin() + shift.val(); }
 
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   { return data.getInitialMax() + shift.val(); }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { return data.getInitialMin() + shift.val(); }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { data.setMax(i - shift.val()); }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { data.setMin(i - shift.val()); }
   
-  void uncheckedAssign(int b)
+  void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(b - shift.val()); }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   { data.propogateAssign(b - shift.val()); }
   
-  void removeFromDomain(int b)
+  void removeFromDomain(DomainInt b)
   { data.removeFromDomain(b - shift.val()); }
     
  void addTrigger(Trigger t, TrigType type)
@@ -101,7 +101,7 @@ struct ShiftVar
 
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  data.addDynamicTrigger(t, type, pos); }
 #endif
 

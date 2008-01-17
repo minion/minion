@@ -54,7 +54,7 @@ namespace Controller
   {
 	  vector<AnyVarRef> variables = con->get_vars();
 	  unsigned vec_size = variables.size();	  
-	  vector<int> values(vec_size);
+	  vector<DomainInt> values(vec_size);
 
 	  for(unsigned loop = 0; loop < vec_size; ++loop)
 	  {

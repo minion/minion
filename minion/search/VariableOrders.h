@@ -61,7 +61,7 @@ struct VariableOrder
   void branch_left()
   {
 	D_ASSERT(!var_order[pos].isAssigned()) 
-	int assign_val;
+	DomainInt assign_val;
 	if(val_order[pos])
 	  assign_val = var_order[pos].getMin();
 	else

@@ -39,9 +39,9 @@ struct ProductConstraint : public Constraint
   ProductConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
 	var1(_var1), var2(_var2), var3(_var3)
   {
-	  long long int max1 = max(abs(var1.getInitialMin()),abs(var1.getInitialMax()));
-	  long long int max2 = max(abs(var2.getInitialMin()),abs(var2.getInitialMax()));
-	  long long int bound = numeric_limits<int>::max();
+	  BigInt max1 = checked_cast<BigInt>(max(abs(var1.getInitialMin()),abs(var1.getInitialMax())));
+	  BigInt max2 = checked_cast<BigInt>(max(abs(var2.getInitialMin()),abs(var2.getInitialMax())));
+	  BigInt bound = DomainInt_Max;
 	  if(max1 * max2 >= bound)
 	  {
 	    cerr << "Fatal error." << endl;
@@ -64,39 +64,39 @@ struct ProductConstraint : public Constraint
 	return t;
   }
   
-  int mult_max(int min1, int max1, int min2, int max2)
+  DomainInt mult_max(DomainInt min1, DomainInt max1, DomainInt min2, DomainInt max2)
   { return mymax(mymax(min1*min2, min1*max2),mymax(max1*min2, max1*max2)); }
   
-  int mult_min(int min1, int max1, int min2, int max2)
+  DomainInt mult_min(DomainInt min1, DomainInt max1, DomainInt min2, DomainInt max2)
   { return mymin(mymin(min1*min2, min1*max2),mymin(max1*min2, max1*max2)); }
   
-  int round_up_div(int x, int y)
+  DomainInt round_up_div(DomainInt x, DomainInt y)
   {
 	if(y == 0)
 	  return 0;
-	div_t division = div(x,y);
+	div_t division = div(checked_cast<int>(x), checked_cast<int>(y));
 	int return_val = division.quot;
 	if(division.rem != 0)
 	  return_val++;
 	return return_val;
   }
   
-  int round_down_div(int x, int y)
+  DomainInt round_down_div(DomainInt x, DomainInt y)
   { 
 	if(y == 0)
-	  return INT_MAX;
+	  return DomainInt_Max;
 	return x / y; 
   }
   
   PROPAGATE_FUNCTION(int, DomainDelta)
   {
 	PROP_INFO_ADDONE(Product);
-	int var1_min = var1.getMin();
-	int var1_max = var1.getMax();
-	int var2_min = var2.getMin();
-	int var2_max = var2.getMax();
-	int var3_min = var3.getMin();
-	int var3_max = var3.getMax();
+	DomainInt var1_min = var1.getMin();
+	DomainInt var1_max = var1.getMax();
+	DomainInt var2_min = var2.getMin();
+	DomainInt var2_max = var2.getMax();
+	DomainInt var3_min = var3.getMin();
+	DomainInt var3_max = var3.getMax();
 	
 	if((var1_min >= 0) && (var2_min >= 0))
 	{
@@ -124,7 +124,7 @@ struct ProductConstraint : public Constraint
 	  var3.setMin(mult_min(var1_min, var1_max, var2_min, var2_max));
 	  if(var1.isAssigned())
   	  {
-	    int val1 = var1.getAssignedValue();
+	    DomainInt val1 = var1.getAssignedValue();
 	    if(val1 > 0)
 	    { 
 		  var3.setMin(var2.getMin() * val1);
@@ -139,7 +139,7 @@ struct ProductConstraint : public Constraint
 	  
 	  if(var2.isAssigned())
 	  {
-		int val2 = var2.getAssignedValue();
+		DomainInt val2 = var2.getAssignedValue();
 		if(val2 > 0)
 		{ 
 		  var3.setMin(var1.getMin() * val2);
@@ -157,7 +157,7 @@ struct ProductConstraint : public Constraint
   virtual void full_propogate()
   { propogate(0,0); }
   
-  virtual BOOL check_assignment(vector<int> v)
+  virtual BOOL check_assignment(vector<DomainInt> v)
   {
 	D_ASSERT(v.size() == 3);
 	return (v[0] * v[1]) == v[2];

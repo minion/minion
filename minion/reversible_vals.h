@@ -24,43 +24,44 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-class ReversibleInt
+template<typename Type>
+class Reversible
 {
   BackTrackOffset backtrack_ptr;
+  
 public:
-  void set(int newval)
-{
-    D_ASSERT((size_t)(backtrack_ptr.get_ptr()) % sizeof(int) == 0);
-    int* int_ptr = (int*)(backtrack_ptr.get_ptr());
+  void set(Type newval)
+  {
+    Type* int_ptr = (Type*)(backtrack_ptr.get_ptr());
     *int_ptr = newval;
-}
+  }
 
-  int get()
-{
-    D_ASSERT((size_t)(backtrack_ptr.get_ptr()) % sizeof(int) == 0);
-    int* int_ptr = (int*)(backtrack_ptr.get_ptr());
+  Type get()
+  {
+    Type* int_ptr = (Type*)(backtrack_ptr.get_ptr());
     return *int_ptr;
-}
+  }
 
-  int decrement()
-{
-      int* int_ptr = (int*)(backtrack_ptr.get_ptr());
+  Type decrement()
+  {
+      Type* int_ptr = (Type*)(backtrack_ptr.get_ptr());
       return --(*int_ptr)  ;
-}
+  }
 
-  int increment()
-{
-      int* int_ptr = (int*)(backtrack_ptr.get_ptr());
+  Type increment()
+  {
+      Type* int_ptr = (Type*)(backtrack_ptr.get_ptr());
       return ++(*int_ptr)  ;
-}
+  }
 
 
-ReversibleInt()
+Reversible()
 { 
-   backtrack_ptr.request_bytes(sizeof(int));
-   D_ASSERT( (size_t)(backtrack_ptr.get_ptr()) % sizeof(int) == 0);
+   backtrack_ptr.request_bytes(sizeof(Type));
+   D_ASSERT( (size_t)(backtrack_ptr.get_ptr()) % sizeof(Type) == 0);
 }
 
 };
 
+typedef Reversible<int> ReversibleInt;
 

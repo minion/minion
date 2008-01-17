@@ -54,52 +54,52 @@ struct VarNot
   // There is a good reason this is like this. It is because the 'neg' of an BOOL var
   // might be used in arithmetic. This is an extension to all of the integers which
   // swaps 0 and 1.
-  int swap(int i) const
+  DomainInt swap(DomainInt i) const
   { return -i+1; }
 
   BOOL isAssigned()
   { return data.isAssigned(); }
   
-  int getAssignedValue()
+  DomainInt getAssignedValue()
   { return swap(data.getAssignedValue()); }
   
-  BOOL isAssignedValue(int i)
+  BOOL isAssignedValue(DomainInt i)
   { 
     return data.isAssigned() &&
     swap(data.getAssignedValue()) == i;
   }
   
-  BOOL inDomain(int b)
+  BOOL inDomain(DomainInt b)
   { return data.inDomain(swap(b)); }
 
-  BOOL inDomain_noBoundCheck(int b)
+  BOOL inDomain_noBoundCheck(DomainInt b)
   { return data.inDomain(swap(b)); }
   
-  int getMax()
+  DomainInt getMax()
   { return swap(data.getMin()); }
   
-  int getMin()
+  DomainInt getMin()
   { return swap(data.getMax()); }
 
-  int getInitialMax() const
+  DomainInt getInitialMax() const
   { return swap(data.getInitialMin()); }
   
-  int getInitialMin() const
+  DomainInt getInitialMin() const
   { return swap(data.getInitialMax()); }
   
-  void setMax(int i)
+  void setMax(DomainInt i)
   { data.setMin(swap(i)); }
   
-  void setMin(int i)
+  void setMin(DomainInt i)
   { data.setMax(swap(i)); }
   
-  void uncheckedAssign(int b)
+  void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(swap(b)); }
   
-  void propogateAssign(int b)
+  void propogateAssign(DomainInt b)
   { data.propogateAssign(swap(b)); }
   
-  void removeFromDomain(int b)
+  void removeFromDomain(DomainInt b)
   { data.removeFromDomain(swap(b)); }
  
   void addTrigger(Trigger t, TrigType type)
@@ -126,7 +126,7 @@ struct VarNot
   { return data.getDomainChange(d); }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, int pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  data.addDynamicTrigger(t, type, swap(pos)); }
 #endif
 };
