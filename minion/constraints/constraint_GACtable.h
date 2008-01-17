@@ -110,7 +110,11 @@ struct GACTableConstraint : public DynamicConstraint
   GACTableConstraint(const VarArray& _vars, TupleList* _tuples) :
 	vars(_vars), lists(_tuples->getLitLists())
   {
-    D_ASSERT((int)_vars.size() == lists->tuples->tuple_size());
+    if((int)_vars.size() != lists->tuples->tuple_size())
+    {
+        cerr << "In table constraint, number of variables is not equal to length of tuples." <<endl; 
+        FAIL_EXIT();
+    }
 	_current_support.request_bytes(lists->tuples->literal_num * sizeof(int));
   }
   

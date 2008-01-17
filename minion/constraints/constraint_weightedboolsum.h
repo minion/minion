@@ -173,7 +173,11 @@ LeqWeightedSum(light_vector<int> scale, light_vector<T1> vec, const light_vector
   
   // Preprocess to remove any multiplications by 0, both for efficency
   // and correctness
-  
+  if(scale.size() != vec.size())
+  {
+      cerr << "In weighted sum constraint, the vector of weights has different length to the vector of variables." << endl;
+      FAIL_EXIT();
+  }
   for(unsigned i = 0; i < scale.size(); ++i)
   {
     if(scale[i] == 0)
@@ -218,7 +222,11 @@ GeqWeightedSum(light_vector<int> scale, light_vector<T1> vec, const light_vector
   
   // Preprocess to remove any multiplications by 0, both for efficency
   // and correctness
-  
+  if(scale.size() != vec.size())
+  {
+      cerr << "In weighted sum constraint, the vector of weights has different length to the vector of variables." << endl;
+      FAIL_EXIT();
+  }
   for(unsigned i = 0; i < scale.size(); ++i)
   {
     if(scale[i] == 0)

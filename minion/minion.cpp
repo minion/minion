@@ -34,7 +34,7 @@ struct MinionArguments
   { None, SAC, SSAC, SACBounds, SSACBounds  };
 
   VarOrder order;
-  int preprocess;   // Why is this an int and not an enum PreProcess??
+  enum PreProcess preprocess;
   unsigned random_seed;
   MinionArguments() : order(ORDER_ORIGINAL), preprocess(None), random_seed((unsigned)time(NULL))
   { }
