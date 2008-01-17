@@ -338,8 +338,8 @@ int main(int argc, char** argv) {
   
   getState(stateObj).getTimer().startClock();
   
-  //cout << "# " << VERSION << endl ;
-  //cout << "# Svn version: " << SVN_VER << endl; 
+  cout << "# " << VERSION << endl ;
+  cout << "# Svn version: " << SVN_VER << endl; 
   if (argc == 1) {
     cout << "Type '" << argv[0] << " help' for usage." << endl;
     return EXIT_SUCCESS;
