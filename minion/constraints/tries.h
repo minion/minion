@@ -95,7 +95,7 @@ struct TupleTrie
   {
 	  // TODO : Fix this hard limit.
 	  D_ASSERT(arity < 100);
-	  
+	  trie_data=NULL;
 	  tuples_vector.resize(tuplelist->size());
 	  
 	  // Need a copy so we can sort it and such things.
@@ -103,8 +103,15 @@ struct TupleTrie
 		tuples_vector[i] = tuplelist->get_vector(i);
 	  
 	  std::sort(tuples_vector.begin(), tuples_vector.end(), TupleComparator(sigIndex, arity));
-	  build_trie(0, tuplelist->size());
-	  build_final_trie();
+      if(tuplelist->size()>0)
+      {
+          build_trie(0, tuplelist->size());
+          build_final_trie();
+      }
+      else
+      {
+          cerr << "Warning: table constraint with empty table." << endl;
+      }
   }
   
   struct EarlyTrieObj
@@ -116,9 +123,7 @@ struct TupleTrie
   
   vector<EarlyTrieObj> initial_trie;
   
-
-  
-  TrieObj* trie_data;
+  TrieObj* trie_data;  // This is the actual trie used during search.
   
   void build_final_trie()
   {
@@ -152,7 +157,7 @@ struct TupleTrie
 	if(depth == arity)
 	  return;
 	
-	assert(start_pos < end_pos);
+	assert(start_pos <= end_pos);
 	int values = get_distinct_values(start_pos, end_pos, depth);
 	
 	int start_section = initial_trie.size();

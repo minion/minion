@@ -144,10 +144,15 @@ struct GACTableConstraint : public DynamicConstraint
   }
   
   virtual void full_propogate()
-  { 
-    D_INFO(2, DI_TABLECON, "Full prop");
+  {
+      D_INFO(2, DI_TABLECON, "Full prop");
+      if(tuples->size()==0)
+      {   // it seems to work without this explicit check, but I put it in anyway.
+          Controller::fail();
+          return;
+      }
       for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
-      { 
+      {
 	    vars[varIndex].setMin((tuples->dom_smallest)[varIndex]);
 	    vars[varIndex].setMax((tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]);
 		
