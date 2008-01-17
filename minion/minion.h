@@ -54,7 +54,7 @@
 #endif
 
 
-#define VERSION "Minion Version 0.4.0"
+#define VERSION "Minion Version 0.4.1"
 #define REVISION "Subversion (svn) Revision Number $Revision$"
 // above line will work but only gives revision of this file,
 //  not the current global revision 
