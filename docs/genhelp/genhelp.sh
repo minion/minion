@@ -78,6 +78,16 @@ for i in /tmp/*.html; do #end pages
 done
 outfile="/tmp/index.html";
 makepage $outfile "minion"
+# add some information to the top of the index page.
+echo "<h2>Reference documentation for Minion 0.5.0</h2>" >> $outfile;
+echo "<p>This file is the root of the reference docs for Minion release 0.5.0." >> $outfile;
+echo "The same documentation is available from the Minion executable by using the <code>help</code> " >> $outfile;
+echo "command-line option. Try running <code> minion help </code>. </p>" >> $outfile;
+echo "<p>The list below contains all entries of the minion help system. " >> $outfile;
+echo "To learn how to use Minion, the <code>input example</code> entry, along with" >> $outfile;
+echo "other <code>input</code> entries, might be " >> $outfile;
+echo "particularly useful.</p>" >> $outfile;
+
 cat $TMP_FILE | sort | uniq > $SORTED_TMP;
 cat $SORTED_TMP | while read entry; do
     entry_underbars=`echo $entry | sed 's/ /_/g'`;
