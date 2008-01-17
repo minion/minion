@@ -13,7 +13,7 @@ rm $PREFIX_TMP;
 touch $PREFIX_TMP;
 
 dashes() {
-    for i in `seq 1 $1`; do echo -n -; done
+    for ((i=1;i<=$1;i+=1)); do echo -n -; done
 }
 
 # a piece of code to output a C function based on help code embedded in
@@ -27,7 +27,7 @@ echo "void help(string request)";
 echo "{";
 previous_entry=hjkhasdkjfhsdkbfs76f87sdf; #doesn't match any entry
 firsttime=true;
-grep -n -R "/\*\* @help" $CODE_ROOT | while read entry ; do
+find . \( ! -regex '.*/\..*' \) -type f -exec grep -H -n "/\*\* @help" {} \; | while read entry ; do
     match_file=`echo $entry | cut -d: -f1`; #file comment is in
     match_line=`echo $entry | cut -d: -f2`; #line comment begins on
     match_entry=`echo $entry | cut -d' ' -f3`; #entry comment is for
