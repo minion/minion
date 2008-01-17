@@ -15,13 +15,17 @@ my $uniqexe = "uniq";
 my $awkexe = "awk"; 
 my $gnuplotexe = "gnuplot";
 my $egrepexe = "egrep";
+my $name1="";
+my $name2="";
 
 GetOptions( 'outdir=s' => \$dir, 
             'basedir=s' => \$basedir,
             'tmpdir=s' => \$tmpdir,
             'join=s' => \$joinexe,
-            'gnuoplot=s' => \$gnuoplotexe,
-            'help' => \$help
+            'gnuplot=s' => \$gnuplotexe,
+            'help' => \$help,
+            'name1=s' => \$name1,
+            'name2=s' => \$name2
             );
 
 if (@ARGV != 2) 
@@ -57,13 +61,28 @@ my $referencename = $ARGV[1];
 my $newdir = "$basedir/$ARGV[0]";
 my $referencedir = "$basedir/$ARGV[1]";
 
+if(not $name1 eq "")  # == and != do not work for strings in this ridiculous language.
+{
+    $newname=$name1;
+}
+if(not $name2 eq "")
+{
+    $referencename=$name2;
+}
+
 # $^X = perl executable
 
 # join requires input to be in sorted order with -b flag (who knew?)
-
-system "$^X $scriptdir/analyse_minion.pl $newdir/* | $sortexe -b  > $tmpdir/1.$$";
-system "$^X $scriptdir/analyse_minion.pl $referencedir/* | $sortexe -b > $tmpdir/2.$$";
-
+if( -f $newdir)
+{
+    system "$^X $scriptdir/analyse_minion.pl $newdir | $sortexe -b  > $tmpdir/1.$$";
+    system "$^X $scriptdir/analyse_minion.pl $referencedir | $sortexe -b > $tmpdir/2.$$";
+}
+else
+{
+    system "$^X $scriptdir/analyse_minion.pl $newdir/* | $sortexe -b  > $tmpdir/1.$$";
+    system "$^X $scriptdir/analyse_minion.pl $referencedir/* | $sortexe -b > $tmpdir/2.$$";
+}
 
 if ((-e $dir) and not (-d $dir) )
 {
@@ -84,7 +103,7 @@ set term png
 set output "$dir/comparison.$newname.$referencename.png"
 set log x
 set autoscale yfix
-set xrange [0.1:*]
+set xrange [0.01:*]
 set xlabel "run time of $referencename in secs"
 set ylabel "%age improvement  in $newname from $referencename "
 set grid
