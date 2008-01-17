@@ -108,9 +108,9 @@ enum BoundType
 };
 
 #ifdef BOUNDS_CHECK
-typedef int DomainInt;
-#else
 typedef Wrapper<int> DomainInt;
+#else
+typedef int DomainInt;
 #endif
 
 #ifndef CONTAINER_TYPE
