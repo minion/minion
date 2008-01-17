@@ -28,7 +28,8 @@ using namespace ProbSpec;
 
 //ConstraintDef* constraint_list;
 
-const int num_of_constraints = 28;// = sizeof(constraint_list) / sizeof(ConstraintDef);
+// Defined in MinionThreeInputReader, cos it can only be in one place.
+extern int num_of_constraints;
 
 ConstraintDef& get_constraint(ConstraintType t);
 

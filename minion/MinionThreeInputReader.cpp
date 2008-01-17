@@ -24,7 +24,7 @@ using namespace ProbSpec;
 #include "MinionInputReader.h"
 
 #include "build_constraints/constraint_defs.h"
-const int num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);
+int num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);
 
 
 ConstraintDef& get_constraint(ConstraintType t)
