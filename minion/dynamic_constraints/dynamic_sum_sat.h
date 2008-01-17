@@ -42,7 +42,7 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
   BoolSATConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array) :
 	DynamicConstraint(_stateObj), var_array(_var_array)
   { 
-#ifndef WATCHEDLITERALS
+#ifndef DYNAMICTRIGGERS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
   }

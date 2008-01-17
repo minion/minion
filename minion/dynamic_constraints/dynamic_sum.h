@@ -45,23 +45,10 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   
   // ReversibleInt count;
   VarArray var_array;
-#ifdef WATCHEDLITERALS
+
   MemOffset unwatched_indexes;
   int last;
   int num_unwatched;
-#else
-/// XXX : These first two variables are just here to make the code compile.
-/// This code has basically decayed beyound the point of working.. :(
-  int num_unwatched;
-  int last;
-
-  MoveablePointer vals_watched;
-  MoveablePointer unwatched_indexes;     // no promise this will work in this case
-  //ReversibleInt last;
-  BOOL& values_watched(int i)
-  { return static_cast<BOOL*>(vals_watched.get_ptr())[i]; }
-#endif
-
 
   int& unwatched(int i)
   { return static_cast<int*>(unwatched_indexes.get_ptr())[i]; }
@@ -72,7 +59,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	DynamicConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
   { 
     D_ASSERT((VarToCount == 0) || (VarToCount == 1));
-#ifndef WATCHEDLITERALS
+#ifndef DYNAMICTRIGGERS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
   }
@@ -96,14 +83,6 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
     }
     else
     {
-          
-#ifndef WATCHEDLITERALS
-      // Note that this BOOL array could be compacted using masks for lookup
-      vals_watched.getMemory(stateObj).backTrack()(request_bytes(sizeof(BOOL) * array_size));
-      for(int i = 0; i < array_size; i++) 
-        values_watched(i) = false;
-#endif
-
       num_unwatched = array_size - var_sum - 1 ;
       D_ASSERT(num_unwatched >= 0);
 
@@ -204,25 +183,6 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   //  
   BOOL check_consistency()
   {
-#ifndef WATCHEDLITERALS 
-    DynamicTrigger* start = dynamic_trigger_start();
-    DynamicTrigger* end = start + var_sum + 1;	
-	for(DynamicTrigger* ptr = start; ptr < end; ptr++)
-	{  D_ASSERT(values_watched(ptr->trigger_info())); }
-	
-	int array_size = var_array.size(); 
-	for(int i = 0; i < array_size; ++i)
-	{
-          if(values_watched(i))
-	  {
-		DynamicTrigger* ptr = start;
-		while(ptr < end && ptr->trigger_info() != i)
-		  ptr++;
-		D_ASSERT(ptr != end);
-	  }
-	}
-#endif
-	
 	return true;
   }
   
@@ -232,9 +192,6 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
     D_ASSERT(check_consistency());
 	int propval = dt->trigger_info();
     D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
-#ifndef WATCHEDLITERALS 
-	D_ASSERT(values_watched(propval));
-#endif
 	D_ASSERT(var_array[propval].getAssignedValue() == VarToCount);
     // VarIterator<VarRef> it(var_array[i], propval + 1);
 	// should generalise
@@ -242,8 +199,6 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 
 	bool found_new_support = false;
         
-#ifdef WATCHEDLITERALS
-
         int loop;
         int j;
 
@@ -272,28 +227,6 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 
 	  return;
 	}
-
-#else
-	int array_size = var_array.size();
-	int i = propval+1;
-
-	while((i < array_size) &&
-		  (values_watched(i) || !var_array[i].inDomain(1 - VarToCount)))
-	{ ++i; }
-	if(i < array_size)
-	  found_new_support = true;
-	
-	if (found_new_support)         // so we have found a new literal to watch
-	{
-	  values_watched(propval) = false;
-	  D_ASSERT(!values_watched(i) && var_array[i].inDomain(1 - VarToCount));    
-	  dt->trigger_info() = i;
-	  var_array[i].addDynamicTrigger(dt, VarToCount ? LowerBound : UpperBound); 
-
-	  values_watched(i) = true;
-	  return;
-	}
-#endif
 
 	D_INFO(1,DI_DYSUMCON,"Limit Reached in WL sum (0/1) constraint");	
 	// there is no literal to watch, we need to propagate

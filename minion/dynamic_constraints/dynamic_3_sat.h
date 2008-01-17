@@ -41,7 +41,7 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
 	DynamicConstraint(_stateObj), var_array(_var_array)
   { 
 	D_ASSERT(var_array.size() == 3);
-#ifndef WATCHEDLITERALS
+#ifndef DYNAMICTRIGGERS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
   }
