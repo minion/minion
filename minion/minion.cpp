@@ -32,10 +32,13 @@ using namespace ProbSpec;
 
 struct MinionArguments
 {
+  enum PreProcess
+  { None, SAC, SSAC, SACBounds, SSACBounds  };
+
   VarOrder order;
   int preprocess;
   unsigned random_seed;
-  MinionArguments() : order(ORDER_ORIGINAL), preprocess(0), random_seed((unsigned)time(NULL))
+  MinionArguments() : order(ORDER_ORIGINAL), preprocess(None), random_seed((unsigned)time(NULL))
   { }
 };
 
@@ -59,6 +62,7 @@ void print_info()
     << "   can cause a severe performance drop." << endl
     << "         [-sac-root]				 Perform SAC at the first node of search" << endl
     << "         [-ssac-root]              Perform SSAC at first node of search (can take a LONG time)" << endl
+    << "         [-sac-bound-root], [-ssac-bound-root] Only check bounds" << endl
     << "         [-varorder] order			 Change variable ordering strategy" << endl
 	<< "		   order = sdf               Smallest Domain First (static breaks ties)" << endl
 	<< "		   order = sdf-random        SDF (randomly break ties)" << endl
@@ -120,9 +124,14 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 	else if(command == string("-verbose"))
 	{ reader.parser_verbose = true; }
 	else if(command == string("-sac-root"))
-	{ args.preprocess = 1; }
+	{ args.preprocess = MinionArguments::SAC; }
 	else if(command == string("-ssac-root"))
-	{ args.preprocess = 2; }
+	{ args.preprocess = MinionArguments::SSAC; }
+    else if(command == string("-sac-bound-root"))
+	{ args.preprocess = MinionArguments::SACBounds; }
+	else if(command == string("-ssac-bound-root"))
+	{ args.preprocess = MinionArguments::SSACBounds; }
+    
 	else if(command == string("-fullprop"))
 	{
 #ifndef NO_DEBUG
@@ -359,23 +368,31 @@ int main(int argc, char** argv) {
   }
   // Solve!
   
+  long long initial_lit_count = 0;
+    
+  if(args.preprocess != MinionArguments::None)
+    initial_lit_count = lit_count(var_val_order.first);
+  
   Controller::initalise_search();
   if(!Controller::failed)
   {
-	if(args.preprocess > 0)
+	if(args.preprocess != MinionArguments::None)
 	{
+      bool bounds_check = (args.preprocess == MinionArguments::SACBounds) ||
+                          (args.preprocess == MinionArguments::SSACBounds);
 	  long long lits = lit_count(var_val_order.first);
+      cout << "Initial GAC loop literal removal:" << initial_lit_count - lits << endl;
 	  clock_t start_SAC_time = clock();
 	  PropogateSAC prop;
-      prop(var_val_order.first);
+      prop(var_val_order.first, bounds_check);
       cout << "Preprocess Time: " << (clock() - start_SAC_time) / (1.0 * CLOCKS_PER_SEC) << endl;
 	  cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;
-	  if(args.preprocess > 1)
+	  if(args.preprocess == MinionArguments::SSAC || args.preprocess == MinionArguments::SSACBounds)
 	  {
 		long long lits = lit_count(var_val_order.first);
 		clock_t start_SAC_time = clock();
 		PropogateSSAC prop;
-		prop(var_val_order.first);
+		prop(var_val_order.first, bounds_check);
 		cout << "Preprocess 2 Time: " << (clock() - start_SAC_time) / (1.0 * CLOCKS_PER_SEC) << endl;
 		cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;
 	  }
