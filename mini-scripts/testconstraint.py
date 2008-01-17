@@ -2,7 +2,7 @@
 # Generate two minion input files, run them then compare dumptree outputs to 
 # detect bugs in constraint propagators.
 
-import sys, os
+import sys, os, getopt
 from constraint_test_common import *
 import random
 
