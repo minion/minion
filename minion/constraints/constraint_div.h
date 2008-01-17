@@ -24,6 +24,25 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;div Description
+The constraint
+ 
+   div([x,y],z)
+
+ensures that floor(x/y)=z.
+*/
+
+/** @help constraints;div Notes
+This constraint is only available for positive domains x, y and z.
+*/
+
+/** @help constraints;div Reifiability
+Not reifiable.
+*/
+
+/** @help constraints;div References
+help constraints modulo
+*/
 
 #include <math.h>
 
@@ -47,7 +66,7 @@ struct DivConstraint : public Constraint
 	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
 		 var3.getInitialMin() < 0)
 	  { 
-		cerr << "The 'pow' constraint only supports positive numbers at present.";
+		cerr << "The 'div' constraint only supports positive numbers at present.";
 		exit(1);
 	  }
   }

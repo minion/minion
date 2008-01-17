@@ -24,6 +24,26 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;modulo Description
+The constraint
+ 
+   modulo([x,y],z)
+
+ensures that x%y=z i.e. z is the remainder of dividing x by y.
+*/
+
+/** @help constraints;modulo Notes
+This constraint is only available for positive domains x, y and z.
+*/
+
+/** @help constraints;modulo Reifiability
+Not reifiable.
+*/
+
+/** @help constraints;modulo References
+help constraints div
+*/
+
 /// var1 % var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct ModConstraint : public Constraint

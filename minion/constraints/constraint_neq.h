@@ -40,6 +40,39 @@ diseq(v0,v1)
 This constraint is reifiable.
 */
 
+/** @help constraints;alldiff Description
+Forces the input vector of variables to take distinct values.
+*/
+
+/** @help constraints;alldiff Example 
+Suppose the input file had the following vector of variables defined:
+
+DISCRETE myVec[9] {1..9}
+
+To ensure that each variable takes a different value include the
+following constraint:
+
+alldiff(myVec)
+*/
+
+/** @help constraints;alldiff Notes
+Enforces the same level of consistency as a clique of not equals 
+constraints.
+*/
+
+/** @help constraints;alldiff Reifiability
+Not reifiable.
+*/
+
+/** @help constraints;alldiff References
+See
+
+   help constraints alldiffgacslow
+
+for the same constraint that enforces GAC.
+*/
+
+
 template<typename VarArray>
 struct NeqConstraint : public Constraint
 {

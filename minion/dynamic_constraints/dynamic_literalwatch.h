@@ -26,8 +26,6 @@
 */
 
 
-
-
 template<typename VarArray, typename ValueArray, typename VarSum>
 struct LiteralSumConstraintDynamic : public DynamicConstraint
 {

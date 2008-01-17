@@ -24,6 +24,29 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;product Description
+The constraint
+
+   product([x,y],z)
+
+ensures that z=xy in any solution.
+*/
+
+/** @help constraints;product Description 
+This constraint can be used for (and, in fact, has a specialised
+implementation for) achieving boolean AND, i.e. x^y=z can be modelled
+as
+
+   product([x,y],z)
+
+The general constraint achieves bounds generalised arc consistency for
+positive numbers.
+*/
+
+/** @help constraints;product Reifiability
+This constraint is not reifiable.
+*/
+
 #include "constraint_and.h"
 
 /// var1 * var2 = var3

@@ -24,6 +24,60 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;occurrence Description
+The constraint
+
+   occurrence(vec, elem, count)
+
+ensures that there are count occurrences of the value elem in the
+vector vec.
+*/
+
+/** @help constraints;occurrence Reifiability
+This constraint is not reifiable.
+*/
+
+/** @help constraints;occurrence References
+help constraints occurrenceleq
+help constraints occurrencegeq
+*/
+
+/** @help constraints;occurrenceleq Description
+The constraint
+
+   occurrenceleq(vec, elem, count)
+
+ensures that there are AT MOST count occurrences of the value elem in
+the vector vec.
+*/
+
+/** @help constraints;occurrenceleq Reifiability
+This constraint is not reifiable.
+*/
+
+/** @help constraints;occurrenceleq References
+help constraints occurrence
+help constraints occurrencegeq
+*/
+
+/** @help constraints;occurrencegeq Description
+The constraint
+
+   occurrencegeq(vec, elem, count)
+
+ensures that there are AT LEAST count occurrences of the value elem in
+the vector vec.
+*/
+
+/** @help constraints;occurrencegeq Reifiability
+This constraint is not reifiable.
+*/
+
+/** @help constraints;occurrencegeq References
+help constraints occurrence
+help constraints occurrenceleq
+*/
+
 template<typename VarArray, typename Val, typename ValCount>
 struct OccurrenceEqualConstraint : public Constraint
 {

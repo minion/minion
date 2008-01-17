@@ -24,6 +24,29 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;alldiffgacslow Description
+Forces the input vector of variables to take distinct values.
+*/
+
+/** @help constraints;alldiffgacslow Example 
+Suppose the input file had the following vector of variables defined:
+
+DISCRETE myVec[9] {1..9}
+
+To ensure that each variable takes a different value include the
+following constraint:
+
+alldiffgacslow(myVec)
+*/
+
+/** @help constraints;alldiffgacslow Reifiability
+Not reifiable.
+*/
+
+/** @help constraints;alldiffgacslow Notes
+This constraint enforces generalised arc consistency.
+*/
+
 #include <stdlib.h>
 #include <iostream>
 #include <map>

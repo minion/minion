@@ -24,6 +24,36 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;weightedsumleq Description
+The constraint
+
+   weightedsumleq(constantVec, varVec, total)
+
+ensures that constantVec.varVec >= total, where constantVec.varVec is
+the scalar dot product of constantVec and varVec.
+*/
+
+/** @help constraints;weightedsumleq References
+help constraints weightedsumgeq
+help constraints sumleq
+help constraints sumgeq
+*/
+
+/** @help constraints;weightedsumgeq Description
+The constraint
+
+   weightedsumgeq(constantVec, varVec, total)
+
+ensures that constantVec.varVec <= total, where constantVec.varVec is
+the scalar dot product of constantVec and varVec.
+*/
+
+/** @help constraints;weightedsumgeq References
+help constraints weightedsumleq
+help constraints sumleq
+help constraints sumgeq
+*/
+
 #include "constraint_fullsum.h"
 
 template<typename VarArray, typename WeightArray, typename VarSum>

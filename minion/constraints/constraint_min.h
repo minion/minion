@@ -6,7 +6,45 @@
    $Id$
 */
 
+/** @help constraints;max Description
+The constraint
 
+   max(vec, x)
+
+ensures that x is equal to the maximum value of any variable in vec.
+*/
+
+/** @help constraints;max Reifiability
+This constraint is not reifiable.
+*/
+
+/** @help constraints;max References
+See
+
+   help constraints min
+
+for the opposite constraint.
+*/
+
+/** @help constraints;min Description
+The constraint
+
+   min(vec, x)
+
+ensures that x is equal to the minimum value of any variable in vec.
+*/
+
+/** @help constraints;min Reifiability
+This constraint is not reifiable.
+*/
+
+/** @help constraints;min References
+See
+
+   help constraints max
+
+for the opposite constraint.
+*/
 
 
 template<typename VarArray, typename MinVarRef>

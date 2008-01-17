@@ -24,6 +24,21 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;pow Description
+The constraint
+ 
+   pow([x,y],z)
+
+ensures that x^y=z.
+*/
+
+/** @help constraints;pow Notes
+This constraint is only available for positive domains x, y and z.
+*/
+
+/** @help constraints;pow Reifiability
+Not reifiable.
+*/
 
 #include <math.h>
 

@@ -40,6 +40,25 @@ Achieves bounds consistency.
 This constraint is reifiable.
 */
 
+/** @help constraints;eq Reference
+help constraints minuseq
+
+/** @help constraints;minuseq Description
+Constraint
+
+   minuseq(x,y)
+
+ensures that x=-y.
+*/
+
+/** @help constraints;minuseq Reifiability
+This constraint is reifiable.
+*/
+
+/** @help constraints;minuseq Reference
+help constraints eq
+*/
+
 
 /// (var1 = var2) = var3
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
