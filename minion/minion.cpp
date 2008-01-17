@@ -28,15 +28,13 @@ using namespace ProbSpec;
 
 #include "svn_header.h"
 
-
-
 struct MinionArguments
 {
   enum PreProcess
   { None, SAC, SSAC, SACBounds, SSACBounds  };
 
   VarOrder order;
-  int preprocess;
+  int preprocess;   // Why is this an int and not an enum PreProcess??
   unsigned random_seed;
   MinionArguments() : order(ORDER_ORIGINAL), preprocess(None), random_seed((unsigned)time(NULL))
   { }
@@ -74,6 +72,7 @@ void print_info()
     << "            nodes, so will perform poorly on problem with many variables." << endl
     << "         [-randomseed] N             Set the random seed used to N." << endl
     << "         [-dumptree]                 Dumps the search tree" << endl
+    << "         [-tableout] filename        Writes a line of statistics to the file" << endl
   
 #ifndef NO_DEBUG
 	<< "  Note: The following tags should never change the results produced." << endl
@@ -103,6 +102,8 @@ void print_info()
 }
   
 BOOL randomise_valvaroder = false;
+
+TableOut tableout= TableOut();
 
 template<typename Reader>
 void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** argv)
@@ -228,12 +229,28 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
 	  ++i;
 	  args.random_seed = atoi(argv[i]);
 	}
+    else if(command == string("-tableout"))
+    {
+        Controller::commandlineoption_tableout=true;
+        ++i;
+        tableout.set_filename(argv[i]);
+    }
 	else
 	{ 
 	  cout << "I don't understand '" << command << "'. Sorry." << endl;
 	  FAIL_EXIT();
 	}
   }
+  // bundle all options together and store
+  string s=string("");
+  for(int i = 1; i < argc - 1; ++i)
+  {
+      if(i<argc-2)
+          s=s+argv[i]+",";
+      else
+          s=s+argv[i];
+  }
+  tableout.set("CommandLineArguments", s);
 }
 
 pair<vector<AnyVarRef>, vector<int> > var_val_order;
@@ -294,11 +311,22 @@ void BuildCSP(Reader& reader)
 template<typename Reader>
 void SolveCSP(Reader& reader, MinionArguments args)
 {
-  if (!Controller::print_only_solution) { print_timestep("Parsing Time: ");} 
+    // Copy args into tableout
+    tableout.set("RandomSeed", toString(args.random_seed));
+    {   char * b;
+        if(args.preprocess == MinionArguments::None) b="None";
+        if(args.preprocess == MinionArguments::SAC) b="SAC";
+        if(args.preprocess == MinionArguments::SSAC) b="SSAC";
+        if(args.preprocess == MinionArguments::SACBounds) b="SACBounds";
+        if(args.preprocess == MinionArguments::SSACBounds) b="SSACBounds";
+        tableout.set("Preprocess", string(b));}
+    // should be one for varorder as well.
+    
+if (!Controller::print_only_solution) { print_timestep_store("Parsing Time: ", "ParsingTime", tableout);} 
   
   BuildCSP(reader);
   
-  if (!Controller::print_only_solution) print_timestep("Setup Time: ");
+  if (!Controller::print_only_solution) print_timestep_store("Setup Time: ", "SetupTime", tableout);
   
   if(randomise_valvaroder)
   {
@@ -361,12 +389,20 @@ void SolveCSP(Reader& reader, MinionArguments args)
       solve(args.order, var_val_order);
   }
   
-  print_finaltimestep("Solve Time: ");
+  print_finaltimestep_store("Solve Time: ", "SolveTime", tableout);
   cout << "Total Nodes: " << nodes << endl;
   cout << "Problem solvable?: " 
 	<< (Controller::solutions == 0 ? "no" : "yes") << endl;
   cout << "Solutions Found: " << Controller::solutions << endl;
   
+  tableout.set("Nodes", toString(nodes));
+  tableout.set("Satisfiable", (Controller::solutions==0 ? 0 : 1));
+  tableout.set("SolutionsFound", Controller::solutions);
+  
+  if(Controller::commandlineoption_tableout)
+  {
+      tableout.print_line();  // Outputs a line to the table file.
+  }
   
 #ifdef MORE_SEARCH_INFO
   print_search_info();
@@ -383,7 +419,7 @@ void ReadCSP(Reader& reader,  InputFileReader* infile, char* filename)
 #endif
   
   reader.read(infile) ;
-  
+  tableout.set(string("Filename"), string(filename));
 #ifndef NOCATCH
 }
 catch(parse_exception& s)

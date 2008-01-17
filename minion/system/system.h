@@ -118,6 +118,7 @@ using namespace std;
 #include "wrapper.h"
 #include "to_string.h"
 #include "local_array.h"
+#include "tableout.h"
 #include "time_keeping.h"
 #include "linked_ptr.h"
 #include "sys_constants.h"

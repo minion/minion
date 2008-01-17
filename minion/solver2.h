@@ -25,8 +25,6 @@
 */
 // This header is designed to be included after all other headers
 
-
-
 VARDEF_ASSIGN(clock_t time_limit, 0);
 
 VARDEF(unsigned long long nodes);
@@ -51,6 +49,8 @@ namespace Controller
   VARDEF_ASSIGN(BOOL commandlineoption_fullpropogate, false);
   VARDEF_ASSIGN(BOOL commandlineoption_nocheck, false);
   VARDEF_ASSIGN(unsigned long long commandlineoption_nodelimit, 0);
+  
+  VARDEF_ASSIGN(BOOL commandlineoption_tableout, false);
   
   // Forward decleration.
   inline BOOL are_queues_empty();

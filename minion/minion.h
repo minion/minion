@@ -29,7 +29,6 @@
 #define MINION_H
 
 #include "svn_header.h"
-
 #include "system/system.h"
 
 #include "constants.h"
@@ -127,7 +126,6 @@ namespace Controller
 #include "variables/variables.h"
 
 #include "solver2.h"
-
 
 #include "build_constraints/build_helper.h"
 

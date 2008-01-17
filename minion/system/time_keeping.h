@@ -45,8 +45,17 @@ inline void print_timestep_without_reset(const char* time_name)
 inline void print_timestep(const char* time_name)
 {
   clock_t current_time = clock();
-  cout << time_name << (current_time - _last_check_time) / (1.0 * CLOCKS_PER_SEC) << endl;
+  double diff=(current_time - _last_check_time) / (1.0 * CLOCKS_PER_SEC);
+  cout << time_name << diff << endl;
   _last_check_time = current_time;
+}
+inline void print_timestep_store(const char* time_name, const char* store_name, TableOut & tableout)
+{
+    clock_t current_time = clock();
+    double diff=(current_time - _last_check_time) / (1.0 * CLOCKS_PER_SEC);
+    cout << time_name << diff << endl;
+    _last_check_time = current_time;
+    tableout.set(string(store_name), toString(diff));
 }
 
 inline void print_finaltimestep(const char* time_name)
@@ -54,5 +63,12 @@ inline void print_finaltimestep(const char* time_name)
   print_timestep(time_name);
   cout << "Total Time: " << (_last_check_time - _internal_start_time) / (1.0 * CLOCKS_PER_SEC) << endl;
   
+}
+
+inline void print_finaltimestep_store(const char* time_name, const char* store_name, TableOut & tableout)
+{
+  print_timestep_store(time_name, store_name, tableout);
+  cout << "Total Time: " << (_last_check_time - _internal_start_time) / (1.0 * CLOCKS_PER_SEC) << endl;
+  tableout.set(string("TotalTime"), toString((_last_check_time - _internal_start_time) / (1.0 * CLOCKS_PER_SEC)));
 }
 
