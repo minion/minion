@@ -543,6 +543,7 @@ struct ConstraintBlob
 		VarReplace(it->vars, new_map);
   }
   
+  // Perform a simple check to ensure the constraint will not cause integer overflow.
   bool bounds_check_last_constraint()
   {
     const ConstraintBlob& con = constraints.back();
@@ -580,6 +581,7 @@ struct ConstraintBlob
       case CT_WATCHED_ELEMENT:
       case CT_GACELEMENT:
       case CT_ALLDIFF:
+	case CT_ALLDIFF_GACSLOW:
       case CT_DISEQ:
       case CT_EQ:
       case CT_INEQ:
@@ -599,7 +601,8 @@ struct ConstraintBlob
       case CT_REIFYIMPLY:
         throw parse_exception("Internal Error - Invalid Constraint");
     }
-    throw parse_exception("Internal Error - Unknown Error");
+    throw parse_exception("Internal Error - Constraint has not had a check implemented to ensure\n"
+                          "The values given will not cause integer overflow.");
 
   }
   
