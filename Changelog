@@ -1,3 +1,8 @@
+03/03/2006 - RELEASE 0.4.1
+
+03/03/2006 - Chris
+    * Add 'print all' option
+
 28/02/2006 - Chris
     * Fix bug in weighted sum (couldn't use negative powers)
 
