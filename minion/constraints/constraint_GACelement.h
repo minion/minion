@@ -138,8 +138,8 @@ struct GACElementConstraint : public Constraint
 	  
 	  VarRef& var = var_array[prop_val];
 	  
-	  DomainInt min_val = var.getMin();
-	  DomainInt max_val = var.getMax();
+	  DomainInt min_val = var.getInitialMin();
+	  DomainInt max_val = var.getInitialMax();
 	  for(DomainInt val = min_val; val <= max_val; ++val)
 	  {
 	    if(!var.inDomain(val) && resultvar.inDomain(val) &&
