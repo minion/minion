@@ -202,6 +202,7 @@ struct SparseBoundVarContainer {
   /// This function is provided for convience. It should never be called.
   void removeFromDomain(SparseBoundVarRef_internal, DomainInt)
   {
+    D_FATAL_ERROR("Cannot Remove Value from domain of a bound var");
     FAIL_EXIT();
   }
   

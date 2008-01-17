@@ -142,6 +142,7 @@ namespace Controller
 	    if(check_timeout(time_limit))
 	    {
 		  cout << "Time out." << endl;
+          tableout.set("TimeOut", 1);
 		  return true;
 	    }
 	  }

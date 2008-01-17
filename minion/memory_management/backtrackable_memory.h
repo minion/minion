@@ -58,8 +58,6 @@
 VARDEF_ASSIGN(void* memory_base_ptr, NULL);
 #endif
 
-extern TableOut tableout;
-
 /// A pointer to some backtrackable memory.
 class BackTrackOffset
 {

@@ -102,7 +102,6 @@ void print_info()
 }
   
 BOOL randomise_valvaroder = false;
-VARDEF(TableOut tableout);
 
 template<typename Reader>
 void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** argv)
@@ -321,7 +320,7 @@ void SolveCSP(Reader& reader, MinionArguments args)
         tableout.set("Preprocess", string(b));}
     // should be one for varorder as well.
     tableout.set("MinionVersion", SVN_VER);
-    
+    tableout.set("TimeOut", 0); // will be set to 1 if a timeout occurs.
     maybe_print_timestep_store("Parsing Time: ", "ParsingTime", tableout, !Controller::print_only_solution);
     
     BuildCSP(reader);

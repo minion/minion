@@ -66,6 +66,8 @@
 
 #include "solver.h"
 
+VARDEF(TableOut tableout);
+
 #include "memory_management/backtrackable_memory.h"
 #include "memory_management/nonbacktrack_memory.h"
 
