@@ -25,28 +25,88 @@
 */
 
 /** @help variables General
-Minion nominally supports 5 different variable types, namely
+Minion supports 4 different variable types, namely
 
 - 0/1 variables,
 - bounds variables,
-- sparse bounds variables,
-- discrete variables, and
-- discrete sparse variables.
+- sparse bounds variables, and
+- discrete variables.
 
 Sub-dividing the variable types in this manner affords the greatest
 opportunity for optimisation. In general, we recommend thinking of the
 variable types as a hierarchy, where 1 (0/1 variables) is the most
-efficient type, and 5 (Discrete Sparse Variables) is the least. The
+efficient type, and 4 (Discrete variables) is the least. The
 user should use the variable which is the highest in the hierarchy,
 yet encompasses enough information to provide a full model for the
 problem they are attempting to solve.
+
+See the entry on vectors for information on how vectors, matrices and
+tensors are handled in minion input. See also the alias entry for
+information on how to multiply name variables for convenience.
 */
 
-/** @help variables Notes
-Discrete sparse variables are not yet implemented, and some of the
-others only work with certain constraints (particularly bounds
-variables). See entries for individual constraints for any problematic
-variable types.
+/** @help variables;vectors Description 
+Vectors, matrices and tensors can be declared in minion
+input. Matrices and tensors are for convenience, as constraints do not
+take these as input; they must first undergo a flattening process to
+convert them to a vector before use.
+*/
+
+/** @help variables;vectors Examples
+A vector of 0/1 variables:
+
+BOOL myvec[5]
+
+A matrix of discrete variables:
+
+DISCRETE sudoku[9,9] {1..9}
+
+A 3D tensor of 0/1s:
+
+BOOL mycube[3,3,2]
+
+One can create a vector from scalars and elements of vectors, etc.:
+
+alldiff([x,y,myvec[1],mymatrix[3,4]])
+
+When a matrix or tensor is constrained, it is treated as a vector
+whose entries have been strung out into a vector in index order with
+the rightmost index changing most quickly, e.g.
+
+alldiff(sudoku)
+
+is equivalent to
+
+alldiff([sudoku[0,0],...,sudoku[0,8],...,sudoku[8,0],...,sudoku[8,8]])
+
+Furthermore, with indices filled selectively and the remainder filled
+with underscores (_) the flattening applies only to the underscore
+indices:
+
+alldiff(sudoku[4,_])
+
+is equivalent to
+
+alldiff([sudoku[4,0],...,sudoku[4,8]])
+
+Lastly, one can optionally add square brackets ([]) around an
+expression to be flattened to make it look more like a vector:
+
+alldiff([sudoku[4,_]])
+
+is equivalent to
+
+alldiff(sudoku[4,_])
+*/
+
+/** @help variables;alias Description
+Specifying an alias is a way to give a variable another name. Aliases
+appear in the **VARIABLES** section of an input file. It is best
+described using some examples:
+
+ALIAS c = a
+
+ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 */
 
 /// Internal type used by AnyVarRef.
