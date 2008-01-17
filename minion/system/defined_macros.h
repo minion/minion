@@ -52,9 +52,6 @@ cout << "NO_DYN_CHECK" << " ";
 #ifdef NO_PRINT
 cout << "NO_PRINT" << " "; 
 #endif
-#ifdef NO_SPECIALISATIONS
-cout << "NO_SPECIALISATIONS" << " "; 
-#endif
 #ifdef OLDTABLE
 cout << "OLDTABLE" << " "; 
 #endif
