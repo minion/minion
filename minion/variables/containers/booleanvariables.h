@@ -24,9 +24,6 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
-
-
 /// Standard data type used for storing compressed booleans 
 typedef unsigned long data_type;
 static const data_type one = 1;

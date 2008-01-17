@@ -69,10 +69,7 @@ struct OccurrenceEqualConstraint : public Constraint
       }
       else
       { 
-        if(it->inDomain(value))
-        {
-          it->removeFromDomain(value);
-        }
+        it->removeFromDomain(value);
       }
     }
     //D_ASSERT(occs >= oalc_count());
