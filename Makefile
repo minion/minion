@@ -73,7 +73,7 @@ OBJFILES=$(patsubst minion/%.cpp,$(OBJDIR)/%.o,$(SRC))
 all: svn_version minion generate
 
 svn_version:
-	./get_svn_version.sh minion/svn_header.h
+	mini-scripts/get_svn_version.sh minion/svn_header.h
 
 $(OBJDIR)/%.o: minion/%.cpp
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
