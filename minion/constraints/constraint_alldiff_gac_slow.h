@@ -122,7 +122,7 @@ struct AlldiffGacSlow : public Constraint
   VarArray var_array;
   
   AlldiffGacSlow(StateObj* _stateObj, const VarArray& _var_array) : Constraint(_stateObj),
-    var_array(_var_array)
+    var_array(_var_array) ,constraint_locked(false)
   { }
   
   virtual triggerCollection setup_internal()
@@ -137,11 +137,26 @@ struct AlldiffGacSlow : public Constraint
   
   virtual Constraint* reverse_constraint()
   { return new CheckAssignConstraint<VarArray, AlldiffGacSlow>(stateObj, var_array, *this); }
+
+  bool constraint_locked;
+  PROPAGATE_FUNCTION(int, DomainDelta)
+  { 
+    if(constraint_locked) return;
+    constraint_locked = true;
+    getQueue(stateObj).pushSpecialTrigger(this);
+  }
   
-  PROPAGATE_FUNCTION(int prop_val, DomainDelta)
+  virtual void special_unlock() { constraint_locked = false; }
+  virtual void special_check()
   {
-	PROP_INFO_ADDONE(AlldiffGacSlow);
-    
+    constraint_locked = false;
+    do_prop();
+  }
+
+  void do_prop()
+  {
+    PROP_INFO_ADDONE(AlldiffGacSlow);
+  
     unsigned int numvars=var_array.size();  // number of variables in the constraint
     
     map<long, long, less<long> > matching;   //maps value to variable number
@@ -432,9 +447,7 @@ struct AlldiffGacSlow : public Constraint
   }
   
   virtual void full_propagate()
-  {
-    propagate(1, 0);
-  }
+  { do_prop(); }
 	
 	virtual BOOL check_assignment(vector<DomainInt> v)
 	{
