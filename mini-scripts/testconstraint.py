@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/python
 # Generate two minion input files, run them then compare dumptree outputs to 
 # detect bugs in constraint propagators.
 
