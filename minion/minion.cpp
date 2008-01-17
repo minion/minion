@@ -191,8 +191,8 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
 	    cout << "Did not understand the parameter to timelimit:" << argv[i] << endl;
 		FAIL_EXIT();
 	  }
-	}
-	else if(command == string("-varorder"))
+	}// TODO : Should remove -varorder for beta orderings.
+	else if(command == string("-varorder") || command == string("-X-varorder") )
 	{ 
 	  cout << "# -varorder is experimental and slower than minion's standard branching." << endl;
 	  ++i;

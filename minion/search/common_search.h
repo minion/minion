@@ -176,9 +176,9 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
 	  // Must check if this setMin will fail before doing it, else
 	  // The setjmp will throw us off. It's cheaper to check than set up
 	  // a new setjmp point here.
-	  if(getState(stateObj).getOptimiseVar()->getMax() >= getState(stateObj).getOptimiseVar())
+	  if(getState(stateObj).getOptimiseVar()->getMax() >= getState(stateObj).getOptimiseValue())
 	  { 
-		getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseVar());
+		getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseValue());
 		getQueue(stateObj).propagateQueue();
 	  }
 	  else

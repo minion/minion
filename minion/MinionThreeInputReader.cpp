@@ -536,6 +536,7 @@ vector<vector<Var> > MinionThreeInputReader::read2DMatrix(InputFileReader* infil
   
   while(infile->peek_char() != ']')
   {
+    parser_info("Continuing reading matrix, peeked at " + to_string(']'));
     // See if there is an array, or just a variable.
     if(infile->peek_char() == '[') 
       return_vals.push_back(readLiteralVector(infile));
@@ -567,7 +568,7 @@ vector<vector<Var> > MinionThreeInputReader::read2DMatrixVariable(InputFileReade
   if(indices.size() != 1 && indices.size() != 2)
     throw parse_exception("Only support 1 or 2D matrices here.");
   // Make sure the matrix doesn't have an index after it. This is to produce better error messages.
-  if(infile->peek_char() != ',')
+  if(infile->peek_char() != ',' && infile->peek_char() != ']')
      throw parse_exception("Only accept raw matrix names here, expected ',' next.");
 
   if(indices.size() == 1)
@@ -585,7 +586,7 @@ vector<vector<Var> > MinionThreeInputReader::read2DMatrixVariable(InputFileReade
     {
       vector<Var> row;
       for(int j = 0; j < indices[1]; ++j)
-        row.push_back(instance.vars.getSymbol(name+"["+to_string(i)+","+to_string(j)+"]"));
+        row.push_back(instance.vars.getSymbol(name+"["+to_string(i)+" , "+to_string(j)+"]"));
       terms.push_back(row);
     }
     return terms;
