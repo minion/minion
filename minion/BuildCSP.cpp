@@ -82,19 +82,19 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   
   if(!getState(stateObj).isFailed())
   {
-    preprocessCSP(stateObj, args.preprocess, var_val_order.first);
+    PropogateCSP(stateObj, args.preprocess, var_val_order.first, true);
 	getState(stateObj).getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !getOptions(stateObj).print_only_solution);
 	if(!getState(stateObj).isFailed())
     {
       switch(args.prop_method)
       {
-        case MinionArguments::GAC:
+        case PropLevel_GAC:
           solve(stateObj, args.order, var_val_order, PropogateGAC());   // add a getState(stateObj).getTimer().maybePrintTimestepStore to search..
           break;
-        case MinionArguments::SAC:
+        case PropLevel_SAC:
           solve(stateObj, args.order, var_val_order, PropagateSAC());
           break;
-        case MinionArguments::SSAC:
+        case PropLevel_SSAC:
           solve(stateObj, args.order, var_val_order, PropagateSSAC());
           break;
         default:

@@ -120,20 +120,20 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
 	else if(command == string("-verbose"))
 	{ reader.parser_verbose = true; }
 	else if(command == string("-sac-root"))
-	{ args.preprocess = MinionArguments::SAC; }
+	{ args.preprocess = PropLevel_SAC; }
 	else if(command == string("-ssac-root"))
-	{ args.preprocess = MinionArguments::SSAC; }
+	{ args.preprocess = PropLevel_SSAC; }
     else if(command == string("-sac-bound-root"))
-	{ args.preprocess = MinionArguments::SACBounds; }
+	{ args.preprocess = PropLevel_SACBounds; }
 	else if(command == string("-ssac-bound-root"))
-	{ args.preprocess = MinionArguments::SSACBounds; }
+	{ args.preprocess = PropLevel_SSACBounds; }
     else if(command == string("-X-prop-node"))
     {
       cout << "# WARNING: -X-prop-node is experimental. Do not use for benchmarking!" << endl;
       ++i;
       string prop_mode(argv[i]);
-      args.prop_method = MinionArguments::getPropMethod(prop_mode);
-      if(args.prop_method == MinionArguments::None)
+      args.prop_method = GetPropMethodFromString(prop_mode);
+      if(args.prop_method == PropLevel_None)
         cerr << "Must propagate at each node!" << endl;
     }
     else if(command == string("-X-preprocess"))
@@ -141,7 +141,7 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
       cout << "# WARNING: -X-preprocess is experimental. Do not use for benchmarking!" << endl;
       ++i;
       string prop_mode(argv[i]);
-      args.preprocess = MinionArguments::getPropMethod(prop_mode);
+      args.preprocess = GetPropMethodFromString(prop_mode);
     }
 	else if(command == string("-fullprop"))
 	{
@@ -440,15 +440,15 @@ int main(int argc, char** argv) {
   tableout.set("RandomSeed", to_string(args.random_seed));
   {   const char * b = "";
     switch (args.preprocess) {
-      case MinionArguments::None:
+      case PropLevel_None:
         b = "None"; break;
-      case MinionArguments::SAC:
+      case PropLevel_SAC:
         b = "SAC"; break;
-      case MinionArguments::SSAC:
+      case PropLevel_SSAC:
         b = "SSAC"; break;
-      case MinionArguments::SACBounds:
+      case PropLevel_SACBounds:
         b = "SACBounds"; break;
-      case MinionArguments::SSACBounds:
+      case PropLevel_SSACBounds:
         b = "SSACBounds"; break;
     }
     tableout.set("Preprocess", string(b));

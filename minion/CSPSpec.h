@@ -148,11 +148,15 @@ struct ConstraintBlob
   ConstraintDef constraint;
   /// The variables of the problem.
   vector<vector<Var> > vars;
-  ///Pointer to list of tuples. Only used in Table Constraints.
+  /// Pointer to list of tuples. Only used in Table Constraints.
   TupleList* tuples;
-  ///A vector of signs. Only used for SAT clause "or" constraint.
+  /// A vector of signs. Only used for SAT clause "or" constraint.
   vector<int> negs;
+  
+  /// For use in Gadget constraints, lists the propagation level to be achieved.
+  PropagationLevel gadget_prop_type;
 
+  /// For use in Gadget constraints, gives the actual gadget.
   shared_ptr<CSPInstance> gadget;
   
   BOOL reified;

@@ -36,12 +36,13 @@ struct GadgetConstraint : public Constraint
   
   shared_ptr<CSPInstance> gadget_instance;
   StateObj* gadget_stateObj;
+  PropagationLevel gadget_prop_type;
   
   bool constraint_locked;
   
-  GadgetConstraint(StateObj* _stateObj, const VarArray& _vars, shared_ptr<CSPInstance> _gadget) : 
+  GadgetConstraint(StateObj* _stateObj, const VarArray& _vars, shared_ptr<CSPInstance> _gadget, PropagationLevel _proptype) : 
   Constraint(_stateObj), var_array(_vars), gadget_instance(_gadget),
-  gadget_stateObj(new StateObj),
+  gadget_stateObj(new StateObj), gadget_prop_type(_proptype), 
   constraint_locked(false)
   { 
     BuildCSP(gadget_stateObj, *gadget_instance); 
@@ -134,8 +135,8 @@ struct GadgetConstraint : public Constraint
     }
     
     
-    PropagateSAC prop_SAC;
-    prop_SAC(gadget_stateObj, construction_vars);
+    PropogateCSP(gadget_stateObj, gadget_prop_type, construction_vars);
+
     if(getState(gadget_stateObj).isFailed())
     {
       getState(gadget_stateObj).setFailed(false);
@@ -168,7 +169,7 @@ struct GadgetConstraint : public Constraint
 template<typename VarArray>
 GadgetConstraint<VarArray>*
 gadgetCon(StateObj* stateObj, const VarArray& vars, ConstraintBlob& blob)
-{ return new GadgetConstraint<VarArray>(stateObj, vars, blob.gadget); }
+{ return new GadgetConstraint<VarArray>(stateObj, vars, blob.gadget, blob.gadget_prop_type); }
 
 #ifdef REENTER
 

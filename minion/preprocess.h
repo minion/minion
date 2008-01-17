@@ -122,33 +122,27 @@ enum VarOrder
   ORDER_CONFLICT
 };
 
+inline PropagationLevel GetPropMethodFromString(string s)
+{
+  if(s == "None") return PropLevel_None;
+  else if(s == "GAC") return PropLevel_GAC;
+  else if(s == "SAC") return PropLevel_SAC;
+  else if(s == "SSAC") return PropLevel_SSAC;
+  else if(s == "SACBounds") return PropLevel_SACBounds;
+  else if(s == "SSACBounds") return PropLevel_SSACBounds;
+  else
+    throw parse_exception(s + " is not a valid Propagation Method");
+}
+
 struct MinionArguments
 {
-  enum PreProcess
-  { None, GAC, SAC, SSAC, SACBounds, SSACBounds  };
-  
-  static PreProcess getPropMethod(string s)
-  {
-    if(s == "None") return None;
-    else if(s == "GAC") return GAC;
-    else if(s == "SAC") return SAC;
-    else if(s == "SSAC") return SSAC;
-    else if(s == "SACBounds") return SACBounds;
-    else if(s == "SSACBounds") return SSACBounds;
-    else
-    {
-      cerr << s << " is an invalid propagation method" << endl;
-      abort();
-    }
-  }
-  
   VarOrder order;
-  enum PreProcess preprocess;
-  enum PreProcess prop_method;
+  enum PropagationLevel preprocess;
+  enum PropagationLevel prop_method;
   unsigned random_seed;
-  MinionArguments() : order(ORDER_ORIGINAL), preprocess(None), prop_method(GAC), random_seed((unsigned)time(NULL))
+  MinionArguments() : order(ORDER_ORIGINAL), preprocess(PropLevel_None), prop_method(PropLevel_GAC), random_seed((unsigned)time(NULL))
   { }
   
 };
 
-void preprocessCSP(StateObj*, MinionArguments::PreProcess, vector<AnyVarRef>&);
+void PropogateCSP(StateObj*, PropagationLevel, vector<AnyVarRef>&, bool print_info = false);

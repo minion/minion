@@ -389,6 +389,8 @@ void MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile
   shared_ptr<CSPInstance> in_gadget = instance.getGadgetSymbol(s);
   ConstraintBlob gadgetCon( get_constraint(CT_GADGET) , vectorOfVars);
   gadgetCon.gadget = in_gadget;
+  infile->check_sym(',');
+  gadgetCon.gadget_prop_type = GetPropMethodFromString(infile->get_string());
   infile->check_sym(')');
   instance.add_constraint(gadgetCon);
   parser_info("End gadget reading");
