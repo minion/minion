@@ -27,7 +27,12 @@
 
 #include <math.h>
 
-#define LRINT(x) static_cast<long>(x + 0.5)
+// This constraint is half-way to being changed from using
+// LRINT to roundup and rounddown. Still don't quite have my head around
+// this +0.5 business. Or at least I'm not convinced that it's OK.
+// at least now it passes test_nightingale_pow.minion.
+
+#define LRINT(x) static_cast<DomainInt>(x + 0.5)
 
 /// var1 ^ var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
@@ -47,7 +52,7 @@ struct PowConstraint : public Constraint
 	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
 		 var3.getInitialMin() < 0)
 	  { 
-		cerr << "The 'pow' constraint only supports positive numbers at present.";
+		cerr << "The 'pow' constraint only supports non-negative numbers at present.";
 		exit(1);
 	  }
   }
@@ -64,7 +69,32 @@ struct PowConstraint : public Constraint
 	t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
 	return t;
   }
-    
+  
+  inline DomainInt roundup(double x)
+  {
+      // remember no numbers are non-negative in here, so
+      // how are we going to hit the lower limit for ints?
+      if(x<std::numeric_limits<DomainInt>::min())
+      {
+          return std::numeric_limits<DomainInt>::min();
+      }
+      else
+      {
+          return static_cast<DomainInt>(x);  // Actually this should round up!
+      }
+  }
+  
+  inline DomainInt rounddown(double x)
+  {
+      if(x>std::numeric_limits<DomainInt>::max())
+      {
+          return std::numeric_limits<DomainInt>::max();
+      }
+      else
+      {
+          return static_cast<DomainInt>(x);  
+      }
+  }
   
   double my_pow(DomainInt x, DomainInt y)
   { return pow((double)checked_cast<int>(x), checked_cast<int>(y));}
@@ -82,13 +112,17 @@ struct PowConstraint : public Constraint
 	{
 	  case -1:
 	  {
+        // var3 >= min(var1) ^ min(var2)
+        
 		var3.setMin(LRINT(my_pow(var1.getMin(),var2.getMin())));
 		DomainInt var1_min = var1.getMin();
 		if(var1_min > 1)
+          // var2 <= log base max(var3) of min(var1)
 		  var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
 		break;
 	  }
 	  case -2:
+        // var3>= min(var1) ^ min(var2) 
 	    var3.setMin(LRINT(my_pow(var1.getMin(), var2.getMin())));
 		var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
 		break;
@@ -103,14 +137,16 @@ struct PowConstraint : public Constraint
 	  }
 	  case 1:
 	  {
-		var3.setMax(LRINT(my_pow(var1.getMax(),var2.getMax())));
+        var3.setMax(rounddown(my_pow(var1.getMax(),var2.getMax())));  // wraparound was occurring here, so use rounddown
 		DomainInt var1_max = var1.getMax();
 		if(var1_max > 1)
-		  var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
+        {
+          var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
+        }
 		break;
 	  }
 	  case 2:
-	    var3.setMax(LRINT(my_pow(var1.getMax(), var2.getMax())));
+	    var3.setMax(rounddown(my_pow(var1.getMax(), var2.getMax())));  // wraparound here.
 		var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
 		break;
 		
@@ -127,7 +163,7 @@ struct PowConstraint : public Constraint
   
   virtual void full_propagate()
   { 
-	propagate(1,0); 
+    propagate(1,0); 
     propagate(2,0);
     propagate(3,0);
     propagate(-1,0);
