@@ -39,9 +39,11 @@ struct compiletime_val
 { 
   int val() const {return i; } 
   
-  template<int j>
-  compiletime_val<i+j> add() const
-{ return compiletime_val<i+j>(); }
+  compiletime_val<-i-1> negminusone() const
+{ return compiletime_val<-i-1>(); }
+  
+  compiletime_val<-i> neg() const
+{ return compiletime_val<-i>(); }
 };
 
 
@@ -52,11 +54,15 @@ struct runtime_val
   int i;
   runtime_val(int _i) : i(_i)
   {}
+  
   int val() const { return i; }
   
+  runtime_val negminusone() const
+  { return runtime_val(-i-1); }
+  
   template<int j>
-    runtime_val add() const
-  { return runtime_val(i+j); }
+  runtime_val neg() const
+  { return runtime_val(-i); }
 };
 
 template<typename T1, typename T2>

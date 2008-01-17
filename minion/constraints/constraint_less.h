@@ -33,7 +33,7 @@ struct LeqConstraint : public Constraint
   { return "Leq"; }
   
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
-  Offset offset;
+  const Offset offset;
   VarRef1 x;
   VarRef2 y;
   
@@ -50,7 +50,8 @@ struct LeqConstraint : public Constraint
 	return t;
   }
   
-  //  virtual Constraint* reverse_constraint()
+  virtual Constraint* reverse_constraint()
+  { return new LeqConstraint(y,x, offset.negminusone()); }
   
   PROPAGATE_FUNCTION(int prop_val,DomainDelta)
   {
@@ -66,6 +67,9 @@ struct LeqConstraint : public Constraint
   }
   
   virtual BOOL check_unsat(int,DomainDelta)
+  { return (x.getMin() > y.getMax() + offset.val()); }
+  
+  virtual BOOL full_check_unsat()
   { return (x.getMin() > y.getMax() + offset.val()); }
   
   virtual void full_propogate()
