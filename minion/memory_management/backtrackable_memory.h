@@ -221,7 +221,7 @@ struct BacktrackableMemory
     D_ASSERT(!final_lock_m);
     lock_m = true;
 #ifdef VM_COPY
-	allocated_bytes + ((vm_page_size - (allocated_bytes % vm_page_size)) % vm_page_size);
+	allocated_bytes += ((vm_page_size - (allocated_bytes % vm_page_size)) % vm_page_size);
 #endif
     current_data = new char[allocated_bytes];
 	
@@ -301,7 +301,7 @@ struct BacktrackableMemory
 #ifdef SEPERATE_PAGES
 	
 #ifdef VM_COPY
-	vm_copy(mach_task_self(), (vm_address_t)backtrack_cache[backtrack_cache_offset / allocated_bytes], allocated_bytes, (vm_address_t)current_data);
+	vm_copy(mach_task_self(), (vm_address_t)current_data,  allocated_bytes, (vm_address_t)backtrack_cache[backtrack_cache_offset / allocated_bytes] );
 #else
 	memcpy(backtrack_cache[backtrack_cache_offset / allocated_bytes], current_data, allocated_bytes);
 #endif
@@ -322,7 +322,7 @@ struct BacktrackableMemory
 #ifdef SEPERATE_PAGES
 	
 #ifdef VM_COPY
-	vm_copy(mach_task_self(), (vm_address_t)current_data, allocated_bytes, (vm_address_t)backtrack_cache[backtrack_cache_offset / allocated_bytes]);
+	vm_copy(mach_task_self(),  (vm_address_t)backtrack_cache[backtrack_cache_offset / allocated_bytes], allocated_bytes, (vm_address_t)current_data);
 #else
     memcpy(current_data, backtrack_cache[backtrack_cache_offset / allocated_bytes], allocated_bytes);
 #endif
