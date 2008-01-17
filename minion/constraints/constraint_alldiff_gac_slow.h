@@ -148,7 +148,6 @@ struct AlldiffGacSlow : public Constraint
   int numvars, numvals;
   
   AlldiffGacSlow(StateObj* _stateObj, const VarArray& _var_array) : Constraint(_stateObj),
-<<<<<<< .mine
     var_array(_var_array), constraint_locked(false)
   {
       dom_min=var_array[0].getInitialMin();
@@ -168,10 +167,6 @@ struct AlldiffGacSlow : public Constraint
       initialize_hopcroft();
       initialize_tarjan();
   }
-=======
-    var_array(_var_array) ,constraint_locked(false)
-  { }
->>>>>>> .r795
   
   virtual triggerCollection setup_internal()
   {
@@ -185,9 +180,6 @@ struct AlldiffGacSlow : public Constraint
   
   virtual Constraint* reverse_constraint()
   { return new CheckAssignConstraint<VarArray, AlldiffGacSlow>(stateObj, var_array, *this); }
-<<<<<<< .mine
-   
-=======
 
   bool constraint_locked;
   PROPAGATE_FUNCTION(int, DomainDelta)
@@ -196,22 +188,6 @@ struct AlldiffGacSlow : public Constraint
     constraint_locked = true;
     getQueue(stateObj).pushSpecialTrigger(this);
   }
->>>>>>> .r795
-  
-<<<<<<< .mine
-  bool constraint_locked;
-
-PROPAGATE_FUNCTION(int, DomainDelta)
-=======
-  virtual void special_unlock() { constraint_locked = false; }
-  virtual void special_check()
->>>>>>> .r795
-  {
-<<<<<<< .mine
-    if(constraint_locked) return;
-    constraint_locked = true;
-    getQueue(stateObj).pushSpecialTrigger(this);
-  }
 
   virtual void special_unlock() { constraint_locked = false; }
   virtual void special_check()
@@ -220,20 +196,11 @@ PROPAGATE_FUNCTION(int, DomainDelta)
     do_prop();
   }
   
-  void do_prop()
-  {
-	PROP_INFO_ADDONE(AlldiffGacSlow);
-    
-=======
-    constraint_locked = false;
-    do_prop();
-  }
 
   void do_prop()
   {
     PROP_INFO_ADDONE(AlldiffGacSlow);
-  
->>>>>>> .r795
+    
     // Check length of the matching against the number of variables
     var_indices.resize(numvars);
     for(int i=0; i<numvars; i++)
@@ -422,13 +389,7 @@ PROPAGATE_FUNCTION(int, DomainDelta)
   }
   
   virtual void full_propagate()
-<<<<<<< .mine
-  {
-    do_prop();
-  }
-=======
   { do_prop(); }
->>>>>>> .r795
 	
 	virtual BOOL check_assignment(vector<DomainInt> v)
 	{
