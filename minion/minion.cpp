@@ -338,14 +338,6 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
 	{ getOptions(stateObj).print_only_solution = true; }
 	else if(command == string("-verbose"))
 	{ reader.parser_verbose = true; }
-	else if(command == string("-sac-root"))
-	{ args.preprocess = PropLevel_SAC; }
-	else if(command == string("-ssac-root"))
-	{ args.preprocess = PropLevel_SSAC; }
-    else if(command == string("-sac-bound-root"))
-	{ args.preprocess = PropLevel_SACBounds; }
-	else if(command == string("-ssac-bound-root"))
-	{ args.preprocess = PropLevel_SSACBounds; }
     else if(command == string("-X-prop-node"))
     {
       cout << "# WARNING: -X-prop-node is experimental. Do not use for benchmarking!" << endl;
@@ -355,9 +347,8 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
       if(args.prop_method == PropLevel_None)
         cerr << "Must propagate at each node!" << endl;
     }
-    else if(command == string("-X-preprocess"))
+    else if(command == string("-preprocess"))
     {
-      cout << "# WARNING: -X-preprocess is experimental. Do not use for benchmarking!" << endl;
       ++i;
       string prop_mode(argv[i]);
       args.preprocess = GetPropMethodFromString(prop_mode);
