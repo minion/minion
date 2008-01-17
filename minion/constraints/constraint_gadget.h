@@ -35,22 +35,25 @@ struct GadgetConstraint : public Constraint
   vector<AnyVarRef> construction_vars;
   
   shared_ptr<CSPInstance> gadget_instance;
-  shared_ptr<StateObj> gadget_stateObj;
+  StateObj* gadget_stateObj;
   
   bool constraint_locked;
   
   GadgetConstraint(StateObj* _stateObj, const VarArray& _vars, shared_ptr<CSPInstance> _gadget) : 
   Constraint(_stateObj), var_array(_vars), gadget_instance(_gadget),
-  gadget_stateObj(shared_ptr<StateObj>(new StateObj)),
+  gadget_stateObj(new StateObj),
   constraint_locked(false)
   { 
-    BuildCSP(&*stateObj, *gadget_instance); 
+    BuildCSP(gadget_stateObj, *gadget_instance); 
     construction_vars.reserve(gadget_instance->constructionSite.size());
     for(int i = 0; i < gadget_instance->constructionSite.size(); ++i)
-      construction_vars.push_back(get_AnyVarRef_from_Var(stateObj, gadget_instance->constructionSite[i]));
+      construction_vars.push_back(get_AnyVarRef_from_Var(gadget_stateObj, gadget_instance->constructionSite[i]));
     if(construction_vars.size() != var_array.size())
       D_FATAL_ERROR("Gadgets construction site");
   }
+  
+  virtual ~GadgetConstraint()
+  { delete gadget_stateObj; }
   
   virtual Constraint* reverse_constraint()
   {
@@ -68,7 +71,10 @@ struct GadgetConstraint : public Constraint
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)
-  { D_FATAL_ERROR(".."); }
+  { 
+    cout << "Gadget Assignment:" << v << endl;
+    return true;
+  }
   
   virtual vector<AnyVarRef> get_vars()
   {
@@ -83,13 +89,14 @@ struct GadgetConstraint : public Constraint
   {
     D_ASSERT(constraint_locked);
 	constraint_locked = false;
+    do_prop();
   }
   
   virtual void special_unlock()
   {
     D_ASSERT(constraint_locked);
 	constraint_locked = false;
-    full_propagate();
+    do_prop();
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
@@ -103,7 +110,17 @@ struct GadgetConstraint : public Constraint
   }
   
   virtual void full_propagate()
+  {
+    if(getState(gadget_stateObj).isFailed())
+      getState(stateObj).setFailed(true);
+    do_prop();
+  }
+
+  void do_prop()
   { 
+    D_ASSERT(!getState(gadget_stateObj).isFailed());
+    Controller::world_push(gadget_stateObj);
+    
     for(int i = 0; i < var_array.size(); ++i)
     {
       DomainInt min_val = var_array[i].getMin();
@@ -111,11 +128,40 @@ struct GadgetConstraint : public Constraint
       construction_vars[i].setMin(min_val);
       construction_vars[i].setMax(max_val);
       
-      for(int j = min_val + 1; j <max_val; ++j)
+      for(int j = min_val + 1; j < max_val; ++j)
         if(!var_array[i].inDomain(j))
           construction_vars[i].removeFromDomain(j);
     }
-  
+    
+    
+    PropagateSAC prop_SAC;
+    prop_SAC(gadget_stateObj, construction_vars);
+    if(getState(gadget_stateObj).isFailed())
+    {
+      getState(gadget_stateObj).setFailed(false);
+      Controller::world_pop(gadget_stateObj);
+      getState(stateObj).setFailed(true);
+      return;
+    }
+        
+    for(int i = 0; i < var_array.size(); ++i)
+    {
+
+      DomainInt min_val = construction_vars[i].getMin();
+      DomainInt max_val = construction_vars[i].getMax();
+      var_array[i].setMin(min_val);
+      var_array[i].setMax(max_val);
+      
+      for(int j = min_val + 1; j < max_val; ++j)
+      {
+        if(!construction_vars[i].inDomain(j))
+        { 
+          var_array[i].removeFromDomain(j);
+        }
+      }
+    }
+    
+    Controller::world_pop(gadget_stateObj);
   }
 };
 

@@ -53,9 +53,7 @@ namespace Controller
 		  world_push(stateObj);
 		  order.branch_left();
 		  getVars(stateObj).getBigRangevarContainer().bms_array.after_branch_left();
-
-                 prop(stateObj, v);
-		//  getQueue(stateObj).propagateQueue();
+          prop(stateObj, v);
 		}
 		
 		// Either search failed, or a solution was found.
@@ -69,8 +67,7 @@ namespace Controller
 		  world_pop(stateObj);
           maybe_print_search_action(stateObj, "bt");
 	  
-	         getVars(stateObj).getBigRangevarContainer().bms_array.before_branch_right();
-
+	      getVars(stateObj).getBigRangevarContainer().bms_array.before_branch_right();
 		  order.branch_right();
 		  getVars(stateObj).getBigRangevarContainer().bms_array.after_branch_right();
 

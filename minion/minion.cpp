@@ -423,13 +423,7 @@ int main(int argc, char** argv) {
   getState(stateObj).getTimer().maybePrintTimestepStore("Parsing Time: ", "ParsingTime", tableout, !getOptions(stateObj).print_only_solution);
   
   BuildCSP(stateObj, instance);
-
-
-
-  
   SolveCSP(stateObj, instance, args);
-  
-  
   return 0;
 }
 

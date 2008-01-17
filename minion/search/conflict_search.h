@@ -53,11 +53,13 @@ namespace Controller
       else
       {
         maybe_print_search_state(stateObj, "Node: ", v);
+        getVars(stateObj).getBigRangevarContainer().bms_array.before_branch_left();        
         world_push(stateObj);
         if(last_conflict_var == -1)
           order.branch_left();
         else
           order.force_branch_left(last_conflict_var);
+        getVars(stateObj).getBigRangevarContainer().bms_array.after_branch_left();
         prop(stateObj, v);
       }
       
@@ -82,7 +84,11 @@ namespace Controller
           
           world_pop(stateObj);
           maybe_print_search_action(stateObj, "bt");
+
+	      getVars(stateObj).getBigRangevarContainer().bms_array.before_branch_right();          
           order.branch_right();
+          getVars(stateObj).getBigRangevarContainer().bms_array.after_branch_right();
+
           set_optimise_and_propagate_queue(stateObj);
         }
       }
