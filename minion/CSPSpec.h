@@ -210,6 +210,8 @@ struct ConstraintBlob
   {
     switch(v.type)
     {
+    case VAR_CONSTANT:
+      return Bounds(v.pos, v.pos);    
     case VAR_BOOL:
       return Bounds(0,1);
     case VAR_BOUND:  
@@ -221,7 +223,7 @@ struct ConstraintBlob
           if(v.pos < bound_size)
             return bound[x].second;
         }
-        throw parse_exception("Internal Error.");
+        throw parse_exception("Internal Error - Bound OverFlow");
       }
       
     case VAR_SPARSEBOUND:
@@ -233,7 +235,7 @@ struct ConstraintBlob
           if(v.pos < sparse_bound_size)
             return Bounds(sparse_bound[x].second.front(), sparse_bound[x].second.back());
         }
-        throw parse_exception("Internal Error.");
+        throw parse_exception("Internal Error - SparseBound OverFlow");
       }
     case VAR_DISCRETE_BASE: 
     {
@@ -244,21 +246,21 @@ struct ConstraintBlob
         if(v.pos < discrete_size)
           return discrete[x].second;
       }
-      throw parse_exception("Internal Error.");
+      throw parse_exception("Internal Error - Discrete OverFlow");
     }
     case VAR_SPARSEDISCRETE:
     {
       int sparse_discrete_size = 0;
-      for(unsigned int x=0;x<sparse_discrete.size();++x)
+      for(unsigned int x = 0; x < sparse_discrete.size(); ++x)
       {
         sparse_discrete_size += sparse_discrete[x].first;
         if(v.pos < sparse_discrete_size)
           return Bounds(sparse_discrete[x].second.front(), sparse_discrete[x].second.back());
       }
-      throw parse_exception("Internal Error.");
+      throw parse_exception("Internal Error - SparseDiscrete OverFlow");
     }
     }
-      throw parse_exception("Internal Error.");
+      throw parse_exception("Internal Error - Unknown Variable Type");
   }
   
   Var get_var(char, int i)
@@ -467,9 +469,9 @@ struct ConstraintBlob
         return true;
       case CT_REIFY:
       case CT_REIFYIMPLY:
-        throw parse_exception("Internal Error.");
+        throw parse_exception("Internal Error - Invalid Constraint");
     }
-    throw parse_exception("Internal Error.");
+    throw parse_exception("Internal Error - Unknown Error");
 
   }
   
