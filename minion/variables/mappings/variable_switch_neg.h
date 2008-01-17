@@ -145,8 +145,10 @@ struct SwitchNeg
 	}
   }
   
-  operator string()
-  { return "SwitchNeg " + to_string(multiplier) + ":" + string(data); }
+ friend std::ostream& operator<<(std::ostream& o, const SwitchNeg& v)
+ {
+   return o << "SwitchNeg " << v.multiplier << ":" << v.data;
+ }
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)

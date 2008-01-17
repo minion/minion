@@ -45,13 +45,18 @@ const int big_constant = 999999;
 template<int i>
 struct compiletime_val
 { 
-  int val() const {return i; } 
+  operator int() const
+{ return i; }
   
   compiletime_val<-i-1> negminusone() const
 { return compiletime_val<-i-1>(); }
   
   compiletime_val<-i> neg() const
 { return compiletime_val<-i>(); }
+  
+  friend std::ostream& operator<<(std::ostream& o, const compiletime_val& v)
+{ return o << "CompiletimeConst:" << i; }
+  
 };
 
 
@@ -63,7 +68,8 @@ struct runtime_val
   runtime_val(int _i) : i(_i)
   {}
   
-  int val() const { return i; }
+  operator int() const
+  { return i; }
   
   runtime_val negminusone() const
   { return runtime_val(-i-1); }
@@ -71,6 +77,10 @@ struct runtime_val
   template<int j>
   runtime_val neg() const
   { return runtime_val(-i); }
+  
+  friend std::ostream& operator<<(std::ostream& o, const runtime_val& v)
+  { return o << v.i; }
+
 };
 
 template<typename T>

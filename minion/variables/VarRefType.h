@@ -98,9 +98,9 @@ struct VarRefType
   void addTrigger(Trigger t, TrigType type)
   { GetContainer::con().addTrigger(data, t, type); }
 
-  operator string()
-  { return GetContainer::name() + to_string(data.var_num); }
-  
+  friend std::ostream& operator<<(std::ostream& o, const VarRefType& v)
+  { return o << GetContainer::name() << v.data.var_num; }
+    
   int getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
   
@@ -176,9 +176,9 @@ struct QuickVarRefType
   
   void addTrigger(Trigger t, TrigType type)
   { GetContainer::con().addTrigger(data, t, type); }
-  
-  operator string()
-  { return "Bool:" + to_string(data.var_num); }
+
+  friend std::ostream& operator<<(std::ostream& o, const QuickVarRefType& b)
+  { return o << "Bool:" << b.data; }
   
   int getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
@@ -247,8 +247,8 @@ struct CompleteVarRefType
   void addTrigger(Trigger t, TrigType type)
   { (data.getCon()).addTrigger(data, t, type); }
   
-  operator string()
-  { return "CompleteCon:" + to_string(data.var_num); }
+  friend std::ostream& operator<<(std::ostream& o, const CompleteVarRefType& cv)
+  { return o << "CompleteCon:" << cv.data.var_num; }
   
   int getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }

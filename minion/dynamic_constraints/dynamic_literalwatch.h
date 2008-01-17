@@ -59,7 +59,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	
 	// XXX comment out this optimisation for now
 	/*
-	if (var_sum.val() == array_size)
+	if (var_sum == array_size)
 	{
 	  // In this case every var will be set to 1
 	  // This will happen before triggers set up in full_propogate
@@ -72,14 +72,14 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	else*/
 	{
 	  
-	  num_unwatched = array_size - var_sum.val() - 1 ;
+	  num_unwatched = array_size - var_sum - 1 ;
 	  D_ASSERT(num_unwatched >= 0);
 	  
 	  unwatched_indexes.request_bytes(sizeof(unsigned) * num_unwatched);
 	  // above line might request 0 bytes
 	  last = 0;
 	  
-	  return var_sum.val() + 1;
+	  return var_sum + 1;
 	}
   }
     
@@ -88,7 +88,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
 	int array_size = var_array.size(); 
-	int triggers_wanted = var_sum.val() + 1;
+	int triggers_wanted = var_sum + 1;
 	int index;
 	
 	for(index = 0; (index < array_size) && (triggers_wanted > 0); ++index) 
@@ -212,7 +212,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	
 	DynamicTrigger* dt2 = dynamic_trigger_start();
 	
-	for(int z = 0; z < var_sum.val() + 1; ++z)
+	for(int z = 0; z < var_sum + 1; ++z)
 	{
 	  if(dt != dt2)       // that one has just been set the other way
 	  {
@@ -229,7 +229,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 	int count = 0;
 	for(int i = 0; i < v_size; ++i)
 	  count += (v[i] == value_array[i]);
-	return count >= var_sum.val();
+	return count >= var_sum;
   }
   
   virtual vector<AnyVarRef> get_vars()

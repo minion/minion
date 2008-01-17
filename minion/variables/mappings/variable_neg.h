@@ -108,8 +108,8 @@ struct VarNeg
 	}
   }
     
-  operator string()
-  { return "Neg:" + string(data); }
+  friend std::ostream& operator<<(std::ostream& o, const VarNeg& n)
+  { return o << "Neg " << n.data; }
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)

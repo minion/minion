@@ -62,7 +62,6 @@ void assert_function(BOOL x, const char* a, const char* f, int line);
 #ifndef NO_DEBUG
 
 #define BOUNDS_CHECK
-#define DUMP_TREE
 
 #define D_ASSERT(x) assert_function(x, #x, __FILE__, __LINE__);
 #define D_DATA(x) x

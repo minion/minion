@@ -49,43 +49,43 @@ struct ShiftVar
   { return data.isAssigned(); }
   
   DomainInt getAssignedValue()
-  { return data.getAssignedValue() + shift.val(); }
+  { return data.getAssignedValue() + shift; }
   
   BOOL isAssignedValue(DomainInt i)
-  { return data.getAssignedValue() == i - shift.val(); }
+  { return data.getAssignedValue() == i - shift; }
   
   BOOL inDomain(DomainInt i)
-  { return data.inDomain(i - shift.val()); }
+  { return data.inDomain(i - shift); }
 
   BOOL inDomain_noBoundCheck(DomainInt i)
-  { return data.inDomain(i - shift.val()); }
+  { return data.inDomain(i - shift); }
   
   DomainInt getMax()
-  { return data.getMax() + shift.val(); }
+  { return data.getMax() + shift; }
   
   DomainInt getMin()
-  { return data.getMin() + shift.val(); }
+  { return data.getMin() + shift; }
 
   DomainInt getInitialMax() const
-  { return data.getInitialMax() + shift.val(); }
+  { return data.getInitialMax() + shift; }
   
   DomainInt getInitialMin() const
-  { return data.getInitialMin() + shift.val(); }
+  { return data.getInitialMin() + shift; }
   
   void setMax(DomainInt i)
-  { data.setMax(i - shift.val()); }
+  { data.setMax(i - shift); }
   
   void setMin(DomainInt i)
-  { data.setMin(i - shift.val()); }
+  { data.setMin(i - shift); }
   
   void uncheckedAssign(DomainInt b)
-  { data.uncheckedAssign(b - shift.val()); }
+  { data.uncheckedAssign(b - shift); }
   
   void propogateAssign(DomainInt b)
-  { data.propogateAssign(b - shift.val()); }
+  { data.propogateAssign(b - shift); }
   
   void removeFromDomain(DomainInt b)
-  { data.removeFromDomain(b - shift.val()); }
+  { data.removeFromDomain(b - shift); }
     
  void addTrigger(Trigger t, TrigType type)
   { 
@@ -105,8 +105,8 @@ struct ShiftVar
   {  data.addDynamicTrigger(t, type, pos); }
 #endif
 
-  operator string()
-  { return "Shift " + to_string(shift.val()) + ":" + string(data); }
+  friend std::ostream& operator<<(std::ostream& o, const ShiftVar& sv)
+  { return o << "Shift " << sv.data << "+" << sv.shift; }
   
   int getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }

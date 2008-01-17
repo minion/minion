@@ -68,14 +68,14 @@ struct OccurrenceEqualConstraint : public Constraint
     {
       if(it->isAssigned())
       { 
-	if(it->getAssignedValue() == value.val()) 
+	if(it->getAssignedValue() == value) 
 	  ++occs; 
       }
       else
-      { it->removeFromDomain(value.val()); }
+      { it->removeFromDomain(value); }
     }
     //D_ASSERT(occs >= oalc_count());
-    if(occs > val_count.val())
+    if(occs > val_count)
       Controller::fail();
   }
   
@@ -88,50 +88,50 @@ struct OccurrenceEqualConstraint : public Constraint
     {
       if(it->isAssigned())
       { 
-      if(it->getAssignedValue() != value.val()) 
+      if(it->getAssignedValue() != value) 
         ++occs; 
       }
       else
-      { it->propogateAssign(value.val()); }
+      { it->propogateAssign(value); }
     }
     //D_ASSERT(occs >= oalc_count());
-    if(occs > (static_cast<int>(var_array.size()) - val_count.val()))
+    if(occs > (static_cast<int>(var_array.size()) - val_count))
       Controller::fail();
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
 	PROP_INFO_ADDONE(OccEqual);
-    if( var_array[i].getAssignedValue() == value.val() )
+    if( var_array[i].getAssignedValue() == value )
     {
       int c = occurrences_count.get() + 1;
       occurrences_count.set(c);
-      if(c == val_count.val())
+      if(c == val_count)
         occurrence_limit_reached();
     }
     else
     {
       int c = not_occurrences_count.get() + 1;
       not_occurrences_count.set(c);
-      if(c == (static_cast<int>(var_array.size()) - val_count.val()))
+      if(c == (static_cast<int>(var_array.size()) - val_count))
 	not_occurrence_limit_reached();
     }
   }
   
   virtual BOOL check_unsat(int i, DomainDelta)
   {
-    if( var_array[i].getAssignedValue() == value.val() )
+    if( var_array[i].getAssignedValue() == value )
     {
       int c = occurrences_count.get() + 1;
       occurrences_count.set(c);
-      if(c > val_count.val())
+      if(c > val_count)
         return true;    
     }
     else
     {
       int c = not_occurrences_count.get() + 1;
       not_occurrences_count.set(c);
-      if(c > (static_cast<int>(var_array.size()) - val_count.val()))
+      if(c > (static_cast<int>(var_array.size()) - val_count))
 	return true;
     }
     return false;
@@ -147,7 +147,7 @@ struct OccurrenceEqualConstraint : public Constraint
     {
       if(it->isAssigned())
 	  {
-	    if(it->getAssignedValue() == value.val())
+	    if(it->getAssignedValue() == value)
 	      ++occs;
 		else
 	      ++not_occs;
@@ -163,13 +163,13 @@ struct OccurrenceEqualConstraint : public Constraint
     int i = occurrences_count.get();
     int j = not_occurrences_count.get();
     D_INFO(1,DI_SUMCON,to_string("Full Propogate, count",i));
-    if(i > val_count.val())
+    if(i > val_count)
       Controller::fail();
-    if(i == val_count.val())
+    if(i == val_count)
       occurrence_limit_reached(); 
-    if(j > (static_cast<int>(var_array.size() - val_count.val())))
+    if(j > (static_cast<int>(var_array.size() - val_count)))
        Controller::fail();
-    if(j == (static_cast<int>(var_array.size() - val_count.val())))
+    if(j == (static_cast<int>(var_array.size() - val_count)))
       not_occurrence_limit_reached();
   }
   
@@ -179,8 +179,8 @@ struct OccurrenceEqualConstraint : public Constraint
     DomainInt count = 0;  
     typename vector<DomainInt>::iterator end_it(v.end());
     for( typename vector<DomainInt>::iterator it=v.begin(); it < end_it; ++it)
-      count += (*it == value.val());
-    return count == val_count.val();
+      count += (*it == value);
+    return count == val_count;
   }
   
   virtual vector<AnyVarRef> get_vars()
@@ -247,7 +247,7 @@ struct OccurrenceLeqConstraint : public Constraint
   
   OccurrenceLeqConstraint(const VarArray& _var_array, const Val& _value, const ValCount& _val_count) :
     var_array(_var_array), val_count(_val_count), value(_value)
-  { D_ASSERT(!(val_count.val() == 0 || val_count.val() == static_cast<int>(var_array.size()))); }
+  { D_ASSERT(!(val_count == 0 || val_count == static_cast<int>(var_array.size()))); }
   
   virtual triggerCollection setup_internal()
   {
@@ -270,35 +270,35 @@ struct OccurrenceLeqConstraint : public Constraint
     {
       if(it->isAssigned())
       { 
-	    if(it->getAssignedValue() == value.val()) 
+	    if(it->getAssignedValue() == value) 
 	      ++occs; 
       }
       else
-      { it->removeFromDomain(value.val()); }
+      { it->removeFromDomain(value); }
     }
-    if(occs > val_count.val())
+    if(occs > val_count)
       Controller::fail();
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-    if( var_array[i].getAssignedValue() == value.val() )
+    if( var_array[i].getAssignedValue() == value )
     {
       int c = count.get() + 1;
       count.set(c);
-      if(c == val_count.val())
+      if(c == val_count)
         limit_reached();
     }
   }
   
   virtual BOOL check_unsat(int i, DomainDelta)
   {
-    if( var_array[i].getAssignedValue() == value.val() )
+    if( var_array[i].getAssignedValue() == value )
     {
     int c = count.get() + 1;
     D_INFO(1,DI_SUMCON,to_string("Checking unsat, count",c));
     count.set(c);
-    if(c > val_count.val())
+    if(c > val_count)
       return true;
     else
       return false;
@@ -309,9 +309,9 @@ struct OccurrenceLeqConstraint : public Constraint
   {
     int i = count.get();
     D_INFO(1,DI_SUMCON,to_string("Full Propogate, count",i));
-    if(i > val_count.val())
+    if(i > val_count)
       Controller::fail();
-    if(i == val_count.val())
+    if(i == val_count)
       limit_reached();  
   }
   
@@ -320,8 +320,8 @@ struct OccurrenceLeqConstraint : public Constraint
     D_ASSERT(v.size() == var_array.size());
     int c = 0;  
     for(unsigned int i=0;i<v.size();i++)
-      c += (v[i] == value.val());
-    return c <= value.val();
+      c += (v[i] == value);
+    return c <= value;
   }
 
   virtual vector<AnyVarRef> get_vars()

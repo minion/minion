@@ -216,8 +216,8 @@ struct MultiplyVar
 #endif
 
   
-  operator string()
-  { return "Mult " + to_string(Multiply) + ":" + string(data); }
+  friend std::ostream& operator<<(std::ostream& o, const MultiplyVar& n)
+  { return o << "Mult:" << n.data << "*" << n.Multiply; }
   
   int getDomainChange(DomainDelta d)
   { return abs(Multiply) * data.getDomainChange(d); }

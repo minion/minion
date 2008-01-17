@@ -118,9 +118,8 @@ struct VarNot
 	}
   }
 
-  
-  operator string()
-  { return "Not:" + string(data); }
+  friend std::ostream& operator<<(std::ostream& o, const VarNot& n)
+  { return o << "Not " << n.data; }
   
   int getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }

@@ -58,19 +58,19 @@ struct LeqConstraint : public Constraint
 	PROP_INFO_ADDONE(BinaryLeq);
     if(prop_val)
     {// y changed
-      x.setMax(y.getMax() + offset.val());
+      x.setMax(y.getMax() + offset);
     }
     else
     {// x changed
-      y.setMin(x.getMin() - offset.val());
+      y.setMin(x.getMin() - offset);
     }
   }
   
   virtual BOOL check_unsat(int,DomainDelta)
-  { return (x.getMin() > y.getMax() + offset.val()); }
+  { return (x.getMin() > y.getMax() + offset); }
   
   virtual BOOL full_check_unsat()
-  { return (x.getMin() > y.getMax() + offset.val()); }
+  { return (x.getMin() > y.getMax() + offset); }
   
   virtual void full_propogate()
   {
@@ -81,7 +81,7 @@ struct LeqConstraint : public Constraint
   virtual BOOL check_assignment(vector<DomainInt> v)
   {
 	D_ASSERT(v.size() == 2);
-	return v[0] <= (v[1] + offset.val());
+	return v[0] <= (v[1] + offset);
   }
   
   virtual vector<AnyVarRef> get_vars()

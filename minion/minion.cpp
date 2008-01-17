@@ -73,9 +73,7 @@ void print_info()
     << "            Note: These orderings do not cache any information between" << endl
     << "            nodes, so will perform poorly on problem with many variables." << endl
     << "         [-randomseed] N             Set the random seed used to N." << endl
-#ifdef DUMP_TREE
-   << "         [-dumptree]                 Dumps the search tree" << endl
-#endif
+    << "         [-dumptree]                 Dumps the search tree" << endl
   
 #ifndef NO_DEBUG
 	<< "  Note: The following tags should never change the results produced." << endl
@@ -154,12 +152,7 @@ void parse_command_line(MinionInputReader& reader, MinionArguments& args, int ar
 	
 	else if(command == string("-dumptree"))
 	{
-#ifndef DUMP_TREE
 	  Controller::commandlineoption_dumptree = true; 
-#else
-	  cout << "This version of minion was not built to support the '-dumptree' command. Sorry" << endl;
-	  FAIL_EXIT();
-#endif
 	}
 	else if(command == string("-crash"))
 	{ debug_crash = true; }
@@ -354,9 +347,9 @@ int main(int argc, char** argv) {
 	  int size = var_val_order.first.size();
 	  if(size != 0)
 	  {
-	    cout << "Var Order: <" << string(var_val_order.first[0]);
+	    cout << "Var Order: <" << var_val_order.first[0];
 	    for(int i = 1; i < size; ++i)
-	      cout << "," << string(var_val_order.first[i]);
+	      cout << "," << var_val_order.first[i];
 	    cout << ">" << endl;
 	  
 	    cout << "Val Order: <" << var_val_order.second[0];

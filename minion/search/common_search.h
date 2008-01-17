@@ -72,7 +72,7 @@ namespace Controller
 	    cerr << "A " << con->constraint_name() << " constraint is not satisfied by this sol!" << endl;
 		cerr << "The constraint is over the following variables:" << endl;
 		for(unsigned loop = 0; loop < vec_size; ++loop)
-		  cerr << string(variables[loop]) << ",";
+		  cerr << variables[loop] << ",";
 		cerr << endl;
 		cerr << "Variables were assigned:" << endl;
 	    for(unsigned loop = 0; loop < vec_size; ++loop)
@@ -150,16 +150,12 @@ namespace Controller
   }
   
   
-#ifdef DUMP_TREE
-#define maybe_print_search_state(x,y)
-#else
 template<typename T>
-void maybe_print_search_state(string name, T& vars)
+void inline maybe_print_search_state(char* name, T& vars)
 {
   if(commandlineoption_dumptree)
 	cout << name << nodes << "," << get_dom_as_string(vars) << endl;
 }
-#endif
 
   void inline deal_with_solution()
   {

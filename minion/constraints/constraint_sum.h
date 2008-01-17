@@ -62,17 +62,17 @@ struct BoolLessSumConstraint : public Constraint
   virtual Constraint* reverse_constraint()
   { 
     if(VarToCount)
-      return new BoolLessSumConstraint<VarArray, runtime_val, 0>(var_array, runtime_val(var_sum.val() + 1)); 
+      return new BoolLessSumConstraint<VarArray, runtime_val, 0>(var_array, runtime_val(var_sum + 1)); 
     else
-      return new BoolLessSumConstraint<VarArray, runtime_val, 1>(var_array, runtime_val(var_sum.val() - 1));
+      return new BoolLessSumConstraint<VarArray, runtime_val, 1>(var_array, runtime_val(var_sum - 1));
   }
   
   int occ_count()
   {
     if (VarToCount)
-      return var_sum.val();
+      return var_sum;
     else
-      return var_array.size() - var_sum.val();
+      return var_array.size() - var_sum;
   }
   
   
@@ -152,9 +152,9 @@ struct BoolLessSumConstraint : public Constraint
     for(int i = 0; i < v_size; i++)
       D_ASSERT(v[i] == 0 || v[i] == 1);
     if(VarToCount)
-      return std::accumulate(v.begin(),v.end(),DomainInt(0)) <= var_sum.val();
+      return std::accumulate(v.begin(),v.end(),DomainInt(0)) <= var_sum;
     else
-      return std::accumulate(v.begin(),v.end(),DomainInt(0)) >= var_sum.val();
+      return std::accumulate(v.begin(),v.end(),DomainInt(0)) >= var_sum;
   }
   
   virtual vector<AnyVarRef> get_vars()

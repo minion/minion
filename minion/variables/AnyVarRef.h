@@ -120,7 +120,7 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   { data.addTrigger(t, type); }
   
   virtual string virtual_to_string()
-  { return string(data); }
+  { return to_string(data); }
   
   virtual ~AnyVarRef_Concrete()
   {}
@@ -202,8 +202,8 @@ struct AnyVarRef
   void addTrigger(Trigger t, TrigType type)
   { data->addTrigger(t, type); }
   
-  operator string()
-  { return "AnyVRef:" + data->virtual_to_string(); }
+  friend std::ostream& operator<<(std::ostream& o, const AnyVarRef& avr)
+  { return o << "AnyVarRef:" << avr.data->virtual_to_string(); }
   
   int getDomainChange(DomainDelta d)
   { return data->getDomainChange(d); }

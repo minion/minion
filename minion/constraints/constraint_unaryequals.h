@@ -54,17 +54,17 @@ struct UnaryEqualConstraint : public Constraint
   
   
   virtual BOOL check_unsat(int,DomainDelta)
-  { return (x.getMin() <= offset.val()) && (x.getMax() >= offset.val()); }
+  { return (x.getMin() <= offset) && (x.getMax() >= offset); }
   
   virtual void full_propogate()
   {
-    x.propogateAssign(offset.val());
+    x.propogateAssign(offset);
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == 1);
-    return v[0] == offset.val();
+    return v[0] == offset;
   }
   
   virtual vector<AnyVarRef> get_vars()

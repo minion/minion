@@ -102,7 +102,7 @@ struct ConstantVar
 	return 0;
   }
   
-  operator string()
-  { return "Constant:" + to_string(val); }
+  friend std::ostream& operator<<(std::ostream& o, const ConstantVar& constant)
+  { return o << "Constant" << constant.val; }
 };
 

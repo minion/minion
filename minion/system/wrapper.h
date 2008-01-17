@@ -62,11 +62,11 @@ bool operator op (const Wrapper<T>& t1, const Wrapper<T>& t2) \
 \
 template<typename T, typename U> \
 bool operator op (const U& t1, const Wrapper<T>& t2) \
-{ return t1 op t2.t; } \
+{ return Wrapper<T>(t1) op t2.t; } \
 \
 template<typename T, typename U> \
 bool operator op (const Wrapper<T>& t1, const U& t2) \
-{ return t1.t op t2; } 
+{ return t1.t op Wrapper<T>(t2); } \
 
 WRAP_BOOL_OPS(==)
 WRAP_BOOL_OPS(!=)

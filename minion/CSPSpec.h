@@ -138,12 +138,8 @@ struct Var
   Var() : type(VAR_INVALID), pos(-1)
   {}
   
-  operator string()
-  {
-   ostringstream s;
-   s << "Var. Type:" << type << " Pos:" << pos << ".";
-   return s.str();
-   }
+  friend std::ostream& operator<<(std::ostream& o, const Var& v)
+  { return o << "Var. Type:" << v.type << " Pos:" << v.pos << "."; }
    
    BOOL operator==(const Var& var)
    { return type == var.type && pos == var.pos; }

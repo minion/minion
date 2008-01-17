@@ -108,9 +108,11 @@ struct InfoRefType
     data.addTrigger( t, type); 
   }
   
-  operator string()
-  { return "InfoRef:" + string(data); }
-  
+  friend std::ostream& operator<<(std::ostream& o, const InfoRefType& ir)
+  {
+    return o << "InfoRef " << ir.data;
+  }
+ 
   int getDomainChange(DomainDelta d)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getDomainChange);

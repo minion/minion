@@ -89,7 +89,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	
 	int array_size = var_array.size();
 
-        if (var_sum.val() == array_size)
+        if (var_sum == array_size)
         {
           // In this case every var will be set to 1
           // This will happen before triggers set up in full_propogate
@@ -110,14 +110,14 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
             values_watched(i) = false;
 #endif
 
-          num_unwatched = array_size - var_sum.val() - 1 ;
+          num_unwatched = array_size - var_sum - 1 ;
           D_ASSERT(num_unwatched >= 0);
 
           unwatched_indexes.request_bytes(sizeof(unsigned) * num_unwatched);
           // above line might request 0 bytes
           last = 0;
 
-          return var_sum.val() + 1;
+          return var_sum + 1;
         }
   }
   
@@ -125,9 +125,9 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   int occ_count()
   {
 	if (VarToCount)
-	  return var_sum.val();
+	  return var_sum;
 	else
-	  return var_array.size() - var_sum.val();
+	  return var_array.size() - var_sum;
   }
   */
   
@@ -136,7 +136,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
 	int array_size = var_array.size(); 
-	int triggers_wanted = var_sum.val() + 1;
+	int triggers_wanted = var_sum + 1;
         int index;
 	
 	for(index = 0; (index < array_size) && (triggers_wanted > 0); ++index) 
@@ -218,7 +218,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   {
 #ifndef WATCHEDLITERALS 
     DynamicTrigger* start = dynamic_trigger_start();
-    DynamicTrigger* end = start + var_sum.val() + 1;	
+    DynamicTrigger* end = start + var_sum + 1;	
 	for(DynamicTrigger* ptr = start; ptr < end; ptr++)
 	{  D_ASSERT(values_watched(ptr->trigger_info())); }
 	
@@ -312,7 +312,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	
 	DynamicTrigger* dt2 = dynamic_trigger_start();
 	
-	for(int z = 0; z < var_sum.val() + 1; ++z)
+	for(int z = 0; z < var_sum + 1; ++z)
 	{
 	  if(dt != dt2)       // that one has just been set the other way
 	  {
@@ -332,7 +332,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 	int count = 0;
 	for(int i = 0; i < v_size; ++i)
 	  count += (v[i] != VarToCount);
-	return count >= var_sum.val();
+	return count >= var_sum;
   }
   
   virtual vector<AnyVarRef> get_vars()
@@ -350,7 +350,7 @@ DynamicConstraint*
 BoolLessEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
 { 
   return new BoolLessSumConstraintDynamic<VarArray,VarSum>(_var_array,
-		  runtime_val(_var_array.size() - _var_sum.val())); 
+		  runtime_val(_var_array.size() - _var_sum)); 
 }
 
 template<typename VarArray,  typename VarSum>

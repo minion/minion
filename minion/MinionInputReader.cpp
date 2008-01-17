@@ -646,7 +646,7 @@ void MinionInputReader::readObjective(InputFileReader* infile) {
   BOOL minimising = (s == "minimising");
   Var var = readIdentifier(infile) ;
   if(parser_verbose)
-    cout << ((minimising) ? "minimising" : "maximising") << string(var) << endl ;
+    cout << ((minimising) ? "minimising" : "maximising") << var << endl ;
   instance.set_optimise(minimising, var);
 }
 

@@ -53,15 +53,15 @@ struct UnaryNeqConstraint : public Constraint
   
   
   virtual BOOL check_unsat(int,DomainDelta)
-  { return !x.inDomain(offset.val()); }
+  { return !x.inDomain(offset); }
   
   virtual void full_propogate()
-  { x.removeFromDomain(offset.val()); }
+  { x.removeFromDomain(offset); }
   
   virtual BOOL check_assignment(vector<DomainInt> v)
   {
     D_ASSERT(v.size() == 1);
-    return v[0] != offset.val();
+    return v[0] != offset;
   }
   
   virtual vector<AnyVarRef> get_vars()
