@@ -187,8 +187,8 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
 	  max_domain_val = initial_bounds[0].second;
 	  for(unsigned int i = 0; i < var_count_m; ++i)
       {
-           bound_ptr[2*i] = initial_bounds[i].first;
-           bound_ptr[2*i+1] = initial_bounds[i].second;
+        bound_ptr[2*i] = initial_bounds[i].first;
+        bound_ptr[2*i+1] = initial_bounds[i].second;
 	  
 	    min_domain_val = mymin(initial_bounds[i].first, min_domain_val);
 	    max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
@@ -335,7 +335,7 @@ private:
   {
 #ifdef FULL_DOMAIN_TRIGGERS
     // TODO : Optimise this function to only check values in domain.
-    int domainOffset = var_offset[d.var_num] - initial_bounds[d.var_num].first;
+    int domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
     for(DomainInt loop = lower; loop <= upper; ++loop)
     {
       // def of inDomain: bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
@@ -388,7 +388,7 @@ public:
     {
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-      int domainOffset = var_offset[d.var_num] - initial_bounds[d.var_num].first;
+      int domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
 	  for(DomainInt loop = offset + 1; loop <= up_bound; ++loop)
 	  {
         // Def of inDomain: bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
@@ -442,7 +442,7 @@ public:
     {
 #ifdef FULL_DOMAIN_TRIGGERS
 	  // TODO : Optimise this function to only check values in domain.
-      int domainOffset = var_offset[d.var_num] - initial_bounds[d.var_num].first;
+      int domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
 	  for(DomainInt loop = low_bound; loop < offset; ++loop)
 	  {
         // def of inDomain: bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
