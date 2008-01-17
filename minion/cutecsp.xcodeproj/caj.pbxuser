@@ -93,7 +93,7 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					36,
+					529,
 					20,
 					48,
 					43,
@@ -186,12 +186,12 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 198770535;
-			PBXWorkspaceStateSaveDate = 198770535;
+			PBXPerProjectTemplateStateSaveDate = 199722331;
+			PBXWorkspaceStateSaveDate = 199722331;
 		};
 		perUserProjectItems = {
-			26DA90450BD8FF7D0044D16D /* PBXBookmark */ = 26DA90450BD8FF7D0044D16D /* PBXBookmark */;
-			26DA90560BD919BB0044D16D /* PBXTextBookmark */ = 26DA90560BD919BB0044D16D /* PBXTextBookmark */;
+			26A4CE100BE7885700160A9E /* PBXTextBookmark */ = 26A4CE100BE7885700160A9E /* PBXTextBookmark */;
+			26A4CE120BE7885700160A9E /* PBXTextBookmark */ = 26A4CE120BE7885700160A9E /* PBXTextBookmark */;
 		};
 		sourceControlManager = 26AAF872096D3BAC00AD8C1A /* Source Control */;
 		userBuildSettings = {
@@ -702,6 +702,42 @@
 			sepNavWindowFrame = "{{401, 47}, {979, 831}}";
 		};
 	};
+	26A4CE100BE7885700160A9E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 26A4CE110BE7885700160A9E /* constraint_div.h */;
+		rLen = 0;
+		rLoc = 2147483647;
+		rType = 0;
+	};
+	26A4CE110BE7885700160A9E /* constraint_div.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = constraint_div.h;
+		path = /Users/caj/minion/trunk/minion/constraints/constraint_div.h;
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {684, 2324}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {684, 688}}";
+			sepNavWindowFrame = "{{15, 56}, {729, 817}}";
+		};
+	};
+	26A4CE120BE7885700160A9E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 26A4CE130BE7885700160A9E /* constraint_div.h */;
+		name = "(null): 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1516;
+		vrLoc = 0;
+	};
+	26A4CE130BE7885700160A9E /* constraint_div.h */ = {
+		isa = PBXFileReference;
+		name = constraint_div.h;
+		path = /Users/caj/minion/trunk/minion/constraints/constraint_div.h;
+		sourceTree = "<absolute>";
+	};
 	26A83EEF097A923F009DD39A /* VarRefType.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {725, 3724}}";
@@ -806,7 +842,7 @@
 			sepNavIntBoundsRect = "{{0, 0}, {684, 1792}}";
 			sepNavSelRange = "{3472, 0}";
 			sepNavVisRect = "{{0, 1090}, {684, 688}}";
-			sepNavWindowFrame = "{{668, 61}, {729, 817}}";
+			sepNavWindowFrame = "{{48, 56}, {729, 817}}";
 		};
 	};
 	26B99BD609979C0E009D27F0 /* reify_true.h */ = {
@@ -928,20 +964,6 @@
 			sepNavVisRect = "{{0, 544}, {541, 702}}";
 			sepNavWindowFrame = "{{52, 47}, {586, 831}}";
 		};
-	};
-	26DA90450BD8FF7D0044D16D /* PBXBookmark */ = {
-		isa = PBXBookmark;
-		fRef = 26B537A20981633E00902866 /* constraint_less.h */;
-	};
-	26DA90560BD919BB0044D16D /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 26B537A20981633E00902866 /* constraint_less.h */;
-		name = "constraint_less.h: 124";
-		rLen = 0;
-		rLoc = 3472;
-		rType = 0;
-		vrLen = 1490;
-		vrLoc = 2172;
 	};
 	26DB943709F84BE1001A1230 /* constraint_GACelement.h */ = {
 		uiCtxt = {

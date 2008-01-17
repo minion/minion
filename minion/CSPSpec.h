@@ -58,6 +58,8 @@ enum ConstraintType {
   CT_WATCHED_VECNEQ,
   CT_WATCHED_LITSUM, 
   CT_MINUSEQ,
+  CT_DIV,
+  CT_MODULO,
   CT_REIFY,
   CT_REIFYIMPLY
 };
