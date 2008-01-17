@@ -166,7 +166,8 @@ public:
   int dynamic_trigger_num(DynamicTrigger* trig)
   { return trig - static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }
   
-  /// Actually creates the dynamic triggers.
+  /// Actually creates the dynamic triggers. Calls dynamic_trigger_count from function to get
+  /// the number of triggers required.
   void setup()
   {
     int trigs = dynamic_trigger_count();
@@ -179,6 +180,7 @@ public:
   }
   
   /// Defines the number of dynamic triggers the constraint wants.
+  /// Must be implemented by any constraint.
   virtual int dynamic_trigger_count() = 0;
   
   /// Performs a full round of propagation and sets up any data needs by propagate().

@@ -207,7 +207,7 @@ struct ConstraintBlob
 
   /// Given a matrix variable and a parameter list, returns a slice of the matrix.
   /// Params can either be wildcards (denoted -999), or a value for the matrix.
-  vector<Var> buildVarList(const string& name, vector<int> params)
+  vector<Var> buildVarList(const string& name, const vector<int>& params)
   {
      vector<Var> return_list;
     
@@ -251,7 +251,7 @@ struct ConstraintBlob
     return return_list;
   }
   
-  vector<vector<Var> > flattenTo2DMatrix(string name)
+  vector<vector<Var> > flattenTo2DMatrix(const string& name)
   {
     // The following code looks a bit weird, but aims to maximise code reuse.
     // The idea is that we use buildVarList with all but the last parameter wild to get
@@ -268,6 +268,7 @@ struct ConstraintBlob
     {
       loop_indices.back() = i;
       vector<Var> slice = buildVarList(name, loop_indices);
+      // This line should only do something first pass through the loop.
       terms.resize(slice.size());
       for(int i = 0; i < slice.size(); ++i)
         terms[i].push_back(slice[i]);
