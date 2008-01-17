@@ -212,7 +212,7 @@ struct LessEqualSumConstraint : public Constraint
 
 template<typename VarArray,  typename VarSum>
 Constraint*
-LessEqualSumCon(const VarArray& _var_array, const vector<VarSum>& _var_sum)
+LessEqualSumCon(const VarArray& _var_array, const light_vector<VarSum>& _var_sum)
 { 
   if(_var_array.size() == 2)
   {
@@ -230,7 +230,7 @@ LessEqualSumCon(const VarArray& _var_array, const vector<VarSum>& _var_sum)
 #ifndef NO_SPECIALISATIONS
 
 inline Constraint*
-LessEqualSumCon(const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum)
+LessEqualSumCon(const light_vector<BoolVarRef>& var_array, const light_vector<ConstantVar>& var_sum)
 { 
   runtime_val t2(var_sum[0].getAssignedValue());
   return BoolLessEqualSumCon(var_array, t2);
@@ -244,7 +244,7 @@ BUILD_CONSTRAINT2(CT_LEQSUM, LessEqualSumCon);
 
 template<typename VarArray,  typename VarSum>
 Constraint*
-GreaterEqualSumCon(const VarArray& _var_array, const vector<VarSum>& _var_sum)
+GreaterEqualSumCon(const VarArray& _var_array, const light_vector<VarSum>& _var_sum)
 { 
   if(_var_array.size() == 2)
   {
@@ -262,8 +262,9 @@ GreaterEqualSumCon(const VarArray& _var_array, const vector<VarSum>& _var_sum)
 
 #ifndef NO_SPECIALISATIONS
 
+
 inline Constraint*
-GreaterEqualSumCon(const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum)
+GreaterEqualSumCon(const light_vector<BoolVarRef>& var_array, const light_vector<ConstantVar>& var_sum)
 { 
   runtime_val t2(var_sum[0].getAssignedValue());
   return BoolGreaterEqualSumCon(var_array, t2);

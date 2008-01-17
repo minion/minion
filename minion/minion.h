@@ -35,6 +35,15 @@
 #include "system/time_keeping.h"
 #include "system/to_string.h"
 
+#include "constants.h"
+#include "debug.h"
+
+#ifdef USELIGHTVECTOR
+#include "system/light_vector.h"
+#else
+#define light_vector vector
+#endif
+
 // XXX These could possibly be turned off, but it's possible it will require
 // Some small amount of work to make them work.
 #define FULL_DOMAIN_TRIGGERS
@@ -50,8 +59,7 @@
 // above line will work but only gives revision of this file,
 //  not the current global revision 
 
-#include "constants.h"
-#include "debug.h"
+
 
 #ifdef MORE_SEARCH_INFO
 #include "get_info/get_info.h"

@@ -117,6 +117,7 @@
 		26CE28F00A234F8400110C21 /* AnyVarRef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnyVarRef.h; path = variables/AnyVarRef.h; sourceTree = "<group>"; };
 		26CFEBEC0AA64E5A00A35D56 /* VariableOrders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VariableOrders.h; path = search/VariableOrders.h; sourceTree = "<group>"; };
 		26DB943709F84BE1001A1230 /* constraint_GACelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_GACelement.h; path = constraints/constraint_GACelement.h; sourceTree = "<group>"; };
+		26DFA2ED0B919A0F003A2B4E /* light_vector.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = light_vector.h; path = system/light_vector.h; sourceTree = "<group>"; };
 		26E1C004098401610061B982 /* constraint_occurrance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_occurrance.h; path = constraints/constraint_occurrance.h; sourceTree = "<group>"; };
 		26E1C09E098413D40061B982 /* constraint_element.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constraint_element.h; path = constraints/constraint_element.h; sourceTree = "<group>"; };
 		26E34D160970235600058E70 /* minion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = minion.h; sourceTree = "<group>"; };
@@ -190,6 +191,7 @@
 				26FB02020B63D2230062AD1B /* BuildStart.h */,
 				26FB02030B63D2230062AD1B /* BuildStaticStart.cpp */,
 				26FB02040B63D2230062AD1B /* constraint_defs.h */,
+				26DFA2ED0B919A0F003A2B4E /* light_vector.h */,
 				08FB7795FE84155DC02AAC07 /* Source */,
 				26F697FD0986D79A00D3B93B /* variables */,
 				2689211009DBB65000D0472B /* Dynamic Constraints */,

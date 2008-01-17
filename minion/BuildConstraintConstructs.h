@@ -75,7 +75,7 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 	{
 	  case VAR_BOOL:
 	  {
-		vector<BoolVarRef> v(vars.size());
+		light_vector<BoolVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = boolean_container.get_var_num(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
@@ -83,7 +83,7 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 	  }
 	  case VAR_NOTBOOL:
 	  {
-		vector<VarNot<BoolVarRef> > v(vars.size());
+		light_vector<VarNot<BoolVarRef> > v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = VarNotRef(boolean_container.get_var_num(vars[i].pos));
 		return BUILDCON<initial_size, size - 1>::
@@ -91,7 +91,7 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 	  }
 	  case VAR_BOUND:
 	  {
-		vector<BoundVarRef> v(vars.size());
+		light_vector<BoundVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = boundvar_container.get_var_num(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
@@ -99,7 +99,7 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 	  }		
 	  case VAR_SPARSEBOUND:
 	  {
-		vector<SparseBoundVarRef> v(vars.size());
+		light_vector<SparseBoundVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = sparse_boundvar_container.get_var_num(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
@@ -107,7 +107,7 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 	  }
 	  case VAR_DISCRETE:
 	  {
-		vector<LRangeVarRef> v(vars.size());
+		light_vector<LRangeVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = rangevar_container.get_var_num(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
@@ -115,7 +115,7 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 	  }		
 	  case VAR_LONG_DISCRETE:
 	  {
-		vector<BigRangeVarRef> v(vars.size());
+		light_vector<BigRangeVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = big_rangevar_container.get_var_num(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
@@ -126,7 +126,7 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 		
 	  case VAR_CONSTANT:
 	  {
-		vector<ConstantVar> v(vars.size());
+		light_vector<ConstantVar> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = ConstantVar(vars[i].pos);
 		return BUILDCON<initial_size, size - 1>::
@@ -137,7 +137,7 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
   else
   #endif
   {
-	vector<AnyVarRef> v(vars.size());
+	light_vector<AnyVarRef> v(vars.size());
 	for(unsigned i = 0; i < vars.size(); ++i)
 	  v[i] = get_AnyVarRef_from_Var(vars[i]);
 	

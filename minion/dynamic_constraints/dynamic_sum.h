@@ -366,7 +366,7 @@ BoolGreaterEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
 #include "dynamic_3_sat.h"
 
 inline DynamicConstraint*
-BuildCT_WATCHED_LEQSUM(const vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_LEQSUM(const light_vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   if(reify) 
   { 
@@ -386,7 +386,7 @@ BuildCT_WATCHED_LEQSUM(const T& t1, BOOL reify, const BoolVarRef& reifyVar, Cons
 }
 
 inline DynamicConstraint*
-BuildCT_WATCHED_GEQSUM(const vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_GEQSUM(const light_vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   if(reify) 
   { 

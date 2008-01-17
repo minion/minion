@@ -105,7 +105,7 @@ struct MultiplyVar
   
   BOOL isAssignedValue(int i)
   { 
-    if(data.isAssigned()) return false;
+    if(!data.isAssigned()) return false;
 	
 	return data.getAssignedValue() == i * Multiply;
   }
@@ -216,7 +216,7 @@ struct MultiplyVar
   { return "Mult " + to_string(Multiply) + ":" + string(data); }
   
   int getDomainChange(DomainDelta d)
-  { return Multiply * data.getDomainChange(d); }
+  { return abs(Multiply) * data.getDomainChange(d); }
 };
 
 template<typename T>
@@ -226,6 +226,12 @@ struct MultiplyType
 template<typename T>
 struct MultiplyType<vector<T> >
 { typedef vector<MultiplyVar<T> > type; };
+
+#ifdef LIGHT_VECTOR
+template<typename T>
+struct MultiplyType<light_vector<T> >
+{ typedef light_vector<MultiplyVar<T> > type; };
+#endif
 
 template<typename T, std::size_t i>
 struct MultiplyType<array<T, i> >
@@ -246,6 +252,18 @@ MultiplyVarRef(const vector<VarRef>& var_array, const vector<int>& multiplies)
     Multiply_array[i] = MultiplyVarRef(var_array[i], multiplies[i]);
   return Multiply_array;
 }
+
+#ifdef LIGHT_VECTOR
+template<typename VarRef>
+light_vector<MultiplyVar<VarRef> >
+MultiplyVarRef(const light_vector<VarRef>& var_array, const light_vector<int>& multiplies)
+{
+  light_vector<MultiplyVar<VarRef> > Multiply_array(var_array.size());
+  for(unsigned int i = 0; i < var_array.size(); ++i)
+    Multiply_array[i] = MultiplyVarRef(var_array[i], multiplies[i]);
+  return Multiply_array;
+}
+#endif
 
 template<typename VarRef, std::size_t i>
 array<MultiplyVar<VarRef>, i>

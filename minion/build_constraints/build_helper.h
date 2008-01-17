@@ -100,7 +100,7 @@ struct Build ## TYPE<CT_NAME, 0> \
 { \
   template<typename T1, typename T2, typename T3> \
   static  \
-  TYPE* build(const pair<pair<pair<EmptyType, vector<T1>* >, vector<T2>* >, vector<T3>*>& vars, ConstraintBlob& b, int) \
+  TYPE* build(const pair<pair<pair<EmptyType, light_vector<T1>* >, light_vector<T2>* >, light_vector<T3>*>& vars, ConstraintBlob& b, int) \
   { \
 	if(b.implied_reified) \
 	{ \
@@ -127,7 +127,7 @@ struct Build ## TYPE<CT_NAME, 0> \
 { \
   template<typename T1, typename T2> \
   static  \
-  TYPE* build(const pair<pair<EmptyType, vector<T1>* >, vector<T2>* >& vars, ConstraintBlob& b, int) \
+  TYPE* build(const pair<pair<EmptyType, light_vector<T1>* >, light_vector<T2>* >& vars, ConstraintBlob& b, int) \
   { \
 	if(b.implied_reified) \
 	{ \
@@ -154,7 +154,7 @@ struct Build ## TYPE<CT_NAME, 0> \
 { \
   template<typename T1> \
   static  \
-  TYPE* build(const pair<EmptyType, vector<T1>* >& vars, ConstraintBlob& b, int) \
+  TYPE* build(const pair<EmptyType, light_vector<T1>* >& vars, ConstraintBlob& b, int) \
   { \
 	if(b.implied_reified) \
 	{ \
@@ -183,10 +183,10 @@ build_constraint_ ## CT_NAME(ConstraintBlob& b) \
 TYPE* \
 build_constraint_ ## CT_NAME (ConstraintBlob& b) \
   { \
-	  vector<int> weights; \
 	  const vector<Var>& vars = b.vars[0]; \
+	  light_vector<int> weights(vars.size()); \
 	  for(unsigned i = 0; i < vars.size(); ++i) \
-		weights.push_back(vars[i].pos); \
+		weights[i] = vars[i].pos; \
 	  return Build ## TYPE <CT_NAME, COUNT-1>::build(make_pair(EmptyType(), &weights), b, 1); \
   }
 

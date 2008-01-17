@@ -168,7 +168,7 @@ GeqWeightBoolSumCon(const VarArray& _var_array, const WeightArray& w_array, cons
  
 template<typename T1, typename T2>
 Constraint*
-LeqWeightedSum(const vector<int>& scale, const vector<T1>& vec, const vector<T2>& t2)
+LeqWeightedSum(const light_vector<int>& scale, const light_vector<T1>& vec, const light_vector<T2>& t2)
 {
   BOOL multipliers_size_one = true;
   for(unsigned i = 0; i < scale.size(); ++i)
@@ -182,23 +182,23 @@ LeqWeightedSum(const vector<int>& scale, const vector<T1>& vec, const vector<T2>
   
   if(multipliers_size_one)
   {
-	vector<SwitchNeg<T1> > mult_vars;
+	light_vector<SwitchNeg<T1> > mult_vars(vec.size());
 	for(unsigned int i = 0; i < vec.size(); ++i)
-	  mult_vars.push_back(SwitchNeg<T1>(vec[i], scale[i]));
+	  mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
 	return LessEqualSumCon(mult_vars, t2);
   }
   else
   {
-	vector<MultiplyVar<T1> > mult_vars;
+	light_vector<MultiplyVar<T1> > mult_vars(vec.size());
 	for(unsigned int i = 0; i < vec.size(); ++i)
-	  mult_vars.push_back(MultiplyVar<T1>(vec[i], scale[i]));
+	  mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
 	return LessEqualSumCon(mult_vars, t2);
   }
 }
 
 template<typename T1, typename T2>
 Constraint*
-GeqWeightedSum(const vector<int>& scale, const vector<T1>& vec, const vector<T2>& t2)
+GeqWeightedSum(const light_vector<int>& scale, const light_vector<T1>& vec, const light_vector<T2>& t2)
 {
   BOOL multipliers_size_one = true;
   for(unsigned i = 0; i < scale.size(); ++i)
@@ -212,16 +212,16 @@ GeqWeightedSum(const vector<int>& scale, const vector<T1>& vec, const vector<T2>
   
   if(multipliers_size_one)
   {
-	vector<SwitchNeg<T1> > mult_vars;
+	light_vector<SwitchNeg<T1> > mult_vars(vec.size());
 	for(unsigned int i = 0; i < vec.size(); ++i)
-	  mult_vars.push_back(SwitchNeg<T1>(vec[i], scale[i]));
+	  mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
 	return GreaterEqualSumCon(mult_vars, t2);
   }
   else
   {
-	vector<MultiplyVar<T1> > mult_vars;
+	light_vector<MultiplyVar<T1> > mult_vars(vec.size());
 	for(unsigned int i = 0; i < vec.size(); ++i)
-	  mult_vars.push_back(MultiplyVar<T1>(vec[i], scale[i]));
+	  mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
 	return GreaterEqualSumCon(mult_vars, t2);
   }
 }

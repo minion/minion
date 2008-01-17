@@ -275,10 +275,14 @@ NeqCon(const VarArray& var_array)
 { return new NeqConstraint<VarArray>(var_array); }
 
 
-template<typename VarRef1, typename VarRef2>
+template<typename Var1, typename Var2>
 Constraint*
-NeqConBinary(const vector<VarRef1>& var1, const vector<VarRef2>& var2)
-{ return new NeqConstraintBinary<VarRef1, VarRef2>(var1[0], var2[0]); }
+NeqConBinary(const Var1& var1, const Var2& var2)
+{
+  typedef typename Var1::value_type VarRef1;
+  typedef typename Var2::value_type VarRef2;
+  return new NeqConstraintBinary<VarRef1, VarRef2>(var1[0], var2[0]); 
+}
 
 BUILD_CONSTRAINT2(CT_DISEQ, NeqConBinary)
 

@@ -176,7 +176,7 @@ struct ProductConstraint : public Constraint
 #ifndef NO_SPECIALISATIONS
 
 inline Constraint*
-ProductCon(const vector<BoolVarRef>& vars, const vector<BoolVarRef>& var2)
+ProductCon(const light_vector<BoolVarRef>& vars, const light_vector<BoolVarRef>& var2)
 {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
@@ -187,7 +187,7 @@ ProductCon(const vector<BoolVarRef>& vars, const vector<BoolVarRef>& var2)
 
 template<typename VarRef1, typename VarRef2>
 Constraint*
-ProductCon(const vector<VarRef1>& vars, const vector<VarRef2>& var2)
+ProductCon(const light_vector<VarRef1>& vars, const light_vector<VarRef2>& var2)
 { 
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
