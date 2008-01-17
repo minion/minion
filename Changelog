@@ -1,3 +1,9 @@
+28/02/2006 - Chris
+    * Fix bug in weighted sum (couldn't use negative powers)
+
+26/02/2006 - Chris
+    * Release 0.4.0
+
 07/02/2006 - Chris
     * Lots of changes. 
     * Added different variable orders.
