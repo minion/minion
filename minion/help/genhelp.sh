@@ -34,7 +34,7 @@ echo "cout << \"   minion help variables\" << NEWLINE << NEWLINE;";
 echo "cout << \"You can find out what other entries are available, if any, by looking at the 'subentries'\" << NEWLINE;";
 echo "cout << \"section at the end of an entry.\" << NEWLINE << NEWLINE;";
 echo "} else";
-find . \( ! -regex '.*/\..*' \) -iname "*.cpp" -or -iname "*.hpp" -or -iname "*.h" -type f -exec grep -H -n "/\*\* @help" {} \; | while read entry ; do
+find . \( ! -regex '.*/\..*' \) \( -iname "*.cpp" -or -iname "*.hpp" -or -iname "*.h" \) -type f -exec grep -H -n "/\*\* @help" {} \; | while read entry ; do
     match_file=`echo $entry | cut -d: -f1`; #file comment is in
     match_line=`echo $entry | cut -d: -f2`; #line comment begins on
     match_entry=`echo $entry | cut -d' ' -f3`; #entry comment is for
