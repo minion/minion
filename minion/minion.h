@@ -143,11 +143,7 @@ namespace Controller
 
 #include "constraints/function_defs.hpp"
 
-#ifndef SLOW_QUEUE
 #include "queue/standard_queue.h"
-#else
-#include "queue/slow_queue.h"
-#endif
 
 #include "search/standard_search.h"
 #include "search/recursive_search.h"
