@@ -409,6 +409,30 @@ void MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile
   parser_info("End gadget reading");
 }
 
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// readConstraintOr
+// or(<vectorOfVars>)
+// SAT clauses represented as literals and negated literals
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* infile)
+{
+  parser_info("Reading a SAT clause");
+  vector<Var> vars;
+  while(infile->peek_char() != ')')
+    vars.push_back(infile->readIdentifier());
+  infile->get_char();
+  bool negs[vars.size()];
+  for(int i = 0; i < negs.size(); i++) {
+    if(vars[i].type == VAR_NOTBOOL) {
+      negs[i] = 0;
+      vars[i].type == VAR_BOOL;
+    } else {
+      negs[i] = 1;
+    }
+  }
+  //now do something with this data to create the new constraint
+}
 
 /// Reads an identifier which represents a single variable or constant.
 template<typename FileReader>

@@ -265,6 +265,7 @@ class MinionThreeInputReader {
   void readConstraintElement(FileReader* infile, const ConstraintDef&) ;
   void readConstraintTable(FileReader* infile, const ConstraintDef&) ;
   void readConstraintGadget(FileReader* infile);
+  void readConstraintOr(FileReader* infile);
   Var readIdentifier(FileReader* infile) ;
   vector<Var> readPossibleMatrixIdentifier(FileReader* infile, bool mustBeMatrix = false);
   vector< vector<Var> > readLiteralMatrix(FileReader* infile) ;
