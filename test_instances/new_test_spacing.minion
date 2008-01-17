@@ -1,0 +1,35 @@
+#TEST SOLCOUNT 1
+	MINION	 
+	3
+	# This file is filled with spaces, tabs and returns.. it might look funny but should parse correctly.
+
+	**VARIABLES**
+
+	# There are 4 type of variables
+
+BOOL
+b
+[
+2
+,
+2
+]
+
+	**CONSTRAINTS**
+
+sumgeq(
+b
+ ,
+  4
+	)
+
+**SEARCH** 
+
+VARORDER [ b[	_	,	_	]	]
+
+VALORDER [a, a,	a,
+a]
+
+
+
+**EOF**
