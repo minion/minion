@@ -157,7 +157,7 @@ class MemBlockCache
   // Forbid copying this type!
   MemBlockCache(const MemBlockCache&);
   void operator=(const MemBlockCache&);
-  SET_TYPE<NewMemoryBlock*> NewMemoryBlockCache;
+  vector<NewMemoryBlock*> NewMemoryBlockCache;
   
 public:    
   
@@ -166,10 +166,17 @@ public:
 
 
   void registerNewMemoryBlock(NewMemoryBlock* mb)
-  { NewMemoryBlockCache.insert(mb); }
+  { 
+    D_ASSERT(find(NewMemoryBlockCache.begin(), NewMemoryBlockCache.end(), mb) != NewMemoryBlockCache.end());
+    NewMemoryBlockCache.push_back(mb); 
+  }
 
   void unregisterNewMemoryBlock(NewMemoryBlock* mb)
-  { NewMemoryBlockCache.erase(mb); }
+  { 
+    vector<NewMemoryBlock*>::iterator it = find(NewMemoryBlockCache.begin(), NewMemoryBlockCache.end(), mb);
+    D_ASSERT(it != NewMemoryBlockCache.end());
+    NewMemoryBlockCache.erase(it); 
+  }
 
   inline void addPointerToNewMemoryBlock(MoveablePointer* vp);
 
@@ -390,7 +397,7 @@ inline void MemBlockCache::addPointerToNewMemoryBlock(MoveablePointer* vp)
     if(vp->get_ptr_noCheck() == NULL)
       return;
 
-    for(SET_TYPE<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
+    for(vector<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
         it != NewMemoryBlockCache.end();
         ++it)
     {
@@ -402,7 +409,7 @@ inline void MemBlockCache::addPointerToNewMemoryBlock(MoveablePointer* vp)
 
   inline void MemBlockCache::removePointerFromNewMemoryBlock(MoveablePointer* vp)
   {
-    for(SET_TYPE<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
+    for(vector<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
         it != NewMemoryBlockCache.end();
         ++it)
     {
@@ -416,7 +423,7 @@ inline void MemBlockCache::addPointerToNewMemoryBlock(MoveablePointer* vp)
   {
     if(vp->get_ptr_noCheck() == NULL)
       return true;
-    for(SET_TYPE<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
+    for(vector<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
         it != NewMemoryBlockCache.end();
         ++it)
     {
