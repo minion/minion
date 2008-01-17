@@ -8,6 +8,7 @@ $(OBJDIR)/build_constraints/BuildDynamicStart.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -70,6 +71,7 @@ $(OBJDIR)/build_constraints/BuildStaticStart.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -131,6 +133,7 @@ $(OBJDIR)/build_constraints/CT_ALLDIFF.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -193,6 +196,7 @@ $(OBJDIR)/build_constraints/CT_DISEQ.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -255,6 +259,7 @@ $(OBJDIR)/build_constraints/CT_DIV.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -317,6 +322,7 @@ $(OBJDIR)/build_constraints/CT_ELEMENT.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -379,6 +385,7 @@ $(OBJDIR)/build_constraints/CT_EQ.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -441,6 +448,7 @@ $(OBJDIR)/build_constraints/CT_GACELEMENT.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -503,6 +511,7 @@ $(OBJDIR)/build_constraints/CT_GEQSUM.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -567,6 +576,7 @@ $(OBJDIR)/build_constraints/CT_INEQ.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -629,6 +639,7 @@ $(OBJDIR)/build_constraints/CT_LEQSUM.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -693,6 +704,7 @@ $(OBJDIR)/build_constraints/CT_LEXLEQ.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -755,6 +767,7 @@ $(OBJDIR)/build_constraints/CT_LEXLESS.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -817,6 +830,7 @@ $(OBJDIR)/build_constraints/CT_MAX.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -879,6 +893,7 @@ $(OBJDIR)/build_constraints/CT_MIN.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -942,6 +957,7 @@ $(OBJDIR)/build_constraints/CT_MINUSEQ.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1004,6 +1020,7 @@ $(OBJDIR)/build_constraints/CT_MODULO.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1066,6 +1083,7 @@ $(OBJDIR)/build_constraints/CT_OCCURRENCE.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1128,6 +1146,7 @@ $(OBJDIR)/build_constraints/CT_POW.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1190,6 +1209,7 @@ $(OBJDIR)/build_constraints/CT_PRODUCT2.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1253,6 +1273,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_ELEMENT.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1315,6 +1336,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_GEQSUM.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1380,6 +1402,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LEQSUM.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1445,6 +1468,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_LITSUM.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1507,6 +1531,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_TABLE.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1571,6 +1596,7 @@ $(OBJDIR)/build_constraints/CT_WATCHED_VECNEQ.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1633,6 +1659,7 @@ $(OBJDIR)/build_constraints/CT_WEIGHTGEQSUM.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1698,6 +1725,7 @@ $(OBJDIR)/build_constraints/CT_WEIGHTLEQSUM.o:  \
   minion/./build_constraints/../system/wrapper.h \
   minion/./build_constraints/../system/to_string.h \
   minion/./build_constraints/../system/local_array.h \
+  minion/./build_constraints/../system/tableout.h \
   minion/./build_constraints/../system/time_keeping.h \
   minion/./build_constraints/../system/linked_ptr.h \
   minion/./build_constraints/../system/sys_constants.h \
@@ -1758,11 +1786,11 @@ $(OBJDIR)/build_constraints/CT_WEIGHTLEQSUM.o:  \
 $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
   minion/./minion.h minion/./svn_header.h minion/./system/system.h \
   minion/./system/wrapper.h minion/./system/to_string.h \
-  minion/./system/local_array.h minion/./system/time_keeping.h \
-  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
-  minion/./system/debug.h minion/./system/array_functions.h \
-  minion/./constants.h minion/./solver.h \
-  minion/./memory_management/backtrackable_memory.h \
+  minion/./system/local_array.h minion/./system/tableout.h \
+  minion/./system/time_keeping.h minion/./system/linked_ptr.h \
+  minion/./system/sys_constants.h minion/./system/debug.h \
+  minion/./system/array_functions.h minion/./constants.h \
+  minion/./solver.h minion/./memory_management/backtrackable_memory.h \
   minion/./memory_management/nonbacktrack_memory.h \
   minion/./reversible_vals.h \
   minion/./memory_management/trailed_monotonic_set.h \
@@ -1801,11 +1829,11 @@ $(OBJDIR)/BuildConstraint2.o: minion/./BuildConstraint2.cpp \
 $(OBJDIR)/constraint_setup.o: minion/./constraint_setup.cpp \
   minion/./minion.h minion/./svn_header.h minion/./system/system.h \
   minion/./system/wrapper.h minion/./system/to_string.h \
-  minion/./system/local_array.h minion/./system/time_keeping.h \
-  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
-  minion/./system/debug.h minion/./system/array_functions.h \
-  minion/./constants.h minion/./solver.h \
-  minion/./memory_management/backtrackable_memory.h \
+  minion/./system/local_array.h minion/./system/tableout.h \
+  minion/./system/time_keeping.h minion/./system/linked_ptr.h \
+  minion/./system/sys_constants.h minion/./system/debug.h \
+  minion/./system/array_functions.h minion/./constants.h \
+  minion/./solver.h minion/./memory_management/backtrackable_memory.h \
   minion/./memory_management/nonbacktrack_memory.h \
   minion/./reversible_vals.h \
   minion/./memory_management/trailed_monotonic_set.h \
@@ -1844,23 +1872,24 @@ $(OBJDIR)/constraint_setup.o: minion/./constraint_setup.cpp \
 $(OBJDIR)/debug_functions.o: minion/./debug_functions.cpp \
   minion/./system/system.h minion/./system/wrapper.h \
   minion/./system/to_string.h minion/./system/local_array.h \
-  minion/./system/time_keeping.h minion/./system/linked_ptr.h \
-  minion/./system/sys_constants.h minion/./system/debug.h \
-  minion/./system/array_functions.h
+  minion/./system/tableout.h minion/./system/time_keeping.h \
+  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
+  minion/./system/debug.h minion/./system/array_functions.h
 $(OBJDIR)/get_info.o: minion/./get_info.cpp minion/./system/system.h \
   minion/./system/wrapper.h minion/./system/to_string.h \
-  minion/./system/local_array.h minion/./system/time_keeping.h \
-  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
-  minion/./system/debug.h minion/./system/array_functions.h \
-  minion/./constants.h minion/./get_info/get_info.h
+  minion/./system/local_array.h minion/./system/tableout.h \
+  minion/./system/time_keeping.h minion/./system/linked_ptr.h \
+  minion/./system/sys_constants.h minion/./system/debug.h \
+  minion/./system/array_functions.h minion/./constants.h \
+  minion/./get_info/get_info.h
 $(OBJDIR)/minion.o: minion/./minion.cpp minion/./minion.h \
   minion/./svn_header.h minion/./system/system.h \
   minion/./system/wrapper.h minion/./system/to_string.h \
-  minion/./system/local_array.h minion/./system/time_keeping.h \
-  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
-  minion/./system/debug.h minion/./system/array_functions.h \
-  minion/./constants.h minion/./solver.h \
-  minion/./memory_management/backtrackable_memory.h \
+  minion/./system/local_array.h minion/./system/tableout.h \
+  minion/./system/time_keeping.h minion/./system/linked_ptr.h \
+  minion/./system/sys_constants.h minion/./system/debug.h \
+  minion/./system/array_functions.h minion/./constants.h \
+  minion/./solver.h minion/./memory_management/backtrackable_memory.h \
   minion/./memory_management/nonbacktrack_memory.h \
   minion/./reversible_vals.h \
   minion/./memory_management/trailed_monotonic_set.h \
@@ -1900,16 +1929,17 @@ $(OBJDIR)/minion.o: minion/./minion.cpp minion/./minion.h \
 $(OBJDIR)/MinionInputReader.o: minion/./MinionInputReader.cpp \
   minion/./system/system.h minion/./system/wrapper.h \
   minion/./system/to_string.h minion/./system/local_array.h \
-  minion/./system/time_keeping.h minion/./system/linked_ptr.h \
-  minion/./system/sys_constants.h minion/./system/debug.h \
-  minion/./system/array_functions.h minion/./CSPSpec.h \
-  minion/./tuple_container.h minion/./MinionInputReader.h \
-  minion/./build_constraints/constraint_defs.h
+  minion/./system/tableout.h minion/./system/time_keeping.h \
+  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
+  minion/./system/debug.h minion/./system/array_functions.h \
+  minion/./CSPSpec.h minion/./tuple_container.h \
+  minion/./MinionInputReader.h
 $(OBJDIR)/MinionThreeInputReader.o: minion/./MinionThreeInputReader.cpp \
   minion/./system/system.h minion/./system/wrapper.h \
   minion/./system/to_string.h minion/./system/local_array.h \
-  minion/./system/time_keeping.h minion/./system/linked_ptr.h \
-  minion/./system/sys_constants.h minion/./system/debug.h \
-  minion/./system/array_functions.h minion/./CSPSpec.h \
-  minion/./tuple_container.h minion/./MinionInputReader.h \
+  minion/./system/tableout.h minion/./system/time_keeping.h \
+  minion/./system/linked_ptr.h minion/./system/sys_constants.h \
+  minion/./system/debug.h minion/./system/array_functions.h \
+  minion/./CSPSpec.h minion/./tuple_container.h \
+  minion/./MinionInputReader.h \
   minion/./build_constraints/constraint_defs.h
