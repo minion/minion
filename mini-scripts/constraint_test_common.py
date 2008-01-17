@@ -516,9 +516,9 @@ class testoccurrence:
         for l in cross:
             if l[:-1].count(self.const1)==l[-1]:
                 out.append(l)
-            elif leq and l[:-1].count(self.const1)<l[-1]:
+            elif leq and l[:-1].count(self.const1)<=l[-1]:
                 out.append(l)
-            elif geq and l[:-1].count(self.const1)>l[-1]:
+            elif geq and l[:-1].count(self.const1)>=l[-1]:
                 out.append(l)
         return out
     
@@ -526,21 +526,29 @@ class testoccurrence:
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
         return runtestgeneral("occurrence", False, reify, reifyimply, [6, 1], ["smallnum", "num"], [6, "smallconst", 1], self, False)
 
-class testoccurrenceleq(testoccurrence):
-    def printtable(self, domains):
-        return testoccurrence.printtable(self, domains, leq=True)
+class testoccurrenceleq:
+    def printtable(self, domains, leq=True, geq=False):
+        cross=[]
+        out=[]
+        crossprod(domains, [], cross)
+        for l in cross:
+            if leq and l.count(self.const1)<=self.const2:
+                out.append(l)
+            elif geq and l.count(self.const1)>=self.const2:
+                out.append(l)
+        return out
     
     def runtest(self, reify=False, reifyimply=False):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrenceleq", False, reify, reifyimply, [6, 1], ["smallnum", "num"], [6, "smallconst", 1], self, False)
+        return runtestgeneral("occurrenceleq", False, reify, reifyimply, [6], ["smallnum"], [6, "smallconst", "const"], self, False)
 
-class testoccurrencegeq(testoccurrence):
+class testoccurrencegeq(testoccurrenceleq):
     def printtable(self, domains):
-        return testoccurrence.printtable(self, domains, geq=True)
+        return testoccurrenceleq.printtable(self, domains, leq=False, geq=True)
     
     def runtest(self, reify=False, reifyimply=False):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrencegeq", False, reify, reifyimply, [6, 1], ["smallnum", "num"], [6, "smallconst", 1], self, False)
+        return runtestgeneral("occurrencegeq", False, reify, reifyimply, [6], ["smallnum"], [6, "smallconst", "const"], self, False)
 
 class testproduct:
     def printtable(self, domains): 
