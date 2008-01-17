@@ -7,11 +7,10 @@ void help(string request)
 if("variables 01" == request) {
 cout << "Help entry: " << "variables 01" << NEWLINE << NEWLINE;
 cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
-cout << "01 variables, which are used very commonly for logical" << NEWLINE
-<< "expressions, and for encoding the characteristic functions of sets and" << NEWLINE
-<< "relations. Note that wherever a 01 variable can appear, the negation" << NEWLINE
-<< "of that variable can also appear. For instance, the first Boolean" << NEWLINE
-<< "variable (if any) is always x0. Its negation is identified by nx0." << NEWLINE << NEWLINE << NEWLINE;
+cout << "01 variables are used very commonly for logical expressions, and for" << NEWLINE
+<< "encoding the characteristic functions of sets and relations. Note that" << NEWLINE
+<< "wherever a 01 variable can appear, the negation of that variable can" << NEWLINE
+<< "also appear. A boolean variable x's negation is identified by !x." << NEWLINE << NEWLINE << NEWLINE;
 cout << "Example" << "-------------------------------------------------------------------------" << NEWLINE;
 cout << "Declaration of a 01 variable called bool in input file:" << NEWLINE
 << "" << NEWLINE
@@ -126,11 +125,10 @@ cout << "Declaration of a discrete variable called myvar containing values" << N
 if("variables 01" == request) {
 cout << "Help entry: " << "variables 01" << NEWLINE << NEWLINE;
 cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
-cout << "01 variables, which are used very commonly for logical" << NEWLINE
-<< "expressions, and for encoding the characteristic functions of sets and" << NEWLINE
-<< "relations. Note that wherever a 01 variable can appear, the negation" << NEWLINE
-<< "of that variable can also appear. For instance, the first Boolean" << NEWLINE
-<< "variable (if any) is always x0. Its negation is identified by nx0." << NEWLINE << NEWLINE << NEWLINE;
+cout << "01 variables are used very commonly for logical expressions, and for" << NEWLINE
+<< "encoding the characteristic functions of sets and relations. Note that" << NEWLINE
+<< "wherever a 01 variable can appear, the negation of that variable can" << NEWLINE
+<< "also appear. A boolean variable x's negation is identified by !x." << NEWLINE << NEWLINE << NEWLINE;
 cout << "Example" << "-------------------------------------------------------------------------" << NEWLINE;
 cout << "Declaration of a 01 variable called bool in input file:" << NEWLINE
 << "" << NEWLINE

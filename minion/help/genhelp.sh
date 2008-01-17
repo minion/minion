@@ -38,7 +38,7 @@ grep -n -R "/\*\* @help" $CODE_ROOT | while read entry ; do
     fi
     firsttime=false;
     match_heading=`echo $entry | cut -d' ' -f 4`; #heading comment is for
-    lines_in_file=`wc -l $match_file | cut -d' ' -f1`; #lines in match file
+    lines_in_file=`wc -l $match_file | awk '{print $1}' | cut -d' ' -f1`; #lines in match file
     reqd_lines=$(($lines_in_file-$match_line))
     end_of_comment_in_tail=`tail -n$reqd_lines $match_file | grep -m1 -n "\*/" | cut -d':' -f1`;
     end_of_comment=$(($match_line+$end_of_comment_in_tail)); #line comment ends on
@@ -64,7 +64,7 @@ echo "} else";
 echo 'cout << "Unknown entry, please try again." << NEWLINE;'; #final else body
 
 cat $TMP_FILE | while read entry; do
-    words=`echo $entry | wc -w`; #number of words in entry
+    words=`echo $entry | wc -w | awk '{print $1}'`; #number of words in entry
     if [ $words = 1 ]; then
 	echo >> $PREFIX_TMP;
     else
@@ -78,7 +78,7 @@ sort $PREFIX_TMP | uniq > $SORTED_PREF; #obtain sorted list of unique prefixes
 cat $SORTED_PREF | while read outerentry; do #loop over prefixes
     none_printed=true;
     cat $SORTED_TMP | while read innerentry; do #hunting for things it's a prefix of
-	words=`echo $innerentry | wc -w`;
+	words=`echo $innerentry | wc -w | awk '{print $1}'`;
 	pref_len=$(($words-1));
 	if [ $words = 1 ]; then
 	    prefix="";
