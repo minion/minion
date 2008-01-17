@@ -68,7 +68,12 @@ struct OccurrenceEqualConstraint : public Constraint
 	  ++occs; 
       }
       else
-      { it->removeFromDomain(value); }
+      { 
+        if(it->inDomain(value))
+        {
+          it->removeFromDomain(value);
+        }
+      }
     }
     //D_ASSERT(occs >= oalc_count());
     if(occs > val_count)
@@ -110,7 +115,7 @@ struct OccurrenceEqualConstraint : public Constraint
       int c = not_occurrences_count + 1;
       not_occurrences_count = c;
       if(c == (static_cast<int>(var_array.size()) - val_count))
-	not_occurrence_limit_reached();
+      not_occurrence_limit_reached();
     }
   }
   
@@ -162,9 +167,11 @@ struct OccurrenceEqualConstraint : public Constraint
     if(i > val_count)
       Controller::fail();
     if(i == val_count)
-      occurrence_limit_reached(); 
+      occurrence_limit_reached();
     if(j > (static_cast<int>(var_array.size() - val_count)))
-       Controller::fail();
+    {
+      Controller::fail();
+    }
     if(j == (static_cast<int>(var_array.size() - val_count)))
       not_occurrence_limit_reached();
   }
