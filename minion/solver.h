@@ -50,6 +50,8 @@ class SearchState
   bool finished;
   bool failed;
   jmp_buf g_env;
+  
+  TimerClass timer;
 public:
 	
 	unsigned long long getNodeCount() { return nodes; }
@@ -89,6 +91,8 @@ public:
   // variables.
   bool* getFailedPtr() { return &failed; }
   
+  TimerClass& getTimer() { return timer; }
+  
   jmp_buf* getJmpBufPtr() { return &g_env; }
   SearchState() : nodes(0), optimise_var(NULL), current_optimise_position(0), optimise(false), solutions(0),
 	dynamic_triggers_used(false)
@@ -110,9 +114,33 @@ public:
   unsigned long long nodelimit;
   bool tableout;
   
+  /// This variable contains the name of a function which should be called
+  /// Wherever a solution is found.
+  //void (*solution_check)(void);
+  
+  /// Denotes if only one solution should be found.
+  bool find_one_sol;
+  
+  /// Denotes if solutions should be printed.
+  bool print_solution;
+  
   SearchOptions() : print_only_solution(false), dumptree(false), sollimit(-1), fullpropagate(false), 
-	nocheck(false), nodelimit(0), tableout(false)
+	nocheck(false), nodelimit(0), tableout(false),  find_one_sol(true), 
+    print_solution(true)
+    //,solution_check(NULL)
   {}
+  
+//  void setSolutionCheckFunction(void(*fun_ptr)(void))
+//  { solution_check = fun_ptr; }
+  
+  void setFindAllSolutions()
+  { find_one_sol = false; }
+  
+  void setFindOneSolution()
+  { find_one_sol = true; }
+
+  bool lookingForOneSolution()
+  { return find_one_sol; }
 };
 
 VARDEF(SearchOptions* options);

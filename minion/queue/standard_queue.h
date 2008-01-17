@@ -25,27 +25,38 @@
 */
 
 
-namespace Controller
-{
+
   
-  VARDEF(vector<TriggerRange> propagate_trigger_list);
-#ifdef DYNAMICTRIGGERS
-  VARDEF(vector<DynamicTrigger*> dynamic_trigger_list);
-#endif  
+class Queues
+{
+  vector<TriggerRange> propagate_trigger_list;
+  vector<DynamicTrigger*> dynamic_trigger_list;
   
   // Special triggers are those which can only be run while the
   // normal queue is empty. This list is at the moment only used
   // by reified constraints when they want to start propagation.
   // I don't like it, but it is necesasary.
-  VARDEF(vector<Constraint*> special_triggers);
+  vector<Constraint*> special_triggers;
   
-  inline void push_special_trigger(Constraint* trigger)
+#ifndef NO_DYN_CHECK
+  DynamicTrigger* next_queue_ptr;
+#endif
+  
+public:
+    
+  DynamicTrigger*& getNextQueuePtrRef() { return next_queue_ptr; }
+  
+  Queues() : next_queue_ptr(NULL)
+  {}
+  
+  void pushSpecialTrigger(Constraint* trigger)
   {
-	CON_INFO_ADDONE(AddSpecialToQueue);
-    special_triggers.push_back(trigger);
+      CON_INFO_ADDONE(AddSpecialToQueue);
+      special_triggers.push_back(trigger);
   }
   
-  inline void push_triggers(TriggerRange new_triggers)
+  
+  inline void pushTriggers(TriggerRange new_triggers)
   { 
 	CON_INFO_ADDONE(AddConToQueue);
     D_INFO(1, DI_QUEUE, string("Adding new triggers. Trigger list size is ") + 
@@ -54,7 +65,7 @@ namespace Controller
   }
   
 #ifdef DYNAMICTRIGGERS
-  inline void push_dynamic_triggers(DynamicTrigger* new_dynamic_trig_range)
+  void pushDynamicTriggers(DynamicTrigger* new_dynamic_trig_range)
   { 
 	CON_INFO_ADDONE(AddDynToQueue);
     D_ASSERT(new_dynamic_trig_range->sanity_check_list());
@@ -63,7 +74,7 @@ namespace Controller
 #endif
   
   
-  inline void clear_queues()
+  void clearQueues()
   {
 	propagate_trigger_list.clear();
 	dynamic_trigger_list.clear();
@@ -77,16 +88,18 @@ namespace Controller
 	}
   }
   
-  inline BOOL are_queues_empty()
+  bool isQueuesEmpty()
   { 
 	return propagate_trigger_list.empty() && dynamic_trigger_list.empty() &&
-	       special_triggers.empty();
+    special_triggers.empty();
   }
+  
+ 
   // next_queue_ptr is defined in constraint_dynamic.
   // It is used if pointers are moved around.
   
   
-  inline BOOL propagate_dynamic_trigger_lists()
+  bool propagateDynamicTriggerLists()
   {
 	bool* fail_ptr = state->getFailedPtr();
 	while(!dynamic_trigger_list.empty())
@@ -101,11 +114,12 @@ namespace Controller
 #ifndef USE_SETJMP
 		if(*fail_ptr) 
 		{
-		  clear_queues();
+		  clearQueues();
 		  return true; 
 		}
 #endif
 		D_INFO(1, DI_QUEUE, string("Checking ") + to_string(it));
+        
 #ifdef NO_DYN_CHECK
 		DynamicTrigger* next_queue_ptr;
 #endif
@@ -120,7 +134,7 @@ namespace Controller
 	return false;
   }
   
-  inline BOOL propagate_static_trigger_lists()
+  bool propagateStaticTriggerLists()
   {
 	bool* fail_ptr = state->getFailedPtr();
 	while(!propagate_trigger_list.empty())
@@ -134,7 +148,7 @@ namespace Controller
 #ifndef USE_SETJMP
 		if(*fail_ptr) 
 		{
-		  clear_queues();
+		  clearQueues();
 		  return true; 
 		}
 #endif
@@ -159,7 +173,7 @@ namespace Controller
 	return false;
   }
   
-  inline void propagate_queue()
+  inline void propagateQueue()
   {
     D_INFO(2, DI_QUEUE, "Starting Propagation");
 #ifdef USE_SETJMP
@@ -168,7 +182,7 @@ namespace Controller
 	{ // Failure has occured
 	  D_ASSERT(!state->isFailed());
 	  state->setFailed(true);
-	  clear_queues();
+	  queues->clearQueues();
 	  printf("!\n");
 	  return;
 	}
@@ -181,21 +195,21 @@ namespace Controller
 	  {
 		while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
 		{
-		  if(propagate_dynamic_trigger_lists())
+		  if(propagateDynamicTriggerLists())
 			return;
 		  
 		  /* Don't like code duplication here but a slight efficiency gain */
-		  if(propagate_static_trigger_lists())
+		  if(propagateStaticTriggerLists())
 			return;
 		}
 	  }
 	  else
 	  {
-		if(propagate_static_trigger_lists())
+		if(propagateStaticTriggerLists())
 		  return;
 	  }
 #else
-	  if(propagate_static_trigger_lists())
+	  if(propagateStaticTriggerLists())
 		return;
 #endif
 	  
@@ -212,11 +226,14 @@ namespace Controller
 	
   } // end Function
 
-  // This just allows SAC (which wants a list of vars)
-  // and normal propagate to have the same input method.
-  // Just checking the bounds doesn't make sense here, so we ignore it.
-  template<typename Vars>
-  inline void propagate_queue_vars(Vars& vars, bool /*CheckBounds*/)
-  {	propagate_queue(); }
-} // namespace Controller
+  
+};  
 
+VARDEF(Queues* queues);
+
+// This just allows SAC (which wants a list of vars)
+// and normal propagate to have the same input method.
+// Just checking the bounds doesn't make sense here, so we ignore it.
+template<typename Vars>
+inline void propagate_queue_vars(Vars& vars, bool /*CheckBounds*/)
+{	queues->propagateQueue(); }

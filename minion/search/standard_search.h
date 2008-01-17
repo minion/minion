@@ -51,7 +51,7 @@ namespace Controller
 		  maybe_print_search_state("Node: ", v);
 		  world_push();
 		  order.branch_left();
-		  propagate_queue();
+		  queues->propagateQueue();
 		}
 		
 		// Either search failed, or a solution was found.

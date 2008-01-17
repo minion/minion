@@ -15,11 +15,11 @@ namespace Controller
 void lock()
 {
   D_INFO(2, DI_SOLVER, "Starting Locking process");
-  rangevar_container.lock();
-  big_rangevar_container.lock();
-  sparse_boundvar_container.lock();
-  boolean_container.lock(); 
-  boundvar_container.lock();
+  varContainer->getRangevarContainer().lock();
+  varContainer->getBigRangevarContainer().lock();
+  varContainer->getSparseBoundvarContainer().lock();
+  varContainer->getBooleanContainer().lock(); 
+  varContainer->getBoundvarContainer().lock();
 #ifdef DYNAMICTRIGGERS
   int dynamic_size = state->getDynamicConstraintList().size();
   for(int i = 0; i < dynamic_size; ++i)
@@ -33,7 +33,7 @@ void lock()
   for(int i = 0 ; i < size;i++)
 	state->getConstraintList()[i]->setup();
   
-  TriggerSpace::finaliseTriggerLists();
+  triggerMem->finaliseTriggerLists();
   
   backtrackable_memory.final_lock();
   memory_block.final_lock();  
@@ -44,7 +44,7 @@ void lock()
   if(setjmp_return != 0)
   {
 	state->setFailed(true);
-	clear_queues();
+	queues->clearQueues();
 	return;
   }
 #endif
@@ -60,9 +60,9 @@ void lock()
 	  if(state->isFailed()) 
 		return;
 	  // If queues not empty, more work to do.
-	  if(!are_queues_empty())
+	  if(!queues->isQueuesEmpty())
 	  {
-		clear_queues();
+		queues->clearQueues();
 		prop_to_do = true;
 	  }
 	}
@@ -72,7 +72,7 @@ void lock()
   for(int i = 0; i < dynamic_size; ++i)
   {
 	state->getDynamicConstraintList()[i]->full_propagate();
-	propagate_queue();
+	queues->propagateQueue();
 	if(state->isFailed()) 
 	  return;
   }

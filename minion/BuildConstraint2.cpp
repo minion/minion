@@ -32,17 +32,17 @@ get_AnyVarRef_from_Var(Var v)
   switch(v.type)
 		{
 		  case VAR_BOOL:
-			return AnyVarRef(boolean_container.get_var_num(v.pos));
+			return AnyVarRef(varContainer->getBooleanContainer().get_var_num(v.pos));
 		  case VAR_NOTBOOL:
-		    return AnyVarRef(VarNotRef(boolean_container.get_var_num(v.pos)));
+		    return AnyVarRef(VarNotRef(varContainer->getBooleanContainer().get_var_num(v.pos)));
 		  case VAR_BOUND:
-			return AnyVarRef(boundvar_container.get_var_num(v.pos));
+			return AnyVarRef(varContainer->getBoundvarContainer().get_var_num(v.pos));
 		  case VAR_SPARSEBOUND:
-			return AnyVarRef(sparse_boundvar_container.get_var_num(v.pos));
+			return AnyVarRef(varContainer->getSparseBoundvarContainer().get_var_num(v.pos));
 		  case VAR_DISCRETE_SHORT:
-			return AnyVarRef(rangevar_container.get_var_num(v.pos));
+			return AnyVarRef(varContainer->getRangevarContainer().get_var_num(v.pos));
 		  case VAR_DISCRETE_LONG:
-			return AnyVarRef(big_rangevar_container.get_var_num(v.pos));
+			return AnyVarRef(varContainer->getBigRangevarContainer().get_var_num(v.pos));
 		  case VAR_SPARSEDISCRETE:	
 			D_FATAL_ERROR("Sparse Discrete not supported at present");
 		  case VAR_CONSTANT:
@@ -74,13 +74,13 @@ get_AnyVarRef_from_Var(Var v)
   {
 	for(int i = 0; i < vars.BOOLs; ++i)
 	{
-	  BoolVarRef b = boolean_container.get_new_var();
+	  BoolVarRef b = varContainer->getBooleanContainer().get_new_var();
 	}
 	for(unsigned int i = 0; i < vars.bound.size(); ++i)
 	{
 	  for(int j = 0; j < vars.bound[i].first; ++j)
 	  {
-		BoundVarRef b = boundvar_container.get_new_var(vars.bound[i].second.lower_bound,
+		BoundVarRef b = varContainer->getBoundvarContainer().get_new_var(vars.bound[i].second.lower_bound,
 													   vars.bound[i].second.upper_bound);
 	  }
 	}
@@ -89,7 +89,7 @@ get_AnyVarRef_from_Var(Var v)
 	  for(int j = 0; j < vars.sparse_bound[i].first; ++j)
 	  {
 		SparseBoundVarRef b = 
-		sparse_boundvar_container.get_new_var(vars.sparse_bound[i].second);
+		varContainer->getSparseBoundvarContainer().get_new_var(vars.sparse_bound[i].second);
 	  }
 	}
 	
@@ -97,11 +97,11 @@ get_AnyVarRef_from_Var(Var v)
 	{
 	  for(int j = 0; j < vars.discrete[i].first; ++j)
 	  {
-	    if(rangevar_container.valid_range(vars.discrete[i].second.lower_bound, vars.discrete[i].second.upper_bound))
-	    LRangeVarRef r = rangevar_container.get_new_var(vars.discrete[i].second.lower_bound,
+	    if(varContainer->getRangevarContainer().valid_range(vars.discrete[i].second.lower_bound, vars.discrete[i].second.upper_bound))
+	    LRangeVarRef r = varContainer->getRangevarContainer().get_new_var(vars.discrete[i].second.lower_bound,
 														vars.discrete[i].second.upper_bound);
 		else
-		BigRangeVarRef r = big_rangevar_container.get_new_var(vars.discrete[i].second.lower_bound,
+		BigRangeVarRef r = varContainer->getBigRangevarContainer().get_new_var(vars.discrete[i].second.lower_bound,
 															  vars.discrete[i].second.upper_bound);
 	  }
     }

@@ -26,30 +26,28 @@
 
 // This file is designed to encapsulate all time keeping done by Minion.
 
-VARDEF(clock_t _internal_start_time);
-VARDEF(clock_t _last_check_time);
+class TimerClass
+{
+  clock_t _internal_start_time;
+  clock_t _last_check_time;
 
-inline void start_clock()
+public:
+  
+void startClock()
 {
   _internal_start_time = clock();
   _last_check_time = _internal_start_time;
 }
 
-inline bool check_timeout(unsigned seconds)
+bool checkTimeout(unsigned seconds)
 { return (clock() - _internal_start_time) >= (seconds * CLOCKS_PER_SEC); }
 
-inline void print_timestep_without_reset(const char* time_name)
+void printTimestepWithoutReset(const char* time_name)
 {
   cout << time_name << (clock() - _last_check_time) / (1.0 * CLOCKS_PER_SEC) << endl;
 } 
-inline void print_timestep(const char* time_name)
-{
-  clock_t current_time = clock();
-  double diff=(current_time - _last_check_time) / (1.0 * CLOCKS_PER_SEC);
-  cout << time_name << diff << endl;
-  _last_check_time = current_time;
-}
-inline void maybe_print_timestep_store(const char* time_name, const char* store_name, TableOut & tableout, BOOL toprint)
+
+void maybePrintTimestepStore(const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
 {
     clock_t current_time = clock();
     double diff=(current_time - _last_check_time) / (1.0 * CLOCKS_PER_SEC);
@@ -58,17 +56,14 @@ inline void maybe_print_timestep_store(const char* time_name, const char* store_
     tableout.set(string(store_name), to_string(diff));
 }
 
-inline void print_finaltimestep(const char* time_name)
-{
-  print_timestep(time_name);
-  cout << "Total Time: " << (_last_check_time - _internal_start_time) / (1.0 * CLOCKS_PER_SEC) << endl;
-  
-}
 
-inline void maybe_print_finaltimestep_store(const char* time_name, const char* store_name, TableOut & tableout, BOOL toprint)
+void maybePrintFinaltimestepStore(const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
 {
-  maybe_print_timestep_store(time_name, store_name, tableout, toprint);
-  if(toprint) cout << "Total Time: " << (_last_check_time - _internal_start_time) / (1.0 * CLOCKS_PER_SEC) << endl;
+  maybePrintTimestepStore(time_name, store_name, tableout, toprint);
+  if(toprint) 
+    cout << "Total Time: " << (_last_check_time - _internal_start_time) / (1.0 * CLOCKS_PER_SEC) << endl;
   tableout.set(string("TotalTime"), to_string((_last_check_time - _internal_start_time) / (1.0 * CLOCKS_PER_SEC)));
 }
+};
+
 

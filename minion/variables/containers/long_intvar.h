@@ -469,13 +469,7 @@ public:
 
 typedef BigRangeVarContainer<BitContainerType> BigRangeCon;
 
-VARDEF(BigRangeCon big_rangevar_container);
 
-struct GetBigRangeVarContainer
-{
-  static BigRangeCon& con() { return big_rangevar_container; }
-  static string name() { return "BigRangeVar"; }
-};
 
 template<typename T>
 inline BigRangeVarRef

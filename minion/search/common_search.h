@@ -10,31 +10,13 @@
 
 namespace Controller
 {
-   /// This variable contains the name of a function which should be called
-  /// Wherever a solution is found.
-  VARDEF_ASSIGN(void (*_solution_check)(void), NULL);
-  
-  /// Sets the function to be called when a solution is found.
-  inline void set_solution_check_function(void(*fun_ptr)(void))
-  { _solution_check = fun_ptr; }
-
-  /// Global variable to denote if only one solution should be found.
-  VARDEF_ASSIGN(BOOL _find_one_sol,true);
-  
-  /// Global variable to denote if solutions should be printed.
-  VARDEF_ASSIGN(BOOL print_solution, true);
-  
-
-  
-  /// Makes solver find all solutions.
-  inline void find_all_solutions()
-  { _find_one_sol = false; }
+    
   
   /// Sets optimisation variable.
   template<typename VarRef>
 	void optimise_maximise_var(VarRef var)
   {
-	  _find_one_sol = false;
+	  options->setFindAllSolutions();
 	  state->setOptimiseVar(new AnyVarRef(var));
 	  state->setOptimisationProblem(true);
   }
@@ -43,7 +25,7 @@ namespace Controller
   template<typename VarRef>
 	void optimise_minimise_var(VarRef var)
   {
-	  _find_one_sol = false;
+	  options->setFindAllSolutions();
 	  state->setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
 	  state->setOptimisationProblem(true);
   }
@@ -88,10 +70,10 @@ namespace Controller
   /// This function checks the solution is correct, and prints it if required.
   inline void check_sol_is_correct()
   {
-    if(_solution_check != NULL)
-	  _solution_check();
+    //if(solution_check != NULL)
+	//  solution_check();
 	state->incrementSolutionCount();
-	if(print_solution)
+	if(options->print_solution)
 	{
 	  if(!print_matrix.empty())
 	  {
@@ -115,7 +97,7 @@ namespace Controller
           if (!options->print_only_solution) 
           {
 	    cout << "Solution Number: " << state->getSolutionCount() << endl;
-	    print_timestep_without_reset("Time:");
+	    state->getTimer().printTimestepWithoutReset("Time:");
 	    cout << "Nodes: " << state->getNodeCount() << endl << endl;
           }
     }
@@ -139,7 +121,7 @@ namespace Controller
 	{
 	  if(time_limit != 0)
 	  {
-	    if(check_timeout(time_limit))
+	    if(state->getTimer().checkTimeout(time_limit))
 	    {
 		  cout << "Time out." << endl;
           tableout.set("TimeOut", 1);
@@ -181,7 +163,7 @@ void inline maybe_print_search_action(char* action)
 	  
 	  state->setOptimiseValue(state->getOptimiseVar()->getAssignedValue() + 1);			
 	}
-	if(_find_one_sol || state->getSolutionCount() == options->sollimit)
+	if(options->lookingForOneSolution() || state->getSolutionCount() == options->sollimit)
 	  throw 0;
   }
 
@@ -196,17 +178,17 @@ void inline maybe_print_search_action(char* action)
 	  if(state->getOptimiseVar()->getMax() >= state->getOptimiseVar())
 	  { 
 		state->getOptimiseVar()->setMin(state->getOptimiseVar());
-		propagate_queue();
+		queues->propagateQueue();
 	  }
 	  else
 	  {failed = true; }
 	}
 	else
-	{ propagate_queue();}
+	{ queues->propagateQueue();}
   #else
 	if(state->isOptimisationProblem())
 	  state->getOptimiseVar()->setMin(state->getOptimiseValue());
-	propagate_queue();
+	queues->propagateQueue();
   #endif	
   }
 
@@ -215,7 +197,7 @@ void inline maybe_print_search_action(char* action)
 	state->setSolutionCount(0);  
 	state->setNodeCount(0);
 	lock();
-	print_timestep_without_reset("First Node Time: ");
+	state->getTimer().printTimestepWithoutReset("First Node Time: ");
 	/// Failed initially propagating constraints!
 	if(state->isFailed())
 	  return;

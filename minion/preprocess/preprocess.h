@@ -22,7 +22,7 @@ bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop, bool chec
 template <typename Var, typename Prop>
 void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool checkBounds)
 {
-  Controller::propagate_queue();
+  queues->propagateQueue();
   if(state->isFailed())
 	return;
   
@@ -76,7 +76,7 @@ struct PropagateSAC
 {
   template<typename Vars>
   void operator()(Vars& vars, bool checkBounds)
-  {propagateSAC_internal(vars, Controller::propagate_queue_vars<Vars>, checkBounds);}
+  {propagateSAC_internal(vars, propagate_queue_vars<Vars>, checkBounds);}
 };
 
 

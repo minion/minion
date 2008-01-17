@@ -112,15 +112,19 @@ struct DynamicTrigger;
 #include "constraints/constraint_dynamic.h"
 #endif 
 
+/*
 namespace Controller
 {
   /// Add a new list of triggers to the queue.
-  inline void push_triggers(TriggerRange new_triggers);
+  inline void queues->pushTriggers(TriggerRange new_triggers);
   inline void push_special_trigger(Constraint* trigger);
 #ifdef DYNAMICTRIGGERS
   inline void push_dynamic_triggers(DynamicTrigger* trigs);
 #endif
 }
+*/
+
+#include "queue/standard_queue.h"
 
 #include "trigger_list.h"
 
@@ -143,7 +147,7 @@ namespace Controller
 
 #include "constraints/function_defs.hpp"
 
-#include "queue/standard_queue.h"
+
 
 #include "search/standard_search.h"
 #include "search/recursive_search.h"

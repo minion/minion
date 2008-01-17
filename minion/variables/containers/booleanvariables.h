@@ -271,14 +271,7 @@ struct BooleanContainer
   }*/
 };
 
-VARDEF(BooleanContainer boolean_container);
 
-struct GetBooleanContainer
-{ 
-  static BooleanContainer& con() { return boolean_container; } 
-  static string name()
-  { return "Bool:"; }
-};
 
 
 

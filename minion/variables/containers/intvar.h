@@ -412,20 +412,7 @@ struct RangeVarContainer {
 
 typedef RangeVarContainer<0, BitContainerType> LRVCon;
 
-VARDEF(LRVCon rangevar_container);
 
-struct SmallDiscreteCheck
-{
-  template<typename T>
-  bool operator()(const T& lower, const T& upper) const
-  { return rangevar_container.valid_range(lower, upper); }
-};
-
-struct GetRangeVarContainer
-{
-  static LRVCon& con() { return rangevar_container; }
-  static string name() { return "RangeVar:"; }
-};
 
 template<int var_min, typename T>
 inline LRangeVarRef

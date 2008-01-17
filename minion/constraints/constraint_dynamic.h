@@ -31,9 +31,7 @@ struct DynamicTrigger;
 
 #define DYNAMIC_PROPAGATE_FUNCTION virtual void propagate
 
-#ifndef NO_DYN_CHECK
-VARDEF_ASSIGN(DynamicTrigger* next_queue_ptr, NULL);
-#endif
+
 
 /// This is a trigger to a constraint, which can be dynamically moved around.
 struct DynamicTrigger
@@ -91,7 +89,8 @@ public:
   
   /// Add this trigger after another one in a list.
   /// This function will remove this trigger from any list it currently lives in.
-  void add_after(DynamicTrigger* new_prev)
+  // next_queue_ptr is a '*&' as it is a pointer which we want a reference to, so we can change it!
+  void add_after(DynamicTrigger* new_prev, DynamicTrigger*& next_queue_ptr)
   {
     D_INFO(1, DI_DYNAMICTRIG, string("Trigger ") + to_string(this) + " added to list " + to_string(new_prev));
     D_ASSERT(constraint != NULL);
@@ -106,6 +105,7 @@ public:
 		CON_INFO_ADDONE(DynamicMovePtr);
 	    next_queue_ptr = next;
 	  }
+      
 #endif
 	  remove();
 	}

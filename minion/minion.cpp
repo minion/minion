@@ -110,13 +110,13 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
   {
     const string command(argv[i]);
 	if(command == string("-findallsols"))
-	{ Controller::find_all_solutions(); }
+	{ options->setFindAllSolutions(); }
 	else if(command == string("-quiet"))
 	{ reader.parser_verbose = false; }
 	else if(command == string("-printsols"))
-	{ Controller::print_solution = true; }
+	{ options->print_solution = true; }
 	else if(command == string("-noprintsols"))
-	{ Controller::print_solution = false; }
+	{ options->print_solution = false; }
 	else if(command == string("-printsolsonly"))
 	{ options->print_only_solution = true; }
 	else if(command == string("-verbose"))
@@ -170,7 +170,7 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
 	{
 	  ++i;
 	  options->sollimit = atoi(argv[i]);
-	  Controller::find_all_solutions(); 
+	  options->setFindAllSolutions(); 
 	  if(options->sollimit == 0)
 	  {
 	    cout << "Did not understand the parameter to sollimit:" << argv[i] << endl;
@@ -321,7 +321,7 @@ void SolveCSP(Reader& reader, MinionArguments args)
     // should be one for varorder as well.
     tableout.set("MinionVersion", SVN_VER);
     tableout.set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-    maybe_print_timestep_store("Parsing Time: ", "ParsingTime", tableout, !options->print_only_solution);
+    state->getTimer().maybePrintTimestepStore("Parsing Time: ", "ParsingTime", tableout, !options->print_only_solution);
     
     BuildCSP(reader);
     
@@ -352,7 +352,7 @@ void SolveCSP(Reader& reader, MinionArguments args)
         }
     }
   // Solve!
-  maybe_print_timestep_store("Setup Time: ", "SetupTime", tableout, !options->print_only_solution);
+  state->getTimer().maybePrintTimestepStore("Setup Time: ", "SetupTime", tableout, !options->print_only_solution);
   
   long long initial_lit_count = 0;
   
@@ -384,16 +384,16 @@ void SolveCSP(Reader& reader, MinionArguments args)
 		cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;
 	  }
 	}
-    maybe_print_timestep_store("First node time: ", "FirstNodeTime", tableout, !options->print_only_solution);
+    state->getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !options->print_only_solution);
 	if(!state->isFailed())
-        solve(args.order, var_val_order);   // add a maybe_print_timestep_store to search..
+        solve(args.order, var_val_order);   // add a state->getTimer().maybePrintTimestepStore to search..
   }
   else
   {
-      maybe_print_timestep_store("First node time: ", "FirstNodeTime", tableout, !options->print_only_solution);
+      state->getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !options->print_only_solution);
   }
   
-  maybe_print_finaltimestep_store("Solve Time: ", "SolveTime", tableout, !options->print_only_solution);
+  state->getTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", tableout, !options->print_only_solution);
   cout << "Total Nodes: " << state->getNodeCount() << endl;
   cout << "Problem solvable?: " 
 	<< (state->getSolutionCount() == 0 ? "no" : "yes") << endl;
@@ -482,8 +482,11 @@ int main(int argc, char** argv) {
   
   state = new SearchState();
   options = new SearchOptions();
+  queues = new Queues();
+  varContainer = new VariableContainer();
+  triggerMem = new TriggerMem();
   
-  start_clock();
+  state->getTimer().startClock();
   
   cout << "# " << VERSION << endl ;
   cout << "# Svn version: " << SVN_VER << endl; 

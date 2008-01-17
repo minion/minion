@@ -103,7 +103,7 @@ struct Build ## TYPE<CT_NAME, 0> \
   { \
 	if(b.implied_reified) \
 	{ \
-	  BoolVarRef reifyVar = boolean_container.get_var_num(b.reify_var.pos); \
+	  BoolVarRef reifyVar = varContainer->getBooleanContainer().get_var_num(b.reify_var.pos); \
 	  BoolVarRef dummyVar; \
 	  return truereifyCon(Build ## CT_NAME(*(vars.first.first.second), *(vars.first.second), *(vars.second), false, dummyVar, b), reifyVar); \
 	} \
@@ -111,7 +111,7 @@ struct Build ## TYPE<CT_NAME, 0> \
 	{ \
 	  BoolVarRef reifyVar; \
 	  if(b.reified) \
-	    reifyVar = boolean_container.get_var_num(b.reify_var.pos); \
+	    reifyVar = varContainer->getBooleanContainer().get_var_num(b.reify_var.pos); \
 	  return Build ## CT_NAME(*(vars.first.first.second), *(vars.first.second), *(vars.second),  b.reified, reifyVar, b); \
 	} \
   } \
@@ -130,7 +130,7 @@ struct Build ## TYPE<CT_NAME, 0> \
   { \
 	if(b.implied_reified) \
 	{ \
-	  BoolVarRef reifyVar = boolean_container.get_var_num(b.reify_var.pos); \
+	  BoolVarRef reifyVar = varContainer->getBooleanContainer().get_var_num(b.reify_var.pos); \
 	  BoolVarRef dummyVar; \
 	  return truereifyCon(Build ## CT_NAME(*(vars.first.second), *(vars.second), false, dummyVar, b), reifyVar); \
 	} \
@@ -138,7 +138,7 @@ struct Build ## TYPE<CT_NAME, 0> \
 	{ \
 	  BoolVarRef reifyVar; \
 	  if(b.reified) \
-	    reifyVar = boolean_container.get_var_num(b.reify_var.pos); \
+	    reifyVar = varContainer->getBooleanContainer().get_var_num(b.reify_var.pos); \
 	  return Build ## CT_NAME(*(vars.first.second), *(vars.second), b.reified, reifyVar, b); \
 	} \
   } \
@@ -157,7 +157,7 @@ struct Build ## TYPE<CT_NAME, 0> \
   { \
 	if(b.implied_reified) \
 	{ \
-	  BoolVarRef reifyVar = boolean_container.get_var_num(b.reify_var.pos); \
+	  BoolVarRef reifyVar = varContainer->getBooleanContainer().get_var_num(b.reify_var.pos); \
 	  BoolVarRef dummyVar; \
 	  return truereifyCon(Build ## CT_NAME(*(vars.second), false, dummyVar, b), reifyVar); \
 	} \
@@ -165,7 +165,7 @@ struct Build ## TYPE<CT_NAME, 0> \
 	{ \
 	  BoolVarRef reifyVar; \
 	  if(b.reified) \
-	    reifyVar = boolean_container.get_var_num(b.reify_var.pos); \
+	    reifyVar = varContainer->getBooleanContainer().get_var_num(b.reify_var.pos); \
 	  return Build ## CT_NAME(*(vars.second), b.reified, reifyVar, b); \
 	} \
   } \

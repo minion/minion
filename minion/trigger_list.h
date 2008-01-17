@@ -29,16 +29,32 @@
 
 class TriggerList;
 
-namespace TriggerSpace
+class TriggerMem
 {
-  VARDEF(vector<TriggerList*> trigger_lists);
-  
-  inline void addTriggerList(TriggerList* t) 
+  vector<TriggerList*> trigger_lists;
+  char* triggerlist_data;
+
+public:
+  void addTriggerList(TriggerList* t) 
   { trigger_lists.push_back(t); }
   
-  VARDEF(char* triggerlist_data);
   void finaliseTriggerLists();
-}
+  
+  TriggerMem() : triggerlist_data(NULL)
+  {}
+  
+  void allocateTriggerListData(unsigned mem)
+  {
+    D_ASSERT(triggerlist_data == NULL);
+    triggerlist_data = new char[mem];
+  }
+  
+  char* getTriggerListDataPtr() { return triggerlist_data; }
+  ~TriggerMem()
+  { delete[] triggerlist_data; }
+};
+
+VARDEF(TriggerMem* triggerMem);
 
 
 class TriggerList
@@ -94,7 +110,7 @@ public:
 	else
 	  dynamic_triggers.request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
 #endif
-	TriggerSpace::addTriggerList(this);
+	triggerMem->addTriggerList(this);
   }
   
   size_t memRequirement()
@@ -170,7 +186,7 @@ public:
   void slow_trigger_push(int var_num, TrigType type, int delta)
   {
     if(!triggers[type][var_num].empty())
-      Controller::push_triggers(TriggerRange(&triggers[type][var_num].front(),
+      queues->pushTriggers(TriggerRange(&triggers[type][var_num].front(),
       (&triggers[type][var_num].front()) + triggers[type][var_num].size(), delta));
   }
   
@@ -196,7 +212,7 @@ public:
     D_ASSERT(trig->next != NULL);
     // This is an optimisation, no need to push empty lists.
     if(trig->next != trig)
-	  Controller::push_dynamic_triggers(trig);
+	  queues->pushDynamicTriggers(trig);
   }
 #endif
   
@@ -213,7 +229,7 @@ public:
 #else
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
 	if (range.first != range.second)
-	  Controller::push_triggers(TriggerRange(range.first, range.second, 
+	  queues->pushTriggers(TriggerRange(range.first, range.second, 
 											 checked_cast<int>(upper_delta)));
 #endif	
   }
@@ -230,7 +246,7 @@ public:
 #else
 	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
 	if (range.first != range.second)
-	  Controller::push_triggers(TriggerRange(range.first, range.second, 
+	  queues->pushTriggers(TriggerRange(range.first, range.second, 
 											 checked_cast<int>(lower_delta)));
 #endif
   }
@@ -248,7 +264,7 @@ public:
 #else	
 	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
 	if (range.first != range.second)
-	  Controller::push_triggers(TriggerRange(range.first, range.second, -1));
+	  queues->pushTriggers(TriggerRange(range.first, range.second, -1));
 #endif
   }
   
@@ -264,7 +280,7 @@ public:
 	D_ASSERT(lock_second);
 	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
 	if (range.first != range.second)	  
-	  Controller::push_triggers(TriggerRange(range.first, range.second, -1)); 
+	  queues->pushTriggers(TriggerRange(range.first, range.second, -1)); 
 #endif
   }
   
@@ -320,32 +336,32 @@ public:
 			  + checked_cast<int>(b + (DomainRemoval + (val - vars_min_domain_val)) * var_count_m);
 	}
 	D_ASSERT(queue->sanity_check_list());
-	t->add_after(queue);
+    
+	t->add_after(queue, queues->getNextQueuePtrRef());
 	D_ASSERT(old_list == NULL || old_list->sanity_check_list(false));
   }
 #endif
   
 };
 
-namespace TriggerSpace
-{
-  inline void finaliseTriggerLists()
+void inline TriggerMem::finaliseTriggerLists()
   {
 	size_t trigger_size = 0;
-	for(unsigned int i=0;i<trigger_lists.size();i++)
+	for(unsigned int i = 0;i < trigger_lists.size(); i++)
 	  trigger_size += trigger_lists[i]->memRequirement();
-	triggerlist_data = new char[trigger_size];
+	triggerMem->allocateTriggerListData(trigger_size);
 	
-	char* triggerlist_offset = triggerlist_data;
+	char* triggerlist_offset = triggerMem->getTriggerListDataPtr();
+    
 	for(unsigned int i=0;i<trigger_lists.size();i++)
 	{
 	  size_t offset = trigger_lists[i]->memRequirement();
 	  trigger_lists[i]->allocateMem(triggerlist_offset);
 	  triggerlist_offset += offset;
 	}
-	D_ASSERT(triggerlist_offset - triggerlist_data == (int)trigger_size);
+	D_ASSERT(triggerlist_offset - triggerMem->getTriggerListDataPtr() == (int)trigger_size);
   }
-}
+
 
 #endif //TRIGGERLIST_H
 

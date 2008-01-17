@@ -345,16 +345,7 @@ struct SparseBoundVarContainer {
 };
 
 
-VARDEF(SparseBoundVarContainer<> sparse_boundvar_container);
 
-struct GetSparseBoundVarContainer
-{
-  static SparseBoundVarContainer<>& con() 
-  { return sparse_boundvar_container; }
-  
-  static string name()
-  { return "SparseBound:"; }
-};
 
 
 template<typename T>

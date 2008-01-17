@@ -143,7 +143,7 @@ struct reify : public Constraint
     if(i == -99998 || i == -99999)
     {
 	  constraint_locked = true;
-	  Controller::push_special_trigger(this);
+	  queues->pushSpecialTrigger(this);
 	  
       if(i==-99999)
       {

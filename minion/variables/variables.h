@@ -34,6 +34,68 @@
 #include "containers/intboundvar.h"
 #include "containers/sparse_intboundvar.h"
 
+class VariableContainer
+{
+  BoundVarContainer<> boundvarContainer; 
+  BooleanContainer booleanContainer;
+  LRVCon rangevarContainer;
+  BigRangeCon bigRangevarContainer;
+  SparseBoundVarContainer<> sparseBoundvarContainer;
+public:
+  
+  BoundVarContainer<>& getBoundvarContainer() { return boundvarContainer; }
+  BooleanContainer& getBooleanContainer() { return booleanContainer; }
+  LRVCon& getRangevarContainer() { return rangevarContainer; }
+  BigRangeCon& getBigRangevarContainer() { return bigRangevarContainer; }
+  SparseBoundVarContainer<>& getSparseBoundvarContainer() { return sparseBoundvarContainer; }
+};
+
+VARDEF(VariableContainer* varContainer);
+
+struct GetBoundVarContainer
+{
+  static BoundVarContainer<>& con() 
+  { return varContainer->getBoundvarContainer(); }
+  static string name()
+  { return "Bound"; }
+};
+
+struct GetBooleanContainer
+{ 
+  static BooleanContainer& con() { return varContainer->getBooleanContainer(); } 
+  static string name()
+  { return "Bool:"; }
+};
+
+struct GetRangeVarContainer
+{
+  static LRVCon& con() { return varContainer->getRangevarContainer(); }
+  static string name() { return "RangeVar:"; }
+};
+
+struct GetBigRangeVarContainer
+{
+  static BigRangeCon& con() { return varContainer->getBigRangevarContainer(); }
+  static string name() { return "BigRangeVar"; }
+};
+
+
+struct GetSparseBoundVarContainer
+{
+  static SparseBoundVarContainer<>& con() 
+  { return varContainer->getSparseBoundvarContainer(); }
+  
+  static string name()
+  { return "SparseBound:"; }
+};
+
+struct SmallDiscreteCheck
+{
+  template<typename T>
+  bool operator()(const T& lower, const T& upper) const
+  { return varContainer->getRangevarContainer().valid_range(lower, upper); }
+};
+
 #include "mappings/variable_neg.h"
 #include "mappings/variable_switch_neg.h"
 #include "mappings/variable_stretch.h"
@@ -41,4 +103,5 @@
 #include "mappings/variable_not.h"
 #include "mappings/variable_shift.h"
 #include "iterators.h"
+
 

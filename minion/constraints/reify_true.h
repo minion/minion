@@ -99,7 +99,7 @@ struct reify_true : public Constraint
     {
       D_INFO(1,DI_REIFY,"Full Pos Propagation");
 	  constraint_locked = true;
-	  Controller::push_special_trigger(this);
+	  queues->pushSpecialTrigger(this);
 	  //poscon->full_propagate();
       return;
     }

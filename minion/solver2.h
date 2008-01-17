@@ -32,14 +32,12 @@ VARDEF_ASSIGN(clock_t time_limit, 0);
 namespace Controller
 {
   VARDEF(vector<vector<AnyVarRef> > print_matrix);
-  // Forward decleration.
-  inline BOOL are_queues_empty();
   
   /// Pushes the state of the whole world.
   inline void world_push()
   {
     D_INFO(0,DI_SOLVER,"World Push");
-	D_ASSERT(are_queues_empty());
+	D_ASSERT(queues->isQueuesEmpty());
     backtrackable_memory.world_push();
   }
   
@@ -47,9 +45,9 @@ namespace Controller
   inline void world_pop()
   {
     D_INFO(0,DI_SOLVER,"World Pop");
-	D_ASSERT(are_queues_empty());
+	D_ASSERT(queues->isQueuesEmpty());
     backtrackable_memory.world_pop();
-    big_rangevar_container.bms_array.undo();
+    varContainer->getBigRangevarContainer().bms_array.undo();
   }
   
   inline void world_pop_all()

@@ -28,6 +28,8 @@
 #define DEBUG_H
 
 // If true, "-crash" was used and execution will crash on error (for debugging)
+// This is a global setting rather than an instance-specific flag, as whatever
+// happens minion will stop.
 VARDEF_ASSIGN(bool debug_crash, false);
 
 struct parse_exception : public std::exception
