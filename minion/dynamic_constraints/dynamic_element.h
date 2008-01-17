@@ -204,6 +204,12 @@ struct ElementConstraintDynamic : public DynamicConstraint
   virtual void full_propogate()
   {
 	D_INFO(2, DI_DYELEMENT, "Setup Triggers");
+    for(int i=0; i<var_array.size(); i++) 
+        if(var_array[i].isBound()) 
+            cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
+    if(indexvar.isBound() || resultvar.isBound())
+        cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
+    
 	int array_size = var_array.size(); 
 	DomainInt result_dom_size = initial_result_dom_max - initial_result_dom_min + 1;
 	

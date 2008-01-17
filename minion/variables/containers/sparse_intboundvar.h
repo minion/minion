@@ -74,7 +74,7 @@ struct SparseBoundVarContainer {
   
   BoundType& upper_bound(SparseBoundVarRef_internal i)
   { return static_cast<BoundType*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
-
+  
   /// find the small possible lower bound above @new_lower_bound.
   /// Does not actually change the lower bound.  
   DomainInt find_lower_bound(SparseBoundVarRef_internal d, DomainInt new_lower_bound)
@@ -141,7 +141,7 @@ struct SparseBoundVarContainer {
     trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
   }
   
-  SparseBoundVarContainer() : lock_m(0), trigger_list(true)
+  SparseBoundVarContainer() : lock_m(false), trigger_list(true)
   {}
   
   BOOL isAssigned(SparseBoundVarRef_internal d) const
@@ -157,13 +157,29 @@ struct SparseBoundVarContainer {
     return lower_bound(d);
   }
   
-  /// This function is provided just to make life simpler. It should never be called.
-  BOOL inDomain(SparseBoundVarRef_internal, DomainInt) const
-  { D_FATAL_ERROR( "sparse bound ints do not allow 'inDomain' checks"); }
-
-  /// This function is provided just to make life simpler. It should never be called.
-  BOOL inDomain_noBoundCheck(SparseBoundVarRef_internal, DomainInt) const
-  { D_FATAL_ERROR("sparse bound ints do not allow 'inDomain_noBoundCheck' checks"); }
+  BOOL inDomain(SparseBoundVarRef_internal d, DomainInt i) const
+  { 
+      D_ASSERT(lock_m);
+      // First check against bounds
+      if(i< lower_bound(d) || i> upper_bound(d))
+      {
+          return false;
+      }
+      else
+      {
+          return inDomain_noBoundCheck(d, i); 
+      }
+  }
+  
+  BOOL inDomain_noBoundCheck(SparseBoundVarRef_internal ref, DomainInt i) const
+  {
+      D_ASSERT(lock_m);
+      // use binary search to find if the value is in the domain vector.
+      //const vector<BoundType>& dom = get_domain(ref);  // why does this not work?
+      const vector<BoundType>& dom = domains[domain_reference[ref.var_num]];
+      
+      return std::binary_search( dom.begin(), dom.end(), i );
+  }
   
   DomainInt getMin(SparseBoundVarRef_internal d) const
   {

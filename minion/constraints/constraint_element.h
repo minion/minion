@@ -78,7 +78,7 @@ struct ElementConstraint : public Constraint
       if(prop_val>=0)
       {
 		DomainInt assigned_val = var_array[prop_val].getAssignedValue();
-		if(!result_var.inDomain(assigned_val))
+		if(index_ref.inDomain(prop_val) && !result_var.inDomain(assigned_val))  //perhaps the check if prop_val is indomain of index_ref is not necessary.
         {
             if(index_ref.isBound())
             {
@@ -99,7 +99,7 @@ struct ElementConstraint : public Constraint
 		int array_size = var_array.size();
 		for(int i = 0; i < array_size; ++i)
 		{
-		  if(!var_array[i].inDomain(assigned_val))
+		  if(index_ref.inDomain(i) && !var_array[i].inDomain(assigned_val)) // fixed here.
           {
               if(index_ref.isBound())
                 {
@@ -174,8 +174,9 @@ struct ElementConstraint : public Constraint
     else
     {// result_var is a bound variable
         // iterate up from the minimum
-        for(DomainInt i=result_var.getMin(); i<=result_var.getMax(); i++)
+        while(!Controller::failed)
         {
+            DomainInt i=result_var.getMin();
             BOOL supported=false;
             for(DomainInt j=index_ref.getMin(); j<=index_ref.getMax(); j++)
             {
@@ -193,8 +194,9 @@ struct ElementConstraint : public Constraint
                 break;
         }
         // now iterate down from the top.
-        for(DomainInt i=result_var.getMax(); i>=result_var.getMin(); i--)
+        while(!Controller::failed)
         {
+            DomainInt i=result_var.getMax();
             BOOL supported=false;
             for(DomainInt j=index_ref.getMin(); j<=index_ref.getMax(); j++)
             {
@@ -212,14 +214,15 @@ struct ElementConstraint : public Constraint
                 break;
         }
     }
+    
     if(Controller::failed) return;
     
-    for(int i = 0;i < array_size; i++)
+    for(int i = index_ref.getMin();i <= index_ref.getMax(); i++)
 	{
-	  if(var_array[i].isAssigned())
-	  {
-		DomainInt assigned_val = var_array[i].getAssignedValue();
-		if(!result_var.inDomain(assigned_val))
+      if(index_ref.inDomain(i) && var_array[i].isAssigned())
+      {
+        DomainInt assigned_val = var_array[i].getAssignedValue();
+        if(!result_var.inDomain(assigned_val))
         {
             if(index_ref.isBound())
             {
@@ -228,18 +231,19 @@ struct ElementConstraint : public Constraint
             }
             else
             {
+                
                 index_ref.removeFromDomain(i);
             }
         }
-	  }
+      }
 	}
-	
+    
     if(result_var.isAssigned())
     {
       DomainInt assigned_val = result_var.getAssignedValue();
       for(int i = 0; i < array_size; ++i)
       {
-        if(!var_array[i].inDomain(assigned_val))
+        if(index_ref.inDomain(i) && !var_array[i].inDomain(assigned_val))  // fixed here.
         {
             if(index_ref.isBound())
             {
@@ -253,6 +257,7 @@ struct ElementConstraint : public Constraint
         }
       }
     }
+    
   }
   
   virtual BOOL check_assignment(vector<DomainInt> v)

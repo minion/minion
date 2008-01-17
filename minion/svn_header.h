@@ -1,2 +1,2 @@
-#define SVN_VER "659"
-#define SVN_DATE "2007-09-19 17:17:37 +0100 (Wed, 19 Sep 2007)"
+#define SVN_VER "660"
+#define SVN_DATE "2007-09-20 21:27:06 +0100 (Thu, 20 Sep 2007)"
