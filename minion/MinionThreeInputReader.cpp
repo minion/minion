@@ -659,7 +659,7 @@ void MinionThreeInputReader::readVars(InputFileReader* infile) {
     }
     else if(var_type == "SPARSEBOUND")
     {
-      variable_type = VAR_DISCRETE_BASE;
+      variable_type = VAR_SPARSEBOUND;
       domain = readConstantVector(infile, '{', '}');
       if(domain.size() < 1)
         throw parse_exception("Don't accept empty domains!");
