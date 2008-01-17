@@ -11,7 +11,7 @@ ifdef DEBUG
    DEBUG_FLAGS = -D_GLIBCXX_DEBUG -DNO_PRINT -g -DMORE_SEARCH_INFO
  endif
 else
-  FLAGS := $(FLAGS) -O2 -DNO_DEBUG
+  FLAGS := $(FLAGS) -O3 -fdynamic-no-pic -DNO_DEBUG
 endif
 
 ifdef PROFILE
@@ -50,7 +50,11 @@ EXE=bin/$(NAME)
 #If you want to optimise for a particular CPU, enable one of these lines
 CPU=
 #CPU=-march=pentium4
-#CPU=-march=pentium-m
+#CPU=-march=pentium-m 
+#CPU=-march=pentium-m -mdynamic-no-pic 
+# above line seems good for intel macs
+
+
 
 FULLFLAGS=-Wextra -Wno-sign-compare $(DEBUG_FLAGS) $(FLAGS) $(CPU) $(MYFLAGS)
 
