@@ -286,7 +286,7 @@ struct BacktrackableMemory
     {
 #ifdef SEPERATE_PAGES
 	  int pages = backtrack_cache_size / allocated_bytes;
-	  backtrack_cache = realloc(backtrack_cache, pages * 2 * sizeof(char**));
+	  backtrack_cache = (char**)realloc(backtrack_cache, pages * 2 * sizeof(char**));
 	  for(int i = pages; i < pages * 2; ++i)
 		backtrack_cache[i] = (char*)malloc(allocated_bytes);
 #else
