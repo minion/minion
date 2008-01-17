@@ -512,13 +512,13 @@ class testoccurrence:
         # last var is the occurrence parameter.
         cross=[]
         out=[]
-        crossprod(domains[:-1], [], cross)
+        crossprod(domains, [], cross)
         for l in cross:
-            if l.count(self.const1)==domains[-1]:
+            if l[:-1].count(self.const1)==l[-1]:
                 out.append(l)
-            elif leq and l.count(self.const1)<domains[-1]:
+            elif leq and l[:-1].count(self.const1)<l[-1]:
                 out.append(l)
-            elif geq and l.count(self.const1)>domains[-1]:
+            elif geq and l[:-1].count(self.const1)>l[-1]:
                 out.append(l)
         return out
     
