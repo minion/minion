@@ -10,7 +10,7 @@ cp LICENSE.txt minion-release-$1
 cp -r test_instances minion-release-$1
 cp -r benchmarks minion-release-$1
 cp Changelog minion-release-$1
-cp translator/translator.jar minion-release-$1/tailor.jar
+cp translator/tailor.jar minion-release-$1/tailor.jar
 cp translator/README minion-release-$1/README.tailor
 cp -r translator/examples minion-release-$1/tailor-examples
 cp -r translator/doc minion-release-$1/tailor-doc
