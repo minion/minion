@@ -549,6 +549,9 @@ struct ConstraintBlob
     const ConstraintBlob& con = constraints.back();
     switch(con.constraint.type)
     {
+      case CT_REIFY:
+      case CT_REIFYIMPLY:
+        throw parse_exception("Internal Error - Invalid Constraint in bounds_check_last_constraint.");
       case CT_PRODUCT2:
         return DOMAIN_CHECK(checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound)*
                      checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound))
@@ -568,6 +571,7 @@ struct ConstraintBlob
         }
         return true;
       }
+      
         // XXX : Todo : Check these constraints!
       case CT_WEIGHTLEQSUM:
       case CT_WEIGHTGEQSUM:
@@ -575,32 +579,11 @@ struct ConstraintBlob
       case CT_GEQSUM:
       case CT_WATCHED_GEQSUM:
       case CT_WATCHED_LEQSUM:
-        
-      // The following constraints can't cause failure!
-      case CT_ELEMENT:
-      case CT_WATCHED_ELEMENT:
-      case CT_GACELEMENT:
-      case CT_ALLDIFF:
-	case CT_ALLDIFF_GACSLOW:
-      case CT_DISEQ:
-      case CT_EQ:
-      case CT_INEQ:
-      case CT_LEXLEQ:
-      case CT_LEXLESS:
-      case CT_MAX:
-      case CT_MIN:
-      case CT_OCCURRENCE:
-      case CT_WATCHED_TABLE:
-      case CT_WATCHED_VECNEQ:
-      case CT_MINUSEQ:
-      case CT_WATCHED_LITSUM:
-      case CT_MODULO:
-      case CT_DIV:
+      
+      default:
         return true;
-      case CT_REIFY:
-      case CT_REIFYIMPLY:
-        throw parse_exception("Internal Error - Invalid Constraint");
     }
+    // This should be unreachable.
     throw parse_exception("Internal Error - Constraint has not had a check implemented to ensure\n"
                           "The values given will not cause integer overflow.");
 
