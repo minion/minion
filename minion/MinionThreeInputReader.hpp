@@ -440,7 +440,9 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
     for(int i = 0; i < params.size(); ++i)
     {
       if(params[i] < 0 || params[i] >= max_index[i])
-        throw parse_exception(to_string(i) + string("th index is invalid"));
+        throw parse_exception(to_string(i) + string("th index is out of bounds,") + 
+                              to_string(params[i]) + " is not between 0 and " +
+                              to_string(max_index[i] - 1));
     }
     name += to_string(params);
     var = instance.vars.getSymbol(name);
