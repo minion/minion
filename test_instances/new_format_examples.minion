@@ -38,9 +38,9 @@ MAXIMISING bool
 # MINIMISING x3
 
 
-# Print statement takes a vector of things to print
+# Print statement takes a matrix of things to print
 
-PRINT [bool, q]
+PRINT [ [bool, q] ]
 
 # You can also give:
 # PRINT ALL (the default)
