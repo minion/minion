@@ -49,6 +49,11 @@
  * itself.
  */
 
+#ifdef VM_COPY
+#define SEPERATE_PAGES
+#include <mach/mach.h>
+#endif
+
 #ifdef NO_DOUBLE_MEMORY_COPY
 VARDEF_ASSIGN(void* memory_base_ptr, NULL);
 #endif
@@ -105,7 +110,11 @@ struct VirtualBackTrackOffset
 struct BacktrackableMemory
 {
   char* current_data;
+#ifdef SEPERATE_PAGES
+  char** backtrack_cache;
+#else
   char* backtrack_cache;
+#endif
   unsigned backtrack_cache_size;
   unsigned backtrack_cache_offset;
   unsigned allocated_bytes;
@@ -211,6 +220,9 @@ struct BacktrackableMemory
     D_ASSERT(!lock_m);
     D_ASSERT(!final_lock_m);
     lock_m = true;
+#ifdef VM_COPY
+	allocated_bytes + ((vm_page_size - (allocated_bytes % vm_page_size)) % vm_page_size);
+#endif
     current_data = new char[allocated_bytes];
 	
 	D_ASSERT( (size_t)current_data % sizeof(int) == 0);
@@ -252,8 +264,16 @@ struct BacktrackableMemory
     }
 #ifdef NO_DOUBLE_MEMORY_COPY
 	memory_base_ptr = current_data;
-#endif    
+#endif
+
+#ifdef SEPERATE_PAGES
+	backtrack_cache = (char**)malloc(100 * sizeof(char*));
+	for(int i = 0; i < 100; ++i)
+	  backtrack_cache[i] = (char*)malloc(allocated_bytes);
+#else
     backtrack_cache = new char[allocated_bytes * 100];
+#endif
+	
     backtrack_cache_size = allocated_bytes * 100;
     backtrack_cache_offset = 0;
   }
@@ -261,16 +281,36 @@ struct BacktrackableMemory
   void world_push()
   {
     D_ASSERT(lock_m);
-    if(backtrack_cache_offset == backtrack_cache_size)
+    
+	if(backtrack_cache_offset == backtrack_cache_size)
     {
+#ifdef SEPERATE_PAGES
+	  int pages = backtrack_cache_size / allocated_bytes;
+	  realloc(backtrack_cache, pages * 2 * sizeof(char**));
+	  for(int i = pages; i < pages * 2; ++i)
+		backtrack_cache[i] = (char*)malloc(allocated_bytes);
+#else
       char* new_backtrack_cache = new char[backtrack_cache_size * 2];
       memcpy(new_backtrack_cache, backtrack_cache, backtrack_cache_size);
-      backtrack_cache_size *= 2;
       delete[] backtrack_cache;
       backtrack_cache = new_backtrack_cache;
+#endif
+	  backtrack_cache_size *= 2;
     }
-    char* old_world = backtrack_cache + backtrack_cache_offset;
+    
+#ifdef SEPERATE_PAGES
+	
+#ifdef VM_COPY
+	vm_copy(mach_task_self(), (vm_address_t)backtrack_cache[backtrack_cache_offset / allocated_bytes], allocated_bytes, (vm_address_t)current_data);
+#else
+	memcpy(backtrack_cache[backtrack_cache_offset / allocated_bytes], current_data, allocated_bytes);
+#endif
+	
+#else
+	char* old_world = backtrack_cache + backtrack_cache_offset;
     memcpy(old_world, current_data, allocated_bytes);
+#endif
+
     backtrack_cache_offset += allocated_bytes;
   }
   
@@ -279,7 +319,17 @@ struct BacktrackableMemory
     D_ASSERT(lock_m);
     D_ASSERT(backtrack_cache_offset >= allocated_bytes);
     backtrack_cache_offset -= allocated_bytes;
+#ifdef SEPERATE_PAGES
+	
+#ifdef VM_COPY
+	vm_copy(mach_task_self(), (vm_address_t)current_data, allocated_bytes, (vm_address_t)backtrack_cache[backtrack_cache_offset / allocated_bytes]);
+#else
+    memcpy(current_data, backtrack_cache[backtrack_cache_offset / allocated_bytes], allocated_bytes);
+#endif
+
+#else
     memcpy(current_data, backtrack_cache + backtrack_cache_offset, allocated_bytes);
+#endif
   }
   
   int current_depth()
