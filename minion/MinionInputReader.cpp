@@ -17,7 +17,11 @@
 
 #define NO_MAIN
 
-#include "minion.h"
+#include <string>
+#include "system.h"
+#include "debug.h"
+
+//#include "minion.h"
 #include "CSPSpec.h"
 using namespace ProbSpec;
 
@@ -278,7 +282,6 @@ BOOL MinionInputReader::readConstraint(InputFileReader* infile, BOOL reified) {
 	cerr << "So there is not support for the " << constraint.name << "." << endl;
 	exit(1);
 #else
-	dynamic_triggers_used = true;
 	if(reified)
 	{
 	  cerr << "Cannot reify a watched constraint!" << endl;
@@ -703,6 +706,8 @@ void MinionInputReader::readValOrder(InputFileReader* infile) {
   
   char delim = infile->peek_char();
   
+  vector<char> valOrder ;
+	 
   if(delim == ']')
   {
     // Eat the ']'
@@ -711,8 +716,6 @@ void MinionInputReader::readValOrder(InputFileReader* infile) {
   }
   else
   {
-    vector<char> valOrder ;
-  
     while (delim != ']') {
       char valOrderIdentifier = infile->get_char();
 	  if(valOrderIdentifier != 'a' && valOrderIdentifier != 'd')
@@ -720,11 +723,18 @@ void MinionInputReader::readValOrder(InputFileReader* infile) {
 	  valOrder.push_back(valOrderIdentifier == 'a');
       delim = infile->get_char();                                 // , or ]
     }
-    instance.val_order = valOrder;
+
     ostringstream s;
     s << "Read val order. Length: " << valOrder.size();
-    parser_info(s.str());
+	parser_info(s.str());
   }
+  
+  if(valOrder.empty())
+  {
+	parser_info("No value order given, generating automatically");
+	valOrder = vector<char>(instance.var_order.size(), true);
+  }
+  instance.val_order = valOrder;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -735,10 +745,30 @@ void MinionInputReader::readVarOrder(InputFileReader* infile) {
   parser_info( "Reading var order" ) ;
   vector<Var> varOrder = readLiteralVector(infile);
 
-  instance.var_order = varOrder;
+
   
   ostringstream s;
   s << "Read var order. Length: " << varOrder.size();
+  
+  if(varOrder.empty())
+  {
+	parser_info("No order generated, auto-generating complete order");
+	int var_count = 0;
+	var_count += instance.vars.BOOLs;
+	for(unsigned i = 0; i < instance.vars.bound.size(); ++i)
+	  var_count += instance.vars.bound[i].first;
+	for(unsigned i = 0; i < instance.vars.sparse_bound.size(); ++i)
+	  var_count += instance.vars.sparse_bound[i].first;
+	for(unsigned i = 0; i < instance.vars.discrete.size(); ++i)
+	  var_count += instance.vars.discrete[i].first;
+	for(unsigned i = 0; i < instance.vars.sparse_discrete.size(); ++i)
+	  var_count += instance.vars.sparse_discrete[i].first;
+	
+	varOrder.reserve(var_count);
+	for(int i = 0; i < var_count; ++i)
+	  varOrder.push_back(instance.vars.get_var('x',i));
+  }
+  instance.var_order = varOrder;
   parser_info(s.str());
 }
 

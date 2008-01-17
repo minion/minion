@@ -30,6 +30,8 @@
 
 #include "svn_header.h"
 
+#include "system/wrapper.h"
+
 #include "system.h"
 
 #include "system/time_keeping.h"

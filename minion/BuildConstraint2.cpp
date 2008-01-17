@@ -39,9 +39,9 @@ get_AnyVarRef_from_Var(Var v)
 			return AnyVarRef(boundvar_container.get_var_num(v.pos));
 		  case VAR_SPARSEBOUND:
 			return AnyVarRef(sparse_boundvar_container.get_var_num(v.pos));
-		  case VAR_DISCRETE:
+		  case VAR_DISCRETE_SHORT:
 			return AnyVarRef(rangevar_container.get_var_num(v.pos));
-		  case VAR_LONG_DISCRETE:
+		  case VAR_DISCRETE_LONG:
 			return AnyVarRef(big_rangevar_container.get_var_num(v.pos));
 		  case VAR_SPARSEDISCRETE:	
 			D_FATAL_ERROR("Sparse Discrete not supported at present");
@@ -59,37 +59,12 @@ get_AnyVarRef_from_Var(Var v)
 	  vector<BOOL> final_val_order;
 	  vector<AnyVarRef> final_var_order;
 	  if(instance.var_order.size() != instance.val_order.size())
-	  {
 	    D_FATAL_ERROR("Variable order and value order must be same size.");
-	  }
-	  if(!instance.var_order.empty())
+	
+	  for(unsigned int i = 0 ;i < instance.var_order.size(); ++i)
 	  {
-		for(unsigned int i = 0 ;i < instance.var_order.size(); ++i)
-		{
-		  final_val_order.push_back(instance.val_order[i]);
-		  final_var_order.push_back(get_AnyVarRef_from_Var(instance.var_order[i]));
-		}
-	  }
-	  else
-	  {
-	    int var_count = 0;
-		var_count += instance.vars.BOOLs;
-		for(unsigned i = 0; i < instance.vars.bound.size(); ++i)
-		  var_count += instance.vars.bound[i].first;
-		for(unsigned i = 0; i < instance.vars.sparse_bound.size(); ++i)
-		  var_count += instance.vars.sparse_bound[i].first;
-		for(unsigned i = 0; i < instance.vars.discrete.size(); ++i)
-		  var_count += instance.vars.discrete[i].first;
-		for(unsigned i = 0; i < instance.vars.sparse_discrete.size(); ++i)
-		  var_count += instance.vars.sparse_discrete[i].first;
-		
-		final_var_order.reserve(var_count);
-		final_val_order.reserve(var_count);
-		for(int i = 0; i < var_count; ++i)
-		{
-		  final_var_order.push_back(get_AnyVarRef_from_Var(instance.vars.get_var('x',i)));
-		  final_val_order.push_back(true);
-		}
+		final_val_order.push_back(instance.val_order[i]);
+		final_var_order.push_back(get_AnyVarRef_from_Var(instance.var_order[i]));
 	  }
 	  return make_pair(final_var_order, final_val_order);
   }	

@@ -30,6 +30,9 @@
 #include <vector>
 #include <list>
 #include <utility>
+#include <map>
+#include "tuple_container.h"
+
 using namespace std;
 
 /// The currently accepted types of Constraints.
@@ -101,8 +104,9 @@ enum VariableType
   VAR_NOTBOOL,
   VAR_BOUND,
   VAR_SPARSEBOUND,
-  VAR_DISCRETE,
-  VAR_LONG_DISCRETE,
+  VAR_DISCRETE_BASE,
+  VAR_DISCRETE_SHORT,
+  VAR_DISCRETE_LONG,
   VAR_SPARSEDISCRETE,
   VAR_CONSTANT,
   VAR_INVALID = -999
@@ -204,58 +208,43 @@ struct ConstraintBlob
   
   Var get_var(char, int i)
   {
-    if(i < BOOLs)
+	if(i < BOOLs)
 	  return Var(VAR_BOOL, i);
-    i -= BOOLs;
-    {
-    int bound_size = 0;
-    for(unsigned int x = 0; x < bound.size(); ++x)
-      bound_size += bound[x].first;
-    if(i < bound_size)
-      return Var(VAR_BOUND, i);
-    i -= bound_size;
-    }
-    {
-    int sparse_bound_size = 0;
-    for(unsigned int x=0;x<sparse_bound.size();++x)
-      sparse_bound_size += sparse_bound[x].first;
-    if(i < sparse_bound_size)
-      return Var(VAR_SPARSEBOUND, i);
-    i -= sparse_bound_size;
-    }
+	i -= BOOLs;
+	{
+	  int bound_size = 0;
+	  for(unsigned int x = 0; x < bound.size(); ++x)
+		bound_size += bound[x].first;
+	  if(i < bound_size)
+		return Var(VAR_BOUND, i);
+	  i -= bound_size;
+	}
+	{
+	  int sparse_bound_size = 0;
+	  for(unsigned int x=0;x<sparse_bound.size();++x)
+		sparse_bound_size += sparse_bound[x].first;
+	  if(i < sparse_bound_size)
+		return Var(VAR_SPARSEBOUND, i);
+	  i -= sparse_bound_size;
+	}
 	
-	// Need to handle both discrete and long_discrete variables!
-    {
-      int short_discrete_size = 0;
-	  int long_discrete_size = 0;
-      for(unsigned int x=0;x<discrete.size();++x)
-	  {
-		int var_length = discrete[x].first;
-		
-		if(rangevar_container.valid_range(discrete[x].second.lower_bound, discrete[x].second.upper_bound))
-		{
-		  short_discrete_size += var_length;
-		  if(short_discrete_size + long_discrete_size > i)
-		    return Var(VAR_DISCRETE, i - long_discrete_size);
-		}
-		else
-		{
-		  long_discrete_size += var_length;
-		  if(short_discrete_size + long_discrete_size > i)
-		    return Var(VAR_LONG_DISCRETE, i - short_discrete_size);
-		}
-	  }
-      i -= (short_discrete_size + long_discrete_size);
-    }
-    {
-      int sparse_discrete_size = 0;
-      for(unsigned int x=0;x<sparse_discrete.size();++x)
-	sparse_discrete_size += sparse_discrete[x].first;
-      if(i < sparse_discrete_size)
-	return Var(VAR_SPARSEDISCRETE, i);
-      i -= sparse_discrete_size;
-    }
-    throw parse_exception("Var Out of Range!");   
+	{
+	  int discrete_size = 0;
+	  for(unsigned int x=0;x<discrete.size();++x)
+		discrete_size += discrete[x].first;
+	  if(i < discrete_size)
+		return Var(VAR_DISCRETE_BASE, i);
+	  i -= discrete_size;
+	}
+	{
+	  int sparse_discrete_size = 0;
+	  for(unsigned int x=0;x<sparse_discrete.size();++x)
+		sparse_discrete_size += sparse_discrete[x].first;
+	  if(i < sparse_discrete_size)
+		return Var(VAR_SPARSEDISCRETE, i);
+	  i -= sparse_discrete_size;
+	}
+	throw parse_exception("Var Out of Range!");   
   }
   
   vector<Var> get_all_vars()
@@ -275,11 +264,11 @@ struct ConstraintBlob
   vector<Var> var_order;
   vector<char> val_order;
   
-  BOOL is_optimisation_problem;
-  BOOL optimise_minimising;
+  bool is_optimisation_problem;
+  bool optimise_minimising;
   Var optimise_variable;
   
-    vector<vector<Var> > print_matrix;
+  vector<vector<Var> > print_matrix;
 	
   
   CSPInstance() : is_optimisation_problem(false)
@@ -300,7 +289,74 @@ struct ConstraintBlob
   
   void last_constraint_reifyimply(Var reifyVar)
   { constraints.back().reifyimply(reifyVar); }
-  //VarArrayBlob make_var_blob(vector<int>&);
+  
+  template<typename Map>
+  void VarReplace(Var& v, Map& new_map)
+  {
+	if(v.type == VAR_DISCRETE_BASE)
+	{
+	  D_ASSERT(new_map.count(v.pos) == 1);
+	  v = new_map[v.pos]; 
+	}
+  }
+  
+  template<typename Element, typename Map>
+  void VarReplace(std::vector<Element>& v, Map& new_map)
+  {
+    for(int i = 0; i < v.size(); ++i)
+	  VarReplace(v[i], new_map);
+  }
+  
+  template<typename SmallBoundCheck>
+	void fixDiscrete(SmallBoundCheck check)
+  {
+	  // Right, this is horrible, but necessary. We need to:
+	  // a) Look for VAR_DISCRETEs whose bounds don't satisfy check
+	  //    and turn them into VAR_DISCRETE_LONG
+	  // b) Go through and fix all the constraints to satisfy the
+	  //    new numbering order.
+	  
+	  // We'll do that in two steps:
+	  // 1) Go through variables, and build a map between old and new vars
+	  // 2) Go through all the occurrences of variables (including in constraints)
+	  //    and change them.
+	  
+	  // Will map the int part of VAR_DISCRETE vars to whole new vars
+	  std::map<int, Var> new_map;
+	  
+	  vector<pair<int, Bounds> >& discrete = vars.discrete;
+	  int short_discrete_size = 0;
+	  int long_discrete_size = 0;
+	  for(unsigned int x = 0; x < discrete.size(); ++x)
+	  {
+		int var_length = discrete[x].first;
+		if(check(discrete[x].second.lower_bound, discrete
+				 [x].second.upper_bound))
+		{
+		  for(int i = 0; i < var_length; i++)
+		  {
+			new_map[short_discrete_size + long_discrete_size + i] = 
+			Var(VAR_DISCRETE_SHORT, short_discrete_size + i);
+		  }
+		  short_discrete_size += var_length;
+		}
+		else
+		{
+		  for(int i = 0; i < var_length; i++)
+		  {
+			new_map[short_discrete_size + long_discrete_size + i] = 
+			Var(VAR_DISCRETE_LONG, long_discrete_size + i);
+		  }
+		  long_discrete_size += var_length;
+		}
+	  }
+	  
+	  VarReplace(var_order, new_map);
+	  VarReplace(print_matrix, new_map);
+	  for(list<ConstraintBlob>::iterator it = constraints.begin(); 
+		  it != constraints.end(); ++it)
+		VarReplace(it->vars, new_map);
+  }
 };
 
 }

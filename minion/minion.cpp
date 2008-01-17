@@ -234,6 +234,10 @@ pair<vector<AnyVarRef>, vector<BOOL> > var_val_order;
 
 void BuildCSP(MinionInputReader& reader)
 {
+  // Fix up Bound / Sparse Bound
+  
+  reader.instance.fixDiscrete(SmallDiscreteCheck());
+  
   // Set up variables
   BuildCon::build_variables(reader.instance.vars);
   

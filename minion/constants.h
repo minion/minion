@@ -27,6 +27,8 @@
 #ifndef _CONSTANTS_H
 #define _CONSTANTS_H
 
+#include "system/wrapper.h"
+
 /// A placeholder type.
 struct EmptyType
 {};
@@ -101,5 +103,13 @@ enum BoundType
   Bound_No,
   Bound_Maybe
 };
+
+typedef long long int BigInt;
+
+typedef Wrapper<int> DomainInt;
+
+// Put a ' -1, +1 ' just to have some slack
+BigInt DomainInt_Max = std::numeric_limits<int>::max() - 1;
+BigInt DomainInt_Min = std::numeric_limits<int>::min() + 1;
 
 #endif // _CONSTANTS_H

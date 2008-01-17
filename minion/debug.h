@@ -52,15 +52,15 @@ struct parse_exception : public exception
 void D_FATAL_ERROR2(string s, string file, string line);
 void _NORETURN FAIL_EXIT();
 
-
-#ifndef NO_DEBUG
-
 struct assert_fail {};
 
 void assert_function(BOOL x, const char* a, const char* f, int line);
 
-#define D_ASSERT(x) {assert_function(x, #x, __FILE__, __LINE__);}
+#define M_ASSERT(x) {assert_function(x, #x, __FILE__, __LINE__);}
 
+#ifndef NO_DEBUG
+
+#define D_ASSERT(x) M_ASSERT(x)
 #define D_DATA(x) x
 
 enum debug_types

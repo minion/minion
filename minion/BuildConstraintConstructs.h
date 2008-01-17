@@ -105,7 +105,10 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 		return BUILDCON<initial_size, size - 1>::
 		  build(make_pair(partial_build, &v), b, pos + 1);
 	  }
-	  case VAR_DISCRETE:
+	  case VAR_DISCRETE_BASE:
+		D_FATAL_ERROR("Serious internal error");
+		
+	  case VAR_DISCRETE_SHORT:
 	  {
 		light_vector<LRangeVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
@@ -113,7 +116,7 @@ build(const ConData& partial_build, ConstraintBlob& b, int pos)
 		return BUILDCON<initial_size, size - 1>::
 		  build(make_pair(partial_build, &v), b, pos + 1);
 	  }		
-	  case VAR_LONG_DISCRETE:
+	  case VAR_DISCRETE_LONG:
 	  {
 		light_vector<BigRangeVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
