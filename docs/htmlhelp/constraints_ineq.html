@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>constraints ineq</title>
+</head>
+<body>
+<h1>Help on <tt>constraints ineq</tt></h1>
+<h3>Description</h3>
+<pre>
+The constraint
+
+   ineq(x, y, k)
+
+ensures that 
+
+   x &lt;= y + k 
+
+in any solution.
+</pre>
+<h3>Notes</h3>
+<pre>
+Minion has no strict inequality (&lt;) constraints. However x &lt; y can be
+achieved by
+
+   ineq(x, y, -1)
+</pre>
+<h3>Reifiability</h3>
+<pre>
+This constraint is reifiable.
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

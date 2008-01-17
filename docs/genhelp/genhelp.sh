@@ -6,6 +6,7 @@ SORTED_TMP="sorted.tmp";
 touch $TMP_FILE;
 rm $TMP_FILE; #ensure empty
 touch $TMP_FILE;
+rm docs/htmlhelp/*.html;
 
 dashes() {
     for ((i=1;i<=$1;i+=1)); do echo -n -; done
@@ -66,68 +67,39 @@ find . \( ! -regex '.*/\..*' \) \( -iname "*.cpp" -or -iname "*.hpp" -or -iname 
     match_entry_spaces=`echo $match_entry | sed 's/;/ /g'`;
     match_entry_underbars=`echo $match_entry | sed 's/;/_/g'`;
     echo $match_entry_spaces >> $TMP_FILE #record entry for later
-    outfile="/tmp/$match_entry_underbars.html";
+    outfile="docs/htmlhelp/$match_entry_underbars.html";
     querymakepage $outfile "$match_entry_spaces"; #make page for entry if necessary
     echo "<h3>$match_heading</h3>" >> $outfile;
     echo "<pre>" >> $outfile;
     echo "$html_body" >> $outfile;
     echo "</pre>" >> $outfile;
 done
-for i in /tmp/*.html; do #end pages
+for i in docs/htmlhelp/*.html; do #end pages
     endpage $i;
 done
-outfile="/tmp/index.html";
+outfile="docs/htmlhelp/index.html";
 makepage $outfile "minion"
 # add some information to the top of the index page.
-echo "<h2>Reference documentation for Minion 0.5.0</h2>" >> $outfile;
-echo "<p>This file is the root of the reference docs for Minion release 0.5.0." >> $outfile;
-echo "The same documentation is available from the Minion executable by using the <code>help</code> " >> $outfile;
-echo "command-line option. Try running <code> minion help </code>. </p>" >> $outfile;
-echo "<p>The list below contains all entries of the minion help system. " >> $outfile;
-echo "To learn how to use Minion, the <code>input example</code> entry, along with" >> $outfile;
-echo "other <code>input</code> entries, might be " >> $outfile;
-echo "particularly useful.</p>" >> $outfile;
-
+echo "<p>You are viewing documentation for minion. The same " >> $outfile;
+echo "documentation is available from a minion executable by " >> $outfile;
+echo "typing <tt>minion help</tt> at the command line." >> $outfile;
+echo "We intend that the command line help system be the " >> $outfile;
+echo "main source of documentation for the system.<p>" >> $outfile;
+echo "<p>Each of the entries below concerns a different aspect" >> $outfile;
+echo "of the system, and the entries are arranged hierarchically." >> $outfile;
+echo "For example to view information about the set of available" >> $outfile;
+echo "constraints as a whole view \"constraints\" and to view" >> $outfile;
+echo "specific information about the alldiff constraint view " >> $outfile;
+echo "\"constraints alldiff\".</p>" >> $outfile;
+echo >> $outfile;
+echo "<p>A good place to start would be viewing the " >> $outfile;
+echo "\"input example\" entry which exhibits a complete" >> $outfile; 
+echo "example of a minion input file.<p>" >> $outfile;
+echo "<p>Usage: minion [switches] [minion input file]</p>" >> $outfile;
 cat $TMP_FILE | sort | uniq > $SORTED_TMP;
 cat $SORTED_TMP | while read entry; do
     entry_underbars=`echo $entry | sed 's/ /_/g'`;
-    echo "<a href=\"/tmp/$entry_underbars.html\">$entry</a><br />" >> $outfile;
+    echo "<a href=\"$entry_underbars.html\">$entry</a><br />" >> $outfile;
 done
 endpage $outfile;
-    
-
-# cat $TMP_FILE | while read entry; do
-#     words=`echo $entry | wc -w | awk '{print $1}'`; #number of words in entry
-#     if [ $words = 1 ]; then
-# 	echo >> $PREFIX_TMP;
-#     else
-# 	pref_len=$(($words-1)); #words in prefix
-# 	prefix=`echo $entry | cut -d' ' -f-$pref_len`; #all but last word
-# 	echo $prefix >> $PREFIX_TMP; #store for next pass
-#     fi
-# done
-# sort $TMP_FILE | uniq > $SORTED_TMP;
-# sort $PREFIX_TMP | uniq > $SORTED_PREF; #obtain sorted list of unique prefixes
-# cat $SORTED_PREF | while read outerentry; do #loop over prefixes
-#     none_printed=true;
-#     cat $SORTED_TMP | while read innerentry; do #hunting for things it's a prefix of
-# 	words=`echo $innerentry | wc -w | awk '{print $1}'`;
-# 	pref_len=$(($words-1));
-# 	if [ $words = 1 ]; then
-# 	    prefix="";
-# 	else
-# 	    prefix=`echo $innerentry | cut -d' ' -f-$pref_len`;
-# 	fi
-# 	if [ "$prefix" = "$outerentry" ]; then
-# 	    if [ $none_printed = true ]; then
-# 		none_printed=false;
-# 		echo "if(\"$outerentry\" == request) {";
-# 		echo "cout << \"Available subentries:\" << NEWLINE;";
-# 	    fi
-# 	    echo "cout << \"help $innerentry\" << NEWLINE;";
-# 	fi
-#     done
-#     echo "} else";
-# done
-# echo ";"; #null statement to occupy final else branch
-# echo '}'; #end of function
+   

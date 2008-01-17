@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>input search</title>
+</head>
+<body>
+<h1>Help on <tt>input search</tt></h1>
+<h3>Description</h3>
+<pre>
+
+Inside the search section one can specify
+
+- variable orderings, 
+- value orderings,
+- optimisation function, and
+- details of how to print out solutions.
+
+SearchSection::= &lt;VariableOrdering&gt;?
+                 &lt;ValueOrdering&gt;?
+                 &lt;OptimisationFn&gt;?
+                 &lt;PrintFormat&gt;?
+
+In the variable ordering a fixed ordering can be specified on any
+subset of variables. These are the search variables that will be
+instantiated in every solution. If none is specified some other fixed
+ordering of all the variables will be used.
+
+   VariableOrdering::= VARORDER[ &lt;varname&gt;+ ]
+
+The value ordering allows the user to specify an instantiation order
+for the variables involved in the variable order, either ascending (a)
+or descending (d) for each. When no value ordering is specified, the
+default is to use ascending order for every search variable.
+
+   ValueOrdering::= VALORDER[ (a|d)+ ]
+
+To model an optimisation problem the user can specify to minimise
+or maximise a variable's value.
+
+   OptimisationFn::= MAXIMISING &lt;varname&gt;
+                   | MINIMISING &lt;varname&gt;
+
+Finally, the user can control some aspects of the way solutions are
+printed. By default (no PrintFormat specified) all the variables are
+printed in declaration order. Alternatively a custom vector, or ALL
+variables, or no (NONE) variables can be printed. If a matrix or, more
+generally, a tensor is given instead of a vector, it is automatically
+flattened into a vector as described in 'help variables vectors'.
+
+   PrintFormat::= PRINT &lt;vector&gt;
+                | PRINT ALL
+                | PRINT NONE
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

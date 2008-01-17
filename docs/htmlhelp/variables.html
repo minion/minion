@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>variables</title>
+</head>
+<body>
+<h1>Help on <tt>variables</tt></h1>
+<h3>General</h3>
+<pre>
+Minion supports 4 different variable types, namely
+
+- 0/1 variables,
+- bounds variables,
+- sparse bounds variables, and
+- discrete variables.
+
+Sub-dividing the variable types in this manner affords the greatest
+opportunity for optimisation. In general, we recommend thinking of the
+variable types as a hierarchy, where 1 (0/1 variables) is the most
+efficient type, and 4 (Discrete variables) is the least. The
+user should use the variable which is the highest in the hierarchy,
+yet encompasses enough information to provide a full model for the
+problem they are attempting to solve.
+
+See the entry on vectors for information on how vectors, matrices and,
+more generally, tensors are handled in minion input. See also the
+alias entry for information on how to multiply name variables for
+convenience.
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

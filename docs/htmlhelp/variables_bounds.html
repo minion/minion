@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>variables bounds</title>
+</head>
+<body>
+<h1>Help on <tt>variables bounds</tt></h1>
+<h3>Description</h3>
+<pre>
+Bounds variables, where only the upper and lower bounds of the domain
+are maintained. These domains must be continuous ranges of integers
+i.e. holes cannot be put in the domains of the variables.
+</pre>
+<h3>Example</h3>
+<pre>
+
+Declaration of a bound variable called myvar with domain between 1
+and 7 in input file:
+
+BOUND myvar {1..7}
+
+Use of this variable in a constraint:
+
+eq(myvar, 4) #variable myvar equals 4
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

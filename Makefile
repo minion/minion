@@ -95,6 +95,8 @@ sports:
 	g++ generators/SportsSchedule/MinionSportsInstanceGenerator.cpp -O2 -o bin/sports $(FULLFLAGS)
 
 
+htmlhelp:
+	bash docs/genhelp/genhelp.sh minion
 
 lisp-generate: minion-helper minion-sat minion-quasigroup
 

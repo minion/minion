@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>constraints alldiff</title>
+</head>
+<body>
+<h1>Help on <tt>constraints alldiff</tt></h1>
+<h3>Description</h3>
+<pre>
+Forces the input vector of variables to take distinct values.
+</pre>
+<h3>Example</h3>
+<pre>
+Suppose the input file had the following vector of variables defined:
+
+DISCRETE myVec[9] {1..9}
+
+To ensure that each variable takes a different value include the
+following constraint:
+
+alldiff(myVec)
+</pre>
+<h3>Notes</h3>
+<pre>
+Enforces the same level of consistency as a clique of not equals 
+constraints.
+</pre>
+<h3>Reifiability</h3>
+<pre>
+Not reifiable.
+</pre>
+<h3>References</h3>
+<pre>
+See
+
+   help constraints alldiffgacslow
+
+for the same constraint that enforces GAC.
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

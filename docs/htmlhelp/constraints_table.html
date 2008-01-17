@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>constraints table</title>
+</head>
+<body>
+<h1>Help on <tt>constraints table</tt></h1>
+<h3>Description</h3>
+<pre>
+An extensional constraint that enforces GAC. The constraint is
+specified via a list of tuples.
+</pre>
+<h3>Example</h3>
+<pre>
+To specify a constraint over 3 variables that allows assignments
+(0,0,0), (1,0,0), (0,1,0) or (0,0,1) do the following.
+
+1) Add a tuplelist to the **TUPLELIST** section, e.g.:
+
+**TUPLELIST**
+myext 4 3
+0 0 0
+1 0 0
+0 1 0
+0 0 1
+
+N.B. the number 4 is the number of tuples in the constraint, the 
+number 3 is the -arity.
+
+2) Add a table constraint to the **CONSTRAINTS** section, e.g.:
+
+**CONSTRAINTS**
+table(myvec, myext)
+
+and now the variables of myvec will satisfy the constraint myext.
+</pre>
+<h3>Example</h3>
+<pre>
+The constraints extension can also be specified in the constraint
+definition, e.g.:
+
+table(myvec, {&lt;0,0,0&gt;,&lt;1,0,0&gt;,&lt;0,1,0&gt;,&lt;0,0,1&gt;})
+</pre>
+<h3>References</h3>
+<pre>
+help input tuplelist
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>
