@@ -1,0 +1,23 @@
+Welcome to the Minion source.
+
+Minion does does not have a traditional configure file. The quickest way
+to get started, which will work for most people using a unix-type system
+is:
+
+make minion
+make minion DEBUG=1
+
+which will make two binaries in the bin directory, called "minion" and
+"minion-debug". minion-debug is much slower but has a large amount of
+internal checks. It should be used if you are unsure / worried about
+the results minion produces, or it crashes.
+
+To test your minion installation, go into the test_instances directory
+and type:
+
+./run_tests.sh ../bin/minion
+
+the "docs" directory contains a full manual for Minion. 
+The "benchmarks" directory contains a range of example programs.
+The "generators" directory contains a number of generators. These are
+in general poorly documented. Sorry.
