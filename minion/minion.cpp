@@ -478,6 +478,8 @@ catch(parse_exception& s)
 int main(int argc, char** argv) {
   start_clock();
   
+  cout << "# " << VERSION << endl ;
+  cout << "# Svn version: " << SVN_VER << endl; 
   if (argc == 1)
     print_info();
   
