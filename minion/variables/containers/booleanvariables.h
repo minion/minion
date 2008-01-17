@@ -234,9 +234,9 @@ struct BooleanContainer
 	}
     assign_ptr()[d.data_offset] |= d.shift_offset;
     
-    trigger_list.push_domain(d.var_num);
-#ifndef FEW_BOOLEAN_TRIGGERS
     trigger_list.push_assign(d.var_num, b);
+#ifndef FEW_BOOLEAN_TRIGGERS
+    trigger_list.push_domain(d.var_num);
 	trigger_list.push_domain_removal(d.var_num, 1 - b);
 #endif
     
@@ -267,8 +267,8 @@ struct BooleanContainer
   { 
     D_ASSERT(lock_m); 
 #ifdef FEW_BOOLEAN_TRIGGERS
-    if(type == Assigned)
-      type = DomainChanged;
+    if(type == DomainChanged)
+      type = Assigned;
     // Static triggers should never be of this type!
     D_ASSERT(type != DomainRemoval);
 #endif
@@ -286,8 +286,8 @@ struct BooleanContainer
     TrigType new_type = type;
     switch(type)
     {
-      case Assigned:
-        new_type = DomainChanged; break;
+      case DomainChanged:
+        new_type = Assigned; break;
       case DomainRemoval:
         if(pos == 0)
           new_type = LowerBound;
