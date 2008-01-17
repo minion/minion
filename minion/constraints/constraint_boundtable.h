@@ -1,9 +1,9 @@
 /* Minion Constraint Solver
-   http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
+http://minion.sourceforge.net
 
-   $Id$
+For Licence Information see file LICENSE.txt 
+
+$Id$
 */
 
 /* Minion
@@ -28,7 +28,7 @@ template<typename VarArray>
 struct BoundsTableConstraint : public Constraint
 {
   virtual string constraint_name()
-  { return "BoundTable"; }
+{ return "BoundTable"; }
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
@@ -56,71 +56,71 @@ struct BoundsTableConstraint : public Constraint
     for(unsigned int i=0;i<v.size();i++)
     {
       if(i == check_var)
-	continue;
+        continue;
       if(v[i] == vars[i].getMax())
-	 {
-	v[i] = vars[i].getMin();
-	 }
-	 else
-	 {
-	   v[i] = vars[i].getMax();
-	   return true;
-	 }
+      {
+        v[i] = vars[i].getMin();
+      }
+      else
+      {
+        v[i] = vars[i].getMax();
+        return true;
+      }
     }
     return false;
   }
   
   PROPAGATE_FUNCTION(int, DomainDelta)
   {
-	PROP_INFO_ADDONE(BoundTable);
+    PROP_INFO_ADDONE(BoundTable);
     for(unsigned int check_var = 0; check_var < vars.size(); check_var++)
     {
       int check_dom;
       //cerr << vars[check_var].data.var_num << vars[check_var].getMin() << "```" << vars[check_var].getMax() << vars[check_var].inDomain(0) <<  endl;
       for(check_dom = vars[check_var].getMin();
-	  check_dom <= vars[check_var].getMax(); check_dom++)
+          check_dom <= vars[check_var].getMax(); check_dom++)
       {
-	vector<int> v(vars.size());
+        vector<DomainInt> v(vars.size());
         for(unsigned int i=0;i<vars.size();i++)
-	  v[i] = vars[i].getMin();
+          v[i] = vars[i].getMin();
         v[check_var] = check_dom;
-	BOOL satisfied = false;
-	do
-	{
-	  if(constraint->check_assignment(v))
-	  { 
-	    satisfied = true; 
-	    D_INFO(0,DI_ANDCON,to_string(check_var,check_dom)+print_vec(v));
-	  }
-	} while(!satisfied && increment(v, check_var));
-	if(satisfied)
-	  goto end_check_lower;
+        BOOL satisfied = false;
+        do
+        {
+          if(constraint->check_assignment(v))
+          { 
+            satisfied = true; 
+            D_INFO(0,DI_ANDCON,to_string(check_var,check_dom)+print_vec(v));
+          }
+        } while(!satisfied && increment(v, check_var));
+        if(satisfied)
+          goto end_check_lower;
       }
 end_check_lower:
       D_INFO(0,DI_ANDCON,string("Removing up to:")+to_string(check_var,check_dom));
       vars[check_var].setMin(check_dom);
       
       for(check_dom = vars[check_var].getMax();
-	  check_dom >= vars[check_var].getMax(); check_dom--)
+          check_dom >= vars[check_var].getMax(); check_dom--)
       {
-	vector<int> v(vars.size());
+        vector<DomainInt> v(vars.size());
         for(unsigned int i=0;i<vars.size();i++)
-	  v[i] = vars[i].getMin();
+          v[i] = vars[i].getMin();
         v[check_var] = check_dom;
-	BOOL satisfied = false;
-	do
-	{
-	  if(constraint->check_assignment(v))
-	  { 
-	    satisfied = true; 
-	    D_INFO(0,DI_ANDCON,to_string(check_var,check_dom)+print_vec(v));
-	  }
-	} while(!satisfied && increment(v, check_var));
-	if(satisfied)
-	  goto end_check_upper;
+        BOOL satisfied = false;
+        do
+        {
+          if(constraint->check_assignment(v))
+          { 
+            satisfied = true; 
+            D_INFO(0,DI_ANDCON,to_string(check_var,check_dom)+print_vec(v));
+          }
+        } while(!satisfied && increment(v, check_var));
+        if(satisfied)
+          goto end_check_upper;
       }
 end_check_upper:
-	D_INFO(0,DI_ANDCON,string("Removing up to:")+to_string(check_var,check_dom));
+        D_INFO(0,DI_ANDCON,string("Removing up to:")+to_string(check_var,check_dom));
       vars[check_var].setMax(check_dom);
       
       
