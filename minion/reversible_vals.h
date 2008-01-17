@@ -64,6 +64,14 @@ public:
      backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(Type));
      D_ASSERT( (size_t)(backtrack_ptr.get_ptr()) % sizeof(Type) == 0);
   }
+  
+  /// Constructs and assigns in one step.
+  Reversible(StateObj* stateObj, Type t)
+  {
+    backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(Type));
+    D_ASSERT( (size_t)(backtrack_ptr.get_ptr()) % sizeof(Type) == 0);
+    (*this) = t;
+  }
 
   /// Provide output.
   friend std::ostream& operator<<(std::ostream& o, const Reversible& v)
