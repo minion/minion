@@ -92,12 +92,12 @@ string pad_start(string s, int length = 12)
   return output + s;
 }
 
-inline void VarInfoAddone(VarType type, VarEvent event)
+void VarInfoAddone(VarType type, VarEvent event)
 {
     vareventcounters[type][event]++;
 }
 
-inline void ConInfoAddone(string type)
+void ConInfoAddone(string type)
 { 
     if(concount.find(type) == concount.end())
         concount[type]=1;
@@ -105,7 +105,7 @@ inline void ConInfoAddone(string type)
         concount[type]++;
 }
 
-inline void PropInfoAddone(string type)
+void PropInfoAddone(string type)
 {
     if(propcount.find(type) == propcount.end())
         propcount[type]=1;
