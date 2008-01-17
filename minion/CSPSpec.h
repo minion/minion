@@ -253,7 +253,7 @@ struct ConstraintBlob
 	return Var(VAR_SPARSEDISCRETE, i);
       i -= sparse_discrete_size;
     }
-    throw new parse_exception("Var Out of Range!");   
+    throw parse_exception("Var Out of Range!");   
   }
   
   vector<Var> get_all_vars()

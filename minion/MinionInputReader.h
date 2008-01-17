@@ -57,7 +57,7 @@ struct ConcreteFileReader : public InputFileReader
 	/* int i;
 	infile >> i;
 	if(infile.fail())
-    throw new parse_exception("Problem parsing number");
+    throw parse_exception("Problem parsing number");
 	return i;
 	*/
 	char next_char = infile.get();
@@ -73,7 +73,7 @@ struct ConcreteFileReader : public InputFileReader
 	}
 	
 	if(!(next_char >= '0' && next_char <= '9') )
-	  throw new parse_exception("Problem parsing number");  
+	  throw parse_exception("Problem parsing number");  
 	
 	int num=0;
 	
@@ -107,7 +107,7 @@ struct ConcreteFileReader : public InputFileReader
 	infile >> idChar ;
 	if(idChar != sym)
 	{
-	  throw new parse_exception(string("Expected '") + sym + "'. Recieved '" + idChar + "'.");
+	  throw parse_exception(string("Expected '") + sym + "'. Recieved '" + idChar + "'.");
 	}
   }
   
