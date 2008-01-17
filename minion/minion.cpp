@@ -586,7 +586,9 @@ void readInput(InputReader* infile, int argc, char** argv, StateObj* stateObj, C
 void help(string request);
 
 int main(int argc, char** argv) {
-  
+// Wrap main in a try/catch just to stop exceptions leaving main,
+// as windows gets really annoyed when that happens.
+try {
   StateObj* stateObj = new StateObj();
 
   
@@ -699,5 +701,9 @@ int main(int argc, char** argv) {
   delete stateObj;
   
   return 0;
+    
+}
+catch(...)
+{ cerr << "Minion exited abnormally via an exception." << endl; }
 }
 
