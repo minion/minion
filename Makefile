@@ -61,7 +61,7 @@ all: svn_version minion generate
 svn_version:
 	mini-scripts/get_svn_version.sh minion/svn_header.h
 
-$(OBJDIR)/%.o: minion/%.cpp
+$(OBJDIR)/%.o: minion/%.cpp svn_version help mkdirectory
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
 
