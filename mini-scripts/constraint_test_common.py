@@ -508,18 +508,39 @@ class testmin(testmax):
         return runtestgeneral("min", True, reify, reifyimply, [5,1], ["smallnum", "num"], [5,1], self, False)
 
 class testoccurrence:
-    def printtable(self, domains):
+    def printtable(self, domains, leq=False, geq=False):
+        # last var is the occurrence parameter.
         cross=[]
         out=[]
-        crossprod(domains, [], cross)
+        crossprod(domains[:-1], [], cross)
         for l in cross:
-            if l.count(self.const1)==self.const2:
+            if l.count(self.const1)==domains[-1]:
+                out.append(l)
+            elif leq and l.count(self.const1)<domains[-1]:
+                out.append(l)
+            elif geq and l.count(self.const1)>domains[-1]:
                 out.append(l)
         return out
     
     def runtest(self, reify=False, reifyimply=False):
-        # note that the two constants generated may be completely inappropriate. e.g. -2 occurrences..
-        return runtestgeneral("occurrence", False, reify, reifyimply, [6], ["smallnum"], [6, "smallconst", "smallconst"], self, False)
+        # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
+        return runtestgeneral("occurrence", False, reify, reifyimply, [6, 1], ["smallnum", "num"], [6, "smallconst", 1], self, False)
+
+class testoccurrenceleq(testoccurrence):
+    def printtable(self, domains):
+        return testoccurrence.printtable(self, domains, leq=True)
+    
+    def runtest(self, reify=False, reifyimply=False):
+        # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
+        return runtestgeneral("occurrenceleq", False, reify, reifyimply, [6, 1], ["smallnum", "num"], [6, "smallconst", 1], self, False)
+
+class testoccurrencegeq(testoccurrence):
+    def printtable(self, domains):
+        return testoccurrence.printtable(self, domains, geq=True)
+    
+    def runtest(self, reify=False, reifyimply=False):
+        # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
+        return runtestgeneral("occurrencegeq", False, reify, reifyimply, [6, 1], ["smallnum", "num"], [6, "smallconst", 1], self, False)
 
 class testproduct:
     def printtable(self, domains): 
@@ -702,7 +723,7 @@ def product(list):
     return reduce(lambda x,y:x*y, list)
 
 # print the minion file header
-def printminionfile(fileh, variables, constraint, tuplelist):
+def printminionfile(fileh, variables, constraint, tuplelist=False, opt=False):
     # constraint parameter must include reify if required.
     fileh.write("MINION 3\n")
     fileh.write("\n**VARIABLES**\n")
@@ -710,6 +731,9 @@ def printminionfile(fileh, variables, constraint, tuplelist):
     if tuplelist:
         fileh.write("\n**TUPLELIST**\n")
         fileh.write(tuplelist)
+    if opt:
+        fileh.write("\n**SEARCH**\n")
+        fileh.write(opt)
     fileh.write("\n**CONSTRAINTS**\n")
     fileh.write(constraint)
     fileh.write("\n**EOF**")
@@ -781,8 +805,17 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
     if reifyimply:
         constraint="reifyimply("+constraint+", x0)"
     
-    opt=random.randint(0,1)
-    optvar=random.randint(0, sum(varnums))
+    toopt=random.randint(0,3)
+    optvar=random.randint(0, sum(varnums)-1)
+    
+    optline=False
+    if toopt==0:
+        # 1 in 4 chance
+        minmax=random.randint(0,1)
+        if minmax==1:
+            optline="MAXIMIZING x%d"%optvar
+        else:
+            optline="MINIMIZING x%d"%optvar
     
     if reify or reifyimply:
         tuplelist=tablegen.printtable(domlists[1:])
@@ -825,8 +858,8 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
         constrainttable+=",x%d"%i
     constrainttable+="], modtable)"
     
-    retval1=runminion("infile1.minion", "outfile1", tablegen.solver, tablevars, constrainttable, tuplestring)
-    retval2=runminion("infile2.minion", "outfile2", tablegen.solver, modvars, constraint, False)
+    retval1=runminion("infile1.minion", "outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline)
+    retval2=runminion("infile2.minion", "outfile2", tablegen.solver, modvars, constraint, opt=optline)
     if retval1!=0 or retval2!=0:
         print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
         return False
@@ -835,9 +868,9 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
         treesame=False
     return comparetrees(treesame)  # tree subset
 
-def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist):
+def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist=False, opt=False):
     file1=open(filename, "w")
-    printminionfile(file1, variables, constraint, tuplelist)
+    printminionfile(file1, variables, constraint, tuplelist=tuplelist, opt=opt)
     file1.close()
     cmd=minionbin+" -dumptree -findallsols "+filename+" >"+outfilename
     print "Executing command: "+cmd
