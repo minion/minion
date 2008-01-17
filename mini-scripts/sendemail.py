@@ -6,6 +6,7 @@ from email.MIMEText import MIMEText
 
 def mail(txt):
     # Create a text/plain message
+    print "Attempting to send email."
     try:
         msg = MIMEText(txt)
         
@@ -25,3 +26,4 @@ def mail(txt):
         # This is dangerous, but I'm not too bothered really.
         print "An error occurred when attempting to send email. Retrying."
         mail(txt)
+    print "Succeeded in sending email."  # Unfortunately this will be printed more than once

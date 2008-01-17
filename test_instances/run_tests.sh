@@ -101,3 +101,6 @@ echo $expectedfail tests failed due to expected errors.
 echo $unexpectedpass tests passed unexpectedly.
 
 ./do_random_tests.sh $exec $*
+
+# return 0 iff all tests succeeded
+exit $(($j - $pass - $expectedfail + $?))

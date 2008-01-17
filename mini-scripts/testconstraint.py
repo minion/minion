@@ -8,10 +8,22 @@ import random
 
 random.seed(12345)   # stupid seed but at least it makes the test repeatable.
 
-if len(sys.argv)<2:
-    print "Usage: testconstraint.py constraintname"
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests="])
 
-consname=sys.argv[1]  # name of the constraint to test
+if len(other)!=2:
+    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] constraintname"
+    sys.exit(1)
+
+numtests=10000
+minionbin="bin/minion"
+for i in optargs:
+    (a1, a2)=i
+    if a1=="--minion":
+        minionbin=a2
+    elif a1=="--numtests":
+        numtests=int(a2)
+
+consname=other[1]  # name of the constraint to test
 
 reify=False
 reifyimply=False
@@ -24,8 +36,8 @@ if consname[0:5]=="reify":
     consname=consname[5:]
 
 testobj=eval("test"+consname+"()")
-
-for testnum in range(10000):
+testobj.solver=minionbin
+for testnum in range(numtests):
     print "Test number %d"%(testnum)
     if not testobj.runtest(reify=reify, reifyimply=reifyimply):
         sys.exit(0)

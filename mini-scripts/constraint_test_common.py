@@ -811,8 +811,8 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
         constrainttable+=",x%d"%i
     constrainttable+="], modtable)"
     
-    retval1=runminion("infile1.minion", "outfile1", "bin/minion", tablevars, constrainttable, tuplestring)
-    retval2=runminion("infile2.minion", "outfile2", "bin/minion", modvars, constraint, False)
+    retval1=runminion("infile1.minion", "outfile1", tablegen.solver, tablevars, constrainttable, tuplestring)
+    retval2=runminion("infile2.minion", "outfile2", tablegen.solver, modvars, constraint, False)
     if retval1!=0 or retval2!=0:
         print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
         return False
