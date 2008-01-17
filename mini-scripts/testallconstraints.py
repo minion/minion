@@ -24,9 +24,11 @@ conslist+=["gacelement", "reifyimplygacelement", "element", "reifyimplyelement",
 #non-reifiable arithmetic constraints
 conslist+=["modulo", "pow", "minuseq", "watchsumleq", "watchsumgeq", "watchvecneq"]
 
-conslist+=["product", "reifyproduct", "reifyimplyproduct"]
+conslist+=["product", "reifyimplyproduct"]
 conslist+=["sumgeq", "reifysumgeq", "reifyimplysumgeq"]
 conslist+=["sumleq", "reifysumleq", "reifyimplysumleq"]
+
+conslist+=["occurrence", "reifyoccurrence", "reifyimplyoccurrence"]
 
 #conslist+=["weightedsumleq"...
 
