@@ -173,6 +173,7 @@ public:
   void setup()
   {
     int trigs = dynamic_trigger_count();
+    D_ASSERT(trigs >= 0);
 #ifdef WATCHEDLITERALS
     _DynamicTriggerCache = getMemory(stateObj).nonBackTrack().request_bytes((sizeof(DynamicTrigger) * trigs));
 #else

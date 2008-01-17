@@ -79,65 +79,53 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   
   int dynamic_trigger_count()
   {
-	
-	
 	// Sum of 1's is >= K
 	// == Number of 1's is >=K         // this is the one I want to do
 	// == Number of 0's is <= N-K
 	
 	D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BoolLessSumConstraintDynamic");
 	
-	int array_size = var_array.size();
+    int array_size = var_array.size();
 
-        if (var_sum == array_size)
-        {
-          // In this case every var will be set to 1
-          // This will happen before triggers set up in full_propagate
-          // Thus zero triggers are needed
-          // However we will say that 1 is needed 
-          //     because I don't know if setup code will work when 0 triggers requested
-          //     Should set to 0 and test it.
-
-          return 1;
-        }
-        else
-        {
+    if (var_sum >= array_size || var_sum < 0)
+    {
+      // In these cases the constraints are all set before search.
+      // This will happen before triggers set up in full_propagate
+      // Thus zero triggers are needed
+      return 0;
+    }
+    else
+    {
           
 #ifndef WATCHEDLITERALS
-          // Note that this BOOL array could be compacted using masks for lookup
-          vals_watched.getMemory(stateObj).backTrack()(request_bytes(sizeof(BOOL) * array_size));
-          for(int i = 0; i < array_size; i++) 
-            values_watched(i) = false;
+      // Note that this BOOL array could be compacted using masks for lookup
+      vals_watched.getMemory(stateObj).backTrack()(request_bytes(sizeof(BOOL) * array_size));
+      for(int i = 0; i < array_size; i++) 
+        values_watched(i) = false;
 #endif
 
-          num_unwatched = array_size - var_sum - 1 ;
-          D_ASSERT(num_unwatched >= 0);
+      num_unwatched = array_size - var_sum - 1 ;
+      D_ASSERT(num_unwatched >= 0);
 
-          unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(unsigned) * num_unwatched);
-          // above line might request 0 bytes
-          last = 0;
+      unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(unsigned) * num_unwatched);
+      // above line might request 0 bytes
+      last = 0;
 
-          return var_sum + 1;
-        }
+      return var_sum + 1;
+    }
   }
-  
-  /*
-  int occ_count()
-  {
-	if (VarToCount)
-	  return var_sum;
-	else
-	  return var_array.size() - var_sum;
-  }
-  */
-  
+
   virtual void full_propagate()
   {
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
+    if(var_sum <= 0)
+      // Constraint trivially satisfied
+      return;
+    
 	int array_size = var_array.size(); 
 	int triggers_wanted = var_sum + 1;
-        int index;
+    int index;
 	
 	for(index = 0; (index < array_size) && (triggers_wanted > 0); ++index) 
 	{
