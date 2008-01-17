@@ -29,7 +29,7 @@ template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct ModConstraint : public Constraint
 {
   virtual string constraint_name()
-  { return "XXX"; }
+  { return "Modulo"; }
   
   VarRef1 var1;
   VarRef2 var2;

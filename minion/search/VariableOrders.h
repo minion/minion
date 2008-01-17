@@ -43,6 +43,7 @@ struct VariableOrder
   vector<VarType> var_order;
   vector<int> val_order;
   vector<int> branches;
+  vector<int> first_unassigned_variable;
   unsigned pos;
   
   BranchType branch_method;
@@ -53,8 +54,9 @@ struct VariableOrder
   {
     // if this isn't enough room, the vector will autoresize. While that can be slow,
     // it only has to happen at most the log of the maximum search depth.
-	  branches.reserve(var_order.size());
-	  pos = 0; 
+    branches.reserve(var_order.size());
+    first_unassigned_variable.reserve(var_order.size());
+    pos = 0; 
   }
   
   
@@ -79,13 +81,36 @@ struct VariableOrder
 	var_order[pos].uncheckedAssign(assign_val);
 	maybe_print_search_assignment(stateObj, var_order[pos], assign_val, true);
 	branches.push_back(pos);
+    first_unassigned_variable.push_back(pos);
+  }
+  
+  int get_current_pos()
+  { return pos; }
+  
+  void force_branch_left(int new_pos)
+  {
+    D_ASSERT(new_pos >= 0 && new_pos < var_order.size()); 
+	D_ASSERT(!var_order[new_pos].isAssigned()) 
+	DomainInt assign_val;
+	if(val_order[new_pos])
+	  assign_val = var_order[new_pos].getMin();
+	else
+	  assign_val = var_order[new_pos].getMax();
+	var_order[new_pos].uncheckedAssign(assign_val);
+	maybe_print_search_assignment(stateObj, var_order[new_pos], assign_val, true);
+	branches.push_back(new_pos);
+    // The first unassigned variable could still be much earlier.
+    first_unassigned_variable.push_back(pos);
   }
   
   void branch_right()
   {  
-	 pos = branches.back();
-	 branches.pop_back();
+	 int other_branch = branches.back();
+     pos = first_unassigned_variable.back();
 	 
+     branches.pop_back();
+     first_unassigned_variable.pop_back();
+    
 	 if(val_order[pos])
 	 {
 	   D_ASSERT(var_order[pos].getMax() >= var_order[pos].getMin() + 1);

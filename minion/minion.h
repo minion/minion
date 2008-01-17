@@ -139,6 +139,7 @@ class DynamicTrigger;
 
 #include "search/standard_search.h"
 #include "search/recursive_search.h"
+#include "search/conflict_search.h"
 
 #include "search/search_control.h"
 

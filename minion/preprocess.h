@@ -118,7 +118,8 @@ enum VarOrder
   ORDER_STATIC,
   ORDER_SDF,
   ORDER_LDF,
-  ORDER_ORIGINAL
+  ORDER_ORIGINAL,
+  ORDER_CONFLICT
 };
 
 struct MinionArguments

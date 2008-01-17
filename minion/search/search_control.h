@@ -57,7 +57,17 @@
 		catch(...)
 		{ }
 	  }
-		break;
+        break;
+      case ORDER_CONFLICT:
+      {
+        Controller::VariableOrder<VarType, Controller::StaticBranch>
+		order(stateObj, search_order.first, search_order.second);
+		try
+		{ Controller::conflict_solve_loop(stateObj, order, search_order.first, prop); }
+		catch(...)
+		{ }
+      }
+        break;
 	  default:
 		FAIL_EXIT();
 	} 

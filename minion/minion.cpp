@@ -217,6 +217,8 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
 	  }
 	  else if(order == "random")
 		getOptions(stateObj).randomise_valvarorder = true;
+      else if(order == "conflict")
+        args.order = ORDER_CONFLICT;
 	  else
 	  {
 		cerr << "I do not understand the order:" << order << endl;

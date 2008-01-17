@@ -387,9 +387,15 @@ Var MinionThreeInputReader::readIdentifier(InputFileReader* infile) {
     int i = infile->read_num();
 	return Var(VAR_CONSTANT, i);
   }
+  bool negVar = false;
+  // Check to see if this is a negated Boolean
+  if(infile->peek_char() == '!')
+  {
+    negVar = true;
+    infile->get_char();
+  }
   
   string name = infile->get_string();
-  
   Var var = instance.vars.getSymbol(name);
   if(var.type == VAR_MATRIX)
   {
@@ -407,6 +413,15 @@ Var MinionThreeInputReader::readIdentifier(InputFileReader* infile) {
     name += to_string(params);
     var = instance.vars.getSymbol(name);
   }
+  
+  if(negVar)
+  {
+    if(var.type != VAR_BOOL)
+      parser_info("Only Booleans can be negated!");
+    else
+      var.type = VAR_NOTBOOL;
+  }
+  
   parser_info("Read variable '" + name + "', internally: " + to_string(var));
   return var;
 }
@@ -416,7 +431,7 @@ Var MinionThreeInputReader::readIdentifier(InputFileReader* infile) {
 // This function reads an identifier which might be a single variable,
 // which includes a fully derefenced matrix, or might be a partially or
 // not-at-all dereferenced matrix. It could also just be a number!
-// The code shares a lot with readIndentifier, and at some point the two
+// The code shares a lot with readIdentifier, and at some point the two
 // should probably merge
 vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader* infile) {
   char idChar = infile->peek_char();
@@ -428,9 +443,18 @@ vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader
     return returnVec;
   }
   
+  bool negVar = false;
+  // Check to see if this is a negated Boolean
+  if(infile->peek_char() == '!')
+  {
+    negVar = true;
+    infile->get_char();
+  }
+  
   string name = infile->get_string();
   
   Var var = instance.vars.getSymbol(name);
+  
   if(var.type == VAR_MATRIX)
   {
     vector<int> params;
@@ -441,11 +465,19 @@ vector<Var> MinionThreeInputReader::readPossibleMatrixIdentifier(InputFileReader
       vector<int> maxterms = instance.vars.getMatrixSymbol(name);
       params = vector<int>(maxterms.size(), -999);
     }
+    throw parse_exception("Sorry, can't negate a matrix");
     returnVec = instance.vars.buildVarList(name, params);
     parser_info("Got matrix:" + to_string(returnVec));
   }
   else
   { 
+    if(negVar)
+    {
+      if(var.type != VAR_BOOL)
+        parser_info("Only Booleans can be negated!");
+      else
+        var.type = VAR_NOTBOOL;
+    }
     returnVec.push_back(var);
   }
   parser_info("Read variable '" + name + "', internally: " + to_string(var));
@@ -491,6 +523,56 @@ vector<Var> MinionThreeInputReader::readLiteralVector(InputFileReader* infile) {
   return newVector;
 }
 
+
+/// Reads a 1D or 2D matrix of variables.
+
+
+
+// This function allows a number of special cases:
+// 1) If only a 1-D matrix is given, it is mapped to a 2-D matrix with only one row
+// 2) If a n-D matrix is given mid-row, it is flattened.
+// 3) If an n-D matrix is given not in a row, then if it 1-D or 2-D, it is placed inline.
+//    Higher dimensions are an error.
+vector<vector<Var> > MinionThreeInputReader::readLiteralMatrix(InputFileReader* infile) {
+  vector<vector<Var> > newVector;
+  
+  infile->check_sym('[');
+
+  string name = infile->get_string();
+  Var var = instance.vars.getSymbol(name);
+  // Check it is a matrix
+  if(var.type != VAR_MATRIX)
+    throw parse_exception("Expected matrix");
+  // Check it is 1 or 2d.
+  vector<int> indices = instance.vars.getMatrixSymbol(name);
+  if(indices.size() != 1 && indices.size() != 2)
+    throw parse_exception("Only support 1 or 2D matrices here.");
+  // Make sure the matrix doesn't have an index after it. This is to produce better error messages.
+  if(infile->peek_char() != ',')
+     throw parse_exception("Only accept raw matrix names here, expected ',' next.");
+
+  if(indices.size() == 1)
+  {
+    vector<int> terms;
+    terms.push_back(-999);
+    // Use the existing code to flatten a matrix.
+    // make_vec takes a T and turns it into a 1 element vector<T>.
+    return make_vec(instance.vars.buildVarList(name, terms));
+  }
+  else
+  {
+    vector<vector<Var> > terms;
+    for(int i = 0; i < indices[0]; ++i)
+    {
+      vector<Var> row;
+      for(int j = 0; j < indices[1]; ++j)
+        row.push_back(instance.vars.getSymbol(name+"["+to_string(i)+","+to_string(j)+"]"));
+      terms.push_back(row);
+    }
+    infile->check_sym(']');
+    return terms;
+  }
+}
 // Note: allowNulls maps '_' to -999 (a horrible hack I know).
 // That last parameter defaults to false.
 // The start and end default to '[' and ']'
@@ -546,7 +628,7 @@ vector<int> MinionThreeInputReader::readRange(InputFileReader* infile)
 }
 
 
-
+/// Read a list of tuples
 void MinionThreeInputReader::readTuples(InputFileReader* infile)
 {
   while(infile->peek_char() != '*')
@@ -671,11 +753,13 @@ void MinionThreeInputReader::readVars(InputFileReader* infile) {
     string var_type = infile->get_string();
 
     if(var_type != "BOOL" && var_type != "BOUND" && var_type != "SPARSEBOUND"
-       && var_type != "DISCRETE")
+       && var_type != "DISCRETE" && var_type != "ALIAS")
       throw parse_exception(string("Unknown variable type: '") + var_type + "'");
 
     string varname = infile->get_string();
     parser_info("Name:" + varname);
+    
+    // XXX
       
     bool isArray = false;
     vector<int> indices;
