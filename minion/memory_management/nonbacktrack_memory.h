@@ -82,7 +82,7 @@ struct MemoryBlock
   
   void removeFromTracker(MemOffset* bto)
   {
-    D_ASSERT(!lock_m || Controller::finished);
+    D_ASSERT(!lock_m || state->isFinished());
     offsets.erase(bto);
   }
   
@@ -110,7 +110,7 @@ struct MemoryBlock
   
   void removeFromVirtualTracker(VirtualMemOffset* bto)
   {
-    if(!final_lock_m || Controller::finished)
+    if(!final_lock_m || state->isFinished())
 	{ virtual_ptrs.erase(bto); }
   }
   

@@ -27,31 +27,11 @@
 
 VARDEF_ASSIGN(clock_t time_limit, 0);
 
-VARDEF(unsigned long long nodes);
 
 
 namespace Controller
 {
-
-  VARDEF_ASSIGN(AnyVarRef* optimise_var, NULL);
-  VARDEF(DomainInt current_optimise_position);
-  VARDEF_ASSIGN(BOOL optimise, false);
-
-  VARDEF(vector<Constraint*> constraints);
-#ifdef DYNAMICTRIGGERS
-  VARDEF(vector<DynamicConstraint*> dynamic_constraints);
-#endif
-  VARDEF(int solutions);
   VARDEF(vector<vector<AnyVarRef> > print_matrix);
-  VARDEF_ASSIGN(BOOL print_only_solution, false);
-  VARDEF_ASSIGN(BOOL commandlineoption_dumptree, false);
-  VARDEF_ASSIGN(int commandlineoption_sollimit, -1);
-  VARDEF_ASSIGN(BOOL commandlineoption_fullpropagate, false);
-  VARDEF_ASSIGN(BOOL commandlineoption_nocheck, false);
-  VARDEF_ASSIGN(unsigned long long commandlineoption_nodelimit, 0);
-  
-  VARDEF_ASSIGN(BOOL commandlineoption_tableout, false);
-  
   // Forward decleration.
   inline BOOL are_queues_empty();
   

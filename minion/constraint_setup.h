@@ -17,15 +17,7 @@
 
 namespace Controller
 {
-  
-  inline void add_constraint(Constraint* c)
-{ constraints.push_back(c); }
-  
-#ifdef DYNAMICTRIGGERS
-  inline void add_constraint(DynamicConstraint* c)
-{ dynamic_constraints.push_back(c); }
-#endif
-  
+    
 /// Lists all structures that must be locked before search.
 // @todo This could be done more neatly... 
   void lock();

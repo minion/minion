@@ -32,7 +32,7 @@
 template<typename T>
 void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal)
 {
-    if(commandlineoption_dumptree)
+    if(options->dumptree)
         cout << "SearchAssign:" << var << (equal?" = ":" != ") << val << endl;
 }
 

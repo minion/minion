@@ -230,7 +230,7 @@ struct GACTableConstraint : public DynamicConstraint
 	  vars[i].setMin(dom_min);
 	  vars[i].setMax(dom_max - 1);
 	  
-	  if(Controller::failed) return;
+	  if(state->isFailed()) return;
 	  
 	  for(int x = vars[i].getMin(); x <= vars[i].getMax(); ++x)
 	  {

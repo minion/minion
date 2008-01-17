@@ -21,17 +21,17 @@ void lock()
   boolean_container.lock(); 
   boundvar_container.lock();
 #ifdef DYNAMICTRIGGERS
-  int dynamic_size = dynamic_constraints.size();
+  int dynamic_size = state->getDynamicConstraintList().size();
   for(int i = 0; i < dynamic_size; ++i)
-	dynamic_constraints[i]->setup();
+	state->getDynamicConstraintList()[i]->setup();
 #endif
   backtrackable_memory.lock();
   memory_block.lock();
   atexit(Controller::finish);
   
-  int size = constraints.size();
+  int size = state->getConstraintList().size();
   for(int i = 0 ; i < size;i++)
-	constraints[i]->setup();
+	state->getConstraintList()[i]->setup();
   
   TriggerSpace::finaliseTriggerLists();
   
@@ -40,10 +40,10 @@ void lock()
   
   bool prop_to_do = true;
 #ifdef USE_SETJMP
-  int setjmp_return = SYSTEM_SETJMP(g_env);
+  int setjmp_return = SYSTEM_SETJMP(*(state->getJmpBufPtr()));
   if(setjmp_return != 0)
   {
-	Controller::failed = true;
+	state->setFailed(true);
 	clear_queues();
 	return;
   }
@@ -56,8 +56,8 @@ void lock()
 	// To propagate the first node.
 	for(int i = 0; i < size; ++i)
 	{
-	  constraints[i]->full_propagate();
-	  if(Controller::failed) 
+	  state->getConstraintList()[i]->full_propagate();
+	  if(state->isFailed()) 
 		return;
 	  // If queues not empty, more work to do.
 	  if(!are_queues_empty())
@@ -71,9 +71,9 @@ void lock()
 #ifdef DYNAMICTRIGGERS
   for(int i = 0; i < dynamic_size; ++i)
   {
-	dynamic_constraints[i]->full_propagate();
+	state->getDynamicConstraintList()[i]->full_propagate();
 	propagate_queue();
-	if(Controller::failed) 
+	if(state->isFailed()) 
 	  return;
   }
 #endif

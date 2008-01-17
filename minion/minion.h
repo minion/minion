@@ -109,7 +109,6 @@ struct DynamicTrigger;
 #include "constraints/constraint.h"
 
 #ifdef DYNAMICTRIGGERS
-VARDEF_ASSIGN(BOOL dynamic_triggers_used, false);
 #include "constraints/constraint_dynamic.h"
 #endif 
 

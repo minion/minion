@@ -27,8 +27,8 @@ namespace Controller
 	  
 	  while(true)
 	  {
-		nodes++;
-		if(nodes == commandlineoption_nodelimit)
+		state->incrementNodeCount();
+		if(state->getNodeCount() == options->nodelimit)
 		  return;
 	
 		if(do_checks())
@@ -44,7 +44,7 @@ namespace Controller
 		  deal_with_solution();
 
 		  // fail here to force backtracking.
-		  failed = true;
+		  state->setFailed(true);
 		}
 		else
 		{
@@ -55,9 +55,9 @@ namespace Controller
 		}
 		
 		// Either search failed, or a solution was found.
-		while(failed)
+		while(state->isFailed())
 		{
-		  failed = false;
+		  state->setFailed(false);
 		  
 		  if(order.finished_search())
 			return;

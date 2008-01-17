@@ -11,8 +11,8 @@ bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop, bool chec
   var.propagateAssign(val);
   prop(vars, checkBounds);
   
-  bool check_failed = Controller::failed;
-  Controller::failed = false;
+  bool check_failed = state->isFailed();
+  state->setFailed(false);
   
   Controller::world_pop();
   
@@ -23,7 +23,7 @@ template <typename Var, typename Prop>
 void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool checkBounds)
 {
   Controller::propagate_queue();
-  if(Controller::failed)
+  if(state->isFailed())
 	return;
   
   bool reduced = true;
@@ -40,7 +40,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool checkBounds)
           reduced = true;
           var.setMax(var.getMax() - 1);
           prop(vararray, checkBounds);
-          if(Controller::failed)
+          if(state->isFailed())
             return;
         }
         
@@ -49,7 +49,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool checkBounds)
           reduced = true;
           var.setMin(var.getMin() + 1);
           prop(vararray, checkBounds);
-          if(Controller::failed)
+          if(state->isFailed())
             return;
         }
       }
@@ -62,7 +62,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool checkBounds)
             reduced = true;
             var.removeFromDomain(val);
             prop(vararray, checkBounds);
-            if(Controller::failed)
+            if(state->isFailed())
               return;          
           }
         }

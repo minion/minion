@@ -90,7 +90,7 @@ namespace Controller
   
   inline BOOL propagate_dynamic_trigger_lists()
   {
-	BOOL* fail_ptr = &Controller::failed;
+	bool* fail_ptr = state->getFailedPtr();
 	while(!dynamic_trigger_list.empty())
 	{
 	  DynamicTrigger* t = dynamic_trigger_list.back();
@@ -119,7 +119,7 @@ namespace Controller
   
   inline BOOL propagate_static_trigger_lists()
   {
-	BOOL* fail_ptr = &Controller::failed;
+	bool* fail_ptr = state->getFailedPtr();
 	while(!propagate_trigger_list.empty())
 	{
 	  pair<Trigger,short> t = propagate_trigger_list.back();
@@ -133,7 +133,7 @@ namespace Controller
 #endif
 		
 #ifdef MORE_SEARCH_INFO
-		if(commandlineoption_fullpropagate)
+		if(options->fullpropagate)
 		  t.first.full_propagate();
 		else
 		  t.first.propagate(t.second);
@@ -151,11 +151,11 @@ namespace Controller
   {
     D_INFO(2, DI_QUEUE, "Starting Propagation");
 #ifdef USE_SETJMP
-    int setjmp_return = _setjmp(g_env);
+    int setjmp_return = _setjmp(*(state->getJmpBufPtr()));
 	if(setjmp_return != 0)
 	{ // Failure has occured
-	  D_ASSERT(!Controller::failed);
-	  Controller::failed = true;
+	  D_ASSERT(!state->isFailed());
+	  state->setFailed(true);
 	  clear_queues();
 	  return;
 	}
@@ -164,7 +164,7 @@ namespace Controller
 	while(true)
 	{
 #ifdef DYNAMICTRIGGERS
-	  if (dynamic_triggers_used) 
+	  if (state->isDynamicTriggersUsed()) 
 	  {
 		while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
 		{

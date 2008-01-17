@@ -158,7 +158,7 @@ struct BacktrackableMemory
   /// Is done in BackTrackOffset's destructor.
   void removeFromTracker(BackTrackOffset* bto)
   {
-    if(Controller::finished)
+    if(state->isFinished())
       return;
     D_ASSERT(!lock_m);
     //D_DATA(char* old_ptr = static_cast<char*>(bto->ptr));

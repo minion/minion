@@ -73,7 +73,7 @@ struct ModConstraint : public Constraint
         // While no support for upperbound, reduce upperbound
         var1.setMax(var1val-1);
         var1val=var1.getMax();
-        if(Controller::failed) return;  // Does not work with setjmp!
+        if(state->isFailed()) return;  // Does not work with setjmp!
     }
     
     var1val=var1.getMin();
@@ -81,7 +81,7 @@ struct ModConstraint : public Constraint
     {
         var1.setMin(var1val+1);
         var1val=var1.getMin();
-        if(Controller::failed) return;
+        if(state->isFailed()) return;
     }
     
     DomainInt var2val=var2.getMax();
@@ -90,7 +90,7 @@ struct ModConstraint : public Constraint
         // While no support for upperbound, reduce upperbound
         var2.setMax(var2val-1);  // Is this the right function for pruning the upperbound?
         var2val=var2.getMax();
-        if(Controller::failed) return;  // Does not work with setjmp!
+        if(state->isFailed()) return;  // Does not work with setjmp!
     }
     
     var2val=var2.getMin();
@@ -98,7 +98,7 @@ struct ModConstraint : public Constraint
     {
         var2.setMin(var2val+1);
         var2val=var2.getMin();
-        if(Controller::failed) return;
+        if(state->isFailed()) return;
     }
     
     DomainInt var3val=var3.getMax();
@@ -107,7 +107,7 @@ struct ModConstraint : public Constraint
         // While no support for upperbound, reduce upperbound
         var3.setMax(var3val-1);  // Is this the right function for pruning the upperbound?
         var3val=var3.getMax();
-        if(Controller::failed) return;  // Does not work with setjmp!
+        if(state->isFailed()) return;  // Does not work with setjmp!
     }
     
     var3val=var3.getMin();
@@ -115,7 +115,7 @@ struct ModConstraint : public Constraint
     {
         var3.setMin(var3val+1);
         var3val=var3.getMin();
-        if(Controller::failed) return;
+        if(state->isFailed()) return;
     }
     
   }

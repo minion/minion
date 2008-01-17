@@ -206,14 +206,14 @@ struct BigRangeVarContainer {
   DomainInt getMin(BigRangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     return lower_bound(d);
   }
   
   DomainInt getMax(BigRangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     return upper_bound(d);
   }
   
@@ -234,7 +234,7 @@ struct BigRangeVarContainer {
     bms_array.print_state();
 #endif
     D_ASSERT(lock_m);
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     if(!inDomain(d,i)) 
     {
 #ifdef DEBUG
@@ -266,7 +266,7 @@ struct BigRangeVarContainer {
     
     if(upper_bound(d) == lower_bound(d))
       trigger_list.push_assign(d.var_num, getAssignedValue(d));
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
 #ifdef DEBUG
     cout << "Exiting removeFromDomain: " << d.var_num << " " << i << " [" 
@@ -280,7 +280,7 @@ struct BigRangeVarContainer {
   
   void propagateAssign(BigRangeVarRef_internal d, DomainInt offset)
   {
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     if(!inDomain(d,offset))
 	  {Controller::fail(); return;}
 	DomainInt lower = lower_bound(d);
@@ -333,7 +333,7 @@ private:
       trigger_list.push_upper(d.var_num, up_bound - offset);
       upper_bound(d) = offset;
     }
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
   }    
 public:
 
@@ -348,7 +348,7 @@ public:
     bms_array.print_state();
 #endif
 
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     DomainInt up_bound = upper_bound(d);
     DomainInt low_bound = lower_bound(d);
 	
@@ -380,7 +380,7 @@ public:
       if(lower_bound(d) == upper_bound(d)) 
         trigger_list.push_assign(d.var_num, getAssignedValue(d));
     }
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 #ifdef DEBUG
     cout << "Exiting setMax: " << d.var_num << " " << upper_bound(d) << " [" 
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
@@ -399,7 +399,7 @@ public:
          << endl;
     bms_array.print_state();
 #endif
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
 	DomainInt up_bound = upper_bound(d);
     DomainInt low_bound = lower_bound(d);
@@ -422,7 +422,7 @@ public:
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
     lower_bound(d) = offset;
     DomainInt new_lower = find_new_lower_bound(d);    
@@ -433,7 +433,7 @@ public:
     if(lower_bound(d) == upper_bound(d)) 
       trigger_list.push_assign(d.var_num, getAssignedValue(d)); 
     }
-    D_ASSERT(Controller::failed || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(state->isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 #ifdef DEBUG
     cout << "Exiting setMin: " << d.var_num << " " << lower_bound(d) << " [" 
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["

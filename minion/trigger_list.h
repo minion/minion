@@ -203,10 +203,10 @@ public:
   void push_upper(int var_num, DomainInt upper_delta)
   {
 #ifdef DYNAMICTRIGGERS
-    if (dynamic_triggers_used) dynamic_propagate(var_num, UpperBound);
+    if (state->isDynamicTriggersUsed()) dynamic_propagate(var_num, UpperBound);
 #endif
 	D_ASSERT(lock_second);
-    D_ASSERT(upper_delta > 0 || Controller::failed);
+    D_ASSERT(upper_delta > 0 || state->isFailed());
 	
 #ifdef SLOW_TRIGGERS
 	slow_trigger_push(var_num, UpperBound, upper_delta);
@@ -221,10 +221,10 @@ public:
   void push_lower(int var_num, DomainInt lower_delta)
   { 
 #ifdef DYNAMICTRIGGERS
-    if (dynamic_triggers_used) dynamic_propagate(var_num, LowerBound);
+    if (state->isDynamicTriggersUsed()) dynamic_propagate(var_num, LowerBound);
 #endif
 	D_ASSERT(lock_second);
-	D_ASSERT(lower_delta > 0 || Controller::failed);
+	D_ASSERT(lower_delta > 0 || state->isFailed());
 #ifdef SLOW_TRIGGERS
 	slow_trigger_push(var_num, LowerBound, lower_delta);
 #else
@@ -239,7 +239,7 @@ public:
   void push_assign(int var_num, DomainInt)
   { 
 #ifdef DYNAMICTRIGGERS
-    if (dynamic_triggers_used) dynamic_propagate(var_num, Assigned);
+    if (state->isDynamicTriggersUsed()) dynamic_propagate(var_num, Assigned);
 #endif
     D_ASSERT(lock_second);
 
@@ -255,7 +255,7 @@ public:
   void push_domain(int var_num)
   { 
 #ifdef DYNAMICTRIGGERS
-    if (dynamic_triggers_used) dynamic_propagate(var_num, DomainChanged);
+    if (state->isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);
 #endif
 	
 #ifdef SLOW_TRIGGERS

@@ -35,8 +35,8 @@ namespace Controller
 	void optimise_maximise_var(VarRef var)
   {
 	  _find_one_sol = false;
-	  optimise_var = new AnyVarRef(var);
-	  optimise = true;
+	  state->setOptimiseVar(new AnyVarRef(var));
+	  state->setOptimisationProblem(true);
   }
   
   /// Sets optimisation variable.
@@ -44,8 +44,8 @@ namespace Controller
 	void optimise_minimise_var(VarRef var)
   {
 	  _find_one_sol = false;
-	  optimise_var = new AnyVarRef(VarNeg<VarRef>(var));
-	  optimise = true;
+	  state->setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
+	  state->setOptimisationProblem(true);
   }
   
   /// Ensures a particular constraint is satisfied by the solution.
@@ -90,14 +90,14 @@ namespace Controller
   {
     if(_solution_check != NULL)
 	  _solution_check();
-	++solutions;
+	state->incrementSolutionCount();
 	if(print_solution)
 	{
 	  if(!print_matrix.empty())
 	  {
 		for(unsigned i = 0; i < print_matrix.size(); ++i)
 		{
-	          if (!Controller::print_only_solution) cout << "Sol: ";  
+	          if (!options->print_only_solution) cout << "Sol: ";  
 		  for(unsigned j = 0; j < print_matrix[i].size(); ++j)
 		  {
 			if(!print_matrix[i][j].isAssigned())
@@ -108,25 +108,25 @@ namespace Controller
 		  }
 		  cout << endl;
 		}
-		if (!Controller::print_only_solution) cout << endl;
+		if (!options->print_only_solution) cout << endl;
 	  }
   
 	  // TODO : Make this more easily changable.
-          if (!Controller::print_only_solution) 
+          if (!options->print_only_solution) 
           {
-	    cout << "Solution Number: " << solutions << endl;
+	    cout << "Solution Number: " << state->getSolutionCount() << endl;
 	    print_timestep_without_reset("Time:");
-	    cout << "Nodes: " << nodes << endl << endl;
+	    cout << "Nodes: " << state->getNodeCount() << endl << endl;
           }
     }
 #ifndef NO_DEBUG
-  if(!commandlineoption_nocheck)
+  if(!options->nocheck)
   {
-    for(unsigned i = 0; i < dynamic_constraints.size(); ++i)
-      check_constraint(dynamic_constraints[i]);
+    for(unsigned i = 0; i < state->getDynamicConstraintList().size(); ++i)
+      check_constraint(state->getDynamicConstraintList()[i]);
   
-    for(unsigned i = 0 ; i < constraints.size();i++)
-      check_constraint(constraints[i]);
+    for(unsigned i = 0 ; i < state->getConstraintList().size();i++)
+      check_constraint(state->getConstraintList()[i]);
   }
 #endif
   }
@@ -135,7 +135,7 @@ namespace Controller
   /// Check if timelimit has been exceeded.
   inline BOOL do_checks()
   {
-  	if((nodes & 1023) == 0)
+  	if((state->getNodeCount() & 1023) == 0)
 	{
 	  if(time_limit != 0)
 	  {
@@ -154,22 +154,22 @@ namespace Controller
 template<typename T>
 void inline maybe_print_search_state(char* name, T& vars)
 {
-  if(commandlineoption_dumptree)
-	cout << name << nodes << "," << get_dom_as_string(vars) << endl;
+  if(options->dumptree)
+	cout << name << state->getNodeCount() << "," << get_dom_as_string(vars) << endl;
 }
 
 void inline maybe_print_search_action(char* action)
 {
     // used to print "bt" usually
-    if(commandlineoption_dumptree)
+    if(options->dumptree)
         cout << "SearchAction:" << action << endl;
 }
 
   void inline deal_with_solution()
   {
-	if(optimise)
+	if(state->isOptimisationProblem())
 	{
-	  if(!optimise_var->isAssigned())
+	  if(!state->getOptimiseVar()->isAssigned())
 	  {
 		cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
 		cerr << "Put it in the variable ordering?" << endl;
@@ -177,25 +177,25 @@ void inline maybe_print_search_action(char* action)
 	  }
 	  
 	  cout << "Solution found with Value: " 
-	  << optimise_var->getAssignedValue() << endl;
+	  << state->getOptimiseVar()->getAssignedValue() << endl;
 	  
-	  current_optimise_position = optimise_var->getAssignedValue() + 1;			
+	  state->setOptimiseValue(state->getOptimiseVar()->getAssignedValue() + 1);			
 	}
-	if(_find_one_sol || solutions == commandlineoption_sollimit)
+	if(_find_one_sol || state->getSolutionCount() == options->sollimit)
 	  throw 0;
   }
 
   void inline set_optimise_and_propagate_queue()
   {
   #ifdef USE_SETJMP
-	if(optimise)
+	if(state->isOptimisationProblem())
 	{
 	  // Must check if this setMin will fail before doing it, else
 	  // The setjmp will throw us off. It's cheaper to check than set up
 	  // a new setjmp point here.
-	  if(optimise_var->getMax() >= current_optimise_position)
+	  if(state->getOptimiseVar()->getMax() >= state->getOptimiseVar())
 	  { 
-		optimise_var->setMin(current_optimise_position);
+		state->getOptimiseVar()->setMin(state->getOptimiseVar());
 		propagate_queue();
 	  }
 	  else
@@ -204,23 +204,23 @@ void inline maybe_print_search_action(char* action)
 	else
 	{ propagate_queue();}
   #else
-	if(optimise)
-	  optimise_var->setMin(current_optimise_position);
+	if(state->isOptimisationProblem())
+	  state->getOptimiseVar()->setMin(state->getOptimiseValue());
 	propagate_queue();
   #endif	
   }
 
   void inline initalise_search()
   {
-	solutions = 0;  
-	nodes = 0;
+	state->setSolutionCount(0);  
+	state->setNodeCount(0);
 	lock();
 	print_timestep_without_reset("First Node Time: ");
 	/// Failed initially propagating constraints!
-	if(Controller::failed)
+	if(state->isFailed())
 	  return;
-	if(optimise)
-	  current_optimise_position = optimise_var->getMin(); 
+	if(state->isOptimisationProblem())
+	  state->setOptimiseValue(state->getOptimiseVar()->getMin()); 
   }
 }
 

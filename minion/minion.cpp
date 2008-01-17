@@ -118,7 +118,7 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
 	else if(command == string("-noprintsols"))
 	{ Controller::print_solution = false; }
 	else if(command == string("-printsolsonly"))
-	{ Controller::print_only_solution = true; }
+	{ options->print_only_solution = true; }
 	else if(command == string("-verbose"))
 	{ reader.parser_verbose = true; }
 	else if(command == string("-sac-root"))
@@ -133,7 +133,7 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
 	else if(command == string("-fullprop"))
 	{
 #ifndef NO_DEBUG
-	  Controller::commandlineoption_fullpropagate = true; 
+	  options->fullpropagate = true; 
 #else
 	  cout << "This version of minion was not built to support the '-fullprop' command. Sorry" << endl;
 	  FAIL_EXIT();
@@ -142,7 +142,7 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
 	else if(command == string("-nocheck"))
 	{
 #ifndef NO_DEBUG
-	  Controller::commandlineoption_nocheck = true; 
+	  options->nocheck = true; 
 #else
 	  cout << "# WARNING: This version of minion was not built to support the '-nocheck' command." << endl;
 	  cout << "# WARNING: Solutions will not be checked in this version." << endl;
@@ -152,15 +152,15 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
 	
 	else if(command == string("-dumptree"))
 	{
-	  Controller::commandlineoption_dumptree = true; 
+	  options->dumptree = true; 
 	}
 	else if(command == string("-crash"))
 	{ debug_crash = true; }
 	else if(command == string("-nodelimit"))
 	{
 	  ++i;
-	  Controller::commandlineoption_nodelimit = atoi(argv[i]);
-	  if(Controller::commandlineoption_nodelimit == 0)
+	  options->nodelimit = atoi(argv[i]);
+	  if(options->nodelimit == 0)
 	  {
 		cout << "Did not understand parameter to nodelimit:" << argv[i] << endl;
 		FAIL_EXIT();
@@ -169,9 +169,9 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
 	else if(command == string("-sollimit"))
 	{
 	  ++i;
-	  Controller::commandlineoption_sollimit = atoi(argv[i]);
+	  options->sollimit = atoi(argv[i]);
 	  Controller::find_all_solutions(); 
-	  if(Controller::commandlineoption_sollimit == 0)
+	  if(options->sollimit == 0)
 	  {
 	    cout << "Did not understand the parameter to sollimit:" << argv[i] << endl;
 		FAIL_EXIT();
@@ -229,7 +229,7 @@ void parse_command_line(Reader& reader, MinionArguments& args, int argc, char** 
 	}
     else if(command == string("-tableout"))
     {
-        Controller::commandlineoption_tableout=true;
+        options->tableout=true;
         ++i;
         tableout.set_filename(argv[i]);
     }
@@ -290,8 +290,8 @@ void BuildCSP(Reader& reader)
     if(it->is_dynamic())
     {
 #ifdef DYNAMICTRIGGERS
-      Controller::add_constraint(build_dynamic_constraint(*it));
-      dynamic_triggers_used = true;
+      state->addDynamicConstraint(build_dynamic_constraint(*it));
+      state->setDynamicTriggersUsed(true);
 #else
       cout << "Sorry, cannot process this constraint as it needs dynamic triggers or watched literals." << endl ;
       cout << "use an alternative encoding or recompile with -DWATCHEDLITERALS or -DDYNAMICTRIGGERS in command line" << endl;
@@ -299,7 +299,7 @@ void BuildCSP(Reader& reader)
 #endif
     }
     else
-      Controller::add_constraint(build_constraint(*it));
+      state->addConstraint(build_constraint(*it));
   }
 
 
@@ -321,7 +321,7 @@ void SolveCSP(Reader& reader, MinionArguments args)
     // should be one for varorder as well.
     tableout.set("MinionVersion", SVN_VER);
     tableout.set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-    maybe_print_timestep_store("Parsing Time: ", "ParsingTime", tableout, !Controller::print_only_solution);
+    maybe_print_timestep_store("Parsing Time: ", "ParsingTime", tableout, !options->print_only_solution);
     
     BuildCSP(reader);
     
@@ -352,7 +352,7 @@ void SolveCSP(Reader& reader, MinionArguments args)
         }
     }
   // Solve!
-  maybe_print_timestep_store("Setup Time: ", "SetupTime", tableout, !Controller::print_only_solution);
+  maybe_print_timestep_store("Setup Time: ", "SetupTime", tableout, !options->print_only_solution);
   
   long long initial_lit_count = 0;
   
@@ -361,7 +361,7 @@ void SolveCSP(Reader& reader, MinionArguments args)
   
   Controller::initalise_search();
   
-  if(!Controller::failed)
+  if(!state->isFailed())
   {
 	if(args.preprocess != MinionArguments::None)
 	{
@@ -384,26 +384,26 @@ void SolveCSP(Reader& reader, MinionArguments args)
 		cout << "Removed " << (lits - lit_count(var_val_order.first)) << " literals" << endl;
 	  }
 	}
-    maybe_print_timestep_store("First node time: ", "FirstNodeTime", tableout, !Controller::print_only_solution);
-	if(!Controller::failed)
+    maybe_print_timestep_store("First node time: ", "FirstNodeTime", tableout, !options->print_only_solution);
+	if(!state->isFailed())
         solve(args.order, var_val_order);   // add a maybe_print_timestep_store to search..
   }
   else
   {
-      maybe_print_timestep_store("First node time: ", "FirstNodeTime", tableout, !Controller::print_only_solution);
+      maybe_print_timestep_store("First node time: ", "FirstNodeTime", tableout, !options->print_only_solution);
   }
   
-  maybe_print_finaltimestep_store("Solve Time: ", "SolveTime", tableout, !Controller::print_only_solution);
-  cout << "Total Nodes: " << nodes << endl;
+  maybe_print_finaltimestep_store("Solve Time: ", "SolveTime", tableout, !options->print_only_solution);
+  cout << "Total Nodes: " << state->getNodeCount() << endl;
   cout << "Problem solvable?: " 
-	<< (Controller::solutions == 0 ? "no" : "yes") << endl;
-  cout << "Solutions Found: " << Controller::solutions << endl;
+	<< (state->getSolutionCount() == 0 ? "no" : "yes") << endl;
+  cout << "Solutions Found: " << state->getSolutionCount() << endl;
   
-  tableout.set("Nodes", to_string(nodes));
-  tableout.set("Satisfiable", (Controller::solutions==0 ? 0 : 1));
-  tableout.set("SolutionsFound", Controller::solutions);
+  tableout.set("Nodes", to_string(state->getNodeCount()));
+  tableout.set("Satisfiable", (state->getSolutionCount()==0 ? 0 : 1));
+  tableout.set("SolutionsFound", state->getSolutionCount());
   
-  if(Controller::commandlineoption_tableout)
+  if(options->tableout)
   {
       tableout.print_line();  // Outputs a line to the table file.
   }
@@ -479,6 +479,10 @@ catch(parse_exception& s)
 //Entrance:
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 int main(int argc, char** argv) {
+  
+  state = new SearchState();
+  options = new SearchOptions();
+  
   start_clock();
   
   cout << "# " << VERSION << endl ;
@@ -486,7 +490,7 @@ int main(int argc, char** argv) {
   if (argc == 1)
     print_info();
   
-  if (!Controller::print_only_solution) 
+  if (!options->print_only_solution) 
   { 
     
     cout << "# Svn last changed date: " << SVN_DATE << endl;

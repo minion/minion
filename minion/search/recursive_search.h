@@ -23,8 +23,8 @@ namespace Controller
 	
 	maybe_print_search_state("Node: ", v);
 	
-	nodes++;
-	if(nodes == commandlineoption_nodelimit)
+	state->incrementNodeCount();
+	if(state->getNodeCount() == options->nodelimit)
 	  return;
 	if(do_checks())
 		return;
@@ -44,16 +44,16 @@ namespace Controller
 	world_push();
 	order.branch_left();
 	propagate_queue();
-	if(!failed)
+	if(!state->isFailed())
 	  solve_loop_recursive(order, v);
 	
-	failed = false;
+	state->setFailed(false);
 	
 	world_pop();
 	order.branch_right();
     set_optimise_and_propagate_queue();
 	
-	if(!failed)
+	if(!state->isFailed())
 	  solve_loop_recursive(order, v);
 }
 }
