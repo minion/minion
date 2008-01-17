@@ -9,6 +9,15 @@ string types[3] = { "element", "gacelement", "watchelement" };
 
 int main(int argc, char** argv)
 {
+
+  if(argc < 2) {
+	   cerr << " usage: langford k type  "
+		<< endl
+	        << "\t type: 0: element,  1: gacelement,  2: watchelement"
+	        << endl;  
+	   return 0;
+   }
+  
   int k = atoi(argv[1]);
   int type = atoi(argv[2]);
   
@@ -63,3 +72,4 @@ int main(int argc, char** argv)
     printf("sumgeq([x%d, %d], x%d)\n", k*n + 2*i, i+2, k*n + 2*i + 1);
   }
 }
+
