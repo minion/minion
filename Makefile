@@ -11,7 +11,7 @@ ifdef DEBUG
    DEBUG_FLAGS = -D_GLIBCXX_DEBUG -DNO_PRINT -g -DMORE_SEARCH_INFO
  endif
 else
-  FLAGS := $(FLAGS) -O3 -fomit-frame-pointer -DNO_DEBUG
+  FLAGS := $(FLAGS) -O3 -DNO_DEBUG
 endif
 
 ifdef PROFILE
