@@ -19,4 +19,4 @@ MINION 1
 objective none
 print m0
 
-gacelement([x0,x1,x2],x3,x4)
+gacelement-deprecated([x0,x1,x2],x3,x4)

@@ -70,149 +70,149 @@ eq(x28,4)
 
 eq(x35,5)
 
-gacelement(col(m0,0),x0,x36)
+gacelement-deprecated(col(m0,0),x0,x36)
 
-gacelement(row(m0,0),x0,x36)
+gacelement-deprecated(row(m0,0),x0,x36)
 
-gacelement(col(m0,1),x6,x37)
+gacelement-deprecated(col(m0,1),x6,x37)
 
-gacelement(row(m0,0),x6,x37)
+gacelement-deprecated(row(m0,0),x6,x37)
 
-gacelement(col(m0,2),x12,x38)
+gacelement-deprecated(col(m0,2),x12,x38)
 
-gacelement(row(m0,0),x12,x38)
+gacelement-deprecated(row(m0,0),x12,x38)
 
-gacelement(col(m0,3),x18,x39)
+gacelement-deprecated(col(m0,3),x18,x39)
 
-gacelement(row(m0,0),x18,x39)
+gacelement-deprecated(row(m0,0),x18,x39)
 
-gacelement(col(m0,4),x24,x40)
+gacelement-deprecated(col(m0,4),x24,x40)
 
-gacelement(row(m0,0),x24,x40)
+gacelement-deprecated(row(m0,0),x24,x40)
 
-gacelement(col(m0,5),x30,x41)
+gacelement-deprecated(col(m0,5),x30,x41)
 
-gacelement(row(m0,0),x30,x41)
+gacelement-deprecated(row(m0,0),x30,x41)
 
-gacelement(col(m0,0),x1,x42)
+gacelement-deprecated(col(m0,0),x1,x42)
 
-gacelement(row(m0,1),x1,x42)
+gacelement-deprecated(row(m0,1),x1,x42)
 
-gacelement(col(m0,1),x7,x43)
+gacelement-deprecated(col(m0,1),x7,x43)
 
-gacelement(row(m0,1),x7,x43)
+gacelement-deprecated(row(m0,1),x7,x43)
 
-gacelement(col(m0,2),x13,x44)
+gacelement-deprecated(col(m0,2),x13,x44)
 
-gacelement(row(m0,1),x13,x44)
+gacelement-deprecated(row(m0,1),x13,x44)
 
-gacelement(col(m0,3),x19,x45)
+gacelement-deprecated(col(m0,3),x19,x45)
 
-gacelement(row(m0,1),x19,x45)
+gacelement-deprecated(row(m0,1),x19,x45)
 
-gacelement(col(m0,4),x25,x46)
+gacelement-deprecated(col(m0,4),x25,x46)
 
-gacelement(row(m0,1),x25,x46)
+gacelement-deprecated(row(m0,1),x25,x46)
 
-gacelement(col(m0,5),x31,x47)
+gacelement-deprecated(col(m0,5),x31,x47)
 
-gacelement(row(m0,1),x31,x47)
+gacelement-deprecated(row(m0,1),x31,x47)
 
-gacelement(col(m0,0),x2,x48)
+gacelement-deprecated(col(m0,0),x2,x48)
 
-gacelement(row(m0,2),x2,x48)
+gacelement-deprecated(row(m0,2),x2,x48)
 
-gacelement(col(m0,1),x8,x49)
+gacelement-deprecated(col(m0,1),x8,x49)
 
-gacelement(row(m0,2),x8,x49)
+gacelement-deprecated(row(m0,2),x8,x49)
 
-gacelement(col(m0,2),x14,x50)
+gacelement-deprecated(col(m0,2),x14,x50)
 
-gacelement(row(m0,2),x14,x50)
+gacelement-deprecated(row(m0,2),x14,x50)
 
-gacelement(col(m0,3),x20,x51)
+gacelement-deprecated(col(m0,3),x20,x51)
 
-gacelement(row(m0,2),x20,x51)
+gacelement-deprecated(row(m0,2),x20,x51)
 
-gacelement(col(m0,4),x26,x52)
+gacelement-deprecated(col(m0,4),x26,x52)
 
-gacelement(row(m0,2),x26,x52)
+gacelement-deprecated(row(m0,2),x26,x52)
 
-gacelement(col(m0,5),x32,x53)
+gacelement-deprecated(col(m0,5),x32,x53)
 
-gacelement(row(m0,2),x32,x53)
+gacelement-deprecated(row(m0,2),x32,x53)
 
-gacelement(col(m0,0),x3,x54)
+gacelement-deprecated(col(m0,0),x3,x54)
 
-gacelement(row(m0,3),x3,x54)
+gacelement-deprecated(row(m0,3),x3,x54)
 
-gacelement(col(m0,1),x9,x55)
+gacelement-deprecated(col(m0,1),x9,x55)
 
-gacelement(row(m0,3),x9,x55)
+gacelement-deprecated(row(m0,3),x9,x55)
 
-gacelement(col(m0,2),x15,x56)
+gacelement-deprecated(col(m0,2),x15,x56)
 
-gacelement(row(m0,3),x15,x56)
+gacelement-deprecated(row(m0,3),x15,x56)
 
-gacelement(col(m0,3),x21,x57)
+gacelement-deprecated(col(m0,3),x21,x57)
 
-gacelement(row(m0,3),x21,x57)
+gacelement-deprecated(row(m0,3),x21,x57)
 
-gacelement(col(m0,4),x27,x58)
+gacelement-deprecated(col(m0,4),x27,x58)
 
-gacelement(row(m0,3),x27,x58)
+gacelement-deprecated(row(m0,3),x27,x58)
 
-gacelement(col(m0,5),x33,x59)
+gacelement-deprecated(col(m0,5),x33,x59)
 
-gacelement(row(m0,3),x33,x59)
+gacelement-deprecated(row(m0,3),x33,x59)
 
-gacelement(col(m0,0),x4,x60)
+gacelement-deprecated(col(m0,0),x4,x60)
 
-gacelement(row(m0,4),x4,x60)
+gacelement-deprecated(row(m0,4),x4,x60)
 
-gacelement(col(m0,1),x10,x61)
+gacelement-deprecated(col(m0,1),x10,x61)
 
-gacelement(row(m0,4),x10,x61)
+gacelement-deprecated(row(m0,4),x10,x61)
 
-gacelement(col(m0,2),x16,x62)
+gacelement-deprecated(col(m0,2),x16,x62)
 
-gacelement(row(m0,4),x16,x62)
+gacelement-deprecated(row(m0,4),x16,x62)
 
-gacelement(col(m0,3),x22,x63)
+gacelement-deprecated(col(m0,3),x22,x63)
 
-gacelement(row(m0,4),x22,x63)
+gacelement-deprecated(row(m0,4),x22,x63)
 
-gacelement(col(m0,4),x28,x64)
+gacelement-deprecated(col(m0,4),x28,x64)
 
-gacelement(row(m0,4),x28,x64)
+gacelement-deprecated(row(m0,4),x28,x64)
 
-gacelement(col(m0,5),x34,x65)
+gacelement-deprecated(col(m0,5),x34,x65)
 
-gacelement(row(m0,4),x34,x65)
+gacelement-deprecated(row(m0,4),x34,x65)
 
-gacelement(col(m0,0),x5,x66)
+gacelement-deprecated(col(m0,0),x5,x66)
 
-gacelement(row(m0,5),x5,x66)
+gacelement-deprecated(row(m0,5),x5,x66)
 
-gacelement(col(m0,1),x11,x67)
+gacelement-deprecated(col(m0,1),x11,x67)
 
-gacelement(row(m0,5),x11,x67)
+gacelement-deprecated(row(m0,5),x11,x67)
 
-gacelement(col(m0,2),x17,x68)
+gacelement-deprecated(col(m0,2),x17,x68)
 
-gacelement(row(m0,5),x17,x68)
+gacelement-deprecated(row(m0,5),x17,x68)
 
-gacelement(col(m0,3),x23,x69)
+gacelement-deprecated(col(m0,3),x23,x69)
 
-gacelement(row(m0,5),x23,x69)
+gacelement-deprecated(row(m0,5),x23,x69)
 
-gacelement(col(m0,4),x29,x70)
+gacelement-deprecated(col(m0,4),x29,x70)
 
-gacelement(row(m0,5),x29,x70)
+gacelement-deprecated(row(m0,5),x29,x70)
 
-gacelement(col(m0,5),x35,x71)
+gacelement-deprecated(col(m0,5),x35,x71)
 
-gacelement(row(m0,5),x35,x71)
+gacelement-deprecated(row(m0,5),x35,x71)
 
 ineq(0,x5,2)
 
