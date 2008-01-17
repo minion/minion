@@ -62,18 +62,17 @@ OBJFILES=$(patsubst minion/%.cpp,$(OBJDIR)/%.o,$(SRC))
 
 all: svn_version minion generate
 
-svn_version:
+minion/svn_header.h:
 	mini-scripts/get_svn_version.sh minion/svn_header.h
-
-
-# Special cases
-$(OBJDIR)/minion.o: svn_version
-$(OBJDIR)/help/help.o: help
+minion/help/help.cpp:
+	bash minion/help/genhelp.sh minion/ > minion/help/help.cpp
+	
+$(OBJDIR)/minion.o : minion/svn_header.h
 
 $(OBJDIR)/%.o: minion/%.cpp 
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
-minion: depend help svn_version mkdirectory $(OBJFILES)	
+minion: depend mkdirectory $(OBJFILES)	
 	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES)
 	
 mkdirectory:
@@ -94,8 +93,7 @@ steelmill:
 sports:
 	g++ generators/SportsSchedule/MinionSportsInstanceGenerator.cpp -O2 -o bin/sports $(FULLFLAGS)
 
-help: depend
-	bash minion/help/genhelp.sh minion/ > minion/help/help.cpp
+
 
 lisp-generate: minion-helper minion-sat minion-quasigroup
 
@@ -115,7 +113,8 @@ clean:
 veryclean:
 	rm -rf bin/*
 
-depend:
+# Make sure these things get constructed before doing a make depend.
+depend: minion/svn_header.h minion/help/help.cpp
 	mini-scripts/make_depend.sh
 	
 include Makefile.dep
