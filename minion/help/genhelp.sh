@@ -98,7 +98,7 @@ cat $SORTED_PREF | while read outerentry; do #loop over prefixes
 		echo "if(\"$outerentry\" == request) {";
 		echo "cout << \"Available subentries:\" << NEWLINE;";
 	    fi
-	    echo "cout << \"$innerentry\" << NEWLINE;";
+	    echo "cout << \"help $innerentry\" << NEWLINE;";
 	fi
     done
     echo "} else";
