@@ -304,7 +304,12 @@ int main(int argc, char** argv)
 {
   if(argc < 7 || argc < atoi(argv[6]) + 7)
   {
+    cout << "This generates BIBDs using random models." << endl;
+    cout << "If you don't know what this is for, feel free to ask Chris Jefferson" << endl;
     cout << "v b r k l <instances> <branch_all> <list of seeds (0 = no random)>" << endl;
+    cout << "List of seeds should be as long as the number of instances" << endl;
+    cout << "<branch_all> = 0 means only branch on the first model." << endl;
+    cout << "             = 1 means branch on variables in all models." << endl;
     cout << "Need more parameters!" << endl;
     exit(0);
   }
