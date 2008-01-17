@@ -29,6 +29,13 @@
 
 #include "search_methods.h"
 
+template<typename T>
+void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal)
+{
+    if(commandlineoption_dumptree)
+        cout << "SearchAssign:" << var << (equal?" = ":" != ") << val << endl;
+}
+
 template<typename VarType = AnyVarRef, typename BranchType = StaticBranch>
 struct VariableOrder
 {
@@ -69,7 +76,7 @@ struct VariableOrder
 	else
 	  assign_val = var_order[pos].getMax();
 	var_order[pos].uncheckedAssign(assign_val);
-	
+	maybe_print_search_assignment(var_order[pos], assign_val, true);
 	branches.push_back(pos);
   }
   
@@ -81,11 +88,13 @@ struct VariableOrder
 	 if(val_order[pos])
 	 {
 	   D_ASSERT(var_order[pos].getMax() >= var_order[pos].getMin() + 1);
+       maybe_print_search_assignment(var_order[pos], var_order[pos].getMin(), false);
 	   var_order[pos].setMin(var_order[pos].getMin() + 1);
 	 }
 	 else
 	 {
 	   D_ASSERT(var_order[pos].getMax() >= var_order[pos].getMin() + 1);
+       maybe_print_search_assignment(var_order[pos], var_order[pos].getMax(), false);
 	   var_order[pos].setMax(var_order[pos].getMax() - 1);
 	 }
   }

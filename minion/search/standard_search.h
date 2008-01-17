@@ -63,6 +63,7 @@ namespace Controller
 			return;
 
 		  world_pop();
+          maybe_print_search_action("bt");
 		  order.branch_right();
 		  set_optimise_and_propogate_queue();
 		}

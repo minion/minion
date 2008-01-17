@@ -157,6 +157,13 @@ void inline maybe_print_search_state(char* name, T& vars)
 	cout << name << nodes << "," << get_dom_as_string(vars) << endl;
 }
 
+void inline maybe_print_search_action(char* action)
+{
+    // used to print "bt" usually
+    if(commandlineoption_dumptree)
+        cout << "SearchAction:" << action << endl;
+}
+
   void inline deal_with_solution()
   {
 	if(optimise)
