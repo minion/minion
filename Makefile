@@ -60,11 +60,11 @@ FULLFLAGS=-Wextra -Wno-sign-compare $(DEBUG_FLAGS) $(FLAGS) $(CPU) $(MYFLAGS)
 
 OBJFILES=$(patsubst minion/%.cpp,$(OBJDIR)/%.o,$(SRC))
 
-all: svn_version minion generate
+all: minion generate
 
-minion/svn_header.h:
+minion/svn_header.h: .DUMMY
 	mini-scripts/get_svn_version.sh minion/svn_header.h
-minion/help/help.cpp:
+minion/help/help.cpp: .DUMMY
 	bash minion/help/genhelp.sh minion/ > minion/help/help.cpp
 	
 $(OBJDIR)/minion.o : minion/svn_header.h
@@ -116,5 +116,7 @@ veryclean:
 # Make sure these things get constructed before doing a make depend.
 depend: minion/svn_header.h minion/help/help.cpp
 	mini-scripts/make_depend.sh
-	
+
+.DUMMY:
+
 include Makefile.dep
