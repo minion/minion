@@ -215,6 +215,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	// We define UNDEF = false ;)
 	indexvar.setMin(0);
 	indexvar.setMax(array_size - 1);
+    if(Controller::failed) return;
 	for(int i = 0; i < array_size; ++i)
 	{
 	  current_support[i] = initial_result_dom_min-1;        // will be incremented if support sought
