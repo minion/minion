@@ -36,9 +36,7 @@ namespace Controller
 		
 		// order.find_next_unassigned returns true if all variables assigned.
 		if(order.find_next_unassigned())
-		{  
-		  maybe_print_search_state("Sol: ", v);
-		  
+		{  		  
 		  // We have found a solution!
 		  check_sol_is_correct();
 		  // This function may escape from search if solution limit
@@ -63,8 +61,7 @@ namespace Controller
 		  
 		  if(order.finished_search())
 			return;
-		  
-		  maybe_print_search_state("Node: ", v);		  
+
 		  world_pop();
 		  order.branch_right();
 		  set_optimise_and_propogate_queue();

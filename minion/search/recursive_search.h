@@ -31,9 +31,7 @@ namespace Controller
 	
 	// order.find_next_unassigned returns true if all variables assigned.
 	if(order.find_next_unassigned())
-	{  
-	  maybe_print_search_state("Sol: ", v);
-	  
+	{  	  
 	  // We have found a solution!
 	  check_sol_is_correct();
 	  deal_with_solution();
