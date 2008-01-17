@@ -11,7 +11,7 @@ random.seed(12345)   # stupid seed but at least it makes the test repeatable.
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests="])
 
 if len(other)!=2:
-    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] constraintname"
+    print "Usage: testconstraint.py [--minion=<location of minion binary>] [--numtests=...] constraintname"
     sys.exit(1)
 
 numtests=10000

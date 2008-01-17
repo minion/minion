@@ -7,23 +7,29 @@ from email.MIMEText import MIMEText
 def mail(txt):
     # Create a text/plain message
     print "Attempting to send email."
-    try:
-        msg = MIMEText(txt)
+    succeeded=False
+    for i in range(5):
+        try:
+            msg = MIMEText(txt)
+            
+            # me == the sender's email address
+            # you == the recipient's email address
+            msg['Subject'] = 'Minion testing error report'
+            msg['From'] = "pn@cs.st-and.ac.uk"
+            msg['To'] = "pn@cs.st-and.ac.uk"
+            
+            # Send the message via our own SMTP server, but don't include the
+            # envelope header.
+            s = smtplib.SMTP("mail.cs.st-and.ac.uk")
+            s.sendmail("pn@cs.st-and.ac.uk", ["pn@cs.st-and.ac.uk"], msg.as_string())
+            s.close()
+            succeeded=True
+            break
+        except:
+            print "An error occurred when attempting to send email."
+            
+    if succeeded:
+        print "Succeeded in sending email."
+    else:
+        print "Failed to send email."
         
-        # me == the sender's email address
-        # you == the recipient's email address
-        msg['Subject'] = 'Minion testing error report'
-        msg['From'] = "pn@cs.st-and.ac.uk"
-        msg['To'] = "pn@cs.st-and.ac.uk"
-        
-        # Send the message via our own SMTP server, but don't include the
-        # envelope header.
-        s = smtplib.SMTP("mail.cs.st-and.ac.uk")
-        s.sendmail("pn@cs.st-and.ac.uk", ["pn@cs.st-and.ac.uk"], msg.as_string())
-        s.close()
-    except:
-        # recursive call.
-        # This is dangerous, but I'm not too bothered really.
-        print "An error occurred when attempting to send email. Retrying."
-        mail(txt)
-    print "Succeeded in sending email."  # Unfortunately this will be printed more than once

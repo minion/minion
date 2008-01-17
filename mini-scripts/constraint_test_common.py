@@ -532,6 +532,19 @@ class testproduct:
     def runtest(self, reify=False, reifyimply=False):
         return runtestgeneral("product", True, reify, reifyimply, [3], ["num"], [1,1,1], self, False)
 
+class testgacsum:
+    def printtable(self, domains):
+        cross=[]
+        out=[]
+        crossprod(domains[:-1], [], cross)
+        for i in cross:
+            if sum(i) in domains[-1]:
+                out.append(i+[sum(i)])
+        return out
+    
+    def runtest(self, reify=False, reifyimply=False):
+        return runtestgeneral("gacsum", False, reify, reifyimply, [3], ["num"], [1,1,1], self, True)
+
 class testsumgeq:
     def printtable(self, domains, less=False, weights=[1,1,1,1,1,1,1,1]):
         cross=[]

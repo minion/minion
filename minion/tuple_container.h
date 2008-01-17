@@ -100,7 +100,7 @@ class TupleList
   
   const int* get_tupleptr(int pos) const
   { 
-	D_ASSERT(pos >= 0 && pos < number_of_tuples);
+	D_ASSERT(pos >= 0 && (pos < number_of_tuples || (number_of_tuples==0 && pos==0)));
 	return tuple_data + pos*tuple_length;
   }
   

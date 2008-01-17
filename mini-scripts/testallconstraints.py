@@ -45,7 +45,10 @@ for consname1 in conslist:
     for testnum in range(numtests):
         print "Test number %d"%(testnum)
         if not testobj.runtest(reify=reify, reifyimply=reifyimply):
-            mail("Mail from testallconstraints.py.\nProblem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test."%(consname1, consname1))
+            mailstring="Mail from testallconstraints.py.\n"
+            mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)
+            mailstring+="Using binary %s\n"%minionbin
+            mail(mailstring)
             break
 
 
