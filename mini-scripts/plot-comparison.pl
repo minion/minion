@@ -126,11 +126,11 @@ set term png
 set output "$dir/breakdown.$newname.$referencename.png"
 set log x
 set log y
-set xrange [0.1:*]
+set xrange [0.01:*]
 set xlabel "run time of $referencename in secs"
 set ytics (0.001,0.01,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99,1,1.01,1.05,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,3,4,5,10,100,1000)
 set autoscale yfix
-set ylabel "%age improvement  in $newname from $referencename "
+set ylabel "Proportion improvement  in $newname from $referencename "
 set grid
 set size 1.5,1.2
 set pointsize 2
