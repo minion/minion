@@ -1,58 +1,44 @@
 # To make a universal mac build add: -arch ppc -arch i686 to flags
 
+FLAGS = -DWATCHEDLITERALS
+NAMEBASE = minion
+
 ifdef DEBUG
+ NAMEBASE := $(NAMEBASE)-debug
  ifdef PRINT
    DEBUG_FLAGS = -D_GLIBCXX_DEBUG -g -DMORE_SEARCH_INFO
-   FLAGS =
  else
    DEBUG_FLAGS = -D_GLIBCXX_DEBUG -DNO_PRINT -g -DMORE_SEARCH_INFO
-   FLAGS = 
  endif
-
 else
- DEBUG_FLAGS = -DNO_DEBUG
- ifdef PROFILE
-   FLAGS = -O2 -g -fno-inline -fno-inline-functions
- else
-   FLAGS = -O2
- endif
+  FLAGS := $(FLAGS) -O2 -DNO_DEBUG
+endif
+
+ifdef PROFILE
+  NAMEBASE := $(NAMEBASE)-profile
+  FLAGS := -g -fno-inline -fno-inline-functions
 endif
 
 ifdef INFO
-  MORE_INFO_FLAGS = -DMORE_SEARCH_INFO
-else
-  MORE_INFO_FLAGS =
-endif
-
-ifdef NOWATCHED
-  WATCHED=
-else
-  WATCHED=-DWATCHEDLITERALS
+  FLAGS := $(FLAGS) -DMORE_SEARCH_INFO
+  NAMEBASE := $(NAMEBASE)-info
 endif
 
 ifdef QUICK
-  QUICK_COMPILE=-DQUICK_COMPILE
-else
-  QUICK_COMPILE= 
+  FLAGS := $(FLAGS) -DQUICK_COMPILE
+  NAMEBASE := $(NAMEBASE)-quick
 endif
 
+ifdef REENTER
+  FLAGS := $(FLAGS) -DREENTER
+  NAMEBASE := $(NAMEBASE)-reenter
+endif
 
 OUTDIR=bin
 
+# Only use our choice of name if one was not provided
 ifndef NAME
-  NAME=minion
-  ifdef DEBUG
-    NAME:=$(NAME)-debug
-  endif
-  ifdef QUICK
-    NAME:=$(NAME)-quick
-  endif
-  ifdef PROFILE
-    NAME:=$(NAME)-profile
-  endif
-  ifdef INFO
-    NAME:=$(NAME)-info
-  endif
+  NAME = $(NAMEBASE)
 endif
 
 OBJDIR=$(OUTDIR)/objdir-$(NAME)
@@ -66,7 +52,7 @@ CPU=
 #CPU=-march=pentium4
 #CPU=-march=pentium-m
 
-FULLFLAGS=-Wextra -Wno-sign-compare $(DEBUG_FLAGS) $(FLAGS) $(CPU) $(WATCHED) $(QUICK_COMPILE) $(MORE_INFO_FLAGS) $(MYFLAGS)
+FULLFLAGS=-Wextra -Wno-sign-compare $(DEBUG_FLAGS) $(FLAGS) $(CPU) $(MYFLAGS)
 
 OBJFILES=$(patsubst minion/%.cpp,$(OBJDIR)/%.o,$(SRC))
 
@@ -79,7 +65,6 @@ $(OBJDIR)/%.o: minion/%.cpp
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
 
-	
 minion: svn_version mkdirectory $(OBJFILES)
 	
 	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES)
