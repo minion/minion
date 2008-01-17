@@ -23,6 +23,7 @@ class TrailedMonotonicSet
 
 
   static const value_type one = 1;
+  static const int _num_sweeps = 0;
 
   int _size;
   int _max_undos;
@@ -91,35 +92,45 @@ public:
     D_ASSERT(_local_depth == bt_depth);
   }
 
-  void set(DomainInt index, const value_type& newval)
+  void remove(DomainInt index)
   {
     // cout << "index: " << index << " value: " << newval << " local: " << _local_depth << " bt: " << _backtrack_depth.get() << endl; 
 
+    // Assumes index is currently in the set.  Use checked_remove if this is not correct assumption.
+ 
     D_ASSERT( !needs_undoing() && 0 <= index && index < size());
     undo_indexes(_local_depth) = checked_cast<int>(index);
-    // undo_values(_local_depth) = array(index);
 
     ++_local_depth;
     ++_backtrack_depth;
     
-    array(index) = newval;
+    array(index) = 0;
   }
 
+  void checked_remove(DomainInt index) 
+  {
+    // check for membership to reduce amount of trailing 
+    // or to ensure correctness
+  
+    if (isMember(index)) { remove(index); }
+  }
+  
   int size() const
   {
     return _size;    
   }
-
-  void remove(DomainInt index) 
-  {
-    // check for membership to reduce amount of trailing 
-    if (array(index)) { set(index,0); }
-  }
+  
 
   bool isMember(DomainInt index) const
   {
     return (bool)array(index);
   }
+
+void branch_left()  // nothing to do
+  { return ; }
+  
+void branch_right()  // nothing to do
+  { return ; }
 
 void initialise(const int& size, const int& max_undos)
   { 
@@ -155,6 +166,7 @@ void initialise(const int& size, const int& max_undos)
 TrailedMonotonicSet()
 { } 
 
+int num_sweeps() { return _num_sweeps ; } 
 
 void print_state()
 {
