@@ -441,6 +441,10 @@ int main(int argc, char** argv) {
   
   BuildCSP(stateObj, instance);
   SolveCSP(stateObj, instance, args);
+  
+  delete infile;
+  delete stateObj;
+  
   return 0;
 }
 
