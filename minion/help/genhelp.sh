@@ -94,9 +94,7 @@ cat $SORTED_PREF | while read outerentry; do #loop over prefixes
 	    echo "cout << \"$innerentry\" << NEWLINE;";
 	fi
     done
-    echo "} else {";
+    echo "} else";
 done
 echo ";"; #null statement to occupy final else branch
-echo "}"; #end else
-
 echo '}'; #end of function

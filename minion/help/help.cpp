@@ -189,14 +189,13 @@ cout << "Unknown entry, please try again." << NEWLINE;
 if("" == request) {
 cout << "Available subentries:" << NEWLINE;
 cout << "variables" << NEWLINE;
-} else {
+} else
 if("variables" == request) {
 cout << "Available subentries:" << NEWLINE;
 cout << "variables 01" << NEWLINE;
 cout << "variables bounds" << NEWLINE;
 cout << "variables discrete" << NEWLINE;
 cout << "variables sparsebounds" << NEWLINE;
-} else {
+} else
 ;
-}
 }

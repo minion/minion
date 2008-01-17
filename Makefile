@@ -65,7 +65,7 @@ $(OBJDIR)/%.o: minion/%.cpp
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
 
-minion: svn_version mkdirectory $(OBJFILES)
+minion: svn_version help mkdirectory $(OBJFILES)
 	
 	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES)
 	

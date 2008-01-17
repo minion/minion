@@ -24,12 +24,11 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-/** @help variables;01 Description
-01 variables, which are used very commonly for logical
-expressions, and for encoding the characteristic functions of sets and
-relations. Note that wherever a 01 variable can appear, the negation
-of that variable can also appear. For instance, the first Boolean
-variable (if any) is always x0. Its negation is identified by nx0.
+/** @help variables;01 Description 
+01 variables are used very commonly for logical expressions, and for
+encoding the characteristic functions of sets and relations. Note that
+wherever a 01 variable can appear, the negation of that variable can
+also appear. A boolean variable x's negation is identified by !x.
 */
 
 /** @help variables;01 Example 
