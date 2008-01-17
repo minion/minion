@@ -353,9 +353,17 @@ BoolGreaterEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  V
 #include "dynamic_binary_sat.h"
 #include "dynamic_3_sat.h"
 
+template<typename T>
 inline DynamicConstraint*
-BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<T>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
+  for(int i = 0; i < t1.size(); ++i)
+  {
+    if(t1[i].getInitialMin() != 0 || t1[i].getInitialMax() != 1)
+      cerr << "watched leqsum only works on Boolean variables!" << endl;
+  }
+
+  
   if(reify) 
   { 
     cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
@@ -366,16 +374,15 @@ BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<BoolVarRef>& t1, B
 }
 
 template<typename T>
-DynamicConstraint*
-BuildCT_WATCHED_LEQSUM(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
-{ 
-  cerr << "Watched LeqSum only works on Boolean variables at present. Sorry!" << endl;
-  exit(1);
-}
-
 inline DynamicConstraint*
-BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const light_vector<BoolVarRef>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const light_vector<T>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
+  for(int i = 0; i < t1.size(); ++i)
+  {
+    if(t1[i].getInitialMin() != 0 || t1[i].getInitialMax() != 1)
+      cerr << "watched geqsum only works on Boolean variables!" << endl;
+  }
+  
   if(reify) 
   { 
     cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
@@ -410,12 +417,4 @@ BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const light_vector<BoolVarRef>& t1, BO
 	  return BoolGreaterEqualSumConDynamic(stateObj, t1, runtime_val(sum)); 
 	}
   }
-}
-
-template<typename T>
-DynamicConstraint*
-BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
-{ 
-  cerr << "Watched GeqSum only works on Boolean variables at present. Sorry!" << endl;
-  exit(1);
 }
