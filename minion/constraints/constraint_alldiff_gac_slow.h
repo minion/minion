@@ -107,14 +107,9 @@ long& N,
 map<vertex, long, vertexlt>& dfsnum,
 map<vertex, long, vertexlt>& low,
 multimap<vertex, vertex, vertexlt>& edges,   //can't be const for some stupid reason.
-map<vertex, vertex, vertexlt>& T,
-set<vertex, vertexlt>& inT,
-vector<set<vertex, vertexlt> >& components
+vector<set<vertex, vertexlt> >& components,
+set<vertex> & visited
 );
-
-
-
-
 
 template<typename VarArray>
 struct AlldiffGacSlow : public Constraint
@@ -171,6 +166,7 @@ struct AlldiffGacSlow : public Constraint
     // Do greedy matching
     
     for(i=0; i<numvars; i++)
+    {
         for(j=var_array[i].getMin(); j<=var_array[i].getMax(); j++)
         {
             if(var_array[i].inDomain(j))
@@ -184,7 +180,7 @@ struct AlldiffGacSlow : public Constraint
                 }
             }
         }
-    
+    }
     
     // Check length of the matching against the number of variables
     
@@ -260,6 +256,15 @@ struct AlldiffGacSlow : public Constraint
     // edge from every used value to sink
     // edge from sink to every unused value.
     
+    // set up values.
+    for(int tempvar=0; tempvar<numvars; tempvar++)
+    {
+        for(DomainInt tempval=var_array[tempvar].getMin(); tempval<=var_array[tempvar].getMax(); tempval++)
+        {
+            if(var_array[tempvar].inDomain(tempval)) values.insert(tempval);
+        }
+    }
+    
     for(setit=values.begin(); setit!=values.end(); setit++)
     {
         tempval=(*setit);
@@ -283,7 +288,8 @@ struct AlldiffGacSlow : public Constraint
         (*edgesit).second.print();
     }*/
     
-    // add node with an edge to all others - special 2
+    // add node with an edge to all others - special 2 - Incorrect! Leave out special 2.
+    // This is just for Tarjan's algorithm to use.
     
     for(setit=values.begin(); setit!=values.end(); setit++)
     {
@@ -308,23 +314,31 @@ struct AlldiffGacSlow : public Constraint
     }*/
     
     // ------------------------------- call Targan's algorithm ----------------------------------
+    /*
+        Input: Graph G = (V, E), Start node v0
+
+        max_dfs := 0  // Counter for dfs
+        U := V        // Collection of unvisited nodes
+        S := {}       // An initially empty stack
+        tarjan(v0)    // Call the function with the start node
+    */
+    
     long N=0;
-    map<vertex, vertex, vertexlt> T;
-    set<vertex, vertexlt> inT;
     
     vector<set<vertex, vertexlt> > components;
     
-    vector<vertex> L;
+    vector<vertex> S;
     map<vertex, long, vertexlt> dfsnum;
     map<vertex, long, vertexlt> low;
+    set<vertex> visited;
     
-    visit(vertex(special, 2), L, N, dfsnum, low, edges, T, inT, components);
+    visit(vertex(special, 2), S, N, dfsnum, low, edges, components, visited);
     
     vector<set<vertex, vertexlt> >::iterator compit;
-    /*
+    
     //  print components out
     
-    cout<<"components:"<<endl;
+    /*cout<<"components:"<<endl;
     for(compit=components.begin(); compit!=components.end(); compit++)
     {
         set<vertex, vertexlt>::iterator cit;
@@ -337,7 +351,7 @@ struct AlldiffGacSlow : public Constraint
     
     // --------------------------- find residual edges to delete -------------------------------
     
-    for(tempvar=numvars-1; tempvar>=0; tempvar--)   // construct the list backwards
+    for(tempvar=0; tempvar<numvars; tempvar++)
     {
         for(DomainInt tempval=var_array[tempvar].getMin(); tempval<=var_array[tempvar].getMax(); tempval++)
         {
@@ -417,7 +431,6 @@ struct AlldiffGacSlow : public Constraint
 	return false;
   }
   
-  
   virtual void full_propagate()
   {
     propagate(1, 0);
@@ -445,90 +458,109 @@ struct AlldiffGacSlow : public Constraint
     // ------------------------------- Targan's algorithm ------------------------------------
     
     void visit(vertex p, 
-    vector<vertex>& L, 
-    long& N, 
+    vector<vertex>& S, 
+    long& N,
     map<vertex, long, vertexlt>& dfsnum,
     map<vertex, long, vertexlt>& low,
     multimap<vertex, vertex, vertexlt>& edges,   //can't be const for some stupid reason.
-    map<vertex, vertex, vertexlt>& T,
-    set<vertex, vertexlt>& inT,
-    vector<set<vertex, vertexlt> >& components
+    vector<set<vertex, vertexlt> >& components,
+    set<vertex>& visited
     )
     {
-        //cout<<"In visit."<<endl;
-        //p.print();
-        L.push_back(p);
+        // based on the following pseudocode from wikipedia.
+        /*
+        Input: Graph G = (V, E), Start node v0
+
+        max_dfs := 0  // Counter for dfs
+        U := V        // Collection of unvisited nodes
+        S := {}       // An initially empty stack
+        tarjan(v0)    // Call the function with the start node
+        
+        procedure tarjan(v)
+        v.dfs := max_dfs;          // Set the depth index
+        v.lowlink := max_dfs;      // v.lowlink <= v.dfs
+        max_dfs := max_dfs + 1;    // Increment the counter
+        S.push(v);                 // Place v on the stack
+        U := U \ {v};              // Separate v from U
+        forall (v, v') in E do     // Consider the neighboring nodes
+          if (v' in U)
+            tarjan(v');            // recursive call
+            v.lowlink := min(v.lowlink, v'.lowlink);
+          // Ask whether v' is on the stack 
+          // by a clever constant time method
+          // (for example, setting a flag on the node when it is pushed or popped) 
+          elseif (v' in S)
+            v.lowlink := min(v.lowlink, v'.dfs);
+          end if
+        end for
+        if (v.lowlink = v.dfs)     // the root of a strongly connected component
+          print "SZK:";
+          repeat
+            v' := S.pop;
+            print v';
+          until (v' = v);
+        end if
+        */
+        
+        S.push_back(p);
         dfsnum[p]=N;
         low[p]=N;
         N++;
+        visited.insert(p);
         
         multimap<vertex, vertex, vertexlt>::iterator edgeit;
         multimap<vertex, vertex, vertexlt>::iterator edgeit2;
         
-        set<vertex> visited;
-        
-        while(1)
+        // Iterate through unvisited vertices.
+        edgeit2=edges.upper_bound(p);
+        for(edgeit=edges.lower_bound(p); edgeit!=edgeit2 && edgeit!=edges.end(); edgeit++)
         {
-            // find a vertex to visit that is not in visited
-            edgeit2=edges.upper_bound(p);
-            
-            for(edgeit=edges.lower_bound(p); edgeit!=edgeit2; edgeit++)
-            {
-                //cout<<"Pair:"<<endl;
-                //((vertex)(*edgeit).first).print();
-                //(*edgeit).second.print();
-                if(visited.find((*edgeit).second)==visited.end())
-                {
-                    break;
-                }
-            }
-            
-            if(edgeit==edgeit2)
-                break;
-            
+            //cout <<"In loop."<<endl;
+            //cout<<"Pair:"<<endl;
+            //((vertex)(*edgeit).first).print();  // why sometimes get garbage from these prints?
+            //(*edgeit).second.print();
             vertex q=(*edgeit).second;
-            visited.insert(q);
             
-            // for each p->q
-            if(inT.find(q)==inT.end())
-            { 
-                // add q to tree
-                inT.insert(q);
-                T.insert(pair<vertex, vertex>(p, q));
-    
-                // recursive call
-                //cout<<"Making recursive call:";
-                //q.print();
-                visit(q, L, N, dfsnum, low, edges, T, inT, components);
-    
+            if(visited.find(q)==visited.end())  // if not visited
+            {
+                // now we have an unvisited vertex in q.
+                
+                //cout <<"Making recursive call."<<endl;
+                visit(q, S, N, dfsnum, low, edges, components, visited);
+                
                 low[p]=((low[p]<low[q])?low[p]:low[q]);
             }
             else
             {
-                low[p]=((low[p]<dfsnum[q])?low[p]:dfsnum[q]);
+                vector<vertex>::iterator sit = find(S.begin(), S.end(), q);
+                if(sit!=S.end())
+                {
+                    D_ASSERT( (*sit)==q );
+                    low[p]=((low[p]<dfsnum[q])?low[p]:dfsnum[q]);
+                }
             }
         }
         
         if(low[p]==dfsnum[p])
         {
-            //cout<<"Constructing component"<<endl;
+            // we are at the root of a strongly connected component
             
             set<vertex, vertexlt> tempset;
             while(true)
             {
-                vertex v=(* --(L.end()));  //get last element
+                vertex v=(* --(S.end()));  //get last element
                 //v.print();
-                L.pop_back();
+                S.pop_back();  // why does this not return the value we need?
                 tempset.insert(v);
                 
                 // remove vertex v from the graph
-                for(edgeit=edges.begin(); edgeit!=edges.end(); edgeit++)
+                /*for(edgeit=edges.begin(); edgeit!=edges.end(); edgeit++)
                 {
                     if((*edgeit).first==v || (*edgeit).second==v)
                     {
                         edges.erase(edgeit);
                     }
-                }
+                }*/
                 
                 if(v==p)
                 {
