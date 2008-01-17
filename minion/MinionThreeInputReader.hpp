@@ -165,8 +165,8 @@ Below is a complete minion input file with commentary, as an example.
 
 MINION 3
 
-# While the variable section doesn't have to come first, you can't
-really do anything until
+# While the variable section doesn't have to come first, you can't 
+# really do anything until
 # You have one...
 **VARIABLES**
 
@@ -230,7 +230,7 @@ eq(q[1],0)
 eq(bn[0,1,1,1], bm[1,1])
 
 # It's easy to get a row or column from a matrix. Just use _ in the
-indices you want
+# indices you want
 # to vary. Just giving a matrix gives all the variables in that matrix.
 
 #The following shows how flattening occurs...
@@ -273,7 +273,7 @@ Bob 2 2 1 2 3 4
 table([q], Fred)
 
 # Can still list tuples explicitally in the constraint if you want at
-the moment.
+# the moment.
 # On the other hand, I might remove this altogether, as it's worse than giving
 # Tuplelists
 
