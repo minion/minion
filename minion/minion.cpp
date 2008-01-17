@@ -590,7 +590,7 @@ try {
 
   if (argc == 1) {
     cout << "Type '" << argv[0] << " help' for usage." << endl;
-    cout << endl << "Usage: " << argv[0] << "{switch}* [input file]" << endl;
+    cout << endl << "Usage: " << argv[0] << " {switch}* [input file]" << endl;
     help("switches");
     cout << endl;
     cout << "This version of Minion was built with internal checking " <<

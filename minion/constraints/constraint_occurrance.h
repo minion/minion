@@ -51,6 +51,10 @@ ensures that there are AT MOST count occurrences of the value elem in
 the vector vec.
 */
 
+/** @help constraints;occurrenceleq Notes
+Variable count must be a constant.
+*/
+
 /** @help constraints;occurrenceleq Reifiability
 This constraint is not reifiable.
 */
@@ -67,6 +71,10 @@ The constraint
 
 ensures that there are AT LEAST count occurrences of the value elem in
 the vector vec.
+*/
+
+/** @help constraints;occurrencegeq Notes
+Variable count must be a constant.
 */
 
 /** @help constraints;occurrencegeq Reifiability

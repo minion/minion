@@ -42,6 +42,7 @@ This constraint is reifiable.
 
 /** @help constraints;eq Reference
 help constraints minuseq
+*/
 
 /** @help constraints;minuseq Description
 Constraint
