@@ -28,8 +28,7 @@
 namespace Controller
 {
   
-  typedef  vector<pair<Trigger, short> > triglisttype;
-  VARDEF(triglisttype propagate_trigger_list);
+  VARDEF(vector<pair<Trigger, short> > propagate_trigger_list);
   
 #ifdef DYNAMICTRIGGERS
   VARDEF(vector<DynamicTrigger*> dynamic_trigger_list);
