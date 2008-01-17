@@ -73,7 +73,7 @@ struct ModConstraint : public Constraint
         // While no support for upperbound, reduce upperbound
         var1.setMax(var1val-1);
         var1val=var1.getMax();
-        if(state->isFailed()) return;  // Does not work with setjmp!
+        if(state->isFailed()) return;
     }
     
     var1val=var1.getMin();
@@ -90,7 +90,7 @@ struct ModConstraint : public Constraint
         // While no support for upperbound, reduce upperbound
         var2.setMax(var2val-1);  // Is this the right function for pruning the upperbound?
         var2val=var2.getMax();
-        if(state->isFailed()) return;  // Does not work with setjmp!
+        if(state->isFailed()) return;
     }
     
     var2val=var2.getMin();
@@ -107,7 +107,7 @@ struct ModConstraint : public Constraint
         // While no support for upperbound, reduce upperbound
         var3.setMax(var3val-1);  // Is this the right function for pruning the upperbound?
         var3val=var3.getMax();
-        if(state->isFailed()) return;  // Does not work with setjmp!
+        if(state->isFailed()) return;
     }
     
     var3val=var3.getMin();
@@ -172,14 +172,14 @@ struct ModConstraint : public Constraint
                 if(mod<var3val)
                 {
                     var1val+=(var3val-mod);
-                    if((var1val%var2val) != var3val) {cerr << "What on earth?1" << endl;}
+                    //if((var1val%var2val) != var3val) {cerr << "What on earth?1" << endl;}
                 }
                 if(mod>var3val)
                 {
                     var1val+=(var3val-mod)+var2val;
-                    if((var1val%var2val) != var3val) {cerr << "What on earth?2" << endl;}
+                    //if((var1val%var2val) != var3val) {cerr << "What on earth?2" << endl;}
                 }
-                if((var1val%var2val) != var3val) {cerr << var1val <<","<<var2val<<","<<var3val << endl;}
+                //if((var1val%var2val) != var3val) {cerr << var1val <<","<<var2val<<","<<var3val << endl;}
                 for(; var1val<=var1.getMax(); var1val+=var2val) 
                     // Skips values which are not congruent.
                 {

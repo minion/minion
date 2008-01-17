@@ -4,6 +4,7 @@ switch(b.constraint.type) {
 case CT_ELEMENT : return build_constraint_CT_ELEMENT(b);
 case CT_GACELEMENT : return build_constraint_CT_GACELEMENT(b);
 case CT_ALLDIFF : return build_constraint_CT_ALLDIFF(b);
+case CT_ALLDIFF_GACSLOW : return build_constraint_CT_ALLDIFF_GACSLOW(b);
 case CT_DISEQ : return build_constraint_CT_DISEQ(b);
 case CT_EQ : return build_constraint_CT_EQ(b);
 case CT_INEQ : return build_constraint_CT_INEQ(b);

@@ -38,6 +38,7 @@ using namespace std;
 /// The currently accepted types of Constraints.
 enum ConstraintType {
   CT_ALLDIFF ,
+  CT_ALLDIFF_GACSLOW ,
   CT_DISEQ ,
   CT_INEQ ,
   CT_MAX ,

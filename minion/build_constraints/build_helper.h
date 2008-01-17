@@ -13,7 +13,6 @@
 
 using namespace ProbSpec;
 
-
 #define STATIC_BUILD_CONSTRAINT
 #include "../BuildConstraintConstructs.h"
 #define DYNAMIC_BUILD_CONSTRAINT

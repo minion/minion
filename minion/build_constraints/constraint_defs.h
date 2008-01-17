@@ -4,6 +4,7 @@ ConstraintDef constraint_list[] = {
 { "watchelement" , CT_WATCHED_ELEMENT, 2 ,{ read_list , read_var }, DYNAMIC_CT },
 { "gacelement" , CT_GACELEMENT, 2 ,{ read_list , read_var }, STATIC_CT },
 { "alldiff" , CT_ALLDIFF, 1 ,{ read_list }, STATIC_CT },
+{ "alldiffgacslow" , CT_ALLDIFF_GACSLOW, 1 ,{ read_list }, STATIC_CT },
 { "diseq" , CT_DISEQ, 2 ,{ read_var , read_var }, STATIC_CT },
 { "eq" , CT_EQ, 2 ,{ read_var , read_var }, STATIC_CT },
 { "ineq" , CT_INEQ, 3 ,{ read_var , read_var , read_constant }, STATIC_CT },

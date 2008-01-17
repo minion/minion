@@ -52,6 +52,7 @@ ConEvent_END
  PROP_INFO_Lex,
  PROP_INFO_FullSum,
  PROP_INFO_BoolSum,
+ PROP_INFO_AlldiffGacSlow,
  PROP_INFO_LightSum,
  PROP_INFO_WeightBoolSum,
  PROP_INFO_ReifyEqual,
