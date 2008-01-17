@@ -102,6 +102,9 @@ minion-sat:
 minion-quasigroup: 
 	clisp -C -x "(clisp-make-executable \"bin/minion-quasigroup\" (function clisp-toplevel-quasigroup))" -i generators/MinionHelper.lsp -i generators/Quasigroup/MinionQuasigroup.lsp  
 
+objclean:
+	rm -rf bin/objdir-*
+
 clean:
 	rm -rf bin/minion bin/minion-* bin/objdir-minion* bin/bibd bin/golomb bin/solitaire bin/steelmill bin/sports
 
