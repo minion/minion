@@ -4,7 +4,9 @@
 #include <iostream>
 #include <ostream>
 #include <istream>
+#include <algorithm>
 #include <iomanip>
+#include <map>
 
 #include "system/system.h"
 #include "constants.h"
@@ -16,124 +18,34 @@ using namespace std;
 // XXX : Provide access to this.
 const int ShowUnused = 0;
 
-string EventNames[] = {
- "construct",
- "copy",
- "isAssigned",
- "getAssignedValue",
-   "isAssignedValue",
-   "inDomain",
-   "inDomain_noBC",
-   "getMax",
-   "getMin",
-   "getInitialMax",
-   "getInitialMin",
-  "setMax",
-  "setMin",
-  "uncheckedAssign",
-  "propagateAssign",
-  "RemoveFromDomain",
-  "addTrigger",
-  "getDomainChange",
-  "addDynamicTrigger"
-};
-
-// 0 - ignore, 1 - read, 2 - write
-int EventCategory[] = {
- 0,
- 0,
- 0,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 2,
- 2,
- 2,
- 2,
- 2,
- 0,
- 0,
- 0,
- 
-};
-
-string VarNames[] =
-{ "Bool" , "Bound", "SparseBound", "Range", "BigRange"};
-
-string ConEventNames[] =  {
-"StaticTrigger",
-"DynamicTrigger",
-"SpecialTrigger",
-"DynamicMovePtr",
-"AddSpecialToQueue",
-"AddConToQueue",
-"AddDynToQueue",
-};
-
-string PropEventNames[] = {
-"CheckAssign",
- "BoundTable",
- "Reify",
- "ReifyTrue",
- "Table",
- "ArrayNeq",
- "BinaryNeq",
- "NonGACElement",
- "GACElement",
- "Lex",
- "FullSum",
- "BoolSum",
- "LightSum",
- "WeightBoolSum",
- "ReifyEqual",
- "Equal",
- "BinaryLeq",
- "Min",
- "OccEqual",
- "Pow",
- "And",
- "Product",
- "DynSum",
- "DynSumSat",
- "Dyn3SAT",
- "Dyn2SAT",
- "DynLitWatch",
- "DynElement",
- "DynVecNeq",
- "DynGACTable",
- "Mod"
- };
-
- 
- 
-// This is put in an object so we can zero it at start time.
-struct VarInfo
+// In a class so the vectors can be initialized.
+class initvectors
 {
-  long long int counters[VarTypeCount][VarEventCount];
-  long long int concount[ConEventCount];
-  long long int propcount[PropEventCount];
-  VarInfo()
-  {
-   for(int i = 0; i < VarTypeCount; ++i)
-     for(int j = 0; j < VarEventCount; ++j)
-       counters[i][j] = 0;
-       
-       
-   for(int i = 0; i < ConEventCount; ++i)
-     concount[i] = 0;
-     
-   for(int i = 0; i < PropEventCount; ++i)
-     propcount[i] = 0;
-  }
+    public:
+    vector<string> VarNames;
+    vector<string> Checks;
+    vector<string> Changes;
+    
+    initvectors()
+    {
+        VarNames.push_back("Bool"); VarNames.push_back("Bound"); VarNames.push_back("SparseBound");
+        VarNames.push_back("Range"); VarNames.push_back("BigRange");
+        
+        Checks.push_back("inDomain"); Checks.push_back("inDomain_noBC"); 
+        Checks.push_back("getMin"); Checks.push_back("getMax");
+        Checks.push_back("getAssignedValue"); Checks.push_back("isAssigned");
+        Checks.push_back("getInitialMax"); Checks.push_back("getInitialMin");
+        
+        Changes.push_back("removeFromDomain"); Changes.push_back("setMin"); Changes. push_back("setMax");
+        Changes.push_back("uncheckedAssign"); Changes.push_back("propagateAssign");
+    }
 };
 
-VarInfo var_info;
+initvectors init;
+
+map<pair<string, string>, long long int> vareventcounters;
+map<string, long long int> concount;
+map<string, long long int> propcount;
 
 string pad(string s, int length = 18)
 {
@@ -149,91 +61,157 @@ string pad_start(string s, int length = 12)
   return output + s;
 }
 
-void VarInfoAddone(VarType type, VarEvent event)
-{ var_info.counters[type][event]++; }
+void VarInfoAddone(VarType type, string event)
+{
+    D_ASSERT( type>=0 && type<init.VarNames.size() );
+    pair<string, string> key=pair<string, string>(init.VarNames[type], event);
+    if(vareventcounters.find(key) == vareventcounters.end())
+        vareventcounters[key]=1;
+    else
+        vareventcounters[key]++;
+}
 
-void ConInfoAddone(ConEvent type)
-{ var_info.concount[type]++; }
+void ConInfoAddone(string type)
+{ 
+    if(concount.find(type) == concount.end())
+        concount[type]=1;
+    else
+        concount[type]++;
+}
 
-void PropInfoAddone(PropEvent type)
-{ var_info.propcount[type]++; }
+void PropInfoAddone(string type)
+{
+    if(propcount.find(type) == propcount.end())
+        propcount[type]=1;
+    else
+        propcount[type]++;
+}
 
 void print_search_info()
 {
+    // Collect event names from the vareventcounters map.
+    map<pair<string, string>, long long int>::iterator it1;
+    vector<string> EventNames;
+    vector<string> Other;  // All the events in EventNames which are not in Changes or Checks.
+    // First put some in in a standard order.
+    EventNames.push_back("inDomain");EventNames.push_back("removeFromDomain");
+    EventNames.push_back("getMin");EventNames.push_back("getMax");
+    EventNames.push_back("setMin");EventNames.push_back("setMax");
+    
+    for(it1=vareventcounters.begin(); it1 != vareventcounters.end(); it1 ++)
+    {
+        string name=(*it1).first.second;
+        if(find(EventNames.begin(), EventNames.end(), name)==EventNames.end())
+        {
+            EventNames.push_back(name);
+            if(find(init.Checks.begin(), init.Checks.end(), name)==init.Checks.end() &&
+                find(init.Changes.begin(), init.Changes.end(), name)==init.Changes.end())
+            {
+                Other.push_back(name);
+            }
+        }
+    }
+    
+    sort(EventNames.begin()+6, EventNames.end());  // Sort all except the first 6
+    
+    // Print the table heading.
+    
    cout << pad("");
-   for(int i = 0; i < VarTypeCount; ++i)
-     cout << pad_start(VarNames[i]);
+   for(int i = 0; i < init.VarNames.size(); ++i)
+   {
+     cout << pad_start(init.VarNames[i]);
+   }
    cout << pad_start("Total");
    cout << endl;
-  
-   for(int j = 0; j < VarEventCount; ++j)  
+   
+   // Print the table
+   for(int j = 0; j < EventNames.size(); ++j)
    {
+     string varevent=EventNames[j];
      long long int total = 0;
-     for(int i = 0; i < VarTypeCount; ++i)
-       total += var_info.counters[i][j];
-       
-     if(ShowUnused || total != 0)
+     for(int i = 0; i < init.VarNames.size(); ++i)
      {
-       cout << pad(EventNames[j]);
-       for(int i = 0; i < VarTypeCount; ++i)
-       {
-         cout << setiosflags(ios::right) << setw(12) <<
-                 var_info.counters[i][j];
-       }
-       cout << setiosflags(ios::right) << setw(12) << total;
-       cout << endl;
+         string vartype= string(init.VarNames[i]);
+         pair<string, string> key=pair<string, string>(vartype, varevent);
+       if(vareventcounters.find(key)!=vareventcounters.end())
+           total += vareventcounters[key];
      }
+     
+    cout << pad(varevent);
+    for(int i = 0; i < init.VarNames.size(); ++i)
+    {
+       string vartype= string(init.VarNames[i]);
+       pair<string, string> key=pair<string, string>(vartype, varevent);
+     if(vareventcounters.find(key)!=vareventcounters.end())
+         cout << setiosflags(ios::right) << setw(12) <<vareventcounters[key];
+     else
+         cout << setiosflags(ios::right) << setw(12) <<0;
+    }
+    cout << setiosflags(ios::right) << setw(12) << total;
+    cout << endl;
+     
    }
    
-   for(int check_type = 1; check_type < 3; check_type++)
+   // Print rows for the totals.
+   for(int totaltype=0; totaltype<3; totaltype++) // checks, changes, other -> 0,1,2
    {
-     long long int total = 0;
-     for(int i = 0; i < VarTypeCount; ++i)
-       for(int j = 0; j < VarEventCount; ++j)
+       vector<string> & eventstosum=((totaltype==0)? init.Checks:((totaltype==1)?init.Changes:Other));
+       if(totaltype == 0)
        {
-         if (EventCategory[j] == check_type)
-          total += var_info.counters[i][j];
-       }
-        
-     if(ShowUnused || total != 0)
-     {
-       if(check_type == 1)
          cout << pad("TotalChecks");
-       else
-         cout << pad("TotalChanges");
-     
-       for(int i = 0; i < VarTypeCount; ++i)
-       {
-         long long int checks = 0;
-         for(int j = 0; j < VarEventCount; ++j)  
-         {
-           if (EventCategory[j] == check_type)
-             checks += var_info.counters[i][j];
-         }
-         cout << setiosflags(ios::right) << setw(12) <<
-                 checks;
+         eventstosum=init.Checks;
        }
-        cout << setiosflags(ios::right) << setw(12) <<
+       else if(totaltype==1)
+       {
+         cout << pad("TotalChanges");
+         eventstosum=init.Changes;
+       }
+       else
+       {
+         cout << pad("TotalOther");
+         eventstosum=Other;
+       }
+       long long int total=0;
+       
+       for(int i = 0; i < init.VarNames.size(); ++i)
+       {  
+            long long int minortotal = 0;
+            
+            for(int j = 0; j < EventNames.size(); ++j)
+            {
+                pair<string, string> key=pair<string, string>(init.VarNames[i], EventNames[j]);
+                if(vareventcounters.find(key)!=vareventcounters.end() && 
+                    find(eventstosum.begin(), eventstosum.end(), EventNames[j])!=eventstosum.end() )
+                {
+                     minortotal+= vareventcounters[key];
+                     total += vareventcounters[key];
+                }
+            }
+            
+            cout << setiosflags(ios::right) << setw(12) <<
+             minortotal;
+       }
+       cout << setiosflags(ios::right) << setw(12) <<
                 total;
        cout << endl;
-     }
    }
-  
+   
   cout << "  ** Constraints" << endl;
-  for(int i = 0; i < PropEventCount; ++i)
+  map<string, long long int>::iterator it;
+  
+  for(it = propcount.begin(); it != propcount.end(); it++)
   {
-    if(ShowUnused || var_info.propcount[i] != 0)
-      cout << pad(PropEventNames[i]) << 
-              setiosflags(ios::right) << setw(12) <<
-              var_info.propcount[i] << endl;
+      cout << pad((*it).first ) << 
+          setiosflags(ios::right) << setw(12) <<
+          (*it).second << endl;
   }
   
   cout << "  ** Queue Events" << endl;
-  for(int i = 0; i < ConEventCount; ++i)
+  
+  for(it=concount.begin(); it != concount.end(); it++)
   {
-    if(ShowUnused || var_info.concount[i] != 0)
-      cout << pad(ConEventNames[i]) << 
-              setiosflags(ios::right) << setw(12) <<
-              var_info.concount[i] << endl;
+      cout << pad((*it).first) << 
+          setiosflags(ios::right) << setw(12) <<
+          (*it).second << endl;
   }
 }

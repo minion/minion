@@ -57,7 +57,7 @@ struct ElementConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PROP_INFO_ADDONE(NonGACElement);
+	PropInfoAddone("NonGACElement");
     if(index_ref.isAssigned())
     {
       int index = checked_cast<int>(index_ref.getAssignedValue());

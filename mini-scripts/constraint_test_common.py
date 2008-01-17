@@ -413,11 +413,12 @@ class testalldiff:
         return out
         
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("alldiff", True, reify, reifyimply, [6], ["quitesmallnum"], [6], self, False)
+        return runtestgeneral("alldiff", True, reify, reifyimply, [5], ["quitesmallnum"], [5], self, False)
 
 class testalldiffgacslow(testalldiff):
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("alldiffgacslow", False, reify, reifyimply, [6], ["quitesmallnum"], [6], self, True)
+        treesame= not reify and not reifyimply
+        return runtestgeneral("alldiffgacslow", False, reify, reifyimply, [5], ["quitesmallnum"], [5], self, treesame)
 
 class testdiseq(testalldiff):
     def runtest(self, reify=False, reifyimply=False):
@@ -667,7 +668,7 @@ class testwatchvecneq:
         return out
     
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("watchvecneq", True, reify, reifyimply, [8], ["smallnum"], [4,4], self, False)
+        return runtestgeneral("watchvecneq", True, reify, reifyimply, [6], ["smallnum"], [3,3], self, False)
         # does not quite do GAC. Is it supposed to?
     
 class testpow:

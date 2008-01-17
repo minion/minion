@@ -10,101 +10,101 @@ struct InfoRefType
   { return data.isBound();}
   
   InfoRefType(const WrapType& _data) : data(_data)
-  { VAR_INFO_ADDONE(VAR_TYPE, copy); }
+  { VarInfoAddone(VAR_TYPE, "copy"); }
   
   InfoRefType() 
-  {VAR_INFO_ADDONE(VAR_TYPE, construct);}
+  {VarInfoAddone(VAR_TYPE, "construct");}
   
   InfoRefType(const InfoRefType& b) : data(b.data)
-  {VAR_INFO_ADDONE(VAR_TYPE, copy);}
+  {VarInfoAddone(VAR_TYPE, "copy");}
   
   BOOL isAssigned()
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, isAssigned);
+    VarInfoAddone(VAR_TYPE, "isAssigned");
     return data.isAssigned(); 
   }
   
   DomainInt getAssignedValue()
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, getAssignedValue);
+    VarInfoAddone(VAR_TYPE, "getAssignedValue");
     return data.getAssignedValue(); }
   
   BOOL isAssignedValue(DomainInt i)
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, isAssignedValue);
+    VarInfoAddone(VAR_TYPE, "isAssignedValue");
     return data.isAssignedValue(i);
   }
   
   BOOL inDomain(DomainInt b)
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, inDomain);
+    VarInfoAddone(VAR_TYPE, "inDomain");
     return data.inDomain( b); 
   }
   
   BOOL inDomain_noBoundCheck(DomainInt b)
   {
-    VAR_INFO_ADDONE(VAR_TYPE, inDomain_noBoundCheck);
+    VarInfoAddone(VAR_TYPE, "inDomain_noBoundCheck");
     return data.inDomain_noBoundCheck(b);
   }
   
   
   DomainInt getMax()
   {
-    VAR_INFO_ADDONE(VAR_TYPE, getMax);
+    VarInfoAddone(VAR_TYPE, "getMax");
     return data.getMax(); 
   }
   
   DomainInt getMin()
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, getMin);
+    VarInfoAddone(VAR_TYPE, "getMin");
     return data.getMin(); 
   }
 
   DomainInt getInitialMax() const
   {
-    VAR_INFO_ADDONE(VAR_TYPE, getInitialMax);
+    VarInfoAddone(VAR_TYPE, "getInitialMax");
     return data.getInitialMax(); 
   }
   
   DomainInt getInitialMin() const
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, getInitialMin);
+    VarInfoAddone(VAR_TYPE, "getInitialMin");
     return data.getInitialMin(); 
   }
   
   void setMax(DomainInt i)
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, setMax);
+    VarInfoAddone(VAR_TYPE, "setMax");
     data.setMax(i); 
   }
   
   void setMin(DomainInt i)
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, setMin);
+    VarInfoAddone(VAR_TYPE, "setMin");
     data.setMin(i); 
   }
   
   void uncheckedAssign(DomainInt b)
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, uncheckedAssign);
+    VarInfoAddone(VAR_TYPE, "uncheckedAssign");
     data.uncheckedAssign( b); 
   }
   
   void propagateAssign(DomainInt b)
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, propagateAssign);
+    VarInfoAddone(VAR_TYPE, "propagateAssign");
     data.propagateAssign( b); 
   }
   
   void removeFromDomain(DomainInt b)
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, RemoveFromDomain);
+    VarInfoAddone(VAR_TYPE, "removeFromDomain");
     data.removeFromDomain( b); 
   }
   
   void addTrigger(Trigger t, TrigType type)
   {
-    VAR_INFO_ADDONE(VAR_TYPE, addTrigger);
+    VarInfoAddone(VAR_TYPE, "addTrigger");
     data.addTrigger( t, type); 
   }
   
@@ -115,14 +115,14 @@ struct InfoRefType
  
   int getDomainChange(DomainDelta d)
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, getDomainChange);
+    VarInfoAddone(VAR_TYPE, "getDomainChange");
     return d.XXX_get_domain_diff(); 
   }
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   { 
-    VAR_INFO_ADDONE(VAR_TYPE, addDynamicTrigger);
+    VarInfoAddone(VAR_TYPE, "addDynamicTrigger");
     data.addDynamicTrigger( t, type, pos); 
   }
 #endif

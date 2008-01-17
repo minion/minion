@@ -59,9 +59,9 @@
 #ifdef MORE_SEARCH_INFO
 #include "get_info/get_info.h"
 #else
-#define CON_INFO_ADDONE(ConEvent)
-#define VAR_INFO_ADDONE(VarType, VarEvent)
-#define PROP_INFO_ADDONE(PropType)
+#define ConInfoAddone(ConEvent)
+#define VarInfoAddone(VarType, VarEvent)
+#define PropInfoAddone(PropType)
 #endif
 
 #include "solver.h"

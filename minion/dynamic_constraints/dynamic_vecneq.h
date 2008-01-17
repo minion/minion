@@ -131,7 +131,7 @@ struct VecNeqDynamic : public DynamicConstraint
   // XXX : I'm not sure this gets GAC, but it does some pruning, and is fast.
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PROP_INFO_ADDONE(DynVecNeq);
+	PropInfoAddone("DynVecNeq");
     D_INFO(2, DI_VECNEQ, "Starting propagate");
     if(only_one_possible_pair)
 	{

@@ -13,8 +13,22 @@ if len(other)>1:
     print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...]"
     sys.exit(1)
 
-conslist=["pow", "alldiff", "reifyalldiff",  "reifyimplyalldiff"]
 # This one tests all the constraints in the following list.
+
+# alldiffs
+conslist=["alldiff", "reifyalldiff",  "reifyimplyalldiff", "alldiffgacslow", "reifyalldiffgacslow", "reifyimplyalldiffgacslow"]
+
+#element constraints
+conslist+=["gacelement", "reifyimplygacelement", "element", "reifyimplyelement", "watchelement"]
+
+#non-reifiable arithmetic constraints
+conslist+=["modulo", "pow", "minuseq", "watchsumleq", "watchsumgeq", "watchvecneq"]
+
+conslist+=["product", "reifyproduct", "reifyimplyproduct"]
+conslist+=["sumgeq", "reifysumgeq", "reifyimplysumgeq"]
+conslist+=["sumleq", "reifysumleq", "reifyimplysumleq"]
+
+#conslist+=["weightedsumleq"...
 
 numtests=50
 minionbin="bin/minion"
@@ -49,6 +63,6 @@ for consname1 in conslist:
             mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)
             mailstring+="Using binary %s\n"%minionbin
             mail(mailstring)
-            break
+            sys.exit(1)
 
 

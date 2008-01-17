@@ -72,7 +72,7 @@ struct BoundsTableConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int, DomainDelta)
   {
-    PROP_INFO_ADDONE(BoundTable);
+    PropInfoAddone("BoundTable");
     for(unsigned int check_var = 0; check_var < vars.size(); check_var++)
     {
       int check_dom;

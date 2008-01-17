@@ -62,7 +62,7 @@ struct ModConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
-	PROP_INFO_ADDONE(Mod);
+	PropInfoAddone("Mod");
     // aiming at bounds(D)-consistency. 
     // Not achieved because we don't trigger on the supporting values, only bounds.
     

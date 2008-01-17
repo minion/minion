@@ -55,7 +55,7 @@ struct LightLessEqualSumConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PROP_INFO_ADDONE(LightSum);
+	PropInfoAddone("LightSum");
     DomainInt min_sum = 0;
     for(unsigned i = 0; i < size; ++i)
       min_sum += var_array[i].getMin();

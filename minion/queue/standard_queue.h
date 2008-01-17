@@ -51,14 +51,14 @@ public:
   
   void pushSpecialTrigger(Constraint* trigger)
   {
-      CON_INFO_ADDONE(AddSpecialToQueue);
+      ConInfoAddone("AddSpecialToQueue");
       special_triggers.push_back(trigger);
   }
   
   
   inline void pushTriggers(TriggerRange new_triggers)
   { 
-	CON_INFO_ADDONE(AddConToQueue);
+	ConInfoAddone("AddConToQueue");
     D_INFO(1, DI_QUEUE, string("Adding new triggers. Trigger list size is ") + 
 		   to_string(propagate_trigger_list.size()) + ".");
 	propagate_trigger_list.push_back(new_triggers); 
@@ -67,7 +67,7 @@ public:
 #ifdef DYNAMICTRIGGERS
   void pushDynamicTriggers(DynamicTrigger* new_dynamic_trig_range)
   { 
-	CON_INFO_ADDONE(AddDynToQueue);
+	ConInfoAddone("AddDynToQueue");
     D_ASSERT(new_dynamic_trig_range->sanity_check_list());
     dynamic_trigger_list.push_back(new_dynamic_trig_range);   
   }
@@ -125,7 +125,7 @@ public:
 #endif
 		next_queue_ptr = it->next;
 		D_INFO(1, DI_QUEUE, string("Will do ") + to_string(next_queue_ptr) + " next");
-		CON_INFO_ADDONE(DynamicTrigger);
+		ConInfoAddone("DynamicTrigger");
 		it->propagate();  
 
 		it = next_queue_ptr;
@@ -158,12 +158,12 @@ public:
 		  it->full_propagate();
 		else
 		{
-		  CON_INFO_ADDONE(StaticTrigger);
+		  ConInfoAddone("StaticTrigger");
 		  it->propagate(data_val);
 		}
 #else
 		{
-		  CON_INFO_ADDONE(StaticTrigger);
+		  ConInfoAddone("StaticTrigger");
 		  it->propagate(data_val);
 		}
 #endif
@@ -219,7 +219,7 @@ public:
 	  D_INFO(1, DI_QUEUE, string("Doing a special trigger!"));
 	  Constraint* trig = special_triggers.back();
 	  special_triggers.pop_back();
-	  CON_INFO_ADDONE(SpecialTrigger);
+	  ConInfoAddone("SpecialTrigger");
 	  trig->special_check();
 
 	} // while(true)

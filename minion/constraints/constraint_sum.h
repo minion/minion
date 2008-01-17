@@ -96,7 +96,7 @@ struct BoolLessSumConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PROP_INFO_ADDONE(BoolSum);
+	PropInfoAddone("BoolSum");
     D_ASSERT(var_array[i].getAssignedValue() == 0 ||
 			 var_array[i].getAssignedValue() == 1);
     int c = count + 1;

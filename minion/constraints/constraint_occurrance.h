@@ -99,7 +99,7 @@ struct OccurrenceEqualConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PROP_INFO_ADDONE(OccEqual);
+	PropInfoAddone("OccEqual");
     if( var_array[i].getAssignedValue() == value )
     {
       int c = occurrences_count + 1;

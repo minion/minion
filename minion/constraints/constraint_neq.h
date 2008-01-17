@@ -56,7 +56,7 @@ struct NeqConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PROP_INFO_ADDONE(ArrayNeq);
+	PropInfoAddone("ArrayNeq");
     DomainInt remove_val = var_array[prop_val].getAssignedValue();
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
@@ -190,7 +190,7 @@ struct NeqConstraintBinary : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PROP_INFO_ADDONE(BinaryNeq);
+	PropInfoAddone("BinaryNeq");
     if (prop_val == 1) {
       DomainInt remove_val = var1.getAssignedValue();
 	  if(var2.isBound())

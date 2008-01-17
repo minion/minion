@@ -97,7 +97,7 @@ struct GACTableConstraint : public DynamicConstraint
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
   {
-	PROP_INFO_ADDONE(DynGACTable);
+	PropInfoAddone("DynGACTable");
 	D_INFO(1, DI_TABLECON, "Propagation Triggered: " + to_string(propagated_trig));
 	DynamicTrigger* dt = dynamic_trigger_start();
 	int trigger_pos = propagated_trig - dt;

@@ -67,7 +67,7 @@ struct DivConstraint : public Constraint
     
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
-	PROP_INFO_ADDONE(Pow);
+	PropInfoAddone("Pow");
   }
   
   virtual void full_propagate()

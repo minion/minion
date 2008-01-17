@@ -121,7 +121,7 @@ struct GACElementConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PROP_INFO_ADDONE(GACElement);
+	PropInfoAddone("GACElement");
     int array_size = var_array.size();
 	DomainInt domain_size = (var_array_max_val - var_array_min_val + 1);
 	

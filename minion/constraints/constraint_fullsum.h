@@ -83,7 +83,7 @@ struct LessEqualSumConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta domain_change)
   {
-	PROP_INFO_ADDONE(FullSum);
+	PropInfoAddone("FullSum");
     DomainInt sum = var_array_min_sum;
     if(prop_val != -1)
     { // One of the array changed

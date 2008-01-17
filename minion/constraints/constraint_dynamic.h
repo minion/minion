@@ -95,7 +95,7 @@ public:
 #ifndef NO_DYN_CHECK
 	  if(this == next_queue_ptr)
 	  {
-		CON_INFO_ADDONE(DynamicMovePtr);
+		ConInfoAddone("DynamicMovePtr");
 	    next_queue_ptr = next;
 	  }
       

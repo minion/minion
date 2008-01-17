@@ -126,7 +126,7 @@ struct LexLeqConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PROP_INFO_ADDONE(Lex);
+	PropInfoAddone("Lex");
     D_INFO(0,DI_LEXCON,"Begin Propagation");
     if (F)
     {

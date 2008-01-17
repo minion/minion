@@ -240,7 +240,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PROP_INFO_ADDONE(DynSum);
+	PropInfoAddone("DynSum");
     D_ASSERT(check_consistency());
 	int propval = dt->trigger_info();
     D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));

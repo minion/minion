@@ -55,7 +55,7 @@ struct LeqConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val,DomainDelta)
   {
-	PROP_INFO_ADDONE(BinaryLeq);
+	PropInfoAddone("BinaryLeq");
     if(prop_val)
     {// y changed
       x.setMax(y.getMax() + offset);

@@ -60,7 +60,7 @@ struct AndConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PROP_INFO_ADDONE(And);
+	PropInfoAddone("And");
     switch(i)
     {
       case 1:

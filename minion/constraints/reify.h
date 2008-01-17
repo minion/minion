@@ -135,7 +135,7 @@ struct reify : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
-	PROP_INFO_ADDONE(Reify);
+	PropInfoAddone("Reify");
     D_INFO(1,DI_REIFY,"Propagation Start");
 	if(constraint_locked)
 	  return;

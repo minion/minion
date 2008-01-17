@@ -140,7 +140,7 @@ struct AlldiffGacSlow : public Constraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PROP_INFO_ADDONE(AlldiffGacSlow);
+	PropInfoAddone("AlldiffGacSlow");
     
     unsigned int numvars=var_array.size();  // number of variables in the constraint
     

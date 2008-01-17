@@ -77,7 +77,7 @@ struct BoolBinarySATConstraintDynamic : public DynamicConstraint
     
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PROP_INFO_ADDONE(Dyn2SAT);
+	PropInfoAddone("Dyn2SAT");
 	int propval = dt->trigger_info();
 	
 	if(propval)
