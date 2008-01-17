@@ -122,5 +122,6 @@ using namespace std;
 #include "linked_ptr.h"
 #include "sys_constants.h"
 #include "debug.h"
+#include "array_functions.h"
 //#include "light_vector.h"
 
