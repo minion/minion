@@ -1,5 +1,5 @@
 #!/bin/bash
 cd ..
-./build-all.sh MYFLAGS=" -march=pentium -fomit-frame-pointer"
+./build-all.sh MYFLAGS=" -march=pentium"
 cd release-scripts
 ./make-release.sh intel-linux
