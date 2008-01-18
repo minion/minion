@@ -40,7 +40,7 @@ specifies that, in any solution, vec[i] = e.
 */
 
 /** @help constraints;watchelement Reifiability
-This constraint is reifiable.
+This constraint is NOT reifiable.
 */
 
 /** @help constraints;watchelement Notes
