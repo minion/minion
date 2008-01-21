@@ -387,7 +387,7 @@ class testgacelement__minus__deprecated:
         return out
     
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("gacelement-deprecated", False, reify, reifyimply, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, True)
+        return runtestgeneral("gacelement-deprecated", False, reify, reifyimply, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, not reifyimply)
 
 class testwatchelement(testgacelement__minus__deprecated):
     def runtest(self, reify=False, reifyimply=False):
