@@ -4,10 +4,10 @@ rm -rf temp-mac-intel-build
 mkdir temp-mac-intel-build
 rm -rf temp-mac-ppc-build
 mkdir temp-mac-ppc-build
-./build-all.sh MYFLAGS=" -fast -arch i386 -march=pentium-m -mdynamic-no-pic -fomit-frame-pointer"
+./build-all.sh MYFLAGS=" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -fast -arch i386 -march=pentium-m -mdynamic-no-pic -fomit-frame-pointer"
 cp bin/* temp-mac-intel-build/
 # Now build the PPC bits
-./build-all.sh MYFLAGS=" -fast -arch ppc -mcpu=G4 -mdynamic-no-pic -fomit-frame-pointer"
+./build-all.sh MYFLAGS=" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -fast -arch ppc -mcpu=G4 -mdynamic-no-pic -fomit-frame-pointer"
 cp bin/* temp-mac-ppc-build/
 make veryclean
 lipo -create temp-mac-intel-build/minion temp-mac-ppc-build/minion -output bin/minion
