@@ -109,6 +109,7 @@ struct ReifiedEqualConstraint : public Constraint
     switch(i)
     {
       case 1:
+        D_ASSERT(var1.isAssigned());
 		if(var2.isAssigned())
 		{ var3.propagateAssign(var1.getAssignedValue() == var2.getAssignedValue()); }
 		else
@@ -122,6 +123,7 @@ struct ReifiedEqualConstraint : public Constraint
 		break;
         
       case 2:
+        D_ASSERT(var2.isAssigned());
         if(var1.isAssigned())
 		{ var3.propagateAssign(var1.getAssignedValue() == var2.getAssignedValue()); }
 		else
@@ -135,6 +137,8 @@ struct ReifiedEqualConstraint : public Constraint
 		break;        
 		
       case 3:
+        D_ASSERT(var3.isAssigned() && var3.getAssignedValue()==1);
+        // reifyvar==1
 		if(var1.isAssigned())
 		{ var2.propagateAssign(var1.getAssignedValue()); }
 		else
@@ -145,6 +149,19 @@ struct ReifiedEqualConstraint : public Constraint
 		break;
 		
       case -3:
+        D_ASSERT(var3.isAssigned() && var3.getAssignedValue()==0);
+        // reifyvar==0
+        
+        if(var1.isAssigned() && !var2.isBound())
+        {
+            var2.removeFromDomain(var1.getAssignedValue());
+        }
+        
+        if(var2.isAssigned() && !var1.isBound())
+        {
+            var1.removeFromDomain(var2.getAssignedValue());
+        }
+        
         if(var1.isAssigned() && var2.isAssigned())
 		{ 
 		  if(var1.getAssignedValue() == var2.getAssignedValue())

@@ -33,7 +33,7 @@ specifies that, in any solution, vec[i] = e.
 */
 
 /** @help constraints;element Reifiability
-This constraint is reifiable.
+This constraint is not reifiable.
 */
 
 /** @help constraints;element References 
