@@ -26,43 +26,82 @@
 
 // This file is designed to encapsulate all time keeping done by Minion.
 
+#include <sys/time.h>
+#include <sys/resource.h>
+
 class TimerClass
 {
-  clock_t _internal_start_time;
-  clock_t _last_check_time;
+  rusage _internal_start_time;
+  rusage _last_check_time;
+  timeval start_wallclock;
 
 public:
   
 void startClock()
 {
-  _internal_start_time = clock();
+  getrusage(RUSAGE_SELF, &_internal_start_time);
+  gettimeofday(&start_wallclock, NULL);
   _last_check_time = _internal_start_time;
 }
 
+double getTimeDiff(const rusage& end_time, const rusage& start_time)
+{
+  double time = end_time.ru_utime.tv_sec - start_time.ru_utime.tv_sec;
+  time += (end_time.ru_utime.tv_usec - start_time.ru_utime.tv_usec) / 1000000.0;
+  return time;
+}
+
+double getSecsSince(const rusage& start_time)
+{
+  struct rusage temp_time;
+  getrusage(RUSAGE_SELF, &temp_time);
+  return getTimeDiff(temp_time, start_time);
+}
+
 bool checkTimeout(unsigned seconds)
-{ return (clock() - _internal_start_time) >= (seconds * CLOCKS_PER_SEC); }
+{ 
+  struct rusage temp_time;
+  getrusage(RUSAGE_SELF, &temp_time);
+  return ( getSecsSince(_internal_start_time) >= seconds );
+}
 
 void printTimestepWithoutReset(const char* time_name)
 {
-  cout << time_name << (clock() - _last_check_time) / (1.0 * CLOCKS_PER_SEC) << endl;
+  cout << time_name << getSecsSince(_last_check_time) << endl;
 } 
 
 void maybePrintTimestepStore(const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
 {
-    clock_t current_time = clock();
-    double diff=(current_time - _last_check_time) / (1.0 * CLOCKS_PER_SEC);
-    if(toprint) cout << time_name << diff << endl;
-    _last_check_time = current_time;
-    tableout.set(string(store_name), to_string(diff));
+  struct rusage temp_time;
+  getrusage(RUSAGE_SELF, &temp_time);
+  double diff=getTimeDiff(temp_time, _last_check_time);
+  if(toprint) cout << time_name << diff << endl;
+  _last_check_time = temp_time;
+  tableout.set(string(store_name), to_string(diff));
 }
 
 
 void maybePrintFinaltimestepStore(const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
 {
+  timeval end_wallclock;
+  gettimeofday(&end_wallclock, NULL);
+  
+  // Get final wallclock time.
+  double time_wallclock = end_wallclock.tv_sec - start_wallclock.tv_sec;
+  time_wallclock += (end_wallclock.tv_usec - start_wallclock.tv_usec) / 1000000.0;
+  
+  // Get used system time.
+  double sys_time = _last_check_time.ru_stime.tv_sec - _internal_start_time.ru_stime.tv_sec;
+  sys_time += (_last_check_time.ru_stime.tv_usec - _internal_start_time.ru_stime.tv_usec) / 1000000.0;
+  
   maybePrintTimestepStore(time_name, store_name, tableout, toprint);
   if(toprint) 
-    cout << "Total Time: " << (_last_check_time - _internal_start_time) / (1.0 * CLOCKS_PER_SEC) << endl;
-  tableout.set(string("TotalTime"), to_string((_last_check_time - _internal_start_time) / (1.0 * CLOCKS_PER_SEC)));
+  {
+    cout << "Total Time: " << getTimeDiff(_last_check_time, _internal_start_time) << endl;
+    cout << "Total System Time: " << sys_time << endl;
+    cout << "Total Wall Time: " << time_wallclock << endl;
+  }
+  tableout.set(string("TotalTime"), to_string(getTimeDiff(_last_check_time, _internal_start_time)) );
 }
 };
 
