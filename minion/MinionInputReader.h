@@ -247,7 +247,7 @@ class MinionInputReader {
   
   BOOL parser_verbose ;
   
-  MinionInputReader() : parser_verbose(false)
+  MinionInputReader(bool _parser_verbose) : parser_verbose(_parser_verbose)
   {}
 };
 
@@ -299,7 +299,7 @@ public:
   bool isGadgetReader()
   { return isGadgetReader_m; }
   
-  MinionThreeInputReader() : parser_verbose(false), print_all_vars(true),
+  MinionThreeInputReader(bool _parser_verbose) : parser_verbose(_parser_verbose), print_all_vars(true),
     isGadgetReader_m(false)
   {}
 };

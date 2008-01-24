@@ -332,16 +332,15 @@ void print_info()
 }
 
 
-template<typename Reader>
-void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& args, int argc, char** argv)
+void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, char** argv)
 {
- for(int i = 1; i < argc - 1; ++i)
+ for(int i = 1; i < argc; ++i)
   {
     const string command(argv[i]);
 	if(command == string("-findallsols"))
 	{ getOptions(stateObj).findAllSolutions(); }
 	else if(command == string("-quiet"))
-	{ reader.parser_verbose = false; }
+	{ getOptions(stateObj).parser_verbose = false; }
 	else if(command == string("-printsols"))
 	{ getOptions(stateObj).print_solution = true; }
 	else if(command == string("-noprintsols"))
@@ -349,7 +348,7 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
 	else if(command == string("-printsolsonly"))
 	{ getOptions(stateObj).print_only_solution = true; }
 	else if(command == string("-verbose"))
-	{ reader.parser_verbose = true; }
+	{ getOptions(stateObj).parser_verbose = true; }
     else if(command == string("-X-prop-node"))
     {
       cout << "# WARNING: -X-prop-node is experimental. Do not use for benchmarking!" << endl;
@@ -479,15 +478,21 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
     }
 	else
 	{ 
-	  cout << "I don't understand '" << command << "'. Sorry." << endl;
-	  FAIL_EXIT();
+	  if(getOptions(stateObj).instance_name == "")
+      getOptions(stateObj).instance_name = command;
+    else
+    {
+	    cout << "I don't understand '" << command << "'. Sorry." << endl;
+      cout << "You can only give one instance file when running minion." << endl;
+	    FAIL_EXIT();
+    }
 	}
   }
   // bundle all options together and store
   string s=string("");
-  for(int i = 1; i < argc - 1; ++i)
+  for(int i = 1; i < argc; ++i)
   {
-      if(i<argc-2)
+      if(i<argc-1)
           s=s+argv[i]+",";
       else
           s=s+argv[i];
@@ -502,7 +507,7 @@ void parse_command_line(StateObj* stateObj, Reader& reader, MinionArguments& arg
   * output in the case when a parsing error occurs
   */
 template<typename Reader, typename FileReader>
-void ReadCSP(Reader& reader, FileReader* infile, char* filename)
+void ReadCSP(Reader& reader, FileReader* infile, const char* filename)
 {
 #ifndef NOCATCH  
   try
@@ -577,16 +582,14 @@ void readInput(InputReader* infile, int argc, char** argv, StateObj* stateObj, C
   
   if(inputFileVersionNumber == 3)
   {
-    MinionThreeInputReader<InputReader> reader;
-    parse_command_line(stateObj, reader, args, argc, argv);
-    ReadCSP(reader, infile, argv[argc - 1]);
+    MinionThreeInputReader<InputReader> reader(getOptions(stateObj).parser_verbose);
+    ReadCSP(reader, infile, getOptions(stateObj).instance_name.c_str());
     instance = reader.instance;
   } 
   else
   {
-    MinionInputReader<InputReader> reader;
-    parse_command_line(stateObj, reader, args, argc, argv);
-    ReadCSP(reader, infile, argv[argc - 1]);
+    MinionInputReader<InputReader> reader(getOptions(stateObj).parser_verbose);
+    ReadCSP(reader, infile, getOptions(stateObj).instance_name.c_str());
     instance = reader.instance;
   }  
 
@@ -650,6 +653,10 @@ try {
   } else {
   }
     
+  CSPInstance instance;
+  MinionArguments args;
+
+  parse_command_line(stateObj, args, argc, argv);
   
   if (!getOptions(stateObj).print_only_solution) 
   { 
@@ -663,20 +670,23 @@ try {
     cout << "#  Minion is still very new and in active development." << endl;
     cout << "#  If you have problems with Minion or find any bugs, please tell us!" << endl;
     cout << "#  Either at the bug reporter at the website, or 'chris@bubblescope.net'" << endl;
-    cout << "# Input filename: " << argv[argc-1] << endl;
+    cout << "# Input filename: " << getOptions(stateObj).instance_name << endl;
     cout << "# Command line: " ;
     for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; } 
     cout << endl;
   }
   
-  CSPInstance instance;
-  MinionArguments args;
+
+     
   
-  if( argv[argc - 1] != string("--") )
+  if( getOptions(stateObj).instance_name != "--" )
   {
-    ConcreteFileReader<ifstream> infile(argv[argc - 1]);
+	// Why do I have to put this filename into a variable before I feed it into the ConcreteFileReader?
+	// I'm not completely sure, but it works this way.
+    const char* filename = getOptions(stateObj).instance_name.c_str();
+    ConcreteFileReader<ifstream> infile(filename);
 	if (infile.failed_open()) {
-	  D_FATAL_ERROR("Can't open given input file '" + string(argv[argc - 1]) + "'.");
+	  D_FATAL_ERROR("Can't open given input file '" + getOptions(stateObj).instance_name + "'.");
 	}    
     readInput(&infile, argc,argv,stateObj,instance,args);
   }
@@ -686,10 +696,6 @@ try {
     readInput(&infile, argc,argv,stateObj,instance,args);
   }
 
-  
-  
- 
-  
   getState(stateObj).setTupleListContainer(instance.tupleListContainer);
   
   // Copy args into tableout

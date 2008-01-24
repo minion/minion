@@ -408,10 +408,8 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
   string name = infile->get_string();
   parser_info("Gadget name:" + name);
   
-  MinionThreeInputReader gadget;
+  MinionThreeInputReader gadget(parser_verbose);
   gadget.setGadgetReader();
-  // Pass on parser verboseness
-  gadget.parser_verbose = parser_verbose;
   gadget.read(infile);
   
   // Take the CSPInstance out of the Minion3InputReader, and make a copy of it.
