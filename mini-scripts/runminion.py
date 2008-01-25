@@ -1,0 +1,63 @@
+#!/usr/bin/python
+import os, getopt, sys
+import random
+
+# very simple program, just runs minion on the given minion files, using tableout.
+
+#Get the minion binary, and possibly a filelist and other options.
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "filelist=", "benchdir=", "timelimit=", "tableout="])
+
+rand=random.randint(0, 1000000)
+minion="bin/minion"
+tableout="miniontable"
+filelist=[]
+timeout="-timelimit 1200"
+
+for (ident, value) in optargs:
+    if ident=="--minion":
+        minion=value
+    elif ident=="--filelist": 
+        filelist+=open(value, "r").readlines()
+    elif ident=="--benchdir":
+        print "benchdir=" + value
+        for root, dirs, files in os.walk(value):
+            for name in files:
+                if name.endswith('.minion'):
+                    filelist.append(os.path.join(root,name))
+    elif ident=="--xgrid":
+        print "xgrid not implemneted"
+    elif ident=="--timelimit":
+        timeout="-timelimit "+str(value)
+    elif ident=="--tableout":
+        tableout=value
+
+# grab any command line arguments which are minion instance files.
+othercopy=other[:]
+for l in othercopy:
+    if l.endswith(".minion"):
+        other.remove(l)
+        filelist.append(l)
+
+if len(other)!=1:
+    print "Usage: runminion.py [--minion=<location of minion binary>]"
+    print "       [--filelist=... | --benchdir=...] [--timelimit=...] [--tableout=..]"
+    print "       instance.minion ... "
+    print " Any number of instance directories, instances and filelists can be specified, they"
+    print " will all be used."
+    sys.exit(1)
+
+# This script assumes it can use the current directory for temporary files.
+assert filelist!=[] , "You need to specify some instance files in some way"
+print filelist
+
+
+for i in filelist:
+    minioncommand1=minion+" -tableout "+tableout+" "+timeout+" "+i+" >>1."+str(rand)
+    
+    print "Executing command:"+minioncommand1
+    status1=os.system(minioncommand1)
+    
+    assert status1 == 0 , "A minion exited in non-standard way on instance %s"%i
+
+#os.system("mini-scripts/plot-comparison.pl 1.%d 2.%d --name1=%s --name2=%s"%(rand, rand, name1, name2))
+

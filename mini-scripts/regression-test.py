@@ -7,8 +7,8 @@ import random
 
 rand=random.randint(0, 1000000)
 
-name1="minion1"
-name2="minion2"
+name1=False
+name2=False
 
 filelist=[]
 timeout="-timelimit 1200"
@@ -34,6 +34,11 @@ for (ident, value) in optargs:
         name1=value
     elif ident=="--name2":
         name2=value
+
+if not name1:
+    name1=minion1
+if not name2:
+    name2=minion2
 
 # grab any command line arguments which are minion instance files.
 othercopy=other[:]
