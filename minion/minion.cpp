@@ -400,7 +400,6 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
 	{
 	  ++i;
 	  getOptions(stateObj).sollimit = atoi(argv[i]);
-	  getOptions(stateObj).findAllSolutions(); 
 	  if(getOptions(stateObj).sollimit == 0)
 	  {
 	    cout << "Did not understand the parameter to sollimit:" << argv[i] << endl;
