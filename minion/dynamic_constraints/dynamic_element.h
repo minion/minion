@@ -245,7 +245,9 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	// We define UNDEF = false ;)
 	indexvar.setMin(0);
 	indexvar.setMax(array_size - 1);
+	
     if(getState(stateObj).isFailed()) return;
+	
 	for(int i = 0; i < array_size; ++i)
 	{
 	  current_support[i] = initial_result_dom_min-1;        // will be incremented if support sought
@@ -259,6 +261,9 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	  if(resultvar.inDomain(i + initial_result_dom_min))
 	    find_new_support_for_result(i);
 	}
+	
+	if(indexvar.isAssigned())
+	  deal_with_assigned_index();
 	
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
