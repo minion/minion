@@ -1,0 +1,15 @@
+MINION 3
+#TEST SOLCOUNT 1
+**VARIABLES**
+BOOL x0
+BOUND x1 {-1..0}
+BOUND x4 {-1..0}
+
+**SEARCH**
+MAXIMIZING x4
+**CONSTRAINTS**
+reifyimply(sumleq([x1, 0, x4],0), x0)
+eq(x0,0)
+eq(x4, x1)
+diseq(x4, x0)
+**EOF**
