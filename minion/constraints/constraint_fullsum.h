@@ -95,6 +95,8 @@ struct LessEqualSumConstraint : public Constraint
     }
 	
 	var_sum.setMin(sum);
+	if(getState(stateObj).isFailed())
+        return;
 	D_ASSERT(sum <= get_real_min_sum());
 	
 	DomainInt looseness = var_sum.getMax() - sum;
@@ -145,6 +147,7 @@ struct LessEqualSumConstraint : public Constraint
     }
 	
     var_array_min_sum = min_sum;
+    D_ASSERT(min_sum == get_real_min_sum());
     max_looseness = max_diff;
 	D_ASSERT(var_array[0].getDomainChange(0) == 0);
     propagate(0,0);
