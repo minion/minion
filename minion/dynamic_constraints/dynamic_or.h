@@ -76,8 +76,10 @@ struct BoolOrConstraintDynamic : public DynamicConstraint
 	}
       }
     }
-    if(found == 0)
+    if(found == 0) {
       getState(stateObj).setFailed(true);
+      return;
+    }
     if(found == 1) { //detect unit clause
       var_array[first_found].propagateAssign(negs[first_found]);
       return; //don't bother placing any watches on unit clause
