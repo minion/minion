@@ -315,8 +315,9 @@ public:
   bool checkPointerValid(const MoveablePointer*const vp)
   {
     void* ptr = vp->get_ptr_noCheck();
-    D_INFO(0, DI_MEMBLOCK, "Checking for " + to_string(vp) + " to " + to_string(ptr) + " in range " + to_string((void*) current_data) + string(":")
-      + to_string((void*)(current_data + allocated_bytes)));
+    // This message is useful when debugging memory issues, but prints far too much in normal usage.
+    // D_INFO(0, DI_MEMBLOCK, "Checking for " + to_string(vp) + " to " + to_string(ptr) + " in range " + to_string((void*) current_data) + string(":")
+    //  + to_string((void*)(current_data + allocated_bytes)));
 
     bool check1 = (pointers.count(const_cast<MoveablePointer*>(vp)) > 0);
     bool check2 = (ptr >= current_data && ptr < current_data + allocated_bytes);
