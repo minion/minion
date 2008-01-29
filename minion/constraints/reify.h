@@ -46,11 +46,12 @@ struct reify : public Constraint
   BoolVar rar_var;
   
   // These two variables are only used in special cases.
-  BOOL constraint_locked;
-  BOOL value_assigned;
+  bool constraint_locked;
+  Reversible<bool> full_propagate_called;
   
   reify(StateObj* _stateObj, Constraint* _poscon, BoolVar v) : Constraint(_stateObj), poscon(_poscon),
-                                                               rar_var(v),  constraint_locked(false)
+                                                               rar_var(v),  constraint_locked(false),
+                                                               full_propagate_called(false)
   { negcon = poscon->reverse_constraint();}
   
   virtual Constraint* reverse_constraint()
@@ -120,94 +121,85 @@ struct reify : public Constraint
   virtual void special_check()
   {
     D_ASSERT(constraint_locked);
-	constraint_locked = false;
-	if(value_assigned)
-	  poscon->full_propagate();
+    constraint_locked = false;
+    D_ASSERT(rar_var.isAssigned());
+    if(rar_var.getAssignedValue() > 0)
+      poscon->full_propagate();
     else
-	  negcon->full_propagate();
+      negcon->full_propagate();
+    full_propagate_called = true;
   }
   
   virtual void special_unlock()
   {
     D_ASSERT(constraint_locked);
-	constraint_locked = false;
+	  constraint_locked = false;
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
-	PROP_INFO_ADDONE(Reify);
+    PROP_INFO_ADDONE(Reify);
     D_INFO(1,DI_REIFY,"Propagation Start");
-	if(constraint_locked)
-	  return;
+    
+    if(constraint_locked)
+      return;
 	  
     if(i == -99998 || i == -99999)
     {
-	  constraint_locked = true;
-	  getQueue(stateObj).pushSpecialTrigger(this);
-	  
-      if(i==-99999)
-      {
-		D_INFO(1,DI_REIFY,"Full Pos Propagation");
-		value_assigned = true;
-		//poscon->full_propagate();
-      }
-      else
-      {
-		D_INFO(1,DI_REIFY,"Full Neg Propagation");
-		value_assigned = false;
-		//negcon->full_propagate();
-      }
-      return;
+	    constraint_locked = true;
+  	  getQueue(stateObj).pushSpecialTrigger(this);
+  	  return;
     }
     
-    if(rar_var.isAssigned())
+    if(full_propagate_called)
     {
+      D_ASSERT(rar_var.isAssigned());
       if(rar_var.getAssignedValue() == 1)
-      { if(i%2 == 0) poscon->propagate(i/2, domain); }
+        { if(i%2 == 0) poscon->propagate(i/2, domain); }
       else
-      { if(i%2 == 1) negcon->propagate((i-1)/2, domain); }
+        { if(i%2 == 1) negcon->propagate((i-1)/2, domain); }
+      return;
+    }
+
+    if(i%2 == 0)
+    { 
+      if(poscon->check_unsat(i/2, domain)) 
+      { 
+        D_INFO(1,DI_REIFY,"Constraint False");
+        rar_var.uncheckedAssign(false);
+      }
     }
     else
-    {
-      if(i%2 == 0)
-      { 
-		if(poscon->check_unsat(i/2, domain)) 
-		{ 
-		  D_INFO(1,DI_REIFY,"Constraint False");
-		  rar_var.uncheckedAssign(false);
-		}
-      }
-      else
-      { 
-		if(negcon->check_unsat((i-1)/2,domain)) 
-		{
-		  D_INFO(1,DI_REIFY,"Constraint True");
-		  rar_var.uncheckedAssign(true);
-		}
+    { 
+      if(negcon->check_unsat((i-1)/2,domain)) 
+      {
+        D_INFO(1,DI_REIFY,"Constraint True");
+        rar_var.uncheckedAssign(true);
       }
     }
   }
-  
+
   virtual void full_propagate()
   {
     if(poscon->full_check_unsat())
-	{
-	  D_INFO(1,DI_REIFY,"Pos full_check_unsat true!");
+    {
+      D_INFO(1,DI_REIFY,"Pos full_check_unsat true!");
       rar_var.propagateAssign(false);
-	}
-	
+    }
+
     if(negcon->full_check_unsat())
-	{
-	  D_INFO(1,DI_REIFY,"False full_check_unsat true!");
+    {
+      D_INFO(1,DI_REIFY,"False full_check_unsat true!");
       rar_var.propagateAssign(true);
-	}
-    
+    }
+
     if(rar_var.isAssigned())
     {
-      if(rar_var.getAssignedValue() == 1)
-		poscon->full_propagate();
+      if(rar_var.getAssignedValue() > 0)
+        poscon->full_propagate();
       else
-		negcon->full_propagate();
+        negcon->full_propagate();
+      full_propagate_called = true;
     }
   }
 };

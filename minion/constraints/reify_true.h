@@ -29,17 +29,18 @@
 template<typename BoolVar>
 struct reify_true : public Constraint
 {
-  StateObj* stateObj;
   virtual string constraint_name()
   { return "ReifyTrue:" + poscon->constraint_name(); }
   
   Constraint* poscon;
   BoolVar rar_var;
-  BOOL constraint_locked;
+  bool constraint_locked;
   
-  reify_true(StateObj* _stateObj, Constraint* _poscon, BoolVar v) : Constraint(_stateObj), stateObj(_stateObj), 
-                                                                    poscon(_poscon), 
-                                                                    rar_var(v), constraint_locked(false)
+  Reversible<bool> full_propagate_called;
+  
+  reify_true(StateObj* _stateObj, Constraint* _poscon, BoolVar v) : Constraint(_stateObj), poscon(_poscon), 
+                                                                    rar_var(v), constraint_locked(false),
+                                                                    full_propagate_called(stateObj, false)
   { }
   
   virtual Constraint* reverse_constraint()
@@ -82,6 +83,7 @@ struct reify_true : public Constraint
     D_ASSERT(constraint_locked);
 	constraint_locked = false;
 	poscon->full_propagate();
+    full_propagate_called = true;
   }
   
   virtual void special_unlock()
@@ -106,19 +108,19 @@ struct reify_true : public Constraint
       return;
     }
     
-    if(rar_var.isAssigned())
+    if(full_propagate_called)
     {
-      if(rar_var.getAssignedValue() == 1)
-      { poscon->propagate(i, domain); }
+      D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
+      poscon->propagate(i, domain);
     }
   }
   
   virtual void full_propagate()
   {
-    if(rar_var.isAssigned())
+    if(rar_var.isAssigned() && rar_var.getAssignedValue() > 0)
     {
-      if(rar_var.getAssignedValue() != 0)
-	    poscon->full_propagate();
+	  poscon->full_propagate();
+	  full_propagate_called = true;
     }
   }
 };
