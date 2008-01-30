@@ -36,6 +36,25 @@ specifies that, in any solution, vec[i] = e.
 This constraint is not reifiable.
 */
 
+/** @help constraints;element Notes 
+
+The level of propagation enforced by this constraint is not named, however it
+works as follows. For constraint vec[i]=e:
+
+- After i is assigned, ensures that min(vec[i]) = min(e) and 
+  max(vec[i]) = min(e).
+
+- When e is assigned, removes idx from the domain of i whenever e is not an
+  element of the domain of vec[idx].
+
+- When m[idx] is assigned, removes idx from i when m[idx] is not in the domain
+  of e.
+
+This level of constency is designed to avoid the propagator having to scan
+through vec, except when e is assigned. It does a quantity of cheap propagation
+and may work well in practise on certain problems.
+*/
+
 /** @help constraints;element References 
 See the entry 
 

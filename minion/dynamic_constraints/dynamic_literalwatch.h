@@ -25,6 +25,31 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;litsumgeq Description 
+The constraint litsumgeq(vec1, vec2, c) ensures that there exists at least c
+distinct indices i such that vec1[i] = vec2[i].
+*/
+
+/** @help constraints;litsumgeq Notes
+A SAT clause {x,y,z} can be created using:
+
+   litsumgeq([x,y,z],[1,1,1],1)
+
+Note also that this constraint is more efficient for smaller values of c. For
+large values consider using watchsumleq.
+*/
+
+/** @help constraints;litsumgeq Reifiability
+This constraint is NOT reifiable.
+*/
+
+/** @help constraints;litsumgeq References
+See also
+
+   help constraints watchsumleq
+   help constraints watchsumgeq
+*/
+
 
 template<typename VarArray, typename ValueArray, typename VarSum>
 struct LiteralSumConstraintDynamic : public DynamicConstraint

@@ -24,6 +24,39 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;reify References
+See
+   help constraints reifiable
+*/
+
+/** @help constraints;reifyimply References
+See
+   help constraints reifiable
+*/
+
+/** @help constraints;reification Description
+Reification is provided in two forms: reify and reifyimply.
+
+   reify(constraint, r) where r is a 0/1 var
+
+ensures that r is set to 1 if and only if constraint is satisfied. That is, if r
+is 0 the constraint must NOT be satisfied; and if r is 1 it must be satisfied as
+normal. Conversely, if the constraint is satisfied then r must be 1, and if not
+then r must be 0.
+
+   reifyimply(constraint, r)
+
+only checks that if r is set to 1 then constraint must be satisfied. If r is not
+1, constraint may be either satisfied or unsatisfied. Furthermore r is never set
+by propagation, only by search; that is, satisfaction of constraint does not
+affect the value of r.
+*/
+
+/** @help constraints;reification Notes
+Not all constraints are reifiable. Entries for individual constraints give
+more information.
+*/
+
 
 // Note: The whole constraint_locked thing is for the following case:
 // Consider the following events are on the queue:

@@ -27,7 +27,7 @@
 /** @help constraints;div Description
 The constraint
  
-   div([x,y],z)
+   div(x,y,z)
 
 ensures that floor(x/y)=z.
 */

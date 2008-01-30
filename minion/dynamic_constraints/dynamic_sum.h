@@ -31,7 +31,59 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;watchsumgeq Description
+The constraint watchsumleq(vec, c) ensures that sum(vec) >= c.
+*/
 
+/** @help constraints;watchsumgeq Notes
+Equivalent to litsumgeq(vec, [1,...,1], c), but faster.
+*/
+
+/** @help constraints;watchsumgeq Notes
+This constraint works on 0/1 variables only.
+*/
+
+/** @help constraints;watchsumgeq Reifiablity
+This constraint is NOT reifiable.
+*/
+
+/** @help constraints;watchsumgeq References
+See also
+
+   help constraints watchsumleq 
+   help constraints litsumgeq
+*/
+
+/** @help constraints;watchsumleq Description
+The constraint watchsumleq(vec, c) ensures that sum(vec) >= c.
+*/
+
+/** @help constraints;watchsumleq Notes
+For this constraint, small values of c are more efficient.
+*/
+
+/** @help constraints;watchsumleq Notes
+Equivelent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster.
+*/
+
+/** @help constraints;watchsumleq Notes
+This constraint works on binary variables only.
+*/
+
+/** @help constraints;watchsumleq Notes
+For this constraint, large values of c are more efficient.
+*/
+
+/** @help constraints;watchsumleq Reifiablity
+This constraint is NOT reifiable.
+*/
+
+/** @help constraints;watchsumleq References
+See also
+
+   help constraints watchsumgeq 
+   help constraints litsumgeq
+*/
 
 // VarToCount = 1 means leq, = 0 means geq.
 template<typename VarArray, typename VarSum, int VarToCount = 1 >
