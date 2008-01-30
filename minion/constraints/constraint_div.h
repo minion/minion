@@ -86,12 +86,21 @@ struct DivConstraint : public Constraint
     
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
-	PROP_INFO_ADDONE(Pow);
+    PROP_INFO_ADDONE(Pow);
+    if(var1.isAssigned() && var2.isAssigned())
+	  {
+	    if(var2.getAssignedValue() == 0)
+	      getState(stateObj).setFailed(true);
+      var3.propagateAssign(var1.getAssignedValue() / var2.getAssignedValue() );
+    }
   }
   
   virtual void full_propagate()
   { 
-	propagate(1,0); 
+    if(!var2.isBound())
+      var2.removeFromDomain(0);
+      
+    propagate(1,0); 
     propagate(2,0);
     propagate(3,0);
     propagate(-1,0);
