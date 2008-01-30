@@ -1,0 +1,16 @@
+#TEST SOLCOUNT 2
+MINION 3
+
+**VARIABLES**
+
+BOOL a
+
+ALIAS b[1] = [a]
+ALIAS c = a
+
+**CONSTRAINTS**
+
+eq(a,b[0])
+eq(a,c)
+
+**EOF**
