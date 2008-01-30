@@ -304,9 +304,9 @@ ConstraintDef& get_constraint(ConstraintType t)
   for(int i = 0; i < num_of_constraints; ++i)
   {
     if(constraint_list[i].type == t)
-	  return constraint_list[i];
+      return constraint_list[i];
   }
-  
+
   D_FATAL_ERROR("Constraint not found");
 }
 
@@ -322,53 +322,53 @@ void MinionThreeInputReader<FileReader>::parser_info(string s)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 void MinionThreeInputReader<FileReader>::read(FileReader* infile) {  
-    string s = infile->get_asciistring();
-    parser_info("Read: '" + s + "'");
-    
-    string eof, wrong_eof;
-    
-    if(isGadgetReader())
+  string s = infile->get_asciistring();
+  parser_info("Read: '" + s + "'");
+
+  string eof, wrong_eof;
+
+  if(isGadgetReader())
+  {
+    eof = "**GADGET_END**";
+    wrong_eof = "**EOF**";
+  }
+  else
+  {
+    eof = "**EOF**";
+    wrong_eof = "**GADGET_END**";
+  }
+
+  while(s != eof)
+  {
+    if(s == "**VARIABLES**")
+      readVars(infile);
+    else if(s == "**SEARCH**")
+      readSearch(infile);
+    else if(s == "**TUPLELIST**")
+      readTuples(infile);
+    else if(s =="**CONSTRAINTS**")
     {
-      eof = "**GADGET_END**";
-      wrong_eof = "**EOF**";
+      while(infile->peek_char() != '*')
+        readConstraint(infile, false);
+    }
+    else if(s == "**GADGET**")
+      { readGadget(infile); }
+    else if(s == wrong_eof)
+    { 
+      throw parse_exception("Section terminated with " + wrong_eof + 
+        " instead of " + eof);
     }
     else
-    {
-      eof = "**EOF**";
-      wrong_eof = "**GADGET_END**";
-    }
-    
-    while(s != eof)
-    {
-      if(s == "**VARIABLES**")
-        readVars(infile);
-      else if(s == "**SEARCH**")
-        readSearch(infile);
-      else if(s == "**TUPLELIST**")
-        readTuples(infile);
-      else if(s =="**CONSTRAINTS**")
-      {
-        while(infile->peek_char() != '*')
-          readConstraint(infile, false);
-      }
-      else if(s == "**GADGET**")
-      { readGadget(infile); }
-      else if(s == wrong_eof)
-      { 
-        throw parse_exception("Section terminated with " + wrong_eof + 
-                              " instead of " + eof);
-      }
-      else
-        throw parse_exception("Don't understand '" + s + "' as a section header");
-      s = infile->get_asciistring();
-      parser_info("Read: '" + s + "'");
-    }
-    
-    parser_info("Reached end of CSP");
+      throw parse_exception("Don't understand '" + s + "' as a section header");
+    s = infile->get_asciistring();
+    parser_info("Read: '" + s + "'");
+  }
 
-    if(isGadgetReader() && instance.constructionSite.empty())
-      throw parse_exception("Gadgets need a construction site!");
-  
+  parser_info("Reached end of CSP");
+
+  if(isGadgetReader() && instance.constructionSite.empty())
+    throw parse_exception("Gadgets need a construction site!");
+
   // Fill in any missing defaults
   if(instance.var_order.empty())
   {
@@ -383,15 +383,15 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
       var_count += instance.vars.discrete[i].first;
     for(unsigned i = 0; i < instance.vars.sparse_discrete.size(); ++i)
       var_count += instance.vars.sparse_discrete[i].first;
-    
+
     instance.var_order.reserve(var_count);
     for(int i = 0; i < var_count; ++i)
       instance.var_order.push_back(instance.vars.get_var('x',i));
   }
-  
+
   if(instance.val_order.empty())
     instance.val_order = vector<char>(instance.var_order.size(), 'a');
-  
+
   // This has to be delayed unless not all variables are defined where 'PRINT ALL' occurs.
   if(print_all_vars)
     instance.print_matrix = instance.all_vars_list;
@@ -403,15 +403,15 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
   parser_info("Entering gadget parsing");
   if(isGadgetReader())
     throw parse_exception("Gadgets can't have gadgets!");
-  
+
   infile->check_string("NAME");
   string name = infile->get_string();
   parser_info("Gadget name:" + name);
-  
+
   MinionThreeInputReader gadget(parser_verbose);
   gadget.setGadgetReader();
   gadget.read(infile);
-  
+
   // Take the CSPInstance out of the Minion3InputReader, and make a copy of it.
   instance.addGadgetSymbol(name, shared_ptr<CSPInstance>(new CSPInstance(gadget.instance)));
   parser_info("Exiting gadget parsing");
@@ -426,82 +426,82 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
 template<typename FileReader>
 BOOL MinionThreeInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reified) {
   string id = infile->getline('(');
-  
+
   int constraint_num = -1;
   for(int i = 0; i < num_of_constraints; ++i)
   {
-	if(constraint_list[i].name == id)
-	{
-	  constraint_num = i;
-	  break;
-	}
+    if(constraint_list[i].name == id)
+    {
+      constraint_num = i;
+      break;
+    }
   }
-  
+
   if(constraint_num == -1) 
   {
-	if (infile->eof()) 
-	{
-	  throw parse_exception(string("Bad Constraint Name or reached end of file: '") + id + "'");
-	}
-	else
-	{ throw parse_exception(string("Unknown Constraint:") + id); }
+    if (infile->eof()) 
+    {
+      throw parse_exception(string("Bad Constraint Name or reached end of file: '") + id + "'");
+    }
+    else
+      { throw parse_exception(string("Unknown Constraint:") + id); }
   }
   ConstraintDef constraint = constraint_list[constraint_num];
- 
+
   if( constraint.trig_type == DYNAMIC_CT )
   {
 #ifndef WATCHEDLITERALS
-	cerr << "This version of Minion was not complied with -WATCHEDLITERALS" << endl;
-	cerr << "So there is not support for the " << constraint.name << "." << endl;
-	exit(1);
+    cerr << "This version of Minion was not complied with -WATCHEDLITERALS" << endl;
+    cerr << "So there is not support for the " << constraint.name << "." << endl;
+    exit(1);
 #else
-	if(reified)
-	{
-	  cerr << "Cannot reify a watched constraint!" << endl;
-	  exit(1);
-	}
+    if(reified)
+    {
+      cerr << "Cannot reify a watched constraint!" << endl;
+      exit(1);
+    }
 #endif
   }
 
   switch(constraint.type)
   {
-	case CT_ELEMENT:
-	case CT_WATCHED_ELEMENT:
-	case CT_GACELEMENT:
-	  readConstraintElement(infile, constraint) ;
-	  break;
-	case CT_REIFY:
-	case CT_REIFYIMPLY:
-	  { 
-	  if(reified)
-		throw parse_exception("Can't reify a reified constraint!");
-	  readConstraint(infile, true);
-	  
-	  infile->check_sym(',');
-	  Var reifyVar = readIdentifier(infile);
-	  infile->check_sym(')');
-	  if(constraint.type == CT_REIFY)
-	    instance.last_constraint_reify(reifyVar);
-	  else
-	    instance.last_constraint_reifyimply(reifyVar);
-	  }
-	  break;
+    case CT_ELEMENT:
+    case CT_WATCHED_ELEMENT:
+    case CT_GACELEMENT:
+    readConstraintElement(infile, constraint) ;
+    break;
+    case CT_REIFY:
+    case CT_REIFYIMPLY:
+    { 
+      if(reified)
+        throw parse_exception("Can't reify a reified constraint!");
+      readConstraint(infile, true);
 
-	case CT_WATCHED_TABLE:
-	  readConstraintTable(infile, get_constraint(CT_WATCHED_TABLE));
-	  break;
+      infile->check_sym(',');
+      Var reifyVar = readIdentifier(infile);
+      infile->check_sym(')');
+      if(constraint.type == CT_REIFY)
+        instance.last_constraint_reify(reifyVar);
+      else
+        instance.last_constraint_reifyimply(reifyVar);
+    }
+    break;
 
-  case CT_WATCHED_OR:
+    case CT_WATCHED_TABLE:
+    readConstraintTable(infile, get_constraint(CT_WATCHED_TABLE));
+    break;
+
+    case CT_WATCHED_OR:
     readConstraintOr(infile, get_constraint(CT_WATCHED_OR));
     break;
-      
+
     case CT_GADGET:
-      readConstraintGadget(infile);
-      break;
-	default:
-	  readGeneralConstraint(infile, constraint);
+    readConstraintGadget(infile);
+    break;
+    default:
+    readGeneralConstraint(infile, constraint);
   }
-  
+
   instance.bounds_check_last_constraint();
   return true ;
 }
@@ -514,48 +514,48 @@ void MinionThreeInputReader<FileReader>::readGeneralConstraint(FileReader* infil
   instance.add_constraint(ConstraintBlob(def));
   vector<vector<Var> >& varsblob = instance.constraints.back().vars;
   varsblob.reserve(def.number_of_params);
-  
+
   for(int i = 0; i < def.number_of_params; ++i)
   {
     switch(def.read_types[i])
-	{
-	  case read_list:
-	    varsblob.push_back(readLiteralVector(infile));
-		break;
-	  case read_var:
-	    varsblob.push_back(make_vec(readIdentifier(infile)));
-		break;
-	  case read_2_vars:
-	  {
-	    vector<Var> vars(2);
-	    vars[0] = readIdentifier(infile);
-	    infile->check_sym(',');
-	    vars[1] = readIdentifier(infile);
-            varsblob.push_back(vars);
-	  }
-		break;
-	  case read_constant:
-	    varsblob.push_back(make_vec(readIdentifier(infile)));
-		if(varsblob.back().back().type != VAR_CONSTANT)
-		  throw parse_exception("Expected constant but got variable.");
-		break;
-	  case read_constant_list:
-	  {
-		vector<Var> vectorOfConst ;
-		vectorOfConst = readLiteralVector(infile) ;
-		for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
-		{
-		  if(vectorOfConst[loop].type != VAR_CONSTANT)
-			throw parse_exception("Vector must only contain constants.");
-		}
-		varsblob.push_back(vectorOfConst);
-	  }
-		break;  
-	  default:
-	    D_FATAL_ERROR("Internal Error!");
-	}
-	if(i != def.number_of_params - 1)
-	  infile->check_sym(',');
+    {
+      case read_list:
+      varsblob.push_back(readLiteralVector(infile));
+      break;
+      case read_var:
+      varsblob.push_back(make_vec(readIdentifier(infile)));
+      break;
+      case read_2_vars:
+      {
+        vector<Var> vars(2);
+        vars[0] = readIdentifier(infile);
+        infile->check_sym(',');
+        vars[1] = readIdentifier(infile);
+        varsblob.push_back(vars);
+      }
+      break;
+      case read_constant:
+      varsblob.push_back(make_vec(readIdentifier(infile)));
+      if(varsblob.back().back().type != VAR_CONSTANT)
+        throw parse_exception("Expected constant but got variable.");
+      break;
+      case read_constant_list:
+      {
+        vector<Var> vectorOfConst ;
+        vectorOfConst = readLiteralVector(infile) ;
+        for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
+        {
+          if(vectorOfConst[loop].type != VAR_CONSTANT)
+            throw parse_exception("Vector must only contain constants.");
+        }
+        varsblob.push_back(vectorOfConst);
+      }
+      break;  
+      default:
+      D_FATAL_ERROR("Internal Error!");
+    }
+    if(i != def.number_of_params - 1)
+      infile->check_sym(',');
   }
   infile->check_sym(')');
 }
@@ -591,19 +591,18 @@ template<typename FileReader>
 void MinionThreeInputReader<FileReader>::readConstraintTable(FileReader* infile, const ConstraintDef& def) 
 {
   parser_info( "reading a table ct (unreifiable)" ) ;
-  
+
   char delim = ' ';
   int count, elem ;
   vector<Var> vectorOfVars = readLiteralVector(infile) ;
   int tupleSize = vectorOfVars.size() ;
-  
+
   infile->check_sym(',');
-  
+
   char next_char = infile->peek_char();
-  
-  
+
   TupleList* tuplelist;
-  
+
   if(next_char != '{')
   {
     string name = infile->get_string();
@@ -611,33 +610,33 @@ void MinionThreeInputReader<FileReader>::readConstraintTable(FileReader* infile,
   }
   else
   {
-	vector<vector<int> > tuples ;
-	infile->check_sym('{');
-	while (delim != '}') 
-	{
-	  infile->check_sym('<');
-	  vector<int> tuple(tupleSize);
-	  elem = infile->read_num() ;
-	  tuple[0] = elem ;
-	  for (count = 1; count < tupleSize; count++) 
-	  {
-		infile->check_sym(',');
-		elem = infile->read_num() ;
-		tuple[count] = elem ;
-	  }
-	  infile->check_sym('>');
-	  tuples.push_back(tuple) ;
-	  delim = infile->get_char();                          // ',' or '}'
-	  if(delim != ',' && delim!= '}')
-		throw parse_exception("Expected ',' or '}'");
-	}
-	tuplelist = instance.tupleListContainer->getNewTupleList(tuples);
+    vector<vector<int> > tuples ;
+    infile->check_sym('{');
+    while (delim != '}') 
+    {
+      infile->check_sym('<');
+      vector<int> tuple(tupleSize);
+      elem = infile->read_num() ;
+      tuple[0] = elem ;
+      for (count = 1; count < tupleSize; count++) 
+      {
+        infile->check_sym(',');
+        elem = infile->read_num() ;
+        tuple[count] = elem ;
+      }
+      infile->check_sym('>');
+      tuples.push_back(tuple) ;
+      delim = infile->get_char();                          // ',' or '}'
+      if(delim != ',' && delim!= '}')
+        throw parse_exception("Expected ',' or '}'");
+    }
+    tuplelist = instance.tupleListContainer->getNewTupleList(tuples);
   }
-	
-	infile->check_sym(')');
-	ConstraintBlob tableCon(def, vectorOfVars);
-	tableCon.tuples = tuplelist;
-	instance.add_constraint(tableCon);
+
+  infile->check_sym(')');
+  ConstraintBlob tableCon(def, vectorOfVars);
+  tableCon.tuples = tuplelist;
+  instance.add_constraint(tableCon);
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -649,14 +648,13 @@ template<typename FileReader>
 void MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile) 
 {
   parser_info( "Reading a gadget constraint" ) ;
-  
+
   vector<Var> vectorOfVars = readLiteralVector(infile) ;
-  //int tupleSize = vectorOfVars.size() ;
-  
+
   infile->check_sym(',');
-  
+
   string s = infile->get_string();
-  
+
   parser_info( "Gadget name: '" + s + "'");
   shared_ptr<CSPInstance> in_gadget = instance.getGadgetSymbol(s);
   ConstraintBlob gadgetCon( get_constraint(CT_GADGET) , vectorOfVars);
@@ -675,7 +673,7 @@ void MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 void MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* infile, 
-							  const ConstraintDef& ct)
+  const ConstraintDef& ct)
 {
   parser_info("Reading a SAT clause");
   infile->check_sym('[');
@@ -706,10 +704,10 @@ void MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* infile,
 template<typename FileReader>
 Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
   char idChar = infile->peek_char();
-  
+
   if ((('0' <= idChar) && ('9' >= idChar)) || idChar == '-') {
     int i = infile->read_num();
-	return Var(VAR_CONSTANT, i);
+    return Var(VAR_CONSTANT, i);
   }
   bool negVar = false;
   // Check to see if this is a negated Boolean
@@ -718,7 +716,7 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
     negVar = true;
     infile->get_char();
   }
-  
+
   string name = infile->get_string();
   Var var = instance.vars.getSymbol(name);
   if(var.type == VAR_MATRIX)
@@ -727,19 +725,19 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
     vector<int> max_index = instance.vars.getMatrixSymbol(name);
     if(params.size() != max_index.size())
       throw parse_exception("Can't index a " + to_string(max_index.size()) + 
-                            "-d matrix with " + to_string(params.size()) +
-                            " indices.");
+      "-d matrix with " + to_string(params.size()) +
+      " indices.");
     for(int i = 0; i < params.size(); ++i)
     {
       if(params[i] < 0 || params[i] >= max_index[i])
         throw parse_exception(to_string(i) + string("th index is out of bounds,") + 
-                              to_string(params[i]) + " is not between 0 and " +
-                              to_string(max_index[i] - 1));
+        to_string(params[i]) + " is not between 0 and " +
+        to_string(max_index[i] - 1));
     }
     name += to_string(params);
     var = instance.vars.getSymbol(name);
   }
-  
+
   if(negVar)
   {
     if(var.type != VAR_BOOL)
@@ -747,7 +745,7 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
     else
       var.type = VAR_NOTBOOL;
   }
-  
+
   parser_info("Read variable '" + name + "', internally: " + to_string(var));
   return var;
 }
@@ -760,31 +758,31 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
 template<typename FileReader>
 vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(FileReader* infile, bool mustBeMatrix) {
   char idChar = infile->peek_char();
-  
+
   vector<Var> returnVec;
 
   if ((('0' <= idChar) && ('9' >= idChar)) || idChar == '-') {
     if(mustBeMatrix)
       throw parse_exception("Must be matrix here, not constant");
     int i = infile->read_num();
-	returnVec.push_back(Var(VAR_CONSTANT, i));
+    returnVec.push_back(Var(VAR_CONSTANT, i));
     return returnVec;
   }
-  
+
   bool negVar = false;
   // Check to see if this is a negated Boolean
   if(infile->peek_char() == '!')
   {
     negVar = true;
-    // Swallow the '!'
+  // Swallow the '!'
     infile->get_char();
   }
-  
+
   // Get name of variable.
   string name = infile->get_string();
-  
+
   Var var = instance.vars.getSymbol(name);
-  
+
   if(var.type == VAR_MATRIX)
   {
     if(negVar)
@@ -793,28 +791,28 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
     if(infile->peek_char() == '[')
       params = readConstantVector(infile,'[',']',true);
     else
-    { // build a vector of all 'nulls'
+      { // build a vector of all 'nulls'
       vector<int> maxterms = instance.vars.getMatrixSymbol(name);
-      params = vector<int>(maxterms.size(), -999);
-    }
-    returnVec = instance.vars.buildVarList(name, params);
-    parser_info("Got matrix:" + to_string(returnVec));
+    params = vector<int>(maxterms.size(), -999);
   }
-  else
-  { 
-    if(mustBeMatrix)
-      throw parse_exception("Must give matrix here, not single variable!");
-    if(negVar)
-    {
-      if(var.type != VAR_BOOL)
-        parser_info("Only Booleans can be negated!");
-      else
-        var.type = VAR_NOTBOOL;
-    }
-    returnVec.push_back(var);
+  returnVec = instance.vars.buildVarList(name, params);
+  parser_info("Got matrix:" + to_string(returnVec));
+}
+else
+{ 
+  if(mustBeMatrix)
+    throw parse_exception("Must give matrix here, not single variable!");
+  if(negVar)
+  {
+    if(var.type != VAR_BOOL)
+      parser_info("Only Booleans can be negated!");
+    else
+      var.type = VAR_NOTBOOL;
   }
-  parser_info("Read variable '" + name + "', internally: " + to_string(var));
-  return returnVec;  
+  returnVec.push_back(var);
+}
+parser_info("Read variable '" + name + "', internally: " + to_string(var));
+return returnVec;  
 }
 
 /// Reads a vector of variables (which can include constants).
@@ -824,22 +822,22 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
 template<typename FileReader>
 vector<Var> MinionThreeInputReader<FileReader>::readLiteralVector(FileReader* infile) {
   vector<Var> newVector;
-  
+
   if(infile->peek_char() != '[')
   { // Must just be a matrix identifier
     return readPossibleMatrixIdentifier(infile, true);
   }
-  
+
   infile->check_sym('[');
- 
+
   // Delim here might end up being "x" or something similar. The reason
   // that we peek it is in case whis is an empty vector.
-  
+
   char delim = infile->peek_char();
-    	
+
   if(delim == ']')
   {
-    // Eat the ']'
+  // Eat the ']'
     infile->get_char();
     parser_info("Read empty vector.");
   }
@@ -847,17 +845,17 @@ vector<Var> MinionThreeInputReader<FileReader>::readLiteralVector(FileReader* in
   {
     while (delim != ']') {
       vector<Var> v = readPossibleMatrixIdentifier(infile);
-	  newVector.insert(newVector.end(), v.begin(), v.end());
-      //newVector.push_back(readIdentifier(infile)) ;
-	  delim = infile->get_char();
-	     if(delim != ',' && delim != ']')
-	     {
-		   // replace X with the character we got.
-		   string s = "Expected ',' or ']'. Got 'X'.";
-		   s[s.size() - 3] = delim;
-		   throw parse_exception(s);
-	     }
+      newVector.insert(newVector.end(), v.begin(), v.end());
+  //newVector.push_back(readIdentifier(infile)) ;
+      delim = infile->get_char();
+      if(delim != ',' && delim != ']')
+      {
+  // replace X with the character we got.
+        string s = "Expected ',' or ']'. Got 'X'.";
+        s[s.size() - 3] = delim;
+        throw parse_exception(s);
       }
+    }
   }
   return newVector;
 }
@@ -867,12 +865,12 @@ template<typename FileReader>
 vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrix(FileReader* infile)
 {
   vector<vector<Var> > return_vals; 
-  
+
   if(infile->peek_char() != '[')
     return read2DMatrixVariable(infile);
-  
+
   infile->check_sym('[');
-  
+
   while(infile->peek_char() != ']')
   {
     parser_info("Continuing reading matrix, peeked at " + to_string(']'));
@@ -889,7 +887,7 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrix(FileReader
     if(infile->peek_char() == ',')
       infile->check_sym(',');
   }
-  
+
   infile->check_sym(']');
   return return_vals;
 }
@@ -907,7 +905,7 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrixVariable(Fi
   vector<int> indices = instance.vars.getMatrixSymbol(name);
   // Make sure the matrix doesn't have an index after it. This is to produce better error messages.
   if(infile->peek_char() != ',' && infile->peek_char() != ']')
-     throw parse_exception("Only accept raw matrix names here, expected ',' next.");
+    throw parse_exception("Only accept raw matrix names here, expected ',' next.");
 
   if(indices.size() == 1)
   {
@@ -928,14 +926,14 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrixVariable(Fi
 // The start and end default to '[' and ']'
 template<typename FileReader>
 vector<int> MinionThreeInputReader<FileReader>::readConstantVector
-          (FileReader* infile, char start, char end, bool allowNulls) 
+  (FileReader* infile, char start, char end, bool allowNulls) 
 {
   vector<int> newVector;
   infile->check_sym(start);
-  
+
   // The reason we peek here is in case this is an empty vector
   char delim = infile->peek_char();
-  
+
   if(delim == end)
   {
     // Eat the ']'
@@ -952,11 +950,11 @@ vector<int> MinionThreeInputReader<FileReader>::readConstantVector
         newVector.push_back(-999);
       }
       else
-	    newVector.push_back(infile->read_num()) ;
-	  delim = infile->get_char();
+        newVector.push_back(infile->read_num()) ;
+      delim = infile->get_char();
       if(delim != ',' && delim != end)
-       throw parse_exception(string("Expect ',' or ") + end + string("'. Got '") +
-                             delim + string("'"));
+        throw parse_exception(string("Expect ',' or ") + end + string("'. Got '") +
+        delim + string("'"));
     }
   }
   return newVector;
@@ -968,13 +966,13 @@ vector<int> MinionThreeInputReader<FileReader>::readRange(FileReader* infile)
 {
   vector<int> newVector;
   infile->check_sym('{');
-  
+
   newVector.push_back(infile->read_num());
   infile->check_sym('.');
   infile->check_sym('.');
-  
+
   newVector.push_back(infile->read_num());
-  
+
   infile->check_sym('}');
   return newVector;
 }
@@ -988,20 +986,20 @@ void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile)
   {
     string name = infile->get_string();
     int num_of_tuples = infile->read_num();
-	int tuple_length = infile->read_num();
+    int tuple_length = infile->read_num();
     parser_info("Reading tuplelist '" + name + "', length " + to_string(num_of_tuples) +
-                ", arity " + to_string(tuple_length) );
-	TupleList* tuplelist = instance.tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
+      ", arity " + to_string(tuple_length) );
+    TupleList* tuplelist = instance.tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
     int* tuple_ptr = tuplelist->getPointer();
     for(int i = 0; i < num_of_tuples; ++i)
       for(int j = 0; j < tuple_length; ++j)
-	  {
-	    tuple_ptr[i * tuple_length + j] = infile->read_num();
-	  }
+    {
+      tuple_ptr[i * tuple_length + j] = infile->read_num();
+    }
     tuplelist->finalise_tuples();
     instance.addTableSymbol(name, tuplelist);
   }
-  
+
 }
 
 template<typename FileReader>
@@ -1009,25 +1007,25 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
   while(infile->peek_char() != '*')
   {
     string var_type = infile->get_string();
-   
+
     if(var_type == "VARORDER")
     {
       if(!instance.var_order.empty())
         throw parse_exception("Can't have two VARORDERs!");
       instance.var_order = readLiteralVector(infile);
       parser_info("Read var order, length " +
-                  to_string(instance.var_order.size()));
+        to_string(instance.var_order.size()));
     }
     else if(var_type == "VALORDER")
     {
       if(!instance.val_order.empty())
         throw parse_exception("Can't have two VALORDERs!");
       vector<char> valOrder ;
-      
+
       infile->check_sym('[');
-      
+
       char delim = infile->peek_char();
-       
+
       while (delim != ']') {
         char valOrderIdentifier = infile->get_char();
         if(valOrderIdentifier != 'a' && valOrderIdentifier != 'd')
@@ -1036,9 +1034,9 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
         delim = infile->get_char();                                 // , or ]
       }
       instance.val_order = valOrder;
-      
+
       parser_info("Read val order, length " +
-                  to_string(instance.val_order.size()));
+        to_string(instance.val_order.size()));
     }
     else if(var_type == "MAXIMISING" || var_type == "MAXIMIZING")
     {
@@ -1091,7 +1089,7 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
       parser_info("Read construction site, size " + to_string(instance.constructionSite.size()));
     }
     else
-    {  throw parse_exception("Don't understand '" + var_type + "' as a variable type."); }
+      {  throw parse_exception("Don't understand '" + var_type + "' as a variable type."); }
   }
 }
 
@@ -1116,8 +1114,8 @@ void MinionThreeInputReader<FileReader>::readAliasMatrix(FileReader* infile, con
     }
     if(indices.back() + 1 != max_indices[indices.size() - 1])
       throw parse_exception("Incorrectly sized matrix!, expected index " +
-                            to_string(indices.size() - 1) + " to have " + to_string(max_indices[indices.size() - 1]) +
-                            " terms, got " + to_string(indices.back() + 1));
+      to_string(indices.size() - 1) + " to have " + to_string(max_indices[indices.size() - 1]) +
+      " terms, got " + to_string(indices.back() + 1));
   }
   else
   {
@@ -1134,8 +1132,8 @@ void MinionThreeInputReader<FileReader>::readAliasMatrix(FileReader* infile, con
     }
     if(indices.back() + 1 != max_indices[indices.size() - 1])
       throw parse_exception("Incorrectly sized matrix!, expected index " +
-                            to_string(indices.size() - 1) + " to have " + to_string(max_indices[indices.size() - 1]) +
-                            " terms, got " + to_string(indices.back() + 1));
+      to_string(indices.size() - 1) + " to have " + to_string(max_indices[indices.size() - 1]) +
+      " terms, got " + to_string(indices.back() + 1));
   }
 }
 
@@ -1148,7 +1146,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
     string var_type = infile->get_string();
 
     if(var_type != "BOOL" && var_type != "BOUND" && var_type != "SPARSEBOUND"
-       && var_type != "DISCRETE" && var_type != "ALIAS")
+      && var_type != "DISCRETE" && var_type != "ALIAS")
       throw parse_exception(string("Unknown variable type: '") + var_type + "'");
 
     string varname = infile->get_string();
@@ -1156,7 +1154,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
 
     bool isArray = false;
     vector<int> indices;
-      
+
     if(infile->peek_char() == '[')
     {
       parser_info("Is array!");
@@ -1164,19 +1162,26 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       indices = readConstantVector(infile);
       parser_info("Found " + to_string(indices.size()) + " indices");
     }
-    
+
     VariableType variable_type;
     vector<int> domain;
-    
+
     if(var_type == "ALIAS")
     {
       if(isArray == false)
-        throw parse_exception("ALIAS must always be a matrix!");
-      instance.vars.addMatrixSymbol(varname, indices);
-      infile->check_sym('=');
-      infile->check_sym('[');
-      readAliasMatrix(infile, indices, vector<int>(), varname);
-      infile->check_sym(']');
+      {
+        infile->check_sym('='); // XYZ
+        Var v = readIdentifier(infile);
+        instance.vars.addSymbol(varname, v);
+      }
+      else
+      {
+        instance.vars.addMatrixSymbol(varname, indices);
+        infile->check_sym('=');
+        infile->check_sym('[');
+        readAliasMatrix(infile, indices, vector<int>(), varname);
+        infile->check_sym(']');
+      }
     }
     else if(var_type == "BOOL")
     {
@@ -1205,7 +1210,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
     }
     else
       throw parse_exception("I don't know about var_type '" + var_type + "'");
-      
+
     if(var_type != "ALIAS")
     {
       if(isArray)
@@ -1221,7 +1226,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
           instance.vars.addSymbol(varname + to_string(current_index),
                                   instance.vars.getNewVar(variable_type, domain));
         }
-        
+
         vector<vector<Var> > matrix_list = instance.vars.flattenTo2DMatrix(varname);
         for(int i = 0; i < matrix_list.size(); ++i)
           instance.all_vars_list.push_back(matrix_list[i]);
@@ -1234,5 +1239,5 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       }
     }
   }
-  
+
 }
