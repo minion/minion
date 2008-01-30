@@ -45,10 +45,14 @@ struct VecNeqDynamic : public DynamicConstraint
   int watched_index1;
   
   BOOL only_one_possible_pair;
-  
+
+  Reversible<bool> propagate_mode;
+  int index_to_propagate; 
+
   VecNeqDynamic(StateObj* _stateObj,const VarArray1& _array1,
 				const VarArray2& _array2) :
-				DynamicConstraint(_stateObj), var_array1(_array1), var_array2(_array2)
+				DynamicConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
+				propagate_mode(false)
   { D_ASSERT(var_array1.size() == var_array2.size()); }
   
   int dynamic_trigger_count()
@@ -147,12 +151,13 @@ struct VecNeqDynamic : public DynamicConstraint
 					 var_array1[watched_index0]);
 	  return;
 	}
-
-    int trigger_activated = dt - dynamic_trigger_start();
+	
+	int trigger_activated = dt - dynamic_trigger_start();
 	int triggerpair = trigger_activated / 2;
-	//int othertriggerpair = 1 - triggerpair;
 	D_ASSERT(triggerpair == 0 || triggerpair == 1);
-	//D_ASSERT(othertriggerpair == 0 || othertriggerpair == 1);
+	// Var arrays are numbered 1 and 2
+	int triggerarray = (trigger_activated % 2) + 1;
+	D_ASSERT(triggerarray == 1 || triggerarray == 2);
 
 	int original_index;
 	int other_index;
@@ -167,17 +172,47 @@ struct VecNeqDynamic : public DynamicConstraint
 	  original_index = watched_index1;
 	  other_index = watched_index0;
 	}
+	 
+	if(propagate_mode)
+	{
+		// If this is true, the other index got assigned.
+		if(index_to_propagate != original_index)
+		  return;
+			
+	    if(triggerarray == 1)
+	    {
+		  D_ASSERT(var_array1[index_to_propagate].isAssigned());
+		  remove_value(var_array1[index_to_propagate].getAssignedValue(),
+			           var_array2[index_to_propagate]);
+	    }
+	    else
+	    {  
+		  D_ASSERT(var_array2[index_to_propagate].isAssigned());
+		  remove_value(var_array2[index_to_propagate].getAssignedValue(),
+			           var_array1[index_to_propagate]);
+	    }
+		return;		
+	}
+	
 
-    D_INFO(2, DI_VECNEQ, "Triggerpair: " + to_string(triggerpair) + 
-						 " original:" + to_string(original_index) + 
-						 " other:" + to_string(other_index));
-						 
-    int index = original_index; // XXX +1?;
+    // Check if the assignment has not caused a neq failure.
+    if(triggerarray == 1)
+    {
+	  D_ASSERT(var_array1[original_index].isAssigned())
+	  if(!var_array2[original_index].isAssigned() ||
+		  var_array2[original_index].getAssignedValue() != var_array1[original_index].getAssignedValue())
+		return;
+    }
+    else
+    {  
+	  D_ASSERT(var_array2[original_index].isAssigned())
+	  if(!var_array1[original_index].isAssigned() ||
+		  var_array1[original_index].getAssignedValue() != var_array2[original_index].getAssignedValue())
+	    return;
+    }
 	
-	
-		   
-	
-		   
+	int index = original_index + 1;
+			   
 	int size = var_array1.size();
 	
 	while( (index < size &&
@@ -198,20 +233,14 @@ struct VecNeqDynamic : public DynamicConstraint
 	  if(index == original_index)
 	  {// This is the only possible non-equal index.
 	    D_INFO(2, DI_VECNEQ, "Cannot find another index");
-	    if(var_array1[other_index].isAssigned() && 
-		   var_array2[other_index].isAssigned() &&
-		   var_array1[other_index].getAssignedValue() ==
-		   var_array2[other_index].getAssignedValue())
-		{
-		  D_INFO(2, DI_VECNEQ, "Index " + to_string(other_index) + " is assigned & equal" +
-							   " so ping " + to_string(original_index));
-		  if(var_array2[original_index].isAssigned())
-		    remove_value(var_array2[original_index].getAssignedValue(),
-						 var_array1[original_index]);
-		  if(var_array1[original_index].isAssigned())
-		    remove_value(var_array1[original_index].getAssignedValue(),
-						 var_array2[original_index]);
-		}
+	    propagate_mode = true;
+		index_to_propagate = other_index;
+		if(var_array2[other_index].isAssigned())
+		  remove_value(var_array2[other_index].getAssignedValue(),
+		               var_array1[other_index]);
+		if(var_array1[other_index].isAssigned())
+		  remove_value(var_array1[other_index].getAssignedValue(),
+					   var_array2[other_index]);
 		return;
 	  }
 	}
