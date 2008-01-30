@@ -427,7 +427,7 @@ class testwatchedalldiff(testalldiff):
 
 class testdiseq(testalldiff):
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("diseq", True, reify, reifyimply, [2], ["num"], [1,1], self, False)
+        return runtestgeneral("diseq", True, reify, reifyimply, [2], ["num"], [1,1], self, not reify and not reifyimply)
 
 class testeq:
     # printtable essentially sets up pairsame constraint. negation of alldiff.
@@ -461,7 +461,7 @@ class testineq:
         return out
     
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("ineq", True, reify, reifyimply, [2], ["num"], [1,1,"const"], self, False)
+        return runtestgeneral("ineq", True, reify, reifyimply, [2], ["num"], [1,1,"const"], self, not reifyimply)
 
 class testlexleq:
     def printtable(self, domains, less=False):
@@ -477,14 +477,14 @@ class testlexleq:
         return out
     
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("lexleq", True, reify, reifyimply, [4,4], ["quitesmallnum", "quitesmallnum"], [4,4], self, False)
+        return runtestgeneral("lexleq", True, reify, reifyimply, [4,4], ["smallnum", "smallnum"], [4,4], self, not reifyimply)
 
 class testlexless(testlexleq):
     def printtable(self, domains):
         return testlexleq.printtable(self, domains, less=True)
     
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("lexless", True, reify, reifyimply, [4,4], ["quitesmallnum", "quitesmallnum"], [4,4], self, False)
+        return runtestgeneral("lexless", True, reify, reifyimply, [4,4], ["smallnum", "smallnum"], [4,4], self, not reifyimply)
 
 class testmax:
     def printtable(self, domains, ismax=True):
@@ -604,6 +604,20 @@ class testsumleq(testsumgeq):
     def runtest(self, reify=False, reifyimply=False):
         return runtestgeneral("sumleq", True, reify, reifyimply, [5,1], ["smallnum", "num"], [5,1], self, False)
 
+class testdiv:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            if l[0]//l[1] == l[2]:
+                out.append(l)
+        return out
+        
+    def runtest(self, reify=False, reifyimply=False):
+        return runtestgeneral("div", True, reify, reifyimply, [3], ["posnum"], [1,1,1], self, False)
+  
+    
 ## Come back to these two. BUG.
 class testweightedsumgeq(testsumgeq):
     def runtest(self):
@@ -702,8 +716,7 @@ class testwatchvecneq:
         return out
     
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("watchvecneq", True, reify, reifyimply, [6], ["smallnum"], [3,3], self, False)
-        # does not quite do GAC. Is it supposed to?
+        return runtestgeneral("watchvecneq", True, reify, reifyimply, [6], ["smallnum"], [3,3], self, True)
     
 class testpow:
     def printtable(self, domains):
@@ -775,6 +788,9 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
         vartypes=["boolean"]+vartypes
     
     (domlists, modvars, tablevars)=generatevariables(varnums, vartypes, boundsallowed)
+    
+    if modvars.find("BOUND")!=-1:
+        treesame=False    # Assume can't have GAC when there are bound variables around.
     
     curvar=0
     if reify or reifyimply:

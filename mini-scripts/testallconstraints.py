@@ -14,9 +14,14 @@ if len(other)>1:
     sys.exit(1)
 
 # This one tests all the constraints in the following list.
+conslist=[]
+
+
+# equality constraints
+conslist+=["diseq", "reifydiseq", "reifyimplydiseq", "eq", "reifyeq", "reifyimplyeq"]
 
 # alldiffs
-conslist=["alldiff", "reifyalldiff",  "reifyimplyalldiff", "alldiffgacslow", "reifyalldiffgacslow", "reifyimplyalldiffgacslow"]
+conslist+=["alldiff", "reifyalldiff",  "reifyimplyalldiff", "alldiffgacslow", "reifyalldiffgacslow", "reifyimplyalldiffgacslow"]
 
 #element constraints
 conslist+=["gacelement-deprecated", "reifyimplygacelement-deprecated", "element", "reifyimplyelement", "watchelement"]
@@ -31,6 +36,17 @@ conslist+=["sumleq", "reifysumleq", "reifyimplysumleq"]
 conslist+=["occurrence", "reifyimplyoccurrence"]
 conslist+=["occurrenceleq", "occurrencegeq"]
 
+conslist+=["ineq", "reifyineq", "reifyimplyineq"]
+
+# symmetry-breaking constraints
+
+conslist+=["lexleq", "lexless", "reifylexleq", "reifylexless", "reifyimplylexleq", "reifyimplylexless"]
+
+conslist+=["max", "min", "reifyimplymax", "reifyimplymin"]
+
+conslist+=["div", "reifyimplydiv"]
+
+#todo
 #conslist+=["weightedsumleq"...
 
 numtests=100
