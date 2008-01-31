@@ -95,18 +95,21 @@ struct LexLeqConstraint : public Constraint
     int x_size = x.size();
     for(int i=0; i < x_size; ++i)
     {
-	  t.push_back(make_trigger(x[i], Trigger(this, i), LowerBound));
-	  t.push_back(make_trigger(x[i], Trigger(this, i), UpperBound));
+      t.push_back(make_trigger(x[i], Trigger(this, i), LowerBound));
+      t.push_back(make_trigger(x[i], Trigger(this, i), UpperBound));
     }
     
     int y_size = y.size();
     for(int i=0; i < y_size; ++i)
     {
-	  t.push_back(make_trigger(y[i], Trigger(this, i), LowerBound));
-	  t.push_back(make_trigger(y[i], Trigger(this, i), UpperBound));
+      t.push_back(make_trigger(y[i], Trigger(this, i), LowerBound));
+      t.push_back(make_trigger(y[i], Trigger(this, i), UpperBound));
     }
     alpha = 0;
-    beta = 100000;
+    if(Less)
+      beta = x_size;
+    else
+      beta = 100000;
     F = 0;
     return t;
   }
@@ -122,26 +125,26 @@ struct LexLeqConstraint : public Constraint
     {
       if(i == n || i == beta)
       {
-		getState(stateObj).setFailed(true);
-		return;
+        getState(stateObj).setFailed(true);
+        return;
       }
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
-		  x[i].getAssignedValue() != y[i].getAssignedValue())  {
-		alpha = i;
-		propagate(i,0);
+          x[i].getAssignedValue() != y[i].getAssignedValue())  {
+        alpha = i;
+        propagate(i,0);
       }
       else updateAlpha(i+1);
     }
     else
     {
       while (i < n) {
-		if (!x[i].isAssigned() || !y[i].isAssigned() ||
-			x[i].getAssignedValue() != y[i].getAssignedValue())  {
-		  alpha = i ;
-		  propagate(i,0) ;
-		  return ;
-		}
-		i++ ;
+        if (!x[i].isAssigned() || !y[i].isAssigned() ||
+            x[i].getAssignedValue() != y[i].getAssignedValue())  {
+          alpha = i ;
+          propagate(i,0) ;
+          return ;
+        }
+        i++ ;
       }
       F = true ;
     }
@@ -154,9 +157,9 @@ struct LexLeqConstraint : public Constraint
     int a = alpha ;
     while (i >= a) {
       if (x[i].getMin() < y[i].getMax()) {
-		beta = i+1 ;
-		if (!(x[i].getMax() < y[i].getMin())) propagate(i,0) ;
-		return ;
+        beta = i+1 ;
+        if (!(x[i].getMax() < y[i].getMin())) propagate(i,0) ;
+        return ;
       }
       i-- ;    
     }
@@ -166,7 +169,7 @@ struct LexLeqConstraint : public Constraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PROP_INFO_ADDONE(Lex);
+    PROP_INFO_ADDONE(Lex);
     D_INFO(0,DI_LEXCON,"Begin Propagation");
     if (F)
     {
@@ -175,13 +178,13 @@ struct LexLeqConstraint : public Constraint
     }
     int a = alpha, b = beta;
     
-	//Not sure why we need this, but we seem to.
-	if(b <= a)
-	{
-	  getState(stateObj).setFailed(true);
-	  return;
-	}
-	
+    //Not sure why we need this, but we seem to.
+    if(b <= a)
+    {
+      getState(stateObj).setFailed(true);
+      return;
+    }
+    
     if(Less)
     { if(i < a || i >=b) return; }
     else
@@ -191,23 +194,23 @@ struct LexLeqConstraint : public Constraint
       x[i].setMax(y[i].getMax()-1) ;
       y[i].setMin(x[i].getMin()+1) ;
       if (checkLex(i)) {
-		F = true ;
-		return ;
+        F = true ;
+        return ;
       }
     }
     else if (i == a && i+1 < b) {
       x[i].setMax(y[i].getMax()) ;
       y[i].setMin(x[i].getMin()) ;
       if (checkLex(i)) {
-		F = true ;
-		return ;
+        F = true ;
+        return ;
       }
       if (x[i].isAssigned() && y[i].isAssigned() && x[i].getAssignedValue() == y[i].getAssignedValue())
-		updateAlpha(i+1) ;
+        updateAlpha(i+1) ;
     }
     else if (a < i && i < b) {
       if ((i == b-1 && x[i].getMin() == y[i].getMax()) || x[i].getMin() > y[i].getMax())
-		updateBeta(i-1) ;
+        updateBeta(i-1) ;
     }
   }
   
@@ -220,22 +223,22 @@ struct LexLeqConstraint : public Constraint
       int x_size = x.size();
       for(int i = a; i < x_size; ++i)
       {
-		DomainInt xval = x[i].getMin();
-		DomainInt yval = y[i].getMax();
-		if(xval < yval) 
-		{
-		  alpha = i;
-		  return false;
-		}
-		if(xval > yval)
-		  return true;
+        DomainInt xval = x[i].getMin();
+        DomainInt yval = y[i].getMax();
+        if(xval < yval) 
+        {
+          alpha = i;
+          return false;
+        }
+        if(xval > yval)
+          return true;
       }
       if(Less)
-		return true;
+        return true;
       else
       {
-		alpha = x.size();
-		return false;
+        alpha = x.size();
+        return false;
       }
       
     }
@@ -244,9 +247,9 @@ struct LexLeqConstraint : public Constraint
       DomainInt xval = x[unsat_val].getMin();
       DomainInt yval = y[unsat_val].getMax();
       if (xval > yval)
-		return true;
+        return true;
       else
-		return false;
+        return false;
     }
     FAIL_EXIT();
   }
@@ -254,7 +257,7 @@ struct LexLeqConstraint : public Constraint
   virtual BOOL full_check_unsat()
   {
     alpha = 0;
-	return check_unsat(0, 0);
+    return check_unsat(0, 0);
   }
   
   BOOL checkLex(int i) {
@@ -275,34 +278,34 @@ struct LexLeqConstraint : public Constraint
     D_INFO(1, DI_LEXCON, "Begin Full Propagate");
     int i, n = x.size() ;
     for (i = 0; i < n; i++) {
-      if (!x[i].isAssigned()) break ;	
+      if (!x[i].isAssigned()) break ;    
       if (!y[i].isAssigned()) break ;
       if (x[i].getAssignedValue() != y[i].getAssignedValue()) break ;
     }
     if (i < n) {
       alpha = i ;
       if (checkLex(i)) {
-		F = true ;
-		return ;
+        F = true ;
+        return ;
       }
       int betaBound = -1 ;
       for (; i < n; i++) {
-		if (x[i].getMin() > y[i].getMax()) break ;
-		if (x[i].getMin() == y[i].getMax()) {
-		  if (betaBound == -1) betaBound = i ;	 
-		}
-		else betaBound = -1 ;
+        if (x[i].getMin() > y[i].getMax()) break ;
+        if (x[i].getMin() == y[i].getMax()) {
+          if (betaBound == -1) betaBound = i ;     
+        }
+        else betaBound = -1 ;
       }
       if(!Less)
       {
-		if (i == n) beta = 1000000 ;
-		else if (betaBound == -1) beta = i ;
-		else beta = betaBound ;
+        if (i == n) beta = 1000000 ;
+        else if (betaBound == -1) beta = i ;
+        else beta = betaBound ;
       }
       else
       {
-		if (betaBound == -1)  beta = i;
-		else if (betaBound == -1) beta = betaBound ;
+        if (betaBound == -1) beta = n ;
+        else beta = betaBound ;
       }
       if (alpha >= beta) getState(stateObj).setFailed(true);
       propagate(alpha,0) ;             //initial propagation, if necessary.
@@ -310,9 +313,9 @@ struct LexLeqConstraint : public Constraint
     else 
     {
       if(Less)
-		getState(stateObj).setFailed(true);
+        getState(stateObj).setFailed(true);
       else
-		F = true;
+        F = true;
     }
   }
   
@@ -321,18 +324,18 @@ struct LexLeqConstraint : public Constraint
     D_ASSERT(v.size() == x.size() + y.size());
     size_t x_size = x.size();
 
-	for(size_t i = 0;i < x_size; i++)
+    for(size_t i = 0;i < x_size; i++)
     {
       if(v[i] < v[i + x_size])
-		return true;
+        return true;
       if(v[i] > v[i + x_size])
-		return false;
+        return false;
     }
     if(Less)
       return false;
     else
       return true;
-	  
+      
   }
    
   virtual vector<AnyVarRef> get_vars()
@@ -343,7 +346,7 @@ struct LexLeqConstraint : public Constraint
     
     for(unsigned int i=0;i<y.size();i++)
       array_copy.push_back(AnyVarRef(y[i]));
-	return array_copy;
+    return array_copy;
   }
 };
 
