@@ -135,8 +135,11 @@ struct Var
   friend std::ostream& operator<<(std::ostream& o, const Var& v)
   { return o << "Var. Type:" << v.type << " Pos:" << v.pos << "."; }
    
-   BOOL operator==(const Var& var)
+   bool operator==(const Var& var) const
    { return type == var.type && pos == var.pos; }
+   
+   bool operator<(const Var& var) const
+   { return (type < var.type) || (type == var.type && pos < var.pos); }
 };
 
 struct CSPInstance;
@@ -197,6 +200,7 @@ struct ConstraintBlob
 {
   int BOOLs;
   map<string, Var> symbol_table;
+  map<Var, string> name_table;
   vector<pair<int, Bounds> > bound;
   vector<pair<int, vector<int> > > sparse_bound;
   vector<pair<int, Bounds> > discrete;
@@ -288,6 +292,8 @@ struct ConstraintBlob
       throw parse_exception("Name already in table:" + name);
     symbol_table[name] = variable;
   
+    if(name_table.find(variable) == name_table.end())
+      name_table[variable] = name;
   }
   
   void addMatrixSymbol(const string& name, const vector<int>& indices)
@@ -297,11 +303,19 @@ struct ConstraintBlob
     matrix_table[name] = indices;
   }
   
-  Var getSymbol(const string& name)
+  Var getSymbol(const string& name) const
   {
-    map<string, Var>::iterator it = symbol_table.find(name);
+    map<string, Var>::const_iterator it = symbol_table.find(name);
     if(it == symbol_table.end())
       throw parse_exception("Undefined name: '" + name + "'");
+    return it->second;
+  }
+  
+  string getName(const Var& var) const
+  {
+    map<Var, string>::const_iterator it = name_table.find(var);
+    if(it == name_table.end())
+      throw parse_exception("Undefined Var");
     return it->second;
   }
   
@@ -313,7 +327,7 @@ struct ConstraintBlob
     return it->second;
   }
   
-  Bounds get_bounds(Var v)
+  Bounds get_bounds(Var v) const
   {
     switch(v.type)
     {
@@ -370,7 +384,7 @@ struct ConstraintBlob
       throw parse_exception("Internal Error - Unknown Variable Type");
   }
   
-  Var get_var(char, int i)
+  Var get_var(char, int i) const
   {
 	if(i < BOOLs)
 	  return Var(VAR_BOOL, i);
@@ -454,7 +468,7 @@ struct ConstraintBlob
     return Var(VAR_DISCRETE, discrete.size() - 1);
   }
   
-  vector<Var> get_all_vars()
+  vector<Var> get_all_vars() const
   {
     int total_var_count = 0;
     total_var_count += BOOLs;
