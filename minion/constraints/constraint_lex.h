@@ -304,7 +304,8 @@ struct LexLeqConstraint : public Constraint
       }
       else
       {
-        if (betaBound == -1) beta = n ;
+        if(i == n) beta = n;
+        if (betaBound == -1) beta = i ;
         else beta = betaBound ;
       }
       if (alpha >= beta) getState(stateObj).setFailed(true);
