@@ -84,7 +84,7 @@ struct reify : public Constraint
   
   reify(StateObj* _stateObj, Constraint* _poscon, BoolVar v) : Constraint(_stateObj), poscon(_poscon),
                                                                rar_var(v),  constraint_locked(false),
-                                                               full_propagate_called(false)
+                                                               full_propagate_called(stateObj, false)
   { negcon = poscon->reverse_constraint();}
   
   virtual Constraint* reverse_constraint()

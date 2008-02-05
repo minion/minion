@@ -49,10 +49,10 @@ struct VecNeqDynamic : public DynamicConstraint
   Reversible<bool> propagate_mode;
   int index_to_propagate; 
 
-  VecNeqDynamic(StateObj* _stateObj,const VarArray1& _array1,
+  VecNeqDynamic(StateObj* _stateObj, const VarArray1& _array1,
 				const VarArray2& _array2) :
 				DynamicConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
-				propagate_mode(false)
+				propagate_mode(_stateObj, false)
   { D_ASSERT(var_array1.size() == var_array2.size()); }
   
   int dynamic_trigger_count()
