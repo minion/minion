@@ -45,7 +45,8 @@ if retval!=0:
 
 chdir("/home/pn/minion-svn/minion")
 # This sends its own email when a test fails, so no need to. 
-system("mini-scripts/testallconstraints.py --numtests=500 --email --minion=bin/minion") # just do 50 random tests for each constraint.
+system("mini-scripts/testallconstraints.py --numtests=250 --email --minion=bin/minion") # just do 250 random tests for each constraint. Increase when
+# we have a faster machine.
 
 system("mini-scripts/testallconstraints.py --numtests=100 --email --minion=bin/minion-debug")
 

@@ -24,12 +24,16 @@ conslist+=["diseq", "reifydiseq", "reifyimplydiseq", "eq", "reifyeq", "reifyimpl
 conslist+=["alldiff", "reifyalldiff",  "reifyimplyalldiff", "alldiffgacslow", "reifyalldiffgacslow", "reifyimplyalldiffgacslow"]
 
 #element constraints
-conslist+=["gacelement-deprecated", "reifyimplygacelement-deprecated", "element", "reifyimplyelement", "watchelement"]
+conslist+=["gacelement-deprecated", "reifyimplygacelement-deprecated"]
+conslist+=["element", "reifyimplyelement", "watchelement"]
 
 #non-reifiable arithmetic constraints
-conslist+=["modulo", "pow", "minuseq", "watchsumleq", "watchsumgeq", "watchvecneq"]
-
+conslist+=["modulo", "reifyimplymodulo", "pow", "reifyimplypow", "minuseq", "reifyimplyminuseq"]
 conslist+=["product", "reifyimplyproduct"]
+conslist+=["div", "reifyimplydiv"]
+
+conslist+=["watchsumleq", "watchsumgeq", "watchvecneq"]
+
 conslist+=["sumgeq", "reifysumgeq", "reifyimplysumgeq"]
 conslist+=["sumleq", "reifysumleq", "reifyimplysumleq"]
 
@@ -44,7 +48,7 @@ conslist+=["lexleq", "lexless", "reifylexleq", "reifylexless", "reifyimplylexleq
 
 conslist+=["max", "min", "reifyimplymax", "reifyimplymin"]
 
-conslist+=["div", "reifyimplydiv"]
+
 
 #todo
 #conslist+=["weightedsumleq"...

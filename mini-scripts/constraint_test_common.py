@@ -616,26 +616,16 @@ class testdiv:
         
     def runtest(self, reify=False, reifyimply=False):
         return runtestgeneral("div", True, reify, reifyimply, [3], ["posnum"], [1,1,1], self, False)
-  
-    
-## Come back to these two. BUG.
+
+## Come back to these two. BUG.   
+# refactor runtestgeneral to take "const" as a variable type and a number representing how many in the other two lists.
 class testweightedsumgeq(testsumgeq):
+    def printtable(self, domains):
+        return testsumgeq.printtable(self, domains, weights=self.const1)
+    
     def runtest(self):
-        (domlists, modvars, tablevars)=generatevariables([6,1], ["smallnum", "num"], True)
-        # run the table instance
-        weights=[random.randint(-2, 2) for i in range(6)]
-        tuplelist=self.printtable(domlists, False, False, weights)
-        constraint="table([x0, x1, x2, x3, x4, x5, x6], modtable)"
-        retval1=runminion("infile1.minion", "outfile1", "bin/minion", tablevars, constraint, tuplelist)
-        # run the modulo instance
-        constraint="weightedsumgeq([%s], [x0, x1, x2, x3, x4, x5], x6)"%reduce(lambda x,y:str(x)+","+str(y),weights)
-        retval2=runminion("infile2.minion", "outfile2", "bin/minion", modvars, constraint, False)
+        return runtestgeneral("weightedsumgeq", True, reify, reifyimply, [5,5,1], ["const", "smallnum", "num"], [5,5,1], self, False)
         
-        # now compare
-        if retval1!=0 or retval2!=0:
-            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
-            return False
-        return comparetrees(False)  # tree subset
 
 class testweightedsumleq(testsumgeq):
     def runtest(self):
@@ -666,7 +656,7 @@ class testminuseq:
         return out
     
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("minuseq", True, reify, reifyimply, [2], ["num"], [1,1], self, True)
+        return runtestgeneral("minuseq", True, reify, reifyimply, [2], ["num"], [1,1], self, not reifyimply)
         
 class testlitsumeq:
     # does this constraint even exist??
