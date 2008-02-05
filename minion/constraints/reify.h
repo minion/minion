@@ -199,7 +199,7 @@ struct reify : public Constraint
       if(poscon->check_unsat(i/2, domain)) 
       { 
         D_INFO(1,DI_REIFY,"Constraint False");
-        rar_var.uncheckedAssign(false);
+        rar_var.propagateAssign(false);
       }
     }
     else
@@ -207,7 +207,7 @@ struct reify : public Constraint
       if(negcon->check_unsat((i-1)/2,domain)) 
       {
         D_INFO(1,DI_REIFY,"Constraint True");
-        rar_var.uncheckedAssign(true);
+        rar_var.propagateAssign(true);
       }
     }
   }
