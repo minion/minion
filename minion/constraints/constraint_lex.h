@@ -33,6 +33,10 @@ takes two vectors vec0 and vec1 of the same length and ensures that
 vec0 is lexicographically less than vec1 in any solution.
 */
 
+/** @help constraints;lexless Notes
+This constraint maintains GAC.
+*/
+
 /** @help constraints;lexless Reifiability
 This constraint is reifiable.
 */
@@ -52,6 +56,10 @@ The constraint
 
 takes two vectors vec0 and vec1 of the same length and ensures that
 vec0 is lexicographically less than or equal to vec1 in any solution.
+*/
+
+/** @help constraints;lexleq Notes
+This constraints achieves GAC.
 */
 
 /** @help constraints;lexleq Reifiability
