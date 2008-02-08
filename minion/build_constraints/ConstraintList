@@ -28,3 +28,4 @@ STATIC_CT "pow" CT_POW						 2  2 read_2_vars read_var
 STATIC_CT "div" CT_DIV						 2  2 read_2_vars read_var
 STATIC_CT "modulo" CT_MODULO				 2  2 read_2_vars read_var
 STATIC_CT "gadget" CT_GADGET	1	1	read_list
+DYNAMIC_CT "disabled-or" CT_WATCHED_OR 1 1 read_list

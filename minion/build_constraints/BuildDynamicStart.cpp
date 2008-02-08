@@ -7,4 +7,5 @@ case CT_WATCHED_LEQSUM : return build_constraint_CT_WATCHED_LEQSUM(stateObj, b);
 case CT_WATCHED_TABLE : return build_constraint_CT_WATCHED_TABLE(stateObj, b);
 case CT_WATCHED_VECNEQ : return build_constraint_CT_WATCHED_VECNEQ(stateObj, b);
 case CT_WATCHED_LITSUM : return build_constraint_CT_WATCHED_LITSUM(stateObj, b);
+case CT_WATCHED_OR : return build_constraint_CT_WATCHED_OR(stateObj, b);
 }}

@@ -36,41 +36,8 @@
 using namespace std;
 
 /// The currently accepted types of Constraints.
-enum ConstraintType {
-  CT_ALLDIFF ,
-  CT_ALLDIFF_GACSLOW ,
-  CT_DISEQ ,
-  CT_INEQ ,
-  CT_MAX ,
-  CT_MIN ,
-  CT_POW ,
-  CT_LEQSUM ,
-  CT_GEQSUM ,
-  CT_PRODUCT2 ,
-  CT_WEIGHTLEQSUM,
-  CT_WEIGHTGEQSUM,
-  CT_ELEMENT ,
-  CT_GACELEMENT,
-  CT_WATCHED_ELEMENT,
-  CT_LEXLEQ ,
-  CT_LEXLESS ,
-  CT_OCCURRENCE ,
-  CT_LEQ_OCCURRENCE,
-  CT_GEQ_OCCURRENCE ,
-  CT_EQ,
-  CT_WATCHED_TABLE,
-  CT_WATCHED_LEQSUM,
-  CT_WATCHED_GEQSUM,
-  CT_WATCHED_OR,
-  CT_WATCHED_VECNEQ,
-  CT_WATCHED_LITSUM, 
-  CT_MINUSEQ,
-  CT_DIV,
-  CT_MODULO,
-  CT_REIFY,
-  CT_REIFYIMPLY,
-  CT_GADGET
-};
+
+#include "build_constraints/ConstraintEnum.h"
 
 enum ReadTypes
 {
