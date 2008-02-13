@@ -36,6 +36,8 @@ volatile bool* trig;
 
 StateObj* stateObj;
 
+bool check_double_ctrlc;
+
 void trigger_function(int /* signum */ )
 {
   *trig = true;
@@ -58,6 +60,20 @@ void activate_trigger(volatile bool* b)
 
 void ctrlc_function(int /* signum */ )
 {
+  if(check_double_ctrlc)
+  {
+    cerr << "Ctrl+C pressed twice. Exiting immediately." << endl;
+    exit(1);
+  }
+  
+  if(trig == NULL)
+  {
+    cerr << "Search has not started. Exiting immediately." << endl;
+    exit(1);
+  }
+  
+  check_double_ctrlc = true;
+  
   cerr << "Ctrl+C pressed. Exiting.\n";
   // This is the quickest way to get things to stop.
   *trig = true;
@@ -66,6 +82,7 @@ void ctrlc_function(int /* signum */ )
 
 void install_ctrlc_trigger(void* _stateObj)
 {
+  check_double_ctrlc = false;
   stateObj = (StateObj*)_stateObj;
   signal(SIGINT, ctrlc_function);
 }
