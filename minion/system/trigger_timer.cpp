@@ -24,20 +24,22 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "trigger_timer.h"
+#include "../minion.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/time.h>
 
+
 volatile bool* trig;
+
+StateObj* stateObj;
 
 void trigger_function(int /* signum */ )
 {
   *trig = true;
 }
-
 
 void activate_trigger(volatile bool* b)
 {
@@ -52,4 +54,18 @@ void activate_trigger(volatile bool* b)
 	timer.it_interval.tv_sec = 1;
 	timer.it_interval.tv_usec = 0;
 	setitimer(ITIMER_REAL, &timer, NULL);
+}
+
+void ctrlc_function(int /* signum */ )
+{
+  cerr << "Ctrl+C pressed. Exiting.\n";
+  // This is the quickest way to get things to stop.
+  *trig = true;
+  getState(stateObj).setCtrlcPressed();
+}
+
+void install_ctrlc_trigger(void* _stateObj)
+{
+  stateObj = (StateObj*)_stateObj;
+  signal(SIGINT, ctrlc_function);
 }

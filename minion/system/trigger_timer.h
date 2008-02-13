@@ -25,16 +25,13 @@
 */
 
 
-
 #ifndef TRIG_TIMER_H
 #define TRIG_TIMER_H
 
 /// This function will cause the boolean passed to be set to 'true' every second.
 void activate_trigger(volatile bool*);
 
-
-
-
-
+// This takes a StateObj*
+void install_ctrlc_trigger(void*);
 
 #endif

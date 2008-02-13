@@ -132,6 +132,9 @@ namespace Controller
   	if(getState(stateObj).isAlarmActivated())
   	{
       getState(stateObj).clearAlarm();
+      if(getState(stateObj).isCtrlcPressed())
+        return true;
+
   	  if(getOptions(stateObj).time_limit != 0)
   	  {
   	    if(getState(stateObj).getTimer().checkTimeout(getOptions(stateObj).time_limit))
@@ -212,6 +215,7 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
 	getState(stateObj).setNodeCount(0);
 	if(getOptions(stateObj).time_limit != 0)
     getState(stateObj).setupAlarm();
+  install_ctrlc_trigger(stateObj);
 	lock(stateObj);
 	getState(stateObj).getTimer().printTimestepWithoutReset("First Node Time: ");
 	/// Failed initially propagating constraints!

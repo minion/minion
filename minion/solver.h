@@ -58,11 +58,12 @@ class SearchState
 
   bool is_locked;
   
-  
   volatile bool alarm_trigger;
-
+  
+  volatile bool ctrl_c_pressed;
+    
 public:
-	
+
   unsigned long long getNodeCount() { return nodes; }
   void setNodeCount(unsigned long long _nodes) { nodes = _nodes; }
   void incrementNodeCount() { nodes++; }
@@ -117,7 +118,8 @@ public:
   { tupleListContainer = _tupleList; }
                           
   SearchState() : nodes(0), optimise_var(NULL), current_optimise_position(0), optimise(false), solutions(0),
-	dynamic_triggers_used(false), finished(false), failed(false), tupleListContainer(NULL), is_locked(false)
+	dynamic_triggers_used(false), finished(false), failed(false), tupleListContainer(NULL), is_locked(false),
+	alarm_trigger(false), ctrl_c_pressed(false)
   {}
   
   // Must be defined later.
@@ -137,6 +139,14 @@ public:
   
   void setupAlarm()
   { activate_trigger(&alarm_trigger);}
+  
+  bool isCtrlcPressed()
+  { return ctrl_c_pressed; }
+  
+  void setCtrlcPressed()
+  { ctrl_c_pressed = true; }
+  
+  
 };
 
 /// Stored all the options related to search. This item should not
