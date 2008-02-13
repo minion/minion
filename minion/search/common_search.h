@@ -129,18 +129,19 @@ namespace Controller
   /// Check if timelimit has been exceeded.
   inline bool do_checks(StateObj* stateObj)
   {
-  	if((getState(stateObj).getNodeCount() & 1023) == 0)
-	{
-	  if(getOptions(stateObj).time_limit != 0)
-	  {
-	    if(getState(stateObj).getTimer().checkTimeout(getOptions(stateObj).time_limit))
-	    {
-		  cout << "Time out." << endl;
-          tableout.set("TimeOut", 1);
-		  return true;
-	    }
-	  }
-	}
+  	if(getState(stateObj).isAlarmActivated())
+  	{
+      getState(stateObj).clearAlarm();
+  	  if(getOptions(stateObj).time_limit != 0)
+  	  {
+  	    if(getState(stateObj).getTimer().checkTimeout(getOptions(stateObj).time_limit))
+  	    {
+  		  cout << "Time out." << endl;
+            tableout.set("TimeOut", 1);
+  		  return true;
+  	    }
+  	  }
+  	}
 	return false;
   }
   
@@ -209,6 +210,8 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
   {
 	getState(stateObj).setSolutionCount(0);  
 	getState(stateObj).setNodeCount(0);
+	if(getOptions(stateObj).time_limit != 0)
+    getState(stateObj).setupAlarm();
 	lock(stateObj);
 	getState(stateObj).getTimer().printTimestepWithoutReset("First Node Time: ");
 	/// Failed initially propagating constraints!

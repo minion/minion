@@ -57,6 +57,9 @@ class SearchState
   shared_ptr<TupleListContainer> tupleListContainer;
 
   bool is_locked;
+  
+  
+  volatile bool alarm_trigger;
 
 public:
 	
@@ -105,6 +108,7 @@ public:
   
   TimerClass& getTimer() { return timer; }
   
+  
   jmp_buf* getJmpBufPtr() { return &g_env; }
   
   TupleListContainer* getTupleListContainer() { return &*tupleListContainer; }
@@ -125,7 +129,14 @@ public:
   bool isLocked()
   { return is_locked; }
   
+  bool isAlarmActivated()
+  { return alarm_trigger; }
+
+  void clearAlarm()
+  { alarm_trigger = false; }  
   
+  void setupAlarm()
+  { activate_trigger(&alarm_trigger);}
 };
 
 /// Stored all the options related to search. This item should not

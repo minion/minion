@@ -141,6 +141,7 @@ using namespace std;
 #include "sys_constants.h"
 #include "debug.h"
 #include "array_functions.h"
+#include "trigger_timer.h"
 //#include "light_vector.h"
 
 #endif

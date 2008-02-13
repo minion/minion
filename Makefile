@@ -43,7 +43,7 @@ endif
 
 OBJDIR=$(OUTDIR)/objdir-$(NAME)
 
-SRC=$(wildcard minion/*.cpp) $(wildcard minion/build_constraints/*.cpp) minion/help/help.cpp
+SRC=$(wildcard minion/*.cpp) $(wildcard minion/build_constraints/*.cpp minion/system/*.cpp) minion/help/help.cpp
 EXE=bin/$(NAME)
 
 
@@ -80,6 +80,7 @@ mkdirectory:
 	if [ ! -d $(OBJDIR) ]; then mkdir $(OBJDIR); fi
 	if [ ! -d $(OBJDIR)/build_constraints ]; then mkdir $(OBJDIR)/build_constraints; fi
 	if [ ! -d $(OBJDIR)/help ]; then mkdir $(OBJDIR)/help; fi
+	if [ ! -d $(OBJDIR)/system ]; then mkdir $(OBJDIR)/system; fi
 
 generate: bibd golomb solitaire steelmill sports
 
