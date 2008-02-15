@@ -83,8 +83,8 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   if(!getState(stateObj).isFailed())
   {
     PropogateCSP(stateObj, args.preprocess, var_val_order.first, true);
-	getState(stateObj).getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !getOptions(stateObj).print_only_solution);
-	if(!getState(stateObj).isFailed())
+	  getState(stateObj).getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !getOptions(stateObj).print_only_solution);
+	  if(!getState(stateObj).isFailed())
     {
       switch(args.prop_method)
       {

@@ -708,6 +708,32 @@ class testwatchvecneq:
     def runtest(self, reify=False, reifyimply=False):
         return runtestgeneral("watchvecneq", True, reify, reifyimply, [6], ["smallnum"], [3,3], self, True)
     
+class testwatchvecexists_less:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            if any([  (l[i]< l[len(l)/2+i]) for i in xrange(len(l)/2)] ):
+                out.append(l)
+        return out
+
+    def runtest(self, reify=False, reifyimply=False):
+        return runtestgeneral("watchvecexists_less", True, reify, reifyimply, [6], ["smallnum"], [3,3], self, True)
+
+class testwatchvecexists_and:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            if any([  (l[i]>0 and l[len(l)/2+i]>0) for i in xrange(len(l)/2)] ):
+                out.append(l)
+        return out
+
+    def runtest(self, reify=False, reifyimply=False):
+        return runtestgeneral("watchvecexists_and", True, reify, reifyimply, [6], ["smallnum"], [3,3], self, True)
+                        
 class testpow:
     def printtable(self, domains):
         cross=[]

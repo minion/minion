@@ -61,6 +61,21 @@ Build ## CT_NAME(StateObj* stateObj, const T1& t1, bool reify, \
   { return function(stateObj, t1); } \
 }
 
+#define BUILD_DYNAMIC_CONSTRAINT3(CT_NAME, function)  \
+template<typename T1, typename T2, typename T3> \
+DynamicConstraint*\
+Build ## CT_NAME(StateObj* stateObj, const T1& t1, const T2& t2, const T3& t3, bool reify, \
+				 const BoolVarRef& reifyVar, ConstraintBlob& b) \
+{ \
+  if(reify) \
+  { \
+    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; \
+    exit(0); \
+  } \
+  else \
+  { return function(stateObj,t1,t2,t3); } \
+}
+
 #define BUILD_DYNAMIC_CONSTRAINT2(CT_NAME, function)  \
 template<typename T1, typename T2> \
 DynamicConstraint*\
@@ -201,6 +216,10 @@ MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME, DynamicConstraint)
 #define BUILD_STATIC_CT_INITIAL_LIST(CT_NAME, COUNT) \
 START_BUILDCON_INITIAL_LIST(CT_NAME, COUNT, Constraint) \
 MERGE(TERMINATE_BUILDCON,COUNT)(CT_NAME, Constraint)
+
+#define BUILD_DYNAMIC_CT_INITIAL_LIST(CT_NAME, COUNT) \
+START_BUILDCON_INITIAL_LIST(CT_NAME, COUNT, DynamicConstraint) \
+MERGE(TERMINATE_BUILDCON,COUNT)(CT_NAME, DynamicConstraint)
 
 #define BUILD_DEF_STATIC_CT(CT_NAME) \
 Constraint* build_constraint_ ## CT_NAME(StateObj* stateObj, ConstraintBlob&);

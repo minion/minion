@@ -21,7 +21,7 @@ STATIC_CT  "sumleq" CT_LEQSUM 				 2  2 read_list read_var
 DYNAMIC_CT "watchsumgeq" CT_WATCHED_GEQSUM 	 2  1 read_list read_constant 
 DYNAMIC_CT "watchsumleq" CT_WATCHED_LEQSUM 	 2  1 read_list read_constant
 DYNAMIC_CT "table" CT_WATCHED_TABLE 		 2  1 read_list read_tuples 
-DYNAMIC_CT "watchvecneq" CT_WATCHED_VECNEQ 	 2  2 read_list read_list 
+DYNAMIC_CT "watchvecneq" CT_WATCHED_VECNEQ 	 2  2 read_list read_list
 STATIC_CT  "minuseq" CT_MINUSEQ 			 2  2 read_var read_var  
 DYNAMIC_CT "litsumgeq" CT_WATCHED_LITSUM 	 3  1 read_list read_constant_list read_constant 
 STATIC_CT "pow" CT_POW						 2  2 read_2_vars read_var
@@ -29,3 +29,6 @@ STATIC_CT "div" CT_DIV						 2  2 read_2_vars read_var
 STATIC_CT "modulo" CT_MODULO				 2  2 read_2_vars read_var
 STATIC_CT "gadget" CT_GADGET	1	1	read_list
 DYNAMIC_CT "disabled-or" CT_WATCHED_OR 1 1 read_list
+DYNAMIC_CT "weightedgacsum" CT_GACSUM 3 3 read_constant_list read_list read_var
+DYNAMIC_CT "watchvecexists_less" CT_WATCHED_VEC_OR_LESS 2 2 read_list read_list
+DYNAMIC_CT "watchvecexists_and" CT_WATCHED_VEC_OR_AND 2 2 read_list read_list

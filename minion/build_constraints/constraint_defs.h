@@ -31,6 +31,9 @@ ConstraintDef constraint_list[] = {
 { "modulo" , CT_MODULO, 2 ,{ read_2_vars , read_var }, STATIC_CT },
 { "gadget" , CT_GADGET, 1 ,{ read_list }, STATIC_CT },
 { "disabled-or" , CT_WATCHED_OR, 1 ,{ read_list }, DYNAMIC_CT },
+{ "gacsum" , CT_GACSUM, 3 ,{ read_constant_list , read_list , read_var }, DYNAMIC_CT },
+{ "watchvecexists_less" , CT_WATCHED_VEC_OR_LESS, 2 ,{ read_list , read_list }, DYNAMIC_CT },
+{ "watchvecexists_and" , CT_WATCHED_VEC_OR_AND, 2 ,{ read_list , read_list }, DYNAMIC_CT },
 { "reify", CT_REIFY, 0, {}, STATIC_CT },
 { "reifyimply", CT_REIFYIMPLY, 0, {}, STATIC_CT },
 };
