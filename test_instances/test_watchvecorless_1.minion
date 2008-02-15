@@ -1,0 +1,11 @@
+MINION 3
+#TEST SOLCOUNT 7
+
+**VARIABLES**
+BOOL x[2]
+BOOL y[2]
+
+**CONSTRAINTS**
+watchvecexists_less(x,y)
+
+**EOF**
