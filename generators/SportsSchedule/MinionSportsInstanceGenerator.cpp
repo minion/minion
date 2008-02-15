@@ -3,6 +3,8 @@
 #include "../InstanceHelp.h"
 #include "MinionSportsInstanceGenerator.h"
 
+bool use_gacsum;
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //Generate
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -32,7 +34,7 @@ void MinionSportsInstanceGenerator::generateVars(int n) {
   // (n^2-n) + 1/2 * (n^2 - n) Discrete vars.
   cout << ((n*n-n) + ((n*n-n) / 2)) << endl ;
   cout << 0 << " " << (n-1) << " " << (n*n-n) << endl ;
-  cout << 0 << " " << (n/2*(n-1))-1 << " " << (n/2*(n-1)) << endl << endl ;
+  cout << 0 << " " << /*(n/2*(n-1))-1*/ n*n << " " << (n/2*(n-1)) << endl << endl ;
   // no Sparse Discrete vars.
   cout << 0 << endl << endl ;
 }
@@ -152,22 +154,31 @@ void MinionSportsInstanceGenerator::generateConstraints(int n) {
   // Channelling
   for (i1 = 0; i1 < n-1; i1++)                             // Week loop
     for (i2 = 0; i2 < n/2; i2++) {                       // Period loop
-      cout << "table([x" << (i1*n/2)+i2 << ", x" << ((i1*n/2)+i2)+(n/2*(n-1)) 
-	  << ", x" << (i1*n/2)+i2+n*n-n << "] ," << endl ;
-      cout << "{" << endl ;
-      int game = 0 ;
-	  bool first_pass = true;
-      for (i3 = 0; i3 < n; i3++)
-        for (i4 = i3+1; i4 < n; i4++)
-		{
-		  if(first_pass)
-		    first_pass = false;
-		  else
-		    cout << ",";
-          cout << "<" << i3 << ", " << i4 << ", " << game++ << ">" << endl ;
-		}
-		  cout << "} )" << endl ;
-    }
+      printf("ineq(x%d,x%d,1)", (i1*n/2)+i2 , ((i1*n/2)+i2)+(n/2*(n-1)));
+			if(use_gacsum)
+			{
+			cout << "gacsum([1," << n << "], [x" << (i1*n/2)+i2 << ", x" << ((i1*n/2)+i2)+(n/2*(n-1)) 
+				<< "], x" << (i1*n/2)+i2+n*n-n << ")" << endl ;
+			}
+			else
+			{
+					cout << "table([x" << (i1*n/2)+i2 << ", x" << ((i1*n/2)+i2)+(n/2*(n-1)) 
+				<< ", x" << (i1*n/2)+i2+n*n-n << "] ," << endl ;
+					cout << "{" << endl ;
+					int game = 0 ;
+				bool first_pass = true;
+					for (i3 = 0; i3 < n; i3++)
+						for (i4 = 0; i4 < n; i4++)
+				{
+					if(first_pass)
+						first_pass = false;
+					else
+						cout << ",";
+							cout << "<" << i3 << ", " << i4 << ", " << /*game++*/ i3 + n * i4 << ">" << endl ;
+				}
+					cout << "} )" << endl ;
+			}
+	}
 	 
   
   // Break all symm on game matrix: top-left less than all.
@@ -189,11 +200,19 @@ void MinionSportsInstanceGenerator::generateConstraints(int n) {
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 int main(int argc, char* argv[]) {
   MinionSportsInstanceGenerator generator ;
-  if (argc != 2)
-    cout << "params: n" << endl ;
+  if (argc != 3 || (argv[2][0] != 'y' && argv[2][0] !='n') )
+  {
+    cout << "params: <number of teams> <y/n: use gacsum>" << endl ;
+    exit(0);
+  }
   else
   {
     cout << "MINION 1" << endl;
+    if(argv[2][0] == 'y')
+      use_gacsum = true;
+    else
+      use_gacsum = false;
+      
     instance dummy = instance() ;       // only created for next line
     cout << dummy.header() ;
     generator.generate(atoi(argv[1])) ;

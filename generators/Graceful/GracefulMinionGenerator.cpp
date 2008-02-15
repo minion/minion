@@ -183,7 +183,15 @@ void onediff_print (int var1, int var2, int k, int p)
         int diff = diffvar(var1,var2,k,p);
         int newmin = diff + numdiffs;
         int newmax = diff + 2*numdiffs;
-
+#ifdef GACSUM
+				cout <<  "gacsum([1,1], [";
+				outvar(newmin);
+				cout << ",";
+				outvar(diff);
+				cout << "],";
+				outvar(newmax);
+				cout << ")" << endl;
+#else
         cout << "sumleq([" ;
         outvar(newmin);
         cout << ",";
@@ -199,7 +207,7 @@ void onediff_print (int var1, int var2, int k, int p)
         cout << "]," ; 
         outvar(newmax);
         cout << ")" << endl;
-
+#endif
         cout << "min([" ;
         outvar(var1);
         cout << "," ;
