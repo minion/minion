@@ -473,12 +473,12 @@ class testhamming:
         for l in cross:
           l1=l[:len(l)/2]
           l2=l[len(l)/2:]
-          if count([  l1[i] != l2[i] for i in xrange(len(l1))] ) >= const:
+          if sum([  l1[i] != l2[i] for i in xrange(len(l1))] ) >= const:
             out.append(l)
         return out
 
     def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("hamming", True, reify, reifyimply, [4,4], ["smallnum, smallnum"], [4,4,"const"], self, not reifyimply)
+        return runtestgeneral("hamming", True, reify, reifyimply, [4,4], ["smallnum", "smallnum"], [4,4,"const"], self, not reifyimply)
 
 
 class testlexleq:

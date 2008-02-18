@@ -9,5 +9,5 @@
 
 #include "../dynamic_constraints/dynamic_sumor.h"
 #include "../dynamic_constraints/dynamic_vecneq.h"
-BUILD_DYNAMIC_CT(CT_WATCHED_VEC_OR_LESS, 2)
+BUILD_DYNAMIC_CT(CT_WATCHED_VEC_OR_AND, 2)
 

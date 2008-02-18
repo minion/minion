@@ -24,6 +24,8 @@ For Licence Information see file LICENSE.txt
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef _DYNAMIC_VECNEQ_H
+#define _DYNAMIC_VECNEQ_H
 
 struct NeqIterated
 {
@@ -365,3 +367,5 @@ DynamicConstraint*
   { return new VecNeqDynamic<VarArray1,VarArray2, BothNonZeroIterated>(stateObj, varray1, varray2); }
 
 BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_VEC_OR_AND, VecOrAndConDynamic)
+
+#endif

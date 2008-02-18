@@ -31,3 +31,4 @@ STATIC_CT "gadget" CT_GADGET	1	1	read_list
 DYNAMIC_CT "disabled-or" CT_WATCHED_OR 1 1 read_list
 DYNAMIC_CT "watchvecexists_less" CT_WATCHED_VEC_OR_LESS 2 2 read_list read_list
 DYNAMIC_CT "watchvecexists_and" CT_WATCHED_VEC_OR_AND 2 2 read_list read_list
+DYNAMIC_CT "hamming"			CT_WATCHED_HAMMING 3 2 read_list read_list read_constant
