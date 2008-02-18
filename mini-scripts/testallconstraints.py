@@ -32,7 +32,7 @@ conslist+=["modulo", "reifyimplymodulo", "pow", "reifyimplypow", "minuseq", "rei
 conslist+=["product", "reifyimplyproduct"]
 conslist+=["div", "reifyimplydiv"]
 
-conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "watchvecexists_less", "watchvecexists_and"]
+conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "watchvecexists_less", "watchvecexists_and", "hamming"]
 
 conslist+=["sumgeq", "reifysumgeq", "reifyimplysumgeq"]
 conslist+=["sumleq", "reifysumleq", "reifyimplysumleq"]
