@@ -210,7 +210,9 @@ class TriggerMem;
 class VariableContainer;
 
 class StateObj;
+class BoolContainer;
 
+inline BoolContainer& getBools(StateObj* stateObj);
 inline SearchOptions& getOptions(StateObj* stateObj);
 inline SearchState& getState(StateObj* stateObj);
 inline Queues& getQueue(StateObj* stateObj);

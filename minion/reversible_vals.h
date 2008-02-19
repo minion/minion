@@ -79,6 +79,77 @@ public:
 
 };
 
+class BoolContainer
+{
+  MoveablePointer backtrack_ptr;
+  int offset;
+  StateObj* stateObj;
+public:
+  BoolContainer(StateObj* _stateObj) : stateObj(_stateObj), offset(sizeof(int)*8)
+  {}
+  
+  pair<MoveablePointer, unsigned> returnBacktrackBool()
+  {
+    if(offset == sizeof(int)*8)
+    {
+      offset = 0;
+      backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(int));
+    }
+    
+    pair<MoveablePointer,unsigned> ret(backtrack_ptr, ((unsigned)1) << offset);
+    offset++;
+    return ret;
+  }
+};
+
+template<>
+class Reversible<bool>
+{
+  MoveablePointer backtrack_ptr;
+  unsigned mask;
+  
+public:
+  
+  /// Automatic conversion to the type.
+  operator bool() const
+  {  
+    unsigned* ptr = (unsigned*)(backtrack_ptr.get_ptr());
+    return (*ptr & mask);
+  }
+
+  /// Assignment operator.
+  void operator=(const bool& newval)
+  {
+    unsigned* ptr = (unsigned*)(backtrack_ptr.get_ptr());
+    if(newval)
+      *ptr |= mask;
+    else
+      *ptr &= ~mask;
+  }
+  
+  /// Constructs a new backtrackable type connected to stateObj.
+  Reversible(StateObj* stateObj)
+  { 
+    pair<MoveablePointer, unsigned> state = getBools(stateObj).returnBacktrackBool();
+    backtrack_ptr = state.first;
+    mask = state.second;
+  }
+  
+  /// Constructs and assigns in one step.
+  Reversible(StateObj* stateObj, bool b)
+  {
+    pair<MoveablePointer, unsigned> state = getBools(stateObj).returnBacktrackBool();
+    backtrack_ptr = state.first;
+    mask = state.second;
+    (*this) = b;
+  }
+
+  /// Provide output.
+  //friend std::ostream& operator<<(std::ostream& o, const Reversible<Bool>& v)
+  //{ return o << Bool(v); }
+
+};
+
 /// Specialisation for backwards compatability.
 typedef Reversible<int> ReversibleInt;
 

@@ -162,18 +162,24 @@ struct StateObj
   Queues* queues_m;
   TriggerMem* triggerMem_m;
   VariableContainer* varContainer_m;
+  BoolContainer* backtrack_bools; 
 public:
+  
+ 
+  
   StateObj() :
     searchMem_m(new Memory),
     options_m(new SearchOptions),
     state_m(),
     queues_m(new Queues(this)),
     triggerMem_m(new TriggerMem(this)),
-    varContainer_m(new VariableContainer(this))
+    varContainer_m(new VariableContainer(this)),
+    backtrack_bools(new BoolContainer(this))
   { }
 
   ~StateObj()
   { 
+    delete backtrack_bools;
     delete varContainer_m;
     delete triggerMem_m;
     delete queues_m;
@@ -182,6 +188,8 @@ public:
   }
 };
 
+inline BoolContainer& getBools(StateObj* stateObj)
+{ return *(stateObj->backtrack_bools); }
 inline SearchOptions& getOptions(StateObj* stateObj)
 { return *(stateObj->options_m); }
 inline SearchState& getState(StateObj* stateObj)
@@ -205,7 +213,10 @@ VARDEF(SearchState state_m);
 VARDEF_ASSIGN(Queues queues_m, &_noreenter_stateObj);
 VARDEF_ASSIGN(TriggerMem triggerMem_m, &_noreenter_stateObj);
 VARDEF_ASSIGN(VariableContainer varContainer_m, &_noreenter_stateObj);
+VARDEF_ASSIGN(BoolContainer bools_m, &_noreenter_stateObj);
 
+inline BoolContainer& getBools(StateObj* stateObj)
+{ return bools_m; }
 inline SearchOptions& getOptions(StateObj* stateObj)
 { return options_m; }
 inline SearchState& getState(StateObj* stateObj)

@@ -56,11 +56,10 @@ public:
   MoveableArray<T> requestArray(unsigned size)
   { 
     D_ASSERT(!locked);
-    return new_memory_block.requestArray<T>(size); 
+    return new_memory_block.requestArray<T>(size);
   }
   
-  BackTrackMemory() : backtrack_data(NULL),
-    current_depth_m(0), max_depth(0), locked(false)
+  BackTrackMemory() : backtrack_data(NULL), current_depth_m(0), max_depth(0), locked(false)
   {
       
   }

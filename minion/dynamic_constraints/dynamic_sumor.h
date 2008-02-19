@@ -87,10 +87,8 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     
     while(found_matches < num_to_watch && index < size)
     {
-      printf("#%d,%d,%d,%d\n", found_matches, num_to_watch, index, size);
       while(index < size && no_support_for_index(index))
       {
-        printf("!%d,%d,%d,%d\n", found_matches, num_to_watch, index, size);
       
         ++index;
       }
@@ -147,6 +145,8 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       if(!found)
         unwatched_values.push_back(i); 
     }
+    
+    random_shuffle(unwatched_values.begin(), unwatched_values.end());
   }
 
   void propagate_from_var1(int index)
