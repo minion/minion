@@ -16,7 +16,6 @@ dashes() {
 makepage() {
     outfile=$1; #page to start
     title=$2; #title of page
-    echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" >> $outfile;
     echo "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" >> $outfile;
     echo "<html xmlns=\"http://www.w3.org/1999/xhtml\">" >> $outfile;
     echo "<head>" >> $outfile;
