@@ -24,6 +24,25 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;sumleq Description
+The constraint
+
+   sumleq(vec, c)
+
+ensures that sum(vec) <= c.
+*/
+
+/** @help constraints;sumleq Reifiability
+This constrait is reifiable.
+*/
+
+/** @help constraints;sumgeq Description
+The constraint
+
+   sumgeq(vec, c)
+
+ensures that sum(vec) >= c.
+*/ 
 
 // This is the "primary" implement of sum, so it has to include headers for the
 // other specialised implementations.

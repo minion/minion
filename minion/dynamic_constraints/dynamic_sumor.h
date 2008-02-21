@@ -24,6 +24,19 @@ For Licence Information see file LICENSE.txt
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;hamming Description
+The constraint
+
+   hamming(X,Y,c)
+
+ensures that the hamming distance between X and Y is c. That is, that
+c is the size of the set {i | X[i] != y[i]}
+*/
+
+/** @help constraints;hamming Reifiability
+This constraint is not reifiable.
+*/
+
 // For operators
 #include "dynamic_vecneq.h"
 
