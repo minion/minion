@@ -54,8 +54,21 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
   {
 	  vector<int> final_val_order;
 	  vector<AnyVarRef> final_var_order;
-	  if(instance.var_order.size() != instance.val_order.size())
-	    D_FATAL_ERROR("Variable order and value order must be same size.");
+	  if(instance.var_order.size() < instance.val_order.size())
+      D_FATAL_ERROR("Variable order cannot be shorter than value order.");
+    
+    if(instance.var_order.size() > instance.val_order.size())
+    {
+      cout << "# Var order size = " << instance.var_order.size();  
+      cout << ", Val order size = " << instance.val_order.size();
+      cout << ", so padding val order." << endl;
+    
+      instance.val_order.insert(instance.val_order.end(), 
+        instance.var_order.size() - instance.val_order.size(), instance.val_order.back());
+    }
+      
+    D_ASSERT(instance.val_order.size() == instance.var_order.size());
+	    
 	
 	  for(unsigned int i = 0 ;i < instance.var_order.size(); ++i)
 	  {
