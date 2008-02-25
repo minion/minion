@@ -56,7 +56,7 @@ The constraint
 
 ensures that there exists some index i such that A[i] > 0 and B[i] > 0.
 
-For booleans this is the same as "exists i s.t. A[i] && B[i]".
+For booleans this is the same as 'exists i s.t. A[i] && B[i]'.
 */
 
 /** @help constraints;watchvecexists_and Reifiability
