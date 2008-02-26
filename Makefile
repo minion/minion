@@ -73,7 +73,7 @@ $(OBJDIR)/minion.o : minion/svn_header.h
 $(OBJDIR)/%.o: minion/%.cpp 
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
-minion: depend mkdirectory $(OBJFILES)	
+minion: Makefile.dep mkdirectory $(OBJFILES)	
 	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES)
 	
 mkdirectory:
@@ -118,7 +118,7 @@ veryclean:
 	rm -rf bin/*
 
 # Make sure these things get constructed before doing a make depend.
-depend: minion/svn_header.h
+Makefile.dep: minion/svn_header.h
 	mini-scripts/make_depend.sh
 
 .DUMMY:
