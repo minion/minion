@@ -89,7 +89,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
       switch(args.prop_method)
       {
         case PropLevel_GAC:
-          solve(stateObj, args.order, var_val_order, PropogateGAC());   // add a getState(stateObj).getTimer().maybePrintTimestepStore to search..
+          solve(stateObj, args.order, var_val_order, PropagateGAC());   // add a getState(stateObj).getTimer().maybePrintTimestepStore to search..
           break;
         case PropLevel_SAC:
           solve(stateObj, args.order, var_val_order, PropagateSAC());

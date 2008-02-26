@@ -65,7 +65,7 @@ class Constraint
 public:
   StateObj* stateObj;
   
-  Constraint(StateObj* _stateObj) : stateObj(_stateObj)
+  Constraint(StateObj* _stateObj) : stateObj(_stateObj),full_propagate_done(false)
   { }
   
   /// Returns the name of the constraint.
@@ -78,6 +78,8 @@ public:
   /** This function shouldn't do any propagation. That is full_propagate's job.*/
   virtual triggerCollection setup_internal() = 0;
 
+  // Has full_propagate been called yet?
+  BOOL full_propagate_done;
   
   // In function_defs.hpp
   //virtual Constraint* get_table_constraint();

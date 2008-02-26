@@ -5,13 +5,15 @@ import random
 # very simple program, just runs minion on the given minion files, using tableout.
 
 #Get the minion binary, and possibly a filelist and other options.
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "filelist=", "benchdir=", "timelimit=", "tableout="])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "filelist=", "benchdir=", "timelimit=", "tableout=", "nodelimit=", "xgrid"])
 
 rand=random.randint(0, 1000000)
 minion="bin/minion"
 tableout="miniontable"
 filelist=[]
-timeout="-timelimit 1200"
+timeout="-timelimit 1200 "
+nodelimit=""
+xgrid=False
 
 for (ident, value) in optargs:
     if ident=="--minion":
@@ -24,12 +26,14 @@ for (ident, value) in optargs:
             for name in files:
                 if name.endswith('.minion'):
                     filelist.append(os.path.join(root,name))
-    elif ident=="--xgrid":
-        print "xgrid not implemneted"
     elif ident=="--timelimit":
-        timeout="-timelimit "+str(value)
+        timeout="-timelimit "+str(value)+" "
     elif ident=="--tableout":
         tableout=value
+    elif ident=="--nodelimit":
+        nodelimit="-nodelimit "+str(value)+" "
+    elif ident=="--xgrid":
+        xgrid=True
 
 # grab any command line arguments which are minion instance files.
 othercopy=other[:]
@@ -50,10 +54,14 @@ if len(other)!=1:
 assert filelist!=[] , "You need to specify some instance files in some way"
 print filelist
 
+if xgrid:
+    os.system("export XGRID_CONTROLLER_HOSTNAME=xgrid.cs.st-andrews.ac.uk")
+    os.system("export XGRID_CONTROLLER_PASSWORD=....")
 
 for i in filelist:
-    minioncommand1=minion+" -tableout "+tableout+" "+timeout+" "+i+" >>1."+str(rand)
-    
+    minioncommand1=minion+" -tableout "+tableout+" "+timeout+nodelimit+" "+i+" >>1."+str(rand)
+    if xgrid:
+        minioncommand1="xgrid -job submit "+minioncommand1
     print "Executing command:"+minioncommand1
     status1=os.system(minioncommand1)
     

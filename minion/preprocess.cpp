@@ -16,7 +16,7 @@ void PropogateCSP(StateObj* stateObj, PropagationLevel preprocessLevel, vector<A
   if(preprocessLevel == PropLevel_None)
     return;
   
-  PropogateGAC propGAC;
+  PropagateGAC propGAC;
   propGAC(stateObj, vars);
   
   if(preprocessLevel == PropLevel_GAC)

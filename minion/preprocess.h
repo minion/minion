@@ -72,7 +72,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
   
 }
 
-struct PropogateGAC
+struct PropagateGAC
 {
   template<typename Vars>
   void operator()(StateObj* stateObj, Vars&)
@@ -83,14 +83,14 @@ struct PropagateSAC
 {
   template<typename Vars>
   void operator()(StateObj* stateObj, Vars& vars)
-  {propagateSAC_internal(stateObj, vars, PropogateGAC(), false);}
+  {propagateSAC_internal(stateObj, vars, PropagateGAC(), false);}
 };
 
 struct PropagateSAC_Bounds
 {
   template<typename Vars>
   void operator()(StateObj* stateObj, Vars& vars)
-  {propagateSAC_internal(stateObj, vars, PropogateGAC(), true);}
+  {propagateSAC_internal(stateObj, vars, PropagateGAC(), true);}
 };
 
 struct PropagateSSAC

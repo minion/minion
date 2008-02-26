@@ -16,7 +16,7 @@ namespace Controller
   // This function implements the algorithm in the ECAI '06 paper,
   // Last Conﬂict based Reasoning 
   template<typename VarOrder, typename Variables, typename Propogator>
-  inline void conflict_solve_loop(StateObj* stateObj, VarOrder& order, Variables& v, Propogator prop = PropogateGAC())
+  inline void conflict_solve_loop(StateObj* stateObj, VarOrder& order, Variables& v, Propogator prop = PropagateGAC())
   {
     D_INFO(0, DI_SOLVER, "Non-Boolean Search");
     

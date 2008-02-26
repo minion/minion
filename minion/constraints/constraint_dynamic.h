@@ -148,8 +148,8 @@ class DynamicConstraint
 public:
   
   StateObj* stateObj;
-  
-  DynamicConstraint(StateObj* _stateObj) : stateObj(_stateObj)
+  BOOL full_propagate_done;
+  DynamicConstraint(StateObj* _stateObj) : stateObj(_stateObj), full_propagate_done(false)
   { }
   
   /// Method to get constraint name for debugging.

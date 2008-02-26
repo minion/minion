@@ -732,7 +732,7 @@ class testwatchvecexists_less:
         crossprod(domains, [], cross)
         out=[]
         for l in cross:
-            if any([  (l[i]< l[len(l)/2+i]) for i in xrange(len(l)/2)] ):
+            if len([(l[i]< l[len(l)/2+i]) for i in xrange(len(l)/2)])>0:
                 out.append(l)
         return out
 
@@ -745,7 +745,7 @@ class testwatchvecexists_and:
         crossprod(domains, [], cross)
         out=[]
         for l in cross:
-            if any([  (l[i]>0 and l[len(l)/2+i]>0) for i in xrange(len(l)/2)] ):
+            if len([(l[i]>0 and l[len(l)/2+i]>0) for i in xrange(len(l)/2)] )>0:
                 out.append(l)
         return out
 
