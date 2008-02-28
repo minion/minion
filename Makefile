@@ -67,13 +67,20 @@ minion/svn_header.h: .DUMMY
 	
 minion/help/help.cpp: .DUMMY
 	bash minion/help/genhelp.sh minion/ > minion/help/help.cpp
+
+# This rule is here to ensure if Makefile.dep is missing, it is built so it can be included.	
+Makefile.dep:
+	mini-scripts/make_depend.sh
+	
+depend: Makefile.dep minion/svn_header.h
+
 	
 $(OBJDIR)/minion.o : minion/svn_header.h
 
 $(OBJDIR)/%.o: minion/%.cpp 
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
-minion: Makefile.dep mkdirectory $(OBJFILES)	
+minion: depend mkdirectory $(OBJFILES)	
 	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES)
 	
 mkdirectory:
@@ -116,10 +123,6 @@ clean:
 
 veryclean:
 	rm -rf bin/*
-
-# Make sure these things get constructed before doing a make depend.
-Makefile.dep: .DUMMY
-	mini-scripts/make_depend.sh
 
 .DUMMY:
 
