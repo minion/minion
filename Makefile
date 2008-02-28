@@ -118,7 +118,7 @@ veryclean:
 	rm -rf bin/*
 
 # Make sure these things get constructed before doing a make depend.
-Makefile.dep: minion/svn_header.h
+Makefile.dep: .DUMMY
 	mini-scripts/make_depend.sh
 
 .DUMMY:

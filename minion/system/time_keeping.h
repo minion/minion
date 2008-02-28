@@ -60,8 +60,6 @@ double getSecsSince(const rusage& start_time)
 
 bool checkTimeout(unsigned seconds)
 { 
-  struct rusage temp_time;
-  getrusage(RUSAGE_SELF, &temp_time);
   return ( getSecsSince(_internal_start_time) >= seconds );
 }
 
