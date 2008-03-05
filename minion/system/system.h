@@ -129,7 +129,7 @@ using namespace std;
 #define VARDEF(x) x
 #endif
 
-#define BOOL int
+#define BOOL bool
 
 
 #include "wrapper.h"
