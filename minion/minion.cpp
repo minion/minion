@@ -168,7 +168,15 @@ Do not check solutions for correctness before printing them out.
 */
 
 /** @help switches;-nocheck Notes
-This option only works in a DEBUG executable.
+This option is the default on non-DEBUG executables.
+*/
+
+/** @help switches;-check Description 
+Check solutions for correctness before printing them out.
+*/
+
+/** @help switches;-nocheck Notes
+This option is the default for DEBUG executables.
 */
 
 /** @help switches;-nodelimit Description
@@ -299,16 +307,17 @@ void print_info()
 //     << "            nodes, so will perform poorly on problem with many variables." << endl
 //     << "         [-randomseed] N             Set the random seed used to N." << endl
 //     << "         [-dumptree]                 Dumps the search tree" << endl
-//     << "         [-tableout] filename        Writes a line of statistics to the file" << endl
-  
-// #ifndef NO_DEBUG
-// 	<< "  Note: The following tags should never change the results produced." << endl
-// 	<< "        If they do, this is a bug." << endl
-// 	<< "        -fullprop will always slow search down." << endl
-// 	<< "        -nocheck will only speed up search." << endl
-// 	<< "         [-fullprop]                 Used for debugging" << endl
-// 	<< "         [-nocheck]                  Don't sanity check solutions" << endl
-
+//     << "         [-tableout] filename        Writes a line of statistics to the file" << endl << endl
+// 	   << "  Note: The following tags should never change the results produced." << endl
+// 	   << "        If they do, this is a bug." << endl
+//     << "         [-check]                    Performs an extra check on solutions to ensure they" << endl
+//     << "                                       satisfy all the constraints." << endl
+// 	   << "         [-nocheck]                  Don't sanity check solutions." << endl
+// #ifdef NO_DEBUG
+//     << "On this copy of Minion, -nocheck is the default behaviour, and giving this flag has no effect."
+// #else
+//     << "On this copy of Minion, -check is the default behaviour, and giving this flag has no effect."
+// 	   << "         [-fullprop]                 Don't use incremental propagators. Will always slow search" << endl
 // #endif
 // 	<< endl
 // 	<< "Notes: In problems with an optimisation function, -findallsols is ignored." << endl;
@@ -366,7 +375,7 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
     }
 	else if(command == string("-fullprop"))
 	{
-#ifndef NO_DEBUG
+#ifdef NO_DEBUG
 	  getOptions(stateObj).fullpropagate = true; 
 #else
 	  cout << "This version of minion was not built to support the '-fullprop' command. Sorry" << endl;
@@ -375,15 +384,12 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
 	}
 	else if(command == string("-nocheck"))
 	{
-#ifndef NO_DEBUG
 	  getOptions(stateObj).nocheck = true; 
-#else
-	  cout << "# WARNING: This version of minion was not built to support the '-nocheck' command." << endl;
-	  cout << "# WARNING: Solutions will not be checked in this version." << endl;
-	  cout << "# WARNING: This is probably the behaviour you want but this option does nothing." << endl;
-#endif
 	}
-	
+  else if(command == string("-check"))
+  {
+    getOptions(stateObj).nocheck = false;
+  }	
 	else if(command == string("-dumptree"))
 	{ getOptions(stateObj).dumptree = true; }
 	else if(command == string("-nodelimit"))

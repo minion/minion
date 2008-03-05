@@ -113,7 +113,7 @@ namespace Controller
 	    cout << "Nodes: " << getState(stateObj).getNodeCount() << endl << endl;
           }
     }
-#ifndef NO_DEBUG
+
   if(!getOptions(stateObj).nocheck)
   {
     for(unsigned i = 0; i < getState(stateObj).getDynamicConstraintList().size(); ++i)
@@ -122,7 +122,6 @@ namespace Controller
     for(unsigned i = 0 ; i < getState(stateObj).getConstraintList().size();i++)
       check_constraint(stateObj, getState(stateObj).getConstraintList()[i]);
   }
-#endif
   }
   
    

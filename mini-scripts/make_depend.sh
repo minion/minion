@@ -12,7 +12,7 @@ do
     # This nasty line just changes the extension...
     BINFILE=${file%.cpp}.o
   #  BINFILE=${BINFILE#./}
-    g++ -MM -MT \$\(OBJDIR\)/${BINFILE} minion/$file > /dev/null
+    g++ -MM -MT \$\(OBJDIR\)/${BINFILE} minion/$file &> /dev/null
     if [ "$?" -eq "0" ]; then
       # Have to run this twice, as storing the result in a variable
       # Loses line endings.

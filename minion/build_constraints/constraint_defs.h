@@ -34,6 +34,6 @@ ConstraintDef constraint_list[] = {
 { "watchvecexists_less" , CT_WATCHED_VEC_OR_LESS, 2 ,{ read_list , read_list }, DYNAMIC_CT },
 { "watchvecexists_and" , CT_WATCHED_VEC_OR_AND, 2 ,{ read_list , read_list }, DYNAMIC_CT },
 { "hamming" , CT_WATCHED_HAMMING, 3 ,{ read_list , read_list , read_constant }, DYNAMIC_CT },
-{ "reify", CT_REIFY, 0, {}, STATIC_CT },
-{ "reifyimply", CT_REIFYIMPLY, 0, {}, STATIC_CT },
+{ "reify", CT_REIFY, 0, {read_var}, STATIC_CT },
+{ "reifyimply", CT_REIFYIMPLY, 0, {read_var}, STATIC_CT },
 };

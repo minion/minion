@@ -1163,7 +1163,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       parser_info("Found " + to_string(indices.size()) + " indices");
     }
 
-    VariableType variable_type;
+    VariableType variable_type = VAR_INVALID;
     vector<int> domain;
 
     if(var_type == "ALIAS")

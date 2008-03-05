@@ -9,8 +9,8 @@ do
   ./internal_ConstraintDef.sh $f >> constraint_defs.h
 done < ConstraintList
 
-echo \{ \"reify\", CT_REIFY, 0, {}, STATIC_CT \}, >> constraint_defs.h
-echo \{ \"reifyimply\", CT_REIFYIMPLY, 0, {}, STATIC_CT \}, >> constraint_defs.h
+echo \{ \"reify\", CT_REIFY, 0, {read_var}, STATIC_CT \}, >> constraint_defs.h
+echo \{ \"reifyimply\", CT_REIFYIMPLY, 0, {read_var}, STATIC_CT \}, >> constraint_defs.h
 echo \}\; >> constraint_defs.h
 
 # Output a simple header that contains all the constraint identifiers
