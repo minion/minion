@@ -171,12 +171,12 @@ Do not check solutions for correctness before printing them out.
 This option is the default on non-DEBUG executables.
 */
 
-/** @help switches;-check Description 
-Check solutions for correctness before printing them out.
-*/
-
 /** @help switches;-nocheck Notes
 This option is the default for DEBUG executables.
+*/
+
+/** @help switches;-check Description 
+Check solutions for correctness before printing them out.
 */
 
 /** @help switches;-nodelimit Description
