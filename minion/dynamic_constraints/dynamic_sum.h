@@ -32,7 +32,7 @@
 */
 
 /** @help constraints;watchsumgeq Description
-The constraint watchsumleq(vec, c) ensures that sum(vec) >= c.
+The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c.
 */
 
 /** @help constraints;watchsumgeq Notes
@@ -55,7 +55,7 @@ See also
 */
 
 /** @help constraints;watchsumleq Description
-The constraint watchsumleq(vec, c) ensures that sum(vec) >= c.
+The constraint watchsumleq(vec, c) ensures that sum(vec) <= c.
 */
 
 /** @help constraints;watchsumleq Notes
