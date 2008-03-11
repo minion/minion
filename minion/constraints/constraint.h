@@ -64,6 +64,8 @@ class Constraint
 {
 public:
   StateObj* stateObj;
+
+  vector<AnyVarRef> vars;
   
   Constraint(StateObj* _stateObj) : stateObj(_stateObj),full_propagate_done(false)
   { }
@@ -99,7 +101,13 @@ public:
   // Returns a table constraint which implements this constraint
   /** The main reason for this function is to make the constraint package up all its variables */
   virtual vector<AnyVarRef> get_vars() = 0;  
-
+  
+  vector<AnyVarRef>* get_vars_singleton() //piggyback singleton vector on get_vars()
+  { 
+    if(vars.size() == 0) vars = get_vars(); //for efficiency: no constraint over 0 variables
+    return &vars; 
+  }
+  
   /// Checks if an assignment is satisfied.
   /** This takes the variable order returned by, and is mainly only used by, get_table_constraint() */
   virtual BOOL check_assignment(vector<DomainInt>) = 0;

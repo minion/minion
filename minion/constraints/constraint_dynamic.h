@@ -147,6 +147,8 @@ class DynamicConstraint
 {
 public:
   
+  vector<AnyVarRef> vars;
+  
   StateObj* stateObj;
   BOOL full_propagate_done;
   DynamicConstraint(StateObj* _stateObj) : stateObj(_stateObj), full_propagate_done(false)
@@ -194,6 +196,11 @@ public:
   // Returns the variables of the constraint
   virtual vector<AnyVarRef> get_vars() = 0;
   
+  vector<AnyVarRef>* get_vars_singleton() //piggyback singleton vector on get_vars()
+  { 
+    if(vars.size() == 0) vars = get_vars(); //for efficiency: no constraint over 0 variables
+    return &vars; 
+  }
   
   /// Checks if an assignment is satisfied.
   /** This takes the variable order returned by, and is mainly only used by, get_table_constraint() */
