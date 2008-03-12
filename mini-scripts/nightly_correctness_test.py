@@ -7,7 +7,9 @@ from sys import exit
 import sendemail
 
 # of course this is bad. The minion directory should be a command line option.
-chdir("/home/pn/minion-svn/minion")   #cd /home/pn/minion-svn/minion
+homedir="/cs/home/rsch/pn/"
+
+chdir(homedir+"minion-svn/minion")   #cd /home/pn/minion-svn/minion
 system("rm Makefile*")   # get rid of stale makefiles that were causing problems.
 
 retval=0
@@ -18,13 +20,13 @@ if retval!=0:
     sendemail.mail("An error occurred when checking out or doing make veryclean.")
     exit(1)
 
-retval+=system("make minion")
+retval+=system("make minion -j2")
 
 if retval!=0:
     sendemail.mail("An error occurred when building minion.")
     exit(1)
 
-retval+=system("export DEBUG=1;make minion")
+retval+=system("export DEBUG=1;make minion -j2")
 
 if retval!=0:
     sendemail.mail("An error occurred when building minion-debug.")
@@ -43,9 +45,12 @@ if retval!=0:
     sendemail.mail("An error occurred when running test_instances/run_tests.sh for minion-debug")
     exit(1)
 
-chdir("/home/pn/minion-svn/minion")
+chdir(homedir+"minion-svn/minion")   #cd /home/pn/minion-svn/minion
+
 # This sends its own email when a test fails, so no need to. 
-system("mini-scripts/testallconstraints.py --numtests=250 --email --minion=bin/minion") # just do 250 random tests for each constraint. Increase when
+# Do these two test sets in parallel.
+system("mini-scripts/testallconstraints.py --numtests=250 --email --minion=bin/minion &") 
+# just do 250 random tests for each constraint. Increase when
 # we have a faster machine.
 
 system("mini-scripts/testallconstraints.py --numtests=100 --email --minion=bin/minion-debug")

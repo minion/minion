@@ -25,7 +25,8 @@ GetOptions( 'outdir=s' => \$dir,
             'gnuplot=s' => \$gnuplotexe,
             'help' => \$help,
             'name1=s' => \$name1,
-            'name2=s' => \$name2
+            'name2=s' => \$name2,
+            'tableout' => \$tableout
             );
 
 if (@ARGV != 2) 
@@ -52,6 +53,7 @@ options:
         default: gnuplot
     --join=EXECUTABLE or -j EXE: name of join command
         default: join
+    --tableout: Inputs are tableout files rather than plain minion output
 EOF
 exit;
 }
@@ -73,15 +75,32 @@ if(not $name2 eq "")
 # $^X = perl executable
 
 # join requires input to be in sorted order with -b flag (who knew?)
-if( -f $newdir)
+if($tableout)
 {
-    system "$^X $scriptdir/analyse_minion.pl $newdir | $sortexe -b  > $tmpdir/1.$$";
-    system "$^X $scriptdir/analyse_minion.pl $referencedir | $sortexe -b > $tmpdir/2.$$";
+    # extract columns to approximate the output of analyse-minion.pl. Uses minionversion as a filler for columns.
+    system "cat $newdir | $scriptdir/getcolumns.py filename minionversion satisfiable solutionsfound totaltime nodes minionversion timeout parsingtime setuptime firstnodetime solvetime minionversion minionversion minionversion | $sortexe -b > $tmpdir/1.$$";
+    system "cat $referencedir | $scriptdir/getcolumns.py filename minionversion satisfiable solutionsfound totaltime nodes minionversion timeout parsingtime setuptime firstnodetime solvetime minionversion minionversion minionversion | $sortexe -b > $tmpdir/2.$$";
 }
 else
-{
-    system "$^X $scriptdir/analyse_minion.pl $newdir/* | $sortexe -b  > $tmpdir/1.$$";
-    system "$^X $scriptdir/analyse_minion.pl $referencedir/* | $sortexe -b > $tmpdir/2.$$";
+{   
+    # the old bit which uses analyse_minion.pl to get the values out of minion's stdout 
+    if( -f $newdir)
+    {
+        system "$^X $scriptdir/analyse_minion.pl $newdir | $sortexe -b  > $tmpdir/1.$$";
+    }
+    else
+    {
+        system "$^X $scriptdir/analyse_minion.pl $newdir/* | $sortexe -b  > $tmpdir/1.$$";
+    }
+    
+    if( -f $referencedir)
+    {
+        system "$^X $scriptdir/analyse_minion.pl $referencedir | $sortexe -b > $tmpdir/2.$$";
+    }
+    else
+    {
+        system "$^X $scriptdir/analyse_minion.pl $referencedir/* | $sortexe -b > $tmpdir/2.$$";
+    }
 }
 
 if ((-e $dir) and not (-d $dir) )
@@ -111,8 +130,8 @@ set size 1.5,1.2
 set pointsize 2
 set autoscale yfix
 set key outside box 
-plot "$dir/comparison.$newname.$referencename.txt" using 19:((\$7/\$21-1)*100) t "overall nodes/s", \\
-     "$dir/comparison.$newname.$referencename.txt" using 19:((\$13/\$27-1)*100) t "search nodes/s", \\
+plot "$dir/comparison.$newname.$referencename.txt" using 19:(((\$6/\$5) / (\$20/\$19)-1)*100) t "overall nodes/s", \\
+     "$dir/comparison.$newname.$referencename.txt" using 19:(((\$6/\$12) / (\$20/\$26)-1)*100) t "search nodes/s", \\
      "$dir/comparison.$newname.$referencename.txt" using 19:((\$6/\$20-1)*100) t "total nodes" 
 EOF
 close GNUPLOT1;
@@ -151,7 +170,7 @@ while (<PREFIXES>)
      $i = @field[0];
      system "$egrepexe \"^$i\[ 0-9\]\" $dir/comparison.$newname.$referencename.txt > $tmpdir/$newname.$referencename.$$.$i";
      print GNUPLOT2 << "EOF" 
-"$tmpdir/$newname.$referencename.$$.$i" using 19:((\$7/\$21)) t "$i", \\
+"$tmpdir/$newname.$referencename.$$.$i" using 19:(((\$6/\$5)/ (\$20/\$19))) t "$i", \\
 EOF
 }
 close PREFIXES;
