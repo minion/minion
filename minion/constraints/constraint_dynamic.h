@@ -24,6 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "constraint_abstract.h"
+
 #define DYNAMIC_PROPAGATE_FUNCTION virtual void propagate
 
 /// This is a trigger to a constraint, which can be dynamically moved around.
@@ -143,20 +145,12 @@ public:
 };
 
 /// Base type from which all dynamic constraints are derived.
-class DynamicConstraint
+class DynamicConstraint : public AbstractConstraint
 {
 public:
-  
-  vector<AnyVarRef> vars;
-  
-  StateObj* stateObj;
-  BOOL full_propagate_done;
-  DynamicConstraint(StateObj* _stateObj) : stateObj(_stateObj), full_propagate_done(false)
-  { }
-  
-  /// Method to get constraint name for debugging.
-  virtual string constraint_name() = 0;
-  
+  DynamicConstraint(StateObj* _stateObj) : AbstractConstraint(_stateObj)
+    {}
+
   /// Private member of the base class.
   MemOffset _DynamicTriggerCache;
   
@@ -185,29 +179,9 @@ public:
   /// Must be implemented by any constraint.
   virtual int dynamic_trigger_count() = 0;
   
-  /// Performs a full round of propagation and sets up any data needs by propagate().
-  /** This function can be called during search if the function is reified */
-  virtual void full_propagate() = 0;
-  
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger*) = 0;
-  
-  // Returns the variables of the constraint
-  virtual vector<AnyVarRef> get_vars() = 0;
-  
-  vector<AnyVarRef>* get_vars_singleton() //piggyback singleton vector on get_vars()
-  { 
-    if(vars.size() == 0) vars = get_vars(); //for efficiency: no constraint over 0 variables
-    return &vars; 
-  }
-  
-  /// Checks if an assignment is satisfied.
-  /** This takes the variable order returned by, and is mainly only used by, get_table_constraint() */
-  virtual BOOL check_assignment(vector<DomainInt>) = 0;
-    
-  virtual ~DynamicConstraint()
-  {}
 };
 
 
