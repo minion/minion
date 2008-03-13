@@ -68,7 +68,8 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     {
        if(num_to_watch <= 0)
          num_to_watch = 0;
-       D_ASSERT(var_array1.size() == var_array2.size()); }
+       D_ASSERT(var_array1.size() == var_array2.size()); 
+    }
 
   int dynamic_trigger_count()
   { return Operator::dynamic_trigger_count() * num_to_watch; }
@@ -102,7 +103,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     {
       while(index < size && no_support_for_index(index))
       {
-      
         ++index;
       }
       if(index != size)
@@ -172,15 +172,25 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   {
     PROP_INFO_ADDONE(DynVecNeq);
     D_INFO(2, DI_VECNEQ, "Starting propagate");
-
     int trigger_activated = dt - dynamic_trigger_start();
     int triggerpair = trigger_activated / 2;
     D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);
+/*
+    printf("propmode=%d, triggerpair=%d, trigger_activated=%d, nopropindex=%d\n",
+      (int)propagate_mode, (int)triggerpair, (int)trigger_activated, (int)index_to_not_propagate);
 
+    for(int i = 0; i < watched_values.size(); ++i)
+      printf("%d,", watched_values[i]);
+    
+    printf(":");  
+    for(int i = 0; i < unwatched_values.size(); ++i)
+      printf("%d,", unwatched_values[i]);
+    printf("\n");
+*/    
     if(propagate_mode)
     {
       // If this is true, the other index got assigned.
-      if(index_to_not_propagate == triggerpair)
+      if(index_to_not_propagate == watched_values[triggerpair])
         return;
 
       if(trigger_activated % 2 == 0)
@@ -205,6 +215,10 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       D_INFO(2, DI_VECNEQ, "Cannot find another index");
       propagate_mode = true;
       index_to_not_propagate = watched_values[triggerpair];
+      
+//     printf("!propmode=%d, triggerpair=%d, trigger_activated=%d, nopropindex=%d\n",
+//        (int)propagate_mode, (int)triggerpair, (int)trigger_activated, (int)index_to_not_propagate);
+        
       for(int i = 0; i < watched_values.size(); ++i)
       {
         if(i != triggerpair)
