@@ -24,13 +24,15 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "../../constraints/constraint_abstract.h"
+
 template<typename Var>
 struct VarNeg
 {
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Var::isBoundConst;
   Var data;
-  
+
   BOOL isBound()
   { return data.isBound();}
   
@@ -115,6 +117,12 @@ struct VarNeg
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  data.addDynamicTrigger(t, type, pos); }
 #endif
+
+  vector<AbstractConstraint*>* getConstraints()
+  { return data.getConstraints(); }
+
+  void addConstraint(AbstractConstraint* c)
+  { data.addConstraint(c); }
 };
 
 

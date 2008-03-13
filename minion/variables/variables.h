@@ -24,7 +24,6 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 #ifdef MANY_VAR_CONTAINERS
 #define GET_CONTAINER() data.getCon()
 #define GET_LOCAL_CON() getCon()

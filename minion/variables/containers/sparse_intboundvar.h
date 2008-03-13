@@ -43,6 +43,8 @@ Use of this variable in a constraint:
 eq(myvar, 3) #myvar equals 3
 */
 
+#include "../../constraints/constraint_abstract.h"
+
 template<typename T>
 struct SparseBoundVarContainer;
 
@@ -92,6 +94,7 @@ struct SparseBoundVarContainer {
   TriggerList trigger_list;
   vector<vector<BoundType> > domains;
   vector<int> domain_reference;
+  vector<vector<AbstractConstraint*> > constraints;
   unsigned var_count_m;
   BOOL lock_m;
 
@@ -195,6 +198,8 @@ struct SparseBoundVarContainer {
   // TODO: Setting var_count_m to avoid changing other code.. long term, do
   // we need it?
   var_count_m = domain_reference.size();
+
+  constraints.resize(var_count_m);
 
   bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
   BoundType* bound_ptr = static_cast<BoundType*>(bound_data.get_ptr());
@@ -376,6 +381,12 @@ struct SparseBoundVarContainer {
     D_ASSERT(lock_m); 
 	trigger_list.add_trigger(b.var_num, t, type); 
   }
+
+  vector<AbstractConstraint*>* getConstraints(const SparseBoundVarRef_internal<BoundType>& b)
+  { return &constraints[b.var_num]; }
+
+  void addConstraint(const SparseBoundVarRef_internal<BoundType>& b, AbstractConstraint* c)
+  { constraints[b.var_num].push_back(c); }
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)

@@ -260,4 +260,6 @@ inline SearchState::~SearchState()
 #endif
 }
 
+#include "solver.hpp"
+
 #endif

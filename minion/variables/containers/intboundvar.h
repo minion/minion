@@ -42,6 +42,8 @@ Use of this variable in a constraint:
 eq(myvar, 4) #variable myvar equals 4
 */
 
+#include "../../constraints/constraint_abstract.h"
+
 template<typename BoundType>
 struct BoundVarContainer;
 
@@ -143,6 +145,12 @@ struct BoundVarRef_internal
   void addTrigger(Trigger t, TrigType type)
   { GET_LOCAL_CON().addTrigger(*this, t, type); }
 
+  vector<AbstractConstraint*>* getConstraints()
+  { return GET_LOCAL_CON().getConstraints(*this); }
+
+  void addConstraint(AbstractConstraint* c)
+  { GET_LOCAL_CON().addConstraint(*this, c); }
+
   friend std::ostream& operator<<(std::ostream& o, const BoundVarRef_internal& v)
   { return o << "BoundVar:" << v.var_num; }
     
@@ -172,6 +180,7 @@ struct BoundVarContainer {
   MoveablePointer bound_data;
   TriggerList trigger_list;
   vector<pair<BoundType, BoundType> > initial_bounds;
+  vector<vector<AbstractConstraint*> > constraints;
   unsigned var_count_m;
   BOOL lock_m;
   
@@ -346,6 +355,8 @@ struct BoundVarContainer {
       }
     }
 
+    constraints.resize(var_count_m);
+
     bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
     BoundType* bound_ptr = static_cast<BoundType*>(bound_data.get_ptr());
     for(unsigned int i = 0; i < var_count_m; ++i)
@@ -377,6 +388,12 @@ struct BoundVarContainer {
 	D_ASSERT(lock_m);  
 	trigger_list.add_trigger(b.var_num, t, type); 
   }
+
+  vector<AbstractConstraint*>* getConstraints(const BoundVarRef_internal<BoundType>& b)
+  { return &constraints[b.var_num]; }
+  
+  void addConstraint(const BoundVarRef_internal<BoundType>& b, AbstractConstraint* c)
+  { constraints[b.var_num].push_back(c); }
 
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)

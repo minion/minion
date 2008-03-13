@@ -77,10 +77,10 @@ public:
   bool isOptimisationProblem() { return optimise; }
   void setOptimisationProblem(bool _optimise) { optimise = _optimise; }
   
-  void addConstraint(Constraint* c) { constraints.push_back(c); }
+  void addConstraint(Constraint* c);
   vector<Constraint*>& getConstraintList() { return constraints; }
 #ifdef DYNAMICTRIGGERS
-  void addDynamicConstraint(DynamicConstraint* c) { dynamic_constraints.push_back(c); }
+  void addDynamicConstraint(DynamicConstraint* c);
   vector<DynamicConstraint*>& getDynamicConstraintList() { return dynamic_constraints; }
 #endif
   

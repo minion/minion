@@ -24,6 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include "../../constraints/constraint_abstract.h"
+
 struct TrivialBoundVar
 {
   // TODO: This really only needs enough to get 'fail'
@@ -37,6 +39,8 @@ struct TrivialBoundVar
   
   Reversible<DomainInt> lower;
   Reversible<DomainInt> upper;
+
+  vector<AbstractConstraint*> constraints;
   
   explicit TrivialBoundVar(StateObj* _stateObj, DomainInt _lower, DomainInt _upper) :
   stateObj(_stateObj), lower(stateObj, _lower), upper(stateObj, _upper)
@@ -111,6 +115,11 @@ struct TrivialBoundVar
   void addTrigger(Trigger, TrigType)
   { }
   
+  vector<AbstractConstraint*>* getConstraints()
+  { return &constraints; }
+
+  void addConstraint(AbstractConstraint* c)
+  { constraints.push_back(c); }
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = -999)

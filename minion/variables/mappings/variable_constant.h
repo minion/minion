@@ -24,6 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "../../constraints/constraint_abstract.h"
+
 struct ConstantVar
 {
   // TODO: This really only needs enough to get 'fail'
@@ -100,6 +102,10 @@ struct ConstantVar
   void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = -999)
   { dt->remove(); }
 #endif
+
+  vector<AbstractConstraint*>* getConstraints() { ; }
+
+  void addConstraint(AbstractConstraint* c){ ; }
 
   int getDomainChange(DomainDelta d)
   { 

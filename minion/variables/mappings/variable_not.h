@@ -24,6 +24,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "../../constraints/constraint_abstract.h"
 
 /**
  * @brief Nots a variable reference.
@@ -128,6 +129,12 @@ struct VarNot
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  data.addDynamicTrigger(t, type, swap(pos)); }
 #endif
+
+  vector<AbstractConstraint*>* getConstraints()
+  { return data.getConstraints(); }
+
+  void addConstraint(AbstractConstraint* c)
+  { data.addConstraint(c); }
 };
 
 template<typename T>

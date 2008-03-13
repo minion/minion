@@ -18,6 +18,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "../../constraints/constraint_abstract.h"
+
 template<typename d_type>
 struct BigRangeVarContainer;
 
@@ -83,6 +85,8 @@ struct BigRangeVarContainer {
   vector<pair<int,int> > initial_bounds;
   /// Position in the variable data (in counts of d_type) of where each variable starts
   vector<int> var_offset;
+  /// Constraints variable participates in
+  vector<vector<AbstractConstraint*> > constraints;
  
   unsigned var_count_m;
   BOOL lock_m;
@@ -168,6 +172,7 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
       D_INFO(0,DI_LONGINTCON,"Adding var of domain: (" + to_string(new_domains[i].second.lower_bound) + "," +
                                                          to_string(new_domains[i].second.upper_bound) + ")");
     }
+    constraints.resize(var_count_m);
   }
 
  
@@ -489,6 +494,12 @@ public:
     trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
   }
 #endif
+
+  vector<AbstractConstraint*>* getConstraints(const BigRangeVarRef_internal& b)
+  { return &constraints[b.var_num]; }
+
+  void addConstraint(const BigRangeVarRef_internal& b, AbstractConstraint* c)
+  { constraints[b.var_num].push_back(c); }
 
   ~BigRangeVarContainer() { 
     for(unsigned i=0; i < var_count_m ; i++) {

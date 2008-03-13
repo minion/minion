@@ -41,6 +41,8 @@ Use of this variable in a constraint:
 eq(bool, 0) #variable bool equals 0
 */
 
+#include "../../constraints/constraint_abstract.h"
+
 /// Standard data type used for storing compressed booleans 
 typedef unsigned long data_type;
 static const data_type one = 1;
@@ -157,6 +159,7 @@ struct BooleanContainer
   static const int width = 7;
   MoveablePointer assign_offset;
   MemOffset values_mem;
+  vector<vector<AbstractConstraint*> > constraints;
   unsigned var_count_m;
   TriggerList trigger_list;
   /// When false, no variable can be altered. When true, no variables can be created.
@@ -194,6 +197,7 @@ struct BooleanContainer
 	required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
     assign_offset = getMemory(stateObj).backTrack().request_bytes(required_mem);
     values_mem = getMemory(stateObj).nonBackTrack().request_bytes(required_mem);
+    constraints.resize(bool_count);
   }
   
   /// Returns a reference to the ith Boolean variable which was previously created.
@@ -316,6 +320,12 @@ struct BooleanContainer
 	trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
   }
 #endif
+
+  vector<AbstractConstraint*>* getConstraints(const BoolVarRef_internal& b)
+  { return& constraints[b.var_num]; }
+
+  void addConstraint(const BoolVarRef_internal& b, AbstractConstraint* c)
+  { constraints[b.var_num].push_back(c); }
 };
 
 inline BoolVarRef BooleanContainer::get_var_num(int i)

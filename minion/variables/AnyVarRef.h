@@ -110,6 +110,8 @@ ALIAS c = a
 ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 */
 
+#include "../constraints/constraint_abstract.h"
+
 /// Internal type used by AnyVarRef.
 struct AnyVarRef_Abstract
 {
@@ -129,6 +131,8 @@ struct AnyVarRef_Abstract
   virtual void propagateAssign(DomainInt b) = 0;
   virtual void removeFromDomain(DomainInt b) = 0;
   virtual void addTrigger(Trigger t, TrigType type) = 0;
+  virtual vector<AbstractConstraint*>* getConstraints() = 0;
+  virtual void addConstraint(AbstractConstraint* c) = 0;
 
   virtual string virtual_to_string() = 0;
   
@@ -203,6 +207,12 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   
   virtual void addTrigger(Trigger t, TrigType type)
   { data.addTrigger(t, type); }
+
+  virtual vector<AbstractConstraint*>* getConstraints()
+  { return data.getConstraints(); }
+
+  virtual void addConstraint(AbstractConstraint* c)
+  { data.addConstraint(c); }
   
   virtual string virtual_to_string()
   { return to_string(data); }
@@ -287,6 +297,12 @@ public:
 
   void addTrigger(Trigger t, TrigType type)
   { data->addTrigger(t, type); }
+
+  vector<AbstractConstraint*>* getConstraints() 
+  { return data->getConstraints(); }
+
+  void addConstraint(AbstractConstraint* c)
+  { data->addConstraint(c); }
   
   friend std::ostream& operator<<(std::ostream& o, const AnyVarRef& avr)
   { return o << "AnyVarRef:" << avr.data->virtual_to_string(); }

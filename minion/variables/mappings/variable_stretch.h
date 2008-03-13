@@ -24,6 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "../../constraints/constraint_abstract.h"
+
 template<typename T>
 struct MultiplyHelp
 {
@@ -221,6 +223,12 @@ struct MultiplyVar
   
   int getDomainChange(DomainDelta d)
   { return abs(Multiply) * data.getDomainChange(d); }
+
+  vector<AbstractConstraint*>* getConstraints()
+  { return data.getConstraints(); }
+
+  void addConstraint(AbstractConstraint* c)
+  { data.addConstraint(c); }
 };
 
 template<typename T>

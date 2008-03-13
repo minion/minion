@@ -25,6 +25,8 @@
 */
 
 
+#include "../../constraints/constraint_abstract.h"
+
 template<typename VarRef, typename ShiftType>
 struct ShiftVar
 {
@@ -110,6 +112,12 @@ struct ShiftVar
   
   int getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
+
+  vector<AbstractConstraint*>* getConstraints()
+  { return data.getConstraints(); }
+
+  void addConstraint(AbstractConstraint* c)
+  { data.addConstraint(c); }
 };
 
 template<typename T, typename U>

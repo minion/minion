@@ -24,6 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "../constraints/constraint_abstract.h"
+
 #ifndef VARREFTYPE_H
 #define VARREFTYPE_H
 
@@ -97,6 +99,12 @@ struct VarRefType
   
   void addTrigger(Trigger t, TrigType type)
   { GET_CONTAINER().addTrigger(data, t, type); }
+
+  vector<AbstractConstraint*>* getConstraints()
+  { return GET_CONTAINER().getConstraints(data); }
+
+  void addConstraint(AbstractConstraint* c)
+  { GET_CONTAINER().addConstraint(data, c); }
 
   friend std::ostream& operator<<(std::ostream& o, const VarRefType& v)
   { return o << InternalRefType::name() << v.data.var_num; }
@@ -177,6 +185,12 @@ struct QuickVarRefType
   void addTrigger(Trigger t, TrigType type)
   { GET_CONTAINER().addTrigger(data, t, type); }
 
+  vector<AbstractConstraint*>* getConstraints()
+  { return GET_CONTAINER().getConstraints(data); }
+
+  void addConstraint(AbstractConstraint* c)
+  { GET_CONTAINER().addConstraint(data, c); }
+
   friend std::ostream& operator<<(std::ostream& o, const QuickVarRefType& b)
   { return o << "Bool:" << b.data; }
   
@@ -246,6 +260,12 @@ struct CompleteVarRefType
   
   void addTrigger(Trigger t, TrigType type)
   { (data.getCon()).addTrigger(data, t, type); }
+
+  vector<AbstractConstraint*>* getConstraints()
+  { return (data.getCon()).getConstraints(data); }
+  
+  void addConstraint(AbstractConstraint* c)
+  { (data.getCon()).addConstraint(data, c); }
   
   friend std::ostream& operator<<(std::ostream& o, const CompleteVarRefType& cv)
   { return o << "CompleteCon:" << cv.data.var_num; }

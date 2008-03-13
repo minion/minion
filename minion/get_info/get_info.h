@@ -17,6 +17,8 @@
   VAR_INFO_propagateAssign,
   VAR_INFO_RemoveFromDomain,
   VAR_INFO_addTrigger,
+  VAR_INFO_addConstraint,
+  VAR_INFO_getConstraints,
   VAR_INFO_getDomainChange,
   VAR_INFO_addDynamicTrigger,
   VarEvent_END

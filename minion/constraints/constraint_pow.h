@@ -54,7 +54,7 @@ template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct PowConstraint : public Constraint
 {
   virtual string constraint_name()
-  { return "Product"; }
+  { return "Pow"; }
   
   VarRef1 var1;
   VarRef2 var2;

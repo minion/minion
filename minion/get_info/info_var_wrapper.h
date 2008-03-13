@@ -1,3 +1,5 @@
+#include "../constraints/constraint_abstract.h"
+
 template<typename WrapType, VarType VAR_TYPE>
 struct InfoRefType
 {
@@ -106,6 +108,18 @@ struct InfoRefType
   {
     VAR_INFO_ADDONE(VAR_TYPE, addTrigger);
     data.addTrigger( t, type); 
+  }
+
+  vector<AbstractConstraint*>* getConstraints()
+  { 
+    VAR_INFO_ADDONE(VAR_TYPE, getConstraints);
+    return data.getConstraints();
+  }
+  
+  void addConstraint(AbstractConstraint* c)
+  {
+    VAR_INFO_ADDONE(VAR_TYPE, addConstraint);
+    data.addConstraint(c);
   }
   
   friend std::ostream& operator<<(std::ostream& o, const InfoRefType& ir)
