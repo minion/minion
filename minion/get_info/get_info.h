@@ -1,26 +1,8 @@
 
  enum VarEvent {
- VAR_INFO_construct,
- VAR_INFO_copy,
- VAR_INFO_isAssigned,
- VAR_INFO_getAssignedValue,
-   VAR_INFO_isAssignedValue,
-   VAR_INFO_inDomain,
-   VAR_INFO_inDomain_noBoundCheck,
-   VAR_INFO_getMax,
-   VAR_INFO_getMin,
-   VAR_INFO_getInitialMax,
-   VAR_INFO_getInitialMin,
-  VAR_INFO_setMax,
-  VAR_INFO_setMin,
-  VAR_INFO_uncheckedAssign,
-  VAR_INFO_propagateAssign,
-  VAR_INFO_RemoveFromDomain,
-  VAR_INFO_addTrigger,
-  VAR_INFO_addConstraint,
-  VAR_INFO_getConstraints,
-  VAR_INFO_getDomainChange,
-  VAR_INFO_addDynamicTrigger,
+#define VAR_EVENT(x,y) VAR_INFO_##x ,
+#include "PropEvents.h"
+#undef VAR_EVENT
   VarEvent_END
   };
 
@@ -43,41 +25,11 @@ CON_INFO_LoopSearchTrie,
 ConEvent_END
 };
  
- enum PropEvent {
- PROP_INFO_CheckAssign,
- PROP_INFO_BoundTable,
- PROP_INFO_Reify,
- PROP_INFO_ReifyTrue,
- PROP_INFO_Table,
- PROP_INFO_ArrayNeq,
- PROP_INFO_BinaryNeq,
- PROP_INFO_NonGACElement,
- PROP_INFO_GACElement,
- PROP_INFO_Lex,
- PROP_INFO_FullSum,
- PROP_INFO_BoolSum,
- PROP_INFO_AlldiffGacSlow,
- PROP_INFO_LightSum,
- PROP_INFO_WeightBoolSum,
- PROP_INFO_ReifyEqual,
- PROP_INFO_Equal,
- PROP_INFO_BinaryLeq,
- PROP_INFO_Min,
- PROP_INFO_OccEqual,
- PROP_INFO_Pow,
- PROP_INFO_And,
- PROP_INFO_Product,
- PROP_INFO_DynSum,
- PROP_INFO_DynSumSat,
- PROP_INFO_Dyn3SAT,
- PROP_INFO_Dyn2SAT,
- PROP_INFO_DynLitWatch,
- PROP_INFO_DynElement,
- PROP_INFO_DynVecNeq,
- PROP_INFO_DynGACTable,
- PROP_INFO_Mod,
- PROP_INFO_Gadget,
- PropEvent_END
+enum PropEvent {
+#define PROP_EVENT(x) PROP_INFO_##x ,
+#include "PropEvents.h"
+#undef PROP_EVENT
+PropEvent_END
  };
  
 const int VarEventCount=VarEvent_END;

@@ -16,53 +16,21 @@ using namespace std;
 const int ShowUnused = 0;
 
 string EventNames[] = {
- "construct",
- "copy",
- "isAssigned",
- "getAssignedValue",
-   "isAssignedValue",
-   "inDomain",
-   "inDomain_noBC",
-   "getMax",
-   "getMin",
-   "getInitialMax",
-   "getInitialMin",
-  "setMax",
-  "setMin",
-  "uncheckedAssign",
-  "propagateAssign",
-  "RemoveFromDomain",
-  "addTrigger",
-  "addConstraint",
-  "getConstraints",
-  "getDomainChange",
-  "addDynamicTrigger",
+#define VAR_EVENT(x,y) #x ,
+#include "get_info/PropEvents.h"
+#undef VAR_EVENT
+""
 };
 
 // 0 - ignore, 1 - read, 2 - write
 int EventCategory[] = {
- 0,
- 0,
- 0,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 2,
- 2,
- 2,
- 2,
- 2,
- 0,
- 0,
- 0,
- 1,
- 1,
+#define NULL_EVENT 0
+#define READ_EVENT 1
+#define WRITE_EVENT 2
+#define VAR_EVENT(x,y) y ,
+#include "get_info/PropEvents.h"
+#undef VAR_EVENT
+0
 };
 
 string VarNames[] =
@@ -81,39 +49,9 @@ string ConEventNames[] =  {
 };
 
 string PropEventNames[] = {
-"CheckAssign",
- "BoundTable",
- "Reify",
- "ReifyTrue",
- "Table",
- "ArrayNeq",
- "BinaryNeq",
- "NonGACElement",
- "GACElement",
- "Lex",
- "FullSum",
- "BoolSum",
- "AllDiffGacSlow",
- "LightSum",
- "WeightBoolSum",
- "ReifyEqual",
- "Equal",
- "BinaryLeq",
- "Min",
- "OccEqual",
- "Pow",
- "And",
- "Product",
- "DynSum",
- "DynSumSat",
- "Dyn3SAT",
- "Dyn2SAT",
- "DynLitWatch",
- "DynElement",
- "DynVecNeq",
- "DynGACTable",
- "Mod",
- "Gadget"
+#define PROP_EVENT(x) #x ,
+#include "get_info/PropEvents.h"
+#undef PROP_EVENT
  };
 
  

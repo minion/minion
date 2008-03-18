@@ -463,6 +463,21 @@ class testineq:
     def runtest(self, reify=False, reifyimply=False):
         return runtestgeneral("ineq", True, reify, reifyimply, [2], ["num"], [1,1,"const"], self, not reifyimply)
 
+class testabs:
+    def printtable(self, domains):
+    #  x1 = abs(x2) 
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        numtuples=0
+        for l in cross:
+            if l[0] == abs(l[1]):
+                out.append(l)
+        return out
+
+    def runtest(self, reify=False, reifyimply=False):
+        return runtestgeneral("abs", True, reify, reifyimply, [2], ["num"], [1,1,], self, False)
+
 class testhamming:
     def printtable(self, domains):
         const=self.const1
