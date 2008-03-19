@@ -48,6 +48,7 @@ conslist+=["lexleq", "lexless", "reifylexleq", "reifylexless", "reifyimplylexleq
 
 conslist+=["max", "min", "reifyimplymax", "reifyimplymin"]
 
+conslist+=["abs", "reifyimplyabs"]
 
 
 #todo
