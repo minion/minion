@@ -27,17 +27,17 @@
 /** @help constraints;product Description
 The constraint
 
-   product([x,y],z)
+   product(x,y,z)
 
 ensures that z=xy in any solution.
 */
 
-/** @help constraints;product Description 
+/** @help constraints;product Notes
 This constraint can be used for (and, in fact, has a specialised
-implementation for) achieving boolean AND, i.e. x^y=z can be modelled
+implementation for) achieving boolean AND, i.e. x & y=z can be modelled
 as
 
-   product([x,y],z)
+   product(x,y,z)
 
 The general constraint achieves bounds generalised arc consistency for
 positive numbers.
