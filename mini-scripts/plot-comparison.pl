@@ -17,6 +17,7 @@ my $gnuplotexe = "gnuplot";
 my $egrepexe = "egrep";
 my $name1="";
 my $name2="";
+my $terminal="png";
 
 GetOptions( 'outdir=s' => \$dir, 
             'basedir=s' => \$basedir,
@@ -26,7 +27,8 @@ GetOptions( 'outdir=s' => \$dir,
             'help' => \$help,
             'name1=s' => \$name1,
             'name2=s' => \$name2,
-            'tableout' => \$tableout
+            'tableout' => \$tableout,
+            'terminal=s' => \$terminal
             );
 
 if (@ARGV != 2) 
@@ -77,7 +79,7 @@ if(not $name2 eq "")
 # join requires input to be in sorted order with -b flag (who knew?)
 if($tableout)
 {
-    # extract columns to approximate the output of analyse-minion.pl. Uses minionversion as a filler for columns.
+    # extract columns to approximate the output of analyse-minion.pl. Uses minionversion as a filler for unused columns.
     system "cat $newdir | $scriptdir/getcolumns.py filename minionversion satisfiable solutionsfound totaltime nodes minionversion timeout parsingtime setuptime firstnodetime solvetime minionversion minionversion minionversion | $sortexe -b > $tmpdir/1.$$";
     system "cat $referencedir | $scriptdir/getcolumns.py filename minionversion satisfiable solutionsfound totaltime nodes minionversion timeout parsingtime setuptime firstnodetime solvetime minionversion minionversion minionversion | $sortexe -b > $tmpdir/2.$$";
 }
@@ -118,7 +120,7 @@ unlink("$tmpdir/1.$$","$tmpdir/2.$$");        # unlink is rm
 open GNUPLOT1, "| $gnuplotexe " or die "Can't redirect text into gnuplot";
 print GNUPLOT1 << "EOF";
 set title "Comparison of $newname with $referencename"
-set term png
+set term $terminal
 set output "$dir/comparison.$newname.$referencename.png"
 set log x
 set autoscale yfix
@@ -141,7 +143,7 @@ open GNUPLOT2, ">$tmpdir/$newname.$referencename.$$.gnu";
 
 print GNUPLOT2 << "EOF";
 set title "Comparison of $newname with $referencename"
-set term png
+set term $terminal
 set output "$dir/breakdown.$newname.$referencename.png"
 set log x
 set log y
@@ -179,7 +181,7 @@ print GNUPLOT2 "1 not\n" ;
 
 print GNUPLOT2 << "EOF";
 set title "Runtime Comparison of $newname with $referencename"
-set term png
+set term $terminal
 set output "$dir/timecomparison.$newname.$referencename.png"
 set log x
 set log y
