@@ -17,9 +17,7 @@
 
 Minion expects to be provided with the name of an input file as an
 argument. This file contains a specification of the CSP to be solved
-as well as settings that the search process should use.
-
-The format is
+as well as settings that the search process should use. The format is
 
 Minion3Input::= MINION 3
                 <InputSection>+
@@ -37,6 +35,14 @@ constraints and tuplelists sections (can repeat) followed by
 All text from a '#' character to the end of the line is ignored.
 
 See the associated help entries below for information on each section.
+*/
+
+/** @help input Notes 
+You can give an input file via standard input by specifying "--" as the file
+name, this might help when minion is being used as a tool in a shell script or
+for compressed input, e.g.,
+
+   gunzip -c myinput.minion.gz | minion
 */
 
 /** @help input;variables Description
