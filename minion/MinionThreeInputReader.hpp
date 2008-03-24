@@ -38,7 +38,7 @@ See the associated help entries below for information on each section.
 */
 
 /** @help input Notes 
-You can give an input file via standard input by specifying "--" as the file
+You can give an input file via standard input by specifying '--' as the file
 name, this might help when minion is being used as a tool in a shell script or
 for compressed input, e.g.,
 
