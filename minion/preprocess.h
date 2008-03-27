@@ -120,6 +120,9 @@ enum VarOrder
   ORDER_SDF,
   ORDER_LDF,
   ORDER_ORIGINAL,
+#ifdef WDEG
+  ORDER_WDEG,
+#endif
   ORDER_CONFLICT
 };
 

@@ -447,8 +447,14 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
 	  }
 	  else if(order == "random")
 		getOptions(stateObj).randomise_valvarorder = true;
-      else if(order == "conflict")
-        args.order = ORDER_CONFLICT;
+	  else if(order == "conflict")
+	    args.order = ORDER_CONFLICT;
+#ifdef WDEG
+	  else if(order == "wdeg") {
+	    args.order = ORDER_WDEG;
+	    getOptions(stateObj).wdeg_on = true;
+	  }
+#endif
 	  else
 	  {
 		cerr << "I do not understand the order:" << order << endl;

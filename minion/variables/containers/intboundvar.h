@@ -151,6 +151,14 @@ struct BoundVarRef_internal
   void addConstraint(AbstractConstraint* c)
   { GET_LOCAL_CON().addConstraint(*this, c); }
 
+#ifdef WDEG
+  int getBaseWdeg()
+  { return GET_LOCAL_CON().getBaseWdeg(*this); }
+
+  void incWdeg()
+  { GET_LOCAL_CON().incWdeg(*this); }
+#endif
+
   friend std::ostream& operator<<(std::ostream& o, const BoundVarRef_internal& v)
   { return o << "BoundVar:" << v.var_num; }
     
@@ -181,6 +189,9 @@ struct BoundVarContainer {
   TriggerList trigger_list;
   vector<pair<BoundType, BoundType> > initial_bounds;
   vector<vector<AbstractConstraint*> > constraints;
+#ifdef WDEG
+  vector<unsigned int> wdegs;
+#endif
   unsigned var_count_m;
   BOOL lock_m;
   
@@ -356,6 +367,9 @@ struct BoundVarContainer {
     }
 
     constraints.resize(var_count_m);
+#ifdef WDEG
+    if(getOptions(stateObj).wdeg_on) wdegs.resize(var_count_m);
+#endif
 
     bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
     BoundType* bound_ptr = static_cast<BoundType*>(bound_data.get_ptr());
@@ -393,7 +407,20 @@ struct BoundVarContainer {
   { return &constraints[b.var_num]; }
   
   void addConstraint(const BoundVarRef_internal<BoundType>& b, AbstractConstraint* c)
-  { constraints[b.var_num].push_back(c); }
+  { 
+    constraints[b.var_num].push_back(c); 
+#ifdef WDEG
+    if(getOptions(stateObj).wdeg_on) wdegs[b.var_num] += c->getWdeg(); //add constraint score to base var wdeg
+#endif
+  }
+
+#ifdef WDEG
+  int getBaseWdeg(const BoundVarRef_internal<BoundType>& b)
+  { return wdegs[b.var_num]; }
+
+  void incWdeg(const BoundVarRef_internal<BoundType>& b)
+  { wdegs[b.var_num]++; }
+#endif
 
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)

@@ -133,6 +133,10 @@ struct AnyVarRef_Abstract
   virtual void addTrigger(Trigger t, TrigType type) = 0;
   virtual vector<AbstractConstraint*>* getConstraints() = 0;
   virtual void addConstraint(AbstractConstraint* c) = 0;
+#ifdef WDEG
+  virtual int getBaseWdeg() = 0;
+  virtual void incWdeg() = 0;
+#endif
 
   virtual string virtual_to_string() = 0;
   
@@ -213,6 +217,13 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 
   virtual void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
+
+#ifdef WDEG
+  virtual int getBaseWdeg() 
+  { return data.getBaseWdeg(); }
+  virtual void incWdeg()
+  { data.incWdeg(); }
+#endif
   
   virtual string virtual_to_string()
   { return to_string(data); }
@@ -303,6 +314,14 @@ public:
 
   void addConstraint(AbstractConstraint* c)
   { data->addConstraint(c); }
+
+#ifdef WDEG
+  int getBaseWdeg()
+  { return data->getBaseWdeg(); }
+
+  void incWdeg()
+  { data->incWdeg(); }
+#endif
   
   friend std::ostream& operator<<(std::ostream& o, const AnyVarRef& avr)
   { return o << "AnyVarRef:" << avr.data->virtual_to_string(); }

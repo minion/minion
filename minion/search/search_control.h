@@ -68,6 +68,18 @@
 		{ }
       }
         break;
+#ifdef WDEG
+      case ORDER_WDEG:
+      {
+        Controller::VariableOrder<VarType, Controller::WdegBranch>
+		order(stateObj, search_order.first, search_order.second);
+		try
+		{ Controller::conflict_solve_loop(stateObj, order, search_order.first, prop); }
+		catch(...)
+		{ }
+      }
+        break;
+#endif
 	  default:
 		FAIL_EXIT();
 	} 

@@ -95,6 +95,9 @@ struct SparseBoundVarContainer {
   vector<vector<BoundType> > domains;
   vector<int> domain_reference;
   vector<vector<AbstractConstraint*> > constraints;
+#ifdef WDEG
+  vector<unsigned int> wdegs;
+#endif
   unsigned var_count_m;
   BOOL lock_m;
 
@@ -200,6 +203,9 @@ struct SparseBoundVarContainer {
   var_count_m = domain_reference.size();
 
   constraints.resize(var_count_m);
+#ifdef WDEG
+  if(getOptions(stateObj).wdeg_on) wdegs.resize(var_count_m);
+#endif
 
   bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
   BoundType* bound_ptr = static_cast<BoundType*>(bound_data.get_ptr());
@@ -386,8 +392,21 @@ struct SparseBoundVarContainer {
   { return &constraints[b.var_num]; }
 
   void addConstraint(const SparseBoundVarRef_internal<BoundType>& b, AbstractConstraint* c)
-  { constraints[b.var_num].push_back(c); }
+  { 
+    constraints[b.var_num].push_back(c); 
+#ifdef WDEG
+    if(getOptions(stateObj).wdeg_on) wdegs[b.var_num] += c->getWdeg(); //add constraint score to base var wdeg
+#endif
+  }
   
+#ifdef WDEG
+  int getBaseWdeg(const SparseBoundVarRef_internal<BoundType>& b)
+  { return wdegs[b.var_num]; }
+
+  void incWdeg(const SparseBoundVarRef_internal<BoundType>& b)
+  { wdegs[b.var_num]++; }
+#endif
+
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   { 

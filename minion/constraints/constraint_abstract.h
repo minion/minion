@@ -44,8 +44,15 @@ class AbstractConstraint
   vector<AnyVarRef> vars;
   StateObj* stateObj;
   BOOL full_propagate_done;
+#ifdef WDEG
+  unsigned int wdeg;
+#endif
 
-  AbstractConstraint(StateObj* _stateObj) : stateObj(_stateObj), full_propagate_done(false)
+  AbstractConstraint(StateObj* _stateObj) : 
+#ifdef WDEG
+    wdeg(1),
+#endif
+    stateObj(_stateObj), full_propagate_done(false)
     {}
 
   /// Method to get constraint name for debugging.
@@ -63,6 +70,12 @@ class AbstractConstraint
     if(vars.size() == 0) vars = get_vars(); //for efficiency: no constraint over 0 variables
     return &vars; 
   }
+
+#ifdef WDEG
+  unsigned int getWdeg();
+
+  unsigned int incWdeg();
+#endif
   
   /// Checks if an assignment is satisfied.
   /** This takes the variable order returned by, and is mainly only used by, get_table_constraint() */

@@ -107,6 +107,12 @@ struct ConstantVar
 
   void addConstraint(AbstractConstraint* c){ ; }
 
+#ifdef WDEG
+  int getBaseWdeg() { return 0; } //wdeg is irrelevant for non-search var
+
+  void incWdeg() { ; }
+#endif
+
   int getDomainChange(DomainDelta d)
   { 
     D_ASSERT(d.XXX_get_domain_diff() == 0);

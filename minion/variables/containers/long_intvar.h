@@ -96,13 +96,16 @@ struct BigRangeVarContainer {
   MonotonicSet bms_array;
   TriggerList trigger_list;
 
-  
   /// Initial bounds of each variable
   vector<pair<int,int> > initial_bounds;
   /// Position in the variable data (in counts of d_type) of where each variable starts
   vector<int> var_offset;
   /// Constraints variable participates in
   vector<vector<AbstractConstraint*> > constraints;
+#ifdef WDEG
+  vector<unsigned int> wdegs;
+#endif
+  
  
   unsigned var_count_m;
   BOOL lock_m;
@@ -189,6 +192,9 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
                                                          to_string(new_domains[i].second.upper_bound) + ")");
     }
     constraints.resize(var_count_m);
+#ifdef WDEG
+    if(getOptions(stateObj).wdeg_on) wdegs.resize(var_count_m);
+#endif
   }
 
  
@@ -515,7 +521,20 @@ public:
   { return &constraints[b.var_num]; }
 
   void addConstraint(const BigRangeVarRef_internal& b, AbstractConstraint* c)
-  { constraints[b.var_num].push_back(c); }
+  { 
+    constraints[b.var_num].push_back(c); 
+#ifdef WDEG
+    if(getOptions(stateObj).wdeg_on) wdegs[b.var_num] += c->getWdeg(); //add constraint score to base var wdeg
+#endif
+  }
+
+#ifdef WDEG
+  int getBaseWdeg(const BigRangeVarRef_internal& b)
+  { return wdegs[b.var_num]; }
+
+  void incWdeg(const BigRangeVarRef_internal& b)
+  { wdegs[b.var_num]++; }
+#endif
 
   ~BigRangeVarContainer() { 
     for(unsigned i=0; i < var_count_m ; i++) {

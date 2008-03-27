@@ -131,6 +131,10 @@ public:
 		CON_INFO_ADDONE(DynamicTrigger);
 		it->propagate();  
 
+#ifdef WDEG
+		if(getOptions(stateObj).wdeg_on && *fail_ptr)
+		  it->constraint->incWdeg();
+#endif
 		it = next_queue_ptr;
 	  }
 	}
@@ -169,6 +173,10 @@ public:
 		  CON_INFO_ADDONE(StaticTrigger);
 		  it->propagate(data_val);
 		}
+#endif
+#ifdef WDEG
+		if(getOptions(stateObj).wdeg_on && *fail_ptr)
+		  it->constraint->incWdeg();
 #endif
 	  }
 	}
@@ -224,7 +232,9 @@ public:
 	  special_triggers.pop_back();
 	  CON_INFO_ADDONE(SpecialTrigger);
 	  trig->special_check();
-
+#ifdef WDEG
+	  if(getOptions(stateObj).wdeg_on && getState(stateObj).isFailed()) trig->incWdeg();
+#endif
 	} // while(true)
 	
   } // end Function

@@ -3,6 +3,10 @@
 #define VAR_EVENT(x,y) VAR_INFO_##x ,
 #include "PropEvents.h"
 #undef VAR_EVENT
+#ifdef WDEG
+  VAR_INFO_getBaseWdeg,
+  VAR_INFO_incWdeg,
+#endif
   VarEvent_END
   };
 

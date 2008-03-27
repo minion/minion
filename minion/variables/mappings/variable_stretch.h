@@ -229,6 +229,14 @@ struct MultiplyVar
 
   void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
+
+#ifdef WDEG
+  int getBaseWdeg()
+  { return data.getBaseWdeg(); }
+
+  void incWdeg()
+  { data.incWdeg(); }
+#endif
 };
 
 template<typename T>

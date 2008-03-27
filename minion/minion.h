@@ -262,4 +262,6 @@ inline SearchState::~SearchState()
 
 #include "solver.hpp"
 
+#include "constraints/constraint_abstract.hpp"
+
 #endif

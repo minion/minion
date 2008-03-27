@@ -121,6 +121,20 @@ struct InfoRefType
     VAR_INFO_ADDONE(VAR_TYPE, addConstraint);
     data.addConstraint(c);
   }
+
+#ifdef WDEG
+  int getBaseWdeg()
+  { 
+    VAR_INFO_ADDONE(VAR_TYPE, getBaseWdeg);
+    return data.getBaseWdeg(); 
+  }
+
+  void incWdeg()
+  { 
+    VAR_INFO_ADDONE(VAR_TYPE, incWdeg);
+    data.incWdeg(); 
+  }
+#endif
   
   friend std::ostream& operator<<(std::ostream& o, const InfoRefType& ir)
   {

@@ -106,6 +106,14 @@ struct VarRefType
   void addConstraint(AbstractConstraint* c)
   { GET_CONTAINER().addConstraint(data, c); }
 
+#ifdef WDEG
+  int getBaseWdeg()
+  { return GET_CONTAINER().getBaseWdeg(data); }
+
+  void incWdeg()
+  { GET_CONTAINER().incWdeg(data); }
+#endif
+
   friend std::ostream& operator<<(std::ostream& o, const VarRefType& v)
   { return o << InternalRefType::name() << v.data.var_num; }
     
@@ -191,6 +199,14 @@ struct QuickVarRefType
   void addConstraint(AbstractConstraint* c)
   { GET_CONTAINER().addConstraint(data, c); }
 
+#ifdef WDEG
+  int getBaseWdeg()
+  { return GET_CONTAINER().getBaseWdeg(data); }
+
+  void incWdeg()
+  { GET_CONTAINER().incWdeg(data); }
+#endif
+
   friend std::ostream& operator<<(std::ostream& o, const QuickVarRefType& b)
   { return o << "Bool:" << b.data; }
   
@@ -266,6 +282,14 @@ struct CompleteVarRefType
   
   void addConstraint(AbstractConstraint* c)
   { (data.getCon()).addConstraint(data, c); }
+
+#ifdef WDEG
+  int getBaseWdeg()
+  { return (data.getCon()).getBaseWdeg(data); }
+
+  void incWdeg()
+  { (data.getCon()).incWdeg(data); }
+#endif
   
   friend std::ostream& operator<<(std::ostream& o, const CompleteVarRefType& cv)
   { return o << "CompleteCon:" << cv.data.var_num; }

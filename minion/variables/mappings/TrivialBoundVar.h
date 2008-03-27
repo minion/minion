@@ -41,6 +41,9 @@ struct TrivialBoundVar
   Reversible<DomainInt> upper;
 
   vector<AbstractConstraint*> constraints;
+#ifdef WDEG
+  unsigned int wdeg;
+#endif
   
   explicit TrivialBoundVar(StateObj* _stateObj, DomainInt _lower, DomainInt _upper) :
   stateObj(_stateObj), lower(stateObj, _lower), upper(stateObj, _upper)
@@ -119,7 +122,20 @@ struct TrivialBoundVar
   { return &constraints; }
 
   void addConstraint(AbstractConstraint* c)
-  { constraints.push_back(c); }
+  { 
+    constraints.push_back(c); 
+#ifdef WDEG
+    if(getOptions(stateObj).wdeg_on) wdeg += c->getWdeg();
+#endif
+  }
+
+#ifdef WDEG
+  int getBaseWdeg()
+  { return wdeg; }
+
+  void incWdeg()
+  { wdeg++; }
+#endif
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = -999)

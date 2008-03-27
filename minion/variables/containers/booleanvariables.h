@@ -160,6 +160,9 @@ struct BooleanContainer
   MoveablePointer assign_offset;
   MemOffset values_mem;
   vector<vector<AbstractConstraint*> > constraints;
+#ifdef WDEG
+  vector<unsigned int> wdegs;
+#endif
   unsigned var_count_m;
   TriggerList trigger_list;
   /// When false, no variable can be altered. When true, no variables can be created.
@@ -198,6 +201,9 @@ struct BooleanContainer
     assign_offset = getMemory(stateObj).backTrack().request_bytes(required_mem);
     values_mem = getMemory(stateObj).nonBackTrack().request_bytes(required_mem);
     constraints.resize(bool_count);
+#ifdef WDEG
+    if(getOptions(stateObj).wdeg_on) wdegs.resize(bool_count);
+#endif
   }
   
   /// Returns a reference to the ith Boolean variable which was previously created.
@@ -325,7 +331,20 @@ struct BooleanContainer
   { return& constraints[b.var_num]; }
 
   void addConstraint(const BoolVarRef_internal& b, AbstractConstraint* c)
-  { constraints[b.var_num].push_back(c); }
+  { 
+    constraints[b.var_num].push_back(c); 
+#ifdef WDEG
+    if(getOptions(stateObj).wdeg_on) wdegs[b.var_num] += c->getWdeg(); //add constraint score to base var wdeg
+#endif
+  }
+
+#ifdef WDEG
+  int getBaseWdeg(const BoolVarRef_internal& b)
+  { return wdegs[b.var_num]; }
+
+  void incWdeg(const BoolVarRef_internal& b)
+  { wdegs[b.var_num]++; }
+#endif
 };
 
 inline BoolVarRef BooleanContainer::get_var_num(int i)

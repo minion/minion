@@ -1,3 +1,4 @@
+
 struct StaticBranch
 {
   template<typename VarType>
@@ -22,6 +23,68 @@ struct SlowStaticBranch
 	return pos;
   }
 };
+
+#ifdef WDEG
+//see Boosting Systematic Search by Weighting Constraints by Boussemart et al
+struct WdegBranch
+{
+  template<typename VarType>
+  int operator()(vector<VarType>& var_order, int pos)
+  {
+    int best = var_order.size(); //the variable with the best score so far (init to none)
+    int best_score = -1; //... and its score (all true scores are positive)
+    size_t var_order_size = var_order.size();
+    for(size_t i = 0; i < var_order_size; i++) { //we will find the score for each var
+      //cout << "i=" << i << endl;
+      //cout << "best=" << best << endl;
+      //cout << "best_score=" << best_score << endl;	
+      VarType& v = var_order[i];
+      if(v.isAssigned()) {
+	//cout << "assigned -- stop" << endl;
+	continue;
+      }
+      int base_wdeg = v.getBaseWdeg();
+      //cout << "basewdeg=" << base_wdeg << endl;
+      if(base_wdeg <= best_score) {
+	//cout << "too low before deductions" << endl;
+	continue; //stop if base score is too low before deductions
+      }
+      vector<AbstractConstraint*>* constrs = v.getConstraints();
+      size_t constrs_size = constrs->size();
+      for(size_t j = 0; j < constrs_size; j++) { //find constrs to be deducted from var wdeg
+	AbstractConstraint* c = (*constrs)[j];
+	//cout << "con wdeg=" << c->getWdeg() << endl;
+	vector<AnyVarRef>* c_vars = c->get_vars_singleton();
+	size_t c_vars_size = c_vars->size();
+	int uninst = 0;
+	for(size_t k = 0; k < c_vars_size; k++) 
+	  if(!(*c_vars)[k].isAssigned())
+	    if(++uninst > 1) { //when multiple unassigned we needn't deduct
+	      //cout << "don't deduct" << endl;
+	      break;
+	    }
+	if(uninst <= 1) {
+	  D_ASSERT(uninst == 1);
+	  //cout << "deduct" << endl;
+	  base_wdeg -= c->getWdeg();
+	  if(base_wdeg <= best_score) {
+	    //cout << "too low during deductions" << endl;
+	    break;
+	  }
+	}
+      }
+      //cout << "basewdeg=" << base_wdeg << endl;
+      if(best_score < base_wdeg)
+      {
+	//cout << "replacing top score" << endl;
+	best_score = base_wdeg;
+	best = i;
+      }
+    }
+    return best;
+  }
+};
+#endif
 
 struct SDFBranch
 {

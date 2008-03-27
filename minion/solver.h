@@ -154,6 +154,10 @@ public:
 class SearchOptions
 {
 public:
+#ifdef WDEG
+  /// Denotes if wdeg is turned on
+  bool wdeg_on;
+#endif
   /// Denotes if only solutions should be printed.
   bool print_only_solution;
   /// Denotes if the search tree should be printed.
@@ -192,8 +196,12 @@ public:
   /// The filename of the current input file (-- if reading from command line)
   string instance_name;
   
-  SearchOptions() : print_only_solution(false), dumptree(false), sollimit(1), fullpropagate(false), 
-	nocheck(false), nodelimit(0), tableout(false), solsoutWrite(false), randomise_valvarorder(false), 
+  SearchOptions() : 
+#ifdef WDEG
+    wdeg_on(false),
+#endif
+    print_only_solution(false), dumptree(false), sollimit(1), fullpropagate(false), 
+    nocheck(false), nodelimit(0), tableout(false), solsoutWrite(false), randomise_valvarorder(false), 
     print_solution(true), time_limit(0), parser_verbose(false)
   {}
   
