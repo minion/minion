@@ -24,6 +24,7 @@ ConstraintDef constraint_list[] = {
 { "watchsumgeq" , CT_WATCHED_GEQSUM, 2 ,{ read_list , read_constant }, DYNAMIC_CT },
 { "watchsumleq" , CT_WATCHED_LEQSUM, 2 ,{ read_list , read_constant }, DYNAMIC_CT },
 { "table" , CT_WATCHED_TABLE, 2 ,{ read_list , read_tuples }, DYNAMIC_CT },
+{ "negativetable" , CT_WATCHED_NEGATIVE_TABLE, 2 ,{ read_list , read_tuples }, DYNAMIC_CT },
 { "watchvecneq" , CT_WATCHED_VECNEQ, 2 ,{ read_list , read_list }, DYNAMIC_CT },
 { "minuseq" , CT_MINUSEQ, 2 ,{ read_var , read_var }, STATIC_CT },
 { "litsumgeq" , CT_WATCHED_LITSUM, 3 ,{ read_list , read_constant_list , read_constant }, DYNAMIC_CT },

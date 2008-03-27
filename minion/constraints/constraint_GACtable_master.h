@@ -51,3 +51,17 @@ BuildCT_WATCHED_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarR
   else 
   { return GACTableCon(stateObj, t1, b.tuples); } 
 }
+
+template <typename T>
+DynamicConstraint*
+BuildCT_WATCHED_NEGATIVE_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+{ 
+  if(reify) 
+  { 
+    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
+	exit(0); 
+  } 
+  else 
+  { return GACNegativeTableCon(stateObj, t1, b.tuples); } 
+}
+

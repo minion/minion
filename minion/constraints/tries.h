@@ -33,7 +33,7 @@ $Id$
 
 using namespace std;
 
-int MAXINT = 99999;
+static const int MAXINT = 99999;
 
 struct TupleComparator
 {
