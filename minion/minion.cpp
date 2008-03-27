@@ -604,8 +604,7 @@ void readInput(InputReader* infile, int argc, char** argv, StateObj* stateObj, C
 //Entrance:
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-// From help/help.cpp
-void help(string request);
+#include "help/help.cpp"
 
 void print_default_help(char** argv)
 {

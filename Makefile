@@ -43,7 +43,7 @@ endif
 
 OBJDIR=$(OUTDIR)/objdir-$(NAME)
 
-SRC=$(wildcard minion/*.cpp) $(wildcard minion/build_constraints/*.cpp minion/system/*.cpp) minion/help/help.cpp
+SRC=$(wildcard minion/*.cpp) $(wildcard minion/build_constraints/*.cpp minion/system/*.cpp)
 EXE=bin/$(NAME)
 
 
@@ -65,7 +65,7 @@ all: minion generate
 minion/svn_header.h: .DUMMY
 	mini-scripts/get_svn_version.sh minion/svn_header.h
 	
-minion/help/help.cpp: .DUMMY
+help: 
 	bash minion/help/genhelp.sh minion/ > minion/help/help.cpp
 
 # This rule is here to ensure if Makefile.dep is missing, it is built so it can be included.	
