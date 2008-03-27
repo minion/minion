@@ -26,7 +26,7 @@
 
 #include "tries.h"
 
-template<typename VarArray>
+template<typename VarArray, int negative>
 struct GACTableConstraint : public DynamicConstraint
 {
   virtual string constraint_name()
@@ -205,7 +205,13 @@ struct GACTableConstraint : public DynamicConstraint
 template<typename VarArray>
 DynamicConstraint*
 GACTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
-{ return new GACTableConstraint<VarArray>(stateObj, vars, tuples); }
+{ return new GACTableConstraint<VarArray, 0>(stateObj, vars, tuples); }
+
+template<typename VarArray>
+DynamicConstraint*
+GACNegativeTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
+{ return new GACTableConstraint<VarArray, 1>(stateObj, vars, tuples); }
+
 
 inline TupleTrieArray* TupleList::getTries()
 {
