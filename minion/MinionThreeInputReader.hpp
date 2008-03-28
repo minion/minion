@@ -494,7 +494,8 @@ BOOL MinionThreeInputReader<FileReader>::readConstraint(FileReader* infile, BOOL
     break;
 
     case CT_WATCHED_TABLE:
-    readConstraintTable(infile, get_constraint(CT_WATCHED_TABLE));
+    case CT_WATCHED_NEGATIVE_TABLE:
+    readConstraintTable(infile, get_constraint(constraint.type));
     break;
 
     case CT_WATCHED_OR:
