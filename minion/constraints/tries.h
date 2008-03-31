@@ -259,6 +259,43 @@ struct TupleTrie
 	return false;
   }
   
+  // search_trie_negative searches for a tuple which is not in the trie. 
+  // For the negative table constraint.
+  template<typename VarArray>
+	bool search_trie_negative(const VarArray& _vars, TrieObj** obj_list, int depth, int * returnTuple)
+  {
+    CON_INFO_ADDONE(SearchTrie);
+	VarArray& vars = const_cast<VarArray&>(_vars);
+	if(depth == arity)
+	  return false;
+	
+	obj_list[depth] = obj_list[depth - 1]->offset_ptr;
+    
+    int dep=map_depth(depth);
+    for(int i=vars[dep].getMin(); i<=vars[dep].getMax(); i++)
+    {
+        if(vars[dep].inDomain(i))
+        {
+            while(obj_list[depth]->val < i) obj_list[depth]++;
+            returnTuple[dep]=i;
+            if(obj_list[depth]->val > i)
+            {   // includes case where val is maxint.
+                // if the value is in the domain but not in the trie, we are nearly finished.
+                // Just need to fill in the rest of returnTuple.
+                // Is there any need to search from the previous position?? Yes. But not doing so yet.
+                for(int depth2=depth+1; depth2<arity; depth2++) returnTuple[map_depth(depth2)]=vars[map_depth(depth2)].getMin();
+                return true;
+            }
+            else
+            {
+                if(search_trie_negative(_vars, obj_list, depth+1, returnTuple))
+                    return true;
+            }
+        }
+    }
+    return false;
+  }
+  
   void reconstructTuple(int* array, TrieObj** obj_list)
   {
 	//D_ASSERT(check == obj_list[arity - 1] - obj_list[0]);
@@ -350,6 +387,33 @@ struct TupleTrie
 		  return -1;
 	  }*/
 	}
+  }
+  
+  // Find support for domain value i. This will be the value used by
+  // the first variable.
+  template<typename VarArray>
+    int nextSupportingTupleNegative(DomainInt domain_val, const VarArray& _vars, TrieObj** obj_list, int* recycTuple)
+  {
+	VarArray& vars = const_cast<VarArray&>(_vars);
+	
+    //if(obj_list[0] == NULL)
+	{
+	  TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
+	  if(first_ptr == NULL)
+      {
+          // Hang on a minute. How do we ever get here? Should only be at root node.
+          for(int depth2=1; depth2<arity; depth2++) recycTuple[map_depth(depth2)]=vars[map_depth(depth2)].getMin();
+          recycTuple[map_depth(0)]=domain_val;
+	      return 0;
+      }
+	
+	  obj_list[0] = first_ptr;
+    }
+      
+    bool flag=search_trie_negative(vars, obj_list, 1, recycTuple);
+    
+    if(!flag) return -1;
+    return 0;
   }
 };
 

@@ -83,6 +83,8 @@ struct GACTableConstraint : public DynamicConstraint
      pair<int,int> varval = tuples->get_varval_from_literal(literal);
 	 int varIndex = varval.first;
 	 int val = varval.second;
+     if(negative==0)
+     {
          int new_support = 
            tupleTrieArrayptr->getTrie(varIndex).
                                 nextSupportingTuple(val, vars, trie_current_support[literal]);
@@ -90,9 +92,20 @@ struct GACTableConstraint : public DynamicConstraint
          { // cout << "find_new_support failed literal: " << literal << " var: " << varIndex << " val: " << get_val_from_literal(literal) << endl ;
              return false;
          }
+     }
+     else
+     {
+         int new_support = 
+           tupleTrieArrayptr->getTrie(varIndex).
+                                nextSupportingTupleNegative(val, vars, trie_current_support[literal], recyclableTuple);
+         if (new_support < 0)
+         { // cout << "find_new_support failed literal: " << literal << " var: " << varIndex << " val: " << get_val_from_literal(literal) << endl ;
+             return false;
+         }
+     }
          // cout << "find_new_support sup= "<< new_support << " literal: " << literal << " var: " << varIndex << " val: " << get_val_from_literal(literal) << endl;
          //trie_current_support[literal] = new_support; 
-         return true;
+     return true;
   }
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
@@ -124,7 +137,12 @@ struct GACTableConstraint : public DynamicConstraint
   void setup_watches(int var, int lit)
   {
     // cout << "setup_watches lit= "<< lit << endl ; cout << "calling reconstructTuple from setup_watches" << endl ; 
-	tupleTrieArrayptr->getTrie(var).reconstructTuple(recyclableTuple,trie_current_support[lit]);
+    if(negative==0)
+    {
+        tupleTrieArrayptr->getTrie(var).reconstructTuple(recyclableTuple,trie_current_support[lit]);
+    }
+    // otherwise, the support is already in recyclableTuple. 
+    
     // cout << "  " << var << ", literal" << lit << ":";
     // for(int z = 0; z < vars.size(); ++z) cout << recyclableTuple[z] << " "; cout << endl;
     
@@ -146,34 +164,62 @@ struct GACTableConstraint : public DynamicConstraint
   virtual void full_propagate()
   {
       D_INFO(2, DI_TABLECON, "Full prop");
-      if(tuples->size()==0)
+      if(negative==0 && tuples->size()==0)
       {   // it seems to work without this explicit check, but I put it in anyway.
           getState(stateObj).setFailed(true);
           return;
       }
       for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
       {
-	    vars[varIndex].setMin((tuples->dom_smallest)[varIndex]);
-	    vars[varIndex].setMax((tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]);
-		
+	    if(negative==0)
+        {
+            vars[varIndex].setMin((tuples->dom_smallest)[varIndex]);
+            vars[varIndex].setMax((tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]);
+		}
+        
 		if(getState(stateObj).isFailed()) return;
 		
         DomainInt max = vars[varIndex].getMax();
         for(DomainInt i = vars[varIndex].getMin(); i <= max; ++i) 
-        { 
-		    int literal = tuples->get_literal(varIndex, i);
-            int sup = tupleTrieArrayptr->getTrie(varIndex).       
-                            nextSupportingTuple(i, vars, trie_current_support[literal]);
-            //trie_current_support[literal] = sup;
-            // cout << "    var " << varIndex << " val: " << i << " sup " << sup << " " << endl;
-            if(sup < 0)
+        {
+            if(i>= (tuples->dom_smallest)[varIndex] 
+                && i<=(tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex])
             {
-			  D_INFO(2, DI_TABLECON, "No valid support for " + to_string(i) + " in var " + to_string(varIndex));
-			  vars[varIndex].removeFromDomain(i);
+                int literal = tuples->get_literal(varIndex, i);
+                
+                int sup;
+                if(negative==0)
+                {
+                    sup = tupleTrieArrayptr->getTrie(varIndex).       
+                        nextSupportingTuple(i, vars, trie_current_support[literal]);
+                }
+                else
+                {
+                    sup = tupleTrieArrayptr->getTrie(varIndex).       
+                        nextSupportingTupleNegative(i, vars, trie_current_support[literal], recyclableTuple);
+                }
+                
+                //trie_current_support[literal] = sup;
+                // cout << "    var " << varIndex << " val: " << i << " sup " << sup << " " << endl;
+                if(sup < 0)
+                {
+                  D_INFO(2, DI_TABLECON, "No valid support for " + to_string(i) + " in var " + to_string(varIndex));
+                  //cout <<"No valid support for " + to_string(i) + " in var " + to_string(varIndex) << endl;
+                  //volatile int * myptr=NULL;
+                  //int crashit=*(myptr);
+                  vars[varIndex].removeFromDomain(i);
+                }
+                else
+                {
+                  setup_watches(varIndex, literal);
+                }
             }
             else
             {
-			  setup_watches(varIndex, literal);
+                D_ASSERT(negative==1);
+                // else: if the literal is not contained in any forbidden tuple, then it is 
+                // not necessary to find a support for it or set watches. The else case
+                // only occurs with negative tuple constraints. 
             }
         }
       }
@@ -182,12 +228,24 @@ struct GACTableConstraint : public DynamicConstraint
   
   virtual BOOL check_assignment(vector<DomainInt> v)
   {
-    for(unsigned i = 0; i < tuples->size(); ++i)
-	{
-	  if( std::equal(v.begin(), v.end(), (*tuples)[i]) )
-	    return true;
-	}
-	return false;
+    if(negative==0)
+    {
+        for(unsigned i = 0; i < tuples->size(); ++i)
+        {
+          if( std::equal(v.begin(), v.end(), (*tuples)[i]) )
+            return true;
+        }
+        return false;
+    }
+    else
+    {
+        for(unsigned i = 0; i < tuples->size(); ++i)
+        {
+          if( std::equal(v.begin(), v.end(), (*tuples)[i]) )
+            return false;
+        }
+        return true;
+    }
   }
   
   virtual vector<AnyVarRef> get_vars()
