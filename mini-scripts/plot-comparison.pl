@@ -18,6 +18,7 @@ my $egrepexe = "egrep";
 my $name1="";
 my $name2="";
 my $terminal="png";
+my $notimeouts=0;  # omit points on timecomparison graph for instances which timed out. (default:show all pts) Not yet implemented.
 
 GetOptions( 'outdir=s' => \$dir, 
             'basedir=s' => \$basedir,
@@ -28,8 +29,11 @@ GetOptions( 'outdir=s' => \$dir,
             'name1=s' => \$name1,
             'name2=s' => \$name2,
             'tableout' => \$tableout,
-            'terminal=s' => \$terminal
+            'terminal=s' => \$terminal,
+            'notimeouts' => \$notimeouts
             );
+
+my $showtimeouts=1-$notimeouts;
 
 if (@ARGV != 2) 
 {
@@ -132,9 +136,9 @@ set size 1.5,1.2
 set pointsize 2
 set autoscale yfix
 set key outside box 
-plot "$dir/comparison.$newname.$referencename.txt" using 19:(((\$6/\$5) / (\$20/\$19)-1)*100) t "overall nodes/s", \\
-     "$dir/comparison.$newname.$referencename.txt" using 19:(((\$6/\$12) / (\$20/\$26)-1)*100) t "search nodes/s", \\
-     "$dir/comparison.$newname.$referencename.txt" using 19:((\$6/\$20-1)*100) t "total nodes" 
+plot "$dir/comparison.$newname.$referencename.txt" using 19:((((\$6+1)/\$5) / ((\$20+1)/\$19)-1)*100) t "overall nodes/s", \\
+     "$dir/comparison.$newname.$referencename.txt" using 19:((((\$6+1)/\$12) / ((\$20+1)/\$26)-1)*100) t "search nodes/s", \\
+     "$dir/comparison.$newname.$referencename.txt" using 19:(((\$6+1)/(\$20+1)-1)*100) t "total nodes" 
 EOF
 close GNUPLOT1;
 
@@ -172,7 +176,7 @@ while (<PREFIXES>)
      $i = @field[0];
      system "$egrepexe \"^$i\[ 0-9\]\" $dir/comparison.$newname.$referencename.txt > $tmpdir/$newname.$referencename.$$.$i";
      print GNUPLOT2 << "EOF" 
-"$tmpdir/$newname.$referencename.$$.$i" using 19:(((\$6/\$5)/ (\$20/\$19))) t "$i", \\
+"$tmpdir/$newname.$referencename.$$.$i" using 19:((((\$6+1)/\$5)/ ((\$20+1)/\$19))) t "$i", \\
 EOF
 }
 close PREFIXES;
