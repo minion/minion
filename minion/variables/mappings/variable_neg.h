@@ -124,6 +124,9 @@ struct VarNeg
   void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
 
+  VarIdent getIdent()
+  { return VarIdent(negT, 0, data.getIdent()); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return data.getBaseWdeg(); }

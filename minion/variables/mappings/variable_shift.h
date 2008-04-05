@@ -119,6 +119,9 @@ struct ShiftVar
   void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
 
+  VarIdent getIdent()
+  { return VarIdent(shiftT, shift, data.getIdent()); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return data.getBaseWdeg(); }

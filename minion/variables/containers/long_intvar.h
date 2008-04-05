@@ -528,6 +528,9 @@ public:
 #endif
   }
 
+  VarIdent getIdent(const BigRangeVarRef_internal& b)
+  { return VarIdent(discreteT, noneT, b.var_num, 0); }
+
 #ifdef WDEG
   int getBaseWdeg(const BigRangeVarRef_internal& b)
   { return wdegs[b.var_num]; }

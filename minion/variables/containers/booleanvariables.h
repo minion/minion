@@ -338,6 +338,9 @@ struct BooleanContainer
 #endif
   }
 
+  VarIdent getIdent(const BoolVarRef_internal& b)
+  { return VarIdent(boolVarT, noneT, b.var_num, 0); }
+
 #ifdef WDEG
   int getBaseWdeg(const BoolVarRef_internal& b)
   { return wdegs[b.var_num]; }

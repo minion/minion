@@ -230,6 +230,9 @@ struct MultiplyVar
   void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
 
+  VarIdent getIdent()
+  { return VarIdent(stretchT, Multiply, data.getIdent()); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return data.getBaseWdeg(); }

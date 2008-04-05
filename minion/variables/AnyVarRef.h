@@ -112,6 +112,8 @@ ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 
 #include "../constraints/constraint_abstract.h"
 
+#include "ident.h"
+
 /// Internal type used by AnyVarRef.
 struct AnyVarRef_Abstract
 {
@@ -133,6 +135,7 @@ struct AnyVarRef_Abstract
   virtual void addTrigger(Trigger t, TrigType type) = 0;
   virtual vector<AbstractConstraint*>* getConstraints() = 0;
   virtual void addConstraint(AbstractConstraint* c) = 0;
+  virtual VarIdent getIdent() = 0;
 #ifdef WDEG
   virtual int getBaseWdeg() = 0;
   virtual void incWdeg() = 0;
@@ -217,6 +220,9 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 
   virtual void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
+
+  virtual VarIdent getIdent()
+  { return data.getIdent(); }
 
 #ifdef WDEG
   virtual int getBaseWdeg() 
@@ -315,6 +321,9 @@ public:
   void addConstraint(AbstractConstraint* c)
   { data->addConstraint(c); }
 
+  VarIdent getIdent()
+  { return data->getIdent(); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return data->getBaseWdeg(); }
@@ -334,5 +343,6 @@ public:
   {  data->addDynamicTrigger(t, type, pos); }
 #endif
 };
+
 
 

@@ -136,6 +136,9 @@ struct VarNot
   void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
 
+  VarIdent getIdent()
+  { return VarIdent(notVarT, 0, data.getIdent()); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return data.getBaseWdeg(); }

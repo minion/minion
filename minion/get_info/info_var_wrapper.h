@@ -122,6 +122,12 @@ struct InfoRefType
     data.addConstraint(c);
   }
 
+  VarIdent getIdent()
+  { 
+    VAR_INFO_ADDONE(VAR_TYPE, getIdent);
+    return data.getIdent();
+  }
+
 #ifdef WDEG
   int getBaseWdeg()
   { 

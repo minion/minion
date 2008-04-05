@@ -105,6 +105,9 @@ struct VarRefType
 
   void addConstraint(AbstractConstraint* c)
   { GET_CONTAINER().addConstraint(data, c); }
+  
+  VarIdent getIdent()
+  { return GET_CONTAINER().getIdent(data); }
 
 #ifdef WDEG
   int getBaseWdeg()
@@ -199,6 +202,9 @@ struct QuickVarRefType
   void addConstraint(AbstractConstraint* c)
   { GET_CONTAINER().addConstraint(data, c); }
 
+  VarIdent getIdent()
+  { return GET_CONTAINER().getIdent(data); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return GET_CONTAINER().getBaseWdeg(data); }
@@ -282,6 +288,9 @@ struct CompleteVarRefType
   
   void addConstraint(AbstractConstraint* c)
   { (data.getCon()).addConstraint(data, c); }
+
+  VarIdent getIdent()
+  { return (data.getCon()).getIdent(data); }
 
 #ifdef WDEG
   int getBaseWdeg()
