@@ -2,6 +2,8 @@
 
 using namespace std;
 
+bool debug_crash = false;
+
 void D_FATAL_ERROR2(string s, string file, string line)
 { 
   cerr << "Sorry, there has been some kind of error." << endl;
@@ -17,6 +19,11 @@ void _NORETURN FAIL_EXIT()
 { 
   cerr << "Unrecoverable error. Exiting" << endl;
   cerr.flush();
+  if(debug_crash)
+  { 
+    int* i = NULL;
+    *i = 0;
+  }
   throw 9;
 }
 

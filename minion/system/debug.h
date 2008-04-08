@@ -44,6 +44,7 @@ struct parse_exception : public std::exception
 
 // These functions are defined in debug_functions.cpp
 
+extern bool debug_crash;
 void D_FATAL_ERROR2(string s, string file, string line);
 void _NORETURN FAIL_EXIT();
 
