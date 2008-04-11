@@ -10,6 +10,10 @@
 
 using namespace std;
 
+#ifndef MORE_SEARCH_INFO
+#define MORE_SEARCH_INFO
+#endif
+
 #include "get_info/get_info.h"
 
 // XXX : Provide access to this.

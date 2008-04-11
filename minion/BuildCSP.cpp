@@ -14,6 +14,8 @@
 #include "search/search_control.h"
 
 #include "CSPSpec.h"
+
+
 using namespace ProbSpec;
 
 /// Builds the CSP given by instance into stateObj.

@@ -68,6 +68,14 @@ more information.
 // the function, we "lock" it until the queue empties, then start ping
 // the constraint.
 
+#ifndef REIFY_H
+#define REIFY_H
+
+#include "constraint.h"
+#include "../reversible_vals.h"
+#include "../get_info/get_info.h"
+#include "../queue/standard_queue.h"
+
 template<typename BoolVar>
 struct reify : public Constraint
 {
@@ -242,4 +250,4 @@ reify<BoolVar>*
 reifyCon(StateObj* stateObj, Constraint* c, BoolVar var)
 { return new reify<BoolVar>(stateObj, &*c, var); }
 
-
+#endif

@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef VARIABLE_NEG_H
+#define VARIABLE_NEG_H
+
 #include "../../constraints/constraint_abstract.h"
 
 template<typename Var>
@@ -205,3 +208,4 @@ VarNegRef(const array<VarRef, i>& var_array)
   return neg_array;
 }
 
+#endif

@@ -24,6 +24,13 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef REIFY_TRUE_H
+#define REIFY_TRUE_H
+
+#include "constraint.h"
+#include "../reversible_vals.h"
+#include "../get_info/get_info.h"
+#include "../queue/standard_queue.h"
 
 
 template<typename BoolVar>
@@ -141,4 +148,4 @@ truereifyCon(StateObj* stateObj, DynamicConstraint* c, BoolVar var)
 }
 
 
-
+#endif

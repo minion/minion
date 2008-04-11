@@ -56,13 +56,7 @@
 // above line will work but only gives revision of this file,
 //  not the current global revision 
 
-#ifdef MORE_SEARCH_INFO
 #include "get_info/get_info.h"
-#else
-#define CON_INFO_ADDONE(ConEvent)
-#define VAR_INFO_ADDONE(VarType, VarEvent)
-#define PROP_INFO_ADDONE(PropType)
-#endif
 
 #include "solver.h"
 
@@ -76,17 +70,9 @@ VARDEF(ofstream solsoutFile);
 
 typedef TrailedMonotonicSet MonotonicSet;
 
-#include "tuple_container.h"
-
-#include "propagation_data.h"
-
 class Trigger;
 class Constraint;
 class DynamicTrigger;
-
-#include "constraints/triggers.h"
-
-#include "variables/AnyVarRef.h"
 
 #include "constraints/constraint.h"
 
@@ -106,7 +92,6 @@ namespace Controller
   VARDEF(vector<vector<AnyVarRef> > print_matrix);  
 }
 
-
 #include "build_constraints/build_helper.h"
 
 // This constraint must be listed early so that it can
@@ -120,7 +105,7 @@ namespace Controller
 #include "constraints/reify.h"
 #include "constraints/reify_true.h"
 
-#include "constraints/function_defs.hpp"
+
 
 #include "preprocess.h"
 
@@ -130,11 +115,11 @@ namespace Controller
 
 #include "BuildCSP.h"
 
-
-
 #include "StateObj.hpp"
 
 #include "solver.hpp"
+
+#include "constraints/function_defs.hpp"
 
 #include "constraints/constraint_abstract.hpp"
 

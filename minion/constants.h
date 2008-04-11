@@ -27,7 +27,6 @@
 #ifndef _CONSTANTS_H
 #define _CONSTANTS_H
 
-
 enum TrigType
 { 
   UpperBound, 
@@ -43,8 +42,6 @@ enum BoundType
   Bound_No,
   Bound_Maybe
 };
-
-
 
 #ifndef CONTAINER_TYPE
 typedef unsigned int BitContainerType;

@@ -8,6 +8,13 @@
 #ifndef COMMON_SEARCH_H
 #define COMMON_SEARCH_H
 
+#include "../system/system.h"
+#include "../solver.h"
+#include "../variables/AnyVarRef.h"
+#include "../variables/mappings/variable_neg.h"
+
+#include "../CSPSpec.h"
+
 namespace Controller
 {
     
