@@ -121,6 +121,7 @@ ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 #include "ident.h"
 
 class AbstractConstraint;
+class DynamicTrigger;
 
 
 /// Internal type used by AnyVarRef.

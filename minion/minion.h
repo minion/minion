@@ -50,7 +50,6 @@
 #define DYNAMICTRIGGERS
 #endif
 
-
 #define VERSION "Minion Version 0.5.1"
 #define REVISION "Subversion (svn) Revision Number $Revision$"
 // above line will work but only gives revision of this file,
@@ -69,10 +68,6 @@ VARDEF(ofstream solsoutFile);
 #include "memory_management/trailed_monotonic_set.h"
 
 typedef TrailedMonotonicSet MonotonicSet;
-
-class Trigger;
-class Constraint;
-class DynamicTrigger;
 
 #include "constraints/constraint.h"
 
@@ -98,29 +93,17 @@ namespace Controller
 // be called by all constraints.
 #include "constraints/constraint_checkassign.h"
 
-#include "constraints/constraint_table.h"
-#include "constraints/constraint_boundtable.h"
-
-
 #include "constraints/reify.h"
 #include "constraints/reify_true.h"
 
-
-
 #include "preprocess.h"
-
 #include "constraint_setup.h"
-
 #include "test_functions.h"
-
 #include "BuildCSP.h"
 
 #include "StateObj.hpp"
-
 #include "solver.hpp"
-
 #include "constraints/function_defs.hpp"
-
 #include "constraints/constraint_abstract.hpp"
 
 #endif
