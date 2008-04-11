@@ -1,7 +1,8 @@
 
-
 #ifndef _GETINFO_H
 #define _GETINFO_H
+
+#ifdef MORE_SEARCH_INFO
 
  enum VarEvent {
 #define VAR_EVENT(x,y) VAR_INFO_##x ,
@@ -58,5 +59,11 @@ void VarInfoAddone(VarType, VarEvent);
 void ConInfoAddone(ConEvent);
 void PropInfoAddone(PropEvent);
 void print_search_info();
+
+#else
+#define CON_INFO_ADDONE(ConEvent)
+#define VAR_INFO_ADDONE(VarType, VarEvent)
+#define PROP_INFO_ADDONE(PropType)
+#endif
 
 #endif
