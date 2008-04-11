@@ -42,7 +42,7 @@ The level of propagation enforced by this constraint is not named, however it
 works as follows. For constraint vec[i]=e:
 
 - After i is assigned, ensures that min(vec[i]) = min(e) and 
-  max(vec[i]) = min(e).
+  max(vec[i]) = max(e).
 
 - When e is assigned, removes idx from the domain of i whenever e is not an
   element of the domain of vec[idx].
