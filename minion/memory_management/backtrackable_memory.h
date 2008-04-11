@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef _BACKTRACK_MEMORY_H
+#define _BACKTRACK_MEMORY_H
+
 #include "MemoryBlock.h"
 
 // \addtogroup Memory
@@ -113,3 +116,5 @@ public:
   int current_depth()
   { return current_depth_m; }
 };
+
+#endif

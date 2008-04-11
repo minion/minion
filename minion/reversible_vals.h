@@ -24,6 +24,14 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef REVERSIBLE_VALS_H
+#define REVERSIBLE_VALS_H
+
+#include "memory_management/backtrackable_memory.h"
+#include "memory_management/nonbacktrack_memory.h"
+
+#include "solver.h"
+
 // \addtogroup Memory
 // @{
 
@@ -154,3 +162,5 @@ public:
 typedef Reversible<int> ReversibleInt;
 
 // @}
+
+#endif

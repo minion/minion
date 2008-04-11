@@ -36,6 +36,15 @@ help variables
 #ifndef ABSTRACT_CONSTRAINT
 #define ABSTRACT_CONSTRAINT
 
+#include "../system/system.h"
+#include "../solver.h"
+#include "../variables/AnyVarRef.h"
+#include <vector>
+
+using namespace std;
+
+class AnyVarRef;
+
 /// Base type from which all constraints are derived.
 class AbstractConstraint
 {

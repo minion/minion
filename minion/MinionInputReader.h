@@ -8,6 +8,13 @@
 
 #ifndef _MINIONINPUTREADER_H
 #define _MINIONINPUTREADER_H
+
+#include "system/system.h"
+
+#include "CSPSpec.h"
+
+using namespace ProbSpec;
+
 template<typename StreamType>
 struct ConcreteFileReader
 {

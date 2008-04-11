@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef _CONSTRAINT_H
+#define _CONSTRAINT_H
+
 #include "constraint_abstract.h"
 
 struct AbstractTriggerCreator;
@@ -122,3 +125,4 @@ inline void Constraint::setup()
 }
 
 // @}
+#endif

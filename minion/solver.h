@@ -24,13 +24,18 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef _SOLVER_H
+#define _SOLVER_H
 
+#include "system/system.h"
+
+#include "tuple_container.h"
 // Some advanced definitions, we don't actually need to know anything about these
 // types for SearchState, simply that they exist.
 class Constraint;
 class DynamicConstraint;
 class AnyVarRef;
-class TupleListContainer;
+
 
 class SearchState
 {
@@ -201,7 +206,12 @@ public:
     wdeg_on(false),
 #endif
     print_only_solution(false), dumptree(false), sollimit(1), fullpropagate(false), 
-    nocheck(false), nodelimit(0), tableout(false), solsoutWrite(false), randomise_valvarorder(false), 
+#ifdef NO_DEBUG
+    nocheck(true),
+#else
+    nocheck(false),
+#endif
+    nodelimit(0), tableout(false), solsoutWrite(false), randomise_valvarorder(false), 
     print_solution(true), time_limit(0), parser_verbose(false)
   {}
   
@@ -231,5 +241,14 @@ inline VariableContainer& getVars(StateObj* stateObj);
 namespace Controller
 {
   void lock(StateObj*);
+  
+  /// Pushes the state of the whole world.
+  inline void world_push(StateObj* stateObj);
+
+  /// Pops the state of the whole world.
+  inline void world_pop(StateObj* stateObj);
+
+  inline void world_pop_all(StateObj* stateObj);
 }
 
+#endif

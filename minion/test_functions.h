@@ -15,6 +15,17 @@
  *
  */
 
+#ifndef TEST_FUNCTIONS_H
+#define TEST_FUNCTIONS_H
+
+#include <string>
+#include <sstream>
+
+#include <vector>
+
+#include "system/system.h"
+
+using namespace std;
 
 template<typename Var>
 string get_dom_as_string(Var& v)
@@ -77,3 +88,5 @@ BigInt lit_count(Vars& v)
   }
   return lits;
 }
+
+#endif

@@ -24,6 +24,12 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef _NONBACKTRACK_MEMORY_H
+#define _NONBACKTRACK_MEMORY_H
+
+#include "backtrackable_memory.h"
+
+
 typedef MoveablePointer MemOffset;
 
 // \addtogroup Memory
@@ -40,3 +46,5 @@ public:
 };
 
 // @}
+
+#endif

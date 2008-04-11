@@ -27,6 +27,12 @@
 #ifndef BUILDCONSTRAINT_H
 #define BUILDCONSTRAINT_H
 
+#include "system/system.h"
+
+#include "variables/AnyVarRef.h"
+
+#include "CSPSpec.h"
+
 namespace BuildCon
 {  
   
@@ -39,7 +45,7 @@ namespace BuildCon
 
 /// Helper function used in a few places.
 AnyVarRef
-get_AnyVarRef_from_Var(StateObj* stateObj, Var v);
+get_AnyVarRef_from_Var(StateObj* stateObj, ProbSpec::Var v);
 
 /// Create all the variables used in the CSP.
 void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars);
@@ -52,11 +58,11 @@ pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order(StateObj* stateObj
 }
 #ifdef DYNAMICTRIGGERS
 DynamicConstraint*
-build_dynamic_constraint(StateObj* stateObj, ConstraintBlob& b);
+build_dynamic_constraint(StateObj* stateObj, ProbSpec::ConstraintBlob& b);
 #endif
 
 Constraint*
-build_constraint(StateObj* stateObj, ConstraintBlob& b);
+build_constraint(StateObj* stateObj, ProbSpec::ConstraintBlob& b);
 
 #endif
 

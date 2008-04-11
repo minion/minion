@@ -24,6 +24,11 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef _MEMORYBLOCK_H
+#define _MEMORYBLOCK_H
+
+#include "../system/system.h"
+
 /** \defgroup Memory
  *  This group of classes deals with all of Minion's memory management.
  */
@@ -434,3 +439,5 @@ inline void MemBlockCache::addPointerToNewMemoryBlock(MoveablePointer* vp)
     ;
     D_FATAL_ERROR("Fatal Memory Error - invalid Pointer deferenced!");
   }
+
+#endif

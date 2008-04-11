@@ -15,6 +15,16 @@
  *
  */
 
+#ifndef _TRIGGER_H
+#define _TRIGGER_H
+
+#include "../system/system.h"
+#include "../constants.h"
+#include "../propagation_data.h"
+
+class Trigger;
+class Constraint;
+ 
 /// Container for a range of triggers
 class TriggerRange
 {
@@ -119,4 +129,5 @@ inline shared_ptr<AbstractTriggerCreator>
 make_trigger(VarRef& v, Trigger t, TrigType trigger_type)
 { return shared_ptr<AbstractTriggerCreator>(new TriggerCreator<VarRef>(v,t, trigger_type));}
 
+#endif
 

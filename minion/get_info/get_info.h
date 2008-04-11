@@ -1,4 +1,8 @@
 
+
+#ifndef _GETINFO_H
+#define _GETINFO_H
+
  enum VarEvent {
 #define VAR_EVENT(x,y) VAR_INFO_##x ,
 #include "PropEvents.h"
@@ -54,3 +58,5 @@ void VarInfoAddone(VarType, VarEvent);
 void ConInfoAddone(ConEvent);
 void PropInfoAddone(PropEvent);
 void print_search_info();
+
+#endif

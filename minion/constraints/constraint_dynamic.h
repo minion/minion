@@ -24,7 +24,14 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_DYNAMIC_H
+#define CONSTRAINT_DYNAMIC_H
+
 #include "constraint_abstract.h"
+
+#include "../memory_management/nonbacktrack_memory.h"
+
+#include "../get_info/get_info.h"
 
 #define DYNAMIC_PROPAGATE_FUNCTION virtual void propagate
 
@@ -191,4 +198,4 @@ inline void DynamicTrigger::propagate()
   constraint->propagate(this); 
 }
 
-
+#endif

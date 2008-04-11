@@ -33,7 +33,6 @@
 #endif
 
 #include "system/system.h"
-
 #include "constants.h"
 
 #ifdef USELIGHTVECTOR
@@ -57,8 +56,6 @@
 // above line will work but only gives revision of this file,
 //  not the current global revision 
 
-
-
 #ifdef MORE_SEARCH_INFO
 #include "get_info/get_info.h"
 #else
@@ -81,28 +78,7 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 #include "tuple_container.h"
 
-/** @brief Represents a change in domain. 
- *
- * This is used instead of a simple int as the use of various mappers on variables might mean the domain change needs
- * to be corrected. Every variable should implement the function getDomainChange which uses this and corrects the domain.
- */
-class DomainDelta
-{ 
-  int domain_change; 
-public:
-  /// This function shouldn't be called directly. This object should be passed to a variables, which will do any "massaging" which 
-  /// is required.
-  int XXX_get_domain_diff()
-{ return domain_change; }
-
-  DomainDelta(int i) : domain_change(i)
-{}
-};
-
-enum PropagationLevel
-{ PropLevel_None, PropLevel_GAC, PropLevel_SAC, PropLevel_SSAC, 
-PropLevel_SACBounds, PropLevel_SSACBounds };
-
+#include "propagation_data.h"
 
 class Trigger;
 class Constraint;
@@ -124,7 +100,12 @@ class DynamicTrigger;
 
 #include "variables/variables.h"
 
-#include "solver2.h"
+// TODO: Move this!
+namespace Controller
+{
+  VARDEF(vector<vector<AnyVarRef> > print_matrix);  
+}
+
 
 #include "build_constraints/build_helper.h"
 
@@ -149,116 +130,9 @@ class DynamicTrigger;
 
 #include "BuildCSP.h"
 
-#ifdef REENTER
-struct StateObj
-{
-  // Forbid copying this type!
-  StateObj(const StateObj&);
-  void operator=(const StateObj&);
-  
-  Memory* searchMem_m;
-  SearchOptions* options_m;
-  SearchState state_m;
-  Queues* queues_m;
-  TriggerMem* triggerMem_m;
-  VariableContainer* varContainer_m;
-  BoolContainer* backtrack_bools; 
-public:
-  
- 
-  
-  StateObj() :
-    searchMem_m(new Memory),
-    options_m(new SearchOptions),
-    state_m(),
-    queues_m(new Queues(this)),
-    triggerMem_m(new TriggerMem(this)),
-    varContainer_m(new VariableContainer(this)),
-    backtrack_bools(new BoolContainer(this))
-  { }
 
-  ~StateObj()
-  { 
-    delete backtrack_bools;
-    delete varContainer_m;
-    delete triggerMem_m;
-    delete queues_m;
-    delete options_m;
-    delete searchMem_m;    
-  }
-};
 
-inline BoolContainer& getBools(StateObj* stateObj)
-{ return *(stateObj->backtrack_bools); }
-inline SearchOptions& getOptions(StateObj* stateObj)
-{ return *(stateObj->options_m); }
-inline SearchState& getState(StateObj* stateObj)
-{ return stateObj->state_m; }
-inline Queues& getQueue(StateObj* stateObj)
-{ return *(stateObj->queues_m); }
-inline Memory& getMemory(StateObj* stateObj)
-{ return *(stateObj->searchMem_m); }
-inline TriggerMem& getTriggerMem(StateObj* stateObj)
-{ return *(stateObj->triggerMem_m); }
-inline VariableContainer& getVars(StateObj* stateObj)
-{ return *(stateObj->varContainer_m); }
-
-#else
-
-struct StateObj {};
-VARDEF(StateObj _noreenter_stateObj);
-VARDEF(Memory searchMem_m);
-VARDEF(SearchOptions options_m);
-VARDEF(SearchState state_m);
-VARDEF_ASSIGN(Queues queues_m, &_noreenter_stateObj);
-VARDEF_ASSIGN(TriggerMem triggerMem_m, &_noreenter_stateObj);
-VARDEF_ASSIGN(VariableContainer varContainer_m, &_noreenter_stateObj);
-VARDEF_ASSIGN(BoolContainer bools_m, &_noreenter_stateObj);
-
-inline BoolContainer& getBools(StateObj* stateObj)
-{ return bools_m; }
-inline SearchOptions& getOptions(StateObj* stateObj)
-{ return options_m; }
-inline SearchState& getState(StateObj* stateObj)
-{ return state_m; }
-inline Queues& getQueue(StateObj* stateObj)
-{ return queues_m; }
-inline Memory& getMemory(StateObj* stateObj)
-{ return searchMem_m; }
-inline TriggerMem& getTriggerMem(StateObj* stateObj)
-{ return triggerMem_m; }
-inline VariableContainer& getVars(StateObj* stateObj)
-{ return varContainer_m; }
-#endif
-
-#ifndef MANY_VAR_CONTAINERS
-template<typename DomType>
-inline BoundVarContainer<DomType>& BoundVarRef_internal<DomType>::getCon_Static()
-{ return varContainer_m.boundvarContainer; }
-
-inline BooleanContainer& BoolVarRef_internal::getCon_Static()
-{ return varContainer_m.booleanContainer; }
-
-template<typename DomType>
-inline SparseBoundVarContainer<DomType>& SparseBoundVarRef_internal<DomType>::getCon_Static()
-{ return varContainer_m.sparseBoundvarContainer; }
-
-template<typename d_type>
-inline BigRangeVarContainer<d_type>& BigRangeVarRef_internal_template<d_type>::getCon_Static()
-{ return varContainer_m.bigRangevarContainer; }
-
-#endif
-
-// Must be defined later.
-inline SearchState::~SearchState()
-{ 
-  for(int i = 0; i < constraints.size(); ++i)
-    delete constraints[i];
-#ifdef DYNAMICTRIGGERS
-  for(int i = 0; i < dynamic_constraints.size(); ++i)
-    delete dynamic_constraints[i];
-#endif
-}
+#include "StateObj.hpp"
 
 #include "solver.hpp"
 

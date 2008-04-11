@@ -24,7 +24,11 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef _ITERATORS_H_MINION
+#define _ITERATORS_H_MINION
 
+
+#include "../system/system.h"
 
 template<typename VarType>
 struct VarIterator
@@ -113,3 +117,4 @@ struct VarIterator_looping
   { return current_val; }
 };
 
+#endif

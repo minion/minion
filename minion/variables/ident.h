@@ -9,6 +9,14 @@
 #ifndef IDENTITIES
 #define IDENTITIES
 
+#include "../system/system.h"
+
+#include <vector>
+#include <iostream>
+#include <ostream>
+
+using namespace std;
+
 enum varType {boolVarT, boundsT, sparseT, discreteT, constT, trivialBoundT};
 
 enum mapType {noneT, negT, notVarT, shiftT, stretchT, switch_negT, constantT};

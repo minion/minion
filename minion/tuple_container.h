@@ -9,6 +9,14 @@
 #ifndef _TUPLE_CONTAINER_H
 #define _TUPLE_CONTAINER_H
 
+#include "system/system.h"
+
+using namespace std;
+
+
+#include <vector>
+#include <utility>
+
 /* Minion
 * Copyright (C) 2006
 *

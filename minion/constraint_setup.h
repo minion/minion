@@ -14,7 +14,12 @@
  *  Copyright 2006 __MyCompanyName__. All rights reserved.
  *
  */
+ 
+#ifndef _CONSTRAINT_SETUP_H
+#define _CONSTRAINT_SETUP_H 
 
+struct StateObj;
+ 
 namespace Controller
 {
     
@@ -24,3 +29,4 @@ namespace Controller
 
 } // namespace Controller
 
+#endif

@@ -27,13 +27,16 @@
 #ifndef CSPSPEC_H
 #define CSPSPEC_H
 
+using namespace std;
+
 #include <vector>
 #include <list>
 #include <utility>
 #include <map>
+
 #include "tuple_container.h"
 
-using namespace std;
+#include "propagation_data.h"
 
 /// The currently accepted types of Constraints.
 

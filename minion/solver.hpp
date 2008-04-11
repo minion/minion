@@ -43,3 +43,31 @@ inline void SearchState::addDynamicConstraint(DynamicConstraint* c)
     (*vars)[i].addConstraint(c);
 }
 #endif
+
+namespace Controller
+{
+/// Pushes the state of the whole world.
+inline void world_push(StateObj* stateObj)
+{
+  D_INFO(0,DI_SOLVER,"World Push");
+D_ASSERT(getQueue(stateObj).isQueuesEmpty());
+  getMemory(stateObj).backTrack().world_push();
+}
+
+/// Pops the state of the whole world.
+inline void world_pop(StateObj* stateObj)
+{
+  D_INFO(0,DI_SOLVER,"World Pop");
+D_ASSERT(getQueue(stateObj).isQueuesEmpty());
+  getMemory(stateObj).backTrack().world_pop();
+  getVars(stateObj).getBigRangevarContainer().bms_array.undo();
+}
+
+inline void world_pop_all(StateObj* stateObj)
+{
+int depth = getMemory(stateObj).backTrack().current_depth();
+for(; depth > 0; depth--)
+  world_pop(stateObj); 
+}
+
+}

@@ -41,7 +41,15 @@ Use of this variable in a constraint:
 eq(bool, 0) #variable bool equals 0
 */
 
+#ifndef _BOOLEANVARIABLES_H
+#define _BOOLEANVARIABLES_H
+
+#include "../../system/system.h"
+
+#include "../../memory_management/backtrackable_memory.h"
+
 #include "../../constraints/constraint_abstract.h"
+
 
 /// Standard data type used for storing compressed booleans 
 typedef unsigned long data_type;
@@ -366,3 +374,4 @@ inline BoolVarRef_internal::BoolVarRef_internal(int value, BooleanContainer* b_c
 { shift_offset = one << (value % (sizeof(data_type)*8)); }
 
 
+#endif

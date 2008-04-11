@@ -23,34 +23,30 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-// This header is designed to be included after all other headers
 
-namespace Controller
-{
-  VARDEF(vector<vector<AnyVarRef> > print_matrix);
-  
-  /// Pushes the state of the whole world.
-  inline void world_push(StateObj* stateObj)
-  {
-    D_INFO(0,DI_SOLVER,"World Push");
-	D_ASSERT(getQueue(stateObj).isQueuesEmpty());
-    getMemory(stateObj).backTrack().world_push();
-  }
-  
-  /// Pops the state of the whole world.
-  inline void world_pop(StateObj* stateObj)
-  {
-    D_INFO(0,DI_SOLVER,"World Pop");
-	D_ASSERT(getQueue(stateObj).isQueuesEmpty());
-    getMemory(stateObj).backTrack().world_pop();
-    getVars(stateObj).getBigRangevarContainer().bms_array.undo();
-  }
-  
-  inline void world_pop_all(StateObj* stateObj)
-  {
-	int depth = getMemory(stateObj).backTrack().current_depth();
-	for(; depth > 0; depth--)
-	  world_pop(stateObj); 
-  }
-}
+#ifndef _PROPAGATION_DATA
+#define _PROPAGATION_DATA
 
+/** @brief Represents a change in domain. 
+ *
+ * This is used instead of a simple int as the use of various mappers on variables might mean the domain change needs
+ * to be corrected. Every variable should implement the function getDomainChange which uses this and corrects the domain.
+ */
+class DomainDelta
+{ 
+  int domain_change; 
+public:
+  /// This function shouldn't be called directly. This object should be passed to a variables, which will do any "massaging" which 
+  /// is required.
+  int XXX_get_domain_diff()
+{ return domain_change; }
+
+  DomainDelta(int i) : domain_change(i)
+{}
+};
+
+enum PropagationLevel
+{ PropLevel_None, PropLevel_GAC, PropLevel_SAC, PropLevel_SSAC, 
+PropLevel_SACBounds, PropLevel_SSACBounds };
+
+#endif

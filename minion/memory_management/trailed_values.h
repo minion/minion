@@ -21,7 +21,11 @@
 // However at initialisation time the maximum number of undos must be given, and this is a hard 
 // limit for the rest of the life. 
 
+#ifndef _TRAILED_VALUES_H
+#define _TRAILED_VALUES_H
 
+#include "backtrackable_memory.h"
+#include "../reversible_vals.h"
 
 typedef DomainInt value_type;
 
@@ -194,3 +198,4 @@ void print_state()
 
 };
 
+#endif

@@ -18,6 +18,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef TRAILED_MONOTONIC_SET_H
+#define TRAILED_MONOTONIC_SET_H
+
 typedef bool value_type;
 
 class TrailedMonotonicSet
@@ -189,3 +192,4 @@ void print_state()
 
 };
 
+#endif

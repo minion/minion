@@ -4,6 +4,12 @@
    For Licence Information see file LICENSE.txt 
 */
 
+#ifndef PREPROCESS_H
+#define PREPROCESS_H
+
+#include "solver.h"
+
+
 template<typename Var, typename Vars, typename Prop>
 bool inline check_fail(StateObj* stateObj, Var& var, DomainInt val, Vars& vars, Prop prop)
 {
@@ -150,3 +156,5 @@ struct MinionArguments
 };
 
 void PropogateCSP(StateObj*, PropagationLevel, vector<AnyVarRef>&, bool print_info = false);
+
+#endif

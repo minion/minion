@@ -110,9 +110,18 @@ ALIAS c = a
 ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 */
 
-#include "../constraints/constraint_abstract.h"
+#ifndef _ANYVARREF_H
+#define _ANYVARREF_H
+
+#include "../constants.h"
+#include "../system/system.h"
+#include "../solver.h"
+#include "../constraints/triggers.h"
 
 #include "ident.h"
+
+class AbstractConstraint;
+
 
 /// Internal type used by AnyVarRef.
 struct AnyVarRef_Abstract
@@ -344,5 +353,4 @@ public:
 #endif
 };
 
-
-
+#endif

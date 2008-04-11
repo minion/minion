@@ -24,8 +24,14 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef STANDARD_QUEUE_H
+#define STANDARD_QUEUE_H
 
-
+#include "../solver.h"
+#include "../get_info/get_info.h"
+#include "../constraints/triggers.h"
+#include "../constraints/constraint_dynamic.h"
+#include "../constraints/constraint.h"
   
 class Queues
 {
@@ -382,3 +388,5 @@ public:
 //template<typename Vars>
 //inline void propagate_queue_vars(StateObj* stateObj, Vars& vars, bool /*CheckBounds*/)
 //{	getQueue(stateObj).propagateQueue(); }
+
+#endif
