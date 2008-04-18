@@ -130,7 +130,7 @@ struct TrivialBoundVar
   }
 
   VarIdent getIdent()
-  { return VarIdent(trivialBoundT, noneT, (int)this, 0); } //use pointer as unique var num
+  { return VarIdent(trivialBoundT, noneT, (int)((ptrdiff_t)this), 0); } //use pointer as unique var num - XXX possibly broken on 64 bits
 
 #ifdef WDEG
   int getBaseWdeg()
