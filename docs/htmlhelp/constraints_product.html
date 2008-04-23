@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -10,17 +9,17 @@
 <pre>
 The constraint
 
-   product([x,y],z)
+   product(x,y,z)
 
 ensures that z=xy in any solution.
 </pre>
-<h3>Description</h3>
+<h3>Notes</h3>
 <pre>
 This constraint can be used for (and, in fact, has a specialised
-implementation for) achieving boolean AND, i.e. x^y=z can be modelled
+implementation for) achieving boolean AND, i.e. x & y=z can be modelled
 as
 
-   product([x,y],z)
+   product(x,y,z)
 
 The general constraint achieves bounds generalised arc consistency for
 positive numbers.
