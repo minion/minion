@@ -28,21 +28,26 @@ class TrailedMonotonicSet
   StateObj* stateObj;
 
   static const value_type tms_in_set = 1;
-
+  
+  #ifndef NO_DEBUG
+  bool locked;
+  #endif
+  
   int _size;
   int _max_undos;
   int _max_depth;             
 
   int _local_depth;             // could be unsigned 
-  ReversibleInt _backtrack_depth;
-
+  
+  MoveablePointer _backtrack_depth_ptr;
+  
   MemOffset _array;
   MemOffset _undo_indexes;
   
-  MoveablePointer backtrack_ptr;
+  //MoveablePointer backtrack_ptr;
 
   int& undo_indexes(int i)
-  { 
+  {
 	return static_cast<int*>(_undo_indexes.get_ptr())[i]; 
   }
 
@@ -65,14 +70,14 @@ public:
 
   bool needs_undoing()
   {
-    D_ASSERT( _local_depth < _max_depth && _local_depth >= _backtrack_depth);
+    D_ASSERT( _local_depth < _max_depth && _local_depth >= (*((int*)_backtrack_depth_ptr.get_ptr())) );
 
-    return _local_depth > _backtrack_depth;
+    return _local_depth > (*((int*)_backtrack_depth_ptr.get_ptr()));
   }
 
   void undo()
   {
-    int bt_depth = _backtrack_depth;
+    int bt_depth = (*((int*)_backtrack_depth_ptr.get_ptr()));
 
 #ifdef DEBUG_TMS
     cout << "About to undo: " ; print_state(); 
@@ -106,8 +111,9 @@ public:
 	  return 0;
   }
   
-    bool isMember(DomainInt index) const
+  bool isMember(DomainInt index) const
   {
+     // cout << "Size:"<< _size << ", index:"<<index<<endl;
     return (bool)array(index);
   }
 
@@ -126,7 +132,7 @@ public:
   }
 
 void before_branch_left()
-  { _backtrack_depth = _local_depth;
+  { *((int*)_backtrack_depth_ptr.get_ptr()) = _local_depth;
     return ; }
     
  void after_branch_left()  // nothing to do
@@ -137,42 +143,36 @@ void  before_branch_right()  // nothing to do
 void after_branch_right()  // nothing to do
   { return ; }
 
-void initialise(const int& new_size, const int& max_undos)
-  { 
-    _size = new_size;
-    _max_undos = max_undos;
-
-    // should put in a D_ASSERT on MAXINT here
-    // D_ASSERT( max_undos < MAXINT - size);
-    
-    _max_depth = max_undos;             
-    _local_depth = 0;
-    _backtrack_depth = 0;
-
-    _array = getMemory(stateObj).nonBackTrack().request_bytes(_size*sizeof(value_type)); 
-    _undo_indexes = getMemory(stateObj).nonBackTrack().request_bytes(_max_depth*sizeof(int));
-
-#ifdef DEBUG_TMS
-    cout << "initialising TrailedMonotonicSet with value of size= " << size << endl;
-    // print_state();
-#endif
-    
-    for(int i=0; i< new_size; i++) {
-      array(i) = tms_in_set;
-    };
-  }
-
+    int request_storage(int allocsize)
+    {
+        D_ASSERT(!locked);
+        // returns the index of the first element allocated.
+        int blockindex=_size;
+        _size=_size+allocsize;
+        return blockindex;
+    }
   
-  
-  TrailedMonotonicSet(StateObj* _stateObj) : stateObj(_stateObj), _backtrack_depth(_stateObj)
-  { } 
+    // This should no longer be used. Use request_storage and lock instead.
+  //void initialise(const int& new_size, const int& max_undos, StateObj stateObj);
 
+  // Must be run before the lock for nonbacktrack.
+  void lock(StateObj * stateObj);
+  
+  //TrailedMonotonicSet(StateObj* _stateObj) : stateObj(_stateObj) //, _backtrack_depth(_stateObj)
+  //{ } 
+  
+  TrailedMonotonicSet()
+  #ifndef NO_DEBUG
+  : locked(false)
+  #endif
+  { }
+  
 void print_state()
 {
   cout << "printing state of TrailedMonotonicSet: " ;
   cout << "array size: " << _size;
   cout << " local depth: " << _local_depth;
-  cout << " backtracking depth: " << _backtrack_depth ; 
+  cout << " backtracking depth: " << *((int*)_backtrack_depth_ptr.get_ptr()) ; 
   cout << " max depth: " << _max_depth; 
   cout << endl << "   values: " ;
   for(int i = 0; i < _size; ++i) 
@@ -192,4 +192,6 @@ void print_state()
 
 };
 
+typedef TrailedMonotonicSet MonotonicSet;
 #endif
+

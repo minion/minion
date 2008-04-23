@@ -63,9 +63,13 @@ VARDEF(TableOut tableout);
 VARDEF(ofstream solsoutFile);
 
 #include "memory_management/backtrackable_memory.h"
-#include "memory_management/nonbacktrack_memory.h"
-#include "reversible_vals.h"
+typedef MoveablePointer MemOffset;
+
 #include "memory_management/trailed_monotonic_set.h"
+#include "memory_management/nonbacktrack_memory.h"
+#include "memory_management/trailed_monotonic_set.hpp"
+#include "memory_management/monotonic_set_wrapper.h"
+#include "reversible_vals.h"
 
 typedef TrailedMonotonicSet MonotonicSet;
 

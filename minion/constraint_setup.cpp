@@ -13,6 +13,9 @@ namespace Controller
 void lock(StateObj* stateObj)
 {
   D_INFO(2, DI_SOLVER, "Starting Locking process");
+  // do hackery involving the monotonic set.
+  getMemory(stateObj).monotonic_set=& getVars(stateObj).getBigRangevarContainer().bms_array;
+  
   getVars(stateObj).getBigRangevarContainer().lock();
   getVars(stateObj).getSparseBoundvarContainer().lock();
   getVars(stateObj).getBooleanContainer().lock(); 
@@ -22,6 +25,7 @@ void lock(StateObj* stateObj)
   for(int i = 0; i < dynamic_size; ++i)
 	getState(stateObj).getDynamicConstraintList()[i]->setup();
 #endif
+  getMemory(stateObj).monotonicSet().lock(stateObj);
   getMemory(stateObj).backTrack().lock();
   getMemory(stateObj).nonBackTrack().lock();
 //  atexit(Controller::finish);

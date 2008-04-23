@@ -84,7 +84,7 @@ struct BigRangeVarContainer {
   StateObj* stateObj;
   
   BigRangeVarContainer(StateObj* _stateObj) : stateObj(_stateObj), var_count_m(0), lock_m(0),
-                                              trigger_list(stateObj, false), bms_array(stateObj)
+                                              trigger_list(stateObj, false), bms_array()
   { 
     // Store where the first variable will go.
     var_offset.push_back(0);
@@ -174,6 +174,7 @@ struct BigRangeVarContainer {
   { 
     D_ASSERT(!lock_m);
     lock_m = true;
+    //bms_array.lock(stateObj); // gets locked in constraint_setup.cpp
  }
 
 void addVariables(const vector<pair<int, Bounds> >& new_domains)
@@ -199,7 +200,13 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
 
  
     bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m * 2 * sizeof(domain_bound_type));
-    bms_array.initialise(var_offset.back(), var_offset.back());
+    int temp1=bms_array.request_storage(var_offset.back());
+    D_ASSERT(temp1==0); // we should be at the front of the TMS.
+    if(temp1>0)
+    {   // Need to add the TMS offset onto all the var_offsets
+        for(int i=0;i<var_offset.size(); i++) var_offset[i]+=temp1;
+    }
+    //bms_array.lock(stateObj); // Don't lock it here. lock it in lock.
     for(DomainInt j = 0; j < var_count_m; j++) {
 	       var_offset[j] = var_offset[j] - initial_bounds[j].first;  
     };
