@@ -38,6 +38,11 @@ This constraint is not reifiable.
 
 /** @help constraints;element Notes 
 
+Warning: This constraint is not confluent. Depending on the order the
+propagators are called in Minion, the number of search nodes may vary when
+using element. To avoid this problem, use watchelement instead. More details
+below.
+
 The level of propagation enforced by this constraint is not named, however it
 works as follows. For constraint vec[i]=e:
 
@@ -50,9 +55,26 @@ works as follows. For constraint vec[i]=e:
 - When m[idx] is assigned, removes idx from i when m[idx] is not in the domain
   of e.
 
-This level of constency is designed to avoid the propagator having to scan
+This level of consistency is designed to avoid the propagator having to scan
 through vec, except when e is assigned. It does a quantity of cheap propagation
 and may work well in practise on certain problems.
+
+Element is not confluent, which may cause the number of search nodes to vary
+depending on the order in which constraints are listed in the input file, or 
+the order they are called in Minion. For example, the following input causes
+Minion to search 41 nodes.
+
+MINION 3
+**VARIABLES**
+DISCRETE x[5] {1..5}
+**CONSTRAINTS**
+element([x[0],x[1],x[2]], x[3], x[4])
+alldiff([x])
+**EOF**
+
+However if the two constraints are swapped over, Minion explores 29 nodes.
+As a rule of thumb, to get a lower node count, move element constraints
+to the end of the list.
 */
 
 /** @help constraints;element References 
