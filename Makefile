@@ -1,6 +1,12 @@
 # To make a universal mac build add: -arch ppc -arch i686 to flags
 
+# You may have to change the next line to where boost is installed.
+# For now, you can try adding it to the end, it seems having multiple 
+# directories does not hurt.
+
+BOOSTINCLUDE = -I/usr/local/include/boost-1_35/
 FLAGS = -DWATCHEDLITERALS
+LINKFLAGS = 
 NAMEBASE = minion
 
 ifdef DEBUG
@@ -34,6 +40,11 @@ ifdef REENTER
   NAMEBASE := $(NAMEBASE)-reenter
 endif
 
+ifdef BOOST
+  NAMEBASE := $(NAMEBASE)-boost
+  FLAGS := $(FLAGS) $(BOOSTINCLUDE) -DUSE_BOOST
+  LINKFLAGS := $(LINKFLAGS) -lz -lbz2
+endif
 OUTDIR=bin
 
 # Only use our choice of name if one was not provided
@@ -43,7 +54,7 @@ endif
 
 OBJDIR=$(OUTDIR)/objdir-$(NAME)
 
-SRC=$(wildcard minion/*.cpp) $(wildcard minion/build_constraints/*.cpp minion/system/*.cpp)
+SRC=$(wildcard minion/*.cpp) $(wildcard minion/build_constraints/*.cpp minion/system/*.cpp minion/boost_files/*.cpp)
 EXE=bin/$(NAME)
 
 
@@ -81,13 +92,15 @@ $(OBJDIR)/%.o: minion/%.cpp
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
 minion: depend mkdirectory $(OBJFILES)	
-	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES)
+	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES) $(LINKFLAGS)
 	
 mkdirectory:
 	if [ ! -d $(OBJDIR) ]; then mkdir $(OBJDIR); fi
 	if [ ! -d $(OBJDIR)/build_constraints ]; then mkdir $(OBJDIR)/build_constraints; fi
 	if [ ! -d $(OBJDIR)/help ]; then mkdir $(OBJDIR)/help; fi
 	if [ ! -d $(OBJDIR)/system ]; then mkdir $(OBJDIR)/system; fi
+	if [ ! -d $(OBJDIR)/boost_files ]; then mkdir $(OBJDIR)/boost_files; fi
+	
 
 generate: bibd golomb solitaire steelmill sports
 

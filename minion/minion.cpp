@@ -37,6 +37,19 @@ using namespace ProbSpec;
 
 #include "commandline_parse.h"
 
+#ifdef USE_BOOST
+#include <fstream>
+#include <iostream>
+#include <boost-1_35/boost/iostreams/filtering_streambuf.hpp>
+#include <boost-1_35/boost/iostreams/filtering_stream.hpp>
+#include <boost-1_35/boost/iostreams/copy.hpp>
+#include <boost-1_35/boost/iostreams/filter/gzip.hpp>
+#include <boost-1_35/boost/iostreams/filter/bzip2.hpp>
+
+using namespace boost;
+using namespace iostreams;
+#endif
+
 /** @help switches Description 
 Minion supports a number of switches to augment default behaviour.  To
 see more information on any switch, use the help system. The list
@@ -364,16 +377,45 @@ try {
   {
     // Why do I have to put this filename into a variable before I feed it into the ConcreteFileReader?
     // I'm not completely sure, but it works this way.
+    string fname = getOptions(stateObj).instance_name;
     const char* filename = getOptions(stateObj).instance_name.c_str();
-    ConcreteFileReader<ifstream> infile(filename, filename);
+    string extension = fname.substr(fname.find_last_of("."), fname.size());
+     
+#ifdef USE_BOOST
+    ifstream file(filename, ios_base::in | ios_base::binary);
+    filtering_istream in;
+    
+    if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp")
+    {
+      cout << "# Using gzip uncompression" << endl;
+      in.push(gzip_decompressor());
+    }    
+    
+    if(extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
+    {
+      cout << "# Using bzip2 uncompression" << endl;
+      in.push(bzip2_decompressor());
+    }
+        
+    in.push(file);
+    
+    ConcreteFileReader<filtering_istream> infile(in, filename);
+#else
+     if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp" ||
+        extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
+     { D_FATAL_ERROR("This copy of Minion was built without gzip and bzip2 support!"); }
+
+    ifstream ifm(filename);
+    ConcreteFileReader<ifstream> infile(ifm, filename);
+#endif 
     if (infile.failed_open()) {
       D_FATAL_ERROR("Can't open given input file '" + getOptions(stateObj).instance_name + "'.");
-    }    
+    }   
     instance = readInput(&infile, getOptions(stateObj).parser_verbose);
   }
   else
   {
-    ConcreteFileReader<std::basic_istream<char, std::char_traits<char> >&> infile(cin, "Standard Input");
+    ConcreteFileReader<std::basic_istream<char, std::char_traits<char> > > infile(cin, "Standard Input");
     instance = readInput(&infile, getOptions(stateObj).parser_verbose);
   }
 

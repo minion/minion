@@ -18,7 +18,7 @@ using namespace ProbSpec;
 template<typename StreamType>
 struct ConcreteFileReader
 {
-  StreamType infile;
+  StreamType& infile;
   string filename;
   
   /// Removes all comments after the current place in the file.
@@ -46,9 +46,10 @@ struct ConcreteFileReader
     return peek;
   }
   
-  template<typename InputType>
-  ConcreteFileReader(InputType& name, string _filename) : infile(name), filename(_filename)
+  ConcreteFileReader(StreamType& name, string _filename) : infile(name), filename(_filename)
   {}
+  
+
   
    BOOL failed_open()
   { return !infile; }
