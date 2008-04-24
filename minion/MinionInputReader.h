@@ -19,6 +19,7 @@ template<typename StreamType>
 struct ConcreteFileReader
 {
   StreamType infile;
+  string filename;
   
   /// Removes all comments after the current place in the file.
   // Returns peeked char.
@@ -46,7 +47,7 @@ struct ConcreteFileReader
   }
   
   template<typename InputType>
-  ConcreteFileReader(InputType& name) : infile(name)
+  ConcreteFileReader(InputType& name, string _filename) : infile(name), filename(_filename)
   {}
   
    BOOL failed_open()
