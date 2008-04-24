@@ -40,11 +40,11 @@ using namespace ProbSpec;
 #ifdef USE_BOOST
 #include <fstream>
 #include <iostream>
-#include <boost-1_35/boost/iostreams/filtering_streambuf.hpp>
-#include <boost-1_35/boost/iostreams/filtering_stream.hpp>
-#include <boost-1_35/boost/iostreams/copy.hpp>
-#include <boost-1_35/boost/iostreams/filter/gzip.hpp>
-#include <boost-1_35/boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
 
 using namespace boost;
 using namespace iostreams;
