@@ -38,7 +38,7 @@ conslist+=["sumgeq", "reifysumgeq", "reifyimplysumgeq"]
 conslist+=["sumleq", "reifysumleq", "reifyimplysumleq"]
 
 conslist+=["occurrence", "reifyimplyoccurrence"]
-conslist+=["occurrenceleq", "occurrencegeq"]
+#conslist+=["occurrenceleq", "occurrencegeq"]
 
 conslist+=["ineq", "reifyineq", "reifyimplyineq"]
 
