@@ -410,6 +410,9 @@ struct MultiplyVar
   VarIdent getIdent()
   { return VarIdent(stretchT, Multiply, data.getIdent()); }
 
+  DomainInt getBaseVal(DomainInt v) const
+  { return data.getBaseVal(MultiplyHelp<VarRef>::divide_exact(v, Multiply)); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return data.getBaseWdeg(); }

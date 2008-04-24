@@ -142,6 +142,12 @@ struct BoolVarRef_internal
   
   DomainInt getInitialMax() const
   { return 1; }
+
+  DomainInt getBaseVal(DomainInt v) const 
+  {
+    D_ASSERT(inDomain(v));
+    return v; 
+  }
  
   friend std::ostream& operator<<(std::ostream& o, const BoolVarRef_internal& b)
   { return o << "Bool:" << b.var_num; }

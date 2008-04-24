@@ -139,6 +139,9 @@ struct VarNot
   VarIdent getIdent()
   { return VarIdent(notVarT, 0, data.getIdent()); }
 
+  DomainInt getBaseVal(DomainInt v) const
+  { return data.getBaseVal(swap(v)); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return data.getBaseWdeg(); }

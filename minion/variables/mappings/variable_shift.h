@@ -122,6 +122,10 @@ struct ShiftVar
   VarIdent getIdent()
   { return VarIdent(shiftT, shift, data.getIdent()); }
 
+  DomainInt getBaseVal(DomainInt v) const {
+    return data.getBaseVal(v - shift);
+  }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return data.getBaseWdeg(); }

@@ -146,6 +146,7 @@ struct AnyVarRef_Abstract
   virtual vector<AbstractConstraint*>* getConstraints() = 0;
   virtual void addConstraint(AbstractConstraint* c) = 0;
   virtual VarIdent getIdent() = 0;
+  virtual DomainInt getBaseVal(DomainInt) const = 0;
 #ifdef WDEG
   virtual int getBaseWdeg() = 0;
   virtual void incWdeg() = 0;
@@ -233,6 +234,9 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 
   virtual VarIdent getIdent()
   { return data.getIdent(); }
+
+  virtual DomainInt getBaseVal(DomainInt v) const
+  { return data.getBaseVal(v); }
 
 #ifdef WDEG
   virtual int getBaseWdeg() 
@@ -333,6 +337,9 @@ public:
 
   VarIdent getIdent()
   { return data->getIdent(); }
+
+  DomainInt getBaseVal(DomainInt v) const
+  { return data->getBaseVal(v); }
 
 #ifdef WDEG
   int getBaseWdeg()

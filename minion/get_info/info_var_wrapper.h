@@ -128,6 +128,12 @@ struct InfoRefType
     return data.getIdent();
   }
 
+  DomainInt getBaseVal(DomainInt v) const
+  { 
+    VAR_INFO_ADDONE(VAR_TYPE, getBaseVal);
+    return data.getBaseVal(v);
+  }
+
 #ifdef WDEG
   int getBaseWdeg()
   { 

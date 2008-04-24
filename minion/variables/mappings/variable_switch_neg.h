@@ -166,6 +166,8 @@ struct SwitchNeg
   VarIdent getIdent()
   { return VarIdent(switch_negT, multiplier, data.getIdent()); }
 
+  DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(v * multiplier); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return data.getBaseWdeg(); }

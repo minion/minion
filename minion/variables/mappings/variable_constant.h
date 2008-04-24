@@ -110,6 +110,12 @@ struct ConstantVar
   VarIdent getIdent()
   { return VarIdent(constT, constantT, val, val); }
 
+  DomainInt getBaseVal(DomainInt v) const 
+  { 
+    D_ASSERT(v == val);
+    return val; 
+  }
+
 #ifdef WDEG
   int getBaseWdeg() { return 0; } //wdeg is irrelevant for non-search var
 

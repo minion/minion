@@ -130,6 +130,8 @@ struct VarNeg
   VarIdent getIdent()
   { return VarIdent(negT, 0, data.getIdent()); }
 
+  DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(-v); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return data.getBaseWdeg(); }

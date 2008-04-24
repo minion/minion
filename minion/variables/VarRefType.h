@@ -109,6 +109,9 @@ struct VarRefType
   VarIdent getIdent()
   { return GET_CONTAINER().getIdent(data); }
 
+  DomainInt getBaseVal(DomainInt v) const
+  { return GET_CONTAINER().getBaseVal(data, v); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return GET_CONTAINER().getBaseWdeg(data); }
@@ -205,6 +208,9 @@ struct QuickVarRefType
   VarIdent getIdent()
   { return GET_CONTAINER().getIdent(data); }
 
+  DomainInt getBaseVal(DomainInt v) const
+  { return data.getBaseVal(v); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return GET_CONTAINER().getBaseWdeg(data); }
@@ -291,6 +297,9 @@ struct CompleteVarRefType
 
   VarIdent getIdent()
   { return (data.getCon()).getIdent(data); }
+
+  DomainInt getBaseVal(DomainInt v) const
+  { return (data.getCon()).getBaseVal(v); }
 
 #ifdef WDEG
   int getBaseWdeg()

@@ -153,6 +153,12 @@ struct BoundVarRef_internal
 
   VarIdent getIdent()
   { return GET_LOCAL_CON().getIdent(*this); }
+
+  DomainInt getBaseVal(DomainInt v) const 
+  {
+    D_ASSERT(inDomain(v));
+    return v; 
+  }
   
 #ifdef WDEG
   int getBaseWdeg()

@@ -402,6 +402,12 @@ struct SparseBoundVarContainer {
   VarIdent getIdent(const SparseBoundVarRef_internal<BoundType>& b)
   { return VarIdent(sparseT, noneT, b.var_num, 0); }
 
+  DomainInt getBaseVal(const SparseBoundVarRef_internal<BoundType>& b, DomainInt v) const 
+  { 
+    D_ASSERT(inDomain(b, v));
+    return v; 
+  }
+
 #ifdef WDEG
   int getBaseWdeg(const SparseBoundVarRef_internal<BoundType>& b)
   { return wdegs[b.var_num]; }
