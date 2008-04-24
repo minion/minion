@@ -73,7 +73,6 @@ public:
 #include "mappings/variable_switch_neg.h"
 #include "mappings/variable_stretch.h"
 #include "mappings/variable_constant.h"
-#include "mappings/TrivialBoundVar.h"
 #include "mappings/variable_not.h"
 #include "mappings/variable_shift.h"
 #include "iterators.h"

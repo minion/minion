@@ -14,8 +14,6 @@ ConstraintDef constraint_list[] = {
 { "max" , CT_MAX, 2 ,{ read_list , read_var }, STATIC_CT },
 { "min" , CT_MIN, 2 ,{ read_list , read_var }, STATIC_CT },
 { "occurrence" , CT_OCCURRENCE, 3 ,{ read_list , read_constant , read_var }, STATIC_CT },
-{ "occurrenceleq" , CT_LEQ_OCCURRENCE, 3 ,{ read_list , read_constant , read_constant }, STATIC_CT },
-{ "occurrencegeq" , CT_GEQ_OCCURRENCE, 3 ,{ read_list , read_constant , read_constant }, STATIC_CT },
 { "product" , CT_PRODUCT2, 2 ,{ read_2_vars , read_var }, STATIC_CT },
 { "weightedsumleq" , CT_WEIGHTLEQSUM, 3 ,{ read_constant_list , read_list , read_var }, STATIC_CT },
 { "weightedsumgeq" , CT_WEIGHTGEQSUM, 3 ,{ read_constant_list , read_list , read_var }, STATIC_CT },

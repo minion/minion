@@ -37,55 +37,6 @@ vector vec.
 This constraint is not reifiable.
 */
 
-/** @help constraints;occurrence References
-help constraints occurrenceleq
-help constraints occurrencegeq
-*/
-
-/** @help constraints;occurrenceleq Description
-The constraint
-
-   occurrenceleq(vec, elem, count)
-
-ensures that there are AT MOST count occurrences of the value elem in
-the vector vec.
-*/
-
-/** @help constraints;occurrenceleq Notes
-Variable count must be a constant.
-*/
-
-/** @help constraints;occurrenceleq Reifiability
-This constraint is not reifiable.
-*/
-
-/** @help constraints;occurrenceleq References
-help constraints occurrence
-help constraints occurrencegeq
-*/
-
-/** @help constraints;occurrencegeq Description
-The constraint
-
-   occurrencegeq(vec, elem, count)
-
-ensures that there are AT LEAST count occurrences of the value elem in
-the vector vec.
-*/
-
-/** @help constraints;occurrencegeq Notes
-Variable count must be a constant.
-*/
-
-/** @help constraints;occurrencegeq Reifiability
-This constraint is not reifiable.
-*/
-
-/** @help constraints;occurrencegeq References
-help constraints occurrence
-help constraints occurrenceleq
-*/
-
 template<typename VarArray, typename Val, typename ValCount>
 struct OccurrenceEqualConstraint : public Constraint
 {
@@ -265,26 +216,3 @@ BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T2& t2, const T3& t3,
   { return OccEqualCon(stateObj, t1, runtime_val(val_to_count), t3[0]); } 
 }
 
-template<typename T1>
-Constraint*
-BuildCT_LEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
-{
-  int val_to_count = b.vars[1][0].pos;
-  int occs = b.vars[2][0].pos;
-  if(reify) 
-    { return reifyCon(stateObj, OccEqualCon(stateObj, t1, runtime_val(val_to_count), TrivialBoundVar(stateObj,0,occs)), reifyVar); } 
-  else 
-    { return OccEqualCon(stateObj, t1, runtime_val(val_to_count), TrivialBoundVar(stateObj, 0, occs)); } 
-}
-
-template<typename T1>
-Constraint*
-BuildCT_GEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
-{
-  int val_to_count = b.vars[1][0].pos;
-  int occs = b.vars[2][0].pos;
-  if(reify) 
-  { return reifyCon(stateObj, OccEqualCon(stateObj, t1, runtime_val(val_to_count), TrivialBoundVar(stateObj,occs, t1.size())), reifyVar); } 
-  else 
-  { return OccEqualCon(stateObj, t1, runtime_val(val_to_count), TrivialBoundVar(stateObj,occs, t1.size())); } 
-}
