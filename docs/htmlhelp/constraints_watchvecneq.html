@@ -1,18 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>constraints occurrence</title>
+<title>constraints watchvecneq</title>
 </head>
 <body>
-<h1>Help on <tt>constraints occurrence</tt></h1>
+<h1>Help on <tt>constraints watchvecneq</tt></h1>
 <h3>Description</h3>
 <pre>
 The constraint
 
-   occurrence(vec, elem, count)
+   watchvecneq(A, B)
 
-ensures that there are count occurrences of the value elem in the
-vector vec.
+ensures that A and B are not the same vector, i.e., there exists some index i
+such that A[i] != B[i].
 </pre>
 <h3>Reifiability</h3>
 <pre>
