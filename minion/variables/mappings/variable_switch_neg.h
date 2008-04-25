@@ -26,19 +26,19 @@
 
 #include "../../constraints/constraint_abstract.h"
 
-template<typename Var>
+template<typename VarT>
 struct SwitchNeg
 {
   static const BOOL isBool = false;
-  static const BoundType isBoundConst = Var::isBoundConst;
-  Var data;
+  static const BoundType isBoundConst = VarT::isBoundConst;
+  VarT data;
 	
   BOOL isBound()
   { return data.isBound();}
   
 
   DomainInt multiplier;
-  SwitchNeg(Var _data, int _multiplier) : data(_data), multiplier(_multiplier)
+  SwitchNeg(VarT _data, int _multiplier) : data(_data), multiplier(_multiplier)
   { D_ASSERT(multiplier == -1 || multiplier == 1); }
   
   SwitchNeg() : data()
@@ -167,6 +167,8 @@ struct SwitchNeg
   { return VarIdent(switch_negT, multiplier, data.getIdent()); }
 
   DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(v * multiplier); }
+
+  Var getBaseVar() const { return data.getBaseVar(); }
 
 #ifdef WDEG
   int getBaseWdeg()

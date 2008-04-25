@@ -113,6 +113,7 @@ ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 #ifndef _ANYVARREF_H
 #define _ANYVARREF_H
 
+#include "../CSPSpec.h"
 #include "../constants.h"
 #include "../system/system.h"
 #include "../solver.h"
@@ -122,7 +123,6 @@ ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 
 class AbstractConstraint;
 class DynamicTrigger;
-
 
 /// Internal type used by AnyVarRef.
 struct AnyVarRef_Abstract
@@ -147,6 +147,7 @@ struct AnyVarRef_Abstract
   virtual void addConstraint(AbstractConstraint* c) = 0;
   virtual VarIdent getIdent() = 0;
   virtual DomainInt getBaseVal(DomainInt) const = 0;
+  virtual Var getBaseVar() const = 0;
 #ifdef WDEG
   virtual int getBaseWdeg() = 0;
   virtual void incWdeg() = 0;
@@ -237,6 +238,9 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 
   virtual DomainInt getBaseVal(DomainInt v) const
   { return data.getBaseVal(v); }
+
+  virtual Var getBaseVar() const
+  { return data.getBaseVar(); }
 
 #ifdef WDEG
   virtual int getBaseWdeg() 
@@ -340,6 +344,9 @@ public:
 
   DomainInt getBaseVal(DomainInt v) const
   { return data->getBaseVal(v); }
+
+  Var getBaseVar() const
+  { return data->getBaseVar(); }
 
 #ifdef WDEG
   int getBaseWdeg()

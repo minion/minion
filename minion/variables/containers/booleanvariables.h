@@ -44,6 +44,8 @@ eq(bool, 0) #variable bool equals 0
 #ifndef _BOOLEANVARIABLES_H
 #define _BOOLEANVARIABLES_H
 
+#include "../../CSPSpec.h"
+
 #include "../../system/system.h"
 
 #include "../../memory_management/backtrackable_memory.h"
@@ -148,6 +150,8 @@ struct BoolVarRef_internal
     D_ASSERT(inDomain(v));
     return v; 
   }
+
+  Var getBaseVar() const { return Var(VAR_BOOL, var_num); }
  
   friend std::ostream& operator<<(std::ostream& o, const BoolVarRef_internal& b)
   { return o << "Bool:" << b.var_num; }

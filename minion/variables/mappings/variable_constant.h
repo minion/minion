@@ -24,6 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "../../CSPSpec.h"
+
 #include "../../constraints/constraint_abstract.h"
 
 struct ConstantVar
@@ -115,6 +117,8 @@ struct ConstantVar
     D_ASSERT(v == val);
     return val; 
   }
+
+  Var getBaseVar() const { return Var(VAR_CONSTANT, val); }
 
 #ifdef WDEG
   int getBaseWdeg() { return 0; } //wdeg is irrelevant for non-search var

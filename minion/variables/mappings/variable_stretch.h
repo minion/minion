@@ -24,6 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "../../CSPSpec.h"
+
 #include "../../constraints/constraint_abstract.h"
 
 template<typename T>
@@ -412,6 +414,8 @@ struct MultiplyVar
 
   DomainInt getBaseVal(DomainInt v) const
   { return data.getBaseVal(MultiplyHelp<VarRef>::divide_exact(v, Multiply)); }
+
+  Var getBaseVar() const { return data.getBaseVar(); }
 
 #ifdef WDEG
   int getBaseWdeg()

@@ -45,7 +45,7 @@ namespace BuildCon
 
 /// Helper function used in a few places.
 AnyVarRef
-get_AnyVarRef_from_Var(StateObj* stateObj, ProbSpec::Var v);
+get_AnyVarRef_from_Var(StateObj* stateObj, Var v);
 
 /// Create all the variables used in the CSP.
 void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars);

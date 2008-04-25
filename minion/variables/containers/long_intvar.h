@@ -34,6 +34,8 @@ Use of this variable in a constraint:
 eq(x, 2) #variable x equals 2
 */
 
+#include "../../CSPSpec.h"
+
 #include "../../constraints/constraint_abstract.h"
 
 template<typename d_type>
@@ -544,6 +546,9 @@ public:
     D_ASSERT(inDomain(b, v));
     return v; 
   }
+
+  Var getBaseVar(const BigRangeVarRef_internal& b) const
+  { return Var(VAR_DISCRETE, b.var_num); }
 
 #ifdef WDEG
   int getBaseWdeg(const BigRangeVarRef_internal& b)

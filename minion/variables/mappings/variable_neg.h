@@ -29,17 +29,17 @@
 
 #include "../../constraints/constraint_abstract.h"
 
-template<typename Var>
+template<typename VarT>
 struct VarNeg
 {
   static const BOOL isBool = false;
-  static const BoundType isBoundConst = Var::isBoundConst;
-  Var data;
+  static const BoundType isBoundConst = VarT::isBoundConst;
+  VarT data;
 
   BOOL isBound()
   { return data.isBound();}
   
-  VarNeg(Var _data) : data(_data)
+  VarNeg(VarT _data) : data(_data)
   {}
   
   VarNeg() : data()
@@ -131,6 +131,8 @@ struct VarNeg
   { return VarIdent(negT, 0, data.getIdent()); }
 
   DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(-v); }
+
+  Var getBaseVar() const { return data.getBaseVar(); }
 
 #ifdef WDEG
   int getBaseWdeg()

@@ -134,6 +134,12 @@ struct InfoRefType
     return data.getBaseVal(v);
   }
 
+  Var getBaseVar() const 
+  { 
+    VAR_INFO_ADDONE(VAR_TYPE, getBaseVar);
+    return data.getBaseVar(); 
+  }
+
 #ifdef WDEG
   int getBaseWdeg()
   { 

@@ -42,6 +42,8 @@ Use of this variable in a constraint:
 eq(myvar, 4) #variable myvar equals 4
 */
 
+#include "../../CSPSpec.h"
+
 #include "../../constraints/constraint_abstract.h"
 
 template<typename BoundType>
@@ -159,6 +161,8 @@ struct BoundVarRef_internal
     D_ASSERT(inDomain(v));
     return v; 
   }
+
+  Var getBaseVar() const { return Var(VAR_BOUND, var_num); }
   
 #ifdef WDEG
   int getBaseWdeg()

@@ -24,6 +24,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "../../CSPSpec.h"
 
 #include "../../constraints/constraint_abstract.h"
 
@@ -125,6 +126,8 @@ struct ShiftVar
   DomainInt getBaseVal(DomainInt v) const {
     return data.getBaseVal(v - shift);
   }
+
+  Var getBaseVar() const { return data.getBaseVar(); }
 
 #ifdef WDEG
   int getBaseWdeg()

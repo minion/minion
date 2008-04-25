@@ -29,6 +29,8 @@
 #ifndef VARREFTYPE_H
 #define VARREFTYPE_H
 
+#include "../CSPSpec.h"
+
 // The follow three types are designed to allow turning a variable type which
 // must be fed to a container, into a stand-alone class which is ready to be
 // used as a variable.
@@ -111,6 +113,9 @@ struct VarRefType
 
   DomainInt getBaseVal(DomainInt v) const
   { return GET_CONTAINER().getBaseVal(data, v); }
+
+  Var getBaseVar() const
+  { return GET_CONTAINER().getBaseVar(data); }
 
 #ifdef WDEG
   int getBaseWdeg()
@@ -211,6 +216,9 @@ struct QuickVarRefType
   DomainInt getBaseVal(DomainInt v) const
   { return data.getBaseVal(v); }
 
+  Var getBaseVar() const
+  { return data.getBaseVar(); }
+
 #ifdef WDEG
   int getBaseWdeg()
   { return GET_CONTAINER().getBaseWdeg(data); }
@@ -300,6 +308,9 @@ struct CompleteVarRefType
 
   DomainInt getBaseVal(DomainInt v) const
   { return (data.getCon()).getBaseVal(v); }
+
+  Var getBaseVar() const
+  { return (data.getCon()).getBaseVar(); }
 
 #ifdef WDEG
   int getBaseWdeg()
