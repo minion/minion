@@ -192,7 +192,7 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
 	cerr << "So there is not support for the " << constraint.name << "." << endl;
 	exit(1);
 #else
-	if(reified)
+	if(reified && constraint.type == CT_REIFY)
 	{
 	  cerr << "Cannot reify a watched constraint!" << endl;
 	  exit(1);
@@ -211,7 +211,7 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
 	case CT_REIFYIMPLY:
 	  { 
 	  if(reified)
-		throw parse_exception("Can't reify a reified constraint!");
+		  throw parse_exception("Can't reify a reified constraint!");
 	  readConstraint(infile, true);
 	  
 	  infile->check_sym(',');

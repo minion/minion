@@ -44,7 +44,7 @@ class Queues
   // normal queue is empty. This list is at the moment only used
   // by reified constraints when they want to start propagation.
   // I don't like it, but it is necesasary.
-  vector<Constraint*> special_triggers;
+  vector<AbstractConstraint*> special_triggers;
   
 #ifndef NO_DYN_CHECK
   DynamicTrigger* next_queue_ptr;
@@ -57,7 +57,7 @@ public:
   Queues(StateObj* _stateObj) : next_queue_ptr(NULL), stateObj(_stateObj)
   {}
   
-  void pushSpecialTrigger(Constraint* trigger)
+  void pushSpecialTrigger(AbstractConstraint* trigger)
   {
       CON_INFO_ADDONE(AddSpecialToQueue);
       special_triggers.push_back(trigger);
@@ -234,7 +234,7 @@ public:
 		return;
 	  
 	  D_INFO(1, DI_QUEUE, string("Doing a special trigger!"));
-	  Constraint* trig = special_triggers.back();
+	  AbstractConstraint* trig = special_triggers.back();
 	  special_triggers.pop_back();
 	  CON_INFO_ADDONE(SpecialTrigger);
 	  trig->special_check();
@@ -372,7 +372,7 @@ public:
 		return;
 	  
 	  D_INFO(1, DI_QUEUE, string("Doing a special trigger!"));
-	  Constraint* trig = special_triggers.back();
+	  AbstractConstraint* trig = special_triggers.back();
 	  special_triggers.pop_back();
 	  CON_INFO_ADDONE(SpecialTrigger);
 	  trig->special_check();

@@ -461,7 +461,7 @@ BOOL MinionThreeInputReader<FileReader>::readConstraint(FileReader* infile, BOOL
     cerr << "So there is not support for the " << constraint.name << "." << endl;
     exit(1);
 #else
-    if(reified)
+    if(reified && constraint.type == CT_REIFY)
     {
       cerr << "Cannot reify a watched constraint!" << endl;
       exit(1);

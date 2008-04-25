@@ -99,6 +99,7 @@ namespace Controller
 
 #include "constraints/reify.h"
 #include "constraints/reify_true.h"
+#include "dynamic_constraints/dynamic_reifyimply.h"
 
 #include "preprocess.h"
 #include "constraint_setup.h"

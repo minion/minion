@@ -85,6 +85,20 @@ class AbstractConstraint
 
   unsigned int incWdeg();
 #endif
+
+  /// Allows functions to activate a special kind of trigger, run only
+  /// after the normal queue is empty.
+  virtual void special_check()
+  { 
+	cerr << "Serious internal error" << endl;
+	FAIL_EXIT(); 
+  }
+  
+  virtual void special_unlock()
+  { 
+	cerr << "Serious internal error" << endl;
+	FAIL_EXIT(); 
+  }
   
   /// Checks if an assignment is satisfied.
   /** This takes the variable order returned by, and is mainly only used by, get_table_constraint() */

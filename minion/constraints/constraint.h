@@ -89,22 +89,7 @@ public:
 	cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
 	FAIL_EXIT(); 
   }
-  
-  /// Allows functions to activate a special kind of trigger, run only
-  /// after the normal queue is empty.
-  virtual void special_check()
-  { 
-	cerr << "Serious internal error" << endl;
-	FAIL_EXIT(); 
-  }
-  
-  virtual void special_unlock()
-  { 
-	cerr << "Serious internal error" << endl;
-	FAIL_EXIT(); 
-  }
-  
-  
+    
   /// Returns the reverse of the current constraint
   /** Used by rarification */
   virtual Constraint* reverse_constraint()

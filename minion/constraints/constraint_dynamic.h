@@ -171,7 +171,7 @@ public:
   
   /// Actually creates the dynamic triggers. Calls dynamic_trigger_count from function to get
   /// the number of triggers required.
-  void setup()
+  virtual void setup()
   {
     int trigs = dynamic_trigger_count();
     D_ASSERT(trigs >= 0);
