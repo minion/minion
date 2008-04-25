@@ -944,6 +944,10 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
     
     # tablegen, an object with a printtable function.
     
+    if reifyimply:
+        # if a GAC constraint is reifyimplied, it no longer gets GAC.
+        treesame=False
+    
     if reify or reifyimply:
         # add extra bool variable.
         varnums=[1]+varnums
