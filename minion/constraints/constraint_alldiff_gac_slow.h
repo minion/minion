@@ -397,7 +397,8 @@ struct AlldiffGacSlow : public Constraint
   virtual BOOL check_unsat(int i, DomainDelta)
   {
     int v_size = var_array.size();
-	D_ASSERT(var_array[i].isAssigned());
+	if(!var_array[i].isAssigned()) return false;
+    
 	DomainInt assign_val = var_array[i].getAssignedValue();
     for(int loop = 0; loop < v_size; ++loop)
 	{
