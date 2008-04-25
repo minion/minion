@@ -120,9 +120,6 @@ struct ShiftVar
   void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
 
-  VarIdent getIdent()
-  { return VarIdent(shiftT, shift, data.getIdent()); }
-
   DomainInt getBaseVal(DomainInt v) const {
     return data.getBaseVal(v - shift);
   }

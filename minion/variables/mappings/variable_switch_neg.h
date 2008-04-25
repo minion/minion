@@ -163,9 +163,6 @@ struct SwitchNeg
   void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
 
-  VarIdent getIdent()
-  { return VarIdent(switch_negT, multiplier, data.getIdent()); }
-
   DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(v * multiplier); }
 
   Var getBaseVar() const { return data.getBaseVar(); }

@@ -138,9 +138,6 @@ struct VarNot
   void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
 
-  VarIdent getIdent()
-  { return VarIdent(notVarT, 0, data.getIdent()); }
-
   DomainInt getBaseVal(DomainInt v) const
   { return data.getBaseVal(swap(v)); }
 

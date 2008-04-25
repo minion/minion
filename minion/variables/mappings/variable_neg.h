@@ -127,9 +127,6 @@ struct VarNeg
   void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
 
-  VarIdent getIdent()
-  { return VarIdent(negT, 0, data.getIdent()); }
-
   DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(-v); }
 
   Var getBaseVar() const { return data.getBaseVar(); }

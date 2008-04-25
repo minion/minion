@@ -538,9 +538,6 @@ public:
 #endif
   }
 
-  VarIdent getIdent(const BigRangeVarRef_internal& b)
-  { return VarIdent(discreteT, noneT, b.var_num, 0); }
-
   DomainInt getBaseVal(const BigRangeVarRef_internal& b, DomainInt v) const 
   {
     D_ASSERT(inDomain(b, v));

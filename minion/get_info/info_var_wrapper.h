@@ -122,12 +122,6 @@ struct InfoRefType
     data.addConstraint(c);
   }
 
-  VarIdent getIdent()
-  { 
-    VAR_INFO_ADDONE(VAR_TYPE, getIdent);
-    return data.getIdent();
-  }
-
   DomainInt getBaseVal(DomainInt v) const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getBaseVal);

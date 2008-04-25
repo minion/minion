@@ -109,9 +109,6 @@ struct ConstantVar
 
   void addConstraint(AbstractConstraint* c){ ; }
 
-  VarIdent getIdent()
-  { return VarIdent(constT, constantT, val, val); }
-
   DomainInt getBaseVal(DomainInt v) const 
   { 
     D_ASSERT(v == val);

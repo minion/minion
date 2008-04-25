@@ -153,9 +153,6 @@ struct BoundVarRef_internal
   void addConstraint(AbstractConstraint* c)
   { GET_LOCAL_CON().addConstraint(*this, c); }
 
-  VarIdent getIdent()
-  { return GET_LOCAL_CON().getIdent(*this); }
-
   DomainInt getBaseVal(DomainInt v) const 
   {
     D_ASSERT(inDomain(v));
@@ -425,11 +422,6 @@ struct BoundVarContainer {
 #ifdef WDEG
     if(getOptions(stateObj).wdeg_on) wdegs[b.var_num] += c->getWdeg(); //add constraint score to base var wdeg
 #endif
-  }
-
-  VarIdent getIdent(const BoundVarRef_internal<BoundType>& b)
-  { 
-    return VarIdent(boundsT, noneT, b.var_num, 0); 
   }
 
 #ifdef WDEG

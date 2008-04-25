@@ -119,8 +119,6 @@ ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 #include "../solver.h"
 #include "../constraints/triggers.h"
 
-#include "ident.h"
-
 class AbstractConstraint;
 class DynamicTrigger;
 
@@ -145,7 +143,6 @@ struct AnyVarRef_Abstract
   virtual void addTrigger(Trigger t, TrigType type) = 0;
   virtual vector<AbstractConstraint*>* getConstraints() = 0;
   virtual void addConstraint(AbstractConstraint* c) = 0;
-  virtual VarIdent getIdent() = 0;
   virtual DomainInt getBaseVal(DomainInt) const = 0;
   virtual Var getBaseVar() const = 0;
 #ifdef WDEG
@@ -232,9 +229,6 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 
   virtual void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
-
-  virtual VarIdent getIdent()
-  { return data.getIdent(); }
 
   virtual DomainInt getBaseVal(DomainInt v) const
   { return data.getBaseVal(v); }
@@ -338,9 +332,6 @@ public:
 
   void addConstraint(AbstractConstraint* c)
   { data->addConstraint(c); }
-
-  VarIdent getIdent()
-  { return data->getIdent(); }
 
   DomainInt getBaseVal(DomainInt v) const
   { return data->getBaseVal(v); }

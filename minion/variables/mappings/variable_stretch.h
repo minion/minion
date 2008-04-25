@@ -409,9 +409,6 @@ struct MultiplyVar
   void addConstraint(AbstractConstraint* c)
   { data.addConstraint(c); }
 
-  VarIdent getIdent()
-  { return VarIdent(stretchT, Multiply, data.getIdent()); }
-
   DomainInt getBaseVal(DomainInt v) const
   { return data.getBaseVal(MultiplyHelp<VarRef>::divide_exact(v, Multiply)); }
 
