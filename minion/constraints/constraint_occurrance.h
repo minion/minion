@@ -37,6 +37,162 @@ vector vec.
 This constraint is not reifiable.
 */
 
+template<typename VarArray, typename Val>
+struct ConstantOccurrenceEqualConstraint : public Constraint
+{
+  virtual string constraint_name()
+  { return "OccurrenceEqual"; }
+  
+  typedef typename VarArray::value_type VarRef;
+  
+  ReversibleInt occurrences_count;
+  ReversibleInt not_occurrences_count;
+  VarArray var_array;
+  
+  int val_count_min;
+  int val_count_max;
+  Val value;
+  
+  ConstantOccurrenceEqualConstraint(StateObj* _stateObj, const VarArray& _var_array, const Val& _value, 
+                            int _val_count_min, int _val_count_max) :
+    Constraint(_stateObj), occurrences_count(_stateObj), not_occurrences_count(_stateObj),
+    var_array(_var_array), val_count_min(_val_count_min), val_count_max(_val_count_max), value(_value)
+  { }
+  
+  virtual triggerCollection setup_internal()
+  {
+    D_INFO(2,DI_SUMCON,"Setting up Constraint");
+    triggerCollection t;
+    occurrences_count = 0; 
+    not_occurrences_count = 0;
+    for(unsigned int i=0; i < var_array.size(); ++i)
+      t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
+    return t;
+  }
+  
+  void occurrence_limit_reached()
+  {
+    D_INFO(1,DI_SUMCON,"Occurrence Limit Reached");
+    D_ASSERT(val_count_max <= occurrences_count);
+    int occs = 0;
+    typename VarArray::iterator end_it(var_array.end());
+    for(typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
+    {
+      if(it->isAssigned())
+      { 
+        if(it->getAssignedValue() == value) 
+        ++occs;
+      }
+      else
+      { 
+        it->removeFromDomain(value);
+      }
+    }
+    if(val_count_max < occs) 
+      getState(stateObj).setFailed(true);
+  }
+  
+  void not_occurrence_limit_reached()
+  {
+    D_INFO(1,DI_SUMCON,"Not Occurrence Limit Reached");
+    D_ASSERT(not_occurrences_count >= static_cast<int>(var_array.size()) - val_count_min);
+    int occs = 0;
+    typename VarArray::iterator end_it(var_array.end());
+    for( typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
+    {
+      if(it->isAssigned())
+      { 
+      if(it->getAssignedValue() != value) 
+        ++occs; 
+      }
+      else
+      { it->propagateAssign(value); }
+    }
+    if(val_count_min > static_cast<int>(var_array.size()) - occs)
+      getState(stateObj).setFailed(true);
+  }
+  
+  PROPAGATE_FUNCTION(int i, DomainDelta)
+  {
+	  PROP_INFO_ADDONE(OccEqual);
+    D_ASSERT(i >= 0);
+    
+    if( var_array[i].getAssignedValue() == value )
+    {
+      ++occurrences_count;
+      if(val_count_max < occurrences_count)
+        getState(stateObj).setFailed(true);
+      if(occurrences_count == val_count_max)
+        occurrence_limit_reached();
+    }
+    else
+    {
+      ++not_occurrences_count;
+      if(val_count_min > static_cast<int>(var_array.size()) - not_occurrences_count)
+        getState(stateObj).setFailed(true);
+      if(not_occurrences_count == static_cast<int>(var_array.size()) - val_count_min )
+        not_occurrence_limit_reached();
+    }
+  }
+  
+  void setup_counters()
+  {
+    int occs = 0;
+	  int not_occs = 0;
+    typename VarArray::iterator end_it(var_array.end());
+    for(typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
+    {
+      if(it->isAssigned())
+	    {
+  	    if(it->getAssignedValue() == value)
+  	      ++occs;
+  		  else
+  	      ++not_occs;
+      }
+    }
+    occurrences_count = occs;
+	  not_occurrences_count = not_occs;
+  }
+  
+  virtual void full_propagate()
+  {
+    D_INFO(1, DI_SUMCON, "Start full propagate");
+    if(val_count_max < 0 || val_count_min > (int)var_array.size())
+      getState(stateObj).setFailed(true);
+    setup_counters();
+    D_INFO(1,DI_SUMCON,to_string("Full Propagate, count", occurrences_count));
+    
+    if(val_count_max < occurrences_count)
+      getState(stateObj).setFailed(true);
+
+    if(val_count_min > static_cast<int>(var_array.size()) - not_occurrences_count)
+      getState(stateObj).setFailed(true);
+        
+    if(occurrences_count == val_count_max)
+      occurrence_limit_reached();
+    if(not_occurrences_count == static_cast<int>(var_array.size()) - val_count_min)
+      not_occurrence_limit_reached();
+  }
+  
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  {
+    D_ASSERT(v_size == var_array.size());
+    DomainInt count = 0;  
+    for(int i = 0; i < v_size - 1; ++i)
+      count += (*(v + i) == value);
+    return (count >= val_count_min) && (count <= val_count_max);
+  }
+  
+  virtual vector<AnyVarRef> get_vars()
+  {
+    vector<AnyVarRef> vars;
+	  vars.reserve(var_array.size());
+	  for(unsigned i = 0; i < var_array.size(); ++i)
+	    vars.push_back(AnyVarRef(var_array[i]));
+	  return vars;
+  }
+};
+
 template<typename VarArray, typename Val, typename ValCount>
 struct OccurrenceEqualConstraint : public Constraint
 {
@@ -202,6 +358,14 @@ OccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& _value, 
   (new OccurrenceEqualConstraint<VarArray,Val, ValCount>(stateObj, _var_array,  _value, _val_count)); 
 }
 
+template<typename VarArray, typename Val>
+Constraint*
+ConstantOccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& _value, int _val_count_min, int _val_count_max)
+{ 
+  return 
+  (new ConstantOccurrenceEqualConstraint<VarArray,Val>(stateObj, _var_array,  _value, _val_count_min, _val_count_max)); 
+}
+
 template<typename T1, typename T2, typename T3>
 Constraint*
 BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T2& t2, const T3& t3, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
@@ -214,3 +378,26 @@ BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T2& t2, const T3& t3,
   { return OccEqualCon(stateObj, t1, runtime_val(val_to_count), t3[0]); } 
 }
 
+template<typename T1>
+Constraint*
+BuildCT_LEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+{
+  int val_to_count = b.vars[1][0].pos;
+  int occs = b.vars[2][0].pos;
+  if(reify) 
+    { return reifyCon(stateObj, ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), 0, occs), reifyVar); } 
+  else 
+    { return ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), 0, occs); } 
+}
+
+template<typename T1>
+Constraint*
+BuildCT_GEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+{
+  int val_to_count = b.vars[1][0].pos;
+  int occs = b.vars[2][0].pos;
+  if(reify) 
+  { return reifyCon(stateObj, ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), occs, t1.size()), reifyVar); } 
+  else 
+  { return ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), occs, t1.size()); } 
+}
