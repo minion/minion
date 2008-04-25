@@ -85,7 +85,7 @@ struct BoolBinarySATConstraintDynamic : public DynamicConstraint
 	  var2.propagateAssign(true);
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
     return (v[0] != 0) || (v[1] != 0);
   }

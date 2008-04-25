@@ -88,7 +88,7 @@ class AbstractConstraint
   
   /// Checks if an assignment is satisfied.
   /** This takes the variable order returned by, and is mainly only used by, get_table_constraint() */
-  virtual BOOL check_assignment(vector<DomainInt>) = 0;
+  virtual BOOL check_assignment(DomainInt* v, int v_size) = 0;
     
   virtual ~AbstractConstraint()
   {}

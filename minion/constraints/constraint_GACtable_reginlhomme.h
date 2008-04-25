@@ -483,11 +483,11 @@ struct GACTableConstraint : public DynamicConstraint
 	}
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
     for(unsigned i = 0; i < (tupleList)->size(); ++i)
 	{
-	  if( std::equal(v.begin(), v.end(), (*tupleList)[i]) )
+	  if( std::equal(v, v + size, (*tupleList)[i]) )
 	    return true;
 	}
 	return false;

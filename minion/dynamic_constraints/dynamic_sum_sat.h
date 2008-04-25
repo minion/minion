@@ -156,10 +156,9 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 	var_array[loop].addDynamicTrigger(dt, UpperBound);
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-    D_ASSERT(v.size() == var_array.size());
-    int v_size = v.size();
+    D_ASSERT(v_size == var_array.size());
 	int count = 0;
 	for(int i = 0; i < v_size; ++i)
 	  count += (v[i] == 1);

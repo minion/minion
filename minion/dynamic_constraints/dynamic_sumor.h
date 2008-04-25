@@ -236,7 +236,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     add_triggers(watched_values[triggerpair], trigs + triggerpair * 2);
   }
 
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
     int v_size1 = var_array1.size();
     int count = 0;

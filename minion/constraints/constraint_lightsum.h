@@ -85,14 +85,13 @@ struct LightLessEqualSumConstraint : public Constraint
     propagate(0,0);
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-    D_ASSERT(v.size() == var_array.size() + 1);
+    D_ASSERT(v_size == var_array.size() + 1);
     DomainInt sum = 0;
-    int v_size = v.size();
     for(int i = 0; i < v_size - 1; i++)
       sum += v[i];
-    return sum <= v.back();
+    return sum <= *(v + v_size - 1);
   }
   
   virtual vector<AnyVarRef> get_vars()

@@ -114,7 +114,7 @@ struct BoolOrConstraintDynamic : public DynamicConstraint
     var_array[other_var].propagateAssign(negs[other_var]);
   }
 
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
     D_INFO(2, DI_OR, "Checking soln in or constraint");
     for(int i = 0; i < no_vars; i++)

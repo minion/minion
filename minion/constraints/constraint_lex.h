@@ -328,9 +328,9 @@ struct LexLeqConstraint : public Constraint
     }
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-    D_ASSERT(v.size() == x.size() + y.size());
+    D_ASSERT(v_size == x.size() + y.size());
     size_t x_size = x.size();
 
     for(size_t i = 0;i < x_size; i++)

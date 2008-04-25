@@ -145,16 +145,15 @@ struct BoolLessSumConstraint : public Constraint
       limit_reached();  
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-    D_ASSERT(v.size() == var_array.size());
-    int v_size = v.size();
+    D_ASSERT(v_size == var_array.size());
     for(int i = 0; i < v_size; i++)
       D_ASSERT(v[i] == 0 || v[i] == 1);
     if(VarToCount)
-      return std::accumulate(v.begin(),v.end(),DomainInt(0)) <= var_sum;
+      return std::accumulate(v, v + v_size, DomainInt(0)) <= var_sum;
     else
-      return std::accumulate(v.begin(),v.end(),DomainInt(0)) >= var_sum;
+      return std::accumulate(v, v + v_size, DomainInt(0)) >= var_sum;
   }
   
   virtual vector<AnyVarRef> get_vars()

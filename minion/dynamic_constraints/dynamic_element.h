@@ -331,12 +331,12 @@ struct ElementConstraintDynamic : public DynamicConstraint
 	deal_with_assigned_index();
   }
   
-    virtual BOOL check_assignment(vector<DomainInt> v)
+    virtual BOOL check_assignment(DomainInt* v, int v_size)
 	{
-	  D_ASSERT(v.size() == var_array.size() + 2);
-	  DomainInt resultvariable = v[v.size() - 1];
-	  DomainInt indexvariable = v[v.size() - 2];
-	  if(indexvariable < 0 || indexvariable >= (int)v.size() - 2)
+	  D_ASSERT(v_size == var_array.size() + 2);
+	  DomainInt resultvariable = v[v_size - 1];
+	  DomainInt indexvariable = v[v_size - 2];
+	  if(indexvariable < 0 || indexvariable >= (int)v_size - 2)
 	    return false;
 	  return v[checked_cast<int>(indexvariable)] == resultvariable;
 	}

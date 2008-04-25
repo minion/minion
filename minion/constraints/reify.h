@@ -101,22 +101,23 @@ struct reify : public Constraint
     FAIL_EXIT();
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* vals, int v_size)
   {
+    vector<DomainInt> v(vals, vals + v_size);
     // This function is very slow compared to what it could be.
 	// This is unfortunate, but hopefully not important.
-	int vec1size = poscon->get_vars().size();
+	int vec1size = poscon->get_vars_singleton()->size();
     DomainInt back_val = v.back();
     v.pop_back();
     if(back_val != 0)
 	{
 	  v.erase(v.begin() + vec1size, v.end());
-      return poscon->check_assignment(v);
+      return poscon->check_assignment(&v.front(), v.size());
 	}
     else
 	{
 	  v.erase(v.begin(), v.begin() + vec1size);
-      return negcon->check_assignment(v);
+      return negcon->check_assignment(&v.front(), v.size());
 	}
   }
   

@@ -81,7 +81,7 @@ struct CheckAssignConstraint : public Constraint
 	    D_ASSERT(variables[i].isAssigned());
 		assignment[i] = variables[i].getAssignedValue();
 	  }
-	  if(!check_assignment(assignment))
+	  if(!check_assignment(&assignment.front(), assignment.size()))
 	    return true;
 	}
 	assigned_vars = count; 
@@ -104,7 +104,7 @@ struct CheckAssignConstraint : public Constraint
 	    D_ASSERT(variables[i].isAssigned());
 		assignment[i] = variables[i].getAssignedValue();
 	  }
-	  return !check_assignment(assignment);
+	  return !check_assignment(&assignment.front(), assignment.size());
 	}
 	return false;
   }
@@ -115,10 +115,10 @@ struct CheckAssignConstraint : public Constraint
 	  getState(stateObj).setFailed(true);
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-	D_ASSERT(v.size() == variables.size());
-    return !originalcon.check_assignment(v);
+	D_ASSERT(v_size == variables.size());
+    return !originalcon.check_assignment(v, v_size);
   }
   
   virtual vector<AnyVarRef> get_vars()

@@ -226,13 +226,13 @@ struct GACTableConstraint : public DynamicConstraint
       // cout << endl; cout << "  fp: finished finding supports: " << endl ;
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
     if(negative==0)
     {
         for(unsigned i = 0; i < tuples->size(); ++i)
         {
-          if( std::equal(v.begin(), v.end(), (*tuples)[i]) )
+          if( std::equal(v, v + v_size, (*tuples)[i]) )
             return true;
         }
         return false;
@@ -241,7 +241,7 @@ struct GACTableConstraint : public DynamicConstraint
     {
         for(unsigned i = 0; i < tuples->size(); ++i)
         {
-          if( std::equal(v.begin(), v.end(), (*tuples)[i]) )
+          if( std::equal(v, v + v_size, (*tuples)[i]) )
             return false;
         }
         return true;

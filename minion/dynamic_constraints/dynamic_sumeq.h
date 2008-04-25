@@ -86,7 +86,7 @@ struct SumEqConstraintDynamic : public DynamicConstraint
     return a;
   }
 
-  BOOL check_assignment(vector<DomainInt> v) {
+  BOOL check_assignment(DomainInt* v, int v_size) {
     D_INFO(1, DI_TABLECON, "sumeq: checking assignment");
     return xmult*v[0] + ymult*v[1] == v[2];
   }

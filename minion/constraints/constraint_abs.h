@@ -115,9 +115,9 @@ struct AbsConstraint : public Constraint
   }
   
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-    D_ASSERT(v.size() == 2);
+    D_ASSERT(v_size == 2);
     if(v[1] >= 0)
       return v[0] == v[1];
     else

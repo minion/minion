@@ -321,9 +321,9 @@ struct ElementConstraint : public Constraint
     
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-    int length = v.size();
+    int length = v_size;
     if(v[length-2] < 0 || v[length-2] > length - 3)
 	  return false;
     return v[checked_cast<int>(v[length-2])] == v[length-1];

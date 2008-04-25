@@ -71,7 +71,7 @@ struct GadgetConstraint : public Constraint
 	return t;
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   { 
     cout << "Gadget Assignment:" << v << endl;
     return true;

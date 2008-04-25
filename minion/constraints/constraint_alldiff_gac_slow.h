@@ -414,10 +414,10 @@ struct AlldiffGacSlow : public Constraint
   virtual void full_propagate()
   { do_prop(); }
 	
-	virtual BOOL check_assignment(vector<DomainInt> v)
+	virtual BOOL check_assignment(DomainInt* v, int v_size)
 	{
-	  D_ASSERT(v.size() == var_array.size());
-	  int array_size = v.size();
+	  D_ASSERT(v_size == var_array.size());
+	  int array_size = v_size;
 	  for(int i=0;i<array_size;i++)
 		for( int j=i+1;j<array_size;j++)
 		  if(v[i]==v[j]) return false;

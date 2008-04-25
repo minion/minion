@@ -41,8 +41,8 @@ struct TableConstraint : public Constraint
   virtual vector<AnyVarRef> get_vars()
   { return vars; }
   
-  virtual BOOL check_assignment(vector<DomainInt> vals)
-  { return constraint->check_assignment(vals); }
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  { return constraint->check_assignment(v, v_size); }
   
   virtual triggerCollection setup_internal()
   {

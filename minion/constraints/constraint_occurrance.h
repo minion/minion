@@ -172,15 +172,13 @@ struct OccurrenceEqualConstraint : public Constraint
       not_occurrence_limit_reached();
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-    D_ASSERT(v.size() == var_array.size() + 1);
+    D_ASSERT(v_size == var_array.size() + 1);
     DomainInt count = 0;  
-    typename vector<DomainInt>::iterator end_it(v.end());
-    end_it--;
-    for( typename vector<DomainInt>::iterator it=v.begin(); it < end_it; ++it)
-      count += (*it == value);
-    return count == v.back();
+    for(int i = 0; i < v_size - 1; ++i)
+      count += (*(v + i) == value);
+    return count == *(v + v_size - 1);
   }
   
   virtual vector<AnyVarRef> get_vars()

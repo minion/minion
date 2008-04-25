@@ -53,12 +53,13 @@ struct reify_true : public Constraint
   virtual Constraint* reverse_constraint()
   { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-    DomainInt back_val = v.back();
-    v.pop_back();
+    
+    DomainInt back_val = *(v + v_size - 1);
+    //v.pop_back();
     if(back_val != 0)
-      return poscon->check_assignment(v);
+      return poscon->check_assignment(v, v_size - 1);
     else
       return true;
   }

@@ -108,9 +108,9 @@ struct DivConstraint : public Constraint
     propagate(-3,0);
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-	D_ASSERT(v.size() == 3);
+	D_ASSERT(v_size == 3);
 	return v[0] / v[1] == v[2];
   }
   

@@ -41,9 +41,11 @@ namespace Controller
   template<typename T>
 	void check_constraint(StateObj* stateObj, T* con)
   {
-	  vector<AnyVarRef> variables = con->get_vars();
-	  unsigned vec_size = variables.size();	  
-	  vector<DomainInt> values(vec_size);
+	  vector<AnyVarRef>& variables = *(con->get_vars_singleton());
+	  unsigned vec_size = variables.size();	 
+	  
+    DomainInt* values = (DomainInt*) alloca(vec_size * sizeof(DomainInt)); 
+	  //vector<DomainInt> values(vec_size);
 
 	  for(unsigned loop = 0; loop < vec_size; ++loop)
 	  {
@@ -56,7 +58,7 @@ namespace Controller
 		values[loop] = variables[loop].getAssignedValue();
 	  }
 	  
-	  if(!con->check_assignment(values))
+	  if(!con->check_assignment(values, vec_size))
 	  {
 	    cerr << "A " << con->constraint_name() << " constraint is not satisfied by this sol!" << endl;
 		cerr << "The constraint is over the following variables:" << endl;

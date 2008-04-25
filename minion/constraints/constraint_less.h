@@ -101,9 +101,9 @@ struct LeqConstraint : public Constraint
     propagate(1,0);
   }
   
-  virtual BOOL check_assignment(vector<DomainInt> v)
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-	D_ASSERT(v.size() == 2);
+	D_ASSERT(v_size == 2);
 	return v[0] <= (v[1] + offset);
   }
   
