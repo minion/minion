@@ -4,7 +4,7 @@
 # For now, you can try adding it to the end, it seems having multiple 
 # directories does not hurt.
 
-BOOSTINCLUDE = -I/usr/local/include/boost-1_35/
+BOOSTINCLUDE = -I/usr/local/include/boost-1_35/ 
 FLAGS = -DWATCHEDLITERALS
 LINKFLAGS = 
 NAMEBASE = minion
@@ -43,7 +43,13 @@ endif
 ifdef BOOST
   NAMEBASE := $(NAMEBASE)-boost
   FLAGS := $(FLAGS) $(BOOSTINCLUDE) -DUSE_BOOST
-  LINKFLAGS := $(LINKFLAGS) -lz -lbz2
+  ifdef STATIC
+    NAMEBASE := $(NAMEBASE)-static
+    LINKFLAGS := $(LINKFLAGS) external_deps/zlib-1.2.3/libz.a external_deps/bzip2-1.0.5/libbz2.a
+    BOOSTINCLUDE := $(BOOSTINCLUDE) -Iexternal_deps/zlib-1.2.3/ -Iexternal_deps/bzip2-1.0.5/
+  else
+    LINKFLAGS := $(LINKFLAGS) -lz -lbz2
+  endif
 endif
 OUTDIR=bin
 
@@ -71,6 +77,8 @@ FULLFLAGS=-Wextra -Wno-sign-compare $(DEBUG_FLAGS) $(FLAGS) $(CPU) $(MYFLAGS)
 
 OBJFILES=$(patsubst minion/%.cpp,$(OBJDIR)/%.o,$(SRC))
 
+external: 
+	cd external_deps/ && ./build_external_deps.sh
 all: minion generate
 
 minion/svn_header.h: .DUMMY
@@ -91,7 +99,7 @@ $(OBJDIR)/minion.o : minion/svn_header.h
 $(OBJDIR)/%.o: minion/%.cpp 
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
-minion: depend mkdirectory $(OBJFILES)	
+minion: depend mkdirectory external $(OBJFILES)	
 	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES) $(LINKFLAGS)
 	
 mkdirectory:
@@ -133,8 +141,10 @@ objclean:
 
 clean:
 	rm -rf bin/minion bin/minion-* bin/objdir-minion* bin/bibd bin/golomb bin/solitaire bin/steelmill bin/sports
+	cd external_deps/bzip2-1.0.5/ && make clean
+	cd external_deps/zlib-1.2.3/ && make clean
 
-veryclean:
+veryclean: clean
 	rm -rf bin/*
 
 .DUMMY:
