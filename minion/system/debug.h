@@ -42,6 +42,7 @@ struct parse_exception : public std::exception
 
 #define D_FATAL_ERROR(s) { D_FATAL_ERROR2(s,  __FILE__, to_string(__LINE__)); throw 0; }
 
+#define INPUT_ERROR(s) { cout << "There was a problem in your input file:\n" << s << endl; exit(0); }
 // These functions are defined in debug_functions.cpp
 
 extern bool debug_crash;

@@ -75,12 +75,12 @@ CSPInstance readInput(InputReader* infile, bool parser_verbose)
 {  
   string test_name = infile->get_string();
   if(test_name != "MINION")
-    D_FATAL_ERROR("All Minion input files must begin 'MINION'");
+    INPUT_ERROR("All Minion input files must begin 'MINION'");
   
   int inputFileVersionNumber = infile->read_num();
   
   if(inputFileVersionNumber > 3)
-    D_FATAL_ERROR("This version of Minion only supports formats up to 3");
+    INPUT_ERROR("This version of Minion only supports formats up to 3");
   
 
   

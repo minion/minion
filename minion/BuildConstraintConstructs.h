@@ -114,7 +114,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }
 	  case VAR_SPARSEDISCRETE:	
-		D_FATAL_ERROR( "Sparse Discrete Variables current broken. Sorry");
+		INPUT_ERROR( "Sparse Discrete Variables current broken. Sorry");
 		
 	  case VAR_CONSTANT:
 	  {
@@ -137,7 +137,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 	  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
   }
   // This FAIL_EXIT is here to stop a "no return in non-void function" warning. It should never be reached.
-  D_FATAL_ERROR( "This should never be reached..");
+  INPUT_ERROR( "This should never be reached..");
 }  
 
 

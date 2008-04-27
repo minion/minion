@@ -50,7 +50,7 @@ struct GadgetConstraint : public Constraint
     for(int i = 0; i < gadget_instance->constructionSite.size(); ++i)
       construction_vars.push_back(get_AnyVarRef_from_Var(gadget_stateObj, gadget_instance->constructionSite[i]));
     if(construction_vars.size() != var_array.size())
-      D_FATAL_ERROR("Gadgets construction site");
+      INPUT_ERROR("Gadgets construction site is incorrect size");
   }
   
   virtual ~GadgetConstraint()
@@ -182,7 +182,7 @@ Constraint*
 BuildCT_GADGET(StateObj* stateObj, const Vars& vars, BOOL reify, const BoolVarRef& reifyvar, ConstraintBlob& blob)
 {
   if(reify)
-  {  D_FATAL_ERROR("Can't reify gadget constraints. Sorry."); }
+  {  INPUT_ERROR("Can't reify gadget constraints. Sorry."); }
   else
     return gadgetCon(stateObj, vars, blob);
 }
@@ -192,5 +192,5 @@ BuildCT_GADGET(StateObj* stateObj, const Vars& vars, BOOL reify, const BoolVarRe
 template<typename Vars>
 Constraint*
 BuildCT_GADGET(StateObj* stateObj, const Vars& vars, BOOL reify, const BoolVarRef& reifyvar, ConstraintBlob& blob)
-{ D_FATAL_ERROR("This constraint requires REENTER support."); }
+{ INPUT_ERROR("This constraint requires REENTER support."); }
 #endif

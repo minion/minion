@@ -270,10 +270,10 @@ DynamicConstraint*
 BuildCT_WATCHED_HAMMING(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   if(!(b.vars[2].size() == 1 && b.vars[2][0].type == VAR_CONSTANT))
-    D_FATAL_ERROR("Last parameter of 'ineq' constraints must be a constant!");
+    INPUT_ERROR("Last parameter of 'ineq' constraints must be a constant!");
   
   if(reify)
-    { D_FATAL_ERROR("Can't reify a hamming constraint."); }
+    { INPUT_ERROR("Can't reify a hamming constraint."); }
   else
   { return VecOrCountConDynamic(stateObj, t1, t2, b.vars[2][0].pos); }
 }

@@ -145,7 +145,7 @@ Constraint*
 BuildCT_ABS(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
 {
   if(reify)
-    { D_FATAL_ERROR("Can't reify an 'abs' constraint."); }
+    { INPUT_ERROR("Can't reify an 'abs' constraint."); }
   else
   { return AbsCon(stateObj, t1[0],t2[0]); }
 }

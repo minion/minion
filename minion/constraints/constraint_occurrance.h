@@ -41,7 +41,7 @@ template<typename VarArray, typename Val>
 struct ConstantOccurrenceEqualConstraint : public Constraint
 {
   virtual string constraint_name()
-  { return "OccurrenceEqual"; }
+  { return "OccurrenceLeq/Geq"; }
   
   typedef typename VarArray::value_type VarRef;
   
@@ -178,7 +178,7 @@ struct ConstantOccurrenceEqualConstraint : public Constraint
   {
     D_ASSERT(v_size == var_array.size());
     DomainInt count = 0;  
-    for(int i = 0; i < v_size - 1; ++i)
+    for(int i = 0; i < v_size; ++i)
       count += (*(v + i) == value);
     return (count >= val_count_min) && (count <= val_count_max);
   }

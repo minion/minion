@@ -53,7 +53,7 @@ struct SumEqConstraintDynamic : public DynamicConstraint
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
     if(xmult < 1 || ymult < 1)
-      D_FATAL_ERROR("Multipliers on gacsum must be > 0")
+      INPUT_ERROR("Multipliers on gacsum must be > 0")
     D_INFO(1, DI_TABLECON, "sumeq: Constructor here!");
   }
 
@@ -334,7 +334,7 @@ SumEqConDynamic(StateObj* stateObj, const light_vector<int>& consts, const VarAr
   typedef typename Var::value_type VarT;
   
   if(consts.size() != 2 || _var_array.size() != 2)
-    D_FATAL_ERROR("gacsum only accepts two variables on the left hand side.");
+    INPUT_ERROR("gacsum only accepts two variables on the left hand side.");
 
   return new SumEqConstraintDynamic<ValT,ValT,VarT>(stateObj, 
    consts[0], consts[1], _var_array[0], _var_array[1], var[0]);

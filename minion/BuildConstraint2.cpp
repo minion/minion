@@ -40,11 +40,11 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
 		  case VAR_DISCRETE:
 			return AnyVarRef(getVars(stateObj).getBigRangevarContainer().get_var_num(v.pos));
 		  case VAR_SPARSEDISCRETE:	
-			D_FATAL_ERROR("Sparse Discrete not supported at present");
+			INPUT_ERROR("Sparse Discrete not supported at present");
 		  case VAR_CONSTANT:
 			return AnyVarRef(ConstantVar(stateObj, v.pos));
 		  default:
-		    D_FATAL_ERROR("Unknown Error.");
+		    INPUT_ERROR("Unknown Error.");
 		}
 }
 
@@ -55,7 +55,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
 	  vector<int> final_val_order;
 	  vector<AnyVarRef> final_var_order;
 	  if(instance.var_order.size() < instance.val_order.size())
-      D_FATAL_ERROR("Variable order cannot be shorter than value order.");
+      INPUT_ERROR("Variable order cannot be shorter than value order.");
     
     if(instance.var_order.size() > instance.val_order.size())
     {
@@ -87,7 +87,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
     getVars(stateObj).getBigRangevarContainer().addVariables(vars.discrete);
 	
 	for(unsigned int i = 0; i < vars.sparse_discrete.size(); ++i)
-	{ D_FATAL_ERROR("Sparse discrete disabled at present due to bugs. Sorry."); }
+	{ INPUT_ERROR("Sparse discrete disabled at present due to bugs. Sorry."); }
   }
 	
 }
