@@ -379,7 +379,9 @@ try {
     // I'm not completely sure, but it works this way.
     string fname = getOptions(stateObj).instance_name;
     const char* filename = getOptions(stateObj).instance_name.c_str();
-    string extension = fname.substr(fname.find_last_of("."), fname.size());
+    string extension;
+    if(fname.find_last_of(".") < fname.size())
+      extension = fname.substr(fname.find_last_of("."), fname.size());
      
 #ifdef USE_BOOST
     ifstream file(filename, ios_base::in | ios_base::binary);
@@ -403,13 +405,13 @@ try {
 #else
      if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp" ||
         extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
-     { D_FATAL_ERROR("This copy of Minion was built without gzip and bzip2 support!"); }
+     { INPUT_ERROR("This copy of Minion was built without gzip and bzip2 support!"); }
 
     ifstream ifm(filename);
     ConcreteFileReader<ifstream> infile(ifm, filename);
 #endif 
-    if (infile.failed_open()) {
-      D_FATAL_ERROR("Can't open given input file '" + getOptions(stateObj).instance_name + "'.");
+    if (infile.failed_open() || infile.eof()) {
+      INPUT_ERROR("Can't open given input file '" + getOptions(stateObj).instance_name + "'.");
     }   
     instance = readInput(&infile, getOptions(stateObj).parser_verbose);
   }
