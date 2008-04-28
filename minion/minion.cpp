@@ -385,6 +385,10 @@ try {
      
 #ifdef USE_BOOST
     ifstream file(filename, ios_base::in | ios_base::binary);
+    
+     if (!file) {
+        INPUT_ERROR("Can't open given input file '" + getOptions(stateObj).instance_name + "'.");
+      }
     filtering_istream in;
     
     if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp")
