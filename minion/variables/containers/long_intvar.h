@@ -374,12 +374,11 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array.ifMember_remove(
     commonAssign(d,i, lower_bound(d), upper_bound(d)); 
   }
 
-  void decisionAssign(BigRangeVarRef_internal d, DomainInt offset)
+  void decisionAssign(BigRangeVarRef_internal d, DomainInt i)
   {
-    DomainInt lower = lower_bound(d);
-    DomainInt upper = upper_bound(d);
-    if(!validAssignment(d, offset, lower, upper)) return;
-    commonAssign(d, offset, lower, upper);
+    D_ASSERT(inDomain(d,i));
+    D_ASSERT(!isAssigned(d));
+    commonAssign(d,i, lower_bound(d), upper_bound(d)); 
   }
     
 private:

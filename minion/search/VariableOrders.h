@@ -83,7 +83,7 @@ struct VariableOrder
 	  assign_val = var_order[pos].getMin();
 	else
 	  assign_val = var_order[pos].getMax();
-	var_order[pos].uncheckedAssign(assign_val);
+	var_order[pos].decisionAssign(assign_val);
 	maybe_print_search_assignment(stateObj, var_order[pos], assign_val, true);
 	branches.push_back(pos);
     first_unassigned_variable.push_back(pos);
