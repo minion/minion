@@ -87,6 +87,9 @@ struct ShiftVar
   void propagateAssign(DomainInt b)
   { data.propagateAssign(b - shift); }
   
+  void decisionAssign(DomainInt b)
+  { data.decisionAssign(b - shift); }
+  
   void removeFromDomain(DomainInt b)
   { data.removeFromDomain(b - shift); }
     

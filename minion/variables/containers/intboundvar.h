@@ -140,7 +140,10 @@ struct BoundVarRef_internal
   
   void propagateAssign(DomainInt b)
   { GET_LOCAL_CON().propagateAssign(*this, b); }
-  
+
+  void decisionAssign(DomainInt b)
+  { GET_LOCAL_CON().decisionAssign(*this, b); }
+
   void removeFromDomain(DomainInt b)
   { GET_LOCAL_CON().removeFromDomain(*this, b); }
   
@@ -279,8 +282,8 @@ struct BoundVarContainer {
     D_FATAL_ERROR( "Cannot Remove Value from domain of a bound var");
     FAIL_EXIT();
   }
-  
-  void propagateAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
+
+  void internalAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
   {
     DomainInt min_val = getMin(d);
     DomainInt max_val = getMax(d);
@@ -306,12 +309,18 @@ struct BoundVarContainer {
     lower_bound(d) = i;
   }
   
+  void propagateAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
+  { internalAssign(d, i); }
+  
   // TODO : Optimise
   void uncheckedAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
   { 
     D_ASSERT(inDomain(d,i));
-    propagateAssign(d,i); 
+    internalAssign(d, i);
   }
+
+  void decisionAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
+  { internalAssign(d, i); }
   
   void setMax(const BoundVarRef_internal<BoundType>& d, DomainInt i)
   {

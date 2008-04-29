@@ -340,22 +340,30 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array.ifMember_remove(
 #endif
     return;
   }
-  
-  void propagateAssign(BigRangeVarRef_internal d, DomainInt offset)
+
+  BOOL validAssignment(BigRangeVarRef_internal d, DomainInt offset, DomainInt lower, DomainInt upper)
   {
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     if(!inDomain(d,offset))
-	  {getState(stateObj).setFailed(true); return;}
-	DomainInt lower = lower_bound(d);
-	DomainInt upper = upper_bound(d);
+    {
+      getState(stateObj).setFailed(true); 
+      return false;
+    }
     if(offset == upper && offset == lower)
-      return;
-	
-	if(offset > upper || offset < lower)
-	{
-	  getState(stateObj).setFailed(true);
-	  return;
-	}
+      return false;
+    if(offset > upper || offset < lower)
+    {
+      getState(stateObj).setFailed(true);
+      return false;
+    }
+    return true;
+  }    
+  
+  void propagateAssign(BigRangeVarRef_internal d, DomainInt offset)
+  {
+    DomainInt lower = lower_bound(d);
+    DomainInt upper = upper_bound(d);
+    if(!validAssignment(d, offset, lower, upper)) return;
     commonAssign(d, offset, lower, upper);
   }
 
@@ -364,6 +372,14 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array.ifMember_remove(
     D_ASSERT(inDomain(d,i));
     D_ASSERT(!isAssigned(d));
     commonAssign(d,i, lower_bound(d), upper_bound(d)); 
+  }
+
+  void decisionAssign(BigRangeVarRef_internal d, DomainInt offset)
+  {
+    DomainInt lower = lower_bound(d);
+    DomainInt upper = upper_bound(d);
+    if(!validAssignment(d, offset, lower, upper)) return;
+    commonAssign(d, offset, lower, upper);
   }
     
 private:

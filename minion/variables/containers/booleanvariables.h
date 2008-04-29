@@ -267,8 +267,8 @@ struct BooleanContainer
     else
       uncheckedAssign(d,1-b);
   }
-  
-  void uncheckedAssign(const BoolVarRef_internal& d, DomainInt b)
+
+  void internalAssign(const BoolVarRef_internal& d, DomainInt b)
   {
     D_ASSERT(lock_m && d.var_num < var_count_m);
     D_ASSERT(!d.isAssigned());
@@ -297,16 +297,22 @@ struct BooleanContainer
     }
   }
   
+  void uncheckedAssign(const BoolVarRef_internal& d, DomainInt b)
+  { internalAssign(d, b); }
+  
   void propagateAssign(const BoolVarRef_internal& d, DomainInt b)
   {
     if(!d.isAssigned()) 
-      uncheckedAssign(d,b);
+      internalAssign(d,b);
     else
     {
       if(d.getAssignedValue() != b)
 	getState(stateObj).setFailed(true);
     }
   }
+
+  void decisionAssign(const BoolVarRef_internal& d, DomainInt b)
+  { internalAssign(d, b); }
 
   void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type)
   { 

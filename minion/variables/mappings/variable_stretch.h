@@ -366,6 +366,9 @@ struct MultiplyVar
   void propagateAssign(DomainInt b)
   { data.propagateAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); }
   
+  void decisionAssign(DomainInt b)
+  { data.decisionAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); }
+  
   void removeFromDomain(DomainInt)
   { FAIL_EXIT(); }
 

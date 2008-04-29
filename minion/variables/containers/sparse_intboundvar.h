@@ -281,18 +281,18 @@ struct SparseBoundVarContainer {
     D_FATAL_ERROR("Cannot Remove Value from domain of a bound var");
     FAIL_EXIT();
   }
-  
-  
-  void propagateAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
+
+  void internalAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
   {
     vector<BoundType>& bounds = get_domain(d);
+    DomainInt min_val = getMin(d);
+    DomainInt max_val = getMax(d);
+
     if(!binary_search(bounds.begin(), bounds.end(), i))
     {
       getState(stateObj).setFailed(true);
       return;
     }
-    DomainInt min_val = getMin(d);
-    DomainInt max_val = getMax(d);
     if(min_val > i || max_val < i)
     {
       getState(stateObj).setFailed(true);
@@ -301,7 +301,7 @@ struct SparseBoundVarContainer {
     
     if(min_val == max_val)
       return;
-    
+
     trigger_list.push_domain(d.var_num);
     trigger_list.push_assign(d.var_num, i);
     
@@ -317,11 +317,17 @@ struct SparseBoundVarContainer {
     
     upper_bound(d) = i;
     lower_bound(d) = i;
-  }
+  }    
+  
+  void propagateAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
+  { internalAssign(d, i); }
   
   // TODO : Optimise
   void uncheckedAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
-  { propagateAssign(d,i); }
+  { internalAssign(d, i); }
+
+  void decisionAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
+  { internalAssign(d, i); }
   
   void setMax(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
   {
