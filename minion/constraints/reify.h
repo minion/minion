@@ -26,12 +26,12 @@
 
 /** @help constraints;reify References
 See
-   help constraints reifiable
+   help constraints reification
 */
 
 /** @help constraints;reifyimply References
 See
-   help constraints reifiable
+   help constraints reification
 */
 
 /** @help constraints;reification Description
