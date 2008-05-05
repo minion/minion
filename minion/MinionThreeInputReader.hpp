@@ -1023,6 +1023,14 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
       parser_info("Read var order, length " +
         to_string(instance.var_order.size()));
     }
+    else if(var_type == "PERMUTATION")
+    {
+      if(!instance.permutation.empty())
+        throw parse_exception("Can't have two PERMUTATIONs!");
+      instance.permutation = readLiteralVector(infile);
+      parser_info("Read permutation, length " +
+        to_string(instance.permutation.size()));      
+    }
     else if(var_type == "VALORDER")
     {
       if(!instance.val_order.empty())

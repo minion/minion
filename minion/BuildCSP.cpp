@@ -10,6 +10,7 @@
 #include "search/standard_search.h"
 #include "search/recursive_search.h"
 #include "search/conflict_search.h"
+#include "search/group_search.h"
 
 #include "search/search_control.h"
 
@@ -61,9 +62,9 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
   }
   
   // Solve!
-  getState(stateObj).getTimer().maybePrintTimestepStore("Setup Time: ", "SetupTime", tableout, !getOptions(stateObj).print_only_solution);
+  getState(stateObj).getOldTimer().maybePrintTimestepStore("Setup Time: ", "SetupTime", oldtableout, !getOptions(stateObj).print_only_solution);
   Controller::initalise_search(stateObj);
-  getState(stateObj).getTimer().maybePrintTimestepStore("Initial Propagate: ", "InitialPropagate", tableout, !getOptions(stateObj).print_only_solution);
+  getState(stateObj).getOldTimer().maybePrintTimestepStore("Initial Propagate: ", "InitialPropagate", oldtableout, !getOptions(stateObj).print_only_solution);
   
 }
 
@@ -85,19 +86,19 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   if(!getState(stateObj).isFailed())
   {
     PropogateCSP(stateObj, args.preprocess, var_val_order.first, true);
-	  getState(stateObj).getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !getOptions(stateObj).print_only_solution);
+	  getState(stateObj).getOldTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", oldtableout, !getOptions(stateObj).print_only_solution);
 	  if(!getState(stateObj).isFailed())
     {
       switch(args.prop_method)
       {
         case PropLevel_GAC:
-          solve(stateObj, args.order, var_val_order, PropagateGAC());   // add a getState(stateObj).getTimer().maybePrintTimestepStore to search..
+          solve(stateObj, args.order, var_val_order, instance, PropagateGAC());   // add a getState(stateObj).getOldTimer().maybePrintTimestepStore to search..
           break;
         case PropLevel_SAC:
-          solve(stateObj, args.order, var_val_order, PropagateSAC());
+          solve(stateObj, args.order, var_val_order, instance, PropagateSAC());
           break;
         case PropLevel_SSAC:
-          solve(stateObj, args.order, var_val_order, PropagateSSAC());
+          solve(stateObj, args.order, var_val_order, instance, PropagateSSAC());
           break;
         default:
           abort();
@@ -106,22 +107,22 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   }
   else
   {
-    getState(stateObj).getTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", tableout, !getOptions(stateObj).print_only_solution);
+    getState(stateObj).getOldTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", oldtableout, !getOptions(stateObj).print_only_solution);
   }
   
-  getState(stateObj).getTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", tableout, !getOptions(stateObj).print_only_solution);
+  getState(stateObj).getOldTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", oldtableout, !getOptions(stateObj).print_only_solution);
   cout << "Total Nodes: " << getState(stateObj).getNodeCount() << endl;
   cout << "Problem solvable?: " 
   << (getState(stateObj).getSolutionCount() == 0 ? "no" : "yes") << endl;
   cout << "Solutions Found: " << getState(stateObj).getSolutionCount() << endl;
   
-  tableout.set("Nodes", to_string(getState(stateObj).getNodeCount()));
-  tableout.set("Satisfiable", (getState(stateObj).getSolutionCount()==0 ? 0 : 1));
-  tableout.set("SolutionsFound", getState(stateObj).getSolutionCount());
+  oldtableout.set("Nodes", to_string(getState(stateObj).getNodeCount()));
+  oldtableout.set("Satisfiable", (getState(stateObj).getSolutionCount()==0 ? 0 : 1));
+  oldtableout.set("SolutionsFound", getState(stateObj).getSolutionCount());
   
   if(getOptions(stateObj).tableout)
   {
-    tableout.print_line();  // Outputs a line to the table file.
+    oldtableout.print_line();  // Outputs a line to the table file.
   }
   
 #ifdef MORE_SEARCH_INFO

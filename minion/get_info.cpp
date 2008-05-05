@@ -116,7 +116,6 @@ void print_search_info()
   
    for(int j = 0; j < VarEventCount; ++j)  
    {
-     cout << j << endl;
      long long int total = 0;
      for(int i = 0; i < VarTypeCount; ++i)
        total += var_info.counters[i][j];

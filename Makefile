@@ -43,12 +43,12 @@ endif
 ifdef BOOST
   NAMEBASE := $(NAMEBASE)-boost
   FLAGS := $(FLAGS) $(BOOSTINCLUDE) -DUSE_BOOST
-  ifdef STATIC
-    NAMEBASE := $(NAMEBASE)-static
+  ifdef DYNAMIC
+    NAMEBASE := $(NAMEBASE)-dynamic
+    LINKFLAGS := $(LINKFLAGS) -lz -lbz2
+  else
     LINKFLAGS := $(LINKFLAGS) external_deps/zlib-1.2.3/libz.a external_deps/bzip2-1.0.5/libbz2.a
     BOOSTINCLUDE := $(BOOSTINCLUDE) -Iexternal_deps/zlib-1.2.3/ -Iexternal_deps/bzip2-1.0.5/
-  else
-    LINKFLAGS := $(LINKFLAGS) -lz -lbz2
   endif
 endif
 OUTDIR=bin

@@ -466,6 +466,7 @@ struct ConstraintBlob
   shared_ptr<TupleListContainer> tupleListContainer;
   vector<Var> var_order;
   vector<char> val_order;
+  vector<Var> permutation;
 
   /// Only used for gadgets.
   vector<Var> constructionSite;

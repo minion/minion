@@ -57,7 +57,7 @@ class SearchState
   bool failed;
   jmp_buf g_env;
   
-  TimerClass timer;
+  TimerClass oldtimer;
   
   shared_ptr<TupleListContainer> tupleListContainer;
 
@@ -112,7 +112,7 @@ public:
   // variables.
   bool* getFailedPtr() { return &failed; }
   
-  TimerClass& getTimer() { return timer; }
+  TimerClass& getOldTimer() { return oldtimer; }
   
   
   jmp_buf* getJmpBufPtr() { return &g_env; }
@@ -159,10 +159,15 @@ public:
 class SearchOptions
 {
 public:
+
 #ifdef WDEG
   /// Denotes if wdeg is turned on
   bool wdeg_on;
 #endif
+
+  /// Denotes if only generators for group should be found (only makes sense for groups)
+  bool find_generators;
+
   /// Denotes if only solutions should be printed.
   bool print_only_solution;
   /// Denotes if the search tree should be printed.
@@ -201,11 +206,12 @@ public:
   /// The filename of the current input file (-- if reading from command line)
   string instance_name;
   
+
   SearchOptions() : 
 #ifdef WDEG
     wdeg_on(false),
 #endif
-    print_only_solution(false), dumptree(false), sollimit(1), fullpropagate(false), 
+     find_generators(false), print_only_solution(false), dumptree(false), sollimit(1), fullpropagate(false), 
 #ifdef NO_DEBUG
     nocheck(true),
 #else

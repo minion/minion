@@ -59,7 +59,7 @@
 
 #include "solver.h"
 
-VARDEF(TableOut tableout);
+VARDEF(TableOut oldtableout);
 VARDEF(ofstream solsoutFile);
 
 #include "memory_management/backtrackable_memory.h"

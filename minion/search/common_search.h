@@ -118,7 +118,7 @@ namespace Controller
           if (!getOptions(stateObj).print_only_solution) 
           {
 	    cout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
-	    getState(stateObj).getTimer().printTimestepWithoutReset("Time:");
+	    getState(stateObj).getOldTimer().printTimestepWithoutReset("Time:");
 	    cout << "Nodes: " << getState(stateObj).getNodeCount() << endl << endl;
           }
     }
@@ -145,10 +145,10 @@ namespace Controller
 
   	  if(getOptions(stateObj).time_limit != 0)
   	  {
-  	    if(getState(stateObj).getTimer().checkTimeout(getOptions(stateObj).time_limit))
+  	    if(getState(stateObj).getOldTimer().checkTimeout(getOptions(stateObj).time_limit))
   	    {
   		  cout << "Time out." << endl;
-            tableout.set("TimeOut", 1);
+            oldtableout.set("TimeOut", 1);
   		  return true;
   	    }
   	  }
@@ -189,7 +189,7 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
 	}
     // Note that sollimit = -1 if all solutions should be found.
 	if(getState(stateObj).getSolutionCount() == getOptions(stateObj).sollimit)
-	  throw 0;
+	  throw EndOfSearch();
   }
 
   void inline set_optimise_and_propagate_queue(StateObj* stateObj)
@@ -224,7 +224,7 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
   getState(stateObj).setupAlarm();
   install_ctrlc_trigger(stateObj);
 	lock(stateObj);
-	getState(stateObj).getTimer().printTimestepWithoutReset("First Node Time: ");
+	getState(stateObj).getOldTimer().printTimestepWithoutReset("First Node Time: ");
 	/// Failed initially propagating constraints!
 	if(getState(stateObj).isFailed())
 	  return;

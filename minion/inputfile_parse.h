@@ -19,7 +19,7 @@ void ReadCSP(Reader& reader, FileReader* infile)
 #endif
   
   reader.read(infile) ;
-  tableout.set(string("Filename"), infile->filename);
+  oldtableout.set(string("Filename"), infile->filename);
 #ifndef NOCATCH
 }
 catch(parse_exception& s)

@@ -23,6 +23,18 @@ using namespace ProbSpec;
 namespace BuildCon
 {  
 
+vector<AnyVarRef>
+get_AnyVarRef_from_Var(StateObj* stateObj, const vector<Var>& vec)
+{
+  vector<AnyVarRef> ret_vec;
+  ret_vec.reserve(vec.size());
+  
+  for(int i = 0; i < vec.size(); ++i)
+    ret_vec.push_back(get_AnyVarRef_from_Var(stateObj, vec[i]));
+  
+  return ret_vec;
+}
+
 /// Helper function used in a few places.
 AnyVarRef
 get_AnyVarRef_from_Var(StateObj* stateObj, Var v)

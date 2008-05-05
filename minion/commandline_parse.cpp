@@ -7,6 +7,8 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
     const string command(argv[i]);
 	if(command == string("-findallsols"))
 	{ getOptions(stateObj).findAllSolutions(); }
+	else if(command == string("-findgenerators"))
+  { getOptions(stateObj).find_generators = true; }
 	else if(command == string("-crash"))
   { debug_crash = true; }
 	else if(command == string("-quiet"))
@@ -135,7 +137,7 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
     {
         getOptions(stateObj).tableout=true;
         ++i;
-        tableout.set_filename(argv[i]);
+        oldtableout.set_filename(argv[i]);
     }
     else if(command == string("-solsout") || command == string("-solsout0"))
     {
@@ -169,5 +171,5 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
       else
           s=s+argv[i];
   }
-  tableout.set("CommandLineArguments", s);
+  oldtableout.set("CommandLineArguments", s);
 }

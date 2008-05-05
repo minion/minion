@@ -289,10 +289,6 @@ specifies as ordering it will randomly permute this. If no ordering is
 specified a random permutation of all the variables is used.
 */
 
-
-
-
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //Entrance:
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -328,7 +324,7 @@ int main(int argc, char** argv) {
 try {
   StateObj* stateObj = new StateObj();
 
-  getState(stateObj).getTimer().startClock();
+  getState(stateObj).getOldTimer().startClock();
   
   cout << "# " << VERSION << endl ;
   cout << "# Svn version: " << SVN_VER << endl; 
@@ -428,7 +424,7 @@ try {
   getState(stateObj).setTupleListContainer(instance.tupleListContainer);
   
   // Copy args into tableout
-  tableout.set("RandomSeed", to_string(args.random_seed));
+  oldtableout.set("RandomSeed", to_string(args.random_seed));
   {   const char * b = "";
     switch (args.preprocess) {
       case PropLevel_None:
@@ -442,12 +438,12 @@ try {
       case PropLevel_SSACBounds:
         b = "SSACBounds"; break;
     }
-    tableout.set("Preprocess", string(b));
+    oldtableout.set("Preprocess", string(b));
   }
   // should be one for varorder as well.
-  tableout.set("MinionVersion", SVN_VER);
-  tableout.set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-  getState(stateObj).getTimer().maybePrintTimestepStore("Parsing Time: ", "ParsingTime", tableout, !getOptions(stateObj).print_only_solution);
+  oldtableout.set("MinionVersion", SVN_VER);
+  oldtableout.set("TimeOut", 0); // will be set to 1 if a timeout occurs.
+  getState(stateObj).getOldTimer().maybePrintTimestepStore("Parsing Time: ", "ParsingTime", oldtableout, !getOptions(stateObj).print_only_solution);
   
   BuildCSP(stateObj, instance);
   SolveCSP(stateObj, instance, args);
