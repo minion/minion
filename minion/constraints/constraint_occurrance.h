@@ -33,8 +33,61 @@ ensures that there are count occurrences of the value elem in the
 vector vec.
 */
 
+/** @help constraints;occurrence Notes
+elem must be a constant, not a variable.
+*/
+
 /** @help constraints;occurrence Reifiability
 This constraint is not reifiable.
+*/
+
+/** @help constraints;occurrence References
+help constraints occurrenceleq
+help constraints occurrencegeq
+*/
+
+/** @help constraints;occurrenceleq Description
+The constraint
+
+   occurrenceleq(vec, elem, count)
+
+ensures that there are AT MOST count occurrences of the value elem in
+the vector vec.
+*/
+
+/** @help constraints;occurrenceleq Notes
+elem must be a constant
+*/
+
+/** @help constraints;occurrenceleq Reifiability
+This constraint is not reifiable.
+*/
+
+/** @help constraints;occurrenceleq References
+help constraints occurrence
+help constraints occurrencegeq
+*/
+
+/** @help constraints;occurrencegeq Description
+The constraint
+
+   occurrencegeq(vec, elem, count)
+
+ensures that there are AT LEAST count occurrences of the value elem in
+the vector vec.
+*/
+
+/** @help constraints;occurrencegeq Notes
+elem must be a constant
+*/
+
+/** @help constraints;occurrencegeq Reifiability
+This constraint is not reifiable.
+*/
+
+/** @help constraints;occurrencegeq References
+help constraints occurrence
+help constraints occurrenceleq
 */
 
 template<typename VarArray, typename Val>
