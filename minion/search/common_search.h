@@ -179,7 +179,8 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
 	  {
 		cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
 		cerr << "Put it in the variable ordering?" << endl;
-		FAIL_EXIT();
+    cerr << "Aborting Search" << endl;
+		exit(1);
 	  }
 	  
 	  cout << "Solution found with Value: " 

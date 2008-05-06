@@ -77,8 +77,8 @@ public:
   /** This function is used by rarification */
   virtual BOOL full_check_unsat()
   { 
-	cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
-	FAIL_EXIT(); 
+	  cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    exit(1); 
   }
     
   /// Checks incrementaly if constraint cannot be satisfied.
@@ -86,16 +86,16 @@ public:
   /** This function should not be called unless check_unsat_full is called first. This is used by rarification */
   virtual BOOL check_unsat(int,DomainDelta)
   { 
-	cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
-	FAIL_EXIT(); 
+	  cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    exit(1); 
   }
     
   /// Returns the reverse of the current constraint
   /** Used by rarification */
   virtual Constraint* reverse_constraint()
   { 
-	cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
-    FAIL_EXIT();
+	  cerr << "Reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    exit(1);
   }
 };
 

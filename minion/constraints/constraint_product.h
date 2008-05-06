@@ -70,7 +70,7 @@ struct ProductConstraint : public Constraint
 	    cerr << "Fatal error." << endl;
 	    cerr << "Product([a,b],c) must satisfy the condition:" << endl;
 	    cerr << "For all assigments to a and b, |a*b| < 2^31" << endl;
-		FAIL_EXIT();
+      exit(1);
 	  }
   }
   

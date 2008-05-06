@@ -54,7 +54,7 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
 #else
       cout << "Sorry, cannot process this constraint as it needs dynamic triggers or watched literals." << endl ;
       cout << "use an alternative encoding or recompile with -DWATCHEDLITERALS or -DDYNAMICTRIGGERS in command line" << endl;
-      FAIL_EXIT();
+      exit(1);
 #endif
     }
     else
