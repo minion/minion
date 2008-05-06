@@ -126,6 +126,9 @@ struct ConstraintBlob
   /// A vector of signs. Only used for SAT clause "or" constraint.
   vector<int> negs;
   
+  /// A vector of constants, for any constraint which reads a constant array
+  vector<vector<int> > constants;
+  
   /// For use in Gadget constraints, lists the propagation level to be achieved.
   PropagationLevel gadget_prop_type;
 

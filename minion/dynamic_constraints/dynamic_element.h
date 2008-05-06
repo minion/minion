@@ -355,24 +355,23 @@ struct ElementConstraintDynamic : public DynamicConstraint
 };
 
 
-
-// Note: we pass into the first vector into this function by value rather
-// than by const reference because we want to change it.
 template<typename Var1, typename Var2>
 DynamicConstraint*
-DynamicElementCon(StateObj* stateObj,Var1 vararray, const Var2& v1)
+DynamicElementCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var1& v2)
 { 
-  // Because we can only have two things which are parsed at the moment, we do
-  // a dodgy hack and store the last variable on the end of the vararray
-  // during parsing. Now we must pop it back off.
-  typedef typename Var1::value_type VarRef1;
-  typedef typename Var2::value_type VarRef2;
-  VarRef1 assignval = vararray.back();
-  vararray.pop_back();
-  return new ElementConstraintDynamic<Var1, VarRef2, VarRef1>(stateObj, vararray, v1[0], assignval);  
+  return new ElementConstraintDynamic<Var1, typename Var2::value_type, typename Var1::value_type>
+              (stateObj, vararray, v1[0], v2[0]);  
 }
 
-BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_ELEMENT, DynamicElementCon);
+template<typename Var1, typename Var2, typename Var3>
+DynamicConstraint*
+DynamicElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3& v2)
+{ 
+  return new ElementConstraintDynamic<Var1, typename Var2::value_type, AnyVarRef>
+              (stateObj, vararray, v1[0], AnyVarRef(v2[0]));  
+}
+
+BUILD_DYNAMIC_CONSTRAINT3(CT_WATCHED_ELEMENT, DynamicElementCon);
 
 
 

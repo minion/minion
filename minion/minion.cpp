@@ -27,28 +27,15 @@
 using namespace ProbSpec;
 
 #include "BuildConstraint.h"
-#include "MinionInputReader.h"
+//#include "MinionInputReader.h"
 
 #include "inputfile_parse.h"
+#include "commandline_parse.h"
 
 #include "svn_header.h"
 
 #include "system/defined_macros.h"
 
-#include "commandline_parse.h"
-
-#ifdef USE_BOOST
-#include <fstream>
-#include <iostream>
-#include <boost/iostreams/filtering_streambuf.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/filter/bzip2.hpp>
-
-using namespace boost;
-using namespace iostreams;
-#endif
 
 /** @help switches Description 
 Minion supports a number of switches to augment default behaviour.  To
@@ -317,6 +304,7 @@ void print_default_help(char** argv)
   print_macros(); 
 }
 
+
 int main(int argc, char** argv) {
 // Wrap main in a try/catch just to stop exceptions leaving main,
 // as windows gets really annoyed when that happens.
@@ -369,57 +357,8 @@ try {
     cout << endl;
   }
   
-  if( getOptions(stateObj).instance_name != "--" )
-  {
-    // Why do I have to put this filename into a variable before I feed it into the ConcreteFileReader?
-    // I'm not completely sure, but it works this way.
-    string fname = getOptions(stateObj).instance_name;
-    const char* filename = getOptions(stateObj).instance_name.c_str();
-    string extension;
-    if(fname.find_last_of(".") < fname.size())
-      extension = fname.substr(fname.find_last_of("."), fname.size());
-     
-#ifdef USE_BOOST
-    ifstream file(filename, ios_base::in | ios_base::binary);
-    
-     if (!file) {
-        INPUT_ERROR("Can't open given input file '" + getOptions(stateObj).instance_name + "'.");
-      }
-    filtering_istream in;
-    
-    if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp")
-    {
-      cout << "# Using gzip uncompression" << endl;
-      in.push(gzip_decompressor());
-    }    
-    
-    if(extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
-    {
-      cout << "# Using bzip2 uncompression" << endl;
-      in.push(bzip2_decompressor());
-    }
-        
-    in.push(file);
-    
-    ConcreteFileReader<filtering_istream> infile(in, filename);
-#else
-     if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp" ||
-        extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
-     { INPUT_ERROR("This copy of Minion was built without gzip and bzip2 support!"); }
-
-    ifstream ifm(filename);
-    ConcreteFileReader<ifstream> infile(ifm, filename);
-#endif 
-    if (infile.failed_open() || infile.eof()) {
-      INPUT_ERROR("Can't open given input file '" + getOptions(stateObj).instance_name + "'.");
-    }   
-    instance = readInput(&infile, getOptions(stateObj).parser_verbose);
-  }
-  else
-  {
-    ConcreteFileReader<std::basic_istream<char, std::char_traits<char> > > infile(cin, "Standard Input");
-    instance = readInput(&infile, getOptions(stateObj).parser_verbose);
-  }
+  instance = readInputFromFile(getOptions(stateObj).instance_name, getOptions(stateObj).parser_verbose);
+  
 
   getState(stateObj).setTupleListContainer(instance.tupleListContainer);
   

@@ -8,5 +8,5 @@
 */
 
 #include "../dynamic_constraints/dynamic_element.h"
-BUILD_DYNAMIC_CT(CT_WATCHED_ELEMENT, 2)
+BUILD_DYNAMIC_CT(CT_WATCHED_ELEMENT, 3)
 

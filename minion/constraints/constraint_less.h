@@ -136,13 +136,11 @@ template<typename T1, typename T2>
 Constraint*
 BuildCT_INEQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
-  if(!(b.vars[2].size() == 1 && b.vars[2][0].type == VAR_CONSTANT))
-    INPUT_ERROR("Last parameter of 'ineq' constraints must be a constant!");
   
   if(reify)
-  { return reifyCon(stateObj, LeqCon(stateObj, t1[0], t2[0], runtime_val(b.vars[2][0].pos)), reifyVar); }
+  { return reifyCon(stateObj, LeqCon(stateObj, t1[0], t2[0], runtime_val(b.constants[0][0])), reifyVar); }
   else
-  { return LeqCon(stateObj, t1[0], t2[0], runtime_val(b.vars[2][0].pos)); }
+  { return LeqCon(stateObj, t1[0], t2[0], runtime_val(b.constants[0][0])); }
 }
 
 // This is mainly inline to avoid multiple definitions.

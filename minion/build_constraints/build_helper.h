@@ -49,6 +49,18 @@ Build ## CT_NAME(StateObj* stateObj, const T1& t1, const T2& t2, bool reify, \
   { return function(stateObj,t1,t2); } \
 }
 
+#define BUILD_CONSTRAINT2_WITH_BLOB(CT_NAME, function)  \
+template<typename T1, typename T2> \
+Constraint*\
+Build ## CT_NAME(StateObj* stateObj, const T1& t1, const T2& t2, bool reify, \
+				 const BoolVarRef& reifyVar, ConstraintBlob& b) \
+{ \
+  if(reify) \
+  { return reifyCon(stateObj, function(stateObj, t1,t2, b), reifyVar); } \
+  else \
+  { return function(stateObj,t1,t2, b); } \
+}
+
 #define BUILD_CONSTRAINT1(CT_NAME, function)  \
 template<typename T1> \
 Constraint*\
@@ -193,18 +205,6 @@ TYPE* \
 build_constraint_ ## CT_NAME(StateObj* stateObj, ConstraintBlob& b) \
 { return Build ## TYPE<CT_NAME, COUNT>::build(stateObj, EmptyType(), b, 0); }
 
-#define START_BUILDCON_INITIAL_LIST(CT_NAME, COUNT, TYPE) \
-TYPE* \
-build_constraint_ ## CT_NAME (StateObj* stateObj, ConstraintBlob& b) \
-  { \
-	  const vector<Var>& vars = b.vars[0]; \
-	  light_vector<int> weights(vars.size()); \
-	  for(unsigned i = 0; i < vars.size(); ++i) \
-		weights[i] = vars[i].pos; \
-	  return Build ## TYPE <CT_NAME, COUNT-1>::build(stateObj, make_pair(EmptyType(), &weights), b, 1); \
-  }
-
-
 #define BUILD_STATIC_CT(CT_NAME,COUNT) \
 START_BUILDCON(CT_NAME, COUNT, Constraint) \
 MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME, Constraint)
@@ -212,14 +212,6 @@ MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME, Constraint)
 #define BUILD_DYNAMIC_CT(CT_NAME,COUNT) \
 START_BUILDCON(CT_NAME, COUNT, DynamicConstraint) \
 MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME, DynamicConstraint)
-
-#define BUILD_STATIC_CT_INITIAL_LIST(CT_NAME, COUNT) \
-START_BUILDCON_INITIAL_LIST(CT_NAME, COUNT, Constraint) \
-MERGE(TERMINATE_BUILDCON,COUNT)(CT_NAME, Constraint)
-
-#define BUILD_DYNAMIC_CT_INITIAL_LIST(CT_NAME, COUNT) \
-START_BUILDCON_INITIAL_LIST(CT_NAME, COUNT, DynamicConstraint) \
-MERGE(TERMINATE_BUILDCON,COUNT)(CT_NAME, DynamicConstraint)
 
 #define BUILD_DEF_STATIC_CT(CT_NAME) \
 Constraint* build_constraint_ ## CT_NAME(StateObj* stateObj, ConstraintBlob&);

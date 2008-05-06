@@ -8,5 +8,5 @@
 */
 
 #include "../constraints/constraint_element.h"
-BUILD_STATIC_CT(CT_ELEMENT, 2)
+BUILD_STATIC_CT(CT_ELEMENT, 3)
 

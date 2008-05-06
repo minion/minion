@@ -198,9 +198,9 @@ GeqWeightBoolSumCon(StateObj* stateObj,const VarArray& _var_array, const WeightA
  
 template<typename T1, typename T2>
 Constraint*
-LeqWeightedSum(StateObj* stateObj, light_vector<int> scale, light_vector<T1> vec, const light_vector<T2>& t2)
+LeqWeightedSum(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>& t2, const ConstraintBlob& b)
 {
-  
+  vector<int> scale = b.constants[0];
   // Preprocess to remove any multiplications by 0, both for efficency
   // and correctness
   if(scale.size() != vec.size())
@@ -247,9 +247,9 @@ LeqWeightedSum(StateObj* stateObj, light_vector<int> scale, light_vector<T1> vec
 // Don't pass in the vectors by reference, as we might need to copy them.
 template<typename T1, typename T2>
 Constraint*
-GeqWeightedSum(StateObj* stateObj,light_vector<int> scale, light_vector<T1> vec, const light_vector<T2>& t2)
+GeqWeightedSum(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>& t2, const ConstraintBlob& b)
 {
-  
+  vector<int> scale = b.constants[0];
   // Preprocess to remove any multiplications by 0, both for efficency
   // and correctness
   if(scale.size() != vec.size())
@@ -306,6 +306,6 @@ GeqWeightedSum(const vector<int>& scale, const vector<BoolVarRef>& vec, const ve
 { return GeqWeightBoolSumCon(vec, scale, t2[0]); }
 */
 
-BUILD_CONSTRAINT3(CT_WEIGHTLEQSUM, LeqWeightedSum)
-BUILD_CONSTRAINT3(CT_WEIGHTGEQSUM, GeqWeightedSum)
+BUILD_CONSTRAINT2_WITH_BLOB(CT_WEIGHTLEQSUM, LeqWeightedSum)
+BUILD_CONSTRAINT2_WITH_BLOB(CT_WEIGHTGEQSUM, GeqWeightedSum)
 

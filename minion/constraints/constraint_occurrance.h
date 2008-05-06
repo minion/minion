@@ -419,11 +419,11 @@ ConstantOccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& 
   (new ConstantOccurrenceEqualConstraint<VarArray,Val>(stateObj, _var_array,  _value, _val_count_min, _val_count_max)); 
 }
 
-template<typename T1, typename T2, typename T3>
+template<typename T1, typename T3>
 Constraint*
-BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T2& t2, const T3& t3, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T3& t3, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
-  int val_to_count = b.vars[1][0].pos;
+  int val_to_count = b.constants[0][0];
 //  int occs = b.vars[2][0].pos;
   if(reify) 
   { return reifyCon(stateObj, OccEqualCon(stateObj, t1, runtime_val(val_to_count), t3[0]), reifyVar); } 
@@ -435,8 +435,8 @@ template<typename T1>
 Constraint*
 BuildCT_LEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
-  int val_to_count = b.vars[1][0].pos;
-  int occs = b.vars[2][0].pos;
+  int val_to_count = b.constants[0][0];
+  int occs = b.constants[1][0];
   if(reify) 
     { return reifyCon(stateObj, ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), 0, occs), reifyVar); } 
   else 
@@ -447,8 +447,8 @@ template<typename T1>
 Constraint*
 BuildCT_GEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
-  int val_to_count = b.vars[1][0].pos;
-  int occs = b.vars[2][0].pos;
+  int val_to_count = b.constants[0][0];
+  int occs = b.constants[1][0];
   if(reify) 
   { return reifyCon(stateObj, ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), occs, t1.size()), reifyVar); } 
   else 

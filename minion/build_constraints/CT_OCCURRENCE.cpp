@@ -8,5 +8,5 @@
 */
 
 #include "../constraints/constraint_occurrance.h"
-BUILD_STATIC_CT(CT_OCCURRENCE, 3)
+BUILD_STATIC_CT(CT_OCCURRENCE, 2)
 

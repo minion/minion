@@ -99,4 +99,6 @@ CSPInstance readInput(InputReader* infile, bool parser_verbose)
 
 }
 
+CSPInstance readInputFromFile(string fname, bool parser_verbose);
+
 #endif

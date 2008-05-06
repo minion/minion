@@ -301,11 +301,14 @@ using namespace ProbSpec;
 
 #include "MinionInputReader.h"
 
+extern ConstraintDef constraint_list[];
+
+#ifdef IN_MAIN
 #include "build_constraints/constraint_defs.h"
 int num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);
+#endif
 
-
-ConstraintDef& get_constraint(ConstraintType t)
+inline ConstraintDef& get_constraint(ConstraintType t)
 {
   for(int i = 0; i < num_of_constraints; ++i)
   {
@@ -471,11 +474,11 @@ BOOL MinionThreeInputReader<FileReader>::readConstraint(FileReader* infile, BOOL
 
   switch(constraint.type)
   {
-    case CT_ELEMENT:
-    case CT_WATCHED_ELEMENT:
-    case CT_GACELEMENT:
-    readConstraintElement(infile, constraint) ;
-    break;
+//    case CT_ELEMENT:
+//    case CT_WATCHED_ELEMENT:
+//    case CT_GACELEMENT:
+//    readConstraintElement(infile, constraint) ;
+//    break;
     case CT_REIFY:
     case CT_REIFYIMPLY:
     { 
@@ -520,7 +523,7 @@ void MinionThreeInputReader<FileReader>::readGeneralConstraint(FileReader* infil
   // This slightly strange code is to save copying the ConstraintBlob as much as possible.
   instance.add_constraint(ConstraintBlob(def));
   vector<vector<Var> >& varsblob = instance.constraints.back().vars;
-  varsblob.reserve(def.number_of_params);
+  vector<vector<int> >& constblob = instance.constraints.back().constants;
 
   for(int i = 0; i < def.number_of_params; ++i)
   {
@@ -542,20 +545,20 @@ void MinionThreeInputReader<FileReader>::readGeneralConstraint(FileReader* infil
       }
       break;
       case read_constant:
-      varsblob.push_back(make_vec(readIdentifier(infile)));
-      if(varsblob.back().back().type != VAR_CONSTANT)
-        throw parse_exception("Expected constant but got variable.");
+      constblob.push_back(make_vec(infile->read_num()));
       break;
       case read_constant_list:
       {
-        vector<Var> vectorOfConst ;
-        vectorOfConst = readLiteralVector(infile) ;
-        for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
-        {
-          if(vectorOfConst[loop].type != VAR_CONSTANT)
-            throw parse_exception("Vector must only contain constants.");
-        }
-        varsblob.push_back(vectorOfConst);
+        vector<Var> vectorOfConst = readLiteralVector(infile);
+        vector<int> vals;
+    		for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
+    		{
+    		  if(vectorOfConst[loop].type != VAR_CONSTANT)
+    			  throw parse_exception("Vector must only contain constants.");
+    			else
+            vals.push_back(vectorOfConst[loop].pos);
+    		}
+    		constblob.push_back(vals);
       }
       break;  
       default:

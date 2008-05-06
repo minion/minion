@@ -25,13 +25,12 @@
 */
 
 
-template<typename VarArray, typename IndexRef>
+template<typename VarArray, typename IndexRef, typename VarRef>
 struct GACElementConstraint : public Constraint
 {
   virtual string constraint_name()
   { return "GACElement"; }
   
-  typedef typename VarArray::value_type VarRef;
   VarArray var_array;
   IndexRef indexvar;
   VarRef resultvar;
@@ -136,7 +135,7 @@ struct GACElementConstraint : public Constraint
 		indexvar.removeFromDomain(prop_val);
 	  }
 	  
-	  VarRef& var = var_array[prop_val];
+	  typename VarArray::value_type& var = var_array[prop_val];
 	  
 	  DomainInt min_val = var.getInitialMin();
 	  DomainInt max_val = var.getInitialMax();
@@ -212,22 +211,23 @@ struct GACElementConstraint : public Constraint
 };
 
 
-// Note: we pass into the first vector into this function by value rather
-// than by const reference because we want to change it.
 template<typename Var1, typename Var2>
 Constraint*
-GACElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1)
+GACElementCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var1& v2)
 { 
-  // Because we can only have two things which are parsed at the moment, we do
-  // a dodgy hack and store the last variable on the end of the vararray
-  // during parsing. Now we must pop it back off.
-  typedef typename Var1::value_type VarRef1;
-  typedef typename Var2::value_type VarRef2;
-  VarRef1 assignval = vararray.back();
-  vararray.pop_back();
-  return new GACElementConstraint<Var1, VarRef2>(stateObj, vararray, v1[0], assignval);  
+  return new GACElementConstraint<Var1, typename Var2::value_type, typename Var1::value_type>
+              (stateObj, vararray, v1[0], v2[0]);  
 }
 
-BUILD_CONSTRAINT2(CT_GACELEMENT, GACElementCon);
+
+template<typename Var1, typename Var2, typename Var3>
+Constraint*
+GACElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3& v2)
+{ 
+  return new GACElementConstraint<Var1, typename Var2::value_type, AnyVarRef>
+              (stateObj, vararray, v1[0], AnyVarRef(v2[0]));  
+}
+
+BUILD_CONSTRAINT3(CT_GACELEMENT, GACElementCon);
 
 

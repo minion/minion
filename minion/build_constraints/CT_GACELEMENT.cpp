@@ -8,5 +8,5 @@
 */
 
 #include "../constraints/constraint_GACelement.h"
-BUILD_STATIC_CT(CT_GACELEMENT, 2)
+BUILD_STATIC_CT(CT_GACELEMENT, 3)
 

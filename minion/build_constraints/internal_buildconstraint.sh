@@ -1,6 +1,24 @@
 #!/bin/sh
 
-	echo BUILD_DEF \#\# $5\($3\) >> BuildConstraintsStart.h
+  count=0
+  for i in $*
+  do
+    echo $i
+    case "$i" in
+      "read_list")
+        count=$((count + 1))
+      ;;
+      "read_var")
+        count=$((count + 1))
+      ;;
+      "read_2_vars")
+        count=$((count + 1))
+      ;;
+    esac
+  done
+  
+  
+	echo BUILD_DEF \#\# $count\($3\) >> BuildConstraintsStart.h
 	
 	if [ "$1" = "STATIC_CT" ]; then
 	  echo case $3 : return build_constraint_$3\(stateObj, b\)\; >> BuildStaticStart.cpp
@@ -28,11 +46,7 @@
 	done
 	
 	
-    if [ "$6" = "read_constant_list" ]; then
-	  echo BUILD_$1_INITIAL_LIST\($3, $5\) >> $3.cpp
-	else
-	  echo BUILD_$1\($3, $5\) >> $3.cpp
-	fi
+ 	echo BUILD_$1\($3, $count\) >> $3.cpp
 	echo >> $3.cpp
 	
 	

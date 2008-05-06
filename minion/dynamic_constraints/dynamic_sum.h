@@ -354,7 +354,7 @@ BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<T>& t1, BOOL reify
 	  exit(0); 
   } 
   else 
-  { return BoolLessEqualSumConDynamic(stateObj, t1, runtime_val(b.vars[1][0].pos)); } \
+  { return BoolLessEqualSumConDynamic(stateObj, t1, runtime_val(b.constants[0][0])); } \
 }
 
 template<typename T>
@@ -374,7 +374,7 @@ BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const light_vector<T>& t1, BOOL reify,
   } 
   else 
   {
-	int sum = b.vars[1][0].pos;
+	int sum = b.constants[0][0];
 #ifndef SATSPECIAL1
 	if(sum == 1)
 	{

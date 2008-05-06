@@ -202,11 +202,11 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
 
   switch(constraint.type)
   {
-	case CT_ELEMENT:
-	case CT_WATCHED_ELEMENT:
-	case CT_GACELEMENT:
-	  readConstraintElement(infile, constraint) ;
-	  break;
+//	case CT_ELEMENT:
+//	case CT_WATCHED_ELEMENT:
+//	case CT_GACELEMENT:
+//	  readConstraintElement(infile, constraint) ;
+//	  break;
 	case CT_REIFY:
 	case CT_REIFYIMPLY:
 	  { 
@@ -244,7 +244,7 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, co
   // This slightly strange code is to save copying the ConstraintBlob as much as possible.
   instance.add_constraint(ConstraintBlob(def));
   vector<vector<Var> >& varsblob = instance.constraints.back().vars;
-  varsblob.reserve(def.number_of_params);
+  vector<vector<int> >& constblob = instance.constraints.back().constants;
   
   for(int i = 0; i < def.number_of_params; ++i)
   {
@@ -266,20 +266,20 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, co
 	  }
 		break;
 	  case read_constant:
-	    varsblob.push_back(make_vec(readIdentifier(infile)));
-		if(varsblob.back().back().type != VAR_CONSTANT)
-		  throw parse_exception("Expected constant but got variable.");
+	    constblob.push_back(make_vec(infile->read_num()));
 		break;
 	  case read_constant_list:
 	  {
-		vector<Var> vectorOfConst ;
-		vectorOfConst = readVectorExpression(infile) ;
+		vector<Var> vectorOfConst = readVectorExpression(infile) ;
+    vector<int> vals;
 		for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
 		{
 		  if(vectorOfConst[loop].type != VAR_CONSTANT)
-			throw parse_exception("Vector must only contain constants.");
+			  throw parse_exception("Vector must only contain constants.");
+			else
+        vals.push_back(vectorOfConst[loop].pos);
 		}
-		varsblob.push_back(vectorOfConst);
+		constblob.push_back(vals);
 	  }
 		break;  
 	  default:

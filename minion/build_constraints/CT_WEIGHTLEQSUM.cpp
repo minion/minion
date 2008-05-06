@@ -8,5 +8,5 @@
 */
 
 #include "../constraints/constraint_weightedboolsum.h"
-BUILD_STATIC_CT_INITIAL_LIST(CT_WEIGHTLEQSUM, 3)
+BUILD_STATIC_CT(CT_WEIGHTLEQSUM, 2)
 

@@ -280,10 +280,8 @@ BuildCT_WATCHED_LITSUM(StateObj* stateObj,const T1& t1, BOOL reify, const BoolVa
   }
   else
   { 
-	vector<int> values;
-	for(unsigned i = 0; i < b.vars[1].size(); ++i)
-	  values.push_back(b.vars[1][i].pos);
-	return LiteralSumConDynamic(stateObj, t1, values, runtime_val(b.vars[2][0].pos)); 
+    D_ASSERT(b.constants[1].size());
+	  return LiteralSumConDynamic(stateObj, t1, b.constants[0], runtime_val(b.constants[1][0])); 
   }
 }
 
