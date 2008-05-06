@@ -7,7 +7,7 @@ from constraint_test_common import *
 import random
 from sendemail import *
 
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email"])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop"])
 
 if len(other)>1:
     print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email]"
@@ -38,6 +38,9 @@ conslist+=["reifyimplywatchsumleq", "reifyimplywatchsumgeq", "reifyimplywatchvec
 conslist+=["sumgeq", "reifysumgeq", "reifyimplysumgeq"]
 conslist+=["sumleq", "reifysumleq", "reifyimplysumleq"]
 
+conslist+=["weightedsumgeq", "reifyweightedsumgeq", "reifyimplyweightedsumgeq"]
+conslist+=["weightedsumleq", "reifyweightedsumleq", "reifyimplyweightedsumleq"]
+
 conslist+=["occurrence", "reifyimplyoccurrence"]
 conslist+=["occurrenceleq", "occurrencegeq", "reifyimplyoccurrenceleq", "reifyimplyoccurrencegeq"]
 
@@ -58,6 +61,7 @@ conslist+=["abs", "reifyimplyabs"]
 numtests=100
 minionbin="bin/minion"
 email=False
+fullprop=False   # compare the constraint against itself with fullprop. Needs DEBUG=1.
 for i in optargs:
     (a1, a2)=i
     if a1=="--minion":
@@ -66,6 +70,8 @@ for i in optargs:
         numtests=int(a2)
     elif a1=="--email":
         email=True
+    elif a1=="--fullprop":
+        fullprop=True
 
 for consname1 in conslist:
     random.seed(12345)   # stupid seed but at least it makes the test repeatable.
@@ -87,7 +93,8 @@ for consname1 in conslist:
     
     for testnum in range(numtests):
         print "Test number %d"%(testnum)
-        if not testobj.runtest(reify=reify, reifyimply=reifyimply):
+        options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop}
+        if not testobj.runtest(options):
             if email:
                 mailstring="Mail from testallconstraints.py.\n"
                 mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)

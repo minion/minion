@@ -115,7 +115,7 @@ class node:
         return flag
         
     def outputdot(self, fileh):
-        fileh.write("%d label=node%d;\n"%(self.nodenum, self.nodenum) )
+        fileh.write("%d [label=\"Node%d\"];\n"%(self.nodenum, self.nodenum) )
         thisname=str(self.nodenum)
         
         if hasattr(self, "left"):
@@ -123,7 +123,7 @@ class node:
                 leftname=str(self.left.nodenum)
             else:
                 leftname="s"+str(self.left.solnum)
-            fileh.write("%s -> %s;\n"% (thisname, leftname))
+            fileh.write("%s -> %s [label=\"%s\"];\n"% (thisname, leftname, ))
             self.left.outputdot(fileh)
         if hasattr(self, "right"):
             if hasattr(self.right, "nodenum"):
@@ -366,8 +366,8 @@ class testmodulo:
                     out.append([i, j, i%j])
         return out
         
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("modulo", True, reify, reifyimply, [3], ["posnum"], [1,1,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("modulo", True, options, [1,1,1], ["posnum", "posnum", "posnum"], [1,1,1], self, False)
 
 class testgacelement__minus__deprecated:
     def printtable(self, domains): 
@@ -386,16 +386,16 @@ class testgacelement__minus__deprecated:
                     
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("gacelement-deprecated", False, reify, reifyimply, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, not reifyimply)
+    def runtest(self, options=dict()):
+        return runtestgeneral("gacelement-deprecated", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, not options['reifyimply'])
 
 class testwatchelement(testgacelement__minus__deprecated):
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("watchelement", False, reify, reifyimply, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, True)
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchelement", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, True)
 
 class testelement(testgacelement__minus__deprecated):
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("element", False, reify, reifyimply, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("element", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, False)
 
 class testnegativetable:
     def printtable(self, domains, tab):
@@ -410,7 +410,7 @@ class testnegativetable:
         temp.sort()
         return temp
     
-    def runtest(self, reify=False, reifyimply=False):
+    def runtest(self, options=dict()):
         constraintname="negativetable"
         varnums=[5]
         vartypes=["quitesmallnum"]
@@ -525,22 +525,20 @@ class testalldiff:
             out.append(l)
         return out
         
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("alldiff", True, reify, reifyimply, [5], ["quitesmallnum"], [5], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("alldiff", True, options, [5], ["quitesmallnum"], [5], self, False)
 
 class testalldiffgacslow(testalldiff):
-    def runtest(self, reify=False, reifyimply=False):
-        treesame= not reify and not reifyimply
-        return runtestgeneral("alldiffgacslow", False, reify, reifyimply, [5], ["quitesmallnum"], [5], self, treesame)
+    def runtest(self, options=dict()):
+        return runtestgeneral("alldiffgacslow", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'] and not options['reifyimply'])
 
 class testwatchedalldiff(testalldiff):
-    def runtest(self, reify=False, reifyimply=False):
-        treesame= not reify and not reifyimply
-        return runtestgeneral("watchedalldiff", False, reify, reifyimply, [5], ["quitesmallnum"], [5], self, treesame)
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchedalldiff", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'] and not options['reifyimply'])
 
 class testdiseq(testalldiff):
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("diseq", True, reify, reifyimply, [2], ["num"], [1,1], self, not reify and not reifyimply)
+    def runtest(self, options=dict()):
+        return runtestgeneral("diseq", True, options, [1,1], ["num", "num"], [1,1], self, not options['reify'] and not options['reifyimply'])
 
 class testeq:
     # printtable essentially sets up pairsame constraint. negation of alldiff.
@@ -557,12 +555,12 @@ class testeq:
                 out.append(l)
         return out
         
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("eq", True, reify, reifyimply, [2], ["num"], [1,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("eq", True, options, [1,1], ["num", "num"], [1,1], self, False)
 
 class testineq:
     def printtable(self, domains):
-        const=self.const1
+        const=self.constants[0]
         #  x1 <= x2+const 
         cross=[]
         crossprod(domains, [], cross)
@@ -573,8 +571,8 @@ class testineq:
                 out.append(l)
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("ineq", True, reify, reifyimply, [2], ["num"], [1,1,"const"], self, not reifyimply)
+    def runtest(self, options=dict()):
+        return runtestgeneral("ineq", True, options, [2,1], ["num", "const"], [1,1,1], self, not options['reifyimply'])
 
 class testabs:
     def printtable(self, domains):
@@ -588,12 +586,12 @@ class testabs:
                 out.append(l)
         return out
 
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("abs", True, reify, reifyimply, [2], ["num"], [1,1,], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("abs", True, options, [2], ["num"], [1,1,], self, False)
 
 class testhamming:
     def printtable(self, domains):
-        const=self.const1
+        const=self.constants[0]
         #  x1 <= x2+const 
         cross=[]
         crossprod(domains, [], cross)
@@ -605,8 +603,8 @@ class testhamming:
             out.append(l)
         return out
 
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("hamming", True, reify, reifyimply, [4,4], ["smallnum", "smallnum"], [4,4,"const"], self, not reifyimply)
+    def runtest(self, options=dict()):
+        return runtestgeneral("hamming", True, options, [4,4,1], ["smallnum", "smallnum", "const"], [4,4,1], self, not options['reifyimply'])
 
 
 class testlexleq:
@@ -622,15 +620,15 @@ class testlexleq:
                 out.append(l)
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("lexleq", True, reify, reifyimply, [4,4], ["smallnum", "smallnum"], [4,4], self, not reifyimply)
+    def runtest(self, options=dict()):
+        return runtestgeneral("lexleq", True, options, [4,4], ["smallnum", "smallnum"], [4,4], self, not options['reifyimply'])
 
 class testlexless(testlexleq):
     def printtable(self, domains):
         return testlexleq.printtable(self, domains, less=True)
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("lexless", True, reify, reifyimply, [4,4], ["smallnum", "smallnum"], [4,4], self, not reifyimply)
+    def runtest(self, options=dict()):
+        return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], [4,4], self, not options['reifyimply'])
 
 class testmax:
     def printtable(self, domains, ismax=True):
@@ -648,15 +646,15 @@ class testmax:
         
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("max", True, reify, reifyimply, [5,1], ["smallnum", "num"], [5,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("max", True, options, [5,1], ["smallnum", "num"], [5,1], self, False)
     
 class testmin(testmax):
     def printtable(self, domains):
         return testmax.printtable(self, domains, ismax=False)
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("min", True, reify, reifyimply, [5,1], ["smallnum", "num"], [5,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("min", True, options, [5,1], ["smallnum", "num"], [5,1], self, False)
 
 class testoccurrence:
     def printtable(self, domains, leq=False, geq=False):
@@ -665,17 +663,17 @@ class testoccurrence:
         out=[]
         crossprod(domains, [], cross)
         for l in cross:
-            if l[:-1].count(self.const1)==l[-1]:
+            if l[:-1].count(self.constants[0])==l[-1]:
                 out.append(l)
-            elif leq and l[:-1].count(self.const1)<=l[-1]:
+            elif leq and l[:-1].count(self.constants[0])<=l[-1]:
                 out.append(l)
-            elif geq and l[:-1].count(self.const1)>=l[-1]:
+            elif geq and l[:-1].count(self.constants[0])>=l[-1]:
                 out.append(l)
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
+    def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrence", False, reify, reifyimply, [6, 1], ["smallnum", "num"], [6, "smallconst", 1], self, False)
+        return runtestgeneral("occurrence", False, options, [6, 1], ["smallnum", "num"], [6, "smallconst", 1], self, False)
 
 class testoccurrenceleq:
     def printtable(self, domains, leq=True, geq=False):
@@ -683,23 +681,23 @@ class testoccurrenceleq:
         out=[]
         crossprod(domains, [], cross)
         for l in cross:
-            if leq and l.count(self.const1)<=self.const2:
+            if leq and l.count(self.constants[0])<=self.constants[1]:
                 out.append(l)
-            elif geq and l.count(self.const1)>=self.const2:
+            elif geq and l.count(self.constants[0])>=self.constants[1]:
                 out.append(l)
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
+    def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrenceleq", False, reify, reifyimply, [6], ["smallnum"], [6, "smallconst", "const"], self, False)
+        return runtestgeneral("occurrenceleq", False, options, [6,1,1], ["smallnum", "smallconst", "smallnum"], [6,1,1], self, True)
 
 class testoccurrencegeq(testoccurrenceleq):
     def printtable(self, domains):
         return testoccurrenceleq.printtable(self, domains, leq=False, geq=True)
     
-    def runtest(self, reify=False, reifyimply=False):
+    def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrencegeq", False, reify, reifyimply, [6], ["smallnum"], [6, "smallconst", "const"], self, False)
+        return runtestgeneral("occurrencegeq", False, options, [6,1,1], ["smallnum", "smallconst", "smallnum"], [6,1,1], self, True)
 
 class testproduct:
     def printtable(self, domains): 
@@ -710,8 +708,8 @@ class testproduct:
                     out.append([i, j, i*j])
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("product", True, reify, reifyimply, [3], ["num"], [1,1,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("product", True, options, [1,1,1], ["num", "num", "num"], [1,1,1], self, False)
 
 class testgacsum:
     def printtable(self, domains):
@@ -723,8 +721,8 @@ class testgacsum:
                 out.append(i+[sum(i)])
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("gacsum", False, reify, reifyimply, [3], ["num"], [1,1,1], self, True)
+    def runtest(self, options=dict()):
+        return runtestgeneral("gacsum", False, options, [3], ["num"], [1,1,1], self, True)
 
 class testsumgeq:
     def printtable(self, domains, less=False, weights=[1,1,1,1,1,1,1,1]):
@@ -740,15 +738,15 @@ class testsumgeq:
                 out.append(l)
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("sumgeq", True, reify, reifyimply, [5,1], ["smallnum", "num"], [5,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("sumgeq", True, options, [5,1], ["smallnum", "num"], [5,1], self, False)
     
 class testsumleq(testsumgeq):
     def printtable(self, domains):
         return testsumgeq.printtable(self, domains, less=True)
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("sumleq", True, reify, reifyimply, [5,1], ["smallnum", "num"], [5,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("sumleq", True, options, [5,1], ["smallnum", "num"], [5,1], self, False)
 
 class testdiv:
     def printtable(self, domains):
@@ -760,38 +758,22 @@ class testdiv:
                 out.append(l)
         return out
         
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("div", True, reify, reifyimply, [3], ["posnum"], [1,1,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("div", True, options, [1,1,1], ["posnum", "posnum", "posnum"], [1,1,1], self, False)
 
-## Come back to these two. BUG.   
-# refactor runtestgeneral to take "const" as a variable type and a number representing how many in the other two lists.
 class testweightedsumgeq(testsumgeq):
     def printtable(self, domains):
-        return testsumgeq.printtable(self, domains, weights=self.const1)
+        return testsumgeq.printtable(self, domains, weights=self.constants)
     
-    def runtest(self):
-        return runtestgeneral("weightedsumgeq", True, reify, reifyimply, [5,5,1], ["const", "smallnum", "num"], [5,5,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("weightedsumgeq", True, options, [5,5,1], ["const", "smallnum", "num"], [5,5,1], self, True)
         
-
 class testweightedsumleq(testsumgeq):
-    def runtest(self):
-        (domlists, modvars, tablevars)=generatevariables([6,1], ["smallnum", "num"], True)
-        # run the table instance
-        weights=[random.randint(-2, 2) for i in range(6)]
-        tuplelist=self.printtable(domlists, False, True, weights)
-        constraint="table([x0, x1, x2, x3, x4, x5, x6], modtable)"
-        retval1=runminion("infile1.minion", "outfile1", "bin/minion", tablevars, constraint, tuplelist)
-        # run the modulo instance
-        constraint="weightedsumleq([%s], [x0, x1, x2, x3, x4, x5], x6)"%reduce(lambda x,y:str(x)+","+str(y),weights)
-        retval2=runminion("infile2.minion", "outfile2", "bin/minion", modvars, constraint, False)
-        
-        # now compare
-        if retval1!=0 or retval2!=0:
-            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
-            return False
-        return comparetrees(False)  # tree subset
-
-# also need reified versions of the two above.
+    def printtable(self, domains):
+        return testsumgeq.printtable(self, domains, less=True, weights=self.constants)
+    
+    def runtest(self, options=dict()):
+        return runtestgeneral("weightedsumleq", True, options, [5,5,1], ["const", "smallnum", "num"], [5,5,1], self, True)
 
 class testminuseq:
     def printtable(self, domains):
@@ -801,8 +783,8 @@ class testminuseq:
                 out.append([i, -i])
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("minuseq", True, reify, reifyimply, [2], ["num"], [1,1], self, not reifyimply)
+    def runtest(self, options=dict()):
+        return runtestgeneral("minuseq", True, options, [1,1], ["num", "num"], [1,1], self, not options['reifyimply'])
         
 class testlitsumeq:
     # does this constraint even exist??
@@ -817,12 +799,12 @@ class testlitsumeq:
                 out.append(l+[sum(l)])
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("litsumeq", True, reify, reifyimply, [4,1], ["smallnum", "num"], [4,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("litsumeq", True, options, [4,1], ["smallnum", "num"], [4,1], self, False)
 
 class testwatchsumgeq:
     def printtable(self, domains, less=False):
-        const=self.const1
+        const=self.constants[0]
         cross=[]
         crossprod(domains, [], cross)
         out=[]
@@ -832,14 +814,14 @@ class testwatchsumgeq:
                 out.append(l)
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("watchsumgeq", True, reify, reifyimply, [5], ["boolean"], [5, "const"], self, True)
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchsumgeq", True, options, [5,1], ["boolean", "const"], [5,1], self, True)
     
 class testwatchsumleq(testwatchsumgeq):
     def printtable(self, domains):
         return testwatchsumgeq.printtable(self, domains, less=True)
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("watchsumleq", True, reify, reifyimply, [5], ["boolean"], [5, "const"], self, True)
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchsumleq", True, options, [5,1], ["boolean", "const"], [5,1], self, True)
         
 class testwatchvecneq:
     def printtable(self, domains):
@@ -851,8 +833,8 @@ class testwatchvecneq:
                 out.append(l)
         return out
     
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("watchvecneq", True, reify, reifyimply, [6], ["smallnum"], [3,3], self, True)
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchvecneq", True, options, [3,3], ["smallnum","smallnum"], [3,3], self, True)
     
 class testwatchvecexists_less:
     def printtable(self, domains):
@@ -864,8 +846,8 @@ class testwatchvecexists_less:
                 out.append(l)
         return out
 
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("watchvecexists_less", True, reify, reifyimply, [6], ["smallnum"], [3,3], self, True)
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchvecexists_less", True, options, [3,3], ["smallnum", "smallnum"], [3,3], self, True)
 
 class testwatchvecexists_and:
     def printtable(self, domains):
@@ -877,8 +859,8 @@ class testwatchvecexists_and:
                 out.append(l)
         return out
 
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("watchvecexists_and", True, reify, reifyimply, [6], ["smallnum"], [3,3], self, True)
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchvecexists_and", True, options, [3,3], ["smallnum", "smallnum"], [3,3], self, True)
                         
 class testpow:
     def printtable(self, domains):
@@ -889,8 +871,8 @@ class testpow:
             if l[0]**l[1] in domains[-1]:
                 out.append(l+[l[0]**l[1]])
         return out
-    def runtest(self, reify=False, reifyimply=False):
-        return runtestgeneral("pow", True, reify, reifyimply, [1,1,1], ["posnum","posnum","posnum"], [1,1,1], self, False)
+    def runtest(self, options=dict()):
+        return runtestgeneral("pow", True, options, [1,1,1], ["posnum","posnum","posnum"], [1,1,1], self, False)
     
 ################################################################################
 # 
@@ -926,7 +908,7 @@ def printminionfile(fileh, variables, constraint, tuplelist=False, opt=False):
     fileh.write(constraint)
     fileh.write("\n**EOF**")
 
-def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, vartypes, howprintvars, tablegen, treesame):
+def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, howprintvars, tablegen, treesame):
     # given tablevars, tuplelist for the table instance
     # and modvars and constrainttest for the other instance, construct the
     # instances.
@@ -943,6 +925,10 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
     # reifyimply \in true, false and reify \in true, false.
     
     # tablegen, an object with a printtable function.
+    # fullprop compares the constraint against its full-propagated version.
+    reifyimply=options['reifyimply']
+    reify=options['reify']
+    fullprop=options['fullprop']
     
     if reifyimply:
         # if a GAC constraint is reifyimplied, it no longer gets GAC.
@@ -953,40 +939,48 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
         varnums=[1]+varnums
         vartypes=["boolean"]+vartypes
     
-    (domlists, modvars, tablevars)=generatevariables(varnums, vartypes, boundsallowed)
+    (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, boundsallowed)
+    setattr(tablegen, "constants", constants)
     
     if modvars.find("BOUND")!=-1:
         treesame=False    # Assume can't have GAC when there are bound variables around.
     
     curvar=0
+    varnums3=varnums
+    vartypes3=vartypes
     if reify or reifyimply:
         curvar=1
+        varnums3=varnums[1:]
+        vartypes3=vartypes[1:]
     
     constraint=constraintname+"("
     
-    constnum=1   # number of the current const.
+    constnum=0   # number of the current constant
     
-    for i in howprintvars:
-        if i=="const":
-            const=random.randint(-20, 20)
-            setattr(tablegen, "const%d"%constnum, const)
-            constraint+="%d,"%const
-            constnum+=1
-        elif i=="smallconst":
-            const=random.randint(-5, 5)
-            setattr(tablegen, "const%d"%constnum, const)
-            constraint+="%d,"%const
-            constnum+=1
-        elif i>1:
+    for (num,typ) in zip(varnums3, vartypes3):
+        if typ=="const" or typ=="smallconst":
+            if num>1:
+                # print vector of constants
+                constraint+="[%d"%constants[constnum]
+                constnum+=1
+                for e in range(num-1):
+                    constraint+=", %d"%constants[constnum]
+                    constnum+=1
+                constraint+="],"
+            else:
+                # print single constant
+                constraint+="%d,"%constants[constnum]
+                constnum+=1
+        elif num>1:
             #print vector
             constraint+="[x%d"%curvar
             curvar+=1
-            for e in range(i-1):
+            for e in range(num-1):
                 constraint+=", x%d"%curvar
                 curvar+=1
             constraint+="],"
         else:
-            assert i==1
+            assert num==1
             #print single variable.
             constraint+="x%d,"%curvar
             curvar+=1
@@ -999,7 +993,12 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
         constraint="reifyimply("+constraint+", x0)"
     
     toopt=random.randint(0,3)
-    optvar=random.randint(0, sum(varnums)-1)
+    
+    varnums2=varnums[:]
+    for (i,t) in zip(range(len(varnums)), vartypes):
+        if t in ["const", "smallconst"]:
+            varnums2[i]=0   # constants, so don't count as vars.
+    optvar=random.randint(0, sum(varnums2)-1)
     
     optline=False
     if toopt==0:
@@ -1038,7 +1037,7 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
         tuplelist=tuplelist2
     
     # now convert tuplelist into a string.
-    tuplestring="modtable %d %d \n"%(len(tuplelist), sum(varnums))
+    tuplestring="modtable %d %d \n"%(len(tuplelist), sum(varnums2))
     for l in tuplelist:
         for e in l:
             tuplestring+="%d "%e
@@ -1047,17 +1046,17 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
     # tuplelist is actually a set of lists(not yet), so that it can be reformed for reify or reifyimply
     
     constrainttable="table([x0"
-    for i in range(1,sum(varnums)):
+    for i in range(1,sum(varnums2)):
         constrainttable+=",x%d"%i
     constrainttable+="], modtable)"
     
     # add some other constraints at random into the constraint and constrainttable strings
     if random.randint(0,1)==0:
-        for i in range(sum(varnums)-2):
-            var1=random.randint(0, sum(varnums)-1)
-            var2=random.randint(0, sum(varnums)-1)
+        for i in range(sum(varnums2)-2):
+            var1=random.randint(0, sum(varnums2)-1)
+            var2=random.randint(0, sum(varnums2)-1)
             while var1==var2: 
-                var2=random.randint(0, sum(varnums)-1)
+                var2=random.randint(0, sum(varnums2)-1)
             ctype=random.randint(0,2)
             if ctype==0:
                 c="diseq(x%d, x%d)"%(var1, var2)
@@ -1068,58 +1067,79 @@ def runtestgeneral(constraintname, boundsallowed, reify, reifyimply, varnums, va
             constraint+="\n"+c
             constrainttable+="\n"+c
     
-    retval1=runminion("infile1.minion", "outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline)
-    retval2=runminion("infile2.minion", "outfile2", tablegen.solver, modvars, constraint, opt=optline)
-    if retval1!=0 or retval2!=0:
-        print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
-        return False
-    if boundsallowed and modvars.rfind("SPARSEBOUND")!=-1:   
-        # This is a temporary hack while sparsebound does not print its domain properly.
-        treesame=False
-    return comparetrees(treesame)  # tree subset
-
-def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist=False, opt=False):
+    if not fullprop:
+        retval1=runminion("infile1.minion", "outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline)
+        retval2=runminion("infile2.minion", "outfile2", tablegen.solver, modvars, constraint, opt=optline)
+        if retval1!=0 or retval2!=0:
+            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            return False
+        if boundsallowed and modvars.rfind("SPARSEBOUND")!=-1:   
+            # This is a temporary hack while sparsebound does not print its domain properly.
+            treesame=False
+        return comparetrees(treesame)  # tree subset
+    else:
+        retval1=runminion("infile1.minion", "outfile1", tablegen.solver, modvars, constraint, opt=optline, cmd="-fullprop")
+        retval2=runminion("infile2.minion", "outfile2", tablegen.solver, modvars, constraint, opt=optline)
+        if retval1!=0 or retval2!=0:
+            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            return False
+        if boundsallowed and modvars.rfind("SPARSEBOUND")!=-1:   
+            # This is a temporary hack while sparsebound does not print its domain properly.
+            treesame=False
+        return comparetrees(True)  # trees same.
+    
+def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist=False, opt=False, cmd=""):
     file1=open(filename, "w")
     printminionfile(file1, variables, constraint, tuplelist=tuplelist, opt=opt)
     file1.close()
-    cmd=minionbin+" -dumptree -findallsols "+filename+" >"+outfilename
+    cmd=minionbin+" -dumptree -findallsols "+cmd+" "+filename+" >"+outfilename
     print "Executing command: "+cmd
     return os.system(cmd)
 
 def generatevariables(varblocks, types, boundallowed):
     # generate a set of variables with random domains and types
     # Varblocks specifies the groups which should be of the same type
-    # sum(varblocks) is the total number of variables.
+    # sum(varblocks) is the total number of variables/constants.
     # types specifies num, posnum, nonnegnum or boolean for each block
     # boundallowed specifies if it is appropriate to have bound variables.
     st_nontable=""
     st_table=""
     domainlists=[]
+    constants=[]
     typesinczero=["num", "smallnum", "quitesmallnum",  "nonnegnum", "boolean"]
+    typesconst=["const", "smallconst"]
+    varblocks2=varblocks[:]
+    for (i,t) in zip(range(len(varblocks)), types):
+        if t in typesconst:
+            varblocks2[i]=0   # constants, so don't count as vars.
+    
     for i in range(len(varblocks)):
         # randomly choose the type of the variables
-        if boundallowed:
-            if types[i] in typesinczero:
-                t=random.randint(1,4)  # bound sparsebound bool or discrete
+        if types[i] not in typesconst:
+            if boundallowed:
+                if types[i] in typesinczero:
+                    t=random.randint(1,4)  # bound sparsebound bool or discrete
+                else:
+                    t=random.randint(1,3)  # must be of type posnum, so not allowed to be a bool.
             else:
-                t=random.randint(1,3)  # must be of type posnum, so not allowed to be a bool.
-        else:
-            if types[i] in typesinczero:
-                t=random.randint(1,2)*2   # discrete or bool
+                if types[i] in typesinczero:
+                    t=random.randint(1,2)*2   # discrete or bool
+                else:
+                    t=2   # can't be bool, must be discrete.
+            
+            if t==1:
+                ty="BOUND "
+            elif t==2:
+                ty="DISCRETE "
+            elif t==3:
+                ty="SPARSEBOUND "  # Should be sparsebound
             else:
-                t=2   # can't be bool, must be discrete.
-        
-        if t==1:
-            ty="BOUND "
-        elif t==2:
-            ty="DISCRETE "
-        elif t==3:
-            ty="SPARSEBOUND "  # Should be sparsebound
+                ty="BOOL "
+            
+            if types[i]=="boolean":  # This is a hack put in place until reify is fixed, if ever.
+                ty="BOOL "          # reify refuses to work unless the reification var is a bool.
         else:
-            ty="BOOL "
-        
-        if types[i]=="boolean":  # This is a hack put in place until reify is fixed, if ever.
-            ty="BOOL "          # reify refuses to work unless the reification var is a bool.
+            ty=None
         
         for j in range(varblocks[i]):
             # now for each variable generate a domain
@@ -1141,11 +1161,19 @@ def generatevariables(varblocks, types, boundallowed):
             elif types[i]=="nonnegnum":
                 lb=random.randint(0, 20)
                 ub=random.randint(21, 40)
-            else:
-                assert types[i]=="boolean"
+            elif types[i]=="boolean":
                 lb=0
                 ub=1
-            varnum=sum(varblocks[0:i])+j
+            elif types[i]=="const":
+                lb=random.randint(-20, 20)
+                ub=lb
+            elif types[i]=="smallconst":
+                lb=random.randint(-5, 5)
+                ub=lb
+            else:
+                assert False
+            
+            varnum=sum(varblocks2[0:i])+j
             if ty=="SPARSEBOUND ":
                 # take a random subset between lb and ub
                 dom=random.sample(range(lb, ub+1), max((ub-lb)/2, 1))
@@ -1165,10 +1193,15 @@ def generatevariables(varblocks, types, boundallowed):
                 st_nontable+=ty+"x%d {%d..%d}\n"%(varnum, lb, ub)
                 st_table+="DISCRETE x%d {%d..%d}\n"%(varnum, lb, ub)
                 domainlists.append(range(lb, ub+1))
-            else:
+            elif ty=="DISCRETE ":
                 st_nontable+=ty+"x%d {%d..%d}\n"%(varnum, lb, ub)
                 st_table   +=ty+"x%d {%d..%d}\n"%(varnum, lb, ub)
                 domainlists.append(range(lb, ub+1))
+            else:
+                # a constant type. Do not append to domainlists
+                # but return in a constants list
+                constants.append(lb)
+                
     # co-sort the lines of st_nontable and st_table
     # This is to avoid the problem of variables coming out in different
     # orders in minion's dumptree output.
@@ -1183,7 +1216,7 @@ def generatevariables(varblocks, types, boundallowed):
     deco.sort(cmp=comparefunc)
     st_nontable=reduce(lambda x,y:x+"\n"+y, [i[0] for i in deco])+"\n"
     st_table=reduce(lambda x,y:x+"\n"+y, [i[1] for i in deco])+"\n"
-    return (domainlists, st_nontable, st_table)
+    return (domainlists, st_nontable, st_table, constants)
 
 def comparetrees(same):
     # Fork so that memory used in building and comparing
