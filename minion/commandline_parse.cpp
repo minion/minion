@@ -38,7 +38,7 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
     }
 	else if(command == string("-fullprop"))
 	{
-#ifdef NO_DEBUG
+#ifndef NO_DEBUG
 	  getOptions(stateObj).fullpropagate = true; 
 #else
 	  cout << "This version of minion was not built to support the '-fullprop' command. Sorry" << endl;
