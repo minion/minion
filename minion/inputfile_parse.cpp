@@ -44,7 +44,7 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
     ifstream file(filename, ios_base::in | ios_base::binary);
   
      if (!file) {
-        INPUT_ERROR("Can't open given input file '" + getOptions(stateObj).instance_name + "'.");
+        INPUT_ERROR("Can't open given input file '" + fname + "'.");
       }
     filtering_istream in;
   
