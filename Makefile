@@ -78,7 +78,7 @@ FULLFLAGS=-Wextra -Wno-sign-compare $(DEBUG_FLAGS) $(FLAGS) $(CPU) $(MYFLAGS)
 OBJFILES=$(patsubst minion/%.cpp,$(OBJDIR)/%.o,$(SRC))
 
 external: 
-	cd external_deps/ && ./build_external_deps.sh
+	cd external_deps/ && ./build_external_deps.sh $(MYFLAGS) $(CPU) 
 all: minion generate
 
 minion/svn_header.h: .DUMMY
