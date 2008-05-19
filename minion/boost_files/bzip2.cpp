@@ -19,7 +19,7 @@
 
 #include <boost/iostreams/detail/config/dyn_link.hpp>
 #include <boost/iostreams/filter/bzip2.hpp> 
-#include "bzlib.h"  // Julian Seward's "bzip.h" header.
+#include "../../external_deps/bzip2-1.0.5/bzlib.h"  // Julian Seward's "bzip.h" header.
                     // To configure Boost to work with libbz2, see the 
                     // installation instructions here:
                     // http://boost.org/libs/iostreams/doc/index.html?path=7
