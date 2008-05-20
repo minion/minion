@@ -766,14 +766,14 @@ class testweightedsumgeq(testsumgeq):
         return testsumgeq.printtable(self, domains, weights=self.constants)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("weightedsumgeq", True, options, [5,5,1], ["const", "smallnum", "num"], [5,5,1], self, True)
+        return runtestgeneral("weightedsumgeq", True, options, [5,5,1], ["const", "smallnum", "num"], [5,5,1], self, False)
         
 class testweightedsumleq(testsumgeq):
     def printtable(self, domains):
         return testsumgeq.printtable(self, domains, less=True, weights=self.constants)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("weightedsumleq", True, options, [5,5,1], ["const", "smallnum", "num"], [5,5,1], self, True)
+        return runtestgeneral("weightedsumleq", True, options, [5,5,1], ["const", "smallnum", "num"], [5,5,1], self, False)
 
 class testminuseq:
     def printtable(self, domains):
@@ -873,6 +873,31 @@ class testpow:
         return out
     def runtest(self, options=dict()):
         return runtestgeneral("pow", True, options, [1,1,1], ["posnum","posnum","posnum"], [1,1,1], self, False)
+    
+class testgcc:
+    def printtable(self, domains):
+        cross=[]
+        x=domains[:len(domains)/2]
+        cap=domains[len(domains)/2:]
+        crossprod(x, [], cross)
+        # assume same number of x vars and cap vars.
+        dom_min=min([min(y) for y in x])
+        out=[]
+        for line in cross:
+            occ=[0 for y in x]
+            for xi in line:
+                occ[xi-dom_min]+=1
+            flag=True
+            for i in range(len(occ)):
+                if occ[i] not in cap[i]:
+                    flag=False
+            if flag:
+                out.append(line+occ)
+        return out
+        
+    def runtest(self, options=dict()):
+        return runtestgeneral("gcc", False, options, [5,5], ["smallnum","num"], [5,5], self, False)
+        
     
 ################################################################################
 # 
