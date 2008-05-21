@@ -26,7 +26,7 @@
 
 /// var1 /\ var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
-struct AndConstraint : public Constraint
+struct AndConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "And"; }
@@ -34,7 +34,7 @@ struct AndConstraint : public Constraint
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;
-  AndConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) : Constraint(_stateObj),
+  AndConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) : AbstractConstraint(_stateObj),
     var1(_var1), var2(_var2), var3(_var3)
   {
 	D_ASSERT(var1.getInitialMin() == 0);
@@ -148,7 +148,7 @@ struct AndConstraint : public Constraint
 };
 
 template<typename VarRef1, typename VarRef2, typename VarRef3>
-Constraint*
+AbstractConstraint*
 AndCon(StateObj* stateObj, VarRef1 var1, VarRef2 var2, VarRef3 var3)
 { return (new AndConstraint<VarRef1,VarRef2,VarRef3>(stateObj, var1,var2,var3)); }
 

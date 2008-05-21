@@ -73,11 +73,7 @@ typedef MoveablePointer MemOffset;
 
 typedef TrailedMonotonicSet MonotonicSet;
 
-#include "constraints/constraint.h"
-
-#ifdef DYNAMICTRIGGERS
-#include "constraints/constraint_dynamic.h"
-#endif 
+#include "constraints/constraint_abstract.h"
 
 #include "queue/standard_queue.h"
 

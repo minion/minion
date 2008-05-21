@@ -30,7 +30,7 @@
 #include "system/system.h"
 #include "solver.h"
 #include "constraints/triggers.h"
-#include "constraints/constraint_dynamic.h"
+#include "constraints/constraint_abstract.h"
 
 #include "memory_management/backtrackable_memory.h"
 #include "memory_management/nonbacktrack_memory.h"

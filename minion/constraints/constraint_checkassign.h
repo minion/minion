@@ -19,7 +19,7 @@
 // constraint has not got a better method of implementing their
 // inverse for reification.
 template<typename VarArray, typename OriginalConstraint>
-struct CheckAssignConstraint : public Constraint
+struct CheckAssignConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "CheckAssign"; }
@@ -32,7 +32,7 @@ struct CheckAssignConstraint : public Constraint
   
  
   CheckAssignConstraint(StateObj* _stateObj, VarArray& vars, OriginalConstraint& con)
-  : Constraint(_stateObj), originalcon(con),variables(vars), assigned_vars(stateObj), assignment(variables.size())
+  : AbstractConstraint(_stateObj), originalcon(con),variables(vars), assigned_vars(stateObj), assignment(variables.size())
   { D_INFO(2, DI_CHECKCON, "Constructing"); }
   
   virtual triggerCollection setup_internal()
@@ -44,7 +44,7 @@ struct CheckAssignConstraint : public Constraint
 	return t;
   }
   
-  virtual Constraint* reverse_constraint()
+  virtual AbstractConstraint* reverse_constraint()
   { 
     cerr << "Check assign constraints shouldn't get reversed." << endl;
 	FAIL_EXIT();

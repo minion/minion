@@ -25,16 +25,16 @@
 */
 
 template<typename VarArray>
-struct TableConstraint : public Constraint
+struct TableConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Table"; }
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
-  Constraint* constraint;
+  AbstractConstraint* constraint;
   
-  TableConstraint(const VarArray& _vars, Constraint* c) :
+  TableConstraint(const VarArray& _vars, AbstractConstraint* c) :
     vars(_vars), constraint(c)
   { }
   

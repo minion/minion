@@ -18,24 +18,10 @@
 
 #include "BuildConstraint.h"
 
-#ifdef CONSTRAINT_TYPE
-#undef CONSTRAINT_TYPE
-#endif
-#ifdef DYNAMIC_BUILD_CONSTRAINT
-// QUICK_COMPILE doesn't work on dynamic constraints.
-//#undef QUICK_COMPILE
-#define CONSTRAINT_TYPE DynamicConstraint
-#else
-#ifdef STATIC_BUILD_CONSTRAINT
-#define CONSTRAINT_TYPE Constraint
-#else
-#error BuildConstraintConstructs.h is not a normal header. Error occured.
-#endif
-#endif
 
 #define MERGE2(x,y) x ## y
 #define MERGE(x , y) MERGE2(x,y)
-#define BUILDCON MERGE(Build , CONSTRAINT_TYPE)
+#define BUILDCON BuildConObj
  
 namespace BuildCon
 {  
@@ -47,13 +33,13 @@ struct BUILDCON
 {
   template<typename ConData>
   static 
-  CONSTRAINT_TYPE* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos) _NOINLINE;
+  AbstractConstraint* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos) _NOINLINE;
 };
 
 
 template<int initial_size, int size>
 template<typename ConData>
-CONSTRAINT_TYPE* 
+AbstractConstraint* 
 BUILDCON<initial_size, size>::
 build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos)
 {

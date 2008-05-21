@@ -26,7 +26,7 @@
 
 
 template<typename VarArray, typename IndexRef, typename VarRef>
-struct GACElementConstraint : public Constraint
+struct GACElementConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "GACElement"; }
@@ -37,7 +37,7 @@ struct GACElementConstraint : public Constraint
   DomainInt var_array_min_val;
   DomainInt var_array_max_val;
   GACElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexRef& _indexvar, const VarRef& _resultvar) :
-    Constraint(_stateObj), var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar)
+    AbstractConstraint(_stateObj), var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar)
   { }
   
   virtual triggerCollection setup_internal()
@@ -212,7 +212,7 @@ struct GACElementConstraint : public Constraint
 
 
 template<typename Var1, typename Var2>
-Constraint*
+AbstractConstraint*
 GACElementCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var1& v2)
 { 
   return new GACElementConstraint<Var1, typename Var2::value_type, typename Var1::value_type>
@@ -221,7 +221,7 @@ GACElementCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Va
 
 
 template<typename Var1, typename Var2, typename Var3>
-Constraint*
+AbstractConstraint*
 GACElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3& v2)
 { 
   return new GACElementConstraint<Var1, typename Var2::value_type, AnyVarRef>

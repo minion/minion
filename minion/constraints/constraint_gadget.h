@@ -25,7 +25,7 @@
 */
 
 template<typename VarArray>
-struct GadgetConstraint : public Constraint
+struct GadgetConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Gadget"; }
@@ -41,7 +41,7 @@ struct GadgetConstraint : public Constraint
   bool constraint_locked;
   
   GadgetConstraint(StateObj* _stateObj, const VarArray& _vars, shared_ptr<CSPInstance> _gadget, PropagationLevel _proptype) : 
-  Constraint(_stateObj), var_array(_vars), gadget_instance(_gadget),
+  AbstractConstraint(_stateObj), var_array(_vars), gadget_instance(_gadget),
   gadget_stateObj(new StateObj), gadget_prop_type(_proptype), 
   constraint_locked(false)
   { 
@@ -56,7 +56,7 @@ struct GadgetConstraint : public Constraint
   virtual ~GadgetConstraint()
   { delete gadget_stateObj; }
   
-  virtual Constraint* reverse_constraint()
+  virtual AbstractConstraint* reverse_constraint()
   {
     cerr << "You can't reverse a gadget Constraint!";
     FAIL_EXIT();
@@ -178,7 +178,7 @@ gadgetCon(StateObj* stateObj, const VarArray& vars, ConstraintBlob& blob)
 #ifdef REENTER
 
 template<typename Vars>
-Constraint*
+AbstractConstraint*
 BuildCT_GADGET(StateObj* stateObj, const Vars& vars, BOOL reify, const BoolVarRef& reifyvar, ConstraintBlob& blob)
 {
   if(reify)
@@ -190,7 +190,7 @@ BuildCT_GADGET(StateObj* stateObj, const Vars& vars, BOOL reify, const BoolVarRe
 #else
 
 template<typename Vars>
-Constraint*
+AbstractConstraint*
 BuildCT_GADGET(StateObj* stateObj, const Vars& vars, BOOL reify, const BoolVarRef& reifyvar, ConstraintBlob& blob)
 { INPUT_ERROR("This constraint requires REENTER support."); }
 #endif

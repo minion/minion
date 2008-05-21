@@ -52,7 +52,7 @@ See also
 
 
 template<typename VarArray, typename ValueArray, typename VarSum>
-struct LiteralSumConstraintDynamic : public DynamicConstraint
+struct LiteralSumConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "LiteralSumDynamic"; }
@@ -71,7 +71,7 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
   VarSum var_sum;
   
   LiteralSumConstraintDynamic(StateObj* _stateObj,const VarArray& _var_array, ValueArray _val_array, VarSum _var_sum) :
-	DynamicConstraint(_stateObj), var_array(_var_array), value_array(_val_array), var_sum(_var_sum)
+	AbstractConstraint(_stateObj), var_array(_var_array), value_array(_val_array), var_sum(_var_sum)
   { }
   
   int dynamic_trigger_count()
@@ -265,12 +265,12 @@ struct LiteralSumConstraintDynamic : public DynamicConstraint
 };
 
 template<typename VarArray,  typename ValArray, typename VarSum>
-DynamicConstraint*
+AbstractConstraint*
 LiteralSumConDynamic(StateObj* stateObj,const VarArray& _var_array,  const ValArray& _val_array, VarSum _var_sum)
 { return new LiteralSumConstraintDynamic<VarArray,ValArray,VarSum>(stateObj, _var_array, _val_array, _var_sum); }
 
 template<typename T1>
-DynamicConstraint* 
+AbstractConstraint* 
 BuildCT_WATCHED_LITSUM(StateObj* stateObj,const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 {
   if(reify)

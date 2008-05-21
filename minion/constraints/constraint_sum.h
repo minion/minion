@@ -26,7 +26,7 @@
 
 // VarToCount = 1 means leq, = 0 means geq.
 template<typename VarArray, typename VarSum, int VarToCount = 1 >
-struct BoolLessSumConstraint : public Constraint
+struct BoolLessSumConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { if(VarToCount) return "Bool<=Sum"; else return "Bool>=Sum"; }
@@ -40,7 +40,7 @@ struct BoolLessSumConstraint : public Constraint
   VarSum var_sum;
   
   BoolLessSumConstraint(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
-    Constraint(_stateObj), count(_stateObj), var_array(_var_array), var_sum(_var_sum)
+    AbstractConstraint(_stateObj), count(_stateObj), var_array(_var_array), var_sum(_var_sum)
   { D_ASSERT((VarToCount == 0) || (VarToCount == 1)); }
   
   virtual triggerCollection setup_internal()
@@ -59,7 +59,7 @@ struct BoolLessSumConstraint : public Constraint
     return t;
   }
   
-  virtual Constraint* reverse_constraint()
+  virtual AbstractConstraint* reverse_constraint()
   { 
     if(VarToCount)
       return new BoolLessSumConstraint<VarArray, runtime_val, 0>(stateObj, var_array, runtime_val(var_sum + 1)); 
@@ -167,14 +167,14 @@ struct BoolLessSumConstraint : public Constraint
 };
 
 template<typename VarArray,  typename VarSum>
-Constraint*
+AbstractConstraint*
 BoolLessEqualSumCon(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 { 
   return (new BoolLessSumConstraint<VarArray,VarSum>(stateObj, _var_array,_var_sum)); 
 }
 
 template<typename VarArray,  typename VarSum>
-Constraint*
+AbstractConstraint*
 BoolGreaterEqualSumCon(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 { 
   return (new BoolLessSumConstraint<VarArray,VarSum,0>(stateObj, _var_array,_var_sum)); 

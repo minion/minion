@@ -87,7 +87,7 @@ See also
 
 // VarToCount = 1 means leq, = 0 means geq.
 template<typename VarArray, typename VarSum, int VarToCount = 1 >
-struct BoolLessSumConstraintDynamic : public DynamicConstraint
+struct BoolLessSumConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
   { if(VarToCount) return "Bool<=SumDynamic"; else return "Bool>=SumDynamic"; }
@@ -108,7 +108,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
   VarSum var_sum;
   
   BoolLessSumConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
-	DynamicConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
+	AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
   { 
     D_ASSERT((VarToCount == 0) || (VarToCount == 1));
 #ifndef DYNAMICTRIGGERS
@@ -318,7 +318,7 @@ struct BoolLessSumConstraintDynamic : public DynamicConstraint
 };
 
 template<typename VarArray,  typename VarSum>
-DynamicConstraint*
+AbstractConstraint*
 BoolLessEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 { 
   return new BoolLessSumConstraintDynamic<VarArray,VarSum>(stateObj, _var_array,
@@ -326,7 +326,7 @@ BoolLessEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarS
 }
 
 template<typename VarArray,  typename VarSum>
-DynamicConstraint*
+AbstractConstraint*
 BoolGreaterEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 { 
   return new BoolLessSumConstraintDynamic<VarArray,VarSum,0>(stateObj, _var_array, _var_sum); 
@@ -338,7 +338,7 @@ BoolGreaterEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  V
 #include "dynamic_3_sat.h"
 
 template<typename T>
-inline DynamicConstraint*
+inline AbstractConstraint*
 BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<T>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   for(int i = 0; i < t1.size(); ++i)
@@ -358,7 +358,7 @@ BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<T>& t1, BOOL reify
 }
 
 template<typename T>
-inline DynamicConstraint*
+inline AbstractConstraint*
 BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const light_vector<T>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   for(int i = 0; i < t1.size(); ++i)

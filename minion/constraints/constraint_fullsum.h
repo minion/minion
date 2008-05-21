@@ -54,7 +54,7 @@ ensures that sum(vec) >= c.
 /// V1 + ... Vn <= X
 /// is_reversed checks if we are in the case where reverse_constraint was previously called.
 template<typename VarArray, typename VarSum, BOOL is_reversed = false>
-struct LessEqualSumConstraint : public Constraint
+struct LessEqualSumConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "<=Sumup"; }
@@ -67,7 +67,7 @@ struct LessEqualSumConstraint : public Constraint
   Reversible<DomainInt> max_looseness;
   Reversible<DomainInt> var_array_min_sum;
   LessEqualSumConstraint(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
-    Constraint(_stateObj), var_array(_var_array), var_sum(_var_sum), max_looseness(_stateObj), 
+    AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), max_looseness(_stateObj), 
     var_array_min_sum(_stateObj)
   { }
   
@@ -194,7 +194,7 @@ struct LessEqualSumConstraint : public Constraint
   // All the code below here is to get around an annoying problem in C++. Basically we want to say that the
   // reverse of a <= is a >= constraint. However, when compiling C++ keeps getting the reverse of the reverse of..
   // and doesn't figure out it is looping. This code ensures we only go once around the loop.
-  virtual Constraint* reverse_constraint()
+  virtual AbstractConstraint* reverse_constraint()
   { return reverse_constraint_helper<is_reversed,int>::fun(stateObj, *this); }
 
 // BUGFIX: The following two class definitions have a 'T=int' just to get around a really stupid parsing bug
@@ -205,7 +205,7 @@ struct LessEqualSumConstraint : public Constraint
   template<BOOL reversed, typename T>
 	struct reverse_constraint_helper	
   {
-    static Constraint* fun(StateObj* stateObj, LessEqualSumConstraint& con)
+    static AbstractConstraint* fun(StateObj* stateObj, LessEqualSumConstraint& con)
     {
 	  typename NegType<VarArray>::type new_var_array(con.var_array.size());
 	  for(unsigned i = 0; i < con.var_array.size(); ++i)
@@ -222,7 +222,7 @@ struct LessEqualSumConstraint : public Constraint
   template<typename T>
 	struct reverse_constraint_helper<true, T>
   {
-    static Constraint* fun(StateObj*, LessEqualSumConstraint&)
+    static AbstractConstraint* fun(StateObj*, LessEqualSumConstraint&)
     { 
 	  // This should never be reached, unless we try reversing an already reversed constraint.
 	  // We have this code here as the above case makes templates, which if left would keep instansiating
@@ -236,7 +236,7 @@ struct LessEqualSumConstraint : public Constraint
 
 
 template<typename VarArray,  typename VarSum>
-Constraint*
+AbstractConstraint*
 LessEqualSumCon(StateObj* stateObj, const VarArray& _var_array, const light_vector<VarSum>& _var_sum)
 { 
   if(_var_array.size() == 2)
@@ -252,7 +252,7 @@ LessEqualSumCon(StateObj* stateObj, const VarArray& _var_array, const light_vect
   }
 }
 
-inline Constraint*
+inline AbstractConstraint*
 LessEqualSumCon(StateObj* stateObj, const light_vector<BoolVarRef>& var_array, const light_vector<ConstantVar>& var_sum)
 { 
   runtime_val t2(checked_cast<int>(var_sum[0].getAssignedValue()));
@@ -264,7 +264,7 @@ BUILD_CONSTRAINT2(CT_LEQSUM, LessEqualSumCon);
 
 
 template<typename VarArray,  typename VarSum>
-Constraint*
+AbstractConstraint*
 GreaterEqualSumCon(StateObj* stateObj, const VarArray& _var_array, const light_vector<VarSum>& _var_sum)
 { 
   if(_var_array.size() == 2)
@@ -281,7 +281,7 @@ GreaterEqualSumCon(StateObj* stateObj, const VarArray& _var_array, const light_v
   }
 }
 
-inline Constraint*
+inline AbstractConstraint*
 GreaterEqualSumCon(StateObj* stateObj, const light_vector<BoolVarRef>& var_array, const light_vector<ConstantVar>& var_sum)
 { 
   runtime_val t2(checked_cast<int>(var_sum[0].getAssignedValue()));

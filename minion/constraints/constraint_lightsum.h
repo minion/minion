@@ -26,7 +26,7 @@
 
 /// V1 + ... Vn <= X
 template<typename VarRef, std::size_t size, typename VarSum, BOOL is_reversed = false>
-struct LightLessEqualSumConstraint : public Constraint
+struct LightLessEqualSumConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Light<=Sum"; }
@@ -37,7 +37,7 @@ struct LightLessEqualSumConstraint : public Constraint
   array<VarRef, size> var_array;  
   VarSum var_sum;
   LightLessEqualSumConstraint(StateObj* _stateObj, const array<VarRef, size>& _var_array, const VarSum& _var_sum) :
-    Constraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
+    AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
   { }
   
   virtual triggerCollection setup_internal()
@@ -104,7 +104,7 @@ struct LightLessEqualSumConstraint : public Constraint
     return array_copy;
   }
 
- virtual Constraint* reverse_constraint()
+ virtual AbstractConstraint* reverse_constraint()
   { return reverse_constraint_helper<is_reversed,int>::fun(stateObj, *this); }
 
 // BUGFIX: The following two class definitions have a 'T=int' just to get around a really stupid parsing bug
@@ -115,7 +115,7 @@ struct LightLessEqualSumConstraint : public Constraint
   template<BOOL reversed, typename T>
     struct reverse_constraint_helper    
   {
-    static Constraint* fun(StateObj* stateObj,LightLessEqualSumConstraint& con)
+    static AbstractConstraint* fun(StateObj* stateObj,LightLessEqualSumConstraint& con)
     {
       typedef array<typename NegType<VarRef>::type, size> VarArray;
       VarArray new_var_array;
@@ -133,7 +133,7 @@ struct LightLessEqualSumConstraint : public Constraint
   template<typename T>
     struct reverse_constraint_helper<true, T>
   {
-    static Constraint* fun(StateObj*, LightLessEqualSumConstraint&)
+    static AbstractConstraint* fun(StateObj*, LightLessEqualSumConstraint&)
     { 
       // This should never be reached, unless we try reversing an already reversed constraint.
       // We have this code here as the above case makes templates, which if left would keep instansiating
@@ -145,7 +145,7 @@ struct LightLessEqualSumConstraint : public Constraint
 };
 
 template<typename VarRef, std::size_t size, typename VarSum>
-Constraint*
+AbstractConstraint*
 LightLessEqualSumCon(StateObj* stateObj, const array<VarRef,size>& _var_array,  const VarSum& _var_sum)
 { 
   return (new LightLessEqualSumConstraint<VarRef, size, VarSum>(stateObj, _var_array,_var_sum)); 
@@ -153,7 +153,7 @@ LightLessEqualSumCon(StateObj* stateObj, const array<VarRef,size>& _var_array,  
 
 
 template<typename VarRef, std::size_t size, typename VarSum>
-Constraint*
+AbstractConstraint*
 LightGreaterEqualSumCon(StateObj* stateObj, const array<VarRef,size>& _var_array, const VarSum& _var_sum)
 { 
   return 

@@ -27,25 +27,25 @@
 #ifndef DYNAMIC_REIFY_TRUE_H
 #define DYNAMIC_REIFY_TRUE_H
 
-#include "../constraints/constraint_dynamic.h"
+#include "../constraints/constraint_abstract.h"
 #include "../reversible_vals.h"
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 
 
 template<typename BoolVar>
-struct Dynamic_reify_true : public DynamicConstraint
+struct Dynamic_reify_true : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "DynamicReifyTrue:" + poscon->constraint_name(); }
   
-  DynamicConstraint* poscon;
+  AbstractConstraint* poscon;
   BoolVar rar_var;
   bool constraint_locked;
   
   Reversible<bool> full_propagate_called;
   
-  Dynamic_reify_true(StateObj* _stateObj, DynamicConstraint* _poscon, BoolVar v) : DynamicConstraint(_stateObj), poscon(_poscon), 
+  Dynamic_reify_true(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar v) : AbstractConstraint(_stateObj), poscon(_poscon), 
                                                                            rar_var(v), constraint_locked(false),
                                                                            full_propagate_called(stateObj, false)
   { }
@@ -71,7 +71,7 @@ struct Dynamic_reify_true : public DynamicConstraint
   
   virtual void setup()
   {
-    DynamicConstraint::setup();
+    AbstractConstraint::setup();
     
     poscon->setup();
     DynamicTrigger* start = poscon->dynamic_trigger_start();
@@ -137,10 +137,12 @@ struct Dynamic_reify_true : public DynamicConstraint
 };
 
 
+
 // Just a placeholder.
 template<typename BoolVar>
-DynamicConstraint*
-truereifyCon(StateObj* stateObj, DynamicConstraint* c, BoolVar var)
+AbstractConstraint*
+truereifyConDynamic(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
 { return new Dynamic_reify_true<BoolVar>(stateObj, &*c, var); }
+
 
 #endif

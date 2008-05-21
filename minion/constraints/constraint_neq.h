@@ -59,7 +59,7 @@ for the same constraint that enforces GAC.
 
 
 template<typename VarArray>
-struct NeqConstraint : public Constraint
+struct NeqConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Neq"; }
@@ -69,7 +69,7 @@ struct NeqConstraint : public Constraint
   
   VarArray var_array;
   
-  NeqConstraint(StateObj* _stateObj, const VarArray& _var_array) : Constraint(_stateObj),
+  NeqConstraint(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
     var_array(_var_array)
   { }
   
@@ -83,7 +83,7 @@ struct NeqConstraint : public Constraint
     return t;
   }
   
-  virtual Constraint* reverse_constraint()
+  virtual AbstractConstraint* reverse_constraint()
   { return new CheckAssignConstraint<VarArray, NeqConstraint>(stateObj, var_array, *this); }
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
@@ -195,14 +195,9 @@ struct NeqConstraint : public Constraint
 	}
   };
 
-
 template<typename VarArray>
-Constraint*
+AbstractConstraint*
 NeqCon(StateObj* stateObj, const VarArray& var_array)
 { return new NeqConstraint<VarArray>(stateObj, var_array); }
 
-
 BUILD_CONSTRAINT1(CT_ALLDIFF, NeqCon)
-
-
-

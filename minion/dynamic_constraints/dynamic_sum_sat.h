@@ -28,7 +28,7 @@
 
 
 template<typename VarArray>
-struct BoolSATConstraintDynamic : public DynamicConstraint
+struct BoolSATConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "BoolSATDynamic"; }
@@ -40,7 +40,7 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
   int last;
   
   BoolSATConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array) :
-	DynamicConstraint(_stateObj), var_array(_var_array)
+	AbstractConstraint(_stateObj), var_array(_var_array)
   { 
 #ifndef DYNAMICTRIGGERS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
@@ -176,6 +176,6 @@ struct BoolSATConstraintDynamic : public DynamicConstraint
 };
 
 template<typename VarArray>
-DynamicConstraint*
+AbstractConstraint*
 BoolSATConDynamic(StateObj* stateObj, const VarArray& _var_array)
 { return new BoolSATConstraintDynamic<VarArray>(stateObj, _var_array); }

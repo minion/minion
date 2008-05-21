@@ -1,5 +1,5 @@
 #include "BuildStart.h"
-Constraint* build_constraint(StateObj* stateObj, ConstraintBlob& b) {
+AbstractConstraint* build_constraint(StateObj* stateObj, ConstraintBlob& b) {
 switch(b.constraint.type) {
 case CT_ELEMENT : return build_constraint_CT_ELEMENT(stateObj, b);
 case CT_GACELEMENT : return build_constraint_CT_GACELEMENT(stateObj, b);

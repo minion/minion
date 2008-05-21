@@ -49,7 +49,7 @@ This constraint is reifiable.
 
 // x <= y + offset
 template<typename VarRef1, typename VarRef2, typename Offset>
-struct LeqConstraint : public Constraint
+struct LeqConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Leq"; }
@@ -60,7 +60,7 @@ struct LeqConstraint : public Constraint
   VarRef2 y;
   
   LeqConstraint(StateObj* _stateObj,VarRef1 _x, VarRef2 _y, Offset _o) :
-    Constraint(_stateObj), offset(_o), x(_x), y(_y)
+    AbstractConstraint(_stateObj), offset(_o), x(_x), y(_y)
   { }
   
   virtual triggerCollection setup_internal()
@@ -74,7 +74,7 @@ struct LeqConstraint : public Constraint
   }
 
   // Needs to be at end of file
-  virtual Constraint* reverse_constraint();
+  virtual AbstractConstraint* reverse_constraint();
   
   PROPAGATE_FUNCTION(int prop_val,DomainDelta)
   {
@@ -118,22 +118,22 @@ struct LeqConstraint : public Constraint
 };
 
 template<typename VarRef1, typename VarRef2, typename Offset>
-Constraint*
+AbstractConstraint*
 LeqCon(StateObj* stateObj, VarRef1 v1, VarRef2 v2, Offset o)
 { return new LeqConstraint<VarRef1,VarRef2,Offset>(stateObj,v1,v2,o); }
 
 template<typename VarRef1, typename VarRef2>
-Constraint*
+AbstractConstraint*
 LeqCon(StateObj* stateObj,VarRef1 v1, VarRef2 v2)
 { return new LeqConstraint<VarRef1,VarRef2,compiletime_val<0> >(stateObj,v1,v2,compiletime_val<0>()); }
 
 template<typename VarRef>
-Constraint*
+AbstractConstraint*
 ImpliesCon(StateObj* stateObj, VarRef v1, VarRef v2)
 { return new LeqConstraint<VarRef,VarRef,compiletime_val<0> >(stateObj,v1,v2,compiletime_val<0>()); }
 
 template<typename T1, typename T2>
-Constraint*
+AbstractConstraint*
 BuildCT_INEQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   
@@ -145,5 +145,5 @@ BuildCT_INEQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const B
 
 // This is mainly inline to avoid multiple definitions.
 template<typename VarRef1, typename VarRef2, typename Offset>
-inline Constraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint()
+inline AbstractConstraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint()
 { return LeqCon(stateObj,y,x, offset.negminusone()); }

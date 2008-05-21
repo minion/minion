@@ -45,7 +45,7 @@ This constraint is not reifiable.
   *  \ingroup Constraints
 */
 template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
-  struct VecCountDynamic : public DynamicConstraint
+  struct VecCountDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
     { return "VecCountDynamic"; }
@@ -63,7 +63,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   int index_to_not_propagate; 
 
   VecCountDynamic(StateObj* _stateObj, const VarArray1& _array1, const VarArray2& _array2, int _num_of_vals) :
-  DynamicConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_num_of_vals + 1), 
+  AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_num_of_vals + 1), 
     propagate_mode(_stateObj, false)
     {
        if(num_to_watch <= 0)
@@ -259,14 +259,14 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
 };
 
 template<typename VarArray1,  typename VarArray2>
-DynamicConstraint*
+AbstractConstraint*
   VecOrCountConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, int i)
   { return new VecCountDynamic<VarArray1,VarArray2>(stateObj, varray1, varray2, i); }
 
 //BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_HAMMING, VecOrCountConDynamic)
 
 template<typename T1, typename T2>
-DynamicConstraint*
+AbstractConstraint*
 BuildCT_WATCHED_HAMMING(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   if(reify)
@@ -277,14 +277,14 @@ BuildCT_WATCHED_HAMMING(StateObj* stateObj, const T1& t1, const T2& t2, BOOL rei
 
 /*
 template<typename VarArray1,  typename VarArray2>
-DynamicConstraint*
+AbstractConstraint*
   VecOrLessConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2)
   { return new VecNeqDynamic<VarArray1,VarArray2, LessIterated>(stateObj, varray1, varray2); }
 
 BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_VEC_OR_LESS, VecOrLessConDynamic)
 
 template<typename VarArray1,  typename VarArray2>
-DynamicConstraint*
+AbstractConstraint*
   VecOrAndConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2)
   { return new VecNeqDynamic<VarArray1,VarArray2, BothNonZeroIterated>(stateObj, varray1, varray2); }
 

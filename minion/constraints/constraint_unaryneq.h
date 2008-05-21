@@ -27,7 +27,7 @@
 
 // x = constant
 template<typename VarRef, typename Offset>
-struct UnaryNeqConstraint : public Constraint
+struct UnaryNeqConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Unary="; }
@@ -46,7 +46,7 @@ struct UnaryNeqConstraint : public Constraint
     return t;
   }
   
-  //  virtual Constraint* reverse_constraint()
+  //  virtual AbstractConstraint* reverse_constraint()
   
   PROPAGATE_FUNCTION(int,DomainDelta)
   { D_ASSERT(0); }
@@ -73,7 +73,7 @@ struct UnaryNeqConstraint : public Constraint
 };
 
 template<typename VarRef, typename Offset>
-Constraint*
+AbstractConstraint*
 UnaryNeqCon(VarRef v1,  Offset o)
 { return new UnaryNeqConstraint<VarRef,Offset>(v1,o); }
 

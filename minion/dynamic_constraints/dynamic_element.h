@@ -69,7 +69,7 @@ consistency.
 
 
 template<typename VarArray, typename Index, typename Result>
-struct ElementConstraintDynamic : public DynamicConstraint
+struct ElementConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "ElementDynamic"; }
@@ -88,7 +88,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
   vector<DomainInt> current_support;
   
   ElementConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, const Index& _index, const Result& _result) :
-	DynamicConstraint(_stateObj), var_array(_var_array), indexvar(_index), resultvar(_result)
+	AbstractConstraint(_stateObj), var_array(_var_array), indexvar(_index), resultvar(_result)
   { 
 	  initial_result_dom_min = resultvar.getInitialMin();
 	  initial_result_dom_max = resultvar.getInitialMax();
@@ -356,7 +356,7 @@ struct ElementConstraintDynamic : public DynamicConstraint
 
 
 template<typename Var1, typename Var2>
-DynamicConstraint*
+AbstractConstraint*
 DynamicElementCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var1& v2)
 { 
   return new ElementConstraintDynamic<Var1, typename Var2::value_type, typename Var1::value_type>
@@ -364,7 +364,7 @@ DynamicElementCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, cons
 }
 
 template<typename Var1, typename Var2, typename Var3>
-DynamicConstraint*
+AbstractConstraint*
 DynamicElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3& v2)
 { 
   return new ElementConstraintDynamic<Var1, typename Var2::value_type, AnyVarRef>

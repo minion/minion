@@ -159,7 +159,7 @@ struct smallset_nolist
 };
 
 template<typename VarArray>
-struct AlldiffGacSlow : public Constraint
+struct AlldiffGacSlow : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "AlldiffGacSlow"; }
@@ -170,7 +170,7 @@ struct AlldiffGacSlow : public Constraint
   
   int numvars, numvals;
   
-  AlldiffGacSlow(StateObj* _stateObj, const VarArray& _var_array) : Constraint(_stateObj),
+  AlldiffGacSlow(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
     var_array(_var_array), constraint_locked(false)
   {
       dom_min=var_array[0].getInitialMin();
@@ -201,7 +201,7 @@ struct AlldiffGacSlow : public Constraint
     return t;
   }
   
-  virtual Constraint* reverse_constraint()
+  virtual AbstractConstraint* reverse_constraint()
   { return new CheckAssignConstraint<VarArray, AlldiffGacSlow>(stateObj, var_array, *this); }
 
   bool constraint_locked;
@@ -1000,7 +1000,7 @@ struct AlldiffGacSlow : public Constraint
 
 
 template<typename VarArray>
-Constraint*
+AbstractConstraint*
 AlldiffGacSlowCon(StateObj* stateObj, const VarArray& var_array)
 { return new AlldiffGacSlow<VarArray>(stateObj, var_array); }
 

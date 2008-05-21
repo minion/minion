@@ -40,7 +40,7 @@
 
 
 template <typename T>
-DynamicConstraint*
+AbstractConstraint*
 BuildCT_WATCHED_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   if(reify) 
@@ -53,7 +53,7 @@ BuildCT_WATCHED_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarR
 }
 
 template <typename T>
-DynamicConstraint*
+AbstractConstraint*
 BuildCT_WATCHED_NEGATIVE_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
 { 
   if(reify) 

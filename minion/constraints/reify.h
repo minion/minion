@@ -71,31 +71,31 @@ more information.
 #ifndef REIFY_H
 #define REIFY_H
 
-#include "constraint.h"
+#include "constraint_abstract.h"
 #include "../reversible_vals.h"
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 
 template<typename BoolVar>
-struct reify : public Constraint
+struct reify : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Reify:" + poscon->constraint_name(); }
 	
-  Constraint* poscon;
-  Constraint* negcon;
+  AbstractConstraint* poscon;
+  AbstractConstraint* negcon;
   BoolVar rar_var;
   
   // These two variables are only used in special cases.
   bool constraint_locked;
   Reversible<bool> full_propagate_called;
   
-  reify(StateObj* _stateObj, Constraint* _poscon, BoolVar v) : Constraint(_stateObj), poscon(_poscon),
+  reify(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar v) : AbstractConstraint(_stateObj), poscon(_poscon),
                                                                rar_var(v),  constraint_locked(false),
                                                                full_propagate_called(stateObj, false)
   { negcon = poscon->reverse_constraint();}
   
-  virtual Constraint* reverse_constraint()
+  virtual AbstractConstraint* reverse_constraint()
   {
     cerr << "You can't reverse a reified Constraint!";
     FAIL_EXIT();
@@ -248,7 +248,7 @@ struct reify : public Constraint
 
 template<typename BoolVar>
 reify<BoolVar>*
-reifyCon(StateObj* stateObj, Constraint* c, BoolVar var)
+reifyCon(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
 { return new reify<BoolVar>(stateObj, &*c, var); }
 
 #endif

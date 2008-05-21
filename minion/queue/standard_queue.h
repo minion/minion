@@ -30,8 +30,7 @@
 #include "../solver.h"
 #include "../get_info/get_info.h"
 #include "../constraints/triggers.h"
-#include "../constraints/constraint_dynamic.h"
-#include "../constraints/constraint.h"
+#include "../constraints/constraint_abstract.h"
   
 class Queues
 {

@@ -86,7 +86,7 @@ This constraint is reifiable.
 This is the older one written by Chris, with assignment triggers on var1 var2.
 
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
-struct ReifiedEqualConstraint : public Constraint
+struct ReifiedEqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "ReifiedEqual"; }
@@ -95,7 +95,7 @@ struct ReifiedEqualConstraint : public Constraint
   EqualVarRef2 var2;
   BoolVarRef var3;
   ReifiedEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
-    Constraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {}
   
   virtual triggerCollection setup_internal()
@@ -216,7 +216,7 @@ struct ReifiedEqualConstraint : public Constraint
 // New version written by PN with bound triggers.
 // Also stronger in eq case: copies bounds across rather than just propagating on assignment. 
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
-struct ReifiedEqualConstraint : public Constraint
+struct ReifiedEqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "ReifiedEqual"; }
@@ -225,7 +225,7 @@ struct ReifiedEqualConstraint : public Constraint
   EqualVarRef2 var2;
   BoolVarRef var3;
   ReifiedEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
-    Constraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {}
   
   virtual triggerCollection setup_internal()
@@ -447,14 +447,14 @@ struct ReifiedEqualConstraint : public Constraint
 };
 
 template<typename EqualVarRef1, typename EqualVarRef2>
-struct EqualConstraint : public Constraint
+struct EqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Equal"; }
   
   EqualVarRef1 var1;
   EqualVarRef2 var2;
-  EqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2) : Constraint(_stateObj),
+  EqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2) : AbstractConstraint(_stateObj),
     var1(_var1), var2(_var2)
   {}
   
@@ -517,29 +517,29 @@ struct EqualConstraint : public Constraint
 
 
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
-Constraint*
+AbstractConstraint*
 ReifiedEqualCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2, BoolVarRef var3)
 { return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, BoolVarRef>(stateObj,var1,var2,var3); }
 
 template<typename EqualVarRef1, typename EqualVarRef2>
-Constraint*
+AbstractConstraint*
 EqualCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
 { return new EqualConstraint<EqualVarRef1, EqualVarRef2>(stateObj, var1,var2); }
 
 
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
-Constraint*
+AbstractConstraint*
 ReifiedEqualMinusCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2, BoolVarRef var3)
 { return new ReifiedEqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2>, BoolVarRef>(stateObj, var1,VarNegRef(var2),var3); }
 
 template<typename EqualVarRef1, typename EqualVarRef2>
-Constraint*
+AbstractConstraint*
 EqualMinusCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
 { return new EqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2> >(stateObj, var1,VarNegRef(var2)); }
 
 
 template<typename T1, typename T2>
-Constraint*
+AbstractConstraint*
 BuildCT_EQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
 {
   if(reify)
@@ -549,7 +549,7 @@ BuildCT_EQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const Boo
 }
 
 template<typename T1, typename T2>
-Constraint*
+AbstractConstraint*
 BuildCT_MINUSEQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
 {
   if(reify)
@@ -565,7 +565,7 @@ BuildCT_MINUSEQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, cons
 #define MAKECONFLUENT
 
 template<typename VarRef1, typename VarRef2>
-struct NeqConstraintBinary : public Constraint
+struct NeqConstraintBinary : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Neq(Binary)"; }
@@ -575,7 +575,7 @@ struct NeqConstraintBinary : public Constraint
   
   
   NeqConstraintBinary(StateObj* _stateObj, const VarRef1& _var1, const VarRef2& _var2 ) :
-    Constraint(_stateObj), var1(_var1), var2(_var2)
+    AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
   { }
   
   virtual triggerCollection setup_internal()
@@ -753,13 +753,13 @@ struct NeqConstraintBinary : public Constraint
   };
 
 template<typename VarRef1, typename VarRef2, typename BoolVarRef>
-Constraint*
+AbstractConstraint*
 ReifiedNeqConBinary(StateObj* stateObj, VarRef1 var1, VarRef2 var2, BoolVarRef var3)
 { return new ReifiedEqualConstraint<VarRef1, VarRef2, VarNot<BoolVarRef> >
                                    (stateObj,var1,var2, VarNotRef(var3)); }
 
 template<typename Var1, typename Var2>
-Constraint*
+AbstractConstraint*
 NeqConBinary(StateObj* stateObj, const Var1& var1, const Var2& var2)
 {
   return new NeqConstraintBinary<Var1, Var2>(stateObj, var1, var2); 
@@ -767,7 +767,7 @@ NeqConBinary(StateObj* stateObj, const Var1& var1, const Var2& var2)
 
 
 template<typename T1, typename T2>
-Constraint*
+AbstractConstraint*
 BuildCT_DISEQ(StateObj* stateObj, const T1& t1, const T2& t2, bool reify,
 const BoolVarRef& reifyVar, ConstraintBlob& b)
 {

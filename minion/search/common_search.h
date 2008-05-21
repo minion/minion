@@ -125,9 +125,6 @@ namespace Controller
 
   if(!getOptions(stateObj).nocheck)
   {
-    for(unsigned i = 0; i < getState(stateObj).getDynamicConstraintList().size(); ++i)
-      check_constraint(stateObj, getState(stateObj).getDynamicConstraintList()[i]);
-  
     for(unsigned i = 0 ; i < getState(stateObj).getConstraintList().size();i++)
       check_constraint(stateObj, getState(stateObj).getConstraintList()[i]);
   }

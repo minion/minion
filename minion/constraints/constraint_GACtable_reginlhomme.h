@@ -177,7 +177,7 @@ struct Regin
 };
 
 template<typename VarArray>
-struct GACTableConstraint : public DynamicConstraint
+struct GACTableConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "TableRegin"; }
@@ -505,7 +505,7 @@ struct GACTableConstraint : public DynamicConstraint
 
 
 template<typename VarArray>
-DynamicConstraint*
+AbstractConstraint*
 GACTableCon(const VarArray& vars, TupleList* tuples)
 { return new GACTableConstraint<VarArray>(vars, tuples); }
 

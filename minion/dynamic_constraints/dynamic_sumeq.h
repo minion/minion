@@ -31,7 +31,7 @@
 //ONLY WORKS FOR VARS WHERE ARBITRARY VALUES CAN BE REMOVED AT ANY TIME
 
 template<typename VarRef1, typename VarRef2, typename VarRef3>
-struct SumEqConstraintDynamic : public DynamicConstraint
+struct SumEqConstraintDynamic : public AbstractConstraint
 {
 #ifndef NO_PRINT
   char output[200];
@@ -47,7 +47,7 @@ struct SumEqConstraintDynamic : public DynamicConstraint
   int xmult, ymult;
 
   SumEqConstraintDynamic(StateObj* _stateObj, int _xmult, int _ymult, VarRef1 _x, VarRef2 _y, VarRef3 _z) :
-    DynamicConstraint(stateObj), xmult(_xmult), ymult(_ymult), x(_x), y(_y), z(_z), vals(-1)
+    AbstractConstraint(stateObj), xmult(_xmult), ymult(_ymult), x(_x), y(_y), z(_z), vals(-1)
   { 
 #ifndef WATCHEDLITERALS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
@@ -327,7 +327,7 @@ struct SumEqConstraintDynamic : public DynamicConstraint
 };
 
 template<typename VarArray, typename Var>
-DynamicConstraint*
+AbstractConstraint*
 SumEqConDynamic(StateObj* stateObj, const light_vector<int>& consts, const VarArray& _var_array, const Var& var)
 {
   typedef typename VarArray::value_type ValT;

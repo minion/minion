@@ -1,5 +1,5 @@
 #include "BuildStart.h"
-DynamicConstraint* build_dynamic_constraint(StateObj* stateObj, ConstraintBlob& b) {
+AbstractConstraint* build_dynamic_constraint(StateObj* stateObj, ConstraintBlob& b) {
 switch(b.constraint.type) {
 case CT_WATCHED_ELEMENT : return build_constraint_CT_WATCHED_ELEMENT(stateObj, b);
 case CT_WATCHED_GEQSUM : return build_constraint_CT_WATCHED_GEQSUM(stateObj, b);

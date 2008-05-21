@@ -20,19 +20,14 @@ void lock(StateObj* stateObj)
   getVars(stateObj).getSparseBoundvarContainer().lock();
   getVars(stateObj).getBooleanContainer().lock(); 
   getVars(stateObj).getBoundvarContainer().lock();
-#ifdef DYNAMICTRIGGERS
-  int dynamic_size = getState(stateObj).getDynamicConstraintList().size();
-  for(int i = 0; i < dynamic_size; ++i)
-	getState(stateObj).getDynamicConstraintList()[i]->setup();
-#endif
-  getMemory(stateObj).monotonicSet().lock(stateObj);
-  getMemory(stateObj).backTrack().lock();
-  getMemory(stateObj).nonBackTrack().lock();
-//  atexit(Controller::finish);
   
   int size = getState(stateObj).getConstraintList().size();
   for(int i = 0 ; i < size;i++)
 	getState(stateObj).getConstraintList()[i]->setup();
+  
+  getMemory(stateObj).monotonicSet().lock(stateObj);
+  getMemory(stateObj).backTrack().lock();
+  getMemory(stateObj).nonBackTrack().lock();
   
   getTriggerMem(stateObj).finaliseTriggerLists();
   
@@ -72,16 +67,6 @@ void lock(StateObj* stateObj)
 	}
   //}
   
-#ifdef DYNAMICTRIGGERS
-  for(int i = 0; i < dynamic_size; ++i)
-  {
-	getState(stateObj).getDynamicConstraintList()[i]->full_propagate();
-	getQueue(stateObj).propagateQueue();
-	if(getState(stateObj).isFailed()) 
-	  return;
-  }
-#endif
-
   getState(stateObj).markLocked();
 
 } // lock()

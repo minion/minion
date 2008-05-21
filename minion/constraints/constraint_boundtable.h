@@ -25,16 +25,16 @@ $Id$
 */
 
 template<typename VarArray>
-struct BoundsTableConstraint : public Constraint
+struct BoundsTableConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
 { return "BoundTable"; }
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
-  Constraint* constraint;
+  AbstractConstraint* constraint;
   
-  BoundsTableConstraint(const VarArray& _vars, Constraint* c) :
+  BoundsTableConstraint(const VarArray& _vars, AbstractConstraint* c) :
     vars(_vars), constraint(c)
   { }
   

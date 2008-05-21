@@ -191,7 +191,7 @@ struct BothNonZeroIterated
   *  \ingroup Constraints
 */
 template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
-  struct VecNeqDynamic : public DynamicConstraint
+  struct VecNeqDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
     { return "VecNeqDynamic"; }
@@ -210,7 +210,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
 
   VecNeqDynamic(StateObj* _stateObj, const VarArray1& _array1,
     const VarArray2& _array2) :
-  DynamicConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
+  AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
     propagate_mode(_stateObj, false)
     { D_ASSERT(var_array1.size() == var_array2.size()); }
 
@@ -387,21 +387,21 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
 };
 
 template<typename VarArray1,  typename VarArray2>
-DynamicConstraint*
+AbstractConstraint*
   VecNeqConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2)
   { return new VecNeqDynamic<VarArray1,VarArray2>(stateObj, varray1, varray2); }
 
 BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_VECNEQ, VecNeqConDynamic)
 
 template<typename VarArray1,  typename VarArray2>
-DynamicConstraint*
+AbstractConstraint*
   VecOrLessConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2)
   { return new VecNeqDynamic<VarArray1,VarArray2, LessIterated>(stateObj, varray1, varray2); }
 
 BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_VEC_OR_LESS, VecOrLessConDynamic)
 
 template<typename VarArray1,  typename VarArray2>
-DynamicConstraint*
+AbstractConstraint*
   VecOrAndConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2)
   { return new VecNeqDynamic<VarArray1,VarArray2, BothNonZeroIterated>(stateObj, varray1, varray2); }
 

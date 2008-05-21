@@ -237,6 +237,9 @@ public:
   /// Request a new block of memory and returns a \ref MoveablePointer to it's start.
   MoveablePointer request_bytes(unsigned byte_count)
   {
+    if(byte_count == 0)
+      return MoveablePointer(NULL);
+      
     // TODO: is the following line necessary?
     if(byte_count % sizeof(int) != 0)
       byte_count += sizeof(int) - (byte_count % sizeof(int));
@@ -245,9 +248,6 @@ public:
     if(maximum_bytes < allocated_bytes + byte_count)
     { reallocate( (allocated_bytes + byte_count) * 2 ); }
     D_INFO(0,DI_MEMBLOCK,"New pointer at:" + to_string((void*)(current_data+allocated_bytes)) + " for " + to_string(byte_count));
-    // If no bytes asked for, just stuff it at the start of the block.
-    if(byte_count == 0)
-      return MoveablePointer(NULL);
 
     char* return_val = current_data + allocated_bytes;
     allocated_bytes += byte_count;

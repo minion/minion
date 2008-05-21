@@ -24,7 +24,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-inline void SearchState::addConstraint(Constraint* c) 
+inline void SearchState::addConstraint(AbstractConstraint* c) 
 { 
   constraints.push_back(c); 
   vector<AnyVarRef>* vars = c->get_vars_singleton();
@@ -32,17 +32,6 @@ inline void SearchState::addConstraint(Constraint* c)
   for(size_t i = 0; i < vars_s; i++) //note all constraints the var is involved in
     (*vars)[i].addConstraint(c);
 }
-  
-#ifdef DYNAMICTRIGGERS
-inline void SearchState::addDynamicConstraint(DynamicConstraint* c) 
-{ 
-  dynamic_constraints.push_back(c); 
-  vector<AnyVarRef>* vars = c->get_vars_singleton();
-  size_t vars_s = vars->size();
-  for(size_t i = 0; i < vars_s; i++) //note all constraints the var is involved in
-    (*vars)[i].addConstraint(c);
-}
-#endif
 
 namespace Controller
 {

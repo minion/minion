@@ -28,7 +28,7 @@
 
 // x = constant
 template<typename VarRef, typename Offset>
-struct UnaryEqualConstraint : public Constraint
+struct UnaryEqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "UnaryEqual"; }
@@ -47,7 +47,7 @@ struct UnaryEqualConstraint : public Constraint
     return t;
   }
   
-  //  virtual Constraint* reverse_constraint()
+  //  virtual AbstractConstraint* reverse_constraint()
   
   PROPAGATE_FUNCTION(int,DomainDelta)
   { D_ASSERT(0); }
@@ -76,7 +76,7 @@ struct UnaryEqualConstraint : public Constraint
 };
 
 template<typename VarRef, typename Offset>
-Constraint*
+AbstractConstraint*
 UnaryEqualCon(VarRef v1,  Offset o)
 { 
   return (new UnaryEqualConstraint<VarRef,Offset>(v1,o)); 

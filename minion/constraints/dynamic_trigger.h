@@ -1,11 +1,3 @@
-/* Minion Constraint Solver
-   http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
-
-   $Id$
-*/
-
 /* Minion
 * Copyright (C) 2006
 *
@@ -24,16 +16,6 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef CONSTRAINT_DYNAMIC_H
-#define CONSTRAINT_DYNAMIC_H
-
-#include "constraint_abstract.h"
-
-#include "../memory_management/nonbacktrack_memory.h"
-
-#include "../get_info/get_info.h"
-
-#define DYNAMIC_PROPAGATE_FUNCTION virtual void propagate
 
 /// This is a trigger to a constraint, which can be dynamically moved around.
 class DynamicTrigger
@@ -47,7 +29,7 @@ public:
   /// actually points to a valid object.
   D_DATA(int sanity_check); 
   /// The constraint to be triggered.
-  DynamicConstraint* constraint;
+  AbstractConstraint* constraint;
   /// A small space for constraints to store trigger-specific information.
   int _trigger_info;
   
@@ -59,7 +41,7 @@ public:
   DynamicTrigger* next;
 
 
-  DynamicTrigger(DynamicConstraint* c) : constraint(c), prev(NULL), next(NULL)
+  DynamicTrigger(AbstractConstraint* c) : constraint(c), prev(NULL), next(NULL)
   { D_DATA(sanity_check = 1234);}
   
   DynamicTrigger() : constraint(NULL)
@@ -147,55 +129,4 @@ public:
 	}
 	return true;
   }
-
-
 };
-
-/// Base type from which all dynamic constraints are derived.
-class DynamicConstraint : public AbstractConstraint
-{
-public:
-  DynamicConstraint(StateObj* _stateObj) : AbstractConstraint(_stateObj)
-    {}
-
-  /// Private member of the base class.
-  MemOffset _DynamicTriggerCache;
-  
-  /// Returns a point to the first dynamic trigger of the constraint.
-  DynamicTrigger* dynamic_trigger_start()
-  { return static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }
-  
-  /// Gives the value of a specific dynamic trigger.
-  int dynamic_trigger_num(DynamicTrigger* trig)
-  { return trig - static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }
-  
-  /// Actually creates the dynamic triggers. Calls dynamic_trigger_count from function to get
-  /// the number of triggers required.
-  virtual void setup()
-  {
-    int trigs = dynamic_trigger_count();
-    D_ASSERT(trigs >= 0);
-    _DynamicTriggerCache = getMemory(stateObj).nonBackTrack().request_bytes((sizeof(DynamicTrigger) * trigs));
-    
-	DynamicTrigger* start = dynamic_trigger_start();
-	for(int i = 0 ; i < trigs; ++i)
-	  new (start+i) DynamicTrigger(this);
-  }
-  
-  /// Defines the number of dynamic triggers the constraint wants.
-  /// Must be implemented by any constraint.
-  virtual int dynamic_trigger_count() = 0;
-  
-  /// Iterative propagation function.
-  /** Can assume full_propagate is always called at least once before propagate */
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger*) = 0;
-};
-
-
-inline void DynamicTrigger::propagate()
-{ 
-  D_ASSERT(sanity_check == 1234);
-  constraint->propagate(this); 
-}
-
-#endif

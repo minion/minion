@@ -75,7 +75,7 @@ for a similar constraint with strict lexicographic inequality.
 */
 
 template<typename VarArray1, typename VarArray2, BOOL Less = false>
-struct LexLeqConstraint : public Constraint
+struct LexLeqConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { if(Less) return "LexLess"; else return "LexLeq"; }
@@ -92,7 +92,7 @@ struct LexLeqConstraint : public Constraint
   VarArray2 y;
   
   LexLeqConstraint(StateObj* _stateObj,const VarArray1& _x, const VarArray2& _y) :
-    Constraint(_stateObj), alpha(_stateObj), beta(_stateObj), F(_stateObj), x(_x), y(_y)
+    AbstractConstraint(_stateObj), alpha(_stateObj), beta(_stateObj), F(_stateObj), x(_x), y(_y)
   { D_ASSERT(x.size() == y.size()); }
   
   virtual triggerCollection setup_internal()
@@ -122,7 +122,7 @@ struct LexLeqConstraint : public Constraint
     return t;
   }
   
-  virtual Constraint* reverse_constraint()
+  virtual AbstractConstraint* reverse_constraint()
   {
     return new LexLeqConstraint<VarArray2, VarArray1,!Less>(stateObj,y,x);
   }
@@ -361,12 +361,12 @@ struct LexLeqConstraint : public Constraint
 
 
 template<typename VarArray1, typename VarArray2>
-Constraint*
+AbstractConstraint*
 LexLeqCon(StateObj* stateObj, const VarArray1& x, const VarArray2& y)
 { return new LexLeqConstraint<VarArray1, VarArray2>(stateObj,x,y); }
 
 template<typename VarArray1, typename VarArray2>
-Constraint*
+AbstractConstraint*
 LexLessCon(StateObj* stateObj,const VarArray1& x, const VarArray2& y)
 { return new LexLeqConstraint<VarArray1, VarArray2,true>(stateObj, x,y); }
 

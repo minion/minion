@@ -28,3 +28,9 @@
       (*vars)[i].incWdeg();
   }
 #endif
+
+  inline void DynamicTrigger::propagate()
+  { 
+    D_ASSERT(sanity_check == 1234);
+    constraint->propagate(this); 
+  }

@@ -49,7 +49,7 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
     if(it->is_dynamic())
     {
 #ifdef DYNAMICTRIGGERS
-      getState(stateObj).addDynamicConstraint(build_dynamic_constraint(stateObj, *it));
+      getState(stateObj).addConstraint(build_dynamic_constraint(stateObj, *it));
       getState(stateObj).setDynamicTriggersUsed(true);
 #else
       cout << "Sorry, cannot process this constraint as it needs dynamic triggers or watched literals." << endl ;

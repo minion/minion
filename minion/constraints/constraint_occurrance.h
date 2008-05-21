@@ -91,7 +91,7 @@ help constraints occurrenceleq
 */
 
 template<typename VarArray, typename Val>
-struct ConstantOccurrenceEqualConstraint : public Constraint
+struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "OccurrenceLeq/Geq"; }
@@ -108,7 +108,7 @@ struct ConstantOccurrenceEqualConstraint : public Constraint
   
   ConstantOccurrenceEqualConstraint(StateObj* _stateObj, const VarArray& _var_array, const Val& _value, 
                             int _val_count_min, int _val_count_max) :
-    Constraint(_stateObj), occurrences_count(_stateObj), not_occurrences_count(_stateObj),
+    AbstractConstraint(_stateObj), occurrences_count(_stateObj), not_occurrences_count(_stateObj),
     var_array(_var_array), val_count_min(_val_count_min), val_count_max(_val_count_max), value(_value)
   { }
   
@@ -247,7 +247,7 @@ struct ConstantOccurrenceEqualConstraint : public Constraint
 };
 
 template<typename VarArray, typename Val, typename ValCount>
-struct OccurrenceEqualConstraint : public Constraint
+struct OccurrenceEqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "OccurrenceEqual"; }
@@ -262,7 +262,7 @@ struct OccurrenceEqualConstraint : public Constraint
   Val value;
   
   OccurrenceEqualConstraint(StateObj* _stateObj, const VarArray& _var_array, const Val& _value, const ValCount& _val_count) :
-    Constraint(_stateObj), occurrences_count(_stateObj), not_occurrences_count(_stateObj),
+    AbstractConstraint(_stateObj), occurrences_count(_stateObj), not_occurrences_count(_stateObj),
     var_array(_var_array), val_count(_val_count), value(_value)
   { }
   
@@ -404,7 +404,7 @@ struct OccurrenceEqualConstraint : public Constraint
 
 
 template<typename VarArray, typename Val, typename ValCount>
-Constraint*
+AbstractConstraint*
 OccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& _value, const ValCount& _val_count)
 { 
   return 
@@ -412,7 +412,7 @@ OccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& _value, 
 }
 
 template<typename VarArray, typename Val>
-Constraint*
+AbstractConstraint*
 ConstantOccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& _value, int _val_count_min, int _val_count_max)
 { 
   return 
@@ -420,7 +420,7 @@ ConstantOccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& 
 }
 
 template<typename T1, typename T3>
-Constraint*
+AbstractConstraint*
 BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T3& t3, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   int val_to_count = b.constants[0][0];
@@ -432,7 +432,7 @@ BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T3& t3, BOOL reify, c
 }
 
 template<typename T1>
-Constraint*
+AbstractConstraint*
 BuildCT_LEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   int val_to_count = b.constants[0][0];
@@ -444,7 +444,7 @@ BuildCT_LEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolV
 }
 
 template<typename T1>
-Constraint*
+AbstractConstraint*
 BuildCT_GEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   int val_to_count = b.constants[0][0];

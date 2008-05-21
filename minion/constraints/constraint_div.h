@@ -50,7 +50,7 @@ help constraints modulo
 
 /// var1 / var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
-struct DivConstraint : public Constraint
+struct DivConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Div"; }
@@ -59,7 +59,7 @@ struct DivConstraint : public Constraint
   VarRef2 var2;
   VarRef3 var3;
 
-  DivConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) : Constraint(_stateObj),
+  DivConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) : AbstractConstraint(_stateObj),
 	var1(_var1), var2(_var2), var3(_var3)
   {
   
@@ -125,7 +125,7 @@ struct DivConstraint : public Constraint
 };
 
 template<typename V1, typename V2>
-inline Constraint*
+inline AbstractConstraint*
 DivCon(StateObj* stateObj, const V1& vars, const V2& var2)
 {
   D_ASSERT(vars.size() == 2);

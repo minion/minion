@@ -28,7 +28,7 @@
 
 // VarToCount = 1 means leq, = 0 means geq.
 template<typename VarArray>
-struct BoolThreeSATConstraintDynamic : public DynamicConstraint
+struct BoolThreeSATConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "BoolSATDynamic"; }
@@ -38,7 +38,7 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
   VarArray var_array;
 
   BoolThreeSATConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array) :
-	DynamicConstraint(_stateObj), var_array(_var_array)
+	AbstractConstraint(_stateObj), var_array(_var_array)
   { 
 	D_ASSERT(var_array.size() == 3);
 #ifndef DYNAMICTRIGGERS
@@ -157,6 +157,6 @@ struct BoolThreeSATConstraintDynamic : public DynamicConstraint
 };
 
 template<typename VarArray>
-DynamicConstraint*
+AbstractConstraint*
 BoolThreeSATConDynamic(StateObj* stateObj, const VarArray& _var_array)
 { return new BoolThreeSATConstraintDynamic<VarArray>(stateObj, _var_array); }

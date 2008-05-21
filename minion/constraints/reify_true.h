@@ -27,30 +27,30 @@
 #ifndef REIFY_TRUE_H
 #define REIFY_TRUE_H
 
-#include "constraint.h"
+#include "constraint_abstract.h"
 #include "../reversible_vals.h"
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 
 
 template<typename BoolVar>
-struct reify_true : public Constraint
+struct reify_true : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "ReifyTrue:" + poscon->constraint_name(); }
   
-  Constraint* poscon;
+  AbstractConstraint* poscon;
   BoolVar rar_var;
   bool constraint_locked;
   
   Reversible<bool> full_propagate_called;
   
-  reify_true(StateObj* _stateObj, Constraint* _poscon, BoolVar v) : Constraint(_stateObj), poscon(_poscon), 
-                                                                    rar_var(v), constraint_locked(false),
-                                                                    full_propagate_called(stateObj, false)
+  reify_true(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar v) : AbstractConstraint(_stateObj), poscon(_poscon), 
+                                                                            rar_var(v), constraint_locked(false),
+                                                                            full_propagate_called(stateObj, false)
   { }
   
-  virtual Constraint* reverse_constraint()
+  virtual AbstractConstraint* reverse_constraint()
   { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
@@ -133,10 +133,19 @@ struct reify_true : public Constraint
   }
 };
 
+// From dynamic_reifyimply.h
+template<typename BoolVar>
+AbstractConstraint*
+truereifyConDynamic(StateObj* stateObj, AbstractConstraint* c, BoolVar var);
 
 template<typename BoolVar>
-reify_true<BoolVar>*
-truereifyCon(StateObj* stateObj, Constraint* c, BoolVar var)
-{ return new reify_true<BoolVar>(stateObj, &*c, var); }
+AbstractConstraint*
+truereifyCon(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
+{ 
+  if(c->dynamic_trigger_count() == 0)
+    return new reify_true<BoolVar>(stateObj, &*c, var); 
+  else
+    return truereifyConDynamic(stateObj, c, var);
+}
 
 #endif

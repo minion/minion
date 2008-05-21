@@ -44,6 +44,20 @@ help variables
 using namespace std;
 
 class AnyVarRef;
+class DynamicTrigger;
+
+#include "dynamic_trigger.h"
+
+#define DYNAMIC_PROPAGATE_FUNCTION virtual void propagate
+
+#ifdef  FUNCTIONPOINTER_TRIGGER
+#define PROPAGATE_FUNCTION void propagate
+#else
+#define PROPAGATE_FUNCTION virtual void propagate
+#endif
+
+struct AbstractTriggerCreator;
+typedef vector<shared_ptr<AbstractTriggerCreator> > triggerCollection;
 
 /// Base type from which all constraints are derived.
 class AbstractConstraint
@@ -57,6 +71,67 @@ class AbstractConstraint
   unsigned int wdeg;
 #endif
 
+  /// Private member of the base class.
+  MemOffset _DynamicTriggerCache;
+  
+  /// Returns a point to the first dynamic trigger of the constraint.
+  DynamicTrigger* dynamic_trigger_start()
+  { return static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }
+  
+  /// Gives the value of a specific dynamic trigger.
+  int dynamic_trigger_num(DynamicTrigger* trig)
+  { return trig - static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }
+
+  /// Defines the number of dynamic triggers the constraint wants.
+  /// Must be implemented by any constraint.
+  virtual int dynamic_trigger_count() 
+    { return 0; }
+  
+  /// Gets all the triggers a constraint wants to set up.
+  /** This function shouldn't do any propagation. That is full_propagate's job.*/
+  virtual triggerCollection setup_internal()
+    { return triggerCollection(); }
+  
+  /// Iterative propagation function.
+  /** Can assume full_propagate is always called at least once before propagate */
+  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger*)
+  { D_FATAL_ERROR("Fatal error in 'Dynamic Propagate' in " + constraint_name()); }
+  
+    /// Iterative propagation function.
+    /** Can assume full_propagate is always called at least once before propagate */
+  #ifdef FUNCTIONPOINTER_TRIGGER
+    PROPAGATE_FUNCTION(int, DomainDelta) {}
+  #else
+    PROPAGATE_FUNCTION(int, DomainDelta) 
+    { D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + constraint_name()); }
+  #endif
+  
+  /// Checks if a constraint cannot be satisfied, and sets up any data structures for future incremental checks.
+  /// Returns TRUE if constraint cannot be satisfied.
+  /** This function is used by rarification */
+  virtual BOOL full_check_unsat()
+  { 
+	  cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    exit(1); 
+  }
+    
+  /// Checks incrementaly if constraint cannot be satisfied.
+  /// Returns TRUE if constraint cannot be satisfied.
+  /** This function should not be called unless check_unsat_full is called first. This is used by rarification */
+  virtual BOOL check_unsat(int,DomainDelta)
+  { 
+	  cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    exit(1); 
+  }
+    
+  /// Returns the reverse of the current constraint
+  /** Used by rarification */
+  virtual AbstractConstraint* reverse_constraint()
+  { 
+	  cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    exit(1);
+  }
+  
   AbstractConstraint(StateObj* _stateObj) : 
 #ifdef WDEG
     wdeg(1),
@@ -106,6 +181,31 @@ class AbstractConstraint
     
   virtual ~AbstractConstraint()
   {}
+  
+  /// Actually creates the dynamic triggers. Calls dynamic_trigger_count from function to get
+  /// the number of triggers required.
+  virtual void setup()
+  {
+    // Dynamic initialisation
+    int trigs = dynamic_trigger_count();
+    D_ASSERT(trigs >= 0);
+    _DynamicTriggerCache = getMemory(stateObj).nonBackTrack().request_bytes((sizeof(DynamicTrigger) * trigs));
+    
+	DynamicTrigger* start = dynamic_trigger_start();
+	for(int i = 0 ; i < trigs; ++i)
+	  new (start+i) DynamicTrigger(this);
+	  
+	  // Static initialisation
+	  triggerCollection t = setup_internal();
+    for(triggerCollection::iterator it = t.begin(); it != t.end(); ++it)
+    {
+      (*it)->post_trigger();
+    }
+  }
+  
+  
 };
+
+
 
 #endif

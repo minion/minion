@@ -32,8 +32,7 @@
 #include "tuple_container.h"
 // Some advanced definitions, we don't actually need to know anything about these
 // types for SearchState, simply that they exist.
-class Constraint;
-class DynamicConstraint;
+class AbstractConstraint;
 class AnyVarRef;
 
 
@@ -44,9 +43,9 @@ class SearchState
   DomainInt current_optimise_position;
   bool optimise;
   
-  vector<Constraint*> constraints;
+  vector<AbstractConstraint*> constraints;
 #ifdef DYNAMICTRIGGERS
-  vector<DynamicConstraint*> dynamic_constraints;
+  vector<AbstractConstraint*> dynamic_constraints;
 #endif
   
   long long int solutions;
@@ -82,12 +81,8 @@ public:
   bool isOptimisationProblem() { return optimise; }
   void setOptimisationProblem(bool _optimise) { optimise = _optimise; }
   
-  void addConstraint(Constraint* c);
-  vector<Constraint*>& getConstraintList() { return constraints; }
-#ifdef DYNAMICTRIGGERS
-  void addDynamicConstraint(DynamicConstraint* c);
-  vector<DynamicConstraint*>& getDynamicConstraintList() { return dynamic_constraints; }
-#endif
+  void addConstraint(AbstractConstraint* c);
+  vector<AbstractConstraint*>& getConstraintList() { return constraints; }
   
   long long int getSolutionCount() { return solutions; }
   void setSolutionCount(long long int _sol) { solutions = _sol; }
