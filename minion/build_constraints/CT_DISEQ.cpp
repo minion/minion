@@ -7,6 +7,6 @@
    $Id$
 */
 
-#include "../constraints/constraint_neq.h"
+#include "../constraints/constraint_equal.h"
 BUILD_STATIC_CT(CT_DISEQ, 2)
 

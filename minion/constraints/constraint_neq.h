@@ -24,21 +24,6 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-/** @help constraints;diseq Description
-Constrain two variables to take different values.
-*/
-
-/** @help constraints;diseq Notes
-Achieves arc consistency.
-*/
-
-/** @help constraints;diseq Example
-diseq(v0,v1)
-*/
-
-/** @help constraints;diseq Reifiability
-This constraint is reifiable.
-*/
 
 /** @help constraints;alldiff Description
 Forces the input vector of variables to take distinct values.
@@ -210,144 +195,14 @@ struct NeqConstraint : public Constraint
 	}
   };
 
-template<typename VarRef1, typename VarRef2>
-struct NeqConstraintBinary : public Constraint
-{
-  virtual string constraint_name()
-  { return "Neq(Binary)"; }
-  
-  VarRef1 var1;
-  VarRef2 var2;
-  
-  
-  NeqConstraintBinary(StateObj* _stateObj, const VarRef1& _var1, const VarRef2& _var2 ) :
-    Constraint(_stateObj), var1(_var1), var2(_var2)
-  { }
-  
-  virtual triggerCollection setup_internal()
-  {
-    D_INFO(2,DI_SUMCON,"Setting up Constraint");
-    triggerCollection t;
-    t.push_back(make_trigger(var1, Trigger(this, 1), Assigned));
-    t.push_back(make_trigger(var2, Trigger(this, 2), Assigned));
-    return t;
-  }
-  
-  //  virtual Constraint* reverse_constraint()
-  
-  PROPAGATE_FUNCTION(int prop_val, DomainDelta)
-  {
-	PROP_INFO_ADDONE(BinaryNeq);
-    if (prop_val == 1) {
-      DomainInt remove_val = var1.getAssignedValue();
-	  if(var2.isBound())
-	  {
-		if(var2.getMin() == remove_val)
-		  var2.setMin(remove_val + 1);
-		if(var2.getMax() == remove_val)
-		  var2.setMax(remove_val - 1);
-	  }
-	  else
-        var2.removeFromDomain(remove_val);
-	}
-    else
-    {
-      D_ASSERT(prop_val == 2);
-      DomainInt remove_val = var2.getAssignedValue();
-	  if(var1.isBound())
-	  {
-		if(var1.getMin() == remove_val)
-		  var1.setMin(remove_val + 1);
-		if(var1.getMax() == remove_val)
-		  var1.setMax(remove_val - 1);
-	  }
-	  else
-        var1.removeFromDomain(remove_val);
-    }
-  }
-  
-  //  virtual BOOL check_unsat(int i, DomainDelta)
-  
-  
-  virtual void full_propagate()
-  {
-    if(var1.isAssigned())
-    { 
-      DomainInt remove_val = var1.getAssignedValue();
-	  if(var2.isBound())
-	  {
-		if(var2.getMin() == remove_val)
-		  var2.setMin(remove_val + 1);
-		if(var2.getMax() == remove_val)
-		  var2.setMax(remove_val - 1);
-	  }
-	  else
-        var2.removeFromDomain(remove_val);
-    }
-    if(var2.isAssigned())
-    { 
-      DomainInt remove_val = var2.getAssignedValue();
-	  if(var1.isBound())
-	  {
-		if(var1.getMin() == remove_val)
-		  var1.setMin(remove_val + 1);
-		if(var1.getMax() == remove_val)
-		  var1.setMax(remove_val - 1);
-	  }
-	  else
-        var1.removeFromDomain(remove_val);
-    }
-  }
-	
-	virtual BOOL check_assignment(DomainInt* v, int v_size)
-	{
-	  D_ASSERT(v_size == 2); 
-	  if(v[0]==v[1]) return false;
-	  return true;
-	}
-	
-	virtual vector<AnyVarRef> get_vars()
-	{
-	  vector<AnyVarRef> vars(2);
-          vars[0] = var1;
-          vars[1] = var2;
-	  return vars;
-	}
-  };
-
-// For reified Not Equals.
-#include "constraint_equal.h"
 
 template<typename VarArray>
 Constraint*
 NeqCon(StateObj* stateObj, const VarArray& var_array)
 { return new NeqConstraint<VarArray>(stateObj, var_array); }
 
-template<typename VarRef1, typename VarRef2, typename BoolVarRef>
-Constraint*
-ReifiedNeqConBinary(StateObj* stateObj, VarRef1 var1, VarRef2 var2, BoolVarRef var3)
-{ return new ReifiedEqualConstraint<VarRef1, VarRef2, VarNot<BoolVarRef> >
-                                   (stateObj,var1,var2, VarNotRef(var3)); }
 
 BUILD_CONSTRAINT1(CT_ALLDIFF, NeqCon)
 
-template<typename Var1, typename Var2>
-Constraint*
-NeqConBinary(StateObj* stateObj, const Var1& var1, const Var2& var2)
-{
-  return new NeqConstraintBinary<Var1, Var2>(stateObj, var1, var2); 
-}
-
-
-template<typename T1, typename T2>
-Constraint*
-BuildCT_DISEQ(StateObj* stateObj, const T1& t1, const T2& t2, bool reify,
-const BoolVarRef& reifyVar, ConstraintBlob& b)
-{
-  if(reify)
-    return ReifiedNeqConBinary(stateObj, t1[0], t2[0], reifyVar);
-  else
-    return NeqConBinary(stateObj, t1[0], t2[0]);
-}
 
 
