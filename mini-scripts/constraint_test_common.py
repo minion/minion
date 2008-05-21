@@ -673,7 +673,7 @@ class testoccurrence:
     
     def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrence", False, options, [6, 1], ["smallnum", "num"], [6, "smallconst", 1], self, False)
+        return runtestgeneral("occurrence", False, options, [6, 1, 1], ["smallnum", "smallconst", "num"], [6, 1, 1], self, False)
 
 class testoccurrenceleq:
     def printtable(self, domains, leq=True, geq=False):
@@ -689,7 +689,7 @@ class testoccurrenceleq:
     
     def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrenceleq", False, options, [6,1,1], ["smallnum", "smallconst", "smallnum"], [6,1,1], self, True)
+        return runtestgeneral("occurrenceleq", False, options, [6,1,1], ["smallnum", "smallconst", "smallconst"], [6,1,1], self, True)
 
 class testoccurrencegeq(testoccurrenceleq):
     def printtable(self, domains):
@@ -697,7 +697,7 @@ class testoccurrencegeq(testoccurrenceleq):
     
     def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrencegeq", False, options, [6,1,1], ["smallnum", "smallconst", "smallnum"], [6,1,1], self, True)
+        return runtestgeneral("occurrencegeq", False, options, [6,1,1], ["smallnum", "smallconst", "smallconst"], [6,1,1], self, True)
 
 class testproduct:
     def printtable(self, domains): 
