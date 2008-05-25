@@ -50,11 +50,7 @@ class DynamicTrigger;
 
 #define DYNAMIC_PROPAGATE_FUNCTION virtual void propagate
 
-#ifdef  FUNCTIONPOINTER_TRIGGER
-#define PROPAGATE_FUNCTION void propagate
-#else
 #define PROPAGATE_FUNCTION virtual void propagate
-#endif
 
 struct AbstractTriggerCreator;
 typedef vector<shared_ptr<AbstractTriggerCreator> > triggerCollection;
@@ -99,12 +95,8 @@ class AbstractConstraint
   
     /// Iterative propagation function.
     /** Can assume full_propagate is always called at least once before propagate */
-  #ifdef FUNCTIONPOINTER_TRIGGER
-    PROPAGATE_FUNCTION(int, DomainDelta) {}
-  #else
     PROPAGATE_FUNCTION(int, DomainDelta) 
     { D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + constraint_name()); }
-  #endif
   
   /// Checks if a constraint cannot be satisfied, and sets up any data structures for future incremental checks.
   /// Returns TRUE if constraint cannot be satisfied.

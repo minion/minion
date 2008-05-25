@@ -142,6 +142,7 @@ using namespace std;
 #include "debug.h"
 #include "array_functions.h"
 #include "trigger_timer.h"
+#include "box.h"
 //#include "light_vector.h"
 
 #endif

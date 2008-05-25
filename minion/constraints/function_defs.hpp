@@ -14,11 +14,7 @@
 inline void Trigger::propagate(DomainDelta domain_data)
 {
     D_INFO(0,DI_SOLVER,"Trigger Activated");
-#ifdef FUNCTIONPOINTER_TRIGGER
-    constraint_function_ptr(constraint, info, domain_data);
-#else
     constraint->propagate(info, domain_data); 
-#endif
 }
 
 inline void Trigger::full_propagate()

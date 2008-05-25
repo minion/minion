@@ -25,9 +25,6 @@ cout << "DYNAMICTRIGGERS" << " ";
 #ifdef FULL_DOMAIN_TRIGGERS
 cout << "FULL_DOMAIN_TRIGGERS" << " "; 
 #endif
-#ifdef FUNCTIONPOINTER_TRIGGER
-cout << "FUNCTIONPOINTER_TRIGGER" << " "; 
-#endif
 #ifdef LIGHT_VECTOR
 cout << "LIGHT_VECTOR" << " "; 
 #endif
