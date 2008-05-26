@@ -47,7 +47,7 @@ struct BigRangeVarRef_internal_template
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_No;
   static string name() { return "LongRange"; }
-  BOOL isBound()
+  BOOL isBound() const
   { return false;}
   
   int var_num;

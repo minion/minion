@@ -33,7 +33,7 @@ struct SwitchNeg
   static const BoundType isBoundConst = VarT::isBoundConst;
   VarT data;
 	
-  BOOL isBound()
+  BOOL isBound() const
   { return data.isBound();}
   
 
@@ -47,25 +47,25 @@ struct SwitchNeg
   SwitchNeg(const SwitchNeg& b) : data(b.data), multiplier(b.multiplier)
   {}
   
-  BOOL isAssigned()
+  BOOL isAssigned() const
   { return data.isAssigned(); }
   
-  DomainInt getAssignedValue()
+  DomainInt getAssignedValue() const
   { return multiplier * data.getAssignedValue(); }
   
-  BOOL isAssignedValue(DomainInt i)
+  BOOL isAssignedValue(DomainInt i) const
   { 
 	return data.isAssigned() &&
 	data.getAssignedValue() == i * multiplier;
   }
   
-  BOOL inDomain(DomainInt b)
+  BOOL inDomain(DomainInt b) const
   { return data.inDomain(b * multiplier); }
   
-  BOOL inDomain_noBoundCheck(DomainInt b)
+  BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain(b * multiplier); }
   
-  DomainInt getMax()
+  DomainInt getMax() const
   { 
 	if(multiplier == 1)
 	  return data.getMax();
@@ -73,7 +73,7 @@ struct SwitchNeg
 	  return -data.getMin(); 
   }
   
-  DomainInt getMin()
+  DomainInt getMin() const
   { 
 	if(multiplier == 1)
 	  return data.getMin();

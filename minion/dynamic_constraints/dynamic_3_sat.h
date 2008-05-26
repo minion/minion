@@ -154,6 +154,18 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
 	  vars.push_back(AnyVarRef(var_array[i]));
 	return vars;  
   }
+  
+  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  {
+    for(int i = 0; i < var_array.size(); ++i)
+    {
+      if(var_array[i].getMax() > 0)
+      {
+        assignment.push_back(make_pair(i, var_array[i].getMax()));
+        return;
+      }
+    }
+  }
 };
 
 template<typename VarArray>

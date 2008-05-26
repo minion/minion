@@ -13,7 +13,7 @@ struct Wrapper
   
   Wrapper() : t()
   {}
-  
+    
   Wrapper& operator+=(const Wrapper& w)
   { 
     t += w.t; 
@@ -97,5 +97,13 @@ WRAP_ARITHMETIC_OPS(%)
 template<typename T>
 Wrapper<T> abs(const Wrapper<T>& in)
 { return Wrapper<T>(abs(in.t)); }
+
+template<typename T>
+T raw(const T& t)
+  { return t;}
+  
+template<typename T>
+T raw(const Wrapper<T>& t)
+{  return raw(t); }
 
 #endif // _WRAPPER_H

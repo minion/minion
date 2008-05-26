@@ -93,11 +93,11 @@ class AbstractConstraint
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger*)
   { D_FATAL_ERROR("Fatal error in 'Dynamic Propagate' in " + constraint_name()); }
   
-    /// Iterative propagation function.
-    /** Can assume full_propagate is always called at least once before propagate */
-    PROPAGATE_FUNCTION(int, DomainDelta) 
-    { D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + constraint_name()); }
-  
+  /// Iterative propagation function.
+  /** Can assume full_propagate is always called at least once before propagate */
+  PROPAGATE_FUNCTION(int, DomainDelta) 
+  { D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + constraint_name()); }
+ 
   /// Checks if a constraint cannot be satisfied, and sets up any data structures for future incremental checks.
   /// Returns TRUE if constraint cannot be satisfied.
   /** This function is used by rarification */
@@ -115,6 +115,17 @@ class AbstractConstraint
 	  cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
     exit(1); 
   }
+  
+  /// Looks for a valid partial assignment to a constraint.
+  /** The return value (in the box) is pairs of <varnum, domain value>, where varnum is in the same position
+   *  as returned by get_vars.
+   */
+  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  {
+    cerr << "Finding assignment is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    exit(1);
+  }
+  
     
   /// Returns the reverse of the current constraint
   /** Used by rarification */

@@ -116,6 +116,29 @@ struct NeqIterated
     else
       { var.removeFromDomain(val); }
   }
+  
+  template<typename Var1, typename Var2>
+  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2, pair<int,int>& assign)
+  {
+    if(var1.isAssigned() && var2.isAssigned() && var1.getAssignedValue() == var2.getAssignedValue())
+      return false;
+    
+    if(var1.isAssigned())
+    {
+      if(var2.getMin() != var1.getAssignedValue())
+        assign = make_pair(var1.getAssignedValue(), var2.getMin());
+      else
+        assign = make_pair(var1.getAssignedValue(), var2.getMax());
+    }
+    else
+    {
+      if(var1.getMin() != var2.getMin())
+        assign = make_pair(var1.getMin(), var2.getMin());
+      else
+        assign = make_pair(var2.getMax(), var2.getMin());
+    }
+    return true;
+  }
 };
 
 struct LessIterated
@@ -150,6 +173,18 @@ struct LessIterated
      var1.addDynamicTrigger(dt, LowerBound);
      var2.addDynamicTrigger(dt + 1, UpperBound);
   }
+  
+  template<typename Var1, typename Var2>
+  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2, pair<int,int>& assign)
+  {
+    if(var1.getMin() < var2.getMax())
+    {
+      assign = make_pair(var1.getMin(), var2.getMax());
+      return true;
+    }
+    else
+      return false;
+  }
 };
 
 struct BothNonZeroIterated
@@ -183,6 +218,18 @@ struct BothNonZeroIterated
   {
      var1.addDynamicTrigger(dt, UpperBound);
      var2.addDynamicTrigger(dt + 1, UpperBound);
+  }
+  
+  template<typename Var1, typename Var2>
+  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2, pair<int,int>& assign)
+  {
+    if(var1.getMax() > 0 || var2.getMax() > 0)
+    {
+      assign = make_pair(var1.getMax(), var2.getMax());
+      return true;
+    }
+    else
+      return false;
   }
 };
 
@@ -384,6 +431,21 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       vars.push_back(AnyVarRef(var_array2[i]));
     return vars;  
   }
+  
+  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  {
+    pair<int, int> assign;
+    for(int i = 0; i < var_array1.size(); ++i)
+    {
+      if(Operator::get_satisfying_assignment(var_array1[i], var_array2[i], assign))
+      {
+        assignment.push_back(make_pair(i, assign.first));
+        assignment.push_back(make_pair(i + var_array1.size(), assign.second));
+        return;
+      }
+    }
+  }
+  
 };
 
 template<typename VarArray1,  typename VarArray2>

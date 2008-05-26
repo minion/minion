@@ -37,11 +37,6 @@
 #include <algorithm>
 using namespace std;
 
-//#include <bits/stl_iterator_base_funcs.h>
-//#include <bits/functexcept.h>
-//#include <bits/concept_check.h>
-
-
   template<typename T>
 class box 
 {
@@ -178,7 +173,7 @@ public:
 
   bool
     empty() const
-    { return M_finish - M_start; }
+    { return M_finish == M_start; }
 
   // This function is basically ignored in a box
   void
@@ -596,3 +591,7 @@ M_range_insert(iterator position, _ForwardIterator first,
 }
 
 #define MAKE_STACK_BOX(c, type, size) box<type> c((type*)alloca(sizeof(type) * size), size)
+#define GET_ASSIGNMENT(c, constraint) \
+box<pair<int, int> > c((pair<int,int>*)( alloca(sizeof(pair<int, int>) * constraint -> get_vars_singleton()->size()) ), constraint -> get_vars_singleton()->size());\
+  constraint->get_satisfying_assignment(c); 
+  

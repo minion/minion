@@ -55,7 +55,7 @@ struct BoundVarRef_internal
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Yes;
   static string name() { return "BoundVar"; }
-  BOOL isBound()
+  BOOL isBound() const
   { return true;}
 
   MoveablePointer var_bound_data;
@@ -91,7 +91,7 @@ struct BoundVarRef_internal
   BOOL isAssigned() const
   { return lower_bound() == upper_bound(); }
   
-   BOOL isAssignedValue(DomainInt i)
+   BOOL isAssignedValue(DomainInt i) const
   { 
     return isAssigned() &&
     getAssignedValue() == i;

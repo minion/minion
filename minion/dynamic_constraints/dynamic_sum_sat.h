@@ -173,6 +173,18 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
 	  vars.push_back(AnyVarRef(var_array[i]));
 	return vars;  
   }
+  
+  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  {
+    for(int i = 0; i < var_array.size(); ++i)
+    {
+      if(var_array[i].inDomain(1))
+      {
+        assignment.push_back(make_pair(i, 1));
+        return;
+      }
+    }
+  }
 };
 
 template<typename VarArray>

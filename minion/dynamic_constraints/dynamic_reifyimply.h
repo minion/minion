@@ -67,8 +67,9 @@ struct Dynamic_reify_true : public AbstractConstraint
   }
   
   virtual int dynamic_trigger_count() 
-  { return 1; }
+  { return 1 + poscon->get_vars_singleton()->size(); }
   
+  // Override setup!
   virtual void setup()
   {
     AbstractConstraint::setup();
@@ -101,12 +102,36 @@ struct Dynamic_reify_true : public AbstractConstraint
     D_INFO(1,DI_REIFY,"Propagation Start");
     if(constraint_locked)
 	    return;
-	  
-  	if(trig == dynamic_trigger_start())
+	 
+	  DynamicTrigger* dt = dynamic_trigger_start();
+	  DynamicTrigger* assign_trigs = dt + 1;
+	      
+  	if(trig == dt)
     {
+      D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
       D_INFO(1,DI_REIFY,"Full Pos Propagation");
 	    constraint_locked = true;
 	    getQueue(stateObj).pushSpecialTrigger(this);
+      return;
+    }
+    
+    if(trig >= assign_trigs && trig < assign_trigs + dynamic_trigger_count())
+    {// Lost assignment
+      if(!full_propagate_called)
+      {
+        GET_ASSIGNMENT(assignment, poscon);
+
+        if(assignment.empty())
+        { // No satisfying assignment to constraint
+          rar_var.propagateAssign(0);
+          return;
+        }
+      
+        vector<AnyVarRef>& poscon_vars = *(poscon->get_vars_singleton());
+
+        for(int i = 0; i < assignment.size(); ++i)
+          poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainRemoval, assignment[i].second);
+      }
       return;
     }
     
@@ -125,8 +150,27 @@ struct Dynamic_reify_true : public AbstractConstraint
   virtual void full_propagate()
   {
     DynamicTrigger* dt = dynamic_trigger_start();
+    DynamicTrigger* assign_trigs = dt + 1;
+    int dt_count = dynamic_trigger_count();
+    // Clean up triggers
+    for(int i = 0; i < dt_count; ++i)
+      dt[i].remove();
     
     rar_var.addDynamicTrigger(dt, LowerBound);
+    
+    GET_ASSIGNMENT(assignment, poscon);
+    
+    if(assignment.empty())
+    { // No satisfying assignment to constraint
+      cout << "Found no satisfying assignment!" << endl;
+      rar_var.propagateAssign(0);
+      return;
+    }
+    
+    vector<AnyVarRef>& poscon_vars = *(poscon->get_vars_singleton());
+
+    for(int i = 0; i < assignment.size(); ++i)
+      poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainRemoval, assignment[i].second);
     
     if(rar_var.isAssigned() && rar_var.getAssignedValue() > 0)
     {

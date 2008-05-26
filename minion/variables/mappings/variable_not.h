@@ -42,7 +42,7 @@ struct VarNot
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
   
-  BOOL isBound()
+  BOOL isBound()  const
   { return data.isBound();}
   
   VarNot(const VarRef& _data) : data(_data)
@@ -60,28 +60,28 @@ struct VarNot
   DomainInt swap(DomainInt i) const
   { return -i+1; }
 
-  BOOL isAssigned()
+  BOOL isAssigned() const
   { return data.isAssigned(); }
   
-  DomainInt getAssignedValue()
+  DomainInt getAssignedValue() const
   { return swap(data.getAssignedValue()); }
   
-  BOOL isAssignedValue(DomainInt i)
+  BOOL isAssignedValue(DomainInt i) const
   { 
     return data.isAssigned() &&
     swap(data.getAssignedValue()) == i;
   }
   
-  BOOL inDomain(DomainInt b)
+  BOOL inDomain(DomainInt b) const
   { return data.inDomain(swap(b)); }
 
-  BOOL inDomain_noBoundCheck(DomainInt b)
+  BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain(swap(b)); }
   
-  DomainInt getMax()
+  DomainInt getMax() const
   { return swap(data.getMin()); }
   
-  DomainInt getMin()
+  DomainInt getMin() const
   { return swap(data.getMax()); }
 
   DomainInt getInitialMax() const

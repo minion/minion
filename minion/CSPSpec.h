@@ -50,6 +50,8 @@ enum ReadTypes
   read_constant,
   read_constant_list,
   read_tuples,
+  read_constraint,
+  read_constraint_list,
   read_nothing
 };
 
@@ -134,6 +136,9 @@ struct ConstraintBlob
 
   /// For use in Gadget constraints, gives the actual gadget.
   shared_ptr<CSPInstance> gadget;
+  
+  /// For use in nested constraints.
+  vector<ConstraintBlob> internal_constraints;
   
   BOOL reified;
   BOOL implied_reified;

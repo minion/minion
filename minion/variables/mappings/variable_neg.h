@@ -36,7 +36,7 @@ struct VarNeg
   static const BoundType isBoundConst = VarT::isBoundConst;
   VarT data;
 
-  BOOL isBound()
+  BOOL isBound() const
   { return data.isBound();}
   
   VarNeg(VarT _data) : data(_data)
@@ -48,28 +48,28 @@ struct VarNeg
   VarNeg(const VarNeg& b) : data(b.data)
   {}
   
-  BOOL isAssigned()
+  BOOL isAssigned() const
   { return data.isAssigned(); }
   
-  DomainInt getAssignedValue()
+  DomainInt getAssignedValue() const
   { return -data.getAssignedValue(); }
   
-  BOOL isAssignedValue(DomainInt i)
+  BOOL isAssignedValue(DomainInt i) const
   { 
     return data.isAssigned() &&
     data.getAssignedValue() == -i;
   }
   
-  BOOL inDomain(DomainInt b)
+  BOOL inDomain(DomainInt b) const
   { return data.inDomain(-b); }
 
-  BOOL inDomain_noBoundCheck(DomainInt b)
+  BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain(-b); }
   
-  DomainInt getMax()
+  DomainInt getMax() const
   { return -data.getMin(); }
   
-  DomainInt getMin()
+  DomainInt getMin() const
   { return -data.getMax(); }
 
   DomainInt getInitialMax() const

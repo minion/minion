@@ -8,7 +8,7 @@ struct InfoRefType
   static const BOOL isBool = WrapType::isBool;
   static const BoundType isBoundConst = WrapType::isBoundConst;
 
-  BOOL isBound()
+  BOOL isBound() const
   { return data.isBound();}
   
   InfoRefType(const WrapType& _data) : data(_data)
@@ -20,43 +20,43 @@ struct InfoRefType
   InfoRefType(const InfoRefType& b) : data(b.data)
   {VAR_INFO_ADDONE(VAR_TYPE, copy);}
   
-  BOOL isAssigned()
+  BOOL isAssigned() const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, isAssigned);
     return data.isAssigned(); 
   }
   
-  DomainInt getAssignedValue()
+  DomainInt getAssignedValue() const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getAssignedValue);
     return data.getAssignedValue(); }
   
-  BOOL isAssignedValue(DomainInt i)
+  BOOL isAssignedValue(DomainInt i) const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, isAssignedValue);
     return data.isAssignedValue(i);
   }
   
-  BOOL inDomain(DomainInt b)
+  BOOL inDomain(DomainInt b) const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, inDomain);
     return data.inDomain( b); 
   }
   
-  BOOL inDomain_noBoundCheck(DomainInt b)
+  BOOL inDomain_noBoundCheck(DomainInt b) const
   {
     VAR_INFO_ADDONE(VAR_TYPE, inDomain_noBoundCheck);
     return data.inDomain_noBoundCheck(b);
   }
   
   
-  DomainInt getMax()
+  DomainInt getMax() const
   {
     VAR_INFO_ADDONE(VAR_TYPE, getMax);
     return data.getMax(); 
   }
   
-  DomainInt getMin()
+  DomainInt getMin() const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getMin);
     return data.getMin(); 

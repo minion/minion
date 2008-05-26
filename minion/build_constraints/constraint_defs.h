@@ -9,6 +9,8 @@ ConstraintDef constraint_list[] = {
 { "eq" , CT_EQ, 2,{ read_var , read_var }, STATIC_CT },
 { "abs" , CT_ABS, 2,{ read_var , read_var }, STATIC_CT },
 { "ineq" , CT_INEQ, 3,{ read_var , read_var , read_constant }, STATIC_CT },
+{ "watchneq" , CT_WATCHED_NEQ, 2,{ read_var , read_var }, DYNAMIC_CT },
+{ "watchless" , CT_WATCHED_LESS, 2,{ read_var , read_var }, DYNAMIC_CT },
 { "lexleq" , CT_LEXLEQ, 2,{ read_list , read_list }, STATIC_CT },
 { "lexless" , CT_LEXLESS, 2,{ read_list , read_list }, STATIC_CT },
 { "max" , CT_MAX, 2,{ read_list , read_var }, STATIC_CT },
@@ -36,6 +38,7 @@ ConstraintDef constraint_list[] = {
 { "watchvecexists_less" , CT_WATCHED_VEC_OR_LESS, 2,{ read_list , read_list }, DYNAMIC_CT },
 { "watchvecexists_and" , CT_WATCHED_VEC_OR_AND, 2,{ read_list , read_list }, DYNAMIC_CT },
 { "hamming" , CT_WATCHED_HAMMING, 3,{ read_list , read_list , read_constant }, DYNAMIC_CT },
+{ "watched-or" , CT_WATCHED_NEW_OR, 1,{ read_constraint_list }, DYNAMIC_CT },
 { "reify", CT_REIFY, 0, {read_var}, STATIC_CT },
 { "reifyimply", CT_REIFYIMPLY, 0, {read_var}, STATIC_CT },
 };

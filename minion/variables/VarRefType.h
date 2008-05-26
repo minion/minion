@@ -42,7 +42,7 @@ struct VarRefType
 
   InternalRefType data;
   
-  BOOL isBound()
+  BOOL isBound() const
   { return data.isBound();}
   
   VarRefType(const InternalRefType& _data) : data(_data)
@@ -54,28 +54,28 @@ struct VarRefType
   VarRefType(const VarRefType& b) : data(b.data)
   {}
   
-  BOOL isAssigned()
+  BOOL isAssigned() const
   { return GET_CONTAINER().isAssigned(data); }
   
-  DomainInt getAssignedValue()
+  DomainInt getAssignedValue() const
   { return GET_CONTAINER().getAssignedValue(data); }
   
-  BOOL isAssignedValue(DomainInt i)
+  BOOL isAssignedValue(DomainInt i) const
   { 
     return GET_CONTAINER().isAssigned(data) &&
     GET_CONTAINER().getAssignedValue(data) == i;
   }
   
-  BOOL inDomain(DomainInt b)
+  BOOL inDomain(DomainInt b) const
   { return GET_CONTAINER().inDomain(data, b); }
 
-  BOOL inDomain_noBoundCheck(DomainInt b)
+  BOOL inDomain_noBoundCheck(DomainInt b) const
   { return GET_CONTAINER().inDomain_noBoundCheck(data, b); }
   
-  DomainInt getMax()
+  DomainInt getMax() const
   { return GET_CONTAINER().getMax(data); }
   
-  DomainInt getMin()
+  DomainInt getMin() const
   { return GET_CONTAINER().getMin(data); }
 
   DomainInt getInitialMax() const
@@ -145,7 +145,7 @@ struct QuickVarRefType
   static const BoundType isBoundConst = InternalRefType::isBoundConst;
   InternalRefType data;
   
-  BOOL isBound()
+  BOOL isBound() const
   { return data.isBound();}
   
   QuickVarRefType(const InternalRefType& _data) : data(_data)
@@ -157,27 +157,27 @@ struct QuickVarRefType
   QuickVarRefType(const QuickVarRefType& b) : data(b.data)
   {}
   
-  BOOL isAssigned()
+  BOOL isAssigned() const
   { return data.isAssigned(); }
   
-  DomainInt getAssignedValue()
+  DomainInt getAssignedValue() const
   { return data.getAssignedValue(); }
   
-  BOOL isAssignedValue(DomainInt i)
+  BOOL isAssignedValue(DomainInt i) const
   { 
     return data.isAssigned() &&
     data.getAssignedValue() == i;
   }
-  BOOL inDomain(DomainInt b)
+  BOOL inDomain(DomainInt b) const
   { return data.inDomain(b); }
   
-  BOOL inDomain_noBoundCheck(DomainInt b)
+  BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain_noBoundCheck(b); }
 
-  DomainInt getMax()
+  DomainInt getMax() const
   { return data.getMax(); }
   
-  DomainInt getMin()
+  DomainInt getMin() const
   { return data.getMin(); }
 
   DomainInt getInitialMax() const
@@ -253,24 +253,24 @@ struct CompleteVarRefType
   CompleteVarRefType(const CompleteVarRefType& b) : data(b.data)
   {}
   
-  BOOL isAssigned()
+  BOOL isAssigned() const
   { return (data.getCon()).isAssigned(data); }
   
-  DomainInt getAssignedValue()
+  DomainInt getAssignedValue() const
   { return (data.getCon()).getAssignedValue(data); }
   
-  BOOL isAssignedValue(DomainInt i)
+  BOOL isAssignedValue(DomainInt i) const
   { 
     return (data.getCon()).isAssigned(data) &&
     (data.getCon()).getAssignedValue(data) == i;
   }
-  BOOL inDomain(DomainInt b)
+  BOOL inDomain(DomainInt b) const
   { return (data.getCon()).inDomain(data, b); }
   
-  DomainInt getMax()
+  DomainInt getMax() const
   { return (data.getCon()).getMax(data); }
   
-  DomainInt getMin()
+  DomainInt getMin() const
   { return (data.getCon()).getMin(data); }
 
   DomainInt getInitialMax() const

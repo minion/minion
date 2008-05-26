@@ -56,7 +56,7 @@ struct SparseBoundVarRef_internal
   static const BOOL isBool = true;
   static const BoundType isBoundConst = Bound_Yes;
   static string name() { return "SparseBound"; }
-  BOOL isBound()
+  BOOL isBound() const
   { return true;}
   
   int var_num;

@@ -66,7 +66,7 @@ struct BoolVarRef_internal
   static const BOOL isBool = true;
   static const BoundType isBoundConst = Bound_No;
   static string name() { return "Bool"; }
-  BOOL isBound()
+  BOOL isBound() const
   { return false;}
   
   data_type shift_offset;

@@ -101,7 +101,7 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
 {
   static const BOOL isBool = VarRef::isBool;
   static const BoundType isBoundConst = MapData::BoundType || VarRef::isBoundConst;
-  BOOL isBound()
+  BOOL isBound() const
   { return MapData::BoundType || data.isBound(); }
   
   VarRef data;
@@ -119,33 +119,33 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
   MultiplyVar(const MultiplyVar& b) : data(b.data), dataMap(b.dataMap)
   { }
   
-  BOOL isAssigned()
+  BOOL isAssigned() const
   { return data.isAssigned(); }
   
-  DomainInt getAssignedValue()
+  DomainInt getAssignedValue() const
   { return data.getAssignedValue() * dataMap.multiply() + dataMap.shift(); }
   
-  BOOL isAssignedValue(DomainInt i)
+  BOOL isAssignedValue(DomainInt i) const
   { 
     if(!data.isAssigned()) return false;	
 	  return this->getAssignedValue() == i;
   }
   
-  BOOL inDomain(DomainInt b)
+  BOOL inDomain(DomainInt b) const
   { 
     if((b - dataMap.shift()) % dataMap.multiply() != 0)
 	    return false;
 	  return data.inDomain(MapHelp::divide_exact(b - dataMap.shift(), dataMap));
   }
   
-  BOOL inDomain_noBoundCheck(DomainInt b)
+  BOOL inDomain_noBoundCheck(DomainInt b) const
   { 
     if(b % dataMap.multiply() != 0)
 	  return false;
   	return data.inDomain(MapHelp::divide_exact(b - dataMap.shift(), dataMap));
   }
   
-  DomainInt getMax()
+  DomainInt getMax() const
   {  
     if(dataMap.multiply() >= 0)
       return data.getMax() * dataMap.multiply() + dataMap.shift(); 
@@ -153,7 +153,7 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
 	  return data.getMin() * dataMap.multiply() + dataMap.shift();
   }
   
-  DomainInt getMin()
+  DomainInt getMin() const
   { 
     if(dataMap.multiply() >= 0)
 	  return data.getMin() * dataMap.multiply() + dataMap.shift(); 
@@ -264,7 +264,7 @@ struct MultiplyVar
 {
   static const BOOL isBool = true;
   static const BoundType isBoundConst = Bound_Yes;
-  BOOL isBound()
+  BOOL isBound() const
   { return true; }
   
   VarRef data;
@@ -282,34 +282,34 @@ struct MultiplyVar
   MultiplyVar(const MultiplyVar& b) : data(b.data), Multiply(b.Multiply)
   { }
   
-  BOOL isAssigned()
+  BOOL isAssigned() const
   { return data.isAssigned(); }
   
-  DomainInt getAssignedValue()
+  DomainInt getAssignedValue() const
   { return data.getAssignedValue() * Multiply; }
   
-  BOOL isAssignedValue(DomainInt i)
+  BOOL isAssignedValue(DomainInt i) const
   { 
     if(!data.isAssigned()) return false;
 	
 	return data.getAssignedValue() == i * Multiply;
   }
   
-  BOOL inDomain(DomainInt b)
+  BOOL inDomain(DomainInt b) const
   { 
     if(b % Multiply != 0)
 	  return false;
 	return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
   
-  BOOL inDomain_noBoundCheck(DomainInt b)
+  BOOL inDomain_noBoundCheck(DomainInt b) const
   { 
     if(b % Multiply != 0)
 	  return false;
 	return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
   
-  DomainInt getMax()
+  DomainInt getMax() const
   {  
     if(Multiply >= 0)
       return data.getMax() * Multiply; 
@@ -317,7 +317,7 @@ struct MultiplyVar
 	  return data.getMin() * Multiply;
   }
   
-  DomainInt getMin()
+  DomainInt getMin() const
   { 
     if(Multiply >= 0)
 	  return data.getMin() * Multiply; 

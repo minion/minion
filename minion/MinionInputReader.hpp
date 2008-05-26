@@ -202,11 +202,6 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
 
   switch(constraint.type)
   {
-//	case CT_ELEMENT:
-//	case CT_WATCHED_ELEMENT:
-//	case CT_GACELEMENT:
-//	  readConstraintElement(infile, constraint) ;
-//	  break;
 	case CT_REIFY:
 	case CT_REIFYIMPLY:
 	  { 

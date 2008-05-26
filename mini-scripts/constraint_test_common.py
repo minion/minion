@@ -558,6 +558,34 @@ class testeq:
     def runtest(self, options=dict()):
         return runtestgeneral("eq", True, options, [1,1], ["num", "num"], [1,1], self, False)
 
+class testwatchneq:
+    # printtable essentially sets up pairsame constraint. negation of alldiff.
+    def printtable(self, domains):
+        cross=[]
+        out=[]
+        crossprod(domains, [], cross)
+        for l in cross:
+            if l[0] != l[1] :
+                out.append(l)
+        return out
+
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchneq", False, options, [1,1], ["num", "num"], [1,1], self, True)
+
+class testwatchless:
+    # printtable essentially sets up pairsame constraint. negation of alldiff.
+    def printtable(self, domains):
+        cross=[]
+        out=[]
+        crossprod(domains, [], cross)
+        for l in cross:
+            if l[0] < l[1] :
+                out.append(l)
+        return out
+
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchless", True, options, [1,1], ["num", "num"], [1,1], self, True)
+		
 class testineq:
     def printtable(self, domains):
         const=self.constants[0]

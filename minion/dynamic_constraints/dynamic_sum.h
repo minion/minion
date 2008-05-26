@@ -315,6 +315,23 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint
 	  vars.push_back(AnyVarRef(var_array[i]));
 	return vars;  
   }
+  
+  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  {
+    int count = 0;
+    for(int i = 0; i < var_array.size(); ++i)
+    {
+      if(var_array[i].inDomain(!VarToCount))
+      {
+        assignment.push_back(make_pair(i, !VarToCount));
+        count++;
+        if(count == var_sum)
+          return;
+      }
+    }
+    // We didn't make a complete assignment
+    assignment.empty();
+  }
 };
 
 template<typename VarArray,  typename VarSum>

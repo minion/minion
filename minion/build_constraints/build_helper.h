@@ -196,6 +196,31 @@ struct BuildConObj<CT_NAME, 0> \
 }; \
 } \
 
+#define TERMINATE_BUILDCON0(CT_NAME) \
+namespace BuildCon \
+{ \
+template<> \
+struct BuildConObj<CT_NAME, 0> \
+{ \
+  static  \
+  AbstractConstraint* build(StateObj* stateObj, const EmptyType& vars, ConstraintBlob& b, int) \
+  { \
+	if(b.implied_reified) \
+	{ \
+	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos); \
+	  BoolVarRef dummyVar; \
+      return truereifyCon(stateObj, Build ## CT_NAME(stateObj, false, dummyVar, b), reifyVar); \
+	} \
+	else \
+	{ \
+	  BoolVarRef reifyVar; \
+	  if(b.reified) \
+	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos); \
+	  return Build ## CT_NAME(stateObj, b.reified, reifyVar, b); \
+	} \
+  } \
+}; \
+} \
 
 #define START_BUILDCON(CT_NAME, COUNT) \
 AbstractConstraint* \
@@ -203,12 +228,13 @@ build_constraint_ ## CT_NAME(StateObj* stateObj, ConstraintBlob& b) \
 { return BuildConObj<CT_NAME, COUNT>::build(stateObj, EmptyType(), b, 0); }
 
 #define BUILD_STATIC_CT(CT_NAME,COUNT) \
-START_BUILDCON(CT_NAME, COUNT) \
-MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME)
+MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME) \
+START_BUILDCON(CT_NAME, COUNT)
 
 #define BUILD_DYNAMIC_CT(CT_NAME,COUNT) \
-START_BUILDCON(CT_NAME, COUNT) \
-MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME)
+MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME) \
+START_BUILDCON(CT_NAME, COUNT)
+
 
 #define BUILD_DEF_STATIC_CT(CT_NAME) \
 AbstractConstraint* build_constraint_ ## CT_NAME(StateObj* stateObj, ConstraintBlob&);

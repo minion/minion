@@ -35,7 +35,7 @@ struct ShiftVar
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
   
-  BOOL isBound()
+  BOOL isBound() const
   { return data.isBound();}
   
   ShiftType shift;
@@ -48,25 +48,25 @@ struct ShiftVar
   ShiftVar(const ShiftVar& b) : data(b.data), shift(b.shift)
   { }
   
-  BOOL isAssigned()
+  BOOL isAssigned() const
   { return data.isAssigned(); }
   
-  DomainInt getAssignedValue()
+  DomainInt getAssignedValue() const
   { return data.getAssignedValue() + shift; }
   
-  BOOL isAssignedValue(DomainInt i)
+  BOOL isAssignedValue(DomainInt i) const
   { return data.getAssignedValue() == i - shift; }
   
-  BOOL inDomain(DomainInt i)
+  BOOL inDomain(DomainInt i) const
   { return data.inDomain(i - shift); }
 
-  BOOL inDomain_noBoundCheck(DomainInt i)
+  BOOL inDomain_noBoundCheck(DomainInt i) const
   { return data.inDomain(i - shift); }
   
-  DomainInt getMax()
+  DomainInt getMax() const
   { return data.getMax() + shift; }
   
-  DomainInt getMin()
+  DomainInt getMin() const
   { return data.getMin() + shift; }
 
   DomainInt getInitialMax() const

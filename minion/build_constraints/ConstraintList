@@ -7,6 +7,8 @@ STATIC_CT  "diseq"   			CT_DISEQ   		read_var read_var
 STATIC_CT  "eq"     			CT_EQ      		read_var read_var  
 STATIC_CT  "abs"      			CT_ABS     		read_var read_var  
 STATIC_CT  "ineq"    			CT_INEQ    		read_var read_var read_constant  
+DYNAMIC_CT "watchneq"			CT_WATCHED_NEQ		read_var read_var
+DYNAMIC_CT "watchless"			CT_WATCHED_LESS		read_var read_var
 STATIC_CT  "lexleq"  			CT_LEXLEQ  		read_list read_list  
 STATIC_CT  "lexless" 			CT_LEXLESS 		read_list read_list  
 STATIC_CT  "max"     			CT_MAX     		read_list read_var  
@@ -34,3 +36,4 @@ DYNAMIC_CT "disabled-or" 		CT_WATCHED_OR		read_list
 DYNAMIC_CT "watchvecexists_less"	CT_WATCHED_VEC_OR_LESS	read_list read_list
 DYNAMIC_CT "watchvecexists_and" 	CT_WATCHED_VEC_OR_AND	read_list read_list
 DYNAMIC_CT "hamming"			CT_WATCHED_HAMMING	read_list read_list read_constant
+DYNAMIC_CT "watched-or"			CT_WATCHED_NEW_OR	read_constraint_list

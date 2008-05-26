@@ -131,6 +131,18 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
       vars.push_back(AnyVarRef(var_array[i]));
     return vars;  
   }
+  
+  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  {
+    for(int i = 0; i < var_array.size(); ++i)
+    {
+      if(var_array[i].inDomain(negs[i]))
+      {
+        assignment.push_back(make_pair(i, negs[i]));
+        return;
+      }
+    }
+  }
 };
 
 template<typename T>
