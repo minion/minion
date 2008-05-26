@@ -31,6 +31,8 @@ conslist+=["element", "reifyimplyelement", "watchelement", "reifyimplywatcheleme
 conslist+=["modulo", "reifyimplymodulo", "pow", "reifyimplypow", "minuseq", "reifyimplyminuseq"]
 conslist+=["product", "reifyimplyproduct"]
 conslist+=["div", "reifyimplydiv"]
+conslist+=["abs", "reifyimplyabs"]
+
 
 conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "watchvecexists_less", "watchvecexists_and", "hamming"]
 conslist+=["reifyimplywatchsumleq", "reifyimplywatchsumgeq", "reifyimplywatchvecneq", "reifyimplywatchvecexists_less", "reifyimplywatchvecexists_and", "reifyimplyhamming"]
@@ -52,7 +54,6 @@ conslist+=["lexleq", "lexless", "reifylexleq", "reifylexless", "reifyimplylexleq
 
 conslist+=["max", "min", "reifyimplymax", "reifyimplymin"]
 
-conslist+=["abs", "reifyimplyabs"]
 
 
 #todo

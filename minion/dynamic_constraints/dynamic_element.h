@@ -229,9 +229,10 @@ struct ElementConstraintDynamic : public AbstractConstraint
   {
 	D_INFO(2, DI_DYELEMENT, "Setup Triggers");
     for(int i=0; i<var_array.size(); i++) 
-        if(var_array[i].isBound()) 
+        if(var_array[i].isBound() && !var_array[i].isAssigned()) // isassigned excludes constants.
             cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
-    if(indexvar.isBound() || resultvar.isBound())
+    if((indexvar.isBound() && !indexvar.isAssigned())
+        || (resultvar.isBound() && !resultvar.isAssigned()))
         cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
     
 	int array_size = var_array.size(); 

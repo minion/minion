@@ -572,7 +572,7 @@ class testineq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("ineq", True, options, [2,1], ["num", "const"], [1,1,1], self, not options['reifyimply'])
+        return runtestgeneral("ineq", True, options, [1,1,1], ["num", "num", "const"], [1,1,1], self, True)
 
 class testabs:
     def printtable(self, domains):
@@ -587,7 +587,7 @@ class testabs:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("abs", True, options, [2], ["num"], [1,1,], self, False)
+        return runtestgeneral("abs", True, options, [1,1], ["num","num"], [1,1], self, False)
 
 class testhamming:
     def printtable(self, domains):
@@ -697,7 +697,7 @@ class testoccurrencegeq(testoccurrenceleq):
     
     def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrencegeq", False, options, [6,1,1], ["smallnum", "smallconst", "smallconst"], [6,1,1], self, True)
+        return runtestgeneral("occurrencegeq", False, options, [6,1,1], ["smallnum", "smallconst", "smallconst"], [6,1,1], self, False)
 
 class testproduct:
     def printtable(self, domains): 
