@@ -100,7 +100,7 @@ struct Regin
 			tuples[i] = tupleList->get_vector(i);
 		  
 		  // sort, required for correctness.
-		  sort(tuples.begin(), tuples.end(), TupleComparator(0, arity));
+		  std::stable_sort(tuples.begin(), tuples.end(), TupleComparator(0, arity));
 		  
 		  	  tuplelist=new TupleH*[tuples.size()];
 			  setuplist();

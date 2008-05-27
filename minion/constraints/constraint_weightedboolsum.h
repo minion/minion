@@ -89,7 +89,7 @@ struct LeqWeightBoolSumConstraint : public AbstractConstraint
       vector<pair_val> sort_array;
       for(int i = 0; i < array_size; ++i)
 	sort_array.push_back(make_pair(&_weight_array[i], &_var_array[i]));
-      std::sort(sort_array.begin(), sort_array.end(), compare_object());
+      std::stable_sort(sort_array.begin(), sort_array.end(), compare_object());
       for(int i = 0; i < array_size; ++i)
       {
 	var_array[i] = *(sort_array[i].second);
