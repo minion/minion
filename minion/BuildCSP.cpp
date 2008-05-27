@@ -75,7 +75,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   
   if(getOptions(stateObj).randomise_valvarorder)
   {
-    cout << "Using seed: " << args.random_seed << endl;
+    getOptions(stateObj).printLine("Using seed: " + args.random_seed);
     srand( args.random_seed );
     
     std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());
@@ -85,7 +85,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   
   if(!getState(stateObj).isFailed())
   {
-    PropogateCSP(stateObj, args.preprocess, var_val_order.first, true);
+    PropogateCSP(stateObj, args.preprocess, var_val_order.first, !getOptions(stateObj).print_only_solution);
 	  getState(stateObj).getOldTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", oldtableout, !getOptions(stateObj).print_only_solution);
 	  if(!getState(stateObj).isFailed())
     {
@@ -111,10 +111,18 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   }
   
   getState(stateObj).getOldTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", oldtableout, !getOptions(stateObj).print_only_solution);
-  cout << "Total Nodes: " << getState(stateObj).getNodeCount() << endl;
-  cout << "Problem solvable?: " 
-  << (getState(stateObj).getSolutionCount() == 0 ? "no" : "yes") << endl;
-  cout << "Solutions Found: " << getState(stateObj).getSolutionCount() << endl;
+  getOptions(stateObj).printLine("Total Nodes: " + to_string( getState(stateObj).getNodeCount() ));
+  getOptions(stateObj).printLine(string("Problem solvable?: ") + (getState(stateObj).getSolutionCount() == 0 ? "no" : "yes"));
+  
+  if(getOptions(stateObj).cspcomp)
+  {
+    if(getState(stateObj).getSolutionCount() != 0)
+      cout << "s SATISFIABLE" << endl;
+    else
+      cout << "s UNSATISFIABLE" << endl;
+  }
+      
+  getOptions(stateObj).printLine("Solutions Found: " + to_string(getState(stateObj).getSolutionCount()));
   
   oldtableout.set("Nodes", to_string(getState(stateObj).getNodeCount()));
   oldtableout.set("Satisfiable", (getState(stateObj).getSolutionCount()==0 ? 0 : 1));
@@ -126,7 +134,8 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   }
   
 #ifdef MORE_SEARCH_INFO
-  print_search_info();
+  if(!getOptions(stateObj).cspcomp)
+    print_search_info();
 #endif
   
 }

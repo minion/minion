@@ -314,10 +314,9 @@ try {
 
   getState(stateObj).getOldTimer().startClock();
   
-  cout << "# " << VERSION << endl ;
-  cout << "# Svn version: " << SVN_VER << endl; 
-
   if (argc == 1) {
+    getOptions(stateObj).printLine("# " + to_string(VERSION));
+    getOptions(stateObj).printLine("# Svn version: " + to_string(SVN_VER));
     print_default_help(argv);
     return EXIT_SUCCESS;
   }
@@ -339,10 +338,13 @@ try {
 
   parse_command_line(stateObj, args, argc, argv);
   
+  getOptions(stateObj).printLine("# " + to_string(VERSION));
+  getOptions(stateObj).printLine("# Svn version: " + to_string(SVN_VER));
+  
   if (!getOptions(stateObj).print_only_solution) 
   { 
     
-    cout << "# Svn last changed date: " << SVN_DATE << endl;
+    getOptions(stateObj).printLine("# Svn last changed date: " + to_string(SVN_DATE) );
     
     time_t rawtime;
     time(&rawtime);

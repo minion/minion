@@ -19,6 +19,11 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
 	{ getOptions(stateObj).print_solution = false; }
 	else if(command == string("-printsolsonly"))
 	{ getOptions(stateObj).print_only_solution = true; }
+	else if(command == string("-cspcomp"))
+  { 
+    getOptions(stateObj).print_only_solution = true;
+    getOptions(stateObj).cspcomp = true;
+  }
 	else if(command == string("-verbose"))
 	{ getOptions(stateObj).parser_verbose = true; }
     else if(command == string("-X-prop-node"))

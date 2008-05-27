@@ -71,9 +71,9 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
     
     if(instance.var_order.size() > instance.val_order.size())
     {
-      cout << "# Var order size = " << instance.var_order.size();  
-      cout << ", Val order size = " << instance.val_order.size();
-      cout << ", so padding val order." << endl;
+      getOptions(stateObj).print("# Var order size = " + to_string(instance.var_order.size()));  
+      getOptions(stateObj).print( ", Val order size = " + to_string(instance.val_order.size()));
+      getOptions(stateObj).printLine( ", so padding val order.");
     
       instance.val_order.insert(instance.val_order.end(), 
         instance.var_order.size() - instance.val_order.size(), instance.val_order.back());

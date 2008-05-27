@@ -165,6 +165,9 @@ public:
 
   /// Denotes if only solutions should be printed.
   bool print_only_solution;
+  /// Denotes if we should output in a compatable way to the solver competition.
+  bool cspcomp;
+  
   /// Denotes if the search tree should be printed.
   bool dumptree;
   /// Gives the solutions which should be found. 
@@ -178,7 +181,7 @@ public:
   bool nocheck;
   /// Denotes to nodelimit, 0 if none given.
   unsigned long long nodelimit;
-  /// Dentoes if information about search should be printed to a file.
+  /// Denotes if information about search should be printed to a file.
   bool tableout;
   
   /// Denotes if solutions should be printed to a seperate file.
@@ -206,7 +209,7 @@ public:
 #ifdef WDEG
     wdeg_on(false),
 #endif
-     find_generators(false), print_only_solution(false), dumptree(false), sollimit(1), fullpropagate(false), 
+     find_generators(false), print_only_solution(false), cspcomp(false), dumptree(false), sollimit(1), fullpropagate(false), 
 #ifdef NO_DEBUG
     nocheck(true),
 #else
@@ -219,6 +222,18 @@ public:
   /// Denotes all solutions should be found, by setting sollimit to -1.
   void findAllSolutions()
   { sollimit = -1; }
+  
+  void print(string s)
+  {
+    if(!cspcomp)
+     cout << s; 
+  }
+  
+  void printLine(string s)
+  { 
+    if(!cspcomp)
+    cout << s << endl; 
+  }
 };
 
 

@@ -50,13 +50,15 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
   
     if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp")
     {
-      cout << "# Using gzip uncompression" << endl;
+      if(parser_verbose)
+        cout << "# Using gzip uncompression" << endl;
       in.push(gzip_decompressor());
     }    
   
     if(extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
     {
-      cout << "# Using bzip2 uncompression" << endl;
+      if(parser_verbose)
+        cout << "# Using bzip2 uncompression" << endl;
       in.push(bzip2_decompressor());
     }
       
