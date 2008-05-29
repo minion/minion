@@ -22,6 +22,7 @@ public:
     , size(_size)
   #endif
     {
+        D_ASSERT(&getMemory(stateObj).monotonicSet() !=NULL);
         offset=MS.request_storage(_size);
         #ifndef NO_DEBUG
         cout << "Set up ReversibleMonotonicSet with size "<< _size << " and offset " << offset <<endl;

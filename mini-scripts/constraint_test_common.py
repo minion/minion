@@ -532,6 +532,11 @@ class testalldiffgacslow(testalldiff):
     def runtest(self, options=dict()):
         return runtestgeneral("alldiffgacslow", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'] and not options['reifyimply'])
 
+class testgacalldiff(testalldiff):
+    def runtest(self, options=dict()):
+        return runtestgeneral("gacalldiff", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'] and not options['reifyimply'])
+
+
 class testwatchedalldiff(testalldiff):
     def runtest(self, options=dict()):
         return runtestgeneral("watchedalldiff", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'] and not options['reifyimply'])

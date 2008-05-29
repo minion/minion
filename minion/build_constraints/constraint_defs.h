@@ -5,6 +5,7 @@ ConstraintDef constraint_list[] = {
 { "gacelement-deprecated" , CT_GACELEMENT, 3,{ read_list , read_var , read_var }, STATIC_CT },
 { "alldiff" , CT_ALLDIFF, 1,{ read_list }, STATIC_CT },
 { "alldiffgacslow" , CT_ALLDIFF_GACSLOW, 1,{ read_list }, STATIC_CT },
+{ "gacalldiff" , CT_GACALLDIFF, 1,{ read_list }, STATIC_CT },
 { "diseq" , CT_DISEQ, 2,{ read_var , read_var }, STATIC_CT },
 { "eq" , CT_EQ, 2,{ read_var , read_var }, STATIC_CT },
 { "abs" , CT_ABS, 2,{ read_var , read_var }, STATIC_CT },

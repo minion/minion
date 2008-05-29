@@ -5,6 +5,7 @@ case CT_ELEMENT : return build_constraint_CT_ELEMENT(stateObj, b);
 case CT_GACELEMENT : return build_constraint_CT_GACELEMENT(stateObj, b);
 case CT_ALLDIFF : return build_constraint_CT_ALLDIFF(stateObj, b);
 case CT_ALLDIFF_GACSLOW : return build_constraint_CT_ALLDIFF_GACSLOW(stateObj, b);
+case CT_GACALLDIFF : return build_constraint_CT_GACALLDIFF(stateObj, b);
 case CT_DISEQ : return build_constraint_CT_DISEQ(stateObj, b);
 case CT_EQ : return build_constraint_CT_EQ(stateObj, b);
 case CT_ABS : return build_constraint_CT_ABS(stateObj, b);
