@@ -21,10 +21,16 @@ if retval!=0:
     sendemail.mail("An error occurred when checking out or doing make veryclean.")
     exit(1)
 
-retval+=system("make minion")
+retval+=system("make minion -j2")
 
 if retval!=0:
     sendemail.mail("An error occurred when building minion.")
+    exit(1)
+
+retval+=system("make minion DEBUG=1 -j2")
+
+if retval!=0:
+    sendemail.mail("An error occurred when building minion-debug.")
     exit(1)
 
 chdir("test_instances")
@@ -34,7 +40,15 @@ if retval!=0:
     sendemail.mail("An error occurred when running test_instances/run_tests.sh for minion")
     exit(1)
 
-chdir(homedir+miniondir)   #cd /home/pn/minion-svn/minion
+chdir("test_instances")
+retval+=system("./run_tests.sh ../bin/minion-debug")
 
-system("mini-scripts/testallconstraints.py --numtests=300 --email --minion=bin/minion") 
+if retval!=0:
+    sendemail.mail("An error occurred when running test_instances/run_tests.sh for minion-debug")
+    exit(1)
+
+chdir(homedir+miniondir)   #cd /home/pn/minion-svn1/minion
+
+system("mini-scripts/testallconstraints.py --numtests=500 --email --minion=bin/minion &")
+system("mini-scripts/testallconstraints.py --numtests=100 --email --minion=bin/minion-debug")
 

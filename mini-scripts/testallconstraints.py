@@ -22,6 +22,7 @@ conslist+=["diseq", "reifydiseq", "reifyimplydiseq", "eq", "reifyeq", "reifyimpl
 
 # alldiffs
 conslist+=["alldiff", "reifyalldiff",  "reifyimplyalldiff", "alldiffgacslow", "reifyalldiffgacslow", "reifyimplyalldiffgacslow"]
+conslist+=["gacalldiff", "reifygacalldiff", "reifyimplygacalldiff"]
 
 #element constraints
 conslist+=["gacelement-deprecated", "reifyimplygacelement-deprecated"]
@@ -100,6 +101,10 @@ for consname1 in conslist:
             if email:
                 mailstring="Mail from testallconstraints.py.\n"
                 mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)
+                if fullprop:
+                    mailstring+="Testing equivalence of -fullprop and normal propagation.\n"
+                else:
+                    mailstring+="Testing correctness against table representation.\n"
                 mailstring+="Using binary %s\n"%minionbin
                 mail(mailstring)
             sys.exit(1)
