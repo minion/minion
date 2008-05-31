@@ -108,7 +108,7 @@ struct ConstantVar
   { dt->remove(); }
 #endif
 
-  vector<AbstractConstraint*>* getConstraints() { ; }
+  vector<AbstractConstraint*>* getConstraints() { return NULL; }
 
   void addConstraint(AbstractConstraint* c){ ; }
 
