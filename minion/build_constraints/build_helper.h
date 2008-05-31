@@ -11,7 +11,6 @@
 //#include "../minion.h"
 #include "../CSPSpec.h"
 
-using namespace ProbSpec;
 
 #include "../BuildConstraintConstructs.h"
 

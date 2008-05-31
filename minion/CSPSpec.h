@@ -88,6 +88,9 @@ enum VariableType
   VAR_INVALID = -999
 };
 
+namespace ProbSpec
+{
+  
 struct Var
 {
   VariableType type;
@@ -111,8 +114,6 @@ struct Var
    { return (type < var.type) || (type == var.type && pos < var.pos); }
 };
 
-namespace ProbSpec
-{
 
 struct CSPInstance;
   
@@ -590,6 +591,8 @@ struct ConstraintBlob
 };
   
 }
+
+using namespace ProbSpec;
 
 #endif
 

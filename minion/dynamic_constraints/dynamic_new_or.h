@@ -215,9 +215,10 @@ For Licence Information see file LICENSE.txt
 
     if(found_watch == false)
     { 
-      // Propagate watched_constraint[0]
+      propagated_constraint = watched_constraint[0];
+      constraint_locked = true;
+	    getQueue(stateObj).pushSpecialTrigger(this);
     }
-
 
   }
 };

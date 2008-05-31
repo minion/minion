@@ -13,7 +13,6 @@
 
 #include "CSPSpec.h"
 
-using namespace ProbSpec;
 
 template<typename StreamType>
 struct ConcreteFileReader

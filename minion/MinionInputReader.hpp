@@ -20,7 +20,6 @@
 
 //#include "minion.h"
 #include "CSPSpec.h"
-using namespace ProbSpec;
 
 #include "MinionInputReader.h"
 

@@ -297,7 +297,6 @@ nothing at all...)
 #include "system/system.h"
 
 #include "CSPSpec.h"
-using namespace ProbSpec;
 
 #include "MinionInputReader.h"
 

@@ -18,7 +18,6 @@
 #include "minion.h"
 #include "CSPSpec.h"
 
-using namespace ProbSpec;
 
 namespace BuildCon
 {  

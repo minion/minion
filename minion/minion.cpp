@@ -24,7 +24,6 @@
 #include "minion.h"
 #include "CSPSpec.h"
 
-using namespace ProbSpec;
 
 #include "BuildConstraint.h"
 //#include "MinionInputReader.h"
