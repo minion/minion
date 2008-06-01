@@ -215,8 +215,8 @@ public:
 #else
     nocheck(false),
 #endif
-    nodelimit(0), tableout(false), solsoutWrite(false), randomise_valvarorder(false), 
-    print_solution(true), time_limit(0), parser_verbose(false)
+    nodelimit(0), tableout(false), solsoutWrite(false), 
+    print_solution(true), time_limit(0), randomise_valvarorder(false), parser_verbose(false)
   {}
   
   /// Denotes all solutions should be found, by setting sollimit to -1.

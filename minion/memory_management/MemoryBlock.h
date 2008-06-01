@@ -224,7 +224,7 @@ public:
   unsigned getDataSize()
   { return allocated_bytes; }
 
-  NewMemoryBlock() : allocated_bytes(0), maximum_bytes(0), current_data(NULL), 
+  NewMemoryBlock() : current_data(NULL), allocated_bytes(0), maximum_bytes(0),
                   lock_m(false), final_lock_m(false)
   { memBlockCache.registerNewMemoryBlock(this);}
   

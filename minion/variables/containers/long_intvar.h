@@ -86,8 +86,9 @@ struct BigRangeVarContainer {
 
   StateObj* stateObj;
   
-  BigRangeVarContainer(StateObj* _stateObj) : stateObj(_stateObj), var_count_m(0), lock_m(0),
-                                              trigger_list(stateObj, false), bms_array()
+  BigRangeVarContainer(StateObj* _stateObj) : stateObj(_stateObj), bms_array(), 
+                                              trigger_list(stateObj, false),
+                                              var_count_m(0), lock_m(0)
   { 
     // Store where the first variable will go.
     var_offset.push_back(0);

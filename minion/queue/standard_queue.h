@@ -53,7 +53,7 @@ public:
     
   DynamicTrigger*& getNextQueuePtrRef() { return next_queue_ptr; }
   
-  Queues(StateObj* _stateObj) : next_queue_ptr(NULL), stateObj(_stateObj)
+  Queues(StateObj* _stateObj) : stateObj(_stateObj), next_queue_ptr(NULL)
   {}
   
   void pushSpecialTrigger(AbstractConstraint* trigger)

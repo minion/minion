@@ -113,54 +113,52 @@ For Licence Information see file LICENSE.txt
 
   PROPAGATE_FUNCTION(DynamicTrigger* trig)
   {
-    /*
-    PROP_INFO_ADDONE(WatchedOr);
+    //PROP_INFO_ADDONE(WatchedOr);
     if(constraint_locked)
       return;
 
     DynamicTrigger* dt = dynamic_trigger_start();
-    DynamicTrigger* assign_trigs = dt + 1;
 
-    if(trig == dt)
+    if(trig >= dt && trig < dt + assign_size * 2)
     {
-      D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
-      D_INFO(1,DI_REIFY,"Full Pos Propagation");
-      constraint_locked = true;
-      getQueue(stateObj).pushSpecialTrigger(this);
-      return;
-    }
+      int tripped_constraint = (trig - dt) / assign_size;
+      int other_constraint = 1 - tripped_constraint;
+      D_ASSERT(tripped_constraint == 0 || tripped_constraint == 1);
 
-    if(trig >= assign_trigs && trig < assign_trigs + dynamic_trigger_count())
-    {// Lost assignment
-      if(!full_propagate_called)
+      GET_ASSIGNMENT(assignment_try, cons[watched_constraint[tripped_constraint]]);
+      if(!assignment_try.empty())
+      { // Found new support without having to move.
+        watch_assignment(cons[watched_constraint[tripped_constraint]], 
+                         dt + tripped_constraint * assign_size, assignment_try);
+        return; 
+      }
+      
+      for(int i = 0; i < cons.size(); ++i)
       {
-        GET_ASSIGNMENT(assignment, poscon);
-
-        if(assignment.empty())
-        { // No satisfying assignment to constraint
-          rar_var.propagateAssign(0);
+        if(i != watched_constraint[0] && i != watched_constraint[1])
+        {
+          GET_ASSIGNMENT(assignment, cons[i]);
+          watch_assignment(cons[i], dt + tripped_constraint * assign_size, assignment);
+          watched_constraint[tripped_constraint] = i;
           return;
         }
-
-        vector<AnyVarRef>& poscon_vars = *(poscon->get_vars_singleton());
-
-        for(int i = 0; i < assignment.size(); ++i)
-          poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainRemoval, assignment[i].second);
       }
+      
+      // Need to propagate!
+      propagated_constraint = watched_constraint[other_constraint];
+      constraint_locked = true;
+	    getQueue(stateObj).pushSpecialTrigger(this);
       return;
     }
 
-    if(full_propagate_called)
-    {
-      D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
-      poscon->propagate(trig);
-    }
+
+    if(full_propagate_called && cons[propagated_constraint]->own_trigger(trig))
+    { cons[propagated_constraint]->propagate(trig); }
     else
     {
       // This is an optimisation.
       trig->remove();
     }
-    */
   }
 
   void watch_assignment(AbstractConstraint* con, DynamicTrigger* dt, box<pair<int,int> >& assignment)

@@ -77,11 +77,15 @@ class AbstractConstraint
   /// Gives the value of a specific dynamic trigger.
   int dynamic_trigger_num(DynamicTrigger* trig)
   { return trig - static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }
-
+    
   /// Defines the number of dynamic triggers the constraint wants.
   /// Must be implemented by any constraint.
   virtual int dynamic_trigger_count() 
     { return 0; }
+  
+  /// Checks if this constraint 'owns' this trigger.
+  virtual bool own_trigger(DynamicTrigger* trig)
+  { return (trig >= dynamic_trigger_start()) && (trig < dynamic_trigger_start() + dynamic_trigger_count()); }
   
   /// Gets all the triggers a constraint wants to set up.
   /** This function shouldn't do any propagation. That is full_propagate's job.*/

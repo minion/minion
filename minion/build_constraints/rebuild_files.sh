@@ -40,6 +40,8 @@ do
 	./internal_buildconstraint.sh $f
 done < ConstraintList
 
+echo 'default: D_FATAL_ERROR("Fatal error building constraints");' >> BuildStaticStart.cpp
+echo 'default: D_FATAL_ERROR("Fatal error building constraints");' >> BuildDynamicStart.cpp
 
 echo \}\} >> BuildStaticStart.cpp
 echo \}\} >> BuildDynamicStart.cpp

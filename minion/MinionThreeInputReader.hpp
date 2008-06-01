@@ -506,9 +506,8 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
     default:
     return readGeneralConstraint(infile, constraint);
   }
-
-//  instance.bounds_check_last_constraint();
-//  return ;
+  // g++ seems to think compilation can get here. I disagree, but putting a catch doesn't hurt.
+  throw parse_exception("Fatal error in parsing constraints");
 }
 
 
@@ -653,8 +652,8 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileRead
   infile->check_sym(',');
   gadgetCon.gadget_prop_type = GetPropMethodFromString(infile->get_string());
   infile->check_sym(')');
-  return gadgetCon;
   parser_info("End gadget reading");
+  return gadgetCon;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -813,12 +812,13 @@ vector<ConstraintBlob> MinionThreeInputReader<FileReader>::readConstraintList(Fi
   infile->check_sym('{');
   conlist.push_back(readConstraint(infile));
   
-  char delim = infile->peek_char();
+  char delim = infile->get_char();
   while(delim != '}')
   {
     if(delim != ',')
       throw parse_exception(string("Expected '}' or ',' , confused by '") + delim + string("'"));
     conlist.push_back(readConstraint(infile));
+    delim = infile->get_char();
   }
   return conlist;
 }

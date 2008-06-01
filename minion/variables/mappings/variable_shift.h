@@ -102,6 +102,8 @@ struct ShiftVar
 	  case Assigned:
 	  case DomainChanged:
 	    data.addTrigger(t, type);
+	  default:
+      D_FATAL_ERROR("Fatal error in 'shift' mapper");
 	}
   }
 

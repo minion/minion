@@ -15,4 +15,5 @@ case CT_WATCHED_VEC_OR_LESS : return build_constraint_CT_WATCHED_VEC_OR_LESS(sta
 case CT_WATCHED_VEC_OR_AND : return build_constraint_CT_WATCHED_VEC_OR_AND(stateObj, b);
 case CT_WATCHED_HAMMING : return build_constraint_CT_WATCHED_HAMMING(stateObj, b);
 case CT_WATCHED_NEW_OR : return build_constraint_CT_WATCHED_NEW_OR(stateObj, b);
+default: D_FATAL_ERROR("Fatal error building constraints");
 }}

@@ -33,7 +33,7 @@ void lock(StateObj* stateObj)
   
   getTriggerMem(stateObj).finaliseTriggerLists();
   
-  bool prop_to_do = true;
+  //bool prop_to_do = true;
 #ifdef USE_SETJMP
   int setjmp_return = SYSTEM_SETJMP(*(getState(stateObj).getJmpBufPtr()));
   if(setjmp_return != 0)

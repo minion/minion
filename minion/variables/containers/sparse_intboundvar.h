@@ -103,7 +103,7 @@ struct SparseBoundVarContainer {
   unsigned var_count_m;
   BOOL lock_m;
 
-  SparseBoundVarContainer(StateObj* _stateObj) : stateObj(_stateObj), lock_m(false), trigger_list(stateObj, true), var_count_m(0)
+  SparseBoundVarContainer(StateObj* _stateObj) : stateObj(_stateObj), trigger_list(stateObj, true), var_count_m(0), lock_m(false)
   { }
   
   vector<BoundType>& get_domain(SparseBoundVarRef_internal<BoundType> i)

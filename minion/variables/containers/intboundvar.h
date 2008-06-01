@@ -84,7 +84,7 @@ struct BoundVarRef_internal
   { }
 
   explicit BoundVarRef_internal(BoundVarContainer<DomType>*, int i, DomType* ptr) : 
-  var_num(i), var_bound_data(ptr)
+  var_bound_data(ptr), var_num(i)
   { }
 #endif
 
@@ -194,8 +194,8 @@ typedef BoundVarRef_internal<> BoundVarRef;
 template<typename BoundType = DomainInt>
 struct BoundVarContainer {
   StateObj* stateObj;
-  BoundVarContainer(StateObj* _stateObj) : stateObj(_stateObj), lock_m(0), 
-                                           trigger_list(stateObj, true), var_count_m(0)
+  BoundVarContainer(StateObj* _stateObj) : stateObj(_stateObj), trigger_list(stateObj, true), 
+                                            var_count_m(0), lock_m(0)
   {}
     
   MoveablePointer bound_data;

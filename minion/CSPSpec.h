@@ -359,8 +359,9 @@ struct ConstraintBlob
       }
       throw parse_exception("Internal Error - SparseDiscrete OverFlow");
     }
+    default:
+      throw parse_exception("Internal Error - Unknown Variable Type");    
     }
-      throw parse_exception("Internal Error - Unknown Variable Type");
   }
   
   Var get_var(char, int i) const
@@ -489,7 +490,7 @@ struct ConstraintBlob
   /// A complete list of variables in the order they are defined.
   vector<vector<Var> > all_vars_list;
   
-  CSPInstance() : is_optimisation_problem(false), tupleListContainer(new TupleListContainer)
+  CSPInstance() : tupleListContainer(new TupleListContainer), is_optimisation_problem(false)
   {}
   
   void set_optimise(BOOL _minimising, Var var)

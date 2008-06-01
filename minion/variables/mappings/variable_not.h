@@ -121,6 +121,8 @@ struct VarNot
 	  case Assigned:
 	  case DomainChanged:
 	    data.addTrigger(t, type);
+	  default:
+      D_FATAL_ERROR("Invalid trigger in 'not' mapper");
 	}
   }
 

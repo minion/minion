@@ -369,6 +369,8 @@ try {
     switch (args.preprocess) {
       case PropLevel_None:
         b = "None"; break;
+      case PropLevel_GAC:
+        b = "GAC"; break;
       case PropLevel_SAC:
         b = "SAC"; break;
       case PropLevel_SSAC:

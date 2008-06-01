@@ -391,6 +391,8 @@ struct MultiplyVar
 	  case Assigned:
 	  case DomainChanged:
 	    data.addTrigger(t, type);
+	  default:
+      D_FATAL_ERROR("Fatal error in 'stretch' wrapper");
 	}
   }
 
