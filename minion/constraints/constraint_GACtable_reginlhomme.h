@@ -45,7 +45,7 @@ struct TupleComparator
 	  if(tuple1[tupleIndex] != tuple2[tupleIndex])
 		return tuple1[tupleIndex] < tuple2[tupleIndex];
 	}
-	return true;
+	return false;
   }
 };
 
