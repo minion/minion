@@ -66,6 +66,13 @@ This constraint is not reifiable.
 #ifndef _DYNAMIC_VECNEQ_H
 #define _DYNAMIC_VECNEQ_H
 
+#ifdef P
+#undef P
+#endif
+
+#define P(x) cout << x << endl
+//#define P(x)
+
 struct NeqIterated
 {
   static int dynamic_trigger_count()
@@ -135,7 +142,7 @@ struct NeqIterated
       if(var1.getMin() != var2.getMin())
         assign = make_pair(var1.getMin(), var2.getMin());
       else
-        assign = make_pair(var2.getMax(), var2.getMin());
+        assign = make_pair(var1.getMax(), var2.getMin());
     }
     return true;
   }
@@ -265,7 +272,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     { return Operator::dynamic_trigger_count() * 2; }
 
 
-
   bool no_support_for_index(int index)
   { return Operator::no_support_for_pair(var_array1[index], var_array2[index]); }
 
@@ -278,6 +284,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   virtual void full_propagate()
   {
     D_INFO(2, DI_VECNEQ, "Starting full propagate");
+    P("VecNeq full prop");
     DynamicTrigger* dt = dynamic_trigger_start();
     int size = var_array1.size();
     int index = 0;
@@ -332,6 +339,12 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   {
     PROP_INFO_ADDONE(DynVecNeq);
     D_INFO(2, DI_VECNEQ, "Starting propagate");
+    P("VecNeq prop");
+    
+    if(propagate_mode)
+      P("Propagating: " << index_to_propagate);
+    else
+      P("Watching " << watched_index0 << "," << watched_index1);
 
     int trigger_activated = dt - dynamic_trigger_start();
     int triggerpair = trigger_activated / 2;
@@ -391,7 +404,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       if(index == original_index)
       {
         // This is the only possible non-equal index.
-        D_INFO(2, DI_VECNEQ, "Cannot find another index");
+        P("Entering propagate mode for index " << index_to_propagate);
         propagate_mode = true;
         index_to_propagate = other_index;
         propagate_from_var1(other_index);
@@ -439,6 +452,9 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     {
       if(Operator::get_satisfying_assignment(var_array1[i], var_array2[i], assign))
       {
+        D_ASSERT(var_array1[i].inDomain(assign.first));
+        D_ASSERT(var_array2[i].inDomain(assign.second));
+        D_ASSERT(Operator::check_assignment(assign.first, assign.second));
         assignment.push_back(make_pair(i, assign.first));
         assignment.push_back(make_pair(i + var_array1.size(), assign.second));
         return;

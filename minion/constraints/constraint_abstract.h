@@ -58,18 +58,22 @@ typedef vector<shared_ptr<AbstractTriggerCreator> > triggerCollection;
 /// Base type from which all constraints are derived.
 class AbstractConstraint
 {
- public:
+ protected:
 
   vector<AnyVarRef> vars;
   StateObj* stateObj;
-  BOOL full_propagate_done;
+
 #ifdef WDEG
   unsigned int wdeg;
 #endif
 
   /// Private member of the base class.
   MemOffset _DynamicTriggerCache;
+
+public:
   
+  BOOL full_propagate_done;
+    
   /// Returns a point to the first dynamic trigger of the constraint.
   DynamicTrigger* dynamic_trigger_start()
   { return static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }

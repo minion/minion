@@ -207,25 +207,25 @@ public:
   void dynamic_propagate(int var_num, TrigType type, DomainInt val_removed = -999)
   {
     D_ASSERT(val_removed == -999 || ( type == DomainRemoval && val_removed != -999) );
-	D_ASSERT(!only_bounds || type != DomainRemoval);
-	DynamicTrigger* trig;
-	if(type != DomainRemoval)
-	{
-	  trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
-			 + var_num + type*var_count_m;
-	}
-	else
-	{
-	  D_ASSERT(!only_bounds);
-	  D_ASSERT(vars_min_domain_val <= val_removed);
-	  D_ASSERT(vars_max_domain_val >= val_removed);
-	  trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
-			 + checked_cast<int>(var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m);
-	}
+    D_ASSERT(!only_bounds || type != DomainRemoval);
+    DynamicTrigger* trig;
+    if(type != DomainRemoval)
+    {
+      trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
+        + var_num + type*var_count_m;
+    }
+    else
+    {
+      D_ASSERT(!only_bounds);
+      D_ASSERT(vars_min_domain_val <= val_removed);
+      D_ASSERT(vars_max_domain_val >= val_removed);
+      trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
+        + checked_cast<int>(var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m);
+    }
     D_ASSERT(trig->next != NULL);
     // This is an optimisation, no need to push empty lists.
     if(trig->next != trig)
-	  getQueue(stateObj).pushDynamicTriggers(trig);
+      getQueue(stateObj).pushDynamicTriggers(trig);
   }
 #endif
   

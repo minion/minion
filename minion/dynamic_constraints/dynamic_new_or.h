@@ -32,6 +32,10 @@ For Licence Information see file LICENSE.txt
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 
+#ifdef P
+#undef P
+#endif
+
 //#define P(x) cout << x << endl;
 #define P(x)
 

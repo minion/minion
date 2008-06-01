@@ -32,6 +32,13 @@
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 
+#ifdef P
+#undef P
+#endif
+
+#define P(x) cout << x << endl
+//#define P(x)
+
 
 template<typename BoolVar>
 struct Dynamic_reify_true : public AbstractConstraint
@@ -100,12 +107,21 @@ struct Dynamic_reify_true : public AbstractConstraint
   {
 	  PROP_INFO_ADDONE(ReifyTrue);
     D_INFO(1,DI_REIFY,"Propagation Start");
+    P("ReifyImply Prop");
+    
     if(constraint_locked)
 	    return;
 	 
+	  if(full_propagate_called)
+      P("in full_propagate_called");
+    else
+      P("In watching mode");
+      
 	  DynamicTrigger* dt = dynamic_trigger_start();
 	  DynamicTrigger* assign_trigs = dt + 1;
-	      
+	    
+	  P("Trigger: " << trig - dt);
+	          
   	if(trig == dt)
     {
       D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
@@ -115,7 +131,7 @@ struct Dynamic_reify_true : public AbstractConstraint
       return;
     }
     
-    if(trig >= assign_trigs && trig < assign_trigs + dynamic_trigger_count())
+    if(trig >= assign_trigs && trig < dt + dynamic_trigger_count())
     {// Lost assignment
       if(!full_propagate_called)
       {
@@ -130,7 +146,13 @@ struct Dynamic_reify_true : public AbstractConstraint
         vector<AnyVarRef>& poscon_vars = *(poscon->get_vars_singleton());
 
         for(int i = 0; i < assignment.size(); ++i)
-          poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainRemoval, assignment[i].second);
+        {
+          D_ASSERT(poscon_vars[assignment[i].first].inDomain(assignment[i].second));
+          if(poscon_vars[assignment[i].first].isBound())
+            poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainChanged);
+          else  
+            poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainRemoval, assignment[i].second);
+        }
       }
       return;
     }
@@ -149,6 +171,7 @@ struct Dynamic_reify_true : public AbstractConstraint
   
   virtual void full_propagate()
   {
+    P("Reifyimply FullProp");
     DynamicTrigger* dt = dynamic_trigger_start();
     DynamicTrigger* assign_trigs = dt + 1;
     int dt_count = dynamic_trigger_count();
@@ -170,8 +193,13 @@ struct Dynamic_reify_true : public AbstractConstraint
     vector<AnyVarRef>& poscon_vars = *(poscon->get_vars_singleton());
 
     for(int i = 0; i < assignment.size(); ++i)
-      poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainRemoval, assignment[i].second);
-    
+    {
+      D_ASSERT(poscon_vars[assignment[i].first].inDomain(assignment[i].second));
+      if(poscon_vars[assignment[i].first].isBound())
+        poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainChanged);
+      else  
+        poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainRemoval, assignment[i].second);
+    }
     if(rar_var.isAssigned() && rar_var.getAssignedValue() > 0)
     {
 	    poscon->full_propagate();
