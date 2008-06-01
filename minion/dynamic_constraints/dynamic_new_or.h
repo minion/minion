@@ -32,7 +32,8 @@ For Licence Information see file LICENSE.txt
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 
-
+//#define P(x) cout << x << endl;
+#define P(x)
 
   struct Dynamic_OR : public AbstractConstraint
 {
@@ -51,7 +52,7 @@ For Licence Information see file LICENSE.txt
   int watched_constraint[2];
 
   Dynamic_OR(StateObj* _stateObj, vector<AbstractConstraint*> _con) : 
-  AbstractConstraint(_stateObj), full_propagate_called(_stateObj, false), cons(_con), assign_size(-1)
+  AbstractConstraint(_stateObj), cons(_con), full_propagate_called(_stateObj, false), assign_size(-1)
     { }
 
   virtual BOOL check_assignment(DomainInt* v, int v_size)
@@ -70,6 +71,7 @@ For Licence Information see file LICENSE.txt
     vec.push_back(rar_var);
     return vec;
     */
+    return vector<AnyVarRef>();
   }
 
   virtual int dynamic_trigger_count() 
@@ -101,6 +103,7 @@ For Licence Information see file LICENSE.txt
   {
     D_ASSERT(constraint_locked);
     constraint_locked = false;
+    P("Full propagating: " << propagated_constraint);
     cons[propagated_constraint]->full_propagate();
     full_propagate_called = true;
   }
@@ -114,6 +117,8 @@ For Licence Information see file LICENSE.txt
   PROPAGATE_FUNCTION(DynamicTrigger* trig)
   {
     //PROP_INFO_ADDONE(WatchedOr);
+    P("Prop");
+    P("Current: " << watched_constraint[0] << " . " << watched_constraint[1]);
     if(constraint_locked)
       return;
 
@@ -123,6 +128,7 @@ For Licence Information see file LICENSE.txt
     {
       int tripped_constraint = (trig - dt) / assign_size;
       int other_constraint = 1 - tripped_constraint;
+      P("Tripped: " << tripped_constraint << ":" << watched_constraint[tripped_constraint]);
       D_ASSERT(tripped_constraint == 0 || tripped_constraint == 1);
 
       GET_ASSIGNMENT(assignment_try, cons[watched_constraint[tripped_constraint]]);
@@ -130,6 +136,7 @@ For Licence Information see file LICENSE.txt
       { // Found new support without having to move.
         watch_assignment(cons[watched_constraint[tripped_constraint]], 
                          dt + tripped_constraint * assign_size, assignment_try);
+        P("Fixed, returning");
         return; 
       }
       
@@ -138,12 +145,17 @@ For Licence Information see file LICENSE.txt
         if(i != watched_constraint[0] && i != watched_constraint[1])
         {
           GET_ASSIGNMENT(assignment, cons[i]);
-          watch_assignment(cons[i], dt + tripped_constraint * assign_size, assignment);
-          watched_constraint[tripped_constraint] = i;
-          return;
+          if(!assignment.empty())
+          {
+            watch_assignment(cons[i], dt + tripped_constraint * assign_size, assignment);
+            watched_constraint[tripped_constraint] = i;
+            P("New support. Switch " << tripped_constraint << " to " << i);
+            return;
+          }
         }
       }
       
+      P("Start propagating " << watched_constraint[other_constraint]);
       // Need to propagate!
       propagated_constraint = watched_constraint[other_constraint];
       constraint_locked = true;
@@ -170,6 +182,7 @@ For Licence Information see file LICENSE.txt
 
   virtual void full_propagate()
   {
+    P("Full Propagate")
     DynamicTrigger* dt = dynamic_trigger_start();
 
     // Clean up triggers
@@ -198,6 +211,8 @@ For Licence Information see file LICENSE.txt
       return;
     }
 
+    P("Found watch 0: " << loop);
+    
     found_watch = false;
 
     while(loop < cons.size() && !found_watch)
@@ -208,6 +223,8 @@ For Licence Information see file LICENSE.txt
         found_watch = true;
         watched_constraint[1] = loop;
         watch_assignment(cons[loop], dt + assign_size, assignment);
+        P("Found watch 1: " << loop);
+        return;
       }
     }
 
