@@ -108,22 +108,18 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint
   VarSum var_sum;
   
   BoolLessSumConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
-	AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
+	AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), last(0)
   { 
     D_ASSERT((VarToCount == 0) || (VarToCount == 1));
 #ifndef DYNAMICTRIGGERS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
-  }
-  
-  int dynamic_trigger_count()
-  {
-	// Sum of 1's is >= K
-	// == Number of 1's is >=K         // this is the one I want to do
-	// == Number of 0's is <= N-K
-	
-	D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BoolLessSumConstraintDynamic");
-	
+  // Sum of 1's is >= K
+  // == Number of 1's is >=K         // this is the one I want to do
+  // == Number of 0's is <= N-K
+
+    D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BoolLessSumConstraintDynamic");
+
     int array_size = var_array.size();
 
     if (var_sum >= array_size || var_sum < 0)
@@ -131,19 +127,21 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint
       // In these cases the constraints are all set before search.
       // This will happen before triggers set up in full_propagate
       // Thus zero triggers are needed
-      return 0;
     }
     else
     {
       num_unwatched = array_size - var_sum - 1 ;
       D_ASSERT(num_unwatched >= 0);
-
       unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(unsigned) * num_unwatched);
-      // above line might request 0 bytes
-      last = 0;
-
-      return var_sum + 1;
     }
+  }
+  
+  int dynamic_trigger_count()
+  { 
+    if(var_sum >= var_array.size() || var_sum < 0)
+      return 0;
+    else
+      return var_sum + 1; 
   }
 
   virtual void full_propagate()

@@ -72,28 +72,8 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   
   LiteralSumConstraintDynamic(StateObj* _stateObj,const VarArray& _var_array, ValueArray _val_array, VarSum _var_sum) :
 	AbstractConstraint(_stateObj), var_array(_var_array), value_array(_val_array), var_sum(_var_sum)
-  { }
-  
-  int dynamic_trigger_count()
-  {
-	D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for LiteralSumConstraintDynamic");
-	
-	int array_size = var_array.size();
-	
-	// XXX comment out this optimisation for now
-	/*
-	if (var_sum == array_size)
-	{
-	  // In this case every var will be set to 1
-	  // This will happen before triggers set up in full_propagate
-	  // Thus zero triggers are needed
-	  // However we will say that 1 is needed 
-	  //     because I don't know if setup code will work when 0 triggers requested
-	  //     Should set to 0 and test it.
-	  return 1;
-	}
-	else*/
-	{
+  {   
+  	int array_size = var_array.size();
 	  
 	  num_unwatched = array_size - var_sum - 1 ;
 	  D_ASSERT(num_unwatched >= 0);
@@ -101,9 +81,12 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 	  unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(unsigned) * num_unwatched);
 	  // above line might request 0 bytes
 	  last = 0;
-	  
+  }
+  
+  int dynamic_trigger_count()
+  {
+  	D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for LiteralSumConstraintDynamic");
 	  return var_sum + 1;
-	}
   }
     
   virtual void full_propagate()

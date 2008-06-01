@@ -45,14 +45,13 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
 #ifndef DYNAMICTRIGGERS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
+    last = 0;
   }
   
   int dynamic_trigger_count()
   {
-	last = 0;
-	
-	D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BOOLSATConstraintDynamic");
-	return 2;
+	  D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BOOLSATConstraintDynamic");
+ 	  return 2;
   }
     
   virtual void full_propagate()

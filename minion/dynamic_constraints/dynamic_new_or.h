@@ -80,16 +80,17 @@ For Licence Information see file LICENSE.txt
 
   virtual int dynamic_trigger_count() 
   { 
-    size_t max_size = 0;
-    for(int i = 0; i < cons.size(); ++i)
-      max_size = max(max_size, cons[i]->get_vars_singleton()->size());
-    assign_size = max_size;
-    return max_size * 2;
+    return assign_size * 2;
   }
 
   // Override setup!
   virtual void setup()
   {
+    size_t max_size = 0;
+    for(int i = 0; i < cons.size(); ++i)
+      max_size = max(max_size, cons[i]->get_vars_singleton()->size());
+    assign_size = max_size;
+    
     AbstractConstraint::setup();
 
     for(int i = 0; i < cons.size(); ++i)

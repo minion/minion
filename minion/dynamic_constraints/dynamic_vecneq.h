@@ -197,7 +197,7 @@ struct LessIterated
 struct BothNonZeroIterated
 {
   static bool check_assignment(DomainInt i, DomainInt j)
-  { return i > 0 && j > 0; }
+  { return i > 0 || j > 0; }
 
   static int dynamic_trigger_count()
   { return 2; }

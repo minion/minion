@@ -60,19 +60,19 @@ struct SumEqConstraintDynamic : public AbstractConstraint
   int vals;
   
   int dynamic_trigger_count() //need two watched literals per value in each var (one per support) 
-  {	
+  {
     D_INFO(1, DI_TABLECON, "sumeq: counting WLs");
     if(vals == -1) { //not already calculated 
       vals = 0;
       DomainInt max = x.getMax(); 
       for(DomainInt i = x.getMin(); i <= max; i++) 
-	if(x.inDomain(i)) vals++; 
+        if(x.inDomain(i)) vals++; 
       max = y.getMax(); 
       for(DomainInt i = y.getMin(); i <= max; i++) 
-	if(y.inDomain(i)) vals++; 
+        if(y.inDomain(i)) vals++; 
       max = z.getMax(); 
       for(DomainInt i = z.getMin(); i <= max; i++) 
-	if(z.inDomain(i)) vals++; 
+        if(z.inDomain(i)) vals++; 
     } 
     //printf("Count: %d\n", vals);
     return 2 * vals; 

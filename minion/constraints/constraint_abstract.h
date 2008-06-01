@@ -63,14 +63,14 @@ class AbstractConstraint
   vector<AnyVarRef> vars;
   StateObj* stateObj;
 
-#ifdef WDEG
-  unsigned int wdeg;
-#endif
-
   /// Private member of the base class.
   MemOffset _DynamicTriggerCache;
 
 public:
+  
+  #ifdef WDEG
+    unsigned int wdeg;
+  #endif
   
   BOOL full_propagate_done;
     
@@ -79,13 +79,13 @@ public:
   { return static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }
   
   /// Gives the value of a specific dynamic trigger.
-  int dynamic_trigger_num(DynamicTrigger* trig)
-  { return trig - static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }
+  //int dynamic_trigger_num(DynamicTrigger* trig)
+  //{ return trig - static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr()); }
     
   /// Defines the number of dynamic triggers the constraint wants.
   /// Must be implemented by any constraint.
   virtual int dynamic_trigger_count() 
-    { return 0; }
+  { return 0; }
   
   /// Checks if this constraint 'owns' this trigger.
   virtual bool own_trigger(DynamicTrigger* trig)
