@@ -65,7 +65,7 @@ numtests=100
 minionbin="bin/minion"
 email=False
 fullprop=False   # compare the constraint against itself with fullprop. Needs DEBUG=1.
-64bit=False
+bit64=False
 for i in optargs:
     (a1, a2)=i
     if a1=="--minion":
@@ -77,7 +77,7 @@ for i in optargs:
     elif a1=="--fullprop":
         fullprop=True
     elif a1=="--64bit":
-        64bit=True
+        bit64=True
 
 for consname1 in conslist:
     random.seed(12345)   # stupid seed but at least it makes the test repeatable.
@@ -108,7 +108,7 @@ for consname1 in conslist:
                     mailstring+="Testing equivalence of -fullprop and normal propagation.\n"
                 else:
                     mailstring+="Testing correctness against table representation.\n"
-                if 64bit:
+                if bit64:
                     mailstring+="Testing 64bit variant.\n"
                 mailstring+="Using binary %s\n"%minionbin
                 mail(mailstring)
@@ -120,7 +120,7 @@ if email:
     mailstring+="Using binary %s\n"%minionbin
     mailstring+="Tested the following constraints with no errors.\n"
     mailstring+=str(conslist)
-    if 64bit:
+    if bit64:
         mailstring+="Testing 64bit variant.\n"
     
     mail(mailstring, subject="Minion test successful.")
