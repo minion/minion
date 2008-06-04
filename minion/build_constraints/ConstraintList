@@ -18,6 +18,7 @@ STATIC_CT  "occurrence" 		CT_OCCURRENCE 		read_list read_constant read_var
 STATIC_CT  "occurrenceleq" 		CT_LEQ_OCCURRENCE 	read_list read_constant read_constant
 STATIC_CT  "occurrencegeq" 		CT_GEQ_OCCURRENCE 	read_list read_constant read_constant
 STATIC_CT  "product" 			CT_PRODUCT2 		read_2_vars read_var  
+STATIC_CT  "difference"	CT_DIFFERENCE		read_2_vars read_var
 STATIC_CT  "weightedsumleq" 		CT_WEIGHTLEQSUM  	read_constant_list read_list read_var  
 STATIC_CT  "weightedsumgeq" 		CT_WEIGHTGEQSUM  	read_constant_list read_list read_var  
 STATIC_CT  "sumgeq" 			CT_GEQSUM 		read_list read_var 

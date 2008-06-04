@@ -18,6 +18,7 @@ case CT_OCCURRENCE : return build_constraint_CT_OCCURRENCE(stateObj, b);
 case CT_LEQ_OCCURRENCE : return build_constraint_CT_LEQ_OCCURRENCE(stateObj, b);
 case CT_GEQ_OCCURRENCE : return build_constraint_CT_GEQ_OCCURRENCE(stateObj, b);
 case CT_PRODUCT2 : return build_constraint_CT_PRODUCT2(stateObj, b);
+case CT_DIFFERENCE : return build_constraint_CT_DIFFERENCE(stateObj, b);
 case CT_WEIGHTLEQSUM : return build_constraint_CT_WEIGHTLEQSUM(stateObj, b);
 case CT_WEIGHTGEQSUM : return build_constraint_CT_WEIGHTGEQSUM(stateObj, b);
 case CT_GEQSUM : return build_constraint_CT_GEQSUM(stateObj, b);
