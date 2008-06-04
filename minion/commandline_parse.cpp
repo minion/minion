@@ -99,6 +99,13 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
 	  
 	  if(order == "static")
 		args.order = ORDER_STATIC;
+		else if(order == "srf")
+    args.order = ORDER_SRF;
+    else if(order == "srf-random")
+    {
+      args.order = ORDER_SRF;
+      getOptions(stateObj).randomise_valvarorder = true;
+    }  
 	  else if(order == "sdf")
 		args.order = ORDER_SDF;
 	  else if(order == "sdf-random")

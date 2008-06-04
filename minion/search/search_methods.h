@@ -115,6 +115,37 @@ struct SDFBranch
   }
 };
 
+struct SRFBranch
+{
+  template<typename VarType>
+  int operator()(vector<VarType>& var_order, int pos)
+  {
+	int length = var_order.size();
+	int smallest_dom = length;
+	
+  float ratio = 2;
+	
+	
+	for(int i = 0; i < length; ++i)
+	{
+	  DomainInt maxval = var_order[i].getMax();
+	  DomainInt minval = var_order[i].getMin();
+	  
+    DomainInt original_minval = var_order[i].getInitialMin();
+    DomainInt original_maxval = var_order[i].getInitialMax();
+    
+    float new_ratio = (checked_cast<float>(maxval - minval) * 1.0) / checked_cast<float>(original_maxval - original_minval);
+	  if((maxval != minval) && (new_ratio < ratio) )
+	  {
+		  ratio = new_ratio;
+		  smallest_dom = i;
+	  }
+	}
+	return smallest_dom;
+  }
+};
+
+
 struct LDFBranch
 {
   template<typename VarType>

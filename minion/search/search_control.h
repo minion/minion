@@ -12,6 +12,7 @@ template<typename SearchAlgorithm, typename VarOrder, typename Vars, typename Pr
   {
     case ORDER_STATIC:
     case ORDER_SDF:
+    case ORDER_SRF:
     case ORDER_LDF:
     case ORDER_ORIGINAL:
 #ifdef WDEG
@@ -53,6 +54,17 @@ void solve(StateObj* stateObj, VarOrder order_in, VarValOrder& search_order, CSP
     case ORDER_SDF:
     {
       Controller::VariableOrder<VarType, Controller::SDFBranch> 
+        order(stateObj, search_order.first, search_order.second);
+
+      try 
+        { solve_select_search(stateObj, order_in, order, search_order.first, instance, prop); }
+      catch(EndOfSearch)
+        { }
+    }
+    break;
+    case ORDER_SRF:
+    {
+      Controller::VariableOrder<VarType, Controller::SRFBranch> 
         order(stateObj, search_order.first, search_order.second);
 
       try 

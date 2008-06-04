@@ -124,6 +124,7 @@ enum VarOrder
 {
   ORDER_STATIC,
   ORDER_SDF,
+  ORDER_SRF,
   ORDER_LDF,
   ORDER_ORIGINAL,
 #ifdef WDEG
