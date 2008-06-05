@@ -744,6 +744,19 @@ class testproduct:
     def runtest(self, options=dict()):
         return runtestgeneral("product", True, options, [1,1,1], ["num", "num", "num"], [1,1,1], self, False)
 
+class testdifference:
+    def printtable(self, domains): 
+        out=[]
+        for i in domains[0]:
+            for j in domains[1]:
+                if(abs(i-j) in domains[2]):
+                    out.append([i, j, abs(i-j)])
+        return out
+
+    def runtest(self, options=dict()):
+        return runtestgeneral("difference", True, options, [1,1,1], ["num", "num", "num"], [1,1,1], self, False)
+
+
 class testgacsum:
     def printtable(self, domains):
         cross=[]

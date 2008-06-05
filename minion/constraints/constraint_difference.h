@@ -41,6 +41,12 @@ variable, and also gets better propagation. It gets bounds consistency.
 This constraint is not reifiable.
 */
 
+#ifdef P
+#undef P
+#endif
+
+#define P(x) cout << x << endl
+//#define P(x)
 
 /// |var1 - var2| = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
@@ -54,7 +60,7 @@ struct DifferenceConstraint : public AbstractConstraint
   VarRef3 var3;
   DifferenceConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
 	AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
-  { D_FATAL_ERROR("The Difference constraint isn't finished yet!"); }
+  {  }
   
   virtual triggerCollection setup_internal()
   {
@@ -68,15 +74,47 @@ struct DifferenceConstraint : public AbstractConstraint
     t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
     return t;
   }
+  
+  template<typename Var>
+  void remove_range(DomainInt low, DomainInt high, Var& v)
+  {
+    P("Remove Range" << low << high);
+    D_ASSERT(low <= high);
+    if(!v.isBound())
+    {
+      for(DomainInt i = low + 1; i < high; ++i)
+        v.removeFromDomain(i);
+    } 
+    else
+    {
+      if(v.getMax() < high)
+        v.setMax(low + 1);
+      
+      if(v.getMin() > low)
+        v.setMin(high - 1);
+    }
+  }
     
   PROPAGATE_FUNCTION(int, DomainDelta)
   {
 	  PROP_INFO_ADDONE(Difference);
+	
 	  DomainInt var1_min = var1.getMin();
 	  DomainInt var1_max = var1.getMax();
 	  DomainInt var2_min = var2.getMin();
 	  DomainInt var2_max = var2.getMax();
 
+    P(var1_min << var1_max << var2_min << var2_max << var3.getMin() << var3.getMax());
+
+    var3.setMax(max(var2_max, var1_max) - min(var1_min, var2_min));
+
+    var1.setMin(var2.getMin() - var3.getMax());
+    var2.setMin(var1.getMin() - var3.getMax());
+    var1.setMax(var2.getMax() + var3.getMax());
+    P(var2.getMax());
+    var2.setMax(var1.getMax() + var3.getMax());
+    P(var2.getMax());
+        
     if(var1_max < var2_min)
     {
       var3.setMin(var2_min - var1_max);
@@ -88,18 +126,30 @@ struct DifferenceConstraint : public AbstractConstraint
     {
       var3.setMin(var1_min - var2_max);
       var1.setMin(var2.getMin() + var3.getMin());
-      var2.setMax(var1.getMax() - var3.getMin());
+    P(var2.getMax());
+          var2.setMax(var1.getMax() - var3.getMin());
+              P(var2.getMax());
     }
       
+    if(var1_max - var1_min < var3.getMin())
+    {
+      remove_range(var1_max - var3.getMin(), var1_min + var3.getMin(), var2);
+    }
+    
+    if(var2_max - var2_min < var3.getMin())
+    {
+      remove_range(var2_max - var3.getMin(), var2_min + var3.getMin(), var1);
+    }
     
     
-      
-	
-
+    
   }
   
   virtual void full_propagate()
-  { var3.setMin(0); }
+  { 
+    var3.setMin(0);
+    propagate(0,0);
+  }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {

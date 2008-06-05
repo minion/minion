@@ -58,6 +58,8 @@ conslist+=["max", "min", "reifyimplymax", "reifyimplymin"]
 
 conslist+=["watchneq, watchless"]
 
+conslist+=["difference"]
+
 #todo
 #conslist+=["weightedsumleq"...
 
