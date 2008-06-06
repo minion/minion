@@ -151,7 +151,7 @@ struct MinionArguments
   enum PropagationLevel preprocess;
   enum PropagationLevel prop_method;
   unsigned random_seed;
-  MinionArguments() : order(ORDER_ORIGINAL), preprocess(PropLevel_None), prop_method(PropLevel_GAC), random_seed((unsigned)time(NULL))
+  MinionArguments() : order(ORDER_ORIGINAL), preprocess(PropLevel_None), prop_method(PropLevel_GAC), random_seed((unsigned)time(NULL) ^ getpid())
   { }
   
 };

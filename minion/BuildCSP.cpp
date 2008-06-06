@@ -78,7 +78,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   
   if(getOptions(stateObj).randomise_valvarorder)
   {
-    getOptions(stateObj).printLine("Using seed: " + args.random_seed);
+    getOptions(stateObj).printLine("Using seed: " + to_string(args.random_seed));
     srand( args.random_seed );
     
     std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());

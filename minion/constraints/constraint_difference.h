@@ -45,8 +45,8 @@ This constraint is not reifiable.
 #undef P
 #endif
 
-#define P(x) cout << x << endl
-//#define P(x)
+//#define P(x) cout << x << endl
+#define P(x)
 
 /// |var1 - var2| = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>

@@ -74,6 +74,10 @@ PROP_EVENT(Mod)
 PROP_EVENT(Gadget)
 PROP_EVENT(Abs)
 PROP_EVENT(WatchNEQ)
+PROP_EVENT(WatchInSet)
+PROP_EVENT(WatchNotInSet)
+PROP_EVENT(WatchInRange)
+PROP_EVENT(WatchNotInRange)
 
 #undef VAR_EVENT
 #undef PROP_EVENT

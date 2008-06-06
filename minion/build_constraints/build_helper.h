@@ -69,6 +69,18 @@ Build ## CT_NAME(StateObj* stateObj, const T1& t1, bool reify, \
   { return function(stateObj, t1); } \
 }
 
+#define BUILD_CONSTRAINT1_WITH_BLOB(CT_NAME, function)  \
+template<typename T1> \
+AbstractConstraint*\
+Build ## CT_NAME(StateObj* stateObj, const T1& t1, bool reify, \
+				 const BoolVarRef& reifyVar, ConstraintBlob& b) \
+{ \
+  if(reify) \
+  { return reifyCon(stateObj, function(stateObj, t1, b), reifyVar); } \
+  else \
+  { return function(stateObj, t1, b); } \
+}
+
 #define BUILD_DYNAMIC_CONSTRAINT3(CT_NAME, function)  \
 template<typename T1, typename T2, typename T3> \
 AbstractConstraint*\
