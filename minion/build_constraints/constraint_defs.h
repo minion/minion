@@ -6,6 +6,7 @@ ConstraintDef constraint_list[] = {
 { "alldiff" , CT_ALLDIFF, 1,{ read_list }, STATIC_CT },
 { "alldiffgacslow" , CT_ALLDIFF_GACSLOW, 1,{ read_list }, STATIC_CT },
 { "gacalldiff" , CT_GACALLDIFF, 1,{ read_list }, STATIC_CT },
+{ "gcc" , CT_GCC, 2,{ read_list , read_list }, STATIC_CT },
 { "diseq" , CT_DISEQ, 2,{ read_var , read_var }, STATIC_CT },
 { "eq" , CT_EQ, 2,{ read_var , read_var }, STATIC_CT },
 { "abs" , CT_ABS, 2,{ read_var , read_var }, STATIC_CT },

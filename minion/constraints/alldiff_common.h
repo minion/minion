@@ -34,6 +34,9 @@
 // Use BFS instead of HK
 #define BFSMATCHING
 
+// Use staging a la Schulte and Stuckey
+#define STAGED
+
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -557,6 +560,20 @@ struct DynamicAlldiff : public DynamicConstraint
     // i.e. some vars may not need to be queued in to_process.
     #endif
     
+    #ifdef STAGED
+    if(var_array[prop_var].isAssigned())
+    {
+        int assignedval=var_array[prop_var].getAssignedValue();
+        for(int i=0; i<numvars; i++)
+        {
+            if(i!=prop_var)
+            {
+                var_array[i].removeFromDomain(assignedval);
+            }
+        }
+    }
+    #endif
+    
     if(!to_process.in(prop_var))
     {
         to_process.insert(prop_var);
@@ -624,6 +641,20 @@ struct DynamicAlldiff : public DynamicConstraint
     }
     if(count>=numvars)
         return;
+    #endif
+    
+    #ifdef STAGED
+    if(var_array[prop_var].isAssigned())
+    {
+        int assignedval=var_array[prop_var].getAssignedValue();
+        for(int i=0; i<numvars; i++)
+        {
+            if(i!=prop_var)
+            {
+                var_array[i].removeFromDomain(assignedval);
+            }
+        }
+    }
     #endif
     
     if(!to_process.in(prop_var))
