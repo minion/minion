@@ -4,7 +4,11 @@
 # For now, you can try adding it to the end, it seems having multiple 
 # directories does not hurt.
 
-BOOSTINCLUDE = -I/usr/local/include/boost-1_35/ 
+-include Makefile.includes
+ifndef SETUP_INCLUDED
+$(error ./configure.sh has not been executed! *** )
+endif
+
 FLAGS = -DWATCHEDLITERALS
 LINKFLAGS = 
 NAMEBASE = minion
@@ -77,6 +81,9 @@ FULLFLAGS=-Wextra -Wno-sign-compare $(DEBUG_FLAGS) $(FLAGS) $(CPU) $(MYFLAGS)
 
 OBJFILES=$(patsubst minion/%.cpp,$(OBJDIR)/%.o,$(SRC))
 
+minion: depend mkdirectory external $(OBJFILES)	
+	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES) $(LINKFLAGS)
+	
 external: 
 	cd external_deps/ && ./build_external_deps.sh $(MYFLAGS) $(CPU) 
 all: minion generate
@@ -99,8 +106,7 @@ $(OBJDIR)/minion.o : minion/svn_header.h
 $(OBJDIR)/%.o: minion/%.cpp 
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
-minion: depend mkdirectory external $(OBJFILES)	
-	$(CXX) $(FULLFLAGS) -o $(EXE) $(OBJFILES) $(LINKFLAGS)
+
 	
 mkdirectory:
 	if [ ! -d $(OBJDIR) ]; then mkdir $(OBJDIR); fi
@@ -147,6 +153,9 @@ clean:
 veryclean: clean
 	rm -rf bin/*
 
+Makefile.includes:
+	echo Please run /configure.sh
+	exit
 .DUMMY:
 
 include Makefile.dep

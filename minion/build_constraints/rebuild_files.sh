@@ -5,7 +5,7 @@ echo > constraint_defs.h
 echo ConstraintDef constraint_list[] = \{ >> constraint_defs.h
 while read f
 do
-  echo Building $f
+  # echo Building $f
   ./internal_ConstraintDef.sh $f >> constraint_defs.h
 done < ConstraintList
 
@@ -36,7 +36,7 @@ echo switch\(b.constraint.type\) \{ >> BuildDynamicStart.cpp
 
 while read f
 do
-    echo Building $f
+    # echo Building $f
 	./internal_buildconstraint.sh $f
 done < ConstraintList
 
