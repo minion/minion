@@ -264,7 +264,7 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, co
 		break;
 	  case read_constant_list:
 	  {
-		vector<Var> vectorOfConst = readVectorExpression(infile) ;
+		vector<Var> vectorOfConst(readVectorExpression(infile)) ;
     vector<int> vals;
 		for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
 		{
@@ -319,7 +319,7 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, cons
   
   char delim = ' ';
   int count, elem ;
-  vector<Var> vectorOfVars = readVectorExpression(infile) ;
+  vector<Var> vectorOfVars(readVectorExpression(infile)) ;
   int tupleSize = vectorOfVars.size() ;
   
   infile->check_sym(',');
@@ -478,7 +478,8 @@ vector<Var> MinionInputReader<FileReader>::readLiteralVector(FileReader* infile)
 	     }
       }
   }
-  return newVector ;
+  // Squeeze vector to smallest size.
+  return vector<Var>(newVector.begin(), newVector.end());
   
 }
 

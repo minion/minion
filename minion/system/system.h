@@ -31,8 +31,7 @@
 
 // Only GCC has hashtables
 #ifdef __GNUC__
-#define USE_HASHTABLE
-#define USE_HASHSET
+#define USE_EXT_HASH_MAP_AND_SET
 #endif
 
 // On linux systems, _longjmp and _setjmp are faster versions that ignore
@@ -91,9 +90,18 @@
 #include<setjmp.h>
 #include<sys/types.h>
 
+#include "cxx0x-helper.h"
+
+#ifdef USE_TR1_HASH_MAP_AND_SET
+#include <tr1/unordered_set>
+#include <tr1/unordered_map>
+
+#define MAP_TYPE std::tr1::unordered_map
+#define SET_TYPE std::tr1::unordered_set
+#else
 // Note: The hash table (unordered_map) is broken in many versions of g++,
 // so this can't be activated safely.
-#ifdef USE_HASHTABLE
+#ifdef USE_EXT_HASH_MAP_AND_SET
 #include <ext/hash_map>
 namespace __gnu_cxx
 {
@@ -106,17 +114,16 @@ template<typename T>
     };
 }
 #define MAP_TYPE __gnu_cxx::hash_map
-#else
-#include <map>
-#define MAP_TYPE map
-#endif
-
-#ifdef USE_HASHSET
 #include <ext/hash_set>
 #define SET_TYPE __gnu_cxx::hash_set
+
 #else
+
+#include <map>
+#define MAP_TYPE map
 #include <set>
 #define SET_TYPE set
+#endif
 #endif
 
 using namespace std;

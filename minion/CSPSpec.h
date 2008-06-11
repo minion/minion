@@ -152,9 +152,19 @@ struct ConstraintBlob
   ConstraintBlob(ConstraintDef _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars), reified(false), implied_reified(false)
   {}
 
+#ifdef USE_CXX0X
+  ConstraintBlob(ConstraintBlob&& b) : 
+  CXXMOVE(constraint, b), CXXMOVE(vars, b), CXXMOVE(tuples, b), CXXMOVE(negs, b), CXXMOVE(constants, b),
+  CXXMOVE(gadget_prop_type, b), CXXMOVE(gadget, b), CXXMOVE(internal_constraints, b), CXXMOVE(reified, b),
+  CXXMOVE(implied_reified, b), CXXMOVE(reify_var, b)
+  { }
+#endif
+
   /// A helper constructor for when only a SingleVar is passed.
   ConstraintBlob(ConstraintDef _con, vector<Var>& _var) : constraint(_con), reified(false), implied_reified(false)
   { vars.push_back(_var); }
+
+
 
   void reify(Var _reify_var)
   {
@@ -187,6 +197,14 @@ struct ConstraintBlob
   map<string, vector<int> > matrix_table;
   VarContainer() : BOOLs(0)
   {}
+
+#ifdef USE_CXX0X
+  VarContainer(VarContainer&& v) : 
+  CXXMOVE(BOOLs, v), CXXMOVE(symbol_table, v), CXXMOVE(name_table, v), CXXMOVE(bound, v), CXXMOVE(sparse_bound, v),
+  CXXMOVE(discrete, v), CXXMOVE(sparse_discrete, v), CXXMOVE(matrix_table, v)
+  { }
+#endif
+  
 
   /// Given a matrix variable and a parameter list, returns a slice of the matrix.
   /// Params can either be wildcards (denoted -999), or a value for the matrix.
@@ -490,8 +508,26 @@ struct ConstraintBlob
   /// A complete list of variables in the order they are defined.
   vector<vector<Var> > all_vars_list;
   
+  map<string, TupleList*> table_symboltable;
+  /// We make these shared_ptrs so they automatically clear up after themselves.
+  map<string, shared_ptr<CSPInstance> > gadgetMap;
+  
+  
   CSPInstance() : tupleListContainer(new TupleListContainer), is_optimisation_problem(false)
   {}
+ 
+#ifdef USE_CXX0X
+private:
+	CSPInstance(CSPInstance&);
+public:
+  
+  CSPInstance(CSPInstance&& i) : 
+  CXXMOVE(vars, i), CXXMOVE(constraints, i), CXXMOVE(tupleListContainer, i), CXXMOVE(var_order, i),
+  CXXMOVE(val_order, i), CXXMOVE(permutation, i), CXXMOVE(constructionSite, i), CXXMOVE(is_optimisation_problem, i),
+  CXXMOVE(optimise_minimising, i), CXXMOVE(optimise_variable, i), CXXMOVE(print_matrix, i), CXXMOVE(all_vars_list, i),
+  CXXMOVE(table_symboltable, i), CXXMOVE(gadgetMap, i)
+  { }
+#endif
   
   void set_optimise(BOOL _minimising, Var var)
   { 
@@ -555,7 +591,7 @@ struct ConstraintBlob
 
   }
   
-  map<string, TupleList*> table_symboltable;
+
 
   void addTableSymbol(string name, TupleList* tuplelist)
   {
@@ -571,10 +607,7 @@ struct ConstraintBlob
       throw parse_exception("Undefined tuplelist: '" + name + "'");
     return it->second;
   }
-  
-  /// We make these shared_ptrs so they automatically clear up after themselves.
-  map<string, shared_ptr<CSPInstance> > gadgetMap;
-  
+    
   void addGadgetSymbol(string name, shared_ptr<CSPInstance> gadget)
   {
     if(gadgetMap.count(name) != 0)

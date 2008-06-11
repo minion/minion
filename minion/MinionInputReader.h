@@ -137,10 +137,13 @@ struct ConcreteFileReader
   
    char simplepeek_char()
   {
-	while(isspace(infile.peek()))
-	  infile.get();
-	
-	return infile.peek();
+    char peek = infile.peek();
+    while(isspace(peek))
+    {
+      infile.get();
+      peek = infile.peek();
+    }
+    return peek;
   }
   
    char peek_char()
@@ -221,6 +224,7 @@ struct ConcreteFileReader
 
 template<typename FileReader>
 class MinionInputReader {
+  MinionInputReader(MinionInputReader&);
   void parser_info(string);
   vector< vector<Var> > Vectors ;
   vector< vector<vector<Var> > > Matrices ;

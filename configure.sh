@@ -2,6 +2,8 @@
 
 # Note: Not a proper configure script!
 
+
+# First of all rebuild all the files, and get rid of binary files.
 echo Build svn header.
 rm -f minion/svn_header.h &> /dev/null
 mini-scripts/get_svn_version.sh minion/svn_header.h
@@ -14,17 +16,21 @@ cd minion/build_constraints
 cd ../..
 echo Emptying 'bin' directory
 rm -rf bin/*
-if g++ build_tests/tiny_test.cpp -o build_test_temp; then
+
+# First check if we even have a working compiler...
+if g++ build_tests/tiny_test.cpp -o build_test_temp &>/dev/null; then
   echo Compiler found
 else
-  echo g++ is Missing! Fatal error.
+  echo g++ is Missing or the Minion source is completely broken.
+  { (exit 1); exit 1; };
 fi
+
 
 rm -f Makefile.includes > /dev/null
 echo \# BOOST=1 > Makefile.includes
 echo \# BOOSTINCLUDE=-I/usr/local/include/boost-1_35/ >> Makefile.includes
 
-if g++ build_tests/tiny_boost_test.cpp -I/usr/local/include/boost-1_35/ -o build_test_temp; then
+if g++ build_tests/tiny_boost_test.cpp -I/usr/local/include/boost-1_35/ -o build_test_temp &>/dev/null; then
   echo Boost found in proper place.
   echo BOOST=1 > Makefile.includes
   echo BOOSTINCLUDE=-I/usr/local/include/boost-1_35/ >> Makefile.includes
@@ -34,9 +40,17 @@ else
   echo You can edit Makefile.includes to set your Boost location.
 fi
 
+if g++ build_tests/tr1_test.cpp -o build_test_temp &>/dev/null; then
+  echo Found TR1 - Using hashed containers
+  echo MYFLAGS := -DUSE_TR1_HASH_MAP_AND_SET > Makefile.includes
+else
+  echo No TR1 - Using tree containers
+fi
+
 echo \# This next line is just to allow the Makefile to check this file exists, >> Makefile.includes
 echo \# and is vaguely sane. >> Makefile.includes
 echo SETUP_INCLUDED=1 >> Makefile.includes
+
 
 # Clean up
 rm -f build_test_temp_1 > /dev/null

@@ -421,7 +421,7 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
   gadget.read(infile);
 
   // Take the CSPInstance out of the Minion3InputReader, and make a copy of it.
-  instance.addGadgetSymbol(name, shared_ptr<CSPInstance>(new CSPInstance(gadget.instance)));
+  instance.addGadgetSymbol(name, shared_ptr<CSPInstance>(new CSPInstance(MOVE(gadget.instance))));
   parser_info("Exiting gadget parsing");
 }
 

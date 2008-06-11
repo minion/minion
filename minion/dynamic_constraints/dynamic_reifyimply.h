@@ -112,13 +112,6 @@ struct Dynamic_reify_true : public AbstractConstraint
     if(constraint_locked)
 	    return;
 
-#ifdef P
-	  if(full_propagate_called)
-      P("in full_propagate_called");
-    else
-      P("In watching mode");
-#endif
-
 	  DynamicTrigger* dt = dynamic_trigger_start();
 	  DynamicTrigger* assign_trigs = dt + 1;
 	    

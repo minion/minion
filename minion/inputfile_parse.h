@@ -83,18 +83,19 @@ CSPInstance readInput(InputReader* infile, bool parser_verbose)
     INPUT_ERROR("This version of Minion only supports formats up to 3");
   
 
-  
+  // C++0x comment : Need MOVE (which is std::move) here to activate r-value references.
+  // Normally we wouldn't, but here the compiler can't figure out it can "steal" instance.
   if(inputFileVersionNumber == 3)
   {
     MinionThreeInputReader<InputReader> reader(parser_verbose);
     ReadCSP(reader, infile);
-    return reader.instance;
+    return MOVE(reader.instance);
   } 
   else
   {
     MinionInputReader<InputReader> reader(parser_verbose);
     ReadCSP(reader, infile);
-    return reader.instance;
+    return MOVE(reader.instance);
   }  
 
 }

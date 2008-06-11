@@ -13,6 +13,7 @@ FLAGS = -DWATCHEDLITERALS
 LINKFLAGS = 
 NAMEBASE = minion
 
+
 ifdef DEBUG
  NAMEBASE := $(NAMEBASE)-debug
  ifdef PRINT
@@ -25,6 +26,7 @@ else
 endif
 
 ifdef PROFILE
+  PWD := `pwd`/ 
   NAMEBASE := $(NAMEBASE)-profile
   FLAGS := $(FLAGS) -g -fno-inline -fno-inline-functions
 endif
@@ -45,7 +47,6 @@ ifdef REENTER
 endif
 
 ifdef BOOST
-  NAMEBASE := $(NAMEBASE)-boost
   FLAGS := $(FLAGS) $(BOOSTINCLUDE) -DUSE_BOOST
   ifdef DYNAMIC
     NAMEBASE := $(NAMEBASE)-dynamic
@@ -100,14 +101,11 @@ Makefile.dep:
 	
 depend: Makefile.dep minion/svn_header.h
 
-	
 $(OBJDIR)/minion.o : minion/svn_header.h
 
 $(OBJDIR)/%.o: minion/%.cpp 
 	$(CXX) $(FULLFLAGS) -c -o $@ $<
 
-
-	
 mkdirectory:
 	if [ ! -d $(OBJDIR) ]; then mkdir $(OBJDIR); fi
 	if [ ! -d $(OBJDIR)/build_constraints ]; then mkdir $(OBJDIR)/build_constraints; fi
