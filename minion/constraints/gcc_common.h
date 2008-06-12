@@ -13,7 +13,8 @@ template<typename VarArray1, typename VarArray2>
 struct GCC : public AbstractConstraint
 {
     GCC(StateObj* _stateObj, const VarArray1& _var_array, const VarArray2& _capacity_array) : AbstractConstraint(_stateObj),
-    stateObj(_stateObj), var_array(_var_array), capacity_array(_capacity_array), constraint_locked(false)
+    stateObj(_stateObj), var_array(_var_array), capacity_array(_capacity_array), constraint_locked(false),
+    SCCSplit(_stateObj, _var_array.size()), SCCSplitVals(_stateObj, _capacity_array.size())
     {
         dom_min=var_array[0].getInitialMin();
         dom_max=var_array[0].getInitialMax();
@@ -33,6 +34,7 @@ struct GCC : public AbstractConstraint
         {
             numvals=capacity_array.size();
         }
+        D_ASSERT(capacity_array.size()==numvals);
         
         varvalmatching.resize(numvars, dom_min-1);
         usage.resize(numvals, 0);
@@ -152,7 +154,17 @@ struct GCC : public AbstractConstraint
     vector<int> usagebac;
     vector<int> varvalmatching;
     
+    // Incremental SCC data.
+    // For variables.
+    vector<int> SCCs;    // Variable numbers
+    ReversibleMonotonicSet SCCSplit;
     
+    vector<int> varToSCCIndex;  // Mirror of the SCCs array.
+    
+    // For values.
+    vector<int> SCCsVals;    // Values
+    ReversibleMonotonicSet SCCSplitVals;
+    vector<int> valToSCCIndex;  // value-dom_min -> index in SCCsVals.
     
     
     inline bool bfsmatching_gcc()

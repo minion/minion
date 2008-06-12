@@ -1,0 +1,18 @@
+MINION 3
+**VARIABLES**
+DISCRETE a {0..9}
+DISCRETE b {0..9}
+DISCRETE d {0..9}
+DISCRETE e {0..9}
+DISCRETE g {0..9}
+DISCRETE l {0..9}
+DISCRETE n {0..9}
+DISCRETE o {0..9}
+DISCRETE r {0..9}
+DISCRETE t {0..9}
+**CONSTRAINTS**
+weightedsumleq([100000,10000,1000,100,10,1,100000,10000,1000,100,10,1,-100000,-10000,-1000,-100,-10,-1], [d,o,n,a,l,d,g,e,r,a,l,d,r,o,b,e,r,t],0)
+weightedsumgeq([100000,10000,1000,100,10,1,100000,10000,1000,100,10,1,-100000,-10000,-1000,-100,-10,-1], [d,o,n,a,l,d,g,e,r,a,l,d,r,o,b,e,r,t],0)
+gacalldiff([a,b,d,e,g,l,n,o,r,t])
+**EOF**
+
