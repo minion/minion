@@ -399,7 +399,19 @@ DynamicElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3&
               (stateObj, vararray, v1[0], AnyVarRef(v2[0]));  
 }
 
+template<typename Var1, typename Var2, typename Var3>
+DynamicConstraint*
+DynamicElementOneCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var3& v2)
+{ 
+  typedef typename ShiftType<typename Var2::value_type, compiletime_val<-1> >::type ShiftVal;
+  vector<ShiftVal> replace_v1;
+  replace_v1.push_back(ShiftVarRef(v1[0], compiletime_val<-1>()));
+  return DynamicElementCon(stateObj, vararray, replace_v1, v2);
+}
+
+
 BUILD_DYNAMIC_CONSTRAINT3(CT_WATCHED_ELEMENT, DynamicElementCon);
 
+BUILD_DYNAMIC_CONSTRAINT3(CT_WATCHED_ELEMENT_ONE, DynamicElementOneCon);
 
 

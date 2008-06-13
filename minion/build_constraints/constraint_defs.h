@@ -1,7 +1,9 @@
 
 ConstraintDef constraint_list[] = {
 { "element" , CT_ELEMENT, 3,{ read_list , read_var , read_var }, STATIC_CT },
+{ "element_one" , CT_ELEMENT_ONE, 3,{ read_list , read_var , read_var }, STATIC_CT },
 { "watchelement" , CT_WATCHED_ELEMENT, 3,{ read_list , read_var , read_var }, DYNAMIC_CT },
+{ "watchelement_one" , CT_WATCHED_ELEMENT_ONE, 3,{ read_list , read_var , read_var }, DYNAMIC_CT },
 { "gacelement-deprecated" , CT_GACELEMENT, 3,{ read_list , read_var , read_var }, STATIC_CT },
 { "alldiff" , CT_ALLDIFF, 1,{ read_list }, STATIC_CT },
 { "alldiffgacslow" , CT_ALLDIFF_GACSLOW, 1,{ read_list }, STATIC_CT },

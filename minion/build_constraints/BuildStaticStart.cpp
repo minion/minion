@@ -2,6 +2,7 @@
 AbstractConstraint* build_constraint(StateObj* stateObj, ConstraintBlob& b) {
 switch(b.constraint.type) {
 case CT_ELEMENT : return build_constraint_CT_ELEMENT(stateObj, b);
+case CT_ELEMENT_ONE : return build_constraint_CT_ELEMENT_ONE(stateObj, b);
 case CT_GACELEMENT : return build_constraint_CT_GACELEMENT(stateObj, b);
 case CT_ALLDIFF : return build_constraint_CT_ALLDIFF(stateObj, b);
 case CT_ALLDIFF_GACSLOW : return build_constraint_CT_ALLDIFF_GACSLOW(stateObj, b);

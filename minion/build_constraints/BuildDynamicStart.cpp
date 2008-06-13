@@ -2,6 +2,7 @@
 AbstractConstraint* build_dynamic_constraint(StateObj* stateObj, ConstraintBlob& b) {
 switch(b.constraint.type) {
 case CT_WATCHED_ELEMENT : return build_constraint_CT_WATCHED_ELEMENT(stateObj, b);
+case CT_WATCHED_ELEMENT_ONE : return build_constraint_CT_WATCHED_ELEMENT_ONE(stateObj, b);
 case CT_WATCHED_NEQ : return build_constraint_CT_WATCHED_NEQ(stateObj, b);
 case CT_WATCHED_LESS : return build_constraint_CT_WATCHED_LESS(stateObj, b);
 case CT_WATCHED_GEQSUM : return build_constraint_CT_WATCHED_GEQSUM(stateObj, b);
