@@ -400,7 +400,7 @@ DynamicElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3&
 }
 
 template<typename Var1, typename Var2, typename Var3>
-DynamicConstraint*
+AbstractConstraint*
 DynamicElementOneCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var3& v2)
 { 
   typedef typename ShiftType<typename Var2::value_type, compiletime_val<-1> >::type ShiftVal;

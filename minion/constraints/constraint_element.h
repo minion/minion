@@ -358,7 +358,7 @@ ElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3& v2)
 }
 
 template<typename Var1, typename Var2, typename Var3>
-Constraint*
+AbstractConstraint*
 ElementOneCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var3& v2)
 { 
   typedef typename ShiftType<typename Var2::value_type, compiletime_val<-1> >::type ShiftVal;
