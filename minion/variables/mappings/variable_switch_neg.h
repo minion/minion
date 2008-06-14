@@ -147,6 +147,7 @@ struct SwitchNeg
 	  case Assigned:
 	  case DomainChanged:
 	    data.addTrigger(t, type);
+      break;
 	  default:
       D_FATAL_ERROR("Fatal error in 'switch_neg' wrapper");
 	}

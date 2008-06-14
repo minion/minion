@@ -307,6 +307,17 @@ void print_default_help(char** argv)
 int main(int argc, char** argv) {
 // Wrap main in a try/catch just to stop exceptions leaving main,
 // as windows gets really annoyed when that happens.
+  cout << sizeof(ProbSpec::ConstraintBlob) << endl;
+  cout << sizeof(ConstraintDef) << endl;
+  cout << sizeof(vector<int>) << endl;
+  cout << sizeof(vector<vector<int> >) << endl;
+  //cout << sizeof(std::_Vector_base<int, std::allocator<int> >) << endl;
+  cout << sizeof(std::allocator<int>) << endl;
+  cout << sizeof(shared_ptr<int>) << endl;
+  cout << sizeof(BOOL) << endl;
+  cout << sizeof(ProbSpec::Var) << endl;
+  
+  vector<int> v;
   
 try {
   StateObj* stateObj = new StateObj();

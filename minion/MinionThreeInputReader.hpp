@@ -307,12 +307,12 @@ extern ConstraintDef constraint_list[];
 int num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);
 #endif
 
-inline ConstraintDef& get_constraint(ConstraintType t)
+inline ConstraintDef* get_constraint(ConstraintType t)
 {
   for(int i = 0; i < num_of_constraints; ++i)
   {
     if(constraint_list[i].type == t)
-      return constraint_list[i];
+      return constraint_list + i;
   }
 
   D_FATAL_ERROR("Constraint not found");
@@ -454,16 +454,16 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
     else
       { throw parse_exception(string("Unknown Constraint:") + id); }
   }
-  ConstraintDef constraint = constraint_list[constraint_num];
+  ConstraintDef* constraint = constraint_list + constraint_num;
 
-  if( constraint.trig_type == DYNAMIC_CT )
+  if( constraint->trig_type == DYNAMIC_CT )
   {
 #ifndef WATCHEDLITERALS
     cerr << "This version of Minion was not complied with -WATCHEDLITERALS" << endl;
     cerr << "So there is not support for the " << constraint.name << "." << endl;
     exit(1);
 #else
-    if(reified && constraint.type == CT_REIFY)
+    if(reified && constraint->type == CT_REIFY)
     {
       cerr << "Cannot reify a watched constraint!" << endl;
       exit(1);
@@ -471,7 +471,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 #endif
   }
 
-  switch(constraint.type)
+  switch(constraint->type)
   {
     case CT_REIFY:
     case CT_REIFYIMPLY:
@@ -483,7 +483,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
       infile->check_sym(',');
       Var reifyVar = readIdentifier(infile);
       infile->check_sym(')');
-      if(constraint.type == CT_REIFY)
+      if(constraint->type == CT_REIFY)
         blob.reify(reifyVar);
       else
         blob.reifyimply(reifyVar);
@@ -493,7 +493,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 
     case CT_WATCHED_TABLE:
     case CT_WATCHED_NEGATIVE_TABLE:
-    return readConstraintTable(infile, get_constraint(constraint.type));
+    return readConstraintTable(infile, get_constraint(constraint->type));
     break;
 
     case CT_WATCHED_OR:
@@ -512,16 +512,16 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 
 
 template<typename FileReader>
-ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileReader* infile, const ConstraintDef& def)
+ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileReader* infile, ConstraintDef* def)
 {
   // This slightly strange code is to save copying the ConstraintBlob as much as possible.
   ConstraintBlob con(def);
   vector<vector<Var> >& varsblob = con.vars;
   vector<vector<int> >& constblob = con.constants;
 
-  for(int i = 0; i < def.number_of_params; ++i)
+  for(int i = 0; i < def->number_of_params; ++i)
   {
-    switch(def.read_types[i])
+    switch(def->read_types[i])
     {
       case read_list:
       varsblob.push_back(readLiteralVector(infile));
@@ -535,7 +535,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
         vars[0] = readIdentifier(infile);
         infile->check_sym(',');
         vars[1] = readIdentifier(infile);
-        varsblob.push_back(vars);
+        varsblob.push_back(MOVE(vars));
       }
       break;
       case read_constant:
@@ -547,12 +547,12 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
         vector<int> vals;
     		for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
     		{
-    		  if(vectorOfConst[loop].type != VAR_CONSTANT)
+    		  if(vectorOfConst[loop].type() != VAR_CONSTANT)
     			  throw parse_exception("Vector must only contain constants.");
     			else
-            vals.push_back(vectorOfConst[loop].pos);
+            vals.push_back(vectorOfConst[loop].pos());
     		}
-    		constblob.push_back(vals);
+    		constblob.push_back(MOVE(vals));
       }
       break;  
       case read_constraint:
@@ -564,7 +564,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
       default:
       D_FATAL_ERROR("Internal Error!");
     }
-    if(i != def.number_of_params - 1)
+    if(i != def->number_of_params - 1)
       infile->check_sym(',');
   }
   infile->check_sym(')');
@@ -578,7 +578,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
 // Tuples represented as a vector of int arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReader* infile, const ConstraintDef& def) 
+ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReader* infile, ConstraintDef* def) 
 {
   parser_info( "reading a table ct (unreifiable)" ) ;
 
@@ -615,7 +615,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
         tuple[count] = elem ;
       }
       infile->check_sym('>');
-      tuples.push_back(tuple) ;
+      tuples.push_back(MOVE(tuple)) ;
       delim = infile->get_char();                          // ',' or '}'
       if(delim != ',' && delim!= '}')
         throw parse_exception("Expected ',' or '}'");
@@ -663,7 +663,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileRead
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* infile, 
-  const ConstraintDef& ct)
+  ConstraintDef* ct)
 {
   parser_info("Reading a SAT clause");
   infile->check_sym('[');
@@ -678,9 +678,9 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* 
   infile->check_sym(']');
   infile->check_sym(')');
   for(int i = 0; i < clause_vars.size(); i++) {
-    if(clause_vars[i].type == VAR_NOTBOOL) {
+    if(clause_vars[i].type() == VAR_NOTBOOL) {
       negs.push_back(0);
-      clause_vars[i].type = VAR_BOOL;
+      clause_vars[i].setType(VAR_BOOL);
     } else {
       negs.push_back(1);
     }
@@ -709,7 +709,7 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
 
   string name = infile->get_string();
   Var var = instance.vars.getSymbol(name);
-  if(var.type == VAR_MATRIX)
+  if(var.type() == VAR_MATRIX)
   {
     vector<int> params = readConstantVector(infile);
     vector<int> max_index = instance.vars.getMatrixSymbol(name);
@@ -730,10 +730,10 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
 
   if(negVar)
   {
-    if(var.type != VAR_BOOL)
+    if(var.type() != VAR_BOOL)
       parser_info("Only Booleans can be negated!");
     else
-      var.type = VAR_NOTBOOL;
+      var.setType(VAR_NOTBOOL);
   }
 
   parser_info("Read variable '" + name + "', internally: " + to_string(var));
@@ -773,7 +773,7 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
 
   Var var = instance.vars.getSymbol(name);
 
-  if(var.type == VAR_MATRIX)
+  if(var.type() == VAR_MATRIX)
   {
     if(negVar)
       throw parse_exception("Sorry, can't negate a matrix");
@@ -794,10 +794,10 @@ else
     throw parse_exception("Must give matrix here, not single variable!");
   if(negVar)
   {
-    if(var.type != VAR_BOOL)
+    if(var.type() != VAR_BOOL)
       parser_info("Only Booleans can be negated!");
     else
-      var.type = VAR_NOTBOOL;
+      var.setType(VAR_NOTBOOL);
   }
   returnVec.push_back(var);
 }
@@ -907,7 +907,7 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrixVariable(Fi
   string name = infile->get_string();
   Var var = instance.vars.getSymbol(name);
   // Check it is a matrix
-  if(var.type != VAR_MATRIX)
+  if(var.type() != VAR_MATRIX)
     throw parse_exception("Expected matrix");
   // Get dimension of matrix.
   vector<int> indices = instance.vars.getMatrixSymbol(name);

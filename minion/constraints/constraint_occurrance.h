@@ -424,7 +424,7 @@ AbstractConstraint*
 BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T3& t3, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
 {
   int val_to_count = b.constants[0][0];
-//  int occs = b.vars[2][0].pos;
+//  int occs = b.vars[2][0].pos());
   if(reify) 
   { return reifyCon(stateObj, OccEqualCon(stateObj, t1, runtime_val(val_to_count), t3[0]), reifyVar); } 
   else 

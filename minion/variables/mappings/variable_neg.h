@@ -113,6 +113,7 @@ struct VarNeg
 	  case Assigned:
 	  case DomainChanged:
 	    data.addTrigger(t, type);
+      break;
 	  default:
       D_FATAL_ERROR("Invalid trigger in 'neg' mapper");
 	}

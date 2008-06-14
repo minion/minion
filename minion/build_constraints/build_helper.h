@@ -138,7 +138,7 @@ struct BuildConObj<CT_NAME, 0> \
   { \
 	if(b.implied_reified) \
 	{ \
-	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos); \
+	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
 	  BoolVarRef dummyVar; \
 	  return truereifyCon(stateObj, Build ## CT_NAME(stateObj, *(vars.first.first.second), *(vars.first.second), *(vars.second), false, dummyVar, b), reifyVar); \
 	} \
@@ -146,7 +146,7 @@ struct BuildConObj<CT_NAME, 0> \
 	{ \
 	  BoolVarRef reifyVar; \
 	  if(b.reified) \
-	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos); \
+	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
 	  return Build ## CT_NAME(stateObj, *(vars.first.first.second), *(vars.first.second), *(vars.second),  b.reified, reifyVar, b); \
 	} \
   } \
@@ -165,7 +165,7 @@ struct BuildConObj<CT_NAME, 0> \
   { \
 	if(b.implied_reified) \
 	{ \
-	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos); \
+	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
 	  BoolVarRef dummyVar; \
 	  return truereifyCon(stateObj, Build ## CT_NAME(stateObj, *(vars.first.second), *(vars.second), false, dummyVar, b), reifyVar); \
 	} \
@@ -173,7 +173,7 @@ struct BuildConObj<CT_NAME, 0> \
 	{ \
 	  BoolVarRef reifyVar; \
 	  if(b.reified) \
-	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos); \
+	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
 	  return Build ## CT_NAME(stateObj, *(vars.first.second), *(vars.second), b.reified, reifyVar, b); \
 	} \
   } \
@@ -192,7 +192,7 @@ struct BuildConObj<CT_NAME, 0> \
   { \
 	if(b.implied_reified) \
 	{ \
-	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos); \
+	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
 	  BoolVarRef dummyVar; \
       return truereifyCon(stateObj, Build ## CT_NAME(stateObj, *(vars.second), false, dummyVar, b), reifyVar); \
 	} \
@@ -200,7 +200,7 @@ struct BuildConObj<CT_NAME, 0> \
 	{ \
 	  BoolVarRef reifyVar; \
 	  if(b.reified) \
-	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos); \
+	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
 	  return Build ## CT_NAME(stateObj, *(vars.second), b.reified, reifyVar, b); \
 	} \
   } \
@@ -218,7 +218,7 @@ struct BuildConObj<CT_NAME, 0> \
   { \
 	if(b.implied_reified) \
 	{ \
-	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos); \
+	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
 	  BoolVarRef dummyVar; \
       return truereifyCon(stateObj, Build ## CT_NAME(stateObj, false, dummyVar, b), reifyVar); \
 	} \
@@ -226,7 +226,7 @@ struct BuildConObj<CT_NAME, 0> \
 	{ \
 	  BoolVarRef reifyVar; \
 	  if(b.reified) \
-	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos); \
+	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
 	  return Build ## CT_NAME(stateObj, b.reified, reifyVar, b); \
 	} \
   } \

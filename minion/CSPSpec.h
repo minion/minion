@@ -85,33 +85,38 @@ enum VariableType
   VAR_SPARSEDISCRETE,
   VAR_CONSTANT,
   VAR_MATRIX,
-  VAR_INVALID = -999
+  VAR_INVALID
 };
 
 namespace ProbSpec
 {
   
-struct Var
+class Var
 {
-  VariableType type;
-  int pos;
-  Var(VariableType _type, int _pos) : type(_type), pos(_pos)
+  int pos_m : 28;
+  VariableType type_m : 4;
+public:
+  int pos() const { return pos_m; }
+  VariableType type() const { return type_m; }
+  void setType(VariableType v) { type_m = v; }
+  
+  Var(VariableType _type, int _pos) : type_m(_type), pos_m(_pos)
   { }
   
-  Var(const Var& v) : type(v.type), pos(v.pos)
+  Var(const Var& v) : type_m(v.type_m), pos_m(v.pos_m)
   {}
   
-  Var() : type(VAR_INVALID), pos(-1)
+  Var() : type_m(VAR_INVALID), pos_m(-1)
   {}
   
   friend std::ostream& operator<<(std::ostream& o, const Var& v)
-  { return o << "Var. Type:" << v.type << " Pos:" << v.pos << "."; }
+  { return o << "Var. Type:" << v.type_m << " Pos:" << v.pos_m << "."; }
    
    bool operator==(const Var& var) const
-   { return type == var.type && pos == var.pos; }
+   { return type_m == var.type_m && pos_m == var.pos_m; }
    
    bool operator<(const Var& var) const
-   { return (type < var.type) || (type == var.type && pos < var.pos); }
+   { return (type_m < var.type_m) || (type_m == var.type_m && pos_m < var.pos_m); }
 };
 
 
@@ -121,7 +126,7 @@ struct CSPInstance;
 struct ConstraintBlob
 {
   /// The type of constraint.
-  ConstraintDef constraint;
+  ConstraintDef* constraint;
   /// The variables of the problem.
   vector<vector<Var> > vars;
   /// Pointer to list of tuples. Only used in Table Constraints.
@@ -141,15 +146,15 @@ struct ConstraintBlob
   /// For use in nested constraints.
   vector<ConstraintBlob> internal_constraints;
   
-  BOOL reified;
-  BOOL implied_reified;
+  bool reified;
+  bool implied_reified;
   Var reify_var;
   
-  ConstraintBlob(ConstraintDef _con) :
+  ConstraintBlob(ConstraintDef* _con) :
 	constraint(_con), reified(false), implied_reified(false)
   {}
   
-  ConstraintBlob(ConstraintDef _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars), reified(false), implied_reified(false)
+  ConstraintBlob(ConstraintDef* _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars), reified(false), implied_reified(false)
   {}
 
 #ifdef USE_CXX0X
@@ -161,7 +166,7 @@ struct ConstraintBlob
 #endif
 
   /// A helper constructor for when only a SingleVar is passed.
-  ConstraintBlob(ConstraintDef _con, vector<Var>& _var) : constraint(_con), reified(false), implied_reified(false)
+  ConstraintBlob(ConstraintDef* _con, vector<Var>& _var) : constraint(_con), reified(false), implied_reified(false)
   { vars.push_back(_var); }
 
 
@@ -179,7 +184,7 @@ struct ConstraintBlob
   }
   
   bool is_dynamic()
-  { return constraint.trig_type == DYNAMIC_CT; }
+  { return constraint->trig_type == DYNAMIC_CT; }
   
 };
 
@@ -326,10 +331,10 @@ struct ConstraintBlob
   
   Bounds get_bounds(Var v) const
   {
-    switch(v.type)
+    switch(v.type())
     {
     case VAR_CONSTANT:
-      return Bounds(v.pos, v.pos);    
+      return Bounds(v.pos(), v.pos());    
     case VAR_BOOL:
       return Bounds(0,1);
     case VAR_BOUND:  
@@ -338,7 +343,7 @@ struct ConstraintBlob
         for(unsigned int x = 0; x < bound.size(); ++x)
         {
           bound_size += bound[x].first;
-          if(v.pos < bound_size)
+          if(v.pos() < bound_size)
             return bound[x].second;
         }
         throw parse_exception("Internal Error - Bound OverFlow");
@@ -350,7 +355,7 @@ struct ConstraintBlob
         for(unsigned int x=0;x<sparse_bound.size();++x)
         {
           sparse_bound_size += sparse_bound[x].first;
-          if(v.pos < sparse_bound_size)
+          if(v.pos() < sparse_bound_size)
             return Bounds(sparse_bound[x].second.front(), sparse_bound[x].second.back());
         }
         throw parse_exception("Internal Error - SparseBound OverFlow");
@@ -361,7 +366,7 @@ struct ConstraintBlob
       for(unsigned int x = 0; x < discrete.size(); ++x)
       {
         discrete_size += discrete[x].first;
-        if(v.pos < discrete_size)
+        if(v.pos() < discrete_size)
           return discrete[x].second;
       }
       throw parse_exception("Internal Error - Discrete OverFlow");
@@ -372,7 +377,7 @@ struct ConstraintBlob
       for(unsigned int x = 0; x < sparse_discrete.size(); ++x)
       {
         sparse_discrete_size += sparse_discrete[x].first;
-        if(v.pos < sparse_discrete_size)
+        if(v.pos() < sparse_discrete_size)
           return Bounds(sparse_discrete[x].second.front(), sparse_discrete[x].second.back());
       }
       throw parse_exception("Internal Error - SparseDiscrete OverFlow");
@@ -549,7 +554,7 @@ public:
   bool bounds_check_last_constraint()
   {
     const ConstraintBlob& con = constraints.back();
-    switch(con.constraint.type)
+    switch(con.constraint->type)
     {
       case CT_REIFY:
       case CT_REIFYIMPLY:
