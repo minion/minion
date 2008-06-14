@@ -1,8 +1,15 @@
-Welcome to the Minion source.
+Welcome to the Minion source!
 
-Minion does does not have a traditional configure file. The quickest way
-to get started, which will work for most people using a unix-type system
-is:
+The first thing to do is to run Minion's configure script:
+
+./configure.sh
+
+This will look for the location of your compiler, and a few system libraries.
+If you ever add additional constraints, or add or remove files, then
+you should re-run the configure script. Note that you should NOT delete the
+Makefile before re-running the configure scripts, it is not auto-generated.
+
+After that, you can compile minion by doing:
 
 make minion
 make minion DEBUG=1
