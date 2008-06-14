@@ -60,7 +60,7 @@ class AbstractConstraint
 {
  protected:
 
-  vector<AnyVarRef> vars;
+  vector<AnyVarRef> singleton_vars;
   StateObj* stateObj;
 
   /// Private member of the base class.
@@ -162,8 +162,8 @@ public:
   
   vector<AnyVarRef>* get_vars_singleton() //piggyback singleton vector on get_vars()
   { 
-    if(vars.size() == 0) vars = get_vars(); //for efficiency: no constraint over 0 variables
-    return &vars; 
+    if(singleton_vars.size() == 0) singleton_vars = get_vars(); //for efficiency: no constraint over 0 variables
+    return &singleton_vars; 
   }
 
 #ifdef WDEG
