@@ -256,6 +256,29 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       vars.push_back(AnyVarRef(var_array2[i]));
     return vars;  
   }
+  
+  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  {
+    pair<int, int> assign;
+    int found_satisfying = 0;
+    for(int i = 0; i < var_array1.size(); ++i)
+    {
+      if(Operator::get_satisfying_assignment(var_array1[i], var_array2[i], assign))
+      {
+        found_satisfying++;
+        D_ASSERT(var_array1[i].inDomain(assign.first));
+        D_ASSERT(var_array2[i].inDomain(assign.second));
+        D_ASSERT(Operator::check_assignment(assign.first, assign.second));
+        assignment.push_back(make_pair(i, assign.first));
+        assignment.push_back(make_pair(i + var_array1.size(), assign.second));
+        if(found_satisfying == num_to_watch - 1)
+          return;
+      }
+    }
+    // If we didn't get enough, then empty the box again.
+    assignment.clear();
+  }
+  
 };
 
 template<typename VarArray1,  typename VarArray2>
