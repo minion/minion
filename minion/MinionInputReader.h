@@ -22,7 +22,7 @@ struct ConcreteFileReader
   
   /// Removes all comments after the current place in the file.
   // Returns peeked char.
-  char check_for_comments()
+  void check_for_comments()
   {
     char peek = simplepeek_char();
     while(peek == '#')
@@ -30,21 +30,8 @@ struct ConcreteFileReader
       simplegetline();
       peek = simplepeek_char();
     }
-    return peek;
   }
- 
-  /// Removes all comments after the current place in the file
-  char check_for_comments_and_get_char()
-  {
-    char peek = simpleget_char();
-    while(peek == '#')
-    {
-      simplegetline();
-      peek = simpleget_char();
-    }
-    return peek;
-  }
-  
+   
   ConcreteFileReader(StreamType& name, string _filename) : infile(name), filename(_filename)
   {}
   
@@ -56,8 +43,8 @@ struct ConcreteFileReader
   
    string get_string()
   { 
-	string s;
-    char next_char = check_for_comments_and_get_char();
+	  string s;
+    char next_char = get_char();
     while(isalnum(next_char) || next_char == '_')
     {
       s += next_char;
@@ -78,7 +65,7 @@ struct ConcreteFileReader
    string get_asciistring()
   {
     string s;
-    char next_char = check_for_comments_and_get_char();
+    char next_char = get_char();
     while(!isspace(next_char) && !infile.eof())
     {
       s +=  next_char;
@@ -87,22 +74,21 @@ struct ConcreteFileReader
     
     putback(next_char);
     return s;
-    
-    
   }
   
    int read_num()
-  {
+  {	
+	  int i;
+	  infile >> i;
+	  if(infile.fail())
+      throw parse_exception("Problem parsing number");
+	  return i;
+	
+/*
 	// This function should just be "infile >> i;", however that is parsed differently in windows and linux
 	// So we'll have to do it manually.
-	
-	/* int i;
-	infile >> i;
-	if(infile.fail())
-    throw parse_exception("Problem parsing number");
-	return i;
-	*/
-	char next_char = check_for_comments_and_get_char();
+
+	char next_char = get_char();
 	while(isspace(next_char))
 	  next_char = infile.get();
 	
@@ -133,6 +119,7 @@ struct ConcreteFileReader
 	  num*= -1;
 	
 	return num;
+	*/
   }
   
    char simplepeek_char()
@@ -148,18 +135,23 @@ struct ConcreteFileReader
   
    char peek_char()
   {
-    check_for_comments();
-    return simplepeek_char();
+    char peek = simplepeek_char();
+    while(peek == '#')
+    {
+      simplegetline();
+      peek = simplepeek_char();
+    }
+    return peek;
   }
-  
+
   /// Check if the next character from infile is sym.
-   void check_sym(char sym)
+  void check_sym(char sym)
   {
-    char idChar = check_for_comments_and_get_char();
-	if(idChar != sym)
-	{
-	  throw parse_exception(string("Expected '") + sym + "'. Recieved '" + idChar + "'.");
-	}
+    char idChar = get_char();
+    if(idChar != sym)
+    {
+      throw parse_exception(string("Expected '") + sym + "'. Recieved '" + idChar + "'.");
+    }
   }
   
    string getline()
@@ -201,8 +193,13 @@ struct ConcreteFileReader
   
    char get_char()
   { 
-    check_for_comments();
-	return simpleget_char();
+    char peek = simpleget_char();
+    while(peek == '#')
+    {
+      simplegetline();
+      peek = simpleget_char();
+    }
+    return peek;
   }
   
    char simpleget_char()
