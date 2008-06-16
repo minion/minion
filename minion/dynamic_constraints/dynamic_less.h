@@ -47,6 +47,9 @@ struct WatchLessConstraint : public AbstractConstraint
 	    
     var1.addDynamicTrigger(dt    , LowerBound);
     var2.addDynamicTrigger(dt + 1, UpperBound);
+    
+    var2.setMin(var1.getMin() + 1);
+    var1.setMax(var2.getMax() - 1);
   }
   
     
