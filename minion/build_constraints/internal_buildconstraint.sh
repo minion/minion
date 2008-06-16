@@ -41,7 +41,7 @@
     echo */ >> $3.cpp
     echo >> $3.cpp
 	
-	for include in `./only_filename_grep.sh $3 ../constraints/* ../dynamic_constraints/* ../dynamic_constraints/unary/*`; do
+	for include in `./only_filename_grep.sh $3 ../constraints/*.h ../dynamic_constraints/*.h ../dynamic_constraints/unary/*.h`; do
 	echo \#include \"$include\" >> $3.cpp;
 	done
 	
