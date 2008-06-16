@@ -4,6 +4,8 @@ using namespace std;
 
 bool debug_crash = false;
 
+bool in_cspcomp_for_failexit = false;
+
 void D_FATAL_ERROR2(string s, string file, string line)
 { 
   cerr << "Sorry, there has been some kind of error." << endl;
@@ -15,9 +17,18 @@ void D_FATAL_ERROR2(string s, string file, string line)
   cerr << "The error was in the file " << file << " on line " << line << endl;
 }
 
-void _NORETURN FAIL_EXIT() 
+void _NORETURN FAIL_EXIT(string s) 
 { 
-  cerr << "Unrecoverable error. Exiting" << endl;
+  if(in_cspcomp_for_failexit)
+  {
+    if(s != "")
+      cout << "c " << s << endl;
+    cout << "s UNKNOWN" << endl;  
+    exit(1);
+  }
+  
+  cerr << "Unrecoverable error. Exiting." << endl;
+  cerr << s << endl;
   cerr.flush();
   if(debug_crash)
   { 

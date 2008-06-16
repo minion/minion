@@ -67,8 +67,7 @@ struct PowConstraint : public AbstractConstraint
 	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
 		 var3.getInitialMin() < 0)
 	  { 
-		cerr << "The 'pow' constraint only supports non-negative numbers at present.";
-		exit(1);
+		  FAIL_EXIT("The 'pow' constraint only supports non-negative numbers at present.");
 	  }
   }
   

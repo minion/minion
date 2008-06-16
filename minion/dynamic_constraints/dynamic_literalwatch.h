@@ -271,8 +271,7 @@ BuildCT_WATCHED_LITSUM(StateObj* stateObj,const T1& t1, BOOL reify, const BoolVa
 {
   if(reify)
   {
-    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
-	  exit(0);
+    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry."); 
   }
   else
   { 

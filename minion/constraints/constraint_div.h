@@ -66,8 +66,7 @@ struct DivConstraint : public AbstractConstraint
 	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
 		 var3.getInitialMin() < 0)
 	  { 
-		cerr << "The 'div' constraint only supports positive numbers at present.";
-		exit(1);
+      FAIL_EXIT("The 'div' constraint only supports positive numbers at present.");
 	  }
   }
   

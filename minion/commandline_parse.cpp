@@ -1,5 +1,7 @@
 #include "commandline_parse.h"
 
+extern bool in_cspcomp_for_failexit;
+
 void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, char** argv)
 {
  for(int i = 1; i < argc; ++i)
@@ -23,6 +25,7 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
   { 
     getOptions(stateObj).print_only_solution = true;
     getOptions(stateObj).cspcomp = true;
+    in_cspcomp_for_failexit = true;
   }
 	else if(command == string("-verbose"))
 	{ getOptions(stateObj).parser_verbose = true; }
@@ -46,8 +49,7 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
 #ifndef NO_DEBUG
 	  getOptions(stateObj).fullpropagate = true; 
 #else
-	  cout << "This version of minion was not built to support the '-fullprop' command. Sorry" << endl;
-	  exit(1);
+    FAIL_EXIT("This version of minion was not built to support the '-fullprop' command. Sorry");
 #endif
 	}
 	else if(command == string("-nocheck"))

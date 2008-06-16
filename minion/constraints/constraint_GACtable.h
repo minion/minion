@@ -145,8 +145,7 @@ struct GACTableConstraint : public AbstractConstraint
   {
     if((int)_vars.size() != lists->tuples->tuple_size())
     {
-        cerr << "In table constraint, number of variables is not equal to length of tuples." <<endl; 
-        exit(1);
+      FAIL_EXIT("In table constraint, number of variables is not equal to length of tuples.");
     }
 	_current_support.request_bytes(lists->tuples->literal_num * sizeof(int));
   }

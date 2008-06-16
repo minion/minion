@@ -153,11 +153,12 @@ BuildCT_WATCHED_OR(StateObj* stateObj, const light_vector<T>& vs, BOOL reify,
   size_t vs_s = vs.size();
   for(int i = 0; i < vs_s; i++)
     if(vs[i].getInitialMin() != 0 || vs[i].getInitialMax() != 1)
-      cerr << "watched or only works on Boolean variables!" << endl;
-
+    {
+      FAIL_EXIT("watched or only works on Boolean variables!");
+    }
+    
   if(reify) {
-    cerr << "Cannot reify 'watched or' constraint." << endl;
-    exit(0);
+    FAIL_EXIT("Cannot reify 'watched or' constraint.");
   } else {
       return new BoolOrConstraintDynamic<light_vector<T> >(stateObj, vs, bl.negs);
   }

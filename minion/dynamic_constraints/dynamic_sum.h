@@ -359,14 +359,13 @@ BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<T>& t1, BOOL reify
   for(int i = 0; i < t1.size(); ++i)
   {
     if(t1[i].getInitialMin() != 0 || t1[i].getInitialMax() != 1)
-      cerr << "watched leqsum only works on Boolean variables!" << endl;
+      FAIL_EXIT("watched leqsum only works on Boolean variables!");
   }
 
   
   if(reify) 
   { 
-    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
-	  exit(0); 
+    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry."); 
   } 
   else 
   { return BoolLessEqualSumConDynamic(stateObj, t1, runtime_val(b.constants[0][0])); } \
@@ -379,13 +378,12 @@ BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const light_vector<T>& t1, BOOL reify,
   for(int i = 0; i < t1.size(); ++i)
   {
     if(t1[i].getInitialMin() != 0 || t1[i].getInitialMax() != 1)
-      cerr << "watched geqsum only works on Boolean variables!" << endl;
+      FAIL_EXIT("watched geqsum only works on Boolean variables!");
   }
   
   if(reify) 
   { 
-    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
-	exit(0); 
+    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry."); 
   } 
   else 
   {

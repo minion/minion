@@ -45,8 +45,7 @@ BuildCT_WATCHED_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarR
 { 
   if(reify) 
   { 
-    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
-	exit(0); 
+    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry."); 
   } 
   else 
   { return GACTableCon(stateObj, t1, b.tuples); } 
@@ -58,8 +57,7 @@ BuildCT_WATCHED_NEGATIVE_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const
 { 
   if(reify) 
   { 
-    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; 
-	exit(0); 
+    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry.");
   } 
   else 
   { return GACNegativeTableCon(stateObj, t1, b.tuples); } 

@@ -205,8 +205,7 @@ LeqWeightedSum(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>&
   // and correctness
   if(scale.size() != vec.size())
   {
-      cerr << "In a weighted sum constraint, the vector of weights has different length to the vector of variables." << endl;
-      exit(1);
+    FAIL_EXIT("In a weighted sum constraint, the vector of weights must have the same length to the vector of variables.");
   }
   for(unsigned i = 0; i < scale.size(); ++i)
   {
@@ -254,8 +253,7 @@ GeqWeightedSum(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>&
   // and correctness
   if(scale.size() != vec.size())
   {
-      cerr << "In a weighted sum constraint, the vector of weights has different length to the vector of variables." << endl;
-      exit(1);
+      FAIL_EXIT("In a weighted sum constraint, the vector of weights must have the same length as the vector of variables.");
   }
   for(unsigned i = 0; i < scale.size(); ++i)
   {

@@ -152,9 +152,14 @@ namespace Controller
   	  {
   	    if(getState(stateObj).getOldTimer().checkTimeout(getOptions(stateObj).time_limit))
   	    {
-  		  cout << "Time out." << endl;
-            oldtableout.set("TimeOut", 1);
-  		  return true;
+          if(getOptions(stateObj).cspcomp)
+          {
+            FAIL_EXIT("Time out");
+          }
+          
+          getOptions(stateObj).printLine("Time out.");
+          oldtableout.set("TimeOut", 1);
+  		    return true;
   	    }
   	  }
   	}

@@ -465,8 +465,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 #else
     if(reified && constraint->type == CT_REIFY)
     {
-      cerr << "Cannot reify a watched constraint!" << endl;
-      exit(1);
+      FAIL_EXIT("Cannot reify a watched constraint!");
     }
 #endif
   }

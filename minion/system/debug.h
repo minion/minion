@@ -47,7 +47,7 @@ struct parse_exception : public std::exception
 
 extern bool debug_crash;
 void D_FATAL_ERROR2(string s, string file, string line);
-void _NORETURN FAIL_EXIT();
+void _NORETURN FAIL_EXIT(string s = "");
 
 struct assert_fail {};
 

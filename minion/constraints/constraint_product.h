@@ -67,10 +67,7 @@ struct ProductConstraint : public AbstractConstraint
 	  BigInt bound = DomainInt_Max;
 	  if(max1 * max2 >= bound)
 	  {
-	    cerr << "Fatal error." << endl;
-	    cerr << "Product([a,b],c) must satisfy the condition:" << endl;
-	    cerr << "For all assigments to a and b, |a*b| < 2^31" << endl;
-      exit(1);
+	    FAIL_EXIT("Product([a,b],c) must satisfy the condition: For all assigments to a and b, |a*b| < 2^31");
 	  }
   }
   

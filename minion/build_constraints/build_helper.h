@@ -89,8 +89,7 @@ Build ## CT_NAME(StateObj* stateObj, const T1& t1, const T2& t2, const T3& t3, b
 { \
   if(reify) \
   { \
-    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; \
-    exit(0); \
+    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry."); \
   } \
   else \
   { return function(stateObj,t1,t2,t3); } \
@@ -104,8 +103,7 @@ Build ## CT_NAME(StateObj* stateObj, const T1& t1, const T2& t2, bool reify, \
 { \
   if(reify) \
   { \
-    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; \
-    exit(0); \
+    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry."); \
   } \
   else \
   { return function(stateObj,t1,t2); } \
@@ -119,8 +117,7 @@ Build ## CT_NAME(StateObj* stateObj,const T1& t1, bool reify, \
 { \
   if(reify) \
   { \
-    cerr << "Cannot reify 'watched literal' constraints. Sorry." << endl; \
-    exit(0); \
+    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry.") \
   } \
   else \
   { return function(stateObj, t1); } \

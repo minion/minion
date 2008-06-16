@@ -62,8 +62,7 @@ struct ModConstraint : public AbstractConstraint
 	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
 		 var3.getInitialMin() < 0)
 	  { 
-		cerr << "The 'modulo' constraint only supports nonnegative numbers, and positive bases, at present.";
-		exit(1);
+      FAIL_EXIT("The 'modulo' constraint only supports nonnegative numbers, and positive bases, at present.");
 	  }
   }
   
