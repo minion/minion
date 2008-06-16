@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
   count=0
   for i in $*
