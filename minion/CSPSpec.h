@@ -72,8 +72,6 @@ struct ConstraintDef
 
 extern ConstraintDef constraint_list[];
 
-
-
 /// The currently accepted types of Variables.
 enum VariableType
 {
@@ -90,7 +88,8 @@ enum VariableType
 
 namespace ProbSpec
 {
-  
+struct CSPInstance;
+
 class Var
 {
   int pos_m : 28;
@@ -117,10 +116,9 @@ public:
    
    bool operator<(const Var& var) const
    { return (type_m < var.type_m) || (type_m == var.type_m && pos_m < var.pos_m); }
+   
+   void print(ostringstream&, const CSPInstance&) const;
 };
-
-
-struct CSPInstance;
   
 /// Constructed by the parser. Suitable for holding any kind of constraint.
 struct ConstraintBlob
@@ -186,6 +184,7 @@ struct ConstraintBlob
   bool is_dynamic()
   { return constraint->trig_type == DYNAMIC_CT; }
   
+  void print(ostringstream&, const CSPInstance&) const;
 };
 
 
@@ -489,6 +488,8 @@ struct ConstraintBlob
       all_vars[i] = get_var('x',i);
     return all_vars;
   }  
+  
+  void print(ostringstream&, const CSPInstance&) const;
 };
 
 
@@ -627,6 +628,8 @@ public:
       throw parse_exception("Undefined gadget name '" + name + "'");
     return it->second;
   }
+  
+  void print(ostringstream&) const;
 };
   
 }
