@@ -578,7 +578,6 @@ class testwatchneq:
         return runtestgeneral("watchneq", False, options, [1,1], ["num", "num"], [1,1], self, True)
 
 class testwatchless:
-    # printtable essentially sets up pairsame constraint. negation of alldiff.
     def printtable(self, domains):
         cross=[]
         out=[]
