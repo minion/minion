@@ -15,6 +15,7 @@ system("rm Makefile*")   # get rid of stale makefiles that were causing problems
 
 retval=0
 retval+=system("svn update")
+retval+=system("./configure.sh")
 retval+=system("make veryclean")
 
 if retval!=0:
