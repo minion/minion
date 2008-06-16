@@ -66,7 +66,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_num_of_vals + 1), 
     propagate_mode(_stateObj, false)
     {
-       if(num_to_watch <= 0)
+       if(num_to_watch <= 1)
          num_to_watch = 0;
        D_ASSERT(var_array1.size() == var_array2.size()); 
     }
@@ -259,6 +259,13 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   
   virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
   {
+    if(num_to_watch <= 1)
+    {
+      // This constraint is always true. But we can't return an empty allowed assignment unfortunatly.
+      assignment.push_back(make_pair(0, var_array1[0].getMin()));
+      return;
+    }
+    
     pair<int, int> assign;
     int found_satisfying = 0;
     for(int i = 0; i < var_array1.size(); ++i)
