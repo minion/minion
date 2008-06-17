@@ -31,6 +31,19 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;watchelement_one Description
+This constraint is identical to watchelement, except the vector
+is indexed from 1 rather than from 0.
+*/
+
+/** @help constraints;watchelement_one References
+See entry
+
+   help constraints watchelement
+
+for details of watchelement which watchelement_one is based on.
+*/
+
 /** @help constraints;watchelement Description
 The constraint 
 

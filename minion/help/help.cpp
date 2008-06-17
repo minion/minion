@@ -235,6 +235,19 @@ cout << "Randomises the ordering of the decision variables. If the input file" <
 << "specifies as ordering it will randomly permute this. If no ordering is" << NEWLINE
 << "specified a random permutation of all the variables is used." << NEWLINE << NEWLINE << NEWLINE;
 } else
+if("constraints element_one" == request) {
+cout << "Help entry: " << "constraints element_one" << NEWLINE << NEWLINE;
+cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
+cout << "The constraint element one is identical to element, except that the" << NEWLINE
+<< "vector is indexed from 1 rather than from 0." << NEWLINE << NEWLINE << NEWLINE;
+cout << "References" << "----------------------------------------------------------------------" << NEWLINE;
+cout << "See" << NEWLINE
+<< "" << NEWLINE
+<< " help constraints element" << NEWLINE
+<< "" << NEWLINE
+<< "for details of the element constraint which is almost identical to this" << NEWLINE
+<< "one." << NEWLINE << NEWLINE << NEWLINE;
+} else
 if("constraints element" == request) {
 cout << "Help entry: " << "constraints element" << NEWLINE << NEWLINE;
 cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
@@ -247,11 +260,16 @@ cout << "Reifiability" << "-----------------------------------------------------
 cout << "This constraint is not reifiable." << NEWLINE << NEWLINE << NEWLINE;
 cout << "Notes" << "---------------------------------------------------------------------------" << NEWLINE;
 cout << "" << NEWLINE
+<< "Warning: This constraint is not confluent. Depending on the order the" << NEWLINE
+<< "propagators are called in Minion, the number of search nodes may vary when" << NEWLINE
+<< "using element. To avoid this problem, use watchelement instead. More details" << NEWLINE
+<< "below." << NEWLINE
+<< "" << NEWLINE
 << "The level of propagation enforced by this constraint is not named, however it" << NEWLINE
 << "works as follows. For constraint vec[i]=e:" << NEWLINE
 << "" << NEWLINE
 << "- After i is assigned, ensures that min(vec[i]) = min(e) and " << NEWLINE
-<< " max(vec[i]) = min(e)." << NEWLINE
+<< " max(vec[i]) = max(e)." << NEWLINE
 << "" << NEWLINE
 << "- When e is assigned, removes idx from the domain of i whenever e is not an" << NEWLINE
 << " element of the domain of vec[idx]." << NEWLINE
@@ -259,9 +277,26 @@ cout << "" << NEWLINE
 << "- When m[idx] is assigned, removes idx from i when m[idx] is not in the domain" << NEWLINE
 << " of e." << NEWLINE
 << "" << NEWLINE
-<< "This level of constency is designed to avoid the propagator having to scan" << NEWLINE
+<< "This level of consistency is designed to avoid the propagator having to scan" << NEWLINE
 << "through vec, except when e is assigned. It does a quantity of cheap propagation" << NEWLINE
-<< "and may work well in practise on certain problems." << NEWLINE << NEWLINE << NEWLINE;
+<< "and may work well in practise on certain problems." << NEWLINE
+<< "" << NEWLINE
+<< "Element is not confluent, which may cause the number of search nodes to vary" << NEWLINE
+<< "depending on the order in which constraints are listed in the input file, or " << NEWLINE
+<< "the order they are called in Minion. For example, the following input causes" << NEWLINE
+<< "Minion to search 41 nodes." << NEWLINE
+<< "" << NEWLINE
+<< "MINION 3" << NEWLINE
+<< "**VARIABLES**" << NEWLINE
+<< "DISCRETE x[5] {1..5}" << NEWLINE
+<< "**CONSTRAINTS**" << NEWLINE
+<< "element([x[0],x[1],x[2]], x[3], x[4])" << NEWLINE
+<< "alldiff([x])" << NEWLINE
+<< "**EOF**" << NEWLINE
+<< "" << NEWLINE
+<< "However if the two constraints are swapped over, Minion explores 29 nodes." << NEWLINE
+<< "As a rule of thumb, to get a lower node count, move element constraints" << NEWLINE
+<< "to the end of the list." << NEWLINE << NEWLINE << NEWLINE;
 cout << "References" << "----------------------------------------------------------------------" << NEWLINE;
 cout << "See the entry " << NEWLINE
 << "" << NEWLINE
@@ -344,6 +379,17 @@ cout << "This constraint is reifiable." << NEWLINE << NEWLINE << NEWLINE;
 cout << "Reference" << "-----------------------------------------------------------------------" << NEWLINE;
 cout << "help constraints eq" << NEWLINE << NEWLINE << NEWLINE;
 } else
+if("constraints diseq" == request) {
+cout << "Help entry: " << "constraints diseq" << NEWLINE << NEWLINE;
+cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
+cout << "Constrain two variables to take different values." << NEWLINE << NEWLINE << NEWLINE;
+cout << "Notes" << "---------------------------------------------------------------------------" << NEWLINE;
+cout << "Achieves arc consistency." << NEWLINE << NEWLINE << NEWLINE;
+cout << "Example" << "-------------------------------------------------------------------------" << NEWLINE;
+cout << "diseq(v0,v1)" << NEWLINE << NEWLINE << NEWLINE;
+cout << "Reifiability" << "--------------------------------------------------------------------" << NEWLINE;
+cout << "This constraint is reifiable." << NEWLINE << NEWLINE << NEWLINE;
+} else
 if("constraints table" == request) {
 cout << "Help entry: " << "constraints table" << NEWLINE << NEWLINE;
 cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
@@ -388,6 +434,8 @@ cout << "The constraint" << NEWLINE
 << "" << NEWLINE
 << "ensures that there are count occurrences of the value elem in the" << NEWLINE
 << "vector vec." << NEWLINE << NEWLINE << NEWLINE;
+cout << "Notes" << "---------------------------------------------------------------------------" << NEWLINE;
+cout << "elem must be a constant, not a variable." << NEWLINE << NEWLINE << NEWLINE;
 cout << "Reifiability" << "--------------------------------------------------------------------" << NEWLINE;
 cout << "This constraint is not reifiable." << NEWLINE << NEWLINE << NEWLINE;
 cout << "References" << "----------------------------------------------------------------------" << NEWLINE;
@@ -404,7 +452,7 @@ cout << "The constraint" << NEWLINE
 << "ensures that there are AT MOST count occurrences of the value elem in" << NEWLINE
 << "the vector vec." << NEWLINE << NEWLINE << NEWLINE;
 cout << "Notes" << "---------------------------------------------------------------------------" << NEWLINE;
-cout << "Variable count must be a constant." << NEWLINE << NEWLINE << NEWLINE;
+cout << "elem must be a constant" << NEWLINE << NEWLINE << NEWLINE;
 cout << "Reifiability" << "--------------------------------------------------------------------" << NEWLINE;
 cout << "This constraint is not reifiable." << NEWLINE << NEWLINE << NEWLINE;
 cout << "References" << "----------------------------------------------------------------------" << NEWLINE;
@@ -421,7 +469,7 @@ cout << "The constraint" << NEWLINE
 << "ensures that there are AT LEAST count occurrences of the value elem in" << NEWLINE
 << "the vector vec." << NEWLINE << NEWLINE << NEWLINE;
 cout << "Notes" << "---------------------------------------------------------------------------" << NEWLINE;
-cout << "Variable count must be a constant." << NEWLINE << NEWLINE << NEWLINE;
+cout << "elem must be a constant" << NEWLINE << NEWLINE << NEWLINE;
 cout << "Reifiability" << "--------------------------------------------------------------------" << NEWLINE;
 cout << "This constraint is not reifiable." << NEWLINE << NEWLINE << NEWLINE;
 cout << "References" << "----------------------------------------------------------------------" << NEWLINE;
@@ -494,13 +542,13 @@ if("constraints reify" == request) {
 cout << "Help entry: " << "constraints reify" << NEWLINE << NEWLINE;
 cout << "References" << "----------------------------------------------------------------------" << NEWLINE;
 cout << "See" << NEWLINE
-<< " help constraints reifiable" << NEWLINE << NEWLINE << NEWLINE;
+<< " help constraints reification" << NEWLINE << NEWLINE << NEWLINE;
 } else
 if("constraints reifyimply" == request) {
 cout << "Help entry: " << "constraints reifyimply" << NEWLINE << NEWLINE;
 cout << "References" << "----------------------------------------------------------------------" << NEWLINE;
 cout << "See" << NEWLINE
-<< " help constraints reifiable" << NEWLINE << NEWLINE << NEWLINE;
+<< " help constraints reification" << NEWLINE << NEWLINE << NEWLINE;
 } else
 if("constraints reification" == request) {
 cout << "Help entry: " << "constraints reification" << NEWLINE << NEWLINE;
@@ -619,17 +667,6 @@ cout << "Minion has no strict inequality (<) constraints. However x < y can be" 
 cout << "Reifiability" << "--------------------------------------------------------------------" << NEWLINE;
 cout << "This constraint is reifiable." << NEWLINE << NEWLINE << NEWLINE;
 } else
-if("constraints diseq" == request) {
-cout << "Help entry: " << "constraints diseq" << NEWLINE << NEWLINE;
-cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
-cout << "Constrain two variables to take different values." << NEWLINE << NEWLINE << NEWLINE;
-cout << "Notes" << "---------------------------------------------------------------------------" << NEWLINE;
-cout << "Achieves arc consistency." << NEWLINE << NEWLINE << NEWLINE;
-cout << "Example" << "-------------------------------------------------------------------------" << NEWLINE;
-cout << "diseq(v0,v1)" << NEWLINE << NEWLINE << NEWLINE;
-cout << "Reifiability" << "--------------------------------------------------------------------" << NEWLINE;
-cout << "This constraint is reifiable." << NEWLINE << NEWLINE << NEWLINE;
-} else
 if("constraints alldiff" == request) {
 cout << "Help entry: " << "constraints alldiff" << NEWLINE << NEWLINE;
 cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
@@ -688,6 +725,23 @@ cout << "See" << NEWLINE
 << " help constraints max" << NEWLINE
 << "" << NEWLINE
 << "for the opposite constraint." << NEWLINE << NEWLINE << NEWLINE;
+} else
+if("constraints difference" == request) {
+cout << "Help entry: " << "constraints difference" << NEWLINE << NEWLINE;
+cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
+cout << "The constraint" << NEWLINE
+<< "" << NEWLINE
+<< " difference(x,y,z)" << NEWLINE
+<< "" << NEWLINE
+<< "ensures that z=|x-y| in any solution." << NEWLINE << NEWLINE << NEWLINE;
+} else
+if("constraints product" == request) {
+cout << "Help entry: " << "constraints product" << NEWLINE << NEWLINE;
+cout << "Notes" << "---------------------------------------------------------------------------" << NEWLINE;
+cout << "This constraint can be expressed in a much longer form, this form both avoids requiring an extra" << NEWLINE
+<< "variable, and also gets better propagation. It gets bounds consistency." << NEWLINE << NEWLINE << NEWLINE;
+cout << "Reifiability" << "--------------------------------------------------------------------" << NEWLINE;
+cout << "This constraint is not reifiable." << NEWLINE << NEWLINE << NEWLINE;
 } else
 if("input" == request) {
 cout << "Help entry: " << "input" << NEWLINE << NEWLINE;
@@ -1009,6 +1063,18 @@ cout << "The constraint" << NEWLINE
 cout << "Reifiability" << "--------------------------------------------------------------------" << NEWLINE;
 cout << "This constraint is not reifiable." << NEWLINE << NEWLINE << NEWLINE;
 } else
+if("constraints watchelement_one" == request) {
+cout << "Help entry: " << "constraints watchelement_one" << NEWLINE << NEWLINE;
+cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
+cout << "This constraint is identical to watchelement, except the vector" << NEWLINE
+<< "is indexed from 1 rather than from 0." << NEWLINE << NEWLINE << NEWLINE;
+cout << "References" << "----------------------------------------------------------------------" << NEWLINE;
+cout << "See entry" << NEWLINE
+<< "" << NEWLINE
+<< " help constraints watchelement" << NEWLINE
+<< "" << NEWLINE
+<< "for details of watchelement which watchelement_one is based on." << NEWLINE << NEWLINE << NEWLINE;
+} else
 if("constraints watchelement" == request) {
 cout << "Help entry: " << "constraints watchelement" << NEWLINE << NEWLINE;
 cout << "Description" << "---------------------------------------------------------------------" << NEWLINE;
@@ -1250,9 +1316,11 @@ if("constraints" == request) {
 cout << "Available subentries:" << NEWLINE;
 cout << "help constraints alldiff" << NEWLINE;
 cout << "help constraints alldiffgacslow" << NEWLINE;
+cout << "help constraints difference" << NEWLINE;
 cout << "help constraints diseq" << NEWLINE;
 cout << "help constraints div" << NEWLINE;
 cout << "help constraints element" << NEWLINE;
+cout << "help constraints element_one" << NEWLINE;
 cout << "help constraints eq" << NEWLINE;
 cout << "help constraints hamming" << NEWLINE;
 cout << "help constraints ineq" << NEWLINE;
@@ -1275,6 +1343,7 @@ cout << "help constraints sumgeq" << NEWLINE;
 cout << "help constraints sumleq" << NEWLINE;
 cout << "help constraints table" << NEWLINE;
 cout << "help constraints watchelement" << NEWLINE;
+cout << "help constraints watchelement_one" << NEWLINE;
 cout << "help constraints watchsumgeq" << NEWLINE;
 cout << "help constraints watchsumleq" << NEWLINE;
 cout << "help constraints watchvecexists_and" << NEWLINE;
