@@ -23,6 +23,7 @@ conslist+=["diseq", "reifydiseq", "reifyimplydiseq", "eq", "reifyeq", "reifyimpl
 # alldiffs
 conslist+=["alldiff", "reifyalldiff",  "reifyimplyalldiff"]
 conslist+=["gacalldiff", "reifygacalldiff", "reifyimplygacalldiff"]
+conslist+=["gcc", "reifyimplygcc"]
 
 #element constraints
 conslist+=["gacelement-deprecated", "reifyimplygacelement-deprecated"]
