@@ -6,7 +6,6 @@ ConstraintDef constraint_list[] = {
 { "watchelement_one" , CT_WATCHED_ELEMENT_ONE, 3,{ read_list , read_var , read_var }, DYNAMIC_CT },
 { "gacelement-deprecated" , CT_GACELEMENT, 3,{ read_list , read_var , read_var }, STATIC_CT },
 { "alldiff" , CT_ALLDIFF, 1,{ read_list }, STATIC_CT },
-{ "alldiffgacslow" , CT_ALLDIFF_GACSLOW, 1,{ read_list }, STATIC_CT },
 { "gacalldiff" , CT_GACALLDIFF, 1,{ read_list }, STATIC_CT },
 { "gcc" , CT_GCC, 2,{ read_list , read_list }, STATIC_CT },
 { "diseq" , CT_DISEQ, 2,{ read_var , read_var }, STATIC_CT },
