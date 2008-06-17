@@ -21,7 +21,7 @@ conslist=[]
 conslist+=["diseq", "reifydiseq", "reifyimplydiseq", "eq", "reifyeq", "reifyimplyeq"]
 
 # alldiffs
-conslist+=["alldiff", "reifyalldiff",  "reifyimplyalldiff", "alldiffgacslow", "reifyalldiffgacslow", "reifyimplyalldiffgacslow"]
+conslist+=["alldiff", "reifyalldiff",  "reifyimplyalldiff"]
 conslist+=["gacalldiff", "reifygacalldiff", "reifyimplygacalldiff"]
 
 #element constraints
