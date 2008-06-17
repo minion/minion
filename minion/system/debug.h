@@ -27,6 +27,25 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+
+#ifndef MINION_DEBUG_PRINT
+  #ifndef NO_PRINT
+  #define NO_PRINT
+  #endif
+  
+  #ifndef MINION_DEBUG
+  #define MINION_DEBUG
+  #endif
+#endif
+
+#ifndef MINION_DEBUG
+  #ifndef NO_DEBUG
+  #define NO_DEBUG
+  #endif
+#endif
+
+
+
 struct parse_exception : public std::exception
 {
   string error;
@@ -55,7 +74,7 @@ void assert_function(BOOL x, const char* a, const char* f, int line);
 // Unlike Asserts, Checks are always enabled.
 #define CHECK(x, y) {assert_function(x, y, __FILE__, __LINE__);}
 
-#ifndef NO_DEBUG
+#ifdef MINION_DEBUG
 
 #define BOUNDS_CHECK
 
