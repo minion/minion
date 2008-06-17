@@ -357,6 +357,42 @@ cout << "Not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help constraints modulo" << endl << endl << endl;
 } else
+if("constraints gcc" == request) {
+cout << "Help entry: " << "constraints gcc" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The Generalized Cardinality Constraint (GCC) constrains the number of each value" << endl
+<< "that a set of variables can take. " << endl
+<< "" << endl
+<< "gcc([primary variables], [capacity variables])" << endl
+<< "" << endl
+<< "For each value in the initial domains of the primary variables, there must be " << endl
+<< "a capacity variable. " << endl
+<< "" << endl
+<< "For example, if the union of the initial domains of the " << endl
+<< "primary variables is {-5,-3,-1,0,2,3,5} then there would be 11 capacity variables, " << endl
+<< "specifying the number of occurrences of each value in the interval [-5 ... 5]. " << endl
+<< "" << endl
+<< "This constraint is new, and its syntax and implementation are not finalised." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "" << endl
+<< "" << endl
+<< "Suppose the input file had the following vectors of variables defined:" << endl
+<< "" << endl
+<< "DISCRETE myVec[9] {1..9}" << endl
+<< "BOUND cap[9] {0..2}" << endl
+<< "" << endl
+<< "The following constraint would restrict the occurrence of values 1..9 in myVec to be" << endl
+<< "at most 2 each initially, and finally equal to the values of the cap vector. " << endl
+<< "" << endl
+<< "gcc(myVec, cap)" << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
+cout << "Not reifiable." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint enforces a hybrid consistency. It reads the bounds of the " << endl
+<< "capacity variables, then enforces GAC over the primary variables only. " << endl
+<< "Then the bounds of the capacity variables are updated by counting values" << endl
+<< "in the domains of the primary variables." << endl << endl << endl;
+} else
 if("constraints eq" == request) {
 cout << "Help entry: " << "constraints eq" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -1345,6 +1381,7 @@ cout << "help constraints div" << endl;
 cout << "help constraints element" << endl;
 cout << "help constraints element_one" << endl;
 cout << "help constraints eq" << endl;
+cout << "help constraints gcc" << endl;
 cout << "help constraints hamming" << endl;
 cout << "help constraints ineq" << endl;
 cout << "help constraints lexleq" << endl;
