@@ -42,6 +42,16 @@ using namespace std;
 
 #include "build_constraints/ConstraintEnum.h"
 
+inline string to_var_name(const vector<int>& params)
+{ 
+  ostringstream s;
+  s << "_";
+  for(int i = 0; i < params.size(); ++i)
+    s << to_string(params[i]) << "_";
+  s << "_";
+  return s.str();
+}
+
 enum ReadTypes
 {
   read_list,
@@ -245,7 +255,7 @@ struct ConstraintBlob
       for(int i = 0; i < max_index.size(); i++)
         if(params[i] == -999)
           output[i] = current_index[i];
-      return_list.push_back(getSymbol(name + to_string(output)));
+      return_list.push_back(getSymbol(name + to_var_name(output)));
     }
     while(increment_vector(current_index, modified_max));
           
@@ -509,6 +519,8 @@ struct ConstraintBlob
   vector<vector<Var> > all_vars_list;
   
   map<string, TupleList*> table_symboltable;
+  map<TupleList*, string> table_nametable;
+  
   /// We make these shared_ptrs so they automatically clear up after themselves.
   map<string, shared_ptr<CSPInstance> > gadgetMap;
   
@@ -591,20 +603,41 @@ public:
 
   }
   
-
+  void addUnnamedTableSymbol(TupleList* tuplelist)
+  {
+    if(table_nametable.count(tuplelist) != 0)
+      throw parse_exception("Unnamed Tuplelist double registered!");
+    int pos = table_symboltable.size();
+    while( table_symboltable.count("_Unnamed__" + pos) != 0)
+      pos++;
+      
+    table_symboltable["_Unnamed__" + to_string(pos) + "_"] = tuplelist; 
+    table_nametable[tuplelist] = "_Unnamed__" + to_string(pos) + "_";
+  }
 
   void addTableSymbol(string name, TupleList* tuplelist)
   {
     if(table_symboltable.count(name) != 0)
       throw parse_exception("Tuplename '"+name+"' already in use");
+    if(table_nametable.count(tuplelist) != 0)
+      throw parse_exception("Named tuplelist double registered!");
     table_symboltable[name] = tuplelist;
+    table_nametable[tuplelist] = name;
   }
   
-  TupleList* getTableSymbol(string name)
+  TupleList* getTableSymbol(string name) const
   {
-    map<string, TupleList*>::iterator it = table_symboltable.find(name);
+    map<string, TupleList*>::const_iterator it = table_symboltable.find(name);
     if(it == table_symboltable.end())
       throw parse_exception("Undefined tuplelist: '" + name + "'");
+    return it->second;
+  }
+  
+  string getTableName(TupleList* tuples) const
+  {
+    map<TupleList*, string>::const_iterator it = table_nametable.find(tuples);
+    if(it == table_nametable.end())
+      throw parse_exception("Undefined tuplelist: '" + to_string(size_t(tuples)) + "'");
     return it->second;
   }
     

@@ -300,6 +300,8 @@ nothing at all...)
 
 #include "MinionInputReader.h"
 
+
+
 extern ConstraintDef constraint_list[];
 
 #ifdef IN_MAIN
@@ -614,6 +616,7 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
         throw parse_exception("Expected ',' or '}'");
     }
     tuplelist = instance.tupleListContainer->getNewTupleList(tuples);
+    instance.addUnnamedTableSymbol(tuplelist);
   }
   
   return tuplelist;
@@ -738,7 +741,7 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
         to_string(params[i]) + " is not between 0 and " +
         to_string(max_index[i] - 1));
     }
-    name += to_string(params);
+    name += to_var_name(params);
     var = instance.vars.getSymbol(name);
   }
 
@@ -1152,13 +1155,13 @@ void MinionThreeInputReader<FileReader>::readAliasMatrix(FileReader* infile, con
     // Have reached the bottom level!
     indices.push_back(0);
     Var v = readIdentifier(infile);
-    instance.vars.addSymbol(name + to_string(indices), v);
+    instance.vars.addSymbol(name + to_var_name(indices), v);
     while(infile->peek_char() == ',')
     {
       infile->check_sym(',');
       indices.back()++;
       Var v = readIdentifier(infile);
-      instance.vars.addSymbol(name + to_string(indices), v);
+      instance.vars.addSymbol(name + to_var_name(indices), v);
     }
     if(indices.back() + 1 != max_indices[indices.size() - 1])
       throw parse_exception("Incorrectly sized matrix!, expected index " +
@@ -1247,13 +1250,13 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       {
         instance.vars.addMatrixSymbol(varname, indices);
         vector<int> current_index(indices.size(), 0);
-        parser_info("New Var: " + varname + to_string(current_index));
-        instance.vars.addSymbol(varname + to_string(current_index),
+        parser_info("New Var: " + varname + to_var_name(current_index));
+        instance.vars.addSymbol(varname + to_var_name(current_index),
                                 instance.vars.getNewVar(variable_type, domain));
         while(increment_vector(current_index, indices))
         {
-          parser_info("New Var: " + varname + to_string(current_index));
-          instance.vars.addSymbol(varname + to_string(current_index),
+          parser_info("New Var: " + varname + to_var_name(current_index));
+          instance.vars.addSymbol(varname + to_var_name(current_index),
                                   instance.vars.getNewVar(variable_type, domain));
         }
 

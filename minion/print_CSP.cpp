@@ -19,9 +19,9 @@ void print_instance(ostringstream& oss, const Var& var, const CSPInstance& csp)
 
 
 template<typename T>
-void print_instance(ostringstream& oss, const vector<T>& vars, const CSPInstance& csp)
+void print_instance(ostringstream& oss, const vector<T>& vars, const CSPInstance& csp, char start = '[', char end = ']')
 {
-  oss << "[";
+  oss << start;
   if(!vars.empty())
   {
     print_instance(oss, vars[0], csp);
@@ -31,7 +31,7 @@ void print_instance(ostringstream& oss, const vector<T>& vars, const CSPInstance
       print_instance(oss, vars[i], csp);
     }
   }
-  oss << "]";
+  oss << end;
 }
 
 void print_instance(ostringstream& oss, const ConstraintBlob& blob, const CSPInstance& csp)
@@ -79,8 +79,12 @@ void print_instance(ostringstream& oss, const ConstraintBlob& blob, const CSPIns
   	  case read_constant_list:
         print_instance(oss, blob.constants[const_pos++], csp);
   		break;  
+      case read_tuples:
+        oss << csp.getTableName(blob.tuples);
+      break;
   	  default:
-  	    D_FATAL_ERROR("Internal Error!");
+      oss << "???";
+//  	    D_FATAL_ERROR("Internal Error!");
   	}
   }
   
@@ -104,6 +108,7 @@ void print_instance(ostringstream& oss, const VarContainer& vars, const CSPInsta
     oss << endl;
   }
     
+  // Bounds.
   int bound_sum = 0;
   for(int x = 0; x < vars.bound.size(); ++x)
   {
@@ -111,13 +116,98 @@ void print_instance(ostringstream& oss, const VarContainer& vars, const CSPInsta
     {
       oss << "BOUND ";
       print_instance(oss, Var(VAR_BOUND, i + bound_sum), csp);
-      oss << "[" << vars.bound[x].second.lower_bound << ".." << vars.bound[x].second.upper_bound << "]" << endl;
+      oss << "{" << vars.bound[x].second.lower_bound << ".." << vars.bound[x].second.upper_bound << "}" << endl;
     }
     bound_sum += vars.bound[x].first;
   }
   
+  // Sparse Bounds.
   
+  int sparse_bound_sum = 0;
+  for(int x = 0; x < vars.sparse_bound.size(); ++x)
+  {
+    for(int i = 0; i < vars.sparse_bound[x].first; ++i)
+    {
+      oss << "SPARSEBOUND "; 
+      print_instance(oss, Var(VAR_BOUND, i + sparse_bound_sum), csp);
+      oss << " ";
+      print_instance(oss, vars.sparse_bound[x].second, csp, '{', '}');
+      oss << endl;
+    }
+    sparse_bound_sum += vars.sparse_bound[x].first;
+  }
+  
+  // Bounds.
+  int discrete_sum = 0;
+  for(int x = 0; x < vars.discrete.size(); ++x)
+  {
+    for(int i = 0; i < vars.discrete[x].first; ++i)
+    {
+      oss << "DISCRETE ";
+      print_instance(oss, Var(VAR_DISCRETE, i + discrete_sum), csp);
+      oss << "{" << vars.discrete[x].second.lower_bound << ".." << vars.discrete[x].second.upper_bound << "}" << endl;
+    }
+    discrete_sum += vars.discrete[x].first;
+  }
+  
+}
 
+void print_tuples(ostringstream& oss, CSPInstance& csp)
+{
+  typedef map<string, TupleList*>::const_iterator it_type;
+  
+  for(it_type it = csp.table_symboltable.begin(); it != csp.table_symboltable.end(); ++it)
+  {
+    oss << it->first << " ";
+    int tuple_size = it->second->tuple_size();
+    int num_tuples = it->second->size();
+    int* tuple_ptr = it->second->getPointer();
+    oss << num_tuples << " " << tuple_size << endl;
+    for(int i = 0; i < num_tuples; ++i)
+    {
+      for(int j = 0; j < tuple_size; ++j)
+        oss << *(tuple_ptr + (i * tuple_size) + j) << " ";
+      oss << endl;
+    }
+    oss << endl;
+  }
+   
+  
+}
+
+void print_search_info(ostringstream& oss, CSPInstance& csp)
+{
+  if(csp.is_optimisation_problem)
+  {
+    if(csp.optimise_minimising)
+      oss << "MINIMISING ";
+    else
+      oss << "MAXIMISING ";
+    print_instance(oss, csp.optimise_variable, csp);
+    oss << endl; 
+  } 
+  
+  if(!csp.var_order.empty())
+  {
+    oss << "VARORDER ";
+    print_instance(oss, csp.var_order, csp);
+    oss << endl;
+  }
+  
+  if(!csp.val_order.empty())
+  {
+    oss << "VALORDER ";
+    print_instance(oss, csp.val_order, csp);
+    oss << endl;
+  }
+  
+  if(!csp.permutation.empty())
+  {
+    oss << "PERMUTATION ";
+    print_instance(oss, csp.permutation, csp);
+    oss << endl;
+  }
+  
 }
   
 void print_instance(ostringstream& oss, CSPInstance& csp)
@@ -139,6 +229,10 @@ void print_instance(ostringstream& oss, CSPInstance& csp)
 
   oss << "**VARIABLES**" << endl;
   print_instance(oss, csp.vars, csp);
+  
+  oss << "**TUPLELIST**" << endl;
+  print_tuples(oss, csp);
+  
   oss << "**CONSTRAINTS**" << endl;
   for(list<ConstraintBlob>::const_iterator it = csp.constraints.begin(); 
       it != csp.constraints.end(); ++it)

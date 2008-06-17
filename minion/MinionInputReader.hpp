@@ -363,6 +363,7 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
 		throw parse_exception("Expected ',' or '}'");
 	}
 	tuplelist = instance.tupleListContainer->getNewTupleList(tuples);
+  instance.addUnnamedTableSymbol(tuplelist);
   }
 	
 	infile->check_sym(')');
@@ -527,6 +528,7 @@ void MinionInputReader<FileReader>::readTuples(FileReader* infile) {
     int num_of_tuples = infile->read_num();
 	int tuple_length = infile->read_num();
 	TupleList* tuplelist = instance.tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
+	instance.addUnnamedTableSymbol(tuplelist);
 	int* tuple_ptr = tuplelist->getPointer();
 	for(int i = 0; i < num_of_tuples; ++i)
 	  for(int j = 0; j < tuple_length; ++j)
