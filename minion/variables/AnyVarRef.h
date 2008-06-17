@@ -40,10 +40,30 @@ user should use the variable which is the highest in the hierarchy,
 yet encompasses enough information to provide a full model for the
 problem they are attempting to solve.
 
+Minion also supports use of constants in place of variables, and constant
+vectors in place of vectors of variables. Using constants will be at least
+as efficient as using variables when the variable has a singleton domain.
+
 See the entry on vectors for information on how vectors, matrices and,
 more generally, tensors are handled in minion input. See also the
 alias entry for information on how to multiply name variables for
 convenience.
+*/
+
+/** @help variables;constants Description 
+Minion supports the use of constants anywhere where a variable can be used. For
+example, in a constraint as a replacement for a single variable, or a vector of
+constants as a replacement for a vector of variables.
+*/
+
+/** @help variables;constants Examples
+Use of a constant:
+
+   eq(x,1)
+
+Use of a constant vector:
+
+   element([10,9,8,7,6,5,4,3,2,1],idx,e) 
 */
 
 /** @help variables;vectors Description 

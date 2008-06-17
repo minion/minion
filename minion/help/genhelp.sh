@@ -22,17 +22,16 @@ dashes() {
 echo "#include <iostream>";
 echo "#include <string>";
 echo "using namespace std;";
-echo "#define NEWLINE '\n'"
 echo "void help(string request)";
 echo "{";
 previous_entry=hjkhasdkjfhsdkbfs76f87sdf; #doesn't match any entry
 firsttime=true;
 echo "if(\"\" == request) {";
-echo "cout << \"To use this help feature run the minion executable followed by help followed by the\" << NEWLINE;";
-echo "cout << \"entry you wish to see. For example to see documentation on variables you should type:\" << NEWLINE << NEWLINE;";
-echo "cout << \"   minion help variables\" << NEWLINE << NEWLINE;";
-echo "cout << \"You can find out what other entries are available, if any, by looking at the 'subentries'\" << NEWLINE;";
-echo "cout << \"section at the end of an entry.\" << NEWLINE << NEWLINE;";
+echo "cout << \"To use this help feature run the minion executable followed by help followed by the\" << endl;";
+echo "cout << \"entry you wish to see. For example to see documentation on variables you should type:\" << endl << endl;";
+echo "cout << \"   minion help variables\" << endl << endl;";
+echo "cout << \"You can find out what other entries are available, if any, by looking at the 'subentries'\" << endl;";
+echo "cout << \"section at the end of an entry.\" << endl << endl;";
 echo "} else";
 find . \( ! -regex '.*/\..*' \) \( -iname "*.cpp" -or -iname "*.hpp" -or -iname "*.h" \) -type f -exec grep -H -n "/\*\* @help" {} \; | while read entry ; do
     match_file=`echo $entry | cut -d: -f1`; #file comment is in
@@ -56,19 +55,19 @@ find . \( ! -regex '.*/\..*' \) \( -iname "*.cpp" -or -iname "*.hpp" -or -iname 
     echo $match_entry_spaces >> $TMP_FILE #record entry for later
     if [ $previous_entry != $match_entry ]; then
 	echo "if(\"$match_entry_spaces\" == request) {";
-	echo "cout << \"Help entry: \" << \"$match_entry_spaces\" << NEWLINE << NEWLINE;";
+	echo "cout << \"Help entry: \" << \"$match_entry_spaces\" << endl << endl;";
     fi
-    echo "cout << \"$match_heading\" << \"`dashes $((80-${#match_heading}))`\" << NEWLINE;";
+    echo "cout << \"$match_heading\" << \"`dashes $((80-${#match_heading}))`\" << endl;";
     OLDIFS=$IFS;
     IFS=' ';
     #multiline c string, add << and quotes
-    body_for_c=`echo $body | sed 's/^/<< "/g' | sed 's/$/" << NEWLINE/g'`;
+    body_for_c=`echo $body | sed 's/^/<< "/g' | sed 's/$/" << endl/g'`;
     IFS=$OLDIFS;
-    echo "cout $body_for_c << NEWLINE << NEWLINE;";
+    echo "cout $body_for_c << endl << endl;";
     previous_entry=$match_entry; #remember this entry next time
 done
 echo "} else";
-echo 'cout << "Unknown entry, please try again." << NEWLINE;'; #final else body
+echo 'cout << "Unknown entry, please try again." << endl;'; #final else body
 
 cat $TMP_FILE | while read entry; do
     words=`echo $entry | wc -w | awk '{print $1}'`; #number of words in entry
@@ -96,9 +95,9 @@ cat $SORTED_PREF | while read outerentry; do #loop over prefixes
 	    if [ $none_printed = true ]; then
 		none_printed=false;
 		echo "if(\"$outerentry\" == request) {";
-		echo "cout << \"Available subentries:\" << NEWLINE;";
+		echo "cout << \"Available subentries:\" << endl;";
 	    fi
-	    echo "cout << \"help $innerentry\" << NEWLINE;";
+	    echo "cout << \"help $innerentry\" << endl;";
 	fi
     done
     echo "} else";
