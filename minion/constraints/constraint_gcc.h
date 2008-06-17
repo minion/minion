@@ -3,7 +3,7 @@
    
    For Licence Information see file LICENSE.txt 
 
-   $Id: constraint_alldiff_gac_slow.h 668 2007-09-26 15:14:50Z pete_n $
+   $Id: constraint_gcc.h 668 2007-09-26 15:14:50Z pete_n $
 */
 
 /* Minion
@@ -23,6 +23,53 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+
+
+/** @help constraints;gcc Description
+The Generalized Cardinality Constraint (GCC) constrains the number of each value
+that a set of variables can take. 
+
+gcc([primary variables], [capacity variables])
+
+For each value in the initial domains of the primary variables, there must be 
+a capacity variable. 
+
+For example, if the union of the initial domains of the 
+primary variables is {-5,-3,-1,0,2,3,5} then there would be 11 capacity variables, 
+specifying the number of occurrences of each value in the interval [-5 ... 5]. 
+
+This constraint is new, and its syntax and implementation are not finalised.
+
+*/
+
+/** @help constraints;gcc Example 
+
+
+Suppose the input file had the following vectors of variables defined:
+
+DISCRETE myVec[9] {1..9}
+BOUND cap[9] {0..2}
+
+The following constraint would restrict the occurrence of values 1..9 in myVec to be
+at most 2 each initially, and finally equal to the values of the cap vector. 
+
+gcc(myVec, cap)
+
+*/
+
+/** @help constraints;gcc Reifiability
+Not reifiable.
+*/
+
+/** @help constraints;gcc Notes
+This constraint enforces a hybrid consistency. It reads the bounds of the 
+capacity variables, then enforces GAC over the primary variables only. 
+Then the bounds of the capacity variables are updated by counting values
+in the domains of the primary variables.
+
+*/
+
+
 
 
 #include "gcc_common.h"
