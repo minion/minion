@@ -490,11 +490,6 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
     }
     break;
 
-    case CT_WATCHED_TABLE:
-    case CT_WATCHED_NEGATIVE_TABLE:
-    return readConstraintTable(infile, get_constraint(constraint->type));
-    break;
-
     case CT_WATCHED_OR:
     return readConstraintOr(infile, get_constraint(CT_WATCHED_OR));
     break;
@@ -560,6 +555,9 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
       case read_constraint_list:
       con.internal_constraints = readConstraintList(infile);
       break;
+      case read_tuples:
+      con.tuples = readConstraintTupleList(infile);
+      break;
       default:
       D_FATAL_ERROR("Internal Error!");
     }
@@ -572,13 +570,11 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
 }
 
 template<typename FileReader>
-TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReader* infile, int tupleSize)
+TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReader* infile)
 {
   TupleList* tuplelist;
-  int elem;
   
-  char next_char = infile->peek_char();
-  if(next_char != '{')
+  if(infile->peek_char() != '{')
   {
     string name = infile->get_string();
     tuplelist = instance.getTableSymbol(name);
@@ -588,20 +584,31 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
     vector<vector<int> > tuples ;
     infile->check_sym('{');
     char delim = infile->peek_char();
+    
+    int tupleSize = 0;
+    
     while (delim != '}') 
     {
       infile->check_sym('<');
-      vector<int> tuple(tupleSize);
-      elem = infile->read_num() ;
-      tuple[0] = elem ;
-      for (int count = 1; count < tupleSize; count++) 
+      vector<int> tuple;
+      // Optimisation
+      tuple.reserve(tupleSize);
+      
+      char next_char = ',';
+      while(next_char == ',')
       {
-        infile->check_sym(',');
-        elem = infile->read_num() ;
-        tuple[count] = elem ;
+        tuple.push_back(infile->read_num());
+        next_char = infile->get_char();
       }
-      infile->check_sym('>');
+      if(next_char != '>')
+        throw parse_exception("Expected ',' or '>'");
+      
+      if(tupleSize == 0)
+        tupleSize = tuple.size();
+      if(tupleSize != tuple.size())
+        throw parse_exception("All tuples in each constraint must be the same size!");
       tuples.push_back(MOVE(tuple)) ;
+
       delim = infile->get_char();                          // ',' or '}'
       if(delim != ',' && delim!= '}')
         throw parse_exception("Expected ',' or '}'");
@@ -612,6 +619,7 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
   return tuplelist;
 }
 
+/*
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readConstraintTable
 // table(<vectorOfVars>, {<tuple> [, <tuple>]})
@@ -627,13 +635,13 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
 
   infile->check_sym(',');
 
-  TupleList* tuplelist = readConstraintTupleList(infile, tupleSize);
+  TupleList* tuplelist = readConstraintTupleList(infile);
 
   infile->check_sym(')');
   ConstraintBlob tableCon(def, vectorOfVars);
   tableCon.tuples = tuplelist;
   return tableCon;
-}
+}*/
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readConstraintTable
