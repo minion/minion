@@ -365,7 +365,14 @@ try {
   
   instance = readInputFromFile(getOptions(stateObj).instance_name, getOptions(stateObj).parser_verbose);
   
-
+  if(getOptions(stateObj).redump)
+  {
+    ostringstream file;
+    print_instance(file, instance);
+    cout << file.str();
+    exit(0);
+  }
+  
   getState(stateObj).setTupleListContainer(instance.tupleListContainer);
   
   // Copy args into tableout

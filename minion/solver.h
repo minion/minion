@@ -190,7 +190,7 @@ public:
   /// Denotes if solutions should be printed.
   /// Initialised to true.
   bool print_solution;
-  
+    
   /// Stores the timelimit, 0 if none given.
   clock_t time_limit;
   
@@ -205,6 +205,8 @@ public:
   string instance_name;
   
 
+  bool redump;
+
   SearchOptions() : 
 #ifdef WDEG
     wdeg_on(false),
@@ -216,7 +218,7 @@ public:
     nocheck(false),
 #endif
     nodelimit(0), tableout(false), solsoutWrite(false), 
-    print_solution(true), time_limit(0), randomise_valvarorder(false), parser_verbose(false)
+    print_solution(true), time_limit(0), randomise_valvarorder(false), parser_verbose(false), redump(false)
   {}
   
   /// Denotes all solutions should be found, by setting sollimit to -1.

@@ -46,9 +46,13 @@
 #define FULL_DOMAIN_TRIGGERS
 #define DYNAMICTRIGGERS
 
-#ifdef WATCHEDLITERALS
-#define DYNAMICTRIGGERS
+#ifndef WATCHEDLITERALS
+#define WATCHEDLITERALS
 #endif
+
+//#ifdef WATCHEDLITERALS
+//#define DYNAMICTRIGGERS
+//#endif
 
 #define VERSION "Minion Version 0.6.0"
 #define REVISION "Subversion (svn) Revision Number $Revision$"

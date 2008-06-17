@@ -273,6 +273,7 @@ class MinionThreeInputReader {
   void readGadget(FileReader* infile) ;
   //void readConstraintElement(FileReader* infile, ConstraintDef*) ;
   ConstraintBlob readConstraintTable(FileReader* infile, ConstraintDef*) ;
+  TupleList* readConstraintTupleList(FileReader* infile, int tupleSize);
   ConstraintBlob readConstraintGadget(FileReader* infile);
   ConstraintBlob readConstraintOr(FileReader* infile, ConstraintDef*);
   Var readIdentifier(FileReader* infile) ;

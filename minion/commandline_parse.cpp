@@ -15,6 +15,8 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
   { debug_crash = true; }
 	else if(command == string("-quiet"))
 	{ getOptions(stateObj).parser_verbose = false; }
+	else if(command == string("-redump"))
+  { getOptions(stateObj).redump = true; }
 	else if(command == string("-printsols"))
 	{ getOptions(stateObj).print_solution = true; }
 	else if(command == string("-noprintsols"))

@@ -93,7 +93,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
   void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars)
   {
     getVars(stateObj).getBooleanContainer().setVarCount(vars.BOOLs);
-	getVars(stateObj).getBoundvarContainer().addVariables(vars.bound);
+	  getVars(stateObj).getBoundvarContainer().addVariables(vars.bound);
     getVars(stateObj).getSparseBoundvarContainer().addVariables(vars.sparse_bound);
     getVars(stateObj).getBigRangevarContainer().addVariables(vars.discrete);
 	

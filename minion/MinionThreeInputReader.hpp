@@ -571,27 +571,13 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
   return con;
 }
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// readConstraintTable
-// table(<vectorOfVars>, {<tuple> [, <tuple>]})
-// Tuples represented as a vector of int arrays.
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReader* infile, ConstraintDef* def) 
+TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReader* infile, int tupleSize)
 {
-  parser_info( "reading a table ct (unreifiable)" ) ;
-
-  char delim = ' ';
-  int count, elem ;
-  vector<Var> vectorOfVars = readLiteralVector(infile) ;
-  int tupleSize = vectorOfVars.size() ;
-
-  infile->check_sym(',');
-
-  char next_char = infile->peek_char();
-
   TupleList* tuplelist;
-
+  int elem;
+  
+  char next_char = infile->peek_char();
   if(next_char != '{')
   {
     string name = infile->get_string();
@@ -601,13 +587,14 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
   {
     vector<vector<int> > tuples ;
     infile->check_sym('{');
+    char delim = infile->peek_char();
     while (delim != '}') 
     {
       infile->check_sym('<');
       vector<int> tuple(tupleSize);
       elem = infile->read_num() ;
       tuple[0] = elem ;
-      for (count = 1; count < tupleSize; count++) 
+      for (int count = 1; count < tupleSize; count++) 
       {
         infile->check_sym(',');
         elem = infile->read_num() ;
@@ -621,6 +608,26 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
     }
     tuplelist = instance.tupleListContainer->getNewTupleList(tuples);
   }
+  
+  return tuplelist;
+}
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// readConstraintTable
+// table(<vectorOfVars>, {<tuple> [, <tuple>]})
+// Tuples represented as a vector of int arrays.
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+template<typename FileReader>
+ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReader* infile, ConstraintDef* def) 
+{
+  parser_info( "reading a table ct (unreifiable)" ) ;
+
+  vector<Var> vectorOfVars = readLiteralVector(infile) ;
+  int tupleSize = vectorOfVars.size() ;
+
+  infile->check_sym(',');
+
+  TupleList* tuplelist = readConstraintTupleList(infile, tupleSize);
 
   infile->check_sym(')');
   ConstraintBlob tableCon(def, vectorOfVars);
