@@ -100,7 +100,27 @@ echo $(($j - $pass - $expectedfail)) tests failed due to unexpected errors.
 echo $expectedfail tests failed due to expected errors.
 echo $unexpectedpass tests passed unexpectedly.
 
-./do_random_tests.sh $exec $*
+failed=0
+./do_random_tests.sh 10 $exec $* -randomiseorder
+failed=$(($failed + $?))
+./do_random_tests.sh 10 $exec $* -varorder random
+failed=$(($failed + $?))
+./do_random_tests.sh 1 $exec $* -varorder conflict
+failed=$(($failed + $?))
+./do_random_tests.sh 1 $exec $* -varorder static
+failed=$(($failed + $?))
+./do_random_tests.sh 1 $exec $* -varorder sdf
+failed=$(($failed + $?))
+./do_random_tests.sh 10 $exec $* -varorder sdf-random
+failed=$(($failed + $?))
+./do_random_tests.sh 1 $exec $* -varorder srf
+failed=$(($failed + $?))
+./do_random_tests.sh 10 $exec $* -varorder srf-random
+failed=$(($failed + $?))
+./do_random_tests.sh 1 $exec $* -varorder ldf
+failed=$(($failed + $?))
+./do_random_tests.sh 10 $exec $* -varorder ldf-random
+failed=$(($failed + $?))
 
 # return 0 iff all tests succeeded
 exit $(($j - $pass - $expectedfail + $?))

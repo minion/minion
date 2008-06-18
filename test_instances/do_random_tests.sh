@@ -7,12 +7,14 @@ if [ $# -lt 1 ]; then
   exit 0
 fi
 
-if [ ! -x $1 ]
+if [ ! -x $2 ]
 then
   echo $1 either doesn\'t exist, or isn\'t executable.
   exit 0
 fi
 
+tests=$1
+shift
 exec=$1
 #Remove exec from $*, so it only contains parameters
 shift
@@ -26,9 +28,9 @@ for i in `grep -l "#TEST SOLCOUNT" *.minion`; do
   then
     echo -n 
   else
-    while [ $LOOP -lt 10 ]; do
+    while [ $LOOP -lt $tests ]; do
       j=$(($j + 1));
-      if $exec $* -randomiseorder $i &> /dev/null
+      if $exec $* $i &> /dev/null
       then
         pass=$(($pass + 1));
       else
