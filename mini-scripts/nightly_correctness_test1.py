@@ -41,7 +41,6 @@ if retval!=0:
     sendemail.mail("An error occurred when running test_instances/run_tests.sh for minion")
     exit(1)
 
-chdir("test_instances")
 retval+=system("./run_tests.sh ../bin/minion-debug")
 
 if retval!=0:
