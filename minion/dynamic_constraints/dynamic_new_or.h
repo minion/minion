@@ -36,8 +36,8 @@ For Licence Information see file LICENSE.txt
 #undef P
 #endif
 
-//#define P(x) cout << x << endl;
-#define P(x)
+#define P(x) cout << x << endl;
+//#define P(x)
 
   struct Dynamic_OR : public AbstractConstraint
 {
@@ -231,6 +231,7 @@ For Licence Information see file LICENSE.txt
         P("Found watch 1: " << loop);
         return;
       }
+      loop++;
     }
 
     if(found_watch == false)
