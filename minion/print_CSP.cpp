@@ -8,6 +8,9 @@ namespace ProbSpec
 void print_instance(ostringstream& oss, const int& i, const CSPInstance& csp)
 { oss << i; }
   
+void print_instance(ostringstream& oss, const string& s, const CSPInstance& csp)
+{ oss << s; }
+
 void print_instance(ostringstream& oss, const Var& var, const CSPInstance& csp)
 { 
   if(var.type() == VAR_CONSTANT)
@@ -197,7 +200,10 @@ void print_search_info(ostringstream& oss, CSPInstance& csp)
   if(!csp.val_order.empty())
   {
     oss << "VALORDER ";
-    print_instance(oss, csp.val_order, csp);
+    vector<string> output_vars;
+    for(int i = 0; i < csp.val_order.size(); ++i)
+      output_vars.push_back(csp.val_order[i] ? "a" : "d");
+    print_instance(oss, output_vars, csp);
     oss << endl;
   }
   
@@ -226,9 +232,11 @@ void print_instance(ostringstream& oss, CSPInstance& csp)
     
   }
   
-
   oss << "**VARIABLES**" << endl;
   print_instance(oss, csp.vars, csp);
+  
+  oss << "**SEARCH**" << endl;
+  print_search_info(oss, csp);
   
   oss << "**TUPLELIST**" << endl;
   print_tuples(oss, csp);

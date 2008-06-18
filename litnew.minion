@@ -6,7 +6,7 @@ BOOL a
 BOOL b
 
 **CONSTRAINTS**
-w-notliteral(b,0)
+w-notinset(b,[0])
 #w-literal(a,1)
 ##w-notliteral(a,2)
 watched-or({w-inset(a,[1]),w-inset(b,[0])})
