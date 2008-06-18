@@ -47,6 +47,8 @@ ConstraintDef constraint_list[] = {
 { "w-notinset" , CT_WATCHED_NOT_INSET, 2,{ read_var , read_constant_list }, DYNAMIC_CT },
 { "w-inrange" , CT_WATCHED_INRANGE, 2,{ read_var , read_constant_list }, DYNAMIC_CT },
 { "w-notinrange" , CT_WATCHED_NOT_INRANGE, 2,{ read_var , read_constant_list }, DYNAMIC_CT },
+{ "w-literal" , CT_WATCHED_LIT, 2,{ read_var , read_constant }, DYNAMIC_CT },
+{ "w-notliteral" , CT_WATCHED_NOTLIT, 2,{ read_var , read_constant }, DYNAMIC_CT },
 { "reify", CT_REIFY, 0, {read_var}, STATIC_CT },
 { "reifyimply", CT_REIFYIMPLY, 0, {read_var}, STATIC_CT },
 };

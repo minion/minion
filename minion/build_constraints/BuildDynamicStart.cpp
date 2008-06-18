@@ -20,5 +20,7 @@ case CT_WATCHED_INSET : return build_constraint_CT_WATCHED_INSET(stateObj, b);
 case CT_WATCHED_NOT_INSET : return build_constraint_CT_WATCHED_NOT_INSET(stateObj, b);
 case CT_WATCHED_INRANGE : return build_constraint_CT_WATCHED_INRANGE(stateObj, b);
 case CT_WATCHED_NOT_INRANGE : return build_constraint_CT_WATCHED_NOT_INRANGE(stateObj, b);
+case CT_WATCHED_LIT : return build_constraint_CT_WATCHED_LIT(stateObj, b);
+case CT_WATCHED_NOTLIT : return build_constraint_CT_WATCHED_NOTLIT(stateObj, b);
 default: D_FATAL_ERROR("Fatal error building constraints");
 }}
