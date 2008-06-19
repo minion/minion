@@ -130,11 +130,8 @@ For Licence Information see file LICENSE.txt
 
     DynamicTrigger* dt = dynamic_trigger_start();
 
-    if(
-#ifdef CHECK_FULLPROP_FLAG
-    !full_propagate_called &&
-#endif
-    trig >= dt && trig < dt + assign_size * 2)
+    if(!full_propagate_called && //this line may be necessary for either performance or correctness
+       trig >= dt && trig < dt + assign_size * 2)
     {
       int tripped_constraint = (trig - dt) / assign_size;
       int other_constraint = 1 - tripped_constraint;
@@ -168,13 +165,11 @@ For Licence Information see file LICENSE.txt
       P("Start propagating " << watched_constraint[other_constraint]);
       // Need to propagate!
       propagated_constraint = watched_constraint[other_constraint];
-#ifdef SKIP_SPECIAL
       cons[propagated_constraint]->full_propagate();
       full_propagate_called = true;
-#else
-      constraint_locked = true;
-	    getQueue(stateObj).pushSpecialTrigger(this);
-#endif
+      //the following may be necessary for correctness for some constraints
+      //constraint_locked = true;
+      //getQueue(stateObj).pushSpecialTrigger(this);
       return;
     }
 
