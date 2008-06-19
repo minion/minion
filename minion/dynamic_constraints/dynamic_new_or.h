@@ -36,8 +36,8 @@ For Licence Information see file LICENSE.txt
 #undef P
 #endif
 
-#define P(x) cout << x << endl;
-//#define P(x)
+//#define P(x) cout << x << endl;
+#define P(x)
 
   struct Dynamic_OR : public AbstractConstraint
 {
@@ -56,7 +56,8 @@ For Licence Information see file LICENSE.txt
   int watched_constraint[2];
 
   Dynamic_OR(StateObj* _stateObj, vector<AbstractConstraint*> _con) : 
-  AbstractConstraint(_stateObj), cons(_con), full_propagate_called(_stateObj, false), assign_size(-1)
+    AbstractConstraint(_stateObj), cons(_con), full_propagate_called(_stateObj, false), assign_size(-1),
+       constraint_locked(false)
     { }
 
   virtual BOOL check_assignment(DomainInt* v, int v_size)
