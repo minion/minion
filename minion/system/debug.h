@@ -32,7 +32,7 @@
   #ifndef NO_PRINT
   #define NO_PRINT
   #endif
-  
+#else
   #ifndef MINION_DEBUG
   #define MINION_DEBUG
   #endif
