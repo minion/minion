@@ -57,7 +57,7 @@ conslist+=["lexleq", "lexless", "reifylexleq", "reifylexless", "reifyimplylexleq
 conslist+=["max", "min", "reifyimplymax", "reifyimplymin"]
 
 
-conslist+=["watchneq, watchless"]
+conslist+=["watchneq", "watchless"]
 
 conslist+=["difference"]
 
