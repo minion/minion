@@ -5,6 +5,7 @@ MINION 1
 # Prime Queens Instance
 # CSPLib prob029, www.csplib.org
 # Parameters: n = 4
+# CAJ 23/06/2008: Slightly modified to make it faster to solve
 6
 1
 0 6 1
@@ -54,6 +55,8 @@ MINION 1
 objective maximising x6
 
 print m1
+
+eq(x10, 0)
 
 alldiff(v0)
 
