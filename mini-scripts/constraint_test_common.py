@@ -941,8 +941,10 @@ class testgcc:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("gcc", False, options, [5,5], ["smallnum","num"], [5,5], self, False)
-        
+        if options['reifyimply'] or options['reify']:
+            return runtestgeneral("gcc", False, options, [4,4], ["verysmallnum","smallnum"], [4,4], self, False)
+        else:
+            return runtestgeneral("gcc", False, options, [5,5], ["smallnum","num"], [5,5], self, False)
     
 ################################################################################
 # 
@@ -1224,6 +1226,9 @@ def generatevariables(varblocks, types, boundallowed):
                 ub=random.randint(1, 4)
             elif types[i]=="verysmallnum":
                 lb=random.randint(-2, 0)   # max 4 vals in domain.
+                ub=random.randint(0, 1)
+            elif types[i]=="veryverysmallnum":
+                lb=random.randint(-1, 0)   # max 3 vals in domain.
                 ub=random.randint(0, 1)
             elif types[i]=="posnum":
                 lb=random.randint(1, 20)
