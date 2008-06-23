@@ -21,7 +21,9 @@ ifdef DEBUG
  else
    DEBUG_FLAGS = -D_GLIBCXX_DEBUG -DMINION_DEBUG -g -DMORE_SEARCH_INFO
  endif
-else
+endif
+
+ifndef UNOPTIMISED
   FLAGS := $(FLAGS) -O3
 endif
 
