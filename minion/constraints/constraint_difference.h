@@ -32,13 +32,14 @@ The constraint
 ensures that z=|x-y| in any solution.
 */
 
-/** @help constraints;product Notes
-This constraint can be expressed in a much longer form, this form both avoids requiring an extra
-variable, and also gets better propagation. It gets bounds consistency.
+/** @help constraints;difference Notes
+This constraint can be expressed in a much longer form, this form both avoids
+requiring an extra variable, and also gets better propagation. It gets bounds
+consistency.
 */
 
-/** @help constraints;product Reifiability
-This constraint is not reifiable.
+/** @help constraints;difference Reifiability
+This constraint is reifyimply'able but not reifiable.
 */
 
 #ifdef P

@@ -37,7 +37,7 @@ Achieves bounds consistency.
 */
 
 /** @help constraints;eq Reifiability
-This constraint is reifiable.
+This constraint is reifiable and reifyimply'able.
 */
 
 /** @help constraints;eq Reference
@@ -53,7 +53,7 @@ ensures that x=-y.
 */
 
 /** @help constraints;minuseq Reifiability
-This constraint is reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;minuseq Reference
@@ -74,7 +74,7 @@ diseq(v0,v1)
 */
 
 /** @help constraints;diseq Reifiability
-This constraint is reifiable.
+This constraint is reifiable and reifyimply'able.
 */
 
 // This will become always true sooner or later.

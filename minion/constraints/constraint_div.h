@@ -37,7 +37,7 @@ This constraint is only available for positive domains x, y and z.
 */
 
 /** @help constraints;div Reifiability
-Not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;div References

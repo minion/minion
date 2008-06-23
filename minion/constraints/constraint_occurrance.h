@@ -38,7 +38,7 @@ elem must be a constant, not a variable.
 */
 
 /** @help constraints;occurrence Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;occurrence References
@@ -60,7 +60,7 @@ elem must be a constant
 */
 
 /** @help constraints;occurrenceleq Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;occurrenceleq References
@@ -82,7 +82,7 @@ elem must be a constant
 */
 
 /** @help constraints;occurrencegeq Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;occurrencegeq References

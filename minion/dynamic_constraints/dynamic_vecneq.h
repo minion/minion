@@ -34,7 +34,7 @@ such that A[i] != B[i].
 */
 
 /** @help constraints;watchvecneq Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;watchvecexists_less Description
@@ -46,7 +46,7 @@ ensures that there exists some index i such that A[i] < B[i].
 */
 
 /** @help constraints;watchvecexists_less Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;watchvecexists_and Description
@@ -60,7 +60,7 @@ For booleans this is the same as 'exists i s.t. A[i] && B[i]'.
 */
 
 /** @help constraints;watchvecexists_and Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 #ifndef _DYNAMIC_VECNEQ_H

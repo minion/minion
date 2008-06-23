@@ -44,7 +44,7 @@ positive numbers.
 */
 
 /** @help constraints;product Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 #include "constraint_and.h"

@@ -15,7 +15,7 @@ ensures that x is equal to the maximum value of any variable in vec.
 */
 
 /** @help constraints;max Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;max References
@@ -35,7 +35,7 @@ ensures that x is equal to the minimum value of any variable in vec.
 */
 
 /** @help constraints;min Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;min References

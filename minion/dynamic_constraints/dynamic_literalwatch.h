@@ -40,7 +40,7 @@ large values consider using watchsumleq.
 */
 
 /** @help constraints;litsumgeq Reifiability
-This constraint is NOT reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;litsumgeq References

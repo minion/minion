@@ -33,7 +33,7 @@ ensures that sum(vec) <= c.
 */
 
 /** @help constraints;sumleq Reifiability
-This constrait is reifiable.
+This constrait is reifiable and reifyimply'able.
 */
 
 /** @help constraints;sumgeq Description
@@ -43,6 +43,10 @@ The constraint
 
 ensures that sum(vec) >= c.
 */ 
+
+/** @help constraints;sumgeq Reifiability
+This constrait is reifiable and reifyimply'able.
+*/
 
 // This is the "primary" implement of sum, so it has to include headers for the
 // other specialised implementations.

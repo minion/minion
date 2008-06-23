@@ -47,7 +47,7 @@ specifies that, in any solution, vec[i] = e.
 */
 
 /** @help constraints;element Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;element Notes 

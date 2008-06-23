@@ -131,6 +131,11 @@ sports:
 htmlhelp:
 	bash docs/genhelp/genhelp.sh minion
 
+latexhelp:
+	bash docs/genhelp/genlatexhelp.sh minion
+	latex docs/genhelp/doc.latex
+	latex docs/genhelp/doc.latex
+
 lisp-generate: minion-helper minion-sat minion-quasigroup
 
 minion-helper: 

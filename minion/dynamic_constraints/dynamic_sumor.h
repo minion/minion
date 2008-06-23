@@ -34,7 +34,7 @@ c is the size of the set {i | X[i] != y[i]}
 */
 
 /** @help constraints;hamming Reifiability
-This constraint is not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 // For operators

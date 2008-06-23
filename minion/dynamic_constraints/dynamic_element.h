@@ -53,7 +53,7 @@ specifies that, in any solution, vec[i] = e.
 */
 
 /** @help constraints;watchelement Reifiability
-This constraint is NOT reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;watchelement Notes

@@ -46,7 +46,7 @@ constraints.
 */
 
 /** @help constraints;alldiff Reifiability
-Not reifiable.
+This constraint is reifiable and reifyimply'able.
 */
 
 /** @help constraints;alldiff References

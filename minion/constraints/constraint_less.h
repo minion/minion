@@ -44,7 +44,7 @@ achieved by
 */
 
 /** @help constraints;ineq Reifiability
-This constraint is reifiable.
+This constraint is reifiable and reifyimply'able.
 */
 
 // x <= y + offset

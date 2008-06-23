@@ -40,7 +40,7 @@ alldiffgacslow(myVec)
 */
 
 /** @help constraints;alldiffgacslow Reifiability
-Not reifiable.
+This constraint is reifiable and reifyimply'able.
 */
 
 /** @help constraints;alldiffgacslow Notes

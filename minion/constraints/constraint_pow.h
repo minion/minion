@@ -37,7 +37,7 @@ This constraint is only available for positive domains x, y and z.
 */
 
 /** @help constraints;pow Reifiability
-Not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 #include <math.h>

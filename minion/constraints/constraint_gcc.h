@@ -58,7 +58,7 @@ gcc(myVec, cap)
 */
 
 /** @help constraints;gcc Reifiability
-Not reifiable.
+This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;gcc Notes

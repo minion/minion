@@ -261,7 +261,7 @@ cout << "The constraint " << endl
 << "" << endl
 << "specifies that, in any solution, vec[i] = e." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "" << endl
 << "Warning: This constraint is not confluent. Depending on the order the" << endl
@@ -320,7 +320,7 @@ cout << "The constraint" << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This constraint is only available for positive domains x, y and z." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "Not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 } else
 if("constraints product" == request) {
 cout << "Help entry: " << "constraints product" << endl << endl;
@@ -340,7 +340,7 @@ cout << "This constraint can be used for (and, in fact, has a specialised" << en
 << "The general constraint achieves bounds generalised arc consistency for" << endl
 << "positive numbers." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 } else
 if("constraints div" == request) {
 cout << "Help entry: " << "constraints div" << endl << endl;
@@ -353,7 +353,7 @@ cout << "The constraint" << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This constraint is only available for positive domains x, y and z." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "Not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help constraints modulo" << endl << endl << endl;
 } else
@@ -386,7 +386,7 @@ cout << "" << endl
 << "" << endl
 << "gcc(myVec, cap)" << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "Not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This constraint enforces a hybrid consistency. It reads the bounds of the " << endl
 << "capacity variables, then enforces GAC over the primary variables only. " << endl
@@ -402,7 +402,7 @@ cout << "eq(x0,x1)" << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "Achieves bounds consistency." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifiable." << endl << endl << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
 cout << "Reference" << "-----------------------------------------------------------------------" << endl;
 cout << "help constraints minuseq" << endl << endl << endl;
 } else
@@ -415,7 +415,7 @@ cout << "Constraint" << endl
 << "" << endl
 << "ensures that x=-y." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "Reference" << "-----------------------------------------------------------------------" << endl;
 cout << "help constraints eq" << endl << endl << endl;
 } else
@@ -428,7 +428,7 @@ cout << "Achieves arc consistency." << endl << endl << endl;
 cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "diseq(v0,v1)" << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifiable." << endl << endl << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
 } else
 if("constraints table" == request) {
 cout << "Help entry: " << "constraints table" << endl << endl;
@@ -462,6 +462,8 @@ cout << "The constraints extension can also be specified in the constraint" << e
 << "definition, e.g.:" << endl
 << "" << endl
 << "table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})" << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help input tuplelist" << endl << endl << endl;
 } else
@@ -477,7 +479,7 @@ cout << "The constraint" << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "elem must be a constant, not a variable." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help constraints occurrenceleq" << endl
 << "help constraints occurrencegeq" << endl << endl << endl;
@@ -494,7 +496,7 @@ cout << "The constraint" << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "elem must be a constant" << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help constraints occurrence" << endl
 << "help constraints occurrencegeq" << endl << endl << endl;
@@ -511,7 +513,7 @@ cout << "The constraint" << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "elem must be a constant" << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help constraints occurrence" << endl
 << "help constraints occurrenceleq" << endl << endl << endl;
@@ -530,7 +532,7 @@ cout << "Suppose the input file had the following vector of variables defined:" 
 << "" << endl
 << "alldiffgacslow(myVec)" << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "Not reifiable." << endl << endl << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This constraint enforces generalised arc consistency." << endl << endl << endl;
 } else
@@ -559,6 +561,8 @@ cout << "The constraint" << endl
 << "" << endl
 << "ensures that constantVec.varVec >= total, where constantVec.varVec is" << endl
 << "the scalar dot product of constantVec and varVec." << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help constraints weightedsumgeq" << endl
 << "help constraints sumleq" << endl
@@ -573,6 +577,8 @@ cout << "The constraint" << endl
 << "" << endl
 << "ensures that constantVec.varVec <= total, where constantVec.varVec is" << endl
 << "the scalar dot product of constantVec and varVec." << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help constraints weightedsumleq" << endl
 << "help constraints sumleq" << endl
@@ -623,7 +629,7 @@ cout << "The constraint" << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This constraint is only available for positive domains x, y and z." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "Not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help constraints div" << endl << endl << endl;
 } else
@@ -639,7 +645,7 @@ cout << "The constraint" << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This constraint maintains GAC." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifiable." << endl << endl << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See also" << endl
 << "" << endl
@@ -659,7 +665,7 @@ cout << "The constraint" << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This constraints achieves GAC." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifiable." << endl << endl << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See also" << endl
 << "" << endl
@@ -676,7 +682,7 @@ cout << "The constraint" << endl
 << "" << endl
 << "ensures that sum(vec) <= c." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constrait is reifiable." << endl << endl << endl;
+cout << "This constrait is reifiable and reifyimply'able." << endl << endl << endl;
 } else
 if("constraints sumgeq" == request) {
 cout << "Help entry: " << "constraints sumgeq" << endl << endl;
@@ -686,6 +692,8 @@ cout << "The constraint" << endl
 << " sumgeq(vec, c)" << endl
 << "" << endl
 << "ensures that sum(vec) >= c." << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
+cout << "This constrait is reifiable and reifyimply'able." << endl << endl << endl;
 } else
 if("constraints ineq" == request) {
 cout << "Help entry: " << "constraints ineq" << endl << endl;
@@ -705,7 +713,7 @@ cout << "Minion has no strict inequality (<) constraints. However x < y can be" 
 << "" << endl
 << " ineq(x, y, -1)" << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifiable." << endl << endl << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
 } else
 if("constraints alldiff" == request) {
 cout << "Help entry: " << "constraints alldiff" << endl << endl;
@@ -724,7 +732,7 @@ cout << "Notes" << "------------------------------------------------------------
 cout << "Enforces the same level of consistency as a clique of not equals " << endl
 << "constraints." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "Not reifiable." << endl << endl << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See" << endl
 << "" << endl
@@ -741,7 +749,7 @@ cout << "The constraint" << endl
 << "" << endl
 << "ensures that x is equal to the maximum value of any variable in vec." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See" << endl
 << "" << endl
@@ -758,7 +766,7 @@ cout << "The constraint" << endl
 << "" << endl
 << "ensures that x is equal to the minimum value of any variable in vec." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See" << endl
 << "" << endl
@@ -774,14 +782,12 @@ cout << "The constraint" << endl
 << " difference(x,y,z)" << endl
 << "" << endl
 << "ensures that z=|x-y| in any solution." << endl << endl << endl;
-} else
-if("constraints product" == request) {
-cout << "Help entry: " << "constraints product" << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint can be expressed in a much longer form, this form both avoids requiring an extra" << endl
-<< "variable, and also gets better propagation. It gets bounds consistency." << endl << endl << endl;
+cout << "This constraint can be expressed in a much longer form, this form both avoids" << endl
+<< "requiring an extra variable, and also gets better propagation. It gets bounds" << endl
+<< "consistency." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 } else
 if("input" == request) {
 cout << "Help entry: " << "input" << endl << endl;
@@ -1065,7 +1071,7 @@ cout << "The constraint" << endl
 << "ensures that the hamming distance between X and Y is c. That is, that" << endl
 << "c is the size of the set {i | X[i] != y[i]}" << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 } else
 if("constraints watchvecneq" == request) {
 cout << "Help entry: " << "constraints watchvecneq" << endl << endl;
@@ -1077,7 +1083,7 @@ cout << "The constraint" << endl
 << "ensures that A and B are not the same vector, i.e., there exists some index i" << endl
 << "such that A[i] != B[i]." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 } else
 if("constraints watchvecexists_less" == request) {
 cout << "Help entry: " << "constraints watchvecexists_less" << endl << endl;
@@ -1088,7 +1094,7 @@ cout << "The constraint" << endl
 << "" << endl
 << "ensures that there exists some index i such that A[i] < B[i]." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 } else
 if("constraints watchvecexists_and" == request) {
 cout << "Help entry: " << "constraints watchvecexists_and" << endl << endl;
@@ -1101,7 +1107,7 @@ cout << "The constraint" << endl
 << "" << endl
 << "For booleans this is the same as 'exists i s.t. A[i] && B[i]'." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is not reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 } else
 if("constraints watchelement_one" == request) {
 cout << "Help entry: " << "constraints watchelement_one" << endl << endl;
@@ -1124,7 +1130,7 @@ cout << "The constraint " << endl
 << "" << endl
 << "specifies that, in any solution, vec[i] = e." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is NOT reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "Enforces generalised arc consistency." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
@@ -1148,7 +1154,7 @@ cout << "A SAT clause {x,y,z} can be created using:" << endl
 << "Note also that this constraint is more efficient for smaller values of c. For" << endl
 << "large values consider using watchsumleq." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is NOT reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See also" << endl
 << "" << endl
@@ -1164,7 +1170,7 @@ cout << "Equivalent to litsumgeq(vec, [1,...,1], c), but faster." << endl << end
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This constraint works on 0/1 variables only." << endl << endl << endl;
 cout << "Reifiablity" << "---------------------------------------------------------------------" << endl;
-cout << "This constraint is NOT reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See also" << endl
 << "" << endl
@@ -1184,7 +1190,7 @@ cout << "This constraint works on binary variables only." << endl << endl << end
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "For this constraint, large values of c are more efficient." << endl << endl << endl;
 cout << "Reifiablity" << "---------------------------------------------------------------------" << endl;
-cout << "This constraint is NOT reifiable." << endl << endl << endl;
+cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See also" << endl
 << "" << endl

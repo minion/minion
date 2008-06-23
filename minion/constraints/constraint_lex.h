@@ -38,7 +38,7 @@ This constraint maintains GAC.
 */
 
 /** @help constraints;lexless Reifiability
-This constraint is reifiable.
+This constraint is reifiable and reifyimply'able.
 */
 
 /** @help constraints;lexless References
@@ -63,7 +63,7 @@ This constraints achieves GAC.
 */
 
 /** @help constraints;lexleq Reifiability
-This constraint is reifiable.
+This constraint is reifiable and reifyimply'able.
 */
 
 /** @help constraints;lexleq References
