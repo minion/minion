@@ -147,7 +147,8 @@ For Licence Information see file LICENSE.txt
         return; 
       }
       
-      for(int i = 0; i < cons.size(); ++i)
+      const size_t cons_s = cons.size();
+      for(int i = 0; i < cons_s; ++i)
       {
         if(i != watched_constraint[0] && i != watched_constraint[1])
         {

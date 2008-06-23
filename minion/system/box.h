@@ -592,6 +592,7 @@ M_range_insert(iterator position, _ForwardIterator first,
 
 #define MAKE_STACK_BOX(c, type, size) box<type> c((type*)alloca(sizeof(type) * size), size)
 #define GET_ASSIGNMENT(c, constraint) \
-box<pair<int, int> > c((pair<int,int>*)( alloca(sizeof(pair<int, int>) * constraint -> get_vars_singleton()->size()) ), constraint -> get_vars_singleton()->size());\
-  constraint->get_satisfying_assignment(c); 
+const size_t num_vars = constraint->get_vars_singleton()->size();\
+box<pair<int, int> > c((pair<int,int>*)( alloca(sizeof(pair<int, int>) * num_vars) ), num_vars);\
+constraint->get_satisfying_assignment(c); 
   
