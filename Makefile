@@ -131,10 +131,10 @@ sports:
 htmlhelp:
 	bash docs/genhelp/genhelp.sh minion
 
-latexhelp:
+pdfhelp:
 	bash docs/genhelp/genlatexhelp.sh minion
-	latex docs/genhelp/doc.latex
-	latex docs/genhelp/doc.latex
+	pdflatex -output-directory=docs/latexhelp docs/latexhelp/doc.latex
+	pdflatex -output-directory=docs/latexhelp docs/latexhelp/doc.latex
 
 lisp-generate: minion-helper minion-sat minion-quasigroup
 
