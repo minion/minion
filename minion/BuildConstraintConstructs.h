@@ -44,15 +44,22 @@ BUILDCON<initial_size, size>::
 build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos)
 {
   const vector<Var>& vars = b.vars[pos];
-  int type = vars[0].type();
+  
+  // type needs to be something for empty arrays
+  int type = VAR_CONSTANT;
   bool same_type = true;
-  for(unsigned i = 1; i < vars.size(); ++i)
+  
+  if(!vars.empty())
   {
-	if(vars[i].type() != type)
-	{
-	  same_type = false;
-	  break;
-	}
+    type = vars[0].type();
+    for(unsigned i = 1; i < vars.size(); ++i)
+    {
+    	if(vars[i].type() != type)
+    	{
+    	  same_type = false;
+    	  break;
+    	}
+    }
   }
   #ifndef QUICK_COMPILE
   if(same_type)
