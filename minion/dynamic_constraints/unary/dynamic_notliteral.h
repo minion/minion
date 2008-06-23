@@ -105,7 +105,7 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(WatchInRange);
-    D_FATAL_ERROR("Propagation should never be called for 'notliteral'");
+    var.removeFromDomain(val); 
   }
 
   virtual BOOL check_assignment(DomainInt* v, int v_size)
