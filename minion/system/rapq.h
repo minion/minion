@@ -30,9 +30,12 @@
 //Both these operations are log(n).
 //The datum is provided via add() and it becomes property of the class, i.e., you
 //must access it using getData() in future to ensure that the class copy is amended.
+//checkAdd() is the same as add, except it does nothing if the key is already present.
 //You must not duplicate keys, if you do behaviour is undefined.
 //Furthermore if you do call getData() and change the class copy, you must call
-//fixOrder() before using any other method again, or subsequent results are undefined.
+//fixOrder() or repair() before using any other method again, or subsequent results are undefined.
+//The difference between fixOrder() and repair() is that the former assumes only 1 item
+//is out of position, while the latter assume that all are.
 //Finally, do not add items anywhere except the shallowest node you intend to use
 //the data structure, e.g., at the root node, or only use at one depth.
 
@@ -89,7 +92,7 @@ class RandomAccessPriorityQ {
 	pair<Data, size_t>& left_data_pos = mapping.find(left_k)->second;
 	int right = right(pos);
 	if(right >= heap_s) { //no right child
-	  if(left_data_pos.first > init_data_pos.first) { //but left child is larger
+	  if(init_data_pos.first < left_data_pos.first) { //but left child is larger
 	    heap[pos] = left_k; //so swap the left child and current around and then stop
 	    left_data_pos.second = pos;
 	    pos = left;
@@ -98,8 +101,8 @@ class RandomAccessPriorityQ {
 	} else { //both left and right children
 	  Key right_k = heap[right];
 	  pair<Data, size_t>& right_data_pos = mapping.find(right_k)->second;
-	  if(left_data_pos.first > right_data_pos.first) {
-	    if(left_data_pos.first > init_data_pos.first) { //left child is largest
+	  if(right_data_pos.first < left_data_pos.first) {
+	    if(init_data_pos.first < left_data_pos.first) { //left child is largest
 	      heap[pos] = left_k; //so bring it up
 	      left_data_pos.second = pos;
 	      pos = left(pos);
@@ -107,7 +110,7 @@ class RandomAccessPriorityQ {
 	      break;
 	    }
 	  } else {
-	    if(right_data_pos.first > init_data_pos.first) { //right child is largest
+	    if(init_data_pos.first < right_data_pos.first) { //right child is largest
 	      heap[pos] = right_k;
 	      right_data_pos.second = pos;
 	      pos = right(pos);
@@ -137,7 +140,7 @@ class RandomAccessPriorityQ {
 
   void clear() { correctSize = 0; heap.clear(); mapping.clear(); }
 
-  pair<Key, Data> getMax() { checkCorrectSize(); return make_pair(heap[0], getData(heap[0])); }
+  Key getMaxKey() { checkCorrectSize(); return heap[0]; }
 
   void removeMax() {
     checkCorrectSize();
@@ -153,6 +156,13 @@ class RandomAccessPriorityQ {
 
   void fixOrder() { pullUp(lastGetDataPos); pullDown(lastGetDataPos); D_ASSERT(checkHeap()); }
 
+  void repair() {
+    const size_t heap_s = heap.size();
+    for(int i = 0; i < heap_s; i++)
+      pullUp(i);
+    D_ASSERT(checkHeap());
+  }
+
   void add(Key k, Data d) {
     checkCorrectSize(); 
     D_ASSERT(mapping.find(k) == mapping.end()); //check that it's a unique key
@@ -161,6 +171,11 @@ class RandomAccessPriorityQ {
     heap.push_back(k);
     pullUp(heap.size() - 1); //but this function will correct the position
     D_ASSERT(checkHeap());
+  }
+
+  void checkAdd(Key k, Data d) {
+    if(mapping.find(k) == mapping.end())
+      add(k, d);
   }
 
   bool checkHeap() { checkHeap(0); }
@@ -175,11 +190,11 @@ class RandomAccessPriorityQ {
       return true; //no children => is a heap
     else //left is present
       if(right(pos) >= heap_s) { //left child only
-	bool left_ok = data >= getData(heap[left(pos)]) && checkHeap(left(pos));
+	bool left_ok = !(data < getData(heap[left(pos)])) && checkHeap(left(pos));
 	D_ASSERT(left_ok);
 	return left_ok;
       } else { //both children present
-	bool both_ok = data >= getData(heap[left(pos)]) && data >= getData(heap[right(pos)]) &&
+	bool both_ok = !(data < getData(heap[left(pos)])) && !(data < getData(heap[right(pos)])) &&
 	  checkHeap(left(pos)) && checkHeap(right(pos));
 	D_ASSERT(both_ok);
 	return both_ok;
