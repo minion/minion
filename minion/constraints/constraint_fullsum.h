@@ -155,8 +155,13 @@ struct LessEqualSumConstraint : public AbstractConstraint
  	
     var_array_min_sum = min_sum;
     max_looseness = max_diff;
-	D_ASSERT(var_array[0].getDomainChange(0) == 0);
-    return check_unsat(0,0);
+    if(!var_array.empty())
+      return check_unsat(0,0);
+    else
+    { 
+      // Just set sum = 0 from check_unsat
+      return var_sum.getMax() < 0;
+    }
   }
   
   virtual void full_propagate()
@@ -172,8 +177,10 @@ struct LessEqualSumConstraint : public AbstractConstraint
     var_array_min_sum = min_sum;
     D_ASSERT(min_sum == get_real_min_sum());
     max_looseness = max_diff;
-	D_ASSERT(var_array[0].getDomainChange(0) == 0);
-    propagate(0,0);
+    if(!var_array.empty())
+      propagate(0,0);
+    else
+      var_sum.setMin(0);
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
