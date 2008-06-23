@@ -44,29 +44,32 @@ struct GACElementConstraint : public AbstractConstraint
   {
     D_INFO(2,DI_GACELEMENT,"Setting up Constraint");
     triggerCollection t;
+    if(var_array.empty())
+      return t;
+      
     int array_size = var_array.size();
-	DomainInt min_val = var_array[0].getInitialMin();
-	DomainInt max_val = var_array[0].getInitialMax();
-	for(int i = 1; i < array_size; ++i)
-	{
-	  min_val = min(min_val, var_array[i].getInitialMin());
-	  max_val = max(max_val, var_array[i].getInitialMax());
-	}
+  	DomainInt min_val = var_array[0].getInitialMin();
+  	DomainInt max_val = var_array[0].getInitialMax();
+  	for(int i = 1; i < array_size; ++i)
+  	{
+  	  min_val = min(min_val, var_array[i].getInitialMin());
+  	  max_val = max(max_val, var_array[i].getInitialMax());
+  	}
 	
-	var_array_min_val = min_val;
-	var_array_max_val = max_val;
+  	var_array_min_val = min_val;
+  	var_array_max_val = max_val;
 	
-	// DomainInt domain_size = var_array_max_val - var_array_min_val + 1;
-	for(int i = 0; i < array_size; ++i)
-	{
-	  t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
-	}
+  	// DomainInt domain_size = var_array_max_val - var_array_min_val + 1;
+  	for(int i = 0; i < array_size; ++i)
+  	{
+  	  t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
+  	}
 	
-	t.push_back(make_trigger(indexvar,
-							 Trigger(this, array_size), DomainChanged));
+  	t.push_back(make_trigger(indexvar,
+  							 Trigger(this, array_size), DomainChanged));
 	
-	t.push_back(make_trigger(resultvar,
-							 Trigger(this, array_size + 1), DomainChanged));
+  	t.push_back(make_trigger(resultvar,
+  							 Trigger(this, array_size + 1), DomainChanged));
     return t;
   }
   
