@@ -1,0 +1,21 @@
+MINION 1
+#TEST CHECKONESOL 1 0
+
+2
+0
+0
+0
+0
+
+[]
+[]
+
+0 
+1
+[ [ x0,x1] ]
+0
+objective none
+print m0
+
+reify(lexleq([],[]),x0)
+reify(lexless([],[]), x1)
