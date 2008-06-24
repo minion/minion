@@ -49,7 +49,8 @@ The constraint
 
    watchelement(vec, i, e)
 
-specifies that, in any solution, vec[i] = e.
+specifies that, in any solution, vec[i] = e and i is in the range 
+[0 .. |vec|-1].
 */
 
 /** @help constraints;watchelement Reifiability
