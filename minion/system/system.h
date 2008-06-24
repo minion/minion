@@ -89,6 +89,7 @@
 #include<memory.h>
 #include<setjmp.h>
 #include<sys/types.h>
+#include<unistd.h>
 
 #include "cxx0x-helper.h"
 
