@@ -3,7 +3,7 @@
    
    For Licence Information see file LICENSE.txt 
 
-   $Id: constraint_alldiff_gac_slow.h 668 2007-09-26 15:14:50Z pete_n $
+   $Id: constraint_gacalldiff.h 668 2007-09-26 15:14:50Z pete_n $
 */
 
 /* Minion
@@ -23,6 +23,30 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+
+/** @help constraints;gacalldiff Description
+Forces the input vector of variables to take distinct values.
+*/
+
+/** @help constraints;gacalldiff Example 
+Suppose the input file had the following vector of variables defined:
+
+DISCRETE myVec[9] {1..9}
+
+To ensure that each variable takes a different value include the
+following constraint:
+
+gacalldiff(myVec)
+*/
+
+/** @help constraints;gacalldiff Reifiability
+This constraint is reifiable and reifyimply'able.
+*/
+
+/** @help constraints;gacalldiff Notes
+This constraint enforces generalized arc consistency.
+*/
+
 
 
 #include "alldiff_common.h"
