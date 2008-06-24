@@ -314,7 +314,7 @@ cout << "Help entry: " << "constraints pow" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "The constraint" << endl
 << " " << endl
-<< " pow([x,y],z)" << endl
+<< " pow(x,y,z)" << endl
 << "" << endl
 << "ensures that x^y=z." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
@@ -467,6 +467,24 @@ cout << "This constraint is reifyimply'able but not reifiable." << endl << endl 
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help input tuplelist" << endl << endl << endl;
 } else
+if("constraints gacalldiff" == request) {
+cout << "Help entry: " << "constraints gacalldiff" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Forces the input vector of variables to take distinct values." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "Suppose the input file had the following vector of variables defined:" << endl
+<< "" << endl
+<< "DISCRETE myVec[9] {1..9}" << endl
+<< "" << endl
+<< "To ensure that each variable takes a different value include the" << endl
+<< "following constraint:" << endl
+<< "" << endl
+<< "gacalldiff(myVec)" << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint enforces generalized arc consistency." << endl << endl << endl;
+} else
 if("constraints occurrence" == request) {
 cout << "Help entry: " << "constraints occurrence" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -494,7 +512,7 @@ cout << "The constraint" << endl
 << "ensures that there are AT MOST count occurrences of the value elem in" << endl
 << "the vector vec." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "elem must be a constant" << endl << endl << endl;
+cout << "elem and count must be constants" << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
 cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
@@ -511,30 +529,12 @@ cout << "The constraint" << endl
 << "ensures that there are AT LEAST count occurrences of the value elem in" << endl
 << "the vector vec." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "elem must be a constant" << endl << endl << endl;
+cout << "elem and count must be constants" << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
 cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help constraints occurrence" << endl
 << "help constraints occurrenceleq" << endl << endl << endl;
-} else
-if("constraints alldiffgacslow" == request) {
-cout << "Help entry: " << "constraints alldiffgacslow" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Forces the input vector of variables to take distinct values." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "Suppose the input file had the following vector of variables defined:" << endl
-<< "" << endl
-<< "DISCRETE myVec[9] {1..9}" << endl
-<< "" << endl
-<< "To ensure that each variable takes a different value include the" << endl
-<< "following constraint:" << endl
-<< "" << endl
-<< "alldiffgacslow(myVec)" << endl << endl << endl;
-cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint enforces generalised arc consistency." << endl << endl << endl;
 } else
 if("constraints" == request) {
 cout << "Help entry: " << "constraints" << endl << endl;
@@ -623,7 +623,7 @@ cout << "Help entry: " << "constraints modulo" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "The constraint" << endl
 << " " << endl
-<< " modulo([x,y],z)" << endl
+<< " modulo(x,y,z)" << endl
 << "" << endl
 << "ensures that x%y=z i.e. z is the remainder of dividing x by y." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
@@ -736,7 +736,7 @@ cout << "This constraint is reifiable and reifyimply'able." << endl << endl << e
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See" << endl
 << "" << endl
-<< " help constraints alldiffgacslow" << endl
+<< " help constraints gacalldiff" << endl
 << "" << endl
 << "for the same constraint that enforces GAC." << endl << endl << endl;
 } else
@@ -1166,9 +1166,11 @@ cout << "Help entry: " << "constraints watchsumgeq" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "Equivalent to litsumgeq(vec, [1,...,1], c), but faster." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint works on 0/1 variables only." << endl << endl << endl;
+cout << "For this constraint, small values of c are more efficient." << endl
+<< "" << endl
+<< "Equivalent to litsumgeq(vec, [1,...,1], c), but faster." << endl
+<< "" << endl
+<< "This constraint works on 0/1 variables only." << endl << endl << endl;
 cout << "Reifiablity" << "---------------------------------------------------------------------" << endl;
 cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
@@ -1182,14 +1184,12 @@ cout << "Help entry: " << "constraints watchsumleq" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "The constraint watchsumleq(vec, c) ensures that sum(vec) <= c." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "For this constraint, small values of c are more efficient." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "Equivelent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint works on binary variables only." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "For this constraint, large values of c are more efficient." << endl << endl << endl;
-cout << "Reifiablity" << "---------------------------------------------------------------------" << endl;
+cout << "Equivelent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster." << endl
+<< "" << endl
+<< "This constraint works on binary variables only." << endl
+<< "" << endl
+<< "For this constraint, large values of c are more efficient." << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
 cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See also" << endl
@@ -1380,13 +1380,13 @@ cout << "help variables" << endl;
 if("constraints" == request) {
 cout << "Available subentries:" << endl;
 cout << "help constraints alldiff" << endl;
-cout << "help constraints alldiffgacslow" << endl;
 cout << "help constraints difference" << endl;
 cout << "help constraints diseq" << endl;
 cout << "help constraints div" << endl;
 cout << "help constraints element" << endl;
 cout << "help constraints element_one" << endl;
 cout << "help constraints eq" << endl;
+cout << "help constraints gacalldiff" << endl;
 cout << "help constraints gcc" << endl;
 cout << "help constraints hamming" << endl;
 cout << "help constraints ineq" << endl;

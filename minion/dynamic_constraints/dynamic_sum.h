@@ -36,10 +36,10 @@ The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c.
 */
 
 /** @help constraints;watchsumgeq Notes
-Equivalent to litsumgeq(vec, [1,...,1], c), but faster.
-*/
+For this constraint, small values of c are more efficient.
 
-/** @help constraints;watchsumgeq Notes
+Equivalent to litsumgeq(vec, [1,...,1], c), but faster.
+
 This constraint works on 0/1 variables only.
 */
 
@@ -59,22 +59,14 @@ The constraint watchsumleq(vec, c) ensures that sum(vec) <= c.
 */
 
 /** @help constraints;watchsumleq Notes
-For this constraint, small values of c are more efficient.
-*/
-
-/** @help constraints;watchsumleq Notes
 Equivelent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster.
-*/
 
-/** @help constraints;watchsumleq Notes
 This constraint works on binary variables only.
-*/
 
-/** @help constraints;watchsumleq Notes
 For this constraint, large values of c are more efficient.
 */
 
-/** @help constraints;watchsumleq Reifiablity
+/** @help constraints;watchsumleq Reifiability
 This constraint is reifyimply'able but not reifiable.
 */
 
