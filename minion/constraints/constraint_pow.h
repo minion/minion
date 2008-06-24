@@ -27,7 +27,7 @@
 /** @help constraints;pow Description
 The constraint
  
-   pow([x,y],z)
+   pow(x,y,z)
 
 ensures that x^y=z.
 */
