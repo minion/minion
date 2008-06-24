@@ -56,7 +56,7 @@ the vector vec.
 */
 
 /** @help constraints;occurrenceleq Notes
-elem must be a constant
+elem and count must be constants
 */
 
 /** @help constraints;occurrenceleq Reifiability
@@ -78,7 +78,7 @@ the vector vec.
 */
 
 /** @help constraints;occurrencegeq Notes
-elem must be a constant
+elem and count must be constants
 */
 
 /** @help constraints;occurrencegeq Reifiability
