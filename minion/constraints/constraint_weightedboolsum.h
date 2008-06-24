@@ -29,7 +29,7 @@ The constraint
 
    weightedsumleq(constantVec, varVec, total)
 
-ensures that constantVec.varVec >= total, where constantVec.varVec is
+ensures that constantVec.varVec <= total, where constantVec.varVec is
 the scalar dot product of constantVec and varVec.
 */
 
@@ -48,7 +48,7 @@ The constraint
 
    weightedsumgeq(constantVec, varVec, total)
 
-ensures that constantVec.varVec <= total, where constantVec.varVec is
+ensures that constantVec.varVec >= total, where constantVec.varVec is
 the scalar dot product of constantVec and varVec.
 */
 

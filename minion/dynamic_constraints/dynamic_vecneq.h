@@ -52,7 +52,7 @@ This constraint is reifyimply'able but not reifiable.
 /** @help constraints;watchvecexists_and Description
 The constraint
 
-   watchvecexists_less(A, B)
+   watchvecexists_and(A, B)
 
 ensures that there exists some index i such that A[i] > 0 and B[i] > 0.
 
