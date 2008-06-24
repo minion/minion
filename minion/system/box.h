@@ -35,6 +35,9 @@
  
 
 #include <algorithm>
+
+#include <alloca.h>
+
 using namespace std;
 
   template<typename T>
