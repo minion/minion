@@ -103,22 +103,16 @@ struct reify : public AbstractConstraint
   
   virtual BOOL check_assignment(DomainInt* vals, int v_size)
   {
-    vector<DomainInt> v(vals, vals + v_size);
-    // This function is very slow compared to what it could be.
-	// This is unfortunate, but hopefully not important.
-	int vec1size = poscon->get_vars_singleton()->size();
-    DomainInt back_val = v.back();
-    v.pop_back();
+    DomainInt back_val = *(vals + (v_size - 1));
     if(back_val != 0)
-	{
-	  v.erase(v.begin() + vec1size, v.end());
-      return poscon->check_assignment(&v.front(), v.size());
-	}
+    {
+      return poscon->check_assignment(vals, poscon->get_vars_singleton()->size());
+    }
     else
-	{
-	  v.erase(v.begin(), v.begin() + vec1size);
-      return negcon->check_assignment(&v.front(), v.size());
-	}
+    {
+      vals += poscon->get_vars_singleton()->size();
+      return negcon->check_assignment(vals, negcon->get_vars_singleton()->size());
+    }
   }
   
   virtual vector<AnyVarRef> get_vars()
