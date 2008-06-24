@@ -52,7 +52,7 @@ This constraint is reifiable and reifyimply'able.
 /** @help constraints;alldiff References
 See
 
-   help constraints alldiffgacslow
+   help constraints gacalldiff
 
 for the same constraint that enforces GAC.
 */
