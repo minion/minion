@@ -27,7 +27,7 @@
 /** @help constraints;modulo Description
 The constraint
  
-   modulo([x,y],z)
+   modulo(x,y,z)
 
 ensures that x%y=z i.e. z is the remainder of dividing x by y.
 */
