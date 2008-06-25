@@ -35,13 +35,15 @@ find . \( ! -regex '.*/\..*' \) \( -iname "*.cpp" -or -iname "*.hpp" -or -iname 
     echo $match_entry_spaces >> $TMP_FILE #record entry for later
     outfile="docs/latexhelp/$match_entry_underbars.frag";
     echo "\paragraph{$match_heading}" >> $outfile;
+    echo "{\footnotesize" >> $outfile;
     echo "\begin{verbatim}" >> $outfile;
     echo "$processed_body" >> $outfile;
     echo "\end{verbatim}" >> $outfile;
+    echo "}" >> $outfile;
 done
 outfile="docs/latexhelp/doc.latex";
 echo "\documentclass{article}" >> $outfile;
-echo "\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}" >> $outfile;
+#echo "\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}" >> $outfile;
 echo "\title{minion executable documentation}" >> $outfile;
 echo "\date{\today}" >> $outfile;
 echo "\author{Ian Gent, Chris Jefferson, Ian Miguel, Neil Moore, Karen Petrie, Andrea Rendl}" >>  $outfile;
