@@ -34,7 +34,7 @@ echo \# BOOSTINCLUDE=-I/usr/local/include/boost-1_35/ >> Makefile.includes
 echo == Looking for optional components ==
 if g++ build_tests/tiny_boost_test.cpp -I/usr/local/include/boost-1_35/ -o build_test_temp &>/dev/null; then
   echo Boost found in proper place.
-  echo BOOST=1 > Makefile.includes
+  echo BOOST=1 >> Makefile.includes
   echo BOOSTINCLUDE=-I/usr/local/include/boost-1_35/ >> Makefile.includes
 else
   echo Warning : Cannot found boost. This is only an optional com
@@ -45,7 +45,7 @@ fi
 
 if g++ build_tests/tr1_test.cpp -o build_test_temp &>/dev/null; then
   echo Found TR1 - Using hashed containers
-  echo MYFLAGS := -DUSE_TR1_HASH_MAP_AND_SET > Makefile.includes
+  echo MYFLAGS := -DUSE_TR1_HASH_MAP_AND_SET >> Makefile.includes
 else
   echo No TR1 - Using tree containers
 fi
@@ -56,4 +56,4 @@ echo SETUP_INCLUDED=1 >> Makefile.includes
 
 
 # Clean up
-rm -f build_test_temp_1 > /dev/null
+rm -f build_test_temp > /dev/null
