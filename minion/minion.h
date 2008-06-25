@@ -54,7 +54,7 @@
 //#define DYNAMICTRIGGERS
 //#endif
 
-#define VERSION "Minion Version 0.7.0"
+#define VERSION "Minion Version 0.7RC1"
 #define REVISION "Subversion (svn) Revision Number $Revision$"
 // above line will work but only gives revision of this file,
 //  not the current global revision 
