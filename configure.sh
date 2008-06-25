@@ -14,6 +14,8 @@ echo Rebuilding Constraint list.
 cd minion/build_constraints
 ./rebuild_files.sh
 cd ../..
+echo Setting up Help files
+bash minion/help/genhelp.sh minion/ > minion/help/help.cpp
 echo Cleaning up any temporary files.
 rm -rf bin/*
 
