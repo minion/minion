@@ -24,7 +24,7 @@ ifdef DEBUG
 endif
 
 ifdef UNOPTIMISED
-  FLAGS := -g
+  FLAGS := $(FLAGS) -g
 else
   FLAGS := $(FLAGS) -O3
 endif
