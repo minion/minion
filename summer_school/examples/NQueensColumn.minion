@@ -6,95 +6,65 @@ MINION 3
 # amount of common subexpressions used:0
 # amount of inferred common subexpressions used:0
 # amount of original variables saved (over direct equality):0
-# amount of constraints:50
-# amount of auxiliary variables: 16
+# amount of constraints:25
+# amount of auxiliary variables: 12
 
 **VARIABLES**
-DISCRETE nodes[8] {0..16}
-DISCRETE edges[16] {1..16}
+DISCRETE queens[4] {1..4}
 
 # auxiliary variables
-DISCRETE aux0 {-16..16}
-DISCRETE aux1 {-16..16}
-DISCRETE aux2 {-16..16}
-DISCRETE aux3 {-16..16}
-DISCRETE aux4 {-16..16}
-DISCRETE aux5 {-16..16}
-DISCRETE aux6 {-16..16}
-DISCRETE aux7 {-16..16}
-DISCRETE aux8 {-16..16}
-DISCRETE aux9 {-16..16}
-DISCRETE aux10 {-16..16}
-DISCRETE aux11 {-16..16}
-DISCRETE aux12 {-16..16}
-DISCRETE aux13 {-16..16}
-DISCRETE aux14 {-16..16}
-DISCRETE aux15 {-16..16}
+DISCRETE aux0 {-3..3}
+DISCRETE aux1 {0..3}
+DISCRETE aux2 {-3..3}
+DISCRETE aux3 {0..3}
+DISCRETE aux4 {-3..3}
+DISCRETE aux5 {0..3}
+DISCRETE aux6 {-3..3}
+DISCRETE aux7 {0..3}
+DISCRETE aux8 {-3..3}
+DISCRETE aux9 {0..3}
+DISCRETE aux10 {-3..3}
+DISCRETE aux11 {0..3}
 
 # aliases
 
 **SEARCH**
 
 PRINT [
-nodes,edges]
+queens]
 
 VARORDER [
-nodes,edges,
+queens,
 aux0,aux1,aux2,aux3,aux4,aux5,aux6,aux7,
-aux8,aux9,aux10,aux11,aux12,aux13,aux14,aux15]
+aux8,aux9,aux10,aux11]
 
 
 **CONSTRAINTS**
 
-alldiff([nodes])
-alldiff([edges])
-weightedsumgeq([1,-1], [nodes[3],nodes[7]], aux15)
-weightedsumleq([1,-1], [nodes[3],nodes[7]], aux15)
-abs(edges[15],aux15)
-weightedsumgeq([1,-1], [nodes[2],nodes[6]], aux14)
-weightedsumleq([1,-1], [nodes[2],nodes[6]], aux14)
-abs(edges[14],aux14)
-weightedsumgeq([1,-1], [nodes[1],nodes[5]], aux13)
-weightedsumleq([1,-1], [nodes[1],nodes[5]], aux13)
-abs(edges[13],aux13)
-weightedsumgeq([1,-1], [nodes[0],nodes[4]], aux12)
-weightedsumleq([1,-1], [nodes[0],nodes[4]], aux12)
-abs(edges[12],aux12)
-weightedsumgeq([1,-1], [nodes[6],nodes[7]], aux11)
-weightedsumleq([1,-1], [nodes[6],nodes[7]], aux11)
-abs(edges[11],aux11)
-weightedsumgeq([1,-1], [nodes[5],nodes[7]], aux10)
-weightedsumleq([1,-1], [nodes[5],nodes[7]], aux10)
-abs(edges[10],aux10)
-weightedsumgeq([1,-1], [nodes[5],nodes[6]], aux9)
-weightedsumleq([1,-1], [nodes[5],nodes[6]], aux9)
-abs(edges[9],aux9)
-weightedsumgeq([1,-1], [nodes[4],nodes[7]], aux8)
-weightedsumleq([1,-1], [nodes[4],nodes[7]], aux8)
-abs(edges[8],aux8)
-weightedsumgeq([1,-1], [nodes[4],nodes[6]], aux7)
-weightedsumleq([1,-1], [nodes[4],nodes[6]], aux7)
-abs(edges[7],aux7)
-weightedsumgeq([1,-1], [nodes[4],nodes[5]], aux6)
-weightedsumleq([1,-1], [nodes[4],nodes[5]], aux6)
-abs(edges[6],aux6)
-weightedsumgeq([1,-1], [nodes[2],nodes[3]], aux5)
-weightedsumleq([1,-1], [nodes[2],nodes[3]], aux5)
-abs(edges[5],aux5)
-weightedsumgeq([1,-1], [nodes[1],nodes[3]], aux4)
-weightedsumleq([1,-1], [nodes[1],nodes[3]], aux4)
-abs(edges[4],aux4)
-weightedsumgeq([1,-1], [nodes[1],nodes[2]], aux3)
-weightedsumleq([1,-1], [nodes[1],nodes[2]], aux3)
-abs(edges[3],aux3)
-weightedsumgeq([1,-1], [nodes[0],nodes[3]], aux2)
-weightedsumleq([1,-1], [nodes[0],nodes[3]], aux2)
-abs(edges[2],aux2)
-weightedsumgeq([1,-1], [nodes[0],nodes[2]], aux1)
-weightedsumleq([1,-1], [nodes[0],nodes[2]], aux1)
-abs(edges[1],aux1)
-weightedsumgeq([1,-1], [nodes[0],nodes[1]], aux0)
-weightedsumleq([1,-1], [nodes[0],nodes[1]], aux0)
-abs(edges[0],aux0)
+weightedsumgeq([1,-1], [queens[2],queens[3]], aux0)
+weightedsumleq([1,-1], [queens[2],queens[3]], aux0)
+abs(aux1,aux0)
+weightedsumgeq([1,-1], [queens[1],queens[3]], aux2)
+weightedsumleq([1,-1], [queens[1],queens[3]], aux2)
+abs(aux3,aux2)
+weightedsumgeq([1,-1], [queens[1],queens[2]], aux4)
+weightedsumleq([1,-1], [queens[1],queens[2]], aux4)
+abs(aux5,aux4)
+diseq(2, aux3)
+weightedsumgeq([1,-1], [queens[0],queens[3]], aux6)
+weightedsumleq([1,-1], [queens[0],queens[3]], aux6)
+abs(aux7,aux6)
+weightedsumgeq([1,-1], [queens[0],queens[2]], aux8)
+weightedsumleq([1,-1], [queens[0],queens[2]], aux8)
+abs(aux9,aux8)
+weightedsumgeq([1,-1], [queens[0],queens[1]], aux10)
+weightedsumleq([1,-1], [queens[0],queens[1]], aux10)
+abs(aux11,aux10)
+diseq(3, aux7)
+diseq(2, aux9)
+diseq(1, aux1)
+diseq(1, aux5)
+diseq(1, aux11)
+alldiff([queens])
 
 **EOF**
