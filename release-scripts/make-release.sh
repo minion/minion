@@ -1,11 +1,11 @@
 #!/bin/sh
-#./build-all.sh MYFLAGS="-arch ppc -arch i386"
 cd ..
 rm -rf minion-release-$1
 mkdir minion-release-$1
 cp bin/* minion-release-$1
 strip minion-release-$1/*
 cp -r docs/htmlhelp minion-release-$1
+cp manual/Manual.pdf minion-release-$1
 cp LICENSE.txt minion-release-$1
 cp -r test_instances minion-release-$1
 cp -r benchmarks minion-release-$1
