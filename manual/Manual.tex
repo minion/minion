@@ -1,0 +1,3994 @@
+\documentclass[oneside]{book}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{xspace}
+\usepackage{url}
+
+\newcommand{\BOOL}{\texttt{BOOL}\xspace}
+\newcommand{\DISCRETE}{\texttt{DISCRETE}\xspace}
+\newcommand{\BOUND}{\texttt{BOUND}\xspace}
+\newcommand{\SPARSEBOUND}{\texttt{SPARSEBOUND}\xspace}
+
+\providecommand{\boldsymbol}[1]{\mbox{\boldmath $#1$}}
+
+\begin{document}
+
+\title{{\bf The Minion Manual}\\
+~\\
+Minion Version 0.7RC1\\
+Tailor Version 0.2}
+\author{Christopher Jefferson \and Neil Moore \and Peter Nightingale \and Karen E. Petrie \and Andrea Rendl }
+
+\maketitle
+\tableofcontents
+
+\chapter{Introduction to Minion}
+
+Minion is a solver for constraint satisfaction problems. First we
+introduce constraints, then give a general overview of Minion. Following
+this we give instructions for installation and basic use.
+
+
+\section{What are constraints?}
+
+Constraints are a powerful and natural means of knowledge representation
+and inference in many areas of industry and academia. Consider, for
+example, the production of a university timetable. This problem's
+constraints include: the maths lecture theatre has a capacity of 100
+students; art history lectures require a venue with a slide projector;
+no student can attend two lectures simultaneously. Constraint solving
+of a combinatorial problem proceeds in two phases. First, the problem
+is \emph{modelled} as a set of \emph{decision variables}, and a set
+of \emph{constraints} on those variables that a solution must satisfy.
+A decision variable represents a choice that must be made in order
+to solve the problem. The \emph{domain} of potential values associated
+with each decision variable corresponds to the options for that choice.
+In our example one might have two decision variables per lecture,
+representing the time and the venue. For each class of students, the
+time variables of the lectures they attend may have an AllDifferent
+constraint on them to ensure that the class is not timetabled to be
+in two places at once. The second phase consists of using a constraint
+solver to search for \emph{solutions}: assignments of values to decision
+variables satisfying all constraints. The simplicity and generality
+of this approach is fundamental to the successful application of constraint
+solving to a wide variety of disciplines such as scheduling, industrial
+design and combinatorial mathematics \cite{wallace:Survey}.
+
+To illustrate, figure \ref{fig:Alphametic-problem} shows a simple
+puzzle, where two six-digit numbers (DONALD and GERALD) are added
+together to form another six-digit number (ROBERT). Each letter A,
+B, D, E, G, L, N, O, R and T represents a distinct digit $0\ldots9$.
+The puzzle can be represented with the expressions below, given by
+Bessi\`ere and R\'egin \cite{bessiere-gac-schema}.
+
+\begin{eqnarray*}
+100000\times\textrm{D}+10000\times\textrm{O}+1000\times\textrm{N}+100\times\textrm{A}+10\times\textrm{L}+\textrm{D}\\
++100000\times\textrm{G}+10000\times\textrm{E}+1000\times\textrm{R}+100\times\textrm{A}+10\times\textrm{L}+\textrm{D}\\
+=100000\times\textrm{R}+10000\times\textrm{O}+1000\times\textrm{B}+100\times\textrm{E}+10\times\textrm{R}+\textrm{T}\\
+\textrm{and allDifferent}(\textrm{A, B, D, E, G, L, N, O, R, T})\end{eqnarray*}
+
+
+This representation of the puzzle illustrates the main concepts of
+constraint programming. A, B, D, E, G, L, N, O, R and T are variables,
+each with initial domain $0\ldots9$. There are two constraints, one
+representing the sum and the other representing that the variables
+each take a different value. A solution is a function mapping each
+variable to a value in its initial domain, such that all constraints
+are satisfied. The solution to this puzzle is A=4, B=3, D=5, E=9,
+G=1, L=8, N=6, O=2, R=7, T=0.
+
+\begin{figure}
+\begin{centering}
+\includegraphics[scale=0.5]{litreview-example-alphametic}
+\par\end{centering}
+\caption{\label{fig:Alphametic-problem}Alphametic problem}
+\end{figure}
+
+
+Constraints are \emph{declarative} --- the statement of the problem
+and the algorithms used to solve it are separated. This is an attractive
+feature of constraints, since it can reduce the human effort required
+to solve a problem. Various general purpose and specialized algorithms
+exist for solving systems of constraints. A great variety of problems
+can be expressed with constraints. The following list of subject areas
+was taken from CSPLib \cite{csplib}:
+
+\begin{itemize}
+\item Scheduling (e.g. job shop scheduling \cite{martin-jobshop-96new}),
+\item Design, configuration and diagnosis (e.g. template design \cite{proll-smith-templatedesign}),
+\item Bin packing and partitioning (e.g. social golfer problem \cite{harvey01symmetry}),
+\item Frequency assignment (e.g. the golomb ruler problem \cite{smith99golomb}),
+\item Combinatorial mathematics (e.g. balanced incomplete block design \cite{frisch-symmetry-implied-04}),
+\item Games and puzzles (e.g. maximum density still life \cite{smith-model-life}), 
+\item Bioinformatics (e.g. discovering protein shapes \cite{protein-structure-problems}).
+\end{itemize}
+
+\section{Solving constraint problems}
+
+The classical constraint satisfaction problem (CSP) has a finite set
+of variables, each with a finite domain, and a set of constraints
+over those variables. A solution to an instance of CSP is an assignment
+to each variable, such that all constraints are simultaneously \emph{satisfied}
+--- that is, they are all true under the assignment. Solvers typically
+find one or all solutions, or prove there are no solutions. The decision
+problem (`does there exist a solution?') is NP-complete \cite{apt-constraint-programming},
+therefore there is no known polynomial-time procedure to find a solution.
+
+The most common technique (and the one used by Minion) is to interleave
+splitting (also called branching) and propagation. Splitting is the
+basic operation of search, and propagation simplifies the CSP instance.
+Apt views the solution process as the repeated transformation of the
+CSP until a solution state is reached \cite{apt-constraint-programming}.
+In this view, both splitting and propagation are transformations,
+where propagation simplifies the CSP by removing values which cannot
+take part in any solution. A splitting operation transforms a CSP
+instance into two or more simpler CSP instances, and by recursive
+application of splitting any CSP can be solved. 
+
+Since splitting is an exponential-time solution method, it is important
+that splitting is minimized by effective propagation. Much effort
+has gone into developing propagation algorithms which are fast and
+effective in removing values. Most propagation algorithms are specialized
+to particular types of constraint (e.g. a vector of variables take
+distinct values in any solution, the AllDifferent constraint). They
+typically run in polynomial time.
+
+Figure \ref{fig:solver-overview} is a simple representation of how
+many constraint solvers (including Minion) work. The search element
+is typically depth-first chronological backtracking by default, although
+a solver will often allow different search algorithms to be programmed.
+When searching, a variable and value must be selected. This can be
+done statically or with a dynamic heuristic. The simplify component
+contains a queue of constraints which need to be propagated. When
+a constraint is propagated, and removes values from the variable domains,
+the domain events cause other constraints to be added to the queue.
+Propagation of constraints on the queue is iterated until the queue
+is empty.
+
+%
+\begin{figure}
+\begin{centering}
+\includegraphics[width=1\textwidth]{litreview-solver-diagram}
+\par\end{centering}
+
+\caption{\label{fig:solver-overview}Overview of a constraint solver}
+
+\end{figure}
+
+\section{Minion}
+
+Minion accepts a file describing an instance of CSP, and solves it
+as described above. From the user's point of view, the most important
+features are the set of constraints Minion can reason with, and the
+types of variables which are supported. These are described later
+in this document. This section deals with installing Minion and getting
+started with it.
+
+
+\subsection{Installing Minion}
+
+The main Minion website is \url{http://minion.sourceforge.net/},
+and this contains links to the download page. Executables are provided
+for three platforms: Windows, Mac and Linux.
+
+
+\subsection{Installation instructions for Windows}
+
+Download the windows archive minion-x.y.z-windows.zip and unpack,
+you should find Minion executables minion.exe and minion-debug.exe
+along with the required library cygwin1.dll. The executables should
+work from the windows command shell cmd.exe.
+
+
+\subsection{Installation instructions for Mac}
+
+Download the Mac archive minion-x.y.z-mac.zip and unpack. The contents
+include universal binaries `minion' and `minion-debug' which should
+work on both Intel and PowerPC Macs with Mac OS X 10.4.2 or later.
+
+
+\subsection{Installation instructions for Linux-x86 or x64}
+
+Download the Linux archive minion-x.y.z-linux.zip and unpack. It contains
+the binaries `minion' and `minion-debug'. If these binaries do not
+work on your Linux distribution due to a library linking error, use
+the package minion-x.y.z-linux-static.zip instead.
+
+
+\subsection{Compilation instructions}
+
+If there is no executable which works on your computer, you can use
+the source package (named minion-x.y.z-source.zip). To compile on
+Mac and Linux, go to the source directory and issue the following
+commands:
+
+\begin{verbatim}
+./configure.sh
+make minion
+\end{verbatim}
+If you have 2GB of RAM and a dual-core processor, you may prefer to
+use \texttt{make minion -j2} instead. To build minion-debug, append
+\texttt{DEBUG=1} to the \texttt{make} command. Executables will be
+created in the \texttt{bin} subdirectory.
+
+
+\subsection{Trying out the executable}
+
+On all platforms, Minion needs to be run from a command shell so that
+the output can be seen. If you go to the Minion directory in a shell
+and run the executable, it should output version information and a
+help message. 
+
+
+\subsection{The debug variant}
+
+One would normally use the non-debug variant of minion, which runs
+at full speed. However, if some unexpected behaviour is observed,
+running the debug variant may be helpful. It contains a large number
+of assertions and other checks, and may bring to light a problem with
+the input or an internal bug.
+
+
+\subsection{Minion online help}
+
+To see the root page of the help system, run Minion with \texttt{help}
+as the only argument. The help system is hierarchical, with the following
+top-level categories: constraints, input, switches and variables,
+with contents as follows:
+
+\begin{description}
+\item [{\texttt{constraints}}] This category contains a description of
+every constraint which is allowed in the input CSP.
+\item [{\texttt{input}}] Information about the input file format.
+\item [{\texttt{switches}}] Information about command-line switches.
+\item [{\texttt{variables}}] A description of each type of CSP variable
+supported in Minion.
+\end{description}
+To access the help for the alldiff constraint, for example, the command
+would be \texttt{minion help constraints alldiff}. The full documentation
+provided by the Minion executable is reproduced in the Appendix of 
+this manual.
+
+
+\subsection{Basic Minion use}
+
+As a simple example of Minion input, we modelled the alphametic puzzle
+in figure \ref{fig:Alphametic-problem}. The Minion input file shown
+below consists of two sections: the variables, in which the 10 CSP
+variables are declared along with their initial domains; and the constraints.
+The allDifferent constraint in the example above is mapped into gacalldiff
+here. The numerical constraint is translated into two constraints
+as follows: $x+y=z$ is mapped to $x+y-z\le0$ and $x+y-z\ge0$ and
+these two are represented using weightedsumleq and weightedsumgeq
+respectively. The coefficients are specified first, with the coefficients
+of ROBERT negated, followed by the list of variables.
+
+\begin{verbatim}
+MINION 3
+
+**VARIABLES**
+
+DISCRETE a {0..9}
+DISCRETE b {0..9}
+DISCRETE d {0..9}
+DISCRETE e {0..9}
+DISCRETE g {0..9}
+DISCRETE l {0..9}
+DISCRETE n {0..9}
+DISCRETE o {0..9}
+DISCRETE r {0..9}
+DISCRETE t {0..9}
+
+**CONSTRAINTS**
+
+gacalldiff([a,b,d,e,g,l,n,o,r,t])
+
+weightedsumleq([100000,10000,1000,100,10,1,
+100000,10000,1000,100,10,1,
+-100000,-10000,-1000,-100,-10,-1],
+[d,o,n,a,l,d,g,e,r,a,l,d,r,o,b,e,r,t],0)
+
+weightedsumgeq([100000,10000,1000,100,10,1,
+100000,10000,1000,100,10,1,
+-100000,-10000,-1000,-100,-10,-1],
+[d,o,n,a,l,d,g,e,r,a,l,d,r,o,b,e,r,t],0)
+
+**EOF**
+\end{verbatim}
+
+This example is in the Minion distribution, in directory benchmarks/small.
+Executing \texttt{minion benchmarks/small/donaldgeraldrobert.minion}
+gives the solution $A=4, B=3, D=5, E=9, G=1,
+L=8, N=6, O=2, R=7, T=0.$
+
+\chapter{Tailor}
+
+\section{Introduction}
+This tutorial introduces the tool {\sc Tailor} that 
+converts constraint problem models formulated in the solver-independent modelling language 
+{\sc Essence}$'$ to the input format of the Constraint Solver
+{\sc Minion}. 
+%\subsection{Modelling in Constraint Programming}
+%To solve a problem with Constraint Programming techniques, 
+%the problem has to be formulated as a Constraint Satisfaction 
+%Problem(CSP) [***]. A  CSP consists of a set of variables
+%and a set of constraints (relations) on these variables.
+%Each variable ranges over a finite integer domain which the
+%constraints restrict. A constraint can be any kind of 
+%relation, using a wide range of operators (linear, non-linear,
+%arithmetic, logic, ...). To describe CSPs more generally, 
+
+{\sc Essence}$'$ is a solver-independent modelling 
+language for Constraint Programming. It provides means to define 
+variables, constants, parameters and offers a great range of 
+constraint expressions, including complex constructs, 
+such as quantifications.
+
+{\sc Minion} is a fast scalable Constraint solver. 
+However, modelling problems in {\sc Minion}'s input
+language is time-consuming and tedious because of its 
+primitive structure (it can be compared to writing a 
+complex program in machine language).
+
+{\sc Tailor} converts {\sc Essence}$'$ problem instances
+into {\sc Minion} format and applies reformulatios  
+(such as common subexpression elimination) during this 
+process to enhance the problem model.
+
+\subsection{Installing {\sc Tailor}}
+{\sc Tailor} comes together with {\sc Minion} on
+\url{http://minion.sourceforge.net/} as an executable 
+Java {\tt jar}~ file. It can also be downloaded
+as a standalone version from 
+\url{http://www.cs.st-and.ac.uk/~andrea/tailor/tailor.tar.gz}.
+
+\subsection{Running {\sc Tailor}}
+The Java jar file {\tt tailor.jar} can be executed either 
+by double-clicking or in the command line with the command
+\begin{center}
+{\tt java -jar tailor.jar}
+\end{center}
+This initiates the graphical user interface of {\sc Tailor}. 
+More details about the command line version are given with 
+\begin{center}
+{\tt java -jar tailor.jar -help}
+\end{center}
+
+\section{An Introduction to {\sc Essence}$'$}
+
+%It allows you to formulate problem classes
+%and problem instances. 
+
+\subsection{Types and Domains}
+
+Types and domains play a similar role; they prescribe a range of
+values that a variable can take.
+Types denote non-empty
+sets that contain all elements
+that have a similar structure, 
+whereas domains denote possibly  empty
+sets drawn from a
+single type.  In this manner, each domain is associated with an
+underlying type.  For example integer is the type underlying the
+domain comprising integers between 1 and 10.
+
+% what kind of types: only integers, booleans 
+{\sc Essence}$'$ is a strongly typed language;
+every expression
+has a type, and the types of all
+expressions can be inferred and checked for correctness.
+Furthermore, {\sc Essence}$'$ is a finite-domain language; every decision variable is
+associated with a finite domain of values. 
+
+
+The 
+atomic types of {\sc Essence}$'$ are {\tt int} (integer), {\tt bool} (Boolean) and
+ user-defined enumerated types. There is also a compound type, array (or matrix),
+ type that is constructed of atomic types.
+
+
+There are three different types of domains in {\sc Essence}$'$:
+boolean, integer and matrix/array domains. Boolean and integer 
+domains are both atomic domains; array domains are built from 
+atomic domains.
+
+ Decision variables and quantified
+variables need to be associated with a {\em finite} domain. 
+The infinite integer domain, {\tt int}, is only valid with parameters. 
+Decision variables are not allowed as domain elements.
+
+\begin{description}
+
+\item[Boolean Domains]
+ {\tt bool} is the
+ Boolean domain consisting of {\em false} and 
+{\em true}. 
+
+\item[Integer Domains]
+An integer domain is a 
+range of integers that can be either continuous,  e.g. $int$(1..10), or
+sparse, e.g. $int$(1,3,5). Contineous domains are considered to be the empty 
+domain if the lower bound is greater than the upper bound, such as in 
+$int$(10..1).
+The elements of sparse domains need to be ordered, hence $int$(1,5,3) 
+is not valid. %and might produce error messages.
+
+
+\item[Array Domains] 
+%Arrays are used to combine a set of variables or
+  %constant values. In {\sc Essence}$'$ 
+  An array is defined by 
+  the keyword {\tt matrix}, followed by its
+  dimension and the base domain (over which the variables range).
+  For instance,
+  \begin{center}
+   $NAME_1$ : {\tt matrix indexed by } [$int$(1..10)] {\tt of} $int$(1..5) 
+  \end{center}
+ stands for a 1-dimensional array of 10 elements where each element
+ ranges from  $int$(1..5). The index domain states how to dereference 
+ arrays. In the example above, $NAME_1$[1] dereferences the first
+ element because the index domain starts with 1. 
+ However, consider $NAME_2$ with a different index 
+ domain, $int$(0..9):
+  \begin{center}
+   $NAME_2$ : {\tt matrix indexed by } [$int$(0..9)] {\tt of} $int$(1..5) 
+  \end{center}
+   $NAME_2$ is also a 1-dimensional array with 10 Boolean elements,
+  but is dereferenced differently: $NAME_2$[1] dereferences the second 
+  element because its index domain starts with 0.
+  
+
+
+%\item[Parameters]
+
+%\item[Constants]
+
+%\item[Variables]
+
+
+\end{description}
+
+
+
+\subsection{Basic Model Structure}
+An {\sc Essence}$'$ model is structured in the following way:
+
+\begin{enumerate}
+\item Header with version number: {\tt  language Essence' 1.b.a} 
+\item Parameter declarations (optional)
+\item Constant definitions (optional)
+\item Variable declarations (optional)
+\item Objective (optional)
+\item Constraints (optional)
+\end{enumerate}
+
+The version number needs a little explanation.   Over time it is inevitable that the input language will change, and the basic reason for the version number is to ensure that the user is protected against changes to the format which might change the semantics.   At all times Tailor should deal with a given version as intended, even if the latest version of the input format would be treated differently.\footnote{In the worst case, a future version of Tailor may refuse to process an earlier language format if the changes are too drastic. We do not guarantee perfect emulation of earlier formats, for example if we implement bug fixes which affect how earlier versions are dealt with.}  
+The version number is of the form \verb|<number>.<letter1>.<letter2>|.  The number corresponds to a major {\sc Essence} version number, and the first letter the major {\sc Essence}$'$ number within that.
+Finally, the second letter indicates the minor {\sc Essence}$'$ number.
+
+Parameter declaration, Constant definitions and Variable 
+declarations can be interleaved, but for readability we suggest to put them in the 
+order given above. Comments are preceded by `\$'.
+
+Parameter values are defined in a separate file, the 
+{\em parameter file}. Parameter files have the same header 
+as problem models and hold a list of parameter definitions.
+Table \ref{tab:modelstructure} gives an overview of the model
+structure of problem and parameter files.
+Each model part will be discussed in more detail in the following sections.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l||l|}
+\hline
+Problem Model Structure & Parameter File Structure \\
+\hline
+\hline
+%\$ problem model               & \$ parameter file \\
+{\tt language ESSENCE' 1.b.a}  & {\tt language ESSENCE' 1.b.a}  \\
+\ & \\
+\$ {\em parameter declaration}       & \$ {\em parameter instantiation} \\
+{\tt {\bf given} } $n$ : int         & {\tt {\bf letting} } $n$ {\tt be} 7 \\
+\$ {\em constant definition}        & \\
+{\tt {\bf  letting}} $c$ {\tt be} 5   & \\
+\ & \\
+\$ {\em variable declaration }       & \\
+{\tt {\bf find} } $x,y$ : int(1..$n$)  & \\
+\ & \\
+\$ {\em constraints}                 & \\
+{\tt{\bf such that} } & \\
+\ \ $x$ + $y$ $>=$ c,    & \\  
+\ \ $x$ + $c$*$y$ $=$ 0    & \\  
+\hline
+\end{tabular}
+\caption{Model Structure of problem files and parameter files in {\sc
+    Essence}$'$. `\$' denote comments.}\label{tab:modelstructure}
+\end{center}
+\end{table}
+
+\subsection{Constant Definitions}
+In most problem models there are re-occurring constant values and
+it can be useful to define them as constants. The {\tt letting}
+statement allows to assign a name with a constant value. The statement
+\begin{center}
+{\tt letting } {\em NAME} {\tt be} {\em constant}
+\end{center}
+introduces a new reserved name {\em NAME} that is associated with 
+the constant value {\em constant}. Every subsequent occurrence of 
+{\em NAME} in the model is replaced by {\em constant}. Please note 
+that {\em NAME} cannot be used in the model {\em before} it has been 
+defined. In the following subsections we discuss different kinds of 
+constants.
+
+\subsubsection{Constant Expressions}
+The statement
+\begin{center}
+{\tt letting } {\em c} {\tt be} 10
+\end{center}
+introduces a new constant with name $c$ that is assigned the value
+10. Usually constants are written with lower-case letters. The
+constant expression may also contain other constants or parameter
+values, for instance with
+\begin{center}
+\begin{tabular}{llll}
+{\tt letting } & {\em c}& {\tt be}& 10\\
+{\tt letting } &{\em d} &{\tt be}& $c$*2\\
+\end{tabular}
+\end{center}
+
+\subsubsection{Constant Domains}
+Constant domains are defined in a similar way using 
+the keywords {\tt be domain}:
+\begin{center}
+{\tt letting } {\em INDEX} {\tt be domain} $int$(1..5)
+\end{center}
+defines a domain with name {\em INDEX} that ranges 
+from $int$(1..5).
+For readability we suggest to use upper-case letters for domains.
+ Constant domains may contain other 
+constant/parameter values, such as in
+\begin{center}
+\begin{tabular}{llll}
+{\tt letting } & {\em c}& {\tt be} &10\\
+{\tt letting } &{\em INDEX}& {\tt be domain} &$int$(1..$c$) \\
+\end{tabular}
+\end{center}
+
+\subsubsection{Constant Arrays}
+Constant arrays are defined by stating a name, followed by 
+the corresponding matrix type and the constant values in brackets.
+For instance,
+\begin{center}
+{\tt letting }   $name_1$ :  {\tt matrix indexed by } [ $int$(1..4)] of $int$(1..10)  {\tt be}   [2,8,5,9]\\
+\end{center}
+defines a 1-dimensional constant array $name_1$ with 4 Elements
+ranging from $int$(1..10). Hence  $name_1$[3] is replaced by 5.
+2-dimensional constant arrays are defined in the same way:
+\begin{center}
+\begin{tabular}{ll}
+{\tt letting }&  $name_2$ : \\
+      &\ \ \ \ \ \  {\tt matrix indexed by } [ $int$(1..2), $int$(1..4)] of $int$(1..10) \\
+ & \ \ \ \ \ \   {\tt be}  [ [2,8,5,1], \\
+ & \ \ \ \ \ \ \ \ \ \ \ \ [3,7,9,4] ]   \\
+\end{tabular}
+\end{center}
+states that $name_2$ is a (1..2)$\times$(1..3)array of integers ranging from
+$int$(1..10) consisting of the values [ [2,8,5], [3,7,9] ]. Hence
+$name_2$[1,2] is replaced by 8. 
+
+
+
+
+\subsection{Parameter Declarations}
+Parameters are declared with the {\tt given} statement followed 
+by a domain the parameter ranges over. Parameters are allowed to 
+range over the infinite domain $int$. As example, consider
+\begin{center}
+\begin{tabular}{lll}
+{\tt given} & $n$ & : int \\
+%{\tt given} & $D$ & : int(1..$n$) \\
+\end{tabular}
+\end{center}
+
+
+\subsection{Variable Declaration}
+Variables are declared using {\tt find} followed by a name and their
+corresponding domain. The example below
+\begin{center}
+{\tt find}  $x$ : $int$(1..10)
+\end{center}
+defines a variable $x$ on the domain $int$(1..10).
+It is possible to define several variables on the same domain as 
+\begin{center}
+{\tt find}  $x,y,z$ : $int$(1..10)
+\end{center}
+that introduces 3 variables $x,y,z$ ranging over $int$(1..10).
+Arrays of variables are declared by defining the index domain and
+basedomain. Consider the example
+\begin{center}
+{\tt find}  $m$ : {\tt matrix indexed by} [$int$(1..10)] of {\tt bool}
+\end{center}
+that declares $m$ as a 1-dimensional matrix of 10 Booleans. 
+
+
+\subsection{Objective}
+The objective of a problem is either to {\tt maximise} or 
+{\tt minimise} a variable or expression. For instance,
+\begin{center}
+{\tt minimise} $x$
+\end{center}
+states that the value assigned to variable $x$ will be minimised.
+
+
+\subsection{Constraints}
+After defining constants and declaring variables and parameters,
+constraints are specified with the keyword {\tt such that}.
+ {\sc Essence}$'$ supports a wide range of operators (for more details
+on operators see Section \ref{sec:op}):
+
+\begin{itemize}
+
+\item Basic Arithmetic Operators: $+$ \  $-$ \  * \  / \ \% \  $\mid$ {\tt
+  min} \ {\tt max} 
+\item Basic Boolean Operators: \verb1\1/ \  /\verb1\1 \  $=>$ \  $<=>$
+\item Relational Operators: = \  != \  $>$ \  $<$ \  $>=$ \  $<=$
+\item Sum Operator: {\tt sum}
+\item Quantification operators: {\tt forall } \ {\tt exists}
+\item Global Constraints: {\tt alldifferent} \ {\tt element}
+\item Table Constraint: {\tt table}
+\end{itemize}
+
+We define two kinds of expressions: arithmetic and relational
+expressions. Arithmetic relations range over an integer domain, 
+for instance $x + 3$ is an arithmetic expression ranging from 
+($lb(x)+3 .. ub(x)+3$). Relational expressions range over the 
+Boolean domain, for instance the relational expression
+ $x = 3$ can either be {\em true}
+or {\em false}.
+Basic arithmetic operators and the {\tt sum} operator produce 
+arithmetic expressions and all other operators produce relational 
+expressions.
+
+Please note that each operator has a certain precedence and you will 
+sometimes need to use parenthesis to express
+certain constraints. As an example, consider the expression
+\begin{center}
+$x$ = $y$ /\verb1\1 $y$ $<$= $z$
+\end{center}
+According to the operator precedence in {\sc Essence}$'$, the
+expression would be parsed as 
+\begin{center}
+$x$ = (  ($y$ /\verb1\1 $y$)  $<$= $z$ )
+\end{center}
+which might not be intended. Setting parenthesis 
+is helpful to ensure a certain meaning, as illustrated below:
+\begin{center}
+($x$ =  $y$)  /\verb1\1 ($y$  $<$= $z$ )
+\end{center}
+More details about operator precedence is given in Section \ref{sec:op}.
+
+
+
+
+\subsubsection{The {\tt sum} Operator}
+The {\tt sum} operator corresponds to the mathematical 
+$\sum$ and has the following syntax:
+\begin{center}
+{\tt sum} {\em quantified-variable(s)} : {\em domain} . {\em expression} 
+\end{center}
+For example, if we want to take the sum from 1 to 10 we write
+\begin{center}
+{\tt sum} $i$ : $int$(1..10) . $i$ 
+\end{center}
+which corresponds to 
+\begin{center}
+1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10
+\end{center}
+Several quantified variables may be defined for a particular
+quantification domain and {\tt sum}s can also be nested:
+\begin{center}
+{\tt sum} $i,j$ : $int$(1..10) . \\
+\ \ \ \ {\tt sum} $k$ : $int$(i..10) . \\
+\ \ \ \ \ \ \ \ $x$[$i$,$j$] * $k$ 
+\end{center}
+
+
+
+\subsubsection{Universal and Existential Quantification}
+Universal and existential quantification are powerful means to 
+write down a series of constraints in a compact way. 
+Quantifications have the same syntax as {\tt sum}, but with 
+{\tt forall} and {\tt exists} as keywords:
+\begin{center}
+{\tt forall}  {\em quantified-variable(s)} : {\em domain} . {\em expression}
+\end{center}
+For instance, the universal quantification 
+\begin{center}
+{\tt forall}  $i$ : $int$(1..5) . \\
+\ \ \ \ $x$[$i$] = $i$
+\end{center}
+corresponds to the conjunction 
+\begin{center}
+($x$[1] = 1) /\verb1\1 ($x$[2] = 2) /\verb1\1 $\dots$  /\verb1\1  ($x$[5] = 5)
+\end{center}
+which could also be written as 
+\begin{center}
+$x$[1] = 1, \\
+$x$[2] = 2,\\
+ $\dots$ \\ 
+$x$[5] = 5
+\end{center}
+An example for existential quantification is 
+\begin{center}
+{\tt exists}  $i$ : $int$(1..5) . \\
+\ \ \ \ $x$[$i$] = $i$
+\end{center}
+that corresponds to the disjunction
+\begin{center}
+($x$[1] = 1) \verb1\1/ ($x$[2] = 2) \verb1\1/ $\dots$  \verb1\1/  ($x$[5] = 5)
+\end{center}
+Quantifications can range over several quantified variables and can 
+be arbitrarily nested, as demonstrated with the {\tt sum} operator.
+
+% --------------------------------------------------------------
+
+\subsection{Operators in {\sc Essence}$'$}\label{sec:op}
+
+Arithmetic operators and the sum operator return arithmetic
+expressions while all other expressions return relational expressions.
+Arithmetic operators may only be used on arithmetic expressions
+with the exception of addition and substraction (i.e. Booleans 
+may be added/subtracted).\\
+
+To use operators correctly, you have to understand the precedence and associativity of operators. 
+Table \ref{tab:precedence} 
+describes the precedence and associativity of the operators, arranged by decreasing order of precedence (the operators on top have highest precedence).
+
+
+
+\begin{table}  
+    \begin{center}
+    \begin{tabular}{|l|lc|}
+ 
+      \hline
+       Operator(s) & Functionality & Associativity \\
+       \hline
+       \hline
+       ,   & comma & Left \\   
+       \hline
+       :   & colon & Left \\
+       \hline
+       ( ) & left and right parenthesis & Left \\
+       \hline
+       \verb1[ ]1 & left and right brackets & Left \\
+       \hline
+       ! & not & Right \\  
+       \hline
+       \verb1/\1 & and & Left \\ 
+       \hline
+       \verb1\/1 & or & Left \\ 
+       \hline
+        {\tt =>} & if (implication)  & Left \\ 
+	\hline
+        {\tt <=>} & iff (logical equality) & Left \\ 
+	\hline
+        {\tt -} & unary minus & Right \\
+	\hline
+        \verb1^1 & power & Left \\ 
+	\hline
+        * / & multiplication, integer division & Left \\ 
+	\hline
+        {\tt + -} & addition, substraction &  Left \\
+	\hline
+        {\tt < <= > >= } & (lex)less, (lex)less or equal, &  \\ 
+	{\tt <lex <=lex >lex >=lex } & (lex)greater, (lex)greater or equal & none \\ 
+	\hline
+        {\tt = !=} & equality, disequality & none \\
+	\hline
+        . & dot & Right \\ 
+	\hline
+
+      \end{tabular}
+\end{center}
+    \caption{Operator precedence in {\sc Essence}$'$}
+
+\label{tab:precedence}
+\end{table}
+
+As you would expect, operators with higher precedence take priority, so are applied first.   We have, for example 
+\begin{eqnarray*}
+a => b \verb.^. c * d / ( e + f ) & \equiv & a => ( (b \verb.^. c) * d ) /  (e + f) )
+\end{eqnarray*}
+
+For associativity, an operator $\cdot$ with left associativity has 
+$a \cdot b \cdot c \equiv  ( a \cdot b) \cdot c$ while with right associativity we have 
+$a \cdot b \cdot  c \equiv a \cdot (b \cdot c)$.   The operators with no associativity defined are meaningless if nested, so that $a = b = c$ is incorrect.    
+
+
+
+\section{Examples} 
+The problem is as follows:  A farmer has 7 animals on his farm: pigs and hens. They all together have 22 legs. How many pigs (4 legs) and how many hens(2 legs) does the farmer have?
+\subsection{FarmersProblem.eprime}\label{sect:farmers}
+
+\begin{verbatim}
+language ESSENCE' 1.b.a
+
+find pigs, hens: int(0..7)
+
+such that
+
+pigs + hens = 7,
+pigs * 4 + hens * 2 = 22
+\end{verbatim}
+
+\subsection{SENDMOREMONEY.eprime}\label{sect:crypt}
+The second problem outlined is a very famous Cryptarithmetic puzzle: SEND + MORE = MONEY
+\begin{verbatim}
+language ESSENCE' 1.b.a
+
+
+find S,E,N,D,M,O,R,Y : int(0..9)
+
+such that
+
+1000*S + 100*E + 10*N + D + 
+1000*M + 100*O + 10*R + E =
+10000*M + 1000*O + 100*N + 10*E + Y,
+
+alldiff([S,E,N,D,M,O,R,Y])
+\end{verbatim}
+
+\subsection{EightNumberPuzzle.eprime}\label{sect:8number}
+The eight number puzzle asks you to label the nodes of the graph shown in Figure~\ref{fig:8puzzle} with the values 1 to 8 such that no two connected nodes have consecutive values.
+
+\begin{verbatim}
+language ESSENCE' 1.b.a
+
+find circles: matrix indexed by [int(1..8)] of int(1..8)
+
+such that
+
+alldiff(circles),
+| circles[1] - circles[2] | > 1,
+| circles[1] - circles[3] | > 1,
+| circles[1] - circles[4] | > 1,
+| circles[2] - circles[3] | > 1,
+| circles[3] - circles[4] | > 1,
+| circles[2] - circles[5] | > 1,
+| circles[2] - circles[6] | > 1,
+| circles[3] - circles[5] | > 1,
+| circles[3] - circles[6] | > 1,
+| circles[3] - circles[7] | > 1,
+| circles[4] - circles[6] | > 1,
+| circles[4] - circles[7] | > 1,
+| circles[5] - circles[6] | > 1,
+| circles[6] - circles[7] | > 1,
+| circles[5] - circles[8] | > 1,
+| circles[6] - circles[8] | > 1,
+| circles[7] - circles[8] | > 1
+\end{verbatim}
+
+\subsection{K4P2GracefulGraph.eprime}\label{sect:graceful}
+This problem is stated as follows. A labelling $f$ of the nodes of a graph with $q$ edges is graceful if $f$ assigns each node a unique label from $0,1,..., q$ and when each edge $xy$ is labelled with $|f(x) - f(y)|$, the edge labels are all different. (Hence, the edge labels are a permutation of $1, 2, ..., q$.) Does the $K_4 \times P_2$ graph shown in Figure~\ref{fig:k4xp2} have a graceful library
+\begin{verbatim}
+language ESSENCE' 1.b.a
+
+find nodes : matrix indexed by [int(1..8)] of int(0..16),
+       edges: matrix indexed by [int(1..16)] of int(1..16)
+
+such that
+
+|nodes[1] - nodes[2]| = edges[1],
+|nodes[1] - nodes[3]| = edges[2],
+|nodes[1] - nodes[4]| = edges[3],
+|nodes[2] - nodes[3]| = edges[4],
+|nodes[2] - nodes[4]| = edges[5],
+|nodes[3] - nodes[4]| = edges[6],
+
+|nodes[5] - nodes[6]| = edges[7],
+|nodes[5] - nodes[7]| = edges[8],
+|nodes[5] - nodes[8]| = edges[9],
+|nodes[6] - nodes[7]| = edges[10],
+|nodes[6] - nodes[8]| = edges[11],
+|nodes[7] - nodes[8]| = edges[12],
+
+|nodes[1] - nodes[5]| = edges[13],
+|nodes[2] - nodes[6]| = edges[14],
+|nodes[3] - nodes[7]| = edges[15],
+|nodes[4] - nodes[8]| = edges[16],
+
+alldiff(edges),
+alldiff(nodes)
+\end{verbatim}
+
+\subsection{zebra.eprime}\label{sect:zebra}
+The Zebra Puzzle is a very famous logic puzzle. There are many different versions, but the version we will answer is as follows:
+\begin{enumerate}
+\item There are five houses.
+\item The Englishman lives in the red house.
+\item The Spaniard owns the dog.
+\item Coffee is drunk in the green house.
+\item The Ukrainian drinks tea.
+\item The green house is immediately to the right of the ivory house.
+\item The Old Gold smoker owns snails.
+\item Kools are smoked in the yellow house.
+\item Milk is drunk in the middle house.
+\item The Norwegian lives in the first house.
+\item The man who smokes Chesterfields lives in the house next to the man with the fox.
+\item Kools are smoked in the house next to the house where the horse is kept.
+\item The Lucky Strike smoker drinks orange juice.
+\item The Japanese smokes Parliaments.
+\item The Norwegian lives next to the blue house.
+\end{enumerate}
+Now, who drinks water? Who owns the zebra? In the interest of clarity, it must be added that each of the five houses is painted a different color, and their inhabitants are of different national extractions, own different pets, drink different beverages and smoke different brands of American cigarettes.
+
+\begin{verbatim}
+language ESSENCE' 1.b.a
+
+$red = colour[1]
+$green = colour[2]
+$ivory = colour[3]
+$yellow = colour[4]
+$blue = colour[5]
+$Englishman = nationality[1]
+$Spaniard = nationality[2]
+$Ukranian = nationality[3]
+$Norwegian = nationality[4]
+$Japanese = nationality[5]
+$coffee = drink[1]
+$tea = drink[2]
+$milk = drink[3]
+$orange juice = drink[4]
+$Old Gold = smoke[1]
+$Kools = smoke[2]
+$Chesterfields = smoke[3]
+$Lucky Strike = smoke[4]
+$Parliaments = smoke[5]
+$dog = pets[1]
+$snails = pets[2]
+$fox = pets[3]
+$horse = pets[4]
+
+
+find colour: matrix indexed by [int(1..5)] of int(1..5),
+       nationality: matrix indexed by [int(1..5)] of int(1..5),
+       drink: matrix indexed by [int(1..5)] of int(1..5),
+       smoke: matrix indexed by [int(1..5)] of int(1..5),
+       pets: matrix indexed by [int(1..5)] of int(1..5)
+
+such that
+
+$constraints needed as this is a logical problem where 
+$the value allocated to each position of the matrix represents positon of house
+alldiff(colour),
+alldiff(nationality),
+alldiff(drink),
+alldiff(smoke),
+alldiff(pets),
+
+$There are five houses.
+$No constraint covered by domain specification
+
+$The Englishman lives in the red house
+nationality[1] = colour[1],
+
+$The Spaniard owns the dog.
+nationality[2] = pets[1],
+
+$Coffee is drunk in the green house.
+drink[1] = colour[2],
+
+$The Ukranian drinks tea.
+nationality[3] = drink[2],
+
+$The green house is immediately to the right of the ivory house.
+colour[2] + 1 = colour[3],
+
+$The Old Gold smoker owns snails.
+smoke[1] = pets[2],
+
+$Kools are smoked in the yellow house.
+smoke[2] = colour[4],
+
+$Milk is drunk in the middle house.
+drink[3] = 3,
+
+$The Norwegian lives in the first house
+nationality[4] = 1,
+
+$The man who smokes Chesterfields lives in the house next to the man with the fox.
+|smoke[3] - pets[3]| = 1,
+
+$Kools are smoked in the house next to the house where the horse is kept.
+|smoke[2] - pets[4]| = 1,
+
+$The Lucky Strike smoker drinks orange juice.
+smoke[4] = drink[4],
+
+$The Japanese smokes Parliaments.
+nationality[5] = smoke[5],
+
+$The Norwegian lives next to the blue house.
+|nationality[4] - colour[5]| = 1
+\end{verbatim}
+
+\subsection{NQueensColumn.eprime}\label{sect:nqueens}
+N-Queens is perhaps the most famous problem in CP. It is often used to demonstrate systems. It is stated as  the problem of putting $n$ chess queens on an $n \times n$ chessboard such that none of them is able to capture any other using the standard chess queen's moves.
+\begin{verbatim}
+language ESSENCE' 1.b.a
+
+given n: int
+find queens: matrix indexed by [int(1..n)] of int(1..n)
+
+such that
+
+alldiff(queens),
+
+forall i : int(1..n). forall j : int(i+1..n). | queens[i] - queens[j] | != |i - j|
+\end{verbatim}
+
+\chapter{Minion Internals}
+
+This chapter explains several details about Minion's internals, which are useful to know when trying to get the most from Minion.
+
+\section{Variable Types}
+
+Minion's input language is purposefully designed to map exactly to Minion's internals. Unlike most other constraint solvers, Minion does not internally add extra variables and decompose large complex constraints into small parts. This provides complete control over how problems are implemented inside Minion, but also requires understanding how Minion works to get the best results.
+
+For those who, quite reasonably, do not wish to get involved in such details, 'Tailor' abstracts away from these details, and also internally implements a number of optimisations.
+
+One of the most immediately confusing features of Minion are the variable types. Rather than try to provide a "one-size-fits-all" variable implementation, Minion provides four different ones; \BOOL, \DISCRETE, \BOUND and \SPARSEBOUND.  First we shall provide a brief discussion of both what these variables are, and a brief discussion of how they are implemented currently.
+
+\begin{description}
+\item[\BOOL] Variables with domain \(\{0,1\}\). Uses special optimised data structure.
+\item[\DISCRETE] Variables whose domain is a range of integers. Memory usage and the worst-case performance of most operations is O(domain size). Allows any subset of the domain to be represented.
+\item[\BOUND] Variable whose domain is a range of integers. Memory usage and the worst-case performance of all operations is O(1). During search, the domain can only be reduced by changing one of the bounds.
+\item[\SPARSEBOUND] Variable whose domain is an arbitary range of integers. Otherwise identical to BOUND.
+\end{description}
+
+It appears one obvious variable implementation, \texttt{SPARSEDISCRETE}, is missing. This did exist in some very early versions of Minion but due to bugs and lack of use was removed. 
+
+Some of the differences between the variable types only effect performance, whereas some others can effect search size. We provide these here.
+
+\begin{enumerate}
+\item In any problem, changing a \BOOL variable to a \DISCRETE, \BOUND or \SPARSEBOUND variable with domain \(\{0,1\}\) should not change the size of the resulting search. \BOOL should always be fastest, followed by \DISCRETE, \BOUND and \SPARSEBOUND.
+
+\item A \BOUND variable will in general produce a search with more nodes per second, but more nodes overall, than a \DISCRETE variable.
+
+\item Using \SPARSEBOUND or \BOUND variables with a unary constraint imposing the sparse domain should produce identical searches, except the \SPARSEBOUND will be faster if the domain is sparse. 
+\end{enumerate}
+
+As a basic rule of thumb, Always use \BOOL for Boolean domains, \DISCRETE for domains of size up to around 100, and the \BOUND. With \DISCRETE domains, use the \texttt{w-inset} constraint to limit the domain. When to use \SPARSEBOUND over \BOUND is harder, but usually the choice is clear, as either the domain will be a range, or a set like \(\{1,10,100,100\}\).
+
+\section{Choosing Between Minion's Constraints}
+
+Minion has many constraints which at first glance appear to do almost identical things. These each have trade-offs, some of which are difficult to guess in advance. This section will provide some basic guidance.
+
+One of the major design decisions of Minion's input language is that it provides in the input language exactly what it provides internally. Unlike most other constraint solvers, Minion does not break up constraints into smaller pieces, introduce new variables or simplify or manipulate constraints. This provides complete control over how Minion represents your problem, but also leads to a number of annoyances.
+
+Probably the first thing you will notice it that Minion has neither a ``sum equals'' or ``weighted sum equals'' constraint. This is because the most efficiently we could implement such a constraint was simply by gluing together the sumleq and the sumgeq constraints. Minion could provide a wrapper which generated the two constraints internally, but this would go against the transparency. Of course if in the future a more efficient implementation of sumeq was found, it may be added.
+
+The \texttt{watchsumgeq} and \texttt{watchsumleq} are varients on the algorithm used to implement SAT constraints. They are faster than \texttt{sumleq} and \texttt{sumgeq}, but only work when summing a list of Booleans to a constant. Further \texttt{watchsumgeq} performs best when the value being summed to is small, and \texttt{watchsumleq} works best when the value being summed to is close to the size of the input vector.
+
+Minion does not attempt to simplify constraints, so constraints such as \texttt{sumgeq([a,a,a], 3)} are not simplified to \texttt{sumgeq([a],1)}. This kind of simplification, done by hand, will often improve models. Further, and importantly in practice, Minion pre-allocates memory based on the initial domain size of variables. If these are excessively slack, this can hurt performance throughout search.
+
+Some constraints in Minion do not work on \texttt{BOUND} and \texttt{SPARSEBOUND} variables, in particular \texttt{gacalldiff} and \texttt{watchelement}. These two constraints are in general better when they can be used.
+
+\section{Compile Time Options}
+
+There are a number of flags which can be given to Minion at compile time to effect the resulting executable. These flags are prone to regular changes. By searching the Minion source code, you may find others. These undocumented ones are prone to breakage without warning.
+
+The following flags are considered "blessed", and are fully tested (although in future versions they may be removed or altered). Adding any of these flags (except BOOST) will probably slow the resulting Minion executable.
+
+\begin{description}
+\item[NAME=``name":] Overrides Minion's default and names the executable 'name'.
+\item[DEBUG=1:] Turns on a large number of internal consistency checks in minion. This executable is much slower than normal minion, but vital when trying to debug problems.
+\item[QUICK=1:] For optimisation reasons, Minion usually compiles many copies of every constraint. This flag makes Minion compile each constraint only once. This drastically reduces the time to compile and the size of the executable, but the resulting executable is slower. This should never effect the results Minion produces.
+\item[INFO=1:] Makes minion output a large, but poorly documented, set of information about how search is progressing. This flag is useful for debugging but should not be used for trying to following search (use the command line flag -dumptree instead). This option is likely to be replaced with a more useful dump of search in a future version of Minion.
+\item[UNOPTIMISED=1:] Turn off all compiler optimisation, so Minion can be usefully checked in gdb.
+\item[PROFILE=1:] Set compiler optimisation flags that allow Minion to be better profiled.
+\item[REENTER=1:] Compile Minion so it is reenterent (more than one problem can exist in memory at a time). At present reenterence is not used for anything, and will only slightly slow Minion.
+\item[BOOST=1:] Use the 'Boost' library to allow compressed input files. This flag is normally configured by the configure script.
+\end{description}
+
+There is also a method of passing any flag to either the compiler and Minion, using MYFLAGS="<my flags>". Any g++ flag can be given here, some of which may speed up Minion. The only flag which is tested which can be given here is MYFLAGS="-DWEG", which compiles Minion with support for the 'wdeg' variable heuristic. This is not activated by default because it slows down Minion even when it it not in use.
+
+
+
+
+
+\chapter{Minion in Practice}
+The previous chapter clearly outlined what the constructs of a Minon file are, including what the variable types are and which type of constraint should be used when. This chapter takes a more practical role, outlined within are 7 minion example files which are clearly commented so that the user can see what a minion file looks like in practice. Comments in minion start with a $\sharp$, however for reasons of ease of reading all lines of actual code be it Minion or Essence' are shown in typewriter text and comments are inserted in normal text. The first file is a modified version of the one that all the minion developers turn to when modelling a new problem in minion. It shows exactly what a minion file can include and what the syntax is for all the possible sections. If you are modelling a problem as minion than we recommend you take a copy of this file and edit it appropriately, as this will help to guide you through the modelling process. The rest of this chapter contains versions  of the minion input examples introduced in the Tailor chapter of this manual. These are all produced automatically by tailor from the Essence' specification given in that chapter. We hope the comments will clarify exactly what these files mean. These examples can be used as the bases to implement any similar problems. The Minion overview is completed in the last chapter where a full list of all the constraints is given, including a brief overview of how each operates. 
+
+\section{Minion Example File}
+This file does not really relate to any English problem description, although it does parse and run,  it is an example which clearly shows all of the possible Minion input file constructs. If you are modelling a problem as minion than we recommend you take a copy of this file and edit it appropriately, as this will help to guide you through the modelling process. It can be found in the \begin{verbatim}summer_school\end{verbatim} directory and is called \begin{verbatim}format_example.minion\end{verbatim} we have added comments  to explain the different sections to the novice user. 
+
+\begin{verbatim}
+MINION 3
+\end{verbatim}
+
+This file includes an example of all the different inputs  you can give to Minion.  It is a very good place to start from when modelling  problem in the Minion specification. 
+
+ The first section is where all the variables are declared.
+ \begin{verbatim}
+**VARIABLES**
+\end{verbatim}
+
+There are 4 type of variables. Booleans don't need a domain and are formated as follows:
+ \begin{verbatim}
+BOOL bo    
+ \end{verbatim}
+
+Internally, Bound variables are stored only as a lower  and upper bound whereas discrete variables allow any sub-domain.
+Bound variables need a domain given as a range as follows: 
+ \begin{verbatim}
+BOUND b {1..3}   
+ \end{verbatim}
+
+Discrete vars also need a domain given as a range as follows:   
+\begin{verbatim}
+DISCRETE d {1..3} 
+\end{verbatim}
+
+Sparse bound variables take a sorted list of values as follows:
+\begin{verbatim}
+SPARSEBOUND s {1,3,6,7} 
+\end{verbatim}
+
+We can also declare matrices of variables. The first example is a matrix with 3 variables: q[0],q[1] and q[2].
+\begin{verbatim}
+DISCRETE q[3] {0..5} 
+\end{verbatim}
+
+The second example is of a 2d matrix, where the variables are bm[0,0], bm[0,1], bm[1,0], bm[1,1].
+\begin{verbatim}
+BOOL bm[2,2] 
+\end{verbatim}
+
+The third example shows how to declare a matrix with more indices. You can have as many indices as you like!
+\begin{verbatim}
+BOOL bn[2,2,2,2] 
+\end{verbatim}
+
+In this next section, which is optional, you can define tuplelists. Tuplelists provide a method of defining sets of tuples which can then be used in \texttt{table} and \texttt{negativetable} constraints. Defining these in a \texttt{**TUPLELIST**} does not change the search, but can save memory by reusing the same list of tuples in multiple constraints.The input is: $\langle$name$\rangle$ $\langle$num$\_$of$\_$tuples$\rangle$ $\langle$tuple$\_$length$\rangle$ $\langle$numbers$\ldots \rangle$.
+\begin{verbatim}
+**TUPLELIST**
+Fred 3 3
+0 2 3
+2 0 3
+3 1 3
+\end{verbatim}
+
+The next thing to declare are the constraints which go in  this section.
+\begin{verbatim}
+**CONSTRAINTS**
+\end{verbatim}
+
+Constraints are defined in the same way as functions are in most programming paradigms!  A complete list of constraints can be found at the end of  the manual. The two following constraints very simply set bo=0 and b=d.
+\begin{verbatim}
+eq(bo, 0)
+eq(b,d)
+\end{verbatim}
+
+Note that except in special cases (the \texttt{reify} and \texttt{reifyimply} constraints), Minion constraints cannot be nested. For example \texttt{eq(eq(bo,0), d)} is not valid. Such constraints must be written by manually adding extra variables.
+
+To get a single variable from a matrix, you index it with square brackets using commas to delimitate the dimensions of the matrix. The first example following is a 1D matrix, the second in 4D. 
+\begin{verbatim}
+eq(q[1],0)
+eq(bn[0,1,1,1], bm[1,1])
+\end{verbatim}
+
+It's easy to get a row or column from a matrix.  You use $\_$ in the indices you want to vary.  Giving a matrix without an index simply gives all the variables in that matrix. The following shows how flattening occurs...\\
+$[bm] == [ bm[\_,\_] ] == [ bm[0,0], bm[0,1], bm[1,0], bm[1,1] ]$\\
+$[ bm[\_,1] ] = [ bm[0,1], bm[1,1] ]$\\
+$[ bn[1,\_,0,\_] = [ bn[1,0,0,0], b[1,0,0,1], b[1,1,0,0], b[1,1,0,1] ]$\\
+
+You can string together a list of such expressions as in the following example:
+\begin{verbatim}
+lexleq( [bn[1,_,0,_], bo, q[0]] , [b, bm, d] )
+\end{verbatim}
+
+So the parser can recognise them you must always put [ ] around any matrix expression, so lexleq(bm, bm) is invalid, but the following is valid:
+\begin{verbatim}
+lexleq( [bm], [bm] )
+\end{verbatim}
+
+An example of a constraint which uses tuples
+\begin{verbatim}
+table([q], Fred)
+\end{verbatim}
+
+You do not have to pre-declare tuples, you can write them explicitly if you wish. The above constraint for example is equivalent to:
+\begin{verbatim}
+table([q],{ <0,2,3>,<2,0,3>,<3,1,3> })
+\end{verbatim}
+
+The last section is the search section. This section is optional, and allows some limited control over the way minion searches for a solution. Note that everything in this section can be given at most once.
+\begin{verbatim}
+**SEARCH** 
+\end{verbatim}
+
+You give the variable ordering by listing each of the variables in the order you wish them to be searched. You can either list each of the variables in a matrix individually by giving the index of each variable, or you can just state the matrix in which case it goes through each of the variables in turn. If you miss any of the variables out than these variables are not branched on. Note that this can lead to Minion reporting invalid solutions, so use with care! If you don't give an explicit variable ordering, than one is generated based on the order the variables are declared. If you give a \texttt{-varorder} on the command line, that will only consider the variable given in the \texttt{VARORDER}.
+\begin{verbatim}
+VARORDER [bo,b,d,q[_]] 
+\end{verbatim}
+
+You give the value order for each variable as either \texttt{a} for ascending or \texttt{d} for descending. The value orderings are given in the same order as the variable ordering. For example, to make the variable b by searched in descending order you make the second term into a \texttt{d} as the above variable ordering shows it to be the second variable to be searched. The default variable order is ascending order for all variables.
+\begin{verbatim}
+VALORDER [a,a,d,a]
+\end{verbatim}
+
+You can have one objective function which can be either to maximise or minimise any single variable. To minimise a constraint, you should assign it equal to a new variable.
+\begin{verbatim}
+MAXIMISING bo
+# MINIMISING x3
+\end{verbatim}
+
+The print statement takes a 2D matrix of things to print. The following example prints both the variables bo and q, putting these in double square brackets turns them into a 2D matrix so they are acceptable input.  You can also give:  PRINT ALL (the default) which prints all variables and PRINT NONE which turns printing off completely.
+\begin{verbatim}
+PRINT [ [bo, q] ]
+\end{verbatim}
+
+
+The file must end with the **EOF** marker! Any text under that is ignored, so you can write 
+whatever you like (or nothing at all...)
+\begin{verbatim}
+**EOF**
+\end{verbatim}
+
+The only remaining part of Minion's input language are its many constraints. These are listed in the Appendix.
+
+\section{The Farmers Problem}
+The Farmers Problem is a very simple problem which makes a very good example to be the first CP that you model. The problem is as follows:  A farmer has 7 animals on his farm: pigs and hens. They all together have 22 legs. How many pigs (4 legs) and how many hens(2 legs) does the farmer have? These files can be found in \texttt{/summer\_school/examples}. The Essence' file is named \texttt{FarmersProblem.eprime} and the Minion file is \texttt{FarmersProblem.minion}
+
+The Essence' specification of this (which was explained in detail in the Tailor section is as follows:
+
+\begin{verbatim}
+find pigs, hens: int(0..7)
+
+such that
+
+pigs + hens = 7,
+pigs * 4 + hens * 2 = 22
+\end{verbatim}
+
+The Minion input file for this is:
+\begin{verbatim}
+MINION 3
+
+\end{verbatim}
+There are two variables pigs and hens  both have domain {0..7}
+
+\begin{verbatim}
+**VARIABLES**
+DISCRETE pigs {0..7}
+DISCRETE hens {0..7}
+\end{verbatim}
+
+Both variables pigs and hens should be printed and the variable ordering is search pigs than hens.
+\begin{verbatim}
+**SEARCH**
+
+PRINT [[pigs],[hens]]
+
+VARORDER [pigs,hens]
+
+
+**CONSTRAINTS**
+\end{verbatim}
+
+The following two constraints relate to the following $(pigs \times 4) + (hens \times 2) = 22$. There is no weighted sum constraint in Minion so you should use the weighted sum less than and equal to constraint and the weighted sum greater than and equal to constraint. You read this as  $(hens \times 2) + (pigs \times 4)) \leq 22$ and $(hens \times 2) + (pigs \times 4)  \geq 22$.
+\begin{verbatim}
+weightedsumgeq([2,4], [hens,pigs], 22)
+weightedsumleq([2,4], [hens,pigs], 22)
+\end{verbatim}
+
+The following two constraints relate to the following $pigs + hens = 7$. There is no sum constraint in Minion so you should use the sum less than and equal to constraint and the sum greater than and equal to constraint. You read this as $hens + pigs \leq 7$ and $hens + pigs \geq 7$.
+\begin{verbatim}
+sumleq([hens,pigs], 7)
+sumgeq([hens,pigs], 7)
+**EOF**
+\end{verbatim}
+
+\section{Cryptarithmetic}
+The second problem outlined is a very famous Cryptarithmetic puzzle: SEND + MORE = MONEY. These files can be found in \texttt{/summer\_school/examples} the Essence' file is \texttt{SENDMOREMONEY.eprime} and the Minion file is \texttt{SENDMOREMONEY.minion}. The Essence' specification is as follows:
+
+\begin{verbatim}
+find S,E,N,D,M,O,R,Y : int(0..9)
+
+such that
+
+1000*S + 100*E + 10*N + D + 
+1000*M + 100*O + 10*R + E =
+10000*M + 1000*O + 100*N + 10*E + Y,
+
+alldiff([S,E,N,D,M,O,R,Y])
+\end{verbatim}
+
+The Minion model is then:
+
+\begin{verbatim}
+MINION 3
+\end{verbatim}
+
+There are 8 variables: S,E,N,D,M,O,R,Y all with domains 0 to 9.
+\begin{verbatim}
+**VARIABLES**
+DISCRETE S {0..9}
+DISCRETE E {0..9}
+DISCRETE N {0..9}
+DISCRETE D {0..9}
+DISCRETE M {0..9}
+DISCRETE O {0..9}
+DISCRETE R {0..9}
+DISCRETE Y {0..9}
+\end{verbatim}
+
+Search the variables in the order S, E, N, D, M, O, R, Y and print the same variable in this order.
+\begin{verbatim}
+**SEARCH**
+
+PRINT [[S],[E],[N],[D],[M],[O],[R],[Y]]
+
+VARORDER [S,E,N,D,M,O,R,Y]
+\end{verbatim}
+
+The first constraint is an all different which is across all variables this is an implicit constraint in the problem, as all the letters represent different numbers.
+\begin{verbatim}
+**CONSTRAINTS**
+
+alldiff([ S, E, N, D, M, O, R, Y])
+\end{verbatim}
+
+The second constraint represents:$(1000 \times S) + (100 \times E) + (10 \times N) + D +  (1000 \times M) + (100 \times O )+ (10 \times R) + E = (10000 \times M) + (1000 \times O) + (100 \times N) + (10 \times E) + Y$.  The first thing the model does is rewrite this expression to make it equal to a number, in this case 0. So this expression becomes: $(10000 \times M) + (1000 \times O) + (100 \times N) + (10 \times E) + Y - (1000 \times S)  - (100 \times E) - (10 \times N) - D - (1000 \times M) - (100 \times O) - (10 \times R) - E = 0$. The terms are then rearranged so the same weights are together and the positive numbers are first this then becomes: $Y + (10 \times E) + (100 \times N) + (1000 \times O) + (10000 \times M) -D - E - (10 \times N) - (10 \times R) - (100 \times E) - (100 \times O)  - (1000 \times M) - (1000 \times S) = 0$. Minion does not have a weighted sum equals constraint, so this is represented as one weighted sum less than or equal to and one weighted sum greater than or equal to. The two constraints are then: $Y + (10 \times E) + (100 \times N) + (1000 \times O) + (10000 \times M) -D - E - (10 \times N) - (10 \times R) - (100 \times E) - (100 \times O)  - (1000 \times M) - (1000 \times S) \leq 0$ and $Y + (10 \times E) + (100 \times N) + (1000 \times O) + (10000 \times M) -D - E - (10 \times N) - (10 \times R) - (100 \times E) - (100 \times O)  - (1000 \times M) - (1000 \times S) \geq 0$.
+
+\begin{verbatim}
+weightedsumgeq(
+	[1,10,100,1000,10000,-1,-1,-10,-10,-100,-100,-1000,-1000], 
+	[Y,E,N,O,M,D,E,N,R,E,O,M,S], 0)
+weightedsumleq(
+	[1,10,100,1000,10000,-1,-1,-10,-10,-100,-100,-1000,-1000],
+	[Y,E,N,O,M,D,E,N,R,E,O,M,S], 0)
+
+**EOF**
+\end{verbatim}
+
+\section{The Eight Number Puzzle}
+The eight number puzzle asks you to label the nodes of the graph shown in Figure~\ref{fig:8puzzle} with the values 1 to 8 such that no two connected nodes have consecutive values.  These files can be found in /summer\_school/examples the Essence' file is EightPuzzleDiagram.eprime and the Minion file is EightPuzzleDiagram.minion. The Essence' specification is as follows:
+
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=0.25] {EightPuzzleDiagram.pdf} 
+\caption{Graph which represents The Eight Number Puzzle}
+\label{fig:8puzzle}
+\end{figure}
+
+\begin{verbatim}
+find circles: matrix indexed by [int(1..8)] of int(1..8)
+
+such that
+
+alldiff(circles),
+| circles[1] - circles[2] | > 1,
+| circles[1] - circles[3] | > 1,
+| circles[1] - circles[4] | > 1,
+| circles[2] - circles[3] | > 1,
+| circles[3] - circles[4] | > 1,
+| circles[2] - circles[5] | > 1,
+| circles[2] - circles[6] | > 1,
+| circles[3] - circles[5] | > 1,
+| circles[3] - circles[6] | > 1,
+| circles[3] - circles[7] | > 1,
+| circles[4] - circles[6] | > 1,
+| circles[4] - circles[7] | > 1,
+| circles[5] - circles[6] | > 1,
+| circles[6] - circles[7] | > 1,
+| circles[5] - circles[8] | > 1,
+| circles[6] - circles[8] | > 1,
+| circles[7] - circles[8] | > 1
+\end{verbatim}
+
+The Minion model is then:
+
+\begin{verbatim}
+MINION 3
+\end{verbatim}
+
+There is a 1d matrix of size 8 with domain \{1,..,8\} to represent the 8 circles which numbers can be allocated to.  There are also 34 auxiliary variables, 2 to represent each constraint.
+
+\begin{verbatim}
+**VARIABLES**
+DISCRETE circles[8] {1..8}
+
+# auxiliary variables
+DISCRETE aux0 {-7..7}
+DISCRETE aux1 {0..7}
+DISCRETE aux2 {-7..7}
+DISCRETE aux3 {0..7}
+DISCRETE aux4 {-7..7}
+DISCRETE aux5 {0..7}
+DISCRETE aux6 {-7..7}
+DISCRETE aux7 {0..7}
+DISCRETE aux8 {-7..7}
+DISCRETE aux9 {0..7}
+DISCRETE aux10 {-7..7}
+DISCRETE aux11 {0..7}
+DISCRETE aux12 {-7..7}
+DISCRETE aux13 {0..7}
+DISCRETE aux14 {-7..7}
+DISCRETE aux15 {0..7}
+DISCRETE aux16 {-7..7}
+DISCRETE aux17 {0..7}
+DISCRETE aux18 {-7..7}
+DISCRETE aux19 {0..7}
+DISCRETE aux20 {-7..7}
+DISCRETE aux21 {0..7}
+DISCRETE aux22 {-7..7}
+DISCRETE aux23 {0..7}
+DISCRETE aux24 {-7..7}
+DISCRETE aux25 {0..7}
+DISCRETE aux26 {-7..7}
+DISCRETE aux27 {0..7}
+DISCRETE aux28 {-7..7}
+DISCRETE aux29 {0..7}
+DISCRETE aux30 {-7..7}
+DISCRETE aux31 {0..7}
+DISCRETE aux32 {-7..7}
+DISCRETE aux33 {0..7}
+\end{verbatim}
+
+The variable ordering branches on all the circle variables before each of the aux variables. Only the circle variables are printed.
+
+\begin{verbatim}
+**SEARCH**
+
+PRINT [circles]
+
+VARORDER [circles,
+aux0,aux1,aux2,aux3,aux4,aux5,aux6,aux7,
+aux8,aux9,aux10,aux11,aux12,aux13,aux14,aux15,
+aux16,aux17,aux18,aux19,aux20,aux21,aux22,aux23,
+aux24,aux25,aux26,aux27,aux28,aux29,aux30,aux31,
+aux32,aux33]
+\end{verbatim}
+
+The all different constraint on the circle variables are explicit in the  problem, this is the first constraint in the collection. The other constraints are all of the type $|circles[a] - circles[b]| > 1$. The first of these such constraints is $|circles[1] - circles[2]| > 1$ this type of constraint is represented by a series of 4 constraints in MInion.   The constraints are reversed in the Minion specification so that the last 4 constraints represent this first expression. The constraints are indexed from 1 in Essence' and 1 in Minion, so the above constraint becomes $|circles[0] - circles[1]| > 1$. Then $|circles[0] - circles[1]| > 1$ is decomposed to $circles[1] - circles[2] = aux0$ and $|aux0| = aux1$ and $1 \leq aux1-1$.  As Minion has no weighted sum equals to constraint a weighted sum greater than or equals to constraint and a weighted sum less than or equals to, so $circles[1] - circles[2] = aux0$ is $circles[1] - circles[2] \leq aux0$ and $circles[1] - circles[2] \geq aux0$. The other constraints all form the same pattern.
+
+
+\begin{verbatim}
+**CONSTRAINTS**
+
+alldiff([circles])
+weightedsumgeq([1,-1], [circles[6],circles[7]], aux32)
+weightedsumleq([1,-1], [circles[6],circles[7]], aux32)
+abs(aux33,aux32)
+ineq(1,aux33,-1)
+weightedsumgeq([1,-1], [circles[5],circles[7]], aux30)
+weightedsumleq([1,-1], [circles[5],circles[7]], aux30)
+abs(aux31,aux30)
+ineq(1,aux31,-1)
+weightedsumgeq([1,-1], [circles[4],circles[7]], aux28)
+weightedsumleq([1,-1], [circles[4],circles[7]], aux28)
+abs(aux29,aux28)
+ineq(1,aux29,-1)
+weightedsumgeq([1,-1], [circles[5],circles[6]], aux26)
+weightedsumleq([1,-1], [circles[5],circles[6]], aux26)
+abs(aux27,aux26)
+ineq(1,aux27,-1)
+weightedsumgeq([1,-1], [circles[4],circles[5]], aux24)
+weightedsumleq([1,-1], [circles[4],circles[5]], aux24)
+abs(aux25,aux24)
+ineq(1,aux25,-1)
+weightedsumgeq([1,-1], [circles[3],circles[6]], aux22)
+weightedsumleq([1,-1], [circles[3],circles[6]], aux22)
+abs(aux23,aux22)
+ineq(1,aux23,-1)
+weightedsumgeq([1,-1], [circles[3],circles[5]], aux20)
+weightedsumleq([1,-1], [circles[3],circles[5]], aux20)
+abs(aux21,aux20)
+ineq(1,aux21,-1)
+weightedsumgeq([1,-1], [circles[2],circles[6]], aux18)
+weightedsumleq([1,-1], [circles[2],circles[6]], aux18)
+abs(aux19,aux18)
+ineq(1,aux19,-1)
+weightedsumgeq([1,-1], [circles[2],circles[5]], aux16)
+weightedsumleq([1,-1], [circles[2],circles[5]], aux16)
+abs(aux17,aux16)
+ineq(1,aux17,-1)
+weightedsumgeq([1,-1], [circles[2],circles[4]], aux14)
+weightedsumleq([1,-1], [circles[2],circles[4]], aux14)
+abs(aux15,aux14)
+ineq(1,aux15,-1)
+weightedsumgeq([1,-1], [circles[1],circles[5]], aux12)
+weightedsumleq([1,-1], [circles[1],circles[5]], aux12)
+abs(aux13,aux12)
+ineq(1,aux13,-1)
+weightedsumgeq([1,-1], [circles[1],circles[4]], aux10)
+weightedsumleq([1,-1], [circles[1],circles[4]], aux10)
+abs(aux11,aux10)
+ineq(1,aux11,-1)
+weightedsumgeq([1,-1], [circles[2],circles[3]], aux8)
+weightedsumleq([1,-1], [circles[2],circles[3]], aux8)
+abs(aux9,aux8)
+ineq(1,aux9,-1)
+weightedsumgeq([1,-1], [circles[1],circles[2]], aux6)
+weightedsumleq([1,-1], [circles[1],circles[2]], aux6)
+abs(aux7,aux6)
+ineq(1,aux7,-1)
+weightedsumgeq([1,-1], [circles[0],circles[3]], aux4)
+weightedsumleq([1,-1], [circles[0],circles[3]], aux4)
+abs(aux5,aux4)
+ineq(1,aux5,-1)
+weightedsumgeq([1,-1], [circles[0],circles[2]], aux2)
+weightedsumleq([1,-1], [circles[0],circles[2]], aux2)
+abs(aux3,aux2)
+ineq(1,aux3,-1)
+weightedsumgeq([1,-1], [circles[0],circles[1]], aux0)
+weightedsumleq([1,-1], [circles[0],circles[1]], aux0)
+abs(aux1,aux0)
+ineq(1,aux1,-1)
+
+**EOF**
+\end{verbatim}
+
+\section{A $K_4 \times P_2$ Graceful Graph}
+This problem is stated as follows. A labelling $f$ of the nodes of a graph with $q$ edges is graceful if $f$ assigns each node a unique label from $0,1,..., q$ and when each edge $xy$ is labelled with $|f(x) - f(y)|$, the edge labels are all different. (Hence, the edge labels are a permutation of $1, 2, ..., q$.) Does the $K_4 \times P_2$ graph shown in Figure~\ref{fig:k4xp2} have a graceful library.  These files can be found in \texttt{/summer\_school/examples}, the Essence' file is called \texttt{K4P2GracefulGraph.eprime} and the Minion file is \texttt{K4P2GracefulGraph.minion}. The Essence' specification is as follows:
+
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=0.25] {k4xp2.pdf} 
+\caption{A $K_4 \times P_2$ Graph }
+\label{fig:k4xp2}
+\end{figure}
+
+
+\begin{verbatim}
+find nodes : matrix indexed by [int(1..8)] of int(0..16),
+       edges: matrix indexed by [int(1..16)] of int(1..16)
+
+such that
+
+|nodes[1] - nodes[2]| = edges[1],
+|nodes[1] - nodes[3]| = edges[2],
+|nodes[1] - nodes[4]| = edges[3],
+|nodes[2] - nodes[3]| = edges[4],
+|nodes[2] - nodes[4]| = edges[5],
+|nodes[3] - nodes[4]| = edges[6],
+
+|nodes[5] - nodes[6]| = edges[7],
+|nodes[5] - nodes[7]| = edges[8],
+|nodes[5] - nodes[8]| = edges[9],
+|nodes[6] - nodes[7]| = edges[10],
+|nodes[6] - nodes[8]| = edges[11],
+|nodes[7] - nodes[8]| = edges[12],
+
+|nodes[1] - nodes[5]| = edges[13],
+|nodes[2] - nodes[6]| = edges[14],
+|nodes[3] - nodes[7]| = edges[15],
+|nodes[4] - nodes[8]| = edges[16],
+
+alldiff(edges),
+alldiff(nodes)
+\end{verbatim}
+
+The Minion model is then:
+
+\begin{verbatim}
+MINION 3
+\end{verbatim}
+
+There are two 1d arrays of variables one representing all the node variables and one representing all the edge variables. The 8 node variables have domain 0 to 16 and the edge variables have domain 1 to 16. There are also 16 auxiliary variables introduced called aux0 to aux15 there is one of these for each constraint and there is one constraint to represent each edge. 
+
+\begin{verbatim}
+**VARIABLES**
+DISCRETE nodes[8] {0..16}
+DISCRETE edges[16] {1..16}
+
+# auxiliary variables
+DISCRETE aux0 {-16..16}
+DISCRETE aux1 {-16..16}
+DISCRETE aux2 {-16..16}
+DISCRETE aux3 {-16..16}
+DISCRETE aux4 {-16..16}
+DISCRETE aux5 {-16..16}
+DISCRETE aux6 {-16..16}
+DISCRETE aux7 {-16..16}
+DISCRETE aux8 {-16..16}
+DISCRETE aux9 {-16..16}
+DISCRETE aux10 {-16..16}
+DISCRETE aux11 {-16..16}
+DISCRETE aux12 {-16..16}
+DISCRETE aux13 {-16..16}
+DISCRETE aux14 {-16..16}
+DISCRETE aux15 {-16..16}
+\end{verbatim}
+
+The variable order is to branch on the nodes then on the edges then the auxiliary variables. Only the node and the edge variables are printed. 
+
+\begin{verbatim}
+**SEARCH**
+
+PRINT [nodes,edges]
+
+VARORDER [nodes,edges,
+aux0,aux1,aux2,aux3,aux4,aux5,aux6,aux7,
+aux8,aux9,aux10,aux11,aux12,aux13,aux14,aux15]
+\end{verbatim}
+
+Implicit in the problem is an all different constraint on both the node and edge variables. The other constraints are all of the form |nodes[a] - nodes[b]| = edges[a], the first of these constraints from the Essence' specification is $|nodes[1] - nodes[2]| = edges[1]$  this corresponds to the last three constraints in the minion file as the order of constraints are reversed. Minion starts indexing matrices from 0, whereas Essence' started numbering from 1 so the above constraint becomes $|nodes[0] - nodes[1]| = edges[0]$.  This is broken into $nodes[0] - nodes[1] = aux0$ and $|edges[0]| = aux0$. As minion has no weighted sum equals this is broken into a weighted sum less than or equals to and weighted sum greater than or equals to. So this full constraint is represented as $nodes[0] - nodes[1]  \leq aux0$ and $nodes[0] - nodes[1]  \geq aux0$ and $|edges[0]| = aux0$. 
+
+\begin{verbatim}
+**CONSTRAINTS**
+
+alldiff([nodes])
+alldiff([edges])
+weightedsumgeq([1,-1], [nodes[3],nodes[7]], aux15)
+weightedsumleq([1,-1], [nodes[3],nodes[7]], aux15)
+abs(edges[15],aux15)
+weightedsumgeq([1,-1], [nodes[2],nodes[6]], aux14)
+weightedsumleq([1,-1], [nodes[2],nodes[6]], aux14)
+abs(edges[14],aux14)
+weightedsumgeq([1,-1], [nodes[1],nodes[5]], aux13)
+weightedsumleq([1,-1], [nodes[1],nodes[5]], aux13)
+abs(edges[13],aux13)
+weightedsumgeq([1,-1], [nodes[0],nodes[4]], aux12)
+weightedsumleq([1,-1], [nodes[0],nodes[4]], aux12)
+abs(edges[12],aux12)
+weightedsumgeq([1,-1], [nodes[6],nodes[7]], aux11)
+weightedsumleq([1,-1], [nodes[6],nodes[7]], aux11)
+abs(edges[11],aux11)
+weightedsumgeq([1,-1], [nodes[5],nodes[7]], aux10)
+weightedsumleq([1,-1], [nodes[5],nodes[7]], aux10)
+abs(edges[10],aux10)
+weightedsumgeq([1,-1], [nodes[5],nodes[6]], aux9)
+weightedsumleq([1,-1], [nodes[5],nodes[6]], aux9)
+abs(edges[9],aux9)
+weightedsumgeq([1,-1], [nodes[4],nodes[7]], aux8)
+weightedsumleq([1,-1], [nodes[4],nodes[7]], aux8)
+abs(edges[8],aux8)
+weightedsumgeq([1,-1], [nodes[4],nodes[6]], aux7)
+weightedsumleq([1,-1], [nodes[4],nodes[6]], aux7)
+abs(edges[7],aux7)
+weightedsumgeq([1,-1], [nodes[4],nodes[5]], aux6)
+weightedsumleq([1,-1], [nodes[4],nodes[5]], aux6)
+abs(edges[6],aux6)
+weightedsumgeq([1,-1], [nodes[2],nodes[3]], aux5)
+weightedsumleq([1,-1], [nodes[2],nodes[3]], aux5)
+abs(edges[5],aux5)
+weightedsumgeq([1,-1], [nodes[1],nodes[3]], aux4)
+weightedsumleq([1,-1], [nodes[1],nodes[3]], aux4)
+abs(edges[4],aux4)
+weightedsumgeq([1,-1], [nodes[1],nodes[2]], aux3)
+weightedsumleq([1,-1], [nodes[1],nodes[2]], aux3)
+abs(edges[3],aux3)
+weightedsumgeq([1,-1], [nodes[0],nodes[3]], aux2)
+weightedsumleq([1,-1], [nodes[0],nodes[3]], aux2)
+abs(edges[2],aux2)
+weightedsumgeq([1,-1], [nodes[0],nodes[2]], aux1)
+weightedsumleq([1,-1], [nodes[0],nodes[2]], aux1)
+abs(edges[1],aux1)
+weightedsumgeq([1,-1], [nodes[0],nodes[1]], aux0)
+weightedsumleq([1,-1], [nodes[0],nodes[1]], aux0)
+abs(edges[0],aux0)
+
+**EOF**
+\end{verbatim}
+
+\section{The Zebra Puzzle} 
+
+The Zebra Puzzle is a very famous logic puzzle. There are many different versions, but the version we will answer is as follows:
+\begin{enumerate}
+\item There are five houses.
+\item The Englishman lives in the red house.
+\item The Spaniard owns the dog.
+\item Coffee is drunk in the green house.
+\item The Ukrainian drinks tea.
+\item The green house is immediately to the right of the ivory house.
+\item The Old Gold smoker owns snails.
+\item Kools are smoked in the yellow house.
+\item Milk is drunk in the middle house.
+\item The Norwegian lives in the first house.
+\item The man who smokes Chesterfields lives in the house next to the man with the fox.
+\item Kools are smoked in the house next to the house where the horse is kept.
+\item The Lucky Strike smoker drinks orange juice.
+\item The Japanese smokes Parliaments.
+\item The Norwegian lives next to the blue house.
+\end{enumerate}
+Now, who drinks water? Who owns the zebra? In the interest of clarity, it must be added that each of the five houses is painted a different color, and their inhabitants are of different national extractions, own different pets, drink different beverages and smoke different brands of American cigarettes.  These files can be found in /summer\_school/examples the Essence' file is zebra.eprime and the Minion file is zebra.minion. The Essence' specification is as follows:
+
+\begin{verbatim}
+language ESSENCE' 1.b.a
+
+$red = colour[1]
+$green = colour[2]
+$ivory = colour[3]
+$yellow = colour[4]
+$blue = colour[5]
+$Englishman = nationality[1]
+$Spaniard = nationality[2]
+$Ukranian = nationality[3]
+$Norwegian = nationality[4]
+$Japanese = nationality[5]
+$coffee = drink[1]
+$tea = drink[2]
+$milk = drink[3]
+$orange juice = drink[4]
+$Old Gold = smoke[1]
+$Kools = smoke[2]
+$Chesterfields = smoke[3]
+$Lucky Strike = smoke[4]
+$Parliaments = smoke[5]
+$dog = pets[1]
+$snails = pets[2]
+$fox = pets[3]
+$horse = pets[4]
+
+
+find colour: matrix indexed by [int(1..5)] of int(1..5),
+       nationality: matrix indexed by [int(1..5)] of int(1..5),
+       drink: matrix indexed by [int(1..5)] of int(1..5),
+       smoke: matrix indexed by [int(1..5)] of int(1..5),
+       pets: matrix indexed by [int(1..5)] of int(1..5)
+
+such that
+
+$constraints needed as this is a logical problem where 
+$the value allocated to each position of the matrix 
+$represents positon of house
+alldiff(colour),
+alldiff(nationality),
+alldiff(drink),
+alldiff(smoke),
+alldiff(pets),
+
+$There are five houses.
+$No constraint covered by domain specification
+
+$The Englishman lives in the red house
+nationality[1] = colour[1],
+
+$The Spaniard owns the dog.
+nationality[2] = pets[1],
+
+$Coffee is drunk in the green house.
+drink[1] = colour[2],
+
+$The Ukranian drinks tea.
+nationality[3] = drink[2],
+
+$The green house is immediately to the 
+$right of the ivory house.
+colour[2] + 1 = colour[3],
+
+$The Old Gold smoker owns snails.
+smoke[1] = pets[2],
+
+$Kools are smoked in the yellow house.
+smoke[2] = colour[4],
+
+$Milk is drunk in the middle house.
+drink[3] = 3,
+
+$The Norwegian lives in the first house
+nationality[4] = 1,
+
+$The man who smokes Chesterfields lives in 
+$the house next to the man with the fox.
+|smoke[3] - pets[3]| = 1,
+
+$Kools are smoked in the house next 
+$ to the house where the horse is kept.
+|smoke[2] - pets[4]| = 1,
+
+$The Lucky Strike smoker drinks orange juice.
+smoke[4] = drink[4],
+
+$The Japanese smokes Parliaments.
+nationality[5] = smoke[5],
+
+$The Norwegian lives next to the blue house.
+|nationality[4] - colour[5]| = 1
+
+\end{verbatim}
+
+The Minion model is then: 
+
+\begin{verbatim}
+MINION 3
+\end{verbatim}
+
+There are matrices named colour, nationality, drink, smoke and pets to represent each of the objects discussed in the puzzle. They have domain $\{1,\ldots ,5\}$  which represents where in the row of five houses this object is held. There are also three auxiliary variables introduced which are necessary for the most difficult constraints, these all have domains $\{-4,\ldots ,4\}$.
+
+\begin{verbatim}
+**VARIABLES**
+DISCRETE colour[5] {1..5}
+DISCRETE nationality[5] {1..5}
+DISCRETE drink[5] {1..5}
+DISCRETE smoke[5] {1..5}
+DISCRETE pets[5] {1..5}
+
+# auxiliary variables
+DISCRETE aux0 {-4..4}
+DISCRETE aux1 {-4..4}
+DISCRETE aux2 {-4..4}
+\end{verbatim}
+
+The variable order branches on each of the matrices in turn then on the auxiliary variables. Only the matrices of variables are printed.
+
+\begin{verbatim}
+**SEARCH**
+
+PRINT [colour,nationality,drink,smoke,pets]
+
+VARORDER [colour,nationality,drink,smoke,pets,aux0,aux1,aux2]
+\end{verbatim}
+
+We will go through each constraint in turn. As usual the constraints in Minion are in the reverse order of the Essence' specification and the minion matrices are indexed from 0 whereas 
+\begin{verbatim}
+**CONSTRAINTS**
+\end{verbatim}
+
+$|nationality[4] - colour[5]| = 1$ becomes by counting indices from zero: $|nationality[3] - colour[4]| = 1$. This is then decomposed as $nationality[3] - colour[4] \geq aux2$, $nationality[3] - colour[4] \leq aux2$ and $|aux2|=1$.
+\begin{verbatim}
+weightedsumgeq([1,-1], [nationality[3],colour[4]], aux2)
+weightedsumleq([1,-1], [nationality[3],colour[4]], aux2)
+abs(1,aux2)
+\end{verbatim}
+
+$nationality[5] = smoke[5]$ becomes by counting indices from zero: $nationality[4] = smoke[4]$.
+\begin{verbatim}
+eq(nationality[4], smoke[4])
+\end{verbatim}
+
+$drink[4] = smoke[4]$ becomes by counting indices from zero: $drink[3] = smoke[3]$.
+\begin{verbatim}
+eq(drink[3], smoke[3])
+\end{verbatim} 
+
+$|smoke[2] - pets[4]| = 1$ becomes by counting indices from zero: $|smoke[1] - pets[3]| = 1$. This is then decomposed as $smoke[1] - pets[3] \leq aux1$, $smoke[1] - pets[3] \geq aux1$ and $|aux1|=1$.
+\begin{verbatim}
+weightedsumgeq([1,-1], [smoke[1],pets[3]], aux1)
+weightedsumleq([1,-1], [smoke[1],pets[3]], aux1)
+abs(1,aux1)
+\end{verbatim}
+
+$|smoke[3] - pets[3]| = 1$ becomes by counting indices from zero: $|smoke[2] - pets[2]| = 1$. This is then decomposed as $smoke[2] - pets[2] \leq aux0$, $smoke[2] - pets[2] \geq aux0$ and $|aux0|=1$.
+\begin{verbatim}
+weightedsumgeq([1,-1], [smoke[2],pets[2]], aux0)
+weightedsumleq([1,-1], [smoke[2],pets[2]], aux0)
+abs(1,aux0)
+\end{verbatim}
+
+$nationality[4] = 1$ becomes by counting indices from zero: $nationality[3] = 1$.
+\begin{verbatim}
+eq(1, nationality[3])
+\end{verbatim}
+
+$drink[3] = 3$ becomes by counting indices from zero: $drink[2] = 3$.
+\begin{verbatim}
+eq(3, drink[2])
+\end{verbatim}
+
+$smoke[2] = colour[4]$ becomes by counting indices from zero: $smoke[1] = colour[3]$
+\begin{verbatim}
+eq(colour[3], smoke[1])
+\end{verbatim}
+
+$smoke[1] = pets[2]$ becomes by counting indices from zero: $smoke[0] = pets[1]$
+\begin{verbatim}
+eq(pets[1], smoke[0])
+\end{verbatim}
+
+$colour[2] + 1 = colour[3]$ becomes by counting indices from zero: $colour[1] + 1 = colour[2]$. This is decomposed as $colour[1] + 1 \leq colour[2]$ and $colour[1] + 1 \geq colour[2]$. 
+\begin{verbatim}
+sumleq([1,colour[1]], colour[2])
+sumgeq([1,colour[1]], colour[2])
+\end{verbatim}
+
+$nationality[3] = drink[2]$ becomes by counting indices from zero: $nationality[2] = drink[1]$
+\begin{verbatim}
+eq(drink[1], nationality[2])
+\end{verbatim}
+
+$drink[1] = colour[2]$ becomes by counting indices from zero: $drink[0] = colour[1]$
+\begin{verbatim}
+eq(colour[1], drink[0])
+\end{verbatim}
+
+$nationality[2] = pets[1]$ becomes by counting indices from zero: $nationality[1] = pets[0]$
+\begin{verbatim}
+eq(nationality[1], pets[0])
+\end{verbatim}
+
+$nationality[1] = colour[1]$ becomes by counting indices from zero: $nationality[0] = colour[0]$
+\begin{verbatim}
+eq(colour[0], nationality[0])
+\end{verbatim}
+
+There is an implicit all different in the problem which is placed over all the matrices of variables.
+\begin{verbatim}
+alldiff([pets])
+alldiff([smoke])
+alldiff([drink])
+alldiff([nationality])
+alldiff([colour])
+
+**EOF**
+\end{verbatim}
+
+
+\section{N-Queens}
+N-Queens is perhaps the most famous problem in CP. It is often used to demonstrate systems. It is stated as  the problem of putting $n$ chess queens on an $n \times n$ chessboard such that none of them is able to capture any other using the standard chess queen's moves. The model we will discuss here is the column model, where there is one variable of domain 1, .. n for each row,  which is the easiest model to describe. We will look at the version where $n=4$ as this has a reasonably small number of constraints to  These files can be found in /summer\_school/examples the Essence' file is NQueensColumn.eprime and the Minion file is NQueensColumn.minion. The Essence' specification is as follows:
+
+\begin{verbatim}
+given n: int
+find queens: matrix indexed by [int(1..n)] of int(1..n)
+
+such that
+
+forall i : int(1..n). forall j : int(i+1..n).
+ |queens[i] - queens[j]| != |i - j|,
+ alldiff(queens),
+
+letting n be 4
+\end{verbatim}
+
+The Minion model is then: 
+\begin{verbatim}
+MINION 3
+\end{verbatim}
+
+There are 4 variables, each of which represents a column of the chess board. This instance is of a $4 \times 4$ chessboard so there are 4 variables stored in a matrix called queens with domain $\{1,\ldots ,4\}$.  There are two auxiliary variables for each of the 6 diagonal constraints, one with domain $\{-3, \ldots ,3\}$ and one with domain $\{0, \ldots ,3\}$.
+
+\begin{verbatim}
+**VARIABLES**
+DISCRETE queens[4] {1..4}
+
+# auxiliary variables
+DISCRETE aux0 {-3..3}
+DISCRETE aux1 {0..3}
+DISCRETE aux2 {-3..3}
+DISCRETE aux3 {0..3}
+DISCRETE aux4 {-3..3}
+DISCRETE aux5 {0..3}
+DISCRETE aux6 {-3..3}
+DISCRETE aux7 {0..3}
+DISCRETE aux8 {-3..3}
+DISCRETE aux9 {0..3}
+DISCRETE aux10 {-3..3}
+DISCRETE aux11 {0..3}
+\end{verbatim}
+
+The variable order branches on each of the matrice variables in turn then on the auxiliary variables. Only the matrice of variables is printed.
+\begin{verbatim}
+**SEARCH**
+
+PRINT [queens]
+
+VARORDER [queens,
+aux0,aux1,aux2,aux3,aux4,aux5,aux6,aux7,
+aux8,aux9,aux10,aux11]
+\end{verbatim}
+
+There is an all different constraint on the queens variables. This ensures that two queens cannot be put in the same row. The other constraints stop two queens being placed on a diagonal. These diagonal constraints are all of the form $|queens[i] - queens[j]| \ne |i - j|$.  This is decomposed into the following: $queens[i] - queens[j] = auxa$, $|auxa| = auxb$ and $auxb \ne constant$.  As minion has no weighted sum equals the constraint is broken into a weighted sum less than or equals to and weighted sum greater than or equals to. So this full constraint $queens[i] - queens[j] = auxa$  is represented as $queens[i] - queens[j] \leq auxa$ and $queens[i] - queens[j] \geq auxa$.
+
+\begin{verbatim}
+**CONSTRAINTS**
+
+weightedsumgeq([1,-1], [queens[2],queens[3]], aux0)
+weightedsumleq([1,-1], [queens[2],queens[3]], aux0)
+abs(aux1,aux0)
+weightedsumgeq([1,-1], [queens[1],queens[3]], aux2)
+weightedsumleq([1,-1], [queens[1],queens[3]], aux2)
+abs(aux3,aux2)
+weightedsumgeq([1,-1], [queens[1],queens[2]], aux4)
+weightedsumleq([1,-1], [queens[1],queens[2]], aux4)
+abs(aux5,aux4)
+diseq(2, aux3)
+weightedsumgeq([1,-1], [queens[0],queens[3]], aux6)
+weightedsumleq([1,-1], [queens[0],queens[3]], aux6)
+abs(aux7,aux6)
+weightedsumgeq([1,-1], [queens[0],queens[2]], aux8)
+weightedsumleq([1,-1], [queens[0],queens[2]], aux8)
+abs(aux9,aux8)
+weightedsumgeq([1,-1], [queens[0],queens[1]], aux10)
+weightedsumleq([1,-1], [queens[0],queens[1]], aux10)
+abs(aux11,aux10)
+diseq(3, aux7)
+diseq(2, aux9)
+diseq(1, aux1)
+diseq(1, aux5)
+diseq(1, aux11)
+alldiff([queens])
+
+**EOF**
+\end{verbatim}
+
+\appendix
+\chapter{All the Minion programming constructs}
+You are viewing documentation for minion. The same 
+documentation is available from a minion executable by 
+typing \texttt{minion help} at the command line.
+We intend that the command line help system be the 
+main source of documentation for the system.
+
+Each of the entries below concerns a different aspect
+of the system, and the entries are arranged hierarchically.
+For example to view information about the set of available
+constraints as a whole view ``constraints'' and to view
+specific information about the alldiff constraint view 
+``constraints alldiff''.
+
+A good place to start would be viewing the 
+``input example'' entry which exhibits a complete
+example of a minion input file.
+
+Usage: \texttt{minion [switches] [minion input file]}
+
+\section{constraints}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Minion supports many constraints and these are regularly being
+improved and added to. In some cases multiple implementations of the
+same constraints are provided and we would appreciate additional
+feedback on their relative merits in your problem.
+
+Minion does not support nesting of constraints, however this can be
+achieved by auxiliary variables and reification.
+
+Variables can be replaced by constants. You can find out more on
+expressions for variables, vectors, etc. in the section on variables.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help variables
+\end{verbatim}
+}
+\section{constraints alldiff}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Forces the input vector of variables to take distinct values.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+Suppose the input file had the following vector of variables defined:
+
+DISCRETE myVec[9] {1..9}
+
+To ensure that each variable takes a different value include the
+following constraint:
+
+alldiff(myVec)
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+Enforces the same level of consistency as a clique of not equals 
+constraints.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See
+
+   help constraints gacalldiff
+
+for the same constraint that enforces GAC.
+\end{verbatim}
+}
+\section{constraints difference}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   difference(x,y,z)
+
+ensures that z=|x-y| in any solution.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This constraint can be expressed in a much longer form, this form both avoids
+requiring an extra variable, and also gets better propagation. It gets bounds
+consistency.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\section{constraints diseq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Constrain two variables to take different values.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+Achieves arc consistency.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+diseq(v0,v1)
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\section{constraints div}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+ 
+   div(x,y,z)
+
+ensures that floor(x/y)=z.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This constraint is only available for positive domains x, y and z.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints modulo
+\end{verbatim}
+}
+\section{constraints element}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint 
+
+   element(vec, i, e)
+
+specifies that, in any solution, vec[i] = e and i is in the range 
+[0 .. |vec|-1].
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+
+Warning: This constraint is not confluent. Depending on the order the
+propagators are called in Minion, the number of search nodes may vary when
+using element. To avoid this problem, use watchelement instead. More details
+below.
+
+The level of propagation enforced by this constraint is not named, however it
+works as follows. For constraint vec[i]=e:
+
+- After i is assigned, ensures that min(vec[i]) = min(e) and 
+  max(vec[i]) = max(e).
+
+- When e is assigned, removes idx from the domain of i whenever e is not an
+  element of the domain of vec[idx].
+
+- When m[idx] is assigned, removes idx from i when m[idx] is not in the domain
+  of e.
+
+This level of consistency is designed to avoid the propagator having to scan
+through vec, except when e is assigned. It does a quantity of cheap propagation
+and may work well in practise on certain problems.
+
+Element is not confluent, which may cause the number of search nodes to vary
+depending on the order in which constraints are listed in the input file, or 
+the order they are called in Minion. For example, the following input causes
+Minion to search 41 nodes.
+
+MINION 3
+**VARIABLES**
+DISCRETE x[5] {1..5}
+**CONSTRAINTS**
+element([x[0],x[1],x[2]], x[3], x[4])
+alldiff([x])
+**EOF**
+
+However if the two constraints are swapped over, Minion explores 29 nodes.
+As a rule of thumb, to get a lower node count, move element constraints
+to the end of the list.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See the entry 
+
+   constraints watchelement
+
+for details of an identical constraint that enforces generalised arc
+consistency.
+\end{verbatim}
+}
+\section{constraints element\textunderscore one}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint element one is identical to element, except that the
+vector is indexed from 1 rather than from 0.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See
+
+   help constraints element
+
+for details of the element constraint which is almost identical to this
+one.
+\end{verbatim}
+}
+\section{constraints eq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Constrain two variables to take equal values.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+eq(x0,x1)
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+Achieves bounds consistency.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\paragraph{Reference}
+{\footnotesize
+\begin{verbatim}
+help constraints minuseq
+\end{verbatim}
+}
+\section{constraints gacalldiff}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Forces the input vector of variables to take distinct values.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+Suppose the input file had the following vector of variables defined:
+
+DISCRETE myVec[9] {1..9}
+
+To ensure that each variable takes a different value include the
+following constraint:
+
+gacalldiff(myVec)
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This constraint enforces generalized arc consistency.
+\end{verbatim}
+}
+\section{constraints gcc}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The Generalized Cardinality Constraint (GCC) constrains the number of each value
+that a set of variables can take.
+
+gcc([primary variables], [capacity variables])
+
+For each value in the initial domains of the primary variables, there must be 
+a capacity variable. 
+
+For example, if the union of the initial domains of the primary variables is
+{-5,-3,-1,0,2,3,5} then there would be 11 capacity variables, specifying the
+number of occurrences of each value in the interval [-5 ... 5].
+
+This constraint is new, and its syntax and implementation are not finalised.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+Suppose the input file had the following vectors of variables defined:
+
+DISCRETE myVec[9] {1..9}
+BOUND cap[9] {0..2}
+
+The following constraint would restrict the occurrence of values 1..9 in myVec
+to be at most 2 each initially, and finally equal to the values of the cap
+vector.
+
+gcc(myVec, cap)
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This constraint enforces a hybrid consistency. It reads the bounds of the
+capacity variables, then enforces GAC over the primary variables only.  Then the
+bounds of the capacity variables are updated by counting values in the domains
+of the primary variables.
+\end{verbatim}
+}
+\section{constraints hamming}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   hamming(X,Y,c)
+
+ensures that the hamming distance between X and Y is c. That is, that
+c is the size of the set {i | X[i] != y[i]}
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\section{constraints ineq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   ineq(x, y, k)
+
+ensures that 
+
+   x <= y + k 
+
+in any solution.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+Minion has no strict inequality (<) constraints. However x < y can be
+achieved by
+
+   ineq(x, y, -1)
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\section{constraints lexleq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   lexleq(vec0, vec1)
+
+takes two vectors vec0 and vec1 of the same length and ensures that
+vec0 is lexicographically less than or equal to vec1 in any solution.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This constraints achieves GAC.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See also
+
+   help constraints lexless
+
+for a similar constraint with strict lexicographic inequality.
+\end{verbatim}
+}
+\section{constraints lexless}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   lexless(vec0, vec1)
+
+takes two vectors vec0 and vec1 of the same length and ensures that
+vec0 is lexicographically less than vec1 in any solution.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This constraint maintains GAC.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See also
+
+   help constraints lexleq
+
+for a similar constraint with non-strict lexicographic inequality.
+\end{verbatim}
+}
+\section{constraints litsumgeq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint litsumgeq(vec1, vec2, c) ensures that there exists at least c
+distinct indices i such that vec1[i] = vec2[i].
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+A SAT clause {x,y,z} can be created using:
+
+   litsumgeq([x,y,z],[1,1,1],1)
+
+Note also that this constraint is more efficient for smaller values of c. For
+large values consider using watchsumleq.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See also
+
+   help constraints watchsumleq
+   help constraints watchsumgeq
+\end{verbatim}
+}
+\section{constraints max}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   max(vec, x)
+
+ensures that x is equal to the maximum value of any variable in vec.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See
+
+   help constraints min
+
+for the opposite constraint.
+\end{verbatim}
+}
+\section{constraints min}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   min(vec, x)
+
+ensures that x is equal to the minimum value of any variable in vec.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See
+
+   help constraints max
+
+for the opposite constraint.
+\end{verbatim}
+}
+\section{constraints minuseq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Constraint
+
+   minuseq(x,y)
+
+ensures that x=-y.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{Reference}
+{\footnotesize
+\begin{verbatim}
+help constraints eq
+\end{verbatim}
+}
+\section{constraints modulo}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+ 
+   modulo(x,y,z)
+
+ensures that x%y=z i.e. z is the remainder of dividing x by y.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This constraint is only available for positive domains x, y and z.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints div
+\end{verbatim}
+}
+\section{constraints occurrence}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   occurrence(vec, elem, count)
+
+ensures that there are count occurrences of the value elem in the
+vector vec.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+elem must be a constant, not a variable.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints occurrenceleq
+help constraints occurrencegeq
+\end{verbatim}
+}
+\section{constraints occurrencegeq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   occurrencegeq(vec, elem, count)
+
+ensures that there are AT LEAST count occurrences of the value elem in
+the vector vec.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+elem and count must be constants
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints occurrence
+help constraints occurrenceleq
+\end{verbatim}
+}
+\section{constraints occurrenceleq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   occurrenceleq(vec, elem, count)
+
+ensures that there are AT MOST count occurrences of the value elem in
+the vector vec.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+elem and count must be constants
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints occurrence
+help constraints occurrencegeq
+\end{verbatim}
+}
+\section{constraints pow}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+ 
+   pow(x,y,z)
+
+ensures that x^y=z.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This constraint is only available for positive domains x, y and z.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\section{constraints product}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   product(x,y,z)
+
+ensures that z=xy in any solution.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This constraint can be used for (and, in fact, has a specialised
+implementation for) achieving boolean AND, i.e. x & y=z can be modelled
+as
+
+   product(x,y,z)
+
+The general constraint achieves bounds generalised arc consistency for
+positive numbers.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\section{constraints reification}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Reification is provided in two forms: reify and reifyimply.
+
+   reify(constraint, r) where r is a 0/1 var
+
+ensures that r is set to 1 if and only if constraint is satisfied. That is, if r
+is 0 the constraint must NOT be satisfied; and if r is 1 it must be satisfied as
+normal. Conversely, if the constraint is satisfied then r must be 1, and if not
+then r must be 0.
+
+   reifyimply(constraint, r)
+
+only checks that if r is set to 1 then constraint must be satisfied. If r is not
+1, constraint may be either satisfied or unsatisfied. Furthermore r is never set
+by propagation, only by search; that is, satisfaction of constraint does not
+affect the value of r.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+Not all constraints are reifiable. Entries for individual constraints give
+more information.
+\end{verbatim}
+}
+\section{constraints reify}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See
+   help constraints reification
+\end{verbatim}
+}
+\section{constraints reifyimply}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See
+   help constraints reification
+\end{verbatim}
+}
+\section{constraints sumgeq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   sumgeq(vec, c)
+
+ensures that sum(vec) >= c.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constrait is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\section{constraints sumleq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   sumleq(vec, c)
+
+ensures that sum(vec) <= c.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constrait is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\section{constraints table}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+An extensional constraint that enforces GAC. The constraint is
+specified via a list of tuples.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+To specify a constraint over 3 variables that allows assignments
+(0,0,0), (1,0,0), (0,1,0) or (0,0,1) do the following.
+
+1) Add a tuplelist to the **TUPLELIST** section, e.g.:
+
+**TUPLELIST**
+myext 4 3
+0 0 0
+1 0 0
+0 1 0
+0 0 1
+
+N.B. the number 4 is the number of tuples in the constraint, the 
+number 3 is the -arity.
+
+2) Add a table constraint to the **CONSTRAINTS** section, e.g.:
+
+**CONSTRAINTS**
+table(myvec, myext)
+
+and now the variables of myvec will satisfy the constraint myext.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+The constraints extension can also be specified in the constraint
+definition, e.g.:
+
+table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help input tuplelist
+\end{verbatim}
+}
+\section{constraints watchelement}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint 
+
+   watchelement(vec, i, e)
+
+specifies that, in any solution, vec[i] = e and i is in the range 
+[0 .. |vec|-1].
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+Enforces generalised arc consistency.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See entry
+
+   help constraints element
+
+for details of an identical constraint that enforces a lower level of
+consistency.
+\end{verbatim}
+}
+\section{constraints watchelement\textunderscore one}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+This constraint is identical to watchelement, except the vector
+is indexed from 1 rather than from 0.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See entry
+
+   help constraints watchelement
+
+for details of watchelement which watchelement_one is based on.
+\end{verbatim}
+}
+\section{constraints watchsumgeq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+For this constraint, small values of c are more efficient.
+
+Equivalent to litsumgeq(vec, [1,...,1], c), but faster.
+
+This constraint works on 0/1 variables only.
+\end{verbatim}
+}
+\paragraph{Reifiablity}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See also
+
+   help constraints watchsumleq 
+   help constraints litsumgeq
+\end{verbatim}
+}
+\section{constraints watchsumleq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint watchsumleq(vec, c) ensures that sum(vec) <= c.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+Equivelent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster.
+
+This constraint works on binary variables only.
+
+For this constraint, large values of c are more efficient.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See also
+
+   help constraints watchsumgeq 
+   help constraints litsumgeq
+\end{verbatim}
+}
+\section{constraints watchvecexists\textunderscore and}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   watchvecexists_and(A, B)
+
+ensures that there exists some index i such that A[i] > 0 and B[i] > 0.
+
+For booleans this is the same as 'exists i s.t. A[i] && B[i]'.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\section{constraints watchvecexists\textunderscore less}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   watchvecexists_less(A, B)
+
+ensures that there exists some index i such that A[i] < B[i].
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\section{constraints watchvecneq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   watchvecneq(A, B)
+
+ensures that A and B are not the same vector, i.e., there exists some index i
+such that A[i] != B[i].
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifyimply'able but not reifiable.
+\end{verbatim}
+}
+\section{constraints weightedsumgeq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   weightedsumgeq(constantVec, varVec, total)
+
+ensures that constantVec.varVec >= total, where constantVec.varVec is
+the scalar dot product of constantVec and varVec.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints weightedsumleq
+help constraints sumleq
+help constraints sumgeq
+\end{verbatim}
+}
+\section{constraints weightedsumleq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   weightedsumleq(constantVec, varVec, total)
+
+ensures that constantVec.varVec <= total, where constantVec.varVec is
+the scalar dot product of constantVec and varVec.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+This constraint is reifiable and reifyimply'able.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints weightedsumgeq
+help constraints sumleq
+help constraints sumgeq
+\end{verbatim}
+}
+\section{input}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+
+Minion expects to be provided with the name of an input file as an
+argument. This file contains a specification of the CSP to be solved
+as well as settings that the search process should use. The format is
+
+Minion3Input::= MINION 3
+                <InputSection>+
+                **EOF**
+
+InputSection::= <VariablesSection> 
+              | <SearchSection>
+              | <ConstraintsSection> 
+              | <TuplelistSection>
+
+i.e. 'MINION 3' followed by any number of variable, search,
+constraints and tuplelists sections (can repeat) followed by
+'**EOF**', the end of file marker.
+
+All text from a '#' character to the end of the line is ignored.
+
+See the associated help entries below for information on each section.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+You can give an input file via standard input by specifying '--' as the file
+name, this might help when minion is being used as a tool in a shell script or
+for compressed input, e.g.,
+
+   gunzip -c myinput.minion.gz | minion
+\end{verbatim}
+}
+\section{input constraints}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+
+The constraints section consists of any number of constraint
+declarations on separate lines.
+
+ConstraintsSection::= **CONSTRAINTS**
+                      <ConstraintDeclaration>*
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+**CONSTRAINTS**
+eq(bool,0)
+alldiff(d)
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See help entries for individual constraints under
+
+   help constraints
+
+for details on constraint declarations.
+\end{verbatim}
+}
+\section{input example}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+Below is a complete minion input file with commentary, as an example.
+
+MINION 3
+
+# While the variable section doesn't have to come first, you can't 
+# really do anything until
+# You have one...
+**VARIABLES**
+
+# There are 4 type of variables
+BOOL bool         # Boolean don't need a domain
+BOUND b {1..3}    # Bound vars need a domain given as a range
+DISCRETE d {1..3} # So do discrete vars
+
+#Note: Names are case sensitive!
+
+# Internally, Bound variables are stored only as a lower and upper bound
+# Whereas discrete variables allow any sub-domain
+
+SPARSEBOUND s {1,3,6,7} # Sparse bound variables take a sorted list of values
+
+# We can also declare matrices of variables!
+
+DISCRETE q[3] {0..5} # This is a matrix with 3 variables: q[0],q[1] and q[2]
+BOOL bm[2,2] # A 2d matrix, variables bm[0,0], bm[0,1], bm[1,0], bm[1,1]
+BOOL bn[2,2,2,2] # You can have as many indices as you like!
+
+#The search section is entirely optional
+**SEARCH**
+
+# Note that everything in SEARCH is optional, and can only be given at
+# most once!
+
+# If you don't give an explicit variable ordering, one is generated.
+# These can take matrices in interesting ways like constraints, see below.
+VARORDER [bool,b,d]
+
+# If you don't give a value ordering, 'ascending' is used
+#VALORDER [a,a,a,a]
+
+# You can have one objective function, or none at all.
+MAXIMISING bool
+# MINIMISING x3
+
+# both (MAX/MIN)IMISING and (MAX/MIN)IMIZING are accepted...
+
+
+# Print statement takes a vector of things to print
+
+PRINT [bool, q]
+
+# You can also give:
+# PRINT ALL (the default)
+# PRINT NONE
+
+
+# Declare constraints in this section!
+**CONSTRAINTS**
+
+# Constraints are defined in exactly the same way as in MINION input
+formats 1 & 2
+eq(bool, 0)
+eq(b,d)
+
+# To get a single variable from a matrix, just index it
+eq(q[1],0)
+eq(bn[0,1,1,1], bm[1,1])
+
+# It's easy to get a row or column from a matrix. Just use _ in the
+# indices you want
+# to vary. Just giving a matrix gives all the variables in that matrix.
+
+#The following shows how flattening occurs...
+
+# [bm] == [ bm[_,_] ] == [ bm[0,0], bm[0,1], bm[1,0], bm[1,1] ]
+# [ bm[_,1] ] = [ bm[0,1], bm[1,1] ]
+# [ bn[1,_,0,_] = [ bn[1,0,0,0], b[1,0,0,1], b[1,1,0,0], b[1,1,0,1] ]
+
+# You can string together a list of such expressions!
+
+lexleq( [bn[1,_,0,_], bool, q[0]] , [b, bm, d] )
+
+# One minor problem.. you must always put [ ] around any matrix expression, so
+# lexleq(bm, bm) is invalid
+
+lexleq( [bm], [bm] ) # This is OK!
+
+# Can give tuplelists, which can have names!
+# The input is: <name> <num_of_tuples> <tuple_length> <numbers...>
+# The formatting can be about anything..
+
+**TUPLELIST**
+
+Fred 3 3
+0 2 3
+2 0 3
+3 1 3
+
+Bob 2 2 1 2 3 4
+
+#No need to put everything in one section! All sections can be reopened..
+**VARIABLES**
+
+# You can even have empty sections.. if you want
+
+**CONSTRAINTS**
+
+#Specify tables by their names..
+
+table([q], Fred)
+
+# Can still list tuples explicitally in the constraint if you want at
+# the moment.
+# On the other hand, I might remove this altogether, as it's worse than giving
+# Tuplelists
+
+table([q],{ <0,2,3>,<2,0,3>,<3,1,3> })
+
+#Must end with the **EOF** marker!
+
+**EOF**
+
+Any text down here is ignored, so you can write whatever you like (or
+nothing at all...)
+\end{verbatim}
+}
+\section{input search}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+
+Inside the search section one can specify
+
+- variable orderings, 
+- value orderings,
+- optimisation function, and
+- details of how to print out solutions.
+
+SearchSection::= <VariableOrdering>?
+                 <ValueOrdering>?
+                 <OptimisationFn>?
+                 <PrintFormat>?
+
+In the variable ordering a fixed ordering can be specified on any
+subset of variables. These are the search variables that will be
+instantiated in every solution. If none is specified some other fixed
+ordering of all the variables will be used.
+
+   VariableOrdering::= VARORDER[ <varname>+ ]
+
+The value ordering allows the user to specify an instantiation order
+for the variables involved in the variable order, either ascending (a)
+or descending (d) for each. When no value ordering is specified, the
+default is to use ascending order for every search variable.
+
+   ValueOrdering::= VALORDER[ (a|d)+ ]
+
+To model an optimisation problem the user can specify to minimise
+or maximise a variable's value.
+
+   OptimisationFn::= MAXIMISING <varname>
+                   | MINIMISING <varname>
+
+Finally, the user can control some aspects of the way solutions are
+printed. By default (no PrintFormat specified) all the variables are
+printed in declaration order. Alternatively a custom vector, or ALL
+variables, or no (NONE) variables can be printed. If a matrix or, more
+generally, a tensor is given instead of a vector, it is automatically
+flattened into a vector as described in 'help variables vectors'.
+
+   PrintFormat::= PRINT <vector>
+                | PRINT ALL
+                | PRINT NONE
+\end{verbatim}
+}
+\section{input tuplelist}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+In a tuplelist section lists of allowed tuples for table constraints
+can be specified. This technique is preferable to specifying the
+tuples in the constraint declaration, since the tuplelists can be
+shared between constraints and named for readability.
+
+The required format is
+
+TuplelistSection::= **TUPLELIST**
+                    <Tuplelist>*
+
+Tuplelist::= <name> <num_tuples> <tuple_length> <numbers>+
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+**TUPLELIST**
+AtMostOne 4 3
+0 0 0
+0 0 1
+0 1 0
+1 0 0
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints table
+\end{verbatim}
+}
+\section{input variables}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The variables section consists of any number of variable declarations
+on separate lines.
+
+VariablesSection::= **VARIABLES**
+                    <VarDeclaration>*
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+ **VARIABLES**
+
+BOOL bool                          #boolean var
+BOUND b {1..3}                     #bounds var
+SPARSEBOUND myvar {1,3,4,6,7,9,11} #sparse bounds var
+DISCRETE d[3] {1..3}               #array of discrete vars
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See the help section
+
+   help variables
+
+for detailed information on variable declarations.
+\end{verbatim}
+}
+\section{switches}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Minion supports a number of switches to augment default behaviour.  To
+see more information on any switch, use the help system. The list
+below contains all available switches. For example to see help on
+-quiet type something similar to
+
+   minion help switches -quiet
+
+replacing 'minion' by the name of the executable you're using.
+\end{verbatim}
+}
+\section{switches -X-prop-node}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Allows the user to choose the level of consistency to be enforced
+during search.
+
+See entry 'help switches -preprocess' for details of the available
+levels of consistency.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+To enforce SSAC during search:
+
+   minion -X-prop-node SSAC input.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -preprocess
+\end{verbatim}
+}
+\section{switches -check}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Check solutions for correctness before printing them out.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This option is the default for DEBUG executables.
+\end{verbatim}
+}
+\section{switches -dumptree}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Print out the branching decisions and variable states at each node.
+\end{verbatim}
+}
+\section{switches -findallsols}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Find all solutions and count them. This option is ignored if the
+problem contains any minimising or maximising objective.
+\end{verbatim}
+}
+\section{switches -fullprop}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Disable incremental propagation.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This should always slow down search while producing exactly the same
+search tree.
+
+Only available in a DEBUG executable.
+\end{verbatim}
+}
+\section{switches -nocheck}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Do not check solutions for correctness before printing them out.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+This option is the default on non-DEBUG executables.
+\end{verbatim}
+}
+\section{switches -nodelimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+To stop search after N nodes, do
+
+   minion -nodelimit N myinput.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -timelimit
+help switches -sollimit
+\end{verbatim}
+}
+\section{switches -noprintsols}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Do not print solutions.
+\end{verbatim}
+}
+\section{switches -preprocess}
+\paragraph{}
+{\footnotesize
+\begin{verbatim}
+
+This switch allows the user to choose what level of preprocess is
+applied to their model before search commences.
+
+The choices are:
+
+- GAC 
+- generalised arc consistency (default)
+- all propagators are run to a fixed point
+- if some propagators enforce less than GAC then the model will
+not necessarily be fully GAC at the outset
+
+- SACBounds 
+- singleton arc consistency on the bounds of each variable
+- AC can be achieved when any variable lower or upper bound is a 
+singleton in its own domain
+
+- SAC 
+- singleton arc consistency
+- AC can be achieved in the model if any value is a singleton in
+its own domain
+
+- SSACBounds
+- singleton singleton bounds arc consistency
+- SAC can be achieved in the model when domains are replaced by either
+the singleton containing their upper bound, or the singleton containing
+their lower bound
+
+- SSAC 
+- singleton singleton arc consistency
+- SAC can be achieved when any value is a singleton in its own domain
+
+These are listed in order of roughly how long they take to
+achieve. Preprocessing is a one off cost at the start of search. The
+success of higher levels of preprocessing is problem specific; SAC
+preprocesses may take a long time to complete, but may reduce search
+time enough to justify the cost.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+To enforce SAC before search:
+
+   minion -preprocess SAC myinputfile.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -X-prop-node
+\end{verbatim}
+}
+\section{switches -printsols}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Print solutions.
+\end{verbatim}
+}
+\section{switches -printsolsonly}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Print only solutions and a summary at the end.
+\end{verbatim}
+}
+\section{switches -quiet}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Do not print parser progress.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -verbose
+\end{verbatim}
+}
+\section{switches -randomiseorder}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Randomises the ordering of the decision variables. If the input file
+specifies as ordering it will randomly permute this. If no ordering is
+specified a random permutation of all the variables is used.
+\end{verbatim}
+}
+\section{switches -randomseed}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Set the pseudorandom seed to N. This allows 'random' behaviour to be
+repeated in different runs of minion.
+\end{verbatim}
+}
+\section{switches -sollimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+To stop search after N solutions have been found, do
+
+   minion -sollimit N myinput.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -nodelimit
+help switches -timelimit
+\end{verbatim}
+}
+\section{switches -solsout}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Append all solutionsto a named file.
+Each solution is placed on a line, with no extra formatting.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+To add the solutions of myproblem.minion to mysols.txt do
+
+   minion -solsout mysols.txt myproblem.minion
+\end{verbatim}
+}
+\section{switches -tableout}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Append a line of data about the current run of minion to a named file.
+This data includes minion version information, arguments to the
+executable, build and solve time statistics, etc. See the file itself
+for a precise schema of the supplied information.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+To add statistics about solving myproblem.minion to mystats.txt do
+
+   minion -tableout mystats.txt myproblem.minion
+\end{verbatim}
+}
+\section{switches -timelimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+To stop search after N seconds, do
+
+   minion -timelimit N myinput.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -nodelimit
+help switches -sollimit
+\end{verbatim}
+}
+\section{switches -varorder}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+
+Enable a particular variable ordering for the search process. This
+flag is experimental and minion's default ordering might be faster.
+
+The available orders are:
+
+- sdf - smallest domain first, break ties lexicographically
+
+- sdf-random - sdf, but break ties randomly
+
+- srf - smallest ratio first, chooses unassigned variable with smallest
+  percentage of its initial values remaining, break ties lexicographically
+
+- srf-random - srf, but break ties randomly
+
+- ldf - largest domain first, break ties lexicographically
+
+- ldf-random - ldf, but break ties randomly
+
+- random - random variable ordering
+
+- static - lexicographical ordering
+\end{verbatim}
+}
+\section{switches -verbose}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Print parser progress.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -quiet
+\end{verbatim}
+}
+\section{variables}
+\paragraph{General}
+{\footnotesize
+\begin{verbatim}
+Minion supports 4 different variable types, namely
+
+- 0/1 variables,
+- bounds variables,
+- sparse bounds variables, and
+- discrete variables.
+
+Sub-dividing the variable types in this manner affords the greatest
+opportunity for optimisation. In general, we recommend thinking of the
+variable types as a hierarchy, where 1 (0/1 variables) is the most
+efficient type, and 4 (Discrete variables) is the least. The
+user should use the variable which is the highest in the hierarchy,
+yet encompasses enough information to provide a full model for the
+problem they are attempting to solve.
+
+Minion also supports use of constants in place of variables, and constant
+vectors in place of vectors of variables. Using constants will be at least
+as efficient as using variables when the variable has a singleton domain.
+
+See the entry on vectors for information on how vectors, matrices and,
+more generally, tensors are handled in minion input. See also the
+alias entry for information on how to multiply name variables for
+convenience.
+\end{verbatim}
+}
+\section{variables 01}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+01 variables are used very commonly for logical expressions, and for
+encoding the characteristic functions of sets and relations. Note that
+wherever a 01 variable can appear, the negation of that variable can
+also appear. A boolean variable x's negation is identified by !x.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+Declaration of a 01 variable called bool in input file:
+
+BOOL bool
+
+Use of this variable in a constraint:
+
+eq(bool, 0) #variable bool equals 0
+\end{verbatim}
+}
+\section{variables alias}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Specifying an alias is a way to give a variable another name. Aliases
+appear in the **VARIABLES** section of an input file. It is best
+described using some examples:
+
+ALIAS c = a
+
+ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
+\end{verbatim}
+}
+\section{variables bounds}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Bounds variables, where only the upper and lower bounds of the domain
+are maintained. These domains must be continuous ranges of integers
+i.e. holes cannot be put in the domains of the variables.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+
+Declaration of a bound variable called myvar with domain between 1
+and 7 in input file:
+
+BOUND myvar {1..7}
+
+Use of this variable in a constraint:
+
+eq(myvar, 4) #variable myvar equals 4
+\end{verbatim}
+}
+\section{variables constants}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Minion supports the use of constants anywhere where a variable can be used. For
+example, in a constraint as a replacement for a single variable, or a vector of
+constants as a replacement for a vector of variables.
+\end{verbatim}
+}
+\paragraph{Examples}
+{\footnotesize
+\begin{verbatim}
+Use of a constant:
+
+   eq(x,1)
+
+Use of a constant vector:
+
+   element([10,9,8,7,6,5,4,3,2,1],idx,e) 
+\end{verbatim}
+}
+\section{variables discrete}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+In discrete variables, the domain ranges between the specified lower and upper
+bounds, but during search any domain value may be pruned, i.e., propagation and
+search may punch arbitrary holes in the domain.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+Declaration of a discrete variable x with domain {1,2,3,4} in input file:
+
+DISCRETE x {1..4}
+
+Use of this variable in a constraint:
+
+eq(x, 2) #variable x equals 2
+\end{verbatim}
+}
+\section{variables sparsebounds}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+In sparse bounds variables the domain is composed of discrete values
+(e.g. {1, 5, 36, 92}), but only the upper and lower bounds of the
+domain may be updated during search. Although the domain of these
+variables is not a continuous range, any holes in the domains must be
+there at time of specification, as they can not be added during the
+solving process.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+Declaration of a sparse bounds variable called myvar containing values
+{1,3,4,6,7,9,11} in input file:
+
+SPARSEBOUND myvar {1,3,4,6,7,9,11}
+
+Use of this variable in a constraint:
+eq(myvar, 3) #myvar equals 3
+\end{verbatim}
+}
+\section{variables vectors}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Vectors, matrices and tensors can be declared in minion
+input. Matrices and tensors are for convenience, as constraints do not
+take these as input; they must first undergo a flattening process to
+convert them to a vector before use.
+\end{verbatim}
+}
+\paragraph{Examples}
+{\footnotesize
+\begin{verbatim}
+A vector of 0/1 variables:
+
+BOOL myvec[5]
+
+A matrix of discrete variables:
+
+DISCRETE sudoku[9,9] {1..9}
+
+A 3D tensor of 0/1s:
+
+BOOL mycube[3,3,2]
+
+One can create a vector from scalars and elements of vectors, etc.:
+
+alldiff([x,y,myvec[1],mymatrix[3,4]])
+
+When a matrix or tensor is constrained, it is treated as a vector
+whose entries have been strung out into a vector in index order with
+the rightmost index changing most quickly, e.g.
+
+alldiff(sudoku)
+
+is equivalent to
+
+alldiff([sudoku[0,0],...,sudoku[0,8],...,sudoku[8,0],...,sudoku[8,8]])
+
+Furthermore, with indices filled selectively and the remainder filled
+with underscores (_) the flattening applies only to the underscore
+indices:
+
+alldiff(sudoku[4,_])
+
+is equivalent to
+
+alldiff([sudoku[4,0],...,sudoku[4,8]])
+
+Lastly, one can optionally add square brackets ([]) around an
+expression to be flattened to make it look more like a vector:
+
+alldiff([sudoku[4,_]])
+
+is equivalent to
+
+alldiff(sudoku[4,_])
+\end{verbatim}
+}
+
+
+
+
+\bibliographystyle{plain}
+\bibliography{general}
+
+\end{document}
