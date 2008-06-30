@@ -100,6 +100,8 @@ struct AbsConstraint : public AbstractConstraint
       var2.setMin(-var1.getMax());
       return;
       case 2:
+      if(var2.getMax() < var1.getMin())
+        var2.setMax(-var1.getMin());
       if(var2.getMin() > -var1.getMin())
         var2.setMin(var1.getMin());
       else
