@@ -209,6 +209,8 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
 	  
 	  infile->check_sym(',');
 	  Var reifyVar = readIdentifier(infile);
+	  if(reifyVar.type() != VAR_BOOL)
+      throw parse_exception("Can only reify to a Boolean!");
 	  infile->check_sym(')');
 	  if(constraint->type == CT_REIFY)
 	    instance.last_constraint_reify(reifyVar);
