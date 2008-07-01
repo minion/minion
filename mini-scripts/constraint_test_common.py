@@ -1140,8 +1140,8 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
             constrainttable+="\n"+c
     
     if not fullprop:
-        retval1=runminion(os.getpid()+"infile1.minion", os.getpid()+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline)
-        retval2=runminion(os.getpid()+"infile2.minion", os.getpid()+"outfile2", tablegen.solver, modvars, constraint, opt=optline)
+        retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline)
+        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline)
         if retval1!=0 or retval2!=0:
             print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
             return False
@@ -1150,8 +1150,8 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
             treesame=False
         return comparetrees(treesame)  # tree subset
     else:
-        retval1=runminion(os.getpid()+"infile1.minion", os.getpid()+"outfile1", tablegen.solver, modvars, constraint, opt=optline, cmd="-fullprop")
-        retval2=runminion(os.getpid()+"infile2.minion", os.getpid()+"outfile2", tablegen.solver, modvars, constraint, opt=optline)
+        retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, modvars, constraint, opt=optline, cmd="-fullprop")
+        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline)
         if retval1!=0 or retval2!=0:
             print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
             return False
@@ -1298,6 +1298,8 @@ def comparetrees(same):
     # trees in the child process is returned when the process ends.
     r, w = os.pipe() # these are file descriptors, not file objects
     
+    parentpid=os.getpid()
+
     pid = os.fork()
     if pid:
         # we are the parent
@@ -1315,8 +1317,8 @@ def comparetrees(same):
         tree1=tree()
         tree2=tree()
         
-        tree1.buildtree(os.getpid()+"outfile1")
-        tree2.buildtree(os.getpid()+"outfile2")
+        tree1.buildtree(str(parentpid)+"outfile1")
+        tree2.buildtree(str(parentpid)+"outfile2")
         
         if same:
             temp= tree1.equal(tree2)
