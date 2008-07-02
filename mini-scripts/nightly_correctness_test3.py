@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-# Script to run the nightly correctness testing scripts.# does the 64-bit version in minion-svn3
+# Script to run the nightly correctness testing scripts.# does the 64-bit version in minion-svn1
+# Must run after nightly_correctness_test1.py
 
 from os import *
 from sys import exit
@@ -11,12 +12,12 @@ homedir="/cs/home/rsch/pn/"
 miniondir="minion-svn1/minion"
 
 chdir(homedir+miniondir)   #cd /home/pn/minion-svn/minion
-system("rm Makefile*")   # get rid of stale makefiles that were causing problems.
+#system("rm Makefile*")   # get rid of stale makefiles that were causing problems.
 
 retval=0
-retval+=system("svn update")
-retval+=system("./configure.sh")
-retval+=system("make veryclean")
+#retval+=system("svn update")
+#retval+=system("./configure.sh")
+#retval+=system("make veryclean")
 
 if retval!=0:
     sendemail.mail("An error occurred when checking out or doing make veryclean.")

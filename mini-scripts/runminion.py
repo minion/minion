@@ -5,7 +5,7 @@ import random
 # very simple program, just runs minion on the given minion files, using tableout.
 
 #Get the minion binary, and possibly a filelist and other options.
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "filelist=", "benchdir=", "timelimit=", "tableout=", "nodelimit=", "xgrid"])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "filelist=", "benchdir=", "timelimit=", "tableout=", "nodelimit=", "args=", "xgrid"])
 
 rand=random.randint(0, 1000000)
 minion="bin/minion"
@@ -14,6 +14,7 @@ filelist=[]
 timeout="-timelimit 1200 "
 nodelimit=""
 xgrid=False
+args=""
 
 for (ident, value) in optargs:
     if ident=="--minion":
@@ -34,6 +35,8 @@ for (ident, value) in optargs:
         nodelimit="-nodelimit "+str(value)+" "
     elif ident=="--xgrid":
         xgrid=True
+    elif ident=="--args":
+        args=" "+value+" "
 
 # grab any command line arguments which are minion instance files.
 othercopy=other[:]
@@ -59,7 +62,7 @@ if xgrid:
     os.system("export XGRID_CONTROLLER_PASSWORD=....")
 
 for i in filelist:
-    minioncommand1=minion+" -tableout "+tableout+" "+timeout+nodelimit+" "+i+" >>1."+str(rand)
+    minioncommand1=minion+args+" -tableout "+tableout+" "+timeout+nodelimit+" "+i+" >>1."+str(rand)
     if xgrid:
         minioncommand1="xgrid -job submit "+minioncommand1
     print "Executing command:"+minioncommand1
