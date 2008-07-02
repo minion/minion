@@ -31,5 +31,5 @@ lipo -create temp-mac-intel-build/minion-debug temp-mac-ppc-build/minion-debug -
 checkreturn
 cd release-scripts
 checkreturn
-./make-release.sh mac
+./make-release.sh $1-mac
 checkreturn
