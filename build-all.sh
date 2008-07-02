@@ -1,6 +1,10 @@
 #!/bin/bash
+function checkreturn() { if [[ $? != 0 ]]; then echo Fail; exit 1; fi }
 ./configure.sh
+checkreturn
 make veryclean "$@"
+checkreturn
 make DEBUG=1 BOOST=1 "$@" minion NAME="minion-debug" -j2
+checkreturn
 make minion BOOST=1 "$@"  NAME="minion" -j2
-#make generate "$@" 
+checkreturn
