@@ -4,7 +4,7 @@ function checkreturn() { if [[ $? != 0 ]]; then echo Fail; exit 1; fi }
 checkreturn
 make veryclean "$@"
 checkreturn
-make DEBUG=1 BOOST=1 "$@" minion NAME="minion-debug" -j2
+make DEBUG=1 "$@" minion NAME="minion-debug" -j2
 checkreturn
-make minion BOOST=1 "$@"  NAME="minion" -j2
+make minion "$@"  NAME="minion" -j2
 checkreturn
