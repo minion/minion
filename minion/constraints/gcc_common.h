@@ -102,7 +102,7 @@ struct GCC : public AbstractConstraint
         }
         
         bool flag=bfsmatching_gcc();
-        cout << "matching:"<<flag<<endl;
+        D_DATA(cout << "matching:"<<flag<<endl);
         
         if(!flag)
         {
@@ -191,8 +191,8 @@ struct GCC : public AbstractConstraint
         // the usage[val] of some value is greater than upper[val]. This is impossible
         // in the flow graph, so it must be corrected before we run the algorithm.
         // Some values in the matching are changed to blank (dom_min-1).
-        cout << varvalmatching << endl;
-        cout << usage << endl;
+        D_DATA(cout << varvalmatching << endl);
+        D_DATA(cout << usage << endl);
         for(int valindex=0; valindex<=dom_max-dom_min; valindex++)
         {
             if(usage[valindex]>upper[valindex] && upper[valindex]>=0)
@@ -220,7 +220,7 @@ struct GCC : public AbstractConstraint
             usage=usagebac;
             return false;
         }
-        cout << "Lower:" <<lower<<endl;
+        D_DATA(cout << "Lower:" <<lower<<endl);
         // iterate through the values looking for ones which are below their lower capacity bound. 
         for(int startvalindex=0; startvalindex<numvals; startvalindex++)
         {
@@ -313,8 +313,8 @@ struct GCC : public AbstractConstraint
         
         // now search for augmenting paths for unmatched vars.
         
-        cout << "feasible matching (respects lower & upper bounds)"<<endl;
-        cout << varvalmatching <<endl;
+        D_DATA(cout << "feasible matching (respects lower & upper bounds)"<<endl);
+        D_DATA(cout << varvalmatching <<endl);
         
         // Flip the graph around, so it's like the alldiff case now. 
         // follow an edge in the matching from a value to a variable,
@@ -404,8 +404,8 @@ struct GCC : public AbstractConstraint
             }
         }
         
-        cout << "maximum matching:"<<endl;
-        cout << varvalmatching <<endl;
+        D_DATA(cout << "maximum matching:"<<endl);
+        D_DATA(cout << varvalmatching <<endl);
         
         return true;
     }
