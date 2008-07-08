@@ -1,5 +1,5 @@
 MINION 1
-#TEST SOLCOUNT 262144
+#TEST SOLCOUNT 64
 0
 0
 0
@@ -13,3 +13,6 @@ MINION 1
 0
 objective none
 print all
+
+eq(x1,1)
+eq(x2,1)

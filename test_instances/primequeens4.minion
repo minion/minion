@@ -57,6 +57,8 @@ objective maximising x6
 print m1
 
 eq(x10, 0)
+eq(x1,1)
+eq(x3,0)
 
 alldiff(v0)
 

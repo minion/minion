@@ -1,5 +1,5 @@
 MINION 1
-#TEST SOLCOUNT 18
+#TEST SOLCOUNT 1
 # n=7 e=10 r=7 d=4 density=0.5
 0
 0
@@ -15,6 +15,10 @@ MINION 1
 0
 objective none
 print m0
+
+eq(x0,1)
+eq(x1,0)
+
 table([x5,x3,x4,x1,x2,x0,x6],
 {<0,0,0,0,0,0,0>,
 <0,0,0,0,0,0,2>,

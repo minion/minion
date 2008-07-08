@@ -24,11 +24,11 @@ j=0
 pass=0
 for i in `grep -l "#TEST SOLCOUNT" *.minion`; do
   LOOP=0
-  if grep "#FAIL\|#BUG\|maximising\|minimising" $i &> /dev/null;
+  if grep "#FAIL\|#BUG\|maximising\|minimising\|MAXIMISING\|MINIMISING" $i &> /dev/null;
   then
     echo -n 
   else
-    echo $i
+#    echo $i
     while [ $LOOP -lt $tests ]; do
       j=$(($j + 1));
       

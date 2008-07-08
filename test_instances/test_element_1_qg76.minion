@@ -70,6 +70,10 @@ eq(x28,4)
 
 eq(x35,5)
 
+eq(x2,1)
+
+eq(x3,4)
+
 element(col(m0,0),x0,x36)
 
 element(row(m0,0),x0,x36)
