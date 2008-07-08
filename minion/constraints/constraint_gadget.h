@@ -122,7 +122,6 @@ struct GadgetConstraint : public AbstractConstraint
   void do_prop()
   { 
     D_ASSERT(!getState(gadget_stateObj).isFailed());
-    getVars(gadget_stateObj).getBigRangevarContainer().bms_array.before_branch_left();
     Controller::world_push(gadget_stateObj);
     
     for(int i = 0; i < var_array.size(); ++i)

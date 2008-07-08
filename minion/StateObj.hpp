@@ -49,7 +49,7 @@ public:
   StateObj() :
     searchMem_m(new Memory),
     options_m(new SearchOptions),
-    state_m(),
+    state_m(this),
     queues_m(new Queues(this)),
     triggerMem_m(new TriggerMem(this)),
     varContainer_m(new VariableContainer(this)),
@@ -88,7 +88,7 @@ struct StateObj {};
 VARDEF(StateObj _noreenter_stateObj);
 VARDEF(Memory searchMem_m);
 VARDEF(SearchOptions options_m);
-VARDEF(SearchState state_m);
+VARDEF_ASSIGN(SearchState state_m, &_noreenter_stateObj);
 VARDEF_ASSIGN(Queues queues_m, &_noreenter_stateObj);
 VARDEF_ASSIGN(TriggerMem triggerMem_m, &_noreenter_stateObj);
 VARDEF_ASSIGN(VariableContainer varContainer_m, &_noreenter_stateObj);

@@ -34,16 +34,20 @@
 // types for SearchState, simply that they exist.
 class AbstractConstraint;
 class AnyVarRef;
-
+class StateObj;
 
 class SearchState
 {
+  StateObj* stateObj;
   unsigned long long nodes;
   AnyVarRef* optimise_var;
   DomainInt current_optimise_position;
   bool optimise;
   
   vector<AbstractConstraint*> constraints;
+  
+  vector<set<AbstractConstraint*> > constraints_to_propagate;
+  
 #ifdef DYNAMICTRIGGERS
   vector<AbstractConstraint*> dynamic_constraints;
 #endif
@@ -68,6 +72,9 @@ class SearchState
     
 public:
 
+  vector<set<AbstractConstraint*> >& getConstraintsToPropagate()
+  { return constraints_to_propagate; }
+  
   unsigned long long getNodeCount() { return nodes; }
   void setNodeCount(unsigned long long _nodes) { nodes = _nodes; }
   void incrementNodeCount() { nodes++; }
@@ -83,6 +90,9 @@ public:
   
   void addConstraint(AbstractConstraint* c);
   vector<AbstractConstraint*>& getConstraintList() { return constraints; }
+  
+  void addConstraintMidsearch(AbstractConstraint* c);
+  void redoFullPropagate(AbstractConstraint* c);
   
   long long int getSolutionCount() { return solutions; }
   void setSolutionCount(long long int _sol) { solutions = _sol; }
@@ -117,8 +127,10 @@ public:
   void setTupleListContainer(shared_ptr<TupleListContainer> _tupleList) 
   { tupleListContainer = _tupleList; }
                           
-  SearchState() : nodes(0), optimise_var(NULL), current_optimise_position(0), optimise(false), solutions(0),
-	dynamic_triggers_used(false), finished(false), failed(false), tupleListContainer(NULL), is_locked(false),
+  SearchState(StateObj* _stateObj) : stateObj(_stateObj), nodes(0), optimise_var(NULL), 
+  current_optimise_position(0), optimise(false), solutions(0),
+	dynamic_triggers_used(false), finished(false), failed(false), 
+	tupleListContainer(NULL), is_locked(false),
 	alarm_trigger(false), ctrl_c_pressed(false)
   {}
   

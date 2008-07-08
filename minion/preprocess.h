@@ -13,7 +13,6 @@
 template<typename Var, typename Vars, typename Prop>
 bool inline check_fail(StateObj* stateObj, Var& var, DomainInt val, Vars& vars, Prop prop)
 {
-  getVars(stateObj).getBigRangevarContainer().bms_array.before_branch_left();
   Controller::world_push(stateObj);
   var.propagateAssign(val);
   prop(stateObj, vars);
