@@ -29,10 +29,9 @@
 The Generalized Cardinality Constraint (GCC) constrains the number of each value
 that a set of variables can take.
 
-gcc([primary variables], [capacity variables])
+gcc([primary variables], [values of interest], [capacity variables])
 
-For each value in the initial domains of the primary variables, there must be 
-a capacity variable. 
+For each value of interest, there must be a capacity variable. 
 
 For example, if the union of the initial domains of the primary variables is
 {-5,-3,-1,0,2,3,5} then there would be 11 capacity variables, specifying the
@@ -65,17 +64,13 @@ bounds of the capacity variables are updated by counting values in the domains
 of the primary variables.
 */
 
-
-
-
 #include "gcc_common.h"
 
 template<typename VarArray1, typename VarArray2>
 AbstractConstraint*
-GlobalCardCon(StateObj* stateObj, const VarArray1& var_array, const VarArray2& cap_array)
-{ return new GCC<VarArray1, VarArray2>(stateObj, var_array, cap_array); }
-
-BUILD_CONSTRAINT2(CT_GCC, GlobalCardCon)
+GlobalCardCon(StateObj* stateObj, const VarArray1& var_array, const VarArray2& cap_array, ConstraintBlob& b)
+{ return new GCC<VarArray1, VarArray2>(stateObj, var_array, cap_array, b); }
 
 
+BUILD_CONSTRAINT2_WITH_BLOB(CT_GCC, GlobalCardCon)
 
