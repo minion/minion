@@ -921,6 +921,7 @@ class testpow:
     
 class testgcc:
     def printtable(self, domains):
+        vals=self.constants
         cross=[]
         x=domains[:len(domains)/2]
         cap=domains[len(domains)/2:]
@@ -929,9 +930,11 @@ class testgcc:
         dom_min=min([min(y) for y in x])
         out=[]
         for line in cross:
-            occ=[0 for y in x]
+            occ=[0 for y in vals]
             for xi in line:
-                occ[xi-dom_min]+=1
+                for i in range(len(vals)):
+                    if vals[i]==xi:
+                        occ[i]+=1
             flag=True
             for i in range(len(occ)):
                 if occ[i] not in cap[i]:
@@ -942,9 +945,9 @@ class testgcc:
         
     def runtest(self, options=dict()):
         if options['reifyimply'] or options['reify']:
-            return runtestgeneral("gcc", False, options, [4,4], ["verysmallnum","smallnum"], [4,4], self, False)
+            return runtestgeneral("gcc", False, options, [4,4,4], ["verysmallnum","smallconst","smallnum"], [4,4,4], self, False)
         else:
-            return runtestgeneral("gcc", False, options, [5,5], ["smallnum","num"], [5,5], self, False)
+            return runtestgeneral("gcc", False, options, [5,5,5], ["smallnum","smallconst", "num"], [5,5,5], self, False)
     
 ################################################################################
 # 
