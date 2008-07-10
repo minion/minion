@@ -24,6 +24,21 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;abs Description
+The constraint
+
+   abs(x,y)
+
+makes sure that x=|y|, i.e. x is the absolute value of y.
+*/
+
+/** @help constraints;abs Reifiability
+This constraint is reifyimply'able but not reifiable.
+*/
+
+/** @help constraints;abs Reference
+help constraints abs
+*/
 
 // X = abs(Y)
 template<typename AbsVarRef1, typename AbsVarRef2>
@@ -95,11 +110,11 @@ struct AbsConstraint : public AbstractConstraint
     PROP_INFO_ADDONE(Abs);
     switch(i)
     {
-      case 1:
+    case 1: //var1 upper
       var2.setMax(var1.getMax());
       var2.setMin(-var1.getMax());
       return;
-      case 2:
+    case 2: //var1 lower
       if(var2.getMax() < var1.getMin())
         var2.setMax(-var1.getMin());
       if(var2.getMin() > -var1.getMin())
@@ -107,8 +122,8 @@ struct AbsConstraint : public AbstractConstraint
       else
         var2.setMin(-var1.getMax());
       return;
-      case 3: 
-      case 4: 
+    case 3: //var 2 upper
+    case 4: //var 2 lower
       var1.setMax(absmax(var2.getMin(), var2.getMax()));
       var1.setMin(absmin(var2.getMin(), var2.getMax()));  
       if(var2.getMin() > -var1.getMin())
