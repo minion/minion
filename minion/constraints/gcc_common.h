@@ -211,11 +211,7 @@ struct GCC : public AbstractConstraint
         }
         
         bool flag=bfsmatching_gcc();
-<<<<<<< .mine
         GCCPRINT("matching:"<<flag);
-=======
-        D_DATA(cout << "matching:"<<flag<<endl);
->>>>>>> .r1630
         
         if(!flag)
         {
@@ -430,13 +426,7 @@ struct GCC : public AbstractConstraint
         // the usage[val] of some value is greater than upper[val]. This is impossible
         // in the flow graph, so it must be corrected before we run the algorithm.
         // Some values in the matching are changed to blank (dom_min-1).
-<<<<<<< .mine
         for(int valsccindex=0; valsccindex<vals_in_scc.size(); valsccindex++)
-=======
-        D_DATA(cout << varvalmatching << endl);
-        D_DATA(cout << usage << endl);
-        for(int valindex=0; valindex<=dom_max-dom_min; valindex++)
->>>>>>> .r1630
         {
             int valindex=vals_in_scc[valsccindex]-dom_min;
             if(usage[valindex]>upper[valindex] && upper[valindex]>=0)
@@ -454,21 +444,6 @@ struct GCC : public AbstractConstraint
             }
         }
         
-<<<<<<< .mine
-=======
-        int lowertotal=0;   // add up lower bounds
-        for(int i=0; i<dom_max-dom_min; i++)
-        {
-            lowertotal+=lower[i];
-        }
-        if(lowertotal>numvars)
-        {
-            varvalmatching=matchbac;
-            usage=usagebac;
-            return false;
-        }
-        D_DATA(cout << "Lower:" <<lower<<endl);
->>>>>>> .r1630
         // iterate through the values looking for ones which are below their lower capacity bound. 
         for(int startvalsccindex=0; startvalsccindex<vals_in_scc.size(); startvalsccindex++)
         {
@@ -563,12 +538,7 @@ struct GCC : public AbstractConstraint
         
         // now search for augmenting paths for unmatched vars.
         
-<<<<<<< .mine
         GCCPRINT("feasible matching (respects lower & upper bounds):"<<varvalmatching);
-=======
-        D_DATA(cout << "feasible matching (respects lower & upper bounds)"<<endl);
-        D_DATA(cout << varvalmatching <<endl);
->>>>>>> .r1630
         
         // Flip the graph around, so it's like the alldiff case now. 
         // follow an edge in the matching from a value to a variable,
@@ -656,13 +626,7 @@ struct GCC : public AbstractConstraint
             }
         }
         
-<<<<<<< .mine
         GCCPRINT("maximum matching:" << varvalmatching);
-=======
-        D_DATA(cout << "maximum matching:"<<endl);
-        D_DATA(cout << varvalmatching <<endl);
-        
->>>>>>> .r1630
         return true;
     }
     
