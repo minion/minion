@@ -29,8 +29,8 @@ The constraint
 
    hamming(X,Y,c)
 
-ensures that the hamming distance between X and Y is c. That is, that
-c is the size of the set {i | X[i] != y[i]}
+ensures that the hamming distance between X and Y is at least c. That is, that
+the size of the set {i | X[i] != y[i]} is greater than or equal to c.
 */
 
 /** @help constraints;hamming Reifiability
