@@ -260,10 +260,10 @@ struct GACTableConstraint : public AbstractConstraint
 };
 
 
-template<typename VarArray>
-AbstractConstraint*
-GACTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
-{ return new GACTableConstraint<VarArray, 0>(stateObj, vars, tuples); }
+//template<typename VarArray>
+//AbstractConstraint*
+//GACTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
+//{ return new GACTableConstraint<VarArray, 0>(stateObj, vars, tuples); }
 
 template<typename VarArray>
 AbstractConstraint*
@@ -271,10 +271,5 @@ GACNegativeTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
 { return new GACTableConstraint<VarArray, 1>(stateObj, vars, tuples); }
 
 
-inline TupleTrieArray* TupleList::getTries()
-{
-  if(triearray == NULL)
-    triearray = new TupleTrieArray(this);
-  return triearray;
-}
+
 

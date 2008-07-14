@@ -657,7 +657,6 @@ public:
   }
 };
 
-void print_instance(ostringstream& oss, CSPInstance& csp);
 }
 
 

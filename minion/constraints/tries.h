@@ -24,6 +24,8 @@ $Id$
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef _TRIES_H_INCLUDE_15243
+#define _TRIES_H_INCLUDE_15243
 
 #include <numeric>
 
@@ -353,6 +355,9 @@ struct TupleTrie
   template<typename VarArray>
     int nextSupportingTuple(DomainInt domain_val, const VarArray& _vars, TrieObj** obj_list)
   {
+    if(trie_data == NULL)
+      return -1;
+      
 	VarArray& vars = const_cast<VarArray&>(_vars);
 	  
     if(obj_list[0] == NULL)
@@ -452,3 +457,4 @@ public:
   }
 };
 
+#endif

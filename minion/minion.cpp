@@ -35,6 +35,7 @@
 
 #include "system/defined_macros.h"
 
+#include "print_CSP.h"
 
 /** @help switches Description 
 Minion supports a number of switches to augment default behaviour.  To
@@ -368,8 +369,8 @@ try {
   if(getOptions(stateObj).redump)
   {
     ostringstream file;
-    print_instance(file, instance);
-    cout << file.str();
+    MinionInstancePrinter printer(instance);
+    cout << printer.getInstance();
     exit(0);
   }
   

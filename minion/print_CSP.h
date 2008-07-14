@@ -5,16 +5,27 @@
 namespace ProbSpec
 {
   
-void print_instance(ostringstream& oss, const int& i, const CSPInstance& csp)
+struct MinionInstancePrinter
+{
+  ostringstream oss;
+  CSPInstance& csp;
+  
+  MinionInstancePrinter(CSPInstance& _csp) : csp(_csp)
+    { print_instance(); }
+    
+  string getInstance()
+  { return oss.str(); }
+  
+void print_instance(const int& i)
 { oss << i; }
   
-void print_instance(ostringstream& oss, const string& s, const CSPInstance& csp)
+void print_instance(const string& s)
 { oss << s; }
 
-void print_instance(ostringstream& oss, const Var& var, const CSPInstance& csp)
+void print_instance(const Var& var)
 { 
   if(var.type() == VAR_CONSTANT)
-    print_instance(oss, var.pos(), csp);
+    print_instance( var.pos());
   else
     oss << csp.vars.getName(var); 
 }
@@ -22,22 +33,22 @@ void print_instance(ostringstream& oss, const Var& var, const CSPInstance& csp)
 
 
 template<typename T>
-void print_instance(ostringstream& oss, const vector<T>& vars, const CSPInstance& csp, char start = '[', char end = ']')
+void print_instance( const vector<T>& vars, char start = '[', char end = ']')
 {
   oss << start;
   if(!vars.empty())
   {
-    print_instance(oss, vars[0], csp);
+    print_instance( vars[0]);
     for(int i = 1; i < vars.size(); ++i)
     {
       oss << ",";
-      print_instance(oss, vars[i], csp);
+      print_instance( vars[i]);
     }
   }
   oss << end;
 }
 
-void print_instance(ostringstream& oss, const ConstraintBlob& blob, const CSPInstance& csp)
+void print_instance(const ConstraintBlob& blob)
 {
     
   if(blob.reified)
@@ -64,23 +75,23 @@ void print_instance(ostringstream& oss, const ConstraintBlob& blob, const CSPIns
     switch(blob.constraint->read_types[i])
   	{
   	  case read_list:
-        print_instance(oss, blob.vars[var_pos++], csp);
+        print_instance( blob.vars[var_pos++]);
   		break;
   	  case read_var:
-        print_instance(oss, blob.vars[var_pos++][0], csp);
+        print_instance( blob.vars[var_pos++][0]);
   		break;
   	  case read_2_vars:
   	  {
-        print_instance(oss, blob.vars[var_pos][0], csp);
+        print_instance( blob.vars[var_pos][0]);
         oss << ",";
-        print_instance(oss, blob.vars[var_pos++][1], csp);
+        print_instance( blob.vars[var_pos++][1]);
   	  }
   		break;
   	  case read_constant:
-        print_instance(oss, blob.constants[const_pos++][0], csp);
+        print_instance( blob.constants[const_pos++][0]);
   		break;
   	  case read_constant_list:
-        print_instance(oss, blob.constants[const_pos++], csp);
+        print_instance( blob.constants[const_pos++]);
   		break;  
       case read_tuples:
         oss << csp.getTableName(blob.tuples);
@@ -96,18 +107,18 @@ void print_instance(ostringstream& oss, const ConstraintBlob& blob, const CSPIns
   if(blob.reified || blob.implied_reified)
   {
     oss << ", ";
-    print_instance(oss, blob.reify_var, csp);
+    print_instance( blob.reify_var);
     oss << " )";
   }
   oss << endl;  
 }
   
-void print_instance(ostringstream& oss, const VarContainer& vars, const CSPInstance& csp)
+void print_instance(const VarContainer& vars)
 { 
   for(int i = 0; i < vars.BOOLs; ++i)
   {  
     oss << "BOOL ";
-    print_instance(oss, Var(VAR_BOOL, i), csp);
+    print_instance( Var(VAR_BOOL, i));
     oss << endl;
   }
     
@@ -118,7 +129,7 @@ void print_instance(ostringstream& oss, const VarContainer& vars, const CSPInsta
     for(int i = 0; i < vars.bound[x].first; ++i)
     {
       oss << "BOUND ";
-      print_instance(oss, Var(VAR_BOUND, i + bound_sum), csp);
+      print_instance( Var(VAR_BOUND, i + bound_sum));
       oss << "{" << vars.bound[x].second.lower_bound << ".." << vars.bound[x].second.upper_bound << "}" << endl;
     }
     bound_sum += vars.bound[x].first;
@@ -132,9 +143,9 @@ void print_instance(ostringstream& oss, const VarContainer& vars, const CSPInsta
     for(int i = 0; i < vars.sparse_bound[x].first; ++i)
     {
       oss << "SPARSEBOUND "; 
-      print_instance(oss, Var(VAR_BOUND, i + sparse_bound_sum), csp);
+      print_instance( Var(VAR_BOUND, i + sparse_bound_sum));
       oss << " ";
-      print_instance(oss, vars.sparse_bound[x].second, csp, '{', '}');
+      print_instance( vars.sparse_bound[x].second, '{', '}');
       oss << endl;
     }
     sparse_bound_sum += vars.sparse_bound[x].first;
@@ -147,7 +158,7 @@ void print_instance(ostringstream& oss, const VarContainer& vars, const CSPInsta
     for(int i = 0; i < vars.discrete[x].first; ++i)
     {
       oss << "DISCRETE ";
-      print_instance(oss, Var(VAR_DISCRETE, i + discrete_sum), csp);
+      print_instance( Var(VAR_DISCRETE, i + discrete_sum));
       oss << "{" << vars.discrete[x].second.lower_bound << ".." << vars.discrete[x].second.upper_bound << "}" << endl;
     }
     discrete_sum += vars.discrete[x].first;
@@ -155,7 +166,7 @@ void print_instance(ostringstream& oss, const VarContainer& vars, const CSPInsta
   
 }
 
-void print_tuples(ostringstream& oss, CSPInstance& csp)
+void print_tuples( )
 {
   typedef map<string, TupleList*>::const_iterator it_type;
   
@@ -178,7 +189,7 @@ void print_tuples(ostringstream& oss, CSPInstance& csp)
   
 }
 
-void print_search_info(ostringstream& oss, CSPInstance& csp)
+void print_search_info( )
 {
   if(csp.is_optimisation_problem)
   {
@@ -186,14 +197,14 @@ void print_search_info(ostringstream& oss, CSPInstance& csp)
       oss << "MINIMISING ";
     else
       oss << "MAXIMISING ";
-    print_instance(oss, csp.optimise_variable, csp);
+    print_instance( csp.optimise_variable);
     oss << endl; 
   } 
   
   if(!csp.var_order.empty())
   {
     oss << "VARORDER ";
-    print_instance(oss, csp.var_order, csp);
+    print_instance( csp.var_order);
     oss << endl;
   }
   
@@ -203,20 +214,20 @@ void print_search_info(ostringstream& oss, CSPInstance& csp)
     vector<string> output_vars;
     for(int i = 0; i < csp.val_order.size(); ++i)
       output_vars.push_back(csp.val_order[i] ? "a" : "d");
-    print_instance(oss, output_vars, csp);
+    print_instance( output_vars);
     oss << endl;
   }
   
   if(!csp.permutation.empty())
   {
     oss << "PERMUTATION ";
-    print_instance(oss, csp.permutation, csp);
+    print_instance( csp.permutation);
     oss << endl;
   }
   
 }
   
-void print_instance(ostringstream& oss, CSPInstance& csp)
+void print_instance( )
 {   
     oss << "MINION 3" << endl;
   if(csp.vars.symbol_table.empty())
@@ -233,21 +244,25 @@ void print_instance(ostringstream& oss, CSPInstance& csp)
   }
   
   oss << "**VARIABLES**" << endl;
-  print_instance(oss, csp.vars, csp);
+  print_instance( csp.vars);
   
   oss << "**SEARCH**" << endl;
-  print_search_info(oss, csp);
+  print_search_info();
   
   oss << "**TUPLELIST**" << endl;
-  print_tuples(oss, csp);
+  print_tuples();
   
   oss << "**CONSTRAINTS**" << endl;
   for(list<ConstraintBlob>::const_iterator it = csp.constraints.begin(); 
       it != csp.constraints.end(); ++it)
   {
-    print_instance(oss, *it, csp);
+    print_instance( *it);
   }
   oss << "**EOF**" << endl;
 }
+
+  
+};
+
 
 }
