@@ -82,6 +82,9 @@ public:
     ; // Defined at bottom of file.
 #endif
 
+  bool is_null() const
+  { return ptr == NULL; }
+
   /// Manually alters the pointer being watched. This function should only
   /// be used by those with a complete understanding of the whole memory system,
   /// and in special circumstances.
