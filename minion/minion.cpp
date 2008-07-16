@@ -48,6 +48,11 @@ below contains all available switches. For example to see help on
 replacing 'minion' by the name of the executable you're using.
 */
 
+/** @help switches;-redump Description
+Print the minion input instance file to standard out. No search is
+carried out when this switch is used.
+*/
+
 /** @help switches;-findallsols Description
 Find all solutions and count them. This option is ignored if the
 problem contains any minimising or maximising objective.
