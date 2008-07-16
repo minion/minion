@@ -59,12 +59,10 @@ typedef vector<shared_ptr<AbstractTriggerCreator> > triggerCollection;
 class AbstractConstraint
 {
  protected:
-
-  vector<AnyVarRef> singleton_vars;
-  StateObj* stateObj;
-
   /// Private member of the base class.
   MemOffset _DynamicTriggerCache;
+  vector<AnyVarRef> singleton_vars;
+  StateObj* stateObj;
 
 public:
   
@@ -87,9 +85,14 @@ public:
   virtual int dynamic_trigger_count() 
   { return 0; }
   
+  /// Returns the number of dynamic triggers for this constraint, and all the children of
+  /// this constraint. Only differs from the above for things like 'reify', 'reifyimply' and 'or'.
+  virtual int dynamic_trigger_count_with_children()
+  { return dynamic_trigger_count(); }
+  
   /// Checks if this constraint 'owns' this trigger.
   virtual bool own_trigger(DynamicTrigger* trig)
-  { return (trig >= dynamic_trigger_start()) && (trig < dynamic_trigger_start() + dynamic_trigger_count()); }
+  { return false; }
   
   /// Gets all the triggers a constraint wants to set up.
   /** This function shouldn't do any propagation. That is full_propagate's job.*/
@@ -192,6 +195,12 @@ public:
     
   virtual ~AbstractConstraint()
   {}
+
+    
+  
+  virtual void setup_dynamic_triggers(MemOffset DynamicTriggerPointer)
+  { _DynamicTriggerCache = DynamicTriggerPointer; }
+
   
   /// Actually creates the dynamic triggers. Calls dynamic_trigger_count from function to get
   /// the number of triggers required.
@@ -200,14 +209,101 @@ public:
     // Dynamic initialisation
     int trigs = dynamic_trigger_count();
     D_ASSERT(trigs >= 0);
-    _DynamicTriggerCache = getMemory(stateObj).nonBackTrack().request_bytes((sizeof(DynamicTrigger) * trigs));
+    setup_dynamic_triggers(getMemory(stateObj).nonBackTrack().request_bytes((sizeof(DynamicTrigger) * trigs)));
     
-	DynamicTrigger* start = dynamic_trigger_start();
-	for(int i = 0 ; i < trigs; ++i)
-	  new (start+i) DynamicTrigger(this);
-	  
-	  // Static initialisation
-	  triggerCollection t = setup_internal();
+    DynamicTrigger* start = dynamic_trigger_start();
+    for(int i = 0 ; i < trigs; ++i)
+      new (start+i) DynamicTrigger(this);
+    
+    // Static initialisation
+    triggerCollection t = setup_internal();
+    for(triggerCollection::iterator it = t.begin(); it != t.end(); ++it)
+    {
+      (*it)->post_trigger();
+    }
+  }
+};
+
+/// Constraint from which other constraints can be inherited. Extends dynamicconstraint to allow children to be dynamic.
+class ParentConstraint : public AbstractConstraint
+{
+  vector<AbstractConstraint*> child_constraints;
+  // Maps a dynamic trigger to the constraint which it belongs to.
+  map<DynamicTrigger*, int> dynamic_trigger_to_constraint;
+  // Maps a static trigger to a pair { constraint, trigger for that constraint } 
+  vector< pair<int, int> > static_trigger_to_constraint;
+public:
+  /// Gets all the triggers a constraint wants to set up.
+  /** This function shouldn't do any propagation. That is full_propagate's job.*/
+  virtual triggerCollection setup_internal()
+  {     
+    triggerCollection newTriggers;
+    
+    for(int i = 0; i < child_constraints.size(); i++)
+    {
+      triggerCollection childTrigs = child_constraints[i]->setup_internal();
+      for(int i = 0; i < childTrigs.size(); ++i)
+      {
+        // Record each original trigger value, then add the modified trigger to the collection.
+        static_trigger_to_constraint.push_back(make_pair(i, childTrigs[i]->trigger.info));
+        childTrigs[i]->trigger.info = static_trigger_to_constraint.size();
+        childTrigs[i]->trigger.constraint = this;
+        newTriggers.push_back(childTrigs[i]);
+      }
+    }
+    
+    return newTriggers;
+  }
+    
+  ParentConstraint(StateObj* _stateObj, const vector<AbstractConstraint*> _children) : 
+    AbstractConstraint(_stateObj), child_constraints(_children)
+    {}
+
+  virtual ~ParentConstraint()
+  {}
+  
+  virtual int dynamic_trigger_count_with_children()
+  {
+    int trigger_count = dynamic_trigger_count();
+    for(int i = 0; i < child_constraints.size(); ++i)
+      trigger_count += child_constraints[i]->dynamic_trigger_count_with_children();
+    return trigger_count;
+  }
+    
+  virtual void setup_dynamic_triggers(MemOffset dynamicTriggerPointer)
+  {
+    _DynamicTriggerCache = dynamicTriggerPointer;
+    
+    // Get start of first child constraint.
+    MemOffset childPtr = dynamicTriggerPointer.getOffset(dynamic_trigger_count());
+    
+    for(int i = 0; i < child_constraints.size(); ++i)
+    {
+      child_constraints[i]->setup_dynamic_triggers(childPtr);
+      childPtr = childPtr.getOffset(child_constraints[i]->dynamic_trigger_count_with_children()); 
+    }
+  }
+  
+  /// Actually creates the dynamic triggers. Calls dynamic_trigger_count from function to get
+  /// the number of triggers required.
+  virtual void setup()
+  {
+    // Dynamic initialisation
+    int trigs = dynamic_trigger_count();
+    int all_trigs = dynamic_trigger_count_with_children();
+    
+    D_ASSERT(trigs >= 0);
+    D_ASSERT(all_trigs >= trigs);
+    
+    MemOffset trigMem = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(DynamicTrigger) * all_trigs);
+    DynamicTrigger* start = static_cast<DynamicTrigger*>(_DynamicTriggerCache.get_ptr());
+    for(int i = 0 ; i < all_trigs; ++i)
+      new (start+i) DynamicTrigger(this);
+      
+    setup_dynamic_triggers(trigMem);
+    
+    // Static initialisation
+    triggerCollection t = setup_internal();
     for(triggerCollection::iterator it = t.begin(); it != t.end(); ++it)
     {
       (*it)->post_trigger();
