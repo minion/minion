@@ -752,7 +752,9 @@ struct GCC : public AbstractConstraint
 	{
 	  D_ASSERT(vsize == var_array.size()+capacity_array.size());
       // borrow augpath array
-      for(int i=0; i<numvals; i++) augpath[i]=0;
+      augpath.clear();
+      augpath.resize(numvals, 0);
+      // for(int i=0; i<numvals; i++) augpath.push_back(0);
       for(int i=0; i<numvars; i++)
       {   // count the values.
           augpath[v[i]-dom_min]++;
