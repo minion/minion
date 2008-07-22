@@ -31,11 +31,8 @@ that a set of variables can take.
 
 gcc([primary variables], [values of interest], [capacity variables])
 
-For each value of interest, there must be a capacity variable. 
-
-For example, if the union of the initial domains of the primary variables is
-{-5,-3,-1,0,2,3,5} then there would be 11 capacity variables, specifying the
-number of occurrences of each value in the interval [-5 ... 5].
+For each value of interest, there must be a capacity variable, which specifies
+the number of occurrences of the value in the primary variables.
 
 This constraint is new, and its syntax and implementation are not finalised.
 */
@@ -50,7 +47,7 @@ The following constraint would restrict the occurrence of values 1..9 in myVec
 to be at most 2 each initially, and finally equal to the values of the cap
 vector.
 
-gcc(myVec, cap)
+gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)
 */
 
 /** @help constraints;gcc Reifiability
