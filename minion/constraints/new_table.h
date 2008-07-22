@@ -30,8 +30,8 @@ For Licence Information see file LICENSE.txt
 #undef P
 #endif
 
-#define P(x) cout << x << endl
-//#define P(x)
+//#define P(x) cout << x << endl
+#define P(x)
 
   struct Literal
 {
