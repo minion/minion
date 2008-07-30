@@ -38,8 +38,12 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
     string extension;
     if(fname.find_last_of(".") < fname.size())
       extension = fname.substr(fname.find_last_of("."), fname.size());
-   
+  
+    if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp" ||
+        extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
+    {
   #ifdef USE_BOOST
+  
     ifstream file(filename, ios_base::in | ios_base::binary);
   
      if (!file) {
@@ -64,18 +68,25 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
     in.push(file);
   
     ConcreteFileReader<filtering_istream> infile(in, filename);
-  #else
-     if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp" ||
-        extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
-     { INPUT_ERROR("This copy of Minion was built without gzip and bzip2 support!"); }
-
-    ifstream ifm(filename);
-    ConcreteFileReader<ifstream> infile(ifm, filename);
-  #endif 
+    
     if (infile.failed_open() || infile.eof()) {
       INPUT_ERROR("Can't open given input file '" + fname + "'.");
     }   
     return readInput(&infile, parser_verbose);
+  #else 
+     INPUT_ERROR("This copy of Minion was built without gzip and bzip2 support!");
+  #endif
+    }
+    else
+    {
+      ifstream ifm(filename);
+      ConcreteFileReader<ifstream> infile(ifm, filename);
+      if (infile.failed_open() || infile.eof()) {
+        INPUT_ERROR("Can't open given input file '" + fname + "'.");
+      }   
+      return readInput(&infile, parser_verbose);
+    }
+
   }
   else
   {
