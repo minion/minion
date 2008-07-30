@@ -130,9 +130,11 @@ For Licence Information see file LICENSE.txt
 
     DynamicTrigger* dt = dynamic_trigger_start();
 
-    if(!full_propagate_called && //this line may be necessary for either performance or correctness
-       trig >= dt && trig < dt + assign_size * 2)
+    if(trig >= dt && trig < dt + assign_size * 2)
     {
+      if(full_propagate_called)
+        return;
+
       int tripped_constraint = (trig - dt) / assign_size;
       int other_constraint = 1 - tripped_constraint;
       P("Tripped: " << tripped_constraint << ":" << watched_constraint[tripped_constraint]);
@@ -213,7 +215,8 @@ For Licence Information see file LICENSE.txt
         watched_constraint[0] = loop;
         watch_assignment(cons[loop], dt, assignment);
       }
-      loop++;
+      else
+        loop++;
     }
 
     if(found_watch == false)
@@ -223,6 +226,7 @@ For Licence Information see file LICENSE.txt
     }
 
     P("Found watch 0: " << loop);
+    loop++;
     
     found_watch = false;
 

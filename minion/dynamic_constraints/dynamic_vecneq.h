@@ -342,9 +342,9 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     P("VecNeq prop");
     
     if(propagate_mode)
-      P("Propagating: " << index_to_propagate);
+    { P("Propagating: " << index_to_propagate); }
     else
-      P("Watching " << watched_index0 << "," << watched_index1);
+    { P("Watching " << watched_index0 << "," << watched_index1); }
 
     int trigger_activated = dt - dynamic_trigger_start();
     int triggerpair = trigger_activated / 2;
