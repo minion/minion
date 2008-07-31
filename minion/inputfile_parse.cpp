@@ -17,18 +17,7 @@
 
 #include "svn_header.h"
 
-#ifdef USE_BOOST
-#include <fstream>
-#include <iostream>
-#include <boost/iostreams/filtering_streambuf.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/filter/bzip2.hpp>
 
-using namespace boost;
-using namespace iostreams;
-#endif
 
 CSPInstance readInputFromFile(string fname, bool parser_verbose)
 {
