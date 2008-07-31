@@ -49,6 +49,6 @@ if retval!=0:
 
 chdir(homedir+miniondir)   #cd /home/pn/minion-svn1/minion
 
-system("mini-scripts/testallconstraints.py --numtests=500 --email --minion=bin/minion &")
+system("mini-scripts/testallconstraints.py --numtests=400 --email --minion=bin/minion &")
 system("mini-scripts/testallconstraints.py --numtests=100 --email --minion=bin/minion-debug")
 
