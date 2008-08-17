@@ -85,7 +85,7 @@ namespace Controller
     if(getOptions(stateObj).solsoutWrite)
     {
       for(unsigned i = 0; i < print_matrix.size(); ++i)
-        for(unsigned j = 0; j < print_matrix.size(); ++j)
+        for(unsigned j = 0; j < print_matrix[i].size(); ++j)
         {
           if(!print_matrix[i][j].isAssigned())
             INPUT_ERROR("Some variable was unassigned while writing solution to file.");
