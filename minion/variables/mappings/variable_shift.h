@@ -111,7 +111,26 @@ struct ShiftVar
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
-  {  data.addDynamicTrigger(t, type, pos); }
+  {  
+    switch(type)
+    {
+      case UpperBound:
+        data.addDynamicTrigger(t, LowerBound);
+        break;
+      case LowerBound:
+        data.addDynamicTrigger(t, UpperBound);
+        break;
+      case Assigned:
+      case DomainChanged:
+        data.addDynamicTrigger(t, type);
+        break;
+      case DomainRemoval:
+        data.addDynamicTrigger(t, DomainRemoval, pos - shift); 
+        break;
+      default:
+        D_FATAL_ERROR("Broken dynamic trigger");
+    }
+  }
 #endif
 
   friend std::ostream& operator<<(std::ostream& o, const ShiftVar& sv)

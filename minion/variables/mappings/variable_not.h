@@ -46,7 +46,10 @@ struct VarNot
   { return data.isBound();}
   
   VarNot(const VarRef& _data) : data(_data)
-  { D_ASSERT(VarRef::isBool); }
+  { 
+    D_ASSERT(data.getInitialMin() == 0);
+    D_ASSERT(data.getInitialMax() == 1);
+  }
   
   VarNot() : data()
   {}
@@ -135,7 +138,26 @@ struct VarNot
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
-  {  data.addDynamicTrigger(t, type, swap(pos)); }
+  {  
+    switch(type)
+    {
+      case UpperBound:
+        data.addDynamicTrigger(t, LowerBound);
+        break;
+      case LowerBound:
+        data.addDynamicTrigger(t, UpperBound);
+        break;
+      case Assigned:
+      case DomainChanged:
+        data.addDynamicTrigger(t, type);
+        break;
+      case DomainRemoval:
+        data.addDynamicTrigger(t, DomainRemoval, -(pos-1)); 
+        break;
+      default:
+        D_FATAL_ERROR("Broken dynamic trigger");
+    }
+  }
 #endif
 
   vector<AbstractConstraint*>* getConstraints()

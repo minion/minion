@@ -160,7 +160,32 @@ struct SwitchNeg
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
-  {  data.addDynamicTrigger(t, type, pos); }
+  {  
+    if(multiplier == 1)
+    {
+      data.addDynamicTrigger(t, type, pos);
+      return;
+    }
+    
+    switch(type)
+    {
+      case UpperBound:
+        data.addDynamicTrigger(t, LowerBound);
+        break;
+      case LowerBound:
+        data.addDynamicTrigger(t, UpperBound);
+        break;
+      case Assigned:
+      case DomainChanged:
+        data.addDynamicTrigger(t, type);
+        break;
+      case DomainRemoval:
+        data.addDynamicTrigger(t, DomainRemoval, -pos); 
+        break;
+      default:
+        D_FATAL_ERROR("Broken dynamic trigger");
+    }
+  }
 #endif
 
   vector<AbstractConstraint*>* getConstraints()
