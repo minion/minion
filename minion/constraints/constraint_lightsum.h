@@ -53,6 +53,22 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
     return t;    
   }
   
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    int sum_value = 0;
+    int v_size = var_array.size();
+    for(int i = 0; i < v_size; ++i)
+    {
+      assignment.push_back(make_pair(i, var_array[i].getMin()));
+      sum_value += var_array[i].getMin();
+    }
+    assignment.push_back(make_pair(v_size, var_sum.getMax()));
+    
+    if(sum_value > var_sum.getMax())
+      assignment.clear();
+  }
+  
+  
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
 	PROP_INFO_ADDONE(LightSum);

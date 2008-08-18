@@ -54,6 +54,12 @@ This constrait is reifiable and reifyimply'able.
 #include "constraint_lightsum.h"
 #include "constraint_sum.h"
 
+#ifdef P
+#undef P
+#endif
+
+#define P(x) cout << x << endl
+//#define P(x)
 
 /// V1 + ... Vn <= X
 /// is_reversed checks if we are in the case where reverse_constraint was previously called.
@@ -191,6 +197,24 @@ struct LessEqualSumConstraint : public AbstractConstraint
       sum += v[i];
     return sum <= *(v + v_size - 1);
   }
+  
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    int sum_value = 0;
+    int v_size = var_array.size();
+    for(int i = 0; i < v_size; ++i)
+    {
+      assignment.push_back(make_pair(i, var_array[i].getMin()));
+      sum_value += var_array[i].getMin();
+    }
+    assignment.push_back(make_pair(v_size, var_sum.getMax()));
+    
+    P(v_size << "." << var_sum.getMax() << "." << sum_value << "." << assignment.size());
+    if(sum_value > var_sum.getMax())
+      assignment.clear();
+    P(assignment.size());
+  }
+  
   
   virtual vector<AnyVarRef> get_vars()
   { 

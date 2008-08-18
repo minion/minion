@@ -344,9 +344,32 @@ struct LexLeqConstraint : public AbstractConstraint
       return false;
     else
       return true;
-      
   }
-   
+  
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    size_t x_size = x.size();
+    for(size_t i = 0; i < x_size; ++i)
+    {
+      DomainInt x_i_min = x[i].getMin();
+      DomainInt y_i_max = y[i].getMax();
+      
+      if(x_i_min > y_i_max)
+      {
+        assignment.clear();
+        return;
+      }
+      
+      assignment.push_back(make_pair(i         , x_i_min));
+      assignment.push_back(make_pair(i + x_size, y_i_max));
+      if(x_i_min < y_i_max)
+        return;
+    }
+    
+    if(Less)
+      assignment.clear();
+  }
+  
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> array_copy;
@@ -373,4 +396,3 @@ LexLessCon(StateObj* stateObj,const VarArray1& x, const VarArray2& y)
 BUILD_CONSTRAINT2(CT_LEXLEQ, LexLeqCon)
 
 BUILD_CONSTRAINT2(CT_LEXLESS, LexLessCon)
-

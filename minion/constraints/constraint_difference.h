@@ -160,6 +160,23 @@ struct DifferenceConstraint : public AbstractConstraint
 	  return abs_val == v[2];
   }
   
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    for(int i = var1.getMin(); i <= var1.getMax(); ++i)
+    {
+      for(int j = var2.getMin(); j <= var2.getMax(); ++j)
+      {
+        if(var3.inDomain(abs(i - j)))
+        {
+          assignment.push_back(make_pair(0, i));
+          assignment.push_back(make_pair(1, j));
+          assignment.push_back(make_pair(2, abs(i - j)));
+          return;
+        }
+      }
+    }
+  }
+  
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> v;

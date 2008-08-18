@@ -171,6 +171,37 @@ struct MinConstraint : public AbstractConstraint
 	return min_val == *(v + v_size - 1);
   }
 
+  // Bah: This could be much better!
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    for(int i = min_var.getMin(); i <= min_var.getMax(); ++i)
+    {
+      bool flag_domain = false;
+      for(int j = 0; j < var_array.size(); ++j)
+      {
+        if(var_array[j].inDomain(i))
+        {
+          flag_domain = true;
+          assignment.push_back(make_pair(j, i));
+        }
+        else
+        {
+          if(var_array[j].getMax() < i)
+            return;
+          if(var_array[j].getInitialMin() < i)
+            assignment.push_back(make_pair(j, var_array[i].getMax()));
+        }
+      }
+      if(flag_domain)
+      {
+        assignment.push_back(make_pair(var_array.size(), i));
+        return;
+      }
+      else
+        assignment.clear();
+    }
+  }
+  
   virtual vector<AnyVarRef> get_vars()
   {
     vector<AnyVarRef> vars;
@@ -192,7 +223,7 @@ AbstractConstraint*
 MaxCon(StateObj* stateObj, const VarArray& _var_array, const light_vector<VarRef>& _var_ref)
 { return (new MinConstraint<typename NegType<VarArray>::type, typename NegType<VarRef>::type>(stateObj,
                                                                                               VarNegRef(_var_array),
-																					          VarNegRef(_var_ref[0]))); 
+                                                                                              VarNegRef(_var_ref[0]))); 
 }
 
 

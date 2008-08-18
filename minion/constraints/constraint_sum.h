@@ -156,6 +156,23 @@ struct BoolLessSumConstraint : public AbstractConstraint
       return std::accumulate(v, v + v_size, DomainInt(0)) >= var_sum;
   }
   
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    int v_size = var_array.size();
+    int found_count = 0;
+    for(int i = 0; i < v_size; ++i)
+    {
+      if(var_array[i].inDomain(VarToCount))
+      {
+        assignment.push_back(make_pair(i, VarToCount));
+        if(found_count == var_sum)
+          return;
+      }
+    }
+    assignment.clear();
+  }
+  
+  
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;

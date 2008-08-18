@@ -107,6 +107,19 @@ struct LeqConstraint : public AbstractConstraint
 	return v[0] <= (v[1] + offset);
   }
   
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    int x_min = x.getMin();
+    int y_max = y.getMax();
+    
+    if(x_min <= y_max + offset)
+    {
+      assignment.push_back(make_pair(0, x_min));
+      assignment.push_back(make_pair(1, y_max));
+    } 
+    
+  }
+  
   virtual vector<AnyVarRef> get_vars()
   { 
 	vector<AnyVarRef> array;
