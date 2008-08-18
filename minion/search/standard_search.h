@@ -24,9 +24,11 @@ namespace Controller
 	  D_INFO(0, DI_SOLVER, "Non-Boolean Search");
 	  
 	  maybe_print_search_state(stateObj, "Node: ", v);
-	  
+	  D_ASSERT(getQueue(stateObj).isQueuesEmpty());
 	  while(true)
 	  {
+	  D_ASSERT(getQueue(stateObj).isQueuesEmpty());
+  		
 		getState(stateObj).incrementNodeCount();
 		if(getState(stateObj).getNodeCount() == getOptions(stateObj).nodelimit)
 		  return;
@@ -48,10 +50,11 @@ namespace Controller
 		}
 		else
 		{
-		  maybe_print_search_state(stateObj, "Node: ", v);
-		  world_push(stateObj);
-		  order.branch_left();
-          prop(stateObj, v);
+      maybe_print_search_state(stateObj, "Node: ", v);
+      world_push(stateObj);
+      order.branch_left();
+      prop(stateObj, v);
+      D_ASSERT(getQueue(stateObj).isQueuesEmpty() || getState(stateObj).isFailed());
 		}
 		
 		// Either search failed, or a solution was found.
