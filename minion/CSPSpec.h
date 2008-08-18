@@ -62,6 +62,7 @@ enum ReadTypes
   read_tuples,
   read_constraint,
   read_constraint_list,
+  read_bool_var,
   read_nothing
 };
 
@@ -152,43 +153,27 @@ struct ConstraintBlob
   /// For use in nested constraints.
   vector<ConstraintBlob> internal_constraints;
   
-  bool reified;
-  bool implied_reified;
-  Var reify_var;
+//  bool reified;
+//  bool implied_reified;
+//  Var reify_var;
   
-  ConstraintBlob(ConstraintDef* _con) :
-	constraint(_con), reified(false), implied_reified(false)
+  ConstraintBlob(ConstraintDef* _con) : constraint(_con)
   {}
   
-  ConstraintBlob(ConstraintDef* _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars), reified(false), implied_reified(false)
+  ConstraintBlob(ConstraintDef* _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars)
   {}
 
 #ifdef USE_CXX0X
   ConstraintBlob(ConstraintBlob&& b) : 
   CXXMOVE(constraint, b), CXXMOVE(vars, b), CXXMOVE(tuples, b), CXXMOVE(negs, b), CXXMOVE(constants, b),
-  CXXMOVE(gadget_prop_type, b), CXXMOVE(gadget, b), CXXMOVE(internal_constraints, b), CXXMOVE(reified, b),
-  CXXMOVE(implied_reified, b), CXXMOVE(reify_var, b)
+  CXXMOVE(gadget_prop_type, b), CXXMOVE(gadget, b), CXXMOVE(internal_constraints, b)
   { }
 #endif
 
   /// A helper constructor for when only a SingleVar is passed.
-  ConstraintBlob(ConstraintDef* _con, vector<Var>& _var) : constraint(_con), reified(false), implied_reified(false)
+  ConstraintBlob(ConstraintDef* _con, vector<Var>& _var) : constraint(_con)
   { vars.push_back(_var); }
 
-
-
-  void reify(Var _reify_var)
-  {
-    reified = true;
-	reify_var = _reify_var;
-  }
-  
-  void reifyimply(Var _reify_var)
-  {
-    implied_reified = true;
-	reify_var = _reify_var;
-  }
-  
   bool is_dynamic()
   { return constraint->trig_type == DYNAMIC_CT; }
 };
@@ -550,22 +535,13 @@ public:
   
   void add_constraint(const ConstraintBlob& b)
   { constraints.push_back(b); }
-  
-  void last_constraint_reify(Var reifyVar)
-  { constraints.back().reify(reifyVar); }
-  
-  void last_constraint_reifyimply(Var reifyVar)
-  { constraints.back().reifyimply(reifyVar); }
-    
+      
   // Perform a simple check to ensure the constraint will not cause integer overflow.
   bool bounds_check_last_constraint()
   {
     const ConstraintBlob& con = constraints.back();
     switch(con.constraint->type)
     {
-      case CT_REIFY:
-      case CT_REIFYIMPLY:
-        throw parse_exception("Internal Error - Invalid Constraint in bounds_check_last_constraint.");
       case CT_PRODUCT2:
         return DOMAIN_CHECK(checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound)*
                      checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound))
@@ -659,7 +635,19 @@ public:
 
 }
 
+extern ConstraintDef constraint_list[];
+extern int num_of_constraints;
 
+inline ConstraintDef* get_constraint(ConstraintType t)
+{
+  for(int i = 0; i < num_of_constraints; ++i)
+  {
+    if(constraint_list[i].type == t)
+      return constraint_list + i;
+  }
+
+  D_FATAL_ERROR("Constraint not found");
+}
 
 using namespace ProbSpec;
 

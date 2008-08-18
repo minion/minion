@@ -38,15 +38,14 @@ For Licence Information see file LICENSE.txt
 #undef P
 #endif
 
-//#define P(x) cout << x << endl;
-#define P(x)
+#define P(x) cout << x << endl;
+//#define P(x)
 
-  struct Dynamic_OR : public AbstractConstraint
+  struct Dynamic_OR : public ParentConstraint
 {
   virtual string constraint_name()
     { return "Dynamic OR:"; }
 
-  vector<AbstractConstraint*> child_constraints;
 
   Reversible<bool> full_propagate_called;
   bool constraint_locked;
@@ -58,53 +57,59 @@ For Licence Information see file LICENSE.txt
   int watched_constraint[2];
 
   Dynamic_OR(StateObj* _stateObj, vector<AbstractConstraint*> _con) : 
-    AbstractConstraint(_stateObj), child_constraints(_con), full_propagate_called(_stateObj, false), assign_size(-1),
+    ParentConstraint(_stateObj, _con), full_propagate_called(_stateObj, false), assign_size(-1),
        constraint_locked(false), propagated_constraint(-1)
-    { }
+    {
+      size_t max_size = 0;
+      for(int i = 0; i < child_constraints.size(); ++i)
+        max_size = max(max_size, child_constraints[i]->get_vars_singleton()->size());
+      assign_size = max_size * 2;
+    }
 
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-  /*  DomainInt back_val = *(v + v_size - 1);
-    if(back_val != 0)
-      return poscon->check_assignment(v, v_size - 1);
-    else*/
-      return true;
+    for(int i = 0; i < child_constraints.size(); ++i)
+    {
+      if(child_constraints[i]->check_assignment(v + start_of_constraint[i],
+         child_constraints[i]->get_vars_singleton()->size()))
+         return true;
+    }
+    return false;
   }
+  
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    for(int i = 0; i < child_constraints.size(); ++i)
+    {
+      child_constraints[i]->get_satisfying_assignment(assignment);
+      if(!assignment.empty())
+      {
+        // Fix up assignment
+        int var_start = start_of_constraint[i];
+        for(int j = 0; j < assignment.size(); ++j)
+        {
+          assignment[j].first += start_of_constraint[i];
+        }
+        return; 
+      }
+    }
+  }
+  
 
   virtual vector<AnyVarRef> get_vars()
   { 
-  /*
-    vector<AnyVarRef> vec = poscon->get_vars();
-    vec.push_back(rar_var);
-    return vec;
-    */
-    return vector<AnyVarRef>();
+    vector<AnyVarRef> vecs;
+    for(int i = 0; i < child_constraints.size(); ++i)
+    {
+      vector<AnyVarRef>* var_ptr = child_constraints[i]->get_vars_singleton(); 
+      vecs.insert(vecs.end(), var_ptr->begin(), var_ptr->end());
+    }
+    return vecs;
   }
 
   virtual int dynamic_trigger_count() 
   { 
     return assign_size * 2;
-  }
-
-  // Override setup!
-  virtual void setup()
-  {
-    size_t max_size = 0;
-    for(int i = 0; i < child_constraints.size(); ++i)
-      max_size = max(max_size, child_constraints[i]->get_vars_singleton()->size());
-    assign_size = max_size;
-    
-    AbstractConstraint::setup();
-
-    for(int i = 0; i < child_constraints.size(); ++i)
-    {
-      child_constraints[i]->setup();
-      DynamicTrigger* start = child_constraints[i]->dynamic_trigger_start();
-      int trigs = child_constraints[i]->dynamic_trigger_count();
-
-      for(int i = 0; i < trigs; ++i)
-        (start + i)->constraint = this;
-    }
   }
 
   virtual void special_check()
@@ -122,6 +127,26 @@ For Licence Information see file LICENSE.txt
     constraint_locked = false;
   }
 
+  PROPAGATE_FUNCTION(int i, DomainDelta domain)
+  {
+    //PROP_INFO_ADDONE(WatchedOR);
+    P("Static propagate start");
+    if(constraint_locked)
+      return;
+
+    if(full_propagate_called)
+    {
+      P("Already doing static full propagate");
+      pair<int,int> childTrigger = getChildStaticTrigger(i);
+      P("Got trigger: " << i << ", maps to: " << childTrigger.first << "." << childTrigger.second);
+      if(childTrigger.first == propagated_constraint)
+      {
+        P("Passing trigger" << childTrigger.second << "on");
+        child_constraints[propagated_constraint]->propagate(childTrigger.second, domain);
+      }
+    }
+  }
+  
   PROPAGATE_FUNCTION(DynamicTrigger* trig)
   {
     //PROP_INFO_ADDONE(WatchedOr);
@@ -188,7 +213,7 @@ For Licence Information see file LICENSE.txt
     }
 
 
-    if(full_propagate_called && child_constraints[propagated_constraint]->own_trigger(trig))
+    if(full_propagate_called && getChildDynamicTrigger(trig) == propagated_constraint)
     { 
       P("Propagating child");
       child_constraints[propagated_constraint]->propagate(trig); 
@@ -201,7 +226,7 @@ For Licence Information see file LICENSE.txt
     }
   }
 
-  void watch_assignment(AbstractConstraint* con, DynamicTrigger* dt, box<pair<int,int> >& assignment)
+  void watch_assignment(AbstractConstraint* con, DynamicTrigger* dt, box<pair<int,DomainInt> >& assignment)
   {
     vector<AnyVarRef>& vars = *(con->get_vars_singleton());
     D_ASSERT(assignment.size() <= assign_size);
@@ -247,7 +272,7 @@ For Licence Information see file LICENSE.txt
     loop++;
     
     found_watch = false;
-
+    
     while(loop < child_constraints.size() && !found_watch)
     {
       GET_ASSIGNMENT(assignment, child_constraints[loop]);
@@ -284,7 +309,7 @@ BuildCT_WATCHED_NEW_OR(StateObj* stateObj, BOOL reify,
 {
   vector<AbstractConstraint*> cons;
   for(int i = 0; i < bl.internal_constraints.size(); ++i)
-    cons.push_back(build_dynamic_constraint(stateObj, bl.internal_constraints[i]));
+    cons.push_back(build_constraint(stateObj, bl.internal_constraints[i]));
 
 
   if(reify) {

@@ -133,19 +133,8 @@ struct BuildConObj<CT_NAME, 0> \
   static  \
   AbstractConstraint* build(StateObj* stateObj, const pair<pair<pair<EmptyType, light_vector<T1>* >, light_vector<T2>* >, light_vector<T3>*>& vars, ConstraintBlob& b, int) \
   { \
-	if(b.implied_reified) \
-	{ \
-	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
-	  BoolVarRef dummyVar; \
-	  return truereifyCon(stateObj, Build ## CT_NAME(stateObj, *(vars.first.first.second), *(vars.first.second), *(vars.second), false, dummyVar, b), reifyVar); \
-	} \
-	else \
-	{ \
 	  BoolVarRef reifyVar; \
-	  if(b.reified) \
-	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
-	  return Build ## CT_NAME(stateObj, *(vars.first.first.second), *(vars.first.second), *(vars.second),  b.reified, reifyVar, b); \
-	} \
+	  return Build ## CT_NAME(stateObj, *(vars.first.first.second), *(vars.first.second), *(vars.second), false, reifyVar, b); \
   } \
 }; \
 } \
@@ -160,19 +149,8 @@ struct BuildConObj<CT_NAME, 0> \
   static  \
   AbstractConstraint* build(StateObj* stateObj, const pair<pair<EmptyType, light_vector<T1>* >, light_vector<T2>* >& vars, ConstraintBlob& b, int) \
   { \
-	if(b.implied_reified) \
-	{ \
-	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
-	  BoolVarRef dummyVar; \
-	  return truereifyCon(stateObj, Build ## CT_NAME(stateObj, *(vars.first.second), *(vars.second), false, dummyVar, b), reifyVar); \
-	} \
-	else \
-	{ \
 	  BoolVarRef reifyVar; \
-	  if(b.reified) \
-	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
-	  return Build ## CT_NAME(stateObj, *(vars.first.second), *(vars.second), b.reified, reifyVar, b); \
-	} \
+	  return Build ## CT_NAME(stateObj, *(vars.first.second), *(vars.second), false, reifyVar, b); \
   } \
 }; \
 } \
@@ -187,19 +165,8 @@ struct BuildConObj<CT_NAME, 0> \
   static  \
   AbstractConstraint* build(StateObj* stateObj, const pair<EmptyType, light_vector<T1>* >& vars, ConstraintBlob& b, int) \
   { \
-	if(b.implied_reified) \
-	{ \
-	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
-	  BoolVarRef dummyVar; \
-      return truereifyCon(stateObj, Build ## CT_NAME(stateObj, *(vars.second), false, dummyVar, b), reifyVar); \
-	} \
-	else \
-	{ \
 	  BoolVarRef reifyVar; \
-	  if(b.reified) \
-	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
-	  return Build ## CT_NAME(stateObj, *(vars.second), b.reified, reifyVar, b); \
-	} \
+	  return Build ## CT_NAME(stateObj, *(vars.second), false, reifyVar, b); \
   } \
 }; \
 } \
@@ -213,19 +180,8 @@ struct BuildConObj<CT_NAME, 0> \
   static  \
   AbstractConstraint* build(StateObj* stateObj, const EmptyType& vars, ConstraintBlob& b, int) \
   { \
-	if(b.implied_reified) \
-	{ \
-	  BoolVarRef reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
-	  BoolVarRef dummyVar; \
-      return truereifyCon(stateObj, Build ## CT_NAME(stateObj, false, dummyVar, b), reifyVar); \
-	} \
-	else \
-	{ \
 	  BoolVarRef reifyVar; \
-	  if(b.reified) \
-	    reifyVar = getVars(stateObj).getBooleanContainer().get_var_num(b.reify_var.pos()); \
-	  return Build ## CT_NAME(stateObj, b.reified, reifyVar, b); \
-	} \
+	  return Build ## CT_NAME(stateObj, false, reifyVar, b); \
   } \
 }; \
 } \

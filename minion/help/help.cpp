@@ -27,15 +27,15 @@ if("constraints" == request) {
 cout << "Help entry: " << "constraints" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Minion supports many constraints and these are regularly being" << endl
-<< "improved and added to. In some cases multiple implementations of the" << endl
-<< "same constraints are provided and we would appreciate additional" << endl
-<< "feedback on their relative merits in your problem." << endl
+<< " improved and added to. In some cases multiple implementations of the" << endl
+<< " same constraints are provided and we would appreciate additional" << endl
+<< " feedback on their relative merits in your problem." << endl
 << "" << endl
-<< "Minion does not support nesting of constraints, however this can be" << endl
-<< "achieved by auxiliary variables and reification." << endl
+<< " Minion does not support nesting of constraints, however this can be" << endl
+<< " achieved by auxiliary variables and reification." << endl
 << "" << endl
-<< "Variables can be replaced by constants. You can find out more on" << endl
-<< "expressions for variables, vectors, etc. in the section on variables." << endl << endl << endl;
+<< " Variables can be replaced by constants. You can find out more on" << endl
+<< " expressions for variables, vectors, etc. in the section on variables." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help variables" << endl << endl << endl;
 } else

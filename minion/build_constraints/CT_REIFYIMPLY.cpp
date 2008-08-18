@@ -7,7 +7,6 @@
    $Id$
 */
 
-#include "../constraints/constraint_equal.h"
-#include "../constraints/reify.h"
-BUILD_STATIC_CT(CT_EQ, 2)
+#include "../constraints/reify_true.h"
+BUILD_DYNAMIC_CT(CT_REIFYIMPLY, 1)
 

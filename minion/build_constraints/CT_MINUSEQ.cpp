@@ -8,5 +8,6 @@
 */
 
 #include "../constraints/constraint_equal.h"
+#include "../constraints/reify.h"
 BUILD_STATIC_CT(CT_MINUSEQ, 2)
 

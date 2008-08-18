@@ -9,5 +9,5 @@
 
 #include "../constraints/constraint_equal.h"
 #include "../constraints/reify.h"
-BUILD_STATIC_CT(CT_EQ, 2)
+BUILD_STATIC_CT(CT_DISEQ_REIFY, 3)
 

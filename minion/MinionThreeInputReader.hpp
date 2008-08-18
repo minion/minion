@@ -300,25 +300,12 @@ nothing at all...)
 
 #include "MinionInputReader.h"
 
-
-
-extern ConstraintDef constraint_list[];
-
 #ifdef IN_MAIN
 #include "build_constraints/constraint_defs.h"
 int num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);
 #endif
 
-inline ConstraintDef* get_constraint(ConstraintType t)
-{
-  for(int i = 0; i < num_of_constraints; ++i)
-  {
-    if(constraint_list[i].type == t)
-      return constraint_list + i;
-  }
 
-  D_FATAL_ERROR("Constraint not found");
-}
 
 template<typename FileReader>
 void MinionThreeInputReader<FileReader>::parser_info(string s)
@@ -474,26 +461,6 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 
   switch(constraint->type)
   {
-    case CT_REIFY:
-    case CT_REIFYIMPLY:
-    { 
-      if(reified)
-        throw parse_exception("Can't reify a reified constraint!");
-      ConstraintBlob blob = readConstraint(infile, true);
-
-      infile->check_sym(',');
-      Var reifyVar = readIdentifier(infile);
-      if(reifyVar.type() != VAR_BOOL)
-        throw parse_exception("Can only reify to a Boolean!");
-      infile->check_sym(')');
-      if(constraint->type == CT_REIFY)
-        blob.reify(reifyVar);
-      else
-        blob.reifyimply(reifyVar);
-      return blob;
-    }
-    break;
-
     case CT_WATCHED_OR:
     return readConstraintOr(infile, get_constraint(CT_WATCHED_OR));
     break;
@@ -526,6 +493,11 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
       break;
       case read_var:
       varsblob.push_back(make_vec(readIdentifier(infile)));
+      break;
+      case read_bool_var:
+      varsblob.push_back(make_vec(readIdentifier(infile)));
+      if(varsblob.back().back().type() != VAR_BOOL)
+        throw parse_exception("Expected Boolean variable!");
       break;
       case read_2_vars:
       {

@@ -9,5 +9,6 @@
 
 #include "../constraints/constraint_equal.h"
 #include "../constraints/constraint_min.h"
+#include "../constraints/reify.h"
 BUILD_STATIC_CT(CT_MIN, 2)
 

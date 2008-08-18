@@ -22,4 +22,3 @@ inline void Trigger::full_propagate()
     D_INFO(0,DI_SOLVER,"Trigger Full Propagated");
     constraint->full_propagate(); 
 }
-

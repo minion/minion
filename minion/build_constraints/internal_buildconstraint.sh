@@ -11,6 +11,9 @@
       "read_var")
         count=$((count + 1))
       ;;
+      "read_bool_var")
+        count=$((count + 1))
+      ;;
       "read_2_vars")
         count=$((count + 1))
       ;;
@@ -20,11 +23,11 @@
   
 	echo BUILD_DEF \#\# $count\($3\) >> BuildConstraintsStart.h
 	
-	if [ "$1" = "STATIC_CT" ]; then
+#	if [ "$1" = "STATIC_CT" ]; then
 	  echo case $3 : return build_constraint_$3\(stateObj, b\)\; >> BuildStaticStart.cpp
-	 else
-	  echo case $3 : return build_constraint_$3\(stateObj, b\)\; >> BuildDynamicStart.cpp
-	 fi
+#	 else
+#	  echo case $3 : return build_constraint_$3\(stateObj, b\)\; >> BuildDynamicStart.cpp
+#	 fi
 	
 	echo BUILD_DEF_$1\($3\) >> BuildStart.h
 

@@ -1,14 +1,18 @@
 STATIC_CT  "element"  			CT_ELEMENT 		read_list read_var read_var
-STATIC_CT  "element_one"		CT_ELEMENT_ONE	read_list read_var read_var
+STATIC_CT  "element_one"		CT_ELEMENT_ONE		read_list read_var read_var
 DYNAMIC_CT "watchelement" 		CT_WATCHED_ELEMENT 	read_list read_var read_var
-DYNAMIC_CT "watchelement_one" CT_WATCHED_ELEMENT_ONE	read_list read_var read_var
+DYNAMIC_CT "watchelement_one" 		CT_WATCHED_ELEMENT_ONE	read_list read_var read_var
 STATIC_CT  "gacelement-deprecated" 	CT_GACELEMENT 		read_list read_var read_var
 STATIC_CT  "alldiff" 			CT_ALLDIFF 		read_list
-STATIC_CT  "gacalldiff" 		CT_GACALLDIFF 	read_list
-STATIC_CT  "gcc" 		CT_GCC 	read_list read_constant_list read_list
+STATIC_CT  "gacalldiff" 		CT_GACALLDIFF 		read_list
+STATIC_CT  "gcc" 			CT_GCC 			read_list read_constant_list read_list
 STATIC_CT  "diseq"   			CT_DISEQ   		read_var read_var  
+STATIC_CT  "__reify_diseq"		CT_DISEQ_REIFY		read_var read_var read_bool_var
 STATIC_CT  "eq"     			CT_EQ      		read_var read_var  
-STATIC_CT  "abs"      			CT_ABS     		read_var read_var  
+STATIC_CT  "__reify_eq"			CT_EQ_REIFY		read_var read_var read_bool_var
+STATIC_CT  "minuseq" 			CT_MINUSEQ 		read_var read_var 
+STATIC_CT  "__reify_minuseq"		CT_MINUSEQ_REIFY	read_var read_var read_bool_var
+STATIC_CT  "abs"      			CT_ABS     		read_var read_var 
 STATIC_CT  "ineq"    			CT_INEQ    		read_var read_var read_constant  
 DYNAMIC_CT "watchneq"			CT_WATCHED_NEQ		read_var read_var
 DYNAMIC_CT "watchless"			CT_WATCHED_LESS		read_var read_var
@@ -20,7 +24,7 @@ STATIC_CT  "occurrence" 		CT_OCCURRENCE 		read_list read_constant read_var
 STATIC_CT  "occurrenceleq" 		CT_LEQ_OCCURRENCE 	read_list read_constant read_constant
 STATIC_CT  "occurrencegeq" 		CT_GEQ_OCCURRENCE 	read_list read_constant read_constant
 STATIC_CT  "product" 			CT_PRODUCT2 		read_2_vars read_var  
-STATIC_CT  "difference"	CT_DIFFERENCE		read_2_vars read_var
+STATIC_CT  "difference"			CT_DIFFERENCE		read_2_vars read_var
 STATIC_CT  "weightedsumleq" 		CT_WEIGHTLEQSUM  	read_constant_list read_list read_var  
 STATIC_CT  "weightedsumgeq" 		CT_WEIGHTGEQSUM  	read_constant_list read_list read_var  
 STATIC_CT  "sumgeq" 			CT_GEQSUM 		read_list read_var 
@@ -29,8 +33,7 @@ DYNAMIC_CT "watchsumgeq" 		CT_WATCHED_GEQSUM 	read_list read_constant
 DYNAMIC_CT "watchsumleq" 		CT_WATCHED_LEQSUM 	read_list read_constant
 DYNAMIC_CT "table" 			CT_WATCHED_TABLE 	read_list read_tuples 
 DYNAMIC_CT "negativetable" 	CT_WATCHED_NEGATIVE_TABLE	read_list read_tuples
-DYNAMIC_CT "watchvecneq" 		CT_WATCHED_VECNEQ 	read_list read_list
-STATIC_CT  "minuseq" 			CT_MINUSEQ 		read_var read_var  
+DYNAMIC_CT "watchvecneq" 		CT_WATCHED_VECNEQ 	read_list read_list 
 DYNAMIC_CT "litsumgeq" 			CT_WATCHED_LITSUM 	read_list read_constant_list read_constant 
 STATIC_CT "pow" 			CT_POW			read_2_vars read_var
 STATIC_CT "div" 			CT_DIV			read_2_vars read_var
@@ -41,9 +44,12 @@ DYNAMIC_CT "watchvecexists_less"	CT_WATCHED_VEC_OR_LESS	read_list read_list
 DYNAMIC_CT "watchvecexists_and" 	CT_WATCHED_VEC_OR_AND	read_list read_list
 DYNAMIC_CT "hamming"			CT_WATCHED_HAMMING	read_list read_list read_constant
 DYNAMIC_CT "watched-or"			CT_WATCHED_NEW_OR	read_constraint_list
-DYNAMIC_CT "w-inset" CT_WATCHED_INSET read_var read_constant_list
-DYNAMIC_CT "w-notinset" CT_WATCHED_NOT_INSET read_var read_constant_list
-DYNAMIC_CT "w-inrange" CT_WATCHED_INRANGE read_var read_constant_list
-DYNAMIC_CT "w-notinrange" CT_WATCHED_NOT_INRANGE read_var read_constant_list
-DYNAMIC_CT "w-literal" CT_WATCHED_LIT read_var read_constant
-DYNAMIC_CT "w-notliteral" CT_WATCHED_NOTLIT read_var read_constant
+DYNAMIC_CT "w-inset" 			CT_WATCHED_INSET 	read_var read_constant_list
+DYNAMIC_CT "w-notinset" 		CT_WATCHED_NOT_INSET 	read_var read_constant_list
+DYNAMIC_CT "w-inrange" 			CT_WATCHED_INRANGE 	read_var read_constant_list
+DYNAMIC_CT "w-notinrange" 		CT_WATCHED_NOT_INRANGE 	read_var read_constant_list
+DYNAMIC_CT "w-literal" 			CT_WATCHED_LIT 		read_var read_constant
+DYNAMIC_CT "w-notliteral" 		CT_WATCHED_NOTLIT 	read_var read_constant
+DYNAMIC_CT "reify" 			CT_REIFY 		read_constraint read_bool_var
+DYNAMIC_CT "reifyimply-quick" 		CT_REIFYIMPLY_QUICK	read_constraint read_bool_var
+DYNAMIC_CT "reifyimply" 		CT_REIFYIMPLY 		read_constraint read_bool_var

@@ -28,16 +28,6 @@
 // Defined in MinionThreeInputReader, cos it can only be in one place.
 extern int num_of_constraints;
 
-ConstraintDef* get_constraint(ConstraintType t);
-
-template<typename T>
-vector<T> make_vec(const T& t)
-{
-  vector<T> vec(1);
-  vec[0] = t;
-  return vec;
-}
-
 template<typename T>
 typename T::value_type& index(T& container, int index_pos)
 {
@@ -200,6 +190,7 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
 
   switch(constraint->type)
   {
+    /*
 	case CT_REIFY:
 	case CT_REIFYIMPLY:
 	  { 
@@ -218,7 +209,7 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
 	    instance.last_constraint_reifyimply(reifyVar);
 	  }
 	  break;
-
+*/
 	case CT_WATCHED_TABLE:
 	case CT_WATCHED_NEGATIVE_TABLE:
 	  readConstraintTable(infile, get_constraint(constraint->type));
@@ -238,6 +229,7 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
 {
   // This slightly strange code is to save copying the ConstraintBlob as much as possible.
   instance.add_constraint(ConstraintBlob(def));
+  ConstraintBlob& con = instance.constraints.back();
   vector<vector<Var> >& varsblob = instance.constraints.back().vars;
   vector<vector<int> >& constblob = instance.constraints.back().constants;
   
@@ -251,6 +243,12 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
 	  case read_var:
 	    varsblob.push_back(make_vec(readIdentifier(infile)));
 		break;
+		case read_bool_var:
+      varsblob.push_back(make_vec(readIdentifier(infile)));
+      if(varsblob.back().back().type() != VAR_BOOL)
+        throw parse_exception("Expected Boolean variable!");
+    break;
+    
 	  case read_2_vars:
 	  {
 	    vector<Var> vars(2);
@@ -260,6 +258,18 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
             varsblob.push_back(MOVE(vars));
 	  }
 		break;
+		case read_constraint:
+		{
+		  // This slightly weird way of getting a constraint is to avoid having to make
+		  // significant changes to the old parser.
+      readConstraint(infile, false);
+      ConstraintBlob new_con = instance.constraints.back();
+      instance.constraints.pop_back();
+      con.internal_constraints.push_back(new_con);
+    }
+    break;
+    case read_constraint_list:
+    throw parse_exception("Watched or is not supported by this parser. Use 'MINION 3'");
 	  case read_constant:
 	    constblob.push_back(make_vec(infile->read_num()));
 		break;

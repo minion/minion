@@ -61,8 +61,8 @@ pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order(StateObj* stateObj
 
 }
 #ifdef DYNAMICTRIGGERS
-AbstractConstraint*
-build_dynamic_constraint(StateObj* stateObj, ProbSpec::ConstraintBlob& b);
+//AbstractConstraint*
+//build_dynamic_constraint(StateObj* stateObj, ProbSpec::ConstraintBlob& b);
 #endif
 
 AbstractConstraint*

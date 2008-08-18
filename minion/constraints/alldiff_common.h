@@ -1012,6 +1012,38 @@ struct DynamicAlldiff : public DynamicConstraint
 	  return vars;
 	}
     
+    
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {  
+      bool matchok=true;
+      for(int i=0; i<numvars; i++)
+      {
+          if(!var_array[i].inDomain(varvalmatching[i]))
+          {
+              matchok=false;
+              break;
+          }
+      }
+      
+      if(!matchok)
+      {
+          matchok=bfsmatching(0, numvars-1);
+      }
+      
+      if(!matchok)
+      {
+          return;
+      }
+      else
+      {
+          for(int i=0; i<numvars; i++)
+          {
+              assignment.push_back(make_pair(i, varvalmatching[i]));
+          }
+          return;
+      }
+  }
+    
     // ------------------------------- Targan's algorithm ------------------------------------
     // based on the following pseudocode from wikipedia.
         /*
