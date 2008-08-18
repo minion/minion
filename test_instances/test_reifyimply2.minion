@@ -1,0 +1,16 @@
+MINION 3
+#TEST SOLCOUNT 15
+
+**VARIABLES**
+
+BOOL s[2]
+BOOL b
+BOOL c
+
+**SEARCH**
+PRINT [s, [b,c] ]
+**CONSTRAINTS**
+
+reifyimply( reifyimply( sumgeq(s, 1), b), c)
+
+**EOF**

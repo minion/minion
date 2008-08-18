@@ -1,0 +1,12 @@
+MINION 3
+#TEST SOLCOUNT 12
+**VARIABLES**
+
+BOOL b
+BOOL a[3]
+
+**CONSTRAINTS**
+
+reifyimply(product(a[0],a[1],a[2]), b)
+
+**EOF**
