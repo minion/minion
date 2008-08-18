@@ -99,7 +99,7 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
 	return vars;  
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(var1.getMax() > 0)
     {

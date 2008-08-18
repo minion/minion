@@ -306,7 +306,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint
 	return vars;  
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     int count = 0;
     for(int i = 0; i < var_array.size(); ++i)

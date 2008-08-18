@@ -240,6 +240,8 @@ struct BothNonZeroIterated
   }
 };
 
+//#define SLOW_VEC_OR
+
 /** Constraints two vectors of variables to be not equal.
   *
   *  \ingroup Constraints
@@ -266,12 +268,40 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     const VarArray2& _array2) :
   AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
     propagate_mode(_stateObj, false)
+#ifdef SLOW_VEC_OR
+  , counter(_stateObj)
+#endif
     { D_ASSERT(var_array1.size() == var_array2.size()); }
 
   int dynamic_trigger_count()
     { return Operator::dynamic_trigger_count() * 2; }
 
-
+#ifdef SLOW_VEC_OR
+  Reversible<int> counter;
+  
+  virtual triggerCollection setup_internal()
+  {
+    D_INFO(2,DI_LEXCON,"Setting up Constraint");
+    triggerCollection t;
+   
+    for(int i=0; i < var_array1.size(); ++i)
+    {
+      t.push_back(make_trigger(var_array1[i], Trigger(this, i), LowerBound));
+      t.push_back(make_trigger(var_array1[i], Trigger(this, i), UpperBound));
+      t.push_back(make_trigger(var_array2[i], Trigger(this, i), LowerBound));
+      t.push_back(make_trigger(var_array2[i], Trigger(this, i), UpperBound));
+      
+    }
+    return t;
+  }
+  
+  PROPAGATE_FUNCTION(int i, DomainDelta)
+  {
+    if(var_array1[i].getMin() == var_array2[i].getMax())
+      counter = counter + 1;
+  }
+#endif
+  
   bool no_support_for_index(int index)
   { return Operator::no_support_for_pair(var_array1[index], var_array2[index]); }
 
@@ -445,7 +475,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     return vars;  
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     pair<int, int> assign;
     for(int i = 0; i < var_array1.size(); ++i)

@@ -82,7 +82,7 @@ template<typename Var>
     return vars;
   }
 
-  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {  
     /// TODO: Make faster
     int min_val = max(range_min, var.getMin());

@@ -246,7 +246,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 	return vars;  
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     for(int i = 0; i < var_array.size(); ++i)
     {

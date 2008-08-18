@@ -367,7 +367,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
 	return vars;
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,int> >& assignment)
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {  
     int array_start = max(0, indexvar.getMin());
     int array_end   = min((int)var_array.size() - 1, raw(indexvar.getMax()));
