@@ -121,6 +121,27 @@ struct DivConstraint : public AbstractConstraint
 	v.push_back(var3);
 	return v;
   }
+  
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {  
+   for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
+   {
+     if(var1.inDomain(v1))
+     {
+       for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2)
+       {
+         if(var2.inDomain(v2) && var3.inDomain(v1 / v2))
+         {
+           assignment.push_back(make_pair(0, v1));
+           assignment.push_back(make_pair(1, v2));
+           assignment.push_back(make_pair(2, v1 / v2));
+           return;
+         }
+       }
+     }
+   }
+  }
+ 
 };
 
 template<typename V1, typename V2>

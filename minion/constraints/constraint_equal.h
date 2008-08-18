@@ -82,136 +82,6 @@ This constraint is reifiable and reifyimply'able.
 
 /// (var1 = var2) = var3
 
-/*
-This is the older one written by Chris, with assignment triggers on var1 var2.
-
-template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
-struct ReifiedEqualConstraint : public AbstractConstraint
-{
-  virtual string constraint_name()
-  { return "ReifiedEqual"; }
-  
-  EqualVarRef1 var1;
-  EqualVarRef2 var2;
-  BoolVarRef var3;
-  ReifiedEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
-    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
-  {}
-  
-  virtual triggerCollection setup_internal()
-  {
-    D_INFO(2,DI_ANDCON,"Setting up Constraint");
-    triggerCollection t;
-	t.push_back(make_trigger(var1, Trigger(this, 1), Assigned));
-	t.push_back(make_trigger(var2, Trigger(this, 2), Assigned));
-	t.push_back(make_trigger(var3, Trigger(this, 3), LowerBound));
-	t.push_back(make_trigger(var3, Trigger(this, -3), UpperBound));
-	return t;
-  }
-  
-  virtual void full_propagate()
-  {
-    if(var3.isAssigned())
-    {
-      if(var3.getAssignedValue() == 1)
-		propagate(3,0);
-      else
-		propagate(-3,0);
-    }
-    
-    if(var1.isAssigned())
-      propagate(1,0);
-    
-    if(var2.isAssigned())
-      propagate(2,0);
-  }
-  
-  PROPAGATE_FUNCTION(int i, DomainDelta)
-  {
-	PROP_INFO_ADDONE(ReifyEqual);
-    switch(i)
-    {
-      case 1:
-        D_ASSERT(var1.isAssigned());
-		if(var2.isAssigned())
-		{ var3.propagateAssign(var1.getAssignedValue() == var2.getAssignedValue()); }
-		else
-		{
-		  if(var3.isAssigned())
-		  {
-			if(var3.getAssignedValue() == 1)
-			{ var2.propagateAssign(var1.getAssignedValue()); }
-		  }
-		}
-		break;
-        
-      case 2:
-        D_ASSERT(var2.isAssigned());
-        if(var1.isAssigned())
-		{ var3.propagateAssign(var1.getAssignedValue() == var2.getAssignedValue()); }
-		else
-		{
-		  if(var3.isAssigned())
-		  {
-			if(var3.getAssignedValue() == 1)
-			{ var1.propagateAssign(var2.getAssignedValue()); }
-		  }
-		}
-		break;        
-		
-      case 3:
-        D_ASSERT(var3.isAssigned() && var3.getAssignedValue()==1);
-        // reifyvar==1
-		if(var1.isAssigned())
-		{ var2.propagateAssign(var1.getAssignedValue()); }
-		else
-		{
-		  if(var2.isAssigned())
-		  { var1.propagateAssign(var2.getAssignedValue()); }
-		}
-		break;
-		
-      case -3:
-        D_ASSERT(var3.isAssigned() && var3.getAssignedValue()==0);
-        // reifyvar==0
-        
-        if(var1.isAssigned() && !var2.isBound())
-        {
-            var2.removeFromDomain(var1.getAssignedValue());
-        }
-        
-        if(var2.isAssigned() && !var1.isBound())
-        {
-            var1.removeFromDomain(var2.getAssignedValue());
-        }
-        
-        if(var1.isAssigned() && var2.isAssigned())
-		{ 
-		  if(var1.getAssignedValue() == var2.getAssignedValue())
-			getState(stateObj).setFailed(true);
-		}
-		break;
-    }
-  }
-  
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
-  {
-    D_ASSERT(v_size == 3);
-    D_ASSERT(v[2] == 0 || v[2] == 1);
-    return (v[0] == v[1]) == v[2];
-  }
-  
-  virtual vector<AnyVarRef> get_vars()
-  { 
-    vector<AnyVarRef> vars;
-	vars.reserve(3);
-	vars.push_back(var1);
-	vars.push_back(var2);
-	vars.push_back(var3);
-	return vars;
-  }
-};
-*/
 
 // New version written by PN with bound triggers.
 // Also stronger in eq case: copies bounds across rather than just propagating on assignment. 
@@ -513,6 +383,21 @@ struct EqualConstraint : public AbstractConstraint
     return vars;
   }
   
+   virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+   {
+     DomainInt min_val = max(var1.getMin(), var2.getMin());
+     DomainInt max_val = min(var1.getMax(), var2.getMax());
+     
+     for(DomainInt i = min_val ; i <= max_val; ++i)
+     {
+       if(var1.inDomain(i) && var2.inDomain(i))
+       {
+         assignment.push_back(make_pair(0, i));
+         assignment.push_back(make_pair(1, i));
+         return;
+       } 
+     }
+   }
 };
 
 
@@ -745,6 +630,27 @@ struct NeqConstraintBinary : public AbstractConstraint
 	  return true;
 	}
 	
+	virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    if(var1.getMin() != var2.getMax())
+    {
+      assignment.push_back(make_pair(0, var1.getMin()));
+      assignment.push_back(make_pair(1, var2.getMax()));
+      return; 
+    }
+    
+    if(var1.getMax() != var2.getMin())
+    {
+      assignment.push_back(make_pair(0, var1.getMax()));
+      assignment.push_back(make_pair(1, var2.getMin()));
+      return;
+    }
+    
+    D_ASSERT(var1.isAssigned() && var2.isAssigned());
+    D_ASSERT(var1.getAssignedValue() == var2.getAssignedValue());
+  }
+  
+  
 	virtual vector<AnyVarRef> get_vars()
 	{
 	  vector<AnyVarRef> vars(2);

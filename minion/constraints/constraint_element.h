@@ -353,6 +353,34 @@ struct ElementConstraint : public AbstractConstraint
     array.push_back(result_var);
     return array;
   }
+  
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {  
+    int array_start = max(0, index_ref.getMin());
+    int array_end   = min((int)var_array.size() - 1, raw(index_ref.getMax()));
+
+    for(int i = array_start; i <= array_end; ++i)
+    {
+      if(index_ref.inDomain(i))
+      {
+        int dom_start = max(raw(result_var.getMin()), raw(var_array[i].getMin()));
+        int dom_end   = min(raw(result_var.getMax()), raw(var_array[i].getMax()));
+        for(int domval = dom_start; domval <= dom_end; ++domval)
+        {
+          if(var_array[i].inDomain(domval) && result_var.inDomain(domval))
+          {
+            // index_ref = i
+            assignment.push_back(make_pair(var_array.size(), i));
+            // result_var = domval
+            assignment.push_back(make_pair(var_array.size() + 1, domval));
+            // vararray[i] = domval
+            assignment.push_back(make_pair(i, domval));
+            return;
+          }
+        }
+      }
+    }
+  }
 };
 
 
