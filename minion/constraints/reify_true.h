@@ -220,8 +220,6 @@ template<typename BoolVar, bool DoWatchAssignment>
     for(int i = 0; i < dt_count; ++i)
       dt[i].remove();
 
-    rar_var.addDynamicTrigger(dt, LowerBound);
-    
     if(DoWatchAssignment)
     {
       GET_ASSIGNMENT(assignment, child_constraints[0]);
