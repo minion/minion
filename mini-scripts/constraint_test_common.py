@@ -534,7 +534,7 @@ class testalldiffgacslow(testalldiff):
 
 class testgacalldiff(testalldiff):
     def runtest(self, options=dict()):
-        return runtestgeneral("gacalldiff", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'] and not options['reifyimply'])
+        return runtestgeneral("gacalldiff", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'])
 
 
 class testwatchedalldiff(testalldiff):
@@ -1005,9 +1005,9 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
     reify=options['reify']
     fullprop=options['fullprop']
     
-    if reifyimply:
+    #if reifyimply:
         # if a GAC constraint is reifyimplied, it no longer gets GAC.
-        treesame=False
+        #treesame=False
     
     if reify or reifyimply:
         # add extra bool variable.
