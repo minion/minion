@@ -62,10 +62,10 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
       assignment.push_back(make_pair(i, var_array[i].getMin()));
       sum_value += var_array[i].getMin();
     }
-    assignment.push_back(make_pair(v_size, var_sum.getMax()));
-    
     if(sum_value > var_sum.getMax())
       assignment.clear();
+    else
+      assignment.push_back(make_pair(v_size, var_sum.getMax()));
   }
   
   

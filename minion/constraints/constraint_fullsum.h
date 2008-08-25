@@ -207,11 +207,13 @@ struct LessEqualSumConstraint : public AbstractConstraint
       assignment.push_back(make_pair(i, var_array[i].getMin()));
       sum_value += var_array[i].getMin();
     }
-    assignment.push_back(make_pair(v_size, var_sum.getMax()));
-    
-    P(v_size << "." << var_sum.getMax() << "." << sum_value << "." << assignment.size());
     if(sum_value > var_sum.getMax())
       assignment.clear();
+    else
+      assignment.push_back(make_pair(v_size, var_sum.getMax()));
+    
+    P(v_size << "." << var_sum.getMax() << "." << sum_value << "." << assignment.size());
+
     P(assignment.size());
   }
   
