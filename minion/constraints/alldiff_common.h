@@ -1027,6 +1027,8 @@ struct DynamicAlldiff : public DynamicConstraint
       
       if(!matchok)
       {
+          if(numvals<numvars) return; // there can't be a matching.
+          
           matchok=bfsmatching(0, numvars-1);
       }
       

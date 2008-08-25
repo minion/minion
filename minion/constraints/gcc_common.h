@@ -186,6 +186,7 @@ struct GCC : public AbstractConstraint
     #endif
     
   }
+  
     
   
   virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
