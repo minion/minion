@@ -103,8 +103,8 @@ struct CSPInstance;
 
 class Var
 {
-  int pos_m : 28;
   VariableType type_m : 4;
+  int pos_m : 28;
 public:
   int pos() const { return pos_m; }
   VariableType type() const { return type_m; }

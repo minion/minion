@@ -23,8 +23,8 @@ template<typename VarArray1, typename VarArray2>
 struct GCC : public AbstractConstraint
 {
     GCC(StateObj* _stateObj, const VarArray1& _var_array, const VarArray2& _capacity_array, ConstraintBlob& b) : AbstractConstraint(_stateObj),
-    stateObj(_stateObj), var_array(_var_array), capacity_array(_capacity_array), constraint_locked(false),
-    numvals(count_values()),
+    var_array(_var_array), capacity_array(_capacity_array), 
+    numvals(count_values()), constraint_locked(false),
     SCCSplit(_stateObj, numvars+numvals)
     {
         GCCPRINT("numvars:"<< numvars << ", numvals:"<< numvals);
@@ -488,8 +488,6 @@ struct GCC : public AbstractConstraint
         }
         
     }
-    
-    StateObj * stateObj;
     
     deque<int> fifo;
     vector<int> prev;

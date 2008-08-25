@@ -57,8 +57,8 @@ For Licence Information see file LICENSE.txt
   int watched_constraint[2];
 
   Dynamic_OR(StateObj* _stateObj, vector<AbstractConstraint*> _con) : 
-    ParentConstraint(_stateObj, _con), full_propagate_called(_stateObj, false), assign_size(-1),
-       constraint_locked(false), propagated_constraint(-1)
+    ParentConstraint(_stateObj, _con), full_propagate_called(_stateObj, false), constraint_locked(false),
+    assign_size(-1), propagated_constraint(-1)
     {
       size_t max_size = 0;
       for(int i = 0; i < child_constraints.size(); ++i)
@@ -85,11 +85,8 @@ For Licence Information see file LICENSE.txt
       if(!assignment.empty())
       {
         // Fix up assignment
-        int var_start = start_of_constraint[i];
         for(int j = 0; j < assignment.size(); ++j)
-        {
           assignment[j].first += start_of_constraint[i];
-        }
         return; 
       }
     }

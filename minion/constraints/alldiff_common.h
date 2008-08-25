@@ -91,8 +91,8 @@ struct DynamicAlldiff : public DynamicConstraint
     #else
     var_array(_var_array.rbegin(), _var_array.rend()),
     #endif
-    constraint_locked(false), SCCSplit(_stateObj, _var_array.size()),
-    sparevaluespresent(_stateObj, _var_array.size())
+    SCCSplit(_stateObj, _var_array.size()), 
+    sparevaluespresent(_stateObj, _var_array.size()), constraint_locked(false)
   {
       dom_min=var_array[0].getInitialMin();
       dom_max=var_array[0].getInitialMax();

@@ -87,9 +87,10 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint
   typedef BoolLessSumConstraintDynamic<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   
-  // ReversibleInt count;
-  VarArray var_array;
 
+  VarArray var_array;
+  VarSum var_sum;
+  
   MemOffset unwatched_indexes;
   int last;
   int num_unwatched;
@@ -97,7 +98,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint
   int& unwatched(int i)
   { return static_cast<int*>(unwatched_indexes.get_ptr())[i]; }
   
-  VarSum var_sum;
+
   
   BoolLessSumConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
 	AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), last(0)

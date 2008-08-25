@@ -56,7 +56,6 @@ template<typename Var>
 
   virtual void full_propagate()
   {  
-    DynamicTrigger* dt = dynamic_trigger_start();
     var.setMin(range_min);
     var.setMax(range_max);
   }

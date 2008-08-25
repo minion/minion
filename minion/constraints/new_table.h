@@ -138,9 +138,9 @@ public:
   template<typename VarArray>
   vector<DomainInt>* findSupportingTuple(const VarArray& vars, Literal lit)
   {
-    int tuple_size = data->getVarCount();
-    int length = data->getNumOfTuples();
-    int* tuple_data = data->getPointer();
+    //int tuple_size = data->getVarCount();
+    //int length = data->getNumOfTuples();
+    //int* tuple_data = data->getPointer();
     
     int varIndex = lit.var;
     int val = lit.val;

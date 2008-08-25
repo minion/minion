@@ -273,12 +273,9 @@ BuildCT_REIFY(StateObj* stateObj, const VarArray& vars, BOOL reify,
       blob.constraint = get_constraint(CT_MINUSEQ_REIFY);
       return build_constraint(stateObj, blob);
     }
-    
+    default:
+      return reifyCon(stateObj, build_constraint(stateObj, bl.internal_constraints[0]), vars[0]);     
   }
-  
-  return reifyCon(stateObj, build_constraint(stateObj, bl.internal_constraints[0]), vars[0]); 
-  
-
 }
 
 #endif

@@ -100,7 +100,6 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
 	PROP_INFO_ADDONE(DynSumSat);
-	int propval = dt->trigger_info();
 	int var_size = var_array.size();
 	
 	DynamicTrigger* base_dt = dynamic_trigger_start();
