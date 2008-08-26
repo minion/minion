@@ -137,10 +137,10 @@ struct DynamicAlldiff : public DynamicConstraint
       if(usewatches()) watches.resize(numvars);
       #endif
       
-      for(int i=0; i<numvars && i<numvals; i++)
+      for(int i=0; i<numvars ; i++) //&& i<numvals
       {
           varvalmatching[i]=i+dom_min;
-          valvarmatching[i]=i;
+          if(i<numvals) valvarmatching[i]=i;
           
           #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
           if(usewatches()) watches[i].reserve(numvals, stateObj);
