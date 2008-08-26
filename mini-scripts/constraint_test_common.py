@@ -387,7 +387,7 @@ class testgacelement__minus__deprecated:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("gacelement-deprecated", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, not options['reifyimply'])
+        return runtestgeneral("gacelement-deprecated", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, True)
 
 class testwatchelement(testgacelement__minus__deprecated):
     def runtest(self, options=dict()):
@@ -530,7 +530,7 @@ class testalldiff:
 
 class testalldiffgacslow(testalldiff):
     def runtest(self, options=dict()):
-        return runtestgeneral("alldiffgacslow", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'] and not options['reifyimply'])
+        return runtestgeneral("alldiffgacslow", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'])
 
 class testgacalldiff(testalldiff):
     def runtest(self, options=dict()):
@@ -539,11 +539,11 @@ class testgacalldiff(testalldiff):
 
 class testwatchedalldiff(testalldiff):
     def runtest(self, options=dict()):
-        return runtestgeneral("watchedalldiff", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'] and not options['reifyimply'])
+        return runtestgeneral("watchedalldiff", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'])
 
 class testdiseq(testalldiff):
     def runtest(self, options=dict()):
-        return runtestgeneral("diseq", True, options, [1,1], ["num", "num"], [1,1], self, not options['reify'] and not options['reifyimply'])
+        return runtestgeneral("diseq", True, options, [1,1], ["num", "num"], [1,1], self, not options['reify'])
 
 class testeq:
     # printtable essentially sets up pairsame constraint. negation of alldiff.
@@ -636,7 +636,7 @@ class testhamming:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("hamming", True, options, [4,4,1], ["smallnum", "smallnum", "const"], [4,4,1], self, not options['reifyimply'])
+        return runtestgeneral("hamming", True, options, [4,4,1], ["smallnum", "smallnum", "const"], [4,4,1], self, True)
 
 
 class testlexleq:
@@ -653,14 +653,14 @@ class testlexleq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("lexleq", True, options, [4,4], ["smallnum", "smallnum"], [4,4], self, not options['reifyimply'])
+        return runtestgeneral("lexleq", True, options, [4,4], ["smallnum", "smallnum"], [4,4], self, True)
 
 class testlexless(testlexleq):
     def printtable(self, domains):
         return testlexleq.printtable(self, domains, less=True)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], [4,4], self, not options['reifyimply'])
+        return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], [4,4], self, True)
 
 class testmax:
     def printtable(self, domains, ismax=True):
@@ -829,7 +829,7 @@ class testminuseq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("minuseq", True, options, [1,1], ["num", "num"], [1,1], self, not options['reifyimply'])
+        return runtestgeneral("minuseq", True, options, [1,1], ["num", "num"], [1,1], self, True)
         
 class testlitsumeq:
     # does this constraint even exist??
@@ -1004,10 +1004,6 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
     reifyimply=options['reifyimply']
     reify=options['reify']
     fullprop=options['fullprop']
-    
-    #if reifyimply:
-        # if a GAC constraint is reifyimplied, it no longer gets GAC.
-        #treesame=False
     
     if reify or reifyimply:
         # add extra bool variable.
