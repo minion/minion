@@ -207,6 +207,7 @@ template<typename BoolVar, bool DoWatchAssignment>
   virtual void full_propagate()
   {
     P("Full prop");
+    P(child_constraints[0]->constraint_name());
     if(rar_var.isAssigned() && rar_var.getAssignedValue() > 0)
     {
       child_constraints[0]->full_propagate();
