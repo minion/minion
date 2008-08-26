@@ -721,7 +721,7 @@ class testoccurrenceleq:
     
     def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrenceleq", False, options, [6,1,1], ["smallnum", "smallconst", "smallconst"], [6,1,1], self, True)
+        return runtestgeneral("occurrenceleq", False, options, [6,1,1], ["smallnum", "smallconst", "smallconst"], [6,1,1], self, not options['reify'] and not options['reifyimply'])
 
 class testoccurrencegeq(testoccurrenceleq):
     def printtable(self, domains):
