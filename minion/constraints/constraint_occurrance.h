@@ -244,6 +244,32 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
 	    vars.push_back(AnyVarRef(var_array[i]));
 	  return vars;
   }
+  
+   // Getting a satisfying assignment here is too hard, we don't want to have to
+   // build a matching.
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    MAKE_STACK_BOX(c, DomainInt, var_array.size());
+
+    for(int i = 0; i < var_array.size(); ++i)
+    {
+      if(!var_array[i].isAssigned()) 
+      {  
+        assignment.push_back(make_pair(i, var_array[i].getMin()));
+        assignment.push_back(make_pair(i, var_array[i].getMax()));
+        return;
+      }
+      else
+        c.push_back(var_array[i].getAssignedValue());
+    }
+
+    if(check_assignment(c.begin(), c.size()))
+    {  // Put the complete assignment in the box.
+      for(int i = 0; i < var_array.size(); ++i)
+        assignment.push_back(make_pair(i, c[i])); 
+    }
+  }
+ 	
 };
 
 template<typename VarArray, typename Val, typename ValCount>
@@ -399,6 +425,42 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
     vars.push_back(AnyVarRef(val_count));
 	return vars;
   }
+  
+   // Getting a satisfying assignment here is too hard, we don't want to have to
+   // build a matching.
+  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    MAKE_STACK_BOX(c, DomainInt, var_array.size() + 1);
+
+    for(int i = 0; i < var_array.size(); ++i)
+    {
+      if(!var_array[i].isAssigned()) 
+      {  
+        assignment.push_back(make_pair(i, var_array[i].getMin()));
+        assignment.push_back(make_pair(i, var_array[i].getMax()));
+        return;
+      }
+      else
+        c.push_back(var_array[i].getAssignedValue());
+    }
+
+    if(!val_count.isAssigned()) 
+    {  
+      assignment.push_back(make_pair(var_array.size(), val_count.getMin()));
+      assignment.push_back(make_pair(var_array.size(), val_count.getMax()));
+      return;
+    }
+    else
+      c.push_back(val_count.getAssignedValue());
+
+
+    if(check_assignment(c.begin(), c.size()))
+    {  // Put the complete assignment in the box.
+      for(int i = 0; i < var_array.size() + 1; ++i)
+        assignment.push_back(make_pair(i, c[i])); 
+    }
+  }
+ 	
 };
 
 
