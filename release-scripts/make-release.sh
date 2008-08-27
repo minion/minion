@@ -33,9 +33,11 @@ cp Changelog minion-release-$1
 checkreturn
 cp translator/tailor.jar minion-release-$1/tailor.jar
 checkreturn
-cp translator/README minion-release-$1/README.tailor
+cp translator/README.release minion-release-$1/README.tailor
 checkreturn
 cp -r translator/examples minion-release-$1/tailor-examples
+checkreturn
+cp -r translator/syntax-highlighting minion-release-$1/essence-syntax-highlighting
 checkreturn
 cp -r translator/doc minion-release-$1/tailor-doc
 checkreturn
