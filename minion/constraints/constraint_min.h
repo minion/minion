@@ -176,29 +176,36 @@ struct MinConstraint : public AbstractConstraint
   {
     for(int i = min_var.getMin(); i <= min_var.getMax(); ++i)
     {
-      bool flag_domain = false;
-      for(int j = 0; j < var_array.size(); ++j)
+      if(min_var.inDomain(i))
       {
-        if(var_array[j].inDomain(i))
+        bool flag_domain = false;
+        for(int j = 0; j < var_array.size(); ++j)
         {
-          flag_domain = true;
-          assignment.push_back(make_pair(j, i));
+          if(var_array[j].inDomain(i))
+          {
+            flag_domain = true;
+            assignment.push_back(make_pair(j, i));
+          }
+          else
+          {
+            if(var_array[j].getMax() < i)
+            {
+              assignment.clear();
+              return;
+            }
+            if(var_array[j].getInitialMin() < i)
+              assignment.push_back(make_pair(j, var_array[j].getMax()));
+          }
+        }
+      
+        if(flag_domain)
+        {
+          assignment.push_back(make_pair(var_array.size(), i));
+          return;
         }
         else
-        {
-          if(var_array[j].getMax() < i)
-            return;
-          if(var_array[j].getInitialMin() < i)
-            assignment.push_back(make_pair(j, var_array[i].getMax()));
-        }
+          assignment.clear();
       }
-      if(flag_domain)
-      {
-        assignment.push_back(make_pair(var_array.size(), i));
-        return;
-      }
-      else
-        assignment.clear();
     }
   }
   
