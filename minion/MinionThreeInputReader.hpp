@@ -367,7 +367,7 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
     throw parse_exception("Gadgets need a construction site!");
 
   // Fill in any missing defaults
-  if(instance.var_order.empty())
+  if(instance.search_order.empty())
   {
     parser_info("No order generated, auto-generating complete order");
     int var_count = 0;
@@ -381,13 +381,14 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
     for(unsigned i = 0; i < instance.vars.sparse_discrete.size(); ++i)
       var_count += instance.vars.sparse_discrete[i].first;
 
-    instance.var_order.reserve(var_count);
+    vector<Var> vars;
     for(int i = 0; i < var_count; ++i)
-      instance.var_order.push_back(instance.vars.get_var('x',i));
+      vars.push_back(instance.vars.get_var('x',i));
+    instance.search_order.push_back(vars);
   }
 
-  if(instance.val_order.empty())
-    instance.val_order = vector<char>(instance.var_order.size(), 'a');
+  for(int i = 0; i < instance.search_order.size(); ++i)
+    instance.search_order[i].setupValueOrder();
 
   // This has to be delayed unless not all variables are defined where 'PRINT ALL' occurs.
   if(print_all_vars)
@@ -1009,11 +1010,21 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
 
     if(var_type == "VARORDER")
     {
-      if(!instance.var_order.empty())
-        throw parse_exception("Can't have two VARORDERs!");
-      instance.var_order = readLiteralVector(infile);
+      VarOrder vo = ORDER_STATIC;
+      
+      if(infile->peek_char() != '[')
+      {
+        string s = infile->get_string();
+#define Z(x) if(s == #x) { vo = ORDER_##x; goto found; }
+Z(STATIC) Z(SDF) Z(SRF) Z(LDF) Z(ORIGINAL) Z(WDEG) Z(CONFLICT)
+#undef Z        
+throw parse_exception("Don't understand '" + s + "'");
+found: ;
+      }
+      
+      instance.search_order.push_back(SearchOrder(readLiteralVector(infile)));
       parser_info("Read var order, length " +
-        to_string(instance.var_order.size()));
+        to_string(instance.search_order.back().var_order.size()));
     }
     else if(var_type == "PERMUTATION")
     {
@@ -1025,8 +1036,10 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
     }
     else if(var_type == "VALORDER")
     {
-      if(!instance.val_order.empty())
-        throw parse_exception("Can't have two VALORDERs!");
+      if(instance.search_order.empty())
+        throw parse_exception("Must declare VARORDER first");
+      if(!instance.search_order.back().val_order.empty())
+        throw parse_exception("Can't have two VALORDERs for a VARORDER");
       vector<char> valOrder ;
 
       infile->check_sym('[');
@@ -1040,10 +1053,10 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
         valOrder.push_back(valOrderIdentifier == 'a');
         delim = infile->get_char();                                 // , or ]
       }
-      instance.val_order = valOrder;
+      instance.search_order.back().val_order = valOrder;
 
       parser_info("Read val order, length " +
-        to_string(instance.val_order.size()));
+          to_string(instance.search_order.back().val_order.size()));
     }
     else if(var_type == "MAXIMISING" || var_type == "MAXIMIZING")
     {

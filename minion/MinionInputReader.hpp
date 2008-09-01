@@ -663,10 +663,10 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   
   if(valOrder.empty())
   {
-	parser_info("No value order given, generating automatically");
-	valOrder = vector<char>(instance.var_order.size(), true);
+    parser_info("No value order given, generating automatically");
+    valOrder = vector<char>(instance.search_order.back().var_order.size(), true);
   }
-  instance.val_order = valOrder;
+  instance.search_order.back().val_order = valOrder;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -677,8 +677,6 @@ template<typename FileReader>
 void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
   parser_info( "Reading var order" ) ;
   vector<Var> varOrder = readLiteralVector(infile);
-
-
   
   ostringstream s;
   s << "Read var order. Length: " << varOrder.size();
@@ -701,7 +699,10 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
 	for(int i = 0; i < var_count; ++i)
 	  varOrder.push_back(instance.vars.get_var('x',i));
   }
-  instance.var_order = varOrder;
+  
+  
+  instance.search_order.push_back(varOrder);
+  //var_order = varOrder;
   parser_info(s.str());
 }
 

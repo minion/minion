@@ -16,21 +16,19 @@ struct MinionInstancePrinter
   string getInstance()
   { return oss.str(); }
   
-void print_instance(const int& i)
-{ oss << i; }
+  void print_instance(const int& i)
+  { oss << i; }
   
-void print_instance(const string& s)
-{ oss << s; }
+  void print_instance(const string& s)
+  { oss << s; }
 
-void print_instance(const Var& var)
-{ 
-  if(var.type() == VAR_CONSTANT)
-    print_instance( var.pos());
-  else
-    oss << csp.vars.getName(var); 
-}
-
-
+  void print_instance(const Var& var)
+  { 
+    if(var.type() == VAR_CONSTANT)
+      print_instance( var.pos());
+    else
+      oss << csp.vars.getName(var); 
+  }
 
 template<typename T>
 void print_instance( const vector<T>& vars, char start = '[', char end = ']')
@@ -168,8 +166,6 @@ void print_tuples( )
     }
     oss << endl;
   }
-   
-  
 }
 
 void print_search_info( )
@@ -184,23 +180,25 @@ void print_search_info( )
     oss << endl; 
   } 
   
-  if(!csp.var_order.empty())
+  for(int i = 0; i < csp.search_order.size(); ++i)
   {
-    oss << "VARORDER ";
-    print_instance( csp.var_order);
-    oss << endl;
-  }
+    if(!csp.search_order[i].var_order.empty())
+    {
+      oss << "VARORDER ";
+      print_instance( csp.search_order[i].var_order);
+      oss << endl;
+    }
   
-  if(!csp.val_order.empty())
-  {
-    oss << "VALORDER ";
-    vector<string> output_vars;
-    for(int i = 0; i < csp.val_order.size(); ++i)
-      output_vars.push_back(csp.val_order[i] ? "a" : "d");
-    print_instance( output_vars);
-    oss << endl;
+    if(!csp.search_order[i].val_order.empty())
+    {
+      oss << "VALORDER ";
+      vector<string> output_vars;
+      for(int i = 0; i < csp.search_order[i].val_order.size(); ++i)
+        output_vars.push_back(csp.search_order[i].val_order[i] ? "a" : "d");
+      print_instance( output_vars);
+      oss << endl;
+    }
   }
-  
   if(!csp.permutation.empty())
   {
     oss << "PERMUTATION ";
@@ -210,7 +208,7 @@ void print_search_info( )
   
 }
   
-void print_instance( )
+void print_instance()
 {   
     oss << "MINION 3" << endl;
   if(csp.vars.symbol_table.empty())
@@ -220,10 +218,7 @@ void print_instance( )
     vector<Var> all_vars = csp.vars.get_all_vars();
     
     for(int i = 0; i < all_vars.size(); ++i)
-    {
       csp.vars.addSymbol("x" + to_string(i), all_vars[i]);  
-    }  
-    
   }
   
   oss << "**VARIABLES**" << endl;
@@ -244,8 +239,6 @@ void print_instance( )
   oss << "**EOF**" << endl;
 }
 
-  
 };
-
 
 }

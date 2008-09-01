@@ -142,6 +142,9 @@ namespace Controller
   /// Check if timelimit has been exceeded.
   inline bool do_checks(StateObj* stateObj)
   {
+    if(getState(stateObj).getNodeCount() == getOptions(stateObj).nodelimit)
+      return true;
+    
   	if(getState(stateObj).isAlarmActivated())
   	{
       getState(stateObj).clearAlarm();
@@ -183,6 +186,9 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
 
   void inline deal_with_solution(StateObj* stateObj)
   {
+    // We have found a solution!
+    check_sol_is_correct(stateObj);
+    
 	if(getState(stateObj).isOptimisationProblem())
 	{
 	  if(!getState(stateObj).getOptimiseVar()->isAssigned())

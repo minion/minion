@@ -66,6 +66,17 @@ enum ReadTypes
   read_nothing
 };
 
+enum VarOrder
+{
+  ORDER_STATIC,
+  ORDER_SDF,
+  ORDER_SRF,
+  ORDER_LDF,
+  ORDER_ORIGINAL,
+  ORDER_WDEG,
+  ORDER_CONFLICT
+};
+
 enum ConstraintTriggerType
 {
   DYNAMIC_CT,
@@ -481,14 +492,39 @@ struct ConstraintBlob
   }  
 };
 
+struct SearchOrder
+{
+  vector<Var> var_order;
+  vector<char> val_order;
+  VarOrder order;
+  
+  SearchOrder() : order(ORDER_STATIC)
+  { }
+  
+  SearchOrder(const vector<Var>& _var_order) :
+  var_order(_var_order), order(ORDER_STATIC)
+  { }
+  
+  SearchOrder(const vector<Var>& _var_order, VarOrder _order) :
+  var_order(_var_order), order(_order)
+  { }
+  
+  void setupValueOrder()
+  {
+    if(val_order.empty())
+      val_order.resize(var_order.size(), 'a');      
+  }
+};
 
-  struct CSPInstance
+struct CSPInstance
 {
   VarContainer vars;
   list<ConstraintBlob> constraints;
   shared_ptr<TupleListContainer> tupleListContainer;
-  vector<Var> var_order;
-  vector<char> val_order;
+
+  vector<SearchOrder> search_order;
+  //vector<Var> var_order;
+  //vector<char> val_order;
   vector<Var> permutation;
 
   /// Only used for gadgets.
@@ -519,7 +555,7 @@ private:
 public:
   
   CSPInstance(CSPInstance&& i) : 
-  CXXMOVE(vars, i), CXXMOVE(constraints, i), CXXMOVE(tupleListContainer, i), CXXMOVE(var_order, i),
+  CXXMOVE(vars, i), CXXMOVE(constraints, i), CXXMOVE(tupleListContainer, i), CXXMOVE(search_order, i),
   CXXMOVE(val_order, i), CXXMOVE(permutation, i), CXXMOVE(constructionSite, i), CXXMOVE(is_optimisation_problem, i),
   CXXMOVE(optimise_minimising, i), CXXMOVE(optimise_variable, i), CXXMOVE(print_matrix, i), CXXMOVE(all_vars_list, i),
   CXXMOVE(table_symboltable, i), CXXMOVE(gadgetMap, i)

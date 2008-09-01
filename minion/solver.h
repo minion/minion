@@ -166,11 +166,8 @@ public:
 class SearchOptions
 {
 public:
-
-#ifdef WDEG
   /// Denotes if wdeg is turned on
   bool wdeg_on;
-#endif
 
   /// Denotes if only generators for group should be found (only makes sense for groups)
   bool find_generators;
@@ -220,10 +217,8 @@ public:
   bool redump;
 
   SearchOptions() : 
-#ifdef WDEG
-    wdeg_on(false),
-#endif
-     find_generators(false), print_only_solution(false), cspcomp(false), dumptree(false), sollimit(1), fullpropagate(false), 
+    wdeg_on(false), find_generators(false), print_only_solution(false), 
+    cspcomp(false), dumptree(false), sollimit(1), fullpropagate(false), 
 #ifdef NO_DEBUG
     nocheck(true),
 #else

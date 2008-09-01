@@ -629,9 +629,9 @@ cout << "The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c." << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "For this constraint, small values of c are more efficient." << endl
 << "" << endl
-<< "Equivalent to litsumgeq(vec, [1,...,1], c), but faster." << endl
+<< " Equivalent to litsumgeq(vec, [1,...,1], c), but faster." << endl
 << "" << endl
-<< "This constraint works on 0/1 variables only." << endl << endl << endl;
+<< " This constraint works on 0/1 variables only." << endl << endl << endl;
 cout << "Reifiablity" << "---------------------------------------------------------------------" << endl;
 cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
@@ -647,9 +647,9 @@ cout << "The constraint watchsumleq(vec, c) ensures that sum(vec) <= c." << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "Equivelent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster." << endl
 << "" << endl
-<< "This constraint works on binary variables only." << endl
+<< " This constraint works on binary variables only." << endl
 << "" << endl
-<< "For this constraint, large values of c are more efficient." << endl << endl << endl;
+<< " For this constraint, large values of c are more efficient." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
 cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;

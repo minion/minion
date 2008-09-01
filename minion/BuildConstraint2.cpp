@@ -59,12 +59,14 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
 		}
 }
 
-    /// Build the variable and value ordering used.
+  /// Build the variable and value ordering used.
 	/// The var order is placed, the val order is returned.
-	pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order(StateObj* stateObj, ProbSpec::CSPInstance& instance)
+	pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order(StateObj* stateObj, SearchOrder instance)
   {
 	  vector<int> final_val_order;
 	  vector<AnyVarRef> final_var_order;
+	  
+	  
 	  if(instance.var_order.size() < instance.val_order.size())
       INPUT_ERROR("Variable order cannot be shorter than value order.");
     
@@ -83,8 +85,8 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
 	
 	  for(unsigned int i = 0 ;i < instance.var_order.size(); ++i)
 	  {
-		final_val_order.push_back(instance.val_order[i]);
-		final_var_order.push_back(get_AnyVarRef_from_Var(stateObj, instance.var_order[i]));
+      final_val_order.push_back(instance.val_order[i]);
+      final_var_order.push_back(get_AnyVarRef_from_Var(stateObj, instance.var_order[i]));
 	  }
 	  return make_pair(final_var_order, final_val_order);
   }	

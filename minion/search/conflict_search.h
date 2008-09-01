@@ -18,18 +18,11 @@ namespace Controller
   template<typename VarOrder, typename Variables, typename Propogator>
   inline void conflict_solve_loop(StateObj* stateObj, VarOrder& order, Variables& v, Propogator prop = PropagateGAC())
   {
-    D_INFO(0, DI_SOLVER, "Non-Boolean Search");
-    
     maybe_print_search_state(stateObj, "Node: ", v);
-    
     int last_conflict_var = -1;
-    
     while(true)
     {
       getState(stateObj).incrementNodeCount();
-      if(getState(stateObj).getNodeCount() == getOptions(stateObj).nodelimit)
-        return;
-      
       if(do_checks(stateObj))
         return;
       
@@ -41,12 +34,9 @@ namespace Controller
       // order.find_next_unassigned returns true if all variables assigned.
       if(order.find_next_unassigned())
       {  		  
-        // We have found a solution!
-        check_sol_is_correct(stateObj);
         // This function may escape from search if solution limit
         // has been reached.
         deal_with_solution(stateObj);
-        
         // fail here to force backtracking.
         getState(stateObj).setFailed(true);
       }
@@ -92,7 +82,3 @@ namespace Controller
   }
   
 }
-
-
-
-

@@ -119,19 +119,6 @@ struct PropagateSSAC_Bounds
 };
 
 
-enum VarOrder
-{
-  ORDER_STATIC,
-  ORDER_SDF,
-  ORDER_SRF,
-  ORDER_LDF,
-  ORDER_ORIGINAL,
-#ifdef WDEG
-  ORDER_WDEG,
-#endif
-  ORDER_CONFLICT
-};
-
 inline PropagationLevel GetPropMethodFromString(string s)
 {
   if(s == "None") return PropLevel_None;

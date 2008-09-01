@@ -75,7 +75,7 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
 void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
 {
   // Set up variable and value ordering
-  pair<vector<AnyVarRef>, vector<int> > var_val_order = BuildCon::build_val_and_var_order(stateObj, instance);
+  pair<vector<AnyVarRef>, vector<int> > var_val_order = BuildCon::build_val_and_var_order(stateObj, instance.search_order[0]);
   
   if(getOptions(stateObj).randomise_valvarorder)
   {
