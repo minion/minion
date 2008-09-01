@@ -38,6 +38,7 @@ inline void world_push(StateObj* stateObj)
   D_ASSERT(getQueue(stateObj).isQueuesEmpty());
   getMemory(stateObj).backTrack().world_push();
   getVars(stateObj).getBigRangevarContainer().bms_array.after_branch_left();
+  getState(stateObj).getConstraintsToPropagate().push_back(set<AbstractConstraint*>());
 }
 
 /// Pops the state of the whole world.
@@ -62,7 +63,7 @@ inline void world_pop(StateObj* stateObj)
     {
       constraintList[propagateDepth - 1].insert(constraintList[propagateDepth].begin(), constraintList[propagateDepth].end());
     }
-    constraintList[propagateDepth].clear();
+    constraintList.pop_back();
   }
 
   getVars(stateObj).getBigRangevarContainer().bms_array.undo();
@@ -100,6 +101,7 @@ inline void SearchState::addConstraint(AbstractConstraint* c)
 inline void SearchState::addConstraintMidsearch(AbstractConstraint* c)
 {
   addConstraint(c);
+  c->setup();
   redoFullPropagate(c);
 }
 
