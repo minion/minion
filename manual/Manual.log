@@ -1,18 +1,17 @@
-This is pdfeTeX, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) (format=pdflatex 2007.2.9)  26 JUN 2008 13:22
+This is pdfeTeX, Version 3.141592-1.30.6-2.2 (Web2C 7.5.5) (format=pdflatex 2006.9.6)  3 OCT 2008 12:42
 entering extended mode
-\write18 enabled.
 **Manual.tex
 (./Manual.tex
-LaTeX2e <2003/12/01>
-Babel <v3.8d> and hyphenation patterns for american, french, german, ngerman, b
+LaTeX2e <2005/12/01>
+Babel <v3.8h> and hyphenation patterns for american, french, german, ngerman, b
 ahasa, basque, bulgarian, catalan, croatian, czech, danish, dutch, esperanto, e
 stonian, finnish, greek, icelandic, irish, italian, latin, magyar, norsk, polis
 h, portuges, romanian, russian, serbian, slovak, slovene, spanish, swedish, tur
 kish, ukrainian, nohyphenation, loaded.
-(/opt/local/share/texmf-dist/tex/latex/base/book.cls
-Document Class: book 2004/02/16 v1.4f Standard LaTeX document class
-(/opt/local/share/texmf-dist/tex/latex/base/bk10.clo
-File: bk10.clo 2004/02/16 v1.4f Standard LaTeX file (size option)
+(/usr/share/texmf/tex/latex/base/book.cls
+Document Class: book 2005/09/16 v1.4f Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/bk10.clo
+File: bk10.clo 2005/09/16 v1.4f Standard LaTeX file (size option)
 )
 \c@part=\count79
 \c@chapter=\count80
@@ -27,72 +26,81 @@ File: bk10.clo 2004/02/16 v1.4f Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-(/opt/local/share/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/share/texmf/tex/latex/graphics/graphicx.sty
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
-(/opt/local/share/texmf-dist/tex/latex/graphics/keyval.sty
+(/usr/share/texmf/tex/latex/graphics/keyval.sty
 Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks14
 )
-(/opt/local/share/texmf-dist/tex/latex/graphics/graphics.sty
-Package: graphics 2001/07/07 v1.0n Standard LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf/tex/latex/graphics/graphics.sty
+Package: graphics 2006/02/20 v1.0o Standard LaTeX Graphics (DPC,SPQR)
 
-(/opt/local/share/texmf-dist/tex/latex/graphics/trig.sty
+(/usr/share/texmf/tex/latex/graphics/trig.sty
 Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 )
-(/opt/local/share/texmf-dist/tex/latex/graphics/graphics.cfg
-File: graphics.cfg 2005/02/03 v1.3 graphics configuration of teTeX/TeXLive
+(/usr/share/texmf/tex/latex/graphics/graphics.cfg
+File: graphics.cfg 2005/08/28 v1.4 graphics configuration of teTeX/TeXLive
 )
-Package graphics Info: Driver file: pdftex.def on input line 80.
+Package graphics Info: Driver file: pdftex.def on input line 90.
 
-(/opt/local/share/texmf-dist/tex/latex/graphics/pdftex.def
-File: pdftex.def 2002/06/19 v0.03k graphics/color for pdftex
+(/usr/share/texmf/tex/latex/graphics/pdftex.def
+File: pdftex.def 2006/08/14 v0.03t Graphics/color for pdfTeX
 \Gread@gobject=\count88
 ))
 \Gin@req@height=\dimen103
 \Gin@req@width=\dimen104
 )
-(/opt/local/share/texmf-dist/tex/latex/base/fontenc.sty
-Package: fontenc 2004/02/22 v1.99f Standard LaTeX package
+(/usr/share/texmf/tex/latex/base/fontenc.sty
+Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
 
-(/opt/local/share/texmf-dist/tex/latex/base/t1enc.def
-File: t1enc.def 2004/02/22 v1.99f Standard LaTeX file
+(/usr/share/texmf/tex/latex/base/t1enc.def
+File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
 ))
-(/opt/local/share/texmf-dist/tex/latex/base/inputenc.sty
-Package: inputenc 2004/02/05 v1.0d Input encoding file
+(/usr/share/texmf/tex/latex/base/inputenc.sty
+Package: inputenc 2006/05/05 v1.1b Input encoding file
+\inpenc@prehook=\toks15
+\inpenc@posthook=\toks16
 
-(/opt/local/share/texmf-dist/tex/latex/base/latin9.def
-File: latin9.def 2004/02/05 v1.0d Input encoding file
+(/usr/share/texmf/tex/latex/base/latin9.def
+File: latin9.def 2006/05/05 v1.1b Input encoding file
 ))
-(/opt/local/share/texmf-dist/tex/latex/url/url.sty
+(/usr/share/texmf/tex/latex/misc/url.sty
 \Urlmuskip=\muskip10
-Package: url 2004/03/15  ver 3.1  Verb mode for urls, etc.
+Package: url 2005/06/27  ver 3.2  Verb mode for urls, etc.
 )
-(/opt/local/share/texmf-dist/tex/latex/tools/xspace.sty
-Package: xspace 1997/10/13 v1.06 Space after command names (DPC)
+(/usr/share/texmf/tex/latex/psnfss/times.sty
+Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
+)
+(/usr/share/texmf/tex/latex/tools/xspace.sty
+Package: xspace 2006/05/08 v1.12 Space after command names (DPC,MH)
 ) (./Manual.aux)
 \openout1 = `Manual.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Try loading font information for T1+ptm on input line 18.
 
-(/opt/local/share/texmf-dist/tex/context/base/supp-pdf.tex
-(/opt/local/share/texmf-dist/tex/context/base/supp-mis.tex
+(/usr/share/texmf/tex/latex/psnfss/t1ptm.fd
+File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
+)
+(/usr/share/texmf/tex/context/base/supp-pdf.tex
+(/usr/share/texmf/tex/context/base/supp-mis.tex
 loading : Context Support Macros / Miscellaneous (2004.10.26)
 \protectiondepth=\count89
 \scratchcounter=\count90
-\scratchtoks=\toks15
+\scratchtoks=\toks17
 \scratchdimen=\dimen105
 \scratchskip=\skip43
 \scratchmuskip=\muskip11
@@ -105,10 +113,10 @@ loading : Context Support Macros / Miscellaneous (2004.10.26)
 \minusone=\count91
 \thousandpoint=\dimen109
 \onerealpoint=\dimen110
-\emptytoks=\toks16
+\emptytoks=\toks18
 \nextbox=\box27
 \nextdepth=\dimen111
-\everyline=\toks17
+\everyline=\toks19
 \!!counta=\count92
 \!!countb=\count93
 \recursecounter=\count94
@@ -119,24 +127,31 @@ loading : Context Support Macros / PDF (2004.03.26)
 \MPscratchCnt=\count97
 \MPscratchDim=\dimen112
 \MPnumerator=\count98
-\everyMPtoPDFconversion=\toks18
+\everyMPtoPDFconversion=\toks20
 )
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <17.28> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 26.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 25.
+(Font)              <12> on input line 26.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 25.
+(Font)              <8> on input line 26.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 25.
+(Font)              <6> on input line 26.
  [1
 
 
-{/opt/local/share/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-(./Manual.toc
+{/usr/share/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <24.88> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 27.
+ (./Manual.toc
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 1.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 2.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <5> on input line 2.
- [1
+
+[1
 
 ] [2])
 \tf@toc=\write4
@@ -144,83 +159,116 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
  [3]
 Chapter 1.
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <20.74> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 29.
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 36.
 [4
 
-] <litreview-example-alphametic.pdf, id=43, 142.5325pt x 113.42375pt>
+] <litreview-example-alphametic.pdf, id=44, 142.5325pt x 113.42375pt>
 File: litreview-example-alphametic.pdf Graphic file (type pdf)
 
 <use litreview-example-alphametic.pdf>
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 100.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 101.
 
 
-(/opt/local/share/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+(/usr/share/texmf/tex/latex/psnfss/omsptm.fd
+File: omsptm.fd 
 )
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 100.
+LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 101.
  [5 <./litreview-example-alphametic.pdf
-Warning: /opt/local/bin/pdflatex (file ./litreview-example-alphametic.pdf): pdf
- inclusion: Page Group detected which pdfTeX can't handle. Ignoring it.
->] <litreview-solver-diagram.pdf, id=54, 967.615pt x 483.8075pt>
+Warning: pdflatex (file ./litreview-example-alphametic.pdf): pdf inclusion: Pag
+e Group detected which pdfTeX can't handle. Ignoring it.
+>] <litreview-solver-diagram.pdf, id=55, 967.615pt x 483.8075pt>
 File: litreview-solver-diagram.pdf Graphic file (type pdf)
 
-<use litreview-solver-diagram.pdf>
-LaTeX Font Info:    Try loading font information for T1+cmtt on input line 173.
-
-
-(/opt/local/share/texmf-dist/tex/latex/base/t1cmtt.fd
-File: t1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+<use litreview-solver-diagram.pdf> [6 <./litreview-solver-diagram.pdf
+Warning: pdflatex (file ./litreview-solver-diagram.pdf): pdf inclusion: Page Gr
+oup detected which pdfTeX can't handle. Ignoring it.
+>]
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 172.
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 174.
+ (/usr/share/texmf/tex/latex/psnfss/t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-Overfull \hbox (1.02661pt too wide) in paragraph at lines 180--184
-\T1/cmr/m/n/10 Download the win-dows archive minion-x.y.z-windows.zip and un-pa
-ck, you should
+Overfull \hbox (1.69835pt too wide) in paragraph at lines 174--177
+\T1/ptm/m/n/10 The main Min-ion web-site is $\T1/pcr/m/n/10 http : / / minion .
+ sourceforge . net/$\T1/ptm/m/n/10 , and this con-
  []
 
-[6] [7 <./litreview-solver-diagram.pdf
-Warning: /opt/local/bin/pdflatex (file ./litreview-solver-diagram.pdf): pdf inc
-lusion: Page Group detected which pdfTeX can't handle. Ignoring it.
->]
-LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 243.
+[7]
+LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 244.
  [8] [9]
 Chapter 2.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 361.
 [10
 
-]
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 360.
- [11] [12] [13] [14] [15]
-Underfull \hbox (badness 10000) in paragraph at lines 740--745
+] [11] [12] [13]
+Overfull \hbox (1.17664pt too wide) in paragraph at lines 568--571
+\T1/ptm/m/n/10 defines a 1-dimensional con-stant ar-ray $\OML/cmm/m/it/10 name[
+]$ \T1/ptm/m/n/10 with 4 El-e-ments rang-ing from $\OML/cmm/m/it/10 int$\T1/ptm
+/m/n/10 (1..10).
+ []
+
+[14] [15]
+Overfull \hbox (0.13675pt too wide) in paragraph at lines 734--736
+\T1/ptm/m/n/10 Quantifications can range over sev-eral quan-ti-fied vari-ables 
+and can be ar-bi-trar-ily nested,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 741--746
 
  []
 
 [16]
-Overfull \hbox (9.45004pt too wide) in paragraph at lines 754--795
+Overfull \hbox (8.09789pt too wide) in paragraph at lines 755--796
  [] 
  []
 
-[17] [18] [19] [20]
-Overfull \hbox (69.64874pt too wide) in paragraph at lines 1016--1016
-[]\T1/cmtt/m/n/10 $the value allocated to each position of the matrix represent
-s positon of house[] 
+[17] [18]
+Overfull \hbox (3.0pt too wide) in paragraph at lines 906--906
+[]       \T1/pcr/m/n/10 edges: matrix indexed by [int(1..16)] of int(1..16)[] 
+ []
+
+[19] [20]
+Overfull \hbox (33.0pt too wide) in paragraph at lines 1017--1017
+[]       \T1/pcr/m/n/10 nationality: matrix indexed by [int(1..5)] of int(1..5)
+,[] 
+ []
+
+
+Overfull \hbox (129.0pt too wide) in paragraph at lines 1017--1017
+[]\T1/pcr/m/n/10 $the value allocated to each position of the matrix represents
+ positon of house[] 
  []
 
 [21]
-Overfull \hbox (85.3949pt too wide) in paragraph at lines 1016--1016
-[]\T1/cmtt/m/n/10 $The man who smokes Chesterfields lives in the house next to 
-the man with the fox.[] 
+Overfull \hbox (39.0pt too wide) in paragraph at lines 1017--1017
+[]\T1/pcr/m/n/10 $The green house is immediately to the right of the ivory hous
+e.[] 
  []
 
 
-Overfull \hbox (38.15643pt too wide) in paragraph at lines 1016--1016
-[]\T1/cmtt/m/n/10 $Kools are smoked in the house next to the house where the ho
-rse is kept.[] 
+Overfull \hbox (147.0pt too wide) in paragraph at lines 1017--1017
+[]\T1/pcr/m/n/10 $The man who smokes Chesterfields lives in the house next to t
+he man with the fox.[] 
+ []
+
+
+Overfull \hbox (93.0pt too wide) in paragraph at lines 1017--1017
+[]\T1/pcr/m/n/10 $Kools are smoked in the house next to the house where the hor
+se is kept.[] 
  []
 
 [22]
-Overfull \hbox (85.3949pt too wide) in paragraph at lines 1031--1031
-[]\T1/cmtt/m/n/10 forall i : int(1..n). forall j : int(i+1..n). | queens[i] - q
-ueens[j] | != |i - j|[] 
+Overfull \hbox (147.0pt too wide) in paragraph at lines 1032--1032
+[]\T1/pcr/m/n/10 forall i : int(1..n). forall j : int(i+1..n). | queens[i] - qu
+eens[j] | != |i - j|[] 
  []
 
 [23]
@@ -228,85 +276,141 @@ Chapter 3.
 [24
 
 ]
-Overfull \hbox (20.27585pt too wide) in paragraph at lines 1057--1058
-[]\T1/cmr/m/n/10 In any prob-lem, chang-ing a \T1/cmtt/m/n/10 BOOL \T1/cmr/m/n/
-10 vari-able to a \T1/cmtt/m/n/10 DISCRETE\T1/cmr/m/n/10 , \T1/cmtt/m/n/10 BOUN
-D \T1/cmr/m/n/10 or \T1/cmtt/m/n/10 SPARSEBOUND
+Overfull \hbox (3.20674pt too wide) in paragraph at lines 1055--1056
+[]\T1/ptm/m/n/10 Some of the dif-fer-ences be-tween the vari-able types only ef
+-fect per-for-mance, whereas
  []
 
 
-Overfull \hbox (11.0303pt too wide) in paragraph at lines 1061--1062
-\T1/cmr/m/n/10 the sparse do-main should pro-duce iden-ti-cal searches, ex-cept
- the \T1/cmtt/m/n/10 SPARSEBOUND
+Overfull \hbox (25.47787pt too wide) in paragraph at lines 1058--1059
+[]\T1/ptm/m/n/10 In any prob-lem, chang-ing a \T1/pcr/m/n/10 BOOL \T1/ptm/m/n/1
+0 vari-able to a \T1/pcr/m/n/10 DISCRETE\T1/ptm/m/n/10 , \T1/pcr/m/n/10 BOUND \
+T1/ptm/m/n/10 or \T1/pcr/m/n/10 SPARSEBOUND
  []
 
-[25]
-Overfull \hbox (4.86023pt too wide) in paragraph at lines 1087--1088
-[]\T1/cmr/m/n/10 Overrides Min-ion's de-fault and names the ex-e-cutable 'name'
-. 
+
+Overfull \hbox (23.48747pt too wide) in paragraph at lines 1058--1059
+\T1/pcr/m/n/10 BOOL \T1/ptm/m/n/10 should al-ways be fastest, fol-lowed by \T1/
+pcr/m/n/10 DISCRETE\T1/ptm/m/n/10 , \T1/pcr/m/n/10 BOUND \T1/ptm/m/n/10 and \T1
+/pcr/m/n/10 SPARSEBOUND\T1/ptm/m/n/10 . 
  []
 
-[26] [27]
+
+Overfull \hbox (37.40659pt too wide) in paragraph at lines 1077--1078
+[]\T1/ptm/m/n/10 Minion does not at-tempt to sim-plify con-straints, so con-str
+aints such as \T1/pcr/m/n/10 sumgeq([a,a,a],
+ []
+
+[25] [26] [27]
 Chapter 4.
 [28
 
-] [29]
-Underfull \hbox (badness 10000) in paragraph at lines 1184--1188
+]
+Overfull \hbox (13.45811pt too wide) in paragraph at lines 1157--1158
+\T1/ptm/m/n/10 method of defin-ing sets of tu-ples which can then be used in \T
+1/pcr/m/n/10 table \T1/ptm/m/n/10 and \T1/pcr/m/n/10 negativetable
+ []
+
+[29]
+Underfull \hbox (badness 10000) in paragraph at lines 1185--1189
 
  []
 
-[30] [31] [32]
-Overfull \hbox (23.88214pt too wide) in paragraph at lines 1297--1298
-\T1/cmr/m/n/10 Essence' file is \T1/cmtt/m/n/10 SENDMOREMONEY.eprime \T1/cmr/m/
-n/10 and the Min-ion file is \T1/cmtt/m/n/10 SENDMOREMONEY.minion\T1/cmr/m/n/10
- .
+[30]
+Overfull \hbox (31.09892pt too wide) in paragraph at lines 1246--1247
+\T1/pcr/m/n/10 /summer_school/examples\T1/ptm/m/n/10 . The Essence' file is nam
+ed \T1/pcr/m/n/10 FarmersProblem.eprime
  []
 
-[33] <EightPuzzleDiagram.pdf, id=164, 1027.84pt x 770.88pt>
+[31] [32]
+Overfull \hbox (7.70876pt too wide) in paragraph at lines 1298--1299
+\T1/ptm/m/n/10 file is \T1/pcr/m/n/10 SENDMOREMONEY.eprime \T1/ptm/m/n/10 and t
+he Min-ion file is \T1/pcr/m/n/10 SENDMOREMONEY.minion\T1/ptm/m/n/10 .
+ []
+
+[33]
+Overfull \hbox (3.0pt too wide) in paragraph at lines 1358--1358
+[]\T1/pcr/m/n/10 [1,10,100,1000,10000,-1,-1,-10,-10,-100,-100,-1000,-1000],[] 
+ []
+
+
+Overfull \hbox (3.0pt too wide) in paragraph at lines 1358--1358
+[]\T1/pcr/m/n/10 [1,10,100,1000,10000,-1,-1,-10,-10,-100,-100,-1000,-1000],[] 
+ []
+
+<EightPuzzleDiagram.pdf, id=164, 1027.84pt x 770.88pt>
 File: EightPuzzleDiagram.pdf Graphic file (type pdf)
 
 <use EightPuzzleDiagram.pdf> [34] [35 <./EightPuzzleDiagram.pdf>] [36] [37]
-[38]
-Overfull \hbox (12.74597pt too wide) in paragraph at lines 1538--1539
-\T1/cmtt/m/n/10 /summer_school/examples\T1/cmr/m/n/10 , the Essence' file is ca
-lled \T1/cmtt/m/n/10 K4P2GracefulGraph.eprime
- []
-
-<k4xp2.pdf, id=189, 1027.84pt x 770.88pt>
+[38] <k4xp2.pdf, id=189, 1027.84pt x 770.88pt>
 File: k4xp2.pdf Graphic file (type pdf)
- <use k4xp2.pdf> [39 <./k4xp2.pdf>]
-[40]
-Overfull \hbox (2.93578pt too wide) in paragraph at lines 1621--1622
-\T1/cmr/m/n/10 edges[a], the first of these con-straints from the Essence' spec
--i-fi-ca-tion is $\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 nodes\OT1/cmr/m/n/10 [1] \
-OMS/cmsy/m/n/10 ^^@
+ <use k4xp2.pdf>
+Overfull \hbox (3.0pt too wide) in paragraph at lines 1576--1576
+[]       \T1/pcr/m/n/10 edges: matrix indexed by [int(1..16)] of int(1..16)[] 
  []
 
-[41] [42] [43] [44] [45]
-Overfull \hbox (26.07329pt too wide) in paragraph at lines 1841--1842
+[39 <./k4xp2.pdf>] [40] [41] [42] [43]
+Overfull \hbox (33.0pt too wide) in paragraph at lines 1796--1796
+[]       \T1/pcr/m/n/10 nationality: matrix indexed by [int(1..5)] of int(1..5)
+,[] 
+ []
+
+[44] [45]
+Overfull \hbox (21.0pt too wide) in paragraph at lines 1828--1828
+[]\T1/pcr/m/n/10 VARORDER [colour,nationality,drink,smoke,pets,aux0,aux1,aux2][
+] 
+ []
+
+
+Overfull \hbox (33.51079pt too wide) in paragraph at lines 1835--1836
+[]$\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 nationality\OT1/cmr/m/n/10 [4] \OMS/cmsy/
+m/n/10 ^^@ \OML/cmm/m/it/10 colour\OT1/cmr/m/n/10 [5]\OMS/cmsy/m/n/10 j \OT1/cm
+r/m/n/10 = 1$ \T1/ptm/m/n/10 be-comes by count-ing in-dices from zero: $\OMS/cm
+sy/m/n/10 j\OML/cmm/m/it/10 nationality\OT1/cmr/m/n/10 [3] \OMS/cmsy/m/n/10 ^^@
+
+ []
+
+
+Overfull \hbox (15.95276pt too wide) in paragraph at lines 1842--1843
 []$\OML/cmm/m/it/10 nationality\OT1/cmr/m/n/10 [5] = \OML/cmm/m/it/10 smoke\OT1
-/cmr/m/n/10 [5]$ \T1/cmr/m/n/10 be-comes by count-ing in-dices from zero: $\OML
+/cmr/m/n/10 [5]$ \T1/ptm/m/n/10 be-comes by count-ing in-dices from zero: $\OML
 /cmm/m/it/10 nationality\OT1/cmr/m/n/10 [4] =
  []
 
+
+Overfull \hbox (10.24641pt too wide) in paragraph at lines 1847--1848
+[]$\OML/cmm/m/it/10 drink\OT1/cmr/m/n/10 [4] = \OML/cmm/m/it/10 smoke\OT1/cmr/m
+/n/10 [4]$ \T1/ptm/m/n/10 be-comes by count-ing in-dices from zero: $\OML/cmm/m
+/it/10 drink\OT1/cmr/m/n/10 [3] = \OML/cmm/m/it/10 smoke\OT1/cmr/m/n/10 [3]$\T1
+/ptm/m/n/10 . 
+ []
+
 [46]
-Overfull \hbox (22.54387pt too wide) in paragraph at lines 1891--1892
+Overfull \hbox (12.42334pt too wide) in paragraph at lines 1892--1893
 []$\OML/cmm/m/it/10 nationality\OT1/cmr/m/n/10 [3] = \OML/cmm/m/it/10 drink\OT1
-/cmr/m/n/10 [2]$ \T1/cmr/m/n/10 be-comes by count-ing in-dices from zero: $\OML
+/cmr/m/n/10 [2]$ \T1/ptm/m/n/10 be-comes by count-ing in-dices from zero: $\OML
 /cmm/m/it/10 nationality\OT1/cmr/m/n/10 [2] =
  []
 
 
-Overfull \hbox (15.56744pt too wide) in paragraph at lines 1901--1902
+Overfull \hbox (6.19554pt too wide) in paragraph at lines 1897--1898
+[]$\OML/cmm/m/it/10 drink\OT1/cmr/m/n/10 [1] = \OML/cmm/m/it/10 colour\OT1/cmr/
+m/n/10 [2]$ \T1/ptm/m/n/10 be-comes by count-ing in-dices from zero: $\OML/cmm/
+m/it/10 drink\OT1/cmr/m/n/10 [0] = \OML/cmm/m/it/10 colour\OT1/cmr/m/n/10 [1]$ 
+
+ []
+
+
+Overfull \hbox (5.44691pt too wide) in paragraph at lines 1902--1903
 []$\OML/cmm/m/it/10 nationality\OT1/cmr/m/n/10 [2] = \OML/cmm/m/it/10 pets\OT1/
-cmr/m/n/10 [1]$ \T1/cmr/m/n/10 be-comes by count-ing in-dices from zero: $\OML/
+cmr/m/n/10 [1]$ \T1/ptm/m/n/10 be-comes by count-ing in-dices from zero: $\OML/
 cmm/m/it/10 nationality\OT1/cmr/m/n/10 [1] =
  []
 
 
-Overfull \hbox (25.29785pt too wide) in paragraph at lines 1906--1907
+Overfull \hbox (15.17732pt too wide) in paragraph at lines 1907--1908
 []$\OML/cmm/m/it/10 nationality\OT1/cmr/m/n/10 [1] = \OML/cmm/m/it/10 colour\OT
-1/cmr/m/n/10 [1]$ \T1/cmr/m/n/10 be-comes by count-ing in-dices from zero: $\OM
+1/cmr/m/n/10 [1]$ \T1/ptm/m/n/10 be-comes by count-ing in-dices from zero: $\OM
 L/cmm/m/it/10 nationality\OT1/cmr/m/n/10 [0] =
  []
 
@@ -314,42 +418,342 @@ L/cmm/m/it/10 nationality\OT1/cmr/m/n/10 [0] =
 Appendix A.
 [51
 
-] [52] [53] [54] [55] [56] [57] [58] [59] [60] [61] [62] [63] [64] [65]
-[66] [67] [68] [69] [70] [71] [72] [73] [74] [75] [76] [77] [78] [79] [80]
-[81] (./Manual.bbl [82] [83
+]
+Overfull \hbox (24.60023pt too wide) in paragraph at lines 2114--2114
+[]\T1/pcr/m/n/8 This constraint can be expressed in a much longer form, this fo
+rm both avoids[] 
+ []
 
-]) [84] (./Manual.aux) ) 
+
+Overfull \hbox (24.60023pt too wide) in paragraph at lines 2114--2114
+[]\T1/pcr/m/n/8 requiring an extra variable, and also gets better propagation. 
+It gets bounds[] 
+ []
+
+[52] [53]
+Overfull \hbox (10.20023pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 propagators are called in Minion, the number of search nodes ma
+y vary when[] 
+ []
+
+
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 using element. To avoid this problem, use watchelement instead.
+ More details[] 
+ []
+
+
+Overfull \hbox (24.60023pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 The level of propagation enforced by this constraint is not nam
+ed, however it[] 
+ []
+
+
+Overfull \hbox (15.00023pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 - When e is assigned, removes idx from the domain of i whenever
+ e is not an[] 
+ []
+
+
+Overfull \hbox (29.40024pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 - When m[idx] is assigned, removes idx from i when m[idx] is no
+t in the domain[] 
+ []
+
+
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 This level of consistency is designed to avoid the propagator h
+aving to scan[] 
+ []
+
+
+Overfull \hbox (34.20024pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 through vec, except when e is assigned. It does a quantity of c
+heap propagation[] 
+ []
+
+
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 Element is not confluent, which may cause the number of search 
+nodes to vary[] 
+ []
+
+
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 depending on the order in which constraints are listed in the i
+nput file, or[] 
+ []
+
+
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 the order they are called in Minion. For example, the following
+ input causes[] 
+ []
+
+
+Overfull \hbox (10.20023pt too wide) in paragraph at lines 2235--2235
+[]\T1/pcr/m/n/8 However if the two constraints are swapped over, Minion explore
+s 29 nodes.[] 
+ []
+
+[54] [55]
+Overfull \hbox (39.00024pt too wide) in paragraph at lines 2347--2347
+[]\T1/pcr/m/n/8 The Generalized Cardinality Constraint (GCC) constrains the num
+ber of each value[] 
+ []
+
+
+Overfull \hbox (24.60023pt too wide) in paragraph at lines 2347--2347
+[]\T1/pcr/m/n/8 For each value in the initial domains of the primary variables,
+ there must be[] 
+ []
+
+
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 2347--2347
+[]\T1/pcr/m/n/8 For example, if the union of the initial domains of the primary
+ variables is[] 
+ []
+
+
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 2347--2347
+[]\T1/pcr/m/n/8 {-5,-3,-1,0,2,3,5} then there would be 11 capacity variables, s
+pecifying the[] 
+ []
+
+
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 2347--2347
+[]\T1/pcr/m/n/8 This constraint is new, and its syntax and implementation are n
+ot finalised.[] 
+ []
+
+
+Overfull \hbox (29.40024pt too wide) in paragraph at lines 2362--2362
+[]\T1/pcr/m/n/8 The following constraint would restrict the occurrence of value
+s 1..9 in myVec[] 
+ []
+
+
+Overfull \hbox (10.20023pt too wide) in paragraph at lines 2362--2362
+[]\T1/pcr/m/n/8 to be at most 2 each initially, and finally equal to the values
+ of the cap[] 
+ []
+
+
+Overfull \hbox (5.40022pt too wide) in paragraph at lines 2377--2377
+[]\T1/pcr/m/n/8 This constraint enforces a hybrid consistency. It reads the bou
+nds of the[] 
+ []
+
+
+Overfull \hbox (39.00024pt too wide) in paragraph at lines 2377--2377
+[]\T1/pcr/m/n/8 capacity variables, then enforces GAC over the primary variable
+s only.  Then the[] 
+ []
+
+
+Overfull \hbox (29.40024pt too wide) in paragraph at lines 2377--2377
+[]\T1/pcr/m/n/8 bounds of the capacity variables are updated by counting values
+ in the domains[] 
+ []
+
+[56] [57]
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 2501--2501
+[]\T1/pcr/m/n/8 The constraint litsumgeq(vec1, vec2, c) ensures that there exis
+ts at least c[] 
+ []
+
+
+Overfull \hbox (24.60023pt too wide) in paragraph at lines 2512--2512
+[]\T1/pcr/m/n/8 Note also that this constraint is more efficient for smaller va
+lues of c. For[] 
+ []
+
+[58] [59] [60] [61] [62]
+Overfull \hbox (39.00024pt too wide) in paragraph at lines 2800--2800
+[]\T1/pcr/m/n/8 ensures that r is set to 1 if and only if constraint is satisfi
+ed. That is, if r[] 
+ []
+
+
+Overfull \hbox (39.00024pt too wide) in paragraph at lines 2800--2800
+[]\T1/pcr/m/n/8 is 0 the constraint must NOT be satisfied; and if r is 1 it mus
+t be satisfied as[] 
+ []
+
+
+Overfull \hbox (34.20024pt too wide) in paragraph at lines 2800--2800
+[]\T1/pcr/m/n/8 normal. Conversely, if the constraint is satisfied then r must 
+be 1, and if not[] 
+ []
+
+
+Overfull \hbox (39.00024pt too wide) in paragraph at lines 2800--2800
+[]\T1/pcr/m/n/8 only checks that if r is set to 1 then constraint must be satis
+fied. If r is not[] 
+ []
+
+
+Overfull \hbox (39.00024pt too wide) in paragraph at lines 2800--2800
+[]\T1/pcr/m/n/8 1, constraint may be either satisfied or unsatisfied. Furthermo
+re r is never set[] 
+ []
+
+
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 2800--2800
+[]\T1/pcr/m/n/8 by propagation, only by search; that is, satisfaction of constr
+aint does not[] 
+ []
+
+
+Overfull \hbox (10.20023pt too wide) in paragraph at lines 2807--2807
+[]\T1/pcr/m/n/8 Not all constraints are reifiable. Entries for individual const
+raints give[] 
+ []
+
+[63] [64] [65] [66]
+Overfull \hbox (24.60023pt too wide) in paragraph at lines 3077--3077
+[]\T1/pcr/m/n/8 ensures that A and B are not the same vector, i.e., there exist
+s some index i[] 
+ []
+
+[67]
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 3172--3172
+[]\T1/pcr/m/n/8 You can give an input file via standard input by specifying '--
+' as the file[] 
+ []
+
+
+Overfull \hbox (29.40024pt too wide) in paragraph at lines 3172--3172
+[]\T1/pcr/m/n/8 name, this might help when minion is being used as a tool in a 
+shell script or[] 
+ []
+
+[68]
+Overfull \hbox (0.60022pt too wide) in paragraph at lines 3332--3332
+[]\T1/pcr/m/n/8 # Internally, Bound variables are stored only as a lower and up
+per bound[] 
+ []
+
+
+Overfull \hbox (24.60023pt too wide) in paragraph at lines 3332--3332
+[]\T1/pcr/m/n/8 SPARSEBOUND s {1,3,6,7} # Sparse bound variables take a sorted 
+list of values[] 
+ []
+
+
+Overfull \hbox (19.80023pt too wide) in paragraph at lines 3332--3332
+[]\T1/pcr/m/n/8 DISCRETE q[3] {0..5} # This is a matrix with 3 variables: q[0],
+q[1] and q[2][] 
+ []
+
+
+Overfull \hbox (0.60022pt too wide) in paragraph at lines 3332--3332
+[]\T1/pcr/m/n/8 BOOL bm[2,2] # A 2d matrix, variables bm[0,0], bm[0,1], bm[1,0]
+, bm[1,1][] 
+ []
+
+[69]
+Overfull \hbox (10.20023pt too wide) in paragraph at lines 3332--3332
+[]\T1/pcr/m/n/8 # These can take matrices in interesting ways like constraints,
+ see below.[] 
+ []
+
+
+Overfull \hbox (29.40024pt too wide) in paragraph at lines 3332--3332
+[]\T1/pcr/m/n/8 # One minor problem.. you must always put [ ] around any matrix
+ expression, so[] 
+ []
+
+[70]
+Overfull \hbox (5.40022pt too wide) in paragraph at lines 3332--3332
+[]\T1/pcr/m/n/8 #No need to put everything in one section! All sections can be 
+reopened..[] 
+ []
+
+
+Overfull \hbox (29.40024pt too wide) in paragraph at lines 3332--3332
+[]\T1/pcr/m/n/8 # On the other hand, I might remove this altogether, as it's wo
+rse than giving[] 
+ []
+
+[71] [72] [73] [74] [75] [76] [77]
+Overfull \hbox (10.20023pt too wide) in paragraph at lines 3761--3761
+[]  \T1/pcr/m/n/8 percentage of its initial values remaining, break ties lexico
+graphically[] 
+ []
+
+[78]
+Overfull \hbox (5.40022pt too wide) in paragraph at lines 3803--3803
+[]\T1/pcr/m/n/8 Minion also supports use of constants in place of variables, an
+d constant[] 
+ []
+
+
+Overfull \hbox (10.20023pt too wide) in paragraph at lines 3803--3803
+[]\T1/pcr/m/n/8 vectors in place of vectors of variables. Using constants will 
+be at least[] 
+ []
+
+
+Overfull \hbox (5.40022pt too wide) in paragraph at lines 3803--3803
+[]\T1/pcr/m/n/8 as efficient as using variables when the variable has a singlet
+on domain.[] 
+ []
+
+[79]
+Overfull \hbox (34.20024pt too wide) in paragraph at lines 3870--3870
+[]\T1/pcr/m/n/8 Minion supports the use of constants anywhere where a variable 
+can be used. For[] 
+ []
+
+
+Overfull \hbox (34.20024pt too wide) in paragraph at lines 3870--3870
+[]\T1/pcr/m/n/8 example, in a constraint as a replacement for a single variable
+, or a vector of[] 
+ []
+
+
+Overfull \hbox (29.40024pt too wide) in paragraph at lines 3891--3891
+[]\T1/pcr/m/n/8 In discrete variables, the domain ranges between the specified 
+lower and upper[] 
+ []
+
+
+Overfull \hbox (34.20024pt too wide) in paragraph at lines 3891--3891
+[]\T1/pcr/m/n/8 bounds, but during search any domain value may be pruned, i.e.,
+ propagation and[] 
+ []
+
+[80]
+Overfull \hbox (5.40022pt too wide) in paragraph at lines 3903--3903
+[]\T1/pcr/m/n/8 Declaration of a discrete variable x with domain {1,2,3,4} in i
+nput file:[] 
+ []
+
+[81] (./Manual.bbl [82]) [83
+
+] [84] (./Manual.aux) ) 
 Here is how much of TeX's memory you used:
- 1375 strings out of 94500
- 16763 string characters out of 1174974
- 65536 words of memory out of 1000000
- 4537 multiletter control sequences out of 10000+50000
- 23005 words of font info for 48 fonts, out of 500000 for 2000
- 580 hyphenation exceptions out of 1000
- 25i,8n,20p,1486b,320s stack positions out of 1500i,500n,5000p,200000b,5000s
+ 1471 strings out of 94420
+ 17395 string characters out of 1167206
+ 66925 words of memory out of 4000000
+ 4673 multiletter control sequences out of 10000+50000
+ 69280 words of font info for 70 fonts, out of 500000 for 2000
+ 580 hyphenation exceptions out of 8191
+ 25i,8n,19p,1486b,320s stack positions out of 3000i,1500n,5000p,200000b,15000s
 PDF statistics:
- 347 PDF objects out of 300000
+ 346 PDF objects out of 300000
  0 named destinations out of 131072
- 21 words of extra memory for PDF output out of 65536
- </var/tmp/texfonts/pk/ljfour/jknappen/ec/ectt0800.600p
-k></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmmi12.pfb></opt/local/sh
-are/texmf-dist/fonts/type1/bluesky/cm/cmsy8.pfb></opt/local/share/texmf-dist/fo
-nts/type1/bluesky/cm/cmex10.pfb> </var/tmp/texfonts/pk/ljfour/jknappen/ec/ecrm0
-800.600pk> </var/tmp/texfonts/pk/ljfour/jknappen/ec/ecrm0600.600pk> </var/tmp/t
-exfonts/pk/ljfour/jknappen/ec/ecrm0700.600pk> </var/tmp/texfonts/pk/ljfour/jkna
-ppen/ec/eccc1440.600pk> </var/tmp/texfonts/pk/ljfour/jknappen/ec/eccc1200.600pk
-> </var/tmp/texfonts/pk/ljfour/jknappen/ec/ectt1000.600pk> </var/tmp/texfonts/p
-k/ljfour/jknappen/ec/ecbx1200.600pk></opt/local/share/texmf-dist/fonts/type1/bl
-uesky/cm/cmr10.pfb> </var/tmp/texfonts/pk/ljfour/jknappen/ec/ecti1000.600pk> </
-var/tmp/texfonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </var/tmp/texfonts/pk/lj
-four/jknappen/ec/ecbx2074.600pk></opt/local/share/texmf-dist/fonts/type1/bluesk
-y/cm/cmsy10.pfb></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmr7.pfb></
-opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmmi10.pfb> </var/tmp/texfont
-s/pk/ljfour/jknappen/ec/ecsl1000.600pk></opt/local/share/texmf-dist/fonts/type1
-/bluesky/cm/cmsy7.pfb> </var/tmp/texfonts/pk/ljfour/jknappen/ec/eccc1000.600pk>
- </var/tmp/texfonts/pk/ljfour/jknappen/ec/ecrm1000.600pk> </var/tmp/texfonts/pk
-/ljfour/jknappen/ec/ecbx1000.600pk> </var/tmp/texfonts/pk/ljfour/jknappen/ec/ec
-bx2488.600pk> </var/tmp/texfonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </var/tm
-p/texfonts/pk/ljfour/jknappen/ec/ecrm1728.600pk> </var/tmp/texfonts/pk/ljfour/j
-knappen/ec/ecbx1728.600pk>
-Output written on Manual.pdf (85 pages, 447267 bytes).
+ 21 words of extra memory for PDF output out of 10000
+</usr/share/texmf/fonts/type1/bluesky/cm/cmmi12.pfb></us
+r/share/texmf/fonts/type1/bluesky/cm/cmsy8.pfb></usr/share/texmf/fonts/type1/bl
+uesky/cm/cmex10.pfb>{/usr/share/texmf/fonts/enc/dvips/psnfss/8r.enc}</usr/share
+/texmf/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/texmf/fonts/type1/urw/cou
+rier/ucrr8a.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr10.pfb></usr/share/
+texmf/fonts/type1/urw/times/utmri8a.pfb></usr/share/texmf/fonts/type1/bluesky/c
+m/cmsy10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr7.pfb></usr/share/texm
+f/fonts/type1/bluesky/cm/cmmi10.pfb></usr/share/texmf/fonts/type1/urw/times/utm
+r8a.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmsy7.pfb></usr/share/texmf/fo
+nts/type1/urw/times/utmr8a.pfb></usr/share/texmf/fonts/type1/urw/times/utmb8a.p
+fb>
+Output written on Manual.pdf (85 pages, 309985 bytes).
