@@ -1,9 +1,0 @@
-Minion Release 0.3
-
-Minion is still currently a little on the unstable size, and prone to 
-major changes on a regular basis. Use with caution!
-
-
-Note Minion requires g++ 3.4.2 or above. If you try compiling and get a bunch of error messages, post them to the mailing list and I'll have a look. This code hasn't been compiled on many computers yet, so I wouldn't be shocked if people have trouble compiling it.
-
-Note the current reader is very wobbly. Very soon it will be replaced by an XML one, which will be much more stable :)
