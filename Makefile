@@ -140,6 +140,9 @@ pdfhelp:
 	pdflatex -output-directory=docs/latexhelp docs/latexhelp/doc.latex
 	pdflatex -output-directory=docs/latexhelp docs/latexhelp/doc.latex
 
+api-doc:
+	cd minion && doxygen Doxyfile
+
 lisp-generate: minion-helper minion-sat minion-quasigroup
 
 minion-helper: 
