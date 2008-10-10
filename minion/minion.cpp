@@ -362,7 +362,7 @@ try {
     cout << "#    http://minion.sourceforge.net" << endl;
     cout << "#  Minion is still very new and in active development." << endl;
     cout << "#  If you have problems with Minion or find any bugs, please tell us!" << endl;
-    cout << "#  Either at the bug reporter at the website, or 'chris@bubblescope.net'" << endl;
+    cout << "#  Mailing list at: https://mail.cs.st-andrews.ac.uk/mailman/listinfo/mug" << endl;
     cout << "# Input filename: " << getOptions(stateObj).instance_name << endl;
     cout << "# Command line: " ;
     for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; } 
