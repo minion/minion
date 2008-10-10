@@ -7,6 +7,6 @@
    $Id$
 */
 
-#include "../dynamic_constraints/dynamic_satclause.h"
-BUILD_DYNAMIC_CT(CT_WATCHED_OR, 1)
+#include "../dynamic_constraints/dynamic_new_and.h"
+BUILD_DYNAMIC_CT(CT_WATCHED_NEW_AND, 0)
 

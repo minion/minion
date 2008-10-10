@@ -44,6 +44,7 @@ DYNAMIC_CT "watchvecexists_less"	CT_WATCHED_VEC_OR_LESS	read_list read_list
 DYNAMIC_CT "watchvecexists_and" 	CT_WATCHED_VEC_OR_AND	read_list read_list
 DYNAMIC_CT "hamming"			CT_WATCHED_HAMMING	read_list read_list read_constant
 DYNAMIC_CT "watched-or"			CT_WATCHED_NEW_OR	read_constraint_list
+DYNAMIC_CT "watched-and"			CT_WATCHED_NEW_AND	read_constraint_list
 DYNAMIC_CT "w-inset" 			CT_WATCHED_INSET 	read_var read_constant_list
 DYNAMIC_CT "w-notinset" 		CT_WATCHED_NOT_INSET 	read_var read_constant_list
 DYNAMIC_CT "w-inrange" 			CT_WATCHED_INRANGE 	read_var read_constant_list

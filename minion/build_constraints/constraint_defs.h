@@ -46,6 +46,7 @@ ConstraintDef constraint_list[] = {
 { "watchvecexists_and" , CT_WATCHED_VEC_OR_AND, 2,{ read_list , read_list }, DYNAMIC_CT },
 { "hamming" , CT_WATCHED_HAMMING, 3,{ read_list , read_list , read_constant }, DYNAMIC_CT },
 { "watched-or" , CT_WATCHED_NEW_OR, 1,{ read_constraint_list }, DYNAMIC_CT },
+{ "watched-and" , CT_WATCHED_NEW_AND, 1,{ read_constraint_list }, DYNAMIC_CT },
 { "w-inset" , CT_WATCHED_INSET, 2,{ read_var , read_constant_list }, DYNAMIC_CT },
 { "w-notinset" , CT_WATCHED_NOT_INSET, 2,{ read_var , read_constant_list }, DYNAMIC_CT },
 { "w-inrange" , CT_WATCHED_INRANGE, 2,{ read_var , read_constant_list }, DYNAMIC_CT },
