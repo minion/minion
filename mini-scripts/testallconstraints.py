@@ -82,7 +82,8 @@ for i in optargs:
     elif a1=="--64bit":
         bit64=True
 
-for consname1 in conslist:
+for consname1index, consname1 in enumerate(conslist):
+    print "Testing %s (%d/%d)"%(consname1, consname1index + 1, len(conslist))
     random.seed(12345)   # stupid seed but at least it makes the test repeatable.
     
     reify=False
