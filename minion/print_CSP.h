@@ -53,6 +53,7 @@ void print_instance(const ConstraintBlob& blob)
   
   int var_pos = 0;
   int const_pos = 0;
+  int constraint_child_pos = 0;
   
   for(int i = 0; i < blob.constraint->number_of_params; i++)
   {
@@ -84,6 +85,20 @@ void print_instance(const ConstraintBlob& blob)
       case read_tuples:
         oss << csp.getTableName(blob.tuples);
       break;
+      case read_constraint:
+        print_instance(blob.internal_constraints[constraint_child_pos]);
+        constraint_child_pos++;
+      break;
+      case read_constraint_list:
+        oss << "{";
+        print_instance(blob.internal_constraints[0]);
+        for(int j = 1; j < blob.internal_constraints.size(); ++j)
+        {
+          oss << ", ";
+          print_instance(blob.internal_constraints[j]); 
+        }
+        oss << "}";
+        break;
   	  default:
       oss << "???";
 //  	    D_FATAL_ERROR("Internal Error!");
@@ -193,8 +208,8 @@ void print_search_info( )
     {
       oss << "VALORDER ";
       vector<string> output_vars;
-      for(int i = 0; i < csp.search_order[i].val_order.size(); ++i)
-        output_vars.push_back(csp.search_order[i].val_order[i] ? "a" : "d");
+      for(int j = 0; j < csp.search_order[i].val_order.size(); ++j)
+        output_vars.push_back(csp.search_order[i].val_order[j] ? "a" : "d");
       print_instance( output_vars);
       oss << endl;
     }
