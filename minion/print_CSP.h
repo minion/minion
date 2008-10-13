@@ -222,10 +222,9 @@ void print_search_info( )
   }
   
 }
-  
-void print_instance()
-{   
-    oss << "MINION 3" << endl;
+
+void fix_variables()
+{
   if(csp.vars.symbol_table.empty())
   {
     oss << "# This instance was format MINION 1 or 2, so filling in variable names" << endl;
@@ -235,9 +234,19 @@ void print_instance()
     for(int i = 0; i < all_vars.size(); ++i)
       csp.vars.addSymbol("x" + to_string(i), all_vars[i]);  
   }
+}
+
+void print_instance()
+{ print_instance(csp.vars); }
+
+void print_instance(const vector<Var>& vars_in)
+{
+  oss << "MINION 3" << endl;
   
+  fix_variables();
+    
   oss << "**VARIABLES**" << endl;
-  print_instance( csp.vars);
+  print_instance(vars_in);
   
   oss << "**SEARCH**" << endl;
   print_search_info();
