@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.4)
 
 include(CheckIncludeFileCXX)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
@@ -80,9 +80,9 @@ else()
 	message(STATUS "You need a UNIX-like system to regenerate constraints and help")
 endif()
 
-aux_source_directory("${PROJECT_SOURCE_DIR}/minion" SRCS)
-aux_source_directory("${PROJECT_SOURCE_DIR}/minion/build_constraints" SRCS)
-aux_source_directory("${PROJECT_SOURCE_DIR}/minion/system" SRCS)
+aux_source_directory(minion SRCS)
+aux_source_directory(minion/build_constraints SRCS)
+aux_source_directory(minion/system SRCS)
 
 set(BINARY ${PROJECT_NAME})
 set(CFLAGS "-Wextra -Wno-sign-compare")
@@ -244,10 +244,8 @@ if(CLISP)
 	# XXX: adding the dependencies directly to the target causes it to fail
 	# if the current dir != EXECUTABLE_OUTPUT_PATH
 	add_dependencies(lisp-generate minion-helper minion-sat minion-quasigroup)
-	set_property(DIRECTORY PROPERTY
-		     ADDITIONAL_MAKE_CLEAN_FILES ${EXECUTABLE_OUTPUT_PATH}/minion-helper
-						 ${EXECUTABLE_OUTPUT_PATH}/minion-sat
-						 ${EXECUTABLE_OUTPUT_PATH}/minion-quasigroup)
+	set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
+		"${EXECUTABLE_OUTPUT_PATH}/minion-helper;${EXECUTABLE_OUTPUT_PATH}/minion-sat;${EXECUTABLE_OUTPUT_PATH}/minion-quasigroup")
 else()
 	message(STATUS "No clisp executable found, not generating LISP targets")
 endif()
