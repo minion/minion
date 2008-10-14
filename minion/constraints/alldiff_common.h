@@ -48,8 +48,6 @@ using namespace std;
 
 #include "alldiff_gcc_shared.h"
 
-#include "constraint_equal.h"
-
 #ifdef P
 #undef P
 #endif
