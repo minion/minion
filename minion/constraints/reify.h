@@ -111,8 +111,26 @@ struct reify : public ParentConstraint
     
   }
   
+  // constructor which takes a negative constraint and constructs the positive one.
+  // This is so that reify can be reversed. Called in reverse_constraint.
+  reify(StateObj* _stateObj, AbstractConstraint* _negcon, BoolVar _rar_var, bool unused_argument) :
+  ParentConstraint(_stateObj), reify_var(_rar_var), constraint_locked(false),
+    full_propagate_called(stateObj, false)
+  {
+    AbstractConstraint* _poscon = _negcon->reverse_constraint();
+    
+    child_constraints.push_back(_poscon);
+    child_constraints.push_back(_negcon);
+    // assume for the time being that the two child constraints have the same number of vars.
+    reify_var_num=child_constraints[0]->get_vars_singleton()->size();
+    D_ASSERT(child_constraints[0]->get_vars().size() == child_constraints[1]->get_vars().size());
+  }
+  
   virtual AbstractConstraint* reverse_constraint()
-  { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
+  {
+      // reverse it by swapping the positive and negative constraints.
+      return new reify<BoolVar>(stateObj, child_constraints[0], reify_var, true);
+  }
   
   virtual int dynamic_trigger_count()
   {

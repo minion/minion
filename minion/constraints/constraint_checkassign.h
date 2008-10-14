@@ -129,5 +129,29 @@ struct CheckAssignConstraint : public AbstractConstraint
 	  vars.push_back(variables[i]);
 	return vars;
   }
+  
+  // Getting a satisfying assignment here is too hard
+	 virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+   {
+     MAKE_STACK_BOX(c, DomainInt, variables.size());
+     
+     for(int i = 0; i < variables.size(); ++i)
+     {
+       if(!variables[i].isAssigned()) 
+       {  
+         assignment.push_back(make_pair(i, variables[i].getMin()));
+         assignment.push_back(make_pair(i, variables[i].getMax()));
+         return;
+       }
+       else
+         c.push_back(variables[i].getAssignedValue());
+     }
+    
+    if(check_assignment(c.begin(), c.size()))
+    {  // Put the complete assignment in the box.
+      for(int i = 0; i < variables.size(); ++i)
+        assignment.push_back(make_pair(i, c[i])); 
+    }
+   }
 };
 

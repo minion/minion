@@ -53,13 +53,13 @@ template<typename BoolVar, bool DoWatchAssignment>
   reify_true(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar _rar_var) :
   ParentConstraint(_stateObj), rar_var(_rar_var), constraint_locked(false),
     full_propagate_called(stateObj, false)
-  { 
+  {
     child_constraints.push_back(_poscon);
   }
-
+  
   virtual AbstractConstraint* reverse_constraint()
   { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
-
+  
   virtual int dynamic_trigger_count()
   {
     if(DoWatchAssignment)
@@ -67,7 +67,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     else
       return 0;
   }
-
+  
   virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(rar_var.inDomain(0))

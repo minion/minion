@@ -48,6 +48,20 @@ using namespace std;
 
 #include "alldiff_gcc_shared.h"
 
+#include "constraint_equal.h"
+
+#ifdef P
+#undef P
+#endif
+
+#ifdef PLONG
+#undef PLONG
+#endif
+
+#define P(x)
+//#define P(x) cout << x << endl
+//#define PLONG
+
 template<typename VarArray>
 #ifndef DYNAMICALLDIFF
 struct GacAlldiff : public AbstractConstraint    // name changed fortrunk.
@@ -189,6 +203,20 @@ struct DynamicAlldiff : public DynamicConstraint
   #endif
   
   #ifndef DYNAMICALLDIFF
+  /*virtual AbstractConstraint* reverse_constraint()
+  { // w-or of pairwise equality.
+      vector<AbstractConstraint*> con=new vector<AbstractConstraint*>();
+      for(int i=0; i<var_array.size(); i++)
+      {
+          for(int j=0; j<var_array.size(); j++)
+          {
+              EqualConstraint t=new EqualConstraint(stateObj, var_array[i], var_array[j]);
+              con.push_back(t);
+          }
+      }
+      return new Dynamic_OR(stateObj, con);
+  }*/
+  
   virtual AbstractConstraint* reverse_constraint()
   { return new CheckAssignConstraint<VarArray, GacAlldiff>(stateObj, var_array, *this); }
   #endif
@@ -234,7 +262,7 @@ struct DynamicAlldiff : public DynamicConstraint
         
         for(int i=0; i<count; i++)
         {
-            D_DATA(cout << "Checking var "<< prop_var << " val " << list[i]+dom_min << endl );
+            P("Checking var "<< prop_var << " val " << list[i]+dom_min);
             if(!var_array[prop_var].inDomain(list[i]+dom_min))
             {
                 valout=true;
@@ -243,11 +271,7 @@ struct DynamicAlldiff : public DynamicConstraint
         }
         if(!valout)
         {
-            // none of the watches were disturbed.
-            #ifndef NO_DEBUG
-            cout << "None of the watches were disturbed. Saved a call with watches." <<endl;
-            
-            #endif
+            P("None of the watches were disturbed. Saved a call with watches.");
             return;
         }
     }
@@ -311,7 +335,7 @@ struct DynamicAlldiff : public DynamicConstraint
   {
       // get variable number from the trigger
     int prop_var = trig->trigger_info();
-    #ifndef NO_DEBUG
+    #ifdef PLONG
     // check that some value has been disturbed; otherwise the watches are malfunctioning.
     if(var_array[prop_var].inDomain(varvalmatching[prop_var]))
     {
@@ -322,7 +346,7 @@ struct DynamicAlldiff : public DynamicConstraint
         
         for(int i=0; i<count; i++)
         {
-            D_DATA(cout << "Checking var "<< prop_var << " val " << list[i]+dom_min << endl );
+            P("Checking var "<< prop_var << " val " << list[i]+dom_min);
             if(!var_array[prop_var].inDomain(list[i]+dom_min))
             {
                 valout=true;
@@ -422,7 +446,7 @@ struct DynamicAlldiff : public DynamicConstraint
     bt_triggers_start=dynamic_trigger_start()+numvars;
     #endif
     
-    #ifndef NO_DEBUG
+    #ifdef PLONG
     cout << "Entering do_prop."<<endl;
     cout << "Varvalmatching:" <<varvalmatching<<endl;
     cout << "SCCs:" << SCCs <<endl;
@@ -500,7 +524,7 @@ struct DynamicAlldiff : public DynamicConstraint
     sccs_to_process.clear();
     {
     vector<int>& toiterate = to_process.getlist();
-    D_DATA(cout << "About to loop for to_process variables."<<endl);
+    P("About to loop for to_process variables.");
     
     for(int i=0; i<toiterate.size(); ++i)
     {
@@ -530,9 +554,9 @@ struct DynamicAlldiff : public DynamicConstraint
             // Actually should queue the SCCs which need to be hopcrofted,
             // and make greedy repairs to var matchings as we process them here.
             
-            D_DATA(cout << "Varvalmatching:" <<varvalmatching<<endl);
+            P("Varvalmatching:" <<varvalmatching);
             
-            D_DATA(cout << "start:" << sccindex_start << " end:"<< sccindex_end<<endl);
+            P("start:" << sccindex_start << " end:"<< sccindex_end);
             
             if(!matching_wrapper(sccindex_start, sccindex_end))
                 return;
@@ -545,13 +569,12 @@ struct DynamicAlldiff : public DynamicConstraint
             for(int j=0; j<numvars; j++)
             {
                 var_array[j].addWatchTrigger(trig + j, DomainRemoval, varvalmatching[j]);
-                D_DATA(cout << "Adding watch for var " << j << " val " << varvalmatching[j] << endl);
+                P("Adding watch for var " << j << " val " << varvalmatching[j]);
             }
             #endif
             #endif
             
-            
-            D_DATA(cout << "Fixed varvalmatching:" << varvalmatching <<endl);
+            P("Fixed varvalmatching:" << varvalmatching);
             
             // now both varvalmatching and valvarmatching contain 
             // a complete matching for the SCC.
@@ -592,7 +615,7 @@ struct DynamicAlldiff : public DynamicConstraint
                 // Now remove the value from the reduced SCC
                 for(int i=sccindex_start; i<=sccindex_end; i++)
                 {
-                    D_DATA(cout << "Removing var: "<< SCCs[i] << " val:" << tempval <<endl);
+                    P("Removing var: "<< SCCs[i] << " val:" << tempval);
                     var_array[SCCs[i]].removeFromDomain(tempval);
                 }
                 
@@ -703,7 +726,7 @@ struct DynamicAlldiff : public DynamicConstraint
     }
     #endif
     
-    #ifndef NO_DEBUG
+    #ifdef PLONG
     cout << "Entering do_prop."<<endl;
     cout << "Varvalmatching:" <<varvalmatching<<endl;
     cout << "SCCs:" << SCCs <<endl;
@@ -782,8 +805,7 @@ struct DynamicAlldiff : public DynamicConstraint
     #endif
     #endif
     
-    
-    D_DATA(cout << "Fixed varvalmatching:" << varvalmatching <<endl);
+    P("Fixed varvalmatching:" << varvalmatching);
     
     // now both varvalmatching and valvarmatching contain 
     // a complete matching for the SCC.
@@ -982,7 +1004,7 @@ struct DynamicAlldiff : public DynamicConstraint
         for(int j=0; j<numvars; j++)
         {
             var_array[j].addWatchTrigger(trig + j, DomainRemoval, varvalmatching[j]);
-            D_DATA(cout << "Adding watch for var " << j << " val " << varvalmatching[j] << endl);
+            P("Adding watch for var " << j << " val " << varvalmatching[j]);
         }
       #endif
       #endif
@@ -1014,7 +1036,7 @@ struct DynamicAlldiff : public DynamicConstraint
     
     
   virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
-  {  
+  {
       bool matchok=true;
       for(int i=0; i<numvars; i++)
       {
@@ -1169,7 +1191,7 @@ struct DynamicAlldiff : public DynamicConstraint
             {
                 #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
                 watches[var_indices[i]].clear();
-                D_DATA(cout << "Adding DT for var " << var_indices[i] << " val " << varvalmatching[var_indices[i]] << endl);
+                P("Adding DT for var " << var_indices[i] << " val " << varvalmatching[var_indices[i]]);
                 // watch the value from the matching.
                 watches[var_indices[i]].insert(varvalmatching[var_indices[i]]-dom_min);
                 #endif
@@ -1181,7 +1203,7 @@ struct DynamicAlldiff : public DynamicConstraint
                 
                 var_array[var].addDynamicTriggerBT(get_dt(var, 0), 
                     DomainRemoval, varvalmatching[var]);
-                D_DATA(cout << "Adding DT for var " << var_indices[i] << " val " << varvalmatching[var_indices[i]] << endl);
+                P("Adding DT for var " << var_indices[i] << " val " << varvalmatching[var_indices[i]]);
                 #endif
             }
         }
@@ -1248,10 +1270,10 @@ struct DynamicAlldiff : public DynamicConstraint
             int curnode=var_indices[i];
             if(!visited.in(curnode))
             {
-                D_DATA(cout << "(Re)starting tarjan's algorithm, value:"<< curnode <<endl);
+                P("(Re)starting tarjan's algorithm, value:"<< curnode);
                 varcount=0;
                 visit(curnode, sccindex_start);
-                D_DATA(cout << "Returned from tarjan's algorithm." << endl);
+                P("Returned from tarjan's algorithm.");
             }
         }
         
@@ -1371,7 +1393,7 @@ struct DynamicAlldiff : public DynamicConstraint
                             // set a watch
                             if(usewatches())
                             {
-                                D_DATA(cout << "Adding DT for var " << newnode << " val " << curnode-numvars+dom_min << endl);
+                                P("Adding DT for var " << newnode << " val " << curnode-numvars+dom_min);
                                 
                                 #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
                                 watches[newnode].insert(curnode-numvars);
@@ -1434,7 +1456,7 @@ struct DynamicAlldiff : public DynamicConstraint
             // Where did the low link value come from? insert that edge into watches.
             if(usewatches() && lowlinkvar!=-1)
             {
-                D_DATA(cout << "Adding DT for var " << lowlinkvar << " val " << curnode-numvars+dom_min << endl);
+                P("Adding DT for var " << lowlinkvar << " val " << curnode-numvars+dom_min);
                 
                 #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
                 watches[lowlinkvar].insert(curnode-numvars);
@@ -1473,7 +1495,7 @@ struct DynamicAlldiff : public DynamicConstraint
                 
                 //vector<int> tempset;  // pretend this is SCCs for the time being.
                 //tempset.reserve(numvars);
-                D_DATA(cout <<"Writing new SCC:"<<endl );
+                P("Writing new SCC:");
                 bool containsvars=false;
                 for(vector<int>::iterator tstackit=(--tstack.end());  ; --tstackit)
                 {
@@ -1487,7 +1509,7 @@ struct DynamicAlldiff : public DynamicConstraint
                         sccindex++;
                         //tempset.push_back(copynode);  // need to write into sccs instead.
                         varinlocalmatching.insert(copynode);
-                        D_DATA(cout << "Stored SCC element "<< copynode<<endl);
+                        P("Stored SCC element "<< copynode);
                     }
                     
                     if(copynode==curnode)
@@ -1496,7 +1518,7 @@ struct DynamicAlldiff : public DynamicConstraint
                         
                         if(containsvars)
                         {
-                            D_DATA(cout << "Inserting split point." <<endl);
+                            P("Inserting split point.");
                             SCCSplit.remove(sccindex-1);
                             D_DATA(((char*)SCCSplit2.get_ptr())[sccindex-1]=0);
                         }
@@ -1537,8 +1559,7 @@ struct DynamicAlldiff : public DynamicConstraint
                                     // Why doing this test? something wrong with the assigned variable optimization?
                                     if(varvalmatching[curvar]!=copynode+dom_min-numvars)
                                     {
-                                        D_DATA(cout << "Removing var: "<< curvar << " val:" << copynode+dom_min-numvars <<endl);
-                    
+                                        P("Removing var: "<< curvar << " val:" << copynode+dom_min-numvars);
                                         var_array[curvar].removeFromDomain(copynode+dom_min-numvars);
                                     }
                                 }
@@ -1633,7 +1654,7 @@ struct DynamicAlldiff : public DynamicConstraint
         if(!hopcroft(sccstart, sccend))
         {
             // The constraint is unsatisfiable (no matching).
-            D_DATA(cout << "About to fail. Changed varvalmatching: "<< varvalmatching <<endl);
+            P("About to fail. Changed varvalmatching: "<< varvalmatching);
             
             // temporary mess to see if hopcroft is failing prematurely.
             /*vector<int> t=varvalmatching;
@@ -1672,9 +1693,7 @@ struct DynamicAlldiff : public DynamicConstraint
                 valvarmatching[varvalmatching[j]-dom_min]=j;
             }
             
-            //D_DATA(cout << varinlocalmatching.getlist()<<endl);
             getState(stateObj).setFailed(true);
-            //varvalmatching=tempmatching;  // copy back.
             return false;
         }
         
@@ -1981,11 +2000,8 @@ struct DynamicAlldiff : public DynamicConstraint
         if(!bfsmatching(sccstart, sccend))
         {
             // The constraint is unsatisfiable (no matching).
-            D_DATA(cout << "About to fail. Changed varvalmatching: "<< varvalmatching <<endl);
-            
-            //D_DATA(cout << varinlocalmatching.getlist()<<endl);
+            P("About to fail. Changed varvalmatching: "<< varvalmatching);
             getState(stateObj).setFailed(true);
-            //varvalmatching=tempmatching;  // copy back.
             return false;
         }
         
@@ -2022,7 +2038,7 @@ struct DynamicAlldiff : public DynamicConstraint
             int startvar=SCCs[sccindex];
             if(!var_array[startvar].inDomain(varvalmatching[startvar]))
             {
-                D_DATA(cout << "Searching for augmenting path for var: " << startvar <<endl );
+                P("Searching for augmenting path for var: " << startvar);
                 // Matching edge lost; BFS search for augmenting path to fix it.
                 fifo.clear();  // this should be constant time but probably is not.
                 fifo.push_back(startvar);
@@ -2034,7 +2050,7 @@ struct DynamicAlldiff : public DynamicConstraint
                     // pop a vertex and expand it.
                     int curnode=fifo.front();
                     fifo.pop_front();
-                    D_DATA(cout << "Popped vertex " << (curnode<numvars? "(var)":"(val)") << (curnode<numvars? curnode : curnode+dom_min-numvars ) <<endl);
+                    P("Popped vertex " << (curnode<numvars? "(var)":"(val)") << (curnode<numvars? curnode : curnode+dom_min-numvars ));
                     if(curnode<numvars)
                     { // it's a variable
                         // put all corresponding values in the fifo. 
@@ -2048,7 +2064,7 @@ struct DynamicAlldiff : public DynamicConstraint
                                 {
                                     // This vertex completes an even alternating path. 
                                     // Unwind and apply the path here
-                                    D_DATA(cout << "Found augmenting path:" <<endl);
+                                    P("Found augmenting path:");
                                     int unwindvar=curnode;
                                     int unwindval=val;
                                     while(true)
@@ -2058,9 +2074,7 @@ struct DynamicAlldiff : public DynamicConstraint
                                         D_ASSERT(varvalmatching[unwindvar]!=unwindval);
                                         
                                         varvalmatching[unwindvar]=unwindval;
-                                        D_DATA(cout << "Setting var "<< unwindvar << " to "<< unwindval <<endl);
-                                        
-                                        //invprevious.insert(unwindval-dom_min);
+                                        P("Setting var "<< unwindvar << " to "<< unwindval);
                                         
                                         if(unwindvar==startvar)
                                         {
@@ -2071,7 +2085,7 @@ struct DynamicAlldiff : public DynamicConstraint
                                         unwindvar=prev[unwindval-dom_min+numvars];
                                     }
                                     
-                                    #ifndef NO_DEBUG
+                                    #ifdef PLONG
                                     cout << "varvalmatching:";
                                     for(int sccindex=sccstart; sccindex<=sccend; sccindex++)
                                     {
@@ -2130,7 +2144,7 @@ struct DynamicAlldiff : public DynamicConstraint
                 }
                 if(!finished)
                 {   // no augmenting path found
-                    D_DATA(cout << "No augmenting path found."<<endl);
+                    P("No augmenting path found.");
                     // restore the matching to its state before the algo was called.
                     varvalmatching=matchbac;
                     return false;
