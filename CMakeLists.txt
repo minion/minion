@@ -89,7 +89,7 @@ set(CFLAGS "-Wextra -Wno-sign-compare")
 
 find_package(Boost 1.35 COMPONENTS iostreams)
 if(Boost_FOUND)
-	set(CFLAGS "${CFLAGS} -I${Boost_INCLUDE_DIR}")
+	set(CFLAGS "${CFLAGS} -I${Boost_INCLUDE_DIRS}")
 	find_package(ZLIB)
 	if(ZLIB_FOUND)
 		find_package(BZip2)
@@ -200,7 +200,7 @@ if(NOT ${BINARY} STREQUAL ${PROJECT_NAME})
 endif()
 
 if(Boost_FOUND)
-	target_link_libraries(${BINARY} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
+	target_link_libraries(${BINARY} "-lboost_iostreams" ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
 endif()
 
 # generators
