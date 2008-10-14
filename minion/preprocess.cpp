@@ -22,7 +22,7 @@ void PropogateCSP(StateObj* stateObj, PropagationLevel preprocessLevel, vector<A
   if(preprocessLevel == PropLevel_GAC)
     return;
   
-  long long lits = lit_count(vars);
+  BigInt lits = lit_count(vars);
   bool bounds_check = (preprocessLevel == PropLevel_SACBounds) ||
   (preprocessLevel == PropLevel_SSACBounds);
   clock_t start_SAC_time = clock();
