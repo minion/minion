@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "../InstanceHelp.h"
 #include <fstream>
 

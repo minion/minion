@@ -15,8 +15,6 @@
 
 #include "inputfile_parse.h"
 
-#include "svn_header.h"
-
 
 
 CSPInstance readInputFromFile(string fname, bool parser_verbose)

@@ -31,8 +31,6 @@
 #include "inputfile_parse.h"
 #include "commandline_parse.h"
 
-#include "svn_header.h"
-
 #include "system/defined_macros.h"
 
 #include "print_CSP.h"
