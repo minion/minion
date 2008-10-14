@@ -275,3 +275,13 @@ if(UNIX AND BASH)
 else()
 	message(STATUS "You need a UNIX-like system to generate the documentation")
 endif()
+
+find_program(DOXYGEN doxygen)
+if(DOXYGEN)
+	message(STATUS "Generating doxygen documentation target")
+	add_custom_target(api-doc ${DOXYGEN}
+			  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/minion"
+			  COMMENT "api-doc" VERBATIM)
+else()
+	message(STATUS "Doxygen not found, not generating doxygen documentation target")
+endif()
