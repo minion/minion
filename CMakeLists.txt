@@ -41,7 +41,7 @@ if(SVN)
 else()
 	message(STATUS "No SVN executable found, unable to determine SVN version and date")
 endif()
-add_definitions(-DSVN_VER="${SVNVERSION}" -DSVN_DATE="\\\"${SVNDATE}\\\"")
+add_definitions(-DSVN_VER="${SVNVERSION}" -DSVN_DATE="\\"${SVNDATE}\\"")
 
 # if we have a bash, generate constraints and help if necessary and add build
 # targets to do that
