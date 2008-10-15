@@ -15,10 +15,11 @@ struct GraphBuilder
     return "free" + to_string(free_vertices);
   }
   
-  string new_vertex(string name)
+  string new_vertex(string colour)
   {
     string s = new_vertex();
-    vertex_colour[s] = name;
+    vertex_colour[s] = colour;
+    return s;
   }
   
   void output_graph()
