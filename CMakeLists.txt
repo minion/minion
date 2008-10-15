@@ -213,7 +213,7 @@ if(NOT ${BINARY} STREQUAL ${PROJECT_NAME})
 endif()
 
 if(Boost_FOUND)
-	target_link_libraries(${BINARY} "-I${BOOST_LIBRARYDIR} -lboost_iostreams" ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
+	target_link_libraries(${BINARY} "-L${Boost_LIBRARY_DIRS} -lboost_iostreams" ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
 endif()
 
 if(GMP_FOUND)
