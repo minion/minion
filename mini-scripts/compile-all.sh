@@ -10,5 +10,5 @@ for CONFIG in \
 do
 	cmake $CONFIG .
 	make clean
-	make minion || echo "Compilation failed for configuration $CONFIG."
+	make minion $@ || echo "Compilation failed for configuration $CONFIG."
 done
