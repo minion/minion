@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.4)
 
 set(CMAKE_MODULE_PATH .)
 include(CheckIncludeFileCXX)
+include(FindBoost)
 include(FindGMP)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
@@ -213,7 +214,7 @@ if(NOT ${BINARY} STREQUAL ${PROJECT_NAME})
 endif()
 
 if(Boost_FOUND)
-	target_link_libraries(${BINARY} "-L${Boost_LIBRARY_DIRS} -lboost_iostreams" ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
+	target_link_libraries(${BINARY} "-L${Boost_LIBRARY_DIRS}" ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
 endif()
 
 if(GMP_FOUND)
