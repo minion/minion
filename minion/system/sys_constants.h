@@ -27,11 +27,12 @@
 #ifndef _SYS_CONSTANTS_H
 #define _SYS_CONSTANTS_H
 
+#ifdef USE_GMP
 #include <gmpxx.h>
-
-// This needs to be declared as early as possible, as it is used a lot.
 typedef mpz_class BigInt;
-
+#else
+typedef long long BigInt;
+#endif
 
 /// A placeholder type.
 struct EmptyType
