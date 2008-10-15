@@ -35,6 +35,8 @@
 
 #include "print_CSP.h"
 
+#include "sym_output.h"
+
 /** @help switches Description 
 Minion supports a number of switches to augment default behaviour.  To
 see more information on any switch, use the help system. The list

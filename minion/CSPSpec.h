@@ -164,10 +164,6 @@ struct ConstraintBlob
   /// For use in nested constraints.
   vector<ConstraintBlob> internal_constraints;
   
-//  bool reified;
-//  bool implied_reified;
-//  Var reify_var;
-  
   ConstraintBlob(ConstraintDef* _con) : constraint(_con)
   {}
   
