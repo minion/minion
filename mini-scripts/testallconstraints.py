@@ -72,6 +72,7 @@ def run_in_proc(numtests):
         options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop}
         if not testobj.runtest(options):
             sys.exit(1)
+    sys.exit(0)
 
 numtests=100
 minionbin="bin/minion"
@@ -123,8 +124,8 @@ for consname1index, consname1 in enumerate(conslist):
             run_in_proc(num)
     
     for worker in workers:
-        ret = os.waitpid(worker, 0)
-        if ret[1] != 0:
+        (pid, exitcode) = os.waitpid(worker, 0)
+        if exitcode != 0:
             if email:
                 mailstring="Mail from testallconstraints.py.\n"
                 mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)
