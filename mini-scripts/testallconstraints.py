@@ -7,10 +7,10 @@ from constraint_test_common import *
 import random
 from sendemail import *
 
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit"])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit", "procs="])
 
 if len(other)>1:
-    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email]"
+    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email] [--procs=...]"
     sys.exit(1)
 
 # This one tests all the constraints in the following list.
@@ -64,11 +64,21 @@ conslist+=["difference"]
 #todo
 #conslist+=["weightedsumleq"...
 
+def run_in_proc(numtests):
+    testobj=eval("test"+consname+"()")
+    testobj.solver=minionbin
+
+    for testnum in range(numtests):
+        options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop}
+        if not testobj.runtest(options):
+            sys.exit(1)
+
 numtests=100
 minionbin="bin/minion"
 email=False
 fullprop=False   # compare the constraint against itself with fullprop. Needs DEBUG=1.
 bit64=False
+procs=1
 for i in optargs:
     (a1, a2)=i
     if a1=="--minion":
@@ -81,6 +91,8 @@ for i in optargs:
         fullprop=True
     elif a1=="--64bit":
         bit64=True
+    elif a1=="--procs":
+        procs=int(a2)
 
 for consname1index, consname1 in enumerate(conslist):
     print "Testing %s (%d/%d)"%(consname1, consname1index + 1, len(conslist))
@@ -98,13 +110,21 @@ for consname1index, consname1 in enumerate(conslist):
         consname=consname[5:]
     consname=consname.replace("-", "__minus__")
     
-    testobj=eval("test"+consname+"()")
-    testobj.solver=minionbin
+    workers = []
+    for procNum in range(procs):
+        if procNum == procs - 1:
+            num = (numtests // procs) + (numtests % procs)
+        else:
+            num = (numtests // procs)
+        pid = os.fork()
+        if pid:
+            workers.append(pid)
+        else:
+            run_in_proc(num)
     
-    for testnum in range(numtests):
-        print "Test number %d"%(testnum)
-        options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop}
-        if not testobj.runtest(options):
+    for worker in workers:
+        ret = os.waitpid(worker, 0)
+        if ret[1] != 0:
             if email:
                 mailstring="Mail from testallconstraints.py.\n"
                 mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)
