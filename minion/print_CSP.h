@@ -236,17 +236,16 @@ void fix_variables()
   }
 }
 
-void print_instance()
-{ print_instance(csp.vars); }
 
-void print_instance(const vector<Var>& vars_in)
+
+void print_instance()
 {
   oss << "MINION 3" << endl;
   
   fix_variables();
     
   oss << "**VARIABLES**" << endl;
-  print_instance(vars_in);
+  print_instance(csp.vars);
   
   oss << "**SEARCH**" << endl;
   print_search_info();
