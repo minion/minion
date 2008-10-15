@@ -332,7 +332,7 @@ struct ConstraintBlob
     switch(v.type())
     {
     case VAR_CONSTANT:
-      dom.push_back(v.pos);
+      dom.push_back(v.pos());
       return dom;
     case VAR_BOOL:
       dom.push_back(0);
