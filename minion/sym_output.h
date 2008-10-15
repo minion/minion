@@ -66,7 +66,12 @@ struct GraphBuilder
   }
   
   string name(Var v)
-  { return csp.vars.getName(v); }
+  { 
+    if(v.type() == VAR_CONSTANT)
+      return "CONSTANT_" + to_string(v.pos());
+    else
+      return csp.vars.getName(v); 
+  }
   
   void add_edge(string s1, string s2)
   { graph.insert(make_pair(s1, s2)); }
