@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.4)
 
+set(CMAKE_MODULE_PATH .)
 include(CheckIncludeFileCXX)
+include(FindGMP)
+
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 project(minion)
@@ -108,6 +111,15 @@ else()
 	message(STATUS "Boost not found, building without boost")
 endif()
 
+find_package(GMP)
+if(GMP_FOUND)
+	set(CFLAGS "${CFLAGS} -I${GMP_INCLUDE_DIR} -I{GMPCXX_INCLUDE_DIR}")
+	message(STATUS "GMP found")
+	add_definitions(-DUSE_GMP)
+else()
+	message(STATUS "GMP not found, no bounds checking")
+endif()
+
 check_include_file_cxx("tr1/unordered_map" TR1-MAP)
 check_include_file_cxx("tr1/unordered_set" TR1-SET)
 if(TR1-MAP AND TR1-SET)
@@ -201,7 +213,11 @@ if(NOT ${BINARY} STREQUAL ${PROJECT_NAME})
 endif()
 
 if(Boost_FOUND)
-	target_link_libraries(${BINARY} "-lboost_iostreams" ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
+	target_link_libraries(${BINARY} "-I${BOOST_LIBRARYDIR} -lboost_iostreams" ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
+endif()
+
+if(GMP_FOUND)
+	target_link_libraries(${BINARY} ${GMP_LIBRARY} ${GMPXX_LIBRARY})
 endif()
 
 # generators
