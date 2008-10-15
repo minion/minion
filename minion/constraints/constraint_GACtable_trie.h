@@ -38,7 +38,7 @@ struct GACTableConstraint : public AbstractConstraint
   TupleTrieArray* tupleTrieArrayptr;
   
   //Following is setup globally in constraint to be passed by reference & recycled
-  int* recyclableTuple;
+  DomainInt* recyclableTuple;
   
   /// For each literal, the number of the tuple that supports it.
   //   renamed off from current_support in case both run in parallel
@@ -72,7 +72,7 @@ struct GACTableConstraint : public AbstractConstraint
 		trie_current_support[i][j] = NULL;
 	}
 	// initialise supportting tuple for recycle
-	recyclableTuple = new int[arity] ;
+	recyclableTuple = new DomainInt[arity] ;
   }
   
   int dynamic_trigger_count()

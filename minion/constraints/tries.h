@@ -264,7 +264,7 @@ struct TupleTrie
   // search_trie_negative searches for a tuple which is not in the trie. 
   // For the negative table constraint.
   template<typename VarArray>
-	bool search_trie_negative(const VarArray& _vars, TrieObj** obj_list, int depth, int * returnTuple)
+	bool search_trie_negative(const VarArray& _vars, TrieObj** obj_list, int depth, DomainInt* returnTuple)
   {
     CON_INFO_ADDONE(SearchTrie);
 	VarArray& vars = const_cast<VarArray&>(_vars);
@@ -298,7 +298,7 @@ struct TupleTrie
     return false;
   }
   
-  void reconstructTuple(int* array, TrieObj** obj_list)
+  void reconstructTuple(DomainInt* array, TrieObj** obj_list)
   {
 	//D_ASSERT(check == obj_list[arity - 1] - obj_list[0]);
 	for(int i = 0; i < arity; ++i)
@@ -397,7 +397,7 @@ struct TupleTrie
   // Find support for domain value i. This will be the value used by
   // the first variable.
   template<typename VarArray>
-    int nextSupportingTupleNegative(DomainInt domain_val, const VarArray& _vars, TrieObj** obj_list, int* recycTuple)
+    int nextSupportingTupleNegative(DomainInt domain_val, const VarArray& _vars, TrieObj** obj_list, DomainInt* recycTuple)
   {
 	VarArray& vars = const_cast<VarArray&>(_vars);
 	

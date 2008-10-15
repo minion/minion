@@ -61,15 +61,7 @@ struct ProductConstraint : public AbstractConstraint
   VarRef3 var3;
   ProductConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
 	AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
-  {
-	  BigInt max1 = checked_cast<BigInt>(max(abs(var1.getInitialMin()),abs(var1.getInitialMax())));
-	  BigInt max2 = checked_cast<BigInt>(max(abs(var2.getInitialMin()),abs(var2.getInitialMax())));
-	  BigInt bound = DomainInt_Max;
-	  if(max1 * max2 >= bound)
-	  {
-	    FAIL_EXIT("Product([a,b],c) must satisfy the condition: For all assigments to a and b, |a*b| < 2^31");
-	  }
-  }
+  { }
   
   virtual triggerCollection setup_internal()
   {
@@ -94,8 +86,8 @@ struct ProductConstraint : public AbstractConstraint
   {
 	if(y == 0)
 	  return 0;
-	div_t division = div(checked_cast<int>(x), checked_cast<int>(y));
-	int return_val = division.quot;
+	ldiv_t division = div(checked_cast<long>(x), checked_cast<long>(y));
+	long return_val = division.quot;
 	if(division.rem != 0)
 	  return_val++;
 	return return_val;

@@ -112,13 +112,13 @@ struct PowConstraint : public AbstractConstraint
   
   
   double my_pow(DomainInt x, DomainInt y)
-  { return pow((double)checked_cast<int>(x), checked_cast<int>(y));}
+  { return pow(checked_cast<double>(x), checked_cast<double>(y));}
   
   double my_y(DomainInt x, DomainInt z)
-  { return log((double)checked_cast<int>(z)) / log((double)checked_cast<int>(x)); }
+  { return log(checked_cast<double>(z)) / log(checked_cast<double>(x)); }
   
   double my_x(DomainInt y, DomainInt z)
-  { return exp(log((double)checked_cast<int>(z)) / checked_cast<int>(y)); }
+  { return exp(log(checked_cast<double>(z)) / checked_cast<double>(y)); }
   
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {

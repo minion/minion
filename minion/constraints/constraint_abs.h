@@ -148,7 +148,7 @@ struct AbsConstraint : public AbstractConstraint
     DomainInt x_dom_max = var1.getMax();
     DomainInt y_dom_max = max(abs(var2.getMin()), abs(var2.getMax()));
     DomainInt dom_max = min(x_dom_max, y_dom_max);
-    DomainInt dom_min = max(0, max(var1.getMin(), var2.getMin()));
+    DomainInt dom_min = max(DomainInt(0), max(var1.getMin(), var2.getMin()));
 
     for(DomainInt i = dom_min; i <= dom_max; ++i)
     {

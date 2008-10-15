@@ -356,8 +356,8 @@ struct ElementConstraint : public AbstractConstraint
   
   virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {  
-    int array_start = max(0, index_ref.getMin());
-    int array_end   = min((int)var_array.size() - 1, raw(index_ref.getMax()));
+    int array_start = max(DomainInt(0), index_ref.getMin());
+    int array_end   = min((DomainInt)var_array.size() - 1, index_ref.getMax());
 
     for(int i = array_start; i <= array_end; ++i)
     {

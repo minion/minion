@@ -27,8 +27,10 @@
 #ifndef _SYS_CONSTANTS_H
 #define _SYS_CONSTANTS_H
 
+#include <gmpxx.h>
+
 // This needs to be declared as early as possible, as it is used a lot.
-typedef long long int BigInt;
+typedef mpz_class BigInt;
 
 
 /// A placeholder type.
@@ -100,15 +102,16 @@ inline T mymax(T t1, T t2)
     return t1;
 }
 
+typedef int32_t MachineInt;
 #ifdef BOUNDS_CHECK
-typedef Wrapper<int> DomainInt;
+typedef Wrapper<MachineInt> DomainInt;
 #else
-typedef int DomainInt;
+typedef MachineInt DomainInt;
 #endif
 
 // Put a ' -1, +1 ' just to have some slack
-const BigInt DomainInt_Max = std::numeric_limits<int>::max() - 1;
-const BigInt DomainInt_Min = std::numeric_limits<int>::min() + 1;
+const DomainInt DomainInt_Max = std::numeric_limits<MachineInt>::max() - 1;
+const DomainInt DomainInt_Min = std::numeric_limits<MachineInt>::min() + 1;
 
 template<typename To, typename From>
 To checked_cast(const From& t)
