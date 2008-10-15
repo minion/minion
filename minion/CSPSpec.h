@@ -330,6 +330,79 @@ struct ConstraintBlob
     return it->second;
   }
   
+  vector<DomainInt> get_domain_for_graph(Var v) const
+  {
+    vector<DomainInt> dom;
+    switch(v.type())
+    {
+    case VAR_CONSTANT:
+      dom.push_back(v.pos);
+      return dom;
+    case VAR_BOOL:
+      dom.push_back(0);
+      dom.push_back(1);
+      return dom;
+    case VAR_BOUND:  
+      {
+        int bound_size = 0;
+        for(unsigned int x = 0; x < bound.size(); ++x)
+        {
+          bound_size += bound[x].first;
+          if(v.pos() < bound_size)
+          {
+            dom.push_back(bound[x].second.lower_bound);
+            dom.push_back(bound[x].second.lower_bound);
+            dom.push_back(bound[x].second.upper_bound);
+            dom.push_back(bound[x].second.upper_bound);
+            return dom;
+          }
+        }
+        throw parse_exception("Internal Error - Bound OverFlow");
+      }
+    case VAR_SPARSEBOUND:
+      {
+        int sparse_bound_size = 0;
+        for(unsigned int x=0;x<sparse_bound.size();++x)
+        {
+          sparse_bound_size += sparse_bound[x].first;
+          if(v.pos() < sparse_bound_size)
+            return sparse_bound[x].second;
+        }
+        throw parse_exception("Internal Error - SparseBound OverFlow");
+      }
+    case VAR_DISCRETE: 
+    {
+      int discrete_size = 0;
+      for(unsigned int x = 0; x < discrete.size(); ++x)
+      {
+        discrete_size += discrete[x].first;
+        if(v.pos() < discrete_size)
+        {
+          dom.push_back(discrete[x].second.lower_bound);
+          dom.push_back(discrete[x].second.lower_bound);
+          dom.push_back(discrete[x].second.upper_bound);
+          dom.push_back(discrete[x].second.upper_bound);
+          return dom;
+        }        
+      }
+      throw parse_exception("Internal Error - Discrete OverFlow");
+    }
+    case VAR_SPARSEDISCRETE:
+    {
+      int sparse_discrete_size = 0;
+      for(unsigned int x = 0; x < sparse_discrete.size(); ++x)
+      {
+        sparse_discrete_size += sparse_discrete[x].first;
+        if(v.pos() < sparse_discrete_size)
+          return sparse_discrete[x].second;
+      }
+      throw parse_exception("Internal Error - SparseDiscrete OverFlow");
+    }
+    default:
+      throw parse_exception("Internal Error - Unknown Variable Type");    
+    }    
+  }
+  
   Bounds get_bounds(Var v) const
   {
     switch(v.type())
