@@ -736,6 +736,19 @@ public:
       throw parse_exception("Undefined gadget name '" + name + "'");
     return it->second;
   }
+  
+  void add_variable_names()
+  {
+    if(vars.symbol_table.empty())
+    {
+      cerr << "# This instance was format MINION 1 or 2, so filling in variable names" << endl;
+      // This was a MINION 1 or MINION 2 input file. Let's fix it!
+      vector<Var> all_vars = vars.get_all_vars();
+
+      for(int i = 0; i < all_vars.size(); ++i)
+        vars.addSymbol("x" + to_string(i), all_vars[i]);  
+    }
+  }
 };
 
 }

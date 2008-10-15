@@ -21,8 +21,30 @@ struct GraphBuilder
     vertex_colour[s] = name;
   }
   
+  void output_graph()
+  {
+    for(map<string, string>::iterator it = vertex_colour.begin();
+    it != vertex_colour.end();
+    ++it)
+    {
+      cout << it->first << ":" << it->second << endl;
+    }
+    
+    cout << endl;
+    
+    for(set<pair<string, string> >::iterator it = graph.begin();
+    it != graph.end();
+    ++it)
+    {
+      cout << it->first << ", " << it->second << endl;
+    }
+  }
+  
   GraphBuilder(CSPInstance& _csp) : csp(_csp), free_vertices(0)
-  { build_graph(); }
+  { 
+    csp.add_variable_names();
+    build_graph(); 
+  }
   
   
   void build_graph()

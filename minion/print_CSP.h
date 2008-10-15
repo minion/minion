@@ -4,7 +4,7 @@
 
 namespace ProbSpec
 {
-  
+
 struct MinionInstancePrinter
 {
   ostringstream oss;
@@ -223,26 +223,11 @@ void print_search_info( )
   
 }
 
-void fix_variables()
-{
-  if(csp.vars.symbol_table.empty())
-  {
-    oss << "# This instance was format MINION 1 or 2, so filling in variable names" << endl;
-    // This was a MINION 1 or MINION 2 input file. Let's fix it!
-    vector<Var> all_vars = csp.vars.get_all_vars();
-    
-    for(int i = 0; i < all_vars.size(); ++i)
-      csp.vars.addSymbol("x" + to_string(i), all_vars[i]);  
-  }
-}
-
-
-
 void print_instance()
 {
   oss << "MINION 3" << endl;
   
-  fix_variables();
+  csp.add_variable_names();
     
   oss << "**VARIABLES**" << endl;
   print_instance(csp.vars);
