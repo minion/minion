@@ -1,3 +1,5 @@
+#ifndef CONSTRAINT_ENUM_H_BLARG
+#define CONSTRAINT_ENUM_H_BLARG
 enum ConstraintType {
 CT_ELEMENT ,
 CT_ELEMENT_ONE ,
@@ -56,3 +58,4 @@ CT_REIFY ,
 CT_REIFYIMPLY_QUICK ,
 CT_REIFYIMPLY ,
 };
+#endif
