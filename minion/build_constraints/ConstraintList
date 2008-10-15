@@ -6,6 +6,7 @@ STATIC_CT  "gacelement-deprecated" 	CT_GACELEMENT 		read_list read_var read_var
 STATIC_CT  "alldiff" 			CT_ALLDIFF 		read_list
 STATIC_CT  "gacalldiff" 		CT_GACALLDIFF 		read_list
 STATIC_CT  "gcc" 			CT_GCC 			read_list read_constant_list read_list
+DYNAMIC_CT "watchneq"			CT_WATCHED_NEQ		read_var read_var
 STATIC_CT  "diseq"   			CT_DISEQ   		read_var read_var  
 STATIC_CT  "__reify_diseq"		CT_DISEQ_REIFY		read_var read_var read_bool_var
 STATIC_CT  "eq"     			CT_EQ      		read_var read_var  
@@ -14,7 +15,6 @@ STATIC_CT  "minuseq" 			CT_MINUSEQ 		read_var read_var
 STATIC_CT  "__reify_minuseq"		CT_MINUSEQ_REIFY	read_var read_var read_bool_var
 STATIC_CT  "abs"      			CT_ABS     		read_var read_var 
 STATIC_CT  "ineq"    			CT_INEQ    		read_var read_var read_constant  
-DYNAMIC_CT "watchneq"			CT_WATCHED_NEQ		read_var read_var
 DYNAMIC_CT "watchless"			CT_WATCHED_LESS		read_var read_var
 STATIC_CT  "lexleq"  			CT_LEXLEQ  		read_list read_list  
 STATIC_CT  "lexless" 			CT_LEXLESS 		read_list read_list  
