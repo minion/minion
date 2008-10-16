@@ -218,7 +218,7 @@ if(Boost_FOUND)
 endif()
 
 if(GMP_FOUND)
-	target_link_libraries(${BINARY} ${GMP_LIBRARY} ${GMPXX_LIBRARY})
+	target_link_libraries(${BINARY} ${GMPXX_LIBRARY} ${GMP_LIBRARY})
 endif()
 
 # generators
