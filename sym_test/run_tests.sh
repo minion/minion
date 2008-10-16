@@ -27,8 +27,10 @@ for i in *.minion; do
   if grep -q "#TEST GROUP" $i;
   then
     # Congratulations, if you understand the next line you are a dodgy shell script master!
-    $exec -Xgraph $i $* 2>/dev/null | grep -v "#" > fail_graph
-    dreadnaut < fail_graph | ../mini-scripts/dread2gap.py > fail_group
+    $exec -Xgraph $i $* 2>/dev/null > fail_graph
+    grep -v "#" fail_graph | dreadnaut | ../mini-scripts/dread2gap.py > fail_group
+    echo G := Action\(G, [1.. `grep "#VAREND" fail_graph | awk '{print $2}'` ],OnPoints\)\; >> fail_group
+    echo Print\(Size\(G\)\,\" \"\)\; >> fail_group
     numsols=`gap.sh < fail_group | tail -n 1 | awk '{print $2}'`
     testnumsols=`grep "#TEST GROUP" $i  | awk '{print $3}' | tr -d '\015' `
     if [[ $(($numsols)) != $(($testnumsols)) ]]; then

@@ -91,6 +91,9 @@ struct GraphBuilder
     }
 
     cout << endl << "#VAREND " << vertex_counter - 1 << endl;
+    for(map<string,int>::iterator it = v_num.begin(); it != v_num.end(); ++it)
+      cout << "#" << it->first << " " << it->second << endl;
+    
     
     for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
     it != aux_vertex_colour.end();
