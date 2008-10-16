@@ -114,7 +114,7 @@ endif()
 
 find_package(GMP)
 if(GMP_FOUND)
-	set(CFLAGS "${CFLAGS} -I${GMP_INCLUDE_DIR} -I{GMPCXX_INCLUDE_DIR}")
+	set(CFLAGS "${CFLAGS} -I${GMP_INCLUDE_DIR}")
 	message(STATUS "GMP found")
 	add_definitions(-DUSE_GMP)
 else()
