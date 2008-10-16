@@ -90,6 +90,8 @@ struct GraphBuilder
       cout << old_vertex_pos << ":" << vertex_counter - 1;
     }
 
+    cout << endl << "#VAREND " << vertex_counter - 1 << endl;
+    
     for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
     it != aux_vertex_colour.end();
     ++it)
