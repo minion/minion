@@ -371,9 +371,16 @@ try {
   
   instance = readInputFromFile(getOptions(stateObj).instance_name, getOptions(stateObj).parser_verbose);
   
+  if(getOptions(stateObj).graph)
+  {
+    GraphBuilder graph(instance);
+    graph.output_graph();
+    graph.output_nauty_graph();
+    exit(0);
+  }
+  
   if(getOptions(stateObj).redump)
   {
-    ostringstream file;
     MinionInstancePrinter printer(instance);
     cout << printer.getInstance();
     exit(0);

@@ -215,6 +215,7 @@ public:
   
 
   bool redump;
+  bool graph;
 
   SearchOptions() : 
     wdeg_on(false), find_generators(false), print_only_solution(false), 
@@ -225,7 +226,7 @@ public:
     nocheck(false),
 #endif
     nodelimit(0), tableout(false), solsoutWrite(false), 
-    print_solution(true), time_limit(0), randomise_valvarorder(false), parser_verbose(false), redump(false)
+    print_solution(true), time_limit(0), randomise_valvarorder(false), parser_verbose(false), redump(false), graph(false)
   {}
   
   /// Denotes all solutions should be found, by setting sollimit to -1.

@@ -6,8 +6,8 @@ struct GraphBuilder
   CSPInstance& csp;
   set<pair<string, string> > graph;
   // Matches colour to the vertices with that colour
-  map<string, set<string> > vertex_colour;
-  
+  map<string, set<string> > aux_vertex_colour;
+  map<string, set<string> > var_vertex_colour;
   int free_vertices;
   
   string new_vertex()
@@ -20,14 +20,25 @@ struct GraphBuilder
   {
     free_vertices++;
     string s =  "F." + colour + "." + to_string(free_vertices);
-    vertex_colour[colour].insert(s);
+    aux_vertex_colour[colour].insert(s);
     return s;
   }
   
   void output_graph()
   {
-    for(map<string, set<string> >::iterator it = vertex_colour.begin();
-    it != vertex_colour.end();
+    for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
+    it != var_vertex_colour.end();
+    ++it)
+    {
+      cout << it->first << " : ";
+      for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
+        cout << *it2 << " ";
+      cout << endl;
+    }
+
+    
+    for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
+    it != aux_vertex_colour.end();
     ++it)
     {
       cout << it->first << " : ";
@@ -44,6 +55,60 @@ struct GraphBuilder
     {
       cout << it->first << ", " << it->second << endl;
     }
+  }
+  
+  void output_nauty_graph()
+  {
+    map<string, int> v_num;
+    
+    int vertex_count = 0;
+   // for(map<string, set<string> >::iterator it 
+    
+    int vertex_counter = 1;
+    for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
+    it != var_vertex_colour.end();
+    ++it)
+    {
+      D_ASSERT(it->second.size() > 0);
+      for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
+        v_num[*it2] = vertex_counter++;
+      
+      cout << vertex_counter - 1 << " ";
+    }
+
+    
+    for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
+    it != aux_vertex_colour.end();
+    ++it)
+    {
+      D_ASSERT(it->second.size() > 0);
+      for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
+        v_num[*it2] = vertex_counter++;
+      cout << vertex_counter - 1 << " ";
+    }
+    cout << endl;
+    
+    vector<set<int> > graph_int(vertex_counter);
+    
+    for(set<pair<string, string> >::iterator it = graph.begin(); it != graph.end(); ++it)
+    {
+      //cout << it->first << ":" << it->second << endl;
+      D_ASSERT(v_num.count(it->first) == 1);
+      D_ASSERT(v_num.count(it->second) == 1);
+      int first_v = v_num[it->first];
+      int second_v = v_num[it->second];
+      D_ASSERT(first_v != 0 && second_v != 0 && first_v != second_v);
+      graph_int[first_v].insert(second_v);
+    }
+    
+    for(int i = 0; i < graph_int.size(); ++i)
+    {
+      for(set<int>::iterator it = graph_int[i].begin(); it != graph_int[i].end(); ++it)
+        cout << *it << " ";
+      cout << ";" << endl;
+    }
+    
+    
   }
   
   GraphBuilder(CSPInstance& _csp) : csp(_csp), free_vertices(0)
@@ -66,14 +131,18 @@ struct GraphBuilder
     vector<Var> vars = csp.vars.get_all_vars();
     for(int i = 0; i < vars.size(); ++i)
     {
-      vertex_colour[to_string(csp.vars.get_domain_for_graph(vars[i]))].insert(csp.vars.getName(vars[i]));
+      var_vertex_colour[to_string(csp.vars.get_domain_for_graph(vars[i]))].insert(csp.vars.getName(vars[i]));
     }
   }
   
   string name(Var v)
   { 
     if(v.type() == VAR_CONSTANT)
-      return "CONSTANT_" + to_string(v.pos());
+    {
+      string const_name = "CONSTANT_" + to_string(v.pos());
+      aux_vertex_colour[const_name].insert(const_name);
+      return const_name;
+    }
     else
       return csp.vars.getName(v); 
   }
@@ -152,12 +221,14 @@ struct GraphBuilder
   }
   
   // Symmetries where the first array can be permuted, if the same permutation
-  // is applied to the second array.
+  // is applied to the second array, and also pairs X[i] and Y[i] can be independantly swapped.
+  // Other variables are assumed not symmetric.
+  // Example: Hamming(M1, M2, C) - The hamming distance of arrays M1 and M2 is C
   string colour_array_swap_each_index(const ConstraintBlob& b, string name)
   {
-    string v = new_vertex(name + "_MASTER");
-    
     D_ASSERT(b.vars[0].size() == b.vars[1].size());
+    
+    string v = new_vertex(name + "_MASTER");
     
     // Force each array to stay together.
     for(int i = 0; i < 2; ++i)
@@ -186,8 +257,65 @@ struct GraphBuilder
     return v;
   }
   
+  // The first array can be permuted, if the same permutation is applied to the second array.
   string colour_symmetric_indexes(const ConstraintBlob& b, string name)
-    { return "X"; }
+  {
+    D_ASSERT(b.vars[0].size() == b.vars[1].size());
+
+    string v = new_vertex(name + "_MASTER");
+    
+    for(int i = 0; i < b.vars[0].size(); ++i)
+    {
+      string vm = new_vertex(name + "_INDEX");
+      string v1 = new_vertex(name + "_ARRAY1");
+      string v2 = new_vertex(name + "_ARRAY2");
+      
+      add_edge(v,vm);
+      add_edge(vm,v1);
+      add_edge(vm,v2);
+      add_edge(v1, b.vars[0][i]);
+      add_edge(v2, b.vars[1][i]);
+    }
+    
+    for(int i = 2; i < b.vars.size(); ++i)
+    {
+      D_ASSERT(b.vars[i].size() == 1);
+      string vi = new_vertex(name + "_POS_" + to_string(i));
+      add_edge(v, vi);
+    }
+    
+    return v;
+  }
+  
+  // The first array can be permuted, if the same permutation is applied to the second array.
+  string colour_weighted_sum(const ConstraintBlob& b, string name)
+  {
+    D_ASSERT(b.vars[0].size() == b.constants[0].size());
+
+    string v = new_vertex(name + "_MASTER");
+    
+    for(int i = 0; i < b.vars[0].size(); ++i)
+    {
+      string vm = new_vertex(name + "_INDEX");
+      string v1 = new_vertex(name + "_ARRAY1");
+      string v2 = new_vertex(name + "_ARRAY2");
+      
+      add_edge(v,vm);
+      add_edge(vm,v1);
+      add_edge(vm,v2);
+      add_edge(v1, b.vars[0][i]);
+      add_edge(v2, Var(VAR_CONSTANT, b.constants[0][i]));
+    }
+    
+    for(int i = 1; i < b.vars.size(); ++i)
+    {
+      D_ASSERT(b.vars[i].size() == 1);
+      string vi = new_vertex(name + "_POS_" + to_string(i));
+      add_edge(v, vi);
+    }
+    
+    return v;
+  }
   
   string colour_constraint(const ConstraintBlob& b)
   {
@@ -227,8 +355,8 @@ struct GraphBuilder
       
       case CT_DIFFERENCE: return colour_symmetric_constraint(b, "DIFFERENCE");
       
-      case CT_WEIGHTGEQSUM: return colour_symmetric_indexes(b, "WEIGHT_GEQSUM");
-      case CT_WEIGHTLEQSUM: return colour_symmetric_indexes(b, "WEIGHT_LEQSUM");
+      case CT_WEIGHTGEQSUM: return colour_weighted_sum(b, "WEIGHT_GEQSUM");
+      case CT_WEIGHTLEQSUM: return colour_weighted_sum(b, "WEIGHT_LEQSUM");
       
       case CT_GEQSUM:
       case CT_WATCHED_GEQSUM: return colour_symmetric_constraint(b, "GEQSUM");

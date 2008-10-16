@@ -625,9 +625,9 @@ public:
   
   CSPInstance(CSPInstance&& i) : 
   CXXMOVE(vars, i), CXXMOVE(constraints, i), CXXMOVE(tupleListContainer, i), CXXMOVE(search_order, i),
-  CXXMOVE(val_order, i), CXXMOVE(permutation, i), CXXMOVE(constructionSite, i), CXXMOVE(is_optimisation_problem, i),
+  CXXMOVE(permutation, i), CXXMOVE(constructionSite, i), CXXMOVE(is_optimisation_problem, i),
   CXXMOVE(optimise_minimising, i), CXXMOVE(optimise_variable, i), CXXMOVE(print_matrix, i), CXXMOVE(all_vars_list, i),
-  CXXMOVE(table_symboltable, i), CXXMOVE(gadgetMap, i)
+  CXXMOVE(table_symboltable, i), CXXMOVE(table_nametable, i), CXXMOVE(gadgetMap, i)
   { }
 #endif
   
