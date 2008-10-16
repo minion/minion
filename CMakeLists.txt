@@ -92,6 +92,13 @@ set(SRCS "${SRCS};minion/get_info.cpp")
 set(BINARY ${PROJECT_NAME})
 set(CFLAGS "-Wextra -Wno-sign-compare")
 
+find_program(CCACHE ccache)
+if(CCACHE)
+	message(STATUS "Using ccache")
+	set(CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
+	set(CMAKE_CXX_COMPILER ${CCACHE})
+endif()
+
 find_package(Boost 1.35 COMPONENTS iostreams)
 if(Boost_FOUND)
 	set(CFLAGS "${CFLAGS} -I${Boost_INCLUDE_DIRS}")
