@@ -5,30 +5,35 @@ struct GraphBuilder
 {
   CSPInstance& csp;
   set<pair<string, string> > graph;
-  map<string, string> vertex_colour;
+  // Matches colour to the vertices with that colour
+  map<string, set<string> > vertex_colour;
   
   int free_vertices;
   
   string new_vertex()
   {
     free_vertices++;
-    return "free" + to_string(free_vertices);
+    return "F." + to_string(free_vertices);
   }
   
   string new_vertex(string colour)
   {
-    string s = new_vertex();
-    vertex_colour[s] = colour;
+    free_vertices++;
+    string s =  "F." + colour + "." + to_string(free_vertices);
+    vertex_colour[colour].insert(s);
     return s;
   }
   
   void output_graph()
   {
-    for(map<string, string>::iterator it = vertex_colour.begin();
+    for(map<string, set<string> >::iterator it = vertex_colour.begin();
     it != vertex_colour.end();
     ++it)
     {
-      cout << it->first << ":" << it->second << endl;
+      cout << it->first << " : ";
+      for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
+        cout << *it2 << " ";
+      cout << endl;
     }
     
     cout << endl;
@@ -61,8 +66,7 @@ struct GraphBuilder
     vector<Var> vars = csp.vars.get_all_vars();
     for(int i = 0; i < vars.size(); ++i)
     {
-      vertex_colour[ csp.vars.getName(vars[i]) ] =
-        to_string(csp.vars.get_domain_for_graph(vars[i]));
+      vertex_colour[to_string(csp.vars.get_domain_for_graph(vars[i]))].insert(csp.vars.getName(vars[i]));
     }
   }
   
@@ -83,7 +87,7 @@ struct GraphBuilder
   void add_edge(string s1, Var v2)
   { graph.insert(make_pair(s1, name(v2))); }
   
-  void colour_element(const ConstraintBlob& b, string name)
+  string colour_element(const ConstraintBlob& b, string name)
   {
      string v = new_vertex(name + "_MASTER");
      for(int i = 0; i < b.vars[0].size(); ++i)
@@ -100,10 +104,12 @@ struct GraphBuilder
      string v_result = new_vertex(name + "_RESULT");
      add_edge(v, v_result);
      add_edge(v_result, b.vars[2][0]);
+     
+     return v;
   }
   
   // A constraint where each array is independantly symmetric
-  void colour_symmetric_constraint(const ConstraintBlob& b, string name)
+  string colour_symmetric_constraint(const ConstraintBlob& b, string name)
   {
     string v = new_vertex(name + "_MASTER");  
     
@@ -119,31 +125,35 @@ struct GraphBuilder
         add_edge(nv, b.vars[i][j]);
     }
     
+    return v;
   }
   
-  void colour_eq(const ConstraintBlob& b, string name)
+  string colour_eq(const ConstraintBlob& b, string name)
   {
     string v = new_vertex(name + "_MASTER");
     add_edge(v, b.vars[0][0]);
     add_edge(v, b.vars[1][0]);
+    return v;
   }
   
-  void colour_no_symmetry(const ConstraintBlob& b, string name)
+  string colour_no_symmetry(const ConstraintBlob& b, string name)
   {
     string v = new_vertex(name + "_MASTER");
     
     for(int i = 0; i < b.vars.size(); ++i)
       for(int j = 0; j < b.vars[i].size(); ++j)
       {
-        string vij = new_vertex(name + "_CHILD_" + to_string(i) + ":" + to_string(j));
+        string vij = new_vertex(name + "_CHILD_" + to_string(i) + ";" + to_string(j));
         add_edge(v, vij);
         add_edge(vij, b.vars[i][j]);
       }
+      
+    return v;
   }
   
   // Symmetries where the first array can be permuted, if the same permutation
   // is applied to the second array.
-  void colour_array_swap_each_index(const ConstraintBlob& b, string name)
+  string colour_array_swap_each_index(const ConstraintBlob& b, string name)
   {
     string v = new_vertex(name + "_MASTER");
     
@@ -172,69 +182,74 @@ struct GraphBuilder
       string vi = new_vertex(name + "_POS_" + to_string(i));
       add_edge(v, vi);
     }
+    
+    return v;
   }
   
-  void colour_symmetric_indexes(const ConstraintBlob& b, string name)
-  { }
+  string colour_symmetric_indexes(const ConstraintBlob& b, string name)
+    { return "X"; }
   
-  void colour_constraint(const ConstraintBlob& b)
+  string colour_constraint(const ConstraintBlob& b)
   {
     switch(b.constraint->type)
     {
       case CT_ELEMENT:
       case CT_WATCHED_ELEMENT:
       case CT_GACELEMENT:
-        colour_element(b, "ELEMENT");
-        return;
+        return colour_element(b, "ELEMENT");
       case CT_ELEMENT_ONE:
       case CT_WATCHED_ELEMENT_ONE:
-        colour_element(b, "ELEMENT_ONE");
-        return;
+        return colour_element(b, "ELEMENT_ONE");
       case CT_ALLDIFF:
       case CT_GACALLDIFF:
-        colour_symmetric_constraint(b, "ALLDIFF");
-        return;
+        return colour_symmetric_constraint(b, "ALLDIFF");
         
       case CT_WATCHED_NEQ:
-      case CT_DISEQ: colour_eq(b, "DISEQ"); return;
-      case CT_EQ:    colour_eq(b, "EQ"); return;
+      case CT_DISEQ: return colour_eq(b, "DISEQ");
+      case CT_EQ:    return colour_eq(b, "EQ");
       
-      case CT_MINUSEQ: colour_no_symmetry(b, "MINUSEQ"); return;
-      case CT_ABS: colour_no_symmetry(b, "ABS"); return;
-      case CT_INEQ: colour_no_symmetry(b, "INEQ"); return;
-      case CT_WATCHED_LESS: colour_no_symmetry(b, "LESS"); return;
+      case CT_MINUSEQ: return colour_no_symmetry(b, "MINUSEQ");
+      case CT_ABS:     return colour_no_symmetry(b, "ABS");
+      case CT_INEQ:    return colour_no_symmetry(b, "INEQ");
+      case CT_WATCHED_LESS: return colour_no_symmetry(b, "LESS");
       
-      case CT_LEXLEQ: colour_no_symmetry(b, "LEXLEQ"); return;
-      case CT_LEXLESS: colour_no_symmetry(b, "LEXLESS"); return;
+      case CT_LEXLEQ: return colour_no_symmetry(b, "LEXLEQ");
+      case CT_LEXLESS: return colour_no_symmetry(b, "LEXLESS");
       
-      case CT_MAX: colour_symmetric_constraint(b, "MAX"); return;
-      case CT_MIN: colour_symmetric_constraint(b, "MIN"); return;
+      case CT_MAX: return colour_symmetric_constraint(b, "MAX");
+      case CT_MIN: return colour_symmetric_constraint(b, "MIN");
       
-      case CT_OCCURRENCE: colour_symmetric_constraint(b, "OCCURRENCE"); return;
-      case CT_LEQ_OCCURRENCE: colour_symmetric_constraint(b, "OCC_LEQ"); return;
-      case CT_GEQ_OCCURRENCE: colour_symmetric_constraint(b, "OCC_GEQ"); return;
+      case CT_OCCURRENCE: return colour_symmetric_constraint(b, "OCCURRENCE");
+      case CT_LEQ_OCCURRENCE: return colour_symmetric_constraint(b, "OCC_LEQ");
+      case CT_GEQ_OCCURRENCE: return colour_symmetric_constraint(b, "OCC_GEQ");
       
-      case CT_PRODUCT2: colour_symmetric_constraint(b, "PRODUCT"); return;
+      case CT_PRODUCT2: return colour_symmetric_constraint(b, "PRODUCT");
       
-      case CT_DIFFERENCE: colour_symmetric_constraint(b, "DIFFERENCE"); return;
+      case CT_DIFFERENCE: return colour_symmetric_constraint(b, "DIFFERENCE");
       
-      case CT_WEIGHTGEQSUM: colour_symmetric_indexes(b, "WEIGHT_GEQSUM"); return;
-      case CT_WEIGHTLEQSUM: colour_symmetric_indexes(b, "WEIGHT_LEQSUM"); return;
+      case CT_WEIGHTGEQSUM: return colour_symmetric_indexes(b, "WEIGHT_GEQSUM");
+      case CT_WEIGHTLEQSUM: return colour_symmetric_indexes(b, "WEIGHT_LEQSUM");
       
-      case CT_WATCHED_TABLE: colour_no_symmetry(b, "TABLE"); return;
-      case CT_WATCHED_NEGATIVE_TABLE: colour_no_symmetry(b, "NEG_TABLE"); return;
+      case CT_GEQSUM:
+      case CT_WATCHED_GEQSUM: return colour_symmetric_constraint(b, "GEQSUM");
       
-      case CT_WATCHED_VECNEQ: colour_array_swap_each_index(b, "VECNEQ"); return;
-      case CT_WATCHED_LITSUM: colour_no_symmetry(b, "LITSUM"); return;
+      case CT_LEQSUM:
+      case CT_WATCHED_LEQSUM: return colour_symmetric_constraint(b, "LEQSUM");
       
-      case CT_POW: colour_no_symmetry(b, "POW"); return;
-      case CT_DIV: colour_no_symmetry(b, "DIV"); return;
-      case CT_MODULO: colour_no_symmetry(b, "MOD"); return;
+      case CT_WATCHED_TABLE: return colour_no_symmetry(b, "TABLE");
+      case CT_WATCHED_NEGATIVE_TABLE: return colour_no_symmetry(b, "NEG_TABLE");
       
-      case CT_WATCHED_VEC_OR_AND: colour_array_swap_each_index(b, "VEC_OR_AND"); return;
+      case CT_WATCHED_VECNEQ: return colour_array_swap_each_index(b, "VECNEQ");
+      case CT_WATCHED_LITSUM: return colour_no_symmetry(b, "LITSUM");
       
-      case CT_WATCHED_VEC_OR_LESS: colour_symmetric_indexes(b, "VEC_OR_LESS"); return;
-      case CT_WATCHED_HAMMING: colour_array_swap_each_index(b, "HAMMING"); return;
+      case CT_POW: return colour_no_symmetry(b, "POW");
+      case CT_DIV: return colour_no_symmetry(b, "DIV");
+      case CT_MODULO: return colour_no_symmetry(b, "MOD");
+      
+      case CT_WATCHED_VEC_OR_AND: return colour_array_swap_each_index(b, "VEC_OR_AND");
+      
+      case CT_WATCHED_VEC_OR_LESS: return colour_symmetric_indexes(b, "VEC_OR_LESS");
+      case CT_WATCHED_HAMMING: return colour_array_swap_each_index(b, "HAMMING");
       
       default:
         abort();
@@ -243,3 +258,5 @@ struct GraphBuilder
   }
   
 };
+
+
