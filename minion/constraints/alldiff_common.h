@@ -48,6 +48,10 @@ using namespace std;
 
 #include "alldiff_gcc_shared.h"
 
+// includes for reverse constraint.
+#include "constraint_equal.h"
+#include "../dynamic_constraints/dynamic_new_or.h"
+
 #ifdef P
 #undef P
 #endif
@@ -201,22 +205,22 @@ struct DynamicAlldiff : public DynamicConstraint
   #endif
   
   #ifndef DYNAMICALLDIFF
-  /*virtual AbstractConstraint* reverse_constraint()
+  virtual AbstractConstraint* reverse_constraint()
   { // w-or of pairwise equality.
-      vector<AbstractConstraint*> con=new vector<AbstractConstraint*>();
+      vector<AbstractConstraint*> con;
       for(int i=0; i<var_array.size(); i++)
       {
           for(int j=0; j<var_array.size(); j++)
           {
-              EqualConstraint t=new EqualConstraint(stateObj, var_array[i], var_array[j]);
-              con.push_back(t);
+              EqualConstraint<AnyVarRef, AnyVarRef>* t=new EqualConstraint<AnyVarRef, AnyVarRef>(stateObj, var_array[i], var_array[j]);
+              con.push_back((AbstractConstraint*) t);
           }
       }
       return new Dynamic_OR(stateObj, con);
-  }*/
+  }
   
-  virtual AbstractConstraint* reverse_constraint()
-  { return new CheckAssignConstraint<VarArray, GacAlldiff>(stateObj, var_array, *this); }
+  /*virtual AbstractConstraint* reverse_constraint()
+  { return new CheckAssignConstraint<VarArray, GacAlldiff>(stateObj, var_array, *this); }*/
   #endif
   
   smallset to_process;  // set of vars to process.
