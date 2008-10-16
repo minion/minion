@@ -59,37 +59,51 @@ struct GraphBuilder
   
   void output_nauty_graph()
   {
+    
+    // Count from node 1, for GAP compatability,
+    cout << "$ 1" << endl;
+    
     map<string, int> v_num;
     
-    int vertex_count = 0;
-   // for(map<string, set<string> >::iterator it 
+    { // First count the number of vertices.
+      int vertex_count = 0;
+      for(map<string, set<string> >::iterator it = var_vertex_colour.begin(); it != var_vertex_colour.end(); ++it)
+        vertex_count += it->second.size();    
+       for(map<string, set<string> >::iterator it = aux_vertex_colour.begin(); it != aux_vertex_colour.end(); ++it)
+        vertex_count += it->second.size();
+      cout << "n = " << vertex_count << endl;
+    }
     
+    // Now output partitions
     int vertex_counter = 1;
+    bool first_pass = true;
+    cout << "f = [";
     for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
     it != var_vertex_colour.end();
     ++it)
     {
+      int old_vertex_pos = vertex_counter;
       D_ASSERT(it->second.size() > 0);
       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
         v_num[*it2] = vertex_counter++;
-      
-      cout << vertex_counter - 1 << " ";
+      if(first_pass) first_pass = false; else cout << "|";
+      cout << old_vertex_pos << ":" << vertex_counter - 1;
     }
 
-    
     for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
     it != aux_vertex_colour.end();
     ++it)
     {
+      int old_vertex_pos = vertex_counter;
       D_ASSERT(it->second.size() > 0);
       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
         v_num[*it2] = vertex_counter++;
-      cout << vertex_counter - 1 << " ";
+      if(first_pass) first_pass = false; else cout << "|";  
+      cout << old_vertex_pos << ":" << vertex_counter - 1;
     }
-    cout << endl;
-    
-    vector<set<int> > graph_int(vertex_counter);
-    
+    cout << "]" << endl;
+        
+    cout << endl << "g" << endl;
     for(set<pair<string, string> >::iterator it = graph.begin(); it != graph.end(); ++it)
     {
       //cout << it->first << ":" << it->second << endl;
@@ -98,17 +112,11 @@ struct GraphBuilder
       int first_v = v_num[it->first];
       int second_v = v_num[it->second];
       D_ASSERT(first_v != 0 && second_v != 0 && first_v != second_v);
-      graph_int[first_v].insert(second_v);
+      cout << first_v << ":" << second_v << " ";
     }
     
-    for(int i = 0; i < graph_int.size(); ++i)
-    {
-      for(set<int>::iterator it = graph_int[i].begin(); it != graph_int[i].end(); ++it)
-        cout << *it << " ";
-      cout << ";" << endl;
-    }
-    
-    
+    cout << "." << endl;
+    cout << "x" << endl;    
   }
   
   GraphBuilder(CSPInstance& _csp) : csp(_csp), free_vertices(0)
