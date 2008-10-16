@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.4)
 
-set(CMAKE_MODULE_PATH .)
+set(CMAKE_MODULE_PATH cmake-modules)
 include(CheckIncludeFileCXX)
 include(FindBoost)
 include(FindGMP)

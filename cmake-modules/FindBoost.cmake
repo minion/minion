@@ -91,6 +91,10 @@
 #  BSD license.
 #  For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 #
+if (NOT CMAKE_FIND_LIBRARY_SUFFIXES)
+  set (CMAKE_FIND_LIBRARY_SUFFIXES "")
+endif (NOT CMAKE_FIND_LIBRARY_SUFFIXES)
+
 OPTION(Boost_USE_MULTITHREADED 
   "Use the multithreaded versions of the Boost libraries" ON)
 
