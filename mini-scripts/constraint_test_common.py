@@ -250,7 +250,7 @@ class tree:
                 newstring="Sol:"+rest.strip()+" "+rest2.strip()
                 lines[i:i+2]=[newstring]
         
-        print "Entering buildtree"
+        #print "Entering buildtree"
         rootnode=False
         curnode=False
         curassign=False
@@ -1164,7 +1164,7 @@ def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist
     printminionfile(file1, variables, constraint, tuplelist=tuplelist, opt=opt)
     file1.close()
     cmd=minionbin+" -dumptree -findallsols "+cmd+" "+filename+" >"+outfilename
-    print "Executing command: "+cmd
+    #print "Executing command: "+cmd
     return os.system(cmd)
 
 def generatevariables(varblocks, types, boundallowed):
