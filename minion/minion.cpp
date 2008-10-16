@@ -374,7 +374,7 @@ try {
   if(getOptions(stateObj).graph)
   {
     GraphBuilder graph(instance);
-    graph.output_graph();
+    //graph.output_graph();
     graph.output_nauty_graph();
     exit(0);
   }
