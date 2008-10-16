@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.4.6)
 
 set(CMAKE_MODULE_PATH cmake-modules)
 include(CheckIncludeFileCXX)
+INCLUDE(CheckCXXCompilerFlag)
 include(FindBoost)
 include(FindGMP)
 
@@ -127,6 +128,14 @@ if(GMP_FOUND)
 else()
 	message(STATUS "GMP not found, no bounds checking")
 endif()
+
+#check_cxx_compiler_flag("-std=c++0x" CheckForCXX)
+#if(CheckForCXX)
+#	message(STATUS "Compiler supports C++0x!")
+#	add_definitions("-std=c++0x")
+#else()
+#	message(STATUS "Compiler does not support C++0x")
+#endif()
 
 check_include_file_cxx("tr1/unordered_map" TR1-MAP)
 check_include_file_cxx("tr1/unordered_set" TR1-SET)
