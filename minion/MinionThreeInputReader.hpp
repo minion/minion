@@ -370,21 +370,7 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
   if(instance.search_order.empty())
   {
     parser_info("No order generated, auto-generating complete order");
-    int var_count = 0;
-    var_count += instance.vars.BOOLs;
-    for(unsigned i = 0; i < instance.vars.bound.size(); ++i)
-      var_count += instance.vars.bound[i].first;
-    for(unsigned i = 0; i < instance.vars.sparse_bound.size(); ++i)
-      var_count += instance.vars.sparse_bound[i].first;
-    for(unsigned i = 0; i < instance.vars.discrete.size(); ++i)
-      var_count += instance.vars.discrete[i].first;
-    for(unsigned i = 0; i < instance.vars.sparse_discrete.size(); ++i)
-      var_count += instance.vars.sparse_discrete[i].first;
-
-    vector<Var> vars;
-    for(int i = 0; i < var_count; ++i)
-      vars.push_back(instance.vars.get_var('x',i));
-    instance.search_order.push_back(vars);
+    instance.search_order.push_back(instance.vars.get_all_vars());
   }
 
   for(int i = 0; i < instance.search_order.size(); ++i)
@@ -393,6 +379,9 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
   // This has to be delayed unless not all variables are defined where 'PRINT ALL' occurs.
   if(print_all_vars)
     instance.print_matrix = instance.all_vars_list;
+    
+  if(instance.sym_order.empty())
+    instance.sym_order = instance.vars.get_all_vars();
 }
 
 template<typename FileReader>
@@ -1032,6 +1021,14 @@ found: ;
         throw parse_exception("Can't have two PERMUTATIONs!");
       instance.permutation = readLiteralVector(infile);
       parser_info("Read permutation, length " +
+        to_string(instance.permutation.size()));      
+    }
+    else if(var_type == "SYMORDER")
+    {
+      if(!instance.sym_order.empty())
+        throw parse_exception("Can't have two SYMORDERs!");
+      instance.sym_order = readLiteralVector(infile);
+      parser_info("Read Symmetry Ordering, length " +
         to_string(instance.permutation.size()));      
     }
     else if(var_type == "VALORDER")

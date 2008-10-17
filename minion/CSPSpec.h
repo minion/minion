@@ -595,6 +595,7 @@ struct CSPInstance
   //vector<Var> var_order;
   //vector<char> val_order;
   vector<Var> permutation;
+  vector<Var> sym_order;
 
   /// Only used for gadgets.
   vector<Var> constructionSite;
@@ -625,7 +626,7 @@ public:
   
   CSPInstance(CSPInstance&& i) : 
   CXXMOVE(vars, i), CXXMOVE(constraints, i), CXXMOVE(tupleListContainer, i), CXXMOVE(search_order, i),
-  CXXMOVE(permutation, i), CXXMOVE(constructionSite, i), CXXMOVE(is_optimisation_problem, i),
+  CXXMOVE(permutation, i), CXXMOVE(sym_order, i), CXXMOVE(constructionSite, i), CXXMOVE(is_optimisation_problem, i),
   CXXMOVE(optimise_minimising, i), CXXMOVE(optimise_variable, i), CXXMOVE(print_matrix, i), CXXMOVE(all_vars_list, i),
   CXXMOVE(table_symboltable, i), CXXMOVE(table_nametable, i), CXXMOVE(gadgetMap, i)
   { }
