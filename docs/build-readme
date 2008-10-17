@@ -6,20 +6,13 @@ This document provides a brief outline of Minion's build system and the contents
 ** Root directory **
 
 The important files in the root directory of Minion are:
-Changelog - a (poorly kept) log of changes which are made.
 build-all-windows.bat - Builds a copy of Minion using visual C++ instead of the standard gcc. This file may require some system-specific editing.
 build-all.sh - builds both a debug and non-debug version of Minion. Used mainly during automated building of releases.
 
-Makefile and Makefile.dep - the main building parts of Minion.
+CMakeLists.txt - The guts of the build system, tells CMake what to look for and
+what to build.
 
-Makefile.dep is an automatically generated file which tells 'Make' which files must be rebuilt, depending on what is changed. Whenever files are changed or added to Minion, this file should be rebuilt by typing:
-
-mini-scripts/make-depend.sh while in the root directory. Some errors messages may appear (in particular about 'test07.cpp') which can be ignored. If this file is not up-to-date, or missing, then Make will still work, but 'make clean' must be explicitly run whenever a file is changed.
-
-There are a number of flags which can be given to make, to build various different varieties of Minion.
-
-MYFLAGS="<insert flags here>" - allows any compiler flags to be explicitly added to Minion's compile. The mostly likely use of this is to add more advanced optimization flags.
-
+There are a number of flags which can be given to cmake, to build various different varieties of Minion.
 
 DEBUG=1 - Turns on a large number of checks in the Minion source code, denoted D_ASSERT. This will massively slow down Minion, but does a large number of checks. If any assert ever fails in debug mode, this shows the existence of a bug which should be fixed.
 
@@ -38,8 +31,11 @@ QUICK=1 - Reduces compile time by compiling less copies of each constraint, resu
 
 NAME=<insert name> - allows the name for the executable to be chosen. If this is ommited, then the executable is name minion with as many as -debug, -quick, -profile and -info as were required at compile time.
 
+Additionally you can set the following environment variables which affect the
+build.
+
+CPU="<insert flags here>" - allows any compiler flags to be explicitly added to Minion's compile. The mostly likely use of this is to add more advanced optimization flags.
+
 Actually compiling Minion.
 
 Minion works on the assumption that all files which should be compiled end with '.cpp', and are in either the minion or minion/build_constraints directories. All files in the 'build_constraints' directories are automatically generated and should not be changed.
-
-
