@@ -39,8 +39,8 @@ for i in `grep -l "#TEST SOLCOUNT" *.minion`; do
     	  errormess="Got '${numsols}' instead of '${testnumsols}' solutions in $i"
     	else
     	 let pass=pass+1
-       let LOOP=LOOP+1
       fi
+      let LOOP=LOOP+1
     done
     fi
   echo -n .
