@@ -181,6 +181,13 @@ if(SMALL)
 	set(CFLAGS "${CFLAGS} -Os")
 endif()
 
+option(WDEG "" OFF)
+if(WDEG)
+	message(STATUS "Enable wdeg heuristics")
+	set(BINARY "${BINARY}-wdeg")
+	set(CFLAGS "${CFLAGS} -DWDEG")
+endif()
+
 option(INFO "" OFF)
 if(INFO)
 	message(STATUS "Enabling INFO")
