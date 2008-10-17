@@ -74,21 +74,30 @@ struct GraphBuilder
       cout << "n = " << vertex_count << endl;
     }
     
+    for(int i = 0; i < csp.sym_order.size(); ++i)
+    {
+      cout << "# " << name(csp.sym_order[i]) << " " << i + 1 << endl;
+      v_num[name(csp.sym_order[i])] = i + 1;
+    }
+    
     // Now output partitions
-    int vertex_counter = 1;
-    bool first_pass = true;
+    bool first_pass_bar = true;
     cout << "f = [";
     for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
     it != var_vertex_colour.end();
     ++it)
     {
-      int old_vertex_pos = vertex_counter;
+      if(first_pass_bar) first_pass_bar = false; else cout << "|";
       D_ASSERT(it->second.size() > 0);
+      bool first = true;
       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-        v_num[*it2] = vertex_counter++;
-      if(first_pass) first_pass = false; else cout << "|";
-      cout << old_vertex_pos << ":" << vertex_counter - 1;
+      {
+        if(first) first=false; else cout << ",";
+        cout << v_num[*it2];
+      }
     }
+
+    int vertex_counter = v_num.size() + 1;
 
     cout << endl << "#VAREND " << vertex_counter - 1 << endl;
     for(map<string,int>::iterator it = v_num.begin(); it != v_num.end(); ++it)
@@ -103,7 +112,7 @@ struct GraphBuilder
       D_ASSERT(it->second.size() > 0);
       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
         v_num[*it2] = vertex_counter++;
-      if(first_pass) first_pass = false; else cout << "|";  
+      if(first_pass_bar) first_pass_bar = false; else cout << "|";  
       cout << old_vertex_pos << ":" << vertex_counter - 1;
     }
     cout << "]" << endl;
@@ -126,8 +135,11 @@ struct GraphBuilder
   
   GraphBuilder(CSPInstance& _csp) : csp(_csp), free_vertices(0)
   { 
+    if(csp.sym_order.empty())
+      D_FATAL_ERROR("Symmetry detection doesn't work with input formats 1 and 2. Upgrade!");
     csp.add_variable_names();
     build_graph(); 
+    
   }
   
   

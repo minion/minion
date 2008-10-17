@@ -382,6 +382,12 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
     
   if(instance.sym_order.empty())
     instance.sym_order = instance.vars.get_all_vars();
+    
+  if(instance.sym_order.size() != instance.vars.get_all_vars().size())
+    throw parse_exception("SYMORDER must contain every variable");
+    
+  if(instance.sym_order.size() != set<Var>(instance.sym_order.begin(), instance.sym_order.end()).size())
+    throw parse_exception("SYMORDER cannot contain any variable more than once");
 }
 
 template<typename FileReader>
