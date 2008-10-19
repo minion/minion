@@ -16,6 +16,7 @@ template<typename SearchAlgorithm, typename VarOrder, typename Vars, typename Pr
     case ORDER_LDF:
     case ORDER_ORIGINAL:
     case ORDER_WDEG:
+    case ORDER_DOMOVERWDEG:
     if(getOptions(stateObj).find_generators)
     {
       vector<AnyVarRef> perm = get_AnyVarRef_from_Var(stateObj, instance.permutation);
@@ -108,6 +109,23 @@ void solve(StateObj* stateObj, VarOrder order_in, VarValOrder& search_order, CSP
     {
 #ifdef WDEG
       Controller::VariableOrder<VarType, Controller::WdegBranch>
+        order(stateObj, search_order.first, search_order.second);
+      try
+        { solve_select_search(stateObj, order_in, order, search_order.first, instance, prop); }
+      catch(...)
+        { }
+
+#else
+    FAIL_EXIT("This copy of Minion compiled without 'WDEG' support");
+#endif
+    }
+    break;
+      
+
+    case ORDER_DOMOVERWDEG:
+    {
+#ifdef WDEG
+      Controller::VariableOrder<VarType, Controller::DomOverWdegBranch>
         order(stateObj, search_order.first, search_order.second);
       try
         { solve_select_search(stateObj, order_in, order, search_order.first, instance, prop); }

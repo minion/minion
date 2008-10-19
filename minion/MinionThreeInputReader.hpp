@@ -1011,7 +1011,7 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
       {
         string s = infile->get_string();
 #define Z(x) if(s == #x) { vo = ORDER_##x; goto found; }
-Z(STATIC) Z(SDF) Z(SRF) Z(LDF) Z(ORIGINAL) Z(WDEG) Z(CONFLICT)
+Z(STATIC) Z(SDF) Z(SRF) Z(LDF) Z(ORIGINAL) Z(WDEG) Z(CONFLICT) Z(DOMOVERWDEG)
 #undef Z        
 throw parse_exception("Don't understand '" + s + "'");
 found: ;
