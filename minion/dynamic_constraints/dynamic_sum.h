@@ -234,7 +234,6 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
     int propval = dt->trigger_info();
     D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
     D_ASSERT(var_array[propval].getAssignedValue() == VarToCount);
-    // VarIterator<VarRef> it(var_array[i], propval + 1);
   // should generalise
   // and will need to loop round for watched lits	
 
