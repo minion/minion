@@ -277,15 +277,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       }
       if(val_count.inDomain(occ))
       {
-          if(!val_count.isBound())
-          {
-              val_count.removeFromDomain(occ);
-          }
-          else
-          {
-              // go into watching-the-bounds mode.
-              FAIL_EXIT("no support for watching the bounds in not-occurrence");
-          }
+          val_count.removeFromDomain(occ);
       }
   }
   
