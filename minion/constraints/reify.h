@@ -83,6 +83,8 @@ more information.
 //#define P(x) cout << x << endl
 #define P(x)
 
+#define NEWREIFY
+
 #ifdef NEWREIFY
 
 // Reify should work even if its child constraints return different numbers of variables from get_vars.
