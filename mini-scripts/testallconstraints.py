@@ -23,7 +23,13 @@ conslist+=["diseq", "reifydiseq", "reifyimplydiseq", "eq", "reifyeq", "reifyimpl
 # alldiffs
 conslist+=["alldiff", "reifyalldiff",  "reifyimplyalldiff"]
 conslist+=["gacalldiff", "reifygacalldiff", "reifyimplygacalldiff"]
-conslist+=["gcc", "reifyimplygcc"]
+
+# capacity constraints
+conslist+=["gcc", "reifygcc", "reifyimplygcc"]
+
+conslist+=["occurrence", "reifyoccurrence", "reifyimplyoccurrence"]
+conslist+=["occurrenceleq", "reifyoccurrenceleq", "reifyimplyoccurrenceleq"]
+conslist+=["occurrencegeq", "reifyoccurrencegeq", "reifyimplyoccurrencegeq"]
 
 #element constraints
 conslist+=["gacelement-deprecated", "reifyimplygacelement-deprecated"]
@@ -44,9 +50,6 @@ conslist+=["sumleq", "reifysumleq", "reifyimplysumleq"]
 
 conslist+=["weightedsumgeq", "reifyweightedsumgeq", "reifyimplyweightedsumgeq"]
 conslist+=["weightedsumleq", "reifyweightedsumleq", "reifyimplyweightedsumleq"]
-
-conslist+=["occurrence", "reifyimplyoccurrence"]
-conslist+=["occurrenceleq", "occurrencegeq", "reifyimplyoccurrenceleq", "reifyimplyoccurrencegeq"]
 
 conslist+=["ineq", "reifyineq", "reifyimplyineq"]
 
