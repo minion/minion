@@ -503,8 +503,8 @@ class testnegativetable:
                 constraint+="\n"+c
                 constrainttable+="\n"+c
         
-        retval1=runminion("infile1.minion", "outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline)
-        retval2=runminion("infile2.minion", "outfile2", tablegen.solver, modvars, constraint, tuplelist=negtuplestring, opt=optline)
+        retval1=runminion("infile1.minion", "outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
+        retval2=runminion("infile2.minion", "outfile2", tablegen.solver, modvars, constraint, tuplelist=negtuplestring, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
             print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
             return False
@@ -1139,8 +1139,8 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
             constrainttable+="\n"+c
     
     if not fullprop:
-        retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline)
-        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline)
+        retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
+        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
             print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
             return False
@@ -1149,8 +1149,8 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
             treesame=False
         return comparetrees(treesame)  # tree subset
     else:
-        retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, modvars, constraint, opt=optline, cmd="-fullprop")
-        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline)
+        retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'], cmd="-fullprop")
+        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
             print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
             return False
@@ -1159,12 +1159,13 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
             treesame=False
         return comparetrees(True)  # trees same.
     
-def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist=False, opt=False, cmd=""):
+def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist=False, opt=False, printcmd=False, cmd=""):
     file1=open(filename, "w")
     printminionfile(file1, variables, constraint, tuplelist=tuplelist, opt=opt)
     file1.close()
     cmd=minionbin+" -dumptree -findallsols "+cmd+" "+filename+" >"+outfilename
-    #print "Executing command: "+cmd
+    if printcmd:
+        print "Executing command: "+cmd
     return os.system(cmd)
 
 def generatevariables(varblocks, types, boundallowed):

@@ -43,7 +43,7 @@ testobj=eval("test"+consname+"()")
 testobj.solver=minionbin
 for testnum in range(numtests):
     print "Test number %d"%(testnum)
-    options={'reify':reify, 'reifyimply':reifyimply, 'fullprop':fullprop}
+    options={'reify':reify, 'reifyimply':reifyimply, 'fullprop':fullprop, 'printcmd':True}
     if not testobj.runtest(options):
         sys.exit(0)
     

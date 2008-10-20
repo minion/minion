@@ -72,7 +72,7 @@ def run_in_proc(numtests):
     testobj.solver=minionbin
 
     for testnum in range(numtests):
-        options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop}
+        options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False}
         if not testobj.runtest(options):
             sys.exit(1)
     sys.exit(0)
