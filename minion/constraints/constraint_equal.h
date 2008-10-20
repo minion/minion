@@ -316,135 +316,6 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   }
 };
 
-template<typename EqualVarRef1, typename EqualVarRef2>
-struct EqualConstraint : public AbstractConstraint
-{
-  virtual string constraint_name()
-  { return "Equal"; }
-  
-  EqualVarRef1 var1;
-  EqualVarRef2 var2;
-  EqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2) : AbstractConstraint(_stateObj),
-    var1(_var1), var2(_var2)
-  {}
-  
-  virtual triggerCollection setup_internal()
-  {
-    D_INFO(2,DI_ANDCON,"Setting up Constraint");
-    triggerCollection t;
-	t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-	t.push_back(make_trigger(var1, Trigger(this, 2), LowerBound));
-	t.push_back(make_trigger(var2, Trigger(this, 3), UpperBound));
-	t.push_back(make_trigger(var2, Trigger(this, 4), LowerBound));
-	return t;
-  }
-  
-  virtual void full_propagate()
-  {
-	propagate(1,0);
-	propagate(2,0);
-	propagate(3,0);
-	propagate(4,0);
-  }
-  
-  PROPAGATE_FUNCTION(int i, DomainDelta)
-  {
-	PROP_INFO_ADDONE(Equal);
-    switch(i)
-	{
-	  case 1:
-		var2.setMax(var1.getMax());
-		return;
-	  case 2:
-		var2.setMin(var1.getMin());
-		return;
-	  case 3:
-		var1.setMax(var2.getMax());
-		return;
-	  case 4:
-		var1.setMin(var2.getMin());
-		return;
-	}
-  }
-  
-  
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
-  {
-    D_ASSERT(v_size == 2);
-    return (v[0] == v[1]);
-  }
-  
-  virtual vector<AnyVarRef> get_vars()
-  { 
-    vector<AnyVarRef> vars;
-	vars.reserve(2);
-	vars.push_back(var1);
-	vars.push_back(var2);
-    return vars;
-  }
-  
-   virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
-   {
-     DomainInt min_val = max(var1.getMin(), var2.getMin());
-     DomainInt max_val = min(var1.getMax(), var2.getMax());
-     
-     for(DomainInt i = min_val ; i <= max_val; ++i)
-     {
-       if(var1.inDomain(i) && var2.inDomain(i))
-       {
-         assignment.push_back(make_pair(0, i));
-         assignment.push_back(make_pair(1, i));
-         return;
-       } 
-     }
-   }
-};
-
-
-template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
-AbstractConstraint*
-ReifiedEqualCon(StateObj* stateObj, const light_vector<EqualVarRef1>& var1, 
-                                    const light_vector<EqualVarRef2>& var2, const light_vector<BoolVarRef> var3)
-{ return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, BoolVarRef>(stateObj,var1[0],var2[0],var3[0]); }
-
-template<typename EqualVarRef1, typename EqualVarRef2>
-AbstractConstraint*
-EqualCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
-{ return new EqualConstraint<EqualVarRef1, EqualVarRef2>(stateObj, var1,var2); }
-
-
-template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
-AbstractConstraint*
-ReifiedEqualMinusCon(StateObj* stateObj, const light_vector<EqualVarRef1>& var1, 
-                                         const light_vector<EqualVarRef2>& var2, const light_vector<BoolVarRef> var3)
-{ return new ReifiedEqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2>, BoolVarRef>(stateObj, var1[0],VarNegRef(var2[0]),var3[0]); }
-
-template<typename EqualVarRef1, typename EqualVarRef2>
-AbstractConstraint*
-EqualMinusCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
-{ return new EqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2> >(stateObj, var1,VarNegRef(var2)); }
-
-
-template<typename T1, typename T2>
-AbstractConstraint*
-BuildCT_EQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
-{
-//  if(reify)
-//  { return ReifiedEqualCon(stateObj, t1[0],t2[0], reifyVar); }
-//  else
-  { return EqualCon(stateObj, t1[0],t2[0]); }
-}
-
-template<typename T1, typename T2>
-AbstractConstraint*
-BuildCT_MINUSEQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
-{
-//  if(reify)
-//  { return ReifiedEqualMinusCon(stateObj, t1[0],t2[0], reifyVar); }
-//  else
-  { return EqualMinusCon(stateObj, t1[0],t2[0]); }
-}
-
 // This is required for the following to have bound triggers
 // when the variables are bound,
 // and propagate confluently.
@@ -659,6 +530,142 @@ struct NeqConstraintBinary : public AbstractConstraint
 	  return vars;
 	}
   };
+
+
+template<typename EqualVarRef1, typename EqualVarRef2>
+struct EqualConstraint : public AbstractConstraint
+{
+  virtual string constraint_name()
+  { return "Equal"; }
+  
+  EqualVarRef1 var1;
+  EqualVarRef2 var2;
+  EqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2) : AbstractConstraint(_stateObj),
+    var1(_var1), var2(_var2)
+  {}
+  
+  virtual triggerCollection setup_internal()
+  {
+    D_INFO(2,DI_ANDCON,"Setting up Constraint");
+    triggerCollection t;
+	t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
+	t.push_back(make_trigger(var1, Trigger(this, 2), LowerBound));
+	t.push_back(make_trigger(var2, Trigger(this, 3), UpperBound));
+	t.push_back(make_trigger(var2, Trigger(this, 4), LowerBound));
+	return t;
+  }
+  
+  virtual void full_propagate()
+  {
+	propagate(1,0);
+	propagate(2,0);
+	propagate(3,0);
+	propagate(4,0);
+  }
+  
+  PROPAGATE_FUNCTION(int i, DomainDelta)
+  {
+	PROP_INFO_ADDONE(Equal);
+    switch(i)
+	{
+	  case 1:
+		var2.setMax(var1.getMax());
+		return;
+	  case 2:
+		var2.setMin(var1.getMin());
+		return;
+	  case 3:
+		var1.setMax(var2.getMax());
+		return;
+	  case 4:
+		var1.setMin(var2.getMin());
+		return;
+	}
+  }
+  
+  
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  {
+    D_ASSERT(v_size == 2);
+    return (v[0] == v[1]);
+  }
+  
+  virtual vector<AnyVarRef> get_vars()
+  { 
+    vector<AnyVarRef> vars;
+	vars.reserve(2);
+	vars.push_back(var1);
+	vars.push_back(var2);
+    return vars;
+  }
+  
+   virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+   {
+     DomainInt min_val = max(var1.getMin(), var2.getMin());
+     DomainInt max_val = min(var1.getMax(), var2.getMax());
+     
+     for(DomainInt i = min_val ; i <= max_val; ++i)
+     {
+       if(var1.inDomain(i) && var2.inDomain(i))
+       {
+         assignment.push_back(make_pair(0, i));
+         assignment.push_back(make_pair(1, i));
+         return;
+       } 
+     }
+   }
+   
+   virtual AbstractConstraint* reverse_constraint()
+   {
+       return new NeqConstraintBinary<EqualVarRef1, EqualVarRef2>(stateObj, var1, var2);
+   }
+};
+
+
+template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
+AbstractConstraint*
+ReifiedEqualCon(StateObj* stateObj, const light_vector<EqualVarRef1>& var1, 
+                                    const light_vector<EqualVarRef2>& var2, const light_vector<BoolVarRef> var3)
+{ return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, BoolVarRef>(stateObj,var1[0],var2[0],var3[0]); }
+
+template<typename EqualVarRef1, typename EqualVarRef2>
+AbstractConstraint*
+EqualCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
+{ return new EqualConstraint<EqualVarRef1, EqualVarRef2>(stateObj, var1,var2); }
+
+
+template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
+AbstractConstraint*
+ReifiedEqualMinusCon(StateObj* stateObj, const light_vector<EqualVarRef1>& var1, 
+                                         const light_vector<EqualVarRef2>& var2, const light_vector<BoolVarRef> var3)
+{ return new ReifiedEqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2>, BoolVarRef>(stateObj, var1[0],VarNegRef(var2[0]),var3[0]); }
+
+template<typename EqualVarRef1, typename EqualVarRef2>
+AbstractConstraint*
+EqualMinusCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
+{ return new EqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2> >(stateObj, var1,VarNegRef(var2)); }
+
+
+template<typename T1, typename T2>
+AbstractConstraint*
+BuildCT_EQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
+{
+//  if(reify)
+//  { return ReifiedEqualCon(stateObj, t1[0],t2[0], reifyVar); }
+//  else
+  { return EqualCon(stateObj, t1[0],t2[0]); }
+}
+
+template<typename T1, typename T2>
+AbstractConstraint*
+BuildCT_MINUSEQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
+{
+//  if(reify)
+//  { return ReifiedEqualMinusCon(stateObj, t1[0],t2[0], reifyVar); }
+//  else
+  { return EqualMinusCon(stateObj, t1[0],t2[0]); }
+}
+
 
 
 template<typename VarRef1, typename VarRef2, typename BoolVarRef>

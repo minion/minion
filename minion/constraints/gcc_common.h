@@ -9,11 +9,8 @@
 #include <utility>
 #include "alldiff_gcc_shared.h"
 
-#ifdef MINION_DEBUG
-    #define GCCPRINT(x) cout << x << endl
-#else
-    #define GCCPRINT(x)
-#endif
+//#define GCCPRINT(x) cout << x << endl
+#define GCCPRINT(x)
 
 #define SPECIALQUEUE
 #define SCC
@@ -861,9 +858,12 @@ struct GCC : public AbstractConstraint
 	{
 	  D_ASSERT(vsize == var_array.size()+capacity_array.size());
       // borrow augpath array
+      cout << "In check_assignment with array:[";
+      for(int i=0; i<vsize; i++) cout << v[i] <<",";
+      cout << "]" <<endl;
       augpath.clear();
       augpath.resize(numvals, 0);
-      // for(int i=0; i<numvals; i++) augpath.push_back(0);
+      
       for(int i=0; i<numvars; i++)
       {   // count the values.
           augpath[v[i]-dom_min]++;
@@ -871,9 +871,24 @@ struct GCC : public AbstractConstraint
       for(int i=0; i<val_array.size(); i++)
       {
           int val=val_array[i];
-          if(val>=dom_min && val<=dom_max && v[i+numvars]!=augpath[val-dom_min])
-              return false;
+          if(val>=dom_min && val<=dom_max)
+          {
+              if(v[i+numvars]!=augpath[val-dom_min])
+              {
+                  cout << "Returning false."<<endl;
+                  return false;
+              }
+          }
+          else
+          {
+              if(v[i+numvars]!=0)
+              {
+                  cout << "Returning false."<<endl;
+                  return false;
+              }
+          }
       }
+      cout << "Returning true." <<endl;
 	  return true;
 	}
     
@@ -1233,5 +1248,17 @@ struct GCC : public AbstractConstraint
                 }
             }
         }
+    }
+    
+    // Function to make it reifiable in the most minimal way.
+    virtual AbstractConstraint* reverse_constraint()
+    {
+        vector<AnyVarRef> t;
+        for(int i=0; i<var_array.size(); i++)
+            t.push_back(var_array[i]);
+        for(int i=0; i<capacity_array.size(); i++)
+            t.push_back(capacity_array[i]);
+        
+        return new CheckAssignConstraint<vector<AnyVarRef>, GCC>(stateObj, t, *this);
     }
 };

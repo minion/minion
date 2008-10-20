@@ -80,10 +80,15 @@ more information.
 #undef P
 #endif
 
-#define P(x) cout << x << endl
-//#define P(x)
+//#define P(x) cout << x << endl
+#define P(x)
 
 #ifdef NEWREIFY
+
+// Reify should work even if its child constraints return different numbers of variables from get_vars.
+// fix.
+
+// In here variables are numbered from child_constraints[0].get_vars(), then child_constraints[1].get_vars(), then reify_var
 
 template<typename BoolVar>
 struct reify : public ParentConstraint
@@ -93,7 +98,6 @@ struct reify : public ParentConstraint
   
   BoolVar reify_var;
   int reify_var_num;
-  // numbered child_constraints[0]->get_vars_singleton()->size()
   
   bool constraint_locked;
   Reversible<bool> full_propagate_called;
@@ -106,9 +110,7 @@ struct reify : public ParentConstraint
     AbstractConstraint* _negcon = _poscon->reverse_constraint();
     child_constraints.push_back(_negcon);
     // assume for the time being that the two child constraints have the same number of vars.
-    reify_var_num=child_constraints[0]->get_vars_singleton()->size();
-    D_ASSERT(child_constraints[0]->get_vars().size() == child_constraints[1]->get_vars().size());
-    
+    reify_var_num=child_constraints[0]->get_vars_singleton()->size()+child_constraints[1]->get_vars_singleton()->size();
   }
   
   // constructor which takes a negative constraint and constructs the positive one.
@@ -122,8 +124,7 @@ struct reify : public ParentConstraint
     child_constraints.push_back(_poscon);
     child_constraints.push_back(_negcon);
     // assume for the time being that the two child constraints have the same number of vars.
-    reify_var_num=child_constraints[0]->get_vars_singleton()->size();
-    D_ASSERT(child_constraints[0]->get_vars().size() == child_constraints[1]->get_vars().size());
+    reify_var_num=child_constraints[0]->get_vars_singleton()->size()+child_constraints[1]->get_vars_singleton()->size();
   }
   
   virtual AbstractConstraint* reverse_constraint()
@@ -134,7 +135,8 @@ struct reify : public ParentConstraint
   
   virtual int dynamic_trigger_count()
   {
-    return child_constraints[0]->get_vars_singleton()->size()*4;  // *2 for each child constraint.
+    return child_constraints[0]->get_vars_singleton()->size()*2 
+        +child_constraints[1]->get_vars_singleton()->size()*2;  // *2 for each child constraint.
   }
   
   virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
@@ -175,33 +177,26 @@ struct reify : public ParentConstraint
     }
   }
   
-  /*virtual BOOL check_assignment(DomainInt* v, int v_size)
-  {
-    DomainInt back_val = *(v + v_size - 1);
-    if(back_val != 0)
-      return child_constraints[0]->check_assignment(v, v_size - 1);
-    else
-      return child_constraints[1]->check_assignment(v, v_size - 1);
-  }*/
-  
   virtual vector<AnyVarRef> get_vars()
   {
-      // Push both sets of vars in case they have been transformed in different way.
-    vector<AnyVarRef> vec0 = child_constraints[0]->get_vars();
-    vector<AnyVarRef> vec1 = child_constraints[1]->get_vars();
-    vec0.reserve(vec0.size() + vec1.size() + 1);
+      // Push both sets of vars, then reify var.
+    vector<AnyVarRef> vec0 = * child_constraints[0]->get_vars_singleton();
+    vector<AnyVarRef> vec1 = * child_constraints[1]->get_vars_singleton();
+    vector<AnyVarRef> c;
+    c.reserve(vec0.size() + vec1.size() + 1);
+    for(int i=0; i<vec0.size(); i++)
+        c.push_back(vec0[i]);
     for(int i=0; i<vec1.size(); i++)
-        vec0.push_back(vec1[i]);
-    vec0.push_back(reify_var);
-    return vec0;
+        c.push_back(vec1[i]);
+    c.push_back(reify_var);
+    return c;
   }
   
   virtual triggerCollection setup_internal()
   {
     D_INFO(2,DI_REIFY,"Setting up reification");
     triggerCollection triggers;
-    triggers.push_back(make_trigger(reify_var, Trigger(this, -2), LowerBound));
-    triggers.push_back(make_trigger(reify_var, Trigger(this, -1), UpperBound));
+    triggers.push_back(make_trigger(reify_var, Trigger(this, -1000000000), Assigned));
     return triggers;
   }
   
@@ -235,7 +230,7 @@ struct reify : public ParentConstraint
     if(constraint_locked)
       return;
     
-    if(i == -1 || i == -2)
+    if(i == -1000000000)
     {
       P("reifyvar assigned - Do full propagate");
       constraint_locked = true;
@@ -281,7 +276,7 @@ struct reify : public ParentConstraint
     DynamicTrigger* dt = dynamic_trigger_start();
     int numtriggers=dynamic_trigger_count();
     
-    if(trig >= dt && trig < dt + (numtriggers/2))
+    if(trig >= dt && trig < (dt + (child_constraints[0]->get_vars_singleton()->size()*2)) )
     {// Lost assignments for positive constraint.
       P("Triggered on an assignment watch");
       if(!full_propagate_called)
@@ -296,12 +291,16 @@ struct reify : public ParentConstraint
           return;
         }
         P("Found new assignment");
-        watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt);
+        watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt, dt+(child_constraints[0]->get_vars_singleton()->size()*2));
+      }
+      else
+      {
+          P("Ignoring assignment watch");
       }
       return;
     }
     
-    if(trig>= (dt+ (numtriggers/2)) && trig < dt+numtriggers)
+    if(trig>= (dt+ (child_constraints[0]->get_vars_singleton()->size()*2)) && trig < dt+numtriggers)
     {// Lost assignments for negative constraint.
         P("Triggered on an assignment watch");
       if(!full_propagate_called)
@@ -316,7 +315,11 @@ struct reify : public ParentConstraint
           return;
         }
         P("Found new assignment");
-        watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), dt+(numtriggers/2));
+        watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), dt+(child_constraints[0]->get_vars_singleton()->size()*2), dt+numtriggers);
+      }
+      else
+      {
+          P("Ignoring assignment watch");
       }
       return;
     }
@@ -325,13 +328,21 @@ struct reify : public ParentConstraint
     {
       P("Pass triggers to children");
       D_ASSERT(reify_var.isAssigned());
+      
+      int child=getChildDynamicTrigger(trig);
+      if(reify_var.getAssignedValue() == child)
+      {
+          P("Removing leftover trigger from other child constraint");
+          //trig->remove();
+          return;
+      }
       // The trigger might be a leftover of some kind.
-      if(getChildDynamicTrigger(trig) != 1-reify_var.getAssignedValue())
+      /*if(getChildDynamicTrigger(trig) != 1-reify_var.getAssignedValue())
       {
           P("Removing leftover trigger from other child constraint");
           trig->remove();
           return;
-      }
+      }*/
       child_constraints[getChildDynamicTrigger(trig)]->propagate(trig);
     }
     else
@@ -343,7 +354,7 @@ struct reify : public ParentConstraint
   }
   
   template<typename T, typename Vars, typename Trigger>
-  void watch_assignment(const T& assignment, Vars& vars, Trigger* trig)
+  void watch_assignment(const T& assignment, Vars& vars, Trigger* trig, Trigger* endtrig)
   {
     for(int i = 0; i < assignment.size(); ++i)
     {
@@ -353,9 +364,13 @@ struct reify : public ParentConstraint
       else  
         vars[assignment[i].first].addDynamicTrigger(trig + i, DomainRemoval, assignment[i].second);
     }
-
+    // clear other triggers up to (not including) endtrig
+    for(int i=assignment.size(); (trig+i)<endtrig; i++)
+    {
+        (trig+i)->remove();
+    }
   }
-
+  
   virtual void full_propagate()
   {
     P("Full prop");
@@ -394,8 +409,8 @@ struct reify : public ParentConstraint
       return;
     }
     
-    watch_assignment(assignment0, *(child_constraints[0]->get_vars_singleton()), dt);
-    watch_assignment(assignment1, *(child_constraints[1]->get_vars_singleton()), dt+(dt_count/2));
+    watch_assignment(assignment0, *(child_constraints[0]->get_vars_singleton()), dt, dt+(child_constraints[0]->get_vars_singleton()->size()*2));
+    watch_assignment(assignment1, *(child_constraints[1]->get_vars_singleton()), dt+(child_constraints[0]->get_vars_singleton()->size()*2), dt+dt_count);
   }
 };
 

@@ -134,8 +134,8 @@ public:
   /// Returns the reverse of the current constraint
   /** Used by rarification */
   virtual AbstractConstraint* reverse_constraint()
-  { 
-    cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+  {
+    cerr << "Negation is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
     exit(1);
   }
 
