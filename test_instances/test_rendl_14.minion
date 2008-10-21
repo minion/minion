@@ -1,8 +1,5 @@
 MINION 1
 #TEST SOLCOUNT 8820
-#BUG
-# This test fails due to unimplemented reification.
-
 1
 0
 0
