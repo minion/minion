@@ -198,7 +198,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     return sum <= *(v + v_size - 1);
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     int sum_value = 0;
     int v_size = var_array.size();
@@ -208,13 +208,14 @@ struct LessEqualSumConstraint : public AbstractConstraint
       sum_value += var_array[i].getMin();
     }
     if(sum_value > var_sum.getMax())
-      assignment.clear();
+      return false;
     else
       assignment.push_back(make_pair(v_size, var_sum.getMax()));
     
     P(v_size << "." << var_sum.getMax() << "." << sum_value << "." << assignment.size());
 
     P(assignment.size());
+    return true;
   }
   
   

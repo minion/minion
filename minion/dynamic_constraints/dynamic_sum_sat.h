@@ -172,16 +172,17 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
 	return vars;  
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     for(int i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].inDomain(1))
       {
         assignment.push_back(make_pair(i, 1));
-        return;
+        return true;
       }
     }
+    return false;
   }
 };
 

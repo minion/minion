@@ -346,7 +346,7 @@ struct LexLeqConstraint : public AbstractConstraint
       return true;
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     size_t x_size = x.size();
     for(size_t i = 0; i < x_size; ++i)
@@ -356,18 +356,18 @@ struct LexLeqConstraint : public AbstractConstraint
       
       if(x_i_min > y_i_max)
       {
-        assignment.clear();
-        return;
+        return false;
       }
       
       assignment.push_back(make_pair(i         , x_i_min));
       assignment.push_back(make_pair(i + x_size, y_i_max));
       if(x_i_min < y_i_max)
-        return;
+        return true;
     }
     
     if(Less)
-      assignment.clear();
+      return false;
+    return true;
   }
   
   virtual vector<AnyVarRef> get_vars()

@@ -118,20 +118,21 @@ template<typename Var>
     return vars;
   }
 
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {  
     /// TODO: Make faster
     if(var.getMin() < range_min || var.getMin() > range_max)
     {
       assignment.push_back(make_pair(0, var.getMin()));
-      return;
+      return true;
     }
     
     if(var.getMax() < range_min || var.getMax() > range_max)
     {
       assignment.push_back(make_pair(0, var.getMax()));
-      return;
+      return true;
     }
+    return false;
   }
 };
 

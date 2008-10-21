@@ -475,7 +475,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     return vars;  
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     pair<int, int> assign;
     for(int i = 0; i < var_array1.size(); ++i)
@@ -487,9 +487,10 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
         D_ASSERT(Operator::check_assignment(assign.first, assign.second));
         assignment.push_back(make_pair(i, assign.first));
         assignment.push_back(make_pair(i + var_array1.size(), assign.second));
-        return;
+        return true;
       }
     }
+    return false;
   }
   
 };

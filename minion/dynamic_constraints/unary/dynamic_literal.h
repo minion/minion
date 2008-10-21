@@ -67,8 +67,16 @@ template<typename Var>
     return vars;
   }
 
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
-  { if(var.inDomain(val)) assignment.push_back(make_pair(0, val)); }
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  { 
+    if(var.inDomain(val))
+    {
+        assignment.push_back(make_pair(0, val));
+        return true;
+    }
+    else
+        return false;
+  }
 };
 
 template<typename VarArray1>

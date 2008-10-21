@@ -32,15 +32,18 @@ For Licence Information see file LICENSE.txt
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 
+
+
 #ifdef P
 #undef P
 #endif
 
-//#define P(x) cout << x << endl;
+//#define P(x) cout << x << endl
 #define P(x)
 
 // Similar to watched or, but has no watching phase, just propagates all
 // the time, and propagates all constraints of course.
+
 
 struct Dynamic_AND : public ParentConstraint
 {
@@ -66,7 +69,7 @@ struct Dynamic_AND : public ParentConstraint
     return true;
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
       // get all satisfying assignments of child constraints and stick
       // them together. Even if they contradict each other.
@@ -76,11 +79,10 @@ struct Dynamic_AND : public ParentConstraint
       for(int i=0; i<child_constraints.size(); ++i)
       {
           localassignment.clear();
-          child_constraints[i]->get_satisfying_assignment(localassignment);
-          if(localassignment.empty())
-          { // this currently means there is no satisfying assignment
-              assignment.resize(0);
-              return;
+          bool flag=child_constraints[i]->get_satisfying_assignment(localassignment);
+          if(!flag)
+          {
+              return false;
           }
           
           for(int j=0; j<localassignment.size(); j++)
@@ -89,6 +91,7 @@ struct Dynamic_AND : public ParentConstraint
                   localassignment[j].second));
           }
       }
+      return true;
   }
   
   virtual vector<AnyVarRef> get_vars()
@@ -101,7 +104,7 @@ struct Dynamic_AND : public ParentConstraint
     }
     return vecs;
   }
-
+  
   virtual int dynamic_trigger_count()
   { 
     return 0;
@@ -173,15 +176,29 @@ struct Dynamic_AND : public ParentConstraint
   
   virtual void full_propagate()
   {
-    P("Full Propagate")
+    P("Full Propagate");
     
     // push it on the special queue to be full_propagated later.
     D_ASSERT(!constraint_locked);
     constraint_locked = true;
 	getQueue(stateObj).pushSpecialTrigger(this);
   }
+  
+  // This breaks everything.
+  //virtual AbstractConstraint* reverse_constraint();
 };
 
+//#include "dynamic_new_or.h"
+
+/*virtual AbstractConstraint* Dynamic_AND::reverse_constraint()
+{ // OR of the reverse of all the child constraints..
+  vector<AbstractConstraint*> con;
+  for(int i=0; i<child_constraints.size(); i++)
+  {
+      con.push_back(child_constraints[i]->reverse_constraint());
+  }
+  return new Dynamic_OR(stateObj, con);
+}*/
 
 inline AbstractConstraint*
 BuildCT_WATCHED_NEW_AND(StateObj* stateObj, BOOL reify, 

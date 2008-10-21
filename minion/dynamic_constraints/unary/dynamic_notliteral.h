@@ -68,14 +68,21 @@ template<typename Var>
     return vars;
   }
 
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   { 
     D_ASSERT(var.inDomain(var.getMin()) && var.inDomain(var.getMax()));
     DomainInt tmp;
     if((tmp = var.getMin()) != val)
-	assignment.push_back(make_pair(0, tmp)); 
+    {
+        assignment.push_back(make_pair(0, tmp));
+        return true;
+    }
     else if((tmp = var.getMax()) != val)
-	assignment.push_back(make_pair(0, tmp)); 
+    {
+        assignment.push_back(make_pair(0, tmp));
+        return true;
+    }
+    return false;
   }
 };
 
@@ -122,10 +129,14 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
     return vars;
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(var.inDomain(1 - val))
+    {
       assignment.push_back(make_pair(0, 1 - val));
+      return true;
+    }
+    return false;
   }
 };
 

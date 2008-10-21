@@ -237,7 +237,7 @@ struct ModConstraint : public AbstractConstraint
 	return v;
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {  
     for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
     {
@@ -250,11 +250,12 @@ struct ModConstraint : public AbstractConstraint
             assignment.push_back(make_pair(0, v1));
             assignment.push_back(make_pair(1, v2));
             assignment.push_back(make_pair(2, v1 % v2));
-            return;
+            return true;
           }
         }
       }
     }
+    return false;
   }
 };
 

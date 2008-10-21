@@ -358,7 +358,7 @@ struct ElementConstraint : public AbstractConstraint
     return array;
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {  
     int array_start = max(DomainInt(0), index_ref.getMin());
     int array_end   = min((DomainInt)var_array.size() - 1, index_ref.getMax());
@@ -379,11 +379,12 @@ struct ElementConstraint : public AbstractConstraint
             assignment.push_back(make_pair(var_array.size() + 1, domval));
             // vararray[i] = domval
             assignment.push_back(make_pair(i, domval));
-            return;
+            return true;
           }
         }
       }
     }
+    return false;
   }
   
   virtual AbstractConstraint* reverse_constraint()

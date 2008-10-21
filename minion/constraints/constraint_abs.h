@@ -143,7 +143,7 @@ struct AbsConstraint : public AbstractConstraint
       return v[0] == -v[1];
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     DomainInt x_dom_max = var1.getMax();
     DomainInt y_dom_max = max(abs(var2.getMin()), abs(var2.getMax()));
@@ -158,17 +158,18 @@ struct AbsConstraint : public AbstractConstraint
         {
           assignment.push_back(make_pair(0, i));
           assignment.push_back(make_pair(1, i));
-          return;
+          return true;
         }
         else
         if( var2.inDomain(-i) )
         {
           assignment.push_back(make_pair(0, i));
           assignment.push_back(make_pair(1, -i));
-          return;
+          return true;
         }
       }
     }
+    return false;
   }
   
   

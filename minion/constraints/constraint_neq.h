@@ -197,7 +197,7 @@ struct NeqConstraint : public AbstractConstraint
 	
 	 // Getting a satisfying assignment here is too hard, we don't want to have to
 	 // build a matching.
-	 virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+	 virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
    {
      MAKE_STACK_BOX(c, DomainInt, var_array.size());
      
@@ -207,7 +207,7 @@ struct NeqConstraint : public AbstractConstraint
        {  
          assignment.push_back(make_pair(i, var_array[i].getMin()));
          assignment.push_back(make_pair(i, var_array[i].getMax()));
-         return;
+         return true;
        }
        else
          c.push_back(var_array[i].getAssignedValue());
@@ -217,7 +217,9 @@ struct NeqConstraint : public AbstractConstraint
     {  // Put the complete assignment in the box.
       for(int i = 0; i < var_array.size(); ++i)
         assignment.push_back(make_pair(i, c[i])); 
+      return true;
     }
+    return false;
    }
    
    

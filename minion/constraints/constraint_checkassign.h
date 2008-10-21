@@ -30,7 +30,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   // To avoid allocating many vectors.
   vector<DomainInt> assignment;
   
- 
+  
   CheckAssignConstraint(StateObj* _stateObj, VarArray& vars, OriginalConstraint& con)
   : AbstractConstraint(_stateObj), originalcon(con),variables(vars), assigned_vars(stateObj), assignment(variables.size())
   { D_INFO(2, DI_CHECKCON, "Constructing"); }
@@ -131,7 +131,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   }
   
   // Getting a satisfying assignment here is too hard
-	 virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+	 virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
    {
      MAKE_STACK_BOX(c, DomainInt, variables.size());
      
@@ -141,7 +141,7 @@ struct CheckAssignConstraint : public AbstractConstraint
        {  
          assignment.push_back(make_pair(i, variables[i].getMin()));
          assignment.push_back(make_pair(i, variables[i].getMax()));
-         return;
+         return true;
        }
        else
          c.push_back(variables[i].getAssignedValue());
@@ -150,8 +150,12 @@ struct CheckAssignConstraint : public AbstractConstraint
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
       for(int i = 0; i < variables.size(); ++i)
-        assignment.push_back(make_pair(i, c[i])); 
+      {
+        assignment.push_back(make_pair(i, c[i]));
+      }
+      return true;
     }
+    return false;
    }
 };
 

@@ -1037,7 +1037,7 @@ struct DynamicAlldiff : public DynamicConstraint
 	}
     
     
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
       bool matchok=true;
       for(int i=0; i<numvars; i++)
@@ -1051,14 +1051,14 @@ struct DynamicAlldiff : public DynamicConstraint
       
       if(!matchok)
       {
-          if(numvals<numvars) return; // there can't be a matching.
+          if(numvals<numvars) return false; // there can't be a matching.
           
           matchok=bfsmatching(0, numvars-1);
       }
       
       if(!matchok)
       {
-          return;
+          return false;
       }
       else
       {
@@ -1066,7 +1066,7 @@ struct DynamicAlldiff : public DynamicConstraint
           {
               assignment.push_back(make_pair(i, varvalmatching[i]));
           }
-          return;
+          return true;
       }
   }
     

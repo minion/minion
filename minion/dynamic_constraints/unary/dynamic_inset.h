@@ -114,7 +114,7 @@ template<typename Var>
     return vars;
   }
 
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {  
     /// TODO: Make faster
     for(int i = 0; i < vals.size(); ++i)
@@ -122,9 +122,10 @@ template<typename Var>
       if(var.inDomain(vals[i]))
       {
         assignment.push_back(make_pair(0, vals[i]));
-        return;
+        return true;
       }
-    } 
+    }
+    return false;
   }
 };
 

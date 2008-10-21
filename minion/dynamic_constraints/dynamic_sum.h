@@ -304,12 +304,12 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
     return vars;  
   }
 
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(var_sum <= 0)
     {
       assignment.push_back(make_pair(0, var_array[0].getMax()));
-      return;
+      return true;
     }
     
     int count = 0;
@@ -320,11 +320,11 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
         assignment.push_back(make_pair(i, !VarToCount));
         count++;
         if(count >= var_sum)
-          return;
+          return true;
       }
     }
     // We didn't make a complete assignment
-    assignment.clear();
+    return false;
   }
 };
 

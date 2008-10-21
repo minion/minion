@@ -53,7 +53,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
     return t;    
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     int sum_value = 0;
     int v_size = var_array.size();
@@ -63,9 +63,10 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
       sum_value += var_array[i].getMin();
     }
     if(sum_value > var_sum.getMax())
-      assignment.clear();
+      return false;
     else
       assignment.push_back(make_pair(v_size, var_sum.getMax()));
+    return true;
   }
   
   

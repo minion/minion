@@ -68,16 +68,16 @@ template<typename BoolVar, bool DoWatchAssignment>
       return 0;
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(rar_var.inDomain(0))
     {
       D_ASSERT(get_vars()[child_constraints[0]->get_vars_singleton()->size()].inDomain(0));
       assignment.push_back(make_pair(child_constraints[0]->get_vars_singleton()->size(), 0));
-      return;
+      return true;
     }
     
-    child_constraints[0]->get_satisfying_assignment(assignment);
+    return child_constraints[0]->get_satisfying_assignment(assignment);
   }
 
   virtual BOOL check_assignment(DomainInt* v, int v_size)
@@ -161,10 +161,11 @@ template<typename BoolVar, bool DoWatchAssignment>
       P("Triggered on an assignment watch");
       if(!full_propagate_called)
       {
+        bool flag;
         GET_ASSIGNMENT(assignment, child_constraints[0]);
 
         P("Find new assignment");
-        if(assignment.empty())
+        if(!flag)
         { // No satisfying assignment to constraint
           P("Failed!");
           rar_var.propagateAssign(0);
@@ -223,8 +224,9 @@ template<typename BoolVar, bool DoWatchAssignment>
 
     if(DoWatchAssignment)
     {
+      bool flag;
       GET_ASSIGNMENT(assignment, child_constraints[0]);
-      if(assignment.empty())
+      if(!flag)
       { // No satisfying assignment to constraint
         rar_var.propagateAssign(0);
         return;

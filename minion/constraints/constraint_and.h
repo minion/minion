@@ -137,7 +137,7 @@ struct AndConstraint : public AbstractConstraint
     return ((v[0] != 0) && (v[1] != 0)) == (v[2] != 0);
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(var3.getMax() == 1)
     {
@@ -146,7 +146,7 @@ struct AndConstraint : public AbstractConstraint
         assignment.push_back(make_pair(0, 1));
         assignment.push_back(make_pair(1, 1));
         assignment.push_back(make_pair(2, 1));
-        return;
+        return true;
       }      
     }
     
@@ -156,16 +156,17 @@ struct AndConstraint : public AbstractConstraint
       {
         assignment.push_back(make_pair(1, 0));
         assignment.push_back(make_pair(2, 0));
-        return;
+        return true;
       }
       
       if(var1.getMin() == 0)
       {
         assignment.push_back(make_pair(0, 0));
         assignment.push_back(make_pair(2, 0));
-        return;
+        return true;
       }
     }
+    return false;
   }
   
   virtual vector<AnyVarRef> get_vars()

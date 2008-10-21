@@ -80,19 +80,20 @@ struct Dynamic_OR : public ParentConstraint
     return false;
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     for(int i = 0; i < child_constraints.size(); ++i)
     {
-      child_constraints[i]->get_satisfying_assignment(assignment);
-      if(!assignment.empty())
+      bool flag=child_constraints[i]->get_satisfying_assignment(assignment);
+      if(flag)
       {
         // Fix up assignment
         for(int j = 0; j < assignment.size(); ++j)
           assignment[j].first += start_of_constraint[i];
-        return; 
+        return true; 
       }
     }
+    return false;
   }
   
 
@@ -170,9 +171,10 @@ struct Dynamic_OR : public ParentConstraint
       int other_constraint = 1 - tripped_constraint;
       P("Tripped: " << tripped_constraint << ":" << watched_constraint[tripped_constraint]);
       D_ASSERT(tripped_constraint == 0 || tripped_constraint == 1);
-
+      
+      bool flag;
       GET_ASSIGNMENT(assignment_try, child_constraints[watched_constraint[tripped_constraint]]);
-      if(!assignment_try.empty())
+      if(flag)
       { // Found new support without having to move.
         watch_assignment(child_constraints[watched_constraint[tripped_constraint]], 
                          dt + tripped_constraint * assign_size, assignment_try);
@@ -188,7 +190,7 @@ struct Dynamic_OR : public ParentConstraint
         if(i != watched_constraint[0] && i != watched_constraint[1])
         {
           GET_ASSIGNMENT(assignment, child_constraints[i]);
-          if(!assignment.empty())
+          if(flag)
           {
             watch_assignment(child_constraints[i], dt + tripped_constraint * assign_size, assignment);
             watched_constraint[tripped_constraint] = i;
@@ -249,8 +251,9 @@ struct Dynamic_OR : public ParentConstraint
     
     while(loop < child_constraints.size() && !found_watch)
     {
+      bool flag;
       GET_ASSIGNMENT(assignment, child_constraints[loop]);
-      if(!assignment.empty())
+      if(flag)
       {
         found_watch = true;
         watched_constraint[0] = loop;
@@ -275,8 +278,9 @@ struct Dynamic_OR : public ParentConstraint
     
     while(loop < child_constraints.size() && !found_watch)
     {
+      bool flag;
       GET_ASSIGNMENT(assignment, child_constraints[loop]);
-      if(!assignment.empty())
+      if(flag)
       {
         found_watch = true;
         watched_constraint[1] = loop;

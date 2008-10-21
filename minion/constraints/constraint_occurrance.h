@@ -344,7 +344,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   
    // Getting a satisfying assignment here is too hard, we don't want to have to
    // build a matching.
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     MAKE_STACK_BOX(c, DomainInt, var_array.size() + 1);
 
@@ -354,7 +354,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       {  
         assignment.push_back(make_pair(i, var_array[i].getMin()));
         assignment.push_back(make_pair(i, var_array[i].getMax()));
-        return;
+        return true;
       }
       else
         c.push_back(var_array[i].getAssignedValue());
@@ -364,7 +364,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
     {  
       assignment.push_back(make_pair(var_array.size(), val_count.getMin()));
       assignment.push_back(make_pair(var_array.size(), val_count.getMax()));
-      return;
+      return true;
     }
     else
       c.push_back(val_count.getAssignedValue());
@@ -373,7 +373,9 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
     {  // Put the complete assignment in the box.
       for(int i = 0; i < var_array.size() + 1; ++i)
         assignment.push_back(make_pair(i, c[i])); 
+      return true;
     }
+    return false;
   }
 };
 
@@ -534,7 +536,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   
    // Getting a satisfying assignment here is too hard, we don't want to have to
    // build a matching.
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     MAKE_STACK_BOX(c, DomainInt, var_array.size());
 
@@ -544,7 +546,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
       {  
         assignment.push_back(make_pair(i, var_array[i].getMin()));
         assignment.push_back(make_pair(i, var_array[i].getMax()));
-        return;
+        return true;
       }
       else
         c.push_back(var_array[i].getAssignedValue());
@@ -553,8 +555,10 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
       for(int i = 0; i < var_array.size(); ++i)
-        assignment.push_back(make_pair(i, c[i])); 
+        assignment.push_back(make_pair(i, c[i]));
+      return true;
     }
+    return false;
   }
 
   AbstractConstraint* reverse_constraint()
@@ -731,7 +735,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   
    // Getting a satisfying assignment here is too hard, we don't want to have to
    // build a matching.
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     MAKE_STACK_BOX(c, DomainInt, var_array.size() + 1);
 
@@ -741,7 +745,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
       {  
         assignment.push_back(make_pair(i, var_array[i].getMin()));
         assignment.push_back(make_pair(i, var_array[i].getMax()));
-        return;
+        return true;
       }
       else
         c.push_back(var_array[i].getAssignedValue());
@@ -751,7 +755,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
     {  
       assignment.push_back(make_pair(var_array.size(), val_count.getMin()));
       assignment.push_back(make_pair(var_array.size(), val_count.getMax()));
-      return;
+      return true;
     }
     else
       c.push_back(val_count.getAssignedValue());
@@ -760,8 +764,10 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
       for(int i = 0; i < var_array.size() + 1; ++i)
-        assignment.push_back(make_pair(i, c[i])); 
+        assignment.push_back(make_pair(i, c[i]));
+      return true;
     }
+    return false;
   }
   
   AbstractConstraint* reverse_constraint()

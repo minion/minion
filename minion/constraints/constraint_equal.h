@@ -501,24 +501,25 @@ struct NeqConstraintBinary : public AbstractConstraint
 	  return true;
 	}
 	
-	virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+	virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(var1.getMin() != var2.getMax())
     {
       assignment.push_back(make_pair(0, var1.getMin()));
       assignment.push_back(make_pair(1, var2.getMax()));
-      return; 
+      return true; 
     }
     
     if(var1.getMax() != var2.getMin())
     {
       assignment.push_back(make_pair(0, var1.getMax()));
       assignment.push_back(make_pair(1, var2.getMin()));
-      return;
+      return true;
     }
     
     D_ASSERT(var1.isAssigned() && var2.isAssigned());
     D_ASSERT(var1.getAssignedValue() == var2.getAssignedValue());
+    return false;
   }
   
   
@@ -599,7 +600,7 @@ struct EqualConstraint : public AbstractConstraint
     return vars;
   }
   
-   virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
    {
      DomainInt min_val = max(var1.getMin(), var2.getMin());
      DomainInt max_val = min(var1.getMax(), var2.getMax());
@@ -610,9 +611,10 @@ struct EqualConstraint : public AbstractConstraint
        {
          assignment.push_back(make_pair(0, i));
          assignment.push_back(make_pair(1, i));
-         return;
+         return true;
        } 
      }
+     return false;
    }
    
    virtual AbstractConstraint* reverse_constraint()

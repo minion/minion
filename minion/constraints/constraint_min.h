@@ -172,7 +172,7 @@ struct MinConstraint : public AbstractConstraint
   }
 
   // Bah: This could be much better!
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     for(int i = min_var.getMin(); i <= min_var.getMax(); ++i)
     {
@@ -190,8 +190,7 @@ struct MinConstraint : public AbstractConstraint
           {
             if(var_array[j].getMax() < i)
             {
-              assignment.clear();
-              return;
+              return false;
             }
             if(var_array[j].getInitialMin() < i)
               assignment.push_back(make_pair(j, var_array[j].getMax()));
@@ -201,13 +200,25 @@ struct MinConstraint : public AbstractConstraint
         if(flag_domain)
         {
           assignment.push_back(make_pair(var_array.size(), i));
-          return;
+          return true;
         }
         else
           assignment.clear();
       }
     }
+    return false;
   }
+  
+  // Function to make it reifiable in the lousiest way.
+    virtual AbstractConstraint* reverse_constraint()
+    {
+        vector<AnyVarRef> t;
+        for(int i=0; i<var_array.size(); i++)
+            t.push_back(var_array[i]);
+        t.push_back(min_var);
+        
+        return new CheckAssignConstraint<vector<AnyVarRef>, MinConstraint>(stateObj, t, *this);
+    }
   
   virtual vector<AnyVarRef> get_vars()
   {

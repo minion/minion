@@ -257,13 +257,13 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     return vars;  
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(num_to_watch <= 1)
     {
       // This constraint is always true. But we can't return an empty allowed assignment unfortunatly.
       assignment.push_back(make_pair(0, var_array1[0].getMin()));
-      return;
+      return true;
     }
     
     pair<int, int> assign;
@@ -279,11 +279,11 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
         assignment.push_back(make_pair(i, assign.first));
         assignment.push_back(make_pair(i + var_array1.size(), assign.second));
         if(found_satisfying == num_to_watch - 1)
-          return;
+          return true;
       }
     }
-    // If we didn't get enough, then empty the box again.
-    assignment.clear();
+    // If we didn't get enough, 
+    return false;
   }
   
 };

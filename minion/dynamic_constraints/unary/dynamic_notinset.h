@@ -98,7 +98,7 @@ template<typename Var>
     return vars;
   }
 
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {  
     /// TODO: Make faster
     for(DomainInt i = var.getMin(); i <= var.getMax(); ++i)
@@ -106,9 +106,10 @@ template<typename Var>
       if(var.inDomain(i) && !binary_search(vals.begin(), vals.end(), i))
       {
         assignment.push_back(make_pair(0, i));
-        return;
+        return true;
       }
-    } 
+    }
+    return false;
   }
 };
 

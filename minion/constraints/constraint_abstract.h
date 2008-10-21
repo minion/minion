@@ -125,7 +125,7 @@ public:
   /** The return value (in the box) is pairs of <varnum, domain value>, where varnum is in the same position
   *  as returned by get_vars.
    */
-    virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+    virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     cerr << "Finding assignment is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
     exit(1);

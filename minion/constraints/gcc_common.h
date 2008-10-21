@@ -184,9 +184,7 @@ struct GCC : public AbstractConstraint
     
   }
   
-    
-  
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {  
       // borrow augpath for a second, to represent value occurrences
       augpath.clear();
@@ -259,8 +257,7 @@ struct GCC : public AbstractConstraint
       
       if(!matchok)
       {
-          // return empty list
-          return;
+          return false;
       }
       else
       {
@@ -291,7 +288,7 @@ struct GCC : public AbstractConstraint
                  assignment.push_back(make_pair(i+numvars, capacity_array[i].getMax()));
              }
           }
-          return;
+          return true;
       }
   }
   

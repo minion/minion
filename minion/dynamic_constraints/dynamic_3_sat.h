@@ -155,16 +155,17 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
 	return vars;  
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     for(int i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].getMax() > 0)
       {
         assignment.push_back(make_pair(i, var_array[i].getMax()));
-        return;
+        return true;
       }
     }
+    return false;
   }
 };
 

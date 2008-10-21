@@ -141,28 +141,28 @@ struct reify : public ParentConstraint
         +child_constraints[1]->get_vars_singleton()->size()*2;  // *2 for each child constraint.
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(reify_var.inDomain(1))
     {
-        child_constraints[0]->get_satisfying_assignment(assignment);
-        if(assignment.size()!=0)
+        bool flag=child_constraints[0]->get_satisfying_assignment(assignment);
+        if(flag)
         {
             assignment.push_back(make_pair(reify_var_num, 1));
-            return;
+            return true;
         }
     }
+    assignment.clear();
     if(reify_var.inDomain(0))
     {
-        child_constraints[1]->get_satisfying_assignment(assignment);
-        if(assignment.size()!=0)
+        bool flag=child_constraints[1]->get_satisfying_assignment(assignment);
+        if(flag)
         {
             assignment.push_back(make_pair(reify_var_num, 0));
-            return;
+            return true;
         }
     }
-    // No satisfying assignment
-    return;
+    return false;
   }
   
   virtual BOOL check_assignment(DomainInt* vals, int v_size)
@@ -283,10 +283,11 @@ struct reify : public ParentConstraint
       P("Triggered on an assignment watch");
       if(!full_propagate_called)
       {
+        bool flag;
         GET_ASSIGNMENT(assignment, child_constraints[0]);
         
         P("Find new assignment");
-        if(assignment.empty())
+        if(!flag)
         { // No satisfying assignment to constraint
           P("Failed!");
           reify_var.propagateAssign(0);
@@ -307,10 +308,11 @@ struct reify : public ParentConstraint
         P("Triggered on an assignment watch");
       if(!full_propagate_called)
       {
+        bool flag;
         GET_ASSIGNMENT(assignment, child_constraints[1]);
         
         P("Find new assignment");
-        if(assignment.empty())
+        if(!flag)
         { // No satisfying assignment to constraint
           P("Failed!");
           reify_var.propagateAssign(1);
@@ -398,14 +400,15 @@ struct reify : public ParentConstraint
     for(int i = 0; i < dt_count; ++i)
       dt[i].remove();
     
+    bool flag;
     GET_ASSIGNMENT(assignment0, child_constraints[0]);
-    if(assignment0.empty())
+    if(!flag)
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(0);
       return;
     }
     GET_ASSIGNMENT(assignment1, child_constraints[1]);
-    if(assignment1.empty())
+    if(!flag)
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(1);
       return;

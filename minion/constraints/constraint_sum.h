@@ -157,7 +157,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
   }
   
   // TODO : Optimise for booleans
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     int sum_value = 0;
     int v_size = var_array.size();
@@ -170,13 +170,14 @@ struct BoolLessSumConstraint : public AbstractConstraint
     if(VarToCount)
     {
       if(!(sum_value <= var_sum))
-        assignment.clear();
+        return false;
     }
     else
     {
       if(!(sum_value >= var_sum))
-        assignment.clear();
+        return false;
     }
+    return true;
   }
   
   virtual vector<AnyVarRef> get_vars()

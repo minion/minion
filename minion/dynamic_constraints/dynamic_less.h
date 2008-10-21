@@ -85,13 +85,15 @@ struct WatchLessConstraint : public AbstractConstraint
     return vars;
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(var1.getMin() < var2.getMax())
     {
       assignment.push_back(make_pair(0,var1.getMin()));
       assignment.push_back(make_pair(1,var2.getMax()));
+      return true;
     }
+    return false;
   }
 };
 

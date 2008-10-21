@@ -102,10 +102,10 @@ struct WatchNeqConstraint : public AbstractConstraint
     return vars;
   }
   
-  virtual void get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(var1.isAssigned() && var2.isAssigned() && var1.getAssignedValue() == var2.getAssignedValue())
-      return;
+      return false;
     
     if(var1.isAssigned())
     {
@@ -123,6 +123,7 @@ struct WatchNeqConstraint : public AbstractConstraint
       else
         assignment.push_back(make_pair(0, var1.getMax()));
     }
+    return true;
   }
 };
 
