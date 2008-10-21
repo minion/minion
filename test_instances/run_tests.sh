@@ -24,7 +24,7 @@ expectedfail=0
 unexpectedpass=0
 
 for i in *.minion; do
-  echo $i
+  #echo $i
   j=$(($j + 1))
 
   # This gives the value that the program should return.
