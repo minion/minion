@@ -68,7 +68,6 @@ conslist+=["difference"]
 #conslist+=["weightedsumleq"...
 
 def run_in_proc(numconstraints, offset):
-    print "%d %d"%(numconstraints, offset)
     for consname1 in conslist[offset:(offset + numconstraints)]:
         print "Testing %s"%(consname1)
         random.seed(12345)   # stupid seed but at least it makes the test repeatable.

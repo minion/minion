@@ -1327,6 +1327,10 @@ def comparetrees(same):
         
         # now return 
         if temp:
+            os.remove(str(parentpid)+"outfile1")
+            os.remove(str(parentpid)+"outfile2")
+            os.remove(str(parentpid)+"infile1.minion")
+            os.remove(str(parentpid)+"infile2.minion")
             w.write("True")
         
         w.close()
