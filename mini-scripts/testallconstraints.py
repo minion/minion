@@ -67,14 +67,30 @@ conslist+=["difference"]
 #todo
 #conslist+=["weightedsumleq"...
 
-def run_in_proc(numtests):
-    testobj=eval("test"+consname+"()")
-    testobj.solver=minionbin
+def run_in_proc(numconstraints, offset):
+    print "%d %d"%(numconstraints, offset)
+    for consname1 in conslist[offset:(offset + numconstraints)]:
+        print "Testing %s"%(consname1)
+        random.seed(12345)   # stupid seed but at least it makes the test repeatable.
+    
+        reify=False
+        reifyimply=False
+        consname=consname1
+        if consname[0:10]=="reifyimply":
+            reifyimply=True
+            consname=consname[10:]
+    
+        if consname[0:5]=="reify":
+            reify=True
+            consname=consname[5:]
+        consname=consname.replace("-", "__minus__")
+        testobj=eval("test"+consname+"()")
+        testobj.solver=minionbin
 
-    for testnum in range(numtests):
-        options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False}
-        if not testobj.runtest(options):
-            sys.exit(1)
+        for testnum in range(numtests):
+            options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False}
+            if not testobj.runtest(options):
+                sys.exit(1)
     sys.exit(0)
 
 numtests=100
@@ -98,49 +114,33 @@ for i in optargs:
     elif a1=="--procs":
         procs=int(a2)
 
-for consname1index, consname1 in enumerate(conslist):
-    print "Testing %s (%d/%d)"%(consname1, consname1index + 1, len(conslist))
-    random.seed(12345)   # stupid seed but at least it makes the test repeatable.
-    
-    reify=False
-    reifyimply=False
-    consname=consname1
-    if consname[0:10]=="reifyimply":
-        reifyimply=True
-        consname=consname[10:]
-    
-    if consname[0:5]=="reify":
-        reify=True
-        consname=consname[5:]
-    consname=consname.replace("-", "__minus__")
-    
-    workers = []
-    for procNum in range(procs):
-        if procNum == procs - 1:
-            num = (numtests // procs) + (numtests % procs)
-        else:
-            num = (numtests // procs)
-        pid = os.fork()
-        if pid:
-            workers.append(pid)
-        else:
-            run_in_proc(num)
-    
-    for worker in workers:
-        (pid, exitcode) = os.waitpid(worker, 0)
-        if exitcode != 0:
-            if email:
-                mailstring="Mail from testallconstraints.py.\n"
-                mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)
-                if fullprop:
-                    mailstring+="Testing equivalence of -fullprop and normal propagation.\n"
-                else:
-                    mailstring+="Testing correctness against table representation.\n"
-                if bit64:
-                    mailstring+="Testing 64bit variant.\n"
-                mailstring+="Using binary %s\n"%minionbin
-                mail(mailstring)
-            sys.exit(1)
+workers = []
+for procNum in range(procs):
+    if procNum == procs - 1:
+        num = (len(conslist) // procs) + (len(conslist) % procs)
+    else:
+        num = (len(conslist) // procs)
+    pid = os.fork()
+    if pid:
+        workers.append(pid)
+    else:
+        run_in_proc(num, procNum * (len(conslist) // procs))
+
+for worker in workers:
+    (pid, exitcode) = os.waitpid(worker, 0)
+    if exitcode != 0:
+        if email:
+            mailstring="Mail from testallconstraints.py.\n"
+            mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)
+            if fullprop:
+                mailstring+="Testing equivalence of -fullprop and normal propagation.\n"
+            else:
+                mailstring+="Testing correctness against table representation.\n"
+            if bit64:
+                mailstring+="Testing 64bit variant.\n"
+            mailstring+="Using binary %s\n"%minionbin
+            mail(mailstring)
+        sys.exit(1)
 
 # if we got here, send an email indicating success.
 if email:
