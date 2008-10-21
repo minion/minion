@@ -101,6 +101,13 @@ for details of an identical constraint that enforces generalised arc
 consistency.
 */
 
+#include "constraint_equal.h"
+#include "../dynamic_constraints/dynamic_new_or.h"
+#include "../dynamic_constraints/dynamic_new_and.h"
+#include "../dynamic_constraints/unary/dynamic_literal.h"
+#include "../dynamic_constraints/unary/dynamic_notinrange.h"
+
+
 template<typename VarArray, typename IndexRef, typename VarRef>
 struct ElementConstraint : public AbstractConstraint
 {
@@ -126,9 +133,6 @@ struct ElementConstraint : public AbstractConstraint
 	t.push_back(make_trigger(result_var, Trigger(this, -2), Assigned));
     return t;
   }
-  
-  //  virtual AbstractConstraint* reverse_constraint()
-  
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
@@ -380,6 +384,31 @@ struct ElementConstraint : public AbstractConstraint
         }
       }
     }
+  }
+  
+  virtual AbstractConstraint* reverse_constraint()
+  {
+      // This is a slow-ish temporary solution.
+      // (i=1 and X[1]!=r) or (i=2 ...
+      vector<AbstractConstraint*> con;
+      // or the index is out of range:
+      vector<int> r; r.push_back(0); r.push_back(var_array.size()-1);
+      AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<IndexRef>(stateObj, index_ref, r);
+      con.push_back(t4);
+      
+      for(int i=0; i<var_array.size(); i++)
+      {
+          vector<AbstractConstraint*> con2;
+          WatchLiteralConstraint<IndexRef>* t=new WatchLiteralConstraint<IndexRef>(stateObj, index_ref, i);
+          con2.push_back((AbstractConstraint*) t);
+          NeqConstraintBinary<AnyVarRef, VarRef>* t2=new NeqConstraintBinary<AnyVarRef, VarRef>(stateObj, var_array[i], result_var);
+          con2.push_back((AbstractConstraint*) t2);
+          
+          Dynamic_AND* t3= new Dynamic_AND(stateObj, con2);
+          con.push_back((AbstractConstraint*) t3);
+      }
+      
+      return new Dynamic_OR(stateObj, con);
   }
 };
 

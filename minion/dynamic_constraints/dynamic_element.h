@@ -81,6 +81,13 @@ consistency.
 // literal 2 * i : attached to j in V[i]
 // literal 2 * i + 1 : attached to j in Result
 
+// for the reverse constraint.
+#include "../constraints/constraint_equal.h"
+#include "dynamic_new_or.h"
+#include "dynamic_new_and.h"
+#include "unary/dynamic_literal.h"
+#include "unary/dynamic_notinrange.h"
+
 
 template<typename VarArray, typename Index, typename Result>
 struct ElementConstraintDynamic : public AbstractConstraint
@@ -393,6 +400,31 @@ struct ElementConstraintDynamic : public AbstractConstraint
         }
       }
     }
+  }
+  
+  virtual AbstractConstraint* reverse_constraint()
+  {
+      // This is a slow-ish temporary solution.
+      // (i=1 and X[1]!=r) or (i=2 ...
+      vector<AbstractConstraint*> con;
+      // or the index is out of range:
+      vector<int> r; r.push_back(0); r.push_back(var_array.size()-1);
+      AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<Index>(stateObj, indexvar, r);
+      con.push_back(t4);
+      
+      for(int i=0; i<var_array.size(); i++)
+      {
+          vector<AbstractConstraint*> con2;
+          WatchLiteralConstraint<Index>* t=new WatchLiteralConstraint<Index>(stateObj, indexvar, i);
+          con2.push_back((AbstractConstraint*) t);
+          NeqConstraintBinary<AnyVarRef, Result>* t2=new NeqConstraintBinary<AnyVarRef, Result>(stateObj, var_array[i], resultvar);
+          con2.push_back((AbstractConstraint*) t2);
+          
+          Dynamic_AND* t3= new Dynamic_AND(stateObj, con2);
+          con.push_back((AbstractConstraint*) t3);
+      }
+      
+      return new Dynamic_OR(stateObj, con);
   }
 };
 

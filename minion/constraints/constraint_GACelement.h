@@ -24,6 +24,12 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "constraint_equal.h"
+#include "../dynamic_constraints/dynamic_new_or.h"
+#include "../dynamic_constraints/dynamic_new_and.h"
+#include "../dynamic_constraints/unary/dynamic_literal.h"
+#include "../dynamic_constraints/unary/dynamic_notinrange.h"
+
 
 template<typename VarArray, typename IndexRef, typename VarRef>
 struct GACElementConstraint : public AbstractConstraint
@@ -238,6 +244,31 @@ struct GACElementConstraint : public AbstractConstraint
         }
       }
     }
+  }
+  
+  virtual AbstractConstraint* reverse_constraint()
+  {
+      // This is a slow-ish temporary solution.
+      // (i=1 and X[1]!=r) or (i=2 ...
+      vector<AbstractConstraint*> con;
+      // or the index is out of range:
+      vector<int> r; r.push_back(0); r.push_back(var_array.size()-1);
+      AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<IndexRef>(stateObj, indexvar, r);
+      con.push_back(t4);
+      
+      for(int i=0; i<var_array.size(); i++)
+      {
+          vector<AbstractConstraint*> con2;
+          WatchLiteralConstraint<IndexRef>* t=new WatchLiteralConstraint<IndexRef>(stateObj, indexvar, i);
+          con2.push_back((AbstractConstraint*) t);
+          NeqConstraintBinary<AnyVarRef, VarRef>* t2=new NeqConstraintBinary<AnyVarRef, VarRef>(stateObj, var_array[i], resultvar);
+          con2.push_back((AbstractConstraint*) t2);
+          
+          Dynamic_AND* t3= new Dynamic_AND(stateObj, con2);
+          con.push_back((AbstractConstraint*) t3);
+      }
+      
+      return new Dynamic_OR(stateObj, con);
   }
 };
 

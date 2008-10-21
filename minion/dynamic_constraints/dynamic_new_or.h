@@ -41,7 +41,10 @@ For Licence Information see file LICENSE.txt
 #define P(x) cout << x << endl;
 //#define P(x)
 
-  struct Dynamic_OR : public ParentConstraint
+// For reverse_constraint we need an and
+#include "dynamic_new_and.h"
+
+struct Dynamic_OR : public ParentConstraint
 {
   virtual string constraint_name()
     { return "Dynamic OR:"; }
@@ -295,10 +298,17 @@ For Licence Information see file LICENSE.txt
     }
 
   }
+  
+  virtual AbstractConstraint* reverse_constraint()
+  { // and of the reverse of all the child constraints..
+      vector<AbstractConstraint*> con;
+      for(int i=0; i<child_constraints.size(); i++)
+      {
+          con.push_back(child_constraints[i]->reverse_constraint());
+      }
+      return new Dynamic_AND(stateObj, con);
+  }
 };
-
-
-
 
 inline AbstractConstraint*
 BuildCT_WATCHED_NEW_OR(StateObj* stateObj, BOOL reify, 
