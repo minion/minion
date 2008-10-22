@@ -387,11 +387,11 @@ class testgacelement__minus__deprecated:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("gacelement-deprecated", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, True)
+        return runtestgeneral("gacelement-deprecated", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, not options['reify'])
 
 class testwatchelement(testgacelement__minus__deprecated):
     def runtest(self, options=dict()):
-        return runtestgeneral("watchelement", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, True)
+        return runtestgeneral("watchelement", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, not options['reify'])
 
 class testelement(testgacelement__minus__deprecated):
     def runtest(self, options=dict()):

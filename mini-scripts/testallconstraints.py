@@ -32,8 +32,9 @@ conslist+=["occurrenceleq", "reifyoccurrenceleq", "reifyimplyoccurrenceleq"]
 conslist+=["occurrencegeq", "reifyoccurrencegeq", "reifyimplyoccurrencegeq"]
 
 #element constraints
-conslist+=["gacelement-deprecated", "reifyimplygacelement-deprecated"]
-conslist+=["element", "reifyimplyelement", "watchelement", "reifyimplywatchelement"]
+conslist+=["element", "reifyelement", "reifyimplyelement"]
+conslist+=["gacelement-deprecated", "reifygacelement-deprecated", "reifyimplygacelement-deprecated"]
+conslist+=["watchelement", "reifywatchelement", "reifyimplywatchelement"]
 
 #non-reifiable arithmetic constraints
 conslist+=["modulo", "reifyimplymodulo", "pow", "reifyimplypow", "minuseq", "reifyimplyminuseq"]
@@ -57,7 +58,8 @@ conslist+=["ineq", "reifyineq", "reifyimplyineq"]
 
 conslist+=["lexleq", "lexless", "reifylexleq", "reifylexless", "reifyimplylexleq", "reifyimplylexless"]
 
-conslist+=["max", "min", "reifyimplymax", "reifyimplymin"]
+conslist+=["max", "reifymax", "reifyimplymax"]
+conslist+=["min", "reifymin", "reifyimplymin"]
 
 
 conslist+=["watchneq", "watchless"]
@@ -78,17 +80,18 @@ def run_in_proc(numconstraints, offset):
         if consname[0:10]=="reifyimply":
             reifyimply=True
             consname=consname[10:]
-    
+        
         if consname[0:5]=="reify":
             reify=True
             consname=consname[5:]
         consname=consname.replace("-", "__minus__")
         testobj=eval("test"+consname+"()")
         testobj.solver=minionbin
-
+        
         for testnum in range(numtests):
             options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False}
             if not testobj.runtest(options):
+                print "Failed when testing %s"%consname1
                 sys.exit(1)
     sys.exit(0)
 
@@ -139,8 +142,10 @@ for worker in workers:
                 mailstring+="Testing 64bit variant.\n"
             mailstring+="Using binary %s\n"%minionbin
             mail(mailstring)
+        print "Test failed"
         sys.exit(1)
 
+print "Test succeeded"
 # if we got here, send an email indicating success.
 if email:
     mailstring="Mail from testallconstraints.py.\n"
