@@ -829,7 +829,7 @@ class testminuseq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("minuseq", True, options, [1,1], ["num", "num"], [1,1], self, True)
+        return runtestgeneral("minuseq", True, options, [1,1], ["num", "num"], [1,1], self, not options['reifyimply'] and not options['reify'])
         
 class testlitsumeq:
     # does this constraint even exist??
