@@ -7,6 +7,6 @@
    $Id$
 */
 
-#include "../constraints/constraint_occurrance.h"
+#include "../constraints/constraint_occurrence.h"
 BUILD_STATIC_CT(CT_LEQ_OCCURRENCE, 1)
 
