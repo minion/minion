@@ -164,15 +164,18 @@ struct DifferenceConstraint : public AbstractConstraint
   {
     for(int i = var1.getMin(); i <= var1.getMax(); ++i)
     {
-      for(int j = var2.getMin(); j <= var2.getMax(); ++j)
+      if(var1.inDomain(i))
       {
-        if(var3.inDomain(abs(i - j)))
-        {
-          assignment.push_back(make_pair(0, i));
-          assignment.push_back(make_pair(1, j));
-          assignment.push_back(make_pair(2, abs(i - j)));
-          return true;
-        }
+          for(int j = var2.getMin(); j <= var2.getMax(); ++j)
+          {
+            if(var2.inDomain(j) && var3.inDomain(abs(i - j)))
+            {
+              assignment.push_back(make_pair(0, i));
+              assignment.push_back(make_pair(1, j));
+              assignment.push_back(make_pair(2, abs(i - j)));
+              return true;
+            }
+          }
       }
     }
     return false;
