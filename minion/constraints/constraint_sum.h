@@ -47,7 +47,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
   {
     D_INFO(2,DI_SUMCON,"Setting up Constraint");
     triggerCollection t;
-	int array_size = var_array.size();
+    int array_size = var_array.size();
 	
     count = 0;    
     
@@ -161,23 +161,24 @@ struct BoolLessSumConstraint : public AbstractConstraint
   {
     int sum_value = 0;
     int v_size = var_array.size();
-    for(int i = 0; i < v_size; ++i)
-    {
-      assignment.push_back(make_pair(i, var_array[i].getMin()));
-      sum_value += var_array[i].getMin();
-    }
-    
     if(VarToCount)
     {
-      if(!(sum_value <= var_sum))
-        return false;
+      for(int i = 0; i < v_size; ++i)
+      {
+        assignment.push_back(make_pair(i, var_array[i].getMin()));
+        sum_value += var_array[i].getMin();
+      }
+      return (sum_value <= var_sum);
     }
     else
     {
-      if(!(sum_value >= var_sum))
-        return false;
+      for(int i = 0; i < v_size; ++i)
+      {
+        assignment.push_back(make_pair(i, var_array[i].getMax()));
+        sum_value += var_array[i].getMax();
+      }
+      return (sum_value >= var_sum);
     }
-    return true;
   }
   
   virtual vector<AnyVarRef> get_vars()
