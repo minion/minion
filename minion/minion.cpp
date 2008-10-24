@@ -290,7 +290,7 @@ specified a random permutation of all the variables is used.
 //Entrance:
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#include "help/help.cpp"
+void help(string request);
 
 void print_default_help(char** argv)
 {

@@ -88,6 +88,7 @@ endif()
 aux_source_directory(minion SRCS)
 aux_source_directory(minion/build_constraints SRCS)
 aux_source_directory(minion/system SRCS)
+aux_source_directory(minion/help SRCS)
 set(SRCS "${SRCS};minion/get_info.cpp")
 
 set(BINARY ${PROJECT_NAME})
