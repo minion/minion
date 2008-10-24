@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_GACTABLE_TRIES_H
+#define CONSTRAINT_GACTABLE_TRIES_H
+
 #include "tries.h"
 
 template<typename VarArray, int negative>
@@ -270,6 +273,4 @@ AbstractConstraint*
 GACNegativeTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
 { return new GACTableConstraint<VarArray, 1>(stateObj, vars, tuples); }
 
-
-
-
+#endif

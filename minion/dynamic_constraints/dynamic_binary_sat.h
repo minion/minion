@@ -24,6 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_DYNAMIC_BINARY_SAT_H
+#define CONSTRAINT_DYNAMIC_BINARY_SAT_H
 
 //! Specialised SAT implementation for just 2 variables
 template<typename VarArray>
@@ -120,3 +122,5 @@ template<typename VarArray>
 AbstractConstraint*
 BoolBinarySATConDynamic(StateObj* stateObj, const VarArray& _var_array)
 { return new BoolBinarySATConstraintDynamic<VarArray>(stateObj, _var_array); }
+
+#endif

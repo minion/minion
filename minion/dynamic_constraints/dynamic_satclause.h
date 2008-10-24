@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_DYNAMIC_SAT_CLAUSE_H
+#define CONSTRAINT_DYNAMIC_SAT_CLAUSE_H
+
 #include <vector>
 
 template<typename VarArray>
@@ -165,3 +168,4 @@ BuildCT_WATCHED_OR(StateObj* stateObj, const light_vector<T>& vs, BOOL reify,
   }
 }
 
+#endif

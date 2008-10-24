@@ -44,6 +44,9 @@ This constraint is reifyimply'able but not reifiable.
 help constraints div
 */
 
+#ifndef CONSTRAINT_MODULO_H
+#define CONSTRAINT_MODULO_H
+
 /// var1 % var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct ModConstraint : public AbstractConstraint
@@ -271,3 +274,5 @@ ModuloCon(StateObj* stateObj, const V1& vars, const V2& var2)
 
 
 BUILD_CONSTRAINT2(CT_MODULO, ModuloCon);
+
+#endif

@@ -33,8 +33,8 @@
   help variables
 */
 
-#ifndef ABSTRACT_CONSTRAINT
-#define ABSTRACT_CONSTRAINT
+#ifndef ABSTRACT_CONSTRAINT_H
+#define ABSTRACT_CONSTRAINT_H
 
 #include "../system/system.h"
 #include "../solver.h"

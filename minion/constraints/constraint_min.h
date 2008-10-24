@@ -46,6 +46,8 @@ See
 for the opposite constraint.
 */
 
+#ifndef CONSTRAINT_MIN_H
+#define CONSTRAINT_MIN_H
 
 template<typename VarArray, typename MinVarRef>
 struct MinConstraint : public AbstractConstraint
@@ -249,3 +251,4 @@ BUILD_CONSTRAINT2(CT_MAX, MaxCon)
 
 BUILD_CONSTRAINT2(CT_MIN, MinCon)
 
+#endif

@@ -24,8 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
-
+#ifndef CONSTRAINT_DYNAMIC_SUM_SAT_H
+#define CONSTRAINT_DYNAMIC_SUM_SAT_H
 
 template<typename VarArray>
 struct BoolSATConstraintDynamic : public AbstractConstraint
@@ -190,3 +190,5 @@ template<typename VarArray>
 AbstractConstraint*
 BoolSATConDynamic(StateObj* stateObj, const VarArray& _var_array)
 { return new BoolSATConstraintDynamic<VarArray>(stateObj, _var_array); }
+
+#endif

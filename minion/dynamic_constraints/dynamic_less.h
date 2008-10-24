@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_DYNAMIC_LESS_H
+#define CONSTRAINT_DYNAMIC_LESS_H
+
 // var1 < var2
 template<typename Var1, typename Var2>
 struct WatchLessConstraint : public AbstractConstraint
@@ -106,3 +109,5 @@ WatchLessConDynamic(StateObj* stateObj, const VarArray1& _var_array_1, const Var
 }
 
 BUILD_CONSTRAINT2(CT_WATCHED_LESS, WatchLessConDynamic)
+
+#endif

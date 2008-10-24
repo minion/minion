@@ -24,7 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
+#ifndef CONSTRAINT_UNARYEQUALS_H
+#define CONSTRAINT_UNARYEQUALS_H
 
 // x = constant
 template<typename VarRef, typename Offset>
@@ -82,4 +83,4 @@ UnaryEqualCon(VarRef v1,  Offset o)
   return (new UnaryEqualConstraint<VarRef,Offset>(v1,o)); 
 }
 
-
+#endif

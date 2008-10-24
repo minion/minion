@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_GACTABLE_MASTER_H_QPQP
+#define CONSTRAINT_GACTABLE_MASTER_H_QPQP
+
 #include "new_table.h"
 
 #ifdef OLDTABLE
@@ -66,3 +69,4 @@ BuildCT_WATCHED_NEGATIVE_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const
   { return GACNegativeTableCon(stateObj, t1, b.tuples); } 
 }
 
+#endif

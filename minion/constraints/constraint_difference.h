@@ -42,6 +42,10 @@ consistency.
 This constraint is reifyimply'able but not reifiable.
 */
 
+#ifndef CONSTRAINT_DIFFERENCE_H
+#define CONSTRAINT_DIFFERENCE_H
+
+
 #ifdef P
 #undef P
 #endif
@@ -202,3 +206,5 @@ DifferenceCon(StateObj* stateObj,const light_vector<VarRef1>& vars, const light_
 }
 
 BUILD_CONSTRAINT2(CT_DIFFERENCE, DifferenceCon);
+
+#endif

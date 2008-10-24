@@ -24,6 +24,8 @@ For Licence Information see file LICENSE.txt
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_DYNAMIC_UNARY_LITERAL_H
+#define CONSTRAINT_DYNAMIC_UNARY_LITERAL_H
 
 // Checks if a variable is equal to a value.
 template<typename Var>
@@ -88,3 +90,5 @@ WatchLiteralConDynamic(StateObj* stateObj, const VarArray1& _var_array_1, const 
 }
 
 BUILD_CONSTRAINT1_WITH_BLOB(CT_WATCHED_LIT, WatchLiteralConDynamic)
+
+#endif

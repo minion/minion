@@ -37,6 +37,9 @@ the size of the set {i | X[i] != y[i]} is greater than or equal to c.
 This constraint is reifyimply'able but not reifiable.
 */
 
+#ifndef CONSTRAINT_DYNAMIC_SUM_OR_H
+#define CONSTRAINT_DYNAMIC_SUM_OR_H
+
 // For operators
 #include "dynamic_vecneq.h"
 
@@ -320,3 +323,6 @@ AbstractConstraint*
 
 BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_VEC_OR_AND, VecOrAndConDynamic)
 */
+
+#endif
+

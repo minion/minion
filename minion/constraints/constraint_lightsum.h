@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_LIGHTSUM_H_PLOKIJ
+#define CONSTRAINT_LIGHTSUM_H_PLOKIJ
+
 /// V1 + ... Vn <= X
 template<typename VarRef, std::size_t size, typename VarSum, BOOL is_reversed = false>
 struct LightLessEqualSumConstraint : public AbstractConstraint
@@ -178,5 +181,4 @@ LightGreaterEqualSumCon(StateObj* stateObj, const array<VarRef,size>& _var_array
    typename NegType<VarSum>::type>(stateObj, VarNegRef(_var_array), VarNegRef(_var_sum))); 
 }
 
-
-
+#endif

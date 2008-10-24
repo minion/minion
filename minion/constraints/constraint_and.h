@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_AND_H
+#define CONSTRAINT_AND_H
+
 /// var1 /\ var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct AndConstraint : public AbstractConstraint
@@ -184,3 +187,4 @@ AbstractConstraint*
 AndCon(StateObj* stateObj, VarRef1 var1, VarRef2 var2, VarRef3 var3)
 { return (new AndConstraint<VarRef1,VarRef2,VarRef3>(stateObj, var1,var2,var3)); }
 
+#endif

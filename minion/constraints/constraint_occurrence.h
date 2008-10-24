@@ -90,6 +90,9 @@ help constraints occurrence
 help constraints occurrenceleq
 */
 
+#ifndef CONSTRAINT_OCCURRENCE_H
+#define CONSTRAINT_OCCURRENCE_H
+
 // Negated occurrence; used in reverse_constraint for OccurrenceEqualConstraint
 template<typename VarArray, typename Val, typename ValCount>
 struct NotOccurrenceEqualConstraint : public AbstractConstraint
@@ -829,3 +832,5 @@ BuildCT_GEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolV
   else 
   { return ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), occs, t1.size()); } 
 }
+
+#endif

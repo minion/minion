@@ -68,6 +68,9 @@ This constraint is reifyimply'able but not reifiable.
 help input tuplelist
 */
 
+#ifndef CONSTRAINT_GACTABLE_H_LAQ
+#define CONSTRAINT_GACTABLE_H_LAQ
+
 template<typename VarArray>
 struct GACTableConstraint : public AbstractConstraint
 {
@@ -322,5 +325,4 @@ AbstractConstraint*
 GACTableCon(const VarArray& vars, TupleList* tuples)
 { return new GACTableConstraint<VarArray>(vars, tuples); }
 
-
-
+#endif

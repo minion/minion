@@ -50,6 +50,8 @@ See also
    help constraints watchsumgeq
 */
 
+#ifndef CONSTRAINT_DYNAMIC_LITWATCH_H
+#define CONSTRAINT_DYNAMIC_LITWATCH_H
 
 template<typename VarArray, typename ValueArray, typename VarSum>
 struct LiteralSumConstraintDynamic : public AbstractConstraint
@@ -281,5 +283,4 @@ BuildCT_WATCHED_LITSUM(StateObj* stateObj,const T1& t1, BOOL reify, const BoolVa
   }
 }
 
-
-
+#endif

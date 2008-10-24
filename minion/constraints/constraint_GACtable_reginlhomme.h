@@ -24,6 +24,9 @@ $Id$
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_GACTABLE_REGIN_H
+#define CONSTRAINT_GACTABLE_REGIN_H
+
 struct TupleComparator
 {
   int significantIndex;
@@ -515,3 +518,5 @@ inline Regin* TupleList::getRegin()
     regin = new Regin(this);
   return regin;
 }
+
+#endif

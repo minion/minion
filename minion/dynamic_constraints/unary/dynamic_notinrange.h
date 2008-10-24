@@ -24,6 +24,8 @@ For Licence Information see file LICENSE.txt
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_DYNAMIC_UNARY_NOTINRANGE_H
+#define CONSTRAINT_DYNAMIC_UNARY_NOTINRANGE_H
 
 // Checks if a variable is in a fixed Range.
 template<typename Var>
@@ -145,3 +147,5 @@ WatchNotInRangeConDynamic(StateObj* stateObj, const VarArray1& _var_array_1, con
 }
 
 BUILD_CONSTRAINT1_WITH_BLOB(CT_WATCHED_NOT_INRANGE, WatchNotInRangeConDynamic)
+
+#endif

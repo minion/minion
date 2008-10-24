@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_DYNAMIC_SUMEQ_H
+#define CONSTRAINT_DYNAMIC_SUMEQ_H
+
 #ifndef NO_PRINT //for debug messages want complex string output
 #include <string>
 #endif
@@ -341,3 +344,5 @@ SumEqConDynamic(StateObj* stateObj, const light_vector<int>& consts, const VarAr
 }
 
 BUILD_DYNAMIC_CONSTRAINT3(CT_GACSUM, SumEqConDynamic);
+
+#endif

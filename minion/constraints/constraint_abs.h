@@ -40,6 +40,9 @@ This constraint is reifyimply'able but not reifiable.
 help constraints abs
 */
 
+#ifndef CONSTRAINT_ABS_H
+#define CONSTRAINT_ABS_H
+
 // X = abs(Y)
 template<typename AbsVarRef1, typename AbsVarRef2>
 struct AbsConstraint : public AbstractConstraint
@@ -198,3 +201,5 @@ BuildCT_ABS(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const Bo
   else
   { return AbsCon(stateObj, t1[0],t2[0]); }
 }
+
+#endif

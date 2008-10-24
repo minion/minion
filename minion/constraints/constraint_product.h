@@ -47,6 +47,9 @@ positive numbers.
 This constraint is reifyimply'able but not reifiable.
 */
 
+#ifndef CONSTRAINT_PRODUCT_H
+#define CONSTRAINT_PRODUCT_H
+
 #include "constraint_and.h"
 
 /// var1 * var2 = var3
@@ -226,3 +229,5 @@ ProductCon(StateObj* stateObj, const light_vector<VarRef1>& vars, const light_ve
 }
 
 BUILD_CONSTRAINT2(CT_PRODUCT2, ProductCon);
+
+#endif

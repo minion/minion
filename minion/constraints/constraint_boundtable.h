@@ -24,6 +24,9 @@ $Id$
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_BOUNDTABLE_H
+#define CONSTRAINT_BOUNDTABLE_H
+
 template<typename VarArray>
 struct BoundsTableConstraint : public AbstractConstraint
 {
@@ -132,3 +135,4 @@ end_check_upper:
   { propagate(0,0); }
 };
 
+#endif

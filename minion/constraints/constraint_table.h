@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_TABLE_H_ERT
+#define CONSTRAINT_TABLE_H_ERT
+
 template<typename VarArray>
 struct TableConstraint : public AbstractConstraint
 {
@@ -106,3 +109,4 @@ struct TableConstraint : public AbstractConstraint
   { propagate(0,0); }
 };
 
+#endif

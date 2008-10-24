@@ -82,6 +82,8 @@ This constraint is reifiable and reifyimply'able.
 
 /// (var1 = var2) = var3
 
+#ifndef CONSTRAINT_EQUAL_H
+#define CONSTRAINT_EQUAL_H
 
 // New version written by PN with bound triggers.
 // Also stronger in eq case: copies bounds across rather than just propagating on assignment. 
@@ -701,3 +703,5 @@ BUILD_CONSTRAINT3(CT_EQ_REIFY, ReifiedEqualCon);
 BUILD_CONSTRAINT3(CT_MINUSEQ_REIFY, ReifiedEqualMinusCon);
 
 BUILD_CONSTRAINT3(CT_DISEQ_REIFY, ReifiedNeqConBinary);
+
+#endif

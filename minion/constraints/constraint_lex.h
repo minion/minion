@@ -74,6 +74,9 @@ See also
 for a similar constraint with strict lexicographic inequality.
 */
 
+#ifndef CONSTRAINT_LEX_H
+#define CONSTRAINT_LEX_H
+
 template<typename VarArray1, typename VarArray2, BOOL Less = false>
 struct LexLeqConstraint : public AbstractConstraint
 {
@@ -396,3 +399,5 @@ LexLessCon(StateObj* stateObj,const VarArray1& x, const VarArray2& y)
 BUILD_CONSTRAINT2(CT_LEXLEQ, LexLeqCon)
 
 BUILD_CONSTRAINT2(CT_LEXLESS, LexLessCon)
+
+#endif

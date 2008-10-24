@@ -47,7 +47,8 @@ This constraint is reifiable and reifyimply'able.
 This constraint enforces generalized arc consistency.
 */
 
-
+#ifndef CONSTRAINT_GACALLDIFF_H
+#define CONSTRAINT_GACALLDIFF_H
 
 #include "alldiff_common.h"
 
@@ -58,5 +59,4 @@ GacAlldiffCon(StateObj* stateObj, const VarArray& var_array)
 
 BUILD_CONSTRAINT1(CT_GACALLDIFF, GacAlldiffCon)
 
-
-
+#endif

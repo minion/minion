@@ -81,6 +81,9 @@ consistency.
 // literal 2 * i : attached to j in V[i]
 // literal 2 * i + 1 : attached to j in Result
 
+#ifndef CONSTRAINT_DYNAMIC_ELEMENT_H
+#define CONSTRAINT_DYNAMIC_ELEMENT_H
+
 // for the reverse constraint.
 #include "../constraints/constraint_equal.h"
 #include "dynamic_new_or.h"
@@ -461,4 +464,4 @@ BUILD_DYNAMIC_CONSTRAINT3(CT_WATCHED_ELEMENT, DynamicElementCon);
 
 BUILD_DYNAMIC_CONSTRAINT3(CT_WATCHED_ELEMENT_ONE, DynamicElementOneCon);
 
-
+#endif

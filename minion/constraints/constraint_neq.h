@@ -57,6 +57,8 @@ See
 for the same constraint that enforces GAC.
 */
 
+#ifndef CONSTRAINT_NEQ_H
+#define CONSTRAINT_NEQ_H
 
 template<typename VarArray>
 struct NeqConstraint : public AbstractConstraint
@@ -231,3 +233,5 @@ NeqCon(StateObj* stateObj, const VarArray& var_array)
 { return new NeqConstraint<VarArray>(stateObj, var_array); }
 
 BUILD_CONSTRAINT1(CT_ALLDIFF, NeqCon)
+
+#endif

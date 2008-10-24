@@ -101,6 +101,10 @@ for details of an identical constraint that enforces generalised arc
 consistency.
 */
 
+#ifndef CONSTRAINT_ELEMENT_H_EIFESJKLNDFSNMDFS
+#define CONSTRAINT_ELEMENT_H_EIFESJKLNDFSNMDFS
+
+
 #include "constraint_equal.h"
 #include "../dynamic_constraints/dynamic_new_or.h"
 #include "../dynamic_constraints/dynamic_new_and.h"
@@ -444,3 +448,4 @@ ElementOneCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Va
 BUILD_CONSTRAINT3(CT_ELEMENT, ElementCon);
 BUILD_CONSTRAINT3(CT_ELEMENT_ONE, ElementOneCon);
 
+#endif

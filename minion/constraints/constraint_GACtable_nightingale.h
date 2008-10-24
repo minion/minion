@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_GACTABLE_NIGHTINGALE_H
+#define CONSTRAINT_GACTABLE_NIGHTINGALE_H
+
 struct TupleComparator
 {
   int significantIndex;
@@ -533,3 +536,5 @@ inline Nightingale* TupleList::getNightingale()
     nightingale = new Nightingale(this);
   return nightingale;
 }
+
+#endif

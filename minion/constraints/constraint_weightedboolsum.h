@@ -62,6 +62,9 @@ help constraints sumleq
 help constraints sumgeq
 */
 
+#ifndef CONSTRAINT_WEIGHTBOOLSUM_H
+#define CONSTRAINT_WEIGHTBOOLSUM_H
+
 #include "constraint_fullsum.h"
 
 template<typename VarArray, typename WeightArray, typename VarSum>
@@ -315,3 +318,4 @@ GeqWeightedSum(const vector<int>& scale, const vector<BoolVarRef>& vec, const ve
 BUILD_CONSTRAINT2_WITH_BLOB(CT_WEIGHTLEQSUM, LeqWeightedSum)
 BUILD_CONSTRAINT2_WITH_BLOB(CT_WEIGHTGEQSUM, GeqWeightedSum)
 
+#endif

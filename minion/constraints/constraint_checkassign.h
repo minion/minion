@@ -18,6 +18,10 @@
 // This is a standard fall-back constraint which can be used when a
 // constraint has not got a better method of implementing their
 // inverse for reification.
+
+#ifndef CONSTRAINT_CHECKASSIGN_H
+#define CONSTRAINT_CHECKASSIGN_H
+
 template<typename VarArray, typename OriginalConstraint>
 struct CheckAssignConstraint : public AbstractConstraint
 {
@@ -159,3 +163,4 @@ struct CheckAssignConstraint : public AbstractConstraint
    }
 };
 
+#endif

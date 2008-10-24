@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_GADGET_H
+#define CONSTRAINT_GADGET_H
+
 template<typename VarArray>
 struct GadgetConstraint : public AbstractConstraint
 {
@@ -192,4 +195,6 @@ template<typename Vars>
 AbstractConstraint*
 BuildCT_GADGET(StateObj* stateObj, const Vars& vars, BOOL reify, const BoolVarRef& reifyvar, ConstraintBlob& blob)
 { INPUT_ERROR("This constraint requires REENTER support."); }
+#endif
+
 #endif

@@ -212,7 +212,7 @@ struct DynamicAlldiff : public DynamicConstraint
       {
           for(int j=i+1; j<var_array.size(); j++)
           {
-              EqualConstraint<AnyVarRef, AnyVarRef>* t=new EqualConstraint<AnyVarRef, AnyVarRef>(stateObj, var_array[i], var_array[j]);
+              EqualConstraint<VarRef, VarRef>* t=new EqualConstraint<VarRef, VarRef>(stateObj, var_array[i], var_array[j]);
               con.push_back((AbstractConstraint*) t);
           }
       }

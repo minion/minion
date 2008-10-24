@@ -44,6 +44,9 @@ This constraint is reifyimply'able but not reifiable.
 help constraints modulo
 */
 
+#ifndef CONSTRAINT_DIV_H
+#define CONSTRAINT_DIV_H
+
 #include <math.h>
 
 #define LRINT(x) static_cast<long>(x + 0.5)
@@ -157,3 +160,5 @@ DivCon(StateObj* stateObj, const V1& vars, const V2& var2)
 
 
 BUILD_CONSTRAINT2(CT_DIV, DivCon);
+
+#endif

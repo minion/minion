@@ -51,6 +51,9 @@ This constrait is reifiable and reifyimply'able.
 // This is the "primary" implement of sum, so it has to include headers for the
 // other specialised implementations.
 
+#ifndef CONSTRAINT_FULLSUM_H
+#define CONSTRAINT_FULLSUM_H
+
 #include "constraint_lightsum.h"
 #include "constraint_sum.h"
 
@@ -328,3 +331,4 @@ GreaterEqualSumCon(StateObj* stateObj, const light_vector<BoolVarRef>& var_array
 
 BUILD_CONSTRAINT2(CT_GEQSUM, GreaterEqualSumCon);
 
+#endif

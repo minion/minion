@@ -77,6 +77,9 @@ For Licence Information see file LICENSE.txt
   help constraints litsumgeq
 */
 
+#ifndef CONSTRAINT_DYNAMIC_SUM_H
+#define CONSTRAINT_DYNAMIC_SUM_H
+
 // VarToCount = 1 means leq, = 0 means geq.
 template<typename VarArray, typename VarSum, int VarToCount = 1 >
   struct BoolLessSumConstraintDynamic : public AbstractConstraint
@@ -411,3 +414,5 @@ inline AbstractConstraint*
     }
   }
 }
+
+#endif

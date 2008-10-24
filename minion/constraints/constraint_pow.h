@@ -40,6 +40,9 @@ This constraint is only available for positive domains x, y and z.
 This constraint is reifyimply'able but not reifiable.
 */
 
+#ifndef CONSTRAINT_POW_H
+#define CONSTRAINT_POW_H
+
 #include <math.h>
 
 // This constraint is half-way to being changed from using
@@ -232,3 +235,5 @@ PowCon(StateObj* stateObj, const V1& vars, const V2& var2)
 
 
 BUILD_CONSTRAINT2(CT_POW, PowCon);
+
+#endif

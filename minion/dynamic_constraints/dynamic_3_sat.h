@@ -24,7 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
+#ifndef CONSTRAINT_DYNAMIC_3_SAT_H
+#define CONSTRAINT_DYNAMIC_3_SAT_H
 
 // VarToCount = 1 means leq, = 0 means geq.
 template<typename VarArray>
@@ -173,3 +174,5 @@ template<typename VarArray>
 AbstractConstraint*
 BoolThreeSATConDynamic(StateObj* stateObj, const VarArray& _var_array)
 { return new BoolThreeSATConstraintDynamic<VarArray>(stateObj, _var_array); }
+
+#endif

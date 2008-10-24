@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_GACELEMENT_H_OSAFDJ
+#define CONSTRAINT_GACELEMENT_H_OSAFDJ
+
 #include "constraint_equal.h"
 #include "../dynamic_constraints/dynamic_new_or.h"
 #include "../dynamic_constraints/dynamic_new_and.h"
@@ -293,4 +296,4 @@ GACElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3& v2)
 
 BUILD_CONSTRAINT3(CT_GACELEMENT, GACElementCon);
 
-
+#endif

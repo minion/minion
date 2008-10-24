@@ -24,6 +24,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_UNARYNEQ_H
+#define CONSTRAINT_UNARYNEQ_H
 
 // x = constant
 template<typename VarRef, typename Offset>
@@ -77,4 +79,4 @@ AbstractConstraint*
 UnaryNeqCon(VarRef v1,  Offset o)
 { return new UnaryNeqConstraint<VarRef,Offset>(v1,o); }
 
-
+#endif

@@ -24,6 +24,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTRAINT_SUM_H_FGHJ
+#define CONSTRAINT_SUM_H_FGHJ
+
 // VarToCount = 1 means leq, = 0 means geq.
 template<typename VarArray, typename VarSum, int VarToCount = 1 >
 struct BoolLessSumConstraint : public AbstractConstraint
@@ -205,5 +208,4 @@ BoolGreaterEqualSumCon(StateObj* stateObj, const VarArray& _var_array,  VarSum _
   return (new BoolLessSumConstraint<VarArray,VarSum,0>(stateObj, _var_array,_var_sum)); 
 }
 
-
-
+#endif

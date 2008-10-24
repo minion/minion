@@ -47,6 +47,9 @@ achieved by
 This constraint is reifiable and reifyimply'able.
 */
 
+#ifndef CONSTRAINT_LESS_H
+#define CONSTRAINT_LESS_H
+
 // x <= y + offset
 template<typename VarRef1, typename VarRef2, typename Offset>
 struct LeqConstraint : public AbstractConstraint
@@ -161,3 +164,5 @@ BuildCT_INEQ(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const B
 template<typename VarRef1, typename VarRef2, typename Offset>
 inline AbstractConstraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint()
 { return LeqCon(stateObj,y,x, offset.negminusone()); }
+
+#endif

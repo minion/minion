@@ -61,6 +61,9 @@ bounds of the capacity variables are updated by counting values in the domains
 of the primary variables.
 */
 
+#ifndef CONSTRAINT_GCC_H_PQWOEI
+#define CONSTRAINT_GCC_H_PQWOEI
+
 #include "gcc_common.h"
 
 template<typename VarArray1, typename VarArray2>
@@ -71,3 +74,4 @@ GlobalCardCon(StateObj* stateObj, const VarArray1& var_array, const VarArray2& c
 
 BUILD_CONSTRAINT2_WITH_BLOB(CT_GCC, GlobalCardCon)
 
+#endif
