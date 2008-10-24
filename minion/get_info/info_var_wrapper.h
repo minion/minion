@@ -1,6 +1,6 @@
 #include "../constraints/constraint_abstract.h"
 
-template<typename WrapType, VarType VAR_TYPE>
+template<typename WrapType, Info_VarType VAR_TYPE>
 struct InfoRefType
 {
   WrapType data;

@@ -10,9 +10,9 @@
 
 using namespace std;
 
-#ifndef MORE_SEARCH_INFO
-#define MORE_SEARCH_INFO
-#endif
+//#ifndef MORE_SEARCH_INFO
+//#define MORE_SEARCH_INFO
+//#endif
 
 #include "get_info/get_info.h"
 
@@ -97,13 +97,13 @@ string pad_start(string s, int length = 12)
   return output + s;
 }
 
-void VarInfoAddone(VarType type, VarEvent event)
+void VarInfoAddone(Info_VarType type, Info_VarEvent event)
 { var_info.counters[type][event]++; }
 
-void ConInfoAddone(ConEvent type)
+void ConInfoAddone(Info_ConEvent type)
 { var_info.concount[type]++; }
 
-void PropInfoAddone(PropEvent type)
+void PropInfoAddone(Info_PropEvent type)
 { var_info.propcount[type]++; }
 
 void print_search_info()

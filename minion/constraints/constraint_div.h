@@ -49,7 +49,9 @@ help constraints modulo
 
 #include <math.h>
 
-#define LRINT(x) static_cast<long>(x + 0.5)
+#ifndef LRINT
+#define LRINT(x) static_cast<DomainInt>(x + 0.5)
+#endif
 
 /// var1 / var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>

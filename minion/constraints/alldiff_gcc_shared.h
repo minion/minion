@@ -1,4 +1,5 @@
-
+#ifndef ALLDIFF_GAC_SHARED_H
+#define ALLDIFF_GAC_SHARED_H
 
 struct smallset
 {
@@ -290,3 +291,4 @@ struct smallset_list_bt
     }
 };
 
+#endif

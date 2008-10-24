@@ -50,7 +50,9 @@ This constraint is reifyimply'able but not reifiable.
 // this +0.5 business. Or at least I'm not convinced that it's OK.
 // at least now it passes test_nightingale_pow.minion.
 
+#ifndef LRINT
 #define LRINT(x) static_cast<DomainInt>(x + 0.5)
+#endif
 
 /// var1 ^ var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
