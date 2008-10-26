@@ -34,14 +34,23 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
   virtual string constraint_name()
   { return "Light<=Sum"; }
   
-  //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
- 
+  bool no_negatives;
   
   array<VarRef, size> var_array;  
   VarSum var_sum;
   LightLessEqualSumConstraint(StateObj* _stateObj, const array<VarRef, size>& _var_array, const VarSum& _var_sum) :
     AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
-  { }
+  {
+    no_negatives = true;
+    for(int i = 0; i < var_array.size(); ++i)
+    {
+      if(var_array[i].getInitialMin() < 0)
+      {
+        no_negatives = false;
+        return;
+      }
+    }
+  }
   
   virtual triggerCollection setup_internal()
   {
@@ -56,6 +65,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
     return t;    
   }
   
+  /*
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     int sum_value = 0;
@@ -70,6 +80,39 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
     else
       assignment.push_back(make_pair(v_size, var_sum.getMax()));
     return true;
+  }
+  */
+  
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    int sum_value = 0;
+    int v_size = var_array.size();
+    
+    if(no_negatives)
+    {
+      int max_sum = var_sum.getMax();
+      assignment.push_back(make_pair(v_size, max_sum));
+      for(int i = 0; i < v_size && sum_value < max_sum; ++i)
+      {
+        int min_val = var_array[i].getMin();
+        assignment.push_back(make_pair(i, min_val));
+        sum_value += min_val;
+      }
+      return (sum_value <= max_sum);
+    }
+    else
+    {
+      for(int i = 0; i < v_size; ++i)
+      {
+        assignment.push_back(make_pair(i, var_array[i].getMin()));
+        sum_value += var_array[i].getMin();
+      }
+      if(sum_value > var_sum.getMax())
+        return false;
+      else
+        assignment.push_back(make_pair(v_size, var_sum.getMax()));
+      return true;
+    }
   }
   
   

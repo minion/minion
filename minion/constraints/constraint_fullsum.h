@@ -61,8 +61,8 @@ This constrait is reifiable and reifyimply'able.
 #undef P
 #endif
 
-#define P(x) cout << x << endl
-//#define P(x)
+//#define P(x) cout << x << endl
+#define P(x)
 
 /// V1 + ... Vn <= X
 /// is_reversed checks if we are in the case where reverse_constraint was previously called.
@@ -75,6 +75,8 @@ struct LessEqualSumConstraint : public AbstractConstraint
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   
+  bool no_negatives;
+    
   VarArray var_array;  
   VarSum var_sum;
   Reversible<DomainInt> max_looseness;
@@ -82,7 +84,17 @@ struct LessEqualSumConstraint : public AbstractConstraint
   LessEqualSumConstraint(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
     AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), max_looseness(_stateObj), 
     var_array_min_sum(_stateObj)
-  { }
+  {
+    no_negatives = true;
+    for(int i = 0; i < var_array.size(); ++i)
+    {
+      if(var_array[i].getInitialMin() < 0)
+      {
+        no_negatives = false;
+        return;
+      }
+    }
+  }
   
   virtual triggerCollection setup_internal()
   {
@@ -201,6 +213,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     return sum <= *(v + v_size - 1);
   }
   
+  /*
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     int sum_value = 0;
@@ -214,11 +227,41 @@ struct LessEqualSumConstraint : public AbstractConstraint
       return false;
     else
       assignment.push_back(make_pair(v_size, var_sum.getMax()));
-    
-    P(v_size << "." << var_sum.getMax() << "." << sum_value << "." << assignment.size());
 
-    P(assignment.size());
     return true;
+  }
+  */
+  
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    int sum_value = 0;
+    int v_size = var_array.size();
+    
+    if(no_negatives)
+    {
+      int max_sum = var_sum.getMax();
+      assignment.push_back(make_pair(v_size, max_sum));
+      for(int i = 0; i < v_size && sum_value < max_sum; ++i)
+      {
+        int min_val = var_array[i].getMin();
+        assignment.push_back(make_pair(i, min_val));
+        sum_value += min_val;
+      }
+      return (sum_value <= max_sum);
+    }
+    else
+    {
+      for(int i = 0; i < v_size; ++i)
+      {
+        assignment.push_back(make_pair(i, var_array[i].getMin()));
+        sum_value += var_array[i].getMin();
+      }
+      if(sum_value > var_sum.getMax())
+        return false;
+      else
+        assignment.push_back(make_pair(v_size, var_sum.getMax()));
+      return true;
+    }
   }
   
   
