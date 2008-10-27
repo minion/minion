@@ -83,12 +83,9 @@ more information.
 //#define P(x) cout << x << endl
 #define P(x)
 
-#define NEWREIFY
+//#define NEWREIFY
 
 #ifdef NEWREIFY
-
-// Reify should work even if its child constraints return different numbers of variables from get_vars.
-// fix.
 
 // In here variables are numbered from child_constraints[0].get_vars(), then child_constraints[1].get_vars(), then reify_var
 
@@ -368,9 +365,13 @@ struct reify : public ParentConstraint
       else  
         vars[assignment[i].first].addDynamicTrigger(trig + i, DomainRemoval, assignment[i].second);
     }
-    // clear other triggers up to (not including) endtrig
+    // clear a contiguous block of used triggers up to (not including) endtrig
     for(int i=assignment.size(); (trig+i)<endtrig; i++)
     {
+        if(!(trig+i)->isAttached())
+        {
+            break;
+        }
         (trig+i)->remove();
     }
   }

@@ -71,6 +71,11 @@ public:
 	prev = NULL;
   }
   
+  inline bool isAttached()
+  {
+      return prev!=NULL;
+  }
+  
   /// Add this trigger after another one in a list.
   /// This function will remove this trigger from any list it currently lives in.
   // next_queue_ptr is a '*&' as it is a pointer which we want a reference to, so we can change it!
