@@ -83,7 +83,7 @@ more information.
 //#define P(x) cout << x << endl
 #define P(x)
 
-//#define NEWREIFY
+#define NEWREIFY
 
 #ifdef NEWREIFY
 
