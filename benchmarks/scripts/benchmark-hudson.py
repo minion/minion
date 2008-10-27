@@ -14,4 +14,6 @@ for root, dirs, files in os.walk(benchmarks):
       else:
         time = timer.repeat(3,1)
         mintime = min(time)
-      print name + '=%.3f' % mintime
+      FILE = open(name + ".benchmark", "w")
+      FILE.write('YVALUE=%.3f' % mintime)
+      FILE.close
