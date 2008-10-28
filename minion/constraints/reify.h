@@ -104,6 +104,9 @@ struct reify : public ParentConstraint
   
   unsigned long long reifysetnode;
   
+  int dtcount;
+  int c0vars;  // how many vars for child_constraints[0] 
+  
   reify(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar _rar_var) :
   ParentConstraint(_stateObj), reify_var(_rar_var), constraint_locked(false),
     full_propagate_called(stateObj, false)
@@ -115,6 +118,8 @@ struct reify : public ParentConstraint
     child_constraints.push_back(_negcon);
     // assume for the time being that the two child constraints have the same number of vars.
     reify_var_num=child_constraints[0]->get_vars_singleton()->size()+child_constraints[1]->get_vars_singleton()->size();
+    dtcount=dynamic_trigger_count();
+    c0vars=child_constraints[0]->get_vars_singleton()->size();
   }
   
   // constructor which takes a negative constraint and constructs the positive one.
@@ -129,6 +134,8 @@ struct reify : public ParentConstraint
     child_constraints.push_back(_negcon);
     // assume for the time being that the two child constraints have the same number of vars.
     reify_var_num=child_constraints[0]->get_vars_singleton()->size()+child_constraints[1]->get_vars_singleton()->size();
+    dtcount=dynamic_trigger_count();
+    c0vars=child_constraints[0]->get_vars_singleton()->size();
   }
   
   virtual AbstractConstraint* reverse_constraint()
@@ -172,12 +179,12 @@ struct reify : public ParentConstraint
     DomainInt back_val = *(vals + (v_size - 1));
     if(back_val != 0)
     {
-      return child_constraints[0]->check_assignment(vals, child_constraints[0]->get_vars_singleton()->size());
+      return child_constraints[0]->check_assignment(vals, c0vars);
     }
     else
     {
-      vals += child_constraints[0]->get_vars_singleton()->size();
-      return child_constraints[1]->check_assignment(vals, child_constraints[1]->get_vars_singleton()->size());
+      vals += c0vars;
+      return child_constraints[1]->check_assignment(vals, (dtcount/2)-c0vars);
     }
   }
   
@@ -287,9 +294,9 @@ struct reify : public ParentConstraint
       return;
     
     DynamicTrigger* dt = dynamic_trigger_start();
-    int numtriggers=dynamic_trigger_count();
+    //int numtriggers=dynamic_trigger_count();
     
-    if(trig >= dt && trig < (dt + (child_constraints[0]->get_vars_singleton()->size()*2)) )
+    if(trig >= dt && trig < (dt + (c0vars*2)) )
     {// Lost assignments for positive constraint.
       P("Triggered on an assignment watch");
       if(!full_propagate_called)
@@ -310,7 +317,7 @@ struct reify : public ParentConstraint
           return;
         }
         P("Found new assignment");
-        watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt, dt+(child_constraints[0]->get_vars_singleton()->size()*2));
+        watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt, dt+(c0vars*2));
       }
       else
       {
@@ -319,7 +326,7 @@ struct reify : public ParentConstraint
       return;
     }
     
-    if(trig>= (dt+ (child_constraints[0]->get_vars_singleton()->size()*2)) && trig < dt+numtriggers)
+    if(trig>= (dt+ (c0vars*2)) && trig < dt+dtcount)
     {// Lost assignments for negative constraint.
         P("Triggered on an assignment watch");
       if(!full_propagate_called)
@@ -340,7 +347,7 @@ struct reify : public ParentConstraint
           return;
         }
         P("Found new assignment");
-        watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), dt+(child_constraints[0]->get_vars_singleton()->size()*2), dt+numtriggers);
+        watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), dt+(c0vars*2), dt+dtcount);
       }
       else
       {
@@ -420,9 +427,9 @@ struct reify : public ParentConstraint
     }
     
     DynamicTrigger* dt = dynamic_trigger_start();
-    int dt_count = dynamic_trigger_count();
+    //int dt_count = dynamic_trigger_count();
     // Clean up triggers
-    for(int i = 0; i < dt_count; ++i)
+    for(int i = 0; i < dtcount; ++i)
       dt[i].remove();
     
     bool flag;
@@ -448,8 +455,8 @@ struct reify : public ParentConstraint
       return;
     }
     
-    watch_assignment(assignment0, *(child_constraints[0]->get_vars_singleton()), dt, dt+(child_constraints[0]->get_vars_singleton()->size()*2));
-    watch_assignment(assignment1, *(child_constraints[1]->get_vars_singleton()), dt+(child_constraints[0]->get_vars_singleton()->size()*2), dt+dt_count);
+    watch_assignment(assignment0, *(child_constraints[0]->get_vars_singleton()), dt, dt+(c0vars*2));
+    watch_assignment(assignment1, *(child_constraints[1]->get_vars_singleton()), dt+(c0vars*2), dt+dtcount);
   }
 };
 
