@@ -90,6 +90,8 @@ help constraints occurrence
 help constraints occurrenceleq
 */
 
+//#include "constraint_forward_checking.h"
+
 #ifndef CONSTRAINT_OCCURRENCE_H
 #define CONSTRAINT_OCCURRENCE_H
 
@@ -334,14 +336,20 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
     DynamicTrigger* dt = dynamic_trigger_start();
     trigger1index=watch_unassigned_in_vector(-1, 0, dt);
     if(trigger1index==-1)
+    {
         vector_assigned();
+        return;
+    }
     
     if(val_count.isAssigned())
     {
         // watch a second place in the vector.
         trigger2index=watch_unassigned_in_vector(trigger1index, trigger1index, dt+1);
         if(trigger2index==-1)
+        {
             valcount_assigned();
+            return;
+        }
     }
   }
   
@@ -776,6 +784,13 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   AbstractConstraint* reverse_constraint()
   {
       return new NotOccurrenceEqualConstraint<VarArray, Val, ValCount>(stateObj, var_array, value, val_count);
+      /*vector<AnyVarRef> v;
+      for(int i=0; i<var_array.size(); i++)
+      {
+          v.push_back((AnyVarRef) var_array[i]);
+      }
+      v.push_back(val_count);
+      return new ForwardCheckingConstraint<vector<AnyVarRef>, FCNotOccurrence>(stateObj, v, value);*/
   }
 };
 

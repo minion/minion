@@ -84,6 +84,7 @@ more information.
 #define P(x)
 
 #define NEWREIFY
+#define NODETRICK
 
 #ifdef NEWREIFY
 
@@ -101,10 +102,14 @@ struct reify : public ParentConstraint
   bool constraint_locked;
   Reversible<bool> full_propagate_called;
   
+  unsigned long long reifysetnode;
+  
   reify(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar _rar_var) :
   ParentConstraint(_stateObj), reify_var(_rar_var), constraint_locked(false),
     full_propagate_called(stateObj, false)
   {
+      numeric_limits<unsigned long long> ull;
+      reifysetnode=ull.max();
     child_constraints.push_back(_poscon);
     AbstractConstraint* _negcon = _poscon->reverse_constraint();
     child_constraints.push_back(_negcon);
@@ -232,6 +237,15 @@ struct reify : public ParentConstraint
     if(i == -1000000000)
     {
       P("reifyvar assigned - Do full propagate");
+      #ifdef NODETRICK
+      if(reifysetnode==getState(stateObj).getNodeCount())
+      {
+          numeric_limits<unsigned long long> ull;  // I hope the compiler will get rid fo this..
+          reifysetnode=ull.max();  // avoid this happening more than once.
+          return;
+      }
+      #endif
+      
       constraint_locked = true;
       getQueue(stateObj).pushSpecialTrigger(this);
       return;
@@ -288,6 +302,11 @@ struct reify : public ParentConstraint
         { // No satisfying assignment to constraint
           P("Failed!");
           reify_var.propagateAssign(0);
+          
+          #ifdef NODETRICK
+          reifysetnode=getState(stateObj).getNodeCount();
+          #endif
+          
           return;
         }
         P("Found new assignment");
@@ -313,6 +332,11 @@ struct reify : public ParentConstraint
         { // No satisfying assignment to constraint
           P("Failed!");
           reify_var.propagateAssign(1);
+          
+          #ifdef NODETRICK
+          reifysetnode=getState(stateObj).getNodeCount();
+          #endif
+          
           return;
         }
         P("Found new assignment");
@@ -406,12 +430,21 @@ struct reify : public ParentConstraint
     if(!flag)
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(0);
+      
+      #ifdef NODETRICK
+      reifysetnode=getState(stateObj).getNodeCount();
+      #endif
+      
       return;
     }
     GET_ASSIGNMENT(assignment1, child_constraints[1]);
     if(!flag)
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(1);
+      #ifdef NODETRICK
+      reifysetnode=getState(stateObj).getNodeCount();
+      #endif
+          
       return;
     }
     
