@@ -44,7 +44,7 @@ for i in *.minion; do
   
   if grep -q "#TEST SOLCOUNT" $i;
   then
-    numsols=`$exec -findallsols $* $i 2>/dev/null | ../mini-scripts/solutions.sh`
+    numsols=`$exec $i -findallsols $* 2>/dev/null | ../mini-scripts/solutions.sh`
     testnumsols=`grep "#TEST SOLCOUNT" $i  | awk '{print $3}' | tr -d '\015' `
 	if [[ "$numsols" != "$testnumsols" ]]; then
 	  testpass=0
@@ -54,7 +54,7 @@ for i in *.minion; do
 	fi
   else
     if grep -q "#TEST CHECKONESOL" $i; then
-      sol=`$exec $* $i 2>/dev/null | ../mini-scripts/print_sol.sh`
+      sol=`$exec $i $* 2>/dev/null | ../mini-scripts/print_sol.sh`
       # That "tr" is just to deal with line ending problems.
       testsol=`grep "#TEST CHECKONESOL" $i | awk '{$1 = ""; $2 = ""; print }' | tr -d '\015' `
       
