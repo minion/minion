@@ -70,30 +70,32 @@ struct BoolVarRef_internal
   { return false;}
   
   data_type shift_offset;
-  unsigned data_offset;
   unsigned var_num;
   MoveablePointer data_position;
   MemOffset value_position;
+
+  unsigned data_offset() const
+  { return var_num / (sizeof(data_type)*8); }
   
 #ifdef MANY_VAR_CONTAINERS
   BooleanContainer* boolCon;
   BooleanContainer& getCon() const { return *boolCon; }
 
   BoolVarRef_internal(const BoolVarRef_internal& b) :
-  shift_offset(b.shift_offset), data_offset(b.data_offset), var_num(b.var_num), data_position(b.data_position),
+  shift_offset(b.shift_offset), var_num(b.var_num), data_position(b.data_position),
   value_position(b.value_position) ,boolCon(b.boolCon)
   { }
   
-  BoolVarRef_internal() : shift_offset(~1), data_offset(~1), var_num(~1), boolCon(NULL)
+  BoolVarRef_internal() : shift_offset(~1), var_num(~1), boolCon(NULL)
   { }  
 #else
   static BooleanContainer& getCon_Static();
   BoolVarRef_internal(const BoolVarRef_internal& b) :
-  shift_offset(b.shift_offset), data_offset(b.data_offset), var_num(b.var_num), data_position(b.data_position),
+  shift_offset(b.shift_offset), var_num(b.var_num), data_position(b.data_position),
   value_position(b.value_position)
   { }
   
-  BoolVarRef_internal() : shift_offset(~1), data_offset(~1), var_num(~1)
+  BoolVarRef_internal() : shift_offset(~1), var_num(~1)
   { }
 #endif
   
@@ -277,7 +279,7 @@ struct BooleanContainer
 	  getState(stateObj).setFailed(true);
 	  return;
 	}
-    assign_ptr()[d.data_offset] |= d.shift_offset;
+    assign_ptr()[d.data_offset()] |= d.shift_offset;
     
     trigger_list.push_assign(d.var_num, b);
 #ifndef FEW_BOOLEAN_TRIGGERS
@@ -288,12 +290,12 @@ struct BooleanContainer
     if(b == 1)
     {
       trigger_list.push_lower(d.var_num, 1);
-      value_ptr()[d.data_offset] |= d.shift_offset;
+      value_ptr()[d.data_offset()] |= d.shift_offset;
     }
     else
     {
       trigger_list.push_upper(d.var_num, 1);
-      value_ptr()[d.data_offset] &= ~d.shift_offset;
+      value_ptr()[d.data_offset()] &= ~d.shift_offset;
     }
   }
   
@@ -378,9 +380,9 @@ inline BoolVarRef BooleanContainer::get_var_num(int i)
 }
 
 inline BoolVarRef_internal::BoolVarRef_internal(int value, BooleanContainer* b_con) : 
-  data_offset(value / (sizeof(data_type)*8)), var_num(value),  
-  data_position(b_con->assign_offset, data_offset*sizeof(data_type)),
-  value_position(b_con->values_mem, data_offset*sizeof(data_type))
+  var_num(value),  
+  data_position(b_con->assign_offset, data_offset()*sizeof(data_type)),
+  value_position(b_con->values_mem, data_offset()*sizeof(data_type))
 #ifdef MANY_VAR_CONTAINERS
 , boolCon(b_con)
 #endif
