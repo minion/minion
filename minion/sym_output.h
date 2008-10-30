@@ -156,7 +156,7 @@ struct GraphBuilder
     vector<Var> vars = csp.vars.get_all_vars();
     for(int i = 0; i < vars.size(); ++i)
     {
-      var_vertex_colour[to_string(csp.vars.get_domain_for_graph(vars[i]))].insert(csp.vars.getName(vars[i]));
+      var_vertex_colour[to_string(csp.vars.get_domain(vars[i]))].insert(csp.vars.getName(vars[i]));
     }
   }
   

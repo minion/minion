@@ -11,7 +11,7 @@ struct MinionInstancePrinter
   CSPInstance& csp;
   
   MinionInstancePrinter(CSPInstance& _csp) : csp(_csp)
-    { print_instance(); }
+    { begin_print_instance(); }
     
   string getInstance()
   { return oss.str(); }
@@ -26,6 +26,11 @@ struct MinionInstancePrinter
   { 
     if(var.type() == VAR_CONSTANT)
       print_instance( var.pos());
+    else if(var.type() == VAR_NOTBOOL)
+    {
+      oss << "!";
+      oss << csp.vars.getName(Var(VAR_BOOL, var.pos())); 
+    }
     else
       oss << csp.vars.getName(var); 
   }
@@ -109,8 +114,58 @@ void print_instance(const ConstraintBlob& blob)
   oss << endl;  
 }
   
-void print_instance(const VarContainer& vars)
+void print_instance(const VarContainer& vars, const vector<Var>& varlist)
 { 
+  for(int i = 0; i < varlist.size(); ++i)
+  {
+    switch(varlist[i].type())
+    {
+      case VAR_BOOL:
+      oss << "BOOL ";
+      print_instance(varlist[i]);
+      oss << endl;
+      break;
+
+      case VAR_BOUND:
+      {
+        oss << "BOUND ";
+        print_instance(varlist[i]);
+        pair<BoundType, vector<DomainInt> > bound = vars.get_domain(varlist[i]);
+        D_ASSERT(bound.first == Bound_Yes);
+        D_ASSERT(bound.second.size() == 2);
+        oss << "{" << bound.second[0] << ".." << bound.second[1] << "}" << endl;
+      }
+      break;
+
+      case VAR_SPARSEBOUND:
+      {
+        oss << "SPARSEBOUND ";
+        print_instance(varlist[i]);
+        pair<BoundType, vector<DomainInt> > bound = vars.get_domain(varlist[i]);
+        D_ASSERT(bound.first == Bound_No);
+        print_instance( bound.second, '{', '}');
+        oss << endl;
+      }
+      break;
+
+      case VAR_DISCRETE:
+      {
+        oss << "DISCRETE ";
+        print_instance(varlist[i]);
+        pair<BoundType, vector<DomainInt> > bound = vars.get_domain(varlist[i]);
+        D_ASSERT(bound.first == Bound_Yes);
+        D_ASSERT(bound.second.size() == 2);
+        oss << "{" << bound.second[0] << ".." << bound.second[1] << "}" << endl;
+      }
+      break;
+      
+      default:
+      abort();
+    }
+  }
+  
+  return;
+  
   for(int i = 0; i < vars.BOOLs; ++i)
   {  
     oss << "BOOL ";
@@ -221,16 +276,31 @@ void print_search_info( )
     oss << endl;
   }
   
+  if(csp.print_matrix.empty())
+  {
+    oss << "PRINT NONE" << endl;
+  }
+  else
+  {
+    oss << "PRINT";
+    print_instance(csp.print_matrix);
+    oss << endl;
+  }
+  
 }
 
-void print_instance()
+void begin_print_instance()
+{ begin_print_instance(csp.constraints, csp.vars.get_all_vars()); }
+
+void begin_print_instance(const list<ConstraintBlob>& constraints, 
+                          const vector<Var>& varlist)
 {
   oss << "MINION 3" << endl;
   
   csp.add_variable_names();
     
   oss << "**VARIABLES**" << endl;
-  print_instance(csp.vars);
+  print_instance(csp.vars, varlist);
   
   oss << "**SEARCH**" << endl;
   print_search_info();
@@ -239,8 +309,8 @@ void print_instance()
   print_tuples();
   
   oss << "**CONSTRAINTS**" << endl;
-  for(list<ConstraintBlob>::const_iterator it = csp.constraints.begin(); 
-      it != csp.constraints.end(); ++it)
+  for(list<ConstraintBlob>::const_iterator it = constraints.begin(); 
+      it != constraints.end(); ++it)
   {
     print_instance( *it);
   }
