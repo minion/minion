@@ -1,4 +1,4 @@
-#include "CSPSpec.h"
+#include "../CSPSpec.h"
 
 #include <sstream>
 
