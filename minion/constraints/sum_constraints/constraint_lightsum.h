@@ -27,6 +27,9 @@
 #ifndef CONSTRAINT_LIGHTSUM_H_PLOKIJ
 #define CONSTRAINT_LIGHTSUM_H_PLOKIJ
 
+// This implementation of sum is designed for very short arrays, by
+// not keeping any state.
+
 /// V1 + ... Vn <= X
 template<typename VarRef, std::size_t size, typename VarSum, BOOL is_reversed = false>
 struct LightLessEqualSumConstraint : public AbstractConstraint

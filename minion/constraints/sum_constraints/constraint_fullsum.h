@@ -48,14 +48,11 @@ ensures that sum(vec) >= c.
 This constrait is reifiable and reifyimply'able.
 */
 
-// This is the "primary" implement of sum, so it has to include headers for the
-// other specialised implementations.
+// This is the standard implementation of sumleq (and sumgeq)
 
 #ifndef CONSTRAINT_FULLSUM_H
 #define CONSTRAINT_FULLSUM_H
 
-#include "constraint_lightsum.h"
-#include "constraint_sum.h"
 
 #ifdef P
 #undef P
@@ -319,59 +316,6 @@ struct LessEqualSumConstraint : public AbstractConstraint
 
 
 
-template<typename VarArray,  typename VarSum>
-AbstractConstraint*
-LessEqualSumCon(StateObj* stateObj, const VarArray& _var_array, const light_vector<VarSum>& _var_sum)
-{ 
-  if(_var_array.size() == 2)
-  {
-    array<typename VarArray::value_type, 2> v_array;
-	for(int i = 0; i < 2; ++i)
-	  v_array[i] = _var_array[i];
-	return LightLessEqualSumCon(stateObj, v_array, _var_sum[0]);
-  }
-  else
-  {
-	return new LessEqualSumConstraint<VarArray, VarSum>(stateObj, _var_array, _var_sum[0]); 
-  }
-}
 
-inline AbstractConstraint*
-LessEqualSumCon(StateObj* stateObj, const light_vector<BoolVarRef>& var_array, const light_vector<ConstantVar>& var_sum)
-{ 
-  runtime_val t2(checked_cast<int>(var_sum[0].getAssignedValue()));
-  return BoolLessEqualSumCon(stateObj, var_array, t2);
-}
-
-BUILD_CONSTRAINT2(CT_LEQSUM, LessEqualSumCon);
-
-
-
-template<typename VarArray,  typename VarSum>
-AbstractConstraint*
-GreaterEqualSumCon(StateObj* stateObj, const VarArray& _var_array, const light_vector<VarSum>& _var_sum)
-{ 
-  if(_var_array.size() == 2)
-  {
-    array<typename VarArray::value_type, 2> v_array;
-	for(int i = 0; i < 2; ++i)
-	  v_array[i] = _var_array[i];
-	return LightGreaterEqualSumCon(stateObj, v_array, _var_sum[0]);
-  }
-  else
-  {
-	return (new LessEqualSumConstraint<typename NegType<VarArray>::type, 
-			typename NegType<VarSum>::type>(stateObj, VarNegRef(_var_array), VarNegRef(_var_sum[0]))); 
-  }
-}
-
-inline AbstractConstraint*
-GreaterEqualSumCon(StateObj* stateObj, const light_vector<BoolVarRef>& var_array, const light_vector<ConstantVar>& var_sum)
-{ 
-  runtime_val t2(checked_cast<int>(var_sum[0].getAssignedValue()));
-  return BoolGreaterEqualSumCon(stateObj, var_array, t2);
-}
-
-BUILD_CONSTRAINT2(CT_GEQSUM, GreaterEqualSumCon);
 
 #endif

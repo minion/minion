@@ -62,8 +62,8 @@ help constraints sumleq
 help constraints sumgeq
 */
 
-#ifndef CONSTRAINT_WEIGHTBOOLSUM_H
-#define CONSTRAINT_WEIGHTBOOLSUM_H
+#ifndef CONSTRAINT_WEIGHTSUM_H
+#define CONSTRAINT_WEIGHTSUM_H
 
 #include "constraint_fullsum.h"
  
@@ -81,84 +81,84 @@ LeqWeightedSum(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>&
   for(unsigned i = 0; i < scale.size(); ++i)
   {
     if(scale[i] == 0)
-	{
-	  scale.erase(scale.begin() + i);
-	  vec.erase(vec.begin() + i);
-	  --i; // So we don't miss an element.
-	}
+    {
+      scale.erase(scale.begin() + i);
+      vec.erase(vec.begin() + i);
+      --i; // So we don't miss an element.
+    }
   }
-  
+
   BOOL multipliers_size_one = true;
   for(unsigned i = 0; i < scale.size(); ++i)
   {
-	if(scale[i] != 1 && scale[i] != -1)
-	{
-	  multipliers_size_one = false;
-	  i = scale.size();
-	}
+    if(scale[i] != 1 && scale[i] != -1)
+    {
+      multipliers_size_one = false;
+      i = scale.size();
+    }
   }
-  
+
   if(multipliers_size_one)
   {
-	light_vector<SwitchNeg<T1> > mult_vars(vec.size());
-	for(unsigned int i = 0; i < vec.size(); ++i)
-	  mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
-	return LessEqualSumCon(stateObj, mult_vars, t2);
+    light_vector<SwitchNeg<T1> > mult_vars(vec.size());
+    for(unsigned int i = 0; i < vec.size(); ++i)
+      mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
+    return LessEqualSumCon(stateObj, mult_vars, t2);
   }
   else
   {
-	light_vector<MultiplyVar<T1> > mult_vars(vec.size());
-	for(unsigned int i = 0; i < vec.size(); ++i)
-	  mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
-	return LessEqualSumCon(stateObj, mult_vars, t2);
+    light_vector<MultiplyVar<T1> > mult_vars(vec.size());
+    for(unsigned int i = 0; i < vec.size(); ++i)
+      mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
+    return LessEqualSumCon(stateObj, mult_vars, t2);
   }
 }
 
 // Don't pass in the vectors by reference, as we might need to copy them.
 template<typename T1, typename T2>
 AbstractConstraint*
-GeqWeightedSum(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>& t2, const ConstraintBlob& b)
+  GeqWeightedSum(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>& t2, const ConstraintBlob& b)
 {
   vector<int> scale = b.constants[0];
   // Preprocess to remove any multiplications by 0, both for efficency
   // and correctness
   if(scale.size() != vec.size())
   {
-      FAIL_EXIT("In a weighted sum constraint, the vector of weights must have the same length as the vector of variables.");
+    FAIL_EXIT("In a weighted sum constraint, the vector of weights must have the same length as the vector of variables.");
   }
   for(unsigned i = 0; i < scale.size(); ++i)
   {
     if(scale[i] == 0)
-	{
-	  scale.erase(scale.begin() + i);
-	  vec.erase(vec.begin() + i);
-	  --i; // So we don't miss an element.
-	}
+    {
+      scale.erase(scale.begin() + i);
+      vec.erase(vec.begin() + i);
+      --i; // So we don't miss an element.
+    }
   }
-  
+
   BOOL multipliers_size_one = true;  
   for(unsigned i = 0; i < scale.size(); ++i)
   {
-	if(scale[i] != 1 && scale[i] != -1)
-	{
-	  multipliers_size_one = false;
-	  i = scale.size();
-	}
+    if(scale[i] != 1 && scale[i] != -1)
+    {
+      multipliers_size_one = false;
+      i = scale.size();
+    }
   }
-  
+
   if(multipliers_size_one)
   {
-	light_vector<SwitchNeg<T1> > mult_vars(vec.size());
-	for(unsigned int i = 0; i < vec.size(); ++i)
-	  mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
-	return GreaterEqualSumCon(stateObj, mult_vars, t2);
+    light_vector<SwitchNeg<T1> > mult_vars(vec.size());
+    for(unsigned int i = 0; i < vec.size(); ++i)
+      mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
+    return GreaterEqualSumCon(stateObj, mult_vars, t2);
   }
   else
   {
-	light_vector<MultiplyVar<T1> > mult_vars(vec.size());
-	for(unsigned int i = 0; i < vec.size(); ++i)
-	  mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
-	return GreaterEqualSumCon(stateObj, mult_vars, t2);
+    light_vector<MultiplyVar<T1> > mult_vars(vec.size());
+    for(unsigned int i = 0; i < vec.size(); ++i)
+      mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
+    return GreaterEqualSumCon(stateObj, mult_vars, t2);
   }
 }
 
