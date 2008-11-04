@@ -138,6 +138,11 @@ endif()
 #	message(STATUS "Compiler does not support C++0x")
 #endif()
 
+check_cxx_compiler_flag("-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter" CheckWarnings)
+if(CheckWarnings)
+	add_definitions("-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter")
+endif()
+
 check_include_file_cxx("tr1/unordered_map" TR1-MAP)
 check_include_file_cxx("tr1/unordered_set" TR1-SET)
 if(TR1-MAP AND TR1-SET)
