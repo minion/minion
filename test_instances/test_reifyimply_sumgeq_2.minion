@@ -1,0 +1,13 @@
+#TEST COLCOUNT 16
+
+MINION 3
+
+**VARIABLES**
+
+BOOL a[5]
+
+**CONSTRAINTS**
+
+reify(sumgeq([a[0],a[1],a[2],a[3]], 1), a[4])
+
+**EOF**

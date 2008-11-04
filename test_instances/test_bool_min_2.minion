@@ -1,0 +1,14 @@
+#TEST SOLCOUNT 4
+MINION 3
+
+**VARIABLES**
+
+BOOL a
+BOOL b
+BOOL c
+
+**CONSTRAINTS**
+
+min([a, !b], c)
+
+**EOF**
