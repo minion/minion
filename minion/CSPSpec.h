@@ -207,6 +207,8 @@ struct ConstraintBlob
       set<Var> newvars = it->get_all_vars();
       return_vars.insert(newvars.end(), newvars.begin());
     }
+    
+    return return_vars;
   }
 };
 
