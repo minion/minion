@@ -392,6 +392,7 @@ try {
   if(getOptions(stateObj).redump)
   {
     MinionInstancePrinter printer(instance);
+    printer.build_instance();
     cout << printer.getInstance();
     exit(0);
   }

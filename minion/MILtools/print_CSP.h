@@ -11,7 +11,7 @@ struct MinionInstancePrinter
   CSPInstance& csp;
   
   MinionInstancePrinter(CSPInstance& _csp) : csp(_csp)
-    { begin_print_instance(); }
+    { }
     
   string getInstance()
   { return oss.str(); }
@@ -289,11 +289,11 @@ void print_search_info( )
   
 }
 
-void begin_print_instance()
-{ begin_print_instance(csp.constraints, csp.vars.get_all_vars()); }
+void build_instance()
+{ build_instance(csp.constraints, csp.vars.get_all_vars()); }
 
 
-void begin_print_instance(const vector<Var>& varlist_vec)
+void build_instance(const vector<Var>& varlist_vec)
 {
   list<ConstraintBlob> new_constraint_list;
   
@@ -307,9 +307,10 @@ void begin_print_instance(const vector<Var>& varlist_vec)
       new_constraint_list.push_back(*it);
   }
   
+  
 }
 
-void begin_print_instance(const list<ConstraintBlob>& constraints, 
+void build_instance(const list<ConstraintBlob>& constraints, 
                           const vector<Var>& varlist)
 {
   oss << "MINION 3" << endl;
