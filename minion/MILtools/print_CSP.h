@@ -307,7 +307,7 @@ void build_instance(const vector<Var>& varlist_vec)
       new_constraint_list.push_back(*it);
   }
   
-  
+  build_instance( new_constraint_list, varlist_vec);
 }
 
 void build_instance(const list<ConstraintBlob>& constraints, 
