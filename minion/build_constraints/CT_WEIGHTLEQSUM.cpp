@@ -7,6 +7,6 @@
    $Id$
 */
 
-#include "../constraints/constraint_weightedboolsum.h"
+#include "../constraints/sum_constraints/constraint_weightedboolsum.h"
 BUILD_STATIC_CT(CT_WEIGHTLEQSUM, 2)
 

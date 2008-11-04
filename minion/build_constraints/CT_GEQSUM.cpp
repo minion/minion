@@ -7,6 +7,6 @@
    $Id$
 */
 
-#include "../constraints/constraint_fullsum.h"
+#include "../constraints/sum_constraints/constraint_fullsum.h"
 BUILD_STATIC_CT(CT_GEQSUM, 2)
 
