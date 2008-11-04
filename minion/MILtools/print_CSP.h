@@ -292,6 +292,23 @@ void print_search_info( )
 void begin_print_instance()
 { begin_print_instance(csp.constraints, csp.vars.get_all_vars()); }
 
+
+void begin_print_instance(const vector<Var>& varlist_vec)
+{
+  list<ConstraintBlob> new_constraint_list;
+  
+  set<Var> varlist(varlist_vec.begin(), varlist_vec.end());
+  
+  //set<Var> list_of_vars
+  for(list<ConstraintBlob>::iterator it = csp.constraints.begin(); it != csp.constraints.end(); ++it)
+  {
+    set<Var> vars = it->get_all_vars();
+    if(includes(varlist.begin(), varlist.end(), vars.begin(), vars.end()))
+      new_constraint_list.push_back(*it);
+  }
+  
+}
+
 void begin_print_instance(const list<ConstraintBlob>& constraints, 
                           const vector<Var>& varlist)
 {
