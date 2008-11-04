@@ -185,12 +185,12 @@ struct ConstraintBlob
   bool is_dynamic()
   { return constraint->trig_type == DYNAMIC_CT; }
   
-  set<Var> get_all_vars()
+  set<Var> get_all_vars() const
   {
     set<Var> return_vars;
-    for(vector<vector<Var> >::iterator it = vars.begin(); it != vars.end(); ++it)
+    for(vector<vector<Var> >::const_iterator it = vars.begin(); it != vars.end(); ++it)
     {
-      for(vector<Var>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2)
+      for(vector<Var>::const_iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2)
       {
         if(it2->type() != VAR_CONSTANT)
         {
@@ -202,7 +202,7 @@ struct ConstraintBlob
       }
     }
     
-    for(vector<ConstraintBlob>::iterator it = internal_constraints.begin(); it != internal_constraints.end(); ++it)
+    for(vector<ConstraintBlob>::const_iterator it = internal_constraints.begin(); it != internal_constraints.end(); ++it)
     {
       set<Var> newvars = it->get_all_vars();
       return_vars.insert(newvars.end(), newvars.begin());
