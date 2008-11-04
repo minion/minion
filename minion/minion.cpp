@@ -43,9 +43,9 @@
 
 #include "system/defined_macros.h"
 
-#include "print_CSP.h"
+#include "MILtools/print_CSP.h"
 
-#include "sym_output.h"
+#include "MILtools/sym_output.h"
 
 /** @help switches Description 
 Minion supports a number of switches to augment default behaviour.  To
