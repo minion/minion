@@ -65,7 +65,7 @@ help constraints sumgeq
 #ifndef CONSTRAINT_WEIGHTSUM_H
 #define CONSTRAINT_WEIGHTSUM_H
 
-#include "constraint_fullsum.h"
+#include "constraint_sum.h"
  
 template<typename T1, typename T2>
 AbstractConstraint*
