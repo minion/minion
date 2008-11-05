@@ -238,9 +238,11 @@ void print_tuples( )
   }
 }
 
-void print_search_info( )
+void print_search_info(const vector<Var>& var_vec )
 {
-  if(csp.is_optimisation_problem)
+  set<Var> vars(var_vec.begin(), var_vec.end());
+  
+  if(csp.is_optimisation_problem && vars.count(csp.optimise_variable))
   {
     if(csp.optimise_minimising)
       oss << "MINIMISING ";
@@ -252,19 +254,36 @@ void print_search_info( )
   
   for(int i = 0; i < csp.search_order.size(); ++i)
   {
-    if(!csp.search_order[i].var_order.empty())
+    // Filter the var and val orders.
+    
+    vector<Var> var_order = csp.search_order[i].var_order;
+    vector<char> val_order = csp.search_order[i].val_order;
+    
+    int pos = 0;
+    while(pos < var_order.size())
+    {
+      if(vars.count(var_order[pos]) == 0)
+      {
+        var_order.erase(var_order.begin() + pos);
+        val_order.erase(val_order.begin() + pos);
+      }
+      else
+        pos++;
+    }
+    
+    if(!var_order.empty())
     {
       oss << "VARORDER ";
-      print_instance( csp.search_order[i].var_order);
+      print_instance(var_order);
       oss << endl;
     }
   
-    if(!csp.search_order[i].val_order.empty())
+    if(!val_order.empty())
     {
       oss << "VALORDER ";
       vector<string> output_vars;
-      for(int j = 0; j < csp.search_order[i].val_order.size(); ++j)
-        output_vars.push_back(csp.search_order[i].val_order[j] ? "a" : "d");
+      for(int j = 0; j < val_order.size(); ++j)
+        output_vars.push_back(val_order[j] ? "a" : "d");
       print_instance( output_vars);
       oss << endl;
     }
@@ -282,8 +301,19 @@ void print_search_info( )
   }
   else
   {
+    vector<vector<Var> > new_print_matrix;
+    for(int i = 0; i < csp.print_matrix.size(); ++i)
+    {
+      new_print_matrix.push_back(vector<Var>());
+      for(int j = 0; j < csp.print_matrix[i].size(); ++j)
+      {
+        if(vars.count(csp.print_matrix[i][j]))
+          new_print_matrix[i].push_back(csp.print_matrix[i][j]);
+      }
+    }
+    
     oss << "PRINT";
-    print_instance(csp.print_matrix);
+    print_instance(new_print_matrix);
     oss << endl;
   }
   
@@ -321,7 +351,7 @@ void build_instance(const list<ConstraintBlob>& constraints,
   print_instance(csp.vars, varlist);
   
   oss << "**SEARCH**" << endl;
-  print_search_info();
+  print_search_info(varlist);
   
   oss << "**TUPLELIST**" << endl;
   print_tuples();
