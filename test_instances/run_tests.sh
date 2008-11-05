@@ -70,7 +70,7 @@ for i in *.minion; do
       fi
     else
       echo Test $i is not well-formed.
-      exit 0
+      exit 1
     fi  
   fi
   
