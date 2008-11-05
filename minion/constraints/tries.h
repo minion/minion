@@ -93,34 +93,30 @@ struct TupleTrie
   
   
   TupleTrie(int _significantIndex, TupleList* tuplelist) :
-	arity(tuplelist->tuple_size()), sigIndex(_significantIndex)
+  arity(tuplelist->tuple_size()), sigIndex(_significantIndex)
   {
-	  // TODO : Fix this hard limit.
-	  D_ASSERT(arity < 100);
-	  trie_data=NULL;
-	  tuples_vector.resize(tuplelist->size());
-	  
-	  // Need a copy so we can sort it and such things.
-	  for(int i = 0; i < tuplelist->size(); ++i)
-		tuples_vector[i] = tuplelist->get_vector(i);
-	  
-	  std::stable_sort(tuples_vector.begin(), tuples_vector.end(), TupleComparator(sigIndex, arity));
-      if(tuplelist->size()>0)
-      {
-          build_trie(0, tuplelist->size());
-          build_final_trie();
-      }
-      else
-      {
-          cerr << "Warning: table constraint with empty table." << endl;
-      }
+    // TODO : Fix this hard limit.
+    D_ASSERT(arity < 100);
+    trie_data=NULL;
+    tuples_vector.resize(tuplelist->size());
+
+    // Need a copy so we can sort it and such things.
+    for(int i = 0; i < tuplelist->size(); ++i)
+      tuples_vector[i] = tuplelist->get_vector(i);
+
+    std::stable_sort(tuples_vector.begin(), tuples_vector.end(), TupleComparator(sigIndex, arity));
+    if(tuplelist->size()>0)
+    {
+      build_trie(0, tuplelist->size());
+      build_final_trie();
+    }
   }
   
   struct EarlyTrieObj
   {
-	int val;
-	int depth;
-	int offset_ptr;
+    int val;
+    int depth;
+    int offset_ptr;
   };
   
   vector<EarlyTrieObj> initial_trie;
