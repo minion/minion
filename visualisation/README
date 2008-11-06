@@ -9,19 +9,24 @@ Requiremenents
 ----------------------------------------
 
 Haskell (tested with GHC 6.8) with Parsec and the gtk2hs GTK bindings. HUnit if
-you want to run the unit tests.
+you want to run the unit tests. Cabal is recommended for the build.
 
 
 Use
 ----------------------------------------
 
-Compile or run Main.hs directly. The commandline parameter is the number of
-columns to display, the second one is the number of rows. The program expects to
-read the output of "minion -dumptree yourproblem.minion" on stdin. It parses the
-Minion output and puts each domain listed at a search node into a cell of the
-grid, starting in the top left cell and moving right, down. If there're more or
-fewer domains than there're cells, some domains won't be displayed or cells will
-be empty -- there'll be no warning or error message.
+To build, run
+runghc Setup.hs configure
+runghc Setup.hs build
+or compile it manually if you prefer.
+
+The commandline parameter is the number of columns to display, the second one is
+the number of rows. The program expects to read the output of "minion -dumptree
+yourproblem.minion" on stdin. It parses the Minion output and puts each domain
+listed at a search node into a cell of the grid, starting in the top left cell
+and moving right, down. If there're more or fewer domains than there're cells,
+some domains won't be displayed or cells will be empty -- there'll be no warning
+or error message.
 
 Run the "main" function in Test.hs to run the unit tests.
 
