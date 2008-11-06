@@ -29,7 +29,7 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
     if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp" ||
         extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
     {
-  #ifdef USE_BOOST
+#ifdef USE_BOOST_STREAMS
   
     ifstream file(filename, ios_base::in | ios_base::binary);
   

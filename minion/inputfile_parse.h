@@ -6,7 +6,7 @@
 #include "MinionInputReader.hpp"
 #include "MinionThreeInputReader.hpp"
 
-#ifdef USE_BOOST
+#ifdef USE_BOOST_STREAMS
 #include <fstream>
 #include <iostream>
 #include <boost/iostreams/filtering_streambuf.hpp>

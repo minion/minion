@@ -29,11 +29,6 @@
 #ifndef _MINION_SYSTEM_H
 #define _MINION_SYSTEM_H
 
-// Only GCC has hashtables
-#ifdef __GNUC__
-#define USE_EXT_HASH_MAP_AND_SET
-#endif
-
 // On linux systems, _longjmp and _setjmp are faster versions that ignore
 // system signals, which Minion doesn't use.
 #ifdef __GNUC__
@@ -93,30 +88,21 @@
 
 #include "cxx0x-helper.h"
 
+#ifdef USE_BOOST
+#include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
+
+#define MAP_TYPE boost::unordered_map
+#define SET_TYPE boost::unordered_set
+
+#else
+
 #ifdef USE_TR1_HASH_MAP_AND_SET
 #include <tr1/unordered_set>
 #include <tr1/unordered_map>
 
 #define MAP_TYPE std::tr1::unordered_map
 #define SET_TYPE std::tr1::unordered_set
-#else
-// Note: The hash table (unordered_map) is broken in many versions of g++,
-// so this can't be activated safely.
-#ifdef USE_EXT_HASH_MAP_AND_SET
-#include <ext/hash_map>
-namespace __gnu_cxx
-{
-template<typename T>
-    struct hash<T*>
-    {
-      size_t
-      operator()(T* __x) const
-      { return (size_t)__x; }
-    };
-}
-#define MAP_TYPE __gnu_cxx::hash_map
-#include <ext/hash_set>
-#define SET_TYPE __gnu_cxx::hash_set
 
 #else
 
@@ -140,13 +126,19 @@ using namespace std;
 
 #define BOOL bool
 
+#ifdef USE_BOOST
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+#else
+#include "linked_ptr.h"
+#endif
 
 #include "wrapper.h"
 #include "to_string.h"
 #include "local_array.h"
 #include "tableout.h"
 #include "time_keeping.h"
-#include "linked_ptr.h"
+
 #include "sys_constants.h"
 #include "debug.h"
 #include "array_functions.h"

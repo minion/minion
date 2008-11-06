@@ -129,10 +129,8 @@ public:
                           
   SearchState(StateObj* _stateObj) : stateObj(_stateObj), nodes(0), optimise_var(NULL), 
     current_optimise_position(0), optimise(false), constraints_to_propagate(1),
-    solutions(0),
-    dynamic_triggers_used(false), finished(false), failed(false), 
-    tupleListContainer(NULL), is_locked(false),
-    alarm_trigger(false), ctrl_c_pressed(false)
+    solutions(0), dynamic_triggers_used(false), finished(false), failed(false), 
+    is_locked(false), alarm_trigger(false), ctrl_c_pressed(false)
   {}
   
   // Must be defined later.
