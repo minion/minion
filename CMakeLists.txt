@@ -142,8 +142,10 @@ if(CheckWarnings)
 	add_definitions("-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter")
 endif()
 
-if(Boost_FOUND)
-	message(STATUS "Using Boost libraries")
+# slightly weird check to make sure that the boost TR1 libs are there
+check_include_file_cxx("boost/tr1/array.hpp" BOOST-TR1)
+if(Boost_FOUND AND BOOST-TR1)
+	message(STATUS "Using Boost TR1 libraries")
 	add_definitions(-DUSE_BOOST)
 else()
 	check_include_file_cxx("tr1/unordered_map" TR1-MAP)
