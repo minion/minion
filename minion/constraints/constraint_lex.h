@@ -106,15 +106,23 @@ struct LexLeqConstraint : public AbstractConstraint
     int x_size = x.size();
     for(int i=0; i < x_size; ++i)
     {
+#ifdef ASSIGNED
+      t.push_back(make_trigger(x[i], Trigger(this, i), Assigned));
+#else
       t.push_back(make_trigger(x[i], Trigger(this, i), LowerBound));
       t.push_back(make_trigger(x[i], Trigger(this, i), UpperBound));
+#endif
     }
     
     int y_size = y.size();
     for(int i=0; i < y_size; ++i)
     {
+#ifdef ASSIGNED
+      t.push_back(make_trigger(y[i], Trigger(this, i), Assigned));
+#else
       t.push_back(make_trigger(y[i], Trigger(this, i), LowerBound));
       t.push_back(make_trigger(y[i], Trigger(this, i), UpperBound));
+#endif
     }
     alpha = 0;
     if(Less)

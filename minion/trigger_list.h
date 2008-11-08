@@ -315,12 +315,9 @@ public:
   
   void add_trigger(int b, Trigger t, TrigType type)
   {
-	D_ASSERT(type != DomainRemoval)
-	D_ASSERT(lock_first && !lock_second);
-	//if(type != DomainRemoval)
-  	  triggers[type][b].push_back(t);
-	//else
-	//  triggers[type + val - vars_min_domain_val][b].push_back(t);
+    D_ASSERT(type != DomainRemoval);
+    D_ASSERT(lock_first && !lock_second);
+    triggers[type][b].push_back(t);
   }
   
 #ifdef DYNAMICTRIGGERS
