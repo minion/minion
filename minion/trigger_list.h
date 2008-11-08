@@ -142,8 +142,6 @@ public:
   {
 	D_ASSERT(lock_first && !lock_second);
 	lock_second = true;
-
-#ifndef SLOW_TRIGGERS
 	Trigger** trigger_ranges = (Trigger**)(mem_start);
 	trigger_data_m = trigger_ranges;
 	Trigger* trigger_data = (Trigger*)(mem_start + 4 * (triggers[UpperBound].size() + 1) * sizeof(Trigger*));
@@ -173,7 +171,6 @@ public:
 	  vector<vector<vector<Trigger> > > t; 
 	  triggers.swap(t);
 	}
-#endif
 	
 #ifdef DYNAMICTRIGGERS
 	DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr());
@@ -190,17 +187,10 @@ public:
   pair<Trigger*, Trigger*> get_trigger_range(int var_num, TrigType type)
   {
     Trigger** first_trig = trigger_data_m + var_num + (var_count_m + 1) * type;
-	Trigger* trig_range_start = *first_trig;
-	first_trig++;
-	Trigger* trig_range_end = *first_trig;
-	return pair<Trigger*,Trigger*>(trig_range_start, trig_range_end);
-  }
-  
-  void slow_trigger_push(int var_num, TrigType type, int delta)
-  {
-    if(!triggers[type][var_num].empty())
-      getQueue(stateObj).pushTriggers(TriggerRange(&triggers[type][var_num].front(),
-      (&triggers[type][var_num].front()) + triggers[type][var_num].size(), delta));
+    Trigger* trig_range_start = *first_trig;
+    first_trig++;
+    Trigger* trig_range_end = *first_trig;
+    return pair<Trigger*,Trigger*>(trig_range_start, trig_range_end);
   }
   
 #ifdef DYNAMICTRIGGERS
@@ -234,17 +224,13 @@ public:
 #ifdef DYNAMICTRIGGERS
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, UpperBound);
 #endif
-	D_ASSERT(lock_second);
+    D_ASSERT(lock_second);
     D_ASSERT(upper_delta > 0 || getState(stateObj).isFailed());
-	
-#ifdef SLOW_TRIGGERS
-	slow_trigger_push(var_num, UpperBound, upper_delta);
-#else
+
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
-	if (range.first != range.second)
-	  getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, 
-											 checked_cast<int>(upper_delta)));
-#endif	
+    if(range.first != range.second)
+      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, 
+                                                   checked_cast<int>(upper_delta)));
   }
   
   void push_lower(int var_num, DomainInt lower_delta)
@@ -252,16 +238,12 @@ public:
 #ifdef DYNAMICTRIGGERS
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, LowerBound);
 #endif
-	D_ASSERT(lock_second);
-	D_ASSERT(lower_delta > 0 || getState(stateObj).isFailed());
-#ifdef SLOW_TRIGGERS
-	slow_trigger_push(var_num, LowerBound, lower_delta);
-#else
-	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
-	if (range.first != range.second)
-	  getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, 
-											 checked_cast<int>(lower_delta)));
-#endif
+    D_ASSERT(lock_second);
+    D_ASSERT(lower_delta > 0 || getState(stateObj).isFailed());
+    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
+    if(range.first != range.second)
+      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, 
+                                                   checked_cast<int>(lower_delta)));
   }
   
   
@@ -271,14 +253,9 @@ public:
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, Assigned);
 #endif
     D_ASSERT(lock_second);
-
-#ifdef SLOW_TRIGGERS
-	slow_trigger_push(var_num, Assigned, -1);
-#else	
-	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
-	if (range.first != range.second)
-	  getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1));
-#endif
+    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
+    if(range.first != range.second)
+      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1));
   }
   
   void push_domain(int var_num)
@@ -286,31 +263,27 @@ public:
 #ifdef DYNAMICTRIGGERS
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);
 #endif
-	
-#ifdef SLOW_TRIGGERS
-	slow_trigger_push(var_num, DomainChanged, -1);
-#else
-	D_ASSERT(lock_second);
-	pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
-	if (range.first != range.second)	  
-	  getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1)); 
-#endif
+
+    D_ASSERT(lock_second);
+    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
+    if (range.first != range.second)	  
+      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1)); 
   }
   
   void push_domain_removal(int var_num, DomainInt val_removed)
   { 
-	D_ASSERT(!only_bounds);
+    D_ASSERT(!only_bounds);
 #ifdef DYNAMICTRIGGERS
     dynamic_propagate(var_num, DomainRemoval, val_removed);
 #endif
-	D_ASSERT(lock_second);
+    D_ASSERT(lock_second);
   }
   
   void add_domain_trigger(int b, Trigger t)
   { 
-	D_ASSERT(!only_bounds);
-	D_ASSERT(lock_first && !lock_second); 
-	triggers[DomainChanged][b].push_back(t); 
+    D_ASSERT(!only_bounds);
+    D_ASSERT(lock_first && !lock_second); 
+    triggers[DomainChanged][b].push_back(t); 
   }
   
   void add_trigger(int b, Trigger t, TrigType type)
@@ -324,31 +297,31 @@ public:
   void addDynamicTrigger(int b, DynamicTrigger* t, TrigType type, DomainInt val)
   {
     D_INFO(1, DI_QUEUE, "Adding Dynamic Trigger");
-	D_ASSERT(lock_second);
-	D_ASSERT(!only_bounds || type != DomainRemoval);
-	D_ASSERT(t->constraint != NULL);
-	D_ASSERT(t->sanity_check == 1234);
-	// This variable is only use in debug mode, and will be optimised away at any optimisation level.
-	DynamicTrigger* old_list;
-	old_list = t->next;
-	DynamicTrigger* queue;
-	if(type != DomainRemoval)
-	{
-	  queue = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
-			  + b + type*var_count_m;
-	}
-	else
-	{
-	  D_ASSERT(!only_bounds);
-	  D_ASSERT(vars_min_domain_val <= val);
-	  D_ASSERT(vars_max_domain_val >= val);
-	  queue = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
-			  + checked_cast<int>(b + (DomainRemoval + (val - vars_min_domain_val)) * var_count_m);
-	}
-	D_ASSERT(queue->sanity_check_list());
-    
-	t->add_after(queue, getQueue(stateObj).getNextQueuePtrRef());
-	D_ASSERT(old_list == NULL || old_list->sanity_check_list(false));
+    D_ASSERT(lock_second);
+    D_ASSERT(!only_bounds || type != DomainRemoval);
+    D_ASSERT(t->constraint != NULL);
+    D_ASSERT(t->sanity_check == 1234);
+  // This variable is only use in debug mode, and will be optimised away at any optimisation level.
+    DynamicTrigger* old_list;
+    old_list = t->next;
+    DynamicTrigger* queue;
+    if(type != DomainRemoval)
+    {
+      queue = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
+        + b + type*var_count_m;
+    }
+    else
+    {
+      D_ASSERT(!only_bounds);
+      D_ASSERT(vars_min_domain_val <= val);
+      D_ASSERT(vars_max_domain_val >= val);
+      queue = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
+        + checked_cast<int>(b + (DomainRemoval + (val - vars_min_domain_val)) * var_count_m);
+    }
+    D_ASSERT(queue->sanity_check_list());
+
+    t->add_after(queue, getQueue(stateObj).getNextQueuePtrRef());
+    D_ASSERT(old_list == NULL || old_list->sanity_check_list(false));
   }
 #endif
   
