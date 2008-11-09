@@ -168,6 +168,12 @@ public:
   unsigned int incWdeg();
 #endif
 
+  // Weights the constraint for ordering in trigger lists (bigger is later)
+  virtual int getTrigWeight()
+  {
+    return get_vars_singleton()->size();
+  }
+  
   /// Allows functions to activate a special kind of trigger, run only
   /// after the normal queue is empty.
   virtual void special_check()

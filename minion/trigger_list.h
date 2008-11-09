@@ -138,49 +138,66 @@ public:
 	return storage * sizeof(Trigger) + 4 * (var_count_m + 1) * sizeof(Trigger*);
   }
   
+  struct CompareMem
+  {
+    bool operator()(const Trigger& t1, const Trigger& t2)
+      { return t1.constraint->getTrigWeight() < t2.constraint->getTrigWeight(); }
+  };
+
   void allocateMem(char* mem_start)
   {
-	D_ASSERT(lock_first && !lock_second);
-	lock_second = true;
-	Trigger** trigger_ranges = (Trigger**)(mem_start);
-	trigger_data_m = trigger_ranges;
-	Trigger* trigger_data = (Trigger*)(mem_start + 4 * (triggers[UpperBound].size() + 1) * sizeof(Trigger*));
-	
-	for(unsigned int type = 0; type < 4; ++type)
-	{
-	  for(unsigned int i = 0; i < triggers[type].size(); ++i)
-	  {
-		*trigger_ranges = trigger_data;
-		++trigger_ranges;
-		for(unsigned int j = 0; j < triggers[type][i].size(); ++j)
-		{
-		  *trigger_data = triggers[type][i][j];
-		  trigger_data++;
-		}
-	  }
-	  *trigger_ranges = trigger_data;
-	  ++trigger_ranges;
-	}
-	
-	D_ASSERT(static_cast<void*>(mem_start + 4 * (var_count_m + 1) * sizeof(Trigger*)) ==
-			 static_cast<void*>(trigger_ranges));
-	
+#ifdef SORT_TRIGGERRANGES
+    // We can sort triggers if you like here!
+    for(unsigned type = 0; type < 4; ++type)
+    {
+      for(unsigned i = 0; i < triggers[type].size(); ++i)
+      {
+        std::sort(triggers[type][i].begin(), triggers[type][i].end(), CompareMem());
+      }
+    }
+#endif
 
-	// This is a common C++ trick to completely free the memory of an object.
-	{ 
-	  vector<vector<vector<Trigger> > > t; 
-	  triggers.swap(t);
-	}
-	
+    D_ASSERT(lock_first && !lock_second);
+    lock_second = true;
+    Trigger** trigger_ranges = (Trigger**)(mem_start);
+    trigger_data_m = trigger_ranges;
+    Trigger* trigger_data = (Trigger*)(mem_start + 4 * (triggers[UpperBound].size() + 1) * sizeof(Trigger*));
+
+    for(unsigned int type = 0; type < 4; ++type)
+    {
+      for(unsigned int i = 0; i < triggers[type].size(); ++i)
+      {
+        *trigger_ranges = trigger_data;
+        ++trigger_ranges;
+        for(unsigned int j = 0; j < triggers[type][i].size(); ++j)
+        {
+          *trigger_data = triggers[type][i][j];
+          trigger_data++;
+        }
+      }
+      *trigger_ranges = trigger_data;
+      ++trigger_ranges;
+    }
+
+    D_ASSERT(static_cast<void*>(mem_start + 4 * (var_count_m + 1) * sizeof(Trigger*)) ==
+      static_cast<void*>(trigger_ranges));
+
+
+  // This is a common C++ trick to completely free the memory of an object.
+    { 
+      vector<vector<vector<Trigger> > > t; 
+      triggers.swap(t);
+    }
+
 #ifdef DYNAMICTRIGGERS
-	DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr());
-	
-	int trigger_types = ( only_bounds ? 4 : (4 + vars_domain_size));
-	for(unsigned i = 0; i < var_count_m * trigger_types; ++i)
-	{
-	  new (trigger_ptr + i) DynamicTrigger;
-	  D_ASSERT((trigger_ptr + i)->sanity_check_list());
-	}
+    DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr());
+
+    int trigger_types = ( only_bounds ? 4 : (4 + vars_domain_size));
+    for(unsigned i = 0; i < var_count_m * trigger_types; ++i)
+    {
+      new (trigger_ptr + i) DynamicTrigger;
+      D_ASSERT((trigger_ptr + i)->sanity_check_list());
+    }
 #endif
   }
   
