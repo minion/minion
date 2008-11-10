@@ -31,12 +31,20 @@
 #include "../get_info/get_info.h"
 #include "../constraints/triggers.h"
 #include "../constraints/constraint_abstract.h"
+
+#ifdef WEIGHTED_TRIGGERS
+#include <queue>
+#endif
   
 class Queues
 {
   StateObj* stateObj;
   
+#ifdef WEIGHTED_TRIGGERS
+  priority_queue<TriggerRange> propagate_trigger_list;
+#else
   vector<TriggerRange> propagate_trigger_list;
+#endif
   vector<DynamicTrigger*> dynamic_trigger_list;
   
   // Special triggers are those which can only be run while the
@@ -68,7 +76,11 @@ public:
 	CON_INFO_ADDONE(AddConToQueue);
     D_INFO(1, DI_QUEUE, string("Adding new triggers. Trigger list size is ") + 
 		   to_string(propagate_trigger_list.size()) + ".");
+#ifdef WEIGHTED_TRIGGERS
+	propagate_trigger_list.push(new_triggers); 
+#else
 	propagate_trigger_list.push_back(new_triggers); 
+#endif
   }
   
 #ifdef DYNAMICTRIGGERS
@@ -83,7 +95,13 @@ public:
   
   void clearQueues()
   {
+#ifdef WEIGHTED_TRIGGERS
+    while(!propagate_trigger_list.empty()) {
+      propagate_trigger_list.pop();
+    }
+#else
 	propagate_trigger_list.clear();
+#endif
 	dynamic_trigger_list.clear();
 	
 	if(!special_triggers.empty())
@@ -151,9 +169,15 @@ public:
 	bool* fail_ptr = getState(stateObj).getFailedPtr();
 	while(!propagate_trigger_list.empty())
 	{
+#ifdef WEIGHTED_TRIGGERS
+	  TriggerRange t = propagate_trigger_list.top();
+	  int data_val = t.data;
+	  propagate_trigger_list.pop();
+#else
 	  TriggerRange t = propagate_trigger_list.back();
 	  int data_val = t.data;
 	  propagate_trigger_list.pop_back();
+#endif
 	  
 	  for(Trigger* it = t.begin(); it != t.end(); it++)
 	  {
@@ -291,9 +315,15 @@ public:
 	bool* fail_ptr = getState(stateObj).getFailedPtr();
 	while(!propagate_trigger_list.empty())
 	{
+#ifdef WEIGHTED_TRIGGERS
+	  TriggerRange t = propagate_trigger_list.top();
+	  int data_val = t.data;
+	  propagate_trigger_list.pop();
+#else
 	  TriggerRange t = propagate_trigger_list.back();
 	  int data_val = t.data;
 	  propagate_trigger_list.pop_back();
+#endif
 	  
 	  for(Trigger* it = t.begin(); it != t.end(); it++)
 	  {

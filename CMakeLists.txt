@@ -196,9 +196,16 @@ endif()
 
 option(WDEG "" OFF)
 if(WDEG)
-	message(STATUS "Enable wdeg heuristics")
+	message(STATUS "Enabling wdeg heuristics")
 	set(BINARY "${BINARY}-wdeg")
 	set(CFLAGS "${CFLAGS} -DWDEG")
+endif()
+
+option(WTRIG "" OFF)
+if(WTRIG)
+	message(STATUS "Enabling weighted triggers")
+	set(BINARY "${BINARY}-wtrig")
+	set(CFLAGS "${CFLAGS} -DWEIGHTED_TRIGGERS")
 endif()
 
 option(INFO "" OFF)
