@@ -17,7 +17,7 @@
 #define INCREMENTALMATCH
 
 #define SCCCARDS
-#define STRONGCARDS
+//#define STRONGCARDS
 
 //Incremental graph -- maintains adjacency lists for values
 #define INCGRAPH
@@ -113,21 +113,31 @@ struct GCC : public AbstractConstraint
         //fifo.reserve(numvars+numvals);
         
         #ifdef INCGRAPH
-            adjlistval.resize(numvals);
-            for(int i=0; i<numvals; i++)
+            adjlist.resize(numvars+numvals);
+            for(int i=0; i<numvars; i++)
             {
-                adjlistval[i].resize(numvars);
-                for(int j=0; j<numvars; j++) adjlistval[i][j]=j;
+                adjlist[i].resize(numvals);
+                for(int j=0; j<numvals; j++) adjlist[i][j]=j-dom_min;
             }
-            adjlistvalpos.resize(numvals);
-            for(int i=0; i<numvals; i++)
+            for(int i=numvars; i<numvars+numvals; i++)
             {
-                adjlistvalpos[i].resize(numvars);
-                for(int j=0; j<numvars; j++) adjlistvalpos[i][j]=j;
+                adjlist[i].resize(numvars);
+                for(int j=0; j<numvars; j++) adjlist[i][j]=j;
             }
-            
-            adjlistvallength=getMemory(stateObj).backTrack().requestArray<short>(numvals);
-            for(int i=0; i<numvals; i++) adjlistvallength[i]=numvars;
+            adjlistpos.resize(numvars+numvals);
+            for(int i=0; i<numvars; i++)
+            {
+                adjlistpos[i].resize(numvals);
+                for(int j=0; j<numvals; j++) adjlistpos[i][j]=j;
+            }
+            for(int i=numvars; i<numvars+numvals; i++)
+            {
+                adjlistpos[i].resize(numvars);
+                for(int j=0; j<numvars; j++) adjlistpos[i][j]=j;
+            }
+            adjlistlength=getMemory(stateObj).backTrack().requestArray<short>(numvars+numvals);
+            for(int i=0; i<numvars; i++) adjlistlength[i]=numvals;
+            for(int i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
         #endif
     }
     
@@ -137,9 +147,9 @@ struct GCC : public AbstractConstraint
     int dom_min, dom_max, numvars, numvals;
     
     #ifdef INCGRAPH
-    vector<vector<int> > adjlistval;
-    MoveableArray<short> adjlistvallength;
-    vector<vector<int> > adjlistvalpos;   // position of a variable in adjlistval.
+    vector<vector<int> > adjlist;
+    MoveableArray<short> adjlistlength;
+    vector<vector<int> > adjlistpos;   // position of a variable in adjlist.
     #endif
     
     int count_values()
@@ -186,9 +196,9 @@ struct GCC : public AbstractConstraint
             DynamicTrigger* dt=dynamic_trigger_start();
             for(int i=dom_min; i<=dom_max; i++)
             {
-                for(int j=0; j<adjlistvallength[i-dom_min]; j++)
+                for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
                 {
-                    if(!var_array[adjlistval[i-dom_min][j]].inDomain(i))
+                    if(!var_array[adjlist[i-dom_min+numvars][j]].inDomain(i))
                     {
                         // swap with the last element and remove
                         adjlist_remove(i-dom_min, j);
@@ -198,7 +208,7 @@ struct GCC : public AbstractConstraint
                     }
                     else
                     {
-                        int var=adjlistval[i-dom_min][j];
+                        int var=adjlist[i-dom_min+numvars][j];
                         // arranged in blocks for each variable, with numvals triggers in each block
                         DynamicTrigger* mydt= dt+(var*numvals)+(i-dom_min);
                         var_array[var].addDynamicTrigger(mydt, DomainRemoval, i);
@@ -215,19 +225,31 @@ struct GCC : public AbstractConstraint
         #endif
     }
     
-    inline void adjlist_remove(int validx, int varidx)
+    #ifdef INCGRAPH
+    inline void adjlist_remove(int var, int val)
     {
         // swap item at position varidx to the end, then reduce the length by 1.
-        D_ASSERT(varidx<adjlistvallength[validx]);  // var is actually in the list.
-        int t=adjlistval[validx][adjlistvallength[validx]-1];
-        adjlistval[validx][adjlistvallength[validx]-1]=adjlistval[validx][varidx];
-        adjlistvalpos[validx][adjlistval[validx][varidx]]=adjlistvallength[validx]-1;
+        int validx=val-dom_min+numvars;
+        int varidx=adjlistpos[validx][var];
+        D_ASSERT(varidx<adjlistlength[validx]);  // var is actually in the list.
+        delfromlist(validx, varidx);
         
-        adjlistval[validx][varidx]=t;
-        adjlistvalpos[validx][t]=varidx;
-        
-        adjlistvallength[validx]=adjlistvallength[validx]-1;
+        delfromlist(var, adjlistpos[var][val-dom_min]);
     }
+    
+    inline void delfromlist(int i, int j)
+    {
+        // delete item in list i at position j
+        int t=adjlist[i][adjlistlength[i]-1];
+        adjlist[i][adjlistlength[i]-1]=adjlist[i][j];
+        adjlistpos[i][adjlist[i][j]]=adjlistlength[i]-1;
+        
+        adjlist[i][j]=t;
+        adjlistpos[i][t]=j;
+        
+        adjlistlength[i]=adjlistlength[i]-1;
+    }
+    #endif
     
     #ifdef INCGRAPH
     // convert constraint into dynamic. 
@@ -267,9 +289,9 @@ struct GCC : public AbstractConstraint
         int diff=trig-dtstart;
         int var=diff/numvals;
         int validx=diff%numvals;
-        if(adjlistvalpos[validx][var]<adjlistvallength[validx])
+        if(adjlistpos[validx+numvars][var]<adjlistlength[validx+numvars])
         {
-            adjlist_remove(validx, adjlistvalpos[validx][var]);
+            adjlist_remove(var, validx+dom_min); //validx, adjlistpos[validx][var]);
             // trigger the constraint here
             #ifdef ONECALL
             if(!to_process.in(var))
@@ -296,7 +318,7 @@ struct GCC : public AbstractConstraint
     }
     #endif
     
-    virtual void special_unlock() { constraint_locked = false;  } // to_process.clear();
+    virtual void special_unlock() { constraint_locked = false;  } // to_process.clear(); why commented out?
   virtual void special_check()
   {
     constraint_locked = false;  // should be above the if.
@@ -513,10 +535,12 @@ struct GCC : public AbstractConstraint
                 int sccval=SCCs[j];
                 if(sccval<numvars)
                 {
+                    D_ASSERT(sccval>=0);
                     vars_in_scc.push_back(sccval);
                 }
                 else
                 {
+                    D_ASSERT(sccval<numvars+numvals);
                     vals_in_scc.push_back(sccval-numvars+dom_min);
                 }
                 
@@ -556,9 +580,11 @@ struct GCC : public AbstractConstraint
             
             #if defined(SCCCARDS) && defined(STRONGCARDS)
                 // Propagate to capacity variables for all values in vals_in_scc
-                for(int validx=0; validx<vals_in_scc.size(); validx++)
+                for(int valinscc=0; valinscc<vals_in_scc.size(); valinscc++)
                 {
-                    prop_capacity_strong_scc(vals_in_scc[validx]);
+                    int v=vals_in_scc[valinscc];
+                    if(val_to_cap_index[v-dom_min]!=-1)
+                        prop_capacity_strong_scc(v);
                 }
             #endif
             
@@ -668,9 +694,7 @@ struct GCC : public AbstractConstraint
             while(usage[startvalindex]<lower[startvalindex])
             {
                 // usage of val needs to increase. Construct an augmenting path starting at val.
-                int startval=startvalindex+dom_min;
-                
-                GCCPRINT("Searching for augmenting path for val: " << startval);
+                GCCPRINT("Searching for augmenting path for val: " << startvalindex+dom_min);
                 // Matching edge lost; BFS search for augmenting path to fix it.
                 fifo.clear();  // this should be constant time but probably is not.
                 fifo.push_back(startvalindex+numvars);
@@ -716,14 +740,16 @@ struct GCC : public AbstractConstraint
                         {
                             int vartoqueue=vars_in_scc[vartoqueuescc];
                         #else
-                        for(int vartoqueuei=0; vartoqueuei<adjlistvallength[stackval-dom_min]; vartoqueuei++)
+                        for(int vartoqueuei=0; vartoqueuei<adjlistlength[stackval-dom_min+numvars]; vartoqueuei++)
                         {
-                            int vartoqueue=adjlistval[stackval-dom_min][vartoqueuei];
+                            int vartoqueue=adjlist[stackval-dom_min+numvars][vartoqueuei];
                         #endif
                             // For each variable, check if it terminates an odd alternating path
                             // and also queue it if it is suitable.
                             if(!visited.in(vartoqueue)
-                            //    && var_array[vartoqueue].inDomain(stackval) 
+                                #ifndef INCGRAPH
+                                && var_array[vartoqueue].inDomain(stackval)
+                                #endif
                                 && varvalmatching[vartoqueue]!=stackval)   // Need to exclude the matching edges????
                             {
                                 // there is an edge from stackval to vartoqueue.
@@ -787,13 +813,21 @@ struct GCC : public AbstractConstraint
                     if(curnode<numvars)
                     { // it's a variable
                         // follow all edges other than the matching edge. 
+                        #ifndef INCGRAPH
                         for(int valtoqueue=var_array[curnode].getMin(); valtoqueue<=var_array[curnode].getMax(); valtoqueue++)
                         {
+                        #else
+                        for(int valtoqueuei=0; valtoqueuei<adjlistlength[curnode]; valtoqueuei++)
+                        {
+                            int valtoqueue=adjlist[curnode][valtoqueuei];
+                        #endif
                             // For each value, check if it terminates an odd alternating path
                             // and also queue it if it is suitable.
                             int validx=valtoqueue-dom_min+numvars;
                             if(valtoqueue!=varvalmatching[curnode]
+                            #ifndef INCGRAPH
                                 && var_array[curnode].inDomain(valtoqueue)
+                            #endif
                                 && !visited.in(validx) )
                             {
                                 //D_ASSERT(find(vals_in_scc.begin(), vals_in_scc.end(), valtoqueue)!=vals_in_scc.end()); // the value is in the scc.
@@ -826,9 +860,9 @@ struct GCC : public AbstractConstraint
                         {
                             int vartoqueue=vars_in_scc[vartoqueuescc];
                         #else
-                        for(int vartoqueuei=0; vartoqueuei<adjlistvallength[stackval-dom_min]; vartoqueuei++)
+                        for(int vartoqueuei=0; vartoqueuei<adjlistlength[stackval-dom_min+numvars]; vartoqueuei++)
                         {
-                            int vartoqueue=adjlistval[stackval-dom_min][vartoqueuei];
+                            int vartoqueue=adjlist[stackval-dom_min+numvars][vartoqueuei];
                         #endif
                             // For each variable which is matched to stackval, queue it.
                             if(!visited.in(vartoqueue)
@@ -949,14 +983,16 @@ struct GCC : public AbstractConstraint
     {
         D_INFO(2, DI_SUMCON, "Setting up Constraint");
         triggerCollection t;
-        int array_size = var_array.size();
         int capacity_size=capacity_array.size();
+        
         #if !defined(INCGRAPH) || !defined(ONECALL)
+            int array_size = var_array.size();
             for(int i = 0; i < array_size; ++i)
             {
                 t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
             }
         #endif
+        
         for(int i=0; i< capacity_size; ++i)
         {
             if(val_array[i]>=dom_min && val_array[i]<=dom_max)
@@ -1216,13 +1252,15 @@ struct GCC : public AbstractConstraint
             {
                 int newnode=vars_in_scc[i];
             #else
-            for(int i=0; i<adjlistvallength[curnode-numvars]; i++)
+            for(int i=0; i<adjlistlength[curnode]; i++)
             {
-                int newnode=adjlistval[curnode-numvars][i];
+                int newnode=adjlist[curnode][i];
             #endif
                 if(varvalmatching[newnode]!=curnode-numvars+dom_min)   // if the value is not in the matching.
                 {
-                    //if(var_array[newnode].inDomain(curnode+dom_min-numvars)) commented out for adjlists
+                    #ifndef INCGRAPH
+                    if(var_array[newnode].inDomain(curnode+dom_min-numvars))
+                    #endif
                     {
                         //newnode=varvalmatching[newnode]-dom_min+numvars;  // Changed here for merge nodes
                         if(!visited.in(newnode))
@@ -1380,7 +1418,8 @@ struct GCC : public AbstractConstraint
                                             var_array[curvar].removeFromDomain(copynode+dom_min-numvars);
                                             #ifdef INCGRAPH
                                                 // swap with the last element and remove
-                                                adjlist_remove(copynode-numvars, adjlistvalpos[copynode-numvars][curvar]);
+                                                //adjlist_remove(copynode-numvars, adjlistpos[copynode-numvars][curvar]);
+                                                adjlist_remove(curvar, copynode-numvars+dom_min);
                                             #endif
                                         }
                                     }
@@ -1621,14 +1660,22 @@ struct GCC : public AbstractConstraint
                     if(curnode<numvars)
                     { // it's a variable
                         // follow all edges other than the matching edge. 
+                        #ifndef INCGRAPH
                         for(int valtoqueue=var_array[curnode].getMin(); valtoqueue<=var_array[curnode].getMax(); valtoqueue++)
                         {
+                        #else
+                        for(int valtoqueuei=0; valtoqueuei<adjlistlength[curnode]; valtoqueuei++)
+                        {
+                            int valtoqueue=adjlist[curnode][valtoqueuei];
+                        #endif
                             // For each value, check if it terminates an odd alternating path
                             // and also queue it if it is suitable.
                             int validx=valtoqueue-dom_min+numvars;
                             if(valtoqueue!=varvalmatching[curnode]
                                 && valtoqueue!=forbiddenval  // added for this method.
+                            #ifndef INCGRAPH
                                 && var_array[curnode].inDomain(valtoqueue)
+                            #endif
                                 && !visited.in(validx) )
                             {
                                 //D_ASSERT(find(vals_in_scc.begin(), vals_in_scc.end(), valtoqueue)!=vals_in_scc.end()); // the value is in the scc.
@@ -1658,9 +1705,9 @@ struct GCC : public AbstractConstraint
                         D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
                         int stackval=curnode+dom_min-numvars;
                         #ifdef INCGRAPH
-                        for(int vartoqueuei=0; vartoqueuei<adjlistvallength[stackval-dom_min]; vartoqueuei++)
+                        for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
                         {
-                            int vartoqueue=adjlistval[stackval-dom_min][vartoqueuei];
+                            int vartoqueue=adjlist[curnode][vartoqueuei];
                         #else
                         for(int vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
                         {
@@ -1792,14 +1839,16 @@ struct GCC : public AbstractConstraint
                     {
                         int vartoqueue=vars_in_scc[vartoqueuescc];
                     #else
-                    for(int vartoqueuei=0; vartoqueuei<adjlistvallength[stackval-dom_min]; vartoqueuei++)
+                    for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
                     {
-                        int vartoqueue=adjlistval[stackval-dom_min][vartoqueuei];
+                        int vartoqueue=adjlist[curnode][vartoqueuei];
                     #endif
                         // For each variable, check if it terminates an odd alternating path
                         // and also queue it if it is suitable.
                         if(!visited.in(vartoqueue)
-                        //    && var_array[vartoqueue].inDomain(stackval)  // commented out for adjlists 
+                            #ifndef INCGRAPH
+                            && var_array[vartoqueue].inDomain(stackval)
+                            #endif
                             && varvalmatching[vartoqueue]!=stackval)   // Need to exclude the matching edges????
                         {
                             // there is an edge from stackval to vartoqueue.
