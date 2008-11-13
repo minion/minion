@@ -211,7 +211,7 @@ struct PowConstraint : public AbstractConstraint
        {
          for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2)
          {
-           if(var2.inDomain(v2) && var3.inDomain(my_pow(v1, v2)))
+           if(var2.inDomain(v2) && var3.inDomain(my_pow(v1, v2)))  // implicit conversion here causes a warning -- perh use roundup or rounddown
            {
              assignment.push_back(make_pair(0, v1));
              assignment.push_back(make_pair(1, v2));

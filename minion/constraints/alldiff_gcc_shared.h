@@ -1,5 +1,5 @@
-#ifndef ALLDIFF_GAC_SHARED_H
-#define ALLDIFF_GAC_SHARED_H
+#ifndef ALLDIFF_GCC_SHARED_H
+#define ALLDIFF_GCC_SHARED_H
 
 struct smallset
 {
@@ -288,6 +288,58 @@ struct smallset_list_bt
         }
         cout<<"certificate:"<<cert<<endl;
         cout<<membership <<endl;
+    }
+};
+
+struct deque_fixed_size
+{
+    // replacement for stl deque. This one is a fixed size circular array.
+    // pluggable for deque in gcc_common.h
+    vector<int> list;
+    int head, tail;
+    
+    deque_fixed_size()
+    {
+        head=tail=0;
+    }
+    
+    void reserve(int size)
+    {
+        list.resize(size);
+    }
+    
+    inline void clear()
+    {
+        head=tail=0;
+    }
+    
+    inline bool empty()
+    {
+        return head==tail;
+    }
+    
+    inline void push_back(int val)
+    {
+        list[tail]=val;
+        if(++tail == list.size())
+        {
+            tail=0;
+        }
+    }
+    
+    inline int front()
+    {
+        D_ASSERT(head!=tail);
+        return list[head];
+    }
+    
+    inline void pop_front()
+    {
+        D_ASSERT(head!=tail);
+        if(++head == list.size())
+        {
+            head=0;
+        }
     }
 };
 

@@ -84,6 +84,9 @@ class node:
     
     def equal(self, node2):
         # Compare the internal state here with the state of node2
+        if not hasattr(node2, "domains"):
+            print "Node %d in tree 1 corresponds to solution in tree 2"%self.nodenum
+            return False
         if self.domains!=node2.domains:
             print "Domains not equal at node %d"%self.nodenum
             return False
@@ -544,6 +547,7 @@ class testwatchedalldiff(testalldiff):
 class testdiseq(testalldiff):
     def runtest(self, options=dict()):
         return runtestgeneral("diseq", True, options, [1,1], ["num", "num"], [1,1], self, not options['reify'])
+        # not gac when reified because of equal case.
 
 class testeq:
     # printtable essentially sets up pairsame constraint. negation of alldiff.
@@ -945,9 +949,9 @@ class testgcc:
         
     def runtest(self, options=dict()):
         if options['reifyimply'] or options['reify']:
-            return runtestgeneral("gcc", False, options, [4,4,4], ["verysmallnum","smallconst","smallnum"], [4,4,4], self, False)
+            return runtestgeneral("gcc", False, options, [4,4,4], ["verysmallnum","smallconst_distinct","smallnum"], [4,4,4], self, not options['reify'])
         else:
-            return runtestgeneral("gcc", False, options, [5,5,5], ["smallnum","smallconst", "num"], [5,5,5], self, False)
+            return runtestgeneral("gcc", False, options, [5,5,5], ["smallnum","smallconst_distinct", "num"], [5,5,5], self, True)
     
 ################################################################################
 # 
@@ -1029,7 +1033,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
     constnum=0   # number of the current constant
     
     for (num,typ) in zip(varnums3, vartypes3):
-        if typ=="const" or typ=="smallconst":
+        if typ=="const" or typ=="smallconst" or typ=="smallconst_distinct":
             if num>1:
                 # print vector of constants
                 constraint+="[%d"%constants[constnum]
@@ -1067,7 +1071,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
     
     varnums2=varnums[:]
     for (i,t) in zip(range(len(varnums)), vartypes):
-        if t in ["const", "smallconst"]:
+        if t in ["const", "smallconst", "smallconst_distinct"]:
             varnums2[i]=0   # constants, so don't count as vars.
     optvar=random.randint(0, sum(varnums2)-1)
     
@@ -1179,7 +1183,7 @@ def generatevariables(varblocks, types, boundallowed):
     domainlists=[]
     constants=[]
     typesinczero=["num", "smallnum", "quitesmallnum",  "nonnegnum", "boolean"]
-    typesconst=["const", "smallconst"]
+    typesconst=["const", "smallconst", "smallconst_distinct"]
     varblocks2=varblocks[:]
     for (i,t) in zip(range(len(varblocks)), types):
         if t in typesconst:
@@ -1244,6 +1248,12 @@ def generatevariables(varblocks, types, boundallowed):
                 ub=lb
             elif types[i]=="smallconst":
                 lb=random.randint(-5, 5)
+                ub=lb
+            elif types[i]=="smallconst_distinct":
+                assert varblocks[i]<=11
+                lb=random.randint(-5, 5)
+                while lb in constants:
+                    lb=random.randint(-5, 5)
                 ub=lb
             else:
                 assert False
