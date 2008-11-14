@@ -336,9 +336,9 @@ public:
   virtual void setup()
   {
     // Dynamic initialisation
-    int trigs = dynamic_trigger_count();
     int all_trigs = dynamic_trigger_count_with_children();
 
+    D_DATA(int trigs = dynamic_trigger_count());
     D_ASSERT(trigs >= 0);
     D_ASSERT(all_trigs >= trigs);
 
