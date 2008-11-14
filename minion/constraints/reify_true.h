@@ -99,7 +99,7 @@ template<typename BoolVar, bool DoWatchAssignment>
 
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_REIFY,"Setting up rarification");
+    D_INFO(2,DI_REIFY,"Setting up reification");
     triggerCollection triggers;
     triggers.push_back(make_trigger(rar_var, Trigger(this, -1), LowerBound));
     return triggers;

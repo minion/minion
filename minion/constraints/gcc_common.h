@@ -196,7 +196,6 @@ struct GCC : public AbstractConstraint
                     if(!var_array[adjlist[i-dom_min+numvars][j]].inDomain(i))
                     {
                         // swap with the last element and remove
-                        //adjlist_remove(i-dom_min, j);
                         adjlist_remove(adjlist[i-dom_min+numvars][j], i);
                         j--; // stay in the same place, dont' skip over the 
                         // value which was just swapped into the current position.
@@ -340,19 +339,12 @@ struct GCC : public AbstractConstraint
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {  
-      // borrow augpath for a second, to represent value occurrences
-      augpath.clear();
-      augpath.resize(numvals, 0);
       D_ASSERT(dom_max-dom_min+1 == numvals);
       // Check if the matching is OK.
       bool matchok=true;
       for(int i=0; i<numvars; i++)
       {
-          if(var_array[i].inDomain(varvalmatching[i]))
-          {
-              augpath[varvalmatching[i]-dom_min]++;
-          }
-          else
+          if(!var_array[i].inDomain(varvalmatching[i]))
           {
               matchok=false;
               break;
@@ -369,7 +361,7 @@ struct GCC : public AbstractConstraint
                   matchok=false;
                   break;
               }
-              if( val>=dom_min && val<=dom_max && !capacity_array[i].inDomain(augpath[val-dom_min]))
+              if( val>=dom_min && val<=dom_max && !capacity_array[i].inDomain(usage[val-dom_min]))
               {
                   matchok=false;
                   break;
@@ -394,19 +386,25 @@ struct GCC : public AbstractConstraint
             }
         }
         
-        matchok=bfsmatching_gcc();
+        #ifdef INCGRAPH
+            // update the adjacency lists.
+            DynamicTrigger* dt=dynamic_trigger_start();
+            for(int i=dom_min; i<=dom_max; i++)
+            {
+                for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
+                {
+                    if(!var_array[adjlist[i-dom_min+numvars][j]].inDomain(i))
+                    {
+                        // swap with the last element and remove
+                        adjlist_remove(adjlist[i-dom_min+numvars][j], i);
+                        j--; // stay in the same place, dont' skip over the 
+                        // value which was just swapped into the current position.
+                    }
+                }
+            }
+        #endif
         
-        if(matchok)
-        {
-            // count occurrences again.
-            augpath.clear();
-              augpath.resize(numvals, 0);
-              for(int i=0; i<numvars; i++)
-              {
-                  D_ASSERT(var_array[i].inDomain(varvalmatching[i]));
-                  augpath[varvalmatching[i]-dom_min]++;
-              }
-        }
+        matchok=bfsmatching_gcc();
       }
       
       if(!matchok)
@@ -428,7 +426,7 @@ struct GCC : public AbstractConstraint
               }
               else
               {
-                  occ=augpath[val_array[i]-dom_min];
+                  occ=usage[val_array[i]-dom_min];
               }
               
              if(capacity_array[i].inDomain(occ))
