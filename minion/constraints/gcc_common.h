@@ -17,7 +17,7 @@
 #define INCREMENTALMATCH
 
 #define SCCCARDS
-//#define STRONGCARDS
+#define STRONGCARDS
 
 //Incremental graph -- maintains adjacency lists for values
 #define INCGRAPH
@@ -113,25 +113,20 @@ struct GCC : public AbstractConstraint
         //fifo.reserve(numvars+numvals);
         
         #ifdef INCGRAPH
+            // refactor this to use initial upper and lower bounds.
             adjlist.resize(numvars+numvals);
-            for(int i=0; i<numvars; i++)
-            {
-                adjlist[i].resize(numvals);
-                for(int j=0; j<numvals; j++) adjlist[i][j]=j-dom_min;
-            }
-            for(int i=numvars; i<numvars+numvals; i++)
-            {
-                adjlist[i].resize(numvars);
-                for(int j=0; j<numvars; j++) adjlist[i][j]=j;
-            }
             adjlistpos.resize(numvars+numvals);
             for(int i=0; i<numvars; i++)
             {
+                adjlist[i].resize(numvals);
+                for(int j=0; j<numvals; j++) adjlist[i][j]=j+dom_min;
                 adjlistpos[i].resize(numvals);
                 for(int j=0; j<numvals; j++) adjlistpos[i][j]=j;
             }
             for(int i=numvars; i<numvars+numvals; i++)
             {
+                adjlist[i].resize(numvars);
+                for(int j=0; j<numvars; j++) adjlist[i][j]=j;
                 adjlistpos[i].resize(numvars);
                 for(int j=0; j<numvars; j++) adjlistpos[i][j]=j;
             }
@@ -201,8 +196,8 @@ struct GCC : public AbstractConstraint
                     if(!var_array[adjlist[i-dom_min+numvars][j]].inDomain(i))
                     {
                         // swap with the last element and remove
-                        adjlist_remove(i-dom_min, j);
-                        
+                        //adjlist_remove(i-dom_min, j);
+                        adjlist_remove(adjlist[i-dom_min+numvars][j], i);
                         j--; // stay in the same place, dont' skip over the 
                         // value which was just swapped into the current position.
                     }
@@ -242,11 +237,18 @@ struct GCC : public AbstractConstraint
         // delete item in list i at position j
         int t=adjlist[i][adjlistlength[i]-1];
         adjlist[i][adjlistlength[i]-1]=adjlist[i][j];
-        adjlistpos[i][adjlist[i][j]]=adjlistlength[i]-1;
         
+        if(i<numvars)
+        {
+            adjlistpos[i][adjlist[i][j]-dom_min]=adjlistlength[i]-1;
+            adjlistpos[i][t-dom_min]=j;
+        }
+        else
+        {
+            adjlistpos[i][adjlist[i][j]]=adjlistlength[i]-1;
+            adjlistpos[i][t]=j;
+        }
         adjlist[i][j]=t;
-        adjlistpos[i][t]=j;
-        
         adjlistlength[i]=adjlistlength[i]-1;
     }
     #endif
