@@ -388,7 +388,6 @@ struct GCC : public AbstractConstraint
         
         #ifdef INCGRAPH
             // update the adjacency lists.
-            DynamicTrigger* dt=dynamic_trigger_start();
             for(int i=dom_min; i<=dom_max; i++)
             {
                 for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
@@ -650,8 +649,8 @@ struct GCC : public AbstractConstraint
         // current sccs are contained in vars_in_scc and vals_in_scc
         
         // back up the matching to cover failure
-        matchbac=varvalmatching;
-        usagebac=usage;
+        //matchbac=varvalmatching;
+        //usagebac=usage;
         
         // clear out unmatched variables
         for(int scci=0; scci<vars_in_scc.size(); scci++)
@@ -777,8 +776,8 @@ struct GCC : public AbstractConstraint
                 {   // no augmenting path found
                     GCCPRINT("No augmenting path found.");
                     // restore the matching to its state before the algo was called.
-                    varvalmatching=matchbac;
-                    usage=usagebac;
+                    //varvalmatching=matchbac;
+                    //usage=usagebac;
                     return false;
                 }
                 
@@ -882,8 +881,8 @@ struct GCC : public AbstractConstraint
                 {   // no augmenting path found
                     GCCPRINT("No augmenting path found.");
                     // restore the matching to its state before the algo was called.
-                    varvalmatching=matchbac;   // no need for this.
-                    usage=usagebac;
+                    //varvalmatching=matchbac;   // no need for this.
+                    //usage=usagebac;
                     return false;
                 }
             }
@@ -1620,19 +1619,30 @@ struct GCC : public AbstractConstraint
         // usage is the number of times a value is used in the matching.
         
         // current sccs are contained in vars_in_scc and vals_in_scc
-        int newlb=0;  // new lower bound. When this passes existinglb, we can stop.
         // back up the matching to restore afterwards.
         matchbac=varvalmatching;
         usagebac=usage;
         
         // clear out forbiddenval
-        usage[forbiddenval-dom_min]=0;
+        // instead of clearing it out, can we do something else?
+        /*usage[forbiddenval-dom_min]=0;
         for(int i=0; i<numvars; i++)
         {
             if(varvalmatching[i]==forbiddenval)
             {
                 varvalmatching[i]=dom_min-1;
                 newlb++;
+            }
+        }*/
+        int newlb=usage[forbiddenval-dom_min];  // new lower bound. When this passes existinglb, we can stop.
+        
+        for(int startvarscc=0; startvarscc<vars_in_scc.size(); startvarscc++)
+        {
+            int startvar=vars_in_scc[startvarscc];
+            if(varvalmatching[startvar]==forbiddenval)
+            {
+                varvalmatching[startvar]=dom_min-1;
+                usage[forbiddenval-dom_min]--;
             }
         }
         
@@ -1749,47 +1759,9 @@ struct GCC : public AbstractConstraint
         // usage is the number of times a value is used in the matching.
         
         // current sccs are contained in vars_in_scc and vals_in_scc
-        // back up the matching to restore afterwards.
-        matchbac=varvalmatching;
-        usagebac=usage;
-        
-        // delete occurrences of values in excess of their lowerbounds (except the value of interest).
-        // ONLY delete occurrences within the current SCC!!
-        // borrow augpath
-        
-        // Might be able to avoid doing this if we start at the value, and flow the
-        // other way. 
-        
-        /*augpath.clear();
-        augpath.resize(numvals, 0);  // occs.
-        for(int i=0; i<numvars; i++)
-        {
-            int thisval=varvalmatching[i];
-            augpath[thisval-dom_min]++;
-        }*/
-        
-        /*for(int i=0; i<vars_in_scc.size(); i++)
-        {
-            int varidx=vars_in_scc[i];
-            int thisval=varvalmatching[varidx];
-            if(thisval!=value && lower[thisval-dom_min]<usage[thisval-dom_min])
-            {
-                varvalmatching[varidx]=dom_min-1;
-                usage[thisval-dom_min]--;
-                // small opt.
-                if(var_array[varidx].inDomain(value))
-                {
-                    varvalmatching[varidx]=value;
-                    usage[value-dom_min]++;
-                }
-            }
-        }*/
-        
-        //int newub=augpath[value-dom_min];  // new upper bound. When this passes existingub, we can stop.
-        int newub=usage[value-dom_min];  // new upper bound. When this passes existingub, we can stop.
         
         int startvalindex=value-dom_min;
-        while(newub<existingub)
+        while(usage[startvalindex]<existingub)
         {
             // usage of value needs to increase. Construct an augmenting path starting at value.
             GCCPRINT("Searching for augmenting path for val: " << value);
@@ -1819,7 +1791,6 @@ struct GCC : public AbstractConstraint
                             // can reduce the flow of valtoqueue to increase startval.
                             prev[validx]=curnode;
                             apply_augmenting_path(validx, startvalindex+numvars);
-                            newub++;
                             finished=true;
                         }
                         else
@@ -1858,7 +1829,6 @@ struct GCC : public AbstractConstraint
                                 // Unwind and apply the path here
                                 prev[vartoqueue]=curnode;
                                 apply_augmenting_path(vartoqueue, startvalindex+numvars);
-                                newub++;
                                 finished=true;
                                 break;  // get out of for loop
                             }
@@ -1882,10 +1852,10 @@ struct GCC : public AbstractConstraint
             
         }  // end while
         
-        varvalmatching=matchbac;
-        usage=usagebac;
+        //varvalmatching=matchbac;
+        //usage=usagebac;
         
-        return newub;
+        return usage[startvalindex];
     }
     
     // Function to make it reifiable in the most minimal way.
