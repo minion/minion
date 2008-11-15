@@ -25,7 +25,7 @@ for (ident, value) in optargs:
         print "benchdir=" + value
         for root, dirs, files in os.walk(value):
             for name in files:
-                if name.endswith('.minion'):
+                if name.endswith('.minion') or name.endswith('.minion.bz2'):
                     filelist.append(os.path.join(root,name))
     elif ident=="--timelimit":
         timeout="-timelimit "+str(value)+" "
