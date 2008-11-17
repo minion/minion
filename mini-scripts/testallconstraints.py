@@ -7,7 +7,7 @@ from constraint_test_common import *
 import random
 from sendemail import *
 
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit", "procs="])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit", "procs=", "seed="])
 
 if len(other)>1:
     print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email] [--procs=...]"
@@ -73,8 +73,8 @@ conslist+=["difference", "reifyimplydifference"]
 
 def run_in_proc(numconstraints, offset):
     for consname1 in conslist[offset:(offset + numconstraints)]:
-        print "Testing %s"%(consname1)
-        random.seed(12345)   # stupid seed but at least it makes the test repeatable.
+        print "Testing %s, seed %i"%(consname1, seed)
+        random.seed(seed)   # stupid seed but at least it makes the test repeatable.
     
         reify=False
         reifyimply=False
@@ -103,6 +103,7 @@ email=False
 fullprop=False   # compare the constraint against itself with fullprop. Needs DEBUG=1.
 bit64=False
 procs=1
+seed=12345
 for i in optargs:
     (a1, a2)=i
     if a1=="--minion":
@@ -117,6 +118,8 @@ for i in optargs:
         bit64=True
     elif a1=="--procs":
         procs=int(a2)
+    elif a1=="--seed":
+        seed=int(a2)
 
 workers = []
 for procNum in range(procs):
