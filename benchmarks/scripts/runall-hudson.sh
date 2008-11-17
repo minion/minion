@@ -6,5 +6,5 @@ python benchmarks/scripts/benchmark-hudson.py $1 SAT benchmarks/SAT/*
 python benchmarks/scripts/benchmark-hudson.py $1 quasigroup-element benchmarks/Quasigroup/qg-element*
 python benchmarks/scripts/benchmark-hudson.py $1 quasigroup-gacelement benchmarks/Quasigroup/qg-gacelement*
 python benchmarks/scripts/benchmark-hudson.py $1 quasigroup-watchelement benchmarks/Quasigroup/qg-watchelement*
-python benchmarks/scripts/benchmark-hudson.py $1 graceful-simple benchmarks/graceful/*simple.minion
-python benchmarks/scripts/benchmark-hudson.py $1 graceful-table benchmarks/graceful/*table.minion
+python benchmarks/scripts/benchmark-hudson.py $1 graceful-simple benchmarks/graceful/k[3456]p2_*simple.minion
+python benchmarks/scripts/benchmark-hudson.py $1 graceful-table benchmarks/graceful/k[3456]p2_*table.minion
