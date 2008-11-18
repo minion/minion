@@ -293,11 +293,16 @@ struct GCC : public AbstractConstraint
         if(adjlistpos[validx+numvars][var]<adjlistlength[validx+numvars])
         {
             adjlist_remove(var, validx+dom_min); //validx, adjlistpos[validx][var]);
+            if(varvalmatching[var]==validx+dom_min) // remove invalid value in the matching.
+            {
+                varvalmatching[var]=dom_min-1;
+                usage[validx]--;
+            }
             // trigger the constraint here
             #ifdef ONECALL
             if(!to_process.in(var))
             {
-                to_process.insert(var);  // inserts the number attached to the trigger. For values this is val-dom_min+numvars
+                to_process.insert(var);  // add the var to the queue to be processed.
             }
             if(!constraint_locked)
             {
@@ -652,7 +657,9 @@ struct GCC : public AbstractConstraint
         //matchbac=varvalmatching;
         //usagebac=usage;
         
-        // clear out unmatched variables
+        // clear out unmatched variables -- unless this has already been done 
+        // when the adjacency lists were updated.
+        #ifndef INCGRAPH
         for(int scci=0; scci<vars_in_scc.size(); scci++)
         {
             int i=vars_in_scc[scci];
@@ -663,6 +670,7 @@ struct GCC : public AbstractConstraint
                 varvalmatching[i]=dom_min-1;   // marker for unmatched.
             }
         }
+		#endif
         
         // If the upper bounds have been changed since last call, it is possible that
         // the usage[val] of some value is greater than upper[val]. This is impossible
@@ -1636,7 +1644,7 @@ struct GCC : public AbstractConstraint
         }*/
         int newlb=usage[forbiddenval-dom_min];  // new lower bound. When this passes existinglb, we can stop.
         
-        for(int startvarscc=0; startvarscc<vars_in_scc.size(); startvarscc++)
+        /*for(int startvarscc=0; startvarscc<vars_in_scc.size(); startvarscc++)
         {
             int startvar=vars_in_scc[startvarscc];
             if(varvalmatching[startvar]==forbiddenval)
@@ -1644,17 +1652,25 @@ struct GCC : public AbstractConstraint
                 varvalmatching[startvar]=dom_min-1;
                 usage[forbiddenval-dom_min]--;
             }
-        }
+        }*/
         
         // Flip the graph around, so it's like the alldiff case now. 
         // follow an edge in the matching from a value to a variable,
         // follow edges not in the matching from variables to values. 
         
+        #ifdef INCGRAPH
+		for(int startvari=0; startvari<adjlistlength[forbiddenval-dom_min+numvars] && newlb>existinglb; startvari++)
+        {
+            int startvar=adjlist[forbiddenval-dom_min+numvars][startvari];
+        #else
         for(int startvarscc=0; startvarscc<vars_in_scc.size() && newlb>existinglb; startvarscc++)
         {
             int startvar=vars_in_scc[startvarscc];
-            if(varvalmatching[startvar]==dom_min-1)
+        #endif
+            if(varvalmatching[startvar]==forbiddenval)
             {
+                varvalmatching[startvar]=dom_min-1;
+                usage[forbiddenval-dom_min]--;
                 GCCPRINT("Searching for augmenting path for var: " << startvar);
                 fifo.clear();  // this should be constant time but probably is not.
                 fifo.push_back(startvar);
