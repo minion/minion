@@ -140,8 +140,8 @@ struct DynamicAlldiff : public DynamicConstraint
       varvalmatching.resize(numvars); // maps var to actual value
       valvarmatching.resize(numvals); // maps val-dom_min to var.
       #else
-      varvalmatching=getMemory(stateObj).backTrack().requestArray<int>(numvars);
-      valvarmatching=getMemory(stateObj).backTrack().requestArray<int>(numvals);
+      varvalmatching=getMemory(stateObj).backTrack().template requestArray<int>(numvars);
+      valvarmatching=getMemory(stateObj).backTrack().template requestArray<int>(numvals);
       #endif
       
       sccs_to_process.reserve(numvars);

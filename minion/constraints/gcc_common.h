@@ -130,7 +130,7 @@ struct GCC : public AbstractConstraint
                 adjlistpos[i].resize(numvars);
                 for(int j=0; j<numvars; j++) adjlistpos[i][j]=j;
             }
-            adjlistlength=getMemory(stateObj).backTrack().requestArray<short>(numvars+numvals);
+            adjlistlength=getMemory(stateObj).backTrack().template requestArray<short>(numvars+numvals);
             for(int i=0; i<numvars; i++) adjlistlength[i]=numvals;
             for(int i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
         #endif
