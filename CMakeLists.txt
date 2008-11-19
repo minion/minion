@@ -222,6 +222,13 @@ if(QUICK)
 	add_definitions(-DQUICK_COMPILE)
 endif()
 
+option(BACK_VEC "" OFF)
+if(BACK_VEC)
+	message(STATUS "Enabling backtrack memory in vector")
+	set(BINARY "${BINARY}-backtrack-vec")
+	add_definitions(-DBACKTRACK_VEC)
+endif()
+
 option(REENTER "" OFF)
 if(REENTER)
 	message(STATUS "Enabling REENTER")

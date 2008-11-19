@@ -40,9 +40,13 @@ class BackTrackMemory
 {
   NewMemoryBlock new_memory_block;
   
+#ifdef BACKTRACK_VEC
+  vector<char*> backtrack_data; 
+#else
   char* backtrack_data; 
   int current_depth_m;
   int max_depth;
+#endif
   bool locked;
 public:
     
@@ -62,11 +66,18 @@ public:
     return new_memory_block.requestArray<T>(size);
   }
   
-  BackTrackMemory() : backtrack_data(NULL), current_depth_m(0), max_depth(0), locked(false)
+  BackTrackMemory() :
+#ifdef BACKTRACK_VEC
+  backtrack_data(10),
+#else
+  backtrack_data(NULL), current_depth_m(0), max_depth(0),
+#endif
+  locked(false)
   {
       
   }
   
+#ifndef BACKTRACK_VEC
   /// Extends the number of copies of the backtrackable memory that can be stored.
   void extend(int new_max)
   {
@@ -82,39 +93,64 @@ public:
     max_depth = new_max;
     backtrack_data = new_data;
   }
+#endif
   
   void lock()
   { 
     new_memory_block.lock(); 
     locked = true;
+#ifndef BACKTRACK_VEC
     extend(10);
+#endif
   }
   
   /// Copies the current state of backtrackable memory.
   void world_push()
   {
     D_ASSERT(locked);
+    unsigned data_size = new_memory_block.getDataSize();
+#ifdef BACKTRACK_VEC
+    if(backtrack_data.size() == backtrack_data.max_size())
+      backtrack_data.resize(backtrack_data.max_size() * 2);
+    char *tmp = (char *) calloc(data_size, sizeof(char));
+    memcpy(tmp, new_memory_block.getDataPtr(), data_size);
+    backtrack_data.push_back(tmp);
+#else
     if(current_depth_m == max_depth)
       extend(max_depth * 2);
-    unsigned data_size = new_memory_block.getDataSize();
     memcpy(backtrack_data + current_depth_m * data_size, new_memory_block.getDataPtr(), data_size);
     current_depth_m++;
+#endif
   }
   
   /// Restores the state of backtrackable memory to the last stored state.
   void world_pop()
   {
     D_ASSERT(locked);
+    unsigned data_size = new_memory_block.getDataSize();
+#ifdef BACKTRACK_VEC
+    D_ASSERT(backtrack_data.size() > 0);
+    char *tmp = backtrack_data.back();
+    memcpy(new_memory_block.getDataPtr(), tmp, data_size);
+    backtrack_data.pop_back();
+    free(tmp);
+#else
     D_ASSERT(current_depth_m > 0);
     current_depth_m--;
     
-    unsigned data_size = new_memory_block.getDataSize();
     memcpy(new_memory_block.getDataPtr(), backtrack_data + current_depth_m * data_size, data_size);
+#endif
   }
   
   /// Returns the current number of stored copies of the state.
   int current_depth()
-  { return current_depth_m; }
+  {
+#ifdef BACKTRACK_VEC
+    return backtrack_data.size();
+#else
+    return current_depth_m;
+#endif
+  }
 };
 
 #endif
