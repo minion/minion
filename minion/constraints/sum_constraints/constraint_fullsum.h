@@ -210,27 +210,9 @@ struct LessEqualSumConstraint : public AbstractConstraint
     return sum <= *(v + v_size - 1);
   }
   
-  /*
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
-    int sum_value = 0;
-    int v_size = var_array.size();
-    for(int i = 0; i < v_size; ++i)
-    {
-      assignment.push_back(make_pair(i, var_array[i].getMin()));
-      sum_value += var_array[i].getMin();
-    }
-    if(sum_value > var_sum.getMax())
-      return false;
-    else
-      assignment.push_back(make_pair(v_size, var_sum.getMax()));
-
-    return true;
-  }
-  */
-  
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
-  {
+    P("GSA");
     int sum_value = 0;
     int v_size = var_array.size();
     
@@ -238,12 +220,13 @@ struct LessEqualSumConstraint : public AbstractConstraint
     {
       int max_sum = var_sum.getMax();
       assignment.push_back(make_pair(v_size, max_sum));
-      for(int i = 0; i < v_size && sum_value < max_sum; ++i)
+      for(int i = 0; i < v_size && sum_value <= max_sum; ++i)
       {
         int min_val = var_array[i].getMin();
         assignment.push_back(make_pair(i, min_val));
         sum_value += min_val;
       }
+      P("A" << (sum_value <= max_sum));
       return (sum_value <= max_sum);
     }
     else
@@ -253,6 +236,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
         assignment.push_back(make_pair(i, var_array[i].getMin()));
         sum_value += var_array[i].getMin();
       }
+      P("B" << (sum_value <= var_sum.getMax()));
       if(sum_value > var_sum.getMax())
         return false;
       else
