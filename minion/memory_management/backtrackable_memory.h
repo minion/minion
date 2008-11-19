@@ -110,8 +110,6 @@ public:
     D_ASSERT(locked);
     unsigned data_size = new_memory_block.getDataSize();
 #ifdef BACKTRACK_VEC
-    if(backtrack_data.size() == backtrack_data.max_size())
-      backtrack_data.resize(backtrack_data.max_size() * 2);
     char *tmp = (char *) calloc(data_size, sizeof(char));
     memcpy(tmp, new_memory_block.getDataPtr(), data_size);
     backtrack_data.push_back(tmp);
