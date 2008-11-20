@@ -158,6 +158,11 @@ else()
 	endif()
 endif()
 
+# cmake 2.6 only
+#if(CMAKE_HOST_APPLE)
+#  set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
+#endif()
+
 option(DEBUG "" OFF)
 option(PRINT "" OFF)
 if(DEBUG)
@@ -177,7 +182,9 @@ if(UNOPTIMISED)
 	set(BINARY "${BINARY}-unoptimised")
 	set(CFLAGS "${CFLAGS} -g")
 else()
-	set(CFLAGS "${CFLAGS} -O3")
+    # apparently fomit-frame-pointer is only automatically enabled for O* levels
+    # on machines where this doesn't affect debugging
+	set(CFLAGS "${CFLAGS} -O3 -fomit-frame-pointer")
 endif()
 
 option(PROFILE "" OFF)
