@@ -6,9 +6,8 @@ import sys, os, getopt
 from constraint_test_common import *
 import random
 
-random.seed(12345)   # stupid seed but at least it makes the test repeatable.
 
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "fullprop"])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "fullprop", "seed="])
 
 if len(other)!=2:
     print "Usage: testconstraint.py [--minion=<location of minion binary>] [--numtests=...] [--fullprop] constraintname"
@@ -17,6 +16,8 @@ if len(other)!=2:
 numtests=10000
 minionbin="bin/minion"
 fullprop=False
+seed=12345
+
 for i in optargs:
     (a1, a2)=i
     if a1=="--minion":
@@ -25,6 +26,10 @@ for i in optargs:
         numtests=int(a2)
     elif a1=="--fullprop":
         fullprop=True
+    elif a1=="--seed":
+        seed=int(a2)
+
+random.seed(seed)   # stupid seed but at least it makes the test repeatable.
 
 consname=other[1]  # name of the constraint to test
 

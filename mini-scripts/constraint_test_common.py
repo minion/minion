@@ -949,9 +949,9 @@ class testgcc:
         
     def runtest(self, options=dict()):
         if options['reifyimply'] or options['reify']:
-            return runtestgeneral("gcc", False, options, [4,4,4], ["verysmallnum","smallconst_distinct","smallnum"], [4,4,4], self, not options['reify'])
+            return runtestgeneral("gcc", False, options, [4,4,4], ["verysmallnum","smallconst_distinct","smallnum"], [4,4,4], self, False)
         else:
-            return runtestgeneral("gcc", False, options, [5,5,5], ["smallnum","smallconst_distinct", "num"], [5,5,5], self, True)
+            return runtestgeneral("gcc", False, options, [5,5,5], ["smallnum","smallconst_distinct", "num"], [5,5,5], self, False)
     
 ################################################################################
 # 

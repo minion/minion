@@ -185,7 +185,6 @@ struct GCC : public AbstractConstraint
                 capacity_array[i].propagateAssign(0);
             }
         }
-        
         #ifdef INCGRAPH
             // update the adjacency lists. and place dts
             DynamicTrigger* dt=dynamic_trigger_start();
@@ -193,16 +192,21 @@ struct GCC : public AbstractConstraint
             {
                 for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
                 {
-                    if(!var_array[adjlist[i-dom_min+numvars][j]].inDomain(i))
+                    int var=adjlist[i-dom_min+numvars][j];
+                    if(!var_array[var].inDomain(i))
                     {
+                        if(varvalmatching[var]==i)
+                        {
+                            usage[varvalmatching[var]-dom_min]--;
+                            varvalmatching[var]=dom_min-1;
+                        }
                         // swap with the last element and remove
-                        adjlist_remove(adjlist[i-dom_min+numvars][j], i);
+                        adjlist_remove(var, i);
                         j--; // stay in the same place, dont' skip over the 
                         // value which was just swapped into the current position.
                     }
                     else
                     {
-                        int var=adjlist[i-dom_min+numvars][j];
                         // arranged in blocks for each variable, with numvals triggers in each block
                         DynamicTrigger* mydt= dt+(var*numvals)+(i-dom_min);
                         var_array[var].addDynamicTrigger(mydt, DomainRemoval, i);
@@ -343,7 +347,7 @@ struct GCC : public AbstractConstraint
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
-  {  
+  {
       D_ASSERT(dom_max-dom_min+1 == numvals);
       // Check if the matching is OK.
       bool matchok=true;
@@ -366,7 +370,7 @@ struct GCC : public AbstractConstraint
                   matchok=false;
                   break;
               }
-              if( val>=dom_min && val<=dom_max && !capacity_array[i].inDomain(usage[val-dom_min]))
+              if( val>=dom_min && val<=dom_max && !capacity_array[i].inDomain(usage[val-dom_min]))  // is usage OK??
               {
                   matchok=false;
                   break;
@@ -378,15 +382,23 @@ struct GCC : public AbstractConstraint
       {
           // run matching algorithm
           // populate lower and upper
+          // Also check if bounds are well formed.
         for(int i=0; i<val_array.size(); i++)
         {
             if(val_array[i]>=dom_min && val_array[i]<=dom_max)
             {
-                int capi=val_to_cap_index[val_array[i]-dom_min];
-                if(capi>-1)
+                if(capacity_array[i].getMax()<0 || capacity_array[i].getMin()>numvars)
                 {
-                    lower[val_array[i]-dom_min]=capacity_array[capi].getMin();   // not quite right in the presence of duplicate values.
-                    upper[val_array[i]-dom_min]=capacity_array[capi].getMax();
+                    return false;
+                }
+                lower[val_array[i]-dom_min]=capacity_array[i].getMin();
+                upper[val_array[i]-dom_min]=capacity_array[i].getMax();
+            }
+            else
+            {
+                if(capacity_array[i].getMin()>0 || capacity_array[i].getMax()<0)
+                {
+                    return false;
                 }
             }
         }
@@ -397,16 +409,31 @@ struct GCC : public AbstractConstraint
             {
                 for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
                 {
-                    if(!var_array[adjlist[i-dom_min+numvars][j]].inDomain(i))
+                    int var=adjlist[i-dom_min+numvars][j];
+                    if(!var_array[var].inDomain(i))
                     {
+                        if(varvalmatching[var]==i)
+                        {
+                            usage[varvalmatching[var]-dom_min]--;
+                            varvalmatching[var]=dom_min-1;
+                        }
                         // swap with the last element and remove
-                        adjlist_remove(adjlist[i-dom_min+numvars][j], i);
+                        adjlist_remove(var, i);
                         j--; // stay in the same place, dont' skip over the 
                         // value which was just swapped into the current position.
                     }
                 }
             }
         #endif
+        
+        // I'm sure that these four lines are needed, even though
+        // if they are taken out, it still passes the random tests.
+        // They are needed because the two vectors may be stale after
+        // backtracking.
+        vars_in_scc.clear();
+        for(int i=0; i<numvars; i++) vars_in_scc.push_back(i);
+        vals_in_scc.clear();
+        for(int i=dom_min; i<=dom_max; i++) vals_in_scc.push_back(i);
         
         matchok=bfsmatching_gcc();
       }
@@ -419,6 +446,7 @@ struct GCC : public AbstractConstraint
       {
           for(int i=0; i<numvars; i++)
           {
+              D_ASSERT(var_array[i].inDomain(varvalmatching[i]));
               assignment.push_back(make_pair(i, varvalmatching[i]));
           }
           for(int i=0; i<val_array.size(); i++)
@@ -441,7 +469,7 @@ struct GCC : public AbstractConstraint
              {
                  // push upper and lower bounds.
                  assignment.push_back(make_pair(i+numvars, capacity_array[i].getMin()));
-                 assignment.push_back(make_pair(i+numvars, capacity_array[i].getMax()));
+                 assignment.push_back(make_pair(i+numvars, capacity_array[i].getMax()));                 
              }
           }
           return true;
@@ -461,12 +489,8 @@ struct GCC : public AbstractConstraint
         {
             if(val_array[i]>=dom_min && val_array[i]<=dom_max)
             {
-                int capi=val_to_cap_index[val_array[i]-dom_min];
-                if(capi>-1)
-                {
-                    lower[val_array[i]-dom_min]=capacity_array[capi].getMin();   // not quite right in the presence of duplicate values.
-                    upper[val_array[i]-dom_min]=capacity_array[capi].getMax();
-                }
+                lower[val_array[i]-dom_min]=capacity_array[i].getMin();   // not quite right in the presence of duplicate values.
+                upper[val_array[i]-dom_min]=capacity_array[i].getMax();
             }
         }
         

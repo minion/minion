@@ -10,7 +10,7 @@ from sendemail import *
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit", "procs=", "seed="])
 
 if len(other)>1:
-    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email] [--procs=...]"
+    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email] [--procs=...] [--seed=...]"
     sys.exit(1)
 
 # This one tests all the constraints in the following list.
