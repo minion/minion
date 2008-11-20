@@ -229,6 +229,13 @@ if(BACK_VEC)
 	add_definitions(-DBACKTRACK_VEC)
 endif()
 
+option(CACHE_MALLOC "" OFF)
+if(CACHE_MALLOC)
+	message(STATUS "Enabling Caching Malloc")
+	set(BINARY "${BINARY}-cachemalloc")
+	add_definitions(-DMALLOC_CACHE)
+endif()
+
 option(REENTER "" OFF)
 if(REENTER)
 	message(STATUS "Enabling REENTER")

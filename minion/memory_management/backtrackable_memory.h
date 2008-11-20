@@ -28,6 +28,8 @@
 #define _BACKTRACK_MEMORY_H
 
 #include "MemoryBlock.h"
+#include "../system/block_cache.h"
+
 
 // \addtogroup Memory
 // @{
@@ -39,6 +41,9 @@
 class BackTrackMemory
 {
   NewMemoryBlock new_memory_block;
+#ifdef MALLOC_CACHE
+  BlockCache block_cache;
+#endif
   
 #ifdef BACKTRACK_VEC
   vector<char*> backtrack_data; 
@@ -67,6 +72,9 @@ public:
   }
   
   BackTrackMemory() :
+#ifdef MALLOC_CACHE
+  block_cache(100),
+#endif
 #ifdef BACKTRACK_VEC
   backtrack_data(10),
 #else
@@ -110,7 +118,13 @@ public:
     D_ASSERT(locked);
     unsigned data_size = new_memory_block.getDataSize();
 #ifdef BACKTRACK_VEC
-    char *tmp = (char *) calloc(data_size, sizeof(char));
+
+#ifdef MALLOC_CACHE
+    char *tmp = (char *) block_cache.do_malloc(data_size);//calloc(data_size, sizeof(char));
+#else
+    char *tmp = (char *) malloc(data_size);
+#endif
+
     memcpy(tmp, new_memory_block.getDataPtr(), data_size);
     backtrack_data.push_back(tmp);
 #else
@@ -131,7 +145,13 @@ public:
     char *tmp = backtrack_data.back();
     memcpy(new_memory_block.getDataPtr(), tmp, data_size);
     backtrack_data.pop_back();
+
+#ifdef MALLOC_CACHE
+    block_cache.do_free(tmp);//free(tmp);
+#else
     free(tmp);
+#endif
+
 #else
     D_ASSERT(current_depth_m > 0);
     current_depth_m--;
