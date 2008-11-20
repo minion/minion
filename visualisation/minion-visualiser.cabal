@@ -12,5 +12,5 @@ Maintainer:          Lars Kotthoff <larsko@cs.st-andrews.ac.uk>
 Executable           minion-visualiser
     Build-Depends:   base, parsec, gtk, cairo, glib
     Main-is:         MinionVisualiser.hs
-    Other-modules:   MinionParser, Gui
+    Other-modules:   MinionParser
     Ghc-options:     -threaded
