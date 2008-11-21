@@ -20,6 +20,7 @@ my $name2="";
 my $terminal="png";
 my $fileext=".png";
 my $eps=0;
+my $eps_colour=0;
 
 GetOptions( 'outdir=s' => \$dir, 
             'basedir=s' => \$basedir,
@@ -31,6 +32,7 @@ GetOptions( 'outdir=s' => \$dir,
             'name2=s' => \$name2,
             'tableout' => \$tableout,
             'eps' => \$eps,
+            'eps-colour' => \$eps_colour,
             );
 
 if (@ARGV != 2) 
@@ -38,9 +40,10 @@ if (@ARGV != 2)
     print "Exactly two directory or file arguments required\n";
 }
 
-if($eps)
+if($eps || $eps_colour)
 { # alternative output.
-    $terminal="postscript eps color";
+    $terminal="postscript eps";
+    if($eps_colour) { $terminal .= " colour"; }
     $fileext=".eps";
 }
 
