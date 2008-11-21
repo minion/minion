@@ -71,32 +71,6 @@ conslist+=["difference", "reifyimplydifference"]
 #todo
 #conslist+=["weightedsumleq"...
 
-def run_in_proc(numconstraints, offset):
-    for consname1 in conslist[offset:(offset + numconstraints)]:
-        print "Testing %s, seed %i"%(consname1, seed)
-        random.seed(seed)   # stupid seed but at least it makes the test repeatable.
-    
-        reify=False
-        reifyimply=False
-        consname=consname1
-        if consname[0:10]=="reifyimply":
-            reifyimply=True
-            consname=consname[10:]
-        
-        if consname[0:5]=="reify":
-            reify=True
-            consname=consname[5:]
-        consname=consname.replace("-", "__minus__")
-        testobj=eval("test"+consname+"()")
-        testobj.solver=minionbin
-        
-        for testnum in range(numtests):
-            options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False}
-            if not testobj.runtest(options):
-                print "Failed when testing %s"%consname1
-                sys.exit(1)
-    sys.exit(0)
-
 numtests=100
 minionbin="bin/minion"
 email=False
@@ -122,19 +96,53 @@ for i in optargs:
         seed=int(a2)
 
 workers = []
+readers = []
 for procNum in range(procs):
     if procNum == procs - 1:
         num = (len(conslist) // procs) + (len(conslist) % procs)
     else:
         num = (len(conslist) // procs)
+    r, w = os.pipe()
     pid = os.fork()
     if pid:
         workers.append(pid)
+        readers.append(r)
+        os.close(w)
     else:
-        run_in_proc(num, procNum * (len(conslist) // procs))
+        os.close(r)
+        sys.stdout = os.fdopen(w, 'w')
+        offset = procNum * (len(conslist) // procs)
+        for consname1 in conslist[offset:(offset + num)]:
+            print "Testing %s, seed %i"%(consname1, seed)
+            random.seed(seed)
+        
+            reify=False
+            reifyimply=False
+            consname=consname1
+            if consname[0:10]=="reifyimply":
+                reifyimply=True
+                consname=consname[10:]
+            
+            if consname[0:5]=="reify":
+                reify=True
+                consname=consname[5:]
+            consname=consname.replace("-", "__minus__")
+            testobj=eval("test"+consname+"()")
+            testobj.solver=minionbin
+            
+            for testnum in range(numtests):
+                options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False}
+                if not testobj.runtest(options):
+                    print "Failed when testing %s"%consname1
+                    sys.exit(1)
+        sys.stdout.close()
+        sys.exit(0)
 
 for worker in workers:
+    read = os.fdopen(readers.pop(0))
     (pid, exitcode) = os.waitpid(worker, 0)
+    sys.stdout.write(read.read())
+    read.close()
     if exitcode != 0:
         if email:
             mailstring="Mail from testallconstraints.py.\n"
