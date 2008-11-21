@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.4.6)
 
 set(CMAKE_MODULE_PATH cmake-modules)
 include(CheckIncludeFileCXX)
-INCLUDE(CheckCXXCompilerFlag)
+include(CheckCXXCompilerFlag)
 include(FindBoost)
 include(FindGMP)
 
@@ -158,11 +158,6 @@ else()
 	endif()
 endif()
 
-# cmake 2.6 only
-#if(CMAKE_HOST_APPLE)
-#  set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
-#endif()
-
 option(DEBUG "" OFF)
 option(PRINT "" OFF)
 if(DEBUG)
@@ -185,6 +180,10 @@ else()
     # apparently fomit-frame-pointer is only automatically enabled for O* levels
     # on machines where this doesn't affect debugging
 	set(CFLAGS "${CFLAGS} -O3 -fomit-frame-pointer")
+    check_cxx_compiler_flag("-mdynamic-no-pic" MAC_MDYNAMIC)
+    if(MAC_MDYNAMIC)
+	    set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
+    endif()
 endif()
 
 option(PROFILE "" OFF)
