@@ -40,7 +40,7 @@ if (@ARGV != 2)
 
 if($eps)
 { # alternative output.
-    $terminal="postscript eps";
+    $terminal="postscript eps color";
     $fileext=".eps";
 }
 
