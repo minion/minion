@@ -19,7 +19,7 @@
 #ifdef WDEG
   inline unsigned int AbstractConstraint::getWdeg() { return wdeg; }
 
-  inline unsigned int AbstractConstraint::incWdeg() 
+  inline void AbstractConstraint::incWdeg() 
   { 
     wdeg += 1; 
     vector<AnyVarRef>* vars = get_vars_singleton();

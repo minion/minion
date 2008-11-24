@@ -140,10 +140,11 @@ public:
   }
 
   AbstractConstraint(StateObj* _stateObj) : 
+    stateObj(_stateObj), _DynamicTriggerCache(), singleton_vars(),
 #ifdef WDEG
-  wdeg(1),
+    wdeg(1),
 #endif
-    stateObj(_stateObj), _DynamicTriggerCache(), singleton_vars(), full_propagate_done(false)
+    full_propagate_done(false)
     {}
 
   /// Method to get constraint name for debugging.
@@ -165,7 +166,7 @@ public:
 #ifdef WDEG
   unsigned int getWdeg();
 
-  unsigned int incWdeg();
+  void incWdeg();
 #endif
 
   // Weights the constraint for ordering in trigger lists (bigger is later)
