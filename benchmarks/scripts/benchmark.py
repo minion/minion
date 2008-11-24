@@ -5,7 +5,7 @@ benchmarks = sys.argv[2]
 totaltime = 0
 for root, dirs, files in os.walk(benchmarks):
   for name in files:
-    if name.endswith('.minion'):
+    if name.endswith('.minion') or name.endswith('.minion.bz2'):
       timer = timeit.Timer('os.system("'+program+' '+root+'/'+name+' &> /dev/null")','import os')
       time = timer.timeit(1)
       if(time < 5.0):
