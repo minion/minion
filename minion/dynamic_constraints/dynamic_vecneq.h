@@ -197,7 +197,7 @@ struct LessIterated
 struct BothNonZeroIterated
 {
   static bool check_assignment(DomainInt i, DomainInt j)
-  { return i > 0 || j > 0; }
+  { return i > 0 && j > 0; }
 
   static int dynamic_trigger_count()
   { return 2; }
@@ -230,7 +230,7 @@ struct BothNonZeroIterated
   template<typename Var1, typename Var2>
   static bool get_satisfying_assignment(const Var1& var1, const Var2& var2, pair<int,int>& assign)
   {
-    if(var1.getMax() > 0 || var2.getMax() > 0)
+    if(var1.getMax() > 0 && var2.getMax() > 0)
     {
       assign = make_pair(var1.getMax(), var2.getMax());
       return true;
