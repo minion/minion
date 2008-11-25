@@ -308,21 +308,6 @@ BuildCT_WATCHED_HAMMING(StateObj* stateObj, const T1& t1, const T2& t2, BOOL rei
   { return VecOrCountConDynamic(stateObj, t1, t2, b.constants[0][0]); }
 }
 
-/*
-template<typename VarArray1,  typename VarArray2>
-AbstractConstraint*
-  VecOrLessConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2)
-  { return new VecNeqDynamic<VarArray1,VarArray2, LessIterated>(stateObj, varray1, varray2); }
-
-BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_VEC_OR_LESS, VecOrLessConDynamic)
-
-template<typename VarArray1,  typename VarArray2>
-AbstractConstraint*
-  VecOrAndConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2)
-  { return new VecNeqDynamic<VarArray1,VarArray2, BothNonZeroIterated>(stateObj, varray1, varray2); }
-
-BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_VEC_OR_AND, VecOrAndConDynamic)
-*/
 
 #endif
 
