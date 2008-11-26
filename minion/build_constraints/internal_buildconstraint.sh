@@ -34,7 +34,7 @@
 # This might look like a mess, but it's just to get the formatting how it was
 # done manually, to avoid nasty svn diffs for no good reason.
 
-	echo \#include \"../minion.h\" > $3.cpp
+	echo \#include \"../minion.h\" >> $3.cpp
     echo \/\* Minion Constraint Solver >> $3.cpp
     echo \ \  http://minion.sourceforge.net >> $3.cpp
     echo \ \ \ >> $3.cpp
@@ -44,12 +44,9 @@
     echo */ >> $3.cpp
     echo >> $3.cpp
 	
-	for include in `./only_filename_grep.sh $3 ../constraints/*.h ../constraints/sum_constraints/*.h ../dynamic_constraints/*.h ../dynamic_constraints/unary/*.h`; do
+	for include in `grep -l $3 ../constraints/*.h ../constraints/sum_constraints/*.h ../dynamic_constraints/*.h ../dynamic_constraints/unary/*.h`; do
 	echo \#include \"$include\" >> $3.cpp;
 	done
 	
-	
  	echo BUILD_$1\($3, $count\) >> $3.cpp
 	echo >> $3.cpp
-	
-	

@@ -448,22 +448,29 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
     cerr << "So there is not support for the " << constraint.name << "." << endl;
     exit(1);
 #else
+#ifdef CT_REIFY_ABC
     if(reified && constraint->type == CT_REIFY)
     {
       FAIL_EXIT("Cannot reify a watched constraint!");
     }
 #endif
+#endif
   }
 
   switch(constraint->type)
   {
+#ifdef CT_WATCHED_OR_ABC
     case CT_WATCHED_OR:
     return readConstraintOr(infile, get_constraint(CT_WATCHED_OR));
     break;
+#endif
 
+#ifdef CT_GADGET_ABC
     case CT_GADGET:
     return readConstraintGadget(infile);
     break;
+#endif
+
     default:
     return readGeneralConstraint(infile, constraint);
   }
@@ -621,6 +628,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
 // table(<vectorOfVars>, {<tuple> [, <tuple>]})
 // Tuples represented as a vector of int arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#ifdef CT_GADGET_ABC
 template<typename FileReader>
 ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile) 
 {
@@ -642,6 +650,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileRead
   parser_info("End gadget reading");
   return gadgetCon;
 }
+#endif
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readConstraintOr

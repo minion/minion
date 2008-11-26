@@ -181,39 +181,27 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
 	cerr << "So there is not support for the " << constraint.name << "." << endl;
 	exit(1);
 #else
+#ifdef CT_REIFY_ABC
 	if(reified && constraint->type == CT_REIFY)
 	{
 	  FAIL_EXIT("Cannot reify a watched constraint!");
 	}
 #endif
+#endif
   }
 
   switch(constraint->type)
   {
-    /*
-	case CT_REIFY:
-	case CT_REIFYIMPLY:
-	  { 
-	  if(reified)
-		  throw parse_exception("Can't reify a reified constraint!");
-	  readConstraint(infile, true);
-	  
-	  infile->check_sym(',');
-	  Var reifyVar = readIdentifier(infile);
-	  if(reifyVar.type() != VAR_BOOL)
-      throw parse_exception("Can only reify to a Boolean!");
-	  infile->check_sym(')');
-	  if(constraint->type == CT_REIFY)
-	    instance.last_constraint_reify(reifyVar);
-	  else
-	    instance.last_constraint_reifyimply(reifyVar);
-	  }
-	  break;
-*/
+#ifdef CT_WATCHED_TABLE_ABC
 	case CT_WATCHED_TABLE:
+	  readConstraintTable(infile, get_constraint(constraint->type));
+	  break;
+#endif
+#ifdef CT_WATCHED_NEGATIVE_TABLE_ABC
 	case CT_WATCHED_NEGATIVE_TABLE:
 	  readConstraintTable(infile, get_constraint(constraint->type));
 	  break;
+#endif
 
 	default:
 	  readGeneralConstraint(infile, constraint);

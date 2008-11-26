@@ -2,7 +2,7 @@
 
 # First clean up any files which might be from old constraints.
 
-rm CT*.cpp
+rm -f CT*.cpp
 
 # First, build constraint_defs.h, which just maps ConstraintList into a valid C struct.
 echo > constraint_defs.h

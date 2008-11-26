@@ -5,6 +5,7 @@ include(CheckIncludeFileCXX)
 include(CheckCXXCompilerFlag)
 include(FindBoost)
 include(FindGMP)
+include(constraints)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
@@ -53,19 +54,6 @@ add_definitions(-DSVN_VER="${SVNVERSION}" -DSVN_DATE="\\\"${SVNDATE}\\\"")
 if(UNIX)
 	find_program(BASH bash)
 	if(BASH)
-		add_custom_target(generate-constraints ${BASH} "rebuild_files.sh"
-				  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/minion/build_constraints"
-				  COMMENT "generate-constraints" VERBATIM)
-		file(GLOB CONSTRAINTS "${PROJECT_SOURCE_DIR}/minion/build_constraints/CT_*.cpp")
-		if(CONSTRAINTS)
-			message(STATUS "Constraints exist, not regenerating")
-		else()
-			message(STATUS "Generating constraints")
-			execute_process(COMMAND ${BASH} "rebuild_files.sh"
-					WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/minion/build_constraints")
-			message(STATUS "Generating constraints - done")
-		endif()
-
 		add_custom_target(generate-help ${BASH} "minion/help/genhelp.sh" > "minion/help/help.cpp"
 				  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
 				  COMMENT "generate-help" VERBATIM)
@@ -79,17 +67,46 @@ if(UNIX)
 			message(STATUS "Generating help - done")
 		endif()
 	else()
-		message(STATUS "No bash executable found, not generating contraints and help")
+		message(STATUS "No bash executable found, not generating help")
 	endif()
 else()
-	message(STATUS "You need a UNIX-like system to regenerate constraints and help")
+	message(STATUS "You need a UNIX-like system to regenerate help")
 endif()
 
-aux_source_directory(minion SRCS)
-aux_source_directory(minion/build_constraints SRCS)
-aux_source_directory(minion/system SRCS)
-aux_source_directory(minion/help SRCS)
-set(SRCS "${SRCS};minion/get_info.cpp")
+if(CONSTRAINTS)
+    select_constraints(${CONSTRAINTS})
+elseif(CONSTRAINTS_FILE)
+    file(READ ${CONSTRAINTS_FILE} CONSTRAINTS)
+    select_constraints(${CONSTRAINTS})
+else()
+    select_constraints(${ALL_CONSTRAINTS})
+endif()
+if(BASH)
+    message(STATUS "Generating constraints")
+    execute_process(COMMAND ${BASH} "rebuild_files.sh"
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/minion/build_constraints")
+    message(STATUS "Generating constraints - done")
+else()
+    message(STATUS "Unable to generate constraints.")
+endif()
+
+file(GLOB SRCS "minion/build_constraints/CT*.cpp")
+foreach(ct ${SRCS})
+    string(REGEX MATCH "CT_[A-Z_]+" ct_name ${ct})
+    add_definitions(-D${ct_name}_ABC)
+endforeach()
+list(APPEND SRCS minion/BuildConstraint2.cpp
+                 minion/BuildCSP.cpp
+                 minion/commandline_parse.cpp
+                 minion/constraint_setup.cpp
+                 minion/debug_functions.cpp
+                 minion/get_info.cpp
+                 minion/inputfile_parse.cpp
+                 minion/minion.cpp
+                 minion/preprocess.cpp)
+list(APPEND SRCS minion/build_constraints/BuildStaticStart.cpp)
+list(APPEND SRCS minion/system/trigger_timer.cpp)
+list(APPEND SRCS minion/help/help.cpp)
 
 set(BINARY ${PROJECT_NAME})
 

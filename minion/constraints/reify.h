@@ -644,6 +644,7 @@ BuildCT_REIFY(StateObj* stateObj, const VarArray& vars, BOOL reify,
 { 
   switch(bl.internal_constraints[0].constraint->type)
   {
+#if defined(CT_EQ_ABC) && defined(CT_EQ_REIFY_ABC)
     case CT_EQ:
     {
       ConstraintBlob blob(bl.internal_constraints[0]);
@@ -651,6 +652,8 @@ BuildCT_REIFY(StateObj* stateObj, const VarArray& vars, BOOL reify,
       blob.constraint = get_constraint(CT_EQ_REIFY);
       return build_constraint(stateObj, blob);
     }
+#endif
+#if defined(CT_DISEQ_ABC) && defined(CT_DISEQ_REIFY_ABC)
     case CT_DISEQ:
     {
       ConstraintBlob blob(bl.internal_constraints[0]);
@@ -658,6 +661,8 @@ BuildCT_REIFY(StateObj* stateObj, const VarArray& vars, BOOL reify,
       blob.constraint = get_constraint(CT_DISEQ_REIFY);
       return build_constraint(stateObj, blob);
     }
+#endif
+#if defined(CT_MINUSEQ_ABC) && defined(CT_MINUSEQ_REIFY_ABC)
     case CT_MINUSEQ:
     {
       ConstraintBlob blob(bl.internal_constraints[0]);
@@ -665,6 +670,7 @@ BuildCT_REIFY(StateObj* stateObj, const VarArray& vars, BOOL reify,
       blob.constraint = get_constraint(CT_MINUSEQ_REIFY);
       return build_constraint(stateObj, blob);
     }
+#endif
     default:
       return reifyCon(stateObj, build_constraint(stateObj, bl.internal_constraints[0]), vars[0]);     
   }
