@@ -102,7 +102,7 @@ list(APPEND SRCS minion/BuildConstraint2.cpp
                  minion/debug_functions.cpp
                  minion/get_info.cpp
                  minion/inputfile_parse.cpp
-                 minion/minion.cpp
+#                minion/minion.cpp
 		 minion/globals.cpp
                  minion/preprocess.cpp)
 list(APPEND SRCS minion/build_constraints/BuildStaticStart.cpp)
@@ -286,7 +286,11 @@ if(NAME)
 endif()
 message(STATUS "Executable name set to \"${BINARY}\"")
 
-add_executable(${BINARY} ${SRCS})
+add_library(${BINARY}-lib ${SRCS})
+
+add_executable(${BINARY} minion/minion.cpp)
+target_link_libraries(${BINARY} ${BINARY}-lib)
+
 # when we're building minion-something, add a "minion" target that does the same
 if(NOT ${BINARY} STREQUAL ${PROJECT_NAME})
 	add_custom_target(${PROJECT_NAME} DEPENDS ${BINARY})
