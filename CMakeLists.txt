@@ -11,7 +11,7 @@ set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 project(minion)
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin")
-
+set(LIBRARY_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin/libraries")
 # determine svn version and date
 find_program(SVN svn)
 if(SVN)
