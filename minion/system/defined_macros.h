@@ -1,19 +1,13 @@
 // In an ideal world, this would be auto-generated, and involve less typing. Unfortunatly
 // it must be manually updated instead.
 
-#define PRINT(X) #X
-
-void print_macros(void) {
+inline void print_macros(void) {
 #ifdef BINARY_SEARCH
 cout << "BINARY_SEARCH" << " "; 
 #endif
 
 #ifdef BOUNDS_CHECK
 cout << "BOUNDS_CHECK" << " "; 
-#endif
-
-#ifdef CONTAINER_TYPE
-cout << "CONTAINER_TYPE = " << PRINT(CONSTAINER_TYPE) << " "; 
 #endif
 
 #ifdef DEBUG

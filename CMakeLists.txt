@@ -103,6 +103,7 @@ list(APPEND SRCS minion/BuildConstraint2.cpp
                  minion/get_info.cpp
                  minion/inputfile_parse.cpp
                  minion/minion.cpp
+		 minion/globals.cpp
                  minion/preprocess.cpp)
 list(APPEND SRCS minion/build_constraints/BuildStaticStart.cpp)
 list(APPEND SRCS minion/system/trigger_timer.cpp)

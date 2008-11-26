@@ -19,10 +19,6 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #define _CRT_NONSTDC_NO_DEPRECATE 1
 
-#ifndef IN_MAIN
-#define IN_MAIN
-#endif
-
 #ifndef SVN_VER
 #define SVN_VER 0
 #endif
