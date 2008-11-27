@@ -205,7 +205,7 @@ struct ConstraintBlob
     for(vector<ConstraintBlob>::const_iterator it = internal_constraints.begin(); it != internal_constraints.end(); ++it)
     {
       set<Var> newvars = it->get_all_vars();
-      return_vars.insert(newvars.end(), newvars.begin());
+      return_vars.insert(newvars.begin(), newvars.end());
     }
     
     return return_vars;
