@@ -177,10 +177,11 @@ public:
   /// Denotes if only generators for group should be found (only makes sense for groups)
   bool find_generators;
 
-  /// Denotes if only solutions should be printed.
-  bool print_only_solution;
   /// Denotes if we should output in a compatable way to the solver competition.
   bool cspcomp;
+  
+  /// Denotes if minion should print no output, other than that explicitally requested
+  bool silent;
   
   /// Denotes if the search tree should be printed.
   bool dumptree;
@@ -228,8 +229,8 @@ public:
   bool graph;
 
   SearchOptions() : 
-    wdeg_on(false), find_generators(false), print_only_solution(false), 
-    cspcomp(false), dumptree(false), sollimit(1), fullpropagate(false), 
+    wdeg_on(false), find_generators(false), 
+    cspcomp(false), silent(false), dumptree(false), sollimit(1), fullpropagate(false), 
 #ifdef NO_DEBUG
     nocheck(true),
 #else
@@ -245,13 +246,13 @@ public:
   
   void print(string s)
   {
-    if(!cspcomp)
+    if(!silent)
      cout << s; 
   }
   
   void printLine(string s)
   { 
-    if(!cspcomp)
+    if(!silent)
     cout << s << endl; 
   }
 };

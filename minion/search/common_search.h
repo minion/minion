@@ -113,7 +113,7 @@ namespace Controller
       {
         for(unsigned i = 0; i < print_matrix.size(); ++i)
         {
-          if (!getOptions(stateObj).print_only_solution) cout << "Sol: ";  
+          if (!getOptions(stateObj).silent) cout << "Sol: ";  
           for(unsigned j = 0; j < print_matrix[i].size(); ++j)
           {
             if(!print_matrix[i][j].isAssigned())
@@ -124,11 +124,11 @@ namespace Controller
           }
           cout << endl;
         }
-        if (!getOptions(stateObj).print_only_solution) cout << endl;
+        if (!getOptions(stateObj).silent) cout << endl;
       }
 
     // TODO : Make this more easily changable.
-      if (!getOptions(stateObj).print_only_solution) 
+      if (!getOptions(stateObj).silent) 
       {
         cout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
         getState(stateObj).getOldTimer().printTimestepWithoutReset("Time:");
@@ -246,7 +246,7 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
   getState(stateObj).setupAlarm();
   install_ctrlc_trigger(stateObj);
 	lock(stateObj);
-	if (!getOptions(stateObj).print_only_solution) 
+	if (!getOptions(stateObj).silent) 
 	  getState(stateObj).getOldTimer().printTimestepWithoutReset("First Node Time: ");
 	/// Failed initially propagating constraints!
 	if(getState(stateObj).isFailed())

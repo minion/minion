@@ -357,7 +357,7 @@ try {
   getOptions(stateObj).printLine("# " + to_string(VERSION));
   getOptions(stateObj).printLine("# Svn version: " + to_string(SVN_VER));
   
-  if (!getOptions(stateObj).print_only_solution) 
+  if (!getOptions(stateObj).silent) 
   { 
     
     getOptions(stateObj).printLine("# Svn last changed date: " + to_string(SVN_DATE) );
@@ -417,7 +417,7 @@ try {
   // should be one for varorder as well.
   oldtableout.set("MinionVersion", SVN_VER);
   oldtableout.set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-  getState(stateObj).getOldTimer().maybePrintTimestepStore("Parsing Time: ", "ParsingTime", oldtableout, !getOptions(stateObj).print_only_solution);
+  getState(stateObj).getOldTimer().maybePrintTimestepStore("Parsing Time: ", "ParsingTime", oldtableout, !getOptions(stateObj).silent);
   
   BuildCSP(stateObj, instance);
   SolveCSP(stateObj, instance, args);

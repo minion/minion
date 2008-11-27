@@ -65,9 +65,9 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
   }
   
   // Solve!
-  getState(stateObj).getOldTimer().maybePrintTimestepStore("Setup Time: ", "SetupTime", oldtableout, !getOptions(stateObj).print_only_solution);
+  getState(stateObj).getOldTimer().maybePrintTimestepStore("Setup Time: ", "SetupTime", oldtableout, !getOptions(stateObj).silent);
   Controller::initalise_search(stateObj);
-  getState(stateObj).getOldTimer().maybePrintTimestepStore("Initial Propagate: ", "InitialPropagate", oldtableout, !getOptions(stateObj).print_only_solution);
+  getState(stateObj).getOldTimer().maybePrintTimestepStore("Initial Propagate: ", "InitialPropagate", oldtableout, !getOptions(stateObj).silent);
   
 }
 
@@ -88,8 +88,8 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   
   if(!getState(stateObj).isFailed())
   {
-    PropogateCSP(stateObj, args.preprocess, var_val_order.first, !getOptions(stateObj).print_only_solution);
-	  getState(stateObj).getOldTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", oldtableout, !getOptions(stateObj).print_only_solution);
+    PropogateCSP(stateObj, args.preprocess, var_val_order.first, !getOptions(stateObj).silent);
+	  getState(stateObj).getOldTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", oldtableout, !getOptions(stateObj).silent);
 	  if(!getState(stateObj).isFailed())
     {
       switch(args.prop_method)
@@ -110,10 +110,10 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   }
   else
   {
-    getState(stateObj).getOldTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", oldtableout, !getOptions(stateObj).print_only_solution);
+    getState(stateObj).getOldTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", oldtableout, !getOptions(stateObj).silent);
   }
   
-  getState(stateObj).getOldTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", oldtableout, !getOptions(stateObj).print_only_solution);
+  getState(stateObj).getOldTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", oldtableout, !getOptions(stateObj).silent);
   getOptions(stateObj).printLine("Total Nodes: " + to_string( getState(stateObj).getNodeCount() ));
   getOptions(stateObj).printLine(string("Problem solvable?: ") + (getState(stateObj).getSolutionCount() == 0 ? "no" : "yes"));
   
@@ -137,7 +137,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
   }
   
 #ifdef MORE_SEARCH_INFO
-  if(!getOptions(stateObj).cspcomp)
+  if(!getOptions(stateObj).silent)
     print_search_info();
 #endif
   

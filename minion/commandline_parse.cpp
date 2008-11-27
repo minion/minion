@@ -26,10 +26,10 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
 	else if(command == string("-noprintsols"))
 	{ getOptions(stateObj).print_solution = false; }
 	else if(command == string("-printsolsonly"))
-	{ getOptions(stateObj).print_only_solution = true; }
+	{ getOptions(stateObj).silent = true; }
 	else if(command == string("-cspcomp"))
   { 
-    getOptions(stateObj).print_only_solution = true;
+    getOptions(stateObj).silent = true;
     getOptions(stateObj).cspcomp = true;
     in_cspcomp_for_failexit = true;
   }
