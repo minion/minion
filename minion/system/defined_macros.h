@@ -1,3 +1,6 @@
+#ifndef DEFINED_MACROS
+#define DEFINED_MACROS
+
 // In an ideal world, this would be auto-generated, and involve less typing. Unfortunatly
 // it must be manually updated instead.
 
@@ -96,3 +99,5 @@ cout << "__GNUC__" << " ";
 #endif
 cout << endl;
 }
+
+#endif
