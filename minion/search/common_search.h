@@ -99,50 +99,50 @@ namespace Controller
       solsoutFile << "\n";
     }
     
-	if(getOptions(stateObj).print_solution)
-	{
-	  if(getOptions(stateObj).cspcomp)
-	  {
-      cout << "v ";
-      for(unsigned i = 0; i < print_matrix.size(); ++i)
-        for(unsigned j = 0; j < print_matrix[i].size(); ++j)
-          cout << print_matrix[i][j].getAssignedValue() << " ";
-      cout << endl;
-    }
-	  else if(!print_matrix.empty())
-	  {
-		for(unsigned i = 0; i < print_matrix.size(); ++i)
-		{
-	          if (!getOptions(stateObj).print_only_solution) cout << "Sol: ";  
-		  for(unsigned j = 0; j < print_matrix[i].size(); ++j)
-		  {
-			if(!print_matrix[i][j].isAssigned())
-			  cout  << "[" << print_matrix[i][j].getMin() << "," << 
-			                 print_matrix[i][j].getMax() << "]";
-			else
-			  cout << print_matrix[i][j].getAssignedValue() << " ";
-		  }
-		  cout << endl;
-		}
-		if (!getOptions(stateObj).print_only_solution) cout << endl;
-	  }
-  
-	  // TODO : Make this more easily changable.
-    if (!getOptions(stateObj).print_only_solution) 
+    if(getOptions(stateObj).print_solution)
     {
-	    cout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
-	    getState(stateObj).getOldTimer().printTimestepWithoutReset("Time:");
-	    cout << "Nodes: " << getState(stateObj).getNodeCount() << endl << endl;
-    }
+      if(getOptions(stateObj).cspcomp)
+      {
+        cout << "v ";
+        for(unsigned i = 0; i < print_matrix.size(); ++i)
+          for(unsigned j = 0; j < print_matrix[i].size(); ++j)
+          cout << print_matrix[i][j].getAssignedValue() << " ";
+        cout << endl;
+      }
+      else if(!print_matrix.empty())
+      {
+        for(unsigned i = 0; i < print_matrix.size(); ++i)
+        {
+          if (!getOptions(stateObj).print_only_solution) cout << "Sol: ";  
+          for(unsigned j = 0; j < print_matrix[i].size(); ++j)
+          {
+            if(!print_matrix[i][j].isAssigned())
+              cout  << "[" << print_matrix[i][j].getMin() << "," << 
+              print_matrix[i][j].getMax() << "]";
+            else
+              cout << print_matrix[i][j].getAssignedValue() << " ";
+          }
+          cout << endl;
+        }
+        if (!getOptions(stateObj).print_only_solution) cout << endl;
+      }
+
+    // TODO : Make this more easily changable.
+      if (!getOptions(stateObj).print_only_solution) 
+      {
+        cout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
+        getState(stateObj).getOldTimer().printTimestepWithoutReset("Time:");
+        cout << "Nodes: " << getState(stateObj).getNodeCount() << endl << endl;
+      }
     }
 
-  if(!getOptions(stateObj).nocheck)
-  {
-    for(unsigned i = 0 ; i < getState(stateObj).getConstraintList().size();i++)
-      check_constraint(stateObj, getState(stateObj).getConstraintList()[i]);
+    if(!getOptions(stateObj).nocheck)
+    {
+      for(unsigned i = 0 ; i < getState(stateObj).getConstraintList().size();i++)
+        check_constraint(stateObj, getState(stateObj).getConstraintList()[i]);
+    }
   }
-  }
-  
+
    
   /// Check if timelimit has been exceeded.
   inline bool do_checks(StateObj* stateObj)
