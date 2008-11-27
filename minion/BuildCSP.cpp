@@ -42,14 +42,14 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
   
   vector<vector<AnyVarRef> >& print_matrix = getState(stateObj).getPrintMatrix();
     
-  // Set up printing
+  // Reserve room in vector - no necessary but more efficent.
   print_matrix.reserve(instance.print_matrix.size());
-  for(unsigned i = 0; i <  print_matrix.size(); ++i)
-	  print_matrix.push_back(BuildCon::get_AnyVarRef_from_Var(stateObj, instance.print_matrix[i]));
+  for(unsigned i = 0; i < instance.print_matrix.size(); ++i)
+      print_matrix.push_back(BuildCon::get_AnyVarRef_from_Var(stateObj, instance.print_matrix[i]));
   
   // Impose Constraints
   for(list<ConstraintBlob>::iterator it = instance.constraints.begin();
-	  it != instance.constraints.end(); ++it)
+      it != instance.constraints.end(); ++it)
   {
     if(it->is_dynamic())
     {
