@@ -300,13 +300,6 @@ nothing at all...)
 
 #include "MinionInputReader.h"
 
-#ifdef IN_MAIN
-#include "build_constraints/constraint_defs.h"
-int num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);
-#endif
-
-
-
 template<typename FileReader>
 void MinionThreeInputReader<FileReader>::parser_info(string s)
 {
