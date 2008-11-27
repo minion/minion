@@ -194,7 +194,12 @@ public:
   
   /// Denotes if solutions should be printed to a seperate file.
   bool solsoutWrite;
-    
+
+#ifdef USE_BOOST    
+  // A callback function for when a solution is found.
+  boost::function< void (StateObj*)> solCallBack;
+#endif
+
   /// Denotes if solutions should be printed.
   /// Initialised to true.
   bool print_solution;

@@ -79,8 +79,11 @@ namespace Controller
   /// This function checks the solution is correct, and prints it if required.
   inline void check_sol_is_correct(StateObj* stateObj)
   {
-    //if(solution_check != NULL)
-	//  solution_check();
+#ifdef USE_BOOST
+    if(solCallBack)
+      solCallBack(stateObj);
+#endif
+
 	getState(stateObj).incrementSolutionCount();
     if(getOptions(stateObj).solsoutWrite)
     {
