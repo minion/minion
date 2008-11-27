@@ -191,6 +191,9 @@ public:
   inline void removePointerFromNewMemoryBlock(MoveablePointer* vp);
 
   inline bool checkPointerValid(const MoveablePointer*const vp);
+  
+  void clear()
+  { NewMemoryBlockCache.clear(); }
 };
 
 VARDEF(MemBlockCache memBlockCache);

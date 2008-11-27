@@ -163,8 +163,9 @@ void after_branch_right()  // nothing to do
   
   TrailedMonotonicSet()
   #ifndef NO_DEBUG
-  : locked(false)
+  : locked(false),
   #endif
+  _size(0), _max_undos(0), _max_depth(0), _local_depth(0)
   { }
   
 void print_state()
