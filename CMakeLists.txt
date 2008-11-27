@@ -161,8 +161,13 @@ if(CheckWarnings)
 endif()
 
 # slightly weird check to make sure that the boost TR1 libs are there
-check_include_file_cxx("boost/tr1/array.hpp" BOOST-TR1)
-if(Boost_FOUND AND BOOST-TR1)
+
+if(Boost_FOUND)
+ 	set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${Boost_INCLUDE_DIRS})
+	check_include_file_cxx("boost/tr1/array.hpp" BOOST-TR1)
+endif()
+
+if(BOOST-TR1)
 	message(STATUS "Using Boost TR1 libraries")
 	add_definitions(-DUSE_BOOST)
 else()
