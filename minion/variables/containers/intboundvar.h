@@ -75,7 +75,7 @@ struct BoundVarRef_internal
   { }
   
   explicit BoundVarRef_internal(BoundVarContainer<DomType>* con, int i, DomType* ptr) : 
-  var_num(i), boundCon(con), var_bound_data(ptr)
+  var_bound_data(ptr), var_num(i), boundCon(con)
   { }
   
 #else
