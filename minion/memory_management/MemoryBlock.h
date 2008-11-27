@@ -167,6 +167,13 @@ class MemBlockCache
   void operator=(const MemBlockCache&);
   vector<NewMemoryBlock*> NewMemoryBlockCache;
   
+#ifdef THREADSAFE
+  boost::mutex m;
+#define LOCK(M) boost::mutex::scoped_lock lock(M)
+#else
+#define LOCK(M)
+#endif
+
 public:    
   
   MemBlockCache() { }
@@ -175,12 +182,14 @@ public:
 
   void registerNewMemoryBlock(NewMemoryBlock* mb)
   { 
+    LOCK(m);
     D_ASSERT(find(NewMemoryBlockCache.begin(), NewMemoryBlockCache.end(), mb) == NewMemoryBlockCache.end());
     NewMemoryBlockCache.push_back(mb); 
   }
 
   void unregisterNewMemoryBlock(NewMemoryBlock* mb)
   { 
+    LOCK(m);
     vector<NewMemoryBlock*>::iterator it = find(NewMemoryBlockCache.begin(), NewMemoryBlockCache.end(), mb);
     D_ASSERT(it != NewMemoryBlockCache.end());
     NewMemoryBlockCache.erase(it); 
@@ -193,9 +202,9 @@ public:
   inline bool checkPointerValid(const MoveablePointer*const vp);
   
   bool empty()
-  { return NewMemoryBlockCache.empty(); }
+  { LOCK(m); return NewMemoryBlockCache.empty(); }
   void clear()
-  { NewMemoryBlockCache.clear(); }
+  { LOCK(m); NewMemoryBlockCache.clear(); }
 };
 
 VARDEF(MemBlockCache memBlockCache);
@@ -408,6 +417,7 @@ inline void* MoveablePointer::get_ptr() const
 
 inline void MemBlockCache::addPointerToNewMemoryBlock(MoveablePointer* vp)
   {
+    LOCK(m);
     if(vp->get_ptr_noCheck() == NULL)
       return;
 
@@ -423,6 +433,7 @@ inline void MemBlockCache::addPointerToNewMemoryBlock(MoveablePointer* vp)
 
   inline void MemBlockCache::removePointerFromNewMemoryBlock(MoveablePointer* vp)
   {
+    LOCK(m);
     for(vector<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
         it != NewMemoryBlockCache.end();
         ++it)
@@ -435,6 +446,7 @@ inline void MemBlockCache::addPointerToNewMemoryBlock(MoveablePointer* vp)
 
   inline bool MemBlockCache::checkPointerValid(const MoveablePointer *const vp)
   {
+    LOCK(m);
     if(vp->get_ptr_noCheck() == NULL)
       return true;
     for(vector<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();

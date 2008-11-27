@@ -91,6 +91,9 @@
 #ifdef USE_BOOST
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
@@ -99,6 +102,9 @@
 #define SET_TYPE boost::unordered_set
 
 #else
+#ifdef THREADSAFE
+#error Threading requires boost!
+#endif
 
 #ifdef USE_TR1_HASH_MAP_AND_SET
 #include <tr1/unordered_set>
