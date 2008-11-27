@@ -60,7 +60,7 @@ struct BigRangeVarRef_internal_template
   {}
 
   explicit BigRangeVarRef_internal_template(BigRangeVarContainer<d_type>* con, int i) : 
-  rangeCon(con), var_num(i)
+  var_num(i), rangeCon(con)
   {}  
 #else
   static BigRangeVarContainer<d_type>& getCon_Static();
