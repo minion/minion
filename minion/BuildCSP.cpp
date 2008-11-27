@@ -40,13 +40,12 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
 	  Controller::optimise_maximise_var(stateObj, BuildCon::get_AnyVarRef_from_Var(stateObj, instance.optimise_variable));
   }
   
+  vector<vector<AnyVarRef> >& print_matrix = getState(stateObj).getPrintMatrix();
+    
   // Set up printing
-  Controller::print_matrix.resize(instance.print_matrix.size());
-  for(unsigned i = 0; i < instance.print_matrix.size(); ++i)
-  {
-    for(unsigned j = 0; j < instance.print_matrix[i].size(); ++j)
-	  Controller::print_matrix[i].push_back(BuildCon::get_AnyVarRef_from_Var(stateObj, instance.print_matrix[i][j]));
-  }
+  print_matrix.reserve(instance.print_matrix.size());
+  for(unsigned i = 0; i <  print_matrix.size(); ++i)
+	  print_matrix.push_back(BuildCon::get_AnyVarRef_from_Var(stateObj, instance.print_matrix[i]));
   
   // Impose Constraints
   for(list<ConstraintBlob>::iterator it = instance.constraints.begin();

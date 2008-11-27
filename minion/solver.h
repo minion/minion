@@ -44,6 +44,9 @@ class SearchState
   DomainInt current_optimise_position;
   bool optimise;
   
+  // The variables to print when a solution is found.
+  vector<vector<AnyVarRef> > print_matrix;
+  
   vector<AbstractConstraint*> constraints;
   
   vector<set<AbstractConstraint*> > constraints_to_propagate;
@@ -72,6 +75,9 @@ class SearchState
     
 public:
 
+  vector<vector<AnyVarRef> >& getPrintMatrix()
+  { return print_matrix; }
+  
   vector<set<AbstractConstraint*> >& getConstraintsToPropagate()
   { return constraints_to_propagate; }
   

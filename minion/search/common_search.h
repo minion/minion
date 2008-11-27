@@ -80,11 +80,13 @@ namespace Controller
   inline void check_sol_is_correct(StateObj* stateObj)
   {
 #ifdef USE_BOOST
-    if(solCallBack)
-      solCallBack(stateObj);
+    if(getOptions(stateObj).solCallBack)
+      getOptions(stateObj).solCallBack(stateObj);
 #endif
 
-	getState(stateObj).incrementSolutionCount();
+    vector<vector<AnyVarRef> > print_matrix = getState(stateObj).getPrintMatrix();
+    
+    getState(stateObj).incrementSolutionCount();
     if(getOptions(stateObj).solsoutWrite)
     {
       for(unsigned i = 0; i < print_matrix.size(); ++i)

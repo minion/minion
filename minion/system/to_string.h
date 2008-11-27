@@ -10,8 +10,9 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include <ostream>
+#include <set>
 #include <list>
+#include <ostream>
 #include <sstream>
 
 template<typename T>
@@ -61,6 +62,20 @@ std::ostream& operator<<(std::ostream& o, const std::vector<T>& t)
 
 template<typename T>
 std::ostream& operator<<(std::ostream& o, const std::list<T>& t)
+{
+  output_container(o, t);
+  return o;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o, const std::set<T>& t)
+{
+  output_container(o, t);
+  return o;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o, const std::multiset<T>& t)
 {
   output_container(o, t);
   return o;

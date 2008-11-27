@@ -85,11 +85,6 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 #include "variables/variables.h"
 
-// TODO: Move this!
-namespace Controller
-{
-  VARDEF(vector<vector<AnyVarRef> > print_matrix);  
-}
 
 #include "build_constraints/build_helper.h"
 
