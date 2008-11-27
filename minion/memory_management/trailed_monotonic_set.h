@@ -161,9 +161,9 @@ void after_branch_right()  // nothing to do
   //TrailedMonotonicSet(StateObj* _stateObj) : stateObj(_stateObj) //, _backtrack_depth(_stateObj)
   //{ } 
   
-  TrailedMonotonicSet()
+  TrailedMonotonicSet() :
   #ifndef NO_DEBUG
-  : locked(false),
+  locked(false),
   #endif
   _size(0), _max_undos(0), _max_depth(0), _local_depth(0)
   { }
