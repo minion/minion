@@ -192,6 +192,8 @@ public:
 
   inline bool checkPointerValid(const MoveablePointer*const vp);
   
+  bool empty()
+  { return NewMemoryBlockCache.empty(); }
   void clear()
   { NewMemoryBlockCache.clear(); }
 };

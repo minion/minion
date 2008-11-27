@@ -64,7 +64,7 @@ public:
     delete queues_m;
     delete options_m;
     delete searchMem_m;    
-    memBlockCache.clear();
+    D_ASSERT(memBlockCache.empty());
   }
 };
 
