@@ -37,6 +37,9 @@ class TimerClass
 
 public:
   
+  TimerClass()
+  { startClock(); }
+  
 void startClock()
 {
   getrusage(RUSAGE_SELF, &_internal_start_time);
