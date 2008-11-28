@@ -25,8 +25,6 @@ For Licence Information see file LICENSE.txt
   template<typename VarOrder, typename Variables, typename Propogator>
   inline void solve_loop(StateObj* stateObj, function<void (void)> next_search, VarOrder& order, Variables& v, Propogator prop, bool findOneSol)
   {
-    cout << "World depth entering search" << get_world_depth(stateObj) << endl;
-    
     // Don't corrupt the state the world came in with.
     world_push(stateObj);
     
@@ -44,9 +42,7 @@ For Licence Information see file LICENSE.txt
       {  		  
         // This function may escape from search if solution limit
         // has been reached.
-        cout << "World depth entering recursion" << get_world_depth(stateObj) << endl;
         next_search();
-        cout << "World depth exiting recursion" << get_world_depth(stateObj) << endl;
         
         // This is not for overall solution counting, but auxillary variables.
         if(findOneSol) 
