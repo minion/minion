@@ -16,7 +16,7 @@ namespace Controller
   // This function implements the algorithm in the ECAI '06 paper,
   // Last Conﬂict based Reasoning 
   template<typename VarOrder, typename Variables, typename Propogator>
-  inline void conflict_solve_loop(StateObj* stateObj, VarOrder& order, Variables& v, Propogator prop = PropagateGAC())
+  inline void conflict_solve_loop(StateObj* stateObj, function<void (void)> next_search, VarOrder& order, Variables& v, Propogator prop = PropagateGAC())
   {
     maybe_print_search_state(stateObj, "Node: ", v);
     int last_conflict_var = -1;
@@ -33,10 +33,10 @@ namespace Controller
       
       // order.find_next_unassigned returns true if all variables assigned.
       if(order.find_next_unassigned())
-      {  		  
+      {
         // This function may escape from search if solution limit
         // has been reached.
-        deal_with_solution(stateObj);
+        next_search();
         // fail here to force backtracking.
         getState(stateObj).setFailed(true);
       }

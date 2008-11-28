@@ -1,15 +1,22 @@
 /* Minion Constraint Solver
-   http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
+http://minion.sourceforge.net
 
-   $Id$
+For Licence Information see file LICENSE.txt 
+
+  $Id$
 */
+
+#include "../system/system.h"
+#include "common_search.h"
+#include "standard_search.h"
+
+  using namespace boost;
 
 namespace Controller
 {
-   template<typename VarOrder, typename Variables, typename Permutation, typename Propogator>
-  	inline void group_solve_loop(StateObj* stateObj, VarOrder& original_order, Variables& v, Permutation& perm, Propogator prop = PropagateGAC())
+
+    template<typename VarOrder, typename Variables, typename Permutation, typename Propogator>
+    void group_solve_loop(StateObj* stateObj, function<void (void)> next_search, VarOrder& original_order, Variables& v, Permutation& perm, Propogator prop = PropagateGAC())
     {
       int sol_count = 0;
       for(int i = 0; i < perm.size(); ++i)
@@ -17,11 +24,11 @@ namespace Controller
         perm[i].setMin(1);
         perm[i].setMax(perm.size());
       }
-      
+
       getQueue(stateObj).propagateQueue();
       if(getState(stateObj).isFailed())
         return;
-      
+
       for(int i = 0; i < perm.size(); ++i)
       {
         for(int j = i + 2; j <= perm.size(); ++j)
@@ -31,14 +38,14 @@ namespace Controller
           for(int k = 0; k < i; ++k)
             perm[k].propagateAssign(k+1);
           perm[i].propagateAssign(j);
-          
+
           getQueue(stateObj).propagateQueue();
           if(!getState(stateObj).isFailed())
           {
             try
             {
               VarOrder order(original_order);
-              solve_loop(stateObj, order, v, prop);
+              solve_loop(stateObj, next_search, order, v, prop, true);
             }
             catch(EndOfSearch)
             { 
@@ -53,10 +60,9 @@ namespace Controller
           world_pop_to_depth(stateObj, world_depth);          
         }        
       }
-      
+
       printf("Generators: %d\n", sol_count);
-    }  	  
+    }
 }
 
 
-  

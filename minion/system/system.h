@@ -91,6 +91,10 @@
 #ifdef USE_BOOST
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+
+using boost::bind;
+using boost::function;
+
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>

@@ -64,16 +64,25 @@ struct VariableOrder
     pos = 0; 
   }
   
-  
+  void reset()
+  {
+    branches.clear();
+    first_unassigned_variable.clear();
+    pos = 0;
+  }
+      
   // Returns true if all variables assigned
   bool find_next_unassigned()
   {
-	pos = branch_method(var_order, pos);
-	return pos == var_order.size();
+    pos = branch_method(var_order, pos);
+    return pos == var_order.size();
   }
-	  
+  
   bool finished_search()
   { return branches.size() == 0; }
+  
+  int search_depth()
+  { return branches.size(); }
   
   void branch_left()
   {

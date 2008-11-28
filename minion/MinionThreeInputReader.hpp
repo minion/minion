@@ -1007,8 +1007,17 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
 
     if(var_type == "VARORDER")
     {
-      VarOrder vo = ORDER_STATIC;
+      VarOrderEnum vo = ORDER_ORIGINAL;
+      bool find_one_sol = false;
       
+      if(infile->peek_char() == 'A')
+      {
+        string s = infile->get_string();
+        if(s != "AUX")
+          throw parse_exception("I do not understand " + s);
+        find_one_sol = true;
+      }
+        
       if(infile->peek_char() != '[')
       {
         string s = infile->get_string();
@@ -1019,7 +1028,7 @@ throw parse_exception("Don't understand '" + s + "'");
 found: ;
       }
       
-      instance.search_order.push_back(SearchOrder(readLiteralVector(infile)));
+      instance.search_order.push_back(SearchOrder(readLiteralVector(infile), vo, find_one_sol));
       parser_info("Read var order, length " +
         to_string(instance.search_order.back().var_order.size()));
     }

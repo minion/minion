@@ -66,8 +66,10 @@ enum ReadTypes
   read_nothing
 };
 
-enum VarOrder
+enum VarOrderEnum
 {
+  ORDER_NONE,
+  
   ORDER_STATIC,
   ORDER_SDF,
   ORDER_SRF,
@@ -590,17 +592,18 @@ struct SearchOrder
 {
   vector<Var> var_order;
   vector<char> val_order;
-  VarOrder order;
+  VarOrderEnum order;
+  bool find_one_assignment;
   
-  SearchOrder() : order(ORDER_STATIC)
+  SearchOrder() : order(ORDER_STATIC), find_one_assignment(false)
   { }
   
   SearchOrder(const vector<Var>& _var_order) :
-  var_order(_var_order), order(ORDER_STATIC)
+  var_order(_var_order), order(ORDER_STATIC), find_one_assignment(false)
   { }
   
-  SearchOrder(const vector<Var>& _var_order, VarOrder _order) :
-  var_order(_var_order), order(_order)
+  SearchOrder(const vector<Var>& _var_order, VarOrderEnum _order, bool _find_one_assignment = false) :
+  var_order(_var_order), order(_order), find_one_assignment(_find_one_assignment)
   { }
   
   void setupValueOrder()

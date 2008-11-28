@@ -31,7 +31,7 @@ template<typename Reader>
     reader.read(infile) ;
     oldtableout.set(string("Filename"), infile->filename);
   }
-  catch(parse_exception& s)
+  catch(parse_exception s)
   {
     cerr << "Error in input." << endl;
     cerr << s.what() << endl;
@@ -71,7 +71,7 @@ template<typename Reader, typename Stream>
     reader.read(infile) ;
     oldtableout.set(string("Filename"), infile->filename);
   }
-  catch(parse_exception& s)
+  catch(parse_exception s)
   {
     cerr << "Error in input." << endl;
     cerr << s.what() << endl;
@@ -88,31 +88,38 @@ template<typename Reader, typename Stream>
 template<typename InputReader>
 CSPInstance readInput(InputReader* infile, bool parser_verbose)
 {  
-  string test_name = infile->get_string();
-  if(test_name != "MINION")
-    INPUT_ERROR("All Minion input files must begin 'MINION'");
+  try
+  {
+    string test_name = infile->get_string();
+    if(test_name != "MINION")
+      INPUT_ERROR("All Minion input files must begin 'MINION'");
   
-  int inputFileVersionNumber = infile->read_num();
+    int inputFileVersionNumber = infile->read_num();
   
-  if(inputFileVersionNumber > 3)
-    INPUT_ERROR("This version of Minion only supports formats up to 3");
+    if(inputFileVersionNumber > 3)
+      INPUT_ERROR("This version of Minion only supports formats up to 3");
   
 
-  // C++0x comment : Need MOVE (which is std::move) here to activate r-value references.
-  // Normally we wouldn't, but here the compiler can't figure out it can "steal" instance.
-  if(inputFileVersionNumber == 3)
+    // C++0x comment : Need MOVE (which is std::move) here to activate r-value references.
+    // Normally we wouldn't, but here the compiler can't figure out it can "steal" instance.
+    if(inputFileVersionNumber == 3)
+    {
+      MinionThreeInputReader<InputReader> reader(parser_verbose);
+      ReadCSP(reader, infile);
+      return MOVE(reader.instance);
+    } 
+    else
+    {
+      MinionInputReader<InputReader> reader(parser_verbose);
+      ReadCSP(reader, infile);
+      return MOVE(reader.instance);
+    }  
+  }
+  catch(parse_exception s) // This catch should only trigger on the very top-most level issues, like test_name and inputFileVersionNumber above.
   {
-    MinionThreeInputReader<InputReader> reader(parser_verbose);
-    ReadCSP(reader, infile);
-    return MOVE(reader.instance);
-  } 
-  else
-  {
-    MinionInputReader<InputReader> reader(parser_verbose);
-    ReadCSP(reader, infile);
-    return MOVE(reader.instance);
-  }  
-
+    cerr << "Not a valid Minion instance - should start with 'MINION x' where x is 1,2 or 3" << endl;
+    exit(1);
+  }
 }
 
 CSPInstance readInputFromFile(string fname, bool parser_verbose);

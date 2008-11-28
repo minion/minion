@@ -16,6 +16,11 @@
 
 #include "CSPSpec.h"
 
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
+
+using namespace boost;
+
 
 using namespace ProbSpec;
 
@@ -73,46 +78,55 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
 
 void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
 {
+  vector<AnyVarRef> preprocess_vars = BuildCon::build_val_and_var_order(stateObj, instance.search_order[0]).first;
+  PropogateCSP(stateObj, args.preprocess, preprocess_vars, !getOptions(stateObj).silent);
+  getState(stateObj).getOldTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", oldtableout, !getOptions(stateObj).silent);
+  
   // Set up variable and value ordering
-  pair<vector<AnyVarRef>, vector<int> > var_val_order = BuildCon::build_val_and_var_order(stateObj, instance.search_order[0]);
-  
-  if(getOptions(stateObj).randomise_valvarorder)
-  {
-    getOptions(stateObj).printLine("Using seed: " + to_string(args.random_seed));
-    srand( args.random_seed );
-    
-    std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());
-    for(unsigned i = 0; i < var_val_order.second.size(); ++i)
-      var_val_order.second[i] = (rand() % 100) > 50;
-  }
-  
   if(!getState(stateObj).isFailed())
   {
-    PropogateCSP(stateObj, args.preprocess, var_val_order.first, !getOptions(stateObj).silent);
-	  getState(stateObj).getOldTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", oldtableout, !getOptions(stateObj).silent);
-	  if(!getState(stateObj).isFailed())
+    function<void (void)> search(bind(Controller::deal_with_solution, stateObj));
+    for(int i = instance.search_order.size() - 1; i >= 0; --i)
     {
+      /// XXX - pass the whole of search_order[i] to solve.
+      SearchOrder order = instance.search_order[i];
+      
+      if(args.order != ORDER_NONE)
+        order.order = args.order;
+        
+      pair<vector<AnyVarRef>, vector<int> > var_val_order = BuildCon::build_val_and_var_order(stateObj, instance.search_order[i]);
+
+      if(getOptions(stateObj).randomise_valvarorder)
+      {
+        getOptions(stateObj).printLine("Using seed: " + to_string(args.random_seed));
+        srand( args.random_seed );
+
+        std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());
+        for(unsigned i = 0; i < var_val_order.second.size(); ++i)
+          var_val_order.second[i] = (rand() % 100) > 50;
+      }
+      
       switch(args.prop_method)
       {
         case PropLevel_GAC:
-          solve(stateObj, args.order, var_val_order, instance, PropagateGAC());   // add a getState(stateObj).getOldTimer().maybePrintTimestepStore to search..
-          break;
+        search = solve(stateObj, search, order, var_val_order, instance, PropagateGAC());
+        break;
         case PropLevel_SAC:
-          solve(stateObj, args.order, var_val_order, instance, PropagateSAC());
-          break;
+        search = solve(stateObj, search, order, var_val_order, instance, PropagateSAC());
+        break;
         case PropLevel_SSAC:
-          solve(stateObj, args.order, var_val_order, instance, PropagateSSAC());
-          break;
+        search = solve(stateObj, search, order, var_val_order, instance, PropagateSSAC());
+        break;
         default:
-          abort();
+        abort();
       }
     }
+    try
+      { search(); }
+    catch(EndOfSearch)
+    { }
   }
-  else
-  {
-    getState(stateObj).getOldTimer().maybePrintTimestepStore("First node time: ", "FirstNodeTime", oldtableout, !getOptions(stateObj).silent);
-  }
-  
+
   getState(stateObj).getOldTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", oldtableout, !getOptions(stateObj).silent);
   getOptions(stateObj).printLine("Total Nodes: " + to_string( getState(stateObj).getNodeCount() ));
   getOptions(stateObj).printLine(string("Problem solvable?: ") + (getState(stateObj).getSolutionCount() == 0 ? "no" : "yes"));

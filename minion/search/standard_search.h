@@ -6,7 +6,11 @@ For Licence Information see file LICENSE.txt
   $Id$
 */
 
+#ifndef STANDARD_SEARCH_H
+#define STANDARD_SEARCH_H
+
 #include "common_search.h"
+#include "../system/system.h"
 
   namespace Controller
 {
@@ -17,10 +21,15 @@ For Licence Information see file LICENSE.txt
   // These need the following functions:
   // Constructor that takes existing variable and value ordering
   // (Feel free to ignore the value ordering!)
-
+  
   template<typename VarOrder, typename Variables, typename Propogator>
-  inline void solve_loop(StateObj* stateObj, VarOrder& order, Variables& v, Propogator prop = PropagateGAC())
+  inline void solve_loop(StateObj* stateObj, function<void (void)> next_search, VarOrder& order, Variables& v, Propogator prop, bool findOneSol)
   {
+    cout << "World depth entering search" << get_world_depth(stateObj) << endl;
+    
+    // Don't corrupt the state the world came in with.
+    world_push(stateObj);
+    
     maybe_print_search_state(stateObj, "Node: ", v);
     D_ASSERT(getQueue(stateObj).isQueuesEmpty());
     while(true)
@@ -28,14 +37,30 @@ For Licence Information see file LICENSE.txt
       D_ASSERT(getQueue(stateObj).isQueuesEmpty());
       getState(stateObj).incrementNodeCount();
       if(do_checks(stateObj))
-        return;
+        throw EndOfSearch();
 
       // order.find_next_unassigned returns true if all variables assigned.
       if(order.find_next_unassigned())
       {  		  
         // This function may escape from search if solution limit
         // has been reached.
-        deal_with_solution(stateObj);
+        cout << "World depth entering recursion" << get_world_depth(stateObj) << endl;
+        next_search();
+        cout << "World depth exiting recursion" << get_world_depth(stateObj) << endl;
+        
+        // This is not for overall solution counting, but auxillary variables.
+        if(findOneSol) 
+        {
+          int search_depth = order.search_depth();
+          for(int i = 0; i < search_depth; ++i)
+            world_pop(stateObj);
+          // One more to remove the initial save.
+          order.reset();
+          world_pop(stateObj);
+          cout << "Solution Leaving" << endl;
+          return;
+        }
+        
         // fail here to force backtracking.
         getState(stateObj).setFailed(true);
       }
@@ -53,7 +78,12 @@ For Licence Information see file LICENSE.txt
       {
         getState(stateObj).setFailed(false);
         if(order.finished_search())
+        {
+          order.reset();
+          world_pop(stateObj);
+          cout << "Search end leaving" << endl;
           return;
+        }
         world_pop(stateObj);
         maybe_print_search_action(stateObj, "bt");
         order.branch_right();
@@ -64,6 +94,4 @@ For Licence Information see file LICENSE.txt
 
 }
 
-
-
-
+#endif
