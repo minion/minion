@@ -48,6 +48,7 @@ inline void world_pop(StateObj* stateObj)
   D_ASSERT(getQueue(stateObj).isQueuesEmpty());
  
   getMemory(stateObj).backTrack().world_pop();
+  getVars(stateObj).getBigRangevarContainer().bms_array.undo();
   
   vector<set<AbstractConstraint*> >& constraintList = getState(stateObj).getConstraintsToPropagate();
   int propagateDepth = get_world_depth(stateObj) + 1;
@@ -65,8 +66,6 @@ inline void world_pop(StateObj* stateObj)
     }
     constraintList.pop_back();
   }
-
-  getVars(stateObj).getBigRangevarContainer().bms_array.undo();
 }
 
 
