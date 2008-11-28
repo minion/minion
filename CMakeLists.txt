@@ -118,7 +118,7 @@ if(CCACHE)
 	set(CMAKE_CXX_COMPILER ${CCACHE})
 endif()
 
-find_package(Boost 1.35 COMPONENTS iostreams thread)
+find_package(Boost 1.33.0 COMPONENTS iostreams thread)
 if(Boost_FOUND)
 	set(CFLAGS "${CFLAGS} -I${Boost_INCLUDE_DIRS}")
 	find_package(ZLIB)
