@@ -3,6 +3,8 @@ http://minion.sourceforge.net
 
 For Licence Information see file LICENSE.txt 
 */
+#include <boost/bind.hpp>
+using boost::bind;
 
 #include "../system/system.h"
 #include "common_search.h"
