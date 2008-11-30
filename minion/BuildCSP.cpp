@@ -5,11 +5,6 @@
  *
  */
 
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-
-using namespace boost;
-
 #include "minion.h"
 
 #include "search/standard_search.h"
@@ -21,7 +16,11 @@ using namespace boost;
 
 #include "CSPSpec.h"
 
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 
+using boost::function;
+using boost::bind;
 
 
 using namespace ProbSpec;

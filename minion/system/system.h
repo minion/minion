@@ -139,12 +139,13 @@ using namespace std;
 
 #define BOOL bool
 
-#ifdef USE_BOOST
-#include <boost/shared_ptr.hpp>
-using boost::shared_ptr;
-#else
 #include "linked_ptr.h"
-#endif
+//#ifdef USE_BOOST
+//#include <boost/shared_ptr.hpp>
+//using boost::shared_ptr;
+//#else
+//#include "linked_ptr.h"
+//#endif
 
 #include "wrapper.h"
 #include "to_string.h"
