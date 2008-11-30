@@ -12,7 +12,7 @@ For Licence Information see file LICENSE.txt
 #include "common_search.h"
 #include "../system/system.h"
 
-  namespace Controller
+namespace Controller
 {
 
 #include "VariableOrders.h"
