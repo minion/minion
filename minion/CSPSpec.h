@@ -595,11 +595,11 @@ struct SearchOrder
   VarOrderEnum order;
   bool find_one_assignment;
   
-  SearchOrder() : order(ORDER_STATIC), find_one_assignment(false)
+  SearchOrder() : order(ORDER_ORIGINAL), find_one_assignment(false)
   { }
   
   SearchOrder(const vector<Var>& _var_order) :
-  var_order(_var_order), order(ORDER_STATIC), find_one_assignment(false)
+  var_order(_var_order), order(ORDER_ORIGINAL), find_one_assignment(false)
   { }
   
   SearchOrder(const vector<Var>& _var_order, VarOrderEnum _order, bool _find_one_assignment = false) :
