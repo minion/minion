@@ -201,6 +201,14 @@ if(THREADSAFE)
 	add_definitions(-DTHREADSAFE)
 endif()
 
+option(PROFILE "" OFF)
+if(PROFILE)
+	message(STATUS "Enabling profiling")
+	set(BINARY "${BINARY}-profile")
+	set(CFLAGS "${CFLAGS} -O -g -fno-inline -fno-inline-functions")
+	set(UNOPTIMISED ON) # Profiing can't cope with -fomit-frame-pointer
+endif()
+
 option(UNOPTIMISED "" OFF)
 if(UNOPTIMISED)
 	message(STATUS "Building unoptimised binary")
@@ -216,12 +224,7 @@ else()
     endif()
 endif()
 
-option(PROFILE "" OFF)
-if(PROFILE)
-	message(STATUS "Enabling profiling")
-	set(BINARY "${BINARY}-profile")
-	set(CFLAGS "${CFLAGS} -g -fno-inline -fno-inline-functions")
-endif()
+
 
 option(SMALL "" OFF)
 if(SMALL)
