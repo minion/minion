@@ -5,15 +5,15 @@
 rm -f CT*.cpp
 
 # First, build constraint_defs.h, which just maps ConstraintList into a valid C struct.
-echo > constraint_defs.h
-echo ConstraintDef constraint_list[] = \{ >> constraint_defs.h
-while read f
-do
+#echo > constraint_defs.h
+#echo ConstraintDef constraint_list[] = \{ >> constraint_defs.h
+#while read f
+#do
   # echo Building $f
-  ./internal_ConstraintDef.sh $f >> constraint_defs.h
-done < ConstraintList
+#  ./internal_ConstraintDef.sh $f >> constraint_defs.h
+#done < ConstraintList
 
-echo \}\; >> constraint_defs.h
+#echo \}\; >> constraint_defs.h
 
 # Output a simple header that contains all the constraint identifiers
 

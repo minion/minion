@@ -10,6 +10,9 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply")
 
+set(CONSTRAINTS_LIST "minion/build_constraints/ConstraintList")
+set(CONSTRAINT_DEFS "minion/build_constraints/constraint_defs.h")
+
 set(NAME_ID_element "CT_ELEMENT")
 set(NAME_TYPE_element "STATIC_CT")
 set(NAME_READ_element "read_list" "read_var" "read_var")
@@ -235,18 +238,28 @@ set(NAME_TYPE_reifyimply "DYNAMIC_CT")
 set(NAME_READ_reifyimply "read_constraint" "read_bool_var")
 
 macro(select_constraints)
-    file(REMOVE "minion/build_constraints/ConstraintList")
+    file(REMOVE ${CONSTRAINTS_LIST})
+    file(REMOVE ${CONSTRAINT_DEFS})
+    file(APPEND ${CONSTRAINT_DEFS} "ConstraintDef constraint_list[] = {\n")
     foreach(constraint ${ARGV})
         set(index -1)
         list(FIND ALL_CONSTRAINTS ${constraint} index)
         if(${index} GREATER -1)
-            file(APPEND "minion/build_constraints/ConstraintList"
+            list(LENGTH NAME_READ_${constraint} num_read_funcs)
+            # ConstraintList
+            file(APPEND ${CONSTRAINTS_LIST}
                  "${NAME_TYPE_${constraint}} \"${constraint}\" ${NAME_ID_${constraint}}")
             foreach(read_func ${NAME_READ_${constraint}})
-                file(APPEND "minion/build_constraints/ConstraintList"
-                     " ${read_func}")
+                file(APPEND ${CONSTRAINTS_LIST} " ${read_func}")
             endforeach()
-            file(APPEND "minion/build_constraints/ConstraintList" "\n")
+            file(APPEND ${CONSTRAINTS_LIST} "\n")
+            # constraint_defs.h
+            file(APPEND ${CONSTRAINT_DEFS} "{ \"${constraint}\", ${NAME_ID_${constraint}}, ${num_read_funcs}, {")
+            foreach(read_func ${NAME_READ_${constraint}})
+                file(APPEND ${CONSTRAINT_DEFS} "${read_func}, ")
+            endforeach()
+            file(APPEND ${CONSTRAINT_DEFS} "}, ${NAME_TYPE_${constraint}} },\n")
         endif()
     endforeach()
+    file(APPEND ${CONSTRAINT_DEFS} "};")
 endmacro()
