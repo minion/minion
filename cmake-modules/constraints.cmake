@@ -10,12 +10,19 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply")
 
-set(CONSTRAINTS_LIST "minion/build_constraints/ConstraintList")
-set(CONSTRAINT_DEFS "minion/build_constraints/constraint_defs.h")
-set(CONSTRAINT_ENUM "minion/build_constraints/ConstraintEnum.h")
-set(BUILD_CONSTRAINTS_START "minion/build_constraints/BuildConstraintsStart.h")
-set(BUILD_START "minion/build_constraints/BuildStart.h")
-set(BUILD_STATIC_START "minion/build_constraints/BuildStaticStart.h")
+set(GEN_FILES_DIR "minion/build_constraints")
+set(CONSTRAINTS_LIST "${GEN_FILES_DIR}/ConstraintList")
+set(CONSTRAINT_DEFS "${GEN_FILES_DIR}/constraint_defs.h")
+set(CONSTRAINT_ENUM "${GEN_FILES_DIR}/ConstraintEnum.h")
+set(BUILD_CONSTRAINTS_START "${GEN_FILES_DIR}/BuildConstraintsStart.h")
+set(BUILD_START "${GEN_FILES_DIR}/BuildStart.h")
+set(BUILD_STATIC_START "${GEN_FILES_DIR}/BuildStaticStart.h")
+set(CONSTRAINT_HEADER "#include \"../minion.h\"
+/* Minion Constraint Solver
+   http://minion.sourceforge.net
+   
+   For Licence Information see file LICENSE.txt 
+*/\n\n")
 
 set(NAME_ID_element "CT_ELEMENT")
 set(NAME_TYPE_element "STATIC_CT")
@@ -242,6 +249,7 @@ set(NAME_TYPE_reifyimply "DYNAMIC_CT")
 set(NAME_READ_reifyimply "read_constraint" "read_bool_var")
 
 macro(select_constraints)
+    message(STATUS "Generating constraints:")
     file(REMOVE ${CONSTRAINTS_LIST})
     file(REMOVE ${CONSTRAINT_DEFS})
     file(REMOVE ${CONSTRAINT_ENUM})
@@ -252,14 +260,18 @@ macro(select_constraints)
     file(APPEND ${CONSTRAINT_ENUM} "#ifndef CONSTRAINT_ENUM_H_BLARG\n")
     file(APPEND ${CONSTRAINT_ENUM} "#define CONSTRAINT_ENUM_H_BLARG\n")
     file(APPEND ${CONSTRAINT_ENUM} "enum ConstraintType {\n")
-    file(APPEND ${BUILD_START} "#defined NO_MAIN\n#include \"../minion.h\"\n")
+    file(APPEND ${BUILD_START} "#define NO_MAIN\n#include \"../minion.h\"\n")
     file(APPEND ${BUILD_STATIC_START} "#include \"BuildStart.h\"\n")
     file(APPEND ${BUILD_STATIC_START} "AbstractConstraint* build_constraint(StateObj* stateObj, ConstraintBlob& b) {\n")
     file(APPEND ${BUILD_STATIC_START} "switch(b.constraint->type) {\n")
+    file(GLOB_RECURSE constraint_headers
+                      RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/${GEN_FILES_DIR}"
+                      "minion/constraints/*.h" "minion/dynamic_constraints/*.h")
     foreach(constraint ${ARGV})
         set(index -1)
         list(FIND ALL_CONSTRAINTS ${constraint} index)
         if(${index} GREATER -1)
+            message(STATUS "${constraint}")
             list(LENGTH NAME_READ_${constraint} num_read_funcs)
             set(build_read_funcs "")
             foreach(read_func ${NAME_READ_${constraint}})
@@ -268,13 +280,6 @@ macro(select_constraints)
                 endif()
             endforeach()
             list(LENGTH build_read_funcs build_num_read_funcs)
-            # ConstraintList
-            file(APPEND ${CONSTRAINTS_LIST}
-                 "${NAME_TYPE_${constraint}} \"${constraint}\" ${NAME_ID_${constraint}}")
-            foreach(read_func ${NAME_READ_${constraint}})
-                file(APPEND ${CONSTRAINTS_LIST} " ${read_func}")
-            endforeach()
-            file(APPEND ${CONSTRAINTS_LIST} "\n")
             # constraint_defs.h
             file(APPEND ${CONSTRAINT_DEFS} "{ \"${constraint}\", ${NAME_ID_${constraint}}, ${num_read_funcs}, {")
             foreach(read_func ${NAME_READ_${constraint}})
@@ -289,6 +294,19 @@ macro(select_constraints)
             file(APPEND ${BUILD_START} "BUILD_DEF_${NAME_TYPE_${constraint}}(${NAME_ID_${constraint}})\n")
             # BuildStaticStart.h
             file(APPEND ${BUILD_STATIC_START} "case ${NAME_TYPE_${constraint}}: return build_constraint_${NAME_TYPE_${constraint}}(stateObj, b);\n")
+            # CT_*.cpp
+            file(REMOVE "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp")
+            file(APPEND "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp"
+                        ${CONSTRAINT_HEADER})
+            foreach(constraint_header ${constraint_headers})
+                file(READ "${GEN_FILES_DIR}/${constraint_header}" contents)
+                if(contents MATCHES ${NAME_ID_${constraint}})
+                    file(APPEND "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp"
+                                "#include \"${constraint_header}\"\n")
+                endif()
+            endforeach()
+            file(APPEND "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp"
+                        "\nBUILD_${NAME_TYPE_${constraint}}(${NAME_ID_${constraint}}, ${build_num_read_funcs})\n")
         endif()
     endforeach()
     file(APPEND ${CONSTRAINT_DEFS} "};")
