@@ -35,7 +35,7 @@ to_string(T1 t1, T2 t2)
 
 template<typename T, typename U>
 std::ostream& operator<<(std::ostream& o, const std::pair<T,U>& p)
-{ return o << "pair(" << p.first << "," << p.second << ")"; }
+{ return o << "(" << p.first << "," << p.second << ")"; }
 
 template<typename T>
 void output_container(std::ostream& o, const T& t)
