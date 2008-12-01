@@ -24,7 +24,7 @@
 	#echo BUILD_DEF \#\# $count\($3\) >> BuildConstraintsStart.h
 	
 #	if [ "$1" = "STATIC_CT" ]; then
-	  echo case $3 : return build_constraint_$3\(stateObj, b\)\; >> BuildStaticStart.cpp
+#	  echo case $3 : return build_constraint_$3\(stateObj, b\)\; >> BuildStaticStart.cpp
 #	 else
 #	  echo case $3 : return build_constraint_$3\(stateObj, b\)\; >> BuildDynamicStart.cpp
 #	 fi

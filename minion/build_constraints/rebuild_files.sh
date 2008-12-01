@@ -30,11 +30,11 @@ rm -f CT*.cpp
 #echo \#define NO_MAIN > BuildStart.h
 #echo \#include \"../minion.h\" >> BuildStart.h
 
-echo \#include \"BuildStart.h\"   > BuildStaticStart.cpp
+#echo \#include \"BuildStart.h\"   > BuildStaticStart.cpp
 #echo \#include \"BuildStart.h\"   > BuildDynamicStart.cpp
 
-echo AbstractConstraint\* build_constraint\(StateObj* stateObj, ConstraintBlob\& b\) \{ >> BuildStaticStart.cpp
-echo switch\(b.constraint-\>type\) \{ >> BuildStaticStart.cpp
+#echo AbstractConstraint\* build_constraint\(StateObj* stateObj, ConstraintBlob\& b\) \{ >> BuildStaticStart.cpp
+#echo switch\(b.constraint-\>type\) \{ >> BuildStaticStart.cpp
 
 #echo AbstractConstraint\* build_dynamic_constraint\(StateObj* stateObj, ConstraintBlob\& b\) \{ >> BuildDynamicStart.cpp
 #echo switch\(b.constraint-\>type\) \{ >> BuildDynamicStart.cpp
@@ -45,8 +45,8 @@ do
 	./internal_buildconstraint.sh $f
 done < ConstraintList
 
-echo 'default: D_FATAL_ERROR("Fatal error building constraints");' >> BuildStaticStart.cpp
+#echo 'default: D_FATAL_ERROR("Fatal error building constraints");' >> BuildStaticStart.cpp
 #echo 'default: D_FATAL_ERROR("Fatal error building constraints");' >> BuildDynamicStart.cpp
 
-echo \}\} >> BuildStaticStart.cpp
+#echo \}\} >> BuildStaticStart.cpp
 #echo \}\} >> BuildDynamicStart.cpp
