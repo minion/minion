@@ -17,12 +17,12 @@ rm -f CT*.cpp
 
 # Output a simple header that contains all the constraint identifiers
 
-echo \#ifndef CONSTRAINT_ENUM_H_BLARG >  ConstraintEnum.h
-echo \#define CONSTRAINT_ENUM_H_BLARG >> ConstraintEnum.h
-echo enum ConstraintType \{ >> ConstraintEnum.h
-awk '{print $3,","}' < ConstraintList >> ConstraintEnum.h
-echo \}\; >> ConstraintEnum.h
-echo \#endif >> ConstraintEnum.h
+#echo \#ifndef CONSTRAINT_ENUM_H_BLARG >  ConstraintEnum.h
+#echo \#define CONSTRAINT_ENUM_H_BLARG >> ConstraintEnum.h
+#echo enum ConstraintType \{ >> ConstraintEnum.h
+#awk '{print $3,","}' < ConstraintList >> ConstraintEnum.h
+#echo \}\; >> ConstraintEnum.h
+#echo \#endif >> ConstraintEnum.h
 
 # Now build the machinery which builds all the constraints.
 
