@@ -27,8 +27,8 @@ rm -f CT*.cpp
 # Now build the machinery which builds all the constraints.
 
 #echo > BuildConstraintsStart.h
-echo \#define NO_MAIN > BuildStart.h
-echo \#include \"../minion.h\" >> BuildStart.h
+#echo \#define NO_MAIN > BuildStart.h
+#echo \#include \"../minion.h\" >> BuildStart.h
 
 echo \#include \"BuildStart.h\"   > BuildStaticStart.cpp
 #echo \#include \"BuildStart.h\"   > BuildDynamicStart.cpp

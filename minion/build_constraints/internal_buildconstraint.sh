@@ -29,7 +29,7 @@
 #	  echo case $3 : return build_constraint_$3\(stateObj, b\)\; >> BuildDynamicStart.cpp
 #	 fi
 	
-	echo BUILD_DEF_$1\($3\) >> BuildStart.h
+#	echo BUILD_DEF_$1\($3\) >> BuildStart.h
 
 # This might look like a mess, but it's just to get the formatting how it was
 # done manually, to avoid nasty svn diffs for no good reason.
