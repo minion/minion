@@ -224,10 +224,12 @@ public:
   /// The filename of the current input file (-- if reading from command line)
   string instance_name;
   
-
   bool redump;
   bool graph;
 
+  // The format of output used (-1 for default)
+  int outputType;
+  
   SearchOptions() : 
     wdeg_on(false), find_generators(false), 
     cspcomp(false), silent(false), dumptree(false), sollimit(1), fullpropagate(false), 
@@ -237,7 +239,8 @@ public:
     nocheck(false),
 #endif
     nodelimit(0), tableout(false), solsoutWrite(false), 
-    print_solution(true), time_limit(0), randomise_valvarorder(false), parser_verbose(false), redump(false), graph(false)
+    print_solution(true), time_limit(0), randomise_valvarorder(false), parser_verbose(false), 
+    redump(false), graph(false), outputType(-1)
   {}
   
   /// Denotes all solutions should be found, by setting sollimit to -1.

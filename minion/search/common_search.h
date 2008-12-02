@@ -131,7 +131,7 @@ namespace Controller
       if (!getOptions(stateObj).silent) 
       {
         cout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
-        getState(stateObj).getOldTimer().printTimestepWithoutReset("Time:");
+        getState(stateObj).getOldTimer().printTimestepWithoutReset(Output_Always, "Time:");
         cout << "Nodes: " << getState(stateObj).getNodeCount() << endl << endl;
       }
     }
@@ -247,7 +247,7 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
   install_ctrlc_trigger(stateObj);
 	lock(stateObj);
 	if (!getOptions(stateObj).silent) 
-	  getState(stateObj).getOldTimer().printTimestepWithoutReset("First Node Time: ");
+	  getState(stateObj).getOldTimer().printTimestepWithoutReset(Output_1, "First Node Time: ");
 	/// Failed initially propagating constraints!
 	if(getState(stateObj).isFailed())
 	  return;

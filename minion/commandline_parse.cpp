@@ -20,7 +20,11 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
   { getOptions(stateObj).redump = true; }
   else if(command == string("-Xgraph"))
   { getOptions(stateObj).graph = true; }
-
+  else if(command == string("-outputType"))
+  {
+    ++i;
+    getOptions(stateObj).outputType = atoi(argv[i]);
+  }
 	else if(command == string("-printsols"))
 	{ getOptions(stateObj).print_solution = true; }
 	else if(command == string("-noprintsols"))
