@@ -97,7 +97,7 @@ endif()
 
 file(GLOB SRCS "minion/build_constraints/CT*.cpp")
 foreach(ct ${SRCS})
-    string(REGEX MATCH "CT_[A-Z_]+" ct_name ${ct})
+    string(REGEX MATCH "CT_[A-Z_0-9]+" ct_name ${ct})
     add_definitions(-D${ct_name}_ABC)
 endforeach()
 list(APPEND SRCS minion/BuildConstraint2.cpp
