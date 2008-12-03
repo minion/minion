@@ -76,7 +76,7 @@ public:
 
   /// Returns the pointer.
   void* get_ptr() const
-#ifdef NO_DEBUG
+#ifndef SLOW_DEBUG
   { return ptr; }
 #else
     ; // Defined at bottom of file.
@@ -337,9 +337,6 @@ public:
   bool checkPointerValid(const MoveablePointer*const vp)
   {
     void* ptr = vp->get_ptr_noCheck();
-    // This message is useful when debugging memory issues, but prints far too much in normal usage.
-    // D_INFO(0, DI_MEMBLOCK, "Checking for " + to_string(vp) + " to " + to_string(ptr) + " in range " + to_string((void*) current_data) + string(":")
-    //  + to_string((void*)(current_data + allocated_bytes)));
 
     bool check1 = (pointers.count(const_cast<MoveablePointer*>(vp)) > 0);
     bool check2 = (ptr >= current_data && ptr < current_data + allocated_bytes);
@@ -395,6 +392,9 @@ inline MoveablePointer::MoveablePointer(void* _ptr) : ptr(_ptr)
 inline MoveablePointer::~MoveablePointer()
 {
   D_INFO(0,DI_POINTER,"Remove pointer at " + to_string(this));
+#ifndef SLOW_DEBUG
+  D_ASSERT(memBlockCache.checkPointerValid(this));
+#endif
   if(ptr != NULL)
     memBlockCache.removePointerFromNewMemoryBlock(this);
 }
@@ -407,7 +407,7 @@ inline MoveablePointer::MoveablePointer(const MoveablePointer& b, int offset) : 
 }
 
 
-#ifndef NO_DEBUG
+#ifdef SLOW_DEBUG
 inline void* MoveablePointer::get_ptr() const
 {
   D_ASSERT(memBlockCache.checkPointerValid(this));

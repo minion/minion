@@ -186,6 +186,14 @@ else()
     endif()
 endif()
 
+option(SLOW_DEBUG "" OFF)
+if(SLOW_DEBUG)
+    message(STATUS "Enabling slow DEBUG")
+    set(BINARY ${BINARY}-debugextra)
+    add_definitions(-DSLOW_DEBUG)
+    set(DEBUG "TRUE")
+endif()
+
 option(DEBUG "" OFF)
 option(PRINT "" OFF)
 if(DEBUG)
@@ -198,6 +206,7 @@ if(DEBUG)
         add_definitions(-D_GLIBCXX_DEBUG -DMINION_DEBUG -DMORE_SEARCH_INFO)
     endif()
 endif()
+
 
 option(THREADSAFE "" OFF)
 if(THREADSAFE)
