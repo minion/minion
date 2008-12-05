@@ -5,7 +5,6 @@ include(CheckIncludeFileCXX)
 include(CheckCXXCompilerFlag)
 include(FindBoost)
 include(FindGMP)
-include(FindBZip2)
 include(constraints)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
