@@ -1306,26 +1306,44 @@ def generatevariables(varblocks, types, boundallowed):
 def comparetrees(same):
     # Fork so that memory used in building and comparing
     # trees in the child process is returned when the process ends.
+    r, w = os.pipe() # these are file descriptors, not file objects
+    
     parentpid=os.getpid()
 
-    # do the tree comparison:
-    tree1=tree()
-    tree2=tree()
-    
-    tree1.buildtree(str(parentpid)+"outfile1")
-    tree2.buildtree(str(parentpid)+"outfile2")
-    
-    if same:
-        temp= tree1.equal(tree2)
+    pid = os.fork()
+    if pid:
+        # we are the parent
+        os.close(w) # use os.close() to close a file descriptor
+        r = os.fdopen(r) # turn r into a file object
+        txt = r.read()
+        os.waitpid(pid, 0) # make sure the child process gets cleaned up
+        return bool(txt)
     else:
-        temp= tree1.subset(tree2)
-    
-    # now return 
-    if temp:
-        os.remove(str(parentpid)+"outfile1")
-        os.remove(str(parentpid)+"outfile2")
-        os.remove(str(parentpid)+"infile1.minion")
-        os.remove(str(parentpid)+"infile2.minion")
-        return True
-    else:
-        return False
+        # we are the child
+        os.close(r)
+        w = os.fdopen(w, 'w')
+        
+        # do the tree comparison:
+        tree1=tree()
+        tree2=tree()
+        
+        tree1.buildtree(str(parentpid)+"outfile1")
+        tree2.buildtree(str(parentpid)+"outfile2")
+        
+        if same:
+            temp= tree1.equal(tree2)
+        else:
+            temp= tree1.subset(tree2)
+        
+        # now return 
+        if temp:
+            os.remove(str(parentpid)+"outfile1")
+            os.remove(str(parentpid)+"outfile2")
+            os.remove(str(parentpid)+"infile1.minion")
+            os.remove(str(parentpid)+"infile2.minion")
+            w.write("True")
+        
+        w.close()
+        sys.exit(0)
+
+
