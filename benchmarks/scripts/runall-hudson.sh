@@ -1,6 +1,6 @@
 #!/bin/sh
-python benchmarks/scripts/benchmark-hudson.py $1 bibd benchmarks/Bibd/bibdline?.minion
-python benchmarks/scripts/benchmark-hudson.py $1 bibd-watched benchmarks/Bibd/bibdline?watched.minion
+python benchmarks/scripts/benchmark-hudson.py $1 bibd benchmarks/Bibd/bibdline*[0-9].minion
+python benchmarks/scripts/benchmark-hudson.py $1 bibd-watched benchmarks/Bibd/bibdline*watched.minion
 python benchmarks/scripts/benchmark-hudson.py $1 solitaire benchmarks/solitaire/*
 python benchmarks/scripts/benchmark-hudson.py $1 SAT benchmarks/SAT/*
 python benchmarks/scripts/benchmark-hudson.py $1 quasigroup-element benchmarks/Quasigroup/qg-element*
