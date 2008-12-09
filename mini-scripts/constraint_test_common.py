@@ -593,7 +593,7 @@ class testwatchless:
 
     def runtest(self, options=dict()):
         return runtestgeneral("watchless", True, options, [1,1], ["num", "num"], [1,1], self, True)
-		
+        
 class testineq:
     def printtable(self, domains):
         const=self.constants[0]
@@ -1306,23 +1306,17 @@ def generatevariables(varblocks, types, boundallowed):
 def comparetrees(same):
     # Fork so that memory used in building and comparing
     # trees in the child process is returned when the process ends.
-    r, w = os.pipe() # these are file descriptors, not file objects
     
     parentpid=os.getpid()
 
     pid = os.fork()
     if pid:
         # we are the parent
-        os.close(w) # use os.close() to close a file descriptor
-        r = os.fdopen(r) # turn r into a file object
-        txt = r.read()
-        os.waitpid(pid, 0) # make sure the child process gets cleaned up
-        return bool(txt)
+        (pid, exitcode) = os.waitpid(pid, 0) # make sure the child process gets cleaned up
+        return (exitcode == 0)
     else:
         # we are the child
-        os.close(r)
-        w = os.fdopen(w, 'w')
-        
+        sys.exit(0)
         # do the tree comparison:
         tree1=tree()
         tree2=tree()
@@ -1341,9 +1335,8 @@ def comparetrees(same):
             os.remove(str(parentpid)+"outfile2")
             os.remove(str(parentpid)+"infile1.minion")
             os.remove(str(parentpid)+"infile2.minion")
-            w.write("True")
+            sys.exit(0)
         
-        w.close()
-        sys.exit(0)
+        sys.exit(1)
 
 

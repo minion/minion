@@ -114,6 +114,7 @@ for procNum in range(procs):
         offset = procNum * (len(conslist) // procs)
         for consname1 in conslist[offset:(offset + num)]:
             print "Testing %s, seed %i"%(consname1, seed)
+            sys.stdout.flush()
             random.seed(seed)
         
             reify=False
@@ -134,6 +135,7 @@ for procNum in range(procs):
                 options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False}
                 if not testobj.runtest(options):
                     print "Failed when testing %s"%consname1
+                    sys.stdout.flush()
                     sys.exit(1)
         sys.stdout.close()
         sys.exit(0)
