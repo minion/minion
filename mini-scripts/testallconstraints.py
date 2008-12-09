@@ -140,8 +140,8 @@ for procNum in range(procs):
         sys.stdout.close()
         sys.exit(0)
 
-for worker in workers:
-    read = os.fdopen(readers.pop(0))
+for worker, reader in zip(workers, readers):
+    read = os.fdopen(reader)
     (pid, exitcode) = os.waitpid(worker, 0)
     sys.stdout.write(read.read())
     read.close()
