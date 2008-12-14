@@ -8,7 +8,6 @@ include(FindGMP)
 include(constraints)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
-set(Boost_USE_STATIC_LIBS true)
 
 project(minion)
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin")
@@ -117,11 +116,31 @@ list(APPEND SRCS minion/help/help.cpp)
 
 set(BINARY ${PROJECT_NAME})
 
+find_program(UNAME uname)
+if(UNAME)
+    execute_process(COMMAND ${UNAME}
+            OUTPUT_VARIABLE UNAME_OUT OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(UNAME_OUT STREQUAL "Darwin")
+        set(APPLEMAC 1)
+    endif()
+endif()
+
 find_program(CCACHE ccache)
 if(CCACHE)
     message(STATUS "Using ccache")
     set(CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
     set(CMAKE_CXX_COMPILER ${CCACHE})
+endif()
+
+option(STATIC "" OFF)
+if(STATIC)
+    message(STATUS "Building static binary")
+    set(BINARY "${BINARY}-static")
+    if(APPLEMAC)
+        set(Boost_USE_STATIC_LIBS true)
+    else()
+        set(CMAKE_EXE_LINKER_FLAGS "-static")
+    endif()
 endif()
 
 find_package(Boost 1.33.0 COMPONENTS iostreams thread)
@@ -293,13 +312,6 @@ if(REENTER)
     message(STATUS "Enabling REENTER")
     set(BINARY "${BINARY}-reenter")
     add_definitions(-DREENTER)
-endif()
-
-option(STATIC "" OFF)
-if(STATIC)
-    message(STATUS "Building static binary")
-    set(BINARY "${BINARY}-static")
-    set(CMAKE_EXE_LINKER_FLAGS "-static")
 endif()
 
 if(DEFINED ENV{CPU})
