@@ -331,14 +331,15 @@ if(NAME)
 endif()
 message(STATUS "Executable name set to \"${BINARY}\"")
 
-add_library(${BINARY}-lib ${SRCS})
+add_library(${BINARY}-lib STATIC EXCLUDE_FROM_ALL ${SRCS})
 
-add_executable(${BINARY} minion/minion.cpp)
-target_link_libraries(${BINARY} ${BINARY}-lib)
+add_executable(${BINARY} ${SRCS} minion/minion.cpp)
+#target_link_libraries(${BINARY} ${BINARY}-lib)
 
 # when we're building minion-something, add a "minion" target that does the same
 if(NOT ${BINARY} STREQUAL ${PROJECT_NAME})
     add_custom_target(${PROJECT_NAME} DEPENDS ${BINARY})
+    add_custom_target(${PROJECT_NAME}-lib DEPENDS ${BINARY}-lib)
 endif()
 
 if(Boost_FOUND)
