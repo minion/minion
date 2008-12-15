@@ -142,6 +142,10 @@ if(STATIC)
         add_definitions(-mmacosx-version-min=10.4)
         set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.4 )
     else()
+        # the line below builds minion with just the boost stuff statically
+        # linked, however, as the location of the other libraries varies between
+        # linux distros, we just stuff everything into the binary
+        #set(Boost_USE_STATIC_LIBS true)
         set(CMAKE_EXE_LINKER_FLAGS "-static")
     endif()
 endif()
