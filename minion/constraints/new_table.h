@@ -221,7 +221,15 @@ struct NewTableConstraint : public AbstractConstraint
 
   NewTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) : 
   AbstractConstraint(stateObj), vars(_vars), data(new TableDataType(_tuples)), state(data)
-  { }
+  {
+      if(_tuples->tuple_size()!=_vars.size())
+      {
+          cout << "Table constraint: Number of variables " 
+            << _vars.size() << " does not match length of tuples "
+            << _tuples->tuple_size() << "." << endl;
+          FAIL_EXIT();
+      }
+  }
 
   LiteralSpecificLists* lists;
 
