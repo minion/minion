@@ -167,7 +167,7 @@ if(Boost_FOUND)
         message(STATUS "Zlib not found, building without compressed file support")
     endif()
 else()
-    message(FATAL_ERROR "Boost not found")
+    message(FATAL_ERROR "Boost not found -- do you have both iostreams and thread components?")
 endif()
 
 #find_package(GMP)
