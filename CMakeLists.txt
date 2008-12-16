@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.4.6)
+cmake_minimum_required(VERSION 2.4.7)
 
 set(CMAKE_MODULE_PATH cmake-modules)
 include(CheckIncludeFileCXX)
