@@ -1,6 +1,3 @@
-
-
-
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -24,6 +21,8 @@
 
 // Does not trigger itself if this is on, and incgraph is on.
 #define ONECALL
+
+//#define CAPBOUNDSCACHE
 
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
@@ -134,6 +133,12 @@ struct GCC : public AbstractConstraint
             for(int i=0; i<numvars; i++) adjlistlength[i]=numvals;
             for(int i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
         #endif
+        
+        #ifdef CAPBOUNDSCACHE
+        boundsupported.resize(numvals*2, -1);  
+        // does the bound need to be updated? Indexed as validx*2 for lowerbound, validx*2+1 for ub
+        // Contains the capacity value which is supported. Reset to -1 if the support is lost.
+        #endif
     }
     
     VarArray1 var_array;   // primary variables
@@ -160,7 +165,7 @@ struct GCC : public AbstractConstraint
           if(var_array[i].getInitialMax()>dom_max)
               dom_max=var_array[i].getInitialMax();
         }
-        numvars=var_array.size();  // number of main variables in the constraint
+        numvars=var_array.size();  // number of target variables in the constraint
         return dom_max-dom_min+1;
     }
     
@@ -186,6 +191,7 @@ struct GCC : public AbstractConstraint
             }
         }
         #ifdef INCGRAPH
+        {
             // update the adjacency lists. and place dts
             DynamicTrigger* dt=dynamic_trigger_start();
             for(int i=dom_min; i<=dom_max; i++)
@@ -211,6 +217,27 @@ struct GCC : public AbstractConstraint
                         DynamicTrigger* mydt= dt+(var*numvals)+(i-dom_min);
                         var_array[var].addDynamicTrigger(mydt, DomainRemoval, i);
                     }
+                }
+            }
+        }
+        #endif
+        
+        #ifdef CAPBOUNDSCACHE
+            DynamicTrigger* dt=dynamic_trigger_start();
+            dt+=(numvars*numvals);
+            for(int i=0; i<val_array.size(); i++)
+            {
+                // lowerbound first
+                for(int j=0; j<(val_array.size()+numvars); j++)
+                {
+                    dt->trigger_info()=(val_array[i]-dom_min)*2;
+                    dt++;
+                }
+                // upperbound
+                for(int j=0; j<(val_array.size()+numvars); j++)
+                {
+                    dt->trigger_info()=(val_array[i]-dom_min)*2+1;
+                    dt++;
                 }
             }
         #endif
@@ -256,13 +283,23 @@ struct GCC : public AbstractConstraint
     }
     #endif
     
-    #ifdef INCGRAPH
     // convert constraint into dynamic. 
     int dynamic_trigger_count()
     {
-        return numvars*numvals; // one for each var-val pair so we know when it is removed.
+        #if defined(INCGRAPH) && !defined(CAPBOUNDSCACHE)
+            return numvars*numvals; // one for each var-val pair so we know when it is removed.
+        #endif
+        
+        #if !defined(INCGRAPH) && !defined(CAPBOUNDSCACHE)
+            return 0;
+        #endif
+        
+        #ifdef CAPBOUNDSCACHE
+            // first numvars*numvals triggers are not used when INCGRAPH is not defined.
+            // one block of numvars+val_Array.size() for each bound. 
+            return numvars*numvals + 2*val_array.size()*(numvars+val_array.size());
+        #endif
     }
-    #endif
     
     PROPAGATE_FUNCTION(int prop_var, DomainDelta)
     {
@@ -286,46 +323,70 @@ struct GCC : public AbstractConstraint
         }
     }
     
-    #ifdef INCGRAPH
     PROPAGATE_FUNCTION(DynamicTrigger* trig)
     {
         DynamicTrigger* dtstart=dynamic_trigger_start();
-        // which var/val is this trigger attached to?
-        int diff=trig-dtstart;
-        int var=diff/numvals;
-        int validx=diff%numvals;
-        if(adjlistpos[validx+numvars][var]<adjlistlength[validx+numvars])
+        
+        #ifdef CAPBOUNDSCACHE
+        if(trig< dtstart+(numvars*numvals))
+        #endif
         {
-            adjlist_remove(var, validx+dom_min); //validx, adjlistpos[validx][var]);
-            if(varvalmatching[var]==validx+dom_min) // remove invalid value in the matching.
+            // which var/val is this trigger attached to?
+            #ifdef INCGRAPH
+            int diff=trig-dtstart;
+            int var=diff/numvals;
+            int validx=diff%numvals;
+            if(adjlistpos[validx+numvars][var]<adjlistlength[validx+numvars])
             {
-                varvalmatching[var]=dom_min-1;
-                usage[validx]--;
-            }
-            // trigger the constraint here
-            #ifdef ONECALL
-            if(!to_process.in(var))
-            {
-                to_process.insert(var);  // add the var to the queue to be processed.
-            }
-            if(!constraint_locked)
-            {
-                #ifdef SPECIALQUEUE
-                constraint_locked = true;
-                getQueue(stateObj).pushSpecialTrigger(this);
-                #else
-                #ifdef SCC
-                do_gcc_prop_scc();
-                #else
-                do_gcc_prop();
+                adjlist_remove(var, validx+dom_min); //validx, adjlistpos[validx][var]);
+                if(varvalmatching[var]==validx+dom_min) // remove invalid value in the matching.
+                {
+                    varvalmatching[var]=dom_min-1;
+                    usage[validx]--;
+                }
+                // trigger the constraint here
+                #ifdef ONECALL
+                if(!to_process.in(var))
+                {
+                    to_process.insert(var);  // add the var to the queue to be processed.
+                }
+                if(!constraint_locked)
+                {
+                    #ifdef SPECIALQUEUE
+                    constraint_locked = true;
+                    getQueue(stateObj).pushSpecialTrigger(this);
+                    #else
+                    #ifdef SCC
+                    do_gcc_prop_scc();
+                    #else
+                    do_gcc_prop();
+                    #endif
+                    #endif
+                }
                 #endif
-                #endif
             }
+            // else the constraint triggered itself.
             #endif
         }
-        // else the constraint triggered itself.
-        
+        #ifdef CAPBOUNDSCACHE
+        else
+        {
+            //dtstart=dtstart+(numvars*numvals);
+            D_ASSERT(trig>= dtstart && trig<dtstart+(2*val_array.size()*(numvars+val_array.size())) );
+            // arranged in blocks per value. Then the first half of the block is for lower bound.
+            /*int diff=trig-dtstart;
+            int val_arrayidx=diff/((val_array.size()+numvars)*2);
+            int value=val_array[val_arrayidx];
+            int lbub=(diff/((val_array.size()+numvars)))%2;  // lowerbound or upperbound. SIMPLIFY HERE.
+            boundsupported[(value-dom_min)*2+lbub]=-1;*/
+            boundsupported[trig->trigger_info()]=-1;
+        }
+        #endif
     }
+    
+    #ifdef CAPBOUNDSCACHE
+    vector<int> boundsupported;  // does the bound need to be updated? Indexed as validx*2 for lowerbound, validx*2+1 for ub
+    // Contains the capacity value which is supported. Reset to -1 if the support is lost.
     #endif
     
     virtual void special_unlock() { constraint_locked = false;  } // to_process.clear(); why commented out?
@@ -611,31 +672,13 @@ struct GCC : public AbstractConstraint
                 for(int valinscc=0; valinscc<vals_in_scc.size(); valinscc++)
                 {
                     int v=vals_in_scc[valinscc];
-                    if(val_to_cap_index[v-dom_min]!=-1)
+                    if(val_to_cap_index[v-dom_min]!=-1 && lower[v-dom_min]!=upper[v-dom_min])
+                    {
                         prop_capacity_strong_scc(v);
+                    }
                 }
             #endif
             
-            // now do basic prop from main vars to cap variables. equiv to occurrence constraints I think.
-            // CAN'T do it here because there may be values in this scc which also occur elsewhere, assigned to some var.
-            /*for(int scci=0; scci<vals_in_scc.size(); scci++)
-            {
-                int val=vals_in_scc[scci];
-                int mincap=0;
-                int maxcap=0;
-                for(int var=0; var<numvars; var++)
-                {
-                    //int var=vars_in_scc[j];
-                    if(var_array[var].inDomain(val))
-                    {
-                        maxcap++;
-                        if(var_array[var].isAssigned())
-                            mincap++;
-                    }
-                }
-                capacity_array[val-dom_min].setMin(mincap);
-                capacity_array[val-dom_min].setMax(maxcap);
-            }*/
         }
         }
         
@@ -1471,14 +1514,11 @@ struct GCC : public AbstractConstraint
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Propagate to capacity variables.
     
+    // can only be called when SCCs not used. 
     inline void prop_capacity()
     {
         #ifdef STRONGCARDS
-            #if defined(SCC) && defined(SCCCARDS)
-                prop_capacity_strong_scc();
-            #else
-                prop_capacity_strong();
-            #endif
+            prop_capacity_strong();
         #else
             prop_capacity_simple();   
         #endif
@@ -1491,19 +1531,31 @@ struct GCC : public AbstractConstraint
         for(int i=0; i<val_array.size(); i++)
         {
             int val=val_array[i];
-            int mincap=0;
-            int maxcap=0;
-            for(int j=0; j<numvars; j++)
-            {
-                if(var_array[j].inDomain(val))
+            #ifndef INCGRAPH
+                int mincap=0;
+                int maxcap=0;
+                for(int j=0; j<numvars; j++)
                 {
-                    maxcap++;
-                    if(var_array[j].isAssigned())
+                    if(var_array[j].inDomain(val))
+                    {
+                        maxcap++;
+                        if(var_array[j].isAssigned())
+                            mincap++;
+                    }
+                }
+                capacity_array[i].setMin(mincap);
+                capacity_array[i].setMax(maxcap);
+            #else
+                int mincap=0;
+                for(int vari=0; vari<adjlistlength[val-dom_min+numvars]; vari++)
+                {
+                    int var=adjlist[val-dom_min+numvars][vari];
+                    if(var_array[var].isAssigned())
                         mincap++;
                 }
-            }
-            capacity_array[i].setMin(mincap);
-            capacity_array[i].setMax(maxcap);
+                capacity_array[i].setMin(mincap);
+                capacity_array[i].setMax(adjlistlength[val-dom_min+numvars]);
+            #endif
             //if(mincap>lower[val-dom_min])
             //    lower[val-dom_min]=mincap;
             //if(maxcap<upper[val-dom_min])
@@ -1531,62 +1583,6 @@ struct GCC : public AbstractConstraint
             {
                 // use the matching -- change it by lowering flow to value.
                 GCCPRINT("Calling bfsmatching_card_lowerbound for value "<< value);
-                int newlb=bfsmatching_card_lowerbound(value, lower[value-dom_min]);
-                GCCPRINT("bfsmatching_card_lowerbound Returned " << newlb);
-                
-                if(newlb > capacity_array[validx].getMin())
-                {
-                    GCCPRINT("Improved lower bound "<< newlb);
-                    capacity_array[validx].setMin(newlb);
-                }
-                
-                GCCPRINT("Calling card_upperbound for value "<< value);
-                int newub=card_upperbound(value, upper[value-dom_min]);
-                GCCPRINT("card_upperbound Returned " << newub);
-                
-                if(newub < capacity_array[validx].getMax())
-                {
-                    GCCPRINT("Improved upper bound "<< newub);
-                    capacity_array[validx].setMax(newub);
-                }
-            }
-            else
-            {// this may not be neecded. Only needed if we're not calling prop_capacity_simple
-                capacity_array[validx].propagateAssign(0);
-            }
-        }
-    }
-    
-    void prop_capacity_strong_scc()
-    {
-        // Lower bounds.
-        //prop_capacity_simple();
-        GCCPRINT("In prop_capacity_strong_scc");
-        for(int validx=0; validx<val_array.size(); validx++)
-        {
-            int value=val_array[validx];
-            if(value>=dom_min && value<=dom_max)
-            {
-                // use the matching -- change it by lowering flow to value.
-                GCCPRINT("Calling bfsmatching_card_lowerbound for value "<< value);
-                vars_in_scc.clear();
-                int sccindex_start=varToSCCIndex[value-dom_min+numvars];
-                while(sccindex_start>0 && SCCSplit.isMember(sccindex_start-1))
-                {
-                    sccindex_start--;   // seek the first item in the SCC.
-                }
-                for(int j=sccindex_start; j<(numvars+numvals); j++)
-                {
-                    // copy vars in the scc into vars_in_scc
-                    int sccval=SCCs[j];
-                    if(sccval<numvars)
-                    {
-                        vars_in_scc.push_back(sccval);
-                    }
-                    
-                    if(!SCCSplit.isMember(j)) break;
-                }
-                
                 int newlb=bfsmatching_card_lowerbound(value, lower[value-dom_min]);
                 GCCPRINT("bfsmatching_card_lowerbound Returned " << newlb);
                 
@@ -1649,6 +1645,19 @@ struct GCC : public AbstractConstraint
     {
         // lower and upper are indexed by value-dom_min and provide the capacities.
         // usage is the number of times a value is used in the matching.
+        
+        if(existinglb==usage[forbiddenval-dom_min])
+        {
+            //bound already supported
+            return existinglb;
+        }
+        
+        #ifdef CAPBOUNDSCACHE
+        if(boundsupported[(forbiddenval-dom_min)*2]==existinglb)
+        {
+            return existinglb;
+        }
+        #endif
         
         // current sccs are contained in vars_in_scc and vals_in_scc
         // back up the matching to restore afterwards.
@@ -1787,6 +1796,33 @@ struct GCC : public AbstractConstraint
             GCCPRINT("Stopped because new lower bound would be less than or equal the existing lower bound.");
         }
         
+        #ifdef CAPBOUNDSCACHE
+        boundsupported[(forbiddenval-dom_min)*2]=usage[forbiddenval-dom_min];
+        DynamicTrigger* dt=dynamic_trigger_start();
+        dt+=(numvars*numvals);  // skip over the first block of triggers
+        dt+=val_to_cap_index[forbiddenval-dom_min]*(val_array.size()+numvars)*2;  // move to the area for the value.
+        //dt+=(val_array.size()+numvars);  // move to upper bound area
+        // now put down the triggers for varvalmatching and usage
+        for(int i=0; i<numvars; i++)
+        {
+            D_ASSERT((dt+i)->trigger_info() == (forbiddenval-dom_min)*2);
+            var_array[i].addDynamicTrigger(dt+i, DomainRemoval, varvalmatching[i]);
+        }
+        for(int i=0; i<val_array.size(); i++)
+        {
+            D_ASSERT((dt+numvars+i)->trigger_info() == (forbiddenval-dom_min)*2);
+            
+            if(val_array[i]>= dom_min && val_array[i]<= dom_max)
+            {
+                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
+            }
+            else
+            {
+                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, 0);
+            }
+        }
+        #endif
+        
         varvalmatching=matchbac;
         usage=usagebac;
         
@@ -1797,6 +1833,19 @@ struct GCC : public AbstractConstraint
     {
         // lower and upper are indexed by value-dom_min and provide the capacities.
         // usage is the number of times a value is used in the matching.
+        
+        if(existingub==usage[value-dom_min])
+        {
+            // bound is already supported
+            return existingub;
+        }
+        
+        #ifdef CAPBOUNDSCACHE
+        if(boundsupported[(value-dom_min)*2+1]==existingub)
+        {
+            return existingub;
+        }
+        #endif
         
         // current sccs are contained in vars_in_scc and vals_in_scc
         
@@ -1894,6 +1943,31 @@ struct GCC : public AbstractConstraint
         
         //varvalmatching=matchbac;
         //usage=usagebac;
+        #ifdef CAPBOUNDSCACHE
+        boundsupported[(value-dom_min)*2+1]=usage[startvalindex];
+        DynamicTrigger* dt=dynamic_trigger_start();
+        dt+=(numvars*numvals);  // skip over the first block of triggers
+        dt+=val_to_cap_index[value-dom_min]*(val_array.size()+numvars)*2;  // move to the area for the value.
+        dt+=(val_array.size()+numvars);  // move to upper bound area
+        // now put down the triggers for varvalmatching and usage
+        for(int i=0; i<numvars; i++)
+        {
+            D_ASSERT((dt+i)->trigger_info() == (value-dom_min)*2+1);
+            var_array[i].addDynamicTrigger(dt+i, DomainRemoval, varvalmatching[i]);
+        }
+        for(int i=0; i<val_array.size(); i++)
+        {
+            D_ASSERT((dt+numvars+i)->trigger_info() == (value-dom_min)*2+1);
+            if(val_array[i]>= dom_min && val_array[i]<= dom_max)
+            {
+                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
+            }
+            else
+            {
+                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, 0);
+            }
+        }
+        #endif
         
         return usage[startvalindex];
     }
