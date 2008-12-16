@@ -381,7 +381,7 @@ struct reify : public ParentConstraint
     {
       P("Remove unused trigger");
       // This is an optimisation.
-      trig->remove();
+      trig->remove(getQueue(stateObj).getNextQueuePtrRef());
     }
   }
   
@@ -403,7 +403,7 @@ struct reify : public ParentConstraint
         {
             break;
         }
-        (trig+i)->remove();
+        (trig+i)->remove(getQueue(stateObj).getNextQueuePtrRef());
     }
   }
   
@@ -430,7 +430,7 @@ struct reify : public ParentConstraint
     //int dt_count = dynamic_trigger_count();
     // Clean up triggers
     for(int i = 0; i < dtcount; ++i)
-      dt[i].remove();
+      dt[i].remove(getQueue(stateObj).getNextQueuePtrRef());
     
     bool flag;
     GET_ASSIGNMENT(assignment0, child_constraints[0]);

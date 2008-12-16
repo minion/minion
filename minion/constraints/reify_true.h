@@ -187,7 +187,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     {
       P("Remove unused trigger");
       // This is an optimisation.
-      trig->remove();
+      trig->remove(getQueue(stateObj).getNextQueuePtrRef());
     }
   }
 
@@ -220,7 +220,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     int dt_count = dynamic_trigger_count();
     // Clean up triggers
     for(int i = 0; i < dt_count; ++i)
-      dt[i].remove();
+      dt[i].remove(getQueue(stateObj).getNextQueuePtrRef());
 
     if(DoWatchAssignment)
     {

@@ -224,7 +224,7 @@ struct Dynamic_OR : public ParentConstraint
     {
       P("Clean old trigger");
       // This is an optimisation.
-      trig->remove();
+      trig->remove(getQueue(stateObj).getNextQueuePtrRef());
     }
   }
 
@@ -243,7 +243,7 @@ struct Dynamic_OR : public ParentConstraint
 
     // Clean up triggers
     for(int i = 0; i < assign_size * 2; ++i)
-      dt[i].remove();
+      dt[i].remove(getQueue(stateObj).getNextQueuePtrRef());
 
     int loop = 0;
 

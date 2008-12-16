@@ -218,7 +218,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       D_ASSERT(trig==dt+1);
       if(!val_count.isAssigned())
       {   // don't need two triggers.
-          trig->remove();
+          trig->remove(getQueue(stateObj).getNextQueuePtrRef());
           trigger2index=-1;
           return;
       }

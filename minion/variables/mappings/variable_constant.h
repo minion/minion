@@ -105,7 +105,7 @@ struct ConstantVar
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = -999)
-  { dt->remove(); }
+  { dt->remove(getQueue(stateObj).getNextQueuePtrRef()); }
 #endif
 
   vector<AbstractConstraint*>* getConstraints() { return NULL; }

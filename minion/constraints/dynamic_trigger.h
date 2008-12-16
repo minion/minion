@@ -52,10 +52,15 @@ public:
   
  
   /// Remove from whatever list this trigger is currently stored in.
-  void remove()
+  void remove(DynamicTrigger*& next_queue_ptr)
   { 
     D_INFO(1,DI_DYNAMICTRIG,string("Trigger ") + to_string(this) + " removed from list: "
-							+ ":" + to_string(prev) + "," + to_string(next));
+                            + ":" + to_string(prev) + "," + to_string(next));
+    if(this == next_queue_ptr)
+    {
+      CON_INFO_ADDONE(DynamicMovePtr);
+      next_queue_ptr = next;
+    }
 	D_ASSERT(constraint != NULL);
     D_ASSERT(sanity_check == 1234);
     D_ASSERT( (prev == NULL) == (next == NULL) );
@@ -96,7 +101,7 @@ public:
 	  }
       
 #endif
-	  remove();
+	  remove(next_queue_ptr);
 	}
 	DynamicTrigger* new_next = new_prev->next;
 	prev = new_prev;
