@@ -1093,9 +1093,9 @@ struct GCC : public AbstractConstraint
 	{
 	  D_ASSERT(vsize == var_array.size()+capacity_array.size());
       // borrow augpath array
-      cout << "In check_assignment with array:[";
-      for(int i=0; i<vsize; i++) cout << v[i] <<",";
-      cout << "]" <<endl;
+      GCCPRINT("In check_assignment with array:[");
+      for(int i=0; i<vsize; i++) GCCPRINT( v[i] <<",");
+      GCCPRINT("]");
       augpath.clear();
       augpath.resize(numvals, 0);
       
@@ -1110,7 +1110,6 @@ struct GCC : public AbstractConstraint
           {
               if(v[i+numvars]!=augpath[val-dom_min])
               {
-                  cout << "Returning false."<<endl;
                   return false;
               }
           }
@@ -1118,13 +1117,11 @@ struct GCC : public AbstractConstraint
           {
               if(v[i+numvars]!=0)
               {
-                  cout << "Returning false."<<endl;
                   return false;
               }
           }
       }
-      cout << "Returning true." <<endl;
-	  return true;
+      return true;
 	}
     
     ////////////////////////////////////////////////////////////////////////////
@@ -1546,15 +1543,18 @@ struct GCC : public AbstractConstraint
                 capacity_array[i].setMin(mincap);
                 capacity_array[i].setMax(maxcap);
             #else
-                int mincap=0;
-                for(int vari=0; vari<adjlistlength[val-dom_min+numvars]; vari++)
+                if(val>= dom_min && val<=dom_max)
                 {
-                    int var=adjlist[val-dom_min+numvars][vari];
-                    if(var_array[var].isAssigned())
-                        mincap++;
-                }
-                capacity_array[i].setMin(mincap);
-                capacity_array[i].setMax(adjlistlength[val-dom_min+numvars]);
+                    int mincap=0;
+                    for(int vari=0; vari<adjlistlength[val-dom_min+numvars]; vari++)
+                    {
+                        int var=adjlist[val-dom_min+numvars][vari];
+                        if(var_array[var].isAssigned())
+                            mincap++;
+                    }
+                    capacity_array[i].setMin(mincap);
+                    capacity_array[i].setMax(adjlistlength[val-dom_min+numvars]);
+                }  // else the cap will already have been set to 0.
             #endif
             //if(mincap>lower[val-dom_min])
             //    lower[val-dom_min]=mincap;
