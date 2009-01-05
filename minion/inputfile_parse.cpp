@@ -15,7 +15,9 @@
 
 #include "inputfile_parse.h"
 
-
+using boost::iostreams::filtering_istream;
+using boost::iostreams::gzip_decompressor;
+using boost::iostreams::bzip2_decompressor;
 
 CSPInstance readInputFromFile(string fname, bool parser_verbose)
 {

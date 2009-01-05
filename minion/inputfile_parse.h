@@ -15,8 +15,6 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 
-using namespace boost;
-using namespace iostreams;
 #endif
 
 /// Reads the CSP given by infile into reader.

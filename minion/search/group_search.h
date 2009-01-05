@@ -10,8 +10,6 @@ For Licence Information see file LICENSE.txt
 #include "common_search.h"
 #include "standard_search.h"
 
-  using namespace boost;
-
 namespace Controller
 {
 

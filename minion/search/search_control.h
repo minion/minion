@@ -10,8 +10,6 @@ using boost::bind;
 #include "common_search.h"
 #include "standard_search.h"
 
-using namespace boost;
-  
 template<typename SearchAlgorithm, typename Vars, typename Propogator>
   function<void (void)> solve_select_search(StateObj* stateObj, const function<void (void)>& next_search, SearchOrder order_in, 
                                                  SearchAlgorithm& order, Vars& vars, CSPInstance& instance, Propogator prop)
