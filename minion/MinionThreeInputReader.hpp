@@ -1250,18 +1250,18 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       if(isArray)
       {
         // If any index is 0, don't add any variables.
-        if(find(indices.begin(), indices.end(), 0) != indices.end())
+        if(find(indices.begin(), indices.end(), 0) == indices.end())
         {
           instance.vars.addMatrixSymbol(varname, indices);
           vector<int> current_index(indices.size(), 0);
           parser_info("New Var: " + varname + to_var_name(current_index));
           instance.vars.addSymbol(varname + to_var_name(current_index),
-                                  instance.vars.getNewVar(variable_type, domain));
+            instance.vars.getNewVar(variable_type, domain));
           while(increment_vector(current_index, indices))
           {
             parser_info("New Var: " + varname + to_var_name(current_index));
             instance.vars.addSymbol(varname + to_var_name(current_index),
-                                    instance.vars.getNewVar(variable_type, domain));
+              instance.vars.getNewVar(variable_type, domain));
           }
 
           vector<vector<Var> > matrix_list = instance.vars.flattenTo2DMatrix(varname);
