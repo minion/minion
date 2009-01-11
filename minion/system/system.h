@@ -94,6 +94,7 @@
 using boost::bind;
 using boost::function;
 
+#ifdef USE_BOOST
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
@@ -104,9 +105,29 @@ using boost::function;
 
 #define MAP_TYPE boost::unordered_map
 #define SET_TYPE boost::unordered_set
+ 
+#else
+#ifdef THREADSAFE
+#error Threading requires boost!
+#endif
+
+#ifdef USE_TR1_HASH_MAP_AND_SET
+#include <tr1/unordered_set>
+#include <tr1/unordered_map>
+
+#define MAP_TYPE std::tr1::unordered_map
+#define SET_TYPE std::tr1::unordered_set
+
+#else
+
+#include <map>
+#define MAP_TYPE map
+#include <set>
+#define SET_TYPE set
+#endif
+#endif
 
 using namespace std;
-
 
 #ifndef IN_MAIN
 #define VARDEF_ASSIGN(x,y) extern x
