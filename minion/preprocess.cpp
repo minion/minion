@@ -23,19 +23,22 @@ void PropogateCSP(StateObj* stateObj, PropagationLevel preprocessLevel, vector<A
     return;
   
   BigInt lits = lit_count(vars);
-  bool bounds_check = (preprocessLevel == PropLevel_SACBounds) ||
-  (preprocessLevel == PropLevel_SSACBounds);
+  bool bounds_check = ( (preprocessLevel == PropLevel_SACBounds) ||
+                        (preprocessLevel == PropLevel_SSACBounds) );
+  
   if(bounds_check)
-  {
-    PropagateSAC prop_SAC;
-    prop_SAC(stateObj, vars);
-  }
-  else
   {
     PropagateSAC_Bounds prop_SAC_bounds;
     prop_SAC_bounds(stateObj, vars);
   }
-  if(print_info) cout << "SAC(Bounds) Removed " << (lits - lit_count(vars)) << " literals" << endl;
+  else
+  {
+    PropagateSAC prop_SAC;
+    prop_SAC(stateObj, vars);
+  }
+  
+  if(print_info) 
+  { cout << "SAC" << (bounds_check ? "Bounds" : ".") << " Removed " << (lits - lit_count(vars)) << " literals" << endl; }
   
   if(preprocessLevel == PropLevel_SAC || preprocessLevel == PropLevel_SACBounds)
     return;
@@ -43,14 +46,15 @@ void PropogateCSP(StateObj* stateObj, PropagationLevel preprocessLevel, vector<A
   lits = lit_count(vars);
   if(bounds_check)
   {
-    PropagateSSAC prop_SSAC;
-    prop_SSAC(stateObj, vars);
-  }
-  else
-  {
     PropagateSSAC_Bounds prop_SSAC_bounds;
     prop_SSAC_bounds(stateObj, vars);
   }
-  if(print_info) cout << "SSAC(Bounds) Removed " << (lits - lit_count(vars)) << " literals" << endl;
+  else
+  {
+    PropagateSSAC prop_SSAC;
+    prop_SSAC(stateObj, vars);
+  }
+  if(print_info) 
+  { cout << "SSAC" << (bounds_check ? "Bounds" : ".") << " Removed " << (lits - lit_count(vars)) << " literals" << endl; }
 
 }

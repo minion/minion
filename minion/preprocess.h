@@ -26,11 +26,11 @@ bool inline check_fail(StateObj* stateObj, Var& var, DomainInt val, Vars& vars, 
 }
 
 template <typename Var, typename Prop>
-void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop, bool checkBounds)
+void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop, bool onlyCheckBounds)
 {
   getQueue(stateObj).propagateQueue();
   if(getState(stateObj).isFailed())
-	return;
+    return;
   bool reduced = true;
   while(reduced)
   {
@@ -38,8 +38,9 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
     for(int i = 0; i < vararray.size(); ++i)
     {
       Var& var = vararray[i];
-      if(var.isBound() || checkBounds)
+      if(onlyCheckBounds || var.isBound())
       {
+        cout << "B";
         while(check_fail(stateObj, var, var.getMax(), vararray, prop))
         {
           reduced = true;
@@ -60,6 +61,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
       }
       else
       {
+        cout << "N";
         for(DomainInt val = var.getMin(); val <= var.getMax(); ++val)
         {
           if(var.inDomain(val) && check_fail(stateObj, var, val, vararray, prop))
