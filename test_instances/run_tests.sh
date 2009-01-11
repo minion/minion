@@ -24,7 +24,6 @@ expectedfail=0
 unexpectedpass=0
 
 for i in *.minion; do
-  echo $i
   j=$(($j + 1))
 
   # This gives the value that the program should return.
@@ -134,6 +133,9 @@ for i in *.minion; do
   ./do_random_tests.sh 1 $exec $* -varorder ldf
   failed=$(($failed + $?))
   ./do_random_tests.sh 3 $exec $* -varorder ldf-random
+  failed=$(($failed + $?))
+  
+  (cd special_tests; ./special_tests.sh ../$exec)
   failed=$(($failed + $?))
 
   # return 0 iff all tests succeeded
