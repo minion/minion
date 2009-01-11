@@ -40,7 +40,6 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
       Var& var = vararray[i];
       if(onlyCheckBounds || var.isBound())
       {
-        cout << "B";
         while(check_fail(stateObj, var, var.getMax(), vararray, prop))
         {
           reduced = true;
@@ -61,7 +60,6 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
       }
       else
       {
-        cout << "N";
         for(DomainInt val = var.getMin(); val <= var.getMax(); ++val)
         {
           if(var.inDomain(val) && check_fail(stateObj, var, val, vararray, prop))

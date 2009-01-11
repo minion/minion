@@ -38,7 +38,7 @@ void PropogateCSP(StateObj* stateObj, PropagationLevel preprocessLevel, vector<A
   }
   
   if(print_info) 
-  { cout << "SAC" << (bounds_check ? "Bounds" : ".") << " Removed " << (lits - lit_count(vars)) << " literals" << endl; }
+  { cout << "SAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - lit_count(vars)) << " literals" << endl; }
   
   if(preprocessLevel == PropLevel_SAC || preprocessLevel == PropLevel_SACBounds)
     return;
@@ -55,6 +55,6 @@ void PropogateCSP(StateObj* stateObj, PropagationLevel preprocessLevel, vector<A
     prop_SSAC(stateObj, vars);
   }
   if(print_info) 
-  { cout << "SSAC" << (bounds_check ? "Bounds" : ".") << " Removed " << (lits - lit_count(vars)) << " literals" << endl; }
+  { cout << "SSAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - lit_count(vars)) << " literals" << endl; }
 
 }
