@@ -6,6 +6,7 @@ include(CheckCXXCompilerFlag)
 include(FindBoost)
 include(FindGMP)
 include(constraints)
+include(CheckIncludeFiles)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
@@ -198,7 +199,7 @@ endif()
 
 if(Boost_FOUND)
     set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${Boost_INCLUDE_DIRS})
-    check_include_file_cxx("boost/tr1/array.hpp" BOOST-TR1)
+    check_include_file_cxx("boost/unordered_set.hpp" BOOST-TR1)
 endif()
 
 if(BOOST-TR1)
