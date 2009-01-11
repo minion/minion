@@ -6,7 +6,6 @@
 #include "MinionInputReader.hpp"
 #include "MinionThreeInputReader.hpp"
 
-#ifdef USE_BOOST_STREAMS
 #include <fstream>
 #include <iostream>
 #include <boost/iostreams/filtering_streambuf.hpp>
@@ -14,8 +13,6 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
-
-#endif
 
 /// Reads the CSP given by infile into reader.
 /** Most of the code in this function related to trying to provide nice

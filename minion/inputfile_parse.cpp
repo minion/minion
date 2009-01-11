@@ -28,53 +28,41 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
     if(fname.find_last_of(".") < fname.size())
       extension = fname.substr(fname.find_last_of("."), fname.size());
   
+    filtering_istream in;
+    
+    
     if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp" ||
         extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
-    {
-#ifdef USE_BOOST_STREAMS
+    {  
+      if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp")
+      {
+        if(parser_verbose)
+          cout << "# Using gzip uncompression" << endl;
+        in.push(gzip_decompressor());
+      }    
   
-    ifstream file(filename, ios_base::in | ios_base::binary);
-  
-     if (!file) {
-        INPUT_ERROR("Can't open given input file '" + fname + "'.");
+      if(extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
+      {
+        if(parser_verbose)
+          cout << "# Using bzip2 uncompression" << endl;
+        in.push(bzip2_decompressor());
       }
-    filtering_istream in;
-  
-    if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp")
-    {
-      if(parser_verbose)
-        cout << "# Using gzip uncompression" << endl;
-      in.push(gzip_decompressor());
-    }    
-  
-    if(extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
-    {
-      if(parser_verbose)
-        cout << "# Using bzip2 uncompression" << endl;
-      in.push(bzip2_decompressor());
+      
+    }
+    
+    ifstream file(filename, ios_base::in | ios_base::binary);
+
+    if (!file) {
+      INPUT_ERROR("Can't open given input file '" + fname + "'.");
     }
       
     in.push(file);
-  
     ConcreteFileReader<filtering_istream> infile(in, filename);
-    
+
     if (infile.failed_open() || infile.eof()) {
       INPUT_ERROR("Can't open given input file '" + fname + "'.");
     }   
     return readInput(&infile, parser_verbose);
-  #else 
-     INPUT_ERROR("This copy of Minion was built without gzip and bzip2 support!");
-  #endif
-    }
-    else
-    {
-      ifstream ifm(filename);
-      ConcreteFileReader<ifstream> infile(ifm, filename);
-      if (infile.failed_open() || infile.eof()) {
-        INPUT_ERROR("Can't open given input file '" + fname + "'.");
-      }   
-      return readInput(&infile, parser_verbose);
-    }
 
   }
   else

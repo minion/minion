@@ -79,10 +79,8 @@ namespace Controller
   /// This function checks the solution is correct, and prints it if required.
   inline void check_sol_is_correct(StateObj* stateObj)
   {
-#ifdef USE_BOOST
     if(getOptions(stateObj).solCallBack)
       getOptions(stateObj).solCallBack(stateObj);
-#endif
 
     vector<vector<AnyVarRef> > print_matrix = getState(stateObj).getPrintMatrix();
     
