@@ -1,5 +1,11 @@
 import sys, os
-from weakref import ref
+from weakref import ref   ## why?
+
+################################################################################
+#
+#   Code for comparing two search trees dumped by -dumptree.
+#
+
 
 def partition(splitter, st):
     # split the string on the first instance of splitter
@@ -237,11 +243,31 @@ class tree:
     def buildtree(self, filename):
         # use node.left and node.right and node.parent elements to construct a tree of node and sol
         linesraw=open(filename, 'r').readlines()
-        tags=["Node", "Sol", "SearchAssign", "SearchAction", "Solution Number"]  # These are the tags to pick out of the file.
+        tags=["Node", "Sol", "SearchAssign", "SearchAction", "Solution Number", "Problem solvable?"]  # These are the tags to pick out of the file.
         def filt(x):
             (left, temp, right)=partition(":", x)
             return left in tags
-        lines=[x for x in linesraw if filt(x)]
+        lines=[x for x in linesraw if filt(x) in tags]
+        
+        splitlines=[]
+        for line in linesraw:
+            sp=partition(":", line)
+            if sp[0] in tags:
+                splitlines.append((sp[0], sp[2].strip()))
+        
+        # Find out if solutions exist
+        for splitline in splitlines:
+            if splitline[0]=="Problem solvable?":
+                if splitline[1]=="yes":
+                    self.solvable=True
+                else:
+                    assert splitline[1]=="no"
+                    self.solvable=False
+        
+        # splitlines not used yet.
+        
+        assert hasattr(self, "solvable")
+        
         # Now merge adjacent solution lines into one
         i=0
         while i<len(lines)-1:
@@ -333,11 +359,17 @@ class tree:
         fileh.write("}\n")
     
     def equal(self, tree2):
+        if self.solvable!= tree2.solvable:
+            print "Problem 1 solvable: "+str(self.solvable)+", problem 2 solvable: "+str(tree2.solvable)
+            return False
         if self.rootnode==False or tree2.rootnode==False:
             return self.rootnode==tree2.rootnode
         return self.rootnode.equal(tree2.rootnode)
     
     def subset(self, tree2):
+        if self.solvable!=tree2.solvable:
+            print "Problem 1 solvable: "+str(self.solvable)+", problem 2 solvable: "+str(tree2.solvable)
+            return False
         if self.rootnode==False:
             if tree2.rootnode==False:
                 return True
@@ -349,6 +381,55 @@ class tree:
                 return False
             else:
                 return self.rootnode.subset(tree2.rootnode)
+
+
+def comparetrees(same):
+    # Fork so that memory used in building and comparing
+    # trees in the child process is returned when the process ends.
+    parentpid=os.getpid()
+    
+    pid = os.fork()
+    if pid:
+        # we are the parent
+        (pid, exitcode) = os.waitpid(pid, 0) # make sure the child process gets cleaned up
+        return (exitcode == 0)
+    else:
+        # we are the child
+        # do the tree comparison:
+        tree1=tree()
+        tree2=tree()
+        
+        tree1.buildtree(str(parentpid)+"outfile1")
+        tree2.buildtree(str(parentpid)+"outfile2")
+        
+        if same:
+            temp= tree1.equal(tree2)
+        else:
+            temp= tree1.subset(tree2)
+        
+        # now return 
+        if temp:
+            os.remove(str(parentpid)+"outfile1")
+            os.remove(str(parentpid)+"outfile2")
+            os.remove(str(parentpid)+"infile1.minion")
+            os.remove(str(parentpid)+"infile2.minion")
+            sys.exit(0)
+        
+        sys.exit(1)
+
+def comparetrees2(name1, name2, same):
+    tree1=tree()
+    tree2=tree()
+    
+    tree1.buildtree(name1)
+    tree2.buildtree(name2)
+    if same:
+        temp= tree1.equal(tree2)
+    else:
+        temp= tree1.subset(tree2)
+    
+    return temp
+        
 
 ################################################################################
 #
@@ -370,7 +451,7 @@ class testmodulo:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("modulo", True, options, [1,1,1], ["posnum", "posnum", "posnum"], [1,1,1], self, False)
+        return runtestgeneral("modulo", True, options, [1,1,1], ["posnum", "posnum", "posnum"], self, False)
 
 class testgacelement__minus__deprecated:
     def printtable(self, domains): 
@@ -390,15 +471,15 @@ class testgacelement__minus__deprecated:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("gacelement-deprecated", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, not options['reify'])
+        return runtestgeneral("gacelement-deprecated", False, options, [4,1,1], ["smallnum", "num", "num"], self, not options['reify'])
 
 class testwatchelement(testgacelement__minus__deprecated):
     def runtest(self, options=dict()):
-        return runtestgeneral("watchelement", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, not options['reify'])
+        return runtestgeneral("watchelement", False, options, [4,1,1], ["smallnum", "num", "num"], self, not options['reify'])
 
 class testelement(testgacelement__minus__deprecated):
     def runtest(self, options=dict()):
-        return runtestgeneral("element", False, options, [4,1,1], ["smallnum", "num", "num"], [4,1,1], self, False)
+        return runtestgeneral("element", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
 
 class testnegativetable:
     def printtable(self, domains, tab):
@@ -529,24 +610,24 @@ class testalldiff:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("alldiff", True, options, [5], ["quitesmallnum"], [5], self, False)
+        return runtestgeneral("alldiff", True, options, [5], ["quitesmallnum"], self, False)
 
 class testalldiffgacslow(testalldiff):
     def runtest(self, options=dict()):
-        return runtestgeneral("alldiffgacslow", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'])
+        return runtestgeneral("alldiffgacslow", False, options, [5], ["quitesmallnum"], self, not options['reify'])
 
 class testgacalldiff(testalldiff):
     def runtest(self, options=dict()):
-        return runtestgeneral("gacalldiff", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'])
+        return runtestgeneral("gacalldiff", False, options, [5], ["quitesmallnum"], self, not options['reify'])
 
 
 class testwatchedalldiff(testalldiff):
     def runtest(self, options=dict()):
-        return runtestgeneral("watchedalldiff", False, options, [5], ["quitesmallnum"], [5], self, not options['reify'])
+        return runtestgeneral("watchedalldiff", False, options, [5], ["quitesmallnum"], self, not options['reify'])
 
 class testdiseq(testalldiff):
     def runtest(self, options=dict()):
-        return runtestgeneral("diseq", True, options, [1,1], ["num", "num"], [1,1], self, not options['reify'])
+        return runtestgeneral("diseq", True, options, [1,1], ["num", "num"], self, not options['reify'])
         # not gac when reified because of equal case.
 
 class testeq:
@@ -565,7 +646,7 @@ class testeq:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("eq", True, options, [1,1], ["num", "num"], [1,1], self, False)
+        return runtestgeneral("eq", True, options, [1,1], ["num", "num"], self, False)
 
 class testwatchneq:
     # printtable essentially sets up pairsame constraint. negation of alldiff.
@@ -579,7 +660,7 @@ class testwatchneq:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("watchneq", False, options, [1,1], ["num", "num"], [1,1], self, True)
+        return runtestgeneral("watchneq", False, options, [1,1], ["num", "num"], self, True)
 
 class testwatchless:
     def printtable(self, domains):
@@ -592,7 +673,7 @@ class testwatchless:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("watchless", True, options, [1,1], ["num", "num"], [1,1], self, True)
+        return runtestgeneral("watchless", True, options, [1,1], ["num", "num"], self, True)
         
 class testineq:
     def printtable(self, domains):
@@ -608,7 +689,7 @@ class testineq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("ineq", True, options, [1,1,1], ["num", "num", "const"], [1,1,1], self, True)
+        return runtestgeneral("ineq", True, options, [1,1,1], ["num", "num", "const"], self, True)
 
 class testabs:
     def printtable(self, domains):
@@ -623,7 +704,7 @@ class testabs:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("abs", True, options, [1,1], ["num","num"], [1,1], self, False)
+        return runtestgeneral("abs", True, options, [1,1], ["num","num"], self, False)
 
 class testhamming:
     def printtable(self, domains):
@@ -640,7 +721,7 @@ class testhamming:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("hamming", True, options, [4,4,1], ["smallnum", "smallnum", "const"], [4,4,1], self, True)
+        return runtestgeneral("hamming", True, options, [4,4,1], ["smallnum", "smallnum", "const"], self, True)
 
 
 class testlexleq:
@@ -657,24 +738,25 @@ class testlexleq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("lexleq", True, options, [4,4], ["smallnum", "smallnum"], [4,4], self, True)
+        return runtestgeneral("lexleq", True, options, [4,4], ["smallnum", "smallnum"], self, True)
 
 class testlexless(testlexleq):
     def printtable(self, domains):
         return testlexleq.printtable(self, domains, less=True)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], [4,4], self, True)
+        return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], self, True)
 
 class testmax:
     def printtable(self, domains, ismax=True):
-        # assume last var is the max var. and first is the reify var if relevant.
+        # assume last var is the max var. 
+        if len(domains)<2: return False
         cross=[]
         crossprod(domains[:-1], [], cross)
         out=[]
         for l in cross:
             if ismax:
-                maxormin=max(l)
+                maxormin=max(l)   #?? what are the semantics of max when there is nothing in the vector????
             else:
                 maxormin=min(l)
             if maxormin in domains[-1]:
@@ -683,14 +765,14 @@ class testmax:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("max", True, options, [5,1], ["smallnum", "num"], [5,1], self, False)
+        return runtestgeneral("max", True, options, [5,1], ["smallnum", "num"], self, False)
     
 class testmin(testmax):
     def printtable(self, domains):
         return testmax.printtable(self, domains, ismax=False)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("min", True, options, [5,1], ["smallnum", "num"], [5,1], self, False)
+        return runtestgeneral("min", True, options, [5,1], ["smallnum", "num"], self, False)
 
 class testoccurrence:
     def printtable(self, domains, leq=False, geq=False):
@@ -709,7 +791,7 @@ class testoccurrence:
     
     def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrence", False, options, [6, 1, 1], ["smallnum", "smallconst", "num"], [6, 1, 1], self, False)
+        return runtestgeneral("occurrence", False, options, [6, 1, 1], ["smallnum", "smallconst", "num"], self, False)
 
 class testoccurrenceleq:
     def printtable(self, domains, leq=True, geq=False):
@@ -725,7 +807,7 @@ class testoccurrenceleq:
     
     def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrenceleq", False, options, [6,1,1], ["smallnum", "smallconst", "smallconst"], [6,1,1], self, not options['reify'] and not options['reifyimply'])
+        return runtestgeneral("occurrenceleq", False, options, [6,1,1], ["smallnum", "smallconst", "smallconst"], self, not options['reify'] and not options['reifyimply'])
 
 class testoccurrencegeq(testoccurrenceleq):
     def printtable(self, domains):
@@ -733,7 +815,7 @@ class testoccurrencegeq(testoccurrenceleq):
     
     def runtest(self, options=dict()):
         # note that the constant generated may be completely inappropriate. e.g. some value which is not even in the domains.
-        return runtestgeneral("occurrencegeq", False, options, [6,1,1], ["smallnum", "smallconst", "smallconst"], [6,1,1], self, False)
+        return runtestgeneral("occurrencegeq", False, options, [6,1,1], ["smallnum", "smallconst", "smallconst"], self, False)
 
 class testproduct:
     def printtable(self, domains): 
@@ -745,7 +827,7 @@ class testproduct:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("product", True, options, [1,1,1], ["num", "num", "num"], [1,1,1], self, False)
+        return runtestgeneral("product", True, options, [1,1,1], ["num", "num", "num"], self, False)
 
 class testdifference:
     def printtable(self, domains): 
@@ -757,7 +839,7 @@ class testdifference:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("difference", True, options, [1,1,1], ["num", "num", "num"], [1,1,1], self, False)
+        return runtestgeneral("difference", True, options, [1,1,1], ["num", "num", "num"], self, False)
 
 
 class testgacsum:
@@ -771,7 +853,7 @@ class testgacsum:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("gacsum", False, options, [3], ["num"], [1,1,1], self, True)
+        return runtestgeneral("gacsum", False, options, [3], ["num"], self, True)
 
 class testsumgeq:
     def printtable(self, domains, less=False, weights=[1,1,1,1,1,1,1,1]):
@@ -788,14 +870,14 @@ class testsumgeq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("sumgeq", True, options, [5,1], ["smallnum", "num"], [5,1], self, False)
+        return runtestgeneral("sumgeq", True, options, [5,1], ["smallnum", "num"], self, False)
     
 class testsumleq(testsumgeq):
     def printtable(self, domains):
         return testsumgeq.printtable(self, domains, less=True)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("sumleq", True, options, [5,1], ["smallnum", "num"], [5,1], self, False)
+        return runtestgeneral("sumleq", True, options, [5,1], ["smallnum", "num"], self, False)
 
 class testdiv:
     def printtable(self, domains):
@@ -808,21 +890,21 @@ class testdiv:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("div", True, options, [1,1,1], ["posnum", "posnum", "posnum"], [1,1,1], self, False)
+        return runtestgeneral("div", True, options, [1,1,1], ["posnum", "posnum", "posnum"], self, False)
 
 class testweightedsumgeq(testsumgeq):
     def printtable(self, domains):
         return testsumgeq.printtable(self, domains, weights=self.constants)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("weightedsumgeq", True, options, [5,5,1], ["const", "smallnum", "num"], [5,5,1], self, False)
+        return runtestgeneral("weightedsumgeq", True, options, [5,5,1], ["const", "smallnum", "num"], self, False)
         
 class testweightedsumleq(testsumgeq):
     def printtable(self, domains):
         return testsumgeq.printtable(self, domains, less=True, weights=self.constants)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("weightedsumleq", True, options, [5,5,1], ["const", "smallnum", "num"], [5,5,1], self, False)
+        return runtestgeneral("weightedsumleq", True, options, [5,5,1], ["const", "smallnum", "num"], self, False)
 
 class testminuseq:
     def printtable(self, domains):
@@ -833,7 +915,7 @@ class testminuseq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("minuseq", True, options, [1,1], ["num", "num"], [1,1], self, not options['reifyimply'] and not options['reify'])
+        return runtestgeneral("minuseq", True, options, [1,1], ["num", "num"], self, not options['reifyimply'] and not options['reify'])
         
 class testlitsumeq:
     # does this constraint even exist??
@@ -849,7 +931,7 @@ class testlitsumeq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("litsumeq", True, options, [4,1], ["smallnum", "num"], [4,1], self, False)
+        return runtestgeneral("litsumeq", True, options, [4,1], ["smallnum", "num"], self, False)
 
 class testwatchsumgeq:
     def printtable(self, domains, less=False):
@@ -864,13 +946,13 @@ class testwatchsumgeq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("watchsumgeq", True, options, [5,1], ["boolean", "const"], [5,1], self, True)
+        return runtestgeneral("watchsumgeq", True, options, [5,1], ["boolean", "const"], self, True)
     
 class testwatchsumleq(testwatchsumgeq):
     def printtable(self, domains):
         return testwatchsumgeq.printtable(self, domains, less=True)
     def runtest(self, options=dict()):
-        return runtestgeneral("watchsumleq", True, options, [5,1], ["boolean", "const"], [5,1], self, True)
+        return runtestgeneral("watchsumleq", True, options, [5,1], ["boolean", "const"], self, True)
         
 class testwatchvecneq:
     def printtable(self, domains):
@@ -883,7 +965,7 @@ class testwatchvecneq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("watchvecneq", True, options, [3,3], ["smallnum","smallnum"], [3,3], self, True)
+        return runtestgeneral("watchvecneq", True, options, [3,3], ["smallnum","smallnum"], self, True)
     
 class testwatchvecexists_less:
     def printtable(self, domains):
@@ -896,7 +978,7 @@ class testwatchvecexists_less:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("watchvecexists_less", True, options, [3,3], ["smallnum", "smallnum"], [3,3], self, True)
+        return runtestgeneral("watchvecexists_less", True, options, [3,3], ["smallnum", "smallnum"], self, True)
 
 class testwatchvecexists_and:
     def printtable(self, domains):
@@ -909,7 +991,7 @@ class testwatchvecexists_and:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("watchvecexists_and", True, options, [3,3], ["smallnum", "smallnum"], [3,3], self, True)
+        return runtestgeneral("watchvecexists_and", True, options, [3,3], ["smallnum", "smallnum"], self, True)
                         
 class testpow:
     def printtable(self, domains):
@@ -921,7 +1003,7 @@ class testpow:
                 out.append(l+[l[0]**l[1]])
         return out
     def runtest(self, options=dict()):
-        return runtestgeneral("pow", True, options, [1,1,1], ["posnum","posnum","posnum"], [1,1,1], self, False)
+        return runtestgeneral("pow", True, options, [1,1,1], ["posnum","posnum","posnum"], self, False)
     
 class testgcc:
     def printtable(self, domains):
@@ -931,7 +1013,6 @@ class testgcc:
         cap=domains[len(domains)/2:]
         crossprod(x, [], cross)
         # assume same number of x vars and cap vars.
-        dom_min=min([min(y) for y in x])
         out=[]
         for line in cross:
             occ=[0 for y in vals]
@@ -949,9 +1030,9 @@ class testgcc:
         
     def runtest(self, options=dict()):
         if options['reifyimply'] or options['reify']:
-            return runtestgeneral("gcc", False, options, [4,4,4], ["verysmallnum","smallconst_distinct","smallnum"], [4,4,4], self, False)
+            return runtestgeneral("gcc", False, options, [4,4,4], ["verysmallnum","smallconst_distinct","smallnum"], self, False)
         else:
-            return runtestgeneral("gcc", False, options, [5,5,5], ["smallnum","smallconst_distinct", "num"], [5,5,5], self, False)
+            return runtestgeneral("gcc", False, options, [5,5,5], ["smallnum","smallconst_distinct", "num"], self, False)
     
 ################################################################################
 # 
@@ -987,7 +1068,7 @@ def printminionfile(fileh, variables, constraint, tuplelist=False, opt=False):
     fileh.write(constraint)
     fileh.write("\n**EOF**")
 
-def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, howprintvars, tablegen, treesame):
+def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, tablegen, treesame):
     # given tablevars, tuplelist for the table instance
     # and modvars and constrainttest for the other instance, construct the
     # instances.
@@ -1009,10 +1090,28 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
     reify=options['reify']
     fullprop=options['fullprop']
     
+    isvector=[a>1 for a in varnums]  # Is it to be printed as a vector. This seems to suffice at the moment.
+    
     if reify or reifyimply:
         # add extra bool variable.
         varnums=[1]+varnums
         vartypes=["boolean"]+vartypes
+        isvector=[False]+isvector
+    
+    # sometimes (1/4) test very short constraints to find edge cases
+    shortvector=random.randint(0,3)
+    if shortvector==0:
+        # for each item in varnums which is greater than 1...
+        varnumsused=[a for a in list(set(varnums)) if a>1]
+        # pick one at random
+        if len(varnumsused)>0:
+            oldvalue=varnumsused[random.randint(0,len(varnumsused)-1)]
+            newvalue=random.randint(0,2)
+            # replace every instance of oldvalue so that we don't end up with
+            # non-matching array lengths. But it could make arrays non-matching..perhaps
+            for i in range(len(varnums)):
+                if varnums[i]==oldvalue:
+                    varnums[i]=newvalue
     
     (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, boundsallowed)
     setattr(tablegen, "constants", constants)
@@ -1023,36 +1122,38 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
     curvar=0
     varnums3=varnums
     vartypes3=vartypes
+    isvector3=isvector
     if reify or reifyimply:
         curvar=1
         varnums3=varnums[1:]
         vartypes3=vartypes[1:]
+        isvector3=isvector[1:]
     
     constraint=constraintname+"("
     
     constnum=0   # number of the current constant
     
-    for (num,typ) in zip(varnums3, vartypes3):
+    for (num,typ,vect) in zip(varnums3, vartypes3, isvector3):
         if typ=="const" or typ=="smallconst" or typ=="smallconst_distinct":
-            if num>1:
+            if vect:
                 # print vector of constants
-                constraint+="[%d"%constants[constnum]
-                constnum+=1
-                for e in range(num-1):
-                    constraint+=", %d"%constants[constnum]
+                constraint+="["
+                for e in range(num):
+                    constraint+="%d"%constants[constnum]
                     constnum+=1
+                    if e<num-1: constraint+=","
                 constraint+="],"
             else:
                 # print single constant
                 constraint+="%d,"%constants[constnum]
                 constnum+=1
-        elif num>1:
+        elif vect:
             #print vector
-            constraint+="[x%d"%curvar
-            curvar+=1
-            for e in range(num-1):
-                constraint+=", x%d"%curvar
+            constraint+="["
+            for e in range(num):
+                constraint+="x%d"%curvar
                 curvar+=1
+                if e<num-1: constraint+=","
             constraint+="],"
         else:
             assert num==1
@@ -1067,16 +1168,17 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
     if reifyimply:
         constraint="reifyimply("+constraint+", x0)"
     
-    toopt=random.randint(0,3)
     
     varnums2=varnums[:]
     for (i,t) in zip(range(len(varnums)), vartypes):
         if t in ["const", "smallconst", "smallconst_distinct"]:
             varnums2[i]=0   # constants, so don't count as vars.
-    optvar=random.randint(0, sum(varnums2)-1)
     
+    # add a line to optimise a random variable.
     optline=False
-    if toopt==0:
+    toopt=random.randint(0,3)
+    if toopt==0 and sum(varnums2)>0:
+        optvar=random.randint(0, sum(varnums2)-1)
         # 1 in 4 chance
         minmax=random.randint(0,1)
         if minmax==1:
@@ -1088,6 +1190,11 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
         tuplelist=tablegen.printtable(domlists[1:])
     else:
         tuplelist=tablegen.printtable(domlists)
+    
+    if tuplelist is False:
+        # For some reason the printtable function rejected the domlists  
+        # at the moment this is because of an empty vector.
+        return True
     
     if reify:
         tuplelist2=[]
@@ -1120,9 +1227,10 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ho
     
     # tuplelist is actually a set of lists(not yet), so that it can be reformed for reify or reifyimply
     
-    constrainttable="table([x0"
-    for i in range(1,sum(varnums2)):
-        constrainttable+=",x%d"%i
+    constrainttable="table(["
+    for i in range(sum(varnums2)):
+        constrainttable+="x%d"%i
+        if i<(sum(varnums2)-1): constrainttable+=","
     constrainttable+="], modtable)"
     
     # add some other constraints at random into the constraint and constrainttable strings
@@ -1302,41 +1410,4 @@ def generatevariables(varblocks, types, boundallowed):
     st_nontable=reduce(lambda x,y:x+"\n"+y, [i[0] for i in deco])+"\n"
     st_table=reduce(lambda x,y:x+"\n"+y, [i[1] for i in deco])+"\n"
     return (domainlists, st_nontable, st_table, constants)
-
-def comparetrees(same):
-    # Fork so that memory used in building and comparing
-    # trees in the child process is returned when the process ends.
-    
-    parentpid=os.getpid()
-
-    pid = os.fork()
-    if pid:
-        # we are the parent
-        (pid, exitcode) = os.waitpid(pid, 0) # make sure the child process gets cleaned up
-        return (exitcode == 0)
-    else:
-        # we are the child
-        sys.exit(0)
-        # do the tree comparison:
-        tree1=tree()
-        tree2=tree()
-        
-        tree1.buildtree(str(parentpid)+"outfile1")
-        tree2.buildtree(str(parentpid)+"outfile2")
-        
-        if same:
-            temp= tree1.equal(tree2)
-        else:
-            temp= tree1.subset(tree2)
-        
-        # now return 
-        if temp:
-            os.remove(str(parentpid)+"outfile1")
-            os.remove(str(parentpid)+"outfile2")
-            os.remove(str(parentpid)+"infile1.minion")
-            os.remove(str(parentpid)+"infile2.minion")
-            sys.exit(0)
-        
-        sys.exit(1)
-
 
