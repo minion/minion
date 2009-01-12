@@ -16,13 +16,13 @@
 // Check domain size -- if it is greater than numvars, then no need to wake the constraint.
 //#define CHECKDOMSIZE
 
-// Do not process SCCs independently. Do the whole lot each time.
-//#define NOSCC
+// Process SCCs independently
+#define SCC
 
 // Warning: if this is not defined, then watchedalldiff probably won't do anything.
 //#define USEWATCHES
 
-// Optimize the case where a value was assigned. Only works in the absence of NOSCC.
+// Optimize the case where a value was assigned. Only works in the presence of SCC
 #define ASSIGNOPT 
 
 // Use the special queue
@@ -36,6 +36,9 @@
 
 // Use staging a la Schulte and Stuckey
 #define STAGED
+
+//Incremental graph -- maintains adjacency lists for values and vars
+//#define INCGRAPH
 
 #include <stdlib.h>
 #include <iostream>
@@ -166,18 +169,56 @@ struct DynamicAlldiff : public DynamicConstraint
       D_DATA(SCCSplit2=getMemory(stateObj).backTrack().request_bytes((sizeof(char) * numvars)));
       D_DATA(for(int i=0; i<numvars; i++) ((char *)SCCSplit2.get_ptr())[i]=1);
       
-      
+      #ifdef INCGRAPH
+            // refactor this to use initial upper and lower bounds.
+            adjlist.resize(numvars+numvals);
+            adjlistpos.resize(numvars+numvals);
+            for(int i=0; i<numvars; i++)
+            {
+                adjlist[i].resize(numvals);
+                for(int j=0; j<numvals; j++) adjlist[i][j]=j+dom_min;
+                adjlistpos[i].resize(numvals);
+                for(int j=0; j<numvals; j++) adjlistpos[i][j]=j;
+            }
+            for(int i=numvars; i<numvars+numvals; i++)
+            {
+                adjlist[i].resize(numvars);
+                for(int j=0; j<numvars; j++) adjlist[i][j]=j;
+                adjlistpos[i].resize(numvars);
+                for(int j=0; j<numvars; j++) adjlistpos[i][j]=j;
+            }
+            adjlistlength=getMemory(stateObj).backTrack().template requestArray<int>(numvars+numvals);
+            for(int i=0; i<numvars; i++) adjlistlength[i]=numvals;
+            for(int i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
+        #endif
   }
   
+  #ifdef INCGRAPH
+    vector<vector<int> > adjlist;
+    MoveableArray<int> adjlistlength;
+    vector<vector<int> > adjlistpos;   // position of a variable in adjlist.
+  #endif
+  
   // only used in dynamic version.
-  #ifdef DYNAMICALLDIFF
   int dynamic_trigger_count()
   {
 	// First an array of watches for the matching, then a 2d array of mixed triggers
     // indexed by [var][count] where count is increased from 0 as the triggers are used.
-	return numvars+numvars*numvals;
+    int numtrigs=0;
+    #ifdef INCGRAPH
+    numtrigs+=numvars*numvals; // one for each var-val pair so we know when it is removed.
+    #endif
+    
+    #ifdef DYNAMICALLDIFF
+	numtrigs+= numvars+numvars*numvals;
+    #endif
+    
+    // Dynamic alldiff triggers go first, incgraph triggers are after that
+    // so places which access incgraph triggers must check if DYNAMICALLDIFF is defined.
+    return numtrigs;
   }
   
+  #ifdef DYNAMICALLDIFF
   inline DynamicTrigger * get_dt(int var, int counter)
   {
       // index the square array of dynamic triggers from dt
@@ -242,8 +283,6 @@ struct DynamicAlldiff : public DynamicConstraint
   #endif
   
   bool constraint_locked;
-  
-  #ifndef DYNAMICALLDIFF
   
   PROPAGATE_FUNCTION(int prop_var, DomainDelta)
   {
@@ -322,7 +361,7 @@ struct DynamicAlldiff : public DynamicConstraint
         constraint_locked = true;
         getQueue(stateObj).pushSpecialTrigger(this);
         #else
-        #ifdef NOSCC
+        #ifndef SCC
         do_prop_noscc();
         #else
         do_prop();
@@ -331,10 +370,27 @@ struct DynamicAlldiff : public DynamicConstraint
     }
   }
   
-  #else
-  
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* trig)
+  PROPAGATE_FUNCTION(DynamicTrigger* trig)
   {
+      #ifdef INCGRAPH
+      DynamicTrigger* dtstart=dynamic_trigger_start();
+      #ifdef DYNAMICALLDIFF
+      dtstart+=numvars+numvars*numvals;
+      #endif
+      if(trig>=dtstart && trig< dtstart+numvars*numvals)  // does this trigger belong to incgraph?
+      {
+          int diff=trig-dtstart;
+            int var=diff/numvals;
+            int validx=diff%numvals;
+            if(adjlistpos[validx+numvars][var]<adjlistlength[validx+numvars])
+            {
+                P("Removing var, val " << var << ","<< (validx+dom_min) << " from adjacency list.");
+                adjlist_remove(var, validx+dom_min); //validx, adjlistpos[validx][var]);
+            }
+            return;
+      }
+      #endif
+      
       // get variable number from the trigger
     int prop_var = trig->trigger_info();
     #ifdef PLONG
@@ -405,7 +461,7 @@ struct DynamicAlldiff : public DynamicConstraint
         constraint_locked = true;
         getQueue(stateObj).pushSpecialTrigger(this);
         #else
-        #ifdef NOSCC
+        #ifndef SCC
         do_prop_noscc();
         #else
         do_prop();
@@ -414,7 +470,6 @@ struct DynamicAlldiff : public DynamicConstraint
     }
   }
   
-  #endif
   
   virtual void special_unlock() { constraint_locked = false; to_process.clear(); }
   virtual void special_check()
@@ -427,7 +482,7 @@ struct DynamicAlldiff : public DynamicConstraint
         return;
     }
     
-    #ifndef NOSCC
+    #ifdef SCC
     do_prop();
     #else
     do_prop_noscc();
@@ -943,6 +998,35 @@ struct DynamicAlldiff : public DynamicConstraint
   
   virtual void full_propagate()
   { 
+      #ifdef INCGRAPH
+        {
+            // update the adjacency lists. and place dts
+            DynamicTrigger* dt=dynamic_trigger_start();
+            #ifdef DYNAMICALLDIFF
+            dt+=numvars+numvars*numvals;
+            #endif
+            for(int i=dom_min; i<=dom_max; i++)
+            {
+                for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
+                {
+                    int var=adjlist[i-dom_min+numvars][j];
+                    if(!var_array[var].inDomain(i))
+                    {
+                        adjlist_remove(var, i);
+                        j--; // stay in the same place, dont' skip over the 
+                        // value which was just swapped into the current position.
+                    }
+                    else
+                    {
+                        // arranged in blocks for each variable, with numvals triggers in each block
+                        DynamicTrigger* mydt= dt+(var*numvals)+(i-dom_min);
+                        var_array[var].addDynamicTrigger(mydt, DomainRemoval, i);
+                    }
+                }
+            }
+        }
+      #endif
+      
       #if defined(USEWATCHES) && defined(CHECKDOMSIZE)
       cout << "Watches and Quimper&Walsh's criterion do not safely co-exist." <<endl;
       FAIL_EXIT();
@@ -1011,13 +1095,47 @@ struct DynamicAlldiff : public DynamicConstraint
       #endif
       #endif
       
-      #ifndef NOSCC
+      #ifdef SCC
       do_prop();
       #else
       do_prop_noscc();
       #endif
   }
 	
+  #ifdef INCGRAPH
+    inline void adjlist_remove(int var, int val)
+    {
+        // swap item at position varidx to the end, then reduce the length by 1.
+        int validx=val-dom_min+numvars;
+        int varidx=adjlistpos[validx][var];
+        D_ASSERT(varidx<adjlistlength[validx]);  // var is actually in the list.
+        delfromlist(validx, varidx);
+        
+        delfromlist(var, adjlistpos[var][val-dom_min]);
+    }
+    
+    inline void delfromlist(int i, int j)
+    {
+        // delete item in list i at position j
+        int t=adjlist[i][adjlistlength[i]-1];
+        adjlist[i][adjlistlength[i]-1]=adjlist[i][j];
+        
+        if(i<numvars)
+        {
+            adjlistpos[i][adjlist[i][j]-dom_min]=adjlistlength[i]-1;
+            adjlistpos[i][t-dom_min]=j;
+        }
+        else
+        {
+            adjlistpos[i][adjlist[i][j]]=adjlistlength[i]-1;
+            adjlistpos[i][t]=j;
+        }
+        adjlist[i][j]=t;
+        adjlistlength[i]=adjlistlength[i]-1;
+    }
+    #endif
+  
+  
 	virtual BOOL check_assignment(DomainInt* v, int array_size)
 	{
 	  D_ASSERT(array_size == var_array.size());
@@ -1052,6 +1170,23 @@ struct DynamicAlldiff : public DynamicConstraint
       if(!matchok)
       {
           if(numvals<numvars) return false; // there can't be a matching.
+          #ifdef INCGRAPH
+            // update the adjacency lists.
+            for(int i=dom_min; i<=dom_max; i++)
+            {
+                for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
+                {
+                    int var=adjlist[i-dom_min+numvars][j];
+                    if(!var_array[var].inDomain(i))
+                    {
+                        // swap with the last element and remove
+                        adjlist_remove(var, i);
+                        j--; // stay in the same place, dont' skip over the 
+                        // value which was just swapped into the current position.
+                    }
+                }
+            }
+          #endif
           
           matchok=bfsmatching(0, numvars-1);
       }
@@ -1274,7 +1409,7 @@ struct DynamicAlldiff : public DynamicConstraint
             {
                 P("(Re)starting tarjan's algorithm, value:"<< curnode);
                 varcount=0;
-                visit(curnode, sccindex_start);
+                visit(curnode, true, sccindex_start);
                 P("Returned from tarjan's algorithm.");
             }
         }
@@ -1299,7 +1434,7 @@ struct DynamicAlldiff : public DynamicConstraint
         #endif
     }
     
-    void visit(int curnode, int sccindex_start)
+    void visit(int curnode, bool toplevel, int sccindex_start)
     {
         tstack.push_back(curnode);
         in_tstack.insert(curnode);
@@ -1321,7 +1456,7 @@ struct DynamicAlldiff : public DynamicConstraint
                 //cout << "About to visit spare value: " << newnode-numvars+dom_min <<endl;
                 if(!visited.in(newnode))
                 {
-                    visit(newnode, sccindex_start);
+                    visit(newnode, false, sccindex_start);
                     if(lowlink[newnode]<lowlink[curnode])
                     {
                         lowlink[curnode]=lowlink[newnode];
@@ -1347,7 +1482,7 @@ struct DynamicAlldiff : public DynamicConstraint
             
             if(!visited.in(newnode))
             {
-                visit(newnode, sccindex_start);
+                visit(newnode, false, sccindex_start);
                 if(lowlink[newnode]<lowlink[curnode])
                 {
                     lowlink[curnode]=lowlink[newnode];
@@ -1382,13 +1517,22 @@ struct DynamicAlldiff : public DynamicConstraint
             #endif
             
             int lowlinkvar=-1;
+            #ifndef INCGRAPH
             for(int i=0; i<var_indices.size(); i++)
             {
                 int newnode=var_indices[i];
+            #else
+            for(int i=0; i<adjlistlength[curnode]; i++)
+            {
+                int newnode=adjlist[curnode][i];
+            #endif
                 if(varvalmatching[newnode]!=curnode-numvars+dom_min)   // if the value is not in the matching.
                 {
+                    #ifndef INCGRAPH
                     if(var_array[newnode].inDomain(curnode+dom_min-numvars))
+                    #endif
                     {
+                        D_ASSERT(var_array[newnode].inDomain(curnode+dom_min-numvars));
                         //newnode=varvalmatching[newnode]-dom_min+numvars;  // Changed here for merge nodes
                         if(!visited.in(newnode))
                         {
@@ -1407,7 +1551,7 @@ struct DynamicAlldiff : public DynamicConstraint
                                 triggercount[newnode]++;
                                 #endif
                             }
-                            visit(newnode, sccindex_start);
+                            visit(newnode, false, sccindex_start);
                             if(lowlink[newnode]<lowlink[curnode])
                             {
                                 lowlink[curnode]=lowlink[newnode];
@@ -1437,7 +1581,7 @@ struct DynamicAlldiff : public DynamicConstraint
                 int newnode=numvars+numvals;
                 if(!visited.in(newnode))
                 {
-                    visit(newnode, sccindex_start);
+                    visit(newnode, false, sccindex_start);
                     if(lowlink[newnode]<lowlink[curnode])
                     {
                         lowlink[curnode]=lowlink[newnode];
@@ -1478,7 +1622,7 @@ struct DynamicAlldiff : public DynamicConstraint
             // Perhaps we traversed all vars but didn't unroll the recursion right to the top.
             // Then lowlink[curnode]!=1. Or perhaps we didn't traverse all the variables.
             // I think these two cases cover everything.
-            if(lowlink[curnode]!=1 || varcount<var_indices.size())
+            if(!toplevel || varcount<var_indices.size())
             {
                 scc_split=true;  // The SCC has split and there is some work to do later.
             }
@@ -1495,8 +1639,6 @@ struct DynamicAlldiff : public DynamicConstraint
                 
                 varinlocalmatching.clear();  // Borrow this datastructure for a minute.
                 
-                //vector<int> tempset;  // pretend this is SCCs for the time being.
-                //tempset.reserve(numvars);
                 P("Writing new SCC:");
                 bool containsvars=false;
                 for(vector<int>::iterator tstackit=(--tstack.end());  ; --tstackit)
@@ -1562,7 +1704,13 @@ struct DynamicAlldiff : public DynamicConstraint
                                     if(varvalmatching[curvar]!=copynode+dom_min-numvars)
                                     {
                                         P("Removing var: "<< curvar << " val:" << copynode+dom_min-numvars);
-                                        var_array[curvar].removeFromDomain(copynode+dom_min-numvars);
+                                        if(var_array[curvar].inDomain(copynode+dom_min-numvars))
+                                        {
+                                            var_array[curvar].removeFromDomain(copynode+dom_min-numvars);
+                                            #ifdef INCGRAPH
+                                                adjlist_remove(curvar, copynode-numvars+dom_min);
+                                            #endif
+                                        }
                                     }
                                 }
                             }
@@ -2057,10 +2205,19 @@ struct DynamicAlldiff : public DynamicConstraint
                     { // it's a variable
                         // put all corresponding values in the fifo. 
                         // Need to check if we are completing an even alternating path.
+                        #ifndef INCGRAPH
                         for(int val=var_array[curnode].getMin(); val<=var_array[curnode].getMax(); val++)
                         {
-                            if(var_array[curnode].inDomain(val) 
-                                && val!=varvalmatching[curnode])
+                        #else
+                        for(int vali=0; vali<adjlistlength[curnode]; vali++)
+                        {
+                            int val=adjlist[curnode][vali];
+                        #endif
+                            if(val!=varvalmatching[curnode]
+                            #ifndef INCGRAPH
+                                && var_array[curnode].inDomain(val)
+                            #endif
+                                )
                             {
                                 if(!invprevious.in(val-dom_min))
                                 {
