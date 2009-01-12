@@ -31,7 +31,7 @@
 
 #include "../CSPSpec.h"
 
-// The follow three types are designed to allow turning a variable type which
+// The follow two types are designed to allow turning a variable type which
 // must be fed to a container, into a stand-alone class which is ready to be
 // used as a variable.
 template<typename InternalRefType>
@@ -238,101 +238,6 @@ struct QuickVarRefType
   {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos); }
 #endif
 };
-
-
-template<typename InternalRefType>
-struct CompleteVarRefType
-{
-  InternalRefType data;
-  CompleteVarRefType(const InternalRefType& _data) : data(_data)
-  {}
-  
-  CompleteVarRefType() 
-  {}
-  
-  CompleteVarRefType(const CompleteVarRefType& b) : data(b.data)
-  {}
-  
-  BOOL isAssigned() const
-  { return (data.getCon()).isAssigned(data); }
-  
-  DomainInt getAssignedValue() const
-  { return (data.getCon()).getAssignedValue(data); }
-  
-  BOOL isAssignedValue(DomainInt i) const
-  { 
-    return (data.getCon()).isAssigned(data) &&
-    (data.getCon()).getAssignedValue(data) == i;
-  }
-  BOOL inDomain(DomainInt b) const
-  { return (data.getCon()).inDomain(data, b); }
-  
-  DomainInt getMax() const
-  { return (data.getCon()).getMax(data); }
-  
-  DomainInt getMin() const
-  { return (data.getCon()).getMin(data); }
-
-  DomainInt getInitialMax() const
-  { return (data.getCon()).getInitialMax(data); }
-  
-  DomainInt getInitialMin() const
-  { return (data.getCon()).getInitialMin(data); }
-  
-  void setMax(DomainInt i)
-  { (data.getCon()).setMax(data,i); }
-  
-  void setMin(DomainInt i)
-  { (data.getCon()).setMin(data,i); }
-  
-  void uncheckedAssign(DomainInt b)
-  { (data.getCon()).uncheckedAssign(data, b); }
-  
-  void propagateAssign(DomainInt b)
-  { (data.getCon()).propagateAssign(data, b); }
-  
-  void decisionAssign(DomainInt b)
-  { (data.getCon()).decisionAssign(data, b); }
-  
-  void removeFromDomain(DomainInt b)
-  { (data.getCon()).removeFromDomain(data, b); }
-  
-  void addTrigger(Trigger t, TrigType type)
-  { (data.getCon()).addTrigger(data, t, type); }
-
-  vector<AbstractConstraint*>* getConstraints()
-  { return (data.getCon()).getConstraints(data); }
-  
-  void addConstraint(AbstractConstraint* c)
-  { (data.getCon()).addConstraint(data, c); }
-
-  DomainInt getBaseVal(DomainInt v) const
-  { return (data.getCon()).getBaseVal(v); }
-
-  Var getBaseVar() const
-  { return (data.getCon()).getBaseVar(); }
-
-#ifdef WDEG
-  int getBaseWdeg()
-  { return (data.getCon()).getBaseWdeg(data); }
-
-  void incWdeg()
-  { (data.getCon()).incWdeg(data); }
-#endif
-  
-  friend std::ostream& operator<<(std::ostream& o, const CompleteVarRefType& cv)
-  { return o << "CompleteCon:" << cv.data.var_num; }
-  
-  int getDomainChange(DomainDelta d)
-  { return d.XXX_get_domain_diff(); }
-  
-#ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
-  {  (data.getCon()).addDynamicTrigger(data, t, type, pos); }
-#endif
-};
-
-
 
 #endif
 
