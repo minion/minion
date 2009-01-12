@@ -5,7 +5,7 @@ import random
 # very simple program, just runs minion on the given minion files, using tableout.
 
 #Get the minion binary, and possibly a filelist and other options.
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "filelist=", "benchdir=", "timelimit=", "tableout=", "nodelimit=", "args=", "xgrid"])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["sample=", "minion=", "filelist=", "benchdir=", "timelimit=", "tableout=", "nodelimit=", "args=", "xgrid"])
 
 rand=random.randint(0, 1000000)
 minion="bin/minion"
@@ -15,6 +15,7 @@ timeout="-timelimit 1200 "
 nodelimit=""
 xgrid=False
 args=""
+sample=1
 
 for (ident, value) in optargs:
     if ident=="--minion":
@@ -37,6 +38,8 @@ for (ident, value) in optargs:
         xgrid=True
     elif ident=="--args":
         args=" "+value+" "
+    elif ident=="--sample":
+        sample=int(value)
 
 # grab any command line arguments which are minion instance files.
 othercopy=other[:]
@@ -66,9 +69,9 @@ for i in filelist:
     if xgrid:
         minioncommand1="xgrid -job submit "+minioncommand1
     print "Executing command:"+minioncommand1
-    status1=os.system(minioncommand1)
-    
-    assert status1 == 0 , "A minion exited in non-standard way on instance %s"%i
+    for sam in range(sample):
+        status1=os.system(minioncommand1)
+        assert status1 == 0 , "A minion exited in non-standard way on instance %s"%i
 
 #os.system("mini-scripts/plot-comparison.pl 1.%d 2.%d --name1=%s --name2=%s"%(rand, rand, name1, name2))
 
