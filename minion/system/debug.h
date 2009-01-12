@@ -90,55 +90,16 @@ enum DebugTypes
   
 #define DEBUG_CASE(x) case x: std::cerr << #x; break;
 
-#ifdef NO_PRINT
-#define D_INFO(x,y,z)
 #else
-// importance: 0 = trivial, 1 = important, 2 = v. important.
-  inline void D_INFO(int importance, DebugTypes x, std::string s)
-  {
-    std::cerr << importance << ",";
-    switch(x)
-    {
-      DEBUG_CASE(DI_OR);
-      DEBUG_CASE(DI_GADGET);
-      DEBUG_CASE(DI_SOLVER);
-      DEBUG_CASE(DI_SUMCON);
-      DEBUG_CASE(DI_BOOLCON);
-      DEBUG_CASE(DI_ARRAYAND);
-      DEBUG_CASE(DI_QUEUE);
-      DEBUG_CASE(DI_ANDCON);
-      DEBUG_CASE(DI_REIFY);
-      DEBUG_CASE(DI_LEXCON);
-      DEBUG_CASE(DI_TABLECON);
-	  DEBUG_CASE(DI_TEST);
-	  DEBUG_CASE(DI_DYSUMCON);
-	  DEBUG_CASE(DI_DYNAMICTRIG);
-	  DEBUG_CASE(DI_DYELEMENT);
-      DEBUG_CASE(DI_INTCON);
-      DEBUG_CASE(DI_LONGINTCON);
-	  DEBUG_CASE(DI_INTCONTAINER);
-      DEBUG_CASE(DI_BOUNDCONTAINER);
-	  DEBUG_CASE(DI_GACELEMENT);
-	  DEBUG_CASE(DI_CHECKCON);
-	  DEBUG_CASE(DI_VECNEQ);
-      DEBUG_CASE(DI_MEMBLOCK);
-      DEBUG_CASE(DI_POINTER);
-      default:
-	D_FATAL_ERROR("Missing debug case. Go add it to line 125(ish) in debug.h");
-    };
-    
-    std::cerr << ": " << s << std::endl;
-  }
-#endif
 
-  
-#else
-#define D_INFO(x,y,z)
 #define D_DATA(x)
 #define D_ASSERT(x)
 #endif
-    
-    
+
+// Deprecated    
+#define D_INFO(x,y,z)
+
+
 inline bool DOMAIN_CHECK(BigInt v)
 { return v < DomainInt_Max && v > DomainInt_Min; }
 
