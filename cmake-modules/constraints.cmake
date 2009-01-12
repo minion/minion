@@ -8,7 +8,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "pow" "div" "modulo" "gadget" "disabled-or" "watchvecexists_less"
                     "watchvecexists_and" "hamming" "watched-or" "watched-and"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
-                    "w-notliteral" "reify" "reifyimply-quick" "reifyimply")
+                    "w-notliteral" "reify" "reifyimply-quick" "reifyimply" "true" "false")
 
 set(GEN_FILES_DIR "minion/build_constraints")
 set(CONSTRAINTS_LIST "${GEN_FILES_DIR}/ConstraintList")
@@ -247,6 +247,14 @@ set(NAME_READ_reifyimply-quick "read_constraint" "read_bool_var")
 set(NAME_ID_reifyimply "CT_REIFYIMPLY")
 set(NAME_TYPE_reifyimply "DYNAMIC_CT")
 set(NAME_READ_reifyimply "read_constraint" "read_bool_var")
+
+set(NAME_ID_true "CT_TRUE")
+set(NAME_TYPE_true "STATIC_CT")
+set(NAME_READ_true )
+
+set(NAME_ID_false "CT_FALSE")
+set(NAME_TYPE_false "STATIC_CT")
+set(NAME_READ_false )
 
 macro(select_constraints)
     message(STATUS "Generating constraints:")

@@ -81,6 +81,20 @@ Build ## CT_NAME(StateObj* stateObj, const T1& t1, bool reify, \
   { return function(stateObj, t1, b); } \
 }
 
+// This one has to be inline because it's not templated, and we want to avoid multiple definitions if it is
+// included multiple times
+
+#define BUILD_CONSTRAINT0(CT_NAME, function)  \
+inline AbstractConstraint*\
+Build ## CT_NAME(StateObj* stateObj, bool reify, \
+				 const BoolVarRef& reifyVar, ConstraintBlob& b) \
+{ \
+  if(reify) \
+  { return reifyCon(stateObj, function(stateObj), reifyVar); } \
+  else \
+  { return function(stateObj); } \
+}
+
 #define BUILD_DYNAMIC_CONSTRAINT3(CT_NAME, function)  \
 template<typename T1, typename T2, typename T3> \
 AbstractConstraint*\

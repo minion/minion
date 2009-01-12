@@ -592,32 +592,8 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
   return tuplelist;
 }
 
-/*
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// readConstraintTable
-// table(<vectorOfVars>, {<tuple> [, <tuple>]})
-// Tuples represented as a vector of int arrays.
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-template<typename FileReader>
-ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReader* infile, ConstraintDef* def) 
-{
-  parser_info( "reading a table ct (unreifiable)" ) ;
-
-  vector<Var> vectorOfVars = readLiteralVector(infile) ;
-  int tupleSize = vectorOfVars.size() ;
-
-  infile->check_sym(',');
-
-  TupleList* tuplelist = readConstraintTupleList(infile);
-
-  infile->check_sym(')');
-  ConstraintBlob tableCon(def, vectorOfVars);
-  tableCon.tuples = tuplelist;
-  return tableCon;
-}*/
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// readConstraintTable
+// readConstraintGadget
 // table(<vectorOfVars>, {<tuple> [, <tuple>]})
 // Tuples represented as a vector of int arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
