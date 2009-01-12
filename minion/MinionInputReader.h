@@ -270,9 +270,8 @@ class MinionThreeInputReader {
   vector<Var> getColOfMatrix(vector<vector<Var> >& m, int c) ;
   vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,int r,int c) ;
   ConstraintBlob readConstraint(FileReader* infile, BOOL reified = false) ;
+  ConstraintBlob readConstraintTable(FileReader* infile, ConstraintDef* def);
   void readGadget(FileReader* infile) ;
-  //void readConstraintElement(FileReader* infile, ConstraintDef*) ;
-//  ConstraintBlob readConstraintTable(FileReader* infile, ConstraintDef*) ;
   TupleList* readConstraintTupleList(FileReader* infile);
   ConstraintBlob readConstraintGadget(FileReader* infile);
   ConstraintBlob readConstraintOr(FileReader* infile, ConstraintDef*);

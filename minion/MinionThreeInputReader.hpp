@@ -464,6 +464,11 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
     break;
 #endif
 
+    case CT_WATCHED_TABLE:
+    case CT_WATCHED_NEGATIVE_TABLE:
+    return readConstraintTable(infile, constraint);
+    break;
+
     default:
     return readGeneralConstraint(infile, constraint);
   }
@@ -471,6 +476,33 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
   throw parse_exception("Fatal error in parsing constraints");
 }
 
+template<typename FileReader>
+ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReader* infile, ConstraintDef* def)
+{
+  ConstraintBlob con(def);
+  
+  con.vars.push_back(readLiteralVector(infile));
+  infile->check_sym(',');
+  con.tuples = readConstraintTupleList(infile);
+  infile->check_sym(')');
+  
+  if(con.vars[0].size() != con.tuples->tuple_size())
+  {
+    throw parse_exception("Tuple constraint with " + to_string(con.vars[0].size()) + 
+                          " variables cannot have tuples of length " + to_string(con.tuples->tuple_size()));
+  }
+  
+  if(con.vars[0].size() == 0)
+  {
+    // Either trivially true, or trivially false, depending on how many tuples there are.
+    if(con.tuples->size() != 0)
+      return ConstraintBlob(get_constraint(CT_TRUE));
+    else
+      return ConstraintBlob(get_constraint(CT_FALSE));
+  }  
+  
+  return con;
+}
 
 template<typename FileReader>
 ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileReader* infile, ConstraintDef* def)
