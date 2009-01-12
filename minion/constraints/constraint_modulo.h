@@ -47,6 +47,189 @@ help constraints div
 #ifndef CONSTRAINT_MODULO_H
 #define CONSTRAINT_MODULO_H
 
+template<typename VarRef1, typename VarRef2, typename VarRef3>
+struct NotModConstraint : public AbstractConstraint
+{
+    virtual string constraint_name()
+  { return "NotModulo"; }
+  
+  VarRef1 var1;
+  VarRef2 var2;
+  VarRef3 var3;
+
+  NotModConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
+	AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+  {
+  
+	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
+		 var3.getInitialMin() < 0)
+	  { 
+      FAIL_EXIT("The negated 'modulo' constraint only supports nonnegative numbers, and positive bases, at present.");
+	  }
+  }
+  
+  virtual triggerCollection setup_internal()
+  {
+	D_INFO(2,DI_ANDCON,"Setting up Constraint");
+	triggerCollection t;
+    if(var1.isBound())
+    {
+        t.push_back(make_trigger(var1, Trigger(this, 1), LowerBound));
+        t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
+    }
+    else
+    {
+        t.push_back(make_trigger(var1, Trigger(this, 1), Assigned));
+    }
+    
+    if(var1.isBound())
+    {
+        t.push_back(make_trigger(var2, Trigger(this, 1), LowerBound));
+        t.push_back(make_trigger(var2, Trigger(this, 1), UpperBound));
+    }
+    else
+    {
+        t.push_back(make_trigger(var2, Trigger(this, 1), Assigned));
+    }
+    
+    if(var1.isBound())
+    {
+        t.push_back(make_trigger(var3, Trigger(this, 1), LowerBound));
+        t.push_back(make_trigger(var3, Trigger(this, 1), UpperBound));
+    }
+    else
+    {
+        t.push_back(make_trigger(var3, Trigger(this, 1), Assigned));
+    }
+	return t;
+  }
+  
+  PROPAGATE_FUNCTION(int flag, DomainDelta)
+  {
+	PROP_INFO_ADDONE(Mod);
+    // propagate var1 % var2 != var3 by forward checking
+    if(var1.isAssigned() && var2.isAssigned())
+    {
+        if(!var3.isBound())
+        {
+            var3.removeFromDomain(var1.getAssignedValue() % var2.getAssignedValue());
+        }
+        else
+        {
+            DomainInt temp=var1.getAssignedValue() % var2.getAssignedValue();
+            if(temp==var3.getMin())
+                var3.setMin(temp+1);
+            else if(temp==var3.getMax())
+                var3.setMax(temp-1);
+        }
+    }
+    else if(var1.isAssigned() && var3.isAssigned())
+    {
+        if(!var2.isBound())
+        {
+            for(DomainInt i=var2.getMin(); i<=var2.getMax(); i++)
+            {
+                if(var1.getAssignedValue() % i == var3.getAssignedValue())
+                {
+                    var2.removeFromDomain(i);
+                }
+            }
+        }
+        else
+        {
+            if(var1.getAssignedValue() % var2.getMin() == var3.getAssignedValue())
+            {
+                var2.setMin(var2.getMin()+1);
+            }
+            else if(var1.getAssignedValue() % var2.getMax() == var3.getAssignedValue())
+            {
+                var2.setMax(var2.getMax()-1);
+            }
+        }
+    }
+    else if(var2.isAssigned() && var3.isAssigned())
+    {
+        if(!var1.isBound())
+        {
+            for(DomainInt i=var1.getMin(); i<=var1.getMax(); i++)
+            {
+                if(i % var2.getAssignedValue() == var3.getAssignedValue())
+                {
+                    var1.removeFromDomain(i);
+                    
+                    // skip a few iterations to the next interesting value.
+                    i=i+var2.getAssignedValue()-1;
+                }
+            }
+        }
+        else
+        {
+            if(var1.getMin() % var2.getAssignedValue() == var3.getAssignedValue())
+            {
+                var1.setMin(var1.getMin()+1);
+            }
+            else if(var1.getMax() % var2.getAssignedValue() == var3.getAssignedValue())
+            {
+                var1.setMax(var1.getMax()-1);
+            }
+        }
+    }
+    
+  }
+  
+  virtual void full_propagate()
+  { 
+	propagate(1,0);
+  }
+  
+  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  {
+	D_ASSERT(v_size == 3);
+	return v[0] % v[1] != v[2];
+  }
+  
+  virtual vector<AnyVarRef> get_vars()
+  { 
+    vector<AnyVarRef> v;
+	v.push_back(var1);
+	v.push_back(var2);
+	v.push_back(var3);
+	return v;
+  }
+  
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {  
+    for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
+    {
+      if(var1.inDomain(v1))
+      {
+        for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2)
+        {
+          if(var2.inDomain(v2))
+          {
+              if(var3.getMin()!= v1 % v2)
+              {
+                  assignment.push_back(make_pair(0, v1));
+                  assignment.push_back(make_pair(1, v2));
+                  assignment.push_back(make_pair(2, var3.getMin()));
+                  return true;
+              }
+              if(var3.getMax()!= v1 % v2)
+              {
+                  assignment.push_back(make_pair(0, v1));
+                  assignment.push_back(make_pair(1, v2));
+                  assignment.push_back(make_pair(2, var3.getMax()));
+                  return true;
+              }
+          }
+        }
+      }
+    }
+    return false;
+  }
+};
+
+
 /// var1 % var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct ModConstraint : public AbstractConstraint
@@ -260,6 +443,12 @@ struct ModConstraint : public AbstractConstraint
     }
     return false;
   }
+  
+  // Function to make it reifiable in the most minimal way.
+    virtual AbstractConstraint* reverse_constraint()
+    {
+        return new NotModConstraint<VarRef1, VarRef2, VarRef3>(stateObj, var1, var2, var3);
+    }
 };
 
 template<typename V1, typename V2>
