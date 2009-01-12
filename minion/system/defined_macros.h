@@ -43,9 +43,6 @@ cout << "NO_DEBUG" << " ";
 #ifdef NO_DYN_CHECK
 cout << "NO_DYN_CHECK" << " "; 
 #endif
-#ifdef NO_PRINT
-cout << "NO_PRINT" << " "; 
-#endif
 #ifdef OLDTABLE
 cout << "OLDTABLE" << " "; 
 #endif

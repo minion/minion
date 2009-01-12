@@ -306,12 +306,6 @@ void print_default_help(char** argv)
   cout << endl;
   cout << "This version of Minion was built with internal checking " <<
 #ifdef NO_DEBUG
-  "off" <<
-#else
-  "on" << 
-#endif
-  endl << "    and verbose debug info "
-#ifdef NO_PRINT
   "off" << endl;
 #else
   "on" << endl;

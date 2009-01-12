@@ -28,11 +28,7 @@
 #define DEBUG_H
 
 
-#ifndef MINION_DEBUG_PRINT
-  #ifndef NO_PRINT
-  #define NO_PRINT
-  #endif
-#else
+#ifdef MINION_DEBUG_PRINT
   #ifndef MINION_DEBUG
   #define MINION_DEBUG
   #endif

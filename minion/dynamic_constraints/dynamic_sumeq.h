@@ -27,19 +27,11 @@
 #ifndef CONSTRAINT_DYNAMIC_SUMEQ_H
 #define CONSTRAINT_DYNAMIC_SUMEQ_H
 
-#ifndef NO_PRINT //for debug messages want complex string output
-#include <string>
-#endif
-
 //ONLY WORKS FOR VARS WHERE ARBITRARY VALUES CAN BE REMOVED AT ANY TIME
 
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct SumEqConstraintDynamic : public AbstractConstraint
 {
-#ifndef NO_PRINT
-  char output[200];
-#endif
-
   virtual string constraint_name()
   { return "SumEqDynamic"; }
   
@@ -184,16 +176,8 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     for(int i = z.getMin(); i <= max; i++) {
       if(z.inDomain(i)) {
 	if(!get_sumsupport(x, y, i, supp)) {
-#ifndef NO_PRINT
-	  sprintf(output, "sumeq: removing %d in z during full prop", i);
-	  D_INFO(1, DI_TABLECON, output);
-#endif
 	  z.removeFromDomain(i);
 	} else {
-#ifndef NO_PRINT
-	  sprintf(output, "sumeq: %d in z supported by (%d,%d)", i, supp[0], supp[1]);
-	  D_INFO(1, DI_TABLECON, output);
-#endif
 	  x.addDynamicTrigger(dt, DomainRemoval, supp[0]);
 	  y.addDynamicTrigger(dt+1, DomainRemoval, supp[1]);
 	  dt->trigger_info() = i;     //keep a note of the value it supports
@@ -213,16 +197,8 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     for(int i = x.getMin(); i <= max; i++) {
       if(x.inDomain(i)) {
 	if(!get_diffsupport(z, y, ymult, i*xmult, supp)) {
-#ifndef NO_PRINT
-	  sprintf(output, "sumeq: removing %d in x during full prop", i);
-	  D_INFO(1, DI_TABLECON, output);
-#endif
 	  x.removeFromDomain(i);
 	} else {
-#ifndef NO_PRINT
-	  sprintf(output, "sumeq: %d in x supported by (%d,%d)", i, supp[0], supp[1]);
-	  D_INFO(1, DI_TABLECON, output);
-#endif
 	  z.addDynamicTrigger(dt, DomainRemoval, supp[0]);
 	  y.addDynamicTrigger(dt + 1, DomainRemoval, supp[1]);
 	  dt->trigger_info() = i;
@@ -242,16 +218,8 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     for(int i = y.getMin(); i <= max; i++) {
       if(y.inDomain(i)) {
 	if(!get_diffsupport(z, x, xmult, i*ymult, supp)) {
-#ifndef NO_PRINT
-	  sprintf(output, "sumeq: removing %d in y during full prop", i);
-	  D_INFO(1, DI_TABLECON, output);
-#endif
 	  y.removeFromDomain(i);
 	} else {
-#ifndef NO_PRINT
-	  sprintf(output, "sumeq: %d in y supported by (%d,%d)", i, supp[0], supp[1]);
-	  D_INFO(1, DI_TABLECON, output);
-#endif
 	  z.addDynamicTrigger(dt, DomainRemoval, supp[0]);
 	  x.addDynamicTrigger(dt + 1, DomainRemoval, supp[1]);
 	  dt->trigger_info() = i;
@@ -282,46 +250,22 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     DynamicTrigger* first_dt = (dt < dts + data.other) ? dt : dt - 1;
     if(data.isForX) {
       if(!get_diffsupport(z, y, ymult, value*xmult, supp)) {
-#ifndef NO_PRINT
-	sprintf(output, "sumeq: removing %d in x during dynamic prop", value);
-	D_INFO(1, DI_TABLECON, output);
-#endif
 	x.removeFromDomain(value);
       } else {
-#ifndef NO_PRINT
-	sprintf(output, "sumeq: %d in x supported by (%d,%d)", value, supp[0], supp[1]);
-	D_INFO(1, DI_TABLECON, output);
-#endif
 	z.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
 	y.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
       }
     } else if(data.isForY) {
       if(!get_diffsupport(z, x, xmult, value*ymult, supp)) {
-#ifndef NO_PRINT
-	sprintf(output, "sumeq: removing %d in y during dynamic prop", value);
-	D_INFO(1, DI_TABLECON, output);
-#endif
 	y.removeFromDomain(value);
       } else {
-#ifndef NO_PRINT
-	sprintf(output, "sumeq: %d in y supported by (%d,%d)", value, supp[0], supp[1]);
-	D_INFO(1, DI_TABLECON, output);
-#endif
 	z.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
 	x.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
       }
     } else {
       if(!get_sumsupport(x, y, value, supp)) {
-#ifndef NO_PRINT
-	sprintf(output, "sumeq: removing %d in z during dynamic prop", value);
-	D_INFO(1, DI_TABLECON, output);
-#endif
 	z.removeFromDomain(value);
       } else {
-#ifndef NO_PRINT
-	sprintf(output, "sumeq: %d in z supported by (%d,%d)", value, supp[0], supp[1]);
-	D_INFO(1, DI_TABLECON, output);
-#endif
 	x.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
 	y.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
       }
