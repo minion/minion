@@ -113,8 +113,11 @@ struct DynamicAlldiff : public DynamicConstraint
     SCCSplit(_stateObj, _var_array.size()), 
     sparevaluespresent(_stateObj, _var_array.size()), constraint_locked(false)
   {
-      dom_min=var_array[0].getInitialMin();
-      dom_max=var_array[0].getInitialMax();
+      if(var_array.size()>0)
+      {
+          dom_min=var_array[0].getInitialMin();
+          dom_max=var_array[0].getInitialMax();
+      }
       SCCs.resize(var_array.size());
       varToSCCIndex.resize(var_array.size());
       for(int i=0; i<var_array.size(); ++i)
@@ -2254,7 +2257,7 @@ struct DynamicAlldiff : public DynamicConstraint
                                     cout << endl;
                                     #endif
                                     
-                                    invprevious.clear();
+                                    invprevious.clear();  // THIS SHOULD BE CHANGED -- RECOMPUTING THIS EVERY TIME IS STUPID.
                                     for(int sccindex=sccstart; sccindex<=sccend; sccindex++)
                                     {
                                         int var=SCCs[sccindex];
@@ -2280,19 +2283,31 @@ struct DynamicAlldiff : public DynamicConstraint
                         } // end for
                     }
                     else
-                    { // popped a value from the stack.
+                    { // popped a value from the stack. Follow the edge in the matching.
                         D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
                         int stackval=curnode+dom_min-numvars;
                         int vartoqueue=-1;
+                        D_DATA(bool found=false);
+                        #ifndef INCGRAPH
                         for(int scci=sccstart; scci<=sccend; scci++)
                         {
-                            if(varvalmatching[SCCs[scci]]==stackval && var_array[SCCs[scci]].inDomain(stackval))
+                            vartoqueue=SCCs[scci];
+                        #else
+                        for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
+                        {
+                            vartoqueue=adjlist[curnode][vartoqueuei];
+                        #endif
+                            if(varvalmatching[vartoqueue]==stackval
+                                #ifndef INCGRAPH
+                                && var_array[vartoqueue].inDomain(stackval)
+                                #endif
+                                )
                             {
-                                vartoqueue=SCCs[scci];
+                                D_DATA(found=true);
                                 break;
                             }
                         }
-                        D_ASSERT(vartoqueue>=0);  // if this assertion fails, then invprevious must be wrong.
+                        D_ASSERT(found);  // if this assertion fails, then invprevious must be wrong.
                         if(!visited.in(vartoqueue)) // I think it's impossible for this test to be false.
                         {
                             visited.insert(vartoqueue);
