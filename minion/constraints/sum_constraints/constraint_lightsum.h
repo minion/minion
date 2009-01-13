@@ -57,7 +57,6 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_SUMCON,"Setting up Constraint");
     triggerCollection t;
     
     int array_size = var_array.size();

@@ -49,7 +49,6 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   
   int dynamic_trigger_count()
   {	
-	D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BOOLSATConstraintDynamic");
 	return 2;
   }
   
@@ -123,8 +122,6 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
 	else
 	  other_propval = base_dt->trigger_info();
 	
-	
-    D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
 
 	int unchecked_val = other_val(propval, other_propval);
 	

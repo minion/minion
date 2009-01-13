@@ -193,8 +193,6 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
       domain_size = new_domains[i].second.upper_bound - new_domains[i].second.lower_bound + 1;
       var_offset.push_back( var_offset.back() + domain_size);
       var_count_m++;
-      D_INFO(0,DI_LONGINTCON,"Adding var of domain: (" + to_string(new_domains[i].second.lower_bound) + "," +
-                                                         to_string(new_domains[i].second.upper_bound) + ")");
     }
     constraints.resize(var_count_m);
 #ifdef WDEG

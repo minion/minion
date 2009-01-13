@@ -221,7 +221,6 @@ struct GACTableConstraint : public AbstractConstraint
   {
 	PROP_INFO_ADDONE(DynGACTable);
 
-	D_INFO(1, DI_TABLECON, "Propagation Triggered: " + to_string(propagated_trig));
 	DynamicTrigger* dt = dynamic_trigger_start();
 	int trigger_pos = propagated_trig - dt;
 	int propagated_literal = trigger_pos / (vars.size() - 1);
@@ -230,14 +229,12 @@ struct GACTableConstraint : public AbstractConstraint
 	BOOL is_new_support = find_new_support(propagated_literal, varval.first);
 	if(is_new_support)
 	{
-	  D_INFO(1, DI_TABLECON, "Found new support!");
 	  setup_watches(varval.first, varval.second);
                 // better to just pass in varval.first and propagated_literal
                 // setup_watches does not need value and recomputes lit
 	}
 	else
 	{
-	  D_INFO(1, DI_TABLECON, "Failed to find new support");
 	  vars[varval.first].removeFromDomain(varval.second);
 	}
   }  
@@ -267,8 +264,6 @@ struct GACTableConstraint : public AbstractConstraint
 	{
 	  int dom_min = (lists->tuples->dom_smallest)[i];
 	  int dom_max = (lists->tuples->dom_smallest)[i] + (lists->tuples->dom_size)[i];
-	  D_INFO(2, DI_TABLECON, "Var " + to_string(i) + " pruned to [" + 
-			 to_string(dom_min) + "," + to_string(dom_max - 1) + "]");
 	  vars[i].setMin(dom_min);
 	  vars[i].setMax(dom_max - 1);
 	  
@@ -280,7 +275,6 @@ struct GACTableConstraint : public AbstractConstraint
 		if((lists->literal_specific_tuples)[literal].empty())
 		{
 		  vars[i].removeFromDomain(x);
-		  D_INFO(2, DI_TABLECON, "No tuple supports " + to_string(x) + " in var " + to_string(i));
 		}
 		else
 		{
@@ -289,7 +283,6 @@ struct GACTableConstraint : public AbstractConstraint
 		  
 		  if(!is_new_support)
 		  {
-			D_INFO(2, DI_TABLECON, "No valid support for " + to_string(x) + " in var " + to_string(i));
 			vars[i].removeFromDomain(x);
 		  }
 		  else

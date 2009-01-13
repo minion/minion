@@ -281,7 +281,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_LEXCON,"Setting up Constraint");
     triggerCollection t;
    
     for(int i=0; i < var_array1.size(); ++i)
@@ -313,7 +312,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   
   virtual void full_propagate()
   {
-    D_INFO(2, DI_VECNEQ, "Starting full propagate");
     P("VecNeq full prop");
     DynamicTrigger* dt = dynamic_trigger_start();
     int size = var_array1.size();
@@ -341,7 +339,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     // There is only one possible pair allowed...
     if(index == size)
     {
-      D_INFO(2, DI_VECNEQ, "Only found one possible: " + to_string(watched_index0));      
       propagate_from_var1(watched_index0);
       propagate_from_var2(watched_index0);
       propagate_mode = true;
@@ -351,9 +348,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     }
 
     watched_index1 = index;
-
-    D_INFO(2, DI_VECNEQ, "Found two indices: " + to_string(watched_index0) +
-      " and " + to_string(watched_index1));
 
     add_triggers(watched_index0, dt);
     add_triggers(watched_index1, dt + 2);
@@ -368,7 +362,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(DynVecNeq);
-    D_INFO(2, DI_VECNEQ, "Starting propagate");
     P("VecNeq prop");
     
     if(propagate_mode)
@@ -443,7 +436,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       }
     }
 
-    D_INFO(2, DI_VECNEQ, "Now going to watch " + to_string(index));
 
     if(triggerpair == 0)
       watched_index0 = index;

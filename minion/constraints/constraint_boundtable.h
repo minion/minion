@@ -93,14 +93,12 @@ struct BoundsTableConstraint : public AbstractConstraint
           if(constraint->check_assignment(v))
           { 
             satisfied = true; 
-            D_INFO(0,DI_ANDCON,to_string(check_var,check_dom)+to_string(v));
           }
         } while(!satisfied && increment(v, check_var));
         if(satisfied)
           goto end_check_lower;
       }
 end_check_lower:
-      D_INFO(0,DI_ANDCON,string("Removing up to:")+to_string(check_var,check_dom));
       vars[check_var].setMin(check_dom);
       
       for(check_dom = vars[check_var].getMax();
@@ -116,14 +114,12 @@ end_check_lower:
           if(constraint->check_assignment(v))
           { 
             satisfied = true; 
-            D_INFO(0,DI_ANDCON,to_string(check_var,check_dom)+to_string(v));
           }
         } while(!satisfied && increment(v, check_var));
         if(satisfied)
           goto end_check_upper;
       }
 end_check_upper:
-        D_INFO(0,DI_ANDCON,string("Removing up to:")+to_string(check_var,check_dom));
       vars[check_var].setMax(check_dom);
       
       

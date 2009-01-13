@@ -102,7 +102,6 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_ANDCON,"Setting up Constraint");
     triggerCollection t;
 	t.push_back(make_trigger(var1, Trigger(this, 10), LowerBound));
     t.push_back(make_trigger(var1, Trigger(this, 11), UpperBound));
@@ -340,7 +339,6 @@ struct NeqConstraintBinary : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_SUMCON,"Setting up Constraint");
     triggerCollection t;
     #ifndef MAKECONFLUENT
     t.push_back(make_trigger(var1, Trigger(this, 1), Assigned));
@@ -549,7 +547,6 @@ struct EqualConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_ANDCON,"Setting up Constraint");
     triggerCollection t;
 	t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
 	t.push_back(make_trigger(var1, Trigger(this, 2), LowerBound));

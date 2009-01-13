@@ -50,7 +50,6 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
   
   int dynamic_trigger_count()
   {
-	  D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BOOLSATConstraintDynamic");
  	  return 2;
   }
     
@@ -114,7 +113,6 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
 //	if(var_array[other_propval].isAssignedValue(1))
 //	  return;
 	
-    D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
 
 	bool found_new_support = false;
 

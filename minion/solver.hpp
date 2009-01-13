@@ -33,7 +33,6 @@ inline int get_world_depth(StateObj* stateObj)
 /// Pushes the state of the whole world.
 inline void world_push(StateObj* stateObj)
 {
-  D_INFO(0,DI_SOLVER,"World Push");
   getVars(stateObj).getBigRangevarContainer().bms_array.before_branch_left();
   D_ASSERT(getQueue(stateObj).isQueuesEmpty());
   getMemory(stateObj).backTrack().world_push();
@@ -44,7 +43,6 @@ inline void world_push(StateObj* stateObj)
 /// Pops the state of the whole world.
 inline void world_pop(StateObj* stateObj)
 {
-  D_INFO(0,DI_SOLVER,"World Pop");
   D_ASSERT(getQueue(stateObj).isQueuesEmpty());
  
   getMemory(stateObj).backTrack().world_pop();

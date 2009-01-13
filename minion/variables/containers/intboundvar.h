@@ -380,8 +380,6 @@ struct BoundVarContainer {
       {
         var_count_m++;
         initial_bounds.push_back(make_pair(vars[i].second.lower_bound, vars[i].second.upper_bound));
-        D_INFO(0,DI_BOUNDCONTAINER,"Adding var of domain: (" + to_string(vars[i].second.lower_bound) + "," +
-                                                               to_string(vars[i].second.upper_bound) + ")");
       }
     }
 

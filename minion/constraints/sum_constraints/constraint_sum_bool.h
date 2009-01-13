@@ -48,7 +48,6 @@ struct BoolLessSumConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_SUMCON,"Setting up Constraint");
     triggerCollection t;
     int array_size = var_array.size();
 	
@@ -81,7 +80,6 @@ struct BoolLessSumConstraint : public AbstractConstraint
   
   void limit_reached()
   {
-    D_INFO(1,DI_SUMCON,"Limit Reached");
     int one_vars = 0;
     typename VarArray::value_type* it = &*var_array.begin();
     typename VarArray::value_type* end_it = it + var_array.size();
@@ -103,7 +101,6 @@ struct BoolLessSumConstraint : public AbstractConstraint
     D_ASSERT(var_array[i].getAssignedValue() == 0 ||
 			 var_array[i].getAssignedValue() == 1);
     int c = count + 1;
-    D_INFO(1,DI_SUMCON,to_string("Ping Constraint, count",c));
     count = c;
     if(c == occ_count())
       limit_reached();
@@ -125,7 +122,6 @@ struct BoolLessSumConstraint : public AbstractConstraint
   virtual BOOL check_unsat(int, DomainDelta)
   {
     int i = count + 1;
-    D_INFO(1,DI_SUMCON,to_string("Checking unsat, count",i));
     count = i;
     if(i > occ_count())
       return true;
@@ -141,7 +137,6 @@ struct BoolLessSumConstraint : public AbstractConstraint
       if(var_array[i].isAssignedValue(VarToCount))
 		occs++;
     count = occs;
-    D_INFO(1,DI_SUMCON,to_string("Full Propagate, count:",occs));
     if(occs > occ_count())
       getState(stateObj).setFailed(true);
     if(occs == occ_count())

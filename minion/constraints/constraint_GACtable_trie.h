@@ -114,7 +114,6 @@ struct GACTableConstraint : public AbstractConstraint
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
   {
 	PROP_INFO_ADDONE(DynGACTable);
-	D_INFO(1, DI_TABLECON, "Propagation Triggered: " + to_string(propagated_trig));
 	DynamicTrigger* dt = dynamic_trigger_start();
 	int trigger_pos = propagated_trig - dt;
 	int propagated_literal = trigger_pos / (vars.size() - 1);
@@ -127,12 +126,10 @@ struct GACTableConstraint : public AbstractConstraint
 	
 	if(is_new_support)
 	{
-	  D_INFO(1, DI_TABLECON, "Found new support!");
 	  setup_watches(varIndex, propagated_literal);
 	}
 	else
 	{
-	  D_INFO(1, DI_TABLECON, "Failed to find new support");
 	  vars[varIndex].removeFromDomain(val);
 	}
   }
@@ -166,7 +163,6 @@ struct GACTableConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-      D_INFO(2, DI_TABLECON, "Full prop");
       if(negative==0 && tuples->size()==0)
       {   // it seems to work without this explicit check, but I put it in anyway.
           getState(stateObj).setFailed(true);
@@ -206,7 +202,6 @@ struct GACTableConstraint : public AbstractConstraint
                 // cout << "    var " << varIndex << " val: " << i << " sup " << sup << " " << endl;
                 if(sup < 0)
                 {
-                  D_INFO(2, DI_TABLECON, "No valid support for " + to_string(i) + " in var " + to_string(varIndex));
                   //cout <<"No valid support for " + to_string(i) + " in var " + to_string(varIndex) << endl;
                   //volatile int * myptr=NULL;
                   //int crashit=*(myptr);

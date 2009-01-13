@@ -420,7 +420,6 @@ struct GACTableConstraint : public AbstractConstraint
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
   {
 	PROP_INFO_ADDONE(DynGACTable);
-	D_INFO(1, DI_TABLECON, "Propagation Triggered: " + to_string(propagated_trig));
 	DynamicTrigger* dt = dynamic_trigger_start();
 	int trigger_pos = propagated_trig - dt;
 	int propagated_literal = trigger_pos / (vars.size() - 1);
@@ -433,12 +432,10 @@ struct GACTableConstraint : public AbstractConstraint
 	
 	if(is_new_support)
 	{
-	  D_INFO(1, DI_TABLECON, "Found new support!");
 	  setup_watches(varIndex, val, propagated_literal);
 	}
 	else
 	{
-	  D_INFO(1, DI_TABLECON, "Failed to find new support");
 	  vars[varIndex].removeFromDomain(val);
 	}
   }
@@ -492,7 +489,6 @@ struct GACTableConstraint : public AbstractConstraint
 		// cout << "    var " << varIndex << " val: " << i << " sup " << sup << " " << endl;
 		if(_tuple==0)
 		{
-		  D_INFO(2, DI_TABLECON, "No valid support for " + to_string(x) + " in var " + to_string(i));
 		  //cout <<"no support found for var:"<<varIndex<< " and val:"<< i <<endl ;
 		  vars[varIndex].removeFromDomain(i);
 		}

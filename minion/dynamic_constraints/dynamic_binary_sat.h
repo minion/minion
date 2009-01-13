@@ -45,7 +45,6 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
   
   int dynamic_trigger_count()
   {
-	D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BoolSATDinaryConstraintDynamic");
 	return 2;
   }
     

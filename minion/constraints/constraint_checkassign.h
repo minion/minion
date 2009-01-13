@@ -37,11 +37,10 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   CheckAssignConstraint(StateObj* _stateObj, VarArray& vars, OriginalConstraint& con)
   : AbstractConstraint(_stateObj), originalcon(con),variables(vars), assigned_vars(stateObj), assignment(variables.size())
-  { D_INFO(2, DI_CHECKCON, "Constructing"); }
+  { }
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_CHECKCON,"Setting up Constraint");
     triggerCollection t;
 	for(unsigned i = 0; i < variables.size(); ++i)
 	  t.push_back(make_trigger(variables[i], Trigger(this, i), Assigned));
@@ -65,7 +64,6 @@ struct CheckAssignConstraint : public AbstractConstraint
   {
   
 	int count = assigned_vars;
-    D_INFO(2, DI_CHECKCON, "Checking unsat. Count=" + to_string(count));
 	++count;
 	int v_size = variables.size();
 	D_ASSERT(count <= v_size);
@@ -94,13 +92,11 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   virtual BOOL full_check_unsat()
   {
-    D_INFO(2, DI_CHECKCON, "Checking full unsat");
 	unsigned counter = 0;
     for(unsigned i = 0; i < variables.size(); ++i)
 	  if(variables[i].isAssigned()) ++counter;
 	assigned_vars = counter;
 	
-	D_INFO(1, DI_CHECKCON, "Vars assigned:"+to_string(counter));
 	if(counter == variables.size())
 	{
 	  for(unsigned i = 0; i < variables.size(); ++i)

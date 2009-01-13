@@ -70,7 +70,6 @@ struct NotModConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-	D_INFO(2,DI_ANDCON,"Setting up Constraint");
 	triggerCollection t;
     if(var1.isBound())
     {
@@ -254,7 +253,6 @@ struct ModConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-	D_INFO(2,DI_ANDCON,"Setting up Constraint");
 	triggerCollection t;
 	t.push_back(make_trigger(var1, Trigger(this, -1), LowerBound));
 	t.push_back(make_trigger(var2, Trigger(this, -2), LowerBound));

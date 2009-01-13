@@ -90,20 +90,18 @@ public:
   /// and in special circumstances.
   void set_raw_ptr(void* _ptr) 
   { 
-    D_INFO(0, DI_POINTER, "Manually set pointer at " + to_string(this) + " to:" + to_string(ptr));
     ptr = _ptr; 
   }
   
   /// Produces a new MoveablePointer offset from the current one by a given number of bytes.
   MoveablePointer getOffset(unsigned bytes)
   { 
-    D_INFO(0, DI_POINTER, "Offset " + to_string(ptr) + " by " + to_string(bytes));
     return MoveablePointer(((char*)ptr) + bytes); 
   }
 
   /// Default constructor.
   MoveablePointer() : ptr(NULL)
-  { D_INFO(0, DI_POINTER, "Create Empty Pointer at:" + to_string(this)); }
+  { }
   
   /// Destructor.
   ~MoveablePointer();
@@ -264,7 +262,6 @@ public:
     D_ASSERT(!lock_m);
     if(maximum_bytes < allocated_bytes + byte_count)
     { reallocate( (allocated_bytes + byte_count) * 2 ); }
-    D_INFO(0,DI_MEMBLOCK,"New pointer at:" + to_string((void*)(current_data+allocated_bytes)) + " for " + to_string(byte_count));
 
     char* return_val = current_data + allocated_bytes;
     allocated_bytes += byte_count;
@@ -297,7 +294,6 @@ public:
     // TODO: Search codebase for memcpy, use realloc instead if possible.
     memcpy(new_data, current_data, allocated_bytes);
     free(current_data);
-    D_INFO(0, DI_MEMBLOCK, "Moving base from " + to_string((void*)current_data) + " to " + to_string((void*)new_data));
     current_data = new_data;
     maximum_bytes = byte_count;
   }
@@ -307,12 +303,10 @@ public:
   {
     D_ASSERT(!final_lock_m);
     void* ptr = vp->get_ptr_noCheck();
-    D_INFO(0,DI_MEMBLOCK,"Testing if " + to_string(vp) + " to " + to_string(ptr) + " should be added...");
     if(ptr < current_data || ptr >= current_data + allocated_bytes)
       return false;
     else
     {
-      D_INFO(0,DI_MEMBLOCK, "Pointer added!");
       pointers.insert(vp);
       return true;
     }
@@ -326,7 +320,6 @@ public:
       return false;
     else
     {
-      D_INFO(0,DI_MEMBLOCK, "Pointer removed!");
       pointers.erase(vp);
       return true;
     }
@@ -342,7 +335,6 @@ public:
     bool check2 = (ptr >= current_data && ptr < current_data + allocated_bytes);
     if(check1 != check2)
     {
-      D_INFO(0, DI_MEMBLOCK, "Error!" + to_string(check1) + ":" + to_string(check2));
       D_FATAL_ERROR("Fatal Memory corruption - pointer broken!");
     }
     return check1;
@@ -367,14 +359,12 @@ public:
 
 inline MoveablePointer::MoveablePointer(const MoveablePointer& b) : ptr(b.ptr)
 {
-  D_INFO(0,DI_POINTER,"Copy pointer to " + to_string(ptr) + " from vp " + to_string(&b) + " to " + to_string(this));
   if(ptr != NULL)
     memBlockCache.addPointerToNewMemoryBlock(this);
 }
 
 inline void MoveablePointer::operator=(const MoveablePointer& b)
 {
-  D_INFO(0, DI_POINTER, "Make " + to_string(this)+ " point to " + to_string(b.ptr) + " instead of " + to_string(ptr));
   if(ptr != NULL)
     memBlockCache.removePointerFromNewMemoryBlock(this);
   ptr = b.ptr;
@@ -384,14 +374,12 @@ inline void MoveablePointer::operator=(const MoveablePointer& b)
 
 inline MoveablePointer::MoveablePointer(void* _ptr) : ptr(_ptr)
 {
-  D_INFO(0,DI_POINTER,"Create pointer from raw to:" + to_string(ptr) + " at " + to_string(this));
   if(ptr != NULL)
     memBlockCache.addPointerToNewMemoryBlock(this);
 }
 
 inline MoveablePointer::~MoveablePointer()
 {
-  D_INFO(0,DI_POINTER,"Remove pointer at " + to_string(this));
 #ifndef SLOW_DEBUG
   D_ASSERT(memBlockCache.checkPointerValid(this));
 #endif
@@ -401,7 +389,6 @@ inline MoveablePointer::~MoveablePointer()
 
 inline MoveablePointer::MoveablePointer(const MoveablePointer& b, int offset) : ptr(((char*)b.ptr) + offset)
 {
-  D_INFO(0,DI_POINTER,"Create offset of " + to_string(b.ptr) + " by " + to_string(offset));
   D_ASSERT(b.get_ptr() != NULL);
   memBlockCache.addPointerToNewMemoryBlock(this);
 }

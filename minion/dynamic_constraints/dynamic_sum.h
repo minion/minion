@@ -114,7 +114,6 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
   // == Number of 1's is >=K         // this is the one I want to do
   // == Number of 0's is <= N-K
 
-    D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for BoolLessSumConstraintDynamic");
 
     int array_size = var_array.size();
 
@@ -174,7 +173,6 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
       {
         if(var_array[i].inDomain(1 - VarToCount))
         {
-          D_INFO(1, DI_DYSUMCON, to_string(i) + " watched, so pruning.");
           if(VarToCount)
             var_array[i].setMax(0);
           else
@@ -235,7 +233,6 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
     PROP_INFO_ADDONE(DynSum);
     D_ASSERT(check_consistency());
     int propval = dt->trigger_info();
-    D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
     D_ASSERT(var_array[propval].getAssignedValue() == VarToCount);
   // should generalise
   // and will need to loop round for watched lits	
@@ -271,7 +268,6 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
       return;
     }
 
-    D_INFO(1,DI_DYSUMCON,"Limit Reached in WL sum (0/1) constraint");	
   // there is no literal to watch, we need to propagate
 
     DynamicTrigger* dt2 = dynamic_trigger_start();

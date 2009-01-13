@@ -74,8 +74,6 @@ public:
   inline void pushTriggers(TriggerRange new_triggers)
   { 
 	CON_INFO_ADDONE(AddConToQueue);
-    D_INFO(1, DI_QUEUE, string("Adding new triggers. Trigger list size is ") + 
-		   to_string(propagate_trigger_list.size()) + ".");
 #ifdef WEIGHTED_TRIGGERS
 	propagate_trigger_list.push(new_triggers); 
 #else
@@ -131,7 +129,6 @@ public:
 	while(!dynamic_trigger_list.empty())
 	{
 	  DynamicTrigger* t = dynamic_trigger_list.back();
-	  D_INFO(1, DI_QUEUE, string("Checking queue ") + to_string(t));
 	  dynamic_trigger_list.pop_back();
 	  DynamicTrigger* it = t->next;
 	  
@@ -144,13 +141,11 @@ public:
 		  return true; 
 		}
 #endif
-		D_INFO(1, DI_QUEUE, string("Checking ") + to_string(it));
         
 #ifdef NO_DYN_CHECK
 		DynamicTrigger* next_queue_ptr;
 #endif
 		next_queue_ptr = it->next;
-		D_INFO(1, DI_QUEUE, string("Will do ") + to_string(next_queue_ptr) + " next");
 		CON_INFO_ADDONE(DynamicTrigger);
 		it->propagate();  
 
@@ -215,7 +210,6 @@ public:
   
   inline void propagateQueue()
   {
-    D_INFO(2, DI_QUEUE, "Starting Propagation");
 #ifdef USE_SETJMP
     int setjmp_return = SYSTEM_SETJMP(*(getState(stateObj).getJmpBufPtr()));
 	if(setjmp_return != 0)
@@ -256,7 +250,6 @@ public:
 	  if(special_triggers.empty())
 		return;
 	  
-	  D_INFO(1, DI_QUEUE, string("Doing a special trigger!"));
 	  AbstractConstraint* trig = special_triggers.back();
 	  special_triggers.pop_back();
 	  CON_INFO_ADDONE(SpecialTrigger);
@@ -277,7 +270,6 @@ public:
 	while(!dynamic_trigger_list.empty())
 	{
 	  DynamicTrigger* t = dynamic_trigger_list.back();
-	  D_INFO(1, DI_QUEUE, string("Checking queue ") + to_string(t));
 	  dynamic_trigger_list.pop_back();
 	  DynamicTrigger* it = t->next;
 	  
@@ -290,7 +282,6 @@ public:
 		  return true; 
 		}
 #endif
-		D_INFO(1, DI_QUEUE, string("Checking ") + to_string(it));
         
 #ifdef NO_DYN_CHECK
 		DynamicTrigger* next_queue_ptr;
@@ -299,7 +290,6 @@ public:
         
         if(it->constraint->full_propagate_done)
         {
-            D_INFO(1, DI_QUEUE, string("Will do ") + to_string(next_queue_ptr) + " next");
             CON_INFO_ADDONE(DynamicTrigger);
             it->propagate();
         }
@@ -359,7 +349,6 @@ public:
   
   inline void propagateQueueRoot()
   {
-    D_INFO(2, DI_QUEUE, "Starting Propagation at root");
 #ifdef USE_SETJMP
     int setjmp_return = SYSTEM_SETJMP(*(getState(stateObj).getJmpBufPtr()));
 	if(setjmp_return != 0)
@@ -400,7 +389,6 @@ public:
 	  if(special_triggers.empty())
 		return;
 	  
-	  D_INFO(1, DI_QUEUE, string("Doing a special trigger!"));
 	  AbstractConstraint* trig = special_triggers.back();
 	  special_triggers.pop_back();
 	  CON_INFO_ADDONE(SpecialTrigger);

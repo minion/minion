@@ -87,7 +87,6 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   
   int dynamic_trigger_count()
   {
-  	D_INFO(2,DI_DYSUMCON,"Setting up Dynamic Trigger Constraint for LiteralSumConstraintDynamic");
 	  return var_sum + 1;
   }
     
@@ -121,7 +120,6 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 	  {
 		if(var_array[i].inDomain(value_array[i]))
 		{
-		  D_INFO(1, DI_DYSUMCON, to_string(i) + " watched, so pruning.");
 		  var_array[i].propagateAssign(value_array[i]);
 		}
 	  }
@@ -176,7 +174,6 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 	PROP_INFO_ADDONE(DynLitWatch);
     D_ASSERT(check_consistency());
 	int propval = dt->trigger_info();
-    D_INFO(1, DI_DYSUMCON, "Triggering on domain of "+ to_string(propval));
 
 	D_ASSERT(!var_array[propval].inDomain(value_array[propval]));
 	
@@ -215,7 +212,6 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 	}
 	
 	
-	D_INFO(1,DI_DYSUMCON,"Limit Reached in WL sum (0/1) constraint");	
 	// there is no literal to watch, we need to propagate
 	
 	DynamicTrigger* dt2 = dynamic_trigger_start();

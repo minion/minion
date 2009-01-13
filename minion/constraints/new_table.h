@@ -242,7 +242,6 @@ struct NewTableConstraint : public AbstractConstraint
   {
     PROP_INFO_ADDONE(DynGACTable);
 
-    D_INFO(1, DI_TABLECON, "Propagation Triggered: " + to_string(propagated_trig));
     DynamicTrigger* dt = dynamic_trigger_start();
     int trigger_pos = propagated_trig - dt;
     int propagated_literal = trigger_pos / (vars.size() - 1);

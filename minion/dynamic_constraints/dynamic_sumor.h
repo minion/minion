@@ -88,7 +88,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   
   virtual void full_propagate()
   {
-    D_INFO(2, DI_VECNEQ, "Starting full propagate");
     
     // Check if the constraint is trivial, if so just exit now.
     if(num_to_watch <= 1)
@@ -174,7 +173,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(DynVecNeq);
-    D_INFO(2, DI_VECNEQ, "Starting propagate");
     int trigger_activated = dt - dynamic_trigger_start();
     int triggerpair = trigger_activated / 2;
     D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);
@@ -215,7 +213,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     if(index == unwatched_size)
     {
       // This is the only possible non-equal index.
-      D_INFO(2, DI_VECNEQ, "Cannot find another index");
       propagate_mode = true;
       index_to_not_propagate = watched_values[triggerpair];
       

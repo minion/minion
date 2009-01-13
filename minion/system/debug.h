@@ -92,10 +92,6 @@ enum DebugTypes
 #define D_ASSERT(x)
 #endif
 
-// Deprecated    
-#define D_INFO(x,y,z)
-
-
 inline bool DOMAIN_CHECK(BigInt v)
 { return v < DomainInt_Max && v > DomainInt_Min; }
 

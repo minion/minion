@@ -313,7 +313,6 @@ public:
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(int b, DynamicTrigger* t, TrigType type, DomainInt val)
   {
-    D_INFO(1, DI_QUEUE, "Adding Dynamic Trigger");
     D_ASSERT(lock_second);
     D_ASSERT(!only_bounds || type != DomainRemoval);
     D_ASSERT(t->constraint != NULL);

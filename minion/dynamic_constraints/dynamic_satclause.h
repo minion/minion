@@ -48,7 +48,6 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
 			       const vector<int>& _negs) :
     AbstractConstraint(_stateObj), var_array(_var_array), negs(_negs), last(0)
   { 
-    D_INFO(2, DI_OR, "Constructor for OR constraint");
     watched[0] = watched[1] = -2;
     no_vars = _var_array.size();
 #ifndef WATCHEDLITERALS
@@ -58,7 +57,6 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   
   int dynamic_trigger_count()
   {
-    D_INFO(2, DI_OR, "OR constraint: dynamic_trigger_count");
     return 2;
   }
 
@@ -119,7 +117,6 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
 
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-    D_INFO(2, DI_OR, "Checking soln in or constraint");
     for(int i = 0; i < no_vars; i++)
       if(v[i] == negs[i])
 	return true;

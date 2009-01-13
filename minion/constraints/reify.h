@@ -205,7 +205,6 @@ struct reify : public ParentConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_REIFY,"Setting up reification");
     triggerCollection triggers;
     triggers.push_back(make_trigger(reify_var, Trigger(this, -1000000000), Assigned));
     return triggers;
@@ -519,7 +518,6 @@ struct reify : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_REIFY,"Setting up rarification");
     triggerCollection postrig = poscon->setup_internal();
     triggerCollection negtrig = negcon->setup_internal();
     triggerCollection triggers;
@@ -564,7 +562,6 @@ struct reify : public AbstractConstraint
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(Reify);
-    D_INFO(1,DI_REIFY,"Propagation Start");
     
     if(constraint_locked)
       return;
@@ -590,7 +587,6 @@ struct reify : public AbstractConstraint
     { 
       if(poscon->check_unsat(i/2, domain)) 
       { 
-        D_INFO(1,DI_REIFY,"Constraint False");
         rar_var.propagateAssign(false);
       }
     }
@@ -598,7 +594,6 @@ struct reify : public AbstractConstraint
     { 
       if(negcon->check_unsat((i-1)/2,domain)) 
       {
-        D_INFO(1,DI_REIFY,"Constraint True");
         rar_var.propagateAssign(true);
       }
     }
@@ -608,13 +603,11 @@ struct reify : public AbstractConstraint
   {
     if(poscon->full_check_unsat())
     {
-      D_INFO(1,DI_REIFY,"Pos full_check_unsat true!");
       rar_var.propagateAssign(false);
     }
 
     if(negcon->full_check_unsat())
     {
-      D_INFO(1,DI_REIFY,"False full_check_unsat true!");
       rar_var.propagateAssign(true);
     }
 

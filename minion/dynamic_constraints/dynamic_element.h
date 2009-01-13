@@ -158,7 +158,6 @@ struct ElementConstraintDynamic : public AbstractConstraint
         ++support;
       if (support == max_check) 
       {
-        D_INFO(2, DI_DYELEMENT, "No support for " + to_string(realj) + " in result");
         resultvar.removeFromDomain(realj); 
         return;
       }
@@ -210,8 +209,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
 			!(resultvar.inDomain_noBoundCheck(support) && var_array[i].inDomain(support)))
 		++support;
 	  if( support >= max_check )      
-	  {                                     
-	    D_INFO(2, DI_DYELEMENT, "No support for " + to_string(i) + " in index");
+	  {
 	    indexvar.removeFromDomain(i); 
 		return;
 	  }
@@ -251,7 +249,6 @@ struct ElementConstraintDynamic : public AbstractConstraint
   
   virtual void full_propagate()
   {
-	D_INFO(2, DI_DYELEMENT, "Setup Triggers");
     for(int i=0; i<var_array.size(); i++) 
         if(var_array[i].isBound() && !var_array[i].isAssigned()) // isassigned excludes constants.
             cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
@@ -311,7 +308,6 @@ struct ElementConstraintDynamic : public AbstractConstraint
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* trig)
   {
 	PROP_INFO_ADDONE(DynElement);
-    D_INFO(2, DI_DYELEMENT, "Start Propagation");
 	DynamicTrigger* dt = dynamic_trigger_start();
 	unsigned pos = trig - dt;
 	unsigned array_size = var_array.size();
@@ -321,7 +317,6 @@ struct ElementConstraintDynamic : public AbstractConstraint
 	// int when_index_assigned_triggers = (initial_result_dom_max - initial_result_dom_min + 1);
 	if(pos < result_support_triggers)
 	{// It was a value in the result var which lost support
-	  D_INFO(2, DI_DYELEMENT, "Find new support for result var assigned " + to_string(pos/2));
 	  find_new_support_for_result(pos / 2);
 	  return;
 	}
@@ -329,7 +324,6 @@ struct ElementConstraintDynamic : public AbstractConstraint
 	
 	if(pos < index_support_triggers)
 	{// A value in the index var lost support
-	  D_INFO(2, DI_DYELEMENT, "Find new support for index var assigned " + to_string(pos/2));
 	  find_new_support_for_index( pos / 2 );
 	  return;
 	}
@@ -341,18 +335,12 @@ struct ElementConstraintDynamic : public AbstractConstraint
 	  if(indexvar.isAssigned())
 	  {
 		deal_with_assigned_index();
-	    //D_ASSERT(!resultvar.inDomain(pos + initial_result_dom_min));
-		// D_INFO(2, DI_DYELEMENT, "indexvar assigned, so must remove " + to_string(pos + initial_result_dom_min) + " from var " + to_string(indexvar.getAssignedValue()));
-	    //var_array[indexvar.getAssignedValue()].removeFromDomain(pos + initial_result_dom_min);
 	  }
 	  return;
 	}
 	
 	D_ASSERT(pos == 1);
     // index has become assigned.
-	
-	D_INFO(2, DI_DYELEMENT, "Index var assigned " + to_string(indexvar.getAssignedValue()));
-	
 	deal_with_assigned_index();
   }
   

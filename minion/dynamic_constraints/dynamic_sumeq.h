@@ -49,14 +49,12 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 #endif
     if(xmult < 1 || ymult < 1)
       INPUT_ERROR("Multipliers on gacsum must be > 0")
-    D_INFO(1, DI_TABLECON, "sumeq: Constructor here!");
   }
 
   int vals;
   
   int dynamic_trigger_count() //need two watched literals per value in each var (one per support) 
   {
-    D_INFO(1, DI_TABLECON, "sumeq: counting WLs");
     if(vals == -1) { //not already calculated 
       vals = 0;
       DomainInt max = x.getMax(); 
@@ -82,14 +80,12 @@ struct SumEqConstraintDynamic : public AbstractConstraint
   }
 
   BOOL check_assignment(DomainInt* v, int v_size) {
-    D_INFO(1, DI_TABLECON, "sumeq: checking assignment");
     return xmult*v[0] + ymult*v[1] == v[2];
   }
 
   //use smart algorithm to find out if any a + b = c in linear time
   //puts supports for c in resArr and returns T, or F if none exist
   BOOL get_sumsupport(VarRef1& a, VarRef2& b, DomainInt c, int (&resArr)[2]) {
-    D_INFO(1, DI_TABLECON, "sumeq: looking for sum support");
     DomainInt bMin = b.getMin();
     DomainInt bMax = b.getMax();
     DomainInt aCurr = max(a.getMin(), (c - bMax*ymult)/xmult);
@@ -118,7 +114,6 @@ struct SumEqConstraintDynamic : public AbstractConstraint
   //variation on get_sumsupport to do a - b*bmult = c
   template<typename VarType1>
   BOOL get_diffsupport(VarRef3& a, VarType1& b, int bmult, DomainInt c, int (&resArr)[2]) {
-    D_INFO(1, DI_TABLECON, "sumeq: looking for diff support");
     DomainInt bMin = b.getMin();
     DomainInt bMax = b.getMax();
     DomainInt aCurr = max(a.getMin(), (c + bMin*bmult));
@@ -159,7 +154,6 @@ struct SumEqConstraintDynamic : public AbstractConstraint
   // to var/val as well as the other WL on this value
   virtual void full_propagate()
   {
-    D_INFO(1, DI_TABLECON, "sumeq: full prop");
 
     //start placing WLs in the right places
     DynamicTrigger* dt = dynamic_trigger_start();  
@@ -238,7 +232,6 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-    D_INFO(1, DI_TABLECON, "sumeq: dynamic prop");
     int value = dt->trigger_info(); //the value formerly supported by dt
     DynamicTrigger* dts = dynamic_trigger_start();
     int wl_no = dt - dts; //sequence number of WL

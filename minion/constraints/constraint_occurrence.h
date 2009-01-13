@@ -414,7 +414,6 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_SUMCON,"Setting up Constraint");
     triggerCollection t;
     occurrences_count = 0; 
     not_occurrences_count = 0;
@@ -425,7 +424,6 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   
   void occurrence_limit_reached()
   {
-    D_INFO(1,DI_SUMCON,"Occurrence Limit Reached");
     D_ASSERT(val_count_max <= occurrences_count);
     int occs = 0;
     typename VarArray::iterator end_it(var_array.end());
@@ -447,7 +445,6 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   
   void not_occurrence_limit_reached()
   {
-    D_INFO(1,DI_SUMCON,"Not Occurrence Limit Reached");
     D_ASSERT(not_occurrences_count >= static_cast<int>(var_array.size()) - val_count_min);
     int occs = 0;
     typename VarArray::iterator end_it(var_array.end());
@@ -509,11 +506,9 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    D_INFO(1, DI_SUMCON, "Start full propagate");
     if(val_count_max < 0 || val_count_min > (int)var_array.size())
       getState(stateObj).setFailed(true);
     setup_counters();
-    D_INFO(1,DI_SUMCON,to_string("Full Propagate, count", occurrences_count));
     
     if(val_count_max < occurrences_count)
       getState(stateObj).setFailed(true);
@@ -612,7 +607,6 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_SUMCON,"Setting up Constraint");
     triggerCollection t;
     occurrences_count = 0; 
     not_occurrences_count = 0;
@@ -625,7 +619,6 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   
   void occurrence_limit_reached()
   {
-    D_INFO(1,DI_SUMCON,"Occurrence Limit Reached");
     D_ASSERT(val_count.getMax() <= occurrences_count);
     int occs = 0;
     typename VarArray::iterator end_it(var_array.end());
@@ -646,7 +639,6 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   
   void not_occurrence_limit_reached()
   {
-    D_INFO(1,DI_SUMCON,"Not Occurrence Limit Reached");
     D_ASSERT(not_occurrences_count >= static_cast<int>(var_array.size()) - val_count.getMin());
     int occs = 0;
     typename VarArray::iterator end_it(var_array.end());
@@ -715,7 +707,6 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
     val_count.setMin(0);
     val_count.setMax(var_array.size());
     setup_counters();
-    D_INFO(1,DI_SUMCON,to_string("Full Propagate, count", occurrences_count));
     val_count.setMin(occurrences_count);
     val_count.setMax(static_cast<int>(var_array.size()) - not_occurrences_count);
     

@@ -100,7 +100,6 @@ struct LexLeqConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_LEXCON,"Setting up Constraint");
     triggerCollection t;
     
     int x_size = x.size();
@@ -189,10 +188,8 @@ struct LexLeqConstraint : public AbstractConstraint
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
     PROP_INFO_ADDONE(Lex);
-    D_INFO(0,DI_LEXCON,"Begin Propagation");
     if (F)
     {
-      D_INFO(0,DI_LEXCON,"Already True");
       return ;
     }
     int a = alpha, b = beta;
@@ -235,7 +232,6 @@ struct LexLeqConstraint : public AbstractConstraint
   
   virtual BOOL check_unsat(int unsat_val, DomainDelta)
   {
-    D_INFO(0,DI_LEXCON,string("Checking Unsat")+to_string(Less));
     int a = alpha;
     if(unsat_val >= a)
     {
@@ -294,7 +290,6 @@ struct LexLeqConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    D_INFO(1, DI_LEXCON, "Begin Full Propagate");
     int i, n = x.size() ;
     for (i = 0; i < n; i++) {
       if (!x[i].isAssigned()) break ;    

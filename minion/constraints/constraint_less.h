@@ -68,7 +68,6 @@ struct LeqConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_SUMCON,"Setting up Constraint");
     triggerCollection t;
 	t.push_back(make_trigger(x, Trigger(this, 0), LowerBound));
 	t.push_back(make_trigger(y, Trigger(this, 1), UpperBound));

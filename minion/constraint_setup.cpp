@@ -12,7 +12,6 @@ namespace Controller
 
 void lock(StateObj* stateObj)
 {
-  D_INFO(2, DI_SOLVER, "Starting Locking process");
   // do hackery involving the monotonic set.
   //getMemory(stateObj).monotonic_set=& getVars(stateObj).getBigRangevarContainer().bms_array;
   

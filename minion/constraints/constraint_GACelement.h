@@ -51,7 +51,6 @@ struct GACElementConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_GACELEMENT,"Setting up Constraint");
     triggerCollection t;
     if(var_array.empty())
       return t;
@@ -143,7 +142,6 @@ struct GACElementConstraint : public AbstractConstraint
 	{
 	  if(indexvar.inDomain(prop_val) && !support_for_val_in_index(prop_val))
 	  {
-	    D_INFO(2, DI_GACELEMENT, "No support for var in index");
 		indexvar.removeFromDomain(prop_val);
 	  }
 	  
@@ -156,7 +154,6 @@ struct GACElementConstraint : public AbstractConstraint
 	    if(!var.inDomain(val) && resultvar.inDomain(val) &&
 		   !support_for_val_in_result(val))
 	    {
-	      D_INFO(2, DI_GACELEMENT, "No support for val in result var");
 	      resultvar.removeFromDomain(val);
 	    }
 	  }
@@ -180,7 +177,6 @@ struct GACElementConstraint : public AbstractConstraint
 	{
 	  if(indexvar.inDomain(var) && !support_for_val_in_index(var))
 	  {
-		D_INFO(2, DI_GACELEMENT, "No support for var in index");
 		indexvar.removeFromDomain(var);
 	  }
 	}

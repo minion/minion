@@ -54,8 +54,6 @@ public:
   /// Remove from whatever list this trigger is currently stored in.
   void remove(DynamicTrigger*& next_queue_ptr)
   { 
-    D_INFO(1,DI_DYNAMICTRIG,string("Trigger ") + to_string(this) + " removed from list: "
-                            + ":" + to_string(prev) + "," + to_string(next));
     if(this == next_queue_ptr)
     {
       CON_INFO_ADDONE(DynamicMovePtr);
@@ -86,13 +84,11 @@ public:
   // next_queue_ptr is a '*&' as it is a pointer which we want a reference to, so we can change it!
   void add_after(DynamicTrigger* new_prev, DynamicTrigger*& next_queue_ptr)
   {
-    D_INFO(1, DI_DYNAMICTRIG, string("Trigger ") + to_string(this) + " added to list " + to_string(new_prev));
     D_ASSERT(constraint != NULL);
 	D_ASSERT(sanity_check == 1234);
     D_ASSERT(new_prev->sanity_check_list());
     if(prev != NULL)
 	{
-	  D_INFO(1, DI_DYNAMICTRIG, "Must remove trigger from existing queue.");
 #ifndef NO_DYN_CHECK
 	  if(this == next_queue_ptr)
 	  {

@@ -67,7 +67,6 @@ struct GadgetConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-    D_INFO(2,DI_SUMCON,"Setting up Constraint");
     triggerCollection t;
     for(int i = 0; i < var_array.size(); ++i)
       t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
@@ -160,11 +159,8 @@ struct GadgetConstraint : public AbstractConstraint
       {
         if(!construction_vars[i].inDomain(j))
         { 
-          D_INFO(0, DI_GADGET, "Remove " + to_string(j) + " from var " + to_string(i));
           var_array[i].removeFromDomain(j);
         }
-        else
-          D_INFO(0, DI_GADGET, "Leave " + to_string(j) + " in var " + to_string(i));
       }
     }
     
