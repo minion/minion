@@ -28,7 +28,16 @@
 #ifndef STATEOBJ_HPP
 #define STATEOBJ_HPP
 
+// The following is a little trick, to make sure no-one accidentally links together
+// debugging and non-debugging code (which are not link-compatable)
 #ifdef REENTER
+
+#ifdef MINION_DEBUG
+namespace StateObjNamespace_DEBUG
+#else
+namespace StateObjNamespace_RELEASE
+#endif
+{
 struct StateObj
 {
   // Forbid copying this type!
@@ -43,9 +52,7 @@ struct StateObj
   VariableContainer* varContainer_m;
   BoolContainer* backtrack_bools; 
 public:
-  
- 
-  
+
   StateObj() :
     searchMem_m(new Memory),
     options_m(new SearchOptions),
@@ -68,6 +75,15 @@ public:
   }
 };
 
+}
+
+#ifdef MINION_DEBUG
+using namespace StateObjNamespace_DEBUG;
+#else
+using namespace StateObjNamespace_RELEASE;
+#endif
+
+
 inline BoolContainer& getBools(StateObj* stateObj)
 { return *(stateObj->backtrack_bools); }
 inline SearchOptions& getOptions(StateObj* stateObj)
@@ -85,7 +101,19 @@ inline VariableContainer& getVars(StateObj* stateObj)
 
 #else
 
-struct StateObj {};
+#ifdef MINION_DEBUG
+namespace StateObjNamespace_DEBUG
+#else
+namespace StateObjNamespace_RELEASE
+#endif
+{ struct StateObj {}; }
+
+#ifdef MINION_DEBUG
+using namespace StateObjNamespace_DEBUG;
+#else
+using namespace StateObjNamespace_RELEASE;
+#endif
+
 VARDEF(StateObj _noreenter_stateObj);
 VARDEF(Memory searchMem_m);
 VARDEF(SearchOptions options_m);
@@ -139,5 +167,6 @@ inline SearchState::~SearchState()
     delete dynamic_constraints[i];
 #endif
 }
+
 
 #endif
