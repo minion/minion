@@ -11,9 +11,7 @@ private:
     MonotonicSet & MS;
     int offset;
     
-  #ifndef NO_DEBUG
-    int size;
-  #endif
+    D_DATA(int size);
     
 public:
     // The constructor must be called before the monotonicset is locked.
@@ -23,10 +21,9 @@ public:
   #endif
     {
         D_ASSERT(&getMemory(stateObj).monotonicSet() !=NULL);
+        D_ASSERT(size>=0);
         offset=MS.request_storage(_size);
-        #ifndef NO_DEBUG
-        cout << "Set up ReversibleMonotonicSet with size "<< _size << " and offset " << offset <<endl;
-        #endif
+        D_DATA(cout << "Set up ReversibleMonotonicSet with size "<< _size << " and offset " << offset <<endl);
     }
     
     bool isMember(int ref)
