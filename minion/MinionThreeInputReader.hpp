@@ -434,22 +434,6 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
   }
   ConstraintDef* constraint = constraint_list + constraint_num;
 
-  if( constraint->trig_type == DYNAMIC_CT )
-  {
-#ifndef WATCHEDLITERALS
-    cerr << "This version of Minion was not complied with -WATCHEDLITERALS" << endl;
-    cerr << "So there is not support for the " << constraint.name << "." << endl;
-    exit(1);
-#else
-#ifdef CT_REIFY_ABC
-    if(reified && constraint->type == CT_REIFY)
-    {
-      FAIL_EXIT("Cannot reify a watched constraint!");
-    }
-#endif
-#endif
-  }
-
   switch(constraint->type)
   {
 #ifdef CT_WATCHED_OR_ABC

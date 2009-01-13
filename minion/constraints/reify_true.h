@@ -247,23 +247,19 @@ truereifyQuickCon(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
 
 template<typename VarArray>
 inline AbstractConstraint*
-BuildCT_REIFYIMPLY(StateObj* stateObj, const VarArray& vars, BOOL reify, 
-                       const BoolVarRef& reifyVar, ConstraintBlob& bl)
+BuildCT_REIFYIMPLY(StateObj* stateObj, const VarArray& vars, ConstraintBlob& bl)
 {
   D_ASSERT(bl.internal_constraints.size() == 1);
   D_ASSERT(vars.size() == 1);
-  D_ASSERT(reify == false);
   return truereifyCon(stateObj, build_constraint(stateObj, bl.internal_constraints[0]), vars[0]);
 }
 
 template<typename VarArray>
 inline AbstractConstraint*
-BuildCT_REIFYIMPLY_QUICK(StateObj* stateObj, const VarArray& vars, BOOL reify, 
-                          const BoolVarRef& reifyVar, ConstraintBlob& bl)
+BuildCT_REIFYIMPLY_QUICK(StateObj* stateObj, const VarArray& vars, ConstraintBlob& bl)
 {
   D_ASSERT(bl.internal_constraints.size() == 1);
   D_ASSERT(vars.size() == 1);
-  D_ASSERT(reify == false);
   return truereifyQuickCon(stateObj, build_constraint(stateObj, bl.internal_constraints[0]), vars[0]);
 }
 

@@ -47,26 +47,12 @@
 
 template <typename T>
 AbstractConstraint*
-BuildCT_WATCHED_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
-{ 
-  if(reify) 
-  { 
-    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry."); 
-  } 
-  else 
-  { return GACTableCon(stateObj, t1, b.tuples); } 
-}
+BuildCT_WATCHED_TABLE(StateObj* stateObj,const T& t1, ConstraintBlob& b)
+{ return GACTableCon(stateObj, t1, b.tuples); }
 
 template <typename T>
 AbstractConstraint*
-BuildCT_WATCHED_NEGATIVE_TABLE(StateObj* stateObj,const T& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
-{ 
-  if(reify) 
-  { 
-    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry.");
-  } 
-  else 
-  { return GACNegativeTableCon(stateObj, t1, b.tuples); } 
-}
+BuildCT_WATCHED_NEGATIVE_TABLE(StateObj* stateObj,const T& t1, ConstraintBlob& b)
+{ return GACNegativeTableCon(stateObj, t1, b.tuples); }
 
 #endif

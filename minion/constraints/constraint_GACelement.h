@@ -275,7 +275,7 @@ struct GACElementConstraint : public AbstractConstraint
 
 template<typename Var1, typename Var2>
 AbstractConstraint*
-GACElementCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var1& v2)
+BuildCT_GACELEMENT(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var1& v2, ConstraintBlob&)
 { 
   return new GACElementConstraint<Var1, typename Var2::value_type, typename Var1::value_type>
               (stateObj, vararray, v1[0], v2[0]);  
@@ -284,12 +284,10 @@ GACElementCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Va
 
 template<typename Var1, typename Var2, typename Var3>
 AbstractConstraint*
-GACElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3& v2)
+BuildCT_GACELEMENT(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var3& v2, ConstraintBlob&)
 { 
   return new GACElementConstraint<Var1, typename Var2::value_type, AnyVarRef>
               (stateObj, vararray, v1[0], AnyVarRef(v2[0]));  
 }
-
-BUILD_CONSTRAINT3(CT_GACELEMENT, GACElementCon);
 
 #endif

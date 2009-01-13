@@ -148,8 +148,7 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
 
 template<typename T>
 inline AbstractConstraint*
-BuildCT_WATCHED_OR(StateObj* stateObj, const light_vector<T>& vs, BOOL reify,
-		   const BoolVarRef& reifyVar, ConstraintBlob& bl)
+BuildCT_WATCHED_OR(StateObj* stateObj, const light_vector<T>& vs, ConstraintBlob& bl)
 {
   size_t vs_s = vs.size();
   for(int i = 0; i < vs_s; i++)
@@ -158,11 +157,7 @@ BuildCT_WATCHED_OR(StateObj* stateObj, const light_vector<T>& vs, BOOL reify,
       FAIL_EXIT("watched or only works on Boolean variables!");
     }
     
-  if(reify) {
-    FAIL_EXIT("Cannot reify 'watched or' constraint.");
-  } else {
-      return new BoolOrConstraintDynamic<light_vector<T> >(stateObj, vs, bl.negs);
-  }
+  return new BoolOrConstraintDynamic<light_vector<T> >(stateObj, vs, bl.negs);
 }
 
 #endif

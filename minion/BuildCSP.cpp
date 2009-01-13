@@ -57,17 +57,7 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
   for(list<ConstraintBlob>::iterator it = instance.constraints.begin();
       it != instance.constraints.end(); ++it)
   {
-    if(it->is_dynamic())
-    {
-#ifdef DYNAMICTRIGGERS
-      getState(stateObj).addConstraint(build_constraint(stateObj, *it));
-      getState(stateObj).setDynamicTriggersUsed(true);
-#else
-      FAIL_EXIT("Sorry, cannot process this constraint as it needs dynamic triggers or watched literals.");
-#endif
-    }
-    else
-      getState(stateObj).addConstraint(build_constraint(stateObj, *it));
+     getState(stateObj).addConstraint(build_constraint(stateObj, *it));
   }
   
   // Solve!

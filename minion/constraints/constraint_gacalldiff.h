@@ -54,9 +54,7 @@ This constraint enforces generalized arc consistency.
 
 template<typename VarArray>
 AbstractConstraint*
-GacAlldiffCon(StateObj* stateObj, const VarArray& var_array)
+BuildCT_GACALLDIFF(StateObj* stateObj, const VarArray& var_array, ConstraintBlob&)
 { return new GacAlldiff<VarArray>(stateObj, var_array); }
-
-BUILD_CONSTRAINT1(CT_GACALLDIFF, GacAlldiffCon)
 
 #endif

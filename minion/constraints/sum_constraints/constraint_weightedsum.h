@@ -69,7 +69,7 @@ help constraints sumgeq
  
 template<typename T1, typename T2>
 AbstractConstraint*
-LeqWeightedSum(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>& t2, const ConstraintBlob& b)
+BuildCT_WEIGHTLEQSUM(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>& t2, ConstraintBlob& b)
 {
   vector<int> scale = b.constants[0];
   // Preprocess to remove any multiplications by 0, both for efficency
@@ -103,21 +103,21 @@ LeqWeightedSum(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>&
     light_vector<SwitchNeg<T1> > mult_vars(vec.size());
     for(unsigned int i = 0; i < vec.size(); ++i)
       mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
-    return LessEqualSumCon(stateObj, mult_vars, t2);
+    return BuildCT_LEQSUM(stateObj, mult_vars, t2, b);
   }
   else
   {
     light_vector<MultiplyVar<T1> > mult_vars(vec.size());
     for(unsigned int i = 0; i < vec.size(); ++i)
       mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
-    return LessEqualSumCon(stateObj, mult_vars, t2);
+    return BuildCT_LEQSUM(stateObj, mult_vars, t2, b);
   }
 }
 
 // Don't pass in the vectors by reference, as we might need to copy them.
 template<typename T1, typename T2>
 AbstractConstraint*
-  GeqWeightedSum(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>& t2, const ConstraintBlob& b)
+BuildCT_WEIGHTGEQSUM(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>& t2, ConstraintBlob& b)
 {
   vector<int> scale = b.constants[0];
   // Preprocess to remove any multiplications by 0, both for efficency
@@ -151,18 +151,15 @@ AbstractConstraint*
     light_vector<SwitchNeg<T1> > mult_vars(vec.size());
     for(unsigned int i = 0; i < vec.size(); ++i)
       mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
-    return GreaterEqualSumCon(stateObj, mult_vars, t2);
+    return BuildCT_GEQSUM(stateObj, mult_vars, t2, b);
   }
   else
   {
     light_vector<MultiplyVar<T1> > mult_vars(vec.size());
     for(unsigned int i = 0; i < vec.size(); ++i)
       mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
-    return GreaterEqualSumCon(stateObj, mult_vars, t2);
+    return BuildCT_GEQSUM(stateObj, mult_vars, t2, b);
   }
 }
-
-BUILD_CONSTRAINT2_WITH_BLOB(CT_WEIGHTLEQSUM, LeqWeightedSum)
-BUILD_CONSTRAINT2_WITH_BLOB(CT_WEIGHTGEQSUM, GeqWeightedSum)
 
 #endif

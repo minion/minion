@@ -197,13 +197,11 @@ struct DifferenceConstraint : public AbstractConstraint
 
 template<typename VarRef1, typename VarRef2>
 AbstractConstraint*
-DifferenceCon(StateObj* stateObj,const light_vector<VarRef1>& vars, const light_vector<VarRef2>& var2)
+BuildCT_DIFFERENCE(StateObj* stateObj,const light_vector<VarRef1>& vars, const light_vector<VarRef2>& var2, ConstraintBlob&)
 { 
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   return new DifferenceConstraint<VarRef1,VarRef1,VarRef2>(stateObj, vars[0], vars[1], var2[0]); 
 }
-
-BUILD_CONSTRAINT2(CT_DIFFERENCE, DifferenceCon);
 
 #endif

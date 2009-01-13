@@ -177,19 +177,14 @@ gadgetCon(StateObj* stateObj, const VarArray& vars, ConstraintBlob& blob)
 
 template<typename Vars>
 AbstractConstraint*
-BuildCT_GADGET(StateObj* stateObj, const Vars& vars, BOOL reify, const BoolVarRef& reifyvar, ConstraintBlob& blob)
-{
-  if(reify)
-  {  INPUT_ERROR("Can't reify gadget constraints. Sorry."); }
-  else
-    return gadgetCon(stateObj, vars, blob);
-}
+BuildCT_GADGET(StateObj* stateObj, const Vars& vars, ConstraintBlob& blob)
+{ return gadgetCon(stateObj, vars, blob); }
 
 #else
 
 template<typename Vars>
 AbstractConstraint*
-BuildCT_GADGET(StateObj* stateObj, const Vars& vars, BOOL reify, const BoolVarRef& reifyvar, ConstraintBlob& blob)
+BuildCT_GADGET(StateObj* stateObj, const Vars& vars, ConstraintBlob& blob)
 { INPUT_ERROR("This constraint requires REENTER support."); }
 #endif
 

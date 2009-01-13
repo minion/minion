@@ -293,17 +293,10 @@ AbstractConstraint*
   VecOrCountConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, int i)
   { return new VecCountDynamic<VarArray1,VarArray2>(stateObj, varray1, varray2, i); }
 
-//BUILD_DYNAMIC_CONSTRAINT2(CT_WATCHED_HAMMING, VecOrCountConDynamic)
-
 template<typename T1, typename T2>
 AbstractConstraint*
-BuildCT_WATCHED_HAMMING(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
-{
-  if(reify)
-    { INPUT_ERROR("Can't reify a hamming constraint."); }
-  else
-  { return VecOrCountConDynamic(stateObj, t1, t2, b.constants[0][0]); }
-}
+BuildCT_WATCHED_HAMMING(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob& b) 
+{ return VecOrCountConDynamic(stateObj, t1, t2, b.constants[0][0]); }
 
 
 #endif

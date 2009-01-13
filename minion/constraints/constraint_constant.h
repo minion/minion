@@ -69,14 +69,11 @@ struct ConstantConstraint : public AbstractConstraint
 };
 
 inline AbstractConstraint*
-TrueCon(StateObj* stateObj)
+BuildCT_TRUE(StateObj* stateObj, ConstraintBlob&)
 { return (new ConstantConstraint<true>(stateObj)); }
 
 inline AbstractConstraint*
-FalseCon(StateObj* stateObj)
+BuildCT_FALSE(StateObj* stateObj, ConstraintBlob&)
 { return (new ConstantConstraint<false>(stateObj)); }
-
-BUILD_CONSTRAINT0(CT_TRUE, TrueCon);
-BUILD_CONSTRAINT0(CT_FALSE, FalseCon);
 
 #endif

@@ -632,8 +632,7 @@ reifyCon(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
 
 template<typename VarArray>
 inline AbstractConstraint*
-BuildCT_REIFY(StateObj* stateObj, const VarArray& vars, BOOL reify, 
-                          const BoolVarRef& reifyVar, ConstraintBlob& bl)
+BuildCT_REIFY(StateObj* stateObj, const VarArray& vars, ConstraintBlob& bl)
 { 
   switch(bl.internal_constraints[0].constraint->type)
   {

@@ -228,9 +228,7 @@ struct NeqConstraint : public AbstractConstraint
 
 template<typename VarArray>
 AbstractConstraint*
-NeqCon(StateObj* stateObj, const VarArray& var_array)
+BuildCT_ALLDIFF(StateObj* stateObj, const VarArray& var_array, ConstraintBlob&)
 { return new NeqConstraint<VarArray>(stateObj, var_array); }
-
-BUILD_CONSTRAINT1(CT_ALLDIFF, NeqCon)
 
 #endif

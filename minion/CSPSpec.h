@@ -80,19 +80,12 @@ enum VarOrderEnum
   ORDER_CONFLICT
 };
 
-enum ConstraintTriggerType
-{
-  DYNAMIC_CT,
-  STATIC_CT
-};
-
 struct ConstraintDef
 {
   std::string name;
   ConstraintType type;
   int number_of_params;
   array<ReadTypes,4> read_types;
-  ConstraintTriggerType trig_type;
 };
 
 extern ConstraintDef constraint_list[];
@@ -184,9 +177,6 @@ struct ConstraintBlob
   ConstraintBlob(ConstraintDef* _con, vector<Var>& _var) : constraint(_con)
   { vars.push_back(_var); }
 
-  bool is_dynamic()
-  { return constraint->trig_type == DYNAMIC_CT; }
-  
   set<Var> get_all_vars() const
   {
     set<Var> return_vars;

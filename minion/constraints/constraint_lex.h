@@ -391,16 +391,12 @@ struct LexLeqConstraint : public AbstractConstraint
 
 template<typename VarArray1, typename VarArray2>
 AbstractConstraint*
-LexLeqCon(StateObj* stateObj, const VarArray1& x, const VarArray2& y)
+BuildCT_LEXLEQ(StateObj* stateObj, const VarArray1& x, const VarArray2& y, ConstraintBlob&)
 { return new LexLeqConstraint<VarArray1, VarArray2>(stateObj,x,y); }
 
 template<typename VarArray1, typename VarArray2>
 AbstractConstraint*
-LexLessCon(StateObj* stateObj,const VarArray1& x, const VarArray2& y)
+BuildCT_LEXLESS(StateObj* stateObj,const VarArray1& x, const VarArray2& y, ConstraintBlob&)
 { return new LexLeqConstraint<VarArray1, VarArray2,true>(stateObj, x,y); }
-
-BUILD_CONSTRAINT2(CT_LEXLEQ, LexLeqCon)
-
-BUILD_CONSTRAINT2(CT_LEXLESS, LexLessCon)
 
 #endif

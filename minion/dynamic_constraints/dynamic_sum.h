@@ -348,7 +348,7 @@ AbstractConstraint*
 
 template<typename T>
 inline AbstractConstraint*
-  BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<T>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+  BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<T>& t1, ConstraintBlob& b)
 { 
   for(int i = 0; i < t1.size(); ++i)
   {
@@ -356,18 +356,12 @@ inline AbstractConstraint*
       FAIL_EXIT("watched leqsum only works on Boolean variables!");
   }
 
-
-  if(reify) 
-  { 
-    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry."); 
-  } 
-  else 
-    { return BoolLessEqualSumConDynamic(stateObj, t1, runtime_val(b.constants[0][0])); }
+  return BoolLessEqualSumConDynamic(stateObj, t1, runtime_val(b.constants[0][0]));
 }
 
 template<typename T>
 inline AbstractConstraint*
-  BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const light_vector<T>& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+  BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const light_vector<T>& t1, ConstraintBlob& b)
 { 
   for(int i = 0; i < t1.size(); ++i)
   {
@@ -375,12 +369,6 @@ inline AbstractConstraint*
       FAIL_EXIT("watched geqsum only works on Boolean variables!");
   }
 
-  if(reify) 
-  { 
-    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry."); 
-  } 
-  else 
-  {
     int sum = b.constants[0][0];
 #ifndef SATSPECIAL1
     if(sum == 1)
@@ -407,7 +395,7 @@ inline AbstractConstraint*
     {
       return BoolGreaterEqualSumConDynamic(stateObj, t1, runtime_val(sum)); 
     }
-  }
+
 }
 
 #endif

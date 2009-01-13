@@ -143,17 +143,15 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
 };
 
 AbstractConstraint*
-WatchNotLiteralConDynamic(StateObj* stateObj, const light_vector<BoolVarRef>& vec, const ConstraintBlob& b)
+BuildCT_WATCHED_NOTLIT(StateObj* stateObj, const light_vector<BoolVarRef>& vec, const ConstraintBlob& b)
 { return new WatchNotLiteralBoolConstraint(stateObj, vec[0], b.constants[0][0]); }
 
 template<typename VarArray1>
 AbstractConstraint*
-WatchNotLiteralConDynamic(StateObj* stateObj, const VarArray1& _var_array_1, const ConstraintBlob& b)
+BuildCT_WATCHED_NOTLIT(StateObj* stateObj, const VarArray1& _var_array_1, const ConstraintBlob& b)
 { 
   return new WatchNotLiteralConstraint<typename VarArray1::value_type>
     (stateObj, _var_array_1[0], b.constants[0][0]); 
 }
-
-BUILD_CONSTRAINT1_WITH_BLOB(CT_WATCHED_NOTLIT, WatchNotLiteralConDynamic)
 
 #endif

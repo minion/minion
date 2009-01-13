@@ -226,15 +226,12 @@ struct PowConstraint : public AbstractConstraint
 
 template<typename V1, typename V2>
 inline AbstractConstraint*
-PowCon(StateObj* stateObj, const V1& vars, const V2& var2)
+BuildCT_POW(StateObj* stateObj, const V1& vars, const V2& var2, ConstraintBlob&)
 {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   return new PowConstraint<typename V1::value_type, typename V1::value_type,
 						   typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
 }
-
-
-BUILD_CONSTRAINT2(CT_POW, PowCon);
 
 #endif

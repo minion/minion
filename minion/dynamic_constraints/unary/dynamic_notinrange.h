@@ -140,12 +140,10 @@ template<typename Var>
 
 template<typename VarArray1>
 AbstractConstraint*
-WatchNotInRangeConDynamic(StateObj* stateObj, const VarArray1& _var_array_1, const ConstraintBlob& b)
+BuildCT_WATCHED_NOT_INRANGE(StateObj* stateObj, const VarArray1& _var_array_1, const ConstraintBlob& b)
 { 
   return new WatchNotInRangeConstraint<typename VarArray1::value_type>
     (stateObj, _var_array_1[0], b.constants[0]); 
 }
-
-BUILD_CONSTRAINT1_WITH_BLOB(CT_WATCHED_NOT_INRANGE, WatchNotInRangeConDynamic)
 
 #endif

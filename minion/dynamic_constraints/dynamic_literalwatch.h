@@ -266,17 +266,10 @@ LiteralSumConDynamic(StateObj* stateObj,const VarArray& _var_array,  const ValAr
 
 template<typename T1>
 AbstractConstraint* 
-BuildCT_WATCHED_LITSUM(StateObj* stateObj,const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b)
+BuildCT_WATCHED_LITSUM(StateObj* stateObj,const T1& t1, ConstraintBlob& b)
 {
-  if(reify)
-  {
-    FAIL_EXIT("Cannot reify 'watched literal' constraints. Sorry."); 
-  }
-  else
-  { 
-    D_ASSERT(b.constants[1].size());
-	  return LiteralSumConDynamic(stateObj, t1, b.constants[0], runtime_val(b.constants[1][0])); 
-  }
+  D_ASSERT(b.constants[1].size());
+  return LiteralSumConDynamic(stateObj, t1, b.constants[0], runtime_val(b.constants[1][0])); 
 }
 
 #endif

@@ -423,7 +423,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
 
 template<typename Var1, typename Var2>
 AbstractConstraint*
-DynamicElementCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var1& v2)
+BuildCT_WATCHED_ELEMENT(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var1& v2, ConstraintBlob&)
 { 
   return new ElementConstraintDynamic<Var1, typename Var2::value_type, typename Var1::value_type>
               (stateObj, vararray, v1[0], v2[0]);  
@@ -431,7 +431,7 @@ DynamicElementCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, cons
 
 template<typename Var1, typename Var2, typename Var3>
 AbstractConstraint*
-DynamicElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3& v2)
+BuildCT_WATCHED_ELEMENT(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3& v2, ConstraintBlob&)
 { 
   return new ElementConstraintDynamic<Var1, typename Var2::value_type, AnyVarRef>
               (stateObj, vararray, v1[0], AnyVarRef(v2[0]));  
@@ -439,17 +439,12 @@ DynamicElementCon(StateObj* stateObj, Var1 vararray, const Var2& v1, const Var3&
 
 template<typename Var1, typename Var2, typename Var3>
 AbstractConstraint*
-DynamicElementOneCon(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var3& v2)
+BuildCT_WATCHED_ELEMENT_ONE(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var3& v2, ConstraintBlob& b)
 { 
   typedef typename ShiftType<typename Var2::value_type, compiletime_val<-1> >::type ShiftVal;
   vector<ShiftVal> replace_v1;
   replace_v1.push_back(ShiftVarRef(v1[0], compiletime_val<-1>()));
-  return DynamicElementCon(stateObj, vararray, replace_v1, v2);
+  return BuildCT_WATCHED_ELEMENT(stateObj, vararray, replace_v1, v2, b);
 }
-
-
-BUILD_DYNAMIC_CONSTRAINT3(CT_WATCHED_ELEMENT, DynamicElementCon);
-
-BUILD_DYNAMIC_CONSTRAINT3(CT_WATCHED_ELEMENT_ONE, DynamicElementOneCon);
 
 #endif

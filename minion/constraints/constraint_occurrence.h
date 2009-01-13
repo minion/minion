@@ -805,37 +805,27 @@ ConstantOccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& 
 
 template<typename T1, typename T3>
 AbstractConstraint*
-BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T3& t3, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T3& t3, ConstraintBlob& b) 
 {
   int val_to_count = b.constants[0][0];
-//  int occs = b.vars[2][0].pos());
-  if(reify) 
-  { return reifyCon(stateObj, OccEqualCon(stateObj, t1, runtime_val(val_to_count), t3[0]), reifyVar); } 
-  else 
-  { return OccEqualCon(stateObj, t1, runtime_val(val_to_count), t3[0]); } 
+  return OccEqualCon(stateObj, t1, runtime_val(val_to_count), t3[0]);
 }
 
 template<typename T1>
 AbstractConstraint*
-BuildCT_LEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+BuildCT_LEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, ConstraintBlob& b) 
 {
   int val_to_count = b.constants[0][0];
-  int occs = b.constants[1][0];
-  if(reify) 
-    { return reifyCon(stateObj, ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), 0, occs), reifyVar); } 
-  else 
-    { return ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), 0, occs); } 
-}
+  int occs = b.constants[1][0]; 
+  return ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), 0, occs); 
+ }
 
 template<typename T1>
 AbstractConstraint*
-BuildCT_GEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob& b) 
+BuildCT_GEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, ConstraintBlob& b) 
 {
   int val_to_count = b.constants[0][0];
   int occs = b.constants[1][0];
-  if(reify) 
-  { return reifyCon(stateObj, ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), occs, t1.size()), reifyVar); } 
-  else 
   { return ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), occs, t1.size()); } 
 }
 

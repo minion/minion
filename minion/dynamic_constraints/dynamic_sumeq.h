@@ -268,7 +268,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 
 template<typename VarArray, typename Var>
 AbstractConstraint*
-SumEqConDynamic(StateObj* stateObj, const light_vector<int>& consts, const VarArray& _var_array, const Var& var)
+BuildCT_GACSUM(StateObj* stateObj, const light_vector<int>& consts, const VarArray& _var_array, const Var& var, ConstraintBlob&)
 {
   typedef typename VarArray::value_type ValT;
   typedef typename Var::value_type VarT;
@@ -279,7 +279,5 @@ SumEqConDynamic(StateObj* stateObj, const light_vector<int>& consts, const VarAr
   return new SumEqConstraintDynamic<ValT,ValT,VarT>(stateObj, 
    consts[0], consts[1], _var_array[0], _var_array[1], var[0]);
 }
-
-BUILD_DYNAMIC_CONSTRAINT3(CT_GACSUM, SumEqConDynamic);
 
 #endif

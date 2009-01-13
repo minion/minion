@@ -193,12 +193,7 @@ AbsCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
 
 template<typename T1, typename T2>
 AbstractConstraint*
-BuildCT_ABS(StateObj* stateObj, const T1& t1, const T2& t2, BOOL reify, const BoolVarRef& reifyVar, ConstraintBlob&) 
-{
-  if(reify)
-    { INPUT_ERROR("Can't reify an 'abs' constraint."); }
-  else
-  { return AbsCon(stateObj, t1[0],t2[0]); }
-}
+BuildCT_ABS(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob&) 
+{ return AbsCon(stateObj, t1[0],t2[0]); }
 
 #endif
