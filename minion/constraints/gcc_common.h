@@ -155,10 +155,17 @@ struct GCC : public AbstractConstraint
     int count_values()
     {
         // called in initializer list.
+        numvars=var_array.size();  // number of target variables in the constraint
         if(var_array.size()>0)
         {
             dom_min=var_array[0].getInitialMin();
             dom_max=var_array[0].getInitialMax();
+        }
+        else
+        {
+            dom_min=0;
+            dom_max=-1;  // avoids running the body of any loops which go from min to max
+            return 0; // numvals
         }
         for(int i=0; i<var_array.size(); ++i)
         {
@@ -167,7 +174,6 @@ struct GCC : public AbstractConstraint
           if(var_array[i].getInitialMax()>dom_max)
               dom_max=var_array[i].getInitialMax();
         }
-        numvars=var_array.size();  // number of target variables in the constraint
         return dom_max-dom_min+1;
     }
     
