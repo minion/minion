@@ -311,7 +311,6 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
   {
     if(var_sum <= 0)
     {
-      assignment.push_back(make_pair(0, var_array[0].getMax()));
       return true;
     }
     
