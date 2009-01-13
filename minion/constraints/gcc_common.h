@@ -16,7 +16,7 @@
 #define SCCCARDS
 #define STRONGCARDS
 
-//Incremental graph -- maintains adjacency lists for values
+//Incremental graph -- maintains adjacency lists for values and vars
 #define INCGRAPH
 
 // Does not trigger itself if this is on, and incgraph is on.
@@ -155,9 +155,11 @@ struct GCC : public AbstractConstraint
     int count_values()
     {
         // called in initializer list.
-        dom_min=var_array[0].getInitialMin();
-        dom_max=var_array[0].getInitialMax();
-        
+        if(var_array.size()>0)
+        {
+            dom_min=var_array[0].getInitialMin();
+            dom_max=var_array[0].getInitialMax();
+        }
         for(int i=0; i<var_array.size(); ++i)
         {
           if(var_array[i].getInitialMin()<dom_min)
@@ -934,9 +936,9 @@ struct GCC : public AbstractConstraint
                         {
                             int vartoqueue=vars_in_scc[vartoqueuescc];
                         #else
-                        for(int vartoqueuei=0; vartoqueuei<adjlistlength[stackval-dom_min+numvars]; vartoqueuei++)
+                        for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
                         {
-                            int vartoqueue=adjlist[stackval-dom_min+numvars][vartoqueuei];
+                            int vartoqueue=adjlist[curnode][vartoqueuei];
                         #endif
                             // For each variable which is matched to stackval, queue it.
                             if(!visited.in(vartoqueue)
@@ -1488,8 +1490,6 @@ struct GCC : public AbstractConstraint
                                         {
                                             var_array[curvar].removeFromDomain(copynode+dom_min-numvars);
                                             #ifdef INCGRAPH
-                                                // swap with the last element and remove
-                                                //adjlist_remove(copynode-numvars, adjlistpos[copynode-numvars][curvar]);
                                                 adjlist_remove(curvar, copynode-numvars+dom_min);
                                             #endif
                                         }
