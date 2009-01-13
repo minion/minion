@@ -334,7 +334,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     DynamicTrigger* dt = dynamic_trigger_start();
-    trigger1index=watch_unassigned_in_vector(-1, 0, dt);
+    trigger1index=watch_unassigned_in_vector(-1, -1, dt);
     if(trigger1index==-1)
     {
         vector_assigned();
