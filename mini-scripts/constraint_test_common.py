@@ -1003,16 +1003,19 @@ class testpow:
                 out.append(l+[l[0]**l[1]])
         return out
     def runtest(self, options=dict()):
-        return runtestgeneral("pow", True, options, [1,1,1], ["posnum","posnum","posnum"], self, False)
+        return runtestgeneral("pow", True, options, [1,1,1], ["nonnegnum","nonnegnum","nonnegnum"], self, False)
     
 class testgcc:
     def printtable(self, domains):
         vals=self.constants
         cross=[]
-        x=domains[:len(domains)/2]
-        cap=domains[len(domains)/2:]
+        if len(self.constants)>0:
+            x=domains[:-len(self.constants)]
+            cap=domains[-len(self.constants):]
+        else:
+            x=domains[:]
+            cap=[]
         crossprod(x, [], cross)
-        # assume same number of x vars and cap vars.
         out=[]
         for line in cross:
             occ=[0 for y in vals]
@@ -1032,7 +1035,7 @@ class testgcc:
         if options['reifyimply'] or options['reify']:
             return runtestgeneral("gcc", False, options, [4,4,4], ["verysmallnum","smallconst_distinct","smallnum"], self, False)
         else:
-            return runtestgeneral("gcc", False, options, [5,5,5], ["smallnum","smallconst_distinct", "num"], self, False)
+            return runtestgeneral("gcc", False, options, [5,4,4], ["smallnum","smallconst_distinct", "num"], self, False)
     
 ################################################################################
 # 
@@ -1345,6 +1348,9 @@ def generatevariables(varblocks, types, boundallowed):
             elif types[i]=="posnum":
                 lb=random.randint(1, 20)
                 ub=random.randint(21, 40)
+            elif types[i]=="smallposnum":
+                lb=1
+                ub=random.randint(2, 15)
             elif types[i]=="nonnegnum":
                 lb=random.randint(0, 20)
                 ub=random.randint(21, 40)
