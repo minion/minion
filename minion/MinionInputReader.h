@@ -83,43 +83,6 @@ struct ConcreteFileReader
 	  if(infile.fail())
       throw parse_exception("Problem parsing number");
 	  return i;
-	
-/*
-	// This function should just be "infile >> i;", however that is parsed differently in windows and linux
-	// So we'll have to do it manually.
-
-	char next_char = get_char();
-	while(isspace(next_char))
-	  next_char = infile.get();
-	
-	bool negative = false;
-	
-	if(next_char == '-')
-	{
-	  negative = true;
-	  next_char = infile.get();
-	}
-	
-	if(!(next_char >= '0' && next_char <= '9') )
-	  throw parse_exception("Problem parsing number");  
-	
-	BigInt num=0;
-	
-	while( (next_char >= '0' && next_char <= '9'))
-	{
-	  num *= 10;
-	  num += (next_char - '0');
-	  if(num > DomainInt_Max)
-		parse_exception("Number out of bounds");
-	  next_char = infile.get();
-	}
-	
-	infile.putback(next_char);
-    if(negative)
-	  num*= -1;
-	
-	return num;
-	*/
   }
   
    char simplepeek_char()
