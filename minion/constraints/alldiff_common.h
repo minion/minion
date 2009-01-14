@@ -68,22 +68,13 @@ using namespace std;
 //#define PLONG
 
 template<typename VarArray>
-#ifndef DYNAMICALLDIFF
-struct GacAlldiff : public AbstractConstraint    // name changed fortrunk.
-#else
-struct DynamicAlldiff : public DynamicConstraint
-#endif
+struct GacAlldiff : public AbstractConstraint
 {
   virtual string constraint_name()
   { 
-  #ifndef DYNAMICALLDIFF
-      return "GacAlldiff"; 
-  #else
-      return "DynamicAlldiff";
-  #endif
+      return "GacAlldiff";
   }
   
-  typedef typename VarArray::value_type VarRef;  // what for?
   DomainInt dom_min, dom_max;
   VarArray var_array;
   
@@ -99,12 +90,7 @@ struct DynamicAlldiff : public DynamicConstraint
   
   vector<int> varToSCCIndex;  // Mirror of the SCCs array.
   
-  #ifndef DYNAMICALLDIFF
   GacAlldiff(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
-  #else
-  DynamicAlldiff(StateObj* _stateObj, const VarArray& _var_array) : DynamicConstraint(_stateObj),
-  #endif
-  
     #ifndef REVERSELIST
     var_array(_var_array), 
     #else
@@ -247,7 +233,8 @@ struct DynamicAlldiff : public DynamicConstraint
   }
   #endif
   
-  #ifndef DYNAMICALLDIFF
+  
+  typedef typename VarArray::value_type VarRef;
   virtual AbstractConstraint* reverse_constraint()
   { // w-or of pairwise equality.
       vector<AbstractConstraint*> con;
@@ -261,10 +248,6 @@ struct DynamicAlldiff : public DynamicConstraint
       }
       return new Dynamic_OR(stateObj, con);
   }
-  
-  /*virtual AbstractConstraint* reverse_constraint()
-  { return new CheckAssignConstraint<VarArray, GacAlldiff>(stateObj, var_array, *this); }*/
-  #endif
   
   smallset to_process;  // set of vars to process.
   
@@ -495,11 +478,7 @@ struct DynamicAlldiff : public DynamicConstraint
   
   void do_prop()
   {
-    #ifndef DYNAMICALLDIFF
     PROP_INFO_ADDONE(AlldiffGacSlow);
-    #else
-    PROP_INFO_ADDONE(WatchedAlldiff);
-    #endif
     
     #ifdef DYNAMICALLDIFF
     bt_triggers_start=dynamic_trigger_start()+numvars;
@@ -766,11 +745,7 @@ struct DynamicAlldiff : public DynamicConstraint
   // visit for the whole set of variables.
   void do_prop_noscc()
   {
-    #ifndef DYNAMICALLDIFF
     PROP_INFO_ADDONE(AlldiffGacSlow);
-    #else
-    PROP_INFO_ADDONE(WatchedAlldiff);
-    #endif
     
     #ifdef DYNAMICALLDIFF
     bt_triggers_start=dynamic_trigger_start()+numvars;

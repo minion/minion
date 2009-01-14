@@ -750,13 +750,13 @@ class testlexless(testlexleq):
 class testmax:
     def printtable(self, domains, ismax=True):
         # assume last var is the max var. 
-        if len(domains)<2: return False
+        if len(domains)<2: return []   #max/min should fail when there is nothing in the vector.
         cross=[]
         crossprod(domains[:-1], [], cross)
         out=[]
         for l in cross:
             if ismax:
-                maxormin=max(l)   #?? what are the semantics of max when there is nothing in the vector????
+                maxormin=max(l)
             else:
                 maxormin=min(l)
             if maxormin in domains[-1]:
