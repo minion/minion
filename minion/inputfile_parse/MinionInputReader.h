@@ -9,9 +9,9 @@
 #ifndef _MINIONINPUTREADER_H
 #define _MINIONINPUTREADER_H
 
-#include "system/system.h"
+#include "../system/system.h"
 
-#include "CSPSpec.h"
+#include "../CSPSpec.h"
 
 
 template<typename StreamType>

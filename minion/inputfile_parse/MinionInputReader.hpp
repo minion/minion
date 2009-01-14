@@ -16,10 +16,6 @@
 /// TODO: We need somewhere better to put these things.
 
 #include <string>
-#include "system/system.h"
-
-//#include "minion.h"
-#include "CSPSpec.h"
 
 #include "MinionInputReader.h"
 

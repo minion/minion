@@ -294,9 +294,6 @@ nothing at all...)
 */
 
 #include <string>
-#include "system/system.h"
-
-#include "CSPSpec.h"
 
 #include "MinionInputReader.h"
 
