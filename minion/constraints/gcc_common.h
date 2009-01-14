@@ -6,6 +6,11 @@
 #include <utility>
 #include "alldiff_gcc_shared.h"
 
+// for NotOccurrenceEqualConstraint, used in reverse_constraint,
+#include "constraint_occurrence.h"
+#include "../dynamic_constraints/dynamic_new_or.h"
+
+
 //#define GCCPRINT(x) cout << x << endl
 #define GCCPRINT(x)
 
@@ -1977,15 +1982,18 @@ struct GCC : public AbstractConstraint
         return usage[startvalindex];
     }
     
-    // Function to make it reifiable in the most minimal way.
+    typedef typename VarArray2::value_type CapVarRef;
     virtual AbstractConstraint* reverse_constraint()
     {
-        vector<AnyVarRef> t;
-        for(int i=0; i<var_array.size(); i++)
-            t.push_back(var_array[i]);
+        // use a watched-or of NotOccurrenceEqualConstraint, i.e. the negation of occurrence
+        vector<AbstractConstraint*> con;
         for(int i=0; i<capacity_array.size(); i++)
-            t.push_back(capacity_array[i]);
-        
-        return new CheckAssignConstraint<vector<AnyVarRef>, GCC>(stateObj, t, *this);
+        {
+            NotOccurrenceEqualConstraint<VarArray1, DomainInt, CapVarRef>*
+                t=new NotOccurrenceEqualConstraint<VarArray1, DomainInt, CapVarRef>(
+                    stateObj, var_array, val_array[i], capacity_array[i]);
+            con.push_back((AbstractConstraint*) t);
+        }
+        return new Dynamic_OR(stateObj, con);
     }
 };
