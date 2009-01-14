@@ -36,15 +36,17 @@ conslist+=["element", "reifyelement", "reifyimplyelement"]
 conslist+=["gacelement-deprecated", "reifygacelement-deprecated", "reifyimplygacelement-deprecated"]
 conslist+=["watchelement", "reifywatchelement", "reifyimplywatchelement"]
 
-#non-reifiable arithmetic constraints
-conslist+=["modulo", "reifyimplymodulo", "pow", "reifyimplypow"]
+# arithmetic constraints
+conslist+=["modulo", "reifymodulo", "reifyimplymodulo"]
+conslist+=["pow", "reifyimplypow"]
+#conslist+=["reifypow"]    # need to implement reverse of pow.
 conslist+=["minuseq", "reifyminuseq", "reifyimplyminuseq"]
-conslist+=["product", "reifyimplyproduct"]
-conslist+=["div", "reifyimplydiv"]
-conslist+=["abs", "reifyimplyabs"]
-
-
+conslist+=["product", "reifyimplyproduct"]   # need to implement "reifyproduct"
+conslist+=["div", "reifyimplydiv"]   # and "reifydiv", 
+conslist+=["abs", "reifyimplyabs"]   # and "reifyabs", 
+  
 conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "watchvecexists_less", "watchvecexists_and", "hamming"]
+#conslist+=["reifywatchsumleq", "reifywatchsumgeq", "reifywatchvecneq", "reifywatchvecexists_less", "reifywatchvecexists_and", "reifyhamming"]
 conslist+=["reifyimplywatchsumleq", "reifyimplywatchsumgeq", "reifyimplywatchvecneq", "reifyimplywatchvecexists_less", "reifyimplywatchvecexists_and", "reifyimplyhamming"]
 
 conslist+=["sumgeq", "reifysumgeq", "reifyimplysumgeq"]
@@ -69,7 +71,9 @@ conslist+=["watchless", "reifyimplywatchless"]
 conslist+=["difference", "reifyimplydifference"]
 
 #todo
-#conslist+=["weightedsumleq"...
+conslist+=["weightedsumleq", "reifyweightedsumleq", "reifyimplyweightedsumleq"]
+conslist+=["weightedsumgeq", "reifyweightedsumgeq", "reifyimplyweightedsumgeq"]
+
 
 numtests=100
 minionbin="bin/minion"
