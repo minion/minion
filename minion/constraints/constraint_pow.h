@@ -64,7 +64,7 @@ struct PowConstraint : public AbstractConstraint
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;
-
+  
   PowConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
 	AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
@@ -74,6 +74,10 @@ struct PowConstraint : public AbstractConstraint
 	  { 
 		  FAIL_EXIT("The 'pow' constraint only supports non-negative numbers at present.");
 	  }
+      if(var2.getInitialMin()==0)
+      {
+          FAIL_EXIT("The 'pow' constraint (x^y = z) does not allow y to contain 0, to avoid the case 0^0.");
+      }
   }
   
   virtual triggerCollection setup_internal()
@@ -90,7 +94,7 @@ struct PowConstraint : public AbstractConstraint
   
   inline DomainInt roundup(double x)
   {
-    // remember no numbers are non-negative in here, so
+    // remember all numbers are non-negative in here, so
     // how are we going to hit the lower limit for ints?
     if(x<std::numeric_limits<DomainInt>::min())
     {

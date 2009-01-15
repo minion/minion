@@ -995,6 +995,8 @@ class testwatchvecexists_and:
                         
 class testpow:
     def printtable(self, domains):
+        if 0 in domains[1]:
+            return False
         cross=[]
         crossprod(domains[:-1], [], cross)
         out=[]
@@ -1003,7 +1005,7 @@ class testpow:
                 out.append(l+[l[0]**l[1]])
         return out
     def runtest(self, options=dict()):
-        return runtestgeneral("pow", True, options, [1,1,1], ["nonnegnum","nonnegnum","nonnegnum"], self, False)
+        return runtestgeneral("pow", True, options, [1,1,1], ["nonnegnum","posnum","nonnegnum"], self, False)
     
 class testgcc:
     def printtable(self, domains):
@@ -1195,8 +1197,8 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         tuplelist=tablegen.printtable(domlists)
     
     if tuplelist is False:
-        # For some reason the printtable function rejected the domlists  
-        # at the moment this is because of an empty vector.
+        # For some reason the printtable function rejected the domlists
+        # as being a case that the constraint is not specified to work on.
         return True
     
     if reify:
