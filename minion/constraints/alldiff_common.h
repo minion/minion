@@ -91,11 +91,13 @@ struct GacAlldiff : public AbstractConstraint
   vector<int> varToSCCIndex;  // Mirror of the SCCs array.
   
   GacAlldiff(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
+    dom_min(0), dom_max(0),
     #ifndef REVERSELIST
     var_array(_var_array), 
     #else
     var_array(_var_array.rbegin(), _var_array.rend()),
     #endif
+    numvars(0), numvals(0),
     SCCSplit(_stateObj, _var_array.size()), 
     sparevaluespresent(_stateObj, _var_array.size()), constraint_locked(false)
   {
