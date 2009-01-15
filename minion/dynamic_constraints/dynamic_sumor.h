@@ -66,7 +66,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   int index_to_not_propagate; 
 
   VecCountDynamic(StateObj* _stateObj, const VarArray1& _array1, const VarArray2& _array2, int _num_of_vals) :
-  AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_num_of_vals + 1), 
+  AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_num_of_vals + 1),
     propagate_mode(_stateObj, false)
     {
        if(num_to_watch <= 1)
@@ -260,11 +260,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(num_to_watch <= 1)
-    {
-      // This constraint is always true. But we can't return an empty allowed assignment unfortunatly.
-      assignment.push_back(make_pair(0, var_array1[0].getMin()));
       return true;
-    }
     
     pair<int, int> assign;
     int found_satisfying = 0;
