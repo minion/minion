@@ -28,7 +28,7 @@ For Licence Information see file LICENSE.txt
 #define REIFY_TRUE_H
 
 #include "constraint_abstract.h"
-#include "../reversible_vals.h"
+#include "../memory_management/reversible_vals.h"
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 

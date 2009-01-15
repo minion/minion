@@ -73,7 +73,7 @@ typedef MoveablePointer MemOffset;
 #include "memory_management/nonbacktrack_memory.h"
 #include "memory_management/trailed_monotonic_set.hpp"
 #include "memory_management/monotonic_set_wrapper.h"
-#include "reversible_vals.h"
+#include "memory_management/reversible_vals.h"
 
 typedef TrailedMonotonicSet MonotonicSet;
 

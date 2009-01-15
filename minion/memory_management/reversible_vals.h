@@ -27,10 +27,10 @@
 #ifndef REVERSIBLE_VALS_H
 #define REVERSIBLE_VALS_H
 
-#include "memory_management/backtrackable_memory.h"
-#include "memory_management/nonbacktrack_memory.h"
+#include "backtrackable_memory.h"
+#include "nonbacktrack_memory.h"
 
-#include "solver.h"
+#include "../solver.h"
 
 // \addtogroup Memory
 // @{
