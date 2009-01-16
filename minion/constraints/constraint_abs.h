@@ -69,10 +69,8 @@ struct AbsConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     var1.setMin(0);
-    propagate(1,0);
-    propagate(2,0);
-    propagate(3,0);
-    propagate(4,0);
+    for(int i = 0; i < 4 && !getState(stateObj).isFailed(); ++i)
+      propagate(i, 0);
   }
   
   // Assume values passed in in order.
