@@ -29,6 +29,8 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
 	{ getOptions(stateObj).print_solution = true; }
 	else if(command == string("-noprintsols"))
 	{ getOptions(stateObj).print_solution = false; }
+	else if(command == string("-notimers"))
+  { getOptions(stateObj).noTimers = true; }
 	else if(command == string("-printsolsonly"))
 	{ getOptions(stateObj).silent = true; }
 	else if(command == string("-cspcomp"))

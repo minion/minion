@@ -241,8 +241,12 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
   {
 	getState(stateObj).setSolutionCount(0);  
 	getState(stateObj).setNodeCount(0);
-  getState(stateObj).setupAlarm();
-  install_ctrlc_trigger(stateObj);
+	
+	if(!getOptions(stateObj).noTimers)
+	{
+    getState(stateObj).setupAlarm();
+    install_ctrlc_trigger(stateObj);
+	}
 	lock(stateObj);
 	if (!getOptions(stateObj).silent) 
 	  getState(stateObj).getOldTimer().printTimestepWithoutReset(Output_1, "First Node Time: ");

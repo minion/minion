@@ -242,6 +242,9 @@ public:
   // The format of output used (-1 for default)
   int outputType;
   
+  /// Disable the use of linux timers
+  bool noTimers;
+  
   SearchOptions() : 
     wdeg_on(false), find_generators(false), 
     cspcomp(false), silent(false), dumptree(false), sollimit(1), fullpropagate(false), 
@@ -252,7 +255,7 @@ public:
 #endif
     nodelimit(0), tableout(false), solsoutWrite(false), 
     print_solution(true), time_limit(0), randomise_valvarorder(false), parser_verbose(false), 
-    redump(false), graph(false), outputType(-1)
+    redump(false), graph(false), outputType(-1), noTimers(false)
   {}
   
   /// Denotes all solutions should be found, by setting sollimit to -1.
