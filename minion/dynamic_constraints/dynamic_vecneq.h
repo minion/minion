@@ -24,6 +24,12 @@ For Licence Information see file LICENSE.txt
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "dynamic_new_and.h"
+#include "unary/dynamic_literal.h"
+#include "../constraints/constraint_less.h"
+#include "../constraints/constraint_equal.h"
+#include "../constraints/constraint_product.h"
+
 /** @help constraints;watchvecneq Description
 The constraint
 
@@ -146,6 +152,13 @@ struct NeqIterated
     }
     return true;
   }
+  
+  template<typename Var1, typename Var2>
+  static AbstractConstraint* reverse_constraint(StateObj* stateObj, const Var1& var1, const Var2& var2)
+  {
+      EqualConstraint<Var1, Var2>* t=new EqualConstraint<Var1, Var2>(stateObj, var1, var2);
+      return (AbstractConstraint*) t;
+  }
 };
 
 struct LessIterated
@@ -192,6 +205,13 @@ struct LessIterated
     else
       return false;
   }
+  
+  template<typename Var1, typename Var2>
+  static AbstractConstraint* reverse_constraint(StateObj* stateObj, const Var1& var1, const Var2& var2)
+  {
+      LeqConstraint<Var2, Var1, compiletime_val<0> >* t=new LeqConstraint<Var2, Var1, compiletime_val<0> >(stateObj, var2, var1, compiletime_val<0>());
+      return (AbstractConstraint*) t;
+  }
 };
 
 struct BothNonZeroIterated
@@ -237,6 +257,25 @@ struct BothNonZeroIterated
     }
     else
       return false;
+  }
+  
+  template<typename Var1, typename Var2>
+  static AbstractConstraint* reverse_constraint(StateObj* stateObj, const Var1& var1, const Var2& var2)
+  {
+      ProductConstraint<Var1, Var2, ConstantVar>* t=new ProductConstraint<Var1, Var2, ConstantVar>(stateObj, var1, var2, ConstantVar(stateObj, 0));
+      return (AbstractConstraint*) t;
+      
+      // var1=0 or var2=0
+      //vector<AbstractConstraint*> con;
+      //WatchLiteralConstraint<Var1>* t1= new WatchLiteralConstraint<Var1>(stateObj, var1, 0); // doesn't work with bounds variables
+      //WatchLiteralConstraint<Var2>* t2= new WatchLiteralConstraint<Var2>(stateObj, var2, 0);
+      //EqualConstraint<Var1, ConstantVar>* t1= new EqualConstraint<Var1, ConstantVar>(stateObj, var1, ConstantVar(stateObj, 0));
+      
+      //EqualConstraint<Var2, ConstantVar>* t2= new EqualConstraint<Var2, ConstantVar>(stateObj, var2, ConstantVar(stateObj, 0));
+      
+      //con.push_back((AbstractConstraint*) t1);
+      //con.push_back((AbstractConstraint*) t2);
+      //return new Dynamic_OR(stateObj, con);
   }
 };
 
@@ -485,6 +524,19 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     return false;
   }
   
+  virtual AbstractConstraint* reverse_constraint()
+  {
+      vector<AbstractConstraint*> con;
+      for(int i=0; i<var_array1.size(); i++)
+      {
+          con.push_back(Operator::reverse_constraint(stateObj, var_array1[i], var_array2[i]));
+      }
+      return new Dynamic_AND(stateObj, con);
+      /*vector<AnyVarRef> t;
+      for(int i=0; i<var_array1.size(); i++) t.push_back(var_array1[i]);
+      for(int i=0; i<var_array2.size(); i++) t.push_back(var_array2[i]);
+      return new CheckAssignConstraint<vector<AnyVarRef>, VecNeqDynamic>(stateObj, t, *this);*/
+  }
 };
 
 template<typename VarArray1,  typename VarArray2>

@@ -38,15 +38,16 @@ conslist+=["watchelement", "reifywatchelement", "reifyimplywatchelement"]
 
 # arithmetic constraints
 conslist+=["modulo", "reifymodulo", "reifyimplymodulo"]
-conslist+=["pow", "reifyimplypow"]
-#conslist+=["reifypow"]    # need to implement reverse of pow.
+conslist+=["pow", "reifypow", "reifyimplypow"]
 conslist+=["minuseq", "reifyminuseq", "reifyimplyminuseq"]
-conslist+=["product", "reifyimplyproduct"]   # need to implement "reifyproduct"
-conslist+=["div", "reifyimplydiv"]   # and "reifydiv", 
-conslist+=["abs", "reifyimplyabs"]   # and "reifyabs", 
+conslist+=["product", "reifyproduct", "reifyimplyproduct"]
+conslist+=["div", "reifydiv", "reifyimplydiv"]
+conslist+=["abs", "reifyabs", "reifyimplyabs"]
   
 conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "watchvecexists_less", "watchvecexists_and", "hamming"]
-#conslist+=["reifywatchsumleq", "reifywatchsumgeq", "reifywatchvecneq", "reifywatchvecexists_less", "reifywatchvecexists_and", "reifyhamming"]
+#conslist+=["reifywatchsumleq", "reifywatchsumgeq", 
+
+conslist+=["reifywatchvecneq", "reifywatchvecexists_less", "reifywatchvecexists_and"] # and case crashes.      #, "reifyhamming"]
 conslist+=["reifyimplywatchsumleq", "reifyimplywatchsumgeq", "reifyimplywatchvecneq", "reifyimplywatchvecexists_less", "reifyimplywatchvecexists_and", "reifyimplyhamming"]
 
 conslist+=["sumgeq", "reifysumgeq", "reifyimplysumgeq"]

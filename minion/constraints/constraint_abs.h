@@ -182,6 +182,15 @@ struct AbsConstraint : public AbstractConstraint
     return vars;
   }
   
+  
+     // Function to make it reifiable in the lousiest way.
+  virtual AbstractConstraint* reverse_constraint()
+  {
+      vector<AnyVarRef> t;
+      t.push_back(var1);
+      t.push_back(var2);
+      return new CheckAssignConstraint<vector<AnyVarRef>, AbsConstraint>(stateObj, t, *this);
+  }
 };
 
 template<typename EqualVarRef1, typename EqualVarRef2>
