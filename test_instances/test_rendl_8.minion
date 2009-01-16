@@ -1,7 +1,6 @@
 MINION 1
 #TEST SOLCOUNT 125
-#BUG
-# This test fails due to unimplemented reification.
+# This test once failed due to unimplemented reification.
 # Minion Constraint Solver Input
 #    http://sourceforge.net/projects/minion
 1
