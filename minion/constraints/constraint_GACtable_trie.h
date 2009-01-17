@@ -57,18 +57,25 @@ struct GACTableConstraint : public AbstractConstraint
 	AbstractConstraint(_stateObj), vars(_vars), tuples(_tuples)
   { 
     tupleTrieArrayptr = tuples->getTries();
-	int arity = tuples->tuple_size();	  
-	D_ASSERT(_vars.size() == arity);
-	  
-	trie_current_support.resize(tuples->literal_num); 
-	for(int i = 0; i < tuples->literal_num; ++i)
-	{
-	  trie_current_support[i] = new TrieObj*[arity];
-	  for(int j = 0; j < arity; j++)
-		trie_current_support[i][j] = NULL;
-	}
-	// initialise supportting tuple for recycle
-	recyclableTuple = new DomainInt[arity] ;
+    int arity = tuples->tuple_size();	  
+    D_ASSERT(_vars.size() == arity);
+
+    trie_current_support.resize(tuples->literal_num); 
+    for(int i = 0; i < tuples->literal_num; ++i)
+    {
+      trie_current_support[i] = new TrieObj*[arity];
+      for(int j = 0; j < arity; j++)
+        trie_current_support[i][j] = NULL;
+    }
+    // initialise supportting tuple for recycle
+    recyclableTuple = new DomainInt[arity] ;
+  }
+  
+  ~GACTableConstraint()
+  {
+    delete[] recyclableTuple;
+    for(int i = 0; i < trie_current_support.size(); ++i)
+      delete[] trie_current_support[i];
   }
   
   int dynamic_trigger_count()
