@@ -39,7 +39,8 @@ struct GACElementConstraint : public AbstractConstraint
   DomainInt var_array_min_val;
   DomainInt var_array_max_val;
   GACElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexRef& _indexvar, const VarRef& _resultvar) :
-    AbstractConstraint(_stateObj), var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar)
+    AbstractConstraint(_stateObj), var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar),
+    var_array_min_val(0), var_array_max_val(0)
   { }
   
   virtual triggerCollection setup_internal()
