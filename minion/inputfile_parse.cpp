@@ -113,10 +113,14 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
       
     }
     
-    ifstream* file;
+    // We need to use a pointer here, as we want to declare the object inside a for loop,
+    // and we need it to live until after we've finished parsing.
+    // We use an auto_ptr because it will auto-delete on exit.
+    auto_ptr<ifstream> file;
+    
     if(fname != "--")
     {
-      file = new ifstream(filename, ios_base::in | ios_base::binary);
+      file = auto_ptr<ifstream>(new ifstream(filename, ios_base::in | ios_base::binary));
       if (!(*file)) {
         INPUT_ERROR("Can't open given input file '" + fname + "'.");
       }
