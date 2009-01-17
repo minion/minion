@@ -137,46 +137,54 @@ class TupleList
   void finalise_tuples()
   {
     if(tuples_locked)
-	  return;
-	tuples_locked = true;
-	
+      return;
+    tuples_locked = true;
+
     int arity = tuple_size();	
-    
-   	  // Set up the table of tuples.
-	  for(int i = 0; i < arity; ++i)
-	  {
-		int min_val = get_tupleptr(0)[i];
-		int max_val = get_tupleptr(0)[i];
-		for(int j = 1; j < size(); ++j)
-		{
-		  min_val = mymin(min_val, get_tupleptr(j)[i]);
-		  max_val = mymax(max_val, get_tupleptr(j)[i]);
-		}
-		dom_smallest.push_back(min_val);
-		dom_size.push_back(max_val - min_val + 1);
-	  }
-	  
-	int dom_size_size = dom_size.size();
-	_map_vars_to_literal.resize(dom_size_size);
-	// For each variable / value pair, get a literal
-	int literal_count = 0;
-	
-	for(int i = 0; i < dom_size_size; ++i)
-	{
-	  _map_vars_to_literal[i].resize(dom_size[i] + 1);
-	  for(int j = 0; j <= dom_size[i]; ++j)
-	  {
-		_map_vars_to_literal[i][j] = literal_count;
-		_map_literal_to_vars.push_back(make_pair(i, j + dom_smallest[i]));
-		D_ASSERT(get_literal(i, j + dom_smallest[i]) == literal_count);
-		D_ASSERT(get_varval_from_literal(literal_count).first == i);
-		D_ASSERT(get_varval_from_literal(literal_count).second == j + dom_smallest[i]); 
-		++literal_count;
-	  }
-	}
-	 literal_num = literal_count;
+
+    // Set up the table of tuples.
+    for(int i = 0; i < arity; ++i)
+    {
+      if(size() == 0)
+      {
+        dom_smallest.push_back(0);
+        dom_size.push_back(0);
+      }
+      else
+      {
+        int min_val = get_tupleptr(0)[i];
+        int max_val = get_tupleptr(0)[i];
+        for(int j = 1; j < size(); ++j)
+        {
+          min_val = mymin(min_val, get_tupleptr(j)[i]);
+          max_val = mymax(max_val, get_tupleptr(j)[i]);
+        }
+        dom_smallest.push_back(min_val);
+        dom_size.push_back(max_val - min_val + 1);
+      }
+    }
+
+    int dom_size_size = dom_size.size();
+    _map_vars_to_literal.resize(dom_size_size);
+    // For each variable / value pair, get a literal
+    int literal_count = 0;
+
+    for(int i = 0; i < dom_size_size; ++i)
+    {
+      _map_vars_to_literal[i].resize(dom_size[i] + 1);
+      for(int j = 0; j <= dom_size[i]; ++j)
+      {
+        _map_vars_to_literal[i][j] = literal_count;
+        _map_literal_to_vars.push_back(make_pair(i, j + dom_smallest[i]));
+        D_ASSERT(get_literal(i, j + dom_smallest[i]) == literal_count);
+        D_ASSERT(get_varval_from_literal(literal_count).first == i);
+        D_ASSERT(get_varval_from_literal(literal_count).second == j + dom_smallest[i]); 
+        ++literal_count;
+      }
+    }
+    literal_num = literal_count;
   }
-  
+
 };
 
 class TupleListContainer
