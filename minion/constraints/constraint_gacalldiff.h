@@ -1,13 +1,6 @@
-/* Minion Constraint Solver
-   http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
-
-   $Id: constraint_gacalldiff.h 668 2007-09-26 15:14:50Z pete_n $
-*/
-
-/* Minion
-* Copyright (C) 2006
+/*
+* Minion http://minion.sourceforge.net
+* Copyright (C) 2006-09
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License

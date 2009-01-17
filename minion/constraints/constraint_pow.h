@@ -1,13 +1,6 @@
-/* Minion Constraint Solver
-   http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
-
-   $Id: constraint_product.h 472 2006-11-17 17:04:36Z azumanga $
-*/
-
-/* Minion
-* Copyright (C) 2006
+/*
+* Minion http://minion.sourceforge.net
+* Copyright (C) 2006-09
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License

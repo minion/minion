@@ -1,13 +1,6 @@
-/* Minion Constraint Solver
-   http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
-
-   $Id: dynamic_sum.h 830 2007-11-20 10:42:15Z azumanga $
-*/
-
-/* Minion
-* Copyright (C) 2006
+/*
+* Minion http://minion.sourceforge.net
+* Copyright (C) 2006-09
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License

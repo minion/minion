@@ -1,20 +1,6 @@
-/* Minion Constraint Solver
-   http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
-
-   $Id$
-*/
-
-
 /*
- Chris, note there is a bit where I comment out how I really want to propagate instead
- of calling limit_reached, but I couldn't remember if you told me I could have
- that method or not.    It saves going through the whole clause. 
- */
-
-/* Minion
-* Copyright (C) 2006
+* Minion http://minion.sourceforge.net
+* Copyright (C) 2006-09
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License

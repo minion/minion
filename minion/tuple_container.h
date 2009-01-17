@@ -1,24 +1,6 @@
-/* Minion Constraint Solver
-   http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
-
-   $Id$
-*/
-
-#ifndef _TUPLE_CONTAINER_H
-#define _TUPLE_CONTAINER_H
-
-#include "system/system.h"
-
-using namespace std;
-
-
-#include <vector>
-#include <utility>
-
-/* Minion
-* Copyright (C) 2006
+/*
+* Minion http://minion.sourceforge.net
+* Copyright (C) 2006-09
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -34,6 +16,17 @@ using namespace std;
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+
+#ifndef _TUPLE_CONTAINER_H
+#define _TUPLE_CONTAINER_H
+
+#include "system/system.h"
+
+using namespace std;
+
+
+#include <vector>
+#include <utility>
 
 // This file contains lists of tuples, as required by table constraints. This
 // is required as these tuples can get big, and it's important to keep them
