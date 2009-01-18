@@ -15,14 +15,14 @@
 
 \providecommand{\boldsymbol}[1]{\mbox{\boldmath $#1$}}
 
-\def\minionversion{0.7RC1}
+\def\minionversion{0.8}
 
 \begin{document}
 
 \title{{\bf The Minion Manual}\\
 ~\\
 Minion Version \minionversion}
-\author{Christopher Jefferson \and Neil Moore \and Peter Nightingale \and Karen E. Petrie \and Andrea Rendl }
+\author{Christopher Jefferson \and Neil Moore \and Peter Nightingale \and Karen E.\ Petrie \and Andrea Rendl \and Lars Kotthof\/f}
 
 \maketitle
 \tableofcontents
@@ -173,37 +173,37 @@ started with it.
 \subsection{Installing Minion}
 
 The main Minion website is \url{http://minion.sourceforge.net/},
-and this contains links to the download page. Executables are provided
-for three platforms: Windows, Mac and Linux.
+and this contains links to the download page. Currently, executables with and
+without debug information are provided for Mac and Linux. We hope to provide
+Windows executables in future releases.
 
 
-\subsection{Installation instructions for Windows}
-
-Download the windows archive minion-x.y.z-windows.zip and unpack,
-you should find Minion executables minion.exe and minion-debug.exe
-along with the required library cygwin1.dll. The executables should
-work from the windows command shell cmd.exe.
-
+%\subsection{Installation instructions for Windows}
+%
+%Download the windows archive minion-x.y.z-windows.zip and unpack,
+%you should find Minion executables minion.exe and minion-debug.exe
+%along with the required library cygwin1.dll. The executables should
+%work from the windows command shell cmd.exe.
+%
 
 \subsection{Installation instructions for Mac}
 
-Download the Mac archive minion-x.y.z-mac.zip and unpack. The contents
+Download the Mac archive minion-x.y.z-mac.tar.gz and unpack. The contents
 include universal binaries `minion' and `minion-debug' which should
 work on both Intel and PowerPC Macs with Mac OS X 10.4.2 or later.
 
 
 \subsection{Installation instructions for Linux-x86 or x64}
 
-Download the Linux archive minion-x.y.z-linux.zip and unpack. It contains
-the binaries `minion' and `minion-debug'. If these binaries do not
-work on your Linux distribution due to a library linking error, use
-the package minion-x.y.z-linux-static.zip instead.
+Download the Linux archive minion-x.y.z-linux.tar.gz and unpack. It contains
+the binaries `minion' and `minion-debug'. Both executables are linked
+statically.
 
 
 \subsection{Compilation instructions}
 
 If there is no executable which works on your computer, you can use
-the source package (named minion-x.y.z-source.zip). To compile on
+the source package (named minion-x.y.z-source.tar.gz). To compile on
 Mac and Linux, go to the source directory and issue the following
 commands:
 
@@ -215,7 +215,7 @@ make minion
 Minion uses the CMake\footnote{\url{http://www.cmake.org}} build system to check
 for the required and optional components. Without any additional flags, the
 standard binary will be built. The earliest version of CMake the build was
-tested with is 2.4.6.
+tested with is 2.4.7.
 
 Note that you need at least g++ version 3.4.2 to compile Minion.
 
@@ -237,6 +237,12 @@ cmake -DDEBUG=0 .
 
 Executables will be created in the \texttt{bin} subdirectory.
 
+Note that boost\footnote{\url{http://www.boost.org/}} is required to build
+Minion. Any version between 1.33 and 1.37.0 inclusive should work.
+
+\medskip
+
+More details on compile-time options can be found in section~\ref{compiletime}.
 
 \subsection{Trying out the executable}
 
@@ -374,28 +380,94 @@ Minion does not attempt to simplify constraints, so constraints such as \texttt{
 
 Some constraints in Minion do not work on \texttt{BOUND} and \texttt{SPARSEBOUND} variables, in particular \texttt{gacalldiff} and \texttt{watchelement}. These two constraints are in general better when they can be used.
 
-\section{Compile Time Options}
+\section{Compile-time options}\label{compiletime}
 
-There are a number of flags which can be given to Minion at compile time to effect the resulting executable. These flags are prone to regular changes. By searching the Minion source code, you may find others. These undocumented ones are prone to breakage without warning.
+There are a number of flags which can be given to Minion at compile time to
+affect the resulting executable. These flags are prone to regular changes. By
+searching the Minion source code, you may find others. These undocumented ones
+are prone to breakage without warning.
 
-The following flags are considered "blessed", and are fully tested (although in future versions they may be removed or altered). Adding any of these flags (except BOOST) will probably slow the resulting Minion executable.
+The following flags are considered "blessed", and are fully tested (although in
+future versions they may be removed or altered). Adding any of these flags
+will probably slow the resulting Minion executable.
+
+All of these flags have to be passed to \texttt{cmake} with the \verb+-D+
+switch; for example
+\begin{verbatim}
+cmake -DNAME=MyMinion .
+\end{verbatim}
+Again, keep in mind that \texttt{cmake} caches its configuration -- if you run
+it again without specifying \verb+NAME+, it will assume the name you have given
+before and \emph{not} the default.
 
 \begin{description}
-\item[NAME=``name":] Overrides Minion's default and names the executable 'name'.
-\item[DEBUG=1:] Turns on a large number of internal consistency checks in minion. This executable is much slower than normal minion, but vital when trying to debug problems.
-\item[QUICK=1:] For optimisation reasons, Minion usually compiles many copies of every constraint. This flag makes Minion compile each constraint only once. This drastically reduces the time to compile and the size of the executable, but the resulting executable is slower. This should never effect the results Minion produces.
-\item[INFO=1:] Makes minion output a large, but poorly documented, set of information about how search is progressing. This flag is useful for debugging but should not be used for trying to following search (use the command line flag -dumptree instead). This option is likely to be replaced with a more useful dump of search in a future version of Minion.
-\item[UNOPTIMISED=1:] Turn off all compiler optimisation, so Minion can be usefully checked in gdb.
-\item[PROFILE=1:] Set compiler optimisation flags that allow Minion to be better profiled.
-\item[REENTER=1:] Compile Minion so it is reenterent (more than one problem can exist in memory at a time). At present reenterence is not used for anything, and will only slightly slow Minion.
-\item[BOOST=1:] Use the 'Boost' library to allow compressed input files. This flag is normally configured by the configure script.
+\item[\texttt{NAME=name}] Overrides Minion's default and names the executable
+\verb+name+.
+\item[\texttt{DEBUG=1}] Turns on a large number of internal consistency checks in
+minion. This executable is much slower than normal minion, but vital when trying
+to debug problems.
+\item[\texttt{SLOW\_DEBUG=1}] Turns on even more internal checking; the resulting
+executable will be much slower than standard Minion.
+\item[\texttt{PRINT=1}] (Only meaningful with \verb+DEBUG=1+) Turns on
+more printing of information.
+\item[\texttt{QUICK=1}] For optimisation reasons, Minion usually compiles many copies of
+every constraint. This flag makes Minion compile each constraint only once. This
+drastically reduces the time to compile and the size of the executable, but the
+resulting executable is slower. This should never effect the results Minion
+produces.
+\item[\texttt{INFO=1}] Makes minion output a large, but poorly documented, set of
+information about how search is progressing. This flag is useful for debugging
+but should not be used for trying to following search (use the command line flag
+-dumptree instead). This option is likely to be replaced with a more useful dump
+of search in a future version of Minion.
+\item[\texttt{UNOPTIMISED=1}] Turn off all compiler optimisation, so Minion can be
+usefully checked in gdb.
+\item[\texttt{PROFILE=1}] Set compiler optimisation flags that allow Minion to be
+better profiled.
+\item[\texttt{REENTER=1}] Compile Minion so it is reenterent (more than one
+problem can exist in memory at a time). At present reenterence is not used for
+anything, and will only slightly slow Minion.
+\item[\texttt{THREADSAFE=1}] Compile thread-safe Minion. Does not have any effect
+right now.
+\item[\texttt{SMALL=1}] Build a small binary by passing \verb+-Os+ to the
+compiler.
+\item[\texttt{WDEG=1}] Enable weighted degree variable heuristic. This may or may
+not speed up Minion.
+\item[\texttt{WTRIG=1}] Enable a weighted queue of triggers which will process the
+cheapest trigger first. This only affects triggers of the same type. This may or
+may not speed up Minion.
+\item[\texttt{BACK\_VEC=1}] Keep backtrack memory in a vector instead of a
+continuous block of memory.
+\item[\texttt{CACHE\_MALLOC=1}] (Only meaningful with \verb+BACK_VEC=1+) Enable
+caching malloc.
 \end{description}
 
-There is also a method of passing any flag to either the compiler and Minion, using MYFLAGS="<my flags>". Any g++ flag can be given here, some of which may speed up Minion. The only flag which is tested which can be given here is MYFLAGS="-DWEG", which compiles Minion with support for the 'wdeg' variable heuristic. This is not activated by default because it slows down Minion even when it it not in use.
+Furthermore the environment variable \verb+$CPU+ is taken into account when
+running \texttt{cmake}. The contents of this variable are passed on to the
+compiler without any processing; usually one would want to use it as a means of
+specifying machine-specific compiler flags, such as producing code for a
+specific CPU.
 
+\subsection{Selective compilation of constraints}
 
+The most time-consuming part of the Minion compilation process is the
+compilation of all the constraints. If not all constraints are required, the
+user may specify the constraints to be compiled into the binary in two ways.
 
+When running \texttt{cmake} one can give it the \verb+-DCONSTRAINTS="<list>"+
+flag to specify the semicolon-separated list of constraints to be compiled,
+e.g.\
+\begin{verbatim}
+cmake -DCONSTRAINTS="sumleq;sumgeq" .
+\end{verbatim}
 
+Alternatively, one can specify the name of a Minion input file or a file
+containing a list of constraints with the \verb+-DCONSTRAINTS_FILE=<file>+
+option, e.g.\
+\begin{verbatim}
+cmake -DCONSTRAINTS_FILE=input.minion .
+\end{verbatim}
+Note that this does not work with compressed input files.
 
 \chapter{Minion in Practice}
 The previous chapter clearly outlined what the constructs of a Minon file are, including what the variable types are and which type of constraint should be used when. This chapter takes a more practical role, outlined within are 7 minion example files which are clearly commented so that the user can see what a minion file looks like in practice. Comments in minion start with a $\sharp$, however for reasons of ease of reading all lines of actual code be it Minion or Essence' are shown in typewriter text and comments are inserted in normal text. The first file is a modified version of the one that all the minion developers turn to when modelling a new problem in minion. It shows exactly what a minion file can include and what the syntax is for all the possible sections. If you are modelling a problem as minion than we recommend you take a copy of this file and edit it appropriately, as this will help to guide you through the modelling process. The rest of this chapter contains versions  of the minion input examples introduced in the Tailor chapter of this manual. These are all produced automatically by tailor from the Essence' specification given in that chapter. We hope the comments will clarify exactly what these files mean. These examples can be used as the bases to implement any similar problems. The Minion overview is completed in the last chapter where a full list of all the constraints is given, including a brief overview of how each operates. 
