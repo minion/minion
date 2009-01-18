@@ -172,6 +172,17 @@ struct AndConstraint : public AbstractConstraint
     v.push_back(var3);
     return v;
   }
+  
+  // Function to make it reifiable in the lousiest way.
+  virtual AbstractConstraint* reverse_constraint()
+  {
+      vector<AnyVarRef> t;
+      t.push_back(var1);
+      t.push_back(var2);
+      t.push_back(var3);
+      return new CheckAssignConstraint<vector<AnyVarRef>, AndConstraint>(stateObj, t, *this);
+  }
+     
 };
 
 template<typename VarRef1, typename VarRef2, typename VarRef3>
