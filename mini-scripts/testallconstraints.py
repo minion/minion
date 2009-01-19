@@ -52,7 +52,7 @@ conslist+=["max", "min"]
 # undocumented internal constraints.
 conslist+=["watchneq", "watchless"]
 
-reifyexceptions=["watchsumleq", "watchsumgeq", "watchneq", "watchless"]
+reifyexceptions=["watchsumgeq", "watchneq", "watchless"]
 # add reifyimply variant of all constraints,
 # and reify variant of all except those in reifyexceptions
 it=conslist[:]

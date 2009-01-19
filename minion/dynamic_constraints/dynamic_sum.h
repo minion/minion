@@ -73,7 +73,7 @@
 #define CONSTRAINT_DYNAMIC_SUM_H
 
 // VarToCount = 1 means leq, = 0 means geq.
-template<typename VarArray, typename VarSum, int VarToCount = 1 >
+template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reversed = false >
   struct BoolLessSumConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
@@ -81,7 +81,10 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
 
   typedef BoolLessSumConstraintDynamic<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
-
+  
+  // When VarToCount=1 this constraint actually counts 0's and ensures there are var_sum or more.
+  // Name of the class should really be changed, and VarToCount changed to val.. and values flipped
+  // for it to make sense.
 
   VarArray var_array;
   VarSum var_sum;
@@ -92,8 +95,6 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
 
   int& unwatched(int i)
     { return static_cast<int*>(unwatched_indexes.get_ptr())[i]; }
-
-
 
   BoolLessSumConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
   AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), last(0)
@@ -316,12 +317,45 @@ template<typename VarArray, typename VarSum, int VarToCount = 1 >
     // We didn't make a complete assignment
     return false;
   }
+  
+  // All the code below here is to get around an annoying problem in C++. Basically we want to say that the
+  // reverse of a <= is a >= constraint. However, when compiling C++ keeps getting the reverse of the reverse of..
+  // and doesn't figure out it is looping. This code ensures we only go once around the loop.
+  virtual AbstractConstraint* reverse_constraint()
+  { return reverse_constraint_helper<is_reversed, int>::fun(stateObj, var_array, var_sum); }
+
+// BUGFIX: The following two class definitions have a 'T=int' just to get around a really stupid parsing bug
+// in g++ 4.0.x. Hopefully eventually we'll be able to get rid of it.
+
+/// These classes are just here to avoid infinite recursion when calculating the reverse of the reverse
+/// of a constraint.
+  template<BOOL reversed, typename T>
+	struct reverse_constraint_helper	
+  {
+      static AbstractConstraint* fun(StateObj* stateObj, VarArray var_array, VarSum var_sum)
+    {
+        return new BoolLessSumConstraintDynamic<VarArray, VarSum, 1-VarToCount, true>
+                (stateObj, var_array, var_array.size()-var_sum+1);
+    }
+  };
+  
+  template<typename T>
+	struct reverse_constraint_helper<true, T>
+  {
+    static AbstractConstraint* fun(StateObj*, VarArray var_array, VarSum var_sum)
+    {
+	  // This should never be reached, unless we try reversing an already reversed constraint.
+	  // We have this code here as the above case makes templates, which if left would keep instansiating
+	  // recursively and without bound.
+	  FAIL_EXIT();
+    }
+  };
 };
 
 template<typename VarArray,  typename VarSum>
 AbstractConstraint*
   BoolLessEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
-{ 
+{
   return new BoolLessSumConstraintDynamic<VarArray,VarSum>(stateObj, _var_array,
     runtime_val(_var_array.size() - _var_sum)); 
 }
