@@ -51,7 +51,7 @@
 */
 
 /** @help constraints;watchsumleq Notes
-  Equivelent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster.
+  Equivalent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster.
 
   This constraint works on binary variables only.
 
