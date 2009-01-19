@@ -57,7 +57,7 @@
 #define STAGED
 
 //Incremental graph -- maintains adjacency lists for values and vars
-#define INCGRAPH
+//#define INCGRAPH
 
 #include <stdlib.h>
 #include <iostream>
@@ -103,7 +103,7 @@ struct GacAlldiff : public AbstractConstraint
   ReversibleMonotonicSet SCCSplit;
   // If !SCCSplit.isMember(anIndex) then anIndex is the last index in an SCC.
   
-  ReversibleMonotonicSet sparevaluespresent;
+  //ReversibleMonotonicSet sparevaluespresent;
   
   D_DATA(MoveablePointer SCCSplit2);
   
@@ -118,7 +118,8 @@ struct GacAlldiff : public AbstractConstraint
     #endif
     numvars(0), numvals(0),
     SCCSplit(_stateObj, _var_array.size()), 
-    sparevaluespresent(_stateObj, _var_array.size()), constraint_locked(false)
+    //sparevaluespresent(_stateObj, _var_array.size()), 
+    constraint_locked(false)
   {
       if(var_array.size()>0)
       {
@@ -253,7 +254,6 @@ struct GacAlldiff : public AbstractConstraint
     return t;
   }
   #endif
-  
   
   typedef typename VarArray::value_type VarRef;
   virtual AbstractConstraint* reverse_constraint()
@@ -509,8 +509,14 @@ struct GacAlldiff : public AbstractConstraint
     cout << "Entering do_prop."<<endl;
     cout << "Varvalmatching:" <<varvalmatching<<endl;
     cout << "SCCs:" << SCCs <<endl;
+    cout << "SCCSplit: ";
+    for(int i=0; i<numvars; i++)
+    {
+        cout << (SCCSplit.isMember(i)?"1, ":"0, ");
+    }
+    cout <<endl;
     cout << "varToSCCIndex: "<< varToSCCIndex<<endl;
-    cout << "Domains:" <<endl;
+    cout << "Domains (remember that var_array is reversed):" <<endl;
     for(int i=0; i<numvars; i++)
     {
         cout << "var:" << i << " vals:" ;
@@ -676,6 +682,7 @@ struct GacAlldiff : public AbstractConstraint
                 {
                     P("Removing var: "<< SCCs[i] << " val:" << tempval);
                     var_array[SCCs[i]].removeFromDomain(tempval);
+                    if(getState(stateObj).isFailed()) return;
                 }
                 
                 if(sccindex_start<sccindex_end)
@@ -785,8 +792,14 @@ struct GacAlldiff : public AbstractConstraint
     cout << "Entering do_prop."<<endl;
     cout << "Varvalmatching:" <<varvalmatching<<endl;
     cout << "SCCs:" << SCCs <<endl;
+    cout << "SCCSplit: ";
+    for(int i=0; i<numvars; i++)
+    {
+        cout << (SCCSplit.isMember(i)?"1, ":"0, ");
+    }
+    cout <<endl;
     cout << "varToSCCIndex: "<< varToSCCIndex<<endl;
-    cout << "Domains:" <<endl;
+    cout << "Domains (remember that the var array is reversed):" <<endl;
     for(int i=0; i<numvars; i++)
     {
         cout << "var:" << i << " vals:" ;
@@ -799,12 +812,13 @@ struct GacAlldiff : public AbstractConstraint
         }
         cout << endl;
     }
+    
     // Check the matching is valid.
     for(int i=0; i<numvars; i++)
     {
         if(!var_array[i].inDomain(varvalmatching[i]))
         {
-            cout << "val in matching removed: " << i << ", " << varvalmatching[i] <<endl;
+            cout << "val in matching removed, var: " << i << ", val:" << varvalmatching[i] <<endl;
         }
         for(int j=i+1; j<numvars; j++)
         {
@@ -2224,6 +2238,7 @@ struct GacAlldiff : public AbstractConstraint
                                     P("Found augmenting path:");
                                     int unwindvar=curnode;
                                     int unwindval=val;
+                                    P("unwindvar: "<< unwindvar<<"unwindval: "<< unwindval );
                                     while(true)
                                     {
                                         //invprevious.remove(varvalmatching[unwindvar]-dom_min);
