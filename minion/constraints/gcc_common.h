@@ -153,7 +153,7 @@ struct GCC : public AbstractConstraint
                 adjlistpos[i].resize(numvars);
                 for(int j=0; j<numvars; j++) adjlistpos[i][j]=j;
             }
-            adjlistlength=getMemory(stateObj).backTrack().template requestArray<short>(numvars+numvals);
+            adjlistlength=getMemory(stateObj).backTrack().template requestArray<int>(numvars+numvals);
             for(int i=0; i<numvars; i++) adjlistlength[i]=numvals;
             for(int i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
         #endif
@@ -172,7 +172,7 @@ struct GCC : public AbstractConstraint
     
     #ifdef INCGRAPH
     vector<vector<int> > adjlist;
-    MoveableArray<short> adjlistlength;
+    MoveableArray<int> adjlistlength;
     vector<vector<int> > adjlistpos;   // position of a variable in adjlist.
     #endif
     

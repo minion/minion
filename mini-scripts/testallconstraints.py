@@ -18,63 +18,48 @@ conslist=[]
 
 
 # equality constraints
-conslist+=["diseq", "reifydiseq", "reifyimplydiseq", "eq", "reifyeq", "reifyimplyeq"]
+conslist+=["diseq", "eq"]
 
 # alldiffs
-conslist+=["alldiff", "reifyalldiff",  "reifyimplyalldiff"]
-conslist+=["gacalldiff", "reifygacalldiff", "reifyimplygacalldiff"]
+conslist+=["alldiff", "gacalldiff"]
 
 # capacity constraints
-conslist+=["gcc", "reifygcc", "reifyimplygcc"]
-
-conslist+=["occurrence", "reifyoccurrence", "reifyimplyoccurrence"]
-conslist+=["occurrenceleq", "reifyoccurrenceleq", "reifyimplyoccurrenceleq"]
-conslist+=["occurrencegeq", "reifyoccurrencegeq", "reifyimplyoccurrencegeq"]
+conslist+=["gcc", "occurrence", "occurrenceleq", "occurrencegeq"]
 
 #element constraints
-conslist+=["element", "reifyelement", "reifyimplyelement"]
-conslist+=["gacelement-deprecated", "reifygacelement-deprecated", "reifyimplygacelement-deprecated"]
-conslist+=["watchelement", "reifywatchelement", "reifyimplywatchelement"]
+conslist+=["element", "gacelement-deprecated", "watchelement"]
+
+conslist+=["watchelement_one", "element_one"]
 
 # arithmetic constraints
-conslist+=["modulo", "reifymodulo", "reifyimplymodulo"]
-conslist+=["pow", "reifypow", "reifyimplypow"]
-conslist+=["minuseq", "reifyminuseq", "reifyimplyminuseq"]
-conslist+=["product", "reifyproduct", "reifyimplyproduct"]
-conslist+=["div", "reifydiv", "reifyimplydiv"]
-conslist+=["abs", "reifyabs", "reifyimplyabs"]
-  
+conslist+=["modulo", "pow", "minuseq", "product", "div", "abs"]
+
 conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "watchvecexists_less", "watchvecexists_and", "hamming"]
-#conslist+=["reifywatchsumleq", "reifywatchsumgeq", 
+conslist+=["weightedsumleq", "weightedsumgeq"]
 
-conslist+=["reifywatchvecneq", "reifywatchvecexists_less", "reifywatchvecexists_and"] # and case crashes.      #, "reifyhamming"]
-conslist+=["reifyimplywatchsumleq", "reifyimplywatchsumgeq", "reifyimplywatchvecneq", "reifyimplywatchvecexists_less", "reifyimplywatchvecexists_and", "reifyimplyhamming"]
+conslist+=["litsumgeq", "table"]  # table to test reifytable and reifyimplytable
 
-conslist+=["sumgeq", "reifysumgeq", "reifyimplysumgeq"]
-conslist+=["sumleq", "reifysumleq", "reifyimplysumleq"]
-
-conslist+=["weightedsumgeq", "reifyweightedsumgeq", "reifyimplyweightedsumgeq"]
-conslist+=["weightedsumleq", "reifyweightedsumleq", "reifyimplyweightedsumleq"]
-
-conslist+=["ineq", "reifyineq", "reifyimplyineq"]
+conslist+=["sumgeq", "sumleq", "weightedsumleq", "weightedsumgeq"]
+conslist+=["ineq"]
+conslist+=["difference"]
 
 # symmetry-breaking constraints
 
-conslist+=["lexleq", "lexless", "reifylexleq", "reifylexless", "reifyimplylexleq", "reifyimplylexless"]
+conslist+=["lexleq", "lexless"]
 
-conslist+=["max", "reifymax", "reifyimplymax"]
-conslist+=["min", "reifymin", "reifyimplymin"]
+conslist+=["max", "min"]
 
+# undocumented internal constraints.
+conslist+=["watchneq", "watchless"]
 
-conslist+=["watchneq", "reifyimplywatchneq"]
-conslist+=["watchless", "reifyimplywatchless"]
-
-conslist+=["difference", "reifyimplydifference"]
-
-#todo
-conslist+=["weightedsumleq", "reifyweightedsumleq", "reifyimplyweightedsumleq"]
-conslist+=["weightedsumgeq", "reifyweightedsumgeq", "reifyimplyweightedsumgeq"]
-
+reifyexceptions=["watchsumleq", "watchsumgeq", "watchneq", "watchless"]
+# add reifyimply variant of all constraints,
+# and reify variant of all except those in reifyexceptions
+it=conslist[:]
+for c in it:
+    conslist+=["reifyimply"+c]
+    if c not in reifyexceptions:
+        conslist+=["reify"+c]
 
 numtests=100
 minionbin="bin/minion"

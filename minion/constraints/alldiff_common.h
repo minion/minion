@@ -57,7 +57,7 @@
 #define STAGED
 
 //Incremental graph -- maintains adjacency lists for values and vars
-//#define INCGRAPH
+#define INCGRAPH
 
 #include <stdlib.h>
 #include <iostream>

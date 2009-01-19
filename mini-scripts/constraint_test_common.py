@@ -481,6 +481,21 @@ class testelement(testgacelement__minus__deprecated):
     def runtest(self, options=dict()):
         return runtestgeneral("element", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
 
+class testelement_one(testgacelement__minus__deprecated):
+    def printtable(self, domains):
+        tab=testgacelement__minus__deprecated.printtable(self, domains)
+        for t in tab:
+            t[-2]=t[-2]+1
+        return tab
+    
+    def runtest(self, options=dict()):
+        return runtestgeneral("element_one", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
+
+class testwatchelement_one(testelement_one):
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchelement_one", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
+
+
 class testnegativetable:
     def printtable(self, domains, tab):
         cross=[]
@@ -722,6 +737,23 @@ class testhamming:
 
     def runtest(self, options=dict()):
         return runtestgeneral("hamming", True, options, [4,4,1], ["smallnum", "smallnum", "const"], self, True)
+
+class testlitsumgeq:
+    def printtable(self, domains):
+        const=self.constants[0]
+        #  x1 <= x2+const 
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+          l1=l[:len(l)/2]
+          l2=l[len(l)/2:]
+          if sum([  l1[i] == l2[i] for i in xrange(len(l1))] ) >= const:
+            out.append(l)
+        return out
+
+    def runtest(self, options=dict()):
+        return runtestgeneral("litsumgeq", True, options, [5,5,1], ["smallnum", "const", "smallconst"], self, True)
 
 
 class testlexleq:

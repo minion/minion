@@ -1,20 +1,27 @@
-/*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+/* Minion Constraint Solver
+http://minion.sourceforge.net
+
+For Licence Information see file LICENSE.txt 
+
+  $Id: dynamic_vecneq.h 1117 2008-02-15 17:19:14Z caj $
+*/
+
+/* Minion
+  * Copyright (C) 2006
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation; either version 2
+  * of the License, or (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 /** @help constraints;hamming Description
@@ -36,11 +43,7 @@ This constraint is reifyimply'able but not reifiable.
 // For operators
 #include "dynamic_vecneq.h"
 
-/** Constraints two vectors of variables to be not equal.
-  *
-  *  \ingroup Constraints
-*/
-template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
+template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated, BOOL is_reversed = false>
   struct VecCountDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
@@ -52,14 +55,15 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   VarArray1 var_array1;
   VarArray2 var_array2;
   int num_to_watch;
+  int hamming_distance;
   vector<int> watched_values;
   vector<int> unwatched_values;
 
   Reversible<bool> propagate_mode;
   int index_to_not_propagate; 
 
-  VecCountDynamic(StateObj* _stateObj, const VarArray1& _array1, const VarArray2& _array2, int _num_of_vals) :
-  AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_num_of_vals + 1),
+  VecCountDynamic(StateObj* _stateObj, const VarArray1& _array1, const VarArray2& _array2, int _hamming_distance) :
+  AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_hamming_distance + 1), hamming_distance(_hamming_distance),
     propagate_mode(_stateObj, false)
     {
        if(num_to_watch <= 1)
@@ -167,7 +171,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   {
     PROP_INFO_ADDONE(DynVecNeq);
     int trigger_activated = dt - dynamic_trigger_start();
-    int triggerpair = trigger_activated / 2;
+    int triggerpair = trigger_activated / Operator::dynamic_trigger_count();   
     D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);
 /*
     printf("propmode=%d, triggerpair=%d, trigger_activated=%d, nopropindex=%d\n",
@@ -274,6 +278,39 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     // If we didn't get enough, 
     return false;
   }
+  
+  // All the code below here is to get around an annoying problem in C++. Basically we want to say that the
+  // reverse of a <= is a >= constraint. However, when compiling C++ keeps getting the reverse of the reverse of..
+  // and doesn't figure out it is looping. This code ensures we only go once around the loop.
+  virtual AbstractConstraint* reverse_constraint()
+  { return reverse_constraint_helper<is_reversed,typename Operator::reverse_operator>::fun(stateObj, var_array1, var_array2, hamming_distance); }
+
+// BUGFIX: The following two class definitions have a 'T=int' just to get around a really stupid parsing bug
+// in g++ 4.0.x. Hopefully eventually we'll be able to get rid of it.
+
+/// These classes are just here to avoid infinite recursion when calculating the reverse of the reverse
+/// of a constraint.
+  template<BOOL reversed, typename T>
+	struct reverse_constraint_helper	
+  {
+      static AbstractConstraint* fun(StateObj* stateObj, VarArray1 var_array1, VarArray2 var_array2, int hamming_distance)
+    {
+	  return new VecCountDynamic<VarArray1, VarArray2, T, true>
+        (stateObj, var_array1, var_array2, var_array1.size()-hamming_distance+1);
+    }
+  };
+  
+  template<typename T>
+	struct reverse_constraint_helper<true, T>
+  {
+    static AbstractConstraint* fun(StateObj*, VarArray1 var_array1, VarArray2 var_array2, int hamming_distance)
+    { 
+	  // This should never be reached, unless we try reversing an already reversed constraint.
+	  // We have this code here as the above case makes templates, which if left would keep instansiating
+	  // recursively and without bound.
+	  FAIL_EXIT();
+    }
+  };
   
 };
 

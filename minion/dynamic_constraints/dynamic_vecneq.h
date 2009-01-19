@@ -72,6 +72,76 @@ This constraint is reifyimply'able but not reifiable.
 //#define P(x) cout << x << endl
 #define P(x)
 
+struct NeqIterated; // because it is used in EqIterated before it is defn
+
+// for the reverse of the hamming constraint:
+struct EqIterated
+{
+  static int dynamic_trigger_count()
+    { return 4; }
+  
+  static bool check_assignment(DomainInt i, DomainInt j)
+  { return i == j; }
+  
+  template<typename VarType1, typename VarType2>
+  static bool no_support_for_pair(VarType1& var1, VarType2& var2)
+  {
+    return var1.isAssigned() && var2.isAssigned() &&
+      var1.getAssignedValue() != var2.getAssignedValue();
+  }
+  
+  template<typename VarType1, typename VarType2>  
+  static void propagate_from_var1(VarType1& var1, VarType2& var2)
+  {
+      // just do bounds for the time being
+      var2.setMin(var1.getMin());
+      var2.setMax(var1.getMax());
+  }
+  
+  template<typename VarType1, typename VarType2>
+  static void propagate_from_var2(VarType1& var1, VarType2& var2)
+  {
+      var1.setMin(var2.getMin());
+      var1.setMax(var2.getMax());
+  }
+  
+  template<typename VarType1, typename VarType2>
+  static void add_triggers(VarType1& var1, VarType2& var2, DynamicTrigger* dt)
+  {
+     var1.addDynamicTrigger(dt, LowerBound);
+     var1.addDynamicTrigger(dt + 1, UpperBound);
+     var2.addDynamicTrigger(dt + 2, LowerBound);
+     var2.addDynamicTrigger(dt + 3, UpperBound);
+  }
+  
+  template<typename Var1, typename Var2>
+  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2, pair<int,int>& assign)
+  {
+    int min=var1.getMin();
+    if(var2.getMin()>min) min=var2.getMin();
+    int max=var1.getMax();
+    if(var2.getMax()<max) max=var2.getMax();
+    for(int i=min; i<=max; i++)
+    {
+        if(var1.inDomain(i) && var2.inDomain(i))
+        {
+            assign = make_pair(i,i);
+            return true;
+        }
+    }
+    return false;
+  }
+  
+  template<typename Var1, typename Var2>
+  static AbstractConstraint* reverse_constraint(StateObj* stateObj, const Var1& var1, const Var2& var2)
+  {
+      NeqConstraintBinary<Var1, Var2>* t=new NeqConstraintBinary<Var1, Var2>(stateObj, var1, var2);
+      return (AbstractConstraint*) t;
+  }
+  
+  typedef NeqIterated reverse_operator;
+};
+
 struct NeqIterated
 {
   static int dynamic_trigger_count()
@@ -152,6 +222,8 @@ struct NeqIterated
       EqualConstraint<Var1, Var2>* t=new EqualConstraint<Var1, Var2>(stateObj, var1, var2);
       return (AbstractConstraint*) t;
   }
+  
+  typedef EqIterated reverse_operator;
 };
 
 struct LessIterated
@@ -257,18 +329,6 @@ struct BothNonZeroIterated
   {
       ProductConstraint<Var1, Var2, ConstantVar>* t=new ProductConstraint<Var1, Var2, ConstantVar>(stateObj, var1, var2, ConstantVar(stateObj, 0));
       return (AbstractConstraint*) t;
-      
-      // var1=0 or var2=0
-      //vector<AbstractConstraint*> con;
-      //WatchLiteralConstraint<Var1>* t1= new WatchLiteralConstraint<Var1>(stateObj, var1, 0); // doesn't work with bounds variables
-      //WatchLiteralConstraint<Var2>* t2= new WatchLiteralConstraint<Var2>(stateObj, var2, 0);
-      //EqualConstraint<Var1, ConstantVar>* t1= new EqualConstraint<Var1, ConstantVar>(stateObj, var1, ConstantVar(stateObj, 0));
-      
-      //EqualConstraint<Var2, ConstantVar>* t2= new EqualConstraint<Var2, ConstantVar>(stateObj, var2, ConstantVar(stateObj, 0));
-      
-      //con.push_back((AbstractConstraint*) t1);
-      //con.push_back((AbstractConstraint*) t2);
-      //return new Dynamic_OR(stateObj, con);
   }
 };
 
