@@ -79,11 +79,18 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   
   int dynamic_trigger_count()
   {
-	  return var_sum + 1;
+    if(var_sum < 0)
+      return 0;
+    if(var_sum > var_array.size())
+      return var_array.size() + 1;
+    return var_sum + 1;
   }
     
   virtual void full_propagate()
   {
+    if(var_sum <= 0)
+      return;
+      
 	DynamicTrigger* dt = dynamic_trigger_start();
 	
 	int array_size = var_array.size(); 
