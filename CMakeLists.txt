@@ -221,7 +221,7 @@ if(SLOW_DEBUG)
     message(STATUS "Enabling slow DEBUG")
     set(BINARY ${BINARY}-debugextra)
     add_definitions(-DSLOW_DEBUG)
-    set(DEBUG "TRUE")
+    set(DEBUG TRUE)
 endif()
 
 option(DEBUG "" OFF)
