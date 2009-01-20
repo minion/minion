@@ -37,7 +37,9 @@ conslist+=["modulo", "pow", "minuseq", "product", "div", "abs"]
 conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "watchvecexists_less", "watchvecexists_and", "hamming"]
 conslist+=["weightedsumleq", "weightedsumgeq"]
 
-conslist+=["litsumgeq", "table"]  # table to test reifytable and reifyimplytable
+conslist+=["litsumgeq"]  
+
+# should test table to test reifytable? and reifyimplytable
 
 conslist+=["sumgeq", "sumleq", "weightedsumleq", "weightedsumgeq"]
 conslist+=["ineq"]
@@ -52,7 +54,7 @@ conslist+=["max", "min"]
 # undocumented internal constraints.
 conslist+=["watchneq", "watchless"]
 
-reifyexceptions=["watchsumgeq", "watchneq", "watchless"]
+reifyexceptions=["watchsumgeq", "litsumgeq", "watchneq", "watchless"]
 # add reifyimply variant of all constraints,
 # and reify variant of all except those in reifyexceptions
 it=conslist[:]

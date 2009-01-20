@@ -740,20 +740,18 @@ class testhamming:
 
 class testlitsumgeq:
     def printtable(self, domains):
-        const=self.constants[0]
-        #  x1 <= x2+const 
+        const=self.constants[-1]
+        litvals=self.constants[:-1]
         cross=[]
         crossprod(domains, [], cross)
         out=[]
         for l in cross:
-          l1=l[:len(l)/2]
-          l2=l[len(l)/2:]
-          if sum([  l1[i] == l2[i] for i in xrange(len(l1))] ) >= const:
+          if sum([  l[i] == litvals[i] for i in range(len(l))] ) >= const:
             out.append(l)
         return out
-
+        
     def runtest(self, options=dict()):
-        return runtestgeneral("litsumgeq", True, options, [5,5,1], ["smallnum", "const", "smallconst"], self, True)
+        return runtestgeneral("litsumgeq", False, options, [6,6,1], ["smallnum", "const", "smallconst"], self, True)
 
 
 class testlexleq:

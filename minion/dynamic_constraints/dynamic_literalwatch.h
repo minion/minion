@@ -70,8 +70,10 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   	int array_size = var_array.size();
 	  
 	  num_unwatched = array_size - var_sum - 1 ;
-	  D_ASSERT(num_unwatched >= 0);
-	  
+	  if(num_unwatched < 0)
+          num_unwatched=0;
+	  if(num_unwatched > var_array.size()) num_unwatched=var_array.size();
+      
 	  unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(unsigned) * num_unwatched);
 	  // above line might request 0 bytes
 	  last = 0;
@@ -79,7 +81,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   
   int dynamic_trigger_count()
   {
-    if(var_sum < 0)
+    if(var_sum <= 0)
       return 0;
     if(var_sum > var_array.size())
       return var_array.size() + 1;
@@ -245,6 +247,8 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
+      if(var_sum<=0) return true;
+      
     for(int i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].inDomain(value_array[i]))
