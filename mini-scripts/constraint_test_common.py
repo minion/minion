@@ -996,33 +996,7 @@ class testwatchvecneq:
     
     def runtest(self, options=dict()):
         return runtestgeneral("watchvecneq", True, options, [3,3], ["smallnum","smallnum"], self, True)
-    
-class testwatchvecexists_less:
-    def printtable(self, domains):
-        cross=[]
-        crossprod(domains, [], cross)
-        out=[]
-        for l in cross:
-            if sum([(l[i]< l[len(l)/2+i]) for i in xrange(len(l)/2)])>0:
-                out.append(l)
-        return out
 
-    def runtest(self, options=dict()):
-        return runtestgeneral("watchvecexists_less", True, options, [3,3], ["smallnum", "smallnum"], self, True)
-
-class testwatchvecexists_and:
-    def printtable(self, domains):
-        cross=[]
-        crossprod(domains, [], cross)
-        out=[]
-        for l in cross:
-            if sum([(l[i]>0 and l[len(l)/2+i]>0) for i in xrange(len(l)/2)] )>0:
-                out.append(l)
-        return out
-
-    def runtest(self, options=dict()):
-        return runtestgeneral("watchvecexists_and", True, options, [3,3], ["smallnum", "smallnum"], self, True)
-                        
 class testpow:
     def printtable(self, domains):
         if 0 in domains[1]:

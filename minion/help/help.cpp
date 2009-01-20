@@ -1,22 +1,3 @@
-/*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
 #include <iostream>
 #include <string>
 using namespace std;
@@ -195,28 +176,6 @@ cout << "Example" << "----------------------------------------------------------
 cout << "diseq(v0,v1)" << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
 cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
-} else
-if("constraints sumleq" == request) {
-cout << "Help entry: " << "constraints sumleq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " sumleq(vec, c)" << endl
-<< "" << endl
-<< "ensures that sum(vec) <= c." << endl << endl << endl;
-cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constrait is reifiable and reifyimply'able." << endl << endl << endl;
-} else
-if("constraints sumgeq" == request) {
-cout << "Help entry: " << "constraints sumgeq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " sumgeq(vec, c)" << endl
-<< "" << endl
-<< "ensures that sum(vec) >= c." << endl << endl << endl;
-cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constrait is reifiable and reifyimply'able." << endl << endl << endl;
 } else
 if("constraints gacalldiff" == request) {
 cout << "Help entry: " << "constraints gacalldiff" << endl << endl;
@@ -522,38 +481,6 @@ cout << "This constraint can be used for (and, in fact, has a specialised" << en
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
 cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
 } else
-if("constraints weightedsumleq" == request) {
-cout << "Help entry: " << "constraints weightedsumleq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " weightedsumleq(constantVec, varVec, total)" << endl
-<< "" << endl
-<< "ensures that constantVec.varVec <= total, where constantVec.varVec is" << endl
-<< "the scalar dot product of constantVec and varVec." << endl << endl << endl;
-cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints weightedsumgeq" << endl
-<< "help constraints sumleq" << endl
-<< "help constraints sumgeq" << endl << endl << endl;
-} else
-if("constraints weightedsumgeq" == request) {
-cout << "Help entry: " << "constraints weightedsumgeq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " weightedsumgeq(constantVec, varVec, total)" << endl
-<< "" << endl
-<< "ensures that constantVec.varVec >= total, where constantVec.varVec is" << endl
-<< "the scalar dot product of constantVec and varVec." << endl << endl << endl;
-cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints weightedsumleq" << endl
-<< "help constraints sumleq" << endl
-<< "help constraints sumgeq" << endl << endl << endl;
-} else
 if("constraints reify" == request) {
 cout << "Help entry: " << "constraints reify" << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
@@ -587,6 +514,60 @@ cout << "Reification is provided in two forms: reify and reifyimply." << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "Not all constraints are reifiable. Entries for individual constraints give" << endl
 << "more information." << endl << endl << endl;
+} else
+if("constraints sumleq" == request) {
+cout << "Help entry: " << "constraints sumleq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " sumleq(vec, c)" << endl
+<< "" << endl
+<< "ensures that sum(vec) <= c." << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
+cout << "This constrait is reifiable and reifyimply'able." << endl << endl << endl;
+} else
+if("constraints sumgeq" == request) {
+cout << "Help entry: " << "constraints sumgeq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " sumgeq(vec, c)" << endl
+<< "" << endl
+<< "ensures that sum(vec) >= c." << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
+cout << "This constrait is reifiable and reifyimply'able." << endl << endl << endl;
+} else
+if("constraints weightedsumleq" == request) {
+cout << "Help entry: " << "constraints weightedsumleq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " weightedsumleq(constantVec, varVec, total)" << endl
+<< "" << endl
+<< "ensures that constantVec.varVec <= total, where constantVec.varVec is" << endl
+<< "the scalar dot product of constantVec and varVec." << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints weightedsumgeq" << endl
+<< "help constraints sumleq" << endl
+<< "help constraints sumgeq" << endl << endl << endl;
+} else
+if("constraints weightedsumgeq" == request) {
+cout << "Help entry: " << "constraints weightedsumgeq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " weightedsumgeq(constantVec, varVec, total)" << endl
+<< "" << endl
+<< "ensures that constantVec.varVec >= total, where constantVec.varVec is" << endl
+<< "the scalar dot product of constantVec and varVec." << endl << endl << endl;
+cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
+cout << "This constraint is reifiable and reifyimply'able." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints weightedsumleq" << endl
+<< "help constraints sumleq" << endl
+<< "help constraints sumgeq" << endl << endl << endl;
 } else
 if("constraints watchelement_one" == request) {
 cout << "Help entry: " << "constraints watchelement_one" << endl << endl;
@@ -664,7 +645,7 @@ cout << "Help entry: " << "constraints watchsumleq" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "The constraint watchsumleq(vec, c) ensures that sum(vec) <= c." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "Equivelent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster." << endl
+cout << "Equivalent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster." << endl
 << "" << endl
 << " This constraint works on binary variables only." << endl
 << "" << endl
@@ -700,265 +681,6 @@ cout << "The constraint" << endl
 << "such that A[i] != B[i]." << endl << endl << endl;
 cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
 cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
-} else
-if("constraints watchvecexists_less" == request) {
-cout << "Help entry: " << "constraints watchvecexists_less" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " watchvecexists_less(A, B)" << endl
-<< "" << endl
-<< "ensures that there exists some index i such that A[i] < B[i]." << endl << endl << endl;
-cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
-} else
-if("constraints watchvecexists_and" == request) {
-cout << "Help entry: " << "constraints watchvecexists_and" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " watchvecexists_and(A, B)" << endl
-<< "" << endl
-<< "ensures that there exists some index i such that A[i] > 0 and B[i] > 0." << endl
-<< "" << endl
-<< "For booleans this is the same as 'exists i s.t. A[i] && B[i]'." << endl << endl << endl;
-cout << "Reifiability" << "--------------------------------------------------------------------" << endl;
-cout << "This constraint is reifyimply'able but not reifiable." << endl << endl << endl;
-} else
-if("switches" == request) {
-cout << "Help entry: " << "switches" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Minion supports a number of switches to augment default behaviour. To" << endl
-<< "see more information on any switch, use the help system. The list" << endl
-<< "below contains all available switches. For example to see help on" << endl
-<< "-quiet type something similar to" << endl
-<< "" << endl
-<< " minion help switches -quiet" << endl
-<< "" << endl
-<< "replacing 'minion' by the name of the executable you're using." << endl << endl << endl;
-} else
-if("switches -redump" == request) {
-cout << "Help entry: " << "switches -redump" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Print the minion input instance file to standard out. No search is" << endl
-<< "carried out when this switch is used." << endl << endl << endl;
-} else
-if("switches -findallsols" == request) {
-cout << "Help entry: " << "switches -findallsols" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Find all solutions and count them. This option is ignored if the" << endl
-<< "problem contains any minimising or maximising objective." << endl << endl << endl;
-} else
-if("switches -quiet" == request) {
-cout << "Help entry: " << "switches -quiet" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Do not print parser progress." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -verbose" << endl << endl << endl;
-} else
-if("switches -verbose" == request) {
-cout << "Help entry: " << "switches -verbose" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Print parser progress." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -quiet" << endl << endl << endl;
-} else
-if("switches -printsols" == request) {
-cout << "Help entry: " << "switches -printsols" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Print solutions." << endl << endl << endl;
-} else
-if("switches -noprintsols" == request) {
-cout << "Help entry: " << "switches -noprintsols" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Do not print solutions." << endl << endl << endl;
-} else
-if("switches -printsolsonly" == request) {
-cout << "Help entry: " << "switches -printsolsonly" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Print only solutions and a summary at the end." << endl << endl << endl;
-} else
-if("switches -preprocess" == request) {
-cout << "Help entry: " << "switches -preprocess" << endl << endl;
-cout << "" << "--------------------------------------------------------------------------------" << endl;
-cout << "" << endl
-<< "This switch allows the user to choose what level of preprocess is" << endl
-<< "applied to their model before search commences." << endl
-<< "" << endl
-<< "The choices are:" << endl
-<< "" << endl
-<< "- GAC " << endl
-<< "- generalised arc consistency (default)" << endl
-<< "- all propagators are run to a fixed point" << endl
-<< "- if some propagators enforce less than GAC then the model will" << endl
-<< "not necessarily be fully GAC at the outset" << endl
-<< "" << endl
-<< "- SACBounds " << endl
-<< "- singleton arc consistency on the bounds of each variable" << endl
-<< "- AC can be achieved when any variable lower or upper bound is a " << endl
-<< "singleton in its own domain" << endl
-<< "" << endl
-<< "- SAC " << endl
-<< "- singleton arc consistency" << endl
-<< "- AC can be achieved in the model if any value is a singleton in" << endl
-<< "its own domain" << endl
-<< "" << endl
-<< "- SSACBounds" << endl
-<< "- singleton singleton bounds arc consistency" << endl
-<< "- SAC can be achieved in the model when domains are replaced by either" << endl
-<< "the singleton containing their upper bound, or the singleton containing" << endl
-<< "their lower bound" << endl
-<< "" << endl
-<< "- SSAC " << endl
-<< "- singleton singleton arc consistency" << endl
-<< "- SAC can be achieved when any value is a singleton in its own domain" << endl
-<< "" << endl
-<< "These are listed in order of roughly how long they take to" << endl
-<< "achieve. Preprocessing is a one off cost at the start of search. The" << endl
-<< "success of higher levels of preprocessing is problem specific; SAC" << endl
-<< "preprocesses may take a long time to complete, but may reduce search" << endl
-<< "time enough to justify the cost." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "To enforce SAC before search:" << endl
-<< "" << endl
-<< " minion -preprocess SAC myinputfile.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -X-prop-node" << endl << endl << endl;
-} else
-if("switches -X-prop-node" == request) {
-cout << "Help entry: " << "switches -X-prop-node" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Allows the user to choose the level of consistency to be enforced" << endl
-<< "during search." << endl
-<< "" << endl
-<< "See entry 'help switches -preprocess' for details of the available" << endl
-<< "levels of consistency." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "To enforce SSAC during search:" << endl
-<< "" << endl
-<< " minion -X-prop-node SSAC input.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -preprocess" << endl << endl << endl;
-} else
-if("switches -dumptree" == request) {
-cout << "Help entry: " << "switches -dumptree" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Print out the branching decisions and variable states at each node." << endl << endl << endl;
-} else
-if("switches -fullprop" == request) {
-cout << "Help entry: " << "switches -fullprop" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Disable incremental propagation." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This should always slow down search while producing exactly the same" << endl
-<< "search tree." << endl
-<< "" << endl
-<< "Only available in a DEBUG executable." << endl << endl << endl;
-} else
-if("switches -nocheck" == request) {
-cout << "Help entry: " << "switches -nocheck" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Do not check solutions for correctness before printing them out." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This option is the default on non-DEBUG executables." << endl << endl << endl;
-} else
-if("switches -check" == request) {
-cout << "Help entry: " << "switches -check" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Check solutions for correctness before printing them out." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This option is the default for DEBUG executables." << endl << endl << endl;
-} else
-if("switches -nodelimit" == request) {
-cout << "Help entry: " << "switches -nodelimit" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "To stop search after N nodes, do" << endl
-<< "" << endl
-<< " minion -nodelimit N myinput.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -timelimit" << endl
-<< "help switches -sollimit" << endl << endl << endl;
-} else
-if("switches -timelimit" == request) {
-cout << "Help entry: " << "switches -timelimit" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "To stop search after N seconds, do" << endl
-<< "" << endl
-<< " minion -timelimit N myinput.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -nodelimit" << endl
-<< "help switches -sollimit" << endl << endl << endl;
-} else
-if("switches -sollimit" == request) {
-cout << "Help entry: " << "switches -sollimit" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "To stop search after N solutions have been found, do" << endl
-<< "" << endl
-<< " minion -sollimit N myinput.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -nodelimit" << endl
-<< "help switches -timelimit" << endl << endl << endl;
-} else
-if("switches -varorder" == request) {
-cout << "Help entry: " << "switches -varorder" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "" << endl
-<< "Enable a particular variable ordering for the search process. This" << endl
-<< "flag is experimental and minion's default ordering might be faster." << endl
-<< "" << endl
-<< "The available orders are:" << endl
-<< "" << endl
-<< "- sdf - smallest domain first, break ties lexicographically" << endl
-<< "" << endl
-<< "- sdf-random - sdf, but break ties randomly" << endl
-<< "" << endl
-<< "- srf - smallest ratio first, chooses unassigned variable with smallest" << endl
-<< " percentage of its initial values remaining, break ties lexicographically" << endl
-<< "" << endl
-<< "- srf-random - srf, but break ties randomly" << endl
-<< "" << endl
-<< "- ldf - largest domain first, break ties lexicographically" << endl
-<< "" << endl
-<< "- ldf-random - ldf, but break ties randomly" << endl
-<< "" << endl
-<< "- random - random variable ordering" << endl
-<< "" << endl
-<< "- static - lexicographical ordering" << endl << endl << endl;
-} else
-if("switches -randomseed" == request) {
-cout << "Help entry: " << "switches -randomseed" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Set the pseudorandom seed to N. This allows 'random' behaviour to be" << endl
-<< "repeated in different runs of minion." << endl << endl << endl;
-} else
-if("switches -tableout" == request) {
-cout << "Help entry: " << "switches -tableout" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Append a line of data about the current run of minion to a named file." << endl
-<< "This data includes minion version information, arguments to the" << endl
-<< "executable, build and solve time statistics, etc. See the file itself" << endl
-<< "for a precise schema of the supplied information." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "To add statistics about solving myproblem.minion to mystats.txt do" << endl
-<< "" << endl
-<< " minion -tableout mystats.txt myproblem.minion" << endl << endl << endl;
-} else
-if("switches -solsout" == request) {
-cout << "Help entry: " << "switches -solsout" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Append all solutionsto a named file." << endl
-<< "Each solution is placed on a line, with no extra formatting." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "To add the solutions of myproblem.minion to mysols.txt do" << endl
-<< "" << endl
-<< " minion -solsout mysols.txt myproblem.minion" << endl << endl << endl;
-} else
-if("switches -randomiseorder" == request) {
-cout << "Help entry: " << "switches -randomiseorder" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Randomises the ordering of the decision variables. If the input file" << endl
-<< "specifies as ordering it will randomly permute this. If no ordering is" << endl
-<< "specified a random permutation of all the variables is used." << endl << endl << endl;
 } else
 if("input" == request) {
 cout << "Help entry: " << "input" << endl << endl;
@@ -1232,6 +954,241 @@ cout << "Below is a complete minion input file with commentary, as an example." 
 << "Any text down here is ignored, so you can write whatever you like (or" << endl
 << "nothing at all...)" << endl << endl << endl;
 } else
+if("switches" == request) {
+cout << "Help entry: " << "switches" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Minion supports a number of switches to augment default behaviour. To" << endl
+<< "see more information on any switch, use the help system. The list" << endl
+<< "below contains all available switches. For example to see help on" << endl
+<< "-quiet type something similar to" << endl
+<< "" << endl
+<< " minion help switches -quiet" << endl
+<< "" << endl
+<< "replacing 'minion' by the name of the executable you're using." << endl << endl << endl;
+} else
+if("switches -redump" == request) {
+cout << "Help entry: " << "switches -redump" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print the minion input instance file to standard out. No search is" << endl
+<< "carried out when this switch is used." << endl << endl << endl;
+} else
+if("switches -findallsols" == request) {
+cout << "Help entry: " << "switches -findallsols" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Find all solutions and count them. This option is ignored if the" << endl
+<< "problem contains any minimising or maximising objective." << endl << endl << endl;
+} else
+if("switches -quiet" == request) {
+cout << "Help entry: " << "switches -quiet" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Do not print parser progress." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -verbose" << endl << endl << endl;
+} else
+if("switches -verbose" == request) {
+cout << "Help entry: " << "switches -verbose" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print parser progress." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -quiet" << endl << endl << endl;
+} else
+if("switches -printsols" == request) {
+cout << "Help entry: " << "switches -printsols" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print solutions." << endl << endl << endl;
+} else
+if("switches -noprintsols" == request) {
+cout << "Help entry: " << "switches -noprintsols" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Do not print solutions." << endl << endl << endl;
+} else
+if("switches -printsolsonly" == request) {
+cout << "Help entry: " << "switches -printsolsonly" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print only solutions and a summary at the end." << endl << endl << endl;
+} else
+if("switches -preprocess" == request) {
+cout << "Help entry: " << "switches -preprocess" << endl << endl;
+cout << "" << "--------------------------------------------------------------------------------" << endl;
+cout << "" << endl
+<< "This switch allows the user to choose what level of preprocess is" << endl
+<< "applied to their model before search commences." << endl
+<< "" << endl
+<< "The choices are:" << endl
+<< "" << endl
+<< "- GAC " << endl
+<< "- generalised arc consistency (default)" << endl
+<< "- all propagators are run to a fixed point" << endl
+<< "- if some propagators enforce less than GAC then the model will" << endl
+<< "not necessarily be fully GAC at the outset" << endl
+<< "" << endl
+<< "- SACBounds " << endl
+<< "- singleton arc consistency on the bounds of each variable" << endl
+<< "- AC can be achieved when any variable lower or upper bound is a " << endl
+<< "singleton in its own domain" << endl
+<< "" << endl
+<< "- SAC " << endl
+<< "- singleton arc consistency" << endl
+<< "- AC can be achieved in the model if any value is a singleton in" << endl
+<< "its own domain" << endl
+<< "" << endl
+<< "- SSACBounds" << endl
+<< "- singleton singleton bounds arc consistency" << endl
+<< "- SAC can be achieved in the model when domains are replaced by either" << endl
+<< "the singleton containing their upper bound, or the singleton containing" << endl
+<< "their lower bound" << endl
+<< "" << endl
+<< "- SSAC " << endl
+<< "- singleton singleton arc consistency" << endl
+<< "- SAC can be achieved when any value is a singleton in its own domain" << endl
+<< "" << endl
+<< "These are listed in order of roughly how long they take to" << endl
+<< "achieve. Preprocessing is a one off cost at the start of search. The" << endl
+<< "success of higher levels of preprocessing is problem specific; SAC" << endl
+<< "preprocesses may take a long time to complete, but may reduce search" << endl
+<< "time enough to justify the cost." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "To enforce SAC before search:" << endl
+<< "" << endl
+<< " minion -preprocess SAC myinputfile.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -X-prop-node" << endl << endl << endl;
+} else
+if("switches -X-prop-node" == request) {
+cout << "Help entry: " << "switches -X-prop-node" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Allows the user to choose the level of consistency to be enforced" << endl
+<< "during search." << endl
+<< "" << endl
+<< "See entry 'help switches -preprocess' for details of the available" << endl
+<< "levels of consistency." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "To enforce SSAC during search:" << endl
+<< "" << endl
+<< " minion -X-prop-node SSAC input.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -preprocess" << endl << endl << endl;
+} else
+if("switches -dumptree" == request) {
+cout << "Help entry: " << "switches -dumptree" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print out the branching decisions and variable states at each node." << endl << endl << endl;
+} else
+if("switches -fullprop" == request) {
+cout << "Help entry: " << "switches -fullprop" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Disable incremental propagation." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This should always slow down search while producing exactly the same" << endl
+<< "search tree." << endl
+<< "" << endl
+<< "Only available in a DEBUG executable." << endl << endl << endl;
+} else
+if("switches -nocheck" == request) {
+cout << "Help entry: " << "switches -nocheck" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Do not check solutions for correctness before printing them out." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This option is the default on non-DEBUG executables." << endl << endl << endl;
+} else
+if("switches -check" == request) {
+cout << "Help entry: " << "switches -check" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Check solutions for correctness before printing them out." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This option is the default for DEBUG executables." << endl << endl << endl;
+} else
+if("switches -nodelimit" == request) {
+cout << "Help entry: " << "switches -nodelimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "To stop search after N nodes, do" << endl
+<< "" << endl
+<< " minion -nodelimit N myinput.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -timelimit" << endl
+<< "help switches -sollimit" << endl << endl << endl;
+} else
+if("switches -timelimit" == request) {
+cout << "Help entry: " << "switches -timelimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "To stop search after N seconds, do" << endl
+<< "" << endl
+<< " minion -timelimit N myinput.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -nodelimit" << endl
+<< "help switches -sollimit" << endl << endl << endl;
+} else
+if("switches -sollimit" == request) {
+cout << "Help entry: " << "switches -sollimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "To stop search after N solutions have been found, do" << endl
+<< "" << endl
+<< " minion -sollimit N myinput.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -nodelimit" << endl
+<< "help switches -timelimit" << endl << endl << endl;
+} else
+if("switches -varorder" == request) {
+cout << "Help entry: " << "switches -varorder" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "" << endl
+<< "Enable a particular variable ordering for the search process. This" << endl
+<< "flag is experimental and minion's default ordering might be faster." << endl
+<< "" << endl
+<< "The available orders are:" << endl
+<< "" << endl
+<< "- sdf - smallest domain first, break ties lexicographically" << endl
+<< "" << endl
+<< "- sdf-random - sdf, but break ties randomly" << endl
+<< "" << endl
+<< "- srf - smallest ratio first, chooses unassigned variable with smallest" << endl
+<< " percentage of its initial values remaining, break ties lexicographically" << endl
+<< "" << endl
+<< "- srf-random - srf, but break ties randomly" << endl
+<< "" << endl
+<< "- ldf - largest domain first, break ties lexicographically" << endl
+<< "" << endl
+<< "- ldf-random - ldf, but break ties randomly" << endl
+<< "" << endl
+<< "- random - random variable ordering" << endl
+<< "" << endl
+<< "- static - lexicographical ordering" << endl << endl << endl;
+} else
+if("switches -randomseed" == request) {
+cout << "Help entry: " << "switches -randomseed" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Set the pseudorandom seed to N. This allows 'random' behaviour to be" << endl
+<< "repeated in different runs of minion." << endl << endl << endl;
+} else
+if("switches -tableout" == request) {
+cout << "Help entry: " << "switches -tableout" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Append a line of data about the current run of minion to a named file." << endl
+<< "This data includes minion version information, arguments to the" << endl
+<< "executable, build and solve time statistics, etc. See the file itself" << endl
+<< "for a precise schema of the supplied information." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "To add statistics about solving myproblem.minion to mystats.txt do" << endl
+<< "" << endl
+<< " minion -tableout mystats.txt myproblem.minion" << endl << endl << endl;
+} else
+if("switches -solsout" == request) {
+cout << "Help entry: " << "switches -solsout" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Append all solutionsto a named file." << endl
+<< "Each solution is placed on a line, with no extra formatting." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "To add the solutions of myproblem.minion to mysols.txt do" << endl
+<< "" << endl
+<< " minion -solsout mysols.txt myproblem.minion" << endl << endl << endl;
+} else
+if("switches -randomiseorder" == request) {
+cout << "Help entry: " << "switches -randomiseorder" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Randomises the ordering of the decision variables. If the input file" << endl
+<< "specifies as ordering it will randomly permute this. If no ordering is" << endl
+<< "specified a random permutation of all the variables is used." << endl << endl << endl;
+} else
 if("variables" == request) {
 cout << "Help entry: " << "variables" << endl << endl;
 cout << "General" << "-------------------------------------------------------------------------" << endl;
@@ -1448,8 +1405,6 @@ cout << "help constraints watchelement" << endl;
 cout << "help constraints watchelement_one" << endl;
 cout << "help constraints watchsumgeq" << endl;
 cout << "help constraints watchsumleq" << endl;
-cout << "help constraints watchvecexists_and" << endl;
-cout << "help constraints watchvecexists_less" << endl;
 cout << "help constraints watchvecneq" << endl;
 cout << "help constraints weightedsumgeq" << endl;
 cout << "help constraints weightedsumleq" << endl;

@@ -234,12 +234,6 @@ inline void print_constraints() {
 #ifdef CT_MODULO_ABC
       cout << "modulo ";
 #endif
-#ifdef CT_WATCHED_VEC_OR_AND_ABC
-      cout << "watchvecexists_and ";
-#endif
-#ifdef CT_WATCHED_VEC_OR_LESS_ABC
-      cout << "watchvecexists_less ";
-#endif
 #ifdef CT_WATCHED_HAMMING_ABC
       cout << "hamming ";
 #endif

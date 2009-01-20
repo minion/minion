@@ -5,8 +5,8 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "occurrenceleq" "occurrencegeq" "product" "difference"
                     "weightedsumleq" "weightedsumgeq" "sumgeq" "sumleq" "watchsumgeq"
                     "watchsumleq" "table" "negativetable" "watchvecneq" "litsumgeq"
-                    "pow" "div" "modulo" "gadget" "disabled-or" "watchvecexists_less"
-                    "watchvecexists_and" "hamming" "watched-or" "watched-and"
+                    "pow" "div" "modulo" "gadget" "disabled-or"
+                    "hamming" "watched-or" "watched-and"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply" "true" "false")
 
@@ -149,12 +149,6 @@ set(NAME_READ_gadget "read_list")
 
 set(NAME_ID_disabled-or "CT_WATCHED_OR")
 set(NAME_READ_disabled-or "read_list")
-
-set(NAME_ID_watchvecexists_less "CT_WATCHED_VEC_OR_LESS")
-set(NAME_READ_watchvecexists_less "read_list" "read_list")
-
-set(NAME_ID_watchvecexists_and "CT_WATCHED_VEC_OR_AND")
-set(NAME_READ_watchvecexists_and "read_list" "read_list")
 
 set(NAME_ID_hamming "CT_WATCHED_HAMMING")
 set(NAME_READ_hamming "read_list" "read_list" "read_constant")
