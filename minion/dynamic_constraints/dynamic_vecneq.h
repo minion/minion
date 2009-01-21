@@ -60,8 +60,7 @@ struct EqIterated
   template<typename VarType1, typename VarType2>
   static bool no_support_for_pair(VarType1& var1, VarType2& var2)
   {
-    return var1.isAssigned() && var2.isAssigned() &&
-      var1.getAssignedValue() != var2.getAssignedValue();
+    return var1.getMin()>var2.getMax() || var1.getMax() < var2.getMin();
   }
   
   template<typename VarType1, typename VarType2>  
