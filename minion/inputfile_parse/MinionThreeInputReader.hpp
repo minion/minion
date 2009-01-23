@@ -839,7 +839,6 @@ vector<Var> MinionThreeInputReader<FileReader>::readLiteralVector(FileReader* in
     while (delim != ']') {
       vector<Var> v = readPossibleMatrixIdentifier(infile);
       newVector.insert(newVector.end(), v.begin(), v.end());
-  //newVector.push_back(readIdentifier(infile)) ;
       delim = infile->get_char();
       if(delim != ',' && delim != ']')
       {
@@ -848,6 +847,9 @@ vector<Var> MinionThreeInputReader<FileReader>::readLiteralVector(FileReader* in
         s[s.size() - 3] = delim;
         throw parse_exception(s);
       }
+      
+      if(delim == ',' && infile->peek_char() == ']')
+        delim = infile->get_char();
     }
   }
   return newVector;
