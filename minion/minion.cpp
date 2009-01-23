@@ -381,7 +381,7 @@ try {
   {
     GraphBuilder graph(instance);
     //graph.output_graph();
-    graph.output_nauty_graph();
+    graph.g.output_nauty_graph(instance);
     exit(0);
   }
   

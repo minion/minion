@@ -19,6 +19,25 @@
 
 #include "../constraints/constraint_abstract.h"
 
+
+/*
+inline string var_name(const Var& var, CSPInstance& csp)
+ { 
+   if(var.type() == VAR_CONSTANT)
+     print_instance( var.pos());
+   else if(var.type() == VAR_NOTBOOL)
+   {
+     oss << "!";
+     oss << csp.vars.getName(Var(VAR_BOOL, var.pos())); 
+   }
+   else
+     oss << csp.vars.getName(var); 
+ }
+*/
+
+#define VAR_INFO_PRINT_0(X,Y)
+#define VAR_INFO_PRINT_1(X,Y,Z)
+
 template<typename WrapType, Info_VarType VAR_TYPE>
 struct InfoRefType
 {
@@ -34,104 +53,130 @@ struct InfoRefType
   { VAR_INFO_ADDONE(VAR_TYPE, copy); }
   
   InfoRefType() 
-  {VAR_INFO_ADDONE(VAR_TYPE, construct);}
+  { VAR_INFO_ADDONE(VAR_TYPE, construct); }
   
   InfoRefType(const InfoRefType& b) : data(b.data)
-  {VAR_INFO_ADDONE(VAR_TYPE, copy);}
+  { VAR_INFO_ADDONE(VAR_TYPE, copy); }
   
-  BOOL isAssigned() const
-  { 
+  bool isAssigned() const
+  {
     VAR_INFO_ADDONE(VAR_TYPE, isAssigned);
-    return data.isAssigned(); 
+    bool assign = data.isAssigned();
+    VAR_INFO_PRINT_0("Assigned", assign);
+    return assign;
   }
   
   DomainInt getAssignedValue() const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getAssignedValue);
-    return data.getAssignedValue(); }
+    DomainInt assignValue = data.getAssignedValue();
+    VAR_INFO_PRINT_0("isAssignedValue", assignValue);
+    return assignValue; 
+  }
   
-  BOOL isAssignedValue(DomainInt i) const
+  bool isAssignedValue(DomainInt i) const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, isAssignedValue);
-    return data.isAssignedValue(i);
+    bool isAssignValue = data.isAssignedValue(i);
+    VAR_INFO_PRINT_1("is assigned ", i, isAssignValue);
+    return isAssignValue;
   }
   
-  BOOL inDomain(DomainInt b) const
+  bool inDomain(DomainInt b) const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, inDomain);
-    return data.inDomain( b); 
+    bool indom = data.inDomain(b);
+    VAR_INFO_PRINT_1("in domain", b, indom);
+    return indom; 
   }
   
-  BOOL inDomain_noBoundCheck(DomainInt b) const
+  bool inDomain_noBoundCheck(DomainInt b) const
   {
     VAR_INFO_ADDONE(VAR_TYPE, inDomain_noBoundCheck);
-    return data.inDomain_noBoundCheck(b);
+    bool indom_noBC = data.inDomain_noBoundCheck(b);
+    VAR_INFO_PRINT_1("in domain, no bound check", b, indom_noBC);
+    return indom_noBC;
   }
   
   
   DomainInt getMax() const
   {
     VAR_INFO_ADDONE(VAR_TYPE, getMax);
-    return data.getMax(); 
+    DomainInt maxval = data.getMax();
+    VAR_INFO_PRINT_0("GetMax", maxval);
+    return maxval; 
   }
   
   DomainInt getMin() const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getMin);
-    return data.getMin(); 
+    DomainInt minval = data.getMin();
+    VAR_INFO_PRINT_0("GetMin", minval);
+    return minval; 
   }
 
   DomainInt getInitialMax() const
   {
     VAR_INFO_ADDONE(VAR_TYPE, getInitialMax);
-    return data.getInitialMax(); 
+    DomainInt initialMax = data.getInitialMax();
+    VAR_INFO_PRINT_0("InitialMax", initialMax);
+    return initialMax;
   }
   
   DomainInt getInitialMin() const
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getInitialMin);
-    return data.getInitialMin(); 
+    DomainInt initialMin = data.getInitialMin();
+    VAR_INFO_PRINT_0("InitialMin", initialMin);
+    return initialMin; 
   }
   
   void setMax(DomainInt i)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, setMax);
+    VAR_INFO_PRINT_0("SetMax", i);
     data.setMax(i); 
   }
   
   void setMin(DomainInt i)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, setMin);
+    VAR_INFO_PRINT_0("SetMin", i);
     data.setMin(i); 
   }
   
   void uncheckedAssign(DomainInt b)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, uncheckedAssign);
+    VAR_INFO_PRINT_0("uncheckedAssign", b);
     data.uncheckedAssign( b); 
   }
   
   void propagateAssign(DomainInt b)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, propagateAssign);
+    VAR_INFO_PRINT_0("propagateAssign", b);
     data.propagateAssign( b); 
   }
   
   void decisionAssign(DomainInt b)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, decisionAssign);
+    VAR_INFO_PRINT_0("decisionAssign", b);
     data.decisionAssign(b); 
   }
   
   void removeFromDomain(DomainInt b)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, RemoveFromDomain);
+    VAR_INFO_PRINT_0("removeFromDomain", b);
     data.removeFromDomain( b); 
   }
   
   void addTrigger(Trigger t, TrigType type)
   {
     VAR_INFO_ADDONE(VAR_TYPE, addTrigger);
+    VAR_INFO_PRINT_0("addTrigger", type);
     data.addTrigger( t, type); 
   }
 

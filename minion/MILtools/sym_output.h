@@ -17,24 +17,23 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
-
-struct GraphBuilder
+template<typename Name = string, typename Colour = string>
+struct Graph
 {
-  CSPInstance& csp;
-  set<pair<string, string> > graph;
-  // Matches colour to the vertices with that colour
-  map<string, set<string> > aux_vertex_colour;
-  map<string, set<string> > var_vertex_colour;
+  set<pair<Name, Name> > graph;
+  map<Name, set<Colour> > aux_vertex_colour;
+  map<Name, set<Colour> > var_vertex_colour;
   int free_vertices;
   
-  string new_vertex()
+  Graph() : free_vertices(0) { }
+    
+  Name new_vertex()
   {
     free_vertices++;
     return "F." + to_string(free_vertices);
   }
   
-  string new_vertex(string colour)
+  Name new_vertex(string colour)
   {
     free_vertices++;
     string s =  "F." + colour + "." + to_string(free_vertices);
@@ -43,121 +42,139 @@ struct GraphBuilder
   }
   
   void output_graph()
-  {
-    for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
-    it != var_vertex_colour.end();
-    ++it)
-    {
-      cout << it->first << " : ";
-      for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-        cout << *it2 << " ";
-      cout << endl;
-    }
+   {
+     for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
+     it != var_vertex_colour.end();
+     ++it)
+     {
+       cout << it->first << " : ";
+       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
+         cout << *it2 << " ";
+       cout << endl;
+     }
 
-    
-    for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
-    it != aux_vertex_colour.end();
-    ++it)
-    {
-      cout << it->first << " : ";
-      for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-        cout << *it2 << " ";
-      cout << endl;
-    }
-    
-    cout << endl;
-    
-    for(set<pair<string, string> >::iterator it = graph.begin();
-    it != graph.end();
-    ++it)
-    {
-      cout << it->first << ", " << it->second << endl;
-    }
-  }
+
+     for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
+     it != aux_vertex_colour.end();
+     ++it)
+     {
+       cout << it->first << " : ";
+       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
+         cout << *it2 << " ";
+       cout << endl;
+     }
+
+     cout << endl;
+
+     for(set<pair<string, string> >::iterator it = graph.begin();
+     it != graph.end();
+     ++it)
+     {
+       cout << it->first << ", " << it->second << endl;
+     }
+   }
+
+   void output_nauty_graph(CSPInstance& csp)
+   {
+
+     // Count from node 1, for GAP compatability,
+     cout << "$ 1" << endl;
+
+     map<string, int> v_num;
+
+     { // First count the number of vertices.
+       int vertex_count = 0;
+       for(map<string, set<string> >::iterator it = var_vertex_colour.begin(); it != var_vertex_colour.end(); ++it)
+         vertex_count += it->second.size();    
+        for(map<string, set<string> >::iterator it = aux_vertex_colour.begin(); it != aux_vertex_colour.end(); ++it)
+         vertex_count += it->second.size();
+       cout << "n = " << vertex_count << endl;
+     }
+
+     cout << "# varnames := [";
+     for(int i = 0; i < csp.sym_order.size(); ++i)
+     {
+       cout << "\"" << name(csp.sym_order[i], csp) << "\", ";
+       v_num[name(csp.sym_order[i], csp)] = i + 1;
+     }
+     cout << "];" << endl;
+
+     // Now output partitions
+     bool first_pass_bar = true;
+     cout << "f = [";
+     for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
+     it != var_vertex_colour.end();
+     ++it)
+     {
+       if(first_pass_bar) first_pass_bar = false; else cout << "|";
+       D_ASSERT(it->second.size() > 0);
+       bool first = true;
+       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
+       {
+         if(first) first=false; else cout << ",";
+         cout << v_num[*it2];
+       }
+     }
+
+     int vertex_counter = v_num.size() + 1;
+
+     cout << endl << "#VAREND " << vertex_counter - 1 << endl;
+
+     for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
+     it != aux_vertex_colour.end();
+     ++it)
+     {
+       int old_vertex_pos = vertex_counter;
+       D_ASSERT(it->second.size() > 0);
+       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
+         v_num[*it2] = vertex_counter++;
+       if(first_pass_bar) first_pass_bar = false; else cout << "|";  
+       cout << old_vertex_pos << ":" << vertex_counter - 1;
+     }
+     cout << "]" << endl;
+
+     cout << endl << "g" << endl;
+     for(set<pair<string, string> >::iterator it = graph.begin(); it != graph.end(); ++it)
+     {
+       //cout << it->first << ":" << it->second << endl;
+       D_ASSERT(v_num.count(it->first) == 1);
+       D_ASSERT(v_num.count(it->second) == 1);
+       int first_v = v_num[it->first];
+       int second_v = v_num[it->second];
+       D_ASSERT(first_v != 0 && second_v != 0 && first_v != second_v);
+       cout << first_v << ":" << second_v << " ";
+     }
+
+     cout << "." << endl;
+     cout << "x" << endl;    
+   }
+   
+   
+   string name(Var v, CSPInstance& csp)
+   { 
+     if(v.type() == VAR_CONSTANT)
+     {
+       string const_name = "CONSTANT_" + to_string(v.pos());
+       aux_vertex_colour[const_name].insert(const_name);
+       return const_name;
+     }
+     else
+       return csp.vars.getName(v); 
+   }
+};
+
+struct GraphBuilder
+{
+  CSPInstance& csp;
+  Graph<> g;  
+ 
   
-  void output_nauty_graph()
-  {
-    
-    // Count from node 1, for GAP compatability,
-    cout << "$ 1" << endl;
-    
-    map<string, int> v_num;
-    
-    { // First count the number of vertices.
-      int vertex_count = 0;
-      for(map<string, set<string> >::iterator it = var_vertex_colour.begin(); it != var_vertex_colour.end(); ++it)
-        vertex_count += it->second.size();    
-       for(map<string, set<string> >::iterator it = aux_vertex_colour.begin(); it != aux_vertex_colour.end(); ++it)
-        vertex_count += it->second.size();
-      cout << "n = " << vertex_count << endl;
-    }
-    
-    for(int i = 0; i < csp.sym_order.size(); ++i)
-    {
-      cout << "# " << name(csp.sym_order[i]) << " " << i + 1 << endl;
-      v_num[name(csp.sym_order[i])] = i + 1;
-    }
-    
-    // Now output partitions
-    bool first_pass_bar = true;
-    cout << "f = [";
-    for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
-    it != var_vertex_colour.end();
-    ++it)
-    {
-      if(first_pass_bar) first_pass_bar = false; else cout << "|";
-      D_ASSERT(it->second.size() > 0);
-      bool first = true;
-      for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-      {
-        if(first) first=false; else cout << ",";
-        cout << v_num[*it2];
-      }
-    }
-
-    int vertex_counter = v_num.size() + 1;
-
-    cout << endl << "#VAREND " << vertex_counter - 1 << endl;
-    for(map<string,int>::iterator it = v_num.begin(); it != v_num.end(); ++it)
-      cout << "#" << it->first << " " << it->second << endl;
-    
-    
-    for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
-    it != aux_vertex_colour.end();
-    ++it)
-    {
-      int old_vertex_pos = vertex_counter;
-      D_ASSERT(it->second.size() > 0);
-      for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-        v_num[*it2] = vertex_counter++;
-      if(first_pass_bar) first_pass_bar = false; else cout << "|";  
-      cout << old_vertex_pos << ":" << vertex_counter - 1;
-    }
-    cout << "]" << endl;
-        
-    cout << endl << "g" << endl;
-    for(set<pair<string, string> >::iterator it = graph.begin(); it != graph.end(); ++it)
-    {
-      //cout << it->first << ":" << it->second << endl;
-      D_ASSERT(v_num.count(it->first) == 1);
-      D_ASSERT(v_num.count(it->second) == 1);
-      int first_v = v_num[it->first];
-      int second_v = v_num[it->second];
-      D_ASSERT(first_v != 0 && second_v != 0 && first_v != second_v);
-      cout << first_v << ":" << second_v << " ";
-    }
-    
-    cout << "." << endl;
-    cout << "x" << endl;    
-  }
-  
-  GraphBuilder(CSPInstance& _csp) : csp(_csp), free_vertices(0)
+  GraphBuilder(CSPInstance& _csp) : csp(_csp)
   { 
     if(csp.sym_order.empty())
       D_FATAL_ERROR("Symmetry detection doesn't work with input formats 1 and 2. Upgrade!");
     csp.add_variable_names();
     build_graph(); 
-    
   }
   
   
@@ -174,7 +191,7 @@ struct GraphBuilder
     vector<Var> vars = csp.vars.get_all_vars();
     for(int i = 0; i < vars.size(); ++i)
     {
-      var_vertex_colour[to_string(csp.vars.get_domain(vars[i]))].insert(csp.vars.getName(vars[i]));
+      g.var_vertex_colour[to_string(csp.vars.get_domain(vars[i]))].insert(csp.vars.getName(vars[i]));
     }
   }
   
@@ -183,7 +200,7 @@ struct GraphBuilder
     if(v.type() == VAR_CONSTANT)
     {
       string const_name = "CONSTANT_" + to_string(v.pos());
-      aux_vertex_colour[const_name].insert(const_name);
+      g.aux_vertex_colour[const_name].insert(const_name);
       return const_name;
     }
     else
@@ -191,29 +208,29 @@ struct GraphBuilder
   }
   
   void add_edge(string s1, string s2)
-  { graph.insert(make_pair(s1, s2)); }
+  { g.graph.insert(make_pair(s1, s2)); }
   
   void add_edge(Var v1, string s2)
-  { graph.insert(make_pair(name(v1), s2)); }
+  { g.graph.insert(make_pair(name(v1), s2)); }
   
   void add_edge(string s1, Var v2)
-  { graph.insert(make_pair(s1, name(v2))); }
+  { g.graph.insert(make_pair(s1, name(v2))); }
   
   string colour_element(const ConstraintBlob& b, string name)
   {
-     string v = new_vertex(name + "_MASTER");
+     string v = g.new_vertex(name + "_MASTER");
      for(int i = 0; i < b.vars[0].size(); ++i)
      {
-       string t = new_vertex(name + "_CHILD_" + to_string(i));
+       string t = g.new_vertex(name + "_CHILD_" + to_string(i));
        add_edge(v,t);
        add_edge(t, b.vars[0][i]);
      }
      
-     string v_index = new_vertex(name + "_INDEX");
+     string v_index = g.new_vertex(name + "_INDEX");
      add_edge(v, v_index);
      add_edge(v_index, b.vars[1][0]);
      
-     string v_result = new_vertex(name + "_RESULT");
+     string v_result = g.new_vertex(name + "_RESULT");
      add_edge(v, v_result);
      add_edge(v_result, b.vars[2][0]);
      
@@ -223,7 +240,7 @@ struct GraphBuilder
   // A constraint where each array is independantly symmetric
   string colour_symmetric_constraint(const ConstraintBlob& b, string name)
   {
-    string v = new_vertex(name + "_MASTER");  
+    string v = g.new_vertex(name + "_MASTER");  
     
     // Connect these directly to root, because there is likely to be most of them.
     for(int i = 0; i < b.vars[0].size(); ++i)
@@ -231,7 +248,7 @@ struct GraphBuilder
       
     for(int i = 1; i < b.vars.size(); ++i)
     {
-      string nv = new_vertex(name + "_CHILD" + to_string(i));
+      string nv = g.new_vertex(name + "_CHILD" + to_string(i));
       add_edge(v, nv);
       for(int j = 0; j < b.vars[i].size(); ++j)
         add_edge(nv, b.vars[i][j]);
@@ -242,7 +259,7 @@ struct GraphBuilder
   
   string colour_eq(const ConstraintBlob& b, string name)
   {
-    string v = new_vertex(name + "_MASTER");
+    string v = g.new_vertex(name + "_MASTER");
     add_edge(v, b.vars[0][0]);
     add_edge(v, b.vars[1][0]);
     return v;
@@ -250,12 +267,12 @@ struct GraphBuilder
   
   string colour_no_symmetry(const ConstraintBlob& b, string name)
   {
-    string v = new_vertex(name + "_MASTER");
+    string v = g.new_vertex(name + "_MASTER");
     
     for(int i = 0; i < b.vars.size(); ++i)
       for(int j = 0; j < b.vars[i].size(); ++j)
       {
-        string vij = new_vertex(name + "_CHILD_" + to_string(i) + ";" + to_string(j));
+        string vij = g.new_vertex(name + "_CHILD_" + to_string(i) + ";" + to_string(j));
         add_edge(v, vij);
         add_edge(vij, b.vars[i][j]);
       }
@@ -271,12 +288,12 @@ struct GraphBuilder
   {
     D_ASSERT(b.vars[0].size() == b.vars[1].size());
     
-    string v = new_vertex(name + "_MASTER");
+    string v = g.new_vertex(name + "_MASTER");
     
     // Force each array to stay together.
     for(int i = 0; i < 2; ++i)
     {
-      string vi = new_vertex(name + "_ARRAY_STAY_TOGETHER");
+      string vi = g.new_vertex(name + "_ARRAY_STAY_TOGETHER");
       add_edge(v, vi);
       for(int j = 0; j < b.vars[i].size(); ++j)
         add_edge(vi, b.vars[i][j]);
@@ -284,7 +301,7 @@ struct GraphBuilder
     
     for(int i = 0; i < b.vars[0].size(); ++i)
     {
-      string vi = new_vertex(name + "_INDEX");
+      string vi = g.new_vertex(name + "_INDEX");
       add_edge(v, vi);
       add_edge(vi, b.vars[0][i]);
       add_edge(vi, b.vars[1][i]);
@@ -293,7 +310,7 @@ struct GraphBuilder
     for(int i = 2; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
-      string vi = new_vertex(name + "_POS_" + to_string(i));
+      string vi = g.new_vertex(name + "_POS_" + to_string(i));
       add_edge(v, vi);
     }
     
@@ -305,13 +322,13 @@ struct GraphBuilder
   {
     D_ASSERT(b.vars[0].size() == b.vars[1].size());
 
-    string v = new_vertex(name + "_MASTER");
+    string v = g.new_vertex(name + "_MASTER");
     
     for(int i = 0; i < b.vars[0].size(); ++i)
     {
-      string vm = new_vertex(name + "_INDEX");
-      string v1 = new_vertex(name + "_ARRAY1");
-      string v2 = new_vertex(name + "_ARRAY2");
+      string vm = g.new_vertex(name + "_INDEX");
+      string v1 = g.new_vertex(name + "_ARRAY1");
+      string v2 = g.new_vertex(name + "_ARRAY2");
       
       add_edge(v,vm);
       add_edge(vm,v1);
@@ -323,7 +340,7 @@ struct GraphBuilder
     for(int i = 2; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
-      string vi = new_vertex(name + "_POS_" + to_string(i));
+      string vi = g.new_vertex(name + "_POS_" + to_string(i));
       add_edge(v, vi);
     }
     
@@ -335,13 +352,13 @@ struct GraphBuilder
   {
     D_ASSERT(b.vars[0].size() == b.constants[0].size());
 
-    string v = new_vertex(name + "_MASTER");
+    string v = g.new_vertex(name + "_MASTER");
     
     for(int i = 0; i < b.vars[0].size(); ++i)
     {
-      string vm = new_vertex(name + "_INDEX");
-      string v1 = new_vertex(name + "_ARRAY1");
-      string v2 = new_vertex(name + "_ARRAY2");
+      string vm = g.new_vertex(name + "_INDEX");
+      string v1 = g.new_vertex(name + "_ARRAY1");
+      string v2 = g.new_vertex(name + "_ARRAY2");
       
       add_edge(v,vm);
       add_edge(vm,v1);
@@ -353,7 +370,7 @@ struct GraphBuilder
     for(int i = 1; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
-      string vi = new_vertex(name + "_POS_" + to_string(i));
+      string vi = g.new_vertex(name + "_POS_" + to_string(i));
       add_edge(v, vi);
     }
     
