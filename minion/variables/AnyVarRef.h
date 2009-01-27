@@ -63,7 +63,8 @@ Use of a constant vector:
 Vectors, matrices and tensors can be declared in minion
 input. Matrices and tensors are for convenience, as constraints do not
 take these as input; they must first undergo a flattening process to
-convert them to a vector before use.
+convert them to a vector before use. Additional commas at the end of 
+vectors are ignored (see example below).
 */
 
 /** @help variables;vectors Examples
@@ -111,6 +112,19 @@ alldiff([sudoku[4,_]])
 is equivalent to
 
 alldiff(sudoku[4,_])
+*/
+
+/** @help variables;vectors Example
+Additional hanging commas at the end of array are ignored, e.g.
+
+lexleq([A,B,C,],[D,E,F,])
+
+is equivalent to 
+
+lexleq([A,B,C],[D,E,F])
+
+This feature is provided to make it easier to computer-generate input
+files.
 */
 
 /** @help variables;alias Description
