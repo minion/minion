@@ -752,10 +752,13 @@ public:
       cerr << "# This instance was format MINION 1 or 2, so filling in variable names" << endl;
       // This was a MINION 1 or MINION 2 input file. Let's fix it!
       vector<Var> all_vars = vars.get_all_vars();
-
+      
       for(int i = 0; i < all_vars.size(); ++i)
         vars.addSymbol("x" + to_string(i), all_vars[i]);  
     }
+    
+    if(sym_order.empty())
+      sym_order = vars.get_all_vars();
   }
 };
 

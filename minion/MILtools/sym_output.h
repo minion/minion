@@ -171,9 +171,10 @@ struct GraphBuilder
   
   GraphBuilder(CSPInstance& _csp) : csp(_csp)
   { 
+    csp.add_variable_names();
     if(csp.sym_order.empty())
       D_FATAL_ERROR("Symmetry detection doesn't work with input formats 1 and 2. Upgrade!");
-    csp.add_variable_names();
+    
     build_graph(); 
   }
   
