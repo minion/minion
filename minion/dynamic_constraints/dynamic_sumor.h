@@ -60,7 +60,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   vector<int> unwatched_values;
 
   Reversible<bool> propagate_mode;
-  int index_to_not_propagate; 
 
   VecCountDynamic(StateObj* _stateObj, const VarArray1& _array1, const VarArray2& _array2, int _hamming_distance) :
   AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_hamming_distance + 1), hamming_distance(_hamming_distance),
@@ -123,7 +122,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     if(found_matches == num_to_watch - 1)
     {
       propagate_mode = true;
-      index_to_not_propagate = num_to_watch - 1;
       for(int i = 0; i < num_to_watch - 1; ++i)
       {
         propagate_from_var1(watched_values[i]);
@@ -187,10 +185,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
 */    
     if(propagate_mode)
     {
-      // If this is true, the other index got assigned.
-      if(index_to_not_propagate == watched_values[triggerpair])
-        return;
-        
     // assumes that the first set of Operator::dynamic_trigger_count()/2 triggers are on var1, and the other set are on var2.
       if(trigger_activated % Operator::dynamic_trigger_count() < Operator::dynamic_trigger_count()/2)
       { propagate_from_var1(watched_values[triggerpair]); }
@@ -212,7 +206,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     {
       // This is the only possible non-equal index.
       propagate_mode = true;
-      index_to_not_propagate = watched_values[triggerpair];
       
 //     printf("!propmode=%d, triggerpair=%d, trigger_activated=%d, nopropindex=%d\n",
 //        (int)propagate_mode, (int)triggerpair, (int)trigger_activated, (int)index_to_not_propagate);
@@ -241,7 +234,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     for(int i = 0; i < v_size1; ++i)
       if(Operator::check_assignment(v[i], v[i + v_size1]))
         count++;
-    return (count >= (num_to_watch - 1));
+    return (count >= hamming_distance);
   }
 
   virtual vector<AnyVarRef> get_vars()
@@ -272,7 +265,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
         D_ASSERT(Operator::check_assignment(assign.first, assign.second));
         assignment.push_back(make_pair(i, assign.first));
         assignment.push_back(make_pair(i + var_array1.size(), assign.second));
-        if(found_satisfying == num_to_watch - 1)
+        if(found_satisfying == hamming_distance)
           return true;
       }
     }
