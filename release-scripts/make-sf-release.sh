@@ -33,8 +33,6 @@ if [ $# -ge 4 ]; then
             --numtests=100 --minion=bin/minion-debug) || exit "Failed in testallconstraints.py"
 fi
 
-make api-doc || exit "Unable to generate API documentation"
-
 # save the parameters
 echo $@ > RELEASE_PARAMS
 
