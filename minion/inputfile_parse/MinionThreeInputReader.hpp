@@ -760,17 +760,33 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
 
   if(var.type() == VAR_MATRIX)
   {
-    if(negVar)
-      throw parse_exception("Sorry, can't negate a matrix");
     vector<int> params;
     if(infile->peek_char() == '[')
+    {
       params = readConstantVector(infile,'[',']',true);
+      returnVec = instance.vars.buildVarList(name, params);
+      if(negVar)
+      {
+          if(returnVec.size()!=1)
+          {
+              throw parse_exception("Sorry, can't negate a matrix");
+          }
+          if(returnVec[0].type()!=VAR_BOOL)
+          {
+              throw parse_exception("Sorry, can't negate a non-Boolean variable");
+          }
+          returnVec[0].setType(VAR_NOTBOOL);
+      }
+    }
     else
       { // build a vector of all 'nulls'
+      if(negVar)
+        throw parse_exception("Sorry, can't negate a matrix");
+    
       vector<int> maxterms = instance.vars.getMatrixSymbol(name);
     params = vector<int>(maxterms.size(), -999);
+    returnVec = instance.vars.buildVarList(name, params);
   }
-  returnVec = instance.vars.buildVarList(name, params);
   parser_info("Got matrix:" + to_string(returnVec));
 }
 else
