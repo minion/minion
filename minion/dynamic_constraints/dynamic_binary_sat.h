@@ -97,13 +97,13 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
   {
     if(var1.getMax() > 0)
     {
-      assignment.push_back(make_pair(1, var1.getMax()));
+      assignment.push_back(make_pair(0, var1.getMax()));
       return true;
     }
     
     if(var2.getMax() > 0)
     {
-      assignment.push_back(make_pair(2, var2.getMax()));
+      assignment.push_back(make_pair(1, var2.getMax()));
       return true;
     }
     return false;

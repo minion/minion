@@ -661,7 +661,7 @@ class testeq:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("eq", True, options, [1,1], ["num", "num"], self, False)
+        return runtestgeneral("eq", True, options, [1,1], ["num", "num"], self, True)
 
 class testwatchneq:
     # printtable essentially sets up pairsame constraint. negation of alldiff.
@@ -900,14 +900,31 @@ class testsumgeq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("sumgeq", True, options, [5,1], ["smallnum", "num"], self, False)
+        return runtestgeneral("sumgeq", True, options, [5,1], ["smallnum", "num"], self, True)
+
+class testsumgeq_const:
+    def printtable(self, domains, less=False, weights=[1,1,1,1,1,1,1,1]):
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            sumval=0
+            for i in zip(l, weights):
+                sumval+=product(i)
+            
+            if (not less and sumval>=self.constants[0]) or (less and sumval<=self.constants[0]):
+                out.append(l)
+        return out
     
+    def runtest(self, options=dict()):
+        return runtestgeneral("sumgeq", True, options, [5,1], ["boolean", "const"], self, True) # same as class above but with a const.
+
 class testsumleq(testsumgeq):
     def printtable(self, domains):
         return testsumgeq.printtable(self, domains, less=True)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("sumleq", True, options, [5,1], ["smallnum", "num"], self, False)
+        return runtestgeneral("sumleq", True, options, [5,1], ["smallnum", "num"], self, True)
 
 class testdiv:
     def printtable(self, domains):
@@ -927,14 +944,14 @@ class testweightedsumgeq(testsumgeq):
         return testsumgeq.printtable(self, domains, weights=self.constants)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("weightedsumgeq", True, options, [5,5,1], ["const", "smallnum", "num"], self, False)
+        return runtestgeneral("weightedsumgeq", True, options, [5,5,1], ["const", "smallnum", "num"], self, True)
         
 class testweightedsumleq(testsumgeq):
     def printtable(self, domains):
         return testsumgeq.printtable(self, domains, less=True, weights=self.constants)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("weightedsumleq", True, options, [5,5,1], ["const", "smallnum", "num"], self, False)
+        return runtestgeneral("weightedsumleq", True, options, [5,5,1], ["const", "smallnum", "num"], self, True)
 
 class testminuseq:
     def printtable(self, domains):

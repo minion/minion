@@ -775,7 +775,8 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
           {
               throw parse_exception("Sorry, can't negate a non-Boolean variable");
           }
-          returnVec[0].setType(VAR_NOTBOOL);
+          returnVec[0].setType(VAR_NOTBOOL); 
+          // The clever thing to do would be to change type of all of returnVec at the end of the function, if necessary. 
       }
     }
     else
