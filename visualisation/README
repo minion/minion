@@ -20,8 +20,8 @@ runghc Setup.hs configure
 runghc Setup.hs build
 or compile it manually if you prefer.
 
-The commandline parameter is the number of columns to display, the second one is
-the number of rows.
+The first commandline parameter is the number of columns to display, the second
+one is the number of rows.
 
 After you've started the program, you can select an input file by clicking the
 open file icon. It expects to read the output of "minion -dumptree
