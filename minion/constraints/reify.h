@@ -77,7 +77,7 @@ more information.
 #define P(x)
 
 #define NEWREIFY
-#define NODETRICK
+//#define NODETRICK   // This is broken! leave switched off.
 
 #ifdef NEWREIFY
 
