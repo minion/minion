@@ -20,6 +20,8 @@
 #ifndef CONSTRAINT_DYNAMIC_NEQ_H
 #define CONSTRAINT_DYNAMIC_NEQ_H
 
+#include "../constraints/constraint_equal.h"
+
 template<typename Var1, typename Var2>
 struct WatchNeqConstraint : public AbstractConstraint
 {
@@ -120,6 +122,9 @@ struct WatchNeqConstraint : public AbstractConstraint
     }
     return true;
   }
+
+  virtual AbstractConstraint* reverse_constraint()
+  { return new EqualConstraint<Var1,Var2>(stateObj, var1, var2); }
 };
 
 template<typename VarArray1, typename VarArray2>

@@ -21,7 +21,7 @@
 #define CONSTRAINT_DYNAMIC_LESS_H
 
 // var1 < var2
-template<typename Var1, typename Var2>
+template<typename Var1, typename Var2, bool Negated=false>
 struct WatchLessConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
@@ -91,6 +91,16 @@ struct WatchLessConstraint : public AbstractConstraint
     }
     return false;
   }
+
+  template<bool b>
+  typename enable_if_c<b, AbstractConstraint*>::type rev_implement()
+  { return new WatchLessConstraint<Var2,ShiftVar<Var1,DomainInt>,true>(stateObj, var2, ShiftVar<Var1,DomainInt>(var1, 1)); }
+
+  template<bool b>
+  typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
+  { FAIL_EXIT(); } //cannot reverse a reversed constraint
+
+  virtual AbstractConstraint* reverse_constraint() { return rev_implement<Negated>(); }
 };
 
 template<typename VarArray1, typename VarArray2>
