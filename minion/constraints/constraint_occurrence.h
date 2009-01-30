@@ -30,10 +30,6 @@ vector vec.
 elem must be a constant, not a variable.
 */
 
-/** @help constraints;occurrence Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 /** @help constraints;occurrence References
 help constraints occurrenceleq
 help constraints occurrencegeq
@@ -52,10 +48,6 @@ the vector vec.
 elem and count must be constants
 */
 
-/** @help constraints;occurrenceleq Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 /** @help constraints;occurrenceleq References
 help constraints occurrence
 help constraints occurrencegeq
@@ -72,10 +64,6 @@ the vector vec.
 
 /** @help constraints;occurrencegeq Notes
 elem and count must be constants
-*/
-
-/** @help constraints;occurrencegeq Reifiability
-This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;occurrencegeq References

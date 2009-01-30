@@ -53,10 +53,6 @@ definition, e.g.:
 table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})
 */
 
-/** @help constraints;table Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 /** @help constraints;table References
 help input tuplelist
 */

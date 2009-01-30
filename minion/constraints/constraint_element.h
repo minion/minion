@@ -40,10 +40,6 @@ specifies that, in any solution, vec[i] = e and i is in the range
 [0 .. |vec|-1].
 */
 
-/** @help constraints;element Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 /** @help constraints;element Notes 
 
 Warning: This constraint is not confluent. Depending on the order the

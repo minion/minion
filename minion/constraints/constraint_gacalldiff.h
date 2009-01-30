@@ -32,10 +32,6 @@ following constraint:
 gacalldiff(myVec)
 */
 
-/** @help constraints;gacalldiff Reifiability
-This constraint is reifiable and reifyimply'able.
-*/
-
 /** @help constraints;gacalldiff Notes
 This constraint enforces generalized arc consistency.
 */

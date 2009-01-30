@@ -31,10 +31,6 @@ requiring an extra variable, and also gets better propagation. It gets bounds
 consistency.
 */
 
-/** @help constraints;difference Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 #ifndef CONSTRAINT_DIFFERENCE_H
 #define CONSTRAINT_DIFFERENCE_H
 

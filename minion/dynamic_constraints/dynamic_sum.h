@@ -35,8 +35,8 @@
   This constraint works on 0/1 variables only.
 */
 
-/** @help constraints;watchsumgeq Reifiablity
-  This constraint is reifyimply'able but not reifiable.
+/** @help constraints;watchsumgeq Reifiability
+  This constraint is reifiable.
 */
 
 /** @help constraints;watchsumgeq References
@@ -56,10 +56,6 @@
   This constraint works on binary variables only.
 
   For this constraint, large values of c are more efficient.
-*/
-
-/** @help constraints;watchsumleq Reifiability
-  This constraint is reifyimply'able but not reifiable.
 */
 
 /** @help constraints;watchsumleq References

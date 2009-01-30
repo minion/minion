@@ -43,10 +43,6 @@ vector.
 gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)
 */
 
-/** @help constraints;gcc Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 /** @help constraints;gcc Notes 
 This constraint enforces a hybrid consistency. It reads the bounds of the
 capacity variables, then enforces GAC over the primary variables only.  Then the

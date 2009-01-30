@@ -36,10 +36,6 @@ achieved by
    ineq(x, y, -1)
 */
 
-/** @help constraints;ineq Reifiability
-This constraint is reifiable and reifyimply'able.
-*/
-
 #ifndef CONSTRAINT_LESS_H
 #define CONSTRAINT_LESS_H
 

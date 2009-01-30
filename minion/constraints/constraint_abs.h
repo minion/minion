@@ -25,10 +25,6 @@ The constraint
 makes sure that x=|y|, i.e. x is the absolute value of y.
 */
 
-/** @help constraints;abs Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 /** @help constraints;abs Reference
 help constraints abs
 */

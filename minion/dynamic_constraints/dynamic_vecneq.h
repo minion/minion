@@ -32,10 +32,6 @@ ensures that A and B are not the same vector, i.e., there exists some index i
 such that A[i] != B[i].
 */
 
-/** @help constraints;watchvecneq Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 #ifndef _DYNAMIC_VECNEQ_H
 #define _DYNAMIC_VECNEQ_H
 

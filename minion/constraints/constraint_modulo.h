@@ -29,10 +29,6 @@ ensures that x%y=z i.e. z is the remainder of dividing x by y.
 This constraint is only available for positive domains x, y and z.
 */
 
-/** @help constraints;modulo Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 /** @help constraints;modulo References
 help constraints div
 */

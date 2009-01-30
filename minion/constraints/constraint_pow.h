@@ -29,10 +29,6 @@ ensures that x^y=z.
 This constraint is only available for positive domains x, y and z.
 */
 
-/** @help constraints;pow Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 #ifndef CONSTRAINT_POW_H
 #define CONSTRAINT_POW_H
 

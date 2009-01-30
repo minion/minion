@@ -30,10 +30,6 @@ vec0 is lexicographically less than vec1 in any solution.
 This constraint maintains GAC.
 */
 
-/** @help constraints;lexless Reifiability
-This constraint is reifiable and reifyimply'able.
-*/
-
 /** @help constraints;lexless References
 See also
 
@@ -53,10 +49,6 @@ vec0 is lexicographically less than or equal to vec1 in any solution.
 
 /** @help constraints;lexleq Notes
 This constraints achieves GAC.
-*/
-
-/** @help constraints;lexleq Reifiability
-This constraint is reifiable and reifyimply'able.
 */
 
 /** @help constraints;lexleq References

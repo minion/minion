@@ -38,10 +38,6 @@ Enforces the same level of consistency as a clique of not equals
 constraints.
 */
 
-/** @help constraints;alldiff Reifiability
-This constraint is reifiable and reifyimply'able.
-*/
-
 /** @help constraints;alldiff References
 See
 

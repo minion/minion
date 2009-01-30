@@ -29,10 +29,6 @@ ensures that floor(x/y)=z.
 This constraint is only available for positive domains x, y and z.
 */
 
-/** @help constraints;div Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 /** @help constraints;div References
 help constraints modulo
 */

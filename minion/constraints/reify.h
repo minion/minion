@@ -45,9 +45,11 @@ by propagation, only by search; that is, satisfaction of constraint does not
 affect the value of r.
 */
 
-/** @help constraints;reification Notes
-Not all constraints are reifiable. Entries for individual constraints give
-more information.
+/** @help constraints;reification Notes 
+ALMOST ALL constraints are are reifiable. Individual constraint entries mention
+if the constraint is NOT reifiable.
+
+ALL constraints are reifyimplyable.
 */
 
 

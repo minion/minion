@@ -36,10 +36,6 @@ The general constraint achieves bounds generalised arc consistency for
 positive numbers.
 */
 
-/** @help constraints;product Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 #ifndef CONSTRAINT_PRODUCT_H
 #define CONSTRAINT_PRODUCT_H
 

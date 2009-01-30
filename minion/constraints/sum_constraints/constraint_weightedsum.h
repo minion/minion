@@ -26,10 +26,6 @@ ensures that constantVec.varVec <= total, where constantVec.varVec is
 the scalar dot product of constantVec and varVec.
 */
 
-/** @help constraints;weightedsumleq Reifiability
-This constraint is reifiable and reifyimply'able.
-*/
-
 /** @help constraints;weightedsumleq References
 help constraints weightedsumgeq
 help constraints sumleq
@@ -43,10 +39,6 @@ The constraint
 
 ensures that constantVec.varVec >= total, where constantVec.varVec is
 the scalar dot product of constantVec and varVec.
-*/
-
-/** @help constraints;weightedsumgeq Reifiability
-This constraint is reifiable and reifyimply'able.
 */
 
 /** @help constraints;weightedsumgeq References

@@ -39,10 +39,6 @@ specifies that, in any solution, vec[i] = e and i is in the range
 [0 .. |vec|-1].
 */
 
-/** @help constraints;watchelement Reifiability
-This constraint is reifyimply'able but not reifiable.
-*/
-
 /** @help constraints;watchelement Notes
 Enforces generalised arc consistency.
 */
