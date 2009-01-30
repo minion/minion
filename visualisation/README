@@ -49,5 +49,9 @@ MinionVisualiser.hs --
 "delay" is the delay between displaying the domains at a search node and moving
         on to the next node in microseconds.
 
+The standard display should work properly for variables with domains of
+single-digit integers. If your domains are larger than that, you will have to
+increase colWidth.
+
 
 For any questions or suggestions email larsko@cs.st-andrews.ac.uk.
