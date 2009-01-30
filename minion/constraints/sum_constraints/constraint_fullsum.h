@@ -233,57 +233,33 @@ struct LessEqualSumConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> array_copy(var_array.size() + 1);
-	for(unsigned i = 0; i < var_array.size(); ++i)
-	  array_copy[i] = var_array[i];
-	array_copy[var_array.size()] = var_sum;
-	return array_copy;
+    for(unsigned i = 0; i < var_array.size(); ++i)
+      array_copy[i] = var_array[i];
+    array_copy[var_array.size()] = var_sum;
+    return array_copy;
   }
 
-
-  // All the code below here is to get around an annoying problem in C++. Basically we want to say that the
-  // reverse of a <= is a >= constraint. However, when compiling C++ keeps getting the reverse of the reverse of..
-  // and doesn't figure out it is looping. This code ensures we only go once around the loop.
   virtual AbstractConstraint* reverse_constraint()
-  { return reverse_constraint_helper<is_reversed,int>::fun(stateObj, *this); }
+  { return rev_implement<is_reversed>(); }
 
-// BUGFIX: The following two class definitions have a 'T=int' just to get around a really stupid parsing bug
-// in g++ 4.0.x. Hopefully eventually we'll be able to get rid of it.
-
-/// These classes are just here to avoid infinite recursion when calculating the reverse of the reverse
-/// of a constraint.
-  template<BOOL reversed, typename T>
-	struct reverse_constraint_helper	
+ template<bool b> 
+  typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
   {
-    static AbstractConstraint* fun(StateObj* stateObj, LessEqualSumConstraint& con)
-    {
-	  typename NegType<VarArray>::type new_var_array(con.var_array.size());
-	  for(unsigned i = 0; i < con.var_array.size(); ++i)
-		new_var_array[i] = VarNegRef(con.var_array[i]);
-	  
-	  typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<-1> >::type SumType;
-	  SumType new_sum = ShiftVarRef( VarNegRef(con.var_sum), compiletime_val<-1>());
-	  
-	  return new LessEqualSumConstraint<typename NegType<VarArray>::type, SumType, true>
-		(stateObj, new_var_array, new_sum);	
-    }
-  };
+    typename NegType<VarArray>::type new_var_array(var_array.size());
+    for(unsigned i = 0; i < var_array.size(); ++i)
+      new_var_array[i] = VarNegRef(var_array[i]);
+
+    typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<-1> >::type SumType;
+    SumType new_sum = ShiftVarRef( VarNegRef(var_sum), compiletime_val<-1>());
+
+    return new LessEqualSumConstraint<typename NegType<VarArray>::type, SumType, true>
+      (stateObj, new_var_array, new_sum);	
+  }
+
+  template<bool b>
+  typename enable_if_c<b, AbstractConstraint*>::type rev_implement()
+    { FAIL_EXIT(); }
+    
+  };  
   
-  template<typename T>
-	struct reverse_constraint_helper<true, T>
-  {
-    static AbstractConstraint* fun(StateObj*, LessEqualSumConstraint&)
-    { 
-	  // This should never be reached, unless we try reversing an already reversed constraint.
-	  // We have this code here as the above case makes templates, which if left would keep instansiating
-	  // recursively and without bound.
-	  FAIL_EXIT();
-    }
-  };
-  
-};
-
-
-
-
-
 #endif

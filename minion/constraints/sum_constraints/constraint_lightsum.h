@@ -144,44 +144,28 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
     return array_copy;
   }
 
- virtual AbstractConstraint* reverse_constraint()
-  { return reverse_constraint_helper<is_reversed,int>::fun(stateObj, *this); }
+  virtual AbstractConstraint* reverse_constraint()
+  { return rev_implement<is_reversed>(); }
 
-// BUGFIX: The following two class definitions have a 'T=int' just to get around a really stupid parsing bug
-// in g++ 4.0.x. Hopefully eventually we'll be able to get rid of it.
-
-/// These classes are just here to avoid infinite recursion when calculating the reverse of the reverse
-/// of a constraint.
-  template<BOOL reversed, typename T>
-    struct reverse_constraint_helper    
+ template<bool b> 
+  typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
   {
-    static AbstractConstraint* fun(StateObj* stateObj,LightLessEqualSumConstraint& con)
-    {
-      typedef array<typename NegType<VarRef>::type, size> VarArray;
+     typedef array<typename NegType<VarRef>::type, size> VarArray;
       VarArray new_var_array;
-      for(unsigned i = 0; i < con.var_array.size(); ++i)
-        new_var_array[i] = VarNegRef(con.var_array[i]);
+      for(unsigned i = 0; i < var_array.size(); ++i)
+        new_var_array[i] = VarNegRef(var_array[i]);
       
       typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<-1> >::type SumType;
-      SumType new_sum = ShiftVarRef(VarNegRef(con.var_sum), compiletime_val<-1>());
+      SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<-1>());
       
       return new LightLessEqualSumConstraint<typename NegType<VarRef>::type, size, SumType, true>
-        (stateObj, new_var_array, new_sum);   
-    }
-  };
-  
-  template<typename T>
-    struct reverse_constraint_helper<true, T>
-  {
-    static AbstractConstraint* fun(StateObj*, LightLessEqualSumConstraint&)
-    { 
-      // This should never be reached, unless we try reversing an already reversed constraint.
-      // We have this code here as the above case makes templates, which if left would keep instansiating
-      // recursively and without bound.
-      FAIL_EXIT();
-    }
-  };
-  
+        (stateObj, new_var_array, new_sum);
+  }
+
+  template<bool b>
+  typename enable_if_c<b, AbstractConstraint*>::type rev_implement()
+    { FAIL_EXIT(); }
+
 };
 
 template<typename VarRef, std::size_t size, typename VarSum>

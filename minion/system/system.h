@@ -86,6 +86,8 @@
 
 using boost::bind;
 using boost::function;
+using boost::enable_if_c;
+using boost::disable_if_c;
 
 #ifdef USE_BOOST
 

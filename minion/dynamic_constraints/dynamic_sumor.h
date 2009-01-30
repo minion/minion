@@ -269,38 +269,21 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     return false;
   }
   
-  // All the code below here is to get around an annoying problem in C++. Basically we want to say that the
-  // reverse of a <= is a >= constraint. However, when compiling C++ keeps getting the reverse of the reverse of..
-  // and doesn't figure out it is looping. This code ensures we only go once around the loop.
   virtual AbstractConstraint* reverse_constraint()
-  { return reverse_constraint_helper<is_reversed,typename Operator::reverse_operator>::fun(stateObj, var_array1, var_array2, hamming_distance); }
+   { return rev_implement<is_reversed>(); }
 
-// BUGFIX: The following two class definitions have a 'T=int' just to get around a really stupid parsing bug
-// in g++ 4.0.x. Hopefully eventually we'll be able to get rid of it.
+  template<bool b> 
+   typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
+   {
+     return new VecCountDynamic<VarArray1, VarArray2, typename Operator::reverse_operator, true>
+         (stateObj, var_array1, var_array2, var_array1.size()-hamming_distance+1);	
+   }
 
-/// These classes are just here to avoid infinite recursion when calculating the reverse of the reverse
-/// of a constraint.
-  template<BOOL reversed, typename T>
-	struct reverse_constraint_helper	
-  {
-      static AbstractConstraint* fun(StateObj* stateObj, VarArray1 var_array1, VarArray2 var_array2, int hamming_distance)
-    {
-	  return new VecCountDynamic<VarArray1, VarArray2, T, true>
-        (stateObj, var_array1, var_array2, var_array1.size()-hamming_distance+1);
-    }
-  };
+   template<bool b>
+   typename enable_if_c<b, AbstractConstraint*>::type rev_implement()
+     { FAIL_EXIT(); }
   
-  template<typename T>
-	struct reverse_constraint_helper<true, T>
-  {
-    static AbstractConstraint* fun(StateObj*, VarArray1 var_array1, VarArray2 var_array2, int hamming_distance)
-    { 
-	  // This should never be reached, unless we try reversing an already reversed constraint.
-	  // We have this code here as the above case makes templates, which if left would keep instansiating
-	  // recursively and without bound.
-	  FAIL_EXIT();
-    }
-  };
+  
   
 };
 
