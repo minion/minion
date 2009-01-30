@@ -254,6 +254,13 @@ if(PROFILE)
 endif()
 
 option(UNOPTIMISED "" OFF)
+option(COVERAGE "" OFF)
+if(COVERAGE)
+  set(CFLAGS "${CFLAGS} -ftest-coverage -fprofile-arcs")
+  set(BINARY "${BINARY}-coverage")
+  set(UNOPTIMISED TRUE)
+endif()
+
 if(UNOPTIMISED)
     message(STATUS "Building unoptimised binary")
     set(BINARY "${BINARY}-unoptimised")
