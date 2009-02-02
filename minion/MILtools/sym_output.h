@@ -152,11 +152,6 @@ struct Graph
      
 #ifdef USE_NAUTY
      vector<vector<int> > perms = build_graph(edges, partitions);
-#else
-     cerr << "Need to compile Minion with nauty included!" << endl;
-     exit(1);
-#endif
-
      cout << "generators := [()" << endl;  
      for(int i = 0; i < perms.size(); ++i)
      {
@@ -177,7 +172,10 @@ struct Graph
        cout << "])" << endl;
      }
      cout << "];" << endl;
-     
+#else
+     cerr << "Need to compile Minion with nauty included!" << endl;
+     exit(1);
+#endif     
    }
    
    
