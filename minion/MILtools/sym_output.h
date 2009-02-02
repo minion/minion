@@ -146,6 +146,8 @@ struct Graph
      }
 
      cout << "." << endl;
+     // Use a slightly better branching heuristic
+     cout << "*=1" << endl;
      cout << "x" << endl;    
    }
    
@@ -353,6 +355,7 @@ struct GraphBuilder
   {
     D_ASSERT(b.vars[0].size() == b.constants[0].size());
 
+
     string v = g.new_vertex(name + "_MASTER");
     
     for(int i = 0; i < b.vars[0].size(); ++i)
@@ -373,7 +376,25 @@ struct GraphBuilder
       D_ASSERT(b.vars[i].size() == 1);
       string vi = g.new_vertex(name + "_POS_" + to_string(i));
       add_edge(v, vi);
-    }
+    }  
+    return v;
+  }
+  
+  string colour_reify(const ConstraintBlob& b, string name)
+  {
+    D_ASSERT(b.vars.size() == 1 && b.vars[0].size() == 1);
+    D_ASSERT(b.internal_constraints.size() == 1);
+        
+    string v = g.new_vertex(name + "_HEAD");
+    
+    string reify_var = g.new_vertex(name + "_REIFYVAR");
+    
+    add_edge(v, reify_var);
+    add_edge(reify_var, b.vars[0][0]);
+    
+    string child_con = colour_constraint(b.internal_constraints[0]);
+    
+    add_edge(v, child_con);
     
     return v;
   }
@@ -382,6 +403,15 @@ struct GraphBuilder
   {
     switch(b.constraint->type)
     {
+#ifdef CT_REIFY_ABC
+      case CT_REIFY: return colour_reify(b, "REIFY");
+#endif
+#ifdef CT_REIFYIMPLY_ABC
+      case CT_REIFYIMPLY: return colour_reify(b, "REIFYIMPLY");
+#endif
+#ifdef CT_REIFYIMPLY_QUICK_ABC
+      case CT_REIFYIMPLY_QUICK: return colour_reify(b, "REIFYIMPLY_QUICK");
+#endif
 #ifdef CT_ELEMENT_ABC
       case CT_ELEMENT: return colour_element(b, "ELEMENT");
 #endif
