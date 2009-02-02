@@ -17,6 +17,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+std::vector<std::vector<int> > 
+build_graph(std::vector<std::set<int> > graph, const std::vector<std::set<int> >& partition);
+
 template<typename Name = string, typename Colour = string>
 struct Graph
 {
@@ -77,21 +80,16 @@ struct Graph
    void output_nauty_graph(CSPInstance& csp)
    {
 
-     // Count from node 1, for GAP compatability,
-     cout << "$ 1" << endl;
-
      map<string, int> v_num;
 
-     { // First count the number of vertices.
-       int vertex_count = 0;
-       for(map<string, set<string> >::iterator it = var_vertex_colour.begin(); it != var_vertex_colour.end(); ++it)
-         vertex_count += it->second.size();    
-        for(map<string, set<string> >::iterator it = aux_vertex_colour.begin(); it != aux_vertex_colour.end(); ++it)
-         vertex_count += it->second.size();
-       cout << "n = " << vertex_count << endl;
-     }
+     int var_vertex_count = 0, aux_vertex_count = 0;
+     for(map<string, set<string> >::iterator it = var_vertex_colour.begin(); it != var_vertex_colour.end(); ++it)  
+       var_vertex_count += it->second.size();
 
-     cout << "# varnames := [";
+     for(map<string, set<string> >::iterator it = aux_vertex_colour.begin(); it != aux_vertex_colour.end(); ++it)
+       aux_vertex_count += it->second.size();
+         
+     cout << "varnames := [";
      for(int i = 0; i < csp.sym_order.size(); ++i)
      {
        cout << "\"" << name(csp.sym_order[i], csp) << "\", ";
@@ -99,41 +97,48 @@ struct Graph
      }
      cout << "];" << endl;
 
+     int vertex_counter = v_num.size() + 1;
+
      // Now output partitions
-     bool first_pass_bar = true;
-     cout << "f = [";
+
+     vector<set<int> > partitions;
+     
+     set<int> zero;
+     zero.insert(0);
+     partitions.push_back(zero);
+     
      for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
      it != var_vertex_colour.end();
      ++it)
      {
-       if(first_pass_bar) first_pass_bar = false; else cout << "|";
        D_ASSERT(it->second.size() > 0);
-       bool first = true;
+       set<int> partition;
        for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-       {
-         if(first) first=false; else cout << ",";
-         cout << v_num[*it2];
-       }
+         partition.insert(v_num[*it2]);
+       
+       partitions.push_back(partition);
      }
 
-     int vertex_counter = v_num.size() + 1;
-
-     cout << endl << "#VAREND " << vertex_counter - 1 << endl;
-
+    
      for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
      it != aux_vertex_colour.end();
      ++it)
      {
-       int old_vertex_pos = vertex_counter;
+       set<int> partition;
        D_ASSERT(it->second.size() > 0);
        for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-         v_num[*it2] = vertex_counter++;
-       if(first_pass_bar) first_pass_bar = false; else cout << "|";  
-       cout << old_vertex_pos << ":" << vertex_counter - 1;
+       {
+         v_num[*it2] = vertex_counter;
+         partition.insert(vertex_counter);
+         vertex_counter++;
+       }
+       
+       partitions.push_back(partition);
      }
-     cout << "]" << endl;
 
-     cout << endl << "g" << endl;
+     vector<set<int> > edges(var_vertex_count + aux_vertex_count + 1);
+    
+     
      for(set<pair<string, string> >::iterator it = graph.begin(); it != graph.end(); ++it)
      {
        //cout << it->first << ":" << it->second << endl;
@@ -142,13 +147,37 @@ struct Graph
        int first_v = v_num[it->first];
        int second_v = v_num[it->second];
        D_ASSERT(first_v != 0 && second_v != 0 && first_v != second_v);
-       cout << first_v << ":" << second_v << " ";
+       edges[first_v].insert(second_v);
      }
+     
+#ifdef USE_NAUTY
+     vector<vector<int> > perms = build_graph(edges, partitions);
+#else
+     cerr << "Need to compile Minion with nauty included!" << endl;
+     exit(1);
+#endif
 
-     cout << "." << endl;
-     // Use a slightly better branching heuristic
-     cout << "*=1" << endl;
-     cout << "x" << endl;    
+     cout << "generators := [()" << endl;  
+     for(int i = 0; i < perms.size(); ++i)
+     {
+       cout << ", PermList([";
+       bool first_pass = true;
+       D_ASSERT(perms[i][0] == 0);
+       for(int j = 1; j < var_vertex_count; ++j)
+       {
+         D_ASSERT(perms[i][j] < var_vertex_count);
+         if(first_pass)
+         {
+           first_pass = false;
+           cout << perms[i][j];
+         }
+         else
+           cout << ", " << perms[i][j];
+       }
+       cout << "])" << endl;
+     }
+     cout << "];" << endl;
+     
    }
    
    
@@ -206,6 +235,14 @@ struct GraphBuilder
       g.aux_vertex_colour[const_name].insert(const_name);
       return const_name;
     }
+    else if(v.type() == VAR_NOTBOOL)
+    {
+      cerr << "No symmetry !bool support yet, sorry" << endl;
+      exit(1);
+//      string aux_v = g.new_vertex("NOTBOOL");
+//      add_edge(aux_v, csp.vars.getName(Var(VAR_BOOL, v.pos())));
+//      return aux_v;
+    }
     else
       return csp.vars.getName(v); 
   }
@@ -244,17 +281,21 @@ struct GraphBuilder
   string colour_symmetric_constraint(const ConstraintBlob& b, string name)
   {
     string v = g.new_vertex(name + "_MASTER");  
-    
-    // Connect these directly to root, because there is likely to be most of them.
-    for(int i = 0; i < b.vars[0].size(); ++i)
-      add_edge(v, b.vars[0][i]);
       
-    for(int i = 1; i < b.vars.size(); ++i)
+    for(int i = 0; i < b.vars.size(); ++i)
     {
       string nv = g.new_vertex(name + "_CHILD" + to_string(i));
       add_edge(v, nv);
       for(int j = 0; j < b.vars[i].size(); ++j)
         add_edge(nv, b.vars[i][j]);
+    }
+    
+    for(int i = 0; i < b.constants.size(); ++i)
+    {
+      string nv = g.new_vertex(name + "_CHILD_CONST" + to_string(i));
+      add_edge(v, nv);
+      for(int j = 0; j < b.constants[i].size(); ++j)
+        add_edge(nv, Var(VAR_CONSTANT, b.constants[i][j]) );      
     }
     
     return v;

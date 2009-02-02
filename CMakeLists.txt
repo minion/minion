@@ -135,6 +135,13 @@ if(CCACHE)
     set(CMAKE_CXX_COMPILER ${CCACHE})
 endif()
 
+option(NAUTY "" OFF)
+if(NAUTY)
+  message(STATUS "Please configure nauty")
+  add_definitions(-DUSE_NAUTY)
+  list(APPEND SRCS nauty24b7/nautycxx.cpp nauty24b7/nauty.c nauty24b7/nautil.c nauty24b7/nausparse.c)
+endif()
+
 option(STATIC "" OFF)
 if(STATIC)
     message(STATUS "Building static binary")

@@ -1,11 +1,23 @@
 #!/bin/bash
+case $3 in
+nauty)
+  GAPCOMMAND="generators";;
+full)
+  GAPCOMMAND="Elements(Group(generators))";;
+*)
+  echo './generateGraph.sh <minion> <instance> nauty/full'
+  exit;;
+esac
+$1 -Xgraph $2 > $2.gapin
+cat `dirname $0`/rule1.g >> $2.gapin
+echo 'a := OutputTextFile("'$2.gapout'", false);;' >> $2.gapin
+echo 'H :='$GAPCOMMAND';;' >> $2.gapin
+echo 'gen_constraints(H, varnames, a);' >> $2.gapin
+echo 'quit;' >> $2.gapin
+gap.sh < $2.gapin > /dev/null
 
-grep "varnames :=" $1 | cut -c2- > $1.originalnames
-grep -v "^#" $1 > $1.dreadnautin
-dreadnaut < $1.dreadnautin | mini-scripts/dread2gap.py > $1.gapin
-cat $1.originalnames >> $1.gapin
-cat mini-scripts/rule1.g >> $1.gapin
-echo 'a := OutputTextFile("'$1.gapout'", false);;' >> $1.gapin
-echo 'gen_constraints(G, varnames, a);' >> $1.gapin
-echo 'quit;' >> $1.gapin
-#gap.sh < $1.gapin
+grep -v "**EOF**" $2 > $2.symbreak
+cat $2.gapout >> $2.symbreak
+echo '**EOF**' >> $2.symbreak
+# cleanup
+rm $2.gapin $2.gapout

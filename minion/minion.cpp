@@ -380,7 +380,7 @@ try {
   if(getOptions(stateObj).graph)
   {
     GraphBuilder graph(instance);
-    //graph.output_graph();
+    //graph.g.output_graph();
     graph.g.output_nauty_graph(instance);
     exit(0);
   }

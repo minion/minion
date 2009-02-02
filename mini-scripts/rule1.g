@@ -38,13 +38,19 @@ rule1 := function( v1, v2 )
 end;
 
 gen_constraints := function(list, varnames, a)
-  local perm, i, j, vecs;
+  local perm, i, j, vecs, set;
 
+  set := [];
   for i in list do
     perm := ListPerm(i);
     perm := perm{[1..Minimum(Size(perm), Size(varnames))]};
     vecs := rule1([1..Size(perm)], perm);
-    
+    Append(set, [vecs]);
+  od;
+
+  set := Set(set);
+
+  for vecs in set do
     PrintTo(a, "lexleq( [");
     for j in vecs[1] do
       PrintTo(a, varnames[j], ",");
@@ -54,6 +60,5 @@ gen_constraints := function(list, varnames, a)
       PrintTo(a, varnames[j], ",");
     od;
     PrintTo(a, "] )\n");
-
   od;
 end;

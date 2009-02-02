@@ -38,7 +38,10 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
 	else if(command == string("-redump"))
   { getOptions(stateObj).redump = true; }
   else if(command == string("-Xgraph"))
-  { getOptions(stateObj).graph = true; }
+  { 
+    getOptions(stateObj).graph = true;
+    getOptions(stateObj).silent = true;
+  }
   else if(command == string("-outputType"))
   {
     ++i;
