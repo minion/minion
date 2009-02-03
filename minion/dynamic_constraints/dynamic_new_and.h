@@ -17,6 +17,28 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;watched-and Description
+The constraint
+
+  watched-and({C1,...,Cn})
+
+ensures that the constraints C1,...,Cn are all true.
+*/
+
+/** @help constraints;watched-and Notes Conjunctions of constraints may seem
+pointless, bearing in mind that a CSP is simply a conjunction of constraints
+already! However sometimes it may be necessary to use a conjunction as a child
+of another constraint, for example in a reification:
+
+   reify(watched-and({...}),r)
+*/
+
+/** @help constraints;watched-and References
+  See also
+
+  help constraints watched-or
+*/
+
 #ifndef DYNAMIC_WATCHED_AND_NEW_H
 #define DYNAMIC_WATCHED_AND_NEW_H
 

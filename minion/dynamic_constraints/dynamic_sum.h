@@ -36,7 +36,7 @@
 */
 
 /** @help constraints;watchsumgeq Reifiability
-  This constraint is reifiable.
+  This constraint is not reifiable.
 */
 
 /** @help constraints;watchsumgeq References

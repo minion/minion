@@ -17,6 +17,16 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;w-inrange Description
+  The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
+*/
+
+/** @help constraints;w-inrange References
+  See also
+
+  help constraints w-notinrange
+*/
+
 #ifndef CONSTRAINT_DYNAMIC_UNARY_INRANGE_H
 #define CONSTRAINT_DYNAMIC_UNARY_INRANGE_H
 

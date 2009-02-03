@@ -17,6 +17,20 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;watched-or Description
+The constraint
+
+  watched-or({C1,...,Cn})
+
+ensures that at least one of the constraints C1,...,Cn is true.
+*/
+
+/** @help constraints;watched-or References
+  See also
+
+  help constraints watched-and
+*/
+
 #define SLOW_WOR
 
 #ifndef DYNAMIC_WATCHED_OR_NEW_H

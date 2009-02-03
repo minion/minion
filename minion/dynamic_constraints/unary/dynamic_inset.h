@@ -17,6 +17,17 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/** @help constraints;w-inset Description
+The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set 
+{a1,..,an}.
+*/
+
+/** @help constraints;w-inset References
+  See also
+
+  help constraints w-notinset
+*/
+
 #ifndef CONSTRAINT_DYNAMIC_UNARY_INSET_H
 #define CONSTRAINT_DYNAMIC_UNARY_INSET_H
 
