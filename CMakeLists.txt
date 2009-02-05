@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.4.7)
+cmake_minimum_required(VERSION 2.4.7 FATAL_ERROR)
 
 set(CMAKE_MODULE_PATH cmake-modules)
 include(CheckIncludeFileCXX)
