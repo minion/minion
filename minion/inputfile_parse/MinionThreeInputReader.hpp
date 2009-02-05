@@ -136,24 +136,38 @@ Inside the search section one can specify
 - optimisation function, and
 - details of how to print out solutions.
 
-SearchSection::= <VariableOrdering>?
-                 <ValueOrdering>?
-                 <OptimisationFn>?
-                 <PrintFormat>?
+   SearchSection::= <VarValOrdering>*
+                    <OptimisationFn>?
+                    <PrintFormat>?
 
-In the variable ordering a fixed ordering can be specified on any
-subset of variables. These are the search variables that will be
-instantiated in every solution. If none is specified some other fixed
-ordering of all the variables will be used.
+If no varval ordering is given then the variables are assigned in instantiation
+order and the values tried in ascending order.
 
-   VariableOrdering::= VARORDER[ <varname>+ ]
+If a variable order is given as a command line argument it will override
+anything specified in the input file.
+
+Multiple variable orders can be given, each with an optional value ordering:
+
+   VarValOrdering::= <VarOrder> 
+                     <ValOrder>?
+
+In each VarOrder an instantiation order is specified for a subset of
+variables. Variables can optionally be \"auxiliary variables\" (add \"AUX\" to
+the varorder) meaning that if there are several solutions to the problem
+differing only in the auxiliary variables, only one is reported by minion.
+
+   VarOrder::= VARORDER AUX? <ORDER>? [ <varname>+ ]
+
+      where
+
+   <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMOVERWDEG
 
 The value ordering allows the user to specify an instantiation order
 for the variables involved in the variable order, either ascending (a)
 or descending (d) for each. When no value ordering is specified, the
 default is to use ascending order for every search variable.
 
-   ValueOrdering::= VALORDER[ (a|d)+ ]
+   ValOrder::= VALORDER[ (a|d)+ ]
 
 To model an optimisation problem the user can specify to minimise
 or maximise a variable's value.
@@ -171,6 +185,12 @@ flattened into a vector as described in 'help variables vectors'.
    PrintFormat::= PRINT <vector>
                 | PRINT ALL
                 | PRINT NONE
+*/
+
+/** @help input;search References
+See also
+
+   switches -varorder
 */
 
 /** @help input;example Example
