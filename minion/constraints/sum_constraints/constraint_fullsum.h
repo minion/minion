@@ -200,7 +200,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     int sum_value = 0;
     int v_size = var_array.size();
     
-    if(no_negatives)
+    if(no_negatives)   // How are the two cases different? They look identical.
     {
       int max_sum = var_sum.getMax();
       assignment.push_back(make_pair(v_size, max_sum));

@@ -97,17 +97,21 @@ struct reify : public ParentConstraint
   bool constraint_locked;
   Reversible<bool> full_propagate_called;
   
+  #ifdef NODETRICK
   unsigned long long reifysetnode;
+  #endif
   
   int dtcount;
-  int c0vars;  // how many vars for child_constraints[0] 
+  int c0vars;  // how many vars for child_constraints[0]
   
   reify(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar _rar_var) :
   ParentConstraint(_stateObj), reify_var(_rar_var), constraint_locked(false),
     full_propagate_called(stateObj, false)
   {
+      #ifdef NODETRICK
       numeric_limits<unsigned long long> ull;
       reifysetnode=ull.max();
+      #endif
     child_constraints.push_back(_poscon);
     AbstractConstraint* _negcon = _poscon->reverse_constraint();
     child_constraints.push_back(_negcon);
@@ -290,68 +294,80 @@ struct reify : public ParentConstraint
     DynamicTrigger* dt = dynamic_trigger_start();
     //int numtriggers=dynamic_trigger_count();
     
-    if(trig >= dt && trig < (dt + (c0vars*2)) )
-    {// Lost assignments for positive constraint.
-      P("Triggered on an assignment watch");
-      if(!full_propagate_called)
-      {
-        bool flag;
-        GET_ASSIGNMENT(assignment, child_constraints[0]);
-        
-        P("Find new assignment");
-        if(!flag)
-        { // No satisfying assignment to constraint
-          P("Failed!");
-          reify_var.propagateAssign(0);
-          
-          #ifdef NODETRICK
-          reifysetnode=getState(stateObj).getNodeCount();
-          #endif
-          
-          return;
-        }
-        P("Found new assignment");
-        watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt, dt+(c0vars*2));
-      }
-      else
-      {
-          P("Ignoring assignment watch");
-      }
-      return;
-    }
-    
-    if(trig>= (dt+ (c0vars*2)) && trig < dt+dtcount)
-    {// Lost assignments for negative constraint.
-        P("Triggered on an assignment watch");
-      if(!full_propagate_called)
-      {
-        bool flag;
-        GET_ASSIGNMENT(assignment, child_constraints[1]);
-        
-        P("Find new assignment");
-        if(!flag)
-        { // No satisfying assignment to constraint
-          P("Failed!");
-          reify_var.propagateAssign(1);
-          
-          #ifdef NODETRICK
-          reifysetnode=getState(stateObj).getNodeCount();
-          #endif
-          
-          return;
-        }
-        P("Found new assignment");
-        watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), dt+(c0vars*2), dt+dtcount);
-      }
-      else
-      {
-          P("Ignoring assignment watch");
-      }
-      return;
-    }
-    
-    if(full_propagate_called)
+    if(!full_propagate_called)
     {
+        if(trig >= dt && trig < (dt + (c0vars*2)) )
+        {// Lost assignments for positive constraint.
+          P("Triggered on an assignment watch");
+          if(!full_propagate_called)
+          {
+            bool flag;
+            GET_ASSIGNMENT(assignment, child_constraints[0]);
+            
+            P("Find new assignment");
+            if(!flag)
+            { // No satisfying assignment to constraint
+              P("Failed!");
+              reify_var.propagateAssign(0);
+              
+              #ifdef NODETRICK
+              reifysetnode=getState(stateObj).getNodeCount();
+              #endif
+              
+              return;
+            }
+            P("Found new assignment");
+            watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt, dt+(c0vars*2));
+          }
+          else
+          {
+              P("Ignoring assignment watch");
+          }
+          return;
+        }
+        else if(trig>= (dt+ (c0vars*2)) && trig < dt+dtcount)
+        {// Lost assignments for negative constraint.
+            P("Triggered on an assignment watch");
+          if(!full_propagate_called)
+          {
+            bool flag;
+            GET_ASSIGNMENT(assignment, child_constraints[1]);
+            
+            P("Find new assignment");
+            if(!flag)
+            { // No satisfying assignment to constraint
+              P("Failed!");
+              reify_var.propagateAssign(1);
+              
+              #ifdef NODETRICK
+              reifysetnode=getState(stateObj).getNodeCount();
+              #endif
+              
+              return;
+            }
+            P("Found new assignment");
+            watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), dt+(c0vars*2), dt+dtcount);
+          }
+          else
+          {
+              P("Ignoring assignment watch");
+          }
+          return;
+        }
+        else
+        {
+          P("Remove unused trigger");
+          // This is an optimisation. Remove a trigger from stage 2.
+          trig->remove(getQueue(stateObj).getNextQueuePtrRef());
+        }
+    }
+    else // full_propagate_called
+    {
+        if(trig>= dt && trig < dt+dtcount)
+        {   // is it a trigger from stage 1 .. if so, ignore.
+            P("In stage 2, ignoring trigger from stage 1");
+            return;
+        }
       P("Pass triggers to children");
       D_ASSERT(reify_var.isAssigned());
       
@@ -359,24 +375,12 @@ struct reify : public ParentConstraint
       if(reify_var.getAssignedValue() == child)
       {
           P("Removing leftover trigger from other child constraint");
-          //trig->remove();
+          trig->remove(getQueue(stateObj).getNextQueuePtrRef());
           return;
       }
-      // The trigger might be a leftover of some kind.
-      /*if(getChildDynamicTrigger(trig) != 1-reify_var.getAssignedValue())
-      {
-          P("Removing leftover trigger from other child constraint");
-          trig->remove();
-          return;
-      }*/
       child_constraints[getChildDynamicTrigger(trig)]->propagate(trig);
     }
-    else
-    {
-      P("Remove unused trigger");
-      // This is an optimisation.
-      trig->remove(getQueue(stateObj).getNextQueuePtrRef());
-    }
+    
   }
   
   template<typename T, typename Vars, typename Trigger>

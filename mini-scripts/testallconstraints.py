@@ -51,7 +51,6 @@ conslist+=["lexleq", "lexless"]
 
 conslist+=["max", "min"]
 
-# undocumented internal constraints.
 conslist+=["watchneq", "watchless"]
 
 reifyexceptions=["watchsumgeq", "litsumgeq", "watchneq", "watchless"]
