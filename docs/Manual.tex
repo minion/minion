@@ -203,21 +203,24 @@ statically.
 \subsection{Compilation instructions}
 
 If there is no executable which works on your computer, you can use
-the source package (named minion-x.y.z-source.tar.gz). To compile on
-Mac and Linux, go to the source directory and issue the following
-commands:
-
-\begin{verbatim}
-cmake .
-make minion
-\end{verbatim}
+the source package (named minion-x.y.z-source.tar.gz).
 
 Minion uses the CMake\footnote{\url{http://www.cmake.org}} build system to check
 for the required and optional components. Without any additional flags, the
 standard binary will be built. The earliest version of CMake the build was
 tested with is 2.4.7.
 
-Note that you need at least g++ version 3.4.2 to compile Minion.
+Note that you need at least g++ version 3.4.2 to compile Minion. Furthermore
+boost\footnote{\url{http://www.boost.org/}} is required to build Minion. Any
+version between 1.33 and 1.37.0 inclusive should work.
+
+To compile on Mac and Linux, go to the source directory and issue the following
+commands:
+
+\begin{verbatim}
+cmake .
+make minion
+\end{verbatim}
 
 If you have 2GB of RAM and a dual-core processor, you may prefer to
 use \texttt{make minion -j2} instead. To build minion-debug, run
@@ -236,9 +239,6 @@ cmake -DDEBUG=0 .
 \end{verbatim}
 
 Executables will be created in the \texttt{bin} subdirectory.
-
-Note that boost\footnote{\url{http://www.boost.org/}} is required to build
-Minion. Any version between 1.33 and 1.37.0 inclusive should work.
 
 \medskip
 
