@@ -448,6 +448,16 @@ compiler without any processing; usually one would want to use it as a means of
 specifying machine-specific compiler flags, such as producing code for a
 specific CPU.
 
+\subsection{Required and optional components}
+
+Boost is required to build Minion (at least version 1.33). Bzip2 and Zlib are
+optional, if they are not present, you will not be able to read compressed input
+files. If a Common Lisp binary (\texttt{clisp}) is found, you will be able to
+build the LISP generators. If you have a \texttt{doxygen} executable, you will
+be able to generate the API documentation. If you have a \texttt{pdflatex}
+executable and a UNIX-like system, you will be able to generate the PDF
+documentation.
+
 \subsection{Selective compilation of constraints}
 
 The most time-consuming part of the Minion compilation process is the
