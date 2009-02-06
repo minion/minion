@@ -137,6 +137,10 @@ for i in *.minion; do
   
   (cd special_tests; ./special_tests.sh ../$exec)
   failed=$(($failed + $?))
+  
+  if [ "$failed" != "0" ]; then
+      exit $failed
+  fi
 
   # return 0 iff all tests succeeded
-  exit $(($j - $pass - $expectedfail + $?))
+  exit $(($j - $pass - $expectedfail))

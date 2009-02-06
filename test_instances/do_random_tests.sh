@@ -36,7 +36,7 @@ for i in `grep -l "#TEST SOLCOUNT" *.minion`; do
       testnumsols=`grep "#TEST SOLCOUNT" $i  | awk '{print $3}' | tr -d '\015' `
     	if [[ "$numsols" != "$testnumsols" ]]; then
     	  testpass=0
-    	  errormess="Got '${numsols}' instead of '${testnumsols}' solutions in $i"
+    	   echo Got ${numsols} instead of ${testnumsols} solutions in $i
     	else
     	 let pass=pass+1
       fi
@@ -47,4 +47,4 @@ for i in `grep -l "#TEST SOLCOUNT" *.minion`; do
 done
 echo
 echo $pass of $j randomised tests successful.
-exit $(($pass - $j))
+exit $(($j - $pass))
