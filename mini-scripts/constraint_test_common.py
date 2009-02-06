@@ -1059,7 +1059,14 @@ class testgcc:
             return runtestgeneral("gcc", False, options, [4,4,4], ["verysmallnum","smallconst_distinct","smallnum"], self, False)
         else:
             return runtestgeneral("gcc", False, options, [5,4,4], ["smallnum","smallconst_distinct", "num"], self, False)
-    
+
+class testgccweak(testgcc):
+    def runtest(self, options=dict()):
+        if options['reifyimply'] or options['reify']:
+            return runtestgeneral("gccweak", False, options, [4,4,4], ["verysmallnum","smallconst_distinct","smallnum"], self, False)
+        else:
+            return runtestgeneral("gccweak", False, options, [5,4,4], ["smallnum","smallconst_distinct", "num"], self, False)
+
 ################################################################################
 # 
 #                    Utility functions begin here.

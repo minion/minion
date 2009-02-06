@@ -17,6 +17,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef GCC_COMMON_H
+#define GCC_COMMON_H
+
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -38,7 +41,9 @@
 #define INCREMENTALMATCH
 
 #define SCCCARDS
-#define STRONGCARDS
+
+// This option has been moved to the third template parameter.
+//#define STRONGCARDS
 
 //Incremental graph -- maintains adjacency lists for values and vars
 #define INCGRAPH
@@ -51,7 +56,7 @@
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
 
-template<typename VarArray1, typename VarArray2>
+template<typename VarArray1, typename VarArray2, int Strongcards>
 struct GCC : public AbstractConstraint
 {
     GCC(StateObj* _stateObj, const VarArray1& _var_array, const VarArray2& _capacity_array, ConstraintBlob& b) : AbstractConstraint(_stateObj),
@@ -699,7 +704,9 @@ struct GCC : public AbstractConstraint
             
             tarjan_recursive(sccindex_start);
             
-            #if defined(SCCCARDS) && defined(STRONGCARDS)
+            #if defined(SCCCARDS)
+            if(Strongcards)
+            {
                 // Propagate to capacity variables for all values in vals_in_scc
                 for(int valinscc=0; valinscc<vals_in_scc.size(); valinscc++)
                 {
@@ -709,6 +716,7 @@ struct GCC : public AbstractConstraint
                         prop_capacity_strong_scc(v);
                     }
                 }
+            }
             #endif
             
         }
@@ -718,9 +726,19 @@ struct GCC : public AbstractConstraint
             prop_capacity();
         #endif
         
+        #if defined(SCCCARDS)
+        if(!Strongcards)
+        {
+            prop_capacity();
+        }
+        #endif
+        
         // temporary to test without strong upperbound pruning.
-        #if defined(SCCCARDS) && defined(STRONGCARDS)
+        #if defined(SCCCARDS)
+        if(Strongcards)
+        {
             prop_capacity_simple();
+        }
         #endif
     }
     
@@ -1543,11 +1561,14 @@ struct GCC : public AbstractConstraint
     // can only be called when SCCs not used. 
     inline void prop_capacity()
     {
-        #ifdef STRONGCARDS
+        if(Strongcards)
+        {
             prop_capacity_strong();
-        #else
+        }
+        else
+        {
             prop_capacity_simple();   
-        #endif
+        }
     }
     
     void prop_capacity_simple()
@@ -2016,3 +2037,5 @@ struct GCC : public AbstractConstraint
         return new Dynamic_OR(stateObj, con);
     }
 };
+
+#endif

@@ -1,5 +1,5 @@
 set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
-                    "gacelement-deprecated" "alldiff" "gacalldiff" "gcc" "watchneq"
+                    "gacelement-deprecated" "alldiff" "gacalldiff" "gcc" "gccweak" "watchneq"
                     "diseq" "__reify_diseq" "eq" "__reify_eq" "minuseq" "__reify_minuseq"
                     "abs" "ineq" "watchless" "lexleq" "lexless" "max" "min" "occurrence"
                     "occurrenceleq" "occurrencegeq" "product" "difference"
@@ -47,6 +47,9 @@ set(NAME_READ_gacalldiff "read_list")
 
 set(NAME_ID_gcc "CT_GCC")
 set(NAME_READ_gcc "read_list" "read_constant_list" "read_list")
+
+set(NAME_ID_gccweak "CT_GCCWEAK")
+set(NAME_READ_gccweak "read_list" "read_constant_list" "read_list")
 
 set(NAME_ID_watchneq "CT_WATCHED_NEQ")
 set(NAME_READ_watchneq "read_var" "read_var")

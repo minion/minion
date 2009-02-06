@@ -22,7 +22,7 @@
 The Generalized Cardinality Constraint (GCC) constrains the number of each value
 that a set of variables can take.
 
-gcc([primary variables], [values of interest], [capacity variables])
+gccweak([primary variables], [values of interest], [capacity variables])
 
 For each value of interest, there must be a capacity variable, which specifies
 the number of occurrences of the value in the primary variables.
@@ -30,7 +30,7 @@ the number of occurrences of the value in the primary variables.
 This constraint is new, and its syntax and implementation are not finalised.
 */
 
-/** @help constraints;gcc Example 
+/** @help constraints;gccweak Example 
 Suppose the input file had the following vectors of variables defined:
 
 DISCRETE myVec[9] {1..9}
@@ -40,28 +40,27 @@ The following constraint would restrict the occurrence of values 1..9 in myVec
 to be at most 2 each initially, and finally equal to the values of the cap
 vector.
 
-gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)
+gccweak(myVec, [1,2,3,4,5,6,7,8,9], cap)
 */
 
-/** @help constraints;gcc Notes 
+/** @help constraints;gccweak Notes 
 This constraint enforces a hybrid consistency. It reads the bounds of the
 capacity variables, then enforces GAC over the primary variables only.  Then the
-bounds of the capacity variables are updated using flow algorithms similar to
-those proposed by Quimper et al, Improved Algorithms for the Global Cardinality
-Constraint.
+bounds of the capacity variables are updated by counting values in the domains
+of the primary variables.
 
-This constraint provides stronger propagation to the capacity variables than the
-gccweak constraint.
+The consistency over the capacity variables is weaker than the gcc constraint, 
+hence the name gccweak.
 */
 
-#ifndef CONSTRAINT_GCC_H_PQWOEI
-#define CONSTRAINT_GCC_H_PQWOEI
+#ifndef CONSTRAINT_GCCWEAK_H_PQWOEI
+#define CONSTRAINT_GCCWEAK_H_PQWOEI
 
 #include "gcc_common.h"
 
 template<typename VarArray1, typename VarArray2>
 AbstractConstraint*
-BuildCT_GCC(StateObj* stateObj, const VarArray1& var_array, const VarArray2& cap_array, ConstraintBlob& b)
-{ return new GCC<VarArray1, VarArray2, 1>(stateObj, var_array, cap_array, b); }
+BuildCT_GCCWEAK(StateObj* stateObj, const VarArray1& var_array, const VarArray2& cap_array, ConstraintBlob& b)
+{ return new GCC<VarArray1, VarArray2, 0>(stateObj, var_array, cap_array, b); }
 
 #endif

@@ -24,7 +24,7 @@ conslist+=["diseq", "eq"]
 conslist+=["alldiff", "gacalldiff"]
 
 # capacity constraints
-conslist+=["gcc", "occurrence", "occurrenceleq", "occurrencegeq"]
+conslist+=["gcc", "gccweak", "occurrence", "occurrenceleq", "occurrencegeq"]
 
 #element constraints
 conslist+=["element", "gacelement-deprecated", "watchelement"]
