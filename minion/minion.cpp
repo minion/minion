@@ -26,8 +26,15 @@
 #endif
 
 #ifndef SVN_DATE
-#define SVN_DATE "Not from a svn checkout"
+#define SVN_DATE Not from a svn checkout
 #endif
+
+// The marvels of the C pre-processor...
+#define CAJ_EXPAND(x) #x
+#define CAJ_STRING(x) CAJ_EXPAND(x)
+
+#define SVN_DATE_STRING CAJ_STRING(SVN_DATE)
+
 
 #include "minion.h"
 #include "CSPSpec.h"
@@ -360,7 +367,7 @@ try {
   if (!getOptions(stateObj).silent) 
   { 
     
-    getOptions(stateObj).printLine("# Svn last changed date: " + to_string(SVN_DATE) );
+    getOptions(stateObj).printLine("# Svn last changed date: " + to_string(SVN_DATE_STRING) );
     
     time_t rawtime;
     time(&rawtime);
