@@ -472,8 +472,12 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
     break;
 #endif
 
+#ifdef CT_WATCHED_TABLE_ABC
     case CT_WATCHED_TABLE:
+#endif
+#ifdef CT_WATCHED_NEGATIVE_TABLE_ABC
     case CT_WATCHED_NEGATIVE_TABLE:
+#endif
     return readConstraintTable(infile, constraint);
     break;
 
@@ -502,11 +506,15 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
   
   if(con.vars[0].size() == 0)
   {
+#if defined(CT_TRUE_ABC) && defined(CT_FALSE_ABC)
     // Either trivially true, or trivially false, depending on how many tuples there are.
     if(con.tuples->size() != 0)
       return ConstraintBlob(get_constraint(CT_TRUE));
     else
       return ConstraintBlob(get_constraint(CT_FALSE));
+#else
+    throw parse_exception("Need the 'true' and 'false' constraints enable for empty table constraints!");
+#endif
   }  
   
   return con;
