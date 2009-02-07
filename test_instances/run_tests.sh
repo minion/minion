@@ -118,8 +118,8 @@ for i in *.minion; do
   failed=$(($failed + $?))
   ./do_random_tests.sh 3 $exec $* -varorder random
   failed=$(($failed + $?))
-  ./do_random_tests.sh 1 $exec $* -varorder conflict
-  failed=$(($failed + $?))
+#  ./do_random_tests.sh 1 $exec $* -varorder conflict
+#  failed=$(($failed + $?))
   ./do_random_tests.sh 1 $exec $* -varorder static
   failed=$(($failed + $?))
   ./do_random_tests.sh 1 $exec $* -varorder sdf
