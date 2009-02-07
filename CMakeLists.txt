@@ -451,3 +451,7 @@ if(DOXYGEN)
 else()
     message(STATUS "Doxygen not found, not generating doxygen documentation target")
 endif()
+
+add_custom_target(dist-clean
+    "cmake" "-E" "remove" "-f" "CMakeCache.txt" "Makefile" "cmake_install.cmake" VERBATIM)
+add_dependencies(dist-clean clean)
