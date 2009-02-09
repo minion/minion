@@ -37,7 +37,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
   
   BoolLessSumConstraint(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
     AbstractConstraint(_stateObj), count(_stateObj), var_array(_var_array), var_sum(_var_sum)
-  { D_ASSERT((VarToCount == 0) || (VarToCount == 1)); }
+  { CHECK((VarToCount == 0) || (VarToCount == 1), "Fatal Internal Bug"); }
   
   virtual triggerCollection setup_internal()
   {

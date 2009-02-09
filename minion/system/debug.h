@@ -60,6 +60,7 @@ void _NORETURN FAIL_EXIT(string s = "");
 struct assert_fail {};
 
 void assert_function(BOOL x, const char* a, const char* f, int line);
+
 // Unlike Asserts, Checks are always enabled.
 #define CHECK(x, y) {assert_function(x, y, __FILE__, __LINE__);}
 

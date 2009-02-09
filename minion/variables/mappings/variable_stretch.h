@@ -26,7 +26,6 @@ struct MultiplyHelp
 {
 static inline DomainInt round_down(DomainInt val, DomainInt divisor)
 {
- // D_ASSERT(divisor > 0);
   if(val > 0)
     return val / divisor;
   
@@ -264,9 +263,9 @@ struct MultiplyVar
   int Multiply;
   MultiplyVar(const VarRef& _data, int _Multiply) : data(_data), Multiply(_Multiply)
   { 
-    D_ASSERT(DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMax()) * Multiply));
-    D_ASSERT(DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMin()) * Multiply));
-    D_ASSERT(Multiply != 0); 
+    DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMax()) * Multiply);
+    DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMin()) * Multiply);
+    CHECK(Multiply != 0, "Cannot divide variable by 0"); 
   }
   
   MultiplyVar() : data()

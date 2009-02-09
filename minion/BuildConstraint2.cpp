@@ -82,7 +82,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
         instance.var_order.size() - instance.val_order.size(), instance.val_order.back());
     }
       
-    D_ASSERT(instance.val_order.size() == instance.var_order.size());
+    CHECK(instance.val_order.size() == instance.var_order.size(), "Variable and Value orderings must be the same size!");
 	    
 	
 	  for(unsigned int i = 0 ;i < instance.var_order.size(); ++i)
