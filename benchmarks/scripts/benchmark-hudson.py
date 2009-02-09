@@ -15,7 +15,7 @@ class BThread (Thread):
     for name in self.benchmarks:
       print 'Running ' + name
       if name.endswith('.minion'):
-        timer = timeit.Timer('os.system("'+program+' '+name+' &> /dev/null")','import os')
+        timer = timeit.Timer('os.system("'+program+' '+name+' &> '+name+'.benchmark.out")','import os')
         time = timer.timeit(1)
         if(time < 5.0):
           # This is a fast experiment
