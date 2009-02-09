@@ -1407,26 +1407,44 @@ example of a minion input file.
 
 Usage: \texttt{minion [switches] [minion input file]}
 
+\tableofcontents
 \section{constraints}
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
-Minion supports many constraints and these are regularly being
-improved and added to. In some cases multiple implementations of the
-same constraints are provided and we would appreciate additional
-feedback on their relative merits in your problem.
+  Minion supports many constraints and these are regularly being
+  improved and added to. In some cases multiple implementations of the
+  same constraints are provided and we would appreciate additional
+  feedback on their relative merits in your problem.
 
-Minion does not support nesting of constraints, however this can be
-achieved by auxiliary variables and reification.
+  Minion does not support nesting of constraints, however this can be
+  achieved by auxiliary variables and reification.
 
-Variables can be replaced by constants. You can find out more on
-expressions for variables, vectors, etc. in the section on variables.
+  Variables can be replaced by constants. You can find out more on
+  expressions for variables, vectors, etc. in the section on variables.
 \end{verbatim}
 }
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
-help variables
+  help variables
+\end{verbatim}
+}
+\section{constraints abs}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   abs(x,y)
+
+makes sure that x=|y|, i.e. x is the absolute value of y.
+\end{verbatim}
+}
+\paragraph{Reference}
+{\footnotesize
+\begin{verbatim}
+help constraints abs
 \end{verbatim}
 }
 \section{constraints alldiff}
@@ -1454,12 +1472,6 @@ alldiff(myVec)
 \begin{verbatim}
 Enforces the same level of consistency as a clique of not equals 
 constraints.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifiable and reifyimply'able.
 \end{verbatim}
 }
 \paragraph{References}
@@ -1491,12 +1503,6 @@ requiring an extra variable, and also gets better propagation. It gets bounds
 consistency.
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
-\end{verbatim}
-}
 \section{constraints diseq}
 \paragraph{Description}
 {\footnotesize
@@ -1516,12 +1522,6 @@ Achieves arc consistency.
 diseq(v0,v1)
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifiable and reifyimply'able.
-\end{verbatim}
-}
 \section{constraints div}
 \paragraph{Description}
 {\footnotesize
@@ -1537,12 +1537,6 @@ ensures that floor(x/y)=z.
 {\footnotesize
 \begin{verbatim}
 This constraint is only available for positive domains x, y and z.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
 \end{verbatim}
 }
 \paragraph{References}
@@ -1561,12 +1555,6 @@ The constraint
 
 specifies that, in any solution, vec[i] = e and i is in the range 
 [0 .. |vec|-1].
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
 \end{verbatim}
 }
 \paragraph{Notes}
@@ -1661,12 +1649,6 @@ eq(x0,x1)
 Achieves bounds consistency.
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifiable and reifyimply'able.
-\end{verbatim}
-}
 \paragraph{Reference}
 {\footnotesize
 \begin{verbatim}
@@ -1693,12 +1675,6 @@ following constraint:
 gacalldiff(myVec)
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifiable and reifyimply'able.
-\end{verbatim}
-}
 \paragraph{Notes}
 {\footnotesize
 \begin{verbatim}
@@ -1712,14 +1688,24 @@ This constraint enforces generalized arc consistency.
 The Generalized Cardinality Constraint (GCC) constrains the number of each value
 that a set of variables can take.
 
-gcc([primary variables], [capacity variables])
+gccweak([primary variables], [values of interest], [capacity variables])
 
-For each value in the initial domains of the primary variables, there must be 
-a capacity variable. 
+For each value of interest, there must be a capacity variable, which specifies
+the number of occurrences of the value in the primary variables.
 
-For example, if the union of the initial domains of the primary variables is
-{-5,-3,-1,0,2,3,5} then there would be 11 capacity variables, specifying the
-number of occurrences of each value in the interval [-5 ... 5].
+This constraint is new, and its syntax and implementation are not finalised.
+\end{verbatim}
+}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The Generalized Cardinality Constraint (GCC) constrains the number of each value
+that a set of variables can take.
+
+gcc([primary variables], [values of interest], [capacity variables])
+
+For each value of interest, there must be a capacity variable, which specifies
+the number of occurrences of the value in the primary variables.
 
 This constraint is new, and its syntax and implementation are not finalised.
 \end{verbatim}
@@ -1736,13 +1722,36 @@ The following constraint would restrict the occurrence of values 1..9 in myVec
 to be at most 2 each initially, and finally equal to the values of the cap
 vector.
 
-gcc(myVec, cap)
+gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)
 \end{verbatim}
 }
-\paragraph{Reifiability}
+\paragraph{Notes}
 {\footnotesize
 \begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
+This constraint enforces a hybrid consistency. It reads the bounds of the
+capacity variables, then enforces GAC over the primary variables only.  Then the
+bounds of the capacity variables are updated using flow algorithms similar to
+those proposed by Quimper et al, Improved Algorithms for the Global Cardinality
+Constraint.
+
+This constraint provides stronger propagation to the capacity variables than the
+gccweak constraint.
+\end{verbatim}
+}
+\section{constraints gccweak}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+Suppose the input file had the following vectors of variables defined:
+
+DISCRETE myVec[9] {1..9}
+BOUND cap[9] {0..2}
+
+The following constraint would restrict the occurrence of values 1..9 in myVec
+to be at most 2 each initially, and finally equal to the values of the cap
+vector.
+
+gccweak(myVec, [1,2,3,4,5,6,7,8,9], cap)
 \end{verbatim}
 }
 \paragraph{Notes}
@@ -1752,6 +1761,9 @@ This constraint enforces a hybrid consistency. It reads the bounds of the
 capacity variables, then enforces GAC over the primary variables only.  Then the
 bounds of the capacity variables are updated by counting values in the domains
 of the primary variables.
+
+The consistency over the capacity variables is weaker than the gcc constraint, 
+hence the name gccweak.
 \end{verbatim}
 }
 \section{constraints hamming}
@@ -1762,14 +1774,8 @@ The constraint
 
    hamming(X,Y,c)
 
-ensures that the hamming distance between X and Y is c. That is, that
-c is the size of the set {i | X[i] != y[i]}
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
+ensures that the hamming distance between X and Y is at least c. That is, that
+the size of the set {i | X[i] != y[i]} is greater than or equal to c.
 \end{verbatim}
 }
 \section{constraints ineq}
@@ -1796,12 +1802,6 @@ achieved by
    ineq(x, y, -1)
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifiable and reifyimply'able.
-\end{verbatim}
-}
 \section{constraints lexleq}
 \paragraph{Description}
 {\footnotesize
@@ -1818,12 +1818,6 @@ vec0 is lexicographically less than or equal to vec1 in any solution.
 {\footnotesize
 \begin{verbatim}
 This constraints achieves GAC.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifiable and reifyimply'able.
 \end{verbatim}
 }
 \paragraph{References}
@@ -1852,12 +1846,6 @@ vec0 is lexicographically less than vec1 in any solution.
 {\footnotesize
 \begin{verbatim}
 This constraint maintains GAC.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifiable and reifyimply'able.
 \end{verbatim}
 }
 \paragraph{References}
@@ -1892,7 +1880,7 @@ large values consider using watchsumleq.
 \paragraph{Reifiability}
 {\footnotesize
 \begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
+This constraint is not reifiable.
 \end{verbatim}
 }
 \paragraph{References}
@@ -1913,12 +1901,6 @@ The constraint
    max(vec, x)
 
 ensures that x is equal to the maximum value of any variable in vec.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
 \end{verbatim}
 }
 \paragraph{References}
@@ -1942,12 +1924,6 @@ The constraint
 ensures that x is equal to the minimum value of any variable in vec.
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
-\end{verbatim}
-}
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
@@ -1967,12 +1943,6 @@ Constraint
    minuseq(x,y)
 
 ensures that x=-y.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
 \end{verbatim}
 }
 \paragraph{Reference}
@@ -1998,12 +1968,6 @@ ensures that x%y=z i.e. z is the remainder of dividing x by y.
 This constraint is only available for positive domains x, y and z.
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
-\end{verbatim}
-}
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
@@ -2026,12 +1990,6 @@ vector vec.
 {\footnotesize
 \begin{verbatim}
 elem must be a constant, not a variable.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
 \end{verbatim}
 }
 \paragraph{References}
@@ -2059,12 +2017,6 @@ the vector vec.
 elem and count must be constants
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
-\end{verbatim}
-}
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
@@ -2088,12 +2040,6 @@ the vector vec.
 {\footnotesize
 \begin{verbatim}
 elem and count must be constants
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
 \end{verbatim}
 }
 \paragraph{References}
@@ -2120,12 +2066,6 @@ ensures that x^y=z.
 This constraint is only available for positive domains x, y and z.
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
-\end{verbatim}
-}
 \section{constraints product}
 \paragraph{Description}
 {\footnotesize
@@ -2148,12 +2088,6 @@ as
 
 The general constraint achieves bounds generalised arc consistency for
 positive numbers.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
 \end{verbatim}
 }
 \section{constraints reification}
@@ -2180,8 +2114,10 @@ affect the value of r.
 \paragraph{Notes}
 {\footnotesize
 \begin{verbatim}
-Not all constraints are reifiable. Entries for individual constraints give
-more information.
+ALMOST ALL constraints are are reifiable. Individual constraint entries mention
+if the constraint is NOT reifiable.
+
+ALL constraints are reifyimplyable.
 \end{verbatim}
 }
 \section{constraints reify}
@@ -2211,12 +2147,6 @@ The constraint
 ensures that sum(vec) >= c.
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constrait is reifiable and reifyimply'able.
-\end{verbatim}
-}
 \section{constraints sumleq}
 \paragraph{Description}
 {\footnotesize
@@ -2226,12 +2156,6 @@ The constraint
    sumleq(vec, c)
 
 ensures that sum(vec) <= c.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constrait is reifiable and reifyimply'able.
 \end{verbatim}
 }
 \section{constraints table}
@@ -2277,16 +2201,58 @@ definition, e.g.:
 table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})
 \end{verbatim}
 }
-\paragraph{Reifiability}
+\paragraph{References}
 {\footnotesize
 \begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
+help input tuplelist
+\end{verbatim}
+}
+\section{constraints watched-and}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+  watched-and({C1,...,Cn})
+
+ensures that the constraints C1,...,Cn are all true.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+pointless, bearing in mind that a CSP is simply a conjunction of constraints
+already! However sometimes it may be necessary to use a conjunction as a child
+of another constraint, for example in a reification:
+
+   reify(watched-and({...}),r)
 \end{verbatim}
 }
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
-help input tuplelist
+  See also
+
+  help constraints watched-or
+\end{verbatim}
+}
+\section{constraints watched-or}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+  watched-or({C1,...,Cn})
+
+ensures that at least one of the constraints C1,...,Cn is true.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints watched-and
 \end{verbatim}
 }
 \section{constraints watchelement}
@@ -2299,12 +2265,6 @@ The constraint
 
 specifies that, in any solution, vec[i] = e and i is in the range 
 [0 .. |vec|-1].
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
 \end{verbatim}
 }
 \paragraph{Notes}
@@ -2342,104 +2302,77 @@ See entry
 for details of watchelement which watchelement_one is based on.
 \end{verbatim}
 }
-\section{constraints watchsumgeq}
+\section{constraints watchless}
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
-The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c.
-\end{verbatim}
-}
-\paragraph{Notes}
-{\footnotesize
-\begin{verbatim}
-For this constraint, small values of c are more efficient.
-
-Equivalent to litsumgeq(vec, [1,...,1], c), but faster.
-
-This constraint works on 0/1 variables only.
-\end{verbatim}
-}
-\paragraph{Reifiablity}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
+The constraint watchless(x,y) ensures that x is less than y.
 \end{verbatim}
 }
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
-See also
+  See also
 
-   help constraints watchsumleq 
-   help constraints litsumgeq
+  help constraints ineq
+\end{verbatim}
+}
+\section{constraints watchsumgeq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+  For this constraint, small values of c are more efficient.
+
+  Equivalent to litsumgeq(vec, [1,...,1], c), but faster.
+
+  This constraint works on 0/1 variables only.
+\end{verbatim}
+}
+\paragraph{Reifiability}
+{\footnotesize
+\begin{verbatim}
+  This constraint is not reifiable.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints watchsumleq 
+  help constraints litsumgeq
 \end{verbatim}
 }
 \section{constraints watchsumleq}
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
-The constraint watchsumleq(vec, c) ensures that sum(vec) <= c.
+  The constraint watchsumleq(vec, c) ensures that sum(vec) <= c.
 \end{verbatim}
 }
 \paragraph{Notes}
 {\footnotesize
 \begin{verbatim}
-Equivelent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster.
+  Equivalent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster.
 
-This constraint works on binary variables only.
+  This constraint works on binary variables only.
 
-For this constraint, large values of c are more efficient.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
+  For this constraint, large values of c are more efficient.
 \end{verbatim}
 }
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
-See also
+  See also
 
-   help constraints watchsumgeq 
-   help constraints litsumgeq
-\end{verbatim}
-}
-\section{constraints watchvecexists\textunderscore and}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint
-
-   watchvecexists_and(A, B)
-
-ensures that there exists some index i such that A[i] > 0 and B[i] > 0.
-
-For booleans this is the same as 'exists i s.t. A[i] && B[i]'.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
-\end{verbatim}
-}
-\section{constraints watchvecexists\textunderscore less}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint
-
-   watchvecexists_less(A, B)
-
-ensures that there exists some index i such that A[i] < B[i].
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
+  help constraints watchsumgeq 
+  help constraints litsumgeq
 \end{verbatim}
 }
 \section{constraints watchvecneq}
@@ -2454,12 +2387,6 @@ ensures that A and B are not the same vector, i.e., there exists some index i
 such that A[i] != B[i].
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifyimply'able but not reifiable.
-\end{verbatim}
-}
 \section{constraints weightedsumgeq}
 \paragraph{Description}
 {\footnotesize
@@ -2470,12 +2397,6 @@ The constraint
 
 ensures that constantVec.varVec >= total, where constantVec.varVec is
 the scalar dot product of constantVec and varVec.
-\end{verbatim}
-}
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifiable and reifyimply'able.
 \end{verbatim}
 }
 \paragraph{References}
@@ -2498,18 +2419,104 @@ ensures that constantVec.varVec <= total, where constantVec.varVec is
 the scalar dot product of constantVec and varVec.
 \end{verbatim}
 }
-\paragraph{Reifiability}
-{\footnotesize
-\begin{verbatim}
-This constraint is reifiable and reifyimply'able.
-\end{verbatim}
-}
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
 help constraints weightedsumgeq
 help constraints sumleq
 help constraints sumgeq
+\end{verbatim}
+}
+\section{constraints w-inrange}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-notinrange
+\end{verbatim}
+}
+\section{constraints w-inset}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set 
+{a1,..,an}.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-notinset
+\end{verbatim}
+}
+\section{constraints w-literal}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-literal(x, a) ensures that x=a.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-notliteral
+\end{verbatim}
+}
+\section{constraints w-notinrange}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-inrange
+\end{verbatim}
+}
+\section{constraints w-notinset}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong to the
+set {a1,..,an}.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-inset
+\end{verbatim}
+}
+\section{constraints w-notliteral}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-notliteral(x, a) ensures that x =/= a.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-literal
 \end{verbatim}
 }
 \section{input}
@@ -2721,24 +2728,38 @@ Inside the search section one can specify
 - optimisation function, and
 - details of how to print out solutions.
 
-SearchSection::= <VariableOrdering>?
-                 <ValueOrdering>?
-                 <OptimisationFn>?
-                 <PrintFormat>?
+   SearchSection::= <VarValOrdering>*
+                    <OptimisationFn>?
+                    <PrintFormat>?
 
-In the variable ordering a fixed ordering can be specified on any
-subset of variables. These are the search variables that will be
-instantiated in every solution. If none is specified some other fixed
-ordering of all the variables will be used.
+If no varval ordering is given then the variables are assigned in instantiation
+order and the values tried in ascending order.
 
-   VariableOrdering::= VARORDER[ <varname>+ ]
+If a variable order is given as a command line argument it will override
+anything specified in the input file.
+
+Multiple variable orders can be given, each with an optional value ordering:
+
+   VarValOrdering::= <VarOrder> 
+                     <ValOrder>?
+
+In each VarOrder an instantiation order is specified for a subset of
+variables. Variables can optionally be \"auxiliary variables\" (add \"AUX\" to
+the varorder) meaning that if there are several solutions to the problem
+differing only in the auxiliary variables, only one is reported by minion.
+
+   VarOrder::= VARORDER AUX? <ORDER>? [ <varname>+ ]
+
+      where
+
+   <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMOVERWDEG
 
 The value ordering allows the user to specify an instantiation order
 for the variables involved in the variable order, either ascending (a)
 or descending (d) for each. When no value ordering is specified, the
 default is to use ascending order for every search variable.
 
-   ValueOrdering::= VALORDER[ (a|d)+ ]
+   ValOrder::= VALORDER[ (a|d)+ ]
 
 To model an optimisation problem the user can specify to minimise
 or maximise a variable's value.
@@ -2756,6 +2777,14 @@ flattened into a vector as described in 'help variables vectors'.
    PrintFormat::= PRINT <vector>
                 | PRINT ALL
                 | PRINT NONE
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See also
+
+   switches -varorder
 \end{verbatim}
 }
 \section{input tuplelist}
@@ -2836,31 +2865,6 @@ below contains all available switches. For example to see help on
    minion help switches -quiet
 
 replacing 'minion' by the name of the executable you're using.
-\end{verbatim}
-}
-\section{switches -X-prop-node}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-Allows the user to choose the level of consistency to be enforced
-during search.
-
-See entry 'help switches -preprocess' for details of the available
-levels of consistency.
-\end{verbatim}
-}
-\paragraph{Example}
-{\footnotesize
-\begin{verbatim}
-To enforce SSAC during search:
-
-   minion -X-prop-node SSAC input.minion
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-help switches -preprocess
 \end{verbatim}
 }
 \section{switches -check}
@@ -3044,6 +3048,14 @@ Set the pseudorandom seed to N. This allows 'random' behaviour to be
 repeated in different runs of minion.
 \end{verbatim}
 }
+\section{switches -redump}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Print the minion input instance file to standard out. No search is
+carried out when this switch is used.
+\end{verbatim}
+}
 \section{switches -sollimit}
 \paragraph{Description}
 {\footnotesize
@@ -3149,6 +3161,31 @@ Print parser progress.
 {\footnotesize
 \begin{verbatim}
 help switches -quiet
+\end{verbatim}
+}
+\section{switches -X-prop-node}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Allows the user to choose the level of consistency to be enforced
+during search.
+
+See entry 'help switches -preprocess' for details of the available
+levels of consistency.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+To enforce SSAC during search:
+
+   minion -X-prop-node SSAC input.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -preprocess
 \end{verbatim}
 }
 \section{variables}
@@ -3311,7 +3348,8 @@ eq(myvar, 3) #myvar equals 3
 Vectors, matrices and tensors can be declared in minion
 input. Matrices and tensors are for convenience, as constraints do not
 take these as input; they must first undergo a flattening process to
-convert them to a vector before use.
+convert them to a vector before use. Additional commas at the end of 
+vectors are ignored (see example below).
 \end{verbatim}
 }
 \paragraph{Examples}
@@ -3363,9 +3401,21 @@ is equivalent to
 alldiff(sudoku[4,_])
 \end{verbatim}
 }
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+Additional hanging commas at the end of array are ignored, e.g.
 
+lexleq([A,B,C,],[D,E,F,])
 
+is equivalent to 
 
+lexleq([A,B,C],[D,E,F])
+
+This feature is provided to make it easier to computer-generate input
+files.
+\end{verbatim}
+}
 
 \bibliographystyle{plain}
 \bibliography{general}
