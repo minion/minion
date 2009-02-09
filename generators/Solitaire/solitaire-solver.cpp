@@ -254,7 +254,6 @@ int main (int argc, char * const argv[]) {
 		  push_back_if_valid(v,loop1+2,loop2,loop1,loop2);
 		  push_back_if_valid(v,loop1,loop2-2,loop1,loop2);
 		  push_back_if_valid(v,loop1,loop2+2,loop1,loop2);
-		  //D_ASSERT(v.size() != 0);
 		  vector<Var> w(v.size());
 		  for(int loop = 0; loop < v.size(); loop++)
 		  { w[loop] = transition_vars[i][v[loop]]; }
