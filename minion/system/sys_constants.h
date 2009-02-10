@@ -95,8 +95,12 @@ inline T mymax(T t1, T t2)
   else
     return t1;
 }
-
+#ifdef __CYGWIN__
+typedef int MachineInt;
+#else
 typedef int32_t MachineInt;
+#endif
+
 #ifdef BOUNDS_CHECK
 typedef Wrapper<MachineInt> DomainInt;
 #else
