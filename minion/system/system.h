@@ -91,9 +91,9 @@ using boost::disable_if_c;
 
 #ifdef USE_BOOST
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
+//#include <boost/thread/thread.hpp>
+//#include <boost/thread/mutex.hpp>
+//#include <boost/thread/locks.hpp>
 
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
