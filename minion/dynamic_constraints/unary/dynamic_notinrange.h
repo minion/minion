@@ -93,7 +93,7 @@ template<typename Var>
 
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-    PROP_INFO_ADDONE(WatchInRange);
+    PROP_INFO_ADDONE(WatchNotInRange);
     D_ASSERT(var.isBound());
     
     if(var.getMax() <= range_max)
