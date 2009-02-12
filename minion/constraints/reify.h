@@ -154,6 +154,10 @@ struct reify : public ParentConstraint
     if(reify_var.inDomain(1))
     {
         bool flag=child_constraints[0]->get_satisfying_assignment(assignment);
+#ifdef MINION_DEBUG
+	bool unsat = child_constraints[0]->full_check_unsat();
+	D_ASSERT((!flag && unsat) || (flag && !unsat));
+#endif
         if(flag)
         {
             assignment.push_back(make_pair(reify_var_num, 1));
@@ -164,6 +168,10 @@ struct reify : public ParentConstraint
     if(reify_var.inDomain(0))
     {
         bool flag=child_constraints[1]->get_satisfying_assignment(assignment);
+#ifdef MINION_DEBUG
+	bool unsat = child_constraints[1]->full_check_unsat();
+	D_ASSERT((!flag && unsat) || (flag && !unsat));
+#endif
         if(flag)
         {
             assignment.push_back(make_pair(reify_var_num, 0));
@@ -303,6 +311,10 @@ struct reify : public ParentConstraint
           {
             bool flag;
             GET_ASSIGNMENT(assignment, child_constraints[0]);
+#ifdef MINION_DEBUG
+	    bool unsat = child_constraints[0]->full_check_unsat();
+	    D_ASSERT((!flag && unsat) || (flag && !unsat));
+#endif
             
             P("Find new assignment");
             if(!flag)
@@ -332,6 +344,10 @@ struct reify : public ParentConstraint
           {
             bool flag;
             GET_ASSIGNMENT(assignment, child_constraints[1]);
+#ifdef MINION_DEBUG
+	    bool unsat = child_constraints[1]->full_check_unsat();
+	    D_ASSERT((!flag && unsat) || (flag && !unsat));
+#endif
             
             P("Find new assignment");
             if(!flag)
@@ -432,6 +448,12 @@ struct reify : public ParentConstraint
     
     bool flag;
     GET_ASSIGNMENT(assignment0, child_constraints[0]);
+#ifdef MINION_DEBUG
+    {
+      bool unsat = child_constraints[0]->full_check_unsat();
+      D_ASSERT((!flag && unsat) || (flag && !unsat));
+    }
+#endif
     if(!flag)
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(0);
@@ -443,6 +465,12 @@ struct reify : public ParentConstraint
       return;
     }
     GET_ASSIGNMENT(assignment1, child_constraints[1]);
+#ifdef MINION_DEBUG
+    {    
+      bool unsat = child_constraints[1]->full_check_unsat();
+      D_ASSERT((!flag && unsat) || (flag && !unsat));
+    }
+#endif
     if(!flag)
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(1);
@@ -584,6 +612,14 @@ struct reify : public AbstractConstraint
 
     if(i%2 == 0)
     { 
+#ifdef MINION_DEBUG
+      {
+	bool flag;
+	GET_ASSIGNMENT(assignment0, poscon);
+	bool unsat = poscon->check_unsat(i/2, domain);
+	D_ASSERT((!flag && unsat) || (flag && !unsat));
+      }
+#endif
       if(poscon->check_unsat(i/2, domain)) 
       { 
         rar_var.propagateAssign(false);
@@ -591,6 +627,14 @@ struct reify : public AbstractConstraint
     }
     else
     { 
+#ifdef MINION_DEBUG
+      {
+	bool flag;
+	GET_ASSIGNMENT(assignment0, negcon);
+	bool unsat = negcon->check_unsat((i-1)/2,domain);
+	D_ASSERT((!flag && unsat) || (flag && !unsat));
+      }
+#endif
       if(negcon->check_unsat((i-1)/2,domain)) 
       {
         rar_var.propagateAssign(true);
@@ -600,11 +644,27 @@ struct reify : public AbstractConstraint
 
   virtual void full_propagate()
   {
+#ifdef MINION_DEBUG
+    {
+      bool flag;
+      GET_ASSIGNMENT(assignment0, poscon);
+      bool unsat = poscon->full_check_unsat();
+      D_ASSERT((!flag && unsat) || (flag && !unsat));
+    }
+#endif
     if(poscon->full_check_unsat())
     {
       rar_var.propagateAssign(false);
     }
 
+#ifdef MINION_DEBUG
+    { 
+      bool flag;
+      GET_ASSIGNMENT(assignment0, negcon);
+      bool unsat = negcon->full_check_unsat();
+      D_ASSERT((!flag && unsat) || (flag && !unsat));
+    }
+#endif
     if(negcon->full_check_unsat())
     {
       rar_var.propagateAssign(true);
