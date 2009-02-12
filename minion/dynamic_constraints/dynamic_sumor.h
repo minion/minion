@@ -56,10 +56,11 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   vector<int> unwatched_values;
 
   Reversible<bool> propagate_mode;
+  int index_to_not_propagate;
 
   VecCountDynamic(StateObj* _stateObj, const VarArray1& _array1, const VarArray2& _array2, int _hamming_distance) :
   AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_hamming_distance + 1), hamming_distance(_hamming_distance),
-    propagate_mode(_stateObj, false)
+    propagate_mode(_stateObj, false), index_to_not_propagate(-1)
     {
        if(num_to_watch <= 1)
          num_to_watch = 0;
@@ -77,7 +78,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   {
     Operator::add_triggers(var_array1[index], var_array2[index], dt);
   }
-  
+
   virtual void full_propagate()
   {
     
@@ -117,6 +118,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     // Found exactly as many values as we need to propagate
     if(found_matches == num_to_watch - 1)
     {
+      index_to_not_propagate = -1 ;
       propagate_mode = true;
       for(int i = 0; i < num_to_watch - 1; ++i)
       {
@@ -167,9 +169,9 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     int trigger_activated = dt - dynamic_trigger_start();
     int triggerpair = trigger_activated / Operator::dynamic_trigger_count();   
     D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);
-/*
-    printf("propmode=%d, triggerpair=%d, trigger_activated=%d, nopropindex=%d\n",
-      (int)propagate_mode, (int)triggerpair, (int)trigger_activated, (int)index_to_not_propagate);
+
+    printf("propmode=%d, triggerpair=%d, trigger_activated=%d\n",
+      (int)propagate_mode, (int)triggerpair, (int)trigger_activated);
 
     for(int i = 0; i < watched_values.size(); ++i)
       printf("%d,", watched_values[i]);
@@ -178,9 +180,23 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     for(int i = 0; i < unwatched_values.size(); ++i)
       printf("%d,", unwatched_values[i]);
     printf("\n");
-*/    
+    
+    for(int i = 0; i < var_array1.size(); ++i)
+      cout << var_array1[i].getMin() << ":" << var_array1[i].getMax() << ",";
+    
+    cout << endl;
+    
+    for(int i = 0; i < var_array2.size(); ++i)
+      cout << var_array2[i].getMin() << ":" << var_array2[i].getMax() << ",";
+    
+    cout << endl;
+    
+    
     if(propagate_mode)
     {
+      if(index_to_not_propagate == watched_values[triggerpair])
+        return;
+        
     // assumes that the first set of Operator::dynamic_trigger_count()/2 triggers are on var1, and the other set are on var2.
       if(trigger_activated % Operator::dynamic_trigger_count() < Operator::dynamic_trigger_count()/2)
       { propagate_from_var1(watched_values[triggerpair]); }
@@ -202,6 +218,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     {
       // This is the only possible non-equal index.
       propagate_mode = true;
+      index_to_not_propagate = watched_values[triggerpair];
       
 //     printf("!propmode=%d, triggerpair=%d, trigger_activated=%d, nopropindex=%d\n",
 //        (int)propagate_mode, (int)triggerpair, (int)trigger_activated, (int)index_to_not_propagate);
