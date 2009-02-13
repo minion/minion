@@ -443,7 +443,6 @@ struct reify : public ParentConstraint
       return;
     }
     GET_ASSIGNMENT(assignment1, child_constraints[1]);
-#endif
     if(!flag)
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(1);
