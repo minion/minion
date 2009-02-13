@@ -154,10 +154,6 @@ struct reify : public ParentConstraint
     if(reify_var.inDomain(1))
     {
         bool flag=child_constraints[0]->get_satisfying_assignment(assignment);
-#ifdef MINION_DEBUG
-	bool unsat = child_constraints[0]->full_check_unsat();
-	D_ASSERT((!flag && unsat) || (flag && !unsat));
-#endif
         if(flag)
         {
             assignment.push_back(make_pair(reify_var_num, 1));
@@ -168,10 +164,6 @@ struct reify : public ParentConstraint
     if(reify_var.inDomain(0))
     {
         bool flag=child_constraints[1]->get_satisfying_assignment(assignment);
-#ifdef MINION_DEBUG
-	bool unsat = child_constraints[1]->full_check_unsat();
-	D_ASSERT((!flag && unsat) || (flag && !unsat));
-#endif
         if(flag)
         {
             assignment.push_back(make_pair(reify_var_num, 0));
@@ -311,10 +303,6 @@ struct reify : public ParentConstraint
           {
             bool flag;
             GET_ASSIGNMENT(assignment, child_constraints[0]);
-#ifdef MINION_DEBUG
-	    bool unsat = child_constraints[0]->full_check_unsat();
-	    D_ASSERT((!flag && unsat) || (flag && !unsat));
-#endif
             
             P("Find new assignment");
             if(!flag)
@@ -344,10 +332,6 @@ struct reify : public ParentConstraint
           {
             bool flag;
             GET_ASSIGNMENT(assignment, child_constraints[1]);
-#ifdef MINION_DEBUG
-	    bool unsat = child_constraints[1]->full_check_unsat();
-	    D_ASSERT((!flag && unsat) || (flag && !unsat));
-#endif
             
             P("Find new assignment");
             if(!flag)
@@ -448,12 +432,6 @@ struct reify : public ParentConstraint
     
     bool flag;
     GET_ASSIGNMENT(assignment0, child_constraints[0]);
-#ifdef MINION_DEBUG
-    {
-      bool unsat = child_constraints[0]->full_check_unsat();
-      D_ASSERT((!flag && unsat) || (flag && !unsat));
-    }
-#endif
     if(!flag)
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(0);
@@ -465,11 +443,6 @@ struct reify : public ParentConstraint
       return;
     }
     GET_ASSIGNMENT(assignment1, child_constraints[1]);
-#ifdef MINION_DEBUG
-    {    
-      bool unsat = child_constraints[1]->full_check_unsat();
-      D_ASSERT((!flag && unsat) || (flag && !unsat));
-    }
 #endif
     if(!flag)
     { // No satisfying assignment to constraint
