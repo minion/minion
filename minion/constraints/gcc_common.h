@@ -2038,4 +2038,7 @@ struct GCC : public AbstractConstraint
     }
 };
 
+// Note: should not attempt to prune capacity variables when they are assigned.
+// It seems to do so for both strong and weak variants.
+
 #endif
