@@ -22,8 +22,9 @@ else
 fi
 
 # build standard and debug binaries
-(cmake -DSTATIC=1 -DNAME=minion . && make minion) || "Failed to build minion"
-(cmake -DSTATIC=1 -DDEBUG=1 -DUNOPTIMISED=1 -DNAME=minion-debug . && make minion-debug) || exit "Failed to build debug minion"
+# We run cmake twice due to a bug on windows -- it should make no difference anywhere else!
+(cmake -DSTATIC=1 -DNAME=minion . && cmake -DSTATIC=1 -DNAME=minion . && make minion) || "Failed to build minion"
+(cmake -DSTATIC=1 -DDEBUG=1 -DUNOPTIMISED=1 -DNAME=minion-debug . && cmake -DSTATIC=1 -DDEBUG=1 -DUNOPTIMISED=1 -DNAME=minion-debug . && make minion-debug) || exit "Failed to build debug minion"
 
 if [ $# -ge 4 ]; then
     cd test_instances && (./run_tests.sh ../bin/minion \
