@@ -38,7 +38,7 @@ fi
 echo $@ > RELEASE_PARAMS
 
 # tar everything
-tar cf minion-$1-src.tar --exclude=.svn minion test_instances \
+tar cf minion-$1-src.tar --exclude=*.pyc --exclude=.svn minion test_instances \
                          CMakeLists.txt mini-scripts benchmarks \
                          generators LICENSE.txt README docs/Manual.pdf \
                          docs/Manual.tex docs/general.bib \
