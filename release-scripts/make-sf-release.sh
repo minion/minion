@@ -43,7 +43,8 @@ tar cf minion-$1-src.tar --exclude=*.pyc --exclude=.svn minion test_instances \
                          generators LICENSE.txt README docs/Manual.pdf \
                          docs/Manual.tex docs/general.bib \
                          docs/EightPuzzleDiagram.pdf docs/k4xp2.pdf \
-                         RELEASE_PARAMS visualisation cmake-modules &&
+                         RELEASE_PARAMS visualisation cmake-modules \
+                         release-scripts &&
 cp minion-$1-src.tar minion-$1.tar &&
 tar rf minion-$1.tar bin/minion &&
 cp minion-$1-src.tar minion-$1-debug.tar &&
