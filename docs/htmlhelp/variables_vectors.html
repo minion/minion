@@ -10,7 +10,8 @@
 Vectors, matrices and tensors can be declared in minion
 input. Matrices and tensors are for convenience, as constraints do not
 take these as input; they must first undergo a flattening process to
-convert them to a vector before use.
+convert them to a vector before use. Additional commas at the end of 
+vectors are ignored (see example below).
 </pre>
 <h3>Examples</h3>
 <pre>
@@ -58,6 +59,19 @@ alldiff([sudoku[4,_]])
 is equivalent to
 
 alldiff(sudoku[4,_])
+</pre>
+<h3>Example</h3>
+<pre>
+Additional hanging commas at the end of array are ignored, e.g.
+
+lexleq([A,B,C,],[D,E,F,])
+
+is equivalent to 
+
+lexleq([A,B,C],[D,E,F])
+
+This feature is provided to make it easier to computer-generate input
+files.
 </pre>
 <p><a href="index.html">Home</a></p>
 </body>

@@ -7,26 +7,26 @@
 <h1>Help on <tt>constraints watchsumgeq</tt></h1>
 <h3>Description</h3>
 <pre>
-The constraint watchsumgeq(vec, c) ensures that sum(vec) &gt;= c.
+  The constraint watchsumgeq(vec, c) ensures that sum(vec) &gt;= c.
 </pre>
 <h3>Notes</h3>
 <pre>
-Equivalent to litsumgeq(vec, [1,...,1], c), but faster.
+  For this constraint, small values of c are more efficient.
+
+  Equivalent to litsumgeq(vec, [1,...,1], c), but faster.
+
+  This constraint works on 0/1 variables only.
 </pre>
-<h3>Notes</h3>
+<h3>Reifiability</h3>
 <pre>
-This constraint works on 0/1 variables only.
-</pre>
-<h3>Reifiablity</h3>
-<pre>
-This constraint is NOT reifiable.
+  This constraint is not reifiable.
 </pre>
 <h3>References</h3>
 <pre>
-See also
+  See also
 
-   help constraints watchsumleq 
-   help constraints litsumgeq
+  help constraints watchsumleq 
+  help constraints litsumgeq
 </pre>
 <p><a href="index.html">Home</a></p>
 </body>
