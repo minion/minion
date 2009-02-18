@@ -123,21 +123,7 @@ struct reify : public ParentConstraint
     //dtcount=dynamic_trigger_count();
     dtcount=child_constraints[0]->get_vars_singleton()->size()*2 + child_constraints[1]->get_vars_singleton()->size()*2;
     c0vars=child_constraints[0]->get_vars_singleton()->size();
-    bool hasbound=false;
-    for(int i=0; i<c0vars; i++)
-    {
-        if(child_constraints[0]->get_vars_singleton()[i].isBound())
-            hasbound=true;
-    }
-    for(int i=0; i<child_constraints[1]->get_vars_singleton()->size(); i++)
-    {
-        if(child_constraints[1]->get_vars_singleton()[i].isBound())
-            hasbound=true;
-    }
-    if(hasbound)
-    {
-        cout<<"Warning: bound variables in reify degrade performance, because watched literals are translated into DomainChanged triggers." <<endl; 
-    }
+    
     D_DATA(triggerpairs.resize(2));
   }
   
