@@ -103,11 +103,11 @@ struct WatchLessConstraint : public AbstractConstraint
   }
 
   template<bool b>
-  typename enable_if_c<b, AbstractConstraint*>::type rev_implement()
+  typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
   { return new WatchLessConstraint<Var2,ShiftVar<Var1,DomainInt>,true>(stateObj, var2, ShiftVar<Var1,DomainInt>(var1, 1)); }
 
   template<bool b>
-  typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
+  typename enable_if_c<b, AbstractConstraint*>::type rev_implement()
   { FAIL_EXIT(); } //cannot reverse a reversed constraint
 
   virtual AbstractConstraint* reverse_constraint() { return rev_implement<Negated>(); }
