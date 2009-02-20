@@ -158,9 +158,9 @@ struct Graph
        cout << ", PermList([";
        bool first_pass = true;
        D_ASSERT(perms[i][0] == 0);
-       for(int j = 1; j < var_vertex_count; ++j)
+       for(int j = 1; j <= var_vertex_count; ++j)
        {
-         D_ASSERT(perms[i][j] < var_vertex_count);
+         D_ASSERT(perms[i][j] <= var_vertex_count);
          if(first_pass)
          {
            first_pass = false;
