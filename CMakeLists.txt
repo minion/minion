@@ -455,3 +455,5 @@ endif()
 add_custom_target(dist-clean
     "cmake" "-E" "remove" "-f" "CMakeCache.txt" "Makefile" "cmake_install.cmake" VERBATIM)
 add_dependencies(dist-clean clean)
+
+add_custom_target(tests-quick "./do_basic_tests.sh" "../bin/${BINARY}" WORKING_DIRECTORY "test_instances")

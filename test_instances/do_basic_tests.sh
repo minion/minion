@@ -7,7 +7,6 @@ expectedfail=0
 unexpectedpass=0
 
 
-
 if [ $# -lt 1 ]; then
   echo Must give a minion binary to test.
   echo Likely values are ../bin/minion or ../bin/minion-debug
