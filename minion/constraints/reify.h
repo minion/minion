@@ -419,7 +419,7 @@ struct reify : public ParentConstraint
         vars[assignment[i].first].addDynamicTrigger(trig + i, DomainRemoval, assignment[i].second);
     }
     // clear a contiguous block of used triggers up to (not including) endtrig
-    D_DATA(int firstunattached=0);
+    D_DATA(int firstunattached = -1);
     for(int i=assignment.size(); (trig+i)<endtrig; i++)
     {
         if(!(trig+i)->isAttached())
@@ -431,11 +431,13 @@ struct reify : public ParentConstraint
     }
     
     #ifdef MINION_DEBUG
-    for(int i=firstunattached; (trig+i)<endtrig; i++)
+    if(firstunattached != -1)
     {
-        D_ASSERT(!(trig+i)->isAttached());
+      for(int i=firstunattached; (trig+i)<endtrig; i++)
+      {
+          D_ASSERT(!(trig+i)->isAttached());
+      }
     }
-    
     // put the triggers into triggerpairs to check later.
     int cid=((trig==dynamic_trigger_start())?0:1);
     triggerpairs[cid].clear();
