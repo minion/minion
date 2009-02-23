@@ -8,7 +8,8 @@ if [ ! -d $2 ]; then
 fi
 cd $2
 
-svn co -r $3 https://minion.svn.sourceforge.net/svnroot/minion/trunk . || exit "Unable to check out minion source from sourceforge!"
+svn co -r $3 https://minion.svn.sourceforge.net/svnroot/minion/trunk minion-$1 || exit "Unable to check out minion source from sourceforge!"
+cd minion-$1
 
 # check the version of the manual
 MANUALVER=`grep '\\\def\\\minionversion' docs/Manual.tex | awk -F '{' '{ print substr($2,0,length($2)-1); }'`
@@ -37,16 +38,28 @@ fi
 # save the parameters
 echo $@ > RELEASE_PARAMS
 
+cd ..
+
 # tar everything
-tar cf minion-$1-src.tar --exclude=*.pyc --exclude=.svn minion test_instances \
-                         CMakeLists.txt mini-scripts benchmarks \
-                         generators LICENSE.txt README docs/Manual.pdf \
-                         docs/Manual.tex docs/general.bib \
-                         docs/EightPuzzleDiagram.pdf docs/k4xp2.pdf \
-                         RELEASE_PARAMS visualisation cmake-modules \
-                         release-scripts &&
+tar cf minion-$1-src.tar --exclude=*.pyc --exclude=.svn minion-$1/minion \
+                         minion-$1/test_instances \
+                         minion-$1/CMakeLists.txt \
+                         minion-$1/mini-scripts \
+                         minion-$1/benchmarks \
+                         minion-$1/generators \
+                         minion-$1/LICENSE.txt \
+                         minion-$1/README \
+                         minion-$1/docs/Manual.pdf \
+                         minion-$1/docs/Manual.tex \
+                         minion-$1/docs/general.bib \
+                         minion-$1/docs/EightPuzzleDiagram.pdf \
+                         minion-$1/docs/k4xp2.pdf \
+                         minion-$1/RELEASE_PARAMS \
+                         minion-$1/visualisation \
+                         minion-$1/cmake-modules \
+                         minion-$1/release-scripts &&
 cp minion-$1-src.tar minion-$1.tar &&
-tar rf minion-$1.tar bin/minion &&
+tar rf minion-$1.tar minion-$1/bin/minion &&
 cp minion-$1-src.tar minion-$1-debug.tar &&
-tar rf minion-$1-debug.tar bin/minion-debug &&
+tar rf minion-$1-debug.tar minion-$1/bin/minion-debug &&
 gzip *.tar
