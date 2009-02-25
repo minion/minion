@@ -456,10 +456,10 @@ add_custom_target(dist-clean
     "cmake" "-E" "remove" "-f" "CMakeCache.txt" "Makefile" "cmake_install.cmake" VERBATIM)
 add_dependencies(dist-clean clean)
 
-add_custom_target(test-instances-quick "./do_basic_tests.sh" "../bin/${BINARY}" WORKING_DIRECTORY "test_instances")
-add_custom_target(test-instances-slow  "./run_tests.sh" "../bin/${BINARY}" WORKING_DIRECTORY "test_instances")
-add_custom_target(test-random-quick  "./mini-scripts/testallconstraints.py" "--numtests=25" "--procs=2" "--minion=bin/${BINARY}")
-add_custom_target(test-random-slow "./mini-scripts/testallconstraints.py" "--numtests=160" "--seed=17627" "--procs=2" "--minion=bin/${BINARY}")
+add_custom_target(test-instances-quick "./do_basic_tests.sh" "../bin/${BINARY}" WORKING_DIRECTORY "test_instances" DEPENDS minion)
+add_custom_target(test-instances-slow  "./run_tests.sh" "../bin/${BINARY}" WORKING_DIRECTORY "test_instances" DEPENDS minion)
+add_custom_target(test-random-quick  "./mini-scripts/testallconstraints.py" "--numtests=25" "--procs=2" "--minion=bin/${BINARY}" DEPENDS minion)
+add_custom_target(test-random-slow "./mini-scripts/testallconstraints.py" "--numtests=160" "--seed=17627" "--procs=2" "--minion=bin/${BINARY}" DEPENDS minion)
 
 add_custom_target(test-quick DEPENDS test-instances-quick)
 add_custom_target(test DEPENDS test-instances test-random-quick)

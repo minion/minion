@@ -8,7 +8,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "pow" "div" "modulo" "gadget" "disabled-or"
                     "hamming" "watched-or" "watched-and"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
-                    "w-notliteral" "reify" "reifyimply-quick" "reifyimply" "true" "false")
+                    "w-notliteral" "reify" "reifyimply-quick" "reifyimply" "reifyimply-old" "reifyimply-new" "true" "false")
 
 set(GEN_FILES_DIR "minion/build_constraints")
 set(CONSTRAINTS_LIST "${GEN_FILES_DIR}/ConstraintList")
@@ -188,6 +188,12 @@ set(NAME_READ_reifyimply-quick "read_constraint" "read_bool_var")
 
 set(NAME_ID_reifyimply "CT_REIFYIMPLY")
 set(NAME_READ_reifyimply "read_constraint" "read_bool_var")
+
+set(NAME_ID_reifyimply-old "CT_REIFYIMPLY_OLD")
+set(NAME_READ_reifyimply-old "read_constraint" "read_bool_var")
+
+set(NAME_ID_reifyimply-new "CT_REIFYIMPLY_NEW")
+set(NAME_READ_reifyimply-new "read_constraint" "read_bool_var")
 
 set(NAME_ID_true "CT_TRUE")
 set(NAME_READ_true )
