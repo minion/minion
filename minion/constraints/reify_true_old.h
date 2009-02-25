@@ -79,7 +79,7 @@ struct reify_true_old : public AbstractConstraint
     for(unsigned int i=0;i<postrig.size();i++)
     {
       postrig[i]->trigger.constraint = this;
-	  D_ASSERT(postrig[i]->trigger.info != -99999);
+      D_ASSERT(postrig[i]->trigger.info != -99999);
       triggers.push_back(postrig[i]);
     }
     triggers.push_back(make_trigger(rar_var, Trigger(this, -99999), LowerBound));
@@ -89,28 +89,27 @@ struct reify_true_old : public AbstractConstraint
   virtual void special_check()
   {
     D_ASSERT(constraint_locked);
-	constraint_locked = false;
-	poscon->full_propagate();
+    constraint_locked = false;
+    poscon->full_propagate();
     full_propagate_called = true;
   }
   
   virtual void special_unlock()
   {
     D_ASSERT(constraint_locked);
-	constraint_locked = false;
+    constraint_locked = false;
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
-	PROP_INFO_ADDONE(ReifyTrue);
+    PROP_INFO_ADDONE(ReifyTrue);
     if(constraint_locked)
-	  return;
-	  
-	if(i == -99999)
+      return;
+
+    if(i == -99999)
     {
-	  constraint_locked = true;
-	  getQueue(stateObj).pushSpecialTrigger(this);
-	  //poscon->full_propagate();
+      constraint_locked = true;
+      getQueue(stateObj).pushSpecialTrigger(this);
       return;
     }
     
@@ -119,14 +118,36 @@ struct reify_true_old : public AbstractConstraint
       D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
       poscon->propagate(i, domain);
     }
+    
+    #ifdef MINION_DEBUG
+    bool flag;
+    GET_ASSIGNMENT(assignment0, poscon);
+    bool unsat = poscon->check_unsat(i, domain);
+    D_ASSERT((!flag && unsat) || (flag && !unsat));
+    #endif
+    if(poscon->check_unsat(i, domain)) 
+    { rar_var.propagateAssign(false); }
+
   }
   
   virtual void full_propagate()
   {
+    #ifdef MINION_DEBUG
+    {
+      bool flag;
+      GET_ASSIGNMENT(assignment0, poscon);
+      bool unsat = poscon->full_check_unsat();
+      D_ASSERT((!flag && unsat) || (flag && !unsat));
+    }
+    #endif
+    
+    if(poscon->full_check_unsat())
+      rar_var.propagateAssign(false);
+
     if(rar_var.isAssigned() && rar_var.getAssignedValue() > 0)
     {
-	  poscon->full_propagate();
-	  full_propagate_called = true;
+      poscon->full_propagate();
+      full_propagate_called = true;
     }
   }
 };
