@@ -452,26 +452,25 @@ else()
     message(STATUS "Doxygen not found, not generating doxygen documentation target")
 endif()
 
-add_custom_target(test-instances-quick "./do_basic_tests.sh"
-                                       "${PROJECT_BINARY_DIR}/${BINARY}"
-                WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test_instances"
-                DEPENDS minion)
-add_custom_target(test-instances-slow  "./run_tests.sh"
-                                       "${PROJECT_BINARY_DIR}/${BINARY}"
-                WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test_instances"
-                DEPENDS minion)
-add_custom_target(test-random-quick
-                "./mini-scripts/testallconstraints.py"
+add_custom_target(test-instances-quick DEPENDS ${BINARY}
+                  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test_instances"
+                  COMMAND "./do_basic_tests.sh" "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
+                  
+add_custom_target(test-instances-slow DEPENDS ${BINARY}
+                  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test_instances"
+                  COMMAND "./run_tests.sh" "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
+                
+add_custom_target(test-random-quick DEPENDS ${BINARY}
+                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}            
+                 COMMAND "./mini-scripts/testallconstraints.py"
                     "--numtests=25" "--procs=2"
-                    "--minion=${PROJECT_BINARY_DIR}/${BINARY}"
-                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                DEPENDS minion VERBATIM)
-add_custom_target(test-random-slow
-                "./mini-scripts/testallconstraints.py"
+                    "--minion=${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
+                
+add_custom_target(test-random-slow DEPENDS ${BINARY}
+                  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                  COMMAND "./mini-scripts/testallconstraints.py"
                     "--numtests=160" "--procs=2"
-                    "--minion=${PROJECT_BINARY_DIR}/${BINARY}"
-                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                DEPENDS minion VERBATIM)
+                    "--minion=${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
 
 add_custom_target(test-quick)
 add_dependencies(test-quick test-instances-quick)
