@@ -174,30 +174,32 @@ started with it.
 
 The main Minion website is \url{http://minion.sourceforge.net/},
 and this contains links to the download page. Currently, executables with and
-without debug information are provided for Mac and Linux. We hope to provide
-Windows executables in future releases.
+without debug information are provided for Mac, Linux, and Cygwin.
 
 
-%\subsection{Installation instructions for Windows}
-%
-%Download the windows archive minion-x.y.z-windows.zip and unpack,
-%you should find Minion executables minion.exe and minion-debug.exe
-%along with the required library cygwin1.dll. The executables should
-%work from the windows command shell cmd.exe.
-%
+\subsection{Installation instructions for Windows}
+
+Download the windows archive minion-x.y.z-cygwin.tar.gz and unpack,
+you should find Minion executable minion.exe along with the required library
+cygwin1.dll. The executable should work from the windows command shell cmd.exe.
+
 
 \subsection{Installation instructions for Mac}
 
 Download the Mac archive minion-x.y.z-mac.tar.gz and unpack. The contents
-include universal binaries `minion' and `minion-debug' which should
-work on both Intel and PowerPC Macs with Mac OS X 10.4.2 or later.
+include universal binary `minion' which should work on both Intel and PowerPC
+Macs with Mac OS X 10.4.2 or later.
 
 
 \subsection{Installation instructions for Linux-x86 or x64}
 
 Download the Linux archive minion-x.y.z-linux.tar.gz and unpack. It contains
-the binaries `minion' and `minion-debug'. Both executables are linked
-statically.
+the binary `minion'. The executable is linked statically.
+
+\bigskip
+
+All versions come with a debug variant as well. The debug executables are
+contained in the minion-x.y.z-debug-<os>.tar.gz.
 
 
 \subsection{Compilation instructions}
