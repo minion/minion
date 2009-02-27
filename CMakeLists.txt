@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.4.7 FATAL_ERROR)
 
-set(CMAKE_MODULE_PATH cmake-modules)
+project(minion)
+
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-modules)
 include(CheckIncludeFileCXX)
 include(CheckCXXCompilerFlag)
 include(FindBoost)
@@ -10,9 +12,6 @@ include(CheckIncludeFiles)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
-project(minion)
-set(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin")
-set(LIBRARY_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin/libraries")
 # determine svn version and date
 find_program(SVN svn)
 if(SVN)
@@ -98,24 +97,24 @@ else()
     select_constraints(${ALL_CONSTRAINTS})
 endif()
 
-file(GLOB SRCS "minion/build_constraints/CT*.cpp")
+file(GLOB SRCS "${PROJECT_SOURCE_DIR}/minion/build_constraints/CT*.cpp")
 foreach(ct ${SRCS})
     string(REGEX MATCH "CT_[A-Z_0-9]+" ct_name ${ct})
     add_definitions(-D${ct_name}_ABC)
 endforeach()
-list(APPEND SRCS minion/BuildConstraint2.cpp
-                 minion/BuildCSP.cpp
-                 minion/commandline_parse.cpp
-                 minion/constraint_setup.cpp
-                 minion/debug_functions.cpp
-                 minion/get_info.cpp
-                 minion/inputfile_parse.cpp
-#                minion/minion.cpp
-                 minion/globals.cpp
-                 minion/preprocess.cpp)
-list(APPEND SRCS minion/build_constraints/BuildStaticStart.cpp)
-list(APPEND SRCS minion/system/trigger_timer.cpp)
-list(APPEND SRCS minion/help/help.cpp)
+list(APPEND SRCS ${PROJECT_SOURCE_DIR}/minion/BuildConstraint2.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/BuildCSP.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/commandline_parse.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/constraint_setup.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/debug_functions.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/get_info.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/inputfile_parse.cpp
+#                ${PROJECT_SOURCE_DIR}/minion/minion.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/globals.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/preprocess.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/build_constraints/BuildStaticStart.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/system/trigger_timer.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/help/help.cpp)
 
 set(BINARY ${PROJECT_NAME})
 
@@ -137,9 +136,12 @@ endif()
 
 option(NAUTY "" OFF)
 if(NAUTY)
-  message(STATUS "Please configure nauty")
+  message(STATUS "Please be naughty")
   add_definitions(-DUSE_NAUTY)
-  list(APPEND SRCS nauty24b7/nautycxx.cpp nauty24b7/nauty.c nauty24b7/nautil.c nauty24b7/nausparse.c)
+  list(APPEND SRCS ${PROJECT_SOURCE_DIR}/nauty24b7/nautycxx.cpp
+                   ${PROJECT_SOURCE_DIR}/nauty24b7/nauty.c
+                   ${PROJECT_SOURCE_DIR}/nauty24b7/nautil.c
+                   ${PROJECT_SOURCE_DIR}/nauty24b7/nausparse.c)
 endif()
 
 option(STATIC "" OFF)
@@ -354,7 +356,7 @@ message(STATUS "Executable name set to \"${BINARY}\"")
 
 add_library(${BINARY}-lib STATIC EXCLUDE_FROM_ALL ${SRCS})
 
-add_executable(${BINARY} ${SRCS} minion/minion.cpp)
+add_executable(${BINARY} ${SRCS} ${PROJECT_SOURCE_DIR}/minion/minion.cpp)
 #target_link_libraries(${BINARY} ${BINARY}-lib)
 
 # when we're building minion-something, add a "minion" target that does the same
@@ -394,26 +396,24 @@ if(CLISP)
     add_custom_target(minion-helper ${CLISP} ${CLISP_FLAGS}
         "(clisp-make-executable \"minion-helper\")"
         -i "${PROJECT_SOURCE_DIR}/generators/MinionHelper.lsp"
-        WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         COMMENT "minion-helper" VERBATIM)
     add_custom_target(minion-sat ${CLISP} ${CLISP_FLAGS}
         "(clisp-make-executable \"minion-sat\" (function clisp-toplevel-sat))"
         -i "${PROJECT_SOURCE_DIR}/generators/MinionHelper.lsp"
         -i "${PROJECT_SOURCE_DIR}/generators/SAT/MinionDimacsSAT.lsp"
-        WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         COMMENT "minion-sat" VERBATIM)
     add_custom_target(minion-quasigroup ${CLISP} ${CLISP_FLAGS}
         "(clisp-make-executable \"minion-quasigroup\" (function clisp-toplevel-quasigroup))"
         -i "${PROJECT_SOURCE_DIR}/generators/MinionHelper.lsp"
         -i "${PROJECT_SOURCE_DIR}/generators/Quasigroup/MinionQuasigroup.lsp"
-        WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         COMMENT "minion-quasigroup" VERBATIM)
-    add_custom_target(lisp-generate WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
-    # XXX: adding the dependencies directly to the target causes it to fail
-    # if the current dir != EXECUTABLE_OUTPUT_PATH
+    add_custom_target(lisp-generate WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     add_dependencies(lisp-generate minion-helper minion-sat minion-quasigroup)
     set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
-        "${EXECUTABLE_OUTPUT_PATH}/minion-helper;${EXECUTABLE_OUTPUT_PATH}/minion-sat;${EXECUTABLE_OUTPUT_PATH}/minion-quasigroup")
+        "${PROJECT_BINARY_DIR}/minion-helper;${PROJECT_BINARY_DIR}/minion-sat;${PROJECT_BINARY_DIR}/minion-quasigroup")
 else()
     message(STATUS "No clisp executable found, not generating LISP targets")
 endif()
@@ -452,11 +452,30 @@ else()
     message(STATUS "Doxygen not found, not generating doxygen documentation target")
 endif()
 
-add_custom_target(test-instances-quick "./do_basic_tests.sh" "../bin/${BINARY}" WORKING_DIRECTORY "test_instances" DEPENDS minion)
-add_custom_target(test-instances-slow  "./run_tests.sh" "../bin/${BINARY}" WORKING_DIRECTORY "test_instances" DEPENDS minion)
-add_custom_target(test-random-quick  "./mini-scripts/testallconstraints.py" "--numtests=25" "--procs=2" "--minion=bin/${BINARY}" DEPENDS minion)
-add_custom_target(test-random-slow "./mini-scripts/testallconstraints.py" "--numtests=160" "--seed=17627" "--procs=2" "--minion=bin/${BINARY}" DEPENDS minion)
+add_custom_target(test-instances-quick "./do_basic_tests.sh"
+                                       "${PROJECT_BINARY_DIR}/${BINARY}"
+                WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test_instances"
+                DEPENDS minion)
+add_custom_target(test-instances-slow  "./run_tests.sh"
+                                       "${PROJECT_BINARY_DIR}/${BINARY}"
+                WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test_instances"
+                DEPENDS minion)
+add_custom_target(test-random-quick
+                "./mini-scripts/testallconstraints.py"
+                    "--numtests=25" "--procs=2"
+                    "--minion=${PROJECT_BINARY_DIR}/${BINARY}"
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                DEPENDS minion VERBATIM)
+add_custom_target(test-random-slow
+                "./mini-scripts/testallconstraints.py"
+                    "--numtests=160" "--procs=2"
+                    "--minion=${PROJECT_BINARY_DIR}/${BINARY}"
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                DEPENDS minion VERBATIM)
 
-add_custom_target(test-quick DEPENDS test-instances-quick)
-add_custom_target(test DEPENDS test-instances test-random-quick)
-add_custom_target(test-slow DEPENDS test-instances-slow test-random-slow)
+add_custom_target(test-quick)
+add_dependencies(test-quick test-instances-quick)
+add_custom_target(test)
+add_dependencies(test test-instances-slow test-random-quick)
+add_custom_target(test-slow)
+add_dependencies(test-slow test-instances-slow test-random-slow)

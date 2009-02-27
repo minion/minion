@@ -10,7 +10,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply" "reifyimply-old" "reifyimply-new" "true" "false")
 
-set(GEN_FILES_DIR "minion/build_constraints")
+set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
 set(CONSTRAINTS_LIST "${GEN_FILES_DIR}/ConstraintList")
 set(CONSTRAINT_DEFS "${GEN_FILES_DIR}/constraint_defs.h")
 set(CONSTRAINT_ENUM "${GEN_FILES_DIR}/ConstraintEnum.h")
@@ -223,8 +223,9 @@ macro(select_constraints)
     file(APPEND ${BUILD_STATIC_START} "AbstractConstraint* build_constraint(StateObj* stateObj, ConstraintBlob& b) {\n")
     file(APPEND ${BUILD_STATIC_START} "switch(b.constraint->type) {\n")
     file(GLOB_RECURSE constraint_headers
-                      RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/${GEN_FILES_DIR}"
-                      "minion/constraints/*.h" "minion/dynamic_constraints/*.h")
+                      RELATIVE "${GEN_FILES_DIR}"
+                      "${PROJECT_SOURCE_DIR}/minion/constraints/*.h"
+                      "${PROJECT_SOURCE_DIR}/minion/dynamic_constraints/*.h")
     foreach(constraint ${ARGV})
         set(found False)
         foreach(defined_constraint ${ALL_CONSTRAINTS})

@@ -216,33 +216,32 @@ Note that you need at least g++ version 3.4.2 to compile Minion. Furthermore
 boost\footnote{\url{http://www.boost.org/}} is required to build Minion. Any
 version between 1.33 and 1.38.0 inclusive should work.
 
-To compile on Mac and Linux, go to the source directory and issue the following
-commands:
+To compile on Mac and Linux, create a new directory for the build, and issue the
+following commands:
 
 \begin{verbatim}
-cmake .
+cmake <path/to/minion>
 make minion
 \end{verbatim}
 
+where \verb+<path/to/minion>+ is the path to the Minion distribution (the
+directory which contains \verb+CMakeLists.txt+).
+
 If you have 2GB of RAM and a dual-core processor, you may prefer to
-use \texttt{make minion -j2} instead. To build minion-debug, run
+use \verb+make minion -j2+ instead. To build minion-debug, run
 \begin{verbatim}
-cmake -DDEBUG=1 .
+cmake -DDEBUG=1 <path/to/minion>
 \end{verbatim}
 instead of
 \begin{verbatim}
-cmake .
+cmake <path/to/minion>
 \end{verbatim}
 CMake caches the configuration between runs. If you built the debug binary first
 and then want to build the non-debug version, you have to explicitely disable
 that option, i.e.\ run
 \begin{verbatim}
-cmake -DDEBUG=0 .
+cmake -DDEBUG=0 <path/to/minion>
 \end{verbatim}
-
-Executables will be created in the \texttt{bin} subdirectory.
-
-\medskip
 
 More details on compile-time options can be found in section~\ref{compiletime}.
 
@@ -396,7 +395,7 @@ will probably slow the resulting Minion executable.
 All of these flags have to be passed to \texttt{cmake} with the \verb+-D+
 switch; for example
 \begin{verbatim}
-cmake -DNAME=MyMinion .
+cmake -DNAME=MyMinion <path/to/minion>
 \end{verbatim}
 Again, keep in mind that \texttt{cmake} caches its configuration -- if you run
 it again without specifying \verb+NAME+, it will assume the name you have given
@@ -470,14 +469,14 @@ When running \texttt{cmake} one can give it the \verb+-DCONSTRAINTS="<list>"+
 flag to specify the semicolon-separated list of constraints to be compiled,
 e.g.\
 \begin{verbatim}
-cmake -DCONSTRAINTS="sumleq;sumgeq" .
+cmake -DCONSTRAINTS="sumleq;sumgeq" <path/to/minion>
 \end{verbatim}
 
 Alternatively, one can specify the name of a Minion input file or a file
 containing a list of constraints with the \verb+-DCONSTRAINTS_FILE=<file>+
 option, e.g.\
 \begin{verbatim}
-cmake -DCONSTRAINTS_FILE=input.minion .
+cmake -DCONSTRAINTS_FILE=input.minion <path/to/minion>
 \end{verbatim}
 Note that this does not work with compressed input files.
 
