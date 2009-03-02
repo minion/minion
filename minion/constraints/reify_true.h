@@ -149,12 +149,13 @@ template<typename BoolVar, bool DoWatchAssignment>
     DynamicTrigger* dt = dynamic_trigger_start();
 
     if(DoWatchAssignment && trig >= dt && trig < dt + dynamic_trigger_count())
-    {// Lost assignment
+    {// Lost assignment, but don't replace when rar_var=0
       P("Triggered on an assignment watch");
-      if(!full_propagate_called)
+      if(!full_propagate_called && !rar_var.isAssigned())
       {
         bool flag;
         GET_ASSIGNMENT(assignment, child_constraints[0]);
+	PROP_INFO_ADDONE(ReifyImplyGetSatAssg);
 
         P("Find new assignment");
         if(!flag)
@@ -214,10 +215,11 @@ template<typename BoolVar, bool DoWatchAssignment>
     for(int i = 0; i < dt_count; ++i)
       dt[i].remove(getQueue(stateObj).getNextQueuePtrRef());
 
-    if(DoWatchAssignment)
+    if(DoWatchAssignment && !rar_var.isAssigned()) //don't place when rar_var=0
     {
       bool flag;
       GET_ASSIGNMENT(assignment, child_constraints[0]);
+      PROP_INFO_ADDONE(ReifyImplyGetSatAssg);
       if(!flag)
       { // No satisfying assignment to constraint
         rar_var.propagateAssign(0);

@@ -117,17 +117,20 @@ struct reify_true_old : public AbstractConstraint
     {
       D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
       poscon->propagate(i, domain);
+      return;
     }
     
-    #ifdef MINION_DEBUG
-    bool flag;
-    GET_ASSIGNMENT(assignment0, poscon);
-    bool unsat = poscon->check_unsat(i, domain);
-    D_ASSERT((!flag && unsat) || (flag && !unsat));
-    #endif
-    if(poscon->check_unsat(i, domain)) 
-    { rar_var.propagateAssign(false); }
-
+    if(!rar_var.isAssigned()) { //don't check unsat if rar_var=0
+#ifdef MINION_DEBUG
+      bool flag;
+      GET_ASSIGNMENT(assignment0, poscon);
+      bool unsat = poscon->check_unsat(i, domain);
+      D_ASSERT((!flag && unsat) || (flag && !unsat));
+#endif
+      PROP_INFO_ADDONE(ReifyImplyCheckUnsat);
+      if(poscon->check_unsat(i, domain)) 
+	{ rar_var.propagateAssign(false); }
+    }
   }
   
   virtual void full_propagate()
@@ -141,6 +144,7 @@ struct reify_true_old : public AbstractConstraint
     }
     #endif
     
+    PROP_INFO_ADDONE(ReifyImplyFullCheckUnsat);
     if(poscon->full_check_unsat())
       rar_var.propagateAssign(false);
 
