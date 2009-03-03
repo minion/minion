@@ -12,6 +12,10 @@ include(CheckIncludeFiles)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
+if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
+    message(FATAL_ERROR "You cannot run CMake in the source directory (please take a look at the README).")
+endif()
+
 # determine svn version and date
 find_program(SVN svn)
 if(SVN)
