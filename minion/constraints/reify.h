@@ -322,6 +322,7 @@ struct reify : public ParentConstraint
             //D_ASSERT(wllost); This is not true because some WLs may be translated to domainchanged triggers.
             #endif
             bool flag;
+	    PROP_INFO_ADDONE(ReifyPropGetAssgNegCon);
             GET_ASSIGNMENT(assignment, child_constraints[0]);
             
             P("Find new assignment");
@@ -360,6 +361,7 @@ struct reify : public ParentConstraint
             #endif
             bool flag;
             GET_ASSIGNMENT(assignment, child_constraints[1]);
+	    PROP_INFO_ADDONE(ReifyPropGetAssgPosCon);
             
             P("Find new assignment");
             if(!flag)
@@ -475,6 +477,7 @@ struct reify : public ParentConstraint
     
     bool flag;
     GET_ASSIGNMENT(assignment0, child_constraints[0]);
+    PROP_INFO_ADDONE(ReifyFullPropGetAssgNegCon);
     if(!flag)
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(0);
@@ -485,6 +488,7 @@ struct reify : public ParentConstraint
       
       return;
     }
+    PROP_INFO_ADDONE(ReifyPropGetAssgPosCon);
     GET_ASSIGNMENT(assignment1, child_constraints[1]);
     if(!flag)
     { // No satisfying assignment to constraint
@@ -635,6 +639,7 @@ struct reify : public AbstractConstraint
 	D_ASSERT((!flag && unsat) || (flag && !unsat));
       }
 #endif
+      PROP_INFO_ADDONE(ReifyCheckUnsatPosCon);
       if(poscon->check_unsat(i/2, domain)) 
       { 
         rar_var.propagateAssign(false);
@@ -650,6 +655,7 @@ struct reify : public AbstractConstraint
 	D_ASSERT((!flag && unsat) || (flag && !unsat));
       }
 #endif
+      PROP_INFO_ADDONE(ReifyCheckUnsatNegCon);
       if(negcon->check_unsat((i-1)/2,domain)) 
       {
         rar_var.propagateAssign(true);
@@ -667,6 +673,7 @@ struct reify : public AbstractConstraint
       D_ASSERT((!flag && unsat) || (flag && !unsat));
     }
 #endif
+    PROP_INFO_ADDONE(ReifyFullCheckUnsatPosCon);
     if(poscon->full_check_unsat())
     {
       rar_var.propagateAssign(false);
@@ -680,6 +687,7 @@ struct reify : public AbstractConstraint
       D_ASSERT((!flag && unsat) || (flag && !unsat));
     }
 #endif
+    PROP_INFO_ADDONE(ReifyFullCheckUnsatNegCon);
     if(negcon->full_check_unsat())
     {
       rar_var.propagateAssign(true);
