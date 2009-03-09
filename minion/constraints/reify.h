@@ -123,7 +123,23 @@ struct reify : public ParentConstraint
     //dtcount=dynamic_trigger_count();
     dtcount=child_constraints[0]->get_vars_singleton()->size()*2 + child_constraints[1]->get_vars_singleton()->size()*2;
     c0vars=child_constraints[0]->get_vars_singleton()->size();
-    
+    bool hasbound=false;
+    vector<AnyVarRef>& t1=*(child_constraints[0]->get_vars_singleton());
+    for(int i=0; i<t1.size(); i++)
+    {
+        if(t1[i].isBound() && !t1[i].isAssigned())
+            hasbound=true;
+    }
+    vector<AnyVarRef>& t2=*(child_constraints[1]->get_vars_singleton());
+    for(int i=0; i<t2.size(); i++)
+    {
+        if(t2[i].isBound() && !t2[i].isAssigned())
+            hasbound=true;
+    }
+    if(hasbound)
+    {
+        cout<<"Warning: bound variables in reify degrade performance, because DomainRemoval triggers are translated into DomainChanged triggers." <<endl; 
+    }
     D_DATA(triggerpairs.resize(2));
   }
   
@@ -322,7 +338,7 @@ struct reify : public ParentConstraint
             //D_ASSERT(wllost); This is not true because some WLs may be translated to domainchanged triggers.
             #endif
             bool flag;
-	    PROP_INFO_ADDONE(ReifyPropGetAssgNegCon);
+	    PROP_INFO_ADDONE(ReifyPropGetAssgPosCon);
             GET_ASSIGNMENT(assignment, child_constraints[0]);
             
             P("Find new assignment");
@@ -361,7 +377,7 @@ struct reify : public ParentConstraint
             #endif
             bool flag;
             GET_ASSIGNMENT(assignment, child_constraints[1]);
-	    PROP_INFO_ADDONE(ReifyPropGetAssgPosCon);
+	    PROP_INFO_ADDONE(ReifyPropGetAssgNegCon);
             
             P("Find new assignment");
             if(!flag)
@@ -477,7 +493,7 @@ struct reify : public ParentConstraint
     
     bool flag;
     GET_ASSIGNMENT(assignment0, child_constraints[0]);
-    PROP_INFO_ADDONE(ReifyFullPropGetAssgNegCon);
+    PROP_INFO_ADDONE(ReifyFullPropGetAssgPosCon);
     if(!flag)
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(0);
@@ -488,7 +504,7 @@ struct reify : public ParentConstraint
       
       return;
     }
-    PROP_INFO_ADDONE(ReifyPropGetAssgPosCon);
+    PROP_INFO_ADDONE(ReifyFullPropGetAssgNegCon);
     GET_ASSIGNMENT(assignment1, child_constraints[1]);
     if(!flag)
     { // No satisfying assignment to constraint
