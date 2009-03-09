@@ -279,6 +279,9 @@ inline void print_constraints() {
 #ifdef CT_GCC_ABC
       cout << "gcc ";
 #endif
+#ifdef CT_GCCWEAK_ABC
+      cout << "gccweak ";
+#endif
     cout << endl;
 }
 
