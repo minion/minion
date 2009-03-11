@@ -21,9 +21,6 @@
 #include "BuildConstraint.h"
 
 
-#define MERGE2(x,y) x ## y
-#define MERGE(x , y) MERGE2(x,y)
- 
 namespace BuildCon
 {  
 
