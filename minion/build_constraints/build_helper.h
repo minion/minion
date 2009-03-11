@@ -90,11 +90,8 @@ struct BuildConObj<CT_NAME, 0> \
 }; \
 } \
 
-#define START_BUILDCON(CT_NAME, COUNT) \
+#define BUILD_CT(CT_NAME,COUNT) \
+MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME) \
 AbstractConstraint* \
 build_constraint_ ## CT_NAME(StateObj* stateObj, ConstraintBlob& b) \
 { return BuildConObj<CT_NAME, COUNT>::build(stateObj, EmptyType(), b, 0); }
-
-#define BUILD_CT(CT_NAME,COUNT) \
-MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME) \
-START_BUILDCON(CT_NAME, COUNT)
