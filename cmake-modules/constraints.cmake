@@ -13,7 +13,6 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
 set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
 set(CONSTRAINT_DEFS "${GEN_FILES_DIR}/constraint_defs.h")
 set(CONSTRAINT_ENUM "${GEN_FILES_DIR}/ConstraintEnum.h")
-set(BUILD_CONSTRAINTS_START "${GEN_FILES_DIR}/BuildConstraintsStart.h")
 set(BUILD_START "${GEN_FILES_DIR}/BuildStart.h")
 set(BUILD_STATIC_START "${GEN_FILES_DIR}/BuildStaticStart.cpp")
 set(CONSTRAINT_HEADER "#include \"../minion.h\"
@@ -209,7 +208,6 @@ macro(select_constraints)
     endif()
     file(REMOVE ${CONSTRAINT_DEFS})
     file(REMOVE ${CONSTRAINT_ENUM})
-    file(REMOVE ${BUILD_CONSTRAINTS_START})
     file(REMOVE ${BUILD_START})
     file(REMOVE ${BUILD_STATIC_START})
     file(APPEND ${CONSTRAINT_DEFS} "ConstraintDef constraint_list[] = {\n")
@@ -255,8 +253,6 @@ macro(select_constraints)
             file(APPEND ${CONSTRAINT_DEFS} "}, },\n")
             # ConstraintEnum.h
             file(APPEND ${CONSTRAINT_ENUM} "${NAME_ID_${constraint}},\n")
-            # BuildConstraintStart.h
-            file(APPEND ${BUILD_CONSTRAINTS_START} "BUILD_DEF ## ${build_num_read_funcs}(${NAME_ID_${constraint}})\n")
             # BuildStart.h
             file(APPEND ${BUILD_START} "BUILD_DEF_CT(${NAME_ID_${constraint}})\n")
             # BuildStaticStart.h
