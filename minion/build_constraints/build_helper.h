@@ -98,8 +98,3 @@ build_constraint_ ## CT_NAME(StateObj* stateObj, ConstraintBlob& b) \
 #define BUILD_CT(CT_NAME,COUNT) \
 MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME) \
 START_BUILDCON(CT_NAME, COUNT)
-
-#define BUILD_DEF_CT(CT_NAME) \
-AbstractConstraint* build_constraint_ ## CT_NAME(StateObj* stateObj, ConstraintBlob&);
-
-

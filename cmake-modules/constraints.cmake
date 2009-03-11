@@ -254,7 +254,7 @@ macro(select_constraints)
             # ConstraintEnum.h
             file(APPEND ${CONSTRAINT_ENUM} "${NAME_ID_${constraint}},\n")
             # BuildStart.h
-            file(APPEND ${BUILD_START} "BUILD_DEF_CT(${NAME_ID_${constraint}})\n")
+            file(APPEND ${BUILD_START} "AbstractConstraint* build_constraint_${NAME_ID_${constraint}}(StateObj* stateObj, ConstraintBlob&);\n")
             # BuildStaticStart.h
             file(APPEND ${BUILD_STATIC_START} "case ${NAME_ID_${constraint}}: return build_constraint_${NAME_ID_${constraint}}(stateObj, b);\n")
             # CT_*.cpp
