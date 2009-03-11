@@ -127,13 +127,13 @@ struct reify : public ParentConstraint
     vector<AnyVarRef>& t1=*(child_constraints[0]->get_vars_singleton());
     for(int i=0; i<t1.size(); i++)
     {
-        if(t1[i].isBound() && !t1[i].isAssigned())
+        if(t1[i].isBound() && t1[i].getInitialMin()!=t1[i].getInitialMax())
             hasbound=true;
     }
     vector<AnyVarRef>& t2=*(child_constraints[1]->get_vars_singleton());
     for(int i=0; i<t2.size(); i++)
     {
-        if(t2[i].isBound() && !t2[i].isAssigned())
+        if(t2[i].isBound() && t2[i].getInitialMin()!=t2[i].getInitialMax())
             hasbound=true;
     }
     if(hasbound)
