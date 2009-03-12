@@ -26,7 +26,7 @@ namespace BuildCon
 
 /// General case in iteratively build constraints.
 /// This isn't inline, as we don't want the compiler to waste time inlining it.
-template<int constraint, int size>
+template<ConstraintType constraint, int size>
 struct BuildConObj
 {
   template<typename ConData>
@@ -35,7 +35,7 @@ struct BuildConObj
 };
 
 
-template<int constraint, int size>
+template<ConstraintType constraint, int size>
 template<typename ConData>
 AbstractConstraint* 
 BuildConObj<constraint, size>::
