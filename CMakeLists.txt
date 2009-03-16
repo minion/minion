@@ -17,6 +17,8 @@ if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
 endif()
 
 # determine svn version and date
+set(SVNVERSION "0")
+set(SVNDATE "unknown")
 find_program(SVN svn)
 if(SVN)
     execute_process(COMMAND ${SVN} info
@@ -31,9 +33,9 @@ if(SVN)
         message(STATUS "SVN version ${SVNVERSION}, date ${SVNDATE}")
     else()
         # try git
-        find_program(GIT git-svn)
+        find_program(GIT git)
         if(GIT)
-            execute_process(COMMAND ${GIT} info
+            execute_process(COMMAND ${GIT} svn info
                     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
                     RESULT_VARIABLE SVNINFO_STATUS
                     OUTPUT_VARIABLE SVNINFO OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -44,11 +46,10 @@ if(SVN)
                 string(REPLACE "Last Changed Date: " "" SVNDATE ${SVNDATE})
                 message(STATUS "SVN version ${SVNVERSION}, date ${SVNDATE}")
             endif()
-        else()
-            message(STATUS "Unable to determine SVN version (no checkout?)")
-            set(SVNVERSION "0")
-            set(SVNDATE "unknown")
         endif()
+    endif()
+    if(SVNDATE STREQUAL "unknown")
+        message(STATUS "Unable to determine SVN version (no checkout?)")
     endif()
 else()
     message(STATUS "No SVN executable found, unable to determine SVN version and date")
