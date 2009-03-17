@@ -85,7 +85,8 @@ struct BigRangeVarContainer {
 
   StateObj* stateObj;
   
-  BigRangeVarContainer(StateObj* _stateObj) : stateObj(_stateObj), bms_array(), 
+  BigRangeVarContainer(StateObj* _stateObj) : stateObj(_stateObj),
+                                              bms_array(&getMemory(stateObj).monotonicSet()),
                                               trigger_list(stateObj, false),
                                               var_count_m(0), lock_m(0)
   { 
@@ -96,7 +97,7 @@ struct BigRangeVarContainer {
   typedef DomainInt domain_bound_type;
   static const d_type one = static_cast<d_type>(1);
   MoveablePointer bound_data;
-  MonotonicSet bms_array;
+  MonotonicSet *bms_array;
   TriggerList trigger_list;
 
   /// Initial bounds of each variable
@@ -134,12 +135,12 @@ struct BigRangeVarContainer {
 	  /// Here just remove the value which should lead to the least work.
 	  return upper_bound(d);
 	}
-    if(bms_array.isMember(var_offset[d.var_num] + loopvar) && (loopvar >= lower))
+    if(bms_array->isMember(var_offset[d.var_num] + loopvar) && (loopvar >= lower))
       return upper_bound(d);
     --loopvar;
     for(; loopvar >= lower; --loopvar)
     {
-      if(bms_array.isMember(var_offset[d.var_num] + loopvar)) 
+      if(bms_array->isMember(var_offset[d.var_num] + loopvar)) 
         return loopvar;
     }
     getState(stateObj).setFailed(true);
@@ -161,12 +162,12 @@ struct BigRangeVarContainer {
 	  /// Here just remove the value which should lead to the least work.
 	  return lower_bound(d);
 	}
-    if(bms_array.isMember(var_offset[d.var_num] + loopvar) && (loopvar <= upper))
+    if(bms_array->isMember(var_offset[d.var_num] + loopvar) && (loopvar <= upper))
       return lower_bound(d);
     ++loopvar;
     for(; loopvar <= upper; ++loopvar)
     {
-      if(bms_array.isMember(var_offset[d.var_num] + loopvar)) 
+      if(bms_array->isMember(var_offset[d.var_num] + loopvar)) 
         return loopvar;
     }
     getState(stateObj).setFailed(true);
@@ -177,7 +178,7 @@ struct BigRangeVarContainer {
   { 
     D_ASSERT(!lock_m);
     lock_m = true;
-    //bms_array.lock(stateObj); // gets locked in constraint_setup.cpp
+    //bms_array->lock(stateObj); // gets locked in constraint_setup.cpp
  }
 
 void addVariables(const vector<pair<int, Bounds> >& new_domains)
@@ -201,13 +202,13 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
 
  
     bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m * 2 * sizeof(domain_bound_type));
-    int temp1=bms_array.request_storage(var_offset.back());
+    int temp1=bms_array->request_storage(var_offset.back());
     D_ASSERT(temp1==0); // we should be at the front of the TMS.
     if(temp1>0)
     {   // Need to add the TMS offset onto all the var_offsets
         for(int i=0;i<var_offset.size(); i++) var_offset[i]+=temp1;
     }
-    //bms_array.lock(stateObj); // Don't lock it here. lock it in lock.
+    //bms_array->lock(stateObj); // Don't lock it here. lock it in lock.
     for(DomainInt j = 0; j < var_count_m; j++) {
 	       var_offset[j] = var_offset[j] - initial_bounds[j].first;  
     };
@@ -250,7 +251,7 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
       return false;
-    return bms_array.isMember(var_offset[d.var_num] + i);
+    return bms_array->isMember(var_offset[d.var_num] + i);
   }
   
   // Warning: If this is ever changed, be sure to check through the code for other places
@@ -260,7 +261,7 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
     D_ASSERT(lock_m);
     D_ASSERT(i >= lower_bound(d));
     D_ASSERT(i <= upper_bound(d));
-    return bms_array.isMember(var_offset[d.var_num] + i );
+    return bms_array->isMember(var_offset[d.var_num] + i );
   }
   
   DomainInt getMin(BigRangeVarRef_internal d) const
@@ -291,11 +292,11 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
     //bms_pointer(d)->print_state();
-    bms_array.print_state();
+    bms_array->print_state();
 #endif
     D_ASSERT(lock_m);
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
-if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array.ifMember_remove(var_offset[d.var_num] + i) ))
+if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove(var_offset[d.var_num] + i) ))
     {
 #ifdef DEBUG
       cout << "Exiting removeFromDomain: " << d.var_num << " nothing to do" << endl;
@@ -308,7 +309,7 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array.ifMember_remove(
 #ifndef NO_DOMAIN_TRIGGERS
 	trigger_list.push_domain(d.var_num);
 #endif
-    D_ASSERT( ! bms_array.isMember(var_offset[d.var_num] + i));
+    D_ASSERT( ! bms_array->isMember(var_offset[d.var_num] + i));
     
     domain_bound_type up_bound = upper_bound(d);
     if(i == up_bound)
@@ -334,7 +335,7 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array.ifMember_remove(
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
-    bms_array.print_state();
+    bms_array->print_state();
 #endif
     return;
   }
@@ -388,8 +389,8 @@ private:
     int domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
     for(DomainInt loop = lower; loop <= upper; ++loop)
     {
-      // def of inDomain: bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
-      if(bms_array.isMember(loop + domainOffset) && loop != offset)
+      // def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
+      if(bms_array->isMember(loop + domainOffset) && loop != offset)
         trigger_list.push_domain_removal(d.var_num, loop);
     }
 #endif
@@ -421,7 +422,7 @@ public:
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
-    bms_array.print_state();
+    bms_array->print_state();
 #endif
 
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
@@ -441,8 +442,8 @@ public:
       int domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
 	  for(DomainInt loop = offset + 1; loop <= up_bound; ++loop)
 	  {
-        // Def of inDomain: bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
-	    if(bms_array.isMember(domainOffset + loop))
+        // Def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
+	    if(bms_array->isMember(domainOffset + loop))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif	 
@@ -464,7 +465,7 @@ public:
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
-    bms_array.print_state();
+    bms_array->print_state();
 #endif
   }
   
@@ -475,7 +476,7 @@ public:
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
-    bms_array.print_state();
+    bms_array->print_state();
 #endif
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
@@ -495,8 +496,8 @@ public:
       int domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
 	  for(DomainInt loop = low_bound; loop < offset; ++loop)
 	  {
-        // def of inDomain: bms_array.isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
-	    if(bms_array.isMember(loop + domainOffset))
+        // def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
+	    if(bms_array->isMember(loop + domainOffset))
 	      trigger_list.push_domain_removal(d.var_num, loop);
 	  }
 #endif
@@ -519,7 +520,7 @@ public:
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
          << getInitialMin(d) << ":" << getInitialMax(d) << "]"
          << endl;
-    bms_array.print_state();
+    bms_array->print_state();
 #endif
   }
   

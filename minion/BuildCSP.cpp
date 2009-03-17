@@ -46,9 +46,6 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
   // Set up variables
   BuildCon::build_variables(stateObj, instance.vars);
   
-  // Horrible hack 
-  getMemory(stateObj).monotonic_set = & getVars(stateObj).getBigRangevarContainer().bms_array;
-  
   // Set up optimisation
   if(instance.is_optimisation_problem)
   {

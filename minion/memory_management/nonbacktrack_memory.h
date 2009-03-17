@@ -32,13 +32,13 @@ class Memory
 {
   BackTrackMemory backtrack_memory;
   NewMemoryBlock nonbacktrack_memory;
+  MonotonicSet monotonic_set;
   
 public:
-  MonotonicSet * monotonic_set;   // this needs to become a ptr to getVars(stateObj).getBigRangevarContainer().bms_array
 
   BackTrackMemory& backTrack() { return backtrack_memory; }
   NewMemoryBlock& nonBackTrack() { return nonbacktrack_memory; }
-  MonotonicSet& monotonicSet() { return *monotonic_set; }
+  MonotonicSet& monotonicSet() { return monotonic_set; }
 };
 
 // @}

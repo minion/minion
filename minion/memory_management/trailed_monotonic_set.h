@@ -28,9 +28,7 @@ class TrailedMonotonicSet
 
   static const value_type tms_in_set = 1;
   
-  #ifndef NO_DEBUG
-  bool locked;
-  #endif
+  D_DATA(bool locked;)
   
   int _size;
   int _max_undos;
@@ -62,7 +60,7 @@ public:
   
   const value_type& array(DomainInt i) const
   { 
-    D_ASSERT( i >= 0 && i < size());
+    D_ASSERT( i >= 0 && i < size() && _array.get_ptr() != NULL);
 	int val = checked_cast<int>(i);
     return static_cast<const value_type*>(_array.get_ptr())[val]; 
   }
@@ -112,7 +110,7 @@ public:
   
   bool isMember(DomainInt index) const
   {
-     // cout << "Size:"<< _size << ", index:"<<index<<endl;
+    //cerr << "Size:"<< _size << ", index:"<<index<< ", array:" << _array.get_ptr() <<endl;
     return (bool)array(index);
   }
 

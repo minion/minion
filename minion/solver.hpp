@@ -26,10 +26,10 @@ inline int get_world_depth(StateObj* stateObj)
 /// Pushes the state of the whole world.
 inline void world_push(StateObj* stateObj)
 {
-  getVars(stateObj).getBigRangevarContainer().bms_array.before_branch_left();
+  getMemory(stateObj).monotonicSet().before_branch_left();
   D_ASSERT(getQueue(stateObj).isQueuesEmpty());
   getMemory(stateObj).backTrack().world_push();
-  getVars(stateObj).getBigRangevarContainer().bms_array.after_branch_left();
+  getMemory(stateObj).monotonicSet().after_branch_left();
   getState(stateObj).getConstraintsToPropagate().push_back(set<AbstractConstraint*>());
 }
 
@@ -39,7 +39,7 @@ inline void world_pop(StateObj* stateObj)
   D_ASSERT(getQueue(stateObj).isQueuesEmpty());
  
   getMemory(stateObj).backTrack().world_pop();
-  getVars(stateObj).getBigRangevarContainer().bms_array.undo();
+  getMemory(stateObj).monotonicSet().undo();
   
   vector<set<AbstractConstraint*> >& constraintList = getState(stateObj).getConstraintsToPropagate();
   int propagateDepth = get_world_depth(stateObj) + 1;
