@@ -57,7 +57,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
 		  case VAR_CONSTANT:
 			return AnyVarRef(ConstantVar(stateObj, v.pos()));
 		  default:
-		    INPUT_ERROR("Unknown Error.");
+		    INPUT_ERROR("Unknown variable type " << v.type() << ".");
 		}
 }
 
