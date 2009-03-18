@@ -60,6 +60,13 @@ public:
   BooleanContainer& getBooleanContainer() { return booleanContainer; }
   BigRangeCon& getBigRangevarContainer() { return bigRangevarContainer; }
   SparseBoundVarContainer<>& getSparseBoundvarContainer() { return sparseBoundvarContainer; }
+
+  inline void lock() {
+    boundvarContainer.lock();
+    booleanContainer.lock();
+    bigRangevarContainer.lock();
+    sparseBoundvarContainer.lock();
+  }
 };
 
 #include "mappings/variable_neg.h"

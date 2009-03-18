@@ -30,11 +30,7 @@ void lock(StateObj* stateObj)
   //getMemory(stateObj).monotonic_set=& getVars(stateObj).getBigRangevarContainer().bms_array;
   
   
-  getVars(stateObj).getBigRangevarContainer().lock();
-  
-  getVars(stateObj).getSparseBoundvarContainer().lock();
-  getVars(stateObj).getBooleanContainer().lock(); 
-  getVars(stateObj).getBoundvarContainer().lock();
+  getVars(stateObj).lock();
   
   int size = getState(stateObj).getConstraintList().size();
   for(int i = 0 ; i < size;i++)
