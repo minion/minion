@@ -401,10 +401,22 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
     instance.sym_order = instance.vars.get_all_vars();
     
   if(instance.sym_order.size() != instance.vars.get_all_vars().size())
-    throw parse_exception("SYMORDER must contain every variable");
-    
+  {
+    parser_info("Extending symmetry order with auxillery variables");
+    vector<Var> all_vars = instance.vars.get_all_vars();
+    for(typename vector<Var>::iterator i = all_vars.begin(); i != all_vars.end(); ++i)
+    {
+      if(find(instance.sym_order.begin(), instance.sym_order.end(), *i) == instance.sym_order.end() )
+        instance.sym_order.push_back(*i);
+    }
+  }
+  
   if(instance.sym_order.size() != set<Var>(instance.sym_order.begin(), instance.sym_order.end()).size())
-    throw parse_exception("SYMORDER cannot contain any variable more than once");
+     throw parse_exception("SYMORDER cannot contain any variable more than once");
+     
+   if(instance.sym_order.size() != instance.vars.get_all_vars().size())
+     throw parse_exception("SYMORDER must contain every variable");   
+    
 }
 
 template<typename FileReader>
