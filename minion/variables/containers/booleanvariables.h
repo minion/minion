@@ -111,7 +111,7 @@ struct BoolVarRef_internal
   
   BOOL inDomain(DomainInt b) const
   {
-    if(b < 0 || b > 1) 
+    if((b|1) != 1)
 	  return false;
     return (!isAssigned()) || (b == getAssignedValue());
   }
@@ -251,7 +251,7 @@ struct BooleanContainer
   void removeFromDomain(const BoolVarRef_internal& d, DomainInt b)
   {
     D_ASSERT(lock_m && d.var_num < var_count_m);
-    if(b != 0 && b != 1)
+    if((b|1) != 1)
       return;
       
     if(d.isAssigned())
@@ -267,7 +267,7 @@ struct BooleanContainer
   {
     D_ASSERT(lock_m && d.var_num < var_count_m);
     D_ASSERT(!d.isAssigned());
-	if(b!=0 && b!=1)
+	if((b|1) != 1)
     {
 	  getState(stateObj).setFailed(true);
 	  return;
