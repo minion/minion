@@ -129,7 +129,13 @@ if(UNAME)
             OUTPUT_VARIABLE UNAME_OUT OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(UNAME_OUT STREQUAL "Darwin")
         set(APPLEMAC 1)
+    elseif(UNAME_OUT MATCHES "CYGWIN.*")
+        set(WINCYGWIN 1)
     endif()
+endif()
+
+if(WINCYGWIN)
+    set(CFLAGS "${CFLAGS} -enable-auto-import")
 endif()
 
 find_program(CCACHE ccache)
