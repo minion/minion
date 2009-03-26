@@ -43,29 +43,29 @@ class VariableContainer
   VariableContainer(const VariableContainer&);
   void operator=(const VariableContainer&);
 public:
-  BoundVarContainer<> boundvarContainer; 
+  BoundVarContainer<> boundVarContainer;
   BooleanContainer booleanContainer;
-  BigRangeCon bigRangevarContainer;
-  SparseBoundVarContainer<> sparseBoundvarContainer;
+  BigRangeVarContainer<BitContainerType> bigRangeVarContainer;
+  SparseBoundVarContainer<> sparseBoundVarContainer;
 
 
   VariableContainer(StateObj* _stateObj) :
-    boundvarContainer(_stateObj),
+    boundVarContainer(_stateObj),
     booleanContainer(_stateObj),
-    bigRangevarContainer(_stateObj),
-    sparseBoundvarContainer(_stateObj)
+    bigRangeVarContainer(_stateObj),
+    sparseBoundVarContainer(_stateObj)
   {}
   
-  BoundVarContainer<>& getBoundvarContainer() { return boundvarContainer; }
+  BoundVarContainer<>& getBoundVarContainer() { return boundVarContainer; }
   BooleanContainer& getBooleanContainer() { return booleanContainer; }
-  BigRangeCon& getBigRangevarContainer() { return bigRangevarContainer; }
-  SparseBoundVarContainer<>& getSparseBoundvarContainer() { return sparseBoundvarContainer; }
+  BigRangeVarContainer<BitContainerType>& getBigRangeVarContainer() { return bigRangeVarContainer; }
+  SparseBoundVarContainer<>& getSparseBoundVarContainer() { return sparseBoundVarContainer; }
 
   inline void lock() {
-    boundvarContainer.lock();
+    boundVarContainer.lock();
     booleanContainer.lock();
-    bigRangevarContainer.lock();
-    sparseBoundvarContainer.lock();
+    bigRangeVarContainer.lock();
+    sparseBoundVarContainer.lock();
   }
 };
 

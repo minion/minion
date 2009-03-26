@@ -135,18 +135,18 @@ inline VariableContainer& getVars(StateObj* stateObj)
 #ifndef MANY_VAR_CONTAINERS
 template<typename DomType>
 inline BoundVarContainer<DomType>& BoundVarRef_internal<DomType>::getCon_Static()
-{ return varContainer_m.boundvarContainer; }
+{ return varContainer_m.boundVarContainer; }
 
 inline BooleanContainer& BoolVarRef_internal::getCon_Static()
 { return varContainer_m.booleanContainer; }
 
 template<typename DomType>
 inline SparseBoundVarContainer<DomType>& SparseBoundVarRef_internal<DomType>::getCon_Static()
-{ return varContainer_m.sparseBoundvarContainer; }
+{ return varContainer_m.sparseBoundVarContainer; }
 
 template<typename d_type>
 inline BigRangeVarContainer<d_type>& BigRangeVarRef_internal_template<d_type>::getCon_Static()
-{ return varContainer_m.bigRangevarContainer; }
+{ return varContainer_m.bigRangeVarContainer; }
 
 #endif
 

@@ -576,12 +576,6 @@ public:
   }
 };
 
-typedef BigRangeVarContainer<BitContainerType> BigRangeCon;
-
-
-
-
-
 template<typename T>
 inline BigRangeVarRef
 BigRangeVarContainer<T>::get_var_num(int i)

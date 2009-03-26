@@ -84,7 +84,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 	  {
 		light_vector<BoundVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = getVars(stateObj).getBoundvarContainer().get_var_num(vars[i].pos());
+		  v[i] = getVars(stateObj).getBoundVarContainer().get_var_num(vars[i].pos());
 		return BuildConObj<constraint, size - 1>::
 		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }		
@@ -92,7 +92,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 	  {
 		light_vector<SparseBoundVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = getVars(stateObj).getSparseBoundvarContainer().get_var_num(vars[i].pos());
+		  v[i] = getVars(stateObj).getSparseBoundVarContainer().get_var_num(vars[i].pos());
 		return BuildConObj<constraint, size - 1>::
 		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }
@@ -100,7 +100,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 	  {
 		light_vector<BigRangeVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = getVars(stateObj).getBigRangevarContainer().get_var_num(vars[i].pos());
+		  v[i] = getVars(stateObj).getBigRangeVarContainer().get_var_num(vars[i].pos());
 		return BuildConObj<constraint, size - 1>::
 		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
 	  }
