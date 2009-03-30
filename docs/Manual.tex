@@ -15,7 +15,7 @@
 
 \providecommand{\boldsymbol}[1]{\mbox{\boldmath $#1$}}
 
-\def\minionversion{0.8}
+\def\minionversion{0.8.1}
 
 \begin{document}
 
@@ -216,7 +216,7 @@ Note that you need at least g++ version 3.4.2 to compile Minion. Furthermore
 boost\footnote{\url{http://www.boost.org/}} is required to build Minion. Any
 version between 1.33 and 1.38.0 inclusive should work.
 
-To compile on Mac and Linux, create a new directory for the build, and issue the
+To compile, create a new directory for the build, and issue the
 following commands:
 
 \begin{verbatim}
@@ -225,10 +225,16 @@ make minion
 \end{verbatim}
 
 where \verb+<path/to/minion>+ is the path to the Minion distribution (the
-directory which contains \verb+CMakeLists.txt+).
+directory which contains \verb+CMakeLists.txt+). The Cygwin version of CMake
+seems to have a bug; run it twice to get Minion to compile and link correctly.
 
-If you have 2GB of RAM and a dual-core processor, you may prefer to
-use \verb+make minion -j2+ instead. To build minion-debug, run
+If you have at least 2GB of RAM and a dual-core processor, you may prefer to
+use
+\begin{verbatim}
+make minion -j2
+\end{verbatim}
+instead. As a rule of thumb, you should have 1GB of RAM for every compile
+process. To build minion-debug, run
 \begin{verbatim}
 cmake -DDEBUG=1 <path/to/minion>
 \end{verbatim}
