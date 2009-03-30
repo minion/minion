@@ -114,6 +114,7 @@ struct DomOverWdegBranch
     int best = var_order.size(); //the variable with the best score so far (init to none)
     float best_score = FLT_MAX; //... and its score (all true scores are positive)
     size_t var_order_size = var_order.size();
+    bool anyUnassigned = false;
     for(size_t i = 0; i < var_order_size; i++) { //we will find the score for each var
       //cout << "i=" << i << endl;
       //cout << "best=" << best << endl;
@@ -122,6 +123,11 @@ struct DomOverWdegBranch
       if(v.isAssigned()) {
 	//cout << "assigned -- stop" << endl;
 	continue;
+      } else if(!anyUnassigned) {
+	//always use the first unassigned as a fallback in case later calculations don't find
+	//any variables with finite score
+	best = i;
+	anyUnassigned = true;
       }
       int dom_size_approx = v.getMax() - v.getMin() + 1;
       int base_wdeg = v.getBaseWdeg();
@@ -149,7 +155,7 @@ struct DomOverWdegBranch
 	  //cout << "deduct" << endl;
 	  base_wdeg -= c->getWdeg();
 	  if((float)dom_size_approx/base_wdeg >= best_score) {
-	    //cout << "too high during deductions" << endl;
+	    //cout << "too high during deductions,base_wdeg=" << base_wdeg << endl;
 	    break;
 	  }
 	}
@@ -163,6 +169,7 @@ struct DomOverWdegBranch
       }
     }
     //cout << "dec=" << best << "@" << best_score << endl;
+    D_ASSERT(!anyUnassigned || best != var_order_size);
     return best;
   }
 };
