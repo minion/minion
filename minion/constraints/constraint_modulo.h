@@ -70,7 +70,7 @@ struct NotModConstraint : public AbstractConstraint
         t.push_back(make_trigger(var1, Trigger(this, 1), Assigned));
     }
     
-    if(var1.isBound())
+    if(var2.isBound())
     {
         t.push_back(make_trigger(var2, Trigger(this, 1), LowerBound));
         t.push_back(make_trigger(var2, Trigger(this, 1), UpperBound));
@@ -80,7 +80,7 @@ struct NotModConstraint : public AbstractConstraint
         t.push_back(make_trigger(var2, Trigger(this, 1), Assigned));
     }
     
-    if(var1.isBound())
+    if(var3.isBound())
     {
         t.push_back(make_trigger(var3, Trigger(this, 1), LowerBound));
         t.push_back(make_trigger(var3, Trigger(this, 1), UpperBound));
