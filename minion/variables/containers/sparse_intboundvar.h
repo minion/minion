@@ -303,11 +303,13 @@ struct SparseBoundVarContainer {
 	// Can't attach triggers to bound vars!  
 #endif
     
-    if(min_val != i)
+    if(min_val != i) {
       trigger_list.push_lower(d.var_num, i - min_val);
+    }
     
-    if(max_val != i)
+    if(max_val != i) {
       trigger_list.push_upper(d.var_num, max_val - i);    
+    }
     
     upper_bound(d) = i;
     lower_bound(d) = i;
@@ -347,8 +349,9 @@ struct SparseBoundVarContainer {
 #endif
 
       upper_bound(d) = i;
-      if(low_bound == i)
+      if(low_bound == i) {
         trigger_list.push_assign(d.var_num, i);
+      }
     }
   }
   
@@ -374,8 +377,9 @@ struct SparseBoundVarContainer {
 	  // Can't attach triggers to bound vars!  
 #endif
       lower_bound(d) = i;
-      if(up_bound == i)
+      if(up_bound == i) {
        trigger_list.push_assign(d.var_num, i);
+      }
     }
   }
   

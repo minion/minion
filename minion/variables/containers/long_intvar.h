@@ -325,8 +325,9 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove
       trigger_list.push_lower(d.var_num, lower_bound(d) - low_bound);
     }
     
-    if(upper_bound(d) == lower_bound(d))
+    if(upper_bound(d) == lower_bound(d)) {
       trigger_list.push_assign(d.var_num, getAssignedValue(d));
+    }
 
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
@@ -390,8 +391,9 @@ private:
     for(DomainInt loop = lower; loop <= upper; ++loop)
     {
       // def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
-      if(bms_array->isMember(loop + domainOffset) && loop != offset)
+      if(bms_array->isMember(loop + domainOffset) && loop != offset) {
         trigger_list.push_domain_removal(d.var_num, loop);
+      }
     }
 #endif
     trigger_list.push_domain(d.var_num);
@@ -443,8 +445,9 @@ public:
 	  for(DomainInt loop = offset + 1; loop <= up_bound; ++loop)
 	  {
         // Def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
-	    if(bms_array->isMember(domainOffset + loop))
+	    if(bms_array->isMember(domainOffset + loop)) {
 	      trigger_list.push_domain_removal(d.var_num, loop);
+        }
 	  }
 #endif	 
       upper_bound(d) = offset;      
@@ -456,8 +459,9 @@ public:
 #endif
        trigger_list.push_upper(d.var_num, up_bound - upper_bound(d));
 	  
-      if(lower_bound(d) == upper_bound(d)) 
+      if(lower_bound(d) == upper_bound(d)) {
         trigger_list.push_assign(d.var_num, getAssignedValue(d));
+      }
     }
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 #ifdef DEBUG
@@ -497,8 +501,9 @@ public:
 	  for(DomainInt loop = low_bound; loop < offset; ++loop)
 	  {
         // def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
-	    if(bms_array->isMember(loop + domainOffset))
+	    if(bms_array->isMember(loop + domainOffset)) {
 	      trigger_list.push_domain_removal(d.var_num, loop);
+        }
 	  }
 #endif
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
@@ -511,8 +516,9 @@ public:
 	trigger_list.push_domain(d.var_num);
 #endif
     trigger_list.push_lower(d.var_num, lower_bound(d) - low_bound);
-    if(lower_bound(d) == upper_bound(d)) 
+    if(lower_bound(d) == upper_bound(d)) {
       trigger_list.push_assign(d.var_num, getAssignedValue(d)); 
+    }
     }
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 #ifdef DEBUG
