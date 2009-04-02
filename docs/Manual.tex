@@ -216,6 +216,10 @@ Note that you need at least g++ version 3.4.2 to compile Minion. Furthermore
 boost\footnote{\url{http://www.boost.org/}} is required to build Minion. Any
 version between 1.33 and 1.38.0 inclusive should work.
 
+The g++ distributed with Cygwin does \emph{not} compile Minion correctly because
+of differences in exception handling in Unix and Windows. You have to compile
+your own version of g++ and use this to compile Minion.
+
 To compile, create a new directory for the build, and issue the
 following commands:
 
