@@ -307,7 +307,7 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove
 	trigger_list.push_domain_removal(d.var_num, i);
 #endif
 #ifndef NO_DOMAIN_TRIGGERS
-	trigger_list.push_domain(d.var_num);
+	trigger_list.push_domain_changed(d.var_num);
 #endif
     D_ASSERT( ! bms_array->isMember(var_offset[d.var_num] + i));
     
@@ -396,7 +396,7 @@ private:
       }
     }
 #endif
-    trigger_list.push_domain(d.var_num);
+    trigger_list.push_domain_changed(d.var_num);
     trigger_list.push_assign(d.var_num, offset);
     
     DomainInt low_bound = lower_bound(d);
@@ -455,7 +455,7 @@ public:
 	  upper_bound(d) = new_upper;
       
 #ifndef NO_DOMAIN_TRIGGERS
-	trigger_list.push_domain(d.var_num);
+	trigger_list.push_domain_changed(d.var_num);
 #endif
        trigger_list.push_upper(d.var_num, up_bound - upper_bound(d));
 	  
@@ -513,7 +513,7 @@ public:
     lower_bound(d) = new_lower; 
     
 #ifndef NO_DOMAIN_TRIGGERS
-	trigger_list.push_domain(d.var_num);
+	trigger_list.push_domain_changed(d.var_num);
 #endif
     trigger_list.push_lower(d.var_num, lower_bound(d) - low_bound);
     if(lower_bound(d) == upper_bound(d)) {

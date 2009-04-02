@@ -289,7 +289,7 @@ struct BoundVarContainer {
     if(min_val == max_val)
       return;
     
-    trigger_list.push_domain(d.var_num);
+    trigger_list.push_domain_changed(d.var_num);
     trigger_list.push_assign(d.var_num, i);
 
     if(min_val != i) {
@@ -332,7 +332,7 @@ struct BoundVarContainer {
     if(i < up_bound)
     {
       trigger_list.push_upper(d.var_num, up_bound - i);
-      trigger_list.push_domain(d.var_num);
+      trigger_list.push_domain_changed(d.var_num);
       upper_bound(d) = i;
       if(low_bound == i) {
         trigger_list.push_assign(d.var_num, i);
@@ -354,7 +354,7 @@ struct BoundVarContainer {
     if(i > low_bound)
     {
       trigger_list.push_lower(d.var_num, i - low_bound);
-      trigger_list.push_domain(d.var_num);
+      trigger_list.push_domain_changed(d.var_num);
       lower_bound(d) = i;
       if(up_bound == i) {
 	    trigger_list.push_assign(d.var_num, i);

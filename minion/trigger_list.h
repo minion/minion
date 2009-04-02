@@ -268,7 +268,7 @@ public:
       getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1));
   }
   
-  void push_domain(int var_num)
+  void push_domain_changed(int var_num)
   { 
 #ifdef DYNAMICTRIGGERS
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);

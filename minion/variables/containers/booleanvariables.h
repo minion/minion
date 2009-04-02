@@ -276,7 +276,7 @@ struct BooleanContainer
     
     trigger_list.push_assign(d.var_num, b);
 #ifndef FEW_BOOLEAN_TRIGGERS
-    trigger_list.push_domain(d.var_num);
+    trigger_list.push_domain_changed(d.var_num);
 	trigger_list.push_domain_removal(d.var_num, 1 - b);
 #endif
     
