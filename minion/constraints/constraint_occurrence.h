@@ -71,8 +71,6 @@ help constraints occurrence
 help constraints occurrenceleq
 */
 
-//#include "constraint_forward_checking.h"
-
 #ifndef CONSTRAINT_OCCURRENCE_H
 #define CONSTRAINT_OCCURRENCE_H
 
