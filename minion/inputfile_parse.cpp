@@ -91,8 +91,7 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
     filtering_istream in;
     
     error_counter e_count;
-    if(show_errors)
-    	in.push(boost::ref(e_count));
+    in.push(boost::ref(e_count));
     
     if(extension == ".gz" || extension == ".gzip" || extension == ".z" || extension == ".gzp" ||
         extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
@@ -145,18 +144,10 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
       cerr << "Error in input!" << endl;
       cerr << s.what() << endl;
       
-      if(show_errors)
-      {
         cerr << "Error occurred on line " << e_count.lines_prev << ", around character " << e_count.chars_prev << endl;
 #ifdef GET_STRING         
         cerr << "The parser gave up around: '" << e_count.current_line_prev << "'" << endl;
 #endif
         exit(1);
-      }
-      else
-      {
-        cerr << "Rerun minion with flag -showerrors for exact location" << endl;
-        exit(1);
-      }
     }
 }
