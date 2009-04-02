@@ -29,6 +29,7 @@ namespace boost { namespace iostreams {
 //      Ch - The character type.
 // Description: Filter which counts lines and characters.
 //
+
 template<typename Ch>
 class basic_error_finder  {
 public:
@@ -43,9 +44,11 @@ public:
     explicit basic_error_finder(int first_line = 0, int first_char = 0)
         : lines_(first_line), chars_(first_char)
         { }
-         
+
+#ifdef GET_STRING         
     std::string current_line_;
     std::string current_line_prev;
+#endif
     int lines_prev;
     int chars_prev;
           
@@ -56,7 +59,9 @@ public:
     template<typename Source>
     std::streamsize read(Source& src, char_type* s, std::streamsize n)
     {
+#ifdef GET_STRING
       current_line_prev = current_line_;
+#endif
       chars_prev = chars_;
       lines_prev = lines_;
       
@@ -69,7 +74,9 @@ public:
         if(newline_count == 0)
         {
           chars_ += result;
+#ifdef GET_STRING
           current_line_ += std::string(s, result);
+#endif
         }
         else
         {
@@ -80,7 +87,9 @@ public:
               last_newline = i;
           }
           chars_ = result - (last_newline + 1);
+#ifdef GET_STRING
           current_line_ = std::string(s + last_newline + 1, chars_);
+#endif
         }
         return result;
     }
