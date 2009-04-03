@@ -242,12 +242,12 @@ struct MinConstraint : public AbstractConstraint
 
 template<typename VarArray, typename VarRef>
 AbstractConstraint*
-BuildCT_MIN(StateObj* stateObj, const VarArray& _var_array, const light_vector<VarRef>& _var_ref, ConstraintBlob&)
+BuildCT_MIN(StateObj* stateObj, const VarArray& _var_array, const vector<VarRef>& _var_ref, ConstraintBlob&)
 { return (new MinConstraint<VarArray,VarRef>(stateObj, _var_array, _var_ref[0])); }
 
 template<typename VarArray, typename VarRef>
 AbstractConstraint*
-BuildCT_MAX(StateObj* stateObj, const VarArray& _var_array, const light_vector<VarRef>& _var_ref, ConstraintBlob&)
+BuildCT_MAX(StateObj* stateObj, const VarArray& _var_array, const vector<VarRef>& _var_ref, ConstraintBlob&)
 { return (new MinConstraint<typename NegType<VarArray>::type, typename NegType<VarRef>::type>(stateObj,
                                                                                               VarNegRef(_var_array),
                                                                                               VarNegRef(_var_ref[0]))); 

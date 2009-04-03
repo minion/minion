@@ -38,8 +38,5 @@ public:
 {}
 };
 
-enum PropagationLevel
-{ PropLevel_None, PropLevel_GAC, PropLevel_SAC, PropLevel_SSAC, 
-PropLevel_SACBounds, PropLevel_SSACBounds };
 
 #endif

@@ -171,8 +171,8 @@ struct NegType<vector<T> >
 
 #ifdef LIGHT_VECTOR
 template<typename T>
-struct NegType<light_vector<T> >
-{ typedef light_vector<typename NegType<T>::type> type; };
+struct NegType<vector<T> >
+{ typedef vector<typename NegType<T>::type> type; };
 #endif
 
 template<typename T, std::size_t i>
@@ -207,10 +207,10 @@ VarNegRef(const vector<VarRef>& var_array)
 
 #ifdef LIGHT_VECTOR
 template<typename VarRef>
-light_vector<typename NegType<VarRef>::type>
-VarNegRef(const light_vector<VarRef>& var_array)
+vector<typename NegType<VarRef>::type>
+VarNegRef(const vector<VarRef>& var_array)
 {
-  light_vector<typename NegType<VarRef>::type> neg_array(var_array.size());
+  vector<typename NegType<VarRef>::type> neg_array(var_array.size());
   for(unsigned int i = 0; i < var_array.size(); ++i)
     neg_array[i] = VarNegRef(var_array[i]);
   return neg_array;

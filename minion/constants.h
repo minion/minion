@@ -36,6 +36,23 @@ enum BoundType
   Bound_Maybe
 };
 
+enum PropagationLevel
+{ PropLevel_None, PropLevel_GAC, PropLevel_SAC, PropLevel_SSAC, 
+PropLevel_SACBounds, PropLevel_SSACBounds };
+
+inline PropagationLevel GetPropMethodFromString(string s)
+{
+  if(s == "None") return PropLevel_None;
+  else if(s == "GAC") return PropLevel_GAC;
+  else if(s == "SAC") return PropLevel_SAC;
+  else if(s == "SSAC") return PropLevel_SSAC;
+  else if(s == "SACBounds") return PropLevel_SACBounds;
+  else if(s == "SSACBounds") return PropLevel_SSACBounds;
+  else
+    throw parse_exception(s + " is not a valid Propagation Method");
+}
+
+
 struct EndOfSearch
 {};
 

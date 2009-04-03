@@ -54,7 +54,7 @@ help constraints sumgeq
  
 template<typename T1, typename T2>
 AbstractConstraint*
-BuildCT_WEIGHTLEQSUM(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>& t2, ConstraintBlob& b)
+BuildCT_WEIGHTLEQSUM(StateObj* stateObj, vector<T1> vec, const vector<T2>& t2, ConstraintBlob& b)
 {
   vector<int> scale = b.constants[0];
   // Preprocess to remove any multiplications by 0, both for efficency
@@ -85,14 +85,14 @@ BuildCT_WEIGHTLEQSUM(StateObj* stateObj, light_vector<T1> vec, const light_vecto
 
   if(multipliers_size_one)
   {
-    light_vector<SwitchNeg<T1> > mult_vars(vec.size());
+    vector<SwitchNeg<T1> > mult_vars(vec.size());
     for(unsigned int i = 0; i < vec.size(); ++i)
       mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
     return BuildCT_LEQSUM(stateObj, mult_vars, t2, b);
   }
   else
   {
-    light_vector<MultiplyVar<T1> > mult_vars(vec.size());
+    vector<MultiplyVar<T1> > mult_vars(vec.size());
     for(unsigned int i = 0; i < vec.size(); ++i)
       mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
     return BuildCT_LEQSUM(stateObj, mult_vars, t2, b);
@@ -102,7 +102,7 @@ BuildCT_WEIGHTLEQSUM(StateObj* stateObj, light_vector<T1> vec, const light_vecto
 // Don't pass in the vectors by reference, as we might need to copy them.
 template<typename T1, typename T2>
 AbstractConstraint*
-BuildCT_WEIGHTGEQSUM(StateObj* stateObj, light_vector<T1> vec, const light_vector<T2>& t2, ConstraintBlob& b)
+BuildCT_WEIGHTGEQSUM(StateObj* stateObj, vector<T1> vec, const vector<T2>& t2, ConstraintBlob& b)
 {
   vector<int> scale = b.constants[0];
   // Preprocess to remove any multiplications by 0, both for efficency
@@ -133,14 +133,14 @@ BuildCT_WEIGHTGEQSUM(StateObj* stateObj, light_vector<T1> vec, const light_vecto
 
   if(multipliers_size_one)
   {
-    light_vector<SwitchNeg<T1> > mult_vars(vec.size());
+    vector<SwitchNeg<T1> > mult_vars(vec.size());
     for(unsigned int i = 0; i < vec.size(); ++i)
       mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
     return BuildCT_GEQSUM(stateObj, mult_vars, t2, b);
   }
   else
   {
-    light_vector<MultiplyVar<T1> > mult_vars(vec.size());
+    vector<MultiplyVar<T1> > mult_vars(vec.size());
     for(unsigned int i = 0; i < vec.size(); ++i)
       mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
     return BuildCT_GEQSUM(stateObj, mult_vars, t2, b);

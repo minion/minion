@@ -163,8 +163,8 @@ struct ShiftType<vector<T>, U>
 
 #ifdef LIGHT_VECTOR
 template<typename T,typename U>
-struct ShiftType<light_vector<T>, U>
-{ typedef light_vector<ShiftVar<T, U> > type; };
+struct ShiftType<vector<T>, U>
+{ typedef vector<ShiftVar<T, U> > type; };
 #endif
 
 template<typename T, std::size_t i, typename U>
@@ -190,10 +190,10 @@ ShiftVarRef(const vector<VarRef>& var_array, const Shift& shift)
 
 #ifdef LIGHT_VECTOR
 template<typename VarRef, typename Shift>
-light_vector<ShiftVar<VarRef, Shift> >
-ShiftVarRef(const light_vector<VarRef>& var_array, const Shift& shift)
+vector<ShiftVar<VarRef, Shift> >
+ShiftVarRef(const vector<VarRef>& var_array, const Shift& shift)
 {
-  light_vector<ShiftVar<VarRef, Shift> > shift_array(var_array.size());
+  vector<ShiftVar<VarRef, Shift> > shift_array(var_array.size());
   for(unsigned int i = 0; i < var_array.size(); ++i)
     shift_array[i] = ShiftVarRef(var_array[i], shift);
   return shift_array;

@@ -29,7 +29,7 @@ using namespace std;
 
 #include "tuple_container.h"
 
-#include "propagation_data.h"
+#include "constants.h"
 
 /// The currently accepted types of Constraints.
 

@@ -211,7 +211,7 @@ struct ProductConstraint : public AbstractConstraint
 
 
 inline AbstractConstraint*
-BuildCT_PRODUCT2(StateObj* stateObj, const light_vector<BoolVarRef>& vars, const light_vector<BoolVarRef>& var2, ConstraintBlob&)
+BuildCT_PRODUCT2(StateObj* stateObj, const vector<BoolVarRef>& vars, const vector<BoolVarRef>& var2, ConstraintBlob&)
 {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
@@ -220,7 +220,7 @@ BuildCT_PRODUCT2(StateObj* stateObj, const light_vector<BoolVarRef>& vars, const
 
 template<typename VarRef1, typename VarRef2>
 AbstractConstraint*
-BuildCT_PRODUCT2(StateObj* stateObj, const light_vector<VarRef1>& vars, const light_vector<VarRef2>& var2, ConstraintBlob&)
+BuildCT_PRODUCT2(StateObj* stateObj, const vector<VarRef1>& vars, const vector<VarRef2>& var2, ConstraintBlob&)
 { 
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);

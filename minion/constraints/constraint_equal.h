@@ -606,8 +606,8 @@ struct EqualConstraint : public AbstractConstraint
 
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
 AbstractConstraint*
-BuildCT_EQ_REIFY(StateObj* stateObj, const light_vector<EqualVarRef1>& var1, 
-                                    const light_vector<EqualVarRef2>& var2, const light_vector<BoolVarRef> var3,ConstraintBlob&)
+BuildCT_EQ_REIFY(StateObj* stateObj, const vector<EqualVarRef1>& var1, 
+                                    const vector<EqualVarRef2>& var2, const vector<BoolVarRef> var3,ConstraintBlob&)
 { return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, BoolVarRef>(stateObj,var1[0],var2[0],var3[0]); }
 
 
@@ -619,8 +619,8 @@ EqualCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
 
 template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
 AbstractConstraint*
-BuildCT_MINUSEQ_REIFY(StateObj* stateObj, const light_vector<EqualVarRef1>& var1, 
-                                         const light_vector<EqualVarRef2>& var2, const light_vector<BoolVarRef> var3,ConstraintBlob&)
+BuildCT_MINUSEQ_REIFY(StateObj* stateObj, const vector<EqualVarRef1>& var1, 
+                                         const vector<EqualVarRef2>& var2, const vector<BoolVarRef> var3,ConstraintBlob&)
 { return new ReifiedEqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2>, BoolVarRef>(stateObj, var1[0],VarNegRef(var2[0]),var3[0]); }
 
 template<typename EqualVarRef1, typename EqualVarRef2>
@@ -643,8 +643,8 @@ BuildCT_MINUSEQ(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob&)
 
 template<typename VarRef1, typename VarRef2, typename BoolVarRef>
 AbstractConstraint*
-BuildCT_DISEQ_REIFY(StateObj* stateObj, const light_vector<VarRef1>& var1, 
-                                        const light_vector<VarRef2>& var2, const light_vector<BoolVarRef> var3, ConstraintBlob&)
+BuildCT_DISEQ_REIFY(StateObj* stateObj, const vector<VarRef1>& var1, 
+                                        const vector<VarRef2>& var2, const vector<BoolVarRef> var3, ConstraintBlob&)
 { return new ReifiedEqualConstraint<VarRef1, VarRef2, VarNot<BoolVarRef> >
                                    (stateObj,var1[0],var2[0], VarNotRef(var3[0])); }
 

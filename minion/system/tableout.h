@@ -40,8 +40,11 @@ class TableOut
     map<string, string> data;
     string filename;
     
+    // Don't allow copying!
+    TableOut(const TableOut& t); 
     public:
-    
+    TableOut() {}
+      
     template <class Valtype>
     void set(string propname, Valtype value)
     {
@@ -106,6 +109,14 @@ class TableOut
         filename=file;
     }
 };
+
+// Provide a global singleton of the above class. Not threadsafe!
+inline TableOut& getTableOut()
+{
+  static TableOut t;
+  return t;
+}
+
 
 // Design assumption: Column headings will always be sorted in alphabetical order. ??
 

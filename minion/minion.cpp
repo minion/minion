@@ -403,7 +403,7 @@ try {
   getState(stateObj).setTupleListContainer(instance.tupleListContainer);
   
   // Copy args into tableout
-  oldtableout.set("RandomSeed", to_string(args.random_seed));
+  getTableOut().set("RandomSeed", to_string(args.random_seed));
   {   const char * b = "";
     switch (args.preprocess) {
       case PropLevel_None:
@@ -419,12 +419,12 @@ try {
       case PropLevel_SSACBounds:
         b = "SSACBounds"; break;
     }
-    oldtableout.set("Preprocess", string(b));
+    getTableOut().set("Preprocess", string(b));
   }
   // should be one for varorder as well.
-  oldtableout.set("MinionVersion", SVN_VER);
-  oldtableout.set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_Always, "Parsing Time: ", "ParsingTime", oldtableout, !getOptions(stateObj).silent);
+  getTableOut().set("MinionVersion", SVN_VER);
+  getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
+  getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions(stateObj).silent);
   
   BuildCSP(stateObj, instance);
   SolveCSP(stateObj, instance, args);

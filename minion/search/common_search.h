@@ -177,7 +177,7 @@ namespace Controller
           }
           
           getOptions(stateObj).printLine("Time out.");
-          oldtableout.set("TimeOut", 1);
+          getTableOut().set("TimeOut", 1);
   		    return true;
   	    }
   	  }

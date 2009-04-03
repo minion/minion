@@ -28,12 +28,6 @@
 #include "system/system.h"
 #include "constants.h"
 
-#ifdef USELIGHTVECTOR
-#include "system/light_vector.h"
-#else
-#define light_vector vector
-#endif
-
 // XXX These could possibly be turned off, but it's possible it will require
 // Some small amount of work to make them work.
 #define FULL_DOMAIN_TRIGGERS
@@ -56,7 +50,6 @@
 
 #include "solver.h"
 
-VARDEF(TableOut oldtableout);
 VARDEF(ofstream solsoutFile);
 
 #include "memory_management/backtrackable_memory.h"

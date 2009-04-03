@@ -212,8 +212,8 @@ struct SwitchNegType<vector<T> >
 
 #ifdef LIGHT_VECTOR
 template<typename T>
-struct SwitchNegType<light_vector<T> >
-{ typedef light_vector<SwitchNeg<T> > type; };
+struct SwitchNegType<vector<T> >
+{ typedef vector<SwitchNeg<T> > type; };
 #endif
 
 template<typename T, std::size_t i>
@@ -239,8 +239,8 @@ SwitchNegRef(const vector<VarRef>& var_array)
 
 #ifdef LIGHT_VECTOR
 template<typename VarRef>
-light_vector<SwitchNeg<VarRef> >
-SwitchNegRef(const light_vector<VarRef>& var_array)
+vector<SwitchNeg<VarRef> >
+SwitchNegRef(const vector<VarRef>& var_array)
 {
   vector<SwitchNeg<VarRef> > neg_array(var_array.size);
   for(unsigned int i = 0; i < var_array.size(); ++i)

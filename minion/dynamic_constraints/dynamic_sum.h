@@ -352,7 +352,7 @@ AbstractConstraint*
 
 template<typename T>
 inline AbstractConstraint*
-  BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const light_vector<T>& t1, ConstraintBlob& b)
+  BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const vector<T>& t1, ConstraintBlob& b)
 { 
   for(int i = 0; i < t1.size(); ++i)
   {
@@ -365,7 +365,7 @@ inline AbstractConstraint*
 
 template<typename T>
 inline AbstractConstraint*
-  BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const light_vector<T>& t1, ConstraintBlob& b)
+  BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const vector<T>& t1, ConstraintBlob& b)
 { 
   for(int i = 0; i < t1.size(); ++i)
   {

@@ -17,8 +17,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "minion.h"
-#include "CSPSpec.h"
+//#include "minion.h"
+//#include "CSPSpec.h"
 
 
 #include "BuildConstraint.h"
@@ -48,7 +48,7 @@ template<typename Reader, typename Stream>
     void ReadCSP(Reader& reader, ConcreteFileReader<Stream>* infile)
 {
     reader.read(infile) ;
-    oldtableout.set(string("Filename"), infile->filename);  
+    getTableOut().set(string("Filename"), infile->filename);  
 }
 
 template<typename InputReader>

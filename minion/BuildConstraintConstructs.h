@@ -66,7 +66,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 	{
 	  case VAR_BOOL:
 	  {
-		light_vector<BoolVarRef> v(vars.size());
+		vector<BoolVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = getVars(stateObj).getBooleanContainer().get_var_num(vars[i].pos());
 		return BuildConObj<constraint, size - 1>::
@@ -74,7 +74,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 	  }
 	  case VAR_NOTBOOL:
 	  {
-		light_vector<VarNot<BoolVarRef> > v(vars.size());
+		vector<VarNot<BoolVarRef> > v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = VarNotRef(getVars(stateObj).getBooleanContainer().get_var_num(vars[i].pos()));
 		return BuildConObj<constraint, size - 1>::
@@ -82,7 +82,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 	  }
 	  case VAR_BOUND:
 	  {
-		light_vector<BoundVarRef> v(vars.size());
+		vector<BoundVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = getVars(stateObj).getBoundVarContainer().get_var_num(vars[i].pos());
 		return BuildConObj<constraint, size - 1>::
@@ -90,7 +90,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 	  }		
 	  case VAR_SPARSEBOUND:
 	  {
-		light_vector<SparseBoundVarRef> v(vars.size());
+		vector<SparseBoundVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = getVars(stateObj).getSparseBoundVarContainer().get_var_num(vars[i].pos());
 		return BuildConObj<constraint, size - 1>::
@@ -98,7 +98,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 	  }
       case VAR_DISCRETE:
 	  {
-		light_vector<BigRangeVarRef> v(vars.size());
+		vector<BigRangeVarRef> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = getVars(stateObj).getBigRangeVarContainer().get_var_num(vars[i].pos());
 		return BuildConObj<constraint, size - 1>::
@@ -109,7 +109,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 		
 	  case VAR_CONSTANT:
 	  {
-		light_vector<ConstantVar> v(vars.size());
+		vector<ConstantVar> v(vars.size());
 		for(unsigned i = 0; i < vars.size(); ++i)
 		  v[i] = ConstantVar(stateObj, vars[i].pos());
 		return BuildConObj<constraint, size - 1>::
@@ -120,7 +120,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
   else
   #endif
   {
-	light_vector<AnyVarRef> v(vars.size());
+	vector<AnyVarRef> v(vars.size());
 	for(unsigned i = 0; i < vars.size(); ++i)
 	  v[i] = get_AnyVarRef_from_Var(stateObj, vars[i]);
 	

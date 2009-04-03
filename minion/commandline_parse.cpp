@@ -188,7 +188,7 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
     {
         getOptions(stateObj).tableout=true;
         ++i;
-        oldtableout.set_filename(argv[i]);
+        getTableOut().set_filename(argv[i]);
     }
     else if(command == string("-solsout") || command == string("-solsout0"))
     {
@@ -227,5 +227,5 @@ void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, cha
       else
           s=s+argv[i];
   }
-  oldtableout.set("CommandLineArguments", s);
+  getTableOut().set("CommandLineArguments", s);
 }

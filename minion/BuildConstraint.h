@@ -53,10 +53,6 @@ void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars);
 pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order(StateObj* stateObj, SearchOrder instance);
 
 }
-#ifdef DYNAMICTRIGGERS
-//AbstractConstraint*
-//build_dynamic_constraint(StateObj* stateObj, ProbSpec::ConstraintBlob& b);
-#endif
 
 AbstractConstraint*
 build_constraint(StateObj* stateObj, ProbSpec::ConstraintBlob& b);

@@ -32,7 +32,7 @@
 
 template<typename VarArray,  typename VarSum>
 AbstractConstraint*
-BuildCT_LEQSUM(StateObj* stateObj, const VarArray& _var_array, const light_vector<VarSum>& _var_sum, ConstraintBlob&)
+BuildCT_LEQSUM(StateObj* stateObj, const VarArray& _var_array, const vector<VarSum>& _var_sum, ConstraintBlob&)
 { 
   if(_var_array.size() == 2)
   {
@@ -48,7 +48,7 @@ BuildCT_LEQSUM(StateObj* stateObj, const VarArray& _var_array, const light_vecto
 }
 
 inline AbstractConstraint*
-BuildCT_LEQSUM(StateObj* stateObj, const light_vector<BoolVarRef>& var_array, const light_vector<ConstantVar>& var_sum, ConstraintBlob&)
+BuildCT_LEQSUM(StateObj* stateObj, const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum, ConstraintBlob&)
 { 
   runtime_val t2(checked_cast<int>(var_sum[0].getAssignedValue()));
   return BoolLessEqualSumCon(stateObj, var_array, t2);
@@ -56,7 +56,7 @@ BuildCT_LEQSUM(StateObj* stateObj, const light_vector<BoolVarRef>& var_array, co
 
 template<typename VarArray,  typename VarSum>
 AbstractConstraint*
-BuildCT_GEQSUM(StateObj* stateObj, const light_vector<VarArray>& _var_array, const light_vector<VarSum>& _var_sum, ConstraintBlob&)
+BuildCT_GEQSUM(StateObj* stateObj, const vector<VarArray>& _var_array, const vector<VarSum>& _var_sum, ConstraintBlob&)
 { 
   if(_var_array.size() == 2)
   {
@@ -67,13 +67,13 @@ BuildCT_GEQSUM(StateObj* stateObj, const light_vector<VarArray>& _var_array, con
   }
   else
   {
-    return (new LessEqualSumConstraint<light_vector<typename NegType<VarArray>::type>, 
+    return (new LessEqualSumConstraint<vector<typename NegType<VarArray>::type>, 
       typename NegType<VarSum>::type>(stateObj, VarNegRef(_var_array), VarNegRef(_var_sum[0]))); 
   }
 }
 
 inline AbstractConstraint*
-BuildCT_GEQSUM(StateObj* stateObj, const light_vector<BoolVarRef>& var_array, const light_vector<ConstantVar>& var_sum, ConstraintBlob&)
+BuildCT_GEQSUM(StateObj* stateObj, const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum, ConstraintBlob&)
 { 
   runtime_val t2(checked_cast<int>(var_sum[0].getAssignedValue()));
   return BoolGreaterEqualSumCon(stateObj, var_array, t2);
