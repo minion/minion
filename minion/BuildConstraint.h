@@ -27,14 +27,7 @@
 #include "CSPSpec.h"
 
 namespace BuildCon
-{  
-  
-  enum VarType
 {
-  VAR_ARRAY = -100,
-  SINGLE_VAR = -101
-};
-
 
 /// Helper function used in a few places.
 AnyVarRef
