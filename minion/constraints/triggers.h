@@ -22,9 +22,27 @@
 
 #include "../system/system.h"
 #include "../constants.h"
-#include "../propagation_data.h"
 
 class AbstractConstraint;
+
+
+/** @brief Represents a change in domain. 
+ *
+ * This is used instead of a simple int as the use of various mappers on variables might mean the domain change needs
+ * to be corrected. Every variable should implement the function getDomainChange which uses this and corrects the domain.
+ */
+class DomainDelta
+{ 
+  int domain_change; 
+public:
+  /// This function shouldn't be called directly. This object should be passed to a variables, which will do any "massaging" which 
+  /// is required.
+  int XXX_get_domain_diff()
+{ return domain_change; }
+
+  DomainDelta(int i) : domain_change(i)
+{}
+};
 
 ///The classes which are used to build the queue.
 class Trigger
