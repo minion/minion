@@ -19,22 +19,6 @@
 
 #include "../constraints/constraint_abstract.h"
 
-
-/*
-inline string var_name(const Var& var, CSPInstance& csp)
- { 
-   if(var.type() == VAR_CONSTANT)
-     print_instance( var.pos());
-   else if(var.type() == VAR_NOTBOOL)
-   {
-     oss << "!";
-     oss << csp.vars.getName(Var(VAR_BOOL, var.pos())); 
-   }
-   else
-     oss << csp.vars.getName(var); 
- }
-*/
-
 #define VAR_INFO_PRINT_0(X,Y)
 #define VAR_INFO_PRINT_1(X,Y,Z)
 
