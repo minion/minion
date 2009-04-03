@@ -37,7 +37,6 @@
 
 
 #include "minion.h"
-#include "CSPSpec.h"
 
 
 #include "BuildVariables.h"
@@ -354,7 +353,7 @@ try {
   }
     
   CSPInstance instance;
-  MinionArguments args;
+  SearchMethod args;
 
   parse_command_line(stateObj, args, argc, argv);
   

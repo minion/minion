@@ -37,7 +37,7 @@ Use of this variable in a constraint:
 eq(myvar, 3) #myvar equals 3
 */
 
-#include "../../CSPSpec.h"
+
 
 #include "../../constraints/constraint_abstract.h"
 

@@ -20,13 +20,20 @@
 #ifndef _BUILDCSP_H
 #define _BUILDCSP_H
 
-//#include "solver.h"
-#include "preprocess.h"
-#include "CSPSpec.h"
+#include "inputfile_parse/InputVariableDef.h"
 
-
+struct SearchMethod
+{
+  VarOrderEnum order;
+  enum PropagationLevel preprocess;
+  enum PropagationLevel prop_method;
+  unsigned random_seed;
+  SearchMethod() : order(ORDER_NONE), preprocess(PropLevel_None), prop_method(PropLevel_GAC), random_seed((unsigned)time(NULL) ^ getpid())
+  { }
+  
+};
 
 void BuildCSP(StateObj* stateObj, ProbSpec::CSPInstance& instance);
-void SolveCSP(StateObj* stateObj, ProbSpec::CSPInstance& instance, MinionArguments args);
+void SolveCSP(StateObj* stateObj, ProbSpec::CSPInstance& instance, SearchMethod args);
 
 #endif

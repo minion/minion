@@ -20,20 +20,7 @@
 #ifndef _CONSTRAINT_SETUP_H
 #define _CONSTRAINT_SETUP_H 
 
-// The following is a little trick, to make sure no-one accidentally links together
-// debugging and non-debugging code (which are not link-compatable)
-#ifdef MINION_DEBUG
-namespace StateObjNamespace_DEBUG
-#else
-namespace StateObjNamespace_RELEASE
-#endif
-{ struct StateObj; }
- 
-#ifdef MINION_DEBUG
-using namespace StateObjNamespace_DEBUG;
-#else
-using namespace StateObjNamespace_RELEASE;
-#endif
+#include "StateObj_forward.h"
 
 namespace Controller
 {

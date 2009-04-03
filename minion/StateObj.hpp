@@ -21,6 +21,8 @@
 #ifndef STATEOBJ_HPP
 #define STATEOBJ_HPP
 
+#include "StateObj_forward.h"
+
 // The following is a little trick, to make sure no-one accidentally links together
 // debugging and non-debugging code (which are not link-compatable)
 #ifdef REENTER

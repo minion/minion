@@ -18,7 +18,7 @@
 */
 
 
-#include "../CSPSpec.h"
+#include "../inputfile_parse/InputVariableDef.h"
 
 
 #include "BuildConstraintConstructs.h"

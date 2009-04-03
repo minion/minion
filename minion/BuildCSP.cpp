@@ -19,6 +19,8 @@
 
 #include "minion.h"
 
+#include "preprocess.h"
+
 #include "search/standard_search.h"
 #include "search/recursive_search.h"
 #include "search/conflict_search.h"
@@ -75,7 +77,7 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
   
 }
 
-void SolveCSP(StateObj* stateObj, CSPInstance& instance, MinionArguments args)
+void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
 {
   vector<AnyVarRef> preprocess_vars = BuildCon::build_val_and_var_order(stateObj, instance.search_order[0]).first;  
   function<void (void)> search(bind(Controller::deal_with_solution, stateObj));

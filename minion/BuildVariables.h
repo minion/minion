@@ -24,8 +24,6 @@
 
 #include "variables/AnyVarRef.h"
 
-#include "CSPSpec.h"
-
 namespace BuildCon
 {
 

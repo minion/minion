@@ -131,17 +131,6 @@ struct PropagateSSAC_Bounds
   }
 };
 
-struct MinionArguments
-{
-  VarOrderEnum order;
-  enum PropagationLevel preprocess;
-  enum PropagationLevel prop_method;
-  unsigned random_seed;
-  MinionArguments() : order(ORDER_NONE), preprocess(PropLevel_None), prop_method(PropLevel_GAC), random_seed((unsigned)time(NULL) ^ getpid())
-  { }
-  
-};
-
 void PropogateCSP(StateObj*, PropagationLevel, vector<AnyVarRef>&, bool print_info = false);
 
 #endif

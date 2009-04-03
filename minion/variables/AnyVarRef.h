@@ -140,12 +140,11 @@ ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 #ifndef _ANYVARREF_H
 #define _ANYVARREF_H
 
-#include "../CSPSpec.h"
+#include "../inputfile_parse/InputVariableDef.h"
 #include "../constants.h"
 #include "../system/system.h"
 #include "../solver.h"
 #include "../constraints/triggers.h"
-
 class AbstractConstraint;
 class DynamicTrigger;
 

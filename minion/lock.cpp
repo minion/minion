@@ -25,11 +25,7 @@ namespace Controller
 // @todo This could be done more neatly... 
 
 void lock(StateObj* stateObj)
-{
-  // do hackery involving the monotonic set.
-  //getMemory(stateObj).monotonic_set=& getVars(stateObj).getBigRangevarContainer().bms_array;
-  
-  
+{  
   getVars(stateObj).lock();
   
   int size = getState(stateObj).getConstraintList().size();

@@ -27,7 +27,7 @@ using namespace std;
 #include <utility>
 #include <map>
 
-#include "../CSPSpec.h"
+#include "InputVariableDef.h"
 
 #include "../tuple_container.h"
 

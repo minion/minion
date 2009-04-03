@@ -33,7 +33,7 @@ Use of this variable in a constraint:
 eq(x, 2) #variable x equals 2
 */
 
-#include "../../CSPSpec.h"
+
 
 #include "../../constraints/constraint_abstract.h"
 

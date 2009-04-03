@@ -17,11 +17,27 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef COMMANDLINE_PARSE_H
-#define COMMANDLINE_PARSE_H
+#ifndef BUILDINPUTCONSTRAINT_H
+#define BUILDINPUTCONSTRAINT_H
 
-#include "minion.h"
+#include "system/system.h"
 
-void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char** argv);
+#include "variables/AnyVarRef.h"
+
+#include "inputfile_parse/CSPSpec.h"
+
+namespace BuildCon
+{
+
+/// Create all the variables used in the CSP.
+void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars);
+
+
+/// Build the variable and value ordering used.
+/// The var order is placed, the val order is returned.
+pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order(StateObj* stateObj, SearchOrder instance);
+
+}
 
 #endif
+

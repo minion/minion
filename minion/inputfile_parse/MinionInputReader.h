@@ -22,9 +22,6 @@
 
 #include "../system/system.h"
 
-#include "../CSPSpec.h"
-
-
 template<typename StreamType>
 struct ConcreteFileReader
 {

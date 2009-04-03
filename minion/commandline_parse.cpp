@@ -21,7 +21,7 @@
 
 extern bool in_cspcomp_for_failexit;
 
-void parse_command_line(StateObj* stateObj, MinionArguments& args, int argc, char** argv)
+void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char** argv)
 {
  for(int i = 1; i < argc; ++i)
   {

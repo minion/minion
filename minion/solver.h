@@ -23,25 +23,15 @@
 #include "system/system.h"
 
 #include "tuple_container.h"
+
+#include "stateObj_forward.h"
+
 // Some advanced definitions, we don't actually need to know anything about these
 // types for SearchState, simply that they exist.
 class AbstractConstraint;
 class AnyVarRef;
 
-// The following is a little trick, to make sure no-one accidentally links together
-// debugging and non-debugging code (which are not link-compatable)
-#ifdef MINION_DEBUG
-namespace StateObjNamespace_DEBUG
-#else
-namespace StateObjNamespace_RELEASE
-#endif
-{ struct StateObj; }
- 
-#ifdef MINION_DEBUG
-using namespace StateObjNamespace_DEBUG;
-#else
-using namespace StateObjNamespace_RELEASE;
-#endif
+
 
 class SearchState
 {
@@ -267,23 +257,6 @@ public:
     cout << s << endl; 
   }
 };
-
-
-class Queues;
-class MemBlockCache;
-class Memory;
-class TriggerMem;
-class VariableContainer;
-
-class BoolContainer;
-
-inline BoolContainer& getBools(StateObj* stateObj);
-inline SearchOptions& getOptions(StateObj* stateObj);
-inline SearchState& getState(StateObj* stateObj);
-inline Queues& getQueue(StateObj* stateObj);
-inline Memory& getMemory(StateObj* stateObj);
-inline TriggerMem& getTriggerMem(StateObj* stateObj);
-inline VariableContainer& getVars(StateObj* stateObj);
 
 namespace Controller
 {

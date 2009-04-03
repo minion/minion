@@ -18,7 +18,7 @@
 */
 
 #include "minion.h"
-
+#include "preprocess.h"
 /// Apply a high level of consistency to a CSP.
 /** This function is not particularly optimised, implementing only the most basic SAC and SSAC algorithms */
 void PropogateCSP(StateObj* stateObj, PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, bool print_info)

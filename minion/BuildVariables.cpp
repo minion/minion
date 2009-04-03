@@ -18,8 +18,6 @@
 */
 
 #include "minion.h"
-#include "CSPSpec.h"
-
 
 namespace BuildCon
 {  

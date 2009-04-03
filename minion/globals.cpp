@@ -28,7 +28,6 @@
 #endif
 
 #include "minion.h"
-#include "CSPSpec.h"
 
 #include "system/defined_macros.h"
 

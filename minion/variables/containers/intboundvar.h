@@ -35,7 +35,7 @@ Use of this variable in a constraint:
 eq(myvar, 4) #variable myvar equals 4
 */
 
-#include "../../CSPSpec.h"
+
 
 #include "../../constraints/constraint_abstract.h"
 

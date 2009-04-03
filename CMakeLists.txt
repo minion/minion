@@ -110,7 +110,7 @@ endforeach()
 list(APPEND SRCS ${PROJECT_SOURCE_DIR}/minion/BuildVariables.cpp
                  ${PROJECT_SOURCE_DIR}/minion/BuildCSP.cpp
                  ${PROJECT_SOURCE_DIR}/minion/commandline_parse.cpp
-                 ${PROJECT_SOURCE_DIR}/minion/constraint_setup.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/lock.cpp
                  ${PROJECT_SOURCE_DIR}/minion/debug_functions.cpp
                  ${PROJECT_SOURCE_DIR}/minion/get_info.cpp
                  ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp

@@ -26,7 +26,7 @@
 #include "../variables/AnyVarRef.h"
 #include "../variables/mappings/variable_neg.h"
 
-#include "../CSPSpec.h"
+
 
 namespace Controller
 {
