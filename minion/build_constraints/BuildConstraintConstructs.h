@@ -17,9 +17,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
-#include "BuildConstraint.h"
-
+#include "../BuildVariables.h"
 
 namespace BuildCon
 {  
@@ -134,6 +132,9 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
 
 
 }
+
+AbstractConstraint*
+build_constraint(StateObj* stateObj, ProbSpec::ConstraintBlob& b);
 
 
 

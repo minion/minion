@@ -107,7 +107,7 @@ foreach(ct ${SRCS})
     string(REGEX MATCH "CT_[A-Z_0-9]+" ct_name ${ct})
     add_definitions(-D${ct_name}_ABC)
 endforeach()
-list(APPEND SRCS ${PROJECT_SOURCE_DIR}/minion/BuildConstraint2.cpp
+list(APPEND SRCS ${PROJECT_SOURCE_DIR}/minion/BuildVariables.cpp
                  ${PROJECT_SOURCE_DIR}/minion/BuildCSP.cpp
                  ${PROJECT_SOURCE_DIR}/minion/commandline_parse.cpp
                  ${PROJECT_SOURCE_DIR}/minion/constraint_setup.cpp

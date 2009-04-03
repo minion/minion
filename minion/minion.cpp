@@ -40,7 +40,7 @@
 #include "CSPSpec.h"
 
 
-#include "BuildConstraint.h"
+#include "BuildVariables.h"
 
 #include "inputfile_parse.h"
 #include "commandline_parse.h"

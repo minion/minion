@@ -17,12 +17,6 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-//#include "minion.h"
-//#include "CSPSpec.h"
-
-
-#include "BuildConstraint.h"
-
 #include "inputfile_parse.h"
 
 #include "inputfile_parse/MinionInputReader.hpp"

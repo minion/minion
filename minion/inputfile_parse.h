@@ -20,7 +20,7 @@
 #ifndef INPUTFILE_PARSE_H
 #define INPUTFILE_PARSE_H
 
-//#include "minion.h"
+#include "CSPSpec.h"
 
 CSPInstance readInputFromFile(string fname, bool parser_verbose);
 

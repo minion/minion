@@ -17,11 +17,11 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-//#include "../minion.h"
+
 #include "../CSPSpec.h"
 
 
-#include "../BuildConstraintConstructs.h"
+#include "BuildConstraintConstructs.h"
 
 using namespace BuildCon;
 
