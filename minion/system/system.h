@@ -146,5 +146,5 @@ using namespace std;
 #include "array_functions.h"
 #include "trigger_timer.h"
 #include "box.h"
-
+#include "test_functions.h"
 #endif

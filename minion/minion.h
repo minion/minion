@@ -71,7 +71,6 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 #include "variables/variables.h"
 
-
 #include "build_constraints/build_helper.h"
 
 // This constraint must be listed early so that it can
@@ -80,7 +79,6 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 #include "preprocess.h"
 #include "constraint_setup.h"
-#include "test_functions.h"
 #include "BuildCSP.h"
 
 #include "StateObj.hpp"

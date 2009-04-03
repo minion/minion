@@ -113,7 +113,7 @@ list(APPEND SRCS ${PROJECT_SOURCE_DIR}/minion/BuildVariables.cpp
                  ${PROJECT_SOURCE_DIR}/minion/constraint_setup.cpp
                  ${PROJECT_SOURCE_DIR}/minion/debug_functions.cpp
                  ${PROJECT_SOURCE_DIR}/minion/get_info.cpp
-                 ${PROJECT_SOURCE_DIR}/minion/inputfile_parse.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp
 #                ${PROJECT_SOURCE_DIR}/minion/minion.cpp
                  ${PROJECT_SOURCE_DIR}/minion/globals.cpp
                  ${PROJECT_SOURCE_DIR}/minion/preprocess.cpp

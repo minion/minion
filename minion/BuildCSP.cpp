@@ -26,7 +26,6 @@
 
 #include "search/search_control.h"
 
-#include "CSPSpec.h"
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>

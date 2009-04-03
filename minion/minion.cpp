@@ -42,7 +42,7 @@
 
 #include "BuildVariables.h"
 
-#include "inputfile_parse.h"
+#include "inputfile_parse/inputfile_parse.h"
 #include "commandline_parse.h"
 
 #include "system/defined_macros.h"

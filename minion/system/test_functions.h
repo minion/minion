@@ -25,10 +25,6 @@
 
 #include <vector>
 
-#include "system/system.h"
-
-using namespace std;
-
 template<typename Var>
 string get_dom_as_string(Var& v)
 {

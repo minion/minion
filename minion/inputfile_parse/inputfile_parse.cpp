@@ -19,8 +19,8 @@
 
 #include "inputfile_parse.h"
 
-#include "inputfile_parse/MinionInputReader.hpp"
-#include "inputfile_parse/MinionThreeInputReader.hpp"
+#include "MinionInputReader.hpp"
+#include "MinionThreeInputReader.hpp"
 
 #include "counter.hpp"
 

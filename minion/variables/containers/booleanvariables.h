@@ -37,8 +37,6 @@ eq(bool, 0) #variable bool equals 0
 #ifndef _BOOLEANVARIABLES_H
 #define _BOOLEANVARIABLES_H
 
-#include "../../CSPSpec.h"
-
 #include "../../system/system.h"
 
 #include "../../memory_management/backtrackable_memory.h"
