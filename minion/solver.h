@@ -24,7 +24,7 @@
 
 #include "tuple_container.h"
 
-#include "stateObj_forward.h"
+#include "StateObj_forward.h"
 
 // Some advanced definitions, we don't actually need to know anything about these
 // types for SearchState, simply that they exist.

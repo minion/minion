@@ -20,6 +20,8 @@
 #ifndef CONSTRAINT_GADGET_H
 #define CONSTRAINT_GADGET_H
 
+#include "../preprocess.h"
+
 template<typename VarArray>
 struct GadgetConstraint : public AbstractConstraint
 {
