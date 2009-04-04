@@ -61,7 +61,7 @@ tar cf minion-$1-src.tar --exclude=*.pyc --exclude=.svn minion-$1/minion \
                          minion-$1/cmake-modules \
                          minion-$1/release-scripts &&
 cp minion-$1-src.tar minion-$1.tar &&
-tar rf minion-$1.tar minion-$1/bin/minion &&
+tar rf minion-$1.tar minion-$1/bin/minion?(.exe) &&
 cp minion-$1-src.tar minion-$1-debug.tar &&
-tar rf minion-$1-debug.tar minion-$1/bin/minion-debug &&
+tar rf minion-$1-debug.tar minion-$1/bin/minion-debug?(.exe) &&
 gzip *.tar
