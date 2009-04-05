@@ -139,6 +139,19 @@ if(WINCYGWIN)
 endif()
 
 find_program(CCACHE ccache)
+
+option(DISTCC "" OFF)
+if(DISTCC)
+    find_program(DISTCC-P distcc)
+    if(DISTCC-P)
+        message(STATUS "Using distcc")
+        if(CCACHE)
+            set(ENV{CCACHE_PREFIX} "distcc")
+        endif()
+        set(CMAKE_CXX_COMPILER ${DISTCC-P})
+    endif()
+endif()
+
 if(CCACHE)
     message(STATUS "Using ccache")
     set(CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
@@ -210,9 +223,10 @@ endif()
 #   message(STATUS "Compiler does not support C++0x")
 #endif()
 
-check_cxx_compiler_flag("-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter" CheckWarnings)
+set(WFLAGS "-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter -fwrapv")
+check_cxx_compiler_flag(${WFLAGS} CheckWarnings)
 if(CheckWarnings)
-    add_definitions("-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter")
+    add_definitions(${WFLAGS})
 endif()
 
 # slightly weird check to make sure that the boost TR1 libs are there
