@@ -55,6 +55,27 @@ table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})
 
 /** @help constraints;table References
 help input tuplelist
+help input negativetable
+*/
+
+/** @help constraints;negativetable Description
+An extensional constraint that enforces GAC. The constraint is
+specified via a list of disallowed tuples.
+*/
+
+/** @help constraints;negativetable Notes
+See entry 
+
+   help input negativetable
+
+for how to specify a table constraint in minion input. The only
+difference for negativetable is that the specified tuples are
+disallowed.
+*/
+
+/** @help constraints;negativetable References
+help input table
+help input tuplelist
 */
 
 #ifndef CONSTRAINT_GACTABLE_H_LAQ
