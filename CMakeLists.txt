@@ -280,10 +280,15 @@ if(THREADSAFE)
 endif()
 
 option(PROFILE "" OFF)
+option(GPROF "" OFF)
 if(PROFILE)
     message(STATUS "Enabling profiling")
     set(BINARY "${BINARY}-profile")
     set(CFLAGS "${CFLAGS} -O -g -fno-inline -fno-inline-functions")
+    if(GPROF)
+        message(STATUS "Enabling gprof")
+        set(CFLAGS "${CFLAGS} -pg")
+    endif()
     set(UNOPTIMISED ON) # Profiing can't cope with -fomit-frame-pointer
 endif()
 
