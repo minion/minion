@@ -419,7 +419,7 @@ minion. This executable is much slower than normal minion, but vital when trying
 to debug problems.
 \item[\texttt{SLOW\_DEBUG=1}] Turns on even more internal checking; the resulting
 executable will be much slower than standard Minion.
-\item[\texttt{PRINT=1}] (Only meaningful with \verb+DEBUG=1+) Turns on
+\item[\texttt{PRINT=1}] (Only meaningful with \texttt{DEBUG=1}) Turns on
 more printing of information.
 \item[\texttt{QUICK=1}] For optimisation reasons, Minion usually compiles many copies of
 every constraint. This flag makes Minion compile each constraint only once. This
@@ -434,7 +434,9 @@ of search in a future version of Minion.
 \item[\texttt{UNOPTIMISED=1}] Turn off all compiler optimisation, so Minion can be
 usefully checked in gdb.
 \item[\texttt{PROFILE=1}] Set compiler optimisation flags that allow Minion to be
-better profiled.
+better profiled. Implies \texttt{UNOPTIMISED=1}.
+\item[\texttt{GPROF=1}] (Only meaningful with \texttt{PROFILE=1}) Set compiler flags to profile the binary with
+\texttt{gprof}.
 \item[\texttt{REENTER=1}] Compile Minion so it is reenterent (more than one
 problem can exist in memory at a time). At present reenterence is not used for
 anything, and will only slightly slow Minion.
@@ -449,8 +451,9 @@ cheapest trigger first. This only affects triggers of the same type. This may or
 may not speed up Minion.
 \item[\texttt{BACK\_VEC=1}] Keep backtrack memory in a vector instead of a
 continuous block of memory.
-\item[\texttt{CACHE\_MALLOC=1}] (Only meaningful with \verb+BACK_VEC=1+) Enable
+\item[\texttt{CACHE\_MALLOC=1}] (Only meaningful with \texttt{BACK\_VEC=1}) Enable
 caching malloc.
+\item[\texttt{DISTCC=1}] Use \verb+distcc+ (if found). Experimental.
 \end{description}
 
 Furthermore the environment variable \verb+$CPU+ is taken into account when
