@@ -58,9 +58,9 @@ struct LeqConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-	t.push_back(make_trigger(x, Trigger(this, 0), LowerBound));
-	t.push_back(make_trigger(y, Trigger(this, 1), UpperBound));
-	return t;
+    t.push_back(make_trigger(x, Trigger(this, 0), LowerBound));
+    t.push_back(make_trigger(y, Trigger(this, 1), UpperBound));
+    return t;
     
   }
 
@@ -69,7 +69,7 @@ struct LeqConstraint : public AbstractConstraint
   
   PROPAGATE_FUNCTION(int prop_val,DomainDelta)
   {
-	PROP_INFO_ADDONE(BinaryLeq);
+    PROP_INFO_ADDONE(BinaryLeq);
     if(prop_val)
     {// y changed
       x.setMax(y.getMax() + offset);
@@ -94,8 +94,8 @@ struct LeqConstraint : public AbstractConstraint
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-	D_ASSERT(v_size == 2);
-	return v[0] <= (v[1] + offset);
+    D_ASSERT(v_size == 2);
+    return v[0] <= (v[1] + offset);
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
@@ -114,11 +114,11 @@ struct LeqConstraint : public AbstractConstraint
   
   virtual vector<AnyVarRef> get_vars()
   { 
-	vector<AnyVarRef> array;
-	array.reserve(2);
-	array.push_back(x);
-	array.push_back(y);
-	return array;
+    vector<AnyVarRef> array;
+    array.reserve(2);
+    array.push_back(x);
+    array.push_back(y);
+    return array;
   }
 };
 

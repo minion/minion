@@ -50,130 +50,130 @@ struct GACElementConstraint : public AbstractConstraint
       return t;
       
     int array_size = var_array.size();
-  	DomainInt min_val = var_array[0].getInitialMin();
-  	DomainInt max_val = var_array[0].getInitialMax();
-  	for(int i = 1; i < array_size; ++i)
-  	{
-  	  min_val = min(min_val, var_array[i].getInitialMin());
-  	  max_val = max(max_val, var_array[i].getInitialMax());
-  	}
-	
-  	var_array_min_val = min_val;
-  	var_array_max_val = max_val;
-	
-  	// DomainInt domain_size = var_array_max_val - var_array_min_val + 1;
-  	for(int i = 0; i < array_size; ++i)
-  	{
-  	  t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
-  	}
-	
-  	t.push_back(make_trigger(indexvar,
-  							 Trigger(this, array_size), DomainChanged));
-	
-  	t.push_back(make_trigger(resultvar,
-  							 Trigger(this, array_size + 1), DomainChanged));
+    DomainInt min_val = var_array[0].getInitialMin();
+    DomainInt max_val = var_array[0].getInitialMax();
+    for(int i = 1; i < array_size; ++i)
+    {
+      min_val = min(min_val, var_array[i].getInitialMin());
+      max_val = max(max_val, var_array[i].getInitialMax());
+    }
+    
+    var_array_min_val = min_val;
+    var_array_max_val = max_val;
+    
+    // DomainInt domain_size = var_array_max_val - var_array_min_val + 1;
+    for(int i = 0; i < array_size; ++i)
+    {
+      t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
+    }
+    
+    t.push_back(make_trigger(indexvar,
+                             Trigger(this, array_size), DomainChanged));
+    
+    t.push_back(make_trigger(resultvar,
+                             Trigger(this, array_size + 1), DomainChanged));
     return t;
   }
   
   void index_assigned()
   {
     int index = checked_cast<int>(indexvar.getAssignedValue());
-	int array_size = var_array.size();
-	
-	if(index < 0 || index >= array_size)
-	{
-	  getState(stateObj).setFailed(true);
-	  return;
-	}
-	
-	var_array[index].setMin(resultvar.getMin());
-	var_array[index].setMax(resultvar.getMax());
-	
-	DomainInt min_val = max(var_array[index].getMin(), resultvar.getMin());
-	DomainInt max_val = min(var_array[index].getMax(), resultvar.getMax());
-	
-	for(DomainInt i = min_val; i <= max_val; ++i)
-	{
-	  if(!resultvar.inDomain(i))
-	    var_array[index].removeFromDomain(i);
-	}
+    int array_size = var_array.size();
+    
+    if(index < 0 || index >= array_size)
+    {
+      getState(stateObj).setFailed(true);
+      return;
+    }
+    
+    var_array[index].setMin(resultvar.getMin());
+    var_array[index].setMax(resultvar.getMax());
+    
+    DomainInt min_val = max(var_array[index].getMin(), resultvar.getMin());
+    DomainInt max_val = min(var_array[index].getMax(), resultvar.getMax());
+    
+    for(DomainInt i = min_val; i <= max_val; ++i)
+    {
+      if(!resultvar.inDomain(i))
+        var_array[index].removeFromDomain(i);
+    }
   }
   
   BOOL support_for_val_in_result(DomainInt val)
   {
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
-	{
-	  if(indexvar.inDomain(i) && var_array[i].inDomain(val))
-	    return true;
-	}
+    {
+      if(indexvar.inDomain(i) && var_array[i].inDomain(val))
+        return true;
+    }
     return false;
   }
   
   BOOL support_for_val_in_index(DomainInt dom_index)
   {
-	int index = checked_cast<int>(dom_index);
+    int index = checked_cast<int>(dom_index);
     DomainInt min_val = max(var_array[index].getMin(), resultvar.getMin());
-	DomainInt max_val = min(var_array[index].getMax(), resultvar.getMax());
-	for(DomainInt i = min_val; i <= max_val; ++i)
-	{
-	  if(var_array[index].inDomain(i) && resultvar.inDomain(i))
-	    return true;
-	}
+    DomainInt max_val = min(var_array[index].getMax(), resultvar.getMax());
+    for(DomainInt i = min_val; i <= max_val; ++i)
+    {
+      if(var_array[index].inDomain(i) && resultvar.inDomain(i))
+        return true;
+    }
     return false;
   }
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PROP_INFO_ADDONE(GACElement);
+    PROP_INFO_ADDONE(GACElement);
     int array_size = var_array.size();
-	// DomainInt domain_size = (var_array_max_val - var_array_min_val + 1);
-	
-	if(indexvar.isAssigned())
-	{ index_assigned(); }
-	
+    // DomainInt domain_size = (var_array_max_val - var_array_min_val + 1);
+    
+    if(indexvar.isAssigned())
+    { index_assigned(); }
+    
     if(prop_val < array_size)
-	{
-	  if(indexvar.inDomain(prop_val) && !support_for_val_in_index(prop_val))
-	  {
-		indexvar.removeFromDomain(prop_val);
-	  }
-	  
-	  typename VarArray::value_type& var = var_array[prop_val];
-	  
-	  DomainInt min_val = var.getInitialMin();
-	  DomainInt max_val = var.getInitialMax();
-	  for(DomainInt val = min_val; val <= max_val; ++val)
-	  {
-	    if(!var.inDomain(val) && resultvar.inDomain(val) &&
-		   !support_for_val_in_result(val))
-	    {
-	      resultvar.removeFromDomain(val);
-	    }
-	  }
-	  return;
-	}
-	
-	if(prop_val == array_size)
-	{ // Value got removed from index. Basically have to check everything.
-	  
-	  for(DomainInt i = var_array_min_val; i <= var_array_max_val; ++i)
-	  {
-		if(resultvar.inDomain(i) && !support_for_val_in_result(i))
-		  resultvar.removeFromDomain(i);
-	  }
-	  return;
-	}
-	
-	D_ASSERT(prop_val == array_size + 1);
-	
-	for(int var = 0; var < array_size; ++var)
-	{
-	  if(indexvar.inDomain(var) && !support_for_val_in_index(var))
-	  {
-		indexvar.removeFromDomain(var);
-	  }
-	}
+    {
+      if(indexvar.inDomain(prop_val) && !support_for_val_in_index(prop_val))
+      {
+        indexvar.removeFromDomain(prop_val);
+      }
+      
+      typename VarArray::value_type& var = var_array[prop_val];
+      
+      DomainInt min_val = var.getInitialMin();
+      DomainInt max_val = var.getInitialMax();
+      for(DomainInt val = min_val; val <= max_val; ++val)
+      {
+        if(!var.inDomain(val) && resultvar.inDomain(val) &&
+           !support_for_val_in_result(val))
+        {
+          resultvar.removeFromDomain(val);
+        }
+      }
+      return;
+    }
+    
+    if(prop_val == array_size)
+    { // Value got removed from index. Basically have to check everything.
+      
+      for(DomainInt i = var_array_min_val; i <= var_array_max_val; ++i)
+      {
+        if(resultvar.inDomain(i) && !support_for_val_in_result(i))
+          resultvar.removeFromDomain(i);
+      }
+      return;
+    }
+    
+    D_ASSERT(prop_val == array_size + 1);
+    
+    for(int var = 0; var < array_size; ++var)
+    {
+      if(indexvar.inDomain(var) && !support_for_val_in_index(var))
+      {
+        indexvar.removeFromDomain(var);
+      }
+    }
   }
   
   virtual void full_propagate()
@@ -184,31 +184,31 @@ struct GACElementConstraint : public AbstractConstraint
     if(indexvar.isBound() || resultvar.isBound())
         cerr << "Warning: GACElement is not designed to be used on bound variables and may cause crashes." << endl;
     indexvar.setMin(0);
-	indexvar.setMax(var_array.size() - 1);
-	resultvar.setMin(var_array_min_val);
-	resultvar.setMax(var_array_max_val);
-	for(unsigned i = 0; i < var_array.size() + 2; ++i)
-	  propagate(i,0);
+    indexvar.setMax(var_array.size() - 1);
+    resultvar.setMin(var_array_min_val);
+    resultvar.setMax(var_array_max_val);
+    for(unsigned i = 0; i < var_array.size() + 2; ++i)
+      propagate(i,0);
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-	int length = v_size;
-	if(v[length-2] < 0 ||
-	   v[length-2] > length - 3)
-	  return false;
-	return v[checked_cast<int>(v[length-2])] == v[length-1];
+    int length = v_size;
+    if(v[length-2] < 0 ||
+       v[length-2] > length - 3)
+      return false;
+    return v[checked_cast<int>(v[length-2])] == v[length-1];
   }
   
   virtual vector<AnyVarRef> get_vars()
   { 
-	vector<AnyVarRef> array;
-	array.reserve(var_array.size() + 2);
-	for(unsigned int i=0;i<var_array.size(); ++i)
-	  array.push_back(var_array[i]);
-	array.push_back(indexvar);
-	array.push_back(resultvar);
-	return array;
+    vector<AnyVarRef> array;
+    array.reserve(var_array.size() + 2);
+    for(unsigned int i=0;i<var_array.size(); ++i)
+      array.push_back(var_array[i]);
+    array.push_back(indexvar);
+    array.push_back(resultvar);
+    return array;
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)

@@ -82,30 +82,30 @@ void print_instance(const ConstraintBlob& blob)
   for(int i = 0; i < blob.constraint->number_of_params; i++)
   {
     if(i != 0)
-  	  oss << ", ";
-  	  
+      oss << ", ";
+      
     switch(blob.constraint->read_types[i])
-  	{
-  	  case read_list:
+    {
+      case read_list:
         print_instance( blob.vars[var_pos++]);
-  		break;
-  	  case read_var:
+        break;
+      case read_var:
       case read_bool_var:
         print_instance( blob.vars[var_pos++][0]);
-  		break;
-  	  case read_2_vars:
-  	  {
+        break;
+      case read_2_vars:
+      {
         print_instance( blob.vars[var_pos][0]);
         oss << ",";
         print_instance( blob.vars[var_pos++][1]);
-  	  }
-  		break;
-  	  case read_constant:
+      }
+        break;
+      case read_constant:
         print_instance( blob.constants[const_pos++][0]);
-  		break;
-  	  case read_constant_list:
+        break;
+      case read_constant_list:
         print_instance( blob.constants[const_pos++]);
-  		break;  
+        break;  
       case read_tuples:
         oss << csp.getTableName(blob.tuples);
       break;
@@ -123,10 +123,10 @@ void print_instance(const ConstraintBlob& blob)
         }
         oss << "}";
         break;
-  	  default:
+      default:
       oss << "???";
-//  	    D_FATAL_ERROR("Internal Error!");
-  	}
+//          D_FATAL_ERROR("Internal Error!");
+    }
   }
   
   oss << ")";

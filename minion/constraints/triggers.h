@@ -100,7 +100,7 @@ class TriggerRange
   Trigger* finish;
 
 public:
-	
+    
   Trigger* begin() const
   { return start; }
   

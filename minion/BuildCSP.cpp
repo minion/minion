@@ -52,8 +52,8 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
   {
     if(instance.optimise_minimising)
       Controller::optimise_minimise_var(stateObj, BuildCon::get_AnyVarRef_from_Var(stateObj, instance.optimise_variable));
-	else
-	  Controller::optimise_maximise_var(stateObj, BuildCon::get_AnyVarRef_from_Var(stateObj, instance.optimise_variable));
+    else
+      Controller::optimise_maximise_var(stateObj, BuildCon::get_AnyVarRef_from_Var(stateObj, instance.optimise_variable));
   }
   
   vector<vector<AnyVarRef> >& print_matrix = getState(stateObj).getPrintMatrix();

@@ -85,58 +85,58 @@ struct LessEqualSumConstraint : public AbstractConstraint
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
     {
-	  t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
+      t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
     }
-	t.push_back(make_trigger(var_sum, Trigger(this, -1), UpperBound));
+    t.push_back(make_trigger(var_sum, Trigger(this, -1), UpperBound));
     return t;    
   }
   
   DomainInt get_real_min_sum()
   {
-	DomainInt min_sum = 0;
-	for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
+    DomainInt min_sum = 0;
+    for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
       min_sum += it->getMin();
     return min_sum;
   }
   
   DomainInt get_real_max_diff()
   {
-	DomainInt max_diff = 0;
+    DomainInt max_diff = 0;
     for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
-	  max_diff = max(max_diff, it->getMax() - it->getMin());
+      max_diff = max(max_diff, it->getMax() - it->getMin());
     return max_diff;
   }
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta domain_change)
   {
-	PROP_INFO_ADDONE(FullSum);
+    PROP_INFO_ADDONE(FullSum);
     DomainInt sum = var_array_min_sum;
     if(prop_val != -1)
     { // One of the array changed
       int change = var_array[prop_val].getDomainChange(domain_change);
-	  D_ASSERT(change >= 0);
-	  sum += change;
+      D_ASSERT(change >= 0);
+      sum += change;
       var_array_min_sum = sum;
     }
-	
-	var_sum.setMin(sum);
-	if(getState(stateObj).isFailed())
+    
+    var_sum.setMin(sum);
+    if(getState(stateObj).isFailed())
         return;
-	D_ASSERT(sum <= get_real_min_sum());
-	
-	DomainInt looseness = var_sum.getMax() - sum;
-	if(looseness < 0)
-	{ 
-	  getState(stateObj).setFailed(true);
-	  return;
-	}
+    D_ASSERT(sum <= get_real_min_sum());
+    
+    DomainInt looseness = var_sum.getMax() - sum;
+    if(looseness < 0)
+    { 
+      getState(stateObj).setFailed(true);
+      return;
+    }
 
-	if(looseness < max_looseness)
-	{
-	  // max_looseness.set(looseness);
-	  for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
-	    it->setMax(it->getMin() + looseness);
-	}
+    if(looseness < max_looseness)
+    {
+      // max_looseness.set(looseness);
+      for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
+        it->setMax(it->getMin() + looseness);
+    }
   }
   
   virtual BOOL check_unsat(int prop_val, DomainDelta domain_change)
@@ -154,7 +154,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
   {
     DomainInt min_sum = get_real_min_sum();
     DomainInt max_diff = get_real_max_diff();
- 	
+    
     var_array_min_sum = min_sum;
     max_looseness = max_diff;
     if(!var_array.empty())
@@ -175,7 +175,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
       min_sum += it->getMin();
       max_diff = max(max_diff, it->getMax() - it->getMin());
     }
-	
+    
     var_array_min_sum = min_sum;
     D_ASSERT(min_sum == get_real_min_sum());
     max_looseness = max_diff;
@@ -253,7 +253,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     SumType new_sum = ShiftVarRef( VarNegRef(var_sum), compiletime_val<-1>());
 
     return new LessEqualSumConstraint<typename NegType<VarArray>::type, SumType, true>
-      (stateObj, new_var_array, new_sum);	
+      (stateObj, new_var_array, new_sum);   
   }
 
   template<bool b>

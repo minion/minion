@@ -45,13 +45,13 @@ struct ConcreteFileReader
   
 
   
-   BOOL failed_open()
+  BOOL failed_open()
   { return !infile; }
   
   
-   string get_string()
+  string get_string()
   { 
-	  string s;
+    string s;
     char next_char = get_char();
     while(isalnum(next_char) || next_char == '_')
     {
@@ -63,14 +63,14 @@ struct ConcreteFileReader
     return s;
   }
   
-   void check_string(const string& string_in)
+  void check_string(const string& string_in)
   {
     string s = get_string();
     if(s != string_in)
     { throw parse_exception("Expected " + string_in + ", recieved '" + s + "'"); }
   }
   
-   string get_asciistring()
+  string get_asciistring()
   {
     string s;
     char next_char = get_char();
@@ -84,16 +84,16 @@ struct ConcreteFileReader
     return s;
   }
   
-   int read_num()
-  {	
-	  int i;
-	  infile >> i;
-	  if(infile.fail())
+  int read_num()
+  { 
+      int i;
+      infile >> i;
+      if(infile.fail())
       throw parse_exception("Problem parsing number");
-	  return i;
+      return i;
   }
   
-   char simplepeek_char()
+  char simplepeek_char()
   {
     char peek = infile.peek();
     while(isspace(peek))
@@ -104,7 +104,7 @@ struct ConcreteFileReader
     return peek;
   }
   
-   char peek_char()
+  char peek_char()
   {
     char peek = simplepeek_char();
     while(peek == '#')
@@ -125,44 +125,44 @@ struct ConcreteFileReader
     }
   }
   
-   string getline()
+  string getline()
   {
     check_for_comments();
     return simplegetline();
   }
   
-   string simplegetline()
+  string simplegetline()
   {
-	char buf[10000];
-	infile.getline(buf,10000);
-	char* buf_start = buf;
-	while(buf_start < buf + 10000 && isspace(*buf_start))
-	  buf_start++;
-	
-	return string(buf_start);
+    char buf[10000];
+    infile.getline(buf,10000);
+    char* buf_start = buf;
+    while(buf_start < buf + 10000 && isspace(*buf_start))
+      buf_start++;
+    
+    return string(buf_start);
   }
   
   /// Cleans rubbish off start of string.
-   void clean_string(string& s)
+  void clean_string(string& s)
   {
-	while(!s.empty() && isspace(s[0]))
-	  s.erase(s.begin());
+    while(!s.empty() && isspace(s[0]))
+      s.erase(s.begin());
   }
   
-   string getline(char deliminator)
+  string getline(char deliminator)
   {
     check_for_comments();
-	char buf[10000];
-	infile.getline(buf,10000, deliminator);
+    char buf[10000];
+    infile.getline(buf,10000, deliminator);
 
-	char* buf_start = buf;
-	while(buf_start < buf + 10000 && isspace(*buf_start))
-	  buf_start++;
-	
-	return string(buf_start);
+    char* buf_start = buf;
+    while(buf_start < buf + 10000 && isspace(*buf_start))
+      buf_start++;
+    
+    return string(buf_start);
   }
   
-   char get_char()
+  char get_char()
   { 
     char peek = simpleget_char();
     while(peek == '#')
@@ -173,7 +173,7 @@ struct ConcreteFileReader
     return peek;
   }
   
-   char simpleget_char()
+  char simpleget_char()
   {
     char k;
     infile >> k;
@@ -181,10 +181,10 @@ struct ConcreteFileReader
   }
   
   
-   BOOL eof()
+  BOOL eof()
   { return infile.eof(); }
   
-   void putback(char c)
+  void putback(char c)
   { infile.putback(c); }
   
    ~ConcreteFileReader() {}

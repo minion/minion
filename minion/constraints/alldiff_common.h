@@ -213,7 +213,7 @@ struct GacAlldiff : public AbstractConstraint
   // only used in dynamic version.
   int dynamic_trigger_count()
   {
-	// First an array of watches for the matching, then a 2d array of mixed triggers
+    // First an array of watches for the matching, then a 2d array of mixed triggers
     // indexed by [var][count] where count is increased from 0 as the triggers are used.
     int numtrigs=0;
     #ifdef INCGRAPH
@@ -221,7 +221,7 @@ struct GacAlldiff : public AbstractConstraint
     #endif
     
     #ifdef DYNAMICALLDIFF
-	numtrigs+= numvars+numvars*numvals;
+    numtrigs+= numvars+numvars*numvals;
     #endif
     
     // Dynamic alldiff triggers go first, incgraph triggers are after that
@@ -250,7 +250,7 @@ struct GacAlldiff : public AbstractConstraint
     triggerCollection t;
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
-	  t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
+      t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
     return t;
   }
   #endif
@@ -971,41 +971,41 @@ struct GacAlldiff : public AbstractConstraint
   { 
     int v_size = var_array.size();
     for(int i = 0; i < v_size; ++i)
-	{
-	  if(var_array[i].isAssigned())
-	  {
-	  
-	    for(int j = i + 1; j < v_size; ++j)
-		{
-		  if(var_array[j].isAssigned())
-		  {
-		    if(var_array[i].getAssignedValue() == var_array[j].getAssignedValue())
-		      return true;
-		  }
-		}
-		
-	  }
-	}
-	
-	return false;
+    {
+      if(var_array[i].isAssigned())
+      {
+      
+        for(int j = i + 1; j < v_size; ++j)
+        {
+          if(var_array[j].isAssigned())
+          {
+            if(var_array[i].getAssignedValue() == var_array[j].getAssignedValue())
+              return true;
+          }
+        }
+        
+      }
+    }
+    
+    return false;
   }
   
   virtual BOOL check_unsat(int i, DomainDelta)
   {
     int v_size = var_array.size();
-	if(!var_array[i].isAssigned()) return false;
+    if(!var_array[i].isAssigned()) return false;
     
-	DomainInt assign_val = var_array[i].getAssignedValue();
+    DomainInt assign_val = var_array[i].getAssignedValue();
     for(int loop = 0; loop < v_size; ++loop)
-	{
-	  if(loop != i)
-	  {
-	    if(var_array[loop].isAssigned() && 
-		   var_array[loop].getAssignedValue() == assign_val)
-		return true;
-	  }
-	}
-	return false;
+    {
+      if(loop != i)
+      {
+        if(var_array[loop].isAssigned() && 
+           var_array[loop].getAssignedValue() == assign_val)
+        return true;
+      }
+    }
+    return false;
   }
   
   virtual void full_propagate()
@@ -1113,7 +1113,7 @@ struct GacAlldiff : public AbstractConstraint
       do_prop_noscc();
       #endif
   }
-	
+    
   #ifdef INCGRAPH
     inline void adjlist_remove(int var, int val)
     {
@@ -1148,23 +1148,23 @@ struct GacAlldiff : public AbstractConstraint
     #endif
   
   
-	virtual BOOL check_assignment(DomainInt* v, int array_size)
-	{
-	  D_ASSERT(array_size == var_array.size());
-	  for(int i=0;i<array_size;i++)
-		for( int j=i+1;j<array_size;j++)
-		  if(v[i]==v[j]) return false;
-	  return true;
-	}
-	
-	virtual vector<AnyVarRef> get_vars()
-	{
-	  vector<AnyVarRef> vars;
-	  vars.reserve(var_array.size());
-	  for(unsigned i = 0; i < var_array.size(); ++i)
-	    vars.push_back(var_array[i]);
-	  return vars;
-	}
+    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    {
+      D_ASSERT(array_size == var_array.size());
+      for(int i=0;i<array_size;i++)
+        for( int j=i+1;j<array_size;j++)
+          if(v[i]==v[j]) return false;
+      return true;
+    }
+    
+    virtual vector<AnyVarRef> get_vars()
+    {
+      vector<AnyVarRef> vars;
+      vars.reserve(var_array.size());
+      for(unsigned i = 0; i < var_array.size(); ++i)
+        vars.push_back(var_array[i]);
+      return vars;
+    }
     
     
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
@@ -1972,7 +1972,7 @@ struct GacAlldiff : public AbstractConstraint
             // we have now calculated layer
             /*
             while layer and not unmatched:
-			    newLayer = {}
+                newLayer = {}
             */
             
             while(layer.size()!=0 && unmatched.size()==0)

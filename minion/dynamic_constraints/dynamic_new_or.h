@@ -305,7 +305,7 @@ struct Dynamic_OR : public ParentConstraint
     { 
       propagated_constraint = watched_constraint[0];
       constraint_locked = true;
-	    getQueue(stateObj).pushSpecialTrigger(this);
+      getQueue(stateObj).pushSpecialTrigger(this);
     }
 
   }

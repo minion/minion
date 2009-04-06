@@ -39,11 +39,11 @@ string get_dom_as_string(Var& v)
     { s << "[" << v.getMin() << "," << v.getMax() << "]"; }
     else
     {
-	  s << "{" << v.getMin();
+      s << "{" << v.getMin();
       for(DomainInt i = v.getMin() + 1; i <= v.getMax(); ++i)
-	    if(v.inDomain(i))
-		  s << "," << i;
-	  s << "}";
+        if(v.inDomain(i))
+          s << "," << i;
+      s << "}";
     }
   }
   return s.str();
@@ -56,11 +56,11 @@ string get_dom_as_string(vector<T>& vec)
   if(!vec.empty())
   {
     output += get_dom_as_string(vec[0]);
-	for(unsigned i = 1; i < vec.size(); ++i)
-	{
-	  output += ",";
-	  output += get_dom_as_string(vec[i]);
-	}
+    for(unsigned i = 1; i < vec.size(); ++i)
+    {
+      output += ",";
+      output += get_dom_as_string(vec[i]);
+    }
   }
   output += ">";
   return output;

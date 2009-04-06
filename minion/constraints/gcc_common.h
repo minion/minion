@@ -787,7 +787,7 @@ struct GCC : public AbstractConstraint
                 varvalmatching[i]=dom_min-1;   // marker for unmatched.
             }
         }
-		#endif
+        #endif
         
         // If the upper bounds have been changed since last call, it is possible that
         // the usage[val] of some value is greater than upper[val]. This is impossible
@@ -1128,19 +1128,19 @@ struct GCC : public AbstractConstraint
     }
     
     virtual vector<AnyVarRef> get_vars()
-	{
-	  vector<AnyVarRef> vars;
-	  vars.reserve(var_array.size());
-	  for(unsigned i = 0; i < var_array.size(); ++i)
-	    vars.push_back(var_array[i]);
+    {
+      vector<AnyVarRef> vars;
+      vars.reserve(var_array.size());
+      for(unsigned i = 0; i < var_array.size(); ++i)
+        vars.push_back(var_array[i]);
       for(unsigned i = 0; i < capacity_array.size(); ++i)
-	    vars.push_back(capacity_array[i]);
-	  return vars;
-	}
+        vars.push_back(capacity_array[i]);
+      return vars;
+    }
     
     virtual BOOL check_assignment(DomainInt* v, int vsize)
-	{
-	  D_ASSERT(vsize == var_array.size()+capacity_array.size());
+    {
+      D_ASSERT(vsize == var_array.size()+capacity_array.size());
       // borrow augpath array
       GCCPRINT("In check_assignment with array:[");
       for(int i=0; i<vsize; i++) GCCPRINT( v[i] <<",");
@@ -1171,7 +1171,7 @@ struct GCC : public AbstractConstraint
           }
       }
       return true;
-	}
+    }
     
     ////////////////////////////////////////////////////////////////////////////
     //
@@ -1742,7 +1742,7 @@ struct GCC : public AbstractConstraint
         // follow edges not in the matching from variables to values. 
         
         #ifdef INCGRAPH
-		for(int startvari=0; startvari<adjlistlength[forbiddenval-dom_min+numvars] && newlb>existinglb; startvari++)
+        for(int startvari=0; startvari<adjlistlength[forbiddenval-dom_min+numvars] && newlb>existinglb; startvari++)
         {
             int startvar=adjlist[forbiddenval-dom_min+numvars][startvari];
         #else

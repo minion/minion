@@ -89,16 +89,16 @@ struct ShiftVar
  void addTrigger(Trigger t, TrigType type)
   { 
     switch(type)
-	{
-	  case UpperBound:
-	  case LowerBound:
-	  case Assigned:
-	  case DomainChanged:
-	    data.addTrigger(t, type);
+    {
+      case UpperBound:
+      case LowerBound:
+      case Assigned:
+      case DomainChanged:
+        data.addTrigger(t, type);
       break;
-	  default:
+      default:
       D_FATAL_ERROR("Fatal error in 'shift' mapper");
-	}
+    }
   }
 
   

@@ -32,13 +32,13 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   
   VarArray var_array;
   vector<int> negs; //negs[i]==0 iff var_array[i] is negated, NB. this
-		    //is also the value that must be watched
+            //is also the value that must be watched
   size_t no_vars;
   int watched[2];
   int last;
 
   BoolOrConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array,
-			       const vector<int>& _negs) :
+                   const vector<int>& _negs) :
     AbstractConstraint(_stateObj), var_array(_var_array), negs(_negs), last(0)
   { 
     watched[0] = watched[1] = -2;
@@ -61,13 +61,13 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
     int next_found = -1;
     for(int i = 0; i < no_vars; i++) {
       if(var_array[i].inDomain(negs[i])) { //can literal be T?
-	found++;
-	if(found == 1) 
-	  first_found = i;
-	else {
-	  next_found = i;
-	  break;
-	}
+        found++;
+        if(found == 1) 
+          first_found = i;
+        else {
+          next_found = i;
+          break;
+        }
       }
     }
     if(found == 0) {
@@ -97,11 +97,11 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
       VarRef& v = var_array[j];
       int neg = negs[j];
       if(j != other_var && v.inDomain(neg)) {
-	v.addDynamicTrigger(dt, DomainRemoval, neg);
-	dt->trigger_info() = j;
-	last = j;
-	watched[watched[0] == prev_var ? 0 : 1] = j;
-	return;
+    v.addDynamicTrigger(dt, DomainRemoval, neg);
+    dt->trigger_info() = j;
+    last = j;
+    watched[watched[0] == prev_var ? 0 : 1] = j;
+    return;
       } 
     }
     //if we get here, we couldn't find a place to put the watch, do UP
@@ -112,7 +112,7 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   {
     for(int i = 0; i < no_vars; i++)
       if(v[i] == negs[i])
-	return true;
+        return true;
     return false;
   }
   

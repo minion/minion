@@ -300,7 +300,7 @@ struct SparseBoundVarContainer {
     trigger_list.push_assign(d.var_num, i);
     
 #ifdef FULL_DOMAIN_TRIGGERS
-	// Can't attach triggers to bound vars!  
+    // Can't attach triggers to bound vars!  
 #endif
     
     if(min_val != i) {
@@ -374,7 +374,7 @@ struct SparseBoundVarContainer {
       trigger_list.push_lower(d.var_num, i - low_bound);
       trigger_list.push_domain_changed(d.var_num);
 #ifdef FULL_DOMAIN_TRIGGERS
-	  // Can't attach triggers to bound vars!  
+      // Can't attach triggers to bound vars!  
 #endif
       lower_bound(d) = i;
       if(up_bound == i) {
@@ -391,7 +391,7 @@ struct SparseBoundVarContainer {
   void addTrigger(SparseBoundVarRef_internal<BoundType> b, Trigger t, TrigType type)
   { 
     D_ASSERT(lock_m); 
-	trigger_list.add_trigger(b.var_num, t, type); 
+    trigger_list.add_trigger(b.var_num, t, type); 
   }
 
   vector<AbstractConstraint*>* getConstraints(const SparseBoundVarRef_internal<BoundType>& b)
@@ -425,9 +425,9 @@ struct SparseBoundVarContainer {
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   { 
-	D_ASSERT(lock_m); 
-	D_ASSERT(type != DomainRemoval);
-	trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
+    D_ASSERT(lock_m); 
+    D_ASSERT(type != DomainRemoval);
+    trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
   }
 #endif
 

@@ -95,7 +95,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PROP_INFO_ADDONE(LightSum);
+    PROP_INFO_ADDONE(LightSum);
     DomainInt min_sum = 0;
     for(unsigned i = 0; i < size; ++i)
       min_sum += var_array[i].getMin();
@@ -137,7 +137,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> array_copy;
-	array_copy.reserve(var_array.size() + 1);
+    array_copy.reserve(var_array.size() + 1);
     for(unsigned i = 0; i < var_array.size(); ++i)
       array_copy.push_back(var_array[i]);
     array_copy.push_back(var_sum);

@@ -60,19 +60,19 @@ public:
       CON_INFO_ADDONE(DynamicMovePtr);
       next_queue_ptr = next;
     }
-	D_ASSERT(constraint != NULL);
+    D_ASSERT(constraint != NULL);
     D_ASSERT(sanity_check == 1234);
     D_ASSERT( (prev == NULL) == (next == NULL) );
-	DynamicTrigger* old_prev = prev;
-	DynamicTrigger* old_next = next;
+    DynamicTrigger* old_prev = prev;
+    DynamicTrigger* old_next = next;
     if(old_prev != NULL)
-	{ old_prev->next = old_next; }
-	if(old_next != NULL)
-	{ old_next->prev = old_prev; }
-	D_ASSERT(old_prev == NULL || old_prev->sanity_check_list(false));
-	D_ASSERT(old_next == NULL || old_next->sanity_check_list(false));
-	next = NULL;
-	prev = NULL;
+    { old_prev->next = old_next; }
+    if(old_next != NULL)
+    { old_next->prev = old_prev; }
+    D_ASSERT(old_prev == NULL || old_prev->sanity_check_list(false));
+    D_ASSERT(old_next == NULL || old_next->sanity_check_list(false));
+    next = NULL;
+    prev = NULL;
   }
   
   inline bool isAttached()
@@ -86,27 +86,27 @@ public:
   void add_after(DynamicTrigger* new_prev, DynamicTrigger*& next_queue_ptr)
   {
     D_ASSERT(constraint != NULL);
-	D_ASSERT(sanity_check == 1234);
+    D_ASSERT(sanity_check == 1234);
     D_ASSERT(new_prev->sanity_check_list());
     if(prev != NULL)
-	{
+    {
 #ifndef NO_DYN_CHECK
-	  if(this == next_queue_ptr)
-	  {
-		CON_INFO_ADDONE(DynamicMovePtr);
-	    next_queue_ptr = next;
-	  }
+      if(this == next_queue_ptr)
+      {
+        CON_INFO_ADDONE(DynamicMovePtr);
+        next_queue_ptr = next;
+      }
       
 #endif
-	  remove(next_queue_ptr);
-	}
-	DynamicTrigger* new_next = new_prev->next;
-	prev = new_prev;
-	next = new_next;
-	new_prev->next = this;
-	new_next->prev = this;
-	D_ASSERT(prev->next == this);
-	D_ASSERT(next->prev == this);
+      remove(next_queue_ptr);
+    }
+    DynamicTrigger* new_next = new_prev->next;
+    prev = new_prev;
+    next = new_next;
+    new_prev->next = this;
+    new_next->prev = this;
+    D_ASSERT(prev->next == this);
+    D_ASSERT(next->prev == this);
     D_ASSERT(new_prev->sanity_check_list());
   }
   
@@ -120,20 +120,20 @@ public:
   BOOL sanity_check_list(BOOL is_head_of_list = true)
   {
     if(is_head_of_list)
-	{
-	  D_ASSERT(this->constraint == NULL);
-	}
-	D_ASSERT(this->sanity_check == 1234);
-	for(DynamicTrigger* it = this->next; it != this; it = it->next)
-	{
-	  D_ASSERT(it->sanity_check == 1234);
-	  if(is_head_of_list)
-	  {
-	    D_ASSERT(it->constraint != NULL);
-	  }
-	  D_ASSERT(it->prev->next == it);
-	  D_ASSERT(it->next->prev == it);
-	}
-	return true;
+    {
+      D_ASSERT(this->constraint == NULL);
+    }
+    D_ASSERT(this->sanity_check == 1234);
+    for(DynamicTrigger* it = this->next; it != this; it = it->next)
+    {
+      D_ASSERT(it->sanity_check == 1234);
+      if(is_head_of_list)
+      {
+        D_ASSERT(it->constraint != NULL);
+      }
+      D_ASSERT(it->prev->next == it);
+      D_ASSERT(it->next->prev == it);
+    }
+    return true;
   }
 };

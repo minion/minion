@@ -69,7 +69,7 @@ struct NeqConstraint : public AbstractConstraint
     triggerCollection t;
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
-	  t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
+      t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
     return t;
   }
   
@@ -78,65 +78,65 @@ struct NeqConstraint : public AbstractConstraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PROP_INFO_ADDONE(ArrayNeq);
+    PROP_INFO_ADDONE(ArrayNeq);
     DomainInt remove_val = var_array[prop_val].getAssignedValue();
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
     {
       if(i != prop_val)
-	  {
-		if(var_array[i].isBound())
-	    {
-		  if(var_array[i].getMin() == remove_val)
-		    var_array[i].setMin(remove_val + 1);
-		  if(var_array[i].getMax() == remove_val)
-		    var_array[i].setMax(remove_val - 1);
-	    }
-		else
-		  var_array[i].removeFromDomain(remove_val);
-	  }
+      {
+        if(var_array[i].isBound())
+        {
+          if(var_array[i].getMin() == remove_val)
+            var_array[i].setMin(remove_val + 1);
+          if(var_array[i].getMax() == remove_val)
+            var_array[i].setMax(remove_val - 1);
+        }
+        else
+          var_array[i].removeFromDomain(remove_val);
+      }
     }
-	
+    
   }
   
   virtual BOOL full_check_unsat()
   { 
     int v_size = var_array.size();
     for(int i = 0; i < v_size; ++i)
-	{
-	  if(var_array[i].isAssigned())
-	  {
-	  
-	    for(int j = i + 1; j < v_size; ++j)
-		{
-		  if(var_array[j].isAssigned())
-		  {
-		    if(var_array[i].getAssignedValue() == var_array[j].getAssignedValue())
-		      return true;
-		  }
-		}
-		
-	  }
-	}
-	
-	return false;
+    {
+      if(var_array[i].isAssigned())
+      {
+      
+        for(int j = i + 1; j < v_size; ++j)
+        {
+          if(var_array[j].isAssigned())
+          {
+            if(var_array[i].getAssignedValue() == var_array[j].getAssignedValue())
+              return true;
+          }
+        }
+        
+      }
+    }
+    
+    return false;
   }
   
   virtual BOOL check_unsat(int i, DomainDelta)
   {
     int v_size = var_array.size();
-	D_ASSERT(var_array[i].isAssigned());
-	DomainInt assign_val = var_array[i].getAssignedValue();
+    D_ASSERT(var_array[i].isAssigned());
+    DomainInt assign_val = var_array[i].getAssignedValue();
     for(int loop = 0; loop < v_size; ++loop)
-	{
-	  if(loop != i)
-	  {
-	    if(var_array[loop].isAssigned() && 
-		   var_array[loop].getAssignedValue() == assign_val)
-		return true;
-	  }
-	}
-	return false;
+    {
+      if(loop != i)
+      {
+        if(var_array[loop].isAssigned() && 
+           var_array[loop].getAssignedValue() == assign_val)
+        return true;
+      }
+    }
+    return false;
   }
   
   
@@ -146,48 +146,48 @@ struct NeqConstraint : public AbstractConstraint
     for(int i = 0; i < array_size; ++i)
       if(var_array[i].isAssigned())
       {
-		DomainInt remove_val = var_array[i].getAssignedValue();
-		for(int j = 0; j < array_size;++j)
-		{
-		  if(i != j)
-		  {
-			if(var_array[j].isBound())
-			{
-			  if(var_array[j].getMin() == remove_val)
-				var_array[j].setMin(remove_val + 1);
-			  if(var_array[j].getMax() == remove_val)
-				var_array[j].setMax(remove_val - 1);
-			}
-			else
-			  var_array[j].removeFromDomain(remove_val);
-		  }
-		}
+        DomainInt remove_val = var_array[i].getAssignedValue();
+        for(int j = 0; j < array_size;++j)
+        {
+          if(i != j)
+          {
+            if(var_array[j].isBound())
+            {
+              if(var_array[j].getMin() == remove_val)
+                var_array[j].setMin(remove_val + 1);
+              if(var_array[j].getMax() == remove_val)
+                var_array[j].setMax(remove_val - 1);
+            }
+            else
+              var_array[j].removeFromDomain(remove_val);
+          }
+        }
       }
   }
-	
-	virtual BOOL check_assignment(DomainInt* v, int v_size)
-	{
-	  D_ASSERT(v_size == var_array.size());
-	  int array_size = v_size;
-	  for(int i=0;i<array_size;i++)
-		for( int j=i+1;j<array_size;j++)
-		  if(v[i]==v[j]) return false;
-	  return true;
-	}
-	
-	virtual vector<AnyVarRef> get_vars()
-	{
-	  vector<AnyVarRef> vars;
-	  vars.reserve(var_array.size());
-	  for(unsigned i = 0; i < var_array.size(); ++i)
-	    vars.push_back(var_array[i]);
-	  return vars;
-	}
-	
-	
-	 // Getting a satisfying assignment here is too hard, we don't want to have to
-	 // build a matching.
-	 virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+    
+    virtual BOOL check_assignment(DomainInt* v, int v_size)
+    {
+      D_ASSERT(v_size == var_array.size());
+      int array_size = v_size;
+      for(int i=0;i<array_size;i++)
+        for( int j=i+1;j<array_size;j++)
+          if(v[i]==v[j]) return false;
+      return true;
+    }
+    
+    virtual vector<AnyVarRef> get_vars()
+    {
+      vector<AnyVarRef> vars;
+      vars.reserve(var_array.size());
+      for(unsigned i = 0; i < var_array.size(); ++i)
+        vars.push_back(var_array[i]);
+      return vars;
+    }
+    
+    
+     // Getting a satisfying assignment here is too hard, we don't want to have to
+     // build a matching.
+     virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
    {
      MAKE_STACK_BOX(c, DomainInt, var_array.size());
      

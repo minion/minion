@@ -32,118 +32,118 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   VarArray var_array;
 
   BoolThreeSATConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array) :
-	AbstractConstraint(_stateObj), var_array(_var_array)
+    AbstractConstraint(_stateObj), var_array(_var_array)
   { 
-	D_ASSERT(var_array.size() == 3);
+    D_ASSERT(var_array.size() == 3);
 #ifndef DYNAMICTRIGGERS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
   }
   
   int dynamic_trigger_count()
-  {	
-	return 2;
+  { 
+    return 2;
   }
   
   // Not specialised for 3 sat
   virtual void full_propagate()
   {
-	DynamicTrigger* dt = dynamic_trigger_start();
-	
-	int array_size = var_array.size(); 
-	int trig1, trig2;
-	int index = 0;
-	
-	while(index < array_size && !var_array[index].inDomain(1))
+    DynamicTrigger* dt = dynamic_trigger_start();
+    
+    int array_size = var_array.size(); 
+    int trig1, trig2;
+    int index = 0;
+    
+    while(index < array_size && !var_array[index].inDomain(1))
       ++index;
-	
-	trig1 = index;
+    
+    trig1 = index;
 
-	if(index == array_size)
-	{ // Not enough triggers
-	  getState(stateObj).setFailed(true);
-	  return;
-	}
-	
+    if(index == array_size)
+    { // Not enough triggers
+      getState(stateObj).setFailed(true);
+      return;
+    }
+    
     ++index;
-	
-	while(index < array_size && !var_array[index].inDomain(1))
+    
+    while(index < array_size && !var_array[index].inDomain(1))
       ++index;
-	
-	trig2 = index;
-	
-	if(index >= array_size)
-	{ // Only one valid variable.
-	  var_array[trig1].propagateAssign(1);
-	  return;
-	}
-	
+    
+    trig2 = index;
+    
+    if(index >= array_size)
+    { // Only one valid variable.
+      var_array[trig1].propagateAssign(1);
+      return;
+    }
+    
     dt->trigger_info() = trig1;
-	var_array[trig1].addDynamicTrigger(dt, UpperBound);
-	
-	++dt;
-	
-	dt->trigger_info() = trig2;
-	var_array[trig2].addDynamicTrigger(dt, UpperBound);
-	
-	return;
+    var_array[trig1].addDynamicTrigger(dt, UpperBound);
+    
+    ++dt;
+    
+    dt->trigger_info() = trig2;
+    var_array[trig2].addDynamicTrigger(dt, UpperBound);
+    
+    return;
   }
   
   /// Finds the value out of 0,1 and 2 which is not a or b.
   inline int other_val(int a, int b)
   {
-	if(a != 0 && b != 0)
-	  return 0;
+    if(a != 0 && b != 0)
+      return 0;
   
-	if(a != 1 && b != 1)
-	  return 1;
-	
-	return 2;
+    if(a != 1 && b != 1)
+      return 1;
+    
+    return 2;
   }
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PROP_INFO_ADDONE(Dyn3SAT);
-	int propval = dt->trigger_info();
-	//int var_size = var_array.size();
-	
-	DynamicTrigger* base_dt = dynamic_trigger_start();
-	int other_propval;
-	
-	if(base_dt == dt)
-	  other_propval = (base_dt + 1)->trigger_info();
-	else
-	  other_propval = base_dt->trigger_info();
-	
+    PROP_INFO_ADDONE(Dyn3SAT);
+    int propval = dt->trigger_info();
+    //int var_size = var_array.size();
+    
+    DynamicTrigger* base_dt = dynamic_trigger_start();
+    int other_propval;
+    
+    if(base_dt == dt)
+      other_propval = (base_dt + 1)->trigger_info();
+    else
+      other_propval = base_dt->trigger_info();
+    
 
-	int unchecked_val = other_val(propval, other_propval);
-	
-	if(var_array[unchecked_val].inDomain(1))
-	{
-	  // Found new value to watch
-	  dt->trigger_info() = unchecked_val;
-	  var_array[unchecked_val].addDynamicTrigger(dt, UpperBound);
-	}
-	else
-	{ var_array[other_propval].propagateAssign(1); }
+    int unchecked_val = other_val(propval, other_propval);
+    
+    if(var_array[unchecked_val].inDomain(1))
+    {
+      // Found new value to watch
+      dt->trigger_info() = unchecked_val;
+      var_array[unchecked_val].addDynamicTrigger(dt, UpperBound);
+    }
+    else
+    { var_array[other_propval].propagateAssign(1); }
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
     D_ASSERT(v_size == var_array.size());
-	int count = 0;
-	for(int i = 0; i < v_size; ++i)
-	  count += (v[i] == 1);
-	return count > 0;
+    int count = 0;
+    for(int i = 0; i < v_size; ++i)
+      count += (v[i] == 1);
+    return count > 0;
   }
   
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;
-	vars.reserve(var_array.size());
-	for(unsigned i = 0; i < var_array.size(); ++i)
-	  vars.push_back(AnyVarRef(var_array[i]));
-	return vars;  
+    vars.reserve(var_array.size());
+    for(unsigned i = 0; i < var_array.size(); ++i)
+      vars.push_back(AnyVarRef(var_array[i]));
+    return vars;  
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)

@@ -27,7 +27,7 @@ struct GadgetConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Gadget"; }
-	
+    
   VarArray var_array;
   
   vector<AnyVarRef> construction_vars;
@@ -65,7 +65,7 @@ struct GadgetConstraint : public AbstractConstraint
     triggerCollection t;
     for(int i = 0; i < var_array.size(); ++i)
       t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
-	return t;
+    return t;
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
@@ -86,21 +86,21 @@ struct GadgetConstraint : public AbstractConstraint
   virtual void special_check()
   {
     D_ASSERT(constraint_locked);
-	constraint_locked = false;
+    constraint_locked = false;
     do_prop();
   }
   
   virtual void special_unlock()
   {
     D_ASSERT(constraint_locked);
-	constraint_locked = false;
+    constraint_locked = false;
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(Gadget);
-	if(constraint_locked)
-	  return;
+    if(constraint_locked)
+      return;
 
     constraint_locked = true;
     getQueue(stateObj).pushSpecialTrigger(this);

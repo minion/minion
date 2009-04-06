@@ -43,21 +43,21 @@ struct GACTableConstraint : public AbstractConstraint
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
   BOOL check_tuple(const vector<int>& v)
   {
-	for(unsigned i = 0; i < v.size(); ++i)
-	{
-	  if(!vars[i].inDomain(v[i]))
-		return false;
-	}
-	return true;
+    for(unsigned i = 0; i < v.size(); ++i)
+    {
+      if(!vars[i].inDomain(v[i]))
+        return false;
+    }
+    return true;
   }
     
   TupleList* tuples;
   
   GACTableConstraint(StateObj* _stateObj,const VarArray& _vars, TupleList* _tuples) :
-	AbstractConstraint(_stateObj), vars(_vars), tuples(_tuples)
+    AbstractConstraint(_stateObj), vars(_vars), tuples(_tuples)
   { 
     tupleTrieArrayptr = tuples->getTries();
-    int arity = tuples->tuple_size();	  
+    int arity = tuples->tuple_size();     
     D_ASSERT(_vars.size() == arity);
 
     trie_current_support.resize(tuples->literal_num); 
@@ -84,8 +84,8 @@ struct GACTableConstraint : public AbstractConstraint
   BOOL find_new_support(int literal)
   {
      pair<int,int> varval = tuples->get_varval_from_literal(literal);
-	 int varIndex = varval.first;
-	 int val = varval.second;
+     int varIndex = varval.first;
+     int val = varval.second;
      if(negative==0)
      {
          int new_support = 
@@ -113,25 +113,25 @@ struct GACTableConstraint : public AbstractConstraint
   
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
   {
-	PROP_INFO_ADDONE(DynGACTable);
-	DynamicTrigger* dt = dynamic_trigger_start();
-	int trigger_pos = propagated_trig - dt;
-	int propagated_literal = trigger_pos / (vars.size() - 1);
-	
-	BOOL is_new_support = find_new_support(propagated_literal);
+    PROP_INFO_ADDONE(DynGACTable);
+    DynamicTrigger* dt = dynamic_trigger_start();
+    int trigger_pos = propagated_trig - dt;
+    int propagated_literal = trigger_pos / (vars.size() - 1);
+    
+    BOOL is_new_support = find_new_support(propagated_literal);
 
     pair<int,int> varval = tuples->get_varval_from_literal(propagated_literal);
-	int varIndex = varval.first;
-	int val = varval.second;
-	
-	if(is_new_support)
-	{
-	  setup_watches(varIndex, propagated_literal);
-	}
-	else
-	{
-	  vars[varIndex].removeFromDomain(val);
-	}
+    int varIndex = varval.first;
+    int val = varval.second;
+    
+    if(is_new_support)
+    {
+      setup_watches(varIndex, propagated_literal);
+    }
+    else
+    {
+      vars[varIndex].removeFromDomain(val);
+    }
   }
   
   void setup_watches(int var, int lit)
@@ -146,19 +146,19 @@ struct GACTableConstraint : public AbstractConstraint
     // cout << "  " << var << ", literal" << lit << ":";
     // for(int z = 0; z < vars.size(); ++z) cout << recyclableTuple[z] << " "; cout << endl;
     
-	DynamicTrigger* dt = dynamic_trigger_start();
-	
-	int vars_size = vars.size();
-	dt += lit * (vars_size - 1);
-	for(int v = 0; v < vars_size; ++v)
-	{
-	  if(v != var)
-	  {
-		D_ASSERT(vars[v].inDomain(recyclableTuple[v]));
-		vars[v].addDynamicTrigger(dt, DomainRemoval, recyclableTuple[v]);
-		++dt;
-	  }
-	}
+    DynamicTrigger* dt = dynamic_trigger_start();
+    
+    int vars_size = vars.size();
+    dt += lit * (vars_size - 1);
+    for(int v = 0; v < vars_size; ++v)
+    {
+      if(v != var)
+      {
+        D_ASSERT(vars[v].inDomain(recyclableTuple[v]));
+        vars[v].addDynamicTrigger(dt, DomainRemoval, recyclableTuple[v]);
+        ++dt;
+      }
+    }
   }
   
   virtual void full_propagate()
@@ -170,14 +170,14 @@ struct GACTableConstraint : public AbstractConstraint
       }
       for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
       {
-	    if(negative==0)
+        if(negative==0)
         {
             vars[varIndex].setMin((tuples->dom_smallest)[varIndex]);
             vars[varIndex].setMax((tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]);
-		}
+        }
         
-		if(getState(stateObj).isFailed()) return;
-		
+        if(getState(stateObj).isFailed()) return;
+        
         DomainInt max = vars[varIndex].getMax();
         for(DomainInt i = vars[varIndex].getMin(); i <= max; ++i) 
         {
@@ -250,8 +250,8 @@ struct GACTableConstraint : public AbstractConstraint
   { 
     vector<AnyVarRef> anyvars;
     for(unsigned i = 0; i < vars.size(); ++i)
-	  anyvars.push_back(vars[i]);
-	return anyvars;
+      anyvars.push_back(vars[i]);
+    return anyvars;
   }
   
   

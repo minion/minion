@@ -34,58 +34,58 @@ namespace Controller
   
   /// Sets optimisation variable.
   template<typename VarRef>
-	void optimise_maximise_var(StateObj* stateObj, VarRef var)
+  void optimise_maximise_var(StateObj* stateObj, VarRef var)
   {
-	  getOptions(stateObj).findAllSolutions();
-	  getState(stateObj).setOptimiseVar(new AnyVarRef(var));
-	  getState(stateObj).setOptimisationProblem(true);
+      getOptions(stateObj).findAllSolutions();
+      getState(stateObj).setOptimiseVar(new AnyVarRef(var));
+      getState(stateObj).setOptimisationProblem(true);
   }
   
   /// Sets optimisation variable.
   template<typename VarRef>
-	void optimise_minimise_var(StateObj* stateObj, VarRef var)
+  void optimise_minimise_var(StateObj* stateObj, VarRef var)
   {
-	  getOptions(stateObj).findAllSolutions();
-	  getState(stateObj).setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
-	  getState(stateObj).setOptimisationProblem(true);
+      getOptions(stateObj).findAllSolutions();
+      getState(stateObj).setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
+      getState(stateObj).setOptimisationProblem(true);
   }
   
   /// Ensures a particular constraint is satisfied by the solution.
   template<typename T>
-	void check_constraint(StateObj* stateObj, T* con)
+  void check_constraint(StateObj* stateObj, T* con)
   {
-	  vector<AnyVarRef>& variables = *(con->get_vars_singleton());
-	  unsigned vec_size = variables.size();	 
-	  
+      vector<AnyVarRef>& variables = *(con->get_vars_singleton());
+      unsigned vec_size = variables.size();  
+      
     DomainInt* values = (DomainInt*) alloca(vec_size * sizeof(DomainInt)); 
-	  //vector<DomainInt> values(vec_size);
+      //vector<DomainInt> values(vec_size);
 
-	  for(unsigned loop = 0; loop < vec_size; ++loop)
-	  {
-		if(!variables[loop].isAssigned())
-		{
-		  cerr << "Some variables are unassigned. Unless you purposefully " <<
-		  "left them out, have a look." << endl;
-		  return;
-		}
-		values[loop] = variables[loop].getAssignedValue();
-	  }
-	  
-	  if(!con->check_assignment(values, vec_size))
-	  {
-	    cerr << "A " << con->constraint_name() << " constraint is not satisfied by this sol!" << endl;
-		cerr << "The constraint is over the following variables:" << endl;
-		for(unsigned loop = 0; loop < vec_size; ++loop)
-		  cerr << variables[loop] << ",";
-		cerr << endl;
-		cerr << "Variables were assigned:" << endl;
-	    for(unsigned loop = 0; loop < vec_size; ++loop)
-		  cerr << values[loop] << ",";
-		cerr << endl;
-		cerr << "This is an internal bug. It shouldn't happen!!" << endl;
-		cerr << "Please report this instance to the developers." << endl;
-		FAIL_EXIT();
-	  }
+      for(unsigned loop = 0; loop < vec_size; ++loop)
+      {
+        if(!variables[loop].isAssigned())
+        {
+          cerr << "Some variables are unassigned. Unless you purposefully " <<
+          "left them out, have a look." << endl;
+          return;
+        }
+        values[loop] = variables[loop].getAssignedValue();
+      }
+      
+      if(!con->check_assignment(values, vec_size))
+      {
+        cerr << "A " << con->constraint_name() << " constraint is not satisfied by this sol!" << endl;
+        cerr << "The constraint is over the following variables:" << endl;
+        for(unsigned loop = 0; loop < vec_size; ++loop)
+          cerr << variables[loop] << ",";
+        cerr << endl;
+        cerr << "Variables were assigned:" << endl;
+        for(unsigned loop = 0; loop < vec_size; ++loop)
+          cerr << values[loop] << ",";
+        cerr << endl;
+        cerr << "This is an internal bug. It shouldn't happen!!" << endl;
+        cerr << "Please report this instance to the developers." << endl;
+        FAIL_EXIT();
+      }
   }
 
   /// All operations to be performed when a solution is found.
@@ -161,16 +161,16 @@ namespace Controller
     if(getState(stateObj).getNodeCount() == getOptions(stateObj).nodelimit)
       return true;
     
-  	if(getState(stateObj).isAlarmActivated())
-  	{
+    if(getState(stateObj).isAlarmActivated())
+    {
       getState(stateObj).clearAlarm();
       if(getState(stateObj).isCtrlcPressed())
         return true;
 
-  	  if(getOptions(stateObj).time_limit != 0)
-  	  {
-  	    if(getState(stateObj).getOldTimer().checkTimeout(getOptions(stateObj).time_limit))
-  	    {
+      if(getOptions(stateObj).time_limit != 0)
+      {
+        if(getState(stateObj).getOldTimer().checkTimeout(getOptions(stateObj).time_limit))
+        {
           if(getOptions(stateObj).cspcomp)
           {
             FAIL_EXIT("Time out");
@@ -178,11 +178,11 @@ namespace Controller
           
           getOptions(stateObj).printLine("Time out.");
           getTableOut().set("TimeOut", 1);
-  		    return true;
-  	    }
-  	  }
-  	}
-	return false;
+            return true;
+        }
+      }
+    }
+    return false;
   }
   
   
@@ -190,7 +190,7 @@ template<typename T>
 void inline maybe_print_search_state(StateObj* stateObj, const char* name, T& vars)
 {
   if(getOptions(stateObj).dumptree)
-	cout << name << getState(stateObj).getNodeCount() << "," << get_dom_as_string(vars) << endl;
+    cout << name << getState(stateObj).getNodeCount() << "," << get_dom_as_string(vars) << endl;
 }
 
 void inline maybe_print_search_action(StateObj* stateObj, const char* action)
@@ -205,69 +205,69 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
     // We have found a solution!
     check_sol_is_correct(stateObj);
     
-	if(getState(stateObj).isOptimisationProblem())
-	{
-	  if(!getState(stateObj).getOptimiseVar()->isAssigned())
-	  {
-		cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
-		cerr << "Put it in the variable ordering?" << endl;
+    if(getState(stateObj).isOptimisationProblem())
+    {
+      if(!getState(stateObj).getOptimiseVar()->isAssigned())
+      {
+        cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
+        cerr << "Put it in the variable ordering?" << endl;
     cerr << "Aborting Search" << endl;
-		exit(1);
-	  }
-	  
-	  cout << "Solution found with Value: " 
-	  << getState(stateObj).getOptimiseVar()->getAssignedValue() << endl;
-	  
-	  getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getAssignedValue() + 1);			
-	}
+        exit(1);
+      }
+      
+      cout << "Solution found with Value: " 
+      << getState(stateObj).getOptimiseVar()->getAssignedValue() << endl;
+      
+      getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getAssignedValue() + 1);         
+    }
     // Note that sollimit = -1 if all solutions should be found.
-	if(getState(stateObj).getSolutionCount() == getOptions(stateObj).sollimit)
-	  throw EndOfSearch();
+    if(getState(stateObj).getSolutionCount() == getOptions(stateObj).sollimit)
+      throw EndOfSearch();
   }
 
   void inline set_optimise_and_propagate_queue(StateObj* stateObj)
   {
   #ifdef USE_SETJMP
-	if(getState(stateObj).isOptimisationProblem())
-	{
-	  // Must check if this setMin will fail before doing it, else
-	  // The setjmp will throw us off. It's cheaper to check than set up
-	  // a new setjmp point here.
-	  if(getState(stateObj).getOptimiseVar()->getMax() >= getState(stateObj).getOptimiseValue())
-	  { 
-		getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseValue());
-		getQueue(stateObj).propagateQueue();
-	  }
-	  else
-	  {failed = true; }
-	}
-	else
-	{ getQueue(stateObj).propagateQueue();}
+    if(getState(stateObj).isOptimisationProblem())
+    {
+      // Must check if this setMin will fail before doing it, else
+      // The setjmp will throw us off. It's cheaper to check than set up
+      // a new setjmp point here.
+      if(getState(stateObj).getOptimiseVar()->getMax() >= getState(stateObj).getOptimiseValue())
+      { 
+        getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseValue());
+        getQueue(stateObj).propagateQueue();
+      }
+      else
+      {failed = true; }
+    }
+    else
+    { getQueue(stateObj).propagateQueue();}
   #else
-	if(getState(stateObj).isOptimisationProblem())
-	  getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseValue());
-	getQueue(stateObj).propagateQueue();
-  #endif	
+    if(getState(stateObj).isOptimisationProblem())
+      getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseValue());
+    getQueue(stateObj).propagateQueue();
+  #endif    
   }
 
   void inline initalise_search(StateObj* stateObj)
   {
-	getState(stateObj).setSolutionCount(0);  
-	getState(stateObj).setNodeCount(0);
-	
-	if(!getOptions(stateObj).noTimers)
-	{
+    getState(stateObj).setSolutionCount(0);  
+    getState(stateObj).setNodeCount(0);
+    
+    if(!getOptions(stateObj).noTimers)
+    {
     getState(stateObj).setupAlarm();
     install_ctrlc_trigger(stateObj);
-	}
-	lock(stateObj);
-	if (!getOptions(stateObj).silent) 
-	  getState(stateObj).getOldTimer().printTimestepWithoutReset(Output_1, "First Node Time: ");
-	/// Failed initially propagating constraints!
-	if(getState(stateObj).isFailed())
-	  return;
-	if(getState(stateObj).isOptimisationProblem())
-	  getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getMin()); 
+    }
+    lock(stateObj);
+    if (!getOptions(stateObj).silent) 
+      getState(stateObj).getOldTimer().printTimestepWithoutReset(Output_1, "First Node Time: ");
+    /// Failed initially propagating constraints!
+    if(getState(stateObj).isFailed())
+      return;
+    if(getState(stateObj).isOptimisationProblem())
+      getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getMin()); 
   }
 }
 

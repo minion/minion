@@ -155,7 +155,7 @@ template<typename BoolVar, bool DoWatchAssignment>
       {
         bool flag;
         GET_ASSIGNMENT(assignment, child_constraints[0]);
-	PROP_INFO_ADDONE(ReifyImplyGetSatAssg);
+        PROP_INFO_ADDONE(ReifyImplyGetSatAssg);
 
         P("Find new assignment");
         if(!flag)

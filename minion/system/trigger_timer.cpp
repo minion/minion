@@ -44,11 +44,11 @@ void activate_trigger(volatile bool* b)
   struct itimerval timer;
           
   signal(SIGALRM, trigger_function);
-	timer.it_value.tv_sec = 1;
-	timer.it_value.tv_usec = 0;
-	timer.it_interval.tv_sec = 1;
-	timer.it_interval.tv_usec = 0;
-	setitimer(ITIMER_REAL, &timer, NULL);
+  timer.it_value.tv_sec = 1;
+  timer.it_value.tv_usec = 0;
+  timer.it_interval.tv_sec = 1;
+  timer.it_interval.tv_usec = 0;
+  setitimer(ITIMER_REAL, &timer, NULL);
 }
 
 void ctrlc_function(int /* signum */ )

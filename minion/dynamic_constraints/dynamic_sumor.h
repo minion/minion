@@ -293,7 +293,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
    typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
    {
      return new VecCountDynamic<VarArray1, VarArray2, typename Operator::reverse_operator, true>
-         (stateObj, var_array1, var_array2, var_array1.size()-hamming_distance+1);	
+         (stateObj, var_array1, var_array2, var_array1.size()-hamming_distance+1);
    }
 
    template<bool b>

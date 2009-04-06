@@ -57,7 +57,7 @@ class box
     { }
 
 public:
-  typedef T					 value_type;
+  typedef T                  value_type;
   typedef T*                   pointer;
   typedef const T*             const_pointer;
   typedef T&                 reference;
@@ -65,10 +65,10 @@ public:
   typedef pointer iterator;
   typedef const_pointer const_iterator;
   typedef std::reverse_iterator<const_iterator>  const_reverse_iterator;
-  typedef std::reverse_iterator<iterator>		 reverse_iterator;
-  typedef size_t					 size_type;
-  typedef ptrdiff_t					 difference_type;
-  typedef void		 allocator_type;
+  typedef std::reverse_iterator<iterator>        reverse_iterator;
+  typedef size_t                     size_type;
+  typedef ptrdiff_t                  difference_type;
+  typedef void       allocator_type;
 
 public:
 
@@ -80,8 +80,8 @@ public:
       M_finish = start;
     else
       M_finish = end;
-//	std::uninitialized_fill_n_a(M_start, n, value,
-//				      this->get_allocator());
+//  std::uninitialized_fill_n_a(M_start, n, value,
+//                    this->get_allocator());
   }
 
     box(T* start, size_t size, IsFull isFull = StartEmpty) : M_start(start),  M_end_of_storage(start + size)
@@ -90,8 +90,8 @@ public:
         M_finish = start;
       else
         M_finish = start + size;
-  //	std::uninitialized_fill_n_a(M_start, n, value,
-  //				      this->get_allocator());
+  //    std::uninitialized_fill_n_a(M_start, n, value,
+  //                      this->get_allocator());
     }
   
 //  box(const box& box) : M_start(box.M_start), M_finish(box.M_start), 

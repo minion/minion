@@ -84,13 +84,13 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-	t.push_back(make_trigger(var1, Trigger(this, 10), LowerBound));
+    t.push_back(make_trigger(var1, Trigger(this, 10), LowerBound));
     t.push_back(make_trigger(var1, Trigger(this, 11), UpperBound));
     t.push_back(make_trigger(var2, Trigger(this, 20), LowerBound));
-	t.push_back(make_trigger(var2, Trigger(this, 21), UpperBound));
-	t.push_back(make_trigger(var3, Trigger(this, 3), LowerBound));
-	t.push_back(make_trigger(var3, Trigger(this, -3), UpperBound));
-	return t;
+    t.push_back(make_trigger(var2, Trigger(this, 21), UpperBound));
+    t.push_back(make_trigger(var3, Trigger(this, 3), LowerBound));
+    t.push_back(make_trigger(var3, Trigger(this, -3), UpperBound));
+    return t;
   }
   
   // rewrite the following two functions.
@@ -99,7 +99,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
     if(var3.isAssigned())
     {
       if(var3.getAssignedValue() == 1)
-		eqprop();
+        eqprop();
       else
       {
           if(var1.isAssigned())
@@ -120,7 +120,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PROP_INFO_ADDONE(ReifyEqual);
+    PROP_INFO_ADDONE(ReifyEqual);
     switch(i)
     {
       case 10:
@@ -140,7 +140,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
           {
               check();
           }
-		break;
+        break;
         
     case 11:
         // var1 upper bound has moved.
@@ -159,8 +159,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint
           {
               check();
           }
-		break;        
-		
+        break;        
+        
       case 20:
           // var2 lower bound has moved.
           if(var3.isAssigned())
@@ -202,9 +202,9 @@ struct ReifiedEqualConstraint : public AbstractConstraint
       case 3:
         D_ASSERT(var3.isAssigned() && var3.getAssignedValue()==1);
         // reifyvar==1
-		eqprop();
-		break;
-		
+        eqprop();
+        break;
+        
       case -3:
         D_ASSERT(var3.isAssigned() && var3.getAssignedValue()==0);
         if(var1.isAssigned())
@@ -215,7 +215,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
         {
             diseqvar2assigned();
         }
-		break;
+        break;
     }
   }
   
@@ -290,11 +290,11 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;
-	vars.reserve(3);
-	vars.push_back(var1);
-	vars.push_back(var2);
-	vars.push_back(var3);
-	return vars;
+    vars.reserve(3);
+    vars.push_back(var1);
+    vars.push_back(var2);
+    vars.push_back(var3);
+    return vars;
   }
 };
 
@@ -350,19 +350,19 @@ struct NeqConstraintBinary : public AbstractConstraint
   
   PROPAGATE_FUNCTION(int prop_val, DomainDelta)
   {
-	PROP_INFO_ADDONE(BinaryNeq);
+    PROP_INFO_ADDONE(BinaryNeq);
     if (prop_val == 1) {
       DomainInt remove_val = var1.getAssignedValue();
-	  if(var2.isBound())
-	  {
-		if(var2.getMin() == remove_val)
-		  var2.setMin(remove_val + 1);
-		if(var2.getMax() == remove_val)
-		  var2.setMax(remove_val - 1);
-	  }
-	  else
+      if(var2.isBound())
+      {
+        if(var2.getMin() == remove_val)
+          var2.setMin(remove_val + 1);
+        if(var2.getMax() == remove_val)
+          var2.setMax(remove_val - 1);
+      }
+      else
         var2.removeFromDomain(remove_val);
-	}
+    }
     #ifdef MAKECONFLUENT
     else if(prop_val == 3)
     {   // ub moved var1
@@ -405,14 +405,14 @@ struct NeqConstraintBinary : public AbstractConstraint
     {
       D_ASSERT(prop_val == 2);
       DomainInt remove_val = var2.getAssignedValue();
-	  if(var1.isBound())
-	  {
-		if(var1.getMin() == remove_val)
-		  var1.setMin(remove_val + 1);
-		if(var1.getMax() == remove_val)
-		  var1.setMax(remove_val - 1);
-	  }
-	  else
+      if(var1.isBound())
+      {
+        if(var1.getMin() == remove_val)
+          var1.setMin(remove_val + 1);
+        if(var1.getMax() == remove_val)
+          var1.setMax(remove_val - 1);
+      }
+      else
         var1.removeFromDomain(remove_val);
     }
   }
@@ -450,39 +450,39 @@ struct NeqConstraintBinary : public AbstractConstraint
     if(var1.isAssigned())
     { 
       DomainInt remove_val = var1.getAssignedValue();
-	  if(var2.isBound())
-	  {
-		if(var2.getMin() == remove_val)
-		  var2.setMin(remove_val + 1);
-		if(var2.getMax() == remove_val)
-		  var2.setMax(remove_val - 1);
-	  }
-	  else
+      if(var2.isBound())
+      {
+        if(var2.getMin() == remove_val)
+          var2.setMin(remove_val + 1);
+        if(var2.getMax() == remove_val)
+          var2.setMax(remove_val - 1);
+      }
+      else
         var2.removeFromDomain(remove_val);
     }
     if(var2.isAssigned())
     { 
       DomainInt remove_val = var2.getAssignedValue();
-	  if(var1.isBound())
-	  {
-		if(var1.getMin() == remove_val)
-		  var1.setMin(remove_val + 1);
-		if(var1.getMax() == remove_val)
-		  var1.setMax(remove_val - 1);
-	  }
-	  else
+      if(var1.isBound())
+      {
+        if(var1.getMin() == remove_val)
+          var1.setMin(remove_val + 1);
+        if(var1.getMax() == remove_val)
+          var1.setMax(remove_val - 1);
+      }
+      else
         var1.removeFromDomain(remove_val);
     }
   }
-	
-	virtual BOOL check_assignment(DomainInt* v, int v_size)
-	{
-	  D_ASSERT(v_size == 2); 
-	  if(v[0]==v[1]) return false;
-	  return true;
-	}
-	
-	virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+    
+    virtual BOOL check_assignment(DomainInt* v, int v_size)
+    {
+      D_ASSERT(v_size == 2); 
+      if(v[0]==v[1]) return false;
+      return true;
+    }
+    
+    virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(var1.getMin() != var2.getMax())
     {
@@ -504,13 +504,13 @@ struct NeqConstraintBinary : public AbstractConstraint
   }
   
   
-	virtual vector<AnyVarRef> get_vars()
-	{
-	  vector<AnyVarRef> vars(2);
+    virtual vector<AnyVarRef> get_vars()
+    {
+      vector<AnyVarRef> vars(2);
           vars[0] = var1;
           vars[1] = var2;
-	  return vars;
-	}
+      return vars;
+    }
   };
 
 
@@ -529,39 +529,39 @@ struct EqualConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-	t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-	t.push_back(make_trigger(var1, Trigger(this, 2), LowerBound));
-	t.push_back(make_trigger(var2, Trigger(this, 3), UpperBound));
-	t.push_back(make_trigger(var2, Trigger(this, 4), LowerBound));
-	return t;
+    t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
+    t.push_back(make_trigger(var1, Trigger(this, 2), LowerBound));
+    t.push_back(make_trigger(var2, Trigger(this, 3), UpperBound));
+    t.push_back(make_trigger(var2, Trigger(this, 4), LowerBound));
+    return t;
   }
   
   virtual void full_propagate()
   {
-	propagate(1,0);
-	propagate(2,0);
-	propagate(3,0);
-	propagate(4,0);
+    propagate(1,0);
+    propagate(2,0);
+    propagate(3,0);
+    propagate(4,0);
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PROP_INFO_ADDONE(Equal);
+    PROP_INFO_ADDONE(Equal);
     switch(i)
-	{
-	  case 1:
-		var2.setMax(var1.getMax());
-		return;
-	  case 2:
-		var2.setMin(var1.getMin());
-		return;
-	  case 3:
-		var1.setMax(var2.getMax());
-		return;
-	  case 4:
-		var1.setMin(var2.getMin());
-		return;
-	}
+    {
+      case 1:
+        var2.setMax(var1.getMax());
+        return;
+      case 2:
+        var2.setMin(var1.getMin());
+        return;
+      case 3:
+        var1.setMax(var2.getMax());
+        return;
+      case 4:
+        var1.setMin(var2.getMin());
+        return;
+    }
   }
   
   
@@ -574,9 +574,9 @@ struct EqualConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;
-	vars.reserve(2);
-	vars.push_back(var1);
-	vars.push_back(var2);
+    vars.reserve(2);
+    vars.push_back(var1);
+    vars.push_back(var2);
     return vars;
   }
   

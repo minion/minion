@@ -44,18 +44,18 @@ struct AndConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-	t.push_back(make_trigger(var1, Trigger(this, 1), LowerBound));
-	t.push_back(make_trigger(var2, Trigger(this, 2), LowerBound));
-	t.push_back(make_trigger(var3, Trigger(this, 3), LowerBound));
-	t.push_back(make_trigger(var1, Trigger(this, -1), UpperBound));
-	t.push_back(make_trigger(var2, Trigger(this, -2), UpperBound));
-	t.push_back(make_trigger(var3, Trigger(this, -3), UpperBound));
-	return t;
+    t.push_back(make_trigger(var1, Trigger(this, 1), LowerBound));
+    t.push_back(make_trigger(var2, Trigger(this, 2), LowerBound));
+    t.push_back(make_trigger(var3, Trigger(this, 3), LowerBound));
+    t.push_back(make_trigger(var1, Trigger(this, -1), UpperBound));
+    t.push_back(make_trigger(var2, Trigger(this, -2), UpperBound));
+    t.push_back(make_trigger(var3, Trigger(this, -3), UpperBound));
+    return t;
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PROP_INFO_ADDONE(And);
+    PROP_INFO_ADDONE(And);
     switch(i)
     {
       case 1:
@@ -113,9 +113,9 @@ struct AndConstraint : public AbstractConstraint
     if(var3.isAssignedValue(false))
     {
       if(var1.isAssignedValue(true))
-		var2.propagateAssign(false);
+        var2.propagateAssign(false);
       if(var2.isAssignedValue(true))
-		var1.propagateAssign(false);
+        var1.propagateAssign(false);
     }
     
     if(var3.isAssignedValue(true))

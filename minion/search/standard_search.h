@@ -50,7 +50,7 @@ namespace Controller
 
       // order.find_next_unassigned returns true if all variables assigned.
       if(order.find_next_unassigned())
-      {  		  
+      {
         // This function may escape from search if solution limit
         // has been reached.
         next_search();

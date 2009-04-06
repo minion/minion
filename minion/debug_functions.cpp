@@ -62,12 +62,12 @@ void assert_function(BOOL x, const char* a, const char* f, int line)
   if(!x) 
   {
     cerr << "Assert Error!" << endl;
-	cerr << "Test '" << a << "' failed." << endl;
-	cerr << "In file " << f << ", line " << line << endl;
+    cerr << "Test '" << a << "' failed." << endl;
+    cerr << "In file " << f << ", line " << line << endl;
     cerr << "\n";
-	cout << "\n";
+    cout << "\n";
     cout.flush();
-	cerr.flush();
+    cerr.flush();
     FAIL_EXIT();
   }
 }

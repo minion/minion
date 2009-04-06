@@ -65,11 +65,11 @@ class TriggerList
   bool only_bounds;
   
 public:
-	TriggerList(StateObj* _stateObj, bool _only_bounds) : stateObj(_stateObj), 
-	only_bounds(_only_bounds)
+  TriggerList(StateObj* _stateObj, bool _only_bounds) : stateObj(_stateObj), 
+  only_bounds(_only_bounds)
   { 
-	  var_count_m = 0;
-	  lock_first = lock_second = 0; 
+    var_count_m = 0;
+    lock_first = lock_second = 0; 
   }
   
   vector<vector<vector<Trigger> > > triggers;
@@ -94,47 +94,47 @@ public:
   
   void lock(int size, DomainInt min_domain_val, DomainInt max_domain_val)
   {
-	D_ASSERT(!lock_first && !lock_second);
-	lock_first = true;
-	var_count_m = size;
-	vars_min_domain_val = min_domain_val;
-	vars_max_domain_val = max_domain_val;
-	vars_domain_size = checked_cast<unsigned>(max_domain_val - min_domain_val + 1);
-	
-	triggers.resize(4);
-	for(unsigned i = 0; i < 4; ++i)
-	  triggers[i].resize(var_count_m);
-	
+    D_ASSERT(!lock_first && !lock_second);
+    lock_first = true;
+    var_count_m = size;
+    vars_min_domain_val = min_domain_val;
+    vars_max_domain_val = max_domain_val;
+    vars_domain_size = checked_cast<unsigned>(max_domain_val - min_domain_val + 1);
+    
+    triggers.resize(4);
+    for(unsigned i = 0; i < 4; ++i)
+      triggers[i].resize(var_count_m);
+    
 #ifdef DYNAMICTRIGGERS
     if(only_bounds)
       dynamic_triggers = getMemory(stateObj).nonBackTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);
     else
       dynamic_triggers = getMemory(stateObj).nonBackTrack().request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
 #else
-	if(only_bounds)
-  	  dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);  
-	else
-	  dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
+    if(only_bounds)
+      dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);  
+    else
+      dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
 #endif
-	getTriggerMem(stateObj).addTriggerList(this);
+    getTriggerMem(stateObj).addTriggerList(this);
   }
   
   size_t memRequirement()
   {
-	D_ASSERT(lock_first && !lock_second);
-	size_t storage = 0;
-	for(unsigned i = 0; i < 4; ++i)
-	{
-	  for(unsigned j = 0; j < triggers[i].size(); ++j)
-	    storage += triggers[i][j].size();
-	}
-	return storage * sizeof(Trigger) + 4 * (var_count_m + 1) * sizeof(Trigger*);
+    D_ASSERT(lock_first && !lock_second);
+    size_t storage = 0;
+    for(unsigned i = 0; i < 4; ++i)
+    {
+      for(unsigned j = 0; j < triggers[i].size(); ++j)
+        storage += triggers[i][j].size();
+    }
+    return storage * sizeof(Trigger) + 4 * (var_count_m + 1) * sizeof(Trigger*);
   }
   
   struct CompareMem
   {
     bool operator()(const Trigger& t1, const Trigger& t2)
-      { return t1.constraint->getTrigWeight() < t2.constraint->getTrigWeight(); }
+    { return t1.constraint->getTrigWeight() < t2.constraint->getTrigWeight(); }
   };
 
   void allocateMem(char* mem_start)
@@ -276,7 +276,7 @@ public:
 
     D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
-    if (range.first != range.second)	  
+    if (range.first != range.second)      
       getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1)); 
   }
   
@@ -338,20 +338,20 @@ public:
 
 void inline TriggerMem::finaliseTriggerLists()
   {
-	size_t trigger_size = 0;
-	for(unsigned int i = 0;i < trigger_lists.size(); i++)
-	  trigger_size += trigger_lists[i]->memRequirement();
-	getTriggerMem(stateObj).allocateTriggerListData(trigger_size);
-	
-	char* triggerlist_offset = getTriggerMem(stateObj).getTriggerListDataPtr();
+    size_t trigger_size = 0;
+    for(unsigned int i = 0;i < trigger_lists.size(); i++)
+      trigger_size += trigger_lists[i]->memRequirement();
+    getTriggerMem(stateObj).allocateTriggerListData(trigger_size);
     
-	for(unsigned int i=0;i<trigger_lists.size();i++)
-	{
-	  size_t offset = trigger_lists[i]->memRequirement();
-	  trigger_lists[i]->allocateMem(triggerlist_offset);
-	  triggerlist_offset += offset;
-	}
-	D_ASSERT(triggerlist_offset - getTriggerMem(stateObj).getTriggerListDataPtr() == (int)trigger_size);
+    char* triggerlist_offset = getTriggerMem(stateObj).getTriggerListDataPtr();
+    
+    for(unsigned int i=0;i<trigger_lists.size();i++)
+    {
+      size_t offset = trigger_lists[i]->memRequirement();
+      trigger_lists[i]->allocateMem(triggerlist_offset);
+      triggerlist_offset += offset;
+    }
+    D_ASSERT(triggerlist_offset - getTriggerMem(stateObj).getTriggerListDataPtr() == (int)trigger_size);
   }
 
 

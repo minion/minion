@@ -74,21 +74,21 @@ class TupleList
   vector<int> get_vector(int pos) const
   {
     vector<int> vec(tuple_length);
-	for(int i = 0; i < tuple_length; ++i)
-	  vec[i] = tuple_data[pos * tuple_length + i];
-	return vec;
+    for(int i = 0; i < tuple_length; ++i)
+      vec[i] = tuple_data[pos * tuple_length + i];
+    return vec;
   }
   
   TupleList(const vector<vector<int> >& tuple_list) : litlists(NULL), 
     nightingale(NULL), triearray(NULL), regin(NULL),  tuples_locked(false)
   {
     number_of_tuples = tuple_list.size();
-	tuple_length = tuple_list[0].size();
-	tuple_data = new int[number_of_tuples * tuple_length];
+    tuple_length = tuple_list[0].size();
+    tuple_data = new int[number_of_tuples * tuple_length];
     for(int i = 0; i < number_of_tuples; ++i)
-	  for(int j = 0; j < tuple_length; ++j)
-	  { tuple_data[i * tuple_length + j] = tuple_list[i][j]; }
-	finalise_tuples();
+      for(int j = 0; j < tuple_length; ++j)
+      { tuple_data[i * tuple_length + j] = tuple_list[i][j]; }
+    finalise_tuples();
   }
   
   TupleList(int _numtuples, int _tuplelength) : litlists(NULL),
@@ -101,8 +101,8 @@ class TupleList
   
   const int* get_tupleptr(int pos) const
   { 
-	D_ASSERT(pos >= 0 && (pos < number_of_tuples || (number_of_tuples==0 && pos==0)));
-	return tuple_data + pos*tuple_length;
+    D_ASSERT(pos >= 0 && (pos < number_of_tuples || (number_of_tuples==0 && pos==0)));
+    return tuple_data + pos*tuple_length;
   }
   
 
@@ -125,8 +125,8 @@ class TupleList
   int get_literal(int var_num, DomainInt dom_num)
   {
      D_ASSERT(var_num >= 0 && var_num < tuple_size());
-	 D_ASSERT(dom_num >= dom_smallest[var_num] && 
-			  dom_num <= dom_smallest[var_num] + dom_size[var_num]);
+     D_ASSERT(dom_num >= dom_smallest[var_num] && 
+              dom_num <= dom_smallest[var_num] + dom_size[var_num]);
     return _map_vars_to_literal[var_num][checked_cast<int>(dom_num - dom_smallest[var_num])]; 
   }
   
@@ -140,7 +140,7 @@ class TupleList
       return;
     tuples_locked = true;
 
-    int arity = tuple_size();	
+    int arity = tuple_size();   
 
     // Set up the table of tuples.
     for(int i = 0; i < arity; ++i)
@@ -225,24 +225,24 @@ public:
   
   LiteralSpecificLists(TupleList* _tuples) : tuples(_tuples)
   { 
-	  tuples->finalise_tuples();
-	  // For each literal, store the set of tuples which it allows.
-	  for(unsigned i = 0; i < tuples->dom_size.size(); ++i)
-	  {
-		for(int j = tuples->dom_smallest[i]; 
-				j <= tuples->dom_smallest[i] + tuples->dom_size[i];
-				 ++j)
-		{
-		  vector<vector<int> > specific_tuples;
-		  for(int k = 0; k < (*tuples).size(); ++k)
-		  {
-			if((*tuples)[k][i] == j)
-			  specific_tuples.push_back((*tuples).get_vector(k));
-		  }
-		  literal_specific_tuples.push_back(specific_tuples);
-		  //D_ASSERT(literal_specific_tuples.size() - 1 == get_literal(i,j));
-		}
-	  }
+      tuples->finalise_tuples();
+      // For each literal, store the set of tuples which it allows.
+      for(unsigned i = 0; i < tuples->dom_size.size(); ++i)
+      {
+        for(int j = tuples->dom_smallest[i]; 
+                j <= tuples->dom_smallest[i] + tuples->dom_size[i];
+                 ++j)
+        {
+          vector<vector<int> > specific_tuples;
+          for(int k = 0; k < (*tuples).size(); ++k)
+          {
+            if((*tuples)[k][i] == j)
+              specific_tuples.push_back((*tuples).get_vector(k));
+          }
+          literal_specific_tuples.push_back(specific_tuples);
+          //D_ASSERT(literal_specific_tuples.size() - 1 == get_literal(i,j));
+        }
+      }
   }
 };
 

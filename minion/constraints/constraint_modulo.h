@@ -47,19 +47,19 @@ struct NotModConstraint : public AbstractConstraint
   VarRef3 var3;
 
   NotModConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
-	AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
   
-	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
-		 var3.getInitialMin() < 0)
-	  { 
+      if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
+         var3.getInitialMin() < 0)
+      { 
       FAIL_EXIT("The negated 'modulo' constraint only supports nonnegative numbers, and positive bases, at present.");
-	  }
+      }
   }
   
   virtual triggerCollection setup_internal()
   {
-	triggerCollection t;
+    triggerCollection t;
     if(var1.isBound())
     {
         t.push_back(make_trigger(var1, Trigger(this, 1), LowerBound));
@@ -89,12 +89,12 @@ struct NotModConstraint : public AbstractConstraint
     {
         t.push_back(make_trigger(var3, Trigger(this, 1), Assigned));
     }
-	return t;
+    return t;
   }
   
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
-	PROP_INFO_ADDONE(Mod);
+    PROP_INFO_ADDONE(Mod);
     // propagate var1 % var2 != var3 by forward checking
     if(var1.isAssigned() && var2.isAssigned())
     {
@@ -167,22 +167,22 @@ struct NotModConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-	propagate(1,0);
+    propagate(1,0);
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-	D_ASSERT(v_size == 3);
-	return v[0] % v[1] != v[2];
+    D_ASSERT(v_size == 3);
+    return v[0] % v[1] != v[2];
   }
   
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> v;
-	v.push_back(var1);
-	v.push_back(var2);
-	v.push_back(var3);
-	return v;
+    v.push_back(var1);
+    v.push_back(var2);
+    v.push_back(var3);
+    return v;
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
@@ -230,31 +230,31 @@ struct ModConstraint : public AbstractConstraint
   VarRef3 var3;
 
   ModConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
-	AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
   
-	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
-		 var3.getInitialMin() < 0)
-	  { 
+      if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
+         var3.getInitialMin() < 0)
+      { 
       FAIL_EXIT("The 'modulo' constraint only supports nonnegative numbers, and positive bases, at present.");
-	  }
+      }
   }
   
   virtual triggerCollection setup_internal()
   {
-	triggerCollection t;
-	t.push_back(make_trigger(var1, Trigger(this, -1), LowerBound));
-	t.push_back(make_trigger(var2, Trigger(this, -2), LowerBound));
-	t.push_back(make_trigger(var3, Trigger(this, -3), LowerBound));
-	t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-	t.push_back(make_trigger(var2, Trigger(this, 2), UpperBound));
-	t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
-	return t;
+    triggerCollection t;
+    t.push_back(make_trigger(var1, Trigger(this, -1), LowerBound));
+    t.push_back(make_trigger(var2, Trigger(this, -2), LowerBound));
+    t.push_back(make_trigger(var3, Trigger(this, -3), LowerBound));
+    t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
+    t.push_back(make_trigger(var2, Trigger(this, 2), UpperBound));
+    t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
+    return t;
   }
   
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
-	PROP_INFO_ADDONE(Mod);
+    PROP_INFO_ADDONE(Mod);
     // aiming at bounds(D)-consistency. 
     // Not achieved because we don't trigger on the supporting values, only bounds.
     
@@ -387,7 +387,7 @@ struct ModConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-	propagate(1,0); 
+    propagate(1,0); 
     /*propagate(2,0);
     propagate(3,0);
     propagate(-1,0);
@@ -397,17 +397,17 @@ struct ModConstraint : public AbstractConstraint
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-	D_ASSERT(v_size == 3);
-	return v[0] % v[1] == v[2];
+    D_ASSERT(v_size == 3);
+    return v[0] % v[1] == v[2];
   }
   
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> v;
-	v.push_back(var1);
-	v.push_back(var2);
-	v.push_back(var3);
-	return v;
+    v.push_back(var1);
+    v.push_back(var2);
+    v.push_back(var3);
+    return v;
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
@@ -445,7 +445,7 @@ BuildCT_MODULO(StateObj* stateObj, const V1& vars, const V2& var2, ConstraintBlo
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   return new ModConstraint<typename V1::value_type, typename V1::value_type,
-						   typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
+                           typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
 }
 
 #endif

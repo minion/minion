@@ -48,7 +48,7 @@ template<typename Var>
     { stable_sort(vals.begin(), vals.end()); }
 
   int dynamic_trigger_count()
-    {	return 2; }
+    { return 2; }
 
   virtual void full_propagate()
   {  

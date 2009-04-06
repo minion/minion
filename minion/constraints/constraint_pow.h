@@ -55,14 +55,14 @@ struct PowConstraint : public AbstractConstraint
   VarRef3 var3;
   
   PowConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
-	AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
   
-	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
-		 var3.getInitialMin() < 0)
-	  { 
-		  FAIL_EXIT("The 'pow' constraint only supports non-negative numbers at present.");
-	  }
+      if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
+         var3.getInitialMin() < 0)
+      { 
+          FAIL_EXIT("The 'pow' constraint only supports non-negative numbers at present.");
+      }
       if(var2.getInitialMin()==0)
       {
           FAIL_EXIT("The 'pow' constraint (x^y = z) does not allow y to contain 0, to avoid the case 0^0.");
@@ -71,14 +71,14 @@ struct PowConstraint : public AbstractConstraint
   
   virtual triggerCollection setup_internal()
   {
-	triggerCollection t;
-	t.push_back(make_trigger(var1, Trigger(this, -1), LowerBound));
-	t.push_back(make_trigger(var2, Trigger(this, -2), LowerBound));
-	t.push_back(make_trigger(var3, Trigger(this, -3), LowerBound));
-	t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-	t.push_back(make_trigger(var2, Trigger(this, 2), UpperBound));
-	t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
-	return t;
+    triggerCollection t;
+    t.push_back(make_trigger(var1, Trigger(this, -1), LowerBound));
+    t.push_back(make_trigger(var2, Trigger(this, -2), LowerBound));
+    t.push_back(make_trigger(var3, Trigger(this, -3), LowerBound));
+    t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
+    t.push_back(make_trigger(var2, Trigger(this, 2), UpperBound));
+    t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
+    return t;
   }
   
   inline DomainInt roundup(double x)
@@ -119,55 +119,55 @@ struct PowConstraint : public AbstractConstraint
   
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
-	PROP_INFO_ADDONE(Pow);
-	switch(flag)
-	{
-	  case -1:
-	  {
+    PROP_INFO_ADDONE(Pow);
+    switch(flag)
+    {
+      case -1:
+      {
         // var3 >= min(var1) ^ min(var2)
-		var3.setMin(LRINT(my_pow(var1.getMin(),var2.getMin())));
-		DomainInt var1_min = var1.getMin();
-		if(var1_min > 1)
+        var3.setMin(LRINT(my_pow(var1.getMin(),var2.getMin())));
+        DomainInt var1_min = var1.getMin();
+        if(var1_min > 1)
           // var2 <= log base max(var3) of min(var1)
-		  var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
-		break;
-	  }
-	  case -2:
+          var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
+        break;
+      }
+      case -2:
         // var3>= min(var1) ^ min(var2) 
-	    var3.setMin(LRINT(my_pow(var1.getMin(), var2.getMin())));
-		var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
-		break;
-		
-	  case -3:
-	  {
-		var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
-		DomainInt var1_max = var1.getMax();
-		if(var1_max > 1)
-		  var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
-		break;
-	  }
-	  case 1:
-	  {
-		var3.setMax(rounddown(my_pow(var1.getMax(),var2.getMax())));  // wraparound was occurring here, so use rounddown
-		DomainInt var1_max = var1.getMax();
-		if(var1_max > 1)
-		  var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
-		break;
-	  }
-	  case 2:
-	    var3.setMax(rounddown(my_pow(var1.getMax(), var2.getMax())));  // wraparound here.
-		var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
-		break;
-		
-	  case 3:
-	  {
-		var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
-		DomainInt var1_min = var1.getMin();
-		if(var1_min > 1)
-		  var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
-		break;
-	  }
-	}
+        var3.setMin(LRINT(my_pow(var1.getMin(), var2.getMin())));
+        var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
+        break;
+        
+      case -3:
+      {
+        var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
+        DomainInt var1_max = var1.getMax();
+        if(var1_max > 1)
+          var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
+        break;
+      }
+      case 1:
+      {
+        var3.setMax(rounddown(my_pow(var1.getMax(),var2.getMax())));  // wraparound was occurring here, so use rounddown
+        DomainInt var1_max = var1.getMax();
+        if(var1_max > 1)
+          var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
+        break;
+      }
+      case 2:
+        var3.setMax(rounddown(my_pow(var1.getMax(), var2.getMax())));  // wraparound here.
+        var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
+        break;
+        
+      case 3:
+      {
+        var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
+        DomainInt var1_min = var1.getMin();
+        if(var1_min > 1)
+          var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
+        break;
+      }
+    }
   }
   
   virtual void full_propagate()
@@ -182,17 +182,17 @@ struct PowConstraint : public AbstractConstraint
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-	D_ASSERT(v_size == 3);
-	return my_pow(v[0],v[1]) == v[2];
+    D_ASSERT(v_size == 3);
+    return my_pow(v[0],v[1]) == v[2];
   }
   
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> v;
-	v.push_back(var1);
-	v.push_back(var2);
-	v.push_back(var3);
-	return v;
+    v.push_back(var1);
+    v.push_back(var2);
+    v.push_back(var3);
+    return v;
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
@@ -234,7 +234,7 @@ BuildCT_POW(StateObj* stateObj, const V1& vars, const V2& var2, ConstraintBlob&)
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   return new PowConstraint<typename V1::value_type, typename V1::value_type,
-						   typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
+                           typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
 }
 
 #endif

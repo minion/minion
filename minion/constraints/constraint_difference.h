@@ -53,7 +53,7 @@ struct DifferenceConstraint : public AbstractConstraint
   VarRef2 var2;
   VarRef3 var3;
   DifferenceConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
-	AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {  }
   
   virtual triggerCollection setup_internal()
@@ -90,12 +90,12 @@ struct DifferenceConstraint : public AbstractConstraint
     
   PROPAGATE_FUNCTION(int, DomainDelta)
   {
-	  PROP_INFO_ADDONE(Difference);
-	
-	  DomainInt var1_min = var1.getMin();
-	  DomainInt var1_max = var1.getMax();
-	  DomainInt var2_min = var2.getMin();
-	  DomainInt var2_max = var2.getMax();
+      PROP_INFO_ADDONE(Difference);
+    
+      DomainInt var1_min = var1.getMin();
+      DomainInt var1_max = var1.getMax();
+      DomainInt var2_min = var2.getMin();
+      DomainInt var2_max = var2.getMax();
 
     P(var1_min << var1_max << var2_min << var2_max << var3.getMin() << var3.getMax());
 
@@ -146,10 +146,10 @@ struct DifferenceConstraint : public AbstractConstraint
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-	  D_ASSERT(v_size == 3);
+      D_ASSERT(v_size == 3);
     int abs_val = v[0] - v[1];
     if(abs_val < 0) abs_val = - abs_val;
-	  return abs_val == v[2];
+      return abs_val == v[2];
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)

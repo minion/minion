@@ -66,18 +66,18 @@ public:
   
   inline void pushTriggers(TriggerRange new_triggers)
   { 
-	CON_INFO_ADDONE(AddConToQueue);
+    CON_INFO_ADDONE(AddConToQueue);
 #ifdef WEIGHTED_TRIGGERS
-	propagate_trigger_list.push(new_triggers); 
+    propagate_trigger_list.push(new_triggers); 
 #else
-	propagate_trigger_list.push_back(new_triggers); 
+    propagate_trigger_list.push_back(new_triggers); 
 #endif
   }
   
 #ifdef DYNAMICTRIGGERS
   void pushDynamicTriggers(DynamicTrigger* new_dynamic_trig_range)
   { 
-	CON_INFO_ADDONE(AddDynToQueue);
+    CON_INFO_ADDONE(AddDynToQueue);
     D_ASSERT(new_dynamic_trig_range->sanity_check_list());
     dynamic_trigger_list.push_back(new_dynamic_trig_range);   
   }
@@ -91,22 +91,22 @@ public:
       propagate_trigger_list.pop();
     }
 #else
-	propagate_trigger_list.clear();
+    propagate_trigger_list.clear();
 #endif
-	dynamic_trigger_list.clear();
-	
-	if(!special_triggers.empty())
-	{
-	  int size = special_triggers.size();
-	  for(int i = 0; i < size; ++i)
-		special_triggers[i]->special_unlock();
-	  special_triggers.clear();
-	}
+    dynamic_trigger_list.clear();
+    
+    if(!special_triggers.empty())
+    {
+      int size = special_triggers.size();
+      for(int i = 0; i < size; ++i)
+        special_triggers[i]->special_unlock();
+      special_triggers.clear();
+    }
   }
   
   bool isQueuesEmpty()
   { 
-	return propagate_trigger_list.empty() && dynamic_trigger_list.empty() &&
+    return propagate_trigger_list.empty() && dynamic_trigger_list.empty() &&
     special_triggers.empty();
   }
   
@@ -118,140 +118,140 @@ public:
   
   bool propagateDynamicTriggerLists()
   {
-	bool* fail_ptr = getState(stateObj).getFailedPtr();
-	while(!dynamic_trigger_list.empty())
-	{
-	  DynamicTrigger* t = dynamic_trigger_list.back();
-	  dynamic_trigger_list.pop_back();
-	  DynamicTrigger* it = t->next;
-	  
-	  while(it != t)
-	  {
+    bool* fail_ptr = getState(stateObj).getFailedPtr();
+    while(!dynamic_trigger_list.empty())
+    {
+      DynamicTrigger* t = dynamic_trigger_list.back();
+      dynamic_trigger_list.pop_back();
+      DynamicTrigger* it = t->next;
+      
+      while(it != t)
+      {
 #ifndef USE_SETJMP
-		if(*fail_ptr) 
-		{
-		  clearQueues();
-		  return true; 
-		}
+        if(*fail_ptr) 
+        {
+          clearQueues();
+          return true; 
+        }
 #endif
         
 #ifdef NO_DYN_CHECK
-		DynamicTrigger* next_queue_ptr;
+        DynamicTrigger* next_queue_ptr;
 #endif
-		next_queue_ptr = it->next;
-		CON_INFO_ADDONE(DynamicTrigger);
-		it->propagate();  
+        next_queue_ptr = it->next;
+        CON_INFO_ADDONE(DynamicTrigger);
+        it->propagate();  
 
 #ifdef WDEG
-		if(getOptions(stateObj).wdeg_on && *fail_ptr)
-		  it->constraint->incWdeg();
+        if(getOptions(stateObj).wdeg_on && *fail_ptr)
+          it->constraint->incWdeg();
 #endif
-		it = next_queue_ptr;
-	  }
-	}
-	return false;
+        it = next_queue_ptr;
+      }
+    }
+    return false;
   }
   
   bool propagateStaticTriggerLists()
   {
-	bool* fail_ptr = getState(stateObj).getFailedPtr();
-	while(!propagate_trigger_list.empty())
-	{
+    bool* fail_ptr = getState(stateObj).getFailedPtr();
+    while(!propagate_trigger_list.empty())
+    {
 #ifdef WEIGHTED_TRIGGERS
-	  TriggerRange t = propagate_trigger_list.top();
-	  int data_val = t.data;
-	  propagate_trigger_list.pop();
+      TriggerRange t = propagate_trigger_list.top();
+      int data_val = t.data;
+      propagate_trigger_list.pop();
 #else
-	  TriggerRange t = propagate_trigger_list.back();
-	  int data_val = t.data;
-	  propagate_trigger_list.pop_back();
+      TriggerRange t = propagate_trigger_list.back();
+      int data_val = t.data;
+      propagate_trigger_list.pop_back();
 #endif
-	  
-	  for(Trigger* it = t.begin(); it != t.end(); it++)
-	  {
+      
+      for(Trigger* it = t.begin(); it != t.end(); it++)
+      {
 #ifndef USE_SETJMP
-		if(*fail_ptr) 
-		{
-		  clearQueues();
-		  return true; 
-		}
+        if(*fail_ptr) 
+        {
+          clearQueues();
+          return true; 
+        }
 #endif
-		
+        
 #ifndef NO_DEBUG
-		if(getOptions(stateObj).fullpropagate)
-		  it->full_propagate();
-		else
-		{
-		  CON_INFO_ADDONE(StaticTrigger);
-		  it->propagate(data_val);
-		}
+        if(getOptions(stateObj).fullpropagate)
+          it->full_propagate();
+        else
+        {
+          CON_INFO_ADDONE(StaticTrigger);
+          it->propagate(data_val);
+        }
 #else
-		{
-		  CON_INFO_ADDONE(StaticTrigger);
-		  it->propagate(data_val);
-		}
+        {
+          CON_INFO_ADDONE(StaticTrigger);
+          it->propagate(data_val);
+        }
 #endif
 #ifdef WDEG
-		if(getOptions(stateObj).wdeg_on && *fail_ptr)
-		  it->constraint->incWdeg();
+        if(getOptions(stateObj).wdeg_on && *fail_ptr)
+          it->constraint->incWdeg();
 #endif
-	  }
-	}
-	
-	return false;
+      }
+    }
+    
+    return false;
   }
   
   inline void propagateQueue()
   {
 #ifdef USE_SETJMP
     int setjmp_return = SYSTEM_SETJMP(*(getState(stateObj).getJmpBufPtr()));
-	if(setjmp_return != 0)
-	{ // Failure has occured
-	  D_ASSERT(!getState(stateObj).isFailed());
-	  getState(stateObj).setFailed(true);
-	  getQueue(stateObj).clearQueues();
-	  printf("!\n");
-	  return;
-	}
+    if(setjmp_return != 0)
+    { // Failure has occured
+      D_ASSERT(!getState(stateObj).isFailed());
+      getState(stateObj).setFailed(true);
+      getQueue(stateObj).clearQueues();
+      printf("!\n");
+      return;
+    }
 #endif
-	
-	while(true)
-	{
+    
+    while(true)
+    {
 #ifdef DYNAMICTRIGGERS
-	  if (getState(stateObj).isDynamicTriggersUsed()) 
-	  {
-		while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
-		{
-		  if(propagateDynamicTriggerLists())
-			return;
-		  
-		  /* Don't like code duplication here but a slight efficiency gain */
-		  if(propagateStaticTriggerLists())
-			return;
-		}
-	  }
-	  else
-	  {
-		if(propagateStaticTriggerLists())
-		  return;
-	  }
+      if (getState(stateObj).isDynamicTriggersUsed()) 
+      {
+        while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
+        {
+          if(propagateDynamicTriggerLists())
+            return;
+          
+          /* Don't like code duplication here but a slight efficiency gain */
+          if(propagateStaticTriggerLists())
+            return;
+        }
+      }
+      else
+      {
+        if(propagateStaticTriggerLists())
+          return;
+      }
 #else
-	  if(propagateStaticTriggerLists())
-		return;
+      if(propagateStaticTriggerLists())
+        return;
 #endif
-	  
-	  if(special_triggers.empty())
-		return;
-	  
-	  AbstractConstraint* trig = special_triggers.back();
-	  special_triggers.pop_back();
-	  CON_INFO_ADDONE(SpecialTrigger);
-	  trig->special_check();
+      
+      if(special_triggers.empty())
+        return;
+      
+      AbstractConstraint* trig = special_triggers.back();
+      special_triggers.pop_back();
+      CON_INFO_ADDONE(SpecialTrigger);
+      trig->special_check();
 #ifdef WDEG
-	  if(getOptions(stateObj).wdeg_on && getState(stateObj).isFailed()) trig->incWdeg();
+      if(getOptions(stateObj).wdeg_on && getState(stateObj).isFailed()) trig->incWdeg();
 #endif
-	} // while(true)
-	
+    } // while(true)
+    
   } // end Function
   
 // ******************************************************************************************
@@ -259,27 +259,27 @@ public:
   
   bool propagateDynamicTriggerListsRoot()
   {
-	bool* fail_ptr = getState(stateObj).getFailedPtr();
-	while(!dynamic_trigger_list.empty())
-	{
-	  DynamicTrigger* t = dynamic_trigger_list.back();
-	  dynamic_trigger_list.pop_back();
-	  DynamicTrigger* it = t->next;
-	  
-	  while(it != t)
-	  {
+    bool* fail_ptr = getState(stateObj).getFailedPtr();
+    while(!dynamic_trigger_list.empty())
+    {
+      DynamicTrigger* t = dynamic_trigger_list.back();
+      dynamic_trigger_list.pop_back();
+      DynamicTrigger* it = t->next;
+      
+      while(it != t)
+      {
 #ifndef USE_SETJMP
-		if(*fail_ptr) 
-		{
-		  clearQueues();
-		  return true; 
-		}
+        if(*fail_ptr) 
+        {
+          clearQueues();
+          return true; 
+        }
 #endif
         
 #ifdef NO_DYN_CHECK
-		DynamicTrigger* next_queue_ptr;
+        DynamicTrigger* next_queue_ptr;
 #endif
-		next_queue_ptr = it->next;
+        next_queue_ptr = it->next;
         
         if(it->constraint->full_propagate_done)
         {
@@ -287,108 +287,108 @@ public:
             it->propagate();
         }
         
-		it = next_queue_ptr;
-	  }
-	}
-	return false;
+        it = next_queue_ptr;
+      }
+    }
+    return false;
   }
   
   bool propagateStaticTriggerListsRoot()
   {
-	bool* fail_ptr = getState(stateObj).getFailedPtr();
-	while(!propagate_trigger_list.empty())
-	{
+    bool* fail_ptr = getState(stateObj).getFailedPtr();
+    while(!propagate_trigger_list.empty())
+    {
 #ifdef WEIGHTED_TRIGGERS
-	  TriggerRange t = propagate_trigger_list.top();
-	  int data_val = t.data;
-	  propagate_trigger_list.pop();
+      TriggerRange t = propagate_trigger_list.top();
+      int data_val = t.data;
+      propagate_trigger_list.pop();
 #else
-	  TriggerRange t = propagate_trigger_list.back();
-	  int data_val = t.data;
-	  propagate_trigger_list.pop_back();
+      TriggerRange t = propagate_trigger_list.back();
+      int data_val = t.data;
+      propagate_trigger_list.pop_back();
 #endif
-	  
-	  for(Trigger* it = t.begin(); it != t.end(); it++)
-	  {
+      
+      for(Trigger* it = t.begin(); it != t.end(); it++)
+      {
 #ifndef USE_SETJMP
-		if(*fail_ptr) 
-		{
-		  clearQueues();
-		  return true; 
-		}
+        if(*fail_ptr) 
+        {
+          clearQueues();
+          return true; 
+        }
 #endif
-		if(it->constraint->full_propagate_done)
+        if(it->constraint->full_propagate_done)
         {
 #ifndef NO_DEBUG
-		if(getOptions(stateObj).fullpropagate)
-		  it->full_propagate();
-		else
-		{
-		  CON_INFO_ADDONE(StaticTrigger);
-		  it->propagate(data_val);
-		}
+        if(getOptions(stateObj).fullpropagate)
+          it->full_propagate();
+        else
+        {
+          CON_INFO_ADDONE(StaticTrigger);
+          it->propagate(data_val);
+        }
 #else
-		{
-		  CON_INFO_ADDONE(StaticTrigger);
-		  it->propagate(data_val);
-		}
+        {
+          CON_INFO_ADDONE(StaticTrigger);
+          it->propagate(data_val);
+        }
 #endif
         }
-	  }
-	}
-	
-	return false;
+      }
+    }
+    
+    return false;
   }
   
   inline void propagateQueueRoot()
   {
 #ifdef USE_SETJMP
     int setjmp_return = SYSTEM_SETJMP(*(getState(stateObj).getJmpBufPtr()));
-	if(setjmp_return != 0)
-	{ // Failure has occured
-	  D_ASSERT(!getState(stateObj).isFailed());
-	  getState(stateObj).setFailed(true);
-	  getQueue(stateObj).clearQueues();
-	  printf("!\n");
-	  return;
-	}
+    if(setjmp_return != 0)
+    { // Failure has occured
+      D_ASSERT(!getState(stateObj).isFailed());
+      getState(stateObj).setFailed(true);
+      getQueue(stateObj).clearQueues();
+      printf("!\n");
+      return;
+    }
 #endif
-	
-	while(true)
-	{
+    
+    while(true)
+    {
 #ifdef DYNAMICTRIGGERS
-	  if (getState(stateObj).isDynamicTriggersUsed()) 
-	  {
-		while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
-		{
-		  if(propagateDynamicTriggerListsRoot())
-			return;
-		  
-		  /* Don't like code duplication here but a slight efficiency gain */
-		  if(propagateStaticTriggerListsRoot())
-			return;
-		}
-	  }
-	  else
-	  {
-		if(propagateStaticTriggerListsRoot())
-		  return;
-	  }
+      if (getState(stateObj).isDynamicTriggersUsed()) 
+      {
+        while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
+        {
+          if(propagateDynamicTriggerListsRoot())
+            return;
+          
+          /* Don't like code duplication here but a slight efficiency gain */
+          if(propagateStaticTriggerListsRoot())
+            return;
+        }
+      }
+      else
+      {
+        if(propagateStaticTriggerListsRoot())
+          return;
+      }
 #else
-	  if(propagateStaticTriggerListsRoot())
-		return;
+      if(propagateStaticTriggerListsRoot())
+        return;
 #endif
-	  
-	  if(special_triggers.empty())
-		return;
-	  
-	  AbstractConstraint* trig = special_triggers.back();
-	  special_triggers.pop_back();
-	  CON_INFO_ADDONE(SpecialTrigger);
-	  trig->special_check();
+      
+      if(special_triggers.empty())
+        return;
+      
+      AbstractConstraint* trig = special_triggers.back();
+      special_triggers.pop_back();
+      CON_INFO_ADDONE(SpecialTrigger);
+      trig->special_check();
 
-	} // while(true)
-	
+    } // while(true)
+    
   } // end Function
 };  
 
@@ -397,6 +397,6 @@ public:
 // Just checking the bounds doesn't make sense here, so we ignore it.
 //template<typename Vars>
 //inline void propagate_queue_vars(StateObj* stateObj, Vars& vars, bool /*CheckBounds*/)
-//{	getQueue(stateObj).propagateQueue(); }
+//{ getQueue(stateObj).propagateQueue(); }
 
 #endif

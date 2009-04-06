@@ -66,9 +66,9 @@ struct Dynamic_reify_true_old : public AbstractConstraint
   
   virtual vector<AnyVarRef> get_vars()
   { 
-	  vector<AnyVarRef> vec = poscon->get_vars();
-	  vec.push_back(rar_var);
-	  return vec;
+      vector<AnyVarRef> vec = poscon->get_vars();
+      vec.push_back(rar_var);
+      return vec;
   }
   
   virtual int dynamic_trigger_count() 
@@ -90,35 +90,35 @@ struct Dynamic_reify_true_old : public AbstractConstraint
   virtual void special_check()
   {
     D_ASSERT(constraint_locked);
-	  constraint_locked = false;
-	  poscon->full_propagate();
+    constraint_locked = false;
+    poscon->full_propagate();
     full_propagate_called = true;
   }
   
   virtual void special_unlock()
   {
     D_ASSERT(constraint_locked);
-	  constraint_locked = false;
+    constraint_locked = false;
   }
   
   PROPAGATE_FUNCTION(DynamicTrigger* trig)
   {
-	  PROP_INFO_ADDONE(ReifyTrue);
+    PROP_INFO_ADDONE(ReifyTrue);
     P("ReifyImply Prop");
     
     if(constraint_locked)
-	    return;
+        return;
 
-	  DynamicTrigger* dt = dynamic_trigger_start();
-	  DynamicTrigger* assign_trigs = dt + 1;
-	    
-	  P("Trigger: " << trig - dt);
-	          
-  	if(trig == dt)
+    DynamicTrigger* dt = dynamic_trigger_start();
+    DynamicTrigger* assign_trigs = dt + 1;
+      
+    P("Trigger: " << trig - dt);
+              
+    if(trig == dt)
     {
       D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
- 	    constraint_locked = true;
-	    getQueue(stateObj).pushSpecialTrigger(this);
+      constraint_locked = true;
+      getQueue(stateObj).pushSpecialTrigger(this);
       return;
     }
     
@@ -195,8 +195,8 @@ struct Dynamic_reify_true_old : public AbstractConstraint
     }
     if(rar_var.isAssigned() && rar_var.getAssignedValue() > 0)
     {
-	    poscon->full_propagate();
-	    full_propagate_called = true;
+        poscon->full_propagate();
+        full_propagate_called = true;
     }
   }
 };

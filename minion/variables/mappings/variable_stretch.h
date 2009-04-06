@@ -69,7 +69,7 @@ struct MultiplyHelp<BoolVarRef>
   
   static inline int round_up(int val, int divisor)
   {
-	if(
+    if(
   }
   
 };*/
@@ -119,70 +119,70 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
   
   BOOL isAssignedValue(DomainInt i) const
   { 
-    if(!data.isAssigned()) return false;	
-	  return this->getAssignedValue() == i;
+    if(!data.isAssigned()) return false;    
+      return this->getAssignedValue() == i;
   }
   
   BOOL inDomain(DomainInt b) const
   { 
     if((b - dataMap.shift()) % dataMap.multiply() != 0)
-	    return false;
-	  return data.inDomain(MapHelp::divide_exact(b - dataMap.shift(), dataMap));
+        return false;
+      return data.inDomain(MapHelp::divide_exact(b - dataMap.shift(), dataMap));
   }
   
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { 
     if(b % dataMap.multiply() != 0)
-	  return false;
-  	return data.inDomain(MapHelp::divide_exact(b - dataMap.shift(), dataMap));
+      return false;
+    return data.inDomain(MapHelp::divide_exact(b - dataMap.shift(), dataMap));
   }
   
   DomainInt getMax() const
   {  
     if(dataMap.multiply() >= 0)
       return data.getMax() * dataMap.multiply() + dataMap.shift(); 
-  	else
-	  return data.getMin() * dataMap.multiply() + dataMap.shift();
+    else
+      return data.getMin() * dataMap.multiply() + dataMap.shift();
   }
   
   DomainInt getMin() const
   { 
     if(dataMap.multiply() >= 0)
-	  return data.getMin() * dataMap.multiply() + dataMap.shift(); 
-	    else
-	  return data.getMax() * dataMap.multiply() + dataMap.shift();  
+      return data.getMin() * dataMap.multiply() + dataMap.shift(); 
+        else
+      return data.getMax() * dataMap.multiply() + dataMap.shift();  
   }
 
   DomainInt getInitialMax() const
   {  
     if(dataMap.multiply() >= 0)
       return data.getInitialMax() * dataMap.multiply() + dataMap.shift(); 
-	else
-	  return data.getInitialMin() * dataMap.multiply() + dataMap.shift();
+    else
+      return data.getInitialMin() * dataMap.multiply() + dataMap.shift();
   }
   
   DomainInt getInitialMin() const
   { 
     if(dataMap.multiply() >= 0)
-	  return data.getInitialMin() * dataMap.multiply() + dataMap.shift(); 
-	else
-	  return data.getInitialMax() * dataMap.multiply() + dataMap.shift();  
+      return data.getInitialMin() * dataMap.multiply() + dataMap.shift(); 
+    else
+      return data.getInitialMax() * dataMap.multiply() + dataMap.shift();  
   }
   
   void setMax(DomainInt i)
   { 
     if(dataMap.multiply() >= 0)
       data.setMax(MapHelp::round_down(i, dataMap.multiply())); 
-	else
-	  data.setMin(MapHelp::round_up(-i, -dataMap.multiply()));  
+    else
+      data.setMin(MapHelp::round_up(-i, -dataMap.multiply()));  
   }
   
   void setMin(DomainInt i)
   { 
     if(Multiply >= 0)
-	  data.setMin(MapHelp::round_up(i, dataMap.multiply()));
-	else
-	  data.setMax(MapHelp::round_down(-i, dataMap.multiply()));  
+      data.setMin(MapHelp::round_up(i, dataMap.multiply()));
+    else
+      data.setMax(MapHelp::round_down(-i, dataMap.multiply()));  
   }
   
   void uncheckedAssign(DomainInt b)
@@ -200,23 +200,23 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
   void addTrigger(Trigger t, TrigType type)
   { 
     switch(type)
-	{
-	  case UpperBound:
-		if(Multiply>=0)
-		  data.addTrigger(t, UpperBound);
-		else
-		  data.addTrigger(t, LowerBound);
-		break;
-	  case LowerBound:
-		if(Multiply>=0)
-		  data.addTrigger(t, LowerBound);
-		else
-		  data.addTrigger(t, UpperBound);
-		break;
-	  case Assigned:
-	  case DomainChanged:
-	    data.addTrigger(t, type);
-	}
+    {
+      case UpperBound:
+        if(Multiply>=0)
+          data.addTrigger(t, UpperBound);
+        else
+          data.addTrigger(t, LowerBound);
+        break;
+      case LowerBound:
+        if(Multiply>=0)
+          data.addTrigger(t, LowerBound);
+        else
+          data.addTrigger(t, UpperBound);
+        break;
+      case Assigned:
+      case DomainChanged:
+        data.addTrigger(t, type);
+    }
   }
 
 #ifdef DYNAMICTRIGGERS
@@ -283,70 +283,70 @@ struct MultiplyVar
   BOOL isAssignedValue(DomainInt i) const
   { 
     if(!data.isAssigned()) return false;
-	
-	return data.getAssignedValue() == i * Multiply;
+    
+    return data.getAssignedValue() == i * Multiply;
   }
   
   BOOL inDomain(DomainInt b) const
   { 
     if(b % Multiply != 0)
-	  return false;
-	return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
+      return false;
+    return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
   
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { 
     if(b % Multiply != 0)
-	  return false;
-	return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
+      return false;
+    return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
   
   DomainInt getMax() const
   {  
     if(Multiply >= 0)
       return data.getMax() * Multiply; 
-	else
-	  return data.getMin() * Multiply;
+    else
+      return data.getMin() * Multiply;
   }
   
   DomainInt getMin() const
   { 
     if(Multiply >= 0)
-	  return data.getMin() * Multiply; 
-	else
-	  return data.getMax() * Multiply;  
+      return data.getMin() * Multiply; 
+    else
+      return data.getMax() * Multiply;  
   }
 
   DomainInt getInitialMax() const
   {  
     if(Multiply >= 0)
       return data.getInitialMax() * Multiply; 
-	else
-	  return data.getInitialMin() * Multiply;
+    else
+      return data.getInitialMin() * Multiply;
   }
   
   DomainInt getInitialMin() const
   { 
     if(Multiply >= 0)
-	  return data.getInitialMin() * Multiply; 
-	else
-	  return data.getInitialMax() * Multiply;  
+      return data.getInitialMin() * Multiply; 
+    else
+      return data.getInitialMax() * Multiply;  
   }
   
   void setMax(DomainInt i)
   { 
     if(Multiply >= 0)
       data.setMax(MultiplyHelp<VarRef>::round_down(i, Multiply)); 
-	else
-	  data.setMin(MultiplyHelp<VarRef>::round_up(-i, -Multiply));  
+    else
+      data.setMin(MultiplyHelp<VarRef>::round_up(-i, -Multiply));  
   }
   
   void setMin(DomainInt i)
   { 
     if(Multiply >= 0)
-	  data.setMin(MultiplyHelp<VarRef>::round_up(i, Multiply));
-	else
-	  data.setMax(MultiplyHelp<VarRef>::round_down(-i, -Multiply));  
+      data.setMin(MultiplyHelp<VarRef>::round_up(i, Multiply));
+    else
+      data.setMax(MultiplyHelp<VarRef>::round_down(-i, -Multiply));  
   }
   
   void uncheckedAssign(DomainInt b)
@@ -367,26 +367,26 @@ struct MultiplyVar
   void addTrigger(Trigger t, TrigType type)
   { 
     switch(type)
-	{
-	  case UpperBound:
-		if(Multiply>=0)
-		  data.addTrigger(t, UpperBound);
-		else
-		  data.addTrigger(t, LowerBound);
-		break;
-	  case LowerBound:
-		if(Multiply>=0)
-		  data.addTrigger(t, LowerBound);
-		else
-		  data.addTrigger(t, UpperBound);
-		break;
-	  case Assigned:
-	  case DomainChanged:
-	    data.addTrigger(t, type);
+    {
+      case UpperBound:
+        if(Multiply>=0)
+          data.addTrigger(t, UpperBound);
+        else
+          data.addTrigger(t, LowerBound);
+        break;
+      case LowerBound:
+        if(Multiply>=0)
+          data.addTrigger(t, LowerBound);
+        else
+          data.addTrigger(t, UpperBound);
+        break;
+      case Assigned:
+      case DomainChanged:
+        data.addTrigger(t, type);
       break;
-	  default:
+      default:
       D_FATAL_ERROR("Fatal error in 'stretch' wrapper");
-	}
+    }
   }
 
 #ifdef DYNAMICTRIGGERS

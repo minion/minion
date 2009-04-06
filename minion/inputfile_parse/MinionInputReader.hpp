@@ -36,7 +36,7 @@ typename T::value_type& index(T& container, int index_pos)
 {
   if(index_pos < 0 || index_pos >= (int)container.size())
     throw parse_exception("Index position " + to_string(index_pos) + 
-							  " out of range");
+                          " out of range");
   return container[index_pos];
 }
 
@@ -87,7 +87,7 @@ template<typename FileReader>
 vector<Var> MinionInputReader<FileReader>::getColOfMatrix(vector<vector<Var> >& matrix, int colNo) {
   vector<Var> result ;
   for (unsigned int rowIndex = 0; rowIndex < matrix.size(); rowIndex++) {
-	result.push_back(matrix.at(rowIndex).at(colNo)) ;
+    result.push_back(matrix.at(rowIndex).at(colNo)) ;
   }
   return result ;
 }
@@ -97,7 +97,7 @@ vector<Var> MinionInputReader<FileReader>::getColOfMatrix(vector<vector<Var> >& 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 vector<Var> MinionInputReader<FileReader>::getRowThroughTensor(
-												   vector< vector< vector<Var> > >& tensor, int rowNo, int colNo) {
+                                                   vector< vector< vector<Var> > >& tensor, int rowNo, int colNo) {
   vector<Var> result ;
   for (unsigned int planeIndex = 0; planeIndex < tensor.size() ; planeIndex ++) {
     vector< vector<Var> >& plane = tensor.at(planeIndex) ;
@@ -117,30 +117,30 @@ void MinionInputReader<FileReader>::read(FileReader* infile) {
     parser_info(string("Read comment line:") + infile->getline());
 
 
-	readVars(infile) ;
-	readVarOrder(infile) ;
-	readValOrder(infile) ;
-	readMatrices(infile) ;
-	
-	// At this point, may or may not have a tuples entry
-	{
-	  string s = infile->get_string();
-	  if(s == "tuplelists")
-	  {
-	    readTuples(infile);
-		s = infile->get_string();
-	  }
-	  if(s == "objective")
-	    readObjective(infile);
-	  else
-	  {
-	    throw parse_exception("I don't understand: " + s + ". Did you mean "
-								  " tuplelists or objective?");
-	  }
-	}
-	readPrint(infile);
-	
-	while(readConstraint(infile, false)) ;
+    readVars(infile) ;
+    readVarOrder(infile) ;
+    readValOrder(infile) ;
+    readMatrices(infile) ;
+    
+    // At this point, may or may not have a tuples entry
+    {
+      string s = infile->get_string();
+      if(s == "tuplelists")
+      {
+        readTuples(infile);
+        s = infile->get_string();
+      }
+      if(s == "objective")
+        readObjective(infile);
+      else
+      {
+        throw parse_exception("I don't understand: " + s + ". Did you mean "
+                                  " tuplelists or objective?");
+      }
+    }
+    readPrint(infile);
+    
+    while(readConstraint(infile, false)) ;
 
 }
 
@@ -158,40 +158,40 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
   int constraint_num = -1;
   for(int i = 0; i < num_of_constraints; ++i)
   {
-	if(constraint_list[i].name == id)
-	{
-	  constraint_num = i;
-	  break;
-	}
+    if(constraint_list[i].name == id)
+    {
+      constraint_num = i;
+      break;
+    }
   }
   
   if(constraint_num == -1) 
   {
-	if (infile->eof()) 
-	{
-	  parser_info("Done.") ;
-	  return false;
-	}
-	else
-	{ throw parse_exception(string("Unknown Constraint:") + id); }
+    if (infile->eof()) 
+    {
+      parser_info("Done.") ;
+      return false;
+    }
+    else
+    { throw parse_exception(string("Unknown Constraint:") + id); }
   }
   ConstraintDef* constraint = constraint_list + constraint_num;
  
   switch(constraint->type)
   {
 #ifdef CT_WATCHED_TABLE_ABC
-	case CT_WATCHED_TABLE:
-	  readConstraintTable(infile, get_constraint(constraint->type));
-	  break;
+    case CT_WATCHED_TABLE:
+      readConstraintTable(infile, get_constraint(constraint->type));
+      break;
 #endif
 #ifdef CT_WATCHED_NEGATIVE_TABLE_ABC
-	case CT_WATCHED_NEGATIVE_TABLE:
-	  readConstraintTable(infile, get_constraint(constraint->type));
-	  break;
+    case CT_WATCHED_NEGATIVE_TABLE:
+      readConstraintTable(infile, get_constraint(constraint->type));
+      break;
 #endif
 
-	default:
-	  readGeneralConstraint(infile, constraint);
+    default:
+      readGeneralConstraint(infile, constraint);
   }
   
   instance.bounds_check_last_constraint();
@@ -211,32 +211,32 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
   for(int i = 0; i < def->number_of_params; ++i)
   {
     switch(def->read_types[i])
-	{
-	  case read_list:
-	    varsblob.push_back(readVectorExpression(infile));
-		break;
-	  case read_var:
-	    varsblob.push_back(make_vec(readIdentifier(infile)));
-		break;
-		case read_bool_var:
+    {
+      case read_list:
+        varsblob.push_back(readVectorExpression(infile));
+        break;
+      case read_var:
+        varsblob.push_back(make_vec(readIdentifier(infile)));
+        break;
+        case read_bool_var:
       varsblob.push_back(make_vec(readIdentifier(infile)));
       if(varsblob.back().back().type() != VAR_BOOL)
         throw parse_exception("Expected Boolean variable!");
     break;
     
-	  case read_2_vars:
-	  {
-	    vector<Var> vars(2);
-	    vars[0] = readIdentifier(infile);
-	    infile->check_sym(',');
-	    vars[1] = readIdentifier(infile);
+      case read_2_vars:
+      {
+        vector<Var> vars(2);
+        vars[0] = readIdentifier(infile);
+        infile->check_sym(',');
+        vars[1] = readIdentifier(infile);
             varsblob.push_back(MOVE(vars));
-	  }
-		break;
-		case read_constraint:
-		{
-		  // This slightly weird way of getting a constraint is to avoid having to make
-		  // significant changes to the old parser.
+      }
+        break;
+        case read_constraint:
+        {
+          // This slightly weird way of getting a constraint is to avoid having to make
+          // significant changes to the old parser.
       readConstraint(infile, false);
       ConstraintBlob new_con = instance.constraints.back();
       instance.constraints.pop_back();
@@ -245,28 +245,28 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
     break;
     case read_constraint_list:
     throw parse_exception("Watched or is not supported by this parser. Use 'MINION 3'");
-	  case read_constant:
-	    constblob.push_back(make_vec(infile->read_num()));
-		break;
-	  case read_constant_list:
-	  {
-		vector<Var> vectorOfConst(readVectorExpression(infile)) ;
+      case read_constant:
+        constblob.push_back(make_vec(infile->read_num()));
+        break;
+      case read_constant_list:
+      {
+        vector<Var> vectorOfConst(readVectorExpression(infile)) ;
     vector<int> vals;
-		for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
-		{
-		  if(vectorOfConst[loop].type() != VAR_CONSTANT)
-			  throw parse_exception("Vector must only contain constants.");
-			else
+        for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
+        {
+          if(vectorOfConst[loop].type() != VAR_CONSTANT)
+              throw parse_exception("Vector must only contain constants.");
+            else
         vals.push_back(vectorOfConst[loop].pos());
-		}
-		constblob.push_back(vals);
-	  }
-		break;  
-	  default:
-	    D_FATAL_ERROR("Internal Error!");
-	}
-	if(i != def->number_of_params - 1)
-	  infile->check_sym(',');
+        }
+        constblob.push_back(vals);
+      }
+        break;  
+      default:
+        D_FATAL_ERROR("Internal Error!");
+    }
+    if(i != def->number_of_params - 1)
+      infile->check_sym(',');
   }
   infile->check_sym(')');
 }
@@ -312,51 +312,51 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
   
   char next_char = infile->peek_char();
   if(next_char != 't' && next_char != '{')
-	throw parse_exception("Expected either 't' or a tuple list");
+    throw parse_exception("Expected either 't' or a tuple list");
   
   TupleList* tuplelist;
   
   if(next_char == 't')
   {
-	infile->check_sym('t');
-	int tuple_num = infile->read_num();
-	if(tuple_num >= instance.tupleListContainer->size())
-	{
-	  throw parse_exception("There are only " + to_string(instance.tupleListContainer->size()) +
-								" tuplelists, requested " + to_string(tuple_num) + ".");
-	}
-	tuplelist = instance.tupleListContainer->getTupleList(tuple_num);
+    infile->check_sym('t');
+    int tuple_num = infile->read_num();
+    if(tuple_num >= instance.tupleListContainer->size())
+    {
+      throw parse_exception("There are only " + to_string(instance.tupleListContainer->size()) +
+                                " tuplelists, requested " + to_string(tuple_num) + ".");
+    }
+    tuplelist = instance.tupleListContainer->getTupleList(tuple_num);
   }
   else
   {
-	vector<vector<int> > tuples ;
-	infile->check_sym('{');
-	while (delim != '}') 
-	{
-	  infile->check_sym('<');
-	  vector<int> tuple(tupleSize);
-	  elem = infile->read_num() ;
-	  tuple[0] = elem ;
-	  for (count = 1; count < tupleSize; count++) 
-	  {
-		infile->check_sym(',');
-		elem = infile->read_num() ;
-		tuple[count] = elem ;
-	  }
-	  infile->check_sym('>');
-	  tuples.push_back(tuple) ;
-	  delim = infile->get_char();                          // ',' or '}'
-	  if(delim != ',' && delim!= '}')
-		throw parse_exception("Expected ',' or '}'");
-	}
-	tuplelist = instance.tupleListContainer->getNewTupleList(tuples);
+    vector<vector<int> > tuples ;
+    infile->check_sym('{');
+    while (delim != '}') 
+    {
+      infile->check_sym('<');
+      vector<int> tuple(tupleSize);
+      elem = infile->read_num() ;
+      tuple[0] = elem ;
+      for (count = 1; count < tupleSize; count++) 
+      {
+        infile->check_sym(',');
+        elem = infile->read_num() ;
+        tuple[count] = elem ;
+      }
+      infile->check_sym('>');
+      tuples.push_back(tuple) ;
+      delim = infile->get_char();                          // ',' or '}'
+      if(delim != ',' && delim!= '}')
+        throw parse_exception("Expected ',' or '}'");
+    }
+    tuplelist = instance.tupleListContainer->getNewTupleList(tuples);
   instance.addUnnamedTableSymbol(tuplelist);
   }
-	
-	infile->check_sym(')');
-	ConstraintBlob tableCon(def, vectorOfVars);
-	tableCon.tuples = tuplelist;
-	instance.add_constraint(tableCon);
+    
+    infile->check_sym(')');
+    ConstraintBlob tableCon(def, vectorOfVars);
+    tableCon.tuples = tuplelist;
+    instance.add_constraint(tableCon);
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -371,22 +371,22 @@ Var MinionInputReader<FileReader>::readIdentifier(FileReader* infile) {
   char idChar = infile->peek_char();
   if ((('0' <= idChar) && ('9' >= idChar)) || idChar == '-') {
     int i = infile->read_num();
-	return Var(VAR_CONSTANT, i);
+    return Var(VAR_CONSTANT, i);
   }
   int index = -1 ;
   
   if(idChar != 'x' && idChar != 'n')
   {
     string s("Found 'X', expected 'x' or 'n' at start of a variable");
-	s[7] = idChar;
+    s[7] = idChar;
     throw parse_exception(s);
   }
   
   if(idChar == 'x')
   {
-	// Eat the 'x'.
-	infile->check_sym('x');
-	index = infile->read_num();
+    // Eat the 'x'.
+    infile->check_sym('x');
+    index = infile->read_num();
     return instance.vars.get_var(idChar, index);
   }
   
@@ -444,7 +444,7 @@ vector<Var> MinionInputReader<FileReader>::readLiteralVector(FileReader* infile)
   // that we peek it is in case whis is an empty vector.
   
   char delim = infile->peek_char();
-    	
+        
   if(delim == ']')
   {
     // Eat the ']'
@@ -454,15 +454,15 @@ vector<Var> MinionInputReader<FileReader>::readLiteralVector(FileReader* infile)
   else
   {
     while (delim != ']') {
-	  newVector.push_back(readIdentifier(infile)) ;
-	  delim = infile->get_char();
-	     if(delim != ',' && delim != ']')
-	     {
-		   // replace X with the character we got.
-		   string s = "Expected ',' or ']'. Got 'X'.";
-		   s[s.size() - 3] = delim;
-		   throw parse_exception(s);
-	     }
+      newVector.push_back(readIdentifier(infile)) ;
+      delim = infile->get_char();
+         if(delim != ',' && delim != ']')
+         {
+           // replace X with the character we got.
+           string s = "Expected ',' or ']'. Got 'X'.";
+           s[s.size() - 3] = delim;
+           throw parse_exception(s);
+         }
       }
   }
   // Squeeze vector to smallest size.
@@ -513,16 +513,16 @@ void MinionInputReader<FileReader>::readTuples(FileReader* infile) {
   for(int counter = 0; counter < tuple_count; counter++)
   {
     int num_of_tuples = infile->read_num();
-	int tuple_length = infile->read_num();
-	TupleList* tuplelist = instance.tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
-	instance.addUnnamedTableSymbol(tuplelist);
-	int* tuple_ptr = tuplelist->getPointer();
-	for(int i = 0; i < num_of_tuples; ++i)
-	  for(int j = 0; j < tuple_length; ++j)
-	  {
-	    tuple_ptr[i * tuple_length + j] = infile->read_num();
-	  }
-	tuplelist->finalise_tuples();
+    int tuple_length = infile->read_num();
+    TupleList* tuplelist = instance.tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
+    instance.addUnnamedTableSymbol(tuplelist);
+    int* tuple_ptr = tuplelist->getPointer();
+    for(int i = 0; i < num_of_tuples; ++i)
+      for(int j = 0; j < tuple_length; ++j)
+      {
+        tuple_ptr[i * tuple_length + j] = infile->read_num();
+      }
+    tuplelist->finalise_tuples();
   }
 }
 
@@ -537,13 +537,13 @@ void MinionInputReader<FileReader>::readObjective(FileReader* infile) {
   if(s == "none")
   {
     parser_info( "objective none" );
-	return;
+    return;
   }
   
   if(s != "minimising" && s != "maximising")
   {
     throw parse_exception(string("Expected 'none', 'maximising'") +
-							  string("or 'minimising'. Got '") + s + "'");
+                              string("or 'minimising'. Got '") + s + "'");
   }
   
   BOOL minimising = (s == "minimising");
@@ -563,34 +563,34 @@ void MinionInputReader<FileReader>::readPrint(FileReader* infile) {
   if(letter == 'n')
   {
     s = infile->get_string();
-	if(s != "one")
-	  throw parse_exception(string("I don't understand '")+s+"'");
-	parser_info( "print none" );
-	return;
+    if(s != "one")
+      throw parse_exception(string("I don't understand '")+s+"'");
+    parser_info( "print none" );
+    return;
   }
   else if(letter == 'a')
   {
-	s = infile->get_string();
-	if(s != "ll")
-	  throw parse_exception(string("I don't understand '" + s + "'"));
-							  
-	instance.print_matrix = make_vec(instance.vars.get_all_vars());
-	return;
+    s = infile->get_string();
+    if(s != "ll")
+      throw parse_exception(string("I don't understand '" + s + "'"));
+                              
+    instance.print_matrix = make_vec(instance.vars.get_all_vars());
+    return;
   }
   else if(letter == 'm')
   {
     int matrix_num = infile->read_num();
-	instance.print_matrix = index(Matrices, matrix_num);
-	if(parser_verbose)
-	  cout << "print m" << matrix_num << endl;
-	return;
+    instance.print_matrix = index(Matrices, matrix_num);
+    if(parser_verbose)
+      cout << "print m" << matrix_num << endl;
+    return;
   }
   else if(letter == 'v')
   {
     int vec_num = infile->read_num();
-	instance.print_matrix = make_vec(index(Vectors, vec_num));
-	if(parser_verbose)
-	  cout << "print v" << vec_num << endl;
+    instance.print_matrix = make_vec(index(Vectors, vec_num));
+    if(parser_verbose)
+      cout << "print v" << vec_num << endl;
     return;
   }
 
@@ -614,7 +614,7 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   char delim = infile->peek_char();
   
   vector<char> valOrder ;
-	 
+     
   if(delim == ']')
   {
     // Eat the ']'
@@ -625,15 +625,15 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   {
     while (delim != ']') {
       char valOrderIdentifier = infile->get_char();
-	  if(valOrderIdentifier != 'a' && valOrderIdentifier != 'd')
-	    throw parse_exception("Expected 'a' or 'd'");
-	  valOrder.push_back(valOrderIdentifier == 'a');
+      if(valOrderIdentifier != 'a' && valOrderIdentifier != 'd')
+        throw parse_exception("Expected 'a' or 'd'");
+      valOrder.push_back(valOrderIdentifier == 'a');
       delim = infile->get_char();                                 // , or ]
     }
 
     ostringstream s;
     s << "Read val order. Length: " << valOrder.size();
-	parser_info(s.str());
+    parser_info(s.str());
   }
   
   if(valOrder.empty())
@@ -658,21 +658,21 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
   
   if(varOrder.empty())
   {
-	parser_info("No order generated, auto-generating complete order");
-	int var_count = 0;
-	var_count += instance.vars.BOOLs;
-	for(unsigned i = 0; i < instance.vars.bound.size(); ++i)
-	  var_count += instance.vars.bound[i].first;
-	for(unsigned i = 0; i < instance.vars.sparse_bound.size(); ++i)
-	  var_count += instance.vars.sparse_bound[i].first;
-	for(unsigned i = 0; i < instance.vars.discrete.size(); ++i)
-	  var_count += instance.vars.discrete[i].first;
-	for(unsigned i = 0; i < instance.vars.sparse_discrete.size(); ++i)
-	  var_count += instance.vars.sparse_discrete[i].first;
-	
-	varOrder.reserve(var_count);
-	for(int i = 0; i < var_count; ++i)
-	  varOrder.push_back(instance.vars.get_var('x',i));
+    parser_info("No order generated, auto-generating complete order");
+    int var_count = 0;
+    var_count += instance.vars.BOOLs;
+    for(unsigned i = 0; i < instance.vars.bound.size(); ++i)
+      var_count += instance.vars.bound[i].first;
+    for(unsigned i = 0; i < instance.vars.sparse_bound.size(); ++i)
+      var_count += instance.vars.sparse_bound[i].first;
+    for(unsigned i = 0; i < instance.vars.discrete.size(); ++i)
+      var_count += instance.vars.discrete[i].first;
+    for(unsigned i = 0; i < instance.vars.sparse_discrete.size(); ++i)
+      var_count += instance.vars.sparse_discrete[i].first;
+    
+    varOrder.reserve(var_count);
+    for(int i = 0; i < var_count; ++i)
+      varOrder.push_back(instance.vars.get_var('x',i));
   }
   
   
@@ -701,11 +701,11 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
     cout << "Number of Bounds Vars: " << noOfVarType << endl ;
   while (noOfVarType > 0) {
     lb = infile->read_num();
-	ub = infile->read_num();
-	if(lb > ub)
-	  throw parse_exception("Lower bound must be less than upper bound!");
-	count = infile->read_num();
-	if(parser_verbose)
+    ub = infile->read_num();
+    if(lb > ub)
+      throw parse_exception("Lower bound must be less than upper bound!");
+    count = infile->read_num();
+    if(parser_verbose)
       cout << count << " of " << lb << ", " << ub << endl ;
     var_obj.bound.push_back(make_pair(count, Bounds(lb, ub)));
     noOfVarType -= count ;
@@ -722,16 +722,16 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
     while (delim != '}') {
       domainElem = infile->read_num();
       domainElements.push_back(domainElem) ;
-	  size_t dom_size = domainElements.size();
-	  if(dom_size > 1)
-	  {
-		if(domainElements[dom_size-1] <= domainElements[dom_size-2])
-		  throw parse_exception("Domains must be ordered!");
-	  }
+      size_t dom_size = domainElements.size();
+      if(dom_size > 1)
+      {
+        if(domainElements[dom_size-1] <= domainElements[dom_size-2])
+          throw parse_exception("Domains must be ordered!");
+      }
       delim = infile->get_char();                               // , or }
     }
     count = infile->read_num();
-	if(parser_verbose)
+    if(parser_verbose)
       cout << count << " of these " << endl ;
     // **** Construct this many discrete vars.
     var_obj.sparse_bound.push_back(make_pair(count, domainElements));
@@ -744,11 +744,11 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
     cout << "Number of Discrete Vars: " << noOfVarType << endl ;
   while (noOfVarType > 0) {
     lb = infile->read_num();
-	ub = infile->read_num();
-	count = infile->read_num();
-	if(lb > ub)
-	  throw parse_exception("Lower bound must be less than upper bound!");
-	if(parser_verbose)
+    ub = infile->read_num();
+    count = infile->read_num();
+    if(lb > ub)
+      throw parse_exception("Lower bound must be less than upper bound!");
+    if(parser_verbose)
       cout << count << " of " << lb << ", " << ub << endl ;
     var_obj.discrete.push_back(make_pair(count, Bounds(lb, ub)));
     // **** Construct this many discrete bounds vars.
@@ -798,92 +798,92 @@ vector<Var> MinionInputReader<FileReader>::readVectorExpression(FileReader* infi
     case 'v':                                        // vector identifier
       parser_info( "Reading vector identifier" ) ;
       //infile->putback(idChar) ;
-	  input_val = infile->read_num();
-	  return Vectors.at(input_val) ;
+      input_val = infile->read_num();
+      return Vectors.at(input_val) ;
     case 'm':                                       // matrix identifier
       parser_info( "Reading matrix identifier (will flatten)" ) ;
       //infile->putback(idChar) ;
-	  input_val = infile->read_num();
-	  return flatten('m', input_val) ;
+      input_val = infile->read_num();
+      return flatten('m', input_val) ;
     case 't':                                        // matrix identifier
       parser_info( "Reading tensor identifier (will flatten)" ) ;
       //infile->putback(idChar) ;
-	  input_val = infile->read_num();
-	  return flatten('t', input_val) ;
+      input_val = infile->read_num();
+      return flatten('t', input_val) ;
     case 'r':                                       // row of a mx/tensor
-	  infile->check_sym('o');
-	  infile->check_sym('w');
+      infile->check_sym('o');
+      infile->check_sym('w');
       idChar = infile->get_char();            // o w [( x or z]
       switch(idChar) {
-		case '(':                                        // row of a matrix
-		{parser_info( "Reading row of a matrix" ) ;
-		  infile->check_sym('m');
-		  input_val = infile->read_num();
-		  vector< vector<Var> > matrix = Matrices.at(input_val) ;
-		  delim = infile->get_char();
-		  row = infile->read_num();
-		  delim = infile->get_char();
-		  return matrix.at(row) ;}
-		case 'x':                             // row of a plane of a tensor
-		{parser_info( "Reading row of a plane of a tensor" ) ;
-		  infile->check_sym('(');
-		  infile->check_sym('t');
-		  input_val = infile->read_num();
-		  vector< vector< vector<Var> > >& tensor = Tensors.at(input_val) ;
-		  infile->check_sym(',');
-		  input_val = infile->read_num();
-		  vector< vector <Var> >& tensorPlane = tensor.at(input_val) ;
-		  infile->check_sym(',');
-		  input_val = infile->read_num();
-		  infile->check_sym(')');
-		  return tensorPlane.at(input_val);
-		}
-		case 'z':                         // Row through planes of a tensor
-		{parser_info( "Reading row through planes of a tensor" ) ;
-		  infile->check_sym('(');
-		  input_val = infile->read_num();
-		  vector< vector< vector<Var> > >& tensor = Tensors.at(input_val) ;
-		  infile->check_sym(',');
-		  row = infile->read_num();
-		  infile->check_sym(',');
-		  col = infile->read_num();
-		  infile->check_sym(')');
-		  return getRowThroughTensor(tensor, row, col) ;}
-		default:
-		  throw parse_exception("Malformed Row Expression");
-		  break ;
-	  }
-		break ;
+        case '(':                                        // row of a matrix
+        {parser_info( "Reading row of a matrix" ) ;
+          infile->check_sym('m');
+          input_val = infile->read_num();
+          vector< vector<Var> > matrix = Matrices.at(input_val) ;
+          delim = infile->get_char();
+          row = infile->read_num();
+          delim = infile->get_char();
+          return matrix.at(row) ;}
+        case 'x':                             // row of a plane of a tensor
+        {parser_info( "Reading row of a plane of a tensor" ) ;
+          infile->check_sym('(');
+          infile->check_sym('t');
+          input_val = infile->read_num();
+          vector< vector< vector<Var> > >& tensor = Tensors.at(input_val) ;
+          infile->check_sym(',');
+          input_val = infile->read_num();
+          vector< vector <Var> >& tensorPlane = tensor.at(input_val) ;
+          infile->check_sym(',');
+          input_val = infile->read_num();
+          infile->check_sym(')');
+          return tensorPlane.at(input_val);
+        }
+        case 'z':                         // Row through planes of a tensor
+        {parser_info( "Reading row through planes of a tensor" ) ;
+          infile->check_sym('(');
+          input_val = infile->read_num();
+          vector< vector< vector<Var> > >& tensor = Tensors.at(input_val) ;
+          infile->check_sym(',');
+          row = infile->read_num();
+          infile->check_sym(',');
+          col = infile->read_num();
+          infile->check_sym(')');
+          return getRowThroughTensor(tensor, row, col) ;}
+        default:
+          throw parse_exception("Malformed Row Expression");
+          break ;
+      }
+        break ;
       //col(mi, c), col(ti, p, c)
     case 'c':                                        // col of a mx/tensor
-	  infile->check_sym('o');
-	  infile->check_sym('l');
-	  infile->check_sym('(');
+      infile->check_sym('o');
+      infile->check_sym('l');
+      infile->check_sym('(');
       if(infile->peek_char() == 'm') {
-		parser_info( "Reading col of matrix" ) ;
-		infile->check_sym('m');
-		input_val = infile->read_num();
-		vector< vector<Var> >& matrix = Matrices.at(input_val) ;
-		infile->check_sym(',');
-		col = infile->read_num();
-		infile->check_sym(')');
-		return getColOfMatrix(matrix, col) ;
+        parser_info( "Reading col of matrix" ) ;
+        infile->check_sym('m');
+        input_val = infile->read_num();
+        vector< vector<Var> >& matrix = Matrices.at(input_val) ;
+        infile->check_sym(',');
+        col = infile->read_num();
+        infile->check_sym(')');
+        return getColOfMatrix(matrix, col) ;
       }
-		else {
-		  parser_info( "Reading col of tensor" ) ;
-		  infile->check_sym('t');
-		  input_val = infile->read_num();
-		  vector< vector< vector<Var> > >& tensor = Tensors.at(input_val);
-		  infile->check_sym(',');
-		  plane = infile->read_num();
-		  infile->check_sym(',');
-		  col = infile->read_num();
-		  infile->check_sym(')');
-		  return getColOfMatrix(tensor.at(plane), col) ;
-		}
+        else {
+          parser_info( "Reading col of tensor" ) ;
+          infile->check_sym('t');
+          input_val = infile->read_num();
+          vector< vector< vector<Var> > >& tensor = Tensors.at(input_val);
+          infile->check_sym(',');
+          plane = infile->read_num();
+          infile->check_sym(',');
+          col = infile->read_num();
+          infile->check_sym(')');
+          return getColOfMatrix(tensor.at(plane), col) ;
+        }
       default:
-		throw parse_exception("Malformed Vector Expression") ;
-		break ;
+        throw parse_exception("Malformed Vector Expression") ;
+        break ;
   }
   FAIL_EXIT("?");
 }

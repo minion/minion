@@ -107,20 +107,20 @@ struct VarNot
   void addTrigger(Trigger t, TrigType type)
   { 
     switch(type)
-	{
-	  case UpperBound:
-		data.addTrigger(t, LowerBound);
-		break;
-	  case LowerBound:
-		data.addTrigger(t, UpperBound);
-		break;
-	  case Assigned:
-	  case DomainChanged:
-	    data.addTrigger(t, type);
+    {
+      case UpperBound:
+        data.addTrigger(t, LowerBound);
+        break;
+      case LowerBound:
+        data.addTrigger(t, UpperBound);
+        break;
+      case Assigned:
+      case DomainChanged:
+        data.addTrigger(t, type);
       break;
-	  default:
+      default:
       D_FATAL_ERROR("Invalid trigger in 'not' mapper");
-	}
+    }
   }
 
   friend std::ostream& operator<<(std::ostream& o, const VarNot& n)

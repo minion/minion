@@ -571,14 +571,14 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
       {
         vector<Var> vectorOfConst = readLiteralVector(infile);
         vector<int> vals;
-    		for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
-    		{
-    		  if(vectorOfConst[loop].type() != VAR_CONSTANT)
-    			  throw parse_exception("Vector must only contain constants.");
-    			else
-            vals.push_back(vectorOfConst[loop].pos());
-    		}
-    		constblob.push_back(MOVE(vals));
+          for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
+          {
+            if(vectorOfConst[loop].type() != VAR_CONSTANT)
+                throw parse_exception("Vector must only contain constants.");
+              else
+          vals.push_back(vectorOfConst[loop].pos());
+          }
+          constblob.push_back(MOVE(vals));
       }
       break;  
       case read_constraint:

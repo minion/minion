@@ -338,7 +338,7 @@ struct reify : public ParentConstraint
             //D_ASSERT(wllost); This is not true because some WLs may be translated to domainchanged triggers.
             #endif
             bool flag;
-	    PROP_INFO_ADDONE(ReifyPropGetAssgPosCon);
+            PROP_INFO_ADDONE(ReifyPropGetAssgPosCon);
             GET_ASSIGNMENT(assignment, child_constraints[0]);
             
             P("Find new assignment");
@@ -377,7 +377,7 @@ struct reify : public ParentConstraint
             #endif
             bool flag;
             GET_ASSIGNMENT(assignment, child_constraints[1]);
-	    PROP_INFO_ADDONE(ReifyPropGetAssgNegCon);
+            PROP_INFO_ADDONE(ReifyPropGetAssgNegCon);
             
             P("Find new assignment");
             if(!flag)
@@ -531,7 +531,7 @@ struct reify : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Reify:" + poscon->constraint_name(); }
-	
+    
   AbstractConstraint* poscon;
   AbstractConstraint* negcon;
   BoolVar rar_var;
@@ -568,14 +568,14 @@ struct reify : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     // We have to push back both sets of variables, as they may
-	// have been transformed in different ways.
+    // have been transformed in different ways.
     vector<AnyVarRef> vec1 = poscon->get_vars();
-	vector<AnyVarRef> vec2 = negcon->get_vars();
-	vec1.reserve(vec1.size() + vec2.size() + 1);
-	for(unsigned i = 0; i < vec2.size(); ++i)
-	  vec1.push_back(vec2[i]);
-	vec1.push_back(rar_var);
-	return vec1;
+    vector<AnyVarRef> vec2 = negcon->get_vars();
+    vec1.reserve(vec1.size() + vec2.size() + 1);
+    for(unsigned i = 0; i < vec2.size(); ++i)
+      vec1.push_back(vec2[i]);
+    vec1.push_back(rar_var);
+    return vec1;
   }
   
   virtual triggerCollection setup_internal()
@@ -618,7 +618,7 @@ struct reify : public AbstractConstraint
   virtual void special_unlock()
   {
     D_ASSERT(constraint_locked);
-	  constraint_locked = false;
+      constraint_locked = false;
   }
   
   PROPAGATE_FUNCTION(int i, DomainDelta domain)
@@ -627,12 +627,12 @@ struct reify : public AbstractConstraint
     
     if(constraint_locked)
       return;
-	  
+      
     if(i == -99998 || i == -99999)
     {
-	    constraint_locked = true;
-  	  getQueue(stateObj).pushSpecialTrigger(this);
-  	  return;
+        constraint_locked = true;
+      getQueue(stateObj).pushSpecialTrigger(this);
+      return;
     }
     
     if(full_propagate_called)
@@ -649,10 +649,10 @@ struct reify : public AbstractConstraint
     { 
 #ifdef MINION_DEBUG
       {
-	bool flag;
-	GET_ASSIGNMENT(assignment0, poscon);
-	bool unsat = poscon->check_unsat(i/2, domain);
-	D_ASSERT((!flag && unsat) || (flag && !unsat));
+    bool flag;
+    GET_ASSIGNMENT(assignment0, poscon);
+    bool unsat = poscon->check_unsat(i/2, domain);
+    D_ASSERT((!flag && unsat) || (flag && !unsat));
       }
 #endif
       PROP_INFO_ADDONE(ReifyCheckUnsatPosCon);
@@ -665,10 +665,10 @@ struct reify : public AbstractConstraint
     { 
 #ifdef MINION_DEBUG
       {
-	bool flag;
-	GET_ASSIGNMENT(assignment0, negcon);
-	bool unsat = negcon->check_unsat((i-1)/2,domain);
-	D_ASSERT((!flag && unsat) || (flag && !unsat));
+    bool flag;
+    GET_ASSIGNMENT(assignment0, negcon);
+    bool unsat = negcon->check_unsat((i-1)/2,domain);
+    D_ASSERT((!flag && unsat) || (flag && !unsat));
       }
 #endif
       PROP_INFO_ADDONE(ReifyCheckUnsatNegCon);

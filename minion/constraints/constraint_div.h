@@ -54,35 +54,35 @@ struct DivConstraint : public AbstractConstraint
   VarRef3 var3;
 
   DivConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) : AbstractConstraint(_stateObj),
-	var1(_var1), var2(_var2), var3(_var3)
+    var1(_var1), var2(_var2), var3(_var3)
   {
   
-	  if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
-		 var3.getInitialMin() < 0)
-	  { 
+      if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
+         var3.getInitialMin() < 0)
+      { 
       FAIL_EXIT("The 'div' constraint only supports positive numbers at present.");
-	  }
+      }
   }
   
   virtual triggerCollection setup_internal()
   {
-	triggerCollection t;
-	t.push_back(make_trigger(var1, Trigger(this, -1), LowerBound));
-	t.push_back(make_trigger(var2, Trigger(this, -2), LowerBound));
-	t.push_back(make_trigger(var3, Trigger(this, -3), LowerBound));
-	t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-	t.push_back(make_trigger(var2, Trigger(this, 2), UpperBound));
-	t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
-	return t;
+    triggerCollection t;
+    t.push_back(make_trigger(var1, Trigger(this, -1), LowerBound));
+    t.push_back(make_trigger(var2, Trigger(this, -2), LowerBound));
+    t.push_back(make_trigger(var3, Trigger(this, -3), LowerBound));
+    t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
+    t.push_back(make_trigger(var2, Trigger(this, 2), UpperBound));
+    t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
+    return t;
   }
     
   PROPAGATE_FUNCTION(int flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Pow);
     if(var1.isAssigned() && var2.isAssigned())
-	  {
-	    if(var2.getAssignedValue() == 0)
-	      getState(stateObj).setFailed(true);
+      {
+        if(var2.getAssignedValue() == 0)
+          getState(stateObj).setFailed(true);
       var3.propagateAssign(var1.getAssignedValue() / var2.getAssignedValue() );
     }
   }
@@ -102,17 +102,17 @@ struct DivConstraint : public AbstractConstraint
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-	D_ASSERT(v_size == 3);
-	return v[0] / v[1] == v[2];
+    D_ASSERT(v_size == 3);
+    return v[0] / v[1] == v[2];
   }
   
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> v;
-	v.push_back(var1);
-	v.push_back(var2);
-	v.push_back(var3);
-	return v;
+    v.push_back(var1);
+    v.push_back(var2);
+    v.push_back(var3);
+    return v;
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
@@ -154,7 +154,7 @@ BuildCT_DIV(StateObj* stateObj, const V1& vars, const V2& var2, ConstraintBlob&)
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   return new DivConstraint<typename V1::value_type, typename V1::value_type,
-						   typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
+                           typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
 }
 
 #endif

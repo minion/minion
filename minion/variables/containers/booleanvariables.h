@@ -110,14 +110,14 @@ struct BoolVarRef_internal
   BOOL inDomain(DomainInt b) const
   {
     if((b|1) != 1)
-	  return false;
+      return false;
     return (!isAssigned()) || (b == getAssignedValue());
   }
   
   BOOL inDomain_noBoundCheck(DomainInt b) const
   {
     D_ASSERT(b == 0 || b == 1);
-	return (!isAssigned()) || (b == getAssignedValue());
+    return (!isAssigned()) || (b == getAssignedValue());
   }
   
   DomainInt getMin() const
@@ -194,7 +194,7 @@ struct BooleanContainer
   void lock()
   { 
    lock_m = true;
-	// Min domain value = 0, max domain val = 1.
+    // Min domain value = 0, max domain val = 1.
     trigger_list.lock(var_count_m, 0, 1);
   }
   
@@ -206,9 +206,9 @@ struct BooleanContainer
     D_ASSERT(!lock_m);
     var_count_m = bool_count;
 
-	int required_mem = var_count_m / 8 + 1;
-	// Round up to nearest data_type block
-	required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
+    int required_mem = var_count_m / 8 + 1;
+    // Round up to nearest data_type block
+    required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
     assign_offset = getMemory(stateObj).backTrack().request_bytes(required_mem);
     values_mem = getMemory(stateObj).nonBackTrack().request_bytes(required_mem);
     constraints.resize(bool_count);
@@ -224,23 +224,23 @@ struct BooleanContainer
   void setMax(const BoolVarRef_internal& d, DomainInt i) 
   {
     if(i < 0)
-	{
-	  getState(stateObj).setFailed(true);
-	  return;
-	}
+    {
+      getState(stateObj).setFailed(true);
+      return;
+    }
 
     D_ASSERT(i >= 0);
-	if(i==0)
+    if(i==0)
       propagateAssign(d,0);
   }
   
   void setMin(const BoolVarRef_internal& d, DomainInt i) 
   {
     if(i > 1)
-	{
-	  getState(stateObj).setFailed(true);
-	  return;
-	}
+    {
+      getState(stateObj).setFailed(true);
+      return;
+    }
     D_ASSERT(i <= 1);
     if(i==1)
       propagateAssign(d,1);
@@ -255,7 +255,7 @@ struct BooleanContainer
     if(d.isAssigned())
     {
       if(b == d.getAssignedValue()) 
-	    getState(stateObj).setFailed(true);
+        getState(stateObj).setFailed(true);
     }
     else
       uncheckedAssign(d,1-b);
@@ -265,17 +265,17 @@ struct BooleanContainer
   {
     D_ASSERT(lock_m && d.var_num < var_count_m);
     D_ASSERT(!d.isAssigned());
-	if((b|1) != 1)
+    if((b|1) != 1)
     {
-	  getState(stateObj).setFailed(true);
-	  return;
-	}
+      getState(stateObj).setFailed(true);
+      return;
+    }
     assign_ptr()[d.data_offset()] |= d.shift_offset;
     
     trigger_list.push_assign(d.var_num, b);
 #ifndef FEW_BOOLEAN_TRIGGERS
     trigger_list.push_domain_changed(d.var_num);
-	trigger_list.push_domain_removal(d.var_num, 1 - b);
+    trigger_list.push_domain_removal(d.var_num, 1 - b);
 #endif
     
     if(b == 1)
@@ -300,7 +300,7 @@ struct BooleanContainer
     else
     {
       if(d.getAssignedValue() != b)
-	getState(stateObj).setFailed(true);
+    getState(stateObj).setFailed(true);
     }
   }
 
@@ -340,7 +340,7 @@ struct BooleanContainer
     }
     pos = -999;
 #endif    
-	trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
+    trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
   }
 #endif
 

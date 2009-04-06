@@ -130,11 +130,11 @@ struct BigRangeVarContainer {
     DomainInt loopvar = old_up_bound; 
     //DomainInt low_bound = initial_bounds[d.var_num].first; 
     if(loopvar < lower)
-	{
-	  getState(stateObj).setFailed(true);
-	  /// Here just remove the value which should lead to the least work.
-	  return upper_bound(d);
-	}
+    {
+      getState(stateObj).setFailed(true);
+      /// Here just remove the value which should lead to the least work.
+      return upper_bound(d);
+    }
     if(bms_array->isMember(var_offset[d.var_num] + loopvar) && (loopvar >= lower))
       return upper_bound(d);
     --loopvar;
@@ -157,11 +157,11 @@ struct BigRangeVarContainer {
     DomainInt loopvar = old_low_bound; 
     //DomainInt low_bound = initial_bounds[d.var_num].first; 
     if(loopvar > upper)
-	{
-	  getState(stateObj).setFailed(true);
-	  /// Here just remove the value which should lead to the least work.
-	  return lower_bound(d);
-	}
+    {
+      getState(stateObj).setFailed(true);
+      /// Here just remove the value which should lead to the least work.
+      return lower_bound(d);
+    }
     if(bms_array->isMember(var_offset[d.var_num] + loopvar) && (loopvar <= upper))
       return lower_bound(d);
     ++loopvar;
@@ -210,24 +210,24 @@ void addVariables(const vector<pair<int, Bounds> >& new_domains)
     }
     //bms_array->lock(stateObj); // Don't lock it here. lock it in lock.
     for(DomainInt j = 0; j < var_count_m; j++) {
-	       var_offset[j] = var_offset[j] - initial_bounds[j].first;  
+           var_offset[j] = var_offset[j] - initial_bounds[j].first;  
     };
     
     domain_bound_type* bound_ptr = static_cast<domain_bound_type*>(bound_data.get_ptr());
     
-	int min_domain_val = 0;
-	int max_domain_val = 0;
-	if(!initial_bounds.empty())
-	{
-	  min_domain_val = initial_bounds[0].first;
-	  max_domain_val = initial_bounds[0].second;
-	  for(unsigned int i = 0; i < var_count_m; ++i)
+    int min_domain_val = 0;
+    int max_domain_val = 0;
+    if(!initial_bounds.empty())
+    {
+      min_domain_val = initial_bounds[0].first;
+      max_domain_val = initial_bounds[0].second;
+      for(unsigned int i = 0; i < var_count_m; ++i)
       {
         bound_ptr[2*i] = initial_bounds[i].first;
         bound_ptr[2*i+1] = initial_bounds[i].second;
-	  
-	    min_domain_val = mymin(initial_bounds[i].first, min_domain_val);
-	    max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
+      
+        min_domain_val = mymin(initial_bounds[i].first, min_domain_val);
+        max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
       }
     }
     trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
@@ -304,10 +304,10 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove
       return;
     }
 #ifdef FULL_DOMAIN_TRIGGERS
-	trigger_list.push_domain_removal(d.var_num, i);
+    trigger_list.push_domain_removal(d.var_num, i);
 #endif
 #ifndef NO_DOMAIN_TRIGGERS
-	trigger_list.push_domain_changed(d.var_num);
+    trigger_list.push_domain_changed(d.var_num);
 #endif
     D_ASSERT( ! bms_array->isMember(var_offset[d.var_num] + i));
     
@@ -430,35 +430,35 @@ public:
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     DomainInt up_bound = upper_bound(d);
     DomainInt low_bound = lower_bound(d);
-	
-	if(offset < low_bound)
-	{
-	  getState(stateObj).setFailed(true);
-	  return;
+    
+    if(offset < low_bound)
+    {
+      getState(stateObj).setFailed(true);
+      return;
     }
-	
+    
     if(offset < up_bound)
     {
 #ifdef FULL_DOMAIN_TRIGGERS
-	  // TODO : Optimise this function to only check values in domain.
+      // TODO : Optimise this function to only check values in domain.
       int domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
-	  for(DomainInt loop = offset + 1; loop <= up_bound; ++loop)
-	  {
+      for(DomainInt loop = offset + 1; loop <= up_bound; ++loop)
+      {
         // Def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
-	    if(bms_array->isMember(domainOffset + loop)) {
-	      trigger_list.push_domain_removal(d.var_num, loop);
+        if(bms_array->isMember(domainOffset + loop)) {
+          trigger_list.push_domain_removal(d.var_num, loop);
         }
-	  }
-#endif	 
+      }
+#endif   
       upper_bound(d) = offset;      
-	  DomainInt new_upper = find_new_upper_bound(d);
-	  upper_bound(d) = new_upper;
+      DomainInt new_upper = find_new_upper_bound(d);
+      upper_bound(d) = new_upper;
       
 #ifndef NO_DOMAIN_TRIGGERS
-	trigger_list.push_domain_changed(d.var_num);
+    trigger_list.push_domain_changed(d.var_num);
 #endif
        trigger_list.push_upper(d.var_num, up_bound - upper_bound(d));
-	  
+      
       if(lower_bound(d) == upper_bound(d)) {
         trigger_list.push_assign(d.var_num, getAssignedValue(d));
       }
@@ -484,27 +484,27 @@ public:
 #endif
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
-	DomainInt up_bound = upper_bound(d);
+    DomainInt up_bound = upper_bound(d);
     DomainInt low_bound = lower_bound(d);
     
-	if(offset > up_bound)
-	{
-	  getState(stateObj).setFailed(true);
-	  return;
-	}
-	
+    if(offset > up_bound)
+    {
+      getState(stateObj).setFailed(true);
+      return;
+    }
+    
     if(offset > low_bound)
     {
 #ifdef FULL_DOMAIN_TRIGGERS
-	  // TODO : Optimise this function to only check values in domain.
+      // TODO : Optimise this function to only check values in domain.
       int domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
-	  for(DomainInt loop = low_bound; loop < offset; ++loop)
-	  {
+      for(DomainInt loop = low_bound; loop < offset; ++loop)
+      {
         // def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
-	    if(bms_array->isMember(loop + domainOffset)) {
-	      trigger_list.push_domain_removal(d.var_num, loop);
+        if(bms_array->isMember(loop + domainOffset)) {
+          trigger_list.push_domain_removal(d.var_num, loop);
         }
-	  }
+      }
 #endif
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
@@ -513,7 +513,7 @@ public:
     lower_bound(d) = new_lower; 
     
 #ifndef NO_DOMAIN_TRIGGERS
-	trigger_list.push_domain_changed(d.var_num);
+    trigger_list.push_domain_changed(d.var_num);
 #endif
     trigger_list.push_lower(d.var_num, lower_bound(d) - low_bound);
     if(lower_bound(d) == upper_bound(d)) {
@@ -540,9 +540,9 @@ public:
   void addDynamicTrigger(BigRangeVarRef_internal b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {  
     D_ASSERT(lock_m);
-	D_ASSERT(b.var_num >= 0);
-	D_ASSERT(b.var_num <= (int)var_count_m);
-	D_ASSERT(type != DomainRemoval || (pos >= getInitialMin(b) && pos <= getInitialMax(b)));
+    D_ASSERT(b.var_num >= 0);
+    D_ASSERT(b.var_num <= (int)var_count_m);
+    D_ASSERT(type != DomainRemoval || (pos >= getInitialMin(b) && pos <= getInitialMax(b)));
     trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
   }
 #endif

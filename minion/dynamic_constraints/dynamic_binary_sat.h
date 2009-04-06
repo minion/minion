@@ -33,50 +33,50 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
   VarRef var2;
   
   BoolBinarySATConstraintDynamic(StateObj* _stateObj,const VarArray& _var_array) :
-	AbstractConstraint(_stateObj), var1(_var_array[0]), var2(_var_array[1])
+    AbstractConstraint(_stateObj), var1(_var_array[0]), var2(_var_array[1])
   { D_ASSERT(_var_array.size() == 2); }
   
   int dynamic_trigger_count()
   {
-	return 2;
+    return 2;
   }
     
   virtual void full_propagate()
   {
-	DynamicTrigger* dt = dynamic_trigger_start();
+    DynamicTrigger* dt = dynamic_trigger_start();
 
-	if(var1.isAssignedValue(false))
-	{
-	  var2.propagateAssign(true);
-	  return;
-	}
-	
-	if(var2.isAssignedValue(false))
-	{
-	  var1.propagateAssign(true);
-	  return;
-	}
-	
-	dt->trigger_info() = 0;
-	var1.addDynamicTrigger(dt, UpperBound);
-	
-	++dt;
-	
-	dt->trigger_info() = 1;
-	var2.addDynamicTrigger(dt, UpperBound);
-	
-	return;
+    if(var1.isAssignedValue(false))
+    {
+      var2.propagateAssign(true);
+      return;
+    }
+    
+    if(var2.isAssignedValue(false))
+    {
+      var1.propagateAssign(true);
+      return;
+    }
+    
+    dt->trigger_info() = 0;
+    var1.addDynamicTrigger(dt, UpperBound);
+    
+    ++dt;
+    
+    dt->trigger_info() = 1;
+    var2.addDynamicTrigger(dt, UpperBound);
+    
+    return;
   }
     
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	PROP_INFO_ADDONE(Dyn2SAT);
-	int propval = dt->trigger_info();
-	
-	if(propval)
-	  var1.propagateAssign(true);
-	else
-	  var2.propagateAssign(true);
+    PROP_INFO_ADDONE(Dyn2SAT);
+    int propval = dt->trigger_info();
+    
+    if(propval)
+      var1.propagateAssign(true);
+    else
+      var2.propagateAssign(true);
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
@@ -87,10 +87,10 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;
-	vars.reserve(2);
-	vars.push_back(var1);
-	vars.push_back(var2);
-	return vars;  
+    vars.reserve(2);
+    vars.push_back(var1);
+    vars.push_back(var2);
+    return vars;  
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)

@@ -432,43 +432,43 @@ struct ConstraintBlob
   
   Var get_var(char, int i) const
   {
-	if(i < BOOLs)
-	  return Var(VAR_BOOL, i);
-	i -= BOOLs;
-	{
-	  int bound_size = 0;
-	  for(unsigned int x = 0; x < bound.size(); ++x)
-		bound_size += bound[x].first;
-	  if(i < bound_size)
-		return Var(VAR_BOUND, i);
-	  i -= bound_size;
-	}
-	{
-	  int sparse_bound_size = 0;
-	  for(unsigned int x=0;x<sparse_bound.size();++x)
-		sparse_bound_size += sparse_bound[x].first;
-	  if(i < sparse_bound_size)
-		return Var(VAR_SPARSEBOUND, i);
-	  i -= sparse_bound_size;
-	}
-	
-	{
-	  int discrete_size = 0;
-	  for(unsigned int x=0;x<discrete.size();++x)
-		discrete_size += discrete[x].first;
-	  if(i < discrete_size)
-		return Var(VAR_DISCRETE, i);
-	  i -= discrete_size;
-	}
-	{
-	  int sparse_discrete_size = 0;
-	  for(unsigned int x=0;x<sparse_discrete.size();++x)
-		sparse_discrete_size += sparse_discrete[x].first;
-	  if(i < sparse_discrete_size)
-		return Var(VAR_SPARSEDISCRETE, i);
-	  i -= sparse_discrete_size;
-	}
-	throw parse_exception("Var Out of Range!");   
+    if(i < BOOLs)
+      return Var(VAR_BOOL, i);
+    i -= BOOLs;
+    {
+      int bound_size = 0;
+      for(unsigned int x = 0; x < bound.size(); ++x)
+        bound_size += bound[x].first;
+      if(i < bound_size)
+        return Var(VAR_BOUND, i);
+      i -= bound_size;
+    }
+    {
+      int sparse_bound_size = 0;
+      for(unsigned int x=0;x<sparse_bound.size();++x)
+        sparse_bound_size += sparse_bound[x].first;
+      if(i < sparse_bound_size)
+        return Var(VAR_SPARSEBOUND, i);
+      i -= sparse_bound_size;
+    }
+    
+    {
+      int discrete_size = 0;
+      for(unsigned int x=0;x<discrete.size();++x)
+        discrete_size += discrete[x].first;
+      if(i < discrete_size)
+        return Var(VAR_DISCRETE, i);
+      i -= discrete_size;
+    }
+    {
+      int sparse_discrete_size = 0;
+      for(unsigned int x=0;x<sparse_discrete.size();++x)
+        sparse_discrete_size += sparse_discrete[x].first;
+      if(i < sparse_discrete_size)
+        return Var(VAR_SPARSEDISCRETE, i);
+      i -= sparse_discrete_size;
+    }
+    throw parse_exception("Var Out of Range!");   
   }
   
 
@@ -595,7 +595,7 @@ struct CSPInstance
  
 #ifdef USE_CXX0X
 private:
-	CSPInstance(CSPInstance&);
+    CSPInstance(CSPInstance&);
 public:
   
   CSPInstance(CSPInstance&& i) : 

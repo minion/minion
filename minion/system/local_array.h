@@ -44,15 +44,15 @@
   template<typename _Tp, size_t _Nm = 1>
     struct array
     {
-      typedef _Tp 	    			value_type;
-      typedef value_type&                   	reference;
-      typedef const value_type&             	const_reference;
-      typedef value_type*          		iterator;
-      typedef const value_type*			const_iterator;
-      typedef size_t                    	size_type;
-      typedef ptrdiff_t                     	difference_type;
-      typedef std::reverse_iterator<iterator>	reverse_iterator;
-      typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
+      typedef _Tp                   value_type;
+      typedef value_type&                       reference;
+      typedef const value_type&                 const_reference;
+      typedef value_type*               iterator;
+      typedef const value_type*         const_iterator;
+      typedef size_t                        size_type;
+      typedef ptrdiff_t                         difference_type;
+      typedef std::reverse_iterator<iterator>   reverse_iterator;
+      typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
       // Compile time constant without other dependencies.
       enum { _S_index = _Nm };
@@ -123,17 +123,17 @@
       const_reference 
       at(size_type __n) const
       { 
-	if (__builtin_expect(__n > _Nm, false))
-	  std::__throw_out_of_range("array::at");
-	return reinterpret_cast<const_reference>(_M_instance[__n]); 
+    if (__builtin_expect(__n > _Nm, false))
+      std::__throw_out_of_range("array::at");
+    return reinterpret_cast<const_reference>(_M_instance[__n]); 
       }
 
       reference 
       at(size_type __n)
       { 
-	if (__builtin_expect(__n > _Nm, false))
-	  std::__throw_out_of_range("array::at");
-	return reinterpret_cast<reference>(_M_instance[__n]); 
+    if (__builtin_expect(__n > _Nm, false))
+      std::__throw_out_of_range("array::at");
+    return reinterpret_cast<reference>(_M_instance[__n]); 
       }
 
       reference 
@@ -171,7 +171,7 @@
    operator<(const array<_Tp, _Nm>& a, const array<_Tp, _Nm>& b)
    { 
      return std::lexicographical_compare(a.begin(), a.end(), 
-					 b.begin(), b.end()); 
+                     b.begin(), b.end()); 
    }
 
  template<typename _Tp, size_t _Nm>

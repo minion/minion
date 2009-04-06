@@ -104,7 +104,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   
   int dynamic_trigger_count()
   { // two moving assignment triggers.
-	return 2;
+    return 2;
   }
   
   virtual triggerCollection setup_internal()
@@ -126,11 +126,11 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   {
     vector<AnyVarRef> vars;
-	vars.reserve(var_array.size() + 1);
-	for(unsigned i = 0; i < var_array.size(); ++i)
-	  vars.push_back(AnyVarRef(var_array[i]));
+    vars.reserve(var_array.size() + 1);
+    for(unsigned i = 0; i < var_array.size(); ++i)
+      vars.push_back(AnyVarRef(var_array[i]));
     vars.push_back(AnyVarRef(val_count));
-	return vars;
+    return vars;
   }
   
   
@@ -443,7 +443,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	  PROP_INFO_ADDONE(OccEqual);
+      PROP_INFO_ADDONE(OccEqual);
     D_ASSERT(i >= 0);
     
     if( var_array[i].getAssignedValue() == value )
@@ -467,20 +467,20 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   void setup_counters()
   {
     int occs = 0;
-	  int not_occs = 0;
+      int not_occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for(typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
     {
       if(it->isAssigned())
-	    {
-  	    if(it->getAssignedValue() == value)
-  	      ++occs;
-  		  else
-  	      ++not_occs;
+        {
+        if(it->getAssignedValue() == value)
+          ++occs;
+          else
+          ++not_occs;
       }
     }
     occurrences_count = occs;
-	  not_occurrences_count = not_occs;
+      not_occurrences_count = not_occs;
   }
   
   virtual void full_propagate()
@@ -513,10 +513,10 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   {
     vector<AnyVarRef> vars;
-	  vars.reserve(var_array.size());
-	  for(unsigned i = 0; i < var_array.size(); ++i)
-	    vars.push_back(AnyVarRef(var_array[i]));
-	  return vars;
+      vars.reserve(var_array.size());
+      for(unsigned i = 0; i < var_array.size(); ++i)
+        vars.push_back(AnyVarRef(var_array[i]));
+      return vars;
   }
   
    // Getting a satisfying assignment here is too hard, we don't want to have to
@@ -636,7 +636,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PROP_INFO_ADDONE(OccEqual);
+    PROP_INFO_ADDONE(OccEqual);
     if(i < 0)
     { // val_count changed
       if(occurrences_count == val_count.getMax())
@@ -665,20 +665,20 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   void setup_counters()
   {
     int occs = 0;
-	int not_occs = 0;
+    int not_occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for(typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
     {
       if(it->isAssigned())
-	  {
-	    if(it->getAssignedValue() == value)
-	      ++occs;
-		else
-	      ++not_occs;
+      {
+        if(it->getAssignedValue() == value)
+          ++occs;
+        else
+          ++not_occs;
       }
     }
     occurrences_count = occs;
-	not_occurrences_count = not_occs;
+    not_occurrences_count = not_occs;
   }
   
   virtual void full_propagate()
@@ -707,11 +707,11 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   {
     vector<AnyVarRef> vars;
-	vars.reserve(var_array.size() + 1);
-	for(unsigned i = 0; i < var_array.size(); ++i)
-	  vars.push_back(AnyVarRef(var_array[i]));
+    vars.reserve(var_array.size() + 1);
+    for(unsigned i = 0; i < var_array.size(); ++i)
+      vars.push_back(AnyVarRef(var_array[i]));
     vars.push_back(AnyVarRef(val_count));
-	return vars;
+    return vars;
   }
   
    // Getting a satisfying assignment here is too hard, we don't want to have to

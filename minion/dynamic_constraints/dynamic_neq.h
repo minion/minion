@@ -32,34 +32,34 @@ struct WatchNeqConstraint : public AbstractConstraint
   Var2 var2;
 
   WatchNeqConstraint(StateObj* _stateObj, const Var1& _var1, const Var2& _var2) :
-	AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
+    AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
   { }
   
   int dynamic_trigger_count()
-  {	return 2; }
+  { return 2; }
   
   virtual void full_propagate()
   {  
-  	DynamicTrigger* dt = dynamic_trigger_start();
-	
-	  if(var1.isAssigned() && var2.isAssigned() && var1.getAssignedValue() == var2.getAssignedValue())
-	  {
-      getState(stateObj).setFailed(true);
-      return;
-	  }
-	  
-	  if(var1.isAssigned())
-	  {
-      var2.removeFromDomain(var1.getAssignedValue());
-      return;
-	  }
-	  
-	  if(var2.isAssigned())
-	  {
-      var1.removeFromDomain(var2.getAssignedValue());
-      return;
-	  }
-	  
+    DynamicTrigger* dt = dynamic_trigger_start();
+    
+      if(var1.isAssigned() && var2.isAssigned() && var1.getAssignedValue() == var2.getAssignedValue())
+      {
+        getState(stateObj).setFailed(true);
+        return;
+      }
+      
+      if(var1.isAssigned())
+      {
+        var2.removeFromDomain(var1.getAssignedValue());
+        return;
+      }
+      
+      if(var2.isAssigned())
+      {
+        var1.removeFromDomain(var2.getAssignedValue());
+        return;
+      }
+      
     var1.addDynamicTrigger(dt    , Assigned);
     var2.addDynamicTrigger(dt + 1, Assigned);
   }
@@ -67,21 +67,21 @@ struct WatchNeqConstraint : public AbstractConstraint
     
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	  PROP_INFO_ADDONE(WatchNEQ);
-	  DynamicTrigger* dt_start = dynamic_trigger_start();
-	  
+      PROP_INFO_ADDONE(WatchNEQ);
+      DynamicTrigger* dt_start = dynamic_trigger_start();
+      
     D_ASSERT(dt == dt_start || dt == dt_start + 1);
     
-	  if(dt == dt_start)
-	  {
-      D_ASSERT(var1.isAssigned());
-      var2.removeFromDomain(var1.getAssignedValue());
-	  }
-	  else
-	  {
-      D_ASSERT(var2.isAssigned());
-      var1.removeFromDomain(var2.getAssignedValue());
-	  }
+      if(dt == dt_start)
+      {
+        D_ASSERT(var1.isAssigned());
+        var2.removeFromDomain(var1.getAssignedValue());
+      }
+      else
+      {
+        D_ASSERT(var2.isAssigned());
+        var1.removeFromDomain(var2.getAssignedValue());
+      }
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
@@ -93,7 +93,7 @@ struct WatchNeqConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;
-	  vars.reserve(2);
+      vars.reserve(2);
     vars.push_back(var1);
     vars.push_back(var2);
     return vars;

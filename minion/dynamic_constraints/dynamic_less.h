@@ -41,16 +41,16 @@ struct WatchLessConstraint : public AbstractConstraint
   Var2 var2;
 
   WatchLessConstraint(StateObj* _stateObj, const Var1& _var1, const Var2& _var2) :
-	AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
+    AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
   { }
   
   int dynamic_trigger_count()
-  {	return 2; }
+  { return 2; }
   
   virtual void full_propagate()
   {  
-  	DynamicTrigger* dt = dynamic_trigger_start();
-	    
+    DynamicTrigger* dt = dynamic_trigger_start();
+        
     var1.addDynamicTrigger(dt    , LowerBound);
     var2.addDynamicTrigger(dt + 1, UpperBound);
     
@@ -61,19 +61,15 @@ struct WatchLessConstraint : public AbstractConstraint
     
   DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
   {
-	  PROP_INFO_ADDONE(WatchNEQ);
-	  DynamicTrigger* dt_start = dynamic_trigger_start();
-	  
-    D_ASSERT(dt == dt_start || dt == dt_start + 1);
+      PROP_INFO_ADDONE(WatchNEQ);
+      DynamicTrigger* dt_start = dynamic_trigger_start();
+      
+      D_ASSERT(dt == dt_start || dt == dt_start + 1);
     
-	  if(dt == dt_start)
-	  {
-      var2.setMin(var1.getMin() + 1);
-	  }
-	  else
-	  {
-      var1.setMax(var2.getMax() - 1);
-	  }
+      if(dt == dt_start)
+      { var2.setMin(var1.getMin() + 1); }
+      else
+      { var1.setMax(var2.getMax() - 1); }
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
@@ -85,7 +81,7 @@ struct WatchLessConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;
-	  vars.reserve(2);
+      vars.reserve(2);
     vars.push_back(var1);
     vars.push_back(var2);
     return vars;

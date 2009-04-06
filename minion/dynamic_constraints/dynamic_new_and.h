@@ -196,7 +196,7 @@ struct Dynamic_AND : public ParentConstraint
     // push it on the special queue to be full_propagated later.
     D_ASSERT(!constraint_locked);
     constraint_locked = true;
-	getQueue(stateObj).pushSpecialTrigger(this);
+    getQueue(stateObj).pushSpecialTrigger(this);
   }
   
   // This breaks everything.

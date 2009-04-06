@@ -39,7 +39,7 @@ struct BuildConObj<CT_NAME, 0> \
   static  \
   AbstractConstraint* build(StateObj* stateObj, const pair<pair<pair<EmptyType, vector<T1>* >, vector<T2>* >, vector<T3>*>& vars, ConstraintBlob& b, int) \
   { \
-	  return Build ## CT_NAME(stateObj, *(vars.first.first.second), *(vars.first.second), *(vars.second), b); \
+      return Build ## CT_NAME(stateObj, *(vars.first.first.second), *(vars.first.second), *(vars.second), b); \
   } \
 }; \
 } \
@@ -54,7 +54,7 @@ struct BuildConObj<CT_NAME, 0> \
   static  \
   AbstractConstraint* build(StateObj* stateObj, const pair<pair<EmptyType, vector<T1>* >, vector<T2>* >& vars, ConstraintBlob& b, int) \
   { \
-	  return Build ## CT_NAME(stateObj, *(vars.first.second), *(vars.second), b); \
+      return Build ## CT_NAME(stateObj, *(vars.first.second), *(vars.second), b); \
   } \
 }; \
 } \
@@ -69,7 +69,7 @@ struct BuildConObj<CT_NAME, 0> \
   static  \
   AbstractConstraint* build(StateObj* stateObj, const pair<EmptyType, vector<T1>* >& vars, ConstraintBlob& b, int) \
   { \
-	  return Build ## CT_NAME(stateObj, *(vars.second), b); \
+      return Build ## CT_NAME(stateObj, *(vars.second), b); \
   } \
 }; \
 } \
@@ -83,7 +83,7 @@ struct BuildConObj<CT_NAME, 0> \
   static  \
   AbstractConstraint* build(StateObj* stateObj, const EmptyType& vars, ConstraintBlob& b, int) \
   { \
-	  return Build ## CT_NAME(stateObj, b); \
+      return Build ## CT_NAME(stateObj, b); \
   } \
 }; \
 } \

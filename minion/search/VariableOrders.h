@@ -79,15 +79,15 @@ struct VariableOrder
   
   void branch_left()
   {
-	D_ASSERT(!var_order[pos].isAssigned()) 
-	DomainInt assign_val;
-	if(val_order[pos])
-	  assign_val = var_order[pos].getMin();
-	else
-	  assign_val = var_order[pos].getMax();
-	var_order[pos].decisionAssign(assign_val);
-	maybe_print_search_assignment(stateObj, var_order[pos], assign_val, true);
-	branches.push_back(pos);
+    D_ASSERT(!var_order[pos].isAssigned()) 
+    DomainInt assign_val;
+    if(val_order[pos])
+      assign_val = var_order[pos].getMin();
+    else
+      assign_val = var_order[pos].getMax();
+    var_order[pos].decisionAssign(assign_val);
+    maybe_print_search_assignment(stateObj, var_order[pos], assign_val, true);
+    branches.push_back(pos);
     first_unassigned_variable.push_back(pos);
   }
   
@@ -97,36 +97,36 @@ struct VariableOrder
   void force_branch_left(int new_pos)
   {
     D_ASSERT(new_pos >= 0 && new_pos < var_order.size()); 
-	D_ASSERT(!var_order[new_pos].isAssigned()) 
-	DomainInt assign_val;
-	if(val_order[new_pos])
-	  assign_val = var_order[new_pos].getMin();
-	else
-	  assign_val = var_order[new_pos].getMax();
-	var_order[new_pos].uncheckedAssign(assign_val);
-	maybe_print_search_assignment(stateObj, var_order[new_pos], assign_val, true, true);
-	branches.push_back(new_pos);
+    D_ASSERT(!var_order[new_pos].isAssigned()) 
+    DomainInt assign_val;
+    if(val_order[new_pos])
+      assign_val = var_order[new_pos].getMin();
+    else
+      assign_val = var_order[new_pos].getMax();
+    var_order[new_pos].uncheckedAssign(assign_val);
+    maybe_print_search_assignment(stateObj, var_order[new_pos], assign_val, true, true);
+    branches.push_back(new_pos);
     // The first unassigned variable could still be much earlier.
     first_unassigned_variable.push_back(pos);
   }
   
   void branch_right()
   {  
-	 int other_branch = branches.back();
+     int other_branch = branches.back();
      branches.pop_back();
     
-	 if(val_order[other_branch])
-	 {
-	   D_ASSERT(var_order[other_branch].getMax() >= var_order[other_branch].getMin() + 1);
+     if(val_order[other_branch])
+     {
+       D_ASSERT(var_order[other_branch].getMax() >= var_order[other_branch].getMin() + 1);
        maybe_print_search_assignment(stateObj, var_order[other_branch], var_order[other_branch].getMin(), false);
-	   var_order[other_branch].setMin(var_order[other_branch].getMin() + 1);
-	 }
-	 else
-	 {
-	   D_ASSERT(var_order[other_branch].getMax() >= var_order[other_branch].getMin() + 1);
+       var_order[other_branch].setMin(var_order[other_branch].getMin() + 1);
+     }
+     else
+     {
+       D_ASSERT(var_order[other_branch].getMax() >= var_order[other_branch].getMin() + 1);
        maybe_print_search_assignment(stateObj, var_order[other_branch], var_order[other_branch].getMax(), false);
-	   var_order[other_branch].setMax(var_order[other_branch].getMax() - 1);
-	 }
+       var_order[other_branch].setMax(var_order[other_branch].getMax() - 1);
+     }
     
     pos = first_unassigned_variable.back();
     first_unassigned_variable.pop_back();

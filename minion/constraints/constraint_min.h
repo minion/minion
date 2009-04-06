@@ -65,22 +65,22 @@ struct MinConstraint : public AbstractConstraint
   MinVarRef min_var;
   
   MinConstraint(StateObj* _stateObj, const VarArray& _var_array, const MinVarRef& _min_var) :
-	AbstractConstraint(_stateObj), var_array(_var_array), min_var(_min_var)
+    AbstractConstraint(_stateObj), var_array(_var_array), min_var(_min_var)
   { }
   
   virtual triggerCollection setup_internal()
   {
-	triggerCollection t;
-	
-	for(int i = 0; i < var_array.size(); ++i)
-	{ // Have to add 1 else the 0th element will be lost.
-	  t.push_back(make_trigger(var_array[i], Trigger(this, i + 1), LowerBound));
-	  t.push_back(make_trigger(var_array[i], Trigger(this, -(i + 1)), UpperBound));
-	}
-	t.push_back(make_trigger(min_var, Trigger(this, var_array.size() + 1 ),LowerBound));
-	t.push_back(make_trigger(min_var, Trigger(this, -((int)var_array.size() + 1) ),UpperBound));
-	
-	return t;
+    triggerCollection t;
+    
+    for(int i = 0; i < var_array.size(); ++i)
+    { // Have to add 1 else the 0th element will be lost.
+      t.push_back(make_trigger(var_array[i], Trigger(this, i + 1), LowerBound));
+      t.push_back(make_trigger(var_array[i], Trigger(this, -(i + 1)), UpperBound));
+    }
+    t.push_back(make_trigger(min_var, Trigger(this, var_array.size() + 1 ),LowerBound));
+    t.push_back(make_trigger(min_var, Trigger(this, -((int)var_array.size() + 1) ),UpperBound));
+    
+    return t;
   }
   
   //  virtual AbstractConstraint* reverse_constraint()

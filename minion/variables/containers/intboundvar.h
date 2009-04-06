@@ -105,8 +105,8 @@ struct BoundVarRef_internal
   
   BOOL inDomain_noBoundCheck(DomainInt i) const
   {
-	D_ASSERT(i >= lower_bound());
-	D_ASSERT(i <= upper_bound());
+    D_ASSERT(i >= lower_bound());
+    D_ASSERT(i <= upper_bound());
     return true;
   }
   
@@ -245,8 +245,8 @@ struct BoundVarContainer {
   BOOL inDomain_noBoundCheck(const BoundVarRef_internal<BoundType>& d, DomainInt i) const
   {
     D_ASSERT(lock_m);
-	D_ASSERT(i >= lower_bound(d));
-	D_ASSERT(i <= upper_bound(d));
+    D_ASSERT(i >= lower_bound(d));
+    D_ASSERT(i <= upper_bound(d));
     return true;
   }
   
@@ -357,7 +357,7 @@ struct BoundVarContainer {
       trigger_list.push_domain_changed(d.var_num);
       lower_bound(d) = i;
       if(up_bound == i) {
-	    trigger_list.push_assign(d.var_num, i);
+        trigger_list.push_assign(d.var_num, i);
       }
     }
   }
@@ -392,20 +392,20 @@ struct BoundVarContainer {
       bound_ptr[2*i] = initial_bounds[i].first;
       bound_ptr[2*i+1] = initial_bounds[i].second;
     }
-	
-	DomainInt min_domain_val = 0;
-	DomainInt max_domain_val = 0;
-	if(!initial_bounds.empty())
-	{
-	  min_domain_val = initial_bounds[0].first;
-	  max_domain_val = initial_bounds[0].second;
-	  for(unsigned int i = 0; i < var_count_m; ++i)
+    
+    DomainInt min_domain_val = 0;
+    DomainInt max_domain_val = 0;
+    if(!initial_bounds.empty())
+    {
+      min_domain_val = initial_bounds[0].first;
+      max_domain_val = initial_bounds[0].second;
+      for(unsigned int i = 0; i < var_count_m; ++i)
       {
         bound_ptr[2*i] = initial_bounds[i].first;
         bound_ptr[2*i+1] = initial_bounds[i].second;
-	  
-	    min_domain_val = mymin(initial_bounds[i].first, min_domain_val);
-	    max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
+      
+        min_domain_val = mymin(initial_bounds[i].first, min_domain_val);
+        max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
       }
     }
     trigger_list.lock(var_count_m, min_domain_val, max_domain_val);    
@@ -413,8 +413,8 @@ struct BoundVarContainer {
 
   void addTrigger(const BoundVarRef_internal<BoundType>& b, Trigger t, TrigType type)
   { 
-	D_ASSERT(lock_m);  
-	trigger_list.add_trigger(b.var_num, t, type); 
+    D_ASSERT(lock_m);  
+    trigger_list.add_trigger(b.var_num, t, type); 
   }
 
   vector<AbstractConstraint*>* getConstraints(const BoundVarRef_internal<BoundType>& b)
@@ -439,9 +439,9 @@ struct BoundVarContainer {
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   {
-	D_ASSERT(lock_m); 
-	D_ASSERT(type != DomainRemoval);
-	trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
+    D_ASSERT(lock_m); 
+    D_ASSERT(type != DomainRemoval);
+    trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
   }
 #endif
 
@@ -453,10 +453,10 @@ struct BoundVarContainer {
     for(unsigned int i=0;i<var_count_m;i++)
     {
       if(!isAssigned(BoundVarRef_internal<BoundType>(i)))
-	s << "X";
+    s << "X";
       else
       {
-	s << (getAssignedValue(BoundVarRef_internal<BoundType>(i))?1:0); 
+    s << (getAssignedValue(BoundVarRef_internal<BoundType>(i))?1:0); 
       }
       char_count++;
       if(char_count%7==0) s << endl;

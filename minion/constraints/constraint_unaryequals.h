@@ -65,7 +65,7 @@ struct UnaryEqualConstraint : public AbstractConstraint
   { 
     vector<AnyVarRef> array;
     array.push_back(x);
-	return array;
+    return array;
   }
 };
 

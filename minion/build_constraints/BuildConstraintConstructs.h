@@ -52,80 +52,80 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
     type = vars[0].type();
     for(unsigned i = 1; i < vars.size(); ++i)
     {
-    	if(vars[i].type() != type)
-    	{
-    	  same_type = false;
-    	  break;
-    	}
+        if(vars[i].type() != type)
+        {
+          same_type = false;
+          break;
+        }
     }
   }
   #ifndef QUICK_COMPILE
   if(same_type)
   {
-	switch(type)
-	{
-	  case VAR_BOOL:
-	  {
-		vector<BoolVarRef> v(vars.size());
-		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = getVars(stateObj).getBooleanContainer().get_var_num(vars[i].pos());
-		return BuildConObj<constraint, size - 1>::
-		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
-	  }
-	  case VAR_NOTBOOL:
-	  {
-		vector<VarNot<BoolVarRef> > v(vars.size());
-		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = VarNotRef(getVars(stateObj).getBooleanContainer().get_var_num(vars[i].pos()));
-		return BuildConObj<constraint, size - 1>::
-		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
-	  }
-	  case VAR_BOUND:
-	  {
-		vector<BoundVarRef> v(vars.size());
-		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = getVars(stateObj).getBoundVarContainer().get_var_num(vars[i].pos());
-		return BuildConObj<constraint, size - 1>::
-		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
-	  }		
-	  case VAR_SPARSEBOUND:
-	  {
-		vector<SparseBoundVarRef> v(vars.size());
-		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = getVars(stateObj).getSparseBoundVarContainer().get_var_num(vars[i].pos());
-		return BuildConObj<constraint, size - 1>::
-		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
-	  }
+    switch(type)
+    {
+      case VAR_BOOL:
+      {
+        vector<BoolVarRef> v(vars.size());
+        for(unsigned i = 0; i < vars.size(); ++i)
+          v[i] = getVars(stateObj).getBooleanContainer().get_var_num(vars[i].pos());
+        return BuildConObj<constraint, size - 1>::
+          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+      }
+      case VAR_NOTBOOL:
+      {
+        vector<VarNot<BoolVarRef> > v(vars.size());
+        for(unsigned i = 0; i < vars.size(); ++i)
+          v[i] = VarNotRef(getVars(stateObj).getBooleanContainer().get_var_num(vars[i].pos()));
+        return BuildConObj<constraint, size - 1>::
+          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+      }
+      case VAR_BOUND:
+      {
+        vector<BoundVarRef> v(vars.size());
+        for(unsigned i = 0; i < vars.size(); ++i)
+          v[i] = getVars(stateObj).getBoundVarContainer().get_var_num(vars[i].pos());
+        return BuildConObj<constraint, size - 1>::
+          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+      }     
+      case VAR_SPARSEBOUND:
+      {
+        vector<SparseBoundVarRef> v(vars.size());
+        for(unsigned i = 0; i < vars.size(); ++i)
+          v[i] = getVars(stateObj).getSparseBoundVarContainer().get_var_num(vars[i].pos());
+        return BuildConObj<constraint, size - 1>::
+          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+      }
       case VAR_DISCRETE:
-	  {
-		vector<BigRangeVarRef> v(vars.size());
-		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = getVars(stateObj).getBigRangeVarContainer().get_var_num(vars[i].pos());
-		return BuildConObj<constraint, size - 1>::
-		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
-	  }
-	  case VAR_SPARSEDISCRETE:	
-		INPUT_ERROR( "Sparse Discrete Variables current broken. Sorry");
-		
-	  case VAR_CONSTANT:
-	  {
-		vector<ConstantVar> v(vars.size());
-		for(unsigned i = 0; i < vars.size(); ++i)
-		  v[i] = ConstantVar(stateObj, vars[i].pos());
-		return BuildConObj<constraint, size - 1>::
-		  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
-	  }
-	}
+      {
+        vector<BigRangeVarRef> v(vars.size());
+        for(unsigned i = 0; i < vars.size(); ++i)
+          v[i] = getVars(stateObj).getBigRangeVarContainer().get_var_num(vars[i].pos());
+        return BuildConObj<constraint, size - 1>::
+          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+      }
+      case VAR_SPARSEDISCRETE:  
+        INPUT_ERROR( "Sparse Discrete Variables current broken. Sorry");
+        
+      case VAR_CONSTANT:
+      {
+        vector<ConstantVar> v(vars.size());
+        for(unsigned i = 0; i < vars.size(); ++i)
+          v[i] = ConstantVar(stateObj, vars[i].pos());
+        return BuildConObj<constraint, size - 1>::
+          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+      }
+    }
   }
   else
   #endif
   {
-	vector<AnyVarRef> v(vars.size());
-	for(unsigned i = 0; i < vars.size(); ++i)
-	  v[i] = get_AnyVarRef_from_Var(stateObj, vars[i]);
-	
-	return BuildConObj<constraint, size - 1>::
-	  build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+    vector<AnyVarRef> v(vars.size());
+    for(unsigned i = 0; i < vars.size(); ++i)
+      v[i] = get_AnyVarRef_from_Var(stateObj, vars[i]);
+    
+    return BuildConObj<constraint, size - 1>::
+      build(stateObj, make_pair(partial_build, &v), b, pos + 1);
   }
   // This FAIL_EXIT is here to stop a "no return in non-void function" warning. It should never be reached.
   INPUT_ERROR( "This should never be reached..");

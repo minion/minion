@@ -116,8 +116,8 @@ struct PropagateSSAC
   template<typename Vars>
   void operator()(StateObj* stateObj, Vars& vars)
   {
-	PropagateSAC sac;
-	propagateSAC_internal(stateObj, vars, sac, false);
+    PropagateSAC sac;
+    propagateSAC_internal(stateObj, vars, sac, false);
   }
 };
 
@@ -126,8 +126,8 @@ struct PropagateSSAC_Bounds
   template<typename Vars>
   void operator()(StateObj* stateObj, Vars& vars)
   {
-	PropagateSAC sac;
-	propagateSAC_internal(stateObj, vars, sac, true);
+    PropagateSAC sac;
+    propagateSAC_internal(stateObj, vars, sac, true);
   }
 };
 

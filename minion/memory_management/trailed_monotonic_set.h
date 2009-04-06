@@ -45,7 +45,7 @@ class TrailedMonotonicSet
 
   int& undo_indexes(int i)
   {
-	return static_cast<int*>(_undo_indexes.get_ptr())[i]; 
+    return static_cast<int*>(_undo_indexes.get_ptr())[i]; 
   }
 
 public:
@@ -54,14 +54,14 @@ public:
   value_type& array(DomainInt i)
   { 
     D_ASSERT( i >= 0 && i < size());
-	int val = checked_cast<int>(i);
+    int val = checked_cast<int>(i);
     return static_cast<value_type*>(_array.get_ptr())[val]; 
   }
   
   const value_type& array(DomainInt i) const
   { 
     D_ASSERT( i >= 0 && i < size() && _array.get_ptr() != NULL);
-	int val = checked_cast<int>(i);
+    int val = checked_cast<int>(i);
     return static_cast<const value_type*>(_array.get_ptr())[val]; 
   }
 
@@ -98,14 +98,14 @@ public:
   {
 
          D_ASSERT( 0 <= index && index < size());
-    	  if (array(index)) 
-	  { 
-		  undo_indexes(_local_depth) = checked_cast<int>(index);
-		  ++_local_depth;
-		 array(index) = 0;	  
-		 return 1;
-	  }
-	  return 0;
+          if (array(index)) 
+      { 
+          undo_indexes(_local_depth) = checked_cast<int>(index);
+          ++_local_depth;
+         array(index) = 0;    
+         return 1;
+      }
+      return 0;
   }
   
   bool isMember(DomainInt index) const

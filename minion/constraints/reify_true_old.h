@@ -67,9 +67,9 @@ struct reify_true_old : public AbstractConstraint
   
   virtual vector<AnyVarRef> get_vars()
   { 
-	vector<AnyVarRef> vec = poscon->get_vars();
-	vec.push_back(rar_var);
-	return vec;
+    vector<AnyVarRef> vec = poscon->get_vars();
+    vec.push_back(rar_var);
+    return vec;
   }
   
   virtual triggerCollection setup_internal()
@@ -129,7 +129,7 @@ struct reify_true_old : public AbstractConstraint
 #endif
       PROP_INFO_ADDONE(ReifyImplyCheckUnsat);
       if(poscon->check_unsat(i, domain)) 
-	{ rar_var.propagateAssign(false); }
+    { rar_var.propagateAssign(false); }
     }
   }
   

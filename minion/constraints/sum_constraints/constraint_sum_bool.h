@@ -43,14 +43,14 @@ struct BoolLessSumConstraint : public AbstractConstraint
   {
     triggerCollection t;
     int array_size = var_array.size();
-	
+    
     count = 0;    
     
     for(int i = 0; i < array_size; ++i)
       if(VarToCount)
-	  	t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
+        t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
       else
-	  	t.push_back(make_trigger(var_array[i], Trigger(this, i), UpperBound));
+        t.push_back(make_trigger(var_array[i], Trigger(this, i), UpperBound));
     return t;
   }
   
@@ -90,9 +90,9 @@ struct BoolLessSumConstraint : public AbstractConstraint
   
   PROPAGATE_FUNCTION(int i, DomainDelta)
   {
-	PROP_INFO_ADDONE(BoolSum);
+    PROP_INFO_ADDONE(BoolSum);
     D_ASSERT(var_array[i].getAssignedValue() == 0 ||
-			 var_array[i].getAssignedValue() == 1);
+             var_array[i].getAssignedValue() == 1);
     int c = count + 1;
     count = c;
     if(c == occ_count())
@@ -105,7 +105,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
       if(var_array[i].isAssignedValue(VarToCount))
-		occs++;
+        occs++;
     count = occs;
     if(occs > occ_count())
       return true;
@@ -128,7 +128,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     int array_size = var_array.size();
     for(int i = 0; i < array_size; ++i)
       if(var_array[i].isAssignedValue(VarToCount))
-		occs++;
+        occs++;
     count = occs;
     if(occs > occ_count())
       getState(stateObj).setFailed(true);
@@ -203,10 +203,10 @@ struct BoolLessSumConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;
-	vars.reserve(var_array.size());
-	for(unsigned i = 0; i < var_array.size(); ++i)
-	  vars.push_back(var_array[i]);
-	return vars;
+    vars.reserve(var_array.size());
+    for(unsigned i = 0; i < var_array.size(); ++i)
+      vars.push_back(var_array[i]);
+    return vars;
   }
 };
 

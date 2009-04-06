@@ -224,7 +224,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     int propval = dt->trigger_info();
     D_ASSERT(var_array[propval].getAssignedValue() == VarToCount);
   // should generalise
-  // and will need to loop round for watched lits	
+  // and will need to loop round for watched lits
 
     bool found_new_support = false;
 

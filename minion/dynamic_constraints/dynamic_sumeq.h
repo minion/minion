@@ -125,7 +125,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
       } else {
         aCurr++;
         while(aCurr <= aMax && !(a.inDomain(aCurr)))
-          aCurr++;	
+          aCurr++;
       }
     }
     return 0; //no supports possible    
@@ -162,63 +162,63 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     int max = z.getMax();
     for(int i = z.getMin(); i <= max; i++) {
       if(z.inDomain(i)) {
-	if(!get_sumsupport(x, y, i, supp)) {
-	  z.removeFromDomain(i);
-	} else {
-	  x.addDynamicTrigger(dt, DomainRemoval, supp[0]);
-	  y.addDynamicTrigger(dt+1, DomainRemoval, supp[1]);
-	  dt->trigger_info() = i;     //keep a note of the value it supports
-	  (dt+1)->trigger_info() = i;
-	  workingData.other = index + 1;
-	  workingData.isForX = 0; workingData.isForY = 0; workingData.isForZ = 1;
-	  wlToData.push_back(workingData);
-	  workingData.other = index;
-	  wlToData.push_back(workingData);
-	  index += 2;
-	  dt += 2;
-	}
+    if(!get_sumsupport(x, y, i, supp)) {
+      z.removeFromDomain(i);
+    } else {
+      x.addDynamicTrigger(dt, DomainRemoval, supp[0]);
+      y.addDynamicTrigger(dt+1, DomainRemoval, supp[1]);
+      dt->trigger_info() = i;     //keep a note of the value it supports
+      (dt+1)->trigger_info() = i;
+      workingData.other = index + 1;
+      workingData.isForX = 0; workingData.isForY = 0; workingData.isForZ = 1;
+      wlToData.push_back(workingData);
+      workingData.other = index;
+      wlToData.push_back(workingData);
+      index += 2;
+      dt += 2;
+    }
       }
     }
     //supports for x:
     max = x.getMax();
     for(int i = x.getMin(); i <= max; i++) {
       if(x.inDomain(i)) {
-	if(!get_diffsupport(z, y, ymult, i*xmult, supp)) {
-	  x.removeFromDomain(i);
-	} else {
-	  z.addDynamicTrigger(dt, DomainRemoval, supp[0]);
-	  y.addDynamicTrigger(dt + 1, DomainRemoval, supp[1]);
-	  dt->trigger_info() = i;
-	  (dt+1)->trigger_info() = i;
-	  workingData.other = index + 1;
-	  workingData.isForX = 1; workingData.isForY = 0; workingData.isForZ = 0;
-	  wlToData.push_back(workingData);
-	  workingData.other = index;
-	  wlToData.push_back(workingData);
-	  index += 2;
-	  dt += 2;
-	}
+    if(!get_diffsupport(z, y, ymult, i*xmult, supp)) {
+      x.removeFromDomain(i);
+    } else {
+      z.addDynamicTrigger(dt, DomainRemoval, supp[0]);
+      y.addDynamicTrigger(dt + 1, DomainRemoval, supp[1]);
+      dt->trigger_info() = i;
+      (dt+1)->trigger_info() = i;
+      workingData.other = index + 1;
+      workingData.isForX = 1; workingData.isForY = 0; workingData.isForZ = 0;
+      wlToData.push_back(workingData);
+      workingData.other = index;
+      wlToData.push_back(workingData);
+      index += 2;
+      dt += 2;
+    }
       }
     }
     //supports for y:
     max = y.getMax();
     for(int i = y.getMin(); i <= max; i++) {
       if(y.inDomain(i)) {
-	if(!get_diffsupport(z, x, xmult, i*ymult, supp)) {
-	  y.removeFromDomain(i);
-	} else {
-	  z.addDynamicTrigger(dt, DomainRemoval, supp[0]);
-	  x.addDynamicTrigger(dt + 1, DomainRemoval, supp[1]);
-	  dt->trigger_info() = i;
-	  (dt+1)->trigger_info() = i;
-	  workingData.other = index + 1;
-	  workingData.isForX = 0; workingData.isForY = 1; workingData.isForZ = 0;
-	  wlToData.push_back(workingData);
-	  workingData.other = index;
-	  wlToData.push_back(workingData);
-	  index += 2;
-	  dt += 2;
-	}
+    if(!get_diffsupport(z, x, xmult, i*ymult, supp)) {
+      y.removeFromDomain(i);
+    } else {
+      z.addDynamicTrigger(dt, DomainRemoval, supp[0]);
+      x.addDynamicTrigger(dt + 1, DomainRemoval, supp[1]);
+      dt->trigger_info() = i;
+      (dt+1)->trigger_info() = i;
+      workingData.other = index + 1;
+      workingData.isForX = 0; workingData.isForY = 1; workingData.isForZ = 0;
+      wlToData.push_back(workingData);
+      workingData.other = index;
+      wlToData.push_back(workingData);
+      index += 2;
+      dt += 2;
+    }
       }
     }
   }
@@ -230,30 +230,30 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     int wl_no = dt - dts; //sequence number of WL
     WLdata data = wlToData[wl_no];
     if(!(data.isForX ? x.inDomain(value) :
-	 (data.isForY ? y.inDomain(value) : z.inDomain(value))))
+     (data.isForY ? y.inDomain(value) : z.inDomain(value))))
       return;
     int supp[2] = {0, 0};
     DynamicTrigger* first_dt = (dt < dts + data.other) ? dt : dt - 1;
     if(data.isForX) {
       if(!get_diffsupport(z, y, ymult, value*xmult, supp)) {
-	x.removeFromDomain(value);
+    x.removeFromDomain(value);
       } else {
-	z.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
-	y.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
+    z.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
+    y.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
       }
     } else if(data.isForY) {
       if(!get_diffsupport(z, x, xmult, value*ymult, supp)) {
-	y.removeFromDomain(value);
+    y.removeFromDomain(value);
       } else {
-	z.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
-	x.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
+    z.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
+    x.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
       }
     } else {
       if(!get_sumsupport(x, y, value, supp)) {
-	z.removeFromDomain(value);
+    z.removeFromDomain(value);
       } else {
-	x.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
-	y.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
+    x.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
+    y.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
       }
     }
   }

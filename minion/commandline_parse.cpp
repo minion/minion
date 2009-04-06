@@ -26,43 +26,43 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
  for(int i = 1; i < argc; ++i)
   {
     const string command(argv[i]);
-	if(command == string("-findallsols"))
-	{ getOptions(stateObj).findAllSolutions(); }
-	else if(command == string("-findgenerators"))
-  { getOptions(stateObj).find_generators = true; }
-	else if(command == string("-crash"))
-  { debug_crash = true; }
-	else if(command == string("-quiet"))
-	{ getOptions(stateObj).parser_verbose = false; }
+    if(command == string("-findallsols"))
+    { getOptions(stateObj).findAllSolutions(); }
+    else if(command == string("-findgenerators"))
+    { getOptions(stateObj).find_generators = true; }
+    else if(command == string("-crash"))
+    { debug_crash = true; }
+    else if(command == string("-quiet"))
+    { getOptions(stateObj).parser_verbose = false; }
 
-	else if(command == string("-redump"))
-  { getOptions(stateObj).redump = true; }
-  else if(command == string("-Xgraph"))
-  { 
-    getOptions(stateObj).graph = true;
-    getOptions(stateObj).silent = true;
-  }
-  else if(command == string("-outputType"))
-  {
-    ++i;
-    getOptions(stateObj).outputType = atoi(argv[i]);
-  }
-	else if(command == string("-printsols"))
-	{ getOptions(stateObj).print_solution = true; }
-	else if(command == string("-noprintsols"))
-	{ getOptions(stateObj).print_solution = false; }
-	else if(command == string("-notimers"))
-  { getOptions(stateObj).noTimers = true; }
-	else if(command == string("-printsolsonly"))
-	{ getOptions(stateObj).silent = true; }
-	else if(command == string("-cspcomp"))
-  { 
-    getOptions(stateObj).silent = true;
-    getOptions(stateObj).cspcomp = true;
-    in_cspcomp_for_failexit = true;
-  }
-	else if(command == string("-verbose"))
-	{ getOptions(stateObj).parser_verbose = true; }
+    else if(command == string("-redump"))
+    { getOptions(stateObj).redump = true; }
+    else if(command == string("-Xgraph"))
+    { 
+      getOptions(stateObj).graph = true;
+      getOptions(stateObj).silent = true;
+    }
+    else if(command == string("-outputType"))
+    {
+      ++i;
+      getOptions(stateObj).outputType = atoi(argv[i]);
+    }
+    else if(command == string("-printsols"))
+    { getOptions(stateObj).print_solution = true; }
+    else if(command == string("-noprintsols"))
+    { getOptions(stateObj).print_solution = false; }
+    else if(command == string("-notimers"))
+    { getOptions(stateObj).noTimers = true; }
+    else if(command == string("-printsolsonly"))
+    { getOptions(stateObj).silent = true; }
+    else if(command == string("-cspcomp"))
+    { 
+      getOptions(stateObj).silent = true;
+      getOptions(stateObj).cspcomp = true;
+      in_cspcomp_for_failexit = true;
+    }
+    else if(command == string("-verbose"))
+    { getOptions(stateObj).parser_verbose = true; }
     else if(command == string("-X-prop-node"))
     {
       cout << "# WARNING: -X-prop-node is experimental. Do not use for benchmarking!" << endl;
@@ -78,112 +78,112 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       string prop_mode(argv[i]);
       args.preprocess = GetPropMethodFromString(prop_mode);
     }
-	else if(command == string("-fullprop"))
-	{
+    else if(command == string("-fullprop"))
+    {
 #ifndef NO_DEBUG
-	  getOptions(stateObj).fullpropagate = true; 
+      getOptions(stateObj).fullpropagate = true; 
 #else
     FAIL_EXIT("This version of minion was not built to support the '-fullprop' command. Sorry");
 #endif
-	}
-	else if(command == string("-nocheck"))
-	{
-	  getOptions(stateObj).nocheck = true; 
-	}
-  else if(command == string("-check"))
-  {
-    getOptions(stateObj).nocheck = false;
-  }	
-	else if(command == string("-dumptree"))
-	{ getOptions(stateObj).dumptree = true; }
-	else if(command == string("-nodelimit"))
-	{
-	  ++i;
-	  getOptions(stateObj).nodelimit = atoi(argv[i]);
-	  if(getOptions(stateObj).nodelimit == 0)
-	  {
-		cout << "Did not understand parameter to nodelimit:" << argv[i] << endl;
-		exit(1);
-	  }
-	}
-	else if(command == string("-sollimit"))
-	{
-	  ++i;
-	  getOptions(stateObj).sollimit = atoi(argv[i]);
-	  if(getOptions(stateObj).sollimit == 0)
-	  {
-	    cout << "Did not understand the parameter to sollimit:" << argv[i] << endl;
-		  exit(1);
-	  }
-	}
-	else if(command == string("-timelimit"))
-	{
-	  ++i;
-	  getOptions(stateObj).time_limit = atoi(argv[i]);
-	  if(getOptions(stateObj).time_limit == 0)
-	  {
-	    cout << "Did not understand the parameter to timelimit:" << argv[i] << endl;
-      exit(1);
-	  }
-	}// TODO : Should remove -varorder for beta orderings.
-	else if(command == string("-varorder") || command == string("-X-varorder") )
-	{ 
-	  cout << "# -varorder is experimental and slower than minion's standard branching." << endl;
-	  ++i;
-	  
-	  string order(argv[i]);
-	  
-	  if(order == "static")
-		args.order = ORDER_STATIC;
-		else if(order == "srf")
-    args.order = ORDER_SRF;
-    else if(order == "srf-random")
+    }
+    else if(command == string("-nocheck"))
     {
+      getOptions(stateObj).nocheck = true; 
+    }
+    else if(command == string("-check"))
+    {
+      getOptions(stateObj).nocheck = false;
+    } 
+    else if(command == string("-dumptree"))
+    { getOptions(stateObj).dumptree = true; }
+    else if(command == string("-nodelimit"))
+    {
+      ++i;
+      getOptions(stateObj).nodelimit = atoi(argv[i]);
+      if(getOptions(stateObj).nodelimit == 0)
+      {
+        cout << "Did not understand parameter to nodelimit:" << argv[i] << endl;
+        exit(1);
+      }
+    }
+    else if(command == string("-sollimit"))
+    {
+      ++i;
+      getOptions(stateObj).sollimit = atoi(argv[i]);
+      if(getOptions(stateObj).sollimit == 0)
+      {
+        cout << "Did not understand the parameter to sollimit:" << argv[i] << endl;
+          exit(1);
+      }
+    }
+    else if(command == string("-timelimit"))
+    {
+      ++i;
+      getOptions(stateObj).time_limit = atoi(argv[i]);
+      if(getOptions(stateObj).time_limit == 0)
+      {
+        cout << "Did not understand the parameter to timelimit:" << argv[i] << endl;
+      exit(1);
+      }
+    }// TODO : Should remove -varorder for beta orderings.
+    else if(command == string("-varorder") || command == string("-X-varorder") )
+    { 
+        cout << "# -varorder is experimental and slower than minion's standard branching." << endl;
+        ++i;
+        
+        string order(argv[i]);
+        
+        if(order == "static")
+          args.order = ORDER_STATIC;
+          else if(order == "srf")
       args.order = ORDER_SRF;
-      getOptions(stateObj).randomise_valvarorder = true;
-    }  
-	  else if(order == "sdf")
-		args.order = ORDER_SDF;
-	  else if(order == "sdf-random")
-	  {
-		args.order = ORDER_SDF;
-		getOptions(stateObj).randomise_valvarorder = true;
-	  }
-	  else if(order == "ldf")
-		args.order = ORDER_LDF;
-	  else if(order == "ldf-random")
-	  {
-		args.order = ORDER_LDF;
-		getOptions(stateObj).randomise_valvarorder = true;
-	  }
-	  else if(order == "random")
-		getOptions(stateObj).randomise_valvarorder = true;
+      else if(order == "srf-random")
+      {
+        args.order = ORDER_SRF;
+        getOptions(stateObj).randomise_valvarorder = true;
+      }  
+      else if(order == "sdf")
+        args.order = ORDER_SDF;
+      else if(order == "sdf-random")
+      {
+        args.order = ORDER_SDF;
+        getOptions(stateObj).randomise_valvarorder = true;
+      }
+      else if(order == "ldf")
+        args.order = ORDER_LDF;
+      else if(order == "ldf-random")
+      {
+        args.order = ORDER_LDF;
+        getOptions(stateObj).randomise_valvarorder = true;
+      }
+      else if(order == "random")
+        getOptions(stateObj).randomise_valvarorder = true;
 #if 0
-	  else if(order == "conflict")
-	    args.order = ORDER_CONFLICT;
+      else if(order == "conflict")
+        args.order = ORDER_CONFLICT;
 #endif
-	  else if(order == "wdeg") {
-	    args.order = ORDER_WDEG;
-	    getOptions(stateObj).wdeg_on = true;
-	  } else if(order == "domoverwdeg") {
-	    args.order = ORDER_DOMOVERWDEG;
-	    getOptions(stateObj).wdeg_on = true;
-	  } 
-	  else
-	  {
-		cerr << "I do not understand the order:" << order << endl;
-    exit(1);
-	  }
-	}
-	else if(command == string("-randomiseorder"))
-	{
-	  getOptions(stateObj).randomise_valvarorder = true;
-	}
-	else if(command == string("-randomseed"))
-	{
-	  ++i;
-	  args.random_seed = atoi(argv[i]);
-	}
+      else if(order == "wdeg") {
+        args.order = ORDER_WDEG;
+        getOptions(stateObj).wdeg_on = true;
+      } else if(order == "domoverwdeg") {
+        args.order = ORDER_DOMOVERWDEG;
+        getOptions(stateObj).wdeg_on = true;
+      } 
+      else
+      {
+        cerr << "I do not understand the order:" << order << endl;
+        exit(1);
+      }
+    }
+    else if(command == string("-randomiseorder"))
+    {
+      getOptions(stateObj).randomise_valvarorder = true;
+    }
+    else if(command == string("-randomseed"))
+    {
+      ++i;
+      args.random_seed = atoi(argv[i]);
+    }
     else if(command == string("-tableout") || command == string("-tableout0"))
     {
         getOptions(stateObj).tableout=true;
@@ -206,17 +206,17 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       cout << "I don't understand '" << command << "'. Sorry. " << endl;
       exit(1);
     }
-	else
-	{ 
-	  if(getOptions(stateObj).instance_name == "")
-      getOptions(stateObj).instance_name = command;
+    else
+    { 
+      if(getOptions(stateObj).instance_name == "")
+        getOptions(stateObj).instance_name = command;
     else
     {
-	    cout << "I was confused by '" << command << "'. Sorry." << endl;
+      cout << "I was confused by '" << command << "'. Sorry." << endl;
       cout << "You can only give one instance file." << endl;
       exit(1);
     }
-	}
+    }
   }
   // bundle all options together and store
   string s=string("");

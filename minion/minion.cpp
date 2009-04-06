@@ -344,7 +344,7 @@ try {
     std::string sect("");
     if(argc != 2) {
       for(size_t i = 2; i < argc - 1; i++) 
-	sect.append(argv[i]).append(" ");
+        sect.append(argv[i]).append(" ");
       sect.append(argv[argc - 1]);
     }
     help(sect);

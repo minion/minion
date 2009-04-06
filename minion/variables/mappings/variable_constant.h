@@ -59,7 +59,7 @@ struct ConstantVar
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { 
     D_ASSERT(b == val);
-	return true;
+    return true;
   }
   
   DomainInt getMax() const
@@ -122,7 +122,7 @@ struct ConstantVar
   int getDomainChange(DomainDelta d)
   { 
     D_ASSERT(d.XXX_get_domain_diff() == 0);
-	return 0;
+    return 0;
   }
   
   friend std::ostream& operator<<(std::ostream& o, const ConstantVar& constant)

@@ -62,14 +62,14 @@ class RandomAccessPriorityQ {
       Key parent_k = heap[parent(pos)];
       pair<Data, size_t>& parent_data_pos = mapping.find(parent_k)->second;
       if(parent_data_pos.first < data_pos.first) {
-	heap[pos] = parent_k;
-	parent_data_pos.second = pos;
-	pos = parent(pos);
+        heap[pos] = parent_k;
+        parent_data_pos.second = pos;
+        pos = parent(pos);
       } else
-	break;
-    }
-    heap[pos] = pos_k;
-    data_pos.second = pos;
+        break;
+      }
+      heap[pos] = pos_k;
+      data_pos.second = pos;
   }
 
   void pullDown(size_t pos) {
@@ -79,39 +79,39 @@ class RandomAccessPriorityQ {
     while(true) {
       int left = left(pos);
       if(left >= heap_s) //no children
-	break;
+    break;
       else { //left child at least
-	Key left_k = heap[left];
-	pair<Data, size_t>& left_data_pos = mapping.find(left_k)->second;
-	int right = right(pos);
-	if(right >= heap_s) { //no right child
-	  if(init_data_pos.first < left_data_pos.first) { //but left child is larger
-	    heap[pos] = left_k; //so swap the left child and current around and then stop
-	    left_data_pos.second = pos;
-	    pos = left;
-	  }
-	  break;
-	} else { //both left and right children
-	  Key right_k = heap[right];
-	  pair<Data, size_t>& right_data_pos = mapping.find(right_k)->second;
-	  if(right_data_pos.first < left_data_pos.first) {
-	    if(init_data_pos.first < left_data_pos.first) { //left child is largest
-	      heap[pos] = left_k; //so bring it up
-	      left_data_pos.second = pos;
-	      pos = left(pos);
-	    } else {
-	      break;
-	    }
-	  } else {
-	    if(init_data_pos.first < right_data_pos.first) { //right child is largest
-	      heap[pos] = right_k;
-	      right_data_pos.second = pos;
-	      pos = right(pos);
-	    } else {
-	      break;
-	    }
-	  }
-	}
+        Key left_k = heap[left];
+        pair<Data, size_t>& left_data_pos = mapping.find(left_k)->second;
+        int right = right(pos);
+        if(right >= heap_s) { //no right child
+          if(init_data_pos.first < left_data_pos.first) { //but left child is larger
+            heap[pos] = left_k; //so swap the left child and current around and then stop
+            left_data_pos.second = pos;
+            pos = left;
+          }
+          break;
+        } else { //both left and right children
+          Key right_k = heap[right];
+          pair<Data, size_t>& right_data_pos = mapping.find(right_k)->second;
+          if(right_data_pos.first < left_data_pos.first) {
+            if(init_data_pos.first < left_data_pos.first) { //left child is largest
+              heap[pos] = left_k; //so bring it up
+              left_data_pos.second = pos;
+              pos = left(pos);
+            } else {
+              break;
+            }
+          } else {
+            if(init_data_pos.first < right_data_pos.first) { //right child is largest
+              heap[pos] = right_k;
+              right_data_pos.second = pos;
+              pos = right(pos);
+            } else {
+              break;
+            }
+          }
+        }
       }
     }
     heap[pos] = init_k; //put into final position
@@ -183,14 +183,14 @@ class RandomAccessPriorityQ {
       return true; //no children => is a heap
     else //left is present
       if(right(pos) >= heap_s) { //left child only
-	bool left_ok = !(data < getData(heap[left(pos)])) && checkHeap(left(pos));
-	D_ASSERT(left_ok);
-	return left_ok;
+          bool left_ok = !(data < getData(heap[left(pos)])) && checkHeap(left(pos));
+          D_ASSERT(left_ok);
+          return left_ok;
       } else { //both children present
-	bool both_ok = !(data < getData(heap[left(pos)])) && !(data < getData(heap[right(pos)])) &&
-	  checkHeap(left(pos)) && checkHeap(right(pos));
-	D_ASSERT(both_ok);
-	return both_ok;
+          bool both_ok = !(data < getData(heap[left(pos)])) && !(data < getData(heap[right(pos)])) &&
+            checkHeap(left(pos)) && checkHeap(right(pos));
+          D_ASSERT(both_ok);
+          return both_ok;
       }
   }
 };
