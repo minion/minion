@@ -89,8 +89,9 @@ struct DivConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    if(!var2.isBound())
+    if(!var2.isBound()) {
       var2.removeFromDomain(0);
+    }
       
     propagate(1,0); 
     propagate(2,0);

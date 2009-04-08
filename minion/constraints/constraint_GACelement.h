@@ -179,10 +179,12 @@ struct GACElementConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     for(int i=0; i<var_array.size(); i++) 
-        if(var_array[i].isBound()) 
+        if(var_array[i].isBound()) {
             cerr << "Warning: GACElement is not designed to be used on bound variables and may cause crashes." << endl;
-    if(indexvar.isBound() || resultvar.isBound())
+        }
+    if(indexvar.isBound() || resultvar.isBound()) {
         cerr << "Warning: GACElement is not designed to be used on bound variables and may cause crashes." << endl;
+    }
     indexvar.setMin(0);
     indexvar.setMax(var_array.size() - 1);
     resultvar.setMin(var_array_min_val);

@@ -173,14 +173,14 @@ struct ElementConstraint : public AbstractConstraint
           if(index_ref.inDomain(i) && !var_array[i].inDomain(assigned_val)) // fixed here.
           {
               if(index_ref.isBound())
-                {
-                    if(i==index_ref.getMax()) index_ref.setMax(i-1);
-                    if(i==index_ref.getMin()) index_ref.setMin(i+1);
-                }
-                else
-                {
-                    index_ref.removeFromDomain(i);
-                }
+              {
+                  if(i==index_ref.getMax()) index_ref.setMax(i-1);
+                  if(i==index_ref.getMin()) index_ref.setMin(i+1);
+              }
+              else
+              {
+                  index_ref.removeFromDomain(i);
+              }
           }
         }
       }

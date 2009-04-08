@@ -92,8 +92,9 @@ struct NeqConstraint : public AbstractConstraint
           if(var_array[i].getMax() == remove_val)
             var_array[i].setMax(remove_val - 1);
         }
-        else
+        else {
           var_array[i].removeFromDomain(remove_val);
+        }
       }
     }
     
@@ -158,8 +159,9 @@ struct NeqConstraint : public AbstractConstraint
               if(var_array[j].getMax() == remove_val)
                 var_array[j].setMax(remove_val - 1);
             }
-            else
+            else {
               var_array[j].removeFromDomain(remove_val);
+            }
           }
         }
       }

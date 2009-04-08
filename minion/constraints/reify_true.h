@@ -190,10 +190,11 @@ template<typename BoolVar, bool DoWatchAssignment>
     for(int i = 0; i < assignment.size(); ++i)
     {
       D_ASSERT(vars[assignment[i].first].inDomain(assignment[i].second));
-      if(vars[assignment[i].first].isBound())
+      if(vars[assignment[i].first].isBound()) {
         vars[assignment[i].first].addDynamicTrigger(trig + i, DomainChanged);
-      else  
+      } else {
         vars[assignment[i].first].addDynamicTrigger(trig + i, DomainRemoval, assignment[i].second);
+      }
     }
 
   }

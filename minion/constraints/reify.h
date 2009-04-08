@@ -127,14 +127,16 @@ struct reify : public ParentConstraint
     vector<AnyVarRef>& t1=*(child_constraints[0]->get_vars_singleton());
     for(int i=0; i<t1.size(); i++)
     {
-        if(t1[i].isBound() && t1[i].getInitialMin()!=t1[i].getInitialMax())
+        if(t1[i].isBound() && t1[i].getInitialMin()!=t1[i].getInitialMax()) {
             hasbound=true;
+        }
     }
     vector<AnyVarRef>& t2=*(child_constraints[1]->get_vars_singleton());
     for(int i=0; i<t2.size(); i++)
     {
-        if(t2[i].isBound() && t2[i].getInitialMin()!=t2[i].getInitialMax())
+        if(t2[i].isBound() && t2[i].getInitialMin()!=t2[i].getInitialMax()) {
             hasbound=true;
+        }
     }
     if(hasbound)
     {
@@ -431,10 +433,11 @@ struct reify : public ParentConstraint
     {
       D_ASSERT(vars[assignment[i].first].inDomain(assignment[i].second));
       D_ASSERT(trig+i < endtrig);
-      if(vars[assignment[i].first].isBound())
+      if(vars[assignment[i].first].isBound()) {
         vars[assignment[i].first].addDynamicTrigger(trig + i, DomainChanged);
-      else  
+      } else {
         vars[assignment[i].first].addDynamicTrigger(trig + i, DomainRemoval, assignment[i].second);
+      }
     }
     // clear a contiguous block of used triggers up to (not including) endtrig
     D_DATA(int firstunattached = -1);

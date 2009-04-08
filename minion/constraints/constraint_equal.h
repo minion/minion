@@ -250,8 +250,9 @@ struct ReifiedEqualConstraint : public AbstractConstraint
         if(var2.getMax() == remove_val)
           var2.setMax(remove_val - 1);
       }
-      else
+      else {
         var2.removeFromDomain(remove_val);
+      }
   }
   
   inline void diseqvar2assigned()
@@ -264,8 +265,9 @@ struct ReifiedEqualConstraint : public AbstractConstraint
         if(var1.getMax() == remove_val)
           var1.setMax(remove_val - 1);
       }
-      else
+      else {
         var1.removeFromDomain(remove_val);
+      }
   }
   
   inline void diseq()
@@ -360,8 +362,9 @@ struct NeqConstraintBinary : public AbstractConstraint
         if(var2.getMax() == remove_val)
           var2.setMax(remove_val - 1);
       }
-      else
+      else {
         var2.removeFromDomain(remove_val);
+      }
     }
     #ifdef MAKECONFLUENT
     else if(prop_val == 3)
@@ -412,8 +415,9 @@ struct NeqConstraintBinary : public AbstractConstraint
         if(var1.getMax() == remove_val)
           var1.setMax(remove_val - 1);
       }
-      else
+      else {
         var1.removeFromDomain(remove_val);
+      }
     }
   }
   
@@ -427,8 +431,9 @@ struct NeqConstraintBinary : public AbstractConstraint
         if(var2.getMax() == remove_val)
           var2.setMax(remove_val - 1);
       }
-      else
+      else {
         var2.removeFromDomain(remove_val);
+      }
   }
   
   inline void var2assigned()
@@ -441,8 +446,9 @@ struct NeqConstraintBinary : public AbstractConstraint
         if(var1.getMax() == remove_val)
           var1.setMax(remove_val - 1);
       }
-      else
+      else {
         var1.removeFromDomain(remove_val);
+      }
   }
   
   virtual void full_propagate()
@@ -457,8 +463,9 @@ struct NeqConstraintBinary : public AbstractConstraint
         if(var2.getMax() == remove_val)
           var2.setMax(remove_val - 1);
       }
-      else
+      else {
         var2.removeFromDomain(remove_val);
+      }
     }
     if(var2.isAssigned())
     { 
@@ -470,8 +477,9 @@ struct NeqConstraintBinary : public AbstractConstraint
         if(var1.getMax() == remove_val)
           var1.setMax(remove_val - 1);
       }
-      else
+      else {
         var1.removeFromDomain(remove_val);
+      }
     }
   }
     
