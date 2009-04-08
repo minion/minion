@@ -231,10 +231,11 @@ struct ElementConstraintDynamic : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    for(int i=0; i<var_array.size(); i++) 
+    for(int i=0; i<var_array.size(); i++) {
         if(var_array[i].isBound() && !var_array[i].isAssigned()) { // isassigned excludes constants.
             cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
         }
+    }
     if((indexvar.isBound() && !indexvar.isAssigned())
         || (resultvar.isBound() && !resultvar.isAssigned())) {
         cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
