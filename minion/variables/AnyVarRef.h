@@ -184,9 +184,7 @@ struct AnyVarRef_Abstract
   {}
   
   virtual int getDomainChange(DomainDelta d) = 0;
-#ifdef DYNAMICTRIGGERS
   virtual void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF) = 0;
-#endif
 };
 
 /// Internal type used by AnyVarRef.
