@@ -74,14 +74,12 @@ public:
 #endif
   }
   
-#ifdef DYNAMICTRIGGERS
   void pushDynamicTriggers(DynamicTrigger* new_dynamic_trig_range)
   { 
     CON_INFO_ADDONE(AddDynToQueue);
     D_ASSERT(new_dynamic_trig_range->sanity_check_list());
     dynamic_trigger_list.push_back(new_dynamic_trig_range);   
   }
-#endif
   
   
   void clearQueues()
@@ -217,7 +215,6 @@ public:
     
     while(true)
     {
-#ifdef DYNAMICTRIGGERS
       if (getState(stateObj).isDynamicTriggersUsed()) 
       {
         while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
@@ -235,11 +232,7 @@ public:
         if(propagateStaticTriggerLists())
           return;
       }
-#else
-      if(propagateStaticTriggerLists())
-        return;
-#endif
-      
+
       if(special_triggers.empty())
         return;
       
@@ -356,7 +349,6 @@ public:
     
     while(true)
     {
-#ifdef DYNAMICTRIGGERS
       if (getState(stateObj).isDynamicTriggersUsed()) 
       {
         while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
@@ -374,10 +366,6 @@ public:
         if(propagateStaticTriggerListsRoot())
           return;
       }
-#else
-      if(propagateStaticTriggerListsRoot())
-        return;
-#endif
       
       if(special_triggers.empty())
         return;
