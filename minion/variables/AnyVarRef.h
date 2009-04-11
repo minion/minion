@@ -185,7 +185,7 @@ struct AnyVarRef_Abstract
   
   virtual int getDomainChange(DomainDelta d) = 0;
 #ifdef DYNAMICTRIGGERS
-  virtual void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999) = 0;
+  virtual void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF) = 0;
 #endif
 };
 
@@ -284,8 +284,8 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   { return data.getDomainChange(d); }
 
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
-  {  data.addDynamicTrigger(t, type, pos); }
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
+  {  data.addDynamicTrigger(t, type, pos BT_CALL); }
 #endif
 };
 
@@ -388,8 +388,8 @@ public:
   { return data->getDomainChange(d); }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
-  {  data->addDynamicTrigger(t, type, pos); }
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
+  {  data->addDynamicTrigger(t, type, pos BT_CALL); }
 #endif
 };
 

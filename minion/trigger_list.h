@@ -204,9 +204,9 @@ public:
   }
   
 #ifdef DYNAMICTRIGGERS
-  void dynamic_propagate(int var_num, TrigType type, DomainInt val_removed = -999)
+  void dynamic_propagate(int var_num, TrigType type, DomainInt val_removed = NoDomainValue)
   {
-    D_ASSERT(val_removed == -999 || ( type == DomainRemoval && val_removed != -999) );
+    D_ASSERT(val_removed == NoDomainValue || ( type == DomainRemoval && val_removed != NoDomainValue) );
     D_ASSERT(!only_bounds || type != DomainRemoval);
     DynamicTrigger* trig;
     if(type != DomainRemoval)
@@ -303,8 +303,8 @@ public:
     triggers[type][b].push_back(t);
   }
   
-#ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(int b, DynamicTrigger* t, TrigType type, DomainInt val)
+
+  void addDynamicTrigger(int b, DynamicTrigger* t, TrigType type, DomainInt val BT_FUNDEF)
   {
     D_ASSERT(lock_second);
     D_ASSERT(!only_bounds || type != DomainRemoval);
@@ -329,10 +329,28 @@ public:
     }
     D_ASSERT(queue->sanity_check_list());
 
+#ifdef BTWLDEF
+    switch(op)
+    {
+        case TO_Default:
+            D_DATA(t->setQueue((DynamicTrigger*)BAD_POINTER));
+        break;
+        case TO_Store:
+        t->setQueue(queue);
+        break;
+        case TO_Backtrack:
+            D_ASSERT(t->getQueue() != (DynamicTrigger*)BAD_POINTER);
+            // Add to queue.
+            t->setQueue(queue);
+        break;
+        default:
+        abort();
+    }
+#endif
+
     t->add_after(queue, getQueue(stateObj).getNextQueuePtrRef());
     D_ASSERT(old_list == NULL || old_list->sanity_check_list(false));
   }
-#endif
   
 };
 

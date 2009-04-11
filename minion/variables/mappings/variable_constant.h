@@ -96,10 +96,13 @@ struct ConstantVar
   { }
 
   
-#ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = -999)
-  { dt->remove(getQueue(stateObj).getNextQueuePtrRef()); }
+  void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = NoDomainValue BT_FUNDEF)
+  { 
+#ifdef BTWLDEF
+      abort();
 #endif
+      dt->remove(getQueue(stateObj).getNextQueuePtrRef());    
+  }
 
   vector<AbstractConstraint*>* getConstraints() { return NULL; }
 

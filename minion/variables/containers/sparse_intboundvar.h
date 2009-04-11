@@ -423,11 +423,11 @@ struct SparseBoundVarContainer {
 #endif
 
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   { 
     D_ASSERT(lock_m); 
     D_ASSERT(type != DomainRemoval);
-    trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
+    trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL); 
   }
 #endif
 

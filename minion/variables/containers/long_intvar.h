@@ -537,13 +537,13 @@ public:
   { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type);  }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(BigRangeVarRef_internal b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  void addDynamicTrigger(BigRangeVarRef_internal b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {  
     D_ASSERT(lock_m);
     D_ASSERT(b.var_num >= 0);
     D_ASSERT(b.var_num <= (int)var_count_m);
     D_ASSERT(type != DomainRemoval || (pos >= getInitialMin(b) && pos <= getInitialMax(b)));
-    trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
+    trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL); 
   }
 #endif
 

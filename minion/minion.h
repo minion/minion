@@ -25,6 +25,8 @@
 #define MANY_VAR_CONTAINERS
 #endif
 
+#include "BuildDefines.h"
+
 #include "system/system.h"
 #include "constants.h"
 

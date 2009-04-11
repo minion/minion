@@ -36,19 +36,29 @@ public:
   AbstractConstraint* constraint;
   /// A small space for constraints to store trigger-specific information.
   int _trigger_info;
-  
+
+  DynamicTrigger* prev;
+  DynamicTrigger* next;
+
   /// Wrapper function for _trigger_info.
   int& trigger_info()
   { return _trigger_info; }
   
-  DynamicTrigger* prev;
-  DynamicTrigger* next;
-#ifdef BTWL
+  
+#ifdef BTWLDEF
+private:
   DynamicTrigger* basequeue;
+public:
+  DynamicTrigger* getQueue()
+  { return basequeue; }
+  
+  void setQueue(DynamicTrigger* ptr)
+  { basequeue = ptr; }
 #endif
 
+
   DynamicTrigger(AbstractConstraint* c) : constraint(c), prev(NULL), next(NULL)
-#ifdef BTWL
+#ifdef BTWLDEF
   , basequeue(NULL)
 #endif
   { D_DATA(sanity_check = 1234);}

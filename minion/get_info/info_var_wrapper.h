@@ -213,10 +213,10 @@ struct InfoRefType
     return d.XXX_get_domain_diff(); 
   }
   
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, addDynamicTrigger);
-    data.addDynamicTrigger( t, type, pos); 
+    data.addDynamicTrigger( t, type, pos BT_CALL); 
   }
 };
 

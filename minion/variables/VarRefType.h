@@ -123,8 +123,8 @@ struct VarRefType
   { return d.XXX_get_domain_diff(); }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
-  {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos); }
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
+  {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos BT_CALL); }
 #endif
 };
 
@@ -225,8 +225,8 @@ struct QuickVarRefType
   { return d.XXX_get_domain_diff(); }
   
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
-  {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos); }
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
+  {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos BT_CALL); }
 #endif
 };
 

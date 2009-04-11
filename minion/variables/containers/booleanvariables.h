@@ -319,11 +319,9 @@ struct BooleanContainer
     trigger_list.add_trigger(b.var_num, t, type); 
   }
     
-  
-#ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(BoolVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  void addDynamicTrigger(BoolVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   { 
-    D_ASSERT(pos == -999 || ( type == DomainRemoval && pos != -999 ) );
+    D_ASSERT(pos == NoDomainValue || ( type == DomainRemoval && pos != NoDomainValue ) );
     D_ASSERT(lock_m);
     
 #ifdef FEW_BOOLEAN_TRIGGERS
@@ -338,11 +336,11 @@ struct BooleanContainer
         else
           new_type = UpperBound;
     }
-    pos = -999;
+    pos = NoDomainValue;
 #endif    
-    trigger_list.addDynamicTrigger(b.var_num, t, type, pos); 
+    trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL); 
   }
-#endif
+
 
   vector<AbstractConstraint*>* getConstraints(const BoolVarRef_internal& b)
   { return& constraints[b.var_num]; }

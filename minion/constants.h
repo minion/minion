@@ -20,6 +20,8 @@
 #ifndef _CONSTANTS_H
 #define _CONSTANTS_H
 
+#define BTWLDEF
+
 enum TrigType
 { 
   UpperBound, 
@@ -28,6 +30,26 @@ enum TrigType
   DomainChanged, 
   DomainRemoval
 };
+
+enum TrigOp
+{
+    TO_Default,
+    TO_Store,
+    TO_Backtrack
+};
+
+static const int NoDomainValue = -98765;
+static void* BAD_POINTER = (void*)(-1);
+
+#ifdef BTWLDEF
+#define BTWL(x) x
+#define BT_FUNDEF , TrigOp op = TO_Default
+#define BT_CALL , op
+#else
+#define BTWL(x)
+#define BT_FUNDEF
+#define BT_CALL
+#endif
 
 enum BoundType
 {

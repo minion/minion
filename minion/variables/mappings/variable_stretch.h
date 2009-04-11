@@ -220,7 +220,7 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
   }
 
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {  data.addDynamicTrigger(t, type, pos); }
 #endif
 
@@ -390,29 +390,29 @@ struct MultiplyVar
   }
 
 #ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {  
     switch(type)
     {
       case UpperBound:
       if(Multiply>=0)
-        data.addDynamicTrigger(t, UpperBound);
+        data.addDynamicTrigger(t, UpperBound, pos BT_CALL);
       else
-        data.addDynamicTrigger(t, LowerBound);
+        data.addDynamicTrigger(t, LowerBound, pos BT_CALL);
       break;
       case LowerBound:
       if(Multiply>=0)
-        data.addDynamicTrigger(t, LowerBound);
+        data.addDynamicTrigger(t, LowerBound, pos BT_CALL);
       else
-        data.addDynamicTrigger(t, UpperBound);
+        data.addDynamicTrigger(t, UpperBound, pos BT_CALL);
         break;
       case Assigned:
       case DomainChanged:
-        data.addDynamicTrigger(t, type);
+        data.addDynamicTrigger(t, type, pos BT_CALL);
         break;
       case DomainRemoval:
         data.addDynamicTrigger(t, DomainRemoval, 
-                               MultiplyHelp<VarRef>::divide_exact(pos, Multiply));
+                               MultiplyHelp<VarRef>::divide_exact(pos, Multiply) BT_CALL);
         break;
       default:
         D_FATAL_ERROR("Broken dynamic trigger");

@@ -33,6 +33,7 @@ class Queues
 {
   StateObj* stateObj;
   
+  
 #ifdef WEIGHTED_TRIGGERS
   priority_queue<TriggerRange> propagate_trigger_list;
 #else
