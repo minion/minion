@@ -117,6 +117,27 @@ PROP_EVENT(LightsumGetSatAssg)
 PROP_EVENT(ReifyImplyFullCheckUnsat)
 PROP_EVENT(ReifyImplyCheckUnsat)
 PROP_EVENT(ReifyImplyGetSatAssg)
+PROP_EVENT(Clique)
+
+PROP_EVENT(Counter1)
+PROP_EVENT(Counter2)
+PROP_EVENT(Counter3)
+PROP_EVENT(Counter4)
+PROP_EVENT(Counter5)
+PROP_EVENT(Counter6)
+PROP_EVENT(Counter7)
+PROP_EVENT(Counter8)
+PROP_EVENT(Counter9)
+
+PROP_EVENT(CounterA)
+PROP_EVENT(CounterB)
+PROP_EVENT(CounterC)
+PROP_EVENT(CounterD)
+PROP_EVENT(CounterE)
+PROP_EVENT(CounterF)
+PROP_EVENT(CounterG)
+PROP_EVENT(CounterH)
+PROP_EVENT(CounterI)
 
 #undef VAR_EVENT
 #undef PROP_EVENT
