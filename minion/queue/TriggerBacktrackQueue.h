@@ -23,17 +23,35 @@
 // This container stores a list of triggers and queues. On backtrack
 // It puts the triggers back onto the queue they were on previously.
 
+#include "../constraints/constraint_abstract.h"
+
 struct TriggerBacktrackQueue
 {
-    vector<vector<pair<DynamicTrigger*, DynamicTrigger*> > > queue;
-    
+	typedef vector<pair<DynamicTrigger*, DynamicTrigger*> > TriggerList;
+
+    vector<TriggerList> queue;
+
     TriggerBacktrackQueue()
     { queue.resize(1); }
-    
+
     void addTrigger(DynamicTrigger* trig)
-    { queue.back().push_back(make_pair(trig, trig->getQueue()); }
-    
-    
+    { queue.back().push_back(make_pair(trig, trig->getQueue())); }
+
+    void world_push()
+    { queue.push_back(TriggerList()); }
+
+    void world_pop()
+    {
+    	TriggerList& tl = queue.back();
+    	DynamicTrigger* nulldt = NULL;
+    	for(int i = 0; i < tl.size(); ++i)
+    	{
+    		if(tl[i].second == NULL)
+    			tl[i].first->remove(nulldt);
+    		else
+    			tl[i].first->add_after(tl[i].second, nulldt);
+    	}
+    }
 };
 
 
