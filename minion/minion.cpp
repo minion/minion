@@ -21,6 +21,19 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #define _CRT_NONSTDC_NO_DEPRECATE 1
 
+#include "minion.h"
+
+#include "BuildVariables.h"
+
+#include "inputfile_parse/inputfile_parse.h"
+#include "commandline_parse.h"
+
+#include "system/defined_macros.h"
+
+#include "MILtools/print_CSP.h"
+
+#include "MILtools/sym_output.h"
+
 #ifndef SVN_VER
 #define SVN_VER 0
 #endif
@@ -36,21 +49,8 @@
 #define SVN_DATE_STRING CAJ_STRING(SVN_DATE)
 
 
-#include "minion.h"
 
-
-#include "BuildVariables.h"
-
-#include "inputfile_parse/inputfile_parse.h"
-#include "commandline_parse.h"
-
-#include "system/defined_macros.h"
-
-#include "MILtools/print_CSP.h"
-
-#include "MILtools/sym_output.h"
-
-/** @help switches Description 
+/** @help switches Description
 Minion supports a number of switches to augment default behaviour.  To
 see more information on any switch, use the help system. The list
 below contains all available switches. For example to see help on
@@ -106,18 +106,18 @@ applied to their model before search commences.
 
 The choices are:
 
-- GAC 
+- GAC
 - generalised arc consistency (default)
 - all propagators are run to a fixed point
 - if some propagators enforce less than GAC then the model will
 not necessarily be fully GAC at the outset
 
-- SACBounds 
+- SACBounds
 - singleton arc consistency on the bounds of each variable
-- AC can be achieved when any variable lower or upper bound is a 
+- AC can be achieved when any variable lower or upper bound is a
 singleton in its own domain
 
-- SAC 
+- SAC
 - singleton arc consistency
 - AC can be achieved in the model if any value is a singleton in
 its own domain
@@ -128,7 +128,7 @@ its own domain
 the singleton containing their upper bound, or the singleton containing
 their lower bound
 
-- SSAC 
+- SSAC
 - singleton singleton arc consistency
 - SAC can be achieved when any value is a singleton in its own domain
 
@@ -182,7 +182,7 @@ search tree.
 Only available in a DEBUG executable.
 */
 
-/** @help switches;-nocheck Description 
+/** @help switches;-nocheck Description
 Do not check solutions for correctness before printing them out.
 */
 
@@ -190,7 +190,7 @@ Do not check solutions for correctness before printing them out.
 This option is the default on non-DEBUG executables.
 */
 
-/** @help switches;-check Description 
+/** @help switches;-check Description
 Check solutions for correctness before printing them out.
 */
 
@@ -231,7 +231,7 @@ help switches -nodelimit
 help switches -timelimit
 */
 
-/** @help switches;-varorder Description 
+/** @help switches;-varorder Description
 
 Enable a particular variable ordering for the search process. This
 flag is experimental and minion's default ordering might be faster.
@@ -256,19 +256,19 @@ The available orders are:
 - static - lexicographical ordering
 */
 
-/* @help switches;-varorder Example 
+/* @help switches;-varorder Example
 To use smallest domain first ordering (probably the most sensible of
 the available orderings) do:
 
    minion -varorder sdf myinput.minion
 */
 
-/** @help switches;-randomseed Description 
+/** @help switches;-randomseed Description
 Set the pseudorandom seed to N. This allows 'random' behaviour to be
 repeated in different runs of minion.
 */
 
-/** @help switches;-tableout Description 
+/** @help switches;-tableout Description
 Append a line of data about the current run of minion to a named file.
 This data includes minion version information, arguments to the
 executable, build and solve time statistics, etc. See the file itself
@@ -281,7 +281,7 @@ To add statistics about solving myproblem.minion to mystats.txt do
    minion -tableout mystats.txt myproblem.minion
 */
 
-/** @help switches;-solsout Description 
+/** @help switches;-solsout Description
 Append all solutionsto a named file.
 Each solution is placed on a line, with no extra formatting.
 */
@@ -293,7 +293,7 @@ To add the solutions of myproblem.minion to mysols.txt do
 */
 
 
-/** @help switches;-randomiseorder Description 
+/** @help switches;-randomiseorder Description
 Randomises the ordering of the decision variables. If the input file
 specifies as ordering it will randomly permute this. If no ordering is
 specified a random permutation of all the variables is used.
@@ -318,21 +318,21 @@ void print_default_help(char** argv)
   "on" << endl;
 #endif
   cout << "The following preprocessor flags were active:" << endl;
-  print_macros(); 
+  print_macros();
   cout << "The following constraints were compiled in:" << endl;
-  print_constraints(); 
+  print_constraints();
 }
 
 
 int main(int argc, char** argv) {
 // Wrap main in a try/catch just to stop exceptions leaving main,
 // as windows gets really annoyed when that happens.
-  
+
 try {
   StateObj* stateObj = new StateObj();
 
   getState(stateObj).getOldTimer().startClock();
-  
+
   if (argc == 1) {
     getOptions(stateObj).printLine("# " + to_string(VERSION));
     getOptions(stateObj).printLine("# Svn version: " + to_string(SVN_VER));
@@ -343,7 +343,7 @@ try {
   if(!strcmp(argv[1], "help")) {
     std::string sect("");
     if(argc != 2) {
-      for(size_t i = 2; i < argc - 1; i++) 
+      for(size_t i = 2; i < argc - 1; i++)
         sect.append(argv[i]).append(" ");
       sect.append(argv[argc - 1]);
     }
@@ -351,23 +351,23 @@ try {
     return EXIT_SUCCESS;
   } else {
   }
-    
+
   CSPInstance instance;
   SearchMethod args;
 
   parse_command_line(stateObj, args, argc, argv);
-  
+
   if(getOptions(stateObj).outputType != -1)
     getState(stateObj).getOldTimer().setOutputType(getOptions(stateObj).outputType);
-  
+
   getOptions(stateObj).printLine("# " + to_string(VERSION));
   getOptions(stateObj).printLine("# Svn version: " + to_string(SVN_VER));
-  
-  if (!getOptions(stateObj).silent) 
-  { 
-    
+
+  if (!getOptions(stateObj).silent)
+  {
+
     getOptions(stateObj).printLine("# Svn last changed date: " + to_string(SVN_DATE_STRING) );
-    
+
     time_t rawtime;
     time(&rawtime);
     cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
@@ -377,12 +377,12 @@ try {
     cout << "#  Mailing list at: https://mail.cs.st-andrews.ac.uk/mailman/listinfo/mug" << endl;
     cout << "# Input filename: " << getOptions(stateObj).instance_name << endl;
     cout << "# Command line: " ;
-    for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; } 
+    for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; }
     cout << endl;
   }
-  
+
   instance = readInputFromFile(getOptions(stateObj).instance_name, getOptions(stateObj).parser_verbose);
-  
+
   if(getOptions(stateObj).graph)
   {
     GraphBuilder graph(instance);
@@ -390,7 +390,7 @@ try {
     graph.g.output_nauty_graph(instance);
     exit(0);
   }
-  
+
   if(getOptions(stateObj).redump)
   {
     MinionInstancePrinter printer(instance);
@@ -398,9 +398,9 @@ try {
     cout << printer.getInstance();
     exit(0);
   }
-  
+
   getState(stateObj).setTupleListContainer(instance.tupleListContainer);
-  
+
   // Copy args into tableout
   getTableOut().set("RandomSeed", to_string(args.random_seed));
   {   const char * b = "";
@@ -424,14 +424,14 @@ try {
   getTableOut().set("MinionVersion", SVN_VER);
   getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
   getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions(stateObj).silent);
-  
+
   BuildCSP(stateObj, instance);
   SolveCSP(stateObj, instance, args);
-  
+
   delete stateObj;
-  
+
   return 0;
-    
+
 }
 catch(...)
 { cerr << "Minion exited abnormally via an exception." << endl; }
