@@ -19,13 +19,14 @@
 
 namespace Controller
 {
-  
+
 inline int get_world_depth(StateObj* stateObj)
 { return getMemory(stateObj).backTrack().current_depth(); }
 
 /// Pushes the state of the whole world.
 inline void world_push(StateObj* stateObj)
 {
+  getQueue(stateObj).getTbq().world_push();
   getMemory(stateObj).monotonicSet().before_branch_left();
   D_ASSERT(getQueue(stateObj).isQueuesEmpty());
   getMemory(stateObj).backTrack().world_push();
@@ -37,10 +38,10 @@ inline void world_push(StateObj* stateObj)
 inline void world_pop(StateObj* stateObj)
 {
   D_ASSERT(getQueue(stateObj).isQueuesEmpty());
- 
+  getQueue(stateObj).getTbq().world_pop();
   getMemory(stateObj).backTrack().world_pop();
   getMemory(stateObj).monotonicSet().undo();
-  
+
   vector<set<AbstractConstraint*> >& constraintList = getState(stateObj).getConstraintsToPropagate();
   int propagateDepth = get_world_depth(stateObj) + 1;
   if(constraintList.size() > propagateDepth)
@@ -50,7 +51,7 @@ inline void world_pop(StateObj* stateObj)
     {
       (*it)->full_propagate();
     }
-    
+
     if(propagateDepth > 0)
     {
       constraintList[propagateDepth - 1].insert(constraintList[propagateDepth].begin(), constraintList[propagateDepth].end());
@@ -65,7 +66,7 @@ inline void world_pop_to_depth(StateObj* stateObj, int depth)
   // TODO: Speed up this method. It shouldn't call world_pop repeatedly.
   // The main problem is this requires adding additions to things like
   // monotonic sets I suspect.
-  D_ASSERT(depth <= get_world_depth(stateObj)); 
+  D_ASSERT(depth <= get_world_depth(stateObj));
   while(depth < get_world_depth(stateObj))
     world_pop(stateObj);
 }
@@ -74,14 +75,14 @@ inline void world_pop_all(StateObj* stateObj)
 {
 int depth = getMemory(stateObj).backTrack().current_depth();
 for(; depth > 0; depth--)
-  world_pop(stateObj); 
+  world_pop(stateObj);
 }
 
 }
 
-inline void SearchState::addConstraint(AbstractConstraint* c) 
-{ 
-  constraints.push_back(c); 
+inline void SearchState::addConstraint(AbstractConstraint* c)
+{
+  constraints.push_back(c);
   vector<AnyVarRef>* vars = c->get_vars_singleton();
   size_t vars_s = vars->size();
   for(size_t i = 0; i < vars_s; i++) //note all constraints the var is involved in

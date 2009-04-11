@@ -47,13 +47,15 @@ class Queues
   // I don't like it, but it is necesasary.
   vector<AbstractConstraint*> special_triggers;
 
-  TriggerBacktrackQueue tbq;
-
 #ifndef NO_DYN_CHECK
   DynamicTrigger* next_queue_ptr;
 #endif
 
+  TriggerBacktrackQueue tbq;
 public:
+
+  TriggerBacktrackQueue& getTbq()
+  { return tbq; }
 
   DynamicTrigger*& getNextQueuePtrRef() { return next_queue_ptr; }
 
