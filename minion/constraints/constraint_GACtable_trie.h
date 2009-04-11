@@ -111,7 +111,7 @@ struct GACTableConstraint : public AbstractConstraint
      return true;
   }
   
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
+  virtual void propagate(DynamicTrigger* propagated_trig)
   {
     PROP_INFO_ADDONE(DynGACTable);
     DynamicTrigger* dt = dynamic_trigger_start();

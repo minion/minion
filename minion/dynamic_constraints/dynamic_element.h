@@ -290,7 +290,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
   }
   
   
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* trig)
+  virtual void propagate(DynamicTrigger* trig)
   {
     PROP_INFO_ADDONE(DynElement);
     DynamicTrigger* dt = dynamic_trigger_start();

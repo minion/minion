@@ -91,7 +91,7 @@ struct AbsConstraint : public AbstractConstraint
     
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta)
+  virtual void propagate(int i, DomainDelta)
   {
     // Assume this in the algorithm.
     D_ASSERT(var1.getMin() >= 0);

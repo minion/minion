@@ -92,7 +92,7 @@ struct NotModConstraint : public AbstractConstraint
     return t;
   }
   
-  PROPAGATE_FUNCTION(int flag, DomainDelta)
+  virtual void propagate(int flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Mod);
     // propagate var1 % var2 != var3 by forward checking
@@ -252,7 +252,7 @@ struct ModConstraint : public AbstractConstraint
     return t;
   }
   
-  PROPAGATE_FUNCTION(int flag, DomainDelta)
+  virtual void propagate(int flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Mod);
     // aiming at bounds(D)-consistency. 

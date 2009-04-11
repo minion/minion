@@ -98,7 +98,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
     return 2;
   }
   
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(Dyn3SAT);
     int propval = dt->trigger_info();

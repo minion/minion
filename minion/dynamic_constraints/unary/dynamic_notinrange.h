@@ -91,7 +91,7 @@ template<typename Var>
   }
 
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(WatchNotInRange);
     D_ASSERT(var.isBound());

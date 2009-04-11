@@ -88,7 +88,7 @@ struct DifferenceConstraint : public AbstractConstraint
     }
   }
     
-  PROPAGATE_FUNCTION(int, DomainDelta)
+  virtual void propagate(int, DomainDelta)
   {
       PROP_INFO_ADDONE(Difference);
     

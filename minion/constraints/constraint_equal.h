@@ -118,7 +118,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
     }
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta)
+  virtual void propagate(int i, DomainDelta)
   {
     PROP_INFO_ADDONE(ReifyEqual);
     switch(i)
@@ -350,7 +350,7 @@ struct NeqConstraintBinary : public AbstractConstraint
     return t;
   }
   
-  PROPAGATE_FUNCTION(int prop_val, DomainDelta)
+  virtual void propagate(int prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(BinaryNeq);
     if (prop_val == 1) {
@@ -552,7 +552,7 @@ struct EqualConstraint : public AbstractConstraint
     propagate(4,0);
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta)
+  virtual void propagate(int i, DomainDelta)
   {
     PROP_INFO_ADDONE(Equal);
     switch(i)

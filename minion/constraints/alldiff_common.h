@@ -290,7 +290,7 @@ struct GacAlldiff : public AbstractConstraint
   
   bool constraint_locked;
   
-  PROPAGATE_FUNCTION(int prop_var, DomainDelta)
+  virtual void propagate(int prop_var, DomainDelta)
   {
     D_ASSERT(prop_var>=0 && prop_var<var_array.size());
     
@@ -376,7 +376,7 @@ struct GacAlldiff : public AbstractConstraint
     }
   }
   
-  PROPAGATE_FUNCTION(DynamicTrigger* trig)
+  virtual void propagate(DynamicTrigger* trig)
   {
       #ifdef INCGRAPH
       DynamicTrigger* dtstart=dynamic_trigger_start();

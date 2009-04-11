@@ -88,7 +88,7 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
     watched[1] = next_found;
   }
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     size_t prev_var = dt->trigger_info();
     size_t other_var = watched[0] == prev_var ? watched[1] : watched[0];

@@ -338,7 +338,7 @@ struct GCC : public AbstractConstraint
         #endif
     }
     
-    PROPAGATE_FUNCTION(int prop_var, DomainDelta)
+    virtual void propagate(int prop_var, DomainDelta)
     {
         if(!to_process.in(prop_var))
         {
@@ -360,7 +360,7 @@ struct GCC : public AbstractConstraint
         }
     }
     
-    PROPAGATE_FUNCTION(DynamicTrigger* trig)
+    virtual void propagate(DynamicTrigger* trig)
     {
         DynamicTrigger* dtstart=dynamic_trigger_start();
         

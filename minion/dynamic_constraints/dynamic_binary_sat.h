@@ -68,7 +68,7 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
     return;
   }
     
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(Dyn2SAT);
     int propval = dt->trigger_info();

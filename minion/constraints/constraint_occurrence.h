@@ -134,7 +134,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   }
   
   
-  PROPAGATE_FUNCTION(int z, DomainDelta)
+  virtual void propagate(int z, DomainDelta)
   {
       // val_count has been assigned.
       D_ASSERT(z==-1);
@@ -159,7 +159,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       }
   }
   
-  PROPAGATE_FUNCTION(DynamicTrigger* trig)
+  virtual void propagate(DynamicTrigger* trig)
   {
       DynamicTrigger* dt = dynamic_trigger_start();
       if(trig==dt || trigger1index==-1)
@@ -441,7 +441,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
       getState(stateObj).setFailed(true);
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta)
+  virtual void propagate(int i, DomainDelta)
   {
       PROP_INFO_ADDONE(OccEqual);
     D_ASSERT(i >= 0);
@@ -634,7 +634,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
     val_count.setMax(static_cast<int>(var_array.size()) - occs);
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta)
+  virtual void propagate(int i, DomainDelta)
   {
     PROP_INFO_ADDONE(OccEqual);
     if(i < 0)

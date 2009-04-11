@@ -113,7 +113,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     constraint_locked = false;
   }
 
-  PROPAGATE_FUNCTION(int i, DomainDelta domain)
+  virtual void propagate(int i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(ReifyTrue);
     P("Static propagate start");
@@ -139,7 +139,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     }
   }
 
-  PROPAGATE_FUNCTION(DynamicTrigger* trig)
+  virtual void propagate(DynamicTrigger* trig)
   {
     PROP_INFO_ADDONE(ReifyTrue);
     P("Dynamic prop start");

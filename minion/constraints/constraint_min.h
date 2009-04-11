@@ -85,7 +85,7 @@ struct MinConstraint : public AbstractConstraint
   
   //  virtual AbstractConstraint* reverse_constraint()
   
-  PROPAGATE_FUNCTION(int prop_val, DomainDelta)
+  virtual void propagate(int prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(Min);
     if(prop_val > 0)

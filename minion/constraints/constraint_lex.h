@@ -162,7 +162,7 @@ struct LexLeqConstraint : public AbstractConstraint
     
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta)
+  virtual void propagate(int i, DomainDelta)
   {
     PROP_INFO_ADDONE(Lex);
     if (F)

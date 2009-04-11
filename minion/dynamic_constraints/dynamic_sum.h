@@ -217,7 +217,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     return true;
   }
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(DynSum);
     D_ASSERT(check_consistency());

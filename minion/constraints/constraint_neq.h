@@ -76,7 +76,7 @@ struct NeqConstraint : public AbstractConstraint
   virtual AbstractConstraint* reverse_constraint()
   { return new CheckAssignConstraint<VarArray, NeqConstraint>(stateObj, var_array, *this); }
   
-  PROPAGATE_FUNCTION(int prop_val, DomainDelta)
+  virtual void propagate(int prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(ArrayNeq);
     DomainInt remove_val = var_array[prop_val].getAssignedValue();

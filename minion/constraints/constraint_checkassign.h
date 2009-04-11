@@ -55,7 +55,7 @@ struct CheckAssignConstraint : public AbstractConstraint
     FAIL_EXIT();
   }
   
-  PROPAGATE_FUNCTION(int prop_val,DomainDelta delta)
+  virtual void propagate(int prop_val,DomainDelta delta)
   {
     PROP_INFO_ADDONE(CheckAssign);
     if(check_unsat(prop_val, delta))

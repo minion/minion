@@ -67,7 +67,7 @@ struct LeqConstraint : public AbstractConstraint
   // Needs to be at end of file
   virtual AbstractConstraint* reverse_constraint();
   
-  PROPAGATE_FUNCTION(int prop_val,DomainDelta)
+  virtual void propagate(int prop_val,DomainDelta)
   {
     PROP_INFO_ADDONE(BinaryLeq);
     if(prop_val)

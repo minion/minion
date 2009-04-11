@@ -170,7 +170,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   BOOL check_consistency()
   { return true; }
   
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(DynLitWatch);
     D_ASSERT(check_consistency());

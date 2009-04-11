@@ -89,7 +89,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
     return;
   }
     
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(DynSumSat);
     int var_size = var_array.size();

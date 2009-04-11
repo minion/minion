@@ -231,7 +231,7 @@ struct NewTableConstraint : public AbstractConstraint
   int dynamic_trigger_count()
     { return data->getLiteralCount() * ( vars.size() - 1) ; }
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* propagated_trig)
+  virtual void propagate(DynamicTrigger* propagated_trig)
   {
     PROP_INFO_ADDONE(DynGACTable);
 

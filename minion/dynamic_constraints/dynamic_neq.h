@@ -65,7 +65,7 @@ struct WatchNeqConstraint : public AbstractConstraint
   }
   
     
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
       PROP_INFO_ADDONE(WatchNEQ);
       DynamicTrigger* dt_start = dynamic_trigger_start();

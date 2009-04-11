@@ -88,7 +88,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
       getState(stateObj).setFailed(true);
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta)
+  virtual void propagate(int i, DomainDelta)
   {
     PROP_INFO_ADDONE(BoolSum);
     D_ASSERT(var_array[i].getAssignedValue() == 0 ||

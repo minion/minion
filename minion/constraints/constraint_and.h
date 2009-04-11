@@ -53,7 +53,7 @@ struct AndConstraint : public AbstractConstraint
     return t;
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta)
+  virtual void propagate(int i, DomainDelta)
   {
     PROP_INFO_ADDONE(And);
     switch(i)

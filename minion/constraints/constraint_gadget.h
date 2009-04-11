@@ -96,7 +96,7 @@ struct GadgetConstraint : public AbstractConstraint
     constraint_locked = false;
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta domain)
+  virtual void propagate(int i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(Gadget);
     if(constraint_locked)

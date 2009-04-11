@@ -107,7 +107,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     return max_diff;
   }
   
-  PROPAGATE_FUNCTION(int prop_val, DomainDelta domain_change)
+  virtual void propagate(int prop_val, DomainDelta domain_change)
   {
     PROP_INFO_ADDONE(FullSum);
     DomainInt sum = var_array_min_sum;

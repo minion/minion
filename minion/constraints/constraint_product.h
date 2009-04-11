@@ -91,7 +91,7 @@ struct ProductConstraint : public AbstractConstraint
     return x / y; 
   }
   
-  PROPAGATE_FUNCTION(int, DomainDelta)
+  virtual void propagate(int, DomainDelta)
   {
     PROP_INFO_ADDONE(Product);
     DomainInt var1_min = var1.getMin();

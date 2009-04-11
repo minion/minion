@@ -163,7 +163,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   void propagate_from_var2(int index)
   {  Operator::propagate_from_var2(var_array1[index], var_array2[index]); }
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(DynVecNeq);
     int trigger_activated = dt - dynamic_trigger_start();

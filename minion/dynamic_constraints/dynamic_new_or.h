@@ -135,7 +135,7 @@ struct Dynamic_OR : public ParentConstraint
     constraint_locked = false;
   }
 
-  PROPAGATE_FUNCTION(int i, DomainDelta domain)
+  virtual void propagate(int i, DomainDelta domain)
   {
     //PROP_INFO_ADDONE(WatchedOR);
     P("Static propagate start");
@@ -155,7 +155,7 @@ struct Dynamic_OR : public ParentConstraint
     }
   }
   
-  PROPAGATE_FUNCTION(DynamicTrigger* trig)
+  virtual void propagate(DynamicTrigger* trig)
   {
     //PROP_INFO_ADDONE(WatchedOr);
     P("Prop");

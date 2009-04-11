@@ -101,7 +101,7 @@ struct Dynamic_reify_true_old : public AbstractConstraint
     constraint_locked = false;
   }
   
-  PROPAGATE_FUNCTION(DynamicTrigger* trig)
+  virtual void propagate(DynamicTrigger* trig)
   {
     PROP_INFO_ADDONE(ReifyTrue);
     P("ReifyImply Prop");

@@ -355,7 +355,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     return t;
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta)
+  virtual void propagate(int i, DomainDelta)
   {
     if(var_array1[i].getMin() == var_array2[i].getMax())
       counter = counter + 1;
@@ -420,7 +420,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   void propagate_from_var2(int index)
   {  Operator::propagate_from_var2(var_array1[index], var_array2[index]); }
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(DynVecNeq);
     P("VecNeq prop");

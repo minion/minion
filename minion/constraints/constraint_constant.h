@@ -36,7 +36,7 @@ struct ConstantConstraint : public AbstractConstraint
     return t;
   }
   
-  PROPAGATE_FUNCTION(int i, DomainDelta)
+  virtual void propagate(int i, DomainDelta)
   {  }
   
   virtual void full_propagate()

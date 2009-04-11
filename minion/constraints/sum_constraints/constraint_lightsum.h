@@ -93,7 +93,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
   }
   
   
-  PROPAGATE_FUNCTION(int prop_val, DomainDelta)
+  virtual void propagate(int prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(LightSum);
     DomainInt min_sum = 0;

@@ -117,7 +117,7 @@ struct PowConstraint : public AbstractConstraint
   double my_x(DomainInt y, DomainInt z)
   { return exp(log(checked_cast<double>(z)) / checked_cast<double>(y)); }
   
-  PROPAGATE_FUNCTION(int flag, DomainDelta)
+  virtual void propagate(int flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Pow);
     switch(flag)

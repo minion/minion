@@ -52,7 +52,7 @@ template<typename Var>
   { var.propagateAssign(val); }
 
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(WatchInRange);
     var.propagateAssign(val);

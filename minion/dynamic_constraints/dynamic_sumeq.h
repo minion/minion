@@ -223,7 +223,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     }
   }
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     int value = dt->trigger_info(); //the value formerly supported by dt
     DynamicTrigger* dts = dynamic_trigger_start();

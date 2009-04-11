@@ -30,7 +30,7 @@
   expressions for variables, vectors, etc. in the section on variables.
 */
 
-/** @help constraints References 
+/** @help constraints References
   help variables
 */
 
@@ -49,10 +49,6 @@ class DynamicTrigger;
 
 #include "dynamic_trigger.h"
 
-#define DYNAMIC_PROPAGATE_FUNCTION virtual void propagate
-
-#define PROPAGATE_FUNCTION virtual void propagate
-
 struct AbstractTriggerCreator;
 typedef vector<shared_ptr<AbstractTriggerCreator> > triggerCollection;
 
@@ -61,7 +57,7 @@ class AbstractConstraint
 {
 protected:
   /// Private members of the base class.
-  
+
   StateObj* stateObj;
   MemOffset _DynamicTriggerCache;
   vector<AnyVarRef> singleton_vars;
@@ -81,7 +77,7 @@ public:
 
   /// Defines the number of dynamic triggers the constraint wants.
   /// Must be implemented by any constraint.
-  virtual int dynamic_trigger_count() 
+  virtual int dynamic_trigger_count()
     { return 0; }
 
   /// Returns the number of dynamic triggers for this constraint, and all the children of
@@ -96,30 +92,30 @@ public:
 
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger*)
+  virtual void propagate(DynamicTrigger*)
     { D_FATAL_ERROR("Fatal error in 'Dynamic Propagate' in " + constraint_name()); }
 
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
-  PROPAGATE_FUNCTION(int, DomainDelta) 
+  virtual void propagate(int, DomainDelta)
     { D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + constraint_name()); }
 
   /// Checks if a constraint cannot be satisfied, and sets up any data structures for future incremental checks.
   /// Returns TRUE if constraint cannot be satisfied.
   /** This function is used by rarification */
   virtual BOOL full_check_unsat()
-  { 
+  {
     cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
-    exit(1); 
+    exit(1);
   }
 
   /// Checks incrementaly if constraint cannot be satisfied.
   /// Returns TRUE if constraint cannot be satisfied.
   /** This function should not be called unless check_unsat_full is called first. This is used by rarification */
   virtual BOOL check_unsat(int,DomainDelta)
-  { 
+  {
     cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
-    exit(1); 
+    exit(1);
   }
 
   /// Looks for a valid partial assignment to a constraint.
@@ -140,7 +136,7 @@ public:
     exit(1);
   }
 
-  AbstractConstraint(StateObj* _stateObj) : 
+  AbstractConstraint(StateObj* _stateObj) :
     stateObj(_stateObj), _DynamicTriggerCache(), singleton_vars(),
 #ifdef WDEG
     wdeg(1),
@@ -159,9 +155,9 @@ public:
   virtual vector<AnyVarRef> get_vars() = 0;
 
   vector<AnyVarRef>* get_vars_singleton() //piggyback singleton vector on get_vars()
-  { 
+  {
     if(singleton_vars.size() == 0) singleton_vars = get_vars(); //for efficiency: no constraint over 0 variables
-    return &singleton_vars; 
+    return &singleton_vars;
   }
 
 #ifdef WDEG
@@ -175,20 +171,20 @@ public:
   {
     return get_vars_singleton()->size();
   }
-  
+
   /// Allows functions to activate a special kind of trigger, run only
   /// after the normal queue is empty.
   virtual void special_check()
-  { 
+  {
     cerr << "Serious internal error" << endl;
-    FAIL_EXIT(); 
+    FAIL_EXIT();
   }
 
   // Called if failure occurs without actiating a special trigger, so the constraint can unlock.
   virtual void special_unlock()
-  { 
+  {
     cerr << "Serious internal error" << endl;
-    FAIL_EXIT(); 
+    FAIL_EXIT();
   }
 
   /// Checks if an assignment is satisfied.
@@ -236,7 +232,7 @@ protected:
   vector<AbstractConstraint*> child_constraints;
   // Maps a dynamic trigger to the constraint which it belongs to.
   vector<int> _dynamic_trigger_to_constraint;
-  // Maps a static trigger to a pair { constraint, trigger for that constraint } 
+  // Maps a static trigger to a pair { constraint, trigger for that constraint }
   vector< pair<int, int> > _static_trigger_to_constraint;
   // Maps variables to constraints
   vector<int> variable_to_constraint;
@@ -246,18 +242,18 @@ public:
 
   pair<int,int> getChildStaticTrigger(int i)
     { return _static_trigger_to_constraint[i]; }
-    
+
   int getChildDynamicTrigger(DynamicTrigger* ptr)
-  { 
-    return _dynamic_trigger_to_constraint[ptr - dynamic_trigger_start()]; 
+  {
+    return _dynamic_trigger_to_constraint[ptr - dynamic_trigger_start()];
   }
 
   /// Gets all the triggers a constraint wants to set up.
   /** This function shouldn't do any propagation. That is full_propagate's job.*/
   virtual triggerCollection setup_internal_gather_triggers()
-  {     
+  {
     triggerCollection newTriggers;
-    
+
     for(int i = 0; i < child_constraints.size(); i++)
     {
       triggerCollection childTrigs = child_constraints[i]->setup_internal_gather_triggers();
@@ -271,16 +267,16 @@ public:
         newTriggers.push_back(childTrigs[j]);
       }
     }
-    
+
     triggerCollection parentTrigs = setup_internal();
     for(int i = 0; i < parentTrigs.size(); ++i)
       D_ASSERT(parentTrigs[i]->trigger.info < 0);
     newTriggers.insert(newTriggers.end(), parentTrigs.begin(), parentTrigs.end());
-    
+
     return newTriggers;
   }
 
-  ParentConstraint(StateObj* _stateObj, const vector<AbstractConstraint*> _children = vector<AbstractConstraint*>()) : 
+  ParentConstraint(StateObj* _stateObj, const vector<AbstractConstraint*> _children = vector<AbstractConstraint*>()) :
   AbstractConstraint(_stateObj), child_constraints(_children)
   {
     int var_count = 0;
@@ -309,26 +305,26 @@ public:
     _DynamicTriggerCache = dynamicTriggerPointer;
 
     int current_trigger_count = dynamic_trigger_count();
-    
+
     for(int count = 0; count < current_trigger_count; count++)
       _dynamic_trigger_to_constraint.push_back(child_constraints.size());
-    
+
     for(int i = 0; i < child_constraints.size(); ++i)
     {
       // We need this check to ensure we don't try constructing a "start of trigger" block one off the
       // the end of memory array.
       if(current_trigger_count == dynamic_trigger_count_with_children())
         return;
-        
-      // Get start child's dynamic triggers.      
+
+      // Get start child's dynamic triggers.
       MemOffset childPtr = dynamicTriggerPointer.getOffset(current_trigger_count * sizeof(DynamicTrigger));
       child_constraints[i]->setup_dynamic_triggers(childPtr);
-      
+
       int child_trig_count = child_constraints[i]->dynamic_trigger_count_with_children();
-      
+
       for(int count = current_trigger_count; count < current_trigger_count + child_trig_count; ++count)
         _dynamic_trigger_to_constraint.push_back(i);
-        
+
       current_trigger_count += child_trig_count;
     }
   }
@@ -345,7 +341,7 @@ public:
     D_ASSERT(all_trigs >= trigs);
 
     MemOffset trigMem = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(DynamicTrigger) * all_trigs);
-    
+
     // Start by allocating triggers in the memory block
     DynamicTrigger* start = static_cast<DynamicTrigger*>(trigMem.get_ptr());
     for(int i = 0 ; i < all_trigs; ++i)

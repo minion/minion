@@ -67,7 +67,7 @@ struct TableConstraint : public AbstractConstraint
     return false;
   }
   
-  PROPAGATE_FUNCTION(int, DomainDelta)
+  virtual void propagate(int, DomainDelta)
   {
     PROP_INFO_ADDONE(Table);
     for(unsigned int check_var = 0; check_var < vars.size(); check_var++)

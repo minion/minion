@@ -76,7 +76,7 @@ struct DivConstraint : public AbstractConstraint
     return t;
   }
     
-  PROPAGATE_FUNCTION(int flag, DomainDelta)
+  virtual void propagate(int flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Pow);
     if(var1.isAssigned() && var2.isAssigned())

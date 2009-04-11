@@ -71,7 +71,7 @@ template<typename Var>
   }
 
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(WatchInSet);
     // If we are in here, we have a bounds variable.

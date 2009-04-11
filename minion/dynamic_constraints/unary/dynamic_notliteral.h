@@ -53,7 +53,7 @@ template<typename Var>
   }
 
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(WatchInRange);
     var.removeFromDomain(val); 
@@ -114,7 +114,7 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
     var.removeFromDomain(val); 
   }
 
-  DYNAMIC_PROPAGATE_FUNCTION(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(WatchInRange);
     var.removeFromDomain(val); 

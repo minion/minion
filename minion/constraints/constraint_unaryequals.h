@@ -43,7 +43,7 @@ struct UnaryEqualConstraint : public AbstractConstraint
   
   //  virtual AbstractConstraint* reverse_constraint()
   
-  PROPAGATE_FUNCTION(int,DomainDelta)
+  virtual void propagate(int,DomainDelta)
   { D_FATAL_ERROR("This method should never be called"); }
   
   
