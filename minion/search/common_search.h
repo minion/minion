@@ -227,27 +227,9 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
 
   void inline set_optimise_and_propagate_queue(StateObj* stateObj)
   {
-  #ifdef USE_SETJMP
-    if(getState(stateObj).isOptimisationProblem())
-    {
-      // Must check if this setMin will fail before doing it, else
-      // The setjmp will throw us off. It's cheaper to check than set up
-      // a new setjmp point here.
-      if(getState(stateObj).getOptimiseVar()->getMax() >= getState(stateObj).getOptimiseValue())
-      { 
-        getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseValue());
-        getQueue(stateObj).propagateQueue();
-      }
-      else
-      {failed = true; }
-    }
-    else
-    { getQueue(stateObj).propagateQueue();}
-  #else
     if(getState(stateObj).isOptimisationProblem())
       getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseValue());
     getQueue(stateObj).propagateQueue();
-  #endif    
   }
 
   void inline initalise_search(StateObj* stateObj)

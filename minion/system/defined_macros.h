@@ -101,9 +101,6 @@ cout << "USE_HASHTABLE" << " ";
 #ifdef USE_HASHSET
 cout << "USE_HASHSET" << " "; 
 #endif
-#ifdef USE_SETJMP
-cout << "USE_SETJMP" << " "; 
-#endif
 #ifdef WATCHEDLITERALS
 cout << "WATCHEDLITERALS" << " "; 
 #endif

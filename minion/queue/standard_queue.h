@@ -126,13 +126,11 @@ public:
       
       while(it != t)
       {
-#ifndef USE_SETJMP
         if(*fail_ptr) 
         {
           clearQueues();
           return true; 
         }
-#endif
         
 #ifdef NO_DYN_CHECK
         DynamicTrigger* next_queue_ptr;
@@ -168,13 +166,11 @@ public:
       
       for(Trigger* it = t.begin(); it != t.end(); it++)
       {
-#ifndef USE_SETJMP
         if(*fail_ptr) 
         {
           clearQueues();
           return true; 
         }
-#endif
         
 #ifndef NO_DEBUG
         if(getOptions(stateObj).fullpropagate)
@@ -202,18 +198,6 @@ public:
   
   inline void propagateQueue()
   {
-#ifdef USE_SETJMP
-    int setjmp_return = SYSTEM_SETJMP(*(getState(stateObj).getJmpBufPtr()));
-    if(setjmp_return != 0)
-    { // Failure has occured
-      D_ASSERT(!getState(stateObj).isFailed());
-      getState(stateObj).setFailed(true);
-      getQueue(stateObj).clearQueues();
-      printf("!\n");
-      return;
-    }
-#endif
-    
     while(true)
     {
       if (getState(stateObj).isDynamicTriggersUsed()) 
@@ -262,13 +246,11 @@ public:
       
       while(it != t)
       {
-#ifndef USE_SETJMP
         if(*fail_ptr) 
         {
           clearQueues();
           return true; 
         }
-#endif
         
 #ifdef NO_DYN_CHECK
         DynamicTrigger* next_queue_ptr;
@@ -304,13 +286,11 @@ public:
       
       for(Trigger* it = t.begin(); it != t.end(); it++)
       {
-#ifndef USE_SETJMP
         if(*fail_ptr) 
         {
           clearQueues();
           return true; 
         }
-#endif
         if(it->constraint->full_propagate_done)
         {
 #ifndef NO_DEBUG
@@ -335,19 +315,7 @@ public:
   }
   
   inline void propagateQueueRoot()
-  {
-#ifdef USE_SETJMP
-    int setjmp_return = SYSTEM_SETJMP(*(getState(stateObj).getJmpBufPtr()));
-    if(setjmp_return != 0)
-    { // Failure has occured
-      D_ASSERT(!getState(stateObj).isFailed());
-      getState(stateObj).setFailed(true);
-      getQueue(stateObj).clearQueues();
-      printf("!\n");
-      return;
-    }
-#endif
-    
+  {    
     while(true)
     {
       if (getState(stateObj).isDynamicTriggersUsed()) 

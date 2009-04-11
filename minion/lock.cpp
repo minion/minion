@@ -38,23 +38,6 @@ void lock(StateObj* stateObj)
   
   getTriggerMem(stateObj).finaliseTriggerLists();
   
-  //bool prop_to_do = true;
-#ifdef USE_SETJMP
-  int setjmp_return = SYSTEM_SETJMP(*(getState(stateObj).getJmpBufPtr()));
-  if(setjmp_return != 0)
-  {
-    getState(stateObj).setFailed(true);
-    getQueue(stateObj).clearQueues();
-    return;
-  }
-#endif
-  //while(prop_to_do)
-  //{
-  //prop_to_do = false;
-  // We can't use incremental propagate until all constraints
-  // have been setup, so this slightly messy loop is necessary
-  // To propagate the first node.
-  
   // No longer AC1, thank goodness.
   for(int i = 0; i < size; ++i)
   {

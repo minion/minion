@@ -109,10 +109,6 @@ public:
   
   bool isFailed() { return failed; }
   void setFailed(bool f) {
-#ifdef USE_SETJMP
-    if(f)
-      SYSTEM_LONGJMP(*(getState(stateObj).getJmpBufPtr()),1);
-#endif
     failed = f; 
   }
   // This function is here because a number of pieces of code want a raw reference to the 'failed' variable.
