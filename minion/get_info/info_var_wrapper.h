@@ -213,13 +213,11 @@ struct InfoRefType
     return d.XXX_get_domain_diff(); 
   }
   
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = -999)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, addDynamicTrigger);
     data.addDynamicTrigger( t, type, pos); 
   }
-#endif
 };
 
 
