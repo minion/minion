@@ -35,9 +35,6 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
     AbstractConstraint(_stateObj), var_array(_var_array)
   { 
     D_ASSERT(var_array.size() == 3);
-#ifndef DYNAMICTRIGGERS
-    cerr << "This almost certainly isn't going to work... sorry" << endl;
-#endif
   }
   
   int dynamic_trigger_count()
