@@ -182,7 +182,6 @@ public:
       triggers.swap(t);
     }
 
-#ifdef DYNAMICTRIGGERS
     DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr());
 
     int trigger_types = ( only_bounds ? 4 : (4 + vars_domain_size));
@@ -191,7 +190,6 @@ public:
       new (trigger_ptr + i) DynamicTrigger;
       D_ASSERT((trigger_ptr + i)->sanity_check_list());
     }
-#endif
   }
   
   pair<Trigger*, Trigger*> get_trigger_range(int var_num, TrigType type)
@@ -203,7 +201,6 @@ public:
     return pair<Trigger*,Trigger*>(trig_range_start, trig_range_end);
   }
   
-#ifdef DYNAMICTRIGGERS
   void dynamic_propagate(int var_num, TrigType type, DomainInt val_removed = NoDomainValue)
   {
     D_ASSERT(val_removed == NoDomainValue || ( type == DomainRemoval && val_removed != NoDomainValue) );
@@ -227,13 +224,10 @@ public:
     if(trig->next != trig)
       getQueue(stateObj).pushDynamicTriggers(trig);
   }
-#endif
   
   void push_upper(int var_num, DomainInt upper_delta)
   {
-#ifdef DYNAMICTRIGGERS
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, UpperBound);
-#endif
     D_ASSERT(lock_second);
     D_ASSERT(upper_delta > 0 || getState(stateObj).isFailed());
 
@@ -245,9 +239,7 @@ public:
   
   void push_lower(int var_num, DomainInt lower_delta)
   { 
-#ifdef DYNAMICTRIGGERS
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, LowerBound);
-#endif
     D_ASSERT(lock_second);
     D_ASSERT(lower_delta > 0 || getState(stateObj).isFailed());
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
@@ -259,9 +251,7 @@ public:
   
   void push_assign(int var_num, DomainInt)
   { 
-#ifdef DYNAMICTRIGGERS
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, Assigned);
-#endif
     D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
     if(range.first != range.second)
@@ -270,9 +260,7 @@ public:
   
   void push_domain_changed(int var_num)
   { 
-#ifdef DYNAMICTRIGGERS
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);
-#endif
 
     D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
@@ -283,9 +271,7 @@ public:
   void push_domain_removal(int var_num, DomainInt val_removed)
   { 
     D_ASSERT(!only_bounds);
-#ifdef DYNAMICTRIGGERS
     dynamic_propagate(var_num, DomainRemoval, val_removed);
-#endif
     D_ASSERT(lock_second);
   }
   
