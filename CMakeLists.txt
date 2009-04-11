@@ -12,6 +12,9 @@ include(CheckIncludeFiles)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
+set(BUILD_DEF_FILE "${PROJECT_SOURCE_DIR}/minion/BuildDefines.h")
+file(REMOVE ${BUILD_DEF_FILE})
+
 if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
     message(FATAL_ERROR "You cannot run CMake in the source directory (please take a look at the README).")
 endif()
@@ -54,7 +57,10 @@ if(SVN)
 else()
     message(STATUS "No SVN executable found, unable to determine SVN version and date")
 endif()
-add_definitions(-DSVN_VER=${SVNVERSION} -DSVN_DATE="${SVNDATE}")
+
+file(APPEND ${BUILD_DEF_FILE} "#define SVN_VER ${SVNVERSION}\n")
+file(APPEND ${BUILD_DEF_FILE} "#define SVN_DATE ${SVNDATE}\n")
+
 
 # if we have a bash, generate constraints and help if necessary and add build
 # targets to do that
@@ -103,10 +109,13 @@ else()
 endif()
 
 file(GLOB SRCS "${PROJECT_SOURCE_DIR}/minion/build_constraints/CT*.cpp")
+
 foreach(ct ${SRCS})
     string(REGEX MATCH "CT_[A-Z_0-9]+" ct_name ${ct})
-    add_definitions(-D${ct_name}_ABC)
+	file(APPEND ${BUILD_DEF_FILE} "#define ${ct_name}_ABC\n")
+#    add_definitions(-D${ct_name}_ABC)
 endforeach()
+
 list(APPEND SRCS ${PROJECT_SOURCE_DIR}/minion/BuildVariables.cpp
                  ${PROJECT_SOURCE_DIR}/minion/BuildCSP.cpp
                  ${PROJECT_SOURCE_DIR}/minion/commandline_parse.cpp
