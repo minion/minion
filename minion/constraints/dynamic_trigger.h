@@ -26,9 +26,12 @@ private:
   DynamicTrigger(const DynamicTrigger&);  
 public:
 
-  /// In debug mode, a value set to 1234. This allows a check that a DynamicTrigger*
+  /// In debug mode, a value set to 1234 if this is a DynamicTrigger, or 4321 if this
+  /// is a BacktrackableTrigger. This allows a check that a DynamicTrigger*
   /// actually points to a valid object.
   D_DATA(int sanity_check); 
+  
+  /// In debug mode, a value set to 
   /// The constraint to be triggered.
   AbstractConstraint* constraint;
   /// A small space for constraints to store trigger-specific information.
@@ -40,9 +43,14 @@ public:
   
   DynamicTrigger* prev;
   DynamicTrigger* next;
-
+#ifdef BTWL
+  DynamicTrigger* basequeue;
+#endif
 
   DynamicTrigger(AbstractConstraint* c) : constraint(c), prev(NULL), next(NULL)
+#ifdef BTWL
+  , basequeue(NULL)
+#endif
   { D_DATA(sanity_check = 1234);}
   
   DynamicTrigger() : constraint(NULL)
@@ -79,7 +87,32 @@ public:
   {
       return prev!=NULL;
   }
-  
+   
+private:
+   void add_after_implementation(DynamicTrigger* new_prev, DynamicTrigger*& next_queue_ptr)
+   {
+       if(prev != NULL)
+       {
+    #ifndef NO_DYN_CHECK
+         if(this == next_queue_ptr)
+         {
+           CON_INFO_ADDONE(DynamicMovePtr);
+           next_queue_ptr = next;
+         }
+
+    #endif
+         remove(next_queue_ptr);
+       }
+       DynamicTrigger* new_next = new_prev->next;
+       prev = new_prev;
+       next = new_next;
+       new_prev->next = this;
+       new_next->prev = this;
+       D_ASSERT(prev->next == this);
+       D_ASSERT(next->prev == this);
+       D_ASSERT(new_prev->sanity_check_list());
+   }
+public:  
   /// Add this trigger after another one in a list.
   /// This function will remove this trigger from any list it currently lives in.
   // next_queue_ptr is a '*&' as it is a pointer which we want a reference to, so we can change it!
@@ -88,26 +121,7 @@ public:
     D_ASSERT(constraint != NULL);
     D_ASSERT(sanity_check == 1234);
     D_ASSERT(new_prev->sanity_check_list());
-    if(prev != NULL)
-    {
-#ifndef NO_DYN_CHECK
-      if(this == next_queue_ptr)
-      {
-        CON_INFO_ADDONE(DynamicMovePtr);
-        next_queue_ptr = next;
-      }
-      
-#endif
-      remove(next_queue_ptr);
-    }
-    DynamicTrigger* new_next = new_prev->next;
-    prev = new_prev;
-    next = new_next;
-    new_prev->next = this;
-    new_next->prev = this;
-    D_ASSERT(prev->next == this);
-    D_ASSERT(next->prev == this);
-    D_ASSERT(new_prev->sanity_check_list());
+    add_after_implementation(new_prev, next_queue_ptr);
   }
   
   /// Propagates the constraint stored in the trigger.
@@ -115,7 +129,10 @@ public:
   void propagate();
   
   ~DynamicTrigger()
-  { D_DATA(sanity_check = -1); }
+  { 
+      D_ASSERT(sanity_check == 1234);
+      D_DATA(sanity_check = -1); 
+  }
   
   BOOL sanity_check_list(BOOL is_head_of_list = true)
   {
