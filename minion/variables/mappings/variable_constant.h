@@ -25,93 +25,93 @@ struct ConstantVar
 {
   // TODO: This really only needs enough to get 'fail'
   StateObj* stateObj;
-  
+
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Yes;
-  
+
   // Hmm.. no sure if it's better to make this true or false.
   BOOL isBound() const
   { return true;}
-  
+
   DomainInt val;
-  
+
   explicit ConstantVar(StateObj* _stateObj, DomainInt _val) : stateObj(_stateObj), val(_val)
   {}
-  
-  ConstantVar() 
+
+  ConstantVar()
   {}
-  
+
   ConstantVar(const ConstantVar& b) : stateObj(b.stateObj), val(b.val)
   {}
-  
+
   BOOL isAssigned() const
   { return true;}
-  
+
   DomainInt getAssignedValue() const
   { return val;}
-  
+
   BOOL isAssignedValue(DomainInt i) const
   { return i == val; }
-  
+
   BOOL inDomain(DomainInt b) const
   { return b == val; }
 
   BOOL inDomain_noBoundCheck(DomainInt b) const
-  { 
+  {
     D_ASSERT(b == val);
     return true;
   }
-  
+
   DomainInt getMax() const
   { return val; }
-  
+
   DomainInt getMin() const
   { return val; }
 
   DomainInt getInitialMax() const
   { return val; }
-  
+
   DomainInt getInitialMin() const
   { return val; }
-  
+
   void setMax(DomainInt i)
   { if(i<val) getState(stateObj).setFailed(true); }
-  
+
   void setMin(DomainInt i)
   { if(i>val) getState(stateObj).setFailed(true); }
-  
+
   void uncheckedAssign(DomainInt)
   { FAIL_EXIT(); }
-  
+
   void propagateAssign(DomainInt b)
   {if(b != val) getState(stateObj).setFailed(true); }
-  
+
   void decisionAssign(DomainInt b)
   { propagateAssign(b); }
-  
+
   void removeFromDomain(DomainInt b)
   { if(b==val) getState(stateObj).setFailed(true); }
- 
+
   void addTrigger(Trigger, TrigType)
   { }
 
-  
+
   void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = NoDomainValue BT_FUNDEF)
-  { 
+  {
 #ifdef BTWLDEF
-      abort();
+      // XXX : Todo. Sensibly move this trigger...
 #endif
-      dt->remove(getQueue(stateObj).getNextQueuePtrRef());    
+      dt->remove(getQueue(stateObj).getNextQueuePtrRef());
   }
 
   vector<AbstractConstraint*>* getConstraints() { return NULL; }
 
   void addConstraint(AbstractConstraint* c){ ; }
 
-  DomainInt getBaseVal(DomainInt v) const 
-  { 
+  DomainInt getBaseVal(DomainInt v) const
+  {
     D_ASSERT(v == val);
-    return val; 
+    return val;
   }
 
   Var getBaseVar() const { return Var(VAR_CONSTANT, val); }
@@ -123,11 +123,11 @@ struct ConstantVar
 #endif
 
   int getDomainChange(DomainDelta d)
-  { 
+  {
     D_ASSERT(d.XXX_get_domain_diff() == 0);
     return 0;
   }
-  
+
   friend std::ostream& operator<<(std::ostream& o, const ConstantVar& constant)
   { return o << "Constant" << constant.val; }
 };

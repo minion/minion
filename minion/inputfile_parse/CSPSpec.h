@@ -27,18 +27,20 @@ using namespace std;
 #include <utility>
 #include <map>
 
+#include "../system/system.h"
+#include "../constants.h"
+
 #include "InputVariableDef.h"
 
 #include "../tuple_container.h"
 
-#include "../constants.h"
 
 /// The currently accepted types of Constraints.
 
 #include "../build_constraints/ConstraintEnum.h"
 
 inline string to_var_name(const vector<int>& params)
-{ 
+{
   ostringstream s;
   s << "_";
   for(int i = 0; i < params.size(); ++i)
@@ -64,7 +66,7 @@ enum ReadTypes
 enum VarOrderEnum
 {
   ORDER_NONE,
-  
+
   ORDER_STATIC,
   ORDER_SDF,
   ORDER_SRF,
@@ -91,7 +93,7 @@ namespace ProbSpec
 {
 struct CSPInstance;
 
-  
+
 /// Constructed by the parser. Suitable for holding any kind of constraint.
 struct ConstraintBlob
 {
@@ -103,27 +105,27 @@ struct ConstraintBlob
   TupleList* tuples;
   /// A vector of signs. Only used for SAT clause "or" constraint.
   vector<int> negs;
-  
+
   /// A vector of constants, for any constraint which reads a constant array
   vector<vector<int> > constants;
-  
+
   /// For use in Gadget constraints, lists the propagation level to be achieved.
   PropagationLevel gadget_prop_type;
 
   /// For use in Gadget constraints, gives the actual gadget.
   shared_ptr<CSPInstance> gadget;
-  
+
   /// For use in nested constraints.
   vector<ConstraintBlob> internal_constraints;
-  
+
   ConstraintBlob(ConstraintDef* _con) : constraint(_con)
   {}
-  
+
   ConstraintBlob(ConstraintDef* _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars)
   {}
 
 #ifdef USE_CXX0X
-  ConstraintBlob(ConstraintBlob&& b) : 
+  ConstraintBlob(ConstraintBlob&& b) :
   CXXMOVE(constraint, b), CXXMOVE(vars, b), CXXMOVE(tuples, b), CXXMOVE(negs, b), CXXMOVE(constants, b),
   CXXMOVE(gadget_prop_type, b), CXXMOVE(gadget, b), CXXMOVE(internal_constraints, b)
   { }
@@ -149,13 +151,13 @@ struct ConstraintBlob
         }
       }
     }
-    
+
     for(vector<ConstraintBlob>::const_iterator it = internal_constraints.begin(); it != internal_constraints.end(); ++it)
     {
       set<Var> newvars = it->get_all_vars();
       return_vars.insert(newvars.begin(), newvars.end());
     }
-    
+
     return return_vars;
   }
 };
@@ -176,22 +178,22 @@ struct ConstraintBlob
   {}
 
 #ifdef USE_CXX0X
-  VarContainer(VarContainer&& v) : 
+  VarContainer(VarContainer&& v) :
   CXXMOVE(BOOLs, v), CXXMOVE(symbol_table, v), CXXMOVE(name_table, v), CXXMOVE(bound, v), CXXMOVE(sparse_bound, v),
   CXXMOVE(discrete, v), CXXMOVE(sparse_discrete, v), CXXMOVE(matrix_table, v)
   { }
 #endif
-  
+
 
   /// Given a matrix variable and a parameter list, returns a slice of the matrix.
   /// Params can either be wildcards (denoted -999), or a value for the matrix.
   vector<Var> buildVarList(const string& name, const vector<int>& params)
   {
      vector<Var> return_list;
-    
+
      vector<int> max_index = getMatrixSymbol(name);
      if(params.size() != max_index.size())
-      throw parse_exception("Can't index a " + to_string(max_index.size()) + 
+      throw parse_exception("Can't index a " + to_string(max_index.size()) +
                             "-d matrix with " + to_string(params.size()) +
                             " indices.");
     for(int i = 0; i < params.size(); ++i)
@@ -200,7 +202,7 @@ struct ConstraintBlob
       if(params[i] != -999 && (params[i] < 0 || params[i] >= max_index[i]))
         throw parse_exception(to_string(i) + string("th index is invalid"));
     }
-    
+
     // Set all fixed indices to 1, so they won't move.
     // Set all variable indices to their max value.
     vector<int> modified_max(params.size());
@@ -211,10 +213,10 @@ struct ConstraintBlob
       else
         modified_max[i] = 1;
     }
-    
+
     // Iterates through the variable indices
     vector<int> current_index(params.size());
-    
+
     // Vector which actually contains the output
     vector<int> output(params);
     do
@@ -225,10 +227,10 @@ struct ConstraintBlob
       return_list.push_back(getSymbol(name + to_var_name(output)));
     }
     while(increment_vector(current_index, modified_max));
-          
+
     return return_list;
   }
-  
+
   vector<vector<Var> > flattenTo2DMatrix(const string& name)
   {
     // The following code looks a bit weird, but aims to maximise code reuse.
@@ -239,9 +241,9 @@ struct ConstraintBlob
     vector<int> loop_indices(indices.size());
     for(int i = 0; i < indices.size() - 1; ++i)
       loop_indices[i] = -999;
-    
+
     vector<vector<Var> > terms;
-    
+
     for(int i = 0; i < indices.back(); ++i)
     {
       loop_indices.back() = i;
@@ -252,10 +254,10 @@ struct ConstraintBlob
         terms[i].push_back(slice[i]);
     }
     return terms;
-    
+
   }
-  
-  
+
+
   void addSymbol(const string& name, Var variable)
   {
     if(name == "")
@@ -265,18 +267,18 @@ struct ConstraintBlob
     if(symbol_table.count(name) != 0)
       throw parse_exception("Name already in table:" + name);
     symbol_table[name] = variable;
-  
+
     if(name_table.find(variable) == name_table.end())
       name_table[variable] = name;
   }
-  
+
   void addMatrixSymbol(const string& name, const vector<int>& indices)
   {
     Var var(VAR_MATRIX, matrix_table.size());
     addSymbol(name, var);
     matrix_table[name] = indices;
   }
-  
+
   Var getSymbol(const string& name) const
   {
     map<string, Var>::const_iterator it = symbol_table.find(name);
@@ -284,7 +286,7 @@ struct ConstraintBlob
       throw parse_exception("Undefined name: '" + name + "'");
     return it->second;
   }
-  
+
   string getName(const Var& var) const
   {
     map<Var, string>::const_iterator it = name_table.find(var);
@@ -292,7 +294,7 @@ struct ConstraintBlob
       throw parse_exception("Undefined Var");
     return it->second;
   }
-  
+
   vector<int> getMatrixSymbol(const string& name)
   {
     map<string, vector<int> >::iterator it = matrix_table.find(name);
@@ -300,7 +302,7 @@ struct ConstraintBlob
       throw parse_exception("Undefined matrix: '" + name + "'");
     return it->second;
   }
-  
+
   // Returns a bool, where the first element is if these are bounds.
   pair<BoundType, vector<DomainInt> > get_domain(Var v) const
   {
@@ -314,7 +316,7 @@ struct ConstraintBlob
       dom.push_back(0);
       dom.push_back(1);
       return make_pair(Bound_No, dom);
-    case VAR_BOUND:  
+    case VAR_BOUND:
       {
         int bound_size = 0;
         for(unsigned int x = 0; x < bound.size(); ++x)
@@ -340,7 +342,7 @@ struct ConstraintBlob
         }
         throw parse_exception("Internal Error - SparseBound OverFlow");
       }
-    case VAR_DISCRETE: 
+    case VAR_DISCRETE:
     {
       int discrete_size = 0;
       for(unsigned int x = 0; x < discrete.size(); ++x)
@@ -351,7 +353,7 @@ struct ConstraintBlob
           dom.push_back(discrete[x].second.lower_bound);
           dom.push_back(discrete[x].second.upper_bound);
           return make_pair(Bound_Yes, dom);
-        }        
+        }
       }
       throw parse_exception("Internal Error - Discrete OverFlow");
     }
@@ -367,20 +369,20 @@ struct ConstraintBlob
       throw parse_exception("Internal Error - SparseDiscrete OverFlow");
     }
     default:
-      throw parse_exception("Internal Error - Unknown Variable Type");    
-    }    
+      throw parse_exception("Internal Error - Unknown Variable Type");
+    }
   }
-  
-  
+
+
   Bounds get_bounds(Var v) const
   {
     switch(v.type())
     {
     case VAR_CONSTANT:
-      return Bounds(v.pos(), v.pos());    
+      return Bounds(v.pos(), v.pos());
     case VAR_BOOL:
       return Bounds(0,1);
-    case VAR_BOUND:  
+    case VAR_BOUND:
       {
         int bound_size = 0;
         for(unsigned int x = 0; x < bound.size(); ++x)
@@ -391,7 +393,7 @@ struct ConstraintBlob
         }
         throw parse_exception("Internal Error - Bound OverFlow");
       }
-      
+
     case VAR_SPARSEBOUND:
       {
         int sparse_bound_size = 0;
@@ -403,7 +405,7 @@ struct ConstraintBlob
         }
         throw parse_exception("Internal Error - SparseBound OverFlow");
       }
-    case VAR_DISCRETE: 
+    case VAR_DISCRETE:
     {
       int discrete_size = 0;
       for(unsigned int x = 0; x < discrete.size(); ++x)
@@ -426,10 +428,10 @@ struct ConstraintBlob
       throw parse_exception("Internal Error - SparseDiscrete OverFlow");
     }
     default:
-      throw parse_exception("Internal Error - Unknown Variable Type");    
+      throw parse_exception("Internal Error - Unknown Variable Type");
     }
   }
-  
+
   Var get_var(char, int i) const
   {
     if(i < BOOLs)
@@ -451,7 +453,7 @@ struct ConstraintBlob
         return Var(VAR_SPARSEBOUND, i);
       i -= sparse_bound_size;
     }
-    
+
     {
       int discrete_size = 0;
       for(unsigned int x=0;x<discrete.size();++x)
@@ -468,9 +470,9 @@ struct ConstraintBlob
         return Var(VAR_SPARSEDISCRETE, i);
       i -= sparse_discrete_size;
     }
-    throw parse_exception("Var Out of Range!");   
+    throw parse_exception("Var Out of Range!");
   }
-  
+
 
   Var getNewVar(VariableType type, vector<int> bounds)
   {
@@ -488,37 +490,37 @@ struct ConstraintBlob
         D_FATAL_ERROR("Internal error");
     }
   }
-  
+
   Var getNewBoolVar()
   {
     Var newBool(VAR_BOOL, BOOLs);
     BOOLs++;
     return newBool;
   }
-  
+
   Var getNewBoundVar(int lower, int upper)
   {
      bound.push_back(make_pair(1, Bounds(lower, upper)));
      return Var(VAR_BOUND, bound.size() - 1);
   }
-  
+
   Var getNewSparseBoundVar(const vector<int>& vals)
   {
     sparse_bound.push_back(make_pair(1, vals));
     return Var(VAR_SPARSEBOUND, sparse_bound.size() - 1);
   }
-  
+
   Var getNewDiscreteVar(int lower, int upper)
   {
     discrete.push_back(make_pair(1, Bounds(lower, upper)));
     return Var(VAR_DISCRETE, discrete.size() - 1);
   }
-  
+
   vector<Var> get_all_vars() const
   {
     int total_var_count = 0;
     total_var_count += BOOLs;
-    
+
     for(unsigned int x = 0; x < bound.size(); ++x)
       total_var_count += bound[x].first;
     for(unsigned int x=0;x<sparse_bound.size();++x)
@@ -531,7 +533,7 @@ struct ConstraintBlob
     for(int i = 0; i < total_var_count; ++i)
       all_vars[i] = get_var('x',i);
     return all_vars;
-  }  
+  }
 };
 
 struct SearchOrder
@@ -540,22 +542,22 @@ struct SearchOrder
   vector<char> val_order;
   VarOrderEnum order;
   bool find_one_assignment;
-  
+
   SearchOrder() : order(ORDER_ORIGINAL), find_one_assignment(false)
   { }
-  
+
   SearchOrder(const vector<Var>& _var_order) :
   var_order(_var_order), order(ORDER_ORIGINAL), find_one_assignment(false)
   { }
-  
+
   SearchOrder(const vector<Var>& _var_order, VarOrderEnum _order, bool _find_one_assignment = false) :
   var_order(_var_order), order(_order), find_one_assignment(_find_one_assignment)
   { }
-  
+
   void setupValueOrder()
   {
     if(val_order.empty())
-      val_order.resize(var_order.size(), 'a');      
+      val_order.resize(var_order.size(), 'a');
   }
 };
 
@@ -573,49 +575,49 @@ struct CSPInstance
 
   /// Only used for gadgets.
   vector<Var> constructionSite;
-  
+
   bool is_optimisation_problem;
   bool optimise_minimising;
   Var optimise_variable;
-  
+
   vector<vector<Var> > print_matrix;
-  
+
   /// A complete list of variables in the order they are defined.
   vector<vector<Var> > all_vars_list;
-  
+
   map<string, TupleList*> table_symboltable;
   map<TupleList*, string> table_nametable;
-  
+
   /// We make these shared_ptrs so they automatically clear up after themselves.
   map<string, shared_ptr<CSPInstance> > gadgetMap;
-  
-  
+
+
   CSPInstance() : tupleListContainer(new TupleListContainer), is_optimisation_problem(false)
   {}
- 
+
 #ifdef USE_CXX0X
 private:
     CSPInstance(CSPInstance&);
 public:
-  
-  CSPInstance(CSPInstance&& i) : 
+
+  CSPInstance(CSPInstance&& i) :
   CXXMOVE(vars, i), CXXMOVE(constraints, i), CXXMOVE(tupleListContainer, i), CXXMOVE(search_order, i),
   CXXMOVE(permutation, i), CXXMOVE(sym_order, i), CXXMOVE(constructionSite, i), CXXMOVE(is_optimisation_problem, i),
   CXXMOVE(optimise_minimising, i), CXXMOVE(optimise_variable, i), CXXMOVE(print_matrix, i), CXXMOVE(all_vars_list, i),
   CXXMOVE(table_symboltable, i), CXXMOVE(table_nametable, i), CXXMOVE(gadgetMap, i)
   { }
 #endif
-  
+
   void set_optimise(BOOL _minimising, Var var)
-  { 
+  {
     is_optimisation_problem = true;
     optimise_minimising = _minimising;
     optimise_variable = var;
   }
-  
+
   void add_constraint(const ConstraintBlob& b)
   { constraints.push_back(b); }
-      
+
   // Perform a simple check to ensure the constraint will not cause integer overflow.
   bool bounds_check_last_constraint()
   {
@@ -637,7 +639,7 @@ public:
         BigInt b = checked_cast<BigInt>(vars.get_bounds(con.vars[0][1]).upper_bound);
         BigInt out = 1;
         for(int i = 0; i < b; ++i)
-        { 
+        {
           out *= a;
           if(!DOMAIN_CHECK(out))
             return false;
@@ -645,7 +647,7 @@ public:
         return true;
       }
 #endif
-      
+
       default:
         return true;
     }
@@ -654,7 +656,7 @@ public:
                           "The values given will not cause integer overflow.");
 
   }
-  
+
   void addUnnamedTableSymbol(TupleList* tuplelist)
   {
     if(table_nametable.count(tuplelist) != 0)
@@ -662,8 +664,8 @@ public:
     int pos = table_symboltable.size();
     while( table_symboltable.count("_Unnamed__" + pos) != 0)
       pos++;
-      
-    table_symboltable["_Unnamed__" + to_string(pos) + "_"] = tuplelist; 
+
+    table_symboltable["_Unnamed__" + to_string(pos) + "_"] = tuplelist;
     table_nametable[tuplelist] = "_Unnamed__" + to_string(pos) + "_";
   }
 
@@ -676,7 +678,7 @@ public:
     table_symboltable[name] = tuplelist;
     table_nametable[tuplelist] = name;
   }
-  
+
   TupleList* getTableSymbol(string name) const
   {
     map<string, TupleList*>::const_iterator it = table_symboltable.find(name);
@@ -684,7 +686,7 @@ public:
       throw parse_exception("Undefined tuplelist: '" + name + "'");
     return it->second;
   }
-  
+
   string getTableName(TupleList* tuples) const
   {
     map<TupleList*, string>::const_iterator it = table_nametable.find(tuples);
@@ -692,14 +694,14 @@ public:
       throw parse_exception("Undefined tuplelist: '" + to_string(size_t(tuples)) + "'");
     return it->second;
   }
-    
+
   void addGadgetSymbol(string name, shared_ptr<CSPInstance> gadget)
   {
     if(gadgetMap.count(name) != 0)
       throw parse_exception("Gadget name "+ name + " already in use.");
     gadgetMap[name] = gadget;
   }
-  
+
   shared_ptr<CSPInstance> getGadgetSymbol(string name)
   {
     map<string, shared_ptr<CSPInstance> >::iterator it = gadgetMap.find(name);
@@ -707,18 +709,18 @@ public:
       throw parse_exception("Undefined gadget name '" + name + "'");
     return it->second;
   }
-  
+
   void add_variable_names()
   {
     if(vars.symbol_table.empty())
     {
       // This was a MINION 1 or MINION 2 input file. Let's fix it!
       vector<Var> all_vars = vars.get_all_vars();
-      
+
       for(int i = 0; i < all_vars.size(); ++i)
-        vars.addSymbol("x" + to_string(i), all_vars[i]);  
+        vars.addSymbol("x" + to_string(i), all_vars[i]);
     }
-    
+
     if(sym_order.empty())
       sym_order = vars.get_all_vars();
   }

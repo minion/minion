@@ -1,5 +1,5 @@
-#define SVN_VER 2512
-#define SVN_DATE 2009-04-11 09:23:42 +0100 (Sat, 11 Apr 2009)
+#define SVN_VER 2517
+#define SVN_DATE 2009-04-11 17:32:46 +0100 (Sat, 11 Apr 2009)
 #define CT_ABS_ABC
 #define CT_ALLDIFF_ABC
 #define CT_DIFFERENCE_ABC

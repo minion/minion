@@ -20,14 +20,18 @@
 #ifndef _CONSTANTS_H
 #define _CONSTANTS_H
 
+#include <string>
+
+#include "BuildDefines.h"
+
 #define BTWLDEF
 
 enum TrigType
-{ 
-  UpperBound, 
-  LowerBound, 
+{
+  UpperBound,
+  LowerBound,
   Assigned,
-  DomainChanged, 
+  DomainChanged,
   DomainRemoval
 };
 
@@ -39,7 +43,7 @@ enum TrigOp
 };
 
 static const int NoDomainValue = -98765;
-static void* BAD_POINTER = (void*)(-1);
+#define BAD_POINTER (void*)(-1)
 
 #ifdef BTWLDEF
 #define BTWL(x) x
@@ -59,10 +63,10 @@ enum BoundType
 };
 
 enum PropagationLevel
-{ PropLevel_None, PropLevel_GAC, PropLevel_SAC, PropLevel_SSAC, 
+{ PropLevel_None, PropLevel_GAC, PropLevel_SAC, PropLevel_SSAC,
 PropLevel_SACBounds, PropLevel_SSACBounds };
 
-inline PropagationLevel GetPropMethodFromString(string s)
+inline PropagationLevel GetPropMethodFromString(std::string s)
 {
   if(s == "None") return PropLevel_None;
   else if(s == "GAC") return PropLevel_GAC;

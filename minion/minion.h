@@ -1,57 +1,44 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 #ifndef MINION_H
 #define MINION_H
-
 #ifdef REENTER
 #define MANY_VAR_CONTAINERS
 #endif
-
-#include "BuildDefines.h"
-
 #include "system/system.h"
-#include "constants.h"
-
+#include "BuildDefines.h"
 // XXX These could possibly be turned off, but it's possible it will require
 // Some small amount of work to make them work.
 #define FULL_DOMAIN_TRIGGERS
 #define DYNAMICTRIGGERS
-
 #ifndef WATCHEDLITERALS
 #define WATCHEDLITERALS
 #endif
-
 //#ifdef WATCHEDLITERALS
 //#define DYNAMICTRIGGERS
 //#endif
-
 #define VERSION "Minion Version 0.8.1"
 #define REVISION "Subversion (svn) Revision Number $Revision$"
 // above line will work but only gives revision of this file,
-//  not the current global revision 
-
+//  not the current global revision
 #include "get_info/get_info.h"
-
 #include "solver.h"
-
 VARDEF(ofstream solsoutFile);
 
 #include "memory_management/backtrackable_memory.h"
