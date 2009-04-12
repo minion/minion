@@ -27,6 +27,11 @@
 
 struct TriggerBacktrackQueue
 {
+	StateObj* stateObj;
+
+	TriggerBacktrackQueue(StateObj* _stateObj) : stateObj(_stateObj)
+	{ }
+
 	typedef vector<pair<DynamicTrigger*, DynamicTrigger*> > TriggerList;
 
 	vector<TriggerList> queue;
@@ -53,7 +58,7 @@ struct TriggerBacktrackQueue
 		for (int i = 0; i < tl.size(); ++i)
 		{
 			if (tl[i].second == NULL)
-				tl[i].first->remove(nulldt);
+				releaseTrigger(stateObj, nulldt BT_CALL_STORE);
 			else
 				tl[i].first->add_after(tl[i].second, nulldt);
 		}

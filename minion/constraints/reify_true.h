@@ -49,18 +49,18 @@ template<typename BoolVar, bool DoWatchAssignment>
   {
     child_constraints.push_back(_poscon);
   }
-  
+
   virtual AbstractConstraint* reverse_constraint()
   { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
-  
+
   virtual int dynamic_trigger_count()
   {
     if(DoWatchAssignment)
-      return child_constraints[0]->get_vars_singleton()->size()*2; 
+      return child_constraints[0]->get_vars_singleton()->size()*2;
     else
       return 0;
   }
-  
+
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     if(rar_var.inDomain(0))
@@ -69,7 +69,7 @@ template<typename BoolVar, bool DoWatchAssignment>
       assignment.push_back(make_pair(child_constraints[0]->get_vars_singleton()->size(), 0));
       return true;
     }
-    
+
     return child_constraints[0]->get_satisfying_assignment(assignment);
   }
 
@@ -180,7 +180,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     {
       P("Remove unused trigger");
       // This is an optimisation.
-      trig->remove(getQueue(stateObj).getNextQueuePtrRef());
+      releaseTrigger(stateObj, trig);
     }
   }
 
@@ -214,7 +214,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     int dt_count = dynamic_trigger_count();
     // Clean up triggers
     for(int i = 0; i < dt_count; ++i)
-      dt[i].remove(getQueue(stateObj).getNextQueuePtrRef());
+      releaseTrigger(stateObj, dt);
 
     if(DoWatchAssignment && !rar_var.isAssigned()) //don't place when rar_var=0
     {
@@ -269,7 +269,7 @@ BuildCT_REIFYIMPLY(StateObj* stateObj, const VarArray& vars, ConstraintBlob& bl)
   return BuildCT_REIFYIMPLY_OLD(stateObj, vars, bl);
 #else
   return BuildCT_REIFYIMPLY_NEW(stateObj, vars, bl);
-#endif  
+#endif
 }
 
 #endif

@@ -59,14 +59,14 @@ struct Dynamic_OR : public ParentConstraint
 
   Reversible<bool> full_propagate_called;
   bool constraint_locked;
-  
+
   int assign_size;
 
   int propagated_constraint;
 
   int watched_constraint[2];
 
-  Dynamic_OR(StateObj* _stateObj, vector<AbstractConstraint*> _con) : 
+  Dynamic_OR(StateObj* _stateObj, vector<AbstractConstraint*> _con) :
     ParentConstraint(_stateObj, _con), full_propagate_called(_stateObj, false), constraint_locked(false),
     assign_size(-1), propagated_constraint(-1)
     {
@@ -86,7 +86,7 @@ struct Dynamic_OR : public ParentConstraint
     }
     return false;
   }
-  
+
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
     for(int i = 0; i < child_constraints.size(); ++i)
@@ -97,26 +97,26 @@ struct Dynamic_OR : public ParentConstraint
         // Fix up assignment
         for(int j = 0; j < assignment.size(); ++j)
           assignment[j].first += start_of_constraint[i];
-        return true; 
+        return true;
       }
     }
     return false;
   }
-  
+
 
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> vecs;
     for(int i = 0; i < child_constraints.size(); ++i)
     {
-      vector<AnyVarRef>* var_ptr = child_constraints[i]->get_vars_singleton(); 
+      vector<AnyVarRef>* var_ptr = child_constraints[i]->get_vars_singleton();
       vecs.insert(vecs.end(), var_ptr->begin(), var_ptr->end());
     }
     return vecs;
   }
 
-  virtual int dynamic_trigger_count() 
-  { 
+  virtual int dynamic_trigger_count()
+  {
     return assign_size * 2;
   }
 
@@ -154,7 +154,7 @@ struct Dynamic_OR : public ParentConstraint
       }
     }
   }
-  
+
   virtual void propagate(DynamicTrigger* trig)
   {
     //PROP_INFO_ADDONE(WatchedOr);
@@ -178,24 +178,24 @@ struct Dynamic_OR : public ParentConstraint
       int other_constraint = 1 - tripped_constraint;
       P("Tripped: " << tripped_constraint << ":" << watched_constraint[tripped_constraint]);
       D_ASSERT(tripped_constraint == 0 || tripped_constraint == 1);
-      
+
       bool flag;
       GET_ASSIGNMENT(assignment_try, child_constraints[watched_constraint[tripped_constraint]]);
       if(flag)
       { // Found new support without having to move.
-        watch_assignment(child_constraints[watched_constraint[tripped_constraint]], 
+        watch_assignment(child_constraints[watched_constraint[tripped_constraint]],
                          dt + tripped_constraint * assign_size, assignment_try);
         for(int i = 0; i < assignment_try.size(); ++i)
           P(assignment_try[i].first << "." << assignment_try[i].second << "  ");
         P(" -- Fixed, returning");
-        return; 
+        return;
       }
-      
+
       const size_t cons_s = child_constraints.size();
-      
+
       int loop_start = watched_constraint[tripped_constraint] + 1;
       int skip_pos = watched_constraint[other_constraint];
-      
+
       for(int i = loop_start; i < cons_s; ++i)
       {
         if(i != skip_pos)
@@ -225,7 +225,7 @@ struct Dynamic_OR : public ParentConstraint
             }
           }
         }
-        
+
       P("Start propagating " << watched_constraint[other_constraint]);
       // Need to propagate!
       propagated_constraint = watched_constraint[other_constraint];
@@ -242,15 +242,15 @@ struct Dynamic_OR : public ParentConstraint
 
 
     if(full_propagate_called && getChildDynamicTrigger(trig) == propagated_constraint)
-    { 
+    {
       P("Propagating child");
-      child_constraints[propagated_constraint]->propagate(trig); 
+      child_constraints[propagated_constraint]->propagate(trig);
     }
     else
     {
       P("Clean old trigger");
       // This is an optimisation.
-      trig->remove(getQueue(stateObj).getNextQueuePtrRef());
+      releaseTrigger(stateObj, trig);
     }
   }
 
@@ -269,12 +269,12 @@ struct Dynamic_OR : public ParentConstraint
 
     // Clean up triggers
     for(int i = 0; i < assign_size * 2; ++i)
-      dt[i].remove(getQueue(stateObj).getNextQueuePtrRef());
+      releaseTrigger(stateObj, dt + i);
 
     int loop = 0;
 
     bool found_watch = false;
-    
+
     while(loop < child_constraints.size() && !found_watch)
     {
       bool flag;
@@ -299,9 +299,9 @@ struct Dynamic_OR : public ParentConstraint
 
     P(" -- Found watch 0: " << loop);
     loop++;
-    
+
     found_watch = false;
-    
+
     while(loop < child_constraints.size() && !found_watch)
     {
       bool flag;
@@ -321,14 +321,14 @@ struct Dynamic_OR : public ParentConstraint
     }
 
     if(found_watch == false)
-    { 
+    {
       propagated_constraint = watched_constraint[0];
       constraint_locked = true;
       getQueue(stateObj).pushSpecialTrigger(this);
     }
 
   }
-  
+
   virtual AbstractConstraint* reverse_constraint()
   { // and of the reverse of all the child constraints..
       vector<AbstractConstraint*> con;

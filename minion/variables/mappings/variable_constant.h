@@ -101,7 +101,8 @@ struct ConstantVar
 #ifdef BTWLDEF
       // XXX : Todo. Sensibly move this trigger...
 #endif
-      dt->remove(getQueue(stateObj).getNextQueuePtrRef());
+	  releaseTrigger(stateObj, dt BT_CALL);
+//      dt->remove(getQueue(stateObj).getNextQueuePtrRef());
   }
 
   vector<AbstractConstraint*>* getConstraints() { return NULL; }

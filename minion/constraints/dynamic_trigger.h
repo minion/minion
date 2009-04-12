@@ -23,15 +23,15 @@ class DynamicTrigger
 {
 private:
   /// Hidden, as copying a DynamicTrigger is almost certainly an error.
-  DynamicTrigger(const DynamicTrigger&);  
+  DynamicTrigger(const DynamicTrigger&);
 public:
 
   /// In debug mode, a value set to 1234 if this is a DynamicTrigger, or 4321 if this
   /// is a BacktrackableTrigger. This allows a check that a DynamicTrigger*
   /// actually points to a valid object.
-  D_DATA(int sanity_check); 
-  
-  /// In debug mode, a value set to 
+  D_DATA(int sanity_check);
+
+  /// In debug mode, a value set to
   /// The constraint to be triggered.
   AbstractConstraint* constraint;
   /// A small space for constraints to store trigger-specific information.
@@ -43,15 +43,15 @@ public:
   /// Wrapper function for _trigger_info.
   int& trigger_info()
   { return _trigger_info; }
-  
-  
+
+
 #ifdef BTWLDEF
 private:
   DynamicTrigger* basequeue;
 public:
   DynamicTrigger* getQueue()
   { return basequeue; }
-  
+
   void setQueue(DynamicTrigger* ptr)
   { basequeue = ptr; }
 #endif
@@ -62,17 +62,18 @@ public:
   , basequeue(NULL)
 #endif
   { D_DATA(sanity_check = 1234);}
-  
+
   DynamicTrigger() : constraint(NULL)
-  { 
+  {
     D_DATA(sanity_check = 1234);
-    prev = next = this; 
+    prev = next = this;
   }
-  
- 
+
+  friend void releaseTrigger(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF);
+private:
   /// Remove from whatever list this trigger is currently stored in.
   void remove(DynamicTrigger*& next_queue_ptr)
-  { 
+  {
     if(this == next_queue_ptr)
     {
       CON_INFO_ADDONE(DynamicMovePtr);
@@ -92,12 +93,12 @@ public:
     next = NULL;
     prev = NULL;
   }
-  
+public:
   inline bool isAttached()
   {
       return prev!=NULL;
   }
-   
+
 private:
    void add_after_implementation(DynamicTrigger* new_prev, DynamicTrigger*& next_queue_ptr)
    {
@@ -122,7 +123,7 @@ private:
        D_ASSERT(next->prev == this);
        D_ASSERT(new_prev->sanity_check_list());
    }
-public:  
+public:
   /// Add this trigger after another one in a list.
   /// This function will remove this trigger from any list it currently lives in.
   // next_queue_ptr is a '*&' as it is a pointer which we want a reference to, so we can change it!
@@ -133,17 +134,17 @@ public:
     D_ASSERT(new_prev->sanity_check_list());
     add_after_implementation(new_prev, next_queue_ptr);
   }
-  
+
   /// Propagates the constraint stored in the trigger.
   /** Out of line as it needs the full definition of DynamicConstraint */
   void propagate();
-  
+
   ~DynamicTrigger()
-  { 
+  {
       D_ASSERT(sanity_check == 1234);
-      D_DATA(sanity_check = -1); 
+      D_DATA(sanity_check = -1);
   }
-  
+
   BOOL sanity_check_list(BOOL is_head_of_list = true)
   {
     if(is_head_of_list)

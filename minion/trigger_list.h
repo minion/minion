@@ -35,22 +35,22 @@ class TriggerMem
   vector<TriggerList*> trigger_lists;
   char* triggerlist_data;
   StateObj* stateObj;
-  
+
 public:
-  void addTriggerList(TriggerList* t) 
+  void addTriggerList(TriggerList* t)
   { trigger_lists.push_back(t); }
-  
+
   void finaliseTriggerLists();
-  
+
   TriggerMem(StateObj* _stateObj) : triggerlist_data(NULL), stateObj(_stateObj)
   {}
-  
+
   void allocateTriggerListData(unsigned mem)
   {
     D_ASSERT(triggerlist_data == NULL);
     triggerlist_data = new char[mem];
   }
-  
+
   char* getTriggerListDataPtr() { return triggerlist_data; }
   ~TriggerMem()
   { delete[] triggerlist_data; }
@@ -59,21 +59,21 @@ public:
 class TriggerList
 {
   StateObj* stateObj;
-  
+
   TriggerList(const TriggerList&);
   void operator=(const TriggerList&);
   bool only_bounds;
-  
+
 public:
-  TriggerList(StateObj* _stateObj, bool _only_bounds) : stateObj(_stateObj), 
+  TriggerList(StateObj* _stateObj, bool _only_bounds) : stateObj(_stateObj),
   only_bounds(_only_bounds)
-  { 
+  {
     var_count_m = 0;
-    lock_first = lock_second = 0; 
+    lock_first = lock_second = 0;
   }
-  
+
   vector<vector<vector<Trigger> > > triggers;
-  
+
 #ifdef DYNAMICTRIGGERS
 #ifdef WATCHEDLITERALS
   MemOffset dynamic_triggers;
@@ -81,17 +81,17 @@ public:
   BackTrackOffset dynamic_triggers;
 #endif
 #endif
-  
+
   Trigger** trigger_data_m;
-  
+
   int var_count_m;
   int lock_first;
   int lock_second;
-  
+
   DomainInt vars_min_domain_val;
   DomainInt vars_max_domain_val;
   unsigned vars_domain_size;
-  
+
   void lock(int size, DomainInt min_domain_val, DomainInt max_domain_val)
   {
     D_ASSERT(!lock_first && !lock_second);
@@ -100,11 +100,11 @@ public:
     vars_min_domain_val = min_domain_val;
     vars_max_domain_val = max_domain_val;
     vars_domain_size = checked_cast<unsigned>(max_domain_val - min_domain_val + 1);
-    
+
     triggers.resize(4);
     for(unsigned i = 0; i < 4; ++i)
       triggers[i].resize(var_count_m);
-    
+
 #ifdef DYNAMICTRIGGERS
     if(only_bounds)
       dynamic_triggers = getMemory(stateObj).nonBackTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);
@@ -112,13 +112,13 @@ public:
       dynamic_triggers = getMemory(stateObj).nonBackTrack().request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
 #else
     if(only_bounds)
-      dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);  
+      dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);
     else
       dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
 #endif
     getTriggerMem(stateObj).addTriggerList(this);
   }
-  
+
   size_t memRequirement()
   {
     D_ASSERT(lock_first && !lock_second);
@@ -130,7 +130,7 @@ public:
     }
     return storage * sizeof(Trigger) + 4 * (var_count_m + 1) * sizeof(Trigger*);
   }
-  
+
   struct CompareMem
   {
     bool operator()(const Trigger& t1, const Trigger& t2)
@@ -177,8 +177,8 @@ public:
 
 
   // This is a common C++ trick to completely free the memory of an object.
-    { 
-      vector<vector<vector<Trigger> > > t; 
+    {
+      vector<vector<vector<Trigger> > > t;
       triggers.swap(t);
     }
 
@@ -191,7 +191,7 @@ public:
       D_ASSERT((trigger_ptr + i)->sanity_check_list());
     }
   }
-  
+
   pair<Trigger*, Trigger*> get_trigger_range(int var_num, TrigType type)
   {
     Trigger** first_trig = trigger_data_m + var_num + (var_count_m + 1) * type;
@@ -200,7 +200,7 @@ public:
     Trigger* trig_range_end = *first_trig;
     return pair<Trigger*,Trigger*>(trig_range_start, trig_range_end);
   }
-  
+
   void dynamic_propagate(int var_num, TrigType type, DomainInt val_removed = NoDomainValue)
   {
     D_ASSERT(val_removed == NoDomainValue || ( type == DomainRemoval && val_removed != NoDomainValue) );
@@ -224,7 +224,7 @@ public:
     if(trig->next != trig)
       getQueue(stateObj).pushDynamicTriggers(trig);
   }
-  
+
   void push_upper(int var_num, DomainInt upper_delta)
   {
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, UpperBound);
@@ -233,62 +233,62 @@ public:
 
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
     if(range.first != range.second)
-      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, 
+      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second,
                                                    checked_cast<int>(upper_delta)));
   }
-  
+
   void push_lower(int var_num, DomainInt lower_delta)
-  { 
+  {
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, LowerBound);
     D_ASSERT(lock_second);
     D_ASSERT(lower_delta > 0 || getState(stateObj).isFailed());
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
     if(range.first != range.second)
-      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, 
+      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second,
                                                    checked_cast<int>(lower_delta)));
   }
-  
-  
+
+
   void push_assign(int var_num, DomainInt)
-  { 
+  {
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, Assigned);
     D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
     if(range.first != range.second)
       getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1));
   }
-  
+
   void push_domain_changed(int var_num)
-  { 
+  {
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);
 
     D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
-    if (range.first != range.second)      
-      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1)); 
+    if (range.first != range.second)
+      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1));
   }
-  
+
   void push_domain_removal(int var_num, DomainInt val_removed)
-  { 
+  {
     D_ASSERT(!only_bounds);
     dynamic_propagate(var_num, DomainRemoval, val_removed);
     D_ASSERT(lock_second);
   }
-  
+
   void add_domain_trigger(int b, Trigger t)
-  { 
+  {
     D_ASSERT(!only_bounds);
-    D_ASSERT(lock_first && !lock_second); 
-    triggers[DomainChanged][b].push_back(t); 
+    D_ASSERT(lock_first && !lock_second);
+    triggers[DomainChanged][b].push_back(t);
   }
-  
+
   void add_trigger(int b, Trigger t, TrigType type)
   {
     D_ASSERT(type != DomainRemoval);
     D_ASSERT(lock_first && !lock_second);
     triggers[type][b].push_back(t);
   }
-  
+
 
   void addDynamicTrigger(int b, DynamicTrigger* t, TrigType type, DomainInt val BT_FUNDEF)
   {
@@ -337,7 +337,7 @@ public:
     t->add_after(queue, getQueue(stateObj).getNextQueuePtrRef());
     D_ASSERT(old_list == NULL || old_list->sanity_check_list(false));
   }
-  
+
 };
 
 void inline TriggerMem::finaliseTriggerLists()
@@ -346,9 +346,9 @@ void inline TriggerMem::finaliseTriggerLists()
     for(unsigned int i = 0;i < trigger_lists.size(); i++)
       trigger_size += trigger_lists[i]->memRequirement();
     getTriggerMem(stateObj).allocateTriggerListData(trigger_size);
-    
+
     char* triggerlist_offset = getTriggerMem(stateObj).getTriggerListDataPtr();
-    
+
     for(unsigned int i=0;i<trigger_lists.size();i++)
     {
       size_t offset = trigger_lists[i]->memRequirement();
@@ -358,6 +358,11 @@ void inline TriggerMem::finaliseTriggerLists()
     D_ASSERT(triggerlist_offset - getTriggerMem(stateObj).getTriggerListDataPtr() == (int)trigger_size);
   }
 
+inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF_NODEFAULT)
+{
+	/// TODO : Make use of BT_FUNDEF
+	trig->remove(getQueue(stateObj).getNextQueuePtrRef());
+}
 
 #endif //TRIGGERLIST_H
 
