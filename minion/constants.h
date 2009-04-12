@@ -48,11 +48,15 @@ static const int NoDomainValue = -98765;
 #ifdef BTWLDEF
 #define BTWL(x) x
 #define BT_FUNDEF , TrigOp op = TO_Default
+#define BT_FUNDEF_NODEFAULT , TrigOp op
 #define BT_CALL , op
+#define BT_CALL_STORE , TO_Store
 #else
 #define BTWL(x)
 #define BT_FUNDEF
+#define BT_FUNDEF_NODEFAULT
 #define BT_CALL
+#define BT_CALL_STORE
 #endif
 
 enum BoundType
