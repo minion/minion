@@ -50,18 +50,18 @@ public:
 
   int* getPointer()
     { return tuple_data->getPointer(); }
-    
+
   int getLiteralCount()
   { return tuple_data->literal_num; }
 
   Literal getLiteralFromPos(int pos)
-  { 
+  {
     pair<int,int> lit = tuple_data->get_varval_from_literal(pos);
     return Literal(lit.first, lit.second);
   }
 
   pair<DomainInt,DomainInt> getDomainBounds(int var)
-  { 
+  {
     return make_pair(tuple_data->dom_smallest[var],
       tuple_data->dom_smallest[var] + tuple_data->dom_size[var]);
   }
@@ -72,7 +72,7 @@ public:
 class TableData : public BaseTableData
 {
 public:
-   TableData(TupleList* _tuple_data) : BaseTableData(_tuple_data) { } 
+   TableData(TupleList* _tuple_data) : BaseTableData(_tuple_data) { }
 
    // TODO : Optimise possibly?
    bool checkTuple(DomainInt* tuple, int tuple_size)
@@ -81,10 +81,10 @@ public:
      for(int i = 0; i < getNumOfTuples(); ++i)
      {
        if(std::equal(tuple, tuple + tuple_size, tuple_data->get_tupleptr(i)))
-         return true; 
+         return true;
      }
      return false;
-   }  
+   }
 };
 
 class TrieData : public BaseTableData
@@ -92,11 +92,11 @@ class TrieData : public BaseTableData
 
 public:
     TupleTrieArray* tupleTrieArrayptr;
-    
-  TrieData(TupleList* _tuple_data) : 
+
+  TrieData(TupleList* _tuple_data) :
   BaseTableData(_tuple_data), tupleTrieArrayptr(_tuple_data->getTries())
   { }
-  
+
   // TODO: Optimise possibly?
   bool checkTuple(DomainInt* tuple, int tuple_size)
    {
@@ -104,7 +104,7 @@ public:
      for(int i = 0; i < getNumOfTuples(); ++i)
      {
        if(std::equal(tuple, tuple + tuple_size, tuple_data->get_tupleptr(i)))
-         return true; 
+         return true;
      }
      return false;
    }
@@ -127,22 +127,22 @@ public:
     }
     scratch_tuple.resize(data->getVarCount());
   }
-  
+
   template<typename VarArray>
   vector<DomainInt>* findSupportingTuple(const VarArray& vars, Literal lit)
   {
     //int tuple_size = data->getVarCount();
     //int length = data->getNumOfTuples();
     //int* tuple_data = data->getPointer();
-    
+
     int varIndex = lit.var;
     int val = lit.val;
-    
+
     int litnum = data->getLiteralPos(lit);
-    
+
     int new_support = data->tupleTrieArrayptr->getTrie(varIndex).
       nextSupportingTuple(val, vars, trie_current_support[litnum]);
-    
+
     if(new_support < 0)
       return NULL;
     else
@@ -189,7 +189,7 @@ public:
       if(success)
       {
         std::copy(tuple_start, tuple_start + tuple_size, scratch_tuple.begin());
-        return &scratch_tuple; 
+        return &scratch_tuple;
       }
     }
     return NULL;
@@ -201,7 +201,7 @@ public:
 
 template<typename VarArray, typename TableDataType = TrieData, typename TableStateType = TrieState>
 struct NewTableConstraint : public AbstractConstraint
-{ 
+{
   virtual string constraint_name()
     { return "TableDynamic"; }
 
@@ -212,12 +212,12 @@ struct NewTableConstraint : public AbstractConstraint
 
   TableStateType state;
 
-  NewTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) : 
+  NewTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
   AbstractConstraint(stateObj), vars(_vars), data(new TableDataType(_tuples)), state(data)
   {
       if(_tuples->tuple_size()!=_vars.size())
       {
-          cout << "Table constraint: Number of variables " 
+          cout << "Table constraint: Number of variables "
             << _vars.size() << " does not match length of tuples "
             << _tuples->tuple_size() << "." << endl;
           FAIL_EXIT();
@@ -240,10 +240,11 @@ struct NewTableConstraint : public AbstractConstraint
     int propagated_literal = trigger_pos / (vars.size() - 1);
 
     Literal lit = data->getLiteralFromPos(propagated_literal);
-    
+
     P(propagated_literal << "." << vars.size() << "." << lit.var << "." << lit.val);
     if(!vars[lit.var].inDomain(lit.val))
     {
+      //releaseTrigger(stateObj, propagated_trig BT_CALL_BACKTRACK);
       P("Quick return");
       return;
     }
@@ -258,8 +259,9 @@ struct NewTableConstraint : public AbstractConstraint
     {
       P("Failed to find new support");
       vars[lit.var].removeFromDomain(lit.val);
+      //clear_watches(lit, propagated_literal);
     }
-  }  
+  }
 
   void setup_watches(Literal lit, int lit_pos, const vector<DomainInt>& support)
   {
@@ -273,20 +275,34 @@ struct NewTableConstraint : public AbstractConstraint
       {
         P(vars.size() << ".Watching " << v << "." << support[v] << " for " << lit.var << "." << lit.val);
         D_ASSERT(vars[v].inDomain(support[v]));
-        vars[v].addDynamicTrigger(dt, DomainRemoval, support[v]);
+        PROP_INFO_ADDONE(CounterA);
+        vars[v].addDynamicTrigger(dt, DomainRemoval, support[v] BT_CALL_STORE);
         ++dt;
       }
     }
   }
 
+  void clear_watches(Literal lit, int lit_pos)
+  {
+    DynamicTrigger* dt = dynamic_trigger_start();
+    D_ASSERT(data->getLiteralPos(lit) == lit_pos);
+    int vars_size = vars.size();
+    dt += lit_pos * (vars_size - 1);
+    for(int v = 0; v < vars_size; ++v)
+    {
+      releaseTrigger(stateObj, dt BT_CALL_BACKTRACK);
+      ++dt;
+    }
+  }
+
   virtual void full_propagate()
-  { 
+  {
     if(vars.size() == 0)
     {
       getState(stateObj).setFailed(true);
       return;
     }
-    
+
     for(unsigned i = 0; i < vars.size(); ++i)
     {
       pair<DomainInt, DomainInt> bounds = data->getDomainBounds(i);
@@ -316,7 +332,7 @@ struct NewTableConstraint : public AbstractConstraint
   }
 
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> anyvars;
     for(unsigned i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);

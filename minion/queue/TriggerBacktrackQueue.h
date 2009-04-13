@@ -27,43 +27,54 @@
 
 struct TriggerBacktrackQueue
 {
-	StateObj* stateObj;
+    StateObj* stateObj;
 
-	TriggerBacktrackQueue(StateObj* _stateObj) : stateObj(_stateObj)
-	{ }
+    TriggerBacktrackQueue(StateObj* _stateObj) :
+        stateObj(_stateObj)
+    {
+    }
 
-	typedef vector<pair<DynamicTrigger*, DynamicTrigger*> > TriggerList;
+    typedef vector<pair<DynamicTrigger*, DynamicTrigger*> > TriggerList;
 
-	vector<TriggerList> queue;
+    vector<TriggerList> queue;
 
-	TriggerBacktrackQueue()
-	{
-		queue.resize(1);
-	}
+    TriggerBacktrackQueue()
+    {
+        queue.resize(1);
+    }
 
-	void addTrigger(DynamicTrigger* trig)
-	{
-		queue.back().push_back(make_pair(trig, trig->getQueue()));
-	}
+    void addTrigger(DynamicTrigger* trig)
+    {
+        PROP_INFO_ADDONE(Counter3);
+        queue.back().push_back(make_pair(trig, trig->getQueue()));
+    }
 
-	void world_push()
-	{
-		queue.push_back(TriggerList());
-	}
+    void world_push()
+    {
+        queue.push_back(TriggerList());
+    }
 
-	void world_pop()
-	{
-		TriggerList& tl = queue.back();
-		DynamicTrigger* nulldt = NULL;
-		for (int i = 0; i < tl.size(); ++i)
-		{
-			if (tl[i].second == NULL)
-				releaseTrigger(stateObj, nulldt BT_CALL_STORE);
-			else
-				tl[i].first->add_after(tl[i].second, nulldt);
-		}
-		queue.pop_back();
-	}
+    void world_pop()
+    {
+        TriggerList& tl = queue.back();
+        DynamicTrigger* nulldt = NULL;
+        PROP_INFO_ADDONE(Counter1);
+        for (int i = 0; i < tl.size(); ++i)
+        {
+            PROP_INFO_ADDONE(Counter2);
+            if (tl[i].second == NULL)
+                releaseTrigger(stateObj, tl[i].first BT_CALL_STORE);
+            else
+            {
+                tl[i].first->add_after(tl[i].second, nulldt);
+                tl[i].first->setQueue(tl[i].second);
+            }
+        }
+        queue.pop_back();
+        // The first layer of the queue consists of things added in full_propagate()
+        // So should never get popped.
+        D_ASSERT(!queue.empty());
+    }
 };
 
 #endif

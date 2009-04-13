@@ -53,7 +53,10 @@ public:
   { return basequeue; }
 
   void setQueue(DynamicTrigger* ptr)
-  { basequeue = ptr; }
+  {
+    D_ASSERT(ptr != (DynamicTrigger*)(-1));
+    basequeue = ptr;
+  }
 #endif
 
 

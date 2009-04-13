@@ -326,6 +326,7 @@ public:
         break;
         case TO_Backtrack:
             D_ASSERT(t->getQueue() != (DynamicTrigger*)BAD_POINTER);
+            getQueue(stateObj).getTbq().addTrigger(t);
             // Add to queue.
             t->setQueue(queue);
         break;
@@ -358,10 +359,28 @@ void inline TriggerMem::finaliseTriggerLists()
     D_ASSERT(triggerlist_offset - getTriggerMem(stateObj).getTriggerListDataPtr() == (int)trigger_size);
   }
 
-inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF_NODEFAULT)
+inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t BT_FUNDEF_NODEFAULT)
 {
-	/// TODO : Make use of BT_FUNDEF
-	trig->remove(getQueue(stateObj).getNextQueuePtrRef());
+#ifdef BTWLDEF
+    switch(op)
+    {
+        case TO_Default:
+            D_DATA(t->setQueue((DynamicTrigger*)BAD_POINTER));
+        break;
+        case TO_Store:
+        t->setQueue((DynamicTrigger*)(NULL));
+        break;
+        case TO_Backtrack:
+            D_ASSERT(t->getQueue() != (DynamicTrigger*)BAD_POINTER);
+            getQueue(stateObj).getTbq().addTrigger(t);
+            // Add to queue.
+            t->setQueue((DynamicTrigger*)(NULL));
+        break;
+        default:
+        abort();
+    }
+#endif
+	t->remove(getQueue(stateObj).getNextQueuePtrRef());
 }
 
 #endif //TRIGGERLIST_H
