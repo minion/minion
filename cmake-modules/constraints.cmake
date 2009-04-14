@@ -246,11 +246,11 @@ macro(select_constraints)
             endforeach()
             list(LENGTH build_read_funcs build_num_read_funcs)
             # constraint_defs.h
-            file(APPEND ${CONSTRAINT_DEFS} "{ \"${constraint}\", ${NAME_ID_${constraint}}, ${num_read_funcs}, {")
+            file(APPEND ${CONSTRAINT_DEFS} "{ \"${constraint}\", ${NAME_ID_${constraint}}, ${num_read_funcs}, {{")
             foreach(read_func ${NAME_READ_${constraint}})
                 file(APPEND ${CONSTRAINT_DEFS} "${read_func}, ")
             endforeach()
-            file(APPEND ${CONSTRAINT_DEFS} "}, },\n")
+            file(APPEND ${CONSTRAINT_DEFS} "}}, },\n")
             # ConstraintEnum.h
             file(APPEND ${CONSTRAINT_ENUM} "${NAME_ID_${constraint}},\n")
             # BuildStart.h
