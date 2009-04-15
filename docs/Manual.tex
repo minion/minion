@@ -214,7 +214,11 @@ tested with is 2.4.7.
 
 Note that you need at least g++ version 3.4.2 to compile Minion. Furthermore
 boost\footnote{\url{http://www.boost.org/}} is required to build Minion. Any
-version between 1.33 and 1.38.0 inclusive should work.
+version between 1.33 and 1.38.0 inclusive should work. If you have installed
+boost in a non-standard location or CMake does not find it for some other
+reason, you can try setting the environment variable \verb+BOOST_ROOT+ to your
+installation directory or the environment variables \verb+BOOST_INCLUDEDIR+ and
+\verb+BOOST_LIBRARYDIR+ before running CMake.
 
 The g++ distributed with Cygwin does \emph{not} compile Minion correctly because
 of differences in exception handling in Unix and Windows. You have to compile
