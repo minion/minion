@@ -54,7 +54,6 @@ public:
 
   void setQueue(DynamicTrigger* ptr)
   {
-    D_ASSERT(ptr != (DynamicTrigger*)(-1));
     basequeue = ptr;
   }
 #endif
