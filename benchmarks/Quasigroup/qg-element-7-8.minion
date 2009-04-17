@@ -1,358 +1,309 @@
-MINION 1
-# Minion Quasigroup Instance
-# Kind: QG7 Size: 8
-# Idempotent
-# CSPLib Problem prob003
-#    http://www.csplib.org
-# In main matrix,  Row(a)[b] = c  means  a*b=c
-# Idempotency Constraints
-# Result variables are (b*a)*b and should be = a*(b*a)
-# Symmetry Breaking Constraints
-# Var ordering should be linked to symmetry constraints
-#
-# Minion Constraint Solver Input
-#    http://sourceforge.net/projects/minion
-# Instance created using CLisp generator written by Ian Gent
-# Instance created at 16:31 on 19 Apr 2006
-0
-0
-0
-128
-0 7 128
-0
-[x63,x55,x47,x39,x31,x23,x15,x7,x0,x1,x2,x3,x4,x5,x6,x8,x9,x10,x11,x12,x13,x14,x16,x17,x18,x19,x20,x21,x22,x24,x25,x26,x27,x28,x29,x30,x32,x33,x34,x35,x36,x37,x38,x40,x41,x42,x43,x44,x45,x46,x48,x49,x50,x51,x52,x53,x54,x56,x57,x58,x59,x60,x61,x62]
-[a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
-0
-1
-[[x0,x1,x2,x3,x4,x5,x6,x7]
-,[x8,x9,x10,x11,x12,x13,x14,x15]
-,[x16,x17,x18,x19,x20,x21,x22,x23]
-,[x24,x25,x26,x27,x28,x29,x30,x31]
-,[x32,x33,x34,x35,x36,x37,x38,x39]
-,[x40,x41,x42,x43,x44,x45,x46,x47]
-,[x48,x49,x50,x51,x52,x53,x54,x55]
-,[x56,x57,x58,x59,x60,x61,x62,x63]
-]
-0
-objective none
-print m0
-alldiff(col(m0,0))
-
-alldiff(row(m0,0))
-
-alldiff(col(m0,1))
-
-alldiff(row(m0,1))
-
-alldiff(col(m0,2))
-
-alldiff(row(m0,2))
-
-alldiff(col(m0,3))
-
-alldiff(row(m0,3))
-
-alldiff(col(m0,4))
-
-alldiff(row(m0,4))
-
-alldiff(col(m0,5))
-
-alldiff(row(m0,5))
-
-alldiff(col(m0,6))
-
-alldiff(row(m0,6))
-
-alldiff(col(m0,7))
-
-alldiff(row(m0,7))
-
-eq(x0,0)
-
-eq(x9,1)
-
-eq(x18,2)
-
-eq(x27,3)
-
-eq(x36,4)
-
-eq(x45,5)
-
-eq(x54,6)
-
-eq(x63,7)
-
-element(col(m0,0),x0,x64)
-
-element(row(m0,0),x0,x64)
-
-element(col(m0,1),x8,x65)
-
-element(row(m0,0),x8,x65)
-
-element(col(m0,2),x16,x66)
-
-element(row(m0,0),x16,x66)
-
-element(col(m0,3),x24,x67)
-
-element(row(m0,0),x24,x67)
-
-element(col(m0,4),x32,x68)
-
-element(row(m0,0),x32,x68)
-
-element(col(m0,5),x40,x69)
-
-element(row(m0,0),x40,x69)
-
-element(col(m0,6),x48,x70)
-
-element(row(m0,0),x48,x70)
-
-element(col(m0,7),x56,x71)
-
-element(row(m0,0),x56,x71)
-
-element(col(m0,0),x1,x72)
-
-element(row(m0,1),x1,x72)
-
-element(col(m0,1),x9,x73)
-
-element(row(m0,1),x9,x73)
-
-element(col(m0,2),x17,x74)
-
-element(row(m0,1),x17,x74)
-
-element(col(m0,3),x25,x75)
-
-element(row(m0,1),x25,x75)
-
-element(col(m0,4),x33,x76)
-
-element(row(m0,1),x33,x76)
-
-element(col(m0,5),x41,x77)
-
-element(row(m0,1),x41,x77)
-
-element(col(m0,6),x49,x78)
-
-element(row(m0,1),x49,x78)
-
-element(col(m0,7),x57,x79)
-
-element(row(m0,1),x57,x79)
-
-element(col(m0,0),x2,x80)
-
-element(row(m0,2),x2,x80)
-
-element(col(m0,1),x10,x81)
-
-element(row(m0,2),x10,x81)
-
-element(col(m0,2),x18,x82)
-
-element(row(m0,2),x18,x82)
-
-element(col(m0,3),x26,x83)
-
-element(row(m0,2),x26,x83)
-
-element(col(m0,4),x34,x84)
-
-element(row(m0,2),x34,x84)
-
-element(col(m0,5),x42,x85)
-
-element(row(m0,2),x42,x85)
-
-element(col(m0,6),x50,x86)
-
-element(row(m0,2),x50,x86)
-
-element(col(m0,7),x58,x87)
-
-element(row(m0,2),x58,x87)
-
-element(col(m0,0),x3,x88)
-
-element(row(m0,3),x3,x88)
-
-element(col(m0,1),x11,x89)
-
-element(row(m0,3),x11,x89)
-
-element(col(m0,2),x19,x90)
-
-element(row(m0,3),x19,x90)
-
-element(col(m0,3),x27,x91)
-
-element(row(m0,3),x27,x91)
-
-element(col(m0,4),x35,x92)
-
-element(row(m0,3),x35,x92)
-
-element(col(m0,5),x43,x93)
-
-element(row(m0,3),x43,x93)
-
-element(col(m0,6),x51,x94)
-
-element(row(m0,3),x51,x94)
-
-element(col(m0,7),x59,x95)
-
-element(row(m0,3),x59,x95)
-
-element(col(m0,0),x4,x96)
-
-element(row(m0,4),x4,x96)
-
-element(col(m0,1),x12,x97)
-
-element(row(m0,4),x12,x97)
-
-element(col(m0,2),x20,x98)
-
-element(row(m0,4),x20,x98)
-
-element(col(m0,3),x28,x99)
-
-element(row(m0,4),x28,x99)
-
-element(col(m0,4),x36,x100)
-
-element(row(m0,4),x36,x100)
-
-element(col(m0,5),x44,x101)
-
-element(row(m0,4),x44,x101)
-
-element(col(m0,6),x52,x102)
-
-element(row(m0,4),x52,x102)
-
-element(col(m0,7),x60,x103)
-
-element(row(m0,4),x60,x103)
-
-element(col(m0,0),x5,x104)
-
-element(row(m0,5),x5,x104)
-
-element(col(m0,1),x13,x105)
-
-element(row(m0,5),x13,x105)
-
-element(col(m0,2),x21,x106)
-
-element(row(m0,5),x21,x106)
-
-element(col(m0,3),x29,x107)
-
-element(row(m0,5),x29,x107)
-
-element(col(m0,4),x37,x108)
-
-element(row(m0,5),x37,x108)
-
-element(col(m0,5),x45,x109)
-
-element(row(m0,5),x45,x109)
-
-element(col(m0,6),x53,x110)
-
-element(row(m0,5),x53,x110)
-
-element(col(m0,7),x61,x111)
-
-element(row(m0,5),x61,x111)
-
-element(col(m0,0),x6,x112)
-
-element(row(m0,6),x6,x112)
-
-element(col(m0,1),x14,x113)
-
-element(row(m0,6),x14,x113)
-
-element(col(m0,2),x22,x114)
-
-element(row(m0,6),x22,x114)
-
-element(col(m0,3),x30,x115)
-
-element(row(m0,6),x30,x115)
-
-element(col(m0,4),x38,x116)
-
-element(row(m0,6),x38,x116)
-
-element(col(m0,5),x46,x117)
-
-element(row(m0,6),x46,x117)
-
-element(col(m0,6),x54,x118)
-
-element(row(m0,6),x54,x118)
-
-element(col(m0,7),x62,x119)
-
-element(row(m0,6),x62,x119)
-
-element(col(m0,0),x7,x120)
-
-element(row(m0,7),x7,x120)
-
-element(col(m0,1),x15,x121)
-
-element(row(m0,7),x15,x121)
-
-element(col(m0,2),x23,x122)
-
-element(row(m0,7),x23,x122)
-
-element(col(m0,3),x31,x123)
-
-element(row(m0,7),x31,x123)
-
-element(col(m0,4),x39,x124)
-
-element(row(m0,7),x39,x124)
-
-element(col(m0,5),x47,x125)
-
-element(row(m0,7),x47,x125)
-
-element(col(m0,6),x55,x126)
-
-element(row(m0,7),x55,x126)
-
-element(col(m0,7),x63,x127)
-
-element(row(m0,7),x63,x127)
-
-ineq(0,x7,2)
-
-ineq(1,x15,2)
-
-ineq(2,x23,2)
-
-ineq(3,x31,2)
-
-ineq(4,x39,2)
-
-ineq(5,x47,2)
-
-ineq(6,x55,2)
-
-ineq(7,x63,2)
-
+# Minion Version 0.8.1
+# Svn version: 2537
+# Svn last changed date: 2009-04-15 22:05:43 +0100 (Wed, 15 Apr 2009)
+#  Run at: UTC Thu Apr 16 19:55:55 2009
+
+#    http://minion.sourceforge.net
+#  Minion is still very new and in active development.
+#  If you have problems with Minion or find any bugs, please tell us!
+#  Mailing list at: https://mail.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: benchmarks/Quasigroup/qg-element-7-8.minion
+# Command line: ./build/minion -redump benchmarks/Quasigroup/qg-element-7-8.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..7}
+DISCRETE x1{0..7}
+DISCRETE x2{0..7}
+DISCRETE x3{0..7}
+DISCRETE x4{0..7}
+DISCRETE x5{0..7}
+DISCRETE x6{0..7}
+DISCRETE x7{0..7}
+DISCRETE x8{0..7}
+DISCRETE x9{0..7}
+DISCRETE x10{0..7}
+DISCRETE x11{0..7}
+DISCRETE x12{0..7}
+DISCRETE x13{0..7}
+DISCRETE x14{0..7}
+DISCRETE x15{0..7}
+DISCRETE x16{0..7}
+DISCRETE x17{0..7}
+DISCRETE x18{0..7}
+DISCRETE x19{0..7}
+DISCRETE x20{0..7}
+DISCRETE x21{0..7}
+DISCRETE x22{0..7}
+DISCRETE x23{0..7}
+DISCRETE x24{0..7}
+DISCRETE x25{0..7}
+DISCRETE x26{0..7}
+DISCRETE x27{0..7}
+DISCRETE x28{0..7}
+DISCRETE x29{0..7}
+DISCRETE x30{0..7}
+DISCRETE x31{0..7}
+DISCRETE x32{0..7}
+DISCRETE x33{0..7}
+DISCRETE x34{0..7}
+DISCRETE x35{0..7}
+DISCRETE x36{0..7}
+DISCRETE x37{0..7}
+DISCRETE x38{0..7}
+DISCRETE x39{0..7}
+DISCRETE x40{0..7}
+DISCRETE x41{0..7}
+DISCRETE x42{0..7}
+DISCRETE x43{0..7}
+DISCRETE x44{0..7}
+DISCRETE x45{0..7}
+DISCRETE x46{0..7}
+DISCRETE x47{0..7}
+DISCRETE x48{0..7}
+DISCRETE x49{0..7}
+DISCRETE x50{0..7}
+DISCRETE x51{0..7}
+DISCRETE x52{0..7}
+DISCRETE x53{0..7}
+DISCRETE x54{0..7}
+DISCRETE x55{0..7}
+DISCRETE x56{0..7}
+DISCRETE x57{0..7}
+DISCRETE x58{0..7}
+DISCRETE x59{0..7}
+DISCRETE x60{0..7}
+DISCRETE x61{0..7}
+DISCRETE x62{0..7}
+DISCRETE x63{0..7}
+DISCRETE x64{0..7}
+DISCRETE x65{0..7}
+DISCRETE x66{0..7}
+DISCRETE x67{0..7}
+DISCRETE x68{0..7}
+DISCRETE x69{0..7}
+DISCRETE x70{0..7}
+DISCRETE x71{0..7}
+DISCRETE x72{0..7}
+DISCRETE x73{0..7}
+DISCRETE x74{0..7}
+DISCRETE x75{0..7}
+DISCRETE x76{0..7}
+DISCRETE x77{0..7}
+DISCRETE x78{0..7}
+DISCRETE x79{0..7}
+DISCRETE x80{0..7}
+DISCRETE x81{0..7}
+DISCRETE x82{0..7}
+DISCRETE x83{0..7}
+DISCRETE x84{0..7}
+DISCRETE x85{0..7}
+DISCRETE x86{0..7}
+DISCRETE x87{0..7}
+DISCRETE x88{0..7}
+DISCRETE x89{0..7}
+DISCRETE x90{0..7}
+DISCRETE x91{0..7}
+DISCRETE x92{0..7}
+DISCRETE x93{0..7}
+DISCRETE x94{0..7}
+DISCRETE x95{0..7}
+DISCRETE x96{0..7}
+DISCRETE x97{0..7}
+DISCRETE x98{0..7}
+DISCRETE x99{0..7}
+DISCRETE x100{0..7}
+DISCRETE x101{0..7}
+DISCRETE x102{0..7}
+DISCRETE x103{0..7}
+DISCRETE x104{0..7}
+DISCRETE x105{0..7}
+DISCRETE x106{0..7}
+DISCRETE x107{0..7}
+DISCRETE x108{0..7}
+DISCRETE x109{0..7}
+DISCRETE x110{0..7}
+DISCRETE x111{0..7}
+DISCRETE x112{0..7}
+DISCRETE x113{0..7}
+DISCRETE x114{0..7}
+DISCRETE x115{0..7}
+DISCRETE x116{0..7}
+DISCRETE x117{0..7}
+DISCRETE x118{0..7}
+DISCRETE x119{0..7}
+DISCRETE x120{0..7}
+DISCRETE x121{0..7}
+DISCRETE x122{0..7}
+DISCRETE x123{0..7}
+DISCRETE x124{0..7}
+DISCRETE x125{0..7}
+DISCRETE x126{0..7}
+DISCRETE x127{0..7}
+**SEARCH**
+VARORDER [x63,x55,x47,x39,x31,x23,x15,x7,x0,x1,x2,x3,x4,x5,x6,x8,x9,x10,x11,x12,x13,x14,x16,x17,x18,x19,x20,x21,x22,x24,x25,x26,x27,x28,x29,x30,x32,x33,x34,x35,x36,x37,x38,x40,x41,x42,x43,x44,x45,x46,x48,x49,x50,x51,x52,x53,x54,x56,x57,x58,x59,x60,x61,x62]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47,x48,x49,x50,x51,x52,x53,x54,x55,x56,x57,x58,x59,x60,x61,x62,x63,x64,x65,x66,x67,x68,x69,x70,x71,x72,x73,x74,x75,x76,x77,x78,x79,x80,x81,x82,x83,x84,x85,x86,x87,x88,x89,x90,x91,x92,x93,x94,x95,x96,x97,x98,x99,x100,x101,x102,x103,x104,x105,x106,x107,x108,x109,x110,x111,x112,x113,x114,x115,x116,x117,x118,x119,x120,x121,x122,x123,x124,x125,x126,x127]
+PRINT[[x0,x1,x2,x3,x4,x5,x6,x7],[x8,x9,x10,x11,x12,x13,x14,x15],[x16,x17,x18,x19,x20,x21,x22,x23],[x24,x25,x26,x27,x28,x29,x30,x31],[x32,x33,x34,x35,x36,x37,x38,x39],[x40,x41,x42,x43,x44,x45,x46,x47],[x48,x49,x50,x51,x52,x53,x54,x55],[x56,x57,x58,x59,x60,x61,x62,x63]]
+**TUPLELIST**
+**CONSTRAINTS**
+alldiff([x0,x8,x16,x24,x32,x40,x48,x56])
+alldiff([x0,x1,x2,x3,x4,x5,x6,x7])
+alldiff([x1,x9,x17,x25,x33,x41,x49,x57])
+alldiff([x8,x9,x10,x11,x12,x13,x14,x15])
+alldiff([x2,x10,x18,x26,x34,x42,x50,x58])
+alldiff([x16,x17,x18,x19,x20,x21,x22,x23])
+alldiff([x3,x11,x19,x27,x35,x43,x51,x59])
+alldiff([x24,x25,x26,x27,x28,x29,x30,x31])
+alldiff([x4,x12,x20,x28,x36,x44,x52,x60])
+alldiff([x32,x33,x34,x35,x36,x37,x38,x39])
+alldiff([x5,x13,x21,x29,x37,x45,x53,x61])
+alldiff([x40,x41,x42,x43,x44,x45,x46,x47])
+alldiff([x6,x14,x22,x30,x38,x46,x54,x62])
+alldiff([x48,x49,x50,x51,x52,x53,x54,x55])
+alldiff([x7,x15,x23,x31,x39,x47,x55,x63])
+alldiff([x56,x57,x58,x59,x60,x61,x62,x63])
+eq(x0, 0)
+eq(x9, 1)
+eq(x18, 2)
+eq(x27, 3)
+eq(x36, 4)
+eq(x45, 5)
+eq(x54, 6)
+eq(x63, 7)
+element([x0,x8,x16,x24,x32,x40,x48,x56], x0, x64)
+element([x0,x1,x2,x3,x4,x5,x6,x7], x0, x64)
+element([x1,x9,x17,x25,x33,x41,x49,x57], x8, x65)
+element([x0,x1,x2,x3,x4,x5,x6,x7], x8, x65)
+element([x2,x10,x18,x26,x34,x42,x50,x58], x16, x66)
+element([x0,x1,x2,x3,x4,x5,x6,x7], x16, x66)
+element([x3,x11,x19,x27,x35,x43,x51,x59], x24, x67)
+element([x0,x1,x2,x3,x4,x5,x6,x7], x24, x67)
+element([x4,x12,x20,x28,x36,x44,x52,x60], x32, x68)
+element([x0,x1,x2,x3,x4,x5,x6,x7], x32, x68)
+element([x5,x13,x21,x29,x37,x45,x53,x61], x40, x69)
+element([x0,x1,x2,x3,x4,x5,x6,x7], x40, x69)
+element([x6,x14,x22,x30,x38,x46,x54,x62], x48, x70)
+element([x0,x1,x2,x3,x4,x5,x6,x7], x48, x70)
+element([x7,x15,x23,x31,x39,x47,x55,x63], x56, x71)
+element([x0,x1,x2,x3,x4,x5,x6,x7], x56, x71)
+element([x0,x8,x16,x24,x32,x40,x48,x56], x1, x72)
+element([x8,x9,x10,x11,x12,x13,x14,x15], x1, x72)
+element([x1,x9,x17,x25,x33,x41,x49,x57], x9, x73)
+element([x8,x9,x10,x11,x12,x13,x14,x15], x9, x73)
+element([x2,x10,x18,x26,x34,x42,x50,x58], x17, x74)
+element([x8,x9,x10,x11,x12,x13,x14,x15], x17, x74)
+element([x3,x11,x19,x27,x35,x43,x51,x59], x25, x75)
+element([x8,x9,x10,x11,x12,x13,x14,x15], x25, x75)
+element([x4,x12,x20,x28,x36,x44,x52,x60], x33, x76)
+element([x8,x9,x10,x11,x12,x13,x14,x15], x33, x76)
+element([x5,x13,x21,x29,x37,x45,x53,x61], x41, x77)
+element([x8,x9,x10,x11,x12,x13,x14,x15], x41, x77)
+element([x6,x14,x22,x30,x38,x46,x54,x62], x49, x78)
+element([x8,x9,x10,x11,x12,x13,x14,x15], x49, x78)
+element([x7,x15,x23,x31,x39,x47,x55,x63], x57, x79)
+element([x8,x9,x10,x11,x12,x13,x14,x15], x57, x79)
+element([x0,x8,x16,x24,x32,x40,x48,x56], x2, x80)
+element([x16,x17,x18,x19,x20,x21,x22,x23], x2, x80)
+element([x1,x9,x17,x25,x33,x41,x49,x57], x10, x81)
+element([x16,x17,x18,x19,x20,x21,x22,x23], x10, x81)
+element([x2,x10,x18,x26,x34,x42,x50,x58], x18, x82)
+element([x16,x17,x18,x19,x20,x21,x22,x23], x18, x82)
+element([x3,x11,x19,x27,x35,x43,x51,x59], x26, x83)
+element([x16,x17,x18,x19,x20,x21,x22,x23], x26, x83)
+element([x4,x12,x20,x28,x36,x44,x52,x60], x34, x84)
+element([x16,x17,x18,x19,x20,x21,x22,x23], x34, x84)
+element([x5,x13,x21,x29,x37,x45,x53,x61], x42, x85)
+element([x16,x17,x18,x19,x20,x21,x22,x23], x42, x85)
+element([x6,x14,x22,x30,x38,x46,x54,x62], x50, x86)
+element([x16,x17,x18,x19,x20,x21,x22,x23], x50, x86)
+element([x7,x15,x23,x31,x39,x47,x55,x63], x58, x87)
+element([x16,x17,x18,x19,x20,x21,x22,x23], x58, x87)
+element([x0,x8,x16,x24,x32,x40,x48,x56], x3, x88)
+element([x24,x25,x26,x27,x28,x29,x30,x31], x3, x88)
+element([x1,x9,x17,x25,x33,x41,x49,x57], x11, x89)
+element([x24,x25,x26,x27,x28,x29,x30,x31], x11, x89)
+element([x2,x10,x18,x26,x34,x42,x50,x58], x19, x90)
+element([x24,x25,x26,x27,x28,x29,x30,x31], x19, x90)
+element([x3,x11,x19,x27,x35,x43,x51,x59], x27, x91)
+element([x24,x25,x26,x27,x28,x29,x30,x31], x27, x91)
+element([x4,x12,x20,x28,x36,x44,x52,x60], x35, x92)
+element([x24,x25,x26,x27,x28,x29,x30,x31], x35, x92)
+element([x5,x13,x21,x29,x37,x45,x53,x61], x43, x93)
+element([x24,x25,x26,x27,x28,x29,x30,x31], x43, x93)
+element([x6,x14,x22,x30,x38,x46,x54,x62], x51, x94)
+element([x24,x25,x26,x27,x28,x29,x30,x31], x51, x94)
+element([x7,x15,x23,x31,x39,x47,x55,x63], x59, x95)
+element([x24,x25,x26,x27,x28,x29,x30,x31], x59, x95)
+element([x0,x8,x16,x24,x32,x40,x48,x56], x4, x96)
+element([x32,x33,x34,x35,x36,x37,x38,x39], x4, x96)
+element([x1,x9,x17,x25,x33,x41,x49,x57], x12, x97)
+element([x32,x33,x34,x35,x36,x37,x38,x39], x12, x97)
+element([x2,x10,x18,x26,x34,x42,x50,x58], x20, x98)
+element([x32,x33,x34,x35,x36,x37,x38,x39], x20, x98)
+element([x3,x11,x19,x27,x35,x43,x51,x59], x28, x99)
+element([x32,x33,x34,x35,x36,x37,x38,x39], x28, x99)
+element([x4,x12,x20,x28,x36,x44,x52,x60], x36, x100)
+element([x32,x33,x34,x35,x36,x37,x38,x39], x36, x100)
+element([x5,x13,x21,x29,x37,x45,x53,x61], x44, x101)
+element([x32,x33,x34,x35,x36,x37,x38,x39], x44, x101)
+element([x6,x14,x22,x30,x38,x46,x54,x62], x52, x102)
+element([x32,x33,x34,x35,x36,x37,x38,x39], x52, x102)
+element([x7,x15,x23,x31,x39,x47,x55,x63], x60, x103)
+element([x32,x33,x34,x35,x36,x37,x38,x39], x60, x103)
+element([x0,x8,x16,x24,x32,x40,x48,x56], x5, x104)
+element([x40,x41,x42,x43,x44,x45,x46,x47], x5, x104)
+element([x1,x9,x17,x25,x33,x41,x49,x57], x13, x105)
+element([x40,x41,x42,x43,x44,x45,x46,x47], x13, x105)
+element([x2,x10,x18,x26,x34,x42,x50,x58], x21, x106)
+element([x40,x41,x42,x43,x44,x45,x46,x47], x21, x106)
+element([x3,x11,x19,x27,x35,x43,x51,x59], x29, x107)
+element([x40,x41,x42,x43,x44,x45,x46,x47], x29, x107)
+element([x4,x12,x20,x28,x36,x44,x52,x60], x37, x108)
+element([x40,x41,x42,x43,x44,x45,x46,x47], x37, x108)
+element([x5,x13,x21,x29,x37,x45,x53,x61], x45, x109)
+element([x40,x41,x42,x43,x44,x45,x46,x47], x45, x109)
+element([x6,x14,x22,x30,x38,x46,x54,x62], x53, x110)
+element([x40,x41,x42,x43,x44,x45,x46,x47], x53, x110)
+element([x7,x15,x23,x31,x39,x47,x55,x63], x61, x111)
+element([x40,x41,x42,x43,x44,x45,x46,x47], x61, x111)
+element([x0,x8,x16,x24,x32,x40,x48,x56], x6, x112)
+element([x48,x49,x50,x51,x52,x53,x54,x55], x6, x112)
+element([x1,x9,x17,x25,x33,x41,x49,x57], x14, x113)
+element([x48,x49,x50,x51,x52,x53,x54,x55], x14, x113)
+element([x2,x10,x18,x26,x34,x42,x50,x58], x22, x114)
+element([x48,x49,x50,x51,x52,x53,x54,x55], x22, x114)
+element([x3,x11,x19,x27,x35,x43,x51,x59], x30, x115)
+element([x48,x49,x50,x51,x52,x53,x54,x55], x30, x115)
+element([x4,x12,x20,x28,x36,x44,x52,x60], x38, x116)
+element([x48,x49,x50,x51,x52,x53,x54,x55], x38, x116)
+element([x5,x13,x21,x29,x37,x45,x53,x61], x46, x117)
+element([x48,x49,x50,x51,x52,x53,x54,x55], x46, x117)
+element([x6,x14,x22,x30,x38,x46,x54,x62], x54, x118)
+element([x48,x49,x50,x51,x52,x53,x54,x55], x54, x118)
+element([x7,x15,x23,x31,x39,x47,x55,x63], x62, x119)
+element([x48,x49,x50,x51,x52,x53,x54,x55], x62, x119)
+element([x0,x8,x16,x24,x32,x40,x48,x56], x7, x120)
+element([x56,x57,x58,x59,x60,x61,x62,x63], x7, x120)
+element([x1,x9,x17,x25,x33,x41,x49,x57], x15, x121)
+element([x56,x57,x58,x59,x60,x61,x62,x63], x15, x121)
+element([x2,x10,x18,x26,x34,x42,x50,x58], x23, x122)
+element([x56,x57,x58,x59,x60,x61,x62,x63], x23, x122)
+element([x3,x11,x19,x27,x35,x43,x51,x59], x31, x123)
+element([x56,x57,x58,x59,x60,x61,x62,x63], x31, x123)
+element([x4,x12,x20,x28,x36,x44,x52,x60], x39, x124)
+element([x56,x57,x58,x59,x60,x61,x62,x63], x39, x124)
+element([x5,x13,x21,x29,x37,x45,x53,x61], x47, x125)
+element([x56,x57,x58,x59,x60,x61,x62,x63], x47, x125)
+element([x6,x14,x22,x30,x38,x46,x54,x62], x55, x126)
+element([x56,x57,x58,x59,x60,x61,x62,x63], x55, x126)
+element([x7,x15,x23,x31,x39,x47,x55,x63], x63, x127)
+element([x56,x57,x58,x59,x60,x61,x62,x63], x63, x127)
+ineq(0, x7, 2)
+ineq(1, x15, 2)
+ineq(2, x23, 2)
+ineq(3, x31, 2)
+ineq(4, x39, 2)
+ineq(5, x47, 2)
+ineq(6, x55, 2)
+ineq(7, x63, 2)
+**EOF**

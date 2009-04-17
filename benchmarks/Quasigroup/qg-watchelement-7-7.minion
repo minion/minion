@@ -1,289 +1,245 @@
-MINION 1
-# Minion Quasigroup Instance
-# Kind: QG7 Size: 7
-# Idempotent
-# CSPLib Problem prob003
-#    http://www.csplib.org
-# In main matrix,  Row(a)[b] = c  means  a*b=c
-# Idempotency Constraints
-# Result variables are (b*a)*b and should be = a*(b*a)
-# Symmetry Breaking Constraints
-# Var ordering should be linked to symmetry constraints
-#
-# Minion Constraint Solver Input
-#    http://sourceforge.net/projects/minion
-# Instance created using CLisp generator written by Ian Gent
-# Instance created at 16:30 on 19 Apr 2006
-0
-0
-0
-98
-0 6 98
-0
-[x48,x41,x34,x27,x20,x13,x6,x0,x1,x2,x3,x4,x5,x7,x8,x9,x10,x11,x12,x14,x15,x16,x17,x18,x19,x21,x22,x23,x24,x25,x26,x28,x29,x30,x31,x32,x33,x35,x36,x37,x38,x39,x40,x42,x43,x44,x45,x46,x47]
-[a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
-0
-1
-[[x0,x1,x2,x3,x4,x5,x6]
-,[x7,x8,x9,x10,x11,x12,x13]
-,[x14,x15,x16,x17,x18,x19,x20]
-,[x21,x22,x23,x24,x25,x26,x27]
-,[x28,x29,x30,x31,x32,x33,x34]
-,[x35,x36,x37,x38,x39,x40,x41]
-,[x42,x43,x44,x45,x46,x47,x48]
-]
-0
-objective none
-print m0
-alldiff(col(m0,0))
-
-alldiff(row(m0,0))
-
-alldiff(col(m0,1))
-
-alldiff(row(m0,1))
-
-alldiff(col(m0,2))
-
-alldiff(row(m0,2))
-
-alldiff(col(m0,3))
-
-alldiff(row(m0,3))
-
-alldiff(col(m0,4))
-
-alldiff(row(m0,4))
-
-alldiff(col(m0,5))
-
-alldiff(row(m0,5))
-
-alldiff(col(m0,6))
-
-alldiff(row(m0,6))
-
-eq(x0,0)
-
-eq(x8,1)
-
-eq(x16,2)
-
-eq(x24,3)
-
-eq(x32,4)
-
-eq(x40,5)
-
-eq(x48,6)
-
-watchelement(col(m0,0),x0,x49)
-
-watchelement(row(m0,0),x0,x49)
-
-watchelement(col(m0,1),x7,x50)
-
-watchelement(row(m0,0),x7,x50)
-
-watchelement(col(m0,2),x14,x51)
-
-watchelement(row(m0,0),x14,x51)
-
-watchelement(col(m0,3),x21,x52)
-
-watchelement(row(m0,0),x21,x52)
-
-watchelement(col(m0,4),x28,x53)
-
-watchelement(row(m0,0),x28,x53)
-
-watchelement(col(m0,5),x35,x54)
-
-watchelement(row(m0,0),x35,x54)
-
-watchelement(col(m0,6),x42,x55)
-
-watchelement(row(m0,0),x42,x55)
-
-watchelement(col(m0,0),x1,x56)
-
-watchelement(row(m0,1),x1,x56)
-
-watchelement(col(m0,1),x8,x57)
-
-watchelement(row(m0,1),x8,x57)
-
-watchelement(col(m0,2),x15,x58)
-
-watchelement(row(m0,1),x15,x58)
-
-watchelement(col(m0,3),x22,x59)
-
-watchelement(row(m0,1),x22,x59)
-
-watchelement(col(m0,4),x29,x60)
-
-watchelement(row(m0,1),x29,x60)
-
-watchelement(col(m0,5),x36,x61)
-
-watchelement(row(m0,1),x36,x61)
-
-watchelement(col(m0,6),x43,x62)
-
-watchelement(row(m0,1),x43,x62)
-
-watchelement(col(m0,0),x2,x63)
-
-watchelement(row(m0,2),x2,x63)
-
-watchelement(col(m0,1),x9,x64)
-
-watchelement(row(m0,2),x9,x64)
-
-watchelement(col(m0,2),x16,x65)
-
-watchelement(row(m0,2),x16,x65)
-
-watchelement(col(m0,3),x23,x66)
-
-watchelement(row(m0,2),x23,x66)
-
-watchelement(col(m0,4),x30,x67)
-
-watchelement(row(m0,2),x30,x67)
-
-watchelement(col(m0,5),x37,x68)
-
-watchelement(row(m0,2),x37,x68)
-
-watchelement(col(m0,6),x44,x69)
-
-watchelement(row(m0,2),x44,x69)
-
-watchelement(col(m0,0),x3,x70)
-
-watchelement(row(m0,3),x3,x70)
-
-watchelement(col(m0,1),x10,x71)
-
-watchelement(row(m0,3),x10,x71)
-
-watchelement(col(m0,2),x17,x72)
-
-watchelement(row(m0,3),x17,x72)
-
-watchelement(col(m0,3),x24,x73)
-
-watchelement(row(m0,3),x24,x73)
-
-watchelement(col(m0,4),x31,x74)
-
-watchelement(row(m0,3),x31,x74)
-
-watchelement(col(m0,5),x38,x75)
-
-watchelement(row(m0,3),x38,x75)
-
-watchelement(col(m0,6),x45,x76)
-
-watchelement(row(m0,3),x45,x76)
-
-watchelement(col(m0,0),x4,x77)
-
-watchelement(row(m0,4),x4,x77)
-
-watchelement(col(m0,1),x11,x78)
-
-watchelement(row(m0,4),x11,x78)
-
-watchelement(col(m0,2),x18,x79)
-
-watchelement(row(m0,4),x18,x79)
-
-watchelement(col(m0,3),x25,x80)
-
-watchelement(row(m0,4),x25,x80)
-
-watchelement(col(m0,4),x32,x81)
-
-watchelement(row(m0,4),x32,x81)
-
-watchelement(col(m0,5),x39,x82)
-
-watchelement(row(m0,4),x39,x82)
-
-watchelement(col(m0,6),x46,x83)
-
-watchelement(row(m0,4),x46,x83)
-
-watchelement(col(m0,0),x5,x84)
-
-watchelement(row(m0,5),x5,x84)
-
-watchelement(col(m0,1),x12,x85)
-
-watchelement(row(m0,5),x12,x85)
-
-watchelement(col(m0,2),x19,x86)
-
-watchelement(row(m0,5),x19,x86)
-
-watchelement(col(m0,3),x26,x87)
-
-watchelement(row(m0,5),x26,x87)
-
-watchelement(col(m0,4),x33,x88)
-
-watchelement(row(m0,5),x33,x88)
-
-watchelement(col(m0,5),x40,x89)
-
-watchelement(row(m0,5),x40,x89)
-
-watchelement(col(m0,6),x47,x90)
-
-watchelement(row(m0,5),x47,x90)
-
-watchelement(col(m0,0),x6,x91)
-
-watchelement(row(m0,6),x6,x91)
-
-watchelement(col(m0,1),x13,x92)
-
-watchelement(row(m0,6),x13,x92)
-
-watchelement(col(m0,2),x20,x93)
-
-watchelement(row(m0,6),x20,x93)
-
-watchelement(col(m0,3),x27,x94)
-
-watchelement(row(m0,6),x27,x94)
-
-watchelement(col(m0,4),x34,x95)
-
-watchelement(row(m0,6),x34,x95)
-
-watchelement(col(m0,5),x41,x96)
-
-watchelement(row(m0,6),x41,x96)
-
-watchelement(col(m0,6),x48,x97)
-
-watchelement(row(m0,6),x48,x97)
-
-ineq(0,x6,2)
-
-ineq(1,x13,2)
-
-ineq(2,x20,2)
-
-ineq(3,x27,2)
-
-ineq(4,x34,2)
-
-ineq(5,x41,2)
-
-ineq(6,x48,2)
-
+# Minion Version 0.8.1
+# Svn version: 2537
+# Svn last changed date: 2009-04-15 22:05:43 +0100 (Wed, 15 Apr 2009)
+#  Run at: UTC Thu Apr 16 20:18:03 2009
+
+#    http://minion.sourceforge.net
+#  Minion is still very new and in active development.
+#  If you have problems with Minion or find any bugs, please tell us!
+#  Mailing list at: https://mail.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: benchmarks/Quasigroup/qg-watchelement-7-7.minion
+# Command line: ./build/minion -redump benchmarks/Quasigroup/qg-watchelement-7-7.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..6}
+DISCRETE x1{0..6}
+DISCRETE x2{0..6}
+DISCRETE x3{0..6}
+DISCRETE x4{0..6}
+DISCRETE x5{0..6}
+DISCRETE x6{0..6}
+DISCRETE x7{0..6}
+DISCRETE x8{0..6}
+DISCRETE x9{0..6}
+DISCRETE x10{0..6}
+DISCRETE x11{0..6}
+DISCRETE x12{0..6}
+DISCRETE x13{0..6}
+DISCRETE x14{0..6}
+DISCRETE x15{0..6}
+DISCRETE x16{0..6}
+DISCRETE x17{0..6}
+DISCRETE x18{0..6}
+DISCRETE x19{0..6}
+DISCRETE x20{0..6}
+DISCRETE x21{0..6}
+DISCRETE x22{0..6}
+DISCRETE x23{0..6}
+DISCRETE x24{0..6}
+DISCRETE x25{0..6}
+DISCRETE x26{0..6}
+DISCRETE x27{0..6}
+DISCRETE x28{0..6}
+DISCRETE x29{0..6}
+DISCRETE x30{0..6}
+DISCRETE x31{0..6}
+DISCRETE x32{0..6}
+DISCRETE x33{0..6}
+DISCRETE x34{0..6}
+DISCRETE x35{0..6}
+DISCRETE x36{0..6}
+DISCRETE x37{0..6}
+DISCRETE x38{0..6}
+DISCRETE x39{0..6}
+DISCRETE x40{0..6}
+DISCRETE x41{0..6}
+DISCRETE x42{0..6}
+DISCRETE x43{0..6}
+DISCRETE x44{0..6}
+DISCRETE x45{0..6}
+DISCRETE x46{0..6}
+DISCRETE x47{0..6}
+DISCRETE x48{0..6}
+DISCRETE x49{0..6}
+DISCRETE x50{0..6}
+DISCRETE x51{0..6}
+DISCRETE x52{0..6}
+DISCRETE x53{0..6}
+DISCRETE x54{0..6}
+DISCRETE x55{0..6}
+DISCRETE x56{0..6}
+DISCRETE x57{0..6}
+DISCRETE x58{0..6}
+DISCRETE x59{0..6}
+DISCRETE x60{0..6}
+DISCRETE x61{0..6}
+DISCRETE x62{0..6}
+DISCRETE x63{0..6}
+DISCRETE x64{0..6}
+DISCRETE x65{0..6}
+DISCRETE x66{0..6}
+DISCRETE x67{0..6}
+DISCRETE x68{0..6}
+DISCRETE x69{0..6}
+DISCRETE x70{0..6}
+DISCRETE x71{0..6}
+DISCRETE x72{0..6}
+DISCRETE x73{0..6}
+DISCRETE x74{0..6}
+DISCRETE x75{0..6}
+DISCRETE x76{0..6}
+DISCRETE x77{0..6}
+DISCRETE x78{0..6}
+DISCRETE x79{0..6}
+DISCRETE x80{0..6}
+DISCRETE x81{0..6}
+DISCRETE x82{0..6}
+DISCRETE x83{0..6}
+DISCRETE x84{0..6}
+DISCRETE x85{0..6}
+DISCRETE x86{0..6}
+DISCRETE x87{0..6}
+DISCRETE x88{0..6}
+DISCRETE x89{0..6}
+DISCRETE x90{0..6}
+DISCRETE x91{0..6}
+DISCRETE x92{0..6}
+DISCRETE x93{0..6}
+DISCRETE x94{0..6}
+DISCRETE x95{0..6}
+DISCRETE x96{0..6}
+DISCRETE x97{0..6}
+**SEARCH**
+VARORDER [x48,x41,x34,x27,x20,x13,x6,x0,x1,x2,x3,x4,x5,x7,x8,x9,x10,x11,x12,x14,x15,x16,x17,x18,x19,x21,x22,x23,x24,x25,x26,x28,x29,x30,x31,x32,x33,x35,x36,x37,x38,x39,x40,x42,x43,x44,x45,x46,x47]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47,x48,x49,x50,x51,x52,x53,x54,x55,x56,x57,x58,x59,x60,x61,x62,x63,x64,x65,x66,x67,x68,x69,x70,x71,x72,x73,x74,x75,x76,x77,x78,x79,x80,x81,x82,x83,x84,x85,x86,x87,x88,x89,x90,x91,x92,x93,x94,x95,x96,x97]
+PRINT[[x0,x1,x2,x3,x4,x5,x6],[x7,x8,x9,x10,x11,x12,x13],[x14,x15,x16,x17,x18,x19,x20],[x21,x22,x23,x24,x25,x26,x27],[x28,x29,x30,x31,x32,x33,x34],[x35,x36,x37,x38,x39,x40,x41],[x42,x43,x44,x45,x46,x47,x48]]
+**TUPLELIST**
+**CONSTRAINTS**
+alldiff([x0,x7,x14,x21,x28,x35,x42])
+alldiff([x0,x1,x2,x3,x4,x5,x6])
+alldiff([x1,x8,x15,x22,x29,x36,x43])
+alldiff([x7,x8,x9,x10,x11,x12,x13])
+alldiff([x2,x9,x16,x23,x30,x37,x44])
+alldiff([x14,x15,x16,x17,x18,x19,x20])
+alldiff([x3,x10,x17,x24,x31,x38,x45])
+alldiff([x21,x22,x23,x24,x25,x26,x27])
+alldiff([x4,x11,x18,x25,x32,x39,x46])
+alldiff([x28,x29,x30,x31,x32,x33,x34])
+alldiff([x5,x12,x19,x26,x33,x40,x47])
+alldiff([x35,x36,x37,x38,x39,x40,x41])
+alldiff([x6,x13,x20,x27,x34,x41,x48])
+alldiff([x42,x43,x44,x45,x46,x47,x48])
+eq(x0, 0)
+eq(x8, 1)
+eq(x16, 2)
+eq(x24, 3)
+eq(x32, 4)
+eq(x40, 5)
+eq(x48, 6)
+watchelement([x0,x7,x14,x21,x28,x35,x42], x0, x49)
+watchelement([x0,x1,x2,x3,x4,x5,x6], x0, x49)
+watchelement([x1,x8,x15,x22,x29,x36,x43], x7, x50)
+watchelement([x0,x1,x2,x3,x4,x5,x6], x7, x50)
+watchelement([x2,x9,x16,x23,x30,x37,x44], x14, x51)
+watchelement([x0,x1,x2,x3,x4,x5,x6], x14, x51)
+watchelement([x3,x10,x17,x24,x31,x38,x45], x21, x52)
+watchelement([x0,x1,x2,x3,x4,x5,x6], x21, x52)
+watchelement([x4,x11,x18,x25,x32,x39,x46], x28, x53)
+watchelement([x0,x1,x2,x3,x4,x5,x6], x28, x53)
+watchelement([x5,x12,x19,x26,x33,x40,x47], x35, x54)
+watchelement([x0,x1,x2,x3,x4,x5,x6], x35, x54)
+watchelement([x6,x13,x20,x27,x34,x41,x48], x42, x55)
+watchelement([x0,x1,x2,x3,x4,x5,x6], x42, x55)
+watchelement([x0,x7,x14,x21,x28,x35,x42], x1, x56)
+watchelement([x7,x8,x9,x10,x11,x12,x13], x1, x56)
+watchelement([x1,x8,x15,x22,x29,x36,x43], x8, x57)
+watchelement([x7,x8,x9,x10,x11,x12,x13], x8, x57)
+watchelement([x2,x9,x16,x23,x30,x37,x44], x15, x58)
+watchelement([x7,x8,x9,x10,x11,x12,x13], x15, x58)
+watchelement([x3,x10,x17,x24,x31,x38,x45], x22, x59)
+watchelement([x7,x8,x9,x10,x11,x12,x13], x22, x59)
+watchelement([x4,x11,x18,x25,x32,x39,x46], x29, x60)
+watchelement([x7,x8,x9,x10,x11,x12,x13], x29, x60)
+watchelement([x5,x12,x19,x26,x33,x40,x47], x36, x61)
+watchelement([x7,x8,x9,x10,x11,x12,x13], x36, x61)
+watchelement([x6,x13,x20,x27,x34,x41,x48], x43, x62)
+watchelement([x7,x8,x9,x10,x11,x12,x13], x43, x62)
+watchelement([x0,x7,x14,x21,x28,x35,x42], x2, x63)
+watchelement([x14,x15,x16,x17,x18,x19,x20], x2, x63)
+watchelement([x1,x8,x15,x22,x29,x36,x43], x9, x64)
+watchelement([x14,x15,x16,x17,x18,x19,x20], x9, x64)
+watchelement([x2,x9,x16,x23,x30,x37,x44], x16, x65)
+watchelement([x14,x15,x16,x17,x18,x19,x20], x16, x65)
+watchelement([x3,x10,x17,x24,x31,x38,x45], x23, x66)
+watchelement([x14,x15,x16,x17,x18,x19,x20], x23, x66)
+watchelement([x4,x11,x18,x25,x32,x39,x46], x30, x67)
+watchelement([x14,x15,x16,x17,x18,x19,x20], x30, x67)
+watchelement([x5,x12,x19,x26,x33,x40,x47], x37, x68)
+watchelement([x14,x15,x16,x17,x18,x19,x20], x37, x68)
+watchelement([x6,x13,x20,x27,x34,x41,x48], x44, x69)
+watchelement([x14,x15,x16,x17,x18,x19,x20], x44, x69)
+watchelement([x0,x7,x14,x21,x28,x35,x42], x3, x70)
+watchelement([x21,x22,x23,x24,x25,x26,x27], x3, x70)
+watchelement([x1,x8,x15,x22,x29,x36,x43], x10, x71)
+watchelement([x21,x22,x23,x24,x25,x26,x27], x10, x71)
+watchelement([x2,x9,x16,x23,x30,x37,x44], x17, x72)
+watchelement([x21,x22,x23,x24,x25,x26,x27], x17, x72)
+watchelement([x3,x10,x17,x24,x31,x38,x45], x24, x73)
+watchelement([x21,x22,x23,x24,x25,x26,x27], x24, x73)
+watchelement([x4,x11,x18,x25,x32,x39,x46], x31, x74)
+watchelement([x21,x22,x23,x24,x25,x26,x27], x31, x74)
+watchelement([x5,x12,x19,x26,x33,x40,x47], x38, x75)
+watchelement([x21,x22,x23,x24,x25,x26,x27], x38, x75)
+watchelement([x6,x13,x20,x27,x34,x41,x48], x45, x76)
+watchelement([x21,x22,x23,x24,x25,x26,x27], x45, x76)
+watchelement([x0,x7,x14,x21,x28,x35,x42], x4, x77)
+watchelement([x28,x29,x30,x31,x32,x33,x34], x4, x77)
+watchelement([x1,x8,x15,x22,x29,x36,x43], x11, x78)
+watchelement([x28,x29,x30,x31,x32,x33,x34], x11, x78)
+watchelement([x2,x9,x16,x23,x30,x37,x44], x18, x79)
+watchelement([x28,x29,x30,x31,x32,x33,x34], x18, x79)
+watchelement([x3,x10,x17,x24,x31,x38,x45], x25, x80)
+watchelement([x28,x29,x30,x31,x32,x33,x34], x25, x80)
+watchelement([x4,x11,x18,x25,x32,x39,x46], x32, x81)
+watchelement([x28,x29,x30,x31,x32,x33,x34], x32, x81)
+watchelement([x5,x12,x19,x26,x33,x40,x47], x39, x82)
+watchelement([x28,x29,x30,x31,x32,x33,x34], x39, x82)
+watchelement([x6,x13,x20,x27,x34,x41,x48], x46, x83)
+watchelement([x28,x29,x30,x31,x32,x33,x34], x46, x83)
+watchelement([x0,x7,x14,x21,x28,x35,x42], x5, x84)
+watchelement([x35,x36,x37,x38,x39,x40,x41], x5, x84)
+watchelement([x1,x8,x15,x22,x29,x36,x43], x12, x85)
+watchelement([x35,x36,x37,x38,x39,x40,x41], x12, x85)
+watchelement([x2,x9,x16,x23,x30,x37,x44], x19, x86)
+watchelement([x35,x36,x37,x38,x39,x40,x41], x19, x86)
+watchelement([x3,x10,x17,x24,x31,x38,x45], x26, x87)
+watchelement([x35,x36,x37,x38,x39,x40,x41], x26, x87)
+watchelement([x4,x11,x18,x25,x32,x39,x46], x33, x88)
+watchelement([x35,x36,x37,x38,x39,x40,x41], x33, x88)
+watchelement([x5,x12,x19,x26,x33,x40,x47], x40, x89)
+watchelement([x35,x36,x37,x38,x39,x40,x41], x40, x89)
+watchelement([x6,x13,x20,x27,x34,x41,x48], x47, x90)
+watchelement([x35,x36,x37,x38,x39,x40,x41], x47, x90)
+watchelement([x0,x7,x14,x21,x28,x35,x42], x6, x91)
+watchelement([x42,x43,x44,x45,x46,x47,x48], x6, x91)
+watchelement([x1,x8,x15,x22,x29,x36,x43], x13, x92)
+watchelement([x42,x43,x44,x45,x46,x47,x48], x13, x92)
+watchelement([x2,x9,x16,x23,x30,x37,x44], x20, x93)
+watchelement([x42,x43,x44,x45,x46,x47,x48], x20, x93)
+watchelement([x3,x10,x17,x24,x31,x38,x45], x27, x94)
+watchelement([x42,x43,x44,x45,x46,x47,x48], x27, x94)
+watchelement([x4,x11,x18,x25,x32,x39,x46], x34, x95)
+watchelement([x42,x43,x44,x45,x46,x47,x48], x34, x95)
+watchelement([x5,x12,x19,x26,x33,x40,x47], x41, x96)
+watchelement([x42,x43,x44,x45,x46,x47,x48], x41, x96)
+watchelement([x6,x13,x20,x27,x34,x41,x48], x48, x97)
+watchelement([x42,x43,x44,x45,x46,x47,x48], x48, x97)
+ineq(0, x6, 2)
+ineq(1, x13, 2)
+ineq(2, x20, 2)
+ineq(3, x27, 2)
+ineq(4, x34, 2)
+ineq(5, x41, 2)
+ineq(6, x48, 2)
+**EOF**

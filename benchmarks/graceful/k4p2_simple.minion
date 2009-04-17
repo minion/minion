@@ -1,83 +1,128 @@
-MINION 1
-# Input file for Minion built for Version 0.2
-#    http://sourceforge.net/projects/minion
-# Graceful Graph instance for input to Minion
-#  k = 4
-#  p = 2
-#  Created: UTC Sun Mar 26 10:03:17 2006
-#  Generator program written by Ian Gent
-#  
+# Minion Version 0.8.1
+# Svn version: 2537
+# Svn last changed date: 2009-04-15 22:05:43 +0100 (Wed, 15 Apr 2009)
+#  Run at: UTC Thu Apr 16 16:24:17 2009
 
-0
-0
-0
-52
-0 0 1
-1 16 19
-0 16 32
-0
-[x0,x1,x2,x3,x4,x5,x24,x40,x8,x30,x46,x14,x6,x25,x41,x9,x31,x47,x15,x33,x49,x17,x7,x26,x42,x10,x32,x48,x16,x34,x50,x18,x35,x51,x19]
-[a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
-0
-1
-[[x0,x1,x2,x3],
-[x4,x5,x6,x7],
-[x0,x1,x2,x3,x4,x5,x24,x40,x8,x30,x46,x14,x6,x25,x41,x9,x31,x47,x15,x33,x49,x17,x7,x26,x42,x10,x32,x48,x16,x34,x50,x18,x35,x51,x19]]
-0
-objective none
-print m0
-eq(x0,0)
+#    http://minion.sourceforge.net
+#  Minion is still very new and in active development.
+#  If you have problems with Minion or find any bugs, please tell us!
+#  Mailing list at: https://mail.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: benchmarks/graceful/k4p2_simple.minion
+# Command line: ./build/minion -redump benchmarks/graceful/k4p2_simple.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..0}
+DISCRETE x1{1..16}
+DISCRETE x2{1..16}
+DISCRETE x3{1..16}
+DISCRETE x4{1..16}
+DISCRETE x5{1..16}
+DISCRETE x6{1..16}
+DISCRETE x7{1..16}
+DISCRETE x8{1..16}
+DISCRETE x9{1..16}
+DISCRETE x10{1..16}
+DISCRETE x11{1..16}
+DISCRETE x12{1..16}
+DISCRETE x13{1..16}
+DISCRETE x14{1..16}
+DISCRETE x15{1..16}
+DISCRETE x16{1..16}
+DISCRETE x17{1..16}
+DISCRETE x18{1..16}
+DISCRETE x19{1..16}
+DISCRETE x20{0..16}
+DISCRETE x21{0..16}
+DISCRETE x22{0..16}
+DISCRETE x23{0..16}
+DISCRETE x24{0..16}
+DISCRETE x25{0..16}
+DISCRETE x26{0..16}
+DISCRETE x27{0..16}
+DISCRETE x28{0..16}
+DISCRETE x29{0..16}
+DISCRETE x30{0..16}
+DISCRETE x31{0..16}
+DISCRETE x32{0..16}
+DISCRETE x33{0..16}
+DISCRETE x34{0..16}
+DISCRETE x35{0..16}
+DISCRETE x36{0..16}
+DISCRETE x37{0..16}
+DISCRETE x38{0..16}
+DISCRETE x39{0..16}
+DISCRETE x40{0..16}
+DISCRETE x41{0..16}
+DISCRETE x42{0..16}
+DISCRETE x43{0..16}
+DISCRETE x44{0..16}
+DISCRETE x45{0..16}
+DISCRETE x46{0..16}
+DISCRETE x47{0..16}
+DISCRETE x48{0..16}
+DISCRETE x49{0..16}
+DISCRETE x50{0..16}
+DISCRETE x51{0..16}
+**SEARCH**
+VARORDER [x0,x1,x2,x3,x4,x5,x24,x40,x8,x30,x46,x14,x6,x25,x41,x9,x31,x47,x15,x33,x49,x17,x7,x26,x42,x10,x32,x48,x16,x34,x50,x18,x35,x51,x19]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47,x48,x49,x50,x51]
+PRINT[[x0,x1,x2,x3],[x4,x5,x6,x7],[x0,x1,x2,x3,x4,x5,x24,x40,x8,x30,x46,x14,x6,x25,x41,x9,x31,x47,x15,x33,x49,x17,x7,x26,x42,x10,x32,x48,x16,x34,x50,x18,x35,x51,x19]]
+**TUPLELIST**
+**CONSTRAINTS**
+eq(x0, 0)
 alldiff([x0,x1,x2,x3,x4,x5,x6,x7])
 alldiff([x4,x1,x2,x3,x8,x11,x12,x9,x13,x10,x14,x15,x16,x17,x18,x19])
-occurrence([x1,x2,x3,x4],16,1)
-occurrence([x1,x2,x3,x4],15,1)
-ineq(x1,x2,-1)
-ineq(x2,x3,-1)
-sumleq([x24,x8],x40)
-sumgeq([x24,x8],x40)
-min([x1,x5],x24)
-max([x1,x5],x40)
-sumleq([x27,x11],x43)
-sumgeq([x27,x11],x43)
-min([x1,x2],x27)
-max([x1,x2],x43)
-sumleq([x28,x12],x44)
-sumgeq([x28,x12],x44)
-min([x1,x3],x28)
-max([x1,x3],x44)
-sumleq([x25,x9],x41)
-sumgeq([x25,x9],x41)
-min([x2,x6],x25)
-max([x2,x6],x41)
-sumleq([x29,x13],x45)
-sumgeq([x29,x13],x45)
-min([x2,x3],x29)
-max([x2,x3],x45)
-sumleq([x26,x10],x42)
-sumgeq([x26,x10],x42)
-min([x3,x7],x26)
-max([x3,x7],x42)
-sumleq([x30,x14],x46)
-sumgeq([x30,x14],x46)
-min([x4,x5],x30)
-max([x4,x5],x46)
-sumleq([x31,x15],x47)
-sumgeq([x31,x15],x47)
-min([x4,x6],x31)
-max([x4,x6],x47)
-sumleq([x32,x16],x48)
-sumgeq([x32,x16],x48)
-min([x4,x7],x32)
-max([x4,x7],x48)
-sumleq([x33,x17],x49)
-sumgeq([x33,x17],x49)
-min([x5,x6],x33)
-max([x5,x6],x49)
-sumleq([x34,x18],x50)
-sumgeq([x34,x18],x50)
-min([x5,x7],x34)
-max([x5,x7],x50)
-sumleq([x35,x19],x51)
-sumgeq([x35,x19],x51)
-min([x6,x7],x35)
-max([x6,x7],x51)
+occurrence([x1,x2,x3,x4], 16, 1)
+occurrence([x1,x2,x3,x4], 15, 1)
+ineq(x1, x2, -1)
+ineq(x2, x3, -1)
+sumleq([x24,x8], x40)
+sumgeq([x24,x8], x40)
+min([x1,x5], x24)
+max([x1,x5], x40)
+sumleq([x27,x11], x43)
+sumgeq([x27,x11], x43)
+min([x1,x2], x27)
+max([x1,x2], x43)
+sumleq([x28,x12], x44)
+sumgeq([x28,x12], x44)
+min([x1,x3], x28)
+max([x1,x3], x44)
+sumleq([x25,x9], x41)
+sumgeq([x25,x9], x41)
+min([x2,x6], x25)
+max([x2,x6], x41)
+sumleq([x29,x13], x45)
+sumgeq([x29,x13], x45)
+min([x2,x3], x29)
+max([x2,x3], x45)
+sumleq([x26,x10], x42)
+sumgeq([x26,x10], x42)
+min([x3,x7], x26)
+max([x3,x7], x42)
+sumleq([x30,x14], x46)
+sumgeq([x30,x14], x46)
+min([x4,x5], x30)
+max([x4,x5], x46)
+sumleq([x31,x15], x47)
+sumgeq([x31,x15], x47)
+min([x4,x6], x31)
+max([x4,x6], x47)
+sumleq([x32,x16], x48)
+sumgeq([x32,x16], x48)
+min([x4,x7], x32)
+max([x4,x7], x48)
+sumleq([x33,x17], x49)
+sumgeq([x33,x17], x49)
+min([x5,x6], x33)
+max([x5,x6], x49)
+sumleq([x34,x18], x50)
+sumgeq([x34,x18], x50)
+min([x5,x7], x34)
+max([x5,x7], x50)
+sumleq([x35,x19], x51)
+sumgeq([x35,x19], x51)
+min([x6,x7], x35)
+max([x6,x7], x51)
+**EOF**

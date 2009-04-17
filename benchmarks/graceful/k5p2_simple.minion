@@ -1,116 +1,189 @@
-MINION 1
-# Input file for Minion built for Version 0.2
-#    http://sourceforge.net/projects/minion
-# Graceful Graph instance for input to Minion
-#  k = 5
-#  p = 2
-#  Created: UTC Sun Mar 26 10:03:21 2006
-#  Generator program written by Ian Gent
-#  
+# Minion Version 0.8.1
+# Svn version: 2537
+# Svn last changed date: 2009-04-15 22:05:43 +0100 (Wed, 15 Apr 2009)
+#  Run at: UTC Thu Apr 16 16:24:17 2009
 
-0
-0
-0
-80
-0 0 1
-1 25 29
-0 25 50
-0
-[x0,x1,x2,x3,x4,x5,x6,x35,x60,x10,x45,x70,x20,x7,x36,x61,x11,x46,x71,x21,x49,x74,x24,x8,x37,x62,x12,x47,x72,x22,x50,x75,x25,x52,x77,x27,x9,x38,x63,x13,x48,x73,x23,x51,x76,x26,x53,x78,x28,x54,x79,x29]
-[a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
-0
-1
-[[x0,x1,x2,x3,x4],
-[x5,x6,x7,x8,x9],
-[x0,x1,x2,x3,x4,x5,x6,x35,x60,x10,x45,x70,x20,x7,x36,x61,x11,x46,x71,x21,x49,x74,x24,x8,x37,x62,x12,x47,x72,x22,x50,x75,x25,x52,x77,x27,x9,x38,x63,x13,x48,x73,x23,x51,x76,x26,x53,x78,x28,x54,x79,x29]]
-0
-objective none
-print m0
-eq(x0,0)
+#    http://minion.sourceforge.net
+#  Minion is still very new and in active development.
+#  If you have problems with Minion or find any bugs, please tell us!
+#  Mailing list at: https://mail.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: benchmarks/graceful/k5p2_simple.minion
+# Command line: ./build/minion -redump benchmarks/graceful/k5p2_simple.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..0}
+DISCRETE x1{1..25}
+DISCRETE x2{1..25}
+DISCRETE x3{1..25}
+DISCRETE x4{1..25}
+DISCRETE x5{1..25}
+DISCRETE x6{1..25}
+DISCRETE x7{1..25}
+DISCRETE x8{1..25}
+DISCRETE x9{1..25}
+DISCRETE x10{1..25}
+DISCRETE x11{1..25}
+DISCRETE x12{1..25}
+DISCRETE x13{1..25}
+DISCRETE x14{1..25}
+DISCRETE x15{1..25}
+DISCRETE x16{1..25}
+DISCRETE x17{1..25}
+DISCRETE x18{1..25}
+DISCRETE x19{1..25}
+DISCRETE x20{1..25}
+DISCRETE x21{1..25}
+DISCRETE x22{1..25}
+DISCRETE x23{1..25}
+DISCRETE x24{1..25}
+DISCRETE x25{1..25}
+DISCRETE x26{1..25}
+DISCRETE x27{1..25}
+DISCRETE x28{1..25}
+DISCRETE x29{1..25}
+DISCRETE x30{0..25}
+DISCRETE x31{0..25}
+DISCRETE x32{0..25}
+DISCRETE x33{0..25}
+DISCRETE x34{0..25}
+DISCRETE x35{0..25}
+DISCRETE x36{0..25}
+DISCRETE x37{0..25}
+DISCRETE x38{0..25}
+DISCRETE x39{0..25}
+DISCRETE x40{0..25}
+DISCRETE x41{0..25}
+DISCRETE x42{0..25}
+DISCRETE x43{0..25}
+DISCRETE x44{0..25}
+DISCRETE x45{0..25}
+DISCRETE x46{0..25}
+DISCRETE x47{0..25}
+DISCRETE x48{0..25}
+DISCRETE x49{0..25}
+DISCRETE x50{0..25}
+DISCRETE x51{0..25}
+DISCRETE x52{0..25}
+DISCRETE x53{0..25}
+DISCRETE x54{0..25}
+DISCRETE x55{0..25}
+DISCRETE x56{0..25}
+DISCRETE x57{0..25}
+DISCRETE x58{0..25}
+DISCRETE x59{0..25}
+DISCRETE x60{0..25}
+DISCRETE x61{0..25}
+DISCRETE x62{0..25}
+DISCRETE x63{0..25}
+DISCRETE x64{0..25}
+DISCRETE x65{0..25}
+DISCRETE x66{0..25}
+DISCRETE x67{0..25}
+DISCRETE x68{0..25}
+DISCRETE x69{0..25}
+DISCRETE x70{0..25}
+DISCRETE x71{0..25}
+DISCRETE x72{0..25}
+DISCRETE x73{0..25}
+DISCRETE x74{0..25}
+DISCRETE x75{0..25}
+DISCRETE x76{0..25}
+DISCRETE x77{0..25}
+DISCRETE x78{0..25}
+DISCRETE x79{0..25}
+**SEARCH**
+VARORDER [x0,x1,x2,x3,x4,x5,x6,x35,x60,x10,x45,x70,x20,x7,x36,x61,x11,x46,x71,x21,x49,x74,x24,x8,x37,x62,x12,x47,x72,x22,x50,x75,x25,x52,x77,x27,x9,x38,x63,x13,x48,x73,x23,x51,x76,x26,x53,x78,x28,x54,x79,x29]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47,x48,x49,x50,x51,x52,x53,x54,x55,x56,x57,x58,x59,x60,x61,x62,x63,x64,x65,x66,x67,x68,x69,x70,x71,x72,x73,x74,x75,x76,x77,x78,x79]
+PRINT[[x0,x1,x2,x3,x4],[x5,x6,x7,x8,x9],[x0,x1,x2,x3,x4,x5,x6,x35,x60,x10,x45,x70,x20,x7,x36,x61,x11,x46,x71,x21,x49,x74,x24,x8,x37,x62,x12,x47,x72,x22,x50,x75,x25,x52,x77,x27,x9,x38,x63,x13,x48,x73,x23,x51,x76,x26,x53,x78,x28,x54,x79,x29]]
+**TUPLELIST**
+**CONSTRAINTS**
+eq(x0, 0)
 alldiff([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9])
 alldiff([x5,x1,x2,x3,x4,x10,x14,x15,x16,x11,x17,x18,x12,x19,x13,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29])
-occurrence([x1,x2,x3,x4,x5],25,1)
-occurrence([x1,x2,x3,x4,x5],24,1)
-ineq(x1,x2,-1)
-ineq(x2,x3,-1)
-ineq(x3,x4,-1)
-sumleq([x35,x10],x60)
-sumgeq([x35,x10],x60)
-min([x1,x6],x35)
-max([x1,x6],x60)
-sumleq([x39,x14],x64)
-sumgeq([x39,x14],x64)
-min([x1,x2],x39)
-max([x1,x2],x64)
-sumleq([x40,x15],x65)
-sumgeq([x40,x15],x65)
-min([x1,x3],x40)
-max([x1,x3],x65)
-sumleq([x41,x16],x66)
-sumgeq([x41,x16],x66)
-min([x1,x4],x41)
-max([x1,x4],x66)
-sumleq([x36,x11],x61)
-sumgeq([x36,x11],x61)
-min([x2,x7],x36)
-max([x2,x7],x61)
-sumleq([x42,x17],x67)
-sumgeq([x42,x17],x67)
-min([x2,x3],x42)
-max([x2,x3],x67)
-sumleq([x43,x18],x68)
-sumgeq([x43,x18],x68)
-min([x2,x4],x43)
-max([x2,x4],x68)
-sumleq([x37,x12],x62)
-sumgeq([x37,x12],x62)
-min([x3,x8],x37)
-max([x3,x8],x62)
-sumleq([x44,x19],x69)
-sumgeq([x44,x19],x69)
-min([x3,x4],x44)
-max([x3,x4],x69)
-sumleq([x38,x13],x63)
-sumgeq([x38,x13],x63)
-min([x4,x9],x38)
-max([x4,x9],x63)
-sumleq([x45,x20],x70)
-sumgeq([x45,x20],x70)
-min([x5,x6],x45)
-max([x5,x6],x70)
-sumleq([x46,x21],x71)
-sumgeq([x46,x21],x71)
-min([x5,x7],x46)
-max([x5,x7],x71)
-sumleq([x47,x22],x72)
-sumgeq([x47,x22],x72)
-min([x5,x8],x47)
-max([x5,x8],x72)
-sumleq([x48,x23],x73)
-sumgeq([x48,x23],x73)
-min([x5,x9],x48)
-max([x5,x9],x73)
-sumleq([x49,x24],x74)
-sumgeq([x49,x24],x74)
-min([x6,x7],x49)
-max([x6,x7],x74)
-sumleq([x50,x25],x75)
-sumgeq([x50,x25],x75)
-min([x6,x8],x50)
-max([x6,x8],x75)
-sumleq([x51,x26],x76)
-sumgeq([x51,x26],x76)
-min([x6,x9],x51)
-max([x6,x9],x76)
-sumleq([x52,x27],x77)
-sumgeq([x52,x27],x77)
-min([x7,x8],x52)
-max([x7,x8],x77)
-sumleq([x53,x28],x78)
-sumgeq([x53,x28],x78)
-min([x7,x9],x53)
-max([x7,x9],x78)
-sumleq([x54,x29],x79)
-sumgeq([x54,x29],x79)
-min([x8,x9],x54)
-max([x8,x9],x79)
+occurrence([x1,x2,x3,x4,x5], 25, 1)
+occurrence([x1,x2,x3,x4,x5], 24, 1)
+ineq(x1, x2, -1)
+ineq(x2, x3, -1)
+ineq(x3, x4, -1)
+sumleq([x35,x10], x60)
+sumgeq([x35,x10], x60)
+min([x1,x6], x35)
+max([x1,x6], x60)
+sumleq([x39,x14], x64)
+sumgeq([x39,x14], x64)
+min([x1,x2], x39)
+max([x1,x2], x64)
+sumleq([x40,x15], x65)
+sumgeq([x40,x15], x65)
+min([x1,x3], x40)
+max([x1,x3], x65)
+sumleq([x41,x16], x66)
+sumgeq([x41,x16], x66)
+min([x1,x4], x41)
+max([x1,x4], x66)
+sumleq([x36,x11], x61)
+sumgeq([x36,x11], x61)
+min([x2,x7], x36)
+max([x2,x7], x61)
+sumleq([x42,x17], x67)
+sumgeq([x42,x17], x67)
+min([x2,x3], x42)
+max([x2,x3], x67)
+sumleq([x43,x18], x68)
+sumgeq([x43,x18], x68)
+min([x2,x4], x43)
+max([x2,x4], x68)
+sumleq([x37,x12], x62)
+sumgeq([x37,x12], x62)
+min([x3,x8], x37)
+max([x3,x8], x62)
+sumleq([x44,x19], x69)
+sumgeq([x44,x19], x69)
+min([x3,x4], x44)
+max([x3,x4], x69)
+sumleq([x38,x13], x63)
+sumgeq([x38,x13], x63)
+min([x4,x9], x38)
+max([x4,x9], x63)
+sumleq([x45,x20], x70)
+sumgeq([x45,x20], x70)
+min([x5,x6], x45)
+max([x5,x6], x70)
+sumleq([x46,x21], x71)
+sumgeq([x46,x21], x71)
+min([x5,x7], x46)
+max([x5,x7], x71)
+sumleq([x47,x22], x72)
+sumgeq([x47,x22], x72)
+min([x5,x8], x47)
+max([x5,x8], x72)
+sumleq([x48,x23], x73)
+sumgeq([x48,x23], x73)
+min([x5,x9], x48)
+max([x5,x9], x73)
+sumleq([x49,x24], x74)
+sumgeq([x49,x24], x74)
+min([x6,x7], x49)
+max([x6,x7], x74)
+sumleq([x50,x25], x75)
+sumgeq([x50,x25], x75)
+min([x6,x8], x50)
+max([x6,x8], x75)
+sumleq([x51,x26], x76)
+sumgeq([x51,x26], x76)
+min([x6,x9], x51)
+max([x6,x9], x76)
+sumleq([x52,x27], x77)
+sumgeq([x52,x27], x77)
+min([x7,x8], x52)
+max([x7,x8], x77)
+sumleq([x53,x28], x78)
+sumgeq([x53,x28], x78)
+min([x7,x9], x53)
+max([x7,x9], x78)
+sumleq([x54,x29], x79)
+sumgeq([x54,x29], x79)
+min([x8,x9], x54)
+max([x8,x9], x79)
+**EOF**
