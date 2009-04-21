@@ -122,7 +122,6 @@ list(APPEND SRCS ${PROJECT_SOURCE_DIR}/minion/BuildVariables.cpp
                  ${PROJECT_SOURCE_DIR}/minion/lock.cpp
                  ${PROJECT_SOURCE_DIR}/minion/debug_functions.cpp
                  ${PROJECT_SOURCE_DIR}/minion/get_info.cpp
-                 ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp
 #                ${PROJECT_SOURCE_DIR}/minion/minion.cpp
                  ${PROJECT_SOURCE_DIR}/minion/globals.cpp
                  ${PROJECT_SOURCE_DIR}/minion/preprocess.cpp
@@ -393,9 +392,12 @@ if(NAME)
 endif()
 message(STATUS "Executable name set to \"${BINARY}\"")
 
+add_library(inputfile_parse ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp)
+
 add_library(${BINARY}-lib STATIC EXCLUDE_FROM_ALL ${SRCS})
 
 add_executable(${BINARY} ${SRCS} ${PROJECT_SOURCE_DIR}/minion/minion.cpp)
+target_link_libraries(${BINARY} inputfile_parse)
 #target_link_libraries(${BINARY} ${BINARY}-lib)
 
 # when we're building minion-something, add a "minion" target that does the same
