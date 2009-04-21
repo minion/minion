@@ -18,9 +18,6 @@
 */
 
 
-#include "../inputfile_parse/InputVariableDef.h"
-
-
 #include "BuildConstraintConstructs.h"
 
 using namespace BuildCon;
