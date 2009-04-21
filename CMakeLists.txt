@@ -6,7 +6,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-modules)
 include(CheckIncludeFileCXX)
 include(CheckCXXCompilerFlag)
 include(FindBoost)
-include(FindGMP)
+#include(FindGMP)
 include(constraints)
 include(CheckIncludeFiles)
 
@@ -408,9 +408,9 @@ if(Boost_FOUND)
     target_link_libraries(${BINARY} "-L${Boost_LIBRARY_DIRS}" ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
 endif()
 
-if(GMP_FOUND)
-    target_link_libraries(${BINARY} ${GMPXX_LIBRARY} ${GMP_LIBRARY})
-endif()
+#if(GMP_FOUND)
+#    target_link_libraries(${BINARY} ${GMPXX_LIBRARY} ${GMP_LIBRARY})
+#endif()
 
 # generators
 add_executable(bibd "${PROJECT_SOURCE_DIR}/generators/Bibd/MinionBIBDInstanceGenerator.cpp")
