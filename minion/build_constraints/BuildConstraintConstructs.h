@@ -18,7 +18,6 @@
 */
 
 #include "../BuildVariables.h"
-#include "../BuildInputVariables.h"
 #include "../inputfile_parse/CSPSpec.h"
 
 namespace BuildCon
