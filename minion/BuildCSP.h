@@ -20,8 +20,6 @@
 #ifndef _BUILDCSP_H
 #define _BUILDCSP_H
 
-#include "inputfile_parse/InputVariableDef.h"
-
 struct SearchMethod
 {
   VarOrderEnum order;
