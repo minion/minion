@@ -42,7 +42,7 @@
 #include "../variables/AnyVarRef.h"
 #include <vector>
 
-  using namespace std;
+using namespace std;
 
 class AnyVarRef;
 class DynamicTrigger;
@@ -161,9 +161,16 @@ public:
   }
 
 #ifdef WDEG
-  unsigned int getWdeg();
+  inline unsigned int getWdeg() { return wdeg; }
 
-  void incWdeg();
+  inline void incWdeg()
+  {
+    wdeg += 1;
+    vector<AnyVarRef>* vars = get_vars_singleton();
+    size_t vars_s = vars->size();
+    for(size_t i = 0; i < vars_s; i++)
+      (*vars)[i].incWdeg();
+  }
 #endif
 
   // Weights the constraint for ordering in trigger lists (bigger is later)
@@ -364,7 +371,10 @@ public:
   }
 };
 
-
+inline void DynamicTrigger::propagate()
+{
+  D_ASSERT(sanity_check == 1234);
+  constraint->propagate(this);
+}
 
 #endif
-

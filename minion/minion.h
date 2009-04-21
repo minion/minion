@@ -72,6 +72,5 @@ typedef TrailedMonotonicSet MonotonicSet;
 #include "StateObj.hpp"
 #include "solver.hpp"
 #include "constraints/function_defs.hpp"
-#include "constraints/constraint_abstract.hpp"
 
 #endif
