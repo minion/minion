@@ -21,8 +21,8 @@
 #ifndef TRIG_TIMER_H
 #define TRIG_TIMER_H
 
-/// This function will cause the boolean passed to be set to 'true' every second.
-void activate_trigger(volatile bool*, int timeout);
+/// This function will cause the boolean passed to be set to 'true' after timeout.
+void activate_trigger(volatile bool*, int timeout, bool CPU_time);
 
 // This takes a StateObj*
 void install_ctrlc_trigger(void*);

@@ -147,8 +147,8 @@ public:
   void clearAlarm()
   { alarm_trigger = false; }  
   
-  void setupAlarm(int timeout)
-  { activate_trigger(&alarm_trigger, timeout);}
+  void setupAlarm(int timeout, bool CPU_time)
+  { activate_trigger(&alarm_trigger, timeout, CPU_time);}
   
   bool isCtrlcPressed()
   { return ctrl_c_pressed; }
@@ -205,6 +205,9 @@ public:
   /// Stores the timelimit, 0 if none given.
   clock_t time_limit;
   
+  /// Stores if the timelimit is CPU time (yes) or wall-clock time (no)
+  bool time_limit_is_CPU_time;
+  
   /// Denotes if the variable and value orderings should be randomised.
   /// Initialised to false.
   bool randomise_valvarorder;
@@ -233,7 +236,8 @@ public:
     nocheck(false),
 #endif
     nodelimit(0), tableout(false), solsoutWrite(false), 
-    print_solution(true), time_limit(0), randomise_valvarorder(false), parser_verbose(false), 
+    print_solution(true), time_limit(0), time_limit_is_CPU_time(false),
+    randomise_valvarorder(false), parser_verbose(false), 
     redump(false), graph(false), outputType(-1), noTimers(false)
   {}
   

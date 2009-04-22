@@ -120,12 +120,24 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
     {
       ++i;
       getOptions(stateObj).time_limit = atoi(argv[i]);
+      getOptions(stateObj).time_limit_is_CPU_time = false;
       if(getOptions(stateObj).time_limit == 0)
       {
         cout << "Did not understand the parameter to timelimit:" << argv[i] << endl;
       exit(1);
       }
-    }// TODO : Should remove -varorder for beta orderings.
+    }
+    else if(command == string("-cpulimit"))
+    {
+      ++i;
+      getOptions(stateObj).time_limit = atoi(argv[i]);
+      getOptions(stateObj).time_limit_is_CPU_time = true;
+      if(getOptions(stateObj).time_limit == 0)
+      {
+        cout << "Did not understand the parameter to cpulimit:" << argv[i] << endl;
+      exit(1);
+      }
+    } // TODO : Should remove -varorder for beta orderings.
     else if(command == string("-varorder") || command == string("-X-varorder") )
     { 
         cout << "# -varorder is experimental and slower than minion's standard branching." << endl;

@@ -233,7 +233,7 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
     
     if(!getOptions(stateObj).noTimers)
     {
-        getState(stateObj).setupAlarm(getOptions(stateObj).time_limit);
+        getState(stateObj).setupAlarm(getOptions(stateObj).time_limit, getOptions(stateObj).time_limit_is_CPU_time);
         install_ctrlc_trigger(stateObj);
     }
     lock(stateObj);

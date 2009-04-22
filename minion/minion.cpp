@@ -205,17 +205,31 @@ To stop search after N nodes, do
 */
 
 /** @help switches;-nodelimit References
+help switches -cpulimit
 help switches -timelimit
 help switches -sollimit
 */
 
 /** @help switches;-timelimit Description
-To stop search after N seconds, do
+To stop search after N seconds (real time), do
 
    minion -timelimit N myinput.minion
 */
 
 /** @help switches;-timelimit References
+help switches -cpulimit
+help switches -nodelimit
+help switches -sollimit
+*/
+
+/** @help switches;-cpulimit Description
+To stop search after N seconds (CPU time), do
+
+   minion -cpulimit N myinput.minion
+*/
+
+/** @help switches;-cpulimit References
+help switches -timelimit
 help switches -nodelimit
 help switches -sollimit
 */
@@ -227,6 +241,7 @@ To stop search after N solutions have been found, do
 */
 
 /** @help switches;-sollimit References
+help switches -cpulimit
 help switches -nodelimit
 help switches -timelimit
 */

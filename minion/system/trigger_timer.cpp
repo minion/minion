@@ -39,19 +39,27 @@ void trigger_function(int /* signum */ )
   *trig = true;
 }
 
-void activate_trigger(volatile bool* b, int timeout)
+void activate_trigger(volatile bool* b, int timeout, bool CPU_time) // CPU_time = false -> real time 
 {
-  if(timeout <= 0)
-    return;
-  
+  // We still set these, as they are how 'ctrlc' checks if we have got started properly or not.
   trig = b;
   *trig = false;
-  
-  rlimit lim;
-  lim.rlim_cur = timeout;
-  lim.rlim_max = timeout + 10;
-  setrlimit(RLIMIT_CPU, &lim);
+ 
+  if(timeout <= 0)
+    return;
+
   signal(SIGXCPU, trigger_function);
+  signal(SIGALRM, trigger_function);
+
+  if(CPU_time)
+  {
+      rlimit lim;
+      lim.rlim_cur = timeout;
+      lim.rlim_max = timeout + 10;
+      setrlimit(RLIMIT_CPU, &lim);
+  }
+  else
+      alarm(timeout);
 }
 
 void ctrlc_function(int /* signum */ )
