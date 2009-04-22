@@ -147,8 +147,8 @@ public:
   void clearAlarm()
   { alarm_trigger = false; }  
   
-  void setupAlarm()
-  { activate_trigger(&alarm_trigger);}
+  void setupAlarm(int timeout)
+  { activate_trigger(&alarm_trigger, timeout);}
   
   bool isCtrlcPressed()
   { return ctrl_c_pressed; }

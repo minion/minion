@@ -21,9 +21,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
+#include <sys/types.h>
 #include <sys/time.h>
-
+#include <sys/resource.h>
+#include <signal.h>
+#include <stdio.h>
+#include <errno.h>
 
 volatile bool* trig;
 
@@ -36,19 +39,19 @@ void trigger_function(int /* signum */ )
   *trig = true;
 }
 
-void activate_trigger(volatile bool* b)
+void activate_trigger(volatile bool* b, int timeout)
 {
+  if(timeout <= 0)
+    return;
+  
   trig = b;
   *trig = false;
   
-  struct itimerval timer;
-          
-  signal(SIGALRM, trigger_function);
-  timer.it_value.tv_sec = 1;
-  timer.it_value.tv_usec = 0;
-  timer.it_interval.tv_sec = 1;
-  timer.it_interval.tv_usec = 0;
-  setitimer(ITIMER_REAL, &timer, NULL);
+  rlimit lim;
+  lim.rlim_cur = timeout;
+  lim.rlim_max = timeout + 10;
+  setrlimit(RLIMIT_CPU, &lim);
+  signal(SIGXCPU, trigger_function);
 }
 
 void ctrlc_function(int /* signum */ )

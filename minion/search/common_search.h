@@ -162,25 +162,19 @@ namespace Controller
       return true;
     
     if(getState(stateObj).isAlarmActivated())
-    {
+    { // Either a timeout has occurred, or ctrl+c has been pressed.
       getState(stateObj).clearAlarm();
       if(getState(stateObj).isCtrlcPressed())
         return true;
 
-      if(getOptions(stateObj).time_limit != 0)
+      if(getOptions(stateObj).cspcomp)
       {
-        if(getState(stateObj).getOldTimer().checkTimeout(getOptions(stateObj).time_limit))
-        {
-          if(getOptions(stateObj).cspcomp)
-          {
-            FAIL_EXIT("Time out");
-          }
-          
-          getOptions(stateObj).printLine("Time out.");
-          getTableOut().set("TimeOut", 1);
-            return true;
-        }
+        FAIL_EXIT("Time out");
       }
+      
+      getOptions(stateObj).printLine("Time out.");
+      getTableOut().set("TimeOut", 1);
+        return true;
     }
     return false;
   }
@@ -239,8 +233,8 @@ void inline maybe_print_search_action(StateObj* stateObj, const char* action)
     
     if(!getOptions(stateObj).noTimers)
     {
-    getState(stateObj).setupAlarm();
-    install_ctrlc_trigger(stateObj);
+        getState(stateObj).setupAlarm(getOptions(stateObj).time_limit);
+        install_ctrlc_trigger(stateObj);
     }
     lock(stateObj);
     if (!getOptions(stateObj).silent) 
