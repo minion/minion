@@ -39,8 +39,6 @@ positive numbers.
 #ifndef CONSTRAINT_PRODUCT_H
 #define CONSTRAINT_PRODUCT_H
 
-#include "constraint_and.h"
-
 /// var1 * var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct ProductConstraint : public AbstractConstraint
@@ -207,24 +205,4 @@ struct ProductConstraint : public AbstractConstraint
       return new CheckAssignConstraint<vector<AnyVarRef>, ProductConstraint>(stateObj, t, *this);
   }
 };
-
-
-
-inline AbstractConstraint*
-BuildCT_PRODUCT2(StateObj* stateObj, const vector<BoolVarRef>& vars, const vector<BoolVarRef>& var2, ConstraintBlob&)
-{
-  D_ASSERT(vars.size() == 2);
-  D_ASSERT(var2.size() == 1);
-  return AndCon(stateObj, vars[0], vars[1], var2[0]);
-}
-
-template<typename VarRef1, typename VarRef2>
-AbstractConstraint*
-BuildCT_PRODUCT2(StateObj* stateObj, const vector<VarRef1>& vars, const vector<VarRef2>& var2, ConstraintBlob&)
-{ 
-  D_ASSERT(vars.size() == 2);
-  D_ASSERT(var2.size() == 1);
-  return new ProductConstraint<VarRef1,VarRef1,VarRef2>(stateObj, vars[0],vars[1],var2[0]); 
-}
-
 #endif

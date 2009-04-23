@@ -437,15 +437,4 @@ struct ModConstraint : public AbstractConstraint
         return new NotModConstraint<VarRef1, VarRef2, VarRef3>(stateObj, var1, var2, var3);
     }
 };
-
-template<typename V1, typename V2>
-inline AbstractConstraint*
-BuildCT_MODULO(StateObj* stateObj, const V1& vars, const V2& var2, ConstraintBlob&)
-{
-  D_ASSERT(vars.size() == 2);
-  D_ASSERT(var2.size() == 1);
-  return new ModConstraint<typename V1::value_type, typename V1::value_type,
-                           typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
-}
-
 #endif

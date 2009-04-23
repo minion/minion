@@ -186,10 +186,4 @@ template<typename EqualVarRef1, typename EqualVarRef2>
 AbstractConstraint*
 AbsCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
 { return new AbsConstraint<EqualVarRef1, EqualVarRef2>(stateObj, var1,var2); }
-
-template<typename T1, typename T2>
-AbstractConstraint*
-BuildCT_ABS(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob&) 
-{ return AbsCon(stateObj, t1[0],t2[0]); }
-
 #endif

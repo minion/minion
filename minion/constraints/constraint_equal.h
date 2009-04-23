@@ -611,50 +611,15 @@ struct EqualConstraint : public AbstractConstraint
    }
 };
 
-
-template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
-AbstractConstraint*
-BuildCT_EQ_REIFY(StateObj* stateObj, const vector<EqualVarRef1>& var1, 
-                                    const vector<EqualVarRef2>& var2, const vector<BoolVarRef> var3,ConstraintBlob&)
-{ return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, BoolVarRef>(stateObj,var1[0],var2[0],var3[0]); }
-
-
 template<typename EqualVarRef1, typename EqualVarRef2>
 AbstractConstraint*
 EqualCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
 { return new EqualConstraint<EqualVarRef1, EqualVarRef2>(stateObj, var1,var2); }
 
-
-template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
-AbstractConstraint*
-BuildCT_MINUSEQ_REIFY(StateObj* stateObj, const vector<EqualVarRef1>& var1, 
-                                         const vector<EqualVarRef2>& var2, const vector<BoolVarRef> var3,ConstraintBlob&)
-{ return new ReifiedEqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2>, BoolVarRef>(stateObj, var1[0],VarNegRef(var2[0]),var3[0]); }
-
 template<typename EqualVarRef1, typename EqualVarRef2>
 AbstractConstraint*
 EqualMinusCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
 { return new EqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2> >(stateObj, var1,VarNegRef(var2)); }
-
-
-template<typename T1, typename T2>
-AbstractConstraint*
-BuildCT_EQ(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob&) 
-{ return EqualCon(stateObj, t1[0],t2[0]); }
-
-template<typename T1, typename T2>
-AbstractConstraint*
-BuildCT_MINUSEQ(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob&) 
-{ return EqualMinusCon(stateObj, t1[0],t2[0]); }
-
-
-
-template<typename VarRef1, typename VarRef2, typename BoolVarRef>
-AbstractConstraint*
-BuildCT_DISEQ_REIFY(StateObj* stateObj, const vector<VarRef1>& var1, 
-                                        const vector<VarRef2>& var2, const vector<BoolVarRef> var3, ConstraintBlob&)
-{ return new ReifiedEqualConstraint<VarRef1, VarRef2, VarNot<BoolVarRef> >
-                                   (stateObj,var1[0],var2[0], VarNotRef(var3[0])); }
 
 template<typename Var1, typename Var2>
 AbstractConstraint*
@@ -662,11 +627,5 @@ NeqConBinary(StateObj* stateObj, const Var1& var1, const Var2& var2)
 {
   return new NeqConstraintBinary<Var1, Var2>(stateObj, var1, var2); 
 }
-
-
-template<typename T1, typename T2>
-AbstractConstraint*
-BuildCT_DISEQ(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob& b)
-{ return NeqConBinary(stateObj, t1[0], t2[0]); }
 
 #endif

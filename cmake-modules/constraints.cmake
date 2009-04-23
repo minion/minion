@@ -15,12 +15,6 @@ set(CONSTRAINT_DEFS "${GEN_FILES_DIR}/constraint_defs.h")
 set(CONSTRAINT_ENUM "${GEN_FILES_DIR}/ConstraintEnum.h")
 set(BUILD_START "${GEN_FILES_DIR}/BuildStart.h")
 set(BUILD_STATIC_START "${GEN_FILES_DIR}/BuildStaticStart.cpp")
-set(CONSTRAINT_HEADER "#include \"../minion.h\"
-/* Minion Constraint Solver
-   http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
-*/\n\n")
 
 set(NAME_ID_element "CT_ELEMENT")
 set(NAME_READ_element "read_list" "read_var" "read_var")
@@ -218,10 +212,6 @@ macro(select_constraints)
     file(APPEND ${BUILD_STATIC_START} "#include \"BuildStart.h\"\n")
     file(APPEND ${BUILD_STATIC_START} "AbstractConstraint* build_constraint(StateObj* stateObj, ConstraintBlob& b) {\n")
     file(APPEND ${BUILD_STATIC_START} "switch(b.constraint->type) {\n")
-    file(GLOB_RECURSE constraint_headers
-                      RELATIVE "${GEN_FILES_DIR}"
-                      "${PROJECT_SOURCE_DIR}/minion/constraints/*.h"
-                      "${PROJECT_SOURCE_DIR}/minion/dynamic_constraints/*.h")
     set(msg "")
     foreach(constraint ${ARGV})
         set(found False)
@@ -258,18 +248,8 @@ macro(select_constraints)
             # BuildStaticStart.h
             file(APPEND ${BUILD_STATIC_START} "case ${NAME_ID_${constraint}}: return build_constraint_${NAME_ID_${constraint}}(stateObj, b);\n")
             # CT_*.cpp
-            file(REMOVE "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp")
-            file(APPEND "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp"
-                        ${CONSTRAINT_HEADER})
-            foreach(constraint_header ${constraint_headers})
-                file(READ "${GEN_FILES_DIR}/${constraint_header}" contents)
-                if(contents MATCHES "${NAME_ID_${constraint}}")
-                    file(APPEND "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp"
-                                "#include \"${constraint_header}\"\n")
-                endif()
-            endforeach()
-            file(APPEND "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp"
-                        "\nBUILD_CT(${NAME_ID_${constraint}}, ${build_num_read_funcs})\n")
+            file(READ "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.tmpl" CONS)
+            file(WRITE "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp" "${CONS}")
         endif()
     endforeach()
     message(STATUS "${msg}")

@@ -364,16 +364,4 @@ struct LexLeqConstraint : public AbstractConstraint
     return array_copy;
   }
 };
-
-
-template<typename VarArray1, typename VarArray2>
-AbstractConstraint*
-BuildCT_LEXLEQ(StateObj* stateObj, const VarArray1& x, const VarArray2& y, ConstraintBlob&)
-{ return new LexLeqConstraint<VarArray1, VarArray2>(stateObj,x,y); }
-
-template<typename VarArray1, typename VarArray2>
-AbstractConstraint*
-BuildCT_LEXLESS(StateObj* stateObj,const VarArray1& x, const VarArray2& y, ConstraintBlob&)
-{ return new LexLeqConstraint<VarArray1, VarArray2,true>(stateObj, x,y); }
-
 #endif

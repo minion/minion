@@ -137,11 +137,6 @@ AbstractConstraint*
 ImpliesCon(StateObj* stateObj, VarRef v1, VarRef v2)
 { return new LeqConstraint<VarRef,VarRef,compiletime_val<0> >(stateObj,v1,v2,compiletime_val<0>()); }
 
-template<typename T1, typename T2>
-AbstractConstraint*
-BuildCT_INEQ(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob& b) 
-{ return LeqCon(stateObj, t1[0], t2[0], runtime_val(b.constants[0][0])); }
-
 // This is mainly inline to avoid multiple definitions.
 template<typename VarRef1, typename VarRef2, typename Offset>
 inline AbstractConstraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint()

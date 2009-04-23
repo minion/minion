@@ -266,13 +266,4 @@ template<typename VarArray,  typename ValArray, typename VarSum>
 AbstractConstraint*
 LiteralSumConDynamic(StateObj* stateObj,const VarArray& _var_array,  const ValArray& _val_array, VarSum _var_sum)
 { return new LiteralSumConstraintDynamic<VarArray,ValArray,VarSum>(stateObj, _var_array, _val_array, _var_sum); }
-
-template<typename T1>
-AbstractConstraint* 
-BuildCT_WATCHED_LITSUM(StateObj* stateObj,const T1& t1, ConstraintBlob& b)
-{
-  D_ASSERT(b.constants[1].size());
-  return LiteralSumConDynamic(stateObj, t1, b.constants[0], runtime_val(b.constants[1][0])); 
-}
-
 #endif

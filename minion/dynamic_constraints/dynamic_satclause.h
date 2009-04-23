@@ -138,19 +138,4 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
     return false;
   }
 };
-
-template<typename T>
-inline AbstractConstraint*
-BuildCT_WATCHED_OR(StateObj* stateObj, const vector<T>& vs, ConstraintBlob& bl)
-{
-  size_t vs_s = vs.size();
-  for(int i = 0; i < vs_s; i++)
-    if(vs[i].getInitialMin() != 0 || vs[i].getInitialMax() != 1)
-    {
-      FAIL_EXIT("watched or only works on Boolean variables!");
-    }
-    
-  return new BoolOrConstraintDynamic<vector<T> >(stateObj, vs, bl.negs);
-}
-
 #endif

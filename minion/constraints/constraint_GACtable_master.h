@@ -35,17 +35,4 @@
 #endif 
 #endif
 #endif
-
-
-
-template <typename T>
-AbstractConstraint*
-BuildCT_WATCHED_TABLE(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return GACTableCon(stateObj, t1, b.tuples); }
-
-template <typename T>
-AbstractConstraint*
-BuildCT_WATCHED_NEGATIVE_TABLE(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return GACNegativeTableCon(stateObj, t1, b.tuples); }
-
 #endif

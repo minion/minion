@@ -167,20 +167,4 @@ template<typename VarArray>
 GadgetConstraint<VarArray>*
 gadgetCon(StateObj* stateObj, const VarArray& vars, ConstraintBlob& blob)
 { return new GadgetConstraint<VarArray>(stateObj, vars, blob.gadget, blob.gadget_prop_type); }
-
-#ifdef REENTER
-
-template<typename Vars>
-AbstractConstraint*
-BuildCT_GADGET(StateObj* stateObj, const Vars& vars, ConstraintBlob& blob)
-{ return gadgetCon(stateObj, vars, blob); }
-
-#else
-
-template<typename Vars>
-AbstractConstraint*
-BuildCT_GADGET(StateObj* stateObj, const Vars& vars, ConstraintBlob& blob)
-{ INPUT_ERROR("This constraint requires REENTER support."); }
-#endif
-
 #endif

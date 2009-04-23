@@ -59,9 +59,4 @@ gccweak constraint.
 
 #include "gcc_common.h"
 
-template<typename VarArray1, typename VarArray2>
-AbstractConstraint*
-BuildCT_GCC(StateObj* stateObj, const VarArray1& var_array, const VarArray2& cap_array, ConstraintBlob& b)
-{ return new GCC<VarArray1, VarArray2, 1>(stateObj, var_array, cap_array, b); }
-
 #endif

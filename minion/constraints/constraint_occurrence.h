@@ -781,31 +781,4 @@ ConstantOccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& 
   return
   (new ConstantOccurrenceEqualConstraint<VarArray,Val>(stateObj, _var_array,  _value, _val_count_min, _val_count_max));
 }
-
-template<typename T1, typename T3>
-AbstractConstraint*
-BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T3& t3, ConstraintBlob& b)
-{
-  int val_to_count = b.constants[0][0];
-  return OccEqualCon(stateObj, t1, runtime_val(val_to_count), t3[0]);
-}
-
-template<typename T1>
-AbstractConstraint*
-BuildCT_LEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, ConstraintBlob& b)
-{
-  int val_to_count = b.constants[0][0];
-  int occs = b.constants[1][0];
-  return ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), 0, occs);
- }
-
-template<typename T1>
-AbstractConstraint*
-BuildCT_GEQ_OCCURRENCE(StateObj* stateObj, const T1& t1, ConstraintBlob& b)
-{
-  int val_to_count = b.constants[0][0];
-  int occs = b.constants[1][0];
-  { return ConstantOccEqualCon(stateObj, t1, runtime_val(val_to_count), occs, t1.size()); }
-}
-
 #endif

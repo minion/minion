@@ -170,14 +170,4 @@ truereifyConOld(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
   else
     return truereifyConDynamicOld(stateObj, c, var);
 }
-
-template<typename VarArray>
-inline AbstractConstraint*
-BuildCT_REIFYIMPLY_OLD(StateObj* stateObj, const VarArray& vars, ConstraintBlob& bl)
-{
-  D_ASSERT(bl.internal_constraints.size() == 1);
-  D_ASSERT(vars.size() == 1);
-  return truereifyConOld(stateObj, build_constraint(stateObj, bl.internal_constraints[0]), vars[0]);
-}
-
 #endif

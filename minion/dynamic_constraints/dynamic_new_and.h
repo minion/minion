@@ -214,16 +214,4 @@ struct Dynamic_AND : public ParentConstraint
   }
   return new Dynamic_OR(stateObj, con);
 }*/
-
-inline AbstractConstraint*
-BuildCT_WATCHED_NEW_AND(StateObj* stateObj, ConstraintBlob& bl)
-{
-  vector<AbstractConstraint*> cons;
-  for(int i = 0; i < bl.internal_constraints.size(); ++i)
-    cons.push_back(build_constraint(stateObj, bl.internal_constraints[i]));
-
-  return new Dynamic_AND(stateObj, cons);
-}
-
-
 #endif

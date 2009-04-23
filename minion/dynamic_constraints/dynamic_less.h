@@ -108,13 +108,4 @@ struct WatchLessConstraint : public AbstractConstraint
 
   virtual AbstractConstraint* reverse_constraint() { return rev_implement<Negated>(); }
 };
-
-template<typename VarArray1, typename VarArray2>
-AbstractConstraint*
-BuildCT_WATCHED_LESS(StateObj* stateObj, const VarArray1& _var_array_1, const VarArray2& _var_array_2, ConstraintBlob&)
-{ 
-  return new WatchLessConstraint<typename VarArray1::value_type, typename VarArray2::value_type>
-    (stateObj, _var_array_1[0], _var_array_2[0]); 
-}
-
 #endif

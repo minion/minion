@@ -192,15 +192,4 @@ struct DifferenceConstraint : public AbstractConstraint
       return new CheckAssignConstraint<vector<AnyVarRef>, DifferenceConstraint>(stateObj, t, *this);
   }
 };
-
-
-template<typename VarRef1, typename VarRef2>
-AbstractConstraint*
-BuildCT_DIFFERENCE(StateObj* stateObj,const vector<VarRef1>& vars, const vector<VarRef2>& var2, ConstraintBlob&)
-{ 
-  D_ASSERT(vars.size() == 2);
-  D_ASSERT(var2.size() == 1);
-  return new DifferenceConstraint<VarRef1,VarRef1,VarRef2>(stateObj, vars[0], vars[1], var2[0]); 
-}
-
 #endif
