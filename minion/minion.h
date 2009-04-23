@@ -60,14 +60,18 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 #include "variables/variables.h"
 
+#ifndef DOMINION
 #include "build_constraints/build_helper.h"
+#endif
 
 // This constraint must be listed early so that it can
 // be called by all constraints.
 #include "constraints/constraint_checkassign.h"
 
 #include "lock.h"
+#ifndef DOMINION
 #include "BuildCSP.h"
+#endif
 
 #include "StateObj.hpp"
 #include "solver.hpp"
