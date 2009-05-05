@@ -3,6 +3,7 @@
 # $2 is the directory to do everything in
 # $3 is the SVN revision to use
 # if $4 is present, run the tests
+shopt -s extglob
 if [ ! -d $2 ]; then
     mkdir $2
 fi
