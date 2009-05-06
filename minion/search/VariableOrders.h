@@ -22,6 +22,16 @@
 
 #include "search_methods.h"
 
+struct triple {
+  bool isLeft;
+  unsigned var;
+  DomainInt val;
+
+  triple(bool _isLeft, unsigned _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
+  friend std::ostream& operator<<(std::ostream& o, const triple& t)
+  { o << "(" << t.isLeft << "," << t.var << "," << t.val << ")"; return o; }
+};
+
 template<typename T>
 void inline maybe_print_search_assignment(StateObj* stateObj, T& var, DomainInt val, BOOL equal, bool force = false)
 {
@@ -40,9 +50,10 @@ struct VariableOrder
   StateObj* stateObj;
   vector<VarType> var_order;
   vector<int> val_order;
-  vector<int> branches;
+  vector<triple> branches; //L & R branches so far (isLeftBranch?,var,value)
   vector<int> first_unassigned_variable;
   unsigned pos;
+  unsigned depth; //number of left branches
   
   BranchType branch_method;
   
@@ -55,6 +66,7 @@ struct VariableOrder
     branches.reserve(var_order.size());
     first_unassigned_variable.reserve(var_order.size());
     pos = 0; 
+    depth = 0;
   }
   
   void reset()
@@ -62,6 +74,7 @@ struct VariableOrder
     branches.clear();
     first_unassigned_variable.clear();
     pos = 0;
+    depth = 0;
   }
       
   // Returns true if all variables assigned
@@ -72,10 +85,10 @@ struct VariableOrder
   }
   
   bool finished_search()
-  { return branches.size() == 0; }
+  { return depth == 0; }
   
   int search_depth()
-  { return branches.size(); }
+  { return depth; }
   
   void branch_left()
   {
@@ -87,7 +100,8 @@ struct VariableOrder
       assign_val = var_order[pos].getMax();
     var_order[pos].decisionAssign(assign_val);
     maybe_print_search_assignment(stateObj, var_order[pos], assign_val, true);
-    branches.push_back(pos);
+    branches.push_back(triple(true, pos, assign_val));
+    depth++;
     first_unassigned_variable.push_back(pos);
   }
   
@@ -105,29 +119,38 @@ struct VariableOrder
       assign_val = var_order[new_pos].getMax();
     var_order[new_pos].uncheckedAssign(assign_val);
     maybe_print_search_assignment(stateObj, var_order[new_pos], assign_val, true, true);
-    branches.push_back(new_pos);
+    branches.push_back(triple(true, new_pos, assign_val));
+    depth++;
     // The first unassigned variable could still be much earlier.
     first_unassigned_variable.push_back(pos);
   }
   
   void branch_right()
   {  
-     int other_branch = branches.back();
+     while(!branches.back().isLeft) { //pop off all the RBs
+       branches.pop_back();
+     }
+     int other_branch = branches.back().var; //then the LB is the next to branch on
      branches.pop_back();
-    
+     depth--;
+
      if(val_order[other_branch])
      {
        D_ASSERT(var_order[other_branch].getMax() >= var_order[other_branch].getMin() + 1);
-       maybe_print_search_assignment(stateObj, var_order[other_branch], var_order[other_branch].getMin(), false);
-       var_order[other_branch].setMin(var_order[other_branch].getMin() + 1);
+       const DomainInt var_min = var_order[other_branch].getMin();
+       maybe_print_search_assignment(stateObj, var_order[other_branch], var_min, false);
+       var_order[other_branch].setMin(var_min + 1);
+       branches.push_back(triple(false, other_branch, var_min));
      }
      else
      {
        D_ASSERT(var_order[other_branch].getMax() >= var_order[other_branch].getMin() + 1);
-       maybe_print_search_assignment(stateObj, var_order[other_branch], var_order[other_branch].getMax(), false);
-       var_order[other_branch].setMax(var_order[other_branch].getMax() - 1);
+       const DomainInt var_max = var_order[other_branch].getMax();
+       maybe_print_search_assignment(stateObj, var_order[other_branch], var_max, false);
+       var_order[other_branch].setMax(var_max - 1);
+       branches.push_back(triple(false, other_branch, var_max));
      }
-    
+
     pos = first_unassigned_variable.back();
     first_unassigned_variable.pop_back();
   }
