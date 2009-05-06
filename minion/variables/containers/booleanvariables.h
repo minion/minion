@@ -49,7 +49,7 @@ typedef unsigned long data_type;
 static const data_type one = 1;
 static const data_type max_data = one << ( sizeof(data_type) - 1 );
 
-struct BooleanContainer;
+struct BoolVarContainer;
 
 /// A reference to a boolean variable
 struct BoolVarRef_internal
@@ -69,8 +69,8 @@ struct BoolVarRef_internal
   { return var_num / (sizeof(data_type)*8); }
   
 #ifdef MANY_VAR_CONTAINERS
-  BooleanContainer* boolCon;
-  BooleanContainer& getCon() const { return *boolCon; }
+  BoolVarContainer* boolCon;
+  BoolVarContainer& getCon() const { return *boolCon; }
 
   BoolVarRef_internal(const BoolVarRef_internal& b) :
   shift_offset(b.shift_offset), var_num(b.var_num), data_position(b.data_position),
@@ -80,7 +80,7 @@ struct BoolVarRef_internal
   BoolVarRef_internal() : shift_offset(~1), var_num(~1), boolCon(NULL)
   { }  
 #else
-  static BooleanContainer& getCon_Static();
+  static BoolVarContainer& getCon_Static();
   BoolVarRef_internal(const BoolVarRef_internal& b) :
   shift_offset(b.shift_offset), var_num(b.var_num), data_position(b.data_position),
   value_position(b.value_position)
@@ -90,7 +90,7 @@ struct BoolVarRef_internal
   { }
 #endif
   
-  BoolVarRef_internal(int value, BooleanContainer* b_con);
+  BoolVarRef_internal(int value, BoolVarContainer* b_con);
   
   data_type& assign_ptr() const
   { return *static_cast<data_type*>(data_position.get_ptr()); }
@@ -151,19 +151,19 @@ struct BoolVarRef_internal
   
 };
 
-struct GetBooleanContainer;
+struct GetBoolVarContainer;
 
 #ifdef MORE_SEARCH_INFO
-typedef InfoRefType<QuickVarRefType<GetBooleanContainer, BoolVarRef_internal>, VAR_INFO_BOOL> BoolVarRef;
+typedef InfoRefType<QuickVarRefType<GetBoolVarContainer, BoolVarRef_internal>, VAR_INFO_BOOL> BoolVarRef;
 #else
-typedef QuickVarRefType<GetBooleanContainer, BoolVarRef_internal> BoolVarRef;
+typedef QuickVarRefType<GetBoolVarContainer, BoolVarRef_internal> BoolVarRef;
 #endif
 
 /// Container for boolean variables
-struct BooleanContainer
+struct BoolVarContainer
 {
   StateObj* stateObj;
-  BooleanContainer(StateObj* _stateObj) : stateObj(_stateObj), var_count_m(0),  
+  BoolVarContainer(StateObj* _stateObj) : stateObj(_stateObj), var_count_m(0),  
                                           trigger_list(stateObj, false), lock_m(false)
   {}
   
@@ -362,13 +362,13 @@ struct BooleanContainer
 #endif
 };
 
-inline BoolVarRef BooleanContainer::get_var_num(int i)
+inline BoolVarRef BoolVarContainer::get_var_num(int i)
 {
   D_ASSERT(i < (int)var_count_m);
   return BoolVarRef(BoolVarRef_internal(i, this));
 }
 
-inline BoolVarRef_internal::BoolVarRef_internal(int value, BooleanContainer* b_con) : 
+inline BoolVarRef_internal::BoolVarRef_internal(int value, BoolVarContainer* b_con) : 
   var_num(value),  
   data_position(b_con->assign_offset, data_offset()*sizeof(data_type)),
   value_position(b_con->values_mem, data_offset()*sizeof(data_type))

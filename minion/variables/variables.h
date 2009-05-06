@@ -44,7 +44,7 @@ class VariableContainer
   void operator=(const VariableContainer&);
 public:
   BoundVarContainer<> boundVarContainer;
-  BooleanContainer booleanContainer;
+  BoolVarContainer booleanContainer;
   BigRangeVarContainer<BitContainerType> bigRangeVarContainer;
   SparseBoundVarContainer<> sparseBoundVarContainer;
 
@@ -57,7 +57,7 @@ public:
   {}
   
   BoundVarContainer<>& getBoundVarContainer() { return boundVarContainer; }
-  BooleanContainer& getBooleanContainer() { return booleanContainer; }
+  BoolVarContainer& getBoolVarContainer() { return booleanContainer; }
   BigRangeVarContainer<BitContainerType>& getBigRangeVarContainer() { return bigRangeVarContainer; }
   SparseBoundVarContainer<>& getSparseBoundVarContainer() { return sparseBoundVarContainer; }
 

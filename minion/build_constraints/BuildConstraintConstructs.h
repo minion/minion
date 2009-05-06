@@ -67,7 +67,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
       {
         vector<BoolVarRef> v(vars.size());
         for(unsigned i = 0; i < vars.size(); ++i)
-          v[i] = getVars(stateObj).getBooleanContainer().get_var_num(vars[i].pos());
+          v[i] = getVars(stateObj).getBoolVarContainer().get_var_num(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
           build(stateObj, make_pair(partial_build, &v), b, pos + 1);
       }
@@ -75,7 +75,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
       {
         vector<VarNot<BoolVarRef> > v(vars.size());
         for(unsigned i = 0; i < vars.size(); ++i)
-          v[i] = VarNotRef(getVars(stateObj).getBooleanContainer().get_var_num(vars[i].pos()));
+          v[i] = VarNotRef(getVars(stateObj).getBoolVarContainer().get_var_num(vars[i].pos()));
         return BuildConObj<constraint, size - 1>::
           build(stateObj, make_pair(partial_build, &v), b, pos + 1);
       }

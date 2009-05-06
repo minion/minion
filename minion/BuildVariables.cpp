@@ -41,9 +41,9 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
   switch(v.type())
         {
           case VAR_BOOL:
-            return AnyVarRef(getVars(stateObj).getBooleanContainer().get_var_num(v.pos()));
+            return AnyVarRef(getVars(stateObj).getBoolVarContainer().get_var_num(v.pos()));
           case VAR_NOTBOOL:
-          return AnyVarRef(VarNotRef(getVars(stateObj).getBooleanContainer().get_var_num(v.pos())));
+          return AnyVarRef(VarNotRef(getVars(stateObj).getBoolVarContainer().get_var_num(v.pos())));
           case VAR_BOUND:
             return AnyVarRef(getVars(stateObj).getBoundVarContainer().get_var_num(v.pos()));
           case VAR_SPARSEBOUND:
@@ -94,7 +94,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
   /// Create all the variables used in the CSP.
   void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars)
   {
-    getVars(stateObj).getBooleanContainer().setVarCount(vars.BOOLs);
+    getVars(stateObj).getBoolVarContainer().setVarCount(vars.BOOLs);
     getVars(stateObj).getBoundVarContainer().addVariables(vars.bound);
     getVars(stateObj).getSparseBoundVarContainer().addVariables(vars.sparse_bound);
     getVars(stateObj).getBigRangeVarContainer().addVariables(vars.discrete);
