@@ -17,8 +17,6 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "../minion.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -29,8 +27,7 @@
 #include <errno.h>
 
 volatile bool* trig;
-
-StateObj* stateObj;
+volatile bool* ctrl_c_press;
 
 bool check_double_ctrlc;
 
@@ -81,12 +78,12 @@ void ctrlc_function(int /* signum */ )
   cerr << "Ctrl+C pressed. Exiting.\n";
   // This is the quickest way to get things to stop.
   *trig = true;
-  getState(stateObj).setCtrlcPressed();
+  *ctrl_c_press = true;
 }
 
-void install_ctrlc_trigger(void* _stateObj)
+void install_ctrlc_trigger(volatile bool* ctrl_c_press_)
 {
   check_double_ctrlc = false;
-  stateObj = (StateObj*)_stateObj;
+  ctrl_c_press = ctrl_c_press_;
   signal(SIGINT, ctrlc_function);
 }

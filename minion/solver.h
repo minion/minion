@@ -153,8 +153,8 @@ public:
   bool isCtrlcPressed()
   { return ctrl_c_pressed; }
   
-  void setCtrlcPressed()
-  { ctrl_c_pressed = true; }
+  void setupCtrlc()
+  { install_ctrlc_trigger(&ctrl_c_pressed); }
   
   
 };

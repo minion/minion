@@ -24,7 +24,7 @@
 /// This function will cause the boolean passed to be set to 'true' after timeout.
 void activate_trigger(volatile bool*, int timeout, bool CPU_time);
 
-// This takes a StateObj*
-void install_ctrlc_trigger(void*);
+// This takes a point to a bool*, which will be switch when ctrl+c is pressed.
+void install_ctrlc_trigger(volatile bool*);
 
 #endif
