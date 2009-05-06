@@ -25,6 +25,10 @@
 #include <signal.h>
 #include <stdio.h>
 #include <errno.h>
+#include <iostream>
+#include <ostream>
+
+using namespace std;
 
 volatile bool* trig;
 volatile bool* ctrl_c_press;
