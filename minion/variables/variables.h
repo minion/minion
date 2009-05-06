@@ -44,26 +44,26 @@ class VariableContainer
   void operator=(const VariableContainer&);
 public:
   BoundVarContainer<> boundVarContainer;
-  BoolVarContainer booleanContainer;
+  BoolVarContainer boolVarContainer;
   BigRangeVarContainer<BitContainerType> bigRangeVarContainer;
   SparseBoundVarContainer<> sparseBoundVarContainer;
 
 
   VariableContainer(StateObj* _stateObj) :
     boundVarContainer(_stateObj),
-    booleanContainer(_stateObj),
+    boolVarContainer(_stateObj),
     bigRangeVarContainer(_stateObj),
     sparseBoundVarContainer(_stateObj)
   {}
   
   BoundVarContainer<>& getBoundVarContainer() { return boundVarContainer; }
-  BoolVarContainer& getBoolVarContainer() { return booleanContainer; }
+  BoolVarContainer& getBoolVarContainer() { return boolVarContainer; }
   BigRangeVarContainer<BitContainerType>& getBigRangeVarContainer() { return bigRangeVarContainer; }
   SparseBoundVarContainer<>& getSparseBoundVarContainer() { return sparseBoundVarContainer; }
 
   inline void lock() {
     boundVarContainer.lock();
-    booleanContainer.lock();
+    boolVarContainer.lock();
     bigRangeVarContainer.lock();
     sparseBoundVarContainer.lock();
   }

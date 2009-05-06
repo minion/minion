@@ -140,7 +140,7 @@ inline BoundVarContainer<DomType>& BoundVarRef_internal<DomType>::getCon_Static(
 { return varContainer_m.boundVarContainer; }
 
 inline BoolVarContainer& BoolVarRef_internal::getCon_Static()
-{ return varContainer_m.booleanContainer; }
+{ return varContainer_m.boolVarContainer; }
 
 template<typename DomType>
 inline SparseBoundVarContainer<DomType>& SparseBoundVarRef_internal<DomType>::getCon_Static()
