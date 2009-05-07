@@ -40,6 +40,8 @@ using namespace ProbSpec;
 /// Builds the CSP given by instance into stateObj.
 void BuildCSP(StateObj* stateObj, CSPInstance& instance)
 {
+  getState(stateObj).setTupleListContainer(instance.tupleListContainer);
+
   // XXX : Hack for reify / reifyimply problem.
   getState(stateObj).setDynamicTriggersUsed(true);
 

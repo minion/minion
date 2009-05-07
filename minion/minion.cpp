@@ -421,8 +421,6 @@ try {
     exit(0);
   }
 
-  getState(stateObj).setTupleListContainer(instance.tupleListContainer);
-
   // Copy args into tableout
   getTableOut().set("RandomSeed", to_string(args.random_seed));
   {   const char * b = "";
