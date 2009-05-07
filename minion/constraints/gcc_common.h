@@ -59,14 +59,14 @@
 template<typename VarArray1, typename VarArray2, int Strongcards>
 struct GCC : public AbstractConstraint
 {
-    GCC(StateObj* _stateObj, const VarArray1& _var_array, const VarArray2& _capacity_array, ConstraintBlob& b) : AbstractConstraint(_stateObj),
+    GCC(StateObj* _stateObj, const VarArray1& _var_array, const VarArray2& _capacity_array, vector<vector<int> > val_arrays) : AbstractConstraint(_stateObj),
     var_array(_var_array), capacity_array(_capacity_array), 
     numvals(count_values()), constraint_locked(false),
     SCCSplit(_stateObj, numvars+numvals)
     {
         GCCPRINT("numvars:"<< numvars << ", numvals:"<< numvals);
-        val_array = b.constants[0];
         
+        val_array = val_arrays[0];
         D_ASSERT(capacity_array.size()==val_array.size());
         
         for(int i=0; i<val_array.size(); i++)
