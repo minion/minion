@@ -181,24 +181,24 @@ struct BigRangeVarContainer {
     //bms_array->lock(stateObj); // gets locked in constraint_setup.cpp
  }
 
-void addVariables(const vector<pair<int, Bounds> >& new_domains)
-{
-  D_ASSERT(!lock_m);
-  for(int i = 0; i < new_domains.size(); ++i)
+  void addVariables(const vector<pair<int, Bounds> >& new_domains)
   {
-    for(int j = 0; j < new_domains[i].first; ++j)
+    D_ASSERT(!lock_m);
+    for(int i = 0; i < new_domains.size(); ++i)
     {
-      initial_bounds.push_back(make_pair(new_domains[i].second.lower_bound, new_domains[i].second.upper_bound));
-      int domain_size;
-      domain_size = new_domains[i].second.upper_bound - new_domains[i].second.lower_bound + 1;
-      var_offset.push_back( var_offset.back() + domain_size);
-      var_count_m++;
-    }
-    constraints.resize(var_count_m);
+      for(int j = 0; j < new_domains[i].first; ++j)
+      {
+        initial_bounds.push_back(make_pair(new_domains[i].second.lower_bound, new_domains[i].second.upper_bound));
+        int domain_size;
+        domain_size = new_domains[i].second.upper_bound - new_domains[i].second.lower_bound + 1;
+        var_offset.push_back( var_offset.back() + domain_size);
+        var_count_m++;
+      }
+      constraints.resize(var_count_m);
 #ifdef WDEG
-    if(getOptions(stateObj).wdeg_on) wdegs.resize(var_count_m);
+      if(getOptions(stateObj).wdeg_on) wdegs.resize(var_count_m);
 #endif
-  }
+    }
 
  
     bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m * 2 * sizeof(domain_bound_type));
