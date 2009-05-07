@@ -170,11 +170,6 @@ namespace Controller
   template<typename VarOrder>
     inline void generateRestartFile(StateObj* stateObj, VarOrder& order)
   {
-    for(vector<triple>::const_iterator curr = order.branches.begin();
-	curr != order.branches.end();
-	curr++)
-      cout << *curr << ",";
-    cout << endl;
     string filename = string("minion-resume-") + to_string(getpid());
     cout << "Output resume file to \"" << filename << "\"" << endl;
     ofstream fileout(filename.c_str());
@@ -207,14 +202,16 @@ namespace Controller
   template<typename VarOrder>
     inline bool do_checks(StateObj* stateObj, VarOrder& order)
   {
-    if(getState(stateObj).getNodeCount() == getOptions(stateObj).nodelimit)
+    if(getState(stateObj).getNodeCount() == getOptions(stateObj).nodelimit) {
+      generateRestartFile(stateObj, order);
       return true;
+    }
     
     if(getState(stateObj).isAlarmActivated())
     { // Either a timeout has occurred, or ctrl+c has been pressed.
+      generateRestartFile(stateObj, order);
       getState(stateObj).clearAlarm();
       if(getState(stateObj).isCtrlcPressed()) {
-	generateRestartFile(stateObj, order);
         return true;
       }
 
