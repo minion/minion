@@ -22,6 +22,6 @@
 
 #include "CSPSpec.h"
 
-CSPInstance readInputFromFile(string fname, bool parser_verbose);
+void readInputFromFiles(CSPInstance& inst, vector<string> fnames, bool parser_verbose);
 
 #endif

@@ -45,6 +45,7 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
 
   // Set up variables
   BuildCon::build_variables(stateObj, instance.vars);
+  getState(stateObj).setVarContainer(&instance.vars);
 
   // Set up optimisation
   if(instance.is_optimisation_problem)

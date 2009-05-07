@@ -77,4 +77,6 @@ typedef TrailedMonotonicSet MonotonicSet;
 #include "solver.hpp"
 #include "constraints/function_defs.hpp"
 
+#include "inputfile_parse/CSPSpec.hpp"
+
 #endif

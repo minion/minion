@@ -34,7 +34,7 @@ namespace Controller
     while(true)
     {
       getState(stateObj).incrementNodeCount();
-      if(do_checks(stateObj))
+      if(do_checks(stateObj, order))
         return;
       
       D_ASSERT(last_conflict_var >= -1 && last_conflict_var < (int)v.size());

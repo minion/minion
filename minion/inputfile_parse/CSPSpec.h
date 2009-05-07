@@ -289,6 +289,9 @@ struct ConstraintBlob
 
   string getName(const Var& var) const
   {
+    if(var.type() == VAR_CONSTANT) {
+      return to_string(var.pos()); //special case for constants
+    }
     map<Var, string>::const_iterator it = name_table.find(var);
     if(it == name_table.end())
       throw parse_exception("Undefined Var");

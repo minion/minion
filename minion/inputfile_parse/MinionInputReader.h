@@ -269,6 +269,8 @@ class MinionThreeInputReader {
 public:
   void read(FileReader* infile) ;
 
+  void finalise();
+
   ProbSpec::CSPInstance instance ;
   bool parser_verbose;
   bool print_all_vars;

@@ -22,16 +22,6 @@
 
 #include "search_methods.h"
 
-struct triple {
-  bool isLeft;
-  unsigned var;
-  DomainInt val;
-
-  triple(bool _isLeft, unsigned _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
-  friend std::ostream& operator<<(std::ostream& o, const triple& t)
-  { o << "(" << t.isLeft << "," << t.var << "," << t.val << ")"; return o; }
-};
-
 template<typename T>
 void inline maybe_print_search_assignment(StateObj* stateObj, T& var, DomainInt val, BOOL equal, bool force = false)
 {

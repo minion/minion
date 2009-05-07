@@ -331,6 +331,49 @@ void MinionThreeInputReader<FileReader>::parser_info(string s)
     cout << s << endl;
 }
 
+//This function is called to finalise reading an instance that may have
+//consisted of two input files. If the first input file was a "MINION 1" then
+//this function should be safe for it also.
+template<typename FileReader>
+void MinionThreeInputReader<FileReader>::finalise() {
+  if(isGadgetReader() && instance.constructionSite.empty())
+    throw parse_exception("Gadgets need a construction site!");
+
+  // Fill in any missing defaults
+  if(instance.search_order.empty())
+  {
+    parser_info("No order generated, auto-generating complete order");
+    instance.search_order.push_back(instance.vars.get_all_vars());
+  }
+
+  for(int i = 0; i < instance.search_order.size(); ++i)
+    instance.search_order[i].setupValueOrder();
+
+  // This has to be delayed unless not all variables are defined where 'PRINT ALL' occurs.
+  if(print_all_vars)
+    instance.print_matrix = instance.all_vars_list;
+    
+  if(instance.sym_order.empty())
+    instance.sym_order = instance.vars.get_all_vars();
+    
+  if(instance.sym_order.size() != instance.vars.get_all_vars().size())
+  {
+    parser_info("Extending symmetry order with auxillery variables");
+    vector<Var> all_vars = instance.vars.get_all_vars();
+    for(typename vector<Var>::iterator i = all_vars.begin(); i != all_vars.end(); ++i)
+    {
+      if(find(instance.sym_order.begin(), instance.sym_order.end(), *i) == instance.sym_order.end() )
+        instance.sym_order.push_back(*i);
+    }
+  }
+  
+  if(instance.sym_order.size() != set<Var>(instance.sym_order.begin(), instance.sym_order.end()).size())
+     throw parse_exception("SYMORDER cannot contain any variable more than once");
+     
+   if(instance.sym_order.size() != instance.vars.get_all_vars().size())
+     throw parse_exception("SYMORDER must contain every variable");   
+}
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // read
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -379,44 +422,6 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
   }
 
   parser_info("Reached end of CSP");
-
-  if(isGadgetReader() && instance.constructionSite.empty())
-    throw parse_exception("Gadgets need a construction site!");
-
-  // Fill in any missing defaults
-  if(instance.search_order.empty())
-  {
-    parser_info("No order generated, auto-generating complete order");
-    instance.search_order.push_back(instance.vars.get_all_vars());
-  }
-
-  for(int i = 0; i < instance.search_order.size(); ++i)
-    instance.search_order[i].setupValueOrder();
-
-  // This has to be delayed unless not all variables are defined where 'PRINT ALL' occurs.
-  if(print_all_vars)
-    instance.print_matrix = instance.all_vars_list;
-    
-  if(instance.sym_order.empty())
-    instance.sym_order = instance.vars.get_all_vars();
-    
-  if(instance.sym_order.size() != instance.vars.get_all_vars().size())
-  {
-    parser_info("Extending symmetry order with auxillery variables");
-    vector<Var> all_vars = instance.vars.get_all_vars();
-    for(typename vector<Var>::iterator i = all_vars.begin(); i != all_vars.end(); ++i)
-    {
-      if(find(instance.sym_order.begin(), instance.sym_order.end(), *i) == instance.sym_order.end() )
-        instance.sym_order.push_back(*i);
-    }
-  }
-  
-  if(instance.sym_order.size() != set<Var>(instance.sym_order.begin(), instance.sym_order.end()).size())
-     throw parse_exception("SYMORDER cannot contain any variable more than once");
-     
-   if(instance.sym_order.size() != instance.vars.get_all_vars().size())
-     throw parse_exception("SYMORDER must contain every variable");   
-    
 }
 
 template<typename FileReader>

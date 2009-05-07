@@ -33,6 +33,10 @@ class AnyVarRef;
 
 
 
+namespace ProbSpec {
+  class VarContainer;
+}
+
 class SearchState
 {
   StateObj* stateObj;
@@ -59,6 +63,9 @@ class SearchState
   bool finished;
   bool failed;
   jmp_buf g_env;
+
+  ProbSpec::VarContainer* vc;
+
   
   TimerClass oldtimer;
   
@@ -75,6 +82,10 @@ public:
   vector<vector<AnyVarRef> >& getPrintMatrix()
   { return print_matrix; }
   
+  ProbSpec::VarContainer* getVarContainer() { return vc; }
+   
+  void setVarContainer(ProbSpec::VarContainer* _vc) { vc = _vc; }
+
   vector<set<AbstractConstraint*> >& getConstraintsToPropagate()
   { return constraints_to_propagate; }
   
@@ -220,6 +231,10 @@ public:
   
   bool redump;
   bool graph;
+
+  //do we resume from a previous run and, if so, what file
+  bool resume;
+  string resume_file;
 
   // The format of output used (-1 for default)
   int outputType;

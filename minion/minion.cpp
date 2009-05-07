@@ -396,7 +396,14 @@ try {
     cout << endl;
   }
 
-  instance = readInputFromFile(getOptions(stateObj).instance_name, getOptions(stateObj).parser_verbose);
+  vector<string> files(1, getOptions(stateObj).instance_name);
+  if(getOptions(stateObj).resume) {
+    cout << "Resuming from " << getOptions(stateObj).resume_file << endl;
+    files.reserve(2);
+    files.push_back(getOptions(stateObj).resume_file);
+  }
+
+  readInputFromFiles(instance, files, getOptions(stateObj).parser_verbose);
 
   if(getOptions(stateObj).graph)
   {

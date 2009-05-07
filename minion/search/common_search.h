@@ -154,9 +154,58 @@ namespace Controller
     }
   }
 
+#include <fstream>
+
+  //repeat declaration
+  struct triple {
+    bool isLeft;
+    unsigned var;
+    DomainInt val;
+    
+    triple(bool _isLeft, unsigned _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
+    friend std::ostream& operator<<(std::ostream& o, const triple& t)
+    { o << "(" << t.isLeft << "," << t.var << "," << t.val << ")"; return o; }
+  };
+
+  template<typename VarOrder>
+    inline void generateRestartFile(StateObj* stateObj, VarOrder& order)
+  {
+    for(vector<triple>::const_iterator curr = order.branches.begin();
+	curr != order.branches.end();
+	curr++)
+      cout << *curr << ",";
+    cout << endl;
+    string filename = string("minion-resume-") + to_string(getpid());
+    cout << "Output resume file to \"" << filename << "\"" << endl;
+    ofstream fileout(filename.c_str());
+    fileout << "MINION 3" << endl;
+    fileout << "**CONSTRAINTS**" << endl;
+    vector<triple>& branches = order.branches;
+    vector<triple> left_branches_so_far;
+    left_branches_so_far.reserve(branches.size());
+    for(vector<triple>::const_iterator curr = branches.begin(); curr != branches.end(); curr++) {
+      if(curr->isLeft) {
+ 	left_branches_so_far.push_back(*curr);
+      } else {
+	fileout << "watched-or({";
+	for(vector<triple>::const_iterator lb = left_branches_so_far.begin(); 
+	    lb != left_branches_so_far.end();
+	    lb++) {
+	  fileout << "w-notliteral(";
+	  inputPrint(fileout, stateObj, order.var_order[lb->var].getBaseVar());
+	  fileout << "," << lb->val << "),";
+	}
+	fileout << "w-notliteral(";
+	inputPrint(fileout, stateObj, order.var_order[curr->var].getBaseVar());
+	fileout << "," << curr->val << ")})" << endl;
+      }
+    }
+    fileout << "**EOF**" << endl;
+  }
    
   /// Check if timelimit has been exceeded.
-  inline bool do_checks(StateObj* stateObj)
+  template<typename VarOrder>
+    inline bool do_checks(StateObj* stateObj, VarOrder& order)
   {
     if(getState(stateObj).getNodeCount() == getOptions(stateObj).nodelimit)
       return true;
@@ -164,8 +213,10 @@ namespace Controller
     if(getState(stateObj).isAlarmActivated())
     { // Either a timeout has occurred, or ctrl+c has been pressed.
       getState(stateObj).clearAlarm();
-      if(getState(stateObj).isCtrlcPressed())
+      if(getState(stateObj).isCtrlcPressed()) {
+	generateRestartFile(stateObj, order);
         return true;
+      }
 
       if(getOptions(stateObj).cspcomp)
       {

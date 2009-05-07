@@ -45,42 +45,15 @@ template<typename Reader, typename Stream>
     getTableOut().set(string("Filename"), infile->filename);  
 }
 
-template<typename InputReader>
-CSPInstance readInput(InputReader* infile, bool parser_verbose)
-{  
-    string test_name = infile->get_string();
-    if(test_name != "MINION")
-      INPUT_ERROR("All Minion input files must begin 'MINION'");
-  
-    int inputFileVersionNumber = infile->read_num();
-  
-    if(inputFileVersionNumber > 3)
-      INPUT_ERROR("This version of Minion only supports formats up to 3");
-  
-
-    // C++0x comment : Need MOVE (which is std::move) here to activate r-value references.
-    // Normally we wouldn't, but here the compiler can't figure out it can "steal" instance.
-    if(inputFileVersionNumber == 3)
-    {
-      MinionThreeInputReader<InputReader> reader(parser_verbose);
-      ReadCSP(reader, infile);
-      return MOVE(reader.instance);
-    } 
-    else
-    {
-      MinionInputReader<InputReader> reader(parser_verbose);
-      ReadCSP(reader, infile);
-      return MOVE(reader.instance);
-    }  
-}
-
-
-CSPInstance readInputFromFile(string fname, bool parser_verbose)
+void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parser_verbose)
 {
-    const char* filename = fname.c_str();
+  MinionThreeInputReader<ConcreteFileReader<filtering_istream> > readerThree(parser_verbose);
+  MinionInputReader<ConcreteFileReader<filtering_istream> > reader(parser_verbose);
+  for(vector<string>::const_iterator fname = fnames.begin(); fname != fnames.end(); fname++) {
+    const char* filename = fname->c_str();
     string extension;
-    if(fname.find_last_of(".") < fname.size())
-      extension = fname.substr(fname.find_last_of("."), fname.size());
+    if(fname->find_last_of(".") < fname->size())
+      extension = fname->substr(fname->find_last_of("."), fname->size());
   
     filtering_istream in;
     
@@ -111,11 +84,11 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
     // We use an auto_ptr because it will auto-delete on exit.
     auto_ptr<ifstream> file;
     
-    if(fname != "--")
+    if(*fname != "--")
     {
       file = auto_ptr<ifstream>(new ifstream(filename, ios_base::in | ios_base::binary));
       if (!(*file)) {
-        INPUT_ERROR("Can't open given input file '" + fname + "'.");
+        INPUT_ERROR("Can't open given input file '" + *fname + "'.");
       }
       in.push(*file);
     }
@@ -125,13 +98,34 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
     ConcreteFileReader<filtering_istream> infile(in, filename);
 
     if (infile.failed_open() || infile.eof()) {
-      INPUT_ERROR("Can't open given input file '" + fname + "'.");
+      INPUT_ERROR("Can't open given input file '" + *fname + "'.");
     }   
     
     try
     {
-      return readInput(&infile, parser_verbose);
-      // delete file;
+      string test_name = infile.get_string();
+      if(test_name != "MINION")
+	INPUT_ERROR("All Minion input files must begin 'MINION'");
+  
+      int inputFileVersionNumber = infile.read_num();
+  
+      if(inputFileVersionNumber > 3)
+	INPUT_ERROR("This version of Minion only supports formats up to 3");
+
+      // C++0x comment : Need MOVE (which is std::move) here to activate r-value references.
+      // Normally we wouldn't, but here the compiler can't figure out it can "steal" instance.
+      if(inputFileVersionNumber == 3)
+      {
+	readerThree.instance = MOVE(instance);
+	ReadCSP(readerThree, &infile);
+	instance = MOVE(readerThree.instance);
+      } 
+      else
+      {
+	reader.instance = MOVE(instance);
+	ReadCSP(reader, &infile);
+	instance = MOVE(reader.instance);
+      }
     }
     catch(parse_exception s)
     {
@@ -144,4 +138,6 @@ CSPInstance readInputFromFile(string fname, bool parser_verbose)
 #endif
         exit(1);
     }
+  }
+  readerThree.finalise();
 }

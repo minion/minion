@@ -34,7 +34,7 @@ namespace Controller
     maybe_print_search_state(stateObj, "Node: ", v);
 
     getState(stateObj).incrementNodeCount();
-    if(do_checks(stateObj))
+    if(do_checks(stateObj, order))
       return;
     
     // order.find_next_unassigned returns true if all variables assigned.

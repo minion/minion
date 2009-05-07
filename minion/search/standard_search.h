@@ -45,7 +45,7 @@ namespace Controller
     {
       D_ASSERT(getQueue(stateObj).isQueuesEmpty());
       getState(stateObj).incrementNodeCount();
-      if(do_checks(stateObj))
+      if(do_checks(stateObj, order))
         throw EndOfSearch();
 
       // order.find_next_unassigned returns true if all variables assigned.
