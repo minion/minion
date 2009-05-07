@@ -49,6 +49,7 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
 {
   MinionThreeInputReader<ConcreteFileReader<filtering_istream> > readerThree(parser_verbose);
   MinionInputReader<ConcreteFileReader<filtering_istream> > reader(parser_verbose);
+  bool needs_finalise_three = false;
   for(vector<string>::const_iterator fname = fnames.begin(); fname != fnames.end(); fname++) {
     const char* filename = fname->c_str();
     string extension;
@@ -105,26 +106,27 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
     {
       string test_name = infile.get_string();
       if(test_name != "MINION")
-	INPUT_ERROR("All Minion input files must begin 'MINION'");
+        INPUT_ERROR("All Minion input files must begin 'MINION'");
   
       int inputFileVersionNumber = infile.read_num();
   
       if(inputFileVersionNumber > 3)
-	INPUT_ERROR("This version of Minion only supports formats up to 3");
+        INPUT_ERROR("This version of Minion only supports formats up to 3");
 
       // C++0x comment : Need MOVE (which is std::move) here to activate r-value references.
       // Normally we wouldn't, but here the compiler can't figure out it can "steal" instance.
       if(inputFileVersionNumber == 3)
       {
-	readerThree.instance = MOVE(instance);
-	ReadCSP(readerThree, &infile);
-	instance = MOVE(readerThree.instance);
+        readerThree.instance = MOVE(instance);
+        ReadCSP(readerThree, &infile);
+        instance = MOVE(readerThree.instance);
+        needs_finalise_three = true;
       } 
       else
       {
-	reader.instance = MOVE(instance);
-	ReadCSP(reader, &infile);
-	instance = MOVE(reader.instance);
+        reader.instance = MOVE(instance);
+        ReadCSP(reader, &infile);
+        instance = MOVE(reader.instance);
       }
     }
     catch(parse_exception s)
@@ -139,5 +141,9 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
         exit(1);
     }
   }
-  readerThree.finalise();
+  if(needs_finalise_three)
+  {
+      readerThree.finalise();
+      instance = MOVE(readerThree.instance);
+  }
 }
