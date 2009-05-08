@@ -287,6 +287,7 @@ struct GCC : public AbstractConstraint
         #endif
     }
     
+    // to be deleted these two methods.
     #ifdef INCGRAPH
     inline void adjlist_remove(int var, int val)
     {

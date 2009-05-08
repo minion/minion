@@ -20,6 +20,117 @@
 #ifndef ALLDIFF_GCC_SHARED_H
 #define ALLDIFF_GCC_SHARED_H
 
+#include <vector>
+#include "constraint_abstract.h"
+
+#define REVERSELIST   // Is this really necessary now?
+
+template<typename VarArray, bool UseIncGraph>
+struct FlowConstraint : public AbstractConstraint
+{
+    protected:
+    
+    // Base class for GAC alldiff and GCC
+    FlowConstraint(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
+    numvars(0), numvals(0), dom_min(0), dom_max(0), 
+    #ifndef REVERSELIST
+    var_array(_var_array), 
+    #else
+    var_array(_var_array.rbegin(), _var_array.rend()),
+    #endif
+    constraint_locked(false)
+  {
+    if(var_array.size()>0)
+    {
+        dom_min=var_array[0].getInitialMin();
+        dom_max=var_array[0].getInitialMax();
+    }
+    for(int i=0; i<var_array.size(); ++i)
+    {
+      if(var_array[i].getInitialMin()<dom_min)
+          dom_min=var_array[i].getInitialMin();
+      if(var_array[i].getInitialMax()>dom_max)
+          dom_max=var_array[i].getInitialMax();
+    }
+    numvars=var_array.size();  // number of variables in the constraint
+    numvals=dom_max-dom_min+1;
+    
+    //to_process.reserve(var_array.size()); Could this be shared as well??
+    
+    if(UseIncGraph)
+    {
+        // refactor this to use initial upper and lower bounds.
+        adjlist.resize(numvars+numvals);
+        adjlistpos.resize(numvars+numvals);
+        for(int i=0; i<numvars; i++)
+        {
+            adjlist[i].resize(numvals);
+            for(int j=0; j<numvals; j++) adjlist[i][j]=j+dom_min;
+            adjlistpos[i].resize(numvals);
+            for(int j=0; j<numvals; j++) adjlistpos[i][j]=j;
+        }
+        for(int i=numvars; i<numvars+numvals; i++)
+        {
+            adjlist[i].resize(numvars);
+            for(int j=0; j<numvars; j++) adjlist[i][j]=j;
+            adjlistpos[i].resize(numvars);
+            for(int j=0; j<numvars; j++) adjlistpos[i][j]=j;
+        }
+        adjlistlength=getMemory(stateObj).backTrack().template requestArray<int>(numvars+numvals);
+        for(int i=0; i<numvars; i++) adjlistlength[i]=numvals;
+        for(int i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
+    }
+  }
+  
+  int numvars, numvals, dom_min, dom_max;
+    
+    VarArray var_array;
+    
+    bool constraint_locked;
+    
+    
+  
+    // Incremental adjacency lists
+    
+    // adjlist[varnum or val-dom_min+numvars] is the vector of vals in the 
+    // domain of the variable, or variables with val in their domain.
+    vector<vector<int> > adjlist;
+    MoveableArray<int> adjlistlength;
+    vector<vector<int> > adjlistpos;   // position of a variable in adjlist.
+    
+    inline void adjlist_remove(int var, int val)
+    {
+        // swap item at position varidx to the end, then reduce the length by 1.
+        int validx=val-dom_min+numvars;
+        int varidx=adjlistpos[validx][var];
+        D_ASSERT(varidx<adjlistlength[validx]);  // var is actually in the list.
+        delfromlist(validx, varidx);
+        
+        delfromlist(var, adjlistpos[var][val-dom_min]);
+    }
+    
+    inline void delfromlist(int i, int j)
+    {
+        // delete item in list i at position j
+        int t=adjlist[i][adjlistlength[i]-1];
+        adjlist[i][adjlistlength[i]-1]=adjlist[i][j];
+        
+        if(i<numvars)
+        {
+            adjlistpos[i][adjlist[i][j]-dom_min]=adjlistlength[i]-1;
+            adjlistpos[i][t-dom_min]=j;
+        }
+        else
+        {
+            adjlistpos[i][adjlist[i][j]]=adjlistlength[i]-1;
+            adjlistpos[i][t]=j;
+        }
+        adjlist[i][j]=t;
+        adjlistlength[i]=adjlistlength[i]-1;
+    }
+    
+};
+
 struct smallset
 {
     // a small set of integers (could be templated?) which

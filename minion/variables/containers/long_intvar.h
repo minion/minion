@@ -203,12 +203,13 @@ struct BigRangeVarContainer {
  
     bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m * 2 * sizeof(domain_bound_type));
     int temp1=bms_array->request_storage(var_offset.back());
-    D_ASSERT(temp1==0); // we should be at the front of the TMS.
+    
+    // correct var_offsets to start at the start of our block.
     if(temp1>0)
-    {   // Need to add the TMS offset onto all the var_offsets
+    {
         for(int i=0;i<var_offset.size(); i++) var_offset[i]+=temp1;
     }
-    //bms_array->lock(stateObj); // Don't lock it here. lock it in lock.
+    
     for(DomainInt j = 0; j < var_count_m; j++) {
            var_offset[j] = var_offset[j] - initial_bounds[j].first;  
     };

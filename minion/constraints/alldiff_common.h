@@ -86,18 +86,26 @@ using namespace std;
 //#define P(x) cout << x << endl
 //#define PLONG
 
-template<typename VarArray>
-struct GacAlldiff : public AbstractConstraint
+template<typename VarArray, bool UseIncGraph>
+struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
 {
+    using FlowConstraint<VarArray, UseIncGraph>::stateObj;
+    using FlowConstraint<VarArray, UseIncGraph>::constraint_locked;
+    using FlowConstraint<VarArray, UseIncGraph>::adjlist;
+    using FlowConstraint<VarArray, UseIncGraph>::adjlistlength;
+    using FlowConstraint<VarArray, UseIncGraph>::adjlistpos;
+    using FlowConstraint<VarArray, UseIncGraph>::dynamic_trigger_start;
+    using FlowConstraint<VarArray, UseIncGraph>::adjlist_remove;
+    using FlowConstraint<VarArray, UseIncGraph>::var_array;
+    using FlowConstraint<VarArray, UseIncGraph>::dom_min;
+    using FlowConstraint<VarArray, UseIncGraph>::dom_max;
+    using FlowConstraint<VarArray, UseIncGraph>::numvars;
+    using FlowConstraint<VarArray, UseIncGraph>::numvals;
+    
   virtual string constraint_name()
   { 
       return "GacAlldiff";
   }
-  
-  DomainInt dom_min, dom_max;
-  VarArray var_array;
-  
-  int numvars, numvals;
   
   vector<int> SCCs;    // Variable numbers
   ReversibleMonotonicSet SCCSplit;
@@ -109,38 +117,18 @@ struct GacAlldiff : public AbstractConstraint
   
   vector<int> varToSCCIndex;  // Mirror of the SCCs array.
   
-  GacAlldiff(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
-    dom_min(0), dom_max(0),
-    #ifndef REVERSELIST
-    var_array(_var_array), 
-    #else
-    var_array(_var_array.rbegin(), _var_array.rend()),
-    #endif
-    numvars(0), numvals(0),
-    SCCSplit(_stateObj, _var_array.size()), 
-    //sparevaluespresent(_stateObj, _var_array.size()), 
-    constraint_locked(false)
+  GacAlldiffConstraint(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
+    SCCSplit(_stateObj, _var_array.size())
+    //sparevaluespresent(_stateObj, _var_array.size())
   {
-      if(var_array.size()>0)
-      {
-          dom_min=var_array[0].getInitialMin();
-          dom_max=var_array[0].getInitialMax();
-      }
+      
       SCCs.resize(var_array.size());
       varToSCCIndex.resize(var_array.size());
       for(int i=0; i<var_array.size(); ++i)
       {
-          if(var_array[i].getInitialMin()<dom_min)
-              dom_min=var_array[i].getInitialMin();
-          if(var_array[i].getInitialMax()>dom_max)
-              dom_max=var_array[i].getInitialMax();
-          
           SCCs[i]=i;
           varToSCCIndex[i]=i;
-          //D_ASSERT(SCCSplit.isMember(i));  // Can't do this until the thing is locked.
       }
-      numvars=var_array.size();  // number of variables in the constraint
-      numvals=dom_max-dom_min+1;
       
       to_process.reserve(var_array.size());
       
@@ -180,35 +168,7 @@ struct GacAlldiff : public AbstractConstraint
       D_DATA(SCCSplit2=getMemory(stateObj).backTrack().request_bytes((sizeof(char) * numvars)));
       D_DATA(for(int i=0; i<numvars; i++) ((char *)SCCSplit2.get_ptr())[i]=1);
       
-      #ifdef INCGRAPH
-            // refactor this to use initial upper and lower bounds.
-            adjlist.resize(numvars+numvals);
-            adjlistpos.resize(numvars+numvals);
-            for(int i=0; i<numvars; i++)
-            {
-                adjlist[i].resize(numvals);
-                for(int j=0; j<numvals; j++) adjlist[i][j]=j+dom_min;
-                adjlistpos[i].resize(numvals);
-                for(int j=0; j<numvals; j++) adjlistpos[i][j]=j;
-            }
-            for(int i=numvars; i<numvars+numvals; i++)
-            {
-                adjlist[i].resize(numvars);
-                for(int j=0; j<numvars; j++) adjlist[i][j]=j;
-                adjlistpos[i].resize(numvars);
-                for(int j=0; j<numvars; j++) adjlistpos[i][j]=j;
-            }
-            adjlistlength=getMemory(stateObj).backTrack().template requestArray<int>(numvars+numvals);
-            for(int i=0; i<numvars; i++) adjlistlength[i]=numvals;
-            for(int i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
-        #endif
   }
-  
-  #ifdef INCGRAPH
-    vector<vector<int> > adjlist;
-    MoveableArray<int> adjlistlength;
-    vector<vector<int> > adjlistpos;   // position of a variable in adjlist.
-  #endif
   
   // only used in dynamic version.
   int dynamic_trigger_count()
@@ -258,6 +218,10 @@ struct GacAlldiff : public AbstractConstraint
   typedef typename VarArray::value_type VarRef;
   virtual AbstractConstraint* reverse_constraint()
   { // w-or of pairwise equality.
+      
+      /// solely for reify exps
+      return new CheckAssignConstraint<VarArray, GacAlldiffConstraint>(stateObj, var_array, *this);
+      
       vector<AbstractConstraint*> con;
       for(int i=0; i<var_array.size(); i++)
       {
@@ -288,7 +252,6 @@ struct GacAlldiff : public AbstractConstraint
   }
   #endif
   
-  bool constraint_locked;
   
   virtual void propagate(int prop_var, DomainDelta)
   {
@@ -348,9 +311,12 @@ struct GacAlldiff : public AbstractConstraint
         int assignedval=var_array[prop_var].getAssignedValue();
         for(int i=0; i<numvars; i++)
         {
-            if(i!=prop_var)
+            if(i!=prop_var && var_array[i].inDomain(assignedval))
             {
                 var_array[i].removeFromDomain(assignedval);
+                #ifdef INCGRAPH
+                    adjlist_remove(i, assignedval);
+                #endif
             }
         }
     }
@@ -448,9 +414,12 @@ struct GacAlldiff : public AbstractConstraint
         int assignedval=var_array[prop_var].getAssignedValue();
         for(int i=0; i<numvars; i++)
         {
-            if(i!=prop_var)
+            if(i!=prop_var && var_array[i].inDomain(assignedval))
             {
                 var_array[i].removeFromDomain(assignedval);
+                #ifdef INCGRAPH
+                    adjlist_remove(i, assignedval);
+                #endif
             }
         }
     }
@@ -680,9 +649,15 @@ struct GacAlldiff : public AbstractConstraint
                 // Now remove the value from the reduced SCC
                 for(int i=sccindex_start; i<=sccindex_end; i++)
                 {
-                    P("Removing var: "<< SCCs[i] << " val:" << tempval);
-                    var_array[SCCs[i]].removeFromDomain(tempval);
-                    if(getState(stateObj).isFailed()) return;
+                    if(var_array[SCCs[i]].inDomain(tempval))
+                    {
+                        P("Removing var: "<< SCCs[i] << " val:" << tempval);
+                        var_array[SCCs[i]].removeFromDomain(tempval);
+                        #ifdef INCGRAPH
+                            adjlist_remove(SCCs[i], tempval);
+                        #endif
+                        if(getState(stateObj).isFailed()) return;
+                    }
                 }
                 
                 if(sccindex_start<sccindex_end)
@@ -1114,40 +1089,6 @@ struct GacAlldiff : public AbstractConstraint
       #endif
   }
     
-  #ifdef INCGRAPH
-    inline void adjlist_remove(int var, int val)
-    {
-        // swap item at position varidx to the end, then reduce the length by 1.
-        int validx=val-dom_min+numvars;
-        int varidx=adjlistpos[validx][var];
-        D_ASSERT(varidx<adjlistlength[validx]);  // var is actually in the list.
-        delfromlist(validx, varidx);
-        
-        delfromlist(var, adjlistpos[var][val-dom_min]);
-    }
-    
-    inline void delfromlist(int i, int j)
-    {
-        // delete item in list i at position j
-        int t=adjlist[i][adjlistlength[i]-1];
-        adjlist[i][adjlistlength[i]-1]=adjlist[i][j];
-        
-        if(i<numvars)
-        {
-            adjlistpos[i][adjlist[i][j]-dom_min]=adjlistlength[i]-1;
-            adjlistpos[i][t-dom_min]=j;
-        }
-        else
-        {
-            adjlistpos[i][adjlist[i][j]]=adjlistlength[i]-1;
-            adjlistpos[i][t]=j;
-        }
-        adjlist[i][j]=t;
-        adjlistlength[i]=adjlistlength[i]-1;
-    }
-    #endif
-  
-  
     virtual BOOL check_assignment(DomainInt* v, int array_size)
     {
       D_ASSERT(array_size == var_array.size());

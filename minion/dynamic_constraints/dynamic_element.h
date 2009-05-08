@@ -282,11 +282,11 @@ struct ElementConstraintDynamic : public AbstractConstraint
     // resultvar.addDynamicTrigger(dt, DomainRemoval, i);
     // ++dt;
     // }
-    resultvar.addDynamicTrigger(dt, DomainChanged);
+    resultvar.addDynamicTrigger(dt, DomainChanged);  // Why is this always here-- why not place it when indexvar becomes assigned, lift it 
+    // whenever it triggers when indexvar is not assigned.
     ++dt;
     
     indexvar.addDynamicTrigger(dt, Assigned);
-    
   }
   
   
@@ -404,4 +404,5 @@ struct ElementConstraintDynamic : public AbstractConstraint
       return new Dynamic_OR(stateObj, con);
   }
 };
+
 #endif

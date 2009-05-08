@@ -140,7 +140,7 @@ struct CheckAssignConstraint : public AbstractConstraint
      for(int i = 0; i < variables.size(); ++i)
      {
        if(!variables[i].isAssigned()) 
-       {  
+       {
          assignment.push_back(make_pair(i, variables[i].getMin()));
          assignment.push_back(make_pair(i, variables[i].getMax()));
          return true;
