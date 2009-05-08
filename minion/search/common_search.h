@@ -180,19 +180,19 @@ namespace Controller
     left_branches_so_far.reserve(branches.size());
     for(vector<triple>::const_iterator curr = branches.begin(); curr != branches.end(); curr++) {
       if(curr->isLeft) {
- 	left_branches_so_far.push_back(*curr);
+        left_branches_so_far.push_back(*curr);
       } else {
-	fileout << "watched-or({";
-	for(vector<triple>::const_iterator lb = left_branches_so_far.begin(); 
-	    lb != left_branches_so_far.end();
-	    lb++) {
-	  fileout << "w-notliteral(";
-	  inputPrint(fileout, stateObj, order.var_order[lb->var].getBaseVar());
-	  fileout << "," << lb->val << "),";
-	}
-	fileout << "w-notliteral(";
-	inputPrint(fileout, stateObj, order.var_order[curr->var].getBaseVar());
-	fileout << "," << curr->val << ")})" << endl;
+        fileout << "watched-or({";
+        for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
+            lb != left_branches_so_far.end();
+            lb++) {
+          fileout << "w-notliteral(";
+          inputPrint(fileout, stateObj, order.var_order[lb->var].getBaseVar());
+          fileout << "," << lb->val << "),";
+        }
+        fileout << "w-notliteral(";
+        inputPrint(fileout, stateObj, order.var_order[curr->var].getBaseVar());
+        fileout << "," << curr->val << ")})" << endl;
       }
     }
     fileout << "**EOF**" << endl;
