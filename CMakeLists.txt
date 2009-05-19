@@ -525,9 +525,14 @@ add_custom_target(test-random-slow DEPENDS ${BINARY}
                     "--numtests=160" "--procs=2"
                     "--minion=${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
 
+add_custom_target(test-resume DEPENDS ${BINARY}
+                  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		  COMMAND "./mini-scripts/test-resume.sh"
+		     "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
+
 add_custom_target(test-quick)
 add_dependencies(test-quick test-instances-quick)
 add_custom_target(test)
-add_dependencies(test test-instances-slow test-random-quick)
+add_dependencies(test test-instances-slow test-random-quick test-resume)
 add_custom_target(test-slow)
-add_dependencies(test-slow test-instances-slow test-random-slow)
+add_dependencies(test-slow test-instances-slow test-random-slow test-resume)
