@@ -1,4 +1,4 @@
-Welcome to the Minion source!
+Welcome to the Minion source! Now in git!
 
 The minimum verson of CMake you'll need is 2.4.7. You'll also need Boost (at
 least version 1.33).
