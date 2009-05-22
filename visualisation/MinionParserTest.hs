@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -cpp #-}
 module MinionParserTest where
 
 import Text.ParserCombinators.Parsec
@@ -11,8 +12,10 @@ import MinionParser
 instance Eq ParseError where
    a == b = errorMessages a == errorMessages b
 
+#if __GLASGOW_HASKELL__ < 610
 instance Eq Message where
    (==) = messageEq
+#endif
 --------------------------------------------------------------------------------
 
 runTestsMinionParser = runTestTT $ test
