@@ -22,6 +22,15 @@
 
 #include "../system/system.h"
 
+#define BLOCK_CHAIN
+
+#ifdef P
+#undef P
+#endif
+
+#define P(x)
+//#define P(x) std::cout << x << std::endl
+
 /** \defgroup Memory
  *  This group of classes deals with all of Minion's memory management.
  */
@@ -217,22 +226,80 @@ class NewMemoryBlock
   void operator=(const NewMemoryBlock&);
   
   char* current_data;
+  
   unsigned allocated_bytes;
   unsigned maximum_bytes;
+  
+#ifdef BLOCK_CHAIN
+  vector<pair<char*, unsigned> > stored_blocks;
+  int total_stored_bytes;
+#endif
+
+#ifndef BLOCK_SIZE
+#define BLOCK_SIZE (16*1024*1024)
+#endif
+  
   bool lock_m;
   bool final_lock_m;
   SET_TYPE<MoveablePointer*> pointers;
 public:
   
   /// Gets a raw pointer to the start of the allocated memory.
-  char* getDataPtr()
-  { return current_data; }
+  //char* getDataPtr()
+  //{ return current_data; }
+#ifdef BLOCK_CHAIN
+  void storeMem(char* store_ptr)
+  {
+    P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
+    unsigned current_offset = 0;
+    for(int i = 0; i < stored_blocks.size(); ++i)
+    {
+      P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].first << " " << stored_blocks[i].second);
+      memcpy(store_ptr + current_offset, stored_blocks[i].first, stored_blocks[i].second);
+      current_offset += stored_blocks[i].second;
+    }
 
+    P((void*)(store_ptr + current_offset) << " " << (void*)current_data << " " << allocated_bytes);    
+    memcpy(store_ptr + current_offset, current_data, allocated_bytes);
+    D_ASSERT(getDataSize() == current_offset + allocated_bytes);
+  }
+
+  void retrieveMem(char* store_ptr)
+  {
+    P("RetrieveMem: " << (void*)this << " : " << (void*)store_ptr);
+    unsigned current_offset = 0;
+    for(int i = 0; i < stored_blocks.size(); ++i)
+    {
+      P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].first << " " << stored_blocks[i].second);
+      memcpy(stored_blocks[i].first, store_ptr + current_offset, stored_blocks[i].second);
+      current_offset += stored_blocks[i].second;
+    }
+    
+    P((void*)(store_ptr + current_offset) << " " << (void*)current_data << " " << allocated_bytes);
+    memcpy(current_data, store_ptr + current_offset, allocated_bytes);
+    D_ASSERT(getDataSize() == current_offset + allocated_bytes);
+  }
+  
+#else
+  void storeMem(char* store_ptr)
+  { memcpy(store_ptr, current_data, allocated_bytes); }
+  
+  void retrieveMem(char* store_ptr)
+  { memcpy(current_data, store_ptr, allocated_bytes); }
+#endif
+  
   /// Returns the size of the allocated memory in bytes.
   unsigned getDataSize()
-  { return allocated_bytes; }
+#ifdef BLOCK_CHAIN
+    { return total_stored_bytes + allocated_bytes; }
+#else
+    { return allocated_bytes; }
+#endif
 
   NewMemoryBlock() : current_data(NULL), allocated_bytes(0), maximum_bytes(0),
+#ifdef BLOCK_CHAIN
+                  total_stored_bytes(0),
+#endif
                   lock_m(false), final_lock_m(false)
   { memBlockCache.registerNewMemoryBlock(this);}
   
@@ -245,6 +312,7 @@ public:
   /// Request a new block of memory and returns a \ref MoveablePointer to it's start.
   MoveablePointer request_bytes(unsigned byte_count)
   {
+    P("Request: " << (void*)this << " : " << byte_count);
     if(byte_count == 0)
       return MoveablePointer(NULL);
       
@@ -254,9 +322,11 @@ public:
 
     D_ASSERT(!lock_m);
     if(maximum_bytes < allocated_bytes + byte_count)
-    { reallocate( (allocated_bytes + byte_count) * 2 ); }
+    { reallocate(byte_count); }
 
+    D_ASSERT(maximum_bytes >= allocated_bytes + byte_count);
     char* return_val = current_data + allocated_bytes;
+    P("Return val:" << (void*)current_data);
     allocated_bytes += byte_count;
     return MoveablePointer(return_val);
   }
@@ -270,9 +340,28 @@ public:
   }
 
 private:
-  /// Enlarges (or reduces) memory block and moves all \ref MoveablePointer to point to the new block.
-  void reallocate(unsigned byte_count)
+#ifdef BLOCK_CHAIN
+  void reallocate(unsigned byte_count_new_request)
   {
+    P("Reallocate: " << (void*)this << " : " << byte_count_new_request);
+    D_ASSERT(allocated_bytes + byte_count_new_request > maximum_bytes);
+
+    stored_blocks.push_back(make_pair(current_data, allocated_bytes));
+    P((void*)current_data << ":" << allocated_bytes << " of " << maximum_bytes);
+    total_stored_bytes += allocated_bytes;
+
+    unsigned new_block_size = max((unsigned)BLOCK_SIZE, byte_count_new_request);
+    current_data = (char*)malloc(new_block_size);
+    memset(current_data, 0, new_block_size);
+    P((void*)current_data << " " << new_block_size);
+    maximum_bytes = new_block_size;
+    allocated_bytes = 0; 
+  }
+#else  
+  /// Enlarges (or reduces) memory block and moves all \ref MoveablePointer to point to the new block.
+  void reallocate(unsigned byte_count_new_request)
+  {
+    unsigned byte_count = (allocated_bytes + byte_count_new_request) * 2;
     D_ASSERT(!lock_m);
     D_ASSERT(byte_count >= allocated_bytes);
     char* new_data = (char*)malloc(byte_count);
@@ -290,6 +379,7 @@ private:
     current_data = new_data;
     maximum_bytes = byte_count;
   }
+#endif
 public:
     
   /// Checks if vp points inside this memoryblock and if so registers it and returns true.
@@ -343,7 +433,7 @@ public:
   
   void lock()
   {
-    reallocate(allocated_bytes);
+    //reallocate(allocated_bytes);
     lock_m = true;
   }
    
@@ -351,6 +441,29 @@ public:
 
 // @}
 
+#ifdef BLOCK_CHAIN
+inline MoveablePointer::MoveablePointer(const MoveablePointer& b) : ptr(b.ptr)
+{ }
+
+inline void MoveablePointer::operator=(const MoveablePointer& b)
+{ ptr = b.ptr; }
+
+inline MoveablePointer::MoveablePointer(void* _ptr) : ptr(_ptr)
+{ }
+
+inline MoveablePointer::~MoveablePointer()
+{ }
+
+inline MoveablePointer::MoveablePointer(const MoveablePointer& b, int offset) : ptr(((char*)b.ptr) + offset)
+{ D_ASSERT(b.get_ptr() != NULL); }
+
+
+#ifdef SLOW_DEBUG
+inline void* MoveablePointer::get_ptr() const
+{ return ptr; }
+#endif
+
+#else
 inline MoveablePointer::MoveablePointer(const MoveablePointer& b) : ptr(b.ptr)
 {
   if(ptr != NULL)
@@ -396,8 +509,13 @@ inline void* MoveablePointer::get_ptr() const
 }
 #endif
 
+#endif
+
 inline void MemBlockCache::addPointerToNewMemoryBlock(MoveablePointer* vp)
   {
+#ifdef BLOCK_CHAIN
+    D_FATAL_ERROR("Fatal Exception");
+#endif
     LOCK(m);
     if(vp->get_ptr_noCheck() == NULL)
       return;
@@ -414,6 +532,9 @@ inline void MemBlockCache::addPointerToNewMemoryBlock(MoveablePointer* vp)
 
   inline void MemBlockCache::removePointerFromNewMemoryBlock(MoveablePointer* vp)
   {
+#ifdef BLOCK_CHAIN
+    D_FATAL_ERROR("Fatal Exception");
+#endif
     LOCK(m);
     for(vector<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
         it != NewMemoryBlockCache.end();

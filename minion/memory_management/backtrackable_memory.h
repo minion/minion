@@ -23,6 +23,12 @@
 #include "MemoryBlock.h"
 #include "../system/block_cache.h"
 
+#ifdef P
+#undef P
+#endif
+
+#define P(x)
+//#define P(x) std::cout << x << std::endl
 
 // \addtogroup Memory
 // @{
@@ -118,12 +124,12 @@ public:
     char *tmp = (char *) malloc(data_size);
 #endif
 
-    memcpy(tmp, new_memory_block.getDataPtr(), data_size);
+    new_memory_block.storeMem(tmp);
     backtrack_data.push_back(tmp);
 #else
     if(current_depth_m == max_depth)
       extend(max_depth * 2);
-    memcpy(backtrack_data + current_depth_m * data_size, new_memory_block.getDataPtr(), data_size);
+    new_memory_block.storeMem(backtrack_data + current_depth_m * data_size);
     current_depth_m++;
 #endif
   }
@@ -136,7 +142,7 @@ public:
 #ifdef BACKTRACK_VEC
     D_ASSERT(backtrack_data.size() > 0);
     char *tmp = backtrack_data.back();
-    memcpy(new_memory_block.getDataPtr(), tmp, data_size);
+    new_memory_block.retrieveMem(tmp);
     backtrack_data.pop_back();
 
 #ifdef MALLOC_CACHE
@@ -148,8 +154,7 @@ public:
 #else
     D_ASSERT(current_depth_m > 0);
     current_depth_m--;
-    
-    memcpy(new_memory_block.getDataPtr(), backtrack_data + current_depth_m * data_size, data_size);
+    new_memory_block.retrieveMem(backtrack_data + current_depth_m * data_size);
 #endif
   }
   
