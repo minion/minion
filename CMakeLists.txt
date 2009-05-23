@@ -19,47 +19,26 @@ if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
     message(FATAL_ERROR "You cannot run CMake in the source directory (please take a look at the README).")
 endif()
 
-# determine svn version and date
-set(SVNVERSION "0")
-set(SVNDATE "unknown")
-find_program(SVN svn)
-if(SVN)
-    execute_process(COMMAND ${SVN} info
+set(GITVERSION "0")
+set(GITDATE "unknown")
+find_program(GIT git)
+if(GIT)
+    execute_process(COMMAND ${GIT} log -1 --format=format:%H
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            RESULT_VARIABLE SVNINFO_STATUS
-            OUTPUT_VARIABLE SVNINFO OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if(SVNINFO_STATUS EQUAL 0)
-        string(REGEX MATCH "Last Changed Rev: [0-9]+" SVNVERSION "${SVNINFO}")
-        string(REPLACE "Last Changed Rev: " "" SVNVERSION ${SVNVERSION})
-        string(REGEX MATCH "Last Changed Date: .+" SVNDATE "${SVNINFO}")
-        string(REPLACE "Last Changed Date: " "" SVNDATE ${SVNDATE})
-        message(STATUS "SVN version ${SVNVERSION}, date ${SVNDATE}")
-    else()
-        # try git
-        find_program(GIT git)
-        if(GIT)
-            execute_process(COMMAND ${GIT} svn info
-                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                    RESULT_VARIABLE SVNINFO_STATUS
-                    OUTPUT_VARIABLE SVNINFO OUTPUT_STRIP_TRAILING_WHITESPACE)
-            if(SVNINFO_STATUS EQUAL 0)
-                string(REGEX MATCH "Last Changed Rev: [0-9]+" SVNVERSION "${SVNINFO}")
-                string(REPLACE "Last Changed Rev: " "" SVNVERSION ${SVNVERSION})
-                string(REGEX MATCH "Last Changed Date: .+" SVNDATE "${SVNINFO}")
-                string(REPLACE "Last Changed Date: " "" SVNDATE ${SVNDATE})
-                message(STATUS "SVN version ${SVNVERSION}, date ${SVNDATE}")
-            endif()
-        endif()
+            OUTPUT_VARIABLE GITVERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${GIT} log -1 --format=format:%ad
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+            OUTPUT_VARIABLE GITDATE OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(GITDATE STREQUAL "unknown")
+        message(STATUS "Unable to determine git version (no checkout?)")
     endif()
-    if(SVNDATE STREQUAL "unknown")
-        message(STATUS "Unable to determine SVN version (no checkout?)")
-    endif()
+    message(STATUS "Git version ${GITVERSION}, date ${GITDATE}")
 else()
-    message(STATUS "No SVN executable found, unable to determine SVN version and date")
+    message(STATUS "No git executable found, unable to determine git version and date")
 endif()
 
-file(APPEND ${BUILD_DEF_FILE} "#define SVN_VER ${SVNVERSION}\n")
-file(APPEND ${BUILD_DEF_FILE} "#define SVN_DATE ${SVNDATE}\n")
+file(APPEND ${BUILD_DEF_FILE} "#define GIT_VER ${GITVERSION}\n")
+file(APPEND ${BUILD_DEF_FILE} "#define GIT_DATE ${GITDATE}\n")
 
 
 # if we have a bash, generate constraints and help if necessary and add build

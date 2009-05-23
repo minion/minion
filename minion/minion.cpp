@@ -34,19 +34,20 @@
 
 #include "MILtools/sym_output.h"
 
-#ifndef SVN_VER
-#define SVN_VER 0
+#ifndef GIT_VER
+#define GIT_VER "0"
 #endif
 
-#ifndef SVN_DATE
-#define SVN_DATE Not from a svn checkout
+#ifndef GIT_DATE
+#define GIT_DATE Not from a git checkout
 #endif
 
 // The marvels of the C pre-processor...
 #define CAJ_EXPAND(x) #x
 #define CAJ_STRING(x) CAJ_EXPAND(x)
 
-#define SVN_DATE_STRING CAJ_STRING(SVN_DATE)
+#define GIT_DATE_STRING CAJ_STRING(GIT_DATE)
+#define GIT_VER_STRING CAJ_STRING(GIT_VER)
 
 
 
@@ -350,7 +351,7 @@ try {
 
   if (argc == 1) {
     getOptions(stateObj).printLine("# " + to_string(VERSION));
-    getOptions(stateObj).printLine("# Svn version: " + to_string(SVN_VER));
+    getOptions(stateObj).printLine("# Git version: " + to_string(GIT_VER_STRING));
     print_default_help(argv);
     return EXIT_SUCCESS;
   }
@@ -376,12 +377,12 @@ try {
     getState(stateObj).getOldTimer().setOutputType(getOptions(stateObj).outputType);
 
   getOptions(stateObj).printLine("# " + to_string(VERSION));
-  getOptions(stateObj).printLine("# Svn version: " + to_string(SVN_VER));
+  getOptions(stateObj).printLine("# Git version: " + to_string(GIT_VER_STRING));
 
   if (!getOptions(stateObj).silent)
   {
 
-    getOptions(stateObj).printLine("# Svn last changed date: " + to_string(SVN_DATE_STRING) );
+    getOptions(stateObj).printLine("# Git last changed date: " + to_string(GIT_DATE_STRING) );
 
     time_t rawtime;
     time(&rawtime);
@@ -441,7 +442,7 @@ try {
     getTableOut().set("Preprocess", string(b));
   }
   // should be one for varorder as well.
-  getTableOut().set("MinionVersion", SVN_VER);
+  getTableOut().set("MinionVersion", GIT_VER_STRING);
   getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
   getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions(stateObj).silent);
 
