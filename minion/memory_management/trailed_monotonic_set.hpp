@@ -18,36 +18,6 @@
 */
 
 
-    // This should no longer be used. Use request_storage and lock instead.
-/*inline void TrailedMonotonicSet::initialise(const int& new_size, const int& max_undos, StateObj * _stateObj)
-{ 
-    stateObj=_stateObj;
-    
-    _size = new_size;
-    _max_undos = max_undos;
-    
-    // should put in a D_ASSERT on MAXINT here
-    // D_ASSERT( max_undos < MAXINT - size);
-    
-    _max_depth = max_undos;             
-    _local_depth = 0;
-    
-    _array = getMemory(stateObj).nonBackTrack().request_bytes(_size*sizeof(value_type)); 
-    _undo_indexes = getMemory(stateObj).nonBackTrack().request_bytes(_max_depth*sizeof(int));
-    
-    _backtrack_depth_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(int));
-    *((int*)_backtrack_depth_ptr.get_ptr()) = 0;
-    
-    #ifdef DEBUG_TMS
-    cout << "initialising TrailedMonotonicSet with value of size= " << size << endl;
-    // print_state();
-    #endif
-    
-    for(int i=0; i< new_size; i++) {
-      array(i) = tms_in_set;
-    };
-}*/
-
   // Must be run before the lock for nonbacktrack.
 inline void TrailedMonotonicSet::lock(StateObj * _stateObj)
 {

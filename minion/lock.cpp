@@ -49,15 +49,10 @@ void lock(StateObj* stateObj)
     if(!getQueue(stateObj).isQueuesEmpty())
     {
         getQueue(stateObj).propagateQueueRoot();
-        
-        // old AC1 stuff
-      //getQueue(stateObj).clearQueues();
-      //prop_to_do = true;
     }
   }
-  //}
   
   getState(stateObj).markLocked();
 
-} // lock()
+}
 }
