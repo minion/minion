@@ -17,44 +17,44 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-/** @help constraints;lexless Description
+/** @help constraints;gaclexless Description
 The constraint
 
-   lexless(vec0, vec1)
+   gaclexless(vec0, vec1)
 
 takes two vectors vec0 and vec1 of the same length and ensures that
 vec0 is lexicographically less than vec1 in any solution.
 */
 
-/** @help constraints;lexless Notes
+/** @help constraints;gaclexless Notes
 This constraint maintains GAC.
 */
 
-/** @help constraints;lexless References
+/** @help constraints;gaclexless References
 See also
 
-   help constraints lexleq
+   help constraints gaclexleq
 
 for a similar constraint with non-strict lexicographic inequality.
 */
 
-/** @help constraints;lexleq Description
+/** @help constraints;gaclexleq Description
 The constraint
 
-   lexleq(vec0, vec1)
+   gaclexleq(vec0, vec1)
 
 takes two vectors vec0 and vec1 of the same length and ensures that
 vec0 is lexicographically less than or equal to vec1 in any solution.
 */
 
-/** @help constraints;lexleq Notes
+/** @help constraints;gaclexleq Notes
 This constraints achieves GAC.
 */
 
-/** @help constraints;lexleq References
+/** @help constraints;gaclexleq References
 See also
 
-   help constraints lexless
+   help constraints gaclexless
 
 for a similar constraint with strict lexicographic inequality.
 */
