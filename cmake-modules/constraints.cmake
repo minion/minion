@@ -1,7 +1,7 @@
 set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "gacelement-deprecated" "alldiff" "gacalldiff" "gcc" "gccweak" "watchneq"
                     "diseq" "__reify_diseq" "eq" "__reify_eq" "minuseq" "__reify_minuseq"
-                    "abs" "ineq" "watchless" "lexleq" "lexless" "max" "min" "occurrence"
+                    "abs" "ineq" "watchless" "gaclexleq" "gaclexless" "lexleq" "lexless" "max" "min" "occurrence"
                     "occurrenceleq" "occurrencegeq" "product" "difference"
                     "weightedsumleq" "weightedsumgeq" "sumgeq" "sumleq" "watchsumgeq"
                     "watchsumleq" "table" "negativetable" "watchvecneq" "litsumgeq"
@@ -78,6 +78,13 @@ set(NAME_READ_lexleq "read_list" "read_list")
 
 set(NAME_ID_lexless "CT_LEXLESS")
 set(NAME_READ_lexless "read_list" "read_list")
+
+set(NAME_ID_gaclexleq "CT_GACLEXLEQ")
+set(NAME_READ_gaclexleq "read_list" "read_list")
+
+set(NAME_ID_gaclexless "CT_GACLEXLESS")
+set(NAME_READ_gaclexless "read_list" "read_list")
+
 
 set(NAME_ID_max "CT_MAX")
 set(NAME_READ_max "read_list" "read_var")
