@@ -53,5 +53,5 @@ To clean all generated files, simply delete the directory you did the build in.
 
 the "docs" directory contains a full manual for Minion. 
 The "benchmarks" directory contains a range of example programs.
-The "generators" directory contains a number of generators. These are
-in general poorly documented. Sorry.
+The "generators" directory contains a number of generators, these are
+in general poorly documented.
