@@ -6,7 +6,6 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-modules)
 include(CheckIncludeFileCXX)
 include(CheckCXXCompilerFlag)
 include(FindBoost)
-#include(FindGMP)
 include(constraints)
 include(CheckIncludeFiles)
 
