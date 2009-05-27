@@ -42,9 +42,6 @@
 
 #define SCCCARDS
 
-// This option has been moved to the third template parameter.
-//#define STRONGCARDS
-
 //Incremental graph -- maintains adjacency lists for values and vars
 #define INCGRAPH
 
@@ -56,17 +53,37 @@
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
 
-template<typename VarArray1, typename VarArray2, int Strongcards>
-struct GCC : public AbstractConstraint
+template<typename VarArray, typename CapArray, bool Strongcards, bool UseIncGraph>
+struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 {
-    GCC(StateObj* _stateObj, const VarArray1& _var_array, const VarArray2& _capacity_array, vector<vector<int> > val_arrays) : AbstractConstraint(_stateObj),
-    var_array(_var_array), capacity_array(_capacity_array), 
-    numvals(count_values()), constraint_locked(false),
+    using FlowConstraint<VarArray, UseIncGraph>::stateObj;
+    using FlowConstraint<VarArray, UseIncGraph>::constraint_locked;
+    
+    using FlowConstraint<VarArray, UseIncGraph>::adjlist;
+    using FlowConstraint<VarArray, UseIncGraph>::adjlistlength;
+    using FlowConstraint<VarArray, UseIncGraph>::adjlistpos;
+    using FlowConstraint<VarArray, UseIncGraph>::adjlist_remove;
+    
+    using FlowConstraint<VarArray, UseIncGraph>::dynamic_trigger_start;
+    using FlowConstraint<VarArray, UseIncGraph>::var_array;
+    using FlowConstraint<VarArray, UseIncGraph>::dom_min;
+    using FlowConstraint<VarArray, UseIncGraph>::dom_max;
+    using FlowConstraint<VarArray, UseIncGraph>::numvars;
+    using FlowConstraint<VarArray, UseIncGraph>::numvals;
+    using FlowConstraint<VarArray, UseIncGraph>::varvalmatching;
+    
+    using FlowConstraint<VarArray, UseIncGraph>::varinlocalmatching;
+    using FlowConstraint<VarArray, UseIncGraph>::valinlocalmatching;
+    using FlowConstraint<VarArray, UseIncGraph>::invprevious;
+    
+    using FlowConstraint<VarArray, UseIncGraph>::initialize_hopcroft;
+    
+    GCC(StateObj* _stateObj, const VarArray& _var_array, const CapArray& _capacity_array, vector<vector<int> > val_arrays) : 
+    FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
+    capacity_array(_capacity_array), 
     SCCSplit(_stateObj, numvars+numvals)
     {
-        GCCPRINT("numvars:"<< numvars << ", numvals:"<< numvals);
-        
-        val_array = val_arrays[0];
+        val_array = val_arrays[0]; // the values of interest
         D_ASSERT(capacity_array.size()==val_array.size());
         
         for(int i=0; i<val_array.size(); i++)
@@ -76,13 +93,14 @@ struct GCC : public AbstractConstraint
                 D_ASSERT(val_array[i]!=val_array[j]);
             }
         }
-        varvalmatching.resize(numvars, dom_min-1);
         usage.resize(numvals, 0);
         
         lower.resize(numvals, 0);
         upper.resize(numvals, numvars);
         
         prev.resize(numvars+numvals);
+        
+        initialize_hopcroft();
         initialize_tarjan();
         
         // SCC data structures
@@ -140,75 +158,20 @@ struct GCC : public AbstractConstraint
         augpath.reserve(numvars+numvals+1);
         //fifo.reserve(numvars+numvals);
         
-        #ifdef INCGRAPH
-            // refactor this to use initial upper and lower bounds.
-            adjlist.resize(numvars+numvals);
-            adjlistpos.resize(numvars+numvals);
-            for(int i=0; i<numvars; i++)
-            {
-                adjlist[i].resize(numvals);
-                for(int j=0; j<numvals; j++) adjlist[i][j]=j+dom_min;
-                adjlistpos[i].resize(numvals);
-                for(int j=0; j<numvals; j++) adjlistpos[i][j]=j;
-            }
-            for(int i=numvars; i<numvars+numvals; i++)
-            {
-                adjlist[i].resize(numvars);
-                for(int j=0; j<numvars; j++) adjlist[i][j]=j;
-                adjlistpos[i].resize(numvars);
-                for(int j=0; j<numvars; j++) adjlistpos[i][j]=j;
-            }
-            adjlistlength=getMemory(stateObj).backTrack().template requestArray<int>(numvars+numvals);
-            for(int i=0; i<numvars; i++) adjlistlength[i]=numvals;
-            for(int i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
-        #endif
-        
         #ifdef CAPBOUNDSCACHE
         boundsupported.resize(numvals*2, -1);  
         // does the bound need to be updated? Indexed as validx*2 for lowerbound, validx*2+1 for ub
         // Contains the capacity value which is supported. Reset to -1 if the support is lost.
         #endif
+        
+        for(int i=0; i<numvars; i++)
+            varvalmatching[i]=dom_min-1;
     }
     
-    VarArray1 var_array;   // primary variables
-    VarArray2 capacity_array;   // capacities for values of interest
+    CapArray capacity_array;   // capacities for values of interest
     vector<int> val_array;   // values of interest
-    int dom_min, dom_max, numvars, numvals;
-    
-    #ifdef INCGRAPH
-    vector<vector<int> > adjlist;
-    MoveableArray<int> adjlistlength;
-    vector<vector<int> > adjlistpos;   // position of a variable in adjlist.
-    #endif
-    
-    int count_values()
-    {
-        // called in initializer list.
-        numvars=var_array.size();  // number of target variables in the constraint
-        if(var_array.size()>0)
-        {
-            dom_min=var_array[0].getInitialMin();
-            dom_max=var_array[0].getInitialMax();
-        }
-        else
-        {
-            dom_min=0;
-            dom_max=-1;  // avoids running the body of any loops which go from min to max
-            return 0; // numvals
-        }
-        for(int i=0; i<var_array.size(); ++i)
-        {
-          if(var_array[i].getInitialMin()<dom_min)
-              dom_min=var_array[i].getInitialMin();
-          if(var_array[i].getInitialMax()>dom_max)
-              dom_max=var_array[i].getInitialMax();
-        }
-        return dom_max-dom_min+1;
-    }
     
     vector<int> val_to_cap_index;
-    
-    bool constraint_locked;
     
     vector<int> vars_in_scc;
     vector<int> vals_in_scc;  // Actual values.
@@ -286,40 +249,6 @@ struct GCC : public AbstractConstraint
         do_gcc_prop();
         #endif
     }
-    
-    // to be deleted these two methods.
-    #ifdef INCGRAPH
-    inline void adjlist_remove(int var, int val)
-    {
-        // swap item at position varidx to the end, then reduce the length by 1.
-        int validx=val-dom_min+numvars;
-        int varidx=adjlistpos[validx][var];
-        D_ASSERT(varidx<adjlistlength[validx]);  // var is actually in the list.
-        delfromlist(validx, varidx);
-        
-        delfromlist(var, adjlistpos[var][val-dom_min]);
-    }
-    
-    inline void delfromlist(int i, int j)
-    {
-        // delete item in list i at position j
-        int t=adjlist[i][adjlistlength[i]-1];
-        adjlist[i][adjlistlength[i]-1]=adjlist[i][j];
-        
-        if(i<numvars)
-        {
-            adjlistpos[i][adjlist[i][j]-dom_min]=adjlistlength[i]-1;
-            adjlistpos[i][t-dom_min]=j;
-        }
-        else
-        {
-            adjlistpos[i][adjlist[i][j]]=adjlistlength[i]-1;
-            adjlistpos[i][t]=j;
-        }
-        adjlist[i][j]=t;
-        adjlistlength[i]=adjlistlength[i]-1;
-    }
-    #endif
     
     // convert constraint into dynamic. 
     int dynamic_trigger_count()
@@ -723,16 +652,14 @@ struct GCC : public AbstractConstraint
         }
         }
         
-        #if !defined(SCCCARDS) || !defined(STRONGCARDS)
+        #if !defined(SCCCARDS)
             prop_capacity();
         #endif
         
-        #if defined(SCCCARDS)
         if(!Strongcards)
         {
             prop_capacity();
         }
-        #endif
         
         // temporary to test without strong upperbound pruning.
         #if defined(SCCCARDS)
@@ -754,7 +681,6 @@ struct GCC : public AbstractConstraint
     vector<int> upper;
     vector<int> usage;
     vector<int> usagebac;
-    vector<int> varvalmatching;
     
     // Incremental SCC data.
     vector<int> SCCs;    // Variable numbers and values as val-dom_min+numvars
@@ -1193,9 +1119,6 @@ struct GCC : public AbstractConstraint
     
     int max_dfs;
     
-    smallset valinlocalmatching;
-    smallset varinlocalmatching;
-    
     int varcount, valcount;
     //int localmin,localmax;
     
@@ -1214,7 +1137,7 @@ struct GCC : public AbstractConstraint
         curnodestack.reserve(numnodes);
         
         //valinlocalmatching.reserve(numvals);
-        varinlocalmatching.reserve(numvars);
+        //varinlocalmatching.reserve(numvars);
     }
     
     void tarjan_recursive(int sccindex_start)
@@ -2023,15 +1946,15 @@ struct GCC : public AbstractConstraint
         return usage[startvalindex];
     }
     
-    typedef typename VarArray2::value_type CapVarRef;
+    typedef typename CapArray::value_type CapVarRef;
     virtual AbstractConstraint* reverse_constraint()
     {
         // use a watched-or of NotOccurrenceEqualConstraint, i.e. the negation of occurrence
         vector<AbstractConstraint*> con;
         for(int i=0; i<capacity_array.size(); i++)
         {
-            NotOccurrenceEqualConstraint<VarArray1, DomainInt, CapVarRef>*
-                t=new NotOccurrenceEqualConstraint<VarArray1, DomainInt, CapVarRef>(
+            NotOccurrenceEqualConstraint<VarArray, DomainInt, CapVarRef>*
+                t=new NotOccurrenceEqualConstraint<VarArray, DomainInt, CapVarRef>(
                     stateObj, var_array, val_array[i], capacity_array[i]);
             con.push_back((AbstractConstraint*) t);
         }
