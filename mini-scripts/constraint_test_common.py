@@ -6,14 +6,14 @@ from weakref import ref   ## why?
 #   Code for comparing two search trees dumped by -dumptree.
 #
 
-
+# should match defn of partition method of a string
 def partition(splitter, st):
     # split the string on the first instance of splitter
-    st2=st.split(splitter, 1)
-    if len(st2)==1:
-        return (st2[0], splitter, "")
+    idx=st.find(splitter)
+    if idx==-1:
+        return (st[:], "", "")
     else:
-        return (st2[0], splitter, st2[1])
+        return (st[:idx], splitter, st[idx+len(splitter):])
 
 class sol:
     def read(self, line):
@@ -244,10 +244,6 @@ class tree:
         # use node.left and node.right and node.parent elements to construct a tree of node and sol
         linesraw=open(filename, 'r').readlines()
         tags=["Node", "Sol", "SearchAssign", "SearchAction", "Solution Number", "Problem solvable?"]  # These are the tags to pick out of the file.
-        def filt(x):
-            (left, temp, right)=partition(":", x)
-            return left in tags
-        lines=[x for x in linesraw if filt(x) in tags]
         
         splitlines=[]
         for line in linesraw:
@@ -264,32 +260,31 @@ class tree:
                     assert splitline[1]=="no"
                     self.solvable=False
         
-        # splitlines not used yet.
-        
         assert hasattr(self, "solvable")
         
-        # Now merge adjacent solution lines into one
+        # Merge adjacent solution lines into one
         i=0
-        while i<len(lines)-1:
-            (tag, temp, rest)=partition(":", lines[i])
-            (tag2, temp, rest2)=partition(":", lines[i+1])
+        while i<len(splitlines)-1:
+            (tag, rest)=splitlines[i]
+            (tag2, rest2)=splitlines[i+1]
             if tag!="Sol" or tag2!="Sol":
                 i=i+1
             else:
-                newstring="Sol:"+rest.strip()+" "+rest2.strip()
-                lines[i:i+2]=[newstring]
+                newstring=rest.strip()+" "+rest2.strip()
+                splitlines[i:i+2]=[("Sol", newstring)]
         
         #print "Entering buildtree"
         rootnode=False
         curnode=False
         curassign=False
-        for line in lines:
-            (tag, temp, rl1)=partition(":", line)
+        for line in splitlines:
+            (tag, rl1)=line
             if rootnode==False:
-                assert tag=="Node"
-                rootnode=node()
-                rootnode.read(rl1)
-                curnode=rootnode
+                assert tag=="Node" or tag=="Problem solvable?"
+                if tag=="Node":
+                    rootnode=node()
+                    rootnode.read(rl1)
+                    curnode=rootnode
             else:
                 if tag=="Node":
                     if curassign=="=" or (hasattr(curnode, "nodenum") and curnode.nodenum==0):
@@ -321,10 +316,14 @@ class tree:
                     assert rl1.strip()=="bt"
                     curassign=False
                 elif tag=="Solution Number":
-                    assert hasattr(curnode, "solution")
+                    if not hasattr(curnode, "solution"):
+                        # deal with the strange case of problems with no variables (therefore no Sol: lines)
+                        curnode.left=sol()
+                        curnode.left.parent=curnode
+                        curnode=curnode.left
+                        curnode.solution=[]
                     curnode.solnum=int(rl1.strip())
-                else:
-                    assert tag=="SearchAssign"
+                elif tag=="SearchAssign":
                     assert not curassign
                     (part1, temp, part2)=partition("=", rl1)
                     if part1[-1]=="!":
@@ -335,6 +334,8 @@ class tree:
                     else:
                         curassign="="
                         curnode.assignpair=(part1, part2)
+                else:
+                    assert tag=="Problem solvable?"
         self.rootnode=rootnode
     
     def printtree(self, curnode=False):
@@ -776,6 +777,26 @@ class testlexless(testlexleq):
     
     def runtest(self, options=dict()):
         return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], self, True)
+
+class testlexleq_repeatedvars:
+    def printtable(self, domains, less=False):
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            l1=l[:len(l)/2]
+            l2=l[len(l)/2:]
+            
+            if (not less and l1 <= l2) or (less and l1<l2):
+                out.append(l)
+        return out
+    
+    def runtest(self, options=dict()):
+        (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, boundsallowed)
+        setattr(self, "constants", constants)
+        
+        
+        #return runtestgeneral("lexleq", True, options, [4,4], ["smallnum", "smallnum"], self, True)
 
 class testmax:
     def printtable(self, domains, ismax=True):
