@@ -1,0 +1,24 @@
+MINION 1
+#TEST SOLCOUNT 16
+#This just sanity checks a number of powers
+
+0
+3
+1 10 1
+1 4  1
+1 10 1
+0
+0
+0
+
+[]
+[]
+
+0 
+1
+[ [ x0,x1,x2] ]
+0
+objective none
+print m0
+
+pow(x0,x1,x2)

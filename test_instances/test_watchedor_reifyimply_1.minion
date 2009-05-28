@@ -1,0 +1,14 @@
+#TEST SOLCOUNT 7
+# Recursive test
+MINION 3
+
+**VARIABLES**
+BOOL a
+BOOL b
+BOOL c
+
+**CONSTRAINTS**
+
+reifyimply(watched-or({w-inset(a,[1]),w-inset(b,[0])}), c)
+
+**EOF**
