@@ -59,8 +59,8 @@
   for a similar constraint with strict lexicographic inequality.
 */
 
-#ifndef CONSTRAINT_LEX_H
-#define CONSTRAINT_LEX_H
+#ifndef CONSTRAINT_GACLEX_H
+#define CONSTRAINT_GACLEX_H
 
 template<typename VarArray1, typename VarArray2, BOOL Less = false>
   struct GacLexLeqConstraint : public AbstractConstraint
