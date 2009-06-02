@@ -1,0 +1,13 @@
+MINION 3
+#TEST SOLCOUNT 2
+
+**VARIABLES**
+
+BOOL d[2]
+
+**CONSTRAINTS**
+
+lexleq([d[0], ], [d[1], ])
+lexleq([d[1], ], [d[0], ])
+
+**EOF**
