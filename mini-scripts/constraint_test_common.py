@@ -630,7 +630,7 @@ class testalldiff:
 
 class testgacalldiff(testalldiff):
     def runtest(self, options=dict()):
-        return runtestgeneral("gacalldiff", False, options, [5], ["quitesmallnum"], self, True)
+        return runtestgeneral("gacalldiff", False, options, [5], ["quitesmallnum"], self, not options['reify'])
 
 class testdiseq(testalldiff):
     def runtest(self, options=dict()):
