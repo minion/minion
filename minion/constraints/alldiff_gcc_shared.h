@@ -818,6 +818,7 @@ struct FlowConstraint : public AbstractConstraint
     
     // This one uses dom_min-1 as a marker for 'free variable' in matching.
     // also has upper as the upper bound for value nodes, indexed by val+dom_min
+    // usage is the occurrences of each value in the matching. 
     
     // Oh no -- does this work with SCCs??
     // First do it without using SCCs.
@@ -852,6 +853,8 @@ struct FlowConstraint : public AbstractConstraint
         
         int localnumvars=sccend-sccstart+1;
         
+        // This is the wrong datastructure. Shoudl be edges, not vertices.
+        // Or perhaps both, because a vertex is removed when the DFS explores it.
         vector<vector<int> > layers; // turn this into a box of boxes??
         
         layers.resize(10000);
@@ -1081,51 +1084,13 @@ struct FlowConstraint : public AbstractConstraint
         augpath.clear();
     }
     
-    bool recurse(int val)
-    {
-        // Again values are val-dom_min in this function.
-        // Clearly this should be turned into a loop.
-        //cout << "Entering recurse with value " <<val <<endl;
-        if(invprevious.in(val))
-        {
-            vector<int>& listvars=vprevious[val];  //L
-            
-            // Remove the value from vprevious.
-            invprevious.remove(val);
-            
-            for(int i=0; i<listvars.size(); ++i)  //for u in L
-            {
-                int tempvar=listvars[i];
-                int pu=uprevious[tempvar];
-                if(pu!=-2)   // if u in pred:
-                {
-                    uprevious[tempvar]=-2;
-                    //cout<<"Variable: "<<tempvar<<endl;
-                    if(pu==-1 || recurse(pu))
-                    {
-                        //cout << "Setting "<< tempvar << " to " << val <<endl;
-                        
-                        if(!valinlocalmatching.in(val))  // If we are not replacing a mapping
-                        {
-                            valinlocalmatching.insert(val);
-                        }
-                        
-                        valvarmatching[val]=tempvar;
-                        //varvalmatching[tempvar]=val+dom_min;  // This will be 
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
     
 };
 
 struct deque_fixed_size
 {
     // replacement for stl deque. This one is a fixed size circular array.
-    // pluggable for deque in gcc_common.h
+    // pluggable for deque in gcc_common.h -- no faster.
     vector<int> list;
     int head, tail;
     
