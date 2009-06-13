@@ -36,7 +36,7 @@
 //#define CHECKDOMSIZE
 
 // Process SCCs independently
-#define SCC
+//#define SCC
 
 // Warning: if this is not defined, then watchedalldiff probably won't do anything.
 //#define USEWATCHES
@@ -51,7 +51,12 @@
 #define INCREMENTALMATCH
 
 // Use BFS instead of HK
-#define BFSMATCHING
+//#define BFSMATCHING
+
+// Use the new hopcroft-karp implementation.
+#define NEWHK
+
+#define INCGRAPH
 
 // Use staging a la Schulte and Stuckey
 #define STAGED
@@ -179,9 +184,10 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     // First an array of watches for the matching, then a 2d array of mixed triggers
     // indexed by [var][count] where count is increased from 0 as the triggers are used.
     int numtrigs=0;
-    #ifdef INCGRAPH
-    numtrigs+=numvars*numvals; // one for each var-val pair so we know when it is removed.
-    #endif
+    if(UseIncGraph)
+    {
+        numtrigs+=numvars*numvals; // one for each var-val pair so we know when it is removed.
+    }
     
     #ifdef DYNAMICALLDIFF
     numtrigs+= numvars+numvars*numvals;
@@ -1679,7 +1685,22 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         #ifdef BFSMATCHING
         return bfs_wrapper(sccstart,sccend);
         #else
+        #ifdef NEWHK
+        // This is just to test the new HK implementation. 
+        // to use this, must not be using SCCs and must be using incgraph.
+        vector<int> upper;
+        upper.resize(numvals, 1);
+        vector<int> usage;
+        usage.resize(numvals, 0);
+        for(int i=0; i<numvars; i++)
+        {
+            D_ASSERT(usage[varvalmatching[i]-dom_min]==0);
+            usage[varvalmatching[i]-dom_min]=1;
+        }
+        return hopcroft_wrapper2(sccstart, sccend, SCCs, varvalmatching, upper, usage);
+        #else
         return hopcroft_wrapper(sccstart,sccend, SCCs);
+        #endif
         #endif
     }
     

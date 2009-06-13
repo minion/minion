@@ -78,12 +78,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     using FlowConstraint<VarArray, UseIncGraph>::initialize_hopcroft;
     
-    GCC(StateObj* _stateObj, const VarArray& _var_array, const CapArray& _capacity_array, vector<vector<int> > val_arrays) : 
+    GCC(StateObj* _stateObj, const VarArray& _var_array, const CapArray& _capacity_array, vector<int> _val_arrays) : 
     FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
-    capacity_array(_capacity_array), 
+    capacity_array(_capacity_array), val_array(_val_array),
     SCCSplit(_stateObj, numvars+numvals)
     {
-        val_array = val_arrays[0]; // the values of interest
         D_ASSERT(capacity_array.size()==val_array.size());
         
         for(int i=0; i<val_array.size(); i++)

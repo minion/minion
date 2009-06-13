@@ -851,20 +851,22 @@ struct FlowConstraint : public AbstractConstraint
             }
         }
         
-        int localnumvars=sccend-sccstart+1;
+        //int localnumvars=sccend-sccstart+1;
         
         // This is the wrong datastructure. Shoudl be edges, not vertices.
         // Or perhaps both, because a vertex is removed when the DFS explores it.
-        vector<vector<int> > layers; // turn this into a box of boxes??
+        vector<vector<int> > edges; // turn this into a box of boxes??
         
-        layers.resize(10000);
-        smallset_nolist valinlayer;
-        smallset_nolist varused;
-        smallset_nolist valused;
+        edges.clear();
+        edges.resize(numvars+numvals+1);
+        // in here vars are numbered 0.. numvars-1, vals: numvars..numvars+numvals-1
         
-        valinlayer.reserve(numvals);
-        varused.reserve(numvars);
-        valused.reserve(numvals);
+        // element numvars+numvals is a special one: list of all the starting vertices
+        
+        smallset_nolist varvalused;
+        smallset thislayer;
+        
+        varvalused.reserve(numvars+numvals);
         
         // Note: multiple nodes representing each domain value. 
         // All nodes for a particular value end up in the same layer
@@ -872,10 +874,12 @@ struct FlowConstraint : public AbstractConstraint
         
         while(true)
         {
-            // Find all free variables in current SCC and insert into layers[0].
+            // Find all free variables in current SCC and insert into edges
+            edges[numvars+numvals].clear();
             
-            // real stuff starts here
-            layers[0].clear();
+            deque<int> fifo;
+            
+            fifo.clear();
             
             int unmatched=0;
             for(int i=sccstart; i<=sccend; ++i)
@@ -883,7 +887,9 @@ struct FlowConstraint : public AbstractConstraint
                 int tempvar=SCCs[i];
                 if(matching[tempvar]==dom_min-1)
                 {
-                    layers[0].push_back(tempvar);
+                    edges[numvars+numvals].push_back(tempvar);
+                    fifo.push_back(tempvar);
+                    varvalused.insert(tempvar);
                     unmatched++;
                 }
             }
@@ -893,95 +899,112 @@ struct FlowConstraint : public AbstractConstraint
                 return true;
             }
             
-            int curlayer=0;
-            varused.clear();
-            valused.clear();
+            varvalused.clear();
             
-            // continue layering until we see a free value vertex.
+            // BFS until we see a free value vertex.
             
             bool foundFreeValNode=false;
-            while(layers[curlayer].size()!=0)
+            while(!fifo.empty())
             {
-                layers[curlayer+1].clear();
-                
-                vector<int>& layer1=layers[curlayer];
-                // at a variable layer, extend it to a value layer using 
-                // values which are not saturated.
-                valinlayer.clear();
-                for(int i=0; i<layer1.size(); i++)
+                // first process a layer of vars
+                while(!fifo.empty() && fifo.front()<numvars)
                 {
-                    int tempvar=layer1[i];
-                    for(DomainInt realval=var_array[tempvar].getMin(); realval<=var_array[tempvar].getMax(); realval++)
+                    int curnode=fifo.front();
+                    fifo.pop_front();
+                    edges[curnode].clear();
+                    // curnode is a variable.
+                    // next layer is adjacent values which are not saturated.
+                    for(int i=0; i<adjlistlength[curnode]; i++)
                     {
-                        if(var_array[tempvar].inDomain(realval))
+                        int realval=adjlist[curnode][i];
+                        int validx=realval-dom_min+numvars;
+                        if(!varvalused.in(validx))
                         {
-                            int tempval=realval-dom_min;
-                            if(!valused.in(tempval)) 
+                            edges[curnode].push_back(validx);
+                            fifo.push_back(validx);
+                            
+                            if(!thislayer.in(validx))
                             {
-                                layers[curlayer+1].push_back(tempval);
-                                valinlayer.insert(tempval);
-                                valused.insert(tempval);
-                                
-                                if(upper[tempval]>usage[tempval])
-                                {
-                                    foundFreeValNode=true;
-                                }
+                                thislayer.insert(validx);
+                            }
+                            if(usage[realval-dom_min]<upper[realval-dom_min])
+                            {
+                                foundFreeValNode=true;
                             }
                         }
                     }
                 }
-                curlayer++;
-                layers[curlayer+1].clear();
+                
+                // transfer things from thislayer to varvalused.
+                vector<int>& temp1 = thislayer.getlist();
+                for(int i=0; i<temp1.size(); i++)
+                {
+                    varvalused.insert(temp1[i]);
+                }
+                thislayer.clear();
                 
                 if(foundFreeValNode)
-                {
+                {   // we have seen at least one unsaturated value vertex and
+                    // must have expanded all variable vertices in the 
+                    // layer above.
                     break;
                 }
-                else if(layers[curlayer].size()==0)
+                
+                while(!fifo.empty() && fifo.front()>=numvars)
                 {
-                    // no augmenting paths
-                    return false;
-                }
-                
-                // at a value layer, extend it to a variable layer using
-                // variables which are matched to one of the values.
-                // Probably shouldn't iterate through variables like this.
-                
-                vector<int>& layer2=layers[curlayer];
-                
-                for(int i=sccstart; i<=sccend; i++)
-                {
-                    int tempvar=SCCs[i];
-                    if(!varused.in(tempvar))
+                    int curnode=fifo.front();
+                    fifo.pop_front();
+                    edges[curnode].clear();
+                    // curnode is a value
+                    // next layer is variables, following matching edges.
+                    // darn, need inverse matching here!
+                    // oh well, not having the inverse matching only adds a 
+                    // factor of 2 to the O.
+                    
+                    for(int i=0; i<adjlistlength[curnode]; i++)
                     {
-                        int tempval=matching[tempvar]-dom_min;
-                        if(valinlayer.in(tempval))
+                        int var=adjlist[curnode][i];
+                        if(!varvalused.in(var) &&
+                            matching[var]==curnode+dom_min-numvars)
                         {
-                            layers[curlayer+1].push_back(tempvar);
-                            varused.insert(tempvar);
+                            edges[curnode].push_back(var);
+                            fifo.push_back(var);
+                            if(!thislayer.in(var))
+                            {
+                                thislayer.insert(var);
+                            }
                         }
                     }
                 }
                 
-                curlayer++;
-                
-                if(layers[curlayer].size()==0)
+                // transfer things from thislayer to varvalused.
+                vector<int>& temp2 = thislayer.getlist();
+                for(int i=0; i<temp2.size(); i++)
                 {
-                    // no augmenting paths
-                    return false;
+                    varvalused.insert(temp2[i]);
                 }
-            }
+                thislayer.clear();
+                
+            } // end of BFS loop.
             
             if(foundFreeValNode)
             {
                 // Find a set of minimal-length augmenting paths using DFS within
-                // the layers.
+                // the edges ds.
                 // starting at layer 0.
                 
                 vector<int> augpath; // alternating path stored here with vars and val-dom_min
                 
-                augpath.clear();
-                dfs_hopcroft2(augpath
+                for(int i=0; i<edges[numvars+numvals].size(); i++)
+                {
+                    augpath.clear();
+                    augpath.push_back(edges[numvars+numvals][i]);
+                    dfs_hopcroft2(augpath, upper, usage, matching, edges);
+                }
+            }
+            else
+            {
+                return false;
             }
             
         } // end of main loop.
@@ -991,80 +1014,40 @@ struct FlowConstraint : public AbstractConstraint
         return false;
     }
     
-    bool dfs_hopcroft2(vector<int>& augpath, vector<int>& upper, vector<int>& usage, vector<int>& matching)
+    // return value indicates whether an augmenting path was found.
+    bool dfs_hopcroft2(vector<int>& augpath, vector<int>& upper, vector<int>& usage, vector<int>& matching, vector<vector<int> >& edges)
     {
-        int layer=augpath.size(); // depth of recursion, starting at 0
+        int var=augpath.back();
+        vector<int>& outedges=edges[var];
         
-        if(layer & 1)  // if layer is odd
-        {   // values layer
-            int tempvar=augpath[layer-1];
+        while(!outedges.empty())
+        {
+            int validx=outedges.back();
+            outedges.pop_back();
             
-            // going from a var layer to a val layer
-            for(int i=0; i<layers[layer].size(); i++)
+            // does this complete an augmenting path?
+            if(usage[validx-numvars]<upper[validx-numvars])
             {
-                int tempval=layers[layer][i];    // problem: is it a real value or a val-dom_min in layers??
-                if(matching[tempvar]!=(tempval+dom_min)
-                    && var_array[tempvar].inDomain(tempval+dom_min))
-                {
-                    augpath.push_back(tempval);
-                    if(upper[tempval]>usage[tempval])
-                    {
-                        apply_augmenting_path(augpath); // update matching and usage.
-                        if(upper[tempval]==usage[tempval])
-                        {
-                            // if this value vertex is now saturated, delete it from
-                            // the layer.
-                            layers[layer][i]=layers[layer][layers[layer].size()-1];
-                            layers[layer].pop_back();
-                        }
-                        return true;
-                    }
-                    if(upper[tempval]==usage[tempval])
-                    {
-                        // if this value vertex is saturated, delete it from
-                        // the layer.
-                        layers[layer][i]=layers[layer][layers[layer].size()-1];
-                        layers[layer].pop_back();
-                        i--; // we just replaced the item at i, so do position i
-                        // again next time around the loop.
-                    }
-                    
-                    if(dfs_hopcroft2(augpath, upper, usage, matching))
-                    {
-                        return true;
-                    }
-                    augpath.pop_back();
-                }
+                augpath.push_back(validx);
+                apply_augmenting_path(augpath, matching, usage);
+                return true;
             }
-            // didn't find an unsaturated vertex or a path to one.
-            return false;
-        }
-        else
-        {   // going from a val layer to a var layer.
-            // Only edges in the matching.
             
-            // This is a special case because it ignores the 
-            if(layer==0)
+            vector<int>& outedges2 = edges[validx];
+            while(!outedges2.empty())
             {
-                for(int i=0; i<layers[layer].size(); i++)
+                int var2=outedges2.back();
+                outedges2.pop_back();
+                
+                augpath.push_back(validx);
+                augpath.push_back(var2);
+                if(dfs_hopcroft2(augpath, upper, usage, matching, edges))
                 {
-                    D_ASSERT(augpath.empty());
-                    augpath.push_back(layers[layer][i]);
-                    
-                    
-                    
-                    augpath.pop_back();
-                }
-            }
-            else
-            {
-                int tempval=augpath[layer-1];   // what about first layer??
-                for(int i=0; i<layers[layer][i].size(); i++)
-                {
-                    
+                    return true;
                 }
             }
         }
+        return false;
     }
     
     inline void apply_augmenting_path(vector<int>& augpath, vector<int>& matching, vector<int>& usage)
