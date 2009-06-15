@@ -84,8 +84,8 @@ using namespace std;
 #undef PLONG
 #endif
 
-#define P(x)
-//#define P(x) cout << x << endl
+//#define P(x)
+#define P(x) cout << x << endl
 //#define PLONG
 
 template<typename VarArray, bool UseIncGraph>
@@ -113,6 +113,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     using FlowConstraint<VarArray, UseIncGraph>::initialize_hopcroft;
     using FlowConstraint<VarArray, UseIncGraph>::hopcroft_wrapper;
+    using FlowConstraint<VarArray, UseIncGraph>::hopcroft2_setup;
     
     virtual string constraint_name()
     { 
@@ -151,6 +152,10 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       //#endif
       
       initialize_tarjan();
+      
+      #ifdef NEWHK
+      hopcroft2_setup();
+      #endif
       
       // The matching in both directions.
       
@@ -886,7 +891,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     var_indices.clear();
     for(int i=0; i<numvars; i++) var_indices.push_back(i);
     
-    tarjan_recursive(0);
+    if(numvars>0)
+        tarjan_recursive(0);
     
     return;
   }
@@ -1694,8 +1700,11 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         usage.resize(numvals, 0);
         for(int i=0; i<numvars; i++)
         {
-            D_ASSERT(usage[varvalmatching[i]-dom_min]==0);
-            usage[varvalmatching[i]-dom_min]=1;
+            if(varvalmatching[i]!=dom_min-1)
+            {
+                D_ASSERT(usage[varvalmatching[i]-dom_min]==0);
+                usage[varvalmatching[i]-dom_min]=1;
+            }
         }
         return hopcroft_wrapper2(sccstart, sccend, SCCs, varvalmatching, upper, usage);
         #else

@@ -29,8 +29,8 @@
 #undef P
 #endif
 
-#define P(x)
-//#define P(x) cout << x << endl
+//#define P(x)
+#define P(x) cout << x << endl
 
 struct smallset
 {
@@ -822,7 +822,26 @@ struct FlowConstraint : public AbstractConstraint
     
     // Oh no -- does this work with SCCs??
     // First do it without using SCCs.
-    // Also ignore the incremental graph to begin with....
+    
+    vector<vector<int> > edges; // turn this into a box of boxes??
+    smallset_nolist varvalused;
+    smallset thislayer;
+    deque<int> fifo;
+    
+    void hopcroft2_setup()
+    {
+        edges.resize(numvars+numvals+1);
+        for(int i=0; i<numvars; i++)
+        {
+            edges.reserve(numvals);
+        }
+        for(int i=numvars; i<=numvars+numvals; i++)
+        {
+            edges.reserve(numvars);
+        }
+        varvalused.reserve(numvars+numvals);
+        thislayer.reserve(numvars+numvals);
+    }
     
     inline bool hopcroft_wrapper2(int sccstart, int sccend, vector<int>& SCCs, vector<int>& matching, vector<int>& upper, vector<int>& usage)
     {
@@ -833,6 +852,7 @@ struct FlowConstraint : public AbstractConstraint
         }
         return true;
     }
+    
     
     inline bool hopcroft2(int sccstart, int sccend, vector<int>& SCCs, vector<int>& matching, vector<int>& upper, vector<int>& usage)
     {
@@ -851,34 +871,18 @@ struct FlowConstraint : public AbstractConstraint
             }
         }
         
-        //int localnumvars=sccend-sccstart+1;
-        
-        // This is the wrong datastructure. Shoudl be edges, not vertices.
-        // Or perhaps both, because a vertex is removed when the DFS explores it.
-        vector<vector<int> > edges; // turn this into a box of boxes??
-        
-        edges.clear();
-        edges.resize(numvars+numvals+1);
         // in here vars are numbered 0.. numvars-1, vals: numvars..numvars+numvals-1
         
-        // element numvars+numvals is a special one: list of all the starting vertices
+        // a value node with cap>1 will only appear in one layer, 
+        // but the DFS is allowed to visit it multiple times.
         
-        smallset_nolist varvalused;
-        smallset thislayer;
-        
-        varvalused.reserve(numvars+numvals);
-        
-        // Note: multiple nodes representing each domain value. 
-        // All nodes for a particular value end up in the same layer
-        // because they all have the same set of non-matching edges NOT TRUE.
+        // darn, does the DFS visit nodes it is not supposed to?
         
         while(true)
         {
             // Find all free variables in current SCC and insert into edges
             edges[numvars+numvals].clear();
-            
-            deque<int> fifo;
-            
+            varvalused.clear();
             fifo.clear();
             
             int unmatched=0;
@@ -888,6 +892,7 @@ struct FlowConstraint : public AbstractConstraint
                 if(matching[tempvar]==dom_min-1)
                 {
                     edges[numvars+numvals].push_back(tempvar);
+                    edges[tempvar].clear();
                     fifo.push_back(tempvar);
                     varvalused.insert(tempvar);
                     unmatched++;
@@ -896,10 +901,9 @@ struct FlowConstraint : public AbstractConstraint
             
             if(unmatched==0)
             {
+                cout << "matching:"<< matching << endl;
                 return true;
             }
-            
-            varvalused.clear();
             
             // BFS until we see a free value vertex.
             
@@ -911,7 +915,6 @@ struct FlowConstraint : public AbstractConstraint
                 {
                     int curnode=fifo.front();
                     fifo.pop_front();
-                    edges[curnode].clear();
                     // curnode is a variable.
                     // next layer is adjacent values which are not saturated.
                     for(int i=0; i<adjlistlength[curnode]; i++)
@@ -921,11 +924,14 @@ struct FlowConstraint : public AbstractConstraint
                         if(!varvalused.in(validx))
                         {
                             edges[curnode].push_back(validx);
-                            fifo.push_back(validx);
                             
                             if(!thislayer.in(validx))
-                            {
+                            {   // have not seen this value before.
+                                // add it to the new layer.
                                 thislayer.insert(validx);
+                                
+                                fifo.push_back(validx);
+                                edges[validx].clear();
                             }
                             if(usage[realval-dom_min]<upper[realval-dom_min])
                             {
@@ -954,7 +960,6 @@ struct FlowConstraint : public AbstractConstraint
                 {
                     int curnode=fifo.front();
                     fifo.pop_front();
-                    edges[curnode].clear();
                     // curnode is a value
                     // next layer is variables, following matching edges.
                     // darn, need inverse matching here!
@@ -968,10 +973,13 @@ struct FlowConstraint : public AbstractConstraint
                             matching[var]==curnode+dom_min-numvars)
                         {
                             edges[curnode].push_back(var);
-                            fifo.push_back(var);
                             if(!thislayer.in(var))
-                            {
+                            {   // have not seen this variable before.
+                                // add it to the new layer.
                                 thislayer.insert(var);
+                                
+                                fifo.push_back(var);
+                                edges[var].clear();
                             }
                         }
                     }
@@ -1024,6 +1032,7 @@ struct FlowConstraint : public AbstractConstraint
         {
             int validx=outedges.back();
             outedges.pop_back();
+            D_ASSERT(var_array[var].inDomain(validx-numvars+dom_min));
             
             // does this complete an augmenting path?
             if(usage[validx-numvars]<upper[validx-numvars])
@@ -1034,18 +1043,21 @@ struct FlowConstraint : public AbstractConstraint
             }
             
             vector<int>& outedges2 = edges[validx];
+            
+            augpath.push_back(validx);
             while(!outedges2.empty())
             {
                 int var2=outedges2.back();
                 outedges2.pop_back();
                 
-                augpath.push_back(validx);
                 augpath.push_back(var2);
                 if(dfs_hopcroft2(augpath, upper, usage, matching, edges))
                 {
                     return true;
                 }
+                augpath.pop_back(); // remove var2
             }
+            augpath.pop_back(); // remove validx
         }
         return false;
     }
@@ -1056,13 +1068,14 @@ struct FlowConstraint : public AbstractConstraint
         for(int i=0; i<augpath.size(); i=i+2)
         {
             int var=augpath[i];
-            int val=augpath[i+1];
+            int validx=augpath[i+1];
             if(matching[var]!=dom_min-1)
             {
                 usage[matching[var]-dom_min]--;
             }
-            matching[var]=val+dom_min;
-            usage[val]++;
+            matching[var]=validx-numvars+dom_min;
+            D_ASSERT(var_array[var].inDomain(validx-numvars+dom_min));
+            usage[validx-numvars]++;
         }
         augpath.clear();
     }
