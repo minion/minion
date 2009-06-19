@@ -50,29 +50,38 @@ template<typename VarArray1, typename VarArray2>
     { D_ASSERT(var_array1.size() == var_array2.size()); }
 
   int dynamic_trigger_count()
-    { return 2; }
+    { return 2 + var_array1.size() * 2; }
 
   
   void attach_triggers(int i)
   {
+      P("Attach Trigger: " << i);
     DynamicTrigger* dt = dynamic_trigger_start();
     var_array1[i].addDynamicTrigger(dt, LowerBound, NoDomainValue BT_CALL_BACKTRACK);
-    var_array2[i].addDynamicTrigger(dt, UpperBound, NoDomainValue BT_CALL_BACKTRACK);
+    var_array2[i].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue BT_CALL_BACKTRACK);
   }
   
-  void detach_triggers(int i)
+  void detach_triggers()
   {
+      P("Detach Triggers");
     DynamicTrigger* dt = dynamic_trigger_start();
     releaseTrigger(stateObj, dt BT_CALL_BACKTRACK);
-    releaseTrigger(stateObj, dt BT_CALL_BACKTRACK);
+    releaseTrigger(stateObj, dt + 1 BT_CALL_BACKTRACK);
   }
   
   virtual void full_propagate()
   {
     DynamicTrigger* dt = dynamic_trigger_start();
+    
+    for(int i = 0; i < var_array1.size(); ++i)
+    {
+        var_array1[i].addDynamicTrigger(dt + 2 + i, LowerBound, NoDomainValue BT_CALL_STORE);
+        var_array2[i].addDynamicTrigger(dt + 2 + var_array1.size() + i, UpperBound, NoDomainValue BT_CALL_STORE);    
+    }
+    
     alpha = 0;
     var_array1[0].addDynamicTrigger(dt, LowerBound, NoDomainValue BT_CALL_STORE);
-    var_array2[0].addDynamicTrigger(dt, UpperBound, NoDomainValue BT_CALL_STORE);
+    var_array2[0].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue BT_CALL_STORE);
     propagate(dt);
     propagate(dt+1);
   }
@@ -104,14 +113,21 @@ template<typename VarArray1, typename VarArray2>
          }
     }
     
-    detach_triggers(a);
+    //detach_triggers();
     alpha = n;
   }
   
   virtual void propagate(DynamicTrigger* dt)
   {
     DynamicTrigger* base_dt = dynamic_trigger_start();
-    D_ASSERT(dt == base_dt || dt == base_dt + 1);
+    if(dt >= base_dt + 2)
+    {
+        P("Domain change occurred: " << (dt - base_dt - 2) % var_array1.size() << ":" << (dt - base_dt - 2) / var_array1.size() << " alpha:" << (int)alpha);
+        return;
+    }
+    
+    P("Trigger Event:" << dt - base_dt << " alpha:" << (int)alpha);
+
     int a = alpha;
 
     if(base_dt == dt)
@@ -135,7 +151,7 @@ template<typename VarArray1, typename VarArray2>
     D_ASSERT(v_size == var_array1.size() + var_array2.size());
     size_t x_size = var_array1.size();
 
-    cout << (int)alpha << ":" << x_size << endl;
+    P("Check Assignment: " << (int)alpha);
     for(size_t i = 0;i < x_size; i++)
     {
       if(v[i] < v[i + x_size])

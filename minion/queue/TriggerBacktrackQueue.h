@@ -25,6 +25,13 @@
 
 #include "../constraints/constraint_abstract.h"
 
+#ifdef P
+#undef P
+#endif
+
+#define P(x)
+//#define P(x) cout << x << endl
+
 struct TriggerBacktrackQueue
 {
     StateObj* stateObj;
@@ -51,21 +58,25 @@ struct TriggerBacktrackQueue
 
     void world_push()
     {
+        P("TBQ:World_push");
         queue.push_back(TriggerList());
     }
 
     void world_pop()
     {
+        P("TBQ: World_pop");
         TriggerList& tl = queue.back();
         DynamicTrigger* nulldt = NULL;
-        PROP_INFO_ADDONE(Counter1);
-        for (int i = 0; i < tl.size(); ++i)
+        for (int i = tl.size() - 1; i >= 0; --i)
         {
-            PROP_INFO_ADDONE(Counter2);
             if (tl[i].second == NULL)
+            {
+                P("Release " << tl[i].first);
                 releaseTrigger(stateObj, tl[i].first BT_CALL_STORE);
+            }
             else
             {
+                P("Add " << tl[i].first << " to " << tl[i].second);
                 tl[i].first->add_after(tl[i].second, nulldt);
                 tl[i].first->setQueue(tl[i].second);
             }
