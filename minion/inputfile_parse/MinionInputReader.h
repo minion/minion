@@ -21,6 +21,7 @@
 #define _MINIONINPUTREADER_H
 
 #include "../system/system.h"
+#include "cheap_stream.h"
 
 template<typename StreamType>
 struct ConcreteFileReader
@@ -80,6 +81,10 @@ struct ConcreteFileReader
       next_char = infile.get();
     }
     
+    // Fix for nasty windows issue -- long term we should clean this up.
+    if(infile.eof() && !isspace(next_char))
+      s += next_char;  
+
     putback(next_char);
     return s;
   }
