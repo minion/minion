@@ -1,0 +1,152 @@
+MINION 1
+#TEST CHECKONESOL 0 2 1 2 1 0 1 0 2 
+# Minion Quasigroup Instance
+# Kind: QG3 Size: 3
+# Idempotent
+# CSPLib Problem prob003
+#    http://www.csplib.org
+# In main matrix,  Row(a)[b] = c  means  a*b=c
+# Idempotency Constraints
+# In flattened matrix,  V[a*n+b] = c  means  a*b=c
+# Symmetry Breaking Constraints
+# Var ordering should be linked to symmetry constraints
+#
+# Minion Constraint Solver Input
+#    http://sourceforge.net/projects/minion
+# Instance created using CLisp generator written by Ian Gent
+# Instance created at 11:13 on 20 Apr 2006
+0
+0
+0
+18
+0 8 9
+0 2 9
+0
+[x17,x14,x11,x9,x10,x12,x13,x15,x16]
+[a,a,a,a,a,a,a,a,a]
+1
+[x9,x10,x11,x12,x13,x14,x15,x16,x17]
+2
+[[x9,x10,x11]
+,[x12,x13,x14]
+,[x15,x16,x17]
+]
+[[x9,x10,x11,x12,x13,x14,x15,x16,x17]]
+
+0
+objective none
+print m1
+alldiff(col(m0,0))
+
+alldiff(row(m0,0))
+
+alldiff(col(m0,1))
+
+alldiff(row(m0,1))
+
+alldiff(col(m0,2))
+
+alldiff(row(m0,2))
+
+eq(x9,0)
+
+eq(x13,1)
+
+eq(x17,2)
+
+weightedsumleq([3,1]
+,[x9,x9]
+,x0)
+
+weightedsumgeq([3,1]
+,[x9,x9]
+,x0)
+
+watchelement(v0,x0,x9)
+
+weightedsumleq([3,1]
+,[x10,x12]
+,x1)
+
+weightedsumgeq([3,1]
+,[x10,x12]
+,x1)
+
+watchelement(v0,x1,x10)
+
+weightedsumleq([3,1]
+,[x11,x15]
+,x2)
+
+weightedsumgeq([3,1]
+,[x11,x15]
+,x2)
+
+watchelement(v0,x2,x11)
+
+weightedsumleq([3,1]
+,[x12,x10]
+,x3)
+
+weightedsumgeq([3,1]
+,[x12,x10]
+,x3)
+
+watchelement(v0,x3,x12)
+
+weightedsumleq([3,1]
+,[x13,x13]
+,x4)
+
+weightedsumgeq([3,1]
+,[x13,x13]
+,x4)
+
+watchelement(v0,x4,x13)
+
+weightedsumleq([3,1]
+,[x14,x16]
+,x5)
+
+weightedsumgeq([3,1]
+,[x14,x16]
+,x5)
+
+watchelement(v0,x5,x14)
+
+weightedsumleq([3,1]
+,[x15,x11]
+,x6)
+
+weightedsumgeq([3,1]
+,[x15,x11]
+,x6)
+
+watchelement(v0,x6,x15)
+
+weightedsumleq([3,1]
+,[x16,x14]
+,x7)
+
+weightedsumgeq([3,1]
+,[x16,x14]
+,x7)
+
+watchelement(v0,x7,x16)
+
+weightedsumleq([3,1]
+,[x17,x17]
+,x8)
+
+weightedsumgeq([3,1]
+,[x17,x17]
+,x8)
+
+watchelement(v0,x8,x17)
+
+ineq(0,x11,2)
+
+ineq(1,x14,2)
+
+ineq(2,x17,2)
+

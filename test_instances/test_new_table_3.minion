@@ -1,0 +1,48 @@
+MINION 2
+#TEST SOLCOUNT 16
+# Minion Graceful Graph Instance
+#   Version with alldiff from -Q to Q
+# K3 x P2
+#
+# Minion Constraint Solver Input
+#    http://sourceforge.net/projects/minion
+# Instance created using CLisp generator written by Ian Gent
+# Instance created at 14:06 on 12 Apr 2006
+0
+0
+0
+6
+0 4 6
+0
+[]
+[]
+0
+0
+0
+
+tuplelists 2
+
+6 3 
+1 2 1
+1 2 2
+2 0 1
+2 1 1
+2 1 2
+2 2 2
+
+6 2
+0 0
+1 0
+1 1 
+1 2
+2 0
+2 2
+
+objective none
+print none
+
+table([x0,x1,x2],t0)
+table([x3,x4,x5],t0)
+table([x1,x2],t1)
+table([x0,x4],t1)
+table([x3,x4],t1)
