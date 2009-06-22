@@ -11,6 +11,6 @@ VARORDER [y,x]
 
 **CONSTRAINTS**
 
-quicklexleq(x,y)
+lexleq[quick](x,y)
 
 **EOF**
