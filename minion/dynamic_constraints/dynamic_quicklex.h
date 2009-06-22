@@ -56,17 +56,17 @@ template<typename VarArray1, typename VarArray2>
   void attach_triggers(int i)
   {
       P("Attach Trigger: " << i);
-    DynamicTrigger* dt = dynamic_trigger_start();
-    var_array1[i].addDynamicTrigger(dt, LowerBound, NoDomainValue BT_CALL_BACKTRACK);
-    var_array2[i].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue BT_CALL_BACKTRACK);
+      DynamicTrigger* dt = dynamic_trigger_start();
+      var_array1[i].addDynamicTrigger(dt, LowerBound, NoDomainValue BT_CALL_BACKTRACK);
+      var_array2[i].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue BT_CALL_BACKTRACK);
   }
   
   void detach_triggers()
   {
       P("Detach Triggers");
-    DynamicTrigger* dt = dynamic_trigger_start();
-    releaseTrigger(stateObj, dt BT_CALL_BACKTRACK);
-    releaseTrigger(stateObj, dt + 1 BT_CALL_BACKTRACK);
+      DynamicTrigger* dt = dynamic_trigger_start();
+      releaseTrigger(stateObj, dt BT_CALL_BACKTRACK);
+      releaseTrigger(stateObj, dt + 1 BT_CALL_BACKTRACK);
   }
   
   virtual void full_propagate()
@@ -117,7 +117,7 @@ template<typename VarArray1, typename VarArray2>
          }
     }
     
-    //detach_triggers();
+    detach_triggers();
     alpha = n;
   }
   
@@ -142,6 +142,11 @@ template<typename VarArray1, typename VarArray2>
        var_array1[a].getAssignedValue() == var_array2[a].getAssignedValue())
     {
       progress();
+    }
+    else
+    {
+        //if(var_array1[a].getMax() < var_array2[a].getMin())
+        //    detach_triggers();
     }
   }
 
