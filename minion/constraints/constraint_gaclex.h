@@ -305,7 +305,6 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     }
     
     y_case:
-    if(1==1);
 
     //cout << "!!" << endl;
     if(x[a].getMin() == y[a].getMin())
