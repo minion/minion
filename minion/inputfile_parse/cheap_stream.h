@@ -105,7 +105,7 @@ public:
     
     void getline(char* buf, int buf_length, char deliminator = '\n')
     {
-        int length = std::min(buf_length, stream_end - stream_pos);
+        int length = std::min((int)buf_length, (int)(stream_end - stream_pos));
         P(length << ":");
         for(int i = 0; i < length; ++i)
         {
