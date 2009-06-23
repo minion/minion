@@ -34,7 +34,7 @@ class AnyVarRef;
 
 
 namespace ProbSpec {
-  class VarContainer;
+  class CSPInstance;
 }
 
 class SearchState
@@ -64,7 +64,7 @@ class SearchState
   bool failed;
   jmp_buf g_env;
 
-  ProbSpec::VarContainer* vc;
+  ProbSpec::CSPInstance* csp_instance;
 
   
   TimerClass oldtimer;
@@ -82,9 +82,9 @@ public:
   vector<vector<AnyVarRef> >& getPrintMatrix()
   { return print_matrix; }
   
-  ProbSpec::VarContainer* getVarContainer() { return vc; }
+  ProbSpec::CSPInstance* getInstance() { return csp_instance; }
    
-  void setVarContainer(ProbSpec::VarContainer* _vc) { vc = _vc; }
+  void setInstance(ProbSpec::CSPInstance* _csp) { csp_instance = _csp; }
 
   vector<set<AbstractConstraint*> >& getConstraintsToPropagate()
   { return constraints_to_propagate; }
