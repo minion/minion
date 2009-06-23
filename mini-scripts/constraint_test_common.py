@@ -1023,7 +1023,7 @@ class testwatchvecneq:
         return out
     
     def runtest(self, options=dict()):
-        return runtestgeneral("watchvecneq", True, options, [3,3], ["smallnum","smallnum"], self, True)
+        return runtestgeneral("watchvecneq", True, options, [3,3], ["smallnum","smallnum"], self, not options['reify'])
 
 class testpow:
     def printtable(self, domains):
