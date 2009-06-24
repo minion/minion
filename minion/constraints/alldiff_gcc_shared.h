@@ -905,7 +905,6 @@ struct FlowConstraint : public AbstractConstraint
             
             if(unmatched==0)
             {
-                cout << "matching:"<< matching << endl;
                 return true;
             }
             
