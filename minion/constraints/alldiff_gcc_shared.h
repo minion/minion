@@ -843,9 +843,9 @@ struct FlowConstraint : public AbstractConstraint
         thislayer.reserve(numvars+numvals);
     }
     
-    inline bool hopcroft_wrapper2(int sccstart, int sccend, vector<int>& SCCs, vector<int>& matching, vector<int>& upper, vector<int>& usage)
+    inline bool hopcroft_wrapper2(vector<int>& vars_in_scc, vector<int>& matching, vector<int>& upper, vector<int>& usage)
     {
-        if(!hopcroft2(sccstart, sccend, SCCs, matching, upper, usage))
+        if(!hopcroft2(vars_in_scc, matching, upper, usage))
         {
             getState(stateObj).setFailed(true);
             return false;
@@ -854,20 +854,24 @@ struct FlowConstraint : public AbstractConstraint
     }
     
     
-    inline bool hopcroft2(int sccstart, int sccend, vector<int>& SCCs, vector<int>& matching, vector<int>& upper, vector<int>& usage)
+    inline bool hopcroft2(vector<int>& vars_in_scc, vector<int>& matching, vector<int>& upper, vector<int>& usage)
     {
         // The return value is whether the matching is complete over teh variables
         // in the SCC.
-        D_ASSERT(sccstart==0 && sccend==(SCCs.size()-1));
         // Clear any values from matching which are no longer in domain.
-        for(int i=sccstart; i<=sccend; i++)
+        // Clear vals if their usage is larger than the upper bound.
+        for(int i=0; i<vars_in_scc.size(); i++)
         {
-            int var=SCCs[i];
-            if(matching[var]!=dom_min-1 &&
-                !var_array[var].inDomain(matching[var]))
+            int var=vars_in_scc[i];
+            if(matching[var]!=dom_min-1)
             {
-                usage[matching[var]-dom_min]--;
-                matching[var]=dom_min-1;
+                int match=matching[var];
+                if(!var_array[var].inDomain(match)
+                    || usage[match-dom_min]>upper[match-dom_min])
+                {
+                    usage[match-dom_min]--;
+                    matching[var]=dom_min-1;
+                }
             }
         }
         
@@ -886,9 +890,9 @@ struct FlowConstraint : public AbstractConstraint
             fifo.clear();
             
             int unmatched=0;
-            for(int i=sccstart; i<=sccend; ++i)
+            for(int i=0; i<vars_in_scc.size(); ++i)
             {
-                int tempvar=SCCs[i];
+                int tempvar=vars_in_scc[i];
                 if(matching[tempvar]==dom_min-1)
                 {
                     edges[numvars+numvals].push_back(tempvar);

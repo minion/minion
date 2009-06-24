@@ -36,7 +36,7 @@
 //#define CHECKDOMSIZE
 
 // Process SCCs independently
-//#define SCC
+#define SCC
 
 // Warning: if this is not defined, then watchedalldiff probably won't do anything.
 //#define USEWATCHES
@@ -51,12 +51,12 @@
 #define INCREMENTALMATCH
 
 // Use BFS instead of HK
-//#define BFSMATCHING
+#define BFSMATCHING
 
 // Use the new hopcroft-karp implementation.
-#define NEWHK
+//#define NEWHK
 
-#define INCGRAPH
+//#define INCGRAPH
 
 // Use staging a la Schulte and Stuckey
 #define STAGED
@@ -1706,7 +1706,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 usage[varvalmatching[i]-dom_min]=1;
             }
         }
-        return hopcroft_wrapper2(sccstart, sccend, SCCs, varvalmatching, upper, usage);
+        return hopcroft_wrapper2(SCCs, varvalmatching, upper, usage);
         #else
         return hopcroft_wrapper(sccstart,sccend, SCCs);
         #endif

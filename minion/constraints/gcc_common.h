@@ -84,6 +84,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     using FlowConstraint<VarArray, UseIncGraph>::hopcroft2_setup;
     using FlowConstraint<VarArray, UseIncGraph>::hopcroft_wrapper2;
+    using FlowConstraint<VarArray, UseIncGraph>::hopcroft2;
     
     GCC(StateObj* _stateObj, const VarArray& _var_array, const CapArray& _capacity_array, vector<int> _val_array) : 
     FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
@@ -518,10 +519,16 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
   
     void do_gcc_prop()
     {
+        #ifdef QUIMPER
+        do_gcc_prop_quimper();
+        return;
+        #endif
+        
         // find/ repair the matching.
         #ifndef INCREMENTALMATCH
         varvalmatching.resize(0);
         varvalmatching.resize(numvars, dom_min-1);
+        // what about usage???
         #endif
         
         // populate lower and upper
@@ -546,7 +553,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             return;
         }
         
-        tarjan_recursive(0, upper, lower, varvalmatching);
+        tarjan_recursive(0, upper, lower, varvalmatching, usage);
         
         prop_capacity();
         
@@ -563,6 +570,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         varvalmatching.resize(numvars, dom_min-1);
         lbcmatching.clear();
         lbcmatching.resize(numvars, dom_min-1);
+        // what about usage and lbcusage??
         #endif
         
         // populate lower and upper
@@ -579,31 +587,56 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         
         // first process the lower bound constraint.
         // use lower for the 'upper' parameter here.
+        hopcroft2(vars_in_scc, lbcmatching, lower, lbcusage);
         
-        // careful: what if the matching already contains more than lower[val] of val?
-        hopcroft_wrapper2(0, numvars-1, SCCs, lbcmatching, lower, lbcusage);
-        
-        // args are upper, lower, matching
-        vector<int> blank;
-        blank.resize(numvals, numvars);
-        tarjan_recursive(0, blank, upper, lbcmatching);
-        
-        
-        
-        
-        
-        bool flag=bfsmatching_gcc();
-        GCCPRINT("matching:"<<flag);
-        
-        if(!flag)
+        for(int i=0; i<numvals; i++)
         {
-            getState(stateObj).setFailed(true);
-            return;
+            if(lbcusage[i]<lower[i])
+            {
+                // can't hit the lower bound.
+                GCCPRINT("failing because can't construct lower bound matching.");
+                getState(stateObj).setFailed(true);
+                return;
+            }
         }
         
+        GCCPRINT("Unpadded lbc matching: " << lbcmatching);
+        
+        // fill in the blanks in the matching
+        for(int i=0; i<numvars; i++)
+        {
+            if(lbcmatching[i]==dom_min-1)
+            {
+                int minval=var_array[i].getMin();
+                lbcmatching[i]=minval;
+                lbcusage[minval-dom_min]++;
+            }
+        }
+        
+        GCCPRINT("Padded lbc matching: " << lbcmatching);
+        
+        // args are upper, lower, matching
+        // use interval [lower .. numvars]
+        // use augpath temporarily for the upper bound.
+        augpath.clear();
+        augpath.resize(numvals, numvars);
+        tarjan_recursive(0, augpath, lower, lbcmatching, lbcusage);
+        
+        // Now ubc
+        
+        if(!hopcroft_wrapper2(vars_in_scc, varvalmatching, upper, usage))
+        {
+            GCCPRINT("failed when constructing ubc matching.");
+            return;
+        }
+        GCCPRINT("ubc matching: " << varvalmatching);
+        
+        // borrow augpath for the lower bounds.
+        augpath.clear();
+        augpath.resize(numvals, 0);
+        tarjan_recursive(0, upper, augpath, varvalmatching, usage);
         
         prop_capacity();
-        
     }
     
     smallset sccs_to_process;
@@ -698,7 +731,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 return;
             }
             
-            tarjan_recursive(sccindex_start, upper, lower, varvalmatching);
+            tarjan_recursive(sccindex_start, upper, lower, varvalmatching, usage);
             
             #if defined(SCCCARDS)
             if(Strongcards)
@@ -1208,7 +1241,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     void tarjan_recursive(int sccindex_start,
         vector<int>& upper, 
-        vector<int>& lower, vector<int>& matching)
+        vector<int>& lower, vector<int>& matching, vector<int>& usage)
     {
         tstack.clear();
         in_tstack.clear();
@@ -1226,7 +1259,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             {
                 GCCPRINT("(Re)starting tarjan's algorithm, at node:"<< curnode);
                 varcount=0; valcount=0;
-                visit(curnode, true, upper, lower, matching);
+                visit(curnode, true, upper, lower, matching, usage);
                 GCCPRINT("Returned from tarjan's algorithm.");
             }
         }
@@ -1240,13 +1273,13 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             {
                 GCCPRINT("(Re)starting tarjan's algorithm, at node:"<< curnode);
                 varcount=0; valcount=0;
-                visit(curnode, true, upper, lower, matching);
+                visit(curnode, true, upper, lower, matching, usage);
                 GCCPRINT("Returned from tarjan's algorithm.");
             }
         }
     }
     
-    void visit(int curnode, bool toplevel, vector<int>& upper, vector<int>& lower, vector<int>& matching)
+    void visit(int curnode, bool toplevel, vector<int>& upper, vector<int>& lower, vector<int>& matching, vector<int>& usage)
     {
         // toplevel is true iff this is the top level of the recursion.
         tstack.push_back(curnode);
@@ -1298,7 +1331,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     GCCPRINT("val "<< i << "below upper cap.");
                     if(!visited.in(newnode))
                     {
-                        visit(newnode, false, upper, lower, matching);
+                        visit(newnode, false, upper, lower, matching, usage);
                         if(lowlink[newnode]<lowlink[curnode])
                         {
                             lowlink[curnode]=lowlink[newnode];
@@ -1319,12 +1352,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         {
             D_ASSERT(find(vars_in_scc.begin(), vars_in_scc.end(), curnode)!=vars_in_scc.end());
             varcount++;
-            int newnode=varvalmatching[curnode]-dom_min+numvars;
+            int newnode=matching[curnode]-dom_min+numvars;
             D_ASSERT(var_array[curnode].inDomain(newnode+dom_min-numvars));
             
             if(!visited.in(newnode))
             {
-                visit(newnode, false, upper, lower, matching);
+                visit(newnode, false, upper, lower, matching, usage);
                 if(lowlink[newnode]<lowlink[curnode])
                 {
                     lowlink[curnode]=lowlink[newnode];
@@ -1368,7 +1401,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             {
                 int newnode=adjlist[curnode][i];
             #endif
-                if(varvalmatching[newnode]!=curnode-numvars+dom_min)   // if the value is not in the matching.
+                if(matching[newnode]!=curnode-numvars+dom_min)   // if the value is not in the matching.
                 {
                     #ifndef INCGRAPH
                     if(var_array[newnode].inDomain(curnode+dom_min-numvars))
@@ -1378,7 +1411,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                         if(!visited.in(newnode))
                         {
                             
-                            visit(newnode, false, upper, lower, matching);
+                            visit(newnode, false, upper, lower, matching, usage);
                             if(lowlink[newnode]<lowlink[curnode])
                             {
                                 lowlink[curnode]=lowlink[newnode];
@@ -1405,7 +1438,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 int newnode=numvars+numvals;
                 if(!visited.in(newnode))
                 {
-                    visit(newnode, false, upper, lower, matching);
+                    visit(newnode, false, upper, lower, matching, usage);
                     if(lowlink[newnode]<lowlink[curnode])
                     {
                         lowlink[curnode]=lowlink[newnode];
@@ -1522,7 +1555,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                                 {
                                     // var not in tempset so might have to do some test against matching.
                                     // Why doing this test? something wrong with the assigned variable optimization?
-                                    if(varvalmatching[curvar]!=copynode+dom_min-numvars)
+                                    if(matching[curvar]!=copynode+dom_min-numvars)
                                     {
                                         GCCPRINT("Removing var: "<< curvar << " val:" << copynode+dom_min-numvars);
                                         if(var_array[curvar].inDomain(copynode+dom_min-numvars))
