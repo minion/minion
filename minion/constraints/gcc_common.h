@@ -37,7 +37,7 @@
 #define GCCPRINT(x)
 
 #define SPECIALQUEUE
-//#define SCC
+#define SCC
 #define INCREMENTALMATCH
 
 //#define SCCCARDS
@@ -50,7 +50,7 @@
 
 // use the algorithm from Quimper et al. to prune the target variables.
 // requires INCGRAPH and not SCC
-#define QUIMPER
+//#define QUIMPER
 
 //#define CAPBOUNDSCACHE
 
