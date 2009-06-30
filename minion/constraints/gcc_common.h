@@ -351,14 +351,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #ifdef CAPBOUNDSCACHE
         else
         {
-            //dtstart=dtstart+(numvars*numvals);
             D_ASSERT(trig>= dtstart && trig<dtstart+(2*val_array.size()*(numvars+val_array.size())) );
-            // arranged in blocks per value. Then the first half of the block is for lower bound.
-            /*int diff=trig-dtstart;
-            int val_arrayidx=diff/((val_array.size()+numvars)*2);
-            int value=val_array[val_arrayidx];
-            int lbub=(diff/((val_array.size()+numvars)))%2;  // lowerbound or upperbound. SIMPLIFY HERE.
-            boundsupported[(value-dom_min)*2+lbub]=-1;*/
             boundsupported[trig->trigger_info()]=-1;
         }
         #endif
