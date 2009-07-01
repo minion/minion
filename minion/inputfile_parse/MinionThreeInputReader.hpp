@@ -471,7 +471,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
       throw parse_exception(string("Bad Constraint Name or reached end of file: '") + id + "'");
     }
     else
-      { throw parse_exception(string("Unknown Constraint:") + id); }
+      { throw parse_exception(string("Unknown Constraint: '") + id + string("'")); }
   }
   ConstraintDef* constraint = constraint_list + constraint_num;
 

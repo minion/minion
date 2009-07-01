@@ -173,7 +173,7 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
       return false;
     }
     else
-    { throw parse_exception(string("Unknown Constraint:") + id); }
+    { throw parse_exception(string("Unknown Constraint: '") + id + string("'")); }
   }
   ConstraintDef* constraint = constraint_list + constraint_num;
  
