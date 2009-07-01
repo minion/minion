@@ -7,6 +7,6 @@ DISCRETE a[3] {-10..10}
 
 **CONSTRAINTS**
 
-check[fc](product(a[0],a[1], a[2]))
+check[assign](product(a[0],a[1], a[2]))
 
 **EOF**

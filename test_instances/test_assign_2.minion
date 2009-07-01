@@ -7,6 +7,6 @@ BOOL a[3]
 
 **CONSTRAINTS**
 
-check[fc](min([a[0],a[1]], a[2]))
+check[assign](min([a[0],a[1]], a[2]))
 
 **EOF**

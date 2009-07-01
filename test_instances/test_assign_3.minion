@@ -7,6 +7,6 @@ BOOL a[1]
 
 **CONSTRAINTS**
 
-check[fc](eq(a[0],0))
+check[assign](eq(a[0],0))
 
 **EOF**

@@ -17,8 +17,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef CHECK_GSA_H_HIUO
-#define CHECK_GSA_H_HIUO
+#ifndef CHECK_ASSIGN_H_HIUO
+#define CHECK_ASSIGN_H_HIUO
 
 #include "constraint_abstract.h"
 #include "../memory_management/reversible_vals.h"
@@ -32,18 +32,18 @@
 //#define P(x) cout << x << endl
 #define P(x)
 
-struct Check_FC : public AbstractConstraint
+struct Check_Assign : public AbstractConstraint
 {
   virtual string constraint_name()
     { return "Check_FC:" + child->constraint_name(); }
 
   AbstractConstraint* child;
 
-  Check_FC(StateObj* _stateObj, AbstractConstraint* _con) :
+  Check_Assign(StateObj* _stateObj, AbstractConstraint* _con) :
   AbstractConstraint(_stateObj), child(_con)
   { }
 
-  virtual ~Check_FC()
+  virtual ~Check_Assign()
     { delete child; }
 
   virtual int dynamic_trigger_count()
@@ -86,7 +86,7 @@ struct Check_FC : public AbstractConstraint
 };
 
 AbstractConstraint*
-checkFCCon(StateObj* stateObj, AbstractConstraint* c)
-{ return new Check_FC(stateObj, c); }
+checkAssignCon(StateObj* stateObj, AbstractConstraint* c)
+{ return new Check_Assign(stateObj, c); }
 
 #endif
