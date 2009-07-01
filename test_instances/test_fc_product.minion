@@ -1,0 +1,12 @@
+#TEST SOLCOUNT 149
+MINION 3
+
+**VARIABLES**
+
+DISCRETE a[3] {-10..10}
+
+**CONSTRAINTS**
+
+check[fc](product(a[0],a[1], a[2]))
+
+**EOF**
