@@ -73,6 +73,9 @@ template<typename VarArray1, typename VarArray2>
   {
     DynamicTrigger* dt = dynamic_trigger_start();
 
+    if(var_array1.size() == 0)
+        return;
+    
     alpha = 0;
     
     var_array2[0].setMin(var_array1[0].getMin());

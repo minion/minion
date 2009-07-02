@@ -784,6 +784,23 @@ class testlexleq:
     def runtest(self, options=dict()):
         return runtestgeneral("lexleq", True, options, [4,4], ["smallnum", "smallnum"], self, True)
 
+class testlexleq_quick:
+    def printtable(self, domains, less=False):
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            l1=l[:len(l)/2]
+            l2=l[len(l)/2:]
+
+            if (not less and l1 <= l2) or (less and l1<l2):
+                out.append(l)
+        return out
+
+    def runtest(self, options=dict()):
+        return runtestgeneral("lexleq[quick]", True, options, [4,4], ["smallnum", "smallnum"], self, False)
+
+
 class testlexless(testlexleq):
     def printtable(self, domains):
         return testlexleq.printtable(self, domains, less=True)
