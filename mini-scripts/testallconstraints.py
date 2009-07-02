@@ -47,7 +47,7 @@ conslist+=["difference"]
 
 # symmetry-breaking constraints
 
-conslist+=["lexleq", "lexless"]
+conslist+=["lexleq", "lexless", "lexleq_quick"]
 
 conslist+=["max", "min"]
 
