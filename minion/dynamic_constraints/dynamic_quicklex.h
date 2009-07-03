@@ -80,16 +80,16 @@ template<typename VarArray1, typename VarArray2>
     
     var_array2[0].setMin(var_array1[0].getMin());
     var_array1[0].setMax(var_array2[0].getMax());
+    
+    // Set these up, just so they are stored.
+    var_array1[0].addDynamicTrigger(dt, LowerBound, NoDomainValue BT_CALL_STORE);
+    var_array2[0].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue BT_CALL_STORE);
+    
 
     if(var_array1[0].isAssigned() && var_array2[0].isAssigned() &&
        var_array1[0].getAssignedValue() == var_array2[0].getAssignedValue())
     {
         progress();
-    }
-    else
-    {
-        var_array1[0].addDynamicTrigger(dt, LowerBound, NoDomainValue BT_CALL_STORE);
-        var_array2[0].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue BT_CALL_STORE);
     }
   }
   
