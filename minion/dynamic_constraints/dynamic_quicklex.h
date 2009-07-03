@@ -169,6 +169,28 @@ template<typename VarArray1, typename VarArray2>
     
     return true;
   }
+  
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+    {
+      size_t array_size = var_array1.size();
+      for(size_t i = 0; i < array_size; ++i)
+      {
+        DomainInt x_i_min = var_array1[i].getMin();
+        DomainInt y_i_max = var_array2[i].getMax();
+
+        if(x_i_min > y_i_max)
+        {
+          return false;
+        }
+
+        assignment.push_back(make_pair(i         , x_i_min));
+        assignment.push_back(make_pair(i + array_size, y_i_max));
+        if(x_i_min < y_i_max)
+          return true;
+      }
+
+      return true;
+    }
 
   virtual vector<AnyVarRef> get_vars()
   { 
