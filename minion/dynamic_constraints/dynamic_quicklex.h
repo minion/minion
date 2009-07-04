@@ -28,11 +28,16 @@
 //#define P(x) cout << x << endl
 #define P(x)
 
-template<typename VarArray1, typename VarArray2>
+template<typename VarArray1, typename VarArray2, bool Less = false>
   struct QuickLexDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "QuickLexDynamic"; }
+    { 
+        if(Less)
+            return "QuickLexLessDynamic";
+        else
+            return "QuickLexDynamic"; 
+    }
 
   typedef typename VarArray1::value_type VarRef1;
   typedef typename VarArray2::value_type VarRef2;
@@ -120,8 +125,13 @@ template<typename VarArray1, typename VarArray2>
          }
     }
     
-    detach_triggers();
-    alpha = n;
+    if(Less)
+        getState(stateObj).setFailed(true);
+    else
+    {
+        detach_triggers();
+        alpha = n;
+    }
   }
   
   virtual void propagate(DynamicTrigger* dt)
@@ -167,7 +177,7 @@ template<typename VarArray1, typename VarArray2>
         return false;
     }
     
-    return true;
+    return !Less;
   }
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
@@ -189,9 +199,14 @@ template<typename VarArray1, typename VarArray2>
           return true;
       }
 
-      return true;
+      return !Less;
     }
 
+  virtual AbstractConstraint* reverse_constraint()
+  {
+      return new QuickLexDynamic<VarArray2, VarArray1,!Less>(stateObj,var_array2,var_array1);
+  }
+    
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;
