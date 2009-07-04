@@ -40,8 +40,8 @@ struct VarNot
   
   VarNot(const VarRef& _data) : data(_data)
   { 
-    D_ASSERT(data.getInitialMin() == 0);
-    D_ASSERT(data.getInitialMax() == 1);
+    //D_ASSERT(data.getInitialMin() == 0);
+    //D_ASSERT(data.getInitialMax() == 1);
   }
   
   VarNot() : data()
