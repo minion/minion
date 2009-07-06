@@ -427,7 +427,7 @@ struct GCC : public AbstractConstraint
     // Contains the capacity value which is supported. Reset to -1 if the support is lost.
     #endif
     
-    virtual void special_unlock() { constraint_locked = false;  } // to_process.clear(); why commented out?
+    virtual void special_unlock() { constraint_locked = false; to_process.clear(); }
   virtual void special_check()
   {
     constraint_locked = false;  // should be above the if.
@@ -647,7 +647,7 @@ struct GCC : public AbstractConstraint
             }
         }
         }
-        
+        to_process.clear();
         {
         vector<int>& toiterate = sccs_to_process.getlist();
         GCCPRINT("About to loop for sccs_to_process:"<< toiterate);
