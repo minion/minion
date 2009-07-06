@@ -37,7 +37,7 @@
 #define GCCPRINT(x)
 
 #define SPECIALQUEUE
-#define SCC
+//#define SCC
 #define INCREMENTALMATCH
 
 //#define SCCCARDS
@@ -726,39 +726,30 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             
             tarjan_recursive(sccindex_start, upper, lower, varvalmatching, usage);
             
-            #if defined(SCCCARDS)
-            if(Strongcards)
-            {
+            #ifdef SCCCARDS
                 // Propagate to capacity variables for all values in vals_in_scc
                 for(int valinscc=0; valinscc<vals_in_scc.size(); valinscc++)
                 {
                     int v=vals_in_scc[valinscc];
                     if(val_to_cap_index[v-dom_min]!=-1 && lower[v-dom_min]!=upper[v-dom_min])
                     {
-                        prop_capacity_strong_scc(v);
+                        if(Strongcards)
+                        {
+                            prop_capacity_strong_scc(v);
+                        }
+                        else
+                        {
+                            prop_capacity_simple(v);
+                        }
                     }
                 }
-            }
             #endif
             
         }
         }
         
-        #if !defined(SCCCARDS)
-            prop_capacity();
-        #endif
-        
-        if(!Strongcards)
-        {
-            prop_capacity();
-        }
-        
-        // temporary to test without strong upperbound pruning.
-        #if defined(SCCCARDS)
-        if(Strongcards)
-        {
-            prop_capacity_simple();
-        }
+        #ifndef SCCCARDS
+        prop_capacity();
         #endif
     }
     
@@ -1596,45 +1587,48 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         for(int i=0; i<val_array.size(); i++)
         {
             int val=val_array[i];
-            #ifndef INCGRAPH
-                int mincap=0;
-                int maxcap=0;
-                for(int j=0; j<numvars; j++)
+            prop_capacity_simple(val);
+        }
+    }
+    
+    void prop_capacity_simple(int val)
+    {
+        int i=val_to_cap_index[val-dom_min];
+        
+        // called above or directly from do_gcc_prop_scc when using SCCCARDS 
+        #ifndef INCGRAPH
+            int mincap=0;
+            int maxcap=0;
+            for(int j=0; j<numvars; j++)
+            {
+                if(var_array[j].inDomain(val))
                 {
-                    if(var_array[j].inDomain(val))
-                    {
-                        maxcap++;
-                        if(var_array[j].isAssigned())
-                            mincap++;
-                    }
+                    maxcap++;
+                    if(var_array[j].isAssigned())
+                        mincap++;
+                }
+            }
+            capacity_array[i].setMin(mincap);
+            capacity_array[i].setMax(maxcap);
+        #else
+            if(val>= dom_min && val<=dom_max)
+            {
+                int mincap=0;
+                for(int vari=0; vari<adjlistlength[val-dom_min+numvars]; vari++)
+                {
+                    int var=adjlist[val-dom_min+numvars][vari];
+                    if(var_array[var].isAssigned())
+                        mincap++;
                 }
                 capacity_array[i].setMin(mincap);
-                capacity_array[i].setMax(maxcap);
-            #else
-                if(val>= dom_min && val<=dom_max)
-                {
-                    int mincap=0;
-                    for(int vari=0; vari<adjlistlength[val-dom_min+numvars]; vari++)
-                    {
-                        int var=adjlist[val-dom_min+numvars][vari];
-                        if(var_array[var].isAssigned())
-                            mincap++;
-                    }
-                    capacity_array[i].setMin(mincap);
-                    capacity_array[i].setMax(adjlistlength[val-dom_min+numvars]);
-                }  // else the cap will already have been set to 0.
-            #endif
-            //if(mincap>lower[val-dom_min])
-            //    lower[val-dom_min]=mincap;
-            //if(maxcap<upper[val-dom_min])
-            //    upper[val-dom_min]=maxcap;
-        }
+                capacity_array[i].setMax(adjlistlength[val-dom_min+numvars]);
+            }  // else the cap will already have been set to 0.
+        #endif
     }
     
     void prop_capacity_strong()
     {
         // Lower bounds.
-        prop_capacity_simple();
         GCCPRINT("In prop_capacity_strong");
         
         // Temporary measure.
@@ -1723,10 +1717,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #ifdef CAPBOUNDSCACHE
         if(boundsupported[(forbiddenval-dom_min)*2]==existinglb)
         {
+            PROP_INFO_ADDONE(Counter8);
             return existinglb;
         }
         #endif
-        
+        PROP_INFO_ADDONE(Counter9);
         // current sccs are contained in vars_in_scc and vals_in_scc
         // back up the matching to restore afterwards.
         matchbac=varvalmatching;
@@ -1911,10 +1906,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #ifdef CAPBOUNDSCACHE
         if(boundsupported[(value-dom_min)*2+1]==existingub)
         {
+            PROP_INFO_ADDONE(Counter8);
             return existingub;
         }
         #endif
-        
+        PROP_INFO_ADDONE(Counter9);
         // current sccs are contained in vars_in_scc and vals_in_scc
         
         int startvalindex=value-dom_min;
