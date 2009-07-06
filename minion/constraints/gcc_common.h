@@ -37,7 +37,7 @@
 #define GCCPRINT(x)
 
 #define SPECIALQUEUE
-//#define SCC
+#define SCC
 #define INCREMENTALMATCH
 
 //#define SCCCARDS
@@ -362,7 +362,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     // Contains the capacity value which is supported. Reset to -1 if the support is lost.
     #endif
     
-    virtual void special_unlock() { constraint_locked = false;  } // to_process.clear(); why commented out?
+    virtual void special_unlock() { constraint_locked = false; to_process.clear(); }
   virtual void special_check()
   {
     constraint_locked = false;  // should be above the if.
@@ -668,7 +668,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             }
         }
         }
-        
+        to_process.clear();
         {
         vector<int>& toiterate = sccs_to_process.getlist();
         GCCPRINT("About to loop for sccs_to_process:"<< toiterate);
@@ -1567,7 +1567,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Propagate to capacity variables.
     
-    // can only be called when SCCs not used. 
     inline void prop_capacity()
     {
         if(Strongcards)
@@ -1587,7 +1586,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         for(int i=0; i<val_array.size(); i++)
         {
             int val=val_array[i];
-            prop_capacity_simple(val);
+            if(lower[val-dom_min] != upper[val-dom_min])
+            {
+                prop_capacity_simple(val);
+            }
         }
     }
     
@@ -1633,40 +1635,19 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         
         // Temporary measure.
         vars_in_scc.clear();
-        for(int i=0; i<numvars; i++)
-        {
-            vars_in_scc.push_back(i);
-        }
+        for(int i=0; i<numvars; i++) vars_in_scc.push_back(i);
+        
+        vals_in_scc.clear();
+        for(int i=dom_min; i<=dom_max; i++) vals_in_scc.push_back(i);
         
         for(int validx=0; validx<val_array.size(); validx++)
         {
             int value=val_array[validx];
-            if(value>=dom_min && value<=dom_max)
+            
+            if(value>=dom_min && value<=dom_max
+                && lower[value-dom_min]!=upper[value-dom_min])
             {
-                // use the matching -- change it by lowering flow to value.
-                GCCPRINT("Calling bfsmatching_card_lowerbound for value "<< value);
-                int newlb=bfsmatching_card_lowerbound(value, lower[value-dom_min]);
-                GCCPRINT("bfsmatching_card_lowerbound Returned " << newlb);
-                
-                if(newlb > capacity_array[validx].getMin())
-                {
-                    GCCPRINT("Improved lower bound "<< newlb);
-                    capacity_array[validx].setMin(newlb);
-                }
-                
-                GCCPRINT("Calling card_upperbound for value "<< value);
-                int newub=card_upperbound(value, upper[value-dom_min]);
-                GCCPRINT("card_upperbound Returned " << newub);
-                
-                if(newub < capacity_array[validx].getMax())
-                {
-                    GCCPRINT("Improved upper bound "<< newub);
-                    capacity_array[validx].setMax(newub);
-                }
-            }
-            else
-            {// this may not be neecded. Only needed if we're not calling prop_capacity_simple
-                capacity_array[validx].propagateAssign(0);
+                prop_capacity_strong_scc(value);
             }
         }
     }
@@ -1685,6 +1666,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         {
             GCCPRINT("Improved lower bound "<< newlb);
             capacity_array[validx].setMin(newlb);
+            lower[value-dom_min]=newlb;
         }
         
         GCCPRINT("Calling card_upperbound for value "<< value);
@@ -1695,6 +1677,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         {
             GCCPRINT("Improved upper bound "<< newub);
             capacity_array[validx].setMax(newub);
+            upper[value-dom_min]=newub;
         }
     }
     
