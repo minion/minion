@@ -22,8 +22,6 @@
 
 #include "../system/system.h"
 
-#define BLOCK_CHAIN
-
 #ifdef P
 #undef P
 #endif
