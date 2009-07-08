@@ -33,8 +33,6 @@ void lock(StateObj* stateObj)
   getState(stateObj).getConstraintList()[i]->setup();
   
   getMemory(stateObj).monotonicSet().lock(stateObj);
-  getMemory(stateObj).backTrack().lock();
-  getMemory(stateObj).nonBackTrack().lock();
   
   getTriggerMem(stateObj).finaliseTriggerLists();
   

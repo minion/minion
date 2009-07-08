@@ -153,64 +153,6 @@ public:
 
 typedef MoveablePointer BackTrackOffset;
 
-class NewMemoryBlock;
-
-#ifndef BLOCK_CHAIN
-/// Singleton type which tracks all occurrences of \ref NewMemoryBlock.
-/** This class is the only singleton global variable in Minion when in reenterant
- *  mode. It keeps track of all the occurrences of \ref NewMemoryBlock so when a
- *  \ref MoveablePointer is copied, it is possible to find which block it was from.
- */
-class MemBlockCache
-{
-  // Forbid copying this type!
-  MemBlockCache(const MemBlockCache&);
-  void operator=(const MemBlockCache&);
-  vector<NewMemoryBlock*> NewMemoryBlockCache;
-  
-#ifdef THREADSAFE
-  boost::mutex m;
-#define LOCK(M) boost::mutex::scoped_lock lock(M)
-#else
-#define LOCK(M)
-#endif
-
-public:    
-  
-  MemBlockCache() { }
-  
-
-
-  void registerNewMemoryBlock(NewMemoryBlock* mb)
-  { 
-    LOCK(m);
-    D_ASSERT(find(NewMemoryBlockCache.begin(), NewMemoryBlockCache.end(), mb) == NewMemoryBlockCache.end());
-    NewMemoryBlockCache.push_back(mb); 
-  }
-
-  void unregisterNewMemoryBlock(NewMemoryBlock* mb)
-  { 
-    LOCK(m);
-    vector<NewMemoryBlock*>::iterator it = find(NewMemoryBlockCache.begin(), NewMemoryBlockCache.end(), mb);
-    D_ASSERT(it != NewMemoryBlockCache.end());
-    NewMemoryBlockCache.erase(it); 
-  }
-
-  inline void addPointerToNewMemoryBlock(MoveablePointer* vp);
-
-  inline void removePointerFromNewMemoryBlock(MoveablePointer* vp);
-
-  inline bool checkPointerValid(const MoveablePointer*const vp);
-  
-  bool empty()
-  { LOCK(m); return NewMemoryBlockCache.empty(); }
-  void clear()
-  { LOCK(m); NewMemoryBlockCache.clear(); }
-};
-
-VARDEF(MemBlockCache memBlockCache);
-#endif
-
 /// Looks after all \ref MoveablePointer to a block of memory, and also the memory itself.
 /** A NewMemoryBlock is basically an extendable, moveable block of memory which
  * keeps track of all pointers into it, and moves them when approriate.
@@ -231,24 +173,16 @@ class NewMemoryBlock
   unsigned allocated_bytes;
   unsigned maximum_bytes;
   
-#ifdef BLOCK_CHAIN
   vector<pair<char*, unsigned> > stored_blocks;
   int total_stored_bytes;
-#endif
 
 #ifndef BLOCK_SIZE
 #define BLOCK_SIZE (16*1024*1024)
 #endif
   
-  bool lock_m;
-  bool final_lock_m;
   SET_TYPE<MoveablePointer*> pointers;
 public:
   
-  /// Gets a raw pointer to the start of the allocated memory.
-  //char* getDataPtr()
-  //{ return current_data; }
-#ifdef BLOCK_CHAIN
   void storeMem(char* store_ptr)
   {
     P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
@@ -265,54 +199,46 @@ public:
     D_ASSERT(getDataSize() == current_offset + allocated_bytes);
   }
 
-  void retrieveMem(char* store_ptr)
+private:
+  void copyMemBlock(char* location, pair<char*,size_t> data, size_t copy_start, size_t copy_length)
+  {
+      D_ASSERT(data.second >= copy_start + copy_length);
+      //memcpy(location, data.first + copy_start, copy_length);
+      
+      size_t data_copy = 0;
+      // If these is some data to copy, then we do so. We write the code this way
+      // to avoid unsigned underflow.
+      if(copy_start <= data.second)
+          data_copy = std::min(data.second - copy_start, copy_length);
+      
+      memcpy(location, data.first + copy_start, data_copy);
+      memset(location + data_copy, 0, copy_length - data_copy);
+  }
+public:
+    
+  void retrieveMem(pair<char*,size_t> store_ptr)
   {
     P("RetrieveMem: " << (void*)this << " : " << (void*)store_ptr);
     unsigned current_offset = 0;
     for(int i = 0; i < stored_blocks.size(); ++i)
     {
-      P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].first << " " << stored_blocks[i].second);
-      memcpy(stored_blocks[i].first, store_ptr + current_offset, stored_blocks[i].second);
+      copyMemBlock(stored_blocks[i].first, store_ptr, current_offset, stored_blocks[i].second);
       current_offset += stored_blocks[i].second;
     }
-    
-    P((void*)(store_ptr + current_offset) << " " << (void*)current_data << " " << allocated_bytes);
-    memcpy(current_data, store_ptr + current_offset, allocated_bytes);
+    copyMemBlock(current_data, store_ptr, current_offset, allocated_bytes);
     D_ASSERT(getDataSize() == current_offset + allocated_bytes);
   }
   
-#else
-  void storeMem(char* store_ptr)
-  { memcpy(store_ptr, current_data, allocated_bytes); }
-  
-  void retrieveMem(char* store_ptr)
-  { memcpy(current_data, store_ptr, allocated_bytes); }
-#endif
-  
   /// Returns the size of the allocated memory in bytes.
   unsigned getDataSize()
-#ifdef BLOCK_CHAIN
     { return total_stored_bytes + allocated_bytes; }
-#else
-    { return allocated_bytes; }
-#endif
 
   NewMemoryBlock() : current_data(NULL), allocated_bytes(0), maximum_bytes(0),
-#ifdef BLOCK_CHAIN
-                  total_stored_bytes(0),
-#endif
-                  lock_m(false), final_lock_m(false)
-  {
-#ifndef BLOCK_CHAIN
-    memBlockCache.registerNewMemoryBlock(this);
-#endif
-  }
+                  total_stored_bytes(0)
+  {  }
   
   ~NewMemoryBlock()
   { 
-#ifndef BLOCK_CHAIN
-    memBlockCache.unregisterNewMemoryBlock(this);
-#endif
     free(current_data);
   }
   
@@ -327,7 +253,6 @@ public:
     if(byte_count % sizeof(int) != 0)
       byte_count += sizeof(int) - (byte_count % sizeof(int));
 
-    D_ASSERT(!lock_m);
     if(maximum_bytes < allocated_bytes + byte_count)
     { reallocate(byte_count); }
 
@@ -347,7 +272,6 @@ public:
   }
 
 private:
-#ifdef BLOCK_CHAIN
   void reallocate(unsigned byte_count_new_request)
   {
     P("Reallocate: " << (void*)this << " : " << byte_count_new_request);
@@ -364,91 +288,12 @@ private:
     maximum_bytes = new_block_size;
     allocated_bytes = 0; 
   }
-#else  
-  /// Enlarges (or reduces) memory block and moves all \ref MoveablePointer to point to the new block.
-  void reallocate(unsigned byte_count_new_request)
-  {
-    unsigned byte_count = (allocated_bytes + byte_count_new_request) * 2;
-    D_ASSERT(!lock_m);
-    D_ASSERT(byte_count >= allocated_bytes);
-    char* new_data = (char*)malloc(byte_count);
-    memset(new_data, 0, byte_count);
-
-    for(SET_TYPE<MoveablePointer*>::iterator it = pointers.begin(); it != pointers.end(); ++it)
-    {
-      D_ASSERT((*it)->get_ptr() >= current_data && (*it)->get_ptr() < current_data + allocated_bytes);
-      (*it)->set_raw_ptr( ((char*)((*it)->get_ptr()) - current_data) + new_data );
-    }
-   
-    // TODO: Search codebase for memcpy, use realloc instead if possible.
-    memcpy(new_data, current_data, allocated_bytes);
-    free(current_data);
-    current_data = new_data;
-    maximum_bytes = byte_count;
-  }
-#endif
-public:
-    
-  /// Checks if vp points inside this memoryblock and if so registers it and returns true.
-  bool checkAddToTracker(MoveablePointer* vp)
-  {
-    D_ASSERT(!final_lock_m);
-    void* ptr = vp->get_ptr_noCheck();
-    if(ptr < current_data || ptr >= current_data + allocated_bytes)
-      return false;
-    else
-    {
-      pointers.insert(vp);
-      return true;
-    }
-  }
-
-  /// Checks if this pointer belongs to this tracker, and if so unregisters and returns true
-  bool checkRemoveFromTracker(MoveablePointer* vp)
-  {
-    void* ptr = vp->get_ptr_noCheck();
-    if(ptr < current_data || ptr >= current_data + allocated_bytes)
-      return false;
-    else
-    {
-      pointers.erase(vp);
-      return true;
-    }
-  }
-
-  /// Checks if a given pointer should point into this block and if so checks for consistency
-  /* Used only in debug mode for validation. Should never fail. */
-  bool checkPointerValid(const MoveablePointer*const vp)
-  {
-    void* ptr = vp->get_ptr_noCheck();
-
-    bool check1 = (pointers.count(const_cast<MoveablePointer*>(vp)) > 0);
-    bool check2 = (ptr >= current_data && ptr < current_data + allocated_bytes);
-    if(check1 != check2)
-    {
-      D_FATAL_ERROR("Fatal Memory corruption - pointer broken!");
-    }
-    return check1;
-  }
-
-  // TODO: Remove
-  void final_lock()
-  { 
-    D_ASSERT(lock_m);
-    final_lock_m = true;
-  }
-  
-  void lock()
-  {
-    //reallocate(allocated_bytes);
-    lock_m = true;
-  }
    
 };
 
 // @}
 
-#ifdef BLOCK_CHAIN
+
 inline MoveablePointer::MoveablePointer(const MoveablePointer& b) : ptr(b.ptr)
 { }
 
@@ -468,102 +313,6 @@ inline MoveablePointer::MoveablePointer(const MoveablePointer& b, int offset) : 
 #ifdef SLOW_DEBUG
 inline void* MoveablePointer::get_ptr() const
 { return ptr; }
-#endif
-
-#else
-inline MoveablePointer::MoveablePointer(const MoveablePointer& b) : ptr(b.ptr)
-{
-  if(ptr != NULL)
-    memBlockCache.addPointerToNewMemoryBlock(this);
-}
-
-inline void MoveablePointer::operator=(const MoveablePointer& b)
-{
-  if(ptr != NULL)
-    memBlockCache.removePointerFromNewMemoryBlock(this);
-  ptr = b.ptr;
-  if(ptr != NULL)
-    memBlockCache.addPointerToNewMemoryBlock(this);
-}
-
-inline MoveablePointer::MoveablePointer(void* _ptr) : ptr(_ptr)
-{
-  if(ptr != NULL)
-    memBlockCache.addPointerToNewMemoryBlock(this);
-}
-
-inline MoveablePointer::~MoveablePointer()
-{
-#ifndef SLOW_DEBUG
-  D_ASSERT(memBlockCache.checkPointerValid(this));
-#endif
-  if(ptr != NULL)
-    memBlockCache.removePointerFromNewMemoryBlock(this);
-}
-
-inline MoveablePointer::MoveablePointer(const MoveablePointer& b, int offset) : ptr(((char*)b.ptr) + offset)
-{
-  D_ASSERT(b.get_ptr() != NULL);
-  memBlockCache.addPointerToNewMemoryBlock(this);
-}
-
-
-#ifdef SLOW_DEBUG
-inline void* MoveablePointer::get_ptr() const
-{
-  D_ASSERT(memBlockCache.checkPointerValid(this));
-  return ptr;
-}
-#endif
-
-#endif
-
-
-#ifndef BLOCK_CHAIN
-inline void MemBlockCache::addPointerToNewMemoryBlock(MoveablePointer* vp)
-  {
-    LOCK(m);
-    if(vp->get_ptr_noCheck() == NULL)
-      return;
-
-    for(vector<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
-        it != NewMemoryBlockCache.end();
-        ++it)
-    {
-      if((*it)->checkAddToTracker(vp))
-        return;
-    }
-    D_FATAL_ERROR("Fatal Memory Corruption when adding to tracker!");
-  }
-
-  inline void MemBlockCache::removePointerFromNewMemoryBlock(MoveablePointer* vp)
-  {
-    LOCK(m);
-    for(vector<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
-        it != NewMemoryBlockCache.end();
-        ++it)
-    {
-      if((*it)->checkRemoveFromTracker(vp))
-        return;
-    }
-    //D_FATAL_ERROR("Fatal Memory Corruption when leaving the tracker");
-  }
-
-  inline bool MemBlockCache::checkPointerValid(const MoveablePointer *const vp)
-  {
-    LOCK(m);
-    if(vp->get_ptr_noCheck() == NULL)
-      return true;
-    for(vector<NewMemoryBlock*>::iterator it = NewMemoryBlockCache.begin();
-        it != NewMemoryBlockCache.end();
-        ++it)
-    {
-      if((*it)->checkPointerValid(vp))
-        return true;
-    }
-    ;
-    D_FATAL_ERROR("Fatal Memory Error - invalid Pointer deferenced!");
-  }
 #endif
 
 #endif

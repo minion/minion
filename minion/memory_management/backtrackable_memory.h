@@ -22,7 +22,7 @@
 
 #include "MemoryBlock.h"
 #include "../system/block_cache.h"
-
+#include <utility>
 #ifdef P
 #undef P
 #endif
@@ -42,15 +42,13 @@ class BackTrackMemory
   NewMemoryBlock new_memory_block;
   BlockCache block_cache;
   
-  vector<char*> backtrack_data; 
-  bool locked;
+  vector<pair<char*, size_t> > backtrack_data; 
 public:
     
   
   /// Wraps request_bytes of the internal \ref NewMemoryBlock.
   MoveablePointer request_bytes(unsigned byte_count)
   { 
-    D_ASSERT(!locked);
     return new_memory_block.request_bytes(byte_count); 
   }
   
@@ -58,40 +56,31 @@ public:
   template<typename T>
   MoveableArray<T> requestArray(unsigned size)
   { 
-    D_ASSERT(!locked);
     return new_memory_block.requestArray<T>(size);
   }
   
   BackTrackMemory() :
-  block_cache(100), backtrack_data(10), locked(false)
+  block_cache(100), backtrack_data(10)
   { }
-    
-  void lock()
-  { 
-    new_memory_block.lock(); 
-    locked = true;
-  }
-  
+ 
   /// Copies the current state of backtrackable memory.
   void world_push()
   {
-    D_ASSERT(locked);
     unsigned data_size = new_memory_block.getDataSize();
     char *tmp = (char *) block_cache.do_malloc(data_size);//calloc(data_size, sizeof(char));
 
     new_memory_block.storeMem(tmp);
-    backtrack_data.push_back(tmp);
+    backtrack_data.push_back(std::make_pair(tmp, data_size));
   }
   
   /// Restores the state of backtrackable memory to the last stored state.
   void world_pop()
   {
-    D_ASSERT(locked);
     D_ASSERT(backtrack_data.size() > 0);
-    char *tmp = backtrack_data.back();
+    pair<char*, size_t> tmp = backtrack_data.back();
     new_memory_block.retrieveMem(tmp);
     backtrack_data.pop_back();
-    block_cache.do_free(tmp);
+    block_cache.do_free(tmp.first);
   }
   
   /// Returns the current number of stored copies of the state.
