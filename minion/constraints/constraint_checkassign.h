@@ -72,21 +72,15 @@ struct CheckAssignConstraint : public AbstractConstraint
 
     if(count == v_size)
     {
-      // XXX HACKY HACKY HACK
-      // OK, this is serious. The problem is that full_check_unsat
-      // might be called while other events are on the queue
-      // which end up in this function.
-      // This is a serious problem for all reified constraints.
-      // The following would fix it in this case:
-      // full_check_unsat()
-      // but that is too expensive in general.
       for(int i = 0; i < v_size; ++i)
       {
         D_ASSERT(variables[i].isAssigned());
         assignment[i] = variables[i].getAssignedValue();
       }
-      if(!check_assignment(&assignment.front(), assignment.size()))
-        return true;
+      if(assignment.size() == 0)
+          return !check_assignment(NULL, 0);
+      else
+          return !check_assignment(&assignment.front(), assignment.size());
     }
     assigned_vars = count; 
     return false;
@@ -106,7 +100,10 @@ struct CheckAssignConstraint : public AbstractConstraint
         D_ASSERT(variables[i].isAssigned());
         assignment[i] = variables[i].getAssignedValue();
       }
-      return !check_assignment(&assignment.front(), assignment.size());
+      if(assignment.size() == 0)
+          return !check_assignment(NULL, 0);
+      else
+          return !check_assignment(&assignment.front(), assignment.size());
     }
     return false;
   }
