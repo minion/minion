@@ -1177,7 +1177,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     if reify or reifyimply:
         # add extra bool variable.
         varnums=[1]+varnums
-        vartypes=["num"]+vartypes # no longer bool since all var types now allowed.
+        vartypes=["boolean"]+vartypes # no longer bool since all var types now allowed.
     
     isvector=[a>1 for a in varnums]  # Is it to be printed as a vector. This seems to suffice at the moment.
     
@@ -1408,8 +1408,8 @@ def generatevariables(varblocks, types, boundallowed):
             else:
                 ty="BOOL "
             
-            if types[i]=="boolean":  # This is a hack put in place until reify is fixed, if ever.
-                ty="BOOL "          # reify refuses to work unless the reification var is a bool.
+#            if types[i]=="boolean":  # This is a hack put in place until reify is fixed, if ever.
+#                ty="BOOL "          # reify refuses to work unless the reification var is a bool.
         else:
             ty=None
         
