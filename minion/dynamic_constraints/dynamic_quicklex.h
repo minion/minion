@@ -79,7 +79,11 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     DynamicTrigger* dt = dynamic_trigger_start();
 
     if(var_array1.size() == 0)
+    {
+        if(Less)
+            getState(stateObj).setFailed(true);
         return;
+    }
     
     alpha = 0;
     
