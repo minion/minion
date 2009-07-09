@@ -53,8 +53,8 @@ of another constraint, for example in a reification:
 #undef P
 #endif
 
-//#define P(x) cout << x << endl
-#define P(x)
+#define P(x) cout << x << endl
+//#define P(x)
 
 // Similar to watched or, but has no watching phase, just propagates all
 // the time, and propagates all constraints of course.

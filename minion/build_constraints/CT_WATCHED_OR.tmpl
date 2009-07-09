@@ -13,7 +13,7 @@ BuildCT_WATCHED_OR(StateObj* stateObj, const vector<T>& vs, ConstraintBlob& bl)
 {
   size_t vs_s = vs.size();
   for(int i = 0; i < vs_s; i++)
-    if(vs[i].getInitialMin() != 0 || vs[i].getInitialMax() != 1)
+    if(vs[i].getInitialMin() < 0 || vs[i].getInitialMax() > 1)
     {
       FAIL_EXIT("watched or only works on Boolean variables!");
     }

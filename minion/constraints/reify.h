@@ -75,8 +75,8 @@ ALL constraints are reifyimplyable.
 #undef P
 #endif
 
-//#define P(x) cout << x << endl
-#define P(x)
+#define P(x) cout << x << endl
+//#define P(x)
 
 #define NEWREIFY
 //#define NODETRICK   // This is broken! leave switched off.
@@ -111,6 +111,9 @@ struct reify : public ParentConstraint
   ParentConstraint(_stateObj), reify_var(_rar_var), constraint_locked(false),
     full_propagate_called(stateObj, false)
   {
+      CHECK(reify_var.getInitialMin() >= 0, "Reification variables must have domain within {0,1}");
+      CHECK(reify_var.getInitialMin() <= 1, "Reification variables must have domain within {0,1}");
+      
       #ifdef NODETRICK
       numeric_limits<unsigned long long> ull;
       reifysetnode=ull.max();
@@ -267,6 +270,7 @@ struct reify : public ParentConstraint
 
     if(i == -1000000000)
     {
+      D_ASSERT(!full_propagate_called);
       P("reifyvar assigned - Do full propagate");
       #ifdef NODETRICK
       if(reifysetnode==getState(stateObj).getNodeCount())
@@ -474,8 +478,6 @@ struct reify : public ParentConstraint
     P("Full prop");
     P("reify " << child_constraints[0]->constraint_name());
     P("negation: " << child_constraints[1]->constraint_name());
-    reify_var.setMin(0);
-    reify_var.setMax(1);
     
     if(reify_var.isAssigned())
     {

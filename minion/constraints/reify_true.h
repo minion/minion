@@ -47,6 +47,8 @@ template<typename BoolVar, bool DoWatchAssignment>
   ParentConstraint(_stateObj), rar_var(_rar_var), constraint_locked(false),
     full_propagate_called(stateObj, false)
   {
+      CHECK(rar_var.getInitialMin() >= 0, "Reification variables must have domain within {0,1}");
+      CHECK(rar_var.getInitialMin() <= 1, "Reification variables must have domain within {0,1}");
     child_constraints.push_back(_poscon);
   }
 
@@ -204,8 +206,6 @@ template<typename BoolVar, bool DoWatchAssignment>
   virtual void full_propagate()
   {
     P("Full prop");
-    rar_var.setMin(0);
-    rar_var.setMax(1);
     
     P(child_constraints[0]->constraint_name());
     if(rar_var.isAssigned() && rar_var.getAssignedValue() == 1)

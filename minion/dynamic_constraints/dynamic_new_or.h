@@ -41,15 +41,15 @@ ensures that at least one of the constraints C1,...,Cn is true.
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 
+// For reverse_constraint we need an and
+#include "dynamic_new_and.h"
+
 #ifdef P
 #undef P
 #endif
 
 //#define P(x) cout << x << endl;
 #define P(x)
-
-// For reverse_constraint we need an and
-#include "dynamic_new_and.h"
 
 struct Dynamic_OR : public ParentConstraint
 {
