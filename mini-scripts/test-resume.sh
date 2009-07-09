@@ -7,9 +7,9 @@ for i in ./test_instances/resume_instances/*.minion; do
     INSTANCE=$i;
     echo $i;
 
-    COMPLETEOUTPUT=`mktemp`;
-    FIRSTPARTIALOUTPUT=`mktemp`;
-    SECONDPARTIALOUTPUT=`mktemp`;
+    COMPLETEOUTPUT=`mktemp test-resume.co.XXXXXX`;
+    FIRSTPARTIALOUTPUT=`mktemp test-resume.fpo.XXXXXX`;
+    SECONDPARTIALOUTPUT=`mktemp test-resume.spo.XXXXXX`;
     
     $MINION $INSTANCE > $COMPLETEOUTPUT;
     completenodes=`grep "Total Nodes" $COMPLETEOUTPUT | cut -d' ' -f3`;
@@ -53,6 +53,8 @@ for i in ./test_instances/resume_instances/*.minion; do
     echo "Resume sols: $(($firstpartialsols+$secondpartialsols))=$firstpartialsols+$secondpartialsols";
     
     if [ $completesols -ne $(($firstpartialsols+$secondpartialsols)) ]; then
-	exit 1; #fail and exit if sols don't match
+        exit 1; #fail and exit if sols don't match
     fi
-done;
+
+    rm -f $COMPLETEOUTPUT $FIRSTPARTIALOUTPUT $SECONDPARTIALOUTPUT
+done
