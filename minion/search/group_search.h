@@ -54,7 +54,7 @@ namespace Controller
             try
             {
               VarOrder order(original_order);
-              solve_loop(stateObj, next_search, order, v, prop, true);
+              solve_loop<false, false>(stateObj, next_search, order, v, prop, true);
             }
             catch(EndOfSearch)
             { 

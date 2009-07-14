@@ -236,6 +236,12 @@ public:
   bool resume;
   string resume_file;
 
+  //doing restarts?
+  bool doing_restarts;
+
+  //learn cons after restarts?
+  bool learn_restart_cons;
+
   // The format of output used (-1 for default)
   int outputType;
   
@@ -253,7 +259,8 @@ public:
     nodelimit(0), tableout(false), solsoutWrite(false), 
     print_solution(true), time_limit(0), time_limit_is_CPU_time(false),
     randomise_valvarorder(false), parser_verbose(false), 
-    redump(false), graph(false), outputType(-1), noTimers(false)
+    redump(false), graph(false), doing_restarts(false), learn_restart_cons(true), 
+    outputType(-1), noTimers(false)
   {}
   
   /// Denotes all solutions should be found, by setting sollimit to -1.

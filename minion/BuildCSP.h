@@ -23,10 +23,12 @@
 struct SearchMethod
 {
   VarOrderEnum order;
+  RestartStrategyEnum restart;
+  int restart_param;
   enum PropagationLevel preprocess;
   enum PropagationLevel prop_method;
   unsigned random_seed;
-  SearchMethod() : order(ORDER_NONE), preprocess(PropLevel_None), prop_method(PropLevel_GAC), random_seed((unsigned)time(NULL) ^ getpid())
+  SearchMethod() : order(ORDER_NONE), restart(RESTART_NEVER), restart_param(10), preprocess(PropLevel_None), prop_method(PropLevel_GAC), random_seed((unsigned)time(NULL) ^ getpid())
   { }
   
 };
