@@ -1,0 +1,14 @@
+MINION 3
+#TEST SOLCOUNT 4
+
+**VARIABLES**
+DISCRETE q {-1..1}
+BOOL b
+
+**CONSTRAINTS**
+
+reifyimply(weightedsumgeq([], [], q), b)
+reifyimply(weightedsumleq([], [], q), b)
+
+
+**EOF**
