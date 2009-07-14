@@ -72,18 +72,18 @@ cout << "" << endl
 << "" << endl
 << "The choices are:" << endl
 << "" << endl
-<< "- GAC" << endl
+<< "- GAC " << endl
 << "- generalised arc consistency (default)" << endl
 << "- all propagators are run to a fixed point" << endl
 << "- if some propagators enforce less than GAC then the model will" << endl
 << "not necessarily be fully GAC at the outset" << endl
 << "" << endl
-<< "- SACBounds" << endl
+<< "- SACBounds " << endl
 << "- singleton arc consistency on the bounds of each variable" << endl
-<< "- AC can be achieved when any variable lower or upper bound is a" << endl
+<< "- AC can be achieved when any variable lower or upper bound is a " << endl
 << "singleton in its own domain" << endl
 << "" << endl
-<< "- SAC" << endl
+<< "- SAC " << endl
 << "- singleton arc consistency" << endl
 << "- AC can be achieved in the model if any value is a singleton in" << endl
 << "its own domain" << endl
@@ -94,7 +94,7 @@ cout << "" << endl
 << "the singleton containing their upper bound, or the singleton containing" << endl
 << "their lower bound" << endl
 << "" << endl
-<< "- SSAC" << endl
+<< "- SSAC " << endl
 << "- singleton singleton arc consistency" << endl
 << "- SAC can be achieved when any value is a singleton in its own domain" << endl
 << "" << endl
@@ -161,30 +161,17 @@ cout << "To stop search after N nodes, do" << endl
 << "" << endl
 << " minion -nodelimit N myinput.minion" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -cpulimit" << endl
-<< "help switches -timelimit" << endl
+cout << "help switches -timelimit" << endl
 << "help switches -sollimit" << endl << endl << endl;
 } else
 if("switches -timelimit" == request) {
 cout << "Help entry: " << "switches -timelimit" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "To stop search after N seconds (real time), do" << endl
+cout << "To stop search after N seconds, do" << endl
 << "" << endl
 << " minion -timelimit N myinput.minion" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -cpulimit" << endl
-<< "help switches -nodelimit" << endl
-<< "help switches -sollimit" << endl << endl << endl;
-} else
-if("switches -cpulimit" == request) {
-cout << "Help entry: " << "switches -cpulimit" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "To stop search after N seconds (CPU time), do" << endl
-<< "" << endl
-<< " minion -cpulimit N myinput.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -timelimit" << endl
-<< "help switches -nodelimit" << endl
+cout << "help switches -nodelimit" << endl
 << "help switches -sollimit" << endl << endl << endl;
 } else
 if("switches -sollimit" == request) {
@@ -194,8 +181,7 @@ cout << "To stop search after N solutions have been found, do" << endl
 << "" << endl
 << " minion -sollimit N myinput.minion" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -cpulimit" << endl
-<< "help switches -nodelimit" << endl
+cout << "help switches -nodelimit" << endl
 << "help switches -timelimit" << endl << endl << endl;
 } else
 if("switches -varorder" == request) {
@@ -461,42 +447,6 @@ cout << "See also" << endl
 << "" << endl
 << " help constraints watched-or" << endl << endl << endl;
 } else
-if("constraints gaclexless" == request) {
-cout << "Help entry: " << "constraints gaclexless" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " gaclexless(vec0, vec1)" << endl
-<< "" << endl
-<< " takes two vectors vec0 and vec1 of the same length and ensures that" << endl
-<< " vec0 is lexicographically less than vec1 in any solution." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint maintains GAC." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
-<< "" << endl
-<< " help constraints gaclexleq" << endl
-<< "" << endl
-<< " for a similar constraint with non-strict lexicographic inequality." << endl << endl << endl;
-} else
-if("constraints gaclexleq" == request) {
-cout << "Help entry: " << "constraints gaclexleq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " gaclexleq(vec0, vec1)" << endl
-<< "" << endl
-<< " takes two vectors vec0 and vec1 of the same length and ensures that" << endl
-<< " vec0 is lexicographically less than or equal to vec1 in any solution." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraints achieves GAC." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
-<< "" << endl
-<< " help constraints gaclexless" << endl
-<< "" << endl
-<< " for a similar constraint with strict lexicographic inequality." << endl << endl << endl;
-} else
 if("constraints gacalldiff" == request) {
 cout << "Help entry: " << "constraints gacalldiff" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -696,44 +646,8 @@ cout << "Suppose the input file had the following vectors of variables defined:"
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This constraint enforces a hybrid consistency. It reads the bounds of the" << endl
 << "capacity variables, then enforces GAC over the primary variables only. Then the" << endl
-<< "bounds of the capacity variables are updated using flow algorithms similar to" << endl
-<< "those proposed by Quimper et al, Improved Algorithms for the Global Cardinality" << endl
-<< "Constraint." << endl
-<< "" << endl
-<< "This constraint provides stronger propagation to the capacity variables than the" << endl
-<< "gccweak constraint." << endl << endl << endl;
-} else
-if("constraints gccweak" == request) {
-cout << "Help entry: " << "constraints gccweak" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The Generalized Cardinality Constraint (GCC) (weak variant) constrains the " << endl
-<< "number of each value that a set of variables can take." << endl
-<< "" << endl
-<< "gccweak([primary variables], [values of interest], [capacity variables])" << endl
-<< "" << endl
-<< "For each value of interest, there must be a capacity variable, which specifies" << endl
-<< "the number of occurrences of the value in the primary variables." << endl
-<< "" << endl
-<< "This constraint is new, and its syntax and implementation are not finalised." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "Suppose the input file had the following vectors of variables defined:" << endl
-<< "" << endl
-<< "DISCRETE myVec[9] {1..9}" << endl
-<< "BOUND cap[9] {0..2}" << endl
-<< "" << endl
-<< "The following constraint would restrict the occurrence of values 1..9 in myVec" << endl
-<< "to be at most 2 each initially, and finally equal to the values of the cap" << endl
-<< "vector." << endl
-<< "" << endl
-<< "gccweak(myVec, [1,2,3,4,5,6,7,8,9], cap)" << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint enforces a hybrid consistency. It reads the bounds of the" << endl
-<< "capacity variables, then enforces GAC over the primary variables only. Then the" << endl
 << "bounds of the capacity variables are updated by counting values in the domains" << endl
-<< "of the primary variables." << endl
-<< "" << endl
-<< "The consistency over the capacity variables is weaker than the gcc constraint, " << endl
-<< "hence the name gccweak." << endl << endl << endl;
+<< "of the primary variables." << endl << endl << endl;
 } else
 if("constraints pow" == request) {
 cout << "Help entry: " << "constraints pow" << endl << endl;
@@ -1040,59 +954,7 @@ cout << "The constraints extension can also be specified in the constraint" << e
 << "" << endl
 << "table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help input tuplelist" << endl
-<< "help input negativetable" << endl << endl << endl;
-} else
-if("constraints negativetable" == request) {
-cout << "Help entry: " << "constraints negativetable" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "An extensional constraint that enforces GAC. The constraint is" << endl
-<< "specified via a list of disallowed tuples." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "See entry " << endl
-<< "" << endl
-<< " help input negativetable" << endl
-<< "" << endl
-<< "for how to specify a table constraint in minion input. The only" << endl
-<< "difference for negativetable is that the specified tuples are" << endl
-<< "disallowed." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help input table" << endl
-<< "help input tuplelist" << endl << endl << endl;
-} else
-if("switches -restart" == request) {
-cout << "Help entry: " << "switches -restart" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Allows a choice of restart strategies. By default, minion will not perform any" << endl
-<< "restarts." << endl
-<< "" << endl
-<< "The input format is -restart <strategy> <parameter>?" << endl
-<< "" << endl
-<< "If no parameter is given, the default is 10. In the following let k=<parameter>." << endl
-<< "" << endl
-<< "The available strategies are as follows:" << endl
-<< "" << endl
-<< "- never - never restart" << endl
-<< "- constant - restart every k nodes" << endl
-<< "- arithmetic - restart after k nodes, then 2k, then 3k, and so on" << endl
-<< "- geometric - restart after k nodes, then k^2, then k^3, and so on" << endl
-<< "- luby - restart after intervals of k, k, 2k, k, k, 2k, 4k, ... nodes" << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "" << endl
-<< "Be warned that the wrong restart strategy and/or argument can lead to search" << endl
-<< "times increasing dramatically." << endl
-<< "" << endl
-<< "If restarts are combined with the argument -norestartlearn then search may" << endl
-<< "loop infinitely and/or the same solution may be found multiple times." << endl << endl << endl;
-} else
-if("switches -norestartlearn" == request) {
-cout << "Help entry: " << "switches -norestartlearn" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Do not add constraints after each backtrack to avoid the same search space" << endl
-<< "being explored again after a restart." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This switch is very dangerous. It can lead to infinite search and the same" << endl
-<< "solution being returned several times." << endl << endl << endl;
+cout << "help input tuplelist" << endl << endl << endl;
 } else
 if("variables discrete" == request) {
 cout << "Help entry: " << "variables discrete" << endl << endl;
@@ -1587,10 +1449,7 @@ cout << "help constraints element" << endl;
 cout << "help constraints element_one" << endl;
 cout << "help constraints eq" << endl;
 cout << "help constraints gacalldiff" << endl;
-cout << "help constraints gaclexleq" << endl;
-cout << "help constraints gaclexless" << endl;
 cout << "help constraints gcc" << endl;
-cout << "help constraints gccweak" << endl;
 cout << "help constraints hamming" << endl;
 cout << "help constraints ineq" << endl;
 cout << "help constraints lexleq" << endl;
@@ -1600,7 +1459,6 @@ cout << "help constraints max" << endl;
 cout << "help constraints min" << endl;
 cout << "help constraints minuseq" << endl;
 cout << "help constraints modulo" << endl;
-cout << "help constraints negativetable" << endl;
 cout << "help constraints occurrence" << endl;
 cout << "help constraints occurrencegeq" << endl;
 cout << "help constraints occurrenceleq" << endl;
@@ -1640,14 +1498,12 @@ cout << "help input variables" << endl;
 if("switches" == request) {
 cout << "Available subentries:" << endl;
 cout << "help switches -check" << endl;
-cout << "help switches -cpulimit" << endl;
 cout << "help switches -dumptree" << endl;
 cout << "help switches -findallsols" << endl;
 cout << "help switches -fullprop" << endl;
 cout << "help switches -nocheck" << endl;
 cout << "help switches -nodelimit" << endl;
 cout << "help switches -noprintsols" << endl;
-cout << "help switches -norestartlearn" << endl;
 cout << "help switches -preprocess" << endl;
 cout << "help switches -printsols" << endl;
 cout << "help switches -printsolsonly" << endl;
@@ -1655,7 +1511,6 @@ cout << "help switches -quiet" << endl;
 cout << "help switches -randomiseorder" << endl;
 cout << "help switches -randomseed" << endl;
 cout << "help switches -redump" << endl;
-cout << "help switches -restart" << endl;
 cout << "help switches -sollimit" << endl;
 cout << "help switches -solsout" << endl;
 cout << "help switches -tableout" << endl;

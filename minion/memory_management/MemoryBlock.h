@@ -200,6 +200,7 @@ public:
 private:
   void copyMemBlock(char* location, pair<char*,size_t> data, size_t copy_start, size_t copy_length)
   {
+      D_ASSERT(data.second >= copy_start + copy_length);
       //memcpy(location, data.first + copy_start, copy_length);
       
       size_t data_copy = 0;

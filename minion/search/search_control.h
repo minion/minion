@@ -23,12 +23,10 @@ using boost::bind;
 #include "../system/system.h"
 #include "common_search.h"
 #include "standard_search.h"
-#include "restart_strategies.h"
 
 template<typename SearchAlgorithm, typename Vars, typename Propogator>
   function<void (void)> solve_select_search(StateObj* stateObj, const function<void (void)>& next_search, SearchOrder order_in, 
-					    SearchAlgorithm& order, Vars& vars, CSPInstance& instance, Propogator prop,
-					    RestartStrategy* rs)
+                                                 SearchAlgorithm& order, Vars& vars, CSPInstance& instance, Propogator prop)
 {
   switch(order_in.order)
   {
@@ -45,16 +43,7 @@ template<typename SearchAlgorithm, typename Vars, typename Propogator>
       return bind(Controller::group_solve_loop<SearchAlgorithm, Vars, vector<AnyVarRef>, Propogator>, stateObj, next_search, order, vars, perm, prop);
     }
     else
-      if(getOptions(stateObj).learn_restart_cons)
-	if(getOptions(stateObj).doing_restarts)
-	  return bind(Controller::solve_loop<true, true, SearchAlgorithm, Vars, Propogator>, stateObj, next_search, order, vars, prop, order_in.find_one_assignment, rs);
-	else
-	  return bind(Controller::solve_loop<false, false, SearchAlgorithm, Vars, Propogator>, stateObj, next_search, order, vars, prop, order_in.find_one_assignment, rs);
-      else
-	if(getOptions(stateObj).doing_restarts)
-	  return bind(Controller::solve_loop<true, false, SearchAlgorithm, Vars, Propogator>, stateObj, next_search, order, vars, prop, order_in.find_one_assignment, rs);
-	else
-	  return bind(Controller::solve_loop<false, false, SearchAlgorithm, Vars, Propogator>, stateObj, next_search, order, vars, prop, order_in.find_one_assignment, rs);
+      return bind(Controller::solve_loop<SearchAlgorithm, Vars, Propogator>, stateObj, next_search, order, vars, prop, order_in.find_one_assignment);
     case ORDER_CONFLICT:
       return bind(Controller::conflict_solve_loop<SearchAlgorithm, Vars, Propogator>, stateObj, next_search, order, vars, prop);
     default:
@@ -64,8 +53,7 @@ template<typename SearchAlgorithm, typename Vars, typename Propogator>
 
   template<typename VarValOrder, typename Propogator>
 function<void (void)> solve(StateObj* stateObj, const function<void (void)>& next_search, SearchOrder order_in, 
-			    VarValOrder& search_order, CSPInstance& instance, Propogator prop,
-			    RestartStrategy* rs)
+                                 VarValOrder& search_order, CSPInstance& instance, Propogator prop)
 {
   typedef typename VarValOrder::first_type::value_type VarType;
 
@@ -76,7 +64,7 @@ function<void (void)> solve(StateObj* stateObj, const function<void (void)>& nex
       Controller::VariableOrder<VarType, Controller::SlowStaticBranch> 
         order(stateObj, search_order.first, search_order.second);
 
-      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop, rs);
+      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop);
     }
     break;
     case ORDER_SDF:
@@ -84,7 +72,7 @@ function<void (void)> solve(StateObj* stateObj, const function<void (void)>& nex
       Controller::VariableOrder<VarType, Controller::SDFBranch> 
         order(stateObj, search_order.first, search_order.second);
 
-      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop, rs);
+      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop);
     }
     break;
     case ORDER_SRF:
@@ -92,7 +80,7 @@ function<void (void)> solve(StateObj* stateObj, const function<void (void)>& nex
       Controller::VariableOrder<VarType, Controller::SRFBranch> 
         order(stateObj, search_order.first, search_order.second);
 
-      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop, rs); 
+      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop); 
     }
     break;
     case ORDER_LDF:
@@ -100,7 +88,7 @@ function<void (void)> solve(StateObj* stateObj, const function<void (void)>& nex
       Controller::VariableOrder<VarType, Controller::LDFBranch> 
         order(stateObj, search_order.first, search_order.second);
 
-      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop, rs);
+      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop);
     }
     break;
 
@@ -108,14 +96,14 @@ function<void (void)> solve(StateObj* stateObj, const function<void (void)>& nex
     {  
       Controller::VariableOrder<VarType, Controller::StaticBranch>
         order(stateObj, search_order.first, search_order.second);
-      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop, rs);
+      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop);
     }
     break;
     case ORDER_CONFLICT:
     {
       Controller::VariableOrder<VarType, Controller::StaticBranch>
         order(stateObj, search_order.first, search_order.second);
-      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop, rs); 
+      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop); 
     }
     break;
 
@@ -124,7 +112,7 @@ function<void (void)> solve(StateObj* stateObj, const function<void (void)>& nex
 #ifdef WDEG
       Controller::VariableOrder<VarType, Controller::WdegBranch>
         order(stateObj, search_order.first, search_order.second);
-      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop, rs); 
+      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop); 
 #else
     FAIL_EXIT("This copy of Minion compiled without 'WDEG' support");
 #endif
@@ -137,7 +125,7 @@ function<void (void)> solve(StateObj* stateObj, const function<void (void)>& nex
 #ifdef WDEG
       Controller::VariableOrder<VarType, Controller::DomOverWdegBranch>
         order(stateObj, search_order.first, search_order.second);
-      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop, rs);
+      return solve_select_search(stateObj, next_search, order_in, order, search_order.first, instance, prop);
 #else
     FAIL_EXIT("This copy of Minion compiled without 'WDEG' support");
 #endif

@@ -32,29 +32,9 @@ namespace Controller
   // These need the following functions:
   // Constructor that takes existing variable and value ordering
   // (Feel free to ignore the value ordering!)
-
-  //function that performs a restart of the search procedure
-  template<bool restart_learn, typename VarOrder, typename Variables, typename Propagator>
-    inline void do_rs(StateObj* stateObj, VarOrder& order, Variables& v, Propagator prop)
-  {
-    vector<AbstractConstraint*> cons;
-    if(restart_learn)
-      cons = generateRestartCons(stateObj, order);
-    maybe_print_search_action(stateObj, "restart");
-    int search_depth = order.search_depth();
-    for(int i = 0; i < search_depth; ++i) {
-      world_pop(stateObj);
-    }
-    order.reset();
-    if(restart_learn) {
-      for(vector<AbstractConstraint*>::iterator curr = cons.begin(); curr != cons.end(); curr++)
-	getState(stateObj).addConstraintMidsearch(*curr);
-      prop(stateObj, v);
-    }
-  }
   
-  template<bool doing_restarts, bool restart_learn, typename VarOrder, typename Variables, typename Propogator>
-    inline void solve_loop(StateObj* stateObj, function<void (void)> next_search, VarOrder& order, Variables& v, Propogator prop, bool findOneSol, RestartStrategy* rs = new NeverRS())
+  template<typename VarOrder, typename Variables, typename Propogator>
+  inline void solve_loop(StateObj* stateObj, function<void (void)> next_search, VarOrder& order, Variables& v, Propogator prop, bool findOneSol)
   {
     // Don't corrupt the state the world came in with.
     world_push(stateObj);
@@ -67,10 +47,6 @@ namespace Controller
       getState(stateObj).incrementNodeCount();
       if(do_checks(stateObj, order))
         throw EndOfSearch();
-      if(doing_restarts && rs->check()) {
-	do_rs<restart_learn>(stateObj, order, v, prop);
-	continue; //start again as if for the first time
-      }
 
       // order.find_next_unassigned returns true if all variables assigned.
       if(order.find_next_unassigned())

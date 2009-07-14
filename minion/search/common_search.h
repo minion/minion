@@ -25,9 +25,7 @@
 #include "../solver.h"
 #include "../variables/AnyVarRef.h"
 #include "../variables/mappings/variable_neg.h"
-#include "restart_strategies.h"
-#include "../dynamic_constraints/dynamic_new_or.h"
-#include "../dynamic_constraints/unary/dynamic_notliteral.h"
+
 
 
 namespace Controller
@@ -200,31 +198,6 @@ namespace Controller
       }
     }
     fileout << "**EOF**" << endl;
-  }
-   
-  template<typename VarOrder>
-    inline vector<AbstractConstraint*> generateRestartCons(StateObj* stateObj, VarOrder& order)
-  {
-    vector<AbstractConstraint*> retVal;
-    retVal.reserve(order.branches.size());
-    vector<triple>& branches = order.branches;
-    vector<triple> left_branches_so_far;
-    left_branches_so_far.reserve(branches.size());
-    for(vector<triple>::const_iterator curr = branches.begin(); curr != branches.end(); curr++) {
-      if(curr->isLeft) {
-        left_branches_so_far.push_back(*curr);
-      } else {
-	vector<AbstractConstraint*> disjuncts;
-        for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
-            lb != left_branches_so_far.end();
-            lb++) {
-	  disjuncts.push_back(new WatchNotLiteralConstraint<AnyVarRef>(stateObj, order.var_order[lb->var], lb->val));
-        }
-	disjuncts.push_back(new WatchNotLiteralConstraint<AnyVarRef>(stateObj, order.var_order[curr->var], curr->val));
-	retVal.push_back(new Dynamic_OR(stateObj, disjuncts));
-      }
-    }
-    return retVal;
   }
    
   /// Check if timelimit has been exceeded.

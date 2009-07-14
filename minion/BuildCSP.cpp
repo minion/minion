@@ -104,41 +104,18 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
         var_val_order.second[i] = (rand() % 100) > 50;
     }
 
-    RestartStrategy* rs;
-    int k = args.restart_param;
-    switch(args.restart) {
-    case RESTART_NEVER:
-      rs = new NeverRS();
-      break;
-    case RESTART_CONSTANT:
-      rs = new ConstantRS(k);
-      break;
-    case RESTART_ARITHMETIC:
-      rs = new ArithmeticRS(k);
-      break;
-    case RESTART_GEOMETRIC:
-      rs = new GeometricRS(k);
-      break;
-    case RESTART_LUBY:
-      rs = new LubyRS(k);
-      break;
-    default:
-      D_ASSERT(false);
-      exit(1);
-    }
-
     switch(args.prop_method)
     {
-    case PropLevel_GAC:
-      search = solve(stateObj, search, order, var_val_order, instance, PropagateGAC(), rs);
+      case PropLevel_GAC:
+      search = solve(stateObj, search, order, var_val_order, instance, PropagateGAC());
       break;
-    case PropLevel_SAC:
-      search = solve(stateObj, search, order, var_val_order, instance, PropagateSAC(), rs);
+      case PropLevel_SAC:
+      search = solve(stateObj, search, order, var_val_order, instance, PropagateSAC());
       break;
-    case PropLevel_SSAC:
-      search = solve(stateObj, search, order, var_val_order, instance, PropagateSSAC(), rs);
+      case PropLevel_SSAC:
+      search = solve(stateObj, search, order, var_val_order, instance, PropagateSSAC());
       break;
-    default:
+      default:
       abort();
     }
   }

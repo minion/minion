@@ -60,7 +60,7 @@ public:
   }
   
   BackTrackMemory() :
-  block_cache(100)
+  block_cache(100), backtrack_data(10)
   { }
  
   /// Copies the current state of backtrackable memory.

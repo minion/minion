@@ -77,15 +77,6 @@ enum VarOrderEnum
   ORDER_CONFLICT
 };
 
-enum RestartStrategyEnum
-{
-  RESTART_NEVER,
-  RESTART_CONSTANT,
-  RESTART_ARITHMETIC,
-  RESTART_GEOMETRIC,
-  RESTART_LUBY
-};
-
 struct ConstraintDef
 {
   std::string name;

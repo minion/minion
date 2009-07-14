@@ -213,10 +213,6 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
         exit(1);
       }
     }
-    else if(command == string("-norestartlearn"))
-    {
-      getOptions(stateObj).learn_restart_cons = false;      
-    }
     else if(command == string("-resume-file"))
     {
       getOptions(stateObj).resume = true;
@@ -227,36 +223,6 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
 	exit(1);
       }
       getOptions(stateObj).resume_file = file;
-    }
-    else if(command == string("-restart"))
-    {
-      i++;
-      getOptions(stateObj).doing_restarts = true;
-      string strategy(argv[i]);
-      if(strategy == "never")
-	args.restart = RESTART_NEVER;
-      else if(strategy == "constant")
-	args.restart = RESTART_CONSTANT;
-      else if(strategy == "arithmetic")
-	args.restart = RESTART_ARITHMETIC;
-      else if(strategy == "geometric")
-	args.restart = RESTART_GEOMETRIC;
-      else if(strategy == "luby") {
-	args.restart = RESTART_LUBY;
-      } else {
-	cerr << "Unknown restart strategy: " << strategy << endl;
-	exit(1);
-      }
-      std::stringstream k_stream(argv[i + 1]);
-      int k;
-      if(k_stream >> k) { //phew! the next argument is an int.
-	if(k <= 0) {
-	  cout << "argument to restart strategy must be positive" << endl;
-	  exit(1);
-	}
-	i++;
-	args.restart_param = k;
-      }      
     }
     else if(command[0] == '-' && command != string("--"))
     {
