@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.4.7 FATAL_ERROR)
-#foo
 
-project(minion)
+project(MinionProject)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-modules)
 include(CheckIncludeFileCXX)
