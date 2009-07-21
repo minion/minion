@@ -369,11 +369,9 @@ add_executable(${BINARY} ${SRCS} ${PROJECT_SOURCE_DIR}/minion/minion.cpp)
 target_link_libraries(${BINARY} inputfile_parse)
 #target_link_libraries(${BINARY} ${BINARY}-lib)
 
-# when we're building minion-something, add a "minion" target that does the same
-if(NOT ${BINARY} STREQUAL ${PROJECT_NAME})
-    add_custom_target(${PROJECT_NAME} DEPENDS ${BINARY})
-    add_custom_target(${PROJECT_NAME}-lib DEPENDS ${BINARY}-lib)
-endif()
+# add a "minion" makefile target
+add_custom_target(minion DEPENDS ${BINARY})
+add_custom_target(minion-lib DEPENDS ${BINARY}-lib)
 
 if(Boost_FOUND)
     target_link_libraries(${BINARY} "-L${Boost_LIBRARY_DIRS}" ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
