@@ -1,0 +1,17 @@
+MINION 3
+#TEST SOLCOUNT 1
+# Minion Graceful Graph Instance
+#   Version with alldiff from -Q to Q
+# K3 x P2
+
+**VARIABLES**
+
+**TUPLELIST**
+
+Empty 1 0
+
+**CONSTRAINTS**
+
+table([ ],Empty)
+
+**EOF**
