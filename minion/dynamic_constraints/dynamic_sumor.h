@@ -308,5 +308,9 @@ template<typename VarArray1,  typename VarArray2>
 AbstractConstraint*
   VecOrCountConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, int i)
   { return new VecCountDynamic<VarArray1,VarArray2>(stateObj, varray1, varray2, i); }
-#endif
 
+template<typename VarArray1,  typename VarArray2>
+AbstractConstraint*
+  NotVecOrCountConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, int i)
+  { return new VecCountDynamic<VarArray1,VarArray2,EqIterated>(stateObj, varray1, varray2, i); }
+#endif
