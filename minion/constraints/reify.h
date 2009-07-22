@@ -75,8 +75,8 @@ ALL constraints are reifyimplyable.
 #undef P
 #endif
 
-#define P(x) cout << x << endl
-//#define P(x)
+//#define P(x) cout << x << endl
+#define P(x)
 
 #define NEWREIFY
 //#define NODETRICK   // This is broken! leave switched off.
