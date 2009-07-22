@@ -20,8 +20,7 @@ for i in ./test_instances/resume_instances/*.minion; do
     #don't test if the solve time is under a second, because  it is difficult to ensure
     #that the first partial run later will not run to competition, due to variation in
     #solve times
-    continue=`echo "($completewalltime - $completesolvetime)<1.0" | bc`;
-    if [ $continue -eq 1 ]; then
+    if [ `echo $completesolvetime | awk -F '.' '{ print $1 }'` -eq 0 ]; then
 	echo "Solve time under a second - don't test";
 	continue;
     fi
