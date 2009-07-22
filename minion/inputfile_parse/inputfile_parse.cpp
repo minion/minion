@@ -140,7 +140,7 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
           line_count++;
           start_of_line = cs.get_raw_pos();
           char buf[10000];
-          cs.getline(buf, 10000);
+          cs.getline(buf, 9999);
           current_line = buf;
       }
       while(cs.get_raw_pos() < pos);
