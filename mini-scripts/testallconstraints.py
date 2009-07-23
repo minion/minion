@@ -6,11 +6,12 @@ import sys, os, getopt
 from constraint_test_common import *
 import random
 from sendemail import *
+from string import split
 
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit", "procs=", "seed="])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit", "procs=", "seed=", "conslist="])
 
 if len(other)>1:
-    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email] [--procs=...] [--seed=...]"
+    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email] [--procs=...] [--seed=...] [--conslist=...]"
     sys.exit(1)
 
 # This one tests all the constraints in the following list.
@@ -87,6 +88,8 @@ for i in optargs:
         procs=int(a2)
     elif a1=="--seed":
         seed=int(a2)
+    elif a1=="--conslist":
+        conslist=split(a2, ",")
 
 workers = []
 readers = []
