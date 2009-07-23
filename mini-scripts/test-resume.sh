@@ -16,7 +16,7 @@ for i in ./test_instances/resume_instances/*.minion; do
     completesols=`grep "Solutions Found" $COMPLETEOUTPUT | cut -d' ' -f3`;
     completewalltime=`grep "Total Wall Time" $COMPLETEOUTPUT | cut -d' ' -f4`;
     completesolvetime=`grep "Solve Time" $COMPLETEOUTPUT | cut -d' ' -f3`;
-    completefirstnodetime=`grep "First node time" | cut -d' ' -f4`;
+    completefirstnodetime=`grep "First node time" $COMPLETEOUTPUT | cut -d' ' -f4`;
     
     #don't test if the solve time is under a second, because  it is difficult to ensure
     #that the first partial run later will not run to completion, due to variation in
