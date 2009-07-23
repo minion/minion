@@ -738,7 +738,6 @@ class testabs:
 class testhamming:
     def printtable(self, domains):
         const=self.constants[0]
-        #  x1 <= x2+const 
         cross=[]
         crossprod(domains, [], cross)
         out=[]
@@ -751,6 +750,22 @@ class testhamming:
 
     def runtest(self, options=dict()):
         return runtestgeneral("hamming", True, options, [4,4,1], ["smallnum", "smallnum", "const"], self, not options['reify'])
+
+class testnot__minus__hamming:
+    def printtable(self, domains):
+        const=abs(self.constants[0])
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+          l1=l[:len(l)/2]
+          l2=l[len(l)/2:]
+          if sum([  l1[i] != l2[i] for i in xrange(len(l1))] ) < const:
+            out.append(l)
+        return out
+
+    def runtest(self, options=dict()):
+        return runtestgeneral("not-hamming", True, options, [4,4,1], ["smallnum", "smallnum", "const"], self, not options['reify'] and not options['reifyimply'])
 
 class testlitsumgeq:
     def printtable(self, domains):

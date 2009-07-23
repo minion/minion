@@ -34,7 +34,7 @@ conslist+=["watchelement_one", "element_one"]
 # arithmetic constraints
 conslist+=["modulo", "pow", "minuseq", "product", "div", "abs"]
 
-conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "hamming"]
+conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "hamming", "not-hamming"]
 conslist+=["weightedsumleq", "weightedsumgeq"]
 
 conslist+=["litsumgeq"]  
@@ -53,12 +53,14 @@ conslist+=["max", "min"]
 
 conslist+=["watchneq", "watchless"]
 
-reifyexceptions=["watchsumgeq", "litsumgeq", "watchneq", "watchless"]
+reifyexceptions=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
+reifyimplyexceptions=["not-hamming"]
 # add reifyimply variant of all constraints,
 # and reify variant of all except those in reifyexceptions
 it=conslist[:]
 for c in it:
-    conslist+=["reifyimply"+c]
+    if c not in reifyimplyexceptions:
+        conslist+=["reifyimply"+c]
     if c not in reifyexceptions:
         conslist+=["reify"+c]
 
