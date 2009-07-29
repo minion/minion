@@ -71,8 +71,18 @@ class TableOut
         // If the column headers are unexpected, should print something to cerr.
         
         // Second version should be able to cope with different column headers? At least different orders?
-        
-        fstream f(filename.c_str(), ios::app | ios::out);  // Open with append mode.
+
+        ofstream f;
+        if(filename == "-")
+        {
+            f.copyfmt(std::cout);
+            f.clear(std::cout.rdstate());
+            f.basic_ios<char>::rdbuf(std::cout.rdbuf());
+        }
+        else
+        {
+            f.open(filename.c_str(), ios::app | ios::out);  // Open with append mode.
+        }
         
         if(!f)
         {
@@ -80,7 +90,7 @@ class TableOut
         }
         
         // if file position is the beginning of the file, then output the column headers.
-        if(f.tellp()==streampos(0))
+        if(filename == "-" || f.tellp()==streampos(0))
         {
             f << "#";
             
