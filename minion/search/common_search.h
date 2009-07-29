@@ -171,6 +171,9 @@ namespace Controller
   template<typename VarOrder>
     inline void generateRestartFile(StateObj* stateObj, VarOrder& order)
   {
+    if(getOptions(stateObj).noresumefile) {
+        return;
+    }
     string filename = string("minion-resume-") + to_string(getpid());
     cout << "Output resume file to \"" << filename << "\"" << endl;
     ofstream fileout(filename.c_str());

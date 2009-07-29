@@ -268,6 +268,11 @@ cout << "To resume the solving of problem.minion from the file resume.minion do"
 << "" << endl
 << " minion -resume-file resume.minion problem.minion" << endl << endl << endl;
 } else
+if("switches -noresume" == request) {
+cout << "Help entry: " << "switches -noresume" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Do not write a resume file on timeout or being killed." << endl << endl << endl;
+} else
 if("input" == request) {
 cout << "Help entry: " << "input" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -1622,6 +1627,7 @@ cout << "help switches -fullprop" << endl;
 cout << "help switches -nocheck" << endl;
 cout << "help switches -nodelimit" << endl;
 cout << "help switches -noprintsols" << endl;
+cout << "help switches -noresume" << endl;
 cout << "help switches -preprocess" << endl;
 cout << "help switches -printsols" << endl;
 cout << "help switches -printsolsonly" << endl;
