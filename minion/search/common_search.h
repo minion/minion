@@ -201,7 +201,7 @@ namespace Controller
    
   /// Check if timelimit has been exceeded.
   template<typename VarOrder>
-    inline bool do_checks(StateObj* stateObj, VarOrder& order)
+  inline bool do_checks(StateObj* stateObj, VarOrder& order)
   {
     if(getState(stateObj).getNodeCount() == getOptions(stateObj).nodelimit) {
       generateRestartFile(stateObj, order);
@@ -223,25 +223,25 @@ namespace Controller
       
       getOptions(stateObj).printLine("Time out.");
       getTableOut().set("TimeOut", 1);
-        return true;
+      return true;
     }
     return false;
   }
   
-  
-template<typename T>
-void inline maybe_print_search_state(StateObj* stateObj, const char* name, T& vars)
-{
-  if(getOptions(stateObj).dumptree)
-    cout << name << getState(stateObj).getNodeCount() << "," << get_dom_as_string(vars) << endl;
-}
 
-void inline maybe_print_search_action(StateObj* stateObj, const char* action)
-{
-    // used to print "bt" usually
+  template<typename T>
+  void inline maybe_print_search_state(StateObj* stateObj, const char* name, T& vars)
+  {
     if(getOptions(stateObj).dumptree)
-        cout << "SearchAction:" << action << endl;
-}
+      cout << name << getState(stateObj).getNodeCount() << "," << get_dom_as_string(vars) << endl;
+  }
+
+  void inline maybe_print_search_action(StateObj* stateObj, const char* action)
+  {
+      // used to print "bt" usually
+      if(getOptions(stateObj).dumptree)
+          cout << "SearchAction:" << action << endl;
+  }
 
   void inline deal_with_solution(StateObj* stateObj)
   {
