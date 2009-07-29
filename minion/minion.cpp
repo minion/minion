@@ -315,6 +315,16 @@ specifies as ordering it will randomly permute this. If no ordering is
 specified a random permutation of all the variables is used.
 */
 
+/** @help switches;-resume-file Description
+Resume solving from a resume file.
+*/
+
+/** @help switches;-resume-file Example
+To resume the solving of problem.minion from the file resume.minion do
+
+   minion -resume-file resume.minion problem.minion
+*/
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //Entrance:
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
