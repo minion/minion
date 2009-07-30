@@ -56,11 +56,6 @@ public:
     sparseBoundVarContainer(_stateObj)
   {}
   
-  BoundVarContainer<>& getBoundVarContainer() { return boundVarContainer; }
-  BoolVarContainer& getBoolVarContainer() { return boolVarContainer; }
-  BigRangeVarContainer<BitContainerType>& getBigRangeVarContainer() { return bigRangeVarContainer; }
-  SparseBoundVarContainer<>& getSparseBoundVarContainer() { return sparseBoundVarContainer; }
-
   inline void lock() {
     boundVarContainer.lock();
     boolVarContainer.lock();
