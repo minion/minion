@@ -95,7 +95,6 @@ struct BigRangeVarContainer {
   }
   
   typedef DomainInt domain_bound_type;
-  static const d_type one = static_cast<d_type>(1);
   MoveablePointer bound_data;
   MonotonicSet *bms_array;
   TriggerList trigger_list;
