@@ -22,6 +22,7 @@ using boost::bind;
 
 #include "../system/system.h"
 #include "SearchManager.h"
+#include "variable_orderings.h"
 
 template<typename SearchAlgorithm, typename Vars, typename Propagator>
   function<void (void)> solve_select_search(StateObj* stateObj, const function<void (void)>& next_search, SearchOrder order_in, 
@@ -50,18 +51,59 @@ template<typename SearchAlgorithm, typename Vars, typename Propagator>
   }
 }
 
+// returns an instance of SearchManager with the required variable ordering, propagator etc.
 
-
-  template<typename VarValOrder, typename Propagator>
-function<void (void)> solve(StateObj* stateObj, const function<void (void)>& next_search, SearchOrder order_in, 
-                                 VarValOrder& search_order, CSPInstance& instance, Propagator prop)
+SearchManager& make_search_manager(StateObj* stateObj, PropagationLevel prop_method, VarOrderEnum order, 
+    vector<AnyVarRef> var_array, vector<char> val_order, )
 {
-  typedef typename VarValOrder::first_type::value_type VarType;
-
+    VariableOrder* vo;
+    
+    switch(order)
+    {
+    case ORDER_STATIC:
+        vo=new StaticBranch(var_array, val_order, stateObj);
+        break;
+    case ORDER_SDF:
+        vo=new SDFBranch(Var_array, val_order, stateObj);
+        break;
+    default:
+        abort();
+    }
+    
+    Propagator* p;
+    switch(prop_method)
+    {   // doesn't cover the PropLevel_None case.
+    case PropLevel_GAC:
+        p= new PropGAC();
+        break;
+    case PropLevel_SAC:
+        p= new PropSAC();
+        break;
+    case PropLevel_SSAC:
+        p=new PropSSAC();
+        break;
+    case PropLevel_SACBounds:
+        p=new PropSAC_Bounds();
+        break;
+    case PropLevel_SSACBounds:
+        p=new PropSSAC_Bounds();
+        break;
+    default:
+        abort();
+    }
+    
+    
+    
+    // need to switch here for different search algorthms. plain, parallel, group or conflict
+    SearchManager& sm=new SearchManager(stateObj, var_array, vo, p);
+    return sm;
+  
+  /*
   switch(order_in.order)
   {
     case ORDER_STATIC:
     {
+       VariableOr new 
       Controller::VariableOrder<VarType, Controller::SlowStaticBranch> 
         order(stateObj, search_order.first, search_order.second);
 
@@ -136,5 +178,6 @@ function<void (void)> solve(StateObj* stateObj, const function<void (void)>& nex
     default:
     FAIL_EXIT();
   } 
+  */
 }
 

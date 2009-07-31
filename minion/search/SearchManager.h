@@ -42,12 +42,13 @@ void inline maybe_print_search_assignment(StateObj* stateObj, T& var, DomainInt 
 
 // remove template on branchtype. make virtual.
 
-template<typename Propagator, typename VarType = AnyVarRef>   // for the time being vartype  must be anyvarref.
 struct SearchManager 
 {
   StateObj* stateObj;
-  vector<VarType> var_array;
+  vector<AnyVarRef> var_array;
   VariableOrder var_order;
+  
+  Propagator& prop;  // Propagator is the type of the base class. Method prop.prop(stateObj, var_array)
   
   vector<triple> branches; //L & R branches so far (isLeftBranch?,var,value)
   //vector<int> first_unassigned_variable;
@@ -55,8 +56,8 @@ struct SearchManager
   unsigned depth; //number of left branches
   unsigned ceiling; // index into branches, it is the lowest LB which has been stolen.
     
-  SearchManager(StateObj* _stateObj, vector<VarType> _var_array, VariableOrder _var_order)
-  : stateObj(_stateObj), var_order(_var_order), var_array(_var_array), depth(0), ceiling(-1)
+  SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array, VariableOrder& _var_order, Propagator& _prop)
+  : stateObj(_stateObj), var_order(_var_order), var_array(_var_array), depth(0), ceiling(-1), prop(_prop)
   {
     // if this isn't enough room, the vector will autoresize. While that can be slow,
     // it only has to happen at most the log of the maximum search depth.
@@ -172,9 +173,9 @@ struct SearchManager
     }
     
     // Most basic search procedure
-    virtual void search(Propagator prop, )
+    virtual void search()
     {
-        maybe_print_search_state(stateObj, "Node: ", v);
+        maybe_print_search_state(stateObj, "Node: ", var_array);
         while(true)
         {
             getState(stateObj).incrementNodeCount();
@@ -190,10 +191,10 @@ struct SearchManager
             }
             else
             {
-                maybe_print_search_state(stateObj, "Node: ", v);
+                maybe_print_search_state(stateObj, "Node: ", var_array);
                 world_push(stateObj);
                 branch_left();
-                prop(stateObj, v);
+                prop.prop(stateObj, var_array);
             }
             
             if(getState(stateObj).isFailed())
