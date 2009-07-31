@@ -92,7 +92,7 @@ struct SearchManager
         {
             return false;
         }
-        D_ASSERT(!var_order[picked.first].isAssigned())
+        D_ASSERT(!var_order[picked.first].isAssigned());
         var_order[picked.first].decisionAssign(picked.second);
         maybe_print_search_assignment(stateObj, var_order[pos], assign_val, true);
         branches.push_back(triple(true, picked.first, picked.second));
