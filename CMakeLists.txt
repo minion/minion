@@ -5,7 +5,11 @@ project(MinionProject)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-modules)
 include(CheckIncludeFileCXX)
 include(CheckCXXCompilerFlag)
-include(FindBoost)
+
+if(!WIN32)
+    include(LocalFindBoost)
+endif()
+
 include(constraints)
 include(CheckIncludeFiles)
 
