@@ -38,6 +38,11 @@
 #define _NOINLINE
 #endif
 
+#ifdef _WIN32
+#define NOMINMAX
+#include <windows.h>
+#endif
+
 // Stupid visual C++ needs a little hacking
 #ifdef _MSC_VER
 // We don't want no stupid safe library warnings
