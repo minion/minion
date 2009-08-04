@@ -29,14 +29,9 @@ volatile bool* ctrl_c_press;
 
 bool check_double_ctrlc;
 
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <signal.h>
-#include <stdio.h>
-#include <errno.h>
 
-#include <unistd.h>
+#include <stdio.h>
+
 
 #ifdef _WIN32
 
@@ -65,7 +60,7 @@ void activate_trigger(volatile bool* b, int timeout, bool CPU_time)
     		TimerProc,
     		NULL,
     		timeout * 1000,
-    		,
+    		0,
     		WT_EXECUTEINTIMERTHREAD);
 }
 
@@ -73,6 +68,12 @@ void install_ctrlc_trigger(volatile bool*)
 { /* Not implemented on windows */ }
 
 #else
+#include <sys/types.h>
+#include <sys/resource.h>
+#include <signal.h>
+#include <sys/time.h>
+#include <errno.h>
+#include <unistd.h>
 
 void trigger_function(int /* signum */ )
 { *trig = true; }
