@@ -19,7 +19,7 @@
 
 // This file is designed to encapsulate all time keeping done by Minion.
 #ifdef _WIN32
-#include <windows.h>
+#define ULL unsigned __int64
 
 inline double get_wall_time()
 {
