@@ -69,7 +69,7 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
         in.push(gzip_decompressor());
 #else
         cerr << "Error: Built without gzip support" << endl;
-        exit();
+        exit(0);
 #endif
       }    
   
@@ -81,7 +81,7 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
         in.push(bzip2_decompressor());
 #else
         cerr << "Error: Built without bzip2 support" << endl;
-        exit();
+        exit(0);
 #endif
 
       }
