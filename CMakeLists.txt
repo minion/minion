@@ -272,6 +272,10 @@ if(THREADSAFE)
     add_definitions(-DTHREADSAFE)
 endif()
 
+if(WIN32)
+	set(CFLAGS "${CFLAGS} /EHsc")
+endif()
+
 option(PROFILE "" OFF)
 option(GPROF "" OFF)
 if(PROFILE)
@@ -300,11 +304,15 @@ if(UNOPTIMISED)
 else()
     # apparently fomit-frame-pointer is only automatically enabled for O* levels
     # on machines where this doesn't affect debugging
-    set(CFLAGS "${CFLAGS} -O3 -fomit-frame-pointer")
-    check_cxx_compiler_flag("-mdynamic-no-pic" MAC_MDYNAMIC)
-    if(MAC_MDYNAMIC)
-        set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
-    endif()
+	if(WIN32)
+		set(CFLAGS "${CFLAGS} /O2")
+	else()
+		set(CFLAGS "${CFLAGS} -O3 -fomit-frame-pointer")
+		check_cxx_compiler_flag("-mdynamic-no-pic" MAC_MDYNAMIC)
+		if(MAC_MDYNAMIC)
+			set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
+		endif()
+	endif()
 endif()
 
 
