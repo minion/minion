@@ -20,6 +20,11 @@
 #ifndef _BUILDCSP_H
 #define _BUILDCSP_H
 
+#ifdef _WIN32
+#include <process.h>
+#define getpid _getpid
+#endif
+
 struct SearchMethod
 {
   VarOrderEnum order;
