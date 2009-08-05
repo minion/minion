@@ -6,14 +6,14 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-modules)
 include(CheckIncludeFileCXX)
 include(CheckCXXCompilerFlag)
 
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+
 if(!WIN32)
     include(LocalFindBoost)
 endif()
 
 include(constraints)
 include(CheckIncludeFiles)
-
-set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 set(BUILD_DEF_FILE "${PROJECT_SOURCE_DIR}/minion/BuildDefines.h")
 file(REMOVE ${BUILD_DEF_FILE})
