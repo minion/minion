@@ -43,9 +43,12 @@ echo Testing $exec with options .$*.
   failed=$(($failed + $?))
   ./do_random_tests.sh 3 $exec $* -varorder ldf-random
   failed=$(($failed + $?))
+  if [ $failed -gt 0 ]; then
+    exit $failed
+  fi
   
   (cd special_tests; ./special_tests.sh ../$exec)
   failed=$(($failed + $?))
-  
-  exit $failed
-
+  if [ $failed -gt 0 ]; then
+    echo "Some non-critical tests failed."
+  fi
