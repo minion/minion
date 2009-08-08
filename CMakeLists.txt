@@ -8,7 +8,7 @@ include(CheckCXXCompilerFlag)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
-if(!WIN32)
+if(NOT WIN32)
     include(LocalFindBoost)
 endif()
 
