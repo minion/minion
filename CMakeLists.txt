@@ -388,7 +388,8 @@ if(NOT ${BINARY} STREQUAL minion)
 endif()
 
 if(Boost_FOUND)
-    target_link_libraries(${BINARY} "-L${Boost_LIBRARY_DIRS}" ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
+    link_directories(${Boost_LIBRARY_DIRS})
+    target_link_libraries(${BINARY} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
 endif()
 
 #if(GMP_FOUND)
