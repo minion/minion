@@ -49,6 +49,12 @@
 #define GIT_DATE_STRING CAJ_STRING(GIT_DATE)
 #define GIT_VER_STRING CAJ_STRING(GIT_VER)
 
+#ifdef _WIN32
+#include "boost-externals/bzip2.cpp"
+#include "boost-externals/zlib.cpp"
+#endif
+
+
 
 
 /** @help switches Description
