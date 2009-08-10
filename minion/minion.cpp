@@ -49,14 +49,6 @@
 #define GIT_DATE_STRING CAJ_STRING(GIT_DATE)
 #define GIT_VER_STRING CAJ_STRING(GIT_VER)
 
-#ifdef _WIN32
-#include "boost-externals/bzip2.cpp"
-#include "boost-externals/zlib.cpp"
-#endif
-
-
-
-
 /** @help switches Description
 Minion supports a number of switches to augment default behaviour.  To
 see more information on any switch, use the help system. The list
