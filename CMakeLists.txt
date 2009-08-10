@@ -12,6 +12,10 @@ if(NOT WIN32)
     include(LocalFindBoost)
 endif()
 
+if(TINY_TEST)
+    set(CONSTRAINTS "reify;reifyimply;watchelement;eq;sumgeq;true;watched-or")
+endif()
+
 include(constraints)
 include(CheckIncludeFiles)
 
@@ -170,6 +174,7 @@ if(Boost_FOUND)
             message(STATUS "Boost and all required libraries found, building with boost")
             aux_source_directory("${PROJECT_SOURCE_DIR}/minion/boost_files" SRCS)
             add_definitions(-DUSE_BOOST_STREAMS)
+            set(CFLAGS "${CFLAGS} -I${ZLIB_INCLUDE_DIR} -I${BZIP2_INCLUDE_DIR}")
         else()
             message(STATUS "Bzip2 not found, building without compressed file support")
         endif()
@@ -373,7 +378,7 @@ if(NAME)
 endif()
 message(STATUS "Executable name set to \"${BINARY}\"")
 
-add_library(inputfile_parse ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp)
+add_library(inputfile_parse STATIC ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp)
 
 add_library(${BINARY}-lib STATIC EXCLUDE_FROM_ALL ${SRCS})
 
