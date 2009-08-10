@@ -45,9 +45,11 @@
 
 // Stupid visual C++ needs a little hacking
 #ifdef _MSC_VER
+#define BOOST_ALL_NO_LIB
 // We don't want no stupid safe library warnings
 #define _SCL_SECURE_NO_DEPRECATE
 #define DEFAULT_CALL __std_call
+#pragma warning(disable: 4715)
 // Supress 'size_t -> int' warnings.
 #pragma warning(disable: 4267)
 // I don't even get this warning.
