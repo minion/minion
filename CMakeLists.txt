@@ -142,16 +142,20 @@ if(NAUTY)
                    ${PROJECT_SOURCE_DIR}/nauty24b7/nausparse.c)
 endif()
 
+# This used to be in Static, but there is no reason not to always do it
+
+if(APPLEMAC)
+    set(Boost_USE_STATIC_LIBS true)
+    set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.4u.sdk")
+    add_definitions(-mmacosx-version-min=10.4)
+    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.4 )
+endif()
+
 option(STATIC "" OFF)
 if(STATIC)
     message(STATUS "Building static binary")
     set(BINARY "${BINARY}-static")
-    if(APPLEMAC)
-        set(Boost_USE_STATIC_LIBS true)
-        set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.4u.sdk")
-        add_definitions(-mmacosx-version-min=10.4)
-        set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.4 )
-    else()
+    if(!APPLEMAC)
         # the line below builds minion with just the boost stuff statically
         # linked, however, as the location of the other libraries varies between
         # linux distros, we just stuff everything into the binary
