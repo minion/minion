@@ -390,6 +390,10 @@ if(NOT ${BINARY} STREQUAL minion)
 endif()
 
 if(Boost_FOUND)
+    if(NOT DEFINED Boost_LIBRARIES)
+        # cmake 2.4 doesn't set this variable, so we take care of it manually
+        set(Boost_LIBRARIES "-lboost_iostreams")
+    endif()
     link_directories(${Boost_LIBRARY_DIRS})
     target_link_libraries(${BINARY} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
 endif()
