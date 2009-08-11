@@ -8,10 +8,6 @@ include(CheckCXXCompilerFlag)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
-if(NOT WIN32)
-    include(LocalFindBoost)
-endif()
-
 if(TINY_TEST)
     set(CONSTRAINTS "reify;reifyimply;watchelement;eq;sumgeq;true;watched-or")
 endif()
@@ -164,7 +160,8 @@ if(STATIC)
     endif()
 endif()
 
-find_package(Boost 1.33.0 COMPONENTS ${BOOST_COMPONENTS})
+set(Boost_ADDITIONAL_VERSIONS "1.39.1" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" "1.36.1" "1.36.0" "1.36" "1.35.1" "1.35.0" "1.35" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33")
+find_package(Boost COMPONENTS ${BOOST_COMPONENTS})
 if(Boost_FOUND)
     set(CFLAGS "${CFLAGS} -I${Boost_INCLUDE_DIRS}")
     find_package(ZLIB)
