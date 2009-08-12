@@ -94,7 +94,7 @@ file(GLOB SRCS "${PROJECT_SOURCE_DIR}/minion/build_constraints/CT*.cpp")
 
 foreach(ct ${SRCS})
     string(REGEX MATCH "CT_[A-Z_0-9]+" ct_name ${ct})
-	file(APPEND ${BUILD_DEF_FILE} "#define ${ct_name}_ABC\n")
+    file(APPEND ${BUILD_DEF_FILE} "#define ${ct_name}_ABC\n")
 #    add_definitions(-D${ct_name}_ABC)
 endforeach()
 
@@ -279,7 +279,7 @@ if(THREADSAFE)
 endif()
 
 if(WIN32)
-	set(CFLAGS "${CFLAGS} /EHsc")
+    set(CFLAGS "${CFLAGS} /EHsc")
 endif()
 
 option(PROFILE "" OFF)
@@ -310,15 +310,15 @@ if(UNOPTIMISED)
 else()
     # apparently fomit-frame-pointer is only automatically enabled for O* levels
     # on machines where this doesn't affect debugging
-	if(WIN32)
-		set(CFLAGS "${CFLAGS} /O2")
-	else()
-		set(CFLAGS "${CFLAGS} -O3 -fomit-frame-pointer")
-		check_cxx_compiler_flag("-mdynamic-no-pic" MAC_MDYNAMIC)
-		if(MAC_MDYNAMIC)
-			set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
-		endif()
-	endif()
+    if(WIN32)
+        set(CFLAGS "${CFLAGS} /O2")
+    else()
+        set(CFLAGS "${CFLAGS} -O3 -fomit-frame-pointer")
+        check_cxx_compiler_flag("-mdynamic-no-pic" MAC_MDYNAMIC)
+        if(MAC_MDYNAMIC)
+            set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
+        endif()
+    endif()
 endif()
 
 
@@ -510,8 +510,8 @@ add_custom_target(test-random-slow DEPENDS ${BINARY}
 
 add_custom_target(test-resume DEPENDS ${BINARY}
                   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		  COMMAND "./mini-scripts/test-resume.sh"
-		     "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
+                  COMMAND "./mini-scripts/test-resume.sh"
+                   "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
 
 add_custom_target(test-quick)
 add_dependencies(test-quick test-instances-quick)
