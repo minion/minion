@@ -17,27 +17,25 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <boost/bind.hpp>
-using boost::bind;
+//#include <boost/bind.hpp>
+//using boost::bind;
 
 #include "../system/system.h"
 #include "SearchManager.h"
 #include "variable_orderings.h"
 
 // returns an instance of SearchManager with the required variable ordering, propagator etc.
-
-SearchManager& make_search_manager(StateObj* stateObj, PropagationLevel prop_method, VarOrderEnum order, 
-    vector<AnyVarRef> var_array, vector<char> val_order, )
+SearchManager& make_search_manager(StateObj* stateObj, PropagationLevel prop_method, SearchOrder order)
 {
     VariableOrder* vo;
     
-    switch(order)
+    switch(order.order)  // get the VarOrderEnum
     {
     case ORDER_STATIC:
-        vo=new StaticBranch(var_array, val_order, stateObj);
+        vo=new StaticBranch(order.var_order, order.val_order, stateObj);
         break;
     case ORDER_SDF:
-        vo=new SDFBranch(var_array, val_order, stateObj);
+        vo=new SDFBranch(order.var_order, order.val_order, stateObj);
         break;
     default:
         abort();
@@ -66,7 +64,7 @@ SearchManager& make_search_manager(StateObj* stateObj, PropagationLevel prop_met
     }
     
     // need to switch here for different search algorthms. plain, parallel, group or conflict
-    SearchManager& sm=new SearchManager(stateObj, var_array, vo, p);
+    SearchManager& sm=new SearchManager(stateObj, order.var_array, vo, p);
     return sm;
 }
 

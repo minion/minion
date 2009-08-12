@@ -17,10 +17,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef VARIABLEORDERS_H
-#define VARIABLEORDERS_H
+#ifndef SEARCHMANAGER_H
+#define SEARCHMANAGER_H
 
-#include "search_methods.h"
+#include "variable_orderings.h"
 
 template<typename T>
 void inline maybe_print_search_assignment(StateObj* stateObj, T& var, DomainInt val, BOOL equal, bool force = false)
@@ -87,7 +87,7 @@ struct SearchManager
     // returns false if left branch not possible.
     bool branch_left()
     {
-        pair<int, DomainInt> picked = var_order.pickVarVal();
+        pair<int, DomainInt> picked = var_order.pickVarVal();   // future complexity goes into var_order.
         if(picked.first == -1)
         {
             return false;
