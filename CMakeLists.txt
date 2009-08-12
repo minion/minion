@@ -278,7 +278,7 @@ if(THREADSAFE)
     add_definitions(-DTHREADSAFE)
 endif()
 
-if(WIN32)
+if(WIN32 AND NOT CYGWIN)
     set(CFLAGS "${CFLAGS} /EHsc")
 endif()
 
@@ -310,7 +310,7 @@ if(UNOPTIMISED)
 else()
     # apparently fomit-frame-pointer is only automatically enabled for O* levels
     # on machines where this doesn't affect debugging
-    if(WIN32)
+    if(WIN32 AND NOT CYGWIN)
         set(CFLAGS "${CFLAGS} /O2")
     else()
         set(CFLAGS "${CFLAGS} -O3 -fomit-frame-pointer")
