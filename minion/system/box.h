@@ -36,7 +36,14 @@
 
 #include <algorithm>
 
+#ifdef _WIN32
+#include <malloc.h>
+#define alloc _alloca
+#else
 #include <alloca.h>
+#endif
+
+#include <boost/type_traits.hpp>
 
 using namespace std;
 
@@ -113,7 +120,7 @@ public:
     assign(_InputIterator first, _InputIterator last)
   {
     // Check whether it's an integral type.  If so, it's not an iterator.
-    typedef typename std::__is_integer<_InputIterator>::__type _Integral;
+    typedef typename boost::is_integral<_InputIterator>::__type _Integral;
     M_assign_dispatch(first, last, _Integral());
   }
 
@@ -255,7 +262,7 @@ public:
     _InputIterator last)
   {
     // Check whether it's an integral type.  If so, it's not an iterator.
-    typedef typename std::__is_integer<_InputIterator>::__type _Integral;
+    typedef typename boost::is_integral<_InputIterator>::__type _Integral;
     M_insert_dispatch(position, first, last, _Integral());
   }
 
@@ -297,7 +304,7 @@ protected:
       // Called by the range constructor to implement [23.1.1]/9
       template<typename _Integer>
   void
-    M_initialize_dispatch(_Integer n, _Integer value, __true_type)
+    M_initialize_dispatch(_Integer n, _Integer value, boost::true_type)
   {
     M_start = M_allocate(n);
     M_end_of_storage = M_start + n;
@@ -309,7 +316,7 @@ protected:
       template<typename _InputIterator>
   void
     M_initialize_dispatch(_InputIterator first, _InputIterator last,
-    __false_type)
+    boost::false_type)
   {
     for (; first != last; ++first)
       push_back(*first);
@@ -319,7 +326,7 @@ protected:
       // Called by the range assign to implement [23.1.1]/9
       template<typename _Integer>
   void
-    M_assign_dispatch(_Integer n, _Integer val, __true_type)
+    M_assign_dispatch(_Integer n, _Integer val, boost::true_type)
   {
     M_fill_assign(static_cast<size_type>(n),
       static_cast<value_type>(val));
@@ -329,7 +336,7 @@ protected:
       template<typename _InputIterator>
   void
     M_assign_dispatch(_InputIterator first, _InputIterator last,
-    __false_type)
+    boost::false_type)
   {
     iterator cur(begin());
     for (; first != last && cur != end(); ++cur, ++first)
@@ -352,7 +359,7 @@ protected:
       template<typename _Integer>
   void
     M_insert_dispatch(iterator pos, _Integer n, _Integer val,
-    __true_type)
+    boost::true_type)
   {
     M_fill_insert(pos, static_cast<size_type>(n),
       static_cast<value_type>(val));
@@ -362,7 +369,7 @@ protected:
       template<typename _InputIterator>
   void
     M_insert_dispatch(iterator pos, _InputIterator first,
-    _InputIterator last, __false_type)
+    _InputIterator last, boost::false_type)
   {
     typedef typename iterator_traits<_InputIterator>::iterator_category
       _IterCategory;
@@ -593,7 +600,7 @@ M_range_insert(iterator position, _ForwardIterator first,
   }
 }
 
-#define MAKE_STACK_BOX(c, type, size) box<type> c((type*)alloca(sizeof(type) * size), size)
+#define MAKE_STACK_BOX(c, type, size) box<type> c((type*)alloca(sizeof(type) * (size)), (size))
 
 // Now requires bool flag to be declared before the macro is used.
 #define GET_ASSIGNMENT(c, constraint) \

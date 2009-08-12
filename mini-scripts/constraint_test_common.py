@@ -753,7 +753,7 @@ class testhamming:
 
 class testnot__minus__hamming:
     def printtable(self, domains):
-        const=abs(self.constants[0])
+        const=self.constants[0]
         cross=[]
         crossprod(domains, [], cross)
         out=[]

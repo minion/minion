@@ -27,12 +27,16 @@
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/filter/bzip2.hpp>
 
 using boost::iostreams::filtering_istream;
+
+#ifdef USE_BOOST_STREAMS
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
 using boost::iostreams::gzip_decompressor;
 using boost::iostreams::bzip2_decompressor;
+#endif
+
 
 template<typename Reader, typename Stream>
     void ReadCSP(Reader& reader, ConcreteFileReader<Stream>* infile)
@@ -61,14 +65,25 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
       {
         if(parser_verbose)
           cout << "# Using gzip uncompression" << endl;
+#ifdef USE_BOOST_STREAMS
         in.push(gzip_decompressor());
+#else
+        cerr << "Error: Built without gzip support" << endl;
+        exit(0);
+#endif
       }    
   
       if(extension == ".bz2" || extension == ".bz" || extension == ".bzip2" || extension == ".bzip")
       {
         if(parser_verbose)
           cout << "# Using bzip2 uncompression" << endl;
+#ifdef USE_BOOST_STREAMS
         in.push(bzip2_decompressor());
+#else
+        cerr << "Error: Built without bzip2 support" << endl;
+        exit(0);
+#endif
+
       }
       
     }

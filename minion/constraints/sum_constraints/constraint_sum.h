@@ -30,4 +30,39 @@
 #include "constraint_lightsum.h"
 #include "constraint_sum_bool.h"
 
+template<typename VarArray,  typename VarSum>
+AbstractConstraint*
+greaterEqualSumConstraint(StateObj* stateObj, const vector<VarArray>& _var_array, const VarSum _var_sum)
+{
+  if(_var_array.size() == 2)
+  {
+    array<VarArray, 2> v_array;
+    for(int i = 0; i < 2; ++i)
+      v_array[i] = _var_array[i];
+    return LightGreaterEqualSumCon(stateObj, v_array, _var_sum);
+  }
+  else
+  {
+    return (new LessEqualSumConstraint<vector<typename NegType<VarArray>::type>, 
+      typename NegType<VarSum>::type>(stateObj, VarNegRef(_var_array), VarNegRef(_var_sum))); 
+  }
+}
+
+template<typename VarArray,  typename VarSum>
+AbstractConstraint*
+lessEqualSumConstraint(StateObj* stateObj, const vector<VarArray>& _var_array, const VarSum _var_sum)
+{
+  if(_var_array.size() == 2)
+  {
+    array<VarArray, 2> v_array;
+    for(int i = 0; i < 2; ++i)
+      v_array[i] = _var_array[i];
+    return LightLessEqualSumCon(stateObj, v_array, _var_sum);
+  }
+  else
+  {
+    return new LessEqualSumConstraint<vector<VarArray>, VarSum>(stateObj, _var_array, _var_sum); 
+  }
+}
+
 #endif

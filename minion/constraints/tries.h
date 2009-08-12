@@ -28,7 +28,6 @@
 
 using namespace std;
 
-static const int MAXINT = 99999;
 
 struct TupleComparator
 {
@@ -192,7 +191,7 @@ struct TupleTrie
     build_trie(current_start, end_pos, depth + 1);
     
     assert(num_of_val + 1 == values);
-    initial_trie[start_section + values].val = MAXINT;
+    initial_trie[start_section + values].val = DomainInt_Max;
     initial_trie[start_section + values].depth = depth;
     initial_trie[start_section + values].offset_ptr = -1;
   }
@@ -238,7 +237,7 @@ struct TupleTrie
       return true;
     
     obj_list[depth] = obj_list[depth - 1]->offset_ptr;  
-    while(obj_list[depth]->val != MAXINT)
+    while(obj_list[depth]->val != DomainInt_Max)
     {
       if(vars[map_depth(depth)].inDomain(obj_list[depth]->val))
       {
@@ -302,7 +301,7 @@ struct TupleTrie
       if(depth == arity)
         return true;
       
-      if(obj_list[depth]->val == MAXINT)
+      if(obj_list[depth]->val == DomainInt_Max)
         return search_trie(_vars, obj_list, depth);
           
       if(vars[map_depth(depth)].inDomain(obj_list[depth]->val))
@@ -314,7 +313,7 @@ struct TupleTrie
       TrieObj* initial_pos = obj_list[depth]; 
       
       obj_list[depth]++;
-      while(obj_list[depth]->val != MAXINT)
+      while(obj_list[depth]->val != DomainInt_Max)
       {
         if(vars[map_depth(depth)].inDomain(obj_list[depth]->val))
         {

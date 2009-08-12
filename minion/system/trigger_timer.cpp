@@ -19,15 +19,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <signal.h>
-#include <stdio.h>
-#include <errno.h>
 #include <iostream>
 #include <ostream>
-#include <unistd.h>
 
 using namespace std;
 
@@ -36,10 +29,54 @@ volatile bool* ctrl_c_press;
 
 bool check_double_ctrlc;
 
-void trigger_function(int /* signum */ )
+
+#include <stdio.h>
+
+
+#ifdef _WIN32
+
+#define _WIN32_WINNT 0x0500
+#include <windows.h>
+
+void CALLBACK TimerProc(void* ,  BOOLEAN)
+{ *trig = true; }
+    
+void activate_trigger(volatile bool* b, int timeout, bool CPU_time)
 {
-  *trig = true;
+    if(CPU_time)
+        cerr << "CPU-time timing not available on windows, falling back on clock" << endl;
+    
+    trig = b;
+    *trig = false;
+    
+    if(timeout <= 0)
+        return;        
+    
+    HANDLE m_timerHandle;
+    
+    BOOL success = ::CreateTimerQueueTimer(
+        &m_timerHandle,
+        NULL,
+        TimerProc,
+        NULL,
+        timeout * 1000,
+        0,
+        WT_EXECUTEINTIMERTHREAD);
 }
+
+void install_ctrlc_trigger(volatile bool*)
+{ /* Not implemented on windows */ }
+
+#else
+#include <sys/types.h>
+#include <sys/resource.h>
+#include <signal.h>
+#include <sys/time.h>
+#include <errno.h>
+#include <unistd.h>
+
+void trigger_function(int /* signum */ )
+{ *trig = true; }
 
 void activate_trigger(volatile bool* b, int timeout, bool CPU_time) // CPU_time = false -> real time 
 {
@@ -92,3 +129,5 @@ void install_ctrlc_trigger(volatile bool* ctrl_c_press_)
   ctrl_c_press = ctrl_c_press_;
   signal(SIGINT, ctrlc_function);
 }
+#endif
+

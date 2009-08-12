@@ -236,6 +236,9 @@ public:
   bool resume;
   string resume_file;
 
+  // Do not write a resume file.
+  bool noresumefile;
+
   // The format of output used (-1 for default)
   int outputType;
   
@@ -253,7 +256,8 @@ public:
     nodelimit(0), tableout(false), solsoutWrite(false), 
     print_solution(true), time_limit(0), time_limit_is_CPU_time(false),
     randomise_valvarorder(false), parser_verbose(false), 
-    redump(false), graph(false), outputType(-1), noTimers(false)
+    redump(false), graph(false), resume(false), noresumefile(false),
+    outputType(-1), noTimers(false)
   {}
   
   /// Denotes all solutions should be found, by setting sollimit to -1.

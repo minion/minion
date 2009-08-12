@@ -22,6 +22,12 @@
 
 #include "../../constraints/constraint_abstract.h"
 
+// This is a temporary fix to get around the fact that 'VarNeg' is defined in some windows header.
+// Long term, probably need a better solution.
+#ifdef _WIN32
+#define VarNeg Minion_VarNeg
+#endif
+
 template<typename VarT>
 struct VarNeg
 {

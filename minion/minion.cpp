@@ -49,8 +49,6 @@
 #define GIT_DATE_STRING CAJ_STRING(GIT_DATE)
 #define GIT_VER_STRING CAJ_STRING(GIT_VER)
 
-
-
 /** @help switches Description
 Minion supports a number of switches to augment default behaviour.  To
 see more information on any switch, use the help system. The list
@@ -313,6 +311,20 @@ To add the solutions of myproblem.minion to mysols.txt do
 Randomises the ordering of the decision variables. If the input file
 specifies as ordering it will randomly permute this. If no ordering is
 specified a random permutation of all the variables is used.
+*/
+
+/** @help switches;-resume-file Description
+Resume solving from a resume file.
+*/
+
+/** @help switches;-resume-file Example
+To resume the solving of problem.minion from the file resume.minion do
+
+   minion -resume-file resume.minion problem.minion
+*/
+
+/** @help switches;-noresume Description
+Do not write a resume file on timeout or being killed.
 */
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

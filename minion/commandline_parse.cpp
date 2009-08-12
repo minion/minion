@@ -219,10 +219,14 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       i++;
       string file(argv[i]);
       if(file[0] == '-') {
-	cout << "Please give a resume file name" << endl;
-	exit(1);
+        cout << "Please give a resume file name" << endl;
+        exit(1);
       }
       getOptions(stateObj).resume_file = file;
+    }
+    else if(command == string("-noresume"))
+    {
+      getOptions(stateObj).noresumefile = true;
     }
     else if(command[0] == '-' && command != string("--"))
     {

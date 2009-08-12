@@ -41,15 +41,15 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
   switch(v.type())
         {
           case VAR_BOOL:
-            return AnyVarRef(getVars(stateObj).getBoolVarContainer().get_var_num(v.pos()));
+            return AnyVarRef(getVars(stateObj).boolVarContainer.get_var_num(v.pos()));
           case VAR_NOTBOOL:
-          return AnyVarRef(VarNotRef(getVars(stateObj).getBoolVarContainer().get_var_num(v.pos())));
+          return AnyVarRef(VarNotRef(getVars(stateObj).boolVarContainer.get_var_num(v.pos())));
           case VAR_BOUND:
-            return AnyVarRef(getVars(stateObj).getBoundVarContainer().get_var_num(v.pos()));
+            return AnyVarRef(getVars(stateObj).boundVarContainer.get_var_num(v.pos()));
           case VAR_SPARSEBOUND:
-            return AnyVarRef(getVars(stateObj).getSparseBoundVarContainer().get_var_num(v.pos()));
+            return AnyVarRef(getVars(stateObj).sparseBoundVarContainer.get_var_num(v.pos()));
           case VAR_DISCRETE:
-            return AnyVarRef(getVars(stateObj).getBigRangeVarContainer().get_var_num(v.pos()));
+            return AnyVarRef(getVars(stateObj).bigRangeVarContainer.get_var_num(v.pos()));
           case VAR_SPARSEDISCRETE:  
             INPUT_ERROR("Sparse Discrete not supported at present");
           case VAR_CONSTANT:
@@ -94,10 +94,10 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
   /// Create all the variables used in the CSP.
   void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars)
   {
-    getVars(stateObj).getBoolVarContainer().setVarCount(vars.BOOLs);
-    getVars(stateObj).getBoundVarContainer().addVariables(vars.bound);
-    getVars(stateObj).getSparseBoundVarContainer().addVariables(vars.sparse_bound);
-    getVars(stateObj).getBigRangeVarContainer().addVariables(vars.discrete);
+    getVars(stateObj).boolVarContainer.setVarCount(vars.BOOLs);
+    getVars(stateObj).boundVarContainer.addVariables(vars.bound);
+    getVars(stateObj).sparseBoundVarContainer.addVariables(vars.sparse_bound);
+    getVars(stateObj).bigRangeVarContainer.addVariables(vars.discrete);
     
     for(unsigned int i = 0; i < vars.sparse_discrete.size(); ++i)
     { INPUT_ERROR("Sparse discrete disabled at present due to bugs. Sorry."); }

@@ -101,7 +101,7 @@ struct ConstantVar
 #ifdef BTWLDEF
       // XXX : Todo. Sensibly move this trigger...
 #endif
-	  releaseTrigger(stateObj, dt BT_CALL);
+    releaseTrigger(stateObj, dt BT_CALL);
 //      dt->remove(getQueue(stateObj).getNextQueuePtrRef());
   }
 

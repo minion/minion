@@ -20,12 +20,12 @@
 #ifndef CSPSPEC_H
 #define CSPSPEC_H
 
-using namespace std;
-
 #include <vector>
 #include <list>
 #include <utility>
 #include <map>
+
+using namespace std;
 
 #include "../system/system.h"
 #include "../constants.h"

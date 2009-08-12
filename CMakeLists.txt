@@ -5,11 +5,15 @@ project(MinionProject)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-modules)
 include(CheckIncludeFileCXX)
 include(CheckCXXCompilerFlag)
-include(FindBoost)
-include(constraints)
-include(CheckIncludeFiles)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+
+if(TINY_TEST)
+    set(CONSTRAINTS "reify;reifyimply;watchelement;eq;sumgeq;true;watched-or")
+endif()
+
+include(constraints)
+include(CheckIncludeFiles)
 
 set(BUILD_DEF_FILE "${PROJECT_SOURCE_DIR}/minion/BuildDefines.h")
 file(REMOVE ${BUILD_DEF_FILE})
@@ -90,7 +94,7 @@ file(GLOB SRCS "${PROJECT_SOURCE_DIR}/minion/build_constraints/CT*.cpp")
 
 foreach(ct ${SRCS})
     string(REGEX MATCH "CT_[A-Z_0-9]+" ct_name ${ct})
-	file(APPEND ${BUILD_DEF_FILE} "#define ${ct_name}_ABC\n")
+    file(APPEND ${BUILD_DEF_FILE} "#define ${ct_name}_ABC\n")
 #    add_definitions(-D${ct_name}_ABC)
 endforeach()
 
@@ -138,16 +142,20 @@ if(NAUTY)
                    ${PROJECT_SOURCE_DIR}/nauty24b7/nausparse.c)
 endif()
 
+# This used to be in Static, but there is no reason not to always do it
+
+if(APPLEMAC)
+    set(Boost_USE_STATIC_LIBS true)
+    set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.4u.sdk")
+    add_definitions(-mmacosx-version-min=10.4)
+    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.4 )
+endif()
+
 option(STATIC "" OFF)
 if(STATIC)
     message(STATUS "Building static binary")
     set(BINARY "${BINARY}-static")
-    if(APPLEMAC)
-        set(Boost_USE_STATIC_LIBS true)
-        set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.4u.sdk")
-        add_definitions(-mmacosx-version-min=10.4)
-        set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.4 )
-    else()
+    if(NOT APPLEMAC)
         # the line below builds minion with just the boost stuff statically
         # linked, however, as the location of the other libraries varies between
         # linux distros, we just stuff everything into the binary
@@ -156,7 +164,8 @@ if(STATIC)
     endif()
 endif()
 
-find_package(Boost 1.33.0 COMPONENTS ${BOOST_COMPONENTS})
+set(Boost_ADDITIONAL_VERSIONS "1.41.1" "1.41.0" "1.41" "1.40.1" "1.40.0" "1.40" "1.39.1" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" "1.36.1" "1.36.0" "1.36" "1.35.1" "1.35.0" "1.35" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33")
+find_package(Boost COMPONENTS ${BOOST_COMPONENTS})
 if(Boost_FOUND)
     set(CFLAGS "${CFLAGS} -I${Boost_INCLUDE_DIRS}")
     find_package(ZLIB)
@@ -164,8 +173,8 @@ if(Boost_FOUND)
         find_package(BZip2)
         if(BZIP2_FOUND OR NOT BZIP2_LIBRARIES)
             message(STATUS "Boost and all required libraries found, building with boost")
-            aux_source_directory("${PROJECT_SOURCE_DIR}/minion/boost_files" SRCS)
             add_definitions(-DUSE_BOOST_STREAMS)
+            set(CFLAGS "${CFLAGS} -I${ZLIB_INCLUDE_DIR} -I${BZIP2_INCLUDE_DIR}")
         else()
             message(STATUS "Bzip2 not found, building without compressed file support")
         endif()
@@ -268,6 +277,10 @@ if(THREADSAFE)
     add_definitions(-DTHREADSAFE)
 endif()
 
+if(WIN32 AND NOT CYGWIN)
+    set(CFLAGS "${CFLAGS} /EHsc")
+endif()
+
 option(PROFILE "" OFF)
 option(GPROF "" OFF)
 if(PROFILE)
@@ -296,10 +309,14 @@ if(UNOPTIMISED)
 else()
     # apparently fomit-frame-pointer is only automatically enabled for O* levels
     # on machines where this doesn't affect debugging
-    set(CFLAGS "${CFLAGS} -O3 -fomit-frame-pointer")
-    check_cxx_compiler_flag("-mdynamic-no-pic" MAC_MDYNAMIC)
-    if(MAC_MDYNAMIC)
-        set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
+    if(WIN32 AND NOT CYGWIN)
+        set(CFLAGS "${CFLAGS} /O2")
+    else()
+        set(CFLAGS "${CFLAGS} -O3 -fomit-frame-pointer")
+        check_cxx_compiler_flag("-mdynamic-no-pic" MAC_MDYNAMIC)
+        if(MAC_MDYNAMIC)
+            set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
+        endif()
     endif()
 endif()
 
@@ -361,7 +378,7 @@ if(NAME)
 endif()
 message(STATUS "Executable name set to \"${BINARY}\"")
 
-add_library(inputfile_parse ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp)
+add_library(inputfile_parse STATIC ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp)
 
 add_library(${BINARY}-lib STATIC EXCLUDE_FROM_ALL ${SRCS})
 
@@ -376,7 +393,15 @@ if(NOT ${BINARY} STREQUAL minion)
 endif()
 
 if(Boost_FOUND)
-    target_link_libraries(${BINARY} "-L${Boost_LIBRARY_DIRS}" ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
+    if(NOT DEFINED Boost_LIBRARIES)
+        # cmake 2.4 doesn't set this variable, so we take care of it manually
+        set(Boost_LIBRARIES "-lboost_iostreams")
+        if(Boost_USE_MULTITHREADED)
+            set(Boost_LIBRARIES "${Boost_LIBRARIES}-mt")
+        endif()
+    endif()
+    link_directories(${Boost_LIBRARY_DIRS})
+    target_link_libraries(${BINARY} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
 endif()
 
 #if(GMP_FOUND)
@@ -484,8 +509,8 @@ add_custom_target(test-random-slow DEPENDS ${BINARY}
 
 add_custom_target(test-resume DEPENDS ${BINARY}
                   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		  COMMAND "./mini-scripts/test-resume.sh"
-		     "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
+                  COMMAND "./mini-scripts/test-resume.sh"
+                   "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
 
 add_custom_target(test-quick)
 add_dependencies(test-quick test-instances-quick)
