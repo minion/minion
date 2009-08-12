@@ -304,7 +304,7 @@ protected:
       // Called by the range constructor to implement [23.1.1]/9
       template<typename _Integer>
   void
-	  M_initialize_dispatch(_Integer n, _Integer value, boost::true_type)
+    M_initialize_dispatch(_Integer n, _Integer value, boost::true_type)
   {
     M_start = M_allocate(n);
     M_end_of_storage = M_start + n;

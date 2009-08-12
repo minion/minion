@@ -55,13 +55,13 @@ void activate_trigger(volatile bool* b, int timeout, bool CPU_time)
     HANDLE m_timerHandle;
     
     BOOL success = ::CreateTimerQueueTimer(
-    		&m_timerHandle,
-    		NULL,
-    		TimerProc,
-    		NULL,
-    		timeout * 1000,
-    		0,
-    		WT_EXECUTEINTIMERTHREAD);
+        &m_timerHandle,
+        NULL,
+        TimerProc,
+        NULL,
+        timeout * 1000,
+        0,
+        WT_EXECUTEINTIMERTHREAD);
 }
 
 void install_ctrlc_trigger(volatile bool*)

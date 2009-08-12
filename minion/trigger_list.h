@@ -380,7 +380,7 @@ inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t BT_FUNDEF_NODEF
         abort();
     }
 #endif
-	t->remove(getQueue(stateObj).getNextQueuePtrRef());
+    t->remove(getQueue(stateObj).getNextQueuePtrRef());
 }
 
 #endif //TRIGGERLIST_H
