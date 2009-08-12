@@ -174,38 +174,43 @@ started with it.
 
 The main Minion website is \url{http://minion.sourceforge.net/},
 and this contains links to the download page. Currently, executables with and
-without debug information are provided for Mac, Linux, and Cygwin.
+without debug information are provided for Mac, Linux, Cygwin, and
+Windows\footnote{The Windows binaries currently do not support compressed input
+files.}.
 
 
 \subsection{Installation instructions for Windows}
 
-Download the windows archive minion-x.y.z-cygwin.tar.gz and unpack,
-you should find Minion executable minion.exe along with the required library
-cygwin1.dll. The executable should work from the windows command shell cmd.exe.
+Download the Windows archive \texttt{minion-x.y.z-windows.tar.gz} and unpack,
+you should find Minion executable \texttt{minion.exe}. The executable should work from
+the Windows command shell \texttt{cmd.exe}.
+
+Alternatively, you can get the archive \texttt{minion-x.y.z-cygwin.tar.gz} which also
+contains the required library \texttt{cygwin1.dll}.
 
 
 \subsection{Installation instructions for Mac}
 
-Download the Mac archive minion-x.y.z-mac.tar.gz and unpack. The contents
-include universal binary `minion' which should work on both Intel and PowerPC
+Download the Mac archive \texttt{minion-x.y.z-mac.tar.gz} and unpack. The contents
+include universal binary \texttt{minion} which should work on both Intel and PowerPC
 Macs with Mac OS X 10.4.2 or later.
 
 
 \subsection{Installation instructions for Linux-x86 or x64}
 
-Download the Linux archive minion-x.y.z-linux.tar.gz and unpack. It contains
-the binary `minion'. The executable is linked statically.
+Download the Linux archive \texttt{minion-x.y.z-linux.tar.gz} and unpack. It contains
+the binary \texttt{minion}. The executable is linked statically.
 
 \bigskip
 
 All versions come with a debug variant as well. The debug executables are
-contained in the minion-x.y.z-debug-<os>.tar.gz.
+contained in the \texttt{minion-x.y.z-debug-<os>.tar.gz}.
 
 
 \subsection{Compilation instructions}
 
 If there is no executable which works on your computer, you can use
-the source package (named minion-x.y.z-source.tar.gz).
+the source package (named \texttt{minion-x.y.z-source.tar.gz}).
 
 Minion uses the CMake\footnote{\url{http://www.cmake.org}} build system to check
 for the required and optional components. Without any additional flags, the
@@ -214,18 +219,18 @@ tested with is 2.4.7.
 
 Note that you need at least g++ version 3.4.2 to compile Minion. Furthermore
 boost\footnote{\url{http://www.boost.org/}} is required to build Minion. Any
-version between 1.33 and 1.38.0 inclusive should work. If you have installed
+version between 1.33 and 1.39.0 inclusive should work. If you have installed
 boost in a non-standard location or CMake does not find it for some other
 reason, you can try setting the environment variable \verb+BOOST_ROOT+ to your
-installation directory or the environment variables \verb+BOOST_INCLUDEDIR+ and
-\verb+BOOST_LIBRARYDIR+ before running CMake.
+boost installation directory for CMake 2.6, or \verb+Boost_INCLUDE_DIR+ to the
+location of the boost header files for CMake 2.4.
 
 The g++ distributed with Cygwin does \emph{not} compile Minion correctly because
 of differences in exception handling in Unix and Windows. You have to compile
 your own version of g++ and use this to compile Minion.
 
 To compile, create a new directory for the build, and issue the
-following commands:
+following commands on Unix:
 
 \begin{verbatim}
 cmake <path/to/minion>
@@ -235,6 +240,10 @@ make minion
 where \verb+<path/to/minion>+ is the path to the Minion distribution (the
 directory which contains \verb+CMakeLists.txt+). The Cygwin version of CMake
 seems to have a bug; run it twice to get Minion to compile and link correctly.
+
+On Windows, use CMake to generate Visual Studio project files. You can then open
+the project file in Visual Studio and compile it. The build was tested with Visual
+Studio 9 2008.
 
 If you have at least 2GB of RAM and a dual-core processor, you may prefer to
 use
@@ -274,6 +283,9 @@ at full speed. However, if some unexpected behaviour is observed,
 running the debug variant may be helpful. It contains a large number
 of assertions and other checks, and may bring to light a problem with
 the input or an internal bug.
+
+The CMake constants you should set to \verb+1+ to get a binary suitable for
+debugging are \verb+DEBUG+ and \verb+INFO+.
 
 
 \subsection{Minion online help}
