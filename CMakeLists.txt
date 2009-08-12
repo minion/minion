@@ -155,7 +155,7 @@ option(STATIC "" OFF)
 if(STATIC)
     message(STATUS "Building static binary")
     set(BINARY "${BINARY}-static")
-    if(!APPLEMAC)
+    if(NOT APPLEMAC)
         # the line below builds minion with just the boost stuff statically
         # linked, however, as the location of the other libraries varies between
         # linux distros, we just stuff everything into the binary
