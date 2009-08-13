@@ -168,8 +168,8 @@ namespace Controller
     { o << "(" << t.isLeft << "," << t.var << "," << t.val << ")"; return o; }
   };
 
-  template<typename VarOrder>
-    inline void generateRestartFile(StateObj* stateObj, VarOrder& order)
+  template<typename VarArray, typename BranchList>
+    inline void generateRestartFile(StateObj* stateObj, VarArray& var_array, BranchList& branches)
   {
     if(getOptions(stateObj).noresumefile) {
         return;
@@ -179,7 +179,6 @@ namespace Controller
     ofstream fileout(filename.c_str());
     fileout << "MINION 3" << endl;
     fileout << "**CONSTRAINTS**" << endl;
-    vector<triple>& branches = order.branches;
     vector<triple> left_branches_so_far;
     left_branches_so_far.reserve(branches.size());
     for(vector<triple>::const_iterator curr = branches.begin(); curr != branches.end(); curr++) {
@@ -191,11 +190,11 @@ namespace Controller
             lb != left_branches_so_far.end();
             lb++) {
           fileout << "w-notliteral(";
-          inputPrint(fileout, stateObj, order.var_order[lb->var].getBaseVar());
+          inputPrint(fileout, stateObj, var_array[lb->var].getBaseVar());
           fileout << "," << lb->val << "),";
         }
         fileout << "w-notliteral(";
-        inputPrint(fileout, stateObj, order.var_order[curr->var].getBaseVar());
+        inputPrint(fileout, stateObj, var_array[curr->var].getBaseVar());
         fileout << "," << curr->val << ")})" << endl;
       }
     }
@@ -203,17 +202,17 @@ namespace Controller
   }
    
   /// Check if timelimit has been exceeded.
-  template<typename VarOrder>
-  inline bool do_checks(StateObj* stateObj, VarOrder& order)
+  template<typename VarArray, typename BranchList>
+  inline bool do_checks(StateObj* stateObj, VarArray& var_array, BranchList& branches)
   {
     if(getState(stateObj).getNodeCount() == getOptions(stateObj).nodelimit) {
-      generateRestartFile(stateObj, order);
+      generateRestartFile(stateObj, var_array, branches);
       return true;
     }
     
     if(getState(stateObj).isAlarmActivated())
     { // Either a timeout has occurred, or ctrl+c has been pressed.
-      generateRestartFile(stateObj, order);
+      generateRestartFile(stateObj, var_array, branches);
       getState(stateObj).clearAlarm();
       if(getState(stateObj).isCtrlcPressed()) {
         return true;

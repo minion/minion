@@ -17,7 +17,12 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef VARIABLE_ORDERINGS_H
+#define VARIABLE_ORDERINGS_H
+
 #include <cfloat>
+//#include "../system/system.h"
+//#include "../memory_management/reversible_vals.h"
 
 struct VariableOrder
 {
@@ -29,13 +34,13 @@ struct VariableOrder
     
     // returns a pair of variable index, domain value.
     // returning the variable index == -1 means no branch possible.
-    virtual pair<int, DomainInt> pickVarVal();
+    virtual pair<int, DomainInt> pickVarVal() {};
 };
 
 struct StaticBranch : public VariableOrder
 {
-    reversible<int> pos;
-    vector<int>& val_order;
+    vector<char>& val_order;
+    Reversible<int> pos;
     
     StaticBranch(vector<AnyVarRef>& _var_order, vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
         val_order(_val_order), pos(_stateObj)
@@ -63,8 +68,8 @@ struct StaticBranch : public VariableOrder
 
 struct SDFBranch : public VariableOrder
 {
-    reversible<int> pos;
-    vector<int>& val_order;
+    vector<char>& val_order;
+    Reversible<int> pos;
     
     SDFBranch(vector<AnyVarRef>& _var_order, vector<char>& _val_order, StateObj* _stateObj) : 
         VariableOrder(_var_order), val_order(_val_order), pos(_stateObj)
@@ -112,9 +117,9 @@ struct SDFBranch : public VariableOrder
 
 struct SlowStaticBranch : public VariableOrder
 {
-    vector<int>& val_order;
+    vector<char>& val_order;
     
-    SDFBranch(vector<AnyVarRef>& _var_order, vector<char>& _val_order, StateObj* _stateObj) : 
+    SlowStaticBranch(vector<AnyVarRef>& _var_order, vector<char>& _val_order, StateObj* _stateObj) : 
         VariableOrder(_var_order), val_order(_val_order)
     {
     }
@@ -337,3 +342,5 @@ struct LDFBranch
     return largest_dom;
   }
 };
+
+#endif

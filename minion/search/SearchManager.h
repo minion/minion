@@ -21,6 +21,12 @@
 #define SEARCHMANAGER_H
 
 #include "variable_orderings.h"
+#include "common_search.h"
+#include "../preprocess.h"
+
+namespace Controller
+{
+
 
 template<typename T>
 void inline maybe_print_search_assignment(StateObj* stateObj, T& var, DomainInt val, BOOL equal, bool force = false)
@@ -46,22 +52,22 @@ struct SearchManager
 {
   StateObj* stateObj;
   vector<AnyVarRef> var_array;
-  VariableOrder var_order;
+  VariableOrder * var_order;
   
-  Propagator& prop;  // Propagator is the type of the base class. Method prop.prop(stateObj, var_array)
+  Propagate * prop;  // Propagate is the type of the base class. Method prop.prop(stateObj, var_array)
   
-  vector<triple> branches; //L & R branches so far (isLeftBranch?,var,value)
+  vector<Controller::triple> branches; //L & R branches so far (isLeftBranch?,var,value)
   //vector<int> first_unassigned_variable;
   
   unsigned depth; //number of left branches
   unsigned ceiling; // index into branches, it is the lowest LB which has been stolen.
     
-  SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array, VariableOrder& _var_order, Propagator& _prop)
+  SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array, VariableOrder* _var_order, Propagate * _prop)
   : stateObj(_stateObj), var_order(_var_order), var_array(_var_array), depth(0), ceiling(-1), prop(_prop)
   {
     // if this isn't enough room, the vector will autoresize. While that can be slow,
     // it only has to happen at most the log of the maximum search depth.
-    branches.reserve(var_order.size());
+    branches.reserve(var_array.size());
   }
   
   void reset()
@@ -73,7 +79,7 @@ struct SearchManager
   // Returns true if all variables assigned
   bool all_vars_assigned()
   {
-    pair<int, DomainInt> picked = var_order.pickVarVal();
+    pair<int, DomainInt> picked = var_order->pickVarVal();
     return picked.first == -1;
   }
     
@@ -87,15 +93,15 @@ struct SearchManager
     // returns false if left branch not possible.
     bool branch_left()
     {
-        pair<int, DomainInt> picked = var_order.pickVarVal();   // future complexity goes into var_order.
+        pair<int, DomainInt> picked = var_order->pickVarVal();   // future complexity goes into var_order.
         if(picked.first == -1)
         {
             return false;
         }
-        D_ASSERT(!var_order[picked.first].isAssigned());
-        var_order[picked.first].decisionAssign(picked.second);
-        maybe_print_search_assignment(stateObj, var_order[pos], assign_val, true);
-        branches.push_back(triple(true, picked.first, picked.second));
+        D_ASSERT(!var_array[picked.first].isAssigned());
+        var_array[picked.first].decisionAssign(picked.second);
+        maybe_print_search_assignment(stateObj, var_array[picked.first], picked.second, true);
+        branches.push_back(Controller::triple(true, picked.first, picked.second));
         depth++;
         return true;
     }
@@ -103,18 +109,18 @@ struct SearchManager
     // Only for conflict search?
     void force_branch_left(int new_pos)
     {
-        D_ASSERT(new_pos >= 0 && new_pos < var_order.size()); 
-        D_ASSERT(!var_order[new_pos].isAssigned()) 
+        D_ASSERT(new_pos >= 0 && new_pos < var_array.size()); 
+        D_ASSERT(!var_array[new_pos].isAssigned()) 
         
         DomainInt assign_val;
         //if(val_order[new_pos])
-        assign_val = var_order[new_pos].getMin();
+        assign_val = var_array[new_pos].getMin();
         //else
         //assign_val = var_order[new_pos].getMax();
         
-        var_order[new_pos].uncheckedAssign(assign_val);
-        maybe_print_search_assignment(stateObj, var_order[new_pos], assign_val, true, true);
-        branches.push_back(triple(true, new_pos, assign_val));
+        var_array[new_pos].uncheckedAssign(assign_val);
+        maybe_print_search_assignment(stateObj, var_array[new_pos], assign_val, true, true);
+        branches.push_back(Controller::triple(true, new_pos, assign_val));
         depth++;
     }
     
@@ -129,8 +135,8 @@ struct SearchManager
             return false;
         }
         
-        int var = branches.back().var
-        DomainInt val = branches.back().val
+        int var = branches.back().var;
+        DomainInt val = branches.back().val;
         branches.pop_back();
         depth--;
         D_ASSERT(var_array[var].inDomain(val));
@@ -149,7 +155,7 @@ struct SearchManager
             var_array[var].removeFromDomain(val);
         }
         maybe_print_search_assignment(stateObj, var_array[var], val, false);
-        branches.push_back(triple(false, other_branch, var_min));
+        branches.push_back(Controller::triple(false, var, val));
     }
     
     pair<int, DomainInt> steal_work()
@@ -179,10 +185,10 @@ struct SearchManager
         while(true)
         {
             getState(stateObj).incrementNodeCount();
-            if(do_checks(stateObj, order))
+            if(do_checks(stateObj, var_array, branches))
                 return;
             
-            pair<int, DomainInt> varval= var_order.pickVarVal();
+            pair<int, DomainInt> varval= var_order->pickVarVal();
             
             if(varval.first==-1)
             {
@@ -194,7 +200,7 @@ struct SearchManager
                 maybe_print_search_state(stateObj, "Node: ", var_array);
                 world_push(stateObj);
                 branch_left();
-                prop.prop(stateObj, var_array);
+                prop->prop(stateObj, var_array);
             }
             
             if(getState(stateObj).isFailed())
@@ -218,5 +224,7 @@ struct SearchManager
         }
     }
 };
+
+}
 
 #endif

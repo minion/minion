@@ -134,8 +134,8 @@ struct PropagateSSAC_Bounds
 // Class heirarchy to allow virtual function calls to the above.
 struct Propagate
 {
-    virtual void prop(StateObj* stateObj, vector<AnyVarRef> vars);
-}
+    virtual void prop(StateObj* stateObj, vector<AnyVarRef> vars) {};
+};
 
 struct PropGAC : Propagate
 {
@@ -144,7 +144,7 @@ struct PropGAC : Propagate
     {
         prop_obj(stateObj, vars); 
     }
-}
+};
 
 struct PropSAC : Propagate
 {
@@ -153,7 +153,7 @@ struct PropSAC : Propagate
     {
         prop_obj(stateObj, vars); 
     }
-}
+};
 
 struct PropSSAC : Propagate
 {
@@ -162,7 +162,7 @@ struct PropSSAC : Propagate
     {
         prop_obj(stateObj, vars); 
     }
-}
+};
 
 struct PropSAC_Bounds : Propagate
 {
@@ -171,7 +171,7 @@ struct PropSAC_Bounds : Propagate
     {
         prop_obj(stateObj, vars); 
     }
-}
+};
 
 struct PropSSAC_Bounds : Propagate
 {
@@ -180,7 +180,7 @@ struct PropSSAC_Bounds : Propagate
     {
         prop_obj(stateObj, vars); 
     }
-}
+};
 
 void PropogateCSP(StateObj*, PropagationLevel, vector<AnyVarRef>&, bool print_info = false);
 

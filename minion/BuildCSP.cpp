@@ -21,10 +21,10 @@
 
 #include "preprocess.h"
 
-#include "search/standard_search.h"
-#include "search/recursive_search.h"
-#include "search/conflict_search.h"
-#include "search/group_search.h"
+//#include "search/standard_search.h"
+//#include "search/recursive_search.h"
+//#include "search/conflict_search.h"
+//#include "search/group_search.h"
 
 #include "search/search_control.h"
 
@@ -82,8 +82,7 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
 void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
 {
     vector<AnyVarRef> preprocess_vars = BuildCon::build_val_and_var_order(stateObj, instance.search_order[0]).first;
-    //function<void (void)> search(bind(Controller::deal_with_solution, stateObj));
-    SearchManager* sm;
+    
     // Set up variable and value ordering
     
     D_ASSERT(instance.search_order.size()==1);
@@ -104,20 +103,19 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
             var_val_order.second[i] = (rand() % 100) > 50;
     }
     
-    sm=make_search_manager(stateObj, args.prop_method, order);
+    // oops, random order won't work.. need to put it back into order object.
+    Controller::SearchManager* sm=Controller::make_search_manager(stateObj, args.prop_method, order);
     
+    getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions(stateObj).silent);
     
+    PropogateCSP(stateObj, args.preprocess, preprocess_vars, !getOptions(stateObj).silent);
+    getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions(stateObj).silent);
+    getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions(stateObj).silent);
     
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions(stateObj).silent);
-
-  PropogateCSP(stateObj, args.preprocess, preprocess_vars, !getOptions(stateObj).silent);
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions(stateObj).silent);
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions(stateObj).silent);
-
   if(!getState(stateObj).isFailed())
   {
     try
-      { sm.search(); }
+      { sm->search(); }
     catch(EndOfSearch)
     { }
   }
