@@ -33,10 +33,11 @@ SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_met
     cout << "Entered make_search_manager." << endl;
     
     // collect the variables in the SearchOrder object 
-    vector<AnyVarRef> var_array;
+    vector<AnyVarRef>* var_array= new vector<AnyVarRef>();
     for(int i=0; i<order.var_order.size(); i++)
     {
-        var_array.push_back(get_AnyVarRef_from_Var(stateObj, order.var_order[i]));
+        var_array->push_back(get_AnyVarRef_from_Var(stateObj, order.var_order[i]));
+        // some check here?
     }
     
     VariableOrder* vo;
@@ -44,12 +45,16 @@ SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_met
     switch(order.order)  // get the VarOrderEnum
     {
     case ORDER_STATIC:
-        vo=new StaticBranch(var_array, order.val_order, stateObj);
+        vo=new StaticBranch(*var_array, order.val_order, stateObj);
+        break;
+    case ORDER_ORIGINAL:
+        vo=new StaticBranch(*var_array, order.val_order, stateObj);
         break;
     case ORDER_SDF:
-        vo=new SDFBranch(var_array, order.val_order, stateObj);
+        vo=new SDFBranch(*var_array, order.val_order, stateObj);
         break;
     default:
+        cout << "Order not found in make_search_manager." << endl;
         abort();
     }
     
@@ -74,13 +79,14 @@ SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_met
         p=new PropSSAC_Bounds();
         break;
     default:
+        cout << "Propagation method not found in make_search_manager." << endl;
         abort();
     }
     
     cout << "Made Propagate object." <<endl;
     
     // need to switch here for different search algorthms. plain, parallel, group or conflict
-    SearchManager* sm=new SearchManager(stateObj, var_array, vo, p);
+    SearchManager* sm=new SearchManager(stateObj, *var_array, vo, p);
     
     cout << "Exiting make_search_manager"<<endl;
     return sm;

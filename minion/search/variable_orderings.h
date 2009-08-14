@@ -45,13 +45,15 @@ struct StaticBranch : public VariableOrder
     StaticBranch(vector<AnyVarRef>& _var_order, vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
         val_order(_val_order), pos(_stateObj)
     {
+        pos=0;
     }
     
     pair<int, DomainInt> pickVarVal()
     {
         unsigned v_size = var_order.size();
+        
         while(pos < v_size && var_order[pos].isAssigned())
-            ++pos;
+            pos=pos+1;
         
         if(pos == v_size)
             return make_pair(-1, 0);
