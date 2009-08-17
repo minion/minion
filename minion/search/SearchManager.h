@@ -60,7 +60,7 @@ struct SearchManager
   //vector<int> first_unassigned_variable;
   
   unsigned depth; //number of left branches
-  unsigned ceiling; // index into branches, it is the lowest LB which has been stolen.
+  int ceiling; // index into branches, it is the lowest LB which has been stolen.
     
   SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array, VariableOrder* _var_order, Propagate * _prop)
   : stateObj(_stateObj), var_order(_var_order), var_array(_var_array), depth(0), ceiling(-1), prop(_prop)
@@ -98,6 +98,8 @@ struct SearchManager
         {
             return false;
         }
+        
+        world_push(stateObj);
         D_ASSERT(!var_array[picked.first].isAssigned());
         var_array[picked.first].decisionAssign(picked.second);
         maybe_print_search_assignment(stateObj, var_array[picked.first], picked.second, true);
@@ -129,7 +131,8 @@ struct SearchManager
         while(!branches.empty() && !branches.back().isLeft) { //pop off all the RBs
             branches.pop_back();
         }
-        if((branches.size()-1)<=ceiling)
+        
+        if((((int)branches.size())-1)<=ceiling)
         {   // if idx of last element is less than or equal the ceiling. 
             // Also catches the empty case.
             return false;
@@ -137,9 +140,15 @@ struct SearchManager
         
         int var = branches.back().var;
         DomainInt val = branches.back().val;
+        
+        // remove the left branch.
         branches.pop_back();
+        world_pop(stateObj);
         depth--;
+        
         D_ASSERT(var_array[var].inDomain(val));
+        
+        cout << "Branch right removing var: "<< var <<", val: " << val <<endl;
         
         // special case the upper and lower bounds to make it work for bound variables
         if(var_array[var].getMin() == val)
@@ -156,6 +165,7 @@ struct SearchManager
         }
         maybe_print_search_assignment(stateObj, var_array[var], val, false);
         branches.push_back(Controller::triple(false, var, val));
+        return true;
     }
     
     pair<int, DomainInt> steal_work()
@@ -184,42 +194,51 @@ struct SearchManager
         maybe_print_search_state(stateObj, "Node: ", var_array);
         while(true)
         {
+            D_ASSERT(getQueue(stateObj).isQueuesEmpty());
+            
             getState(stateObj).incrementNodeCount();
+            
+            cout << "About to call do_checks" << endl;
+            
             if(do_checks(stateObj, var_array, branches))
                 return;
             
+            cout << "About to call pickVarVal" << endl;
+            
             pair<int, DomainInt> varval= var_order->pickVarVal();
+            
+            cout << varval.first << "," << varval.second <<endl;
             
             if(varval.first==-1)
             {
-                // fail here to force backtracking.
+                deal_with_solution(stateObj);
+                
+                // If we are not finished, then go into the loop below.
                 getState(stateObj).setFailed(true);
             }
             else
             {
                 maybe_print_search_state(stateObj, "Node: ", var_array);
-                world_push(stateObj);
                 branch_left();
                 prop->prop(stateObj, var_array);
             }
             
-            if(getState(stateObj).isFailed())
+            // loop to 
+            while(getState(stateObj).isFailed())
             {
-                // Either search failed, or a solution was found.
-                while(getState(stateObj).isFailed())
-                {
-                    getState(stateObj).setFailed(false);
-                    
-                    if(finished_search())
-                        return;
-                    
-                    world_pop(stateObj);
-                    maybe_print_search_action(stateObj, "bt");
-                    
-                    branch_right();
-                    
-                    set_optimise_and_propagate_queue(stateObj);
+                getState(stateObj).setFailed(false);
+                if(finished_search())
+                {   // what does this do?
+                    return;
                 }
+                
+                maybe_print_search_action(stateObj, "bt");
+                bool flag=branch_right();
+                if(!flag)
+                {   // No remaining left branches to branch right.
+                    return;
+                }
+                set_optimise_and_propagate_queue(stateObj);
             }
         }
     }
