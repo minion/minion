@@ -3,10 +3,9 @@
 CODE_ROOT=$1;
 TMP_FILE="entries.tmp";
 SORTED_TMP="sorted.tmp";
+rm -f $TMP_FILE; #ensure empty
 touch $TMP_FILE;
-rm $TMP_FILE; #ensure empty
-touch $TMP_FILE;
-rm docs/latexhelp/*;
+rm -f docs/latexhelp/*;
 
 # a piece of code to output a LaTeX document based on help code
 # embedded in source code
@@ -16,6 +15,8 @@ rm docs/latexhelp/*;
 
 # finally outputs a document by compiling the individual fragments in a sorted
 # order
+
+# the generated document is meant to be included in another LaTeX document
 
 find . \( ! -regex '.*/\..*' \) \( -iname "*.cpp" -or -iname "*.hpp" -or -iname "*.h" \) -type f -exec grep -H -n "/\*\* @help" {} \; | while read entry ; do
     match_file=`echo $entry | cut -d: -f1`; #file comment is in
@@ -41,35 +42,7 @@ find . \( ! -regex '.*/\..*' \) \( -iname "*.cpp" -or -iname "*.hpp" -or -iname 
     echo "\end{verbatim}" >> $outfile;
     echo "}" >> $outfile;
 done
-outfile="docs/latexhelp/doc.latex";
-echo "\documentclass{article}" >> $outfile;
-#echo "\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}" >> $outfile;
-echo "\title{minion executable documentation}" >> $outfile;
-echo "\date{\today}" >> $outfile;
-echo "\author{Ian Gent, Chris Jefferson, Ian Miguel, Neil Moore, Karen Petrie, Andrea Rendl}" >>  $outfile;
-echo "\begin{document}" >> $outfile;
-echo "\maketitle" >> $outfile;
-# add some information to the top of the index page.
-echo "You are viewing documentation for minion. The same " >> $outfile;
-echo "documentation is available from a minion executable by " >> $outfile;
-echo "typing \texttt{minion help} at the command line." >> $outfile;
-echo "We intend that the command line help system be the " >> $outfile;
-echo "main source of documentation for the system." >> $outfile;
-echo >> $outfile;
-echo "Each of the entries below concerns a different aspect" >> $outfile;
-echo "of the system, and the entries are arranged hierarchically." >> $outfile;
-echo "For example to view information about the set of available" >> $outfile;
-echo "constraints as a whole view \`\`constraints'' and to view" >> $outfile;
-echo "specific information about the alldiff constraint view " >> $outfile;
-echo "\`\`constraints alldiff''." >> $outfile;
-echo >> $outfile;
-echo "A good place to start would be viewing the " >> $outfile;
-echo "\`\`input example'' entry which exhibits a complete" >> $outfile; 
-echo "example of a minion input file." >> $outfile;
-echo >> $outfile;
-echo "Usage: \texttt{minion [switches] [minion input file]}" >> $outfile;
-echo >> $outfile;
-echo "\tableofcontents" >> $outfile;
+outfile="docs/latexhelp/doc.tex";
 cat $TMP_FILE | sort | uniq > $SORTED_TMP;
 cat $SORTED_TMP | while read entry; do
     entry_underbars=`echo $entry | sed 's/ /_/g'`;
@@ -77,6 +50,5 @@ cat $SORTED_TMP | while read entry; do
     echo "\section{$entry_latexformatted}" >> $outfile;
     cat "docs/latexhelp/$entry_underbars.frag" >> $outfile;
 done
-echo "\end{document}" >> $outfile;
 
 rm docs/latexhelp/*.frag;
