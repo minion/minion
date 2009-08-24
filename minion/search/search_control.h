@@ -26,37 +26,67 @@
 
 namespace Controller
 {
-
+    
+    make_search_order(SearchOrder order)
+    {
+        // collect the variables in the SearchOrder object 
+        vector<AnyVarRef>* var_array= new vector<AnyVarRef>();
+        for(int i=0; i<order.var_order.size(); i++)
+        {
+            var_array->push_back(get_AnyVarRef_from_Var(stateObj, order.var_order[i]));
+            // some check here?
+        }
+        
+        VariableOrder* vo;
+        switch(order.order)  // get the VarOrderEnum
+        {
+        case ORDER_STATIC:
+            vo=new StaticBranch(*var_array, order.val_order, stateObj);
+            break;
+        case ORDER_ORIGINAL:
+            vo=new StaticBranch(*var_array, order.val_order, stateObj);
+            break;
+        case ORDER_SDF:
+            vo=new SDFBranch(*var_array, order.val_order, stateObj);
+            break;
+        default:
+            cout << "Order not found in make_search_order." << endl;
+            abort();
+        }
+        return vo;
+    }
+    
+    make_search_order_multiple(vector<SearchOrder> order)
+    {
+        VariableOrder* vo;
+        
+        if(order.size()==1)
+        {
+            return make_search_order(order[0]);
+        }
+        else
+        {
+            vector<VariableOrder*> vovector;
+            for(int i=0; i<order.size(); i++)
+            {
+                vovector.push_back(make_search_order(order[i]));
+            }
+            
+            vo=new MultiBranch(vovector);
+        }
+        
+        return vo;
+    }
+    
+    
 // returns an instance of SearchManager with the required variable ordering, propagator etc.
-SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_method, SearchOrder order)
+SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_method, vector<SearchOrder> order)
 {
     cout << "Entered make_search_manager." << endl;
     
-    // collect the variables in the SearchOrder object 
-    vector<AnyVarRef>* var_array= new vector<AnyVarRef>();
-    for(int i=0; i<order.var_order.size(); i++)
-    {
-        var_array->push_back(get_AnyVarRef_from_Var(stateObj, order.var_order[i]));
-        // some check here?
-    }
-    
     VariableOrder* vo;
     
-    switch(order.order)  // get the VarOrderEnum
-    {
-    case ORDER_STATIC:
-        vo=new StaticBranch(*var_array, order.val_order, stateObj);
-        break;
-    case ORDER_ORIGINAL:
-        vo=new StaticBranch(*var_array, order.val_order, stateObj);
-        break;
-    case ORDER_SDF:
-        vo=new SDFBranch(*var_array, order.val_order, stateObj);
-        break;
-    default:
-        cout << "Order not found in make_search_manager." << endl;
-        abort();
-    }
+    vo=make_search_order_multiple(order);
     
     cout << "Made VariableOrder object." <<endl;
     

@@ -85,7 +85,9 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     
     // Set up variable and value ordering
     
-    D_ASSERT(instance.search_order.size()==1);
+    // How do we deal with contradicting search instructions in the file and
+    // on the command line??
+    
     SearchOrder order = instance.search_order[0];
     
     if(args.order != ORDER_NONE)
@@ -103,8 +105,9 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
             var_val_order.second[i] = (rand() % 100) > 50;
     }
     
-    // oops, random order won't work.. need to put it back into order object.
-    Controller::SearchManager* sm=Controller::make_search_manager(stateObj, args.prop_method, order);
+    // oops, random order won't work.. need to put it back into order object(s).
+    
+    Controller::SearchManager* sm=Controller::make_search_manager(stateObj, args.prop_method, instance.search_order);
     
     getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions(stateObj).silent);
     

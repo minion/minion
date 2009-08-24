@@ -91,16 +91,12 @@ struct SearchManager
     { return depth; }
     
     // returns false if left branch not possible.
-    bool branch_left()
+    virtual void branch_left(pair<int, DomainInt> picked)
     {
-        pair<int, DomainInt> picked = var_order->pickVarVal();   // future complexity goes into var_order.
-        if(picked.first == -1)
-        {
-            return false;
-        }
+        D_ASSERT(picked.first!=-1);
+        D_ASSERT(!var_array[picked.first].isAssigned());
         
         world_push(stateObj);
-        D_ASSERT(!var_array[picked.first].isAssigned());
         var_array[picked.first].decisionAssign(picked.second);
         maybe_print_search_assignment(stateObj, var_array[picked.first], picked.second, true);
         branches.push_back(Controller::triple(true, picked.first, picked.second));
@@ -108,25 +104,7 @@ struct SearchManager
         return true;
     }
     
-    // Only for conflict search?
-    void force_branch_left(int new_pos)
-    {
-        D_ASSERT(new_pos >= 0 && new_pos < var_array.size()); 
-        D_ASSERT(!var_array[new_pos].isAssigned()) 
-        
-        DomainInt assign_val;
-        //if(val_order[new_pos])
-        assign_val = var_array[new_pos].getMin();
-        //else
-        //assign_val = var_order[new_pos].getMax();
-        
-        var_array[new_pos].uncheckedAssign(assign_val);
-        maybe_print_search_assignment(stateObj, var_array[new_pos], assign_val, true, true);
-        branches.push_back(Controller::triple(true, new_pos, assign_val));
-        depth++;
-    }
-    
-    bool branch_right()
+    virtual bool branch_right()
     {
         while(!branches.empty() && !branches.back().isLeft) { //pop off all the RBs
             branches.pop_back();
@@ -219,7 +197,7 @@ struct SearchManager
             else
             {
                 maybe_print_search_state(stateObj, "Node: ", var_array);
-                branch_left();
+                branch_left(varval);
                 prop->prop(stateObj, var_array);
             }
             

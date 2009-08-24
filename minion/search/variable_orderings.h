@@ -37,6 +37,40 @@ struct VariableOrder
     virtual pair<int, DomainInt> pickVarVal() {};
 };
 
+// Container for multiple variable orderings
+struct MultiBranch : public VariableOrder
+{
+    vector<VariableOrder*> vovector;
+    Reversible<int> pos;
+    
+    MultiBranch(vector<VariableOrder*> vovector, StateObj* _stateObj) : 
+    VariableOrder(vovector[0]->var_order), // It doesn't matter what var_order is set to
+    pos(_stateObj)
+    {
+        pos=0;
+    }
+    
+    pair<int, DomainInt> pickVarVal()
+    {
+        int pos2=pos;
+        
+        pair<int, DomainInt> t=vovector[pos2].pickVarVal();
+        
+        while(t.first==-1)   
+        {
+            pos2++;
+            if(pos2== vovector.size())
+            {
+                return make_pair(-1, 0);
+            }
+            
+            t=vovector[pos2].pickVarVal();
+        }
+        
+        return t;
+    }
+};
+
 struct StaticBranch : public VariableOrder
 {
     vector<char>& val_order;
