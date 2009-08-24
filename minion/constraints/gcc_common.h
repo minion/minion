@@ -37,7 +37,7 @@
 #define GCCPRINT(x)
 
 #define SPECIALQUEUE
-#define SCC
+//#define SCC
 #define INCREMENTALMATCH
 
 //#define SCCCARDS
@@ -50,7 +50,7 @@
 
 // use the algorithm from Quimper et al. to prune the target variables.
 // requires INCGRAPH and not SCC
-//#define QUIMPER
+#define QUIMPER
 
 //#define CAPBOUNDSCACHE
 
@@ -85,6 +85,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     using FlowConstraint<VarArray, UseIncGraph>::hopcroft2_setup;
     using FlowConstraint<VarArray, UseIncGraph>::hopcroft_wrapper2;
     using FlowConstraint<VarArray, UseIncGraph>::hopcroft2;
+    using FlowConstraint<VarArray, UseIncGraph>::augpath;
     
     GCC(StateObj* _stateObj, const VarArray& _var_array, const CapArray& _capacity_array, vector<int> _val_array) : 
     FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
@@ -100,6 +101,14 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 D_ASSERT(val_array[i]!=val_array[j]);
             }
         }
+        
+        // sanity check INCGRAPH
+        #ifdef INCGRAPH
+        D_ASSERT(UseIncGraph);
+        #else
+        D_ASSERT(!UseIncGraph);
+        #endif
+        
         usage.resize(numvals, 0);
         
         lower.resize(numvals, 0);
@@ -1026,8 +1035,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         GCCPRINT("maximum matching:" << varvalmatching);
         return true;
     }
-    
-    vector<int> augpath;
     
     inline void apply_augmenting_path(int unwindnode, int startnode)
     {

@@ -827,6 +827,7 @@ struct FlowConstraint : public AbstractConstraint
     smallset_nolist varvalused;
     smallset thislayer;
     deque<int> fifo;
+    vector<int> augpath; // alternating path stored here with vars and val-dom_min
     
     void hopcroft2_setup()
     {
@@ -1003,8 +1004,6 @@ struct FlowConstraint : public AbstractConstraint
                 // Find a set of minimal-length augmenting paths using DFS within
                 // the edges ds.
                 // starting at layer 0.
-                
-                vector<int> augpath; // alternating path stored here with vars and val-dom_min
                 
                 for(int i=0; i<edges[numvars+numvals].size(); i++)
                 {
