@@ -28,12 +28,15 @@ find_program(GIT git)
 if(GIT)
     execute_process(COMMAND ${GIT} log -1 --format=format:%H
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            OUTPUT_VARIABLE GITVERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+            OUTPUT_VARIABLE GITVERSIONTMP OUTPUT_STRIP_TRAILING_WHITESPACE)
     execute_process(COMMAND ${GIT} log -1 --format=format:%ad
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            OUTPUT_VARIABLE GITDATE OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if(GITDATE STREQUAL "unknown")
+            OUTPUT_VARIABLE GITDATETMP OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(GITDATETMP STREQUAL "")
         message(STATUS "Unable to determine git version (no checkout?)")
+    else()
+        set(GITDATE ${GITDATETMP})
+        set(GITVERSION ${GITVERSIONTMP})
     endif()
     message(STATUS "Git version ${GITVERSION}, date ${GITDATE}")
 else()
@@ -42,7 +45,6 @@ endif()
 
 file(APPEND ${BUILD_DEF_FILE} "#define GIT_VER ${GITVERSION}\n")
 file(APPEND ${BUILD_DEF_FILE} "#define GIT_DATE ${GITDATE}\n")
-
 
 # if we have a bash, generate constraints and help if necessary and add build
 # targets to do that
