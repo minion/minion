@@ -84,28 +84,26 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     vector<AnyVarRef> preprocess_vars = BuildCon::build_val_and_var_order(stateObj, instance.search_order[0]).first;
     
     // Set up variable and value ordering
-    
-    // How do we deal with contradicting search instructions in the file and
-    // on the command line??
-    
-    SearchOrder order = instance.search_order[0];
-    
-    if(args.order != ORDER_NONE)
-        order.order = args.order;
-    
-    pair<vector<AnyVarRef>, vector<int> > var_val_order = BuildCon::build_val_and_var_order(stateObj, order);
-    
-    if(getOptions(stateObj).randomise_valvarorder)
+    // Strange that when using randomise_valvarorder, the variables are
+    // only shuffled within the VARORDER blocks from the input file.
+    // Likewise, using a dynamic variable ordering, it only applies within
+    // the VARORDER blocks.
+    for(int i = instance.search_order.size() - 1; i >= 0; --i)
     {
-        getOptions(stateObj).printLine("Using seed: " + to_string(args.random_seed));
-        srand( args.random_seed );
+        if(args.order != ORDER_NONE)
+            instance.search_order[i].order = args.order;
         
-        std::random_shuffle(var_val_order.first.begin(), var_val_order.first.end());
-        for(unsigned i = 0; i < var_val_order.second.size(); ++i)
-            var_val_order.second[i] = (rand() % 100) > 50;
+        if(getOptions(stateObj).randomise_valvarorder)
+        {
+            getOptions(stateObj).printLine("Using seed: " + to_string(args.random_seed));
+            srand( args.random_seed );
+            
+            std::random_shuffle(instance.search_order[i].var_order.begin(), instance.search_order[i].var_order.end()); 
+            
+            for(unsigned j = 0; j < instance.search_order[i].val_order.size(); ++j)
+                instance.search_order[i].val_order[j] = (rand() % 100) > 50;
+        }
     }
-    
-    // oops, random order won't work.. need to put it back into order object(s).
     
     Controller::SearchManager* sm=Controller::make_search_manager(stateObj, args.prop_method, instance.search_order);
     
