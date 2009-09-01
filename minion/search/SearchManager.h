@@ -101,7 +101,6 @@ struct SearchManager
         maybe_print_search_assignment(stateObj, var_array[picked.first], picked.second, true);
         branches.push_back(Controller::triple(true, picked.first, picked.second));
         depth++;
-        return true;
     }
     
     virtual bool branch_right()

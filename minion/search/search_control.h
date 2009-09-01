@@ -27,7 +27,7 @@
 namespace Controller
 {
     
-    make_search_order(SearchOrder order)
+    VariableOrder* make_search_order(SearchOrder order, StateObj* stateObj)
     {
         // collect the variables in the SearchOrder object 
         vector<AnyVarRef>* var_array= new vector<AnyVarRef>();
@@ -56,23 +56,23 @@ namespace Controller
         return vo;
     }
     
-    make_search_order_multiple(vector<SearchOrder> order)
+    VariableOrder* make_search_order_multiple(vector<SearchOrder> order, StateObj* stateObj)
     {
         VariableOrder* vo;
         
         if(order.size()==1)
         {
-            return make_search_order(order[0]);
+            return make_search_order(order[0], stateObj);
         }
         else
         {
             vector<VariableOrder*> vovector;
             for(int i=0; i<order.size(); i++)
             {
-                vovector.push_back(make_search_order(order[i]));
+                vovector.push_back(make_search_order(order[i], stateObj));
             }
             
-            vo=new MultiBranch(vovector);
+            vo=new MultiBranch(vovector, stateObj);
         }
         
         return vo;
@@ -86,7 +86,7 @@ SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_met
     
     VariableOrder* vo;
     
-    vo=make_search_order_multiple(order);
+    vo=make_search_order_multiple(order, stateObj);
     
     cout << "Made VariableOrder object." <<endl;
     
@@ -115,8 +115,18 @@ SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_met
     
     cout << "Made Propagate object." <<endl;
     
+    vector<AnyVarRef>* all_vars=new vector<AnyVarRef>();
+    
+    for(int i=0; i<order.size(); i++)
+    {
+        for(int j=0; j<order[i].var_order.size(); j++)
+        {
+            all_vars->push_back(get_AnyVarRef_from_Var(stateObj, order[i].var_order[j]));
+        }
+    }
+    
     // need to switch here for different search algorthms. plain, parallel, group or conflict
-    SearchManager* sm=new SearchManager(stateObj, *var_array, vo, p);
+    SearchManager* sm=new SearchManager(stateObj, *all_vars, vo, p);
     
     cout << "Exiting make_search_manager"<<endl;
     return sm;

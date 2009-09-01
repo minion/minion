@@ -81,21 +81,28 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
 
 void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
 {
-    vector<AnyVarRef> preprocess_vars = BuildCon::build_val_and_var_order(stateObj, instance.search_order[0]).first;
-    
-    // Fix the above so that preprocess_vars includes all vars, or all vars in a varorder thing.
     // Check that when searching PropagateSAC does actually do the SAC over all vars in any
     // varorder block, not just the ones in the 'current' block
+    
+    
     
     // Set up variable and value ordering
     // Strange that when using randomise_valvarorder, the variables are
     // only shuffled within the VARORDER blocks from the input file.
     // Likewise, using a dynamic variable ordering, it only applies within
     // the VARORDER blocks.
+    
+    vector<AnyVarRef> preprocess_vars;
+    
     for(int i = instance.search_order.size() - 1; i >= 0; --i)
     {
         if(args.order != ORDER_NONE)
             instance.search_order[i].order = args.order;
+        
+        for(int j=0; j<instance.search_order[i].var_order.size(); j++)
+        {   // cobble together all the varorder blocks for preprocessing.
+            preprocess_vars.push_back(get_AnyVarRef_from_Var(stateObj, instance.search_order[i].var_order[j]));
+        }
         
         if(getOptions(stateObj).randomise_valvarorder)
         {

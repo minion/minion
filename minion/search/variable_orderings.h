@@ -26,9 +26,9 @@
 
 struct VariableOrder
 {
-    vector<AnyVarRef>& var_order;  // can assume this is anyvarref? May need to template
+    vector<AnyVarRef> var_order;  // can assume this is anyvarref? May need to template
     
-    VariableOrder(vector<AnyVarRef>& _var_order) : var_order(_var_order) 
+    VariableOrder(const vector<AnyVarRef>& _var_order) : var_order(_var_order) 
     {
     }
     
@@ -43,9 +43,9 @@ struct MultiBranch : public VariableOrder
     vector<VariableOrder*> vovector;
     Reversible<int> pos;
     
-    MultiBranch(vector<VariableOrder*> vovector, StateObj* _stateObj) : 
+    MultiBranch(const vector<VariableOrder*> _vovector, StateObj* _stateObj) : 
     VariableOrder(vovector[0]->var_order), // It doesn't matter what var_order is set to
-    pos(_stateObj)
+    pos(_stateObj), vovector(_vovector)
     {
         pos=0;
     }
@@ -54,7 +54,7 @@ struct MultiBranch : public VariableOrder
     {
         int pos2=pos;
         
-        pair<int, DomainInt> t=vovector[pos2].pickVarVal();
+        pair<int, DomainInt> t=vovector[pos2]->pickVarVal();
         
         while(t.first==-1)   
         {
@@ -64,19 +64,19 @@ struct MultiBranch : public VariableOrder
                 return make_pair(-1, 0);
             }
             
-            t=vovector[pos2].pickVarVal();
+            t=vovector[pos2]->pickVarVal();
         }
-        
+        pos=pos2;
         return t;
     }
 };
 
 struct StaticBranch : public VariableOrder
 {
-    vector<char>& val_order;
+    vector<char> val_order;
     Reversible<int> pos;
     
-    StaticBranch(vector<AnyVarRef>& _var_order, vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
+    StaticBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
         val_order(_val_order), pos(_stateObj)
     {
         pos=0;
@@ -104,10 +104,10 @@ struct StaticBranch : public VariableOrder
 
 struct SDFBranch : public VariableOrder
 {
-    vector<char>& val_order;
+    vector<char> val_order;
     Reversible<int> pos;
     
-    SDFBranch(vector<AnyVarRef>& _var_order, vector<char>& _val_order, StateObj* _stateObj) : 
+    SDFBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : 
         VariableOrder(_var_order), val_order(_val_order), pos(_stateObj)
     {
     }
@@ -116,6 +116,7 @@ struct SDFBranch : public VariableOrder
     
     pair<int, DomainInt> pickVarVal()
     {
+        cout << "In pickVarVal for SDF (approximation)" <<endl;
         int length = var_order.size();
         int smallest_dom = -1;
         DomainInt dom_size = DomainInt_Max;
@@ -153,9 +154,9 @@ struct SDFBranch : public VariableOrder
 
 struct SlowStaticBranch : public VariableOrder
 {
-    vector<char>& val_order;
+    vector<char> val_order;
     
-    SlowStaticBranch(vector<AnyVarRef>& _var_order, vector<char>& _val_order, StateObj* _stateObj) : 
+    SlowStaticBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : 
         VariableOrder(_var_order), val_order(_val_order)
     {
     }
