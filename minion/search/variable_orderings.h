@@ -105,10 +105,9 @@ struct StaticBranch : public VariableOrder
 struct SDFBranch : public VariableOrder
 {
     vector<char> val_order;
-    Reversible<int> pos;
     
     SDFBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : 
-        VariableOrder(_var_order), val_order(_val_order), pos(_stateObj)
+        VariableOrder(_var_order), val_order(_val_order)
     {
     }
     
@@ -183,13 +182,17 @@ struct SlowStaticBranch : public VariableOrder
 
 #ifdef WDEG
 //see Boosting Systematic Search by Weighting Constraints by Boussemart et al
-struct WdegBranch
+struct WdegBranch : public VariableOrder
 {
+    vector<char> val_order;
     
+    WdegBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
+        val_order(_val_order)
+    {
+    }
     
-  template<typename VarType>
-  int operator()(vector<VarType>& var_order, int pos)
-  {
+    pair<int, DomainInt> pickVarVal()
+    {
     int best = var_order.size(); //the variable with the best score so far (init to none)
     int best_score = -1; //... and its score (all true scores are positive)
     size_t var_order_size = var_order.size();
@@ -197,7 +200,7 @@ struct WdegBranch
       //cout << "i=" << i << endl;
       //cout << "best=" << best << endl;
       //cout << "best_score=" << best_score << endl;
-      VarType& v = var_order[i];
+      AnyVarRef v = var_order[i];
       if(v.isAssigned()) {
         //cout << "assigned -- stop" << endl;
         continue;
@@ -240,15 +243,29 @@ struct WdegBranch
         best = i;
       }
     }
-    return best;
+    
+    // new bit. pn
+    if(best==var_order.size())
+        return make_pair(-1, 0);
+    
+    if(val_order[best])
+        return make_pair(best, var_order[best].getMin());
+    else
+        return make_pair(best, var_order[best].getMax());
   }
 };
 
-struct DomOverWdegBranch
+struct DomOverWdegBranch : VariableOrder
 {
-  template<typename VarType>
-  int operator()(vector<VarType>& var_order, int pos)
-  {
+    vector<char> val_order;
+    
+    DomOverWdegBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
+        val_order(_val_order)
+    {
+    }
+    
+    pair<int, DomainInt> pickVarVal()
+    {
     //cout << "using domoverwdeg" << endl;
     int best = var_order.size(); //the variable with the best score so far (init to none)
     float best_score = FLT_MAX; //... and its score (all true scores are positive)
@@ -258,7 +275,7 @@ struct DomOverWdegBranch
       //cout << "i=" << i << endl;
       //cout << "best=" << best << endl;
       //cout << "best_score=" << best_score << endl;    
-      VarType& v = var_order[i];
+      AnyVarRef v = var_order[i];
       if(v.isAssigned()) {
         //cout << "assigned -- stop" << endl;
         continue;
@@ -309,18 +326,32 @@ struct DomOverWdegBranch
     }
     //cout << "dec=" << best << "@" << best_score << endl;
     D_ASSERT(!anyUnassigned || best != var_order_size);
-    return best;
+    
+    // new bit. pn
+    if(best==var_order.size())
+        return make_pair(-1, 0);
+    
+    if(val_order[best])
+        return make_pair(best, var_order[best].getMin());
+    else
+        return make_pair(best, var_order[best].getMax());
   }
 };
 #endif
 
 
 
-struct SRFBranch
+struct SRFBranch : VariableOrder
 {
-  template<typename VarType>
-  int operator()(vector<VarType>& var_order, int pos)
-  {
+    vector<char> val_order;
+    
+    SRFBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
+        val_order(_val_order)
+    {
+    }
+    
+    pair<int, DomainInt> pickVarVal()
+    {
     int length = var_order.size();
     int smallest_dom = length;
     
@@ -342,23 +373,38 @@ struct SRFBranch
             smallest_dom = i;
         }
     }
-    return smallest_dom;
-  }
+    
+    if(smallest_dom==length)
+        return make_pair(-1, 0);
+    
+    if(val_order[smallest_dom])
+        return make_pair(smallest_dom, var_order[smallest_dom].getMin());
+    else
+        return make_pair(smallest_dom, var_order[smallest_dom].getMax());
+    }
 };
 
 
-struct LDFBranch
+struct LDFBranch : VariableOrder
 {
-  template<typename VarType>
-  int operator()(vector<VarType>& var_order, int pos)
-  {
+    vector<char> val_order;
+    
+    LDFBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
+        val_order(_val_order)
+    {
+    }
+    
+    pair<int, DomainInt> pickVarVal()
+    {
     int length = var_order.size();
     
-    pos = 0;
+    int pos = 0;
     while(pos < length && var_order[pos].isAssigned())
       ++pos;
     if(pos == length)
-      return length;
+    {
+        return make_pair(-1, 0);
+    }
     
     int largest_dom = pos;
     DomainInt dom_size = var_order[pos].getMax() - var_order[pos].getMin();
@@ -376,7 +422,11 @@ struct LDFBranch
         largest_dom = pos;
       }
     }
-    return largest_dom;
+    
+    if(val_order[largest_dom])
+        return make_pair(largest_dom, var_order[largest_dom].getMin());
+    else
+        return make_pair(largest_dom, var_order[largest_dom].getMax());
   }
 };
 

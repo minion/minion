@@ -49,6 +49,23 @@ namespace Controller
         case ORDER_SDF:
             vo=new SDFBranch(*var_array, order.val_order, stateObj);
             break;
+        case ORDER_SRF:
+            vo=new SRFBranch(*var_array, order.val_order, stateObj);
+            break;
+        case ORDER_LDF:
+            vo=new LDFBranch(*var_array, order.val_order, stateObj);
+            break;
+        
+        
+        #ifdef WDEG
+        case ORDER_WDEG:
+            vo=new WdegBranch(*var_array, order.val_order, stateObj);
+            break;
+        case ORDER_DOMOVERWDEG:
+            vo=new DomOverWdegBranch(*var_array, order.val_order, stateObj);
+            break;
+        #endif
+        
         default:
             cout << "Order not found in make_search_order." << endl;
             abort();
