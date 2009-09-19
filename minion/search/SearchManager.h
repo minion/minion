@@ -125,8 +125,6 @@ struct SearchManager
         
         D_ASSERT(var_array[var].inDomain(val));
         
-        cout << "Branch right removing var: "<< var <<", val: " << val <<endl;
-        
         // special case the upper and lower bounds to make it work for bound variables
         if(var_array[var].getMin() == val)
         {
@@ -175,16 +173,10 @@ struct SearchManager
             
             getState(stateObj).incrementNodeCount();
             
-            cout << "About to call do_checks" << endl;
-            
             if(do_checks(stateObj, var_array, branches))
                 return;
             
-            cout << "About to call pickVarVal" << endl;
-            
             pair<int, DomainInt> varval= var_order->pickVarVal();
-            
-            cout << varval.first << "," << varval.second <<endl;
             
             if(varval.first==-1)
             {
@@ -220,6 +212,8 @@ struct SearchManager
         }
     }
 };
+
+// junk
 
 struct ConflictSearchManager : SearchManager
 {

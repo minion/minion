@@ -170,10 +170,8 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       }
       else if(order == "random")
         getOptions(stateObj).randomise_valvarorder = true;
-#if 0
       else if(order == "conflict")
         args.order = ORDER_CONFLICT;
-#endif
       else if(order == "wdeg") {
         args.order = ORDER_WDEG;
         getOptions(stateObj).wdeg_on = true;

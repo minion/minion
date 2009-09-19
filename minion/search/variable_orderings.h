@@ -430,4 +430,83 @@ struct LDFBranch : VariableOrder
   }
 };
 
+struct ConflictBranch : VariableOrder
+{
+    // Implements the conflict variable ordering from 
+    // "Last Conflict based Reasoning", Lecoutre et al, ECAI 06.
+    vector<char> val_order;
+    
+    Reversible<int> pos;
+    
+    VariableOrder* innervarorder;
+    
+    ConflictBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, 
+        VariableOrder* _innervarorder, StateObj* _stateObj) : 
+    VariableOrder(_var_order), 
+    val_order(_val_order),
+    pos(_stateObj), innervarorder(_innervarorder), last_returned_var(-1), in_conflict(false)
+    {
+        pos=0;
+        pos2=0;
+    }
+    
+    // pos maintains a 'depth' which is actually the number of calls to pickVarVals
+    // last_returned_var contains the last var returned by pickvarval, or -1
+    // if we were at a solution.
+    
+    // pos and pos2 are used to see if we have backtracked.
+    
+    int pos2;
+    
+    int last_returned_var;
+    bool in_conflict;
+    
+    pair<int, DomainInt> pickVarVal()
+    {
+        if(in_conflict && var_order[last_returned_var].isAssigned())
+        {
+            // If the conflict variable has been successfully assigned, come out
+            // of conflict mode.
+            in_conflict=false;
+        }
+        
+        if(pos2>pos)
+        {
+            pos2=pos;
+            
+            if(last_returned_var!=-1 && !var_order[last_returned_var].isAssigned())
+            {
+                // we backtracked since the last call.
+                // Assume the search procedure made a left branch which failed,
+                // then backtracked.
+                // Go into conflict mode. 
+                in_conflict=true;
+            }
+        }
+        
+        pos=pos+1;
+        pos2++;
+        
+        if(in_conflict)
+        {
+            if(val_order[last_returned_var])
+            {
+                return make_pair(last_returned_var, var_order[last_returned_var].getMin());
+            }
+            else
+            {
+                return make_pair(last_returned_var, var_order[last_returned_var].getMax());
+            }
+        }
+        else
+        {
+            pair<int, DomainInt> temp= innervarorder->pickVarVal();
+            last_returned_var=temp.first;
+            D_ASSERT(temp.first==-1 || var_order[temp.first].inDomain(temp.second));
+            return temp;
+        }
+    }
+    
+};
+
 #endif

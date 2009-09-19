@@ -38,6 +38,8 @@ namespace Controller
         }
         
         VariableOrder* vo;
+        VariableOrder* vo2;
+        
         switch(order.order)  // get the VarOrderEnum
         {
         case ORDER_STATIC:
@@ -55,16 +57,20 @@ namespace Controller
         case ORDER_LDF:
             vo=new LDFBranch(*var_array, order.val_order, stateObj);
             break;
+        case ORDER_CONFLICT:
+            // for the time being, just use static as the underlying order
+            vo2=new StaticBranch(*var_array, order.val_order, stateObj);
+            vo=new ConflictBranch(*var_array, order.val_order, vo2, stateObj);
+            break;
         
         
-        #ifdef WDEG
         case ORDER_WDEG:
             vo=new WdegBranch(*var_array, order.val_order, stateObj);
             break;
         case ORDER_DOMOVERWDEG:
             vo=new DomOverWdegBranch(*var_array, order.val_order, stateObj);
             break;
-        #endif
+        
         
         default:
             cout << "Order not found in make_search_order." << endl;
