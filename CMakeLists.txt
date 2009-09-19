@@ -148,9 +148,9 @@ endif()
 
 if(APPLEMAC)
     set(Boost_USE_STATIC_LIBS true)
-    set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.4u.sdk")
-    add_definitions(-mmacosx-version-min=10.4)
-    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.4 )
+    set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.5.sdk")
+    add_definitions(-mmacosx-version-min=10.5)
+    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.5 )
 endif()
 
 option(STATIC "" OFF)

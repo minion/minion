@@ -10,13 +10,18 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "hamming" "not-hamming" "watched-or" "watched-and"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply" "reifyimply-old"
-                    "reifyimply-new" "true" "false" "check[gsa]" "check[assign]")
+                    "reifyimply-new" "true" "false" "check[gsa]" "check[assign]"
+                    "watchvecexists_less"
+                    )
 
 set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
 set(CONSTRAINT_DEFS "${GEN_FILES_DIR}/constraint_defs.h")
 set(CONSTRAINT_ENUM "${GEN_FILES_DIR}/ConstraintEnum.h")
 set(BUILD_START "${GEN_FILES_DIR}/BuildStart.h")
 set(BUILD_STATIC_START "${GEN_FILES_DIR}/BuildStaticStart.cpp")
+
+set(NAME_ID_watchvecexists_less "CT_WATCHED_VEC_OR_LESS")
+set(NAME_READ_watchvecexists_less "read_list" "read_list")
 
 set(NAME_ID_element "CT_ELEMENT")
 set(NAME_READ_element "read_list" "read_var" "read_var")
