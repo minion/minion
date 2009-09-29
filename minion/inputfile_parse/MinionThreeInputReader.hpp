@@ -825,16 +825,18 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
       }
     }
     else
-      { // build a vector of all 'nulls'
-      if(negVar)
-        throw parse_exception("Sorry, can't negate a matrix");
-    
-      vector<int> maxterms = instance.vars.getMatrixSymbol(name);
-    params = vector<int>(maxterms.size(), -999);
-    returnVec = instance.vars.buildVarList(name, params);
+    { // build a vector of all 'nulls'
+        if(negVar)
+        {
+            throw parse_exception("Sorry, can't negate a matrix");
+        }
+        
+        vector<int> maxterms = instance.vars.getMatrixSymbol(name);
+        params = vector<int>(maxterms.size(), -999);
+        returnVec = instance.vars.buildVarList(name, params);
+    }
+    parser_info("Got matrix:" + to_string(returnVec));
   }
-  parser_info("Got matrix:" + to_string(returnVec));
-}
 else
 { 
   if(mustBeMatrix)
@@ -1309,10 +1311,10 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
     {
       if(isArray)
       {
+        instance.vars.addMatrixSymbol(varname, indices);
         // If any index is 0, don't add any variables.
         if(find(indices.begin(), indices.end(), 0) == indices.end())
         {
-          instance.vars.addMatrixSymbol(varname, indices);
           vector<int> current_index(indices.size(), 0);
           parser_info("New Var: " + varname + to_var_name(current_index));
           instance.vars.addSymbol(varname + to_var_name(current_index),
