@@ -179,7 +179,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     printf(":");  
     for(int i = 0; i < unwatched_values.size(); ++i)
       printf("%d,", unwatched_values[i]);
-    printf("\n");*/
+    printf("\n");
     
     for(int i = 0; i < var_array1.size(); ++i)
       cout << var_array1[i].getMin() << ":" << var_array1[i].getMax() << ",";
@@ -189,7 +189,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     for(int i = 0; i < var_array2.size(); ++i)
       cout << var_array2[i].getMin() << ":" << var_array2[i].getMax() << ",";
     
-    cout << endl;
+    cout << endl;*/
     
     
     if(propagate_mode)
