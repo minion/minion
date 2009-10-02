@@ -463,18 +463,6 @@ if(UNIX AND BASH)
     add_custom_target(htmlhelp ${BASH} "docs/genhelp/genhelp.sh" "minion"
               WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
               COMMENT "htmlhelp" VERBATIM)
-    find_program(PDFLATEX pdflatex)
-    if(PDFLATEX)
-        message(STATUS "Generating PDF documentation target")
-        add_custom_target(pdfhelp
-                  COMMAND ${BASH} "docs/genhelp/genlatexhelp.sh" "minion"
-                  COMMAND ${PDFLATEX} "-output-directory=docs/latexhelp" "docs/latexhelp/doc.latex"
-                  COMMAND ${PDFLATEX} "-output-directory=docs/latexhelp" "docs/latexhelp/doc.latex"
-                  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-                  COMMENT "pdfhelp" VERBATIM)
-    else()
-        message(STATUS "No pdflatex executable found, not generating PDF documentation target")
-    endif()
 else()
     message(STATUS "You need a UNIX-like system to generate the documentation")
 endif()

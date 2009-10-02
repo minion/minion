@@ -170,7 +170,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     int triggerpair = trigger_activated / Operator::dynamic_trigger_count();   
     D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);
 
-    printf("propmode=%d, triggerpair=%d, trigger_activated=%d\n",
+    /*printf("propmode=%d, triggerpair=%d, trigger_activated=%d\n",
       (int)propagate_mode, (int)triggerpair, (int)trigger_activated);
 
     for(int i = 0; i < watched_values.size(); ++i)
@@ -189,7 +189,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     for(int i = 0; i < var_array2.size(); ++i)
       cout << var_array2[i].getMin() << ":" << var_array2[i].getMax() << ",";
     
-    cout << endl;
+    cout << endl;*/
     
     
     if(propagate_mode)

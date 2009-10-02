@@ -749,7 +749,7 @@ class testhamming:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("hamming", True, options, [4,4,1], ["smallnum", "smallnum", "const"], self, not options['reify'])
+        return runtestgeneral("hamming", False, options, [4,4,1], ["smallnum", "smallnum", "const"], self, False)
 
 class testnot__minus__hamming:
     def printtable(self, domains):
@@ -765,7 +765,7 @@ class testnot__minus__hamming:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("not-hamming", True, options, [4,4,1], ["smallnum", "smallnum", "const"], self, not options['reify'] and not options['reifyimply'])
+        return runtestgeneral("not-hamming", False, options, [4,4,1], ["smallnum", "smallnum", "const"], self, False)
 
 class testlitsumgeq:
     def printtable(self, domains):
