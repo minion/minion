@@ -152,19 +152,13 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       to_process.reserve(var_array.size());
       
       // Set up data structures
-      //#ifdef BFSMATCHING
       prev.resize(numvars+numvals, -1);
-      //#else
       initialize_hopcroft();
-      //#endif
-      
       initialize_tarjan();
       
       #ifdef NEWHK
       hopcroft2_setup();
       #endif
-      
-      // The matching in both directions.
       
       sccs_to_process.reserve(numvars);
       

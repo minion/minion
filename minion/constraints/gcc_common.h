@@ -37,10 +37,10 @@
 #define GCCPRINT(x)
 
 #define SPECIALQUEUE
-//#define SCC
+#define SCC
 #define INCREMENTALMATCH
 
-//#define SCCCARDS
+#define SCCCARDS
 
 //Incremental graph -- maintains adjacency lists for values and vars
 #define INCGRAPH

@@ -29,8 +29,8 @@
 #undef P
 #endif
 
-//#define P(x)
-#define P(x) cout << x << endl
+#define P(x)
+//#define P(x) cout << x << endl
 
 struct smallset
 {
@@ -854,7 +854,6 @@ struct FlowConstraint : public AbstractConstraint
         return true;
     }
     
-    
     inline bool hopcroft2(vector<int>& vars_in_scc, vector<int>& matching, vector<int>& upper, vector<int>& usage)
     {
         // The return value is whether the matching is complete over teh variables
@@ -1081,8 +1080,6 @@ struct FlowConstraint : public AbstractConstraint
         }
         augpath.clear();
     }
-    
-    
 };
 
 struct deque_fixed_size
