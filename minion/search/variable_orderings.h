@@ -43,11 +43,21 @@ struct MultiBranch : public VariableOrder
     vector<VariableOrder*> vovector;
     Reversible<int> pos;
     
+    // need to patch up the returned variable index
+    vector<int> variable_offset;
+    
     MultiBranch(const vector<VariableOrder*> _vovector, StateObj* _stateObj) : 
-    VariableOrder(vovector[0]->var_order), // It doesn't matter what var_order is set to
-    pos(_stateObj), vovector(_vovector)
+    VariableOrder(_vovector[0]->var_order), // It doesn't matter what var_order is set to
+    vovector(_vovector),
+    pos(_stateObj)
     {
         pos=0;
+        variable_offset.resize(vovector.size());
+        variable_offset[0]=0;
+        for(int i=1; i<vovector.size(); i++)
+        {
+            variable_offset[i]=variable_offset[i-1]+vovector[i-1]->var_order.size();
+        }
     }
     
     pair<int, DomainInt> pickVarVal()
@@ -55,7 +65,6 @@ struct MultiBranch : public VariableOrder
         int pos2=pos;
         
         pair<int, DomainInt> t=vovector[pos2]->pickVarVal();
-        
         while(t.first==-1)   
         {
             pos2++;
@@ -67,6 +76,7 @@ struct MultiBranch : public VariableOrder
             t=vovector[pos2]->pickVarVal();
         }
         pos=pos2;
+        t.first+=variable_offset[pos2];
         return t;
     }
 };

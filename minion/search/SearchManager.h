@@ -54,20 +54,31 @@ struct SearchManager
   vector<AnyVarRef> var_array;
   VariableOrder * var_order;
   
-  Propagate * prop;  // Propagate is the type of the base class. Method prop.prop(stateObj, var_array)
+  bool hasauxvars;   // Has a VARORDER AUX
+  int topauxvar;  // lowest index of an aux var.
+  
+  Propagate * prop;  // Propagate is the type of the base class. Method prop->prop(stateObj, var_array)
   
   vector<Controller::triple> branches; //L & R branches so far (isLeftBranch?,var,value)
   //vector<int> first_unassigned_variable;
   
   unsigned depth; //number of left branches
   int ceiling; // index into branches, it is the lowest LB which has been stolen.
-    
-  SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array, VariableOrder* _var_order, Propagate * _prop)
-  : stateObj(_stateObj), var_order(_var_order), var_array(_var_array), depth(0), ceiling(-1), prop(_prop)
+  
+  SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array, vector<SearchOrder> _order, VariableOrder* _var_order, Propagate * _prop)
+  : stateObj(_stateObj), var_array(_var_array), var_order(_var_order), topauxvar(0), prop(_prop), depth(0), ceiling(-1)
   {
     // if this isn't enough room, the vector will autoresize. While that can be slow,
     // it only has to happen at most the log of the maximum search depth.
     branches.reserve(var_array.size());
+    hasauxvars=_order.back().find_one_assignment;
+    if(hasauxvars)
+    {
+        for(int i=0; i<_order.size()-1; i++)
+        {
+            topauxvar+=_order[i].var_order.size();
+        }
+    }
   }
   
   void reset()
@@ -77,21 +88,21 @@ struct SearchManager
   }
   
   // Returns true if all variables assigned
-  bool all_vars_assigned()
+  inline bool all_vars_assigned()
   {
     pair<int, DomainInt> picked = var_order->pickVarVal();
     return picked.first == -1;
   }
     
     // this is weird: what if we just started search, or only have right-branches above?
-    bool finished_search()
+    inline bool finished_search()
     { return depth == 0; }
     
     int search_depth()
     { return depth; }
     
     // returns false if left branch not possible.
-    virtual void branch_left(pair<int, DomainInt> picked)
+    inline void branch_left(pair<int, DomainInt> picked)
     {
         D_ASSERT(picked.first!=-1);
         D_ASSERT(!var_array[picked.first].isAssigned());
@@ -103,7 +114,7 @@ struct SearchManager
         depth++;
     }
     
-    virtual bool branch_right()
+    inline bool branch_right()
     {
         while(!branches.empty() && !branches.back().isLeft) { //pop off all the RBs
             branches.pop_back();
@@ -141,6 +152,20 @@ struct SearchManager
         maybe_print_search_assignment(stateObj, var_array[var], val, false);
         branches.push_back(Controller::triple(false, var, val));
         return true;
+    }
+    
+    inline void jump_out_aux_vars()
+    {
+        while(branches.back().var >= topauxvar)
+        {
+            if(branches.back().isLeft)
+            {
+                world_pop(stateObj);
+                depth--;
+            }
+            
+            branches.pop_back();
+        }
     }
     
     pair<int, DomainInt> steal_work()
@@ -181,6 +206,11 @@ struct SearchManager
             if(varval.first==-1)
             {
                 deal_with_solution(stateObj);
+                if(hasauxvars)
+                {   // There are AUX vars at the end of the var ordering. 
+                    // Backtrack out of them.
+                    jump_out_aux_vars();
+                }
                 
                 // If we are not finished, then go into the loop below.
                 getState(stateObj).setFailed(true);
@@ -195,86 +225,6 @@ struct SearchManager
             // loop to 
             while(getState(stateObj).isFailed())
             {
-                getState(stateObj).setFailed(false);
-                if(finished_search())
-                {   // what does this do?
-                    return;
-                }
-                
-                maybe_print_search_action(stateObj, "bt");
-                bool flag=branch_right();
-                if(!flag)
-                {   // No remaining left branches to branch right.
-                    return;
-                }
-                set_optimise_and_propagate_queue(stateObj);
-            }
-        }
-    }
-};
-
-// junk
-
-struct ConflictSearchManager : SearchManager
-{
-    // Conflict search procedure
-    virtual void search()
-    {
-        maybe_print_search_state(stateObj, "Node: ", var_array);
-        int last_conflict_var = -1;
-        while(true)
-        {
-            D_ASSERT(getQueue(stateObj).isQueuesEmpty());
-            
-            getState(stateObj).incrementNodeCount();
-            
-            cout << "About to call do_checks" << endl;
-            
-            if(do_checks(stateObj, var_array, branches))
-                return;
-            
-            D_ASSERT(last_conflict_var >= -1 && last_conflict_var < (int)var_array.size());
-            // Clear the 'last conflict var if it has got assigned'
-            if(last_conflict_var != -1 && var_array[last_conflict_var].isAssigned())
-                last_conflict_var = -1;
-            
-            cout << "About to call pickVarVal" << endl;
-            
-            pair<int, DomainInt> varval= var_order->pickVarVal();
-            
-            cout << varval.first << "," << varval.second <<endl;
-            
-            if(varval.first==-1)
-            {
-                deal_with_solution(stateObj);
-                
-                // If we are not finished, then go into the loop below.
-                getState(stateObj).setFailed(true);
-            }
-            else
-            {
-                maybe_print_search_state(stateObj, "Node: ", var_array);
-                if(last_conflict_var!=-1)
-                {
-                    //BUG BUG BUG only uses the ascending value order.
-                    varval=make_pair(last_conflict_var, var_array[last_conflict_var].getMin());
-                }
-                branch_left(varval);
-                prop->prop(stateObj, var_array);
-                
-                if(!getState(stateObj).isFailed())
-                {
-                    last_conflict_var=-1;
-                }
-            }
-            
-            // loop to 
-            while(getState(stateObj).isFailed())
-            {
-                // the varval.first != -1 is in case we just got a soln.
-                if(last_conflict_var == -1 && varval.first!=-1)
-                    last_conflict_var = varval.first;
-                
                 getState(stateObj).setFailed(false);
                 if(finished_search())
                 {   // what does this do?

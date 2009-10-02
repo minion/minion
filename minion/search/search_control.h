@@ -63,14 +63,14 @@ namespace Controller
             vo=new ConflictBranch(*var_array, order.val_order, vo2, stateObj);
             break;
         
-        
+        #ifdef WDEG
         case ORDER_WDEG:
             vo=new WdegBranch(*var_array, order.val_order, stateObj);
             break;
         case ORDER_DOMOVERWDEG:
             vo=new DomOverWdegBranch(*var_array, order.val_order, stateObj);
             break;
-        
+        #endif
         
         default:
             cout << "Order not found in make_search_order." << endl;
@@ -93,6 +93,11 @@ namespace Controller
             for(int i=0; i<order.size(); i++)
             {
                 vovector.push_back(make_search_order(order[i], stateObj));
+                if(order[i].find_one_assignment && i!= order.size()-1)
+                {
+                    cout << "Only one VARORDER AUX is allowed, and it must be the final VARORDER command." << endl;
+                    abort();
+                }
             }
             
             vo=new MultiBranch(vovector, stateObj);
@@ -148,8 +153,8 @@ SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_met
         }
     }
     
-    // need to switch here for different search algorthms. plain, parallel, group or conflict
-    SearchManager* sm=new SearchManager(stateObj, *all_vars, vo, p);
+    // need to switch here for different search algorthms. plain, parallel, group
+    SearchManager* sm=new SearchManager(stateObj, *all_vars, order, vo, p);
     
     cout << "Exiting make_search_manager"<<endl;
     return sm;
