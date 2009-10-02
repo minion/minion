@@ -1,0 +1,110 @@
+MINION 3
+
+#This file includes an example of all the different inputs you can give to Minion. 
+#It is a very good place to start from when modelling a problem in the Minion specification.
+#A copy can be found to edit in /summer_school/format_example.minion
+
+
+# The first section is where all the variables are declared
+**VARIABLES**
+
+# There are 4 type of variables
+
+# Boolean don't need a domain
+BOOL bo    
+
+# Bound vars need a domain given as a range     
+BOUND b {1..3}   
+
+# Discrete vars also need a domain given as a range    
+DISCRETE d {1..3} 
+
+# Internally, Bound variables are stored only as a lower and upper bound
+# Whereas discrete variables allow any sub-domain
+
+# Sparse bound variables take a sorted list of values
+SPARSEBOUND s {1,3,6,7} 
+
+# We can also declare matrices of variables!
+DISCRETE q[3] {0..5} # This is a matrix with 3 variables: q[0],q[1] and q[2]
+BOOL bm[2,2] # A 2d matrix, variables bm[0,0], bm[0,1], bm[1,0], bm[1,1]
+BOOL bn[2,2,2,2] # You can have as many indices as you like!
+
+
+# In this section which is optional you can define tuplelists
+# Tuplelists are a way of renaming variables which can make them 
+# Easier to refer to in constraints
+# The input is: <name> <num_of_tuples> <tuple_length> <numbers...>
+**TUPLELIST**
+Fred 3 3
+0 2 3
+2 0 3
+3 1 3
+
+
+# The next thing to declare are the constraints which go in this section.
+**CONSTRAINTS**
+
+# Constraints are defined in the same way as functions are
+# A complete list of constraints can be found at the end of the manual
+eq(bo, 0)
+eq(b,d)
+
+# To get a single variable from a matrix, you index it as you would when programming
+eq(q[1],0)
+eq(bn[0,1,1,1], bm[1,1])
+
+# It's easy to get a row or column from a matrix. 
+# You use _ in the indices you want to vary. 
+# Giving a matrix gives all the variables in that matrix.
+
+# The following shows how flattening occurs...
+# [bm] == [ bm[_,_] ] == [ bm[0,0], bm[0,1], bm[1,0], bm[1,1] ]
+# [ bm[_,1] ] = [ bm[0,1], bm[1,1] ]
+# [ bn[1,_,0,_] = [ bn[1,0,0,0], b[1,0,0,1], b[1,1,0,0], b[1,1,0,1] ]
+
+# You can string together a list of such expressions
+# as in the following example
+lexleq( [bn[1,_,0,_], bo, q[0]] , [b, bm, d] )
+
+# One minor problem.. you must always put [ ] around any matrix expression, so
+# lexleq(bm, bm) is invalid
+# This is OK
+lexleq( [bm], [bm] )
+
+# A constraint which uses tuples
+table([q], Fred)
+
+# You do not have to declare tuples you can write them explicitly if you wish
+# the above constraint then becomes:
+table([q],{ <0,2,3>,<2,0,3>,<3,1,3> })
+
+
+# The search section is entirely optional
+# This section allows you some control over the way minion searches for a solution
+**SEARCH** 
+
+# Note that everything in SEARCH is optional, 
+#and can only be given at most once
+
+# If you don't give an explicit variable ordering, one is generated.
+VARORDER [bo,b,d,q[_]] 
+
+# If you don't give a value ordering, 'ascending' is used
+#VALORDER [a,a,a,a]
+
+# You can have one objective function.
+MAXIMISING bo
+# MINIMISING x3
+
+# Print statement takes a matrix of things to print
+PRINT [ [bo, q] ]
+# You can also give:
+# PRINT ALL (the default) which prints all variables
+# PRINT NONE
+
+
+# Must end with the **EOF** marker!
+**EOF**
+
+Any text down here is ignored, so you can write whatever you like (or nothing at all...)
