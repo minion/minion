@@ -208,15 +208,20 @@ struct ConstraintBlob
     vector<int> modified_max(params.size());
     for(int i = 0; i < max_index.size(); i++)
     {
+      if(max_index[i]==0)
+      {   // matrix is empty, all slices are empty.
+          return return_list;
+      }
+      
       if(params[i] == -999)
         modified_max[i] = max_index[i];
       else
         modified_max[i] = 1;
     }
-
+    
     // Iterates through the variable indices
     vector<int> current_index(params.size());
-
+    
     // Vector which actually contains the output
     vector<int> output(params);
     do
@@ -227,7 +232,7 @@ struct ConstraintBlob
       return_list.push_back(getSymbol(name + to_var_name(output)));
     }
     while(increment_vector(current_index, modified_max));
-
+    
     return return_list;
   }
 
