@@ -49,7 +49,12 @@ def generate_indicator(ConstraintList, domainsize, indicatorsize, check_idempote
       print "eq(V[%d], %d)" % (list_to_int([i]*indicatorsize, domainsize), i)
   print "**EOF**"
 
+def build_table(X, domain_size):
+  return filter(X, product(range(domain_size), range(domain_size)))
 
-neqtable = filter(lambda (x,y): x < y, product([0,1,2,3,4],[0,1,2,3,4]))
+neqtable = lambda (x,y): x != y
+diff1    = lambda (x,y): abs(x-y) > 1
+xlessy   = lambda (x,y): x < y
 
-generate_indicator([neqtable], 5, 6)
+#generate_indicator([build_table(diff1, 5), build_table(xlessy, 5)], 5, 5)
+generate_indicator([build_table(neqtable, 5)], 4, 4)
