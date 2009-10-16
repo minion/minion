@@ -50,7 +50,7 @@
 
 // use the algorithm from Quimper et al. to prune the target variables.
 // requires INCGRAPH and not SCC
-#define QUIMPER
+//#define QUIMPER
 
 //#define CAPBOUNDSCACHE
 
@@ -314,7 +314,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     virtual void propagate(DynamicTrigger* trig)
     {
+        #if defined(CAPBOUNDSCACHE) || defined(INCGRAPH)
         DynamicTrigger* dtstart=dynamic_trigger_start();
+        #endif
         
         #ifdef CAPBOUNDSCACHE
         if(trig< dtstart+(numvars*numvals))
@@ -363,6 +365,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(trig>= dtstart && trig<dtstart+(2*val_array.size()*(numvars+val_array.size())) );
             boundsupported[trig->trigger_info()]=-1;
         }
+        #endif
+        
+        #if !defined(CAPBOUNDSCACHE) && !defined(INCGRAPH)
+        D_ASSERT(false)   // Should not have dynamic trigger events!!
         #endif
     }
     
@@ -528,9 +534,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         
         // find/ repair the matching.
         #ifndef INCREMENTALMATCH
-        varvalmatching.resize(0);
+        varvalmatching.clear();
         varvalmatching.resize(numvars, dom_min-1);
-        // what about usage???
+        usage.clear();
+        usage.resize(numvals, 0);
         #endif
         
         // populate lower and upper
@@ -572,7 +579,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         varvalmatching.resize(numvars, dom_min-1);
         lbcmatching.clear();
         lbcmatching.resize(numvars, dom_min-1);
-        // what about usage and lbcusage??
+        usage.clear();
+        usage.resize(numvals, 0);
+        lbcusage.clear();
+        lbcusage.resize(numvals, 0);
         #endif
         
         // populate lower and upper
@@ -647,8 +657,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     {
         // Assumes triggered on variables in to_process
         #ifndef INCREMENTALMATCH
-        varvalmatching.resize(0);
+        varvalmatching.clear();
         varvalmatching.resize(numvars, dom_min-1);
+        usage.clear();
+        usage.resize(numvals, 0);
         #endif
         
         sccs_to_process.clear(); 
