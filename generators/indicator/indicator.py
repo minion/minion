@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from itertools import *
 
 def increment_list(list, domainsize):
@@ -13,6 +15,11 @@ def list_to_int(list, domainsize):
   for l in list:
     i = i * domainsize + l
   return i
+
+# Should take as many tuples as arity of cons.
+# More efficient method: instead of testing each pair Tuple1, Tuple2,
+# generate the pairs that will work. I.e. generate all subsets of Constraint
+# of the right size, and which correspond to two all-different tuples.
 
 def possibly_generate_constraint(Tuple1, Tuple2, Constraint, name, domainsize) :
   for i in range(len(Tuple1)):
@@ -57,4 +64,4 @@ diff1    = lambda (x,y): abs(x-y) > 1
 xlessy   = lambda (x,y): x < y
 
 #generate_indicator([build_table(diff1, 5), build_table(xlessy, 5)], 5, 5)
-generate_indicator([build_table(neqtable, 5)], 4, 4)
+generate_indicator([build_table(neqtable, 5)], 5, 5)
