@@ -324,6 +324,8 @@ nothing at all...)
 
 #include "MinionInputReader.h"
 
+#define MAYBE_PARSER_INFO(X) { if(this->parser_verbose) { this->parser_info(X); } }
+
 template<typename FileReader>
 void MinionThreeInputReader<FileReader>::parser_info(string s)
 {
@@ -342,7 +344,7 @@ void MinionThreeInputReader<FileReader>::finalise() {
   // Fill in any missing defaults
   if(instance.search_order.empty())
   {
-    parser_info("No order generated, auto-generating complete order");
+    MAYBE_PARSER_INFO("No order generated, auto-generating complete order");
     instance.search_order.push_back(instance.vars.get_all_vars());
   }
 
@@ -358,7 +360,7 @@ void MinionThreeInputReader<FileReader>::finalise() {
     
   if(instance.sym_order.size() != instance.vars.get_all_vars().size())
   {
-    parser_info("Extending symmetry order with auxillery variables");
+    MAYBE_PARSER_INFO("Extending symmetry order with auxillery variables");
     vector<Var> all_vars = instance.vars.get_all_vars();
     for(typename vector<Var>::iterator i = all_vars.begin(); i != all_vars.end(); ++i)
     {
@@ -380,7 +382,7 @@ void MinionThreeInputReader<FileReader>::finalise() {
 template<typename FileReader>
 void MinionThreeInputReader<FileReader>::read(FileReader* infile) {  
   string s = infile->get_asciistring();
-  parser_info("Read: '" + s + "'");
+  MAYBE_PARSER_INFO("Read: '" + s + "'");
 
   string eof, wrong_eof;
 
@@ -418,22 +420,22 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
     else
       throw parse_exception("Don't understand '" + s + "' as a section header");
     s = infile->get_asciistring();
-    parser_info("Read: '" + s + "'");
+    MAYBE_PARSER_INFO("Read: '" + s + "'");
   }
 
-  parser_info("Reached end of CSP");
+  MAYBE_PARSER_INFO("Reached end of CSP");
 }
 
 template<typename FileReader>
 void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
 {
-  parser_info("Entering gadget parsing");
+  MAYBE_PARSER_INFO("Entering gadget parsing");
   if(isGadgetReader())
     throw parse_exception("Gadgets can't have gadgets!");
 
   infile->check_string("NAME");
   string name = infile->get_string();
-  parser_info("Gadget name:" + name);
+  MAYBE_PARSER_INFO("Gadget name:" + name);
 
   MinionThreeInputReader gadget(parser_verbose);
   gadget.setGadgetReader();
@@ -441,7 +443,7 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
 
   // Take the CSPInstance out of the Minion3InputReader, and make a copy of it.
   instance.addGadgetSymbol(name, shared_ptr<CSPInstance>(new CSPInstance(MOVE(gadget.instance))));
-  parser_info("Exiting gadget parsing");
+  MAYBE_PARSER_INFO("Exiting gadget parsing");
 }
 
 
@@ -666,7 +668,7 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
 template<typename FileReader>
 ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile) 
 {
-  parser_info( "Reading a gadget constraint" ) ;
+  MAYBE_PARSER_INFO( "Reading a gadget constraint" ) ;
 
   vector<Var> vectorOfVars = readLiteralVector(infile) ;
 
@@ -674,14 +676,14 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileRead
 
   string s = infile->get_string();
 
-  parser_info( "Gadget name: '" + s + "'");
+  MAYBE_PARSER_INFO( "Gadget name: '" + s + "'");
   shared_ptr<CSPInstance> in_gadget = instance.getGadgetSymbol(s);
   ConstraintBlob gadgetCon( get_constraint(CT_GADGET) , vectorOfVars);
   gadgetCon.gadget = in_gadget;
   infile->check_sym(',');
   gadgetCon.gadget_prop_type = GetPropMethodFromString(infile->get_string());
   infile->check_sym(')');
-  parser_info("End gadget reading");
+  MAYBE_PARSER_INFO("End gadget reading");
   return gadgetCon;
 }
 #endif
@@ -695,7 +697,7 @@ template<typename FileReader>
 ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* infile, 
   ConstraintDef* ct)
 {
-  parser_info("Reading a SAT clause");
+  MAYBE_PARSER_INFO("Reading a SAT clause");
   infile->check_sym('[');
   vector<int> negs;
   vector<Var> clause_vars;
@@ -761,12 +763,12 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
   if(negVar)
   {
     if(var.type() != VAR_BOOL)
-      parser_info("Only Booleans can be negated!");
+        {  MAYBE_PARSER_INFO("Only Booleans can be negated!"); }
     else
       var.setType(VAR_NOTBOOL);
   }
 
-  parser_info("Read variable '" + name + "', internally: " + to_string(var));
+  MAYBE_PARSER_INFO("Read variable '" + name + "', internally: " + to_string(var));
   return var;
 }
 
@@ -835,7 +837,7 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
         params = vector<int>(maxterms.size(), -999);
         returnVec = instance.vars.buildVarList(name, params);
     }
-    parser_info("Got matrix:" + to_string(returnVec));
+    MAYBE_PARSER_INFO("Got matrix:" + to_string(returnVec));
   }
 else
 { 
@@ -844,13 +846,13 @@ else
   if(negVar)
   {
     if(var.type() != VAR_BOOL)
-      parser_info("Only Booleans can be negated!");
+        {  MAYBE_PARSER_INFO("Only Booleans can be negated!"); }
     else
       var.setType(VAR_NOTBOOL);
   }
   returnVec.push_back(var);
 }
-parser_info("Read variable '" + name + "', internally: " + to_string(var));
+MAYBE_PARSER_INFO("Read variable '" + name + "', internally: " + to_string(var));
 return returnVec;  
 }
 
@@ -896,7 +898,7 @@ vector<Var> MinionThreeInputReader<FileReader>::readLiteralVector(FileReader* in
   {
   // Eat the ']'
     infile->get_char();
-    parser_info("Read empty vector.");
+    MAYBE_PARSER_INFO("Read empty vector.");
   }
   else
   {
@@ -932,7 +934,7 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrix(FileReader
 
   while(infile->peek_char() != ']')
   {
-    parser_info("Continuing reading matrix, peeked at " + to_string(']'));
+    MAYBE_PARSER_INFO("Continuing reading matrix, peeked at " + to_string(']'));
     // See if there is an array, or just a variable.
     if(infile->peek_char() == '[') 
       return_vals.push_back(readLiteralVector(infile));
@@ -997,7 +999,7 @@ vector<int> MinionThreeInputReader<FileReader>::readConstantVector
   {
     // Eat the ']'
     infile->get_char();
-    parser_info("Read empty vector.");
+    MAYBE_PARSER_INFO("Read empty vector.");
   }
   else
   {
@@ -1046,7 +1048,7 @@ void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile)
     string name = infile->get_string();
     int num_of_tuples = infile->read_num();
     int tuple_length = infile->read_num();
-    parser_info("Reading tuplelist '" + name + "', length " + to_string(num_of_tuples) +
+    MAYBE_PARSER_INFO("Reading tuplelist '" + name + "', length " + to_string(num_of_tuples) +
       ", arity " + to_string(tuple_length) );
     TupleList* tuplelist = instance.tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
     int* tuple_ptr = tuplelist->getPointer();
@@ -1091,7 +1093,7 @@ found: ;
       }
       
       instance.search_order.push_back(SearchOrder(readLiteralVector(infile), vo, find_one_sol));
-      parser_info("Read var order, length " +
+      MAYBE_PARSER_INFO("Read var order, length " +
         to_string(instance.search_order.back().var_order.size()));
     }
     else if(var_type == "PERMUTATION")
@@ -1099,7 +1101,7 @@ found: ;
       if(!instance.permutation.empty())
         throw parse_exception("Can't have two PERMUTATIONs!");
       instance.permutation = readLiteralVector(infile);
-      parser_info("Read permutation, length " +
+      MAYBE_PARSER_INFO("Read permutation, length " +
         to_string(instance.permutation.size()));      
     }
     else if(var_type == "SYMORDER")
@@ -1107,7 +1109,7 @@ found: ;
       if(!instance.sym_order.empty())
         throw parse_exception("Can't have two SYMORDERs!");
       instance.sym_order = readLiteralVector(infile);
-      parser_info("Read Symmetry Ordering, length " +
+      MAYBE_PARSER_INFO("Read Symmetry Ordering, length " +
         to_string(instance.permutation.size()));      
     }
     else if(var_type == "VALORDER")
@@ -1131,7 +1133,7 @@ found: ;
       }
       instance.search_order.back().val_order = valOrder;
 
-      parser_info("Read val order, length " +
+      MAYBE_PARSER_INFO("Read val order, length " +
           to_string(instance.search_order.back().val_order.size()));
     }
     else if(var_type == "MAXIMISING" || var_type == "MAXIMIZING")
@@ -1140,7 +1142,7 @@ found: ;
         throw parse_exception("Can only have one min / max per problem!");
 
       Var var = readIdentifier(infile);
-      parser_info("Maximising " + to_string(var));
+      MAYBE_PARSER_INFO("Maximising " + to_string(var));
       instance.set_optimise(false, var);
     }
     else if(var_type == "MINIMISING" || var_type == "MINIMIZING")
@@ -1149,7 +1151,7 @@ found: ;
         throw parse_exception("Can only have one min / max per problem!");
 
       Var var = readIdentifier(infile);
-      parser_info("Minimising " + to_string(var));
+      MAYBE_PARSER_INFO("Minimising " + to_string(var));
       instance.set_optimise(true, var);
     }
     else if(var_type == "PRINT")
@@ -1182,7 +1184,7 @@ found: ;
         throw parse_exception("Only have construction sites on gadgets!");
 
       instance.constructionSite = readLiteralVector(infile);
-      parser_info("Read construction site, size " + to_string(instance.constructionSite.size()));
+      MAYBE_PARSER_INFO("Read construction site, size " + to_string(instance.constructionSite.size()));
     }
     else
       {  throw parse_exception("Don't understand '" + var_type + "' as a variable type."); }
@@ -1238,7 +1240,7 @@ template<typename FileReader>
 void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
   while(infile->peek_char() != '*')
   {
-    parser_info("Begin reading variables");
+    MAYBE_PARSER_INFO("Begin reading variables");
     string var_type = infile->get_string();
 
     if(var_type != "BOOL" && var_type != "BOUND" && var_type != "SPARSEBOUND"
@@ -1246,17 +1248,17 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       throw parse_exception(string("Unknown variable type: '") + var_type + "'");
 
     string varname = infile->get_string();
-    parser_info("Name:" + varname);
+    MAYBE_PARSER_INFO("Name:" + varname);
 
     bool isArray = false;
     vector<int> indices;
 
     if(infile->peek_char() == '[')
     {
-      parser_info("Is array!");
+      MAYBE_PARSER_INFO("Is array!");
       isArray = true;
       indices = readConstantVector(infile);
-      parser_info("Found " + to_string(indices.size()) + " indices");
+      MAYBE_PARSER_INFO("Found " + to_string(indices.size()) + " indices");
     }
 
     VariableType variable_type = VAR_INVALID;
@@ -1316,12 +1318,12 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
         if(find(indices.begin(), indices.end(), 0) == indices.end())
         {
           vector<int> current_index(indices.size(), 0);
-          parser_info("New Var: " + varname + to_var_name(current_index));
+          MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(current_index));
           instance.vars.addSymbol(varname + to_var_name(current_index),
             instance.vars.getNewVar(variable_type, domain));
           while(increment_vector(current_index, indices))
           {
-            parser_info("New Var: " + varname + to_var_name(current_index));
+            MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(current_index));
             instance.vars.addSymbol(varname + to_var_name(current_index),
               instance.vars.getNewVar(variable_type, domain));
           }
