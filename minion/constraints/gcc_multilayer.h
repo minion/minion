@@ -17,8 +17,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef GCC_COMMON_H
-#define GCC_COMMON_H
+#ifndef GCC_MULTILAYER_H
+#define GCC_MULTILAYER_H
 
 #include <stdlib.h>
 #include <iostream>
@@ -26,12 +26,7 @@
 #include <deque>
 #include <algorithm>
 #include <utility>
-#include "alldiff_gcc_shared.h"
-
-// for NotOccurrenceEqualConstraint, used in reverse_constraint,
-#include "constraint_occurrence.h"
-#include "../dynamic_constraints/dynamic_new_or.h"
-
+#include "gcc_common.h"
 
 //#define GCCPRINT(x) cout << x << endl
 #define GCCPRINT(x)
@@ -40,7 +35,7 @@
 #define SCC
 #define INCREMENTALMATCH
 
-#define SCCCARDS
+//#define SCCCARDS
 
 //Incremental graph -- maintains adjacency lists for values and vars
 #define INCGRAPH
@@ -57,39 +52,39 @@
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
 
-template<typename VarArray, typename CapArray, bool Strongcards, bool UseIncGraph>
-struct GCC : public FlowConstraint<VarArray, UseIncGraph>
+
+template<typename VarArray, typename CapArray>
+struct GCCMultiLayer : public FlowConstraint<VarArray, true>
 {
-    using FlowConstraint<VarArray, UseIncGraph>::stateObj;
-    using FlowConstraint<VarArray, UseIncGraph>::constraint_locked;
+    using FlowConstraint<VarArray, true>::stateObj;
+    using FlowConstraint<VarArray, true>::constraint_locked;
     
-    using FlowConstraint<VarArray, UseIncGraph>::adjlist;
-    using FlowConstraint<VarArray, UseIncGraph>::adjlistlength;
-    using FlowConstraint<VarArray, UseIncGraph>::adjlistpos;
-    using FlowConstraint<VarArray, UseIncGraph>::adjlist_remove;
+    using FlowConstraint<VarArray, true>::adjlist;
+    using FlowConstraint<VarArray, true>::adjlistlength;
+    using FlowConstraint<VarArray, true>::adjlistpos;
+    using FlowConstraint<VarArray, true>::adjlist_remove;
     
-    using FlowConstraint<VarArray, UseIncGraph>::dynamic_trigger_start;
-    using FlowConstraint<VarArray, UseIncGraph>::var_array;
-    using FlowConstraint<VarArray, UseIncGraph>::dom_min;
-    using FlowConstraint<VarArray, UseIncGraph>::dom_max;
-    using FlowConstraint<VarArray, UseIncGraph>::numvars;
-    using FlowConstraint<VarArray, UseIncGraph>::numvals;
-    using FlowConstraint<VarArray, UseIncGraph>::varvalmatching;
+    using FlowConstraint<VarArray, true>::dynamic_trigger_start;
+    using FlowConstraint<VarArray, true>::var_array;
+    using FlowConstraint<VarArray, true>::dom_min;
+    using FlowConstraint<VarArray, true>::dom_max;
+    using FlowConstraint<VarArray, true>::numvars;
+    using FlowConstraint<VarArray, true>::numvals;
+    using FlowConstraint<VarArray, true>::varvalmatching;
     
-    using FlowConstraint<VarArray, UseIncGraph>::varinlocalmatching;
-    using FlowConstraint<VarArray, UseIncGraph>::valinlocalmatching;
-    using FlowConstraint<VarArray, UseIncGraph>::invprevious;
+    using FlowConstraint<VarArray, true>::varinlocalmatching;
+    using FlowConstraint<VarArray, true>::valinlocalmatching;
+    using FlowConstraint<VarArray, true>::invprevious;
     
-    using FlowConstraint<VarArray, UseIncGraph>::initialize_hopcroft;
+    using FlowConstraint<VarArray, true>::initialize_hopcroft;
     
-    using FlowConstraint<VarArray, UseIncGraph>::hopcroft2_setup;
-    using FlowConstraint<VarArray, UseIncGraph>::hopcroft_wrapper2;
-    using FlowConstraint<VarArray, UseIncGraph>::hopcroft2;
-    using FlowConstraint<VarArray, UseIncGraph>::augpath;
+    using FlowConstraint<VarArray, true>::hopcroft2_setup;
+    using FlowConstraint<VarArray, true>::hopcroft_wrapper2;
+    using FlowConstraint<VarArray, true>::hopcroft2;
     
-    GCC(StateObj* _stateObj, const VarArray& _var_array, const CapArray& _capacity_array, vector<int> _val_array) : 
+    GCCMultiLayer(StateObj* _stateObj, const VarArray& _var_array, const CapArray& _capacity_array, vector<int> _val_array, vector<int> _varsubsetindices) : 
     FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
-    capacity_array(_capacity_array), val_array(_val_array),
+    capacity_array(_capacity_array), val_array(_val_array), varsubsetindices(_varsubsetindices),
     SCCSplit(_stateObj, numvars+numvals)
     {
         D_ASSERT(capacity_array.size()==val_array.size());
@@ -101,14 +96,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 D_ASSERT(val_array[i]!=val_array[j]);
             }
         }
-        
-        // sanity check INCGRAPH
-        #ifdef INCGRAPH
-        D_ASSERT(UseIncGraph);
-        #else
-        D_ASSERT(!UseIncGraph);
-        #endif
-        
         usage.resize(numvals, 0);
         
         lower.resize(numvals, 0);
@@ -119,28 +106,38 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         initialize_hopcroft();
         initialize_tarjan();
         
-        // SCC data structures
-        SCCs.resize(numvars+numvals);
-        varToSCCIndex.resize(numvars+numvals);
-        for(int i=0; i<numvars+numvals; i++)
+        // count subsets
+        D_ASSERT(varsubsetindices.size()==var_array.size());
+        numsubsets=0;
+        for(int i=0; i<varsubsetindices.size(); i++)
         {
-            SCCs[i]=i;
-            varToSCCIndex[i]=i;
+            D_ASSERT(varsubsetindices[i]>=0);
+            if(varsubsetindices[i]+1>numsubsets)
+                numsubsets=varsubsetindices[i]+1;
         }
-        
-        vars_in_scc.reserve(numvars);
-        vals_in_scc.reserve(numvals);
-        // In case we are not using SCCs, fill the var and val arrays.
-        vars_in_scc.clear();
+        var_subsets.resize(numsubsets);
+        var_subsets_idx.resize(numsubsets);
         for(int i=0; i<numvars; i++)
         {
-            vars_in_scc.push_back(i);
+            var_subsets[varsubsetindices[i]].push_back(var_array[i]);
+            var_subsets_idx[varsubsetindices[i]].push_back(i);
         }
-        vals_in_scc.clear();
-        for(int i=dom_min; i<=dom_max; i++)
+        cap_subsets.resize(numsubsets);
+        
+        // copy blocks of size val_array.size() from capacity_array to cap_subsets
+        for(int i=0; i<numsubsets; i++)
         {
-            vals_in_scc.push_back(i);
+            for(int j=0; j<val_array.size(); j++)
+            {
+                cap_subsets[i].push_back(capacity_array[i*val_array.size()+j]);
+            }
         }
+        // copy the last block of capacity variables
+        for(int i=numsubsets*val_array.size(); i<capacity_array.size(); i++)
+        {
+            cap_allvars.push_back(capacity_array[i]);
+        }
+        
         
         to_process.reserve(numvars+numvals);
         sccs_to_process.reserve(numvars+numvals);
@@ -182,15 +179,19 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         
         for(int i=0; i<numvars; i++)
             varvalmatching[i]=dom_min-1;
-        
-        #ifdef QUIMPER
-        hopcroft2_setup();
-        lbcmatching.resize(numvars, dom_min-1);
-        lbcusage.resize(numvals, 0);
-        #endif
     }
     
     CapArray capacity_array;   // capacities for values of interest
+    
+    
+    int numsubsets;
+    vector<VarArray> var_subsets;
+    vector<vector<int> > var_subsets_idx;
+    vector<CapArray> cap_subsets;   // value capacities for subsets of vars.
+    vector<int> varsubsetindices;
+    
+    CapArray cap_allvars;   // value capacities for all vars.
+    
     vector<int> val_array;   // values of interest
     
     vector<int> val_to_cap_index;
@@ -314,9 +315,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     virtual void propagate(DynamicTrigger* trig)
     {
-        #if defined(CAPBOUNDSCACHE) || defined(INCGRAPH)
         DynamicTrigger* dtstart=dynamic_trigger_start();
-        #endif
         
         #ifdef CAPBOUNDSCACHE
         if(trig< dtstart+(numvars*numvals))
@@ -366,10 +365,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             boundsupported[trig->trigger_info()]=-1;
         }
         #endif
-        
-        #if !defined(CAPBOUNDSCACHE) && !defined(INCGRAPH)
-        D_ASSERT(false)   // Should not have dynamic trigger events!!
-        #endif
     }
     
     #ifdef CAPBOUNDSCACHE
@@ -395,152 +390,22 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
-  {
-      D_ASSERT(dom_max-dom_min+1 == numvals);
-      // Check if the matching is OK.
-      bool matchok=true;
-      for(int i=0; i<numvars; i++)
-      {
-          if(!var_array[i].inDomain(varvalmatching[i]))
-          {
-              matchok=false;
-              break;
-          }
-      }
-      if(matchok)
-      {
-          // now check occurrences
-          for(int i=0; i<val_array.size(); i++)
-          {
-              int val=val_array[i];
-              if( (val<dom_min || val>dom_max) && !capacity_array[i].inDomain(0))
-              {
-                  matchok=false;
-                  break;
-              }
-              if( val>=dom_min && val<=dom_max && !capacity_array[i].inDomain(usage[val-dom_min]))  // is usage OK??
-              {
-                  matchok=false;
-                  break;
-              }
-          }
-      }
-      
-      if(!matchok)
-      {
-          // run matching algorithm
-          // populate lower and upper
-          // Also check if bounds are well formed.
-        for(int i=0; i<val_array.size(); i++)
-        {
-            if(val_array[i]>=dom_min && val_array[i]<=dom_max)
-            {
-                if(capacity_array[i].getMax()<0 || capacity_array[i].getMin()>numvars)
-                {
-                    return false;
-                }
-                lower[val_array[i]-dom_min]=capacity_array[i].getMin();
-                upper[val_array[i]-dom_min]=capacity_array[i].getMax();
-            }
-            else
-            {
-                if(capacity_array[i].getMin()>0 || capacity_array[i].getMax()<0)
-                {
-                    return false;
-                }
-            }
-        }
-        
-        #ifdef INCGRAPH
-            // update the adjacency lists.
-            for(int i=dom_min; i<=dom_max; i++)
-            {
-                for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
-                {
-                    int var=adjlist[i-dom_min+numvars][j];
-                    if(!var_array[var].inDomain(i))
-                    {
-                        if(varvalmatching[var]==i)
-                        {
-                            usage[varvalmatching[var]-dom_min]--;
-                            varvalmatching[var]=dom_min-1;
-                        }
-                        // swap with the last element and remove
-                        adjlist_remove(var, i);
-                        j--; // stay in the same place, dont' skip over the 
-                        // value which was just swapped into the current position.
-                    }
-                }
-            }
-        #endif
-        
-        // I'm sure that these four lines are needed, even though
-        // if they are taken out, it still passes the random tests.
-        // They are needed because the two vectors may be stale after
-        // backtracking.
-        vars_in_scc.clear();
-        for(int i=0; i<numvars; i++) vars_in_scc.push_back(i);
-        vals_in_scc.clear();
-        for(int i=dom_min; i<=dom_max; i++) vals_in_scc.push_back(i);
-        
-        matchok=bfsmatching_gcc();
-      }
-      
-      if(!matchok)
-      {
-          return false;
-      }
-      else
-      {
-          for(int i=0; i<numvars; i++)
-          {
-              D_ASSERT(var_array[i].inDomain(varvalmatching[i]));
-              assignment.push_back(make_pair(i, varvalmatching[i]));
-          }
-          for(int i=0; i<val_array.size(); i++)
-          {
-              int occ;
-              if(val_array[i]<dom_min || val_array[i]>dom_max)
-              {
-                  occ=0;
-              }
-              else
-              {
-                  occ=usage[val_array[i]-dom_min];
-              }
-              
-             if(capacity_array[i].inDomain(occ))
-             {
-                 assignment.push_back(make_pair(i+numvars, occ));
-             }
-             else
-             {
-                 // push upper and lower bounds.
-                 assignment.push_back(make_pair(i+numvars, capacity_array[i].getMin()));
-                 assignment.push_back(make_pair(i+numvars, capacity_array[i].getMax()));                 
-             }
-          }
-          return true;
-      }
-  }
   
     void do_gcc_prop()
     {
-        #ifdef QUIMPER
-        do_gcc_prop_quimper();
-        return;
-        #endif
-        
         // find/ repair the matching.
         #ifndef INCREMENTALMATCH
-        varvalmatching.clear();
+        varvalmatching.resize(0);
         varvalmatching.resize(numvars, dom_min-1);
         usage.clear();
         usage.resize(numvals, 0);
+        usage_subset.clear();
+        usage_subset.resize(numsubsets);
+        for(int i=0; i<numsubsets; i++) usage_subset[i].resize(numvals);
         #endif
         
         // populate lower and upper
+        // should we stop using lower and upper -- just read the card vars??
         for(int i=0; i<val_array.size(); i++)
         {
             if(val_array[i]>=dom_min && val_array[i]<=dom_max)
@@ -553,7 +418,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         GCCPRINT("lower:"<<lower);
         GCCPRINT("upper:"<<upper);
         
-        bool flag=bfsmatching_gcc();
+        bool flag=bfsmatching_multilayer_gcc();
         GCCPRINT("matching:"<<flag);
         
         if(!flag)
@@ -564,215 +429,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         
         tarjan_recursive(0, upper, lower, varvalmatching, usage);
         
-        prop_capacity();
-        
-    }
-    
-    vector<int> lbcmatching;
-    vector<int> lbcusage;
-    
-    void do_gcc_prop_quimper()
-    {
-        // find/ repair the matching.
-        #ifndef INCREMENTALMATCH
-        varvalmatching.clear();
-        varvalmatching.resize(numvars, dom_min-1);
-        lbcmatching.clear();
-        lbcmatching.resize(numvars, dom_min-1);
-        usage.clear();
-        usage.resize(numvals, 0);
-        lbcusage.clear();
-        lbcusage.resize(numvals, 0);
-        #endif
-        
-        // populate lower and upper
-        for(int i=0; i<val_array.size(); i++)
-        {
-            if(val_array[i]>=dom_min && val_array[i]<=dom_max)
-            {
-                lower[val_array[i]-dom_min]=capacity_array[i].getMin();   // not quite right in the presence of duplicate values.
-                upper[val_array[i]-dom_min]=capacity_array[i].getMax();
-            }
-        }
-        GCCPRINT("lower:"<<lower);
-        GCCPRINT("upper:"<<upper);
-        
-        // first process the lower bound constraint.
-        // use lower for the 'upper' parameter here.
-        hopcroft2(vars_in_scc, lbcmatching, lower, lbcusage);
-        
-        for(int i=0; i<numvals; i++)
-        {
-            if(lbcusage[i]<lower[i])
-            {
-                // can't hit the lower bound.
-                GCCPRINT("failing because can't construct lower bound matching.");
-                getState(stateObj).setFailed(true);
-                return;
-            }
-        }
-        
-        GCCPRINT("Unpadded lbc matching: " << lbcmatching);
-        
-        // fill in the blanks in the matching
-        for(int i=0; i<numvars; i++)
-        {
-            if(lbcmatching[i]==dom_min-1)
-            {
-                int minval=var_array[i].getMin();
-                lbcmatching[i]=minval;
-                lbcusage[minval-dom_min]++;
-            }
-        }
-        
-        GCCPRINT("Padded lbc matching: " << lbcmatching);
-        
-        // args are upper, lower, matching
-        // use interval [lower .. numvars]
-        // use augpath temporarily for the upper bound.
-        augpath.clear();
-        augpath.resize(numvals, numvars);
-        tarjan_recursive(0, augpath, lower, lbcmatching, lbcusage);
-        
-        // Now ubc
-        
-        if(!hopcroft_wrapper2(vars_in_scc, varvalmatching, upper, usage))
-        {
-            GCCPRINT("failed when constructing ubc matching.");
-            return;
-        }
-        GCCPRINT("ubc matching: " << varvalmatching);
-        
-        // borrow augpath for the lower bounds.
-        augpath.clear();
-        augpath.resize(numvals, 0);
-        tarjan_recursive(0, upper, augpath, varvalmatching, usage);
-        
-        prop_capacity();
     }
     
     smallset sccs_to_process;
     
-    void do_gcc_prop_scc()
-    {
-        // Assumes triggered on variables in to_process
-        #ifndef INCREMENTALMATCH
-        varvalmatching.clear();
-        varvalmatching.resize(numvars, dom_min-1);
-        usage.clear();
-        usage.resize(numvals, 0);
-        #endif
-        
-        sccs_to_process.clear(); 
-        {
-        vector<int>& toiterate = to_process.getlist();
-        GCCPRINT("About to loop for to_process.");
-        
-        // to_process contains var indexes and vals:
-        // (val-dom_min +numvars)
-        
-        for(int i=0; i<toiterate.size(); ++i)
-        {
-            int tempidx=toiterate[i];
-            
-            int sccindex_start=varToSCCIndex[tempidx];
-            
-            while(sccindex_start>0 && SCCSplit.isMember(sccindex_start-1))
-            {
-                sccindex_start--;   // seek the first item in the SCC.
-            }
-            
-            if(!sccs_to_process.in(sccindex_start) 
-                && SCCSplit.isMember(sccindex_start))   // not singleton.
-            {
-                sccs_to_process.insert(sccindex_start);
-            }
-        }
-        }
-        to_process.clear();
-        {
-        vector<int>& toiterate = sccs_to_process.getlist();
-        GCCPRINT("About to loop for sccs_to_process:"<< toiterate);
-        for(int i=0; i<toiterate.size(); i++)
-        {
-            int sccindex_start=toiterate[i];
-            vars_in_scc.clear();
-            vals_in_scc.clear();
-            for(int j=sccindex_start; j<(numvars+numvals); j++)
-            {
-                // copy vars and vals in the scc into two vectors.
-                int sccval=SCCs[j];
-                if(sccval<numvars)
-                {
-                    D_ASSERT(sccval>=0);
-                    vars_in_scc.push_back(sccval);
-                }
-                else
-                {
-                    D_ASSERT(sccval<numvars+numvals);
-                    vals_in_scc.push_back(sccval-numvars+dom_min);
-                }
-                
-                if(!SCCSplit.isMember(j)) break;
-            }
-            GCCPRINT("vars_in_scc:" << vars_in_scc);
-            GCCPRINT("vals_in_scc:" << vals_in_scc);
-            
-            // Might not need to do anything.
-            if(vars_in_scc.size()==0)
-            {
-                GCCPRINT("refusing to process empty scc.");
-                continue;
-            }
-            
-            // populate lower and upper
-            for(int i=0; i<vals_in_scc.size(); i++)
-            {
-                int validx=vals_in_scc[i]-dom_min;
-                int capi=val_to_cap_index[validx];
-                if(capi>-1)
-                {
-                    lower[validx]=capacity_array[capi].getMin();
-                    upper[validx]=capacity_array[capi].getMax();
-                }
-            }
-            
-            bool flag=bfsmatching_gcc();
-            if(!flag)
-            {
-                GCCPRINT("Failing because no matching");
-                getState(stateObj).setFailed(true);
-                return;
-            }
-            
-            tarjan_recursive(sccindex_start, upper, lower, varvalmatching, usage);
-            
-            #ifdef SCCCARDS
-                // Propagate to capacity variables for all values in vals_in_scc
-                for(int valinscc=0; valinscc<vals_in_scc.size(); valinscc++)
-                {
-                    int v=vals_in_scc[valinscc];
-                    if(val_to_cap_index[v-dom_min]!=-1 && lower[v-dom_min]!=upper[v-dom_min])
-                    {
-                        if(Strongcards)
-                        {
-                            prop_capacity_strong_scc(v);
-                        }
-                        else
-                        {
-                            prop_capacity_simple(v);
-                        }
-                    }
-                }
-            #endif
-            
-        }
-        }
-        
-        #ifndef SCCCARDS
-        prop_capacity();
-        #endif
-    }
     
     deque<int> fifo;
     // deque_fixed_size was not faster.
@@ -784,6 +444,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     vector<int> lower;
     vector<int> upper;
     vector<int> usage;
+    
+    vector<vector<int> > usage_subset;
+    
     vector<int> usagebac;
     
     // Incremental SCC data.
@@ -794,37 +457,166 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     smallset to_process;
     
-    inline bool bfsmatching_gcc()
+    // return value is whether or not an aug path was found and applied. 
+    bool bfs(int startnode)
     {
+        // startnode is required to pass into apply_augmenting_path.
+        while(!fifo.empty())
+        {
+            // pop a vertex and expand it.
+            int curnode=fifo.front();
+            fifo.pop_front();
+            GCCPRINT("Popped vertex " << (curnode<numvars? "(var)":"(val)") << (curnode<numvars? curnode : curnode+dom_min-numvars ));
+            if(curnode<numvars)
+            { // it's a variable
+                // edges are vals in domain except the matching edge.
+                int subset=varsubsetindices[curnode];
+                for(int vali=0; vali<adjlistlength[curnode]; vali++)
+                {
+                    int val=adjlist[curnode][vali];
+                    if(varvalmatching[curnode]!=val)
+                    {
+                        int validx=numvars+subset*numvals+val-dom_min;
+                        prev[validx]=curnode;
+                        fifo.push_back(validx);
+                        visited.insert(validx);
+                    }
+                }
+            }
+            else if(curnode < numvars+(numsubsets*numvals))
+            {
+                // middle value layer.
+                // edges are matching edges to the var layer, and
+                // edges with capacity to the other value layer.
+                int tmp=curnode-numvars;
+                int subset=tmp / numvals;
+                int validx=tmp % numvals;
+                int val= validx+dom_min;
+                // matching edges first.
+                if(usage_subset[subset][validx]>0)
+                {
+                    for(int i=0; i<var_subsets_idx[subset].size(); i++)
+                    {
+                        int var=var_subsets_idx[subset][i];
+                        if(varvalmatching[var]==val)
+                        {
+                            prev[var]=curnode;
+                            fifo.push_back(var);
+                            visited.insert(var);
+                        }
+                    }
+                }
+                
+                // other value layer
+                if(usage_subset[subset][validx]<cap_subsets[subset][validx].getMax())
+                {
+                    int newnode=validx+numvars+(numsubsets*numvals);
+                    prev[newnode]=curnode;
+                    fifo.push_back(newnode);
+                    visited.insert(newnode);
+                }
+            }
+            else
+            {
+                D_ASSERT(curnode < numvars+(numsubsets*numvals)+numvals);
+                // value layer adjacent to t.
+                int validx=curnode-numvars-(numsubsets*numvals);
+                int val=validx+dom_min;
+                // if adjacent to t, we are done.
+                if(usage[validx]<cap_allvars[validx].getMax())
+                {
+                    apply_augmenting_path(curnode, startnode);
+                    return true;
+                }
+                
+                // edges to middle value layer
+                for(int subset=0; subset<numsubsets; subset++)
+                {
+                    if(usage_subset[subset][validx]>cap_subsets[subset][validx].getMin())
+                    {
+                        int newnode=validx+numvars+(subset*numvals);
+                        prev[newnode]=curnode;
+                        fifo.push_back(newnode);
+                        visited.insert(newnode);
+                    }
+                }
+            }
+        }
+        // did not find an augmenting path.
+        return false;
+    }
+    
+    vector<int> augpath;
+    
+    inline void apply_augmenting_path(int unwindnode, int startnode)
+    {
+        augpath.clear();
+        // starting at unwindnode, unwind the path and put it in augpath.
+        // Then apply it.
+        // Assumes prev contains vertex numbers, rather than vars and values.
+        int curnode=unwindnode;
+        while(curnode!=startnode)
+        {
+            augpath.push_back(curnode);
+            curnode=prev[curnode];
+        }
+        augpath.push_back(curnode);
+        
+        std::reverse(augpath.begin(), augpath.end());
+        GCCPRINT("Found augmenting path:" << augpath);
+        
+        // now apply the path.
+        for(int i=0; i<augpath.size()-1; i++)
+        {
+            if(augpath[i]<numvars)
+            {
+                // it's a variable
+                // Next has to be a middle-layer value.
+                int var=augpath[i];
+                int subset=varsubsetindices[var];
+                int validx=augpath[i+1]-numvars-(subset*numvals);
+                
+                D_ASSERT(varvalmatching[var]==dom_min-1);
+                varvalmatching[var]=validx+dom_min;
+                D_ASSERT(var_array.inDomain(varvalmatching[var]));
+                usage[validx]++;
+                usage_subset[subset][validx]++;
+            }
+            else if(augpath[i]<(numvars+(numsubsets*numvals)))
+            {   // it's a middle layer value. check if it has a var next
+                // otherwise ignore, matching does not need to change. 
+                if(augpath[i+1]<numvars)
+                {
+                    int tmp=augpath[i]-numvars;
+                    int subset=tmp / numvals;
+                    int validx=tmp % numvals;
+                    D_ASSERT(augpath[i]>=numvars && augpath[i]<numvars+numvals);
+                    varvalmatching[augpath[i+1]]=dom_min-1;
+                    usage[validx]--;
+                    usage_subset[subset][validx]--;
+                }
+            }
+            // ignores the other value layer entirely.
+        }
+        
+        GCCPRINT("varvalmatching:" << varvalmatching);
+    }
+    
+    inline bool bfsmatching_multilayer_gcc()
+    {
+        // Assumes incgraph is in use.
+        
+        // to start with, assume the matching is blank.
+        
         // lower and upper are indexed by value-dom_min and provide the capacities.
         // usage is the number of times a value is used in the matching.
         
-        // current sccs are contained in vars_in_scc and vals_in_scc
-        
-        // back up the matching to cover failure
-        //matchbac=varvalmatching;
-        //usagebac=usage;
-        
-        // clear out unmatched variables -- unless this has already been done 
-        // when the adjacency lists were updated.
-        #ifndef INCGRAPH
-        for(int scci=0; scci<vars_in_scc.size(); scci++)
-        {
-            int i=vars_in_scc[scci];
-            if(varvalmatching[i]!=dom_min-1
-                && !var_array[i].inDomain(varvalmatching[i]))
-            {
-                usage[varvalmatching[i]-dom_min]--;
-                varvalmatching[i]=dom_min-1;   // marker for unmatched.
-            }
-        }
-        #endif
         
         // If the upper bounds have been changed since last call, it is possible that
         // the usage[val] of some value is greater than upper[val]. This is impossible
         // in the flow graph, so it must be corrected before we run the algorithm.
         // Some values in the matching are changed to blank (dom_min-1).
-        for(int valsccindex=0; valsccindex<vals_in_scc.size(); valsccindex++)
+        for(int valsccindex=0; valsccindex<vals_in_scc.size(); valsccindex++)         // needs adapting.
         {
             int valindex=vals_in_scc[valsccindex]-dom_min;
             if(usage[valindex]>upper[valindex] && upper[valindex]>=0)
@@ -839,6 +631,40 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     }
                 }
                 D_ASSERT(usage[valindex]==upper[valindex]);
+            }
+        }
+        
+        // iterate through the subsets of vars, fixing lowerbounds where necessary.
+        for(int subset=0; subset<numsubsets; subset++)
+        {
+            for(int validx=0; validx<val_array.size(); validx++)
+            {
+                int value=val_array[validx];
+                if(usage_subset[subset][value-dom_min]<cap_subsets[subset][validx].getMin())
+                {
+                    // find an augmenting path starting with a variable in the subset
+                    // and value. 
+                    // Check that the val is in domain.
+                    // If trying to use a variable that is already assigned,
+                    // must un-assign it first and fix the usages..
+                    
+                    
+                    for(int vari=0; vari<var_subsets_idx[subset].size(); vari++)
+                    {
+                        int var=var_subsets_idx[vari];
+                        fifo.clear();
+                        visited.clear();
+                        visited.insert(var);
+                        bool finished=false;
+                        prev[numvars+numvals*subset+value-dom_min]=var;
+                        fifo.push_back(numvars+numvals*subset+value-dom_min);
+                        
+                        if(bfs(
+                            
+                            // but what about aug paths where val is not the second vertex?
+                        
+                    }
+                }
             }
         }
         
@@ -1048,88 +874,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         return true;
     }
     
-    inline void apply_augmenting_path(int unwindnode, int startnode)
-    {
-        augpath.clear();
-        // starting at unwindnode, unwind the path and put it in augpath.
-        // Then apply it.
-        // Assumes prev contains vertex numbers, rather than vars and values.
-        int curnode=unwindnode;
-        while(curnode!=startnode)
-        {
-            augpath.push_back(curnode);
-            curnode=prev[curnode];
-        }
-        augpath.push_back(curnode);
-        
-        std::reverse(augpath.begin(), augpath.end());
-        
-        GCCPRINT("Found augmenting path:" << augpath);
-        
-        // now apply the path.
-        for(int i=0; i<augpath.size()-1; i++)
-        {
-            if(augpath[i]<numvars)
-            {
-                // if it's a variable
-                //D_ASSERT(varvalmatching[augpath[i]]==dom_min-1);
-                // varvalmatching[augpath[i]]=dom_min-1; Can't do this, it would overwrite the correct value.
-                GCCPRINT("decrementing usage for value " << augpath[i+1]-numvars+dom_min);
-                usage[augpath[i+1]-numvars]--;
-            }
-            else
-            {   // it's a value.
-                D_ASSERT(augpath[i]>=numvars && augpath[i]<numvars+numvals);
-                varvalmatching[augpath[i+1]]=augpath[i]-numvars+dom_min;
-                GCCPRINT("incrementing usage for value " << augpath[i]-numvars+dom_min);
-                usage[augpath[i]-numvars]++;
-            }
-        }
-        
-        GCCPRINT("varvalmatching: "<<varvalmatching);
-    }
     
-    inline void apply_augmenting_path_reverse(int unwindnode, int startnode)
-    {
-        augpath.clear();
-        // starting at unwindnode, unwind the path and put it in augpath.
-        // Then apply it.
-        // Assumes prev contains vertex numbers, rather than vars and values.
-        int curnode=unwindnode;
-        while(curnode!=startnode)
-        {
-            augpath.push_back(curnode);
-            curnode=prev[curnode];
-        }
-        augpath.push_back(curnode);
-        
-        std::reverse(augpath.begin(), augpath.end());
-        GCCPRINT("Found augmenting path:" << augpath);
-        
-        // now apply the path.
-        for(int i=0; i<augpath.size()-1; i++)
-        {
-            if(augpath[i]<numvars)
-            {
-                // if it's a variable
-                D_ASSERT(varvalmatching[augpath[i]]==dom_min-1);
-                varvalmatching[augpath[i]]=augpath[i+1]-numvars+dom_min;
-                usage[augpath[i+1]-numvars]++;
-            }
-            else
-            {   // it's a value.
-                D_ASSERT(augpath[i]>=numvars && augpath[i]<numvars+numvals);
-                varvalmatching[augpath[i+1]]=dom_min-1;
-                usage[augpath[i]-numvars]--;
-            }
-        }
-        
-        GCCPRINT("varvalmatching:" << varvalmatching);
-    }
     
     virtual string constraint_name()
     {
-      return "GCC";
+      return "GCCMultiLayer";
     }
     
     virtual triggerCollection setup_internal()
@@ -1581,461 +1330,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 }
             }
         }
-    }
-    
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // Propagate to capacity variables.
-    
-    inline void prop_capacity()
-    {
-        if(Strongcards)
-        {
-            prop_capacity_strong();
-        }
-        else
-        {
-            prop_capacity_simple();   
-        }
-    }
-    
-    void prop_capacity_simple()
-    {
-        // basic prop from main vars to cap variables. equiv to occurrence constraints I think. 
-        // NEEDS TO BE IMPROVED. but it would be quadratic (nd) whatever I do.
-        for(int i=0; i<val_array.size(); i++)
-        {
-            int val=val_array[i];
-            if(lower[val-dom_min] != upper[val-dom_min])
-            {
-                prop_capacity_simple(val);
-            }
-        }
-    }
-    
-    void prop_capacity_simple(int val)
-    {
-        int i=val_to_cap_index[val-dom_min];
-        
-        // called above or directly from do_gcc_prop_scc when using SCCCARDS 
-        #ifndef INCGRAPH
-            int mincap=0;
-            int maxcap=0;
-            for(int j=0; j<numvars; j++)
-            {
-                if(var_array[j].inDomain(val))
-                {
-                    maxcap++;
-                    if(var_array[j].isAssigned())
-                        mincap++;
-                }
-            }
-            capacity_array[i].setMin(mincap);
-            capacity_array[i].setMax(maxcap);
-        #else
-            if(val>= dom_min && val<=dom_max)
-            {
-                int mincap=0;
-                for(int vari=0; vari<adjlistlength[val-dom_min+numvars]; vari++)
-                {
-                    int var=adjlist[val-dom_min+numvars][vari];
-                    if(var_array[var].isAssigned())
-                        mincap++;
-                }
-                capacity_array[i].setMin(mincap);
-                capacity_array[i].setMax(adjlistlength[val-dom_min+numvars]);
-            }  // else the cap will already have been set to 0.
-        #endif
-    }
-    
-    void prop_capacity_strong()
-    {
-        // Lower bounds.
-        GCCPRINT("In prop_capacity_strong");
-        
-        // Temporary measure.
-        vars_in_scc.clear();
-        for(int i=0; i<numvars; i++) vars_in_scc.push_back(i);
-        
-        vals_in_scc.clear();
-        for(int i=dom_min; i<=dom_max; i++) vals_in_scc.push_back(i);
-        
-        for(int validx=0; validx<val_array.size(); validx++)
-        {
-            int value=val_array[validx];
-            
-            if(value>=dom_min && value<=dom_max
-                && lower[value-dom_min]!=upper[value-dom_min])
-            {
-                prop_capacity_strong_scc(value);
-            }
-        }
-    }
-    
-    void prop_capacity_strong_scc(int value)
-    {
-        GCCPRINT("In prop_capacity_strong_scc(value)");
-        // use the matching -- change it by lowering flow to value.
-        GCCPRINT("Calling bfsmatching_card_lowerbound for value "<< value);
-        // assumes vars_in_scc and vals_in_scc are already populated.
-        
-        int newlb=bfsmatching_card_lowerbound(value, lower[value-dom_min]);
-        GCCPRINT("bfsmatching_card_lowerbound Returned " << newlb);
-        int validx=val_to_cap_index[value-dom_min];
-        if(newlb > capacity_array[validx].getMin())
-        {
-            GCCPRINT("Improved lower bound "<< newlb);
-            capacity_array[validx].setMin(newlb);
-            lower[value-dom_min]=newlb;
-        }
-        
-        GCCPRINT("Calling card_upperbound for value "<< value);
-        int newub=card_upperbound(value, upper[value-dom_min]);
-        GCCPRINT("card_upperbound Returned " << newub);
-        
-        if(newub < capacity_array[validx].getMax())
-        {
-            GCCPRINT("Improved upper bound "<< newub);
-            capacity_array[validx].setMax(newub);
-            upper[value-dom_min]=newub;
-        }
-    }
-    
-    // function to re-maximise a matching without using a particular value.
-    // Used to find a new lowerbound for the value.
-    // Changed copy of bfsmatching_gcc method above.
-    
-    // should stop when we reach the existing bound.
-    inline int bfsmatching_card_lowerbound(int forbiddenval, int existinglb)
-    {
-        // lower and upper are indexed by value-dom_min and provide the capacities.
-        // usage is the number of times a value is used in the matching.
-        
-        if(existinglb==usage[forbiddenval-dom_min])
-        {
-            //bound already supported
-            return existinglb;
-        }
-        
-        #ifdef CAPBOUNDSCACHE
-        if(boundsupported[(forbiddenval-dom_min)*2]==existinglb)
-        {
-            PROP_INFO_ADDONE(Counter8);
-            return existinglb;
-        }
-        #endif
-        PROP_INFO_ADDONE(Counter9);
-        // current sccs are contained in vars_in_scc and vals_in_scc
-        // back up the matching to restore afterwards.
-        matchbac=varvalmatching;
-        usagebac=usage;
-        
-        // clear out forbiddenval
-        // instead of clearing it out, can we do something else?
-        /*usage[forbiddenval-dom_min]=0;
-        for(int i=0; i<numvars; i++)
-        {
-            if(varvalmatching[i]==forbiddenval)
-            {
-                varvalmatching[i]=dom_min-1;
-                newlb++;
-            }
-        }*/
-        int newlb=usage[forbiddenval-dom_min];  // new lower bound. When this passes existinglb, we can stop.
-        
-        /*for(int startvarscc=0; startvarscc<vars_in_scc.size(); startvarscc++)
-        {
-            int startvar=vars_in_scc[startvarscc];
-            if(varvalmatching[startvar]==forbiddenval)
-            {
-                varvalmatching[startvar]=dom_min-1;
-                usage[forbiddenval-dom_min]--;
-            }
-        }*/
-        
-        // Flip the graph around, so it's like the alldiff case now. 
-        // follow an edge in the matching from a value to a variable,
-        // follow edges not in the matching from variables to values. 
-        
-        #ifdef INCGRAPH
-        for(int startvari=0; startvari<adjlistlength[forbiddenval-dom_min+numvars] && newlb>existinglb; startvari++)
-        {
-            int startvar=adjlist[forbiddenval-dom_min+numvars][startvari];
-        #else
-        for(int startvarscc=0; startvarscc<vars_in_scc.size() && newlb>existinglb; startvarscc++)
-        {
-            int startvar=vars_in_scc[startvarscc];
-        #endif
-            if(varvalmatching[startvar]==forbiddenval)
-            {
-                varvalmatching[startvar]=dom_min-1;
-                usage[forbiddenval-dom_min]--;
-                GCCPRINT("Searching for augmenting path for var: " << startvar);
-                fifo.clear();  // this should be constant time but probably is not.
-                fifo.push_back(startvar);
-                visited.clear();
-                visited.insert(startvar);
-                bool finished=false;
-                while(!fifo.empty() && !finished)
-                {
-                    // pop a vertex and expand it.
-                    int curnode=fifo.front();
-                    fifo.pop_front();
-                    GCCPRINT("Popped vertex " << (curnode<numvars? "(var)":"(val)") << (curnode<numvars? curnode : curnode+dom_min-numvars ));
-                    if(curnode<numvars)
-                    { // it's a variable
-                        // follow all edges other than the matching edge. 
-                        #ifndef INCGRAPH
-                        for(int valtoqueue=var_array[curnode].getMin(); valtoqueue<=var_array[curnode].getMax(); valtoqueue++)
-                        {
-                        #else
-                        for(int valtoqueuei=0; valtoqueuei<adjlistlength[curnode]; valtoqueuei++)
-                        {
-                            int valtoqueue=adjlist[curnode][valtoqueuei];
-                        #endif
-                            // For each value, check if it terminates an odd alternating path
-                            // and also queue it if it is suitable.
-                            int validx=valtoqueue-dom_min+numvars;
-                            if(valtoqueue!=varvalmatching[curnode]
-                                && valtoqueue!=forbiddenval  // added for this method.
-                            #ifndef INCGRAPH
-                                && var_array[curnode].inDomain(valtoqueue)
-                            #endif
-                                && !visited.in(validx) )
-                            {
-                                //D_ASSERT(find(vals_in_scc.begin(), vals_in_scc.end(), valtoqueue)!=vals_in_scc.end()); // the value is in the scc.
-                                // Does this terminate an augmenting path?
-                                if(usage[valtoqueue-dom_min]<upper[valtoqueue-dom_min])
-                                {
-                                    // valtoqueue terminates an alternating path.
-                                    // Unwind and apply the path here
-                                    prev[validx]=curnode;
-                                    apply_augmenting_path_reverse(validx, startvar);
-                                    finished=true;
-                                    newlb--;  // update bound counter
-                                    break;  // get out of for loop
-                                }
-                                else
-                                {
-                                    // queue valtoqueue
-                                    visited.insert(validx);
-                                    prev[validx]=curnode;
-                                    fifo.push_back(validx);
-                                }
-                            }
-                        }  // end for.
-                    }
-                    else
-                    { // popped a value from the stack.
-                        D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
-                        int stackval=curnode+dom_min-numvars;
-                        #ifdef INCGRAPH
-                        for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
-                        {
-                            int vartoqueue=adjlist[curnode][vartoqueuei];
-                        #else
-                        for(int vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
-                        {
-                            int vartoqueue=vars_in_scc[vartoqueuescc];
-                        #endif
-                            // For each variable which is matched to stackval, queue it.
-                            if(!visited.in(vartoqueue)
-                                && varvalmatching[vartoqueue]==stackval)
-                            {
-                                D_ASSERT(var_array[vartoqueue].inDomain(stackval));
-                                // there is an edge from stackval to vartoqueue.
-                                // queue vartoqueue
-                                visited.insert(vartoqueue);
-                                prev[vartoqueue]=curnode;
-                                fifo.push_back(vartoqueue);
-                            }
-                        }  // end for.
-                    }  // end value
-                }  // end while
-            }
-        }
-        
-        GCCPRINT("maximum matching:" << varvalmatching);
-        
-        if(newlb==existinglb)
-        {
-            GCCPRINT("Stopped because new lower bound would be less than or equal the existing lower bound.");
-        }
-        
-        #ifdef CAPBOUNDSCACHE
-        boundsupported[(forbiddenval-dom_min)*2]=usage[forbiddenval-dom_min];
-        DynamicTrigger* dt=dynamic_trigger_start();
-        dt+=(numvars*numvals);  // skip over the first block of triggers
-        dt+=val_to_cap_index[forbiddenval-dom_min]*(val_array.size()+numvars)*2;  // move to the area for the value.
-        //dt+=(val_array.size()+numvars);  // move to upper bound area
-        // now put down the triggers for varvalmatching and usage
-        for(int i=0; i<numvars; i++)
-        {
-            D_ASSERT((dt+i)->trigger_info() == (forbiddenval-dom_min)*2);
-            var_array[i].addDynamicTrigger(dt+i, DomainRemoval, varvalmatching[i]);
-        }
-        for(int i=0; i<val_array.size(); i++)
-        {
-            D_ASSERT((dt+numvars+i)->trigger_info() == (forbiddenval-dom_min)*2);
-            
-            if(val_array[i]>= dom_min && val_array[i]<= dom_max)
-            {
-                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
-            }
-            else
-            {
-                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, 0);
-            }
-        }
-        #endif
-        
-        varvalmatching=matchbac;
-        usage=usagebac;
-        
-        return newlb;
-    }
-    
-    inline int card_upperbound(int value, int existingub)
-    {
-        // lower and upper are indexed by value-dom_min and provide the capacities.
-        // usage is the number of times a value is used in the matching.
-        
-        if(existingub==usage[value-dom_min])
-        {
-            // bound is already supported
-            return existingub;
-        }
-        
-        #ifdef CAPBOUNDSCACHE
-        if(boundsupported[(value-dom_min)*2+1]==existingub)
-        {
-            PROP_INFO_ADDONE(Counter8);
-            return existingub;
-        }
-        #endif
-        PROP_INFO_ADDONE(Counter9);
-        // current sccs are contained in vars_in_scc and vals_in_scc
-        
-        int startvalindex=value-dom_min;
-        while(usage[startvalindex]<existingub)
-        {
-            // usage of value needs to increase. Construct an augmenting path starting at value.
-            GCCPRINT("Searching for augmenting path for val: " << value);
-            // Matching edge lost; BFS search for augmenting path to fix it.
-            fifo.clear();  // this should be constant time but probably is not.
-            fifo.push_back(startvalindex+numvars);
-            visited.clear();
-            visited.insert(startvalindex+numvars);
-            bool finished=false;
-            while(!fifo.empty() && !finished)
-            {
-                // pop a vertex and expand it.
-                int curnode=fifo.front();
-                fifo.pop_front();
-                GCCPRINT("Popped vertex " << (curnode<numvars? "(var)":"(val)") << (curnode<numvars? curnode : curnode+dom_min-numvars ));
-                if(curnode<numvars)
-                { // it's a variable
-                    // follow the matching edge, if there is one.
-                    int valtoqueue=varvalmatching[curnode];
-                    if(valtoqueue!=dom_min-1 
-                        && !visited.in(valtoqueue-dom_min+numvars))
-                    {
-                        D_ASSERT(var_array[curnode].inDomain(valtoqueue));
-                        int validx=valtoqueue-dom_min+numvars;
-                        if(usage[valtoqueue-dom_min]>lower[valtoqueue-dom_min])
-                        {
-                            // can reduce the flow of valtoqueue to increase startval.
-                            prev[validx]=curnode;
-                            apply_augmenting_path(validx, startvalindex+numvars);
-                            finished=true;
-                        }
-                        else
-                        {
-                            visited.insert(validx);
-                            prev[validx]=curnode;
-                            fifo.push_back(validx);
-                        }
-                    }
-                }
-                else
-                { // popped a value from the stack.
-                    D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
-                    int stackval=curnode+dom_min-numvars;
-                    #ifndef INCGRAPH
-                    for(int vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
-                    {
-                        int vartoqueue=vars_in_scc[vartoqueuescc];
-                    #else
-                    for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
-                    {
-                        int vartoqueue=adjlist[curnode][vartoqueuei];
-                    #endif
-                        // For each variable, check if it terminates an odd alternating path
-                        // and also queue it if it is suitable.
-                        if(!visited.in(vartoqueue)
-                            #ifndef INCGRAPH
-                            && var_array[vartoqueue].inDomain(stackval)
-                            #endif
-                            && varvalmatching[vartoqueue]!=stackval)   // Need to exclude the matching edges????
-                        {
-                            // there is an edge from stackval to vartoqueue.
-                            if(varvalmatching[vartoqueue]==dom_min-1)
-                            {
-                                // vartoqueue terminates an odd alternating path.
-                                // Unwind and apply the path here
-                                prev[vartoqueue]=curnode;
-                                apply_augmenting_path(vartoqueue, startvalindex+numvars);
-                                finished=true;
-                                break;  // get out of for loop
-                            }
-                            else
-                            {
-                                // queue vartoqueue
-                                visited.insert(vartoqueue);
-                                prev[vartoqueue]=curnode;
-                                fifo.push_back(vartoqueue);
-                            }
-                        }
-                    }  // end for.
-                }  // end value
-            }  // end while
-            if(!finished)
-            {   // no augmenting path found
-                GCCPRINT("No augmenting path found.");
-                // restore the matching to its state before the algo was called.
-                break;
-            }
-            
-        }  // end while
-        
-        //varvalmatching=matchbac;
-        //usage=usagebac;
-        #ifdef CAPBOUNDSCACHE
-        boundsupported[(value-dom_min)*2+1]=usage[startvalindex];
-        DynamicTrigger* dt=dynamic_trigger_start();
-        dt+=(numvars*numvals);  // skip over the first block of triggers
-        dt+=val_to_cap_index[value-dom_min]*(val_array.size()+numvars)*2;  // move to the area for the value.
-        dt+=(val_array.size()+numvars);  // move to upper bound area
-        // now put down the triggers for varvalmatching and usage
-        for(int i=0; i<numvars; i++)
-        {
-            D_ASSERT((dt+i)->trigger_info() == (value-dom_min)*2+1);
-            var_array[i].addDynamicTrigger(dt+i, DomainRemoval, varvalmatching[i]);
-        }
-        for(int i=0; i<val_array.size(); i++)
-        {
-            D_ASSERT((dt+numvars+i)->trigger_info() == (value-dom_min)*2+1);
-            if(val_array[i]>= dom_min && val_array[i]<= dom_max)
-            {
-                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
-            }
-            else
-            {
-                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, 0);
-            }
-        }
-        #endif
-        
-        return usage[startvalindex];
     }
     
     typedef typename CapArray::value_type CapVarRef;
