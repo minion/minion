@@ -37,27 +37,29 @@
 #define GCCPRINT(x)
 
 #define SPECIALQUEUE
-#define SCC
+//#define SCC
 #define INCREMENTALMATCH
 
-#define SCCCARDS
+//#define SCCCARDS
 
 //Incremental graph -- maintains adjacency lists for values and vars
+// Second one is for use where a boolean value is required.
 #define INCGRAPH
+#define UseIncGraph true
 
 // Does not trigger itself if this is on, and incgraph is on.
 #define ONECALL
 
 // use the algorithm from Quimper et al. to prune the target variables.
 // requires INCGRAPH and not SCC
-//#define QUIMPER
+#define QUIMPER
 
 //#define CAPBOUNDSCACHE
 
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
 
-template<typename VarArray, typename CapArray, bool Strongcards, bool UseIncGraph>
+template<typename VarArray, typename CapArray, bool Strongcards>
 struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 {
     using FlowConstraint<VarArray, UseIncGraph>::stateObj;
