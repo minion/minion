@@ -1,0 +1,18 @@
+MINION 1
+#TEST SOLCOUNT 720
+0
+0
+0
+3
+0 9 3
+0
+[]
+[]
+0
+0
+0
+objective none
+print all
+diseq(x0,x1)
+diseq(x1,x2)
+diseq(x0,x2)
