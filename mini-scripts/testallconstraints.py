@@ -46,6 +46,8 @@ conslist+=["sumgeq", "sumleq", "weightedsumleq", "weightedsumgeq"]
 conslist+=["ineq"]
 conslist+=["difference"]
 
+conslist+=["negativetable", "lighttable"]
+
 # symmetry-breaking constraints
 
 conslist+=["lexleq", "lexless", "lexleq_quick"]

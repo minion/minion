@@ -66,12 +66,17 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
       print_matrix.push_back(BuildCon::get_AnyVarRef_from_Var(stateObj, instance.print_matrix[i]));
 
   // Impose Constraints
-  for(list<ConstraintBlob>::iterator it = instance.constraints.begin();
+  /*for(list<ConstraintBlob>::iterator it = instance.constraints.begin();
       it != instance.constraints.end(); ++it)
   {
      getState(stateObj).addConstraint(build_constraint(stateObj, *it));
+  }*/
+  while(!instance.constraints.empty())
+  {
+     getState(stateObj).addConstraint(build_constraint(stateObj, instance.constraints.front()));
+     instance.constraints.pop_front();
   }
-
+  
   // Solve!
   getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_Always, "Setup Time: ", "SetupTime", getTableOut(), !getOptions(stateObj).silent);
   Controller::initalise_search(stateObj);

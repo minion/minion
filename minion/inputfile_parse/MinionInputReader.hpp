@@ -194,7 +194,7 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
       readGeneralConstraint(infile, constraint);
   }
   
-  instance.bounds_check_last_constraint();
+  instance->bounds_check_last_constraint();
   return true ;
 }
 
@@ -203,10 +203,10 @@ template<typename FileReader>
 void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, ConstraintDef* def)
 {
   // This slightly strange code is to save copying the ConstraintBlob as much as possible.
-  instance.add_constraint(ConstraintBlob(def));
-  ConstraintBlob& con = instance.constraints.back();
-  vector<vector<Var> >& varsblob = instance.constraints.back().vars;
-  vector<vector<int> >& constblob = instance.constraints.back().constants;
+  instance->add_constraint(ConstraintBlob(def));
+  ConstraintBlob& con = instance->constraints.back();
+  vector<vector<Var> >& varsblob = instance->constraints.back().vars;
+  vector<vector<int> >& constblob = instance->constraints.back().constants;
   
   for(int i = 0; i < def->number_of_params; ++i)
   {
@@ -238,8 +238,8 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
           // This slightly weird way of getting a constraint is to avoid having to make
           // significant changes to the old parser.
       readConstraint(infile, false);
-      ConstraintBlob new_con = instance.constraints.back();
-      instance.constraints.pop_back();
+      ConstraintBlob new_con = instance->constraints.back();
+      instance->constraints.pop_back();
       con.internal_constraints.push_back(new_con);
     }
     break;
@@ -290,7 +290,7 @@ void MinionInputReader<FileReader>::readConstraintElement(FileReader* infile, Co
   // final var
   vars[0].push_back(readIdentifier(infile));
   infile->check_sym(')');
-  instance.add_constraint(ConstraintBlob(ctype, vars));
+  instance->add_constraint(ConstraintBlob(ctype, vars));
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -320,12 +320,12 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
   {
     infile->check_sym('t');
     int tuple_num = infile->read_num();
-    if(tuple_num >= instance.tupleListContainer->size())
+    if(tuple_num >= instance->tupleListContainer->size())
     {
-      throw parse_exception("There are only " + to_string(instance.tupleListContainer->size()) +
+      throw parse_exception("There are only " + to_string(instance->tupleListContainer->size()) +
                                 " tuplelists, requested " + to_string(tuple_num) + ".");
     }
-    tuplelist = instance.tupleListContainer->getTupleList(tuple_num);
+    tuplelist = instance->tupleListContainer->getTupleList(tuple_num);
   }
   else
   {
@@ -349,14 +349,14 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
       if(delim != ',' && delim!= '}')
         throw parse_exception("Expected ',' or '}'");
     }
-    tuplelist = instance.tupleListContainer->getNewTupleList(tuples);
-  instance.addUnnamedTableSymbol(tuplelist);
+    tuplelist = instance->tupleListContainer->getNewTupleList(tuples);
+  instance->addUnnamedTableSymbol(tuplelist);
   }
     
     infile->check_sym(')');
     ConstraintBlob tableCon(def, vectorOfVars);
     tableCon.tuples = tuplelist;
-    instance.add_constraint(tableCon);
+    instance->add_constraint(tableCon);
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -387,14 +387,14 @@ Var MinionInputReader<FileReader>::readIdentifier(FileReader* infile) {
     // Eat the 'x'.
     infile->check_sym('x');
     index = infile->read_num();
-    return instance.vars.get_var(idChar, index);
+    return instance->vars.get_var(idChar, index);
   }
   
   // Must have found an 'n'.
   infile->check_sym('n');
   infile->check_sym('x');
   index = infile->read_num();
-  Var var = instance.vars.get_var(idChar, index);
+  Var var = instance->vars.get_var(idChar, index);
   if(var.type() != VAR_BOOL)
     throw parse_exception("Can only 'not' a Boolean variable!");
   var.setType(VAR_NOTBOOL);
@@ -514,8 +514,8 @@ void MinionInputReader<FileReader>::readTuples(FileReader* infile) {
   {
     int num_of_tuples = infile->read_num();
     int tuple_length = infile->read_num();
-    TupleList* tuplelist = instance.tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
-    instance.addUnnamedTableSymbol(tuplelist);
+    TupleList* tuplelist = instance->tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
+    instance->addUnnamedTableSymbol(tuplelist);
     int* tuple_ptr = tuplelist->getPointer();
     for(int i = 0; i < num_of_tuples; ++i)
       for(int j = 0; j < tuple_length; ++j)
@@ -550,7 +550,7 @@ void MinionInputReader<FileReader>::readObjective(FileReader* infile) {
   Var var = readIdentifier(infile) ;
   if(parser_verbose)
     cout << ((minimising) ? "minimising" : "maximising") << var << endl ;
-  instance.set_optimise(minimising, var);
+  instance->set_optimise(minimising, var);
 }
 
 template<typename FileReader>
@@ -574,13 +574,13 @@ void MinionInputReader<FileReader>::readPrint(FileReader* infile) {
     if(s != "ll")
       throw parse_exception(string("I don't understand '" + s + "'"));
                               
-    instance.print_matrix = make_vec(instance.vars.get_all_vars());
+    instance->print_matrix = make_vec(instance->vars.get_all_vars());
     return;
   }
   else if(letter == 'm')
   {
     int matrix_num = infile->read_num();
-    instance.print_matrix = index(Matrices, matrix_num);
+    instance->print_matrix = index(Matrices, matrix_num);
     if(parser_verbose)
       cout << "print m" << matrix_num << endl;
     return;
@@ -588,7 +588,7 @@ void MinionInputReader<FileReader>::readPrint(FileReader* infile) {
   else if(letter == 'v')
   {
     int vec_num = infile->read_num();
-    instance.print_matrix = make_vec(index(Vectors, vec_num));
+    instance->print_matrix = make_vec(index(Vectors, vec_num));
     if(parser_verbose)
       cout << "print v" << vec_num << endl;
     return;
@@ -639,9 +639,9 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   if(valOrder.empty())
   {
     parser_info("No value order given, generating automatically");
-    valOrder = vector<char>(instance.search_order.back().var_order.size(), true);
+    valOrder = vector<char>(instance->search_order.back().var_order.size(), true);
   }
-  instance.search_order.back().val_order = valOrder;
+  instance->search_order.back().val_order = valOrder;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -660,23 +660,23 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
   {
     parser_info("No order generated, auto-generating complete order");
     int var_count = 0;
-    var_count += instance.vars.BOOLs;
-    for(unsigned i = 0; i < instance.vars.bound.size(); ++i)
-      var_count += instance.vars.bound[i].first;
-    for(unsigned i = 0; i < instance.vars.sparse_bound.size(); ++i)
-      var_count += instance.vars.sparse_bound[i].first;
-    for(unsigned i = 0; i < instance.vars.discrete.size(); ++i)
-      var_count += instance.vars.discrete[i].first;
-    for(unsigned i = 0; i < instance.vars.sparse_discrete.size(); ++i)
-      var_count += instance.vars.sparse_discrete[i].first;
+    var_count += instance->vars.BOOLs;
+    for(unsigned i = 0; i < instance->vars.bound.size(); ++i)
+      var_count += instance->vars.bound[i].first;
+    for(unsigned i = 0; i < instance->vars.sparse_bound.size(); ++i)
+      var_count += instance->vars.sparse_bound[i].first;
+    for(unsigned i = 0; i < instance->vars.discrete.size(); ++i)
+      var_count += instance->vars.discrete[i].first;
+    for(unsigned i = 0; i < instance->vars.sparse_discrete.size(); ++i)
+      var_count += instance->vars.sparse_discrete[i].first;
     
     varOrder.reserve(var_count);
     for(int i = 0; i < var_count; ++i)
-      varOrder.push_back(instance.vars.get_var('x',i));
+      varOrder.push_back(instance->vars.get_var('x',i));
   }
   
   
-  instance.search_order.push_back(varOrder);
+  instance->search_order.push_back(varOrder);
   //var_order = varOrder;
   parser_info(s.str());
 }
@@ -774,7 +774,7 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
     noOfVarType -= count ;
   }
   
-  instance.vars = var_obj;
+  instance->vars = var_obj;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
