@@ -160,7 +160,7 @@ differing only in the auxiliary variables, only one is reported by minion.
 
       where
 
-   <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMOVERWDEG
+   <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMMinionThreeInputReader.hppOVERWDEG
 
 The value ordering allows the user to specify an instantiation order
 for the variables involved in the variable order, either ascending (a)
@@ -338,41 +338,41 @@ void MinionThreeInputReader<FileReader>::parser_info(string s)
 //this function should be safe for it also.
 template<typename FileReader>
 void MinionThreeInputReader<FileReader>::finalise() {
-  if(isGadgetReader() && instance.constructionSite.empty())
+  if(isGadgetReader() && instance->constructionSite.empty())
     throw parse_exception("Gadgets need a construction site!");
 
   // Fill in any missing defaults
-  if(instance.search_order.empty())
+  if(instance->search_order.empty())
   {
     MAYBE_PARSER_INFO("No order generated, auto-generating complete order");
-    instance.search_order.push_back(instance.vars.get_all_vars());
+    instance->search_order.push_back(instance->vars.get_all_vars());
   }
 
-  for(int i = 0; i < instance.search_order.size(); ++i)
-    instance.search_order[i].setupValueOrder();
+  for(int i = 0; i < instance->search_order.size(); ++i)
+    instance->search_order[i].setupValueOrder();
 
   // This has to be delayed unless not all variables are defined where 'PRINT ALL' occurs.
   if(print_all_vars)
-    instance.print_matrix = instance.all_vars_list;
+    instance->print_matrix = instance->all_vars_list;
     
-  if(instance.sym_order.empty())
-    instance.sym_order = instance.vars.get_all_vars();
+  if(instance->sym_order.empty())
+    instance->sym_order = instance->vars.get_all_vars();
     
-  if(instance.sym_order.size() != instance.vars.get_all_vars().size())
+  if(instance->sym_order.size() != instance->vars.get_all_vars().size())
   {
     MAYBE_PARSER_INFO("Extending symmetry order with auxillery variables");
-    vector<Var> all_vars = instance.vars.get_all_vars();
+    vector<Var> all_vars = instance->vars.get_all_vars();
     for(typename vector<Var>::iterator i = all_vars.begin(); i != all_vars.end(); ++i)
     {
-      if(find(instance.sym_order.begin(), instance.sym_order.end(), *i) == instance.sym_order.end() )
-        instance.sym_order.push_back(*i);
+      if(find(instance->sym_order.begin(), instance->sym_order.end(), *i) == instance->sym_order.end() )
+        instance->sym_order.push_back(*i);
     }
   }
   
-  if(instance.sym_order.size() != set<Var>(instance.sym_order.begin(), instance.sym_order.end()).size())
+  if(instance->sym_order.size() != set<Var>(instance->sym_order.begin(), instance->sym_order.end()).size())
      throw parse_exception("SYMORDER cannot contain any variable more than once");
      
-   if(instance.sym_order.size() != instance.vars.get_all_vars().size())
+   if(instance->sym_order.size() != instance->vars.get_all_vars().size())
      throw parse_exception("SYMORDER must contain every variable");   
 }
 
@@ -408,7 +408,7 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
     else if(s =="**CONSTRAINTS**")
     {
       while(infile->peek_char() != '*')
-        instance.constraints.push_back(readConstraint(infile, false));
+        instance->constraints.push_back(readConstraint(infile, false));
     }
     else if(s == "**GADGET**")
       { readGadget(infile); }
@@ -438,11 +438,13 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
   MAYBE_PARSER_INFO("Gadget name:" + name);
 
   MinionThreeInputReader gadget(parser_verbose);
+  CSPInstance* new_instance = new CSPInstance;
+  gadget.instance = new_instance;
   gadget.setGadgetReader();
   gadget.read(infile);
 
   // Take the CSPInstance out of the Minion3InputReader, and make a copy of it.
-  instance.addGadgetSymbol(name, shared_ptr<CSPInstance>(new CSPInstance(MOVE(gadget.instance))));
+  instance->addGadgetSymbol(name, shared_ptr<CSPInstance>(new_instance));
   MAYBE_PARSER_INFO("Exiting gadget parsing");
 }
 
@@ -616,7 +618,7 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
   if(infile->peek_char() != '{')
   {
     string name = infile->get_string();
-    tuplelist = instance.getTableSymbol(name);
+    tuplelist = instance->getTableSymbol(name);
   }
   else
   {
@@ -652,8 +654,8 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
       if(delim != ',' && delim!= '}')
         throw parse_exception("Expected ',' or '}'");
     }
-    tuplelist = instance.tupleListContainer->getNewTupleList(tuples);
-    instance.addUnnamedTableSymbol(tuplelist);
+    tuplelist = instance->tupleListContainer->getNewTupleList(tuples);
+    instance->addUnnamedTableSymbol(tuplelist);
   }
   
   return tuplelist;
@@ -677,7 +679,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileRead
   string s = infile->get_string();
 
   MAYBE_PARSER_INFO( "Gadget name: '" + s + "'");
-  shared_ptr<CSPInstance> in_gadget = instance.getGadgetSymbol(s);
+  shared_ptr<CSPInstance> in_gadget = instance->getGadgetSymbol(s);
   ConstraintBlob gadgetCon( get_constraint(CT_GADGET) , vectorOfVars);
   gadgetCon.gadget = in_gadget;
   infile->check_sym(',');
@@ -740,11 +742,11 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
   }
 
   string name = infile->get_string();
-  Var var = instance.vars.getSymbol(name);
+  Var var = instance->vars.getSymbol(name);
   if(var.type() == VAR_MATRIX)
   {
     vector<int> params = readConstantVector(infile);
-    vector<int> max_index = instance.vars.getMatrixSymbol(name);
+    vector<int> max_index = instance->vars.getMatrixSymbol(name);
     if(params.size() != max_index.size())
       throw parse_exception("Can't index a " + to_string(max_index.size()) + 
       "-d matrix with " + to_string(params.size()) +
@@ -757,7 +759,7 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
         to_string(max_index[i] - 1));
     }
     name += to_var_name(params);
-    var = instance.vars.getSymbol(name);
+    var = instance->vars.getSymbol(name);
   }
 
   if(negVar)
@@ -803,7 +805,7 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
   // Get name of variable.
   string name = infile->get_string();
 
-  Var var = instance.vars.getSymbol(name);
+  Var var = instance->vars.getSymbol(name);
 
   if(var.type() == VAR_MATRIX)
   {
@@ -811,7 +813,7 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
     if(infile->peek_char() == '[')
     {
       params = readConstantVector(infile,'[',']',true);
-      returnVec = instance.vars.buildVarList(name, params);
+      returnVec = instance->vars.buildVarList(name, params);
       if(negVar)
       {
           if(returnVec.size()!=1)
@@ -833,9 +835,9 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
             throw parse_exception("Sorry, can't negate a matrix");
         }
         
-        vector<int> maxterms = instance.vars.getMatrixSymbol(name);
+        vector<int> maxterms = instance->vars.getMatrixSymbol(name);
         params = vector<int>(maxterms.size(), -999);
-        returnVec = instance.vars.buildVarList(name, params);
+        returnVec = instance->vars.buildVarList(name, params);
     }
     MAYBE_PARSER_INFO("Got matrix:" + to_string(returnVec));
   }
@@ -958,12 +960,12 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrix(FileReader
 template<typename FileReader>
 vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrixVariable(FileReader* infile) {
   string name = infile->get_string();
-  Var var = instance.vars.getSymbol(name);
+  Var var = instance->vars.getSymbol(name);
   // Check it is a matrix
   if(var.type() != VAR_MATRIX)
     throw parse_exception("Expected matrix");
   // Get dimension of matrix.
-  vector<int> indices = instance.vars.getMatrixSymbol(name);
+  vector<int> indices = instance->vars.getMatrixSymbol(name);
   // Make sure the matrix doesn't have an index after it. This is to produce better error messages.
   if(infile->peek_char() != ',' && infile->peek_char() != ']')
     throw parse_exception("Only accept raw matrix names here, expected ',' next.");
@@ -974,11 +976,11 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrixVariable(Fi
     terms.push_back(-999);
     // Use the existing code to flatten a matrix.
     // make_vec takes a T and turns it into a 1 element vector<T>.
-    return make_vec(instance.vars.buildVarList(name, terms));
+    return make_vec(instance->vars.buildVarList(name, terms));
   }
   else
   {
-    return instance.vars.flattenTo2DMatrix(name);
+    return instance->vars.flattenTo2DMatrix(name);
   }
 }
 
@@ -1050,7 +1052,7 @@ void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile)
     int tuple_length = infile->read_num();
     MAYBE_PARSER_INFO("Reading tuplelist '" + name + "', length " + to_string(num_of_tuples) +
       ", arity " + to_string(tuple_length) );
-    TupleList* tuplelist = instance.tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
+    TupleList* tuplelist = instance->tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
     int* tuple_ptr = tuplelist->getPointer();
     for(int i = 0; i < num_of_tuples; ++i)
       for(int j = 0; j < tuple_length; ++j)
@@ -1058,7 +1060,7 @@ void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile)
       tuple_ptr[i * tuple_length + j] = infile->read_num();
     }
     tuplelist->finalise_tuples();
-    instance.addTableSymbol(name, tuplelist);
+    instance->addTableSymbol(name, tuplelist);
   }
 
 }
@@ -1092,31 +1094,31 @@ throw parse_exception("Don't understand '" + s + "'");
 found: ;
       }
       
-      instance.search_order.push_back(SearchOrder(readLiteralVector(infile), vo, find_one_sol));
+      instance->search_order.push_back(SearchOrder(readLiteralVector(infile), vo, find_one_sol));
       MAYBE_PARSER_INFO("Read var order, length " +
-        to_string(instance.search_order.back().var_order.size()));
+        to_string(instance->search_order.back().var_order.size()));
     }
     else if(var_type == "PERMUTATION")
     {
-      if(!instance.permutation.empty())
+      if(!instance->permutation.empty())
         throw parse_exception("Can't have two PERMUTATIONs!");
-      instance.permutation = readLiteralVector(infile);
+      instance->permutation = readLiteralVector(infile);
       MAYBE_PARSER_INFO("Read permutation, length " +
-        to_string(instance.permutation.size()));      
+        to_string(instance->permutation.size()));      
     }
     else if(var_type == "SYMORDER")
     {
-      if(!instance.sym_order.empty())
+      if(!instance->sym_order.empty())
         throw parse_exception("Can't have two SYMORDERs!");
-      instance.sym_order = readLiteralVector(infile);
+      instance->sym_order = readLiteralVector(infile);
       MAYBE_PARSER_INFO("Read Symmetry Ordering, length " +
-        to_string(instance.permutation.size()));      
+        to_string(instance->permutation.size()));      
     }
     else if(var_type == "VALORDER")
     {
-      if(instance.search_order.empty())
+      if(instance->search_order.empty())
         throw parse_exception("Must declare VARORDER first");
-      if(!instance.search_order.back().val_order.empty())
+      if(!instance->search_order.back().val_order.empty())
         throw parse_exception("Can't have two VALORDERs for a VARORDER");
       vector<char> valOrder ;
 
@@ -1131,28 +1133,28 @@ found: ;
         valOrder.push_back(valOrderIdentifier == 'a');
         delim = infile->get_char();                                 // , or ]
       }
-      instance.search_order.back().val_order = valOrder;
+      instance->search_order.back().val_order = valOrder;
 
       MAYBE_PARSER_INFO("Read val order, length " +
-          to_string(instance.search_order.back().val_order.size()));
+          to_string(instance->search_order.back().val_order.size()));
     }
     else if(var_type == "MAXIMISING" || var_type == "MAXIMIZING")
     {
-      if(instance.is_optimisation_problem == true)
+      if(instance->is_optimisation_problem == true)
         throw parse_exception("Can only have one min / max per problem!");
 
       Var var = readIdentifier(infile);
       MAYBE_PARSER_INFO("Maximising " + to_string(var));
-      instance.set_optimise(false, var);
+      instance->set_optimise(false, var);
     }
     else if(var_type == "MINIMISING" || var_type == "MINIMIZING")
     {
-      if(instance.is_optimisation_problem == true)
+      if(instance->is_optimisation_problem == true)
         throw parse_exception("Can only have one min / max per problem!");
 
       Var var = readIdentifier(infile);
       MAYBE_PARSER_INFO("Minimising " + to_string(var));
-      instance.set_optimise(true, var);
+      instance->set_optimise(true, var);
     }
     else if(var_type == "PRINT")
     {
@@ -1175,7 +1177,7 @@ found: ;
         print_all_vars = false;
         vector<vector<Var> > new_matrix = read2DMatrix(infile);
         for(int i = 0; i < new_matrix.size(); ++i)
-          instance.print_matrix.push_back(new_matrix[i]);
+          instance->print_matrix.push_back(new_matrix[i]);
       }
     }
     else if(var_type == "CONSTRUCTION")
@@ -1183,8 +1185,8 @@ found: ;
       if(!isGadgetReader())
         throw parse_exception("Only have construction sites on gadgets!");
 
-      instance.constructionSite = readLiteralVector(infile);
-      MAYBE_PARSER_INFO("Read construction site, size " + to_string(instance.constructionSite.size()));
+      instance->constructionSite = readLiteralVector(infile);
+      MAYBE_PARSER_INFO("Read construction site, size " + to_string(instance->constructionSite.size()));
     }
     else
       {  throw parse_exception("Don't understand '" + var_type + "' as a variable type."); }
@@ -1220,13 +1222,13 @@ void MinionThreeInputReader<FileReader>::readAliasMatrix(FileReader* infile, con
     // Have reached the bottom level!
     indices.push_back(0);
     Var v = readIdentifier(infile);
-    instance.vars.addSymbol(name + to_var_name(indices), v);
+    instance->vars.addSymbol(name + to_var_name(indices), v);
     while(infile->peek_char() == ',')
     {
       infile->check_sym(',');
       indices.back()++;
       Var v = readIdentifier(infile);
-      instance.vars.addSymbol(name + to_var_name(indices), v);
+      instance->vars.addSymbol(name + to_var_name(indices), v);
     }
     if(indices.back() + 1 != max_indices[indices.size() - 1])
       throw parse_exception("Incorrectly sized matrix!, expected index " +
@@ -1270,11 +1272,11 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       {
         infile->check_sym('='); // XYZ
         Var v = readIdentifier(infile);
-        instance.vars.addSymbol(varname, v);
+        instance->vars.addSymbol(varname, v);
       }
       else
       {
-        instance.vars.addMatrixSymbol(varname, indices);
+        instance->vars.addMatrixSymbol(varname, indices);
         infile->check_sym('=');
         infile->check_sym('[');
         readAliasMatrix(infile, indices, vector<int>(), varname);
@@ -1313,31 +1315,31 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
     {
       if(isArray)
       {
-        instance.vars.addMatrixSymbol(varname, indices);
+        instance->vars.addMatrixSymbol(varname, indices);
         // If any index is 0, don't add any variables.
         if(find(indices.begin(), indices.end(), 0) == indices.end())
         {
           vector<int> current_index(indices.size(), 0);
           MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(current_index));
-          instance.vars.addSymbol(varname + to_var_name(current_index),
-            instance.vars.getNewVar(variable_type, domain));
+          instance->vars.addSymbol(varname + to_var_name(current_index),
+            instance->vars.getNewVar(variable_type, domain));
           while(increment_vector(current_index, indices))
           {
             MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(current_index));
-            instance.vars.addSymbol(varname + to_var_name(current_index),
-              instance.vars.getNewVar(variable_type, domain));
+            instance->vars.addSymbol(varname + to_var_name(current_index),
+              instance->vars.getNewVar(variable_type, domain));
           }
 
-          vector<vector<Var> > matrix_list = instance.vars.flattenTo2DMatrix(varname);
+          vector<vector<Var> > matrix_list = instance->vars.flattenTo2DMatrix(varname);
           for(int i = 0; i < matrix_list.size(); ++i)
-            instance.all_vars_list.push_back(matrix_list[i]);
+            instance->all_vars_list.push_back(matrix_list[i]);
         }
       }
       else
       {
-        Var v = instance.vars.getNewVar(variable_type, domain);
-        instance.vars.addSymbol(varname, v);
-        instance.all_vars_list.push_back(make_vec(v));
+        Var v = instance->vars.getNewVar(variable_type, domain);
+        instance->vars.addSymbol(varname, v);
+        instance->all_vars_list.push_back(make_vec(v));
       }
     }
   }

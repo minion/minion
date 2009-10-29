@@ -228,7 +228,7 @@ class MinionInputReader {
   //FileReader* infile ;
  public:
   void read(FileReader* infile) ;
-  ProbSpec::CSPInstance instance ;
+  ProbSpec::CSPInstance* instance ;
   
   BOOL parser_verbose ;
   
@@ -276,7 +276,7 @@ public:
 
   void finalise();
 
-  ProbSpec::CSPInstance instance ;
+  ProbSpec::CSPInstance* instance ;
   bool parser_verbose;
   bool print_all_vars;
   
