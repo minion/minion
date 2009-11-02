@@ -50,6 +50,23 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
     reduced = false;
     for(int i = 0; i < vararray.size(); ++i)
     {
+      if(getState(stateObj).isAlarmActivated())
+      {
+        getState(stateObj).clearAlarm();
+        if(getState(stateObj).isCtrlcPressed())
+        {
+            getState(stateObj).setFailed(true);
+            return;
+        }
+        else
+        {
+            getOptions(stateObj).printLine("Time out in preprocessing.");
+            getTableOut().set("TimeOut", 1);
+            getState(stateObj).setFailed(true);
+            return;
+        }
+      }
+      
       Var& var = vararray[i];
       if(onlyCheckBounds || var.isBound())
       {

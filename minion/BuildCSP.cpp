@@ -66,11 +66,6 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
       print_matrix.push_back(BuildCon::get_AnyVarRef_from_Var(stateObj, instance.print_matrix[i]));
 
   // Impose Constraints
-  /*for(list<ConstraintBlob>::iterator it = instance.constraints.begin();
-      it != instance.constraints.end(); ++it)
-  {
-     getState(stateObj).addConstraint(build_constraint(stateObj, *it));
-  }*/
   while(!instance.constraints.empty())
   {
      getState(stateObj).addConstraint(build_constraint(stateObj, instance.constraints.front()));
