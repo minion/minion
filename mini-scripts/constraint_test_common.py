@@ -519,12 +519,9 @@ class testwatchelement_one(testelement_one):
     def runtest(self, options=dict()):
         return runtestgeneral("watchelement_one", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
 
-
-class testnegativetable:
+class testlighttable:
     def printtable(self, domains, tab):
-        cross=[]
-        crossprod(domains,[], cross)
-        return setdifference(cross, tab)
+        return tab
     
     def randomtable(self, domains):
         cross=[]
@@ -534,14 +531,14 @@ class testnegativetable:
         return temp
     
     def runtest(self, options=dict()):
-        constraintname="negativetable"
+        constraintname="lighttable"
         varnums=[5]
         vartypes=["quitesmallnum"]
         howprintvars=[5]
         tablegen=self
         treesame=True
         
-        (domlists, modvars, tablevars)=generatevariables(varnums, vartypes, False)
+        (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, False)
         
         curvar=0
         constraint=constraintname+"("
@@ -626,8 +623,122 @@ class testnegativetable:
                 constraint+="\n"+c
                 constrainttable+="\n"+c
         
-        retval1=runminion("infile1.minion", "outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
-        retval2=runminion("infile2.minion", "outfile2", tablegen.solver, modvars, constraint, tuplelist=negtuplestring, opt=optline, printcmd=options['printcmd'])
+        retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
+        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, tuplelist=negtuplestring, opt=optline, printcmd=options['printcmd'])
+        if retval1!=0 or retval2!=0:
+            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            return False
+        return comparetrees(treesame)  # tree subset
+
+
+class testnegativetable:
+    def printtable(self, domains, tab):
+        cross=[]
+        crossprod(domains,[], cross)
+        return setdifference(cross, tab)
+    
+    def randomtable(self, domains):
+        cross=[]
+        crossprod(domains,[], cross)
+        temp=random.sample(cross, len(cross)/10)
+        temp.sort()
+        return temp
+    
+    def runtest(self, options=dict()):
+        constraintname="negativetable"
+        varnums=[5]
+        vartypes=["quitesmallnum"]
+        howprintvars=[5]
+        tablegen=self
+        treesame=True
+        
+        (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, False)
+        
+        curvar=0
+        constraint=constraintname+"("
+        
+        constnum=1   # number of the current const.
+        
+        for i in howprintvars:
+            if i=="const":
+                const=random.randint(-20, 20)
+                setattr(tablegen, "const%d"%constnum, const)
+                constraint+="%d,"%const
+                constnum+=1
+            elif i=="smallconst":
+                const=random.randint(-5, 5)
+                setattr(tablegen, "const%d"%constnum, const)
+                constraint+="%d,"%const
+                constnum+=1
+            elif i>1:
+                #print vector
+                constraint+="[x%d"%curvar
+                curvar+=1
+                for e in range(i-1):
+                    constraint+=", x%d"%curvar
+                    curvar+=1
+                constraint+="],"
+            else:
+                assert i==1
+                #print single variable.
+                constraint+="x%d,"%curvar
+                curvar+=1
+        
+        constraint=constraint[:-1]+",modtable)"   # hack off the last comma and put a bracket
+        
+        toopt=random.randint(0,3)
+        optvar=random.randint(0, sum(varnums)-1)
+        
+        optline=False
+        if toopt==0:
+            # 1 in 4 chance
+            minmax=random.randint(0,1)
+            if minmax==1:
+                optline="MAXIMIZING x%d"%optvar
+            else:
+                optline="MINIMIZING x%d"%optvar
+        
+        negtuplelist=tablegen.randomtable(domlists)
+        tuplelist=tablegen.printtable(domlists, negtuplelist)
+        
+        # now convert tuplelist into a string.
+        tuplestring="modtable %d %d \n"%(len(tuplelist), sum(varnums))
+        for l in tuplelist:
+            for e in l:
+                tuplestring+="%d "%e
+            tuplestring+="\n"
+        
+        negtuplestring="modtable %d %d \n"%(len(negtuplelist), sum(varnums))
+        for l in negtuplelist:
+            for e in l:
+                negtuplestring+="%d "%e
+            negtuplestring+="\n"
+        # tuplelist is actually a set of lists(not yet), so that it can be reformed for reify or reifyimply
+        
+        constrainttable="table([x0"
+        for i in range(1,sum(varnums)):
+            constrainttable+=",x%d"%i
+        constrainttable+="], modtable)"
+        
+        # add some other constraints at random into the constraint and constrainttable strings
+        if random.randint(0,1)==0:
+            for i in range(sum(varnums)-2):
+                var1=random.randint(0, sum(varnums)-1)
+                var2=random.randint(0, sum(varnums)-1)
+                while var1==var2: 
+                    var2=random.randint(0, sum(varnums)-1)
+                ctype=random.randint(0,2)
+                if ctype==0:
+                    c="diseq(x%d, x%d)"%(var1, var2)
+                elif ctype==1:
+                    c="eq(x%d, x%d)"%(var1, var2)
+                elif ctype==2:
+                    c="ineq(x%d, x%d, 0)"%(var1, var2)
+                constraint+="\n"+c
+                constrainttable+="\n"+c
+        
+        retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
+        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, tuplelist=negtuplestring, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
             print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
             return False
@@ -815,6 +926,12 @@ class testlexleq_quick:
     def runtest(self, options=dict()):
         return runtestgeneral("lexleq[quick]", True, options, [4,4], ["smallnum", "smallnum"], self, False)
 
+class testlexless_quick(testlexleq):
+    def printtable(self, domains):
+        return testlexleq.printtable(self, domains, less=True)
+    
+    def runtest(self, options=dict()):
+        return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], self, False)
 
 class testlexless(testlexleq):
     def printtable(self, domains):

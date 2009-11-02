@@ -1,7 +1,7 @@
 set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "gacelement-deprecated" "alldiff" "gacalldiff" "gcc" "gccweak" "watchneq"
                     "diseq" "__reify_diseq" "eq" "__reify_eq" "minuseq" "__reify_minuseq"
-                    "abs" "ineq" "watchless" "lexleq[rv]" "lexleq[quick]" "lexleq" "lexless"
+                    "abs" "ineq" "watchless" "lexleq[rv]" "lexleq[quick]" "lexleq" "lexless" "lexless[quick]"
                     "max" "min" "occurrence"
                     "occurrenceleq" "occurrencegeq" "product" "difference"
                     "weightedsumleq" "weightedsumgeq" "sumgeq" "sumleq" "watchsumgeq"
@@ -11,7 +11,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply" "reifyimply-old"
                     "reifyimply-new" "true" "false" "check[gsa]" "check[assign]"
-                    "watchvecexists_less"
+                    "watchvecexists_less" "lighttable"
                     )
 
 set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
@@ -89,9 +89,11 @@ set(NAME_READ_lexleq[rv] "read_list" "read_list")
 set(NAME_ID_lexleq "CT_LEXLEQ")
 set(NAME_READ_lexleq "read_list" "read_list")
 
+set(NAME_ID_lexless[quick] "CT_QUICK_LEXLESS")
+set(NAME_READ_lexless[quick] "read_list" "read_list")
+
 set(NAME_ID_lexless "CT_LEXLESS")
 set(NAME_READ_lexless "read_list" "read_list")
-
 
 set(NAME_ID_max "CT_MAX")
 set(NAME_READ_max "read_list" "read_var")
@@ -137,6 +139,9 @@ set(NAME_READ_table "read_list" "read_tuples")
 
 set(NAME_ID_negativetable "CT_WATCHED_NEGATIVE_TABLE")
 set(NAME_READ_negativetable "read_list" "read_tuples")
+
+set(NAME_ID_lighttable "CT_LIGHTTABLE")
+set(NAME_READ_lighttable "read_list" "read_tuples")
 
 set(NAME_ID_watchvecneq "CT_WATCHED_VECNEQ")
 set(NAME_READ_watchvecneq "read_list" "read_list")
@@ -271,8 +276,9 @@ macro(select_constraints)
             # BuildStaticStart.h
             file(APPEND ${BUILD_STATIC_START} "case ${NAME_ID_${constraint}}: return build_constraint_${NAME_ID_${constraint}}(stateObj, b);\n")
             # CT_*.cpp
-            file(READ "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.tmpl" CONS)
-            file(WRITE "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp" "${CONS}")
+            configure_file("${GEN_FILES_DIR}/${NAME_ID_${constraint}}.tmpl"
+                           "${GEN_FILES_DIR}/${NAME_ID_${constraint}}.cpp"
+                           COPYONLY)
         endif()
     endforeach()
     message(STATUS "${msg}")
