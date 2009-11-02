@@ -225,8 +225,6 @@ struct TupleTrie
     else
       return NULL;
   }
- 
-
   
   template<typename VarArray>
     bool search_trie(const VarArray& _vars, TrieObj** obj_list, int depth)
@@ -248,6 +246,44 @@ struct TupleTrie
     }
     return false;
   }
+  
+  // Variant for the lightweight table constraint.
+  template<typename VarArray>
+    bool search_trie_nostate(DomainInt domain_val, const VarArray& _vars)
+  {
+      MAKE_STACK_BOX(obj_list, TrieObj* , _vars.size());
+      
+      TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
+      if(first_ptr == NULL)
+        return false;
+      
+      obj_list[0] = first_ptr;
+      
+      return search_trie_nostate_internal(_vars, obj_list, 1);
+  }
+  
+  // Same as search_trie 
+  template<typename VarArray>
+  bool search_trie_nostate_internal(const VarArray& _vars, box<TrieObj*> obj_list, int depth)
+  {
+    CON_INFO_ADDONE(SearchTrie);
+    VarArray& vars = const_cast<VarArray&>(_vars);
+    if(depth == arity)
+      return true;
+    
+    obj_list[depth] = obj_list[depth - 1]->offset_ptr;  
+    while(obj_list[depth]->val != DomainInt_Max)
+    {
+      if(vars[map_depth(depth)].inDomain(obj_list[depth]->val))
+      {
+        if(search_trie_nostate_internal(_vars, obj_list, depth + 1))
+          return true;
+      }
+      obj_list[depth]++;
+    }
+    return false;
+  }
+  
   
   // search_trie_negative searches for a tuple which is not in the trie. 
   // For the negative table constraint.

@@ -110,13 +110,9 @@ namespace Controller
 // returns an instance of SearchManager with the required variable ordering, propagator etc.
 SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_method, vector<SearchOrder> order)
 {
-    cout << "Entered make_search_manager." << endl;
-    
     VariableOrder* vo;
     
     vo=make_search_order_multiple(order, stateObj);
-    
-    cout << "Made VariableOrder object." <<endl;
     
     Propagate * p;
     switch(prop_method)
@@ -141,8 +137,6 @@ SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_met
         abort();
     }
     
-    cout << "Made Propagate object." <<endl;
-    
     vector<AnyVarRef>* all_vars=new vector<AnyVarRef>();
     
     for(int i=0; i<order.size(); i++)
@@ -156,7 +150,6 @@ SearchManager* make_search_manager(StateObj* stateObj, PropagationLevel prop_met
     // need to switch here for different search algorthms. plain, parallel, group
     SearchManager* sm=new SearchManager(stateObj, *all_vars, order, vo, p);
     
-    cout << "Exiting make_search_manager"<<endl;
     return sm;
 }
 

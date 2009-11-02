@@ -126,16 +126,16 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
       // Normally we wouldn't, but here the compiler can't figure out it can "steal" instance.
       if(inputFileVersionNumber == 3)
       {
-        readerThree.instance = MOVE(instance);
+        readerThree.instance = &instance;
         ReadCSP(readerThree, &infile);
-        instance = MOVE(readerThree.instance);
+        //instance = MOVE(readerThree.instance);
         needs_finalise_three = true;
       } 
       else
       {
-        reader.instance = MOVE(instance);
+        reader.instance = &instance;
         ReadCSP(reader, &infile);
-        instance = MOVE(reader.instance);
+        //instance = MOVE(reader.instance);
         // fix variable names in case we want to write a resume file (which is
         // in Minion 3 format)
         instance.add_variable_names();
@@ -175,6 +175,6 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
   if(needs_finalise_three)
   {
       readerThree.finalise();
-      instance = MOVE(readerThree.instance);
+     // instance = MOVE(readerThree.instance);
   }
 }
