@@ -1,0 +1,20 @@
+MINION 3
+#TEST SOLCOUNT 0
+
+**VARIABLES**
+
+DISCRETE d[2] {0..9}
+
+**TUPLELIST**
+
+Second 0 2
+
+**SEARCH**
+
+PRINT [d]
+
+**CONSTRAINTS**
+
+table([d[0],d[1]],Second)
+
+**EOF**
