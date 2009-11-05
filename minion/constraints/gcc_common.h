@@ -43,18 +43,22 @@
 //#define SCCCARDS
 
 //Incremental graph -- maintains adjacency lists for values and vars
-// Second one is for use where a boolean value is required.
-#define INCGRAPH
 #define UseIncGraph true
 
 // Does not trigger itself if this is on, and incgraph is on.
 #define ONECALL
 
 // use the algorithm from Quimper et al. to prune the target variables.
-// requires INCGRAPH and not SCC
+// requires UseIncGraph and not SCC
 #define QUIMPER
 
+// Use WL's to trigger when support for a bound of a cap var is lost.
+// Support is a matching.  Uses boundsupported array.
 //#define CAPBOUNDSCACHE
+
+// Count domain of triggering variable to avoid running Tarjan's algo.
+// 
+#define DomainCounting true
 
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
@@ -103,13 +107,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 D_ASSERT(val_array[i]!=val_array[j]);
             }
         }
-        
-        // sanity check INCGRAPH
-        #ifdef INCGRAPH
-        D_ASSERT(UseIncGraph);
-        #else
-        D_ASSERT(!UseIncGraph);
-        #endif
         
         usage.resize(numvals, 0);
         
@@ -214,7 +211,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 capacity_array[i].propagateAssign(0);
             }
         }
-        #ifdef INCGRAPH
+        #if UseIncGraph
         {
             // update the adjacency lists. and place dts
             DynamicTrigger* dt=dynamic_trigger_start();
@@ -277,16 +274,16 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     // convert constraint into dynamic. 
     int dynamic_trigger_count()
     {
-        #if defined(INCGRAPH) && !defined(CAPBOUNDSCACHE)
+        #if UseIncGraph && !defined(CAPBOUNDSCACHE)
             return numvars*numvals; // one for each var-val pair so we know when it is removed.
         #endif
         
-        #if !defined(INCGRAPH) && !defined(CAPBOUNDSCACHE)
+        #if !UseIncGraph && !defined(CAPBOUNDSCACHE)
             return 0;
         #endif
         
         #ifdef CAPBOUNDSCACHE
-            // first numvars*numvals triggers are not used when INCGRAPH is not defined.
+            // first numvars*numvals triggers are not used when UseIncGraph is false
             // one block of numvars+val_Array.size() for each bound. 
             return numvars*numvals + 2*val_array.size()*(numvars+val_array.size());
         #endif
@@ -316,7 +313,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     virtual void propagate(DynamicTrigger* trig)
     {
-        #if defined(CAPBOUNDSCACHE) || defined(INCGRAPH)
+        #if defined(CAPBOUNDSCACHE) || UseIncGraph
         DynamicTrigger* dtstart=dynamic_trigger_start();
         #endif
         
@@ -325,7 +322,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #endif
         {
             // which var/val is this trigger attached to?
-            #ifdef INCGRAPH
+            #if UseIncGraph
             int diff=trig-dtstart;
             int var=diff/numvals;
             int validx=diff%numvals;
@@ -369,7 +366,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         }
         #endif
         
-        #if !defined(CAPBOUNDSCACHE) && !defined(INCGRAPH)
+        #if !defined(CAPBOUNDSCACHE) && !UseIncGraph
         D_ASSERT(false)   // Should not have dynamic trigger events!!
         #endif
     }
@@ -454,7 +451,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             }
         }
         
-        #ifdef INCGRAPH
+        #if UseIncGraph
             // update the adjacency lists.
             for(int i=dom_min; i<=dom_max; i++)
             {
@@ -809,7 +806,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         
         // clear out unmatched variables -- unless this has already been done 
         // when the adjacency lists were updated.
-        #ifndef INCGRAPH
+        #if !UseIncGraph
         for(int scci=0; scci<vars_in_scc.size(); scci++)
         {
             int i=vars_in_scc[scci];
@@ -892,7 +889,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     { // popped a value from the stack.
                         D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
                         int stackval=curnode+dom_min-numvars;
-                        #ifndef INCGRAPH
+                        #if !UseIncGraph
                         for(int vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
                         {
                             int vartoqueue=vars_in_scc[vartoqueuescc];
@@ -904,7 +901,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                             // For each variable, check if it terminates an odd alternating path
                             // and also queue it if it is suitable.
                             if(!visited.in(vartoqueue)
-                                #ifndef INCGRAPH
+                                #if !UseIncGraph
                                 && var_array[vartoqueue].inDomain(stackval)
                                 #endif
                                 && varvalmatching[vartoqueue]!=stackval)   // Need to exclude the matching edges????
@@ -970,7 +967,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     if(curnode<numvars)
                     { // it's a variable
                         // follow all edges other than the matching edge. 
-                        #ifndef INCGRAPH
+                        #if !UseIncGraph
                         for(int valtoqueue=var_array[curnode].getMin(); valtoqueue<=var_array[curnode].getMax(); valtoqueue++)
                         {
                         #else
@@ -982,7 +979,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                             // and also queue it if it is suitable.
                             int validx=valtoqueue-dom_min+numvars;
                             if(valtoqueue!=varvalmatching[curnode]
-                            #ifndef INCGRAPH
+                            #if !UseIncGraph
                                 && var_array[curnode].inDomain(valtoqueue)
                             #endif
                                 && !visited.in(validx) )
@@ -1012,7 +1009,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     { // popped a value from the stack.
                         D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
                         int stackval=curnode+dom_min-numvars;
-                        #ifndef INCGRAPH
+                        #if !UseIncGraph
                         for(int vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
                         {
                             int vartoqueue=vars_in_scc[vartoqueuescc];
@@ -1139,7 +1136,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         triggerCollection t;
         int capacity_size=capacity_array.size();
         
-        #if !defined(INCGRAPH) || !defined(ONECALL)
+        #if !UseIncGraph || !defined(ONECALL)
             int array_size = var_array.size();
             for(int i = 0; i < array_size; ++i)
             {
@@ -1397,7 +1394,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             #endif
             
             int lowlinkvar=-1;
-            #ifndef INCGRAPH
+            #if !UseIncGraph
             for(int i=0; i<vars_in_scc.size(); i++)
             {
                 int newnode=vars_in_scc[i];
@@ -1408,7 +1405,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             #endif
                 if(matching[newnode]!=curnode-numvars+dom_min)   // if the value is not in the matching.
                 {
-                    #ifndef INCGRAPH
+                    #if !UseIncGraph
                     if(var_array[newnode].inDomain(curnode+dom_min-numvars))
                     #endif
                     {
@@ -1566,7 +1563,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                                         if(var_array[curvar].inDomain(copynode+dom_min-numvars))
                                         {
                                             var_array[curvar].removeFromDomain(copynode+dom_min-numvars);
-                                            #ifdef INCGRAPH
+                                            #if UseIncGraph
                                                 adjlist_remove(curvar, copynode-numvars+dom_min);
                                             #endif
                                         }
@@ -1619,7 +1616,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         int i=val_to_cap_index[val-dom_min];
         
         // called above or directly from do_gcc_prop_scc when using SCCCARDS 
-        #ifndef INCGRAPH
+        #if !UseIncGraph
             int mincap=0;
             int maxcap=0;
             for(int j=0; j<numvars; j++)
@@ -1758,7 +1755,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         // follow an edge in the matching from a value to a variable,
         // follow edges not in the matching from variables to values. 
         
-        #ifdef INCGRAPH
+        #if UseIncGraph
         for(int startvari=0; startvari<adjlistlength[forbiddenval-dom_min+numvars] && newlb>existinglb; startvari++)
         {
             int startvar=adjlist[forbiddenval-dom_min+numvars][startvari];
@@ -1786,7 +1783,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     if(curnode<numvars)
                     { // it's a variable
                         // follow all edges other than the matching edge. 
-                        #ifndef INCGRAPH
+                        #if !UseIncGraph
                         for(int valtoqueue=var_array[curnode].getMin(); valtoqueue<=var_array[curnode].getMax(); valtoqueue++)
                         {
                         #else
@@ -1799,7 +1796,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                             int validx=valtoqueue-dom_min+numvars;
                             if(valtoqueue!=varvalmatching[curnode]
                                 && valtoqueue!=forbiddenval  // added for this method.
-                            #ifndef INCGRAPH
+                            #if !UseIncGraph
                                 && var_array[curnode].inDomain(valtoqueue)
                             #endif
                                 && !visited.in(validx) )
@@ -1830,7 +1827,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     { // popped a value from the stack.
                         D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
                         int stackval=curnode+dom_min-numvars;
-                        #ifdef INCGRAPH
+                        #if UseIncGraph
                         for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
                         {
                             int vartoqueue=adjlist[curnode][vartoqueuei];
@@ -1962,7 +1959,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 { // popped a value from the stack.
                     D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
                     int stackval=curnode+dom_min-numvars;
-                    #ifndef INCGRAPH
+                    #if !UseIncGraph
                     for(int vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
                     {
                         int vartoqueue=vars_in_scc[vartoqueuescc];
@@ -1974,7 +1971,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                         // For each variable, check if it terminates an odd alternating path
                         // and also queue it if it is suitable.
                         if(!visited.in(vartoqueue)
-                            #ifndef INCGRAPH
+                            #if !UseIncGraph
                             && var_array[vartoqueue].inDomain(stackval)
                             #endif
                             && varvalmatching[vartoqueue]!=stackval)   // Need to exclude the matching edges????
