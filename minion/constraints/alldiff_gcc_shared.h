@@ -444,6 +444,21 @@ struct FlowConstraint : public AbstractConstraint
         adjlistlength[i]=adjlistlength[i]-1;
     }
     
+    void check_adjlists()
+    {
+        for(int i=0; i<numvars; i++)
+        {
+            D_ASSERT(var_array[i].getMin()>=dom_min);
+            D_ASSERT(var_array[i].getMax()<=dom_max);
+            for(int j=dom_min; j<=dom_max; j++)
+            {
+                D_DATA(bool in=adjlistpos[i][j-dom_min]<adjlistlength[i]);
+                D_DATA(bool in2=adjlistpos[j-dom_min+numvars][i]<adjlistlength[j-dom_min+numvars]);
+                D_ASSERT(in==in2);
+                D_ASSERT(in==var_array[i].inDomain(j));
+            }
+        }
+    }
     
     // -------------------------Hopcroft-Karp algorithm -----------------------------
     // Can be applied to a subset of var_array as required.

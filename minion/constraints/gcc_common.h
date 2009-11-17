@@ -37,10 +37,13 @@
 #define GCCPRINT(x)
 
 #define SPECIALQUEUE
-//#define SCC
+
+// should be called dynamic partitioning
+#define SCC
+
 #define INCREMENTALMATCH
 
-//#define SCCCARDS
+#define SCCCARDS
 
 //Incremental graph -- maintains adjacency lists for values and vars
 #define UseIncGraph true
@@ -50,15 +53,26 @@
 
 // use the algorithm from Quimper et al. to prune the target variables.
 // requires UseIncGraph and not SCC
-#define QUIMPER
+//#define QUIMPER
 
 // Use WL's to trigger when support for a bound of a cap var is lost.
 // Support is a matching.  Uses boundsupported array.
 //#define CAPBOUNDSCACHE
 
 // Count domain of triggering variable to avoid running Tarjan's algo.
-// 
-#define DomainCounting true
+// Only implemented with SCCs and adjacency lists.
+// Can't think of any criteria other than |SCCvars|-1
+#define DomainCounting false
+
+// Use internal dynamic triggers to avoid calling Tarjan's algo.
+#define UseWatches false
+
+// This one just sets up the watches BT arrays, to measure the cost of BTing them.
+#define UseWatches2 UseWatches
+
+// Requires SCC to be defined. Only splits off unit SCCs from the current
+// SCC. This is the Gecode implementation.
+#define RemoveAssignedVars true
 
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
@@ -73,6 +87,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     using FlowConstraint<VarArray, UseIncGraph>::adjlistlength;
     using FlowConstraint<VarArray, UseIncGraph>::adjlistpos;
     using FlowConstraint<VarArray, UseIncGraph>::adjlist_remove;
+    using FlowConstraint<VarArray, UseIncGraph>::check_adjlists;
     
     using FlowConstraint<VarArray, UseIncGraph>::dynamic_trigger_start;
     using FlowConstraint<VarArray, UseIncGraph>::var_array;
@@ -187,6 +202,20 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         lbcmatching.resize(numvars, dom_min-1);
         lbcusage.resize(numvals, 0);
         #endif
+        
+        #if DomainCounting || UseWatches
+        changed_vars_per_scc.resize(numvars+numvals);
+        #endif
+        
+        #if UseWatches2
+            //watches.resize(numvars);
+            for(int i=0; i<numvars; i++)
+            {
+                watches.push_back(getMemory(stateObj).backTrack().template requestArray<short>(numvals+1));
+                //watches[i].reserve(numvals, stateObj);
+            }
+            // THe 0'th element is the number of items in the array.
+        #endif
     }
     
     CapArray capacity_array;   // capacities for values of interest
@@ -196,6 +225,14 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     vector<int> vars_in_scc;
     vector<int> vals_in_scc;  // Actual values.
+    
+    #if DomainCounting || UseWatches
+    vector<vector<int> > changed_vars_per_scc;
+    #endif
+    
+    #if UseWatches2
+    vector<MoveableArray<short> > watches;
+    #endif
     
     virtual void full_propagate()
     {
@@ -240,6 +277,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     }
                 }
             }
+            D_DATA(check_adjlists());
         }
         #endif
         
@@ -264,6 +302,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #endif
         
         #ifdef SCC
+        SCCSplit.remove(numvars+numvals-1);
         for(int i=0; i<numvars+numvals; i++) to_process.insert(i);  // may need to change.
         do_gcc_prop_scc();
         #else
@@ -291,6 +330,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     virtual void propagate(int prop_var, DomainDelta)
     {
+        D_ASSERT(!UseIncGraph || (prop_var>=numvars && prop_var<numvars+numvals ) );
         if(!to_process.in(prop_var))
         {
             to_process.insert(prop_var);  // inserts the number attached to the trigger. For values this is val-dom_min+numvars
@@ -322,10 +362,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #endif
         {
             // which var/val is this trigger attached to?
+            D_ASSERT(UseIncGraph);
             #if UseIncGraph
             int diff=trig-dtstart;
             int var=diff/numvals;
             int validx=diff%numvals;
+            
             if(adjlistpos[validx+numvars][var]<adjlistlength[validx+numvars])
             {
                 adjlist_remove(var, validx+dom_min); //validx, adjlistpos[validx][var]);
@@ -355,7 +397,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 }
                 #endif
             }
-            // else the constraint triggered itself.
+            // else the constraint already processed the deletion so don't trigger it again.
             #endif
         }
         #ifdef CAPBOUNDSCACHE
@@ -526,6 +568,17 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
   
     void do_gcc_prop()
     {
+        if(Strongcards)
+        {
+            PROP_INFO_ADDONE(GCC);
+        }
+        else
+        {
+            PROP_INFO_ADDONE(GCCWeak);
+        }
+        
+        D_DATA(check_adjlists());
+        
         #ifdef QUIMPER
         do_gcc_prop_quimper();
         return;
@@ -544,7 +597,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         {
             if(val_array[i]>=dom_min && val_array[i]<=dom_max)
             {
-                lower[val_array[i]-dom_min]=capacity_array[i].getMin();   // not quite right in the presence of duplicate values.
+                lower[val_array[i]-dom_min]=capacity_array[i].getMin();   // doesn't work with duplicate values in list.
                 upper[val_array[i]-dom_min]=capacity_array[i].getMax();
             }
         }
@@ -654,6 +707,17 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     void do_gcc_prop_scc()
     {
+        if(Strongcards)
+        {
+            PROP_INFO_ADDONE(GCC);
+        }
+        else
+        {
+            PROP_INFO_ADDONE(GCCWeak);
+        }
+        
+        D_DATA(check_adjlists());
+        
         // Assumes triggered on variables in to_process
         #ifndef INCREMENTALMATCH
         varvalmatching.clear();
@@ -685,7 +749,15 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 && SCCSplit.isMember(sccindex_start))   // not singleton.
             {
                 sccs_to_process.insert(sccindex_start);
+                #if DomainCounting || UseWatches
+                    changed_vars_per_scc[sccindex_start].clear();
+                #endif
             }
+            #if DomainCounting || UseWatches
+                // make a note of which changed vars are in the scc.
+                if(SCCSplit.isMember(sccindex_start))
+                    changed_vars_per_scc[sccindex_start].push_back(tempidx);
+            #endif
         }
         }
         to_process.clear();
@@ -720,7 +792,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             // Might not need to do anything.
             if(vars_in_scc.size()==0)
             {
-                GCCPRINT("refusing to process empty scc.");
+                GCCPRINT("refusing to process scc with no vars.");
                 continue;
             }
             
@@ -736,15 +808,70 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 }
             }
             
-            bool flag=bfsmatching_gcc();
-            if(!flag)
+            // A flag that indicates whether we do Tarjan's and possibly FF
+            bool run_propagator=true;
+            #if DomainCounting || UseWatches // need to check through triggers to see if broken....
             {
-                GCCPRINT("Failing because no matching");
-                getState(stateObj).setFailed(true);
-                return;
+                run_propagator=false;
+                vector<int>& vars_changed=changed_vars_per_scc[sccindex_start];
+                #if DomainCounting
+                    int varcount=vars_in_scc.size();
+                    for(int i=0; i<vars_changed.size(); i++)
+                    {
+                        int var=vars_changed[i];
+                        if(var>=numvars || adjlistlength[var]<varcount)
+                        {   // either its a val (i.e. a trigger from a cap variable)
+                            // or its a var with fewer than all the values.
+                            run_propagator=true;
+                            break;
+                        }
+                    }
+                #else
+                    for(int i=0; i<vars_changed.size(); i++)
+                    {
+                        int var=vars_changed[i];
+                        if(var>=numvars)
+                        {
+                            // var is actually a val. Triggered from a
+                            // capacity variable.
+                            run_propagator=true;
+                            break;
+                        }
+                        MoveableArray<short>& watch = watches[var];
+                        int len=watch[0];
+                        for(int j=1; j<=len && !run_propagator; j++)
+                        {
+                            if(!var_array[var].inDomain(watch[j]+dom_min))
+                            {
+                                run_propagator=true;
+                                break;
+                            }
+                        }
+                    }
+                #endif
+            }
+            #endif
+            
+            if(run_propagator || Strongcards)
+            {
+                bool flag=bfsmatching_gcc();
+                if(!flag)
+                {
+                    GCCPRINT("Failing because no matching");
+                    getState(stateObj).setFailed(true);
+                    return;
+                }
             }
             
-            tarjan_recursive(sccindex_start, upper, lower, varvalmatching, usage);
+            if(run_propagator)
+            {
+                //cout << 1 << endl;
+                tarjan_recursive(sccindex_start, upper, lower, varvalmatching, usage);
+            }
+            else
+            {
+                //cout << "Saved a call with dc/wl" << endl;
+            }
             
             #ifdef SCCCARDS
                 // Propagate to capacity variables for all values in vals_in_scc
@@ -764,7 +891,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     }
                 }
             #endif
-            
         }
         }
         
@@ -1128,7 +1254,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     virtual string constraint_name()
     {
-      return "GCC";
+        if(Strongcards)
+            return "GCC";
+        else
+            return "GCCWeak";
     }
     
     virtual triggerCollection setup_internal()
@@ -1254,6 +1383,19 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         scc_split=false;
         sccindex=sccindex_start;
         
+        #if UseWatches
+            for(int i=0; i<vars_in_scc.size(); i++)
+            {
+                int varidx=vars_in_scc[i];
+                //watches[varidx].clear();
+                watches[varidx][0]=0;
+                addwatch(varidx, matching[varidx]-dom_min);
+                GCCPRINT("Adding DT for var " << varidx << " val " << matching[varidx]);
+                // watch the value from the matching.
+                //watches[varidx].insert(matching[varidx]-dom_min);
+            }
+        #endif
+        
         for(int i=0; i<vars_in_scc.size(); ++i)
         {
             int curnode=vars_in_scc[i];
@@ -1279,6 +1421,43 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 GCCPRINT("Returned from tarjan's algorithm.");
             }
         }
+        
+        #if RemoveAssignedVars
+            // Didn't split SCCs in visit function, do it here by just taking 
+            // out assigned vars.
+            for(int i=0; i<numvars+numvals; i++)
+            {
+                D_ASSERT(std::find(SCCs.begin(), SCCs.end(), i)!=SCCs.end() );
+            }
+            for(int i=sccindex_start; i<numvars+numvals; i++)
+            {
+                if(SCCs[i]<numvars && var_array[SCCs[i]].isAssigned())
+                {
+                    // swap with first element
+                    if(sccindex_start!=i)
+                    {
+                        int temp=SCCs[sccindex_start];
+                        SCCs[sccindex_start]=SCCs[i];
+                        SCCs[i]=temp;
+                        varToSCCIndex[SCCs[i]]=i;
+                        varToSCCIndex[SCCs[sccindex_start]]=sccindex_start;
+                    }
+                    // partition
+                    D_ASSERT(SCCSplit.isMember(sccindex_start));
+                    SCCSplit.remove(sccindex_start);
+                    sccindex_start++;
+                }
+                if(!SCCSplit.isMember(i))
+                {
+                    break;
+                }
+            }
+            for(int i=0; i<numvars+numvals; i++)
+            {
+                D_ASSERT(std::find(SCCs.begin(), SCCs.end(), i)!=SCCs.end() );
+            }
+            
+        #endif
     }
     
     void visit(int curnode, bool toplevel, vector<int>& upper, vector<int>& lower, vector<int>& matching, vector<int>& usage)
@@ -1350,12 +1529,13 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 }
             }
         }
-        else if(curnode<numvars)  // This case should never occur with merge nodes.
+        else if(curnode<numvars)
         {
             D_ASSERT(find(vars_in_scc.begin(), vars_in_scc.end(), curnode)!=vars_in_scc.end());
             varcount++;
             int newnode=matching[curnode]-dom_min+numvars;
-            D_ASSERT(var_array[curnode].inDomain(newnode+dom_min-numvars));
+            //D_ASSERT(var_array[curnode].inDomain(matching[curnode]));
+            D_ASSERT(adjlistpos[curnode][matching[curnode]-dom_min]<adjlistlength[curnode]);
             
             if(!visited.in(newnode))
             {
@@ -1412,7 +1592,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                         //newnode=varvalmatching[newnode]-dom_min+numvars;  // Changed here for merge nodes
                         if(!visited.in(newnode))
                         {
-                            
+                            #if UseWatches
+                                GCCPRINT("Adding DT for var " << newnode << " val " << curnode-numvars+dom_min);
+                                addwatch(newnode, curnode-numvars);
+                                //watches[newnode].insert(curnode-numvars);
+                            #endif
                             visit(newnode, false, upper, lower, matching, usage);
                             if(lowlink[newnode]<lowlink[curnode])
                             {
@@ -1457,7 +1641,14 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     }
                 }
             }
-            
+            // Where did the low link value come from? insert that edge into watches.
+            #if UseWatches
+            if(lowlinkvar!=-1)
+            {
+                GCCPRINT("Adding DT for var " << lowlinkvar << " val " << curnode-numvars+dom_min);
+                addwatch(lowlinkvar, curnode-numvars);
+            }
+            #endif
         }
         
         //cout << "On way back up, curnode:" << curnode<< ", lowlink:"<<lowlink[curnode]<< ", dfsnum:"<<dfsnum[curnode]<<endl;
@@ -1515,11 +1706,16 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     {
                         // Beware it might be an SCC containing just one value.
                         // or just t
-                        
+                        // sccindex is the first index of a new SCC,
+                        // so insert the marker at sccindex-1, the end of the
+                        // previous SCC.
                         if(containsvars || containsvals)   //containsvars
                         {
                             GCCPRINT("Inserting split point at "<< sccindex-1 << " SCCs:" << SCCs);
-                            SCCSplit.remove(sccindex-1);
+                            #if !RemoveAssignedVars
+                                // If doing the usual SCC dynamic partitioning.
+                                SCCSplit.remove(sccindex-1);
+                            #endif
                         }
                         
                         // The one written last was the last one in the SCC.
@@ -1581,7 +1777,21 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             }
         }
     }
+
+#if UseWatches
+    inline void addwatch(int var, int val)
+    {
+        int len=watches[var][0];
+        len++;
+        watches[var][0]=len;
+        watches[var][len]=val;                        
+    }
     
+    inline void clearwatches(int var)
+    {
+        watches[var][0]=0;
+    }
+#endif
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Propagate to capacity variables.
     
@@ -1601,6 +1811,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     {
         // basic prop from main vars to cap variables. equiv to occurrence constraints I think. 
         // NEEDS TO BE IMPROVED. but it would be quadratic (nd) whatever I do.
+        // Nope, when using incgraph only need to count assignments of each variable
+        // which is linear in r.
         for(int i=0; i<val_array.size(); i++)
         {
             int val=val_array[i];
@@ -1611,10 +1823,37 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         }
     }
     
+    void prop_capacity_simple_scc_incgraph()
+    {
+        // requires vars_in_scc and vals_in_scc.
+        // Buggy! It doesnt work because vars not in vars_in_scc may be 
+        // assigned to a val in vals_in_scc.
+        // Count assigned values using augpath as a temporary.
+        augpath.clear();
+        augpath.resize(numvals,0);
+        for(int i=0; i<vars_in_scc.size(); i++)
+        {
+            int var=vars_in_scc[i];
+            if(var_array[var].isAssigned())
+            {
+                augpath[var_array[var].getAssignedValue()-dom_min]++;
+            }
+        }
+        // Set bounds
+        for(int i=0; i<vals_in_scc.size(); i++)
+        {
+            int val=vals_in_scc[i];
+            int capidx=val_to_cap_index[val-dom_min];
+            capacity_array[capidx].setMin(augpath[val-dom_min]);
+            capacity_array[capidx].setMax(adjlistlength[val-dom_min+numvars]);
+        }
+    }
+    
     void prop_capacity_simple(int val)
     {
         int i=val_to_cap_index[val-dom_min];
-        
+        D_ASSERT(i!=-1);
+        D_ASSERT(lower[val-dom_min]<upper[val-dom_min]);
         // called above or directly from do_gcc_prop_scc when using SCCCARDS 
         #if !UseIncGraph
             int mincap=0;
@@ -1631,13 +1870,20 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             capacity_array[i].setMin(mincap);
             capacity_array[i].setMax(maxcap);
         #else
+            // This is a little odd because the adjacency list might be out of date
+            // because of pruning done earlier on another cap var.
+            // (if some vars are shared between primary and capacity vars).
+            // So need to check that assigned vars in the adjlist are actually
+            // assigned to val.
+            // It's odd because we're using a mixture of real var state and
+            // the internal data structure.
             if(val>= dom_min && val<=dom_max)
             {
                 int mincap=0;
                 for(int vari=0; vari<adjlistlength[val-dom_min+numvars]; vari++)
                 {
                     int var=adjlist[val-dom_min+numvars][vari];
-                    if(var_array[var].isAssigned())
+                    if(var_array[var].isAssigned() && var_array[var].getAssignedValue()==val)
                         mincap++;
                 }
                 capacity_array[i].setMin(mincap);
