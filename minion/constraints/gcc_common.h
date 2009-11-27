@@ -72,7 +72,7 @@
 
 // Requires SCC to be defined. Only splits off unit SCCs from the current
 // SCC. This is the Gecode implementation.
-#define RemoveAssignedVars true
+#define RemoveAssignedVars false
 
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
