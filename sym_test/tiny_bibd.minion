@@ -1,0 +1,25 @@
+MINION 3
+#TEST GROUP 1*2*3*2
+
+**VARIABLES**
+
+BOOL a[3]
+BOOL b[3]
+BOOL c[3]
+
+**CONSTRAINTS**
+
+sumleq(a, 1)
+sumgeq(a, 1)
+
+sumgeq(b, 1)
+sumleq(b, 1)
+
+sumgeq(c, 2)
+sumgeq(c, 2)
+
+product(a[0], b[0], c[0])
+product(a[1], b[1], c[1])
+product(a[2], b[2], c[2])
+
+**EOF**

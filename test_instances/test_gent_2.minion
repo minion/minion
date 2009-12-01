@@ -1,0 +1,18 @@
+MINION 1
+#TEST SOLCOUNT 0
+0
+0
+0
+1
+0 5 1
+0
+[x0]
+[a]
+0
+1
+[[x0]]
+0
+objective none
+print m0
+sumleq([x0],4)
+sumgeq([x0],7)

@@ -1,0 +1,21 @@
+MINION 1
+#TEST SOLCOUNT 13
+0
+0
+0
+2
+-7 5 1
+-5 7 1
+0
+
+
+[]
+[]
+0
+1
+[ [x0,x1] ]
+0
+objective none
+print m0
+
+minuseq(x0,x1)

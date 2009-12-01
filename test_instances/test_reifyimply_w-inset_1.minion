@@ -1,0 +1,12 @@
+MINION 3
+#TEST SOLCOUNT 7
+**VARIABLES**
+
+BOOL b
+DISCRETE d {1..5}
+
+**CONSTRAINTS**
+
+reifyimply(w-inset(d, [1,2]), b)
+
+**EOF**
