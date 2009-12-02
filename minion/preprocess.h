@@ -38,6 +38,27 @@ bool inline check_fail(StateObj* stateObj, Var& var, DomainInt val, Vars& vars, 
   return check_failed;
 }
 
+inline bool check_sac_timeout(StateObj* stateObj)
+{
+    if(getState(stateObj).isAlarmActivated())
+    {
+        getState(stateObj).clearAlarm();
+        if(getState(stateObj).isCtrlcPressed())
+        {
+            getState(stateObj).setFailed(true);
+            return true;
+        }
+        else
+        {
+            getOptions(stateObj).printLine("Time out in preprocessing.");
+            getTableOut().set("TimeOut", 1);
+            getState(stateObj).setFailed(true);
+            return true;
+        }
+    }
+    return false;
+}
+
 template <typename Var, typename Prop>
 void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop, bool onlyCheckBounds)
 {
@@ -50,28 +71,12 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
     reduced = false;
     for(int i = 0; i < vararray.size(); ++i)
     {
-      if(getState(stateObj).isAlarmActivated())
-      {
-        getState(stateObj).clearAlarm();
-        if(getState(stateObj).isCtrlcPressed())
-        {
-            getState(stateObj).setFailed(true);
-            return;
-        }
-        else
-        {
-            getOptions(stateObj).printLine("Time out in preprocessing.");
-            getTableOut().set("TimeOut", 1);
-            getState(stateObj).setFailed(true);
-            return;
-        }
-      }
-      
       Var& var = vararray[i];
       if(onlyCheckBounds || var.isBound())
       {
         while(check_fail(stateObj, var, var.getMax(), vararray, prop))
         {
+          if(check_sac_timeout(stateObj)) return;
           reduced = true;
           var.setMax(var.getMax() - 1);
           prop(stateObj, vararray);
@@ -81,6 +86,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
         
         while(check_fail(stateObj, var, var.getMin(), vararray, prop))
         {
+          if(check_sac_timeout(stateObj)) return;
           reduced = true;
           var.setMin(var.getMin() + 1);
           prop(stateObj, vararray);
@@ -92,6 +98,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
       {
         for(DomainInt val = var.getMin(); val <= var.getMax(); ++val)
         {
+          if(check_sac_timeout(stateObj)) return;
           if(var.inDomain(val) && check_fail(stateObj, var, val, vararray, prop))
           {
             reduced = true;
