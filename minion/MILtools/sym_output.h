@@ -23,6 +23,64 @@
 std::vector<std::vector<int> > 
 build_graph(std::vector<std::set<int> > graph, const std::vector<std::set<int> >& partition);
 
+int
+repartition(const std::vector<std::set<int> >& graph, std::vector<int> partition_num)
+{
+  std::vector<std::multiset<int> > partition_loop(graph.size());
+  for(int i = 0; i < graph.size(); ++i)
+    for(set<int>::iterator it = graph[i].begin(); it != graph[i].end(); ++it)
+    {
+      partition_loop[i].insert(partition_num[*it]);
+      partition_loop[*it].insert(partition_num[i]);
+    }
+
+  std::set<std::multiset<int> > partition_set(partition_loop.begin(), partition_loop.end());
+  std::vector<std::multiset<int> > partition_vec(partition_set.begin(), partition_set.end());
+
+  for(int i = 0; i < graph.size(); ++i)
+  {
+    partition_num[i] = find(partition_vec.begin(), partition_vec.end(), partition_loop[i]) - partition_vec.begin();
+  }
+
+  return partition_set.size();
+}
+
+double
+partition_graph(const tuple<int,vector<set<int> >,vector<set<int> > >& graph_tuple)
+{
+  std::vector<std::set<int> > graph;
+  std::vector<std::set<int> > partition;
+  int blank;
+  tie(blank, graph, partition) = graph_tuple;
+
+  std::vector<int> partition_num(graph.size());
+
+  for(int i = 0; i < partition.size(); ++i)
+  {
+    for(std::set<int>::iterator it = partition[i].begin(); it != partition[i].end(); ++it)
+      partition_num[*it] = i;
+  }
+
+  int partition_count = 0;
+  bool done = false;
+  while(!done)
+  {
+    int new_partition_count= repartition(graph, partition_num);
+    if(partition_count == new_partition_count)
+      done = true;
+    partition_count = new_partition_count;
+  }
+
+  int diff_count = 0;
+  for(int i = 0; i < partition_num.size(); ++i)
+    for(int j = 0; j < partition_num.size(); ++j)
+      if(partition_num[i] != partition_num[j])
+        diff_count++;
+
+  return (double)(diff_count) / (double)(partition_num.size() * partition_num.size());
+ 
+}
+
 template<typename Name = string, typename Colour = string>
 struct Graph
 {
@@ -80,7 +138,7 @@ struct Graph
      }
    }
 
-   void output_nauty_graph(CSPInstance& csp)
+   tuple<int,vector<set<int> >,vector<set<int> > >  build_graph_info(CSPInstance& csp, bool print_names = true)
    {
 
      map<string, int> v_num;
@@ -92,14 +150,16 @@ struct Graph
      for(map<string, set<string> >::iterator it = aux_vertex_colour.begin(); it != aux_vertex_colour.end(); ++it)
        aux_vertex_count += it->second.size();
          
-     cout << "varnames := [";
+     if(print_names)
+       cout << "varnames := [";
      for(int i = 0; i < csp.sym_order.size(); ++i)
-     {
-       cout << "\"" << name(csp.sym_order[i], csp) << "\", ";
-       v_num[name(csp.sym_order[i], csp)] = i + 1;
-     }
-     cout << "];" << endl;
-
+       {
+         if(print_names)
+           cout << "\"" << name(csp.sym_order[i], csp) << "\", ";
+         v_num[name(csp.sym_order[i], csp)] = i + 1;
+       }
+     if(print_names)
+       cout << "];" << endl;
      int vertex_counter = v_num.size() + 1;
 
      // Now output partitions
@@ -152,7 +212,17 @@ struct Graph
        D_ASSERT(first_v != 0 && second_v != 0 && first_v != second_v);
        edges[first_v].insert(second_v);
      }
-     
+
+     return make_tuple(var_vertex_count, edges, partitions);
+   }
+
+   void output_nauty_graph(CSPInstance& csp)
+   {
+     int var_vertex_count;
+     vector<set<int> > edges;
+     vector<set<int> > partitions;
+
+     tie(var_vertex_count, edges, partitions) = build_graph_info(csp);
 #ifdef USE_NAUTY
      vector<vector<int> > perms = build_graph(edges, partitions);
      cout << "generators := [()" << endl;  
@@ -760,17 +830,26 @@ struct InstanceStats
       cout << s << "lex_proportion:" << ((double)lex)/(double)c.size() << endl;
       
       int count_2_overlaps=0;
-      for(list<ConstraintBlob>::iterator i=c.begin(); i!=c.end(); ++i)
+
+      vector<vector<Var> > var_sets;
+
+      for(list<ConstraintBlob>::iterator i = c.begin(); i != c.end(); ++i)
       {
-          for(list<ConstraintBlob>::iterator j=i; j!=c.end(); ++j)
+        set<Var> v = find_all_vars(*i);
+        var_sets.push_back(vector<Var>(v.begin(), v.end()));
+      }
+
+      vector<Var> inter;
+      for(int i = 0; i < var_sets.size(); ++i) 
+      {
+          for(int j = 0; j < var_sets.size(); ++j)
           {
               if(j!=i)  // can't say i+1 above.
               {
-                  set<Var> c1vars=find_all_vars(*i);
-                  set<Var> c2vars=find_all_vars(*j);
-                  vector<Var> inter;
+                  inter.clear();
                   
-                  set_intersection(c1vars.begin(), c1vars.end(), c2vars.begin(), c2vars.end(), back_inserter(inter));
+                  if(!( !var_sets[i].empty() && !var_sets[j].empty() &&  ((var_sets[i].back() < var_sets[j].front()) || (var_sets[j].back() < var_sets[i].front()))))
+                    set_intersection(var_sets[i].begin(), var_sets[i].end(), var_sets[j].begin(), var_sets[j].end(), back_inserter(inter));
                   if(inter.size()>=2)
                   {
                       count_2_overlaps++;
@@ -782,6 +861,10 @@ struct InstanceStats
       int conspairs=((double)(c.size()*(c.size()-1)))/2.0;
       
       cout << s << "multi_shared_vars:" << ((double)count_2_overlaps)/conspairs <<endl;
+
+      GraphBuilder graph(csp);
+      cout << s << "Local_Variance: " << partition_graph(graph.g.build_graph_info(csp, false));
+      
   }
   
   // pretend each top-level constraint is just one constraint (i.e. no constraint trees)

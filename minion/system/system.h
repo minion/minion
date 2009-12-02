@@ -88,11 +88,15 @@
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/tuple/tuple.hpp>
 
 using boost::bind;
 using boost::function;
 using boost::enable_if_c;
 using boost::disable_if_c;
+using boost::tuple;
+using boost::tie;
+using boost::make_tuple;
 
 #ifdef USE_BOOST
 
