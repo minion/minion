@@ -16,9 +16,23 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include <stdlib.h>
+#include <iostream>
+#include <vector>
+#include <deque>
+#include <algorithm>
+#include <utility>
+
+using namespace std;
+
+#include "alldiff_gcc_shared.h"
+
+// includes for reverse constraint.
+#include "constraint_equal.h"
+#include "../dynamic_constraints/dynamic_new_or.h"
 
 // The implementation of the alldiff GAC algorithm,
-// shared between alldiffgacslow and dynamicalldiff.
+// shared between gacalldiff and the (now defunct) dynamicalldiff.
 
 
 // whether to backtrack the matching.
@@ -38,8 +52,8 @@
 // Process SCCs independently
 #define SCC
 
-// Warning: if this is not defined, then watchedalldiff probably won't do anything.
-//#define USEWATCHES
+// Warning: if this is not defined true, then watchedalldiff probably won't do anything.
+#define UseWatches false
 
 // Optimize the case where a value was assigned. Only works in the presence of SCC
 #define ASSIGNOPT 
@@ -53,26 +67,14 @@
 // Use BFS instead of HK
 #define BFSMATCHING
 
+// Use the new hopcroft-karp implementation.
+//#define NEWHK
+
+// Incremental graph stored in adjlist
+#define UseIncGraph false
+
 // Use staging a la Schulte and Stuckey
 #define STAGED
-
-//Incremental graph -- maintains adjacency lists for values and vars
-//#define INCGRAPH
-
-#include <stdlib.h>
-#include <iostream>
-#include <vector>
-#include <deque>
-#include <algorithm>
-#include <utility>
-
-using namespace std;
-
-#include "alldiff_gcc_shared.h"
-
-// includes for reverse constraint.
-#include "constraint_equal.h"
-#include "../dynamic_constraints/dynamic_new_or.h"
 
 #ifdef P
 #undef P
@@ -86,7 +88,7 @@ using namespace std;
 //#define P(x) cout << x << endl
 //#define PLONG
 
-template<typename VarArray, bool UseIncGraph>
+template<typename VarArray>
 struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
 {
     using FlowConstraint<VarArray, UseIncGraph>::stateObj;
@@ -101,27 +103,37 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     using FlowConstraint<VarArray, UseIncGraph>::dom_max;
     using FlowConstraint<VarArray, UseIncGraph>::numvars;
     using FlowConstraint<VarArray, UseIncGraph>::numvals;
+    using FlowConstraint<VarArray, UseIncGraph>::varvalmatching;
+    using FlowConstraint<VarArray, UseIncGraph>::valvarmatching;
     
-  virtual string constraint_name()
-  { 
-      return "GacAlldiff";
-  }
-  
-  vector<int> SCCs;    // Variable numbers
-  ReversibleMonotonicSet SCCSplit;
-  // If !SCCSplit.isMember(anIndex) then anIndex is the last index in an SCC.
-  
-  //ReversibleMonotonicSet sparevaluespresent;
-  
-  D_DATA(MoveablePointer SCCSplit2);
-  
-  vector<int> varToSCCIndex;  // Mirror of the SCCs array.
-  
-  GacAlldiffConstraint(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
-    SCCSplit(_stateObj, _var_array.size())
+    
+    using FlowConstraint<VarArray, UseIncGraph>::varinlocalmatching;
+    using FlowConstraint<VarArray, UseIncGraph>::valinlocalmatching;
+    using FlowConstraint<VarArray, UseIncGraph>::invprevious;
+    
+    using FlowConstraint<VarArray, UseIncGraph>::initialize_hopcroft;
+    using FlowConstraint<VarArray, UseIncGraph>::hopcroft_wrapper;
+    using FlowConstraint<VarArray, UseIncGraph>::hopcroft2_setup;
+    
+    virtual string constraint_name()
+    { 
+        return "GacAlldiff";
+    }
+    
+    vector<int> SCCs;    // Variable numbers
+    ReversibleMonotonicSet SCCSplit;
+    // If !SCCSplit.isMember(anIndex) then anIndex is the last index in an SCC.
+    
+    //ReversibleMonotonicSet sparevaluespresent;
+    
+    D_DATA(MoveablePointer SCCSplit2);
+    
+    vector<int> varToSCCIndex;  // Mirror of the SCCs array.
+    
+    GacAlldiffConstraint(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
+        SCCSplit(_stateObj, _var_array.size())
     //sparevaluespresent(_stateObj, _var_array.size())
-  {
-      
+    {
       SCCs.resize(var_array.size());
       varToSCCIndex.resize(var_array.size());
       for(int i=0; i<var_array.size(); ++i)
@@ -133,17 +145,12 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       to_process.reserve(var_array.size());
       
       // Set up data structures
+      prev.resize(numvars+numvals, -1);
       initialize_hopcroft();
       initialize_tarjan();
       
-      // The matching in both directions.
-      
-      #ifndef BTMATCHING
-      varvalmatching.resize(numvars); // maps var to actual value
-      valvarmatching.resize(numvals); // maps val-dom_min to var.
-      #else
-      varvalmatching=getMemory(stateObj).backTrack().template requestArray<int>(numvars);
-      valvarmatching=getMemory(stateObj).backTrack().template requestArray<int>(numvals);
+      #ifdef NEWHK
+      hopcroft2_setup();
       #endif
       
       sccs_to_process.reserve(numvars);
@@ -152,7 +159,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       // that the values are all different in varvalmatching.
       // watches DS is used in alldiffgacslow and in debugging.
       #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
-      if(usewatches()) watches.resize(numvars);
+      if(UseWatches) watches.resize(numvars);
       #endif
       
       for(int i=0; i<numvars ; i++) //&& i<numvals
@@ -161,7 +168,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
           if(i<numvals) valvarmatching[i]=i;
           
           #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
-          if(usewatches()) watches[i].reserve(numvals, stateObj);
+          if(UseWatches) watches[i].reserve(numvals, stateObj);
           #endif
       }
       
@@ -176,9 +183,10 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     // First an array of watches for the matching, then a 2d array of mixed triggers
     // indexed by [var][count] where count is increased from 0 as the triggers are used.
     int numtrigs=0;
-    #ifdef INCGRAPH
-    numtrigs+=numvars*numvals; // one for each var-val pair so we know when it is removed.
-    #endif
+    if(UseIncGraph)
+    {
+        numtrigs+=numvars*numvals; // one for each var-val pair so we know when it is removed.
+    }
     
     #ifdef DYNAMICALLDIFF
     numtrigs+= numvars+numvars*numvals;
@@ -240,29 +248,16 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   vector<smallset_list_bt> watches;
   #endif
   
-  #ifdef USEWATCHES
-  inline bool usewatches()
-  {
-      return true;
-  }
-  #else
-  inline bool usewatches()
-  {
-      return false;
-  }
-  #endif
-  
-  
   virtual void propagate(int prop_var, DomainDelta)
   {
     D_ASSERT(prop_var>=0 && prop_var<var_array.size());
     
     // return if all the watches are still in place.
     #ifndef BTMATCHING 
-    if(usewatches() && !to_process.in(prop_var) 
+    if(UseWatches && !to_process.in(prop_var) 
         && var_array[prop_var].inDomain(varvalmatching[prop_var]))     // This still has to be here, because we still wake up if the matchingis broken.
     #else
-    if(usewatches() && !to_process.in(prop_var))
+    if(UseWatches && !to_process.in(prop_var))
     #endif
     {
         smallset_list_bt& watch = watches[prop_var];
@@ -314,7 +309,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             if(i!=prop_var && var_array[i].inDomain(assignedval))
             {
                 var_array[i].removeFromDomain(assignedval);
-                #ifdef INCGRAPH
+                #if UseIncGraph
                     adjlist_remove(i, assignedval);
                 #endif
             }
@@ -344,7 +339,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   
   virtual void propagate(DynamicTrigger* trig)
   {
-      #ifdef INCGRAPH
+      #if UseIncGraph
       DynamicTrigger* dtstart=dynamic_trigger_start();
       #ifdef DYNAMICALLDIFF
       dtstart+=numvars+numvars*numvals;
@@ -417,7 +412,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             if(i!=prop_var && var_array[i].inDomain(assignedval))
             {
                 var_array[i].removeFromDomain(assignedval);
-                #ifdef INCGRAPH
+                #if UseIncGraph
                     adjlist_remove(i, assignedval);
                 #endif
             }
@@ -653,7 +648,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                     {
                         P("Removing var: "<< SCCs[i] << " val:" << tempval);
                         var_array[SCCs[i]].removeFromDomain(tempval);
-                        #ifdef INCGRAPH
+                        #if UseIncGraph
                             adjlist_remove(SCCs[i], tempval);
                         #endif
                         if(getState(stateObj).isFailed()) return;
@@ -877,11 +872,13 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     var_indices.clear();
     for(int i=0; i<numvars; i++) var_indices.push_back(i);
     
-    tarjan_recursive(0);
+    if(numvars>0)
+        tarjan_recursive(0);
     
     return;
   }
   
+  /*
   inline bool greedymatch(int tempvar, int sccindex_start, int sccindex_end)
   {
     D_ASSERT(!var_array[tempvar].inDomain(varvalmatching[tempvar]));
@@ -941,6 +938,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     return true;
   }
+  */
   
   virtual BOOL full_check_unsat()
   { 
@@ -985,7 +983,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   
   virtual void full_propagate()
   { 
-      #ifdef INCGRAPH
+      #if UseIncGraph
         {
             // update the adjacency lists. and place dts
             DynamicTrigger* dt=dynamic_trigger_start();
@@ -1014,13 +1012,13 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         }
       #endif
       
-      #if defined(USEWATCHES) && defined(CHECKDOMSIZE)
+      #if UseWatches && defined(CHECKDOMSIZE)
       cout << "Watches and Quimper&Walsh's criterion do not safely co-exist." <<endl;
       FAIL_EXIT();
       #endif
       
-      #if defined(DYNAMICALLDIFF) && !defined(USEWATCHES)
-      cout << "watchedalldiff does not work if USEWATCHES is not defined." << endl;
+      #if defined(DYNAMICALLDIFF) && !UseWatches
+      cout << "watchedalldiff does not work if UseWatches is not defined true." << endl;
       FAIL_EXIT();
       #endif
       
@@ -1123,7 +1121,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       if(!matchok)
       {
           if(numvals<numvars) return false; // there can't be a matching.
-          #ifdef INCGRAPH
+          #if UseIncGraph
             // update the adjacency lists.
             for(int i=dom_min; i<=dom_max; i++)
             {
@@ -1203,16 +1201,6 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     //vector<int> iterationstack;
     vector<int> curnodestack;
     
-    #ifndef BTMATCHING
-    vector<int> varvalmatching; // For each var, give the matching value.
-    // valvarmatching is from val-dom_min to var.
-    vector<int> valvarmatching;   // need to set size somewhere.
-    // -1 means unmatched.
-    #else
-    MoveableArray<int> varvalmatching;
-    MoveableArray<int> valvarmatching;
-    #endif
-    
     // Filled in before calling tarjan's.
     bool scc_split;
     
@@ -1258,7 +1246,6 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     void tarjan_recursive(int sccindex_start)
     {
-        
         valinlocalmatching.clear();
         
         int localmax=var_array[var_indices[0]].getMax();
@@ -1275,7 +1262,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             valinlocalmatching.insert(varvalmatching[var_indices[i]]-dom_min);
         }
         
-        if(usewatches())
+        if(UseWatches)
         {
             for(int i=0; i<var_indices.size(); i++)
             {
@@ -1369,7 +1356,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         
         // Clear any extra watches.
         #ifdef DYNAMICALLDIFF
-        if(usewatches())
+        if(UseWatches)
         {
             for(int i=0; i<var_indices.size(); i++)
             {
@@ -1470,7 +1457,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             #endif
             
             int lowlinkvar=-1;
-            #ifndef INCGRAPH
+            #if !UseIncGraph
             for(int i=0; i<var_indices.size(); i++)
             {
                 int newnode=var_indices[i];
@@ -1481,7 +1468,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             #endif
                 if(varvalmatching[newnode]!=curnode-numvars+dom_min)   // if the value is not in the matching.
                 {
-                    #ifndef INCGRAPH
+                    #if !UseIncGraph
                     if(var_array[newnode].inDomain(curnode+dom_min-numvars))
                     #endif
                     {
@@ -1490,7 +1477,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                         if(!visited.in(newnode))
                         {
                             // set a watch
-                            if(usewatches())
+                            if(UseWatches)
                             {
                                 P("Adding DT for var " << newnode << " val " << curnode-numvars+dom_min);
                                 
@@ -1553,7 +1540,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             }
             
             // Where did the low link value come from? insert that edge into watches.
-            if(usewatches() && lowlinkvar!=-1)
+            if(UseWatches && lowlinkvar!=-1)
             {
                 P("Adding DT for var " << lowlinkvar << " val " << curnode-numvars+dom_min);
                 
@@ -1660,7 +1647,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                         if(var_array[curvar].inDomain(copynode+dom_min-numvars))
                                         {
                                             var_array[curvar].removeFromDomain(copynode+dom_min-numvars);
-                                            #ifdef INCGRAPH
+                                            #if UseIncGraph
                                                 adjlist_remove(curvar, copynode-numvars+dom_min);
                                             #endif
                                         }
@@ -1679,420 +1666,32 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         }
     }
     
-  // -------------------------Hopcroft-Karp algorithm -----------------------------
-  // Can be applied to a subset of var_array as required.
-  
-  // Each domain value has a label which is numvars+
-  
-  
-  // These two are for the valvar version of hopcroft.
-  smallset_nolist varinlocalmatching;    // indicates whether a var is recorded in localmatching.
-  smallset valinlocalmatching;
-  
-  //smallset varinlocalmatching;    // indicates whether a var is recorded in localmatching.
-  //smallset_nolist valinlocalmatching;
-  
-  
-  // Uprevious (pred) gives (for each CSP value) the value-dom_min
-  // it was matched to in the previous layer. If it was unmatched,
-  // -1 is used.
-  vector<int> uprevious;  // -2 means unset, -1 labelled unmatched. 
-  
-  vector<vector<int> > vprevious;  // map val-dom_min to vector of vars.
-  smallset_nolist invprevious;     // is there a mapping in vprevious for val? Allows fast unset.
-  
-  smallset layer;
-  smallset unmatched;   // contains vals-dom_min.
-  
-  vector<vector<int> > newlayer;
-  smallset innewlayer;
-  
-  void initialize_hopcroft()
-  {
-      // Initialize all datastructures to do with hopcroft-karp
-      // Surely could reduce the number of arrays etc used for hopcroft-karp??
-      int numvals=dom_max-dom_min+1;
-      
-      varinlocalmatching.reserve(numvars);
-      valinlocalmatching.reserve(numvals);
-      uprevious.resize(numvars, -2);
-      
-      vprevious.resize(numvals);
-      for(int i=0; i<numvals; ++i)
-      {
-          vprevious[i].reserve(numvars);
-      }
-      invprevious.reserve(numvals);
-      
-      layer.reserve(numvars);
-      unmatched.reserve(numvals);
-      
-      newlayer.resize(numvals);
-      for(int i=0; i<numvals; ++i)
-      {
-          newlayer[i].reserve(numvars);
-      }
-      innewlayer.reserve(numvals);
-      
-      // for BFS algorithm
-      prev.resize(numvars+numvals, -1);
-  }
-  
-  
-    
-// ------------------------- Hopcroft which takes start and end indices.
     
     inline bool matching_wrapper(int sccstart, int sccend)
     {
         #ifdef BFSMATCHING
         return bfs_wrapper(sccstart,sccend);
         #else
-        return hopcroft_wrapper(sccstart,sccend);
+        #ifdef NEWHK
+        // This is just to test the new HK implementation. 
+        // to use this, must not be using SCCs and must be using incgraph.
+        vector<int> upper;
+        upper.resize(numvals, 1);
+        vector<int> usage;
+        usage.resize(numvals, 0);
+        for(int i=0; i<numvars; i++)
+        {
+            if(varvalmatching[i]!=dom_min-1)
+            {
+                D_ASSERT(usage[varvalmatching[i]-dom_min]==0);
+                usage[varvalmatching[i]-dom_min]=1;
+            }
+        }
+        return hopcroft_wrapper2(SCCs, varvalmatching, upper, usage);
+        #else
+        return hopcroft_wrapper(sccstart,sccend, SCCs);
         #endif
-    }
-
-    inline bool hopcroft_wrapper(int sccstart, int sccend)
-    {
-        // Call hopcroft for the whole matching.
-        if(!hopcroft(sccstart, sccend))
-        {
-            // The constraint is unsatisfiable (no matching).
-            P("About to fail. Changed varvalmatching: "<< varvalmatching);
-            
-            // temporary mess to see if hopcroft is failing prematurely.
-            /*vector<int> t=varvalmatching;
-            vector<int> t2=valvarmatching;
-            if(bfs_wrapper(sccstart, sccend))
-            {
-                cout << "BFS fixed matching, but hopcroft did not!" <<endl;
-                cout << "hopcroft varvalmatching:"<< t<<endl;
-                cout << "hopcroft valvarmatching:"<< t2<<endl;
-                cout << "BFS varvalmatching:" << varvalmatching <<endl;
-                
-                {vector<int>& toiterate=valinlocalmatching.getlist();
-                    for(int j=0; j<toiterate.size(); j++)
-                    {
-                        int tempval=toiterate[j];
-                        t[t2[tempval]]=tempval+dom_min;
-                    }
-                }
-                cout << "copied back hopcroft varvalmatching:" << t <<endl;
-                
-                BOOL bfsflag=true, hopflag=true;
-                for(int scci=sccstart; scci<=sccend; scci++)
-                {
-                    if(!var_array[SCCs[scci]].inDomain(t[SCCs[scci]]))
-                        hopflag=false;
-                    if(!var_array[SCCs[scci]].inDomain(t[SCCs[scci]]))
-                        bfsflag=false;
-                }
-                cout << "hopcroft matching valid: "<< hopflag <<endl;
-                cout << "bfs matching valid: "<< bfsflag <<endl;
-            }*/
-            
-            for(int j=0; j<numvars; j++)
-            {
-                // Restore valvarmatching because it might be messed up by Hopcroft.
-                valvarmatching[varvalmatching[j]-dom_min]=j;
-            }
-            
-            getState(stateObj).setFailed(true);
-            return false;
-        }
-        
-        // Here, copy from valvarmatching to varvalmatching.
-        // Using valinlocalmatching left over from hopcroft.
-        // This must not be done when failing, because it might mess
-        // up varvalmatching for the next invocation.
-        {vector<int>& toiterate=valinlocalmatching.getlist();
-            for(int j=0; j<toiterate.size(); j++)
-            {
-                int tempval=toiterate[j];
-                varvalmatching[valvarmatching[tempval]]=tempval+dom_min;
-            }
-        }
-        return true;
-    }
-    
-    inline bool hopcroft(int sccstart, int sccend)
-    {
-        // Domain value convention:
-        // Within hopcroft and recurse,
-        // a domain value is represented as val-dom_min always.
-        
-        // Variables are always represented as their index in
-        // var_array. sccstart and sccend indicates which variables
-        // we are allowed to use here.
-        
-        int localnumvars=sccend-sccstart+1;
-        
-        // Construct the valinlocalmatching for this SCC, checking each val
-        // to see it's in the relevant domain.
-        valinlocalmatching.clear();
-        
-        for(int i=sccstart; i<=sccend; i++)
-        {
-            int tempvar=SCCs[i];
-            if(var_array[tempvar].inDomain(varvalmatching[tempvar]))
-            {
-                valinlocalmatching.insert(varvalmatching[tempvar]-dom_min);
-                // Check the two matching arrays correspond.
-                //D_ASSERT(valvarmatching[varvalmatching[tempvar]-dom_min]==tempvar);
-            }
-        }
-        
-        /*# initialize greedy matching (redundant, but faster than full search)
-        matching = {}
-        for u in graph:
-            for v in graph[u]:
-                if v not in matching:
-                    matching[v] = u
-                    break
-        */
-        
-        if(valinlocalmatching.size()==localnumvars)
-        {
-            return true;
-        }
-        
-        // uprevious == pred
-        // vprevious == preds
-        
-        // need sets u and v
-        // u is easy, v is union of domains[0..numvar-1]
-        
-        while(true)
-        {
-            /*
-            preds = {}
-            unmatched = []
-            pred = dict([(u,unmatched) for u in graph])
-            for v in matching:
-                del pred[matching[v]]
-            layer = list(pred)
-            */
-            // Set up layer and uprevious.
-            invprevious.clear();
-            unmatched.clear();
-            
-            layer.clear();
-            
-            // Reconstruct varinlocalmatching here.
-            // WHY end up with duplicates in valvarmatching here???????
-            // Because it's left over from a bad state when do_prop was last invoked, and failed.
-            varinlocalmatching.clear();
-            {
-                vector<int>& toiterate=valinlocalmatching.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
-                {
-                    if(!varinlocalmatching.in(valvarmatching[toiterate[i]]))   // This should not be conditional --BUG
-                        varinlocalmatching.insert(valvarmatching[toiterate[i]]);
-                }
-            }
-            
-            for(int i=sccstart; i<=sccend; ++i)
-            {
-                int tempvar=SCCs[i];
-                if(varinlocalmatching.in(tempvar))  // The only use of varinlocalmatching.
-                {
-                    uprevious[tempvar]=-2;   // Out of uprevious
-                }
-                else
-                {
-                    layer.insert(tempvar);
-                    uprevious[tempvar]=-1;  // In layer, and set to unmatched in uprevious.
-                }
-            }
-            
-            /*cout<< "Uprevious:" <<endl;
-            for(int i=0; i<localnumvars; ++i)
-            {
-                cout<< "for variable "<<var_indices[i]<<" value "<< uprevious[i]<<endl;
-            }*/
-            
-            // we have now calculated layer
-            /*
-            while layer and not unmatched:
-                newLayer = {}
-            */
-            
-            while(layer.size()!=0 && unmatched.size()==0)
-            {
-                innewlayer.clear();
-                
-                /*
-                for u in layer:
-                    for v in graph[u]:
-                        if v not in preds:
-                            newLayer.setdefault(v,[]).append(u)
-                */
-                {
-                vector<int>& toiterate=layer.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
-                {
-                    //cout<<"Layer item: "<<(*setit)<<endl;
-                    int tempvar=toiterate[i];
-                    for(DomainInt realval=var_array[tempvar].getMin(); realval<=var_array[tempvar].getMax(); realval++)
-                    {
-                        if(var_array[tempvar].inDomain(realval))
-                        {
-                            int tempval=realval-dom_min;
-                            
-                            if(!invprevious.in(tempval))  // if tempval not found in vprevious
-                            {
-                                if(!innewlayer.in(tempval))
-                                {
-                                    innewlayer.insert(tempval);
-                                    newlayer[tempval].clear();
-                                }
-                                newlayer[tempval].push_back(tempvar);
-                            }
-                        }
-                    }
-                }
-                }
-                /*
-                layer = []
-                for v in newLayer:
-                    preds[v] = newLayer[v]
-                    if v in matching:
-                        layer.append(matching[v])
-                        pred[matching[v]] = v
-                    else:
-                        unmatched.append(v)
-                */
-                
-                layer.clear();
-                
-                /*cout<<"Local matching state:"<<endl;
-                {
-                vector<int>& toiterate = valinlocalmatching.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
-                {
-                    int temp=toiterate[i];
-                    D_ASSERT(varinlocalmatching.in(localmatching[temp]));
-                    cout << "mapping "<< localmatching[temp] << " to value " << temp <<endl; 
-                }
-                }*/
-                
-                {
-                vector<int>& toiterate = innewlayer.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
-                {
-                    int tempval = toiterate[i]; // for v in newlayer.
-                    //cout << "Looping for value "<< tempval <<endl;
-                    
-                    D_ASSERT(innewlayer.in(tempval));
-                    // insert mapping in vprevious
-                    invprevious.insert(tempval);
-                    
-                    vprevious[tempval]=newlayer[tempval];  // This should be a copy???
-                    /*vprevious[tempval].resize(newlayer[tempval].size());
-                    for(int x=0; x<newlayer[tempval].size(); x++)
-                    {
-                        vprevious[tempval][x]=newlayer[tempval][x];
-                    }*/
-                    
-                    if(valinlocalmatching.in(tempval))
-                    {
-                        int match=valvarmatching[tempval];
-                        //cout << "Matched to variable:" << match << endl;
-                        layer.insert(match);
-                        uprevious[match]=tempval;
-                    }
-                    else
-                    {
-                        //cout<<"inserting value into unmatched:"<<tempval<<endl;
-                        unmatched.insert(tempval);
-                    }
-                }
-                }
-                
-                //cout << "At end of layering loop." << endl;
-            }
-            //cout << "Out of layering loop."<<endl;
-            // did we finish layering without finding any alternating paths?
-            // we do not need to calculate unlayered here.
-            /*
-            # did we finish layering without finding any alternating paths?
-            if not unmatched:
-                unlayered = {}
-                for u in graph:
-                    for v in graph[u]:
-                        if v not in preds:
-                            unlayered[v] = None
-                return (matching,list(pred),list(unlayered))
-            */
-            //cout << "Unmatched size:" << unmatched.size() << endl;
-            if(unmatched.size()==0)
-            {
-                //cout << "Size of matching:" << valinlocalmatching.size() << endl;
-                
-                if(valinlocalmatching.size()==localnumvars)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            
-            /*
-            for v in unmatched: recurse(v)
-            */
-            {
-            vector<int>& toiterate=unmatched.getlist();
-            for(int i=0; i<toiterate.size(); ++i)
-            {
-                int tempval=toiterate[i];
-                //cout<<"unmatched value:"<<tempval<<endl;
-                recurse(tempval);
-                //cout <<"Returned from recursion."<<endl;
-            }
-            }
-        }
-        return false;
-    }
-    
-    
-    bool recurse(int val)
-    {
-        // Again values are val-dom_min in this function.
-        // Clearly this should be turned into a loop.
-        //cout << "Entering recurse with value " <<val <<endl;
-        if(invprevious.in(val))
-        {
-            vector<int>& listvars=vprevious[val];  //L
-            
-            // Remove the value from vprevious.
-            invprevious.remove(val);
-            
-            for(int i=0; i<listvars.size(); ++i)  //for u in L
-            {
-                int tempvar=listvars[i];
-                int pu=uprevious[tempvar];
-                if(pu!=-2)   // if u in pred:
-                {
-                    uprevious[tempvar]=-2;
-                    //cout<<"Variable: "<<tempvar<<endl;
-                    if(pu==-1 || recurse(pu))
-                    {
-                        //cout << "Setting "<< tempvar << " to " << val <<endl;
-                        
-                        if(!valinlocalmatching.in(val))  // If we are not replacing a mapping
-                        {
-                            valinlocalmatching.insert(val);
-                        }
-                        
-                        valvarmatching[val]=tempvar;
-                        //varvalmatching[tempvar]=val+dom_min;  // This will be 
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        #endif
     }
     
     // BFS alternative to hopcroft. --------------------------------------------
@@ -2158,7 +1757,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                     { // it's a variable
                         // put all corresponding values in the fifo. 
                         // Need to check if we are completing an even alternating path.
-                        #ifndef INCGRAPH
+                        #if !UseIncGraph
                         for(int val=var_array[curnode].getMin(); val<=var_array[curnode].getMax(); val++)
                         {
                         #else
@@ -2167,7 +1766,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                             int val=adjlist[curnode][vali];
                         #endif
                             if(val!=varvalmatching[curnode]
-                            #ifndef INCGRAPH
+                            #if !UseIncGraph
                                 && var_array[curnode].inDomain(val)
                             #endif
                                 )
@@ -2239,7 +1838,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                         int stackval=curnode+dom_min-numvars;
                         int vartoqueue=-1;
                         D_DATA(bool found=false);
-                        #ifndef INCGRAPH
+                        #if !UseIncGraph
                         for(int scci=sccstart; scci<=sccend; scci++)
                         {
                             vartoqueue=SCCs[scci];
@@ -2249,7 +1848,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                             vartoqueue=adjlist[curnode][vartoqueuei];
                         #endif
                             if(varvalmatching[vartoqueue]==stackval
-                                #ifndef INCGRAPH
+                                #if !UseIncGraph
                                 && var_array[vartoqueue].inDomain(stackval)
                                 #endif
                                 )
