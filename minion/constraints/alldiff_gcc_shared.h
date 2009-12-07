@@ -894,6 +894,7 @@ struct FlowConstraint : public AbstractConstraint
         
         // a value node with cap>1 will only appear in one layer, 
         // but the DFS is allowed to visit it multiple times.
+        // The DFS is not allowed to traverse an edge more than once.
         
         // darn, does the DFS visit nodes it is not supposed to?
         
@@ -980,10 +981,6 @@ struct FlowConstraint : public AbstractConstraint
                     fifo.pop_front();
                     // curnode is a value
                     // next layer is variables, following matching edges.
-                    // darn, need inverse matching here!
-                    // oh well, not having the inverse matching only adds a 
-                    // factor of 2 to the O.
-                    
                     for(int i=0; i<adjlistlength[curnode]; i++)
                     {
                         int var=adjlist[curnode][i];
@@ -1039,6 +1036,8 @@ struct FlowConstraint : public AbstractConstraint
     }
     
     // return value indicates whether an augmenting path was found.
+    // DFS can visit a value vertex multiple times up to upper-usage,
+    // but can only use an edge once.
     bool dfs_hopcroft2(vector<int>& augpath, vector<int>& upper, vector<int>& usage, vector<int>& matching, vector<vector<int> >& edges)
     {
         int var=augpath.back();

@@ -39,17 +39,22 @@
 #define SPECIALQUEUE
 
 // should be called dynamic partitioning
-#define SCC
+//#define SCC
 
 #define INCREMENTALMATCH
 
-#define SCCCARDS
+//#define SCCCARDS
 
 //Incremental graph -- maintains adjacency lists for values and vars
 #define UseIncGraph true
 
 // Does not trigger itself if this is on, and incgraph is on.
 #define ONECALL
+
+// When using Regin's algorithm, in the Ford-Fulkerson algorithm, use the
+// transpose graph in the second stage (to complete the matching within upper 
+// bounds).
+#define UseTranspose false
 
 // use the algorithm from Quimper et al. to prune the target variables.
 // requires UseIncGraph and not SCC
@@ -1069,108 +1074,221 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         
         GCCPRINT("feasible matching (respects lower & upper bounds):"<<varvalmatching);
         
-        // Flip the graph around, so it's like the alldiff case now. 
-        // follow an edge in the matching from a value to a variable,
-        // follow edges not in the matching from variables to values. 
-        
-        for(int startvarscc=0; startvarscc<vars_in_scc.size(); startvarscc++)
+        if(UseTranspose)
         {
-            int startvar=vars_in_scc[startvarscc];
-            if(varvalmatching[startvar]==dom_min-1)
+            // Flip the graph around, so it's like the alldiff case now. 
+            // follow an edge in the matching from a value to a variable,
+            // follow edges not in the matching from variables to values. 
+            for(int startvarscc=0; startvarscc<vars_in_scc.size(); startvarscc++)
             {
-                GCCPRINT("Searching for augmenting path for var: " << startvar);
-                fifo.clear();  // this should be constant time but probably is not.
-                fifo.push_back(startvar);
-                visited.clear();
-                visited.insert(startvar);
-                bool finished=false;
-                while(!fifo.empty() && !finished)
+                int startvar=vars_in_scc[startvarscc];
+                if(varvalmatching[startvar]==dom_min-1)
                 {
-                    // pop a vertex and expand it.
-                    int curnode=fifo.front();
-                    fifo.pop_front();
-                    GCCPRINT("Popped vertex " << (curnode<numvars? "(var)":"(val)") << (curnode<numvars? curnode : curnode+dom_min-numvars ));
-                    if(curnode<numvars)
-                    { // it's a variable
-                        // follow all edges other than the matching edge. 
-                        #if !UseIncGraph
-                        for(int valtoqueue=var_array[curnode].getMin(); valtoqueue<=var_array[curnode].getMax(); valtoqueue++)
-                        {
-                        #else
-                        for(int valtoqueuei=0; valtoqueuei<adjlistlength[curnode]; valtoqueuei++)
-                        {
-                            int valtoqueue=adjlist[curnode][valtoqueuei];
-                        #endif
-                            // For each value, check if it terminates an odd alternating path
-                            // and also queue it if it is suitable.
-                            int validx=valtoqueue-dom_min+numvars;
-                            if(valtoqueue!=varvalmatching[curnode]
+                    GCCPRINT("Searching for augmenting path for var: " << startvar);
+                    fifo.clear();  // this should be constant time but probably is not.
+                    fifo.push_back(startvar);
+                    visited.clear();
+                    visited.insert(startvar);
+                    bool finished=false;
+                    while(!fifo.empty() && !finished)
+                    {
+                        // pop a vertex and expand it.
+                        int curnode=fifo.front();
+                        fifo.pop_front();
+                        GCCPRINT("Popped vertex " << (curnode<numvars? "(var)":"(val)") << (curnode<numvars? curnode : curnode+dom_min-numvars ));
+                        if(curnode<numvars)
+                        { // it's a variable
+                            // follow all edges other than the matching edge. 
                             #if !UseIncGraph
-                                && var_array[curnode].inDomain(valtoqueue)
-                            #endif
-                                && !visited.in(validx) )
+                            for(int valtoqueue=var_array[curnode].getMin(); valtoqueue<=var_array[curnode].getMax(); valtoqueue++)
                             {
-                                //D_ASSERT(find(vals_in_scc.begin(), vals_in_scc.end(), valtoqueue)!=vals_in_scc.end()); // the value is in the scc.
-                                // Does this terminate an augmenting path?
-                                if(usage[valtoqueue-dom_min]<upper[valtoqueue-dom_min])
+                            #else
+                            for(int valtoqueuei=0; valtoqueuei<adjlistlength[curnode]; valtoqueuei++)
+                            {
+                                int valtoqueue=adjlist[curnode][valtoqueuei];
+                            #endif
+                                // For each value, check if it terminates an odd alternating path
+                                // and also queue it if it is suitable.
+                                int validx=valtoqueue-dom_min+numvars;
+                                if(valtoqueue!=varvalmatching[curnode]
+                                #if !UseIncGraph
+                                    && var_array[curnode].inDomain(valtoqueue)
+                                #endif
+                                    && !visited.in(validx) )
                                 {
-                                    // valtoqueue terminates an alternating path.
-                                    // Unwind and apply the path here
+                                    //D_ASSERT(find(vals_in_scc.begin(), vals_in_scc.end(), valtoqueue)!=vals_in_scc.end()); // the value is in the scc.
+                                    // Does this terminate an augmenting path?
+                                    if(usage[valtoqueue-dom_min]<upper[valtoqueue-dom_min])
+                                    {
+                                        // valtoqueue terminates an alternating path.
+                                        // Unwind and apply the path here
+                                        prev[validx]=curnode;
+                                        apply_augmenting_path_reverse(validx, startvar);
+                                        finished=true;
+                                        break;  // get out of for loop
+                                    }
+                                    else
+                                    {
+                                        // queue valtoqueue
+                                        visited.insert(validx);
+                                        prev[validx]=curnode;
+                                        fifo.push_back(validx);
+                                    }
+                                }
+                            }  // end for.
+                        }
+                        else
+                        { // popped a value from the stack.
+                            D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
+                            int stackval=curnode+dom_min-numvars;
+                            #if !UseIncGraph
+                            for(int vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
+                            {
+                                int vartoqueue=vars_in_scc[vartoqueuescc];
+                            #else
+                            for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
+                            {
+                                int vartoqueue=adjlist[curnode][vartoqueuei];
+                            #endif
+                                // For each variable which is matched to stackval, queue it.
+                                if(!visited.in(vartoqueue)
+                                    && varvalmatching[vartoqueue]==stackval)
+                                {
+                                    D_ASSERT(var_array[vartoqueue].inDomain(stackval));
+                                    // there is an edge from stackval to vartoqueue.
+                                    // queue vartoqueue
+                                    visited.insert(vartoqueue);
+                                    prev[vartoqueue]=curnode;
+                                    fifo.push_back(vartoqueue);
+                                }
+                            }  // end for.
+                        }  // end value
+                    }  // end while
+                    if(!finished)
+                    {   // no augmenting path found
+                        GCCPRINT("No augmenting path found.");
+                        // restore the matching to its state before the algo was called.
+                        //varvalmatching=matchbac;   // no need for this.
+                        //usage=usagebac;
+                        return false;
+                    }
+                }
+            }
+            GCCPRINT("maximum matching:" << varvalmatching);
+            return true;
+        }
+        else  
+        {   // Do not use the transpose graph.
+            // Graph is oriented s -> values -> variables -> t
+            // Follow a matching edge from variable to value. 
+            // Follow edges not in the matching from values to variables.
+            // iterate through the values looking for ones which are below their lower capacity bound. 
+            
+            // First count unmatched.
+            int unmatched=0;
+            for(int varidx=0; varidx<vars_in_scc.size(); varidx++)
+            {
+                if(matching[vars_in_scc[varidx]]==dom_min-1)
+                    unmatched++;
+            }
+            
+            for(int startvalsccindex=0; startvalsccindex<vals_in_scc.size(); startvalsccindex++)
+            {
+                int startvalindex=vals_in_scc[startvalsccindex]-dom_min;
+                while(usage[startvalindex]<upper[startvalindex])
+                {
+                    // usage of val may increase. Construct an augmenting path starting at val.
+                    GCCPRINT("Searching for augmenting path for val: " << startvalindex+dom_min);
+                    // Matching edge lost; BFS search for augmenting path to fix it.
+                    fifo.clear();  // this should be constant time but probably is not.
+                    fifo.push_back(startvalindex+numvars);
+                    visited.clear();
+                    visited.insert(startvalindex+numvars);
+                    bool finished=false;
+                    while(!fifo.empty() && !finished)
+                    {
+                        // pop a vertex and expand it.
+                        int curnode=fifo.front();
+                        fifo.pop_front();
+                        GCCPRINT("Popped vertex " << (curnode<numvars? "(var)":"(val)") << (curnode<numvars? curnode : curnode+dom_min-numvars ));
+                        if(curnode<numvars)
+                        { // it's a variable
+                            // follow the matching edge, if there is one.
+                            int valtoqueue=varvalmatching[curnode];
+                            if(valtoqueue!=dom_min-1 
+                                && !visited.in(valtoqueue-dom_min+numvars))
+                            {
+                                D_ASSERT(var_array[curnode].inDomain(valtoqueue));
+                                int validx=valtoqueue-dom_min+numvars;
+                                if(usage[valtoqueue-dom_min]>lower[valtoqueue-dom_min])
+                                {
+                                    // can reduce the flow of valtoqueue to increase startval.
                                     prev[validx]=curnode;
-                                    apply_augmenting_path_reverse(validx, startvar);
+                                    apply_augmenting_path(validx, startvalindex+numvars);
                                     finished=true;
-                                    break;  // get out of for loop
+                                    unmatched--;
                                 }
                                 else
                                 {
-                                    // queue valtoqueue
                                     visited.insert(validx);
                                     prev[validx]=curnode;
                                     fifo.push_back(validx);
                                 }
                             }
-                        }  // end for.
-                    }
-                    else
-                    { // popped a value from the stack.
-                        D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
-                        int stackval=curnode+dom_min-numvars;
-                        #if !UseIncGraph
-                        for(int vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
-                        {
-                            int vartoqueue=vars_in_scc[vartoqueuescc];
-                        #else
-                        for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
-                        {
-                            int vartoqueue=adjlist[curnode][vartoqueuei];
-                        #endif
-                            // For each variable which is matched to stackval, queue it.
-                            if(!visited.in(vartoqueue)
-                                && varvalmatching[vartoqueue]==stackval)
+                        }
+                        else
+                        { // popped a value from the stack.
+                            D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
+                            int stackval=curnode+dom_min-numvars;
+                            #if !UseIncGraph
+                            for(int vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
                             {
-                                D_ASSERT(var_array[vartoqueue].inDomain(stackval));
-                                // there is an edge from stackval to vartoqueue.
-                                // queue vartoqueue
-                                visited.insert(vartoqueue);
-                                prev[vartoqueue]=curnode;
-                                fifo.push_back(vartoqueue);
-                            }
-                        }  // end for.
-                    }  // end value
-                }  // end while
-                if(!finished)
-                {   // no augmenting path found
-                    GCCPRINT("No augmenting path found.");
-                    // restore the matching to its state before the algo was called.
-                    //varvalmatching=matchbac;   // no need for this.
-                    //usage=usagebac;
-                    return false;
-                }
-            }
-        }
-        
-        GCCPRINT("maximum matching:" << varvalmatching);
-        return true;
+                                int vartoqueue=vars_in_scc[vartoqueuescc];
+                            #else
+                            for(int vartoqueuei=0; vartoqueuei<adjlistlength[stackval-dom_min+numvars]; vartoqueuei++)
+                            {
+                                int vartoqueue=adjlist[stackval-dom_min+numvars][vartoqueuei];
+                            #endif
+                                // For each variable, check if it terminates an odd alternating path
+                                // and also queue it if it is suitable.
+                                if(!visited.in(vartoqueue)
+                                    #if !UseIncGraph
+                                    && var_array[vartoqueue].inDomain(stackval)
+                                    #endif
+                                    && varvalmatching[vartoqueue]!=stackval)   // Need to exclude the matching edges????
+                                {
+                                    // there is an edge from stackval to vartoqueue.
+                                    if(varvalmatching[vartoqueue]==dom_min-1)
+                                    {
+                                        // vartoqueue terminates an odd alternating path.
+                                        // Unwind and apply the path here
+                                        prev[vartoqueue]=curnode;
+                                        apply_augmenting_path(vartoqueue, startvalindex+numvars);
+                                        finished=true;
+                                        unmatched--;
+                                        break;  // get out of for loop
+                                    }
+                                    else
+                                    {
+                                        // queue vartoqueue
+                                        visited.insert(vartoqueue);
+                                        prev[vartoqueue]=curnode;
+                                        fifo.push_back(vartoqueue);
+                                    }
+                                }
+                            }  // end for.
+                        }  // end value
+                    }  // end while
+                    if(unmatched==0)
+                    {
+                        return true;  // We have a complete matching.
+                    }
+                }  // end while below lower bound.
+            } // end for each value
+            D_ASSERT(unmatched>0);
+            return false;  // If we got to here, we have iterated through
+            // all values and not completed the matching.
+        } // End of !UseTranspose
     }
     
     inline void apply_augmenting_path(int unwindnode, int startnode)
