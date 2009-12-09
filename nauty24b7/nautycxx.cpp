@@ -1,6 +1,7 @@
 #include "nausparse.h"    /* which includes nauty.h */
 #include <vector>
 #include <set>
+#include <cassert>
 
 // This following file provides a C++ wrapper around nauty,
 // Developed by Christopher Jefferson, (c) 2009
