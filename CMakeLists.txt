@@ -134,7 +134,7 @@ endif()
 
 set(BOOST_COMPONENTS iostreams)
 
-option(NAUTY "" OFF)
+option(NAUTY "" ON)
 if(NAUTY)
   message(STATUS "Please be naughty")
   add_definitions(-DUSE_NAUTY)
