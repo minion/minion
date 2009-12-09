@@ -54,7 +54,7 @@
 // When using Regin's algorithm, in the Ford-Fulkerson algorithm, use the
 // transpose graph in the second stage (to complete the matching within upper 
 // bounds).
-#define UseTranspose false
+#define UseTranspose true
 
 // use the algorithm from Quimper et al. to prune the target variables.
 // requires UseIncGraph and not SCC
@@ -1003,7 +1003,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                             int validx=valtoqueue-dom_min+numvars;
                             if(usage[valtoqueue-dom_min]>lower[valtoqueue-dom_min])
                             {
-                                // can reduce the flow of valtoqueue to increase startval.
+                                // can reduce the flow of valtoqueue to increase startval. 
+                                // This is a circular path back to S.
                                 prev[validx]=curnode;
                                 apply_augmenting_path(validx, startvalindex+numvars);
                                 finished=true;
@@ -1188,10 +1189,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             int unmatched=0;
             for(int varidx=0; varidx<vars_in_scc.size(); varidx++)
             {
-                if(matching[vars_in_scc[varidx]]==dom_min-1)
+                if(varvalmatching[vars_in_scc[varidx]]==dom_min-1)
                     unmatched++;
             }
-            
+            if(unmatched==0)
+                return true;  // matching already complete.
             for(int startvalsccindex=0; startvalsccindex<vals_in_scc.size(); startvalsccindex++)
             {
                 int startvalindex=vals_in_scc[startvalsccindex]-dom_min;
@@ -1220,20 +1222,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                             {
                                 D_ASSERT(var_array[curnode].inDomain(valtoqueue));
                                 int validx=valtoqueue-dom_min+numvars;
-                                if(usage[valtoqueue-dom_min]>lower[valtoqueue-dom_min])
-                                {
-                                    // can reduce the flow of valtoqueue to increase startval.
-                                    prev[validx]=curnode;
-                                    apply_augmenting_path(validx, startvalindex+numvars);
-                                    finished=true;
-                                    unmatched--;
-                                }
-                                else
-                                {
-                                    visited.insert(validx);
-                                    prev[validx]=curnode;
-                                    fifo.push_back(validx);
-                                }
+                                visited.insert(validx);
+                                prev[validx]=curnode;
+                                fifo.push_back(validx);
                             }
                         }
                         else
@@ -1266,6 +1257,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                                         apply_augmenting_path(vartoqueue, startvalindex+numvars);
                                         finished=true;
                                         unmatched--;
+                                        if(unmatched==0)
+                                            return true;   // The matching has been completed
                                         break;  // get out of for loop
                                     }
                                     else
@@ -1279,11 +1272,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                             }  // end for.
                         }  // end value
                     }  // end while
-                    if(unmatched==0)
+                    if(!finished)
                     {
-                        return true;  // We have a complete matching.
+                        // No augmenting path found for startval, so jump out of the loop
+                        break;
                     }
-                }  // end while below lower bound.
+                }  // end while below upper bound.
             } // end for each value
             D_ASSERT(unmatched>0);
             return false;  // If we got to here, we have iterated through
