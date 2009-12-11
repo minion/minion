@@ -1,0 +1,20 @@
+MINION 3
+#TEST CHECKONESOL 1 1
+#This just sanity checks a number of powers
+
+**VARIABLES**
+
+DISCRETE b[2] {0..2}
+
+
+**SEARCH**
+
+VARORDER SDF [b]
+VALORDER [a,a]
+
+**CONSTRAINTS**
+
+diseq(b[1], 0)
+sumgeq( b, 2)
+
+**EOF**

@@ -1,0 +1,67 @@
+\documentclass{article}
+
+\usepackage{xspace}
+
+\newcommand{\BOOL}{\texttt{BOOL}\xspace}
+\newcommand{\DISCRETE}{\texttt{DISCRETE}\xspace}
+\newcommand{\BOUND}{\texttt{BOUND}\xspace}
+\newcommand{\SPARSEBOUND}{\texttt{SPARSEBOUND}\xspace}
+
+
+\begin{document}
+
+\section{Minion Internals}
+
+This chapter explains several details about Minion's internals, which are useful to know when trying to get the most from Minion.
+
+\subsection{Variable Types}
+
+Minion's input language is purposefully designed to map exactly to Minion's internals. Unlike most other constraint solvers, Minion does not internally add extra variables and decompose large complex constraints into small parts. This provides complete control over how problems are implemented inside Minion, but also requires understanding how Minion works to get the best results.
+
+For those who, quite reasonably, do not wish to get involved in such details, 'Tailor' abstracts away from these details, and also internally implements a number of optimisations.
+
+One of the most immediately confusing features of Minion are the variable types. Rather than try to provide a "one-size-fits-all" variable implementation, Minion provides four different ones; \BOOL, \DISCRETE, \BOUND and \SPARSEBOUND.  First we shall provide a brief discussion of both what these variables are, and a brief discussion of how they are implemented currently.
+
+\begin{description}
+\item[\BOOL] Variables with domain \(\{0,1\}\). Uses special optimised data structure.
+\item[\DISCRETE] Variables whose domain is a range of integers. Memory usage and the worst-case performance of most operations is O(domain size). Allows any subset of the domain to be represented.
+\item[\BOUND] Variable whose domain is a range of integers. Memory usage and the worst-case performance of all operations is O(1). During search, the domain can only be reduced by changing one of the bounds.
+\item[\SPARSEBOUND] Variable whose domain is an arbitary range of integers. Otherwise identical to BOUND.
+\end{description}
+
+It appears one obvious variable implementation, \texttt{SPARSEDISCRETE}, is missing. This did exist in some very early versions of Minion but due to bugs and lack of use was removed. 
+
+Some of the differences between the variable types only effect performance, whereas some others can effect search size. We provide these here.
+
+\begin{enumerate}
+\item In any problem, changing a \BOOL variable to a \DISCRETE, \BOUND or \SPARSEBOUND variable with domain \(\{0,1\}\) should not change the size of the resulting search. \BOOL should always be fastest, followed by \DISCRETE, \BOUND and \SPARSEBOUND.
+
+\item A \BOUND variable will in general produce a search with more nodes per second, but more nodes overall, than a \DISCRETE variable.
+
+\item Using \SPARSEBOUND or \BOUND variables with a unary constraint imposing the sparse domain should produce identical searches, except the \SPARSEBOUND will be faster if the domain is sparse. 
+\end{enumerate}
+
+As a basic rule of thumb, Always use \BOOL for Boolean domains, \DISCRETE for domains of size up to around 100, and the \BOUND. With \DISCRETE domains, use the \texttt{w-inset} constraint to limit the domain. When to use \SPARSEBOUND over \BOUND is harder, but usually the choice is clear, as either the domain will be a range, or a set like \(\{1,10,100,100\}\).
+
+\subsection{Compile Time Options}
+
+There are a number of flags which can be given to Minion at compile time to effect the resulting executable. These flags are prone to regular changes. By searching the Minion source code, you may find others. These undocumented ones are prone to breakage without warning.
+
+The following flags are considered "blessed", and are fully tested (although in future versions they may be removed or altered). Adding any of these flags (except BOOST) will probably slow the resulting Minion executable.
+
+\begin{description}
+\item[NAME=``name":] Overrides Minion's default and names the executable 'name'.
+\item[DEBUG=1:] Turns on a large number of internal consistency checks in minion. This executable is much slower than normal minion, but vital when trying to debug problems.
+\item[QUICK=1:] For optimisation reasons, Minion usually compiles many copies of every constraint. This flag makes Minion compile each constraint only once. This drastically reduces the time to compile and the size of the executable, but the resulting executable is slower. This should never effect the results Minion produces.
+\item[INFO=1:] Makes minion output a large, but poorly documented, set of information about how search is progressing. This flag is useful for debugging but should not be used for trying to following search (use the command line flag -dumptree instead). This option is likely to be replaced with a more useful dump of search in a future version of Minion.
+\item[UNOPTIMISED=1:] Turn off all compiler optimisation, so Minion can be usefully checked in gdb.
+\item[PROFILE=1:] Set compiler optimisation flags that allow Minion to be better profiled.
+\item[REENTER=1:] Compile Minion so it is reenterent (more than one problem can exist in memory at a time). At present reenterence is not used for anything, and will only slightly slow Minion.
+\item[BOOST=1:] Use the 'Boost' library to allow compressed input files. This flag is normally configured by the configure script.
+\end{description}
+
+There is also a method of passing any flag to either the compiler and Minion, using MYFLAGS="<my flags>". Any g++ flag can be given here, some of which may speed up Minion. The only flag which is tested which can be given here is MYFLAGS="-DWEG", which compiles Minion with support for the 'wdeg' variable heuristic. This is not activated by default because it slows down Minion even when it it not in use.
+
+
+
+\end{document}
