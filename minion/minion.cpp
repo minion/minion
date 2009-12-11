@@ -428,11 +428,25 @@ try {
   
   if(getOptions(stateObj).instance_stats)
   {
-      InstanceStats s(instance); 
+      InstanceStats s(instance, stateObj); 
       s.output_stats();
+      
+      // Do the minimal amount of setting up to create the constraint objects.
+      getState(stateObj).setTupleListContainer(instance.tupleListContainer);
+      BuildCon::build_variables(stateObj, instance.vars);
+      
+      // Create Constraints
+      vector<AbstractConstraint*> cons;
+      while(!instance.constraints.empty())
+      {
+         cons.push_back(build_constraint(stateObj, instance.constraints.front()));
+         instance.constraints.pop_front();
+      }
+      
+      s.output_stats_tightness(cons);
       exit(0);
   }
-
+  
   if(getOptions(stateObj).redump)
   {
     MinionInstancePrinter printer(instance);

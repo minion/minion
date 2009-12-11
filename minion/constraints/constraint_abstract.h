@@ -34,6 +34,8 @@
   help variables
 */
 
+#include <cstdlib>
+
 #ifndef ABSTRACT_CONSTRAINT_H
 #define ABSTRACT_CONSTRAINT_H
 
@@ -229,6 +231,29 @@ public:
     {
       (*it)->post_trigger();
     }
+  }
+  
+  int getTightnessEstimate()
+  {
+      // Make 1000 random tuples and see if they satisfy the constraint
+      vector<AnyVarRef> vars=get_vars();
+      DomainInt* t=new DomainInt[vars.size()];
+      int unsatcounter=0;
+      srand(12345);
+      for(int i=0; i<1000; i++)
+      {
+          for(int j=0; j<vars.size(); j++)
+          {
+              int dsize=vars[j].getInitialMax()-vars[j].getInitialMin()+1;
+              t[j]=(rand()%dsize)+vars[j].getInitialMin();
+          }
+          if(!check_assignment(t, vars.size()))
+          {
+              unsatcounter++;
+          }
+      }
+      delete[] t;
+      return unsatcounter;   // return tightness i.e. #forbidden tuples out of 1000
   }
 };
 
