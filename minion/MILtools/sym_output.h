@@ -670,8 +670,9 @@ struct GraphBuilder
 struct InstanceStats
 {
   CSPInstance& csp;
+  StateObj* stateObj;
   
-  InstanceStats(CSPInstance& _csp) : csp(_csp)
+  InstanceStats(CSPInstance& _csp, StateObj* _stateObj) : csp(_csp), stateObj(_stateObj)
   { }
   
   void output_stats()
@@ -835,66 +836,69 @@ struct InstanceStats
       cout << s << "unary_count:" << unary << endl;
       cout << s << "unary_proportion:" << ((double)unary)/(double)c.size() << endl;
       
+      // Count the number of pairs of constraints that overlap by two or more
+      // variables.
       int count_2_overlaps=0;
-
+      
       vector<vector<Var> > var_sets;
-
+      
       for(list<ConstraintBlob>::iterator i = c.begin(); i != c.end(); ++i)
       {
         set<Var> v = find_all_vars(*i);
         var_sets.push_back(vector<Var>(v.begin(), v.end()));
       }
-
+      
       vector<Var> inter;
       for(int i = 0; i < var_sets.size(); ++i) 
       {
-          for(int j = 0; j < var_sets.size(); ++j)
+          for(int j = i+1; j < var_sets.size(); ++j)
           {
-              if(j!=i)  // can't say i+1 above.
+              inter.clear();
+              
+              if(!( !var_sets[i].empty() && !var_sets[j].empty() &&  ((var_sets[i].back() < var_sets[j].front()) || (var_sets[j].back() < var_sets[i].front()))))
+                set_intersection(var_sets[i].begin(), var_sets[i].end(), var_sets[j].begin(), var_sets[j].end(), back_inserter(inter));
+              if(inter.size()>=2)
               {
-                  inter.clear();
-                  
-                  if(!( !var_sets[i].empty() && !var_sets[j].empty() &&  ((var_sets[i].back() < var_sets[j].front()) || (var_sets[j].back() < var_sets[i].front()))))
-                    set_intersection(var_sets[i].begin(), var_sets[i].end(), var_sets[j].begin(), var_sets[j].end(), back_inserter(inter));
-                  if(inter.size()>=2)
-                  {
-                      count_2_overlaps++;
-                  }
+                  count_2_overlaps++;
               }
           }
       }
       
       int conspairs=((double)(c.size()*(c.size()-1)))/2.0;
       
+      // proportion of pairs of constraints that share two or more variables.
       cout << s << "multi_shared_vars:" << ((double)count_2_overlaps)/conspairs <<endl;
-
+      
       GraphBuilder graph(csp);
-      cout << s << "Local_Variance: " << partition_graph(graph.g.build_graph_info(csp, false));
+      cout << s << "Local_Variance: " << partition_graph(graph.g.build_graph_info(csp, false)) << endl;
       
   }
   
-  // pretend each top-level constraint is just one constraint (i.e. no constraint trees)
-  // naive arity count that eliminates repeated variables but 
-  // counts constants in place of variables as variables.
+  void output_stats_tightness(vector<AbstractConstraint*> cons)
+  {
+      vector<int> tightness;
+      string s("stats_");
+      for(int i=0; i<cons.size(); i++)
+      {
+          tightness.push_back(cons[i]->getTightnessEstimate());
+      }
+      std::sort(tightness.begin(), tightness.end());
+      
+      cout << s << "tightness_0:" << tightness[0] <<endl;
+      cout << s << "tightness_25:" << tightness[tightness.size()/4] <<endl;
+      cout << s << "tightness_50:" << tightness[tightness.size()/2] <<endl;
+      cout << s << "tightness_75:" << tightness[(tightness.size()*3)/4] <<endl;
+      cout << s << "tightness_100:" << tightness.back() <<endl;
+      
+      int totaltightness=std::accumulate(tightness.begin(), tightness.end(), 0);
+      cout << s << "tightness_mean:" << ((double)totaltightness)/(double) tightness.size() << endl;
+  }
+  
   int arity(ConstraintBlob& ct)
   {
       return find_all_vars(ct).size();
-          
-      /*    
-      int count=0;
-      for(int i=0; i< ct.vars.size(); i++)
-      {
-          count=count+ct.vars[i].size();
-      }
-      // sub-constraints
-      for(int i=0; i<ct.internal_constraints.size(); i++)
-      {
-          count=count+arity(ct.internal_constraints[i]);
-      }
-      return count;*/
   }
   
-  // counts constants as vars still.
   set<Var> find_all_vars(ConstraintBlob& ct)
   {
       set<Var> t2;
@@ -916,6 +920,19 @@ struct InstanceStats
       }
       
       // filter out constants here.
+      for(set<Var>::iterator i=t2.begin(); i!=t2.end(); )
+      {
+          if((*i).type() == VAR_CONSTANT)
+          {
+              set<Var>::iterator prev=i;
+              i++;
+              t2.erase(prev);
+          }
+          else
+          {
+              i++;
+          }
+      }
       
       return t2;
   }
