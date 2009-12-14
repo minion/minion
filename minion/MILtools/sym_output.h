@@ -435,8 +435,7 @@ struct GraphBuilder
   // The first array can be permuted, if the same permutation is applied to the second array.
   string colour_symmetric_indexes(const ConstraintBlob& b, string name)
   {
-    D_ASSERT(b.vars[0].size() == b.vars[1].size());
-
+   
     string v = g.new_vertex(name + "_MASTER");
     
     for(int i = 0; i < b.vars[0].size(); ++i)
@@ -461,12 +460,11 @@ struct GraphBuilder
     
     return v;
   }
-  
+
   // The first array can be permuted, if the same permutation is applied to the second array.
   string colour_weighted_sum(const ConstraintBlob& b, string name)
   {
     D_ASSERT(b.vars[0].size() == b.constants[0].size());
-
 
     string v = g.new_vertex(name + "_MASTER");
     
@@ -490,6 +488,52 @@ struct GraphBuilder
       add_edge(v, vi);
     }  
     return v;
+  }
+
+  string colour_lit(const ConstraintBlob& b, string name)
+  {
+    D_ASSERT(b.vars[0].size() == 1 && b.constants[0].size() == 1);
+    string v = g.new_vertex(name + "_MASTER");
+
+    string vm = g.new_vertex(name + "_CHILD_1");
+    add_edge(v, Var(VAR_CONSTANT, b.constants[0][0]));
+    add_edge(v, vm);
+    add_edge(vm, b.vars[0][0]);
+
+    return v;
+  }
+
+  string colour_gcc(const ConstraintBlob& b, string name)
+  {
+    D_ASSERT(b.vars.size() == 2 && b.constants.size() == 1);
+    D_ASSERT(b.vars[1].size() == b.constants[0].size());
+
+    string v = g.new_vertex(name + "_SECOND_MASTER");
+    
+    for(int i = 0; i < b.vars[1].size(); ++i)
+    {
+      string vm = g.new_vertex(name + "_INDEX");
+      string v1 = g.new_vertex(name + "_ARRAY1");
+      string v2 = g.new_vertex(name + "_ARRAY2");
+      
+      add_edge(v,vm);
+      add_edge(vm,v1);
+      add_edge(vm,v2);
+      add_edge(v1, b.vars[0][i]);
+      add_edge(v2, Var(VAR_CONSTANT, b.constants[0][i]));
+    }
+
+    string w = g.new_vertex(name + "_FIRST_MASTER");
+    
+    for(int j = 0; j < b.vars[0].size(); ++j)
+        add_edge(w, b.vars[0][j]);
+
+    string x = g.new_vertex(name + "_MASTER");
+
+    add_edge(x, w);
+    add_edge(x, v);
+
+    return x;
   }
   
   string colour_reify(const ConstraintBlob& b, string name)
@@ -576,6 +620,13 @@ struct GraphBuilder
 #ifdef CT_LEXLESS_ABC
       case CT_LEXLESS: return colour_no_symmetry(b, "LEXLESS");
 #endif
+
+#ifdef CT_QUICK_LEXLEQ_ABC
+      case CT_QUICK_LEXLEQ: return colour_no_symmetry(b, "LEXLEQ");
+#endif
+#ifdef CT_QUICK_LEXLESS_ABC
+      case CT_QUICK_LEXLESS: return colour_no_symmetry(b, "LEXLESS");
+#endif
       
 #ifdef CT_MAX_ABC
       case CT_MAX: return colour_symmetric_constraint(b, "MAX");
@@ -657,8 +708,21 @@ struct GraphBuilder
 #ifdef CT_WATCHED_HAMMING_ABC
       case CT_WATCHED_HAMMING: return colour_array_swap_each_index(b, "HAMMING");
 #endif
-      
+#ifdef CT_WATCHED_LIT_ABC
+      case CT_WATCHED_LIT: return colour_lit(b, "WATCHED_LIT");
+#endif
+#ifdef CT_WATCHED_NOTLIT_ABC
+      case CT_WATCHED_NOTLIT: return colour_lit(b, "WATCHED_NOTLIT");
+#endif
+#ifdef CT_GCC_ABC
+      case CT_GCC:  return colour_gcc(b, "GCC");
+#endif
+#ifdef CT_GCCWEAK_ABC
+      case CT_GCCWEAK: return colour_gcc(b, "GCC");
+#endif
+
       default:
+        cerr << "No colouring defined for " << b.constraint->name << endl;
         abort();
     }
     
