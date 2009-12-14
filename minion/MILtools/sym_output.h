@@ -503,6 +503,20 @@ struct GraphBuilder
     return v;
   }
 
+  string colour_litlist(const ConstraintBlob& b, string name)
+  {
+    D_ASSERT(b.vars[0].size() == 1 && b.constants.size() == 1);
+    string v = g.new_vertex(name + "_MASTER");
+
+    string vm = g.new_vertex(name + "_CHILD_1");
+    for(int i = 0; i < b.constants[0].size(); ++i)
+      add_edge(v, Var(VAR_CONSTANT, b.constants[0][i]));
+    add_edge(v, vm);
+    add_edge(vm, b.vars[0][0]);
+
+    return v;
+  }
+
   string colour_gcc(const ConstraintBlob& b, string name)
   {
     D_ASSERT(b.vars.size() == 2 && b.constants.size() == 1);
@@ -640,6 +654,11 @@ struct GraphBuilder
       case CT_LEXLESS: return colour_no_symmetry(b, "LEXLESS");
 #endif
 
+#ifdef CT_GACLEXLEQ_ABC
+      case CT_GACLEXLEQ: return colour_no_symmetry(b, "LEXLEQ");
+#endif
+
+
 #ifdef CT_QUICK_LEXLEQ_ABC
       case CT_QUICK_LEXLEQ: return colour_no_symmetry(b, "LEXLEQ");
 #endif
@@ -733,6 +752,19 @@ struct GraphBuilder
 #ifdef CT_WATCHED_NOTLIT_ABC
       case CT_WATCHED_NOTLIT: return colour_lit(b, "WATCHED_NOTLIT");
 #endif
+#ifdef CT_WATCHED_INSET_ABC
+      case CT_WATCHED_INSET: return colour_litlist(b, "WATCHED_INSET");
+#endif
+#ifdef CT_WATCHED_NOT_INSET_ABC
+      case CT_WATCHED_NOT_INSET: return colour_litlist(b, "WATCHED_NOT_INSET");
+#endif
+#ifdef CT_WATCHED_INRANGE_ABC
+      case CT_WATCHED_INRANGE: return colour_litlist(b, "WATCHED_INRANGE");
+#endif
+#ifdef CT_WATCHED_NOT_INRANGE_ABC
+      case CT_WATCHED_NOT_INRANGE: return colour_litlist(b, "WATCHED_NOT_INRANGE");
+#endif
+
 #ifdef CT_GCC_ABC
       case CT_GCC:  return colour_gcc(b, "GCC");
 #endif
