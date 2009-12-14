@@ -1,0 +1,16 @@
+MINION 3
+#TEST SOLCOUNT 136
+**VARIABLES**
+
+DISCRETE x[4] {1..2}
+DISCRETE y[4] {1..2}
+
+**SEARCH**
+
+VARORDER [y,x]
+
+**CONSTRAINTS**
+
+lexleq[quick](x,y)
+
+**EOF**

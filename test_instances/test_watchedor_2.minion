@@ -1,0 +1,12 @@
+#TEST SOLCOUNT 2
+MINION 3
+
+**VARIABLES**
+DISCRETE a {-1..1}
+DISCRETE b {-1..1}
+
+**CONSTRAINTS**
+w-notinset(b,[0])
+watched-or({w-inset(a,[1]),w-inset(b,[0])})
+
+**EOF**
