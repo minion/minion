@@ -881,16 +881,21 @@ struct InstanceStats
       cout << s << "cts_per_var_mean:" << ((double)totalarity)/(double) varcount << endl;
       
       // six categories of constraint, output their proportion and count
-      int alldiff=0, sums=0, wor=0, ternary=0, binary=0, table=0, reify=0, lex=0, unary=0;
+      int alldiff=0, sums=0, or_atleastk=0, ternary=0, binary=0, table=0; 
+      int reify=0, lex=0, unary=0, nullary=0, element=0, minmax=0, occurrence=0;
       for(list<ConstraintBlob>::iterator i=c.begin(); i!=c.end(); ++i)
       {
           ConstraintType ct=(*i).constraint->type;
           switch(ct)
           {
-  	    case CT_WATCHED_LIT:
-	    case CT_WATCHED_NOTLIT:
-	      unary++;
-	      break;
+            case CT_WATCHED_LIT:
+            case CT_WATCHED_NOTLIT:
+            case CT_WATCHED_INSET:
+            case CT_WATCHED_NOT_INSET:
+            case CT_WATCHED_INRANGE:
+            case CT_WATCHED_NOT_INRANGE:
+                unary++;
+                break;
             case CT_ALLDIFF:
             case CT_GACALLDIFF:
                 alldiff++;
@@ -903,10 +908,18 @@ struct InstanceStats
             case CT_WATCHED_LEQSUM:
                 sums++;
                 break;
+            case CT_WATCHED_OR:
             case CT_WATCHED_NEW_OR:
-                wor++;
+            case CT_WATCHED_NEW_AND:
+            case CT_WATCHED_LITSUM:
+            case CT_WATCHED_VECNEQ:
+            case CT_WATCHED_HAMMING:
+            case CT_WATCHED_NOT_HAMMING:
+            case CT_WATCHED_VEC_OR_LESS:
+                or_atleastk++;
                 break;
             case CT_PRODUCT2:
+            case CT_DIFFERENCE:
             case CT_MODULO:
             case CT_DIV:
             case CT_POW:
@@ -915,6 +928,10 @@ struct InstanceStats
             case CT_ABS:
             case CT_INEQ:
             case CT_EQ:
+            case CT_MINUSEQ:
+            case CT_DISEQ:
+            case CT_WATCHED_NEQ:
+            case CT_WATCHED_LESS:
                 binary++;
                 break;
             case CT_REIFY:
@@ -939,8 +956,31 @@ struct InstanceStats
             case CT_QUICK_LEXLESS:
                 lex++;
                 break;
+            case CT_TRUE:
+            case CT_FALSE:
+                nullary++;
+                break;
+            case CT_ELEMENT:
+            case CT_ELEMENT_ONE:
+            case CT_WATCHED_ELEMENT:
+            case CT_WATCHED_ELEMENT_ONE:
+            case CT_GACELEMENT:
+                element++;
+                break;
+            case CT_MIN:
+            case CT_MAX:
+                minmax++;
+                break;
+            case CT_OCCURRENCE:
+            case CT_LEQ_OCCURRENCE:
+            case CT_GEQ_OCCURRENCE:
+            case CT_GCC:
+            case CT_GCCWEAK:
+                occurrence++;
+                break;
             default:
                 cerr << "Stats: Uncategorised constraint:" << (*i).constraint->name <<endl;
+                // constraints missing: CT_GADGET, CT_CHECK_GSA, CT_CHECK_ASSIGN.
           }
       }
       
@@ -948,8 +988,8 @@ struct InstanceStats
       cout << s << "alldiff_proportion:" << ((double)alldiff)/(double)c.size() << endl;
       cout << s << "sums_count:" << sums << endl;
       cout << s << "sums_proportion:" << ((double)sums)/(double)c.size() << endl;
-      cout << s << "wor_count:" << wor << endl;
-      cout << s << "wor_proportion:" << ((double)wor)/(double)c.size() << endl;
+      cout << s << "or_atleastk_count:" << or_atleastk << endl;
+      cout << s << "or_atleastk_proportion:" << ((double)or_atleastk)/(double)c.size() << endl;
       cout << s << "ternary_count:" << ternary << endl;
       cout << s << "ternary_proportion:" << ((double)ternary)/(double)c.size() << endl;
       cout << s << "binary_count:" << binary << endl;
@@ -962,6 +1002,15 @@ struct InstanceStats
       cout << s << "lex_proportion:" << ((double)lex)/(double)c.size() << endl;
       cout << s << "unary_count:" << unary << endl;
       cout << s << "unary_proportion:" << ((double)unary)/(double)c.size() << endl;
+      cout << s << "nullary_count:" << nullary << endl;
+      cout << s << "nullary_proportion:" << ((double)nullary)/(double)c.size() << endl;
+      cout << s << "element_count:" << element << endl;
+      cout << s << "element_proportion:" << ((double)element)/(double)c.size() << endl;
+      cout << s << "minmax_count:" << minmax << endl;
+      cout << s << "minmax_proportion:" << ((double)minmax)/(double)c.size() << endl;
+      cout << s << "occurrence_count:" << occurrence << endl;
+      cout << s << "occurrence_proportion:" << ((double)occurrence)/(double)c.size() << endl;
+      
       
       // Count the number of pairs of constraints that overlap by two or more
       // variables.
