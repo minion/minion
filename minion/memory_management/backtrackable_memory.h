@@ -86,6 +86,12 @@ public:
   /// Returns the current number of stored copies of the state.
   int current_depth()
   { return backtrack_data.size(); }
+
+  ~BackTrackMemory()
+  {
+    for(int i = 0; i < backtrack_data.size(); ++i)
+      block_cache.do_free(backtrack_data[i].first);
+  }
 };
 
 #endif

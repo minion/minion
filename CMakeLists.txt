@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.4.7 FATAL_ERROR)
 
 project(MinionProject)
 
+# This will be ignored by everything except mac
+set(MACOSX_DEPLOYMENT_TARGET 10.5)
+
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-modules)
 include(CheckIncludeFileCXX)
 include(CheckCXXCompilerFlag)
@@ -148,8 +151,8 @@ endif()
 
 if(APPLEMAC)
     set(Boost_USE_STATIC_LIBS true)
-    add_definitions(-mmacosx-version-min=10.5)
-    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.5 )
+#    add_definitions(-mmacosx-version-min=10.5)
+#    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.5 )
 endif()
 
 option(STATIC "" OFF)

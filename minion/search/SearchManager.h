@@ -52,7 +52,7 @@ struct SearchManager
 {
   StateObj* stateObj;
   vector<AnyVarRef> var_array;
-  VariableOrder * var_order;
+  shared_ptr<VariableOrder> var_order;
   
   bool hasauxvars;   // Has a VARORDER AUX
   int topauxvar;  // lowest index of an aux var.
@@ -65,8 +65,11 @@ struct SearchManager
   unsigned depth; //number of left branches
   int ceiling; // index into branches, it is the lowest LB which has been stolen.
   
-  SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array, vector<SearchOrder> _order, VariableOrder* _var_order, Propagate * _prop)
-  : stateObj(_stateObj), var_array(_var_array), var_order(_var_order), topauxvar(0), prop(_prop), depth(0), ceiling(-1)
+  SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array,
+                vector<SearchOrder> _order, shared_ptr<VariableOrder> _var_order,
+                Propagate * _prop)
+  : stateObj(_stateObj), var_array(_var_array), var_order(_var_order),
+    topauxvar(0), prop(_prop), depth(0), ceiling(-1)
   {
     // if this isn't enough room, the vector will autoresize. While that can be slow,
     // it only has to happen at most the log of the maximum search depth.
