@@ -34,19 +34,22 @@ struct VariableOrder
     
     // returns a pair of variable index, domain value.
     // returning the variable index == -1 means no branch possible.
-    virtual pair<int, DomainInt> pickVarVal() {};
+    virtual pair<int, DomainInt> pickVarVal() = 0;
+
+    virtual ~VariableOrder() {}
 };
 
 // Container for multiple variable orderings
 struct MultiBranch : public VariableOrder
 {
-    vector<VariableOrder*> vovector;
+    vector<shared_ptr<VariableOrder> > vovector;
     Reversible<int> pos;
     
     // need to patch up the returned variable index
     vector<int> variable_offset;
     
-    MultiBranch(const vector<VariableOrder*> _vovector, StateObj* _stateObj) : 
+    MultiBranch(const vector<shared_ptr<VariableOrder> > _vovector,
+		StateObj* _stateObj):
     VariableOrder(_vovector[0]->var_order), // It doesn't matter what var_order is set to
     vovector(_vovector),
     pos(_stateObj)

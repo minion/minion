@@ -30,7 +30,7 @@ namespace Controller
     shared_ptr<VariableOrder> make_search_order(SearchOrder order, StateObj* stateObj)
     {
         // collect the variables in the SearchOrder object 
-        vector<AnyVarRef> var_array= new vector<AnyVarRef>();
+        vector<AnyVarRef> var_array;
         for(int i=0; i<order.var_order.size(); i++)
         {
             var_array.push_back(get_AnyVarRef_from_Var(stateObj, order.var_order[i]));
@@ -76,7 +76,7 @@ namespace Controller
             cout << "Order not found in make_search_order." << endl;
             abort();
         }
-        return vo;
+        return shared_ptr<VariableOrder>(vo);
     }
     
     shared_ptr<VariableOrder> make_search_order_multiple(vector<SearchOrder> order,
@@ -124,23 +124,23 @@ shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
         p= shared_ptr<Propagate>(new PropGAC());
         break;
     case PropLevel_SAC:
-        p=  shared_ptr<Propagate>(nnew PropSAC());
+        p=  shared_ptr<Propagate>(new PropSAC());
         break;
     case PropLevel_SSAC:
-        p=  shared_ptr<Propagate>(nnew PropSSAC());
+        p=  shared_ptr<Propagate>(new PropSSAC());
         break;
     case PropLevel_SACBounds:
-        p=  shared_ptr<Propagate>(nnew PropSAC_Bounds());
+        p=  shared_ptr<Propagate>(new PropSAC_Bounds());
         break;
     case PropLevel_SSACBounds:
-        p=  shared_ptr<Propagate>(nnew PropSSAC_Bounds());
+        p=  shared_ptr<Propagate>(new PropSSAC_Bounds());
         break;
     default:
         cout << "Propagation method not found in make_search_manager." << endl;
         abort();
     }
     
-    vector<AnyVarRef> all_vars=new vector<AnyVarRef>();
+    vector<AnyVarRef> all_vars;
     
     for(int i=0; i<order.size(); i++)
     {

@@ -57,7 +57,7 @@ struct SearchManager
   bool hasauxvars;   // Has a VARORDER AUX
   int topauxvar;  // lowest index of an aux var.
   
-  Propagate * prop;  // Propagate is the type of the base class. Method prop->prop(stateObj, var_array)
+  shared_ptr<Propagate> prop;  // Propagate is the type of the base class. Method prop->prop(stateObj, var_array)
   
   vector<Controller::triple> branches; //L & R branches so far (isLeftBranch?,var,value)
   //vector<int> first_unassigned_variable;
@@ -67,7 +67,7 @@ struct SearchManager
   
   SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array,
                 vector<SearchOrder> _order, shared_ptr<VariableOrder> _var_order,
-                Propagate * _prop)
+                shared_ptr<Propagate> _prop)
   : stateObj(_stateObj), var_array(_var_array), var_order(_var_order),
     topauxvar(0), prop(_prop), depth(0), ceiling(-1)
   {
