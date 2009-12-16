@@ -124,5 +124,13 @@ private:
 
 };
 
+template<typename T>
+bool operator<(const shared_ptr<T>& lhs, const shared_ptr<T>& rhs)
+{ return lhs.get() < rhs.get(); }
+
+template<typename T>
+bool operator==(const shared_ptr<T>& lhs, const shared_ptr<T>& rhs)
+{ return lhs.get() == rhs.get(); }
+
 #endif // LINKED_PTR_H
 
