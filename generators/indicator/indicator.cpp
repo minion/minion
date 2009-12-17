@@ -32,7 +32,6 @@ void print(vector<int> v)
 
 void check_idempotent(vector<int>& v, int varname)
 {
-  int val = v[0];
   for(int i = 1; i < v.size(); ++i)
     if(v[i] != v[0])
       return;

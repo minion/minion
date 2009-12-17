@@ -17,6 +17,7 @@
 */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "../InstanceHelp.h"
 
 const int BOARDSIZE = 33 ;

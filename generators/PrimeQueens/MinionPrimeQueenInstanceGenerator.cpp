@@ -139,7 +139,7 @@ void MinionPrimeQueenInstanceGenerator::generateMatrices(int n) {
 //Table ct on queens & primes
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void MinionPrimeQueenInstanceGenerator::generateConstraints(int n) {
-  int rowIndex, colIndex, queenPos = 0 ;
+  //int rowIndex, colIndex, queenPos = 0 ;
 
   // sym-b for queen var
   /*cout << endl ;
@@ -263,7 +263,7 @@ void MinionPrimeQueenInstanceGenerator::generateTuplesAdjacentVals(int n) {
   int adjTupleIdx = 0 ;
   int adjTupleSize = adjacentTuples.size()/2 ;
   cout << adjTupleSize << " 2" << endl ;
-  for (adjTupleIdx; adjTupleIdx < adjTupleSize; adjTupleIdx++) {
+  for (adjTupleIdx = 0; adjTupleIdx < adjTupleSize; adjTupleIdx++) {
     cout << adjacentTuples.at(2*adjTupleIdx) << " " 
 		 << adjacentTuples.at(2*adjTupleIdx+1) << endl ;
   }
@@ -353,7 +353,7 @@ void MinionPrimeQueenInstanceGenerator::generateTuplesQueenPrimes(int n) {
   int qnTupleSize = queenTuples.size()/3 ;
   //no of tuples, ternary.
   cout << qnTupleSize << " 3" << endl ;
-  for (qnTupleIdx; qnTupleIdx < qnTupleSize; qnTupleIdx++) {
+  for (qnTupleIdx = 0; qnTupleIdx < qnTupleSize; qnTupleIdx++) {
     cout << queenTuples.at(3*qnTupleIdx) << " " 
          << queenTuples.at(3*qnTupleIdx+1) << " "
 		 << queenTuples.at(3*qnTupleIdx+2) << endl ;

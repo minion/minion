@@ -71,7 +71,7 @@ int diffvar (int i, int j, int k, int p)
   int result;
   int first  = ( i < j ? i : j);
   int second = ( i < j ? j : i);
-  int clique = first / k;
+  //int clique = first / k;
 
   if (first == 0)
     result= (second);
