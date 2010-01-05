@@ -19,6 +19,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <set>
 
 std::vector<std::vector<int> > 
 build_graph(std::vector<std::set<int> > graph, const std::vector<std::set<int> >& partition);
@@ -1047,6 +1048,29 @@ struct InstanceStats
         proportion =((double)count_2_overlaps)/conspairs;
       // proportion of pairs of constraints that share two or more variables.
       cout << s << "multi_shared_vars:" << proportion <<endl;
+      
+      // Edge density of primal graph
+      std::set<pair<Var, Var> > seen_pairs;
+      int count_pairs=0;
+      for(int i = 0; i < var_sets.size(); ++i) 
+      {
+          int size=var_sets[i].size();
+          for(int j = 0; j < size; ++j)
+          {
+              for(int k=j+1; k<size; ++k)
+              {
+                  Var t1=var_sets[i][j];
+                  Var t2=var_sets[i][k];
+                  std::set<pair<Var, Var> >::const_iterator it= seen_pairs.find(make_pair(t1, t2));
+                  if(it==seen_pairs.end())
+                  {
+                      seen_pairs.insert(make_pair(t1, t2));
+                      count_pairs++;
+                  }
+              }
+          }
+      }
+      cout << s << "edge_density:" << ((double)count_pairs)/(((double)(varcount*(varcount-1)))/2.0) << endl;
       
       GraphBuilder graph(csp);
       cout << s << "Local_Variance: " << partition_graph(graph.g.build_graph_info(csp, false)) << endl;
