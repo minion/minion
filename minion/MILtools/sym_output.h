@@ -879,7 +879,9 @@ struct InstanceStats
       
       int totalarity=std::accumulate(arities.begin(), arities.end(), 0);
       cout << s << "arity_mean:" << ((double)totalarity)/(double) arities.size() << endl;
+      cout << s << "arity_mean_normalised:" << (((double)totalarity)/(double) arities.size())/((double) varcount) << endl;
       cout << s << "cts_per_var_mean:" << ((double)totalarity)/(double) varcount << endl;
+      cout << s << "cts_per_var_mean_normalised:" << (((double)totalarity)/((double) varcount))/((double) c.size()) << endl;
       
       // six categories of constraint, output their proportion and count
       int alldiff=0, sums=0, or_atleastk=0, ternary=0, binary=0, table=0; 
@@ -1095,6 +1097,7 @@ struct InstanceStats
       
       int totaltightness=std::accumulate(tightness.begin(), tightness.end(), 0);
       cout << s << "tightness_mean:" << ((double)totaltightness)/(double) tightness.size() << endl;
+      cout << s << "tightness_mean_normalised:" << (((double)totaltightness)/(double) tightness.size())/((double) cons.size()) << endl;
   }
   
   int arity(ConstraintBlob& ct)
