@@ -1097,7 +1097,6 @@ struct InstanceStats
       
       int totaltightness=std::accumulate(tightness.begin(), tightness.end(), 0);
       cout << s << "tightness_mean:" << ((double)totaltightness)/(double) tightness.size() << endl;
-      cout << s << "tightness_mean_normalised:" << (((double)totaltightness)/(double) tightness.size())/((double) cons.size()) << endl;
   }
   
   int arity(ConstraintBlob& ct)
