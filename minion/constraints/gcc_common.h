@@ -215,22 +215,16 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #endif
         
         #if UseWatchesAlt
-        // The first section is idx of start of list. then free list idx.
-        watches2=getMemory(stateObj).backTrack().template requestArray<short>(numvars+1);  
-        watches3=getMemory(stateObj).backTrack().template requestArray<short>(4*numvars+2*numvals); // 2r+d cells.
+        // The first section is idx of start of list. then free list idx. then 2r+d cells.
+        watches2=getMemory(stateObj).backTrack().template requestArray<short>(numvars+1 + 4*numvars+2*numvals);  
+        //watches3=getMemory(stateObj).backTrack().template requestArray<short>(4*numvars+2*numvals); // 2r+d cells.
         for(int i=0; i<numvars; i++) watches2[i]=-1;
-        watches2[numvars]=0;
-        for(int i=0; i<(2*numvars+numvals); i++)
+        watches2[numvars]=numvars+1;
+        for(int i=numvars+2; i<(numvars+1 + 4*numvars+2*numvals); i=i+2)
         {   // link up the freelist.
-            watches3[2*i+1]=2*i+2;
+            watches2[i]=i+1;
         }
-        watches3[4*numvars+2*numvals-1]=-1;
-        
-        //addwatch(2, 4);
-        //for(int i=0; i<numvars+1; i++)
-        //{
-        //    printlist(i);
-        //}
+        watches2[numvars+1 + 4*numvars+2*numvals-1]=-1;
         #endif
         
         #if UseWatches2
@@ -262,7 +256,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     #if UseWatchesAlt
     MoveableArray<short> watches2;
-    MoveableArray<short> watches3;
     #endif
     
     virtual void full_propagate()
@@ -895,12 +888,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                         int idx=watches2[var];  // start of linked list.
                         while(idx!=-1)
                         {
-                            if(!var_array[var].inDomain(watches3[idx]))
+                            if(!var_array[var].inDomain(watches2[idx]))
                             {
                                 run_propagator=true;
                                 break;
                             }
-                            idx=watches3[idx+1]; // go to next.
+                            idx=watches2[idx+1]; // go to next.
                         }
                     }
                 #endif
@@ -1963,12 +1956,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         // chop out the first elelemnt in the free list
         int idx=watches2[numvars];
         if(idx==-1) cout << "No items in freelist, argh!" <<endl;
-        watches2[numvars]=watches3[idx+1];
+        watches2[numvars]=watches2[idx+1];
         
-        watches3[idx]=val;
+        watches2[idx]=val;
         
         // splice into list for var at head. 
-        watches3[idx+1]=watches2[var];
+        watches2[idx+1]=watches2[var];
         watches2[var]=idx;
         //printlist(var);
         
@@ -1981,8 +1974,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         int idx=watches2[var];
         while(idx!=-1)
         {
-            cout << watches3[idx] << " ";
-            idx=watches3[idx+1];
+            cout << watches2[idx] << " ";
+            idx=watches2[idx+1];
         }
         cout << endl;
     }
@@ -1995,12 +1988,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         if(idx==-1) return;
         
         // find the end of the list
-        while(watches3[idx+1]!=-1)
+        while(watches2[idx+1]!=-1)
         {
-            idx=watches3[idx+1]; // next
+            idx=watches2[idx+1]; // next
         }
         // splice list into freelist.
-        watches3[idx+1]=watches2[numvars];
+        watches2[idx+1]=watches2[numvars];
         watches2[numvars]=watches2[var];
         watches2[var]=-1;
         
