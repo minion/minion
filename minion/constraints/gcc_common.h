@@ -39,8 +39,8 @@
 #define SPECIALQUEUE
 
 // should be called dynamic partitioning
-#define SCC
-#define SCCCARDS
+//#define SCC
+//#define SCCCARDS
 
 #define INCREMENTALMATCH
 
@@ -629,19 +629,51 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         GCCPRINT("lower:"<<lower);
         GCCPRINT("upper:"<<upper);
         
-        bool flag=bfsmatching_gcc();
-        GCCPRINT("matching:"<<flag);
+        bool run_propagator=true;
+        #if UseWatchesAlt
+            run_propagator=false;
+            if(watches2[0]==-1)
+            {
+                // This must be the first call.
+                run_propagator=true;
+            }
+            for(int var=0; var<numvars; var++)
+            {
+                int idx=watches2[var];  // start of linked list.
+                while(idx!=-1)
+                {
+                    if(!var_array[var].inDomain(watches2[idx]))
+                    {
+                        run_propagator=true;
+                        break;
+                    }
+                    idx=watches2[idx+1]; // go to next.
+                }
+            }
+        #endif
         
-        if(!flag)
+        if(run_propagator || Strongcards)
         {
-            getState(stateObj).setFailed(true);
-            return;
+            bool flag=bfsmatching_gcc();
+            GCCPRINT("matching:"<<flag);
+        
+            if(!flag)
+            {
+                getState(stateObj).setFailed(true);
+                return;
+            }
         }
         
-        tarjan_recursive(0, upper, lower, varvalmatching, usage);
+        if(run_propagator)
+        {
+            tarjan_recursive(0, upper, lower, varvalmatching, usage);
+        }
+        else
+        {
+            GCCPRINT("Saved a call with UseWatchesAlt.");
+        }
         
         prop_capacity();
-        
     }
     
     vector<int> lbcmatching;
@@ -888,6 +920,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                         int idx=watches2[var];  // start of linked list.
                         while(idx!=-1)
                         {
+                            GCCPRINT("checking var: "<< var << " val: "<< watches2[idx]);
                             if(!var_array[var].inDomain(watches2[idx]))
                             {
                                 run_propagator=true;
@@ -918,7 +951,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             }
             else
             {
-                //cout << "Saved a call with dc/wl" << endl;
+                //cout << "Saved a call to tarjan's with dc/wl" << endl;
             }
             
             #ifdef SCCCARDS
