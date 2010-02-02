@@ -322,6 +322,7 @@ else()
             set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
         endif()
     endif()
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
 endif()
 
 
