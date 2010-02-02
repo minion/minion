@@ -44,6 +44,12 @@ inline double get_sys_time()
          abort();   
 }
 
+inline long get_max_rss()
+{
+    // FIXME: implement me
+    return 0;
+}
+
 
 #else
 #include <sys/time.h>
@@ -72,6 +78,13 @@ inline double get_sys_time()
     double cpu_time = r.ru_stime.tv_sec;
     cpu_time += static_cast<double>(r.ru_stime.tv_usec) / 1000000.0;
     return cpu_time;
+}
+
+inline long get_max_rss()
+{
+    rusage r;
+    getrusage(RUSAGE_SELF, &r);
+    return r.ru_maxrss;
 }
 
 #endif
@@ -184,6 +197,7 @@ void maybePrintFinaltimestepStore(const char* time_name, const char* store_name,
     cout << "Total Time: " << end_cpu_time - _internal_cpu_start_time << endl;
     cout << "Total System Time: " << end_sys_time - _internal_sys_start_time << endl;
     cout << "Total Wall Time: " << time_wallclock << endl;
+    cout << "Maximum Memory (kB): " << get_max_rss() << endl;
   }
   tableout.set(string("TotalTime"), end_cpu_time - _internal_cpu_start_time );
 }
