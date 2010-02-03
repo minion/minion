@@ -103,7 +103,7 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
   WatchNotLiteralBoolConstraint(StateObj* _stateObj, const BoolVarRef& _var, const T& _val) :
     AbstractConstraint(_stateObj), var(_var), val(_val) 
   {
-    cout << "using boolean specialisation" << endl; 
+    //cout << "using boolean specialisation" << endl;
   }  
 
   int dynamic_trigger_count()
