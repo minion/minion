@@ -103,7 +103,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       ++i;
       try
       {
-        getOptions(stateObj).nodelimit = from_string_checked<int>(argv[i]);
+        getOptions(stateObj).nodelimit = from_string_checked<long long int>(argv[i]);
         if(getOptions(stateObj).nodelimit < 0)
           throw "Invalid lower bound";
       }

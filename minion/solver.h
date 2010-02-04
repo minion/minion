@@ -199,7 +199,7 @@ public:
   /// Only for debugging.
   bool nocheck;
   /// Denotes to nodelimit, 0 if none given.
-  unsigned long long nodelimit;
+  long long nodelimit;
   /// Denotes if information about search should be printed to a file.
   bool tableout;
   
