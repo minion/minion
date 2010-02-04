@@ -41,7 +41,7 @@ bool check_double_ctrlc;
 void CALLBACK TimerProc(void* ,  BOOLEAN)
 { *trig = true; }
     
-void activate_trigger(volatile bool* b, int timeout, bool CPU_time)
+void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool CPU_time)
 {
     if(CPU_time)
         cerr << "CPU-time timing not available on windows, falling back on clock" << endl;
@@ -49,11 +49,12 @@ void activate_trigger(volatile bool* b, int timeout, bool CPU_time)
     trig = b;
     *trig = false;
     
-    if(timeout <= 0)
-        return;        
-    
     HANDLE m_timerHandle;
     
+    if(timeout_active)
+    {
+        if(timeout <= 0)
+          *trig = true;
     BOOL success = ::CreateTimerQueueTimer(
         &m_timerHandle,
         NULL,
@@ -62,6 +63,7 @@ void activate_trigger(volatile bool* b, int timeout, bool CPU_time)
         timeout * 1000,
         0,
         WT_EXECUTEINTIMERTHREAD);
+    }
 }
 
 void install_ctrlc_trigger(volatile bool*)
@@ -78,27 +80,29 @@ void install_ctrlc_trigger(volatile bool*)
 void trigger_function(int /* signum */ )
 { *trig = true; }
 
-void activate_trigger(volatile bool* b, int timeout, bool CPU_time) // CPU_time = false -> real time 
+void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool CPU_time) // CPU_time = false -> real time 
 {
   // We still set these, as they are how 'ctrlc' checks if we have got started properly or not.
   trig = b;
   *trig = false;
- 
-  if(timeout <= 0)
-    return;
 
   signal(SIGXCPU, trigger_function);
   signal(SIGALRM, trigger_function);
 
-  if(CPU_time)
+  if(timeout_active)
   {
-      rlimit lim;
-      lim.rlim_cur = timeout;
-      lim.rlim_max = timeout + 10;
-      setrlimit(RLIMIT_CPU, &lim);
-  }
-  else
-      alarm(timeout);
+    if(timeout <= 0)
+	*trig = true;
+    if(CPU_time)
+    {
+        rlimit lim;
+        lim.rlim_cur = timeout;
+        lim.rlim_max = timeout + 10;
+        setrlimit(RLIMIT_CPU, &lim);
+    }
+    else
+        alarm(timeout);
+    }
 }
 
 void ctrlc_function(int /* signum */ )

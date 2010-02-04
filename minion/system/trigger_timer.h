@@ -22,7 +22,7 @@
 #define TRIG_TIMER_H
 
 /// This function will cause the boolean passed to be set to 'true' after timeout.
-void activate_trigger(volatile bool*, int timeout, bool CPU_time);
+void activate_trigger(volatile bool*, bool timeout_active, int timeout, bool CPU_time);
 
 // This takes a point to a bool*, which will be switch when ctrl+c is pressed.
 void install_ctrlc_trigger(volatile bool*);

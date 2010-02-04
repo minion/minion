@@ -29,6 +29,16 @@
 #include <sstream>
 
 template<typename T>
+T from_string_checked(const std::string& str)
+{
+  std::istringstream iss(str);
+  T obj;
+  iss >> std::ws >> obj >> std::ws;
+  if(!iss.eof()) throw "Failed Conversion";
+  return obj; 
+}
+
+template<typename T>
 std::string
 to_string(T t)
 {

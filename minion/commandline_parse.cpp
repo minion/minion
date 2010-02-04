@@ -101,8 +101,13 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
     else if(command == string("-nodelimit"))
     {
       ++i;
-      getOptions(stateObj).nodelimit = atoi(argv[i]);
-      if(getOptions(stateObj).nodelimit == 0)
+      try
+      {
+        getOptions(stateObj).nodelimit = from_string_checked<int>(argv[i]);
+        if(getOptions(stateObj).nodelimit < 0)
+          throw "Invalid lower bound";
+      }
+      catch(...)
       {
         cout << "Did not understand parameter to nodelimit:" << argv[i] << endl;
         exit(1);
@@ -111,33 +116,56 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
     else if(command == string("-sollimit"))
     {
       ++i;
-      getOptions(stateObj).sollimit = atoi(argv[i]);
-      if(getOptions(stateObj).sollimit == 0)
+      try
+      {
+        getOptions(stateObj).sollimit = from_string_checked<int>(argv[i]);
+        if(getOptions(stateObj).sollimit <= 0)
+          throw "Invalid lower bound";
+      }
+      catch(...)
       {
         cout << "Did not understand the parameter to sollimit:" << argv[i] << endl;
-          exit(1);
+        exit(1);
       }
     }
     else if(command == string("-timelimit"))
     {
       ++i;
-      getOptions(stateObj).time_limit = atoi(argv[i]);
-      getOptions(stateObj).time_limit_is_CPU_time = false;
-      if(getOptions(stateObj).time_limit == 0)
+      if(getOptions(stateObj).timeout_active)
+      {
+        cout << "Only one '-cpulimit' or '-timelimit' per instance" << endl;
+        exit(1);
+      }
+      getOptions(stateObj).timeout_active = true;
+      try
+      {
+        getOptions(stateObj).time_limit = from_string_checked<int>(argv[i]);
+        getOptions(stateObj).time_limit_is_CPU_time = false;
+      }
+      catch(...)
       {
         cout << "Did not understand the parameter to timelimit:" << argv[i] << endl;
-      exit(1);
+        exit(1);
       }
     }
     else if(command == string("-cpulimit"))
     {
       ++i;
-      getOptions(stateObj).time_limit = atoi(argv[i]);
-      getOptions(stateObj).time_limit_is_CPU_time = true;
-      if(getOptions(stateObj).time_limit == 0)
+      if(getOptions(stateObj).timeout_active)
+      {
+        cout << "Only one '-cpulimit' or '-timelimit' per instance" << endl;
+        exit(1);
+      }
+      getOptions(stateObj).timeout_active = true;
+      try
+      {
+        getOptions(stateObj).time_limit = from_string_checked<int>(argv[i]);
+        getOptions(stateObj).time_limit_is_CPU_time = true;
+      }
+      catch(...)
       {
         cout << "Did not understand the parameter to cpulimit:" << argv[i] << endl;
-      exit(1);
+        exit(1);
       }
     } // TODO : Should remove -varorder for beta orderings.
     else if(command == string("-varorder") || command == string("-X-varorder") )
