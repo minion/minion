@@ -29,7 +29,7 @@ repartition(const std::vector<std::set<int> >& graph, std::vector<int> partition
 {
   std::vector<std::multiset<int> > partition_loop(graph.size());
   for(int i = 0; i < graph.size(); ++i)
-    for(set<int>::iterator it = graph[i].begin(); it != graph[i].end(); ++it)
+    for(set<int>::const_iterator it = graph[i].begin(); it != graph[i].end(); ++it)
     {
       partition_loop[i].insert(partition_num[*it]);
       partition_loop[*it].insert(partition_num[i]);
