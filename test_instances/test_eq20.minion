@@ -1,0 +1,17 @@
+MINION 1
+#TEST CHECKONESOL 0 0 0 0 0 0 0
+0
+0
+0
+7
+0 10 7
+0
+[x0,x1,x2,x3,x4,x5,x6]
+[a, a, a, a, a, a, a]
+1
+[x0,x1,x2,x3,x4,x5,x6]
+0
+0
+objective none
+print v0
+weightedsumleq([-81102,76212,69028,-12640,97715,47385,-16835], v0, 1244857)
