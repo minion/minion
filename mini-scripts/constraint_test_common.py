@@ -1250,6 +1250,88 @@ class testgccweak(testgcc):
         else:
             return runtestgeneral("gccweak", False, options, [5,4,4], ["smallnum","smallconst_distinct", "num"], self, False)
 
+class testw__minus__inset:
+    def printtable(self, domains):
+        vals=self.constants
+        dom=domains[0]
+        out=[]
+        for v in dom:
+            if v in vals:
+                out.append([v])
+        return out
+        
+    def runtest(self, options=dict()):
+        return runtestgeneral("w-inset", False, options, [1,5], ["num","const"], self, True)
+
+class testw__minus__notinset:
+    def printtable(self, domains):
+        vals=self.constants
+        dom=domains[0]
+        out=[]
+        for v in dom:
+            if v not in vals:
+                out.append([v])
+        return out
+        
+    def runtest(self, options=dict()):
+        return runtestgeneral("w-notinset", False, options, [1,5], ["num","const"], self, True)
+
+class testw__minus__inrange:
+    def printtable(self, domains):
+        vals=self.constants
+        dom=domains[0]
+        out=[]
+        for v in dom:
+            if v>= vals[0] and v<=vals[1]:
+                out.append([v])
+        return out
+        
+    def runtest(self, options=dict()):
+        # must have two constants, so set 'fixlength' option
+        options['fixlength']=True
+        return runtestgeneral("w-inrange", False, options, [1,2], ["num","const"], self, True)
+
+class testw__minus__notinrange:
+    def printtable(self, domains):
+        vals=self.constants
+        dom=domains[0]
+        out=[]
+        for v in dom:
+            if v< vals[0] or v>vals[1]:
+                out.append([v])
+        return out
+        
+    def runtest(self, options=dict()):
+        # must have two constants, so set 'fixlength' option
+        options['fixlength']=True
+        return runtestgeneral("w-notinrange", False, options, [1,2], ["num","const"], self, True)
+
+class testw__minus__literal:
+    def printtable(self, domains):
+        vals=self.constants
+        dom=domains[0]
+        out=[]
+        for v in dom:
+            if v==vals[0]:
+                out.append([v])
+        return out
+        
+    def runtest(self, options=dict()):
+        return runtestgeneral("w-literal", False, options, [1,1], ["num","const"], self, True)
+
+class testw__minus__notliteral:
+    def printtable(self, domains):
+        vals=self.constants
+        dom=domains[0]
+        out=[]
+        for v in dom:
+            if v!=vals[0]:
+                out.append([v])
+        return out
+        
+    def runtest(self, options=dict()):
+        return runtestgeneral("w-notliteral", False, options, [1,1], ["num","const"], self, True)
+
 ################################################################################
 # 
 #                    Utility functions begin here.
@@ -1306,6 +1388,9 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     reify=options['reify']
     fullprop=options['fullprop']
     
+    # some constraints require arrays of a certain length. THis stops the length being randomly changed.
+    fixlength=options['fixlength']
+    
     if reify or reifyimply:
         # add extra bool variable.
         varnums=[1]+varnums
@@ -1315,7 +1400,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     
     # sometimes (1/4) test very short constraints to find edge cases
     shortvector=random.randint(0,3)
-    if shortvector==0:
+    if shortvector==0  and not fixlength:
         # for each item in varnums which is greater than 1...
         varnumsused=[a for a in list(set(varnums)) if a>1]
         # pick one at random

@@ -56,6 +56,8 @@ conslist+=["max", "min"]
 
 conslist+=["watchneq", "watchless"]
 
+conslist+=["w-inset", "w-notinset", "w-inrange", "w-notinrange", "w-literal", "w-notliteral"]
+
 reifyexceptions=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
 reifyimplyexceptions=["not-hamming"]
 # add reifyimply variant of all constraints,
@@ -130,7 +132,7 @@ for procNum in range(procs):
             testobj.solver=minionbin
             
             for testnum in range(numtests):
-                options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False}
+                options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False, 'fixlength':False}
                 if not testobj.runtest(options):
                     print "Failed when testing %s"%consname1
                     sys.stdout.flush()
