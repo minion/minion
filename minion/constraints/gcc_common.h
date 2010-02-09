@@ -69,13 +69,8 @@
 // DOMAIN COUNTING IS INCORRECT, DO NOT USE.
 #define DomainCounting false
 
-// Use internal dynamic triggers to avoid calling Tarjan's algo.
-#define UseWatches false
-
-// This one just sets up the watches BT arrays, to measure the cost of BTing them.
-#define UseWatches2 UseWatches
-
-#define UseWatchesAlt false
+// Use internal dynamic triggers as described in paper. 
+#define InternalDT true
 
 // Requires SCC to be defined. Only splits off unit SCCs from the current
 // SCC. This is the Gecode implementation.
@@ -83,6 +78,9 @@
 
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
+
+
+/// Kind of Blue my Miles Davis --- slowed down bebop and rendered it 'sweet'
 
 template<typename VarArray, typename CapArray, bool Strongcards>
 struct GCC : public FlowConstraint<VarArray, UseIncGraph>
@@ -117,8 +115,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
     GCC(StateObj* _stateObj, const VarArray& _var_array, const CapArray& _capacity_array, vector<int> _val_array) : 
     FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
-    capacity_array(_capacity_array), val_array(_val_array),
-    SCCSplit(_stateObj, numvars+numvals)
+    capacity_array(_capacity_array), val_array(_val_array)
+    #if InternalDT
+    ,idt(_stateObj, numvars, numvals, _var_array)
+    #endif
+    ,SCCSplit(_stateObj, numvars+numvals)
     {
         D_ASSERT(capacity_array.size()==val_array.size());
         
@@ -210,31 +211,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         lbcusage.resize(numvals, 0);
         #endif
         
-        #if DomainCounting || UseWatches || UseWatchesAlt
+        #if DomainCounting || InternalDT
         changed_vars_per_scc.resize(numvars+numvals);
-        #endif
-        
-        #if UseWatchesAlt
-        // The first section is idx of start of list. then free list idx. then 2r+d cells.
-        watches2=getMemory(stateObj).backTrack().template requestArray<short>(numvars+1 + 4*numvars+2*numvals);  
-        //watches3=getMemory(stateObj).backTrack().template requestArray<short>(4*numvars+2*numvals); // 2r+d cells.
-        for(int i=0; i<numvars; i++) watches2[i]=-1;
-        watches2[numvars]=numvars+1;
-        for(int i=numvars+2; i<(numvars+1 + 4*numvars+2*numvals); i=i+2)
-        {   // link up the freelist.
-            watches2[i]=i+1;
-        }
-        watches2[numvars+1 + 4*numvars+2*numvals-1]=-1;
-        #endif
-        
-        #if UseWatches2
-            //watches.resize(numvars);
-            for(int i=0; i<numvars; i++)
-            {
-                watches.push_back(getMemory(stateObj).backTrack().template requestArray<short>(numvals+1));
-                //watches[i].reserve(numvals, stateObj);
-            }
-            // THe 0'th element is the number of items in the array.
         #endif
     }
     
@@ -246,16 +224,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     vector<int> vars_in_scc;
     vector<int> vals_in_scc;  // Actual values.
     
-    #if DomainCounting || UseWatches || UseWatchesAlt
+    #if DomainCounting || InternalDT
     vector<vector<int> > changed_vars_per_scc;
     #endif
     
-    #if UseWatches2
-    vector<MoveableArray<short> > watches;
-    #endif
-    
-    #if UseWatchesAlt
-    MoveableArray<short> watches2;
+    #if InternalDT
+    InternalDynamicTriggers<VarArray> idt;
     #endif
     
     virtual void full_propagate()
@@ -630,25 +604,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         GCCPRINT("upper:"<<upper);
         
         bool run_propagator=true;
-        #if UseWatchesAlt
+        #if InternalDT
             run_propagator=false;
-            if(watches2[0]==-1)
+            for(int var=0; var<numvars && !run_propagator; var++)
             {
-                // This must be the first call.
-                run_propagator=true;
-            }
-            for(int var=0; var<numvars; var++)
-            {
-                int idx=watches2[var];  // start of linked list.
-                while(idx!=-1)
-                {
-                    if(!var_array[var].inDomain(watches2[idx]))
-                    {
-                        run_propagator=true;
-                        break;
-                    }
-                    idx=watches2[idx+1]; // go to next.
-                }
+                run_propagator=idt.doesItTrigger(var);
             }
         #endif
         
@@ -670,7 +630,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         }
         else
         {
-            GCCPRINT("Saved a call with UseWatchesAlt.");
+            GCCPRINT("Saved a call with InternalDT.");
         }
         
         prop_capacity();
@@ -805,11 +765,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 && SCCSplit.isMember(sccindex_start))   // not singleton.
             {
                 sccs_to_process.insert(sccindex_start);
-                #if DomainCounting || UseWatches || UseWatchesAlt
+                #if DomainCounting || InternalDT
                     changed_vars_per_scc[sccindex_start].clear();
                 #endif
             }
-            #if DomainCounting || UseWatches || UseWatchesAlt
+            #if DomainCounting || InternalDT
                 // make a note of which changed vars are in the scc.
                 if(SCCSplit.isMember(sccindex_start))   // if not singleton..?? 
                     changed_vars_per_scc[sccindex_start].push_back(tempidx);
@@ -866,7 +826,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             
             // A flag that indicates whether we do Tarjan's and possibly FF
             bool run_propagator=true;
-            #if DomainCounting || UseWatches || UseWatchesAlt // need to check through triggers to see if broken....
+            #if DomainCounting || InternalDT // need to check through triggers to see if broken....
             {
                 run_propagator=false;
                 vector<int>& vars_changed=changed_vars_per_scc[sccindex_start];
@@ -883,8 +843,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                         }
                     }
                 #endif
-                #if UseWatches
-                    for(int i=0; i<vars_changed.size(); i++)
+                #if InternalDT
+                    for(int i=0; i<vars_changed.size() && !run_propagator; i++)
                     {
                         int var=vars_changed[i];
                         if(var>=numvars)
@@ -894,40 +854,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                             run_propagator=true;
                             break;
                         }
-                        MoveableArray<short>& watch = watches[var];
-                        int len=watch[0];
-                        for(int j=1; j<=len && !run_propagator; j++)
-                        {
-                            if(!var_array[var].inDomain(watch[j]))
-                            {
-                                run_propagator=true;
-                                break;
-                            }
-                        }
-                    }
-                #endif
-                #if UseWatchesAlt
-                    for(int i=0; i<vars_changed.size(); i++)
-                    {
-                        int var=vars_changed[i];
-                        if(var>=numvars)
-                        {
-                            // var is actually a val. Triggered from a
-                            // capacity variable.
-                            run_propagator=true;
-                            break;
-                        }
-                        int idx=watches2[var];  // start of linked list.
-                        while(idx!=-1)
-                        {
-                            GCCPRINT("checking var: "<< var << " val: "<< watches2[idx]);
-                            if(!var_array[var].inDomain(watches2[idx]))
-                            {
-                                run_propagator=true;
-                                break;
-                            }
-                            idx=watches2[idx+1]; // go to next.
-                        }
+                        run_propagator=idt.doesItTrigger(var);
                     }
                 #endif
             }
@@ -1571,15 +1498,13 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         scc_split=false;
         sccindex=sccindex_start;
         
-        #if UseWatches || UseWatchesAlt
+        #if InternalDT
             for(int i=0; i<vars_in_scc.size(); i++)
             {
                 int varidx=vars_in_scc[i];
-                clearwatches(varidx);
-                addwatch(varidx, matching[varidx]);
+                idt.clearwatches(varidx);
+                idt.addwatch(varidx, matching[varidx]);
                 GCCPRINT("Adding DT for var " << varidx << " val " << matching[varidx]);
-                // watch the value from the matching.
-                //watches[varidx].insert(matching[varidx]-dom_min);
             }
         #endif
         
@@ -1779,10 +1704,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                         //newnode=varvalmatching[newnode]-dom_min+numvars;  // Changed here for merge nodes
                         if(!visited.in(newnode))
                         {
-                            #if UseWatches || UseWatchesAlt
+                            #if InternalDT
                                 GCCPRINT("Adding DT for var " << newnode << " val " << curnode-numvars+dom_min);
-                                addwatch(newnode, curnode-numvars+dom_min);
-                                //watches[newnode].insert(curnode-numvars);
+                                idt.addwatch(newnode, curnode-numvars+dom_min);
                             #endif
                             visit(newnode, false, upper, lower, matching, usage);
                             if(lowlink[newnode]<lowlink[curnode])
@@ -1829,12 +1753,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 }
             }
             // Where did the low link value come from? insert that edge into watches.
-            #if UseWatches || UseWatchesAlt
-            if(lowlinkvar!=-1)
-            {
-                GCCPRINT("Adding DT for var " << lowlinkvar << " val " << curnode-numvars+dom_min);
-                addwatch(lowlinkvar, curnode-numvars+dom_min);
-            }
+            #if InternalDT
+                if(lowlinkvar!=-1)
+                {
+                    GCCPRINT("Adding DT for var " << lowlinkvar << " val " << curnode-numvars+dom_min);
+                    idt.addwatch(lowlinkvar, curnode-numvars+dom_min);
+                }
             #endif
         }
         
@@ -1964,77 +1888,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             }
         }
     }
-
-#if UseWatches
-    inline void addwatch(int var, int val)
-    {
-        int len=watches[var][0];
-        len++;
-        watches[var][0]=len;
-        watches[var][len]=val;                        
-    }
     
-    inline void clearwatches(int var)
-    {
-        watches[var][0]=0;
-    }
-#endif
-
-#if UseWatchesAlt
-    inline void addwatch(int var, int val)
-    {
-        //cout << "In addwatch. var:" << var << " val:" << val << endl;
-        //printlist(var);
-        
-        // chop out the first elelemnt in the free list
-        int idx=watches2[numvars];
-        if(idx==-1) cout << "No items in freelist, argh!" <<endl;
-        watches2[numvars]=watches2[idx+1];
-        
-        watches2[idx]=val;
-        
-        // splice into list for var at head. 
-        watches2[idx+1]=watches2[var];
-        watches2[var]=idx;
-        //printlist(var);
-        
-        //cout << "Exiting addwatch" <<endl;
-    }
-    
-    void printlist(int var)
-    {
-        cout <<"Var: "<< var << " values: ";
-        int idx=watches2[var];
-        while(idx!=-1)
-        {
-            cout << watches2[idx] << " ";
-            idx=watches2[idx+1];
-        }
-        cout << endl;
-    }
-    
-    inline void clearwatches(int var)
-    {
-        // go through and find end of list.
-        //cout << "In clearwatches for var: "<<var <<endl;
-        int idx=watches2[var];
-        if(idx==-1) return;
-        
-        // find the end of the list
-        while(watches2[idx+1]!=-1)
-        {
-            idx=watches2[idx+1]; // next
-        }
-        // splice list into freelist.
-        watches2[idx+1]=watches2[numvars];
-        watches2[numvars]=watches2[var];
-        watches2[var]=-1;
-        
-        //cout << "Leaving clearwatches" <<endl;
-    }
-    /// Kind of Blue my Miles Davis --- slowed down bebop and rendered it 'sweet'
-#endif
-
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Propagate to capacity variables.
     

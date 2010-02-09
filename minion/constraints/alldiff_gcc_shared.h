@@ -1148,4 +1148,105 @@ struct deque_fixed_size
     }
 };
 
+// This class contains backtracking memory with lists of important values for each
+// variable. 
+template<typename VarArray>
+struct InternalDynamicTriggers
+{
+    MoveableArray<short> watches;   // should also template on the type here.
+    
+    // watches contains:
+    // [0.. numvars-1]  indices to the start of the list for each variable.
+    // [numvars] index to the start of the free list.
+    // [numvars+1 .. 5*numvars+2*numvals+1] cells, that are pairs of adjacent shorts, <val, nextidx>.
+    // -1 for nextidx means end of list.
+    int numvars;
+    
+    VarArray var_array;  // not nice to have this in here.. 
+    
+    InternalDynamicTriggers(StateObj* _stateObj, int _numvars, int numvals, VarArray _var_array) : numvars(_numvars), var_array(_var_array)
+    {
+        watches=getMemory(_stateObj).backTrack().template requestArray<short>(numvars+1 + 4*numvars+2*numvals); 
+        
+        for(int i=0; i<numvars; i++) watches[i]=-1;
+        watches[numvars]=numvars+1;
+        for(int i=numvars+2; i<(numvars+1 + 4*numvars+2*numvals); i=i+2)
+        {   // link up the freelist.
+            watches[i]=i+1;
+        }
+        watches[numvars+1 + 4*numvars+2*numvals-1]=-1;
+    }
+    
+    inline bool doesItTrigger(int var)
+    {   // does the changed variable var trigger propagation on the target variables. 
+        int idx=watches[var];  // start of linked list.
+        if(idx==-1)
+        {   // must be the first call, because otherwise all variables would have at least two important values.
+            return true;
+        }
+        while(idx!=-1)
+        {
+            if(!var_array[var].inDomain(watches[idx]))
+            {
+                return true;
+            }
+            idx=watches[idx+1]; // go to next.
+        }
+        return false;
+    }
+    
+    inline void addwatch(int var, int val)
+    {
+        //cout << "In addwatch. var:" << var << " val:" << val << endl;
+        //printlist(var);
+        
+        // chop out the first elelemnt in the free list
+        int idx=watches[numvars];
+        D_ASSERT(idx!=-1);
+        watches[numvars]=watches[idx+1];
+        
+        watches[idx]=val;
+        
+        // splice into list for var at head. 
+        watches[idx+1]=watches[var];
+        watches[var]=idx;
+        //printlist(var);
+        
+        //cout << "Exiting addwatch" <<endl;
+    }
+    
+    void printlist(int var)
+    {
+        cout <<"Var: "<< var << " values: ";
+        int idx=watches[var];
+        while(idx!=-1)
+        {
+            cout << watches[idx] << " ";
+            idx=watches[idx+1];
+        }
+        cout << endl;
+    }
+    
+    inline void clearwatches(int var)
+    {
+        // go through and find end of list.
+        //cout << "In clearwatches for var: "<<var <<endl;
+        int idx=watches[var];
+        if(idx==-1) return;
+        
+        // find the end of the list
+        while(watches[idx+1]!=-1)
+        {
+            idx=watches[idx+1]; // next
+        }
+        // splice list into freelist.
+        watches[idx+1]=watches[numvars];
+        watches[numvars]=watches[var];
+        watches[var]=-1;
+        
+        //cout << "Leaving clearwatches" <<endl;
+    }
+};
+
+
 #endif
