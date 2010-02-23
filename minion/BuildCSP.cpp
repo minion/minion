@@ -126,8 +126,14 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     
   if(!getState(stateObj).isFailed())
   {
-    try
-      { sm->search(); }
+    try {
+        if(!getOptions(stateObj).noTimers && getOptions(stateObj).search_limit > 0)
+        {
+            getState(stateObj).setupAlarm(getOptions(stateObj).timeout_active, getOptions(stateObj).search_limit, getOptions(stateObj).time_limit_is_CPU_time);
+            getState(stateObj).setupCtrlc();
+        }
+        sm->search();
+    }
     catch(EndOfSearch)
     { }
   }

@@ -133,7 +133,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       ++i;
       if(getOptions(stateObj).timeout_active)
       {
-        cout << "Only one '-cpulimit' or '-timelimit' per instance" << endl;
+        cout << "Only one '-cpulimit', '-searchlimit' or '-timelimit' per instance" << endl;
         exit(1);
       }
       getOptions(stateObj).timeout_active = true;
@@ -148,12 +148,31 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
         exit(1);
       }
     }
+    else if(command == string("-searchlimit"))
+    {
+      ++i;
+      if(getOptions(stateObj).timeout_active)
+      {
+        cout << "Only one '-cpulimit', '-searchlimit' or '-timelimit' per instance" << endl;
+        exit(1);
+      }
+      getOptions(stateObj).timeout_active = true;
+      try
+      {
+        getOptions(stateObj).search_limit = from_string_checked<int>(argv[i]);
+      }
+      catch(...)
+      {
+        cout << "Did not understand the parameter to searchlimit:" << argv[i] << endl;
+        exit(1);
+      }
+    }
     else if(command == string("-cpulimit"))
     {
       ++i;
       if(getOptions(stateObj).timeout_active)
       {
-        cout << "Only one '-cpulimit' or '-timelimit' per instance" << endl;
+        cout << "Only one '-cpulimit', '-searchlimit' or '-timelimit' per instance" << endl;
         exit(1);
       }
       getOptions(stateObj).timeout_active = true;
