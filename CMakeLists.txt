@@ -355,6 +355,19 @@ if(INFO)
     add_definitions(-DMORE_SEARCH_INFO)
 endif()
 
+option(DUMMYTRIG "" OFF)
+
+if(DUMMYTRIG)
+    message(STATUS "Dummy Trigger")
+    add_definitions(-DNO_DYN_CHECK)
+    add_definitions(-DDUMMY_TRIG)
+endif()
+
+if(BROKENTRIG)
+    message(STATUS "Warning: Broken global triggers!")
+    add_definitions(-DNO_DYN_CHECK)
+endif()
+
 option(QUICK "" OFF)
 if(QUICK)
     message(STATUS "Enabling quick compilation")

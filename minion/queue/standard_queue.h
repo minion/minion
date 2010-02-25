@@ -65,9 +65,14 @@ public:
   TriggerBacktrackQueue& getTbq()
   { return tbq; }
 
+#ifndef NO_DYN_CHECK
   DynamicTrigger*& getNextQueuePtrRef() { return next_queue_ptr; }
+#endif
 
-  Queues(StateObj* _stateObj) : stateObj(_stateObj), next_queue_ptr(NULL)
+  Queues(StateObj* _stateObj) : stateObj(_stateObj)
+#ifndef NO_DYN_CHECK
+                                , next_queue_ptr(NULL)
+#endif
   {}
 
   void pushSpecialTrigger(AbstractConstraint* trigger)
@@ -144,10 +149,15 @@ public:
           return true;
         }
 
-#ifdef NO_DYN_CHECK
-        DynamicTrigger* next_queue_ptr;
+#ifdef DUMMY_TRIG
+        DynamicTrigger dummy;
+        dummy.add_after(it);
 #endif
-        next_queue_ptr = it->next;
+
+#ifndef NO_DYN_CHECK
+       next_queue_ptr = it->next;
+
+#endif
         CON_INFO_ADDONE(DynamicTrigger);
         it->propagate();
 
@@ -155,7 +165,15 @@ public:
         if(getOptions(stateObj).wdeg_on && *fail_ptr)
           it->constraint->incWdeg();
 #endif
+
+#ifdef DUMMY_TRIG
+       it = dummy.next;
+       releaseTrigger(stateObj, &dummy);
+#endif
+
+#ifndef NO_DYN_CHECK
         it = next_queue_ptr;
+#endif
       }
     }
     return false;
@@ -270,10 +288,14 @@ public:
           return true;
         }
 
-#ifdef NO_DYN_CHECK
-        DynamicTrigger* next_queue_ptr;
+#ifdef DUMMY_TRIG
+        DynamicTrigger dummy;
+        dummy.add_after(it);
 #endif
+
+#ifndef NO_DYN_CHECK
         next_queue_ptr = it->next;
+#endif
 
         if(it->constraint->full_propagate_done)
         {
@@ -281,7 +303,14 @@ public:
             it->propagate();
         }
 
+#ifdef DUMMY_TRIG
+        it = dummy.next;
+        releaseTrigger(stateObj, &dummy);
+#endif
+
+#ifndef NO_DYN_CHECK
         it = next_queue_ptr;
+#endif
       }
     }
     return false;
