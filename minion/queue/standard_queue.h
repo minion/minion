@@ -150,7 +150,11 @@ public:
         }
 
 #ifdef DUMMY_TRIG
+#ifdef MINION_DEBUG
+        DynamicTrigger dummy(AbstractConstraint*(BAD_POINTER));
+#else
         DynamicTrigger dummy;
+#endif
         dummy.add_after(it);
 #endif
 
@@ -289,7 +293,11 @@ public:
         }
 
 #ifdef DUMMY_TRIG
+#ifdef MINION_DEBUG
+        DynamicTrigger dummy(AbstractConstraint*(BAD_POINTER));
+#else
         DynamicTrigger dummy;
+#endif
         dummy.add_after(it);
 #endif
 
