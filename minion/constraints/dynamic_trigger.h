@@ -133,7 +133,7 @@ private:
        new_next->prev = this;
        D_ASSERT(prev->next == this);
        D_ASSERT(next->prev == this);
-       D_ASSERT(new_prev->sanity_check_list());
+       D_ASSERT(new_prev->sanity_check_list(false));
    }
 public:
   /// Add this trigger after another one in a list.
