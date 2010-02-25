@@ -113,6 +113,8 @@ private:
 #ifdef NO_DYN_CHECK
    void add_after_implementation(DynamicTrigger* new_prev)
    {
+       if(prev != NULL)
+           remove();
 #else
    void add_after_implementation(DynamicTrigger* new_prev, DynamicTrigger*& next_queue_ptr)
    {
