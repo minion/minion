@@ -144,7 +144,7 @@ public:
   {
     D_ASSERT(constraint != NULL);
     D_ASSERT(sanity_check == 1234);
-    D_ASSERT(new_prev->sanity_check_list());
+    D_ASSERT(new_prev->sanity_check_list(false));
     add_after_implementation(new_prev);
   }
 
@@ -153,7 +153,7 @@ public:
   {
     D_ASSERT(constraint != NULL);
     D_ASSERT(sanity_check == 1234);
-    D_ASSERT(new_prev->sanity_check_list());
+    D_ASSERT(new_prev->sanity_check_list(false));
     add_after_implementation(new_prev, next_queue_ptr);
   }
 #endif
