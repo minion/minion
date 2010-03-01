@@ -884,7 +884,7 @@ struct InstanceStats
       cout << s << "cts_per_var_mean_normalised:" << (((double)totalarity)/((double) varcount))/((double) c.size()) << endl;
 
       // alldiff stats
-      vector<double> alldiffvarsoverdom;
+      vector<double> alldiffdomovervars;
       
       // six categories of constraint, output their proportion and count
       int alldiff=0, sums=0, or_atleastk=0, ternary=0, binary=0, table=0; 
@@ -907,15 +907,17 @@ struct InstanceStats
                 {
                     alldiff++;
                     int num = 0;
-                    int domsize = 0;
+                    int upper = INT_MIN;
+                    int lower = INT_MAX;
                     for(int j = 0; j < i->vars.size(); j++) {
                         for(int k = 0; k < i->vars[j].size(); k++) {
                             num++;
                             Bounds bounds = v.get_bounds(i->vars[j][k]);
-                            domsize += bounds.upper_bound - bounds.lower_bound + 1;
+                            lower = lower > bounds.lower_bound ? bounds.lower_bound : lower;
+                            upper = upper < bounds.upper_bound ? bounds.upper_bound : upper;
                         }
                     }
-                    alldiffvarsoverdom.push_back((double) num * (double) num / (double) domsize);
+                    alldiffdomovervars.push_back(((double) upper - (double) lower + 1.0) / (double) num);
                 }
                 break;
             case CT_GEQSUM:
@@ -1002,16 +1004,16 @@ struct InstanceStats
           }
       }
       
-      std::sort(alldiffvarsoverdom.begin(), alldiffvarsoverdom.end());
+      std::sort(alldiffdomovervars.begin(), alldiffdomovervars.end());
 
-      cout << s << "alldiffvarsoverdom_0:" << alldiffvarsoverdom[0] <<endl;
-      cout << s << "alldiffvarsoverdom_25:" << alldiffvarsoverdom[alldiffvarsoverdom.size()/4] <<endl;
-      cout << s << "alldiffvarsoverdom_50:" << alldiffvarsoverdom[alldiffvarsoverdom.size()/2] <<endl;
-      cout << s << "alldiffvarsoverdom_75:" << alldiffvarsoverdom[(alldiffvarsoverdom.size()*3)/4] <<endl;
-      cout << s << "alldiffvarsoverdom_100:" << alldiffvarsoverdom.back() <<endl;
+      cout << s << "alldiffdomovervars_0:" << alldiffdomovervars[0] <<endl;
+      cout << s << "alldiffdomovervars_25:" << alldiffdomovervars[alldiffdomovervars.size()/4] <<endl;
+      cout << s << "alldiffdomovervars_50:" << alldiffdomovervars[alldiffdomovervars.size()/2] <<endl;
+      cout << s << "alldiffdomovervars_75:" << alldiffdomovervars[(alldiffdomovervars.size()*3)/4] <<endl;
+      cout << s << "alldiffdomovervars_100:" << alldiffdomovervars.back() <<endl;
 
-      double alldiffvarsoverdomtotal = std::accumulate(alldiffvarsoverdom.begin(), alldiffvarsoverdom.end(), 0.0);
-      cout << s << "alldiffvarsoverdom_mean:" << (alldiffvarsoverdomtotal)/(double) alldiffvarsoverdom.size() << endl;
+      double alldiffdomovervarstotal = std::accumulate(alldiffdomovervars.begin(), alldiffdomovervars.end(), 0.0);
+      cout << s << "alldiffdomovervars_mean:" << (alldiffdomovervarstotal)/(double) alldiffdomovervars.size() << endl;
 
       cout << s << "alldiff_count:" << alldiff << endl;
       cout << s << "alldiff_proportion:" << ((double)alldiff)/(double)c.size() << endl;
