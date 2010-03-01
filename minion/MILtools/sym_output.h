@@ -882,6 +882,9 @@ struct InstanceStats
       cout << s << "arity_mean_normalised:" << (((double)totalarity)/(double) arities.size())/((double) varcount) << endl;
       cout << s << "cts_per_var_mean:" << ((double)totalarity)/(double) varcount << endl;
       cout << s << "cts_per_var_mean_normalised:" << (((double)totalarity)/((double) varcount))/((double) c.size()) << endl;
+
+      // alldiff stats
+      vector<double> alldiffvarsoverdom;
       
       // six categories of constraint, output their proportion and count
       int alldiff=0, sums=0, or_atleastk=0, ternary=0, binary=0, table=0; 
@@ -901,7 +904,19 @@ struct InstanceStats
                 break;
             case CT_ALLDIFF:
             case CT_GACALLDIFF:
-                alldiff++;
+                {
+                    alldiff++;
+                    int num = 0;
+                    int domsize = 0;
+                    for(int j = 0; j < i->vars.size(); j++) {
+                        for(int k = 0; k < i->vars[j].size(); k++) {
+                            num++;
+                            Bounds bounds = v.get_bounds(i->vars[j][k]);
+                            domsize += bounds.upper_bound - bounds.lower_bound + 1;
+                        }
+                    }
+                    alldiffvarsoverdom.push_back((double) num * (double) num / (double) domsize);
+                }
                 break;
             case CT_GEQSUM:
             case CT_LEQSUM:
@@ -987,6 +1002,17 @@ struct InstanceStats
           }
       }
       
+      std::sort(alldiffvarsoverdom.begin(), alldiffvarsoverdom.end());
+
+      cout << s << "alldiffvarsoverdom_0:" << alldiffvarsoverdom[0] <<endl;
+      cout << s << "alldiffvarsoverdom_25:" << alldiffvarsoverdom[alldiffvarsoverdom.size()/4] <<endl;
+      cout << s << "alldiffvarsoverdom_50:" << alldiffvarsoverdom[alldiffvarsoverdom.size()/2] <<endl;
+      cout << s << "alldiffvarsoverdom_75:" << alldiffvarsoverdom[(alldiffvarsoverdom.size()*3)/4] <<endl;
+      cout << s << "alldiffvarsoverdom_100:" << alldiffvarsoverdom.back() <<endl;
+
+      double alldiffvarsoverdomtotal = std::accumulate(alldiffvarsoverdom.begin(), alldiffvarsoverdom.end(), 0.0);
+      cout << s << "alldiffvarsoverdom_mean:" << (alldiffvarsoverdomtotal)/(double) alldiffvarsoverdom.size() << endl;
+
       cout << s << "alldiff_count:" << alldiff << endl;
       cout << s << "alldiff_proportion:" << ((double)alldiff)/(double)c.size() << endl;
       cout << s << "sums_count:" << sums << endl;
@@ -1075,7 +1101,7 @@ struct InstanceStats
       cout << s << "edge_density:" << ((double)count_pairs)/(((double)(varcount*(varcount-1)))/2.0) << endl;
       
       GraphBuilder graph(csp);
-      cout << s << "Local_Variance: " << partition_graph(graph.g.build_graph_info(csp, false)) << endl;
+      cout << s << "Local_Variance:" << partition_graph(graph.g.build_graph_info(csp, false)) << endl;
       
   }
   
