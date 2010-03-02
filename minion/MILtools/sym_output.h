@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <set>
 
+#include <limits.h> /* INT_MIN, INT_MAX */
+
 std::vector<std::vector<int> > 
 build_graph(std::vector<std::set<int> > graph, const std::vector<std::set<int> >& partition);
 
