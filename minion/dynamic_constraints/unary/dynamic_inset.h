@@ -133,5 +133,11 @@ template<typename Var>
     }
     return false;
   }
+
+  virtual AbstractConstraint* reverse_constraint();
 };
+
+// To get reverse_constraint
+#include "dynamic_notinset.h"
+
 #endif

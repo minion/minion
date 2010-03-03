@@ -30,6 +30,8 @@
 #ifndef CONSTRAINT_DYNAMIC_UNARY_LITERAL_H
 #define CONSTRAINT_DYNAMIC_UNARY_LITERAL_H
 
+#include "dynamic_notliteral.h"
+
 // Checks if a variable is equal to a value.
 template<typename Var>
   struct WatchLiteralConstraint : public AbstractConstraint
@@ -82,5 +84,16 @@ template<typename Var>
     else
         return false;
   }
+
+   virtual AbstractConstraint* reverse_constraint()
+  { return new WatchNotLiteralConstraint<Var>(stateObj, var, val); }
 };
+
+// From dynamic_notliteral.h
+template<typename Var>
+  AbstractConstraint* WatchNotLiteralConstraint<Var>::reverse_constraint()
+  { return new WatchLiteralConstraint<Var>(stateObj, var, val); }
+
+  inline AbstractConstraint* WatchNotLiteralBoolConstraint::reverse_constraint()
+  { return new WatchLiteralConstraint<BoolVarRef>(stateObj, var, val); }
 #endif

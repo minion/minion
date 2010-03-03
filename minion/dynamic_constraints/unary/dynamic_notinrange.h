@@ -30,6 +30,8 @@
 #ifndef CONSTRAINT_DYNAMIC_UNARY_NOTINRANGE_H
 #define CONSTRAINT_DYNAMIC_UNARY_NOTINRANGE_H
 
+#include "dynamic_inrange.h"
+
 // Checks if a variable is in a fixed Range.
 template<typename Var>
   struct WatchNotInRangeConstraint : public AbstractConstraint
@@ -139,5 +141,19 @@ template<typename Var>
     }
     return false;
   }
+
+  virtual AbstractConstraint* reverse_constraint()
+  {
+      array<DomainInt, 2> a = {range_min, range_max};
+      return new WatchInRangeConstraint<Var>(stateObj, var, a);
+  }
 };
+
+// From dynamic_inrange.h
+template<typename Var>
+AbstractConstraint* WatchInRangeConstraint<Var>::reverse_constraint()
+{
+    array<DomainInt, 2> a = {range_min, range_max};
+    return new WatchNotInRangeConstraint<Var>(stateObj, var, a);  
+}
 #endif

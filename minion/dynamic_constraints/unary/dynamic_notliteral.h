@@ -89,6 +89,8 @@ template<typename Var>
     }
     return false;
   }
+
+   AbstractConstraint* reverse_constraint();
 };
 
 struct WatchNotLiteralBoolConstraint : public AbstractConstraint
@@ -143,5 +145,10 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
     }
     return false;
   }
+
+   AbstractConstraint* reverse_constraint();
 };
+
+// For reverse constraint.
+#include "dynamic_literal.h"
 #endif

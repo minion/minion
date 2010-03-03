@@ -31,6 +31,8 @@ set {a1,..,an}.
 #ifndef CONSTRAINT_DYNAMIC_UNARY_NOTINSET_H
 #define CONSTRAINT_DYNAMIC_UNARY_NOTINSET_H
 
+#include "dynamic_inset.h"
+
 // Checks if a variable is not in a fixed set.
 template<typename Var>
   struct WatchNotInSetConstraint : public AbstractConstraint
@@ -117,5 +119,16 @@ template<typename Var>
     }
     return false;
   }
+
+  virtual AbstractConstraint* reverse_constraint()
+  { return new WatchInSetConstraint<Var>(stateObj, var, vals); }
+
 };
+
+
+// From dynamic_inset.h
+template<typename Var>
+AbstractConstraint* WatchInSetConstraint<Var>::reverse_constraint()
+{ return new WatchNotInSetConstraint<Var>(stateObj, var, vals); }
+
 #endif
