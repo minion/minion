@@ -1261,7 +1261,7 @@ class testw__minus__inset:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("w-inset", False, options, [1,5], ["num","const"], self, True)
+        return runtestgeneral("w-inset", True, options, [1,5], ["num","const"], self, True)
 
 class testw__minus__notinset:
     def printtable(self, domains):
@@ -1274,7 +1274,7 @@ class testw__minus__notinset:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("w-notinset", False, options, [1,5], ["num","const"], self, True)
+        return runtestgeneral("w-notinset", True, options, [1,5], ["num","const"], self, True)
 
 class testw__minus__inrange:
     def printtable(self, domains):
@@ -1289,7 +1289,7 @@ class testw__minus__inrange:
     def runtest(self, options=dict()):
         # must have two constants, so set 'fixlength' option
         options['fixlength']=True
-        return runtestgeneral("w-inrange", False, options, [1,2], ["num","const"], self, True)
+        return runtestgeneral("w-inrange", True, options, [1,2], ["num","const"], self, True)
 
 class testw__minus__notinrange:
     def printtable(self, domains):
@@ -1304,7 +1304,7 @@ class testw__minus__notinrange:
     def runtest(self, options=dict()):
         # must have two constants, so set 'fixlength' option
         options['fixlength']=True
-        return runtestgeneral("w-notinrange", False, options, [1,2], ["num","const"], self, True)
+        return runtestgeneral("w-notinrange", True, options, [1,2], ["num","const"], self, True)
 
 class testw__minus__literal:
     def printtable(self, domains):
@@ -1317,7 +1317,7 @@ class testw__minus__literal:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("w-literal", False, options, [1,1], ["num","const"], self, True)
+        return runtestgeneral("w-literal", True, options, [1,1], ["num","const"], self, True)
 
 class testw__minus__notliteral:
     def printtable(self, domains):
@@ -1330,7 +1330,7 @@ class testw__minus__notliteral:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("w-notliteral", False, options, [1,1], ["num","const"], self, True)
+        return runtestgeneral("w-notliteral", True, options, [1,1], ["num","const"], self, True)
 
 ################################################################################
 # 

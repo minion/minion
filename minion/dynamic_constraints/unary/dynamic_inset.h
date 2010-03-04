@@ -53,6 +53,11 @@ template<typename Var>
   virtual void full_propagate()
   {  
     DynamicTrigger* dt = dynamic_trigger_start();
+    if(vals.empty())
+    {
+        getState(stateObj).setFailed(true);
+        return;
+    }
     var.setMin(vals.front());
     var.setMax(vals.back());
 
