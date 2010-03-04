@@ -156,10 +156,15 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
-    if(var.inDomain(1 - val))
+    if(var.getMin() != val)
     {
-      assignment.push_back(make_pair(0, 1 - val));
-      return true;
+        assignment.push_back(make_pair(0, var.getMin()));
+        return true;
+    }
+    if(var.getMax() != val)
+    {
+        assignment.push_back(make_pair(0, var.getMax()));
+        return true;
     }
     return false;
   }
