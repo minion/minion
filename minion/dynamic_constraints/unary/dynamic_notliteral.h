@@ -45,18 +45,36 @@ template<typename Var>
     AbstractConstraint(_stateObj), var(_var), val(_val) {}
 
   int dynamic_trigger_count()
-  { return 0; }
+  { return 1; }
 
   virtual void full_propagate()
   { 
-    var.removeFromDomain(val); 
+    if(var.isBound())
+    {
+        if(var.getMin() == val)
+            var.setMin(val + 1);
+        else if(var.getMax() == val)
+            var.setMax(val - 1);
+        else
+            var.addDynamicTrigger(dynamic_trigger_start(), DomainChanged);
+    }
+    else
+      var.removeFromDomain(val); 
   }
 
 
   virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(WatchInRange);
-    var.removeFromDomain(val); 
+    if(var.isBound())
+    {
+        if(var.getMin() == val)
+            var.setMin(val + 1);
+        else if(var.getMax() == val)
+            var.setMax(val - 1);
+    }
+    else
+      var.removeFromDomain(val); 
   }
 
   virtual BOOL check_assignment(DomainInt* v, int v_size)
