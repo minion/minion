@@ -33,7 +33,7 @@ int main(int argc, char** argv)
   //  cout << "sumleq(v, 50)" << endl;
   //  cout << "sumgeq(v, 51)" << endl;
 
-    for(int i = 0; i < 2000; ++i)
+    for(int i = 0; i < 10000; ++i)
     {
         int x1,x2,x3,x4;
         x1 = rand() % num;
@@ -51,10 +51,12 @@ int main(int argc, char** argv)
         printf("table([v[%d],v[%d],v[%d], v[%d]], mytab)\n", x1 ,x2, x3, x4);
         break;
             case 2:
-        printf("min([v[%d],v[%d]], v[%d])\n", x1, x2, x3);
-        break;
-           case 3:
-        printf("product(v[%d],v[%d], v[%d])\n", x1, x2, x3);
+        printf("watched-or({diseq(v[%d],v[%d]), diseq(v[%d],v[%d])})\n", x1, x2, x3, x4);
+            case 3:
+        printf("**VARIABLES**\n BOOL x_%d\n BOOL y_%d\n", i, i);
+        printf("**CONSTRAINTS**\n");
+        printf("reify(diseq(v[%d],v[%d]),x_%d)\n reify(diseq(v[%d],v[%d]), y_%d)\n", x1, x2, i, x3, x4, i);
+        printf("sumgeq([x_%d,y_%d],1)\n", i, i);
         break;
         default: abort();
         }
