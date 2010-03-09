@@ -149,7 +149,7 @@ if(var_array[0].inDomain(0)) {
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
-    return (std::min(v[0], v[1]) == v[2]);  }
+    return (std::min(v[0], v[1]) == v[2]);
   }
 
   virtual vector<AnyVarRef> get_vars()
