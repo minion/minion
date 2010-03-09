@@ -11,7 +11,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply" "reifyimply-old"
                     "reifyimply-new" "true" "false" "check[gsa]" "check[assign]"
-                    "watchvecexists_less" "lighttable"
+                    "watchvecexists_less" "lighttable" "test"
                     )
 
 set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
@@ -100,6 +100,9 @@ set(NAME_READ_max "read_list" "read_var")
 
 set(NAME_ID_min "CT_MIN")
 set(NAME_READ_min "read_list" "read_var")
+
+set(NAME_ID_test "CT_TEST")
+set(NAME_READ_test "read_list")
 
 set(NAME_ID_occurrence "CT_OCCURRENCE")
 set(NAME_READ_occurrence "read_list" "read_constant" "read_var")
