@@ -1,0 +1,35 @@
+MINION 1
+#TEST CHECKONESOL 2 0 1 1 0
+# Minion Quasigroup Instance
+# Kind: QG7 Size: 6
+# Idempotent
+# CSPLib Problem prob003
+#    http://www.csplib.org
+# Idempotency Constraints
+# Result variables are (b*a)*b and should be = a*(b*a)
+# Symmetry Breaking Constraints
+#
+# Minion Constraint Solver Input
+#    http://sourceforge.net/projects/minion
+# Instance created using CLisp generator written by Ian Gent
+# Instance created at 18:08 on 29 Mar 2006
+0
+0
+0
+5
+2 2 1
+0 0 1
+1 1 1
+0 1 1
+0 1 1
+0
+[x0,x1,x2,x3,x4]
+[a,a,a,a,a]
+0
+1
+[[x0,x1,x2,x3,x4]]
+0
+objective none
+print m0
+
+watchelement([x0,x1,x2],x3,x4)

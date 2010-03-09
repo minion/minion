@@ -1,0 +1,9 @@
+MINION 3
+#TEST SOLCOUNT 0
+
+**CONSTRAINTS**
+
+watched-or({false(), false()})
+
+**EOF**
+
