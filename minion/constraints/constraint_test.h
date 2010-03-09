@@ -56,99 +56,100 @@ struct TestConstraint : public AbstractConstraint
   
   virtual void propagate(int lit, DomainDelta)
   {
-#ifdef NO_SPLIT
+
    full_propagate();
-#else
-switch(lit) {
-case 0:
-if(var_array[1].inDomain(0)) {
-  if(var_array[1].inDomain(1)) {
-    if(var_array[2].inDomain(0)) {
-      if(!var_array[2].inDomain(1)) {
-        var_array[1].removeFromDomain(1);
-      }
-    } else {
-      var_array[1].removeFromDomain(0);
-    }
-  } else {
-    var_array[2].removeFromDomain(1);
-  }
-} else {
-  var_array[2].removeFromDomain(0);
-}
-break;
-case 1:
-var_array[2].removeFromDomain(1);
-break;
-case 2:
-if(var_array[0].inDomain(0)) {
-  if(var_array[0].inDomain(1)) {
-    if(var_array[2].inDomain(0)) {
-      if(!var_array[2].inDomain(1)) {
-        var_array[0].removeFromDomain(1);
-      }
-    } else {
-      var_array[0].removeFromDomain(0);
-    }
-  } else {
-    var_array[2].removeFromDomain(1);
-  }
-} else {
-  var_array[2].removeFromDomain(0);
-}
-break;
-case 3:
-var_array[2].removeFromDomain(1);
-break;
-case 4:
-var_array[0].removeFromDomain(0);
-var_array[1].removeFromDomain(0);
-break;
-case 5:
-if(var_array[0].inDomain(0)) {
-  if(!var_array[1].inDomain(0)) {
-    var_array[0].removeFromDomain(1);
-  }
-} else {
-  var_array[1].removeFromDomain(1);
-}
-break;
-default: abort(); }
-#endif
   }
   
     
   virtual void full_propagate()
   {
-if(var_array[0].inDomain(1)) {
-  if(var_array[2].inDomain(0)) {
-    if(var_array[1].inDomain(0)) {
-      if(var_array[2].inDomain(1)) {
-        if(!var_array[1].inDomain(1)) {
-          var_array[2].removeFromDomain(1);
+if(var_array[0].inDomain(0)) {
+  if(var_array[0].inDomain(1)) {
+    if(var_array[2].inDomain(0)) {
+      if(!var_array[2].inDomain(1)) {
+        if(!var_array[3].inDomain(1)) {
+          if(var_array[1].inDomain(0)) {
+            if(!var_array[1].inDomain(1)) {
+              var_array[0].removeFromDomain(0);
+            }
+          } else {
+            var_array[0].removeFromDomain(1);
+          }
+        }
+      }
+    } else {
+      if(!var_array[3].inDomain(0)) {
+        if(var_array[1].inDomain(0)) {
+          if(!var_array[1].inDomain(1)) {
+            var_array[0].removeFromDomain(0);
+          }
+        } else {
+          var_array[0].removeFromDomain(1);
+        }
+      }
+    }
+  } else {
+    if(var_array[1].inDomain(1)) {
+      if(var_array[2].inDomain(0)) {
+        if(!var_array[2].inDomain(1)) {
+          if(!var_array[3].inDomain(1)) {
+            var_array[1].removeFromDomain(0);
+          }
         }
       } else {
-        if(!var_array[0].inDomain(0)) {
+        if(!var_array[3].inDomain(0)) {
+          var_array[1].removeFromDomain(0);
+        }
+      }
+    } else {
+      if(var_array[2].inDomain(0)) {
+        if(var_array[2].inDomain(1)) {
+          if(var_array[3].inDomain(0)) {
+            if(!var_array[3].inDomain(1)) {
+              var_array[2].removeFromDomain(0);
+            }
+          } else {
+            var_array[2].removeFromDomain(1);
+          }
+        } else {
+          var_array[3].removeFromDomain(0);
+        }
+      } else {
+        var_array[3].removeFromDomain(1);
+      }
+    }
+  }
+} else {
+  if(var_array[1].inDomain(0)) {
+    if(var_array[2].inDomain(0)) {
+      if(!var_array[2].inDomain(1)) {
+        if(!var_array[3].inDomain(1)) {
           var_array[1].removeFromDomain(1);
         }
       }
     } else {
-      if(var_array[0].inDomain(0)) {
-        if(!var_array[2].inDomain(1)) {
-          var_array[0].removeFromDomain(1);
-        }
-      } else {
-        var_array[2].removeFromDomain(0);
+      if(!var_array[3].inDomain(0)) {
+        var_array[1].removeFromDomain(1);
       }
     }
   } else {
-    var_array[0].removeFromDomain(0);
-    var_array[1].removeFromDomain(0);
+    if(var_array[2].inDomain(0)) {
+      if(var_array[2].inDomain(1)) {
+        if(var_array[3].inDomain(0)) {
+          if(!var_array[3].inDomain(1)) {
+            var_array[2].removeFromDomain(0);
+          }
+        } else {
+          var_array[2].removeFromDomain(1);
+        }
+      } else {
+        var_array[3].removeFromDomain(0);
+      }
+    } else {
+      var_array[3].removeFromDomain(1);
+    }
   }
-} else {
-  var_array[2].removeFromDomain(1);
-}
-      
+}      
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)

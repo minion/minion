@@ -13,7 +13,20 @@ int main(int argc, char** argv)
     const int num = 1000;
     cout << "MINION 3" << endl;
     cout << "**TUPLELIST**" << endl;
-    cout << "mytab 4 3 0 0 0 0 1 0 1 0 0 1 1 1" << endl;
+    cout << "mytab 12 4 \
+        0 1 0 0\
+        0 1 0 1\
+        0 1 1 0\
+        0 1 1 1\
+        1 0 0 0\
+        1 0 0 1\
+        1 0 1 0\
+        1 0 1 1\
+\
+        0 0 1 0\
+        1 1 1 0\
+        0 0 0 1\
+        1 1 0 1" << endl;
     cout << "**VARIABLES**" << endl;
     cout << "BOOL v[" << num << "]" << endl;
     cout << "**CONSTRAINTS**" << endl;
@@ -22,19 +35,20 @@ int main(int argc, char** argv)
 
     for(int i = 0; i < 2000; ++i)
     {
-        int x1,x2,x3;
+        int x1,x2,x3,x4;
         x1 = rand() % num;
         x2 = rand() % num;
         x3 = rand() % num;
+        x4 = rand() % num;
 
 
         switch(choice)
         {
             case 0:
-        printf("test([v[%d],v[%d],v[%d]])\n", x1, x2, x3);
+        printf("test([v[%d],v[%d],v[%d], v[%d]])\n", x1, x2, x3, x4);
         break;
             case 1:
-        printf("table([v[%d],v[%d],v[%d]], mytab)\n", x1 ,x2, x3);
+        printf("table([v[%d],v[%d],v[%d], v[%d]], mytab)\n", x1 ,x2, x3, x4);
         break;
             case 2:
         printf("min([v[%d],v[%d]], v[%d])\n", x1, x2, x3);
