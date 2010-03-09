@@ -2098,6 +2098,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         // follow an edge in the matching from a value to a variable,
         // follow edges not in the matching from variables to values. 
         
+        // IMPROVE HERE: This implementation is time optimal O(r^2 d)
+        // but it can duplicate work: if it looks for a path for x1, and 
+        // doesn't find one, then looks for a path for x2, it can revisit
+        // nodes that were seen in the search for x1.
+        
         #if UseIncGraph
         for(int startvari=0; startvari<adjlistlength[forbiddenval-dom_min+numvars] && newlb>existinglb; startvari++)
         {
@@ -2235,6 +2240,16 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         
         return newlb;
     }
+    
+    // By changing the flow in card_upperbound and not restoring it, 
+    // might compromize the the worst-case analysis of the lowerbound thing...
+    // it requires the same flow so that it only looks for a mazimum of r paths.
+    
+    // Actually might be better to not restore the matching here, because it calls
+    // lowerbound then upperbound for value a, then moves onto next value b.
+    // This means occurrences of a are maximized before looking at b.
+    // therefore occurrences of b might be reduced. 
+    // overall though, not sure if worst-case analysis is not compromised. 
     
     inline int card_upperbound(int value, int existingub)
     {
