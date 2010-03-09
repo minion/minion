@@ -301,17 +301,26 @@ struct BothNonZeroIterated
   }
 };
 
-//#define SLOW_VEC_OR
+#ifdef SLOW_VEC_OR
+#define VEC_NAME STATIC
+#else
+#define VEC_NAME DYNAMIC
+#endif
+
+#define JOIN(a,b) a##b
+#define ConName JOIN(VEC_NAME, VecNeqDynamic)
+
+#define STRINGIFY(a) # a
 
 /** Constraints two vectors of variables to be not equal.
   *
   *  \ingroup Constraints
 */
 template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
-  struct VecNeqDynamic : public AbstractConstraint
+  struct ConName : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "VecNeqDynamic"; }
+    { return STRINGIFY(VEC_NAME) "VecNeqDynamic"; }
 
   typedef typename VarArray1::value_type VarRef1;
   typedef typename VarArray2::value_type VarRef2;
@@ -325,7 +334,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   Reversible<bool> propagate_mode;
   int index_to_propagate; 
 
-  VecNeqDynamic(StateObj* _stateObj, const VarArray1& _array1,
+  ConName (StateObj* _stateObj, const VarArray1& _array1,
     const VarArray2& _array2) :
   AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
     propagate_mode(_stateObj, false)
