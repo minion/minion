@@ -1,0 +1,13 @@
+MINION 3
+#TEST SOLCOUNT 2
+**VARIABLES**
+
+BOOL b[2]
+
+
+**CONSTRAINTS**
+
+eq(b[0], !b[1])
+
+
+**EOF**

@@ -1,0 +1,13 @@
+MINION 3
+#TEST GROUP 1
+
+**VARIABLES**
+
+DISCRETE a {1..4}
+DISCRETE b {1..4}
+**CONSTRAINTS**
+
+eq(a,a)
+eq(a,b)
+
+**EOF**

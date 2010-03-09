@@ -1,0 +1,309 @@
+# Minion Version 0.8.1
+# Svn version: 2537
+# Svn last changed date: 2009-04-15 22:05:43 +0100 (Wed, 15 Apr 2009)
+#  Run at: UTC Thu Apr 16 20:18:03 2009
+
+#    http://minion.sourceforge.net
+#  Minion is still very new and in active development.
+#  If you have problems with Minion or find any bugs, please tell us!
+#  Mailing list at: https://mail.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: benchmarks/Quasigroup/qg-watchelement-7-8.minion
+# Command line: ./build/minion -redump benchmarks/Quasigroup/qg-watchelement-7-8.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..7}
+DISCRETE x1{0..7}
+DISCRETE x2{0..7}
+DISCRETE x3{0..7}
+DISCRETE x4{0..7}
+DISCRETE x5{0..7}
+DISCRETE x6{0..7}
+DISCRETE x7{0..7}
+DISCRETE x8{0..7}
+DISCRETE x9{0..7}
+DISCRETE x10{0..7}
+DISCRETE x11{0..7}
+DISCRETE x12{0..7}
+DISCRETE x13{0..7}
+DISCRETE x14{0..7}
+DISCRETE x15{0..7}
+DISCRETE x16{0..7}
+DISCRETE x17{0..7}
+DISCRETE x18{0..7}
+DISCRETE x19{0..7}
+DISCRETE x20{0..7}
+DISCRETE x21{0..7}
+DISCRETE x22{0..7}
+DISCRETE x23{0..7}
+DISCRETE x24{0..7}
+DISCRETE x25{0..7}
+DISCRETE x26{0..7}
+DISCRETE x27{0..7}
+DISCRETE x28{0..7}
+DISCRETE x29{0..7}
+DISCRETE x30{0..7}
+DISCRETE x31{0..7}
+DISCRETE x32{0..7}
+DISCRETE x33{0..7}
+DISCRETE x34{0..7}
+DISCRETE x35{0..7}
+DISCRETE x36{0..7}
+DISCRETE x37{0..7}
+DISCRETE x38{0..7}
+DISCRETE x39{0..7}
+DISCRETE x40{0..7}
+DISCRETE x41{0..7}
+DISCRETE x42{0..7}
+DISCRETE x43{0..7}
+DISCRETE x44{0..7}
+DISCRETE x45{0..7}
+DISCRETE x46{0..7}
+DISCRETE x47{0..7}
+DISCRETE x48{0..7}
+DISCRETE x49{0..7}
+DISCRETE x50{0..7}
+DISCRETE x51{0..7}
+DISCRETE x52{0..7}
+DISCRETE x53{0..7}
+DISCRETE x54{0..7}
+DISCRETE x55{0..7}
+DISCRETE x56{0..7}
+DISCRETE x57{0..7}
+DISCRETE x58{0..7}
+DISCRETE x59{0..7}
+DISCRETE x60{0..7}
+DISCRETE x61{0..7}
+DISCRETE x62{0..7}
+DISCRETE x63{0..7}
+DISCRETE x64{0..7}
+DISCRETE x65{0..7}
+DISCRETE x66{0..7}
+DISCRETE x67{0..7}
+DISCRETE x68{0..7}
+DISCRETE x69{0..7}
+DISCRETE x70{0..7}
+DISCRETE x71{0..7}
+DISCRETE x72{0..7}
+DISCRETE x73{0..7}
+DISCRETE x74{0..7}
+DISCRETE x75{0..7}
+DISCRETE x76{0..7}
+DISCRETE x77{0..7}
+DISCRETE x78{0..7}
+DISCRETE x79{0..7}
+DISCRETE x80{0..7}
+DISCRETE x81{0..7}
+DISCRETE x82{0..7}
+DISCRETE x83{0..7}
+DISCRETE x84{0..7}
+DISCRETE x85{0..7}
+DISCRETE x86{0..7}
+DISCRETE x87{0..7}
+DISCRETE x88{0..7}
+DISCRETE x89{0..7}
+DISCRETE x90{0..7}
+DISCRETE x91{0..7}
+DISCRETE x92{0..7}
+DISCRETE x93{0..7}
+DISCRETE x94{0..7}
+DISCRETE x95{0..7}
+DISCRETE x96{0..7}
+DISCRETE x97{0..7}
+DISCRETE x98{0..7}
+DISCRETE x99{0..7}
+DISCRETE x100{0..7}
+DISCRETE x101{0..7}
+DISCRETE x102{0..7}
+DISCRETE x103{0..7}
+DISCRETE x104{0..7}
+DISCRETE x105{0..7}
+DISCRETE x106{0..7}
+DISCRETE x107{0..7}
+DISCRETE x108{0..7}
+DISCRETE x109{0..7}
+DISCRETE x110{0..7}
+DISCRETE x111{0..7}
+DISCRETE x112{0..7}
+DISCRETE x113{0..7}
+DISCRETE x114{0..7}
+DISCRETE x115{0..7}
+DISCRETE x116{0..7}
+DISCRETE x117{0..7}
+DISCRETE x118{0..7}
+DISCRETE x119{0..7}
+DISCRETE x120{0..7}
+DISCRETE x121{0..7}
+DISCRETE x122{0..7}
+DISCRETE x123{0..7}
+DISCRETE x124{0..7}
+DISCRETE x125{0..7}
+DISCRETE x126{0..7}
+DISCRETE x127{0..7}
+**SEARCH**
+VARORDER [x63,x55,x47,x39,x31,x23,x15,x7,x0,x1,x2,x3,x4,x5,x6,x8,x9,x10,x11,x12,x13,x14,x16,x17,x18,x19,x20,x21,x22,x24,x25,x26,x27,x28,x29,x30,x32,x33,x34,x35,x36,x37,x38,x40,x41,x42,x43,x44,x45,x46,x48,x49,x50,x51,x52,x53,x54,x56,x57,x58,x59,x60,x61,x62]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47,x48,x49,x50,x51,x52,x53,x54,x55,x56,x57,x58,x59,x60,x61,x62,x63,x64,x65,x66,x67,x68,x69,x70,x71,x72,x73,x74,x75,x76,x77,x78,x79,x80,x81,x82,x83,x84,x85,x86,x87,x88,x89,x90,x91,x92,x93,x94,x95,x96,x97,x98,x99,x100,x101,x102,x103,x104,x105,x106,x107,x108,x109,x110,x111,x112,x113,x114,x115,x116,x117,x118,x119,x120,x121,x122,x123,x124,x125,x126,x127]
+PRINT[[x0,x1,x2,x3,x4,x5,x6,x7],[x8,x9,x10,x11,x12,x13,x14,x15],[x16,x17,x18,x19,x20,x21,x22,x23],[x24,x25,x26,x27,x28,x29,x30,x31],[x32,x33,x34,x35,x36,x37,x38,x39],[x40,x41,x42,x43,x44,x45,x46,x47],[x48,x49,x50,x51,x52,x53,x54,x55],[x56,x57,x58,x59,x60,x61,x62,x63]]
+**TUPLELIST**
+**CONSTRAINTS**
+alldiff([x0,x8,x16,x24,x32,x40,x48,x56])
+alldiff([x0,x1,x2,x3,x4,x5,x6,x7])
+alldiff([x1,x9,x17,x25,x33,x41,x49,x57])
+alldiff([x8,x9,x10,x11,x12,x13,x14,x15])
+alldiff([x2,x10,x18,x26,x34,x42,x50,x58])
+alldiff([x16,x17,x18,x19,x20,x21,x22,x23])
+alldiff([x3,x11,x19,x27,x35,x43,x51,x59])
+alldiff([x24,x25,x26,x27,x28,x29,x30,x31])
+alldiff([x4,x12,x20,x28,x36,x44,x52,x60])
+alldiff([x32,x33,x34,x35,x36,x37,x38,x39])
+alldiff([x5,x13,x21,x29,x37,x45,x53,x61])
+alldiff([x40,x41,x42,x43,x44,x45,x46,x47])
+alldiff([x6,x14,x22,x30,x38,x46,x54,x62])
+alldiff([x48,x49,x50,x51,x52,x53,x54,x55])
+alldiff([x7,x15,x23,x31,x39,x47,x55,x63])
+alldiff([x56,x57,x58,x59,x60,x61,x62,x63])
+eq(x0, 0)
+eq(x9, 1)
+eq(x18, 2)
+eq(x27, 3)
+eq(x36, 4)
+eq(x45, 5)
+eq(x54, 6)
+eq(x63, 7)
+watchelement([x0,x8,x16,x24,x32,x40,x48,x56], x0, x64)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7], x0, x64)
+watchelement([x1,x9,x17,x25,x33,x41,x49,x57], x8, x65)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7], x8, x65)
+watchelement([x2,x10,x18,x26,x34,x42,x50,x58], x16, x66)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7], x16, x66)
+watchelement([x3,x11,x19,x27,x35,x43,x51,x59], x24, x67)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7], x24, x67)
+watchelement([x4,x12,x20,x28,x36,x44,x52,x60], x32, x68)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7], x32, x68)
+watchelement([x5,x13,x21,x29,x37,x45,x53,x61], x40, x69)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7], x40, x69)
+watchelement([x6,x14,x22,x30,x38,x46,x54,x62], x48, x70)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7], x48, x70)
+watchelement([x7,x15,x23,x31,x39,x47,x55,x63], x56, x71)
+watchelement([x0,x1,x2,x3,x4,x5,x6,x7], x56, x71)
+watchelement([x0,x8,x16,x24,x32,x40,x48,x56], x1, x72)
+watchelement([x8,x9,x10,x11,x12,x13,x14,x15], x1, x72)
+watchelement([x1,x9,x17,x25,x33,x41,x49,x57], x9, x73)
+watchelement([x8,x9,x10,x11,x12,x13,x14,x15], x9, x73)
+watchelement([x2,x10,x18,x26,x34,x42,x50,x58], x17, x74)
+watchelement([x8,x9,x10,x11,x12,x13,x14,x15], x17, x74)
+watchelement([x3,x11,x19,x27,x35,x43,x51,x59], x25, x75)
+watchelement([x8,x9,x10,x11,x12,x13,x14,x15], x25, x75)
+watchelement([x4,x12,x20,x28,x36,x44,x52,x60], x33, x76)
+watchelement([x8,x9,x10,x11,x12,x13,x14,x15], x33, x76)
+watchelement([x5,x13,x21,x29,x37,x45,x53,x61], x41, x77)
+watchelement([x8,x9,x10,x11,x12,x13,x14,x15], x41, x77)
+watchelement([x6,x14,x22,x30,x38,x46,x54,x62], x49, x78)
+watchelement([x8,x9,x10,x11,x12,x13,x14,x15], x49, x78)
+watchelement([x7,x15,x23,x31,x39,x47,x55,x63], x57, x79)
+watchelement([x8,x9,x10,x11,x12,x13,x14,x15], x57, x79)
+watchelement([x0,x8,x16,x24,x32,x40,x48,x56], x2, x80)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23], x2, x80)
+watchelement([x1,x9,x17,x25,x33,x41,x49,x57], x10, x81)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23], x10, x81)
+watchelement([x2,x10,x18,x26,x34,x42,x50,x58], x18, x82)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23], x18, x82)
+watchelement([x3,x11,x19,x27,x35,x43,x51,x59], x26, x83)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23], x26, x83)
+watchelement([x4,x12,x20,x28,x36,x44,x52,x60], x34, x84)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23], x34, x84)
+watchelement([x5,x13,x21,x29,x37,x45,x53,x61], x42, x85)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23], x42, x85)
+watchelement([x6,x14,x22,x30,x38,x46,x54,x62], x50, x86)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23], x50, x86)
+watchelement([x7,x15,x23,x31,x39,x47,x55,x63], x58, x87)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23], x58, x87)
+watchelement([x0,x8,x16,x24,x32,x40,x48,x56], x3, x88)
+watchelement([x24,x25,x26,x27,x28,x29,x30,x31], x3, x88)
+watchelement([x1,x9,x17,x25,x33,x41,x49,x57], x11, x89)
+watchelement([x24,x25,x26,x27,x28,x29,x30,x31], x11, x89)
+watchelement([x2,x10,x18,x26,x34,x42,x50,x58], x19, x90)
+watchelement([x24,x25,x26,x27,x28,x29,x30,x31], x19, x90)
+watchelement([x3,x11,x19,x27,x35,x43,x51,x59], x27, x91)
+watchelement([x24,x25,x26,x27,x28,x29,x30,x31], x27, x91)
+watchelement([x4,x12,x20,x28,x36,x44,x52,x60], x35, x92)
+watchelement([x24,x25,x26,x27,x28,x29,x30,x31], x35, x92)
+watchelement([x5,x13,x21,x29,x37,x45,x53,x61], x43, x93)
+watchelement([x24,x25,x26,x27,x28,x29,x30,x31], x43, x93)
+watchelement([x6,x14,x22,x30,x38,x46,x54,x62], x51, x94)
+watchelement([x24,x25,x26,x27,x28,x29,x30,x31], x51, x94)
+watchelement([x7,x15,x23,x31,x39,x47,x55,x63], x59, x95)
+watchelement([x24,x25,x26,x27,x28,x29,x30,x31], x59, x95)
+watchelement([x0,x8,x16,x24,x32,x40,x48,x56], x4, x96)
+watchelement([x32,x33,x34,x35,x36,x37,x38,x39], x4, x96)
+watchelement([x1,x9,x17,x25,x33,x41,x49,x57], x12, x97)
+watchelement([x32,x33,x34,x35,x36,x37,x38,x39], x12, x97)
+watchelement([x2,x10,x18,x26,x34,x42,x50,x58], x20, x98)
+watchelement([x32,x33,x34,x35,x36,x37,x38,x39], x20, x98)
+watchelement([x3,x11,x19,x27,x35,x43,x51,x59], x28, x99)
+watchelement([x32,x33,x34,x35,x36,x37,x38,x39], x28, x99)
+watchelement([x4,x12,x20,x28,x36,x44,x52,x60], x36, x100)
+watchelement([x32,x33,x34,x35,x36,x37,x38,x39], x36, x100)
+watchelement([x5,x13,x21,x29,x37,x45,x53,x61], x44, x101)
+watchelement([x32,x33,x34,x35,x36,x37,x38,x39], x44, x101)
+watchelement([x6,x14,x22,x30,x38,x46,x54,x62], x52, x102)
+watchelement([x32,x33,x34,x35,x36,x37,x38,x39], x52, x102)
+watchelement([x7,x15,x23,x31,x39,x47,x55,x63], x60, x103)
+watchelement([x32,x33,x34,x35,x36,x37,x38,x39], x60, x103)
+watchelement([x0,x8,x16,x24,x32,x40,x48,x56], x5, x104)
+watchelement([x40,x41,x42,x43,x44,x45,x46,x47], x5, x104)
+watchelement([x1,x9,x17,x25,x33,x41,x49,x57], x13, x105)
+watchelement([x40,x41,x42,x43,x44,x45,x46,x47], x13, x105)
+watchelement([x2,x10,x18,x26,x34,x42,x50,x58], x21, x106)
+watchelement([x40,x41,x42,x43,x44,x45,x46,x47], x21, x106)
+watchelement([x3,x11,x19,x27,x35,x43,x51,x59], x29, x107)
+watchelement([x40,x41,x42,x43,x44,x45,x46,x47], x29, x107)
+watchelement([x4,x12,x20,x28,x36,x44,x52,x60], x37, x108)
+watchelement([x40,x41,x42,x43,x44,x45,x46,x47], x37, x108)
+watchelement([x5,x13,x21,x29,x37,x45,x53,x61], x45, x109)
+watchelement([x40,x41,x42,x43,x44,x45,x46,x47], x45, x109)
+watchelement([x6,x14,x22,x30,x38,x46,x54,x62], x53, x110)
+watchelement([x40,x41,x42,x43,x44,x45,x46,x47], x53, x110)
+watchelement([x7,x15,x23,x31,x39,x47,x55,x63], x61, x111)
+watchelement([x40,x41,x42,x43,x44,x45,x46,x47], x61, x111)
+watchelement([x0,x8,x16,x24,x32,x40,x48,x56], x6, x112)
+watchelement([x48,x49,x50,x51,x52,x53,x54,x55], x6, x112)
+watchelement([x1,x9,x17,x25,x33,x41,x49,x57], x14, x113)
+watchelement([x48,x49,x50,x51,x52,x53,x54,x55], x14, x113)
+watchelement([x2,x10,x18,x26,x34,x42,x50,x58], x22, x114)
+watchelement([x48,x49,x50,x51,x52,x53,x54,x55], x22, x114)
+watchelement([x3,x11,x19,x27,x35,x43,x51,x59], x30, x115)
+watchelement([x48,x49,x50,x51,x52,x53,x54,x55], x30, x115)
+watchelement([x4,x12,x20,x28,x36,x44,x52,x60], x38, x116)
+watchelement([x48,x49,x50,x51,x52,x53,x54,x55], x38, x116)
+watchelement([x5,x13,x21,x29,x37,x45,x53,x61], x46, x117)
+watchelement([x48,x49,x50,x51,x52,x53,x54,x55], x46, x117)
+watchelement([x6,x14,x22,x30,x38,x46,x54,x62], x54, x118)
+watchelement([x48,x49,x50,x51,x52,x53,x54,x55], x54, x118)
+watchelement([x7,x15,x23,x31,x39,x47,x55,x63], x62, x119)
+watchelement([x48,x49,x50,x51,x52,x53,x54,x55], x62, x119)
+watchelement([x0,x8,x16,x24,x32,x40,x48,x56], x7, x120)
+watchelement([x56,x57,x58,x59,x60,x61,x62,x63], x7, x120)
+watchelement([x1,x9,x17,x25,x33,x41,x49,x57], x15, x121)
+watchelement([x56,x57,x58,x59,x60,x61,x62,x63], x15, x121)
+watchelement([x2,x10,x18,x26,x34,x42,x50,x58], x23, x122)
+watchelement([x56,x57,x58,x59,x60,x61,x62,x63], x23, x122)
+watchelement([x3,x11,x19,x27,x35,x43,x51,x59], x31, x123)
+watchelement([x56,x57,x58,x59,x60,x61,x62,x63], x31, x123)
+watchelement([x4,x12,x20,x28,x36,x44,x52,x60], x39, x124)
+watchelement([x56,x57,x58,x59,x60,x61,x62,x63], x39, x124)
+watchelement([x5,x13,x21,x29,x37,x45,x53,x61], x47, x125)
+watchelement([x56,x57,x58,x59,x60,x61,x62,x63], x47, x125)
+watchelement([x6,x14,x22,x30,x38,x46,x54,x62], x55, x126)
+watchelement([x56,x57,x58,x59,x60,x61,x62,x63], x55, x126)
+watchelement([x7,x15,x23,x31,x39,x47,x55,x63], x63, x127)
+watchelement([x56,x57,x58,x59,x60,x61,x62,x63], x63, x127)
+ineq(0, x7, 2)
+ineq(1, x15, 2)
+ineq(2, x23, 2)
+ineq(3, x31, 2)
+ineq(4, x39, 2)
+ineq(5, x47, 2)
+ineq(6, x55, 2)
+ineq(7, x63, 2)
+**EOF**
