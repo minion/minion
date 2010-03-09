@@ -41,17 +41,75 @@ struct TestConstraint : public AbstractConstraint
     
     for(int i = 0; i < var_array.size(); ++i)
     { // Have to add 1 else the 0th element will be lost.
-      t.push_back(make_trigger(var_array[i], Trigger(this, i + 1), LowerBound));
-      t.push_back(make_trigger(var_array[i], Trigger(this, -(i + 1)), UpperBound));
+      t.push_back(make_trigger(var_array[i], Trigger(this, 2*i), LowerBound));
+      t.push_back(make_trigger(var_array[i], Trigger(this, 2*i+1), UpperBound));
     }
     
     return t;
   }
   
   
-  virtual void propagate(int prop_val, DomainDelta)
+  virtual void propagate(int lit, DomainDelta)
   {
+#ifdef NO_SPLIT
    full_propagate();
+#else
+switch(lit) {
+case 0:
+if(var_array[1].inDomain(0)) {
+  if(var_array[1].inDomain(1)) {
+    if(var_array[2].inDomain(0)) {
+      if(!var_array[2].inDomain(1)) {
+        var_array[1].removeFromDomain(1);
+      }
+    } else {
+      var_array[1].removeFromDomain(0);
+    }
+  } else {
+    var_array[2].removeFromDomain(1);
+  }
+} else {
+  var_array[2].removeFromDomain(0);
+}
+break;
+case 1:
+var_array[2].removeFromDomain(1);
+break;
+case 2:
+if(var_array[0].inDomain(0)) {
+  if(var_array[0].inDomain(1)) {
+    if(var_array[2].inDomain(0)) {
+      if(!var_array[2].inDomain(1)) {
+        var_array[0].removeFromDomain(1);
+      }
+    } else {
+      var_array[0].removeFromDomain(0);
+    }
+  } else {
+    var_array[2].removeFromDomain(1);
+  }
+} else {
+  var_array[2].removeFromDomain(0);
+}
+break;
+case 3:
+var_array[2].removeFromDomain(1);
+break;
+case 4:
+var_array[0].removeFromDomain(0);
+var_array[1].removeFromDomain(0);
+break;
+case 5:
+if(var_array[0].inDomain(0)) {
+  if(!var_array[1].inDomain(0)) {
+    var_array[0].removeFromDomain(1);
+  }
+} else {
+  var_array[1].removeFromDomain(1);
+}
+break;
+default: abort(); }
+#endif
   }
   
     
