@@ -307,7 +307,8 @@ struct BothNonZeroIterated
 #define VEC_NAME DYNAMIC
 #endif
 
-#define JOIN(a,b) a##b
+#define EXPAND(a,b) a ## b
+#define JOIN(a,b) EXPAND(a,b)
 #define ConName JOIN(VEC_NAME, VecNeqDynamic)
 
 #define STRINGIFY(a) # a
