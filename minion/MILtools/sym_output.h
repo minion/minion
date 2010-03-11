@@ -1006,6 +1006,10 @@ struct InstanceStats
           }
       }
       
+      if(alldiffdomovervars.size() == 0) {
+        alldiffdomovervars.push_back(0.0);
+      }
+
       std::sort(alldiffdomovervars.begin(), alldiffdomovervars.end());
 
       cout << s << "alldiffdomovervars_0:" << alldiffdomovervars[0] <<endl;
