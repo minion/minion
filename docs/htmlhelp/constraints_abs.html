@@ -1,22 +1,21 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>switches -nodelimit</title>
+<title>constraints abs</title>
 </head>
 <body>
-<h1>Help on <tt>switches -nodelimit</tt></h1>
+<h1>Help on <tt>constraints abs</tt></h1>
 <h3>Description</h3>
 <pre>
-To stop search after N nodes, do
+The constraint
 
-   minion -nodelimit N myinput.minion
+   abs(x,y)
+
+makes sure that x=|y|, i.e. x is the absolute value of y.
 </pre>
-<h3>References</h3>
+<h3>Reference</h3>
 <pre>
-help switches -cpulimit
-help switches -timelimit
-help switches -searchlimit
-help switches -sollimit
+help constraints abs
 </pre>
 <p><a href="index.html">Home</a></p>
 </body>
