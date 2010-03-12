@@ -163,6 +163,7 @@ cout << "To stop search after N nodes, do" << endl
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << "help switches -timelimit" << endl
+<< "help switches -searchlimit" << endl
 << "help switches -sollimit" << endl << endl << endl;
 } else
 if("switches -timelimit" == request) {
@@ -174,6 +175,7 @@ cout << "To stop search after N seconds (real time), do" << endl
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << "help switches -nodelimit" << endl
+<< "help switches -searchlimit" << endl
 << "help switches -sollimit" << endl << endl << endl;
 } else
 if("switches -cpulimit" == request) {
@@ -184,6 +186,21 @@ cout << "To stop search after N seconds (CPU time), do" << endl
 << " minion -cpulimit N myinput.minion" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -timelimit" << endl
+<< "help switches -nodelimit" << endl
+<< "help switches -searchlimit" << endl
+<< "help switches -sollimit" << endl << endl << endl;
+} else
+if("switches -searchlimit" == request) {
+cout << "Help entry: " << "switches -searchlimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "To stop search after N seconds search time (real time), do" << endl
+<< "" << endl
+<< " minion -searchlimit N myinput.minion" << endl
+<< "" << endl
+<< "This does not include any time spent in preprocessing." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -timelimit" << endl
+<< "help switches -cpulimit" << endl
 << "help switches -nodelimit" << endl
 << "help switches -sollimit" << endl << endl << endl;
 } else
@@ -196,6 +213,7 @@ cout << "To stop search after N solutions have been found, do" << endl
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << "help switches -nodelimit" << endl
+<< "help switches -searchlimit" << endl
 << "help switches -timelimit" << endl << endl << endl;
 } else
 if("switches -varorder" == request) {
@@ -1636,6 +1654,7 @@ cout << "help switches -randomiseorder" << endl;
 cout << "help switches -randomseed" << endl;
 cout << "help switches -redump" << endl;
 cout << "help switches -resume-file" << endl;
+cout << "help switches -searchlimit" << endl;
 cout << "help switches -sollimit" << endl;
 cout << "help switches -solsout" << endl;
 cout << "help switches -tableout" << endl;
