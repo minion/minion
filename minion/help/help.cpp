@@ -1149,6 +1149,16 @@ cout << "References" << "-------------------------------------------------------
 cout << "help constraints occurrence" << endl
 << "help constraints occurrenceleq" << endl << endl << endl;
 } else
+if("constraints lighttable" == request) {
+cout << "Help entry: " << "constraints lighttable" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "An extensional constraint that enforces GAC. The constraint is" << endl
+<< "specified via a list of tuples. lighttable is a variant of the " << endl
+<< "table constraint that is stateless and potentially faster" << endl
+<< "for small constraints." << endl
+<< "" << endl
+<< "For full documentation, see the help for the table constraint." << endl << endl << endl;
+} else
 if("constraints eq" == request) {
 cout << "Help entry: " << "constraints eq" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -1593,6 +1603,7 @@ cout << "help constraints hamming" << endl;
 cout << "help constraints ineq" << endl;
 cout << "help constraints lexleq" << endl;
 cout << "help constraints lexless" << endl;
+cout << "help constraints lighttable" << endl;
 cout << "help constraints litsumgeq" << endl;
 cout << "help constraints max" << endl;
 cout << "help constraints min" << endl;
