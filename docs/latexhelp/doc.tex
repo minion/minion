@@ -201,7 +201,7 @@ for details of an identical constraint that enforces generalised arc
 consistency.
 \end{verbatim}
 }
-\section{constraints element\textunderscore one}
+\section{constraints element	extunderscore one}
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
@@ -881,6 +881,98 @@ help input tuplelist
 help input negativetable
 \end{verbatim}
 }
+\section{constraints w-inrange}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-notinrange
+\end{verbatim}
+}
+\section{constraints w-inset}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set 
+{a1,..,an}.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-notinset
+\end{verbatim}
+}
+\section{constraints w-literal}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-literal(x, a) ensures that x=a.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-notliteral
+\end{verbatim}
+}
+\section{constraints w-notinrange}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-inrange
+\end{verbatim}
+}
+\section{constraints w-notinset}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong to the
+set {a1,..,an}.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-inset
+\end{verbatim}
+}
+\section{constraints w-notliteral}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-notliteral(x, a) ensures that x =/= a.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-literal
+\end{verbatim}
+}
 \section{constraints watched-and}
 \paragraph{Description}
 {\footnotesize
@@ -958,7 +1050,7 @@ for details of an identical constraint that enforces a lower level of
 consistency.
 \end{verbatim}
 }
-\section{constraints watchelement\textunderscore one}
+\section{constraints watchelement	extunderscore one}
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
@@ -1099,98 +1191,6 @@ the scalar dot product of constantVec and varVec.
 help constraints weightedsumgeq
 help constraints sumleq
 help constraints sumgeq
-\end{verbatim}
-}
-\section{constraints w-inrange}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-  The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-notinrange
-\end{verbatim}
-}
-\section{constraints w-inset}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set 
-{a1,..,an}.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-notinset
-\end{verbatim}
-}
-\section{constraints w-literal}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-  The constraint w-literal(x, a) ensures that x=a.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-notliteral
-\end{verbatim}
-}
-\section{constraints w-notinrange}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-  The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-inrange
-\end{verbatim}
-}
-\section{constraints w-notinset}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong to the
-set {a1,..,an}.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-inset
-\end{verbatim}
-}
-\section{constraints w-notliteral}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-  The constraint w-notliteral(x, a) ensures that x =/= a.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-literal
 \end{verbatim}
 }
 \section{input}
@@ -1541,6 +1541,31 @@ below contains all available switches. For example to see help on
 replacing 'minion' by the name of the executable you're using.
 \end{verbatim}
 }
+\section{switches -X-prop-node}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Allows the user to choose the level of consistency to be enforced
+during search.
+
+See entry 'help switches -preprocess' for details of the available
+levels of consistency.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+To enforce SSAC during search:
+
+   minion -X-prop-node SSAC input.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -preprocess
+\end{verbatim}
+}
 \section{switches -check}
 \paragraph{Description}
 {\footnotesize
@@ -1568,6 +1593,7 @@ To stop search after N seconds (CPU time), do
 \begin{verbatim}
 help switches -timelimit
 help switches -nodelimit
+help switches -searchlimit
 help switches -sollimit
 \end{verbatim}
 }
@@ -1629,6 +1655,7 @@ To stop search after N nodes, do
 \begin{verbatim}
 help switches -cpulimit
 help switches -timelimit
+help switches -searchlimit
 help switches -sollimit
 \end{verbatim}
 }
@@ -1770,6 +1797,26 @@ To resume the solving of problem.minion from the file resume.minion do
    minion -resume-file resume.minion problem.minion
 \end{verbatim}
 }
+\section{switches -searchlimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+To stop search after N seconds search time (real time), do
+
+   minion -searchlimit N myinput.minion
+
+This does not include any time spent in preprocessing.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -timelimit
+help switches -cpulimit
+help switches -nodelimit
+help switches -sollimit
+\end{verbatim}
+}
 \section{switches -sollimit}
 \paragraph{Description}
 {\footnotesize
@@ -1784,6 +1831,7 @@ To stop search after N solutions have been found, do
 \begin{verbatim}
 help switches -cpulimit
 help switches -nodelimit
+help switches -searchlimit
 help switches -timelimit
 \end{verbatim}
 }
@@ -1835,6 +1883,7 @@ To stop search after N seconds (real time), do
 \begin{verbatim}
 help switches -cpulimit
 help switches -nodelimit
+help switches -searchlimit
 help switches -sollimit
 \end{verbatim}
 }
@@ -1877,31 +1926,6 @@ Print parser progress.
 {\footnotesize
 \begin{verbatim}
 help switches -quiet
-\end{verbatim}
-}
-\section{switches -X-prop-node}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-Allows the user to choose the level of consistency to be enforced
-during search.
-
-See entry 'help switches -preprocess' for details of the available
-levels of consistency.
-\end{verbatim}
-}
-\paragraph{Example}
-{\footnotesize
-\begin{verbatim}
-To enforce SSAC during search:
-
-   minion -X-prop-node SSAC input.minion
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-help switches -preprocess
 \end{verbatim}
 }
 \section{variables}
