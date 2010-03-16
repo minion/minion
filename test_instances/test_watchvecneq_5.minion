@@ -1,0 +1,21 @@
+MINION 1
+#TEST SOLCOUNT 15
+
+0
+0
+0
+2
+1 4 2
+0
+
+[x0,x1]
+[a,a]
+
+0 
+1
+[ [ x0,x1] ]
+0
+objective none
+print m0
+
+watchvecneq([x0,x1],[1,2])

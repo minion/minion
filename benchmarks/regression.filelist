@@ -1,0 +1,146 @@
+bibdline1.minion
+bibdline3.minion
+bibdline5.minion
+bibdline7.minion
+bibdline9.minion
+bibdline11.minion
+golomb.7.noimplied.minion
+golomb.8.noimplied.minion
+golomb.9.noimplied.minion
+golomb.10.noimplied.minion
+golomb.11.noimplied.minion
+indicator5-5.minion
+langford4-2.minion -findallsols -noprintsols
+langford5-2.minion -findallsols -noprintsols
+langford6-2.minion -findallsols -noprintsols
+langford7-2.minion -findallsols -noprintsols
+langford8-2.minion -findallsols -noprintsols
+nqueensJFP0100.minion
+nqueensJFP0200.minion
+nqueensJFP0300.minion
+nqueensJFP0400.minion
+nqueensJFP0500.minion
+nqueensJFP0600.minion
+nqueensJFP0700.minion
+nqueensJFP0800.minion
+nqueensJFP0900.minion
+nqueensJFP1000.minion
+primequeens4.minion
+primequeens5.minion
+primequeens6.minion
+primequeens7.minion
+qg-element-3-10.minion
+qg-element-3-11.minion
+qg-element-3-12.minion
+qg-element-3-6.minion
+qg-element-3-7.minion
+qg-element-3-8.minion
+qg-element-3-9.minion
+qg-element-7-10.minion
+qg-element-7-7.minion
+qg-element-7-8.minion
+qg-element-7-9.minion
+qg-watchelement-3-10.minion
+qg-watchelement-3-11.minion
+qg-watchelement-3-12.minion
+qg-watchelement-3-6.minion
+qg-watchelement-3-7.minion
+qg-watchelement-3-8.minion
+qg-watchelement-3-9.minion
+qg-watchelement-7-10.minion
+qg-watchelement-7-7.minion
+qg-watchelement-7-8.minion
+qg-watchelement-7-9.minion
+qg1-07.minion
+qg1-08.minion
+qg2-07.minion
+qg2-08.minion
+qg3-08.minion
+qg3-09.minion
+qg4-08.minion
+qg4-09.minion
+qg5-09.minion
+qg5-10.minion
+qg5-11.minion
+qg5-12.minion
+qg5-13.minion
+qg6-09.minion
+qg6-10.minion
+qg6-11.minion
+qg6-12.minion
+qg7-09.minion
+qg7-10.minion
+qg7-11.minion
+qg7-12.minion
+qg7-13.minion
+solitaire_benchmark_1.minion
+solitaire_benchmark_2.minion
+solitaire_benchmark_3.minion
+solitaire_benchmark_4.minion
+solitaire_benchmark_5.minion
+solitaire_benchmark_6.minion
+solitaire_benchmark_7.minion
+solitaire_benchmark_8.minion
+steelmill_instance40.minion
+steelmill_instance50.minion
+steelmill_instance60.minion
+steelmill_instance70.minion
+steelmill_instance80.minion
+steelmill_instance90.minion
+steelmill_instance100.minion
+uuf150-01.minion
+uuf150-010.minion
+uuf150-013.minion
+uuf150-016.minion
+uuf150-018.minion
+uuf150-024.minion
+uuf150-031.minion
+uuf150-033.minion
+uuf150-036.minion
+uuf150-037.minion
+uuf150-04.minion
+uuf150-042.minion
+uuf150-044.minion
+uuf150-049.minion
+uuf150-05.minion
+uuf150-052.minion
+uuf150-062.minion
+uuf150-069.minion
+uuf150-070.minion
+uuf150-082.minion
+uuf150-087.minion
+uuf150-089.minion
+uuf150-09.minion
+uuf150-092.minion
+uuf150-093.minion
+uuf150-097.minion
+semigroup6non-abelian012354SG.minion -noprintsols -findallsols
+semigroup6non-abelian001345SG.minion -noprintsols -findallsols
+semigroup6non-abelian002244SG.minion -noprintsols -findallsols
+semigroup6abelian002245SG.minion -noprintsols -findallsols
+semigroup6non-abelian000044SG.minion -noprintsols -findallsols
+semigroup6abelian000045SG.minion -noprintsols -findallsols
+semigroup6abelian000005SG.minion -noprintsols -findallsols
+semigroup6abelian000345SG.minion -noprintsols -findallsols
+semigroup6non-abelian000335SG.minion -noprintsols -findallsols
+semigroup6non-abelian001111SG.minion -noprintsols -findallsols
+semigroup6non-abelian000000SG.minion -noprintsols -findallsols
+semigroup6non-abelian000111SG.minion -noprintsols -findallsols
+semigroup6non-abelian000011SG.minion -noprintsols -findallsols
+semigroup6non-abelian000001SG.minion -noprintsols -findallsols
+semigroup6non-abelian012345SG.minion -noprintsols -findallsols
+semigroup6non-abelian002345SG.minion -noprintsols -findallsols
+semigroup6non-abelian002245SG.minion -noprintsols -findallsols
+semigroup6non-abelian000005SG.minion -noprintsols -findallsols
+semigroup6non-abelian000045SG.minion -noprintsols -findallsols
+semigroup6non-abelian000345SG.minion -noprintsols -findallsols
+graceful-simplek3p2_simple.minion
+graceful-simplek4p2_simple.minion
+graceful-simplek5p2_simple.minion
+graceful-simplek6p2_simple.minion
+graceful-simplek7p2_simple.minion
+graceful-table-multik3p2_table.minion
+graceful-table-multik4p2_table.minion
+graceful-table-multik5p2_table.minion
+graceful-table-multik6p2_table.minion
+graceful-table-multik7p2_table.minion
