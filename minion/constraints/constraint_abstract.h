@@ -255,6 +255,32 @@ public:
       delete[] t;
       return unsatcounter;   // return tightness i.e. #forbidden tuples out of 1000
   }
+
+  int getTightnessEstimateVarVal(const size_t var, const DomainInt val)
+  {
+      // Make 100 random tuples and see if they satisfy the constraint
+      vector<AnyVarRef> vars=get_vars();
+      DomainInt* t=new DomainInt[vars.size()];
+      t[var] = val; //fix specified component
+      int unsatcounter=0;
+      srand(12345);
+      for(int i=0; i<100; i++)
+      {
+          for(int j=0; j<vars.size(); j++)
+          {
+	    if(j != var) {
+              int dsize=vars[j].getInitialMax()-vars[j].getInitialMin()+1;
+              t[j]=(rand()%dsize)+vars[j].getInitialMin();
+	    }
+          }
+          if(!check_assignment(t, vars.size()))
+          {
+              unsatcounter++;
+          }
+      }
+      delete[] t;
+      return unsatcounter;   // return tightness i.e. #forbidden tuples out of 100
+  }
 };
 
 /// Constraint from which other constraints can be inherited. Extends dynamicconstraint to allow children to be dynamic.
