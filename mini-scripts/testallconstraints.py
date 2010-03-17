@@ -35,7 +35,7 @@ conslist+=["watchelement_one", "element_one"]
 # arithmetic constraints
 conslist+=["modulo", "pow", "minuseq", "product", "div", "abs"]
 
-conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "hamming", "not-hamming"]
+conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "staticvecneq", "hamming", "not-hamming"]
 conslist+=["weightedsumleq", "weightedsumgeq"]
 
 conslist+=["litsumgeq"]  

@@ -1197,6 +1197,19 @@ class testwatchvecneq:
     def runtest(self, options=dict()):
         return runtestgeneral("watchvecneq", True, options, [3,3], ["smallnum","smallnum"], self, not options['reify'])
 
+class teststaticvecneq:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            if l[:len(l)/2]!=l[len(l)/2:]:
+                out.append(l)
+        return out
+    
+    def runtest(self, options=dict()):
+        return runtestgeneral("staticvecneq", True, options, [3,3], ["smallnum","smallnum"], self, not options['reify'])
+    
 class testpow:
     def printtable(self, domains):
         if 0 in domains[1]:
