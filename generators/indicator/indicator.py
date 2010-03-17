@@ -72,8 +72,15 @@ diff1    = lambda (x,y): abs(x-y) > 1
 xlessy   = lambda (x,y): x < y
 eqoreq = lambda(a,b,c,d) : (a == b) or (c == d)
 eqorneq = lambda(a,b,c,d) : (a == b) or (c != d)
+sumleq = lambda(a,b,c,d) : a+b+c+d <= 2
 
 domsize = 2
 
+# build_table(function, domsize, arity) builds a list of tuples
+
+# generate_indicator([list of constraints], domsize, IndicatorSize, check_idempotent)
+# check_idempotent will tend to make the problem easier to solve.
+# Note: In indicator problems we want *all solutions*
+
 #generate_indicator([build_table(diff1, 5), build_table(xlessy, 5)], 5, 5)
-generate_indicator([build_table(eqorneq,domsize,4), build_table(eqorneq,domsize,4)], domsize,5, False)
+generate_indicator([build_table(sumleq,domsize,4)], domsize,5, True)

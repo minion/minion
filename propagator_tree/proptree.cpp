@@ -406,12 +406,21 @@ int main(int argc, char** argv)
         }
         cout << "default: abort(); }\n";
     }
-    else
+    else if (argc > 1 && argv[1] == string("-heuristic"))
     {
         TreeVertex* v = build_tree_heuristic(data);
         cerr << "Tree depth:" << v->depth() << "  Tree size: " << v->size() << endl;
         v->print();
        // output_tree(v, data);
+    }
+    else
+    {
+        TreeVertex* v = build_tree(data);
+        cerr << "Tree depth:" << v->depth() << "  Tree size: " << v->size() << endl;
+        v->print();
+       // output_tree(v, data);
+
+
     }
 }
 
