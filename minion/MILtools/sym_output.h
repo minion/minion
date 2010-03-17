@@ -804,6 +804,124 @@ struct InstanceStats
   
   InstanceStats(CSPInstance& _csp, StateObj* _stateObj) : csp(_csp), stateObj(_stateObj)
   { }
+
+  void classifyConstraint(ConstraintBlob i, int* alldiff, int* sums, int* or_atleastk, int* ternary, int* binary, int* table, int* reify, int* lex, int* unary, int* nullary, int* element, int* minmax, int* occurrence, vector<double>* alldiffdomovervars, VarContainer& v) {
+      ConstraintType ct=i.constraint->type;
+      switch(ct)
+      {
+        case CT_WATCHED_LIT:
+        case CT_WATCHED_NOTLIT:
+        case CT_WATCHED_INSET:
+        case CT_WATCHED_NOT_INSET:
+        case CT_WATCHED_INRANGE:
+        case CT_WATCHED_NOT_INRANGE:
+            (*unary)++;
+            break;
+        case CT_ALLDIFF:
+        case CT_GACALLDIFF:
+            {
+                (*alldiff)++;
+                int num = 0;
+                int upper = INT_MIN;
+                int lower = INT_MAX;
+                for(int j = 0; j < i.vars.size(); j++) {
+                    for(int k = 0; k < i.vars[j].size(); k++) {
+                        num++;
+                        Bounds bounds = v.get_bounds(i.vars[j][k]);
+                        lower = lower > bounds.lower_bound ? bounds.lower_bound : lower;
+                        upper = upper < bounds.upper_bound ? bounds.upper_bound : upper;
+                    }
+                }
+                alldiffdomovervars->push_back(((double) upper - (double) lower + 1.0) / (double) num);
+            }
+            break;
+        case CT_GEQSUM:
+        case CT_LEQSUM:
+        case CT_WEIGHTGEQSUM:
+        case CT_WEIGHTLEQSUM:
+        case CT_WATCHED_GEQSUM:
+        case CT_WATCHED_LEQSUM:
+            (*sums)++;
+            break;
+        case CT_WATCHED_OR:
+        case CT_WATCHED_NEW_OR:
+        case CT_WATCHED_NEW_AND:
+        case CT_WATCHED_LITSUM:
+        case CT_WATCHED_VECNEQ:
+        case CT_WATCHED_HAMMING:
+        case CT_WATCHED_NOT_HAMMING:
+        case CT_WATCHED_VEC_OR_LESS:
+            (*or_atleastk)++;
+            break;
+        case CT_PRODUCT2:
+        case CT_DIFFERENCE:
+        case CT_MODULO:
+        case CT_DIV:
+        case CT_POW:
+            (*ternary)++;
+            break;
+        case CT_ABS:
+        case CT_INEQ:
+        case CT_EQ:
+        case CT_MINUSEQ:
+        case CT_DISEQ:
+        case CT_WATCHED_NEQ:
+        case CT_WATCHED_LESS:
+            (*binary)++;
+            break;
+        case CT_REIFY:
+        case CT_DISEQ_REIFY:
+        case CT_EQ_REIFY:
+        case CT_MINUSEQ_REIFY:
+        case CT_REIFYIMPLY_QUICK:
+        case CT_REIFYIMPLY:
+        case CT_REIFYIMPLY_OLD:
+        case CT_REIFYIMPLY_NEW:
+            (*reify)++;
+            for(vector<ConstraintBlob>::iterator j=i.internal_constraints.begin(); j!=i.internal_constraints.end(); ++j)
+            {
+                classifyConstraint(*j, alldiff, sums, or_atleastk, ternary, binary, table, reify, lex, unary, nullary, element, minmax, occurrence, alldiffdomovervars, v);
+            }
+            break;
+        case CT_WATCHED_TABLE:
+        case CT_WATCHED_NEGATIVE_TABLE:
+        case CT_LIGHTTABLE:
+            (*table)++;
+            break;
+        case CT_GACLEXLEQ:
+        case CT_QUICK_LEXLEQ:
+        case CT_LEXLEQ:
+        case CT_LEXLESS:
+        case CT_QUICK_LEXLESS:
+            (*lex)++;
+            break;
+        case CT_TRUE:
+        case CT_FALSE:
+            (*nullary)++;
+            break;
+        case CT_ELEMENT:
+        case CT_ELEMENT_ONE:
+        case CT_WATCHED_ELEMENT:
+        case CT_WATCHED_ELEMENT_ONE:
+        case CT_GACELEMENT:
+            (*element)++;
+            break;
+        case CT_MIN:
+        case CT_MAX:
+            (*minmax)++;
+            break;
+        case CT_OCCURRENCE:
+        case CT_LEQ_OCCURRENCE:
+        case CT_GEQ_OCCURRENCE:
+        case CT_GCC:
+        case CT_GCCWEAK:
+            (*occurrence)++;
+            break;
+        default:
+            cerr << "Stats: Uncategorised constraint:" << i.constraint->name <<endl;
+            // constraints missing: CT_GADGET, CT_CHECK_GSA, CT_CHECK_ASSIGN.
+      }
+  }
   
   void output_stats()
   {
@@ -893,119 +1011,13 @@ struct InstanceStats
       int reify=0, lex=0, unary=0, nullary=0, element=0, minmax=0, occurrence=0;
       for(list<ConstraintBlob>::iterator i=c.begin(); i!=c.end(); ++i)
       {
-          ConstraintType ct=(*i).constraint->type;
-          switch(ct)
-          {
-            case CT_WATCHED_LIT:
-            case CT_WATCHED_NOTLIT:
-            case CT_WATCHED_INSET:
-            case CT_WATCHED_NOT_INSET:
-            case CT_WATCHED_INRANGE:
-            case CT_WATCHED_NOT_INRANGE:
-                unary++;
-                break;
-            case CT_ALLDIFF:
-            case CT_GACALLDIFF:
-                {
-                    alldiff++;
-                    int num = 0;
-                    int upper = INT_MIN;
-                    int lower = INT_MAX;
-                    for(int j = 0; j < i->vars.size(); j++) {
-                        for(int k = 0; k < i->vars[j].size(); k++) {
-                            num++;
-                            Bounds bounds = v.get_bounds(i->vars[j][k]);
-                            lower = lower > bounds.lower_bound ? bounds.lower_bound : lower;
-                            upper = upper < bounds.upper_bound ? bounds.upper_bound : upper;
-                        }
-                    }
-                    alldiffdomovervars.push_back(((double) upper - (double) lower + 1.0) / (double) num);
-                }
-                break;
-            case CT_GEQSUM:
-            case CT_LEQSUM:
-            case CT_WEIGHTGEQSUM:
-            case CT_WEIGHTLEQSUM:
-            case CT_WATCHED_GEQSUM:
-            case CT_WATCHED_LEQSUM:
-                sums++;
-                break;
-            case CT_WATCHED_OR:
-            case CT_WATCHED_NEW_OR:
-            case CT_WATCHED_NEW_AND:
-            case CT_WATCHED_LITSUM:
-            case CT_WATCHED_VECNEQ:
-            case CT_WATCHED_HAMMING:
-            case CT_WATCHED_NOT_HAMMING:
-            case CT_WATCHED_VEC_OR_LESS:
-                or_atleastk++;
-                break;
-            case CT_PRODUCT2:
-            case CT_DIFFERENCE:
-            case CT_MODULO:
-            case CT_DIV:
-            case CT_POW:
-                ternary++;
-                break;
-            case CT_ABS:
-            case CT_INEQ:
-            case CT_EQ:
-            case CT_MINUSEQ:
-            case CT_DISEQ:
-            case CT_WATCHED_NEQ:
-            case CT_WATCHED_LESS:
-                binary++;
-                break;
-            case CT_REIFY:
-            case CT_DISEQ_REIFY:
-            case CT_EQ_REIFY:
-            case CT_MINUSEQ_REIFY:
-            case CT_REIFYIMPLY_QUICK:
-            case CT_REIFYIMPLY:
-            case CT_REIFYIMPLY_OLD:
-            case CT_REIFYIMPLY_NEW:
-                reify++;
-                break;
-            case CT_WATCHED_TABLE:
-            case CT_WATCHED_NEGATIVE_TABLE:
-            case CT_LIGHTTABLE:
-                table++;
-                break;
-            case CT_GACLEXLEQ:
-            case CT_QUICK_LEXLEQ:
-            case CT_LEXLEQ:
-            case CT_LEXLESS:
-            case CT_QUICK_LEXLESS:
-                lex++;
-                break;
-            case CT_TRUE:
-            case CT_FALSE:
-                nullary++;
-                break;
-            case CT_ELEMENT:
-            case CT_ELEMENT_ONE:
-            case CT_WATCHED_ELEMENT:
-            case CT_WATCHED_ELEMENT_ONE:
-            case CT_GACELEMENT:
-                element++;
-                break;
-            case CT_MIN:
-            case CT_MAX:
-                minmax++;
-                break;
-            case CT_OCCURRENCE:
-            case CT_LEQ_OCCURRENCE:
-            case CT_GEQ_OCCURRENCE:
-            case CT_GCC:
-            case CT_GCCWEAK:
-                occurrence++;
-                break;
-            default:
-                cerr << "Stats: Uncategorised constraint:" << (*i).constraint->name <<endl;
-                // constraints missing: CT_GADGET, CT_CHECK_GSA, CT_CHECK_ASSIGN.
-          }
+          classifyConstraint(*i, &alldiff, &sums, &or_atleastk, &ternary, &binary, &table, &reify, &lex, &unary, &nullary, &element, &minmax, &occurrence, &alldiffdomovervars, v);
       }
       
+      if(alldiffdomovervars.size() == 0) {
+        alldiffdomovervars.push_back(0.0);
+      }
+
       std::sort(alldiffdomovervars.begin(), alldiffdomovervars.end());
 
       cout << s << "alldiffdomovervars_0:" << alldiffdomovervars[0] <<endl;

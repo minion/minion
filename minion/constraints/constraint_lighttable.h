@@ -19,6 +19,15 @@
 
 #include "tries.h"
 
+/** @help constraints;lighttable Description
+An extensional constraint that enforces GAC. The constraint is
+specified via a list of tuples. lighttable is a variant of the 
+table constraint that is stateless and potentially faster
+for small constraints.
+
+For full documentation, see the help for the table constraint.
+*/
+
 #ifdef P
 #undef P
 #endif

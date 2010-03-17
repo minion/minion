@@ -5,7 +5,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "max" "min" "occurrence"
                     "occurrenceleq" "occurrencegeq" "product" "difference"
                     "weightedsumleq" "weightedsumgeq" "sumgeq" "sumleq" "watchsumgeq"
-                    "watchsumleq" "table" "negativetable" "watchvecneq" "litsumgeq"
+                    "watchsumleq" "table" "negativetable" "watchvecneq" "staticvecneq" "litsumgeq"
                     "pow" "div" "modulo" "gadget" "disabled-or"
                     "hamming" "not-hamming" "watched-or" "watched-and"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
@@ -148,6 +148,9 @@ set(NAME_READ_lighttable "read_list" "read_tuples")
 
 set(NAME_ID_watchvecneq "CT_WATCHED_VECNEQ")
 set(NAME_READ_watchvecneq "read_list" "read_list")
+
+set(NAME_ID_staticvecneq "CT_STATIC_VECNEQ")
+set(NAME_READ_staticvecneq "read_list" "read_list")
 
 set(NAME_ID_litsumgeq "CT_WATCHED_LITSUM")
 set(NAME_READ_litsumgeq "read_list" "read_constant_list" "read_constant")

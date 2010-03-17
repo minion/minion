@@ -163,6 +163,7 @@ cout << "To stop search after N nodes, do" << endl
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << "help switches -timelimit" << endl
+<< "help switches -searchlimit" << endl
 << "help switches -sollimit" << endl << endl << endl;
 } else
 if("switches -timelimit" == request) {
@@ -174,6 +175,7 @@ cout << "To stop search after N seconds (real time), do" << endl
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << "help switches -nodelimit" << endl
+<< "help switches -searchlimit" << endl
 << "help switches -sollimit" << endl << endl << endl;
 } else
 if("switches -cpulimit" == request) {
@@ -184,6 +186,21 @@ cout << "To stop search after N seconds (CPU time), do" << endl
 << " minion -cpulimit N myinput.minion" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -timelimit" << endl
+<< "help switches -nodelimit" << endl
+<< "help switches -searchlimit" << endl
+<< "help switches -sollimit" << endl << endl << endl;
+} else
+if("switches -searchlimit" == request) {
+cout << "Help entry: " << "switches -searchlimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "To stop search after N seconds search time (real time), do" << endl
+<< "" << endl
+<< " minion -searchlimit N myinput.minion" << endl
+<< "" << endl
+<< "This does not include any time spent in preprocessing." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -timelimit" << endl
+<< "help switches -cpulimit" << endl
 << "help switches -nodelimit" << endl
 << "help switches -sollimit" << endl << endl << endl;
 } else
@@ -196,6 +213,7 @@ cout << "To stop search after N solutions have been found, do" << endl
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << "help switches -nodelimit" << endl
+<< "help switches -searchlimit" << endl
 << "help switches -timelimit" << endl << endl << endl;
 } else
 if("switches -varorder" == request) {
@@ -1131,6 +1149,16 @@ cout << "References" << "-------------------------------------------------------
 cout << "help constraints occurrence" << endl
 << "help constraints occurrenceleq" << endl << endl << endl;
 } else
+if("constraints lighttable" == request) {
+cout << "Help entry: " << "constraints lighttable" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "An extensional constraint that enforces GAC. The constraint is" << endl
+<< "specified via a list of tuples. lighttable is a variant of the " << endl
+<< "table constraint that is stateless and potentially faster" << endl
+<< "for small constraints." << endl
+<< "" << endl
+<< "For full documentation, see the help for the table constraint." << endl << endl << endl;
+} else
 if("constraints eq" == request) {
 cout << "Help entry: " << "constraints eq" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -1575,6 +1603,7 @@ cout << "help constraints hamming" << endl;
 cout << "help constraints ineq" << endl;
 cout << "help constraints lexleq" << endl;
 cout << "help constraints lexless" << endl;
+cout << "help constraints lighttable" << endl;
 cout << "help constraints litsumgeq" << endl;
 cout << "help constraints max" << endl;
 cout << "help constraints min" << endl;
@@ -1636,6 +1665,7 @@ cout << "help switches -randomiseorder" << endl;
 cout << "help switches -randomseed" << endl;
 cout << "help switches -redump" << endl;
 cout << "help switches -resume-file" << endl;
+cout << "help switches -searchlimit" << endl;
 cout << "help switches -sollimit" << endl;
 cout << "help switches -solsout" << endl;
 cout << "help switches -tableout" << endl;

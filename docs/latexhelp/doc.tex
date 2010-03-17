@@ -504,6 +504,18 @@ See also
 for a similar constraint with non-strict lexicographic inequality.
 \end{verbatim}
 }
+\section{constraints lighttable}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+An extensional constraint that enforces GAC. The constraint is
+specified via a list of tuples. lighttable is a variant of the 
+table constraint that is stateless and potentially faster
+for small constraints.
+
+For full documentation, see the help for the table constraint.
+\end{verbatim}
+}
 \section{constraints litsumgeq}
 \paragraph{Description}
 {\footnotesize
@@ -1568,6 +1580,7 @@ To stop search after N seconds (CPU time), do
 \begin{verbatim}
 help switches -timelimit
 help switches -nodelimit
+help switches -searchlimit
 help switches -sollimit
 \end{verbatim}
 }
@@ -1629,6 +1642,7 @@ To stop search after N nodes, do
 \begin{verbatim}
 help switches -cpulimit
 help switches -timelimit
+help switches -searchlimit
 help switches -sollimit
 \end{verbatim}
 }
@@ -1770,6 +1784,26 @@ To resume the solving of problem.minion from the file resume.minion do
    minion -resume-file resume.minion problem.minion
 \end{verbatim}
 }
+\section{switches -searchlimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+To stop search after N seconds search time (real time), do
+
+   minion -searchlimit N myinput.minion
+
+This does not include any time spent in preprocessing.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help switches -timelimit
+help switches -cpulimit
+help switches -nodelimit
+help switches -sollimit
+\end{verbatim}
+}
 \section{switches -sollimit}
 \paragraph{Description}
 {\footnotesize
@@ -1784,6 +1818,7 @@ To stop search after N solutions have been found, do
 \begin{verbatim}
 help switches -cpulimit
 help switches -nodelimit
+help switches -searchlimit
 help switches -timelimit
 \end{verbatim}
 }
@@ -1835,6 +1870,7 @@ To stop search after N seconds (real time), do
 \begin{verbatim}
 help switches -cpulimit
 help switches -nodelimit
+help switches -searchlimit
 help switches -sollimit
 \end{verbatim}
 }
