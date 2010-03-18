@@ -87,6 +87,7 @@ domsize = 2
 
 # check for flags
 
+
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["table", "test", "decomp", "lighttable"])
 
 

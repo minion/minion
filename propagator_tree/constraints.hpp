@@ -49,7 +49,7 @@ struct GACSum
     bool operator()(array<int, 3> a)
     {
 
-        return a[0] + a[1] + a[2] < 4;     
+        return (a[0] != a[1]) && (a[0] != a[2]) && (a[1] != a[2]);     
     }
 
     static const int vcount = 3;
