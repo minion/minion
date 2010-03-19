@@ -127,6 +127,7 @@ struct TreeVertex
     {
         delete true_b;
         delete false_b;
+        delete prop;
     }
 
 
@@ -231,7 +232,8 @@ inline double e_log(double d)
 template<typename T>
 double get_entropy(const T& data, int pos)
 {
-    DataSplit s = split_data(data, pos);
+    DataSplit s;
+    split_data(data, pos, s);
 
     
     counts c_true = data_count(s.true_data.maps);
@@ -281,8 +283,12 @@ bool is_fail_node(const counts& c)
 
 
 
-TreeVertex* build_tree(const DataList& data)
+TreeVertex* build_tree(const DataList& data, int best_size)
 {
+    if(best_size <= 0)
+      return NULL;
+    
+
     counts c = data_count(data.maps);
     pair<bool, InData> out = can_finish_tree(c);
     if(out.first)
@@ -296,28 +302,43 @@ TreeVertex* build_tree(const DataList& data)
     else
     {
         TreeVertex* min_vertex = NULL;
+        int min_vertex_depth = 0;
+        int min_vertex_size = 0;
         // Split on pos;
+        DataSplit s;
         for(int pos = 0; pos < dcount; ++pos)
         {
-            DataSplit s = split_data(data, pos);
+            split_data(data, pos, s);
             if(!s.true_data.empty() && !s.false_data.empty())
             {
-                TreeVertex* true_v = build_tree(s.true_data);
-                TreeVertex* false_v = build_tree(s.false_data);
-                TreeVertex* ret = new TreeVertex(true_v, false_v, pos);
-#ifdef MIN_DEPTH
-                if(min_vertex == NULL || ret->depth() < min_vertex->depth()
-                   || (ret->depth() == min_vertex->depth() && ret->size() < min_vertex->size()))
-#else
-                if(min_vertex == NULL || ret->size() < min_vertex->size()
-                   || (ret->size() == min_vertex->size() && ret->depth() < min_vertex->depth()))
-#endif
+                TreeVertex* true_v = build_tree(s.true_data, best_size - 1);
+                if(true_v != NULL)
                 {
-                    delete min_vertex;
-                    min_vertex = ret;
+                    TreeVertex* false_v = build_tree(s.false_data, best_size - 1);
+                    if(false_v == NULL)
+                    {
+                        delete true_v;
+                    }
+                    else
+                    {
+                        TreeVertex* ret = new TreeVertex(true_v, false_v, pos);
+                        int ret_vertex_depth = ret->depth();
+                        int ret_vertex_size = ret->size();
+
+                        if(min_vertex == NULL || ret_vertex_depth < min_vertex_depth
+                           || (ret_vertex_depth == min_vertex_depth && ret_vertex_size < min_vertex_size))
+                        {
+                            delete min_vertex;
+                            best_size = ret_vertex_depth + 1;
+                            min_vertex = ret;
+                            min_vertex_size = ret_vertex_size;
+                            min_vertex_depth = ret_vertex_depth;
+                        }
+                        else
+                            delete ret;
+                    }
                 }
-                else
-                    delete ret;
+                
             }
         }
         return min_vertex;
@@ -350,7 +371,8 @@ TreeVertex* build_tree_heuristic(const DataList& data)
             }
         }
 
-        DataSplit s = split_data(data, entropy_pos);
+        DataSplit s;
+        split_data(data, entropy_pos, s);
         assert(!s.true_data.empty() && !s.false_data.empty());
         TreeVertex* true_v = build_tree_heuristic(s.true_data);
         TreeVertex* false_v = build_tree_heuristic(s.false_data);
@@ -369,7 +391,8 @@ void output_tree(TreeVertex* v, const DataList& data, string indent = "")
     cout << indent << c << ":" << out.first << fail_node << ":" << out.second << ":" << endl;
     if(!v->isFinal())
     {
-        DataSplit s = split_data(data, v->branchval);
+        DataSplit s;
+        split_data(data, v->branchval, s);
         output_tree(v->true_b, s.true_data, indent + " ");
         cout << indent << "--" << endl;
         output_tree(v->false_b, s.false_data, indent + " ");
@@ -399,7 +422,7 @@ int main(int argc, char** argv)
         {
             cout << "case " << i << ":\n";
             DataList lit_data = filterDataList(data, i, false);
-            TreeVertex* v= build_tree(lit_data);
+            TreeVertex* v= build_tree(lit_data, 999999);
             v->print();
            // output_tree(v, lit_data);
            cout << "break;\n";
@@ -415,7 +438,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        TreeVertex* v = build_tree(data);
+        TreeVertex* v = build_tree(data, 999999);
         cerr << "Tree depth:" << v->depth() << "  Tree size: " << v->size() << endl;
         v->print();
        // output_tree(v, data);

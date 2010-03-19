@@ -100,8 +100,18 @@ struct DataList
         : maps(_m), failnodes(_f)
     { }
 
-    DataList() = default;
+    DataList()
+    {
+        maps.reserve(50);
+        failnodes.reserve(50);
+    }
     DataList(const DataList&) = default;
+
+    void clear()
+    {
+        maps.clear();
+        failnodes.clear();
+    }
 };
 
 DataList filterDataList(const DataList& data, int pos, bool val)
@@ -126,12 +136,18 @@ struct DataSplit
 {
     DataList false_data;
     DataList true_data;
+
+    void clear()
+    {
+        false_data.clear();
+        true_data.clear();
+    }
 };
 
-
-DataSplit split_data(const DataList& data, int pos)
+// We pass this in just to avoid excessive malloc/deallocing
+void split_data(const DataList& data, int pos, DataSplit& ret_data)
 {
-    DataSplit ret_data;
+    ret_data.clear();
     for(size_t i = 0; i < data.maps.size(); ++i)
     {
         if(data.maps[i]->in[pos])
@@ -147,9 +163,6 @@ DataSplit split_data(const DataList& data, int pos)
         else
             ret_data.false_data.failnodes.push_back(data.failnodes[i]);
     }
-
-
-    return ret_data;
 }
 
 ostream& operator<<(ostream& os, const DataPoint& dp)
