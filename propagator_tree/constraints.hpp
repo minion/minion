@@ -69,18 +69,18 @@ struct Eqorneq
 
 struct sumgeqthree
 {
-    bool operator()(array<int, 5> a)
+    bool operator()(array<int, 7> a)
     {
-        return (a[0]+ a[1]+a[2]+a[3]+a[4])>=3;
+        return ((a[0]+ a[1]+a[2]+a[3]+a[4]+a[5]) > 0) == a[6];
     }
     
-    static const int vcount = 5;
+    static const int vcount = 7;
     static const int domsize = 2;
 };
 
 //typedef ReifyDiffEqualConCon CurrentConstraint;
 //typedef EqualReifyNotEqual CurrentConstraint;
-typedef sumgeqthree CurrentConstraint;
+typedef ReifyDiffEqualConCon CurrentConstraint;
 
 static const int vcount = CurrentConstraint::vcount;
 static const int domsize = CurrentConstraint::domsize;
