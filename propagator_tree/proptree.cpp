@@ -91,6 +91,11 @@ struct TreeVertex
         return tv;
     }
 
+    void releaseChildren()
+    {
+        true_b = NULL; false_b = NULL;
+    }
+
     bool isFinal() const
     {
         assert( (!true_b) == (!false_b) );
@@ -106,7 +111,7 @@ struct TreeVertex
                 return false;
         return true;
 
-}
+    }
 
     int depth() const
     {
@@ -302,7 +307,7 @@ TreeVertex* build_tree(const DataList& data, int best_size)
     else
     {
         TreeVertex* min_vertex = NULL;
-        int min_vertex_depth = 0;
+        int min_vertex_depth =  best_size - 1;
         int min_vertex_size = 0;
         // Split on pos;
         DataSplit s;
@@ -311,31 +316,29 @@ TreeVertex* build_tree(const DataList& data, int best_size)
             split_data(data, pos, s);
             if(!s.true_data.empty() && !s.false_data.empty())
             {
-                TreeVertex* true_v = build_tree(s.true_data, best_size - 1);
+                TreeVertex* true_v = build_tree(s.true_data, min_vertex_depth);
                 if(true_v != NULL)
                 {
-                    TreeVertex* false_v = build_tree(s.false_data, best_size - 1);
+                    TreeVertex* false_v = build_tree(s.false_data, min_vertex_depth);
                     if(false_v == NULL)
                     {
                         delete true_v;
                     }
                     else
                     {
-                        TreeVertex* ret = new TreeVertex(true_v, false_v, pos);
-                        int ret_vertex_depth = ret->depth();
-                        int ret_vertex_size = ret->size();
+                        TreeVertex ret = TreeVertex(true_v, false_v, pos);
+                        int ret_vertex_depth = ret.depth();
+                        int ret_vertex_size = ret.size();
 
                         if(min_vertex == NULL || ret_vertex_depth < min_vertex_depth
                            || (ret_vertex_depth == min_vertex_depth && ret_vertex_size < min_vertex_size))
                         {
                             delete min_vertex;
-                            best_size = ret_vertex_depth + 1;
-                            min_vertex = ret;
+                            ret.releaseChildren();
+                            min_vertex = new TreeVertex(true_v, false_v, pos);
                             min_vertex_size = ret_vertex_size;
                             min_vertex_depth = ret_vertex_depth;
                         }
-                        else
-                            delete ret;
                     }
                 }
                 
