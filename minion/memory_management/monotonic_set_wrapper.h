@@ -1,0 +1,98 @@
+/*
+* Minion http://minion.sourceforge.net
+* Copyright (C) 2006-09
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+
+// This class wraps the MonotonicSet and provides easier access for a constraint.
+
+// Everything is in the set to begin with.
+// It's like an array of bits, it is allowed to set a 1 to 0 - but not vice versa.
+
+class ReversibleMonotonicSet
+{
+private:
+    MonotonicSet & MS;
+    int offset;
+    
+    D_DATA(int size);
+    
+public:
+    // The constructor must be called before the monotonicset is locked.
+    ReversibleMonotonicSet(StateObj * stateObj, int _size) : MS(getMemory(stateObj).monotonicSet())
+  #ifndef NO_DEBUG  
+    , size(_size)
+  #endif
+    {
+        D_ASSERT(&getMemory(stateObj).monotonicSet() !=NULL);
+        D_ASSERT(size>=0);
+        offset=MS.request_storage(_size);
+        D_DATA(cout << "Set up ReversibleMonotonicSet with size "<< _size << " and offset " << offset <<endl);
+    }
+    
+    bool isMember(int ref)
+    {
+        D_ASSERT(ref<size && ref>=0);
+        return MS.isMember(ref+offset);
+    }
+    
+    void remove(int ref)
+    {
+        D_ASSERT(ref<size && ref>=0);
+        MS.ifMember_remove(ref+offset);
+    }
+    
+    void unchecked_remove(int ref)
+    {
+        D_ASSERT(ref<size && ref>=0);
+        MS.unchecked_remove(ref+offset);
+    }
+};
+
+
+class ReversibleMonotonicBoolean
+{
+private:
+    MonotonicSet & MS;
+    int offset;
+public:
+    // The constructor must be called before the monotonicset is locked.
+    ReversibleMonotonicBoolean(StateObj * stateObj) : MS(getMemory(stateObj).monotonicSet())
+    {
+        offset=MS.request_storage(1);
+        #ifndef NO_DEBUG
+        cout << "Set up ReversibleMonotonicSet with size "<< 1 << " and offset " << offset <<endl;
+        #endif
+    }
+    
+    inline bool isMember()
+    {
+        return MS.isMember(offset);
+    }
+    
+    inline void remove()
+    {
+        MS.ifMember_remove(offset);
+    }
+    
+    inline void unchecked_remove()
+    {
+        MS.unchecked_remove(offset);
+    }
+};
+
+

@@ -1,0 +1,21 @@
+MINION 1
+#TEST SOLCOUNT 0
+#
+#FAIL
+3
+0
+0
+0
+0
+[]
+[]
+0
+1
+[[x0,x1,x2]]
+
+0
+objective none
+print m0
+
+table([x0,x1,x2],{<0,1,a>,<1,1,1>})
+eq(x0,2)
