@@ -53,7 +53,11 @@ def gac_prunings2(nogoods, domains):
 def increment_tuple(tup, domains, var, val):
     return
 
-def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder, memotable):
+checkties=False
+
+checktreecutoff=False
+
+def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder, heuristic):
     # take a list of unsatisfying tuples within domains_poss & domains_in.
     # a tree node
     # a domain list
@@ -65,10 +69,6 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     # IF domains_poss[var] has only one value and domains_in[var] is empty,
     # then we don't need to do a test -- can assume that the poss value is IN,
     # because otherwise, the domain will be empty and no prop is reqd.
-    
-    # Check the memoization table
-    #if memotable.has_key(domains_out):
-    #    return False
     
     # If only one possible value left, assume it is 'in', otherwise we would have failed already.
     for var in xrange(len(domains_poss)):
@@ -90,7 +90,6 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     
     if ct == []:
         # The constraint is implied.
-        memotable[domains_out]=False
         return False  # no pruning.
     
     # find the GAC prunings required at this node.
@@ -131,7 +130,6 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     # If we have complete domain knowledge, then return.
     if len(filter(lambda x:len(x)>0, domains_poss))==0:
         if len(prun)==0:
-            memotable[domains_out]=False
             return False
         else:
             return True
@@ -150,7 +148,6 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     
     if ct2 == []:
         # The constraint is implied.
-        memotable[domains_out]=False
         assert len(prun)>0  # Should only reach here if tuples lost by pruning.
         return True
     
@@ -162,7 +159,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     chosenval=0
     
     # default ordering
-    if False:
+    if not heuristic:
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
                 chosenvar=var
@@ -171,27 +168,34 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     
     # choose the var and val contained in the most remaining nogoods
     # I.e. if it's not in domain, it will eliminate the most nogoods, pushing towards impliedness.
-    numnogoods=-1
-    for (var, val) in varvalorder:
-        if val in domains_poss[var]:
-            count=len(filter(lambda a: a[var]==val,  ct2))
-            if count>numnogoods:
-                numnogoods=count
-                chosenvar=var
-                chosenval=val
+    if heuristic:
+        numnogoods=-1
+        for (var, val) in varvalorder:
+            if val in domains_poss[var]:
+                count=len(filter(lambda a: a[var]==val,  ct2))
+                if count>numnogoods:
+                    numnogoods=count
+                    chosenvar=var
+                    chosenval=val
+        
+        if checkties:
+            for (var, val) in varvalorder:
+                if val in domains_poss[var]:
+                    count=len(filter(lambda a: a[var]==val,  ct2))
+                    if count==numnogoods:
+                        print "Ties"
+                        break
     
-    assert numnogoods>=0   # Could be that all nogoods have only values in domains_in 
-    # -- in which case, we can do no further propagation, but this case is not noticed. 
-    
-    # very simple way of choosing var val to start with.
-    #for var in xrange(len(domains_poss)):
-    #    if len(domains_poss[var])>0:
-    #        chosenvar=var
-    #        chosenval=domains_poss[var][0]
-    #        break
-    
-    
-    assert chosenvar!=-1
+    if chosenvar==-1:
+        # this case arises when the varvalorder does not contain all var val pairs/
+        # This might be because the last variable is functionally dependent on the 
+        # others.
+        # Treated same as complete domain knowledge.
+        assert False
+        if len(prun)==0:
+            return False
+        else:
+            return True
     
     #print "Chosen variable: %d" %chosenvar
     #print "Chosen value:%d"%chosenval
@@ -219,19 +223,22 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     prun_right=False
     
     tree['left']=dict()
-    prun_left=build_tree(copy.deepcopy(ct2), tree['left'], dom_left_in, dom_left_poss, domains_out, varvalorder, memotable)
+    prun_left=build_tree(copy.deepcopy(ct2), tree['left'], dom_left_in, dom_left_poss, domains_out, varvalorder, heuristic)
     if not prun_left:
+        if checktreecutoff:
+            print "deleting subtree of size: %d"%(tree_cost2(tree['left']))
         del tree['left']
     
     # If we have not emptied the domain in the right branch:
     if len(dom_right_poss[chosenvar])+len(dom_right_in[chosenvar])>0:
         tree['right']=dict()
-        prun_right=build_tree(copy.deepcopy(ct2), tree['right'], dom_right_in, dom_right_poss, dom_right_out, varvalorder, memotable)
+        prun_right=build_tree(copy.deepcopy(ct2), tree['right'], dom_right_in, dom_right_poss, dom_right_out, varvalorder, heuristic)
         if not prun_right:
+            if checktreecutoff:
+                print "deleting subtree of size: %d"%(tree_cost2(tree['right']))
             del tree['right']
     
     if (not prun_left) and (not prun_right) and (not tree.has_key('pruning')):
-        memotable[domains_out]=False
         return False
     else:
         return True
@@ -295,27 +302,30 @@ def gen_all_perms(permlist, perm, objects):
             objects2=objects[:i]+objects[i+1:]
             gen_all_perms(permlist, perm2, objects2)
 
-def generate_tree(ct_nogoods, permlist, domains_init):
+def generate_tree(ct_nogoods, domains_init, heuristic):
     bestcost=1000000000
     besttree=[]
+    
+    permlist=[]
+    
+    varvals=[(a,b) for a in range(len(domains_init)) for b in domains_init[a] ]
+    if heuristic:
+        permlist.append(varvals)
+    else:
+        gen_all_perms(permlist, [], varvals)
     
     for perm in permlist:
         tree=dict()
         domains_in=[ [] for i in domains_init]
         domains_out=tuple([ frozenset() for i in domains_init])
         domains=copy.deepcopy(domains_init)
-        memotable=dict()
-        #print "About to build tree, perm: "+str(perm)
-        build_tree(copy.deepcopy(ct_nogoods), tree, domains_in, domains, domains_out, perm, memotable)
+        build_tree(copy.deepcopy(ct_nogoods), tree, domains_in, domains, domains_out, perm, len(permlist)==1)   # last arg is whether to use heuristic.
         cost=tree_cost2(tree)
         if cost<bestcost:
             bestcost=cost
             besttree=tree
-            #print "Better tree found:"
-            #print_tree(tree)
+            print "Better tree found, of size:%d"%bestcost
     
-    #print "// Best tree:"
-    #print_tree(besttree)
     return besttree
 
 def and_constraint():
@@ -323,10 +333,8 @@ def and_constraint():
     ct_nogoods=[[0,0,1], [0,1,1], [1,0,1], [1,1,0]]
     varvalorder=[(0,0), (0,1), (1,0), (1,1), (2,0), (2,1)]
     domains_init=[[0,1],[0,1],[0,1]]
-    permlist=[]
-    gen_all_perms(permlist, [], varvalorder)
-    #permlist=[[(0, 1), (0, 0), (1, 0), (1, 1), (2, 0), (2, 1)]]
-    generate_tree(ct_nogoods, permlist, domains_init)
+    
+    generate_tree(ct_nogoods, domains_init, False)
 
 def sports_constraint():
     # Channelling constraint from sports scheduling 10
@@ -350,9 +358,8 @@ def sports_constraint():
                     ct_nogoods.append(t)
     
     domains_init=[ range(1,11), range(1,11), range(1,46)]
-    varvalorder=[ (0,j) for j in xrange(1,11) ]+[ (1,j) for j in xrange(1,11) ]+[ (2,j) for j in xrange(1,46) ]
-    permlist=[varvalorder]
-    t=generate_tree(ct_nogoods, permlist, domains_init)
+    
+    t=generate_tree(ct_nogoods, domains_init, True)
     print_tree(t)
 
 def sumgeqthree():
@@ -365,14 +372,9 @@ def sumgeqthree():
                     for e in range(2):
                         if sum([a,b,c,d,e])<3:
                             nogoods.append([a,b,c,d,e])
-    
-    varvalorder=[(a,b) for a in range(5) for b in range(2) ]
-    
     domains_init=[[0,1],[0,1],[0,1], [0,1], [0,1]]
-    permlist=[]
-    gen_all_perms(permlist, [], varvalorder)
     
-    generate_tree(nogoods, permlist, domains_init)
+    generate_tree(nogoods, domains_init, False)
 
 def pegsol():
     # constraint for peg solitaire.
@@ -391,14 +393,27 @@ def pegsol():
                                 # not satisfies the conjunction
                                 nogoods.append([a,b,c,d,e,f,1])
     
-    varvalorder=[(a,b) for a in range(7) for b in range(2) ]
-    
     domains_init=[[0,1],[0,1],[0,1], [0,1], [0,1], [0,1], [0,1]]
-    permlist=[]
-    #gen_all_perms(permlist, [], varvalorder)
-    permlist.append(varvalorder)
+    t=generate_tree(nogoods, domains_init, True)
+    print_tree(t)
+    print "Depth: "+str(tree_cost(t))
+    print "Number of nodes: "+str(tree_cost2(t))
     
-    t=generate_tree(nogoods, permlist, domains_init)
+def sokoban():
+    # x+y=z where y has values -n, -1, 1, n
+    nogoods=[]
+    varvalorder=[]
+    n=2   # width/height of grid.
+    
+    for x in range(n*n):
+        for y in [-n, -1, 1, n]:
+            for z in range(n*n):
+                if x+y != z:
+                    nogoods.append([x,y,z])
+    
+    domains_init=[range(n*n),[-n, -1, 1, n], range(n*n)]
+    
+    t=generate_tree(nogoods, domains_init, True)
     print_tree(t)
     print "Depth: "+str(tree_cost(t))
     print "Number of nodes: "+str(tree_cost2(t))
@@ -412,7 +427,7 @@ def pegsol():
 #cProfile.run('sports_constraint()')
 
 #and_constraint()
-pegsol()
+sokoban()
 
 #sports_constraint()
 

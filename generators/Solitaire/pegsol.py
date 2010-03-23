@@ -16,9 +16,9 @@
 noSteps=31
 noFields=33
 noMoves=76
-startField=9
 
-useTest=True  # Use the test constraint.
+
+useTest=False  # Use the test constraint.
 
 cse=True   # do cse on the eq constraints between bState vars.
 
@@ -68,94 +68,100 @@ transitionStep=[ [ 1,2,3], [1,4,9], [2,5,10], [3,2,1], [3,6,11],[4,5,6], [4,9,16
 		   [23,22,21], [23,16,9],[23,28,31], [23,24,25],[24,23,22],[24,17,10],[24,25,26],[24,29,32], [25,24,23],[25,18,11],\
                    [25,30,33], [25,26,27], [26,25,24],[26,19,12],[27,20,13],[27,26,25],[28,29,30],[28,23,16],[29,24,17],[30,29,28],\
                    [30,25,18], [31,32,33], [31,28,23], [32,29,24], [33,32,31] ,[33,30,25]\
-                  ]  
-print "MINION 3"
+                  ]
 
-print "**VARIABLES**"
-
-print "BOOL moves[%d, %d]"%(noSteps, noMoves)
-
-print "BOOL bState[%d, %d]"%(noSteps+1, noFields)
-
-
-if cse:
-    print "BOOL equal[%d, %d]"%(noSteps, noFields)
-
-print "**SEARCH**"
-print "VARORDER [moves[_, _]]"
-print "VALORDER ["+reduce(lambda a,b: a+","+b, ["d" for i in range(noSteps) for j in range(noMoves)])
-print "]"
-
-print "**CONSTRAINTS**"
-
-if cse:
+def printpegsol(startField):
+    print "MINION 3"
+    
+    print "**VARIABLES**"
+    
+    print "BOOL moves[%d, %d]"%(noSteps, noMoves)
+    
+    print "BOOL bState[%d, %d]"%(noSteps+1, noFields)
+    
+    
+    if cse:
+        print "BOOL equal[%d, %d]"%(noSteps, noFields)
+    
+    print "**SEARCH**"
+    print "VARORDER [moves[_, _]]"
+    print "VALORDER ["+reduce(lambda a,b: a+","+b, ["d" for i in range(noSteps) for j in range(noMoves)])
+    print "]"
+    
+    print "**CONSTRAINTS**"
+    
+    if cse:
+        for step in range(noSteps):
+            for pos in range(noFields):
+                print "reify(eq(bState[%d, %d], bState[%d, %d]), equal[%d, %d])"%(step, pos, step+1, pos, step, pos)
+    
+    # exactly one move
     for step in range(noSteps):
-        for pos in range(noFields):
-            print "reify(eq(bState[%d, %d], bState[%d, %d]), equal[%d, %d])"%(step, pos, step+1, pos, step, pos)
-
-# exactly one move
-for step in range(noSteps):
-    print "sumleq([moves[%d, _]], 1)" % step
-    print "sumgeq([moves[%d, _]], 1)" % step
-
-
-for step in range(noSteps):
+        print "sumleq([moves[%d, _]], 1)" % step
+        print "sumgeq([moves[%d, _]], 1)" % step
+    
+    
+    for step in range(noSteps):
+        for f1 in range(noFields):
+            for f2 in range(noFields):
+                # If there is a valid transition
+                if f1!=f2:
+                    mv=transitionNumber[f1][f2]
+                    if mv!=0:
+                        mv=mv-1
+                        middlefield=transitionStep[mv][1]-1
+                        assert transitionStep[mv][0]==f1+1
+                        assert transitionStep[mv][2]==f2+1
+                        
+                        # do the move iff the move variable is true.
+                        if(useTest):
+                            print "test(["
+                            print "bState[%d, %d], bState[%d, %d],"%(step, f1, step+1, f1)
+                            print "bState[%d, %d], bState[%d, %d],"%(step, middlefield, step+1, middlefield)
+                            print "bState[%d, %d], bState[%d, %d]"%(step, f2, step+1, f2)
+                            print ", moves[%d, %d]])"%(step, mv)
+                        else:
+                            print "reify(sumgeq(["
+                            # six literals on bState vars.
+                            print "bState[%d, %d], !bState[%d, %d],"%(step, f1, step+1, f1)
+                            print "bState[%d, %d], !bState[%d, %d],"%(step, middlefield, step+1, middlefield)
+                            print "!bState[%d, %d], bState[%d, %d]"%(step, f2, step+1, f2)
+                            print "], 6), moves[%d, %d])"%(step, mv)
+                        
+                        # frame axioms
+                        # Nothing else changes.
+                        staticfields=[]
+                        
+                        for f3 in range(noFields):
+                            if f3!=f1 and f3!=f2 and f3!=middlefield:
+                                if cse:
+                                    staticfields.append(f3)
+                                else:
+                                    print "reify(eq(bState[%d, %d], bState[%d, %d]), moves[%d, %d])"%(step, f3, step+1, f3, step, mv)
+                        
+                        if cse:
+                            print "reifyimply(sumgeq(["
+                            print reduce(lambda a,b: str(a)+","+str(b), map(lambda f3: "equal[%d, %d]"%(step, f3), staticfields))
+                            print "], %d), moves[%d, %d])"%(len(staticfields), step, mv)
+    
+    # STARTING STATE
     for f1 in range(noFields):
-        for f2 in range(noFields):
-            # If there is a valid transition
-            if f1!=f2:
-                mv=transitionNumber[f1][f2]
-                if mv!=0:
-                    mv=mv-1
-                    middlefield=transitionStep[mv][1]-1
-                    assert transitionStep[mv][0]==f1+1
-                    assert transitionStep[mv][2]==f2+1
-                    
-                    # do the move iff the move variable is true.
-                    if(useTest):
-                        print "test(["
-                        print "bState[%d, %d], bState[%d, %d],"%(step, f1, step+1, f1)
-                        print "bState[%d, %d], bState[%d, %d],"%(step, middlefield, step+1, middlefield)
-                        print "bState[%d, %d], bState[%d, %d]"%(step, f2, step+1, f2)
-                        print ", moves[%d, %d]])"%(step, mv)
-                    else:
-                        print "reify(sumgeq(["
-                        # six literals on bState vars.
-                        print "bState[%d, %d], !bState[%d, %d],"%(step, f1, step+1, f1)
-                        print "bState[%d, %d], !bState[%d, %d],"%(step, middlefield, step+1, middlefield)
-                        print "!bState[%d, %d], bState[%d, %d]"%(step, f2, step+1, f2)
-                        print "], 6), moves[%d, %d])"%(step, mv)
-                    
-                    # frame axioms
-                    # Nothing else changes.
-                    staticfields=[]
-                    
-                    for f3 in range(noFields):
-                        if f3!=f1 and f3!=f2 and f3!=middlefield:
-                            if cse:
-                                staticfields.append(f3)
-                            else:
-                                print "reify(eq(bState[%d, %d], bState[%d, %d]), moves[%d, %d])"%(step, f3, step+1, f3, step, mv)
-                    
-                    if cse:
-                        print "reifyimply(sumgeq(["
-                        print reduce(lambda a,b: str(a)+","+str(b), map(lambda f3: "equal[%d, %d]"%(step, f3), staticfields))
-                        print "], %d), moves[%d, %d])"%(len(staticfields), step, mv)
-
-# STARTING STATE
-for f1 in range(noFields):
-    if f1!=startField:
-        print "eq(bState[0, %d], 1)"%f1
-
-print "eq(bState[0, %d], 0)"%startField
+        if f1!=startField:
+            print "eq(bState[0, %d], 1)"%f1
+    
+    print "eq(bState[0, %d], 0)"%startField
+    
+    
+    # Finishing state has one piece
+    # (and all intermediate states have a fixed number)
+    
+    for step in range(noSteps+1):
+        print "sumgeq([bState[%d, _]], %d)" % (step, noFields-step-1)
+        print "sumleq([bState[%d, _]], %d)" % (step, noFields-step-1)
+    
+    print "**EOF**"
 
 
-# Finishing state has one piece
-# (and all intermediate states have a fixed number)
+printpegsol(17)
 
-for step in range(noSteps+1):
-    print "sumgeq([bState[%d, _]], %d)" % (step, noFields-step-1)
-    print "sumleq([bState[%d, _]], %d)" % (step, noFields-step-1)
-
-print "**EOF**"
 

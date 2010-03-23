@@ -96,9 +96,33 @@ struct pegsol
     static const int domsize=2;
 };
 
+struct sokoban
+{
+    bool operator()(array<int, 3> a)
+    {
+        switch(a[1])
+        {
+        case 0:
+            return a[0]-2==a[2];
+        case 1:
+            return a[0]-1==a[2];
+        case 2:
+            return a[0]+1==a[2];
+        case 3:
+            return a[0]+2==a[2];
+        default:
+            cout << "Wotcher playing at"<<endl;
+            abort();
+        }
+    }
+    
+    static const int vcount=3;
+    static const int domsize=4;
+};
+
 //typedef ReifyDiffEqualConCon CurrentConstraint;
 //typedef EqualReifyNotEqual CurrentConstraint;
-typedef pegsol CurrentConstraint;
+typedef sokoban CurrentConstraint;
 
 static const int vcount = CurrentConstraint::vcount;
 static const int domsize = CurrentConstraint::domsize;
