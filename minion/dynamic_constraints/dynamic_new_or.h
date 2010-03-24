@@ -259,7 +259,12 @@ struct Dynamic_OR : public ParentConstraint
     vector<AnyVarRef>& vars = *(con->get_vars_singleton());
     D_ASSERT(assignment.size() <= assign_size);
     for(int i = 0; i < assignment.size(); ++i)
-      vars[assignment[i].first].addDynamicTrigger(dt + i, DomainRemoval, assignment[i].second);
+    {
+        if(vars[assignment[i].first].isBound())
+            vars[assignment[i].first].addDynamicTrigger(dt + i, DomainChanged);
+        else
+            vars[assignment[i].first].addDynamicTrigger(dt + i, DomainRemoval, assignment[i].second);
+    }
   }
 
   virtual void full_propagate()
