@@ -48,6 +48,13 @@ struct parse_exception : public std::exception
   {}
 };
 
+inline void USER_ERROR(std::string s)
+{
+    cerr << "A fatal error has occurred:\n" << endl;
+    cerr << s << endl;
+    exit(1);
+}
+
 #define D_FATAL_ERROR(s) { D_FATAL_ERROR2(s,  __FILE__, to_string(__LINE__)); throw 0; }
 
 #define INPUT_ERROR(s) { cout << "There was a problem in your input file:\n" << s << endl; exit(1); }

@@ -272,8 +272,8 @@ struct BoundVarContainer {
    
   void removeFromDomain(const BoundVarRef_internal<BoundType>&, DomainInt )
   {
-    D_FATAL_ERROR( "Cannot Remove Value from domain of a bound var");
-    FAIL_EXIT();
+    USER_ERROR("Some constraint you are using does not work with BOUND variables\n"
+               "Unfortunatly we cannot tell you which one. Sorry!");
   }
 
   void internalAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
@@ -440,7 +440,11 @@ struct BoundVarContainer {
   void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {
     D_ASSERT(lock_m); 
-    D_ASSERT(type != DomainRemoval);
+    if(type == DomainRemoval)
+    {
+        USER_ERROR("Some constraint you are using does not work with BOUND variables\n"
+                   "Unfortunatly we cannot tell you which one. Sorry!");
+    }
     trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL); 
   }
 #endif

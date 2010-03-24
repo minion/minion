@@ -272,8 +272,8 @@ struct SparseBoundVarContainer {
   /// This function is provided for convience. It should never be called.
   void removeFromDomain(SparseBoundVarRef_internal<BoundType>, DomainInt)
   {
-    D_FATAL_ERROR("Cannot Remove Value from domain of a bound var");
-    FAIL_EXIT();
+    USER_ERROR("Some constraint you are using does not work with SPARSEBOUND variables\n"
+               "Unfortunatly we cannot tell you which one. Sorry!");
   }
 
   void internalAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
@@ -425,8 +425,12 @@ struct SparseBoundVarContainer {
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   { 
-    D_ASSERT(lock_m); 
-    D_ASSERT(type != DomainRemoval);
+    D_ASSERT(lock_m);
+    if(type == DomainRemoval)
+    {
+      USER_ERROR("Some constraint you are using does not work with SPARSEBOUND variables\n"
+                 "Unfortunatly we cannot tell you which one. Sorry!");
+    }
     trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL); 
   }
 #endif
