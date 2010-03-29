@@ -7,6 +7,7 @@ print "MINION 3"
 print "**VARIABLES**"
 
 n=10
+usetest=False
 
 print "BOOL l[%d,%d]" %(n+2,n+2)
 print "BOUND maxvar {0..%d}" %(n**2)
@@ -53,13 +54,20 @@ print "sumleq(l[_,%d], 0)"%(n+1)
 
 for i in range(1, n+1):
     for j in range(1, n+1):
-        print "lighttable(["
+        if usetest:
+            print "test(["
+        else:
+            print "lighttable(["
         for k in range(i-1, i+2):
             for l in range(j-1, j+2):
                 if i!= k or j!=l:
                     print "l[%d, %d],"%(k, l)
         print "l[%d, %d]"%(i, j)
-        print "], bob)"
+        
+        if usetest:
+            print "])"
+        else:
+            print "], bob)"
         
 
 print "sumleq(l[_,_], maxvar)"
