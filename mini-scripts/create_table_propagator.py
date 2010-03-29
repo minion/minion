@@ -13,6 +13,7 @@
 import copy
 import sys
 import cProfile
+import random
 
 def gac_prunings(nogoods, domains):
     # take a domain list, and a set of nogoods, and calculate the prunings GAC 
@@ -57,6 +58,24 @@ checkties=False
 
 checktreecutoff=False
 
+
+
+calls_build_tree=0
+
+def filter_nogoods(tups_in, domains_in, domains_poss):
+    # Return a new list with only the valid tuples.
+    tups_out=[]
+    for t in tups_in:
+        flag=True
+        for i in xrange(len(t)):
+            if (t[i] not in domains_poss[i]) and (t[i] not in domains_in[i]):
+                flag=False
+                break
+        if flag:
+            tups_out.append(t)
+    return tups_out
+
+
 def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder, heuristic):
     # take a list of unsatisfying tuples within domains_poss & domains_in.
     # a tree node
@@ -64,11 +83,16 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     # and make two new tree nodes ... calls itself recursively.
     # Returns false if it and all its children do not do any pruning.
     #print "Top of build_tree"
+    global calls_build_tree
+    calls_build_tree+=1
     
-    # Process the domains -- last value remaining must be 'in'
-    # IF domains_poss[var] has only one value and domains_in[var] is empty,
-    # then we don't need to do a test -- can assume that the poss value is IN,
-    # because otherwise, the domain will be empty and no prop is reqd.
+    # Filter the tuple list -- remove any tuples that are not valid
+    
+    ct=filter_nogoods(ct_init, domains_in, domains_poss)
+    
+    if ct == []:
+        # The constraint is implied.
+        return False  # no pruning.
     
     # If only one possible value left, assume it is 'in', otherwise we would have failed already.
     for var in xrange(len(domains_poss)):
@@ -76,23 +100,11 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
             domains_in[var]=domains_poss[var]
             domains_poss[var]=[]
     
-    # Filter the tuple list -- remove any tuples that are not valid
-    # nogoods that are outside the current domains are no longer useful.
-    ct=[]
-    for t in ct_init:
-        flag=True
-        for i in xrange(len(t)):
-            if (t[i] not in domains_poss[i]) and (t[i] not in domains_in[i]):
-                flag=False
-                break
-        if flag:
-            ct.append(t)
+    ##########################################################################
+    #
+    #  GAC
+    #  Find the GAC prunings required at this node.
     
-    if ct == []:
-        # The constraint is implied.
-        return False  # no pruning.
-    
-    # find the GAC prunings required at this node.
     whole_domain=[]
     for i in xrange(len(domains_in)):
         whole_domain.append(domains_in[i]+domains_poss[i])
@@ -107,9 +119,6 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     
     prun=gac_prunings(ct, whole_domain)
     
-    #print prun
-    
-    #print "prun:"+str(prun[:])
     if len(prun)>0:
         tree['pruning']=prun[:]
     
@@ -135,16 +144,8 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
             return True
     
     # Filter the tuple list again after pruning -- remove any tuples that are not valid
-    # nogoods that are outside the current domains are no longer useful.
-    ct2=[]
-    for t in ct:
-        flag=True
-        for i in xrange(len(t)):
-            if (t[i] not in domains_poss[i]) and (t[i] not in domains_in[i]):
-                flag=False
-                break
-        if flag:
-            ct2.append(t)
+    
+    ct2=filter_nogoods(ct, domains_in, domains_poss)
     
     if ct2 == []:
         # The constraint is implied.
@@ -153,7 +154,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     
     ########################################################################
     #
-    #  Branching
+    #  Heuristic
     
     chosenvar=-1
     chosenval=0
@@ -170,6 +171,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     # I.e. if it's not in domain, it will eliminate the most nogoods, pushing towards impliedness.
     if heuristic:
         numnogoods=-1
+        ties=[]
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
                 count=len(filter(lambda a: a[var]==val,  ct2))
@@ -177,14 +179,18 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
                     numnogoods=count
                     chosenvar=var
                     chosenval=val
+                    ties=[(var,val)]
+                elif count==numnogoods:
+                    ties.append((var, val))
         
         if checkties:
-            for (var, val) in varvalorder:
-                if val in domains_poss[var]:
-                    count=len(filter(lambda a: a[var]==val,  ct2))
-                    if count==numnogoods:
-                        print "Ties"
-                        break
+            if len(ties)>1:
+                print "Ties"
+                # randomize
+                #(chosenvar, chosenval)=random.choice(ties)
+                
+            else:
+                print "No tie"
     
     if chosenvar==-1:
         # this case arises when the varvalorder does not contain all var val pairs/
@@ -196,6 +202,10 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
             return False
         else:
             return True
+    
+    ##########################################################################
+    #  
+    #  Branching
     
     #print "Chosen variable: %d" %chosenvar
     #print "Chosen value:%d"%chosenval
@@ -398,6 +408,7 @@ def pegsol():
     print_tree(t)
     print "Depth: "+str(tree_cost(t))
     print "Number of nodes: "+str(tree_cost2(t))
+    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
     
 def sokoban():
     # x+y=z where y has values -n, -1, 1, n
@@ -417,18 +428,88 @@ def sokoban():
     print_tree(t)
     print "Depth: "+str(tree_cost(t))
     print "Number of nodes: "+str(tree_cost2(t))
+
+def binseq():
+    # Constraint for low autocorrelation binary sequences
+    twoprod=[]
+    for a in [-1, 1]:
+        for b in [-1,1]:
+            for c in [-1, 1]:
+                for d in [-1, 1]:
+                    for e in [-2,0,2]:
+                        if e!= (a*b)+(c*d):
+                            twoprod.append((a,b,c,d, e))
     
+    domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-2,0,2]]
+    t=generate_tree(twoprod, domains_init, True)
+    print_tree(t)
+    print "Depth: "+str(tree_cost(t))
+    print "Number of nodes: "+str(tree_cost2(t))
+    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+
+def binseq_three():
+    threeprod=[]
+    for a in [-1, 1]:
+        for b in [-1,1]:
+            for c in [-1, 1]:
+                for d in [-1, 1]:
+                    for e in [-1, 1]:
+                        for f in [-1, 1]:
+                            for g in [-3, -1, 1, 3]:
+                                if (a*b)+(c*d)+(e*f) != g:
+                                    threeprod.append((a,b,c,d,e,f,g))
+    domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-1, 1], [-1, 1], [-3,-1,1,3]]
+    t=generate_tree(threeprod, domains_init, True)
+    print_tree(t)
+    print "Depth: "+str(tree_cost(t))
+    print "Number of nodes: "+str(tree_cost2(t))
+    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+    
+def still_life():
+    table=[]
+    def crossprod(domains, conslist, outlist):
+        if domains==[]:
+            outlist.append(conslist[:])
+            return
+        for i in domains[0]:
+            ccopy=conslist[:]
+            ccopy.append(i)
+            crossprod(domains[1:], ccopy, outlist)
+        return
+    
+    cross=[]
+    crossprod([(0,1) for i in range(9)], [], cross)
+    
+    table=[]
+    for l in cross:
+        s=sum(l[:8])
+        if s>3 or s<2:
+            if l[8]==1:
+                table.append(l)
+        elif s==3:
+            if l[8]==0:
+                table.append(l)
+        else:
+            assert s==2
+    
+    domains_init=[[0,1] for i in range(9)]
+    t=generate_tree(table, domains_init, True)
+    print_tree(t)
+    print "Depth: "+str(tree_cost(t))
+    print "Number of nodes: "+str(tree_cost2(t))
+    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
 
 # A tree node is a dictionary containing 'var': 0,1,2.... 'val', 'left', 'right', 'pruning'
-
 
 # get rid of treenodes when there are no nogoods left.
 
 #cProfile.run('sports_constraint()')
 
 #and_constraint()
-sokoban()
+#sokoban()
 
 #sports_constraint()
 
-
+#pegsol()
+#binseq_three()
+still_life()
