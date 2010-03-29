@@ -13,6 +13,7 @@ BuildCT_REIFY(StateObj* stateObj, const VarArray& vars, ConstraintBlob& bl)
 {
   switch(bl.internal_constraints[0].constraint->type)
   {
+      /*
 #if defined(CT_EQ_ABC) && defined(CT_EQ_REIFY_ABC)
     case CT_EQ:
     {
@@ -40,6 +41,7 @@ BuildCT_REIFY(StateObj* stateObj, const VarArray& vars, ConstraintBlob& bl)
       return build_constraint(stateObj, blob);
     }
 #endif
+*/
     default:
       return reifyCon(stateObj, build_constraint(stateObj, bl.internal_constraints[0]), vars[0]);
   }
