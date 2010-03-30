@@ -8,8 +8,14 @@ print "**VARIABLES**"
 
 n=10
 usetest=False
+usetable=False
+usesum=True
 
 print "BOOL l[%d,%d]" %(n+2,n+2)
+
+if usesum:
+    print "DISCRETE sums[%d,%d] {0..8}"%(n+2, n+2)
+
 print "BOUND maxvar {0..%d}" %(n**2)
 print "**TUPLELIST**"
 
@@ -42,6 +48,7 @@ for l in cross:
 print "bob %d %d" %(len(table), 9)
 print " ".join(map(lambda a:str(a), [table[i][j] for i in range(len(table)) for j in range(9) ]))
 
+print "sumlink 10 2   0 0 1 0 2 0 2 1 3 1 4 0 5 0 6 0 7 0 8 0"
 
 
 print "**CONSTRAINTS**"
@@ -52,22 +59,34 @@ print "sumleq(l[%d,_], 0)"%(n+1)
 print "sumleq(l[_,0], 0)"
 print "sumleq(l[_,%d], 0)"%(n+1)
 
+if usesum:
+    print "sumleq(sums[0,_], 0)"
+    print "sumleq(sums[%d,_], 0)"%(n+1)
+    print "sumleq(sums[_,0], 0)"
+    print "sumleq(sums[_,%d], 0)"%(n+1)
+
 for i in range(1, n+1):
     for j in range(1, n+1):
         if usetest:
             print "test(["
-        else:
+        elif usetable:
             print "lighttable(["
+        
+        st=""
         for k in range(i-1, i+2):
             for l in range(j-1, j+2):
                 if i!= k or j!=l:
-                    print "l[%d, %d],"%(k, l)
-        print "l[%d, %d]"%(i, j)
+                    st+="l[%d, %d],"%(k, l)
         
         if usetest:
-            print "])"
+            print "test([%s,l[%d, %d]])"%(st, i, j) 
+        elif usetable:
+            print "lighttable([%s,l[%d, %d]], bob)"%(st, i, j)
         else:
-            print "], bob)"
+            assert usesum
+            print "sumleq([%s], sums[%d, %d])"%(st, i, j)
+            print "sumgeq([%s], sums[%d, %d])"%(st, i, j)
+            print "lighttable([sums[%d, %d], l[%d, %d]], sumlink)"%(i,j,i,j)
         
 
 print "sumleq(l[_,_], maxvar)"
