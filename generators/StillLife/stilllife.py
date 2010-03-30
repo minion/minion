@@ -82,6 +82,16 @@ print " ".join(map(lambda a:str(a), [table[i][j] for i in range(len(table)) for 
 
 print "sumlink 10 2   0 0 1 0 2 0 2 1 3 1 4 0 5 0 6 0 7 0 8 0"
 
+print "sumlinklife 10 2"
+for a in range(9):
+    for b in range(2):
+        for c in range(2):
+            if (a>3 or a<2) and c==0:
+                print "%d %d %d"%(a,b,c)
+            if a==3 and c==1:
+                print "%d %d %d"%(a,b,c)
+            if a==2 and b==c:
+                print "%d %d %d"%(a,b,c)
 
 print "**CONSTRAINTS**"
 # kill the edges.
@@ -123,17 +133,24 @@ for layer in range(layers):
                     print "lighttable([%s], stilllife)"%(st)
             else:
                 assert usesum
-                assert not life
-                print "sumleq([%s], sums[%d, %d])"%(st, i, j)
-                print "sumgeq([%s], sums[%d, %d])"%(st, i, j)
-                print "lighttable([sums[%d, %d], l[%d, %d]], sumlink)"%(i,j,i,j)
+                print "sumleq([%s], sums[%d, %d, %d])"%(st, i, j, layer)
+                print "sumgeq([%s], sums[%d, %d, %d])"%(st, i, j, layer)
+                if not life:
+                    print "lighttable([sums[%d, %d, %d], l[%d, %d, %d]], sumlink)"%(i,j,layer, i,j, layer)
+                else:
+                    print "lighttable([sums[%d, %d, %d], l[%d, %d, %d], l[%d, %d, %d]], sumlinklife)"%(i,j,layer, i,j, layer,i,j,(layer+1)%layers)
             
 if not life:
-    print "sumleq(l[_,_,], maxvar)"
-    print "sumgeq(l[_,_,], maxvar)"
+    print "sumleq(l[_,_,0], maxvar)"
+    print "sumgeq(l[_,_,0], maxvar)"
     
     print "**SEARCH**"
     print "MAXIMIZING maxvar"
+else:
+    # to be interesting the first layer should have something on it. 
+    # two dots will just die, so at least 3 are required.
+    print "sumgeq(l[_,_,0], 3)"
+    
 
 print "**EOF**"
 
