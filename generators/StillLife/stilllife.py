@@ -77,7 +77,7 @@ for l in cross:
         if l[8]==l[9]:
             table.append(l)
 
-print "life %d %d" %(len(table), 9)
+print "life %d %d" %(len(table), 10)
 print " ".join(map(lambda a:str(a), [table[i][j] for i in range(len(table)) for j in range(10) ]))
 
 print "sumlink 10 2   0 0 1 0 2 0 2 1 3 1 4 0 5 0 6 0 7 0 8 0"
@@ -136,9 +136,9 @@ for layer in range(layers):
 if not life:
     print "sumleq(l[_,_,], maxvar)"
     print "sumgeq(l[_,_,], maxvar)"
-
-print "**SEARCH**"
-print "MAXIMIZING maxvar"
+    
+    print "**SEARCH**"
+    print "MAXIMIZING maxvar"
 
 print "**EOF**"
 
