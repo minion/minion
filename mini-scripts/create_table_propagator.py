@@ -499,6 +499,44 @@ def still_life():
     print "Number of nodes: "+str(tree_cost2(t))
     print "Number of nodes explored by algorithm: "+str(calls_build_tree)
 
+def life():
+    table=[]
+    def crossprod(domains, conslist, outlist):
+        if domains==[]:
+            outlist.append(conslist[:])
+            return
+        for i in domains[0]:
+            ccopy=conslist[:]
+            ccopy.append(i)
+            crossprod(domains[1:], ccopy, outlist)
+        return
+    
+    cross=[]
+    crossprod([(0,1) for i in range(10)], [], cross)
+    
+    table=[]
+    for l in cross:
+        s=sum(l[:8])
+        if s>3 or s<2:
+            if l[9]==1:
+                table.append(l)
+        elif s==3:
+            if l[9]==0:
+                table.append(l)
+        else:
+            assert s==2
+            if l[8]!=l[9]:
+                table.append(l)
+            
+    
+    domains_init=[[0,1] for i in range(10)]
+    t=generate_tree(table, domains_init, True)
+    print_tree(t)
+    print "Depth: "+str(tree_cost(t))
+    print "Number of nodes: "+str(tree_cost2(t))
+    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+
+
 # A tree node is a dictionary containing 'var': 0,1,2.... 'val', 'left', 'right', 'pruning'
 
 # get rid of treenodes when there are no nogoods left.
@@ -512,4 +550,4 @@ def still_life():
 
 #pegsol()
 #binseq_three()
-still_life()
+life()
