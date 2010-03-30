@@ -101,11 +101,6 @@ for i in range(layers):
 for layer in range(layers):
     for i in range(1, n+1):
         for j in range(1, n+1):
-            if usetest:
-                print "test(["
-            elif usetable:
-                print "lighttable(["
-            
             st=""
             for k in range(i-1, i+2):
                 for l in range(j-1, j+2):
