@@ -17,22 +17,12 @@ tabctname="lighttable"
 usesum=True
 
 
-
-
-life=(layers>1)
-
-# settings to find blinker 
-
-if not life:
-    # If we're not modelling life, then it's still life, and we have 1 layer.
-    layers=1
-
 print "BOOL l[%d,%d,%d]" %(n+4,n+4, layers)
 
 if usesum:
     print "DISCRETE sums[%d,%d,%d] {0..8}"%(n+4, n+4, layers)
 
-print "BOUND maxvar {0..%d}" %(n**2)
+print "BOUND maxvar {0..%d}" %((n**2)*layers)
 
 print "**TUPLELIST**"
 
@@ -128,7 +118,7 @@ for layer in range(layers):
             
             st2=st  # make a second string with the extra l variables
             st2+="l[%d, %d, %d],"%(i,j, layer)
-            if life:
+            if layers>1:
                 st2+="l[%d, %d, %d],"%(i,j, (layer+1)%layers)
             
             
@@ -153,22 +143,16 @@ for l1 in range(layers):
         # two layers not equal.
         print "watchvecneq([l[_,_,%d]], [l[_,_,%d]])"%(l1, l2)
 
-if not life:
-    print "sumleq(l[_,_,0], maxvar)"
-    print "sumgeq(l[_,_,0], maxvar)"
-    
-    print "**SEARCH**"
-    print "MAXIMIZING maxvar"
-else:
-    # to be interesting the first layer should have something on it. 
-    # two dots will just die, so at least 3 are required.
-    #print "sumgeq(l[_,_,0], 3)"
-    print "sumleq(l[_,_,_], maxvar)"
-    print "sumgeq(l[_,_,_], maxvar)"
-    
-    print "**SEARCH**"
-    print "MAXIMIZING maxvar"
-    
+
+# to be interesting the first layer should have something on it. 
+# two dots will just die, so at least 3 are required.
+#print "sumgeq(l[_,_,0], 3)"
+print "sumleq(l[_,_,_], maxvar)"
+print "sumgeq(l[_,_,_], maxvar)"
+
+print "**SEARCH**"
+print "MAXIMIZING maxvar"
+
 
 print "PRINT [["
 for layer in range(layers):
