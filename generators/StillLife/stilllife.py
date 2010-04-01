@@ -6,16 +6,22 @@ print "MINION 3"
 
 print "**VARIABLES**"
 
-n=10
-usetest=True
+n=7
+layers=4
+
+
+usetest=False
 usetable=False
-usesum=False
+tabctname="lighttable"
+
+usesum=True
 
 
-layers=3
-life=False
 
-# settings to find pulsar 
+
+life=(layers>1)
+
+# settings to find blinker 
 
 if not life:
     # If we're not modelling life, then it's still life, and we have 1 layer.
@@ -120,25 +126,32 @@ for layer in range(layers):
                     if i!= k or j!=l:
                         st+="l[%d, %d, %d],"%(k, l, layer)
             
-            st+="l[%d, %d, %d],"%(i,j, layer)
+            st2=st  # make a second string with the extra l variables
+            st2+="l[%d, %d, %d],"%(i,j, layer)
             if life:
-                st+="l[%d, %d, %d],"%(i,j, (layer+1)%layers)
+                st2+="l[%d, %d, %d],"%(i,j, (layer+1)%layers)
+            
             
             if usetest:
-                print "test([%s])"%(st) 
+                print "test([%s])"%(st2) 
             elif usetable:
-                if life:
-                    print "lighttable([%s], life)"%(st)
+                if layers>1:
+                    print "%s([%s], life)"%(tabctname, st2)
                 else:
-                    print "lighttable([%s], stilllife)"%(st)
+                    print "%s([%s], stilllife)"%(tabctname, st2)
             else:
                 assert usesum
                 print "sumleq([%s], sums[%d, %d, %d])"%(st, i, j, layer)
                 print "sumgeq([%s], sums[%d, %d, %d])"%(st, i, j, layer)
-                if not life:
-                    print "lighttable([sums[%d, %d, %d], l[%d, %d, %d]], sumlink)"%(i,j,layer, i,j, layer)
+                if layers==1:
+                    print "%s([sums[%d, %d, %d], l[%d, %d, %d]], sumlink)"%(tabctname, i,j,layer, i,j, layer)
                 else:
-                    print "lighttable([sums[%d, %d, %d], l[%d, %d, %d], l[%d, %d, %d]], sumlinklife)"%(i,j,layer, i,j, layer,i,j,(layer+1)%layers)
+                    print "%s([sums[%d, %d, %d], l[%d, %d, %d], l[%d, %d, %d]], sumlinklife)"%(tabctname, i,j,layer, i,j, layer,i,j,(layer+1)%layers)
+
+for l1 in range(layers):
+    for l2 in range(l1+1, layers):
+        # two layers not equal.
+        print "watchvecneq([l[_,_,%d]], [l[_,_,%d]])"%(l1, l2)
 
 if not life:
     print "sumleq(l[_,_,0], maxvar)"
@@ -164,12 +177,18 @@ for layer in range(layers):
             print "l[%d, %d, %d],"%(i,j,layer)
         print "],["
     print "],["
+    if usesum:
+        for i in range(0, n+4):
+            for j in range(0, n+4):
+                print "sums[%d, %d, %d],"%(i,j,layer)
+            print "],["
+        print "],["
 
 print "]]"
 
 # val order
 print "VARORDER [l[_,_,0]]"   # should only need to branch on layer 0.
-print "VALORDER ["+(" ".join(["d" for i in range((n+4)**2)]))+" a]"
+#print "VALORDER ["+(" ".join(["d" for i in range(((n+4)**2)*layers)]))+" a]"
 
 print "**EOF**"
 
