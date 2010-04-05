@@ -10,11 +10,11 @@ n=7
 layers=4
 
 
-usetest=False
+usetest=True
 usetable=False
 tabctname="lighttable"
 
-usesum=True
+usesum=False
 
 
 print "BOOL l[%d,%d,%d]" %(n+4,n+4, layers)
@@ -140,15 +140,55 @@ for layer in range(layers):
 
 for l1 in range(layers):
     for l2 in range(l1+1, layers):
-        # two layers not equal.
+        # any two layers not equal.
         print "watchvecneq([l[_,_,%d]], [l[_,_,%d]])"%(l1, l2)
 
 
-# to be interesting the first layer should have something on it. 
-# two dots will just die, so at least 3 are required.
-#print "sumgeq(l[_,_,0], 3)"
+# to be interesting the pattern should have some live cells
 print "sumleq(l[_,_,_], maxvar)"
 print "sumgeq(l[_,_,_], maxvar)"
+
+# First layer lex less than all other layers.
+for layer in range(1, layers):
+    print "lexless(l[_,_,0], l[_,_,%d])"%(layer)
+
+# Symmetry breaking on first layer.
+ordering=[ [ "l[%d, %d, 0]"%(i+2,j+2) for j in range(n)] for i in range(n)]
+
+def flip_horizontal(start):
+    end=[]
+    for row in start:
+        end.append( [row[k] for k in range(n-1,-1,-1)] )
+    return end
+
+def flip_vertical(start):
+    end=[]
+    for k in range(n-1,-1,-1):
+        end.append(start[k])
+    return end
+
+def rotate_90(start):
+    # read up columns starting with the left column.
+    end=[]
+    for col in range(n):
+        end.append([ start[row][col] for row in range(n-1, -1,-1) ])
+    return end
+
+def mkstring(outerlist):
+    return ','.join(str(item) for innerlist in outerlist for item in innerlist)
+
+# 7 images under flips and rotation
+print "lexleq(["+mkstring(ordering)+"],["+mkstring(flip_horizontal(ordering))+"])"
+print "lexleq(["+mkstring(ordering)+"],["+mkstring(flip_vertical(ordering))+"])"
+print "lexleq(["+mkstring(ordering)+"],["+mkstring(flip_horizontal(flip_vertical(ordering)))+"])"
+
+print "lexleq(["+mkstring(ordering)+"],["+mkstring(rotate_90(ordering))+"])"
+print "lexleq(["+mkstring(ordering)+"],["+mkstring(flip_horizontal(rotate_90(ordering)))+"])"
+
+rot270=rotate_90(rotate_90(rotate_90(ordering)))
+print "lexleq(["+mkstring(ordering)+"],["+mkstring(rot270)+"])"
+print "lexleq(["+mkstring(ordering)+"],["+mkstring(flip_horizontal(rot270))+"])"
+
 
 print "**SEARCH**"
 print "MAXIMIZING maxvar"
