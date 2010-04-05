@@ -1,21 +1,43 @@
 #!/usr/bin/python
 
-# still life
+import sys, os, getopt
 
-print "MINION 3"
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["size=", "period=", "table", "test", "lighttable", "sum"])
 
-print "**VARIABLES**"
-
-n=7
-layers=4
+n=-1
+layers=-1
 
 
-usetest=True
+usetest=False
 usetable=False
 tabctname="lighttable"
 
 usesum=False
 
+for i in optargs:
+    (a1, a2)=i
+    if a1=="--size":
+        n=int(a2)
+    elif a1=="--period":
+        layers=int(a2)
+    elif a1=="--test":
+        usetest=True
+    elif a1=="--table":
+        usetable=True
+        tabctname="table"
+    elif a1=="--lighttable":
+        usetable=True
+        tabctname="lighttable"
+    elif a1=="--sum":
+        usesum=True
+
+# still life/ oscillators
+
+print "MINION 3"
+
+print "# size:%d, period:%d, table:%s, test:%s, lighttable:%s, sum:%s"%(n, layers, str(usetable and tabctname=="table"), usetest, str(usetable and tabctname=="lighttable"), usesum)
+
+print "**VARIABLES**"
 
 print "BOOL l[%d,%d,%d]" %(n+4,n+4, layers)
 

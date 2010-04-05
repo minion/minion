@@ -15,6 +15,39 @@ import sys
 import cProfile
 import random
 
+def crossprod(domains, conslist, outlist):
+    if domains==[]:
+        outlist.append(conslist[:])
+        return
+    for i in domains[0]:
+        ccopy=conslist[:]
+        ccopy.append(i)
+        crossprod(domains[1:], ccopy, outlist)
+    return
+
+def tuple_less(tup1, tup2):
+    for i in range(len(tup1)):
+        if tup1[i]<tup2[i]:
+            return True
+        elif tup1[i]>tup2[i]:
+            return False
+    return False # tup1==tup2.
+
+def binary_search(tuples, x):
+    lo=0
+    hi=len(tuples)
+    while lo < hi:
+        mid = (lo+hi)//2
+        midval = tuples[mid]
+        if tuple_less(midval, x):
+            lo = mid+1
+        elif midval==x:
+            return mid
+        else:
+            hi=mid
+    return -1
+
+
 def gac_prunings(nogoods, domains):
     # take a domain list, and a set of nogoods, and calculate the prunings GAC 
     # would do.
@@ -42,17 +75,54 @@ def gac_prunings(nogoods, domains):
     #print "prunings:"+str(prunings)
     return prunings
 
+def tuple_valid(tup, domains):
+    for i in xrange(len(tup)):
+        if tup[i] not in domains[i]:
+            return False
+    return True
 
 def gac_prunings2(nogoods, domains):
     prunings=[]
     for var in xrange(len(domains)):
         for val in domains[var]:
-            tup=[  ]
+            validx=gac2001_domains_init[var].index(val)
+            idx=gac2001_indices[var][validx]
+            # loop from idx to end to find support
+            tuplist=gac2001_goods[var][validx]
             
-    return []
+            support=False
+            
+            for tupidx in xrange(idx, len(tuplist)):
+                valid=True
+                tup=tuplist[tupidx]
+                for i in xrange(len(tup)):
+                    if tup[i] not in domains[i]:
+                        valid= False
+                        break
+                if valid:
+                    # tupidx is a support
+                    support=True
+                    gac2001_indices[var][validx]=tupidx
+                    break
+            if support:
+                continue
+            
+            for tupidx in xrange(0, idx):
+                valid=True
+                tup=tuplist[tupidx]
+                for i in xrange(len(tup)):
+                    if tup[i] not in domains[i]:
+                        valid= False
+                        break
+                if valid:
+                    # tupidx is a support
+                    support=True
+                    gac2001_indices[var][validx]=tupidx
+                    break
+            if not support:
+                prunings.append((var,val))
+    return prunings
 
-def increment_tuple(tup, domains, var, val):
-    return
 
 checkties=False
 
@@ -76,7 +146,7 @@ def filter_nogoods(tups_in, domains_in, domains_poss):
     return tups_out
 
 
-def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder, heuristic):
+def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     # take a list of unsatisfying tuples within domains_poss & domains_in.
     # a tree node
     # a domain list
@@ -87,8 +157,12 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     calls_build_tree+=1
     
     # Filter the tuple list -- remove any tuples that are not valid
-    
     ct=filter_nogoods(ct_init, domains_in, domains_poss)
+    
+    # Shallow copy the domains. Any changes must replace a domain with a new one.
+    domains_in=domains_in[:]
+    domains_poss=domains_poss[:]
+    
     
     if ct == []:
         # The constraint is implied.
@@ -97,7 +171,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     # If only one possible value left, assume it is 'in', otherwise we would have failed already.
     for var in xrange(len(domains_poss)):
         if len(domains_in[var])==0 and len(domains_poss[var])==1:
-            domains_in[var]=domains_poss[var]
+            domains_in[var]=domains_in[var]+[domains_poss[var][0]]
             domains_poss[var]=[]
     
     ##########################################################################
@@ -117,18 +191,19 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     #print "domains:"+str(whole_domain)
     #print "domains_out:"+str(domains_out)
     
-    prun=gac_prunings(ct, whole_domain)
+    prun=gac_prunings2(ct, whole_domain)
     
     if len(prun)>0:
         tree['pruning']=prun[:]
-    
-    # Remove the pruned values from the active domains
-    for (var,val) in prun:
-        if val in domains_in[var]:
-            domains_in[var].remove(val)
-        else:
-            assert val in domains_poss[var]
-            domains_poss[var].remove(val)
+        # Remove the pruned values from the active domains
+        for (var,val) in prun:
+            if val in domains_in[var]:
+                domains_in[var]=domains_in[var][:]
+                domains_in[var].remove(val)
+            else:
+                assert val in domains_poss[var]
+                domains_poss[var]=domains_poss[var][:]
+                domains_poss[var].remove(val)
     
     # check if a domain is empty
     for var in xrange(len(domains_in)):
@@ -174,7 +249,12 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
         ties=[]
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
-                count=len(filter(lambda a: a[var]==val,  ct2))
+                #count=len(filter(lambda a: a[var]==val,  ct2))
+                count=0
+                for nogood in ct2:
+                    if nogood[var]==val:
+                        count+=1
+                
                 if count>numnogoods:
                     numnogoods=count
                     chosenvar=var
@@ -210,22 +290,15 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     #print "Chosen variable: %d" %chosenvar
     #print "Chosen value:%d"%chosenval
     
-    dom_left_poss=copy.deepcopy(domains_poss)
-    dom_right_poss=copy.deepcopy(domains_poss)
     
-    dom_left_in=copy.deepcopy(domains_in)
-    dom_right_in=copy.deepcopy(domains_in)
+    domains_poss[chosenvar]=domains_poss[chosenvar][:]
+    domains_poss[chosenvar].remove(chosenval)
     
-    dom_right_out=list(domains_out)
-    dom_right_out[chosenvar]=dom_right_out[chosenvar]|frozenset([chosenval])
-    dom_right_out=tuple(dom_right_out)
+    #dom_left_in=copy.deepcopy(domains_in)
+    #dom_right_in=copy.deepcopy(domains_in)
     
     # In left tree, move the value from possible to in
-    dom_left_in[chosenvar].append(chosenval)
-    dom_left_poss[chosenvar].remove(chosenval)
-    
-    # In right tree, remove the value from possible.
-    dom_right_poss[chosenvar].remove(chosenval)
+    #dom_left_in[chosenvar].append(chosenval)
     
     tree['var']=chosenvar
     tree['val']=chosenval
@@ -233,16 +306,22 @@ def build_tree(ct_init, tree, domains_in, domains_poss, domains_out, varvalorder
     prun_right=False
     
     tree['left']=dict()
-    prun_left=build_tree(copy.deepcopy(ct2), tree['left'], dom_left_in, dom_left_poss, domains_out, varvalorder, heuristic)
+    
+    # just for left branch
+    domains_in[chosenvar].append(chosenval)
+    
+    prun_left=build_tree(ct2, tree['left'], domains_in, domains_poss, varvalorder, heuristic)
     if not prun_left:
         if checktreecutoff:
             print "deleting subtree of size: %d"%(tree_cost2(tree['left']))
         del tree['left']
     
+    domains_in[chosenvar].remove(chosenval)
+    
     # If we have not emptied the domain in the right branch:
-    if len(dom_right_poss[chosenvar])+len(dom_right_in[chosenvar])>0:
+    if len(domains_poss[chosenvar])+len(domains_in[chosenvar])>0:
         tree['right']=dict()
-        prun_right=build_tree(copy.deepcopy(ct2), tree['right'], dom_right_in, dom_right_poss, dom_right_out, varvalorder, heuristic)
+        prun_right=build_tree(ct2, tree['right'], domains_in, domains_poss, varvalorder, heuristic)
         if not prun_right:
             if checktreecutoff:
                 print "deleting subtree of size: %d"%(tree_cost2(tree['right']))
@@ -318,7 +397,25 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
     
     permlist=[]
     
-    varvals=[(a,b) for a in range(len(domains_init)) for b in domains_init[a] ]
+    alltups=[]
+    crossprod(domains_init, [], alltups)
+    
+    global gac2001_goods, gac2001_indices, gac2001_domains_init
+    
+    gac2001_goods=[ [ [] for a in dom ] for dom in domains_init ]
+    for t in alltups:
+        if binary_search(ct_nogoods, t)==-1:
+            for var in xrange(len(t)):
+                val = t[var]
+                validx=domains_init[var].index(val)
+                gac2001_goods[var][validx].append(t)
+    
+    # counter for each domain element
+    gac2001_indices=[ [0 for a in dom ] for dom in domains_init  ]
+    
+    gac2001_domains_init=copy.deepcopy(domains_init)
+    
+    varvals=[(a,b) for a in xrange(len(domains_init)) for b in domains_init[a] ]
     if heuristic:
         permlist.append(varvals)
     else:
@@ -327,9 +424,8 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
     for perm in permlist:
         tree=dict()
         domains_in=[ [] for i in domains_init]
-        domains_out=tuple([ frozenset() for i in domains_init])
         domains=copy.deepcopy(domains_init)
-        build_tree(copy.deepcopy(ct_nogoods), tree, domains_in, domains, domains_out, perm, len(permlist)==1)   # last arg is whether to use heuristic.
+        build_tree(copy.deepcopy(ct_nogoods), tree, domains_in, domains, perm, len(permlist)==1)   # last arg is whether to use heuristic.
         cost=tree_cost2(tree)
         if cost<bestcost:
             bestcost=cost
@@ -337,6 +433,15 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
             print "Better tree found, of size:%d"%bestcost
     
     return besttree
+
+
+################################################################################
+#
+#
+#       Constraints
+#
+#
+
 
 def and_constraint():
     # A /\ B = C
@@ -467,15 +572,6 @@ def binseq_three():
     
 def still_life():
     table=[]
-    def crossprod(domains, conslist, outlist):
-        if domains==[]:
-            outlist.append(conslist[:])
-            return
-        for i in domains[0]:
-            ccopy=conslist[:]
-            ccopy.append(i)
-            crossprod(domains[1:], ccopy, outlist)
-        return
     
     cross=[]
     crossprod([(0,1) for i in range(9)], [], cross)
@@ -501,15 +597,6 @@ def still_life():
 
 def life():
     table=[]
-    def crossprod(domains, conslist, outlist):
-        if domains==[]:
-            outlist.append(conslist[:])
-            return
-        for i in domains[0]:
-            ccopy=conslist[:]
-            ccopy.append(i)
-            crossprod(domains[1:], ccopy, outlist)
-        return
     
     cross=[]
     crossprod([(0,1) for i in range(10)], [], cross)
@@ -550,4 +637,5 @@ def life():
 
 #pegsol()
 #binseq_three()
+#cProfile.run('life()')
 life()

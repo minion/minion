@@ -6,7 +6,11 @@ grouptwo=True
 groupthree=False
 
 # true, use lighttable, false, use test constraint.
-usetable=False
+usetable=True
+tablecon="lighttable"
+
+symbreak=True
+
 
 print "MINION 3"
 
@@ -157,6 +161,51 @@ for k in range(1, n):
         print "sumgeq([prod%d[_]], ck[%d])" %(k, k-1)
         print "sumleq([prod%d[_]], ck[%d])" %(k, k-1)
         
+
+# symmetry breaking
+if symbreak:
+    print "**VARIABLES**"
+    print "BOOL seq2[%d]" %n
+    print "**CONSTRAINTS**"
+    
+    for i in range(n):
+        print "reify(eq(seq[%d],1), seq2[%d])"%(i,i)
+    
+    # Reverse order
+    print "lexleq(["+(",".join(["seq2[%d]"%(i) for i in range(n) ]))+"],["+(",".join(["seq2[%d]"%(i) for i in range(n-1, -1, -1) ]))+"])"
+    
+    # Negation of each number
+    print "lexleq(["+(",".join(["seq2[%d]"%(i) for i in range(n) ]))+"],["+(",".join(["!seq2[%d]"%(i) for i in range(n) ]))+"])"
+    
+    # Negation of even positions 
+    ls=[]
+    for i in range(n):
+        if i%2 == 1:
+            ls.append("seq2[%d]"%i)
+        else:
+            ls.append("!seq2[%d]"%i)
+    
+    print "lexleq(["+(",".join(["seq2[%d]"%(i) for i in range(n) ]))+"],["+(",".join(ls))+"])"
+    
+    # Negation of odd positions 
+    ls_odd=[]
+    for i in range(n):
+        if i%2 == 1:
+            ls_odd.append("!seq2[%d]"%i)
+        else:
+            ls_odd.append("seq2[%d]"%i)
+    
+    print "lexleq(["+(",".join(["seq2[%d]"%(i) for i in range(n) ]))+"],["+(",".join(ls_odd))+"])"
+    # reverse negation
+    print "lexleq(["+(",".join(["seq2[%d]"%(i) for i in range(n) ]))+"],["+(",".join(["!seq2[%d]"%(i) for i in range(n-1, -1, -1) ]))+"])"
+    
+    # reverse negation of odds
+    
+    print "lexleq(["+(",".join(["seq2[%d]"%(i) for i in range(n) ]))+"],["+(",".join([ls_odd[i] for i in range(n-1, -1, -1)]))+"])"
+    
+    # reverse negation of evens
+    print "lexleq(["+(",".join(["seq2[%d]"%(i) for i in range(n) ]))+"],["+(",".join([ls[i] for i in range(n-1, -1, -1)]))+"])"
+
 
 for i in range(n-1):
     #print "product(ck[%d], ck[%d], cksquared[%d])"%(i,i,i)
