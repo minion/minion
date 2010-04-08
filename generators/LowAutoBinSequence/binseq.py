@@ -1,16 +1,36 @@
 #!/usr/bin/python
 
-n=25
+import sys, os, getopt
 
-grouptwo=True
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["n=", "table", "test", "lighttable", "grouptwo", "groupthree"])
+
+n=-1
+
+usetest=False
+usetable=False
+grouptwo=False
 groupthree=False
 
-# true, use lighttable, false, use test constraint.
-usetable=True
-tablecon="lighttable"
+tabctname="lighttable"
+
+for i in optargs:
+    (a1, a2)=i
+    if a1=="--n":
+        n=int(a2)
+    elif a1=="--test":
+        usetest=True
+    elif a1=="--table":
+        usetable=True
+        tabctname="table"
+    elif a1=="--lighttable":
+        usetable=True
+        tabctname="lighttable"
+    elif a1=="--grouptwo":
+        grouptwo=True
+    elif a1=="--groupthree":
+        groupthree=True
 
 symbreak=True
-
 
 print "MINION 3"
 
@@ -100,9 +120,10 @@ for k in range(1, n):
             print "diseq(prod%d[%d], -1)" %(k, i)
             print "diseq(prod%d[%d], 1)" %(k, i)
             if usetable:
-                print "lighttable([seq[%d], seq[%d], seq[%d], seq[%d], prod%d[%d]], twoprod)"%(startidx, startidx+k, startidx+1, startidx+k+1, k, i)
+                print "%s([seq[%d], seq[%d], seq[%d], seq[%d], prod%d[%d]], twoprod)"%(tabctname, startidx, startidx+k, startidx+1, startidx+k+1, k, i)
             else:
                 # use the test constraint.
+                assert usetest
                 print "test([seq[%d], seq[%d], seq[%d], seq[%d], prod%d[%d]])" %(startidx, startidx+k, startidx+1, startidx+k+1, k, i)
             
         if ((n-k)//2)*2 < n-k:
@@ -137,9 +158,10 @@ for k in range(1, n):
         for i in range(0, (n-k)//3):
             startidx=i*3
             if usetable:
-                print "lighttable([seq[%d], seq[%d], seq[%d], seq[%d], seq[%d], seq[%d], prod%d[%d]], threeprod)"\
-                %(startidx, startidx+k, startidx+1, startidx+k+1, startidx+2, startidx+k+2, k, i)
+                print "%s([seq[%d], seq[%d], seq[%d], seq[%d], seq[%d], seq[%d], prod%d[%d]], threeprod)"\
+                %(tabctname, startidx, startidx+k, startidx+1, startidx+k+1, startidx+2, startidx+k+2, k, i)
             else:
+                assert usetest
                 # use the test constraint.
                 print "test([seq[%d], seq[%d], seq[%d], seq[%d], seq[%d], seq[%d], prod%d[%d]])"\
                 %(startidx, startidx+k, startidx+1, startidx+k+1, startidx+2, startidx+k+2, k, i)
@@ -209,7 +231,7 @@ if symbreak:
 
 for i in range(n-1):
     #print "product(ck[%d], ck[%d], cksquared[%d])"%(i,i,i)
-    print "lighttable([ck[%d], cksquared[%d]], square)"%(i,i)
+    print "%s([ck[%d], cksquared[%d]], square)"%(tabctname,i,i)
 
 print "sumgeq([cksquared[_]], optvar)"
 print "sumleq([cksquared[_]], optvar)"

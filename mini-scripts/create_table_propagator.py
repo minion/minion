@@ -81,7 +81,7 @@ def tuple_valid(tup, domains):
             return False
     return True
 
-def gac_prunings2(nogoods, domains):
+def gac_prunings2(domains):
     prunings=[]
     for var in xrange(len(domains)):
         for val in domains[var]:
@@ -165,7 +165,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     
     
     if ct == []:
-        # The constraint is implied.
+        # The constraint is implied
         return False  # no pruning.
     
     # If only one possible value left, assume it is 'in', otherwise we would have failed already.
@@ -191,7 +191,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     #print "domains:"+str(whole_domain)
     #print "domains_out:"+str(domains_out)
     
-    prun=gac_prunings2(ct, whole_domain)
+    prun=gac_prunings2(whole_domain)
     
     if len(prun)>0:
         tree['pruning']=prun[:]
@@ -543,7 +543,7 @@ def binseq():
                 for d in [-1, 1]:
                     for e in [-2,0,2]:
                         if e!= (a*b)+(c*d):
-                            twoprod.append((a,b,c,d, e))
+                            twoprod.append([a,b,c,d, e])
     
     domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-2,0,2]]
     t=generate_tree(twoprod, domains_init, True)
@@ -562,7 +562,7 @@ def binseq_three():
                         for f in [-1, 1]:
                             for g in [-3, -1, 1, 3]:
                                 if (a*b)+(c*d)+(e*f) != g:
-                                    threeprod.append((a,b,c,d,e,f,g))
+                                    threeprod.append([a,b,c,d,e,f,g])
     domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-1, 1], [-1, 1], [-3,-1,1,3]]
     t=generate_tree(threeprod, domains_init, True)
     print_tree(t)
@@ -638,4 +638,5 @@ def life():
 #pegsol()
 #binseq_three()
 #cProfile.run('life()')
+#binseq()
 life()

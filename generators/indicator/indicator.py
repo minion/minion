@@ -88,7 +88,7 @@ domsize = 2
 # check for flags
 
 
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["table", "test", "decomp", "lighttable"])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["table", "test", "decomp", "lighttable", "random", "arity="])
 
 
 # what type of constraint to print out.
@@ -96,6 +96,9 @@ gentable=False
 gentest=False
 gendecomp=False
 genlighttable=False
+
+arity=-1
+randomct=False
 
 for i in optargs:
     (a1, a2)=i
@@ -107,6 +110,14 @@ for i in optargs:
         gentest=True
     elif a1=="--decomp":
         gendecomp=True
+    elif a1=="--random":
+        randomct=True
+    elif a1=="--arity":
+        arity=int(a2)
 
-#generate_indicator([build_table(diff1, 5), build_table(xlessy, 5)], 5, 5)
-generate_indicator([build_table(sumgeqthree,domsize,5)], domsize,5, True)
+if randomct:
+    print "not yet."
+else:
+    #generate_indicator([build_table(diff1, 5), build_table(xlessy, 5)], 5, 5)
+    generate_indicator([build_table(sumgeqthree,domsize,5)], domsize,5, True)
+

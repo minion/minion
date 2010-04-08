@@ -30,7 +30,7 @@ struct TestConstraint : public AbstractConstraint
   
    typedef typename VarArray::value_type ArrayVarRef;
   
-   array<ArrayVarRef,10> var_array;
+   array<ArrayVarRef,5> var_array;
   
   TestConstraint(StateObj* _stateObj, const VarArray& _var_array) :
     AbstractConstraint(_stateObj)
@@ -65,11 +65,14 @@ struct TestConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
       // life 
-#include "generated_life_ct.h"
+//#include "generated_life_ct.h"
 
       
       // still life
-    // #include "generated_stilllife_ct.h"
+//#include "generated_stilllife_ct.h"
+
+#include "generated_labs_ct.h"
+
           
   }
   
