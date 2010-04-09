@@ -32,7 +32,7 @@ for i in optargs:
     (a1, a2)=i
     if a1=="--startpos":
         startPos=int(a2)
-    if a1=="--test":
+    elif a1=="--test":
         useTest=True
     elif a1=="--min":
         useMin=True
@@ -40,6 +40,7 @@ for i in optargs:
         useReify=True
     else:
         print "Unrecognized option:%s" %(a1)
+        sys.exit()
 
 
 
