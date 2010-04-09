@@ -174,12 +174,12 @@ def printpegsol(startField):
                             print reduce(lambda a,b: str(a)+","+str(b), map(lambda f3: "equal[%d, %d]"%(step, f3), staticfields))
                             print "], %d), moves[%d, %d])"%(len(staticfields), step, mv)
     
-    # STARTING STATE
+    # STARTING STATE -- specified from 1.. whereas arrays indexed from 0 in minion
     for f1 in range(noFields):
-        if f1!=startField:
+        if f1!=startField-1:
             print "eq(bState[0, %d], 1)"%f1
     
-    print "eq(bState[0, %d], 0)"%startField
+    print "eq(bState[0, %d], 0)"%(startField-1)
     
     
     # Finishing state has one piece
