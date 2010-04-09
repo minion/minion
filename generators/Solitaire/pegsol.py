@@ -12,16 +12,37 @@
 # 00000 28 29 30 00000 
 # 00000 31 32 33 00000
 
+import getopt, sys
 
 noSteps=31
 noFields=33
 noMoves=76
 
-
-useTest=False  # Use the test constraint.
-useMin=True    # Use min instead of reify sumgeq
-
 cse=True   # do cse on the eq constraints between bState vars.
+
+
+startPos=-1
+useTest=False  # Use the test constraint.
+useMin=False    # Use min instead of reify sumgeq
+useReify=False  # use reify sumgeq
+
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["startpos=", "test", "min", "reify"])
+
+for i in optargs:
+    (a1, a2)=i
+    if a1=="--startpos":
+        startPos=int(a2)
+    if a1=="--test":
+        useTest=True
+    elif a1=="--min":
+        useMin=True
+    elif a1=="--reify":
+        useReify=True
+    else:
+        print "Unrecognized option:%s" %(a1)
+
+
+
 
 # 0 means no move. otherwise, transitionNumber[field1, field2]=moveNumber that moves a piece from f1 to f2. 
 transitionNumber=\
@@ -80,7 +101,6 @@ def printpegsol(startField):
     
     print "BOOL bState[%d, %d]"%(noSteps+1, noFields)
     
-    
     if cse:
         print "BOOL equal[%d, %d]"%(noSteps, noFields)
     
@@ -115,7 +135,7 @@ def printpegsol(startField):
                         assert transitionStep[mv][2]==f2+1
                         
                         # do the move iff the move variable is true.
-                        if(useTest):
+                        if useTest:
                             print "test(["
                             print "bState[%d, %d], bState[%d, %d],"%(step, f1, step+1, f1)
                             print "bState[%d, %d], bState[%d, %d],"%(step, middlefield, step+1, middlefield)
@@ -129,6 +149,7 @@ def printpegsol(startField):
                             print "!bState[%d, %d], bState[%d, %d]"%(step, f2, step+1, f2)
                             print "], moves[%d, %d])"%(step, mv)
                         else:
+                            assert useReify
                             print "reify(sumgeq(["
                             # six literals on bState vars.
                             print "bState[%d, %d], !bState[%d, %d],"%(step, f1, step+1, f1)
@@ -170,6 +191,6 @@ def printpegsol(startField):
     print "**EOF**"
 
 
-printpegsol(9)
+printpegsol(startPos)
 
 

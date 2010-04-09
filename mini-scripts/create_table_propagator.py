@@ -168,11 +168,12 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         # The constraint is implied
         return False  # no pruning.
     
+    # Now done after pruning:
     # If only one possible value left, assume it is 'in', otherwise we would have failed already.
-    for var in xrange(len(domains_poss)):
-        if len(domains_in[var])==0 and len(domains_poss[var])==1:
-            domains_in[var]=domains_in[var]+[domains_poss[var][0]]
-            domains_poss[var]=[]
+    #for var in xrange(len(domains_poss)):
+    #    if len(domains_in[var])==0 and len(domains_poss[var])==1:
+    #        domains_in[var]=domains_in[var]+[domains_poss[var][0]]
+    #        domains_poss[var]=[]
     
     ##########################################################################
     #
@@ -211,6 +212,13 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
             return True # we did do pruning here.
             # Could change this node from some pruning to a fail.
     
+    # Domains have changed, so do this:
+    # If only one possible value left, assume it is 'in', otherwise we would have failed already.
+    for var in xrange(len(domains_poss)):
+        if len(domains_in[var])==0 and len(domains_poss[var])==1:
+            domains_in[var]=domains_in[var]+[domains_poss[var][0]]
+            domains_poss[var]=[]
+    
     # If we have complete domain knowledge, then return.
     if len(filter(lambda x:len(x)>0, domains_poss))==0:
         if len(prun)==0:
@@ -226,6 +234,8 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         # The constraint is implied.
         assert len(prun)>0  # Should only reach here if tuples lost by pruning.
         return True
+    
+    # No need to find singleton domains here, and put them 'in', because ...?
     
     ########################################################################
     #
@@ -635,8 +645,8 @@ def life():
 
 #sports_constraint()
 
-#pegsol()
+pegsol()
 #binseq_three()
 #cProfile.run('life()')
 #binseq()
-life()
+#life()
