@@ -1,0 +1,23 @@
+MINION 1
+#TEST SOLCOUNT 4
+#This just sanity checks a number of products, to make sure
+#we deal with negative numbers correctly.
+
+0
+3
+0 1 3
+0
+0
+0
+
+[]
+[]
+
+0 
+1
+[ [ x0,x1,x2] ]
+0
+objective none
+print m0
+
+product(x0,x1,x2)

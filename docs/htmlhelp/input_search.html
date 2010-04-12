@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>input search</title>
+</head>
+<body>
+<h1>Help on <tt>input search</tt></h1>
+<h3>Description</h3>
+<pre>
+
+Inside the search section one can specify
+
+- variable orderings, 
+- value orderings,
+- optimisation function, and
+- details of how to print out solutions.
+
+   SearchSection::= &lt;VarValOrdering&gt;*
+                    &lt;OptimisationFn&gt;?
+                    &lt;PrintFormat&gt;?
+
+If no varval ordering is given then the variables are assigned in instantiation
+order and the values tried in ascending order.
+
+If a variable order is given as a command line argument it will override
+anything specified in the input file.
+
+Multiple variable orders can be given, each with an optional value ordering:
+
+   VarValOrdering::= &lt;VarOrder&gt; 
+                     &lt;ValOrder&gt;?
+
+In each VarOrder an instantiation order is specified for a subset of
+variables. Variables can optionally be \"auxiliary variables\" (add \"AUX\" to
+the varorder) meaning that if there are several solutions to the problem
+differing only in the auxiliary variables, only one is reported by minion.
+
+   VarOrder::= VARORDER AUX? &lt;ORDER&gt;? [ &lt;varname&gt;+ ]
+
+      where
+
+   &lt;ORDER&gt;::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMOVERWDEG
+
+The value ordering allows the user to specify an instantiation order
+for the variables involved in the variable order, either ascending (a)
+or descending (d) for each. When no value ordering is specified, the
+default is to use ascending order for every search variable.
+
+   ValOrder::= VALORDER[ (a|d)+ ]
+
+To model an optimisation problem the user can specify to minimise
+or maximise a variable's value.
+
+   OptimisationFn::= MAXIMISING &lt;varname&gt;
+                   | MINIMISING &lt;varname&gt;
+
+Finally, the user can control some aspects of the way solutions are
+printed. By default (no PrintFormat specified) all the variables are
+printed in declaration order. Alternatively a custom vector, or ALL
+variables, or no (NONE) variables can be printed. If a matrix or, more
+generally, a tensor is given instead of a vector, it is automatically
+flattened into a vector as described in 'help variables vectors'.
+
+   PrintFormat::= PRINT &lt;vector&gt;
+                | PRINT ALL
+                | PRINT NONE
+</pre>
+<h3>References</h3>
+<pre>
+See also
+
+   switches -varorder
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>
