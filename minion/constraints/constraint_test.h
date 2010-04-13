@@ -30,7 +30,7 @@ struct TestConstraint : public AbstractConstraint
   
    typedef typename VarArray::value_type ArrayVarRef;
   
-   array<ArrayVarRef,5> var_array;
+   array<ArrayVarRef,3> var_array;
   
   TestConstraint(StateObj* _stateObj, const VarArray& _var_array) :
     AbstractConstraint(_stateObj)
@@ -47,8 +47,9 @@ struct TestConstraint : public AbstractConstraint
     
     for(int i = 0; i < var_array.size(); ++i)
     { // Have to add 1 else the 0th element will be lost.
-      t.push_back(make_trigger(var_array[i], Trigger(this, 2*i), LowerBound));
-      t.push_back(make_trigger(var_array[i], Trigger(this, 2*i+1), UpperBound));
+      //t.push_back(make_trigger(var_array[i], Trigger(this, 2*i), LowerBound));
+      //t.push_back(make_trigger(var_array[i], Trigger(this, 2*i+1), UpperBound));
+      t.push_back(make_trigger(var_array[i], Trigger(this, 2*i+1), DomainChanged));
     }
     
     return t;
@@ -71,8 +72,8 @@ struct TestConstraint : public AbstractConstraint
       // still life
 //#include "generated_stilllife_ct.h"
 
-#include "generated_labs_ct.h"
-
+//#include "generated_labs_ct.h"
+#include "generated_alldiff3_ct.h"
           
   }
   
