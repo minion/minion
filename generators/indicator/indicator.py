@@ -82,13 +82,17 @@ xlessy   = lambda (x,y): x < y
 eqoreq = lambda(a,b,c,d) : (a == b) or (c == d)
 eqorneq = lambda(a,b,c,d) : (a == b) or (c != d)
 sumgeqthree= lambda(a,b,c,d,e): (a+b+c+d+e)>=3
+alldiff3 = lambda(a,b,c): (a!=b) and (a!=c) and (b!=c)
+lexleq = lambda(a,b,c,x,y,z) : [a,b,c] <= [x,y,z]
+lexless = lambda(a,b,c,x,y,z,w) : (a+b+c+x+y+z+w) == 0 or (a+b+c+x+y+z+w) == 7
+twotup = lambda(a,b,c,x,y,z,w) : [a,b,c,x,y,z,w] in [[0,1,0,1,0,1,0],[1,0,1,0,1,0,1]]
 
-domsize = 2
+domsize = -1
 
 # check for flags
 
 
-(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["table", "test", "decomp", "lighttable", "random", "arity="])
+(optargs, other)=getopt.gnu_getopt(sys.argv, "", ["domsize=", "table", "test", "decomp", "lighttable", "random", "arity="])
 
 
 # what type of constraint to print out.
@@ -114,10 +118,12 @@ for i in optargs:
         randomct=True
     elif a1=="--arity":
         arity=int(a2)
+    elif a1=="--domsize":
+        domsize=int(a2)
 
 if randomct:
     print "not yet."
 else:
     #generate_indicator([build_table(diff1, 5), build_table(xlessy, 5)], 5, 5)
-    generate_indicator([build_table(sumgeqthree,domsize,5)], domsize,5, True)
+    generate_indicator([build_table(twotup,domsize,arity)], domsize,5, True)
 
