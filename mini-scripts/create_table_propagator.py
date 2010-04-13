@@ -634,6 +634,24 @@ def life():
     print "Number of nodes explored by algorithm: "+str(calls_build_tree)
 
 
+def alldiff():
+    table=[]
+    
+    cross=[]
+    crossprod([(0,1,2) for i in range(3)], [], cross)
+    
+    table=[]
+    for l in cross:
+        if l[0]==l[1] or l[0]==l[2] or l[1]==l[2]:
+            table.append(l)
+    
+    domains_init=[[0,1,2] for i in range(3)]
+    t=generate_tree(table, domains_init, True)
+    print_tree(t)
+    print "Depth: "+str(tree_cost(t))
+    print "Number of nodes: "+str(tree_cost2(t))
+    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+
 # A tree node is a dictionary containing 'var': 0,1,2.... 'val', 'left', 'right', 'pruning'
 
 # get rid of treenodes when there are no nogoods left.
@@ -645,8 +663,10 @@ def life():
 
 #sports_constraint()
 
-pegsol()
+#pegsol()
 #binseq_three()
 #cProfile.run('life()')
 #binseq()
 #life()
+
+alldiff()
