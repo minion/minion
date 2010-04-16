@@ -128,7 +128,7 @@ struct SDFBranch : public VariableOrder
     
     pair<int, DomainInt> pickVarVal()
     {
-        cout << "In pickVarVal for SDF (approximation)" <<endl;
+        //cout << "In pickVarVal for SDF (approximation)" <<endl;
         int length = var_order.size();
         int smallest_dom = -1;
         DomainInt dom_size = DomainInt_Max;
