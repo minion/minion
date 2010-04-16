@@ -28,7 +28,7 @@ class TrailedMonotonicSet
 
   static const value_type tms_in_set = 1;
   
-  D_DATA(bool locked;)
+  D_DATA(bool locked);
   
   int _size;
   int _max_undos;

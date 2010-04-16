@@ -1460,7 +1460,7 @@ struct GCC : public AbstractConstraint
                 
                 GCCPRINT("Writing new SCC:");
                 bool containsvars=false, containsvals=false;
-                for(vector<int>::iterator tstackit=(--tstack.end());  ; --tstackit)
+                for(vector<int>::iterator tstackit=tstack.end()-1;  ; --tstackit)
                 {
                     int copynode=(*tstackit);
                     
@@ -1514,7 +1514,7 @@ struct GCC : public AbstractConstraint
                 {
                     while(true)
                     {
-                        int copynode=(*(--tstack.end()));
+                        int copynode=(*(tstack.end()-1));
                         
                         tstack.pop_back();
                         in_tstack.remove(copynode);

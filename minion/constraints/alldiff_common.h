@@ -1594,7 +1594,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 
                 P("Writing new SCC:");
                 bool containsvars=false;
-                for(vector<int>::iterator tstackit=(--tstack.end());  ; --tstackit)
+                for(vector<int>::iterator tstackit=(tstack.end()-1);  ; --tstackit)
                 {
                     int copynode=(*tstackit);
                     //cout << "SCC element: "<< copynode<<endl;
@@ -1637,7 +1637,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 {
                     while(true)
                     {
-                        int copynode=(*(--tstack.end()));
+                        int copynode=(*(tstack.end()-1));
                         
                         tstack.pop_back();
                         in_tstack.remove(copynode);

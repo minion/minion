@@ -53,6 +53,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   { 
     cerr << "Check assign constraints shouldn't get reversed." << endl;
     FAIL_EXIT();
+    return NULL;
   }
   
   virtual void propagate(int prop_val,DomainDelta delta)

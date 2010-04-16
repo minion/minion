@@ -109,6 +109,7 @@ public:
   {
     cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
     exit(1);
+    return false;
   }
 
   /// Checks incrementaly if constraint cannot be satisfied.
@@ -118,6 +119,7 @@ public:
   {
     cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
     exit(1);
+    return false;
   }
 
   /// Looks for a valid partial assignment to a constraint.
@@ -128,6 +130,7 @@ public:
   {
     cerr << "Finding assignment is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
     exit(1);
+    return false;
   }
 
   /// Returns the reverse of the current constraint
@@ -136,6 +139,7 @@ public:
   {
     cerr << "Negation is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
     exit(1);
+    return NULL;
   }
 
   AbstractConstraint(StateObj* _stateObj) :
