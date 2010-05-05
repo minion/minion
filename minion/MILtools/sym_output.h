@@ -1139,6 +1139,47 @@ struct InstanceStats
       
       int totaltightness=std::accumulate(tightness.begin(), tightness.end(), 0);
       cout << s << "tightness_mean:" << ((double)totaltightness)/(double) tightness.size() << endl;
+
+      //now literal tightness
+      map<pair<Var,DomainInt>,vector<int> > scores_for_varval; //all available tightnesses for varvals
+      //iterate over constraints, collecting all available tightnesses for varvals involved in con
+      for(int con = 0; con < cons.size(); con++)
+      {
+	vector<AnyVarRef>& all_vars = *cons[con]->get_vars_singleton();
+	for(size_t var = 0; var < all_vars.size(); var++) {
+	  Var vv = all_vars[var].getBaseVar();
+	  for(DomainInt val = all_vars[var].getInitialMin(); val <= all_vars[var].getInitialMax(); val++) {
+	    scores_for_varval[make_pair(vv, val)].push_back(cons[con]->getTightnessEstimateVarVal(var, val));
+	  }
+	}
+      }
+      //now average the tightnesses
+      vector<double> lit_tightness;
+      for(map<pair<Var,DomainInt>,vector<int> >::iterator curr = scores_for_varval.begin();
+	  curr != scores_for_varval.end();
+	  curr++) {
+	vector<int> nums = curr->second;
+	lit_tightness.push_back((double)std::accumulate(nums.begin(), nums.end(), 0) / (double)nums.size()); //mean literal tightness
+      }
+
+      std::sort(lit_tightness.begin(), lit_tightness.end());
+      
+      cout << s << "literal_tightness_0:" << lit_tightness[0] <<endl;
+      cout << s << "literal_tightness_25:" << lit_tightness[lit_tightness.size()/4] <<endl;
+      cout << s << "literal_tightness_50:" << lit_tightness[lit_tightness.size()/2] <<endl;
+      cout << s << "literal_tightness_75:" << lit_tightness[(lit_tightness.size()*3)/4] <<endl;
+      cout << s << "literal_tightness_100:" << lit_tightness.back() <<endl;
+      
+      totaltightness=std::accumulate(lit_tightness.begin(), lit_tightness.end(), 0.0);
+      double lt_mean = (double)totaltightness / (double)lit_tightness.size();
+      cout << s << "literal_tightness_mean:" << lt_mean << endl;
+      //coefficient of variation
+      double st_dev = 0;
+      for(size_t i = 0; i < lit_tightness.size(); i++) {
+	st_dev += pow((double)lit_tightness[i] - lt_mean, 2);
+      }
+      st_dev = sqrt(st_dev / lit_tightness.size());
+      cout << s << "literal_coeff_of_variation:" << st_dev / lt_mean << endl;
   }
   
   int arity(ConstraintBlob& ct)
