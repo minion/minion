@@ -49,7 +49,7 @@ public:
    { return (type_m < var.type_m) || (type_m == var.type_m && pos_m < var.pos_m); }
 };
 
-size_t hash_value(Var v)
+size_t inline hash_value(Var v)
 { return v.pos() + v.type() * 10000; }
 
 }

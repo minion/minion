@@ -51,17 +51,22 @@ struct ConcreteFileReader
   
   
   string get_string()
-  { 
-    string s;
+  {
+    char buffer[1000];
+    int pos = 0;
     char next_char = get_char();
     while(isalnum(next_char) || next_char == '_')
     {
-      s += next_char;
+      buffer[pos] = next_char;
+      pos++;
+      if(pos >= 999)
+      { D_FATAL_ERROR("Identifer too long!"); }
       next_char = infile.get();
     }
     
     putback(next_char);
-    return s;
+    buffer[pos] = '\0';
+    return string(buffer);
   }
   
   void check_string(const string& string_in)
