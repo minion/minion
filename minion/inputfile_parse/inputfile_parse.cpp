@@ -45,7 +45,7 @@ template<typename Reader, typename Stream>
     getTableOut().set(string("Filename"), infile->filename);  
 }
 
-void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parser_verbose)
+void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, bool parser_verbose)
 {
   MinionThreeInputReader<ConcreteFileReader<CheapStream> > readerThree(parser_verbose);
   MinionInputReader<ConcreteFileReader<CheapStream> > reader(parser_verbose);
