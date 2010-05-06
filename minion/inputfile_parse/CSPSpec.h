@@ -167,13 +167,13 @@ struct ConstraintBlob
   struct VarContainer
 {
   int BOOLs;
-  MAP<string, Var> symbol_table;
-  MAP<Var, string> name_table;
+  MAP_TYPE<string, Var> symbol_table;
+  MAP_TYPE<Var, string> name_table;
   vector<pair<int, Bounds> > bound;
   vector<pair<int, vector<int> > > sparse_bound;
   vector<pair<int, Bounds> > discrete;
   vector<pair<int, vector<int> > > sparse_discrete;
-  MAP<string, vector<int> > matrix_table;
+  MAP_TYPE<string, vector<int> > matrix_table;
   VarContainer() : BOOLs(0)
   {}
 
