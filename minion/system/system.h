@@ -98,7 +98,9 @@ using boost::tuple;
 using boost::tie;
 using boost::make_tuple;
 
-#ifdef USE_BOOST
+
+#ifdef 1
+// Always use boost now. USE_BOOST
 
 //#include <boost/thread/thread.hpp>
 //#include <boost/thread/mutex.hpp>
