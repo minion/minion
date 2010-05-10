@@ -167,13 +167,13 @@ struct ConstraintBlob
   struct VarContainer
 {
   int BOOLs;
-  MAP_TYPE<string, Var> symbol_table;
-  MAP_TYPE<Var, string> name_table;
+  INPUT_MAP_TYPE<string, Var> symbol_table;
+  INPUT_MAP_TYPE<Var, string> name_table;
   vector<pair<int, Bounds> > bound;
   vector<pair<int, vector<int> > > sparse_bound;
   vector<pair<int, Bounds> > discrete;
   vector<pair<int, vector<int> > > sparse_discrete;
-  MAP_TYPE<string, vector<int> > matrix_table;
+  INPUT_MAP_TYPE<string, vector<int> > matrix_table;
   VarContainer() : BOOLs(0)
   {}
 
@@ -286,7 +286,7 @@ struct ConstraintBlob
 
   Var getSymbol(const string& name) const
   {
-    MAP_TYPE<string, Var>::const_iterator it = symbol_table.find(name);
+    INPUT_MAP_TYPE<string, Var>::const_iterator it = symbol_table.find(name);
     if(it == symbol_table.end())
       throw parse_exception("Undefined name: '" + name + "'");
     return it->second;
@@ -297,7 +297,7 @@ struct ConstraintBlob
     if(var.type() == VAR_CONSTANT) {
       return to_string(var.pos()); //special case for constants
     }
-    MAP_TYPE<Var, string>::const_iterator it = name_table.find(var);
+    INPUT_MAP_TYPE<Var, string>::const_iterator it = name_table.find(var);
     if(it == name_table.end())
       throw parse_exception("Undefined Var");
     return it->second;
@@ -305,7 +305,7 @@ struct ConstraintBlob
 
   vector<int> getMatrixSymbol(const string& name)
   {
-    MAP_TYPE<string, vector<int> >::iterator it = matrix_table.find(name);
+    INPUT_MAP_TYPE<string, vector<int> >::iterator it = matrix_table.find(name);
     if(it == matrix_table.end())
       throw parse_exception("Undefined matrix: '" + name + "'");
     return it->second;

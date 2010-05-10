@@ -98,8 +98,7 @@ using boost::tuple;
 using boost::tie;
 using boost::make_tuple;
 
-
-// Always use boost now. USE_BOOST
+#ifdef USE_BOOST
 
 //#include <boost/thread/thread.hpp>
 //#include <boost/thread/mutex.hpp>
@@ -110,7 +109,35 @@ using boost::make_tuple;
 
 #define MAP_TYPE boost::unordered_map
 #define SET_TYPE boost::unordered_set
- 
+
+#define INPUT_MAP_TYPE MAP_TYPE
+
+#else
+
+/// Can't be bothered defining hashes for tr1,
+/// as the definition has changed slightly between versions.
+#define INPUT_MAP_TYPE map
+
+#ifdef THREADSAFE
+#error Threading requires boost!
+#endif
+
+#ifdef USE_TR1_HASH_MAP_AND_SET
+#include <tr1/unordered_set>
+#include <tr1/unordered_map>
+
+#define MAP_TYPE std::tr1::unordered_map
+#define SET_TYPE std::tr1::unordered_set
+
+#else
+
+#include <map>
+#define MAP_TYPE map
+#include <set>
+#define SET_TYPE set
+#endif
+#endif
+
 using namespace std;
 
 #ifndef IN_MAIN
