@@ -1,0 +1,13 @@
+#TEST SOLCOUNT 254
+MINION 3
+
+**VARIABLES**
+BOOL b[8]
+
+**CONSTRAINTS**
+watched-or({w-literal(b[0],1),w-literal(b[1],1),w-literal(b[2],1),w-literal(b[3],1),w-literal(b[4],1),w-literal(b[5],1),w-literal(b[6],1),w-literal(b[7],1)})
+
+watched-or({w-literal(b[0],0),w-literal(b[1],0),w-literal(b[2],0),w-literal(b[3],0),w-literal(b[4],0),w-literal(b[5],0),w-literal(b[6],0),w-literal(b[7],0)})
+
+
+**EOF**

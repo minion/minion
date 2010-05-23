@@ -1,0 +1,12 @@
+MINION 3
+#TEST SOLCOUNT 136
+**VARIABLES**
+
+BOOL x[4]
+BOOL y[4]
+
+**CONSTRAINTS**
+
+lexleq(x,y)
+
+**EOF**

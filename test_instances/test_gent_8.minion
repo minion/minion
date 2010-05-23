@@ -1,0 +1,98 @@
+MINION 1
+#TEST CHECKONESOL 0 3 4 2
+#
+# WARNING!  Solution above may not be correct -- throws a failure
+#
+# Minion Graceful Graph Instance
+#alldiff([x0,x8,x7,x6,x5,x4,x3,x2,x1])
+#   Version with alldiff from -Q to Q
+# K2 x P2
+#
+# Minion Constraint Solver Input
+#    http://sourceforge.net/projects/minion
+# Instance created using CLisp generator written by Ian Gent
+# Instance created at 12:01 on 12 Apr 2006
+0
+0
+0
+13
+0 0 1
+-4 4 8
+0 4 4
+0
+[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12]
+[a,a,a,a,a,a,a,a,a,a,a,a,a]
+0
+2
+[[x9,x10]
+,[x11,x12]
+,[x0,x1,x2,x3,x4,x5,x6,x7,x8]
+]
+[[x9,x10,x11,x12]]
+0
+objective none
+print m1
+alldiff([x12,x11,x10,x9]
+)
+
+alldiff([x0,x8,x7,x6,x5,x4,x3,x2,x1])
+
+sumleq([x9,x1]
+,x10)
+
+sumgeq([x9,x1]
+,x10)
+
+sumleq([x9,x2]
+,x11)
+
+sumgeq([x9,x2]
+,x11)
+
+sumleq([x11,x3]
+,x9)
+
+sumgeq([x11,x3]
+,x9)
+
+sumleq([x10,x4]
+,x9)
+
+sumgeq([x10,x4]
+,x9)
+
+sumleq([x10,x5]
+,x12)
+
+sumgeq([x10,x5]
+,x12)
+
+sumleq([x12,x6]
+,x10)
+
+sumgeq([x12,x6]
+,x10)
+
+sumleq([x11,x7]
+,x12)
+
+sumgeq([x11,x7]
+,x12)
+
+sumleq([x12,x8]
+,x11)
+
+sumgeq([x12,x8]
+,x11)
+
+
+eq(x9,0)
+
+occurrence([x10,x11]
+,4,1)
+
+occurrence([x10,x11]
+,3,1)
+
+ineq(x9,x10,-1)
+
