@@ -28,6 +28,17 @@
 #include <ostream>
 #include <sstream>
 
+template<typename T>
+std::ostream& operator<<(std::ostream& o, const std::vector<T>& t);
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o, const std::list<T>& t);
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o, const std::set<T>& t);
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o, const std::multiset<T>& t);
 
 template<typename T, typename U>
 std::ostream& operator<<(std::ostream& o, const std::pair<T,U>& p)
