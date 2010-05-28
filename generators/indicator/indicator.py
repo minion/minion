@@ -85,7 +85,7 @@ sumgeqthree= lambda(a,b,c,d,e): (a+b+c+d+e)>=3
 alldiff3 = lambda(a,b,c): (a!=b) and (a!=c) and (b!=c)
 lexleq = lambda(a,b,c,x,y,z) : [a,b,c] <= [x,y,z]
 lexless = lambda(a,b,c,x,y,z,w) : (a+b+c+x+y+z+w) == 0 or (a+b+c+x+y+z+w) == 7
-twotup = lambda(a,b,c,x,y,z,w) : [a,b,c,x,y,z,w] in [[0,1,0,1,0,1,0],[1,0,1,0,1,0,1]]
+twotup = lambda(a,b,c,d,e,f,g,h,i,j) : [a,b,c,d,e,f,g,h,i,j] in [[0,0,1,0,1,1,1,0,1,0],[1,0,1,1,0,0,0,1,0,1]]
 
 domsize = -1
 

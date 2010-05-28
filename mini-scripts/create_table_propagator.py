@@ -633,7 +633,25 @@ def life():
     print "Number of nodes: "+str(tree_cost2(t))
     print "Number of nodes explored by algorithm: "+str(calls_build_tree)
 
-
+def summinmax():
+    table=[]
+    
+    cross=[]
+    crossprod([(0,1) for i in range(7)], [], cross)
+    
+    table=[]
+    for l in cross:
+        s=sum(l)
+        if s!= 0 and s!=7:
+          table.append(l)
+    
+    domains_init=[[0,1] for i in range(7)]
+    t=generate_tree(table, domains_init, True)
+    print_tree(t)
+    print "Depth: "+str(tree_cost(t))
+    print "Number of nodes: "+str(tree_cost2(t))
+    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+    
 def alldiff():
     table=[]
     
@@ -669,4 +687,5 @@ def alldiff():
 #binseq()
 #life()
 
-alldiff()
+#alldiff()
+summinmax()

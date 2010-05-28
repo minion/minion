@@ -166,7 +166,7 @@ def printpegsol(startField):
                             if f3!=f1 and f3!=f2 and f3!=middlefield:
                                 if cse:
                                     staticfields.append(f3)
-                                else:
+                                else:   # why reify? seems too strong.
                                     print "reify(eq(bState[%d, %d], bState[%d, %d]), moves[%d, %d])"%(step, f3, step+1, f3, step, mv)
                         
                         if cse:
