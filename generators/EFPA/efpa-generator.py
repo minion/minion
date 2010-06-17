@@ -1,7 +1,10 @@
 #!/usr/bin/python
-# Generate ... problems for minion
+# Generate EFPA problems for minion
 
 # equidistant frequency permutation arrays.
+
+# By default this version expects minion-static to be in the working dir,
+# and will run it and parse the output.
 
 import math
 
@@ -10,7 +13,14 @@ import sys, os, getopt
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["gcc", "occurrence", "q=", "lambda=", "d=", "numcodes=", "implied", "table", "fillin", "fillingcc", "scalarprod", "snakelex", "snakeorder"])
 
 if len(other)!=1:
-    print "Usage: carsequencing.py --file=XXXX --gcc --occurrence --implied --seqtype1 --seqtype2 --heuristic (var and val order from Regin and Puget)"
+    print "Usage: efpa-generator.py --q=<alphabet size>"
+    print "--lambda=<number of each symbol in each codeword>"
+    print "--d=<Hamming distance between pairs of codewords>"
+    print "--numcodes=<number of codewords>"
+    print "--occurrence (use occurrence constraints, recommended)"
+    print "--gcc (use GCC constraints, not recommended)"
+    print "--implied (add "
+    
     sys.exit(1)
 
 q=3     # size of alphabet
@@ -26,6 +36,8 @@ fillingcc=False
 scalarprod=False
 snakelex=False
 snakeorder=False
+runminion=True
+minion="./minion-static"
 
 for i in optargs:
     (a1, a2)=i
