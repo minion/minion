@@ -20,6 +20,8 @@
 /** @help constraints;table Description
 An extensional constraint that enforces GAC. The constraint is
 specified via a list of tuples.
+
+The variables used in the constraint have to be DISCRETE variables. Other types are not supported.
 */
 
 /** @help constraints;table Example
