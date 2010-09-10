@@ -64,6 +64,8 @@ n1=int(nodes1[0].partition(":")[2])
 #if n1==nodelimit:
 #    nodeout=True
 
+
+
 # Extract blocks of adjacent sol lines
 sols=[]
 while minout1:
@@ -83,8 +85,8 @@ while minout1:
 
 if len(sols)==0:
     print "No solution found."
-    if nodeout or timeout:
-        print "Solver reached node or time limit. There may be a solution, but it was not found"
+    #if nodeout or timeout:
+    #    print "Solver reached node or time limit. There may be a solution, but it was not found"
     sys.exit(0)
 
 for sol1 in sols:
