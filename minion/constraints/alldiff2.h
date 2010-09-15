@@ -97,31 +97,31 @@ using namespace std;
 //#define PLONG
 
 template<typename VarArray>
-struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
+struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
 {
-    using FlowConstraint<VarArray, UseIncGraph>::stateObj;
-    using FlowConstraint<VarArray, UseIncGraph>::constraint_locked;
-    using FlowConstraint<VarArray, UseIncGraph>::adjlist;
-    using FlowConstraint<VarArray, UseIncGraph>::adjlistlength;
-    using FlowConstraint<VarArray, UseIncGraph>::adjlistpos;
-    using FlowConstraint<VarArray, UseIncGraph>::dynamic_trigger_start;
-    using FlowConstraint<VarArray, UseIncGraph>::adjlist_remove;
-    using FlowConstraint<VarArray, UseIncGraph>::var_array;
-    using FlowConstraint<VarArray, UseIncGraph>::dom_min;
-    using FlowConstraint<VarArray, UseIncGraph>::dom_max;
-    using FlowConstraint<VarArray, UseIncGraph>::numvars;
-    using FlowConstraint<VarArray, UseIncGraph>::numvals;
-    using FlowConstraint<VarArray, UseIncGraph>::varvalmatching;
-    using FlowConstraint<VarArray, UseIncGraph>::valvarmatching;
+    using FlowConstraint<VarArray, true>::stateObj;
+    using FlowConstraint<VarArray, true>::constraint_locked;
+    using FlowConstraint<VarArray, true>::adjlist;
+    using FlowConstraint<VarArray, true>::adjlistlength;
+    using FlowConstraint<VarArray, true>::adjlistpos;
+    using FlowConstraint<VarArray, true>::dynamic_trigger_start;
+    using FlowConstraint<VarArray, true>::adjlist_remove;
+    using FlowConstraint<VarArray, true>::var_array;
+    using FlowConstraint<VarArray, true>::dom_min;
+    using FlowConstraint<VarArray, true>::dom_max;
+    using FlowConstraint<VarArray, true>::numvars;
+    using FlowConstraint<VarArray, true>::numvals;
+    using FlowConstraint<VarArray, true>::varvalmatching;
+    using FlowConstraint<VarArray, true>::valvarmatching;
     
     
-    using FlowConstraint<VarArray, UseIncGraph>::varinlocalmatching;
-    using FlowConstraint<VarArray, UseIncGraph>::valinlocalmatching;
-    using FlowConstraint<VarArray, UseIncGraph>::invprevious;
+    using FlowConstraint<VarArray, true>::varinlocalmatching;
+    using FlowConstraint<VarArray, true>::valinlocalmatching;
+    using FlowConstraint<VarArray, true>::invprevious;
     
-    using FlowConstraint<VarArray, UseIncGraph>::initialize_hopcroft;
-    using FlowConstraint<VarArray, UseIncGraph>::hopcroft_wrapper;
-    using FlowConstraint<VarArray, UseIncGraph>::hopcroft2_setup;
+    using FlowConstraint<VarArray, true>::initialize_hopcroft;
+    using FlowConstraint<VarArray, true>::hopcroft_wrapper;
+    using FlowConstraint<VarArray, true>::hopcroft2_setup;
     
     virtual string constraint_name()
     { 
@@ -133,7 +133,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
     vector<double> flow_val_t;    // flow_val_t[value] is the 0-1 flow from a value to t.
     double totalflow;      // If circular edge, this is the flow from t to s. 
     
-    GacAlldiffConstraint2(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array)
+    GacAlldiffConstraint2(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, true>(_stateObj, _var_array)
     {
         totalflow=0.0;
         
@@ -161,7 +161,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
       if(UseWatches) watches.resize(numvars);
       #endif
       
-      for(int i=0; i<numvars ; i++) //&& i<numvals
+      for(int i=0; i<numvars; i++) //&& i<numvals
       {
           varvalmatching[i]=i+dom_min;
           if(i<numvals) valvarmatching[i]=i;
@@ -178,49 +178,6 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
     
     deque<int> fifo;
     vector<int> prev;
-    
-  /*  
-    def bfs(start, end):
-    # find any non-saturated path from start to end (including the circulating edge.)
-    
-    # nodes are 0..numvars-1 for variables,
-    # numvars..(numvars+dom_max-dom_min) for values
-    # fifo -- append to add, [1:] to delete first element.
-    fifo=[start]
-    prev=dict()
-    visited=[start]
-    
-    while len(fifo)!= 0:
-        curnode=fifo[0]
-        fifo=fifo[1:]
-        
-        if curnode==end:
-            # found a path, extract it from prev.
-            path=[end]
-            while curnode!=start:
-                curnode=prev[path[0]]
-                path=[curnode]+path
-            return path
-        ed=edges[curnode]
-        for e in ed:
-            if e not in visited and flow[(curnode,e)]<cap[(curnode,e)]:
-                # would increase the flow by following this edge
-                visited.append(e)
-                prev[e]=curnode
-                fifo.append(e)
-        
-        ed=[]
-        if curnode in redges:
-            ed=redges[curnode]   # should not lump them together.
-        for e in ed:
-            if e not in visited and flow[(e,curnode)]>0:
-                    # Would decrease the flow by following the edge
-                    visited.append(e)
-                    prev[e]=curnode
-                    fifo.append(e)
-    return False
-*/
-    
     
     
     vector<int>& bfs(int start, int end)
@@ -258,7 +215,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
             // Now cases for each type of node.
             if(curnode==numvars+numvals)
             {   // s.
-                // All variables.    BUG should also connect to t if t->s is not saturated...?
+                // All variables.  No circulating edge.
                 for(int newnode=0;  newnode<numvars; newnode++)
                 {
                     if(!visited.in(newnode) && flow_s_var[newnode]<1.0)
@@ -272,7 +229,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
             else if(curnode==numvars+numvals+1)
             {   // t
                 // Link to all vals that are above 0 flow.
-                // crap, there's no place to store the flow between vals and t.
+                
                 for(int i=dom_min; i<=dom_max; i++)
                 {
                     int newnode=i-dom_min+numvals;
@@ -288,19 +245,27 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
             else if(curnode<numvars)
             {
                 // a variable
-                // link to all values
-                for(int val=var_array[curnode].getMin(); val<=var_array[curnode].getMax(); val++)
+                // link to all values 
+                int len=adjlistlength[curnode];
+                for(int adjlistidx=0; adjlistidx<len; adjlistidx++)
                 {
-                    if(var_array[curnode].inDomain(val))
+                    int val=adjlist[curnode][adjlistidx]
+                    int newnode=val-dom_min+numvals;
+                    if(!visited.in(newnode) && flow_var_val[curnode][val-dom_min]<1.0)
                     {
-                        int newnode=val-dom_min+numvals;
-                        if(!visited.in(newnode) && flow_var_val[curnode][val-dom_min]<1.0)
-                        {
-                            fifo.push_back(newnode);
-                            visited.insert(newnode);
-                            prev[newnode]=curnode;
-                        }
+                        fifo.push_back(newnode);
+                        visited.insert(newnode);
+                        prev[newnode]=curnode;
                     }
+                }
+                
+                // Link to s.
+                int newnode=numvars+numvals; ///s
+                if(!visited.in(newnode) && flow_s_var[curnode]>0.0)
+                {
+                    fifo.push_back(newnode);
+                    visited.insert(newnode);
+                    prev[newnode]=curnode;
                 }
             }
             else
@@ -318,30 +283,123 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
                 }
                 
                 // All variables where the flow on the edge can be reduced. >0.
+                int len=adjlistlength[curnode];
+                for(int adjlistidx=0; adjlistidx<len; adjlistidx++)
+                {
+                    int newnode=adjlist[curnode][adjlistidx];
+                    if(!visited.in(newnode) && flow_var_val[newnode, curnode]<1.0)
+                    {
+                        fifo.push_back(newnode);
+                        visited.insert(newnode);
+                        prev[newnode]=curnode;
+                    }
+                }
             }
         }
+        return null;
+    }
+    
+    // This is a mess -- must be a better way
+    void apply_path_max_zeros(vector<int>& path)
+    {
+        int augamount = 1.0;
+        for(int i=0; i<path.size()-1; i++)
+        {
+            int from=path[i];
+            int to=path[i+1];
+            double diff=-1000000.0;
+            if(from==numvars+numvals)
+            {   // edge from s to a var.
+                diff=1.0-flow_s_var[to];
+            }
+            else if(from==numvars+numvals+1)
+            {   // t to a val
+                diff=flow_val_t[to];  // it can be reduced by the flow amount.
+            }
+            else if(from<numvars)
+            {
+                if(to==numvars+numvals)
+                {
+                    diff=flow_s_var[from]; 
+                }
+                else
+                {
+                    D_ASSERT(to>=numvars && to<numvars+numvals);
+                    diff=1.0-flow_var_val[from][to];
+                }
+            }
+            else
+            {   // from is a value.
+                if(to==numvars+numvals+1)
+                {
+                    diff=1.0-flow_val_t[from-numvars];
+                }
+                else
+                {
+                    D_ASSERT(to<numvars);
+                    diff=flow_var_val[to, from];
+                }
+            }
+            D_ASSERT(diff>0.0);
+            augamount=( diff<augamount ? diff : augamount );
+        }
         
+        cout << "Augmenting flow by: " << augamount <<endl;
+        zeros.clear();
         
-        ed=edges[curnode]
-        for e in ed:
-            if e not in visited and flow[(curnode,e)]<cap[(curnode,e)]:
-                # would increase the flow by following this edge
-                visited.append(e)
-                prev[e]=curnode
-                fifo.append(e)
+        for(int i=0; i<path.size()-1; i++)
+        {
+            int from=path[i];
+            int to=path[i+1];
+            if(from==numvars+numvals)
+            {   // edge from s to a var.
+                flow_s_var[to]+=augamount;
+            }
+            else if(from==numvars+numvals+1)
+            {   // t to a val
+                flow_val_t[to]-=augamount;  // it can be reduced by the flow amount.
+                if(flow_val_t[to]==0.0)
+                {
+                    zeros.push_back(to); zeros.push_back(from);
+                }
+            }
+            else if(from<numvars)
+            {
+                if(to==numvars+numvals)
+                {
+                    flow_s_var[from]-=augamount;
+                    if(flow_s_var[from]==0.0)
+                    {
+                        zeros.push_back(to); zeros.push_back(from);
+                    }
+                }
+                else
+                {
+                    D_ASSERT(to>=numvars && to<numvars+numvals);
+                    flow_var_val[from][to]+=augamount;
+                }
+            }
+            else
+            {   // from is a value.
+                if(to==numvars+numvals+1)
+                {
+                    flow_val_t[from-numvars]+=augamount;
+                }
+                else
+                {
+                    D_ASSERT(to<numvars);
+                    flow_var_val[to, from]-=augamount;
+                    if(flow_var_val[to, from]==0.0)
+                    {
+                        zeros.push_back(to); zeros.push_back(from);
+                    }
+                }
+            }
+            
+        }
         
-        ed=[]
-        if curnode in redges:
-            ed=redges[curnode]   # should not lump them together.
-        for e in ed:
-            if e not in visited and flow[(e,curnode)]>0:
-                    # Would decrease the flow by following the edge
-                    visited.append(e)
-                    prev[e]=curnode
-                    fifo.append(e)
-    return False
-  
-  
+    }
+    
     
     
     
@@ -1036,68 +1094,6 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
     return;
   }
   
-  /*
-  inline bool greedymatch(int tempvar, int sccindex_start, int sccindex_end)
-  {
-    D_ASSERT(!var_array[tempvar].inDomain(varvalmatching[tempvar]));
-    
-    valinlocalmatching.clear();
-    for(int j=sccindex_start; j<=sccindex_end; j++)
-    {
-        valinlocalmatching.insert(varvalmatching[SCCs[j]]-dom_min);
-    }
-    
-    for(int val=var_array[tempvar].getMin(); val<=var_array[tempvar].getMax(); val++)
-    {
-        if(var_array[tempvar].inDomain(val) && !valinlocalmatching.in(val-dom_min))
-        {
-            varvalmatching[tempvar]=val;
-            valvarmatching[val-dom_min]=tempvar;
-            return true;
-        }
-    }
-    return false;
-  }
-  
-  inline bool greedymatch2(int , int sccindex_start, int sccindex_end)
-  {
-      // process all the broken matchings.
-    
-    valinlocalmatching.clear();
-    for(int j=sccindex_start; j<=sccindex_end; j++)
-    {
-        valinlocalmatching.insert(varvalmatching[SCCs[j]]-dom_min);
-    }
-    
-    for(int j=sccindex_start; j<=sccindex_end; j++)
-    {
-        int tempvar=SCCs[j];
-        
-        if(var_array[tempvar].inDomain(varvalmatching[tempvar]))
-        {
-            bool found=false;
-            for(int val=var_array[tempvar].getMin(); val<=var_array[tempvar].getMax(); val++)
-            {
-                if(var_array[tempvar].inDomain(val) && !valinlocalmatching.in(val-dom_min))
-                {
-                    varvalmatching[tempvar]=val;
-                    valvarmatching[val-dom_min]=tempvar;
-                    valinlocalmatching.insert(val-dom_min);
-                    found=true;
-                    break;
-                }
-            }
-            if(!found)
-            {
-                return false;
-            }
-        }
-    }
-    
-    return true;
-  }
-  */
-  
   virtual BOOL full_check_unsat()
   { 
     int v_size = var_array.size();
@@ -1140,46 +1136,32 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
   }
   
   virtual void full_propagate()
-  { 
-      #if UseIncGraph
+  {
+        // update the adjacency lists. and place dts
+        DynamicTrigger* dt=dynamic_trigger_start();
+        for(int i=dom_min; i<=dom_max; i++)
         {
-            // update the adjacency lists. and place dts
-            DynamicTrigger* dt=dynamic_trigger_start();
-            #ifdef DYNAMICALLDIFF
-            dt+=numvars+numvars*numvals;
-            #endif
-            for(int i=dom_min; i<=dom_max; i++)
+            for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
             {
-                for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
+                int var=adjlist[i-dom_min+numvars][j];
+                if(!var_array[var].inDomain(i))
                 {
-                    int var=adjlist[i-dom_min+numvars][j];
-                    if(!var_array[var].inDomain(i))
-                    {
-                        adjlist_remove(var, i);
-                        j--; // stay in the same place, dont' skip over the 
-                        // value which was just swapped into the current position.
-                    }
-                    else
-                    {
-                        // arranged in blocks for each variable, with numvals triggers in each block
-                        DynamicTrigger* mydt= dt+(var*numvals)+(i-dom_min);
-                        var_array[var].addDynamicTrigger(mydt, DomainRemoval, i);
-                    }
+                    adjlist_remove(var, i);
+                    j--; // stay in the same place, dont' skip over the 
+                    // value which was just swapped into the current position.
+                }
+                else
+                {
+                    // arranged in blocks for each variable, with numvals triggers in each block
+                    DynamicTrigger* mydt= dt+(var*numvals)+(i-dom_min);
+                    var_array[var].addDynamicTrigger(mydt, DomainRemoval, i);
                 }
             }
         }
-      #endif
-      
-      #if UseWatches && defined(CHECKDOMSIZE)
-      cout << "Watches and Quimper&Walsh's criterion do not safely co-exist." <<endl;
-      FAIL_EXIT();
-      #endif
-      
-      #if defined(DYNAMICALLDIFF) && !UseWatches
-      cout << "watchedalldiff does not work if UseWatches is not defined true." << endl;
-      FAIL_EXIT();
-      #endif
-      
+        
+        
+        
+        
       // Is this guaranteed to be called before do_prop is ever called??
       // I hope so, because the following test has to be done first.
       if(numvars>numvals)
@@ -1314,727 +1296,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, UseIncGraph>
       }
   }
     
-    // ------------------------------- Targan's algorithm ------------------------------------
-    // based on the following pseudocode from wikipedia.
-        /*
-        Input: Graph G = (V, E), Start node v0
+    
+};  // end of class
 
-        max_dfs := 0  // Counter for dfs
-        U := V        // Collection of unvisited nodes
-        S := {}       // An initially empty stack
-        tarjan(v0)    // Call the function with the start node
-        
-        procedure tarjan(v)
-        v.dfs := max_dfs;          // Set the depth index
-        v.lowlink := max_dfs;      // v.lowlink <= v.dfs
-        max_dfs := max_dfs + 1;    // Increment the counter
-        S.push(v);                 // Place v on the stack
-        U := U \ {v};              // Separate v from U
-        forall (v, v') in E do     // Consider the neighboring nodes
-          if (v' in U)
-            tarjan(v');            // recursive call
-            v.lowlink := min(v.lowlink, v'.lowlink);
-          // Ask whether v' is on the stack 
-          // by a clever constant time method
-          // (for example, setting a flag on the node when it is pushed or popped) 
-          elseif (v' in S)
-            v.lowlink := min(v.lowlink, v'.dfs);
-          end if
-        end for
-        if (v.lowlink = v.dfs)     // the root of a strongly connected component
-          print "SZK:";
-          repeat
-            v' := S.pop;
-            print v';
-          until (v' = v);
-        end if
-        */
-    
-    vector<int> tstack;
-    smallset_nolist in_tstack;
-    smallset_nolist visited;
-    vector<int> dfsnum;
-    vector<int> lowlink;
-    
-    //vector<int> iterationstack;
-    vector<int> curnodestack;
-    
-    // Filled in before calling tarjan's.
-    bool scc_split;
-    
-    int sccindex;
-    
-    int max_dfs;
-    
-    vector<int> spare_values;
-    bool include_sink;
-    vector<int> var_indices;  // Should be a pointer so it can be changed.
-    
-    smallset sccs_to_process;   // Indices to the first var in the SCC to process.
-    
-    int varcount;
-    
-    #ifdef DYNAMICALLDIFF
-    vector<int> triggercount; // number of triggers on the variable
-    DynamicTrigger * bt_triggers_start;   // points at dynamic_trigger_start()+numvars
-    #endif
-    
-    // An integer represents a vertex, where 0 .. numvars-1 represent the vars,
-    // numvars .. numvars+numvals-1 represents the values (val-dom_min+numvars),
-    // numvars+numvals is the sink,
-    // numvars+numvals+1 is the 
-    
-    void initialize_tarjan()
-    {
-        int numnodes=numvars+numvals+1;  // One sink node.
-        tstack.reserve(numnodes);
-        in_tstack.reserve(numnodes);
-        visited.reserve(numnodes);
-        max_dfs=1;
-        scc_split=false;
-        dfsnum.resize(numnodes);
-        lowlink.resize(numnodes);
-        
-        //iterationstack.resize(numnodes);
-        curnodestack.reserve(numnodes);
-        #ifdef DYNAMICALLDIFF
-        triggercount.resize(numvars);
-        #endif
-    }
-    
-    void tarjan_recursive(int sccindex_start)
-    {
-        valinlocalmatching.clear();
-        
-        int localmax=var_array[var_indices[0]].getMax();
-        int localmin=var_array[var_indices[0]].getMin();
-        valinlocalmatching.insert(varvalmatching[var_indices[0]]-dom_min);
-        
-        for(int i=1; i<var_indices.size(); i++)
-        {
-            int tempvar=var_indices[i];
-            int tempmax=var_array[tempvar].getMax();
-            int tempmin=var_array[tempvar].getMin();
-            if(tempmax>localmax) localmax=tempmax;
-            if(tempmin<localmin) localmin=tempmin;
-            valinlocalmatching.insert(varvalmatching[var_indices[i]]-dom_min);
-        }
-        
-        if(UseWatches)
-        {
-            for(int i=0; i<var_indices.size(); i++)
-            {
-                #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
-                watches[var_indices[i]].clear();
-                P("Adding DT for var " << var_indices[i] << " val " << varvalmatching[var_indices[i]]);
-                // watch the value from the matching.
-                watches[var_indices[i]].insert(varvalmatching[var_indices[i]]-dom_min);
-                #endif
-                
-                #ifdef DYNAMICALLDIFF
-                // Clear all the triggers on this variable. At end now.
-                int var=var_indices[i];
-                triggercount[var]=1;
-                
-                var_array[var].addDynamicTriggerBT(get_dt(var, 0), 
-                    DomainRemoval, varvalmatching[var]);
-                P("Adding DT for var " << var_indices[i] << " val " << varvalmatching[var_indices[i]]);
-                #endif
-            }
-        }
-        
-        // spare_values
-        // This should be computed somehow on demand because it might not be used.
-        // Actually it should be used exactly once.
-        #ifdef SPAREVALUESOPT
-        if(sparevaluespresent.isMember(sccindex_start))
-        {
-        #endif
-            spare_values.clear();
-            for(int val=localmin; val<=localmax; ++val)
-            {
-                if(!valinlocalmatching.in(val-dom_min))
-                {
-                    for(int j=0; j<var_indices.size(); j++)
-                    {
-                        if(var_array[var_indices[j]].inDomain(val))
-                        {
-                            spare_values.push_back(val-dom_min+numvars);
-                            break;
-                        }
-                    }
-                }
-            }
-            //cout << "With spare values "<< spare_values <<endl;
-            
-            include_sink= (spare_values.size()>0);  // This should be in the TMS.
-        #ifdef SPAREVALUESOPT    
-            if(!include_sink)
-            {
-                // Set some bits in sparevaluespresent.
-                for(int scci=sccindex_start; ; scci++)
-                {
-                    D_ASSERT(sparevaluespresent.isMember(scci));
-                    sparevaluespresent.remove(scci);
-                    if(!SCCSplit.isMember(scci))  // means this is the last element
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-        else
-        {
-            include_sink=false;
-        }
-        #endif
-        // Just generate the spare_values if no empty sets have been seen above
-        // in this branch.
-        
-        tstack.clear();
-        in_tstack.clear();
-        
-        visited.clear();
-        max_dfs=1;
-        
-        scc_split=false;
-        sccindex=sccindex_start;
-        
-        for(int i=0; i<var_indices.size(); ++i)
-        {
-            int curnode=var_indices[i];
-            if(!visited.in(curnode))
-            {
-                P("(Re)starting tarjan's algorithm, value:"<< curnode);
-                varcount=0;
-                visit(curnode, true, sccindex_start);
-                P("Returned from tarjan's algorithm.");
-            }
-        }
-        
-        // Clear any extra watches.
-        #ifdef DYNAMICALLDIFF
-        if(UseWatches)
-        {
-            for(int i=0; i<var_indices.size(); i++)
-            {
-                int var=var_indices[i];
-                for(int j=triggercount[var]; j<numvals; j++)
-                {
-                    if( get_dt(var, j)->queue == NULL)
-                    {
-                        break;
-                    }
-                    get_dt(var, j)->sleepDynamicTriggerBT(stateObj);
-                }
-            }
-        }
-        #endif
-    }
-    
-    void visit(int curnode, bool toplevel, int sccindex_start)
-    {
-        tstack.push_back(curnode);
-        in_tstack.insert(curnode);
-        dfsnum[curnode]=max_dfs;
-        lowlink[curnode]=max_dfs;
-        max_dfs++;
-        visited.insert(curnode);
-        //cout << "Visiting node: " <<curnode<<endl;
-        
-        if(curnode==numvars+numvals)
-        {
-            //cout << "Visiting sink node." <<endl;
-            D_ASSERT(include_sink);
-            // It's the sink so it links to all spare values.
-            
-            for(int i=0; i<spare_values.size(); ++i)
-            {
-                int newnode=spare_values[i];
-                //cout << "About to visit spare value: " << newnode-numvars+dom_min <<endl;
-                if(!visited.in(newnode))
-                {
-                    visit(newnode, false, sccindex_start);
-                    if(lowlink[newnode]<lowlink[curnode])
-                    {
-                        lowlink[curnode]=lowlink[newnode];
-                    }
-                }
-                else
-                {
-                    // Already visited newnode
-                    if(in_tstack.in(newnode) && dfsnum[newnode]<lowlink[curnode])
-                    {
-                        lowlink[curnode]=dfsnum[newnode];
-                    }
-                }
-            }
-        }
-        else if(curnode<numvars)  // This case should never occur with merge nodes.
-        {
-            D_ASSERT(find(var_indices.begin(), var_indices.end(), curnode)!=var_indices.end());
-            varcount++;
-            //cout << "Visiting node variable: "<< curnode<<endl;
-            int newnode=varvalmatching[curnode]-dom_min+numvars;
-            D_ASSERT(var_array[curnode].inDomain(newnode+dom_min-numvars));
-            
-            if(!visited.in(newnode))
-            {
-                visit(newnode, false, sccindex_start);
-                if(lowlink[newnode]<lowlink[curnode])
-                {
-                    lowlink[curnode]=lowlink[newnode];
-                }
-            }
-            else
-            {
-                // Already visited newnode
-                if(in_tstack.in(newnode) && dfsnum[newnode]<lowlink[curnode])
-                {
-                    lowlink[curnode]=dfsnum[newnode];  // Why dfsnum not lowlink?
-                }
-            }
-        }
-        else
-        {
-            // curnode is a value
-            // This is the only case where watches are set.
-            //cout << "Visiting node val: "<< curnode+dom_min-numvars <<endl;
-            
-            D_ASSERT(curnode>=numvars && curnode<(numvars+numvals));
-            #ifndef NO_DEBUG
-            bool found=false;
-            for(int i=0; i<var_indices.size(); i++)
-            {
-                if(var_array[var_indices[i]].inDomain(curnode+dom_min-numvars))
-                {
-                    found=true;
-                }
-            }
-            D_ASSERT(found);
-            #endif
-            
-            int lowlinkvar=-1;
-            #if !UseIncGraph
-            for(int i=0; i<var_indices.size(); i++)
-            {
-                int newnode=var_indices[i];
-            #else
-            for(int i=0; i<adjlistlength[curnode]; i++)
-            {
-                int newnode=adjlist[curnode][i];
-            #endif
-                if(varvalmatching[newnode]!=curnode-numvars+dom_min)   // if the value is not in the matching.
-                {
-                    #if !UseIncGraph
-                    if(var_array[newnode].inDomain(curnode+dom_min-numvars))
-                    #endif
-                    {
-                        D_ASSERT(var_array[newnode].inDomain(curnode+dom_min-numvars));
-                        //newnode=varvalmatching[newnode]-dom_min+numvars;  // Changed here for merge nodes
-                        if(!visited.in(newnode))
-                        {
-                            // set a watch
-                            if(UseWatches)
-                            {
-                                P("Adding DT for var " << newnode << " val " << curnode-numvars+dom_min);
-                                
-                                #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
-                                watches[newnode].insert(curnode-numvars);
-                                #endif
-                                
-                                #ifdef DYNAMICALLDIFF
-                                var_array[newnode].addDynamicTriggerBT(get_dt(newnode, triggercount[newnode]), 
-                                    DomainRemoval, curnode-numvars+dom_min);
-                                triggercount[newnode]++;
-                                #endif
-                            }
-                            visit(newnode, false, sccindex_start);
-                            if(lowlink[newnode]<lowlink[curnode])
-                            {
-                                lowlink[curnode]=lowlink[newnode];
-                                lowlinkvar=-1;   // Would be placing a watch where there already is one.
-                            }
-                        }
-                        else
-                        {
-                            // Already visited newnode
-                            if(in_tstack.in(newnode) && dfsnum[newnode]<lowlink[curnode])
-                            {
-                                lowlink[curnode]=dfsnum[newnode];
-                                lowlinkvar=newnode;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            
-            
-            // Why the find? Can we not use some DS which is already lying around?
-            // And why does it include the whole matching in the find??
-            if(include_sink && valinlocalmatching.in(curnode-numvars))
-            //    find(varvalmatching.begin(), varvalmatching.end(), curnode+dom_min-numvars)!=varvalmatching.end())
-            {
-                int newnode=numvars+numvals;
-                if(!visited.in(newnode))
-                {
-                    visit(newnode, false, sccindex_start);
-                    if(lowlink[newnode]<lowlink[curnode])
-                    {
-                        lowlink[curnode]=lowlink[newnode];
-                        lowlinkvar=-1;
-                    }
-                }
-                else
-                {
-                    // Already visited newnode
-                    if(in_tstack.in(newnode) && dfsnum[newnode]<lowlink[curnode])
-                    {
-                        lowlink[curnode]=dfsnum[newnode];
-                        lowlinkvar=-1;
-                    }
-                }
-            }
-            
-            // Where did the low link value come from? insert that edge into watches.
-            if(UseWatches && lowlinkvar!=-1)
-            {
-                P("Adding DT for var " << lowlinkvar << " val " << curnode-numvars+dom_min);
-                
-                #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
-                watches[lowlinkvar].insert(curnode-numvars);
-                #endif
-                #ifdef DYNAMICALLDIFF
-                var_array[lowlinkvar].addDynamicTriggerBT(get_dt(lowlinkvar, triggercount[lowlinkvar]), 
-                    DomainRemoval, curnode-numvars+dom_min);
-                triggercount[lowlinkvar]++;
-                #endif
-            }
-        }
-        
-        //cout << "On way back up, curnode:" << curnode<< ", lowlink:"<<lowlink[curnode]<< ", dfsnum:"<<dfsnum[curnode]<<endl;
-        if(lowlink[curnode]==dfsnum[curnode])
-        {
-            // Did the SCC split?
-            // Perhaps we traversed all vars but didn't unroll the recursion right to the top.
-            // Then lowlink[curnode]!=1. Or perhaps we didn't traverse all the variables.
-            // I think these two cases cover everything.
-            if(!toplevel || varcount<var_indices.size())
-            {
-                scc_split=true;  // The SCC has split and there is some work to do later.
-            }
-            
-            // Doing something with the components should not be necessary unless the scc has split.
-            // The first SCC found is deep in the tree, so the flag will be set to its final value
-            // the first time we are here.
-            // so it is OK to assume that scc_split has been
-            // set correctly before we do the following.
-            if(scc_split)
-            {
-                // For each variable, write it to the scc array.
-                // If its the last one, flip the bit.
-                
-                varinlocalmatching.clear();  // Borrow this datastructure for a minute.
-                
-                P("Writing new SCC:");
-                bool containsvars=false;
-                for(vector<int>::iterator tstackit=(--tstack.end());  ; --tstackit)
-                {
-                    int copynode=(*tstackit);
-                    //cout << "SCC element: "<< copynode<<endl;
-                    if(copynode<numvars)
-                    {
-                        containsvars=true;
-                        SCCs[sccindex]=copynode;
-                        varToSCCIndex[copynode]=sccindex;
-                        sccindex++;
-                        //tempset.push_back(copynode);  // need to write into sccs instead.
-                        varinlocalmatching.insert(copynode);
-                        P("Stored SCC element "<< copynode);
-                    }
-                    
-                    if(copynode==curnode)
-                    {
-                        // Beware it might be an SCC containing just one value.
-                        
-                        if(containsvars)
-                        {
-                            P("Inserting split point.");
-                            SCCSplit.remove(sccindex-1);
-                            D_DATA(((char*)SCCSplit2.get_ptr())[sccindex-1]=0);
-                        }
-                        // The one written last was the last one in the SCC.
-                        break;
-                    }
-                    
-                    // Should be no split points in the middle of writing an SCC.
-                    //D_ASSERT(copynode==curnode || copynode>=numvars || SCCSplit.isMember(sccindex-1));
-                }
-                // Just print more stuff here.
-                
-                
-                // For each value, iterate through the current
-                // SCC and remove it from any other variable other
-                // than the one in this SCC.
-                //cout << "Starting loop"<<endl;
-                //if(containsvars) // why is this OK? because of bug above, in case where numnode is a variable.
-                {
-                    while(true)
-                    {
-                        int copynode=(*(--tstack.end()));
-                        
-                        tstack.pop_back();
-                        in_tstack.remove(copynode);
-                        
-                        if(copynode>=numvars && copynode!=(numvars+numvals))
-                        {
-                            // It's a value. Iterate through old SCC and remove it from
-                            // any variables not in tempset.
-                            //cout << "Trashing value "<< copynode+dom_min-numvars << endl;
-                            for(int i=0; i<var_indices.size(); i++)
-                            {
-                                int curvar=var_indices[i];
-                                if(!varinlocalmatching.in(curvar))
-                                {
-                                    // var not in tempset so might have to do some test against matching.
-                                    // Why doing this test? something wrong with the assigned variable optimization?
-                                    if(varvalmatching[curvar]!=copynode+dom_min-numvars)
-                                    {
-                                        P("Removing var: "<< curvar << " val:" << copynode+dom_min-numvars);
-                                        if(var_array[curvar].inDomain(copynode+dom_min-numvars))
-                                        {
-                                            var_array[curvar].removeFromDomain(copynode+dom_min-numvars);
-                                            #if UseIncGraph
-                                                adjlist_remove(curvar, copynode-numvars+dom_min);
-                                            #endif
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        if(copynode==curnode)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    
-    inline bool matching_wrapper(int sccstart, int sccend)
-    {
-        #ifdef BFSMATCHING
-        return bfs_wrapper(sccstart,sccend);
-        #else
-        #ifdef NEWHK
-        // This is just to test the new HK implementation. 
-        // to use this, must not be using SCCs and must be using incgraph.
-        vector<int> upper;
-        upper.resize(numvals, 1);
-        vector<int> usage;
-        usage.resize(numvals, 0);
-        for(int i=0; i<numvars; i++)
-        {
-            if(varvalmatching[i]!=dom_min-1)
-            {
-                D_ASSERT(usage[varvalmatching[i]-dom_min]==0);
-                usage[varvalmatching[i]-dom_min]=1;
-            }
-        }
-        return hopcroft_wrapper2(SCCs, varvalmatching, upper, usage);
-        #else
-        return hopcroft_wrapper(sccstart,sccend, SCCs);
-        #endif
-        #endif
-    }
-    
-    // BFS alternative to hopcroft. --------------------------------------------
-    
-    inline bool bfs_wrapper(int sccstart, int sccend)
-    {
-        // Call hopcroft for the whole matching.
-        if(!bfsmatching(sccstart, sccend))
-        {
-            // The constraint is unsatisfiable (no matching).
-            P("About to fail. Changed varvalmatching: "<< varvalmatching);
-            getState(stateObj).setFailed(true);
-            return false;
-        }
-        
-        return true;
-    }
-    
-    deque<int> fifo;
-    vector<int> prev;
-    vector<int> matchbac;
-    // use push_back to push, front() and pop_front() to pop.
-    
-    //Also use invprevious to record which values are matched.
-    // (recording val-dom_min)
-    
-    inline bool bfsmatching(int sccstart, int sccend)
-    {
-        // construct the set of matched values.
-        invprevious.clear();
-        for(int sccindex=sccstart; sccindex<=sccend; sccindex++)
-        {
-            int var=SCCs[sccindex];
-            if(var_array[var].inDomain(varvalmatching[var]))
-            {
-                invprevious.insert(varvalmatching[var]-dom_min);
-            }
-        }
-        
-        // back up the matching to cover failure
-        matchbac=varvalmatching;
-        
-        // iterate through the SCC looking for broken matches
-        for(int sccindex=sccstart; sccindex<=sccend; sccindex++)
-        {
-            int startvar=SCCs[sccindex];
-            if(!var_array[startvar].inDomain(varvalmatching[startvar]))
-            {
-                P("Searching for augmenting path for var: " << startvar);
-                // Matching edge lost; BFS search for augmenting path to fix it.
-                fifo.clear();  // this should be constant time but probably is not.
-                fifo.push_back(startvar);
-                visited.clear();
-                visited.insert(startvar);
-                bool finished=false;
-                while(!fifo.empty() && !finished)
-                {
-                    // pop a vertex and expand it.
-                    int curnode=fifo.front();
-                    fifo.pop_front();
-                    P("Popped vertex " << (curnode<numvars? "(var)":"(val)") << (curnode<numvars? curnode : curnode+dom_min-numvars ));
-                    if(curnode<numvars)
-                    { // it's a variable
-                        // put all corresponding values in the fifo. 
-                        // Need to check if we are completing an even alternating path.
-                        #if !UseIncGraph
-                        for(int val=var_array[curnode].getMin(); val<=var_array[curnode].getMax(); val++)
-                        {
-                        #else
-                        for(int vali=0; vali<adjlistlength[curnode]; vali++)
-                        {
-                            int val=adjlist[curnode][vali];
-                        #endif
-                            if(val!=varvalmatching[curnode]
-                            #if !UseIncGraph
-                                && var_array[curnode].inDomain(val)
-                            #endif
-                                )
-                            {
-                                if(!invprevious.in(val-dom_min))
-                                {
-                                    // This vertex completes an even alternating path. 
-                                    // Unwind and apply the path here
-                                    P("Found augmenting path:");
-                                    int unwindvar=curnode;
-                                    int unwindval=val;
-                                    P("unwindvar: "<< unwindvar<<"unwindval: "<< unwindval );
-                                    while(true)
-                                    {
-                                        //invprevious.remove(varvalmatching[unwindvar]-dom_min);
-                                        D_ASSERT(var_array[unwindvar].inDomain(unwindval));
-                                        D_ASSERT(varvalmatching[unwindvar]!=unwindval);
-                                        
-                                        varvalmatching[unwindvar]=unwindval;
-                                        P("Setting var "<< unwindvar << " to "<< unwindval);
-                                        
-                                        if(unwindvar==startvar)
-                                        {
-                                            break;
-                                        }
-                                        
-                                        unwindval=prev[unwindvar];
-                                        unwindvar=prev[unwindval-dom_min+numvars];
-                                    }
-                                    
-                                    #ifdef PLONG
-                                    cout << "varvalmatching:";
-                                    for(int sccindex=sccstart; sccindex<=sccend; sccindex++)
-                                    {
-                                        if(var_array[SCCs[sccindex]].inDomain(varvalmatching[SCCs[sccindex]]))
-                                            cout << SCCs[sccindex] << "->" << varvalmatching[SCCs[sccindex]] << ", ";
-                                    }
-                                    cout << endl;
-                                    #endif
-                                    
-                                    invprevious.clear();  // THIS SHOULD BE CHANGED -- RECOMPUTING THIS EVERY TIME IS STUPID.
-                                    for(int sccindex=sccstart; sccindex<=sccend; sccindex++)
-                                    {
-                                        int var=SCCs[sccindex];
-                                        if(var_array[var].inDomain(varvalmatching[var]))
-                                        {
-                                            invprevious.insert(varvalmatching[var]-dom_min);
-                                        }
-                                    }
-                                    
-                                    finished=true;
-                                    break;  // get out of for loop
-                                }
-                                else
-                                {
-                                    if(!visited.in(val-dom_min+numvars))
-                                    {
-                                        visited.insert(val-dom_min+numvars);
-                                        prev[val-dom_min+numvars]=curnode;
-                                        fifo.push_back(val-dom_min+numvars);
-                                    }
-                                }
-                            }
-                        } // end for
-                    }
-                    else
-                    { // popped a value from the stack. Follow the edge in the matching.
-                        D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
-                        int stackval=curnode+dom_min-numvars;
-                        int vartoqueue=-1;
-                        D_DATA(bool found=false);
-                        #if !UseIncGraph
-                        for(int scci=sccstart; scci<=sccend; scci++)
-                        {
-                            vartoqueue=SCCs[scci];
-                        #else
-                        for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
-                        {
-                            vartoqueue=adjlist[curnode][vartoqueuei];
-                        #endif
-                            if(varvalmatching[vartoqueue]==stackval
-                                #if !UseIncGraph
-                                && var_array[vartoqueue].inDomain(stackval)
-                                #endif
-                                )
-                            {
-                                D_DATA(found=true);
-                                break;
-                            }
-                        }
-                        D_ASSERT(found);  // if this assertion fails, then invprevious must be wrong.
-                        if(!visited.in(vartoqueue)) // I think it's impossible for this test to be false.
-                        {
-                            visited.insert(vartoqueue);
-                            prev[vartoqueue]=stackval;
-                            fifo.push_back(vartoqueue);
-                        }
-                    }
-                }
-                if(!finished)
-                {   // no augmenting path found
-                    P("No augmenting path found.");
-                    // restore the matching to its state before the algo was called.
-                    varvalmatching=matchbac;
-                    return false;
-                }
-                
-            }
-        }
-        return true;
-    }
-    
-};  // end of AlldiffGacSlow
+
