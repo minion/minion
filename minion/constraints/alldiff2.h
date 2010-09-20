@@ -74,10 +74,10 @@ using namespace std;
 #undef PLONG
 #endif
 
-//#define P(x)
-#define P(x) cout << x << endl
-//#define PLONG(x)
-#define PLONG(x) x
+#define P(x)
+//#define P(x) cout << x << endl
+#define PLONG(x)
+//#define PLONG(x) x
 
 
 #define BtMatch true
