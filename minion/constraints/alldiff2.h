@@ -54,29 +54,11 @@ using namespace std;
 // Reverse the var list. Leave this switched on.
 #define REVERSELIST
 
-// Check domain size -- if it is greater than numvars, then no need to wake the constraint.
-//#define CHECKDOMSIZE
-
-// Process SCCs independently
-#define SCC
-
 // Warning: if this is not defined true, then watchedalldiff probably won't do anything.
 #define UseWatches false
 
-// Optimize the case where a value was assigned. Only works in the presence of SCC
-#define ASSIGNOPT 
-
 // Use the special queue
 #define SPECIALQUEUE
-
-// store matching from one run to the next.
-#define INCREMENTALMATCH
-
-// Use BFS instead of HK
-#define BFSMATCHING
-
-// Use the new hopcroft-karp implementation.
-//#define NEWHK
 
 // Incremental graph stored in adjlist
 #define UseIncGraph true
@@ -92,9 +74,13 @@ using namespace std;
 #undef PLONG
 #endif
 
-#define P(x)
-//#define P(x) cout << x << endl
-//#define PLONG
+//#define P(x)
+#define P(x) cout << x << endl
+//#define PLONG(x)
+#define PLONG(x) x
+
+
+#define BtMatch true
 
 template<typename VarArray>
 struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
@@ -128,61 +114,67 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         return "GacAlldiff2";
     }
     
-    vector<double> flow_s_var;
-    vector<vector<double> > flow_var_val;  // flow_varval[variable][value] is the 0-1 flow from variable to value.
-    vector<double> flow_val_t;    // flow_val_t[value] is the 0-1 flow from a value to t.
-    double totalflow;      // If circular edge, this is the flow from t to s. 
+    #if BtMatch
+         MoveableArray<float> flow_s_var;
+         vector<MoveableArray<float> > flow_var_val;
+         MoveableArray<float> flow_val_t;
+         Reversible<float> totalflow;
+    #else
+        vector<float> flow_s_var;
+        vector<vector<float> > flow_var_val;  // flow_varval[variable][value] is the 0-1 flow from variable to value.
+        vector<float> flow_val_t;    // flow_val_t[value] is the 0-1 flow from a value to t.
+        float totalflow;      // If circular edge, this is the flow from t to s. 
+    #endif
     
     GacAlldiffConstraint2(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, true>(_stateObj, _var_array)
+    #if BtMatch
+    ,totalflow(_stateObj)
+    #endif
+    
     {
+        #if BtMatch
+            flow_s_var=getMemory(stateObj).backTrack().template requestArray<float>(numvars);
+            flow_val_t=getMemory(stateObj).backTrack().template requestArray<float>(numvals);
+            for(int i=0; i<numvars; i++)
+            {
+                flow_var_val.push_back(getMemory(stateObj).backTrack().template requestArray<float>(numvals));
+            }
+        #else
+            flow_var_val.resize(numvars);
+            for(int i=0; i<numvars; i++)
+            {
+                flow_var_val[i].resize(numvals, 0.0);
+            }
+            flow_val_t.resize(numvals, 0.0);
+            
+            flow_s_var.resize(numvars, 0.0);
+        #endif
+        
         totalflow=0.0;
         
-        flow_var_val.resize(numvars);
-        for(int i=0; i<numvars; i++)
-        {
-            flow_var_val[i].resize(numvals, 0.0);
-        }
-        flow_val_t.resize(numvals, 0.0);
-        
-        flow_s_var.resize(numvars, 0.0);
-        
-        
-        
-      to_process.reserve(var_array.size());
+      to_process.reserve(numvars);
       
       // Set up data structures
-      prev.resize(numvars+numvals, -1);
+      prev.resize(numvars+numvals+2, -1);
       
+      visited.reserve(numvars+numvals+2);   // vars, vals, s and t.
       
-      // Initialize matching to satisfy the invariant
-      // that the values are all different in varvalmatching.
-      // watches DS is used in alldiffgacslow and in debugging.
-      #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
-      if(UseWatches) watches.resize(numvars);
-      #endif
-      
-      for(int i=0; i<numvars; i++) //&& i<numvals
-      {
-          varvalmatching[i]=i+dom_min;
-          if(i<numvals) valvarmatching[i]=i;
-          
-          #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
-          if(UseWatches) watches[i].reserve(numvals, stateObj);
-          #endif
-      }
+         
       
   }
-
+  
     /////////////////////////////////////////////////////////////////////
-    //  BFS
+    //  FF-BFS
     
     deque<int> fifo;
     vector<int> prev;
-    
+    smallset_nolist visited;
+    vector<int> augpath;
     
     vector<int>* bfs(int start, int end)
     {
         // find any non-saturated path from start to end (including the circulating edge.)
+        // Not allowed to use the edge (or reverse edge) start->end !
         // nodes are 0..numvars-1 for variables,
         // numvars..(numvars+numvals-1) for values
         // numvars+numvals    for s
@@ -192,7 +184,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         visited.clear();
         visited.insert(start);
         
-        while(fifo.size()>0):
+        while(fifo.size()>0)
         {
             int curnode=fifo.front();
             fifo.pop_front();
@@ -209,7 +201,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 }
                 std::reverse(augpath.begin(), augpath.end());
                 
-                return augpath;
+                return &augpath;
             }
             
             // Now cases for each type of node.
@@ -218,7 +210,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 // All variables.  No circulating edge.
                 for(int newnode=0;  newnode<numvars; newnode++)
                 {
-                    if(!visited.in(newnode) && flow_s_var[newnode]<1.0)
+                    if(!visited.in(newnode) && flow_s_var[newnode]<1.0 && (curnode!=start || newnode!=end))
                     {
                         fifo.push_back(newnode);
                         visited.insert(newnode);
@@ -232,8 +224,8 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 
                 for(int i=dom_min; i<=dom_max; i++)
                 {
-                    int newnode=i-dom_min+numvals;
-                    if(!visited.in(newnode) && flow_val_t[newnode]>0.0)
+                    int newnode=i-dom_min+numvars;
+                    if(!visited.in(newnode) && flow_val_t[newnode-numvars]>0.0 && (curnode!=start || newnode!=end))
                     {
                         fifo.push_back(newnode);
                         visited.insert(newnode);
@@ -249,9 +241,9 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 int len=adjlistlength[curnode];
                 for(int adjlistidx=0; adjlistidx<len; adjlistidx++)
                 {
-                    int val=adjlist[curnode][adjlistidx]
-                    int newnode=val-dom_min+numvals;
-                    if(!visited.in(newnode) && flow_var_val[curnode][val-dom_min]<1.0)
+                    int val=adjlist[curnode][adjlistidx];
+                    int newnode=val-dom_min+numvars;
+                    if(!visited.in(newnode) && flow_var_val[curnode][val-dom_min]<1.0 && (curnode!=start || newnode!=end))
                     {
                         fifo.push_back(newnode);
                         visited.insert(newnode);
@@ -261,7 +253,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 
                 // Link to s.
                 int newnode=numvars+numvals; ///s
-                if(!visited.in(newnode) && flow_s_var[curnode]>0.0)
+                if(!visited.in(newnode) && flow_s_var[curnode]>0.0 && (curnode!=start || newnode!=end))
                 {
                     fifo.push_back(newnode);
                     visited.insert(newnode);
@@ -270,12 +262,11 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             }
             else
             {
-                assert curnode>=numvars && curnode<numvars+numvals;
+                D_ASSERT( curnode>=numvars && curnode<numvars+numvals);
                 // a value
-                int validx=curnode-numvars;  // 0-based value index.
                 // link to t if edge not saturated
                 int newnode=numvars+numvals+1; ///t
-                if(!visited.in(newnode) && flow_val_t[validx]<1.0)
+                if(!visited.in(newnode) && flow_val_t[curnode-numvars]<1.0 && (curnode!=start || newnode!=end))
                 {
                     fifo.push_back(newnode);
                     visited.insert(newnode);
@@ -287,7 +278,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 for(int adjlistidx=0; adjlistidx<len; adjlistidx++)
                 {
                     int newnode=adjlist[curnode][adjlistidx];
-                    if(!visited.in(newnode) && flow_var_val[newnode, curnode]<1.0)
+                    if(!visited.in(newnode) && (flow_var_val[newnode][curnode-numvars]>0.0) && (curnode!=start || newnode!=end))
                     {
                         fifo.push_back(newnode);
                         visited.insert(newnode);
@@ -296,25 +287,73 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 }
             }
         }
-        return null;
+        return 0;
     }
     
-    // This is a mess -- must be a better way
-    void apply_path_max_zeros(vector<int>& path)
+    /*def balance(valnode, var):
+    val=valnode-100
+    # Given a 0 edge (var -> valnode), find a suitable unsaturated value (if one exists)
+    # and use it to get rid of the 0 edge.
+    for unsatval in range(dom_min, dom_max+1):
+        if flow[(unsatval+100, t)]<1:
+            # unsatval is really unsaturated.
+            # Find a variable with valnode and unsatval in domain
+            for midvar in range(len(domains)):
+                if unsatval in domains[midvar] and val in domains[midvar]:
+                    # Now we're in business.
+                    # Find any value in domains[var] except val
+                    val2 = domains[var][0]
+                    if val2==val:
+                        val2=domains[var][1]
+                    return [valnode, midvar, unsatval+100, t, val2+100, var]
+                    
+    return False*/
+    
+    // specialised search for an augmenting path from val to var of length 6 vertices. 
+    inline bool balance(int val, int var)
     {
-        int augamount = 1.0;
+        //val is a real value.
+        // Given the 0 edge var->val, find a suitable unsaturated value (if one exists)
+        // and use it to get rid of the 0 edge. 
+        for(int unsatval=dom_min; unsatval<=dom_max; unsatval++)
+        {
+            if(flow_val_t[unsatval-dom_min]<1.0)
+            {
+                // unsatval is really unsaturated.
+                // find a variable connecting val and unsatval
+                
+                
+                
+            }
+        }
+        
+        
+        return false;
+    }
+    
+    
+    vector<int> zeros;
+    
+    // This is a mess -- must be a better way
+    
+    // Warning: both these functions do not adjust totalflow.
+    float apply_path_max_zeros(vector<int>& path)
+    {
+        P("Augmenting path:" << path);
+        
+        float augamount = 1.0;
         for(int i=0; i<path.size()-1; i++)
         {
             int from=path[i];
             int to=path[i+1];
-            double diff=-1000000.0;
+            float diff=-1000000.0;
             if(from==numvars+numvals)
             {   // edge from s to a var.
                 diff=1.0-flow_s_var[to];
             }
             else if(from==numvars+numvals+1)
             {   // t to a val
-                diff=flow_val_t[to];  // it can be reduced by the flow amount.
+                diff=flow_val_t[to-numvars];  // it can be reduced by the flow amount.
             }
             else if(from<numvars)
             {
@@ -325,7 +364,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 else
                 {
                     D_ASSERT(to>=numvars && to<numvars+numvals);
-                    diff=1.0-flow_var_val[from][to];
+                    diff=1.0-flow_var_val[from][to-numvars];
                 }
             }
             else
@@ -337,15 +376,14 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 else
                 {
                     D_ASSERT(to<numvars);
-                    diff=flow_var_val[to, from];
+                    diff=flow_var_val[to][from-numvars];
                 }
             }
             D_ASSERT(diff>0.0);
             augamount=( diff<augamount ? diff : augamount );
         }
         
-        cout << "Augmenting flow by: " << augamount <<endl;
-        zeros.clear();
+        P("Augmenting flow by: " << augamount);
         
         for(int i=0; i<path.size()-1; i++)
         {
@@ -357,8 +395,8 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             }
             else if(from==numvars+numvals+1)
             {   // t to a val
-                flow_val_t[to]-=augamount;  // it can be reduced by the flow amount.
-                if(flow_val_t[to]==0.0)
+                flow_val_t[to-numvars]-=augamount;  // it can be reduced by the flow amount.
+                if(flow_val_t[to-numvars]==0.0)
                 {
                     zeros.push_back(to); zeros.push_back(from);
                 }
@@ -367,7 +405,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             {
                 if(to==numvars+numvals)
                 {
-                    flow_s_var[from]-=augamount;
+                    flow_s_var[from]=flow_s_var[from]-augamount;
                     if(flow_s_var[from]==0.0)
                     {
                         zeros.push_back(to); zeros.push_back(from);
@@ -376,7 +414,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 else
                 {
                     D_ASSERT(to>=numvars && to<numvars+numvals);
-                    flow_var_val[from][to]+=augamount;
+                    flow_var_val[from][to-numvars]=flow_var_val[from][to-numvars]+augamount;
                 }
             }
             else
@@ -388,8 +426,8 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 else
                 {
                     D_ASSERT(to<numvars);
-                    flow_var_val[to, from]-=augamount;
-                    if(flow_var_val[to, from]==0.0)
+                    flow_var_val[to][from-numvars]=flow_var_val[to][from-numvars]-augamount;
+                    if(flow_var_val[to][from-numvars]==0.0)
                     {
                         zeros.push_back(to); zeros.push_back(from);
                     }
@@ -398,25 +436,26 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             
         }
         
+        return augamount;
     }
     
     
     // This is a mess -- must be a better way
-    void apply_path_fraction(vector<int>& path)
+    float apply_path_fraction(vector<int>& path)
     {
-        int augamount = 1.0;
+        float augamount = 1.0;
         for(int i=0; i<path.size()-1; i++)
         {
             int from=path[i];
             int to=path[i+1];
-            double diff=-1000000.0;
+            float diff=-1000000.0;
             if(from==numvars+numvals)
             {   // edge from s to a var.
                 diff=1.0-flow_s_var[to];
             }
             else if(from==numvars+numvals+1)
             {   // t to a val
-                diff=flow_val_t[to];  // it can be reduced by the flow amount.
+                diff=flow_val_t[to-numvars];  // it can be reduced by the flow amount.
             }
             else if(from<numvars)
             {
@@ -427,7 +466,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 else
                 {
                     D_ASSERT(to>=numvars && to<numvars+numvals);
-                    diff=1.0-flow_var_val[from][to];
+                    diff=1.0-flow_var_val[from][to-numvars];
                 }
             }
             else
@@ -439,7 +478,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 else
                 {
                     D_ASSERT(to<numvars);
-                    diff=flow_var_val[to, from];
+                    diff=flow_var_val[to][from-numvars];
                 }
             }
             D_ASSERT(diff>0.0);
@@ -448,7 +487,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         
         augamount=augamount/2.0;
         
-        cout << "Augmenting flow by: " << augamount <<endl;
+        P("Augmenting flow by: " << augamount);
         
         for(int i=0; i<path.size()-1; i++)
         {
@@ -460,7 +499,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             }
             else if(from==numvars+numvals+1)
             {   // t to a val
-                flow_val_t[to]-=augamount;  // it can be reduced by the flow amount.
+                flow_val_t[to-numvars]-=augamount;  // it can be reduced by the flow amount.
             }
             else if(from<numvars)
             {
@@ -471,7 +510,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 else
                 {
                     D_ASSERT(to>=numvars && to<numvars+numvals);
-                    flow_var_val[from][to]+=augamount;
+                    flow_var_val[from][to-numvars]+=augamount;
                 }
             }
             else
@@ -483,28 +522,43 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 else
                 {
                     D_ASSERT(to<numvars);
-                    flow_var_val[to, from]-=augamount;
+                    flow_var_val[to][from-numvars]-=augamount;
                 }
             }
             
         }
         
+        return augamount;
     }
     
     
     void print_flow()
     {
-        double checktotalflow=0.0;
+        float checktotalflow=0.0;
+        
+        for(int var=0; var<numvars; var++)
+        {
+            cout << "S -> " <<var << ", flow: " << flow_s_var[var] <<endl;
+            
+        }
+        
+        
         for(int var=0; var<numvars; var++)
         {
             for(int val=var_array[var].getMin(); val<=var_array[var].getMax(); val++)
             {
                 if(var_array[var].inDomain(val))
                 {
-                    cout << "x" << var << "=" <<val << ", flow: " << flow_var_val[var][val-dom_min] <<endl;
+                    cout << "x" << var << " -> " <<val << ", flow: " << flow_var_val[var][val-dom_min] <<endl;
                     checktotalflow+=flow_var_val[var][val-dom_min];
                 }
             }
+        }
+        
+        for(int val=dom_min; val<=dom_max; val++)
+        {
+            cout << val << " -> T, flow: " << flow_val_t[val-dom_min] <<endl;
+            
         }
         
         cout << "Total flow:" << totalflow<<endl;
@@ -512,48 +566,161 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         D_ASSERT(totalflow==checktotalflow);
     }
     
-    // put the prop algo in here.
-    
     void do_initial_prop()
     {
+        P("In do_initial_prop()");
         // clear the flow netowrk.
         totalflow=0.0;
         flow_var_val.resize(numvars);
         for(int i=0; i<numvars; i++)
         {
-            flow_var_val[i].resize(0);
-            flow_var_val[i].resize(numvals, 0.0);
+            for(int j=0; j<numvals; j++) flow_var_val[i][j]=0.0;
         }
-        flow_val_t.resize(0);
-        flow_val_t.resize(numvals, 0.0);
-        flow_s_var.resize(0);
-        flow_s_var.resize(numvars, 0.0);
+        for(int i=0; i<numvars; i++) flow_s_var[i]=0.0;
+        for(int i=0; i<numvals; i++) flow_val_t[i]=0.0;
         
         vector<int>* augpath=bfs(numvars+numvals, numvars+numvals+1);
-        while(augpath.size()!=0)
+        while(augpath!=0)
         {
-            apply_path_max_zeros(augpath);
+            float diff=apply_path_max_zeros(*augpath);
+            totalflow=totalflow+diff;
+            //print_flow();
             augpath=bfs(numvars+numvals, numvars+numvals+1);
         }
         
-        print_flow();
+        if(totalflow < ((float)numvars))
+        {
+            getState(stateObj).setFailed(true);
+            return;
+        }
         
-        
-        
+        P("Before fractional part:");
+        PLONG(print_flow());
+        for(int var=0; var<numvars; var++)
+        {
+            for(int i=0; i<adjlistlength[var]; i++)
+            {
+                int val=adjlist[var][i];
+                if(flow_var_val[var][val-dom_min]==0.0)
+                {
+                    P("Attempting to find augmenting path for var: " << var << ", val:" << val);
+                    augpath=bfs(val+numvars-dom_min, var);
+                    if(augpath==0)
+                    {
+                        P("No aug path found, removing value.");
+                        var_array[var].removeFromDomain(val);
+                        adjlist_remove(var, val);
+                        i--;
+                    }
+                    else
+                    {
+                        P("Fractional augmenting path:" << *augpath );
+                        float diff=apply_path_fraction(*augpath);
+                        flow_var_val[var][val-dom_min]+=diff;
+                    }
+                }
+            }
+        }
+        P("After fractional part:");
+        PLONG(print_flow());
+        P("Leaving do_initial_prop()");
     }
     
     
-    void do_prop()
+    void incremental_prop()
     {
-        do_initial_prop();
+        P("Entered incremental_prop()");
+        // Go through changed vars and update datastructures.
+        vector<int>& changed_vars=to_process.getlist();
+        for(int varidx=0; varidx<changed_vars.size(); varidx++)
+        {
+            int var=changed_vars[varidx];
+            // Go through adjacency list and update.
+            for(int i=0; i<adjlistlength[var]; i++)
+            {
+                int val=adjlist[var][i];
+                if(!var_array[var].inDomain(val))
+                {
+                    // adjust the flow.
+                    float diff=flow_var_val[var][val-dom_min];
+                    flow_var_val[var][val-dom_min]=0.0;
+                    flow_s_var[var]-=diff;
+                    flow_val_t[val-dom_min]-=diff;
+                    totalflow=totalflow-diff;
+                    
+                    // update the adjacency lists. 
+                    adjlist_remove(var, val);
+                    i--;
+                }
+            }
+        }
         
+        // Go through the vars that have lost some flow, and attempt to restore it.
+        // Track the edges that are reduced to zero flow.
+        zeros.clear();
         
+        while(totalflow<((float)numvars))
+        {
+            vector<int>* augpath=bfs(numvars+numvals, numvars+numvals+1);  // var to t.
+            if(augpath==0)
+            {
+                getState(stateObj).setFailed(true);
+                return;
+            }
+            float diff=apply_path_max_zeros(*augpath);
+            totalflow=totalflow+diff;
+        }
         
+        /*for(int varidx=0; varidx<changed_vars.size(); varidx++)
+        {
+            int var=changed_vars[varidx];
+            
+            while(flow_s_var[var]<1.0)
+            {
+                vector<int>* augpath=bfs(var, numvars+numvals+1);  // var to t.
+                if(augpath==0)
+                {
+                    getState(stateObj).setFailed(true);
+                    return;
+                }
+                float diff=apply_path_max_zeros(*augpath);
+                flow_s_var[var]+=diff;
+                totalflow=totalflow+diff;
+                // This aint no good, it might take the flow through the var to >1.
+            }
+        }*/
+        
+        P("After restoring maximum flow in incremental_prop:");
+        PLONG(print_flow());
+        
+        // Now go through zeros and do.... summat.
+        int numzeros=zeros.size()/2;
+        for(int i=0; i<numzeros; i++)
+        {
+            int var=zeros[i*2];
+            int valnode=zeros[i*2+1];
+            int val=valnode-numvars+dom_min;
+            
+            P("Zero: var:" << var << ", val:" << val);
+            if(flow_var_val[var][valnode-numvars]==0.0)
+            {
+                vector<int>* augp=bfs(valnode, var);
+                if(augp==0)
+                {
+                    P("Pruning the zero.");
+                    var_array[var].removeFromDomain(val);
+                    adjlist_remove(var, val);
+                }
+                else
+                {
+                    augp->push_back(valnode);
+                    apply_path_fraction(*augp);
+                }
+            }
+        }
     }
     
     
-    
-  
   // Should only be used in non-dynamic version.
   virtual triggerCollection setup_internal()
   {
@@ -570,7 +737,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
   { // w-or of pairwise equality.
       
       /// solely for reify exps
-      return new CheckAssignConstraint<VarArray, GacAlldiffConstraint>(stateObj, var_array, *this);
+      return new CheckAssignConstraint<VarArray, GacAlldiffConstraint2>(stateObj, var_array, *this);
       
       vector<AbstractConstraint*> con;
       for(int i=0; i<var_array.size(); i++)
@@ -600,118 +767,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             if(i!=prop_var && var_array[i].inDomain(assignedval))
             {
                 var_array[i].removeFromDomain(assignedval);
-                adjlist_remove(i, assignedval);
-            }
-        }
-    }
-    #endif
-    
-    // Go thruogh adjacency list and update.
-    for(int i=0; i<adjlistlength[prop_var]; i++)
-    {
-        if(!var_array[prop_var].inDomain(adjlist[i]))
-        {
-            adjlist_remove(prop_var, adjlist[i]);
-            i--;
-        }
-    }
-    
-    
-    if(!to_process.in(prop_var))
-    {
-        to_process.insert(prop_var);
-    }
-    
-    if(!constraint_locked)
-    {
-        #ifdef SPECIALQUEUE
-        constraint_locked = true;
-        getQueue(stateObj).pushSpecialTrigger(this);
-        #else
-        do_prop();
-        #endif
-    }
-  }
-  
-  /*
-  virtual void propagate(DynamicTrigger* trig)
-  {
-      #if UseIncGraph
-      DynamicTrigger* dtstart=dynamic_trigger_start();
-      #ifdef DYNAMICALLDIFF
-      dtstart+=numvars+numvars*numvals;
-      #endif
-      if(trig>=dtstart && trig< dtstart+numvars*numvals)  // does this trigger belong to incgraph?
-      {
-          int diff=trig-dtstart;
-            int var=diff/numvals;
-            int validx=diff%numvals;
-            if(adjlistpos[validx+numvars][var]<adjlistlength[validx+numvars])
-            {
-                P("Removing var, val " << var << ","<< (validx+dom_min) << " from adjacency list.");
-                adjlist_remove(var, validx+dom_min); //validx, adjlistpos[validx][var]);
-            }
-            return;
-      }
-      #endif
-      
-      // get variable number from the trigger
-    int prop_var = trig->trigger_info();
-    #ifdef PLONG
-    // check that some value has been disturbed; otherwise the watches are malfunctioning.
-    if(var_array[prop_var].inDomain(varvalmatching[prop_var]))
-    {
-        smallset_list_bt& watch = watches[prop_var];
-        short * list = ((short *) watch.list.get_ptr());
-        int count=list[watch.maxsize];
-        bool valout=false;
-        
-        for(int i=0; i<count; i++)
-        {
-            P("Checking var "<< prop_var << " val " << list[i]+dom_min);
-            if(!var_array[prop_var].inDomain(list[i]+dom_min))
-            {
-                valout=true;
-                break;
-            }
-        }
-        if(!valout)
-        {
-            // none of the watches were disturbed.
-            cout << "None of the watches in the DS were disturbed. BT triggers must not match with watches DS." <<endl;
-            cout << "Variable " << prop_var <<", val in matching: " << varvalmatching[prop_var] << endl;
-            D_ASSERT(false);
-        }
-    }
-    #endif
-    
-    #ifdef CHECKDOMSIZE
-    // If the domain size is >= numvars, then return.
-    // WHY IS THIS HERE WHEN checkdomsize and dynamic triggers don't work together??
-    int count=0;
-    for(int i=var_array[prop_var].getMin(); i<=var_array[prop_var].getMax(); i++)
-    {
-        if(var_array[prop_var].inDomain(i))
-        {
-            count++;
-        }
-    }
-    if(count>=numvars)
-        return;
-    #endif
-    
-    #ifdef STAGED
-    if(var_array[prop_var].isAssigned())
-    {
-        int assignedval=var_array[prop_var].getAssignedValue();
-        for(int i=0; i<numvars; i++)
-        {
-            if(i!=prop_var && var_array[i].inDomain(assignedval))
-            {
-                var_array[i].removeFromDomain(assignedval);
-                #if UseIncGraph
-                    adjlist_remove(i, assignedval);
-                #endif
+                //adjlist_remove(i, assignedval);
             }
         }
     }
@@ -728,15 +784,10 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         constraint_locked = true;
         getQueue(stateObj).pushSpecialTrigger(this);
         #else
-        #ifndef SCC
-        do_prop_noscc();
-        #else
-        do_prop();
-        #endif
+        incremental_prop();
         #endif
     }
   }
-  */
   
   virtual void special_unlock() { constraint_locked = false; to_process.clear(); }
   virtual void special_check()
@@ -749,7 +800,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         return;
     }
     
-    do_prop();
+    incremental_prop();
     to_process.clear();
   }
   
@@ -799,7 +850,6 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
   virtual void full_propagate()
   {
         // update the adjacency lists. and place dts
-        DynamicTrigger* dt=dynamic_trigger_start();
         for(int i=dom_min; i<=dom_max; i++)
         {
             for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
@@ -820,29 +870,33 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             }
         }
         
+        //check_adjacency_lists();
         
-        
-        
-      // Is this guaranteed to be called before do_prop is ever called??
-      // I hope so, because the following test has to be done first.
-      if(numvars>numvals)
-      {
-          getState(stateObj).setFailed(true);
-          return;
-      }
+      to_process.clear();
       
-      // process all variables.
-      to_process.clear();    // It seems like this is called twice at the top of the tree, so the clear is necessary.
-      
-      for(int i=0; i<numvars; i++)
-      {
-          to_process.insert(i);
-      }
-      
-      do_prop();
-      
-      
+      do_initial_prop();
   }
+  
+    void check_adjacency_lists()
+    {
+        for(int var=0; var<numvars; var++)
+        {
+            for(int val=dom_min; val<=dom_max; val++)
+            {
+                if(var_array[var].inDomain(val))
+                {
+                    D_ASSERT(adjlistpos[var][val-dom_min]<adjlistlength[var]);
+                    D_ASSERT(adjlistpos[val-dom_min+numvars][var]<adjlistlength[val-dom_min+numvars]);
+                }
+                else
+                {
+                    D_ASSERT(adjlistpos[var][val-dom_min]>=adjlistlength[var]);
+                    D_ASSERT(adjlistpos[val-dom_min+numvars][var]>=adjlistlength[val-dom_min+numvars]);
+                }
+            }
+        }
+    }
+    
     
     virtual BOOL check_assignment(DomainInt* v, int array_size)
     {
