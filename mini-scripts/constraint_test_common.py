@@ -768,7 +768,8 @@ class testgacalldiff(testalldiff):
 
 class testgacalldiffb(testalldiff):
     def runtest(self, options=dict()):
-        return runtestgeneral("gacalldiffb", False, options, [5], ["quitesmallnum"], self, not options['reify'])
+        options["fixlength"]=True
+        return runtestgeneral("gacalldiffb", False, options, [9], ["quitesmallnum"], self, not options['reify'])
 
 
 class testdiseq(testalldiff):
@@ -1320,7 +1321,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     
     # sometimes (1/4) test very short constraints to find edge cases
     shortvector=random.randint(0,3)
-    if shortvector==0:
+    if shortvector==0 and not "fixlength" in options:
         # for each item in varnums which is greater than 1...
         varnumsused=[a for a in list(set(varnums)) if a>1]
         # pick one at random

@@ -60,9 +60,6 @@ using namespace std;
 // Use the special queue
 #define SPECIALQUEUE
 
-// Incremental graph stored in adjlist
-#define UseIncGraph true
-
 // Use staging a la Schulte and Stuckey
 #define STAGED
 
@@ -79,8 +76,20 @@ using namespace std;
 #define PLONG(x)
 //#define PLONG(x) x
 
-
+// not much point having this, the matching has to be bt'd./
 #define BtMatch true
+
+
+// If Permutation is defined true, then use integers and there should be no
+// second stage of the algorithm, and no /2.
+#define Permutation true
+
+
+typedef int num;
+
+#define maxflow 1000000
+#define minflow 0
+
 
 template<typename VarArray>
 struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
@@ -115,15 +124,15 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
     }
     
     #if BtMatch
-         MoveableArray<float> flow_s_var;
-         vector<MoveableArray<float> > flow_var_val;
-         MoveableArray<float> flow_val_t;
-         Reversible<float> totalflow;
+         MoveableArray<num> flow_s_var;
+         vector<MoveableArray<num> > flow_var_val;
+         MoveableArray<num> flow_val_t;
+         Reversible<num> totalflow;
     #else
-        vector<float> flow_s_var;
-        vector<vector<float> > flow_var_val;  // flow_varval[variable][value] is the 0-1 flow from variable to value.
-        vector<float> flow_val_t;    // flow_val_t[value] is the 0-1 flow from a value to t.
-        float totalflow;      // If circular edge, this is the flow from t to s. 
+        vector<num> flow_s_var;
+        vector<vector<num> > flow_var_val;  // flow_varval[variable][value] is the 0-1 flow from variable to value.
+        vector<num> flow_val_t;    // flow_val_t[value] is the 0-1 flow from a value to t.
+        num totalflow;      // If circular edge, this is the flow from t to s. 
     #endif
     
     GacAlldiffConstraint2(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, true>(_stateObj, _var_array)
@@ -133,24 +142,23 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
     
     {
         #if BtMatch
-            flow_s_var=getMemory(stateObj).backTrack().template requestArray<float>(numvars);
-            flow_val_t=getMemory(stateObj).backTrack().template requestArray<float>(numvals);
+            flow_s_var=getMemory(stateObj).backTrack().template requestArray<num>(numvars);
+            flow_val_t=getMemory(stateObj).backTrack().template requestArray<num>(numvals);
             for(int i=0; i<numvars; i++)
             {
-                flow_var_val.push_back(getMemory(stateObj).backTrack().template requestArray<float>(numvals));
+                flow_var_val.push_back(getMemory(stateObj).backTrack().template requestArray<num>(numvals));
             }
         #else
             flow_var_val.resize(numvars);
             for(int i=0; i<numvars; i++)
             {
-                flow_var_val[i].resize(numvals, 0.0);
+                flow_var_val[i].resize(numvals, minflow);
             }
-            flow_val_t.resize(numvals, 0.0);
+            flow_val_t.resize(numvals, minflow);
             
-            flow_s_var.resize(numvars, 0.0);
+            flow_s_var.resize(numvars, minflow);
         #endif
-        
-        totalflow=0.0;
+        totalflow=minflow;
         
       to_process.reserve(numvars);
       
@@ -158,9 +166,6 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
       prev.resize(numvars+numvals+2, -1);
       
       visited.reserve(numvars+numvals+2);   // vars, vals, s and t.
-      
-         
-      
   }
   
     /////////////////////////////////////////////////////////////////////
@@ -210,7 +215,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 // All variables.  No circulating edge.
                 for(int newnode=0;  newnode<numvars; newnode++)
                 {
-                    if(!visited.in(newnode) && flow_s_var[newnode]<1.0 && (curnode!=start || newnode!=end))
+                    if(!visited.in(newnode) && flow_s_var[newnode]<maxflow && (curnode!=start || newnode!=end))
                     {
                         fifo.push_back(newnode);
                         visited.insert(newnode);
@@ -225,7 +230,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 for(int i=dom_min; i<=dom_max; i++)
                 {
                     int newnode=i-dom_min+numvars;
-                    if(!visited.in(newnode) && flow_val_t[newnode-numvars]>0.0 && (curnode!=start || newnode!=end))
+                    if(!visited.in(newnode) && flow_val_t[newnode-numvars]>minflow && (curnode!=start || newnode!=end))
                     {
                         fifo.push_back(newnode);
                         visited.insert(newnode);
@@ -243,7 +248,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 {
                     int val=adjlist[curnode][adjlistidx];
                     int newnode=val-dom_min+numvars;
-                    if(!visited.in(newnode) && flow_var_val[curnode][val-dom_min]<1.0 && (curnode!=start || newnode!=end))
+                    if(!visited.in(newnode) && flow_var_val[curnode][val-dom_min]<maxflow && (curnode!=start || newnode!=end))
                     {
                         fifo.push_back(newnode);
                         visited.insert(newnode);
@@ -253,7 +258,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 
                 // Link to s.
                 int newnode=numvars+numvals; ///s
-                if(!visited.in(newnode) && flow_s_var[curnode]>0.0 && (curnode!=start || newnode!=end))
+                if(!visited.in(newnode) && flow_s_var[curnode]>minflow && (curnode!=start || newnode!=end))
                 {
                     fifo.push_back(newnode);
                     visited.insert(newnode);
@@ -266,7 +271,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 // a value
                 // link to t if edge not saturated
                 int newnode=numvars+numvals+1; ///t
-                if(!visited.in(newnode) && flow_val_t[curnode-numvars]<1.0 && (curnode!=start || newnode!=end))
+                if(!visited.in(newnode) && flow_val_t[curnode-numvars]<maxflow && (curnode!=start || newnode!=end))
                 {
                     fifo.push_back(newnode);
                     visited.insert(newnode);
@@ -278,7 +283,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 for(int adjlistidx=0; adjlistidx<len; adjlistidx++)
                 {
                     int newnode=adjlist[curnode][adjlistidx];
-                    if(!visited.in(newnode) && (flow_var_val[newnode][curnode-numvars]>0.0) && (curnode!=start || newnode!=end))
+                    if(!visited.in(newnode) && (flow_var_val[newnode][curnode-numvars]>minflow) && (curnode!=start || newnode!=end))
                     {
                         fifo.push_back(newnode);
                         visited.insert(newnode);
@@ -317,7 +322,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         // and use it to get rid of the 0 edge. 
         for(int unsatval=dom_min; unsatval<=dom_max; unsatval++)
         {
-            if(flow_val_t[unsatval-dom_min]<1.0)
+            if(flow_val_t[unsatval-dom_min]<maxflow)
             {
                 // unsatval is really unsaturated.
                 // find a variable connecting val and unsatval
@@ -337,19 +342,19 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
     // This is a mess -- must be a better way
     
     // Warning: both these functions do not adjust totalflow.
-    float apply_path_max_zeros(vector<int>& path)
+    num apply_path_max_zeros(vector<int>& path)
     {
         P("Augmenting path:" << path);
         
-        float augamount = 1.0;
+        num augamount = maxflow;
         for(int i=0; i<path.size()-1; i++)
         {
             int from=path[i];
             int to=path[i+1];
-            float diff=-1000000.0;
+            num diff=-1000000.0;
             if(from==numvars+numvals)
             {   // edge from s to a var.
-                diff=1.0-flow_s_var[to];
+                diff=maxflow-flow_s_var[to];
             }
             else if(from==numvars+numvals+1)
             {   // t to a val
@@ -364,14 +369,14 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 else
                 {
                     D_ASSERT(to>=numvars && to<numvars+numvals);
-                    diff=1.0-flow_var_val[from][to-numvars];
+                    diff=maxflow-flow_var_val[from][to-numvars];
                 }
             }
             else
             {   // from is a value.
                 if(to==numvars+numvals+1)
                 {
-                    diff=1.0-flow_val_t[from-numvars];
+                    diff=maxflow-flow_val_t[from-numvars];
                 }
                 else
                 {
@@ -379,7 +384,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                     diff=flow_var_val[to][from-numvars];
                 }
             }
-            D_ASSERT(diff>0.0);
+            D_ASSERT(diff>minflow);
             augamount=( diff<augamount ? diff : augamount );
         }
         
@@ -396,7 +401,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             else if(from==numvars+numvals+1)
             {   // t to a val
                 flow_val_t[to-numvars]-=augamount;  // it can be reduced by the flow amount.
-                if(flow_val_t[to-numvars]==0.0)
+                if(flow_val_t[to-numvars]==minflow)
                 {
                     zeros.push_back(to); zeros.push_back(from);
                 }
@@ -406,7 +411,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 if(to==numvars+numvals)
                 {
                     flow_s_var[from]=flow_s_var[from]-augamount;
-                    if(flow_s_var[from]==0.0)
+                    if(flow_s_var[from]==minflow)
                     {
                         zeros.push_back(to); zeros.push_back(from);
                     }
@@ -427,7 +432,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 {
                     D_ASSERT(to<numvars);
                     flow_var_val[to][from-numvars]=flow_var_val[to][from-numvars]-augamount;
-                    if(flow_var_val[to][from-numvars]==0.0)
+                    if(flow_var_val[to][from-numvars]==minflow)
                     {
                         zeros.push_back(to); zeros.push_back(from);
                     }
@@ -441,17 +446,17 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
     
     
     // This is a mess -- must be a better way
-    float apply_path_fraction(vector<int>& path)
+    num apply_path_fraction(vector<int>& path)
     {
-        float augamount = 1.0;
+        num augamount = maxflow;
         for(int i=0; i<path.size()-1; i++)
         {
             int from=path[i];
             int to=path[i+1];
-            float diff=-1000000.0;
+            num diff=-1000000.0;
             if(from==numvars+numvals)
             {   // edge from s to a var.
-                diff=1.0-flow_s_var[to];
+                diff=maxflow-flow_s_var[to];
             }
             else if(from==numvars+numvals+1)
             {   // t to a val
@@ -466,26 +471,31 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 else
                 {
                     D_ASSERT(to>=numvars && to<numvars+numvals);
-                    diff=1.0-flow_var_val[from][to-numvars];
+                    diff=maxflow-flow_var_val[from][to-numvars];
                 }
             }
             else
             {   // from is a value.
                 if(to==numvars+numvals+1)
                 {
-                    diff=1.0-flow_val_t[from-numvars];
+                    diff=maxflow-flow_val_t[from-numvars];
                 }
                 else
                 {
                     D_ASSERT(to<numvars);
                     diff=flow_var_val[to][from-numvars];
+                    if(diff==1)
+                    {
+                        press_the_nuclear_button();
+                        return 0;  // safe value.
+                    }
                 }
             }
-            D_ASSERT(diff>0.0);
+            D_ASSERT(diff>minflow);
             augamount=( diff<augamount ? diff : augamount );
         }
         
-        augamount=augamount/2.0;
+        augamount=augamount/ ((num)2);
         
         P("Augmenting flow by: " << augamount);
         
@@ -534,7 +544,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
     
     void print_flow()
     {
-        float checktotalflow=0.0;
+        num checktotalflow=minflow;
         
         for(int var=0; var<numvars; var++)
         {
@@ -566,29 +576,93 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         D_ASSERT(totalflow==checktotalflow);
     }
     
-    void do_initial_prop()
+    void print_flow_nocheck()
     {
-        P("In do_initial_prop()");
-        // clear the flow netowrk.
-        totalflow=0.0;
-        flow_var_val.resize(numvars);
+        num checktotalflow=minflow;
+        
+        for(int var=0; var<numvars; var++)
+        {
+            cout << "S -> " <<var << ", flow: " << flow_s_var[var] <<endl;
+            
+        }
+        
+        
+        for(int var=0; var<numvars; var++)
+        {
+            for(int val=var_array[var].getMin(); val<=var_array[var].getMax(); val++)
+            {
+                if(var_array[var].inDomain(val))
+                {
+                    cout << "x" << var << " -> " <<val << ", flow: " << flow_var_val[var][val-dom_min] <<endl;
+                    checktotalflow+=flow_var_val[var][val-dom_min];
+                }
+            }
+        }
+        
+        for(int val=dom_min; val<=dom_max; val++)
+        {
+            cout << val << " -> T, flow: " << flow_val_t[val-dom_min] <<endl;
+            
+        }
+        
+        cout << "Total flow:" << totalflow<<endl;
+        cout << "Total flow check:" << checktotalflow<<endl;
+        
+    }
+    
+    
+    void press_the_nuclear_button()
+    {
+        // Encountered an edge with flow 1 in apply_path_fraction...
+        // can't apply the path. Reset the whole network.
+        num partflow=maxflow/numvals;  // Assume division truncates.
+        D_ASSERT(partflow*numvals<= maxflow);
+        
+        totalflow=minflow;
         for(int i=0; i<numvars; i++)
         {
-            for(int j=0; j<numvals; j++) flow_var_val[i][j]=0.0;
+            int len=adjlistlength[i];
+            for(int j=0; j<len; j++) flow_var_val[i][adjlist[i][j]]=partflow;
+            flow_s_var[i]=partflow*adjlistlength[i];
+            totalflow=totalflow+partflow*adjlistlength[i];
         }
-        for(int i=0; i<numvars; i++) flow_s_var[i]=0.0;
-        for(int i=0; i<numvals; i++) flow_val_t[i]=0.0;
+        for(int i=0; i<numvals; i++) flow_val_t[i]=partflow*adjlistlength[i+numvars];
         
         vector<int>* augpath=bfs(numvars+numvals, numvars+numvals+1);
         while(augpath!=0)
         {
-            float diff=apply_path_max_zeros(*augpath);
+            num diff=apply_path_max_zeros(*augpath);
             totalflow=totalflow+diff;
             //print_flow();
             augpath=bfs(numvars+numvals, numvars+numvals+1);
         }
         
-        if(totalflow < ((float)numvars))
+        D_ASSERT(totalflow == ((num)numvars)*maxflow);
+    }
+    
+    void do_initial_prop()
+    {
+        P("In do_initial_prop()");
+        
+        // clear the flow netowrk.
+        totalflow=minflow;
+        for(int i=0; i<numvars; i++)
+        {
+            for(int j=0; j<numvals; j++) flow_var_val[i][j]=minflow;
+        }
+        for(int i=0; i<numvars; i++) flow_s_var[i]=minflow;
+        for(int i=0; i<numvals; i++) flow_val_t[i]=minflow;
+        
+        vector<int>* augpath=bfs(numvars+numvals, numvars+numvals+1);
+        while(augpath!=0)
+        {
+            num diff=apply_path_max_zeros(*augpath);
+            totalflow=totalflow+diff;
+            //print_flow();
+            augpath=bfs(numvars+numvals, numvars+numvals+1);
+        }
+        
+        if(totalflow < ((num)numvars)*maxflow)
         {
             getState(stateObj).setFailed(true);
             return;
@@ -601,7 +675,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             for(int i=0; i<adjlistlength[var]; i++)
             {
                 int val=adjlist[var][i];
-                if(flow_var_val[var][val-dom_min]==0.0)
+                if(flow_var_val[var][val-dom_min]==minflow)
                 {
                     P("Attempting to find augmenting path for var: " << var << ", val:" << val);
                     augpath=bfs(val+numvars-dom_min, var);
@@ -615,7 +689,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                     else
                     {
                         P("Fractional augmenting path:" << *augpath );
-                        float diff=apply_path_fraction(*augpath);
+                        num diff=apply_path_fraction(*augpath);
                         flow_var_val[var][val-dom_min]+=diff;
                     }
                 }
@@ -630,6 +704,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
     void incremental_prop()
     {
         P("Entered incremental_prop()");
+        PLONG(print_flow_nocheck());
         // Go through changed vars and update datastructures.
         vector<int>& changed_vars=to_process.getlist();
         for(int varidx=0; varidx<changed_vars.size(); varidx++)
@@ -642,8 +717,8 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 if(!var_array[var].inDomain(val))
                 {
                     // adjust the flow.
-                    float diff=flow_var_val[var][val-dom_min];
-                    flow_var_val[var][val-dom_min]=0.0;
+                    num diff=flow_var_val[var][val-dom_min];
+                    flow_var_val[var][val-dom_min]=minflow;
                     flow_s_var[var]-=diff;
                     flow_val_t[val-dom_min]-=diff;
                     totalflow=totalflow-diff;
@@ -654,12 +729,13 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 }
             }
         }
+        PLONG(print_flow());
         
         // Go through the vars that have lost some flow, and attempt to restore it.
         // Track the edges that are reduced to zero flow.
         zeros.clear();
         
-        while(totalflow<((float)numvars))
+        while(totalflow<((num)numvars)*maxflow)
         {
             vector<int>* augpath=bfs(numvars+numvals, numvars+numvals+1);  // var to t.
             if(augpath==0)
@@ -667,7 +743,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 getState(stateObj).setFailed(true);
                 return;
             }
-            float diff=apply_path_max_zeros(*augpath);
+            num diff=apply_path_max_zeros(*augpath);
             totalflow=totalflow+diff;
         }
         
@@ -675,7 +751,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         {
             int var=changed_vars[varidx];
             
-            while(flow_s_var[var]<1.0)
+            while(flow_s_var[var]<maxflow)
             {
                 vector<int>* augpath=bfs(var, numvars+numvals+1);  // var to t.
                 if(augpath==0)
@@ -702,7 +778,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             int val=valnode-numvars+dom_min;
             
             P("Zero: var:" << var << ", val:" << val);
-            if(flow_var_val[var][valnode-numvars]==0.0)
+            if(flow_var_val[var][valnode-numvars]==minflow)
             {
                 vector<int>* augp=bfs(valnode, var);
                 if(augp==0)
@@ -713,11 +789,19 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 }
                 else
                 {
+                    //cout << "Conjecture violated" <<endl;
+                    //print_flow();
+                    
+                    //abort();
+                    
                     augp->push_back(valnode);
                     apply_path_fraction(*augp);
                 }
             }
         }
+        
+        P("About to exit incremental_prop()");
+        PLONG(print_flow());
     }
     
     
