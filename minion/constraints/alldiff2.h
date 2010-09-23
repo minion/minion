@@ -398,7 +398,6 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 }
                 else
                 {
-                    cout << path <<endl;
                     D_ASSERT(to>=numvars && to<numvars+numvals);
                     diff=maxflow-flow_var_val[from][to-numvars];
                 }
