@@ -77,7 +77,7 @@ using namespace std;
 //#define PLONG(x) x
 
 // not much point having this, the matching has to be bt'd./
-#define BtMatch false
+#define BtMatch true
 
 
 // If Permutation is defined true, then use integers and there should be no
@@ -516,8 +516,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                     diff=flow_var_val[to][from-numvars];
                     if(diff==1)
                     {
-                        press_the_nuclear_button();
-                        return 0;  // safe value.
+                        return -1;  // indicates this problem.
                     }
                 }
             }
@@ -652,7 +651,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         for(int i=0; i<numvars; i++)
         {
             int len=adjlistlength[i];
-            for(int j=0; j<len; j++) flow_var_val[i][adjlist[i][j]]=partflow;
+            for(int j=0; j<len; j++) flow_var_val[i][adjlist[i][j]-dom_min]=partflow;   //!!
             flow_s_var[i]=partflow*adjlistlength[i];
             totalflow=totalflow+partflow*adjlistlength[i];
         }
@@ -803,16 +802,20 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 }
                 else
                 {
-                    //cout << "Conjecture violated" <<endl;
-                    //print_flow();
-                    
-                    //abort();
-                    
                     augp->push_back(valnode);
-                    apply_path_fraction(*augp);
+                    num diff=apply_path_fraction(*augp);
+                    if(diff==-1)
+                    {
+                        // Found a 1 somewhere.
+                        // Reset the flow network and start from scratch.
+                        do_initial_prop();
+                        return;
+                    }
                 }
             }
         }
+        
+        
         
         P("About to exit incremental_prop()");
         PLONG(print_flow());
@@ -882,8 +885,8 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         constraint_locked = true;
         getQueue(stateObj).pushSpecialTrigger(this);
         #else
-        //incremental_prop();
-        do_initial_prop();
+        incremental_prop();
+        //do_initial_prop();
         #endif
     }
   }
