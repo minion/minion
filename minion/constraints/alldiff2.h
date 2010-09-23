@@ -91,6 +91,29 @@ typedef int num;
 #define minflow 0
 
 
+// Part of the BFS algorithm.
+// Uses variables newnode, curnode, start, end, augpath.
+
+
+#define VISITNODE { \
+    fifo.push_back(newnode); \
+    visited.insert(newnode); \
+    prev[newnode]=curnode; \
+    if(newnode==end)  \
+    { \
+        augpath.clear();  \
+        augpath.push_back(end); \
+        while(newnode!=start) \
+        { \
+            newnode=prev[newnode]; \
+            augpath.push_back(newnode); \
+        } \
+        std::reverse(augpath.begin(), augpath.end()); \
+        return &augpath; \
+    } \
+}
+
+
 template<typename VarArray>
 struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
 {
@@ -176,6 +199,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
     smallset_nolist visited;
     vector<int> augpath;
     
+    
     vector<int>* bfs(int start, int end)
     {
         // find any non-saturated path from start to end (including the circulating edge.)
@@ -194,7 +218,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             int curnode=fifo.front();
             fifo.pop_front();
             
-            if(curnode==end)
+            /*if(curnode==end)
             {   // found a path, extract it from prev
                 // This needs to go into the cases below.
                 augpath.clear();
@@ -207,7 +231,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 std::reverse(augpath.begin(), augpath.end());
                 
                 return &augpath;
-            }
+            }*/
             
             // Now cases for each type of node.
             if(curnode==numvars+numvals)
@@ -217,9 +241,10 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 {
                     if(!visited.in(newnode) && flow_s_var[newnode]<maxflow && (curnode!=start || newnode!=end))
                     {
-                        fifo.push_back(newnode);
+                        /*fifo.push_back(newnode);
                         visited.insert(newnode);
-                        prev[newnode]=curnode;
+                        prev[newnode]=curnode;*/
+                        VISITNODE
                     }
                 }
             }
@@ -232,9 +257,10 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                     int newnode=i-dom_min+numvars;
                     if(!visited.in(newnode) && flow_val_t[newnode-numvars]>minflow && (curnode!=start || newnode!=end))
                     {
-                        fifo.push_back(newnode);
+                        /*fifo.push_back(newnode);
                         visited.insert(newnode);
-                        prev[newnode]=curnode;
+                        prev[newnode]=curnode;*/
+                        VISITNODE
                     }
                 }
                 // No circulating edge.
@@ -250,9 +276,10 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                     int newnode=val-dom_min+numvars;
                     if(!visited.in(newnode) && flow_var_val[curnode][val-dom_min]<maxflow && (curnode!=start || newnode!=end))
                     {
-                        fifo.push_back(newnode);
+                        /*fifo.push_back(newnode);
                         visited.insert(newnode);
-                        prev[newnode]=curnode;
+                        prev[newnode]=curnode;*/
+                        VISITNODE
                     }
                 }
                 
@@ -260,9 +287,10 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 int newnode=numvars+numvals; ///s
                 if(!visited.in(newnode) && flow_s_var[curnode]>minflow && (curnode!=start || newnode!=end))
                 {
-                    fifo.push_back(newnode);
+                    /*fifo.push_back(newnode);
                     visited.insert(newnode);
-                    prev[newnode]=curnode;
+                    prev[newnode]=curnode;*/
+                    VISITNODE
                 }
             }
             else
@@ -273,9 +301,10 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 int newnode=numvars+numvals+1; ///t
                 if(!visited.in(newnode) && flow_val_t[curnode-numvars]<maxflow && (curnode!=start || newnode!=end))
                 {
-                    fifo.push_back(newnode);
+                    /*fifo.push_back(newnode);
                     visited.insert(newnode);
-                    prev[newnode]=curnode;
+                    prev[newnode]=curnode;*/
+                    VISITNODE
                 }
                 
                 // All variables where the flow on the edge can be reduced. >0.
@@ -285,9 +314,10 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                     int newnode=adjlist[curnode][adjlistidx];
                     if(!visited.in(newnode) && (flow_var_val[newnode][curnode-numvars]>minflow) && (curnode!=start || newnode!=end))
                     {
-                        fifo.push_back(newnode);
+                        /*fifo.push_back(newnode);
                         visited.insert(newnode);
-                        prev[newnode]=curnode;
+                        prev[newnode]=curnode;*/
+                        VISITNODE
                     }
                 }
             }
@@ -368,6 +398,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 }
                 else
                 {
+                    cout << path <<endl;
                     D_ASSERT(to>=numvars && to<numvars+numvals);
                     diff=maxflow-flow_var_val[from][to-numvars];
                 }
