@@ -73,6 +73,8 @@ using namespace std;
 
 #define P(x)
 //#define P(x) cout << x << endl
+//#define P2(x) cout << x <<endl
+#define P2(x) 
 #define PLONG(x)
 //#define PLONG(x) x
 
@@ -87,7 +89,7 @@ using namespace std;
 
 typedef int num;
 
-#define maxflow 1000000
+#define maxflow 10000000
 #define minflow 0
 
 
@@ -345,23 +347,44 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
     return False*/
     
     // specialised search for an augmenting path from val to var of length 6 vertices. 
+    // Used to increase flow from var to val from 0.
     inline bool balance(int val, int var)
     {
         //val is a real value.
         // Given the 0 edge var->val, find a suitable unsaturated value (if one exists)
         // and use it to get rid of the 0 edge. 
-        for(int unsatval=dom_min; unsatval<=dom_max; unsatval++)
+        if(adjlistlength[var]<2)
         {
-            if(flow_val_t[unsatval-dom_min]<maxflow)
-            {
-                // unsatval is really unsaturated.
-                // find a variable connecting val and unsatval
-                
-                
-                
-            }
+            return false;
         }
         
+        // First go through variables adjacent to val.
+        int len=adjlistlength[val-dom_min+numvars];
+        for(int i=0; i<len; i++)
+        {
+            int midvar=adjlist[val-dom_min+numvars][i];
+            
+            // Is there a value with spare capacity adjacent to midvar
+            int len2=adjlistlength[midvar];
+            for(int j=0; j<len2; j++)
+            {
+                int val_sparecap=adjlist[midvar][j];
+                if(flow_val_t[val_sparecap-dom_min]<maxflow)
+                {
+                    // Find any value in dom(var) other than val.
+                    int val2=(adjlist[var][0]!=val ? adjlist[var][0] : adjlist[var][1]);
+                    // Found the appropriate augmenting path. Now apply it.
+                    // Augmenting path is:
+                    // [val, midvar, val_sparecap, t, val2, var, val]
+                    
+                    
+                    
+                    return true;
+                }
+            }
+            
+            
+        }
         
         return false;
     }
@@ -701,7 +724,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                     }
                     else
                     {
-                        P("Fractional augmenting path:" << *augpath );
+                        P2("Fractional augmenting path:" << *augpath );
                         num diff=apply_path_fraction(*augpath);
                         flow_var_val[var][val-dom_min]+=diff;
                     }
@@ -802,6 +825,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 }
                 else
                 {
+                    P2("Fractional augmenting path:"<<*augp);
                     augp->push_back(valnode);
                     num diff=apply_path_fraction(*augp);
                     if(diff==-1)
@@ -814,8 +838,6 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 }
             }
         }
-        
-        
         
         P("About to exit incremental_prop()");
         PLONG(print_flow());
