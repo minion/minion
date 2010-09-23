@@ -674,23 +674,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
     {
         P("In do_initial_prop()");
         
-        // clear the flow netowrk.
-        totalflow=minflow;
-        for(int i=0; i<numvars; i++)
-        {
-            for(int j=0; j<numvals; j++) flow_var_val[i][j]=minflow;
-        }
-        for(int i=0; i<numvars; i++) flow_s_var[i]=minflow;
-        for(int i=0; i<numvals; i++) flow_val_t[i]=minflow;
-        
-        vector<int>* augpath=bfs(numvars+numvals, numvars+numvals+1);
-        while(augpath!=0)
-        {
-            num diff=apply_path_max_zeros(*augpath);
-            totalflow=totalflow+diff;
-            //print_flow();
-            augpath=bfs(numvars+numvals, numvars+numvals+1);
-        }
+        press_the_nuclear_button();
         
         if(totalflow < ((num)numvars)*maxflow)
         {
@@ -898,7 +882,8 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         constraint_locked = true;
         getQueue(stateObj).pushSpecialTrigger(this);
         #else
-        incremental_prop();
+        //incremental_prop();
+        do_initial_prop();
         #endif
     }
   }
