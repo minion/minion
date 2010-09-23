@@ -692,7 +692,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 if(flow_var_val[var][val-dom_min]==minflow)
                 {
                     P("Attempting to find augmenting path for var: " << var << ", val:" << val);
-                    augpath=bfs(val+numvars-dom_min, var);
+                    vector<int>* augpath=bfs(val+numvars-dom_min, var);
                     if(augpath==0)
                     {
                         P("No aug path found, removing value.");
