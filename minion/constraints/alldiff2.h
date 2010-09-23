@@ -771,7 +771,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         // Track the edges that are reduced to zero flow.
         zeros.clear();
         
-        /*while(totalflow<((num)numvars)*maxflow)
+        while(totalflow<((num)numvars)*maxflow)
         {
             vector<int>* augpath=bfs(numvars+numvals, numvars+numvals+1);  // var to t.
             if(augpath==0)
@@ -781,9 +781,9 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
             }
             num diff=apply_path_max_zeros(*augpath);
             totalflow=totalflow+diff;
-        }*/
+        }
         
-        for(int varidx=0; varidx<changed_vars.size(); varidx++)
+        /*for(int varidx=0; varidx<changed_vars.size(); varidx++)
         {
             int var=changed_vars[varidx];
             
@@ -803,7 +803,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 //cout << (*augpath) << endl;
                 apply_path_max_zeros(*augpath);
             }
-        }
+        }*/    /// With this change it's underpropagating slightly.
         
         P("After restoring maximum flow in incremental_prop:");
         PLONG(print_flow());
