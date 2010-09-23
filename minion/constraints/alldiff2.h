@@ -77,7 +77,7 @@ using namespace std;
 //#define PLONG(x) x
 
 // not much point having this, the matching has to be bt'd./
-#define BtMatch true
+#define BtMatch false
 
 
 // If Permutation is defined true, then use integers and there should be no
