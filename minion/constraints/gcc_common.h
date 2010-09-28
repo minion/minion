@@ -142,7 +142,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         if(SimulateAlldiff)
         {   // Pretend to be a gacalldiff.
             upper.resize(numvals, 1);
-            if(capacity_vars.size()!=0) { cout <<"gcc+SimulateAlldiff requires 0 cap vars."<<endl; abort(); }
+            if(capacity_array.size()!=0) { cout <<"gcc+SimulateAlldiff requires 0 cap vars."<<endl; abort(); }
         }
         else
         {   // Normal case.
