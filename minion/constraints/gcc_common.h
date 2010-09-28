@@ -39,8 +39,8 @@
 #define SPECIALQUEUE
 
 // should be called dynamic partitioning
-//#define SCC
-//#define SCCCARDS
+#define SCC
+#define SCCCARDS
 
 #define INCREMENTALMATCH
 
@@ -75,11 +75,17 @@
 // This one just sets up the watches BT arrays, to measure the cost of BTing them.
 #define UseWatches2 UseWatches
 
-#define UseWatchesAlt true
+#define UseWatchesAlt false
 
 // Requires SCC to be defined. Only splits off unit SCCs from the current
 // SCC. This is the Gecode implementation.
 #define RemoveAssignedVars false
+
+// When this is defined true, it never reads/chages the cardinality variables
+// or reads the values list.
+// MUST be used as gcc(vars, [], []) i.e. no capacity variables and no vals.
+// it just takes 0-1 as the range for every value.
+#define SimulateAlldiff true
 
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
@@ -133,7 +139,15 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         usage.resize(numvals, 0);
         
         lower.resize(numvals, 0);
-        upper.resize(numvals, numvars);
+        if(SimulateAlldiff)
+        {   // Pretend to be a gacalldiff.
+            upper.resize(numvals, 1);
+            if(capacity_vars.size()!=0) { cout <<"gcc+SimulateAlldiff requires 0 cap vars."<<endl; abort(); }
+        }
+        else
+        {   // Normal case.
+            upper.resize(numvals, numvars);
+        }
         
         prev.resize(numvars+numvals);
         
