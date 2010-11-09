@@ -70,7 +70,7 @@
 #define DomainCounting false
 
 // Use internal dynamic triggers as described in paper. 
-#define InternalDT true
+#define InternalDT false
 
 // Requires SCC to be defined. Only splits off unit SCCs from the current
 // SCC. This is the Gecode implementation.
@@ -80,7 +80,7 @@
 // or reads the values list.
 // MUST be used as gcc(vars, [], []) i.e. no capacity variables and no vals.
 // it just takes 0-1 as the range for every value.
-#define SimulateAlldiff true
+#define SimulateAlldiff false
 
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 
