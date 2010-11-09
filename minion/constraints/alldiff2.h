@@ -73,11 +73,13 @@ using namespace std;
 
 #define P(x)
 //#define P(x) cout << x << endl
+//#define P2(x) cout << x <<endl
+#define P2(x) 
 #define PLONG(x)
 //#define PLONG(x) x
 
 // not much point having this, the matching has to be bt'd./
-#define BtMatch false
+#define BtMatch true
 
 
 // If Permutation is defined true, then use integers and there should be no
@@ -87,7 +89,7 @@ using namespace std;
 
 typedef int num;
 
-#define maxflow 1000000
+#define maxflow 10000000
 #define minflow 0
 
 
@@ -345,23 +347,44 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
     return False*/
     
     // specialised search for an augmenting path from val to var of length 6 vertices. 
+    // Used to increase flow from var to val from 0.
     inline bool balance(int val, int var)
     {
         //val is a real value.
         // Given the 0 edge var->val, find a suitable unsaturated value (if one exists)
         // and use it to get rid of the 0 edge. 
-        for(int unsatval=dom_min; unsatval<=dom_max; unsatval++)
+        if(adjlistlength[var]<2)
         {
-            if(flow_val_t[unsatval-dom_min]<maxflow)
-            {
-                // unsatval is really unsaturated.
-                // find a variable connecting val and unsatval
-                
-                
-                
-            }
+            return false;
         }
         
+        // First go through variables adjacent to val.
+        int len=adjlistlength[val-dom_min+numvars];
+        for(int i=0; i<len; i++)
+        {
+            int midvar=adjlist[val-dom_min+numvars][i];
+            
+            // Is there a value with spare capacity adjacent to midvar
+            int len2=adjlistlength[midvar];
+            for(int j=0; j<len2; j++)
+            {
+                int val_sparecap=adjlist[midvar][j];
+                if(flow_val_t[val_sparecap-dom_min]<maxflow)
+                {
+                    // Find any value in dom(var) other than val.
+                    int val2=(adjlist[var][0]!=val ? adjlist[var][0] : adjlist[var][1]);
+                    // Found the appropriate augmenting path. Now apply it.
+                    // Augmenting path is:
+                    // [val, midvar, val_sparecap, t, val2, var, val]
+                    
+                    
+                    
+                    return true;
+                }
+            }
+            
+            
+        }
         
         return false;
     }
@@ -516,8 +539,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                     diff=flow_var_val[to][from-numvars];
                     if(diff==1)
                     {
-                        press_the_nuclear_button();
-                        return 0;  // safe value.
+                        return -1;  // indicates this problem.
                     }
                 }
             }
@@ -652,7 +674,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         for(int i=0; i<numvars; i++)
         {
             int len=adjlistlength[i];
-            for(int j=0; j<len; j++) flow_var_val[i][adjlist[i][j]]=partflow;
+            for(int j=0; j<len; j++) flow_var_val[i][adjlist[i][j]-dom_min]=partflow;   //!!
             flow_s_var[i]=partflow*adjlistlength[i];
             totalflow=totalflow+partflow*adjlistlength[i];
         }
@@ -702,7 +724,7 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                     }
                     else
                     {
-                        P("Fractional augmenting path:" << *augpath );
+                        P2("Fractional augmenting path:" << *augpath );
                         num diff=apply_path_fraction(*augpath);
                         flow_var_val[var][val-dom_min]+=diff;
                     }
@@ -773,12 +795,15 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                     getState(stateObj).setFailed(true);
                     return;
                 }
-                float diff=apply_path_max_zeros(*augpath);
-                flow_s_var[var]+=diff;
-                totalflow=totalflow+diff;
-                // This aint no good, it might take the flow through the var to >1.
+                // Put s on the front.
+                //cout << (*augpath) << endl;
+                augpath->push_back(augpath->back());
+                for(int i=augpath->size()-2; i>=0; i--)  (*augpath)[i+1]=(*augpath)[i];
+                (*augpath)[0]=numvars+numvals;
+                //cout << (*augpath) << endl;
+                apply_path_max_zeros(*augpath);
             }
-        }*/
+        }*/    /// With this change it's underpropagating slightly.
         
         P("After restoring maximum flow in incremental_prop:");
         PLONG(print_flow());
@@ -803,13 +828,16 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
                 }
                 else
                 {
-                    //cout << "Conjecture violated" <<endl;
-                    //print_flow();
-                    
-                    //abort();
-                    
+                    P2("Fractional augmenting path:"<<*augp);
                     augp->push_back(valnode);
-                    apply_path_fraction(*augp);
+                    num diff=apply_path_fraction(*augp);
+                    if(diff==-1)
+                    {
+                        // Found a 1 somewhere.
+                        // Reset the flow network and start from scratch.
+                        do_initial_prop();
+                        return;
+                    }
                 }
             }
         }
@@ -882,8 +910,8 @@ struct GacAlldiffConstraint2 : public FlowConstraint<VarArray, true>
         constraint_locked = true;
         getQueue(stateObj).pushSpecialTrigger(this);
         #else
-        //incremental_prop();
-        do_initial_prop();
+        incremental_prop();
+        //do_initial_prop();
         #endif
     }
   }
