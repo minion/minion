@@ -1,0 +1,180 @@
+20 sizes: [12, 14, 17, 18, 19, 20, 23, 24, 25, 26,
+27, 28, 29, 30, 32, 35, 39, 42, 43, 44]
+17 orders, 11 colours 
+22 2
+9 3
+8 5
+8 9
+7 4
+7 8
+7 11
+5 4
+5 10
+4 1
+4 7
+4 7
+3 6
+3 6
+3 4
+2 6
+2 4
+Total Order Weight: 103
+Min no. slabs required: 3
+Max Wasteage: 112
+Max Individual Wasteage: 10
+Slab domains created
+1st slab must be >= 22
+Order matrix created
+Orders 10 and 11 are symmetrical
+Orders 12 and 13 are symmetrical
+Colour matrix created
+Channelling constraints created
+Starting search
+Opt: 107
+Slabs: 23 12 12 12 12 12 12 12 0 0 0 0 0 0 0 0 0 
+
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 1 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 
+0 0 1 0 0 0 0 0 0 1 0 0 0 0 0 0 0 
+0 0 0 1 0 0 0 0 0 0 1 0 0 0 0 0 0 
+0 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+Number of fails               : 5
+Number of choice points       : 20
+Number of variables           : 529
+Number of constraints         : 919
+Reversible stack (bytes)      : 176904
+Solver heap (bytes)           : 948744
+Solver global heap (bytes)    : 4044
+And stack (bytes)             : 4044
+Or stack (bytes)              : 4044
+Search Stack (bytes)          : 4044
+Constraint queue (bytes)      : 11144
+Total memory used (bytes)     : 1152968
+Elapsed time since creation   : 0.13
+Opt: 105
+Slabs: 23 14 14 14 14 14 12 0 0 0 0 0 0 0 0 0 0 
+
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 
+0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 
+0 0 0 1 0 0 0 0 0 0 0 0 1 1 0 0 0 
+0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 1 1 
+0 0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+Number of fails               : 9473
+Number of choice points       : 9485
+Number of variables           : 529
+Number of constraints         : 928
+Reversible stack (bytes)      : 176904
+Solver heap (bytes)           : 948744
+Solver global heap (bytes)    : 4044
+And stack (bytes)             : 4044
+Or stack (bytes)              : 4044
+Search Stack (bytes)          : 4044
+Constraint queue (bytes)      : 11144
+Total memory used (bytes)     : 1152968
+Elapsed time since creation   : 2.824
+Opt: 104
+Slabs: 23 17 14 14 12 12 12 0 0 0 0 0 0 0 0 0 0 
+
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 1 0 0 0 0 0 0 0 0 1 1 0 0 0 
+0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 1 0 1 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 1 0 0 0 0 0 0 1 1 1 
+0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+Number of fails               : 9550
+Number of choice points       : 9565
+Number of variables           : 529
+Number of constraints         : 937
+Reversible stack (bytes)      : 180924
+Solver heap (bytes)           : 948744
+Solver global heap (bytes)    : 4044
+And stack (bytes)             : 4044
+Or stack (bytes)              : 4044
+Search Stack (bytes)          : 4044
+Constraint queue (bytes)      : 11144
+Total memory used (bytes)     : 1156988
+Elapsed time since creation   : 2.864
+Opt: 103
+Slabs: 24 17 14 12 12 12 12 0 0 0 0 0 0 0 0 0 0 
+
+1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 
+0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 1 0 0 0 0 0 0 0 0 1 1 0 0 0 
+0 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 1 
+0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+Number of fails               : 213618
+Number of choice points       : 213634
+Number of variables           : 529
+Number of constraints         : 938
+Reversible stack (bytes)      : 180924
+Solver heap (bytes)           : 948744
+Solver global heap (bytes)    : 4044
+And stack (bytes)             : 4044
+Or stack (bytes)              : 4044
+Search Stack (bytes)          : 4044
+Constraint queue (bytes)      : 11144
+Total memory used (bytes)     : 1156988
+Elapsed time since creation   : 65.724
+
+
+Proven Optimal:
+Number of fails               : 213631
+Number of choice points       : 213634
+Number of variables           : 529
+Number of constraints         : 0
+Reversible stack (bytes)      : 180924
+Solver heap (bytes)           : 948744
+Solver global heap (bytes)    : 4044
+And stack (bytes)             : 4044
+Or stack (bytes)              : 4044
+Search Stack (bytes)          : 4044
+Constraint queue (bytes)      : 11144
+Total memory used (bytes)     : 1156988
+Elapsed time since creation   : 65.724
