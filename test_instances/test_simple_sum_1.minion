@@ -1,0 +1,13 @@
+#TEST NODECOUNT 1
+
+MINION 3
+
+**VARIABLES**
+
+BOOL x
+
+**CONSTRAINTS**
+
+reify(sumleq([4], 0), x)
+
+**EOF**
