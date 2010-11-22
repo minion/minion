@@ -1918,6 +1918,30 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         }
     }
     
+    void prop_capacity_linear()
+    {
+        // We know we have incgraph.
+        // use augpath as a temporary place to count assignments for each value.
+        augpath.clear();
+        augpath.resize(numvals, 0);
+        
+        for(int i=0; i<var_array.size(); i++)
+        {
+            if(var_array[i].isAssigned())
+            {
+                int val=var_array[i].getAssignedValue();
+                augpath[val-dom_min]++;
+            }
+        }
+        // Set bounds
+        for(int i=0; i<val_array.size(); i++)
+        {
+            int val=val_array[i];
+            capacity_array[i].setMin(augpath[val-dom_min]);
+            capacity_array[i].setMax(adjlistlength[val-dom_min+numvars]);
+        }
+    }
+    
     void prop_capacity_simple()
     {
         // basic prop from main vars to cap variables. equiv to occurrence constraints I think. 
