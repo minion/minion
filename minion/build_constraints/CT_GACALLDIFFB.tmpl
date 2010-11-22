@@ -1,0 +1,15 @@
+#include "../minion.h"
+/* Minion Constraint Solver
+   http://minion.sourceforge.net
+   
+   For Licence Information see file LICENSE.txt 
+*/
+
+#include "../constraints/constraint_gacalldiff2.h"
+
+template<typename VarArray>
+AbstractConstraint*
+BuildCT_GACALLDIFFB(StateObj* stateObj, const VarArray& var_array, ConstraintBlob&)
+{ return new GacAlldiffConstraint2<VarArray>(stateObj, var_array); }
+
+BUILD_CT(CT_GACALLDIFFB, 1)

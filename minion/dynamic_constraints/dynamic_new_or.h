@@ -41,9 +41,6 @@ ensures that at least one of the constraints C1,...,Cn is true.
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 
-// For reverse_constraint we need an and
-#include "dynamic_new_and.h"
-
 #ifdef P
 #undef P
 #endif
@@ -334,14 +331,20 @@ struct Dynamic_OR : public ParentConstraint
 
   }
 
-  virtual AbstractConstraint* reverse_constraint()
-  { // and of the reverse of all the child constraints..
+  virtual AbstractConstraint* reverse_constraint();
+};
+
+#include "dynamic_new_and.h"
+
+inline AbstractConstraint* Dynamic_OR::reverse_constraint()
+{// and of the reverse of all the child constraints..
       vector<AbstractConstraint*> con;
       for(int i=0; i<child_constraints.size(); i++)
       {
           con.push_back(child_constraints[i]->reverse_constraint());
       }
       return new Dynamic_AND(stateObj, con);
-  }
-};
+}
+
+
 #endif

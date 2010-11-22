@@ -199,13 +199,12 @@ struct Dynamic_AND : public ParentConstraint
     getQueue(stateObj).pushSpecialTrigger(this);
   }
   
-  // This breaks everything.
-  //virtual AbstractConstraint* reverse_constraint();
+  virtual AbstractConstraint* reverse_constraint();
 };
 
-//#include "dynamic_new_or.h"
+#include "dynamic_new_or.h"
 
-/*virtual AbstractConstraint* Dynamic_AND::reverse_constraint()
+inline AbstractConstraint* Dynamic_AND::reverse_constraint()
 { // OR of the reverse of all the child constraints..
   vector<AbstractConstraint*> con;
   for(int i=0; i<child_constraints.size(); i++)
@@ -213,5 +212,5 @@ struct Dynamic_AND : public ParentConstraint
       con.push_back(child_constraints[i]->reverse_constraint());
   }
   return new Dynamic_OR(stateObj, con);
-}*/
+}
 #endif
