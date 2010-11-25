@@ -32,12 +32,14 @@ inline void world_push(StateObj* stateObj)
   getMemory(stateObj).backTrack().world_push();
   getMemory(stateObj).monotonicSet().after_branch_left();
   getState(stateObj).getConstraintsToPropagate().push_back(set<AbstractConstraint*>());
+  getState(stateObj).getGenericBacktracker().mark();
 }
 
 /// Pops the state of the whole world.
 inline void world_pop(StateObj* stateObj)
 {
   D_ASSERT(getQueue(stateObj).isQueuesEmpty());
+  getState(stateObj).getGenericBacktracker().world_pop();
   getMemory(stateObj).backTrack().world_pop();
   getMemory(stateObj).monotonicSet().undo();
   getQueue(stateObj).getTbq().world_pop();
