@@ -19,6 +19,10 @@
 
 // The algorithm iGAC or short-supports-gac
 
+// Does it place dynamic triggers for the supports.
+#define SupportsGACUseDT true
+
+
 template<typename VarArray>
 struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 {
@@ -165,6 +169,11 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             supportsPerVar[var]++;
             supportsPerLit[var][val]++;
             
+            // Attach trigger if this is the first support containing var,val.
+            if(SupportsGACUseDT && supportsPerLit[var][val]==1) {
+                attach_trigger(var, val+dom_min);
+            }
+            
             // Update partition
             // swap var to the end of its cell.
             partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]]-1]);
@@ -214,6 +223,11 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             if(supportsPerLit[var][litlist[i].second-dom_min]==0)
                 zeroVals[var].push_back(litlist[i].second);
+            
+            // Remove trigger if this is the last support containing var,val.
+            if(SupportsGACUseDT && supportsPerLit[var][litlist[i].second-dom_min]==0) {
+                detach_trigger(var, litlist[i].second);
+            }
             
             // Update partition
             // swap var to the start of its cell.
@@ -305,14 +319,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
     }
     
-    virtual triggerCollection setup_internal()
-    {
-        triggerCollection t;
-        int array_size = vars.size();
-        for(int i = 0; i < array_size; ++i)
-          t.push_back(make_trigger(vars[i], Trigger(this, i), DomainChanged));
-        return t;
-    }
+    #if !SupportsGACUseDT
+        virtual triggerCollection setup_internal()
+        {
+            triggerCollection t;
+            int array_size = vars.size();
+            for(int i = 0; i < array_size; ++i)
+              t.push_back(make_trigger(vars[i], Trigger(this, i), DomainChanged));
+            return t;
+        }
+    #endif
     
     void partition_swap(int xi, int xj)
     {
@@ -376,12 +392,42 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     }
     
     
+    #if SupportsGACUseDT
+        int dynamic_trigger_count() { 
+            return vars.size()*numvals;
+        }
+    #endif
+    
+  inline void attach_trigger(int var, int val)
+  {
+      //P("Attach Trigger: " << i);
+      
+      DynamicTrigger* dt = dynamic_trigger_start();
+      // find the trigger for var, val.
+      dt=dt+(var*numvals)+(val-dom_min);
+      D_ASSERT(!dt->isAttached());
+      
+      vars[var].addDynamicTrigger(dt, DomainRemoval, val BT_CALL_BACKTRACK);
+  }
+  
+  void detach_trigger(int var, int val)
+  {
+      //P("Detach Triggers");
+      
+      D_ASSERT(supportsPerLit[var][val-dom_min] == 0);
+      
+      DynamicTrigger* dt = dynamic_trigger_start();
+      dt=dt+(var*numvals)+(val-dom_min);
+      releaseTrigger(stateObj, dt BT_CALL_BACKTRACK);
+  }
+    
   virtual void propagate(int prop_var, DomainDelta)
   {
     D_ASSERT(prop_var>=0 && prop_var<vars.size());
     // Really needs triggers on each value, or on the supports. 
     
     //printStructures();
+    D_ASSERT(!SupportsGACUseDT);  // Should not be here if using dynamic triggers.
     
     for(int val=dom_min; val<=dom_max; val++) {
         if(!vars[prop_var].inDomain(val) && supportsPerLit[prop_var][val-dom_min]>0) {
@@ -390,6 +436,17 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     }
     
     findSupports();
+  }
+  
+    virtual void propagate(DynamicTrigger* dt)
+  {
+      int pos=dt-dynamic_trigger_start();
+      int var=pos/numvals;
+      int val=pos-(var*numvals)+dom_min;
+      
+      updateCounters(var, val);
+      
+      findSupports();
   }
     
     ////////////////////////////////////////////////////////////////////////////
