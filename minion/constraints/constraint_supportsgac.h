@@ -98,8 +98,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     }
     
     void pop() {
-        cout << "BACKTRACKING:" << endl;
-        cout << backtrack_stack <<endl;
+        //cout << "BACKTRACKING:" << endl;
+        //cout << backtrack_stack <<endl;
         while(backtrack_stack.back().sup != 0) {
             BTRecord temp=backtrack_stack.back();
             backtrack_stack.pop_back();
@@ -112,7 +112,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         
         backtrack_stack.pop_back();  // Pop the marker.
-        cout << "END OF BACKTRACKING." << endl;
+        //cout << "END OF BACKTRACKING." << endl;
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -146,7 +146,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         vector<pair<int, int> >& litlist_internal=*(sup_internal->literals);
         
-        cout << "Adding support (internal) :" << litlist_internal << endl;
+        //cout << "Adding support (internal) :" << litlist_internal << endl;
         
         int litsize=litlist_internal.size();
         for(int i=0; i<litsize; i++) {
@@ -197,7 +197,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         vector<Support*>& prev=sup->prev;
         vector<Support*>& next=sup->next;
         vector<pair<int, int> >& litlist=*(sup->literals);
-        cout << "Removing support (internal) :" << litlist << endl;
+        //cout << "Removing support (internal) :" << litlist << endl;
         
         for(int i=0; i<litlist.size(); i++) {
             int var=litlist[i].first;
@@ -325,16 +325,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
     }
     
-    void print_partition() {
-        for(int i=0; i<supportNumPtrs.size()-1; i++) {
-            cout << "Variables with " << i << " supports:" << endl;
-            for(int j=supportNumPtrs[i]; j<supportNumPtrs[i+1]; j++) {
-                cout << varsPerSupport[j] << " ";
-            }
-            cout <<endl;
-        }
-    }
-    
     void findSupports()
     {
         // For each variable where the number of supports is equal to the total...
@@ -391,7 +381,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     D_ASSERT(prop_var>=0 && prop_var<vars.size());
     // Really needs triggers on each value, or on the supports. 
     
-    printStructures();
+    //printStructures();
     
     for(int val=dom_min; val<=dom_max; val++) {
         if(!vars[prop_var].inDomain(val) && supportsPerLit[prop_var][val-dom_min]>0) {
