@@ -71,65 +71,95 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     // Backtracking mechanism
     
+    struct BTRecord {
+        bool is_removal;   // removal or addition was made. 
+        Support* sup;
+        
+        friend std::ostream& operator<<(std::ostream& o, const BTRecord& rec)
+        {
+            if(rec.sup==0) return o<<"ZeroMarker";
+            o<<"BTRecord:"<<rec.is_removal<<",";
+            o<< *((*rec.sup).literals);
+            return o;
+        }
+    };
+    
+    vector<BTRecord> backtrack_stack;
+    
     // When deleting a support, the literal list goes on this stack. It is added back on backtracking. 
-    vector<vector<pair<int,int> >* > backtrack_stack_removals;
+    //vector<vector<pair<int,int> >* > backtrack_stack_removals;
     
     // When adding a support it goes on this stack. It is removed on backtracking.
-    vector<Support*> backtrack_stack_additions; 
+    //vector<Support*> backtrack_stack_additions; 
     
     void mark() {
-        backtrack_stack_removals.push_back(0);  // marker.
-        backtrack_stack_additions.push_back(0);
+        struct BTRecord temp = { false, 0 };
+        backtrack_stack.push_back(temp);  // marker.
     }
     
     void pop() {
-        while(backtrack_stack_removals.back()!=0) {
-            vector<pair<int,int> >* litlist=backtrack_stack_removals.back();
-            backtrack_stack_removals.pop_back();
-            addSupportInternal(litlist);
+        cout << "BACKTRACKING:" << endl;
+        cout << backtrack_stack <<endl;
+        while(backtrack_stack.back().sup != 0) {
+            BTRecord temp=backtrack_stack.back();
+            backtrack_stack.pop_back();
+            if(temp.is_removal) {
+                addSupportInternal(0, temp.sup);
+            }
+            else {
+                deleteSupportInternal(temp.sup, true);
+            }
         }
-        while(backtrack_stack_additions.back()!=0) {
-            Support* sup=backtrack_stack_additions.back();
-            backtrack_stack_additions.pop_back();
-            deleteSupportInternal(sup);
-        }
-        backtrack_stack_removals.pop_back();  // Pop the markers.
-        backtrack_stack_additions.pop_back();
+        
+        backtrack_stack.pop_back();  // Pop the marker.
+        cout << "END OF BACKTRACKING." << endl;
     }
     
     ////////////////////////////////////////////////////////////////////////////
     // Add and delete support
     
-    template<typename listtype>
-    Support* addSupport(listtype* litlist)
+    Support* addSupport(box<pair<int, DomainInt> >* litlist)
     {
-        Support* newsup=addSupportInternal(litlist);
-        backtrack_stack_additions.push_back(newsup);
+        Support* newsup=addSupportInternal(litlist, 0);
+        struct BTRecord temp;
+        temp.is_removal=false;
+        temp.sup=newsup;
+        backtrack_stack.push_back(temp);
         return newsup;
     }
     
-    template<typename listtype>
-    Support* addSupportInternal(listtype* litlist)
+    // Can take either a box or a support object (for use when backtracking). 
+    Support* addSupportInternal(box<pair<int, DomainInt> >* litbox, Support* sup)
     {
         // add a new support given as a vector of literals.
-        Support* newsup=getFreeSupport();
+        //Support* newsup=getFreeSupport();
+        Support* sup_internal;
         
-        newsup->literals->clear();
-        for(int i=0; i<litlist->size(); i++) newsup->literals->push_back((*litlist)[i]);
+        if(litbox!=0) {
+            // copy.
+            sup_internal=getFreeSupport();
+            sup_internal->literals->clear();
+            for(int i=0; i<litbox->size(); i++) sup_internal->literals->push_back((*litbox)[i]);
+        }
+        else {
+            sup_internal=sup;
+        }
+        vector<pair<int, int> >& litlist_internal=*(sup_internal->literals);
         
+        cout << "Adding support (internal) :" << litlist_internal << endl;
         
-        int litsize=litlist->size();
+        int litsize=litlist_internal.size();
         for(int i=0; i<litsize; i++) {
-            pair<int, int> temp=(*litlist)[i];
+            pair<int, int> temp=litlist_internal[i];
             int var=temp.first;
             int val=temp.second-dom_min;
             
             // Stitch it into supportListPerLit
-            newsup->prev[var]= &(supportListPerLit[var][val]);
-            newsup->next[var]= supportListPerLit[var][val].next[var];
-            supportListPerLit[var][val].next[var]=newsup;
-            if(newsup->next[var] != 0)
-                newsup->next[var]->prev[var]=newsup;
+            sup_internal->prev[var]= &(supportListPerLit[var][val]);
+            sup_internal->next[var]= supportListPerLit[var][val].next[var];
+            supportListPerLit[var][val].next[var]=sup_internal;
+            if(sup_internal->next[var] != 0)
+                sup_internal->next[var]->prev[var]=sup_internal;
             
             //update counters
             supportsPerVar[var]++;
@@ -143,27 +173,31 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         supports++;
         
-        return newsup;
+        return sup_internal;
     }
-    
-    // Need another stack of sups to be deleted on bt!
     
     void deleteSupport(Support* sup) {
-        deleteSupportInternal(sup);
-        // Swap the literal list in sup with a spare one.
-        // Put the one from sup onto the backtrack stack.
+        struct BTRecord temp;
+        temp.is_removal=true;
+        temp.sup=sup;
+        backtrack_stack.push_back(temp);
+        
+        deleteSupportInternal(sup, false);
+        // Copy the literals from sup into a spare list.
         vector<pair<int,int> >* spare=getFreeLitlist();
-        backtrack_stack_removals.push_back(sup->literals);
-        sup->literals=spare;
+        for(int i=0; i<sup->literals->size(); i++) {
+            spare->push_back((*(sup->literals))[i]);
+        }
     }
     
-    void deleteSupportInternal(Support* sup) {
+    void deleteSupportInternal(Support* sup, bool Backtracking) {
         D_ASSERT(sup!=0);
         
         // Remove sup from supportListPerLit
         vector<Support*>& prev=sup->prev;
         vector<Support*>& next=sup->next;
         vector<pair<int, int> >& litlist=*(sup->literals);
+        cout << "Removing support (internal) :" << litlist << endl;
         
         for(int i=0; i<litlist.size(); i++) {
             int var=litlist[i].first;
@@ -176,6 +210,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             // decrement counters
             supportsPerVar[var]--;
             supportsPerLit[var][litlist[i].second-dom_min]--;
+            D_ASSERT(supportsPerLit[var][litlist[i].second-dom_min] >= 0);
+            
             if(supportsPerLit[var][litlist[i].second-dom_min]==0)
                 zeroVals[var].push_back(litlist[i].second);
             
@@ -187,9 +223,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         supports--;
         
-        // Stick it on the free list using next[0] as the next ptr.
-        sup->next[0]=supportFreeList;
-        supportFreeList=sup;
+        if(Backtracking) {
+            // Can re-use the support when it is removed by BT. 
+            // Stick it on the free list using next[0] as the next ptr.
+            sup->next[0]=supportFreeList;
+            supportFreeList=sup;
+        }
+        // else can't re-use it because a ptr to it is on the BT stack. 
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -252,8 +292,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         cout << "supports:" << supports <<endl;
         cout << "supportsPerVar:" << supportsPerVar << endl;
         cout << "supportsPerLit:" << supportsPerLit << endl;
-        
-        
+        cout << "partition:" <<endl;
+        for(int i=0; i<supportNumPtrs.size()-1; i++) {
+            cout << "supports: "<< i<< "  vars: ";
+            for(int j=supportNumPtrs[i]; j<supportNumPtrs[i+1]; j++) {
+                cout << varsPerSupport[j]<< ", ";
+            }
+            cout << endl;
+            if(supportNumPtrs[i+1]==vars.size()) break;
+        }
+        cout << "zeroVals:" << zeroVals << endl;
         
     }
     
@@ -293,12 +341,20 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     restartloop:
         for(int i=supportNumPtrs[supports]; i<supportNumPtrs[supports+1]; i++) {
             int var=varsPerSupport[i];
-            while(zeroVals[var].size()!=0) {
-                int val=zeroVals[var].back(); zeroVals[var].pop_back();
+            //for(int j=0; j<zeroVals[var].size(); j++) {
+            //    int val=zeroVals[var][j];
+            for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
+                /*if(supportsPerLit[var][val-dom_min]>0) {
+                    // No longer a zero val. remove from vector.
+                    zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
+                    zeroVals[var].pop_back();
+                    continue;
+                }*/
+                
                 if(vars[var].inDomain(val) && supportsPerLit[var][val-dom_min]==0) {
                     // val has no support. Find a new one. 
                     typedef pair<int,DomainInt> temptype;
-                    MAKE_STACK_BOX(newsupportbox, temptype, vars.size());
+                    MAKE_STACK_BOX(newsupportbox, temptype, vars.size()); 
                     bool foundsupport=findNewSupport(newsupportbox, var, val);
                     
                     if(!foundsupport) {
@@ -330,32 +386,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     }
     
     
-  /*typedef typename VarArray::value_type VarRef;
-  virtual AbstractConstraint* reverse_constraint()
-  { // w-or of pairwise equality.
-      
-      /// solely for reify exps
-      return new CheckAssignConstraint<VarArray, GacAlldiffConstraint2>(stateObj, var_array, *this);
-      
-      vector<AbstractConstraint*> con;
-      for(int i=0; i<var_array.size(); i++)
-      {
-          for(int j=i+1; j<var_array.size(); j++)
-          {
-              EqualConstraint<VarRef, VarRef>* t=new EqualConstraint<VarRef, VarRef>(stateObj, var_array[i], var_array[j]);
-              con.push_back((AbstractConstraint*) t);
-          }
-      }
-      return new Dynamic_OR(stateObj, con);
-  }*/
-  
-  
   virtual void propagate(int prop_var, DomainDelta)
   {
     D_ASSERT(prop_var>=0 && prop_var<vars.size());
     // Really needs triggers on each value, or on the supports. 
-    
-    cout << "Entered propagate for supportsgac."<< endl;
     
     printStructures();
     
@@ -366,10 +400,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     }
     
     findSupports();
-    cout << "Leaving propagate for supportsgac."<< endl;
   }
     
+    ////////////////////////////////////////////////////////////////////////////
+    // Methods for pair-equals. a=b or c=d.
     
+    /*
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         // a=b or c=d
         D_ASSERT(vars[var].inDomain(val));
@@ -407,6 +443,80 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         return false;
     }
     
+    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    {
+      D_ASSERT(array_size == 4);
+      
+      if(v[0]==v[1] || v[2]==v[3]) return true;
+      return false;
+      
+    }*/
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // Methods for element
+    
+    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+        typedef typename VarArray::value_type VarRef;
+        VarRef idxvar=vars[vars.size()-2];
+        VarRef resultvar=vars[vars.size()-1];
+        D_ASSERT(vars[var].inDomain(val));
+        
+        if(var<vars.size()-2) {
+            // var is in the vector.
+            
+            for(int i=idxvar.getMin(); i<=idxvar.getMax(); i++) {
+                if(idxvar.inDomain(i) && i>=0 && i<vars.size()-2) {
+                    for(int j=resultvar.getMin(); j<=resultvar.getMax(); j++) {
+                        if(resultvar.inDomain(j) && vars[i].inDomain(j) &&
+                            (i!=var || j==val) ) {   // Either the support includes both var, val or neither -- if neither, it will be a support for var,val.
+                            assignment.push_back(make_pair(i, j));
+                            assignment.push_back(make_pair(vars.size()-2, i));
+                            assignment.push_back(make_pair(vars.size()-1, j));
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        else if(var==vars.size()-2) {
+            // It's the index variable.
+            if(val<0 || val>vars.size()-2){
+                return false;
+            }
+            
+            for(int i=resultvar.getMin(); i<=resultvar.getMax(); i++) {
+                if(resultvar.inDomain(i) && vars[val].inDomain(i)) {
+                    assignment.push_back(make_pair(vars.size()-2, val));
+                    assignment.push_back(make_pair(vars.size()-1, i));
+                    assignment.push_back(make_pair(val, i));
+                    return true;
+                }
+            }
+            
+        }
+        else if(var==vars.size()-1) {
+            // The result variable.
+            for(int i=0; i<vars.size()-2; i++) {
+                if(vars[i].inDomain(val) && idxvar.inDomain(i)) {
+                    assignment.push_back(make_pair(vars.size()-2, i));
+                    assignment.push_back(make_pair(vars.size()-1, val));
+                    assignment.push_back(make_pair(i, val));
+                    return true;
+                }
+            }
+        }
+        return false;
+        
+        
+    }
+    
+    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    {
+        int idx=v[array_size-2];
+        if(idx<0 || idx>=array_size-2) return false;
+        return v[v[array_size-2]] == v[array_size-1];
+    }
+    
     ////////////////////////////////////////////////////////////////////////////
     // Memory management.
     
@@ -435,66 +545,14 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         else {
             vector<pair<int,int> >* lits=litsFreeList.back();
             litsFreeList.pop_back();
+            lits->clear();
             return lits;
         }
     }
     
-    // Old from here.
-    /*
-  virtual BOOL full_check_unsat()
-  { 
-    int v_size = vars.size();
-    for(int i = 0; i < v_size; ++i)
+    virtual void full_propagate()
     {
-      if(var_array[i].isAssigned())
-      {
-      
-        for(int j = i + 1; j < v_size; ++j)
-        {
-          if(var_array[j].isAssigned())
-          {
-            if(var_array[i].getAssignedValue() == var_array[j].getAssignedValue())
-              return true;
-          }
-        }
-        
-      }
-    }
-    
-    return false;
-  }
-  
-  virtual BOOL check_unsat(int i, DomainDelta)
-  {
-    int v_size = var_array.size();
-    if(!var_array[i].isAssigned()) return false;
-    
-    DomainInt assign_val = var_array[i].getAssignedValue();
-    for(int loop = 0; loop < v_size; ++loop)
-    {
-      if(loop != i)
-      {
-        if(var_array[loop].isAssigned() && 
-           var_array[loop].getAssignedValue() == assign_val)
-        return true;
-      }
-    }
-    return false;
-  }*/
-  
-  virtual void full_propagate()
-  {
-      findSupports();
-  }
-  
-  
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
-    {
-      D_ASSERT(array_size == 4);
-      
-      if(v[0]==v[1] || v[2]==v[3]) return true;
-      return false;
-      
+        findSupports();
     }
     
     virtual vector<AnyVarRef> get_vars()
