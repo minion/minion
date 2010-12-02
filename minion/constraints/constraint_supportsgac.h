@@ -34,6 +34,20 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         // not include that variable. 
         
         vector<pair<int,int> >* literals;
+        
+        Support(int numvars) : literals(0)
+        {
+            prev.resize(numvars, 0);
+            next.resize(numvars, 0);
+            literals=new vector<pair<int, int> >();
+        }
+        
+        // Blank one for use as list header. Must resize next before use.
+        Support() : literals(0) {}
+        
+        ~Support() {
+            delete literals;
+        }
     };
     
     virtual string constraint_name()
@@ -70,7 +84,69 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     vector<int> supportNumPtrs;   // rd+1 indices into varsPerSupport representing the partition
     
     Support* supportFreeList;       // singly-linked list of spare Support objects.
-    vector< vector<pair<int,int> >* > litsFreeList;    // vector of spare vector<pair<int,int>> to use for storing lists of literals.
+    //vector< vector<pair<int,int> >* > litsFreeList;    // vector of spare vector<pair<int,int>> to use for storing lists of literals.
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // Ctor
+    
+    ShortSupportsGAC(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj), 
+    stateObj(_stateObj), vars(_var_array), supportFreeList(0)
+    {
+        // Register this with the backtracker.
+        getState(stateObj).getGenericBacktracker().add(this);
+        
+        dom_max=vars[0].getInitialMax();
+        dom_min=vars[0].getInitialMin();
+        for(int i=1; i<vars.size(); i++) {
+            if(vars[i].getInitialMin()<dom_min) dom_min=vars[i].getInitialMin();
+            if(vars[i].getInitialMax()>dom_max) dom_max=vars[i].getInitialMax();
+        }
+        numvals=dom_max-dom_min+1;
+        
+        // Initialise counters
+        supports=0;
+        supportsPerVar.resize(vars.size(), 0);
+        supportsPerLit.resize(vars.size());
+        for(int i=0; i<vars.size(); i++) supportsPerLit[i].resize(numvals, 0);
+        
+        supportListPerLit.resize(vars.size());
+        for(int i=0; i<vars.size(); i++) {
+            supportListPerLit[i].resize(numvals);  // blank Support objects.
+            for(int j=0; j<numvals; j++) supportListPerLit[i][j].next.resize(vars.size());
+        }
+        
+        zeroVals.resize(vars.size());
+        for(int i=0; i<vars.size(); i++) {
+            zeroVals[i].reserve(numvals);  // reserve the maximum length.
+            for(int j=dom_min; j<=dom_max; j++) zeroVals[i].push_back(j);
+        }
+        
+        // Partition
+        varsPerSupport.resize(vars.size());
+        varsPerSupInv.resize(vars.size());
+        for(int i=0; i<vars.size(); i++) {
+            varsPerSupport[i]=i;
+            varsPerSupInv[i]=i;
+        }
+        
+        // Start with 1 cell in partition, for 0 supports. 
+        supportNumPtrs.resize(vars.size()*numvals+1);
+        supportNumPtrs[0]=0;
+        for(int i=1; i<supportNumPtrs.size(); i++) supportNumPtrs[i]=vars.size();
+        
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // Dtor
+    
+    ~ShortSupportsGAC() {
+        // Go through supportFreeList
+        while(supportFreeList!=0) {
+            Support* sup=supportFreeList;
+            supportFreeList=sup->next[0];
+            delete sup;
+        }
+    }
     
     ////////////////////////////////////////////////////////////////////////////
     // Backtracking mechanism
@@ -192,11 +268,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         backtrack_stack.push_back(temp);
         
         deleteSupportInternal(sup, false);
-        // Copy the literals from sup into a spare list.
-        vector<pair<int,int> >* spare=getFreeLitlist();
-        for(int i=0; i<sup->literals->size(); i++) {
-            spare->push_back((*(sup->literals))[i]);
-        }
     }
     
     void deleteSupportInternal(Support* sup, bool Backtracking) {
@@ -244,58 +315,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             supportFreeList=sup;
         }
         // else can't re-use it because a ptr to it is on the BT stack. 
-    }
-    
-    ////////////////////////////////////////////////////////////////////////////
-    // Ctor
-    
-    ShortSupportsGAC(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj), 
-    stateObj(_stateObj), vars(_var_array)
-    {
-        // Register this with the backtracker.
-        getState(stateObj).getGenericBacktracker().add(this);
-        
-        dom_max=vars[0].getInitialMax();
-        dom_min=vars[0].getInitialMin();
-        for(int i=1; i<vars.size(); i++) {
-            if(vars[i].getInitialMin()<dom_min) dom_min=vars[i].getInitialMin();
-            if(vars[i].getInitialMax()>dom_max) dom_max=vars[i].getInitialMax();
-        }
-        numvals=dom_max-dom_min+1;
-        
-        // Initialise counters
-        supports=0;
-        supportsPerVar.resize(vars.size(), 0);
-        supportsPerLit.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) supportsPerLit[i].resize(numvals, 0);
-        
-        supportListPerLit.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) {
-            supportListPerLit[i].resize(numvals);  // blank Support objects.
-            for(int j=0; j<numvals; j++) {
-                supportListPerLit[i][j].next.resize(vars.size());
-            }
-        }
-        
-        zeroVals.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) {
-            zeroVals[i].reserve(numvals);  // reserve the maximum length.
-            for(int j=dom_min; j<=dom_max; j++) zeroVals[i].push_back(j);
-        }
-        
-        // Partition
-        varsPerSupport.resize(vars.size());
-        varsPerSupInv.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) {
-            varsPerSupport[i]=i;
-            varsPerSupInv[i]=i;
-        }
-        
-        // Start with 1 cell in partition, for 0 supports. 
-        supportNumPtrs.resize(vars.size()*numvals+1);
-        supportNumPtrs[0]=0;
-        for(int i=1; i<supportNumPtrs.size(); i++) supportNumPtrs[i]=vars.size();
-        
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -570,11 +589,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     Support* getFreeSupport() {
         // Either get a Support off the free list or make one.
         if(supportFreeList==0) {
-            Support* sup=new Support();
-            sup->next.resize(vars.size(), 0);
-            sup->prev.resize(vars.size(), 0);
-            sup->literals=getFreeLitlist();
-            return sup;
+            return new Support(vars.size());
         }
         else {
             Support* temp=supportFreeList;
@@ -583,7 +598,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
     }
     
-    vector<pair<int,int> >* getFreeLitlist() {
+    /*vector<pair<int,int> >* getFreeLitlist() {
         // Either get a spare literal list off the free list or make one.
         if(litsFreeList.size()==0) {
             vector<pair<int,int> >* lits=new vector<pair<int,int> >();
@@ -595,7 +610,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             lits->clear();
             return lits;
         }
-    }
+    }*/
     
     virtual void full_propagate()
     {
