@@ -211,7 +211,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 addSupportInternal(0, temp.sup);
             }
             else {
-                deleteSupportInternal(temp.sup, true);
+                //deleteSupportInternal(temp.sup, true);
             }
         }
         
