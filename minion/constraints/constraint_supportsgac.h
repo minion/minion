@@ -139,7 +139,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     // Dtor
     
     virtual ~ShortSupportsGAC() {
-        printStructures();
+        //printStructures();
         // Go through supportFreeList
         for(int var=0; var<vars.size(); var++) {
             for(int val=dom_min; val<=dom_max; val++) {
