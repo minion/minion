@@ -47,7 +47,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         Support() : literals(0) {}
         
         virtual ~Support() {
-            //delete literals;
+            delete literals;
         }
     };
     
@@ -82,11 +82,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     vector<int> varsPerSupport;    // Permutation of the variables
     vector<int> varsPerSupInv;   // Inverse mapping of the above.
     
-    
     vector<int> supportNumPtrs;   // rd+1 indices into varsPerSupport representing the partition
     
     Support* supportFreeList;       // singly-linked list of spare Support objects.
-    //vector< vector<pair<int,int> >* > litsFreeList;    // vector of spare vector<pair<int,int>> to use for storing lists of literals.
     
     ////////////////////////////////////////////////////////////////////////////
     // Ctor
@@ -145,6 +143,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     virtual ~ShortSupportsGAC() {
         //printStructures();
+        
         // Go through supportFreeList
         for(int var=0; var<vars.size(); var++) {
             for(int val=dom_min; val<=dom_max; val++) {
@@ -174,6 +173,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             Support* sup=supportFreeList;
             supportFreeList=sup->next[0];
             delete sup;
+        }
+        
+        for(int i=0; i<backtrack_stack.size(); i++) {
+            if(backtrack_stack[i].is_removal) {
+                delete backtrack_stack[i].sup;
+            }
         }
     }
     
@@ -667,20 +672,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             return temp;
         }
     }
-    
-    /*vector<pair<int,int> >* getFreeLitlist() {
-        // Either get a spare literal list off the free list or make one.
-        if(litsFreeList.size()==0) {
-            vector<pair<int,int> >* lits=new vector<pair<int,int> >();
-            return lits;
-        }
-        else {
-            vector<pair<int,int> >* lits=litsFreeList.back();
-            litsFreeList.pop_back();
-            lits->clear();
-            return lits;
-        }
-    }*/
     
     virtual void full_propagate()
     {
