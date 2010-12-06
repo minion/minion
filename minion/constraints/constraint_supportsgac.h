@@ -423,6 +423,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     // No longer a zero val. remove from vector.
                     zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
                     zeroVals[var].pop_back();
+                    j--;
                     continue;
                 }
                 
