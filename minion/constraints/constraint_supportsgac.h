@@ -22,6 +22,7 @@
 // Does it place dynamic triggers for the supports.
 #define SupportsGACUseDT true
 
+#define SupportsGACUseZeroVals false
 
 template<typename VarArray>
 struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
@@ -73,7 +74,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     // For each variable, a vector of values with 0 supports (or had 0 supports
     // when added to the vector).
+    #if SupportsGACUseZeroVals
     vector<vector<int> > zeroVals;
+    #endif
     
     // Partition of variables by number of supports.
     vector<int> varsPerSupport;    // Permutation of the variables
@@ -114,11 +117,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             for(int j=0; j<numvals; j++) supportListPerLit[i][j].next.resize(vars.size());
         }
         
+        #if SupportsGACUseZeroVals
         zeroVals.resize(vars.size());
         for(int i=0; i<vars.size(); i++) {
             zeroVals[i].reserve(numvals);  // reserve the maximum length.
             for(int j=dom_min; j<=dom_max; j++) zeroVals[i].push_back(j);
         }
+        #endif
         
         // Partition
         varsPerSupport.resize(vars.size());
@@ -319,10 +324,11 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             supportsPerLit[var][litlist[i].second-dom_min]--;
             D_ASSERT(supportsPerLit[var][litlist[i].second-dom_min] >= 0);
             
+            #if SupportsGACUseZeroVals
             if(supportsPerLit[var][litlist[i].second-dom_min]==0) {
-                // TAKEN OUT because zeroVals is not being used yet.
                 zeroVals[var].push_back(litlist[i].second);
             }
+            #endif
             
             // Remove trigger if this is the last support containing var,val.
             if(SupportsGACUseDT && supportsPerLit[var][litlist[i].second-dom_min]==0) {
@@ -365,7 +371,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             cout << endl;
             if(supportNumPtrs[i+1]==vars.size()) break;
         }
+        #if SupportsGACUseZeroVals
         cout << "zeroVals:" << zeroVals << endl;
+        #endif
         
         cout << "Supports for each literal:"<<endl;
         for(int var=0; var<vars.size(); var++) {
@@ -416,9 +424,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     restartloop:
         for(int i=supportNumPtrs[supports]; i<supportNumPtrs[supports+1]; i++) {
             int var=varsPerSupport[i];
+            
+            #if !SupportsGACUseZeroVals
+            for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
+            #else
             for(int j=0; j<zeroVals[var].size(); j++) {
                 int val=zeroVals[var][j];
-            //for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
                 if(supportsPerLit[var][val-dom_min]>0) {
                     // No longer a zero val. remove from vector.
                     zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
@@ -426,6 +437,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     j--;
                     continue;
                 }
+            #endif
                 
                 if(vars[var].inDomain(val) && supportsPerLit[var][val-dom_min]==0) {
                     // val has no support. Find a new one. 
@@ -439,11 +451,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     else {
                         addSupport(&newsupportbox);
                         
+                        #if SupportsGACUseZeroVals
                         if(supportsPerLit[var][val-dom_min]>0) {
                             // No longer a zero val. remove from vector.
                             zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
                             zeroVals[var].pop_back();
                         }
+                        #endif
                         
                         // supports has changed and so has supportNumPtrs so start again. 
                         // Tail recursion might be optimised?
