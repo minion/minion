@@ -321,7 +321,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             if(supportsPerLit[var][litlist[i].second-dom_min]==0) {
                 // TAKEN OUT because zeroVals is not being used yet.
-                //zeroVals[var].push_back(litlist[i].second);
+                zeroVals[var].push_back(litlist[i].second);
             }
             
             // Remove trigger if this is the last support containing var,val.
@@ -416,15 +416,15 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     restartloop:
         for(int i=supportNumPtrs[supports]; i<supportNumPtrs[supports+1]; i++) {
             int var=varsPerSupport[i];
-            //for(int j=0; j<zeroVals[var].size(); j++) {
-            //    int val=zeroVals[var][j];
-            for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
-                /*if(supportsPerLit[var][val-dom_min]>0) {
+            for(int j=0; j<zeroVals[var].size(); j++) {
+                int val=zeroVals[var][j];
+            //for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
+                if(supportsPerLit[var][val-dom_min]>0) {
                     // No longer a zero val. remove from vector.
                     zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
                     zeroVals[var].pop_back();
                     continue;
-                }*/
+                }
                 
                 if(vars[var].inDomain(val) && supportsPerLit[var][val-dom_min]==0) {
                     // val has no support. Find a new one. 
@@ -437,6 +437,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     }
                     else {
                         addSupport(&newsupportbox);
+                        
+                        if(supportsPerLit[var][val-dom_min]>0) {
+                            // No longer a zero val. remove from vector.
+                            zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
+                            zeroVals[var].pop_back();
+                        }
                         
                         // supports has changed and so has supportNumPtrs so start again. 
                         // Tail recursion might be optimised?
