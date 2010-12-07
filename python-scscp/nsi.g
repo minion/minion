@@ -263,7 +263,7 @@ NewSmallestImage := function(g,set,k,skip_func)
         return num;
     end;
                  
-    n := LargestMovedPoint(g);
+    n := Maximum(LargestMovedPoint(g), Maximum(set));
     s := StabChainMutable(g);
     l := Action(k,set);
     m := Length(set);
