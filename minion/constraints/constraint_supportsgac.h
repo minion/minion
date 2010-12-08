@@ -36,21 +36,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         // Prev and next are indexed by variable. Must be Null if the support does
         // not include that variable. 
         
-        vector<pair<int,int> >* literals;
+        vector<pair<int,int> > literals;
         
-        Support(int numvars) : literals(0)
+        Support(int numvars)
         {
             prev.resize(numvars, 0);
             next.resize(numvars, 0);
-            literals=new vector<pair<int, int> >();
         }
         
         // Blank one for use as list header. Must resize next before use.
-        Support() : literals(0) {}
-        
-        virtual ~Support() {
-            delete literals;
-        }
+        Support() {}
     };
     
     virtual string constraint_name()
@@ -153,7 +148,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 while(sup!=0) {
                     vector<Support*>& prev=sup->prev;
                     vector<Support*>& next=sup->next;
-                    vector<pair<int, int> >& litlist=*(sup->literals);
+                    vector<pair<int, int> >& litlist=sup->literals;
                     // Unstitch supList from all lists it is in.
                     for(int i=0; i<litlist.size(); i++) {
                         int var=litlist[i].first;
@@ -195,7 +190,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         {
             if(rec.sup==0) return o<<"ZeroMarker";
             o<<"BTRecord:"<<rec.is_removal<<",";
-            o<< *((*rec.sup).literals);
+            o<< rec.sup->literals;
             return o;
         }
     };
@@ -247,13 +242,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         if(litbox!=0) {
             // copy.
             sup_internal=getFreeSupport();
-            sup_internal->literals->clear();
-            for(int i=0; i<litbox->size(); i++) sup_internal->literals->push_back((*litbox)[i]);
+            sup_internal->literals.clear();
+            for(int i=0; i<litbox->size(); i++) sup_internal->literals.push_back((*litbox)[i]);
         }
         else {
             sup_internal=sup;
         }
-        vector<pair<int, int> >& litlist_internal=*(sup_internal->literals);
+        vector<pair<int, int> >& litlist_internal=sup_internal->literals;
         
         //cout << "Adding support (internal) :" << litlist_internal << endl;
         D_ASSERT(litlist_internal.size()>0);  // It should be possible to deal with empty supports, but currently they wil
@@ -309,7 +304,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         // Remove sup from supportListPerLit
         vector<Support*>& prev=sup->prev;
         vector<Support*>& next=sup->next;
-        vector<pair<int, int> >& litlist=*(sup->literals);
+        vector<pair<int, int> >& litlist=sup->literals;
         //cout << "Removing support (internal) :" << litlist << endl;
         
         for(int i=0; i<litlist.size(); i++) {
@@ -383,10 +378,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 cout << "Value: "<<val<<endl;
                 Support* sup=supportListPerLit[var][val-dom_min].next[var];
                 while(sup!=0) {
-                    cout << "Support: " << *(sup->literals) << endl;
+                    cout << "Support: " << sup->literals << endl;
                     bool contains_varval=false;
-                    for(int i=0; i<sup->literals->size(); i++) {
-                        if((*(sup->literals))[i].first==var && (*(sup->literals))[i].second==val)
+                    for(int i=0; i<sup->literals.size(); i++) {
+                        if(sup->literals[i].first==var && sup->literals[i].second==val)
                             contains_varval=true;
                     }
                     D_ASSERT(contains_varval);
