@@ -17,14 +17,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// The algorithm iGAC or short-supports-gac
+// GAC Schema implementation, adapted from Supports GAC.
 
 // Does it place dynamic triggers for the supports.
 #define SupportsGACUseDT true
-
-// Switches on the zeroVals array. Possibly 
-// This flag is a slowdown on qg-supportsgac-7-9
-#define SupportsGACUseZeroVals false
 
 template<typename VarArray>
 struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
@@ -32,6 +28,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     struct Support {
         vector<Support*> prev;   // Size r -- some entries null.
         vector<Support*> next;   
+        
+        int id;
         
         // Prev and next are indexed by variable. Must be Null if the support does
         // not include that variable. 
@@ -55,7 +53,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     virtual string constraint_name()
     {
-        return "ShortSupportsGAC";
+        return "GACSchema";
     }
     
     VarArray vars;
@@ -64,27 +62,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     int dom_min;
     int dom_max;
     
-    // Counters
-    int supports;   // 0 to rd.  
-    vector<int> supportsPerVar;
-    vector<vector<int> > supportsPerLit;
-    
     // 2d array (indexed by var then val) of sentinels,
     // at the head of list of supports. 
     // Needs a sentinel at the start so that dlx-style removals work correctly.
     vector<vector<Support> >  supportListPerLit;
     
-    // For each variable, a vector of values with 0 supports (or had 0 supports
-    // when added to the vector).
-    #if SupportsGACUseZeroVals
-    vector<vector<int> > zeroVals;
-    #endif
-    
-    // Partition of variables by number of supports.
-    vector<int> varsPerSupport;    // Permutation of the variables
-    vector<int> varsPerSupInv;   // Inverse mapping of the above.
-    
-    vector<int> supportNumPtrs;   // rd+1 indices into varsPerSupport representing the partition
+    vector<vector<pair<int, int> > > litsPerSupport;  // The structure S from paper.
+    // Maps a support (number) to the values that it is the current support for. 
     
     Support* supportFreeList;       // singly-linked list of spare Support objects.
     
@@ -105,38 +89,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         numvals=dom_max-dom_min+1;
         
-        // Initialise counters
-        supports=0;
-        supportsPerVar.resize(vars.size(), 0);
-        supportsPerLit.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) supportsPerLit[i].resize(numvals, 0);
-        
         supportListPerLit.resize(vars.size());
         for(int i=0; i<vars.size(); i++) {
             supportListPerLit[i].resize(numvals);  // blank Support objects.
             for(int j=0; j<numvals; j++) supportListPerLit[i][j].next.resize(vars.size());
         }
         
-        #if SupportsGACUseZeroVals
-        zeroVals.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) {
-            zeroVals[i].reserve(numvals);  // reserve the maximum length.
-            for(int j=dom_min; j<=dom_max; j++) zeroVals[i].push_back(j);
-        }
-        #endif
-        
-        // Partition
-        varsPerSupport.resize(vars.size());
-        varsPerSupInv.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) {
-            varsPerSupport[i]=i;
-            varsPerSupInv[i]=i;
-        }
-        
-        // Start with 1 cell in partition, for 0 supports. 
-        supportNumPtrs.resize(vars.size()*numvals+1);
-        supportNumPtrs[0]=0;
-        for(int i=1; i<supportNumPtrs.size(); i++) supportNumPtrs[i]=vars.size();
         
     }
     
@@ -190,6 +148,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     struct BTRecord {
         bool is_removal;   // removal or addition was made. 
         Support* sup;
+        int var;   // The literal, for when it's a removal. 
+        int val;
         
         friend std::ostream& operator<<(std::ostream& o, const BTRecord& rec)
         {
@@ -203,7 +163,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     vector<BTRecord> backtrack_stack;
     
     void mark() {
-        struct BTRecord temp = { false, 0 };
+        struct BTRecord temp = { false, 0, 0, 0 };
         backtrack_stack.push_back(temp);  // marker.
     }
     
@@ -214,7 +174,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             BTRecord temp=backtrack_stack.back();
             backtrack_stack.pop_back();
             if(temp.is_removal) {
-                addSupportInternal(0, temp.sup);
+                // The thing was removed from one list, re-insert it into that list.
+                addSupportInternal(0, temp.sup, temp.var, temp.val);
             }
             else {
                 deleteSupportInternal(temp.sup, true);
@@ -237,6 +198,20 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         backtrack_stack.push_back(temp);
         return newsup;
     }
+    
+    // For use by the backtracker.
+    inline Support* addSupportInternal(Support* sup, int var, int val)
+    {
+        // Adds sup to the list for var, val only.
+        int validx=val-dom_min;
+        
+        sup->prev[var]= &(supportListPerLit[var][validx]);
+        sup->next[var]= supportListPerLit[var][validx].next[var];
+        supportListPerLit[var][validx].next[var]=sup;
+        if(sup->next[var] != 0)
+            sup->next[var]->prev[var]=sup;
+    }
+    
     
     // Can take either a box or a support object (for use when backtracking). 
     Support* addSupportInternal(box<pair<int, DomainInt> >* litbox, Support* sup)
@@ -272,25 +247,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             if(sup_internal->next[var] != 0)
                 sup_internal->next[var]->prev[var]=sup_internal;
             
-            //update counters
-            supportsPerVar[var]++;
-            supportsPerLit[var][val]++;
-            
-            // Attach trigger if this is the first support containing var,val.
-            if(SupportsGACUseDT && supportsPerLit[var][val]==1) {
-                attach_trigger(var, val+dom_min);
-            }
-            
-            // Update partition
-            // swap var to the end of its cell.
-            partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]]-1]);
-            // Move the boundary so var is now in the higher cell.
-            supportNumPtrs[supportsPerVar[var]]--;
         }
-        supports++;
-        
-        //printStructures();
-        
         return sup_internal;
     }
     
@@ -355,26 +312,29 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         // else can't re-use it because a ptr to it is on the BT stack. 
     }
     
+    void deleteSupport(Support* sup, int var, int val)
+    {
+        // Deletes sup from the list for var, val only.
+        struct BTRecord temp;
+        temp.is_removal=true;
+        temp.sup=sup;
+        temp.var=var;
+        temp.val=val;
+        backtrack_stack.push_back(temp);
+        
+        sup->prev[var]->next[var]=sup->next[var];
+        if(sup->next[var]!=0) {
+            sup->next[var]->prev[var]=sup->prev[var];
+        }
+        
+    }
+    
+    
     ////////////////////////////////////////////////////////////////////////////
     // 
     void printStructures()
     {
         cout << "PRINTING ALL DATA STRUCTURES" <<endl;
-        cout << "supports:" << supports <<endl;
-        cout << "supportsPerVar:" << supportsPerVar << endl;
-        cout << "supportsPerLit:" << supportsPerLit << endl;
-        cout << "partition:" <<endl;
-        for(int i=0; i<supportNumPtrs.size()-1; i++) {
-            cout << "supports: "<< i<< "  vars: ";
-            for(int j=supportNumPtrs[i]; j<supportNumPtrs[i+1]; j++) {
-                cout << varsPerSupport[j]<< ", ";
-            }
-            cout << endl;
-            if(supportNumPtrs[i+1]==vars.size()) break;
-        }
-        #if SupportsGACUseZeroVals
-        cout << "zeroVals:" << zeroVals << endl;
-        #endif
         
         cout << "Supports for each literal:"<<endl;
         for(int var=0; var<vars.size(); var++) {
@@ -394,28 +354,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     sup=sup->next[var];
                 }
             }
-        }
-    }
-    
-    #if !SupportsGACUseDT
-        virtual triggerCollection setup_internal()
-        {
-            triggerCollection t;
-            int array_size = vars.size();
-            for(int i = 0; i < array_size; ++i)
-              t.push_back(make_trigger(vars[i], Trigger(this, i), DomainChanged));
-            return t;
-        }
-    #endif
-    
-    void partition_swap(int xi, int xj)
-    {
-        if(xi != xj) {
-            varsPerSupport[varsPerSupInv[xj]]=xi;
-            varsPerSupport[varsPerSupInv[xi]]=xj;
-            int temp=varsPerSupInv[xi];
-            varsPerSupInv[xi]=varsPerSupInv[xj];
-            varsPerSupInv[xj]=temp;
         }
     }
     
@@ -481,12 +419,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
     }
     
-    
-    #if SupportsGACUseDT
-        int dynamic_trigger_count() { 
-            return vars.size()*numvals;
-        }
-    #endif
+    int dynamic_trigger_count() { 
+        return vars.size()*numvals;
+    }
     
   inline void attach_trigger(int var, int val)
   {
@@ -497,38 +432,11 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
       dt=dt+(var*numvals)+(val-dom_min);
       D_ASSERT(!dt->isAttached());
       
-      vars[var].addDynamicTrigger(dt, DomainRemoval, val );   //BT_CALL_BACKTRACK
+      vars[var].addDynamicTrigger(dt, DomainRemoval, val );
   }
   
-  inline void detach_trigger(int var, int val)
-  {
-      //P("Detach Triggers");
-      
-      D_ASSERT(supportsPerLit[var][val-dom_min] == 0);
-      
-      DynamicTrigger* dt = dynamic_trigger_start();
-      dt=dt+(var*numvals)+(val-dom_min);
-      releaseTrigger(stateObj, dt );   // BT_CALL_BACKTRACK
-  }
-    
-  virtual void propagate(int prop_var, DomainDelta)
-  {
-    D_ASSERT(prop_var>=0 && prop_var<vars.size());
-    // Really needs triggers on each value, or on the supports. 
-    
-    //printStructures();
-    D_ASSERT(!SupportsGACUseDT);  // Should not be here if using dynamic triggers.
-    
-    for(int val=dom_min; val<=dom_max; val++) {
-        if(!vars[prop_var].inDomain(val) && supportsPerLit[prop_var][val-dom_min]>0) {
-            updateCounters(prop_var, val);
-        }
-    }
-    
-    findSupports();
-  }
   
-    virtual void propagate(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt)
   {
       int pos=dt-dynamic_trigger_start();
       int var=pos/numvals;
@@ -660,11 +568,15 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     Support* getFreeSupport() {
         // Either get a Support off the free list or make one.
         if(supportFreeList==0) {
-            return new Support(vars.size());
+            Support* sp= new Support(vars.size());
+            sp.id=litsPerSupport.size();
+            vector<pair<int,int> > temp;
+            litsPerSupport.push_back(temp);
         }
         else {
             Support* temp=supportFreeList;
             supportFreeList=supportFreeList->next[0];
+            litsPerSupport[temp.id].clear();
             return temp;
         }
     }
@@ -682,6 +594,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         ret.push_back(vars[i]);
       return ret;
     }
+    
+    
+    Support* seekInferableSupport
+    
 };  // end of class
 
 
