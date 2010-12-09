@@ -32,15 +32,19 @@ struct VMConstraint : public AbstractConstraint
   { return "VMConstraint"; }
 
   typedef typename VarArray::value_type VarRef;
-  VarArray vars;
+  array<VarRef, 10> vars;
 
   int* VM_data;
   int VM_size;
 
   VMConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
-  AbstractConstraint(stateObj), vars(_vars), 
+  AbstractConstraint(stateObj), 
   VM_data(_tuples->getPointer()), VM_size(_tuples->tuple_size())
   {
+      if(_vars.size() != 10)
+	  FAIL_EXIT("Invalid constraint length");
+      for(int i = 0; i < _vars.size(); ++i)
+	vars[i] = _vars[i];
       if(_tuples->size() != 1)
       {
           cout << "VM takes a single tuple" << endl;
@@ -101,8 +105,6 @@ struct VMConstraint : public AbstractConstraint
     int InPtr = 0;
     while(true)
     {
-        if(InPtr == -3)
-            return;
         switch(get(InPtr))
         {
             case -1000:
@@ -125,10 +127,14 @@ struct VMConstraint : public AbstractConstraint
                         InPtr = get(InPtr+2);
                 else
                         InPtr = get(InPtr+3);
+		if(InPtr == -3)
+			return;
             }
             break;
             case -1100:
                     InPtr = get(InPtr+1);
+		if(InPtr == -3)
+			return;
             break;
             case -2000:
                     FAIL_EXIT("Attempt to use 'perm' instruction in vm. Use vmsym");
@@ -214,7 +220,7 @@ struct VMConstraint : public AbstractConstraint
 
   virtual void full_propagate()
   {
-    if(UseSymmetricVIM)
+    if(UseSymmetricVM)
       execute_symmetric_vm(VM_data, VM_size); 
     else
       execute_vm(VM_data, VM_size);
