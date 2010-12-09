@@ -25,7 +25,7 @@
 //#define P(x) cout << x << endl
 #define P(x)
 
-template<typename VarArray>
+template<typename VarArray, bool UseSymmetricVM>
 struct VMConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
@@ -130,6 +130,8 @@ struct VMConstraint : public AbstractConstraint
             case -1100:
                     InPtr = get(InPtr+1);
             break;
+            case -2000:
+                    FAIL_EXIT("Attempt to use 'perm' instruction in vm. Use vmsym");
             default:
               FAIL_EXIT("Invalid VM Instruction");
         }
@@ -211,7 +213,12 @@ struct VMConstraint : public AbstractConstraint
 #undef get
 
   virtual void full_propagate()
-  { execute_symmetric_vm(VM_data, VM_size); }
+  {
+    if(UseSymmetricVIM)
+      execute_symmetric_vm(VM_data, VM_size); 
+    else
+      execute_vm(VM_data, VM_size);
+  }
 
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
@@ -231,5 +238,9 @@ struct VMConstraint : public AbstractConstraint
 template<typename VarArray>
 AbstractConstraint*
   VMCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
-  { return new VMConstraint<VarArray>(stateObj, vars, tuples); }
+  { return new VMConstraint<VarArray,false>(stateObj, vars, tuples); }
 
+  template<typename VarArray>
+AbstractConstraint*
+  VMSymCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
+  { return new VMConstraint<VarArray,true>(stateObj, vars, tuples); }
