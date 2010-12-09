@@ -11,7 +11,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply" "reifyimply-old"
                     "reifyimply-new" "true" "false" "check[gsa]" "check[assign]"
-                    "watchvecexists_less" "lighttable" "test"
+                    "watchvecexists_less" "lighttable" "test" "vm"
                     )
 
 set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
@@ -145,6 +145,9 @@ set(NAME_READ_negativetable "read_list" "read_tuples")
 
 set(NAME_ID_lighttable "CT_LIGHTTABLE")
 set(NAME_READ_lighttable "read_list" "read_tuples")
+
+set(NAME_ID_vm "CT_VM")
+set(NAME_READ_vm "read_list" "read_tuples")
 
 set(NAME_ID_watchvecneq "CT_WATCHED_VECNEQ")
 set(NAME_READ_watchvecneq "read_list" "read_list")

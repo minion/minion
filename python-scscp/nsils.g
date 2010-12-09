@@ -1,6 +1,7 @@
-MapListList := function(L,p)
+
+MapListSet := function(L,p)
   local x, y;
-  return List(L, x -> (List(x, y -> y^p)));
+  return List(L, x -> List(Set(x, y -> y^p)) );
 end;
   
 NewSmallestImageList := function(G, L)
@@ -14,6 +15,15 @@ NewSmallestImageList := function(G, L)
   conj   := ConjugateGroup(stab, mapper);
   Limage := List(L{[2..Length(L)]}, x -> (List(x, y -> y^mapper)));
   perm   := NewSmallestImageList(conj, Limage);
-  return [ mapper*perm[1], stab, image, mapper, conj, Limage, perm, MapListList(L, mapper*perm[1])];
+  return [ mapper*perm[1], stab, image, mapper, conj, Limage, perm];
+end;
+
+
+CAJ_MinListImage := function(perms, L)
+  local g, ret;
+  g := Group(List(perms, PermList));
+  ret := NewSmallestImageList(g, L);
+  return [ListPerm(ret[1]), MapListSet(L, ret[1])];
+
 end;
 

@@ -262,7 +262,11 @@ NewSmallestImage := function(g,set,k,skip_func)
         Add(orbsizes,Length(q));
         return num;
     end;
-                 
+    
+    if set = [] then
+      return [ [], k];
+    fi;
+
     n := Maximum(LargestMovedPoint(g), Maximum(set));
     s := StabChainMutable(g);
     l := Action(k,set);

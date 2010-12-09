@@ -55,14 +55,24 @@ def read_listint(arg):
     if arg.tag == "OMI":
         return int(arg.text)
     if arg.tag == "OMA":
-        assert ( arg[0].tag == "OMS" and arg[0].attrib == { "cd":"list1","name":"list" } )
+        assert ( arg[0].tag == "OMS" and
+                           ( arg[0].attrib == { "cd":"list1","name":"list" } or
+                             arg[0].attrib == { "cd":"linalg2", "name":"matrix" } or
+                             arg[0].attrib == { "cd":"linalg2", "name":"matrixrow" } or
+                             arg[0].attrib == { "cd":"set1", "name":"set" } ) )
         list = []
         for i in arg[1:]:
           list += [read_listint(i)]
         return list
+    if arg.tag == "OMS":
+        assert arg.attrib == { "cd":"set1", "name":"emptyset" }
+        return []
     assert 0, "Do not understand " + str(arg)
 
-def make_procedure_call(proc_name, args) :
+def parse_reply(arg, check_cd = True):
+    return read_listint(arg[0][1][1])
+
+def build_call(proc_name, args) :
     OBJbase = et.Element("OMOBJ")
     OBJbase.append(et.Element("OMATTR"))
     OBJbase[0].append(OMATP_node())
@@ -89,26 +99,25 @@ def read_reply(socket) :
         line = str(file.readline()).strip()
     return outline
 
-def make_scscp_connection():
+def make_connection():
     scscp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     scscp_socket.connect(("localhost", 26133))
     opening_string = scscp_socket.makefile().readline()
-    print opening_string
     scscp_socket.sendall('<?scscp scscp_version="1.3" ?>\n')
     opening_string = scscp_socket.makefile().readline()
-    print opening_string
     return scscp_socket
 
-scscp_socket = make_scscp_connection()
-group = group_node([[1,3,2],[4,2,3,1]])
-command = '\n<?scscp start ?>\n' + et.tostring(make_procedure_call("WS_Join",[listint_node([3,4]), listint_node([3,2,6,[2,3]])])) + '\n<?scscp end ?>\n'
-print command
-scscp_socket.sendall(command)
+def execute(socket, proc):
+    command = '\n<?scscp start ?>\n' + et.tostring(proc) + '\n<?scscp end ?>\n'
+    socket.sendall(command)
+    return et.fromstring(read_reply(socket))
 
-replystring = read_reply(scscp_socket)
+if __name__ == '__main__':
+  scscp_socket = make_connection()
+  group = group_node([[1,3,2],[4,2,3,1]])
+  command = build_call("CAJ_MinImage",[listint_node([[2,1],[2,3,4,5,6,1]]), listint_node([[4,6],[2,5,3]]) ] )
+  print command
+  reply = execute(scscp_socket, command)
+  et.dump(reply)
+  print(parse_reply(reply))
 
-reply = et.fromstring(replystring)
-
-et.dump(reply)
-
-print read_listint(reply[0][1][1])

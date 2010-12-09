@@ -14,6 +14,42 @@ import copy
 import sys
 import cProfile
 import random
+sys.path.append("../python-scscp")
+from perms import GetMinimalImage, ValuePerm, VariablePerm, InvPerm, MultPerm, PadPerm
+
+nodenumcounter = 0
+domainsize = -1
+litcount   = -1
+
+def getnodenum():
+    global nodenumcounter
+    nodenumcounter+=1
+    return nodenumcounter
+
+Group = [[1,2,3]]
+MinimalImages = {}
+
+def adddomain(indom, maybedom, nodenum):
+    assert(domainsize>0)
+    global MinimalImages
+    gap_indom = []
+    gap_maybedom = []
+
+    for i in range(0, len(indom)):
+        for j in indom[i]:
+            gap_indom += [j + 1 + i*domainsize]
+        for j in maybedom[i]:
+            gap_maybedom += [j + 1 + i*domainsize]
+    MinImage = GetMinimalImage(Group, [gap_indom, gap_maybedom])
+    Perm = MinImage[0]
+    Image = MinImage[1]
+    Image = tuple(map(lambda x : tuple(x), Image))
+
+    if MinimalImages.has_key(Image):
+       return [ MinimalImages[Image][0], InvPerm(MultPerm(Perm, InvPerm(MinimalImages[Image][1]))) ]
+    else:
+        MinimalImages[Image] = [nodenum, Perm]
+        return False
 
 def crossprod(domains, conslist, outlist):
     if domains==[]:
@@ -235,6 +271,11 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         assert len(prun)>0  # Should only reach here if tuples lost by pruning.
         return True
     
+    perm = adddomain(domains_in, domains_poss, tree['nodelabel'])
+    if perm != False:
+        tree['perm'] = perm[1]
+        tree['goto'] = perm[0]
+        return True
     # No need to find singleton domains here, and put them 'in', because ...?
     
     ########################################################################
@@ -312,10 +353,12 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     
     tree['var']=chosenvar
     tree['val']=chosenval
+
     prun_left=False
     prun_right=False
     
     tree['left']=dict()
+    tree['left']['nodelabel'] = getnodenum()
     
     # just for left branch
     domains_in[chosenvar].append(chosenval)
@@ -331,6 +374,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     # If we have not emptied the domain in the right branch:
     if len(domains_poss[chosenvar])+len(domains_in[chosenvar])>0:
         tree['right']=dict()
+        tree['right']['nodelabel'] = getnodenum()
         prun_right=build_tree(ct2, tree['right'], domains_in, domains_poss, varvalorder, heuristic)
         if not prun_right:
             if checktreecutoff:
@@ -343,10 +387,18 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         return True
 
 
-def print_tree(tree, indent="    "):
+def old_print_tree(tree, indent="    "):
+    if tree.has_key('nodelabel'):
+      print indent+'// Number:' + str(tree['nodelabel'])
+    else:
+      print indent+"// No number"
     if tree.has_key('pruning'):
         for p in tree['pruning']:
             print indent+"var_array[%d].removeFromDomain(%d);"%(p[0], p[1])
+    if tree.has_key('goto'):
+        print indent+str(tree['goto'])
+        print indent+str(tree['perm'])
+        return
     if tree.has_key('left'):
         print indent+"if(var_array[%d].inDomain(%d))"%(tree['var'], tree['val'])
         print indent+"{"
@@ -364,7 +416,55 @@ def print_tree(tree, indent="    "):
             print_tree(tree['right'], indent+"    ")
             print indent+"}"
     return
+
+def vm_tree(tree, nodestarts, jumppoints, currentvm):
+    nodestarts[tree['nodelabel']] = len(currentvm)
+    if(tree.has_key('pruning')):
+        prune_list = [-1001]
+        for p in tree['pruning']:
+            prune_list += p
+        prune_list += [-1]
+        currentvm += prune_list
+    if(tree.has_key('perm')):
+        currentvm += [-2000]
+        assert(litcount > 0)
+        paddedperm = PadPerm(tree['perm'], litcount)
+        paddedperm = [ i - 1 for i in paddedperm ]
+        currentvm += paddedperm
+    if(tree.has_key('goto')):
+        currentvm += [-1100, tree['goto'] + 10000]
+        jumppoints.append(len(currentvm) - 1)
+        return [nodestarts, jumppoints, currentvm]
     
+    if(tree.has_key('left') or tree.has_key('right')):
+        currentvm += [-1010]
+        currentvm += [tree['var'], tree['val']]
+        left_val = -3
+        right_val = -3
+        if tree.has_key('left'):
+            left_val = tree['left']['nodelabel'] + 10000
+            jumppoints.append(len(currentvm))
+        if tree.has_key('right'):
+            right_val = tree['right']['nodelabel'] + 10000
+            jumppoints.append(len(currentvm) + 1)
+        currentvm += [left_val, right_val]
+        
+        if tree.has_key('left'):
+            ret = vm_tree(tree['left'], nodestarts, jumppoints, currentvm)
+            nodestarts = ret[0]
+            jumppoints = ret[1]
+            currentvm = ret[2]
+        if tree.has_key('right'):
+            ret = vm_tree(tree['right'], nodestarts, jumppoints, currentvm)
+            nodestarts = ret[0]
+            jumppoints = ret[1]
+            currentvm = ret[2]
+        return [nodestarts, jumppoints, currentvm]
+    else:
+        # No children
+        currentvm += [-1000]
+        return [nodestarts, jumppoints, currentvm]
+
 def tree_cost(tree):
     # measure the max depth for now.
     l=0
@@ -433,6 +533,7 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
     
     for perm in permlist:
         tree=dict()
+        tree['nodelabel']=getnodenum()
         domains_in=[ [] for i in domains_init]
         domains=copy.deepcopy(domains_init)
         build_tree(copy.deepcopy(ct_nogoods), tree, domains_in, domains, perm, len(permlist)==1)   # last arg is whether to use heuristic.
@@ -443,6 +544,28 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
             print "Better tree found, of size:%d"%bestcost
     
     return besttree
+
+
+
+def print_tree(t):
+    ret = vm_tree(t, dict(), [], [])
+
+    nodestarts = ret[0]
+    jumppoints = ret[1]
+    currentvm  = ret[2]
+
+    #print(ret)
+    for j in jumppoints:
+        assert(currentvm[j] >= 10000)
+        #print(j, currentvm[j])
+        nodepos = -3
+        if nodestarts.has_key(currentvm[j] - 10000):
+            nodepos = nodestarts[currentvm[j] - 10000]
+        currentvm[j] = nodepos
+    print("**TUPLELIST**")
+    print("con 1 " + str(len(currentvm)))
+    for i in currentvm:
+      print(str(i) + " "),
 
 
 ################################################################################
@@ -460,6 +583,8 @@ def and_constraint():
     domains_init=[[0,1],[0,1],[0,1]]
     
     generate_tree(ct_nogoods, domains_init, False)
+
+    print_tree(t)
 
 def sports_constraint():
     # Channelling constraint from sports scheduling 10
@@ -485,6 +610,7 @@ def sports_constraint():
     domains_init=[ range(1,11), range(1,11), range(1,46)]
     
     t=generate_tree(ct_nogoods, domains_init, True)
+       
     print_tree(t)
 
 def sumgeqthree():
@@ -606,8 +732,13 @@ def still_life():
     print "Number of nodes explored by algorithm: "+str(calls_build_tree)
 
 def life():
+    global domainsize
+    global litcount
+    global Group
+    domainsize = 2
+    litcount   = 2*10
     table=[]
-    
+    #Group = VariablePerm(10, 2, [0,1,2,3,4,5,6,7])
     cross=[]
     crossprod([(0,1) for i in range(10)], [], cross)
     
@@ -634,6 +765,8 @@ def life():
     print "Number of nodes explored by algorithm: "+str(calls_build_tree)
 
 def summinmax():
+    global domainsize
+    domainsize = 2
     table=[]
     
     cross=[]
@@ -653,6 +786,12 @@ def summinmax():
     print "Number of nodes explored by algorithm: "+str(calls_build_tree)
     
 def alldiff():
+    global domainsize
+    global litcount
+    global Group
+    #Group = VariablePerm(3, 3, [0,1,2]) + ValuePerm(3, 3, [0,1,2])
+    domainsize = 3
+    litcount = 9
     table=[]
     
     cross=[]
@@ -685,7 +824,7 @@ def alldiff():
 #binseq_three()
 #cProfile.run('life()')
 #binseq()
-#life()
+life()
 
 #alldiff()
-summinmax()
+#summinmax()
