@@ -32,7 +32,7 @@ struct VMConstraint : public AbstractConstraint
   { return "VMConstraint"; }
 
   typedef typename VarArray::value_type VarRef;
-  array<VarRef, 10> vars;
+  array<VarRef, 5> vars;
 
   int* VM_data;
   int VM_size;
@@ -41,7 +41,7 @@ struct VMConstraint : public AbstractConstraint
   AbstractConstraint(stateObj), 
   VM_data(_tuples->getPointer()), VM_size(_tuples->tuple_size())
   {
-      if(_vars.size() != 10)
+      if(_vars.size() != 5)
 	  FAIL_EXIT("Invalid constraint length");
       for(int i = 0; i < _vars.size(); ++i)
 	vars[i] = _vars[i];
@@ -166,17 +166,23 @@ struct VMConstraint : public AbstractConstraint
     while(true)
     {
         if(InPtr == -3)
+        {
+            P(InPtr << ". -3 return");
             return;
+        }
         switch(get(InPtr))
         {
             case -1000:
+                P(InPtr << ". Return");
                 return;
             case -1001:
             {
+                P(InPtr << ". Delete lits");
                 InPtr++;
                 while(get(InPtr) != -1)
                 {
                     pair<int,int> varval = get_varval(vals, domsize, get(InPtr), get(InPtr+1));
+                    P("  Deleting " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
                     vars[varval.first].removeFromDomain(varval.second);
                     InPtr+=2;
                 }
@@ -185,25 +191,42 @@ struct VMConstraint : public AbstractConstraint
             break;
             case -1010:
             {
+                P(InPtr << ". If");
                 InPtr++;
                 pair<int,int> varval = get_varval(vals, domsize, get(InPtr), get(InPtr+1));
+                 P(" Jump based on " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
                 if(vars[varval.first].inDomain(varval.second))
-                        InPtr = get(InPtr+2);
+                {
+                    P(" True, jump to " << get(InPtr+2));  
+                    InPtr = get(InPtr+2);
+                }
                 else
-                        InPtr = get(InPtr+3);
+                {
+                    P(" False, jump to " << get(InPtr+3));
+                    InPtr = get(InPtr+3);
+                }
             }
             break;
             case -1100:
+            {
+                P(InPtr << ". Jump to " << get(InPtr+1));
                 InPtr = get(InPtr+1);
+            }
             break;
             case -2000:
             {
+                P(InPtr << ". Apply perm");
                 InPtr++;
                 int newvals[lits];
                 for(int i = 0; i < lits; ++i)
-                    newvals[i] = get(InPtr+vals[i]);
+                {
+                    P("  " << get(InPtr + i));
+                    newvals[i] = vals[get(InPtr+i)];
+                }
+                P("  New Perm");
                 for(int i = 0; i < lits; ++i)
                 {
+                    P("  " << newvals[i]);
                     vals[i] = newvals[i];
                 }
                 InPtr += lits;

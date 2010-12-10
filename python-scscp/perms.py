@@ -40,7 +40,7 @@ def MultPerm(m1, m2):
    newm1 = PadPerm(m1, length)
    newm2 = PadPerm(m2, length)
 
-   return [ newm1[newm2[i] - 1] for i in range(length) ]
+   return [ newm2[newm1[i] - 1] for i in range(length) ]
 
 socket = False
 

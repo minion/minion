@@ -46,8 +46,12 @@ def adddomain(indom, maybedom, nodenum):
     Image = tuple(map(lambda x : tuple(x), Image))
 
     if MinimalImages.has_key(Image):
-       return [ MinimalImages[Image][0], InvPerm(MultPerm(Perm, InvPerm(MinimalImages[Image][1]))) ]
+        print(["!", nodenum, gap_indom, gap_maybedom], MinImage, 
+                MinimalImages[Image][0], InvPerm(Perm), Perm, 
+                MultPerm(MinimalImages[Image][1], InvPerm(Perm)) )
+        return [ MinimalImages[Image][0], MultPerm(MinimalImages[Image][1], InvPerm(Perm)) ]
     else:
+        print([[nodenum, gap_indom, gap_maybedom], Image, nodenum, Perm])
         MinimalImages[Image] = [nodenum, Perm]
         return False
 
@@ -191,7 +195,13 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     #print "Top of build_tree"
     global calls_build_tree
     calls_build_tree+=1
-    
+   
+    perm = adddomain(domains_in, domains_poss, tree['nodelabel'])
+    if perm != False:
+        tree['perm'] = perm[1]
+        tree['goto'] = perm[0]
+        return True
+
     # Filter the tuple list -- remove any tuples that are not valid
     ct=filter_nogoods(ct_init, domains_in, domains_poss)
     
@@ -271,11 +281,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         assert len(prun)>0  # Should only reach here if tuples lost by pruning.
         return True
     
-    perm = adddomain(domains_in, domains_poss, tree['nodelabel'])
-    if perm != False:
-        tree['perm'] = perm[1]
-        tree['goto'] = perm[0]
-        return True
+
     # No need to find singleton domains here, and put them 'in', because ...?
     
     ########################################################################
@@ -387,7 +393,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         return True
 
 
-def old_print_tree(tree, indent="    "):
+def print_tree(tree, indent="    "):
     if tree.has_key('nodelabel'):
       print indent+'// Number:' + str(tree['nodelabel'])
     else:
@@ -536,12 +542,15 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
         tree['nodelabel']=getnodenum()
         domains_in=[ [] for i in domains_init]
         domains=copy.deepcopy(domains_init)
+        print "# Call buildtree"
+        global MinimialImages
+        MinimalImages = {}
         build_tree(copy.deepcopy(ct_nogoods), tree, domains_in, domains, perm, len(permlist)==1)   # last arg is whether to use heuristic.
         cost=tree_cost2(tree)
         if cost<bestcost:
             bestcost=cost
             besttree=tree
-            print "Better tree found, of size:%d"%bestcost
+            print "# Better tree found, of size:%d"%bestcost
     
     return besttree
 
@@ -554,13 +563,15 @@ def print_tree(t):
     jumppoints = ret[1]
     currentvm  = ret[2]
 
-    #print(ret)
+    print(ret)
     for j in jumppoints:
         assert(currentvm[j] >= 10000)
         #print(j, currentvm[j])
         nodepos = -3
         if nodestarts.has_key(currentvm[j] - 10000):
             nodepos = nodestarts[currentvm[j] - 10000]
+        else:
+            print("# Could not find: " + str(currentvm[j] - 10000))
         currentvm[j] = nodepos
     print("**TUPLELIST**")
     print("con 1 " + str(len(currentvm)))
@@ -615,17 +626,24 @@ def sports_constraint():
 
 def sumgeqthree():
     # sumgeq-3 on 5 bool vars.
+    global domainsize, Group, litcount
+    domainsize = 2
+    litcount = 10
+    Group = VariablePerm(5, 2, [0,1,2,3,4])
+
     nogoods=[]
     for a in range(2):
         for b in range(2):
             for c in range(2):
                 for d in range(2):
                     for e in range(2):
-                        if sum([a,b,c,d,e])<3:
+                        if sum([a,b,c,d,e])<4:
                             nogoods.append([a,b,c,d,e])
     domains_init=[[0,1],[0,1],[0,1], [0,1], [0,1]]
-    
-    generate_tree(nogoods, domains_init, False)
+   
+
+    print_tree(generate_tree(nogoods, domains_init, True))
+
 
 def pegsol():
     # constraint for peg solitaire.
@@ -647,9 +665,10 @@ def pegsol():
     domains_init=[[0,1],[0,1],[0,1], [0,1], [0,1], [0,1], [0,1]]
     t=generate_tree(nogoods, domains_init, True)
     print_tree(t)
-    print "Depth: "+str(tree_cost(t))
-    print "Number of nodes: "+str(tree_cost2(t))
-    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+    print ""
+    print "# Depth: "+str(tree_cost(t))
+    print "# Number of nodes: "+str(tree_cost2(t))
+    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
     
 def sokoban():
     # x+y=z where y has values -n, -1, 1, n
@@ -738,7 +757,7 @@ def life():
     domainsize = 2
     litcount   = 2*10
     table=[]
-    #Group = VariablePerm(10, 2, [0,1,2,3,4,5,6,7])
+    Group = VariablePerm(10, 2, [0,1,2,3,4,5,6,7])
     cross=[]
     crossprod([(0,1) for i in range(10)], [], cross)
     
@@ -789,7 +808,7 @@ def alldiff():
     global domainsize
     global litcount
     global Group
-    #Group = VariablePerm(3, 3, [0,1,2]) + ValuePerm(3, 3, [0,1,2])
+    Group = VariablePerm(3, 3, [0,1,2]) + ValuePerm(3, 3, [0,1,2])
     domainsize = 3
     litcount = 9
     table=[]
@@ -817,14 +836,14 @@ def alldiff():
 
 #and_constraint()
 #sokoban()
-
+sumgeqthree()
 #sports_constraint()
 
 #pegsol()
 #binseq_three()
 #cProfile.run('life()')
 #binseq()
-life()
+#life()
 
 #alldiff()
 #summinmax()
