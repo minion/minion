@@ -103,13 +103,16 @@ struct reify : public ParentConstraint
 
   int dtcount;
   int c0vars;  // how many vars for child_constraints[0]
-
+  
+  int c0watches;  // Number of watches used for GSA of child 0.
+  int c1watches;  
+  
   typedef vector<vector<pair<int,int> > > triggerpairstype;
   D_DATA(triggerpairstype triggerpairs);
 
   reify(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar _rar_var) :
   ParentConstraint(_stateObj), reify_var(_rar_var), constraint_locked(false),
-    full_propagate_called(stateObj, false)
+    full_propagate_called(stateObj, false), c0watches(0), c1watches(0)
   {
       CHECK(reify_var.getInitialMin() >= 0, "Reification variables must have domain within {0,1}");
       CHECK(reify_var.getInitialMin() <= 1, "Reification variables must have domain within {0,1}");
@@ -121,9 +124,9 @@ struct reify : public ParentConstraint
     child_constraints.push_back(_poscon);
     AbstractConstraint* _negcon = _poscon->reverse_constraint();
     child_constraints.push_back(_negcon);
-    // assume for the time being that the two child constraints have the same number of vars.
+    
     reify_var_num=child_constraints[0]->get_vars_singleton()->size()+child_constraints[1]->get_vars_singleton()->size();
-    //dtcount=dynamic_trigger_count();
+    
     dtcount=child_constraints[0]->get_vars_singleton()->size()*2 + child_constraints[1]->get_vars_singleton()->size()*2;
     c0vars=child_constraints[0]->get_vars_singleton()->size();
     bool hasbound=false;
@@ -152,17 +155,42 @@ struct reify : public ParentConstraint
   // This is so that reify can be reversed. Called in reverse_constraint.
   reify(StateObj* _stateObj, AbstractConstraint* _negcon, BoolVar _rar_var, bool unused_argument) :
   ParentConstraint(_stateObj), reify_var(_rar_var), constraint_locked(false),
-    full_propagate_called(stateObj, false)
+    full_propagate_called(stateObj, false), c0watches(0), c1watches(0)
   {
+    CHECK(reify_var.getInitialMin() >= 0, "Reification variables must have domain within {0,1}");
+    CHECK(reify_var.getInitialMin() <= 1, "Reification variables must have domain within {0,1}");
+    
     AbstractConstraint* _poscon = _negcon->reverse_constraint();
 
     child_constraints.push_back(_poscon);
     child_constraints.push_back(_negcon);
-    // assume for the time being that the two child constraints have the same number of vars.
+    
     reify_var_num=child_constraints[0]->get_vars_singleton()->size()+child_constraints[1]->get_vars_singleton()->size();
-    dtcount=dynamic_trigger_count();
+    
     dtcount=child_constraints[0]->get_vars_singleton()->size()*2 + child_constraints[1]->get_vars_singleton()->size()*2;
+    
     c0vars=child_constraints[0]->get_vars_singleton()->size();
+    
+    bool hasbound=false;
+    vector<AnyVarRef>& t1=*(child_constraints[0]->get_vars_singleton());
+    for(int i=0; i<t1.size(); i++)
+    {
+        if(t1[i].isBound() && t1[i].getInitialMin()!=t1[i].getInitialMax()) {
+            hasbound=true;
+        }
+    }
+    vector<AnyVarRef>& t2=*(child_constraints[1]->get_vars_singleton());
+    for(int i=0; i<t2.size(); i++)
+    {
+        if(t2[i].isBound() && t2[i].getInitialMin()!=t2[i].getInitialMax()) {
+            hasbound=true;
+        }
+    }
+    if(hasbound)
+    {
+        cout<<"Warning: bound variables in reify degrade performance, because DomainRemoval triggers are translated into DomainChanged triggers." <<endl;
+    }
+    
     D_DATA(triggerpairs.resize(2));
   }
 
@@ -360,7 +388,7 @@ struct reify : public ParentConstraint
               return;
             }
             P("Found new assignment");
-            watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt, dt+(c0vars*2));
+            watch_assignment(assignment, 0); // for child 0 //*(child_constraints[0]->get_vars_singleton()), dt, dt+(c0vars*2));
 
             return;
         }
@@ -398,7 +426,7 @@ struct reify : public ParentConstraint
               return;
             }
             P("Found new assignment");
-            watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), dt+(c0vars*2), dt+dtcount);
+            watch_assignment(assignment, 1); // child 1   //*(child_constraints[1]->get_vars_singleton()), dt+(c0vars*2), dt+dtcount);
             return;
         }
         else
@@ -430,41 +458,51 @@ struct reify : public ParentConstraint
 
   }
 
-  template<typename T, typename Vars, typename Trigger>
-  void watch_assignment(const T& assignment, Vars& vars, Trigger* trig, Trigger* endtrig)
+  template<typename T>
+  void watch_assignment(const T& assignment, int child_no) //Vars& vars, Trigger* trig, Trigger* endtrig)
   {
+      D_ASSERT(child_no==0 || child_no==1);
+      
+      vector<AnyVarRef>& vars=* child_constraints[child_no]->get_vars_singleton();
+      
+      int numoldwatches=0;
+      
+      if(child_no==0) {
+          numoldwatches=c0watches;
+          c0watches=assignment.size();
+      }
+      else {
+          numoldwatches=c1watches;
+          c1watches=assignment.size();
+      }
+      
+      DynamicTrigger* dt=dynamic_trigger_start();
+      if(child_no==1) dt+=(c0vars*2);
+      
     for(int i = 0; i < assignment.size(); ++i)
     {
       D_ASSERT(vars[assignment[i].first].inDomain(assignment[i].second));
-      D_ASSERT(trig+i < endtrig);
       if(vars[assignment[i].first].isBound()) {
-        vars[assignment[i].first].addDynamicTrigger(trig + i, DomainChanged);
+        vars[assignment[i].first].addDynamicTrigger(dt + i, DomainChanged);
       } else {
-        vars[assignment[i].first].addDynamicTrigger(trig + i, DomainRemoval, assignment[i].second);
+        vars[assignment[i].first].addDynamicTrigger(dt + i, DomainRemoval, assignment[i].second);
       }
     }
-    // clear a contiguous block of used triggers up to (not including) endtrig
-    D_DATA(int firstunattached = -1);
-    for(int i=assignment.size(); (trig+i)<endtrig; i++)
+    // clear the rest of the triggers that were in use.
+    
+    for(int i=assignment.size(); i<numoldwatches; i++)
     {
-        if(!(trig+i)->isAttached())
-        {
-            D_DATA(firstunattached=i);
-            break;
-        }
-        releaseTrigger(stateObj, trig + i);
+        releaseTrigger(stateObj, dt + i);  // May not actually be attached, if a parent of this reify has lifted it. But release it anyway.
     }
-
+    
     #ifdef MINION_DEBUG
-    if(firstunattached != -1)
+    for(int i=assignment.size(); i<(child_no==0? c0vars*2 : dtcount-(c0vars*2)); i++)
     {
-      for(int i=firstunattached; (trig+i)<endtrig; i++)
-      {
-          D_ASSERT(!(trig+i)->isAttached());
-      }
+        D_ASSERT(!(dt+i)->isAttached());
     }
+    
     // put the triggers into triggerpairs to check later.
-    int cid=((trig==dynamic_trigger_start())?0:1);
+    int cid=child_no;
     triggerpairs[cid].clear();
     for(int i=0; i<assignment.size(); i++)
     {
@@ -494,7 +532,7 @@ struct reify : public ParentConstraint
     }
 
     DynamicTrigger* dt = dynamic_trigger_start();
-    //int dt_count = dynamic_trigger_count();
+    
     // Clean up triggers
     for(int i = 0; i < dtcount; ++i)
       releaseTrigger(stateObj, dt + i);
@@ -524,8 +562,8 @@ struct reify : public ParentConstraint
       return;
     }
 
-    watch_assignment(assignment0, *(child_constraints[0]->get_vars_singleton()), dt, dt+(c0vars*2));
-    watch_assignment(assignment1, *(child_constraints[1]->get_vars_singleton()), dt+(c0vars*2), dt+dtcount);
+    watch_assignment(assignment0, 0);   //*(child_constraints[0]->get_vars_singleton()), dt, dt+(c0vars*2));
+    watch_assignment(assignment1, 1);   //*(child_constraints[1]->get_vars_singleton()), dt+(c0vars*2), dt+dtcount);
   }
 };
 
