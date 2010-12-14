@@ -88,12 +88,16 @@ struct Dynamic_OR : public ParentConstraint
   {
     for(int i = 0; i < child_constraints.size(); ++i)
     {
+      assignment.clear();
       bool flag=child_constraints[i]->get_satisfying_assignment(assignment);
       if(flag)
       {
         // Fix up assignment
-        for(int j = 0; j < assignment.size(); ++j)
+        for(int j = 0; j < assignment.size(); ++j) {
           assignment[j].first += start_of_constraint[i];
+          D_ASSERT((*(child_constraints[i]->get_vars_singleton()))[assignment[j].first-start_of_constraint[i]].inDomain(assignment[j].second));
+          D_ASSERT((*(this->get_vars_singleton()))[assignment[j].first].inDomain(assignment[j].second));
+        }
         return true;
       }
     }
