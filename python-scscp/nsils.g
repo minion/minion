@@ -11,7 +11,7 @@ NewSmallestImageList := function(G, L)
   fi;
   stab   := Stabilizer(G, L[1], OnSets);
   image  := NewSmallestImage(G, L[1], stab, x -> x);
-  mapper := RepresentativeAction(G, L[1], image[1], OnSets);
+  mapper := RepresentativeAction(G, L[1], image[1], OnTuples);
   conj   := ConjugateGroup(stab, mapper);
   Limage := List(L{[2..Length(L)]}, x -> (List(x, y -> y^mapper)));
   perm   := NewSmallestImageList(conj, Limage);
