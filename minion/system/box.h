@@ -298,7 +298,18 @@ public:
   void
     clear()
     { erase(begin(), end()); }
-
+  
+  friend std::ostream& operator<<(std::ostream& o, const box<T>& sp)
+    {
+        o<<"[";
+        for(int i=0; i<sp.size(); i++) {
+            o<<sp[i];
+            if(i!=sp.size()-1) o<<", ";
+        }
+        o<<"]";
+        return o;
+    }
+    
 protected:
 
       // Called by the range constructor to implement [23.1.1]/9

@@ -506,6 +506,11 @@ class testsupportsgac(testgacelement__minus__deprecated):
     def runtest(self, options=dict()):
         return runtestgeneral("supportsgac", False, options, [6], ["smallnum"], self, not options['reify'])
 
+# test gacschema constraint assuming it is an element.
+class testgacschema(testgacelement__minus__deprecated):
+    def runtest(self, options=dict()):
+        return runtestgeneral("gacschema", False, options, [6], ["smallnum"], self, not options['reify'])
+
 class testelement(testgacelement__minus__deprecated):
     def runtest(self, options=dict()):
         return runtestgeneral("element", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
