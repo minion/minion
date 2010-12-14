@@ -223,7 +223,7 @@ NewSmallestImage := function(g,set,k,skip_func)
         seed := set[1];
         reps := [];
         gens := GeneratorsOfGroup(gp);
-        while seed <> fail and seed < n do
+        while seed <> fail and seed <= n do
             b[seed] := false;
             q := [seed];
             Add(reps,seed);
@@ -271,7 +271,7 @@ NewSmallestImage := function(g,set,k,skip_func)
     s := StabChainMutable(g);
     l := Action(k,set);
     m := Length(set);
-    hash := s->JENKINS_HASH(s,4*m+4);
+    hash := s->JENKINS_HASH(s,GAPInfo.BytesPerVariable*m+GAPInfo.BytesPerVariable);
     lastupb := 0;
     root := rec(selected := [], 
                 image := set,
