@@ -97,6 +97,7 @@ struct Dynamic_AND : public ParentConstraint
           bool flag=child_constraints[i]->get_satisfying_assignment(localassignment);
           if(!flag)
           {
+              assignment.clear();
               return false;
           }
           
@@ -104,6 +105,8 @@ struct Dynamic_AND : public ParentConstraint
           {
               assignment.push_back(make_pair(localassignment[j].first+start_of_constraint[i],
                   localassignment[j].second));
+              D_ASSERT((*(this->get_vars_singleton()))[localassignment[j].first+start_of_constraint[i]].inDomain(localassignment[j].second));
+              D_ASSERT((*(child_constraints[i]->get_vars_singleton()))[localassignment[j].first].inDomain(localassignment[j].second));
           }
       }
       return true;
