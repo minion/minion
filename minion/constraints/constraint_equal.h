@@ -487,6 +487,8 @@ struct NeqConstraintBinary : public AbstractConstraint
     
     virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
+      D_ASSERT(var1.getMin()<=var1.getMax());
+      D_ASSERT(var2.getMin()<=var2.getMax());
     if(var1.getMin() != var2.getMax())
     {
       assignment.push_back(make_pair(0, var1.getMin()));
@@ -514,6 +516,8 @@ struct NeqConstraintBinary : public AbstractConstraint
           vars[1] = var2;
       return vars;
     }
+    
+    virtual AbstractConstraint* reverse_constraint();
 };
 
 
@@ -605,6 +609,15 @@ struct EqualConstraint : public AbstractConstraint
        return new NeqConstraintBinary<EqualVarRef1, EqualVarRef2>(stateObj, var1, var2);
    }
 };
+
+template<typename VarRef1, typename VarRef2>
+AbstractConstraint* NeqConstraintBinary<VarRef1, VarRef2>::reverse_constraint()
+{
+   return new EqualConstraint<VarRef1, VarRef2>(stateObj, var1, var2);
+}
+   
+   
+   
 
 template<typename EqualVarRef1, typename EqualVarRef2>
 AbstractConstraint*
