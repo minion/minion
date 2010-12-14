@@ -7,6 +7,13 @@ def VariablePermSwap(n, d, var1, var2):
         L[var2*d + i] = var1*d + i + 1
     return [L]
 
+def VariablePermSwapList(n, d, p):
+    L = range(1, n*d + 1)
+    for i in range(len(p)):
+      for j in range(d):
+          L[i*d + j] = p[i]*d + j + 1
+    return L
+
 def ValuePermSwap(n, d, val1, val2):
     L = range(1, n*d+1)
     for i in range(0, n):
@@ -19,6 +26,7 @@ def VariablePerm(n, d, varlist):
     for i in range(len(varlist) - 1):
         L += VariablePermSwap(n, d, varlist[i], varlist[i+1])
     return L
+
 
 def ValuePerm(n, d, vallist):
     L = []
