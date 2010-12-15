@@ -15,19 +15,32 @@ import sys
 import cProfile
 import random
 sys.path.append("../python-scscp")
-from perms import GetMinimalImage, ValuePerm, VariablePerm, InvPerm, MultPerm, PadPerm
+from perms import GetMinimalImage, ValuePerm, VariablePerm, InvPerm, MultPerm, PadPerm, VariablePermSwapList
 
 nodenumcounter = 0
 domainsize = -1
 litcount   = -1
 
+nodenumprint = 100
 def getnodenum():
-    global nodenumcounter
+    global nodenumcounter, nodenumprint
     nodenumcounter+=1
+    if(nodenumcounter >= nodenumprint):
+        print "# Count: ", nodenumcounter
+        nodenumprint *= 2
     return nodenumcounter
 
 Group = [[1,2,3]]
 MinimalImages = {}
+EmptyKey = 'EmptyKey'
+EmptyNodes = {}
+
+matched = 0
+matchedprint = 10
+
+def markEmpty(nodenum):
+    global EmptyNodes
+    EmptyNodes[nodenum] = True
 
 def adddomain(indom, maybedom, nodenum):
     assert(domainsize>0)
@@ -46,12 +59,20 @@ def adddomain(indom, maybedom, nodenum):
     Image = tuple(map(lambda x : tuple(x), Image))
 
     if MinimalImages.has_key(Image):
-        print(["!", nodenum, gap_indom, gap_maybedom], MinImage, 
-                MinimalImages[Image][0], InvPerm(Perm), Perm, 
-                MultPerm(MinimalImages[Image][1], InvPerm(Perm)) )
+        #print(["!", nodenum, gap_indom, gap_maybedom], MinImage, 
+        #        MinimalImages[Image][0], InvPerm(Perm), Perm, 
+        #        MultPerm(MinimalImages[Image][1], InvPerm(Perm)) )
+        global matched, matchedprint
+        matched += 1
+        if matched >= matchedprint:
+            print "# Matched: ", matchedprint
+            matchedprint *= 2
+        if EmptyNodes.has_key(MinimalImages[Image][0]):
+                # Node was empty
+                return EmptyKey
         return [ MinimalImages[Image][0], MultPerm(MinimalImages[Image][1], InvPerm(Perm)) ]
     else:
-        print([[nodenum, gap_indom, gap_maybedom], Image, nodenum, Perm])
+        #print([[nodenum, gap_indom, gap_maybedom], Image, nodenum, Perm])
         MinimalImages[Image] = [nodenum, Perm]
         return False
 
@@ -196,12 +217,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     global calls_build_tree
     calls_build_tree+=1
    
-    perm = adddomain(domains_in, domains_poss, tree['nodelabel'])
-    if perm != False:
-        tree['perm'] = perm[1]
-        tree['goto'] = perm[0]
-        return True
-
+   
     # Filter the tuple list -- remove any tuples that are not valid
     ct=filter_nogoods(ct_init, domains_in, domains_poss)
     
@@ -272,6 +288,15 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         else:
             return True
     
+    perm = adddomain(domains_in, domains_poss, tree['nodelabel'])
+    if perm == EmptyKey:
+        print('# Empty node found')
+        return False
+    if perm != False:
+        tree['perm'] = perm[1]
+        tree['goto'] = perm[0]
+        return True
+
     # Filter the tuple list again after pruning -- remove any tuples that are not valid
     
     ct2=filter_nogoods(ct, domains_in, domains_poss)
@@ -373,6 +398,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     if not prun_left:
         if checktreecutoff:
             print "deleting subtree of size: %d"%(tree_cost2(tree['left']))
+        markEmpty(tree['left']['nodelabel'])
         del tree['left']
     
     domains_in[chosenvar].remove(chosenval)
@@ -385,6 +411,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         if not prun_right:
             if checktreecutoff:
                 print "deleting subtree of size: %d"%(tree_cost2(tree['right']))
+            markEmpty(tree['right']['nodelabel'])
             del tree['right']
     
     if (not prun_left) and (not prun_right) and (not tree.has_key('pruning')):
@@ -393,7 +420,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         return True
 
 
-def print_tree(tree, indent="    "):
+def old_print_tree(tree, indent="    "):
     if tree.has_key('nodelabel'):
       print indent+'// Number:' + str(tree['nodelabel'])
     else:
@@ -536,7 +563,7 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
         permlist.append(varvals)
     else:
         gen_all_perms(permlist, [], varvals)
-    
+   
     for perm in permlist:
         tree=dict()
         tree['nodelabel']=getnodenum()
@@ -547,6 +574,7 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
         MinimalImages = {}
         build_tree(copy.deepcopy(ct_nogoods), tree, domains_in, domains, perm, len(permlist)==1)   # last arg is whether to use heuristic.
         cost=tree_cost2(tree)
+        print(cost)
         if cost<bestcost:
             bestcost=cost
             besttree=tree
@@ -563,15 +591,13 @@ def print_tree(t):
     jumppoints = ret[1]
     currentvm  = ret[2]
 
-    print(ret)
+    #print(ret)
     for j in jumppoints:
         assert(currentvm[j] >= 10000)
         #print(j, currentvm[j])
         nodepos = -3
-        if nodestarts.has_key(currentvm[j] - 10000):
-            nodepos = nodestarts[currentvm[j] - 10000]
-        else:
-            print("# Could not find: " + str(currentvm[j] - 10000))
+        assert(nodestarts.has_key(currentvm[j] - 10000))
+        nodepos = nodestarts[currentvm[j] - 10000]
         currentvm[j] = nodepos
     print("**TUPLELIST**")
     print("con 1 " + str(len(currentvm)))
@@ -640,6 +666,30 @@ def sumgeqthree():
                         if sum([a,b,c,d,e])<4:
                             nogoods.append([a,b,c,d,e])
     domains_init=[[0,1],[0,1],[0,1], [0,1], [0,1]]
+   
+
+    print_tree(generate_tree(nogoods, domains_init, True))
+
+def BIBD():
+    # sumgeq-3 on 5 bool vars.
+    global domainsize, Group, litcount
+    domainsize = 2
+    litcount = 2*2*7
+    Group = [VariablePermSwapList(14, 2, [1,0,3,2,5,4,7,6,9,8,11,10,13,12]), VariablePermSwapList(14, 2, [2,3,0,1]), VariablePermSwapList(14, 2, [2,3,4,5,6,7,8,9,10,11,12,13,0,1])]
+    print Group
+    nogoods=[]
+    cross=[]
+    crossprod([(0,1) for i in range(14)], [], cross)
+    for l in cross:
+        s = sum(l[:7])
+        t = sum(l[7:])
+        prod = 0
+        for i in range(7):
+            prod += l[i] * l[i+7]
+        if s != 3 or t != 3 or prod != 1:
+            nogoods.append(l)
+
+    domains_init=[[0,1] for i in range(14)]
    
 
     print_tree(generate_tree(nogoods, domains_init, True))
@@ -757,7 +807,7 @@ def life():
     domainsize = 2
     litcount   = 2*10
     table=[]
-    Group = VariablePerm(10, 2, [0,1,2,3,4,5,6,7])
+    #Group = VariablePerm(10, 2, [0,1,2,3,4,5,6,7])
     cross=[]
     crossprod([(0,1) for i in range(10)], [], cross)
     
@@ -779,30 +829,80 @@ def life():
     domains_init=[[0,1] for i in range(10)]
     t=generate_tree(table, domains_init, True)
     print_tree(t)
-    print "Depth: "+str(tree_cost(t))
-    print "Number of nodes: "+str(tree_cost2(t))
-    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+    print ""
+    print "# Depth: "+str(tree_cost(t))
+    print "# Number of nodes: "+str(tree_cost2(t))
+    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
 
-def summinmax():
+def life3d():
     global domainsize
+    global litcount
+    global Group
     domainsize = 2
+    varcount = 3*3*3+1
+    litcount   = 2*varcount
     table=[]
-    
+    Group = VariablePerm(varcount, 2, range(varcount-2))
     cross=[]
-    crossprod([(0,1) for i in range(7)], [], cross)
+    crossprod([(0,1) for i in range(varcount - 2)], [], cross)
     
     table=[]
     for l in cross:
         s=sum(l)
-        if s!= 0 and s!=7:
-          table.append(l)
-    
-    domains_init=[[0,1] for i in range(7)]
+        if s>=5 and s<=5:
+            l.append(0)
+            l.append(1)
+            table.append(l)
+        elif s >= 7 and s <= 7:
+            l.append(1)
+            l.append(0)
+            table.append(l)
+        elif l[-2] == l[-1]:
+            dup = l[:]
+            l.append(0)
+            l.append(0)
+            dup.append(1)
+            dup.append(1)
+            table.append(l)
+            table.append(dup)    
+    domains_init=[[0,1] for i in range(varcount)]
+    print '# Generated constraint'
     t=generate_tree(table, domains_init, True)
     print_tree(t)
-    print "Depth: "+str(tree_cost(t))
-    print "Number of nodes: "+str(tree_cost2(t))
-    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+    print ""
+    print "# Depth: "+str(tree_cost(t))
+    print "# Number of nodes: "+str(tree_cost2(t))
+    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
+
+
+
+def summinmax():
+    global domainsize, Group, litcount
+    vars = 14
+    Group = VariablePerm(vars, 2, range(vars))
+    domainsize = 2
+    litcount = 2*vars
+    table=[]
+    
+    cross=[]
+    crossprod([(0,1) for i in range(vars)], [], cross)
+    
+    table=[]
+    for l in cross:
+        s=sum(l)
+        if s%2==0:
+          table.append(l)
+    
+    domains_init=[[0,1] for i in range(vars)]
+    t=generate_tree(table, domains_init, True)
+    print_tree(t)
+    print ""
+    #for i in MinimialImagesalImages:
+    #print i
+    print "# " + str(len(MinimalImages))
+    print "# Depth: "+str(tree_cost(t))
+    print "# Number of nodes: "+str(tree_cost2(t))
+    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
     
 def alldiff():
     global domainsize
@@ -836,7 +936,7 @@ def alldiff():
 
 #and_constraint()
 #sokoban()
-sumgeqthree()
+#sumgeqthree()
 #sports_constraint()
 
 #pegsol()
@@ -844,6 +944,7 @@ sumgeqthree()
 #cProfile.run('life()')
 #binseq()
 #life()
-
+life3d()
+#BIBD()
 #alldiff()
 #summinmax()
