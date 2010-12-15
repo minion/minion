@@ -32,7 +32,7 @@ struct VMConstraint : public AbstractConstraint
   { return "VMConstraint"; }
 
   typedef typename VarArray::value_type VarRef;
-  array<VarRef, 5> vars;
+  array<VarRef, 10> vars;
 
   int* VM_data;
   int VM_size;
@@ -41,7 +41,7 @@ struct VMConstraint : public AbstractConstraint
   AbstractConstraint(stateObj), 
   VM_data(_tuples->getPointer()), VM_size(_tuples->tuple_size())
   {
-      if(_vars.size() != 5)
+      if(_vars.size() != 10)
 	  FAIL_EXIT("Invalid constraint length");
       for(int i = 0; i < _vars.size(); ++i)
 	vars[i] = _vars[i];
@@ -132,7 +132,7 @@ struct VMConstraint : public AbstractConstraint
             }
             break;
             case -1100:
-                    InPtr = get(InPtr+1);
+                InPtr = get(InPtr+1);
 		if(InPtr == -3)
 			return;
             break;
@@ -144,24 +144,45 @@ struct VMConstraint : public AbstractConstraint
     }
   }
 
-  pair<int,int> get_varval(int* perm, int domsize, int var, int val)
+  inline pair<int,int> get_varval(int state, int* perm1, int* perm2, int* perm3, int domsize, int var, int val)
   {
-    int litval = var*domsize + val;
-    int mappedlit = perm[litval];
-    int final_val = mappedlit % domsize;
-    int final_var = mappedlit / domsize;
-    return make_pair(final_var, final_val);
+    switch(state)
+    {
+      case 0:
+        return make_pair(var, val);
+      case 1: {
+                int litval = var*domsize + val;
+                int mappedlit = perm1[litval];
+                int final_val = mappedlit % domsize;
+                int final_var = mappedlit / domsize;
+                return make_pair(final_var, final_val); }
+      case 2: {
+                int litval = var*domsize + val;
+                int mappedlit = perm2[litval];
+                int final_val = mappedlit % domsize;
+                int final_var = mappedlit / domsize;
+                return make_pair(final_var, final_val); }
+      case 3: {
+                int litval = var*domsize + val;
+                int mappedlit = perm3[litval];
+                int final_val = mappedlit % domsize;
+                int final_var = mappedlit / domsize;
+                return make_pair(final_var, final_val); }
+      default:
+                abort();
+    }
   }
 
     template<typename Data>
   void execute_symmetric_vm(Data* VM_start, int length)
   {
     int InPtr = 0;
-    int domsize = vars[0].getInitialMax() - vars[0].getInitialMin() + 1;
-    int lits = vars.size() * domsize;
+    int domsize = 2;
+    int lits = 20;
+    int state = 0;
     int vals[lits];
-    for(int i = 0; i < lits; ++i)
-        vals[i] = i;
+    int newvals[lits];
+    int* perm = 0;
 
     while(true)
     {
@@ -181,7 +202,7 @@ struct VMConstraint : public AbstractConstraint
                 InPtr++;
                 while(get(InPtr) != -1)
                 {
-                    pair<int,int> varval = get_varval(vals, domsize, get(InPtr), get(InPtr+1));
+                    pair<int,int> varval = get_varval(state, perm, vals, newvals, domsize, get(InPtr), get(InPtr+1));
                     P("  Deleting " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
                     vars[varval.first].removeFromDomain(varval.second);
                     InPtr+=2;
@@ -193,7 +214,7 @@ struct VMConstraint : public AbstractConstraint
             {
                 P(InPtr << ". If");
                 InPtr++;
-                pair<int,int> varval = get_varval(vals, domsize, get(InPtr), get(InPtr+1));
+                pair<int,int> varval = get_varval(state, perm, vals, newvals, domsize, get(InPtr), get(InPtr+1));
                  P(" Jump based on " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
                 if(vars[varval.first].inDomain(varval.second))
                 {
@@ -217,17 +238,36 @@ struct VMConstraint : public AbstractConstraint
             {
                 P(InPtr << ". Apply perm");
                 InPtr++;
-                int newvals[lits];
-                for(int i = 0; i < lits; ++i)
+                
+                switch(state)
                 {
-                    P("  " << get(InPtr + i));
-                    newvals[i] = vals[get(InPtr+i)];
-                }
-                P("  New Perm");
-                for(int i = 0; i < lits; ++i)
-                {
-                    P("  " << newvals[i]);
-                    vals[i] = newvals[i];
+                  case 0:
+                  {
+                    state = 1;
+                    perm = VM_start + InPtr;
+                  }
+                  break;
+                  case 1:
+                  {
+                    state = 2;
+                    for(int i = 0; i < lits; ++i)
+                      vals[i] = perm[get(InPtr+i)];
+                  }
+                  break;
+                  case 2:
+                  {
+                    state = 3;
+                    for(int i = 0; i < lits; ++i)
+                      newvals[i] = vals[get(InPtr+i)];
+                  }
+                  break;
+                  case 3:
+                  {
+                    state = 2;
+                    for(int i = 0; i < lits; ++i)
+                      vals[i] = newvals[get(InPtr+i)];
+                  }
+                  break;
                 }
                 InPtr += lits;
             }
