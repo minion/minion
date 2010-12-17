@@ -662,6 +662,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     // Methods for lexleq
     
+    #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) assignment.push_back(make_pair(var,val));
+    
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[var].inDomain(val));
         D_ASSERT(vars.size()%2==0);
@@ -688,12 +690,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     return false;
                 }
                 
-                if(!vars[i].isAssigned()) {
-                    assignment.push_back(make_pair(i, imin));    
-                }
-                if(!vars[j].isAssigned()) {
-                    assignment.push_back(make_pair(j, jmax));
-                }
+                ADDTOASSIGNMENT(i, imin);
+                ADDTOASSIGNMENT(j, jmax);
+                
                 // Do not return, continue along the vector.
                 continue;
             }
@@ -702,32 +701,32 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             if(imin<jmax) {
                 if(i==var) {
                     if(val==jmax) {
-                        assignment.push_back(make_pair(i,val));
-                        assignment.push_back(make_pair(j,val));
+                        ADDTOASSIGNMENT(i, val);
+                        ADDTOASSIGNMENT(j, val);
                         continue;
                     }
                     else if(val>jmax) {
                         return false;
                     }
                     else {   //  val<jmax
-                        assignment.push_back(make_pair(var, val));
-                        assignment.push_back(make_pair(j, jmax));
+                        ADDTOASSIGNMENT(var, val);
+                        ADDTOASSIGNMENT(j, jmax);
                         return true;
                     }
                 }
                 
                 if(j==var) {
                     if(val==imin) {
-                        assignment.push_back(make_pair(i,val));
-                        assignment.push_back(make_pair(j,val));
+                        ADDTOASSIGNMENT(i, val);
+                        ADDTOASSIGNMENT(j, val);
                         continue;
                     }
                     else if(val<imin) {
                         return false;
                     }
                     else {   //  val>imin
-                        assignment.push_back(make_pair(var, val));
-                        assignment.push_back(make_pair(i, imin));
+                        ADDTOASSIGNMENT(var, val);
+                        ADDTOASSIGNMENT(i, imin);
                         return true;
                     }
                 }
@@ -735,9 +734,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 
                 // BETTER NOT TO USE min and max here, should watch something in the middle of the domain...
                 
-                
-                assignment.push_back(make_pair(i, imin));
-                assignment.push_back(make_pair(j, jmax));
+                ADDTOASSIGNMENT(i,imin);
+                ADDTOASSIGNMENT(j,jmax);
                 return true;
             }
             
