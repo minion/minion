@@ -733,9 +733,15 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 
                 
                 // BETTER NOT TO USE min and max here, should watch something in the middle of the domain...
-                
-                ADDTOASSIGNMENT(i,imin);
-                ADDTOASSIGNMENT(j,jmax);
+                int mid=imin + (jmax-imin)/2;
+                if(vars[i].inDomain(mid-1) && vars[j].inDomain(mid)) {
+                    ADDTOASSIGNMENT(i,mid-1);
+                    ADDTOASSIGNMENT(j,mid);
+                }
+                else {
+                    ADDTOASSIGNMENT(i,imin);
+                    ADDTOASSIGNMENT(j,jmax);
+                }
                 return true;
             }
             
