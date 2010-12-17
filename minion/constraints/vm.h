@@ -25,6 +25,8 @@
 //#define P(x) cout << x << endl
 #define P(x)
 
+#define SPECIAL_VM
+
 template<typename VarArray, bool UseSymmetricVM>
 struct VMConstraint : public AbstractConstraint
 {
@@ -40,6 +42,9 @@ struct VMConstraint : public AbstractConstraint
   VMConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
   AbstractConstraint(stateObj), 
   VM_data(_tuples->getPointer()), VM_size(_tuples->tuple_size())
+#ifdef SPECIAL_VM
+    ,constraint_locked(false)
+#endif
   {
       if(_vars.size() != 10)
 	  FAIL_EXIT("Invalid constraint length");
@@ -65,9 +70,21 @@ struct VMConstraint : public AbstractConstraint
 
   int dynamic_trigger_count()
     { return 0; }
+#ifdef SPECIAL_VM
+  virtual void special_unlock()
+  { constraint_locked = false; }
 
-  virtual void propagate(int lit, DomainDelta)
+  virtual void special_check()
   { full_propagate(); }
+
+  bool constraint_locked;
+
+  virtual void propagate(int, DomainDelta)
+  { constraint_locked = true; getQueue(stateObj).pushSpecialTrigger(this); }
+#else
+  virtual void propagate(int, DomainDelta)
+  { full_propagate(); }
+#endif
 
   template<typename Data>
   Data checked_get(Data* VM_start, int length, int pos)
