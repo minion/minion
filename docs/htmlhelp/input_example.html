@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>input example</title>
+</head>
+<body>
+<h1>Help on <tt>input example</tt></h1>
+<h3>Example</h3>
+<pre>
+Below is a complete minion input file with commentary, as an example.
+
+MINION 3
+
+# While the variable section doesn't have to come first, you can't 
+# really do anything until
+# You have one...
+**VARIABLES**
+
+# There are 4 type of variables
+BOOL bool         # Boolean don't need a domain
+BOUND b {1..3}    # Bound vars need a domain given as a range
+DISCRETE d {1..3} # So do discrete vars
+
+#Note: Names are case sensitive!
+
+# Internally, Bound variables are stored only as a lower and upper bound
+# Whereas discrete variables allow any sub-domain
+
+SPARSEBOUND s {1,3,6,7} # Sparse bound variables take a sorted list of values
+
+# We can also declare matrices of variables!
+
+DISCRETE q[3] {0..5} # This is a matrix with 3 variables: q[0],q[1] and q[2]
+BOOL bm[2,2] # A 2d matrix, variables bm[0,0], bm[0,1], bm[1,0], bm[1,1]
+BOOL bn[2,2,2,2] # You can have as many indices as you like!
+
+#The search section is entirely optional
+**SEARCH**
+
+# Note that everything in SEARCH is optional, and can only be given at
+# most once!
+
+# If you don't give an explicit variable ordering, one is generated.
+# These can take matrices in interesting ways like constraints, see below.
+VARORDER [bool,b,d]
+
+# If you don't give a value ordering, 'ascending' is used
+#VALORDER [a,a,a,a]
+
+# You can have one objective function, or none at all.
+MAXIMISING bool
+# MINIMISING x3
+
+# both (MAX/MIN)IMISING and (MAX/MIN)IMIZING are accepted...
+
+
+# Print statement takes a vector of things to print
+
+PRINT [bool, q]
+
+# You can also give:
+# PRINT ALL (the default)
+# PRINT NONE
+
+
+# Declare constraints in this section!
+**CONSTRAINTS**
+
+# Constraints are defined in exactly the same way as in MINION input
+formats 1 & 2
+eq(bool, 0)
+eq(b,d)
+
+# To get a single variable from a matrix, just index it
+eq(q[1],0)
+eq(bn[0,1,1,1], bm[1,1])
+
+# It's easy to get a row or column from a matrix. Just use _ in the
+# indices you want
+# to vary. Just giving a matrix gives all the variables in that matrix.
+
+#The following shows how flattening occurs...
+
+# [bm] == [ bm[_,_] ] == [ bm[0,0], bm[0,1], bm[1,0], bm[1,1] ]
+# [ bm[_,1] ] = [ bm[0,1], bm[1,1] ]
+# [ bn[1,_,0,_] = [ bn[1,0,0,0], b[1,0,0,1], b[1,1,0,0], b[1,1,0,1] ]
+
+# You can string together a list of such expressions!
+
+lexleq( [bn[1,_,0,_], bool, q[0]] , [b, bm, d] )
+
+# One minor problem.. you must always put [ ] around any matrix expression, so
+# lexleq(bm, bm) is invalid
+
+lexleq( [bm], [bm] ) # This is OK!
+
+# Can give tuplelists, which can have names!
+# The input is: &lt;name&gt; &lt;num_of_tuples&gt; &lt;tuple_length&gt; &lt;numbers...&gt;
+# The formatting can be about anything..
+
+**TUPLELIST**
+
+Fred 3 3
+0 2 3
+2 0 3
+3 1 3
+
+Bob 2 2 1 2 3 4
+
+#No need to put everything in one section! All sections can be reopened..
+**VARIABLES**
+
+# You can even have empty sections.. if you want
+
+**CONSTRAINTS**
+
+#Specify tables by their names..
+
+table([q], Fred)
+
+# Can still list tuples explicitally in the constraint if you want at
+# the moment.
+# On the other hand, I might remove this altogether, as it's worse than giving
+# Tuplelists
+
+table([q],{ &lt;0,2,3&gt;,&lt;2,0,3&gt;,&lt;3,1,3&gt; })
+
+#Must end with the **EOF** marker!
+
+**EOF**
+
+Any text down here is ignored, so you can write whatever you like (or
+nothing at all...)
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

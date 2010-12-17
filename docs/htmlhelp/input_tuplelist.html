@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>input tuplelist</title>
+</head>
+<body>
+<h1>Help on <tt>input tuplelist</tt></h1>
+<h3>Description</h3>
+<pre>
+In a tuplelist section lists of allowed tuples for table constraints
+can be specified. This technique is preferable to specifying the
+tuples in the constraint declaration, since the tuplelists can be
+shared between constraints and named for readability.
+
+The required format is
+
+TuplelistSection::= **TUPLELIST**
+                    &lt;Tuplelist&gt;*
+
+Tuplelist::= &lt;name&gt; &lt;num_tuples&gt; &lt;tuple_length&gt; &lt;numbers&gt;+
+</pre>
+<h3>Example</h3>
+<pre>
+**TUPLELIST**
+AtMostOne 4 3
+0 0 0
+0 0 1
+0 1 0
+1 0 0
+</pre>
+<h3>References</h3>
+<pre>
+help constraints table
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

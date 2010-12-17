@@ -1,0 +1,21 @@
+MINION 1
+#TEST SOLCOUNT 1
+#SteelMill Instance - d2Sub3.txt
+1
+
+0
+
+0
+
+0
+
+0
+
+[]
+[]
+0
+0
+0
+
+objective minimising x0
+print none
