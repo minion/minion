@@ -586,7 +586,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for element
-    
+    /*
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         typedef typename VarArray::value_type VarRef;
         VarRef idxvar=vars[vars.size()-2];
@@ -647,6 +647,103 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         int idx=v[array_size-2];
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
+    }*/
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // Methods for lexless
+    
+    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+        D_ASSERT(vars[var].inDomain(val));
+        D_ASSERT(vars.size()%2==0);
+        // First part of vars is vector 1.
+        int vecsize=vars.size()/2;
+        
+        for(int i=0; i<vecsize; i++) {
+            int j=i+vecsize;
+            // CASE 1   It is not possible for the pair to be equal or less.
+            if(vars[i].getMin()>vars[j].getMax()) {
+                return false;
+            }
+            
+            // CASE 2    It is only possible to make the pair equal.
+            if(vars[i].getMin()==vars[j].getMax()) {
+                // check against var, val here.#!!!!
+                if(i==var && vars[i].getMin()!=val) {
+                    return false;
+                }
+                if(j==var && vars[j].getMax()!=val) {
+                    return false;
+                }
+                
+                if(!vars[i].isAssigned()) {
+                    assignment.push_back(make_pair(i, vars[i].getMin()));    
+                }
+                if(!vars[j].isAssigned()) {
+                    assignment.push_back(make_pair(j, vars[j].getMax()));
+                }
+                // Do not return, continue along the vector.
+                continue;
+            }
+            
+            // CASE 3    It is possible make the pair less.
+            if(vars[i].getMin()<vars[j].getMax()) {
+                if(i==var) {
+                    if(val==vars[j].getMax()) {
+                        assignment.push_back(make_pair(i,val));
+                        assignment.push_back(make_pair(j,val));
+                        continue;
+                    }
+                    else if(val>vars[j].getMax()) {
+                        return false;
+                    }
+                    else {   //  val<vars[j].getMax()
+                        assignment.push_back(make_pair(var, val));
+                        assignment.push_back(make_pair(j, vars[j].getMax()));
+                        return true;
+                    }
+                }
+                
+                if(j==var) {
+                    if(val==vars[i].getMin()) {
+                        assignment.push_back(make_pair(i,val));
+                        assignment.push_back(make_pair(j,val));
+                        continue;
+                    }
+                    else if(val<vars[i].getMin()) {
+                        return false;
+                    }
+                    else {   //  val>vars[i].getMin()
+                        assignment.push_back(make_pair(var, val));
+                        assignment.push_back(make_pair(i, vars[i].getMin()));
+                        return true;
+                    }
+                }
+                
+                
+                // BETTER NOT TO USE min and max here, should watch something in the middle of the domain...
+                
+                
+                assignment.push_back(make_pair(i, vars[i].getMin()));
+                assignment.push_back(make_pair(j, vars[j].getMax()));
+                return true;
+            }
+            
+        }
+        
+        // Got to end of vector without finding a pair that can satisfy
+        // the ct.
+        return false;
+    }
+    
+    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    {
+        D_ASSERT(array_size%2==0);
+        for(int i=0; i<array_size/2; i++)
+        {
+            if(v[i]<v[i+array_size/2]) return true;
+            if(v[i]>v[i+array_size/2]) return false;
+        }
+        return false;
     }
     
     ////////////////////////////////////////////////////////////////////////////
