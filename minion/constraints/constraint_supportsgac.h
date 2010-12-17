@@ -670,61 +670,64 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
         for(int i=0; i<vecsize; i++) {
             int j=i+vecsize;
+            int jmax=vars[j].getMax();
+            int imin=vars[i].getMin();
+            
             // CASE 1   It is not possible for the pair to be equal or less.
-            if(vars[i].getMin()>vars[j].getMax()) {
+            if(imin>jmax) {
                 return false;
             }
             
             // CASE 2    It is only possible to make the pair equal.
-            if(vars[i].getMin()==vars[j].getMax()) {
-                // check against var, val here.#!!!!
-                if(i==var && vars[i].getMin()!=val) {
+            if(imin==jmax) {
+                // check against var, val here.
+                if(i==var && imin!=val) {
                     return false;
                 }
-                if(j==var && vars[j].getMax()!=val) {
+                if(j==var && jmax!=val) {
                     return false;
                 }
                 
                 if(!vars[i].isAssigned()) {
-                    assignment.push_back(make_pair(i, vars[i].getMin()));    
+                    assignment.push_back(make_pair(i, imin));    
                 }
                 if(!vars[j].isAssigned()) {
-                    assignment.push_back(make_pair(j, vars[j].getMax()));
+                    assignment.push_back(make_pair(j, jmax));
                 }
                 // Do not return, continue along the vector.
                 continue;
             }
             
             // CASE 3    It is possible make the pair less.
-            if(vars[i].getMin()<vars[j].getMax()) {
+            if(imin<jmax) {
                 if(i==var) {
-                    if(val==vars[j].getMax()) {
+                    if(val==jmax) {
                         assignment.push_back(make_pair(i,val));
                         assignment.push_back(make_pair(j,val));
                         continue;
                     }
-                    else if(val>vars[j].getMax()) {
+                    else if(val>jmax) {
                         return false;
                     }
-                    else {   //  val<vars[j].getMax()
+                    else {   //  val<jmax
                         assignment.push_back(make_pair(var, val));
-                        assignment.push_back(make_pair(j, vars[j].getMax()));
+                        assignment.push_back(make_pair(j, jmax));
                         return true;
                     }
                 }
                 
                 if(j==var) {
-                    if(val==vars[i].getMin()) {
+                    if(val==imin) {
                         assignment.push_back(make_pair(i,val));
                         assignment.push_back(make_pair(j,val));
                         continue;
                     }
-                    else if(val<vars[i].getMin()) {
+                    else if(val<imin) {
                         return false;
                     }
-                    else {   //  val>vars[i].getMin()
+                    else {   //  val>imin
                         assignment.push_back(make_pair(var, val));
-                        assignment.push_back(make_pair(i, vars[i].getMin()));
+                        assignment.push_back(make_pair(i, imin));
                         return true;
                     }
                 }
@@ -733,8 +736,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 // BETTER NOT TO USE min and max here, should watch something in the middle of the domain...
                 
                 
-                assignment.push_back(make_pair(i, vars[i].getMin()));
-                assignment.push_back(make_pair(j, vars[j].getMax()));
+                assignment.push_back(make_pair(i, imin));
+                assignment.push_back(make_pair(j, jmax));
                 return true;
             }
             
