@@ -140,6 +140,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     virtual ~ShortSupportsGAC() {
         //printStructures();
+        set<Support*> myset;
         
         // Go through supportFreeList
         for(int var=0; var<vars.size(); var++) {
@@ -152,16 +153,20 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     // Unstitch supList from all lists it is in.
                     for(int i=0; i<litlist.size(); i++) {
                         int var=litlist[i].first;
-                        D_ASSERT(prev[var]!=0);
-                        prev[var]->next[var]=next[var];
+                        //D_ASSERT(prev[var]!=0);  // Only for igac. Here it might not be in the list.
+                        if(prev[var]!=0) {
+                            prev[var]->next[var]=next[var];
+                            //prev[var]=0;
+                        }
                         if(next[var]!=0) {
                             next[var]->prev[var]=prev[var];
+                            //next[var]=0;
                         }
                     }
                     
                     Support* temp=sup;
                     sup=supportListPerLit[var][val-dom_min].next[var];
-                    delete temp;
+                    myset.insert(temp);
                 }
             }
         }
@@ -169,13 +174,18 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         while(supportFreeList!=0) {
             Support* sup=supportFreeList;
             supportFreeList=sup->next[0];
-            delete sup;
+            myset.insert(sup);
         }
         
         for(int i=0; i<backtrack_stack.size(); i++) {
-            if(backtrack_stack[i].is_removal) {
-                delete backtrack_stack[i].sup;
+            if(backtrack_stack[i].sup!=0) {
+                myset.insert(backtrack_stack[i].sup);
             }
+        }
+        
+        typename set<Support*>::iterator it;
+        for ( it=myset.begin() ; it != myset.end(); it++ ) {
+            delete *it;
         }
     }
     
@@ -251,7 +261,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         vector<pair<int, int> >& litlist_internal=sup_internal->literals;
         
         //cout << "Adding support (internal) :" << litlist_internal << endl;
-        D_ASSERT(litlist_internal.size()>0);  // It should be possible to deal with empty supports, but currently they wil
+        //D_ASSERT(litlist_internal.size()>0);  // It should be possible to deal with empty supports, but currently they wil
         // cause a memory leak. 
         
         int litsize=litlist_internal.size();
@@ -650,7 +660,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     }*/
     
     ////////////////////////////////////////////////////////////////////////////
-    // Methods for lexless
+    // Methods for lexleq
     
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[var].inDomain(val));
@@ -731,8 +741,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         
         // Got to end of vector without finding a pair that can satisfy
-        // the ct.
-        return false;
+        // the ct. However this is equal....
+        return true;
     }
     
     virtual BOOL check_assignment(DomainInt* v, int array_size)
@@ -743,7 +753,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             if(v[i]<v[i+array_size/2]) return true;
             if(v[i]>v[i+array_size/2]) return false;
         }
-        return false;
+        return true;
     }
     
     ////////////////////////////////////////////////////////////////////////////

@@ -524,12 +524,22 @@ class testwatchelement(testgacelement__minus__deprecated):
 
 
 # test supportsgac constraint assuming it is lex
+#class testsupportsgac(testlexleq):
+#    def printtable(self, domains):
+#        return testlexleq.printtable(self, domains, less=True)
+#    
+#    def runtest(self, options=dict()):
+#        return runtestgeneral("supportsgac", False, options, [8], ["smallnum"], self, not options['reify'])
+
 class testsupportsgac(testlexleq):
     def printtable(self, domains):
-        return testlexleq.printtable(self, domains, less=True)
+        return testlexleq.printtable(self, domains, less=False)
     
     def runtest(self, options=dict()):
         return runtestgeneral("supportsgac", False, options, [8], ["smallnum"], self, not options['reify'])
+
+
+
 
 # test gacschema constraint assuming it is an element.
 class testgacschema(testgacelement__minus__deprecated):
