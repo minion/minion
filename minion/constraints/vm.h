@@ -75,7 +75,7 @@ struct VMConstraint : public AbstractConstraint
   { constraint_locked = false; }
 
   virtual void special_check()
-  { full_propagate(); }
+  { constraint_locked = false; full_propagate(); }
 
   bool constraint_locked;
 
