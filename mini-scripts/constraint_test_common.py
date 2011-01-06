@@ -538,7 +538,10 @@ class testsupportsgac(testlexleq):
     def runtest(self, options=dict()):
         return runtestgeneral("supportsgac", False, options, [8], ["smallnum"], self, not options['reify'])
 
-
+# test consttructive disjunction constraint assuming it is an element.
+class testconstructiveor(testgacelement__minus__deprecated):
+    def runtest(self, options=dict()):
+        return runtestgeneral("constructiveor", False, options, [6], ["smallnum"], self, not options['reify'])
 
 
 # test gacschema constraint assuming it is an element.

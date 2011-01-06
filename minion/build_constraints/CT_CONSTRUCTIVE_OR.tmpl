@@ -11,7 +11,12 @@
 template<typename VarArray>
 AbstractConstraint*
 BuildCT_CONSTRUCTIVE_OR(StateObj* stateObj, const VarArray& var_array, ConstraintBlob&)
-{ return new ConstructiveOr<VarArray>(stateObj, var_array); }
+{
+    #ifndef REENTER
+        INPUT_ERROR("This Constructive OR constraint requires REENTER support."); return NULL;
+    #endif
+    return new ConstructiveOr<VarArray>(stateObj, var_array); 
+}
 
 BUILD_CT(CT_CONSTRUCTIVE_OR, 1)
 
