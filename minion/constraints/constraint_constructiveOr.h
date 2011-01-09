@@ -303,6 +303,18 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
     // Assume domains of child CSPs have already been updated by propagate function.
     // Propagate the child CSPs
     
+    /*cout << "Child CSP variables before propagation: " << endl;
+    for(int i=0; i<gadget_stateObj.size(); i++) {
+        cout <<"Child "<<i << " failed:"<<getState(gadget_stateObj[i]).isFailed()<< endl;
+        for(int j=0; j<var_array.size(); j++) {
+            cout << "var:"<<j<<endl;
+            for(int k=inner_vars[i][j].getMin(); k<=inner_vars[i][j].getMax(); k++) {
+                if(inner_vars[i][j].inDomain(k)) cout << k << ",";
+            }
+        }
+    }*/
+    
+    
     for(int i=0; i<gadget_stateObj.size(); i++) {
         if(!getState(gadget_stateObj[i]).isFailed()) {
             PropogateCSP(gadget_stateObj[i], PropLevel_GAC, inner_vars[i]);
@@ -323,8 +335,6 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
                 bool supported=false;
                 
                 for(int j=0; j<gadget_stateObj.size(); j++) {
-                    //if(getState(gadget_stateObj[j]).isFailed()) cout << "Child CSP " << j << " failed."<<endl;
-                    
                     if(!(getState(gadget_stateObj[j]).isFailed()) && inner_vars[j][i].inDomain(val)) {
                         supported=true; break;
                     }
@@ -444,7 +454,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
             eqvars[0].push_back(vars[var_array.size()-1]);
             eqvars[1].push_back(vars[i]);
             
-            ConstraintBlob eqblob(&(constraint_list[13]), eqvars);    // eq
+            ConstraintBlob eqblob(&(constraint_list[72]), eqvars);    // GACeq
             
             vector<vector<Var> > litvars;
             litvars.resize(1);

@@ -843,6 +843,10 @@ class testeq:
     def runtest(self, options=dict()):
         return runtestgeneral("eq", True, options, [1,1], ["num", "num"], self, False)
 
+class testgaceq(testeq):
+    def runtest(self, options=dict()):
+        return runtestgeneral("eq", True, options, [1,1], ["num", "num"], self, True)
+
 class testwatchneq:
     def printtable(self, domains):
         cross=[]
