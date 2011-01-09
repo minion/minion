@@ -348,6 +348,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
     
   }
   
+  //vector<vector<int> > support_pos;   // support_pos[var][val-dom_min] is the last support for that val.
   
   //////////////////////////////////////////////////////////////////////////////
   // diseq or abs.

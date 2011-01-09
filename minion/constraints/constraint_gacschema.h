@@ -315,7 +315,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
         vector<Support*>& prev=sup->prev;
         vector<Support*>& next=sup->next;
         vector<pair<int, int> >& litlist=sup->literals;
-        cout << "Removing support (internal) :" << litlist << endl;
+        //cout << "Removing support (internal) :" << litlist << endl;
         
         for(int i=0; i<litlist.size(); i++) {
             int var=litlist[i].first;
@@ -340,7 +340,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     void deleteSupport(Support* sup, int var, int val)
     {
         // Deletes sup from the list for var, val only.
-        cout << "DeleteSupport " << *sup << " var,val : "<< var <<","<< val <<endl;
+        //cout << "DeleteSupport " << *sup << " var,val : "<< var <<","<< val <<endl;
         struct BTRecord temp;
         temp.typ=1;
         temp.sup=sup;
@@ -419,12 +419,12 @@ struct GACSchema : public AbstractConstraint, Backtrackable
       int val=pos-(var*numvals)+dom_min;
       int validx=val-dom_min;
       
-      cout << "Entered propagate."<<endl;
-      printStructures();
+      //cout << "Entered propagate."<<endl;
+      //printStructures();
       
       while(supportListPerLit[var][validx].next[var]!=0) {
           Support* tau = supportListPerLit[var][validx].next[var];
-          cout << "In main loop for support: "<< *(tau) << ", " << "var:"<< var << " val:"<<val <<endl;
+          //cout << "In main loop for support: "<< *(tau) << ", " << "var:"<< var << " val:"<<val <<endl;
           
           D_ASSERT(tau->prev[var]==&(supportListPerLit[var][validx]) );
           // Delete tau from all lists it is in.  NOT THE SAME AS THE PAPER, WHICH HAS A BUG AT THIS POINT.
@@ -434,7 +434,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
                   deleteSupport(tau, lit.first, lit.second);
               }
           }
-          printStructures();
+          //printStructures();
           D_ASSERT(supportListPerLit[var][validx].next[var]!=tau);
           
           while(litsPerSupport[tau->id].size()>0) {
