@@ -543,6 +543,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
       
       findSupports();
   }
+
+    
+    #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) assignment.push_back(make_pair(var,val));
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for pair-equals. a=b or c=d.
@@ -596,7 +599,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for element
-    /*
+    
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         typedef typename VarArray::value_type VarRef;
         VarRef idxvar=vars[vars.size()-2];
@@ -657,13 +660,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         int idx=v[array_size-2];
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
-    }*/
+    }
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for lexleq
     
-    #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) assignment.push_back(make_pair(var,val));
-    
+    /*
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[var].inDomain(val));
         D_ASSERT(vars.size()%2==0);
@@ -733,12 +735,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 
                 
                 // BETTER NOT TO USE min and max here, should watch something in the middle of the domain...
-                /*int mid=imin + (jmax-imin)/2;
-                if(vars[i].inDomain(mid-1) && vars[j].inDomain(mid)) {
-                    ADDTOASSIGNMENT(i,mid-1);
-                    ADDTOASSIGNMENT(j,mid);
-                }
-                else {*/
+                //int mid=imin + (jmax-imin)/2;
+                //if(vars[i].inDomain(mid-1) && vars[j].inDomain(mid)) {
+                //    ADDTOASSIGNMENT(i,mid-1);
+                //    ADDTOASSIGNMENT(j,mid);
+                //}
+                //else {
                     ADDTOASSIGNMENT(i,imin);
                     ADDTOASSIGNMENT(j,jmax);
                 
@@ -761,7 +763,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             if(v[i]>v[i+array_size/2]) return false;
         }
         return true;
-    }
+    }*/
     
     ////////////////////////////////////////////////////////////////////////////
     // Memory management.
