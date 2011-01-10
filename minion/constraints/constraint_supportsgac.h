@@ -614,9 +614,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     for(int j=resultvar.getMin(); j<=resultvar.getMax(); j++) {
                         if(resultvar.inDomain(j) && vars[i].inDomain(j) &&
                             (i!=var || j==val) ) {   // Either the support includes both var, val or neither -- if neither, it will be a support for var,val.
-                            assignment.push_back(make_pair(i, j));
-                            assignment.push_back(make_pair(vars.size()-2, i));
-                            assignment.push_back(make_pair(vars.size()-1, j));
+                            ADDTOASSIGNMENT(i,j);
+                            ADDTOASSIGNMENT(vars.size()-2, i);
+                            ADDTOASSIGNMENT(vars.size()-1, j);
+                            //assignment.push_back(make_pair(i, j));
+                            //assignment.push_back(make_pair(vars.size()-2, i));
+                            //assignment.push_back(make_pair(vars.size()-1, j));
                             return true;
                         }
                     }
@@ -631,9 +634,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             for(int i=resultvar.getMin(); i<=resultvar.getMax(); i++) {
                 if(resultvar.inDomain(i) && vars[val].inDomain(i)) {
-                    assignment.push_back(make_pair(vars.size()-2, val));
-                    assignment.push_back(make_pair(vars.size()-1, i));
-                    assignment.push_back(make_pair(val, i));
+                    ADDTOASSIGNMENT(vars.size()-2, val);
+                    ADDTOASSIGNMENT(vars.size()-1, i);
+                    ADDTOASSIGNMENT(val, i);
+                    //assignment.push_back(make_pair(vars.size()-2, val));
+                    //assignment.push_back(make_pair(vars.size()-1, i));
+                    //assignment.push_back(make_pair(val, i));
                     return true;
                 }
             }
@@ -643,9 +649,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             // The result variable.
             for(int i=0; i<vars.size()-2; i++) {
                 if(vars[i].inDomain(val) && idxvar.inDomain(i)) {
-                    assignment.push_back(make_pair(vars.size()-2, i));
-                    assignment.push_back(make_pair(vars.size()-1, val));
-                    assignment.push_back(make_pair(i, val));
+                    ADDTOASSIGNMENT(vars.size()-2, i);
+                    ADDTOASSIGNMENT(vars.size()-1, val);
+                    ADDTOASSIGNMENT(i, val);
+                    //assignment.push_back(make_pair(vars.size()-2, i));
+                    //assignment.push_back(make_pair(vars.size()-1, val));
+                    //assignment.push_back(make_pair(i, val));
                     return true;
                 }
             }
