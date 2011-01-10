@@ -600,7 +600,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     // Methods for element
     
-    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+    /*bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         typedef typename VarArray::value_type VarRef;
         VarRef idxvar=vars[vars.size()-2];
         VarRef resultvar=vars[vars.size()-1];
@@ -662,7 +662,79 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         return false;
         
         
+    }*/
+    
+    // ELEMENT - FULL LENGTH TUPLES VERSION.
+    
+    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+        typedef typename VarArray::value_type VarRef;
+        VarRef idxvar=vars[vars.size()-2];
+        VarRef resultvar=vars[vars.size()-1];
+        D_ASSERT(vars[var].inDomain(val));
+        
+        if(var<vars.size()-2) {
+            // var is in the vector.
+            
+            for(int i=idxvar.getMin(); i<=idxvar.getMax(); i++) {
+                if(idxvar.inDomain(i) && i>=0 && i<vars.size()-2) {
+                    for(int j=resultvar.getMin(); j<=resultvar.getMax(); j++) {
+                        if(resultvar.inDomain(j) && vars[i].inDomain(j) &&
+                            (i!=var || j==val) ) {   // Either the support includes both var, val or neither -- if neither, it will be a support for var,val.
+                            assignment.push_back(make_pair(i, j));
+                            assignment.push_back(make_pair(vars.size()-2, i));
+                            assignment.push_back(make_pair(vars.size()-1, j));
+                            for(int k=0; k<vars.size()-2; k++) {
+                                if(k!=i) {
+                                    if(k==var)
+                                        assignment.push_back(make_pair(k, val));
+                                    else
+                                        assignment.push_back(make_pair(k, vars[k].getMin()));
+                                }
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        else if(var==vars.size()-2) {
+            // It's the index variable.
+            if(val<0 || val>=vars.size()-2){
+                return false;
+            }
+            
+            for(int i=resultvar.getMin(); i<=resultvar.getMax(); i++) {
+                if(resultvar.inDomain(i) && vars[val].inDomain(i)) {
+                    assignment.push_back(make_pair(vars.size()-2, val));
+                    assignment.push_back(make_pair(vars.size()-1, i));
+                    assignment.push_back(make_pair(val, i));
+                    for(int k=0; k<vars.size()-2; k++) {
+                        if(k!=val) assignment.push_back(make_pair(k, vars[k].getMin()));
+                    }
+                    return true;
+                }
+            }
+            
+        }
+        else if(var==vars.size()-1) {
+            // The result variable.
+            for(int i=0; i<vars.size()-2; i++) {
+                if(vars[i].inDomain(val) && idxvar.inDomain(i)) {
+                    assignment.push_back(make_pair(vars.size()-2, i));
+                    assignment.push_back(make_pair(vars.size()-1, val));
+                    assignment.push_back(make_pair(i, val));
+                    for(int k=0; k<vars.size()-2; k++) {
+                        if(k!=i) assignment.push_back(make_pair(k, vars[k].getMin()));
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+        
+        
     }
+    
     
     virtual BOOL check_assignment(DomainInt* v, int array_size)
     {
