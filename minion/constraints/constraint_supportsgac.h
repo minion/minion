@@ -938,7 +938,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             if(valid) {
                 for(int j=0; j<supsize; j++) {
-                    assignment.push_back(tuplist[i][j]);
+                    ADDTOASSIGNMENT(tuplist[i][j].first, tuplist[i][j].second);  //assignment.push_back(tuplist[i][j]);
                 }
                 tuple_list_pos[var][val-dom_min]=i;
                 return true;
@@ -960,7 +960,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             if(valid) {
                 for(int j=0; j<supsize; j++) {
-                    assignment.push_back(tuplist[i][j]);
+                    ADDTOASSIGNMENT(tuplist[i][j].first, tuplist[i][j].second);  //assignment.push_back(tuplist[i][j]);
                 }
                 tuple_list_pos[var][val-dom_min]=i;
                 return true;
