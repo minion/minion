@@ -9,7 +9,7 @@
 
 template<typename VarArray>
 AbstractConstraint*
-BuildCT_SUPPORTSGAC(StateObj* stateObj, const VarArray& var_array, ConstraintBlob&)
-{ return new ShortSupportsGAC<VarArray>(stateObj, var_array); }
+BuildCT_SUPPORTSGAC(StateObj* stateObj, const VarArray& var_array, ConstraintBlob& b)
+{ return new ShortSupportsGAC<VarArray>(stateObj, var_array, b.tuples); }
 
 BUILD_CT(CT_SUPPORTSGAC, 1)

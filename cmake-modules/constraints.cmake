@@ -230,7 +230,7 @@ set(NAME_ID_false "CT_FALSE")
 set(NAME_READ_false )
 
 set(NAME_ID_supportsgac "CT_SUPPORTSGAC")
-set(NAME_READ_supportsgac "read_list")
+set(NAME_READ_supportsgac "read_list" "read_tuples")
 
 set(NAME_ID_gacschema "CT_GACSCHEMA")
 set(NAME_READ_gacschema "read_list")
