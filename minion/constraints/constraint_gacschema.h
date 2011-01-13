@@ -610,6 +610,9 @@ struct GACSchema : public AbstractConstraint, Backtrackable
         int i=vars[4].getAssignedValue();
         int j=vars[5].getAssignedValue();
         
+        PADOUT(4)
+        PADOUT(5)
+        
         // object i below object j.
         if(vars[1].getMin()+i <=vars[3].getMax()) {
             if(var==1) {
