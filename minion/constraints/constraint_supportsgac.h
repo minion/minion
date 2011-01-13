@@ -918,7 +918,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     //
     //  Table of short supports passed in.
     
-    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+    /*bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         
         const vector<vector<pair<int, int> > >& tuplist=tuple_lists[var][val-dom_min]; 
@@ -978,9 +978,79 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         int idx=v[array_size-2];
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
+    }*/
+    
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    //  Square packing.
+    // Expects x1,y1, x2,y2, boxsize1, boxsize2 (constant).
+    
+    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+        D_ASSERT(vars[4].isAssigned());
+        D_ASSERT(vars[5].isAssigned());
+        
+        int i=vars[4].getAssignedValue();
+        int j=vars[5].getAssignedValue();
+        
+        // object i above object j.
+        if(vars[1].getMin()+i <=vars[3].getMax()) {
+            ADDTOASSIGNMENT(1, vars[1].getMin());
+            ADDTOASSIGNMENT(3, vars[3].getMax());
+            return true;
+        }
+        
+        // object i below object j
+        if(vars[3].getMin()+j <= vars[1].getMax()) {
+            ADDTOASSIGNMENT(1, vars[1].getMax());
+            ADDTOASSIGNMENT(3, vars[3].getMin());
+            return true;
+        }
+        
+        // object i left of object j.
+        if(vars[0].getMin()+i <=vars[2].getMax()) {
+            ADDTOASSIGNMENT(0, vars[0].getMin());
+            ADDTOASSIGNMENT(2, vars[2].getMax());
+            return true;
+        }
+        
+        
+        
+        // object i right of object j
+        if(vars[2].getMin()+j <= vars[0].getMax()) {
+            ADDTOASSIGNMENT(0, vars[0].getMax());
+            ADDTOASSIGNMENT(2, vars[2].getMin());
+            return true;
+        }
+        
+        return false;
     }
     
-    
+    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    {
+        // argh, how to do this.
+        // test with element first
+        
+        // object i above object j.
+        if(v[1]+v[4] <=v[3]) {
+            return true;
+        }
+        
+        // object i below object j
+        if(v[3]+v[5] <= v[1]) {
+            return true;
+        }
+        
+        // object i left of object j.
+        if(v[0]+v[4] <=v[2]) {
+            return true;
+        }
+        
+        // object i right of object j
+        if(v[2]+v[5] <= v[0]) {
+            return true;
+        }
+        return false;
+    }
     
     ////////////////////////////////////////////////////////////////////////////
     // Memory management.
