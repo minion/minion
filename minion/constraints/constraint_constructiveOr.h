@@ -413,6 +413,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     //
     //  Element
+    /*
     void make_disjunct_csps()
     {
         // Copy variables 
@@ -471,6 +472,111 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
             
             BuildCSP(gadget_stateObj[i], cspi);
             
+            for(int j=0; j<var_array.size(); j++)
+                inner_vars[i].push_back(get_AnyVarRef_from_Var(gadget_stateObj[i], vars[j]));
+        }
+    }
+    */
+    
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    //  Square packing.
+    
+    void make_disjunct_csps()
+    {
+        // Copy variables 
+        vector<Bounds> varbounds;
+        vector<vector<int> > vardoms;
+        for(int i=0; i<var_array.size(); i++) {
+            Bounds b(var_array[i].getInitialMin(), var_array[i].getInitialMax());
+            varbounds.push_back(b);
+            
+            vector<int> varidom; varidom.push_back(var_array[i].getInitialMin()); varidom.push_back(var_array[i].getInitialMax());
+            vardoms.push_back(varidom);
+        }
+        
+        // Four disjuncts
+        for(int i=0; i<4; i++) {
+            StateObj* temp=new StateObj();
+            gadget_stateObj.push_back(temp);
+        }
+        
+        CSPInstance cspi;
+        
+        // Put vars into cspi
+        vector<Var> vars;
+        for(int i=0; i<var_array.size(); i++) {
+            Var vari = cspi.vars.getNewVar(VAR_DISCRETE, vardoms[i]);
+            
+            std::stringstream ss; ss << i;  // convert int to string in ridiculous C++ fashion.
+            
+            cspi.vars.addSymbol(string("x")+ss.str(), vari);
+            cspi.all_vars_list.push_back(make_vec(vari));
+            vars.push_back(vari);
+        }
+        
+        // Put constraint into cspi
+        {vector<vector<Var> > ineqvars;
+        ineqvars.resize(2);
+        ineqvars[0].push_back(vars[0]);
+        ineqvars[1].push_back(vars[2]);
+        
+        ConstraintBlob ineqblob(&(constraint_list[18]), ineqvars);   // ineq
+        
+        ineqblob.constants.resize(1);
+        ineqblob.constants[0].push_back(-var_array[4].getInitialMin());
+        
+        cspi.add_constraint(ineqblob);
+        
+        BuildCSP(gadget_stateObj[0], cspi);}
+        
+        {vector<vector<Var> > ineqvars;
+        ineqvars.resize(2);
+        ineqvars[0].push_back(vars[2]);
+        ineqvars[1].push_back(vars[0]);
+        
+        ConstraintBlob ineqblob(&(constraint_list[18]), ineqvars);   // ineq
+        
+        ineqblob.constants.resize(1);
+        ineqblob.constants[0].push_back(-var_array[5].getInitialMin());
+        
+        cspi.add_constraint(ineqblob);
+        
+        BuildCSP(gadget_stateObj[1], cspi);}
+        
+        {vector<vector<Var> > ineqvars;
+        ineqvars.resize(2);
+        ineqvars[0].push_back(vars[1]);
+        ineqvars[1].push_back(vars[3]);
+        
+        ConstraintBlob ineqblob(&(constraint_list[18]), ineqvars);   // ineq
+        
+        ineqblob.constants.resize(1);
+        ineqblob.constants[0].push_back(-var_array[4].getInitialMin());
+        
+        cspi.add_constraint(ineqblob);
+        
+        BuildCSP(gadget_stateObj[2], cspi);}
+        
+        {vector<vector<Var> > ineqvars;
+        ineqvars.resize(2);
+        ineqvars[0].push_back(vars[3]);
+        ineqvars[1].push_back(vars[1]);
+        
+        ConstraintBlob ineqblob(&(constraint_list[18]), ineqvars);   // ineq
+        
+        ineqblob.constants.resize(1);
+        ineqblob.constants[0].push_back(-var_array[5].getInitialMin());
+        
+        cspi.add_constraint(ineqblob);
+        
+        BuildCSP(gadget_stateObj[3], cspi);}
+        
+        
+        
+        
+        inner_vars.resize(4);
+        for(int i=0; i<4; i++) {
             for(int j=0; j<var_array.size(); j++)
                 inner_vars[i].push_back(get_AnyVarRef_from_Var(gadget_stateObj[i], vars[j]));
         }
