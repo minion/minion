@@ -992,34 +992,108 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         int i=vars[4].getAssignedValue();
         int j=vars[5].getAssignedValue();
         
-        // object i above object j.
-        if(vars[1].getMin()+i <=vars[3].getMax()) {
-            ADDTOASSIGNMENT(1, vars[1].getMin());
-            ADDTOASSIGNMENT(3, vars[3].getMax());
+        // If objects totally disjoint in either dimension...
+        // x
+        if( (vars[0].getMax()+i <= vars[2].getMin()) 
+            || (vars[2].getMax()+j <= vars[0].getMin())
+        // y
+            || (vars[1].getMax()+i <= vars[3].getMin()) 
+            || (vars[3].getMax()+j <= vars[1].getMin()) )
+        {
             return true;
         }
         
-        // object i below object j
+        // object i below object j.
+        if(vars[1].getMin()+i <=vars[3].getMax()) {
+            if(var==1) {
+                if(val+i<=vars[3].getMax()) { 
+                    ADDTOASSIGNMENT(1, val);
+                    ADDTOASSIGNMENT(3, vars[3].getMax());
+                    return true;
+                }
+            }
+            else if(var==3) {
+                if(vars[1].getMin()+i<=val) {
+                    ADDTOASSIGNMENT(1, vars[1].getMin());
+                    ADDTOASSIGNMENT(3, val);
+                    return true;
+                }
+            }
+            else {
+                ADDTOASSIGNMENT(1, vars[1].getMin());
+                ADDTOASSIGNMENT(3, vars[3].getMax());
+                return true;
+            }
+        }
+        
+        // object i above object j
         if(vars[3].getMin()+j <= vars[1].getMax()) {
-            ADDTOASSIGNMENT(1, vars[1].getMax());
-            ADDTOASSIGNMENT(3, vars[3].getMin());
-            return true;
+            if(var==1) {
+                if(vars[3].getMin()+j <= val) {
+                    ADDTOASSIGNMENT(1, val);
+                    ADDTOASSIGNMENT(3, vars[3].getMin());
+                    return true;
+                }
+            }
+            else if(var==3) {
+                if(val+j <= vars[1].getMax())
+                {
+                    ADDTOASSIGNMENT(1, vars[1].getMax());
+                    ADDTOASSIGNMENT(3, val);
+                    return true;
+                }
+            }
+            else {
+                ADDTOASSIGNMENT(1, vars[1].getMax());
+                ADDTOASSIGNMENT(3, vars[3].getMin());
+                return true;
+            }
         }
         
         // object i left of object j.
         if(vars[0].getMin()+i <=vars[2].getMax()) {
-            ADDTOASSIGNMENT(0, vars[0].getMin());
-            ADDTOASSIGNMENT(2, vars[2].getMax());
-            return true;
+            if(var==0) {
+                if(val+i <=vars[2].getMax()) {
+                    ADDTOASSIGNMENT(0, val);
+                    ADDTOASSIGNMENT(2, vars[2].getMax());
+                    return true;
+                }
+            }
+            else if(var==2) {
+                if(vars[0].getMin()+i <=val) {
+                    ADDTOASSIGNMENT(0, vars[0].getMin());
+                    ADDTOASSIGNMENT(2, val);
+                    return true;
+                }
+            }
+            else {
+                ADDTOASSIGNMENT(0, vars[0].getMin());
+                ADDTOASSIGNMENT(2, vars[2].getMax());
+                return true;
+            }
         }
-        
-        
         
         // object i right of object j
         if(vars[2].getMin()+j <= vars[0].getMax()) {
-            ADDTOASSIGNMENT(0, vars[0].getMax());
-            ADDTOASSIGNMENT(2, vars[2].getMin());
-            return true;
+            if(var==0) {
+                if(vars[2].getMin()+j <= val) {
+                    ADDTOASSIGNMENT(0, val);
+                    ADDTOASSIGNMENT(2, vars[2].getMin());
+                    return true;
+                }
+            }
+            else if(var==2) {
+                if(val+j <= vars[0].getMax()) {
+                    ADDTOASSIGNMENT(0, vars[0].getMax());
+                    ADDTOASSIGNMENT(2, val);
+                    return true;
+                }
+            }
+            else {
+                ADDTOASSIGNMENT(0, vars[0].getMax());
+                ADDTOASSIGNMENT(2, vars[2].getMin());
+                return true;
+            }
         }
         
         return false;
