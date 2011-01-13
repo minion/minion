@@ -984,7 +984,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     //
     //  Square packing.
     // Expects x1,y1, x2,y2, boxsize1, boxsize2 (constant).
-    
+    /*
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[4].isAssigned());
         D_ASSERT(vars[5].isAssigned());
@@ -1124,7 +1124,171 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             return true;
         }
         return false;
+    }*/
+    
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    //  Square packing with full-length supports
+    // Expects x1,y1, x2,y2, boxsize1, boxsize2 (constant).
+    
+    
+    // Macro to add either the lower bound or the specified value for a particular variable vartopad
+    #define PADOUT(vartopad) if(var==vartopad) assignment.push_back(make_pair(var, val)); else assignment.push_back(make_pair(vartopad, vars[vartopad].getMin()));
+    
+    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+        D_ASSERT(vars[4].isAssigned());
+        D_ASSERT(vars[5].isAssigned());
+        
+        int i=vars[4].getAssignedValue();
+        int j=vars[5].getAssignedValue();
+        
+        // object i below object j.
+        if(vars[1].getMin()+i <=vars[3].getMax()) {
+            if(var==1) {
+                if(val+i<=vars[3].getMax()) { 
+                    assignment.push_back(make_pair(1, val));
+                    assignment.push_back(make_pair(3, vars[3].getMax()));
+                    PADOUT(0)
+                    PADOUT(2)
+                    return true;
+                }
+            }
+            else if(var==3) {
+                if(vars[1].getMin()+i<=val) {
+                    assignment.push_back(make_pair(1, vars[1].getMin());
+                    assignment.push_back(make_pair(3, val);
+                    PADOUT(0)
+                    PADOUT(2)
+                    return true;
+                }
+            }
+            else {
+                assignment.push_back(make_pair(1, vars[1].getMin());
+                assignment.push_back(make_pair(3, vars[3].getMax());
+                PADOUT(0)
+                PADOUT(2)
+                return true;
+            }
+        }
+        
+        // object i above object j
+        if(vars[3].getMin()+j <= vars[1].getMax()) {
+            if(var==1) {
+                if(vars[3].getMin()+j <= val) {
+                    assignment.push_back(make_pair(1, val);
+                    assignment.push_back(make_pair(3, vars[3].getMin());
+                    PADOUT(0)
+                    PADOUT(2)
+                    return true;
+                }
+            }
+            else if(var==3) {
+                if(val+j <= vars[1].getMax())
+                {
+                    assignment.push_back(make_pair(1, vars[1].getMax());
+                    assignment.push_back(make_pair(3, val);
+                    PADOUT(0)
+                    PADOUT(2)
+                    return true;
+                }
+            }
+            else {
+                assignment.push_back(make_pair(1, vars[1].getMax());
+                assignment.push_back(make_pair(3, vars[3].getMin());
+                PADOUT(0)
+                PADOUT(2)
+                return true;
+            }
+        }
+        
+        // object i left of object j.
+        if(vars[0].getMin()+i <=vars[2].getMax()) {
+            if(var==0) {
+                if(val+i <=vars[2].getMax()) {
+                    assignment.push_back(make_pair(0, val);
+                    assignment.push_back(make_pair(2, vars[2].getMax());
+                    PADOUT(1)
+                    PADOUT(3)
+                    return true;
+                }
+            }
+            else if(var==2) {
+                if(vars[0].getMin()+i <=val) {
+                    assignment.push_back(make_pair(0, vars[0].getMin());
+                    assignment.push_back(make_pair(2, val);
+                    PADOUT(1)
+                    PADOUT(3)
+                    return true;
+                }
+            }
+            else {
+                assignment.push_back(make_pair(0, vars[0].getMin());
+                assignment.push_back(make_pair(2, vars[2].getMax());
+                PADOUT(1)
+                PADOUT(3)
+                return true;
+            }
+        }
+        
+        // object i right of object j
+        if(vars[2].getMin()+j <= vars[0].getMax()) {
+            if(var==0) {
+                if(vars[2].getMin()+j <= val) {
+                    assignment.push_back(make_pair(0, val);
+                    assignment.push_back(make_pair(2, vars[2].getMin());
+                    PADOUT(1)
+                    PADOUT(3)
+                    return true;
+                }
+            }
+            else if(var==2) {
+                if(val+j <= vars[0].getMax()) {
+                    assignment.push_back(make_pair(0, vars[0].getMax());
+                    assignment.push_back(make_pair(2, val);
+                    PADOUT(1)
+                    PADOUT(3)
+                    return true;
+                }
+            }
+            else {
+                assignment.push_back(make_pair(0, vars[0].getMax());
+                assignment.push_back(make_pair(2, vars[2].getMin());
+                PADOUT(1)
+                PADOUT(3)
+                return true;
+            }
+        }
+        
+        return false;
     }
+    
+    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    {
+        // argh, how to do this.
+        // test with element first
+        
+        // object i above object j.
+        if(v[1]+v[4] <=v[3]) {
+            return true;
+        }
+        
+        // object i below object j
+        if(v[3]+v[5] <= v[1]) {
+            return true;
+        }
+        
+        // object i left of object j.
+        if(v[0]+v[4] <=v[2]) {
+            return true;
+        }
+        
+        // object i right of object j
+        if(v[2]+v[5] <= v[0]) {
+            return true;
+        }
+        return false;
+    }
+    
     
     ////////////////////////////////////////////////////////////////////////////
     // Memory management.
