@@ -175,7 +175,7 @@ class NewMemoryBlock
   int total_stored_bytes;
 
 #ifndef BLOCK_SIZE
-#define BLOCK_SIZE (16*1024*1024)
+#define BLOCK_SIZE (512*1024)
 #endif
   
   SET_TYPE<MoveablePointer*> pointers;
