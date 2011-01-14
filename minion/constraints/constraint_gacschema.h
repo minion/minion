@@ -73,11 +73,13 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     
     Support* supportFreeList;       // singly-linked list of spare Support objects.
     
+    vector<DomainInt> constants;   // For constraints where the method to produce supports requires constants. e.g. Square packing, the sizes of the two squares.
+    
     ////////////////////////////////////////////////////////////////////////////
     // Ctor
     
-    GACSchema(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj), 
-    vars(_var_array), supportFreeList(0)
+    GACSchema(StateObj* _stateObj, const VarArray& _var_array, vector<DomainInt> _constants) : AbstractConstraint(_stateObj), 
+    vars(_var_array), supportFreeList(0), constants(_constants)
     {
         // Register this with the backtracker.
         getState(stateObj).getGenericBacktracker().add(this);
@@ -604,14 +606,10 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     // Square packing
     
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
-        D_ASSERT(vars[4].isAssigned());
-        D_ASSERT(vars[5].isAssigned());
+        D_ASSERT(constants.size()==2);
         
-        int i=vars[4].getAssignedValue();
-        int j=vars[5].getAssignedValue();
-        
-        PADOUT(4)
-        PADOUT(5)
+        int i=constants[0];
+        int j=constants[1];
         
         // object i below object j.
         if(vars[1].getMin()+i <=vars[3].getMax()) {
