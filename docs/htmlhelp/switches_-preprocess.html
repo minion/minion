@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>switches -preprocess</title>
+</head>
+<body>
+<h1>Help on <tt>switches -preprocess</tt></h1>
+<h3></h3>
+<pre>
+
+This switch allows the user to choose what level of preprocess is
+applied to their model before search commences.
+
+The choices are:
+
+- GAC
+- generalised arc consistency (default)
+- all propagators are run to a fixed point
+- if some propagators enforce less than GAC then the model will
+not necessarily be fully GAC at the outset
+
+- SACBounds
+- singleton arc consistency on the bounds of each variable
+- AC can be achieved when any variable lower or upper bound is a
+singleton in its own domain
+
+- SAC
+- singleton arc consistency
+- AC can be achieved in the model if any value is a singleton in
+its own domain
+
+- SSACBounds
+- singleton singleton bounds arc consistency
+- SAC can be achieved in the model when domains are replaced by either
+the singleton containing their upper bound, or the singleton containing
+their lower bound
+
+- SSAC
+- singleton singleton arc consistency
+- SAC can be achieved when any value is a singleton in its own domain
+
+These are listed in order of roughly how long they take to
+achieve. Preprocessing is a one off cost at the start of search. The
+success of higher levels of preprocessing is problem specific; SAC
+preprocesses may take a long time to complete, but may reduce search
+time enough to justify the cost.
+</pre>
+<h3>Example</h3>
+<pre>
+To enforce SAC before search:
+
+   minion -preprocess SAC myinputfile.minion
+</pre>
+<h3>References</h3>
+<pre>
+help switches -X-prop-node
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

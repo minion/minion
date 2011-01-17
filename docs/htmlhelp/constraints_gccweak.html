@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>constraints gccweak</title>
+</head>
+<body>
+<h1>Help on <tt>constraints gccweak</tt></h1>
+<h3>Description</h3>
+<pre>
+The Generalized Cardinality Constraint (GCC) (weak variant) constrains the 
+number of each value that a set of variables can take.
+
+gccweak([primary variables], [values of interest], [capacity variables])
+
+For each value of interest, there must be a capacity variable, which specifies
+the number of occurrences of the value in the primary variables.
+
+This constraint is new, and its syntax and implementation are not finalised.
+</pre>
+<h3>Example</h3>
+<pre>
+Suppose the input file had the following vectors of variables defined:
+
+DISCRETE myVec[9] {1..9}
+BOUND cap[9] {0..2}
+
+The following constraint would restrict the occurrence of values 1..9 in myVec
+to be at most 2 each initially, and finally equal to the values of the cap
+vector.
+
+gccweak(myVec, [1,2,3,4,5,6,7,8,9], cap)
+</pre>
+<h3>Notes</h3>
+<pre>
+This constraint enforces a hybrid consistency. It reads the bounds of the
+capacity variables, then enforces GAC over the primary variables only.  Then the
+bounds of the capacity variables are updated by counting values in the domains
+of the primary variables.
+
+The consistency over the capacity variables is weaker than the gcc constraint, 
+hence the name gccweak.
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>
