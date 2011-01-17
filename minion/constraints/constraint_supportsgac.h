@@ -73,6 +73,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     // when added to the vector).
     #if SupportsGACUseZeroVals
     vector<vector<int> > zeroVals;
+    vector<vector<char> > inZeroVals;  // is a var/val in zeroVals
     #endif
     
     // Partition of variables by number of supports.
@@ -119,9 +120,11 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
         #if SupportsGACUseZeroVals
         zeroVals.resize(vars.size());
+        inZeroVals.resize(vars.size());
         for(int i=0; i<vars.size(); i++) {
             zeroVals[i].reserve(numvals);  // reserve the maximum length.
             for(int j=dom_min; j<=dom_max; j++) zeroVals[i].push_back(j);
+            inZeroVals.resize(numvals, true);
         }
         #endif
         
@@ -399,7 +402,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             #if SupportsGACUseZeroVals
             if(supportsPerLit[var][litlist[i].second-dom_min]==0) {
-                zeroVals[var].push_back(litlist[i].second);
+                if(!inZeroVals[var][litlist[i].second-dom_min]) {
+                    inZeroVals[var][litlist[i].second-dom_min]=true;
+                    zeroVals[var].push_back(litlist[i].second);
+                }
             }
             #endif
             
@@ -446,6 +452,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         #if SupportsGACUseZeroVals
         cout << "zeroVals:" << zeroVals << endl;
+        cout << "inZeroVals:" << inZeroVals << endl;
         #endif
         
         cout << "Supports for each literal:"<<endl;
@@ -507,6 +514,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     // No longer a zero val. remove from vector.
                     zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
                     zeroVals[var].pop_back();
+                    inZeroVals[var][val-dom_min]=false;
                     j--;
                     continue;
                 }
@@ -529,6 +537,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                             // No longer a zero val. remove from vector.
                             zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
                             zeroVals[var].pop_back();
+                            inZeroVals[var][val-dom_min]=false;
                         }
                         #endif
                         
@@ -671,7 +680,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     // Methods for element
     
-    /*bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         typedef typename VarArray::value_type VarRef;
         VarRef idxvar=vars[vars.size()-2];
         VarRef resultvar=vars[vars.size()-1];
@@ -688,9 +697,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                             ADDTOASSIGNMENT(i,j);
                             ADDTOASSIGNMENT(vars.size()-2, i);
                             ADDTOASSIGNMENT(vars.size()-1, j);
-                            //assignment.push_back(make_pair(i, j));
-                            //assignment.push_back(make_pair(vars.size()-2, i));
-                            //assignment.push_back(make_pair(vars.size()-1, j));
                             return true;
                         }
                     }
@@ -708,9 +714,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     ADDTOASSIGNMENT(vars.size()-2, val);
                     ADDTOASSIGNMENT(vars.size()-1, i);
                     ADDTOASSIGNMENT(val, i);
-                    //assignment.push_back(make_pair(vars.size()-2, val));
-                    //assignment.push_back(make_pair(vars.size()-1, i));
-                    //assignment.push_back(make_pair(val, i));
                     return true;
                 }
             }
@@ -723,9 +726,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     ADDTOASSIGNMENT(vars.size()-2, i);
                     ADDTOASSIGNMENT(vars.size()-1, val);
                     ADDTOASSIGNMENT(i, val);
-                    //assignment.push_back(make_pair(vars.size()-2, i));
-                    //assignment.push_back(make_pair(vars.size()-1, val));
-                    //assignment.push_back(make_pair(i, val));
                     return true;
                 }
             }
@@ -733,7 +733,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         return false;
         
         
-    }*/
+    }
     
     ////////////////////////////////////////////////////////////////////////////
     // ELEMENT - FULL LENGTH TUPLES VERSION.
@@ -806,14 +806,14 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
         
     }
-    
+    */
     
     virtual BOOL check_assignment(DomainInt* v, int array_size)
     {
         int idx=v[array_size-2];
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
-    }*/
+    }
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for lexleq
@@ -1134,7 +1134,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     //
     //  Square packing with full-length supports
     // Expects x1,y1, x2,y2, boxsize1, boxsize2 (constant).
-    
+    /*
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[4].isAssigned());
         D_ASSERT(vars[5].isAssigned());
@@ -1288,7 +1288,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         return false;
     }
-    
+    */
     
     ////////////////////////////////////////////////////////////////////////////
     // Memory management.
