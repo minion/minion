@@ -481,7 +481,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     //
     //  Square packing.
-    
+    /*
     void make_disjunct_csps()
     {
         // Copy variables 
@@ -580,7 +580,81 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
             for(int j=0; j<var_array.size(); j++)
                 inner_vars[i].push_back(get_AnyVarRef_from_Var(gadget_stateObj[i], vars[j]));
         }
+    }*/
+    
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    //  Lexleq
+    
+    void make_disjunct_csps()
+    {
+        // Copy variables 
+        vector<Bounds> varbounds;
+        vector<vector<int> > vardoms;
+        for(int i=0; i<var_array.size(); i++) {
+            Bounds b(var_array[i].getInitialMin(), var_array[i].getInitialMax());
+            varbounds.push_back(b);
+            
+            vector<int> varidom; varidom.push_back(var_array[i].getInitialMin()); varidom.push_back(var_array[i].getInitialMax());
+            vardoms.push_back(varidom);
+        }
+        
+        // One disjunct per variable in each vector
+        for(int i=0; i<=var_array.size()/2; i++) {
+            StateObj* temp=new StateObj();
+            gadget_stateObj.push_back(temp);
+        }
+        
+        CSPInstance cspi;
+        
+        // Put vars into cspi
+        vector<Var> vars;
+        for(int i=0; i<var_array.size(); i++) {
+            Var vari = cspi.vars.getNewVar(VAR_DISCRETE, vardoms[i]);
+            
+            std::stringstream ss; ss << i;  // convert int to string in ridiculous C++ fashion.
+            
+            cspi.vars.addSymbol(string("x")+ss.str(), vari);
+            cspi.all_vars_list.push_back(make_vec(vari));
+            vars.push_back(vari);
+        }
+        
+        // Put constraint into cspi
+        inner_vars.resize(var_array.size()/2+1);
+        for(int i=0; i<=var_array.size()/2; i++) {
+            
+            // Set of gaceq constraints for all pairs up to i
+            for(int j=0; j<i; j++) {
+                vector<vector<Var> > eqvars;
+                eqvars.resize(2);
+                eqvars[0].push_back(vars[j]);
+                eqvars[1].push_back(vars[j+var_array.size()/2]);
+                
+                ConstraintBlob eqblob(&(constraint_list[72]), eqvars);    // GACeq
+                cspi.add_constraint(eqblob);
+            }
+            
+            if(i<var_array.size()/2) {
+                vector<vector<Var> > litvars;
+                litvars.resize(2);
+                litvars[0].push_back(vars[i]);
+                litvars[1].push_back(vars[i+var_array.size()/2]);
+                
+                ConstraintBlob litblob(&(constraint_list[18]), litvars);   // ineq
+                
+                litblob.constants.resize(1);
+                litblob.constants[0].push_back(-1);
+                
+                cspi.add_constraint(litblob);
+            }
+            
+            BuildCSP(gadget_stateObj[i], cspi);
+            
+            for(int j=0; j<var_array.size(); j++)
+                inner_vars[i].push_back(get_AnyVarRef_from_Var(gadget_stateObj[i], vars[j]));
+        }
     }
+    
     
 };
 

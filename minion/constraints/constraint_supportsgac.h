@@ -623,6 +623,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) assignment.push_back(make_pair(var,val));
     
+    // For full-length support variant:
+    #define ADDTOASSIGNMENTFL(var, val) assignment.push_back(make_pair(var,val));
+    
+    
     // Macro to add either the lower bound or the specified value for a particular variable vartopad
     // Intended to pad out an assignment to a full-length support.
     #define PADOUT(vartopad) if(var==vartopad) assignment.push_back(make_pair(var, val)); else assignment.push_back(make_pair(vartopad, vars[vartopad].getMin()));
@@ -679,7 +683,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for element
-    
+    /*
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         typedef typename VarArray::value_type VarRef;
         VarRef idxvar=vars[vars.size()-2];
@@ -735,6 +739,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
     }
     
+    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    {
+        int idx=v[array_size-2];
+        if(idx<0 || idx>=array_size-2) return false;
+        return v[v[array_size-2]] == v[array_size-1];
+    }
+    */
     ////////////////////////////////////////////////////////////////////////////
     // ELEMENT - FULL LENGTH TUPLES VERSION.
     /*
@@ -806,7 +817,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
         
     }
-    */
     
     virtual BOOL check_assignment(DomainInt* v, int array_size)
     {
@@ -814,6 +824,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
     }
+    */
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for lexleq
@@ -917,6 +928,115 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         return true;
     }*/
+    
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    //  Lexleq with full-length supports.
+    
+    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+        D_ASSERT(vars[var].inDomain(val));
+        D_ASSERT(vars.size()%2==0);
+        // First part of vars is vector 1.
+        int vecsize=vars.size()/2;
+        
+        for(int i=0; i<vecsize; i++) {
+            int j=i+vecsize;
+            int jmax=vars[j].getMax();
+            int imin=vars[i].getMin();
+            
+            // CASE 1   It is not possible for the pair to be equal or less.
+            if(imin>jmax) {
+                return false;
+            }
+            
+            // CASE 2    It is only possible to make the pair equal.
+            if(imin==jmax) {
+                // check against var, val here.
+                if(i==var && imin!=val) {
+                    return false;
+                }
+                if(j==var && jmax!=val) {
+                    return false;
+                }
+                
+                ADDTOASSIGNMENTFL(i, imin);
+                ADDTOASSIGNMENTFL(j, jmax);
+                
+                // Do not return, continue along the vector.
+                continue;
+            }
+            
+            // CASE 3    It is possible make the pair less.
+            if(imin<jmax) {
+                if(i==var) {
+                    if(val==jmax) {
+                        ADDTOASSIGNMENTFL(i, val);
+                        ADDTOASSIGNMENTFL(j, val);
+                        continue;
+                    }
+                    else if(val>jmax) {
+                        return false;
+                    }
+                    else {   //  val<jmax
+                        ADDTOASSIGNMENTFL(var, val);
+                        ADDTOASSIGNMENTFL(j, jmax);
+                        for(int k=i+1; k<vecsize; k++) {
+                            PADOUT(k);
+                            PADOUT(k+vecsize);
+                        }
+                        
+                        return true;
+                    }
+                }
+                
+                if(j==var) {
+                    if(val==imin) {
+                        ADDTOASSIGNMENTFL(i, val);
+                        ADDTOASSIGNMENTFL(j, val);
+                        continue;
+                    }
+                    else if(val<imin) {
+                        return false;
+                    }
+                    else {   //  val>imin
+                        ADDTOASSIGNMENTFL(var, val);
+                        ADDTOASSIGNMENTFL(i, imin);
+                        for(int k=i+1; k<vecsize; k++) {
+                            PADOUT(k);
+                            PADOUT(k+vecsize);
+                        }
+                        
+                        return true;
+                    }
+                }
+                
+                ADDTOASSIGNMENTFL(i,imin);
+                ADDTOASSIGNMENTFL(j,jmax);
+                for(int k=i+1; k<vecsize; k++) {
+                    PADOUT(k);
+                    PADOUT(k+vecsize);
+                }
+                
+                return true;
+            }
+            
+        }
+        
+        // Got to end of vector without finding a pair that can satisfy
+        // the ct. However this is equal....
+        return true;
+    }
+    
+    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    {
+        D_ASSERT(array_size%2==0);
+        for(int i=0; i<array_size/2; i++)
+        {
+            if(v[i]<v[i+array_size/2]) return true;
+            if(v[i]>v[i+array_size/2]) return false;
+        }
+        return true;
+    }
     
     ////////////////////////////////////////////////////////////////////////////
     //
