@@ -830,7 +830,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     // Methods for lexleq
     
-    /*
+    
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[var].inDomain(val));
         D_ASSERT(vars.size()%2==0);
@@ -928,12 +928,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             if(v[i]>v[i+array_size/2]) return false;
         }
         return true;
-    }*/
+    }
     
     ////////////////////////////////////////////////////////////////////////////
     //
     //  Lexleq with full-length supports.
-    
+    /*
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[var].inDomain(val));
         D_ASSERT(vars.size()%2==0);
@@ -1038,7 +1038,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         return true;
     }
-    
+    */
     ////////////////////////////////////////////////////////////////////////////
     //
     //  Table of short supports passed in.
