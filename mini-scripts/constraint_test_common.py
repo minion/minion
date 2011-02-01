@@ -539,15 +539,31 @@ class testsupportsgac(testlexleq):
         return runtestgeneral("supportsgac", False, options, [8], ["smallnum"], self, not options['reify'])
 
 # test consttructive disjunction constraint assuming it is an element.
-class testconstructiveor(testgacelement__minus__deprecated):
-    def runtest(self, options=dict()):
-        return runtestgeneral("constructiveor", False, options, [6], ["smallnum"], self, not options['reify'])
+#class testconstructiveor(testgacelement__minus__deprecated):
+#    def runtest(self, options=dict()):
+#        return runtestgeneral("constructiveor", False, options, [6], ["smallnum"], self, not options['reify'])
 
+# test consttructive disjunction constraint assuming it is an element.
+class testconstructiveor(testlexleq):
+    def printtable(self, domains):
+        return testlexleq.printtable(self, domains, less=False)
+    
+    def runtest(self, options=dict()):
+        return runtestgeneral("constructiveor", False, options, [8], ["smallnum"], self, not options['reify'])
 
 # test gacschema constraint assuming it is an element.
-class testgacschema(testgacelement__minus__deprecated):
+#class testgacschema(testgacelement__minus__deprecated):
+#    def runtest(self, options=dict()):
+#        return runtestgeneral("gacschema", False, options, [6], ["smallnum"], self, not options['reify'])
+
+#... assuming it is lexleq
+class testgacschema(testlexleq):
+    def printtable(self, domains):
+        return testlexleq.printtable(self, domains, less=False)
+    
     def runtest(self, options=dict()):
-        return runtestgeneral("gacschema", False, options, [6], ["smallnum"], self, not options['reify'])
+        return runtestgeneral("gacschema", False, options, [8], ["smallnum"], self, not options['reify'])
+
 
 class testelement(testgacelement__minus__deprecated):
     def runtest(self, options=dict()):
@@ -1515,6 +1531,12 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
             curvar+=1
     
     constraint=constraint[:-1]+")"   # hack off the last comma and put a bracket
+    
+    #  hacks to deal with extra arguments in supportsgac and gacschema
+    if constraintname=="supportsgac":
+        constraint=constraint[:-1]+",{<-1, -1>})"    # Pass empty list when testing supportsgac with method.
+    if constraintname=="gacschema":
+        constraint=constraint[:-1]+",[])"    # Pass empty list when testing supportsgac with method.
     
     if reify:
         constraint="reify("+constraint+", x0)"
