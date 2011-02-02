@@ -66,7 +66,7 @@ struct TestConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
       // life 
-#include "generated_life_ct.h"
+    //#include "generated_life_ct.h"
 
       
       // still life

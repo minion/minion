@@ -34,7 +34,7 @@ struct VMConstraint : public AbstractConstraint
   { return "VMConstraint"; }
 
   typedef typename VarArray::value_type VarRef;
-  array<VarRef, 10> vars;
+  array<VarRef, 5> vars;
 
   int* VM_data;
   int VM_size;
@@ -46,7 +46,7 @@ struct VMConstraint : public AbstractConstraint
     ,constraint_locked(false)
 #endif
   {
-      if(_vars.size() != 10)
+      if(_vars.size() != 5)
 	  FAIL_EXIT("Invalid constraint length");
       for(int i = 0; i < _vars.size(); ++i)
 	vars[i] = _vars[i];
@@ -199,8 +199,8 @@ struct VMConstraint : public AbstractConstraint
   void execute_symmetric_vm(Data* VM_start, int length)
   {
     int InPtr = 0;
-    int domsize = 3;
-    int lits = 30;
+    int domsize = 5;
+    int lits = 25;
     int state = 0;
     int vals[lits];
     int newvals[lits];

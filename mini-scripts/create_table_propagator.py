@@ -76,6 +76,25 @@ def adddomain(indom, maybedom, nodenum):
         MinimalImages[Image] = [nodenum, Perm]
         return False
 
+def increment_vector(con, maxvals):
+    pos = len(con) - 1
+    while pos >= 0:
+        con[pos] = con[pos] + 1
+        if con[pos] >= maxvals[pos]:
+            con[pos] = 0
+        else:
+            return True
+        pos = pos - 1
+    return False
+
+def fastcrossprod(domainmax):
+    outlist = []
+    basevec = [0] * len(domainmax)
+    outlist.append(basevec[:])
+    while increment_vector(basevec, domainmax):
+        outlist.append(basevec[:])
+    return outlist
+
 def crossprod(domains, conslist, outlist):
     if domains==[]:
         outlist.append(conslist[:])
@@ -290,7 +309,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     
     perm = adddomain(domains_in, domains_poss, tree['nodelabel'])
     if perm == EmptyKey:
-        print('# Empty node found')
+        #print('# Empty node found')
         return False
     if perm != False:
         tree['perm'] = perm[1]
@@ -834,6 +853,104 @@ def life():
     print "# Number of nodes: "+str(tree_cost2(t))
     print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
 
+def lifeImmigration():
+    global domainsize
+    global litcount
+    global Group
+    domainsize = 3
+    litcount   = 3*10
+    table=[]
+    Group = VariablePerm(10, 3, [0,1,2,3,4,5,6,7])
+    cross = fastcrossprod([3]*10)    
+    table=[]
+    # 0 = dead, 1 = alive, 2 = dying
+    for l in cross:
+        s=sum(map(lambda x: x != 0, l[:8]))
+        if l[-2] == 2 and l[-1] != 0:
+            table.append(l)
+        elif l[-2] == 1 and l[-1] != 2:
+            table.append(l)
+        elif l[-2] == 0 and l[-1] == 1 and s != 2:
+            table.append(l)
+        elif l[-2] == 0 and l[-1] == 0 and s == 2:
+            table.append(l)
+        elif l[-2] == 0 and l[-1] == 2:
+            table.append(l)
+
+    domains_init=[[0,1,2] for i in range(10)]
+    t=generate_tree(table, domains_init, True)
+    print_tree(t)
+    print ""
+    print "# Depth: "+str(tree_cost(t))
+    print "# Number of nodes: "+str(tree_cost2(t))
+    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
+
+def lifeRotation():
+    global domainsize
+    global litcount
+    global Group
+    domainsize = 3
+    litcount   = 3*10
+    table=[]
+    Group = VariablePerm(10, 3, [0,1,2,3,4,5,6,7])
+    cross=[]
+    crossprod([(0,1,2) for i in range(10)], [], cross)
+    
+    table=[]
+    for l in cross:
+        s=sum(map(lambda x: x != 0, l[:8]))
+        onecount=sum(map(lambda x: x == 1, l[:8]))
+        twocount=sum(map(lambda x: x == 2, l[:8]))
+        if onecount > twocount:
+            maxcol = 1
+        else:
+            maxcol = 2
+
+        if s>3 or s<2: # should die, or stay dead
+            if l[9]==1 or l[9]==2:
+                table.append(l)
+        elif l[8]==0: # might come to life, or stay dead
+            if (s==2 and l[9]!=0) or (s==3 and l[9]!=maxcol):
+                table.append(l)
+        else: # cell alive, 2 or 3 neighbours, stays alive
+            if l[8] != l[9]:
+                table.append(l)
+    
+    domains_init=[[0,1,2] for i in range(10)]
+    t=generate_tree(table, domains_init, True)
+    print_tree(t)
+    print ""
+    print "# Depth: "+str(tree_cost(t))
+    print "# Number of nodes: "+str(tree_cost2(t))
+    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
+
+def gcc():
+    global domainsize
+    global litcount
+    global Group
+    domainsize = 3
+    litcount   = 3*12
+    table=[]
+    Group = VariablePerm(12, 3, [0,1,2,3,4,5,6,7,8,9,10,11])
+    cross=[]
+    crossprod([(0,1,2) for i in range(12)], [], cross)
+    
+    table=[]
+    for l in cross:
+        zerocount=sum(map(lambda x: x == 0, l))
+        onecount=sum(map(lambda x: x == 1, l))
+        twocount=sum(map(lambda x: x == 2, l))
+        if zerocount != 4 or onecount != 4 or twocount != 4:
+            table.append(l)    
+
+    domains_init=[[0,1,2] for i in range(12)]
+    t=generate_tree(table, domains_init, True)
+    print_tree(t)
+    print ""
+    print "# Depth: "+str(tree_cost(t))
+    print "# Number of nodes: "+str(tree_cost2(t))
+    print "# Number nodes explored by algorithm: "+str(calls_build_tree)
+
 def life3d():
     global domainsize
     global litcount
@@ -905,23 +1022,24 @@ def summinmax():
     print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
     
 def alldiff():
+    size = 5
     global domainsize
     global litcount
     global Group
-    Group = VariablePerm(3, 3, [0,1,2]) + ValuePerm(3, 3, [0,1,2])
-    domainsize = 3
-    litcount = 9
+    Group = VariablePerm(size, size, range(size)) + ValuePerm(size, size, range(size))
+    domainsize = size
+    litcount = size*size
     table=[]
     
     cross=[]
-    crossprod([(0,1,2) for i in range(3)], [], cross)
+    crossprod([range(size) for i in range(size)], [], cross)
     
     table=[]
     for l in cross:
-        if l[0]==l[1] or l[0]==l[2] or l[1]==l[2]:
-            table.append(l)
+        if l[0]==l[1] or l[0]==l[2] or l[0]==l[3] or l[1]==l[2] or l[1]==l[3] or l[2]==l[3] or  l[0]==l[4] or l[1]==l[4] or l[2]==l[4] or l[3]==l[4]: #or l[0]==l[5] or l[1]==l[5] or l[2]==l[5] or l[3]==l[5] or l[4]==l[5]:
+              table.append(l)
     
-    domains_init=[[0,1,2] for i in range(3)]
+    domains_init=[range(size) for i in range(size)]
     t=generate_tree(table, domains_init, True)
     print_tree(t)
     print "Depth: "+str(tree_cost(t))
@@ -944,7 +1062,9 @@ def alldiff():
 #cProfile.run('life()')
 #binseq()
 #life()
-life3d()
+#life3d()
+#lifeImmigration()
+#gcc()
 #BIBD()
-#alldiff()
+alldiff()
 #summinmax()
