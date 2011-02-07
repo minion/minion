@@ -7,6 +7,7 @@ from constraint_test_common import *
 import random
 from sendemail import *
 from string import split
+import time
 
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit", "procs=", "seed=", "conslist="])
 
@@ -113,7 +114,8 @@ for procNum in range(procs):
         sys.stdout = os.fdopen(w, 'w')
         offset = procNum * (len(conslist) // procs)
         for consname1 in conslist[offset:(offset + num)]:
-            print "Testing %s, seed %i"%(consname1, seed)
+            print "Testing %s, seed %i, time: %s"%(consname1, seed, time.asctime())
+            starttime=time.time()
             sys.stdout.flush()
             random.seed(seed)
         
@@ -137,6 +139,7 @@ for procNum in range(procs):
                     print "Failed when testing %s"%consname1
                     sys.stdout.flush()
                     sys.exit(1)
+            print "Completed testing %s, time: %s, duration: %d"%(consname1, time.asctime(), time.time()-starttime)
         sys.stdout.close()
         sys.exit(0)
 
