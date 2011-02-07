@@ -1417,7 +1417,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     
     # sometimes (1/4) test very short constraints to find edge cases
     shortvector=random.randint(0,3)
-    if shortvector==0 and not "fixlength" in options:
+    if shortvector==0 and not options["fixlength"]:
         # for each item in varnums which is greater than 1...
         varnumsused=[a for a in list(set(varnums)) if a>1]
         # pick one at random
