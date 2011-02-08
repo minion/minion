@@ -45,7 +45,7 @@
 #define INCREMENTALMATCH
 
 //Incremental graph -- maintains adjacency lists for values and vars
-#define UseIncGraph true
+#define UseIncGraph 1
 
 // Does not trigger itself if this is on, and incgraph is on.
 #define ONECALL
@@ -53,7 +53,7 @@
 // When using Regin's algorithm, in the Ford-Fulkerson algorithm, use the
 // transpose graph in the second stage (to complete the matching within upper 
 // bounds).
-#define UseTranspose true
+#define UseTranspose 1
 
 // use the algorithm from Quimper et al. to prune the target variables.
 // requires UseIncGraph and not SCC
@@ -67,20 +67,20 @@
 // Only implemented with SCCs and adjacency lists.
 // Can't think of any criteria other than |SCCvars|-1
 // DOMAIN COUNTING IS INCORRECT, DO NOT USE.
-#define DomainCounting false
+#define DomainCounting 0
 
 // Use internal dynamic triggers as described in paper. 
-#define InternalDT false
+#define InternalDT 0
 
 // Requires SCC to be defined. Only splits off unit SCCs from the current
 // SCC. This is the Gecode implementation.
-#define RemoveAssignedVars false
+#define RemoveAssignedVars 0
 
 // When this is defined true, it never reads/chages the cardinality variables
 // or reads the values list.
 // MUST be used as gcc(vars, [], []) i.e. no capacity variables and no vals.
 // it just takes 0-1 as the range for every value.
-#define SimulateAlldiff false
+#define SimulateAlldiff 0
 
 // Note on semantics: GCC only restricts those values which are 'of interest',
 // it does not put any restriction on the number of other values. 

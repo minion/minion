@@ -55,7 +55,7 @@ using namespace std;
 #define REVERSELIST
 
 // Warning: if this is not defined true, then watchedalldiff probably won't do anything.
-#define UseWatches false
+#define UseWatches 0
 
 // Use the special queue
 #define SPECIALQUEUE
@@ -79,12 +79,12 @@ using namespace std;
 //#define PLONG(x) x
 
 // not much point having this, the matching has to be bt'd./
-#define BtMatch true
+#define BtMatch 1
 
 
 // If Permutation is defined true, then use integers and there should be no
 // second stage of the algorithm, and no /2.
-#define Permutation true
+#define Permutation 1
 
 
 typedef int num;
