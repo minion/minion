@@ -17,6 +17,14 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#define UseSquarePackingShort false
+#define UseSquarePackingLong false
+#define UseLexLeqShort false
+#define UseLexLeqLong false
+#define UseElementShort false
+#define UseElementLong false
+#define UseList true
+
 // The algorithm iGAC or short-supports-gac
 
 // Does it place dynamic triggers for the supports.
@@ -684,7 +692,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for element
-    /*
+
+#if UseElementShort
+    
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         typedef typename VarArray::value_type VarRef;
         VarRef idxvar=vars[vars.size()-2];
@@ -746,10 +756,14 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
     }
-    */
+
+#endif
+    //
     ////////////////////////////////////////////////////////////////////////////
     // ELEMENT - FULL LENGTH TUPLES VERSION.
-    /*
+
+#if UseElementLong
+
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         typedef typename VarArray::value_type VarRef;
         VarRef idxvar=vars[vars.size()-2];
@@ -825,11 +839,14 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
     }
-    */
+
+
+#endif 
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for lexleq
     
+#if UseLexLeqShort
     
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[var].inDomain(val));
@@ -929,11 +946,17 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         return true;
     }
+
+
+#endif 
     
     ////////////////////////////////////////////////////////////////////////////
     //
-    //  Lexleq with full-length supports.
-    /*
+    //  Lexleq with full-length supports
+    //
+
+#if UseLexLeqLong
+    
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[var].inDomain(val));
         D_ASSERT(vars.size()%2==0);
@@ -1038,12 +1061,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         return true;
     }
-    */
+    
+#endif
+    
+#if UseList
+
     ////////////////////////////////////////////////////////////////////////////
     //
     //  Table of short supports passed in.
     
-    /*bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         
         const vector<vector<pair<int, int> > >& tuplist=tuple_lists[var][val-dom_min]; 
@@ -1103,13 +1130,17 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         int idx=v[array_size-2];
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
-    }*/
-    
+    }
+
+#endif
+   
+#if UseSquarePackingShort
+
     ////////////////////////////////////////////////////////////////////////////
     //
     //  Square packing.
-    // Expects x1,y1, x2,y2, boxsize1, boxsize2 (constant).
-    /*
+    // Expects x1,y1, x2,y2, boxsize1, boxsize2 (constant)
+
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[4].isAssigned());
         D_ASSERT(vars[5].isAssigned());
@@ -1129,6 +1160,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         
         // object i below object j.
+
         if(vars[1].getMin()+i <=vars[3].getMax()) {
             if(var==1) {
                 if(val+i<=vars[3].getMax()) { 
@@ -1249,13 +1281,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             return true;
         }
         return false;
-    }*/
+    }
+#endif
+
+#if UseSquarePackingLong
     
     ////////////////////////////////////////////////////////////////////////////
     //
     //  Square packing with full-length supports
     // Expects x1,y1, x2,y2, boxsize1, boxsize2 (constant).
-    /*
+
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(vars[4].isAssigned());
         D_ASSERT(vars[5].isAssigned());
@@ -1409,7 +1444,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         return false;
     }
-    */
+#endif
     
     ////////////////////////////////////////////////////////////////////////////
     // Memory management.
