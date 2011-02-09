@@ -454,9 +454,11 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 detach_trigger(var, litlist[i].second);
             }
             
-
             // Update partition
-            // swap var to the start of its cell.
+            // swap var to the start of its cell.  
+	    // This plays a crucial role in moving together the vars which previously
+	    // had 1 less than numsupports and soon will have numsupports.
+
             partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]+1]]);
             // Move the boundary so var is now in the lower cell.
             supportNumPtrs[supportsPerVar[var]+1]++;
@@ -469,7 +471,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	// vars together which used to have SupportsPerVar[i] = supports-1 and 
 	// now have supportsPerVar[i] = supports (because supports has been decremented
 	// 
-	// So change of implementation to partitionSwap could be deadly
 	//
 	    //
 	    // Similarly to the above, each var can only be added to this list once per call to update_counters
