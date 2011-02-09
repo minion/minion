@@ -15,7 +15,14 @@ gccweak([primary variables], [values of interest], [capacity variables])
 For each value of interest, there must be a capacity variable, which specifies
 the number of occurrences of the value in the primary variables.
 
-This constraint is new, and its syntax and implementation are not finalised.
+This constraint only restricts the number of occurrences of the values in
+the value list. There is no restriction on the occurrences of other values.
+Therefore the semantics of gccweak are identical to a set of occurrence 
+constraints:
+
+occurrence([primary variables], val1, cap1)
+occurrence([primary variables], val2, cap2)
+...
 </pre>
 <h3>Example</h3>
 <pre>

@@ -423,7 +423,7 @@ cout << "" << endl
 << "" << endl
 << " where" << endl
 << "" << endl
-<< " <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMOVERWDEG" << endl
+<< " <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMMinionThreeInputReader.hppOVERWDEG" << endl
 << "" << endl
 << "The value ordering allows the user to specify an instantiation order" << endl
 << "for the variables involved in the variable order, either ascending (a)" << endl
@@ -608,7 +608,14 @@ cout << "The Generalized Cardinality Constraint (GCC) (weak variant) constrains 
 << "For each value of interest, there must be a capacity variable, which specifies" << endl
 << "the number of occurrences of the value in the primary variables." << endl
 << "" << endl
-<< "This constraint is new, and its syntax and implementation are not finalised." << endl << endl << endl;
+<< "This constraint only restricts the number of occurrences of the values in" << endl
+<< "the value list. There is no restriction on the occurrences of other values." << endl
+<< "Therefore the semantics of gccweak are identical to a set of occurrence " << endl
+<< "constraints:" << endl
+<< "" << endl
+<< "occurrence([primary variables], val1, cap1)" << endl
+<< "occurrence([primary variables], val2, cap2)" << endl
+<< "..." << endl << endl << endl;
 cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "Suppose the input file had the following vectors of variables defined:" << endl
 << "" << endl
@@ -705,7 +712,10 @@ if("constraints table" == request) {
 cout << "Help entry: " << "constraints table" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "An extensional constraint that enforces GAC. The constraint is" << endl
-<< "specified via a list of tuples." << endl << endl << endl;
+<< "specified via a list of tuples." << endl
+<< "" << endl
+<< "The variables used in the constraint have to be BOOL or DISCRETE variables." << endl
+<< "Other types are not supported." << endl << endl << endl;
 cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "To specify a constraint over 3 variables that allows assignments" << endl
 << "(0,0,0), (1,0,0), (0,1,0) or (0,0,1) do the following." << endl
@@ -789,7 +799,14 @@ cout << "The Generalized Cardinality Constraint (GCC) constrains the number of e
 << "For each value of interest, there must be a capacity variable, which specifies" << endl
 << "the number of occurrences of the value in the primary variables." << endl
 << "" << endl
-<< "This constraint is new, and its syntax and implementation are not finalised." << endl << endl << endl;
+<< "This constraint only restricts the number of occurrences of the values in" << endl
+<< "the value list. There is no restriction on the occurrences of other values." << endl
+<< "Therefore the semantics of gcc are identical to a set of occurrence " << endl
+<< "constraints:" << endl
+<< "" << endl
+<< "occurrence([primary variables], val1, cap1)" << endl
+<< "occurrence([primary variables], val2, cap2)" << endl
+<< "..." << endl << endl << endl;
 cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "Suppose the input file had the following vectors of variables defined:" << endl
 << "" << endl
@@ -806,7 +823,7 @@ cout << "This constraint enforces a hybrid consistency. It reads the bounds of t
 << "capacity variables, then enforces GAC over the primary variables only. Then the" << endl
 << "bounds of the capacity variables are updated using flow algorithms similar to" << endl
 << "those proposed by Quimper et al, Improved Algorithms for the Global Cardinality" << endl
-<< "Constraint." << endl
+<< "Constraint (CP 2004)." << endl
 << "" << endl
 << "This constraint provides stronger propagation to the capacity variables than the" << endl
 << "gccweak constraint." << endl << endl << endl;
