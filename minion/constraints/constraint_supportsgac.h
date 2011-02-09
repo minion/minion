@@ -612,7 +612,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             int var= varsWithLostImplicitSupport[i];
 	    varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
 
-	    if (varsPerSupport[var] == supports) { 	// otherwise has found implicit support in the meantime
+	    if (supportsPerVar[var] == supports) { 	// otherwise has found implicit support in the meantime
 		    #if !SupportsGACUseZeroVals
 		    for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
 		    #else
