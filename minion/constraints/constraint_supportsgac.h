@@ -479,8 +479,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	// I hope we only need to do this when NOT backtracking, at least for non backtrack-stable version
 	// When we backtrack we will add supports which did support it so there is no need to find new supports
 
+// 	cout << supportNumPtrs[supports] << " " << oldIndex << endl;
+	
 	if (!Backtracking) {
-		for(int i=oldIndex; i < supportNumPtrs[supports]; i++) { 
+		for(int i=supportNumPtrs[supports]; i < oldIndex; i++) { 
 			varsWithLostImplicitSupport.push_back(varsPerSupport[i]);
 		}
 	} 
