@@ -19,10 +19,10 @@
 
 #define UseSquarePackingShort false
 #define UseSquarePackingLong false
-#define UseLexLeqShort true
+#define UseLexLeqShort false
 #define UseLexLeqLong false
 #define UseElementShort false
-#define UseElementLong false
+#define UseElementLong true
 #define UseList false
 
 // The algorithm iGAC or short-supports-gac
