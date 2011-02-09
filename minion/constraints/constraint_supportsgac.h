@@ -18,8 +18,8 @@
 */
 
 #define UseSquarePackingShort false
-#define UseSquarePackingLong true
-#define UseLexLeqShort false
+#define UseSquarePackingLong false
+#define UseLexLeqShort true
 #define UseLexLeqLong false
 #define UseElementShort false
 #define UseElementLong false
