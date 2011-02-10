@@ -19,10 +19,10 @@
 
 #define UseSquarePackingShort false
 #define UseSquarePackingLong false
-#define UseLexLeqShort false
+#define UseLexLeqShort true
 #define UseLexLeqLong false
 #define UseElementShort false
-#define UseElementLong true
+#define UseElementLong false
 #define UseList false
 
 // The algorithm iGAC or short-supports-gac
@@ -71,7 +71,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     // Counters
     int supports;   // 0 to rd.  
     vector<int> supportsPerVar;
-    vector<vector<int> > supportsPerLit;
 
     vector<pair<int,int> > litsWithLostExplicitSupport;
     vector<int> varsWithLostImplicitSupport;
@@ -121,8 +120,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         // Initialise counters
         supports=0;
         supportsPerVar.resize(vars.size(), 0);
-        supportsPerLit.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) supportsPerLit[i].resize(numvals, 0);
         
         supportListPerLit.resize(vars.size());
         for(int i=0; i<vars.size(); i++) {
@@ -358,7 +355,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         for(int i=0; i<litsize; i++) {
             pair<int, int> temp=litlist_internal[i];
             int var=temp.first;
-            int val=temp.second-dom_min;
+	    int valoriginal=temp.second;
+            int val=valoriginal-dom_min;
+	    
+            // Attach trigger if this is the first support containing var,val.
+            if(SupportsGACUseDT && supportListPerLit[var][val].next[var]==0) {
+                attach_trigger(var, valoriginal);
+            }
             
             // Stitch it into supportListPerLit
             sup_internal->prev[var]= &(supportListPerLit[var][val]);
@@ -369,12 +372,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             //update counters
             supportsPerVar[var]++;
-            supportsPerLit[var][val]++;
             
-            // Attach trigger if this is the first support containing var,val.
-            if(SupportsGACUseDT && supportsPerLit[var][val]==1) {
-                attach_trigger(var, val+dom_min);
-            }
             
             // Update partition
             // swap var to the end of its cell.
@@ -423,8 +421,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             // decrement counters
             supportsPerVar[var]--;
-            supportsPerLit[var][valoffset]--;
-            D_ASSERT(supportsPerLit[var][valoffset] >= 0);
             
 	    // I believe that each literal can only be marked once here in a call to update_counters.
 	    // so we should be able to push it onto a list
@@ -432,7 +428,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    // As long as we do not actually call find_new_support.
 	    // So probably should shove things onto a list and then call find supports later
 
-            if(supportsPerLit[var][valoffset]==0) {
+            if(supportListPerLit[var][valoffset].next[var] == 0){
 		    // Surely don't need to update lost supports on backtracking in non-backtrack-stable code?
 		if (!Backtracking && supportsPerVar[var] == (supports - 1)) {	// since supports not decremented yet
 			litsWithLostExplicitSupport.push_back(make_pair(var,litlist[i].second));
@@ -447,12 +443,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     zeroVals[var].push_back(litlist[i].second);
                 }
                 #endif
+            // Remove trigger if this is the last support containing var,val.
+            if(SupportsGACUseDT) { detach_trigger(var, litlist[i].second); }
             }
             
-            // Remove trigger if this is the last support containing var,val.
-            if(SupportsGACUseDT && supportsPerLit[var][valoffset]==0) {
-                detach_trigger(var, litlist[i].second);
-            }
             
             // Update partition
             // swap var to the start of its cell.  
@@ -505,7 +499,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    // If we have no valid supports then (if algorithms are right) we will eventually delete
 	    // the last known valid support and at that time start looking for a new one.
 
-	    return supportsPerLit[var][val-dom_min]==0 && supportsPerVar[var] == supports; 
+	    return supportsPerVar[var] == supports && (supportListPerLit[var][val-dom_min].next[var] == 0);
     }
     //
     ////////////////////////////////////////////////////////////////////////////
@@ -515,7 +509,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         cout << "PRINTING ALL DATA STRUCTURES" <<endl;
         cout << "supports:" << supports <<endl;
         cout << "supportsPerVar:" << supportsPerVar << endl;
-        cout << "supportsPerLit:" << supportsPerLit << endl;
         cout << "partition:" <<endl;
         for(int i=0; i<supportNumPtrs.size()-1; i++) {
             cout << "supports: "<< i<< "  vars: ";
@@ -621,7 +614,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    #else
 		    for(int j=0; j<zeroVals[var].size(); j++) {
 			int val=zeroVals[var][j];
-			if(supportsPerLit[var][val-dom_min]>0) {
+                        if(supportListPerLit[var][val-dom_min].next[var] != 0){
 			    // No longer a zero val. remove from vector.
 			    zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
 			    zeroVals[var].pop_back();
@@ -632,9 +625,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    #endif
 
 		    #if !SupportsGACUseZeroVals
-			if(vars[var].inDomain(val) && supportsPerLit[var][val-dom_min]==0) {
+			if(vars[var].inDomain(val) && (supportListPerLit[var][valoffset].next[var] == 0)){
 		    #else
-			if(vars[var].inDomain(val)) {	// tested supportsPerLit above
+			if(vars[var].inDomain(val)) {	// tested supportListPerLit  above
 		    #endif
 		            findSupportsIncrementalHelper(var,val);
 			    // No longer do we remove j from zerovals in this case if support is found.
@@ -683,7 +676,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
   {
       //P("Detach Triggers");
       
-      D_ASSERT(supportsPerLit[var][val-dom_min] == 0);
+      D_ASSERT(supportListPerLit[var][val-dom_min].next[var] == 0);
       
       DynamicTrigger* dt = dynamic_trigger_start();
       dt=dt+(var*numvals)+(val-dom_min);
@@ -703,7 +696,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     D_ASSERT(!SupportsGACUseDT);  // Should not be here if using dynamic triggers.
     
     for(int val=dom_min; val<=dom_max; val++) {
-        if(!vars[prop_var].inDomain(val) && supportsPerLit[prop_var][val-dom_min]>0) {
+        if(!vars[prop_var].inDomain(val) && supportListPerLit[var][val-dom_min].next[var]!=0) {
             updateCounters(prop_var, val);
         }
     }
