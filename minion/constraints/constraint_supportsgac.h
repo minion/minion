@@ -19,9 +19,9 @@
 
 #define UseSquarePackingShort false
 #define UseSquarePackingLong false
-#define UseLexLeqShort true
+#define UseLexLeqShort false
 #define UseLexLeqLong false
-#define UseElementShort false
+#define UseElementShort true
 #define UseElementLong false
 #define UseList false
 
@@ -413,6 +413,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         for(int i=0; i<litlist.size(); i++) {
             int var=litlist[i].first;
             int valoffset=litlist[i].second-dom_min;
+
 	    D_ASSERT(prev[var]!=0);
             prev[var]->next[var]=next[var];
             if(next[var]!=0) {
@@ -444,7 +445,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 }
                 #endif
             // Remove trigger if this is the last support containing var,val.
-            if(SupportsGACUseDT) { detach_trigger(var, litlist[i].second); }
+               if(SupportsGACUseDT) { detach_trigger(var, litlist[i].second); }
             }
             
             
@@ -696,7 +697,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     D_ASSERT(!SupportsGACUseDT);  // Should not be here if using dynamic triggers.
     
     for(int val=dom_min; val<=dom_max; val++) {
-        if(!vars[prop_var].inDomain(val) && supportListPerLit[var][val-dom_min].next[var]!=0) {
+        if(!vars[prop_var].inDomain(val) && supportListPerLit[prop_var][val-dom_min].next[prop_var]!=0) {
             updateCounters(prop_var, val);
         }
     }
