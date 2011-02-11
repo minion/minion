@@ -145,8 +145,11 @@ for procNum in range(procs):
 
 for worker, reader in zip(workers, readers):
     read = os.fdopen(reader)
+    s = []
+    for tmp in read.readlines():
+        s.append(tmp)
     (pid, exitcode) = os.waitpid(worker, 0)
-    sys.stdout.write(read.read())
+    sys.stdout.write("\n".join(s))
     read.close()
     if exitcode != 0:
         if email:
