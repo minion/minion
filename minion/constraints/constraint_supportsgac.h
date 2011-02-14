@@ -17,13 +17,67 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#define UseSquarePackingShort false
-#define UseSquarePackingLong false
+// Default will be List.   
+// If any special case is defined list will be switched off
+// If two options given compile errors are expected to result.
+
+#define UseElementShort false
+#define UseElementLong false
 #define UseLexLeqShort false
 #define UseLexLeqLong false
+#define UseSquarePackingShort false
+#define UseSquarePackingLong false
+#define UseList true
+
+#ifdef SUPPORTSGACELEMENT
+#undef UseElementShort
+#undef UseList
 #define UseElementShort true
-#define UseElementLong false
 #define UseList false
+#endif
+
+#ifdef SUPPORTSGACELEMENTLONG
+#undef UseElementLong
+#undef UseList
+#define UseElementLong true
+#define UseList false
+#endif
+
+#ifdef SUPPORTSGACLEX
+#undef UseLexLeqShort
+#undef UseList
+#define UseLexLeqShort true
+#define UseList false
+#endif
+
+#ifdef SUPPORTSGACLEXLONG
+#undef UseLexLeqLong
+#undef UseList
+#define UseLexLeqLong true
+#define UseList false
+#endif
+
+#ifdef SUPPORTSGACSQUAREPACK
+#undef UseSquarePackingShort
+#undef UseList
+#define UseSquarePackingShort true
+#define UseList false
+#endif
+
+#ifdef SUPPORTSGACSQUAREPACKLONG
+#undef UseSquarePackingLong
+#undef UseList
+#define UseSquarePackingLong true
+#define UseList false
+#endif
+
+#ifdef SUPPORTSGACLIST
+#undef UseList
+#define UseList true
+#endif
+
+
+
 
 // The algorithm iGAC or short-supports-gac
 
