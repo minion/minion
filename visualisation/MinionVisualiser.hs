@@ -49,7 +49,6 @@ main = do
     quit        <- actionNew "Q" "Quit" Nothing (Just stockQuit)
     quitButton  <- actionCreateToolItem quit
     toolbarInsert toolbar (castToToolItem quitButton) $ -1
-    toolbarSetIconSize toolbar iconSizeSmallToolbar
     boxPackStart box toolbar PackNatural 0
 
     canvas      <- drawingAreaNew

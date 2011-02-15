@@ -1,11 +1,11 @@
 Name:                minion-visualiser
-Version:             0.1
+Version:             0.1.1
 Cabal-Version:       >= 1.2
+Build-Type:          Simple
 Synopsis:            Grid visualiser for minion searches
 Description:         Visualiser which takes the output of minion -dumptree and
                      puts the domains of the variables in a user-specified grid.
 License:             GPL
-License-file:        LICENSE
 Author:              Lars Kotthoff
 Maintainer:          Lars Kotthoff <larsko@cs.st-andrews.ac.uk>
 
