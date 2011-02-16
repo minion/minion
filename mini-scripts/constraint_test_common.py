@@ -937,7 +937,7 @@ class testlexless_quick(testlexleq):
         return testlexleq.printtable(self, domains, less=True)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], self, False)
+        return runtestgeneral("lexless[quick]", True, options, [4,4], ["smallnum", "smallnum"], self, False)
 
 class testlexless(testlexleq):
     def printtable(self, domains):
