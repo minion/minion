@@ -41,7 +41,8 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
     if(xmult < 1 || ymult < 1)
-      INPUT_ERROR("Multipliers on gacsum must be > 0")
+      INPUT_ERROR("Multipliers on gacsum must be > 0");
+
   }
 
   int vals;

@@ -96,6 +96,9 @@ struct ElementConstraintDynamic : public AbstractConstraint
   ElementConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, const Index& _index, const Result& _result) :
     AbstractConstraint(_stateObj), var_array(_var_array), indexvar(_index), resultvar(_result)
   { 
+    CheckNotBound(var_array, "watchelement", "element");
+    CheckNotBoundSingle(indexvar, "watchelement", "element");
+    CheckNotBoundSingle(resultvar, "watchelement", "element");
       initial_result_dom_min = resultvar.getInitialMin();
       initial_result_dom_max = resultvar.getInitialMax();
   }

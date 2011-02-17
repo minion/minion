@@ -127,6 +127,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     #endif
     ,SCCSplit(_stateObj, numvars+numvals)
     {
+        CheckNotBound(_var_array, "gcc");
         D_ASSERT(capacity_array.size()==val_array.size());
         
         for(int i=0; i<val_array.size(); i++)

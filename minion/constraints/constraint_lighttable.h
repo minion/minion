@@ -120,6 +120,7 @@ struct LightTableConstraint : public AbstractConstraint
   LightTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
   AbstractConstraint(stateObj), vars(_vars), data(new TableDataType(_tuples))
   {
+      CheckNotBound(vars, "table constraints","");
       if(_tuples->tuple_size()!=_vars.size())
       {
           cout << "Table constraint: Number of variables "

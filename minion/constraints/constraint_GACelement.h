@@ -41,7 +41,11 @@ struct GACElementConstraint : public AbstractConstraint
   GACElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexRef& _indexvar, const VarRef& _resultvar) :
     AbstractConstraint(_stateObj), var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar),
     var_array_min_val(0), var_array_max_val(0)
-  { }
+  { 
+    CheckNotBound(var_array, "gacelement-deprecated", "element");
+    CheckNotBoundSingle(indexvar, "gacelement-deprecated", "element");
+    CheckNotBoundSingle(resultvar, "gacelement-deprecated", "element");
+  }
   
   virtual triggerCollection setup_internal()
   {

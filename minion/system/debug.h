@@ -20,6 +20,34 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+template<typename T>
+inline void CheckNotBound(const T& t, std::string s, std::string s2 = "")
+{
+  for(int i = 0; i < t.size(); ++i)
+  {
+    if(t[i].isBound())
+    {
+      std::cerr << "Cannot use '" << s << "' with BOUND or SPARSEBOUND variables.\n";
+      if(s2 != "")
+        std::cerr << "Please use '" << s2 << "' as a replacement or";
+      std::cerr << "Please use DISCRETE variables instead.\n";
+      abort();
+    }
+  }
+}
+
+template<typename T>
+inline void CheckNotBoundSingle(const T& t, std::string s, std::string s2 = "")
+{
+    if(t.isBound())
+    {
+      std::cerr << "Cannot use " << s << " with BOUND or SPARSEBOUND variables.\n";
+      if(s2 != "")
+        std::cerr << "Please use " << s2 << " as a replacement or ";
+      std::cerr << "Please use DISCRETE variables instead.\n";
+      abort();
+    }
+}
 
 #ifdef MINION_DEBUG_PRINT
   #ifndef MINION_DEBUG

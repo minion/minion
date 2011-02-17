@@ -33,7 +33,9 @@ struct WatchNeqConstraint : public AbstractConstraint
 
   WatchNeqConstraint(StateObj* _stateObj, const Var1& _var1, const Var2& _var2) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
-  { }
+  { 
+    CheckNotBoundSingle(var1, "watchneq","neq");
+  }
   
   int dynamic_trigger_count()
   { return 2; }

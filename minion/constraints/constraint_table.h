@@ -32,7 +32,9 @@ struct TableConstraint : public AbstractConstraint
   
   TableConstraint(const VarArray& _vars, AbstractConstraint* c) :
     vars(_vars), constraint(c)
-  { }
+  { 
+    CheckNotBound(vars, "table constraint");
+  }
   
   virtual vector<AnyVarRef> get_vars()
   { return vars; }
