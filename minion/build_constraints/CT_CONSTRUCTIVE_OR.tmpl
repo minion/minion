@@ -1,0 +1,22 @@
+#include "../minion.h"
+/* Minion Constraint Solver
+   http://minion.sourceforge.net
+   
+   For Licence Information see file LICENSE.txt 
+*/
+
+#include "../constraints/constraint_constructiveOr.h"
+
+
+template<typename VarArray>
+AbstractConstraint*
+BuildCT_CONSTRUCTIVE_OR(StateObj* stateObj, const VarArray& var_array, ConstraintBlob&)
+{
+    #ifndef REENTER
+        INPUT_ERROR("This Constructive OR constraint requires REENTER support."); return NULL;
+    #endif
+    return new ConstructiveOr<VarArray>(stateObj, var_array); 
+}
+
+BUILD_CT(CT_CONSTRUCTIVE_OR, 1)
+

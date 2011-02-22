@@ -1,0 +1,12 @@
+MINION 3
+#TEST SOLCOUNT 0
+**VARIABLES**
+
+BOOL X
+BOOL Y
+
+**CONSTRAINTS**
+
+watchelement([], X, Y)
+
+**EOF**

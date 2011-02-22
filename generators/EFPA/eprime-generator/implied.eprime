@@ -1,0 +1,57 @@
+language ESSENCE' 1.b.a
+
+$ This one might not be exactly same as one on skye...
+
+$ ---- Parameters & Constants ----
+  given d : int(1..) $ hamming distance
+  given lambda : int(1..) $ occurrences
+  given q : int(1..) $ alphabet size
+  given noCodes : int(1..) $ to generate
+  given valuesArray : matrix indexed by [int(1..q)] of int(1..q)
+  given occsArray : matrix indexed by [int(1..q)] of int(lambda..lambda)
+
+  letting COLS be domain int(0..q*lambda-1)
+  letting ROWS be domain int(0..noCodes-1)
+
+$ ---- Decision Variables ----
+  find codes : matrix indexed by[int(0..noCodes-1), COLS] of int(1..q)
+
+
+  find pete : matrix indexed by[int(0..(noCodes-1)-1 ), int(0..q-1),
+    int(0..q-1)] of int(0..lambda)
+$ pete is occurrences of values in blocks 0..q-1 of codeword. pete[code, block, symbol]=occs of symbol
+$ ---- Constraints ----
+such that
+
+$ Symmetry breaking
+  forall col : int(0..q*lambda-2) .
+    codes[.., col] <=lex codes[..,col+1],
+  forall row : int(0..noCodes-2) .
+    codes[row, ..] <=lex codes[row+1, ..],
+
+$ gcc on code words
+  forall row : ROWS .
+    gcc (codes[row,..], valuesArray, occsArray),
+    $forall val : int(1..q) . Get andrea to fix this.
+    $ (atmost(codes[row,..], [lambda], [val]) /\\ atleast(codes[row,..],[lambda],[val])),
+
+
+$ Hamming distance -- it should be possible to take these out with fred.
+
+  forall row1 : ROWS .
+    forall row2 : int (row1+1..noCodes-1) .
+      ((sum col : COLS . codes[row1,col] != codes[row2,col]) = d)
+
+
+$ Implied
+,
+  forall row : int(1..noCodes-1) .
+    forall block : int(1 .. q) .
+(
+      gcc (codes[row,(block-1)*lambda..(block*lambda-1)],
+           valuesArray, pete[row-1,block-1,..]) /\ (pete[row-1, block-1, block-1]>=(lambda-(d/2))) /\ $ sum up the columns in pete
+
+
+      ( (sum col : int(0..q-1) . pete[row-1, col, block-1]) = lambda)
+)
+

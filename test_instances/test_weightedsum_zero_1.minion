@@ -1,0 +1,22 @@
+MINION 1
+#TEST SOLCOUNT 15
+
+0
+0
+0
+2
+-2 2 2
+0
+
+[ ]
+[ ]
+
+0 
+0
+0
+objective none
+print all
+
+weightedsumleq([0,1],[x0,x1],0)
+
+
