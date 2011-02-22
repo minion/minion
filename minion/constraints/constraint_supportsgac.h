@@ -164,7 +164,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
         numlits = vars[0].getInitialMax() - vars[0].getInitialMin() + 1;
 
-	numvals==numlits;
+	numvals = numlits;
 
         for(int i=vars.size()-1; i > 0 ; i--) {
 	    int numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
@@ -605,7 +605,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             cout << "Variable: "<<var<<endl;
             for(int val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
                 cout << "Value: "<<val<<endl;
-                Support* sup=supportListPerLit[var][val-dom_min].next[var];
+                Support* sup=supportListPerLit[var][val-vars[var].getInitialMin()].next[var];
                 while(sup!=0) {
                     cout << "Support: " << sup->literals << endl;
                     bool contains_varval=false;
@@ -772,7 +772,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     //printStructures();
     D_ASSERT(!SupportsGACUseDT);  // Should not be here if using dynamic triggers.
     
-    for(int val=vars[prop_var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
+    for(int val=vars[prop_var].getInitialMin(); val<=vars[prop_var].getInitialMax(); val++) {
         if(!vars[prop_var].inDomain(val) && supportListPerLit[prop_var][val-vars[prop_var].getInitialMin()].next[prop_var]!=0) {
             updateCounters(prop_var, val);
         }
@@ -790,8 +790,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     //  cout << "Propagate called: var= " << var << "val = " << val << endl;
       //printStructures();
 
-      deletedSupports.resize(0);
-      
       updateCounters(var, val);
       
       findSupportsIncremental();
