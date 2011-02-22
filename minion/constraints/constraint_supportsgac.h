@@ -119,8 +119,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     VarArray vars;
     
     int numvals;
-    int dom_min;
-    int dom_max;
+    int numlits;
     
     // Counters
     int supports;   // 0 to rd.  
@@ -163,31 +162,40 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         // Register this with the backtracker.
         getState(stateObj).getGenericBacktracker().add(this);
         
-        dom_max=vars[0].getInitialMax();
-        dom_min=vars[0].getInitialMin();
-        for(int i=1; i<vars.size(); i++) {
-            if(vars[i].getInitialMin()<dom_min) dom_min=vars[i].getInitialMin();
-            if(vars[i].getInitialMax()>dom_max) dom_max=vars[i].getInitialMax();
+        numlits = vars[0].getInitialMax() - vars[0].getInitialMin() + 1;
+
+	numvals==numlits;
+
+        for(int i=vars.size()-1; i > 0 ; i--) {
+	    int numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
+	    numlits += numvals_i; 
+	    if(numvals_i > numvals) numvals = numvals_i;
         }
-        numvals=dom_max-dom_min+1;
-        
+
         // Initialise counters
         supports=0;
         supportsPerVar.resize(vars.size(), 0);
         
         supportListPerLit.resize(vars.size());
         for(int i=0; i<vars.size(); i++) {
-            supportListPerLit[i].resize(numvals);  // blank Support objects.
-            for(int j=0; j<numvals; j++) supportListPerLit[i][j].next.resize(vars.size());
+	    // int numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
+	     // cout << "     i " << i << " Initial Max " << vars[i].getInitialMax() << endl ; 
+	    int numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
+            supportListPerLit[i].resize(numvals_i);  // blank Support objects.
+            for(int j=0; j<numvals_i; j++) {
+		    supportListPerLit[i][j].next.resize(vars.size());
+	      // cout << "     i j SupportListPerLit[var][val].next = " << i << " " << j << " " << supportListPerLit[i][j].next << endl ; 
+	    }
         }
         
         #if SupportsGACUseZeroVals
         zeroVals.resize(vars.size());
         inZeroVals.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) {
-            zeroVals[i].reserve(numvals);  // reserve the maximum length.
-            for(int j=dom_min; j<=dom_max; j++) zeroVals[i].push_back(j);
-            inZeroVals[i].resize(numvals, true);
+        for(int i=vars.size()-1 ; i >= 0; i--) {
+	    int numvals_i = vars[i].getInitialMax()- vars[i].getInitialMin()+1; // vars[i].getInitialMin()+1;
+            zeroVals[i].reserve(numvals_i);  // reserve the maximum length.
+            for(int j=vars[i].getInitialMin(); j<=vars[i].getInitialMax(); j++) zeroVals[i].push_back(j);
+            inZeroVals[i].resize(numvals_i, true);
         }
         #endif
 	
@@ -267,7 +275,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                         if(!varin || valmatches) {
                             // If the support doesn't include the var, or it 
                             // does include var,val then add it to the list.
-                            tuple_lists[var][val-dom_min].push_back(shortsupports[i]);
+                            tuple_lists[var][val-vars[var].getInitialMin()].push_back(shortsupports[i]);
                         }
                     }
                 }
@@ -281,11 +289,25 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     virtual ~ShortSupportsGAC() {
         //printStructures();
         set<Support*> myset;
+
+	/* 
+        for(int i=0; i<vars.size(); i++) {
+	    cout << "     i " << i << " Initial Max " << vars[i].getInitialMax() << endl ; 
+	    int numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
+            for(int j=0; j<numvals_i; j++) {
+	      cout << "     i j SupportListPerLit[var][val].next = " << i << " " << j << " " << supportListPerLit[i][j].next << endl ; 
+	    }
+        }
+	*/
         
         // Go through supportFreeList
         for(int var=0; var<vars.size(); var++) {
-            for(int val=dom_min; val<=dom_max; val++) {
-                Support* sup = supportListPerLit[var][val-dom_min].next[var];
+	  // cout << "  destructor 2: var= " << var << " original var " << vars[var] << endl ; 
+            for(int val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
+	      // cout << "     destructor 2: val= " << val << "val - vars[var].getInitialMin() = " << val - vars[var].getInitialMin() << endl ; 
+	      // cout << "     SupportListPerLit[var][val].next = " << supportListPerLit[var][val-vars[var].getInitialMin()].next << endl ; 
+                Support* sup = supportListPerLit[var][val-vars[var].getInitialMin()].next[var];
+	      // cout << "     destructor 2: sup*= " << sup << endl ; 
                 while(sup!=0) {
                     vector<Support*>& prev=sup->prev;
                     vector<Support*>& next=sup->next;
@@ -305,7 +327,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     }
                     
                     Support* temp=sup;
-                    sup=supportListPerLit[var][val-dom_min].next[var];
+                    sup=supportListPerLit[var][val-vars[var].getInitialMin()].next[var];
                     myset.insert(temp);
                 }
             }
@@ -410,7 +432,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             pair<int, int> temp=litlist_internal[i];
             int var=temp.first;
 	    int valoriginal=temp.second;
-            int val=valoriginal-dom_min;
+            int val=valoriginal-vars[var].getInitialMin();
 	    
             // Attach trigger if this is the first support containing var,val.
             if(SupportsGACUseDT && supportListPerLit[var][val].next[var]==0) {
@@ -466,7 +488,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	
         for(int i=0; i<litlist.size(); i++) {
             int var=litlist[i].first;
-            int valoffset=litlist[i].second-dom_min;
+            int valoffset=litlist[i].second-vars[var].getInitialMin();
 
 	    D_ASSERT(prev[var]!=0);
             prev[var]->next[var]=next[var];
@@ -554,7 +576,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    // If we have no valid supports then (if algorithms are right) we will eventually delete
 	    // the last known valid support and at that time start looking for a new one.
 
-	    return supportsPerVar[var] == supports && (supportListPerLit[var][val-dom_min].next[var] == 0);
+	    return supportsPerVar[var] == supports && (supportListPerLit[var][val-vars[var].getInitialMin()].next[var] == 0);
     }
     //
     ////////////////////////////////////////////////////////////////////////////
@@ -581,7 +603,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         cout << "Supports for each literal:"<<endl;
         for(int var=0; var<vars.size(); var++) {
             cout << "Variable: "<<var<<endl;
-            for(int val=dom_min; val<=dom_max; val++) {
+            for(int val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
                 cout << "Value: "<<val<<endl;
                 Support* sup=supportListPerLit[var][val-dom_min].next[var];
                 while(sup!=0) {
@@ -669,18 +691,18 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    #else
 		    for(int j=0; j<zeroVals[var].size(); j++) {
 			int val=zeroVals[var][j];
-                        if(supportListPerLit[var][val-dom_min].next[var] != 0){
+                        if(supportListPerLit[var][val-vars[var].getInitialMin()].next[var] != 0){
 			    // No longer a zero val. remove from vector.
 			    zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
 			    zeroVals[var].pop_back();
-			    inZeroVals[var][val-dom_min]=false;
+			    inZeroVals[var][val-vars[var].getInitialMin()]=false;
 			    j--;
 			    continue;
 			}
 		    #endif
 
 		    #if !SupportsGACUseZeroVals
-			if(vars[var].inDomain(val) && (supportListPerLit[var][valoffset].next[var] == 0)){
+			if(vars[var].inDomain(val) && (supportListPerLit[var][val-vars[var].getInitialMin()].next[var] == 0)){
 		    #else
 			if(vars[var].inDomain(val)) {	// tested supportListPerLit  above
 		    #endif
@@ -696,7 +718,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 
     inline void updateCounters(int var, int val) {
 
-        Support* supList = supportListPerLit[var][val-dom_min].next[var];
+        Support* supList = supportListPerLit[var][val-vars[var].getInitialMin()].next[var];
 
         litsWithLostExplicitSupport.resize(0);   
         varsWithLostImplicitSupport.resize(0);
@@ -721,7 +743,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
       
       DynamicTrigger* dt = dynamic_trigger_start();
       // find the trigger for var, val.
-      dt=dt+(var*numvals)+(val-dom_min);
+      dt=dt+(var*numvals)+(val-vars[var].getInitialMin());
       D_ASSERT(!dt->isAttached());
       
       vars[var].addDynamicTrigger(dt, DomainRemoval, val );   //BT_CALL_BACKTRACK
@@ -731,10 +753,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
   {
       //P("Detach Triggers");
       
-      D_ASSERT(supportListPerLit[var][val-dom_min].next[var] == 0);
+      D_ASSERT(supportListPerLit[var][val-vars[var].getInitialMin()].next[var] == 0);
       
       DynamicTrigger* dt = dynamic_trigger_start();
-      dt=dt+(var*numvals)+(val-dom_min);
+      dt=dt+(var*numvals)+(val-vars[var].getInitialMin());
       releaseTrigger(stateObj, dt );   // BT_CALL_BACKTRACK
   }
     
@@ -750,8 +772,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     //printStructures();
     D_ASSERT(!SupportsGACUseDT);  // Should not be here if using dynamic triggers.
     
-    for(int val=dom_min; val<=dom_max; val++) {
-        if(!vars[prop_var].inDomain(val) && supportListPerLit[prop_var][val-dom_min].next[prop_var]!=0) {
+    for(int val=vars[prop_var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
+        if(!vars[prop_var].inDomain(val) && supportListPerLit[prop_var][val-vars[prop_var].getInitialMin()].next[prop_var]!=0) {
             updateCounters(prop_var, val);
         }
     }
@@ -763,7 +785,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
   {
       int pos=dt-dynamic_trigger_start();
       int var=pos/numvals;
-      int val=pos-(var*numvals)+dom_min;
+      int val=pos-(var*numvals)+vars[var].getInitialMin();
+
+    //  cout << "Propagate called: var= " << var << "val = " << val << endl;
+      //printStructures();
+
+      deletedSupports.resize(0);
       
       updateCounters(var, val);
       
@@ -1215,10 +1242,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         
-        const vector<vector<pair<int, int> > >& tuplist=tuple_lists[var][val-dom_min]; 
+        const vector<vector<pair<int, int> > >& tuplist=tuple_lists[var][val-vars[var].getInitialMin()]; 
         
         int listsize=tuplist.size();
-        for(int i=tuple_list_pos[var][val-dom_min]; i<listsize; i++) {
+        for(int i=tuple_list_pos[var][val-vars[var].getInitialMin()]; i<listsize; i++) {
             
             int supsize=tuplist[i].size();
             bool valid=true;
@@ -1234,13 +1261,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 for(int j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tuplist[i][j].first, tuplist[i][j].second);  //assignment.push_back(tuplist[i][j]);
                 }
-                tuple_list_pos[var][val-dom_min]=i;
+                tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
                 return true;
             }
         }
         
         
-        for(int i=0; i<tuple_list_pos[var][val-dom_min]; i++) {
+        for(int i=0; i<tuple_list_pos[var][val-vars[var].getInitialMin()]; i++) {
             
             int supsize=tuplist[i].size();
             bool valid=true;
@@ -1256,7 +1283,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 for(int j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tuplist[i][j].first, tuplist[i][j].second);  //assignment.push_back(tuplist[i][j]);
                 }
-                tuple_list_pos[var][val-dom_min]=i;
+                tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
                 return true;
             }
         }
