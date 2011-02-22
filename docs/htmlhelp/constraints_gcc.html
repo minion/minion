@@ -15,7 +15,14 @@ gcc([primary variables], [values of interest], [capacity variables])
 For each value of interest, there must be a capacity variable, which specifies
 the number of occurrences of the value in the primary variables.
 
-This constraint is new, and its syntax and implementation are not finalised.
+This constraint only restricts the number of occurrences of the values in
+the value list. There is no restriction on the occurrences of other values.
+Therefore the semantics of gcc are identical to a set of occurrence 
+constraints:
+
+occurrence([primary variables], val1, cap1)
+occurrence([primary variables], val2, cap2)
+...
 </pre>
 <h3>Example</h3>
 <pre>
@@ -36,7 +43,7 @@ This constraint enforces a hybrid consistency. It reads the bounds of the
 capacity variables, then enforces GAC over the primary variables only.  Then the
 bounds of the capacity variables are updated using flow algorithms similar to
 those proposed by Quimper et al, Improved Algorithms for the Global Cardinality
-Constraint.
+Constraint (CP 2004).
 
 This constraint provides stronger propagation to the capacity variables than the
 gccweak constraint.

@@ -53,7 +53,7 @@ using namespace std;
 #define SCC
 
 // Warning: if this is not defined true, then watchedalldiff probably won't do anything.
-#define UseWatches false
+#define UseWatches 0
 
 // Optimize the case where a value was assigned. Only works in the presence of SCC
 #define ASSIGNOPT 
@@ -71,7 +71,7 @@ using namespace std;
 //#define NEWHK
 
 // Incremental graph stored in adjlist
-#define UseIncGraph false
+#define UseIncGraph 0
 
 // Use staging a la Schulte and Stuckey
 #define STAGED
