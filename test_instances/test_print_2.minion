@@ -1,0 +1,29 @@
+MINION 1
+#TEST CHECKONESOL 0
+#This just sanity checks a number of products, to make sure
+#we deal with negative numbers correctly.
+
+1
+0
+0
+0
+0
+
+[x0]
+[a]
+
+0 
+0
+0
+objective none
+print all
+
+product(1,2,2)
+product(0,10,0)
+product(-1,0,0)
+product(-1,-1,1)
+product(-1,1,-1)
+product(-2,-2,4)
+product(-10,10,-100)
+product(10,-10,-100)
+product(-10,-10,100)
