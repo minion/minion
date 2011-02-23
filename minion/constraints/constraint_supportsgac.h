@@ -92,6 +92,23 @@
 template<typename VarArray>
 struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 {
+    struct Support ; 
+
+    struct SupportCell { 
+	    int literal ; 
+	    Support* sup ; 
+	    SupportCell* next ; 
+	    SupportCell* prev ; 
+    };
+
+    struct Literal { 
+	int var ; 
+	int val ;
+	SupportCell* litSupportCellList; 
+
+	Literal() { litSupportCellList = 0 ;} 
+    };
+
     struct Support {
         vector<Support*> prev;   // Size r -- some entries null.
         vector<Support*> next;   
