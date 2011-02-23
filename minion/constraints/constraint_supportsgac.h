@@ -104,28 +104,21 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     struct Literal { 
 	int var ; 
 	int val ;
-	SupportCell* litSupportCellList; 
+	SupportCell* supportCellList; 
 
-	Literal() { litSupportCellList = 0 ;} 
+	Literal() { supportCellList = 0 ;} 
     };
 
     struct Support {
-        vector<Support*> prev;   // Size r -- some entries null.
-        vector<Support*> next;   
+        deque<SupportCell*> supportCells ;   // Size r -- some entries null.
+        int var; 
+
+        vector<pair<int,int> > literals; // may not be necessary 
         
-        // Prev and next are indexed by variable. Must be Null if the support does
-        // not include that variable. 
-        
-        vector<pair<int,int> > literals;
-        
-        Support(int numvars)
+        Support()
         {
-            prev.resize(numvars, 0);
-            next.resize(numvars, 0);
+            supportCells.resize(0);
         }
-        
-        // Blank one for use as list header. Must resize next before use.
-        Support() {}
     };
     
     virtual string constraint_name()
@@ -148,13 +141,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     // 2d array (indexed by var then val) of sentinels,
     // at the head of list of supports. 
     // Needs a sentinel at the start so that dlx-style removals work correctly.
-    vector<vector<Support> >  supportListPerLit;
+    vector<Literal>  literalListsupportListPerLit;
     
     // For each variable, a vector of values with 0 supports (or had 0 supports
     // when added to the vector).
     #if SupportsGACUseZeroVals
     vector<vector<int> > zeroVals;
-    vector<vector<char> > inZeroVals;  // is a var/val in zeroVals
+    vector<char> inZeroVals;  // is a literal in zeroVals
     #endif
     
     // Partition of variables by number of supports.
@@ -164,6 +157,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     vector<int> supportNumPtrs;   // rd+1 indices into varsPerSupport representing the partition
     
     Support* supportFreeList;       // singly-linked list of spare Support objects.
+    SupportCell* supportCellFreeList;       // singly-linked list of spare SupportCell objects.
     
     vector<vector<vector<vector<pair<int,int> > > > > tuple_lists;  // tuple_lists[var][val] is a vector 
     // of short supports for that var, val. Includes any supports that do not contain var at all.
