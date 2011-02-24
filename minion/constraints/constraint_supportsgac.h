@@ -99,8 +99,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    Support* sup ; 
 	    SupportCell* next ; 
 	    SupportCell* prev ; 
-
-	    SupportCell() {}  // no necessary defaults
     };
 
     struct Literal { 
@@ -112,13 +110,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     };
 
     struct Support {
-        deque<SupportCell> supportCells ;   // Size can't be more than r, but can be less.
+        vector<SupportCell> supportCells ;   // Size can't be more than r, but can be less.
 
-	int arity; 		// could use deque.size() but don't want to destruct SupportCells when arity decreases
+	int arity; 		// could use vector.size() but don't want to destruct SupportCells when arity decreases
 
 	Support* nextFree ; // for when Support is in Free List.
 
-        vector<pair<int,int> > literals; // may not be necessary 
         
         Support()
         {
@@ -134,6 +131,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     }
     
     VarArray vars;
+
+    vector<pair<int,int> > literalsScratch;   // used instead of per-Support list, as scratch space
     
     int numvals;
     int numlits;
@@ -179,6 +178,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     {
 	int numvars = vars.size(); 
 	
+	literalsScratch.reserve(numvars);
+
         // Register this with the backtracker.
         getState(stateObj).getGenericBacktracker().add(this);
         
@@ -186,7 +187,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         supports=0;
         supportsPerVar.resize(numvars, 0);
         
-	literalList.resize(numvars); 
 	firstLiteralPerVar.resize(0); 
 
 	int litCounter = 0 ; 
@@ -201,6 +201,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    int thisvalmin = vars[i].getInitialMin();
 
             for(int j=0; j<numvals_i; j++) {
+		    literalList.resize(litCounter+j+1);
 		    literalList[litCounter+j].var = i; 
 		    literalList[litCounter+j].val = j+thisvalmin; 
 		    literalList[litCounter+j].literalSupportList = 0;
@@ -390,7 +391,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         {
             if(rec.sup==0) return o<<"ZeroMarker";
             o<<"BTRecord:"<<rec.is_removal<<",";
-            o<< rec.sup->literals;
+            // o<< rec.sup->literals;
             return o;
         }
     };
@@ -409,7 +410,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             BTRecord temp=backtrack_stack.back();
             backtrack_stack.pop_back();
             if(temp.is_removal) {
-                addSupportInternal(0, temp.sup);
+                addSupportInternal(temp.sup);
             }
             else {
                 deleteSupportInternal(temp.sup, true);
@@ -423,60 +424,71 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     // Add and delete support
     
+    // don't need argument?   Just use litlist member?  
+    //
     Support* addSupport(box<pair<int, DomainInt> >* litlist)
     {
-        Support* newsup=addSupportInternal(litlist, 0);
+       Support* newsup = getFreeSupport(); 
+       vector<SupportCell>& supCells=newsup->supportCells;
+       int oldsize = supCells.size() ;
+       int newsize = litlist.size() ;
+
+       newsup->arity = newsize;
+
+       if(newsize > oldsize) { 
+	       supCells.resize(newsize) ; 
+	       // make sure pointers to support cell are correct
+	       // need only be done once as will always point to
+	       // its own support
+	       for(int i=oldsize; i < newsize ; i++) { 
+		       newsup->supCells[i].sup = newsup; 
+	       }
+       }
+
+       for(int i=0; i<newsize ; i++) {
+            int var=litlist[i].first;
+	    int valoriginal=litlist[i].second;
+            int lit=firstLiteralPerVar[var]+valoriginal-vars[var].getInitialMin();
+	    supCells[i].literal = lit;
+       }
+	// now have enough supCells, and sup and literal of each is correct
+
+        Support* newsup=addSupportInternal(newsup);
         struct BTRecord temp;
         temp.is_removal=false;
         temp.sup=newsup;
         backtrack_stack.push_back(temp);
         return newsup;
     }
-    
-    // Can take either a box or a support object (for use when backtracking). 
-    Support* addSupportInternal(box<pair<int, DomainInt> >* litbox, Support* sup)
-    {
-        // add a new support given as a vector of literals.
-        Support* sup_internal;
 
-	// can probably use local var for literals
-        
-        if(litbox!=0) {
-            // copy.
-            sup_internal=getFreeSupport();
-            sup_internal->literals.clear();
-            for(int i=0; i<litbox->size(); i++) sup_internal->literals.push_back((*litbox)[i]);
-        }
-        else {
-            sup_internal=sup;
-        }
-        vector<pair<int, int> >& litlist_internal=sup_internal->literals;
-        
+    // these guys can be void 
+    //
+    //
+    
+    // Takes a support which has: 
+    //  	arity correct
+    //  	supCells containing at least arity elements
+    //  	each supCells[i[ in range has 
+    //  	      literal correct
+    //  	      sup correct
+
+    Support* addSupportInternal(Support* sup_internal)
+    {
+        // add a new support given literals but not pointers in place
+
+
         //cout << "Adding support (internal) :" << litlist_internal << endl;
         //D_ASSERT(litlist_internal.size()>0);  
 	//// It should be possible to deal with empty supports, but currently they wil
         // cause a memory leak. 
         
-        int litsize=litlist_internal.size();
-	sup_internal->arity = litsize; 
+        vector<SupportCell>& supCells=sup_internal->supportCells;
 
-        deque<SupportCell>& supCells=sup_internal->supportCells;
-
-	if(litsize > supCells.size()) { 
-		supCells.resize(litsize) ; 
-	}
-	// now have enough supCells, either filled with old junk or initialised
-	//
         for(int i=0; i<litsize; i++) {
-	    supCells[i].sup = sup_internal; 
 
-            pair<int, int> temp=litlist_internal[i];
-            int var=temp.first;
-	    int valoriginal=temp.second;
-            int lit=firstLiteralPerVar[var]+valoriginal-vars[var].getInitialMin();
-	    supCells[i].literal = lit;
+	    lit= supCells[i].literal;
+	    var=literalList[lit].var;
 	    
-            
             // Stitch it into the start of literalList.supportCellList
 	    
             supCells[i].prev = 0;
@@ -519,7 +531,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     void deleteSupportInternal(Support* sup, bool Backtracking) {
         D_ASSERT(sup!=0);
         
-        deque<SupportCell>& supCells=sup->supportCells;
+        vector<SupportCell>& supCells=sup->supportCells;
 	int supArity = sup->arity; 
         //cout << "Removing support (internal) :" << litlist << endl;
         
@@ -566,11 +578,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    }
 		    else { 
 			    supCell.next->prev=0;
+			    literalList[lit].supportCellList = next; 
 		    }
 	    }
 	    else {
 		    supCell.prev->next = supCell.next;
-		    if(supCell.next==0){
+		    if(supCell.next!=0){
 			    supCell.next->prev = supCell.prev;
 		    }
 	    }
@@ -614,7 +627,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	else { 
             // We are Backtracking 
 	    // Can re-use the support when it is removed by BT. 
-            // Stick it on the free list using next[0] as the next ptr.
+            // Stick it on the free list 
             sup->nextFree=supportFreeList;
             supportFreeList=sup;
         }
@@ -702,6 +715,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 
 	    typedef pair<int,DomainInt> temptype;
 	    MAKE_STACK_BOX(newsupportbox, temptype, vars.size()); 
+	    literalScratch.clear(); 
 	    bool foundsupport=findNewSupport(newsupportbox, var, val);
 	    
 	    if(!foundsupport) {
@@ -855,7 +869,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 
     // HERE will need to be changed for backtrack stability, i.e. added even if isAssigned. Or use FL
     
-    #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) assignment.push_back(make_pair(var,val));
+    #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) literalsScratch.push_back(make_pair(var,val));
     
     // For full-length support variant:
     #define ADDTOASSIGNMENTFL(var, val) assignment.push_back(make_pair(var,val));
