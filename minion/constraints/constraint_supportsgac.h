@@ -178,7 +178,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     {
 	int numvars = vars.size(); 
 	
-	literalsScratch.reserve(numvars);
+	// literalsScratch.reserve(numvars);
+
+	literalsScratch.resize(0);
 
         // Register this with the backtracker.
         getState(stateObj).getGenericBacktracker().add(this);
@@ -715,7 +717,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 
 	    typedef pair<int,DomainInt> temptype;
 	    MAKE_STACK_BOX(newsupportbox, temptype, vars.size()); 
-	    literalScratch.clear(); 
+	    literalsScratch.clear(); 
 	    bool foundsupport=findNewSupport(newsupportbox, var, val);
 	    
 	    if(!foundsupport) {
@@ -872,12 +874,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) literalsScratch.push_back(make_pair(var,val));
     
     // For full-length support variant:
-    #define ADDTOASSIGNMENTFL(var, val) assignment.push_back(make_pair(var,val));
+    #define ADDTOASSIGNMENTFL(var, val) literalsScratch.push_back(make_pair(var,val));
     
     
     // Macro to add either the lower bound or the specified value for a particular variable vartopad
     // Intended to pad out an assignment to a full-length support.
-    #define PADOUT(vartopad) if(var==vartopad) assignment.push_back(make_pair(var, val)); else assignment.push_back(make_pair(vartopad, vars[vartopad].getMin()));
+    #define PADOUT(vartopad) if(var==vartopad) literalsScratch.push_back(make_pair(var, val)); else literalsScratch.push_back(make_pair(vartopad, vars[vartopad].getMin()));
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for pair-equals. a=b or c=d.
@@ -1017,15 +1019,15 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     for(int j=resultvar.getMin(); j<=resultvar.getMax(); j++) {
                         if(resultvar.inDomain(j) && vars[i].inDomain(j) &&
                             (i!=var || j==val) ) {   // Either the support includes both var, val or neither -- if neither, it will be a support for var,val.
-                            assignment.push_back(make_pair(i, j));
-                            assignment.push_back(make_pair(vars.size()-2, i));
-                            assignment.push_back(make_pair(vars.size()-1, j));
+                            literalsScratch.push_back(make_pair(i, j));
+                            literalsScratch.push_back(make_pair(vars.size()-2, i));
+                            literalsScratch.push_back(make_pair(vars.size()-1, j));
                             for(int k=0; k<vars.size()-2; k++) {
                                 if(k!=i) {
                                     if(k==var)
-                                        assignment.push_back(make_pair(k, val));
+                                        literalsScratch.push_back(make_pair(k, val));
                                     else
-                                        assignment.push_back(make_pair(k, vars[k].getMin()));
+                                        literalsScratch.push_back(make_pair(k, vars[k].getMin()));
                                 }
                             }
                             return true;
@@ -1042,11 +1044,11 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             for(int i=resultvar.getMin(); i<=resultvar.getMax(); i++) {
                 if(resultvar.inDomain(i) && vars[val].inDomain(i)) {
-                    assignment.push_back(make_pair(vars.size()-2, val));
-                    assignment.push_back(make_pair(vars.size()-1, i));
-                    assignment.push_back(make_pair(val, i));
+                    literalsScratch.push_back(make_pair(vars.size()-2, val));
+                    literalsScratch.push_back(make_pair(vars.size()-1, i));
+                    literalsScratch.push_back(make_pair(val, i));
                     for(int k=0; k<vars.size()-2; k++) {
-                        if(k!=val) assignment.push_back(make_pair(k, vars[k].getMin()));
+                        if(k!=val) literalsScratch.push_back(make_pair(k, vars[k].getMin()));
                     }
                     return true;
                 }
@@ -1057,11 +1059,11 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             // The result variable.
             for(int i=0; i<vars.size()-2; i++) {
                 if(vars[i].inDomain(val) && idxvar.inDomain(i)) {
-                    assignment.push_back(make_pair(vars.size()-2, i));
-                    assignment.push_back(make_pair(vars.size()-1, val));
-                    assignment.push_back(make_pair(i, val));
+                    literalsScratch.push_back(make_pair(vars.size()-2, i));
+                    literalsScratch.push_back(make_pair(vars.size()-1, val));
+                    literalsScratch.push_back(make_pair(i, val));
                     for(int k=0; k<vars.size()-2; k++) {
-                        if(k!=i) assignment.push_back(make_pair(k, vars[k].getMin()));
+                        if(k!=i) literalsScratch.push_back(make_pair(k, vars[k].getMin()));
                     }
                     return true;
                 }
@@ -1541,8 +1543,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         if(vars[1].getMin()+i <=vars[3].getMax()) {
             if(var==1) {
                 if(val+i<=vars[3].getMax()) { 
-                    assignment.push_back(make_pair(1, val));
-                    assignment.push_back(make_pair(3, vars[3].getMax()));
+                    literalsScratch.push_back(make_pair(1, val));
+                    literalsScratch.push_back(make_pair(3, vars[3].getMax()));
                     PADOUT(0)
                     PADOUT(2)
                     return true;
@@ -1550,16 +1552,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             }
             else if(var==3) {
                 if(vars[1].getMin()+i<=val) {
-                    assignment.push_back(make_pair(1, vars[1].getMin()));
-                    assignment.push_back(make_pair(3, val));
+                    literalsScratch.push_back(make_pair(1, vars[1].getMin()));
+                    literalsScratch.push_back(make_pair(3, val));
                     PADOUT(0)
                     PADOUT(2)
                     return true;
                 }
             }
             else {
-                assignment.push_back(make_pair(1, vars[1].getMin()));
-                assignment.push_back(make_pair(3, vars[3].getMax()));
+                literalsScratch.push_back(make_pair(1, vars[1].getMin()));
+                literalsScratch.push_back(make_pair(3, vars[3].getMax()));
                 PADOUT(0)
                 PADOUT(2)
                 return true;
@@ -1570,8 +1572,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         if(vars[3].getMin()+j <= vars[1].getMax()) {
             if(var==1) {
                 if(vars[3].getMin()+j <= val) {
-                    assignment.push_back(make_pair(1, val));
-                    assignment.push_back(make_pair(3, vars[3].getMin()));
+                    literalsScratch.push_back(make_pair(1, val));
+                    literalsScratch.push_back(make_pair(3, vars[3].getMin()));
                     PADOUT(0)
                     PADOUT(2)
                     return true;
@@ -1580,16 +1582,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             else if(var==3) {
                 if(val+j <= vars[1].getMax())
                 {
-                    assignment.push_back(make_pair(1, vars[1].getMax()));
-                    assignment.push_back(make_pair(3, val));
+                    literalsScratch.push_back(make_pair(1, vars[1].getMax()));
+                    literalsScratch.push_back(make_pair(3, val));
                     PADOUT(0)
                     PADOUT(2)
                     return true;
                 }
             }
             else {
-                assignment.push_back(make_pair(1, vars[1].getMax()));
-                assignment.push_back(make_pair(3, vars[3].getMin()));
+                literalsScratch.push_back(make_pair(1, vars[1].getMax()));
+                literalsScratch.push_back(make_pair(3, vars[3].getMin()));
                 PADOUT(0)
                 PADOUT(2)
                 return true;
@@ -1600,8 +1602,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         if(vars[0].getMin()+i <=vars[2].getMax()) {
             if(var==0) {
                 if(val+i <=vars[2].getMax()) {
-                    assignment.push_back(make_pair(0, val));
-                    assignment.push_back(make_pair(2, vars[2].getMax()));
+                    literalsScratch.push_back(make_pair(0, val));
+                    literalsScratch.push_back(make_pair(2, vars[2].getMax()));
                     PADOUT(1)
                     PADOUT(3)
                     return true;
@@ -1609,16 +1611,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             }
             else if(var==2) {
                 if(vars[0].getMin()+i <=val) {
-                    assignment.push_back(make_pair(0, vars[0].getMin()));
-                    assignment.push_back(make_pair(2, val));
+                    literalsScratch.push_back(make_pair(0, vars[0].getMin()));
+                    literalsScratch.push_back(make_pair(2, val));
                     PADOUT(1)
                     PADOUT(3)
                     return true;
                 }
             }
             else {
-                assignment.push_back(make_pair(0, vars[0].getMin()));
-                assignment.push_back(make_pair(2, vars[2].getMax()));
+                literalsScratch.push_back(make_pair(0, vars[0].getMin()));
+                literalsScratch.push_back(make_pair(2, vars[2].getMax()));
                 PADOUT(1)
                 PADOUT(3)
                 return true;
@@ -1629,8 +1631,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         if(vars[2].getMin()+j <= vars[0].getMax()) {
             if(var==0) {
                 if(vars[2].getMin()+j <= val) {
-                    assignment.push_back(make_pair(0, val));
-                    assignment.push_back(make_pair(2, vars[2].getMin()));
+                    literalsScratch.push_back(make_pair(0, val));
+                    literalsScratch.push_back(make_pair(2, vars[2].getMin()));
                     PADOUT(1)
                     PADOUT(3)
                     return true;
@@ -1638,16 +1640,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             }
             else if(var==2) {
                 if(val+j <= vars[0].getMax()) {
-                    assignment.push_back(make_pair(0, vars[0].getMax()));
-                    assignment.push_back(make_pair(2, val));
+                    literalsScratch.push_back(make_pair(0, vars[0].getMax()));
+                    literalsScratch.push_back(make_pair(2, val));
                     PADOUT(1)
                     PADOUT(3)
                     return true;
                 }
             }
             else {
-                assignment.push_back(make_pair(0, vars[0].getMax()));
-                assignment.push_back(make_pair(2, vars[2].getMin()));
+                literalsScratch.push_back(make_pair(0, vars[0].getMax()));
+                literalsScratch.push_back(make_pair(2, vars[2].getMin()));
                 PADOUT(1)
                 PADOUT(3)
                 return true;
