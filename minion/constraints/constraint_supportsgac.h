@@ -1,3 +1,5 @@
+// LIST BASED CODE WONT BE WORKING
+
 /*
 * Minion http://minion.sourceforge.net
 * Copyright (C) 2006-09
@@ -105,14 +107,14 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	int var ; 
 	int val ;
 	SupportCell* supportCellList; 
-
-	Literal() { supportCellList = 0 ;} 
+//	Literal() { supportCellList = 0 ;} 
     };
 
     struct Support {
         vector<SupportCell> supportCells ;   // Size can't be more than r, but can be less.
 
 	int arity; 		// could use vector.size() but don't want to destruct SupportCells when arity decreases
+				// or reconstruct existing ones when it increases.
 
 	Support* nextFree ; // for when Support is in Free List.
 
@@ -189,36 +191,37 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         supports=0;
         supportsPerVar.resize(numvars, 0);
         
-	firstLiteralPerVar.resize(0); 
+	firstLiteralPerVar.resize(numvars); 
 
 	int litCounter = 0 ; 
-	numvals = 0 ; 
+	numvals = 0 ; 		// only used now by tuple list stuff
 
         for(int i=0; i<numvars; i++) {
 
-	    firstLiteralPerVar.push_back(litCounter); 
-	    int numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
+	    firstLiteralPerVar[i] = litCounter; 
+	    int thisvalmin = vars[i].getInitialMin();
+	    int numvals_i = vars[i].getInitialMax()-thisvalmin+1;
 	    if(numvals_i > numvals) numvals = numvals_i;
 
-	    int thisvalmin = vars[i].getInitialMin();
-
             for(int j=0; j<numvals_i; j++) {
-		    literalList.resize(litCounter+j+1);
-		    literalList[litCounter+j].var = i; 
-		    literalList[litCounter+j].val = j+thisvalmin; 
-		    literalList[litCounter+j].supportCellList = 0;
+		    literalList.resize(litCounter+1);
+		    literalList[litCounter].var = i; 
+		    literalList[litCounter].val = j+thisvalmin; 
+		    literalList[litCounter].supportCellList = 0;
+		    litCounter++;
 	    }
-	    litCounter += numvals_i; 
         }
 
 	numlits = litCounter;
         
         #if SupportsGACUseZeroVals
-        zeroLits.resize(vars.size());
+        zeroLits.resize(numvars);
         for(int i=0 ; i < numvars ; i++) {
 	    int numvals_i = vars[i].getInitialMax()- vars[i].getInitialMin()+1; 
             zeroLits[i].reserve(numvals_i);  // reserve the maximum length.
-            for(int j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+firstLiteralPerVar[i]);
+            zeroLits[i].resize(0); 
+	    int thisvarstart = firstLiteralPerVar[i];
+            for(int j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
         }
         inZeroLits.resize(numlits,true); 
         #endif
@@ -240,7 +243,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         // Start with 1 cell in partition, for 0 supports. 
         supportNumPtrs.resize(numlits+1);
         supportNumPtrs[0]=0;
-        for(int i=1; i<supportNumPtrs.size(); i++) supportNumPtrs[i]=vars.size();
+        for(int i=1; i<= numlits; i++) supportNumPtrs[i]=vars.size();
         
         // Extract short supports from tuples if necessary.
         if(tuples->size()>1) {
@@ -556,6 +559,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             supportsPerVar[var]--;
 
 	    if(supCell.prev==0) { 	// this was the first support in list
+
+		    literalList[lit].supportCellList = supCell.next; 
+
 		    if(supCell.next==0) { 
 			    // We have lost the last support for lit
 			    //
@@ -583,7 +589,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    }
 		    else { 
 			    supCell.next->prev=0;
-			    literalList[lit].supportCellList = supCell.next; 
 		    }
 	    }
 	    else {
