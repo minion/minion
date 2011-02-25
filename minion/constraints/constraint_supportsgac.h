@@ -317,7 +317,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         //printStructures();
         set<Support*> myset;
 
-
 	/* 
         for(int i=0; i<vars.size(); i++) {
 	    cout << "     i " << i << " Initial Max " << vars[i].getInitialMax() << endl ; 
@@ -328,49 +327,27 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
 	*/
         
-	/* 
-	 *
-	 * Going to comment this out for now as I can't face working it out 
 
-        // Go through supportFreeList
-        for(int var=0; var<vars.size(); var++) {
-	  // cout << "  destructor 2: var= " << var << " original var " << vars[var] << endl ; 
-            for(int val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
-	      // cout << "     destructor 2: val= " << val << "val - vars[var].getInitialMin() = " << val - vars[var].getInitialMin() << endl ; 
-	      // cout << "     SupportListPerLit[var][val].next = " << supportListPerLit[var][val-vars[var].getInitialMin()].next << endl ; 
-                Support* sup = supportListPerLit[var][val-vars[var].getInitialMin()].next[var];
+	// Want to find all active support objects so we can delete them 
+        for(int lit=0; lit<numlits; lit++) {
+               SupportCell* supCell = literalList[lit].supportCellList; 
+
 	      // cout << "     destructor 2: sup*= " << sup << endl ; 
-                while(sup!=0) {
-                    vector<Support*>& prev=sup->prev;
-                    vector<Support*>& next=sup->next;
-                    vector<pair<int, int> >& litlist=sup->literals;
-                    // Unstitch supList from all lists it is in.
-                    for(int i=0; i<litlist.size(); i++) {
-                        int var=litlist[i].first;
-                        //D_ASSERT(prev[var]!=0);  // Only for igac. Here it might not be in the list.
-                        if(prev[var]!=0) {
-                            prev[var]->next[var]=next[var];
-                            //prev[var]=0;
-                        }
-                        if(next[var]!=0) {
-                            next[var]->prev[var]=prev[var];
-                            //next[var]=0;
-                        }
-                    }
-                    
-                    Support* temp=sup;
-                    sup=supportListPerLit[var][val-vars[var].getInitialMin()].next[var];
-                    myset.insert(temp);
+                while(supCell!=0) {
+                    myset.insert(supCell->sup);	// may get inserted multiple times but it's a set.
+		    supCell = supCell->next;
                 }
-            }
-        }
+	}
+	
+        // Go through supportFreeList
         
         while(supportFreeList!=0) {
             Support* sup=supportFreeList;
-            supportFreeList=sup->next[0];
+            supportFreeList=sup->nextFree;
             myset.insert(sup);
         }
         
+	// Anything remaining on bracktrack stack
         for(int i=0; i<backtrack_stack.size(); i++) {
             if(backtrack_stack[i].sup!=0) {
                 myset.insert(backtrack_stack[i].sup);
@@ -381,7 +358,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         for ( it=myset.begin() ; it != myset.end(); it++ ) {
             delete *it;
         }
-	*/
     }
 
     
