@@ -117,13 +117,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 				// or reconstruct existing ones when it increases.
 
 	Support* nextFree ; // for when Support is in Free List.
-
+	bool active;  // HERE
+	int  numLastSupported;
         
         Support()
         {
             supportCells.resize(0);
 	    arity=0;
 	    nextFree=0;
+	    active = true;  // HERE
+	    numLastSupported=0;
         }
     };
     
@@ -151,7 +154,11 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     // Needs a sentinel at the start so that dlx-style removals work correctly.
     vector<Literal>  literalList;
     vector<int> firstLiteralPerVar;
-    
+  
+    vector<Support*> lastSupportPerLit; // HERE could be in Literal type
+    vector<Support*> lastSupportPerVar;  //HERE
+    vector<Support*> deletedSupports;
+
     // For each variable, a vector of values with 0 supports (or had 0 supports
     // when added to the vector).
     #if SupportsGACUseZeroVals
@@ -231,11 +238,20 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	
         litsWithLostExplicitSupport.reserve(numlits); // max poss size, not necessarily optimal choice here
         varsWithLostImplicitSupport.reserve(vars.size());
-       
+
+    //HERE
+	// Pointers to the last implicit/explicit support for a var/literal
+	//
+	lastSupportPerVar.resize(numvars,0);	// actually don't think we care what initial val is
+	lastSupportPerLit.resize(numlits,0);
+    //EREH
+    
+	deletedSupports.reserve(numlits);   // max poss size, not necessarily best choice
+
         // Partition
         varsPerSupport.resize(vars.size());
         varsPerSupInv.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) {
+        for(int i=vars.size()-1; i>=0 ; i--) {
             varsPerSupport[i]=i;
             varsPerSupInv[i]=i;
         }
@@ -366,6 +382,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     struct BTRecord {
         bool is_removal;   // removal or addition was made. 
+	int var;  // HERE
+	int val;
         Support* sup;
         
         friend std::ostream& operator<<(std::ostream& o, const BTRecord& rec)
@@ -376,11 +394,19 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             return o;
         }
     };
+
+
+    // Have support stack 
+    // shove deletions onto them. 
+    // Shove deleted literals onto bt record
+    // go through support stack and destroy any zero supports
+    //
+    // on backtrack destroy support if it gets to zero and inactive
     
     vector<BTRecord> backtrack_stack;
     
     void mark() {
-        struct BTRecord temp = { false, 0 };
+        struct BTRecord temp = { false, 0, 0, 0 };
         backtrack_stack.push_back(temp);  // marker.
     }
     
@@ -390,12 +416,33 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         while(backtrack_stack.back().sup != 0) {
             BTRecord temp=backtrack_stack.back();
             backtrack_stack.pop_back();
-            if(temp.is_removal) {
-                addSupportInternal(temp.sup);
-            }
-            else {
+            // HERE
+	    if (! (temp.sup->active)) {
+		 if (hasNoKnownSupport(temp.var,temp.val)) {
+			 // we need to add support back in
+			 addSupportInternal(0,temp.sup); 
+		 }
+		 else {
+			 // could be clever with -- here but let's play safe
+			 if(temp.sup->numLastSupported == 1){ 
+				 // we can add tempsup to supportFreeList
+				 // cout << "adding support to Free List " << temp.sup->literals << endl ; 
+				 addToSupportFreeList(temp.sup);
+			 }
+			 else { 
+				 temp.sup->numLastSupported--;
+			 }
+		 }
+	    }
+
+	    /*
+		    // else there is nothing to do
+            if(!temp.is_removal) {
+		    // should not happen in backtrack stable case
                 deleteSupportInternal(temp.sup, true);
             }
+	    */
+
         }
         
         backtrack_stack.pop_back();  // Pop the marker.
@@ -436,10 +483,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	// now have enough supCells, and sup and literal of each is correct
 
         addSupportInternal(newsup);
-        struct BTRecord temp;
+  /* HERE
+  // Do not need to put anything onto stack for added support.
+  	    struct BTRecord temp;
         temp.is_removal=false;
         temp.sup=newsup;
         backtrack_stack.push_back(temp);
+        */
         // return newsup;
     }
 
@@ -467,7 +517,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         vector<SupportCell>& supCells=sup_internal->supportCells;
 
 	int litsize = sup_internal->arity;
-
+	
+		sup_internal->active = true;   // HERE
+		
         for(int i=0; i<litsize; i++) {
 
 	    int lit=supCells[i].literal;
@@ -504,16 +556,14 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     }
     
     void deleteSupport(Support* sup) {
-        struct BTRecord temp;
-        temp.is_removal=true;
-        temp.sup=sup;
-        backtrack_stack.push_back(temp);
-        
         deleteSupportInternal(sup, false);
     }
     
     void deleteSupportInternal(Support* sup, bool Backtracking) {
         D_ASSERT(sup!=0);
+                
+	sup->active = false; 		// HERE
+	sup->numLastSupported = 0; 
         
         vector<SupportCell>& supCells=sup->supportCells;
 	int supArity = sup->arity; 
@@ -546,9 +596,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    //
 	    // As long as we do not actually call find_new_support.
 	    // So probably should shove things onto a list and then call find supports later
-	// Surely don't need to update lost supports on backtracking in non-backtrack-stable code?
+
 			if (!Backtracking && supportsPerVar[var] == (supports - 1)) {	// since supports not decremented yet
 				litsWithLostExplicitSupport.push_back(lit);
+				lastSupportPerLit[lit] = sup;
 			}
 			#if SupportsGACUseZeroVals
 				// Still need to add to zerovals even if above test is true
@@ -608,14 +659,15 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	if (!Backtracking) {
 		for(int i=supportNumPtrs[supports]; i < oldIndex; i++) { 
 			varsWithLostImplicitSupport.push_back(varsPerSupport[i]);
+			lastSupportPerVar[varsPerSupport[i]] = sup ;
 		}
+		deletedSupports.push_back(sup);
 	} 
 	else { 
             // We are Backtracking 
 	    // Can re-use the support when it is removed by BT. 
             // Stick it on the free list 
-            sup->nextFree=supportFreeList;
-            supportFreeList=sup;
+            addToSupportFreeList(sup); 
         }
         // else can't re-use it because a ptr to it is on the BT stack. 
     }
@@ -699,7 +751,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
     }
 
-    void findSupportsIncrementalHelper(int var, int val) { 
+    bool findSupportsIncrementalHelper(int var, int val) { 
 
 	    typedef pair<int,DomainInt> temptype;
 	    // MAKE_STACK_BOX(newsupportbox, temptype, vars.size()); 
@@ -717,8 +769,49 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		// addSupport(&newsupportbox);
 		addSupport();
 	    }
+	    return foundsupport;
     }
     
+    // HERE
+    void findSupportsInitial()
+    {
+        // called from Full Propagate
+	// We do not assign responsibility for removals as this is called at the root.
+
+
+        for(int i = varsWithLostImplicitSupport.size()-1; i >= 0; i--) { 
+
+            int var= varsWithLostImplicitSupport[i];
+	    varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
+
+	    if (supportsPerVar[var] == supports) { 	// otherwise has found implicit support in the meantime
+		    #if !SupportsGACUseZeroVals
+		    for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
+		    #else
+		    for(int j=0; j<zeroVals[var].size(); j++) {
+			int val=zeroVals[var][j];
+                        if(supportListPerLit[var][val-dom_min].next[var] != 0){
+			    // No longer a zero val. remove from vector.
+			    zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
+			    zeroVals[var].pop_back();
+			    inZeroVals[var][val-dom_min]=false;
+			    j--;
+			    continue;
+			}
+		    #endif
+
+		    #if !SupportsGACUseZeroVals
+			if(vars[var].inDomain(val) && (supportListPerLit[var][val-dom_min].next[var] == 0)){
+		    #else
+			if(vars[var].inDomain(val)) {	// tested supportListPerLit  above
+		    #endif
+		            findSupportsIncrementalHelper(var,val) ;
+			} // } to trick vim bracket matching
+		    }    // } to trick vim bracket matching
+		}
+	}
+    }
+
     void findSupportsIncremental()
     {
 	// For list of vars which have lost their last implicit support
@@ -728,6 +821,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	//
         // For each variable where the number of supports is equal to the total...
 
+
 	for(int i=litsWithLostExplicitSupport.size()-1; i >= 0; i--) { 
 	    int lit=litsWithLostExplicitSupport[i];
 	    int var=literalList[lit].var;
@@ -735,8 +829,20 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    
 	    litsWithLostExplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
 	    
-	    if(vars[var].inDomain(val) && hasNoKnownSupport(var,lit)) {
-		    findSupportsIncrementalHelper(var,val);
+	    
+	    if(vars[var].inDomain(val)) {
+		    if (hasNoKnownSupport(var,val) && ! findSupportsIncrementalHelper(var,val) ) { 
+			    // removed val so must annotate why
+			    lastSupportPerLit[lit]->numLastSupported++ ;
+        		    struct BTRecord backtrackInfo = { false, var, val, lastSupportPerLit[lit] };
+			    backtrack_stack.push_back(backtrackInfo);
+		    }
+		    // else we found another support so we need to record nothing
+	    }
+	    else {  // Need to cover out of domain lits but has known support so it will have support on BT.
+		  lastSupportPerLit[lit]->numLastSupported++ ;
+        	  struct BTRecord backtrackInfo = { false, var, val, lastSupportPerLit[lit] };
+		  backtrack_stack.push_back(backtrackInfo);
 	    }
 	}
 
@@ -768,11 +874,26 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    #else
 			if(vars[var].inDomain(val)) {	// tested literalList  above
 		    #endif
-		            findSupportsIncrementalHelper(var,val);
-			    // No longer do we remove lit from zerolits in this case if support is found.
+		            if (! findSupportsIncrementalHelper(var,val) ) {
+				    lastSupportPerVar[var]->numLastSupported++;
+        		            struct BTRecord backtrackInfo = { false, var, val, lastSupportPerVar[var] };
+			            backtrack_stack.push_back(backtrackInfo);
+			    }
+			    // No longer do we remove j from zerovals in this case if support is found.
 			    // However this is correct as it can be removed lazily next time the list is traversed
 			    // And we might even get lucky and save this small amount of work.
 			} // } to trick vim bracket matching
+			else {
+			    // This is a nasty case because we are doing backtrack stability
+			    // var=val has been removed, and it must have been by something outside this 
+			    // constraint.  Therefore when it is restored we need to make sure it has 
+			    // support in this constraint.   Since it has no explicit support, its last 
+			    // support must be this implicit support we are deleting.  So we have to restore
+			    // it on bracktracking.
+			    lastSupportPerVar[var]->numLastSupported++;
+        		    struct BTRecord backtrackInfo = { false, var, val, lastSupportPerVar[var]};
+			    backtrack_stack.push_back(backtrackInfo);
+			}
 		    }    // } to trick vim bracket matching
 		}
 	}
@@ -853,14 +974,23 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     //  cout << "Propagate called: var= " << var << "val = " << val << endl;
       //printStructures();
 
-      updateCounters(lit);
+      deletedSupports.resize(0);
       
+      updateCounters(lit);
+
       findSupportsIncremental();
+
+      while(deletedSupports.size() > 0) { 
+	      if (deletedSupports.back()->numLastSupported == 0) {
+		      addToSupportFreeList(deletedSupports.back());
+	      }
+	      deletedSupports.pop_back();
+      }
   }
 
-    // HERE will need to be changed for backtrack stability, i.e. added even if isAssigned. Or use FL
+    // for backtrack stability we can't delete assigned variables, i.e. added even if isAssigned. 
     
-    #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) literalsScratch.push_back(make_pair(var,val));
+    #define ADDTOASSIGNMENT(var, val) literalsScratch.push_back(make_pair(var,val));
     
     // For full-length support variant:
     #define ADDTOASSIGNMENTFL(var, val) literalsScratch.push_back(make_pair(var,val));
@@ -1697,6 +1827,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             return temp;
         }
     }
+
+    inline void addToSupportFreeList(Support* sup)
+    { 
+	  sup->nextFree=supportFreeList; 
+	  supportFreeList=sup;
+    }
     
     virtual void full_propagate()
     {
@@ -1707,7 +1843,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	       varsWithLostImplicitSupport.push_back(i);
        }
 
-       findSupportsIncremental();
+       findSupportsInitial();
     }
     
     virtual vector<AnyVarRef> get_vars()
