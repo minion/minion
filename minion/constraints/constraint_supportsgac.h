@@ -1,5 +1,12 @@
 // LIST BASED CODE WONT BE WORKING
 
+// Started on git branch  supportsgac+bstable+adaptive
+//  	intended for supportsgac 
+//  	+ long supports 
+//  	+ better memory 
+//  	+ backtrack stability
+//  	+ adaptive use or ignoring of full length supports
+
 /*
 * Minion http://minion.sourceforge.net
 * Copyright (C) 2006-09
@@ -503,7 +510,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	
 		sup_internal->active = true;   
 		
-        for(int i=0; i<litsize; i++) {
+	if(supCells.size() < vars.size() ) {	
+		// it's a short support, so update supportsPerVar and supports 
+          for(int i=0; i<litsize; i++) {
 
 	    int lit=supCells[i].literal;
 	    int var=literalList[lit].var;
@@ -523,15 +532,37 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 
             //update counters
             supportsPerVar[var]++;
-            
-            
             // Update partition
             // swap var to the end of its cell.
             partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]]-1]);
             // Move the boundary so var is now in the higher cell.
-            supportNumPtrs[supportsPerVar[var]]--;
-        }
-        supports++;
+            supportNumPtrs[supportsPerVar[var]]--; 
+	  }
+          supports++;
+	}
+	else {
+		// it's a full length support so don't update those counters
+          for(int i=0; i<litsize; i++) {
+
+	    int lit=supCells[i].literal;
+	    int var=literalList[lit].var;
+	    
+            // Stitch it into the start of literalList.supportCellList
+	    
+            supCells[i].prev = 0;
+            supCells[i].next = literalList[lit].supportCellList;  
+            if(literalList[lit].supportCellList!=0) {
+                literalList[lit].supportCellList->prev = &(supCells[i]);
+            }
+	    else { 
+            // Attach trigger if this is the first support containing var,val.
+                attach_trigger(var, literalList[lit].val, lit);
+            }
+	    literalList[lit].supportCellList = &(supCells[i]);
+	  }
+	}
+
+
         
         //printStructures();
         
@@ -550,110 +581,176 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
         vector<SupportCell>& supCells=sup->supportCells;
 	int supArity = sup->arity; 
-        //cout << "Removing support (internal) :" << litlist << endl;
-        
-	// oldIndex is where supportsPerVar = numsupports used to be 
-	// Off by 1 error?
 
-	int oldIndex  = supportNumPtrs[supports];
-	
-        for(int i=0; i<supArity; i++) {
+	if(supCells.size() < vars.size() ) { 
+		// it's a short support 
 
-	    SupportCell& supCell = supCells[i];
-	    int lit=supCell.literal;
-            int var=literalList[lit].var ;
+		int oldIndex  = supportNumPtrs[supports];
+		
+		for(int i=0; i<supArity; i++) {
 
-	    // D_ASSERT(prev[var]!=0);
-            // decrement counters
-            supportsPerVar[var]--;
+		    SupportCell& supCell = supCells[i];
+		    int lit=supCell.literal;
+		    int var=literalList[lit].var ;
 
-	    if(supCell.prev==0) { 	// this was the first support in list
+		    // D_ASSERT(prev[var]!=0);
+		    // decrement counters
+		    supportsPerVar[var]--;
 
-		    literalList[lit].supportCellList = supCell.next; 
+		    if(supCell.prev==0) { 	// this was the first support in list
 
-		    if(supCell.next==0) { 
-			    // We have lost the last support for lit
-			    //
-	    // I believe that each literal can only be marked once here in a call to update_counters.
-	    // so we should be able to push it onto a list
-	    //
-	    // As long as we do not actually call find_new_support.
-	    // So probably should shove things onto a list and then call find supports later
+			    literalList[lit].supportCellList = supCell.next; 
 
-			if (!Backtracking && supportsPerVar[var] == (supports - 1)) {	// since supports not decremented yet
-				litsWithLostExplicitSupport.push_back(lit);
-				lastSupportPerLit[lit] = sup;
-			}
-			#if SupportsGACUseZeroVals
-				// Still need to add to zerovals even if above test is true
-				// because we might find a new implicit support, later lose it, and then it will 
-				// be essential that it is in zerovals.  Obviously if an explicit support is 
-				// found then it will later get deleted from zerovals.
-			if(!inZeroLits[lit]) {
-			    inZeroLits[lit]=true;
-			    zeroLits[var].push_back(lit);
-			}
-			#endif
-		    // Remove trigger since this is the last support containing var,val.
-		       if(SupportsGACUseDT) { detach_trigger(lit); }
+			    if(supCell.next==0) { 
+				    // We have lost the last support for lit
+				    //
+		    // I believe that each literal can only be marked once here in a call to update_counters.
+		    // so we should be able to push it onto a list
+		    //
+		    // As long as we do not actually call find_new_support.
+		    // So probably should shove things onto a list and then call find supports later
+
+				if (!Backtracking && supportsPerVar[var] == (supports - 1)) {	// since supports not decremented yet
+					litsWithLostExplicitSupport.push_back(lit);
+					lastSupportPerLit[lit] = sup;
+				}
+				#if SupportsGACUseZeroVals
+					// Still need to add to zerovals even if above test is true
+					// because we might find a new implicit support, later lose it, and then it will 
+					// be essential that it is in zerovals.  Obviously if an explicit support is 
+					// found then it will later get deleted from zerovals.
+				if(!inZeroLits[lit]) {
+				    inZeroLits[lit]=true;
+				    zeroLits[var].push_back(lit);
+				}
+				#endif
+			    // Remove trigger since this is the last support containing var,val.
+			       if(SupportsGACUseDT) { detach_trigger(lit); }
+			    }
+			    else { 
+				    supCell.next->prev=0;
+			    }
 		    }
-		    else { 
-			    supCell.next->prev=0;
+		    else {
+			    supCell.prev->next = supCell.next;
+			    if(supCell.next!=0){
+				    supCell.next->prev = supCell.prev;
+			    }
 		    }
-	    }
-	    else {
-		    supCell.prev->next = supCell.next;
-		    if(supCell.next!=0){
-			    supCell.next->prev = supCell.prev;
-		    }
-	    }
-            
-            
+		    
+		    
 
-            // Update partition
-            // swap var to the start of its cell.  
-	    // This plays a crucial role in moving together the vars which previously
-	    // had 1 less than numsupports and soon will have numsupports.
+		    // Update partition
+		    // swap var to the start of its cell.  
+		    // This plays a crucial role in moving together the vars which previously
+		    // had 1 less than numsupports and soon will have numsupports.
 
-            partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]+1]]);
-	    //
-            // Move the boundary so var is now in the lower cell.
-            supportNumPtrs[supportsPerVar[var]+1]++;
+		    partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]+1]]);
+		    //
+		    // Move the boundary so var is now in the lower cell.
+		    supportNumPtrs[supportsPerVar[var]+1]++;
 
-	    
-        }
-        supports--;
-	
-	// For following code it is essential that partition swaps compress 
-	// vars together which used to have SupportsPerVar[i] = supports-1 and 
-	// now have supportsPerVar[i] = supports (because supports has been decremented
-	// 
-	//
-	    //
-	    // Similarly to the above, each var can only be added to this list once per call to update_counters
-	    // Because it can only lose its last implicit support once since we are only deleting supports.
-	    //
-	
-	// I hope we only need to do this when NOT backtracking, at least for non backtrack-stable version
-	// When we backtrack we will add supports which did support it so there is no need to find new supports
-
-// 	cout << supportNumPtrs[supports] << " " << oldIndex << endl;
-	
-	if (!Backtracking) {
-		for(int i=supportNumPtrs[supports]; i < oldIndex; i++) { 
-			varsWithLostImplicitSupport.push_back(varsPerSupport[i]);
-			lastSupportPerVar[varsPerSupport[i]] = sup ;
+		    
 		}
-		deletedSupports.push_back(sup);
-	} 
-	else { 
-            // We are Backtracking 
-	    // Can re-use the support when it is removed by BT. 
-            // Stick it on the free list 
-            addToSupportFreeList(sup); 
-        }
-        // else can't re-use it because a ptr to it is on the BT stack. 
+		supports--;
+		
+		// For following code it is essential that partition swaps compress 
+		// vars together which used to have SupportsPerVar[i] = supports-1 and 
+		// now have supportsPerVar[i] = supports (because supports has been decremented
+		// 
+		//
+		    //
+		    // Similarly to the above, each var can only be added to this list once per call to update_counters
+		    // Because it can only lose its last implicit support once since we are only deleting supports.
+		    //
+		
+		// I hope we only need to do this when NOT backtracking, at least for non backtrack-stable version
+		// When we backtrack we will add supports which did support it so there is no need to find new supports
+
+	// 	cout << supportNumPtrs[supports] << " " << oldIndex << endl;
+		
+		if (!Backtracking) {
+			for(int i=supportNumPtrs[supports]; i < oldIndex; i++) { 
+				varsWithLostImplicitSupport.push_back(varsPerSupport[i]);
+				lastSupportPerVar[varsPerSupport[i]] = sup ;
+			}
+			deletedSupports.push_back(sup);
+		} 
+		else { 
+		    // We are Backtracking 
+		    // Can re-use the support when it is removed by BT. 
+		    // Stick it on the free list 
+		    addToSupportFreeList(sup); 
+		}
+		// else can't re-use it because a ptr to it is on the BT stack. 
+	    }
+	else {
+		// it's a full length support 
+
+		for(int i=0; i<supArity; i++) {
+
+		    SupportCell& supCell = supCells[i];
+		    int lit=supCell.literal;
+		    int var=literalList[lit].var ;
+
+		    if(supCell.prev==0) { 	// this was the first support in list
+
+			    literalList[lit].supportCellList = supCell.next; 
+
+			    if(supCell.next==0) { 
+				    // We have lost the last support for lit
+				    //
+		    // I believe that each literal can only be marked once here in a call to update_counters.
+		    // so we should be able to push it onto a list
+		    //
+		    // As long as we do not actually call find_new_support.
+		    // So probably should shove things onto a list and then call find supports later
+
+				if (!Backtracking && supportsPerVar[var] == (supports - 1)) {	// since supports not decremented yet
+					litsWithLostExplicitSupport.push_back(lit);
+					lastSupportPerLit[lit] = sup;
+				}
+				#if SupportsGACUseZeroVals
+					// Still need to add to zerovals even if above test is true
+					// because we might find a new implicit support, later lose it, and then it will 
+					// be essential that it is in zerovals.  Obviously if an explicit support is 
+					// found then it will later get deleted from zerovals.
+				if(!inZeroLits[lit]) {
+				    inZeroLits[lit]=true;
+				    zeroLits[var].push_back(lit);
+				}
+				#endif
+			    // Remove trigger since this is the last support containing var,val.
+			       if(SupportsGACUseDT) { detach_trigger(lit); }
+			    }
+			    else { 
+				    supCell.next->prev=0;
+			    }
+		    }
+		    else {
+			    supCell.prev->next = supCell.next;
+			    if(supCell.next!=0){
+				    supCell.next->prev = supCell.prev;
+			    }
+		    }
+		    
+		}
+		
+		// Since this was a full length supports no var has lost its last implicit support
+		
+		if (!Backtracking) {
+			deletedSupports.push_back(sup);
+		} 
+		else { 
+		    // We are Backtracking 
+		    // Can re-use the support when it is removed by BT. 
+		    // Stick it on the free list 
+		    addToSupportFreeList(sup); 
+		}
+		// else can't re-use it because a ptr to it is on the BT stack.  
+	}
     }
+
 
     BOOL hasNoKnownSupport(int var,int lit) {
 	    //
