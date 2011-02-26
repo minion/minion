@@ -706,7 +706,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    // As long as we do not actually call find_new_support.
 		    // So probably should shove things onto a list and then call find supports later
 
-				if (!Backtracking && supportsPerVar[var] == (supports - 1)) {	// since supports not decremented yet
+				if (!Backtracking && supportsPerVar[var] == supports) {		// supports won't be decremented
 					litsWithLostExplicitSupport.push_back(lit);
 					lastSupportPerLit[lit] = sup;
 				}
