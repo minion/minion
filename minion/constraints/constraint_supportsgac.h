@@ -117,7 +117,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 				// or reconstruct existing ones when it increases.
 
 	Support* nextFree ; // for when Support is in Free List.
-	bool active;  // HERE
+	bool active;  
 	int  numLastSupported;
         
         Support()
@@ -125,7 +125,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             supportCells.resize(0);
 	    arity=0;
 	    nextFree=0;
-	    active = true;  // HERE
+	    active = true;  
 	    numLastSupported=0;
         }
     };
@@ -155,8 +155,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     vector<Literal>  literalList;
     vector<int> firstLiteralPerVar;
   
-    vector<Support*> lastSupportPerLit; // HERE could be in Literal type
-    vector<Support*> lastSupportPerVar;  //HERE
+    vector<Support*> lastSupportPerLit; // could be in Literal type
+    vector<Support*> lastSupportPerVar;  
     vector<Support*> deletedSupports;
 
     // For each variable, a vector of values with 0 supports (or had 0 supports
@@ -239,12 +239,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         litsWithLostExplicitSupport.reserve(numlits); // max poss size, not necessarily optimal choice here
         varsWithLostImplicitSupport.reserve(vars.size());
 
-    //HERE
 	// Pointers to the last implicit/explicit support for a var/literal
 	//
 	lastSupportPerVar.resize(numvars,0);	// actually don't think we care what initial val is
 	lastSupportPerLit.resize(numlits,0);
-    //EREH
     
 	deletedSupports.reserve(numlits);   // max poss size, not necessarily best choice
 
@@ -381,15 +379,16 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     // Backtracking mechanism
     
     struct BTRecord {
-        bool is_removal;   // removal or addition was made. 
-	int var;  // HERE
-	int val;
+        // bool is_removal;   // removal or addition was made. 
+	int var;  
+	int lit;
         Support* sup;
         
         friend std::ostream& operator<<(std::ostream& o, const BTRecord& rec)
         {
             if(rec.sup==0) return o<<"ZeroMarker";
-            o<<"BTRecord:"<<rec.is_removal<<",";
+            o<<"BTRecord:"<< ; 
+	    o<<var<<","<<lit;
             // o<< rec.sup->literals;
             return o;
         }
@@ -406,7 +405,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     vector<BTRecord> backtrack_stack;
     
     void mark() {
-        struct BTRecord temp = { false, 0, 0, 0 };
+        struct BTRecord temp = { 0, 0, 0 };
         backtrack_stack.push_back(temp);  // marker.
     }
     
@@ -416,9 +415,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         while(backtrack_stack.back().sup != 0) {
             BTRecord temp=backtrack_stack.back();
             backtrack_stack.pop_back();
-            // HERE
+            // BTStable Change
 	    if (! (temp.sup->active)) {
-		 if (hasNoKnownSupport(temp.var,temp.val)) {
+		 if (hasNoKnownSupport(temp.var,temp.lit)) {
 			 // we need to add support back in
 			 addSupportInternal(0,temp.sup); 
 		 }
@@ -483,14 +482,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	// now have enough supCells, and sup and literal of each is correct
 
         addSupportInternal(newsup);
-  /* HERE
-  // Do not need to put anything onto stack for added support.
-  	    struct BTRecord temp;
-        temp.is_removal=false;
-        temp.sup=newsup;
-        backtrack_stack.push_back(temp);
-        */
-        // return newsup;
     }
 
     // these guys can be void 
@@ -518,7 +509,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 
 	int litsize = sup_internal->arity;
 	
-		sup_internal->active = true;   // HERE
+		sup_internal->active = true;   
 		
         for(int i=0; i<litsize; i++) {
 
@@ -562,7 +553,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     void deleteSupportInternal(Support* sup, bool Backtracking) {
         D_ASSERT(sup!=0);
                 
-	sup->active = false; 		// HERE
+	sup->active = false; 		
 	sup->numLastSupported = 0; 
         
         vector<SupportCell>& supCells=sup->supportCells;
@@ -772,12 +763,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    return foundsupport;
     }
     
-    // HERE
     void findSupportsInitial()
     {
         // called from Full Propagate
 	// We do not assign responsibility for removals as this is called at the root.
-
 
         for(int i = varsWithLostImplicitSupport.size()-1; i >= 0; i--) { 
 
@@ -787,23 +776,25 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    if (supportsPerVar[var] == supports) { 	// otherwise has found implicit support in the meantime
 		    #if !SupportsGACUseZeroVals
 		    for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
+			int lit=firstLiteralPerVar[var]+val-vars[var].getInitialMin();
 		    #else
-		    for(int j=0; j<zeroVals[var].size(); j++) {
-			int val=zeroVals[var][j];
-                        if(supportListPerLit[var][val-dom_min].next[var] != 0){
+		    for(int j=0; j<zeroLits[var].size(); j++) {
+			int lit=zeroLits[var][j];
+                        if(literalList[lit].supportCellList != 0){
 			    // No longer a zero val. remove from vector.
-			    zeroVals[var][j]=zeroVals[var][zeroVals[var].size()-1];
-			    zeroVals[var].pop_back();
-			    inZeroVals[var][val-dom_min]=false;
+			    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
+			    zeroLits[var].pop_back();
+			    inZeroLits[lit]=false;
 			    j--;
 			    continue;
 			}
+			int val=literalList[lit].val;
 		    #endif
 
 		    #if !SupportsGACUseZeroVals
-			if(vars[var].inDomain(val) && (supportListPerLit[var][val-dom_min].next[var] == 0)){
+			if(vars[var].inDomain(val) && (literalList[lit].supportCellList == 0)){
 		    #else
-			if(vars[var].inDomain(val)) {	// tested supportListPerLit  above
+			if(vars[var].inDomain(val)) {	// tested supportCellList  above
 		    #endif
 		            findSupportsIncrementalHelper(var,val) ;
 			} // } to trick vim bracket matching
@@ -831,17 +822,17 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    
 	    
 	    if(vars[var].inDomain(val)) {
-		    if (hasNoKnownSupport(var,val) && ! findSupportsIncrementalHelper(var,val) ) { 
+		    if (hasNoKnownSupport(var,lit) && ! findSupportsIncrementalHelper(var,val) ) { 
 			    // removed val so must annotate why
 			    lastSupportPerLit[lit]->numLastSupported++ ;
-        		    struct BTRecord backtrackInfo = { false, var, val, lastSupportPerLit[lit] };
+        		    struct BTRecord backtrackInfo = { var, lit, lastSupportPerLit[lit] };
 			    backtrack_stack.push_back(backtrackInfo);
 		    }
 		    // else we found another support so we need to record nothing
 	    }
 	    else {  // Need to cover out of domain lits but has known support so it will have support on BT.
 		  lastSupportPerLit[lit]->numLastSupported++ ;
-        	  struct BTRecord backtrackInfo = { false, var, val, lastSupportPerLit[lit] };
+        	  struct BTRecord backtrackInfo = { var, lit, lastSupportPerLit[lit] };
 		  backtrack_stack.push_back(backtrackInfo);
 	    }
 	}
@@ -876,7 +867,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    #endif
 		            if (! findSupportsIncrementalHelper(var,val) ) {
 				    lastSupportPerVar[var]->numLastSupported++;
-        		            struct BTRecord backtrackInfo = { false, var, val, lastSupportPerVar[var] };
+        		            struct BTRecord backtrackInfo = { var, lit, lastSupportPerVar[var] };
 			            backtrack_stack.push_back(backtrackInfo);
 			    }
 			    // No longer do we remove j from zerovals in this case if support is found.
@@ -891,7 +882,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 			    // support must be this implicit support we are deleting.  So we have to restore
 			    // it on bracktracking.
 			    lastSupportPerVar[var]->numLastSupported++;
-        		    struct BTRecord backtrackInfo = { false, var, val, lastSupportPerVar[var]};
+        		    struct BTRecord backtrackInfo = { var, lit, lastSupportPerVar[var]};
 			    backtrack_stack.push_back(backtrackInfo);
 			}
 		    }    // } to trick vim bracket matching
