@@ -387,8 +387,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         friend std::ostream& operator<<(std::ostream& o, const BTRecord& rec)
         {
             if(rec.sup==0) return o<<"ZeroMarker";
-            o<<"BTRecord:"<< ; 
-	    o<<var<<","<<lit;
+            o<<"BTRecord:" ; 
+	    o<<rec.var<<","<<rec.lit;
             // o<< rec.sup->literals;
             return o;
         }
@@ -419,7 +419,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    if (! (temp.sup->active)) {
 		 if (hasNoKnownSupport(temp.var,temp.lit)) {
 			 // we need to add support back in
-			 addSupportInternal(0,temp.sup); 
+			 addSupportInternal(temp.sup); 
 		 }
 		 else {
 			 // could be clever with -- here but let's play safe
@@ -433,14 +433,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 			 }
 		 }
 	    }
-
-	    /*
-		    // else there is nothing to do
-            if(!temp.is_removal) {
-		    // should not happen in backtrack stable case
-                deleteSupportInternal(temp.sup, true);
-            }
-	    */
 
         }
         
