@@ -243,7 +243,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	// Lists (vectors) of literals/vars that have lost support.
 	// Set this up to insist that everything needs to have support found for it on full propagate.
 	
-        litsWithLostExplicitSupport.reserve(numlits); // max poss size, not necessarily optimal choice here
+        // litsWithLostExplicitSupport.reserve(numlits); // max poss size, not necessarily optimal choice here
         varsWithLostImplicitSupport.reserve(vars.size());
 
 	// Pointers to the last implicit/explicit support for a var/literal
@@ -682,7 +682,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    // Stick it on the free list 
 		    addToSupportFreeList(sup); 
 		}
-		// else can't re-use it because a ptr to it is on the BT stack. 
 	    }
 	else {
 		// it's a full length support 
@@ -747,7 +746,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    // Stick it on the free list 
 		    addToSupportFreeList(sup); 
 		}
-		// else can't re-use it because a ptr to it is on the BT stack.  
 	}
     }
 
