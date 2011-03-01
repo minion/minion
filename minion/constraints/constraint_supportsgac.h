@@ -508,9 +508,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 
 	int litsize = sup_internal->arity;
 	
-		sup_internal->active = true;   
+	sup_internal->active = true;   
 		
-	if(supCells.size() < vars.size() ) {	
+	if(litsize < vars.size() ) {	
 		// it's a short support, so update supportsPerVar and supports 
           for(int i=0; i<litsize; i++) {
 
@@ -582,7 +582,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         vector<SupportCell>& supCells=sup->supportCells;
 	int supArity = sup->arity; 
 
-	if(supCells.size() < vars.size() ) { 
+	if(supArity < vars.size() ) { 
 		// it's a short support 
 
 		int oldIndex  = supportNumPtrs[supports];
