@@ -66,11 +66,10 @@ struct Dynamic_AND : public ParentConstraint
     { return "Dynamic AND:"; }
 
     
-  Reversible<bool> full_propagate_called;
   bool constraint_locked;
-  
+  int propagated_to;
   Dynamic_AND(StateObj* _stateObj, vector<AbstractConstraint*> _con) : 
-    ParentConstraint(_stateObj, _con), full_propagate_called(_stateObj, false), constraint_locked(false)
+    ParentConstraint(_stateObj, _con), constraint_locked(false)
     { }
 
   virtual BOOL check_assignment(DomainInt* v, int v_size)
@@ -131,13 +130,15 @@ struct Dynamic_AND : public ParentConstraint
   virtual void special_check()
   {
     D_ASSERT(constraint_locked);
-    constraint_locked = false;
     P("Full propagating all constraints in AND");
-    for(int i=0; i<child_constraints.size(); i++)
+    child_constraints[propagated_to]->full_propagate();
+    propagated_to++;
+    if(propagated_to != child_constraints.size())
+      getQueue(stateObj).pushSpecialTrigger(this);
+    else
     {
-        child_constraints[i]->full_propagate();
-    }
-    full_propagate_called = true;
+       constraint_locked = false;
+     }
   }
 
   virtual void special_unlock()
@@ -150,55 +151,33 @@ struct Dynamic_AND : public ParentConstraint
   {
     //PROP_INFO_ADDONE(WatchedOR);
     P("Static propagate start");
-    if(constraint_locked)
-      return;
-
-    if(full_propagate_called)
-    {
-      pair<int,int> childTrigger = getChildStaticTrigger(i);
-      P("Got trigger: " << i << ", maps to: " << childTrigger.first << "." << childTrigger.second);
-      P("Passing trigger " << childTrigger.second << " on");
-      child_constraints[childTrigger.first]->propagate(childTrigger.second, domain);
-    }
-    else
-    {
-        // add to the special queue so it can be full_propagated later.
-        constraint_locked = true;
-        getQueue(stateObj).pushSpecialTrigger(this);
-    }
+    pair<int,int> childTrigger = getChildStaticTrigger(i);
+    P("Got trigger: " << i << ", maps to: " << childTrigger.first << "." << childTrigger.second);
+    P("Passing trigger " << childTrigger.second << " on");
+    if(!constraint_locked || childTrigger.first < propagated_to)
+    child_constraints[childTrigger.first]->propagate(childTrigger.second, domain);
   }
   
   virtual void propagate(DynamicTrigger* trig)
   {
     //PROP_INFO_ADDONE(WatchedOr);
     P("Prop");
-    P("FullProp: " << (bool)full_propagate_called);
     P("Locked:" << constraint_locked);
-    if(constraint_locked)
-      return;
-    
-      if(!full_propagate_called)
-      {
-          // how did we get here?
-          constraint_locked = true;
-            getQueue(stateObj).pushSpecialTrigger(this);
-            return;
-      }
-  
     // pass the trigger down
     P("Propagating child");
     // need to know which child to prop.
     int child = getChildDynamicTrigger(trig);
+    if(!constraint_locked || child < propagated_to)
     child_constraints[child]->propagate(trig);
   }
   
   virtual void full_propagate()
   {
     P("AND Full Propagate");
-    
     // push it on the special queue to be full_propagated later.
     D_ASSERT(!constraint_locked);
     constraint_locked = true;
+    propagated_to = 0;
     getQueue(stateObj).pushSpecialTrigger(this);
   }
   

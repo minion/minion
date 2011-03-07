@@ -39,20 +39,15 @@ void lock(StateObj* stateObj)
   // No longer AC1, thank goodness.
   for(int i = 0; i < size; ++i)
   {
-    bool foundtrigs = true;
-    while(foundtrigs)
-    {
-      getState(stateObj).getConstraintList()[i]->full_propagate();
-      if(getState(stateObj).isFailed()) 
-        return;
-
-      // If queues not empty, more work to do.
-      if(!getQueue(stateObj).isQueuesEmpty())
-          getQueue(stateObj).propagateQueueRoot();
-      else
-        foundtrigs = false;
-    }
+    getState(stateObj).getConstraintList()[i]->full_propagate();
     getState(stateObj).getConstraintList()[i]->full_propagate_done=true;
+    if(getState(stateObj).isFailed()) 
+      return;
+    // If queues not empty, more work to do.
+    if(!getQueue(stateObj).isQueuesEmpty())
+    {
+        getQueue(stateObj).propagateQueueRoot();
+    }
   }
   
   getState(stateObj).markLocked();
