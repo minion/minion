@@ -131,6 +131,12 @@ struct Dynamic_AND : public ParentConstraint
   {
     D_ASSERT(constraint_locked);
     P("Full propagating all constraints in AND");
+    if(child_constraints.size() == 0)
+    {
+      constraint_locked = false;
+      return;
+    }
+
     child_constraints[propagated_to]->full_propagate();
     propagated_to++;
     if(propagated_to != child_constraints.size())
@@ -138,7 +144,7 @@ struct Dynamic_AND : public ParentConstraint
     else
     {
        constraint_locked = false;
-     }
+    }
   }
 
   virtual void special_unlock()
