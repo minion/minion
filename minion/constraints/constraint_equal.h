@@ -276,6 +276,59 @@ struct ReifiedEqualConstraint : public AbstractConstraint
           diseqvar2assigned();
       }
   }
+
+   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  {
+    bool hasFalse = (var3.getMin() == 0);
+    bool hasTrue  = (var3.getMax() > 0);
+    D_ASSERT(hasFalse || hasTrue);
+    if(hasFalse)
+    {
+      if(var1.getMin() != var2.getMax())
+      {
+        assignment.push_back(make_pair(0, var1.getMin()));
+        assignment.push_back(make_pair(1, var2.getMax()));
+        assignment.push_back(make_pair(2, 0));
+        return true; 
+      }
+    
+      if(var1.getMax() != var2.getMin())
+      {
+        assignment.push_back(make_pair(0, var1.getMax()));
+        assignment.push_back(make_pair(1, var2.getMin()));
+        assignment.push_back(make_pair(2, 0));
+        return true;
+      }
+    
+
+      D_ASSERT(var1.isAssigned() && var2.isAssigned());
+      D_ASSERT(var1.getAssignedValue() == var2.getAssignedValue());
+      if(hasTrue)
+      {
+        assignment.push_back(make_pair(0, var1.getAssignedValue()));
+        assignment.push_back(make_pair(1, var2.getAssignedValue()));
+        assignment.push_back(make_pair(2, var3.getMax()));
+        return true;
+      }
+      return false;
+    }
+    else
+    {
+      DomainInt dom_min = max(var1.getMin(), var2.getMin());
+      DomainInt dom_max = min(var1.getMax(), var2.getMax());
+      for(DomainInt i = dom_min; i <= dom_max; ++i)
+      {
+        if(var1.inDomain(i) && var2.inDomain(i))
+        {
+          assignment.push_back(make_pair(0,i));
+          assignment.push_back(make_pair(1,i));
+          assignment.push_back(make_pair(2,var3.getMax()));
+          return true;
+        }
+      }
+      return false;
+    }
+  }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {

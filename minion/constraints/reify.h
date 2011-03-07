@@ -195,6 +195,8 @@ struct reify : public ParentConstraint
         bool flag=child_constraints[1]->get_satisfying_assignment(assignment);
         if(flag)
         {
+            for(int i = 0; i < assignment.size(); ++i)
+              assignment[i].first += c0vars;
             assignment.push_back(make_pair(reify_var_num, 0));
             return true;
         }

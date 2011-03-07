@@ -248,13 +248,16 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
       if(var_sum<=0) return true;
+      int lit_match_count = 0;
       
     for(int i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].inDomain(value_array[i]))
       {
         assignment.push_back(make_pair(i, value_array[i]));
-        return true;
+        lit_match_count++;
+        if(lit_match_count == var_sum)
+          return true;
       }
     }
     return false;

@@ -90,7 +90,7 @@ struct Dynamic_AND : public ParentConstraint
       // them together. Even if they contradict each other.
       typedef pair<int,DomainInt> temptype;
       MAKE_STACK_BOX(localassignment, temptype, assignment.capacity());
-      
+      P("GetSat for And");
       for(int i=0; i<child_constraints.size(); ++i)
       {
           localassignment.clear();
@@ -100,7 +100,7 @@ struct Dynamic_AND : public ParentConstraint
               assignment.clear();
               return false;
           }
-          
+          P(localassignment[0] << ":" << localassignment[1]);
           for(int j=0; j<localassignment.size(); j++)
           {
               assignment.push_back(make_pair(localassignment[j].first+start_of_constraint[i],
