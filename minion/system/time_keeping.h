@@ -84,7 +84,11 @@ inline long get_max_rss()
 {
     rusage r;
     getrusage(RUSAGE_SELF, &r);
+#ifdef __MACOSX__
+    return r.ru_maxrss / 1024;
+#else
     return r.ru_maxrss;
+#endif
 }
 
 #endif
