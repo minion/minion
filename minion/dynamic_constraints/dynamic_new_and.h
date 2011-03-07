@@ -157,7 +157,7 @@ struct Dynamic_AND : public ParentConstraint
     {
       pair<int,int> childTrigger = getChildStaticTrigger(i);
       P("Got trigger: " << i << ", maps to: " << childTrigger.first << "." << childTrigger.second);
-      P("Passing trigger" << childTrigger.second << "on");
+      P("Passing trigger " << childTrigger.second << " on");
       child_constraints[childTrigger.first]->propagate(childTrigger.second, domain);
     }
     else
@@ -194,7 +194,7 @@ struct Dynamic_AND : public ParentConstraint
   
   virtual void full_propagate()
   {
-    P("Full Propagate");
+    P("AND Full Propagate");
     
     // push it on the special queue to be full_propagated later.
     D_ASSERT(!constraint_locked);
