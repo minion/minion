@@ -21,25 +21,25 @@
 #ifdef _WIN32
 #define ULL unsigned __int64
 
-inline double get_wall_time()
+inline long double get_wall_time()
 {
-    return (double)(clock()) / CLOCKS_PER_SEC;
+    return (long double)(clock()) / CLOCKS_PER_SEC;
 }
 
-inline double get_cpu_time()
+inline long double get_cpu_time()
 {
     FILETIME creat_t, exit_t, kernel_t, user_t;
      if (GetProcessTimes(GetCurrentProcess(), &creat_t, &exit_t, &kernel_t, &user_t))
-      return ((double) (((ULL) user_t.dwHighDateTime << 32) + (ULL) user_t.dwLowDateTime)) / 10000 / 1000;
+      return ((long double) (((ULL) user_t.dwHighDateTime << 32) + (ULL) user_t.dwLowDateTime)) / 10000 / 1000;
      else
          abort();   
 }
 
-inline double get_sys_time()
+inline long double get_sys_time()
 {
     FILETIME creat_t, exit_t, kernel_t, user_t;
      if (GetProcessTimes(GetCurrentProcess(), &creat_t, &exit_t, &kernel_t, &user_t))
-      return ((double) (((ULL) kernel_t.dwHighDateTime << 32) + (ULL) kernel_t.dwLowDateTime)) / 10000 / 1000;
+      return ((long double) (((ULL) kernel_t.dwHighDateTime << 32) + (ULL) kernel_t.dwLowDateTime)) / 10000 / 1000;
      else
          abort();   
 }
@@ -55,28 +55,28 @@ inline long get_max_rss()
 #include <sys/time.h>
 #include <sys/resource.h>
 
-inline double get_wall_time()
+inline long double get_wall_time()
 {
     timeval t;
     gettimeofday(&t, NULL);
-    return static_cast<double>(t.tv_sec) + static_cast<double>(t.tv_usec) / 1000000.0;
+    return static_cast<long double>(t.tv_sec) + static_cast<long double>(t.tv_usec) / 1000000.0;
 }
 
-inline double get_cpu_time()
+inline long double get_cpu_time()
 {
     rusage r;
     getrusage(RUSAGE_SELF, &r);
-    double cpu_time = r.ru_utime.tv_sec;
-    cpu_time += static_cast<double>(r.ru_utime.tv_usec) / 1000000.0;
+    long double cpu_time = r.ru_utime.tv_sec;
+    cpu_time += static_cast<long double>(r.ru_utime.tv_usec) / 1000000.0;
     return cpu_time;
 }
 
-inline double get_sys_time()
+inline long double get_sys_time()
 {
     rusage r;
     getrusage(RUSAGE_SELF, &r);
-    double cpu_time = r.ru_stime.tv_sec;
-    cpu_time += static_cast<double>(r.ru_stime.tv_usec) / 1000000.0;
+    long double cpu_time = r.ru_stime.tv_sec;
+    cpu_time += static_cast<long double>(r.ru_stime.tv_usec) / 1000000.0;
     return cpu_time;
 }
 
@@ -96,29 +96,29 @@ inline long get_max_rss()
 inline void get_current_time(TIME_STRUCT& t) { gettimeofday(&t, NULL); }
 inline void get_current_cpu_time(CPU_TIME_STRUCT& t) { getrusage(RUSAGE_SELF, &t); }
   
-inline double diff_cpu_time(const CPU_TIME_STRUCT& end_time, const CPU_TIME_STRUCT& start_time)
+inline long double diff_cpu_time(const CPU_TIME_STRUCT& end_time, const CPU_TIME_STRUCT& start_time)
 {
-  double time = end_time.ru_utime.tv_sec - start_time.ru_utime.tv_sec;
+  long double time = end_time.ru_utime.tv_sec - start_time.ru_utime.tv_sec;
   time += (end_time.ru_utime.tv_usec - start_time.ru_utime.tv_usec) / 1000000.0;
   return time;
 }
 
-inline double diff_sys_time(const CPU_TIME_STRUCT& end_time, const CPU_TIME_STRUCT& start_time)
+inline long double diff_sys_time(const CPU_TIME_STRUCT& end_time, const CPU_TIME_STRUCT& start_time)
 {
-  double sys_time = end_time.ru_stime.tv_sec - start_time.ru_stime.tv_sec;
+  long double sys_time = end_time.ru_stime.tv_sec - start_time.ru_stime.tv_sec;
   sys_time += (end_time.ru_stime.tv_usec - start_time.ru_stime.tv_usec) / 1000000.0;
   return sys_time;
 }
 
-inline double diff_time(const TIME_STRUCT& end_wallclock, const TIME_STRUCT& start_wallclock)
+inline long double diff_time(const TIME_STRUCT& end_wallclock, const TIME_STRUCT& start_wallclock)
 {
   // Get final wallclock time.
-  double time_wallclock = end_wallclock.tv_sec - start_wallclock.tv_sec;
+  long double time_wallclock = end_wallclock.tv_sec - start_wallclock.tv_sec;
   time_wallclock += (end_wallclock.tv_usec - start_wallclock.tv_usec) / 1000000.0;
   return time_wallclock;
 }
 
-inline double cpu_time_elapsed(CPU_TIME_STRUCT& start_time)
+inline long double cpu_time_elapsed(CPU_TIME_STRUCT& start_time)
 { 
   CPU_TIME_STRUCT t;
   get_current_cpu_time(t);
@@ -132,10 +132,10 @@ enum Output_Type
   
 class TimerClass
 {
-  double _internal_cpu_start_time;
-  double _internal_sys_start_time;
-  double _last_check_time;
-  double start_wallclock;
+  long double _internal_cpu_start_time;
+  long double _internal_sys_start_time;
+  long double _last_check_time;
+  long double start_wallclock;
 
   Output_Type output;
 public:
@@ -181,8 +181,8 @@ void maybePrintTimestepStore(Output_Type t, const char* time_name, const char* s
   if(t != Output_Always && t != output)
     return;
 
-  double temp_time = get_cpu_time();
-  double diff = temp_time -  _last_check_time;
+  long double temp_time = get_cpu_time();
+  long double diff = temp_time - _last_check_time;
   if(toprint) cout << time_name << diff << endl;
   _last_check_time = temp_time;
   tableout.set(string(store_name), to_string(diff));
@@ -190,10 +190,10 @@ void maybePrintTimestepStore(Output_Type t, const char* time_name, const char* s
 
 void maybePrintFinaltimestepStore(const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
 {
-  double time_wallclock = get_wall_time() - start_wallclock;
+  long double time_wallclock = get_wall_time() - start_wallclock;
   
-  double end_cpu_time = get_cpu_time();
-  double end_sys_time = get_sys_time();
+  long double end_cpu_time = get_cpu_time();
+  long double end_sys_time = get_sys_time();
   
   maybePrintTimestepStore(Output_Always, time_name, store_name, tableout, toprint);
   if(toprint) 
