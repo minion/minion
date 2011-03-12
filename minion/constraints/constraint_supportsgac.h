@@ -211,7 +211,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		    literalList[litCounter].var = i; 
 		    literalList[litCounter].val = j+thisvalmin; 
 		    literalList[litCounter].supportCellList = 0;
-		    literalList[litCounter].nextPrimeLit = -1;
 		    litCounter++;
 	    }
         }
@@ -545,8 +544,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             #endif
             
             // Remove trigger if this is the last support containing var,val.
-            if(SupportsGACUseDT && supportsPerLit[var][litlist[i].second-dom_min]==0) {
-                detach_trigger(var, litlist[i].second);
+            if(SupportsGACUseDT && supportsPerLit[lit]==0) {
+                detach_trigger(lit);
 	    }
 
                 
@@ -648,49 +647,49 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             #if !SupportsGACUseZeroVals
 	    for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
 				int lit=firstLiteralPerVar[var]+val-vars[var].getInitialMin();
-		    #else
-		    for(int j=0; j<zeroLits[var].size(); j++) {
-			int lit=zeroLits[var][j];
-			if(supportsPerLit[lit] > 0){
-		    // No longer a zero val. remove from vector.
+				// } to fool vim bracket matching
+	    #else
+	    for(int j=0; j<zeroLits[var].size(); j++) {
+		int lit=zeroLits[var][j];
+		if(supportsPerLit[lit] > 0){
+	    // No longer a zero val. remove from vector.
+		    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
+		    zeroLits[var].pop_back();
+		    inZeroLits[lit]=false;
+		    j--;
+		    continue;
+		}
+		int val=literalList[lit].val;
+	    #endif
+			
+		if(vars[var].inDomain(val) && supportsPerLit[lit]==0) {
+		    // val has no support. Find a new one. 
+		    bool foundsupport=findNewSupport(var, val);
+		    
+		    if(!foundsupport) {
+			vars[var].removeFromDomain(val);
+		    }
+		    else {
+			addSupport();
+			
+			#if SupportsGACUseZeroVals
+			if(supportsPerLit[lit]>0) {
+			    // No longer a zero lit. remove from vector.
 			    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
 			    zeroLits[var].pop_back();
 			    inZeroLits[lit]=false;
-			    j--;
-			    continue;
 			}
-			int val=literalList[lit].val;
-		    #endif
+			#endif
 			
-			if(vars[var].inDomain(val) && supportsPerLit[lit]==0) {
-			    // val has no support. Find a new one. 
-			    bool foundsupport=findNewSupport(var, val);
-			    
-			    if(!foundsupport) {
-				vars[var].removeFromDomain(val);
-			    }
-			    else {
-				addSupport();
-				
-				#if SupportsGACUseZeroVals
-				if(supportsPerLit[lit]>0) {
-				    // No longer a zero lit. remove from vector.
-				    zeroLits[var][j]=zeroVals[var][zeroVals[var].size()-1];
-				    zeroLits[var].pop_back();
-				    inZeroLits[lit]=false;
-				}
-				#endif
-				
-				// supports has changed and so has supportNumPtrs so start again. 
-				// Tail recursion might be optimised?
-				// Should be a goto.
-				goto restartloop;
-				//findSupports();
-				//return;
-			    }
-			} 
-		    } 
-	    }
+			// supports has changed and so has supportNumPtrs so start again. 
+			// Tail recursion might be optimised?
+			// Should be a goto.
+			goto restartloop;
+			//findSupports();
+			//return;
+		    }
+		} 
+	    } 
 	}
     }
     
@@ -757,6 +756,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     }
     
     findSupports();
+    */
   }
   
     virtual void propagate(DynamicTrigger* dt)
@@ -772,15 +772,15 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
   }
 
     
-    #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) assignment.push_back(make_pair(var,val));
+    #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) literalsScratch.push_back(make_pair(var,val));
     
     // For full-length support variant:
-    #define ADDTOASSIGNMENTFL(var, val) assignment.push_back(make_pair(var,val));
+    #define ADDTOASSIGNMENTFL(var, val) literalsScratch.push_back(make_pair(var,val));
     
     
     // Macro to add either the lower bound or the specified value for a particular variable vartopad
-    // Intended to pad out an assignment to a full-length support.
-    #define PADOUT(vartopad) if(var==vartopad) assignment.push_back(make_pair(var, val)); else assignment.push_back(make_pair(vartopad, vars[vartopad].getMin()));
+    // Intended to pad out an literalsScratch to a full-length support.
+    #define PADOUT(vartopad) if(var==vartopad) literalsScratch.push_back(make_pair(var, val)); else literalsScratch.push_back(make_pair(vartopad, vars[vartopad].getMin()));
     
     ////////////////////////////////////////////////////////////////////////////
     // Methods for pair-equals. a=b or c=d.
