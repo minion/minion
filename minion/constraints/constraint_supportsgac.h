@@ -227,7 +227,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    int thisvarstart = firstLiteralPerVar[i];
             for(int j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
         }
-        inZeroLits.resize(numlits,true); 
+        inZeroLits.resize(numlits,1); 
         #endif
         
         // Partition
@@ -312,8 +312,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     
     virtual ~ShortSupportsGAC() {
 
-	return; // HERE fix
-        printStructures();
+	//return; // HERE fix
+        //printStructures();
         set<Support*> myset;
         
 	/* 
@@ -496,7 +496,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         supports++;
         
-        printStructures();
+        //printStructures();
         
         // return sup_internal;
     }
@@ -515,7 +515,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
         vector<SupportCell>& supCells=sup->supportCells;
 	int supArity = sup->arity; 
-        cout << "Removing support (internal) : " << sup << endl;
+        //cout << "Removing support (internal) : " << sup << endl;
         
 	
         for(int i=0; i<supArity; i++) {
@@ -527,6 +527,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    // unstitch cell from list 
 	    if(supCell.prev != 0){ 
 		    supCell.prev->next = supCell.next;
+	    }
+	    else {
+		    literalList[lit].supportCellList = supCell.next;
 	    }
 	    if(supCell.next!=0){
 		    supCell.next->prev = supCell.prev;
@@ -540,7 +543,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             #if SupportsGACUseZeroVals
             if(supportsPerLit[lit]==0) {
                 if(!inZeroLits[lit]) {
-                    inZeroLits[lit]=true;
+                    inZeroLits[lit]=1;
                     zeroLits[var].push_back(lit);  
                 }
             }
@@ -560,7 +563,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         supports--;
         
-        printStructures();
+        //printStructures();
         
         if(Backtracking) {
             // Can re-use the support when it is removed by BT. 
@@ -588,32 +591,38 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             cout << endl;
             if(supportNumPtrs[i+1]==vars.size()) break;
         }
-        #if SupportsGACUseZeroLits
+        #if SupportsGACUseZeroVals
         cout << "zeroLits:" << zeroLits << endl;
         cout << "inZeroLits:" << inZeroLits << endl;
         #endif
-	/*
-        
-        cout << "Supports for each literal:"<<endl;
+
+        cout << "  Supports for each literal:"<<endl;
         for(int var=0; var<vars.size(); var++) {
-            cout << "Variable: "<<var<<endl;
+            cout << "  Variable: "<<var<<endl;
             for(int val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
-                cout << "Value: "<<val<<endl;
-                Support* sup=supportListPerLit[var][val-vars[var].getInitialMin()].next[var];
-                while(sup!=0) {
-                    cout << "Support: " << sup->literals << endl;
-                    bool contains_varval=false;
-                    for(int i=0; i<sup->literals.size(); i++) {
-                        if(sup->literals[i].first==var && sup->literals[i].second==val)
-                            contains_varval=true;
-                    }
-                    D_ASSERT(contains_varval);
-                    
-                    sup=sup->next[var];
+		// if(! vars[var].inDomain(val) ) { continue; } ;
+                cout << "  Value: "<<val ;
+		int lit = firstLiteralPerVar[var]+val-vars[var].getInitialMin(); 
+		cout << "  Lit: "<<lit<< endl;
+                SupportCell* supCell= literalList[lit].supportCellList;
+		cout << "  SupCell = " << supCell << endl; 
+		int count = 0 ;
+                while(supCell !=0) {
+		    Support* sup = supCell->sup; 
+		    cout << "  SupCell = " << supCell << " sup " << sup << endl; 
+                    if(sup!=0) { 
+			    cout << "    Support " << ++count << " " << sup << " literals: "; 
+		    for(int i=0; i < sup->arity; i++) { 
+			    int lit2 = sup->supportCells[i].literal;
+			    cout << " " << lit2 << " " << &(sup->supportCells[i]) << " " << literalList[lit2].var << " " << literalList[lit2].val << ":";
+		    }
+		    cout << endl; 
+		    }
+
+                    supCell=supCell->next;
                 }
             }
         }
-	*/
     }
     
     #if !SupportsGACUseDT
@@ -656,7 +665,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    // No longer a zero val. remove from vector.
 		    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
 		    zeroLits[var].pop_back();
-		    inZeroLits[lit]=false;
+		    inZeroLits[lit]=0;
 		    j--;
 		    continue;
 		}
@@ -679,7 +688,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 			    // No longer a zero lit. remove from vector.
 			    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
 			    zeroLits[var].pop_back();
-			    inZeroLits[lit]=false;
+			    inZeroLits[lit]=0;
 			}
 			#endif
 			
@@ -764,8 +773,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
   {
       int lit=dt-dynamic_trigger_start();
       
-      cout << "Propagate called: lit= " << lit << endl ;  
-      printStructures();
+      //cout << "Propagate called: lit= " << lit << endl ;  
+      //printStructures();
       
       updateCounters(lit);
       
