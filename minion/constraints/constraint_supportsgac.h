@@ -311,7 +311,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     // Dtor
     
     virtual ~ShortSupportsGAC() {
-        //printStructures();
+
+	return; // HERE fix
+        printStructures();
         set<Support*> myset;
         
 	/* 
@@ -479,12 +481,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             if(literalList[lit].supportCellList!=0) {
                 literalList[lit].supportCellList->prev = &(supCells[i]);
             }
-	    else { 
-            // Attach trigger if this is the first support containing var,val.
-                attach_trigger(var, literalList[lit].val, lit);
-            }
 	    literalList[lit].supportCellList = &(supCells[i]);
-            
+	    
+            // Attach trigger if this is the first support containing var,val.
+	    if(SupportsGACUseDT && supportsPerLit[lit]==1) { 
+                attach_trigger(var, literalList[lit].val, lit);
+	    }
+			            
             // Update partition
             // swap var to the end of its cell.
             partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]]-1]);
@@ -493,7 +496,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         supports++;
         
-        //printStructures();
+        printStructures();
         
         // return sup_internal;
     }
@@ -512,7 +515,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
         vector<SupportCell>& supCells=sup->supportCells;
 	int supArity = sup->arity; 
-        //cout << "Removing support (internal) :" << litlist << endl;
+        cout << "Removing support (internal) : " << sup << endl;
         
 	
         for(int i=0; i<supArity; i++) {
@@ -547,8 +550,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             if(SupportsGACUseDT && supportsPerLit[lit]==0) {
                 detach_trigger(lit);
 	    }
-
-                
             
           
             // Update partition
@@ -559,7 +560,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
         supports--;
         
-        //printStructures();
+        printStructures();
         
         if(Backtracking) {
             // Can re-use the support when it is removed by BT. 
@@ -646,7 +647,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             #if !SupportsGACUseZeroVals
 	    for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
-				int lit=firstLiteralPerVar[var]+val-vars[var].getInitialMin();
+		int lit=firstLiteralPerVar[var]+val-vars[var].getInitialMin();
 				// } to fool vim bracket matching
 	    #else
 	    for(int j=0; j<zeroLits[var].size(); j++) {
@@ -664,6 +665,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 			
 		if(vars[var].inDomain(val) && supportsPerLit[lit]==0) {
 		    // val has no support. Find a new one. 
+		    literalsScratch.clear();
 		    bool foundsupport=findNewSupport(var, val);
 		    
 		    if(!foundsupport) {
@@ -696,7 +698,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     inline void updateCounters(int lit) {
 
         SupportCell* supCellList = literalList[lit].supportCellList ;
-
 
         while(supCellList != 0) {
             SupportCell* next=supCellList->next;
@@ -763,8 +764,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
   {
       int lit=dt-dynamic_trigger_start();
       
-    //  cout << "Propagate called: var= " << var << "val = " << val << endl;
-      //printStructures();
+      cout << "Propagate called: lit= " << lit << endl ;  
+      printStructures();
       
       updateCounters(lit);
       
