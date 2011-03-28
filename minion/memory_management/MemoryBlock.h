@@ -280,8 +280,7 @@ private:
     total_stored_bytes += allocated_bytes;
 
     unsigned new_block_size = max((unsigned)BLOCK_SIZE, byte_count_new_request);
-    current_data = (char*)malloc(new_block_size);
-    memset(current_data, 0, new_block_size);
+    current_data = (char*)calloc(new_block_size, sizeof(char));
     P((void*)current_data << " " << new_block_size);
     maximum_bytes = new_block_size;
     allocated_bytes = 0; 
