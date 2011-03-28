@@ -84,13 +84,15 @@ struct GACSchema : public AbstractConstraint, Backtrackable
         // Register this with the backtracker.
         getState(stateObj).getGenericBacktracker().add(this);
         
-        dom_max=vars[0].getInitialMax();
-        dom_min=vars[0].getInitialMin();
-        for(int i=1; i<vars.size(); i++) {
-            if(vars[i].getInitialMin()<dom_min) dom_min=vars[i].getInitialMin();
-            if(vars[i].getInitialMax()>dom_max) dom_max=vars[i].getInitialMax();
+        if(vars.size()>0) {
+            dom_max=vars[0].getInitialMax();
+            dom_min=vars[0].getInitialMin();
+            for(int i=1; i<vars.size(); i++) {
+                if(vars[i].getInitialMin()<dom_min) dom_min=vars[i].getInitialMin();
+                if(vars[i].getInitialMax()>dom_max) dom_max=vars[i].getInitialMax();
+            }
+            numvals=dom_max-dom_min+1;
         }
-        numvals=dom_max-dom_min+1;
         
         supportListPerLit.resize(vars.size());
         for(int i=0; i<vars.size(); i++) {
