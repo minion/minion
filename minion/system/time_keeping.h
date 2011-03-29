@@ -201,7 +201,7 @@ void maybePrintFinaltimestepStore(const char* time_name, const char* store_name,
     cout << "Total Time: " << end_cpu_time - _internal_cpu_start_time << endl;
     cout << "Total System Time: " << end_sys_time - _internal_sys_start_time << endl;
     cout << "Total Wall Time: " << time_wallclock << endl;
-    cout << "Maximum Memory (kB): " << get_max_rss() << endl;
+    cout << "Maximum RSS (kB): " << get_max_rss() << endl;
   }
   tableout.set(string("TotalTime"), end_cpu_time - _internal_cpu_start_time );
 }
