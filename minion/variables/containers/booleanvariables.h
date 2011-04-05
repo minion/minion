@@ -174,7 +174,7 @@ struct BoolVarContainer
   {}
   
 #ifdef THREADSAFE
-  boost::recursive_mutex con_mutex;
+  mutable boost::recursive_mutex con_mutex;
 #define LOCK_BOOL_MUTEX boost::recursive_mutex::scoped_lock lock(con_mutex);
 #else
 #define LOCK_BOOL_MUTEX

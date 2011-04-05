@@ -101,7 +101,7 @@ struct SparseBoundVarContainer {
   BOOL lock_m;
 
 #ifdef THREADSAFE
-  boost::recursive_mutex con_mutex;
+  mutable boost::recursive_mutex con_mutex;
 #define LOCK_CON_MUTEX boost::recursive_mutex::scoped_lock lock(con_mutex);
 #else
 #define LOCK_CON_MUTEX
