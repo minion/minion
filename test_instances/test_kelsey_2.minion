@@ -1,0 +1,999 @@
+MINION 1
+#TEST SOLCOUNT 0
+# Semigroups with 6 elements.
+# 6x6 multiplication table.
+# 36 search vars (all AB combinations).
+# 216 additional vars (all ABC combinations).
+# Element constraints ensure A(BC) = (AB)C.
+# Generated using lexsb-min-sg-gen.ecl
+#Tom Kelsey,  June 06
+222
+
+0
+
+0
+
+264
+0 5 252
+6 36 1
+0 18 1
+0 12 1
+0 9 1
+0 7 1
+0 6 1
+0 6 6
+
+0
+
+[x222,x223,x224,x225,x226,x227,
+x228,x229,x230,x231,x232,x233,
+x234,x235,x236,x237,x238,x239,
+x240,x241,x242,x243,x244,x245,
+x246,x247,x248,x249,x250,x251,
+x252,x253,x254,x255,x256,x257]
+[a,a,a,a,a,a,
+a,a,a,a,a,a,
+a,a,a,a,a,a,
+a,a,a,a,a,a,
+a,a,a,a,a,a,
+a,a,a,a,a,a]
+
+8
+[x0,x6,x12,x18,x24,x30,x36,x42,x48,x54,x60,x66,x72,x78,x84,x90,x96,x102,x108,x114,x120,x126,x132,x138,x144,x150,x156,x162,x168,x174,x180,x186,x192,x198,x204,x210]
+[x1,x7,x13,x19,x25,x31,x37,x43,x49,x55,x61,x67,x73,x79,x85,x91,x97,x103,x109,x115,x121,x127,x133,x139,x145,x151,x157,x163,x169,x175,x181,x187,x193,x199,x205,x211]
+[x2,x8,x14,x20,x26,x32,x38,x44,x50,x56,x62,x68,x74,x80,x86,x92,x98,x104,x110,x116,x122,x128,x134,x140,x146,x152,x158,x164,x170,x176,x182,x188,x194,x200,x206,x212]
+[x3,x9,x15,x21,x27,x33,x39,x45,x51,x57,x63,x69,x75,x81,x87,x93,x99,x105,x111,x117,x123,x129,x135,x141,x147,x153,x159,x165,x171,x177,x183,x189,x195,x201,x207,x213]
+[x4,x10,x16,x22,x28,x34,x40,x46,x52,x58,x64,x70,x76,x82,x88,x94,x100,x106,x112,x118,x124,x130,x136,x142,x148,x154,x160,x166,x172,x178,x184,x190,x196,x202,x208,x214]
+[x5,x11,x17,x23,x29,x35,x41,x47,x53,x59,x65,x71,x77,x83,x89,x95,x101,x107,x113,x119,x125,x131,x137,x143,x149,x155,x161,x167,x173,x179,x185,x191,x197,x203,x209,x215]
+[x222,x229,x236,x243,x250,x257]
+[x216,x217,x218,x219,x220,x221]
+
+3
+[[x222,x223,x224,x225,x226,x227],
+[x228,x229,x230,x231,x232,x233],
+[x234,x235,x236,x237,x238,x239],
+[x240,x241,x242,x243,x244,x245],
+[x246,x247,x248,x249,x250,x251],
+[x252,x253,x254,x255,x256,x257], 
+[x474,x475,x476,x477,x478,x479] ]
+
+[[x222,x223,x224,x225,x226,x227],
+[x228,x229,x230,x231,x232,x233],
+[x234,x235,x236,x237,x238,x239],
+[x240,x241,x242,x243,x244,x245],
+[x246,x247,x248,x249,x250,x251],
+[x252,x253,x254,x255,x256,x257] ] 
+
+[[x222,x228,x234,x240,x246,x252],
+[x223,x229,x235,x241,x247,x253],
+[x224,x230,x236,x242,x248,x254],
+[x225,x231,x237,x243,x249,x255],
+[x226,x232,x238,x244,x250,x256],
+[x227,x233,x239,x245,x251,x257] ]
+
+0
+
+objective none
+
+print m0
+
+lexleq(m1, m2)
+sumleq(m1, 90)
+
+reify(eq(x222, 0), x216)
+reify(eq(x229, 1), x217)
+reify(eq(x236, 2), x218)
+reify(eq(x243, 3), x219)
+reify(eq(x250, 4), x220)
+reify(eq(x257, 5), x221)
+eq(x222,0)
+eq(x223,0)
+eq(x224,0)
+eq(x225,0)
+eq(x226,0)
+eq(x227,0)
+eq(x228,0)
+eq(x229,0)
+eq(x230,0)
+eq(x231,0)
+eq(x232,1)
+eq(x233,0)
+eq(x234,0)
+eq(x235,0)
+eq(x236,1)
+eq(x237,1)
+eq(x238,2)
+eq(x239,0)
+eq(x240,0)
+eq(x243,1)
+eq(x249,2)
+
+
+
+sumgeq(v7, 3)
+sumleq(v7, 3)
+sumleq(v0, x474)
+sumgeq(v0, x474)
+sumleq(v1, x475)
+sumgeq(v1, x475)
+sumleq(v2, x476)
+sumgeq(v2, x476)
+sumleq(v3, x477)
+sumgeq(v3, x477)
+sumleq(v4, x478)
+sumgeq(v4, x478)
+sumleq(v5, x479)
+sumgeq(v5, x479)
+
+ineq(x475, x474, 0)
+ineq(x476, x475, 0)
+ineq(x477, x476, 0)
+ineq(x478, x477, 0)
+ineq(x479, x478, 0)
+
+reify(eq(x222, 0), x0)
+reify(eq(x222, 1), x1)
+reify(eq(x222, 2), x2)
+reify(eq(x222, 3), x3)
+reify(eq(x222, 4), x4)
+reify(eq(x222, 5), x5)
+reify(eq(x223, 0), x6)
+reify(eq(x223, 1), x7)
+reify(eq(x223, 2), x8)
+reify(eq(x223, 3), x9)
+reify(eq(x223, 4), x10)
+reify(eq(x223, 5), x11)
+reify(eq(x224, 0), x12)
+reify(eq(x224, 1), x13)
+reify(eq(x224, 2), x14)
+reify(eq(x224, 3), x15)
+reify(eq(x224, 4), x16)
+reify(eq(x224, 5), x17)
+reify(eq(x225, 0), x18)
+reify(eq(x225, 1), x19)
+reify(eq(x225, 2), x20)
+reify(eq(x225, 3), x21)
+reify(eq(x225, 4), x22)
+reify(eq(x225, 5), x23)
+reify(eq(x226, 0), x24)
+reify(eq(x226, 1), x25)
+reify(eq(x226, 2), x26)
+reify(eq(x226, 3), x27)
+reify(eq(x226, 4), x28)
+reify(eq(x226, 5), x29)
+reify(eq(x227, 0), x30)
+reify(eq(x227, 1), x31)
+reify(eq(x227, 2), x32)
+reify(eq(x227, 3), x33)
+reify(eq(x227, 4), x34)
+reify(eq(x227, 5), x35)
+reify(eq(x228, 0), x36)
+reify(eq(x228, 1), x37)
+reify(eq(x228, 2), x38)
+reify(eq(x228, 3), x39)
+reify(eq(x228, 4), x40)
+reify(eq(x228, 5), x41)
+reify(eq(x229, 0), x42)
+reify(eq(x229, 1), x43)
+reify(eq(x229, 2), x44)
+reify(eq(x229, 3), x45)
+reify(eq(x229, 4), x46)
+reify(eq(x229, 5), x47)
+reify(eq(x230, 0), x48)
+reify(eq(x230, 1), x49)
+reify(eq(x230, 2), x50)
+reify(eq(x230, 3), x51)
+reify(eq(x230, 4), x52)
+reify(eq(x230, 5), x53)
+reify(eq(x231, 0), x54)
+reify(eq(x231, 1), x55)
+reify(eq(x231, 2), x56)
+reify(eq(x231, 3), x57)
+reify(eq(x231, 4), x58)
+reify(eq(x231, 5), x59)
+reify(eq(x232, 0), x60)
+reify(eq(x232, 1), x61)
+reify(eq(x232, 2), x62)
+reify(eq(x232, 3), x63)
+reify(eq(x232, 4), x64)
+reify(eq(x232, 5), x65)
+reify(eq(x233, 0), x66)
+reify(eq(x233, 1), x67)
+reify(eq(x233, 2), x68)
+reify(eq(x233, 3), x69)
+reify(eq(x233, 4), x70)
+reify(eq(x233, 5), x71)
+reify(eq(x234, 0), x72)
+reify(eq(x234, 1), x73)
+reify(eq(x234, 2), x74)
+reify(eq(x234, 3), x75)
+reify(eq(x234, 4), x76)
+reify(eq(x234, 5), x77)
+reify(eq(x235, 0), x78)
+reify(eq(x235, 1), x79)
+reify(eq(x235, 2), x80)
+reify(eq(x235, 3), x81)
+reify(eq(x235, 4), x82)
+reify(eq(x235, 5), x83)
+reify(eq(x236, 0), x84)
+reify(eq(x236, 1), x85)
+reify(eq(x236, 2), x86)
+reify(eq(x236, 3), x87)
+reify(eq(x236, 4), x88)
+reify(eq(x236, 5), x89)
+reify(eq(x237, 0), x90)
+reify(eq(x237, 1), x91)
+reify(eq(x237, 2), x92)
+reify(eq(x237, 3), x93)
+reify(eq(x237, 4), x94)
+reify(eq(x237, 5), x95)
+reify(eq(x238, 0), x96)
+reify(eq(x238, 1), x97)
+reify(eq(x238, 2), x98)
+reify(eq(x238, 3), x99)
+reify(eq(x238, 4), x100)
+reify(eq(x238, 5), x101)
+reify(eq(x239, 0), x102)
+reify(eq(x239, 1), x103)
+reify(eq(x239, 2), x104)
+reify(eq(x239, 3), x105)
+reify(eq(x239, 4), x106)
+reify(eq(x239, 5), x107)
+reify(eq(x240, 0), x108)
+reify(eq(x240, 1), x109)
+reify(eq(x240, 2), x110)
+reify(eq(x240, 3), x111)
+reify(eq(x240, 4), x112)
+reify(eq(x240, 5), x113)
+reify(eq(x241, 0), x114)
+reify(eq(x241, 1), x115)
+reify(eq(x241, 2), x116)
+reify(eq(x241, 3), x117)
+reify(eq(x241, 4), x118)
+reify(eq(x241, 5), x119)
+reify(eq(x242, 0), x120)
+reify(eq(x242, 1), x121)
+reify(eq(x242, 2), x122)
+reify(eq(x242, 3), x123)
+reify(eq(x242, 4), x124)
+reify(eq(x242, 5), x125)
+reify(eq(x243, 0), x126)
+reify(eq(x243, 1), x127)
+reify(eq(x243, 2), x128)
+reify(eq(x243, 3), x129)
+reify(eq(x243, 4), x130)
+reify(eq(x243, 5), x131)
+reify(eq(x244, 0), x132)
+reify(eq(x244, 1), x133)
+reify(eq(x244, 2), x134)
+reify(eq(x244, 3), x135)
+reify(eq(x244, 4), x136)
+reify(eq(x244, 5), x137)
+reify(eq(x245, 0), x138)
+reify(eq(x245, 1), x139)
+reify(eq(x245, 2), x140)
+reify(eq(x245, 3), x141)
+reify(eq(x245, 4), x142)
+reify(eq(x245, 5), x143)
+reify(eq(x246, 0), x144)
+reify(eq(x246, 1), x145)
+reify(eq(x246, 2), x146)
+reify(eq(x246, 3), x147)
+reify(eq(x246, 4), x148)
+reify(eq(x246, 5), x149)
+reify(eq(x247, 0), x150)
+reify(eq(x247, 1), x151)
+reify(eq(x247, 2), x152)
+reify(eq(x247, 3), x153)
+reify(eq(x247, 4), x154)
+reify(eq(x247, 5), x155)
+reify(eq(x248, 0), x156)
+reify(eq(x248, 1), x157)
+reify(eq(x248, 2), x158)
+reify(eq(x248, 3), x159)
+reify(eq(x248, 4), x160)
+reify(eq(x248, 5), x161)
+reify(eq(x249, 0), x162)
+reify(eq(x249, 1), x163)
+reify(eq(x249, 2), x164)
+reify(eq(x249, 3), x165)
+reify(eq(x249, 4), x166)
+reify(eq(x249, 5), x167)
+reify(eq(x250, 0), x168)
+reify(eq(x250, 1), x169)
+reify(eq(x250, 2), x170)
+reify(eq(x250, 3), x171)
+reify(eq(x250, 4), x172)
+reify(eq(x250, 5), x173)
+reify(eq(x251, 0), x174)
+reify(eq(x251, 1), x175)
+reify(eq(x251, 2), x176)
+reify(eq(x251, 3), x177)
+reify(eq(x251, 4), x178)
+reify(eq(x251, 5), x179)
+reify(eq(x252, 0), x180)
+reify(eq(x252, 1), x181)
+reify(eq(x252, 2), x182)
+reify(eq(x252, 3), x183)
+reify(eq(x252, 4), x184)
+reify(eq(x252, 5), x185)
+reify(eq(x253, 0), x186)
+reify(eq(x253, 1), x187)
+reify(eq(x253, 2), x188)
+reify(eq(x253, 3), x189)
+reify(eq(x253, 4), x190)
+reify(eq(x253, 5), x191)
+reify(eq(x254, 0), x192)
+reify(eq(x254, 1), x193)
+reify(eq(x254, 2), x194)
+reify(eq(x254, 3), x195)
+reify(eq(x254, 4), x196)
+reify(eq(x254, 5), x197)
+reify(eq(x255, 0), x198)
+reify(eq(x255, 1), x199)
+reify(eq(x255, 2), x200)
+reify(eq(x255, 3), x201)
+reify(eq(x255, 4), x202)
+reify(eq(x255, 5), x203)
+reify(eq(x256, 0), x204)
+reify(eq(x256, 1), x205)
+reify(eq(x256, 2), x206)
+reify(eq(x256, 3), x207)
+reify(eq(x256, 4), x208)
+reify(eq(x256, 5), x209)
+reify(eq(x257, 0), x210)
+reify(eq(x257, 1), x211)
+reify(eq(x257, 2), x212)
+reify(eq(x257, 3), x213)
+reify(eq(x257, 4), x214)
+reify(eq(x257, 5), x215)
+
+element(row(m0,0),x222,x258)
+element(col(m0,0),x222,x258)
+
+element(row(m0,0),x223,x259)
+element(col(m0,1),x222,x259)
+
+element(row(m0,0),x224,x260)
+element(col(m0,2),x222,x260)
+
+element(row(m0,0),x225,x261)
+element(col(m0,3),x222,x261)
+
+element(row(m0,0),x226,x262)
+element(col(m0,4),x222,x262)
+
+element(row(m0,0),x227,x263)
+element(col(m0,5),x222,x263)
+
+element(row(m0,0),x228,x264)
+element(col(m0,0),x223,x264)
+
+element(row(m0,0),x229,x265)
+element(col(m0,1),x223,x265)
+
+element(row(m0,0),x230,x266)
+element(col(m0,2),x223,x266)
+
+element(row(m0,0),x231,x267)
+element(col(m0,3),x223,x267)
+
+element(row(m0,0),x232,x268)
+element(col(m0,4),x223,x268)
+
+element(row(m0,0),x233,x269)
+element(col(m0,5),x223,x269)
+
+element(row(m0,0),x234,x270)
+element(col(m0,0),x224,x270)
+
+element(row(m0,0),x235,x271)
+element(col(m0,1),x224,x271)
+
+element(row(m0,0),x236,x272)
+element(col(m0,2),x224,x272)
+
+element(row(m0,0),x237,x273)
+element(col(m0,3),x224,x273)
+
+element(row(m0,0),x238,x274)
+element(col(m0,4),x224,x274)
+
+element(row(m0,0),x239,x275)
+element(col(m0,5),x224,x275)
+
+element(row(m0,0),x240,x276)
+element(col(m0,0),x225,x276)
+
+element(row(m0,0),x241,x277)
+element(col(m0,1),x225,x277)
+
+element(row(m0,0),x242,x278)
+element(col(m0,2),x225,x278)
+
+element(row(m0,0),x243,x279)
+element(col(m0,3),x225,x279)
+
+element(row(m0,0),x244,x280)
+element(col(m0,4),x225,x280)
+
+element(row(m0,0),x245,x281)
+element(col(m0,5),x225,x281)
+
+element(row(m0,0),x246,x282)
+element(col(m0,0),x226,x282)
+
+element(row(m0,0),x247,x283)
+element(col(m0,1),x226,x283)
+
+element(row(m0,0),x248,x284)
+element(col(m0,2),x226,x284)
+
+element(row(m0,0),x249,x285)
+element(col(m0,3),x226,x285)
+
+element(row(m0,0),x250,x286)
+element(col(m0,4),x226,x286)
+
+element(row(m0,0),x251,x287)
+element(col(m0,5),x226,x287)
+
+element(row(m0,0),x252,x288)
+element(col(m0,0),x227,x288)
+
+element(row(m0,0),x253,x289)
+element(col(m0,1),x227,x289)
+
+element(row(m0,0),x254,x290)
+element(col(m0,2),x227,x290)
+
+element(row(m0,0),x255,x291)
+element(col(m0,3),x227,x291)
+
+element(row(m0,0),x256,x292)
+element(col(m0,4),x227,x292)
+
+element(row(m0,0),x257,x293)
+element(col(m0,5),x227,x293)
+
+element(row(m0,1),x222,x294)
+element(col(m0,0),x228,x294)
+
+element(row(m0,1),x223,x295)
+element(col(m0,1),x228,x295)
+
+element(row(m0,1),x224,x296)
+element(col(m0,2),x228,x296)
+
+element(row(m0,1),x225,x297)
+element(col(m0,3),x228,x297)
+
+element(row(m0,1),x226,x298)
+element(col(m0,4),x228,x298)
+
+element(row(m0,1),x227,x299)
+element(col(m0,5),x228,x299)
+
+element(row(m0,1),x228,x300)
+element(col(m0,0),x229,x300)
+
+element(row(m0,1),x229,x301)
+element(col(m0,1),x229,x301)
+
+element(row(m0,1),x230,x302)
+element(col(m0,2),x229,x302)
+
+element(row(m0,1),x231,x303)
+element(col(m0,3),x229,x303)
+
+element(row(m0,1),x232,x304)
+element(col(m0,4),x229,x304)
+
+element(row(m0,1),x233,x305)
+element(col(m0,5),x229,x305)
+
+element(row(m0,1),x234,x306)
+element(col(m0,0),x230,x306)
+
+element(row(m0,1),x235,x307)
+element(col(m0,1),x230,x307)
+
+element(row(m0,1),x236,x308)
+element(col(m0,2),x230,x308)
+
+element(row(m0,1),x237,x309)
+element(col(m0,3),x230,x309)
+
+element(row(m0,1),x238,x310)
+element(col(m0,4),x230,x310)
+
+element(row(m0,1),x239,x311)
+element(col(m0,5),x230,x311)
+
+element(row(m0,1),x240,x312)
+element(col(m0,0),x231,x312)
+
+element(row(m0,1),x241,x313)
+element(col(m0,1),x231,x313)
+
+element(row(m0,1),x242,x314)
+element(col(m0,2),x231,x314)
+
+element(row(m0,1),x243,x315)
+element(col(m0,3),x231,x315)
+
+element(row(m0,1),x244,x316)
+element(col(m0,4),x231,x316)
+
+element(row(m0,1),x245,x317)
+element(col(m0,5),x231,x317)
+
+element(row(m0,1),x246,x318)
+element(col(m0,0),x232,x318)
+
+element(row(m0,1),x247,x319)
+element(col(m0,1),x232,x319)
+
+element(row(m0,1),x248,x320)
+element(col(m0,2),x232,x320)
+
+element(row(m0,1),x249,x321)
+element(col(m0,3),x232,x321)
+
+element(row(m0,1),x250,x322)
+element(col(m0,4),x232,x322)
+
+element(row(m0,1),x251,x323)
+element(col(m0,5),x232,x323)
+
+element(row(m0,1),x252,x324)
+element(col(m0,0),x233,x324)
+
+element(row(m0,1),x253,x325)
+element(col(m0,1),x233,x325)
+
+element(row(m0,1),x254,x326)
+element(col(m0,2),x233,x326)
+
+element(row(m0,1),x255,x327)
+element(col(m0,3),x233,x327)
+
+element(row(m0,1),x256,x328)
+element(col(m0,4),x233,x328)
+
+element(row(m0,1),x257,x329)
+element(col(m0,5),x233,x329)
+
+element(row(m0,2),x222,x330)
+element(col(m0,0),x234,x330)
+
+element(row(m0,2),x223,x331)
+element(col(m0,1),x234,x331)
+
+element(row(m0,2),x224,x332)
+element(col(m0,2),x234,x332)
+
+element(row(m0,2),x225,x333)
+element(col(m0,3),x234,x333)
+
+element(row(m0,2),x226,x334)
+element(col(m0,4),x234,x334)
+
+element(row(m0,2),x227,x335)
+element(col(m0,5),x234,x335)
+
+element(row(m0,2),x228,x336)
+element(col(m0,0),x235,x336)
+
+element(row(m0,2),x229,x337)
+element(col(m0,1),x235,x337)
+
+element(row(m0,2),x230,x338)
+element(col(m0,2),x235,x338)
+
+element(row(m0,2),x231,x339)
+element(col(m0,3),x235,x339)
+
+element(row(m0,2),x232,x340)
+element(col(m0,4),x235,x340)
+
+element(row(m0,2),x233,x341)
+element(col(m0,5),x235,x341)
+
+element(row(m0,2),x234,x342)
+element(col(m0,0),x236,x342)
+
+element(row(m0,2),x235,x343)
+element(col(m0,1),x236,x343)
+
+element(row(m0,2),x236,x344)
+element(col(m0,2),x236,x344)
+
+element(row(m0,2),x237,x345)
+element(col(m0,3),x236,x345)
+
+element(row(m0,2),x238,x346)
+element(col(m0,4),x236,x346)
+
+element(row(m0,2),x239,x347)
+element(col(m0,5),x236,x347)
+
+element(row(m0,2),x240,x348)
+element(col(m0,0),x237,x348)
+
+element(row(m0,2),x241,x349)
+element(col(m0,1),x237,x349)
+
+element(row(m0,2),x242,x350)
+element(col(m0,2),x237,x350)
+
+element(row(m0,2),x243,x351)
+element(col(m0,3),x237,x351)
+
+element(row(m0,2),x244,x352)
+element(col(m0,4),x237,x352)
+
+element(row(m0,2),x245,x353)
+element(col(m0,5),x237,x353)
+
+element(row(m0,2),x246,x354)
+element(col(m0,0),x238,x354)
+
+element(row(m0,2),x247,x355)
+element(col(m0,1),x238,x355)
+
+element(row(m0,2),x248,x356)
+element(col(m0,2),x238,x356)
+
+element(row(m0,2),x249,x357)
+element(col(m0,3),x238,x357)
+
+element(row(m0,2),x250,x358)
+element(col(m0,4),x238,x358)
+
+element(row(m0,2),x251,x359)
+element(col(m0,5),x238,x359)
+
+element(row(m0,2),x252,x360)
+element(col(m0,0),x239,x360)
+
+element(row(m0,2),x253,x361)
+element(col(m0,1),x239,x361)
+
+element(row(m0,2),x254,x362)
+element(col(m0,2),x239,x362)
+
+element(row(m0,2),x255,x363)
+element(col(m0,3),x239,x363)
+
+element(row(m0,2),x256,x364)
+element(col(m0,4),x239,x364)
+
+element(row(m0,2),x257,x365)
+element(col(m0,5),x239,x365)
+
+element(row(m0,3),x222,x366)
+element(col(m0,0),x240,x366)
+
+element(row(m0,3),x223,x367)
+element(col(m0,1),x240,x367)
+
+element(row(m0,3),x224,x368)
+element(col(m0,2),x240,x368)
+
+element(row(m0,3),x225,x369)
+element(col(m0,3),x240,x369)
+
+element(row(m0,3),x226,x370)
+element(col(m0,4),x240,x370)
+
+element(row(m0,3),x227,x371)
+element(col(m0,5),x240,x371)
+
+element(row(m0,3),x228,x372)
+element(col(m0,0),x241,x372)
+
+element(row(m0,3),x229,x373)
+element(col(m0,1),x241,x373)
+
+element(row(m0,3),x230,x374)
+element(col(m0,2),x241,x374)
+
+element(row(m0,3),x231,x375)
+element(col(m0,3),x241,x375)
+
+element(row(m0,3),x232,x376)
+element(col(m0,4),x241,x376)
+
+element(row(m0,3),x233,x377)
+element(col(m0,5),x241,x377)
+
+element(row(m0,3),x234,x378)
+element(col(m0,0),x242,x378)
+
+element(row(m0,3),x235,x379)
+element(col(m0,1),x242,x379)
+
+element(row(m0,3),x236,x380)
+element(col(m0,2),x242,x380)
+
+element(row(m0,3),x237,x381)
+element(col(m0,3),x242,x381)
+
+element(row(m0,3),x238,x382)
+element(col(m0,4),x242,x382)
+
+element(row(m0,3),x239,x383)
+element(col(m0,5),x242,x383)
+
+element(row(m0,3),x240,x384)
+element(col(m0,0),x243,x384)
+
+element(row(m0,3),x241,x385)
+element(col(m0,1),x243,x385)
+
+element(row(m0,3),x242,x386)
+element(col(m0,2),x243,x386)
+
+element(row(m0,3),x243,x387)
+element(col(m0,3),x243,x387)
+
+element(row(m0,3),x244,x388)
+element(col(m0,4),x243,x388)
+
+element(row(m0,3),x245,x389)
+element(col(m0,5),x243,x389)
+
+element(row(m0,3),x246,x390)
+element(col(m0,0),x244,x390)
+
+element(row(m0,3),x247,x391)
+element(col(m0,1),x244,x391)
+
+element(row(m0,3),x248,x392)
+element(col(m0,2),x244,x392)
+
+element(row(m0,3),x249,x393)
+element(col(m0,3),x244,x393)
+
+element(row(m0,3),x250,x394)
+element(col(m0,4),x244,x394)
+
+element(row(m0,3),x251,x395)
+element(col(m0,5),x244,x395)
+
+element(row(m0,3),x252,x396)
+element(col(m0,0),x245,x396)
+
+element(row(m0,3),x253,x397)
+element(col(m0,1),x245,x397)
+
+element(row(m0,3),x254,x398)
+element(col(m0,2),x245,x398)
+
+element(row(m0,3),x255,x399)
+element(col(m0,3),x245,x399)
+
+element(row(m0,3),x256,x400)
+element(col(m0,4),x245,x400)
+
+element(row(m0,3),x257,x401)
+element(col(m0,5),x245,x401)
+
+element(row(m0,4),x222,x402)
+element(col(m0,0),x246,x402)
+
+element(row(m0,4),x223,x403)
+element(col(m0,1),x246,x403)
+
+element(row(m0,4),x224,x404)
+element(col(m0,2),x246,x404)
+
+element(row(m0,4),x225,x405)
+element(col(m0,3),x246,x405)
+
+element(row(m0,4),x226,x406)
+element(col(m0,4),x246,x406)
+
+element(row(m0,4),x227,x407)
+element(col(m0,5),x246,x407)
+
+element(row(m0,4),x228,x408)
+element(col(m0,0),x247,x408)
+
+element(row(m0,4),x229,x409)
+element(col(m0,1),x247,x409)
+
+element(row(m0,4),x230,x410)
+element(col(m0,2),x247,x410)
+
+element(row(m0,4),x231,x411)
+element(col(m0,3),x247,x411)
+
+element(row(m0,4),x232,x412)
+element(col(m0,4),x247,x412)
+
+element(row(m0,4),x233,x413)
+element(col(m0,5),x247,x413)
+
+element(row(m0,4),x234,x414)
+element(col(m0,0),x248,x414)
+
+element(row(m0,4),x235,x415)
+element(col(m0,1),x248,x415)
+
+element(row(m0,4),x236,x416)
+element(col(m0,2),x248,x416)
+
+element(row(m0,4),x237,x417)
+element(col(m0,3),x248,x417)
+
+element(row(m0,4),x238,x418)
+element(col(m0,4),x248,x418)
+
+element(row(m0,4),x239,x419)
+element(col(m0,5),x248,x419)
+
+element(row(m0,4),x240,x420)
+element(col(m0,0),x249,x420)
+
+element(row(m0,4),x241,x421)
+element(col(m0,1),x249,x421)
+
+element(row(m0,4),x242,x422)
+element(col(m0,2),x249,x422)
+
+element(row(m0,4),x243,x423)
+element(col(m0,3),x249,x423)
+
+element(row(m0,4),x244,x424)
+element(col(m0,4),x249,x424)
+
+element(row(m0,4),x245,x425)
+element(col(m0,5),x249,x425)
+
+element(row(m0,4),x246,x426)
+element(col(m0,0),x250,x426)
+
+element(row(m0,4),x247,x427)
+element(col(m0,1),x250,x427)
+
+element(row(m0,4),x248,x428)
+element(col(m0,2),x250,x428)
+
+element(row(m0,4),x249,x429)
+element(col(m0,3),x250,x429)
+
+element(row(m0,4),x250,x430)
+element(col(m0,4),x250,x430)
+
+element(row(m0,4),x251,x431)
+element(col(m0,5),x250,x431)
+
+element(row(m0,4),x252,x432)
+element(col(m0,0),x251,x432)
+
+element(row(m0,4),x253,x433)
+element(col(m0,1),x251,x433)
+
+element(row(m0,4),x254,x434)
+element(col(m0,2),x251,x434)
+
+element(row(m0,4),x255,x435)
+element(col(m0,3),x251,x435)
+
+element(row(m0,4),x256,x436)
+element(col(m0,4),x251,x436)
+
+element(row(m0,4),x257,x437)
+element(col(m0,5),x251,x437)
+
+element(row(m0,5),x222,x438)
+element(col(m0,0),x252,x438)
+
+element(row(m0,5),x223,x439)
+element(col(m0,1),x252,x439)
+
+element(row(m0,5),x224,x440)
+element(col(m0,2),x252,x440)
+
+element(row(m0,5),x225,x441)
+element(col(m0,3),x252,x441)
+
+element(row(m0,5),x226,x442)
+element(col(m0,4),x252,x442)
+
+element(row(m0,5),x227,x443)
+element(col(m0,5),x252,x443)
+
+element(row(m0,5),x228,x444)
+element(col(m0,0),x253,x444)
+
+element(row(m0,5),x229,x445)
+element(col(m0,1),x253,x445)
+
+element(row(m0,5),x230,x446)
+element(col(m0,2),x253,x446)
+
+element(row(m0,5),x231,x447)
+element(col(m0,3),x253,x447)
+
+element(row(m0,5),x232,x448)
+element(col(m0,4),x253,x448)
+
+element(row(m0,5),x233,x449)
+element(col(m0,5),x253,x449)
+
+element(row(m0,5),x234,x450)
+element(col(m0,0),x254,x450)
+
+element(row(m0,5),x235,x451)
+element(col(m0,1),x254,x451)
+
+element(row(m0,5),x236,x452)
+element(col(m0,2),x254,x452)
+
+element(row(m0,5),x237,x453)
+element(col(m0,3),x254,x453)
+
+element(row(m0,5),x238,x454)
+element(col(m0,4),x254,x454)
+
+element(row(m0,5),x239,x455)
+element(col(m0,5),x254,x455)
+
+element(row(m0,5),x240,x456)
+element(col(m0,0),x255,x456)
+
+element(row(m0,5),x241,x457)
+element(col(m0,1),x255,x457)
+
+element(row(m0,5),x242,x458)
+element(col(m0,2),x255,x458)
+
+element(row(m0,5),x243,x459)
+element(col(m0,3),x255,x459)
+
+element(row(m0,5),x244,x460)
+element(col(m0,4),x255,x460)
+
+element(row(m0,5),x245,x461)
+element(col(m0,5),x255,x461)
+
+element(row(m0,5),x246,x462)
+element(col(m0,0),x256,x462)
+
+element(row(m0,5),x247,x463)
+element(col(m0,1),x256,x463)
+
+element(row(m0,5),x248,x464)
+element(col(m0,2),x256,x464)
+
+element(row(m0,5),x249,x465)
+element(col(m0,3),x256,x465)
+
+element(row(m0,5),x250,x466)
+element(col(m0,4),x256,x466)
+
+element(row(m0,5),x251,x467)
+element(col(m0,5),x256,x467)
+
+element(row(m0,5),x252,x468)
+element(col(m0,0),x257,x468)
+
+element(row(m0,5),x253,x469)
+element(col(m0,1),x257,x469)
+
+element(row(m0,5),x254,x470)
+element(col(m0,2),x257,x470)
+
+element(row(m0,5),x255,x471)
+element(col(m0,3),x257,x471)
+
+element(row(m0,5),x256,x472)
+element(col(m0,4),x257,x472)
+
+element(row(m0,5),x257,x473)
+element(col(m0,5),x257,x473)
+
+

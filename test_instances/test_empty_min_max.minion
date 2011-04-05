@@ -1,0 +1,14 @@
+MINION 3
+#TEST SOLCOUNT 3
+
+**VARIABLES**
+
+DISCRETE mi {-1..1}
+
+BOOL b
+
+**CONSTRAINTS**
+
+reifyimply(min([], mi), b)
+
+**EOF**
