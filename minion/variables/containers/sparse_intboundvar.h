@@ -37,7 +37,10 @@ Use of this variable in a constraint:
 eq(myvar, 3) #myvar equals 3
 */
 
-
+#ifdef THREADSAFE
+#include <boost/thread/thread.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+#endif
 
 #include "../../constraints/constraint_abstract.h"
 
@@ -96,6 +99,13 @@ struct SparseBoundVarContainer {
 #endif
   unsigned var_count_m;
   BOOL lock_m;
+
+#ifdef THREADSAFE
+  boost::recursive_mutex con_mutex;
+#define LOCK_CON_MUTEX boost::recursive_mutex::scoped_lock lock(con_mutex);
+#else
+#define LOCK_CON_MUTEX
+#endif
 
   SparseBoundVarContainer(StateObj* _stateObj) : stateObj(_stateObj), trigger_list(stateObj, true), var_count_m(0), lock_m(false)
   { }
@@ -215,20 +225,20 @@ struct SparseBoundVarContainer {
 }
   
   BOOL isAssigned(SparseBoundVarRef_internal<BoundType> d) const
-  { 
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     return lower_bound(d) == upper_bound(d); 
   }
   
   DomainInt getAssignedValue(SparseBoundVarRef_internal<BoundType> d) const
-  {
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return lower_bound(d);
   }
   
   BOOL inDomain(SparseBoundVarRef_internal<BoundType> d, DomainInt i) const
-  { 
+  {   LOCK_CON_MUTEX
       D_ASSERT(lock_m);
       // First check against bounds
       if(i< lower_bound(d) || i> upper_bound(d))
@@ -242,7 +252,7 @@ struct SparseBoundVarContainer {
   }
   
   BOOL inDomain_noBoundCheck(SparseBoundVarRef_internal<BoundType> ref, DomainInt i) const
-  {
+  { LOCK_CON_MUTEX
       D_ASSERT(lock_m);
       // use binary search to find if the value is in the domain vector.
       //const vector<BoundType>& dom = get_domain(ref);  // why does this not work?
@@ -252,13 +262,13 @@ struct SparseBoundVarContainer {
   }
   
   DomainInt getMin(SparseBoundVarRef_internal<BoundType> d) const
-  {
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     return lower_bound(d);
   }
   
   DomainInt getMax(SparseBoundVarRef_internal<BoundType> d) const
-  {
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     return upper_bound(d);
   }
@@ -277,7 +287,7 @@ struct SparseBoundVarContainer {
   }
 
   void internalAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
-  {
+  { LOCK_CON_MUTEX
     vector<BoundType>& bounds = get_domain(d);
     DomainInt min_val = getMin(d);
     DomainInt max_val = getMax(d);
@@ -326,7 +336,7 @@ struct SparseBoundVarContainer {
   { internalAssign(d, i); }
   
   void setMax(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
-  {
+  { LOCK_CON_MUTEX
     // Note, this just finds a new upper bound, it doesn't set it.
     i = find_upper_bound(d, i);
     
@@ -356,7 +366,7 @@ struct SparseBoundVarContainer {
   }
   
   void setMin(SparseBoundVarRef_internal<BoundType> d, DomainInt i)
-  {
+  { LOCK_CON_MUTEX
     i = find_lower_bound(d,i);
     
     DomainInt up_bound = upper_bound(d);
@@ -389,7 +399,7 @@ struct SparseBoundVarContainer {
   SparseBoundVarRef get_var_num(int i);
 
   void addTrigger(SparseBoundVarRef_internal<BoundType> b, Trigger t, TrigType type)
-  { 
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m); 
     trigger_list.add_trigger(b.var_num, t, type); 
   }
@@ -424,7 +434,7 @@ struct SparseBoundVarContainer {
 
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  { 
+  {  LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     if(type == DomainRemoval)
     {

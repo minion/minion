@@ -28,6 +28,11 @@
 #include "memory_management/backtrackable_memory.h"
 #include "memory_management/nonbacktrack_memory.h"
 
+#ifdef THREADSAFE
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#endif
+
 class TriggerList;
 
 class TriggerMem
@@ -58,6 +63,13 @@ public:
 
 class TriggerList
 {
+#ifdef THREADSAFE
+  boost::mutex trigger_mutex;
+#define LOCK_MUTEX boost::mutex::scoped_lock lock(trigger_mutex);
+#else
+#define LOCK_MUTEX
+#endif
+
   StateObj* stateObj;
 
   TriggerList(const TriggerList&);
@@ -203,6 +215,7 @@ public:
 
   void dynamic_propagate(int var_num, TrigType type, DomainInt val_removed = NoDomainValue)
   {
+    LOCK_MUTEX;
     D_ASSERT(val_removed == NoDomainValue || ( type == DomainRemoval && val_removed != NoDomainValue) );
     D_ASSERT(!only_bounds || type != DomainRemoval);
     DynamicTrigger* trig;
@@ -277,6 +290,7 @@ public:
 
   void add_domain_trigger(int b, Trigger t)
   {
+        LOCK_MUTEX;
     D_ASSERT(!only_bounds);
     D_ASSERT(lock_first && !lock_second);
     triggers[DomainChanged][b].push_back(t);
@@ -284,6 +298,7 @@ public:
 
   void add_trigger(int b, Trigger t, TrigType type)
   {
+        LOCK_MUTEX;
     D_ASSERT(type != DomainRemoval);
     D_ASSERT(lock_first && !lock_second);
     triggers[type][b].push_back(t);
@@ -292,6 +307,7 @@ public:
 
   void addDynamicTrigger(int b, DynamicTrigger* t, TrigType type, DomainInt val BT_FUNDEF)
   {
+        LOCK_MUTEX;
     D_ASSERT(lock_second);
     D_ASSERT(!only_bounds || type != DomainRemoval);
     D_ASSERT(t->constraint != NULL);

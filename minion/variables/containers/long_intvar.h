@@ -33,7 +33,10 @@ Use of this variable in a constraint:
 eq(x, 2) #variable x equals 2
 */
 
-
+#ifdef THREADSAFE
+#include <boost/thread/thread.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+#endif
 
 #include "../../constraints/constraint_abstract.h"
 
@@ -94,6 +97,13 @@ struct BigRangeVarContainer {
     var_offset.push_back(0);
   }
   
+#ifdef THREADSAFE
+  boost::recursive_mutex con_mutex;
+#define LOCK_CON_MUTEX boost::recursive_mutex::scoped_lock lock(con_mutex);
+#else
+#define LOCK_CON_MUTEX
+#endif
+
   typedef DomainInt domain_bound_type;
   MoveablePointer bound_data;
   MonotonicSet *bms_array;
@@ -234,20 +244,20 @@ struct BigRangeVarContainer {
   }
   
   BOOL isAssigned(BigRangeVarRef_internal d) const
-  { 
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     return lower_bound(d) == upper_bound(d); 
   }
   
   DomainInt getAssignedValue(BigRangeVarRef_internal d) const
-  {
+  {LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return getMin(d);
   }
   
   BOOL inDomain(BigRangeVarRef_internal d, DomainInt i) const
-  {
+  {LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
       return false;
@@ -257,7 +267,7 @@ struct BigRangeVarContainer {
   // Warning: If this is ever changed, be sure to check through the code for other places
   // where bms_array is used directly.
   BOOL inDomain_noBoundCheck(BigRangeVarRef_internal d, DomainInt i) const
-  {
+  {LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(i >= lower_bound(d));
     D_ASSERT(i <= upper_bound(d));
@@ -265,27 +275,27 @@ struct BigRangeVarContainer {
   }
   
   DomainInt getMin(BigRangeVarRef_internal d) const
-  {
+  {LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     return lower_bound(d);
   }
   
   DomainInt getMax(BigRangeVarRef_internal d) const
-  {
+  {LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     return upper_bound(d);
   }
   
   DomainInt getInitialMin(BigRangeVarRef_internal d) const
-  { return initial_bounds[d.var_num].first; }
+  { LOCK_CON_MUTEX return initial_bounds[d.var_num].first; }
   
   DomainInt getInitialMax(BigRangeVarRef_internal d) const
-  { return initial_bounds[d.var_num].second; }
+  { LOCK_CON_MUTEX return initial_bounds[d.var_num].second; }
    
   void removeFromDomain(BigRangeVarRef_internal d, DomainInt i)
-  {
+  { LOCK_CON_MUTEX
 #ifdef DEBUG
     cout << "Calling removeFromDomain: " << d.var_num << " " << i << " [" 
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
@@ -342,7 +352,7 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove
   }
 
   BOOL validAssignment(BigRangeVarRef_internal d, DomainInt offset, DomainInt lower, DomainInt upper)
-  {
+  { LOCK_CON_MUTEX
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     if(!inDomain(d,offset))
     {
@@ -360,7 +370,7 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove
   }    
   
   void propagateAssign(BigRangeVarRef_internal d, DomainInt offset)
-  {
+  { LOCK_CON_MUTEX
     DomainInt lower = lower_bound(d);
     DomainInt upper = upper_bound(d);
     if(!validAssignment(d, offset, lower, upper)) return;
@@ -368,14 +378,14 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove
   }
 
   void uncheckedAssign(BigRangeVarRef_internal d, DomainInt i)
-  { 
+  {  LOCK_CON_MUTEX
     D_ASSERT(inDomain(d,i));
     D_ASSERT(!isAssigned(d));
     commonAssign(d,i, lower_bound(d), upper_bound(d)); 
   }
 
   void decisionAssign(BigRangeVarRef_internal d, DomainInt i)
-  {
+  {LOCK_CON_MUTEX
     D_ASSERT(inDomain(d,i));
     D_ASSERT(!isAssigned(d));
     commonAssign(d,i, lower_bound(d), upper_bound(d)); 
@@ -418,7 +428,7 @@ public:
 
   
   void setMax(BigRangeVarRef_internal d, DomainInt offset)
-  {
+  {LOCK_CON_MUTEX
 #ifdef DEBUG
     cout << "Calling setMax: " << d.var_num << " " << offset << " [" 
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
@@ -474,7 +484,7 @@ public:
   }
   
   void setMin(BigRangeVarRef_internal d, DomainInt offset)
-  {
+  {LOCK_CON_MUTEX
 #ifdef DEBUG
     cout << "Calling setMin: " << d.var_num << " " << offset << " [" 
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
@@ -534,11 +544,11 @@ public:
   BigRangeVarRef get_new_var(int i, int j);
 
   void addTrigger(BigRangeVarRef_internal b, Trigger t, TrigType type)
-  { D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type);  }
+  { LOCK_CON_MUTEX D_ASSERT(lock_m); trigger_list.add_trigger(b.var_num, t, type);  }
   
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(BigRangeVarRef_internal b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  {  
+  {   LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(b.var_num >= 0);
     D_ASSERT(b.var_num <= (int)var_count_m);

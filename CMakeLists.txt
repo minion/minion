@@ -142,7 +142,17 @@ if(WINCYGWIN)
     set(CFLAGS "${CFLAGS} -enable-auto-import")
 endif()
 
-set(BOOST_COMPONENTS iostreams)
+option(THREADSAFE "" OFF)
+if(THREADSAFE)
+    message(STATUS "Compiling thread-safe minion")
+    set(BINARY "${BINARY}-threads")
+    add_definitions(-DTHREADSAFE)
+
+    set(BOOST_COMPONENTS iostreams thread)
+else()
+    set(BOOST_COMPONENTS iostreams)
+endif()
+
 
 option(NAUTY "" ON)
 if(NAUTY)
@@ -281,12 +291,7 @@ if(DEBUG)
 endif()
 
 
-option(THREADSAFE "" OFF)
-if(THREADSAFE)
-    message(STATUS "Compiling thread-safe minion")
-    set(BINARY "${BINARY}-threads")
-    add_definitions(-DTHREADSAFE)
-endif()
+
 
 if(WIN32 AND NOT CYGWIN)
     set(CFLAGS "${CFLAGS} /EHsc")

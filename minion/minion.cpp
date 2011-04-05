@@ -370,11 +370,15 @@ void print_default_help(char** argv)
   print_constraints();
 }
 
+void worker()
+{
+  while(1);
+}
 
 int main(int argc, char** argv) {
 // Wrap main in a try/catch just to stop exceptions leaving main,
 // as windows gets really annoyed when that happens.
-
+boost::thread t(worker);
 try {
   StateObj* stateObj = new StateObj();
 
