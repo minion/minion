@@ -25,8 +25,8 @@
 #undef P
 #endif
 
-#define P(x) cout << x << endl
-//#define P(x)
+//#define P(x) cout << x << endl
+#define P(x)
 
 template<typename VarArray1, typename VarArray2, bool Less = false>
   struct QuickLexDynamic : public AbstractConstraint
