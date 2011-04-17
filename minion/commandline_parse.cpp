@@ -243,6 +243,16 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       ++i;
       args.random_seed = atoi(argv[i]);
     }
+    else if(command == string("-Xvarmunge"))
+    {
+      ++i;
+      getOptions(stateObj).Xvarmunge = atoi(argv[i]);
+    }
+    else if(command == string("-Xsymmunge"))
+    {
+      ++i;
+      getOptions(stateObj).Xsymmunge = atoi(argv[i]);
+    }
     else if(command == string("-tableout") || command == string("-tableout0"))
     {
         getOptions(stateObj).tableout=true;
@@ -284,12 +294,12 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
     { 
       if(getOptions(stateObj).instance_name == "")
         getOptions(stateObj).instance_name = command;
-    else
-    {
-      cout << "I was confused by '" << command << "'. Sorry." << endl;
-      cout << "You can only give one instance file." << endl;
-      exit(1);
-    }
+      else
+      {
+        cout << "I was confused by '" << command << "'. Sorry." << endl;
+        cout << "You can only give one instance file." << endl;
+        exit(1);
+      }
     }
   }
   // bundle all options together and store

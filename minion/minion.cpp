@@ -372,7 +372,52 @@ void print_default_help(char** argv)
 
 void worker()
 {
-  while(1);
+  while(1) {;}
+}
+
+template<typename Con>
+void munge_container(Con& con, int type)
+{
+  switch(type)
+  {
+    case -1: return;
+    case 0: 
+      std::reverse(con.begin(), con.end());
+      return;
+    case 1:
+    {
+      Con con2;
+      int size = con.size();
+      if(size%2==1)
+      {
+        size--;
+        con2.push_back(con[size/2]);
+      }
+      else
+      { size-=2; }
+
+      for(int i = size/2; i >= 0; ++i)
+      {
+        con2.push_back(con[i]);
+        con2.push_back(con[con.size() - i - 1]);
+      }
+      D_ASSERT(con2.size() == con.size());
+      con = con2;
+      return;
+    }
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    {
+      srand(type);
+      std::random_shuffle(con.begin(), con.end());
+      return;
+    }
+    default:
+      abort();
+  }
 }
 
 int main(int argc, char** argv) {
@@ -442,6 +487,17 @@ try {
   }
 
   readInputFromFiles(instance, files, getOptions(stateObj).parser_verbose);
+
+  if(getOptions(stateObj).Xvarmunge != -1)
+  {
+    assert(instance.search_order.size() == 1);
+    munge_container(instance.search_order[0].var_order, getOptions(stateObj).Xvarmunge);  
+  }
+
+  if(getOptions(stateObj).Xsymmunge != -1)
+  {
+    munge_container(instance.sym_order, getOptions(stateObj).Xsymmunge);
+  }
 
   if(getOptions(stateObj).graph)
   {

@@ -252,6 +252,9 @@ public:
   /// Disable the use of linux timers
   bool noTimers;
   
+  int Xvarmunge;
+  int Xsymmunge;
+
   SearchOptions() : 
     wdeg_on(false), find_generators(false), 
     cspcomp(false), silent(false), dumptree(false), sollimit(1), fullpropagate(false), 
@@ -266,7 +269,8 @@ public:
     randomise_valvarorder(false), parser_verbose(false), 
     redump(false), graph(false), instance_stats(false), 
     resume(false), noresumefile(false),
-    outputType(-1), noTimers(false)
+    outputType(-1), noTimers(false),
+    Xvarmunge(-1), Xsymmunge(-1)
   {}
   
   /// Denotes all solutions should be found, by setting sollimit to -1.
