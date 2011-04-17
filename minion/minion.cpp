@@ -380,11 +380,11 @@ void munge_container(Con& con, int type)
 {
   switch(type)
   {
-    case -1: return;
-    case 0: 
+    case 0: return;
+    case 1: 
       std::reverse(con.begin(), con.end());
       return;
-    case 1:
+    case 2:
     {
       Con con2;
       int size = con.size();
@@ -392,11 +392,12 @@ void munge_container(Con& con, int type)
       {
         size--;
         con2.push_back(con[size/2]);
+        size--;
       }
       else
-      { size-=2; }
+        size-=2;
 
-      for(int i = size/2; i >= 0; ++i)
+      for(int i = size/2; i >= 0; --i)
       {
         con2.push_back(con[i]);
         con2.push_back(con[con.size() - i - 1]);
@@ -405,7 +406,6 @@ void munge_container(Con& con, int type)
       con = con2;
       return;
     }
-    case 2:
     case 3:
     case 4:
     case 5:
