@@ -40,6 +40,9 @@ bool check_double_ctrlc;
 
 void CALLBACK TimerProc(void* ,  BOOLEAN)
 { *trig = true; }
+
+void CALLBACK ReallyStop(void*, BOOLEAN)
+{ exit(); }
     
 void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool CPU_time)
 {
@@ -55,7 +58,7 @@ void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool C
     {
         if(timeout <= 0)
           *trig = true;
-    BOOL success = ::CreateTimerQueueTimer(
+        BOOL success = ::CreateTimerQueueTimer(
         &m_timerHandle,
         NULL,
         TimerProc,
@@ -97,7 +100,7 @@ void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool C
     {
         rlimit lim;
         lim.rlim_cur = timeout;
-        lim.rlim_max = timeout + 10;
+        lim.rlim_max = timeout + 5;
         setrlimit(RLIMIT_CPU, &lim);
     }
     else

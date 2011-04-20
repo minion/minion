@@ -86,7 +86,7 @@ namespace Controller
 
           order.branch_right();
 
-          set_optimise_and_propagate_queue(stateObj);
+          set_optimise_and_propagate_queue(stateObj, prop, v);
         }
       }
     }

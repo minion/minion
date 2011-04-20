@@ -22,7 +22,6 @@
 
 #include "solver.h"
 
-
 template<typename Var, typename Vars, typename Prop>
 bool inline check_fail(StateObj* stateObj, Var& var, DomainInt val, Vars& vars, Prop prop)
 {
@@ -76,7 +75,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
       {
         while(check_fail(stateObj, var, var.getMax(), vararray, prop))
         {
-          if(check_sac_timeout(stateObj)) return;
+          if(check_sac_timeout(stateObj)) throw EndOfSearch();
           reduced = true;
           var.setMax(var.getMax() - 1);
           prop(stateObj, vararray);
@@ -86,7 +85,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
         
         while(check_fail(stateObj, var, var.getMin(), vararray, prop))
         {
-          if(check_sac_timeout(stateObj)) return;
+          if(check_sac_timeout(stateObj)) throw EndOfSearch();
           reduced = true;
           var.setMin(var.getMin() + 1);
           prop(stateObj, vararray);
@@ -98,7 +97,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
       {
         for(DomainInt val = var.getMin(); val <= var.getMax(); ++val)
         {
-          if(check_sac_timeout(stateObj)) return;
+          if(check_sac_timeout(stateObj)) throw EndOfSearch();
           if(var.inDomain(val) && check_fail(stateObj, var, val, vararray, prop))
           {
             reduced = true;

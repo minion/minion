@@ -201,6 +201,29 @@ namespace Controller
     fileout << "**EOF**" << endl;
   }
    
+  
+  inline bool checkAlarm(StateObj* stateObj)
+  {
+    if(getState(stateObj).isAlarmActivated())
+    { // Either a timeout has occurred, or ctrl+c has been pressed.
+      
+      getState(stateObj).clearAlarm();
+      if(getState(stateObj).isCtrlcPressed()) {
+        return true;
+      }
+
+      if(getOptions(stateObj).cspcomp)
+      {
+        FAIL_EXIT("Time out");
+      }
+      
+      getOptions(stateObj).printLine("Time out.");
+      getTableOut().set("TimeOut", 1);
+      return true;
+    }
+    return false;
+  }
+
   /// Check if timelimit has been exceeded.
   template<typename VarArray, typename BranchList>
   inline bool do_checks(StateObj* stateObj, VarArray& var_array, BranchList& branches)
@@ -225,7 +248,12 @@ namespace Controller
       
       getOptions(stateObj).printLine("Time out.");
       getTableOut().set("TimeOut", 1);
-      return true;
+
+      if(checkAlarm(stateObj))
+      {
+        generateRestartFile(stateObj, var_array, branches);
+        return true;
+      }
     }
     return false;
   }
@@ -270,11 +298,13 @@ namespace Controller
       throw EndOfSearch();
   }
 
-  void inline set_optimise_and_propagate_queue(StateObj* stateObj)
+  template<typename Prop, typename Vars>
+  void inline set_optimise_and_propagate_queue(StateObj* stateObj, Prop& propagator, Vars& vars)
   {
     if(getState(stateObj).isOptimisationProblem())
       getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseValue());
-    getQueue(stateObj).propagateQueue();
+    propagator.prop(stateObj, vars);
+//    getQueue(stateObj).propagateQueue();
   }
 
   void inline initalise_search(StateObj* stateObj)

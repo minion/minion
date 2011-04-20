@@ -240,7 +240,7 @@ struct SearchManager
                 {   // No remaining left branches to branch right.
                     return;
                 }
-                set_optimise_and_propagate_queue(stateObj);
+                set_optimise_and_propagate_queue(stateObj, *prop, var_array);
             }
         }
     }

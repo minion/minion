@@ -119,6 +119,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     shared_ptr<Controller::SearchManager> sm=Controller::make_search_manager(stateObj, args.prop_method, instance.search_order);
     
     getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions(stateObj).silent);
+    try {
     
     PropogateCSP(stateObj, args.preprocess, preprocess_vars, !getOptions(stateObj).silent);
     getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions(stateObj).silent);
@@ -126,17 +127,16 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     
   if(!getState(stateObj).isFailed())
   {
-    try {
         if(!getOptions(stateObj).noTimers && getOptions(stateObj).search_limit > 0)
         {
             getState(stateObj).setupAlarm(getOptions(stateObj).timeout_active, getOptions(stateObj).search_limit, getOptions(stateObj).time_limit_is_CPU_time);
             getState(stateObj).setupCtrlc();
         }
         sm->search();
+  }
     }
     catch(EndOfSearch)
     { }
-  }
 
   getState(stateObj).getOldTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", getTableOut(), !getOptions(stateObj).silent);
   getOptions(stateObj).printLine("Total Nodes: " + to_string( getState(stateObj).getNodeCount() ));
