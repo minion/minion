@@ -276,7 +276,7 @@ void print_search_info(const vector<Var>& var_vec )
     // Filter the var and val orders.
 
     vector<Var> var_order = csp.search_order[i].var_order;
-    vector<char> val_order = csp.search_order[i].val_order;
+    vector<ValOrderEnum> val_order = csp.search_order[i].val_order;
 
     int pos = 0;
     while(pos < var_order.size())
@@ -302,7 +302,18 @@ void print_search_info(const vector<Var>& var_vec )
       oss << "VALORDER ";
       vector<string> output_vars;
       for(int j = 0; j < val_order.size(); ++j)
-        output_vars.push_back(val_order[j] ? "a" : "d");
+        switch(val_order[j])
+        {
+          case VALORDER_ASCEND:
+            output_vars.push_back("a");
+            break;
+          case VALORDER_DESCEND:
+            output_vars.push_back("d");
+            break;
+          case VALORDER_RANDOM:
+            output_vars.push_back("r");
+            break;
+        }
       print_instance( output_vars);
       oss << endl;
     }

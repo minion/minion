@@ -112,7 +112,24 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
             std::random_shuffle(instance.search_order[i].var_order.begin(), instance.search_order[i].var_order.end()); 
             
             for(unsigned j = 0; j < instance.search_order[i].val_order.size(); ++j)
-                instance.search_order[i].val_order[j] = (rand() % 100) > 50;
+            {
+              ValOrderEnum valo = VALORDER_ASCEND;
+              switch(rand() % 3)
+              {
+                case 0:
+                  valo = VALORDER_ASCEND;
+                  break;
+                case 1:
+                  valo = VALORDER_DESCEND;
+                  break;
+                case 2:
+                  valo = VALORDER_RANDOM;
+                  break;
+                default:
+                  abort();
+              }
+              instance.search_order[i].val_order[j] = valo;
+            }
         }
     }
     

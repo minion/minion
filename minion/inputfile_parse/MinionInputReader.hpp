@@ -613,7 +613,7 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   
   char delim = infile->peek_char();
   
-  vector<char> valOrder ;
+  vector<ValOrderEnum> valOrder ;
      
   if(delim == ']')
   {
@@ -625,9 +625,20 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   {
     while (delim != ']') {
       char valOrderIdentifier = infile->get_char();
-      if(valOrderIdentifier != 'a' && valOrderIdentifier != 'd')
-        throw parse_exception("Expected 'a' or 'd'");
-      valOrder.push_back(valOrderIdentifier == 'a');
+      switch(valOrderIdentifier)
+      {
+        case 'a':
+          valOrder.push_back(VALORDER_ASCEND);
+          break;
+        case 'd':
+          valOrder.push_back(VALORDER_DESCEND);
+          break;
+        case 'r':
+          valOrder.push_back(VALORDER_RANDOM);
+          break;
+        default:
+          throw parse_exception("Expected 'a' or 'd' or 'r'");
+      }
       delim = infile->get_char();                                 // , or ]
     }
 
@@ -639,7 +650,7 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   if(valOrder.empty())
   {
     parser_info("No value order given, generating automatically");
-    valOrder = vector<char>(instance->search_order.back().var_order.size(), true);
+    valOrder = vector<ValOrderEnum>(instance->search_order.back().var_order.size(), VALORDER_ASCEND);
   }
   instance->search_order.back().val_order = valOrder;
 }

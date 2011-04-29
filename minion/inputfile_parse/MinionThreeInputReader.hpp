@@ -1120,7 +1120,7 @@ found: ;
         throw parse_exception("Must declare VARORDER first");
       if(!instance->search_order.back().val_order.empty())
         throw parse_exception("Can't have two VALORDERs for a VARORDER");
-      vector<char> valOrder ;
+      vector<ValOrderEnum> valOrder ;
 
       infile->check_sym('[');
 
@@ -1128,9 +1128,20 @@ found: ;
 
       while (delim != ']') {
         char valOrderIdentifier = infile->get_char();
-        if(valOrderIdentifier != 'a' && valOrderIdentifier != 'd')
-          throw parse_exception("Expected 'a' or 'd'");
-        valOrder.push_back(valOrderIdentifier == 'a');
+        switch(valOrderIdentifier)
+        {
+          case 'a':
+            valOrder.push_back(VALORDER_ASCEND);
+            break;
+          case 'd':
+            valOrder.push_back(VALORDER_DESCEND);
+            break;
+          case 'r':
+            valOrder.push_back(VALORDER_RANDOM);
+            break;
+          default:
+            throw parse_exception("Expected 'a' or 'd' or 'r'");
+        }
         delim = infile->get_char();                                 // , or ]
       }
       instance->search_order.back().val_order = valOrder;

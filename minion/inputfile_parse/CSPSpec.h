@@ -77,6 +77,13 @@ enum VarOrderEnum
   ORDER_CONFLICT
 };
 
+enum ValOrderEnum
+{
+  VALORDER_ASCEND,
+  VALORDER_DESCEND,
+  VALORDER_RANDOM
+};
+
 struct ConstraintDef
 {
   std::string name;
@@ -547,7 +554,7 @@ struct ConstraintBlob
 struct SearchOrder
 {
   vector<Var> var_order;
-  vector<char> val_order;
+  vector<ValOrderEnum> val_order;
   VarOrderEnum order;
   bool find_one_assignment;
 
@@ -565,7 +572,7 @@ struct SearchOrder
   void setupValueOrder()
   {
     if(val_order.empty())
-      val_order.resize(var_order.size(), 'a');
+      val_order.resize(var_order.size(), VALORDER_ASCEND);
   }
 };
 
@@ -576,8 +583,6 @@ struct CSPInstance
   shared_ptr<TupleListContainer> tupleListContainer;
 
   vector<SearchOrder> search_order;
-  //vector<Var> var_order;
-  //vector<char> val_order;
   vector<Var> permutation;
   vector<Var> sym_order;
 
