@@ -34,6 +34,24 @@ DomainInt chooseVal(T& var, ValOrderEnum vo)
             return var.getMin();
         case VALORDER_DESCEND:
             return var.getMax();
+        case VALORDER_9:
+        case VALORDER_8:
+        case VALORDER_7:
+        case VALORDER_6:
+        case VALORDER_5:
+        case VALORDER_4:
+        case VALORDER_3:
+        case VALORDER_2:
+        case VALORDER_1:
+        case VALORDER_0:
+        {
+            int val = (int)vo - (int)VALORDER_0;
+            if(var.inDomain(val))
+                return val;
+            else
+                return var.getMin();
+        }
+
         default:
         {
             if(var.isBound())

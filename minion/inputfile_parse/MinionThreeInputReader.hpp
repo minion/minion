@@ -1139,6 +1139,37 @@ found: ;
           case 'r':
             valOrder.push_back(VALORDER_RANDOM);
             break;
+          case '0':
+            valOrder.push_back(VALORDER_0);
+            break;
+          case '1':
+            valOrder.push_back(VALORDER_1);
+            break;
+          case '2':
+            valOrder.push_back(VALORDER_2);
+            break;
+          case '3':
+            valOrder.push_back(VALORDER_3);
+            break;
+          case '4':
+            valOrder.push_back(VALORDER_4);
+            break;
+          case '5':
+            valOrder.push_back(VALORDER_5);
+            break;
+          case '6':
+            valOrder.push_back(VALORDER_6);
+            break;
+          case '7':
+            valOrder.push_back(VALORDER_7);
+            break;
+          case '8':
+            valOrder.push_back(VALORDER_8);
+            break;
+          case '9':
+            valOrder.push_back(VALORDER_9);
+            break;
+
           default:
             throw parse_exception("Expected 'a' or 'd' or 'r'");
         }
