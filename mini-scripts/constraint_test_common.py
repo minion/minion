@@ -1486,14 +1486,19 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         constraint="reifyimply("+constraint+", x0)"
     
 
+    watched_depth = 0
     tree_choice = random.randint(0,5)    
     while tree_choice <= 1:
       treesame = False
       if tree_choice==0:
-          constraint = "watched-and({"+ ",".join([constraint] * random.randint(1,5)) +"})"
+          constraint = "watched-and({"+ ",".join([constraint] * random.randint(1,3)) +"})"
       if tree_choice==1:
-          constraint = "watched-or({"+ ",".join([constraint] * random.randint(1,5)) +"})"
-      tree_choice = random.randint(0,5)
+          constraint = "watched-or({"+ ",".join([constraint] * random.randint(1,3)) +"})"
+      watched_depth = watched_depth + 1
+      if watched_depth < 4:
+          tree_choice = random.randint(0,5)
+      else:
+          tree_choice = 5
 
     varnums2=varnums[:]
     for (i,t) in zip(range(len(varnums)), vartypes):
