@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>variables vectors</title>
+</head>
+<body>
+<h1>Help on <tt>variables vectors</tt></h1>
+<h3>Description</h3>
+<pre>
+Vectors, matrices and tensors can be declared in minion
+input. Matrices and tensors are for convenience, as constraints do not
+take these as input; they must first undergo a flattening process to
+convert them to a vector before use. Additional commas at the end of 
+vectors are ignored (see example below).
+</pre>
+<h3>Examples</h3>
+<pre>
+A vector of 0/1 variables:
+
+BOOL myvec[5]
+
+A matrix of discrete variables:
+
+DISCRETE sudoku[9,9] {1..9}
+
+A 3D tensor of 0/1s:
+
+BOOL mycube[3,3,2]
+
+One can create a vector from scalars and elements of vectors, etc.:
+
+alldiff([x,y,myvec[1],mymatrix[3,4]])
+
+When a matrix or tensor is constrained, it is treated as a vector
+whose entries have been strung out into a vector in index order with
+the rightmost index changing most quickly, e.g.
+
+alldiff(sudoku)
+
+is equivalent to
+
+alldiff([sudoku[0,0],...,sudoku[0,8],...,sudoku[8,0],...,sudoku[8,8]])
+
+Furthermore, with indices filled selectively and the remainder filled
+with underscores (_) the flattening applies only to the underscore
+indices:
+
+alldiff(sudoku[4,_])
+
+is equivalent to
+
+alldiff([sudoku[4,0],...,sudoku[4,8]])
+
+Lastly, one can optionally add square brackets ([]) around an
+expression to be flattened to make it look more like a vector:
+
+alldiff([sudoku[4,_]])
+
+is equivalent to
+
+alldiff(sudoku[4,_])
+</pre>
+<h3>Example</h3>
+<pre>
+Additional hanging commas at the end of array are ignored, e.g.
+
+lexleq([A,B,C,],[D,E,F,])
+
+is equivalent to 
+
+lexleq([A,B,C],[D,E,F])
+
+This feature is provided to make it easier to computer-generate input
+files.
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

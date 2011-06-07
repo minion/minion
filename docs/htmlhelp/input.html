@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>input</title>
+</head>
+<body>
+<h1>Help on <tt>input</tt></h1>
+<h3>Description</h3>
+<pre>
+
+Minion expects to be provided with the name of an input file as an
+argument. This file contains a specification of the CSP to be solved
+as well as settings that the search process should use. The format is
+
+Minion3Input::= MINION 3
+                &lt;InputSection&gt;+
+                **EOF**
+
+InputSection::= &lt;VariablesSection&gt; 
+              | &lt;SearchSection&gt;
+              | &lt;ConstraintsSection&gt; 
+              | &lt;TuplelistSection&gt;
+
+i.e. 'MINION 3' followed by any number of variable, search,
+constraints and tuplelists sections (can repeat) followed by
+'**EOF**', the end of file marker.
+
+All text from a '#' character to the end of the line is ignored.
+
+See the associated help entries below for information on each section.
+</pre>
+<h3>Notes</h3>
+<pre>
+You can give an input file via standard input by specifying '--' as the file
+name, this might help when minion is being used as a tool in a shell script or
+for compressed input, e.g.,
+
+   gunzip -c myinput.minion.gz | minion
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>
