@@ -42,6 +42,7 @@ class SearchState
   StateObj* stateObj;
   unsigned long long nodes;
   AnyVarRef* optimise_var;
+  AnyVarRef* raw_optimise_var;
   DomainInt current_optimise_position;
   bool optimise;
   
@@ -95,6 +96,9 @@ public:
   
   AnyVarRef* getOptimiseVar() { return optimise_var; }
   void setOptimiseVar(AnyVarRef* _var) { optimise_var = _var; }
+
+  AnyVarRef* getRawOptimiseVar() { return raw_optimise_var; }
+  void setRawOptimiseVar(AnyVarRef* _var) { raw_optimise_var = _var; }
   
   DomainInt getOptimiseValue() { return current_optimise_position; }
   void setOptimiseValue(DomainInt optimise_pos) { current_optimise_position = optimise_pos; }
@@ -138,6 +142,7 @@ public:
   { tupleListContainer = _tupleList; }
                           
   SearchState(StateObj* _stateObj) : stateObj(_stateObj), nodes(0), optimise_var(NULL), 
+    raw_optimise_var(NULL),
     current_optimise_position(0), optimise(false), constraints_to_propagate(1),
     solutions(0), dynamic_triggers_used(false), finished(false), failed(false), 
     is_locked(false), alarm_trigger(false), ctrl_c_pressed(false)

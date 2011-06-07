@@ -218,11 +218,6 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
       case read_var:
         varsblob.push_back(make_vec(readIdentifier(infile)));
         break;
-        case read_bool_var:
-      varsblob.push_back(make_vec(readIdentifier(infile)));
-      if(varsblob.back().back().type() != VAR_BOOL)
-        throw parse_exception("Expected Boolean variable!");
-    break;
     
       case read_2_vars:
       {

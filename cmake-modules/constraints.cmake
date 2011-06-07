@@ -57,19 +57,19 @@ set(NAME_ID_diseq "CT_DISEQ")
 set(NAME_READ_diseq "read_var" "read_var")
 
 set(NAME_ID___reify_diseq "CT_DISEQ_REIFY")
-set(NAME_READ___reify_diseq "read_var" "read_var" "read_bool_var")
+set(NAME_READ___reify_diseq "read_var" "read_var" "read_var")
 
 set(NAME_ID_eq "CT_EQ")
 set(NAME_READ_eq "read_var" "read_var")
 
 set(NAME_ID___reify_eq "CT_EQ_REIFY")
-set(NAME_READ___reify_eq "read_var" "read_var" "read_bool_var")
+set(NAME_READ___reify_eq "read_var" "read_var" "read_var")
 
 set(NAME_ID_minuseq "CT_MINUSEQ")
 set(NAME_READ_minuseq "read_var" "read_var")
 
 set(NAME_ID___reify_minuseq "CT_MINUSEQ_REIFY")
-set(NAME_READ___reify_minuseq "read_var" "read_var" "read_bool_var")
+set(NAME_READ___reify_minuseq "read_var" "read_var" "read_var")
 
 set(NAME_ID_abs "CT_ABS")
 set(NAME_READ_abs "read_var" "read_var")
@@ -201,7 +201,7 @@ set(NAME_ID_reify "CT_REIFY")
 set(NAME_READ_reify "read_constraint" "read_var")
 
 set(NAME_ID_reifyimply-quick "CT_REIFYIMPLY_QUICK")
-set(NAME_READ_reifyimply-quick "read_constraint" "read_bool_var")
+set(NAME_READ_reifyimply-quick "read_constraint" "read_var")
 
 set(NAME_ID_check[gsa] "CT_CHECK_GSA")
 set(NAME_READ_check[gsa] "read_constraint")
@@ -213,10 +213,10 @@ set(NAME_ID_reifyimply "CT_REIFYIMPLY")
 set(NAME_READ_reifyimply "read_constraint" "read_var")
 
 set(NAME_ID_reifyimply-old "CT_REIFYIMPLY_OLD")
-set(NAME_READ_reifyimply-old "read_constraint" "read_bool_var")
+set(NAME_READ_reifyimply-old "read_constraint" "read_var")
 
 set(NAME_ID_reifyimply-new "CT_REIFYIMPLY_NEW")
-set(NAME_READ_reifyimply-new "read_constraint" "read_bool_var")
+set(NAME_READ_reifyimply-new "read_constraint" "read_var")
 
 set(NAME_ID_true "CT_TRUE")
 set(NAME_READ_true )

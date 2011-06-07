@@ -80,8 +80,9 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   ReifiedEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
-      CHECK(var3.getInitialMin() >= 0, "Reification variables must have domain within {0,1}");
-      CHECK(var3.getInitialMin() <= 1, "Reification variables must have domain within {0,1}");
+    std::cout << "Hello!" << std::endl;
+    //CHECK(var3.getInitialMin() < 0, "Reification variables must have domain within {0,1}");
+    //CHECK(var3.getInitialMax() > 1, "Reification variables must have domain within {0,1}");
   }
   
   virtual triggerCollection setup_internal()
@@ -98,6 +99,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   // rewrite the following two functions.
   virtual void full_propagate()
   {
+    var3.setMin(0);
+    var3.setMax(1);
     if(var3.isAssigned())
     {
       if(var3.getAssignedValue() == 1)
@@ -202,13 +205,18 @@ struct ReifiedEqualConstraint : public AbstractConstraint
           break;
           
       case 3:
-          if(var3.getAssignedValue()==1)
+          DomainInt assigned_val = var3.getAssignedValue();
+          if(assigned_val==1)
           {
               eqprop();
           }
-          else
+          else if(assigned_val==0)
           {
               diseq();
+          }
+          else
+          {
+            CHECK(0, "Fatal Error in reify_eq");
           }
           break;
     }
@@ -279,8 +287,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint
 
    virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
-    bool hasFalse = (var3.getMin() == 0);
-    bool hasTrue  = (var3.getMax() > 0);
+    bool hasFalse = var3.inDomain(0);
+    bool hasTrue  = var3.inDomain(1);
     D_ASSERT(hasFalse || hasTrue);
     if(hasFalse)
     {
@@ -307,7 +315,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
       {
         assignment.push_back(make_pair(0, var1.getAssignedValue()));
         assignment.push_back(make_pair(1, var2.getAssignedValue()));
-        assignment.push_back(make_pair(2, var3.getMax()));
+        assignment.push_back(make_pair(2, 1));
         return true;
       }
       return false;
@@ -322,7 +330,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
         {
           assignment.push_back(make_pair(0,i));
           assignment.push_back(make_pair(1,i));
-          assignment.push_back(make_pair(2,var3.getMax()));
+          assignment.push_back(make_pair(2,1));
           return true;
         }
       }

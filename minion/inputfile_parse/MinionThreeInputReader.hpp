@@ -559,11 +559,6 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
       case read_var:
       varsblob.push_back(make_vec(readIdentifier(infile)));
       break;
-      case read_bool_var:
-      varsblob.push_back(make_vec(readIdentifier(infile)));
-      if(varsblob.back().back().type() != VAR_BOOL)
-        throw parse_exception("Expected Boolean variable!");
-      break;
       case read_2_vars:
       {
         vector<Var> vars(2);
@@ -765,7 +760,7 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
   if(negVar)
   {
     if(var.type() != VAR_BOOL)
-        {  MAYBE_PARSER_INFO("Only Booleans can be negated!"); }
+    {  throw parse_exception("Only booleans can be negated!"); }
     else
       var.setType(VAR_NOTBOOL);
   }
@@ -848,7 +843,7 @@ else
   if(negVar)
   {
     if(var.type() != VAR_BOOL)
-        {  MAYBE_PARSER_INFO("Only Booleans can be negated!"); }
+    { throw parse_exception("Sorry, can't negate a non-Boolean variable"); }
     else
       var.setType(VAR_NOTBOOL);
   }
