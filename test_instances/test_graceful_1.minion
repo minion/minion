@@ -1,0 +1,43 @@
+MINION 1
+#TEST CHECKONESOL 0 3 4 2 2 3 1 2 4 2
+#
+# A cut down graceful graph instance.
+#
+# Input file for Minion built for Version 0.2
+#    http://sourceforge.net/projects/minion
+# Graceful Graph instance for input to Minion
+#  k = 2
+#  p = 2
+#  Created: UTC Sun Mar 26 10:03:06 2006
+#  Generator program written by Ian Gent
+#  
+
+0
+0
+0
+14
+0 0 1
+1 4 5
+0 4 8
+0
+[x0,x1,x2,x3,x8,x12,x4,x9,x13,x5]
+[a,a,a,a,a,a,a,a,a,a]
+0
+1
+[[x0,x1,x2,x3,x8,x12,x4,x9,x13,x5]]
+0
+objective none
+print m0
+eq(x0,0)
+alldiff([x0,x1,x2,x3])
+alldiff([x2,x1,x4,x5])
+occurrence([x1,x2],4,1)
+occurrence([x1,x2],3,1)
+sumleq([x8,x4],x12)
+sumgeq([x8,x4],x12)
+min([x1,x3],x8)
+max([x1,x3],x12)
+sumleq([x9,x5],x13)
+sumgeq([x9,x5],x13)
+min([x2,x3],x9)
+max([x2,x3],x13)
