@@ -39,6 +39,8 @@ namespace Controller
       getOptions(stateObj).findAllSolutions();
       getState(stateObj).setOptimiseVar(new AnyVarRef(var));
       getState(stateObj).setOptimisationProblem(true);
+      getState(stateObj).setRawOptimiseVar(new AnyVarRef(var));
+
   }
   
   /// Sets optimisation variable.
@@ -48,6 +50,7 @@ namespace Controller
       getOptions(stateObj).findAllSolutions();
       getState(stateObj).setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
       getState(stateObj).setOptimisationProblem(true);
+      getState(stateObj).setRawOptimiseVar(new AnyVarRef(var));
   }
   
   /// Ensures a particular constraint is satisfied by the solution.
@@ -289,7 +292,7 @@ namespace Controller
       }
       
       cout << "Solution found with Value: " 
-      << getState(stateObj).getOptimiseVar()->getAssignedValue() << endl;
+      << getState(stateObj).getRawOptimiseVar()->getAssignedValue() << endl;
       
       getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getAssignedValue() + 1);         
     }
