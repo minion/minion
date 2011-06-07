@@ -645,9 +645,9 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   if(valOrder.empty())
   {
     parser_info("No value order given, generating automatically");
-    valOrder = vector<ValOrderEnum>(instance->search_order.back().var_order.size(), VALORDER_ASCEND);
+    valOrder = vector<ValOrderEnum>(instance->search_order[0].var_order.size(), VALORDER_ASCEND);
   }
-  instance->search_order.back().val_order = valOrder;
+  instance->search_order[0].val_order = valOrder;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -658,32 +658,53 @@ template<typename FileReader>
 void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
   parser_info( "Reading var order" ) ;
   vector<Var> varOrder = readLiteralVector(infile);
-  
+  set<Var> used_variables(varOrder.begin(), varOrder.end());
+
   ostringstream s;
   s << "Read var order. Length: " << varOrder.size();
   
+  
+
+  parser_info("No order generated, auto-generating complete order");
+  int var_count = 0;
+  var_count += instance->vars.BOOLs;
+  for(unsigned i = 0; i < instance->vars.bound.size(); ++i)
+    var_count += instance->vars.bound[i].first;
+  for(unsigned i = 0; i < instance->vars.sparse_bound.size(); ++i)
+    var_count += instance->vars.sparse_bound[i].first;
+  for(unsigned i = 0; i < instance->vars.discrete.size(); ++i)
+    var_count += instance->vars.discrete[i].first;
+  for(unsigned i = 0; i < instance->vars.sparse_discrete.size(); ++i)
+    var_count += instance->vars.sparse_discrete[i].first;
+  
+  varOrder.reserve(var_count);
+
+  vector<Var> extra_vars;
+
   if(varOrder.empty())
   {
-    parser_info("No order generated, auto-generating complete order");
-    int var_count = 0;
-    var_count += instance->vars.BOOLs;
-    for(unsigned i = 0; i < instance->vars.bound.size(); ++i)
-      var_count += instance->vars.bound[i].first;
-    for(unsigned i = 0; i < instance->vars.sparse_bound.size(); ++i)
-      var_count += instance->vars.sparse_bound[i].first;
-    for(unsigned i = 0; i < instance->vars.discrete.size(); ++i)
-      var_count += instance->vars.discrete[i].first;
-    for(unsigned i = 0; i < instance->vars.sparse_discrete.size(); ++i)
-      var_count += instance->vars.sparse_discrete[i].first;
-    
-    varOrder.reserve(var_count);
     for(int i = 0; i < var_count; ++i)
       varOrder.push_back(instance->vars.get_var('x',i));
   }
-  
+  else
+  {
+    for(int i = 0; i < var_count; ++i)
+    {
+      Var v = instance->vars.get_var('x', i);
+      if(used_variables.count(v) == 0)
+      {
+        extra_vars.push_back(v);
+      }
+    }
+  }
   
   instance->search_order.push_back(varOrder);
-  //var_order = varOrder;
+  if(!extra_vars.empty())
+  {
+    instance->search_order.push_back(extra_vars);
+    instance->search_order.back().find_one_assignment = true;
+    instance->search_order.back().setupValueOrder();
+  }
   parser_info(s.str());
 }
 
