@@ -47,8 +47,6 @@ template<typename BoolVar, bool DoWatchAssignment>
   ParentConstraint(_stateObj), rar_var(_rar_var), constraint_locked(false),
     full_propagate_called(stateObj, false)
   {
-      CHECK(rar_var.getInitialMin() >= 0, "Reification variables must have domain within {0,1}");
-      CHECK(rar_var.getInitialMin() <= 1, "Reification variables must have domain within {0,1}");
     child_constraints.push_back(_poscon);
   }
 
@@ -71,18 +69,19 @@ template<typename BoolVar, bool DoWatchAssignment>
       assignment.push_back(make_pair(child_constraints[0]->get_vars_singleton()->size(), 0));
       return true;
     }
-
-    return child_constraints[0]->get_satisfying_assignment(assignment);
+    else if(rar_var.inDomain(1))
+    { return child_constraints[0]->get_satisfying_assignment(assignment); }
+    else
+      return false;
   }
 
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
     DomainInt back_val = *(v + v_size - 1);
     //v.pop_back();
-    if(back_val != 0)
+    if(back_val == 0)
       return child_constraints[0]->check_assignment(v, v_size - 1);
-    else
-      return true;
+    else return (back_val == 1);
   }
 
   virtual vector<AnyVarRef> get_vars()
@@ -126,6 +125,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     {
         if(!rar_var.isAssigned() || rar_var.getAssignedValue()==0 )
             return;
+        D_ASSERT(rar_var.getAssignedValue() == 1);
         P("rarvar assigned to 1- Do full propagate");
         constraint_locked = true;
         getQueue(stateObj).pushSpecialTrigger(this);
@@ -205,9 +205,10 @@ template<typename BoolVar, bool DoWatchAssignment>
 
   virtual void full_propagate()
   {
-    P("Full prop");
-    
+    P("Full prop");    
     P(child_constraints[0]->constraint_name());
+    rar_var.setMin(0);
+    rar_var.setMax(1);
     if(rar_var.isAssigned() && rar_var.getAssignedValue() == 1)
     {
       child_constraints[0]->full_propagate();

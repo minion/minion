@@ -111,8 +111,6 @@ struct reify : public ParentConstraint
   ParentConstraint(_stateObj), reify_var(_rar_var), constraint_locked(false),
     full_propagate_called(stateObj, false)
   {
-      CHECK(reify_var.getInitialMin() >= 0, "Reification variables must have domain within {0,1}");
-      CHECK(reify_var.getInitialMin() <= 1, "Reification variables must have domain within {0,1}");
       
       #ifdef NODETRICK
       numeric_limits<unsigned long long> ull;
@@ -207,15 +205,17 @@ struct reify : public ParentConstraint
   virtual BOOL check_assignment(DomainInt* vals, int v_size)
   {
     DomainInt back_val = *(vals + (v_size - 1));
-    if(back_val != 0)
+    if(back_val == 1)
     {
       return child_constraints[0]->check_assignment(vals, c0vars);
     }
-    else
+    else if(back_val == 0)
     {
       vals += c0vars;
       return child_constraints[1]->check_assignment(vals, (dtcount/2)-c0vars);
     }
+    else
+      return false;
   }
 
   virtual vector<AnyVarRef> get_vars()
@@ -480,6 +480,9 @@ struct reify : public ParentConstraint
     P("Full prop");
     P("reify " << child_constraints[0]->constraint_name());
     P("negation: " << child_constraints[1]->constraint_name());
+
+    reify_var.setMin(0);
+    reify_var.setMax(1);
     
     if(reify_var.isAssigned())
     {
@@ -532,6 +535,8 @@ struct reify : public ParentConstraint
 };
 
 #else
+
+#error This code needs to be fixed, so that it supports reifying to non-boolean variables
 // ------------------------------------------------------------------------------------------------------------------
 
 // NEWREIFY is not defined so use the older reify code.
