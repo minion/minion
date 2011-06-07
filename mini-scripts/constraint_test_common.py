@@ -1411,7 +1411,10 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     if reify or reifyimply:
         # add extra bool variable.
         varnums=[1]+varnums
-        vartypes=["boolean"]+vartypes # no longer bool since all var types now allowed.
+        if random.randint(0,3)==0:
+            vartypes=["othernum"]
+        else:
+            vartypes=["boolean"]+vartypes # no longer bool since all var types now allowed.
     
     isvector=[a>1 for a in varnums]  # Is it to be printed as a vector. This seems to suffice at the moment.
     
@@ -1675,9 +1678,6 @@ def generatevariables(varblocks, types, boundallowed):
                 ty="SPARSEBOUND "  # Should be sparsebound
             else:
                 ty="BOOL "
-            
-#            if types[i]=="boolean":  # This is a hack put in place until reify is fixed, if ever.
-#                ty="BOOL "          # reify refuses to work unless the reification var is a bool.
         else:
             ty=None
         
@@ -1686,6 +1686,9 @@ def generatevariables(varblocks, types, boundallowed):
             if types[i]=="num":
                 lb=random.randint(-20, 0)
                 ub=random.randint(1, 20)
+            elif types[i]=="othernum":     # An extra type that does not necessarily includ 0 and 1
+                lb=random.randint(-20,10)
+                ub=lb+random.randint(0,10)
             elif types[i]=="smallnum":
                 lb=random.randint(-2, 0)
                 ub=random.randint(0, 2)
