@@ -52,7 +52,9 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     const VarArray2& _array2) :
   AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
     alpha(_stateObj, -1)
-    { D_ASSERT(var_array1.size() == var_array2.size()); }
+    { 
+      CHECK(var_array1.size() == var_array2.size(), "QuickLexLeq and QuickLexLess only work with equal length vectors");
+    }
 
   int dynamic_trigger_count()
     { return 2; }
