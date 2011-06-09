@@ -1,0 +1,22 @@
+MINION 1
+#TEST CHECKONESOL -1
+
+0
+0
+1
+{-1} 1
+0
+0
+
+[x0]
+[a]
+
+0 
+1
+[ [ x0] ]
+0
+objective none
+print m0
+
+weightedsumleq([-1],[x0],1)
+weightedsumgeq([-1],[x0],1)

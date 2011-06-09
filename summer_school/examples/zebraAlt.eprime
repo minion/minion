@@ -1,0 +1,87 @@
+language ESSENCE' 1.b.a
+
+$red = colour[1]
+$green = colour[2]
+$ivory = colour[3]
+$yellow = colour[4]
+$blue = colour[5]
+$Englishman = nationality[1]
+$Spaniard = nationality[2]
+$Ukranian = nationality[3]
+$Norwegian = nationality[4]
+$Japanese = nationality[5]
+$coffee = drink[1]
+$tea = drink[2]
+$milk = drink[3]
+$orange juice = drink[4]
+$Old Gold = smoke[1]
+$Kools = smoke[2]
+$Chesterfields = smoke[3]
+$Lucky Strike = smoke[4]
+$Parliaments = smoke[5]
+$dog = pets[1]
+$snails = pets[2]
+$fox = pets[3]
+$horse = pets[4]
+
+
+find colour: matrix indexed by [int(1..5)] of int(1..5),
+       nationality: matrix indexed by [int(1..5)] of int(1..5),
+       drink: matrix indexed by [int(1..5)] of int(1..5),
+       smoke: matrix indexed by [int(1..5)] of int(1..5),
+       pets: matrix indexed by [int(1..5)] of int(1..5)
+
+such that
+
+$constraints needed as this is a logical problem where 
+$the value allocated to each position of the matrix represents positon of house
+alldiff(colour),
+alldiff(nationality),
+alldiff(drink),
+alldiff(smoke),
+alldiff(pets),
+
+$There are five houses.
+$No constraint covered by domain specification
+
+$The Englishman lives in the red house
+nationality[1] = colour[1],
+
+$The Spaniard owns the dog.
+nationality[2] = pets[1],
+
+$Coffee is drunk in the green house.
+drink[1] = colour[2],
+
+$The Ukranian drinks tea.
+nationality[3] = drink[2],
+
+$The green house is immediately to the right of the ivory house.
+colour[2] + 1 = colour[3],
+
+$The Old Gold smoker owns snails.
+smoke[1] = pets[2],
+
+$Kools are smoked in the yellow house.
+smoke[2] = colour[4],
+
+$Milk is drunk in the middle house.
+drink[3] = 3,
+
+$The Norwegian lives in the first house
+nationality[4] = 1,
+
+$The man who smokes Chesterfields lives in the house next to the man with the fox.
+(smoke[3] = pets[3]+1) \/ (smoke[3] = pets[3]-1),
+
+$Kools are smoked in the house next to the house where the horse is kept.
+(smoke[2] = pets[4]+1) \/ (smoke[2] = pets[4]-1),
+
+$The Lucky Strike smoker drinks orange juice.
+smoke[4] = drink[4],
+
+$The Japanese smokes Parliaments.
+nationality[5] = smoke[5],
+
+$The Norwegian lives next to the blue house.
+(nationality[4] = colour[5]+1) \/ (nationality[4] = colour[5]-1)
