@@ -1,0 +1,29 @@
+MINION 1
+#TEST CHECKONESOL -1
+#
+# Warning, actually has solutions but I don't know what it should print as I can't run it.
+#
+# Minion Graceful Graph Instance
+# K2 x P2
+#
+# Minion Constraint Solver Input
+#    http://sourceforge.net/projects/minion
+# Instance created using CLisp generator written by Ian Gent
+# Instance created at 15:34 on 8 Apr 2006
+0
+0
+0
+1
+-1 -1 1
+0
+[x0]
+[a]
+0
+1
+[[x0]]
+0
+objective none
+print m0
+sumgeq([x0] ,x0)
+
+

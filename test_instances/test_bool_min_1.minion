@@ -1,0 +1,12 @@
+#TEST SOLCOUNT 4
+MINION 3
+
+**VARIABLES**
+
+BOOL a[3]
+
+**CONSTRAINTS**
+
+min([a[0],a[1]], a[2])
+
+**EOF**

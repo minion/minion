@@ -1,0 +1,15 @@
+MINION 3
+#TEST SOLCOUNT 4
+
+**VARIABLES**
+DISCRETE q {-1..1}
+BOOL b
+
+**CONSTRAINTS**
+
+reifyimply(sumgeq([], q), b)
+reifyimply(sumleq([], q), b)
+
+
+
+**EOF**
