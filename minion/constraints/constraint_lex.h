@@ -81,7 +81,7 @@ struct LexLeqConstraint : public AbstractConstraint
   
   LexLeqConstraint(StateObj* _stateObj,const VarArray1& _x, const VarArray2& _y) :
     AbstractConstraint(_stateObj), alpha(_stateObj), beta(_stateObj), F(_stateObj), x(_x), y(_y)
-  { D_ASSERT(x.size() == y.size()); }
+  { CHECK(x.size() == y.size(), "LexLeq and LexLess only work with equal length vectors"); }
   
   virtual triggerCollection setup_internal()
   {

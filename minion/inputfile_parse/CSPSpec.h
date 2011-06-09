@@ -583,6 +583,8 @@ struct SearchOrder
   {
     if(val_order.empty())
       val_order.resize(var_order.size(), VALORDER_ASCEND);
+    while(val_order.size() < var_order.size())
+      val_order.push_back(val_order.back());
   }
 };
 

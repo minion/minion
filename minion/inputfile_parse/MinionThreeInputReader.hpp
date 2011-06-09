@@ -348,6 +348,32 @@ void MinionThreeInputReader<FileReader>::finalise() {
     instance->search_order.push_back(instance->vars.get_all_vars());
   }
 
+  vector<Var> all_vars = instance->vars.get_all_vars();
+  set<Var> unused_vars(all_vars.begin(), all_vars.end());
+  for(int i = 0; i < instance->search_order.size(); ++i)
+  {
+    const vector<Var>& vars_ref = instance->search_order[i].var_order;
+    for(vector<Var>::const_iterator it = vars_ref.begin(); it != vars_ref.end(); ++it)
+    {
+      unused_vars.erase(*it);
+    }
+  }
+
+  if(!unused_vars.empty())
+  {
+    vector<Var> unused_vec(unused_vars.begin(), unused_vars.end());
+    if(instance->search_order.size() > 1 && instance->search_order.back().find_one_assignment == true)
+    {
+      instance->search_order.back().var_order.insert(
+        instance->search_order.back().var_order.end(), unused_vec.begin(), unused_vec.end());
+    }
+    else
+    {
+      instance->search_order.push_back(unused_vec);
+      instance->search_order.back().find_one_assignment=true;
+    }
+  }
+  
   for(int i = 0; i < instance->search_order.size(); ++i)
     instance->search_order[i].setupValueOrder();
 

@@ -85,7 +85,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   GacLexLeqConstraint(StateObj* _stateObj,const VarArray1& _x, const VarArray2& _y) :
   AbstractConstraint(_stateObj), alpha(_stateObj), beta(_stateObj), F(_stateObj), x(_x), y(_y)
   { 
-    D_ASSERT(x.size() == y.size()); 
+    CHECK(x.size() == y.size(), "gaclex only works on vectors of equal length"); 
     for(int i = 0; i < x.size(); ++i)
     {
       if(x[i].getBaseVar() == y[i].getBaseVar())

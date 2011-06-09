@@ -118,7 +118,9 @@ struct ElementConstraint : public AbstractConstraint
   {
     triggerCollection t;
     int array_size = var_array.size();
-    for(int i = 0; i < array_size; ++i)
+    DomainInt loop_start = std::max(0, index_ref.getInitialMin());
+    DomainInt loop_max = std::min(array_size , index_ref.getInitialMax() + 1);
+    for(int i = loop_start; i < loop_max; ++i)
       t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
     
     t.push_back(make_trigger(index_ref, Trigger(this, -1), Assigned));
