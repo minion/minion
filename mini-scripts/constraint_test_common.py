@@ -538,7 +538,7 @@ class testlighttable:
         tablegen=self
         treesame=True
         
-        (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, False)
+        (domlists, modvars, tablevars, constants, diseq_constraints)=generatevariables(varnums, vartypes, False)
         
         curvar=0
         constraint=constraintname+"("
@@ -945,26 +945,6 @@ class testlexless(testlexleq):
     
     def runtest(self, options=dict()):
         return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], self, True)
-
-class testlexleq_repeatedvars:
-    def printtable(self, domains, less=False):
-        cross=[]
-        crossprod(domains, [], cross)
-        out=[]
-        for l in cross:
-            l1=l[:len(l)/2]
-            l2=l[len(l)/2:]
-            
-            if (not less and l1 <= l2) or (less and l1<l2):
-                out.append(l)
-        return out
-    
-    def runtest(self, options=dict()):
-        (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, boundsallowed)
-        setattr(self, "constants", constants)
-        
-        
-        #return runtestgeneral("lexleq", True, options, [4,4], ["smallnum", "smallnum"], self, True)
 
 class testmax:
     def printtable(self, domains, ismax=True):
