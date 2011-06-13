@@ -91,6 +91,45 @@ namespace Controller
       }
   }
 
+  template<typename Stream, typename PrintMatrix>
+  void print_solution(StateObj* stateObj, Stream& sout, const PrintMatrix& print_matrix)
+  {
+      if(getOptions(stateObj).cspcomp)
+      {
+        sout << "v ";
+        for(unsigned i = 0; i < print_matrix.size(); ++i)
+          for(unsigned j = 0; j < print_matrix[i].size(); ++j)
+          sout << print_matrix[i][j].getAssignedValue() << " ";
+        sout << endl;
+      }
+      else if(!print_matrix.empty())
+      {
+        for(unsigned i = 0; i < print_matrix.size(); ++i)
+        {
+          if (!getOptions(stateObj).silent) sout << "Sol: ";  
+          for(unsigned j = 0; j < print_matrix[i].size(); ++j)
+          {
+            if(!print_matrix[i][j].isAssigned())
+              sout  << "[" << print_matrix[i][j].getMin() << "," << 
+              print_matrix[i][j].getMax() << "]";
+            else
+              sout << print_matrix[i][j].getAssignedValue() << " ";
+          }
+          sout << endl;
+        }
+        if (!getOptions(stateObj).silent) sout << endl;
+      }
+
+    // TODO : Make this more easily changable.
+      if (!getOptions(stateObj).silent) 
+      {
+        sout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
+        getState(stateObj).getOldTimer().printTimestepWithoutReset(sout, Output_Always, "Time:");
+        sout << "Nodes: " << getState(stateObj).getNodeCount() << endl << endl;
+      }
+
+  }
+
   /// All operations to be performed when a solution is found.
   /// This function checks the solution is correct, and prints it if required.
   inline void check_sol_is_correct(StateObj* stateObj)
@@ -98,8 +137,8 @@ namespace Controller
     if(getOptions(stateObj).solCallBack)
       getOptions(stateObj).solCallBack(stateObj);
 
-
     getState(stateObj).incrementSolutionCount();
+    
     if(getOptions(stateObj).solsoutWrite)
     {
       vector<vector<AnyVarRef> > print_matrix = getState(stateObj).getPrintMatrix();
@@ -115,40 +154,14 @@ namespace Controller
     
     if(getOptions(stateObj).print_solution)
     {
-      vector<vector<AnyVarRef> > print_matrix = getState(stateObj).getPrintMatrix();  
-      if(getOptions(stateObj).cspcomp)
+      if(getOptions(stateObj).printonlyoptimal)
       {
-        cout << "v ";
-        for(unsigned i = 0; i < print_matrix.size(); ++i)
-          for(unsigned j = 0; j < print_matrix[i].size(); ++j)
-          cout << print_matrix[i][j].getAssignedValue() << " ";
-        cout << endl;
+        std::ostringstream oss;
+        print_solution(stateObj, oss, getState(stateObj).getPrintMatrix());
+        getState(stateObj).storedSolution = oss.str();
       }
-      else if(!print_matrix.empty())
-      {
-        for(unsigned i = 0; i < print_matrix.size(); ++i)
-        {
-          if (!getOptions(stateObj).silent) cout << "Sol: ";  
-          for(unsigned j = 0; j < print_matrix[i].size(); ++j)
-          {
-            if(!print_matrix[i][j].isAssigned())
-              cout  << "[" << print_matrix[i][j].getMin() << "," << 
-              print_matrix[i][j].getMax() << "]";
-            else
-              cout << print_matrix[i][j].getAssignedValue() << " ";
-          }
-          cout << endl;
-        }
-        if (!getOptions(stateObj).silent) cout << endl;
-      }
-
-    // TODO : Make this more easily changable.
-      if (!getOptions(stateObj).silent) 
-      {
-        cout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
-        getState(stateObj).getOldTimer().printTimestepWithoutReset(Output_Always, "Time:");
-        cout << "Nodes: " << getState(stateObj).getNodeCount() << endl << endl;
-      }
+      else
+        print_solution(stateObj, cout, getState(stateObj).getPrintMatrix());
     }
 
     if(!getOptions(stateObj).nocheck)
@@ -287,12 +300,20 @@ namespace Controller
       {
         cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
         cerr << "Put it in the variable ordering?" << endl;
-    cerr << "Aborting Search" << endl;
+        cerr << "Aborting Search" << endl;
         exit(1);
       }
       
-      cout << "Solution found with Value: " 
-      << getState(stateObj).getRawOptimiseVar()->getAssignedValue() << endl;
+      if(getOptions(stateObj).printonlyoptimal)
+      {
+        getState(stateObj).storedSolution += "Solution found with Value: "
+          + to_string(getState(stateObj).getRawOptimiseVar()->getAssignedValue()) + "\n";
+      }
+      else
+      {
+        cout << "Solution found with Value: " 
+             << getState(stateObj).getRawOptimiseVar()->getAssignedValue() << endl;
+      }
       
       getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getAssignedValue() + 1);         
     }
@@ -322,7 +343,7 @@ namespace Controller
     }
     lock(stateObj);
     if (!getOptions(stateObj).silent) 
-      getState(stateObj).getOldTimer().printTimestepWithoutReset(Output_1, "First Node Time: ");
+      getState(stateObj).getOldTimer().printTimestepWithoutReset(cout, Output_1, "First Node Time: ");
     /// Failed initially propagating constraints!
     if(getState(stateObj).isFailed())
       return;
