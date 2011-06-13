@@ -98,6 +98,11 @@ Do not print solutions.
 Print only solutions and a summary at the end.
 */
 
+/** @help switches;-printonlyoptimal Description
+In optimisation problems, only print the optimal value, and
+not intermediate values.
+*/
+
 /** @help switches;-preprocess
 
 This switch allows the user to choose what level of preprocess is
@@ -558,7 +563,7 @@ try {
   // should be one for varorder as well.
   getTableOut().set("MinionVersion", GIT_VER_STRING);
   getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions(stateObj).silent);
+  getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions(stateObj).silent);
 
   BuildCSP(stateObj, instance);
   SolveCSP(stateObj, instance, args);

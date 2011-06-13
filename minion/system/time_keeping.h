@@ -169,39 +169,42 @@ void startClock()
 bool checkTimeout(unsigned seconds)
 { return get_cpu_time() - _internal_cpu_start_time >= seconds; }
 
-void printTimestepWithoutReset(Output_Type t, const char* time_name)
+template<typename Stream>
+void printTimestepWithoutReset(Stream& sout, Output_Type t, const char* time_name)
 { 
   if(t != Output_Always && t != output)
     return;
-  cout << time_name << get_cpu_time() - _last_check_time << endl; 
+  sout << time_name << get_cpu_time() - _last_check_time << endl; 
 } 
 
-void maybePrintTimestepStore(Output_Type t, const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
+template<typename Stream>
+void maybePrintTimestepStore(Stream& sout, Output_Type t, const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
 {
   if(t != Output_Always && t != output)
     return;
 
   long double temp_time = get_cpu_time();
   long double diff = temp_time - _last_check_time;
-  if(toprint) cout << time_name << diff << endl;
+  if(toprint) sout << time_name << diff << endl;
   _last_check_time = temp_time;
   tableout.set(string(store_name), to_string(diff));
 }
 
-void maybePrintFinaltimestepStore(const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
+template<typename Stream>
+void maybePrintFinaltimestepStore(Stream& sout, const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
 {
   long double time_wallclock = get_wall_time() - start_wallclock;
   
   long double end_cpu_time = get_cpu_time();
   long double end_sys_time = get_sys_time();
   
-  maybePrintTimestepStore(Output_Always, time_name, store_name, tableout, toprint);
+  maybePrintTimestepStore(sout, Output_Always, time_name, store_name, tableout, toprint);
   if(toprint) 
   {
-    cout << "Total Time: " << end_cpu_time - _internal_cpu_start_time << endl;
-    cout << "Total System Time: " << end_sys_time - _internal_sys_start_time << endl;
-    cout << "Total Wall Time: " << time_wallclock << endl;
-    cout << "Maximum RSS (kB): " << get_max_rss() << endl;
+    sout << "Total Time: " << end_cpu_time - _internal_cpu_start_time << endl;
+    sout << "Total System Time: " << end_sys_time - _internal_sys_start_time << endl;
+    sout << "Total Wall Time: " << time_wallclock << endl;
+    sout << "Maximum RSS (kB): " << get_max_rss() << endl;
   }
   tableout.set(string("TotalTime"), end_cpu_time - _internal_cpu_start_time );
 }

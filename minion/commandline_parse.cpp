@@ -57,6 +57,8 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
     { getOptions(stateObj).noTimers = true; }
     else if(command == string("-printsolsonly"))
     { getOptions(stateObj).silent = true; }
+    else if(command == string("-printonlyoptimal"))
+    { getOptions(stateObj).printonlyoptimal = true; }
     else if(command == string("-cspcomp"))
     { 
       getOptions(stateObj).silent = true;

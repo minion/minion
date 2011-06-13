@@ -80,6 +80,8 @@ class SearchState
     
 public:
 
+  std::string storedSolution;
+  
   vector<vector<AnyVarRef> >& getPrintMatrix()
   { return print_matrix; }
   
@@ -191,7 +193,10 @@ public:
   
   /// Denotes if minion should print no output, other than that explicitally requested
   bool silent;
-  
+
+  /// Denotes if minion prints only the optimal solution for optimisation problems.
+  bool printonlyoptimal;
+
   /// Denotes if the search tree should be printed.
   bool dumptree;
   /// Gives the solutions which should be found. 
@@ -260,9 +265,12 @@ public:
   int Xvarmunge;
   int Xsymmunge;
 
+
+
   SearchOptions() : 
     wdeg_on(false), find_generators(false), 
-    cspcomp(false), silent(false), dumptree(false), sollimit(1), fullpropagate(false), 
+    cspcomp(false), silent(false), printonlyoptimal(false),
+     dumptree(false), sollimit(1), fullpropagate(false), 
 #ifdef NO_DEBUG
     nocheck(true),
 #else
