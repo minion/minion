@@ -329,10 +329,14 @@ struct NewTableConstraint : public AbstractConstraint
     }
   }
   
-      virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  inline int min(int x, int y) {return (x<y)?x:y; }
+  inline int max(int x, int y) {return (x>y)?x:y; }
+  
+  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
+      pair<DomainInt, DomainInt> bounds = data->getDomainBounds(0);
       
-      for(DomainInt x = vars[0].getMin(); x <= vars[0].getMax(); ++x)
+      for(DomainInt x = max(vars[0].getMin(), bounds.first); x <= min(vars[0].getMax(), bounds.second); ++x)
       {
         vector<DomainInt>* support = state.findSupportingTuple(vars, Literal(0, x));
         if(support)

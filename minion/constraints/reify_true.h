@@ -79,9 +79,9 @@ template<typename BoolVar, bool DoWatchAssignment>
   {
     DomainInt back_val = *(v + v_size - 1);
     //v.pop_back();
-    if(back_val == 0)
+    if(back_val == 1)
       return child_constraints[0]->check_assignment(v, v_size - 1);
-    else return (back_val == 1);
+    else return (back_val == 0);
   }
 
   virtual vector<AnyVarRef> get_vars()

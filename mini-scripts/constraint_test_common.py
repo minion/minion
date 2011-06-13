@@ -1433,7 +1433,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
                 if varnums[i]==oldvalue:
                     varnums[i]=newvalue
     
-    (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, boundsallowed)
+    (domlists, modvars, tablevars, constants, diseq_constraints)=generatevariables(varnums, vartypes, boundsallowed)
     setattr(tablegen, "constants", constants)
     
     if modvars.find("BOUND")!=-1:
@@ -1532,7 +1532,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     
     if random.randint(0,1)==0:
         # Deal with reify and reifyimply in the old way, i.e. tack an extra
-        # variable onto the table constraint and extend the table.
+        # variable onto the (start of the) table constraint and extend the table.
         if reify:
             tuplelist2=[]
             cross=[]
@@ -1578,13 +1578,15 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         # Deal with reify or reifyimply by using reify(table(...)) or reifyimply(table(..))
         
         # now convert tuplelist into a string.
-        tuplestring="modtable %d %d \n"%(len(tuplelist), sum(varnums2))
+        numtablevars=sum(varnums2)
+        if reify or reifyimply: numtablevars-=1
+        
+        tuplestring="modtable %d %d \n"%(len(tuplelist), numtablevars)
         for l in tuplelist:
             for e in l:
                 tuplestring+="%d "%e
             tuplestring+="\n"
         
-        # tuplelist is actually a set of lists(not yet), so that it can be reformed for reify or reifyimply
         constrainttable=""
         if reify:
             constrainttable="reify("
@@ -1592,13 +1594,18 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
             constrainttable="reifyimply("
         
         constrainttable+="table(["
-        for i in range(sum(varnums2)):
+        
+        startidx=0
+        if reify or reifyimply: startidx=1
+        
+        for i in range(startidx, sum(varnums2)):
             constrainttable+="x%d"%i
             if i<(sum(varnums2)-1): constrainttable+=","
         constrainttable+="], modtable)"
         
         if reify or reifyimply:
-            constrainttable+=")"
+            constrainttable+=",x0)"   # add on reification variable
+        
     
     constraintlist = []
     # add some other constraints at random into the constraint and constrainttable strings
@@ -1636,7 +1643,10 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         random.shuffle(constraintlist)
         constraint = "\n".join(constraintlist)
 
-
+    # Add any diseq constraitns generated when replacing a sparsebound with a discrete
+    for c in diseq_constraints:
+        constrainttable+="\n"+c
+    
     if not fullprop:
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
         retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'])
@@ -1679,6 +1689,7 @@ def generatevariables(varblocks, types, boundallowed):
     domainlists=[]
     constants=[]
     typesconst=["const", "smallconst", "smallconst_distinct"]
+    constraints=[]   # extra constraints needed to adjust domain when Discrete is substituted for Sparsebound
     varblocks2=varblocks[:]
     for (i,t) in zip(range(len(varblocks)), types):
         if t in typesconst:
@@ -1703,7 +1714,7 @@ def generatevariables(varblocks, types, boundallowed):
             elif t==2:
                 ty="DISCRETE "
             elif t==3:
-                ty="SPARSEBOUND "  # Should be sparsebound
+                ty="SPARSEBOUND "
             else:
                 ty="BOOL "
         else:
@@ -1768,6 +1779,10 @@ def generatevariables(varblocks, types, boundallowed):
                 strdom+=str(dom[-1])
                 st_nontable+=ty+"x%d {%s}\n"%(varnum, strdom)
                 st_table+="DISCRETE x%d {%d..%d}\n"%(varnum, lb, ub)
+                for val in range(lb, ub+1):
+                    if val not in dom:
+                        # Make a constraint for the Table version to remove the spurious value.
+                        constraints+=["diseq(x%d, %d)"%(varnum, val)]
             elif ty=="BOOL ":
                 st_nontable+=ty+"x%d\n"%(varnum)
                 st_table   +=ty+"x%d\n"%(varnum)
@@ -1799,5 +1814,5 @@ def generatevariables(varblocks, types, boundallowed):
     deco.sort(cmp=comparefunc)
     st_nontable=reduce(lambda x,y:x+"\n"+y, [i[0] for i in deco])+"\n"
     st_table=reduce(lambda x,y:x+"\n"+y, [i[1] for i in deco])+"\n"
-    return (domainlists, st_nontable, st_table, constants)
+    return (domainlists, st_nontable, st_table, constants, constraints)
 
