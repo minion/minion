@@ -63,7 +63,7 @@ public:
   pair<DomainInt,DomainInt> getDomainBounds(int var)
   {
     return make_pair(tuple_data->dom_smallest[var],
-      tuple_data->dom_smallest[var] + tuple_data->dom_size[var]);
+      tuple_data->dom_smallest[var] + tuple_data->dom_size[var] - 1);
   }
 
   BaseTableData(TupleList* _tuple_data) : tuple_data(_tuple_data) { }
