@@ -73,9 +73,9 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
   }
   
   // Solve!
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_Always, "Setup Time: ", "SetupTime", getTableOut(), !getOptions(stateObj).silent);
+  getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Setup Time: ", "SetupTime", getTableOut(), !getOptions(stateObj).silent);
   Controller::initalise_search(stateObj);
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_Always, "Initial Propagate: ", "InitialPropagate", getTableOut(), !getOptions(stateObj).silent);
+  getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Initial Propagate: ", "InitialPropagate", getTableOut(), !getOptions(stateObj).silent);
 
 }
 
@@ -135,12 +135,12 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     
     shared_ptr<Controller::SearchManager> sm=Controller::make_search_manager(stateObj, args.prop_method, instance.search_order);
     
-    getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions(stateObj).silent);
+    getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions(stateObj).silent);
     try {
     
     PropogateCSP(stateObj, args.preprocess, preprocess_vars, !getOptions(stateObj).silent);
-    getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions(stateObj).silent);
-    getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions(stateObj).silent);
+    getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions(stateObj).silent);
+    getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions(stateObj).silent);
     
   if(!getState(stateObj).isFailed())
   {
@@ -155,7 +155,12 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     catch(EndOfSearch)
     { }
 
-  getState(stateObj).getOldTimer().maybePrintFinaltimestepStore("Solve Time: ", "SolveTime", getTableOut(), !getOptions(stateObj).silent);
+  if(getOptions(stateObj).printonlyoptimal)
+  {
+    cout << getState(stateObj).storedSolution;
+  }
+  
+  getState(stateObj).getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime", getTableOut(), !getOptions(stateObj).silent);
   getOptions(stateObj).printLine("Total Nodes: " + to_string( getState(stateObj).getNodeCount() ));
   getOptions(stateObj).printLine(string("Problem solvable?: ") + (getState(stateObj).getSolutionCount() == 0 ? "no" : "yes"));
 
