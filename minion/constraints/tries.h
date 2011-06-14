@@ -287,6 +287,7 @@ struct TupleTrie
   
   // search_trie_negative searches for a tuple which is not in the trie. 
   // For the negative table constraint.
+  // WARNING does not fill in the value at position map_depth(0) in returnTuple
   template<typename VarArray>
     bool search_trie_negative(const VarArray& _vars, TrieObj** obj_list, int depth, DomainInt* returnTuple)
   {
@@ -425,20 +426,19 @@ struct TupleTrie
   {
     VarArray& vars = const_cast<VarArray&>(_vars);
     
-    //if(obj_list[0] == NULL)
-    {
-      TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
-      if(first_ptr == NULL)
-      {
-          // Hang on a minute. How do we ever get here? Should only be at root node.
-          for(int depth2=1; depth2<arity; depth2++) recycTuple[map_depth(depth2)]=vars[map_depth(depth2)].getMin();
-          recycTuple[map_depth(0)]=domain_val;
-          return 0;
-      }
+    // Starts from scratch each time
+    TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
     
-      obj_list[0] = first_ptr;
+    recycTuple[map_depth(0)]=domain_val;
+    if(first_ptr == NULL)
+    {
+      // Hang on a minute. How do we ever get here? Should only be at root node.
+      for(int depth2=1; depth2<arity; depth2++) recycTuple[map_depth(depth2)]=vars[map_depth(depth2)].getMin();
+      return 0;  
     }
-      
+    
+    obj_list[0] = first_ptr;
+    
     bool flag=search_trie_negative(vars, obj_list, 1, recycTuple);
     
     if(!flag) return -1;

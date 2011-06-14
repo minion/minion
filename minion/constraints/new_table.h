@@ -342,6 +342,7 @@ struct NewTableConstraint : public AbstractConstraint
         if(support)
         {
             for(int i=0; i<vars.size(); i++) {
+                D_ASSERT(vars[i].inDomain((*support)[i]));
                 assignment.push_back(make_pair(i, (*support)[i]));
             }
             return true;

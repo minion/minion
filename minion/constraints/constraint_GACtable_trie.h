@@ -183,7 +183,7 @@ struct GACTableConstraint : public AbstractConstraint
         for(DomainInt i = vars[varIndex].getMin(); i <= max; ++i) 
         {
             if(i>= (tuples->dom_smallest)[varIndex] 
-                && i<=(tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex])
+                && i<(tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex])
             {
                 int literal = tuples->get_literal(varIndex, i);
                 
@@ -227,27 +227,53 @@ struct GACTableConstraint : public AbstractConstraint
   
     virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   {
+      D_ASSERT(!getState(stateObj).isFailed());
       DomainInt max = vars[0].getMax();
       for(DomainInt i = vars[0].getMin(); i <= max; ++i) 
       {
-          int literal = tuples->get_literal(0, i);
-          int sup;
-          if(negative) {
-              sup = tupleTrieArrayptr->getTrie(0).       
-                        nextSupportingTupleNegative(i, vars, trie_current_support[literal], recyclableTuple);
-          }
-          else
+          if(vars[0].inDomain(i))
           {
-              sup = tupleTrieArrayptr->getTrie(0).       
-                        nextSupportingTuple(i, vars, trie_current_support[literal]);
-          }
-          
-          if(sup>=0) {
-              if(!negative) tupleTrieArrayptr->getTrie(0).reconstructTuple(recyclableTuple,trie_current_support[literal]);
-              for(int j=0; j<vars.size(); j++) {
-                  assignment.push_back(make_pair(j, recyclableTuple[j]));
+              int sup=-1;
+              int literal=0xdeadbeef;
+              
+              if(i>= (tuples->dom_smallest)[0] 
+                 && i<(tuples->dom_smallest)[0] + (tuples->dom_size)[0])
+              {
+                  literal = tuples->get_literal(0, i);
+                  if(negative) {
+                      sup = tupleTrieArrayptr->getTrie(0).       
+                                nextSupportingTupleNegative(i, vars, trie_current_support[literal], recyclableTuple);
+                  }
+                  else
+                  {
+                      sup = tupleTrieArrayptr->getTrie(0).       
+                                nextSupportingTuple(i, vars, trie_current_support[literal]);
+                  }
               }
-              return true;
+              else
+              {
+                  // If the value i is in domain but outside all tuples passed in, 
+                  // and the constraint is negated, then all tuples containing i
+                  // are valid. Just make something up.
+                  if(negative) {
+                      assignment.push_back(make_pair(0,i));
+                      for(int varidx = 1; varidx < vars.size(); ++varidx) {
+                          assignment.push_back(make_pair(varidx, vars[varidx].getMin()));
+                      }
+                      return true;
+                  }
+              }
+              
+              if(sup>=0) {
+                  if(!negative) tupleTrieArrayptr->getTrie(0).reconstructTuple(recyclableTuple,trie_current_support[literal]);
+                  //recyclableTuple[0]=i;
+                  for(int varidx=0; varidx<vars.size(); varidx++) {
+                      D_ASSERT(recyclableTuple[0]==i);
+                      D_ASSERT(vars[varidx].inDomain(recyclableTuple[varidx]));
+                      assignment.push_back(make_pair(varidx, recyclableTuple[varidx]));
+                  }
+                  return true;
+              }
           }
       }
       
