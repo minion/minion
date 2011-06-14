@@ -289,7 +289,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   {
     bool hasFalse = var3.inDomain(0);
     bool hasTrue  = var3.inDomain(1);
-    D_ASSERT(hasFalse || hasTrue);
+    //D_ASSERT(hasFalse || hasTrue); No longer true
     if(hasFalse)
     {
       if(var1.getMin() != var2.getMax())
@@ -318,9 +318,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint
         assignment.push_back(make_pair(2, 1));
         return true;
       }
-      return false;
     }
-    else
+    if(hasTrue)
     {
       DomainInt dom_min = max(var1.getMin(), var2.getMin());
       DomainInt dom_max = min(var1.getMax(), var2.getMax());
@@ -334,8 +333,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint
           return true;
         }
       }
-      return false;
     }
+    return false;
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)

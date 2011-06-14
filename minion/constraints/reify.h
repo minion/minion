@@ -245,6 +245,9 @@ struct reify : public ParentConstraint
     D_ASSERT(constraint_locked);
     P("Special Check!");
     constraint_locked = false;
+    D_ASSERT(reify_var.isAssigned() &&
+             (reify_var.getAssignedValue() == 0 ||
+              reify_var.getAssignedValue() == 1) );
     if(reify_var.inDomain(0))
     {
         child_constraints[1]->full_propagate();
@@ -272,22 +275,23 @@ struct reify : public ParentConstraint
 
     if(i == -1000000000)
     {
-      D_ASSERT(!full_propagate_called);
-      P("reifyvar assigned - Do full propagate");
-      #ifdef NODETRICK
-      if(reifysetnode==getState(stateObj).getNodeCount())
-      {
-          numeric_limits<unsigned long long> ull;  // I hope the compiler will get rid fo this..
-          reifysetnode=ull.max();  // avoid this happening more than once.
-          return;
-      }
-      #endif
-
-      constraint_locked = true;
-      getQueue(stateObj).pushSpecialTrigger(this);
-      return;
+        if(!full_propagate_called) {
+            P("reifyvar assigned - Do full propagate");
+            #ifdef NODETRICK
+            if(reifysetnode==getState(stateObj).getNodeCount())
+            {
+              numeric_limits<unsigned long long> ull;  // I hope the compiler will get rid fo this..
+              reifysetnode=ull.max();  // avoid this happening more than once.
+              return;
+            }
+            #endif
+            
+            constraint_locked = true;
+            getQueue(stateObj).pushSpecialTrigger(this);
+        }
+        return;
     }
-
+    
     if(full_propagate_called)
     {
       P("Already doing static full propagate");
@@ -483,10 +487,11 @@ struct reify : public ParentConstraint
 
     reify_var.setMin(0);
     reify_var.setMax(1);
+    if(getState(stateObj).isFailed()) return;
     
     if(reify_var.isAssigned())
     {
-        if(reify_var.getAssignedValue() > 0)
+        if(reify_var.getAssignedValue() == 1)
         {
           child_constraints[0]->full_propagate();
         }
