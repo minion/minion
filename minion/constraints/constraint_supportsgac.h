@@ -366,8 +366,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         tuple_lists.resize(vars.size());
         tuple_list_pos.resize(vars.size());
         for(int var=0; var<vars.size(); var++) {
-            tuple_lists[var].resize(numvals);
-            tuple_list_pos[var].resize(numvals, 0);
+            tuple_lists[var].resize(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
+            tuple_list_pos[var].resize(vars[var].getInitialMax()-vars[var].getInitialMin()+1, 0);
             
             for(int val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
                 // get short supports relevant to var,val.
@@ -393,7 +393,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                     if(!varin || valmatches) {
                         // If the support doesn't include the var, or it 
                         // does include var,val then add it to the list.
-                        tuple_lists[var][val-dom_min].push_back(shortsupports[i]);
+                        tuple_lists[var][val-vars[var].getInitialMin()].push_back(shortsupports[i]);
                     }
                 }
             }
@@ -440,7 +440,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         
         tuple_list_pos.resize(vars.size());
         for(int var=0; var<vars.size(); var++) {
-            tuple_list_pos[var].resize(numvals, 0);
+            tuple_list_pos[var].resize(vars[var].getInitialMax()-vars[var].getInitialMin()+1, 0);
         }
         
 #endif
@@ -1369,10 +1369,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         
-        const vector<vector<pair<int, int> > >& tuplist=tuple_lists[var][val-dom_min]; 
+        const vector<vector<pair<int, int> > >& tuplist=tuple_lists[var][val-vars[var].getInitialMin()]; 
         
         int listsize=tuplist.size();
-        for(int i=tuple_list_pos[var][val-dom_min]; i<listsize; i++) {
+        for(int i=tuple_list_pos[var][val-vars[var].getInitialMin()]; i<listsize; i++) {
             
             int supsize=tuplist[i].size();
             bool valid=true;
@@ -1388,13 +1388,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 for(int j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tuplist[i][j].first, tuplist[i][j].second);  //assignment.push_back(tuplist[i][j]);
                 }
-                tuple_list_pos[var][val-dom_min]=i;
+                tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
                 return true;
             }
         }
         
         
-        for(int i=0; i<tuple_list_pos[var][val-dom_min]; i++) {
+        for(int i=0; i<tuple_list_pos[var][val-vars[var].getInitialMin()]; i++) {
             
             int supsize=tuplist[i].size();
             bool valid=true;
@@ -1410,7 +1410,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 for(int j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tuplist[i][j].first, tuplist[i][j].second);  //assignment.push_back(tuplist[i][j]);
                 }
-                tuple_list_pos[var][val-dom_min]=i;
+                tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
                 return true;
             }
         }
@@ -1439,10 +1439,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         
-        const vector<vector<pair<int, int> > * >& tuplist=tuple_lists[var][val-dom_min]; 
+        const vector<vector<pair<int, int> > * >& tuplist=tuple_lists[var][val-vars[var].getInitialMin()]; 
         
         int listsize=tuplist.size();
-        for(int i=tuple_list_pos[var][val-dom_min]; i<listsize; i++) {
+        for(int i=tuple_list_pos[var][val-vars[var].getInitialMin()]; i<listsize; i++) {
             vector<pair<int,int> > & tup=*(tuplist[i]);
             
             int supsize=tup.size();
@@ -1459,13 +1459,13 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 for(int j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tup[j].first, tup[j].second);  //assignment.push_back(tuplist[i][j]);
                 }
-                tuple_list_pos[var][val-dom_min]=i;
+                tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
                 return true;
             }
         }
         
         
-        for(int i=0; i<tuple_list_pos[var][val-dom_min]; i++) {
+        for(int i=0; i<tuple_list_pos[var][val-vars[var].getInitialMin()]; i++) {
             vector<pair<int,int> > & tup=*(tuplist[i]);
             
             int supsize=tup.size();
@@ -1482,7 +1482,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 for(int j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tup[j].first, tup[j].second);  //assignment.push_back(tuplist[i][j]);
                 }
-                tuple_list_pos[var][val-dom_min]=i;
+                tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
                 return true;
             }
         }
@@ -1565,7 +1565,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     }
     
     bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
-        int pos=tuple_list_pos[var][val-dom_min];
+        int pos=tuple_list_pos[var][val-vars[var].getInitialMin()];
         int listsize=tuple_nd_list.size();
         
         while(pos<listsize) {
@@ -1587,7 +1587,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 for(int j=0; j<tupsize; j++) {
                     ADDTOASSIGNMENT(tup[j].get<0>(), tup[j].get<1>());
                 }
-                tuple_list_pos[var][val-dom_min]=pos;
+                tuple_list_pos[var][val-vars[var].getInitialMin()]=pos;
                 return true;
             }
         }
@@ -1595,7 +1595,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         // Restart at position 0
         pos=0;
         
-        int oldpos=tuple_list_pos[var][val-dom_min];
+        int oldpos=tuple_list_pos[var][val-vars[var].getInitialMin()];
         
         while(pos<oldpos) {
             vector<tuple<int,int,int> > & tup=tuple_nd_list[pos];
@@ -1616,7 +1616,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
                 for(int j=0; j<tupsize; j++) {
                     ADDTOASSIGNMENT(tup[j].get<0>(), tup[j].get<1>());
                 }
-                tuple_list_pos[var][val-dom_min]=pos;
+                tuple_list_pos[var][val-vars[var].getInitialMin()]=pos;
                 return true;
             }
         }
