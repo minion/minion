@@ -1366,7 +1366,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     //
     //  Table of short supports passed in.
     
-    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+    //bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+    bool findNewSupport(int var, int val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         
         const vector<vector<pair<int, int> > >& tuplist=tuple_lists[var][val-vars[var].getInitialMin()]; 
@@ -1436,7 +1437,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     //
     //  Table of short supports passed in.
     
-    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+    //bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+    bool findNewSupport(int var, int val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         
         const vector<vector<pair<int, int> > * >& tuplist=tuple_lists[var][val-vars[var].getInitialMin()]; 
@@ -1564,7 +1566,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
     }
     
-    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+    //bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
+    bool findNewSupport(int var, int val) {
         int pos=tuple_list_pos[var][val-vars[var].getInitialMin()];
         int listsize=tuple_nd_list.size();
         
