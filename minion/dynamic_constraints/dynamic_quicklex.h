@@ -25,8 +25,8 @@
 #undef P
 #endif
 
-//#define P(x) cout << x << endl
-#define P(x)
+#define P(x) cout << x << endl
+//#define P(x)
 
 template<typename VarArray1, typename VarArray2, bool Less = false>
   struct QuickLexDynamic : public AbstractConstraint
@@ -76,6 +76,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   
   virtual void full_propagate()
   {
+    P("Full Prop");
     DynamicTrigger* dt = dynamic_trigger_start();
 
     if(var_array1.size() == 0)
@@ -87,14 +88,21 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     
     alpha = 0;
     
-    var_array2[0].setMin(var_array1[0].getMin());
-    var_array1[0].setMax(var_array2[0].getMax());
-    
+    if(Less && var_array1.size() == 1)
+    {
+      var_array2[0].setMin(var_array1[0].getMin() + 1);
+      var_array1[0].setMax(var_array2[0].getMax() - 1);
+    }
+    else
+    {
+      var_array2[0].setMin(var_array1[0].getMin());
+      var_array1[0].setMax(var_array2[0].getMax());
+    }
+
     // Set these up, just so they are stored.
     var_array1[0].addDynamicTrigger(dt, LowerBound, NoDomainValue BT_CALL_STORE);
     var_array2[0].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue BT_CALL_STORE);
     
-
     if(var_array1[0].isAssigned() && var_array2[0].isAssigned() &&
        var_array1[0].getAssignedValue() == var_array2[0].getAssignedValue())
     {
@@ -114,8 +122,17 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     
     while(a < n)
     {
-      var_array1[a].setMax(var_array2[a].getMax());
-      var_array2[a].setMin(var_array1[a].getMin());
+      if(Less && a >= n-1)
+      {
+         var_array2[a].setMin(var_array1[a].getMin() + 1);
+         var_array1[a].setMax(var_array2[a].getMax() - 1);
+      }
+      else
+      {
+         var_array1[a].setMax(var_array2[a].getMax());
+         var_array2[a].setMin(var_array1[a].getMin());
+      }
+
       if(var_array1[a].isAssigned() && var_array2[a].isAssigned() &&
          var_array1[a].getAssignedValue() == var_array2[a].getAssignedValue())
          {
@@ -148,11 +165,17 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
 
     if(base_dt == dt)
     { // X triggered
-      var_array2[a].setMin(var_array1[a].getMin());
+      if(Less && a >= var_array1.size() - 1)
+        var_array2[a].setMin(var_array1[a].getMin() + 1);
+      else
+        var_array2[a].setMin(var_array1[a].getMin());
     }
     else
     { // Y triggered
-      var_array1[a].setMax(var_array2[a].getMax());
+      if(Less && a >= var_array1.size() - 1)
+        var_array1[a].setMax(var_array2[a].getMax() - 1);
+      else
+        var_array1[a].setMax(var_array2[a].getMax());
     }
 
     if(var_array1[a].isAssigned() && var_array2[a].isAssigned() &&

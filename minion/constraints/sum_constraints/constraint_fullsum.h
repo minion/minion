@@ -109,11 +109,13 @@ struct LessEqualSumConstraint : public AbstractConstraint
   
   virtual void propagate(int prop_val, DomainDelta domain_change)
   {
+    P("Prop: " << prop_val);
     PROP_INFO_ADDONE(FullSum);
     DomainInt sum = var_array_min_sum;
     if(prop_val != -1)
     { // One of the array changed
       int change = var_array[prop_val].getDomainChange(domain_change);
+      P(" Change: " << change);
       D_ASSERT(change >= 0);
       sum += change;
       var_array_min_sum = sum;
@@ -168,6 +170,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
+    P("Full Prop");
     DomainInt min_sum = 0;
     DomainInt max_diff = 0;
     for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)

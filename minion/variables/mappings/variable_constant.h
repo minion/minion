@@ -27,11 +27,11 @@ struct ConstantVar
   StateObj* stateObj;
 
   static const BOOL isBool = false;
-  static const BoundType isBoundConst = Bound_Yes;
+  static const BoundType isBoundConst = Bound_No;
 
   // Hmm.. no sure if it's better to make this true or false.
   BOOL isBound() const
-  { return true;}
+  { return false;}
 
   DomainInt val;
 

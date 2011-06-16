@@ -215,6 +215,7 @@ struct NewTableConstraint : public AbstractConstraint
   NewTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
   AbstractConstraint(stateObj), vars(_vars), data(new TableDataType(_tuples)), state(data)
   {
+    CheckNotBound(vars, "table constraint");
       if(_tuples->tuple_size()!=_vars.size())
       {
           cout << "Table constraint: Number of variables "

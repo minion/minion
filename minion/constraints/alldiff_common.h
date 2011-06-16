@@ -134,6 +134,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         SCCSplit(_stateObj, _var_array.size())
     //sparevaluespresent(_stateObj, _var_array.size())
     {
+      CheckNotBound(var_array, "gacalldiff", "alldiff");
       SCCs.resize(var_array.size());
       varToSCCIndex.resize(var_array.size());
       for(int i=0; i<var_array.size(); ++i)

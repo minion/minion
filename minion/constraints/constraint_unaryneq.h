@@ -33,7 +33,9 @@ struct UnaryNeqConstraint : public AbstractConstraint
   
   UnaryNeqConstraint(VarRef _x, Offset _o) :
     offset(_o), x(_x)
-  { }
+  { 
+      CheckNotBound(vars, "Unary neq","");
+  }
   
   virtual triggerCollection setup_internal()
   {

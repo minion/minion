@@ -163,6 +163,7 @@ struct GACTableConstraint : public AbstractConstraint
   GACTableConstraint(const VarArray& _vars, TupleList* _tuples) :
     vars(_vars), lists(_tuples->getLitLists())
   {
+    CheckNotBound(vars, "table constraints","");
     if((int)_vars.size() != lists->tuples->tuple_size())
     {
       FAIL_EXIT("In table constraint, number of variables is not equal to length of tuples.");

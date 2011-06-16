@@ -993,7 +993,7 @@ class testlexless_quick(testlexleq):
         return testlexleq.printtable(self, domains, less=True)
     
     def runtest(self, options=dict()):
-        return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], self, False)
+        return runtestgeneral("lexless[quick]", True, options, [4,4], ["smallnum", "smallnum"], self, False)
 
 class testlexless(testlexleq):
     def printtable(self, domains):
@@ -1547,7 +1547,16 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     if reifyimply:
         constraint="reifyimply("+constraint+", x0)"
     
-    
+
+    tree_choice = random.randint(0,5)    
+    while tree_choice <= 1:
+      treesame = False
+      if tree_choice==0:
+          constraint = "watched-and({"+ ",".join([constraint] * random.randint(1,5)) +"})"
+      if tree_choice==1:
+          constraint = "watched-or({"+ ",".join([constraint] * random.randint(1,5)) +"})"
+      tree_choice = random.randint(0,5)
+
     varnums2=varnums[:]
     for (i,t) in zip(range(len(varnums)), vartypes):
         if t in ["const", "smallconst", "smallconst_distinct"]:
@@ -1617,6 +1626,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         if i<(sum(varnums2)-1): constrainttable+=","
     constrainttable+="], modtable)"
     
+    constraintlist = []
     # add some other constraints at random into the constraint and constrainttable strings
     if random.randint(0,1)==0:
         for i in range(sum(varnums2)-2):
@@ -1631,9 +1641,28 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
                 c="eq(x%d, x%d)"%(var1, var2)
             elif ctype==2:
                 c="ineq(x%d, x%d, 0)"%(var1, var2)
-            constraint+="\n"+c
+            constraintlist.append(c)
             constrainttable+="\n"+c
     
+    # Maybe stick everything in a big watched-and
+    if random.randint(0,3) == 0:
+        random.shuffle(constraintlist)
+        cutpos = random.randint(0, len(constraintlist))
+        watchedlist = constraintlist[:cutpos]
+        otherlist = constraintlist[cutpos:]
+
+        watchedlist.append(constraint)
+        random.shuffle(watchedlist)
+
+        constraint = "watched-and({" + ",".join(watchedlist)  + "})\n"
+        constraint += "\n".join(otherlist)
+        treesame = False
+    else:
+        constraintlist.append(constraint)
+        random.shuffle(constraintlist)
+        constraint = "\n".join(constraintlist)
+
+
     if not fullprop:
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
         retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'])
