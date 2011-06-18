@@ -70,7 +70,17 @@ template<typename BoolVar, bool DoWatchAssignment>
       return true;
     }
     else if(rar_var.inDomain(1))
-    { return child_constraints[0]->get_satisfying_assignment(assignment); }
+    { 
+
+      bool ret = child_constraints[0]->get_satisfying_assignment(assignment);
+      if(ret)
+      {
+        assignment.push_back(make_pair(child_constraints[0]->get_vars_singleton()->size(), 1));
+        return true;
+      }
+      else
+        return false;
+    }
     else
       return false;
   }
