@@ -338,15 +338,17 @@ struct NewTableConstraint : public AbstractConstraint
       
       for(DomainInt x = max(vars[0].getMin(), bounds.first); x <= min(vars[0].getMax(), bounds.second); ++x)
       {
-        vector<DomainInt>* support = state.findSupportingTuple(vars, Literal(0, x));
-        if(support)
-        {
-            for(int i=0; i<vars.size(); i++) {
-                D_ASSERT(vars[i].inDomain((*support)[i]));
-                assignment.push_back(make_pair(i, (*support)[i]));
+          if(vars[0].inDomain(x)) {
+            vector<DomainInt>* support = state.findSupportingTuple(vars, Literal(0, x));
+            if(support)
+            {
+                for(int i=0; i<vars.size(); i++) {
+                    D_ASSERT(vars[i].inDomain((*support)[i]));
+                    assignment.push_back(make_pair(i, (*support)[i]));
+                }
+                return true;
             }
-            return true;
-        }
+          }
       }
       
       return false;
