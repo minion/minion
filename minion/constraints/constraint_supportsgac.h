@@ -17,6 +17,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <algorithm>
+#include "boost/tuple/tuple_comparison.hpp"
+
 // Default will be List.   
 // If any special case is defined list will be switched off
 // If two options given compile errors are expected to result.
