@@ -1,0 +1,10 @@
+language ESSENCE' 1.b.a
+
+given n: int
+find queens: matrix indexed by [int(1..n)] of int(1..n)
+
+such that
+
+alldiff(queens),
+
+forall i : int(1..n). forall j : int(i+1..n). | queens[i] - queens[j] | != |i - j|

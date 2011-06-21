@@ -1,0 +1,21 @@
+MINION 1
+#TEST CHECKONESOL 0
+#This just sanity checks a number of powers
+
+1
+0
+0
+0
+0
+
+[x0]
+[a]
+
+0 
+1
+[ [ x0] ]
+0
+objective none
+print m0
+
+pow(3,1,3)
