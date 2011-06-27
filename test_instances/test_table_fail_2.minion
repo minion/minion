@@ -1,0 +1,15 @@
+MINION 3
+#TEST SOLCOUNT 0
+#
+#FAIL
+
+**VARIABLES**
+
+BOOL a
+BOOL b
+
+**CONSTRAINTS**
+
+table([a, b], {<1,1,1>})
+
+**EOF**
