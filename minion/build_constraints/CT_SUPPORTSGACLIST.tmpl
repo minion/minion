@@ -1,0 +1,15 @@
+#include "../minion.h"
+/* Minion Constraint Solver
+   http://minion.sourceforge.net
+   
+   For Licence Information see file LICENSE.txt 
+*/
+
+#include "../constraints/constraint_supportsgac.h"
+
+template<typename VarArray>
+AbstractConstraint*
+BuildCT_SUPPORTSGACLIST(StateObj* stateObj, const VarArray& var_array, ConstraintBlob& b)
+{ return new ShortSupportsGAC<VarArray>(stateObj, var_array, b.tuples, 1); }
+
+BUILD_CT(CT_SUPPORTSGACLIST, 1)
