@@ -188,7 +188,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
     // Counters
     int supports;   // 0 to rd.  
     vector<int> supportsPerVar;
-    vector<int> supportsPerLit;
     
     vector<Literal>  literalList;
     vector<int> firstLiteralPerVar;
@@ -266,9 +265,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    litCounter += numvals_i; 
         }
 
-	literalList.resize(litCounter); 
-	supportsPerLit.resize(litCounter,0); 
-
+    literalList.resize(litCounter); 
+    
 	litCounter = 0 ; 
         for(int i=0; i<numvars; i++) {
 	    int thisvalmin = vars[i].getInitialMin();
@@ -483,8 +481,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         }
 
 	literalList.resize(litCounter); 
-	supportsPerLit.resize(litCounter,0); 
-
+	
 	litCounter = 0 ; 
         for(int i=0; i<numvars; i++) {
 	    int thisvalmin = vars[i].getInitialMin();
@@ -802,7 +799,12 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             //update counters
             supportsPerVar[var]++;
-            supportsPerLit[lit]++;  
+            
+            // Attach trigger if this is the first support containing var,val.
+            if(SupportsGACUseDT && literalList[lit].supportCellList==0) { 
+                attach_trigger(var, literalList[lit].val, lit);
+            }
+            
             // Stitch it into the start of literalList.supportCellList
             
             supCells[i].prev = 0;
@@ -810,13 +812,8 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             if(literalList[lit].supportCellList!=0) {
                 literalList[lit].supportCellList->prev = &(supCells[i]);
             }
-	    literalList[lit].supportCellList = &(supCells[i]);
-	    
-            // Attach trigger if this is the first support containing var,val.
-	    if(SupportsGACUseDT && supportsPerLit[lit]==1) { 
-                attach_trigger(var, literalList[lit].val, lit);
-	    }
-			            
+            literalList[lit].supportCellList = &(supCells[i]);
+            
             // Update partition
             // swap var to the end of its cell.
             partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]]-1]);
@@ -866,11 +863,9 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             
             // decrement counters
             supportsPerVar[var]--;
-            supportsPerLit[lit]--;
-            D_ASSERT(supportsPerLit[lit] >= 0);
             
             #if SupportsGACUseZeroVals
-            if(supportsPerLit[lit]==0) {
+            if(literalList[lit].supportCellList==0) {
                 if(!inZeroLits[lit]) {
                     inZeroLits[lit]=1;
                     zeroLits[var].push_back(lit);  
@@ -879,11 +874,10 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
             #endif
             
             // Remove trigger if this is the last support containing var,val.
-            if(SupportsGACUseDT && supportsPerLit[lit]==0) {
+            if(SupportsGACUseDT && literalList[lit].supportCellList==0) {
                 detach_trigger(lit);
-	    }
+            }
             
-          
             // Update partition
             // swap var to the start of its cell.
             partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]+1]]);
@@ -910,7 +904,6 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
         cout << "PRINTING ALL DATA STRUCTURES" <<endl;
         cout << "supports:" << supports <<endl;
         cout << "supportsPerVar:" << supportsPerVar << endl;
-        cout << "supportsPerLit:" << supportsPerLit << endl;
         cout << "partition:" <<endl;
         for(int i=0; i<supportNumPtrs.size()-1; i++) {
             cout << "supports: "<< i<< "  vars: ";
@@ -990,7 +983,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 	    #else
 	    for(int j=0; j<zeroLits[var].size(); j++) {
 		int lit=zeroLits[var][j];
-		if(supportsPerLit[lit] > 0){
+		if(literalList[lit].supportCellList != 0){
 	    // No longer a zero val. remove from vector.
 		    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
 		    zeroLits[var].pop_back();
@@ -1001,7 +994,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 		int val=literalList[lit].val;
 	    #endif
 			
-		if(vars[var].inDomain(val) && supportsPerLit[lit]==0) {
+		if(vars[var].inDomain(val) && literalList[lit].supportCellList==0) {
 		    // val has no support. Find a new one. 
 		    literalsScratch.clear();
 		    bool foundsupport=findNewSupport(var, val);
@@ -1013,7 +1006,7 @@ struct ShortSupportsGAC : public AbstractConstraint, Backtrackable
 			addSupport();
 			
 			#if SupportsGACUseZeroVals
-			if(supportsPerLit[lit]>0) {
+			if(literalList[lit].supportCellList != 0) {
 			    // No longer a zero lit. remove from vector.
 			    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
 			    zeroLits[var].pop_back();
