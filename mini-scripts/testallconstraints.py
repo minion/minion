@@ -134,7 +134,7 @@ for procNum in range(procs):
             testobj.solver=minionbin
             
             for testnum in range(numtests):
-                options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False, 'fixlength':False}
+                options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False, 'fixlength':False, 'getsatisfyingassignment':True}
                 if not testobj.runtest(options):
                     print "Failed when testing %s"%consname1
                     sys.stdout.flush()

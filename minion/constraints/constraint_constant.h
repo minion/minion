@@ -20,7 +20,6 @@
 #ifndef CONSTRAINT_CONSTANT_H
 #define CONSTRAINT_CONSTANT_H
 
-/// var1 /\ var2 = var3
 template<bool truth>
 struct ConstantConstraint : public AbstractConstraint
 {
@@ -53,6 +52,11 @@ struct ConstantConstraint : public AbstractConstraint
   
   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
   { return truth; }
+  
+  AbstractConstraint* reverse_constraint()
+  {
+    return new ConstantConstraint<!truth>(stateObj);
+  }
   
   virtual vector<AnyVarRef> get_vars()
   { 
