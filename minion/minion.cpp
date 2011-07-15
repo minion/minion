@@ -574,6 +574,9 @@ try {
 
 }
 catch(...)
-{ cerr << "Minion exited abnormally via an exception." << endl; }
+{ 
+  cerr << "Minion exited abnormally via an exception." << endl; 
+  exit(9);
+}
 }
 
