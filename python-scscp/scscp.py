@@ -115,8 +115,8 @@ def execute(socket, proc):
 if __name__ == '__main__':
   scscp_socket = make_connection()
   group = group_node([[1,3,2],[4,2,3,1]])
-  command = build_call("CAJ_MinImage",[listint_node([[2,1],[2,3,4,5,6,1]]), listint_node([[4,6],[2,5,3]]) ] )
-  print command
+  command = build_call("WS_Size",[listint_node([0,0,0,0,0]) ] )
+  print et.dump(command)
   reply = execute(scscp_socket, command)
   et.dump(reply)
   print(parse_reply(reply))

@@ -118,7 +118,7 @@ end;
 
 # Simple procedures for tests and demos
 InstallSCSCPprocedure( "WS_Factorial", Factorial, "See ?Factorial in GAP", 1, 1 );
-InstallSCSCPprocedure( "WS_Size", Size, "See ?Size in GAP", 1, 1 );
+InstallSCSCPprocedure( "WS_Size", function(a) return [Size(a)]; end, "See ?Size in GAP", 1, 1 );
 
 InstallSCSCPprocedure( "WS_Join", function(a,b) return [a,b]; end );
 
