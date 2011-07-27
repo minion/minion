@@ -32,7 +32,7 @@ Read("nsils.g");
 #
 #############################################################################
 
-SetInfoLevel(InfoSCSCP,0);
+SetInfoLevel(InfoSCSCP,4);
 
 #############################################################################
 #
@@ -118,9 +118,13 @@ end;
 
 # Simple procedures for tests and demos
 InstallSCSCPprocedure( "WS_Factorial", Factorial, "See ?Factorial in GAP", 1, 1 );
-InstallSCSCPprocedure( "WS_Size", function(a) return [Size(a)]; end, "See ?Size in GAP", 1, 1 );
+InstallSCSCPprocedure( "WS_Size", function(a) return Size(a); end, "See ?Size in GAP", 1, 1 );
 
+InstallSCSCPprocedure( "WS_GroupSize", function(L) return Size(Group(List(L, x -> PermList(x)))); end, "Group Size", 1, 1 );
+
+InstallSCSCPprocedure( "WS_Conjugator", function(L,C) cg := ConjugateGroup(Group(List(L, x -> PermList(x))), PermList(C)); return List(GeneratorsOfGroup(cg), x -> ListPerm(x)); end, "Group Size", 1, 1 );
 InstallSCSCPprocedure( "WS_Join", function(a,b) return [a,b]; end );
+
 
 InstallSCSCPprocedure( "CAJ_MinImage", CAJ_MinListImage , "Bla", 1, 1 ); 
 
