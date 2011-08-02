@@ -42,7 +42,7 @@ void CALLBACK TimerProc(void* ,  BOOLEAN)
 { *trig = true; }
 
 void CALLBACK ReallyStop(void*, BOOLEAN)
-{ exit(); }
+{ exit(1); }
     
 void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool CPU_time)
 {
