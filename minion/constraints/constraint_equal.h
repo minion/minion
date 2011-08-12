@@ -80,7 +80,6 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   ReifiedEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
-    std::cout << "Hello!" << std::endl;
     //CHECK(var3.getInitialMin() < 0, "Reification variables must have domain within {0,1}");
     //CHECK(var3.getInitialMax() > 1, "Reification variables must have domain within {0,1}");
   }
