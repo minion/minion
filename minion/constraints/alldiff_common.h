@@ -88,6 +88,13 @@ using namespace std;
 //#define P(x) cout << x << endl
 //#define PLONG
 
+#ifdef PHALLSETSIZE
+#undef PHALLSETSIZE
+#endif
+
+//#define PHALLSETSIZE(x) cout << x << endl
+#define PHALLSETSIZE(x)
+
 template<typename VarArray>
 struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
 {
@@ -310,6 +317,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             if(i!=prop_var && var_array[i].inDomain(assignedval))
             {
                 var_array[i].removeFromDomain(assignedval);
+                PHALLSETSIZE(1);
                 #if UseIncGraph
                     adjlist_remove(i, assignedval);
                 #endif
@@ -413,6 +421,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             if(i!=prop_var && var_array[i].inDomain(assignedval))
             {
                 var_array[i].removeFromDomain(assignedval);
+                PHALLSETSIZE(1);
                 #if UseIncGraph
                     adjlist_remove(i, assignedval);
                 #endif
@@ -649,6 +658,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                     {
                         P("Removing var: "<< SCCs[i] << " val:" << tempval);
                         var_array[SCCs[i]].removeFromDomain(tempval);
+                        PHALLSETSIZE(1);
                         #if UseIncGraph
                             adjlist_remove(SCCs[i], tempval);
                         #endif
@@ -1648,6 +1658,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                         if(var_array[curvar].inDomain(copynode+dom_min-numvars))
                                         {
                                             var_array[curvar].removeFromDomain(copynode+dom_min-numvars);
+                                            PHALLSETSIZE(var_indices.size()-varinlocalmatching.size());
                                             #if UseIncGraph
                                                 adjlist_remove(curvar, copynode-numvars+dom_min);
                                             #endif
