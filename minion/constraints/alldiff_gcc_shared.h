@@ -142,6 +142,16 @@ struct smallset_nolist
         membership[val]=0;
     }
     
+    // Use only in debugging/stats functions
+    inline int size()
+    {
+        int counter=0;
+        for(int i=0; i<membership.size(); i++) {
+            if(in(i)) counter++;
+        }
+        return counter;
+    }
+    
     inline void clear()
     {
         if(cert>2000000000)
