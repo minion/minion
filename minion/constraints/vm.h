@@ -47,9 +47,9 @@ struct VMConstraint : public AbstractConstraint
 #endif
   {
       if(_vars.size() != 5)
-	  FAIL_EXIT("Invalid constraint length");
+          FAIL_EXIT("Invalid constraint length");
       for(int i = 0; i < _vars.size(); ++i)
-	vars[i] = _vars[i];
+        vars[i] = _vars[i];
       if(_tuples->size() != 1)
       {
           cout << "VM takes a single tuple" << endl;
@@ -149,14 +149,14 @@ struct VMConstraint : public AbstractConstraint
                         InPtr = get(InPtr+2);
                 else
                         InPtr = get(InPtr+3);
-		if(InPtr == -3)
-			return;
+                if(InPtr == -3)
+                        return;
             }
             break;
             case -1100:
                 InPtr = get(InPtr+1);
-		if(InPtr == -3)
-			return;
+                if(InPtr == -3)
+                        return;
             break;
             case -2000:
                     FAIL_EXIT("Attempt to use 'perm' instruction in vm. Use vmsym");
