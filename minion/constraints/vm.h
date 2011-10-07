@@ -27,6 +27,9 @@
 
 #define SPECIAL_VM
 
+#define UseStatePtr false
+// UseStatePtr not finished:at least have to do the Jump instruction and also make sure the vm is not using Perm instructions.
+
 template<typename VarArray, bool UseSymmetricVM>
 struct VMConstraint : public AbstractConstraint
 {
@@ -38,10 +41,17 @@ struct VMConstraint : public AbstractConstraint
 
   int* VM_data;
   int VM_size;
+  
+  #if UseStatePtr
+  Reversible<int> StatePtr;
+  #endif
 
   VMConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
   AbstractConstraint(stateObj), 
   VM_data(_tuples->getPointer()), VM_size(_tuples->tuple_size())
+  #if UseStatePtr
+    ,StatePtr(stateObj, 0)
+  #endif
 #ifdef SPECIAL_VM
     ,constraint_locked(false)
 #endif
@@ -205,7 +215,15 @@ struct VMConstraint : public AbstractConstraint
     int vals[lits];
     int newvals[lits];
     int* perm = 0;
-
+    
+    #if UseStatePtr
+        D_ASSERT(StatePtr>=0 && StatePtr<length);
+        InPtr=StatePtr;
+        
+        // All choices above InPtr are fixed down this branch of search i.e you won't get a different answer when called again below this search node.
+        bool AllChoicesFixed=true;  
+    #endif
+    
     while(true)
     {
         if(InPtr == -3)
@@ -240,13 +258,28 @@ struct VMConstraint : public AbstractConstraint
                  P(" Jump based on " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
                 if(vars[varval.first].inDomain(varval.second))
                 {
-                    P(" True, jump to " << get(InPtr+2));  
+                    P(" True, jump to " << get(InPtr+2));
                     InPtr = get(InPtr+2);
+                    #if UseStatePtr
+                        if(AllChoicesFixed) {
+                            if(vars[varval.first].isAssigned()) {
+                                StatePtr=InPtr;
+                            }
+                            else {
+                                AllChoicesFixed=false;
+                            }
+                        }
+                    #endif
                 }
                 else
                 {
                     P(" False, jump to " << get(InPtr+3));
                     InPtr = get(InPtr+3);
+                    #if UseStatePtr
+                        if(AllChoicesFixed) {
+                            StatePtr=InPtr;
+                        }
+                    #endif
                 }
             }
             break;
