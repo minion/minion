@@ -14,5 +14,5 @@ t2=tree()
 t2.buildtree(f2)
 
 # change this to subset if you don't have gac
-print t1.equal(t2)
+print(t1.equal(t2))
 

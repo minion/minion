@@ -22,10 +22,10 @@ class sol:
     
     def equal(self, sol2):
         if not hasattr(sol2, "solution"):
-            print "Spurious node (should be a solution) in tree 2: node %d" %sol2.nodenum
+            print("Spurious node (should be a solution) in tree 2: node %d" %sol2.nodenum)
             return False
         if self.solution!=sol2.solution:
-            print "Solutions different:"+str(self.solution)+" "+str(sol2.solution)
+            print("Solutions different:"+str(self.solution)+" "+str(sol2.solution))
             return False
         else:
             return True
@@ -36,10 +36,10 @@ class sol:
             return self.equal(sol2)
         # sol2 is a node.
         if not sol2.solutionbelow():
-            print "Solution missing in tree 2 below node %d"%sol2.nodenum
+            print("Solution missing in tree 2 below node %d"%sol2.nodenum)
             return False
         if hasattr(sol2, "left") and hasattr(sol2, "right") and sol2.left.solutionbelow() and sol2.right.solutionbelow():
-            print "Too many solutions in tree 2 below node %d"%sol2.nodenum
+            print("Too many solutions in tree 2 below node %d"%sol2.nodenum)
             return False
         if hasattr(sol2, "left") and sol2.left.solutionbelow():
             return self.subset(sol2.left)
@@ -48,7 +48,7 @@ class sol:
             return self.subset(sol2.right)
         
     def solutionbelow(self):
-        #print "Superfluous solution: "+str(self.solution)
+        #print("Superfluous solution: "+str(self.solution))
         return True
     
     def outputdot(self, fileh):
@@ -85,33 +85,33 @@ class node:
             domaincount=domaincount+1
             if len(line)>0 and line[0]==",": line=line[1:]
             if False:
-                print "stored domain "+str((domaincount-1))+" "+str(self.domains[domaincount-1])
+                print("stored domain "+str((domaincount-1))+" "+str(self.domains[domaincount-1]))
         return True
     
     def equal(self, node2):
         # Compare the internal state here with the state of node2
         if not hasattr(node2, "domains"):
-            print "Node %d in tree 1 corresponds to solution in tree 2"%self.nodenum
+            print("Node %d in tree 1 corresponds to solution in tree 2"%self.nodenum)
             return False
         if self.domains!=node2.domains:
-            print "Domains not equal at node %d"%self.nodenum
+            print("Domains not equal at node %d"%self.nodenum)
             return False
         if self.nodenum!=node2.nodenum:
-            print "Different tree structure near nodes %d and %d"%(self.nodenum, node2.nodenum)
+            print("Different tree structure near nodes %d and %d"%(self.nodenum, node2.nodenum))
             return False
         if hasattr(self, "left")!=hasattr(node2, "left"):
-            print "Different tree structure (left branch) after node "+str(self.nodenum)
+            print("Different tree structure (left branch) after node "+str(self.nodenum))
             return False
         if hasattr(self, "right")!=hasattr(node2, "right"):
-            print "Different tree structure (right branch) after node "+str(self.nodenum)
+            print("Different tree structure (right branch) after node "+str(self.nodenum))
             return False
         if hasattr(self, "left"):
             if not self.left.equal(node2.left):
-                print "False on left branch"
+                print("False on left branch")
                 return False
         if hasattr(self, "right"):
             if not self.right.equal(node2.right):
-                print "False on right branch"
+                print("False on right branch")
                 return False
         return True
     
@@ -155,12 +155,12 @@ class node:
         
         if not hasattr(node2, "domains"):
             assert hasattr(node2, "solution")
-            print "Tree 2 reached a solution before tree 1, therefore the constraint is overpropagating."
-            print "This happened below node %d with solution %d" %(self.nodenum, node2.solnum)
+            print("Tree 2 reached a solution before tree 1, therefore the constraint is overpropagating.")
+            print("This happened below node %d with solution %d" %(self.nodenum, node2.solnum))
             return False
         
         if not subsetdomains(self.domains, node2.domains):
-            print "Domains not a subset when comparing nodes %d (in tree 1) and %d (in tree 2)"%(self.nodenum, node2.nodenum)
+            print("Domains not a subset when comparing nodes %d (in tree 1) and %d (in tree 2)"%(self.nodenum, node2.nodenum))
             return False
         
         if self.nodenum==0:   # special handling for weird node 0
@@ -168,7 +168,7 @@ class node:
             return self.left.subset(node2.left)
             
         if self.nodenum>node2.nodenum:
-            print "Problem with node numbers with nodes %d and %d"%(self.nodenum, node2.nodenum)
+            print("Problem with node numbers with nodes %d and %d"%(self.nodenum, node2.nodenum))
             return False
         
         # work out which value was instantiated for left in tree2
@@ -180,7 +180,7 @@ class node:
         if val1>val2:
             # need to descend the right branch of node2 while keeping the same position in tree1.
             if hasattr(node2, "left") and node2.left.solutionbelow():
-                print "Spurious solution below left branch from node %d in tree 2"%node2.nodenum
+                print("Spurious solution below left branch from node %d in tree 2"%node2.nodenum)
                 return False
             return self.subset(node2.right)
         
@@ -188,15 +188,15 @@ class node:
         # tree1 (because the variable is instantiated in tree 1)
         if val1==val2 and len(self.domains[var])==1:
             if hasattr(node2, "right") and node2.right.solutionbelow():
-                print "Spurious solution(s) below node %d in tree 2"%node2.nodenum
+                print("Spurious solution(s) below node %d in tree 2"%node2.nodenum)
                 return False
             return self.subset(node2.left)
         
         if hasattr(self, "left") and not hasattr(node2, "left"):
-            print "Node %d has left child (%d) in smaller tree, but node %d does not in larger tree."%(self.nodenum, self.left.nodenum, node2.nodenum)
+            print("Node %d has left child (%d) in smaller tree, but node %d does not in larger tree."%(self.nodenum, self.left.nodenum, node2.nodenum))
             return False
         if hasattr(self, "right") and not hasattr(node2, "right"):
-            print "Node %d has right child (%d) in smaller tree, but node %d does not in larger tree."%(self.nodenum, self.right.nodenum, node2.nodenum)
+            print("Node %d has right child (%d) in smaller tree, but node %d does not in larger tree."%(self.nodenum, self.right.nodenum, node2.nodenum))
             return False
         if hasattr(self, "left") and not self.left.subset(node2.left):
             return False
@@ -204,11 +204,11 @@ class node:
             return False
         if hasattr(node2, "left") and not hasattr(self, "left"):
             if node2.left.solutionbelow():
-                print "Spurious solution below node %d in tree 2"% node2.left.nodenum
+                print("Spurious solution below node %d in tree 2"% node2.left.nodenum)
                 return False
         if hasattr(node2, "right") and not hasattr(self, "right"):
             if node2.right.solutionbelow():
-                print "Spurious solution below node %d in tree 2"% node2.right.nodenum
+                print("Spurious solution below node %d in tree 2"% node2.right.nodenum)
                 return False
         return True
 
@@ -273,7 +273,7 @@ class tree:
                 newstring=rest.strip()+" "+rest2.strip()
                 splitlines[i:i+2]=[("Sol", newstring)]
         
-        #print "Entering buildtree"
+        #print("Entering buildtree")
         rootnode=False
         curnode=False
         curassign=False
@@ -344,14 +344,14 @@ class tree:
             if not curnode:
                 return
         if hasattr(curnode, "nodenum"):
-            print curnode.nodenum
+            print(curnode.nodenum)
         else:
-            print curnode.solution
+            print(curnode.solution)
         if hasattr(curnode, "left"):
-            print "left branch:"
+            print("left branch:")
             self.printtree(curnode.left)
         if hasattr(curnode, "right"):
-            print "right branch:"
+            print("right branch:")
             self.printtree(curnode.right)
     
     def outputdot(self, fileh):
@@ -361,7 +361,7 @@ class tree:
     
     def equal(self, tree2):
         if self.solvable!= tree2.solvable:
-            print "Problem 1 solvable: "+str(self.solvable)+", problem 2 solvable: "+str(tree2.solvable)
+            print("Problem 1 solvable: "+str(self.solvable)+", problem 2 solvable: "+str(tree2.solvable))
             return False
         if self.rootnode==False or tree2.rootnode==False:
             return self.rootnode==tree2.rootnode
@@ -369,7 +369,7 @@ class tree:
     
     def subset(self, tree2):
         if self.solvable!=tree2.solvable:
-            print "Problem 1 solvable: "+str(self.solvable)+", problem 2 solvable: "+str(tree2.solvable)
+            print("Problem 1 solvable: "+str(self.solvable)+", problem 2 solvable: "+str(tree2.solvable))
             return False
         if self.rootnode==False:
             if tree2.rootnode==False:
@@ -378,7 +378,7 @@ class tree:
                 return not tree2.rootnode.solutionbelow()
         else:
             if tree2.rootnode==False:
-                print "No nodes present in tree 2."
+                print("No nodes present in tree 2.")
                 return False
             else:
                 return self.rootnode.subset(tree2.rootnode)
@@ -626,7 +626,7 @@ class testlighttable:
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
         retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, tuplelist=negtuplestring, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
-            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
             return False
         return comparetrees(treesame)  # tree subset
 
@@ -740,7 +740,7 @@ class testnegativetable:
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
         retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, tuplelist=negtuplestring, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
-            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
             return False
         return comparetrees(treesame)  # tree subset
 
@@ -1631,7 +1631,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
         retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
-            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
             return False
         if boundsallowed and modvars.rfind("SPARSEBOUND")!=-1:   
             # This is a temporary hack while sparsebound does not print its domain properly.
@@ -1641,7 +1641,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'], cmd="-fullprop")
         retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
-            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
             return False
         if boundsallowed and modvars.rfind("SPARSEBOUND")!=-1:   
             # This is a temporary hack while sparsebound does not print its domain properly.
@@ -1654,7 +1654,7 @@ def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist
     file1.close()
     cmd=minionbin+" -dumptree -findallsols "+cmd+" "+filename+" >"+outfilename
     if printcmd:
-        print "Executing command: "+cmd
+        print("Executing command: "+cmd)
     return os.system(cmd)
 
 def generatevariables(varblocks, types, boundallowed):

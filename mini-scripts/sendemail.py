@@ -6,7 +6,7 @@ from email.MIMEText import MIMEText
 
 def mail(txt, subject="Minion testing error report"):
     # Create a text/plain message
-    print "Attempting to send email."
+    print("Attempting to send email.")
     succeeded=False
     for i in range(5):
         try:
@@ -27,10 +27,10 @@ def mail(txt, subject="Minion testing error report"):
             succeeded=True
             break
         except:
-            print "An error occurred when attempting to send email."
+            print("An error occurred when attempting to send email.")
             
     if succeeded:
-        print "Succeeded in sending email."
+        print("Succeeded in sending email.")
     else:
-        print "Failed to send email."
+        print("Failed to send email.")
         

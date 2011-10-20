@@ -13,13 +13,13 @@ import sys, os, getopt
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["gcc", "occurrence", "q=", "lambda=", "d=", "numcodes=", "implied", "table", "fillin", "fillingcc", "scalarprod", "snakelex", "snakeorder"])
 
 if len(other)!=1:
-    print "Usage: efpa-generator.py --q=<alphabet size>"
-    print "--lambda=<number of each symbol in each codeword>"
-    print "--d=<Hamming distance between pairs of codewords>"
-    print "--numcodes=<number of codewords>"
-    print "--occurrence (use occurrence constraints, recommended)"
-    print "--gcc (use GCC constraints, not recommended)"
-    print "--implied (add "
+    print("Usage: efpa-generator.py --q=<alphabet size>")
+    print("--lambda=<number of each symbol in each codeword>")
+    print("--d=<Hamming distance between pairs of codewords>")
+    print("--numcodes=<number of codewords>")
+    print("--occurrence (use occurrence constraints, recommended)")
+    print("--gcc (use GCC constraints, not recommended)")
+    print("--implied (add ")
     
     sys.exit(1)
 
@@ -68,41 +68,41 @@ for i in optargs:
     elif a1=="--snakeorder":
         snakeorder=True
 
-print "MINION 3"
-print "**VARIABLES**"
+print("MINION 3")
+print("**VARIABLES**")
 
-print "DISCRETE codes[%d, %d] {0..%d}"%(numcodes, q*lam, q-1)
+print("DISCRETE codes[%d, %d] {0..%d}"%(numcodes, q*lam, q-1))
 
 if tables:
-    print "**TUPLELIST**"
-    print "reifydiseq %d 3"% (q*q)
+    print("**TUPLELIST**")
+    print("reifydiseq %d 3"% (q*q))
     for i in range(q):
         for j in range(q):
             if i==j:
                 t=0
             else:
                 t=1
-            print "%d %d %d" % (i, j, t)
+            print("%d %d %d" % (i, j, t))
 
-print "**CONSTRAINTS**"
+print("**CONSTRAINTS**")
 
 #for i in range(numcodes-1):
-#    print "hamming([codes[%d,_]], [codes[%d,_]], %d)"%(i, i+1, d)
+#    print("hamming([codes[%d,_]], [codes[%d,_]], %d)"%(i, i+1, d))
 
 boolmap=dict()
 count =0
 for i in range(numcodes):
     for k in range(i+1, numcodes):
-        print "**VARIABLES**"
-        print "BOOL diff%d[%d]"%(count, q*lam)
-        print "**CONSTRAINTS**"
-        print "sumleq([diff%d], %d)"%(count, d)
-        print "sumgeq([diff%d], %d)"%(count, d)
+        print("**VARIABLES**")
+        print("BOOL diff%d[%d]"%(count, q*lam))
+        print("**CONSTRAINTS**")
+        print("sumleq([diff%d], %d)"%(count, d))
+        print("sumgeq([diff%d], %d)"%(count, d))
         for j in range(q*lam):
             if not tables:
-                print "reify(diseq(codes[%d, %d], codes[%d, %d]), diff%d[%d])"%(i, j, k, j, count, j)
+                print("reify(diseq(codes[%d, %d], codes[%d, %d]), diff%d[%d])"%(i, j, k, j, count, j))
             else:
-                print "table([codes[%d, %d], codes[%d, %d], diff%d[%d]], reifydiseq)"%(i, j, k, j, count, j)
+                print("table([codes[%d, %d], codes[%d, %d], diff%d[%d]], reifydiseq)"%(i, j, k, j, count, j))
         boolmap[(i,k)]=count
         boolmap[(k,i)]=count
         count+=1
@@ -117,19 +117,19 @@ if implied:
                     for s in range(q*lam):
                         # now we have three bools. If i and j are set to 0, the other
                         # should be set to 0.
-                        print "reifyimply(sumgeq([diff%d[%d], diff%d[%d]], 1), diff%d[%d])"%(boolmap[(i,j)], s, boolmap[(j,k)], s, boolmap[(i,k)], s)
+                        print("reifyimply(sumgeq([diff%d[%d], diff%d[%d]], 1), diff%d[%d])"%(boolmap[(i,j)], s, boolmap[(j,k)], s, boolmap[(i,k)], s))
 
 implied2=False  
 if implied2:
     # appears to make no difference.
-    print "gcc([codes], %s, %s)"%(str([i for i in range(q)]), str([lam*numcodes for i in range(q)]))
+    print("gcc([codes], %s, %s)"%(str([i for i in range(q)]), str([lam*numcodes for i in range(q)])))
 
 for i in range(numcodes):
     if gcc:
-        print "gcc([codes[%d,_]], %s, %s)"%(i, str(range(q)), str([lam for j in range(q)]))
+        print("gcc([codes[%d,_]], %s, %s)"%(i, str(range(q)), str([lam for j in range(q)])))
     if occurrence:
         for val in range(q):
-            print "occurrence([codes[%d,_]], %d, %d)"%(i, val, lam)
+            print("occurrence([codes[%d,_]], %d, %d)"%(i, val, lam))
 
 if snakelex:
     m0="codes"  # name of the matrix to act on.
@@ -199,18 +199,18 @@ if snakelex:
             else:
                 output += m0+"["+str(j) +","+str(i)+"],"
         output = output[:-1]+"])\n"
-    print output
+    print(output)
 else:
     # add double-lex symmetry breaking.
     for i in range(numcodes-1):
-        print "lexless([codes[%d,_]], [codes[%d,_]])"%(i, i+1)
+        print("lexless([codes[%d,_]], [codes[%d,_]])"%(i, i+1))
     
     for i in range(q*lam -1):
-        print "lexleq([codes[_,%d]], [codes[_,%d]])"%(i, i+1)
+        print("lexleq([codes[_,%d]], [codes[_,%d]])"%(i, i+1))
 
 #Fill in the first row.
 for i in range(q*lam):
-    print "eq(codes[0, %d], %d)"%(i, i//lam)
+    print("eq(codes[0, %d], %d)"%(i, i//lam))
 
 if fillins:
     # Fill in parts of the second row based on lambda and d
@@ -220,63 +220,63 @@ if fillins:
         for i in range(q):
             if i==0:
                 for j in range(fillin):
-                    print "eq(codes[1, %d], %d)"%(i*lam+j, i)
+                    print("eq(codes[1, %d], %d)"%(i*lam+j, i))
             elif i==q-1:
                 for j in range(fillin):
-                    print "eq(codes[1, %d], %d)"%((i+1)*lam-j-1, i)
+                    print("eq(codes[1, %d], %d)"%((i+1)*lam-j-1, i))
             else:
                 v=""
                 for j in range(lam): v+="codes[1, %d],"%(i*lam+j)
-                print "occurrencegeq([%s], %d, %d)"%(v[:-1], i, fillin)
+                print("occurrencegeq([%s], %d, %d)"%(v[:-1], i, fillin))
         for i in range(q):
                 v=""
                 for j in range(lam): v+="codes[1, %d],"%(i*lam+j)
-                print "occurrencegeq([%s], %d, %d)"%(v[:-1], i, fillin)
+                print("occurrencegeq([%s], %d, %d)"%(v[:-1], i, fillin))
         # all other rows
         for row in range(1, numcodes):
             if fillingcc:
-                print "**VARIABLES**"
-                print "DISCRETE cap%d[%d, %d] {%d..%d}"%(row, q, q, 0, lam)
+                print("**VARIABLES**")
+                print("DISCRETE cap%d[%d, %d] {%d..%d}"%(row, q, q, 0, lam))
                 # cap<row num>[<block>,<value>] is the number of value in the block
-                print "**CONSTRAINTS**"
+                print("**CONSTRAINTS**")
             ## join the q gccs together through the cap variables.
             for i in range(q):
                 v=""
                 for j in range(lam): v+="codes[%d, %d],"%(row, i*lam+j)
                 if fillingcc:
-                    print "gcc([%s], %s, cap%d[%d,_])"%(v[:-1], str([dx for dx in range(q)]), row, i)
-                    print "ineq(%d, cap%d[%d, %d], 0)"%(fillin, row, i, i)
-                    print "sumleq([cap%d[_,%d]], %d)"%(row, i, lam)
-                    print "sumgeq([cap%d[_,%d]], %d)"%(row, i, lam)
+                    print("gcc([%s], %s, cap%d[%d,_])"%(v[:-1], str([dx for dx in range(q)]), row, i))
+                    print("ineq(%d, cap%d[%d, %d], 0)"%(fillin, row, i, i))
+                    print("sumleq([cap%d[_,%d]], %d)"%(row, i, lam))
+                    print("sumgeq([cap%d[_,%d]], %d)"%(row, i, lam))
                 else:
-                    print "occurrencegeq([%s], %d, %d)"%(v[:-1], i, fillin)
+                    print("occurrencegeq([%s], %d, %d)"%(v[:-1], i, fillin))
 
 if scalarprod:
     # for each row, Make a 0/1 vector for the occurrence of each value in the row
-    print "**VARIABLES**"
-    print "BOOL occs[%d, %d, %d]"%(numcodes, q, q*lam)
-    print "**CONSTRAINTS**"
+    print("**VARIABLES**")
+    print("BOOL occs[%d, %d, %d]"%(numcodes, q, q*lam))
+    print("**CONSTRAINTS**")
     # occs[<row>, <value>, <row index>]
     
     for row in range(numcodes):
         for val in range(q):
             for pos in range(q*lam):
                 # channel
-                print "reify(eq(codes[%d, %d], %d),occs[%d, %d, %d])"%(row, pos, val, row, val, pos)
+                print("reify(eq(codes[%d, %d], %d),occs[%d, %d, %d])"%(row, pos, val, row, val, pos))
     
     # for each pair of rows, and each value.
     # do the funky thang.
     for row1 in range(numcodes):
         for row2 in range(row1+1, numcodes):
-            print "**VARIABLES**"
-            print "BOOL product_%d_%d[%d, %d]"%(row1, row2, q, q*lam)
-            print "**CONSTRAINTS**"
+            print("**VARIABLES**")
+            print("BOOL product_%d_%d[%d, %d]"%(row1, row2, q, q*lam))
+            print("**CONSTRAINTS**")
             for val in range(q):
                 for pos in range(q*lam):
-                    print "product(occs[%d, %d, %d], occs[%d, %d, %d], product_%d_%d[%d,%d])"%(row1, val, pos, row2, val, pos, row1, row2, val, pos)
-                print "sumgeq([product_%d_%d[%d,_]], %d)"%(row1, row2, val, lam-(d//2))
+                    print("product(occs[%d, %d, %d], occs[%d, %d, %d], product_%d_%d[%d,%d])"%(row1, val, pos, row2, val, pos, row1, row2, val, pos))
+                print("sumgeq([product_%d_%d[%d,_]], %d)"%(row1, row2, val, lam-(d//2)))
     
-print "**SEARCH**"
+print("**SEARCH**")
 
 #rows
 if snakeorder:
@@ -295,33 +295,33 @@ if snakeorder:
     for i in range(count):
         output+= ",diff%d"%i
     output+="]\n"
-    print output
+    print(output)
 
 if not snakeorder:
-    print "VARORDER [codes"
+    print("VARORDER [codes")
     for i in range(count):
-        print ",diff%d"%i
+        print(",diff%d"%i)
     if scalarprod:
-        print ",occs"
+        print(",occs")
         for row1 in range(numcodes):
             for row2 in range(row1+1, numcodes):
-                print ",product_%d_%d"%(row1, row2)
-    print "]"
+                print(",product_%d_%d"%(row1, row2))
+    print("]")
 
 #columns
-#print "VARORDER ["
+#print("VARORDER [")
 #for i in range(q*lam-1):
-#    print "codes[_,%d],"%i 
-#print "codes[_,%d]]"%(q*lam-1)
+#    print("codes[_,%d],"%i )
+#print("codes[_,%d]]"%(q*lam-1))
 
 #aux vars columnwise
-#print "VARORDER ["
+#print("VARORDER [")
 #st=""
 #for i in range(q*lam):
 #    for j in range(numcodes):
 #        for k in range(j+1, numcodes):
 #            st+= "diff%d[%d],"%(boolmap[(j,k)], i)
-#print st+"codes]"
+#print(st+"codes]")
 
 # zigzag rows starting at row 2
 #st=""
@@ -333,12 +333,12 @@ if not snakeorder:
 #    else:
 #        for j in range(q*lam-1, -1, -1):
 #            st+="codes[%d, %d],"%(i, j)
-#print "VARORDER [%s"%(st)
+#print("VARORDER [%s"%(st))
 #for i in range(count-1):
-#    print "diff%d,"%i
-#print "diff%d]"%(count-1)
+#    print("diff%d,"%i)
+#print("diff%d]"%(count-1))
 
-print "PRINT [codes]"
+print("PRINT [codes]")
 
-print "**EOF**"
+print("**EOF**")
 

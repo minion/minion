@@ -27,7 +27,7 @@ def print_var(tuple, domainsize):
 def print_constraint(TupleList, name, domainsize) :
 #    print TupleList
     varlist = zip(*TupleList)
-    print "table([" + ', '.join([print_var(a, domainsize) for a in varlist]) + "], " + name + ")"
+    print("table([" + ', '.join([print_var(a, domainsize) for a in varlist]) + "], " + name + ")")
 
 
 
@@ -39,17 +39,17 @@ def generate_constraint(CurrentTupleList, ConstraintTupleList):
    return returnList
 
 def generate_indicator(ConstraintList, domainsize, indicatorsize, check_idempotent = True):
-  print "MINION 3"
-  print "**VARIABLES**"
-  print "DISCRETE V[%d] {0..%d}" % ( domainsize ** indicatorsize, domainsize - 1)
-  print "**TUPLELIST**"
+  print("MINION 3")
+  print("**VARIABLES**")
+  print("DISCRETE V[%d] {0..%d}" % ( domainsize ** indicatorsize, domainsize - 1))
+  print("**TUPLELIST**")
   
   for i in range(len(ConstraintList)):
-    print "Table%d %d %d" % (i, len(ConstraintList[i]), len(ConstraintList[i][0]))
+    print("Table%d %d %d" % (i, len(ConstraintList[i]), len(ConstraintList[i][0])))
     for tuple in ConstraintList[i]:
-      print " ".join(["%d" % t for t in tuple])
+      print(" ".join(["%d" % t for t in tuple]))
   
-  print "**CONSTRAINTS**"
+  print("**CONSTRAINTS**")
 
   for i in range(len(ConstraintList)):
       Constraint = ConstraintList[i]
@@ -61,8 +61,8 @@ def generate_indicator(ConstraintList, domainsize, indicatorsize, check_idempote
         print_constraint(p, "Table%d" % i, domainsize)
   if check_idempotent:
     for i in range(domainsize):
-      print "eq(V[%d], %d)" % (list_to_int([i]*indicatorsize, domainsize), i)
-  print "**EOF**"
+      print("eq(V[%d], %d)" % (list_to_int([i]*indicatorsize, domainsize), i))
+  print("**EOF**")
 
 def build_table(X, domain_size, arity):
   return filter(X, product(range(domain_size), repeat = arity))

@@ -12,7 +12,7 @@ import time
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit", "procs=", "seed=", "conslist="])
 
 if len(other)>1:
-    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email] [--procs=...] [--seed=...] [--conslist=...]"
+    print("Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email] [--procs=...] [--seed=...] [--conslist=...]")
     sys.exit(1)
 
 # This one tests all the constraints in the following list.
@@ -114,7 +114,7 @@ for procNum in range(procs):
         sys.stdout = os.fdopen(w, 'w')
         offset = procNum * (len(conslist) // procs)
         for consname1 in conslist[offset:(offset + num)]:
-            print "Testing %s, seed %i, time: %s"%(consname1, seed, time.asctime())
+            print("Testing %s, seed %i, time: %s"%(consname1, seed, time.asctime()))
             starttime=time.time()
             sys.stdout.flush()
             random.seed(seed)
@@ -136,10 +136,10 @@ for procNum in range(procs):
             for testnum in range(numtests):
                 options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False, 'fixlength':False, 'getsatisfyingassignment':True}
                 if not testobj.runtest(options):
-                    print "Failed when testing %s"%consname1
+                    print("Failed when testing %s"%consname1)
                     sys.stdout.flush()
                     sys.exit(1)
-            print "Completed testing %s, time: %s, duration: %d"%(consname1, time.asctime(), time.time()-starttime)
+            print("Completed testing %s, time: %s, duration: %d"%(consname1, time.asctime(), time.time()-starttime))
         sys.stdout.close()
         sys.exit(0)
 
@@ -163,10 +163,10 @@ for worker, reader in zip(workers, readers):
                 mailstring+="Testing 64bit variant.\n"
             mailstring+="Using binary %s\n"%minionbin
             mail(mailstring)
-        print "Test failed"
+        print("Test failed")
         sys.exit(1)
 
-print "Test succeeded"
+print("Test succeeded")
 # if we got here, send an email indicating success.
 if email:
     mailstring="Mail from testallconstraints.py.\n"

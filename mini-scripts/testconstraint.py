@@ -10,7 +10,7 @@ import random
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "fullprop", "seed="])
 
 if len(other)!=2:
-    print "Usage: testconstraint.py [--minion=<location of minion binary>] [--numtests=...] [--fullprop] constraintname"
+    print("Usage: testconstraint.py [--minion=<location of minion binary>] [--numtests=...] [--fullprop] constraintname")
     sys.exit(1)
 
 numtests=10000
@@ -47,7 +47,7 @@ consname=consname.replace("-", "__minus__")
 testobj=eval("test"+consname+"()")
 testobj.solver=minionbin
 for testnum in range(numtests):
-    print "Test number %d"%(testnum)
+    print("Test number %d"%(testnum))
     options={'reify':reify, 'reifyimply':reifyimply, 'fullprop':fullprop, 'printcmd':True, 'fixlength':False, 'getsatisfyingassignment':True}
     if not testobj.runtest(options):
         sys.exit(0)
