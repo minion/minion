@@ -89,9 +89,7 @@ struct DivConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    if(!var2.isBound()) {
-      var2.removeFromDomain(0);
-    }
+    var2.setMin(1);   // oBVIOUSLY only works because it's all non-negative.
       
     propagate(1,0); 
     propagate(2,0);
@@ -104,6 +102,8 @@ struct DivConstraint : public AbstractConstraint
   virtual BOOL check_assignment(DomainInt* v, int v_size)
   {
     D_ASSERT(v_size == 3);
+    if(v[1] == 0)
+        return false;
     return v[0] / v[1] == v[2];
   }
   
@@ -124,7 +124,7 @@ struct DivConstraint : public AbstractConstraint
      {
        for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2)
        {
-         if(var2.inDomain(v2) && var3.inDomain(v1 / v2))
+         if(var2.inDomain(v2) && v2 != 0 && var3.inDomain(v1 / v2))
          {
            assignment.push_back(make_pair(0, v1));
            assignment.push_back(make_pair(1, v2));
