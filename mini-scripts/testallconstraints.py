@@ -5,7 +5,7 @@
 import sys, os, getopt
 from constraint_test_common import *
 import random
-from sendemail import *
+#from sendemail import *
 from string import split
 import time
 
@@ -162,7 +162,7 @@ for worker, reader in zip(workers, readers):
             if bit64:
                 mailstring+="Testing 64bit variant.\n"
             mailstring+="Using binary %s\n"%minionbin
-            mail(mailstring)
+            print(mailstring)
         print("Test failed")
         sys.exit(1)
 
@@ -176,6 +176,6 @@ if email:
     if bit64:
         mailstring+="Testing 64bit variant.\n"
     
-    mail(mailstring, subject="Minion test successful.")
+    print(mailstring)
     
 
