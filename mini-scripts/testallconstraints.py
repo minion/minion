@@ -6,7 +6,6 @@ import sys, os, getopt
 from constraint_test_common import *
 import random
 #from sendemail import *
-from string import split
 import time
 
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit", "procs=", "seed=", "conslist="])
@@ -94,7 +93,7 @@ for i in optargs:
     elif a1=="--seed":
         seed=int(a2)
     elif a1=="--conslist":
-        conslist=split(a2, ",")
+        conslist=a2.split(",")
 
 workers = []
 readers = []
