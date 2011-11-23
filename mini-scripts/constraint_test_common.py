@@ -1751,7 +1751,7 @@ def generatevariables(varblocks, types, boundallowed):
             if ty=="SPARSEBOUND ":
                 # take a random subset between lb and ub
                 dom=random.sample(range(lb, ub+1), max((ub-lb)/2, 1))
-                dom.sort(cmp)
+                dom.sort()
                 domainlists.append(dom)
                 strdom=""
                 for j in dom[:-1]:
@@ -1785,13 +1785,22 @@ def generatevariables(varblocks, types, boundallowed):
     # orders in minion's dumptree output.
     deco=zip(st_nontable.strip().split("\n"), st_table.strip().split("\n"))
     
-    def comparefunc(x,y):   # sort in order: bool, bound, sparsebound, discrete
-        t1=x[0][:4]
-        t2=y[0][:4]
-        dic={"BOOL":1, "BOUN":2, "SPAR":3, "DISC":4}
-        return dic[t1]-dic[t2]
+    # decorate the list with a key from dic.
+    dic={"BOOL":1, "BOUN":2, "SPAR":3, "DISC":4}
     
-    deco.sort(cmp=comparefunc)
+    deco2=list(zip( map(lambda x: dic[x[0][:4]], deco), deco))
+    
+    #def comparefunc(x,y):   # sort in order: bool, bound, sparsebound, discrete
+    #    t1=x[0][:4]
+    #    t2=y[0][:4]
+    #    dic={"BOOL":1, "BOUN":2, "SPAR":3, "DISC":4}
+    #    return dic[t1]-dic[t2]
+    
+    deco2.sort()
+    
+    # get rid of the index decoration.
+    (throwaway, deco)=zip(*deco2)
+    
     st_nontable=reduce(lambda x,y:x+"\n"+y, [i[0] for i in deco])+"\n"
     st_table=reduce(lambda x,y:x+"\n"+y, [i[1] for i in deco])+"\n"
     return (domainlists, st_nontable, st_table, constants, constraints)

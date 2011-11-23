@@ -99,6 +99,9 @@ void assert_function(BOOL x, const char* a, const char* f, int line);
 // Unlike Asserts, Checks are always enabled.
 #define CHECK(x, y) {assert_function(x, y, __FILE__, __LINE__);}
 
+// Check a value doesn't overflow, to be used in ctor of cts 
+#define CHECKSIZE( x, message ) CHECK( x <= ((BigInt) (1<<30)) && x>= ((BigInt) -(1<<30)) , message )
+
 #ifdef MINION_DEBUG
 
 #define BOUNDS_CHECK

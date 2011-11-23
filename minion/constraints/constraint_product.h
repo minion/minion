@@ -51,7 +51,14 @@ struct ProductConstraint : public AbstractConstraint
   VarRef3 var3;
   ProductConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
-  { }
+  {
+      CHECKSIZE(  ((BigInt)var1.getInitialMax())*((BigInt)var2.getInitialMax()) , "Magnitude of domain bounds is too large in product constraint");
+      CHECKSIZE(  ((BigInt)var1.getInitialMin())*((BigInt)var2.getInitialMin()) , "Magnitude of domain bounds is too large in product constraint");
+      
+      CHECKSIZE(  ((BigInt)var1.getInitialMax())*((BigInt)var2.getInitialMin()) , "Magnitude of domain bounds is too large in product constraint");
+      CHECKSIZE(  ((BigInt)var1.getInitialMin())*((BigInt)var2.getInitialMax()) , "Magnitude of domain bounds is too large in product constraint");
+      
+  }
   
   virtual triggerCollection setup_internal()
   {
