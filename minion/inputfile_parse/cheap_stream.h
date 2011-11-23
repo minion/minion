@@ -125,10 +125,13 @@ public:
 };
 
 
-void operator>>(CheapStream& cs, int& i)
+void operator>>(CheapStream& cs, int& ret)
 {
     int neg_flag = 1;
     
+    long long i;
+    long long limit = 1 << 30;
+
     // Set initial value
     i = 1;
     while(isspace(cs.peek()))
@@ -143,7 +146,6 @@ void operator>>(CheapStream& cs, int& i)
     if(cs.peek() >= '0' && cs.peek() <= '9')
     {
         i *= (cs.get() - '0');
-        P(": " << i);
     }
     else
     {
@@ -155,10 +157,16 @@ void operator>>(CheapStream& cs, int& i)
     {
         char c = cs.get();
         i = i * 10 + c - '0';
+        if(i > limit)
+        {
+            std::cerr << "Magnitude of number too large!\n";
+            cs.fail_flag = true;
+            return;
+        }
         P(": '" << c << "' :" << i);
     }
     
-    i *= neg_flag;
+    ret = i * neg_flag;
     P(">>int Got: " << i);
 }
 
