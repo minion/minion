@@ -113,22 +113,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
             
             for(unsigned j = 0; j < instance.search_order[i].val_order.size(); ++j)
             {
-              ValOrderEnum valo = VALORDER_ASCEND;
-              switch(rand() % 3)
-              {
-                case 0:
-                  valo = VALORDER_ASCEND;
-                  break;
-                case 1:
-                  valo = VALORDER_DESCEND;
-                  break;
-                case 2:
-                  valo = VALORDER_RANDOM;
-                  break;
-                default:
-                  abort();
-              }
-              instance.search_order[i].val_order[j] = valo;
+              instance.search_order[i].val_order[j] = VALORDER_RANDOM;
             }
         }
     }
