@@ -57,15 +57,14 @@ struct PowConstraint : public AbstractConstraint
   PowConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
-  
-      if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
-         var3.getInitialMin() < 0)
-      { 
-          FAIL_EXIT("The 'pow' constraint only supports non-negative numbers at present.");
-      }
-      if(var2.getInitialMin()==0)
-      {
-          FAIL_EXIT("The 'pow' constraint (x^y = z) does not allow y to contain 0, to avoid the case 0^0.");
+      CHECK( (var1.getInitialMin() >=0 && var2.getInitialMin() >= 0 && var3.getInitialMin() >= 0), "The 'pow' constraint only supports non-negative numbers at present.");
+      CHECK( var2.getInitialMin()!=0, "The 'pow' constraint (x^y = z) does not allow y to contain 0, to avoid the case 0^0.");
+      
+      BigInt pow=1;
+      
+      for(int i=0; i<var2.getInitialMax(); i++) {
+          pow=pow*var1.getInitialMax();
+          CHECKSIZE(pow, "Magnitude of domain bounds is too large in 'pow' constraint.");
       }
   }
   

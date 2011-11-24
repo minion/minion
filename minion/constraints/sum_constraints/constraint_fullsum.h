@@ -67,6 +67,14 @@ struct LessEqualSumConstraint : public AbstractConstraint
     AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), max_looseness(_stateObj), 
     var_array_min_sum(_stateObj)
   {
+      BigInt accumulator=0;
+      for(int i=0; i<var_array.size(); i++) {
+          accumulator+= max( abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin()) );
+          CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
+      }
+      accumulator+= max( abs(var_sum.getInitialMax()), abs(var_sum.getInitialMin()) );
+      CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
+      
     no_negatives = true;
     for(int i = 0; i < var_array.size(); ++i)
     {
