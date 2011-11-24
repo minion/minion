@@ -1664,8 +1664,8 @@ def generatevariables(varblocks, types, boundallowed):
     # sum(varblocks) is the total number of variables/constants.
     # types specifies num, posnum, nonnegnum or boolean for each block
     # boundallowed specifies if it is appropriate to have bound variables.
-    st_nontable=""
-    st_table=""
+    st_nontable=[]
+    st_table=[]
     domainlists=[]
     constants=[]
     typesconst=["const", "smallconst", "smallconst_distinct"]
@@ -1757,23 +1757,23 @@ def generatevariables(varblocks, types, boundallowed):
                 for j in dom[:-1]:
                     strdom+=str(j)+","
                 strdom+=str(dom[-1])
-                st_nontable+=ty+"x%d {%s}\n"%(varnum, strdom)
-                st_table+="DISCRETE x%d {%d..%d}\n"%(varnum, lb, ub)
+                st_nontable.append(ty+"x%d {%s}"%(varnum, strdom))
+                st_table.append("DISCRETE x%d {%d..%d}"%(varnum, lb, ub))
                 for val in range(lb, ub+1):
                     if val not in dom:
                         # Make a constraint for the Table version to remove the spurious value.
                         constraints+=["diseq(x%d, %d)"%(varnum, val)]
             elif ty=="BOOL ":
-                st_nontable+=ty+"x%d\n"%(varnum)
-                st_table   +=ty+"x%d\n"%(varnum)
+                st_nontable.append(ty+"x%d"%(varnum))
+                st_table.append(ty+"x%d"%(varnum))
                 domainlists.append([0,1])
             elif ty=="BOUND ":
-                st_nontable+=ty+"x%d {%d..%d}\n"%(varnum, lb, ub)
-                st_table+="DISCRETE x%d {%d..%d}\n"%(varnum, lb, ub)
+                st_nontable.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
+                st_table.append("DISCRETE x%d {%d..%d}"%(varnum, lb, ub))
                 domainlists.append(range(lb, ub+1))
             elif ty=="DISCRETE ":
-                st_nontable+=ty+"x%d {%d..%d}\n"%(varnum, lb, ub)
-                st_table   +=ty+"x%d {%d..%d}\n"%(varnum, lb, ub)
+                st_nontable.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
+                st_table.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
                 domainlists.append(range(lb, ub+1))
             else:
                 # a constant type. Do not append to domainlists
@@ -1783,11 +1783,10 @@ def generatevariables(varblocks, types, boundallowed):
     # co-sort the lines of st_nontable and st_table
     # This is to avoid the problem of variables coming out in different
     # orders in minion's dumptree output.
-    deco=zip(st_nontable.strip().split("\n"), st_table.strip().split("\n"))
+    deco=zip(st_nontable, st_table)
     
     # decorate the list with a key from dic.
     dic={"BOOL":1, "BOUN":2, "SPAR":3, "DISC":4}
-    
     deco2=list(zip( map(lambda x: dic[x[0][:4]], deco), deco))
     
     #def comparefunc(x,y):   # sort in order: bool, bound, sparsebound, discrete
@@ -1799,7 +1798,10 @@ def generatevariables(varblocks, types, boundallowed):
     deco2.sort()
     
     # get rid of the index decoration.
-    (throwaway, deco)=zip(*deco2)
+    if len(deco2)>0:
+        (throwaway, deco)=zip(*deco2)
+    else:
+        deco=[("","")]   # initial value, to avoid problem with reduce.
     
     st_nontable=reduce(lambda x,y:x+"\n"+y, [i[0] for i in deco])+"\n"
     st_table=reduce(lambda x,y:x+"\n"+y, [i[1] for i in deco])+"\n"
