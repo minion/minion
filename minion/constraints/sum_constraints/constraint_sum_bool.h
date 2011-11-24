@@ -43,7 +43,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
           accumulator+= max( abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin()) );
           CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
       }
-      accumulator+= max( abs(var_sum.getInitialMax()), abs(var_sum.getInitialMin()) );
+      accumulator+= abs(var_sum );
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
       
       
