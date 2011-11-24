@@ -60,12 +60,13 @@ struct PowConstraint : public AbstractConstraint
       CHECK( (var1.getInitialMin() >=0 && var2.getInitialMin() >= 0 && var3.getInitialMin() >= 0), "The 'pow' constraint only supports non-negative numbers at present.");
       CHECK( var2.getInitialMin()!=0, "The 'pow' constraint (x^y = z) does not allow y to contain 0, to avoid the case 0^0.");
       
-      BigInt pow=1;
-      
-      for(int i=0; i<var2.getInitialMax(); i++) {
-          pow=pow*var1.getInitialMax();
-          CHECKSIZE(pow, "Magnitude of domain bounds is too large in 'pow' constraint.");
-      }
+      // Take this check out for now; it seems to be too restrictive. The propagator
+      // uses doubles anyway so integer overflow is not the problem.
+      //BigInt pow=1;
+      //for(int i=0; i<var2.getInitialMax(); i++) {
+      //    pow=pow*var1.getInitialMax();
+      //    CHECKSIZE(pow, "Magnitude of domain bounds is too large in 'pow' constraint.");
+      //}
   }
   
   virtual triggerCollection setup_internal()
