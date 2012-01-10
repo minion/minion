@@ -16,7 +16,6 @@ import cProfile
 import random
 sys.path.append("../python-scscp")
 from perms import GetMinimalImage, ValuePerm, VariablePerm, InvPerm, MultPerm, PadPerm, VariablePermSwapList
-
 nodenumcounter = 0
 domainsize = -1
 litcount   = -1
@@ -34,7 +33,7 @@ Group = [[1,2,3]]
 MinimalImages = {}
 EmptyKey = 'EmptyKey'
 EmptyNodes = {}
-
+EnableSymDetection = False
 matched = 0
 matchedprint = 10
 
@@ -307,14 +306,15 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         else:
             return True
     
-    perm = adddomain(domains_in, domains_poss, tree['nodelabel'])
-    if perm == EmptyKey:
-        #print('# Empty node found')
-        return False
-    if perm != False:
-        tree['perm'] = perm[1]
-        tree['goto'] = perm[0]
-        return True
+    if EnableSymDetection:
+        perm = adddomain(domains_in, domains_poss, tree['nodelabel'])
+        if perm == EmptyKey:
+            #print('# Empty node found')
+            return False
+        if perm != False:
+            tree['perm'] = perm[1]
+            tree['goto'] = perm[0]
+            return True
 
     # Filter the tuple list again after pruning -- remove any tuples that are not valid
     
@@ -454,18 +454,18 @@ def old_print_tree(tree, indent="    "):
     if tree.has_key('left'):
         print indent+"if(var_array[%d].inDomain(%d))"%(tree['var'], tree['val'])
         print indent+"{"
-        print_tree(tree['left'], indent+"    ")
+        old_print_tree(tree['left'], indent+"    ")
         print indent+"}"
         if tree.has_key('right'):
             print indent+"else"
             print indent+"{"
-            print_tree(tree['right'], indent+"    ")
+            old_print_tree(tree['right'], indent+"    ")
             print indent+"}"
     else:
         if tree.has_key('right'):
             print indent+"if(!var_array[%d].inDomain(%d))"%(tree['var'], tree['val'])
             print indent+"{"
-            print_tree(tree['right'], indent+"    ")
+            old_print_tree(tree['right'], indent+"    ")
             print indent+"}"
     return
 
@@ -603,7 +603,7 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
 
 
 
-def print_tree(t):
+def vm_print_tree(t):
     ret = vm_tree(t, dict(), [], [])
 
     nodestarts = ret[0]
@@ -624,6 +624,17 @@ def print_tree(t):
       print(str(i) + " "),
 
 
+def choose_print_tree(t):
+    if EnableVMOutput:
+        vm_print_tree(t)
+    else:
+        old_print_tree(t)
+    print ""
+    print "# Depth: "+str(tree_cost(t))
+    print "# Number of nodes: "+str(tree_cost2(t))
+    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
+
+
 ################################################################################
 #
 #
@@ -640,7 +651,7 @@ def and_constraint():
     
     generate_tree(ct_nogoods, domains_init, False)
 
-    print_tree(t)
+    choose_print_tree(t)
 
 def sports_constraint():
     # Channelling constraint from sports scheduling 10
@@ -667,7 +678,7 @@ def sports_constraint():
     
     t=generate_tree(ct_nogoods, domains_init, True)
        
-    print_tree(t)
+    choose_print_tree(t)
 
 def sumgeqthree():
     # sumgeq-3 on 5 bool vars.
@@ -687,7 +698,8 @@ def sumgeqthree():
     domains_init=[[0,1],[0,1],[0,1], [0,1], [0,1]]
    
 
-    print_tree(generate_tree(nogoods, domains_init, True))
+    choose_print_tree(generate_tree(nogoods, domains_init, True))
+
 
 def BIBD():
     # sumgeq-3 on 5 bool vars.
@@ -711,7 +723,7 @@ def BIBD():
     domains_init=[[0,1] for i in range(14)]
    
 
-    print_tree(generate_tree(nogoods, domains_init, True))
+    choose_print_tree(generate_tree(nogoods, domains_init, True))
 
 
 def pegsol():
@@ -733,7 +745,7 @@ def pegsol():
     
     domains_init=[[0,1],[0,1],[0,1], [0,1], [0,1], [0,1], [0,1]]
     t=generate_tree(nogoods, domains_init, True)
-    print_tree(t)
+    choose_print_tree(t)
     print ""
     print "# Depth: "+str(tree_cost(t))
     print "# Number of nodes: "+str(tree_cost2(t))
@@ -754,9 +766,8 @@ def sokoban():
     domains_init=[range(n*n),[-n, -1, 1, n], range(n*n)]
     
     t=generate_tree(nogoods, domains_init, True)
-    print_tree(t)
-    print "Depth: "+str(tree_cost(t))
-    print "Number of nodes: "+str(tree_cost2(t))
+    choose_print_tree(t)
+
 
 def binseq():
     # Constraint for low autocorrelation binary sequences
@@ -771,10 +782,7 @@ def binseq():
     
     domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-2,0,2]]
     t=generate_tree(twoprod, domains_init, True)
-    print_tree(t)
-    print "Depth: "+str(tree_cost(t))
-    print "Number of nodes: "+str(tree_cost2(t))
-    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+    choose_print_tree(t)
 
 def binseq_three():
     threeprod=[]
@@ -789,10 +797,7 @@ def binseq_three():
                                     threeprod.append([a,b,c,d,e,f,g])
     domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-1, 1], [-1, 1], [-3,-1,1,3]]
     t=generate_tree(threeprod, domains_init, True)
-    print_tree(t)
-    print "Depth: "+str(tree_cost(t))
-    print "Number of nodes: "+str(tree_cost2(t))
-    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+    choose_print_tree(t)
     
 def still_life():
     table=[]
@@ -814,10 +819,7 @@ def still_life():
     
     domains_init=[[0,1] for i in range(9)]
     t=generate_tree(table, domains_init, True)
-    print_tree(t)
-    print "Depth: "+str(tree_cost(t))
-    print "Number of nodes: "+str(tree_cost2(t))
-    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
+    choose_print_tree(t)
 
 def life():
     global domainsize
@@ -826,7 +828,7 @@ def life():
     domainsize = 2
     litcount   = 2*10
     table=[]
-    #Group = VariablePerm(10, 2, [0,1,2,3,4,5,6,7])
+    Group = VariablePerm(10, 2, [0,1,2,3,4,5,6,7])
     cross=[]
     crossprod([(0,1) for i in range(10)], [], cross)
     
@@ -847,11 +849,7 @@ def life():
     
     domains_init=[[0,1] for i in range(10)]
     t=generate_tree(table, domains_init, True)
-    print_tree(t)
-    print ""
-    print "# Depth: "+str(tree_cost(t))
-    print "# Number of nodes: "+str(tree_cost2(t))
-    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
+    choose_print_tree(t)
 
 def lifeImmigration():
     global domainsize
@@ -879,11 +877,7 @@ def lifeImmigration():
 
     domains_init=[[0,1,2] for i in range(10)]
     t=generate_tree(table, domains_init, True)
-    print_tree(t)
-    print ""
-    print "# Depth: "+str(tree_cost(t))
-    print "# Number of nodes: "+str(tree_cost2(t))
-    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
+    choose_print_tree(t)
 
 def lifeRotation():
     global domainsize
@@ -918,12 +912,8 @@ def lifeRotation():
     
     domains_init=[[0,1,2] for i in range(10)]
     t=generate_tree(table, domains_init, True)
-    print_tree(t)
-    print ""
-    print "# Depth: "+str(tree_cost(t))
-    print "# Number of nodes: "+str(tree_cost2(t))
-    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
-
+    choose_print_tree(t)
+ 
 def gcc():
     global domainsize
     global litcount
@@ -945,11 +935,7 @@ def gcc():
 
     domains_init=[[0,1,2] for i in range(12)]
     t=generate_tree(table, domains_init, True)
-    print_tree(t)
-    print ""
-    print "# Depth: "+str(tree_cost(t))
-    print "# Number of nodes: "+str(tree_cost2(t))
-    print "# Number nodes explored by algorithm: "+str(calls_build_tree)
+    choose_print_tree(t)
 
 def life3d():
     global domainsize
@@ -985,12 +971,8 @@ def life3d():
     domains_init=[[0,1] for i in range(varcount)]
     print '# Generated constraint'
     t=generate_tree(table, domains_init, True)
-    print_tree(t)
-    print ""
-    print "# Depth: "+str(tree_cost(t))
-    print "# Number of nodes: "+str(tree_cost2(t))
-    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
-
+    choose_print_tree(t)
+ 
 
 
 def summinmax():
@@ -1012,15 +994,8 @@ def summinmax():
     
     domains_init=[[0,1] for i in range(vars)]
     t=generate_tree(table, domains_init, True)
-    print_tree(t)
-    print ""
-    #for i in MinimialImagesalImages:
-    #print i
-    print "# " + str(len(MinimalImages))
-    print "# Depth: "+str(tree_cost(t))
-    print "# Number of nodes: "+str(tree_cost2(t))
-    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
-    
+    choose_print_tree(t)
+  
 def alldiff():
     size = 5
     global domainsize
@@ -1041,11 +1016,8 @@ def alldiff():
     
     domains_init=[range(size) for i in range(size)]
     t=generate_tree(table, domains_init, True)
-    print_tree(t)
-    print "Depth: "+str(tree_cost(t))
-    print "Number of nodes: "+str(tree_cost2(t))
-    print "Number of nodes explored by algorithm: "+str(calls_build_tree)
-
+    choose_print_tree(t)
+ 
 # A tree node is a dictionary containing 'var': 0,1,2.... 'val', 'left', 'right', 'pruning'
 
 # get rid of treenodes when there are no nogoods left.
@@ -1061,10 +1033,11 @@ def alldiff():
 #binseq_three()
 #cProfile.run('life()')
 #binseq()
-#life()
+#EnableSymDetection = True
+life()
 #life3d()
 #lifeImmigration()
 #gcc()
 #BIBD()
-alldiff()
+#alldiff()
 #summinmax()
