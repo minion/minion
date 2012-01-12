@@ -1,0 +1,26 @@
+The following directory is full of Minion tests. To add a new test, do the
+following:
+
+1) Put the file in here, with the extension .minion
+
+2) Make sure that the "print" command prints a matrix, which contains
+   on a single line (it can be empty)
+   
+3) Put one of the following as the very first line, after "MINION x"
+
+   #TEST CHECKONESOL x x x ...
+     The first solution found will be x x x ... (as given by the "print" 
+     statement).
+   #TEST SOLCOUNT x
+     There will be x solutions found in the whole search (can be 0)
+   #TEST JUSTPARSE
+     Minion will exit after just parsing the input file.
+
+There are two other important poss options #FAIL and #BUG, which act the same,
+but have different intentions.
+   #BUG
+	 This test currently fails due to a bug in Minion.
+	
+   #FAIL
+     This test is supposed to fail (for example, checking parsing rejects
+     incorrect input).
