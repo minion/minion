@@ -34,7 +34,7 @@ class AnyVarRef;
 
 
 namespace ProbSpec {
-  class CSPInstance;
+  struct CSPInstance;
 }
 
 class SearchState
