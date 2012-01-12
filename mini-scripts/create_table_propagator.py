@@ -15,10 +15,9 @@ import sys
 import cProfile
 import random
 sys.path.append("../python-scscp")
-from perms import GetMinimalImage, ValuePerm, VariablePerm, InvPerm, MultPerm, PadPerm, VariablePermSwapList
+from VarValToDomain import initialize_domain,get_lit,get_total_litcount,get_lit_mapping
+from perms import GetMinimalImage, ValueTotalPerm, ValuePermSwapList, VariableTotalPerm, InvPerm, MultPerm, PadPerm, VariablePermSwapList
 nodenumcounter = 0
-domainsize = -1
-litcount   = -1
 
 nodenumprint = 100
 def getnodenum():
@@ -29,7 +28,7 @@ def getnodenum():
         nodenumprint *= 2
     return nodenumcounter
 
-Group = [[1,2,3]]
+Group = False
 MinimalImages = {}
 EmptyKey = 'EmptyKey'
 EmptyNodes = {}
@@ -37,21 +36,21 @@ EnableSymDetection = False
 matched = 0
 matchedprint = 10
 
+
 def markEmpty(nodenum):
     global EmptyNodes
     EmptyNodes[nodenum] = True
 
 def adddomain(indom, maybedom, nodenum):
-    assert(domainsize>0)
     global MinimalImages
     gap_indom = []
     gap_maybedom = []
 
     for i in range(0, len(indom)):
         for j in indom[i]:
-            gap_indom += [j + 1 + i*domainsize]
+            gap_indom.append(get_lit(i,j))
         for j in maybedom[i]:
-            gap_maybedom += [j + 1 + i*domainsize]
+            gap_maybedom.append(get_lit(i,j))
     MinImage = GetMinimalImage(Group, [gap_indom, gap_maybedom])
     Perm = MinImage[0]
     Image = MinImage[1]
@@ -306,6 +305,14 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         else:
             return True
     
+    # Filter the tuple list again after pruning -- remove any tuples that are not valid
+    ct2=filter_nogoods(ct, domains_in, domains_poss)
+    
+    if ct2 == []:
+        # The constraint is implied.
+        assert len(prun)>0  # Should only reach here if tuples lost by pruning.
+        return True
+    
     if EnableSymDetection:
         perm = adddomain(domains_in, domains_poss, tree['nodelabel'])
         if perm == EmptyKey:
@@ -315,16 +322,6 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
             tree['perm'] = perm[1]
             tree['goto'] = perm[0]
             return True
-
-    # Filter the tuple list again after pruning -- remove any tuples that are not valid
-    
-    ct2=filter_nogoods(ct, domains_in, domains_poss)
-    
-    if ct2 == []:
-        # The constraint is implied.
-        assert len(prun)>0  # Should only reach here if tuples lost by pruning.
-        return True
-    
 
     # No need to find singleton domains here, and put them 'in', because ...?
     
@@ -477,8 +474,8 @@ def vm_tree(tree, nodestarts, jumppoints, currentvm):
         currentvm += prune_list
     if(tree.has_key('perm')):
         currentvm += [-2000]
-        assert(litcount > 0)
-        paddedperm = PadPerm(tree['perm'], litcount)
+        assert(get_total_litcount() > 0)
+        paddedperm = PadPerm(tree['perm'], get_total_litcount())
         paddedperm = [ i - 1 for i in paddedperm ]
         currentvm += paddedperm
     if(tree.has_key('goto')):
@@ -620,6 +617,14 @@ def vm_print_tree(t):
     print("con 1 " + str(len(currentvm)))
     for i in currentvm:
       print(str(i) + " "),
+    print("")
+    if EnableSymDetection:
+        lits = get_lit_mapping()
+        print("mapping 1 " + str(len(lits) * 2))
+        for [var,val] in lits:
+            print(str(var) + " " + str(val) + " ")
+    else:
+        print("mapping 1 0 ")
 
 
 def choose_print_tree(t):
@@ -680,10 +685,13 @@ def sports_constraint():
 
 def sumgeqthree():
     # sumgeq-3 on 5 bool vars.
-    global domainsize, Group, litcount
-    domainsize = 2
-    litcount = 10
-    Group = VariablePerm(5, 2, [0,1,2,3,4])
+    global Group
+
+    domains_init=[[0,1],[0,1],[0,1], [0,1], [0,1]]
+
+    initialize_domain(domains_init)
+
+    Group = VariableTotalPerm([0,1,2,3,4])
 
     nogoods=[]
     for a in range(2):
@@ -693,9 +701,7 @@ def sumgeqthree():
                     for e in range(2):
                         if sum([a,b,c,d,e])<4:
                             nogoods.append([a,b,c,d,e])
-    domains_init=[[0,1],[0,1],[0,1], [0,1], [0,1]]
-   
-
+    
     choose_print_tree(generate_tree(nogoods, domains_init, True))
 
 
@@ -769,6 +775,13 @@ def sokoban():
 
 def binseq():
     # Constraint for low autocorrelation binary sequences
+    global Group
+    domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-2,0,2]]
+
+    initialize_domain(domains_init)
+
+    Group = VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariablePermSwapList([2,3,0,1]) + ValuePermSwapList({-2:2, -1:1, 0:0, 1:-1, 2:-2})
+
     twoprod=[]
     for a in [-1, 1]:
         for b in [-1,1]:
@@ -778,7 +791,6 @@ def binseq():
                         if e!= (a*b)+(c*d):
                             twoprod.append([a,b,c,d, e])
     
-    domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-2,0,2]]
     t=generate_tree(twoprod, domains_init, True)
     choose_print_tree(t)
 
@@ -1022,6 +1034,8 @@ def alldiff():
 
 #cProfile.run('sports_constraint()')
 
+EnableVMOutput = True
+EnableSymDetection = True
 #and_constraint()
 #sokoban()
 #sumgeqthree()
@@ -1030,9 +1044,9 @@ def alldiff():
 #pegsol()
 #binseq_three()
 #cProfile.run('life()')
-#binseq()
+binseq()
 #EnableSymDetection = True
-life()
+#life()
 #life3d()
 #lifeImmigration()
 #gcc()

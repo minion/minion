@@ -22,6 +22,8 @@
 #undef P
 #endif
 
+#include "../minion.h"
+
 //#define P(x) cout << x << endl
 #define P(x)
 
@@ -37,7 +39,17 @@ struct VMConstraint : public AbstractConstraint
   { return "VMConstraint"; }
 
   typedef typename VarArray::value_type VarRef;
-  array<VarRef, 5> vars;
+  array<VarRef, 11> vars;
+
+  // Note: This is max - min, not the number of values per domain.
+  static const int MaxDomSize = 7;
+  static const int MaxVarSize = 11;
+  array<signed char, MaxVarSize> domain_min;
+  array<array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
+  array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
+  int total_lits;
+
+  int vars_size;
 
   int* VM_data;
   int VM_size;
@@ -46,7 +58,7 @@ struct VMConstraint : public AbstractConstraint
   Reversible<int> StatePtr;
   #endif
 
-  VMConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
+  VMConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples, TupleList* _mapping_tuples) :
   AbstractConstraint(stateObj), 
   VM_data(_tuples->getPointer()), VM_size(_tuples->tuple_size())
   #if UseStatePtr
@@ -56,22 +68,76 @@ struct VMConstraint : public AbstractConstraint
     ,constraint_locked(false)
 #endif
   {
-      if(_vars.size() != 5)
-          FAIL_EXIT("Invalid constraint length");
+      if(_vars.size() > MaxVarSize)
+          FAIL_EXIT("Only MaxVarSize (11?) variables allowed!");
       for(int i = 0; i < _vars.size(); ++i)
         vars[i] = _vars[i];
-      if(_tuples->size() != 1)
+      vars_size = _vars.size();
+      if(_tuples->size() != 1 || _mapping_tuples->size() != 1)
       {
-          cout << "VM takes a single tuple" << endl;
+          cout << "VM takes tuplelists containing a single tuple" << endl;
           FAIL_EXIT();
       }
+
+      int* mapping = _mapping_tuples->getPointer();
+      int mapping_size = _mapping_tuples->tuple_size();
+      if(mapping_size % 2 != 0)
+      {
+        cout << "Mapping must be of even length";
+        FAIL_EXIT();
+      }
+
+      total_lits = mapping_size / 2;
+
+      vector<set<int> > domains(vars_size);
+      for(int i = 0; i < mapping_size; i+=2)
+      {
+        domains[mapping[i]].insert(mapping[i+1]);
+      }
+
+      int literal = 0;
+      for(int i = 0; i < MaxDomSize * MaxVarSize; ++i)
+        literal_map[i] = std::pair<signed char, signed char>(-1,-1);
+
+      for(int i = 0; i < vars_size; ++i)
+      {
+        if(domains[i].size() == 0)
+        {
+          cout << "empty domain?";
+          FAIL_EXIT();
+        }
+        
+        domain_min[i] = *domains[i].begin();
+
+        set<int>::iterator last = domains[i].end();
+        last--;
+        if(*last - domain_min[i] >= MaxDomSize)
+        {
+          cout << "Go into vm.h and increase MaxDomSize\n";
+          FAIL_EXIT();
+        }
+
+        for(int j = 0; j < MaxDomSize; ++j)
+          domain_vals[i][j] = -1;
+
+        set<int>::iterator it = domains[i].begin();
+        for(set<int>::iterator it = domains[i].begin(); it != domains[i].end(); ++it)
+        {
+          domain_vals[i][*it] = literal;
+          literal_map[literal] = std::pair<signed char, signed char>(i, domain_vals[i][*it]);
+          literal++;
+        }
+      }
+
+
   }
 
-   virtual triggerCollection setup_internal()
+
+  virtual triggerCollection setup_internal()
   {
     triggerCollection t;
     
-    for(int i = 0; i < vars.size(); ++i)
+    for(int i = 0; i < vars_size; ++i)
       t.push_back(make_trigger(vars[i], Trigger(this, 1), DomainChanged));
    
     return t;
@@ -176,53 +242,100 @@ struct VMConstraint : public AbstractConstraint
     }
   }
 
-  inline pair<int,int> get_varval(int state, int* perm1, int* perm2, int* perm3, int domsize, int var, int val)
+  inline int get_lit_from_varval(int var, int val)
   {
-    switch(state)
-    {
-      case 0:
-        return make_pair(var, val);
-      case 1: {
-                int litval = var*domsize + val;
-                int mappedlit = perm1[litval];
-                int final_val = mappedlit % domsize;
-                int final_var = mappedlit / domsize;
-                return make_pair(final_var, final_val); }
-      case 2: {
-                int litval = var*domsize + val;
-                int mappedlit = perm2[litval];
-                int final_val = mappedlit % domsize;
-                int final_var = mappedlit / domsize;
-                return make_pair(final_var, final_val); }
-      case 3: {
-                int litval = var*domsize + val;
-                int mappedlit = perm3[litval];
-                int final_val = mappedlit % domsize;
-                int final_var = mappedlit / domsize;
-                return make_pair(final_var, final_val); }
-      default:
-                abort();
-    }
+    return domain_vals[var][val - domain_min[val]];
   }
 
-    template<typename Data>
-  void execute_symmetric_vm(Data* VM_start, int length)
+  inline pair<int,int> get_varval_from_lit(int lit)
   {
-    int InPtr = 0;
-    int domsize = 5;
-    int lits = 25;
-    int state = 0;
-    int vals[lits];
-    int newvals[lits];
+    D_ASSERT(lit >= 0 && lit < MaxVarSize * MaxDomSize);
+    return literal_map[lit]; 
+  }
+
+
+  pair<int,int> get_varval(compiletime_val<0>, int* perm1, int* perm2, int* perm3, int var, int val)
+  { return make_pair(var, val); }
+
+
+
+  pair<int,int> get_varval(compiletime_val<1>, int* perm1, int* perm2, int* perm3, int var, int val)
+  { 
+    int lit = get_lit_from_varval(var, val);
+    int mapped_lit = perm1[lit];
+    return get_varval_from_lit(mapped_lit);
+  }
+
+  pair<int,int> get_varval(compiletime_val<2>, int* perm1, int* perm2, int* perm3, int var, int val)
+  { 
+    int lit = get_lit_from_varval(var, val);
+    int mapped_lit = perm2[lit];
+    return get_varval_from_lit(mapped_lit);
+  }
+
+  pair<int,int> get_varval(compiletime_val<3>, int* perm1, int* perm2, int* perm3, int var, int val)
+  { 
+    int lit = get_lit_from_varval(var, val);
+    int mapped_lit = perm3[lit];
+    return get_varval_from_lit(mapped_lit);
+  }
+
+  template<typename Data>
+  void execute_symmetric_vm_start(Data* VM_start, int length)
+  {
+    int vals[total_lits];
+    int newvals[total_lits];
     int* perm = 0;
-    
-    #if UseStatePtr
-        D_ASSERT(StatePtr>=0 && StatePtr<length);
-        InPtr=StatePtr;
-        
-        // All choices above InPtr are fixed down this branch of search i.e you won't get a different answer when called again below this search node.
-        bool AllChoicesFixed=true;  
-    #endif
+
+    execute_symmetric_vm(compiletime_val<0>(), VM_start, length, 0, perm, vals, newvals);
+  }
+
+
+  template<typename Data, int CVal>
+  inline void increment_vm_perm(compiletime_val<CVal>, Data* VM_start, int length, int InPtr, int*& perm, int* vals, int* newvals)
+  {
+      switch(CVal)
+      {
+        case 0:
+        {
+          perm = VM_start + InPtr;
+          InPtr += total_lits;
+          return execute_symmetric_vm(compiletime_val<1>(), VM_start, length, InPtr, perm, vals, newvals);
+        }
+        break;
+        case 1:
+        {
+          for(int i = 0; i < total_lits; ++i)
+            vals[i] = perm[get(InPtr+i)];
+          InPtr += total_lits;
+          return execute_symmetric_vm(compiletime_val<2>(), VM_start, length, InPtr, perm, vals, newvals);
+        }
+        break;
+        case 2:
+        {
+          for(int i = 0; i < total_lits; ++i)
+            newvals[i] = vals[get(InPtr+i)];
+          InPtr += total_lits;
+          return execute_symmetric_vm(compiletime_val<3>(), VM_start, length, InPtr, perm, vals, newvals);
+        }
+        break;
+        case 3:
+        {
+          for(int i = 0; i < total_lits; ++i)
+            vals[i] = newvals[get(InPtr+i)];
+          InPtr += total_lits;
+          return execute_symmetric_vm(compiletime_val<2>(), VM_start, length, InPtr, perm, vals, newvals);
+
+        }
+        default:
+        abort();
+      }
+  }
+
+  template<typename Data, int CV>
+  inline void execute_symmetric_vm(compiletime_val<CV> cv, Data* VM_start, int length, int InPtr, int*& perm, int* vals, int* newvals)
+  {
+    //int state = 0;
     
     while(true)
     {
@@ -242,7 +355,7 @@ struct VMConstraint : public AbstractConstraint
                 InPtr++;
                 while(get(InPtr) != -1)
                 {
-                    pair<int,int> varval = get_varval(state, perm, vals, newvals, domsize, get(InPtr), get(InPtr+1));
+                    pair<int,int> varval = get_varval(cv, perm, vals, newvals, get(InPtr), get(InPtr+1));
                     P("  Deleting " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
                     vars[varval.first].removeFromDomain(varval.second);
                     InPtr+=2;
@@ -254,22 +367,12 @@ struct VMConstraint : public AbstractConstraint
             {
                 P(InPtr << ". If");
                 InPtr++;
-                pair<int,int> varval = get_varval(state, perm, vals, newvals, domsize, get(InPtr), get(InPtr+1));
+                pair<int,int> varval = get_varval(cv, perm, vals, newvals, get(InPtr), get(InPtr+1));
                  P(" Jump based on " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
                 if(vars[varval.first].inDomain(varval.second))
                 {
                     P(" True, jump to " << get(InPtr+2));
                     InPtr = get(InPtr+2);
-                    #if UseStatePtr
-                        if(AllChoicesFixed) {
-                            if(vars[varval.first].isAssigned()) {
-                                StatePtr=InPtr;
-                            }
-                            else {
-                                AllChoicesFixed=false;
-                            }
-                        }
-                    #endif
                 }
                 else
                 {
@@ -293,38 +396,8 @@ struct VMConstraint : public AbstractConstraint
             {
                 P(InPtr << ". Apply perm");
                 InPtr++;
-                
-                switch(state)
-                {
-                  case 0:
-                  {
-                    state = 1;
-                    perm = VM_start + InPtr;
-                  }
-                  break;
-                  case 1:
-                  {
-                    state = 2;
-                    for(int i = 0; i < lits; ++i)
-                      vals[i] = perm[get(InPtr+i)];
-                  }
-                  break;
-                  case 2:
-                  {
-                    state = 3;
-                    for(int i = 0; i < lits; ++i)
-                      newvals[i] = vals[get(InPtr+i)];
-                  }
-                  break;
-                  case 3:
-                  {
-                    state = 2;
-                    for(int i = 0; i < lits; ++i)
-                      vals[i] = newvals[get(InPtr+i)];
-                  }
-                  break;
-                }
-                InPtr += lits;
+
+                return increment_vm_perm(cv, VM_start, length, InPtr, perm, vals, newvals);
             }
             break;
             default:
@@ -340,7 +413,7 @@ struct VMConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     if(UseSymmetricVM)
-      execute_symmetric_vm(VM_data, VM_size); 
+      execute_symmetric_vm_start(VM_data, VM_size); 
     else
       execute_vm(VM_data, VM_size);
   }
@@ -353,7 +426,7 @@ struct VMConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   {
     vector<AnyVarRef> anyvars;
-    for(unsigned i = 0; i < vars.size(); ++i)
+    for(unsigned i = 0; i < vars_size; ++i)
       anyvars.push_back(vars[i]);
     return anyvars;
   }
@@ -362,10 +435,10 @@ struct VMConstraint : public AbstractConstraint
 
 template<typename VarArray>
 AbstractConstraint*
-  VMCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
-  { return new VMConstraint<VarArray,false>(stateObj, vars, tuples); }
+  VMCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples, TupleList* tuples2)
+  { return new VMConstraint<VarArray,false>(stateObj, vars, tuples, tuples2); }
 
   template<typename VarArray>
 AbstractConstraint*
-  VMSymCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
-  { return new VMConstraint<VarArray,true>(stateObj, vars, tuples); }
+  VMSymCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples, TupleList* tuples2)
+  { return new VMConstraint<VarArray,true>(stateObj, vars, tuples, tuples2); }

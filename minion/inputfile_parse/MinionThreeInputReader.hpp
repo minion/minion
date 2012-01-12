@@ -597,7 +597,11 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
       con.internal_constraints = readConstraintList(infile);
       break;
       case read_tuples:
-      con.tuples = readConstraintTupleList(infile);
+      if(con.tuples == NULL)
+        con.tuples = readConstraintTupleList(infile);
+      else if(con.tuples2 == NULL)
+        con.tuples2 = readConstraintTupleList(infile);
+      else throw parse_exception("Too many tuplelists");
       break;
       default:
       D_FATAL_ERROR("Internal Error!");

@@ -147,10 +147,10 @@ set(NAME_ID_lighttable "CT_LIGHTTABLE")
 set(NAME_READ_lighttable "read_list" "read_tuples")
 
 set(NAME_ID_vm "CT_VM")
-set(NAME_READ_vm "read_list" "read_tuples")
+set(NAME_READ_vm "read_list" "read_tuples" "read_tuples")
 
 set(NAME_ID_vmsym "CT_VM_SYM")
-set(NAME_READ_vmsym "read_list" "read_tuples")
+set(NAME_READ_vmsym "read_list" "read_tuples" "read_tuples")
 
 set(NAME_ID_watchvecneq "CT_WATCHED_VECNEQ")
 set(NAME_READ_watchvecneq "read_list" "read_list")

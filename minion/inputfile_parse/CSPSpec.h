@@ -103,6 +103,7 @@ struct ConstraintBlob
   vector<vector<Var> > vars;
   /// Pointer to list of tuples. Only used in Table Constraints.
   TupleList* tuples;
+  TupleList* tuples2;
   /// A vector of signs. Only used for SAT clause "or" constraint.
   vector<int> negs;
 
@@ -118,21 +119,25 @@ struct ConstraintBlob
   /// For use in nested constraints.
   vector<ConstraintBlob> internal_constraints;
 
+  ConstraintBlob()
+  { assert(0); }
+  
   ConstraintBlob(ConstraintDef* _con) : constraint(_con)
   {}
 
   ConstraintBlob(ConstraintDef* _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars)
+  , tuples(0), tuples2(0)
   {}
 
 #ifdef USE_CXX0X
   ConstraintBlob(ConstraintBlob&& b) :
-  CXXMOVE(constraint, b), CXXMOVE(vars, b), CXXMOVE(tuples, b), CXXMOVE(negs, b), CXXMOVE(constants, b),
+  CXXMOVE(constraint, b), CXXMOVE(vars, b), CXXMOVE(tuples, b), CXXMOVE(tuples2, b), CXXMOVE(negs, b), CXXMOVE(constants, b),
   CXXMOVE(gadget_prop_type, b), CXXMOVE(gadget, b), CXXMOVE(internal_constraints, b)
   { }
 #endif
 
   /// A helper constructor for when only a SingleVar is passed.
-  ConstraintBlob(ConstraintDef* _con, vector<Var>& _var) : constraint(_con)
+  ConstraintBlob(ConstraintDef* _con, vector<Var>& _var) : constraint(_con), tuples(0), tuples2(0)
   { vars.push_back(_var); }
 
   set<Var> get_all_vars() const

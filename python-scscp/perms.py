@@ -1,37 +1,48 @@
 import scscp 
+from VarValToDomain import *
 
-def VariablePermSwap(n, d, var1, var2):
-    L = range(1, n*d+1)
-    for i in range(0, d):
-        L[var1*d + i] = var2*d + i + 1
-        L[var2*d + i] = var1*d + i + 1
+def VariablePermSwap(var1, var2):
+    L = range(1, get_total_litcount() + 1)
+    assert(get_domain(var1) == get_domain(var2))
+    for i in get_domain(var1):
+        L[get_lit(var1, i) - 1] = get_lit(var2, i)
+        L[get_lit(var2, i) - 1] = get_lit(var1, i)
     return [L]
 
-def VariablePermSwapList(n, d, p):
-    L = range(1, n*d + 1)
+def VariablePermSwapList(p):
+    L = range(1, get_total_litcount() + 1)
+    for i in p[1:]:
+      assert(get_domain(p[0]) == get_domain(i))
+    
     for i in range(len(p)):
-      for j in range(d):
-          L[i*d + j] = p[i]*d + j + 1
-    return L
-
-def ValuePermSwap(n, d, val1, val2):
-    L = range(1, n*d+1)
-    for i in range(0, n):
-        L[i*d + val1] = i*d + val2 + 1
-        L[i*d + val2] = i*d + val1 + 1
+      for j in get_domain(p[0]):
+          L[get_lit(i, j) - 1] = get_lit(p[i], j)
     return [L]
 
-def VariablePerm(n, d, varlist):
+def ValuePermSwap(val1, val2):
+    L = range(1, get_total_litcount() + 1)
+    for i in range(get_total_varcount()):
+        L[get_lit(i, val1) - 1] = get_lit(i, val2)
+        L[get_lit(i, val2) - 1] = get_lit(i, val1)
+    return [L]
+
+def ValuePermSwapList(p):
+    L = range(1, get_total_litcount() + 1)
+    for i in range(get_total_varcount()):
+      for j in get_domain(i):
+          L[get_lit(i, j) - 1] = get_lit(i, p[j])
+    return [L]
+
+def VariableTotalPerm(varlist):
     L = []
     for i in range(len(varlist) - 1):
-        L += VariablePermSwap(n, d, varlist[i], varlist[i+1])
+        L += VariablePermSwap(varlist[i], varlist[i+1])
     return L
 
-
-def ValuePerm(n, d, vallist):
+def ValueTotalPerm(vallist):
     L = []
     for i in range(len(vallist) - 1):
-        L += ValuePermSwap(n, d, vallist[i], vallist[i+1])
+        L += ValuePermSwap(vallist[i], vallist[i+1])
     return L
 
 def InvPerm(l):
