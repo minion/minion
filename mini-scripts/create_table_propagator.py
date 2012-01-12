@@ -588,7 +588,7 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
         MinimalImages = {}
         build_tree(copy.deepcopy(ct_nogoods), tree, domains_in, domains, perm, len(permlist)==1)   # last arg is whether to use heuristic.
         cost=tree_cost2(tree)
-        print(cost)
+        print "# Tree cost: %d" % cost
         if cost<bestcost:
             bestcost=cost
             besttree=tree
@@ -629,6 +629,7 @@ def vm_print_tree(t):
 
 def choose_print_tree(t):
     if EnableVMOutput:
+        print "MINION 3"
         vm_print_tree(t)
     else:
         old_print_tree(t)
@@ -636,6 +637,7 @@ def choose_print_tree(t):
     print "# Depth: "+str(tree_cost(t))
     print "# Number of nodes: "+str(tree_cost2(t))
     print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
+    print "**EOF**"
 
 
 ################################################################################
@@ -1038,13 +1040,13 @@ EnableVMOutput = True
 EnableSymDetection = True
 #and_constraint()
 #sokoban()
-#sumgeqthree()
+sumgeqthree()
 #sports_constraint()
 
 #pegsol()
 #binseq_three()
 #cProfile.run('life()')
-binseq()
+#binseq()
 #EnableSymDetection = True
 #life()
 #life3d()

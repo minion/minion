@@ -122,7 +122,7 @@ struct ConstraintBlob
   ConstraintBlob()
   { assert(0); }
   
-  ConstraintBlob(ConstraintDef* _con) : constraint(_con)
+  ConstraintBlob(ConstraintDef* _con) : constraint(_con), tuples(0), tuples2(0)
   {}
 
   ConstraintBlob(ConstraintDef* _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars)

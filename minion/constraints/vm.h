@@ -87,6 +87,16 @@ struct VMConstraint : public AbstractConstraint
         FAIL_EXIT();
       }
 
+      for(int i = 0; i < MaxDomSize * MaxVarSize; ++i)
+        literal_map[i] = std::pair<signed char, signed char>(-1,-1);
+
+      for(int i = 0; i < MaxVarSize; ++i)
+        for(int j = 0; j < MaxDomSize; ++j)
+          domain_vals[i][j] = -1;
+
+      if(mapping_size == 0)
+        return;
+
       total_lits = mapping_size / 2;
 
       vector<set<int> > domains(vars_size);
@@ -95,9 +105,9 @@ struct VMConstraint : public AbstractConstraint
         domains[mapping[i]].insert(mapping[i+1]);
       }
 
+
+
       int literal = 0;
-      for(int i = 0; i < MaxDomSize * MaxVarSize; ++i)
-        literal_map[i] = std::pair<signed char, signed char>(-1,-1);
 
       for(int i = 0; i < vars_size; ++i)
       {
@@ -116,9 +126,6 @@ struct VMConstraint : public AbstractConstraint
           cout << "Go into vm.h and increase MaxDomSize\n";
           FAIL_EXIT();
         }
-
-        for(int j = 0; j < MaxDomSize; ++j)
-          domain_vals[i][j] = -1;
 
         set<int>::iterator it = domains[i].begin();
         for(set<int>::iterator it = domains[i].begin(); it != domains[i].end(); ++it)
