@@ -301,7 +301,13 @@ struct VMConstraint : public AbstractConstraint
     int newvals[total_lits];
     int* perm = 0;
 
-    execute_symmetric_vm(compiletime_val<0>(), VM_start, length, 0, perm, vals, newvals);
+    execute_symmetric_vm(compiletime_val<0>(), VM_start, length, 
+#if UseStatePtr
+    StatePtr, 
+#else
+    0,
+#endif
+    perm, vals, newvals);
   }
 
 
@@ -382,11 +388,24 @@ struct VMConstraint : public AbstractConstraint
                 P(InPtr << ". If");
                 InPtr++;
                 pair<int,int> varval = get_varval(cv, perm, vals, newvals, get(InPtr), get(InPtr+1));
-                 P(" Jump based on " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
+                P(" Jump based on " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
                 if(vars[varval.first].inDomain(varval.second))
                 {
                     P(" True, jump to " << get(InPtr+2));
                     InPtr = get(InPtr+2);
+                    #if UseStatePtr
+                        if(AllChoicesFixed)
+                        {
+                          if(vars[varval.first].isAssigned())
+                          {
+                            StatePtr=InPtr;
+                          }
+                          else
+                          {
+                            AllChoicesFixed = false;
+                          }
+                        }
+                    #endif
                 }
                 else
                 {
