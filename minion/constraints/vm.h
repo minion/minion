@@ -18,14 +18,17 @@
 */
 
 
+#include "../minion.h"
+
 #ifdef P
 #undef P
 #endif
 
-#include "../minion.h"
+#define P(x) cout << x << endl
+//#define P(x)
 
-//#define P(x) cout << x << endl
-#define P(x)
+//#define D(X,V) X[V]
+#define D(X,V) X.at(V)
 
 #define SPECIAL_VM
 
@@ -71,7 +74,7 @@ struct VMConstraint : public AbstractConstraint
       if(_vars.size() > MaxVarSize)
           FAIL_EXIT("Only MaxVarSize (11?) variables allowed!");
       for(int i = 0; i < _vars.size(); ++i)
-        vars[i] = _vars[i];
+        D(vars,i) = D(_vars,i);
       vars_size = _vars.size();
       if(_tuples->size() != 1 || _mapping_tuples->size() != 1)
       {
@@ -88,11 +91,11 @@ struct VMConstraint : public AbstractConstraint
       }
 
       for(int i = 0; i < MaxDomSize * MaxVarSize; ++i)
-        literal_map[i] = std::pair<signed char, signed char>(-1,-1);
+        D(literal_map,i) = std::pair<signed char, signed char>(-1,-1);
 
       for(int i = 0; i < MaxVarSize; ++i)
         for(int j = 0; j < MaxDomSize; ++j)
-          domain_vals[i][j] = -1;
+          D(D(domain_vals,i),j) = -1;
 
       if(mapping_size == 0)
         return;
@@ -102,10 +105,8 @@ struct VMConstraint : public AbstractConstraint
       vector<set<int> > domains(vars_size);
       for(int i = 0; i < mapping_size; i+=2)
       {
-        domains[mapping[i]].insert(mapping[i+1]);
+        D(domains, mapping[i]).insert(mapping[i+1]);
       }
-
-
 
       int literal = 0;
 
@@ -130,8 +131,8 @@ struct VMConstraint : public AbstractConstraint
         set<int>::iterator it = domains[i].begin();
         for(set<int>::iterator it = domains[i].begin(); it != domains[i].end(); ++it)
         {
-          domain_vals[i][*it] = literal;
-          literal_map[literal] = std::pair<signed char, signed char>(i, domain_vals[i][*it]);
+          D(D(domain_vals,i), (*it - domain_min[i]) ) = literal;
+          D(literal_map,literal) = std::pair<signed char, signed char>(i, domain_vals[i][*it]);
           literal++;
         }
       }
@@ -251,13 +252,16 @@ struct VMConstraint : public AbstractConstraint
 
   inline int get_lit_from_varval(int var, int val)
   {
-    return domain_vals[var][val - domain_min[val]];
+    return D(D(domain_vals,var), (val - domain_min[val]));
   }
 
   inline pair<int,int> get_varval_from_lit(int lit)
   {
     D_ASSERT(lit >= 0 && lit < MaxVarSize * MaxDomSize);
-    return literal_map[lit]; 
+    D_ASSERT(vars[literal_map[lit].first].getInitialMin() <= literal_ma[lit].second);
+    D_ASSERT(vars[literal_map[lit].first].getInitialMax() >= literal_ma[lit].second);
+    
+    return D(literal_map,lit); 
   }
 
 
@@ -299,7 +303,7 @@ struct VMConstraint : public AbstractConstraint
 
 
   template<typename Data, int CVal>
-  inline void increment_vm_perm(compiletime_val<CVal>, Data* VM_start, int length, int InPtr, int*& perm, int* vals, int* newvals)
+  inline void increment_vm_perm(compiletime_val<CVal>, Data* VM_start, int length, int InPtr, int* perm, int* vals, int* newvals)
   {
       switch(CVal)
       {
@@ -340,7 +344,7 @@ struct VMConstraint : public AbstractConstraint
   }
 
   template<typename Data, int CV>
-  inline void execute_symmetric_vm(compiletime_val<CV> cv, Data* VM_start, int length, int InPtr, int*& perm, int* vals, int* newvals)
+  inline void execute_symmetric_vm(compiletime_val<CV> cv, Data* VM_start, int length, int InPtr, int* perm, int* vals, int* newvals)
   {
     //int state = 0;
     
