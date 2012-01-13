@@ -45,6 +45,13 @@ def ValueTotalPerm(vallist):
         L += ValuePermSwap(vallist[i], vallist[i+1])
     return L
 
+def LiteralPermSwapList(p):
+    L = range(1, get_total_litcount() + 1)
+    for ( lit1,lit2 ) in p.iteritems():
+        L[get_lit(*lit1) - 1] = get_lit(*lit2)
+    
+    return [L]
+
 def InvPerm(l):
    R = list(l)
    for i in range(len(l)):

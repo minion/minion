@@ -9,10 +9,10 @@ NewSmallestImageList := function(G, L)
   if L = [] then
     return [()];
   fi;
-  Print(L);
-  Print("Before");
+  #Print(L);
+  #Print("Before");
   stab   := Stabilizer(G, Set(L[1]), OnSets);
-  Print("After");
+  #Print("After");
   image  := NewSmallestImage(G, L[1], stab, x -> x);
   mapper := RepresentativeAction(G, L[1], image[1], OnTuples);
   conj   := ConjugateGroup(stab, mapper);
