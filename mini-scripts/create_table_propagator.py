@@ -16,7 +16,7 @@ import cProfile
 import random
 sys.path.append("../python-scscp")
 from VarValToDomain import initialize_domain,get_lit,get_total_litcount,get_lit_mapping
-from perms import GetMinimalImage, ValueTotalPerm, ValuePermSwapList, VariableTotalPerm, InvPerm, MultPerm, PadPerm, VariablePermSwapList
+from perms import GetMinimalImage, ValueTotalPerm, ValuePermSwapList, VariableTotalPerm, LiteralPermSwapList, InvPerm, MultPerm, PadPerm, VariablePermSwapList
 nodenumcounter = 0
 
 nodenumprint = 100
@@ -584,7 +584,7 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
         domains_in=[ [] for i in domains_init]
         domains=copy.deepcopy(domains_init)
         print "# Call buildtree"
-        global MinimialImages
+        global MinimalImages
         MinimalImages = {}
         build_tree(copy.deepcopy(ct_nogoods), tree, domains_in, domains, perm, len(permlist)==1)   # last arg is whether to use heuristic.
         cost=tree_cost2(tree)
@@ -648,15 +648,7 @@ def choose_print_tree(t):
 #
 
 
-def and_constraint():
-    # A /\ B = C
-    ct_nogoods=[[0,0,1], [0,1,1], [1,0,1], [1,1,0]]
-    varvalorder=[(0,0), (0,1), (1,0), (1,1), (2,0), (2,1)]
-    domains_init=[[0,1],[0,1],[0,1]]
-    
-    generate_tree(ct_nogoods, domains_init, False)
 
-    choose_print_tree(t)
 
 def sports_constraint():
     # Channelling constraint from sports scheduling 10
@@ -732,30 +724,7 @@ def BIBD():
     choose_print_tree(generate_tree(nogoods, domains_init, True))
 
 
-def pegsol():
-    # constraint for peg solitaire.
-    nogoods=[]
-    
-    # One combination satisfies the conjunction.
-    nogoods.append([1,0,1,0,0,1,0])
-    
-    for a in range(2):
-        for b in range(2):
-            for c in range(2):
-                for d in range(2):
-                    for e in range(2):
-                        for f in range(2):
-                            if not (a==1 and b==0 and c==1 and d==0 and e==0 and f==1):
-                                # not satisfies the conjunction
-                                nogoods.append([a,b,c,d,e,f,1])
-    
-    domains_init=[[0,1],[0,1],[0,1], [0,1], [0,1], [0,1], [0,1]]
-    t=generate_tree(nogoods, domains_init, True)
-    choose_print_tree(t)
-    print ""
-    print "# Depth: "+str(tree_cost(t))
-    print "# Number of nodes: "+str(tree_cost2(t))
-    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
+
     
 def sokoban():
     # x+y=z where y has values -n, -1, 1, n
@@ -772,43 +741,6 @@ def sokoban():
     domains_init=[range(n*n),[-n, -1, 1, n], range(n*n)]
     
     t=generate_tree(nogoods, domains_init, True)
-    choose_print_tree(t)
-
-
-def binseq():
-    # Constraint for low autocorrelation binary sequences
-    global Group
-    domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-2,0,2]]
-
-    initialize_domain(domains_init)
-
-    Group = VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariablePermSwapList([2,3,0,1]) + ValuePermSwapList({-2:2, -1:1, 0:0, 1:-1, 2:-2})
-
-    twoprod=[]
-    for a in [-1, 1]:
-        for b in [-1,1]:
-            for c in [-1, 1]:
-                for d in [-1, 1]:
-                    for e in [-2,0,2]:
-                        if e!= (a*b)+(c*d):
-                            twoprod.append([a,b,c,d, e])
-    
-    t=generate_tree(twoprod, domains_init, True)
-    choose_print_tree(t)
-
-def binseq_three():
-    threeprod=[]
-    for a in [-1, 1]:
-        for b in [-1,1]:
-            for c in [-1, 1]:
-                for d in [-1, 1]:
-                    for e in [-1, 1]:
-                        for f in [-1, 1]:
-                            for g in [-3, -1, 1, 3]:
-                                if (a*b)+(c*d)+(e*f) != g:
-                                    threeprod.append([a,b,c,d,e,f,g])
-    domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-1, 1], [-1, 1], [-3,-1,1,3]]
-    t=generate_tree(threeprod, domains_init, True)
     choose_print_tree(t)
     
 def still_life():
@@ -830,99 +762,6 @@ def still_life():
             assert s==2
     
     domains_init=[[0,1] for i in range(9)]
-    t=generate_tree(table, domains_init, True)
-    choose_print_tree(t)
-
-def life():
-    global domainsize
-    global litcount
-    global Group
-    domainsize = 2
-    litcount   = 2*10
-    table=[]
-    Group = VariablePerm(10, 2, [0,1,2,3,4,5,6,7])
-    cross=[]
-    crossprod([(0,1) for i in range(10)], [], cross)
-    
-    table=[]
-    for l in cross:
-        s=sum(l[:8])
-        if s>3 or s<2:
-            if l[9]==1:
-                table.append(l)
-        elif s==3:
-            if l[9]==0:
-                table.append(l)
-        else:
-            assert s==2
-            if l[8]!=l[9]:
-                table.append(l)
-            
-    
-    domains_init=[[0,1] for i in range(10)]
-    t=generate_tree(table, domains_init, True)
-    choose_print_tree(t)
-
-def lifeImmigration():
-    global domainsize
-    global litcount
-    global Group
-    domainsize = 3
-    litcount   = 3*10
-    table=[]
-    Group = VariablePerm(10, 3, [0,1,2,3,4,5,6,7])
-    cross = fastcrossprod([3]*10)    
-    table=[]
-    # 0 = dead, 1 = alive, 2 = dying
-    for l in cross:
-        s=sum(map(lambda x: x != 0, l[:8]))
-        if l[-2] == 2 and l[-1] != 0:
-            table.append(l)
-        elif l[-2] == 1 and l[-1] != 2:
-            table.append(l)
-        elif l[-2] == 0 and l[-1] == 1 and s != 2:
-            table.append(l)
-        elif l[-2] == 0 and l[-1] == 0 and s == 2:
-            table.append(l)
-        elif l[-2] == 0 and l[-1] == 2:
-            table.append(l)
-
-    domains_init=[[0,1,2] for i in range(10)]
-    t=generate_tree(table, domains_init, True)
-    choose_print_tree(t)
-
-def lifeRotation():
-    global domainsize
-    global litcount
-    global Group
-    domainsize = 3
-    litcount   = 3*10
-    table=[]
-    Group = VariablePerm(10, 3, [0,1,2,3,4,5,6,7])
-    cross=[]
-    crossprod([(0,1,2) for i in range(10)], [], cross)
-    
-    table=[]
-    for l in cross:
-        s=sum(map(lambda x: x != 0, l[:8]))
-        onecount=sum(map(lambda x: x == 1, l[:8]))
-        twocount=sum(map(lambda x: x == 2, l[:8]))
-        if onecount > twocount:
-            maxcol = 1
-        else:
-            maxcol = 2
-
-        if s>3 or s<2: # should die, or stay dead
-            if l[9]==1 or l[9]==2:
-                table.append(l)
-        elif l[8]==0: # might come to life, or stay dead
-            if (s==2 and l[9]!=0) or (s==3 and l[9]!=maxcol):
-                table.append(l)
-        else: # cell alive, 2 or 3 neighbours, stays alive
-            if l[8] != l[9]:
-                table.append(l)
-    
-    domains_init=[[0,1,2] for i in range(10)]
     t=generate_tree(table, domains_init, True)
     choose_print_tree(t)
  
@@ -949,41 +788,7 @@ def gcc():
     t=generate_tree(table, domains_init, True)
     choose_print_tree(t)
 
-def life3d():
-    global domainsize
-    global litcount
-    global Group
-    domainsize = 2
-    varcount = 3*3*3+1
-    litcount   = 2*varcount
-    table=[]
-    Group = VariablePerm(varcount, 2, range(varcount-2))
-    cross=[]
-    crossprod([(0,1) for i in range(varcount - 2)], [], cross)
-    
-    table=[]
-    for l in cross:
-        s=sum(l)
-        if s>=5 and s<=5:
-            l.append(0)
-            l.append(1)
-            table.append(l)
-        elif s >= 7 and s <= 7:
-            l.append(1)
-            l.append(0)
-            table.append(l)
-        elif l[-2] == l[-1]:
-            dup = l[:]
-            l.append(0)
-            l.append(0)
-            dup.append(1)
-            dup.append(1)
-            table.append(l)
-            table.append(dup)    
-    domains_init=[[0,1] for i in range(varcount)]
-    print '# Generated constraint'
-    t=generate_tree(table, domains_init, True)
-    choose_print_tree(t)
+
  
 
 
@@ -1029,7 +834,221 @@ def alldiff():
     domains_init=[range(size) for i in range(size)]
     t=generate_tree(table, domains_init, True)
     choose_print_tree(t)
+
+################################################################################
+# Tidied up ones:
+#
+
+def and_constraint():
+    global Group
+    domains_init=[[0,1]]*3
+    
+    initialize_domain(domains_init)
+    
+    Group = VariableTotalPerm([0,1])
+    
+    # A /\ B = C
+    ct_nogoods=[[0,0,1], [0,1,1], [1,0,1], [1,1,0]]
+    
+    t=generate_tree(ct_nogoods, domains_init, False)
+    
+    choose_print_tree(t)
  
+def pegsol():
+    global Group
+    domains_init=[[0,1]]*7
+    
+    initialize_domain(domains_init)
+    
+    Group = ( VariableTotalPerm([0,2,5]) + VariableTotalPerm([1,3,4])  
+        + LiteralPermSwapList({(0,0): (1,1), (0,1):(1,0), (1,0):(0,1), (1,1):(0,0)}) )
+    # constraint for peg solitaire.
+    
+    nogoods=[]
+    
+    # One combination satisfies the conjunction.
+    nogoods.append([1,0,1,0,0,1,0])
+    
+    for a in range(2):
+        for b in range(2):
+            for c in range(2):
+                for d in range(2):
+                    for e in range(2):
+                        for f in range(2):
+                            if not (a==1 and b==0 and c==1 and d==0 and e==0 and f==1):
+                                # not satisfies the conjunction
+                                nogoods.append([a,b,c,d,e,f,1])
+    
+    t=generate_tree(nogoods, domains_init, True)
+    choose_print_tree(t)
+
+def labs():
+    # Constraint for low autocorrelation binary sequences
+    global Group
+    domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-2,0,2]]
+    
+    initialize_domain(domains_init)
+    
+    Group = VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariablePermSwapList([2,3,0,1]) + ValuePermSwapList({-2:2, -1:1, 0:0, 1:-1, 2:-2})
+    
+    twoprod=[]
+    for a in [-1, 1]:
+        for b in [-1,1]:
+            for c in [-1, 1]:
+                for d in [-1, 1]:
+                    for e in [-2,0,2]:
+                        if e!= (a*b)+(c*d):
+                            twoprod.append([a,b,c,d, e])
+    
+    t=generate_tree(twoprod, domains_init, True)
+    choose_print_tree(t)
+
+def labs_three():
+    # Constraint for low autocorrelation binary sequences
+    global Group
+    domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-1, 1], [-1, 1], [-3,-1,1,3]]
+    
+    initialize_domain(domains_init)
+    
+    Group = VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariableTotalPerm([4,5])+ VariablePermSwapList([2,3,0,1]) + VariablePermSwapList([0,1,4,5,2,3]) + ValuePermSwapList({-3:3, -2:2, -1:1, 0:0, 1:-1, 2:-2, 3:-3})
+    
+    threeprod=[]
+    for a in [-1, 1]:
+        for b in [-1,1]:
+            for c in [-1, 1]:
+                for d in [-1, 1]:
+                    for e in [-1, 1]:
+                        for f in [-1, 1]:
+                            for g in [-3, -1, 1, 3]:
+                                if (a*b)+(c*d)+(e*f) != g:
+                                    threeprod.append([a,b,c,d,e,f,g])
+    
+    t=generate_tree(threeprod, domains_init, True)
+    choose_print_tree(t)
+
+def life3d():
+    global Group
+    varcount = 3*3*3+1
+    domains_init=[[0,1]]*varcount
+    initialize_domain(domains_init)
+    
+    
+    table=[]
+    Group = VariableTotalPerm(range(varcount-2))
+    cross=[]
+    crossprod([(0,1) for i in range(varcount - 2)], [], cross)  # this line doesn't work.
+    
+    table=[]
+    for l in cross:
+        s=sum(l)
+        if s>=5 and s<=5:
+            l.append(0)
+            l.append(1)
+            table.append(l)
+        elif s >= 7 and s <= 7:
+            l.append(1)
+            l.append(0)
+            table.append(l)
+        elif l[-2] == l[-1]:
+            dup = l[:]
+            l.append(0)
+            l.append(0)
+            dup.append(1)
+            dup.append(1)
+            table.append(l)
+            table.append(dup)    
+    
+    print '# Generated constraint'
+    t=generate_tree(table, domains_init, True)
+    choose_print_tree(t)
+
+def life():
+    global Group
+    domains_init=[[0,1] for i in range(10)]
+    initialize_domain(domains_init)
+    table=[]
+    Group = VariableTotalPerm([0,1,2,3,4,5,6,7])
+    cross=[]
+    crossprod([(0,1) for i in range(10)], [], cross)
+    
+    table=[]
+    for l in cross:
+        s=sum(l[:8])
+        if s>3 or s<2:
+            if l[9]==1:
+                table.append(l)
+        elif s==3:
+            if l[9]==0:
+                table.append(l)
+        else:
+            assert s==2
+            if l[8]!=l[9]:
+                table.append(l)
+            
+    
+    
+    t=generate_tree(table, domains_init, True)
+    choose_print_tree(t)
+
+def lifeBriansBrain():
+    global Group
+    domains_init=[[0,1,2]]*10
+    initialize_domain(domains_init)
+    
+    Group = VariableTotalPerm([0,1,2,3,4,5,6,7])
+    cross = fastcrossprod([3]*10)
+    
+    table=[]
+    # 0 = dead, 1 = alive, 2 = dying
+    for l in cross:
+        s=sum(map(lambda x: x == 1, l[:8]))    # used to be !=0
+        if l[-2] == 2 and l[-1] != 0:
+            table.append(l)
+        elif l[-2] == 1 and l[-1] != 2:
+            table.append(l)
+        elif l[-2] == 0 and l[-1] == 1 and s != 2: # if s!=2 you cannot go from dead to alive.
+            table.append(l)
+        elif l[-2] == 0 and l[-1] == 0 and s == 2:
+            table.append(l)
+        elif l[-2] == 0 and l[-1] == 2:
+            table.append(l)
+            
+    t=generate_tree(table, domains_init, True)
+    choose_print_tree(t)
+
+
+def lifeImmigration():
+    global Group
+    domains_init=[[0,1,2]]*10
+    initialize_domain(domains_init)
+    Group = VariableTotalPerm([0,1,2,3,4,5,6,7])
+    cross=[]
+    crossprod(domains_init, [], cross)
+    
+    table=[]
+    for l in cross:
+        s=sum(map(lambda x: x != 0, l[:8]))
+        onecount=sum(map(lambda x: x == 1, l[:8]))
+        twocount=sum(map(lambda x: x == 2, l[:8]))
+        if onecount > twocount:
+            maxcol = 1
+        else:
+            maxcol = 2
+        
+        if s>3 or s<2: # should die, or stay dead
+            if l[9]==1 or l[9]==2:
+                table.append(l)
+        elif l[8]==0: # might come to life, or stay dead
+            if (s==2 and l[9]!=0) or (s==3 and l[9]!=maxcol):
+                table.append(l)
+        else: # cell alive, 2 or 3 neighbours, stays alive
+            if l[8] != l[9]:
+                table.append(l)
+    
+    t=generate_tree(table, domains_init, True)
+    choose_print_tree(t)
+
+
 # A tree node is a dictionary containing 'var': 0,1,2.... 'val', 'left', 'right', 'pruning'
 
 # get rid of treenodes when there are no nogoods left.
@@ -1040,8 +1059,10 @@ EnableVMOutput = True
 EnableSymDetection = True
 #and_constraint()
 #sokoban()
-sumgeqthree()
+#sumgeqthree()
 #sports_constraint()
+
+eval(sys.argv[1]+"()")
 
 #pegsol()
 #binseq_three()
