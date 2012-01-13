@@ -1021,7 +1021,7 @@ def lifeImmigration():
     global Group
     domains_init=[[0,1,2]]*10
     initialize_domain(domains_init)
-    Group = VariableTotalPerm([0,1,2,3,4,5,6,7])
+    Group = VariableTotalPerm([0,1,2,3,4,5,6,7]) + ValueTotalPerm([1,2])  # can swap values 1 and 2.
     cross=[]
     crossprod(domains_init, [], cross)
     
@@ -1053,26 +1053,10 @@ def lifeImmigration():
 
 # get rid of treenodes when there are no nogoods left.
 
-#cProfile.run('sports_constraint()')
+#cProfile.run('life()')
 
 EnableVMOutput = True
 EnableSymDetection = True
-#and_constraint()
-#sokoban()
-#sumgeqthree()
-#sports_constraint()
 
 eval(sys.argv[1]+"()")
 
-#pegsol()
-#binseq_three()
-#cProfile.run('life()')
-#binseq()
-#EnableSymDetection = True
-#life()
-#life3d()
-#lifeImmigration()
-#gcc()
-#BIBD()
-#alldiff()
-#summinmax()
