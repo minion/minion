@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>switches -varorder</title>
+</head>
+<body>
+<h1>Help on <tt>switches -varorder</tt></h1>
+<h3>Description</h3>
+<pre>
+
+Enable a particular variable ordering for the search process. This
+flag is experimental and minion's default ordering might be faster.
+
+The available orders are:
+
+- sdf - smallest domain first, break ties lexicographically
+
+- sdf-random - sdf, but break ties randomly
+
+- srf - smallest ratio first, chooses unassigned variable with smallest
+  percentage of its initial values remaining, break ties lexicographically
+
+- srf-random - srf, but break ties randomly
+
+- ldf - largest domain first, break ties lexicographically
+
+- ldf-random - ldf, but break ties randomly
+
+- random - random variable ordering
+
+- static - lexicographical ordering
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>
