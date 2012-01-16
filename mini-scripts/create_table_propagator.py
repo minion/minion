@@ -24,9 +24,10 @@ def getnodenum():
     global nodenumcounter, nodenumprint
     nodenumcounter+=1
     if(nodenumcounter >= nodenumprint):
-        print "# Count: ", nodenumcounter
+        print Comment, " Count: ", nodenumcounter
         nodenumprint *= 2
     return nodenumcounter
+
 
 Group = False
 MinimalImages = {}
@@ -63,7 +64,7 @@ def adddomain(indom, maybedom, nodenum):
         global matched, matchedprint
         matched += 1
         if matched >= matchedprint:
-            print "# Matched: ", matchedprint
+            print Comment, " Matched: ", matchedprint
             matchedprint *= 2
         if EmptyNodes.has_key(MinimalImages[Image][0]):
                 # Node was empty
@@ -583,16 +584,16 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
         tree['nodelabel']=getnodenum()
         domains_in=[ [] for i in domains_init]
         domains=copy.deepcopy(domains_init)
-        print "# Call buildtree"
+        print Comment, " Call buildtree"
         global MinimalImages
         MinimalImages = {}
         build_tree(copy.deepcopy(ct_nogoods), tree, domains_in, domains, perm, len(permlist)==1)   # last arg is whether to use heuristic.
         cost=tree_cost2(tree)
-        print "# Tree cost: %d" % cost
+        print Comment, " Tree cost: %d" % cost
         if cost<bestcost:
             bestcost=cost
             besttree=tree
-            print "# Better tree found, of size:%d"%bestcost
+            print Comment, " Better tree found, of size:%d"%bestcost
     
     return besttree
 
@@ -634,10 +635,11 @@ def choose_print_tree(t):
     else:
         old_print_tree(t)
     print ""
-    print "# Depth: "+str(tree_cost(t))
-    print "# Number of nodes: "+str(tree_cost2(t))
-    print "# Number of nodes explored by algorithm: "+str(calls_build_tree)
-    print "**EOF**"
+    print Comment, " Depth: "+str(tree_cost(t))
+    print Comment, " Number of nodes: "+str(tree_cost2(t))
+    print Comment, " Number of nodes explored by algorithm: "+str(calls_build_tree)
+    if EnableVMOutput:
+        print "**EOF**"
 
 
 ################################################################################
@@ -958,7 +960,7 @@ def life3d():
             table.append(l)
             table.append(dup)    
     
-    print '# Generated constraint'
+    print Comment, ' Generated constraint'
     t=generate_tree(table, domains_init, True)
     choose_print_tree(t)
 
@@ -1057,6 +1059,11 @@ def lifeImmigration():
 
 EnableVMOutput = eval(sys.argv[2])
 EnableSymDetection = eval(sys.argv[3])
+
+if EnableVMOutput:
+    Comment = '#'
+else:
+    Comment = '//'
 
 eval(sys.argv[1]+"()")
 
