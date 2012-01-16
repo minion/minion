@@ -1055,8 +1055,8 @@ def lifeImmigration():
 
 #cProfile.run('life()')
 
-EnableVMOutput = True
-EnableSymDetection = True
+EnableVMOutput = eval(sys.argv[2])
+EnableSymDetection = eval(sys.argv[3])
 
 eval(sys.argv[1]+"()")
 
