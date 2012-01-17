@@ -66,8 +66,9 @@ struct TestConstraint : public AbstractConstraint
 #ifdef SYMMETRIC
       vars_size = _vars.size();
  
-      int mapping_size = get_mapping_size();
       vector<int> vec_mapping = get_mapping_vector();
+      int mapping_size = vec_mapping.size();
+
       int* mapping = &(vec_mapping[0]);
 
       for(int i = 0; i < MaxDomSize * MaxVarSize; ++i)
@@ -80,7 +81,7 @@ struct TestConstraint : public AbstractConstraint
       if(mapping_size == 0)
         return;
 
-      total_lits = mapping_size;
+      total_lits = mapping_size / 2;
 
       vector<set<int> > domains(vars_size);
       for(int i = 0; i < mapping_size; i+=2)
