@@ -1,0 +1,13 @@
+MINION 3
+#TEST SOLCOUNT 1
+
+**VARIABLES**
+BOUND x0 {-1..0}
+BOUND x1 {-1..0}
+BOUND x2 {0..1}
+
+
+**CONSTRAINTS**
+hamming([x0,x1],[x2,0],1)
+ineq(x2, x0, 0)
+**EOF**
