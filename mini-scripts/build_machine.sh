@@ -3,6 +3,6 @@ name=`pwd`/machines/$1.$2.$3
 killall gap 
 time ( cd ../python-scscp; gap.sh myserver.g  > $name.gapout 2>&1)  &> $name.gap_time &
 gap_PID=$!
-sleep 5
+sleep 10
 time (./create_table_propagator.py $* > $name.vm_out 2>&1 ) &> $name.python_time
 killall gap

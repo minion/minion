@@ -268,30 +268,34 @@ struct VMConstraint : public AbstractConstraint
   }
 
 
-  pair<int,int> get_varval(compiletime_val<0>, int* perm1, int* perm2, int* perm3, int var, int val)
-  { return make_pair(var, val); }
-
-
-
-  pair<int,int> get_varval(compiletime_val<1>, int* perm1, int* perm2, int* perm3, int var, int val)
+  template<typename CVal>
+  pair<int,int> get_varval(CVal cval, int* perm1, int* perm2, int* perm3, int var, int val)
   { 
-    int lit = get_lit_from_varval(var, val);
-    int mapped_lit = perm1[lit];
-    return get_varval_from_lit(mapped_lit);
-  }
-
-  pair<int,int> get_varval(compiletime_val<2>, int* perm1, int* perm2, int* perm3, int var, int val)
-  { 
-    int lit = get_lit_from_varval(var, val);
-    int mapped_lit = perm2[lit];
-    return get_varval_from_lit(mapped_lit);
-  }
-
-  pair<int,int> get_varval(compiletime_val<3>, int* perm1, int* perm2, int* perm3, int var, int val)
-  { 
-    int lit = get_lit_from_varval(var, val);
-    int mapped_lit = perm3[lit];
-    return get_varval_from_lit(mapped_lit);
+    switch((int)cval)
+    {
+      case 0:
+        return make_pair(var, val); 
+      case 1:
+      { 
+        int lit = get_lit_from_varval(var, val);
+        int mapped_lit = perm1[lit];
+        return get_varval_from_lit(mapped_lit);
+      }
+      case 2:
+      { 
+        int lit = get_lit_from_varval(var, val);
+        int mapped_lit = perm2[lit];
+        return get_varval_from_lit(mapped_lit);
+      }
+      case 3:
+      { 
+        int lit = get_lit_from_varval(var, val);
+        int mapped_lit = perm3[lit];
+        return get_varval_from_lit(mapped_lit);
+      }
+      default:
+        abort();
+    }
   }
 
   template<typename Data>
@@ -326,10 +330,10 @@ struct VMConstraint : public AbstractConstraint
   }
 
 
-  template<typename Data, int CVal>
-  inline void increment_vm_perm(compiletime_val<CVal>, Data* VM_start, int length, int InPtr, int* perm, int* vals, int* newvals)
+  template<typename Data, typename CVal>
+  inline void increment_vm_perm(CVal cval, Data* VM_start, int length, int InPtr, int* perm, int* vals, int* newvals)
   {
-      switch(CVal)
+      switch((int)cval)
       {
         case 0:
         {
@@ -362,6 +366,7 @@ struct VMConstraint : public AbstractConstraint
           return execute_symmetric_vm(compiletime_val<2>(), VM_start, length, InPtr, perm, vals, newvals);
 
         }
+        break;
         default:
         abort();
       }

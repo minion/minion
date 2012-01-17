@@ -513,6 +513,80 @@ def vm_tree(tree, nodestarts, jumppoints, currentvm):
         currentvm += [-1000]
         return [nodestarts, jumppoints, currentvm]
 
+
+def vm_tree_code_begin(tree):
+    print "int get_mapping_size() { return " + str(len(get_lit_mapping())) + "; }"
+
+    print "vector<int> get_mapping_vector() {"
+    print "  vector<int> v;"
+    lits = get_lit_mapping()
+    for [var,val] in lits:
+        print "  v.push_back(" + str(var) + ");",
+        print "  v.push_back(" + str(val) + ");"
+    print "  return v; "
+    print "}"
+
+    print "virtual void full_propagate() "
+    print "{"
+    print " FULL_PROPAGATE_INIT "
+    vm_tree_code(tree)
+    print "}"
+
+def vm_tree_code(tree):
+    # nodestarts[tree['nodelabel']] = len(currentvm)
+
+    print "Label" + str(tree['nodelabel']) + ":     (void)1;"
+
+    if tree.has_key('pruning'):
+        for p in tree['pruning']:
+            print "permutedRemoveFromDomain(PERM_ARGS, %d,%d);"%(p[0], p[1])
+   
+
+    if(tree.has_key('perm')):
+        print "{"
+        print "const int new_perm[" + str(get_total_litcount()) + "] = {",
+        paddedperm = PadPerm(tree['perm'], get_total_litcount())
+        for i in paddedperm:
+            print str(i) + ",",
+        print "};"
+
+        print "  state = applyPermutation(PERM_ARGS, new_perm);"
+        print "}"
+        # Do the perm!
+        #currentvm += [-2000]
+        #assert(get_total_litcount() > 0)
+        #paddedperm = PadPerm(tree['perm'], get_total_litcount())
+        #paddedperm = [ i - 1 for i in paddedperm ]
+        #currentvm += paddedperm
+    
+
+    if(tree.has_key('goto')):
+        print "goto Label" + str(tree['goto']) + ";"
+    
+    if(tree.has_key('left') or tree.has_key('right')):
+        print "if(permutedInDomain(PERM_ARGS, %d,%d))"%(tree['var'], tree['val'])
+        print "{",
+        if tree.has_key('left'):
+            print "goto Label" + str(tree['left']['nodelabel']) + ";",
+        else:
+            print "return;",
+        print "}"
+        print "else"
+        print "{",
+        if tree.has_key('right'):
+            print "goto Label" + str(tree['right']['nodelabel']) + ";",
+        else:
+            print "return;",
+        print "}"
+
+        if tree.has_key('left'):
+            vm_tree_code(tree['left'])
+
+        if tree.has_key('right'):
+            vm_tree_code(tree['right'])
+
+
+
 def tree_cost(tree):
     # measure the max depth for now.
     l=0
@@ -628,12 +702,23 @@ def vm_print_tree(t):
         print("mapping 1 0 ")
 
 
+
 def choose_print_tree(t):
     if EnableVMOutput:
         print "MINION 3"
         vm_print_tree(t)
     else:
-        old_print_tree(t)
+        print "#ifdef PREPARE"
+        if EnableSymDetection:
+            print "#define SYMMETRIC"
+        print "#else"
+        if EnableSymDetection:
+            vm_tree_code_begin(t)
+        else:
+            print "virtual void full_propagate() {"
+            old_print_tree(t)
+            print "}"
+        print '#endif'
     print ""
     print Comment, " Depth: "+str(tree_cost(t))
     print Comment, " Number of nodes: "+str(tree_cost2(t))
