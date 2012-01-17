@@ -222,13 +222,13 @@ else
 { goto Label221; }
 Label220:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label134;
 Label221:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label199;
@@ -244,13 +244,13 @@ else
 { goto Label225; }
 Label224:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label138;
 Label225:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label203;
@@ -266,13 +266,13 @@ else
 { goto Label229; }
 Label228:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label142;
 Label229:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label207;
@@ -290,7 +290,7 @@ else
 { goto Label234; }
 Label233:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 9, 10, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 8, 9, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label153;
@@ -402,13 +402,13 @@ else
 { goto Label302; }
 Label301:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 11, 12, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 10, 11, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label199;
 Label302:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label280;
@@ -424,13 +424,13 @@ else
 { goto Label306; }
 Label305:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 13, 14, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 12, 13, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label203;
 Label306:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label284;
@@ -446,13 +446,13 @@ else
 { goto Label310; }
 Label309:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 15, 16, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 14, 15, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label207;
 Label310:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label288;
@@ -470,13 +470,13 @@ else
 { goto Label315; }
 Label314:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 9, 10, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 8, 9, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label218;
 Label315:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 9, 10, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 8, 9, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label299;
@@ -492,13 +492,13 @@ else
 { goto Label319; }
 Label318:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 11, 12, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 10, 11, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label222;
 Label319:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 11, 12, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 10, 11, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label303;
@@ -514,13 +514,13 @@ else
 { goto Label323; }
 Label322:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 13, 14, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 12, 13, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label226;
 Label323:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 13, 14, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 12, 13, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label307;
@@ -538,7 +538,7 @@ else
 { goto Label328; }
 Label327:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 7, 8, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 6, 7, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label231;
@@ -554,7 +554,7 @@ else
 { goto Label331; }
 Label330:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 9, 10, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 8, 9, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label234;
@@ -570,7 +570,7 @@ else
 { goto Label334; }
 Label333:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 11, 12, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 10, 11, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label237;
@@ -586,7 +586,7 @@ else
 { goto Label337; }
 Label336:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 13, 14, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 12, 13, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label240;
@@ -602,7 +602,7 @@ else
 { goto Label340; }
 Label339:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 15, 16, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 14, 15, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label243;
@@ -693,7 +693,7 @@ else
 { goto Label392; }
 Label392:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label360;
@@ -748,13 +748,13 @@ else
 { goto Label415; }
 Label414:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 11, 12, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 10, 11, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label280;
 Label415:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label389;
@@ -770,13 +770,13 @@ else
 { goto Label419; }
 Label418:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 13, 14, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 12, 13, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label284;
 Label419:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label393;
@@ -792,13 +792,13 @@ else
 { goto Label423; }
 Label422:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 15, 16, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 14, 15, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label288;
 Label423:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label401;
@@ -816,13 +816,13 @@ else
 { goto Label428; }
 Label427:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 9, 10, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 8, 9, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label299;
 Label428:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 9, 10, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 8, 9, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label412;
@@ -838,13 +838,13 @@ else
 { goto Label432; }
 Label431:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 11, 12, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 10, 11, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label303;
 Label432:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 11, 12, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 10, 11, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label416;
@@ -860,13 +860,13 @@ else
 { goto Label436; }
 Label435:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 13, 14, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 12, 13, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label307;
 Label436:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 13, 14, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 12, 13, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label420;
@@ -884,13 +884,13 @@ else
 { goto Label441; }
 Label440:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 7, 8, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 6, 7, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label312;
 Label441:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 7, 8, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 6, 7, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label425;
@@ -906,13 +906,13 @@ else
 { goto Label445; }
 Label444:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 9, 10, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 8, 9, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label316;
 Label445:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 9, 10, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 8, 9, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label429;
@@ -928,13 +928,13 @@ else
 { goto Label449; }
 Label448:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 11, 12, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 10, 11, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label320;
 Label449:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 11, 12, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 10, 11, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label433;
@@ -952,7 +952,7 @@ else
 { goto Label454; }
 Label453:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 5, 6, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label325;
@@ -968,7 +968,7 @@ else
 { goto Label457; }
 Label456:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 7, 8, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 6, 7, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label328;
@@ -984,7 +984,7 @@ else
 { goto Label460; }
 Label459:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 9, 10, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 8, 9, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label331;
@@ -1000,7 +1000,7 @@ else
 { goto Label463; }
 Label462:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 11, 12, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label334;
@@ -1016,7 +1016,7 @@ else
 { goto Label466; }
 Label465:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 13, 14, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 12, 13, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label337;
@@ -1032,7 +1032,7 @@ else
 { goto Label469; }
 Label468:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 15, 16, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 14, 15, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label340;
@@ -1077,13 +1077,13 @@ else
 { goto Label482; }
 Label481:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 15, 16, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 14, 15, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label349;
 Label482:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label470;
@@ -1150,7 +1150,7 @@ Label504:     (void)1;
 permutedRemoveFromDomain(PERM_ARGS, 9,1);
 Label506:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label484;
@@ -1166,7 +1166,7 @@ else
 { goto Label510; }
 Label510:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label484;
@@ -1192,7 +1192,7 @@ else
 { goto Label521; }
 Label520:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 13, 14, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 12, 13, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label376;
@@ -1203,7 +1203,7 @@ else
 { goto Label523; }
 Label522:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 15, 16, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 14, 15, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label378;
@@ -1217,7 +1217,7 @@ else
 { goto Label526; }
 Label526:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label490;
@@ -1235,7 +1235,7 @@ Label530:     (void)1;
 permutedRemoveFromDomain(PERM_ARGS, 0,1);
 Label531:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label490;
@@ -1285,13 +1285,13 @@ else
 { goto Label548; }
 Label547:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 11, 12, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label389;
 Label548:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label494;
@@ -1307,7 +1307,7 @@ else
 { goto Label552; }
 Label551:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 13, 14, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 12, 13, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label393;
@@ -1318,7 +1318,7 @@ else
 { goto Label554; }
 Label553:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label507;
@@ -1334,19 +1334,19 @@ else
 { goto Label557; }
 Label556:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label528;
 Label557:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label541;
 Label558:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 15, 16, 9, 10, 11, 12, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15, 8, 9, 10, 11, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label489;
@@ -1362,7 +1362,7 @@ else
 { goto Label562; }
 Label561:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 15, 16, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 14, 15, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label401;
@@ -1411,13 +1411,13 @@ else
 { goto Label577; }
 Label576:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 9, 10, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 8, 9, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label412;
 Label577:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 9, 10, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 8, 9, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label545;
@@ -1433,13 +1433,13 @@ else
 { goto Label581; }
 Label580:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 11, 12, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label416;
 Label581:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 11, 12, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 10, 11, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label549;
@@ -1455,13 +1455,13 @@ else
 { goto Label585; }
 Label584:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 13, 14, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 12, 13, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label420;
 Label585:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 13, 14, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 12, 13, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label559;
@@ -1479,13 +1479,13 @@ else
 { goto Label590; }
 Label589:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 7, 8, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 6, 7, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label425;
 Label590:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 7, 8, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 6, 7, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label574;
@@ -1501,13 +1501,13 @@ else
 { goto Label594; }
 Label593:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 9, 10, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 8, 9, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label429;
 Label594:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 9, 10, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 8, 9, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label578;
@@ -1523,13 +1523,13 @@ else
 { goto Label598; }
 Label597:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 11, 12, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label433;
 Label598:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 11, 12, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 10, 11, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label582;
@@ -1547,13 +1547,13 @@ else
 { goto Label603; }
 Label602:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 5, 6, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label438;
 Label603:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 5, 6, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label587;
@@ -1569,13 +1569,13 @@ else
 { goto Label607; }
 Label606:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 7, 8, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 6, 7, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label442;
 Label607:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 7, 8, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 6, 7, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label591;
@@ -1591,13 +1591,13 @@ else
 { goto Label611; }
 Label610:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 9, 10, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 8, 9, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label446;
 Label611:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 9, 10, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 8, 9, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label595;
@@ -1615,7 +1615,7 @@ else
 { goto Label616; }
 Label615:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label451;
@@ -1631,7 +1631,7 @@ else
 { goto Label619; }
 Label618:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label454;
@@ -1647,7 +1647,7 @@ else
 { goto Label622; }
 Label621:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label457;
@@ -1663,7 +1663,7 @@ else
 { goto Label625; }
 Label624:     (void)1;
 {
-const int new_perm[20] = { 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label460;
@@ -1679,7 +1679,7 @@ else
 { goto Label628; }
 Label627:     (void)1;
 {
-const int new_perm[20] = { 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label463;
@@ -1695,7 +1695,7 @@ else
 { goto Label631; }
 Label630:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label466;
@@ -1713,7 +1713,7 @@ else
 { goto Label635; }
 Label634:     (void)1;
 {
-const int new_perm[20] = { 15, 16, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label470;
@@ -1752,13 +1752,13 @@ else
 { goto Label646; }
 Label645:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label479;
 Label646:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label632;
@@ -1779,7 +1779,7 @@ else
 { goto Label651; }
 Label650:     (void)1;
 {
-const int new_perm[20] = { 15, 16, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label484;
@@ -1816,7 +1816,7 @@ else
 { goto Label661; }
 Label660:     (void)1;
 {
-const int new_perm[20] = { 15, 16, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label490;
@@ -1839,7 +1839,7 @@ else
 { goto Label668; }
 Label667:     (void)1;
 {
-const int new_perm[20] = { 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label495;
@@ -1855,7 +1855,7 @@ else
 { goto Label671; }
 Label670:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label498;
@@ -1871,7 +1871,7 @@ else
 { goto Label674; }
 Label673:     (void)1;
 {
-const int new_perm[20] = { 15, 16, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label501;
@@ -1879,13 +1879,13 @@ Label674:     (void)1;
 permutedRemoveFromDomain(PERM_ARGS, 9,1);
 Label675:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 15, 16, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 14, 15, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label651;
 Label676:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label648;
@@ -1901,13 +1901,13 @@ else
 { goto Label680; }
 Label679:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label507;
 Label680:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label648;
@@ -1952,7 +1952,7 @@ else
 { goto Label692; }
 Label691:     (void)1;
 {
-const int new_perm[20] = { 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label519;
@@ -1963,7 +1963,7 @@ else
 { goto Label694; }
 Label693:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label521;
@@ -1977,13 +1977,13 @@ else
 { goto Label697; }
 Label696:     (void)1;
 {
-const int new_perm[20] = { 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label524;
 Label697:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 15, 16, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 14, 15, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label659;
@@ -1994,7 +1994,7 @@ else
 { goto Label700; }
 Label699:     (void)1;
 {
-const int new_perm[20] = { 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label527;
@@ -2005,7 +2005,7 @@ else
 { return; }
 Label701:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label659;
@@ -2026,7 +2026,7 @@ else
 { goto Label707; }
 Label706:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label528;
@@ -2039,13 +2039,13 @@ else
 { return; }
 Label709:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 9, 10, 11, 12, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 8, 9, 10, 11, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label490;
 Label711:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label700;
@@ -2061,7 +2061,7 @@ else
 { goto Label715; }
 Label714:     (void)1;
 {
-const int new_perm[20] = { 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label532;
@@ -2082,7 +2082,7 @@ else
 { goto Label719; }
 Label718:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 11, 12, 7, 8, 9, 10, 5, 6, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 10, 11, 6, 7, 8, 9, 4, 5, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label536;
@@ -2105,7 +2105,7 @@ else
 { goto Label726; }
 Label725:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label541;
@@ -2123,13 +2123,13 @@ else
 { goto Label732; }
 Label731:     (void)1;
 {
-const int new_perm[20] = { 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label545;
 Label732:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 9, 10, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 8, 9, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label664;
@@ -2145,7 +2145,7 @@ else
 { goto Label736; }
 Label735:     (void)1;
 {
-const int new_perm[20] = { 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label549;
@@ -2156,7 +2156,7 @@ else
 { goto Label738; }
 Label737:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 11, 12, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 10, 11, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label677;
@@ -2177,13 +2177,13 @@ else
 { goto Label742; }
 Label741:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 11, 12, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 10, 11, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label705;
 Label742:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 11, 12, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 10, 11, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label724;
@@ -2194,13 +2194,13 @@ else
 { return; }
 Label744:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 5, 6, 11, 12, 15, 16, 7, 8, 9, 10, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 4, 5, 10, 11, 14, 15, 6, 7, 8, 9, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label489;
 Label746:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 7, 8, 9, 10, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 6, 7, 8, 9, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label657;
@@ -2216,7 +2216,7 @@ else
 { goto Label750; }
 Label749:     (void)1;
 {
-const int new_perm[20] = { 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 12, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label559;
@@ -2232,7 +2232,7 @@ else
 { goto Label753; }
 Label752:     (void)1;
 {
-const int new_perm[20] = { 15, 16, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label562;
@@ -2254,13 +2254,13 @@ else
 { goto Label759; }
 Label758:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label574;
 Label759:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 7, 8, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 6, 7, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label729;
@@ -2276,13 +2276,13 @@ else
 { goto Label763; }
 Label762:     (void)1;
 {
-const int new_perm[20] = { 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label578;
 Label763:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 9, 10, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 8, 9, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label733;
@@ -2298,13 +2298,13 @@ else
 { goto Label767; }
 Label766:     (void)1;
 {
-const int new_perm[20] = { 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label582;
 Label767:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 11, 12, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 10, 11, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label747;
@@ -2322,13 +2322,13 @@ else
 { goto Label772; }
 Label771:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label587;
 Label772:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 5, 6, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label756;
@@ -2344,13 +2344,13 @@ else
 { goto Label776; }
 Label775:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label591;
 Label776:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 7, 8, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 6, 7, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label760;
@@ -2366,13 +2366,13 @@ else
 { goto Label780; }
 Label779:     (void)1;
 {
-const int new_perm[20] = { 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label595;
 Label780:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 9, 10, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 8, 9, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label764;
@@ -2390,13 +2390,13 @@ else
 { goto Label785; }
 Label784:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label600;
 Label785:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label769;
@@ -2412,13 +2412,13 @@ else
 { goto Label789; }
 Label788:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label604;
 Label789:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label773;
@@ -2434,13 +2434,13 @@ else
 { goto Label793; }
 Label792:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label608;
 Label793:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label777;
@@ -2541,7 +2541,7 @@ else
 { goto Label1108; }
 Label1107:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1097;
@@ -2552,7 +2552,7 @@ else
 { goto Label1110; }
 Label1109:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1099;
@@ -2563,7 +2563,7 @@ else
 { goto Label1112; }
 Label1111:     (void)1;
 {
-const int new_perm[20] = { 9, 10, 1, 2, 7, 8, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 8, 9, 0, 1, 6, 7, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1101;
@@ -2574,7 +2574,7 @@ else
 { goto Label1114; }
 Label1113:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 11, 12, 3, 4, 5, 6, 9, 10, 7, 8, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 10, 11, 2, 3, 4, 5, 8, 9, 6, 7, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1103;
@@ -2588,7 +2588,7 @@ else
 { goto Label1117; }
 Label1116:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1106;
@@ -2599,7 +2599,7 @@ else
 { goto Label1119; }
 Label1118:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1108;
@@ -2610,7 +2610,7 @@ else
 { goto Label1121; }
 Label1120:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1110;
@@ -2621,7 +2621,7 @@ else
 { goto Label1123; }
 Label1122:     (void)1;
 {
-const int new_perm[20] = { 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1112;
@@ -2635,7 +2635,7 @@ else
 { goto Label1181; }
 Label1180:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1014;
@@ -2689,7 +2689,7 @@ else
 { goto Label1217; }
 Label1216:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1206;
@@ -2700,7 +2700,7 @@ else
 { goto Label1219; }
 Label1218:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1208;
@@ -2711,7 +2711,7 @@ else
 { goto Label1221; }
 Label1220:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1210;
@@ -2722,7 +2722,7 @@ else
 { goto Label1223; }
 Label1222:     (void)1;
 {
-const int new_perm[20] = { 9, 10, 1, 2, 3, 4, 7, 8, 5, 6, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 8, 9, 0, 1, 2, 3, 6, 7, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1212;
@@ -2769,7 +2769,7 @@ else
 { goto Label1249; }
 Label1248:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 5, 6, 3, 4, 7, 8, 9, 10, 11, 12, 15, 16, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 10, 11, 14, 15, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1240;
@@ -2780,7 +2780,7 @@ else
 { goto Label1251; }
 Label1250:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 5, 6, 3, 4, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 4, 5, 2, 3, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1242;
@@ -2791,7 +2791,7 @@ else
 { goto Label1253; }
 Label1252:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 9, 10, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 8, 9, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1244;
@@ -2805,7 +2805,7 @@ else
 { goto Label1256; }
 Label1255:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1247;
@@ -2816,7 +2816,7 @@ else
 { goto Label1258; }
 Label1257:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1249;
@@ -2827,7 +2827,7 @@ else
 { goto Label1260; }
 Label1259:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1251;
@@ -2873,7 +2873,7 @@ else
 { goto Label1295; }
 Label1294:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1284;
@@ -2884,7 +2884,7 @@ else
 { goto Label1297; }
 Label1296:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1286;
@@ -2895,7 +2895,7 @@ else
 { goto Label1299; }
 Label1298:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1288;
@@ -2906,7 +2906,7 @@ else
 { goto Label1301; }
 Label1300:     (void)1;
 {
-const int new_perm[20] = { 9, 10, 1, 2, 3, 4, 7, 8, 5, 6, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 8, 9, 0, 1, 2, 3, 6, 7, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1290;
@@ -2919,7 +2919,7 @@ else
 { goto Label1304; }
 Label1303:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1179;
@@ -2930,7 +2930,7 @@ else
 { goto Label1306; }
 Label1305:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1181;
@@ -2978,7 +2978,7 @@ else
 { goto Label1332; }
 Label1331:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 15, 16, 13, 14, 11, 12, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 14, 15, 12, 13, 10, 11, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1323;
@@ -2989,7 +2989,7 @@ else
 { goto Label1334; }
 Label1333:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1325;
@@ -3000,7 +3000,7 @@ else
 { goto Label1336; }
 Label1335:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 15, 16, 13, 14, 11, 12, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 14, 15, 12, 13, 10, 11, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1327;
@@ -3040,7 +3040,7 @@ else
 { goto Label1361; }
 Label1360:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 15, 16, 13, 14, 11, 12, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 14, 15, 12, 13, 10, 11, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1352;
@@ -3051,7 +3051,7 @@ else
 { goto Label1363; }
 Label1362:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1354;
@@ -3062,7 +3062,7 @@ else
 { goto Label1365; }
 Label1364:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 15, 16, 13, 14, 11, 12, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 14, 15, 12, 13, 10, 11, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1356;
@@ -3102,7 +3102,7 @@ else
 { goto Label1390; }
 Label1389:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 15, 16, 13, 14, 11, 12, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 14, 15, 12, 13, 10, 11, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1381;
@@ -3113,7 +3113,7 @@ else
 { goto Label1392; }
 Label1391:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1383;
@@ -3124,7 +3124,7 @@ else
 { goto Label1394; }
 Label1393:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 15, 16, 13, 14, 11, 12, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 14, 15, 12, 13, 10, 11, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1385;
@@ -3137,7 +3137,7 @@ else
 { goto Label1397; }
 Label1396:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1302;
@@ -3148,7 +3148,7 @@ else
 { goto Label1399; }
 Label1398:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1304;
@@ -3159,7 +3159,7 @@ else
 { return; }
 Label1400:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1306;
@@ -3170,7 +3170,7 @@ else
 { goto Label1404; }
 Label1403:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 9, 10, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 8, 9, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1395;
@@ -3181,7 +3181,7 @@ else
 { goto Label1406; }
 Label1405:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 11, 12, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 10, 11, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1397;
@@ -3192,7 +3192,7 @@ else
 { return; }
 Label1407:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 5, 6, 13, 14, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 4, 5, 12, 13, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1399;
@@ -3203,7 +3203,7 @@ else
 { goto Label1411; }
 Label1410:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 7, 8, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 6, 7, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1402;
@@ -3214,7 +3214,7 @@ else
 { goto Label1413; }
 Label1412:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 9, 10, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 8, 9, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1404;
@@ -3225,7 +3225,7 @@ else
 { return; }
 Label1414:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 3, 4, 11, 12, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 2, 3, 10, 11, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1406;
@@ -3236,7 +3236,7 @@ else
 { goto Label1418; }
 Label1417:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 5, 6, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1409;
@@ -3247,7 +3247,7 @@ else
 { goto Label1420; }
 Label1419:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 7, 8, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 6, 7, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1411;
@@ -3258,7 +3258,7 @@ else
 { return; }
 Label1421:     (void)1;
 {
-const int new_perm[20] = { 1, 2, 9, 10, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 0, 1, 8, 9, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1413;
@@ -3269,7 +3269,7 @@ else
 { goto Label1425; }
 Label1424:     (void)1;
 {
-const int new_perm[20] = { 3, 4, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1416;
@@ -3280,7 +3280,7 @@ else
 { goto Label1427; }
 Label1426:     (void)1;
 {
-const int new_perm[20] = { 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 4, 5, 0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1418;
@@ -3291,7 +3291,7 @@ else
 { return; }
 Label1428:     (void)1;
 {
-const int new_perm[20] = { 7, 8, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, };
+const int new_perm[20] = { 6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, };
   state = applyPermutation(PERM_ARGS, new_perm);
 }
 goto Label1420;
