@@ -181,7 +181,7 @@ struct TestConstraint : public AbstractConstraint
   }
 
   template<typename Data, typename CVal>
-  inline int applyPermutation(CVal cval, int const* perm, int* vals, int* newvals, Data* NewPerm)
+  inline int applyPermutation(CVal cval, int const*& perm, int* vals, int* newvals, Data* NewPerm)
   {
       switch((int)cval)
       {
