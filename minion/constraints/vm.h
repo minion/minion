@@ -66,6 +66,7 @@ struct VMConstraint : public AbstractConstraint
 
   VMConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples, TupleList* _mapping_tuples) :
   AbstractConstraint(stateObj), 
+  total_lits(0), vars_size(-1),
   VM_data(_tuples->getPointer()), VM_size(_tuples->tuple_size())
   #if UseStatePtr
     ,StatePtr(stateObj, 0)
@@ -297,17 +298,32 @@ struct VMConstraint : public AbstractConstraint
   template<typename Data>
   void execute_symmetric_vm_start(Data* VM_start, int length)
   {
-    int vals[total_lits];
-    int newvals[total_lits];
-    int* perm = 0;
+    if(total_lits > 0)
+    {
+      int vals[total_lits];
+      int newvals[total_lits];
+      int* perm = 0;
 
-    execute_symmetric_vm(compiletime_val<0>(), VM_start, length, 
-#if UseStatePtr
-    StatePtr, 
-#else
-    0,
-#endif
-    perm, vals, newvals);
+      execute_symmetric_vm(compiletime_val<0>(), VM_start, length, 
+  #if UseStatePtr
+      StatePtr, 
+  #else
+      0,
+  #endif
+      perm, vals, newvals);
+    }
+    else
+    {
+
+      execute_symmetric_vm(compiletime_val<0>(), VM_start, length, 
+  #if UseStatePtr
+      StatePtr, 
+  #else
+      0,
+  #endif
+      0, 0, 0);
+      
+    }
   }
 
 
