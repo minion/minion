@@ -547,7 +547,7 @@ def vm_tree_code(tree):
         print "const int new_perm[" + str(get_total_litcount()) + "] = {",
         paddedperm = PadPerm(tree['perm'], get_total_litcount())
         for i in paddedperm:
-            print str(i) + ",",
+            print str(i-1) + ",",
         print "};"
 
         print "  state = applyPermutation(PERM_ARGS, new_perm);"
