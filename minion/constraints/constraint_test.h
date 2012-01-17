@@ -256,7 +256,9 @@ int vals[total_lits]; \
 int newvals[total_lits]; \
 int const* perm = 0; \
 
-  
+//#define PRINT_MACRO(X) std::cout << "Label: " << X << std::endl;
+#define PRINT_MACRO(X)
+
 #include "generated_constraint_code.h"
 
 
