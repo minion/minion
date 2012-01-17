@@ -536,7 +536,7 @@ def vm_tree_code(tree):
     # nodestarts[tree['nodelabel']] = len(currentvm)
 
     print "Label" + str(tree['nodelabel']) + ":     (void)1;"
-
+    print "PRINT_MACRO(" + str(tree['nodelabel']) + ");"
     if tree.has_key('pruning'):
         for p in tree['pruning']:
             print "permutedRemoveFromDomain(PERM_ARGS, %d,%d);"%(p[0], p[1])
@@ -584,7 +584,8 @@ def vm_tree_code(tree):
 
         if tree.has_key('right'):
             vm_tree_code(tree['right'])
-
+    else:
+        print "return;"
 
 
 def tree_cost(tree):
