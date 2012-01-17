@@ -132,7 +132,6 @@ struct VMConstraint : public AbstractConstraint
           FAIL_EXIT();
         }
 
-        set<int>::iterator it = domains[i].begin();
         for(set<int>::iterator it = domains[i].begin(); it != domains[i].end(); ++it)
         {
           D(D(domain_vals,i), (*it - domain_min[i]) ) = literal;
@@ -256,7 +255,7 @@ struct VMConstraint : public AbstractConstraint
 
   inline int get_lit_from_varval(int var, int val)
   {
-    return D(D(domain_vals,var), (val - domain_min[val]));
+    return D(D(domain_vals,var), (val - domain_min[var]));
   }
 
   inline pair<int,int> get_varval_from_lit(int lit)
