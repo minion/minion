@@ -80,7 +80,7 @@ struct TestConstraint : public AbstractConstraint
       if(mapping_size == 0)
         return;
 
-      total_lits = mapping_size / 2;
+      total_lits = mapping_size;
 
       vector<set<int> > domains(vars_size);
       for(int i = 0; i < mapping_size; i+=2)
