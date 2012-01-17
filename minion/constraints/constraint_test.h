@@ -194,21 +194,30 @@ struct TestConstraint : public AbstractConstraint
         case 1:
         {
           for(int i = 0; i < total_lits; ++i)
+          {
             vals[i] = perm[NewPerm[i] ];
+            D_ASSERT(vals[i] >= 0 && vals[i] < total_lits);
+          }
           return 2;
         }
         break;
         case 2:
         {
           for(int i = 0; i < total_lits; ++i)
+          {
             newvals[i] = vals[NewPerm[i] ];
+            D_ASSERT(newvals[i] >= 0 && newvals[i] < total_lits);
+          }
           return 3;
         }
         break;
         case 3:
         {
           for(int i = 0; i < total_lits; ++i)
+          {
             vals[i] = newvals[NewPerm[i] ];
+            D_ASSERT(vals[i] >= 0 && vals[i] < total_lits);
+          }
           return 2;
         }
         break;
