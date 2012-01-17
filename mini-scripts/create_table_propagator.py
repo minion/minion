@@ -552,16 +552,11 @@ def vm_tree_code(tree):
 
         print "  state = applyPermutation(PERM_ARGS, new_perm);"
         print "}"
-        # Do the perm!
-        #currentvm += [-2000]
-        #assert(get_total_litcount() > 0)
-        #paddedperm = PadPerm(tree['perm'], get_total_litcount())
-        #paddedperm = [ i - 1 for i in paddedperm ]
-        #currentvm += paddedperm
     
 
     if(tree.has_key('goto')):
         print "goto Label" + str(tree['goto']) + ";"
+        return
     
     if(tree.has_key('left') or tree.has_key('right')):
         print "if(permutedInDomain(PERM_ARGS, %d,%d))"%(tree['var'], tree['val'])
