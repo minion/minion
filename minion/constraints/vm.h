@@ -65,7 +65,7 @@ struct VMConstraint : public AbstractConstraint
   Reversible<int> StatePtr;
   bool AllChoicesFixed;
   #if UseStatePtrSym
-  MoveableArray<int> StatePtrPerm;
+  MoveableArray<char> StatePtrPerm;
   #endif
   #endif
 
@@ -114,7 +114,7 @@ struct VMConstraint : public AbstractConstraint
       total_lits = mapping_size / 2;
       
       #if UseStatePtr && UseStatePtrSym
-      StatePtrPerm=getMemory(stateObj).backTrack().template requestArray<int>(total_lits);
+      StatePtrPerm=getMemory(stateObj).backTrack().template requestArray<char>(total_lits);
       for(int i=0; i<total_lits; i++) StatePtrPerm[i]=i;
       #endif
       
