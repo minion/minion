@@ -35,7 +35,8 @@
 
 //#define SPECIAL_VM
 
-#define UseStatePtr false
+#define UseStatePtr true
+#define UseStatePtrSym true
 // UseStatePtr not finished:at least have to do the Jump instruction and also make sure the vm is not using Perm instructions.
 
 template<typename VarArray, bool UseSymmetricVM>
@@ -62,6 +63,10 @@ struct VMConstraint : public AbstractConstraint
   
   #if UseStatePtr
   Reversible<int> StatePtr;
+  bool AllChoicesFixed;
+  #if UseStatePtrSym
+  MoveableArray<int> StatePtrPerm;
+  #endif
   #endif
 
   VMConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples, TupleList* _mapping_tuples) :
@@ -85,7 +90,9 @@ struct VMConstraint : public AbstractConstraint
           cout << "VM takes tuplelists containing a single tuple" << endl;
           FAIL_EXIT();
       }
-
+      
+      
+      
       int* mapping = _mapping_tuples->getPointer();
       int mapping_size = _mapping_tuples->tuple_size();
       if(mapping_size % 2 != 0)
@@ -105,7 +112,12 @@ struct VMConstraint : public AbstractConstraint
         return;
 
       total_lits = mapping_size / 2;
-
+      
+      #if UseStatePtr && UseStatePtrSym
+      StatePtrPerm=getMemory(stateObj).backTrack().template requestArray<int>(total_lits);
+      for(int i=0; i<total_lits; i++) StatePtrPerm[i]=i;
+      #endif
+      
       vector<set<int> > domains(vars_size);
       for(int i = 0; i < mapping_size; i+=2)
       {
@@ -301,19 +313,34 @@ struct VMConstraint : public AbstractConstraint
   template<typename Data>
   void execute_symmetric_vm_start(Data* VM_start, int length)
   {
+    #if UseStatePtr
+      AllChoicesFixed=true;
+    #endif
+    
     if(total_lits > 0)
     {
       int vals[total_lits];
       int newvals[total_lits];
       int* perm = 0;
-
-      execute_symmetric_vm(compiletime_val<0>(), VM_start, length, 
+      
+      #if UseStatePtr && UseStatePtrSym
+      for(int i=0; i<total_lits; i++) vals[i]=StatePtrPerm[i];
+      
+      // 2 means start in the state where the permutation is in 'vals'... I think... 
+      execute_symmetric_vm(compiletime_val<2>(), VM_start, length, StatePtr, perm, vals, newvals);
+      
+      #else
+      
+      execute_symmetric_vm(compiletime_val<0>(), VM_start, length,  
   #if UseStatePtr
       StatePtr, 
   #else
       0,
   #endif
       perm, vals, newvals);
+      
+      #endif
+      
     }
     else
     {
@@ -339,6 +366,12 @@ struct VMConstraint : public AbstractConstraint
         {
           perm = VM_start + InPtr;
           InPtr += total_lits;
+          #if UseStatePtr && UseStatePtrSym
+          if(AllChoicesFixed) { 
+            StatePtr=InPtr;
+            for(int i=0; i<total_lits; i++) StatePtrPerm[i]=perm[i];
+          }
+          #endif
           return execute_symmetric_vm(compiletime_val<1>(), VM_start, length, InPtr, perm, vals, newvals);
         }
         break;
@@ -347,6 +380,12 @@ struct VMConstraint : public AbstractConstraint
           for(int i = 0; i < total_lits; ++i)
             vals[i] = perm[get(InPtr+i)];
           InPtr += total_lits;
+          #if UseStatePtr && UseStatePtrSym
+          if(AllChoicesFixed) { 
+            StatePtr=InPtr;
+            for(int i=0; i<total_lits; i++) StatePtrPerm[i]=vals[i];
+          }
+          #endif
           return execute_symmetric_vm(compiletime_val<2>(), VM_start, length, InPtr, perm, vals, newvals);
         }
         break;
@@ -355,6 +394,12 @@ struct VMConstraint : public AbstractConstraint
           for(int i = 0; i < total_lits; ++i)
             newvals[i] = vals[get(InPtr+i)];
           InPtr += total_lits;
+          #if UseStatePtr && UseStatePtrSym
+          if(AllChoicesFixed) { 
+            StatePtr=InPtr;
+            for(int i=0; i<total_lits; i++) StatePtrPerm[i]=newvals[i];
+          }
+          #endif
           return execute_symmetric_vm(compiletime_val<3>(), VM_start, length, InPtr, perm, vals, newvals);
         }
         break;
@@ -363,6 +408,12 @@ struct VMConstraint : public AbstractConstraint
           for(int i = 0; i < total_lits; ++i)
             vals[i] = newvals[get(InPtr+i)];
           InPtr += total_lits;
+          #if UseStatePtr && UseStatePtrSym
+          if(AllChoicesFixed) { 
+            StatePtr=InPtr;
+            for(int i=0; i<total_lits; i++) StatePtrPerm[i]=vals[i];
+          }
+          #endif
           return execute_symmetric_vm(compiletime_val<2>(), VM_start, length, InPtr, perm, vals, newvals);
 
         }
@@ -422,7 +473,7 @@ struct VMConstraint : public AbstractConstraint
                           }
                           else
                           {
-                            AllChoicesFixed = false;
+                            AllChoicesFixed = false;  // not assigned; this value could be removed so stop updating state pointer from now on. 
                           }
                         }
                     #endif
@@ -433,7 +484,7 @@ struct VMConstraint : public AbstractConstraint
                     InPtr = get(InPtr+3);
                     #if UseStatePtr
                         if(AllChoicesFixed) {
-                            StatePtr=InPtr;
+                            StatePtr=InPtr;   // 'domain value out' is always fixed. 
                         }
                     #endif
                 }
@@ -449,7 +500,11 @@ struct VMConstraint : public AbstractConstraint
             {
                 P(InPtr << ". Apply perm");
                 InPtr++;
-
+                #if UseStatePtr
+                if(AllChoicesFixed) {
+                    StatePtr=InPtr;
+                }
+                #endif
                 return increment_vm_perm(cv, VM_start, length, InPtr, perm, vals, newvals);
             }
             break;
