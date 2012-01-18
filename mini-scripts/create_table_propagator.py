@@ -37,6 +37,8 @@ EnableSymDetection = False
 matched = 0
 matchedprint = 10
 
+TreeNodes={}   # maps from identifier to tree node. 
+CountTreeSize=True
 
 def markEmpty(nodenum):
     global EmptyNodes
@@ -232,7 +234,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     # and make two new tree nodes ... calls itself recursively.
     # Returns false if it and all its children do not do any pruning.
     #print "Top of build_tree"
-    global calls_build_tree
+    global calls_build_tree, TreeNodes
     calls_build_tree+=1
    
    
@@ -320,9 +322,27 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
             #print('# Empty node found')
             return False
         if perm != False:
-            tree['perm'] = perm[1]
-            tree['goto'] = perm[0]
-            return True
+            if CountTreeSize:
+                gotonodenum=perm[0]
+                assert TreeNodes.has_key(gotonodenum)
+                gotonodelist=[TreeNodes[gotonodenum]]
+                gotonodecounter=0
+                while not gotonodelist.empty():
+                    curnode=gotonodelist[0]
+                    gotonodelist=gotonodelist[1:]
+                    gotonodecounter+=1
+                    if curnode.has_key['left']:
+                        gotonodelist.append(curnode['left'])
+                    if curnode.has_key['right']:
+                        gotonodelist.append(curnode['right'])
+                if gotonodecounter>=10:
+                    tree['perm'] = perm[1]
+                    tree['goto'] = perm[0]
+                    return True
+            else:
+                tree['perm'] = perm[1]
+                tree['goto'] = perm[0]
+                return True
 
     # No need to find singleton domains here, and put them 'in', because ...?
     
@@ -407,6 +427,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     
     tree['left']=dict()
     tree['left']['nodelabel'] = getnodenum()
+    TreeNodes[tree['left']['nodelabel']]=tree['left']
     
     # just for left branch
     domains_in[chosenvar].append(chosenval)
@@ -422,6 +443,8 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     
     tree['right']=dict()
     tree['right']['nodelabel'] = getnodenum()
+    TreeNodes[tree['right']['nodelabel']]=tree['right']
+    
     prun_right=build_tree(ct2, tree['right'], domains_in, domains_poss, varvalorder, heuristic)
     if not prun_right:
         if checktreecutoff:
@@ -628,7 +651,7 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
     alltups=[]
     crossprod(domains_init, [], alltups)
     
-    global gac2001_goods, gac2001_indices, gac2001_domains_init
+    global gac2001_goods, gac2001_indices, gac2001_domains_init, TreeNodes
     
     gac2001_goods=[ [ [] for a in dom ] for dom in domains_init ]
     for t in alltups:
@@ -652,6 +675,7 @@ def generate_tree(ct_nogoods, domains_init, heuristic):
     for perm in permlist:
         tree=dict()
         tree['nodelabel']=getnodenum()
+        TreeNodes[tree['nodelabel']]=tree
         domains_in=[ [] for i in domains_init]
         domains=copy.deepcopy(domains_init)
         print Comment, " Call buildtree"
@@ -865,7 +889,7 @@ def gcc():
         onecount=sum(map(lambda x: x == 1, l))
         twocount=sum(map(lambda x: x == 2, l))
         if zerocount != 4 or onecount != 4 or twocount != 4:
-            table.append(l)    
+            table.append(l)
 
     domains_init=[[0,1,2] for i in range(12)]
     t=generate_tree(table, domains_init, True)
