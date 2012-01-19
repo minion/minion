@@ -474,13 +474,13 @@ def old_print_tree(tree, indent="    "):
       print indent+"// No number"
     if tree.has_key('pruning'):
         for p in tree['pruning']:
-            print indent+"var_array[%d].removeFromDomain(%d);"%(p[0], p[1])
+            print indent+"vars[%d].removeFromDomain(%d);"%(p[0], p[1])
     if tree.has_key('goto'):
         print indent+str(tree['goto'])
         print indent+str(tree['perm'])
         return
     if tree.has_key('left'):
-        print indent+"if(var_array[%d].inDomain(%d))"%(tree['var'], tree['val'])
+        print indent+"if(vars[%d].inDomain(%d))"%(tree['var'], tree['val'])
         print indent+"{"
         old_print_tree(tree['left'], indent+"    ")
         print indent+"}"
@@ -491,7 +491,7 @@ def old_print_tree(tree, indent="    "):
             print indent+"}"
     else:
         if tree.has_key('right'):
-            print indent+"if(!var_array[%d].inDomain(%d))"%(tree['var'], tree['val'])
+            print indent+"if(!vars[%d].inDomain(%d))"%(tree['var'], tree['val'])
             print indent+"{"
             old_print_tree(tree['right'], indent+"    ")
             print indent+"}"
