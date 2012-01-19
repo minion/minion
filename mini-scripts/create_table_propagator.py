@@ -327,15 +327,24 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                 assert TreeNodes.has_key(gotonodenum)
                 gotonodelist=[TreeNodes[gotonodenum]]
                 gotonodecounter=0
-                while not gotonodelist.empty():
+                while gotonodelist:
                     curnode=gotonodelist[0]
                     gotonodelist=gotonodelist[1:]
-                    gotonodecounter+=1
-                    if curnode.has_key['left']:
+                    if curnode.has_key('pruning'):
+                        gotonodecounter+=2+(2*len(curnode['pruning']))
+                    if curnode.has_key('goto'):
+                        gotonodecounter+=2   # jump takes 2 integers
+                    if curnode.has_key('perm'):
+                        gotonodecounter+=1   # the instruction
+                        gotonodecounter+=get_total_litcount()
+                    if curnode.has_key('left') or curnode.has_key('right'):
+                        gotonodecounter+=5
+                    
+                    if curnode.has_key('left'):
                         gotonodelist.append(curnode['left'])
-                    if curnode.has_key['right']:
+                    if curnode.has_key('right'):
                         gotonodelist.append(curnode['right'])
-                if gotonodecounter>=10:
+                if gotonodecounter> ( 1+get_total_litcount()+2 )*TreeCutoff :   # is tree larger than size of perm and goto (multiplied by parameter)?
                     tree['perm'] = perm[1]
                     tree['goto'] = perm[0]
                     return True
@@ -563,8 +572,8 @@ def vm_tree_code(tree):
     if tree.has_key('pruning'):
         for p in tree['pruning']:
             print "permutedRemoveFromDomain(PERM_ARGS, %d,%d);"%(p[0], p[1])
-   
-
+    
+    
     if(tree.has_key('perm')):
         print "{"
         print "const int new_perm[" + str(get_total_litcount()) + "] = {",
@@ -1161,6 +1170,12 @@ def lifeImmigration():
 # get rid of treenodes when there are no nogoods left.
 
 #cProfile.run('life()')
+
+if len(sys.argv)>4:
+    TreeCutoff=float(sys.argv[4])
+    #print "# read TreeCutoff value of %f"%TreeCutoff
+else:
+    TreeCutoff=1
 
 EnableVMOutput = eval(sys.argv[2])
 EnableSymDetection = eval(sys.argv[3])
