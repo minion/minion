@@ -46,14 +46,15 @@ struct TestConstraint : public AbstractConstraint
   
    array<ArrayVarRef,10> vars;
 
+  int vars_size;
+
 #ifdef SYMMETRIC
   static const int MaxDomSize = 7;
   static const int MaxVarSize = 10;
   array<signed char, MaxVarSize> domain_min;
   array<array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
   array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
-  int total_lits;
-  int vars_size;
+  int total_lits;  
 #endif 
   
   TestConstraint(StateObj* _stateObj, const VarArray& _vars) :
@@ -63,9 +64,9 @@ struct TestConstraint : public AbstractConstraint
       {
           vars[i] = _vars[i];
       }
-#ifdef SYMMETRIC
       vars_size = _vars.size();
- 
+
+#ifdef SYMMETRIC
       vector<int> vec_mapping = get_mapping_vector();
       int mapping_size = vec_mapping.size();
 
