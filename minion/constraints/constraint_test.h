@@ -136,6 +136,7 @@ struct TestConstraint : public AbstractConstraint
   }
   
 #ifdef SYMMETRIC
+
   inline int get_lit_from_varval(int var, int val)
   {
     return D(D(domain_vals,var), (val - domain_min[var]));
@@ -150,6 +151,15 @@ struct TestConstraint : public AbstractConstraint
     return D(literal_map,lit); 
   }
 
+  pair<int,int> apply_perm(compiletime_val<0>, int const* perm, int var, int val)
+  {
+    int lit = get_lit_from_varval(var, val);
+    int mapped_lit = perm[lit];
+    return get_varval_from_lit(mapped_lit);
+  }
+
+  pair<int,int> apply_perm(compiletime_val<1>, int const* perm, int var, int val)
+  { return std::pair<int, int>(perm[var], val); }
 
   template<typename CVal>
   pair<int,int> get_varval(CVal cval, int const* perm1, int const* perm2, int const* perm3, int var, int val)
@@ -160,26 +170,21 @@ struct TestConstraint : public AbstractConstraint
         return make_pair(var, val); 
       case 1:
       { 
-        int lit = get_lit_from_varval(var, val);
-        int mapped_lit = perm1[lit];
-        return get_varval_from_lit(mapped_lit);
+        apply_perm(compiletime_val<0>(), perm1, var, val);
       }
       case 2:
       { 
-        int lit = get_lit_from_varval(var, val);
-        int mapped_lit = perm2[lit];
-        return get_varval_from_lit(mapped_lit);
+        apply_perm(compiletime_val<0>(), perm2, var, val);
       }
       case 3:
       { 
-        int lit = get_lit_from_varval(var, val);
-        int mapped_lit = perm3[lit];
-        return get_varval_from_lit(mapped_lit);
+        apply_perm(compiletime_val<0>(), perm3, var, val);
       }
       default:
         abort();
     }
   }
+
 
   template<typename Data, typename CVal>
   inline int applyPermutation(CVal cval, int const*& perm, int* vals, int* newvals, Data* NewPerm)
@@ -247,9 +252,9 @@ struct TestConstraint : public AbstractConstraint
 
   virtual void propagate(int lit, DomainDelta)
   {
-
    full_propagate();
   }
+
 #define PERM_ARGS state, perm, vals, newvals
 #define FULL_PROPAGATE_INIT \
 int state = 0; \
