@@ -35,8 +35,8 @@
 
 //#define SPECIAL_VM
 
-#define UseStatePtr true
-#define UseStatePtrSym true
+#define UseStatePtr false
+#define UseStatePtrSym false
 // UseStatePtr not finished:at least have to do the Jump instruction and also make sure the vm is not using Perm instructions.
 
 template<typename VarArray, bool UseSymmetricVM>
