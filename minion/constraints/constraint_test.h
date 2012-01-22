@@ -118,6 +118,7 @@ struct TestConstraint : public AbstractConstraint
         }
       }
 
+      D_ASSERT(literal == total_lits);
 #endif
   }
   
@@ -154,13 +155,15 @@ struct TestConstraint : public AbstractConstraint
   pair<int,int> apply_perm(compiletime_val<0>, int const* perm, int var, int val)
   {
     int lit = get_lit_from_varval(var, val);
+    D_ASSERT(lit >= 0 && lit < total_lits);
     int mapped_lit = perm[lit];
+    D_ASSERT(mapped_lit >= 0 && mapped_lit < total_lits);
     return get_varval_from_lit(mapped_lit);
   }
-
+/*
   pair<int,int> apply_perm(compiletime_val<1>, int const* perm, int var, int val)
   { return std::pair<int, int>(perm[var], val); }
-
+*/
   template<typename CVal>
   pair<int,int> get_varval(CVal cval, int const* perm1, int const* perm2, int const* perm3, int var, int val)
   { 
@@ -170,15 +173,15 @@ struct TestConstraint : public AbstractConstraint
         return make_pair(var, val); 
       case 1:
       { 
-        apply_perm(compiletime_val<0>(), perm1, var, val);
+        return apply_perm(compiletime_val<0>(), perm1, var, val);
       }
       case 2:
-      { 
-        apply_perm(compiletime_val<0>(), perm2, var, val);
+      {
+        return apply_perm(compiletime_val<0>(), perm2, var, val);
       }
       case 3:
       { 
-        apply_perm(compiletime_val<0>(), perm3, var, val);
+        return apply_perm(compiletime_val<0>(), perm3, var, val);
       }
       default:
         abort();
@@ -187,7 +190,7 @@ struct TestConstraint : public AbstractConstraint
 
 
   template<typename Data, typename CVal>
-  inline int applyPermutation(CVal cval, int const*& perm, int* vals, int* newvals, Data* NewPerm)
+  inline int applyPermutation(CVal cval, int* perm, int* vals, int* newvals, Data* NewPerm)
   {
       switch((int)cval)
       {
@@ -237,18 +240,20 @@ struct TestConstraint : public AbstractConstraint
   }
 
   template<typename CV>
-  bool permutedInDomain(CV cVal, int const* perm, int* vals, int* newvals, int var, int val)
+  bool permutedInDomain(CV cVal, int const* perm, int const* vals, int const* newvals, int var, int val)
   {
     pair<int, int> varval = get_varval(cVal, perm, vals, newvals, var, val);
+    D_ASSERT(vars[varval.first].getInitialMin() <= varval.second);
+    D_ASSERT(vars[varval.first].getInitialMax() >= varval.second);
     return vars[varval.first].inDomain(varval.second);
   }
 
-
-
   template<typename CV>
-  void permutedRemoveFromDomain(CV cVal, int const* perm, int* vals, int* newvals, int var, int val)
+  void permutedRemoveFromDomain(CV cVal, int const* perm, int const* vals, int const* newvals, int var, int val)
   {
     pair<int, int> varval = get_varval(cVal, perm, vals, newvals, var, val);
+    D_ASSERT(vars[varval.first].getInitialMin() <= varval.second);
+    D_ASSERT(vars[varval.first].getInitialMax() >= varval.second);
     vars[varval.first].removeFromDomain(varval.second);
   }
   
