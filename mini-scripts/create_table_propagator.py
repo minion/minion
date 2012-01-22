@@ -1005,7 +1005,8 @@ def labs():
     
     initialize_domain(domains_init)
     
-    Group = VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariablePermSwapList([2,3,0,1]) + ValuePermSwapList({-2:2, -1:1, 0:0, 1:-1, 2:-2})
+    Group = VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariablePermSwapList([2,3,0,1])
+    # + ValuePermSwapList({-2:2, -1:1, 0:0, 1:-1, 2:-2})
     
     twoprod=[]
     for a in [-1, 1]:
@@ -1026,7 +1027,8 @@ def labs_three():
     
     initialize_domain(domains_init)
     
-    Group = VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariableTotalPerm([4,5])+ VariablePermSwapList([2,3,0,1]) + VariablePermSwapList([0,1,4,5,2,3]) + ValuePermSwapList({-3:3, -2:2, -1:1, 0:0, 1:-1, 2:-2, 3:-3})
+    Group = VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariableTotalPerm([4,5]) + VariablePermSwapList([2,3,0,1]) + VariablePermSwapList([0,1,4,5,2,3])
+    # + ValuePermSwapList({-3:3, -2:2, -1:1, 0:0, 1:-1, 2:-2, 3:-3})
     
     threeprod=[]
     for a in [-1, 1]:
