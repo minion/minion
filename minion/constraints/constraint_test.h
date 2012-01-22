@@ -193,7 +193,11 @@ struct TestConstraint : public AbstractConstraint
       {
         case 0:
         {
-          perm = NewPerm;
+          for(int i = 0; i < total_lits; ++i)
+          {
+            perm[i] = NewPerm[i];
+            D_ASSERT(perm[i] >= 0 && perm[i] < total_lits);
+          }
           return 1;
         }
         break;
@@ -260,7 +264,7 @@ struct TestConstraint : public AbstractConstraint
 int state = 0; \
 int vals[total_lits]; \
 int newvals[total_lits]; \
-int const* perm = 0; \
+int perm[total_lits]; \
 
 //#define PRINT_MACRO(X) std::cout << "Label: " << X << std::endl;
 #define PRINT_MACRO(X)
