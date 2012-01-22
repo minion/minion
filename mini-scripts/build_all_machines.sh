@@ -3,7 +3,7 @@ mkdir machines
 rm -rf machines/*
 initial_path=`pwd`
 # life3d 
-for i in labs_three labs; # life pegsol and_constraint labs;
+for i in labs_three labs life pegsol and_constraint labs;
 do
     ./build_machine.sh $i False False
     ./build_machine.sh $i False True
@@ -17,7 +17,7 @@ do
     ( cd ..; rm -rf bin-$i; mkdir bin-$i; cd bin-$i; cmake ..; make minion -j2; cp minion $initial_path/machines/minion-$i-sym )
 done
 
-for i in; # lifeImmigration lifeBriansBrain;
+for i in lifeImmigration lifeBriansBrain;
 do
     ./build_machine.sh $i False True
     ./build_machine.sh $i True True
