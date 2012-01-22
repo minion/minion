@@ -1005,8 +1005,7 @@ def labs():
     
     initialize_domain(domains_init)
     
-    Group = ( VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariablePermSwapList([2,3,0,1])
-      + LiteralPermSwapList({(0,-1): (0,1), (0,1):(0,-1), (1,-1):(1,1), (1,1):(1,-1)}) + LiteralPermSwapList({(2,-1): (2,1), (2,1):(2,-1), (3,-1):(3,1), (3,1):(3,-1)}) )
+    Group = VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariablePermSwapList([2,3,0,1]) + LiteralPermSwapList({(0,-1): (0,1), (0,1):(0,-1), (1,-1):(1,1), (1,1):(1,-1)}) + LiteralPermSwapList({(2,-1): (2,1), (2,1):(2,-1), (3,-1):(3,1), (3,1):(3,-1)})
       
     # + ValuePermSwapList({-2:2, -1:1, 0:0, 1:-1, 2:-2})
     
@@ -1029,10 +1028,7 @@ def labs_three():
     
     initialize_domain(domains_init)
     
-    Group = ( VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariableTotalPerm([4,5]) + VariablePermSwapList([2,3,0,1]) + VariablePermSwapList([0,1,4,5,2,3])
-      + LiteralPermSwapList({(0,-1): (0,1), (0,1):(0,-1), (1,-1):(1,1), (1,1):(1,-1)}) 
-      + LiteralPermSwapList({(2,-1): (2,1), (2,1):(2,-1), (3,-1):(3,1), (3,1):(3,-1)}) 
-      + LiteralPermSwapList({(4,-1): (4,1), (4,1):(4,-1), (5,-1):(5,1), (5,1):(5,-1)}) )
+    Group = VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + VariableTotalPerm([4,5]) + VariablePermSwapList([2,3,0,1]) + VariablePermSwapList([0,1,4,5,2,3]) + LiteralPermSwapList({(0,-1): (0,1), (0,1):(0,-1), (1,-1):(1,1), (1,1):(1,-1)})  + LiteralPermSwapList({(2,-1): (2,1), (2,1):(2,-1), (3,-1):(3,1), (3,1):(3,-1)}) + LiteralPermSwapList({(4,-1): (4,1), (4,1):(4,-1), (5,-1):(5,1), (5,1):(5,-1)})
  
     # + ValuePermSwapList({-3:3, -2:2, -1:1, 0:0, 1:-1, 2:-2, 3:-3})
     
