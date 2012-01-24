@@ -929,31 +929,30 @@ def summinmax():
     t=generate_tree(table, domains_init, True)
     choose_print_tree(t)
   
+
+
+################################################################################
+# Tidied up ones:
+#
+
 def alldiff():
-    size = 5
-    global domainsize
-    global litcount
+    size = 4
     global Group
-    Group = VariablePerm(size, size, range(size)) + ValuePerm(size, size, range(size))
-    domainsize = size
-    litcount = size*size
-    table=[]
+    domains_init=[range(size) for i in range(size)]
+    initialize_domain(domains_init)
+
+    Group = VariableTotalPerm(range(size)) + ValueTotalPerm(range(size))
     
+    table=[]
     cross=[]
     crossprod([range(size) for i in range(size)], [], cross)
     
     table=[]
     for l in cross:
-        if l[0]==l[1] or l[0]==l[2] or l[0]==l[3] or l[1]==l[2] or l[1]==l[3] or l[2]==l[3] or  l[0]==l[4] or l[1]==l[4] or l[2]==l[4] or l[3]==l[4]: #or l[0]==l[5] or l[1]==l[5] or l[2]==l[5] or l[3]==l[5] or l[4]==l[5]:
+        if l[0]==l[1] or l[0]==l[2] or l[1]==l[2] or l[0]==l[3]  or l[1]==l[3] or l[2]==l[3]: # or  l[0]==l[4] or l[1]==l[4] or l[2]==l[4] or l[3]==l[4]: #or l[0]==l[5] or l[1]==l[5] or l[2]==l[5] or l[3]==l[5] or l[4]==l[5]:
               table.append(l)
-    
-    domains_init=[range(size) for i in range(size)]
     t=generate_tree(table, domains_init, True)
     choose_print_tree(t)
-
-################################################################################
-# Tidied up ones:
-#
 
 def and_constraint():
     global Group
@@ -1044,6 +1043,112 @@ def labs_three():
                                     threeprod.append([a,b,c,d,e,f,g])
     
     t=generate_tree(threeprod, domains_init, True)
+    choose_print_tree(t)
+
+def labs_four():
+    # Constraint for low autocorrelation binary sequences
+    global Group
+    domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-1, 1], [-1, 1], [-1, 1], [-1, 1], [-4,-2,0,2,4]]
+    
+    initialize_domain(domains_init)
+    
+    Group = ( VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + 
+        VariableTotalPerm([4,5]) + VariableTotalPerm([6,7]) + 
+        VariablePermSwapList([2,3,0,1]) + VariablePermSwapList([0,1,4,5,2,3]) + 
+        VariablePermSwapList([0,1,2,3,6,7,4,5]) + 
+        LiteralPermSwapList({(0,-1): (0,1), (0,1):(0,-1), (1,-1):(1,1), (1,1):(1,-1)})  )
+  
+    # + ValuePermSwapList({-3:3, -2:2, -1:1, 0:0, 1:-1, 2:-2, 3:-3})
+    
+    fourprod=[]
+    for a in [-1, 1]:
+        for b in [-1,1]:
+            for c in [-1, 1]:
+                for d in [-1, 1]:
+                    for e in [-1, 1]:
+                        for f in [-1, 1]:
+                            for g in [-1,1]:
+                                for h in [-1,1]:
+                                    for x in [-4,-2,0,2,4]:
+                                        if (a*b)+(c*d)+(e*f)+(g*h) != x:
+                                            fourprod.append([a,b,c,d,e,f,g,h,x])
+            
+    t=generate_tree(fourprod, domains_init, True)
+    choose_print_tree(t)
+
+def labs_five():
+    # Constraint for low autocorrelation binary sequences
+    global Group
+    size = 5
+    domains_init= ([ [-1,1] ] * (size*2)) + [ [-5,-3,-1,1,3,5] ]
+
+    initialize_domain(domains_init)
+    
+    Group = ( VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + 
+        VariableTotalPerm([4,5]) + VariableTotalPerm([6,7]) + 
+        VariableTotalPerm([8,9]) +
+        VariablePermSwapList([2,3,0,1]) + VariablePermSwapList([0,1,4,5,2,3]) + 
+        VariablePermSwapList([0,1,2,3,6,7,4,5]) + 
+        VariablePermSwapList([0,1,2,3,4,5,8,9,6,7]) + 
+        LiteralPermSwapList({(0,-1): (0,1), (0,1):(0,-1), (1,-1):(1,1), (1,1):(1,-1)})  )
+  
+    # + ValuePermSwapList({-3:3, -2:2, -1:1, 0:0, 1:-1, 2:-2, 3:-3})
+    
+    fourprod=[]
+    for a in [-1, 1]:
+        for b in [-1,1]:
+            for c in [-1, 1]:
+                for d in [-1, 1]:
+                    for e in [-1, 1]:
+                        for f in [-1, 1]:
+                            for g in [-1,1]:
+                                for h in [-1,1]:
+                                    for i in [-1,1]:
+                                        for j in [-1,1]:
+                                            for x in [-5,-3,-1,1,3,5]:
+                                                if (a*b)+(c*d)+(e*f)+(g*h)+(i*j) != x:
+                                                    fourprod.append([a,b,c,d,e,f,g,h,i,j,x])
+            
+    t=generate_tree(fourprod, domains_init, True)
+    choose_print_tree(t)
+
+def labs_six():
+    # Constraint for low autocorrelation binary sequences
+    global Group
+    size = 6
+    domains_init= ([ [-1,1] ] * (size*2)) + [ [-6,-4,-2,0,2,4,6] ]
+
+    initialize_domain(domains_init)
+    
+    Group = ( VariableTotalPerm([0,1]) + VariableTotalPerm([2,3]) + 
+        VariableTotalPerm([4,5]) + VariableTotalPerm([6,7]) + 
+        VariableTotalPerm([8,9]) + VariableTotalPerm([10,11]) +
+        VariablePermSwapList([2,3,0,1]) + VariablePermSwapList([0,1,4,5,2,3]) + 
+        VariablePermSwapList([0,1,2,3,6,7,4,5]) + 
+        VariablePermSwapList([0,1,2,3,4,5,8,9,6,7]) + 
+        VariablePermSwapList([0,1,2,3,4,5,6,7,10,11,8,9]) + 
+        LiteralPermSwapList({(0,-1): (0,1), (0,1):(0,-1), (1,-1):(1,1), (1,1):(1,-1)})  )
+  
+    # + ValuePermSwapList({-3:3, -2:2, -1:1, 0:0, 1:-1, 2:-2, 3:-3})
+    
+    fourprod=[]
+    for a in [-1, 1]:
+        for b in [-1,1]:
+            for c in [-1, 1]:
+                for d in [-1, 1]:
+                    for e in [-1, 1]:
+                        for f in [-1, 1]:
+                            for g in [-1,1]:
+                                for h in [-1,1]:
+                                    for i in [-1,1]:
+                                        for j in [-1,1]:
+                                            for k in [-1,1]:
+                                                for l in [-1,1]:
+                                                    for x in [-6,-4,-2,0,2,4,6]:
+                                                        if (a*b)+(c*d)+(e*f)+(g*h)+(i*j)+(k*l) != x:
+                                                            fourprod.append([a,b,c,d,e,f,g,h,i,j,k,l,x])
+            
+    t=generate_tree(fourprod, domains_init, True)
     choose_print_tree(t)
 
 def life3d():
