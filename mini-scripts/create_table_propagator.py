@@ -997,7 +997,7 @@ def pegsol():
     t=generate_tree(nogoods, domains_init, True)
     choose_print_tree(t)
 
-def labs():
+def labs_two():
     # Constraint for low autocorrelation binary sequences
     global Group
     domains_init=[[-1,1],[-1,1],[-1,1], [-1,1], [-2,0,2]]
