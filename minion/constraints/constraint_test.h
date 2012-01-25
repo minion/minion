@@ -49,8 +49,8 @@ struct TestConstraint : public AbstractConstraint
   int vars_size;
 
 #ifdef SYMMETRIC
-  static const int MaxDomSize = 7;
-  static const int MaxVarSize = 10;
+  static const int MaxDomSize = 14;
+  static const int MaxVarSize = 13;
   array<signed char, MaxVarSize> domain_min;
   array<array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
   array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
