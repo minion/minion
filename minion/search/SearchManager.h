@@ -201,8 +201,7 @@ struct SearchManager
             
             getState(stateObj).incrementNodeCount();
             
-            if(do_checks(stateObj, var_array, branches))
-                return;
+            do_checks(stateObj, var_array, branches);
             
             pair<int, DomainInt> varval= var_order->pickVarVal();
             

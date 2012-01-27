@@ -242,11 +242,11 @@ namespace Controller
 
   /// Check if timelimit has been exceeded.
   template<typename VarArray, typename BranchList>
-  inline bool do_checks(StateObj* stateObj, VarArray& var_array, BranchList& branches)
+  inline void do_checks(StateObj* stateObj, VarArray& var_array, BranchList& branches)
   {
     if(getState(stateObj).getNodeCount() >= getOptions(stateObj).nodelimit) {
       generateRestartFile(stateObj, var_array, branches);
-      return true;
+      throw EndOfSearch();
     }
     
     if(getState(stateObj).isAlarmActivated())
@@ -254,7 +254,7 @@ namespace Controller
       generateRestartFile(stateObj, var_array, branches);
       getState(stateObj).clearAlarm();
       if(getState(stateObj).isCtrlcPressed()) {
-        return true;
+        throw EndOfSearch();
       }
 
       if(getOptions(stateObj).cspcomp)
@@ -268,10 +268,9 @@ namespace Controller
       if(checkAlarm(stateObj))
       {
         generateRestartFile(stateObj, var_array, branches);
-        return true;
       }
+      throw EndOfSearch();
     }
-    return false;
   }
   
 
