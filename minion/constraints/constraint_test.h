@@ -28,6 +28,7 @@
 #include "generated_constraint_code.h"
 #undef PREPARE
 
+
 #ifdef MINION_DEBUG
 #define D(X,V) X.at(V)
 #else
@@ -44,13 +45,14 @@ struct TestConstraint : public AbstractConstraint
   
    typedef typename VarArray::value_type ArrayVarRef;
   
-   array<ArrayVarRef,10> vars;
 
   int vars_size;
 
-#ifdef SYMMETRIC
   static const int MaxDomSize = 14;
   static const int MaxVarSize = 13;
+  array<ArrayVarRef,MaxVarSize> vars;
+
+#ifdef SYMMETRIC
   array<signed char, MaxVarSize> domain_min;
   array<array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
   array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;

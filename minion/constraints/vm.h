@@ -46,11 +46,11 @@ struct VMConstraint : public AbstractConstraint
   { return "VMConstraint"; }
 
   typedef typename VarArray::value_type VarRef;
-  array<VarRef, 11> vars;
 
   // Note: This is max - min, not the number of values per domain.
   static const int MaxDomSize = 14;
   static const int MaxVarSize = 13;
+  array<VarRef, MaxVarSize> vars;
   array<signed char, MaxVarSize> domain_min;
   array<array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
   array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
