@@ -217,29 +217,6 @@ namespace Controller
     fileout << "**EOF**" << endl;
   }
    
-  
-  inline bool checkAlarm(StateObj* stateObj)
-  {
-    if(getState(stateObj).isAlarmActivated())
-    { // Either a timeout has occurred, or ctrl+c has been pressed.
-      
-      getState(stateObj).clearAlarm();
-      if(getState(stateObj).isCtrlcPressed()) {
-        return true;
-      }
-
-      if(getOptions(stateObj).cspcomp)
-      {
-        FAIL_EXIT("Time out");
-      }
-      
-      getOptions(stateObj).printLine("Time out.");
-      getTableOut().set("TimeOut", 1);
-      return true;
-    }
-    return false;
-  }
-
   /// Check if timelimit has been exceeded.
   template<typename VarArray, typename BranchList>
   inline void do_checks(StateObj* stateObj, VarArray& var_array, BranchList& branches)
@@ -265,10 +242,6 @@ namespace Controller
       getOptions(stateObj).printLine("Time out.");
       getTableOut().set("TimeOut", 1);
 
-      if(checkAlarm(stateObj))
-      {
-        generateRestartFile(stateObj, var_array, branches);
-      }
       throw EndOfSearch();
     }
   }
