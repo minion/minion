@@ -134,7 +134,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         {
             for(int j=i+1; j<val_array.size(); j++)
             {
-                D_ASSERT(val_array[i]!=val_array[j]);
+                CHECK(val_array[i]!=val_array[j], "GCC: Repeated values are not allowed in value list.");
             }
         }
         
