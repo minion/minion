@@ -1,0 +1,22 @@
+MINION 1
+#TEST SOLCOUNT 7
+# Input file for Minion built for Version 0.2
+#    http://sourceforge.net/projects/minion
+# Prime Queens Instance
+# CSPLib prob029, www.csplib.org
+# Parameters: n = 4
+0
+1
+0 6 1
+0
+0
+0
+
+[x0]
+[ a]
+
+0 0 0
+
+objective maximising x0
+
+print none

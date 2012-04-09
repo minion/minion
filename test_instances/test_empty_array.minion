@@ -1,0 +1,11 @@
+#TEST SOLCOUNT 1
+MINION 3
+**VARIABLES**
+
+# All these should have no variables in them, so there should be one solution
+# To this problem.
+DISCRETE x[0] {1..2}
+DISCRETE y[0,0] {1..2}
+DISCRETE z[2,0,1] {1..2}
+
+**EOF**
