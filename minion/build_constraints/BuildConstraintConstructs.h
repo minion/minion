@@ -45,7 +45,9 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
   // type needs to be something for empty arrays
   int type = VAR_CONSTANT;
   bool same_type = true;
-  
+  // Suppress unused warning
+  (void)same_type;
+
   if(!vars.empty())
   {
     type = vars[0].type();
