@@ -149,6 +149,7 @@ struct StaticBranch : public VariableOrder
         val_order(_val_order), pos(_stateObj)
     {
         pos=0;
+        D_ASSERT(var_order.size() == val_order.size());
     }
     
     pair<int, DomainInt> pickVarVal()
