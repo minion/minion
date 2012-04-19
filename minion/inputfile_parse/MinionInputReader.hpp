@@ -703,8 +703,11 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
   {
     instance->search_order.push_back(extra_vars);
     instance->search_order.back().find_one_assignment = true;
-    instance->search_order.back().setupValueOrder();
   }
+
+  for(int i = 0; i < instance->search_order.size(); ++i)
+    instance->search_order[i].setupValueOrder();
+
   parser_info(s.str());
 }
 
