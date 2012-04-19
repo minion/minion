@@ -648,6 +648,9 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
     valOrder = vector<ValOrderEnum>(instance->search_order[0].var_order.size(), VALORDER_ASCEND);
   }
   instance->search_order[0].val_order = valOrder;
+
+  for(int i = 0; i < instance->search_order.size(); ++i)
+    instance->search_order[i].setupValueOrder();
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -705,8 +708,7 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
     instance->search_order.back().find_one_assignment = true;
   }
 
-  for(int i = 0; i < instance->search_order.size(); ++i)
-    instance->search_order[i].setupValueOrder();
+  
 
   parser_info(s.str());
 }
