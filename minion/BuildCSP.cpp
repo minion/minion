@@ -116,6 +116,8 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
               instance.search_order[i].val_order[j] = VALORDER_RANDOM;
             }
         }
+
+        D_ASSERT(instance.search_order[i].var_order.size() == instance.search_order[i].val_order.size());
     }
     
     shared_ptr<Controller::SearchManager> sm=Controller::make_search_manager(stateObj, args.prop_method, instance.search_order);
