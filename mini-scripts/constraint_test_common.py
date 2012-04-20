@@ -506,12 +506,22 @@ class testelement(testgacelement__minus__deprecated):
         return runtestgeneral("element", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
 
 class testelement_one(testgacelement__minus__deprecated):
-    def printtable(self, domains):
-        tab=testgacelement__minus__deprecated.printtable(self, domains)
-        for t in tab:
-            t[-2]=t[-2]+1
-        return tab
-    
+    def printtable(self, domains): 
+        out=[]
+        # given a list of lists for the domains, generate the table for gacelement 
+        numvars=len(domains)
+        vectordoms=domains[:-2]
+        otherdoms=domains[-2:]
+        tocross=domains[:-1]
+        cross=[]
+        crossprod(tocross, [], cross)
+        for l in cross:
+            if l[-1] >=1 and l[-1]<(len(l)):
+                if l[l[-1]-1] in otherdoms[1]:
+                    out.append(l+[l[l[-1]-1]])
+                    
+        return out
+
     def runtest(self, options=dict()):
         return runtestgeneral("element_one", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
 
