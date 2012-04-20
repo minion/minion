@@ -1703,11 +1703,11 @@ def generatevariables(varblocks, types, boundallowed):
         for j in range(varblocks[i]):
             # now for each variable generate a domain
             if types[i]=="num":
-                lb=random.randint(-20, 0)
-                ub=random.randint(1, 20)
+                lb=random.randint(-20, 5)
+                ub=lb+random.randint(0, 15)
             elif types[i]=="othernum":     # An extra type that does not necessarily includ 0 and 1
                 lb=random.randint(-20,10)
-                ub=lb+random.randint(0,10)
+                ub=lb+random.randint(0, 15)
             elif types[i]=="smallnum":
                 lb=random.randint(-2, 0)
                 ub=random.randint(0, 2)
@@ -1722,13 +1722,13 @@ def generatevariables(varblocks, types, boundallowed):
                 ub=random.randint(0, 1)
             elif types[i]=="posnum":
                 lb=random.randint(1, 20)
-                ub=random.randint(21, 40)
+                ub=lb+random.randint(0, 15)
             elif types[i]=="smallposnum":
                 lb=1
                 ub=random.randint(2, 15)
             elif types[i]=="nonnegnum":
                 lb=random.randint(0, 20)
-                ub=random.randint(21, 40)
+                ub=lb+random.randint(0, 15)
             elif types[i]=="boolean":
                 lb=0
                 ub=1
