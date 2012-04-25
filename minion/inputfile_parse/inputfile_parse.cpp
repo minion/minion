@@ -69,7 +69,7 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
         in.push(gzip_decompressor());
 #else
         cerr << "Error: Built without gzip support" << endl;
-        exit(0);
+        exit(1);
 #endif
       }    
   
@@ -81,7 +81,7 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
         in.push(bzip2_decompressor());
 #else
         cerr << "Error: Built without bzip2 support" << endl;
-        exit(0);
+        exit(1);
 #endif
 
       }
