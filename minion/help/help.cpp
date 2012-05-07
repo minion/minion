@@ -63,6 +63,12 @@ cout << "Help entry: " << "switches -printsolsonly" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Print only solutions and a summary at the end." << endl << endl << endl;
 } else
+if("switches -printonlyoptimal" == request) {
+cout << "Help entry: " << "switches -printonlyoptimal" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "In optimisation problems, only print the optimal value, and" << endl
+<< "not intermediate values." << endl << endl << endl;
+} else
 if("switches -preprocess" == request) {
 cout << "Help entry: " << "switches -preprocess" << endl << endl;
 cout << "" << "--------------------------------------------------------------------------------" << endl;
@@ -1675,6 +1681,7 @@ cout << "help switches -nodelimit" << endl;
 cout << "help switches -noprintsols" << endl;
 cout << "help switches -noresume" << endl;
 cout << "help switches -preprocess" << endl;
+cout << "help switches -printonlyoptimal" << endl;
 cout << "help switches -printsols" << endl;
 cout << "help switches -printsolsonly" << endl;
 cout << "help switches -quiet" << endl;
