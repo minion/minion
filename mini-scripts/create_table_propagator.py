@@ -320,7 +320,10 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         perm = adddomain(domains_in, domains_poss, tree['nodelabel'])
         if perm == EmptyKey:
             #print('# Empty node found')
-            return False
+            if len(prun)==0:
+                return False
+            else:
+                return True
         if perm != False:
             if CountTreeSize:
                 gotonodenum=perm[0]
