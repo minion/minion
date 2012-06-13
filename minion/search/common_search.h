@@ -243,6 +243,7 @@ namespace Controller
         string filename = basename + "-resume-" + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
         cout << "Output resume file to \"" << filename << "\"" << endl;
         ofstream fileout(filename.c_str());
+        fileout << "# original instance: " << getOptions(stateObj).instance_name << endl;
         fileout << inst;
         fileout << *s;
         vector<triple> left_branches_so_far;
