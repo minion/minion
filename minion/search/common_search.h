@@ -191,21 +191,39 @@ namespace Controller
     if(getOptions(stateObj).noresumefile) {
         return;
     }
-    string curvar(getState(stateObj).getInstance()->vars.getName(var_array[branches.end()->var].getBaseVar()));
-    vector<string> splits;
-    if(getOptions(stateObj).split) {
-        DomainInt min = var_array[branches.end()->var].getMin();
-        DomainInt max = var_array[branches.end()->var].getMax();
-        int med = (min+max)/2;
-        string left("ineq(");
-        left += curvar + string(", ") + to_string(med) + string(", 0)\n");
-        splits.push_back(left);
 
-        string right("ineq(");
-        right += to_string(med) + string(", ");
-        right += curvar + string(", -1)\n");
-        splits.push_back(right);
-    } else {
+    vector<string> splits;
+    string curvar = "(no split variable)";
+
+    if(getOptions(stateObj).split)
+    {
+        if(branches.empty())
+        {
+            // TODO: We should check if any variable has non-empty domain, but this will do for now.
+            // The most likely case is we have just caught the end of search.
+            splits.push_back("true()\n");
+            splits.push_back("false()\n");
+        }
+        else
+        {
+            typedef typename VarArray::value_type VarRef;
+            VarRef& var = var_array[branches.back().var];
+            curvar = getState(stateObj).getInstance()->vars.getName(var.getBaseVar());
+            DomainInt min = var.getMin();
+            DomainInt max = var.getMax();
+            int med = (min+max)/2;
+            string left("ineq(");
+            left += curvar + string(", ") + to_string(med) + string(", 0)\n");
+            splits.push_back(left);
+
+            string right("ineq(");
+            right += to_string(med) + string(", ");
+            right += curvar + string(", -1)\n");
+            splits.push_back(right);
+        }
+    }
+    else
+    {
         splits.push_back("");
     }
 
