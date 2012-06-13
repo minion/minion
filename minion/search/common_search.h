@@ -172,6 +172,7 @@ namespace Controller
   }
 
 #include <fstream>
+#include "../MILtools/print_CSP.h"
 
   //repeat declaration
   struct triple {
@@ -209,13 +210,16 @@ namespace Controller
         splits.push_back("");
     }
 
+    ProbSpec::MinionInstancePrinter printer(*getState(stateObj).getInstance());
+    printer.build_instance(false);
+    string inst(printer.getInstance());
+
     int i = 0;
     for(vector<string>::iterator s = splits.begin(); s != splits.end(); s++) {
-        string filename = string("minion-resume-") + to_string(getpid()) + "-" + to_string(i++);
+        string filename = string("minion-resume-") + to_string(getpid()) + "-" + to_string(i++) + ".minion";
         cout << "Output resume file to \"" << filename << "\"" << endl;
         ofstream fileout(filename.c_str());
-        fileout << "MINION 3" << endl;
-        fileout << "**CONSTRAINTS**" << endl;
+        fileout << inst;
         fileout << *s;
         vector<triple> left_branches_so_far;
         left_branches_so_far.reserve(branches.size());

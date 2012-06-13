@@ -355,10 +355,13 @@ void print_search_info(const vector<Var>& var_vec )
 }
 
 void build_instance()
-{ build_instance(csp.constraints, csp.vars.get_all_vars()); }
+{ build_instance(csp.constraints, csp.vars.get_all_vars(), true); }
+
+void build_instance(bool printEof)
+{ build_instance(csp.constraints, csp.vars.get_all_vars(), printEof); }
 
 
-void build_instance(const vector<Var>& varlist_vec)
+void build_instance(const vector<Var>& varlist_vec, bool printEof)
 {
   list<ConstraintBlob> new_constraint_list;
 
@@ -372,11 +375,11 @@ void build_instance(const vector<Var>& varlist_vec)
       new_constraint_list.push_back(*it);
   }
 
-  build_instance( new_constraint_list, varlist_vec);
+  build_instance( new_constraint_list, varlist_vec, printEof);
 }
 
 void build_instance(const list<ConstraintBlob>& constraints,
-                          const vector<Var>& varlist)
+                          const vector<Var>& varlist, bool printEof)
 {
   oss << "MINION 3" << endl;
 
@@ -397,7 +400,7 @@ void build_instance(const list<ConstraintBlob>& constraints,
   {
     print_instance( *it);
   }
-  oss << "**EOF**" << endl;
+  if(printEof) oss << "**EOF**" << endl;
 }
 
 };
