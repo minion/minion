@@ -256,6 +256,9 @@ public:
   // Do not write a resume file.
   bool noresumefile;
 
+  // split search tree in half on time out
+  bool split;
+
   // The format of output used (-1 for default)
   int outputType;
   
@@ -281,7 +284,7 @@ public:
     time_limit_is_CPU_time(false),
     randomise_valvarorder(false), parser_verbose(false), 
     redump(false), graph(false), instance_stats(false), 
-    resume(false), noresumefile(false),
+    resume(false), noresumefile(false), split(false),
     outputType(-1), noTimers(false),
     Xvarmunge(-1), Xsymmunge(-1)
   {}
