@@ -228,8 +228,7 @@ namespace Controller
             splits.push_back(left + opt);
 
             string right("ineq(");
-            right += to_string(med) + string(", ");
-            right += curvar + string(", -1)\n");
+            right += to_string(med) + string(", ") + curvar + string(", -1)\n");
             splits.push_back(right + opt);
         }
     }
@@ -272,9 +271,23 @@ namespace Controller
               inputPrint(fileout, stateObj, var_array[lb->var].getBaseVar());
               fileout << "," << lb->val << "),";
             }
+            if(curr == branches.end() - 1) {
+                fileout << "watched-and({";
+            }
             fileout << "w-notliteral(";
             inputPrint(fileout, stateObj, var_array[curr->var].getBaseVar());
-            fileout << "," << curr->val << ")})" << endl;
+            fileout << "," << curr->val << ")";
+            if(curr == branches.end() - 1) {
+                for(vector<triple>::const_iterator tcurr = branches.begin(); tcurr != curr; tcurr++) {
+                    typedef typename VarArray::value_type VarRef;
+                    VarRef& var = var_array[tcurr->var];
+                    string cvar = getState(stateObj).getInstance()->vars.getName(var.getBaseVar());
+                    fileout << ",ineq(" << var.getMin() << "," << cvar << ",0)";
+                    fileout << ",ineq(" << cvar << "," << var.getMax() << ",0)";
+                }
+                fileout << "})";
+            }
+            fileout << "})" << endl;
           }
         }
         fileout << "**EOF**" << endl;
