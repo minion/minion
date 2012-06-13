@@ -232,7 +232,15 @@ namespace Controller
 
     int i = 0;
     for(vector<string>::iterator s = splits.begin(); s != splits.end(); s++) {
-        string filename = getOptions(stateObj).instance_name + "-resume-" + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
+        string basename = getOptions(stateObj).instance_name;
+        size_t mpos = basename.find(".minion");
+        size_t rpos = basename.find("-resume-");
+        if(rpos != string::npos) {
+            basename = basename.substr(0, rpos);
+        } else if(mpos != string::npos) {
+            basename = basename.substr(0, mpos);
+        }
+        string filename = basename + "-resume-" + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
         cout << "Output resume file to \"" << filename << "\"" << endl;
         ofstream fileout(filename.c_str());
         fileout << inst;
