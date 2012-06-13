@@ -194,9 +194,21 @@ namespace Controller
 
     vector<string> splits;
     string curvar = "(no split variable)";
+    string opt = "";
 
     if(getOptions(stateObj).split)
     {
+        if(getState(stateObj).isOptimisationProblem()) {
+            AnyVarRef *optVarRef = getState(stateObj).getOptimiseVar();
+            string optVar = getState(stateObj).getInstance()->vars.getName(optVarRef->getBaseVar());
+            DomainInt optVal = getState(stateObj).getOptimiseValue();
+            opt += "ineq(";
+            if(getState(stateObj).isMaximise()) {
+                opt += to_string(optVal) + string(", ") + optVar + string(", 0)\n");
+            } else {
+                opt += optVar + string(", ") + to_string(-optVal) + string(", 0)\n");
+            }
+        }
         if(branches.empty())
         {
             // TODO: We should check if any variable has non-empty domain, but this will do for now.
@@ -213,12 +225,12 @@ namespace Controller
             int med = (min+max)/2;
             string left("ineq(");
             left += curvar + string(", ") + to_string(med) + string(", 0)\n");
-            splits.push_back(left);
+            splits.push_back(left + opt);
 
             string right("ineq(");
             right += to_string(med) + string(", ");
             right += curvar + string(", -1)\n");
-            splits.push_back(right);
+            splits.push_back(right + opt);
         }
     }
     else

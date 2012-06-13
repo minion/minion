@@ -45,6 +45,7 @@ class SearchState
   AnyVarRef* raw_optimise_var;
   DomainInt current_optimise_position;
   bool optimise;
+  bool maximise;
   
   // The variables to print when a solution is found.
   vector<vector<AnyVarRef> > print_matrix;
@@ -104,10 +105,13 @@ public:
   
   DomainInt getOptimiseValue() { return current_optimise_position; }
   void setOptimiseValue(DomainInt optimise_pos) { current_optimise_position = optimise_pos; }
-  
+
   bool isOptimisationProblem() { return optimise; }
   void setOptimisationProblem(bool _optimise) { optimise = _optimise; }
   
+  bool isMaximise() { return maximise; }
+  void setMaximise(bool _maximise) { maximise = _maximise; }
+
   void addConstraint(AbstractConstraint* c);
   vector<AbstractConstraint*>& getConstraintList() { return constraints; }
   
