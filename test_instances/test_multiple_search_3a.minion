@@ -1,0 +1,24 @@
+MINION 3
+#TEST SOLCOUNT 4
+#This just sanity checks a number of powers
+
+**VARIABLES**
+
+BOOL b[2]
+BOOL c[2]
+BOOL d[3]
+
+**SEARCH**
+
+VARORDER [b]
+VALORDER [d,d]
+
+VARORDER AUX [c]
+VALORDER [a,a]
+
+
+**CONSTRAINTS**
+
+sumleq([b[1], c[1]], 1)
+
+**EOF**
