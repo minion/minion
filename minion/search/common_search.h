@@ -201,8 +201,7 @@ namespace Controller
         {
             // TODO: We should check if any variable has non-empty domain, but this will do for now.
             // The most likely case is we have just caught the end of search.
-            splits.push_back("true()\n");
-            splits.push_back("false()\n");
+            splits.push_back("");
         }
         else
         {
