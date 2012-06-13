@@ -215,7 +215,7 @@ namespace Controller
 
     int i = 0;
     for(vector<string>::iterator s = splits.begin(); s != splits.end(); s++) {
-        string filename = string("minion-resume-") + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
+        string filename = getOptions(stateObj).instance_name + "-resume-" + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
         cout << "Output resume file to \"" << filename << "\"" << endl;
         ofstream fileout(filename.c_str());
         fileout << inst;
