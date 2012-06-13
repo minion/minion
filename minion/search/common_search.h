@@ -278,12 +278,12 @@ namespace Controller
             inputPrint(fileout, stateObj, var_array[curr->var].getBaseVar());
             fileout << "," << curr->val << ")";
             if(curr == branches.end() - 1) {
-                for(vector<triple>::const_iterator tcurr = branches.begin(); tcurr != curr; tcurr++) {
+                for(int i = 0; i < var_array.size(); i++) {
                     typedef typename VarArray::value_type VarRef;
-                    VarRef& var = var_array[tcurr->var];
+                    VarRef& var = var_array[i];
                     string cvar = getState(stateObj).getInstance()->vars.getName(var.getBaseVar());
-                    fileout << ",ineq(" << var.getMin() << "," << cvar << ",0)";
-                    fileout << ",ineq(" << cvar << "," << var.getMax() << ",0)";
+                    if(var.getInitialMin() != var.getMin()) fileout << ",ineq(" << var.getMin() << "," << cvar << ",0)";
+                    if(var.getInitialMax() != var.getMax()) fileout << ",ineq(" << cvar << "," << var.getMax() << ",0)";
                 }
                 fileout << "})";
             }
