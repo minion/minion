@@ -228,7 +228,8 @@ namespace Controller
             splits.push_back(left + opt);
 
             string right("ineq(");
-            right += to_string(med) + string(", ") + curvar + string(", -1)\n");
+            right += to_string(med) + string(", ");
+            right += curvar + string(", -1)\n");
             splits.push_back(right + opt);
         }
     }
@@ -271,23 +272,9 @@ namespace Controller
               inputPrint(fileout, stateObj, var_array[lb->var].getBaseVar());
               fileout << "," << lb->val << "),";
             }
-            if(curr == branches.end() - 1) {
-                fileout << "watched-and({";
-            }
             fileout << "w-notliteral(";
             inputPrint(fileout, stateObj, var_array[curr->var].getBaseVar());
-            fileout << "," << curr->val << ")";
-            if(curr == branches.end() - 1) {
-                for(int i = 0; i < var_array.size(); i++) {
-                    typedef typename VarArray::value_type VarRef;
-                    VarRef& var = var_array[i];
-                    string cvar = getState(stateObj).getInstance()->vars.getName(var.getBaseVar());
-                    if(var.getInitialMin() != var.getMin()) fileout << ",ineq(" << var.getMin() << "," << cvar << ",0)";
-                    if(var.getInitialMax() != var.getMax()) fileout << ",ineq(" << cvar << "," << var.getMax() << ",0)";
-                }
-                fileout << "})";
-            }
-            fileout << "})" << endl;
+            fileout << "," << curr->val << ")})" << endl;
           }
         }
         fileout << "**EOF**" << endl;
