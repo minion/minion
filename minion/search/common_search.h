@@ -242,21 +242,42 @@ namespace Controller
     printer.build_instance(false);
     string inst(printer.getInstance());
 
+    string basename = getOptions(stateObj).instance_name;
+    int noresumelines = -1;
+    size_t mpos = basename.find(".minion");
+    size_t rpos = basename.find("-resume-");
+    if(rpos != string::npos) {
+        size_t rlpos = basename.find('-', rpos+8);
+        if(rlpos != string::npos) {
+            // noresumelines is the number of lines in the original file, i.e. the
+            // one without the resume stuff
+            noresumelines = atoi(basename.substr(rpos+8, rlpos-rpos-8).c_str());
+        }
+        basename = basename.substr(0, rpos);
+    } else if(mpos != string::npos) {
+        basename = basename.substr(0, mpos);
+    }
+
+    size_t pos = -1;
+    if(noresumelines != -1) {
+        int tmp = noresumelines;
+        while((pos = inst.find('\n', pos+1)) != string::npos && tmp > 1) { tmp--; }
+        pos++; // newline
+    } else {
+        pos = inst.length();
+        size_t tpos = -1;
+        noresumelines = 0;
+        while((tpos = inst.find('\n', tpos+1)) != string::npos) { noresumelines++; }
+    }
+    string ninst = inst.substr(0, pos);
+
     int i = 0;
     for(vector<string>::iterator s = splits.begin(); s != splits.end(); s++) {
-        string basename = getOptions(stateObj).instance_name;
-        size_t mpos = basename.find(".minion");
-        size_t rpos = basename.find("-resume-");
-        if(rpos != string::npos) {
-            basename = basename.substr(0, rpos);
-        } else if(mpos != string::npos) {
-            basename = basename.substr(0, mpos);
-        }
-        string filename = basename + "-resume-" + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
+        string filename = basename + "-resume-" + to_string(noresumelines) + "-" + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
         cout << "Output resume file to \"" << filename << "\"" << endl;
         ofstream fileout(filename.c_str());
         fileout << "# original instance: " << getOptions(stateObj).instance_name << endl;
-        fileout << inst;
+        fileout << ninst;
         fileout << *s;
         vector<triple> left_branches_so_far;
         left_branches_so_far.reserve(branches.size());
