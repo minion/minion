@@ -191,20 +191,19 @@ namespace Controller
     if(getOptions(stateObj).noresumefile) {
         return;
     }
+    string curvar(getState(stateObj).getInstance()->vars.getName(var_array[branches.end()->var].getBaseVar()));
     vector<string> splits;
     if(getOptions(stateObj).split) {
         DomainInt min = var_array[branches.end()->var].getMin();
         DomainInt max = var_array[branches.end()->var].getMax();
         int med = (min+max)/2;
         string left("ineq(");
-        left += string(getState(stateObj).getInstance()->vars.getName(var_array[branches.end()->var].getBaseVar()));
-        left += string(", ") + to_string(med) + string(", 0)\n");
+        left += curvar + string(", ") + to_string(med) + string(", 0)\n");
         splits.push_back(left);
 
         string right("ineq(");
         right += to_string(med) + string(", ");
-        right += string(getState(stateObj).getInstance()->vars.getName(var_array[branches.end()->var].getBaseVar()));
-        right += string(", -1)\n");
+        right += curvar + string(", -1)\n");
         splits.push_back(right);
     } else {
         splits.push_back("");
@@ -216,7 +215,7 @@ namespace Controller
 
     int i = 0;
     for(vector<string>::iterator s = splits.begin(); s != splits.end(); s++) {
-        string filename = string("minion-resume-") + to_string(getpid()) + "-" + to_string(i++) + ".minion";
+        string filename = string("minion-resume-") + curvar + "-" + to_string(i++) + ".minion";
         cout << "Output resume file to \"" << filename << "\"" << endl;
         ofstream fileout(filename.c_str());
         fileout << inst;
