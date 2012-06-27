@@ -17,22 +17,36 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <vector>
+
 struct BlockCache
 {
-  vector<char*> blocks;
+  std::vector<char*> blocks;
   
   BlockCache(int size)
   { blocks.resize(size); }
   
   char* do_malloc(size_t size)
   {
+    // This is because realloc/malloc will sometimes return 0 with size=0
+    if(size == 0)
+        return (char*)(0);
+
     if(blocks.empty())
-      return static_cast<char*>(malloc(size));
-    else
     {
+      char* ptr = static_cast<char*>(malloc(size));
+      if(ptr == NULL)
+      { D_FATAL_ERROR("Malloc failed - Memory exausted! Aborting."); }
+      return static_cast<char*>(malloc(size));      
+    }
+    else
+    {      
       char* ret = blocks.back();
       blocks.pop_back();
-      return static_cast<char*>(realloc(ret, size));
+      char* ptr = static_cast<char*>(realloc(ret, size));
+      if(ptr == NULL)
+      { D_FATAL_ERROR("Realloc failed - Memory exausted! Aborting."); }
+      return ptr;
     }
   }
   
