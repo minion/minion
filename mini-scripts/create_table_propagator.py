@@ -341,7 +341,11 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                         gotonodecounter+=1   # the instruction
                         gotonodecounter+=get_total_litcount()
                     if curnode.has_key('left') or curnode.has_key('right'):
+                        # branch instruction
                         gotonodecounter+=5
+                    else:
+                        # return-succeed instruction
+                        gotonodecounter+=1
                     
                     if curnode.has_key('left'):
                         gotonodelist.append(curnode['left'])
