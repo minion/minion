@@ -335,22 +335,28 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                     gotonodelist=gotonodelist[1:]
                     if curnode.has_key('pruning'):
                         gotonodecounter+=2+(2*len(curnode['pruning']))
-                    if curnode.has_key('goto'):
-                        gotonodecounter+=2   # jump takes 2 integers
                     if curnode.has_key('perm'):
                         gotonodecounter+=1   # the instruction
                         gotonodecounter+=get_total_litcount()
+                    if curnode.has_key('goto'):
+                        gotonodecounter+=2   # jump takes 2 integers
+                        continue  # make sure it doesn't count anything below.
+                    
                     if curnode.has_key('left') or curnode.has_key('right'):
                         # branch instruction
                         gotonodecounter+=5
+                        if curnode.has_key('left'):
+                            gotonodelist.append(curnode['left'])
+                        if curnode.has_key('right'):
+                            gotonodelist.append(curnode['right'])
+                        
+                        continue
                     else:
                         # return-succeed instruction
                         gotonodecounter+=1
                     
-                    if curnode.has_key('left'):
-                        gotonodelist.append(curnode['left'])
-                    if curnode.has_key('right'):
-                        gotonodelist.append(curnode['right'])
+                    
+                # now do the test.
                 if gotonodecounter> ( 1+get_total_litcount()+2 )*TreeCutoff :   # is tree larger than size of perm and goto (multiplied by parameter)?
                     tree['perm'] = perm[1]
                     tree['goto'] = perm[0]
