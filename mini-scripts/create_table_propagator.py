@@ -355,7 +355,10 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                         # return-succeed instruction
                         gotonodecounter+=1
                     
-                    
+                
+                (junk1, junk2, vmlist)=vm_tree(TreeNodes[gotonodenum], {}, [], [])
+                assert len(vmlist)==gotonodecounter
+                
                 # now do the test.
                 if gotonodecounter> ( 1+get_total_litcount()+2 )*TreeCutoff :   # is tree larger than size of perm and goto (multiplied by parameter)?
                     tree['perm'] = perm[1]
