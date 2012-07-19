@@ -978,13 +978,28 @@ def and_constraint():
     
     Group = VariableTotalPerm([0,1])
     
-    # A /\ B = C
-    ct_nogoods=[[0,0,1], [0,1,1], [1,0,1], [1,1,0]]
+    # A /\ B = not C
+    ct_nogoods=[[0,0,0], [0,1,0], [1,0,0], [1,1,1]]
     
-    t=generate_tree(ct_nogoods, domains_init, False)
+    t=generate_tree(ct_nogoods, domains_init, True)
     
     choose_print_tree(t)
- 
+
+def and_constraint3():
+    global Group
+    domains_init=[[0,1]]*4
+    
+    initialize_domain(domains_init)
+    
+    Group = VariableTotalPerm([0,1,2])
+    
+    # A /\ B /\ C = not D
+    ct_nogoods=[[0,0,0,0], [0,0,1,0], [0,1,0,0], [0,1,1,0], [1,0,0,0], [1,0,1,0], [1,1,0,0], [1,1,1,1]]
+    
+    t=generate_tree(ct_nogoods, domains_init, True)
+    
+    choose_print_tree(t)
+
 def pegsol():
     global Group
     domains_init=[[0,1]]*7
