@@ -159,7 +159,7 @@ struct SearchManager
     
     inline void jump_out_aux_vars()
     {
-        while(branches.back().var >= topauxvar)
+        while(!branches.empty() && branches.back().var >= topauxvar)
         {
             if(branches.back().isLeft)
             {
