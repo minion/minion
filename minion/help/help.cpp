@@ -313,7 +313,7 @@ cout << "When Minion is terminated before the end of search, write out two new i
 << "Linux systems and it might not work on others (especially Windows)." << endl
 << "" << endl
 << "The name of the new input files is composed of the name of the original" << endl
-<< "instance, the string "resume", a timestamp, the process ID of Minion, the name" << endl
+<< "instance, the string 'resume', a timestamp, the process ID of Minion, the name" << endl
 << "of the variable whose domain is being split and 0 or 1. Each of the new input" << endl
 << "files has a comment identifying the name of the input file which it was split" << endl
 << "from. Similarly, Minion's output identifies the new input files it writes when" << endl
