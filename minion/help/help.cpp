@@ -297,6 +297,34 @@ cout << "Help entry: " << "switches -noresume" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Do not write a resume file on timeout or being killed." << endl << endl << endl;
 } else
+if("switches -split" == request) {
+cout << "Help entry: " << "switches -split" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "When Minion is terminated before the end of search, write out two new input" << endl
+<< "files that split the remaining search space in half. Each of the files will have" << endl
+<< "all the variables and constraints of the original file plus constraints that" << endl
+<< "rule out the search already done. In addition, the domain of the variable under" << endl
+<< "consideration when Minion was stopped is split in half with each of the new" << endl
+<< "input files considering a different half." << endl
+<< "" << endl
+<< "This feature is experimental and intended to facilitate parallelisation -- to" << endl
+<< "parallelise the solving of a single constraint problem, stop and split" << endl
+<< "repeatedly. Please note that large-scale testing of this feature was limited to" << endl
+<< "Linux systems and it might not work on others (especially Windows)." << endl
+<< "" << endl
+<< "The name of the new input files is composed of the name of the original" << endl
+<< "instance, the string "resume", a timestamp, the process ID of Minion, the name" << endl
+<< "of the variable whose domain is being split and 0 or 1. Each of the new input" << endl
+<< "files has a comment identifying the name of the input file which it was split" << endl
+<< "from. Similarly, Minion's output identifies the new input files it writes when" << endl
+<< "splitting." << endl
+<< "" << endl
+<< "The new input files can be run without any special flags." << endl
+<< "" << endl
+<< "This flag is intended to be used with the -timelimit, -sollimit, -nodelimit" << endl
+<< ",-searchlimit or -cpulimit flags. Please note that changing other flags between" << endl
+<< "runs (such as -varorder) may have unintended consequences." << endl << endl << endl;
+} else
 if("input" == request) {
 cout << "Help entry: " << "input" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -1692,6 +1720,7 @@ cout << "help switches -resume-file" << endl;
 cout << "help switches -searchlimit" << endl;
 cout << "help switches -sollimit" << endl;
 cout << "help switches -solsout" << endl;
+cout << "help switches -split" << endl;
 cout << "help switches -tableout" << endl;
 cout << "help switches -timelimit" << endl;
 cout << "help switches -varorder" << endl;
