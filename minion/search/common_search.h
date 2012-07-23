@@ -193,7 +193,7 @@ namespace Controller
     }
 
     vector<string> splits;
-    string curvar = "(no split variable)";
+    string curvar = "(no_split_variable)";
     string opt = "";
 
     if(getOptions(stateObj).split)
