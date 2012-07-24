@@ -30,6 +30,7 @@ git remote add sourceforge ssh://YOURACCOUNTNAME@minion.git.sourceforge.net/gitr
 git push sourceforge (and enter password for your account if you can remember it).
 
 
+6. Go to jenkins. Find job minion-release and build it.
 
 
 
