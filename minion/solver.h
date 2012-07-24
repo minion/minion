@@ -253,10 +253,6 @@ public:
   bool graph;
   bool instance_stats;
 
-  //do we resume from a previous run and, if so, what file
-  bool resume;
-  string resume_file;
-
   // Do not write a resume file.
   bool noresumefile;
 
@@ -288,7 +284,7 @@ public:
     time_limit_is_CPU_time(false),
     randomise_valvarorder(false), parser_verbose(false), 
     redump(false), graph(false), instance_stats(false), 
-    resume(false), noresumefile(false), split(false),
+    noresumefile(false), split(false),
     outputType(-1), noTimers(false),
     Xvarmunge(-1), Xsymmunge(-1)
   {}

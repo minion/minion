@@ -283,15 +283,6 @@ cout << "Randomises the ordering of the decision variables. If the input file" <
 << "specifies as ordering it will randomly permute this. If no ordering is" << endl
 << "specified a random permutation of all the variables is used." << endl << endl << endl;
 } else
-if("switches -resume-file" == request) {
-cout << "Help entry: " << "switches -resume-file" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Resume solving from a resume file." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "To resume the solving of problem.minion from the file resume.minion do" << endl
-<< "" << endl
-<< " minion -resume-file resume.minion problem.minion" << endl << endl << endl;
-} else
 if("switches -noresume" == request) {
 cout << "Help entry: " << "switches -noresume" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -1716,7 +1707,6 @@ cout << "help switches -quiet" << endl;
 cout << "help switches -randomiseorder" << endl;
 cout << "help switches -randomseed" << endl;
 cout << "help switches -redump" << endl;
-cout << "help switches -resume-file" << endl;
 cout << "help switches -searchlimit" << endl;
 cout << "help switches -sollimit" << endl;
 cout << "help switches -solsout" << endl;

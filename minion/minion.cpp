@@ -337,16 +337,6 @@ specifies as ordering it will randomly permute this. If no ordering is
 specified a random permutation of all the variables is used.
 */
 
-/** @help switches;-resume-file Description
-Resume solving from a resume file.
-*/
-
-/** @help switches;-resume-file Example
-To resume the solving of problem.minion from the file resume.minion do
-
-   minion -resume-file resume.minion problem.minion
-*/
-
 /** @help switches;-noresume Description
 Do not write a resume file on timeout or being killed.
 */
@@ -511,12 +501,6 @@ try {
   }
 
   vector<string> files(1, getOptions(stateObj).instance_name);
-  if(getOptions(stateObj).resume) {
-    cout << "Resuming from " << getOptions(stateObj).resume_file << endl;
-    files.reserve(2);
-    files.push_back(getOptions(stateObj).resume_file);
-  }
-
   readInputFromFiles(instance, files, getOptions(stateObj).parser_verbose);
 
   if(getOptions(stateObj).Xvarmunge != -1)

@@ -43,7 +43,7 @@ for i in ./test_instances/resume_instances/*.minion; do
     firstpartialsols=`grep "Solutions Found" $FIRSTPARTIALOUTPUT | cut -d' ' -f3`;
     echo first pid$PID res$resumefile nodes$firstpartialnodes sols$firstpartialsols;
     
-    $MINION -resume-file $resumefile $INSTANCE > $SECONDPARTIALOUTPUT;
+    $MINION $resumefile > $SECONDPARTIALOUTPUT;
     secondpartialnodes=`grep "Total Nodes" $SECONDPARTIALOUTPUT | cut -d' ' -f3`;
     secondpartialsols=`grep "Solutions Found" $SECONDPARTIALOUTPUT | cut -d' ' -f3`;
     echo second nodes$secondpartialnodes sols$secondpartialsols;

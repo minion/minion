@@ -1794,21 +1794,6 @@ Print the minion input instance file to standard out. No search is
 carried out when this switch is used.
 \end{verbatim}
 }
-\section{switches -resume-file}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-Resume solving from a resume file.
-\end{verbatim}
-}
-\paragraph{Example}
-{\footnotesize
-\begin{verbatim}
-To resume the solving of problem.minion from the file resume.minion do
-
-   minion -resume-file resume.minion problem.minion
-\end{verbatim}
-}
 \section{switches -searchlimit}
 \paragraph{Description}
 {\footnotesize
@@ -1880,7 +1865,7 @@ repeatedly. Please note that large-scale testing of this feature was limited to
 Linux systems and it might not work on others (especially Windows).
 
 The name of the new input files is composed of the name of the original
-instance, the string "resume", a timestamp, the process ID of Minion, the name
+instance, the string 'resume', a timestamp, the process ID of Minion, the name
 of the variable whose domain is being split and 0 or 1. Each of the new input
 files has a comment identifying the name of the input file which it was split
 from. Similarly, Minion's output identifies the new input files it writes when
