@@ -19,4 +19,17 @@ Come out of minion and run:
 cd docs
 pdflatex Manual.tex  (and bibtex, pdflatex again etc)
 
+3.  Check all generated files (e.g. representing a new constraint or commandline switch) are in GIT 
+git status
+
+4. Commit results into git and push.
+
+5. Push to sourceforge:
+
+git remote add sourceforge ssh://YOURACCOUNTNAME@minion.git.sourceforge.net/gitroot/minion/minion
+git push sourceforge (and enter password for your account if you can remember it).
+
+
+
+
 
