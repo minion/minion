@@ -1,0 +1,22 @@
+
+
+1. Update version numbers:
+In docs/Manual.tex 
+In minion/minion.h
+In minion/Doxyfile
+
+
+2.  Update the documentation.  
+
+Go into the minion git repository. 
+
+Go into minion/ and run:
+help/genhelp.sh >help/help.cpp
+
+Come out of minion and run:
+./docs/genhelp/genhelp.sh
+./docs/genhelp/genlatexhelp.sh
+cd docs
+pdflatex Manual.tex  (and bibtex, pdflatex again etc)
+
+
