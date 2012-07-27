@@ -59,5 +59,7 @@ After committing and push, jenkins job website-mirror will make it live.
 10.  Tag version in git.
 
 11.  Email MUG and sourceforge mailing lists to announce release.
+mug@cs.st-andrews.ac.uk
+minion-general@lists.sourceforge.net
 
 
