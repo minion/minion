@@ -7,6 +7,16 @@
 # set of unsat tuples most evenly.
 
 
+HEURISTIC_ENTAIL = 1
+HEURISTIC_ANTI_ENTAIL = 2
+HEURISTIC_STATIC = 3
+HEURISTIC_LARGEST_POS_FIRST = 4
+HEURISTIC_SMALLEST_POS_FIRST = 5
+HEURISTIC_SMALLEST_POS_AND_IN_FIRST = 6
+HEURISTIC_RANDOM = 7
+
+GlobalHeuristic = 1
+
 
 # domains_in is the values that are certainly in the domains. 
 # domains_poss is the values that are possibly in. i.e. haven't been tested yet.
@@ -16,7 +26,7 @@ import cProfile
 import random
 sys.path.append("../python-scscp")
 from VarValToDomain import initialize_domain,get_lit,get_total_litcount,get_lit_mapping
-from perms import GetMinimalImage, ValueTotalPerm, ValuePermSwapList, VariableTotalPerm, LiteralPermSwapList, InvPerm, MultPerm, PadPerm, VariablePermSwapList
+from perms import GetGroupSize, GetMinimalImage, ValueTotalPerm, ValuePermSwapList, VariableTotalPerm, LiteralPermSwapList, InvPerm, MultPerm, PadPerm, VariablePermSwapList
 nodenumcounter = 0
 
 nodenumprint = 100
@@ -43,6 +53,7 @@ CountTreeSize=True
 def markEmpty(nodenum):
     global EmptyNodes
     EmptyNodes[nodenum] = True
+
 
 def adddomain(indom, maybedom, nodenum):
     global MinimalImages
@@ -379,17 +390,19 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     chosenval=0
     
     # default ordering
-    if not heuristic:
+    if GlobalHeuristic == HEURISTIC_STATIC:
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
                 chosenvar=var
                 chosenval=val
                 break
-    
     # choose the var and val contained in the most remaining nogoods
     # I.e. if it's not in domain, it will eliminate the most nogoods, pushing towards impliedness.
-    if heuristic:
-        numnogoods=-1
+    elif GlobalHeuristic == HEURISTIC_ENTAIL or GlobalHeuristic == HEURISTIC_ANTI_ENTAIL:
+        if GlobalHeuristic == HEURISTIC_ENTAIL:
+            numnogoods=-1
+        else:
+            numnogoods=10000000000
         ties=[]
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
@@ -399,7 +412,8 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                     if nogood[var]==val:
                         count+=1
                 
-                if count>numnogoods:
+                if ((GlobalHeuristic == HEURISTIC_ENTAIL and count>numnogoods) or
+                   (GlobalHeuristic == HEURISTIC_ANTI_ENTAIL and count<numnogoods)):
                     numnogoods=count
                     chosenvar=var
                     chosenval=val
@@ -415,7 +429,42 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                 
             else:
                 print "No tie"
-    
+    elif GlobalHeuristic == HEURISTIC_SMALLEST_POS_FIRST:
+        domsize = 10000000
+        for (var, val) in varvalorder:
+            if val in domains_poss[var]:
+                if len(domains_poss[var]) < domsize:
+                    domsize = len(domains_poss[var])
+                    chosenvar = var
+                    chosenval = val
+    elif GlobalHeuristic == HEURISTIC_LARGEST_POS_FIRST:
+        domsize = -1
+        for (var, val) in varvalorder:
+            if val in domains_poss[var]:
+                if len(domains_poss[var]) > domsize:
+                    domsize = len(domains_poss[var])
+                    chosenvar = var
+                    chosenval = val
+
+    elif GlobalHeuristic == HEURISTIC_SMALLEST_POS_AND_IN_FIRST:
+        domsize = 10000000
+        for (var, val) in varvalorder:
+            if val in domains_poss[var]:
+                if len(domains_poss[var]) + len(domains_in[var]) < domsize:
+                    domsize = len(domains_poss[var])
+                    chosenvar = var
+                    chosenval = val
+    elif GlobalHeuristic == HEURISTIC_RANDOM:
+        choices = []
+        for (var, val) in varvalorder:
+            if val in domains_poss[var]:
+                choices += [(var,val)]
+        (chosenvar, chosenval) = random.choice(choices)
+    else:
+        sys.exit("Invalid heuristic")
+
+
+
     if chosenvar==-1:
         # this case arises when the varvalorder does not contain all var val pairs/
         # This might be because the last variable is functionally dependent on the 
@@ -1337,11 +1386,15 @@ def lifeImmigration():
 
 #cProfile.run('life()')
 
-if len(sys.argv)>4:
+if len(sys.argv)==5:
     TreeCutoff=float(sys.argv[4])
     #print "# read TreeCutoff value of %f"%TreeCutoff
 else:
     TreeCutoff=1
+
+if len(sys.argv) == 6:
+    assert(sys.argv[4] == 'H')
+    GlobalHeuristic = int(sys.argv[5])
 
 EnableVMOutput = eval(sys.argv[2])
 EnableSymDetection = eval(sys.argv[3])
@@ -1353,3 +1406,4 @@ else:
 
 eval(sys.argv[1]+"()")
 
+print(Comment + "Group Size: " + str(GetGroupSize(Group)))
