@@ -77,3 +77,11 @@ def GetMinimalImage(G, L):
     command = scscp.build_call("CAJ_MinImage", [ scscp.listint_node(G), scscp.listint_node(L) ] )
     reply = scscp.execute(socket, command)
     return scscp.parse_reply(reply)
+
+def GetGroupSize(G):
+    global socket
+    if socket == False:
+        socket = scscp.make_connection()
+    command = scscp.build_call("CAJ_GroupSize", [ scscp.listint_node(G) ] )
+    reply = scscp.execute(socket, command)
+    return scscp.parse_reply(reply)

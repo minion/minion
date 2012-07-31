@@ -128,6 +128,8 @@ InstallSCSCPprocedure( "WS_Join", function(a,b) return [a,b]; end );
 
 InstallSCSCPprocedure( "CAJ_MinImage", CAJ_MinListImage , "Bla", 1, 1 ); 
 
+InstallSCSCPprocedure( "CAJ_GroupSize", CAJ_GroupSizeImpl , "Bla", 1, 1 ); 
+
 InstallSCSCPprocedure( "WS_Phi", Phi, "Euler's totient function, see ?Phi in GAP", 1, 1 );
 
 # Group identification in the GAP small group library

@@ -30,3 +30,6 @@ CAJ_MinListImage := function(perms, L)
 
 end;
 
+CAJ_GroupSizeImpl := function(perms)
+  return Size(Group(List(perms, PermList)));
+end;
