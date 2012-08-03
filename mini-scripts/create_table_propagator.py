@@ -14,6 +14,7 @@ HEURISTIC_LARGEST_POS_FIRST = 4
 HEURISTIC_SMALLEST_POS_FIRST = 5
 HEURISTIC_SMALLEST_POS_AND_IN_FIRST = 6
 HEURISTIC_RANDOM = 7
+HEURISTIC_ENTAIL2 = 8
 
 GlobalHeuristic = 1
 
@@ -389,7 +390,9 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     chosenvar=-1
     chosenval=0
     
+    PassToSmallPosFirst=False
     # default ordering
+    
     if GlobalHeuristic == HEURISTIC_STATIC:
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
@@ -398,8 +401,8 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                 break
     # choose the var and val contained in the most remaining nogoods
     # I.e. if it's not in domain, it will eliminate the most nogoods, pushing towards impliedness.
-    elif GlobalHeuristic == HEURISTIC_ENTAIL or GlobalHeuristic == HEURISTIC_ANTI_ENTAIL:
-        if GlobalHeuristic == HEURISTIC_ENTAIL:
+    if GlobalHeuristic == HEURISTIC_ENTAIL or GlobalHeuristic == HEURISTIC_ENTAIL2 or GlobalHeuristic == HEURISTIC_ANTI_ENTAIL:
+        if GlobalHeuristic == HEURISTIC_ENTAIL or GlobalHeuristic == HEURISTIC_ENTAIL2:
             numnogoods=-1
         else:
             numnogoods=10000000000
@@ -420,6 +423,23 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                     ties=[(var,val)]
                 elif count==numnogoods:
                     ties.append((var, val))
+                
+                if GlobalHeuristic == HEURISTIC_ENTAIL2 and count>=numnogoods:
+                    # check if another value that is 'in'  has a nogood
+                    othervalin=False
+                    for valcheck in domains_in[var]:
+                        for nogood in ct2:
+                            if nogood[var]==valcheck:
+                                othervalin=True
+                                break
+                        if othervalin: break
+                    if not othervalin:
+                        if count>numnogoods:
+                            numnogoods=count
+                            chosenvar=var
+                            chosenval=val
+                        else:
+                            ties.append((var, val))
         
         if checkties:
             if len(ties)>1:
@@ -429,7 +449,11 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                 
             else:
                 print "No tie"
-    elif GlobalHeuristic == HEURISTIC_SMALLEST_POS_FIRST:
+                
+        if chosenvar==-1:
+            PassToSmallPosFirst=True
+        
+    if GlobalHeuristic == HEURISTIC_SMALLEST_POS_FIRST or PassToSmallPosFirst:
         domsize = 10000000
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
@@ -437,7 +461,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                     domsize = len(domains_poss[var])
                     chosenvar = var
                     chosenval = val
-    elif GlobalHeuristic == HEURISTIC_LARGEST_POS_FIRST:
+    if GlobalHeuristic == HEURISTIC_LARGEST_POS_FIRST:
         domsize = -1
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
@@ -446,7 +470,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                     chosenvar = var
                     chosenval = val
 
-    elif GlobalHeuristic == HEURISTIC_SMALLEST_POS_AND_IN_FIRST:
+    if GlobalHeuristic == HEURISTIC_SMALLEST_POS_AND_IN_FIRST:
         domsize = 10000000
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
@@ -454,13 +478,13 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                     domsize = len(domains_poss[var])
                     chosenvar = var
                     chosenval = val
-    elif GlobalHeuristic == HEURISTIC_RANDOM:
+    if GlobalHeuristic == HEURISTIC_RANDOM:
         choices = []
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
                 choices += [(var,val)]
         (chosenvar, chosenval) = random.choice(choices)
-    else:
+    if GlobalHeuristic not in range(1, 9):
         sys.exit("Invalid heuristic")
 
 
