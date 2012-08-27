@@ -1417,7 +1417,10 @@ else:
     TreeCutoff=1
 
 if len(sys.argv) == 6:
-    assert(sys.argv[4] == 'H')
+    if sys.argv[4] != 'H':
+        TreeCutoff=float(sys.argv[4])
+    else:
+        TreeCutoff=1
     GlobalHeuristic = int(sys.argv[5])
 
 EnableVMOutput = eval(sys.argv[2])
