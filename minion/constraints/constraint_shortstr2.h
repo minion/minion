@@ -66,6 +66,51 @@ This constraint enforces generalized arc consistency.
 
 using namespace std;
 
+
+struct arrayset {
+    vector<int> vals;
+    vector<int> vals_pos;
+    int size;
+    int minval;
+    
+    void initialise(int low, int high) {
+        minval=low;
+        vals_pos.resize(high-low+1);
+        vals.resize(high-low+1);
+        for(int i=0; i<high-low+1; i++) {
+            vals[i]=i+low;
+            vals_pos[i]=i;
+        }
+        size=0;
+    }
+    
+    void clear() {
+        sval_size=0;
+    }
+    
+    bool in(int val) {
+        return vals_pos[val-minval]<size;
+    }
+    
+    void insert(int val) {
+        int validx=val-minval;
+        if(!in(val)) {
+            // swap into place
+            vals[vals_pos[validx]]=vals[size];
+            vals[size]=val;
+            
+            size++;
+        }
+    }
+    
+    void remove(int val) {
+        // swap to posiition size-1 then reduce size
+        ...
+    }
+}
+
+
+
 template<typename VarArray>
 struct ShortSTR2
 {
@@ -73,9 +118,9 @@ struct ShortSTR2
     
     bool constraint_locked;
     
-    vector<int> tupindices;
+    vector<vector<int> > tuples;
     
-    TupleList* tups;
+    vector<int> tupindices;
     
     ReversibleInt limit;   // In tupindices, indices less than limit are not known to be invalid.
     
@@ -138,12 +183,30 @@ struct ShortSTR2
         do_prop();
     }
     
+    // S_sup is the set of unset variables with at least one unsupported val.
+    // Iterate only on S_Sup in the main loops looking for support.
+    
+    arrayset ssup;
+    
+    // S_val is the set of "unassigned" vars whose domain has been reduced since
+    // previous call.  
+    // Unassigned here I think means not assigned by the search procedure.
+    // Also contains the last assigned var (i.e. last assigned by the search procedure)
+    // if it belongs to the scope of the constraint. 
+    
+    // Here interpreted as the set of variables that triggered this call.
+    arrayset sval;
+    
+    // lastSize array dropped. Only need to keep a list of the triggering vars.
+    
     
     
     void do_prop() {
         
         
+        int i=0;
         
+        while(i<
         
         
     }
