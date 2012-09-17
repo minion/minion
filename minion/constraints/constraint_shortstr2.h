@@ -85,7 +85,7 @@ struct arrayset {
     }
     
     void clear() {
-        sval_size=0;
+        size=0;
     }
     
     bool in(int val) {
@@ -126,7 +126,7 @@ struct arrayset {
 
 
 template<typename VarArray>
-struct ShortSTR2
+struct ShortSTR2 : public AbstractConstraint
 {
     VarArray vars;
     
@@ -140,15 +140,20 @@ struct ShortSTR2
     
     int numtups;
     
-    ShortSupportsGAC(StateObj* _stateObj, const VarArray& _var_array, TupleList* tuples) : AbstractConstraint(_stateObj), 
-    vars(_var_array), constraint_locked(false), tups(tuples), limit(_stateObj)
+    ShortSTR2(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj), 
+    vars(_var_array), constraint_locked(false), limit(_stateObj)
     {
-        numtups=tuples->size();   //
+        numtups=_tuples->size();   //
         limit=numtups;
         
         tupindices.resize(limit);
         for(int i=0; i<numtups; i++) {
             tupindices[i]=i;
+        }
+        
+        // Hacky hacky hack -- copy the tuples.
+        for(int i=0; i<numtups; i++) {
+            tuples.push_back(_tuples->get_vector(i));
         }
         
         ssup.initialise(0, vars.size()-1);
@@ -177,7 +182,28 @@ struct ShortSTR2
         return t;
     }
     
+    virtual void full_propagate() {
+        // pretend all variables have changed.
+        for(int i=0; i<vars.size(); i++) sval.insert(i);
+        
+        do_prop();
+    }
     
+    virtual vector<AnyVarRef> get_vars()
+    {
+      vector<AnyVarRef> ret;
+      ret.reserve(vars.size());
+      for(unsigned i = 0; i < vars.size(); ++i)
+        ret.push_back(vars[i]);
+      return ret;
+    }
+    
+    virtual bool check_assignment(DomainInt* v, int v_size) {
+        D_ASSERT(v_size == vars.size());
+        vector<int> temp;
+        for(int i=0; i<v_size; i++) temp.push_back(v[i]);
+        return std::find(tuples.begin(), tuples.end(), temp)!=tuples.end();
+    }
     
     virtual void propagate(int prop_var, DomainDelta)
     {
@@ -296,7 +322,7 @@ struct ShortSTR2
         int tmp=tupindices[limit-1];
         tupindices[limit-1]=tupindices[i];
         tupindices[i]=tmp;
-        limit--;
+        limit=limit-1;
     }
     
 };

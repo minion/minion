@@ -13,6 +13,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
                     "reifyimply-new" "true" "false" "check[gsa]" "check[assign]"
                     "watchvecexists_less" "lighttable"
                     "supportsgac" "supportsgaclist" "gacschema" "constructiveor" "gaceq"
+                    "shortstr2"
                     )
 
 set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
@@ -239,6 +240,9 @@ set(NAME_READ_constructiveor "read_list")
 
 set(NAME_ID_gaceq "CT_GACEQ")
 set(NAME_READ_gaceq "read_var" "read_var")
+
+set(NAME_ID_shortstr2 "CT_SHORTSTR2")
+set(NAME_READ_shortstr2 "read_list" "read_tuples")
 
 macro(select_constraints)
     message(STATUS "Generating constraints:")
