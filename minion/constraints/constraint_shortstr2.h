@@ -93,11 +93,15 @@ struct arrayset {
     }
     
     void insert(int val) {
-        int validx=val-minval;
         if(!in(val)) {
             // swap into place
-            vals[vals_pos[validx]]=vals[size];
+            int validx=val-minval;
+            int swapval=vals[size];
+            vals[vals_pos[validx]]=swapval;
             vals[size]=val;
+            
+            vals_pos[swapval-minval]=vals_pos[validx];
+            vals_pos[validx]=size;
             
             size++;
         }
@@ -105,9 +109,19 @@ struct arrayset {
     
     void remove(int val) {
         // swap to posiition size-1 then reduce size
-        ...
+        if(in(val)) {
+            int validx=val-minval;
+            int swapval=vals[size-1];
+            vals[vals_pos[validx]]=swapval;
+            vals[size-1]=val;
+            
+            vals_pos[swapval-minval]=vals_pos[validx];
+            vals_pos[validx]=size-1;
+            
+            size--;
+        }
     }
-}
+};
 
 
 
@@ -137,10 +151,17 @@ struct ShortSTR2
             tupindices[i]=i;
         }
         
+        ssup.initialise(0, vars.size()-1);
+        sval.initialise(0, vars.size()-1);
+        
+        gacvalues.resize(vars.size());
+        for(int i=0; i<vars.size(); i++) {
+            gacvalues[i].initialise(vars[i].getMin(), vars[i].getMax());
+        }
     }
     
     virtual string constraint_name()
-    { 
+    {
         return "ShortSTR2";
     }
     
@@ -160,6 +181,8 @@ struct ShortSTR2
     
     virtual void propagate(int prop_var, DomainDelta)
     {
+        sval.insert(prop_var);
+        
         if(!constraint_locked)
         {
             constraint_locked = true;
@@ -183,9 +206,10 @@ struct ShortSTR2
         do_prop();
     }
     
-    // S_sup is the set of unset variables with at least one unsupported val.
+    // S_sup is the set of unset (by the search procedure) variables with 
+    // at least one unsupported val.
     // Iterate only on S_Sup in the main loops looking for support.
-    
+    // Unfortunately can't do this exactly as in STR2 paper.
     arrayset ssup;
     
     // S_val is the set of "unassigned" vars whose domain has been reduced since
@@ -200,17 +224,80 @@ struct ShortSTR2
     // lastSize array dropped. Only need to keep a list of the triggering vars.
     
     
+    vector<arrayset> gacvalues;
     
     void do_prop() {
+        int numvars=vars.size();
+        
+        // Can't tell which vars have been assigned by the search procedure.
+        // Approximate ssup but make sure at least one var is in the set in 
+        // case we need to wipe out.
+        ssup.clear();
+        for(int i=0; i<numvars; i++) {
+            if(!vars[i].isAssigned()) {
+                ssup.insert(i);
+                gacvalues[i].clear();
+            }
+        }
+        if(ssup.size==0) ssup.insert(numvars-1);
+        
         
         
         int i=0;
         
-        while(i<
+        while(i<limit) {
+            int index=tupindices[i];
+            vector<int> & tau=tuples[index];
+            
+            // check validity
+            bool isvalid=true;
+            for(int j=0; j<sval.size; j++) {
+                int var=sval.vals[j];
+                if(!vars[var].inDomain(tau[var])) {
+                    isvalid=false;
+                    break;
+                }
+            }
+            
+            if(isvalid) {
+                
+                // do stuff
+                for(int j=0; j<ssup.size; j++) {
+                    int var=ssup.vals[j];
+                    gacvalues[var].insert(tau[var]); // noop if value already there.
+                    
+                    // Next line NOT the correct implementation!
+                    if(gacvalues[var].size == vars[var].getMax()-vars[var].getMin()+1) {
+                        ssup.remove(var);
+                        j--;
+                    }
+                }
+                
+                i++;
+            }
+            else {
+                removeTuple(i);
+            }
+        }
         
-        
+        // Prune the domains.
+        for(int j=0; j<ssup.size; j++) {
+            int var=ssup.vals[j];
+            for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
+                if(vars[var].inDomain(val) && !gacvalues[var].in(val)) {
+                    vars[var].removeFromDomain(val);
+                }
+            }
+        }
     }
     
+    inline void removeTuple(int i) {
+        // Swap to end
+        int tmp=tupindices[limit-1];
+        tupindices[limit-1]=tupindices[i];
+        tupindices[i]=tmp;
+        limit--;
+    }
     
 };
 
