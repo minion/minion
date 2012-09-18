@@ -144,9 +144,8 @@ struct ShortSTR2 : public AbstractConstraint
     vars(_var_array), constraint_locked(false), limit(_stateObj)
     {
         numtups=_tuples->size();   //
-        limit=numtups;
         
-        tupindices.resize(limit);
+        tupindices.resize(numtups);
         for(int i=0; i<numtups; i++) {
             tupindices[i]=i;
         }
@@ -161,7 +160,7 @@ struct ShortSTR2 : public AbstractConstraint
         
         gacvalues.resize(vars.size());
         for(int i=0; i<vars.size(); i++) {
-            gacvalues[i].initialise(vars[i].getMin(), vars[i].getMax());
+            gacvalues[i].initialise(vars[i].getInitialMin(), vars[i].getInitialMax());
         }
     }
     
@@ -183,6 +182,8 @@ struct ShortSTR2 : public AbstractConstraint
     }
     
     virtual void full_propagate() {
+        limit=numtups;
+        
         // pretend all variables have changed.
         for(int i=0; i<vars.size(); i++) sval.insert(i);
         
@@ -215,8 +216,6 @@ struct ShortSTR2 : public AbstractConstraint
             getQueue(stateObj).pushSpecialTrigger(this);
         }
     }
-    
-    
     
     virtual void special_unlock() { constraint_locked = false; }
     
@@ -258,14 +257,23 @@ struct ShortSTR2 : public AbstractConstraint
         // Can't tell which vars have been assigned by the search procedure.
         // Approximate ssup but make sure at least one var is in the set in 
         // case we need to wipe out.
-        ssup.clear();
+        /*ssup.clear();
         for(int i=0; i<numvars; i++) {
             if(!vars[i].isAssigned()) {
                 ssup.insert(i);
                 gacvalues[i].clear();
             }
         }
-        if(ssup.size==0) ssup.insert(numvars-1);
+        if(ssup.size==0) ssup.insert(numvars-1);*/
+        
+        // Basic impl for now. 
+        // For 'removing assigned vars' optimization, need them to be both
+        // assigned and to have done the table reduction after assignment!
+        ssup.clear();
+        for(int i=0; i<numvars; i++) {
+            ssup.insert(i);
+            gacvalues[i].clear();
+        }
         
         
         
@@ -315,6 +323,8 @@ struct ShortSTR2 : public AbstractConstraint
                 }
             }
         }
+        
+        sval.clear();
     }
     
     inline void removeTuple(int i) {
