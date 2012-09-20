@@ -138,21 +138,57 @@ struct ShortSTR2 : public AbstractConstraint
     
     ReversibleInt limit;   // In tupindices, indices less than limit are not known to be invalid.
     
-    int numtups;
-    
     ShortSTR2(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj), 
     vars(_var_array), constraint_locked(false), limit(_stateObj)
     {
-        numtups=_tuples->size();   //
-        
-        tupindices.resize(numtups);
-        for(int i=0; i<numtups; i++) {
-            tupindices[i]=i;
+        // Decode the tuples, they are all encoded in one tuple.
+        if(UseShort) {
+            D_ASSERT(_tuples->size()==1);
+            
+            vector<DomainInt> encoded = _tuples->get_vector(0);
+            
+            vector<int> temp;
+            temp.resize(vars.size(), -1000000);
+            
+            for(int i=0; i<encoded.size(); i=i+2) {
+                if(encoded[i]==-1) {
+                    // end of a short support.
+                    if(encoded[i+1]!=-1) {
+                        cout << "Split marker is -1,-1 in tuple for supportsgac." << endl;
+                        abort();
+                    }
+                    tuples.push_back(temp);
+                    
+                    temp.clear();
+                    temp.resize(vars.size(), -1000000);
+                }
+                else
+                {
+                    if(encoded[i]<0 || encoded[i]>=vars.size()) {
+                        cout << "Tuple passed into supportsgac does not correctly encode a set of short supports." << endl;
+                        abort();
+                    }
+                    temp[encoded[i]]=encoded[i+1]; 
+                }
+            }
+            
+            if(encoded[encoded.size()-2]!=-1 || encoded[encoded.size()-1]!=-1) {
+                cout << "Last -1,-1 marker missing from tuple in supportsgac."<< endl;
+                abort();
+            }
+        }
+        else {
+            // Normal table constraint.             
+            // Hacky hacky hack -- copy the tuples.
+            for(int i=0; i<_tuples->size(); i++) {
+                tuples.push_back(_tuples->get_vector(i));
+            }
         }
         
-        // Hacky hacky hack -- copy the tuples.
-        for(int i=0; i<numtups; i++) {
-            tuples.push_back(_tuples->get_vector(i));
+        
+        tupindices.resize(tuples.size());
+        for(int i=0; i<tuples.size(); i++) {
+            tupindices[i]=i;
         }
         
         ssup.initialise(0, vars.size()-1);
@@ -182,7 +218,7 @@ struct ShortSTR2 : public AbstractConstraint
     }
     
     virtual void full_propagate() {
-        limit=numtups;
+        limit=tuples.size();
         
         // pretend all variables have changed.
         for(int i=0; i<vars.size(); i++) sval.insert(i);
@@ -217,7 +253,7 @@ struct ShortSTR2 : public AbstractConstraint
         }
     }
     
-    virtual void special_unlock() { constraint_locked = false; }
+    virtual void special_unlock() { constraint_locked = false; sval.clear(); }
     
     virtual void special_check()
     {
@@ -254,19 +290,7 @@ struct ShortSTR2 : public AbstractConstraint
     void do_prop() {
         int numvars=vars.size();
         
-        // Can't tell which vars have been assigned by the search procedure.
-        // Approximate ssup but make sure at least one var is in the set in 
-        // case we need to wipe out.
-        /*ssup.clear();
-        for(int i=0; i<numvars; i++) {
-            if(!vars[i].isAssigned()) {
-                ssup.insert(i);
-                gacvalues[i].clear();
-            }
-        }
-        if(ssup.size==0) ssup.insert(numvars-1);*/
-        
-        // Basic impl for now. 
+        // Basic impl of ssup for now. 
         // For 'removing assigned vars' optimization, need them to be both
         // assigned and to have done the table reduction after assignment!
         
@@ -277,8 +301,6 @@ struct ShortSTR2 : public AbstractConstraint
             ssup.insert(i);
             gacvalues[i].clear();
         }
-        
-        
         
         int i=0;
         
@@ -314,7 +336,7 @@ struct ShortSTR2 : public AbstractConstraint
                     if(UseShort && tau[var]==-1000000) {
                         ssup.remove(var);
                         j--;
-                    } 
+                    }
                     else if(!gacvalues[var].in(tau[var])) {
                         gacvalues[var].insert(tau[var]);
                         
