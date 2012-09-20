@@ -60,9 +60,7 @@ This constraint enforces generalized arc consistency.
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
-#include <deque>
 #include <algorithm>
-#include <utility>
 
 using namespace std;
 
@@ -120,6 +118,10 @@ struct arrayset {
             
             size--;
         }
+    }
+    
+    void fill() {
+        size=vals.size();
     }
 };
 
@@ -296,9 +298,9 @@ struct ShortSTR2 : public AbstractConstraint
         
         // Actually this thing below is OK: as soon as we find a valid tuple,
         // any assigned vars will be removed from ssup.
-        ssup.clear();
+        ssup.fill();
         for(int i=0; i<numvars; i++) {
-            ssup.insert(i);
+            //ssup.insert(i);
             gacvalues[i].clear();
         }
         
