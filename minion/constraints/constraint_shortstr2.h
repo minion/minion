@@ -125,6 +125,46 @@ struct arrayset {
     }
 };
 
+struct ReversibleArrayset {
+    // Only allows deletion.
+    vector<int> vals;
+    vector<int> vals_pos;
+    ReversibleInt size;
+    int minval;
+    
+    ReversibleArrayset(StateObj * _so) : size(_so) {}
+    
+    void initialise(int low, int high) {
+        minval=low;
+        vals_pos.resize(high-low+1);
+        vals.resize(high-low+1);
+        for(int i=0; i<high-low+1; i++) {
+            vals[i]=i+low;
+            vals_pos[i]=i;
+        }
+        size=vals.size();
+    }
+    
+    bool in(int val) {
+        return vals_pos[val-minval]<size;
+    }
+    
+    void remove(int val) {
+        // swap to posiition size-1 then reduce size
+        if(in(val)) {
+            int validx=val-minval;
+            int swapval=vals[size-1];
+            vals[vals_pos[validx]]=swapval;
+            vals[size-1]=val;
+            
+            vals_pos[swapval-minval]=vals_pos[validx];
+            vals_pos[validx]=size-1;
+            
+            size=size-1;
+        }
+    }
+};
+
 #define UseShort true
 
 template<typename VarArray>
@@ -142,6 +182,7 @@ struct ShortSTR2 : public AbstractConstraint
     
     ShortSTR2(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj), 
     vars(_var_array), constraint_locked(false), limit(_stateObj)
+    //, ssup_permanent(_stateObj)
     {
         // Decode the tuples, they are all encoded in one tuple.
         if(UseShort) {
@@ -195,6 +236,8 @@ struct ShortSTR2 : public AbstractConstraint
         
         ssup.initialise(0, vars.size()-1);
         sval.initialise(0, vars.size()-1);
+        
+        //ssup_permanent.initialise(0, vars.size()-1);
         
         gacvalues.resize(vars.size());
         for(int i=0; i<vars.size(); i++) {
@@ -275,6 +318,8 @@ struct ShortSTR2 : public AbstractConstraint
     // Unfortunately can't do this exactly as in STR2 paper.
     arrayset ssup;
     
+    //ReversibleArrayset ssup_permanent;  // when a var is assigned and after str2 has been run, it is removed from here. 
+    
     // S_val is the set of "unassigned" vars whose domain has been reduced since
     // previous call.  
     // Unassigned here I think means not assigned by the search procedure.
@@ -298,7 +343,13 @@ struct ShortSTR2 : public AbstractConstraint
         
         // Actually this thing below is OK: as soon as we find a valid tuple,
         // any assigned vars will be removed from ssup.
+        
         ssup.fill();
+        
+        // copy ssup_permanent into ssup.
+        //ssup.clear();
+        //for(int j=0; j<ssup_permanent.size; j++) ssup.insert(ssup_permanent.vals[j]); 
+        
         for(int i=0; i<numvars; i++) {
             gacvalues[i].clear();
         }
@@ -337,6 +388,7 @@ struct ShortSTR2 : public AbstractConstraint
                     if(UseShort && tau[var]==-1000000) {
                         ssup.remove(var);
                         j--;
+                        //if(vars[var].isAssigned()) ssup_permanent.remove(var);
                     }
                     else if(!gacvalues[var].in(tau[var])) {
                         gacvalues[var].insert(tau[var]);
@@ -346,6 +398,7 @@ struct ShortSTR2 : public AbstractConstraint
                         if(gacvalues[var].size == vars[var].getMax()-vars[var].getMin()+1) {
                             ssup.remove(var);
                             j--;
+                            //if(vars[var].isAssigned()) ssup_permanent.remove(var);
                         }
                     }
                 }
