@@ -123,7 +123,7 @@ struct arrayset {
     }
 };
 
-
+#define UseShort true
 
 template<typename VarArray>
 struct ShortSTR2 : public AbstractConstraint
@@ -269,6 +269,9 @@ struct ShortSTR2 : public AbstractConstraint
         // Basic impl for now. 
         // For 'removing assigned vars' optimization, need them to be both
         // assigned and to have done the table reduction after assignment!
+        
+        // Actually this thing below is OK: as soon as we find a valid tuple,
+        // any assigned vars will be removed from ssup.
         ssup.clear();
         for(int i=0; i<numvars; i++) {
             ssup.insert(i);
@@ -287,10 +290,19 @@ struct ShortSTR2 : public AbstractConstraint
             bool isvalid=true;
             for(int j=0; j<sval.size; j++) {
                 int var=sval.vals[j];
-                if(!vars[var].inDomain(tau[var])) {
-                    isvalid=false;
-                    break;
+                if(UseShort) {
+                    if( (tau[var]!=-1000000) && !vars[var].inDomain(tau[var])) {
+                        isvalid=false;
+                        break;
+                    }
                 }
+                else {
+                    if(!vars[var].inDomain(tau[var])) {
+                        isvalid=false;
+                        break;
+                    }
+                }
+                
             }
             
             if(isvalid) {
@@ -298,12 +310,20 @@ struct ShortSTR2 : public AbstractConstraint
                 // do stuff
                 for(int j=0; j<ssup.size; j++) {
                     int var=ssup.vals[j];
-                    gacvalues[var].insert(tau[var]); // noop if value already there.
                     
-                    // Next line NOT the correct implementation!
-                    if(gacvalues[var].size == vars[var].getMax()-vars[var].getMin()+1) {
+                    if(UseShort && tau[var]==-1000000) {
                         ssup.remove(var);
                         j--;
+                    } 
+                    else if(!gacvalues[var].in(tau[var])) {
+                        gacvalues[var].insert(tau[var]);
+                        
+                        // Next line NOT the correct implementation!
+                        // Dominion has dom size
+                        if(gacvalues[var].size == vars[var].getMax()-vars[var].getMin()+1) {
+                            ssup.remove(var);
+                            j--;
+                        }
                     }
                 }
                 
@@ -329,6 +349,7 @@ struct ShortSTR2 : public AbstractConstraint
     
     inline void removeTuple(int i) {
         // Swap to end
+        D_ASSERT(tupindices[i]<limit);
         int tmp=tupindices[limit-1];
         tupindices[limit-1]=tupindices[i];
         tupindices[i]=tmp;
