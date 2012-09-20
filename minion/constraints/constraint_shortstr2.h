@@ -300,7 +300,6 @@ struct ShortSTR2 : public AbstractConstraint
         // any assigned vars will be removed from ssup.
         ssup.fill();
         for(int i=0; i<numvars; i++) {
-            //ssup.insert(i);
             gacvalues[i].clear();
         }
         
