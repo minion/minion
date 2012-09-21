@@ -90,33 +90,46 @@ struct arrayset {
         return vals_pos[val-minval]<size;
     }
     
+
+    void unsafe_insert(int val)
+    {
+        D_ASSERT(!in(val));
+        int validx=val-minval;
+        int swapval=vals[size];
+        vals[vals_pos[validx]]=swapval;
+        vals[size]=val;
+        
+        vals_pos[swapval-minval]=vals_pos[validx];
+        vals_pos[validx]=size;
+        
+        size++;
+
+    }
+
     void insert(int val) {
         if(!in(val)) {
-            // swap into place
-            int validx=val-minval;
-            int swapval=vals[size];
-            vals[vals_pos[validx]]=swapval;
-            vals[size]=val;
-            
-            vals_pos[swapval-minval]=vals_pos[validx];
-            vals_pos[validx]=size;
-            
-            size++;
+            unsafe_insert(val);
         }
     }
     
-    void remove(int val) {
+    void unsafe_remove(int val)
+    {
         // swap to posiition size-1 then reduce size
+        D_ASSERT(in(val));
+        int validx=val-minval;
+        int swapval=vals[size-1];
+        vals[vals_pos[validx]]=swapval;
+        vals[size-1]=val;
+        
+        vals_pos[swapval-minval]=vals_pos[validx];
+        vals_pos[validx]=size-1;
+        
+        size--;
+    }
+
+    void remove(int val) {
         if(in(val)) {
-            int validx=val-minval;
-            int swapval=vals[size-1];
-            vals[vals_pos[validx]]=swapval;
-            vals[size-1]=val;
-            
-            vals_pos[swapval-minval]=vals_pos[validx];
-            vals_pos[validx]=size-1;
-            
-            size--;
+            unsafe_remove(val);
         }
     }
     
@@ -175,7 +188,8 @@ struct ShortSTR2 : public AbstractConstraint
     bool constraint_locked;
     
     vector<vector<int> > tuples;
-    
+    vector<vector<pair<int,int> > > compressed_tuples;
+
     vector<int> tupindices;
     
     ReversibleInt limit;   // In tupindices, indices less than limit are not known to be invalid.
@@ -192,6 +206,8 @@ struct ShortSTR2 : public AbstractConstraint
             
             vector<int> temp;
             temp.resize(vars.size(), -1000000);
+
+            vector<pair<int,int> > compressed_temp;
             
             for(int i=0; i<encoded.size(); i=i+2) {
                 if(encoded[i]==-1) {
@@ -204,6 +220,8 @@ struct ShortSTR2 : public AbstractConstraint
                     
                     temp.clear();
                     temp.resize(vars.size(), -1000000);
+                    compressed_tuples.push_back(compressed_temp);
+                    compressed_temp.clear();
                 }
                 else
                 {
@@ -212,6 +230,7 @@ struct ShortSTR2 : public AbstractConstraint
                         abort();
                     }
                     temp[encoded[i]]=encoded[i+1]; 
+                    compressed_temp.push_back(make_pair(encoded[i], encoded[i+1]));
                 }
             }
             
@@ -359,9 +378,11 @@ struct ShortSTR2 : public AbstractConstraint
         while(i<limit) {
             int index=tupindices[i];
             vector<int> & tau=tuples[index];
+            //vector<pair<int,int> >& compressed_tau = compressed_tuples[index];
             
             // check validity
             bool isvalid=true;
+
             for(int j=0; j<sval.size; j++) {
                 int var=sval.vals[j];
                 if(UseShort) {
@@ -386,17 +407,17 @@ struct ShortSTR2 : public AbstractConstraint
                     int var=ssup.vals[j];
                     
                     if(UseShort && tau[var]==-1000000) {
-                        ssup.remove(var);
+                        ssup.unsafe_remove(var);
                         j--;
                         //if(vars[var].isAssigned()) ssup_permanent.remove(var);
                     }
                     else if(!gacvalues[var].in(tau[var])) {
-                        gacvalues[var].insert(tau[var]);
+                        gacvalues[var].unsafe_insert(tau[var]);
                         
                         // Next line NOT the correct implementation!
                         // Dominion has dom size
-                        if(gacvalues[var].size == vars[var].getMax()-vars[var].getMin()+1) {
-                            ssup.remove(var);
+                        if(gacvalues[var].size == vars[var].getDomSize()) {
+                            ssup.unsafe_remove(var);
                             j--;
                             //if(vars[var].isAssigned()) ssup_permanent.remove(var);
                         }
@@ -425,7 +446,7 @@ struct ShortSTR2 : public AbstractConstraint
     
     inline void removeTuple(int i) {
         // Swap to end
-        D_ASSERT(tupindices[i]<limit);
+        D_ASSERT(i<limit);
         int tmp=tupindices[limit-1];
         tupindices[limit-1]=tupindices[i];
         tupindices[i]=tmp;

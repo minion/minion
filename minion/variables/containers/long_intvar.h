@@ -112,13 +112,30 @@ struct BigRangeVarContainer {
  
   unsigned var_count_m;
   BOOL lock_m;
-  
+
+#ifdef SLOW_DOM_SIZE
+#define BOUND_DATA_SIZE 2
+#else
+#define BOUND_DATA_SIZE 3
+#endif
+
   domain_bound_type& lower_bound(BigRangeVarRef_internal i) const
-  { return static_cast<domain_bound_type*>(bound_data.get_ptr())[i.var_num*2]; }
+  { return static_cast<domain_bound_type*>(bound_data.get_ptr())[i.var_num*BOUND_DATA_SIZE]; }
   
   domain_bound_type& upper_bound(BigRangeVarRef_internal i) const
-  { return static_cast<domain_bound_type*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
-    
+  { return static_cast<domain_bound_type*>(bound_data.get_ptr())[i.var_num*BOUND_DATA_SIZE + 1]; }
+
+#ifdef SLOW_DOM_SIZE
+  void reduce_dom_size(BigRangeVarRef_internal i)
+  {}
+#else    
+  domain_bound_type& dom_size(BigRangeVarRef_internal i) const
+  { return static_cast<domain_bound_type*>(bound_data.get_ptr())[i.var_num*BOUND_DATA_SIZE + 2]; }
+
+  void reduce_dom_size(BigRangeVarRef_internal i)
+  { dom_size(i)-=1; }
+#endif
+
   /// Find new "true" upper bound.
   /// This should be used by first setting the value of upper_bound(d), then calling
   /// this function to move this value past any removed values.
@@ -200,7 +217,7 @@ struct BigRangeVarContainer {
     }
 
  
-    bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m * 2 * sizeof(domain_bound_type));
+    bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m * BOUND_DATA_SIZE * sizeof(domain_bound_type));
     int temp1=bms_array->request_storage(var_offset.back());
     
     // correct var_offsets to start at the start of our block.
@@ -223,9 +240,11 @@ struct BigRangeVarContainer {
       max_domain_val = initial_bounds[0].second;
       for(unsigned int i = 0; i < var_count_m; ++i)
       {
-        bound_ptr[2*i] = initial_bounds[i].first;
-        bound_ptr[2*i+1] = initial_bounds[i].second;
-      
+        bound_ptr[BOUND_DATA_SIZE*i] = initial_bounds[i].first;
+        bound_ptr[BOUND_DATA_SIZE*i+1] = initial_bounds[i].second;
+#ifndef SLOW_DOM_SIZE
+        bound_ptr[BOUND_DATA_SIZE*i+2] = initial_bounds[i].second - initial_bounds[i].first + 1;
+#endif
         min_domain_val = mymin(initial_bounds[i].first, min_domain_val);
         max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
       }
@@ -262,6 +281,23 @@ struct BigRangeVarContainer {
     D_ASSERT(i >= lower_bound(d));
     D_ASSERT(i <= upper_bound(d));
     return bms_array->isMember(var_offset[d.var_num] + i );
+  }
+
+  DomainInt getDomSize_Check(BigRangeVarRef_internal d) const
+  {
+    DomainInt dom_size = 0;
+    for(DomainInt i = this->getMin(d); i <= this->getMax(d); ++i)
+    {
+      if(this->inDomain(d,i))
+        dom_size++;
+    }
+    return dom_size;
+  }
+
+  DomainInt getDomSize(BigRangeVarRef_internal d) const
+  {
+    D_ASSERT(getDomSize_Check(d) == dom_size(d));
+    return dom_size(d);
   }
   
   DomainInt getMin(BigRangeVarRef_internal d) const
@@ -305,6 +341,7 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove
     }
 #ifdef FULL_DOMAIN_TRIGGERS
     trigger_list.push_domain_removal(d.var_num, i);
+    reduce_dom_size(d);
 #endif
 #ifndef NO_DOMAIN_TRIGGERS
     trigger_list.push_domain_changed(d.var_num);
@@ -393,6 +430,7 @@ private:
       // def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
       if(bms_array->isMember(loop + domainOffset) && loop != offset) {
         trigger_list.push_domain_removal(d.var_num, loop);
+        reduce_dom_size(d);
       }
     }
 #endif
@@ -447,6 +485,7 @@ public:
         // Def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
         if(bms_array->isMember(domainOffset + loop)) {
           trigger_list.push_domain_removal(d.var_num, loop);
+          reduce_dom_size(d);
         }
       }
 #endif   
@@ -503,6 +542,7 @@ public:
         // def of inDomain: bms_array->isMember(var_offset[d.var_num] + i - initial_bounds[d.var_num].first);
         if(bms_array->isMember(loop + domainOffset)) {
           trigger_list.push_domain_removal(d.var_num, loop);
+          reduce_dom_size(d);
         }
       }
 #endif

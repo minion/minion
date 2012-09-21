@@ -56,6 +56,9 @@ struct ShiftVar
   BOOL inDomain_noBoundCheck(DomainInt i) const
   { return data.inDomain(i - shift); }
   
+  DomainInt getDomSize() const
+  { return data.getDomSize(); }
+
   DomainInt getMax() const
   { return data.getMax() + shift; }
   

@@ -78,6 +78,9 @@ struct VarNot
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain(swap(b)); }
   
+  DomainInt getDomSize() const
+  { return data.getDomSize(); }
+
   DomainInt getMax() const
   { return swap(data.getMin()); }
   

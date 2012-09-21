@@ -110,6 +110,9 @@ struct BoundVarRef_internal
     return true;
   }
   
+  DomainInt getDomSize() const
+  { return getMax() - getMin() + 1; }
+  
   DomainInt getMin() const
   { return lower_bound(); }
   

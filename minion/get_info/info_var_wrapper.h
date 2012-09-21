@@ -82,7 +82,15 @@ struct InfoRefType
     return indom_noBC;
   }
   
-  
+
+  DomainInt getDomSize() const
+  {
+    VAR_INFO_ADDONE(VAR_TYPE, getDomSize);
+    DomainInt domval = data.getDomSize();
+    VAR_INFO_PRINT_0("GetDomSize", domval);
+    return domval; 
+  }
+
   DomainInt getMax() const
   {
     VAR_INFO_ADDONE(VAR_TYPE, getMax);

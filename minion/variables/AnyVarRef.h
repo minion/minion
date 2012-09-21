@@ -158,6 +158,7 @@ struct AnyVarRef_Abstract
   virtual BOOL isAssignedValue(DomainInt i) const = 0;
   virtual BOOL inDomain(DomainInt b) const = 0;
   virtual BOOL inDomain_noBoundCheck(DomainInt b) const = 0;
+  virtual DomainInt getDomSize() const = 0;
   virtual DomainInt getMax() const = 0;
   virtual DomainInt getMin() const = 0;
   virtual DomainInt getInitialMax() const = 0;
@@ -220,6 +221,9 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   virtual BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain_noBoundCheck(b); }
   
+  virtual DomainInt getDomSize() const
+  { return data.getDomSize(); }
+
   virtual DomainInt getMax() const
   { return data.getMax(); }
   
@@ -325,6 +329,10 @@ public:
 
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data->inDomain_noBoundCheck(b); }
+  
+
+  DomainInt getDomSize() const
+  { return data->getDomSize(); }
   
   DomainInt getMax() const
   { return data->getMax(); }

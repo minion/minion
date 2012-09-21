@@ -62,6 +62,9 @@ struct ConstantVar
     return true;
   }
 
+  DomainInt getDomSize() const
+  { return 1; }
+  
   DomainInt getMax() const
   { return val; }
 

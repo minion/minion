@@ -58,6 +58,9 @@ struct SwitchNeg
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain(b * multiplier); }
   
+  DomainInt getDomSize() const
+  { return data.getDomSize(); }
+
   DomainInt getMax() const
   { 
     if(multiplier == 1)

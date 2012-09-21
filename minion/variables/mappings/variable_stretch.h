@@ -136,7 +136,10 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
       return false;
     return data.inDomain(MapHelp::divide_exact(b - dataMap.shift(), dataMap));
   }
-  
+
+  DomainInt getDomSize() const
+  { return data.getDomSize(); }
+
   DomainInt getMax() const
   {  
     if(dataMap.multiply() >= 0)
@@ -301,6 +304,9 @@ struct MultiplyVar
     return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
   
+  DomainInt getDomSize() const
+  { return data.getDomSize(); }
+
   DomainInt getMax() const
   {  
     if(Multiply >= 0)
