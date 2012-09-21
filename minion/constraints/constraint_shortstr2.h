@@ -262,6 +262,8 @@ struct ShortSTR2 : public AbstractConstraint
         for(int i=0; i<vars.size(); i++) {
             gacvalues[i].initialise(vars[i].getInitialMin(), vars[i].getInitialMax());
         }
+
+        std::random_shuffle(tupindices.begin(), tupindices.end());
     }
     
     virtual string constraint_name()
