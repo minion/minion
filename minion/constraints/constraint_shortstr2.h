@@ -405,7 +405,7 @@ struct ShortSTR2 : public AbstractConstraint
 
         bool pass_first_loop=false;
 
-        while(i<limit) {
+        while(UseShort && i<limit) {
             int index=tupindices[i];
             // check validity
             bool isvalid=validTuple(i);
