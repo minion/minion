@@ -353,6 +353,34 @@ struct ShortSTR2 : public AbstractConstraint
     
     vector<arrayset> gacvalues;
     
+
+    bool validTuple(int i)
+    {
+             int index=tupindices[i];
+            vector<int> & tau=tuples[index];
+
+        bool isvalid=true;
+
+        for(int j=0; j<sval.size; j++) {
+            int var=sval.vals[j];
+            if(UseShort) {
+                if( (tau[var]!=-1000000) && !vars[var].inDomain(tau[var])) {
+                    isvalid=false;
+                    break;
+                }
+            }
+            else {
+                if(!vars[var].inDomain(tau[var])) {
+                    isvalid=false;
+                    break;
+                }
+            }
+            
+        }
+
+        return isvalid;
+    }
+
     void do_prop() {
         int numvars=vars.size();
         
@@ -363,8 +391,8 @@ struct ShortSTR2 : public AbstractConstraint
         // Actually this thing below is OK: as soon as we find a valid tuple,
         // any assigned vars will be removed from ssup.
         
-        ssup.fill();
-        
+        //ssup.fill();
+        ssup.clear();
         // copy ssup_permanent into ssup.
         //ssup.clear();
         //for(int j=0; j<ssup_permanent.size; j++) ssup.insert(ssup_permanent.vals[j]); 
@@ -374,31 +402,39 @@ struct ShortSTR2 : public AbstractConstraint
         }
         
         int i=0;
-        
+
+        bool pass_first_loop=false;
+
+        while(i<limit) {
+            int index=tupindices[i];
+            // check validity
+            bool isvalid=validTuple(i);
+            
+            if(isvalid) {
+                vector<pair<int,int> >& compressed_tau = compressed_tuples[index];
+                for(int i = 0; i < compressed_tau.size(); ++i)
+                    ssup.insert(compressed_tau[i].first);
+                pass_first_loop = true;
+                break;
+            }
+            else {
+                removeTuple(i);
+            }
+        }
+
+        if(!pass_first_loop)
+        {
+            // We found no valid tuples!
+            getState(stateObj).setFailed(true);
+            return;
+        }
+
         while(i<limit) {
             int index=tupindices[i];
             vector<int> & tau=tuples[index];
-            //vector<pair<int,int> >& compressed_tau = compressed_tuples[index];
             
             // check validity
-            bool isvalid=true;
-
-            for(int j=0; j<sval.size; j++) {
-                int var=sval.vals[j];
-                if(UseShort) {
-                    if( (tau[var]!=-1000000) && !vars[var].inDomain(tau[var])) {
-                        isvalid=false;
-                        break;
-                    }
-                }
-                else {
-                    if(!vars[var].inDomain(tau[var])) {
-                        isvalid=false;
-                        break;
-                    }
-                }
-                
-            }
+            bool isvalid=validTuple(i);
             
             if(isvalid) {
                 
@@ -430,12 +466,12 @@ struct ShortSTR2 : public AbstractConstraint
                 removeTuple(i);
             }
         }
-        
+
         // Prune the domains.
         for(int j=0; j<ssup.size; j++) {
             int var=ssup.vals[j];
             for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
-                if(vars[var].inDomain(val) && !gacvalues[var].in(val)) {
+                if(!gacvalues[var].in(val)) {
                     vars[var].removeFromDomain(val);
                 }
             }
