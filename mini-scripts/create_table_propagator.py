@@ -475,9 +475,10 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
         for (var, val) in varvalorder:
             if val in domains_poss[var]:
                 if len(domains_poss[var]) + len(domains_in[var]) < domsize:
-                    domsize = len(domains_poss[var])
+                    domsize = len(domains_poss[var]) + len(domains_in[var])
                     chosenvar = var
                     chosenval = val
+
     if GlobalHeuristic == HEURISTIC_RANDOM:
         choices = []
         for (var, val) in varvalorder:
