@@ -394,7 +394,7 @@ struct ShortSTR2 : public AbstractConstraint
         // any assigned vars will be removed from ssup.
         
         //ssup.fill();
-        ssup.clear();
+        
         // copy ssup_permanent into ssup.
         //ssup.clear();
         //for(int j=0; j<ssup_permanent.size; j++) ssup.insert(ssup_permanent.vals[j]); 
@@ -405,30 +405,39 @@ struct ShortSTR2 : public AbstractConstraint
         
         int i=0;
 
-        bool pass_first_loop=false;
 
-        while(UseShort && i<limit) {
-            int index=tupindices[i];
-            // check validity
-            bool isvalid=validTuple(i);
+        if(UseShort)
+        {
+            ssup.clear();
             
-            if(isvalid) {
-                vector<pair<int,int> >& compressed_tau = compressed_tuples[index];
-                for(int i = 0; i < compressed_tau.size(); ++i)
-                    ssup.insert(compressed_tau[i].first);
-                pass_first_loop = true;
-                break;
+            bool pass_first_loop=false;
+            while(i<limit) {
+                int index=tupindices[i];
+                // check validity
+                bool isvalid=validTuple(i);
+                
+                if(isvalid) {
+                    vector<pair<int,int> >& compressed_tau = compressed_tuples[index];
+                    for(int i = 0; i < compressed_tau.size(); ++i)
+                        ssup.insert(compressed_tau[i].first);
+                    pass_first_loop = true;
+                    break;
+                }
+                else {
+                    removeTuple(i);
+                }
             }
-            else {
-                removeTuple(i);
+
+            if(!pass_first_loop)
+            {
+                // We found no valid tuples!
+                getState(stateObj).setFailed(true);
+                return;
             }
         }
-
-        if(!pass_first_loop)
+        else
         {
-            // We found no valid tuples!
-            getState(stateObj).setFailed(true);
-            return;
+            ssup.fill();
         }
 
         while(i<limit) {
