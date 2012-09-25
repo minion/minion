@@ -74,8 +74,10 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       string prop_mode(argv[i]);
       args.prop_method = GetPropMethodFromString(prop_mode);
       if(args.prop_method == PropLevel_None)
+      {
         cerr << "Cannot use 'None' for -X-prop-node, must propagate at each node!" << endl;
         exit(1);
+      }
     }
     else if(command == string("-preprocess"))
     {
