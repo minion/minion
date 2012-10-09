@@ -21,7 +21,17 @@
 #define STANDARD_QUEUE_H
 
 // use a deque (as a fifo) for the special queue
-//#define SQ_DEQUE
+#define SQ_DEQUE
+
+#ifdef SQ_DEQUE
+#define QueueCon deque
+#define queueTop front
+#define queuePop pop_front
+#else
+#define QueueCon vector
+#define queueTop back
+#define queuePop pop_back
+#endif
 
 #include <deque>
 #include "../solver.h"
@@ -41,19 +51,15 @@ class Queues
 #ifdef WEIGHTED_TRIGGERS
   priority_queue<TriggerRange> propagate_trigger_list;
 #else
-  vector<TriggerRange> propagate_trigger_list;
+  QueueCon<TriggerRange> propagate_trigger_list;
 #endif
-  vector<DynamicTrigger*> dynamic_trigger_list;
+  QueueCon<DynamicTrigger*> dynamic_trigger_list;
 
   // Special triggers are those which can only be run while the
   // normal queue is empty. This list is at the moment only used
   // by reified constraints when they want to start propagation.
   // I don't like it, but it is necesasary.
-  #ifdef SQ_DEQUE
-    deque<AbstractConstraint*> special_triggers;
-  #else
-    vector<AbstractConstraint*> special_triggers;
-  #endif
+  QueueCon<AbstractConstraint*> special_triggers;
 
 #ifndef NO_DYN_CHECK
   DynamicTrigger* next_queue_ptr;
@@ -137,8 +143,8 @@ public:
     bool* fail_ptr = getState(stateObj).getFailedPtr();
     while(!dynamic_trigger_list.empty())
     {
-      DynamicTrigger* t = dynamic_trigger_list.back();
-      dynamic_trigger_list.pop_back();
+      DynamicTrigger* t = dynamic_trigger_list.queueTop();
+      dynamic_trigger_list.queuePop();
       DynamicTrigger* it = t->next;
 
       while(it != t)
@@ -193,9 +199,9 @@ public:
       int data_val = t.data;
       propagate_trigger_list.pop();
 #else
-      TriggerRange t = propagate_trigger_list.back();
+      TriggerRange t = propagate_trigger_list.queueTop();
       int data_val = t.data;
-      propagate_trigger_list.pop_back();
+      propagate_trigger_list.queuePop();
 #endif
 
       for(Trigger* it = t.begin(); it != t.end(); it++)
@@ -255,13 +261,8 @@ public:
       if(special_triggers.empty())
         return;
       
-      #ifdef SQ_DEQUE
-        AbstractConstraint* trig = special_triggers.front();
-        special_triggers.pop_front();
-      #else
-        AbstractConstraint* trig = special_triggers.back();
-        special_triggers.pop_back();
-      #endif
+        AbstractConstraint* trig = special_triggers.queueTop();
+        special_triggers.queuePop();
       
       CON_INFO_ADDONE(SpecialTrigger);
       trig->special_check();
@@ -280,8 +281,8 @@ public:
     bool* fail_ptr = getState(stateObj).getFailedPtr();
     while(!dynamic_trigger_list.empty())
     {
-      DynamicTrigger* t = dynamic_trigger_list.back();
-      dynamic_trigger_list.pop_back();
+      DynamicTrigger* t = dynamic_trigger_list.queueTop();
+      dynamic_trigger_list.queuePop();
       DynamicTrigger* it = t->next;
 
       while(it != t)
@@ -334,9 +335,9 @@ public:
       int data_val = t.data;
       propagate_trigger_list.pop();
 #else
-      TriggerRange t = propagate_trigger_list.back();
+      TriggerRange t = propagate_trigger_list.queueTop();
       int data_val = t.data;
-      propagate_trigger_list.pop_back();
+      propagate_trigger_list.queuePop();
 #endif
 
       for(Trigger* it = t.begin(); it != t.end(); it++)
@@ -394,8 +395,8 @@ public:
       if(special_triggers.empty())
         return;
 
-      AbstractConstraint* trig = special_triggers.back();
-      special_triggers.pop_back();
+      AbstractConstraint* trig = special_triggers.queueTop();
+      special_triggers.queuePop();
       CON_INFO_ADDONE(SpecialTrigger);
       trig->special_check();
 
