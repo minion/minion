@@ -113,7 +113,7 @@ struct MultiBranch : public VariableOrder
         pos=0;
         variable_offset.resize(vovector.size());
         variable_offset[0]=0;
-        for(int i=1; i<vovector.size(); i++)
+        for(SysInt i=1; i<vovector.size(); i++)
         {
             variable_offset[i]=variable_offset[i-1]+vovector[i-1]->var_order.size();
         }
@@ -186,7 +186,7 @@ struct SDFBranch : public VariableOrder
         int smallest_dom = -1;
         DomainInt dom_size = DomainInt_Max;
         
-        for(int i = 0; i < length; ++i)
+        for(SysInt i = 0; i < length; ++i)
         {
             DomainInt maxval = var_order[i].getMax();
             DomainInt minval = var_order[i].getMin();
@@ -412,7 +412,7 @@ struct SRFBranch : VariableOrder
     float ratio = 2;
     
     
-    for(int i = 0; i < length; ++i)
+    for(SysInt i = 0; i < length; ++i)
     {
       DomainInt maxval = var_order[i].getMax();
       DomainInt minval = var_order[i].getMin();

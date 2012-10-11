@@ -29,7 +29,7 @@ void lock(StateObj* stateObj)
   getVars(stateObj).lock();
   
   int size = getState(stateObj).getConstraintList().size();
-  for(int i = 0 ; i < size;i++)
+  for(SysInt i = 0 ; i < size;i++)
   getState(stateObj).getConstraintList()[i]->setup();
   
   getMemory(stateObj).monotonicSet().lock(stateObj);
@@ -37,7 +37,7 @@ void lock(StateObj* stateObj)
   getTriggerMem(stateObj).finaliseTriggerLists();
   
   // No longer AC1, thank goodness.
-  for(int i = 0; i < size; ++i)
+  for(SysInt i = 0; i < size; ++i)
   {
     getState(stateObj).getConstraintList()[i]->full_propagate();
     getState(stateObj).getConstraintList()[i]->full_propagate_done=true;

@@ -68,7 +68,7 @@ struct NeqConstraint : public AbstractConstraint
   {
     triggerCollection t;
     int array_size = var_array.size();
-    for(int i = 0; i < array_size; ++i)
+    for(SysInt i = 0; i < array_size; ++i)
       t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
     return t;
   }
@@ -109,7 +109,7 @@ struct NeqConstraint : public AbstractConstraint
       if(var_array[i].isAssigned())
       {
       
-        for(int j = i + 1; j < v_size; ++j)
+        for(SysInt j = i + 1; j < v_size; ++j)
         {
           if(var_array[j].isAssigned())
           {
@@ -129,7 +129,7 @@ struct NeqConstraint : public AbstractConstraint
     int v_size = var_array.size();
     D_ASSERT(var_array[i].isAssigned());
     DomainInt assign_val = var_array[i].getAssignedValue();
-    for(int loop = 0; loop < v_size; ++loop)
+    for(SysInt loop = 0; loop < v_size; ++loop)
     {
       if(loop != i)
       {
@@ -145,11 +145,11 @@ struct NeqConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     int array_size = var_array.size();
-    for(int i = 0; i < array_size; ++i)
+    for(SysInt i = 0; i < array_size; ++i)
       if(var_array[i].isAssigned())
       {
         DomainInt remove_val = var_array[i].getAssignedValue();
-        for(int j = 0; j < array_size;++j)
+        for(SysInt j = 0; j < array_size;++j)
         {
           if(i != j)
           {
@@ -172,7 +172,7 @@ struct NeqConstraint : public AbstractConstraint
     {
       D_ASSERT(v_size == var_array.size());
       SysInt array_size = checked_cast<SysInt>(v_size);
-      for(int i=0;i<array_size;i++)
+      for(SysInt i=0;i<array_size;i++)
         for( int j=i+1;j<array_size;j++)
           if(v[i]==v[j]) return false;
       return true;
@@ -194,7 +194,7 @@ struct NeqConstraint : public AbstractConstraint
    {
      MAKE_STACK_BOX(c, DomainInt, var_array.size());
      
-     for(int i = 0; i < var_array.size(); ++i)
+     for(SysInt i = 0; i < var_array.size(); ++i)
      {
        if(!var_array[i].isAssigned()) 
        {  
@@ -208,7 +208,7 @@ struct NeqConstraint : public AbstractConstraint
     
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
-      for(int i = 0; i < var_array.size(); ++i)
+      for(SysInt i = 0; i < var_array.size(); ++i)
         assignment.push_back(make_pair(i, c[i])); 
       return true;
     }

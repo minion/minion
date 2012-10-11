@@ -45,7 +45,7 @@ inline void TrailedMonotonicSet::lock(StateObj * _stateObj)
     // print_state();
     #endif
     
-    for(int i=0; i< _size; i++) {
+    for(SysInt i=0; i< _size; i++) {
       array(i) = tms_in_set;
     };
 }

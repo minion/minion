@@ -62,10 +62,10 @@ struct GACTableConstraint : public AbstractConstraint
     D_ASSERT(_vars.size() == arity);
     const SysInt litnum = checked_cast<SysInt>(tuples->literal_num);
     trie_current_support.resize(litnum); 
-    for(int i = 0; i < litnum; ++i)
+    for(SysInt i = 0; i < litnum; ++i)
     {
       trie_current_support[i] = new TrieObj*[arity];
-      for(int j = 0; j < arity; j++)
+      for(SysInt j = 0; j < arity; j++)
         trie_current_support[i][j] = NULL;
     }
     // initialise supportting tuple for recycle
@@ -75,7 +75,7 @@ struct GACTableConstraint : public AbstractConstraint
   ~GACTableConstraint()
   {
     delete[] recyclableTuple;
-    for(int i = 0; i < trie_current_support.size(); ++i)
+    for(SysInt i = 0; i < trie_current_support.size(); ++i)
       delete[] trie_current_support[i];
   }
   
@@ -146,7 +146,7 @@ struct GACTableConstraint : public AbstractConstraint
     // otherwise, the support is already in recyclableTuple. 
     
     // cout << "  " << var << ", literal" << lit << ":";
-    // for(int z = 0; z < vars.size(); ++z) cout << recyclableTuple[z] << " "; cout << endl;
+    // for(SysInt z = 0; z < vars.size(); ++z) cout << recyclableTuple[z] << " "; cout << endl;
     
     DynamicTrigger* dt = dynamic_trigger_start();
     
@@ -170,7 +170,7 @@ struct GACTableConstraint : public AbstractConstraint
           getState(stateObj).setFailed(true);
           return;
       }
-      for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
+      for(SysInt varIndex = 0; varIndex < vars.size(); ++varIndex) 
       {
         if(negative==0)
         {

@@ -185,7 +185,7 @@ public:
   {
     P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
-    for(int i = 0; i < stored_blocks.size(); ++i)
+    for(SysInt i = 0; i < stored_blocks.size(); ++i)
     {
       P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].first << " " << stored_blocks[i].second);
       memcpy(store_ptr + current_offset, stored_blocks[i].first, stored_blocks[i].second);
@@ -218,7 +218,7 @@ public:
   {
     P("RetrieveMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
-    for(int i = 0; i < stored_blocks.size(); ++i)
+    for(SysInt i = 0; i < stored_blocks.size(); ++i)
     {
       copyMemBlock(stored_blocks[i].first, store_ptr, current_offset, stored_blocks[i].second);
       current_offset += stored_blocks[i].second;

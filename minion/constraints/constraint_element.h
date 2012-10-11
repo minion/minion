@@ -170,7 +170,7 @@ struct ElementConstraint : public AbstractConstraint
         D_ASSERT(prop_val == -2);
         DomainInt assigned_val = result_var.getAssignedValue();
         int array_size = var_array.size();
-        for(int i = 0; i < array_size; ++i)
+        for(SysInt i = 0; i < array_size; ++i)
         {
           if(index_ref.inDomain(i) && !var_array[i].inDomain(assigned_val)) // fixed here.
           {
@@ -314,7 +314,7 @@ struct ElementConstraint : public AbstractConstraint
     if(result_var.isAssigned())
     {
       DomainInt assigned_val = result_var.getAssignedValue();
-      for(int i = 0; i < array_size; ++i)
+      for(SysInt i = 0; i < array_size; ++i)
       {
         if(index_ref.inDomain(i) && !var_array[i].inDomain(assigned_val))  // fixed here.
         {
@@ -391,7 +391,7 @@ struct ElementConstraint : public AbstractConstraint
       AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<IndexRef>(stateObj, index_ref, r);
       con.push_back(t4);
       
-      for(int i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i<var_array.size(); i++)
       {
           vector<AbstractConstraint*> con2;
           WatchLiteralConstraint<IndexRef>* t=new WatchLiteralConstraint<IndexRef>(stateObj, index_ref, i);

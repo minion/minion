@@ -68,7 +68,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     var_array_min_sum(_stateObj)
   {
       BigInt accumulator=0;
-      for(int i=0; i<var_array.size(); i++) {
+      for(SysInt i=0; i<var_array.size(); i++) {
           accumulator+= checked_cast<SysInt>(max( abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin()) ));
           CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
       }
@@ -76,7 +76,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
       
     no_negatives = true;
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].getInitialMin() < 0)
       {
@@ -91,7 +91,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     triggerCollection t;
     
     int array_size = var_array.size();
-    for(int i = 0; i < array_size; ++i)
+    for(SysInt i = 0; i < array_size; ++i)
     {
       t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
     }
@@ -200,7 +200,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
   {
     D_ASSERT(v_size == var_array.size() + 1);
     DomainInt sum = 0;
-    for(int i = 0; i < v_size - 1; i++)
+    for(SysInt i = 0; i < v_size - 1; i++)
       sum += v[i];
     return sum <= *(v + v_size - 1);
   }
@@ -215,7 +215,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     {
       DomainInt max_sum = var_sum.getMax();
       assignment.push_back(make_pair(v_size, max_sum));
-      for(int i = 0; i < v_size && sum_value <= max_sum; ++i)
+      for(SysInt i = 0; i < v_size && sum_value <= max_sum; ++i)
       {
         DomainInt min_val = var_array[i].getMin();
         assignment.push_back(make_pair(i, min_val));
@@ -226,7 +226,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     }
     else
     {
-      for(int i = 0; i < v_size; ++i)
+      for(SysInt i = 0; i < v_size; ++i)
       {
         assignment.push_back(make_pair(i, var_array[i].getMin()));
         sum_value += var_array[i].getMin();

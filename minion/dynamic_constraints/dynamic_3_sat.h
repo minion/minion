@@ -129,7 +129,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   {
     D_ASSERT(v_size == var_array.size());
     int count = 0;
-    for(int i = 0; i < v_size; ++i)
+    for(SysInt i = 0; i < v_size; ++i)
       count += (v[i] == 1);
     return count > 0;
   }
@@ -145,7 +145,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].getMax() > 0)
       {

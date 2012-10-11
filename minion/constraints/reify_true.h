@@ -201,7 +201,7 @@ template<typename BoolVar, bool DoWatchAssignment>
   template<typename T, typename Vars, typename Trigger>
   void watch_assignment(const T& assignment, Vars& vars, Trigger* trig)
   {
-    for(int i = 0; i < assignment.size(); ++i)
+    for(SysInt i = 0; i < assignment.size(); ++i)
     {
       D_ASSERT(vars[assignment[i].first].inDomain(assignment[i].second));
       if(vars[assignment[i].first].isBound()) {
@@ -229,7 +229,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     DynamicTrigger* dt = dynamic_trigger_start();
     int dt_count = dynamic_trigger_count();
     // Clean up triggers
-    for(int i = 0; i < dt_count; ++i)
+    for(SysInt i = 0; i < dt_count; ++i)
         releaseTrigger(stateObj, dt);
     
     if(DoWatchAssignment && !rar_var.isAssigned()) //don't place when rar_var=0

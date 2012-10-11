@@ -124,7 +124,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     {
       index_to_not_propagate = -1 ;
       propagate_mode = true;
-      for(int i = 0; i < num_to_watch - 1; ++i)
+      for(SysInt i = 0; i < num_to_watch - 1; ++i)
       {
         propagate_from_var1(watched_values[i]);
         propagate_from_var2(watched_values[i]);
@@ -183,20 +183,20 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     /*printf("propmode=%d, triggerpair=%d, trigger_activated=%d\n",
       (int)propagate_mode, (int)triggerpair, (int)trigger_activated);
 
-    for(int i = 0; i < watched_values.size(); ++i)
+    for(SysInt i = 0; i < watched_values.size(); ++i)
       printf("%d,", watched_values[i]);
     
     printf(":");  
-    for(int i = 0; i < unwatched_values.size(); ++i)
+    for(SysInt i = 0; i < unwatched_values.size(); ++i)
       printf("%d,", unwatched_values[i]);
     printf("\n");
     
-    for(int i = 0; i < var_array1.size(); ++i)
+    for(SysInt i = 0; i < var_array1.size(); ++i)
       cout << var_array1[i].getMin() << ":" << var_array1[i].getMax() << ",";
     
     cout << endl;
     
-    for(int i = 0; i < var_array2.size(); ++i)
+    for(SysInt i = 0; i < var_array2.size(); ++i)
       cout << var_array2[i].getMin() << ":" << var_array2[i].getMax() << ",";
     
     cout << endl;*/

@@ -184,12 +184,12 @@ struct SparseBoundVarContainer {
   DomainInt min_domain_val = DomainInt_Min;
   DomainInt max_domain_val = DomainInt_Max;
 
-  for(int i = 0; i < new_domains.size(); ++i)
+  for(SysInt i = 0; i < new_domains.size(); ++i)
   {
     D_ASSERT(new_domains[i].second.front() >= DomainInt_Min);
     D_ASSERT(new_domains[i].second.back() <= DomainInt_Max);
     
-    for(int loop=0;loop<(int)(new_domains[i].second.size()) - 1; ++loop) 
+    for(SysInt loop=0;loop<(int)(new_domains[i].second.size()) - 1; ++loop) 
     { D_ASSERT(new_domains[i].second[loop] < new_domains[i].second[loop+1]); }
   
     vector<BoundType> t_dom(new_domains[i].second.size());
@@ -197,7 +197,7 @@ struct SparseBoundVarContainer {
       t_dom[j] = new_domains[i].second[j];
           
     domains.push_back(t_dom);
-    for(int j = 0; j < new_domains[i].first; ++j)
+    for(SysInt j = 0; j < new_domains[i].first; ++j)
       domain_reference.push_back(i);
 
     min_domain_val = mymin(t_dom.front(), min_domain_val);

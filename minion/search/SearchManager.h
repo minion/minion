@@ -80,7 +80,7 @@ struct SearchManager
     hasauxvars=_order.back().find_one_assignment;
     if(hasauxvars)
     {
-        for(int i=0; i<_order.size()-1; i++)
+        for(SysInt i=0; i<_order.size()-1; i++)
         {
             topauxvar+=_order[i].var_order.size();
         }

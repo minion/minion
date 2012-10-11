@@ -89,7 +89,7 @@ public:
 
   ~BackTrackMemory()
   {
-    for(int i = 0; i < backtrack_data.size(); ++i)
+    for(SysInt i = 0; i < backtrack_data.size(); ++i)
       block_cache.do_free(backtrack_data[i].first);
   }
 };

@@ -244,7 +244,7 @@ public:
       DomainInt* t=new DomainInt[vars.size()];
       SysInt unsatcounter=0;
       srand(12345);
-      for(int i=0; i<1000; i++)
+      for(SysInt i=0; i<1000; i++)
       {
           for(SysInt j=0; j<vars.size(); j++)
           {
@@ -268,9 +268,9 @@ public:
       t[var] = val; //fix specified component
       int unsatcounter=0;
       srand(12345);
-      for(int i=0; i<100; i++)
+      for(SysInt i=0; i<100; i++)
       {
-          for(int j=0; j<vars.size(); j++)
+          for(SysInt j=0; j<vars.size(); j++)
           {
 	    if(j != var) {
               DomainInt dsize=vars[j].getInitialMax()-vars[j].getInitialMin()+1;
@@ -422,7 +422,7 @@ public:
 
   virtual ~ParentConstraint()
   {
-    for(int i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < child_constraints.size(); ++i)
       delete child_constraints[i];
   }
 };

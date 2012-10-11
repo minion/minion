@@ -59,7 +59,7 @@ namespace Controller
         if(findOneSol) 
         {
           int search_depth = order.search_depth();
-          for(int i = 0; i < search_depth; ++i)
+          for(SysInt i = 0; i < search_depth; ++i)
             world_pop(stateObj);
           // One more to remove the initial save.
           order.reset();

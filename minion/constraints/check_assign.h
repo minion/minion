@@ -64,7 +64,7 @@ struct Check_Assign : public AbstractConstraint
     int size = child->get_vars_singleton()->size();
     vector<AnyVarRef>* vars = child->get_vars_singleton();
     
-    for(int i = 0; i < size; ++i)
+    for(SysInt i = 0; i < size; ++i)
     {
         if(!(*vars)[i].isAssigned())
         {
@@ -74,7 +74,7 @@ struct Check_Assign : public AbstractConstraint
     }
     
     MAKE_STACK_BOX(b, DomainInt, size);
-    for(int i = 0; i < size; ++i)
+    for(SysInt i = 0; i < size; ++i)
         b.push_back((*vars)[i].getAssignedValue());
     
     if(!check_assignment(&b[0], size))

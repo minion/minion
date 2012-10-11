@@ -119,7 +119,7 @@ class RandomAccessPriorityQ {
   }
 
   void checkCorrectSize() {
-    for(int i = heap.size(); i < correctSize; i++) {
+    for(SysInt i = heap.size(); i < correctSize; i++) {
       heap.push_back(removed.back());
       removed.pop_back();
       pullUp(heap.size() - 1);
@@ -151,7 +151,7 @@ class RandomAccessPriorityQ {
 
   void repair() {
     const size_t heap_s = heap.size();
-    for(int i = 0; i < heap_s; i++)
+    for(SysInt i = 0; i < heap_s; i++)
       pullUp(i);
     D_ASSERT(checkHeap());
   }
@@ -235,7 +235,7 @@ RandomAccessPriorityQ<UnsignedSysInt, int> test(stateObj);
   cout << test.heap << endl;
   
   int nums[] = {6,11,21,2,1,29,30,5,13,12,14,17,20,22,3,4,25,26,10,23,28,18,16,7,27,9,8,15,19,24};
-  for(int j = 0; j < 30; j++) {
+  for(SysInt j = 0; j < 30; j++) {
   test.getData(test.getMax().first) = -nums[j];
   test.fixOrder();
   }
@@ -247,7 +247,7 @@ RandomAccessPriorityQ<UnsignedSysInt, int> test(stateObj);
   cout << "," <<  test.getData(test.heap[j]);
   cout << endl;
   
-  for(int j = 0; j < 30; j++) {
+  for(SysInt j = 0; j < 30; j++) {
   cout << test.getMax().second << " ";
   test.removeMax();
   }

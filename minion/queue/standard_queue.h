@@ -120,7 +120,7 @@ public:
     if(!special_triggers.empty())
     {
       int size = special_triggers.size();
-      for(int i = 0; i < size; ++i)
+      for(SysInt i = 0; i < size; ++i)
         special_triggers[i]->special_unlock();
       special_triggers.clear();
     }

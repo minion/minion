@@ -107,7 +107,7 @@ public:
     {
         int length = std::min((int)buf_length, (int)(stream_end - stream_pos));
         P(length << ":");
-        for(int i = 0; i < length; ++i)
+        for(SysInt i = 0; i < length; ++i)
         {
             P(i << ":" << *stream_pos << ":");
              if(*stream_pos == deliminator)

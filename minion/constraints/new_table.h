@@ -102,7 +102,7 @@ public:
   bool checkTuple(DomainInt* tuple, int tuple_size)
    {
      D_ASSERT(tuple_size == getVarCount());
-     for(int i = 0; i < getNumOfTuples(); ++i)
+     for(SysInt i = 0; i < getNumOfTuples(); ++i)
      {
        if(std::equal(tuple, tuple + tuple_size, tuple_data->get_tupleptr(i)))
          return true;
@@ -121,10 +121,10 @@ public:
   {
     const SysInt litcount = checked_cast<SysInt>(data->getLiteralCount());
     trie_current_support.resize(litcount);
-    for(int i = 0; i < litcount; ++i)
+    for(SysInt i = 0; i < litcount; ++i)
     {
       trie_current_support[i] = new TrieObj*[litcount];
-      for(int j = 0; j < data->getVarCount(); ++j)
+      for(SysInt j = 0; j < data->getVarCount(); ++j)
         trie_current_support[i][j] = NULL;
     }
     scratch_tuple.resize(litcount);
@@ -177,13 +177,13 @@ public:
     int length = data->getNumOfTuples();
     int* tuple_data = data->getPointer();
 
-    for(int i = 0; i < length; ++i)
+    for(SysInt i = 0; i < length; ++i)
     {
       int* tuple_start = tuple_data + i*tuple_size;
       bool success = true;
       if(tuple_start[checked_cast<SysInt>(lit.var)] != lit.val)
         success = false;
-      for(int j = 0; j < tuple_size && success; ++j)
+      for(SysInt j = 0; j < tuple_size && success; ++j)
       {
         if(!vars[j].inDomain(tuple_start[j]))
           success = false;
@@ -293,7 +293,7 @@ struct NewTableConstraint : public AbstractConstraint
     D_ASSERT(data->getLiteralPos(lit) == lit_pos);
     int vars_size = vars.size();
     dt += lit_pos * (vars_size - 1);
-    for(int v = 0; v < vars_size; ++v)
+    for(SysInt v = 0; v < vars_size; ++v)
     {
       releaseTrigger(stateObj, dt BT_CALL_BACKTRACK);
       ++dt;
@@ -344,7 +344,7 @@ struct NewTableConstraint : public AbstractConstraint
             vector<DomainInt>* support = state.findSupportingTuple(vars, Literal(0, x));
             if(support)
             {
-                for(int i=0; i<vars.size(); i++) {
+                for(SysInt i=0; i<vars.size(); i++) {
                     D_ASSERT(vars[i].inDomain((*support)[i]));
                     assignment.push_back(make_pair(i, (*support)[i]));
                 }

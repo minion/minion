@@ -36,7 +36,7 @@ struct TupleComparator
   {
     if(tuple1[significantIndex] != tuple2[significantIndex])
       return tuple1[significantIndex] < tuple2[significantIndex];
-    for(int tupleIndex = 0; tupleIndex < arity; tupleIndex++)
+    for(SysInt tupleIndex = 0; tupleIndex < arity; tupleIndex++)
     {
       if(tuple1[tupleIndex] != tuple2[tupleIndex])
         return tuple1[tupleIndex] < tuple2[tupleIndex];
@@ -67,7 +67,7 @@ struct TupleH
     
     nextValue=new int[arity];
     redundantNextValue=new int[arity];
-    for(int i=0; i<arity; i++)
+    for(SysInt i=0; i<arity; i++)
     {
       nextValue[i]=-1;
       redundantNextValue[i]=-1;
@@ -92,7 +92,7 @@ struct Regin
           tuples.resize(tupleList->size());
           
           // Need a copy so we can sort it and such things.
-          for(int i = 0; i < tupleList->size(); ++i)
+          for(SysInt i = 0; i < tupleList->size(); ++i)
             tuples[i] = tupleList->get_vector(i);
           
           // sort, required for correctness.
@@ -110,19 +110,19 @@ struct Regin
   {
     
     int * redvalues=new int[arity];
-    for(int i=0; i<arity; i++){ 
+    for(SysInt i=0; i<arity; i++){ 
       redvalues[i]=(tupleList->dom_smallest)[i];
     }
     
-    for(int i=0; i<tuples.size(); i++)
+    for(SysInt i=0; i<tuples.size(); i++)
     {
       // copy redvalues
       int * newredvalues= new int[arity]; 
-      for(int j=0; j<arity; j++)
+      for(SysInt j=0; j<arity; j++)
         newredvalues[j]=redvalues[j];
       
       int * valuesarray= new int[arity];
-      for(int j=0; j<arity; j++)
+      for(SysInt j=0; j<arity; j++)
         valuesarray[j]=tuples[i][j];
       
       TupleH * t=new TupleH(valuesarray, newredvalues, i, arity);
@@ -131,12 +131,12 @@ struct Regin
       // cross-link with previous tuples.
       int valcountlocal=arity;  // for each value in this tuple, there is one forward reference in nextValue.
       
-      for(int j = i - 1; j >= 0; j--)
+      for(SysInt j = i - 1; j >= 0; j--)
       {
         TupleH* prev=tuplelist[j];
         BOOL breakflag=false;
         
-        for(int var=0; var<arity; var++)
+        for(SysInt var=0; var<arity; var++)
         {
           if((prev->values[var])==(t->values[var]) && prev->nextValue[var]==-1)
           {
@@ -156,7 +156,7 @@ struct Regin
       }
       
       // increment redvalues
-      for(int var=0; var<arity; var++)
+      for(SysInt var=0; var<arity; var++)
       {
         redvalues[var]++;
         int max = (tupleList->dom_smallest)[var] + (tupleList->dom_size)[var];
@@ -214,7 +214,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   int comparetuples(int * t1, int * t2)
   {
-    for(int i=0; i<arity; i++)
+    for(SysInt i=0; i<arity; i++)
     {
       if(t1[i]>t2[i])
         return 1;
@@ -249,13 +249,13 @@ struct GACTableConstraint : public AbstractConstraint
       listdone=false;
       
       offset.resize(arity);
-      for(int i=0; i<arity; i++)
+      for(SysInt i=0; i<arity; i++)
       {
         offset[i]=-vars[i].getInitialMin();
         
         current_support[i]= new ReversibleInt*[vars[i].getInitialMax()+offset[i]+1];
         
-        for(int j=0; j<vars[i].getInitialMax()+offset[i]+1; j++){
+        for(SysInt j=0; j<vars[i].getInitialMax()+offset[i]+1; j++){
           current_support[i][j]=new ReversibleInt();
           current_support[i][j]->set(-1);
         }
@@ -274,13 +274,13 @@ struct GACTableConstraint : public AbstractConstraint
     // for other variables, compute the max (over vars) of the min (over vals)
     // which gives the min lower bound of tuples that have been checked already.
     int lowerbound=last_pointer;
-    for(int i=0; i<arity; i++)
+    for(SysInt i=0; i<arity; i++)
     {
       if(i!=var)
       {
         int minlb=current_support[i][vars[i].getMin()+offset[i]]->get();
         
-        for(int valIndex=vars[i].getMin()+1; valIndex<=vars[i].getMax(); valIndex++)
+        for(SysInt valIndex=vars[i].getMin()+1; valIndex<=vars[i].getMax(); valIndex++)
         {
           if(vars[i].inDomain(valIndex))
           {
@@ -294,7 +294,7 @@ struct GACTableConstraint : public AbstractConstraint
     }  // can't do this because we don't use tuples from the checking of other variables to support this one.??
     
     
-    for(int i=0; i<arity; i++)
+    for(SysInt i=0; i<arity; i++)
     {
       if(i!=var)
         upperboundtuple[i]=vars[i].getMax();
@@ -327,7 +327,7 @@ struct GACTableConstraint : public AbstractConstraint
         return 0;
       
       int maxjump=curtupleIndex;
-      for(int y = 0; y < arity; y++)
+      for(SysInt y = 0; y < arity; y++)
       {
         if(y!=var)
         {
@@ -432,7 +432,7 @@ struct GACTableConstraint : public AbstractConstraint
     
     int vars_size = vars.size();
     dt += lit * (vars_size - 1);
-    for(int v = 0; v < vars_size; ++v)
+    for(SysInt v = 0; v < vars_size; ++v)
     {
       if(v != var)
       {
@@ -445,7 +445,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
+    for(SysInt varIndex = 0; varIndex < vars.size(); ++varIndex) 
     {
       // Propagate variables so they fit inside domains. This is a minor fix
       int tuple_domain_min = (tupleList->dom_smallest)[varIndex];

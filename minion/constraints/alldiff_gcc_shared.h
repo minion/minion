@@ -93,7 +93,7 @@ struct smallset
         {
             list.clear();
             cert=1;
-            for(int i=0; i<membership.size(); i++)
+            for(SysInt i=0; i<membership.size(); i++)
             {
                 membership[i]=0;
             }
@@ -354,7 +354,7 @@ struct FlowConstraint : public AbstractConstraint
             dom_min=checked_cast<SysInt>(var_array[0].getInitialMin());
             dom_max=checked_cast<SysInt>(var_array[0].getInitialMax());
         }
-        for(int i=0; i<var_array.size(); ++i)
+        for(SysInt i=0; i<var_array.size(); ++i)
         {
             if(var_array[i].getInitialMin()<dom_min)
                 dom_min=checked_cast<SysInt>(var_array[i].getInitialMin());
@@ -371,23 +371,23 @@ struct FlowConstraint : public AbstractConstraint
             // refactor this to use initial upper and lower bounds.
             adjlist.resize(numvars+numvals);
             adjlistpos.resize(numvars+numvals);
-            for(int i=0; i<numvars; i++)
+            for(SysInt i=0; i<numvars; i++)
             {
                 adjlist[i].resize(numvals);
-                for(int j=0; j<numvals; j++) adjlist[i][j]=j+dom_min;
+                for(SysInt j=0; j<numvals; j++) adjlist[i][j]=j+dom_min;
                 adjlistpos[i].resize(numvals);
-                for(int j=0; j<numvals; j++) adjlistpos[i][j]=j;
+                for(SysInt j=0; j<numvals; j++) adjlistpos[i][j]=j;
             }
-            for(int i=numvars; i<numvars+numvals; i++)
+            for(SysInt i=numvars; i<numvars+numvals; i++)
             {
                 adjlist[i].resize(numvars);
-                for(int j=0; j<numvars; j++) adjlist[i][j]=j;
+                for(SysInt j=0; j<numvars; j++) adjlist[i][j]=j;
                 adjlistpos[i].resize(numvars);
-                for(int j=0; j<numvars; j++) adjlistpos[i][j]=j;
+                for(SysInt j=0; j<numvars; j++) adjlistpos[i][j]=j;
             }
             adjlistlength=getMemory(stateObj).backTrack().template requestArray<int>(numvars+numvals);
-            for(int i=0; i<numvars; i++) adjlistlength[i]=numvals;
-            for(int i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
+            for(SysInt i=0; i<numvars; i++) adjlistlength[i]=numvals;
+            for(SysInt i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
         }
         
         #ifndef BTMATCHING
@@ -456,11 +456,11 @@ struct FlowConstraint : public AbstractConstraint
     
     void check_adjlists()
     {
-        for(int i=0; i<numvars; i++)
+        for(SysInt i=0; i<numvars; i++)
         {
             D_ASSERT(var_array[i].getMin()>=dom_min);
             D_ASSERT(var_array[i].getMax()<=dom_max);
-            for(int j=dom_min; j<=dom_max; j++)
+            for(SysInt j=dom_min; j<=dom_max; j++)
             {
                 D_DATA(bool in=adjlistpos[i][j-dom_min]<adjlistlength[i]);
                 D_DATA(bool in2=adjlistpos[j-dom_min+numvars][i]<adjlistlength[j-dom_min+numvars]);
@@ -507,7 +507,7 @@ struct FlowConstraint : public AbstractConstraint
         uprevious.resize(numvars, -2);
         
         vprevious.resize(numvals);
-        for(int i=0; i<numvals; ++i)
+        for(SysInt i=0; i<numvals; ++i)
         {
             vprevious[i].reserve(numvars);
         }
@@ -517,7 +517,7 @@ struct FlowConstraint : public AbstractConstraint
         unmatched.reserve(numvals);
         
         newlayer.resize(numvals);
-        for(int i=0; i<numvals; ++i)
+        for(SysInt i=0; i<numvals; ++i)
         {
             newlayer[i].reserve(numvars);
         }
@@ -534,7 +534,7 @@ struct FlowConstraint : public AbstractConstraint
             // The constraint is unsatisfiable (no matching).
             P("About to fail. Changed varvalmatching: "<< varvalmatching);
             
-            for(int j=0; j<numvars; j++)
+            for(SysInt j=0; j<numvars; j++)
             {
                 // Restore valvarmatching because it might be messed up by Hopcroft.
                 valvarmatching[varvalmatching[j]-dom_min]=j;
@@ -549,7 +549,7 @@ struct FlowConstraint : public AbstractConstraint
         // This must not be done when failing, because it might mess
         // up varvalmatching for the next invocation.
         {vector<int>& toiterate=valinlocalmatching.getlist();
-            for(int j=0; j<toiterate.size(); j++)
+            for(SysInt j=0; j<toiterate.size(); j++)
             {
                 int tempval=toiterate[j];
                 varvalmatching[valvarmatching[tempval]]=tempval+dom_min;
@@ -574,7 +574,7 @@ struct FlowConstraint : public AbstractConstraint
         // to see it's in the relevant domain.
         valinlocalmatching.clear();
         
-        for(int i=sccstart; i<=sccend; i++)
+        for(SysInt i=sccstart; i<=sccend; i++)
         {
             int tempvar=SCCs[i];
             if(var_array[tempvar].inDomain(varvalmatching[tempvar]))
@@ -627,14 +627,14 @@ struct FlowConstraint : public AbstractConstraint
             varinlocalmatching.clear();
             {
                 vector<int>& toiterate=valinlocalmatching.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
+                for(SysInt i=0; i<toiterate.size(); ++i)
                 {
                     if(!varinlocalmatching.in(valvarmatching[toiterate[i]]))   // This should not be conditional --BUG
                         varinlocalmatching.insert(valvarmatching[toiterate[i]]);
                 }
             }
             
-            for(int i=sccstart; i<=sccend; ++i)
+            for(SysInt i=sccstart; i<=sccend; ++i)
             {
                 int tempvar=SCCs[i];
                 if(varinlocalmatching.in(tempvar))  // The only use of varinlocalmatching.
@@ -649,7 +649,7 @@ struct FlowConstraint : public AbstractConstraint
             }
             
             /*cout<< "Uprevious:" <<endl;
-            for(int i=0; i<localnumvars; ++i)
+            for(SysInt i=0; i<localnumvars; ++i)
             {
                 cout<< "for variable "<<var_indices[i]<<" value "<< uprevious[i]<<endl;
             }*/
@@ -672,7 +672,7 @@ struct FlowConstraint : public AbstractConstraint
                 */
                 {
                 vector<int>& toiterate=layer.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
+                for(SysInt i=0; i<toiterate.size(); ++i)
                 {
                     //cout<<"Layer item: "<<(*setit)<<endl;
                     int tempvar=toiterate[i];
@@ -711,7 +711,7 @@ struct FlowConstraint : public AbstractConstraint
                 /*cout<<"Local matching state:"<<endl;
                 {
                 vector<int>& toiterate = valinlocalmatching.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
+                for(SysInt i=0; i<toiterate.size(); ++i)
                 {
                     int temp=toiterate[i];
                     D_ASSERT(varinlocalmatching.in(localmatching[temp]));
@@ -721,7 +721,7 @@ struct FlowConstraint : public AbstractConstraint
                 
                 {
                 vector<int>& toiterate = innewlayer.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
+                for(SysInt i=0; i<toiterate.size(); ++i)
                 {
                     int tempval = toiterate[i]; // for v in newlayer.
                     //cout << "Looping for value "<< tempval <<endl;
@@ -732,7 +732,7 @@ struct FlowConstraint : public AbstractConstraint
                     
                     vprevious[tempval]=newlayer[tempval];  // This should be a copy???
                     /*vprevious[tempval].resize(newlayer[tempval].size());
-                    for(int x=0; x<newlayer[tempval].size(); x++)
+                    for(SysInt x=0; x<newlayer[tempval].size(); x++)
                     {
                         vprevious[tempval][x]=newlayer[tempval][x];
                     }*/
@@ -787,7 +787,7 @@ struct FlowConstraint : public AbstractConstraint
             */
             {
             vector<int>& toiterate=unmatched.getlist();
-            for(int i=0; i<toiterate.size(); ++i)
+            for(SysInt i=0; i<toiterate.size(); ++i)
             {
                 int tempval=toiterate[i];
                 //cout<<"unmatched value:"<<tempval<<endl;
@@ -812,7 +812,7 @@ struct FlowConstraint : public AbstractConstraint
             // Remove the value from vprevious.
             invprevious.remove(val);
             
-            for(int i=0; i<listvars.size(); ++i)  //for u in L
+            for(SysInt i=0; i<listvars.size(); ++i)  //for u in L
             {
                 int tempvar=listvars[i];
                 int pu=uprevious[tempvar];
@@ -857,11 +857,11 @@ struct FlowConstraint : public AbstractConstraint
     void hopcroft2_setup()
     {
         edges.resize(numvars+numvals+1);
-        for(int i=0; i<numvars; i++)
+        for(SysInt i=0; i<numvars; i++)
         {
             edges.reserve(numvals);
         }
-        for(int i=numvars; i<=numvars+numvals; i++)
+        for(SysInt i=numvars; i<=numvars+numvals; i++)
         {
             edges.reserve(numvars);
         }
@@ -885,7 +885,7 @@ struct FlowConstraint : public AbstractConstraint
         // in the SCC.
         // Clear any values from matching which are no longer in domain.
         // Clear vals if their usage is larger than the upper bound.
-        for(int i=0; i<vars_in_scc.size(); i++)
+        for(SysInt i=0; i<vars_in_scc.size(); i++)
         {
             int var=vars_in_scc[i];
             if(matching[var]!=dom_min-1)
@@ -916,7 +916,7 @@ struct FlowConstraint : public AbstractConstraint
             fifo.clear();
             
             int unmatched=0;
-            for(int i=0; i<vars_in_scc.size(); ++i)
+            for(SysInt i=0; i<vars_in_scc.size(); ++i)
             {
                 int tempvar=vars_in_scc[i];
                 if(matching[tempvar]==dom_min-1)
@@ -946,7 +946,7 @@ struct FlowConstraint : public AbstractConstraint
                     fifo.pop_front();
                     // curnode is a variable.
                     // next layer is adjacent values which are not saturated.
-                    for(int i=0; i<adjlistlength[curnode]; i++)
+                    for(SysInt i=0; i<adjlistlength[curnode]; i++)
                     {
                         int realval=adjlist[curnode][i];
                         int validx=realval-dom_min+numvars;
@@ -972,7 +972,7 @@ struct FlowConstraint : public AbstractConstraint
                 
                 // transfer things from thislayer to varvalused.
                 vector<int>& temp1 = thislayer.getlist();
-                for(int i=0; i<temp1.size(); i++)
+                for(SysInt i=0; i<temp1.size(); i++)
                 {
                     varvalused.insert(temp1[i]);
                 }
@@ -991,7 +991,7 @@ struct FlowConstraint : public AbstractConstraint
                     fifo.pop_front();
                     // curnode is a value
                     // next layer is variables, following matching edges.
-                    for(int i=0; i<adjlistlength[curnode]; i++)
+                    for(SysInt i=0; i<adjlistlength[curnode]; i++)
                     {
                         int var=adjlist[curnode][i];
                         if(!varvalused.in(var) &&
@@ -1012,7 +1012,7 @@ struct FlowConstraint : public AbstractConstraint
                 
                 // transfer things from thislayer to varvalused.
                 vector<int>& temp2 = thislayer.getlist();
-                for(int i=0; i<temp2.size(); i++)
+                for(SysInt i=0; i<temp2.size(); i++)
                 {
                     varvalused.insert(temp2[i]);
                 }
@@ -1026,7 +1026,7 @@ struct FlowConstraint : public AbstractConstraint
                 // the edges ds.
                 // starting at layer 0.
                 
-                for(int i=0; i<edges[numvars+numvals].size(); i++)
+                for(SysInt i=0; i<edges[numvars+numvals].size(); i++)
                 {
                     augpath.clear();
                     augpath.push_back(edges[numvars+numvals][i]);
@@ -1090,7 +1090,7 @@ struct FlowConstraint : public AbstractConstraint
     inline void apply_augmenting_path(vector<int>& augpath, vector<int>& matching, vector<int>& usage)
     {
         D_ASSERT((augpath.size() & 1) == 0);
-        for(int i=0; i<augpath.size(); i=i+2)
+        for(SysInt i=0; i<augpath.size(); i=i+2)
         {
             int var=augpath[i];
             int validx=augpath[i+1];
@@ -1178,9 +1178,9 @@ struct InternalDynamicTriggers
     {
         watches=getMemory(_stateObj).backTrack().template requestArray<short>(numvars+1 + 4*numvars+2*numvals); 
         
-        for(int i=0; i<numvars; i++) watches[i]=-1;
+        for(SysInt i=0; i<numvars; i++) watches[i]=-1;
         watches[numvars]=numvars+1;
-        for(int i=numvars+2; i<(numvars+1 + 4*numvars+2*numvals); i=i+2)
+        for(SysInt i=numvars+2; i<(numvars+1 + 4*numvars+2*numvals); i=i+2)
         {   // link up the freelist.
             watches[i]=i+1;
         }

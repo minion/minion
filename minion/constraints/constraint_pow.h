@@ -63,7 +63,7 @@ struct PowConstraint : public AbstractConstraint
       // Take this check out for now; it seems to be too restrictive. The propagator
       // uses doubles anyway so integer overflow is not the problem.
       //BigInt pow=1;
-      //for(int i=0; i<var2.getInitialMax(); i++) {
+      //for(SysInt i=0; i<var2.getInitialMax(); i++) {
       //    pow=pow*var1.getInitialMax();
       //    CHECKSIZE(pow, "Magnitude of domain bounds is too large in 'pow' constraint.");
       //}

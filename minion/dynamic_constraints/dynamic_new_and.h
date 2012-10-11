@@ -90,7 +90,7 @@ struct Dynamic_AND : public ParentConstraint
       typedef pair<SysInt, DomainInt> temptype;
       MAKE_STACK_BOX(localassignment, temptype, assignment.capacity());
       P("GetSat for And");
-      for(int i=0; i<child_constraints.size(); ++i)
+      for(SysInt i=0; i<child_constraints.size(); ++i)
       {
           localassignment.clear();
           bool flag=child_constraints[i]->get_satisfying_assignment(localassignment);
@@ -100,7 +100,7 @@ struct Dynamic_AND : public ParentConstraint
               return false;
           }
           P(localassignment[0] << ":" << localassignment[1]);
-          for(int j=0; j<localassignment.size(); j++)
+          for(SysInt j=0; j<localassignment.size(); j++)
           {
               assignment.push_back(make_pair(checked_cast<SysInt>(localassignment[j].first+start_of_constraint[i]),
                   localassignment[j].second));
@@ -114,7 +114,7 @@ struct Dynamic_AND : public ParentConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vecs;
-    for(int i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < child_constraints.size(); ++i)
     {
       vector<AnyVarRef>* var_ptr = child_constraints[i]->get_vars_singleton(); 
       vecs.insert(vecs.end(), var_ptr->begin(), var_ptr->end());
@@ -195,7 +195,7 @@ struct Dynamic_AND : public ParentConstraint
 inline AbstractConstraint* Dynamic_AND::reverse_constraint()
 { // OR of the reverse of all the child constraints..
   vector<AbstractConstraint*> con;
-  for(int i=0; i<child_constraints.size(); i++)
+  for(SysInt i=0; i<child_constraints.size(); i++)
   {
       con.push_back(child_constraints[i]->reverse_constraint());
   }

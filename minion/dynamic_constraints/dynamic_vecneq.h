@@ -566,8 +566,8 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       }
       return new Dynamic_AND(stateObj, con);
       /*vector<AnyVarRef> t;
-      for(int i=0; i<var_array1.size(); i++) t.push_back(var_array1[i]);
-      for(int i=0; i<var_array2.size(); i++) t.push_back(var_array2[i]);
+      for(SysInt i=0; i<var_array1.size(); i++) t.push_back(var_array1[i]);
+      for(SysInt i=0; i<var_array2.size(); i++) t.push_back(var_array2[i]);
       return new CheckAssignConstraint<vector<AnyVarRef>, VecNeqDynamic>(stateObj, t, *this);*/
   }
 };

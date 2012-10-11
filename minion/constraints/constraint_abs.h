@@ -58,7 +58,7 @@ struct AbsConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     var1.setMin(0);
-    for(int i = 0; i < 4 && !getState(stateObj).isFailed(); ++i)
+    for(SysInt i = 0; i < 4 && !getState(stateObj).isFailed(); ++i)
       propagate(i, DomainDelta::empty());
   }
   

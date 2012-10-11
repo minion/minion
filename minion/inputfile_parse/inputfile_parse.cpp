@@ -166,7 +166,7 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
       cerr << "Error occurred on line " << line_count << endl;
       cerr << "Parser gave up around:" << endl;
       cerr << current_line << endl;
-      for(int i = 0; i < pos - start_of_line - 1; ++i)
+      for(SysInt i = 0; i < pos - start_of_line - 1; ++i)
           cerr << "-";
       cerr << "^" << endl;
         exit(1);

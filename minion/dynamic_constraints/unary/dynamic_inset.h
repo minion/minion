@@ -69,7 +69,7 @@ template<typename Var>
     }
     else
     {
-      for(int i = 0; i < vals.size() - 1; ++i)
+      for(SysInt i = 0; i < vals.size() - 1; ++i)
         for(DomainInt pos = vals[i] + 1; pos < vals[i+1]; ++pos)
         var.removeFromDomain(pos);
     }
@@ -128,7 +128,7 @@ template<typename Var>
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
     /// TODO: Make faster
-    for(int i = 0; i < vals.size(); ++i)
+    for(SysInt i = 0; i < vals.size(); ++i)
     { 
       if(var.inDomain(vals[i]))
       {

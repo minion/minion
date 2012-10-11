@@ -31,7 +31,7 @@ namespace Controller
     {
         // collect the variables in the SearchOrder object 
         vector<AnyVarRef> var_array;
-        for(int i=0; i<order.var_order.size(); i++)
+        for(SysInt i=0; i<order.var_order.size(); i++)
         {
             var_array.push_back(get_AnyVarRef_from_Var(stateObj, order.var_order[i]));
             // some check here?
@@ -91,7 +91,7 @@ namespace Controller
         else
         {
             vector<shared_ptr<VariableOrder> > vovector;
-            for(int i=0; i<order.size(); i++)
+            for(SysInt i=0; i<order.size(); i++)
             {
                 vovector.push_back(make_search_order(order[i], stateObj));
                 if(order[i].find_one_assignment && i!= order.size()-1)
@@ -142,9 +142,9 @@ shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
     
     vector<AnyVarRef> all_vars;
     
-    for(int i=0; i<order.size(); i++)
+    for(SysInt i=0; i<order.size(); i++)
     {
-        for(int j=0; j<order[i].var_order.size(); j++)
+        for(SysInt j=0; j<order[i].var_order.size(); j++)
         {
             all_vars.push_back(get_AnyVarRef_from_Var(stateObj, order[i].var_order[j]));
         }

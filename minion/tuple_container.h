@@ -73,7 +73,7 @@ class TupleList
   vector<DomainInt> get_vector(int pos) const
   {
     vector<DomainInt> vec(tuple_length);
-    for(int i = 0; i < tuple_length; ++i)
+    for(SysInt i = 0; i < tuple_length; ++i)
       vec[i] = tuple_data[pos * tuple_length + i];
     return vec;
   }
@@ -84,8 +84,8 @@ class TupleList
     number_of_tuples = tuple_list.size();
     tuple_length = tuple_list[0].size();
     tuple_data = new DomainInt[number_of_tuples * tuple_length];
-    for(int i = 0; i < number_of_tuples; ++i)
-      for(int j = 0; j < tuple_length; ++j)
+    for(SysInt i = 0; i < number_of_tuples; ++i)
+      for(SysInt j = 0; j < tuple_length; ++j)
       { tuple_data[i * tuple_length + j] = tuple_list[i][j]; }
     finalise_tuples();
   }
@@ -143,7 +143,7 @@ class TupleList
     DomainInt arity = tuple_size();   
 
     // Set up the table of tuples.
-    for(int i = 0; i < arity; ++i)
+    for(SysInt i = 0; i < arity; ++i)
     {
       if(size() == 0)
       {
@@ -154,7 +154,7 @@ class TupleList
       {
         DomainInt min_val = get_tupleptr(0)[i];
         DomainInt max_val = get_tupleptr(0)[i];
-        for(int j = 1; j < size(); ++j)
+        for(SysInt j = 1; j < size(); ++j)
         {
           min_val = mymin(min_val, get_tupleptr(j)[i]);
           max_val = mymax(max_val, get_tupleptr(j)[i]);
@@ -234,7 +234,7 @@ public:
                       ++j)
         {
           vector<vector<DomainInt> > specific_tuples;
-          for(int k = 0; k < (*tuples).size(); ++k)
+          for(SysInt k = 0; k < (*tuples).size(); ++k)
           {
             if((*tuples)[k][i] == j)
               specific_tuples.push_back((*tuples).get_vector(k));

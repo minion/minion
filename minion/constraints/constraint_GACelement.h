@@ -56,7 +56,7 @@ struct GACElementConstraint : public AbstractConstraint
     int array_size = var_array.size();
     DomainInt min_val = var_array[0].getInitialMin();
     DomainInt max_val = var_array[0].getInitialMax();
-    for(int i = 1; i < array_size; ++i)
+    for(SysInt i = 1; i < array_size; ++i)
     {
       min_val = min(min_val, var_array[i].getInitialMin());
       max_val = max(max_val, var_array[i].getInitialMax());
@@ -66,7 +66,7 @@ struct GACElementConstraint : public AbstractConstraint
     var_array_max_val = max_val;
     
     // DomainInt domain_size = var_array_max_val - var_array_min_val + 1;
-    for(int i = 0; i < array_size; ++i)
+    for(SysInt i = 0; i < array_size; ++i)
     {
       t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
     }
@@ -106,7 +106,7 @@ struct GACElementConstraint : public AbstractConstraint
   BOOL support_for_val_in_result(DomainInt val)
   {
     int array_size = var_array.size();
-    for(int i = 0; i < array_size; ++i)
+    for(SysInt i = 0; i < array_size; ++i)
     {
       if(indexvar.inDomain(i) && var_array[i].inDomain(val))
         return true;
@@ -171,7 +171,7 @@ struct GACElementConstraint : public AbstractConstraint
     
     D_ASSERT(prop_val == array_size + 1);
     
-    for(int var = 0; var < array_size; ++var)
+    for(SysInt var = 0; var < array_size; ++var)
     {
       if(indexvar.inDomain(var) && !support_for_val_in_index(var))
       {
@@ -182,7 +182,7 @@ struct GACElementConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    for(int i=0; i<var_array.size(); i++) {
+    for(SysInt i=0; i<var_array.size(); i++) {
         if(var_array[i].isBound()) {
             cerr << "Warning: GACElement is not designed to be used on bound variables and may cause crashes." << endl;
         }
@@ -257,7 +257,7 @@ struct GACElementConstraint : public AbstractConstraint
       AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<IndexRef>(stateObj, indexvar, r);
       con.push_back(t4);
       
-      for(int i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i<var_array.size(); i++)
       {
           vector<AbstractConstraint*> con2;
           WatchLiteralConstraint<IndexRef>* t=new WatchLiteralConstraint<IndexRef>(stateObj, indexvar, i);

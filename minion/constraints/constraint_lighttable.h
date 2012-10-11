@@ -93,7 +93,7 @@ public:
   bool checkTuple(DomainInt* tuple, int tuple_size)
    {
      D_ASSERT(tuple_size == getVarCount());
-     for(int i = 0; i < getNumOfTuples(); ++i)
+     for(SysInt i = 0; i < getNumOfTuples(); ++i)
      {
        if(std::equal(tuple, tuple + tuple_size, tuple_data->get_tupleptr(i)))
          return true;
@@ -133,7 +133,7 @@ struct LightTableConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    for(int i=0; i<vars.size(); i++)
+    for(SysInt i=0; i<vars.size(); i++)
     {
         t.push_back(make_trigger(vars[i], Trigger(this, i), DomainChanged));
     }
@@ -143,7 +143,7 @@ struct LightTableConstraint : public AbstractConstraint
   virtual void propagate(DomainInt changed_var, DomainDelta)
   {
       // Propagate to all vars except the one that changed.
-      for(int i=0; i<vars.size(); i++)
+      for(SysInt i=0; i<vars.size(); i++)
       {
           if(i!=changed_var)
           {
@@ -176,7 +176,7 @@ struct LightTableConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-      for(int i=0; i<vars.size(); i++)
+      for(SysInt i=0; i<vars.size(); i++)
       {
           propagate_var(i);
       }

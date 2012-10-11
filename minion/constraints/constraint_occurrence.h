@@ -257,7 +257,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   {
       // count occurrences of val
       int occ=0;
-      for(int i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i<var_array.size(); i++)
       {
           if(var_array[i].getAssignedValue()==value)
               occ++;
@@ -275,7 +275,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       SysInt occ=0;
       SysInt unassigned=-1;
       D_ASSERT(val_count.isAssigned());
-      for(int i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i<var_array.size(); i++)
       {
           if(var_array[i].isAssigned())
           {
@@ -341,7 +341,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   {
     MAKE_STACK_BOX(c, DomainInt, var_array.size() + 1);
 
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(!var_array[i].isAssigned())
       {
@@ -364,7 +364,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
 
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
-      for(int i = 0; i < var_array.size() + 1; ++i)
+      for(SysInt i = 0; i < var_array.size() + 1; ++i)
         assignment.push_back(make_pair(i, c[i]));
       return true;
     }
@@ -509,7 +509,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   {
     D_ASSERT(v_size == var_array.size());
     DomainInt count = 0;
-    for(int i = 0; i < v_size; ++i)
+    for(SysInt i = 0; i < v_size; ++i)
       count += (*(v + i) == (DomainInt)value);
     return (count >= val_count_min) && (count <= val_count_max);
   }
@@ -529,7 +529,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   {
     MAKE_STACK_BOX(c, DomainInt, var_array.size());
 
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(!var_array[i].isAssigned())
       {
@@ -543,7 +543,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
 
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
-      for(int i = 0; i < var_array.size(); ++i)
+      for(SysInt i = 0; i < var_array.size(); ++i)
         assignment.push_back(make_pair(i, c[i]));
       return true;
     }
@@ -703,7 +703,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   {
     D_ASSERT(v_size == var_array.size() + 1);
     DomainInt count = 0;
-    for(int i = 0; i < v_size - 1; ++i)
+    for(SysInt i = 0; i < v_size - 1; ++i)
       count += (*(v + i) == value);
     return count == *(v + v_size - 1);
   }
@@ -724,7 +724,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   {
     MAKE_STACK_BOX(c, DomainInt, var_array.size() + 1);
 
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(!var_array[i].isAssigned())
       {
@@ -748,7 +748,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
 
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
-      for(int i = 0; i < var_array.size() + 1; ++i)
+      for(SysInt i = 0; i < var_array.size() + 1; ++i)
         assignment.push_back(make_pair(i, c[i]));
       return true;
     }
@@ -759,7 +759,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   {
       return new NotOccurrenceEqualConstraint<VarArray, Val, ValCount>(stateObj, var_array, value, val_count);
       /*vector<AnyVarRef> v;
-      for(int i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i<var_array.size(); i++)
       {
           v.push_back((AnyVarRef) var_array[i]);
       }

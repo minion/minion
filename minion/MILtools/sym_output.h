@@ -30,7 +30,7 @@ int
 repartition(const std::vector<std::set<int> >& graph, std::vector<SysInt> partition_num)
 {
   std::vector<std::multiset<int> > partition_loop(graph.size());
-  for(int i = 0; i < graph.size(); ++i)
+  for(SysInt i = 0; i < graph.size(); ++i)
     for(set<int>::const_iterator it = graph[i].begin(); it != graph[i].end(); ++it)
     {
       partition_loop[i].insert(partition_num[*it]);
@@ -40,7 +40,7 @@ repartition(const std::vector<std::set<int> >& graph, std::vector<SysInt> partit
   std::set<std::multiset<int> > partition_set(partition_loop.begin(), partition_loop.end());
   std::vector<std::multiset<int> > partition_vec(partition_set.begin(), partition_set.end());
 
-  for(int i = 0; i < graph.size(); ++i)
+  for(SysInt i = 0; i < graph.size(); ++i)
   {
     partition_num[i] = find(partition_vec.begin(), partition_vec.end(), partition_loop[i]) - partition_vec.begin();
   }
@@ -58,7 +58,7 @@ partition_graph(const tuple<int,vector<set<int> >,vector<set<int> > >& graph_tup
 
   std::vector<SysInt> partition_num(graph.size());
 
-  for(int i = 0; i < partition.size(); ++i)
+  for(SysInt i = 0; i < partition.size(); ++i)
   {
     for(std::set<int>::iterator it = partition[i].begin(); it != partition[i].end(); ++it)
       partition_num[*it] = i;
@@ -75,8 +75,8 @@ partition_graph(const tuple<int,vector<set<int> >,vector<set<int> > >& graph_tup
   }
 
   int diff_count = 0;
-  for(int i = 0; i < partition_num.size(); ++i)
-    for(int j = 0; j < partition_num.size(); ++j)
+  for(SysInt i = 0; i < partition_num.size(); ++i)
+    for(SysInt j = 0; j < partition_num.size(); ++j)
       if(partition_num[i] != partition_num[j])
         diff_count++;
 
@@ -155,7 +155,7 @@ struct Graph
          
      if(print_names)
        cout << "varnames := [";
-     for(int i = 0; i < csp.sym_order.size(); ++i)
+     for(SysInt i = 0; i < csp.sym_order.size(); ++i)
        {
          if(print_names)
            cout << "\"" << name(csp.sym_order[i], csp) << "\", ";
@@ -229,12 +229,12 @@ struct Graph
 #ifdef USE_NAUTY
      vector<vector<DomainInt> > perms = build_graph(edges, partitions);
      cout << "generators := [()" << endl;  
-     for(int i = 0; i < perms.size(); ++i)
+     for(SysInt i = 0; i < perms.size(); ++i)
      {
        cout << ", PermList([";
        bool first_pass = true;
        D_ASSERT(perms[i][0] == 0);
-       for(int j = 1; j <= var_vertex_count; ++j)
+       for(SysInt j = 1; j <= var_vertex_count; ++j)
        {
          D_ASSERT(perms[i][j] <= var_vertex_count);
          if(first_pass)
@@ -295,7 +295,7 @@ struct GraphBuilder
   void colour_vertices()
   {
     vector<Var> vars = csp.vars.get_all_vars();
-    for(int i = 0; i < vars.size(); ++i)
+    for(SysInt i = 0; i < vars.size(); ++i)
     {
       g.var_vertex_colour[to_string(csp.vars.get_domain(vars[i]))].insert(csp.vars.getName(vars[i]));
     }
@@ -333,7 +333,7 @@ struct GraphBuilder
   string colour_element(const ConstraintBlob& b, string name)
   {
      string v = g.new_vertex(name + "_MASTER");
-     for(int i = 0; i < b.vars[0].size(); ++i)
+     for(SysInt i = 0; i < b.vars[0].size(); ++i)
      {
        string t = g.new_vertex(name + "_CHILD_" + to_string(i));
        add_edge(v,t);
@@ -356,19 +356,19 @@ struct GraphBuilder
   {
     string v = g.new_vertex(name + "_MASTER");  
       
-    for(int i = 0; i < b.vars.size(); ++i)
+    for(SysInt i = 0; i < b.vars.size(); ++i)
     {
       string nv = g.new_vertex(name + "_CHILD" + to_string(i));
       add_edge(v, nv);
-      for(int j = 0; j < b.vars[i].size(); ++j)
+      for(SysInt j = 0; j < b.vars[i].size(); ++j)
         add_edge(nv, b.vars[i][j]);
     }
     
-    for(int i = 0; i < b.constants.size(); ++i)
+    for(SysInt i = 0; i < b.constants.size(); ++i)
     {
       string nv = g.new_vertex(name + "_CHILD_CONST" + to_string(i));
       add_edge(v, nv);
-      for(int j = 0; j < b.constants[i].size(); ++j)
+      for(SysInt j = 0; j < b.constants[i].size(); ++j)
         add_edge(nv, Var(VAR_CONSTANT, b.constants[i][j]) );      
     }
     
@@ -387,8 +387,8 @@ struct GraphBuilder
   {
     string v = g.new_vertex(name + "_MASTER");
     
-    for(int i = 0; i < b.vars.size(); ++i)
-      for(int j = 0; j < b.vars[i].size(); ++j)
+    for(SysInt i = 0; i < b.vars.size(); ++i)
+      for(SysInt j = 0; j < b.vars[i].size(); ++j)
       {
         string vij = g.new_vertex(name + "_CHILD_" + to_string(i) + ";" + to_string(j));
         add_edge(v, vij);
@@ -409,15 +409,15 @@ struct GraphBuilder
     string v = g.new_vertex(name + "_MASTER");
     
     // Force each array to stay together.
-    for(int i = 0; i < 2; ++i)
+    for(SysInt i = 0; i < 2; ++i)
     {
       string vi = g.new_vertex(name + "_ARRAY_STAY_TOGETHER");
       add_edge(v, vi);
-      for(int j = 0; j < b.vars[i].size(); ++j)
+      for(SysInt j = 0; j < b.vars[i].size(); ++j)
         add_edge(vi, b.vars[i][j]);
     }
     
-    for(int i = 0; i < b.vars[0].size(); ++i)
+    for(SysInt i = 0; i < b.vars[0].size(); ++i)
     {
       string vi = g.new_vertex(name + "_INDEX");
       add_edge(v, vi);
@@ -425,7 +425,7 @@ struct GraphBuilder
       add_edge(vi, b.vars[1][i]);
     }
     
-    for(int i = 2; i < b.vars.size(); ++i)
+    for(SysInt i = 2; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
       string vi = g.new_vertex(name + "_POS_" + to_string(i));
@@ -441,7 +441,7 @@ struct GraphBuilder
    
     string v = g.new_vertex(name + "_MASTER");
     
-    for(int i = 0; i < b.vars[0].size(); ++i)
+    for(SysInt i = 0; i < b.vars[0].size(); ++i)
     {
       string vm = g.new_vertex(name + "_INDEX");
       string v1 = g.new_vertex(name + "_ARRAY1");
@@ -454,7 +454,7 @@ struct GraphBuilder
       add_edge(v2, b.vars[1][i]);
     }
     
-    for(int i = 2; i < b.vars.size(); ++i)
+    for(SysInt i = 2; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
       string vi = g.new_vertex(name + "_POS_" + to_string(i));
@@ -471,7 +471,7 @@ struct GraphBuilder
 
     string v = g.new_vertex(name + "_MASTER");
     
-    for(int i = 0; i < b.vars[0].size(); ++i)
+    for(SysInt i = 0; i < b.vars[0].size(); ++i)
     {
       string vm = g.new_vertex(name + "_INDEX");
       string v1 = g.new_vertex(name + "_ARRAY1");
@@ -484,7 +484,7 @@ struct GraphBuilder
       add_edge(v2, Var(VAR_CONSTANT, b.constants[0][i]));
     }
     
-    for(int i = 1; i < b.vars.size(); ++i)
+    for(SysInt i = 1; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
       string vi = g.new_vertex(name + "_POS_" + to_string(i));
@@ -512,7 +512,7 @@ struct GraphBuilder
     string v = g.new_vertex(name + "_MASTER");
 
     string vm = g.new_vertex(name + "_CHILD_1");
-    for(int i = 0; i < b.constants[0].size(); ++i)
+    for(SysInt i = 0; i < b.constants[0].size(); ++i)
       add_edge(v, Var(VAR_CONSTANT, b.constants[0][i]));
     add_edge(v, vm);
     add_edge(vm, b.vars[0][0]);
@@ -527,7 +527,7 @@ struct GraphBuilder
 
     string v = g.new_vertex(name + "_SECOND_MASTER");
     
-    for(int i = 0; i < b.vars[1].size(); ++i)
+    for(SysInt i = 0; i < b.vars[1].size(); ++i)
     {
       string vm = g.new_vertex(name + "_INDEX");
       string v1 = g.new_vertex(name + "_ARRAY1");
@@ -542,7 +542,7 @@ struct GraphBuilder
 
     string w = g.new_vertex(name + "_FIRST_MASTER");
     
-    for(int j = 0; j < b.vars[0].size(); ++j)
+    for(SysInt j = 0; j < b.vars[0].size(); ++j)
         add_edge(w, b.vars[0][j]);
 
     string x = g.new_vertex(name + "_MASTER");
@@ -577,7 +577,7 @@ struct GraphBuilder
     D_ASSERT(b.vars.size() == 0 && b.constants.size() == 0);
     string v = g.new_vertex(name + "_HEAD");
 
-    for(int i = 0; i < b.internal_constraints.size(); ++i)
+    for(SysInt i = 0; i < b.internal_constraints.size(); ++i)
     {
       string child_con = colour_constraint(b.internal_constraints[i]);
       add_edge(v, child_con);
@@ -937,13 +937,13 @@ struct InstanceStats
       
       // collect all domain sizes into an array
       vector<DomainInt> domsizes;
-      for(int i=0; i<v.BOOLs; i++)
+      for(SysInt i=0; i<v.BOOLs; i++)
           domsizes.push_back(2);
-      for(int i=0; i<v.bound.size(); i++)
+      for(SysInt i=0; i<v.bound.size(); i++)
           domsizes.push_back(v.bound[i].second.upper_bound-v.bound[i].second.lower_bound+1);
-      for(int i=0; i<v.discrete.size(); i++)
+      for(SysInt i=0; i<v.discrete.size(); i++)
           domsizes.push_back(v.discrete[i].second.upper_bound-v.discrete[i].second.lower_bound+1);
-      for(int i=0; i<v.sparse_bound.size(); i++)
+      for(SysInt i=0; i<v.sparse_bound.size(); i++)
           domsizes.push_back(v.sparse_bound[i].second.size());
       
       std::sort(domsizes.begin(), domsizes.end());
@@ -964,7 +964,7 @@ struct InstanceStats
       
       int branchingvars=0;
       int auxvars=0;
-      for(int i=0; i<csp.search_order.size(); i++)
+      for(SysInt i=0; i<csp.search_order.size(); i++)
       {
           if(csp.search_order[i].find_one_assignment)
           {
@@ -1070,9 +1070,9 @@ struct InstanceStats
       }
       
       vector<Var> inter;
-      for(int i = 0; i < var_sets.size(); ++i) 
+      for(SysInt i = 0; i < var_sets.size(); ++i) 
       {
-          for(int j = i+1; j < var_sets.size(); ++j)
+          for(SysInt j = i+1; j < var_sets.size(); ++j)
           {
               inter.clear();
               
@@ -1096,12 +1096,12 @@ struct InstanceStats
       // Edge density of primal graph
       std::set<pair<Var, Var> > seen_pairs;
       int count_pairs=0;
-      for(int i = 0; i < var_sets.size(); ++i) 
+      for(SysInt i = 0; i < var_sets.size(); ++i) 
       {
           int size=var_sets[i].size();
-          for(int j = 0; j < size; ++j)
+          for(SysInt j = 0; j < size; ++j)
           {
-              for(int k=j+1; k<size; ++k)
+              for(SysInt k=j+1; k<size; ++k)
               {
                   Var t1=var_sets[i][j];
                   Var t2=var_sets[i][k];
@@ -1125,7 +1125,7 @@ struct InstanceStats
   {
       vector<DomainInt> tightness;
       string s("stats_");
-      for(int i=0; i<cons.size(); i++)
+      for(SysInt i=0; i<cons.size(); i++)
       {
           tightness.push_back(cons[i]->getTightnessEstimate());
       }
@@ -1143,7 +1143,7 @@ struct InstanceStats
       //now literal tightness
       map<pair<Var,DomainInt>,vector<DomainInt> > scores_for_varval; //all available tightnesses for varvals
       //iterate over constraints, collecting all available tightnesses for varvals involved in con
-      for(int con = 0; con < cons.size(); con++)
+      for(SysInt con = 0; con < cons.size(); con++)
       {
 	vector<AnyVarRef>& all_vars = *cons[con]->get_vars_singleton();
 	for(size_t var = 0; var < all_vars.size(); var++) {
@@ -1190,15 +1190,15 @@ struct InstanceStats
   set<Var> find_all_vars(ConstraintBlob& ct)
   {
       set<Var> t2;
-      for(int i = 0; i < ct.vars.size(); ++i )
+      for(SysInt i = 0; i < ct.vars.size(); ++i )
       {
-          for(int j=0; j<ct.vars[i].size(); j++)
+          for(SysInt j=0; j<ct.vars[i].size(); j++)
           {
             t2.insert(ct.vars[i][j]);
           }
       }
       
-      for(int i=0; i<ct.internal_constraints.size(); i++)
+      for(SysInt i=0; i<ct.internal_constraints.size(); i++)
       {
           set<Var> t3=find_all_vars(ct.internal_constraints[i]);
           for(set<Var>::iterator j=t3.begin(); j!=t3.end(); ++j)

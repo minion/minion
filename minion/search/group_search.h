@@ -28,7 +28,7 @@ namespace Controller
     void group_solve_loop(StateObj* stateObj, function<void (void)> next_search, VarOrder& original_order, Variables& v, Permutation& perm, Propogator prop = PropagateGAC())
     {
       int sol_count = 0;
-      for(int i = 0; i < perm.size(); ++i)
+      for(SysInt i = 0; i < perm.size(); ++i)
       {
         perm[i].setMin(1);
         perm[i].setMax(perm.size());
@@ -38,13 +38,13 @@ namespace Controller
       if(getState(stateObj).isFailed())
         return;
 
-      for(int i = 0; i < perm.size(); ++i)
+      for(SysInt i = 0; i < perm.size(); ++i)
       {
-        for(int j = i + 2; j <= perm.size(); ++j)
+        for(SysInt j = i + 2; j <= perm.size(); ++j)
         {
           int world_depth = get_world_depth(stateObj);
           world_push(stateObj);
-          for(int k = 0; k < i; ++k)
+          for(SysInt k = 0; k < i; ++k)
             perm[k].propagateAssign(k+1);
           perm[i].propagateAssign(j);
 

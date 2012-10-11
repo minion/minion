@@ -106,16 +106,16 @@ struct GACTableConstraint : public AbstractConstraint
   
   void setFirstValid(vector<DomainInt>& support)
   {
-    for(int i = 0; i < support.size(); ++i)
+    for(SysInt i = 0; i < support.size(); ++i)
       support[i] = vars[i].getMin();
   }
   
   int setNextValid(vector<DomainInt>& support, int var_considered, int first_broken_val)
   {
-    for(int i = first_broken_val + 1; i < support.size(); ++i)
+    for(SysInt i = first_broken_val + 1; i < support.size(); ++i)
       support[i] = vars[i].getMin();
     
-    for(int i = first_broken_val; i >= 0; --i)
+    for(SysInt i = first_broken_val; i >= 0; --i)
     {
       if(i != var_considered)
       {
@@ -209,7 +209,7 @@ struct GACTableConstraint : public AbstractConstraint
         return false;
     }
 #else        
-    for(int i = support; i < support_size; ++i)
+    for(SysInt i = support; i < support_size; ++i)
     {
       if(check_tuple(tuples[i]))
       {
@@ -218,7 +218,7 @@ struct GACTableConstraint : public AbstractConstraint
       }
     }
     
-  for(int i = 0; i < support; ++i)
+  for(SysInt i = 0; i < support; ++i)
     {
       if(check_tuple(tuples[i]))
       {
@@ -262,7 +262,7 @@ struct GACTableConstraint : public AbstractConstraint
     
     int vars_size = vars.size();
     dt += lit * (vars_size - 1);
-    for(int v = 0; v < vars_size; ++v)
+    for(SysInt v = 0; v < vars_size; ++v)
     {
       if(v != var)
       {
@@ -308,7 +308,7 @@ struct GACTableConstraint : public AbstractConstraint
   
    virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    for(int i = 0; i < (lists->tuples)->size(); ++i)
+    for(SysInt i = 0; i < (lists->tuples)->size(); ++i)
     {
         if( std::equal(v, v + v_size, (*lists->tuples)[i]) )
         return true;

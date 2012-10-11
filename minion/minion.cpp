@@ -419,7 +419,7 @@ void munge_container(Con& con, int type)
       else
         size-=2;
 
-      for(int i = size/2; i >= 0; --i)
+      for(SysInt i = size/2; i >= 0; --i)
       {
         con2.push_back(con[i]);
         con2.push_back(con[con.size() - i - 1]);

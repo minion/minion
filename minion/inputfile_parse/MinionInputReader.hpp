@@ -156,7 +156,7 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
   string id = infile->getline('(');
   
   int constraint_num = -1;
-  for(int i = 0; i < num_of_constraints; ++i)
+  for(SysInt i = 0; i < num_of_constraints; ++i)
   {
     if(constraint_list[i].name == id)
     {
@@ -208,7 +208,7 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
   vector<vector<Var> >& varsblob = instance->constraints.back().vars;
   vector<vector<DomainInt> >& constblob = instance->constraints.back().constants;
   
-  for(int i = 0; i < def->number_of_params; ++i)
+  for(SysInt i = 0; i < def->number_of_params; ++i)
   {
     switch(def->read_types[i])
     {
@@ -648,7 +648,7 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   }
   instance->search_order[0].val_order = valOrder;
 
-  for(int i = 0; i < instance->search_order.size(); ++i)
+  for(SysInt i = 0; i < instance->search_order.size(); ++i)
     instance->search_order[i].setupValueOrder();
 }
 
@@ -685,12 +685,12 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
 
   if(varOrder.empty())
   {
-    for(int i = 0; i < var_count; ++i)
+    for(SysInt i = 0; i < var_count; ++i)
       varOrder.push_back(instance->vars.get_var('x',i));
   }
   else
   {
-    for(int i = 0; i < var_count; ++i)
+    for(SysInt i = 0; i < var_count; ++i)
     {
       Var v = instance->vars.get_var('x', i);
       if(used_variables.count(v) == 0)

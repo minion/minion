@@ -126,14 +126,14 @@ struct reify : public ParentConstraint
     c0vars=child_constraints[0]->get_vars_singleton()->size();
     bool hasbound=false;
     vector<AnyVarRef>& t1=*(child_constraints[0]->get_vars_singleton());
-    for(int i=0; i<t1.size(); i++)
+    for(SysInt i=0; i<t1.size(); i++)
     {
         if(t1[i].isBound() && t1[i].getInitialMin()!=t1[i].getInitialMax()) {
             hasbound=true;
         }
     }
     vector<AnyVarRef>& t2=*(child_constraints[1]->get_vars_singleton());
-    for(int i=0; i<t2.size(); i++)
+    for(SysInt i=0; i<t2.size(); i++)
     {
         if(t2[i].isBound() && t2[i].getInitialMin()!=t2[i].getInitialMax()) {
             hasbound=true;
@@ -193,7 +193,7 @@ struct reify : public ParentConstraint
         bool flag=child_constraints[1]->get_satisfying_assignment(assignment);
         if(flag)
         {
-            for(int i = 0; i < assignment.size(); ++i)
+            for(SysInt i = 0; i < assignment.size(); ++i)
               assignment[i].first += c0vars;
             assignment.push_back(make_pair(reify_var_num, 0));
             return true;
@@ -225,9 +225,9 @@ struct reify : public ParentConstraint
     vector<AnyVarRef> vec1 = * child_constraints[1]->get_vars_singleton();
     vector<AnyVarRef> c;
     c.reserve(vec0.size() + vec1.size() + 1);
-    for(int i=0; i<vec0.size(); i++)
+    for(SysInt i=0; i<vec0.size(); i++)
         c.push_back(vec0[i]);
-    for(int i=0; i<vec1.size(); i++)
+    for(SysInt i=0; i<vec1.size(); i++)
         c.push_back(vec1[i]);
     c.push_back(reify_var);
     return c;
@@ -340,7 +340,7 @@ struct reify : public ParentConstraint
             bool wllost=false;
             vector<AnyVarRef> t1=*(child_constraints[0]->get_vars_singleton());
 
-            for(int i=0; i<triggerpairs[0].size(); i++)
+            for(SysInt i=0; i<triggerpairs[0].size(); i++)
             {
                 if(!t1[checked_cast<SysInt>(triggerpairs[0][i].first)].inDomain(triggerpairs[0][i].second))
                 {
@@ -379,7 +379,7 @@ struct reify : public ParentConstraint
             bool wllost=false;
             vector<AnyVarRef> t1=*(child_constraints[1]->get_vars_singleton());
 
-            for(int i=0; i<triggerpairs[1].size(); i++)
+            for(SysInt i=0; i<triggerpairs[1].size(); i++)
             {
                 if(!t1[checked_cast<SysInt>(triggerpairs[1][i].first)].inDomain(triggerpairs[1][i].second))
                 {
@@ -441,7 +441,7 @@ struct reify : public ParentConstraint
   template<typename T, typename Vars, typename Trigger>
   void watch_assignment(const T& assignment, Vars& vars, Trigger* trig, Trigger* endtrig)
   {
-    for(int i = 0; i < assignment.size(); ++i)
+    for(SysInt i = 0; i < assignment.size(); ++i)
     {
       const SysInt aif = checked_cast<SysInt>(assignment[i].first);
       D_ASSERT(vars[aif].inDomain(assignment[i].second));
@@ -454,7 +454,7 @@ struct reify : public ParentConstraint
     }
     // clear a contiguous block of used triggers up to (not including) endtrig
     D_DATA(int firstunattached = -1);
-    for(int i=assignment.size(); (trig+i)<endtrig; i++)
+    for(SysInt i=assignment.size(); (trig+i)<endtrig; i++)
     {
         if(!(trig+i)->isAttached())
         {
@@ -467,7 +467,7 @@ struct reify : public ParentConstraint
     #ifdef MINION_DEBUG
     if(firstunattached != -1)
     {
-      for(int i=firstunattached; (trig+i)<endtrig; i++)
+      for(SysInt i=firstunattached; (trig+i)<endtrig; i++)
       {
           D_ASSERT(!(trig+i)->isAttached());
       }
@@ -475,7 +475,7 @@ struct reify : public ParentConstraint
     // put the triggers into triggerpairs to check later.
     int cid=((trig==dynamic_trigger_start())?0:1);
     triggerpairs[cid].clear();
-    for(int i=0; i<assignment.size(); i++)
+    for(SysInt i=0; i<assignment.size(); i++)
     {
         triggerpairs[cid].push_back(assignment[i]);
     }
@@ -509,7 +509,7 @@ struct reify : public ParentConstraint
     DynamicTrigger* dt = dynamic_trigger_start();
     //int dt_count = dynamic_trigger_count();
     // Clean up triggers
-    for(int i = 0; i < dtcount; ++i)
+    for(SysInt i = 0; i < dtcount; ++i)
       releaseTrigger(stateObj, dt + i);
 
     bool flag;

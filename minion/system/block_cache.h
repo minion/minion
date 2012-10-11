@@ -59,5 +59,5 @@ struct BlockCache
   }
   
   ~BlockCache()
-  { for(int i = 0; i < blocks.size(); ++i) free(blocks[i]); }
+  { for(SysInt i = 0; i < blocks.size(); ++i) free(blocks[i]); }
 };

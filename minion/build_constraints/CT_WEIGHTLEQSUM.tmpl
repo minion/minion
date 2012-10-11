@@ -14,7 +14,7 @@ BuildCT_LEQSUM(StateObj* stateObj, const VarArray& _var_array, const vector<VarS
   if(_var_array.size() == 2)
   {
     array<typename VarArray::value_type, 2> v_array;
-    for(int i = 0; i < 2; ++i)
+    for(SysInt i = 0; i < 2; ++i)
       v_array[i] = _var_array[i];
     return LightLessEqualSumCon(stateObj, v_array, _var_sum[0]);
   }

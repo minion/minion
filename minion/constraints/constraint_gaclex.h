@@ -86,17 +86,17 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   AbstractConstraint(_stateObj), alpha(_stateObj), beta(_stateObj), F(_stateObj), x(_x), y(_y)
   { 
     CHECK(x.size() == y.size(), "gaclex only works on vectors of equal length"); 
-    for(int i = 0; i < x.size(); ++i)
+    for(SysInt i = 0; i < x.size(); ++i)
     {
       if(x[i].getBaseVar() == y[i].getBaseVar())
         D_FATAL_ERROR("GacLex constraints cannot have a variable repeated at an index");
     }
 
-    for(int i = 0; i < x.size(); ++i)
+    for(SysInt i = 0; i < x.size(); ++i)
     {
       Var base = x[i].getBaseVar();
       pair<DomainInt, DomainInt> pos = make_pair(0, i);
-      for(int j = 0; j < i; ++j)
+      for(SysInt j = 0; j < i; ++j)
       {
         if(x[j].getBaseVar() == base)
         {
@@ -112,11 +112,11 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
       earliest_occurrence_x.push_back(pos);
     }
 
-    for(int i = 0; i < y.size(); ++i)
+    for(SysInt i = 0; i < y.size(); ++i)
     {
       Var base = y[i].getBaseVar();
       pair<DomainInt, DomainInt> pos = make_pair(1, i);
-      for(int j = 0; j < i; ++j)
+      for(SysInt j = 0; j < i; ++j)
       {
         if(x[j].getBaseVar() == base)
         {
@@ -139,14 +139,14 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     triggerCollection t;
 
     int x_size = x.size();
-    for(int i=0; i < x_size; ++i)
+    for(SysInt i=0; i < x_size; ++i)
     {
       t.push_back(make_trigger(x[i], Trigger(this, i), LowerBound));
       t.push_back(make_trigger(x[i], Trigger(this, i), UpperBound));
     }
 
     int y_size = y.size();
-    for(int i=0; i < y_size; ++i)
+    for(SysInt i=0; i < y_size; ++i)
     {
       t.push_back(make_trigger(y[i], Trigger(this, i), LowerBound));
       t.push_back(make_trigger(y[i], Trigger(this, i), UpperBound));
@@ -359,7 +359,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     if(unsat_val >= a)
     {
       int x_size = x.size();
-      for(int i = a; i < x_size; ++i)
+      for(SysInt i = a; i < x_size; ++i)
       {
         DomainInt xval = x[i].getMin();
         DomainInt yval = y[i].getMax();

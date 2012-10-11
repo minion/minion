@@ -73,7 +73,7 @@ struct CheckAssignConstraint : public AbstractConstraint
 
     if(count == v_size)
     {
-      for(int i = 0; i < v_size; ++i)
+      for(SysInt i = 0; i < v_size; ++i)
       {
         D_ASSERT(variables[i].isAssigned());
         assignment[i] = variables[i].getAssignedValue();
@@ -135,7 +135,7 @@ struct CheckAssignConstraint : public AbstractConstraint
    {
      MAKE_STACK_BOX(c, DomainInt, variables.size());
      
-     for(int i = 0; i < variables.size(); ++i)
+     for(SysInt i = 0; i < variables.size(); ++i)
      {
        if(!variables[i].isAssigned()) 
        {
@@ -149,7 +149,7 @@ struct CheckAssignConstraint : public AbstractConstraint
     
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
-      for(int i = 0; i < variables.size(); ++i)
+      for(SysInt i = 0; i < variables.size(); ++i)
       {
         assignment.push_back(make_pair(i, c[i]));
       }

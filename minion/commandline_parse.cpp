@@ -23,7 +23,7 @@ extern bool in_cspcomp_for_failexit;
 
 void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char** argv)
 {
- for(int i = 1; i < argc; ++i)
+ for(SysInt i = 1; i < argc; ++i)
   {
     const string command(argv[i]);
     if(command == string("-findallsols"))
@@ -302,7 +302,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
   }
   // bundle all options together and store
   string s=string("");
-  for(int i = 1; i < argc; ++i)
+  for(SysInt i = 1; i < argc; ++i)
   {
       if(i<argc-1)
           s=s+argv[i]+",";

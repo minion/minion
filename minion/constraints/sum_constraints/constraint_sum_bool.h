@@ -56,7 +56,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     
     count = 0;    
     
-    for(int i = 0; i < array_size; ++i)
+    for(SysInt i = 0; i < array_size; ++i)
       if(VarToCount)
         t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
       else
@@ -113,7 +113,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
   {
     int occs = 0;
     int array_size = var_array.size();
-    for(int i = 0; i < array_size; ++i)
+    for(SysInt i = 0; i < array_size; ++i)
       if(var_array[i].isAssignedValue(VarToCount))
         occs++;
     count = occs;
@@ -136,7 +136,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
   {
     int occs = 0;
     int array_size = var_array.size();
-    for(int i = 0; i < array_size; ++i)
+    for(SysInt i = 0; i < array_size; ++i)
       if(var_array[i].isAssignedValue(VarToCount))
         occs++;
     count = occs;
@@ -149,7 +149,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
-    for(int i = 0; i < v_size; i++)
+    for(SysInt i = 0; i < v_size; i++)
       D_ASSERT(v[i] == 0 || v[i] == 1);
     if(VarToCount)
       return std::accumulate(v, v + v_size, DomainInt(0)) <= var_sum;
@@ -165,7 +165,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     int v_size = var_array.size();
     if(VarToCount)
     {
-      for(int i = 0; i < v_size; ++i)
+      for(SysInt i = 0; i < v_size; ++i)
       {
         assignment.push_back(make_pair(i, var_array[i].getMin()));
         sum_value += var_array[i].getMin();
@@ -174,7 +174,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     }
     else
     {
-      for(int i = 0; i < v_size; ++i)
+      for(SysInt i = 0; i < v_size; ++i)
       {
         assignment.push_back(make_pair(i, var_array[i].getMax()));
         sum_value += var_array[i].getMax();

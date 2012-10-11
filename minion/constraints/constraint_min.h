@@ -72,7 +72,7 @@ struct MinConstraint : public AbstractConstraint
   {
     triggerCollection t;
     
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     { // Have to add 1 else the 0th element will be lost.
       t.push_back(make_trigger(var_array[i], Trigger(this, i + 1), LowerBound));
       t.push_back(make_trigger(var_array[i], Trigger(this, -(i + 1)), UpperBound));
@@ -160,7 +160,7 @@ struct MinConstraint : public AbstractConstraint
     }
     else
     {
-      for(int i = 1;i <= array_size + 1; ++i)
+      for(SysInt i = 1;i <= array_size + 1; ++i)
       {
         propagate(i,DomainDelta::empty());
         propagate(-i,DomainDelta::empty());
@@ -222,7 +222,7 @@ struct MinConstraint : public AbstractConstraint
   virtual AbstractConstraint* reverse_constraint()
   {
       vector<AnyVarRef> t;
-      for(int i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i<var_array.size(); i++)
           t.push_back(var_array[i]);
       t.push_back(min_var);
       

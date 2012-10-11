@@ -43,7 +43,7 @@ inline string to_var_name(const vector<DomainInt>& params)
 {
   ostringstream s;
   s << "_";
-  for(int i = 0; i < params.size(); ++i)
+  for(SysInt i = 0; i < params.size(); ++i)
     s << to_string(params[i]) << "_";
   s << "_";
   return s.str();
@@ -232,7 +232,7 @@ struct ConstraintBlob
     vector<DomainInt> output(params);
     do
     {
-      for(int i = 0; i < max_index.size(); i++)
+      for(SysInt i = 0; i < max_index.size(); i++)
         if(params[i] == -999)
           output[i] = current_index[i];
       return_list.push_back(getSymbol(name + to_var_name(output)));
@@ -545,7 +545,7 @@ struct ConstraintBlob
     for(UnsignedSysInt x=0;x<sparse_discrete.size();++x)
       total_var_count += sparse_discrete[x].first;
     vector<Var> all_vars(total_var_count);
-    for(int i = 0; i < total_var_count; ++i)
+    for(SysInt i = 0; i < total_var_count; ++i)
       all_vars[i] = get_var('x',i);
     return all_vars;
   }
@@ -655,7 +655,7 @@ public:
         BigInt a = checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound);
         BigInt b = checked_cast<BigInt>(vars.get_bounds(con.vars[0][1]).upper_bound);
         BigInt out = 1;
-        for(int i = 0; i < b; ++i)
+        for(SysInt i = 0; i < b; ++i)
         {
           out *= a;
           if(!DOMAIN_CHECK(out))
@@ -734,7 +734,7 @@ public:
       // This was a MINION 1 or MINION 2 input file. Let's fix it!
       vector<Var> all_vars = vars.get_all_vars();
 
-      for(int i = 0; i < all_vars.size(); ++i)
+      for(SysInt i = 0; i < all_vars.size(); ++i)
         vars.addSymbol("x" + to_string(i), all_vars[i]);
     }
 
@@ -750,7 +750,7 @@ extern int num_of_constraints;
 
 inline ConstraintDef* get_constraint(ConstraintType t)
 {
-  for(int i = 0; i < num_of_constraints; ++i)
+  for(SysInt i = 0; i < num_of_constraints; ++i)
   {
     if(constraint_list[i].type == t)
       return constraint_list + i;

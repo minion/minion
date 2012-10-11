@@ -177,13 +177,13 @@ void print_state()
   cout << " backtracking depth: " << *((DomainInt*)_backtrack_depth_ptr.get_ptr()) ; 
   cout << " max depth: " << _max_depth; 
   cout << endl << "   values: " ;
-  for(int i = 0; i < _size; ++i) 
+  for(SysInt i = 0; i < _size; ++i) 
   { 
     cout << array(i) << " ";
   }
   cout << endl;
   cout << "  history: ";
-  for(int i = 0; i < _local_depth ; ++i) 
+  for(SysInt i = 0; i < _local_depth ; ++i) 
   { 
     cout << "[" << undo_indexes(i) //<< ":" << undo_values(i) 
          << "] " ;

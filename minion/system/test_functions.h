@@ -71,7 +71,7 @@ template<typename Vars>
 BigInt lit_count(Vars& v)
 {
   BigInt lits = 0;
-  for(int i = 0; i < v.size(); ++i)
+  for(SysInt i = 0; i < v.size(); ++i)
   {
     if(v[i].isBound())
     {

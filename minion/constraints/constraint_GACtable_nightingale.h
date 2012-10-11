@@ -33,7 +33,7 @@ struct TupleComparator
   {
     if(tuple1[significantIndex] != tuple2[significantIndex])
       return tuple1[significantIndex] < tuple2[significantIndex];
-    for(int tupleIndex = 0; tupleIndex < arity; tupleIndex++)
+    for(SysInt tupleIndex = 0; tupleIndex < arity; tupleIndex++)
     {
       if(tuple1[tupleIndex] != tuple2[tupleIndex])
         return tuple1[tupleIndex] < tuple2[tupleIndex];
@@ -54,7 +54,7 @@ struct TupleN
   TupleN(int * _values, int _id, int arity, int* _nD) : 
     id(_id), values(_values), nextDifferent(_nD)
   {
-    for(int i = 0; i < arity; i++)
+    for(SysInt i = 0; i < arity; i++)
       nextDifferent[i] = -1;
   }
   
@@ -98,7 +98,7 @@ struct Nightingale
       splittuples(tuples, goods);
       tuplelistlengths = new int*[arity];
       
-      for(int i = 0; i < arity; i++)
+      for(SysInt i = 0; i < arity; i++)
       {
         int varmin = (tuples->dom_smallest)[i];
         int varmax = (tuples->dom_smallest)[i] + (tuples->dom_size)[i];
@@ -106,7 +106,7 @@ struct Nightingale
         tuplelistperlit[i]=new TupleN*[domsize];
         tuplelistlengths[i]=new int[domsize];
         
-        for(int val = varmin; val < varmax; val++)
+        for(SysInt val = varmin; val < varmax; val++)
         {   
           TupleN* tlpl=buildhologram(goods[i][val-varmin]);
           tuplelistperlit[i][val-varmin]=tlpl;
@@ -122,13 +122,13 @@ struct Nightingale
   
   void printhologram(TupleN* tlpl, int size)
   {
-    for(int i = 0; i < size; ++i)
+    for(SysInt i = 0; i < size; ++i)
     {
-      for(int j = 0; j < arity; ++j)
+      for(SysInt j = 0; j < arity; ++j)
         printf("%d,",tlpl[i].values[j]);
       printf("\n");
       
-      for(int j = 0; j < arity; ++j)
+      for(SysInt j = 0; j < arity; ++j)
         printf("%d,",tlpl[i].nextDifferent[j]);
       printf("\n\n");     
     }
@@ -141,7 +141,7 @@ struct Nightingale
     TupleN* tlist=new TupleN[tupleref.size()];
     
     int* mem_block = new int[arity * 2 * tupleref.size()];
-    for(int tupleIndex = 0; tupleIndex < tupleref.size(); tupleIndex++)
+    for(SysInt tupleIndex = 0; tupleIndex < tupleref.size(); tupleIndex++)
     {
       int* _values = mem_block + arity * (tupleIndex * 2) ;
       
@@ -158,20 +158,20 @@ struct Nightingale
       // check how many are the same for the last tuple.
       if(tupleIndex>=1)
       {
-        for(int valIndex=0; valIndex<arity; valIndex++)
+        for(SysInt valIndex=0; valIndex<arity; valIndex++)
         {
           if(_values[valIndex]==tlist[tupleIndex-1].values[valIndex])
             numproc--;
         }
       }
       
-      for(int i = tupleIndex - 1; i >= 0; i--)
+      for(SysInt i = tupleIndex - 1; i >= 0; i--)
       {
         TupleN* backtuple = &tlist[i];
         // if backtuple has a value i which is different to curtuple, make the forward link.
         
         // fill in any entries in nextDifferent
-        for(int valIndex = 0; valIndex < arity; valIndex++)
+        for(SysInt valIndex = 0; valIndex < arity; valIndex++)
         {
           if(backtuple->nextDifferent[valIndex]==-1)
           {
@@ -180,7 +180,7 @@ struct Nightingale
               numproc--;
               backtuple->nextDifferent[valIndex]=tupleIndex;
               // now iterate backwards and fill in any others in the same column
-              for(int j = i - 1; j >= 0; j--)
+              for(SysInt j = i - 1; j >= 0; j--)
               {
                 if(tlist[j].nextDifferent[valIndex]==-1)
                   tlist[j].nextDifferent[valIndex]=tupleIndex;
@@ -205,13 +205,13 @@ struct Nightingale
   {
     int arity = tuples->tuple_size();   
     goods.resize(arity);
-    for(int var = 0; var < arity; var++)
+    for(SysInt var = 0; var < arity; var++)
     {
       goods[var].resize((tuples->dom_size)[var]);
-      for(int val = (tuples->dom_smallest)[var];
+      for(SysInt val = (tuples->dom_smallest)[var];
           val <= (tuples->dom_smallest)[var] + (tuples->dom_size)[var]; val++)
       {
-        for(int tupleindex = 0; tupleindex < tuples->size(); tupleindex++)
+        for(SysInt tupleindex = 0; tupleindex < tuples->size(); tupleindex++)
         {
           if((*tuples)[tupleindex][var] == val)
             goods[var][val-(tuples->dom_smallest)[var]].push_back(tuples->get_vector(tupleindex));
@@ -219,7 +219,7 @@ struct Nightingale
       }
       
       int tuple_sum = 0;
-      for(int i = 0; i < goods[var].size(); ++i)
+      for(SysInt i = 0; i < goods[var].size(); ++i)
         tuple_sum += goods[var][i].size();
       D_ASSERT(tuple_sum == tuples->size());
     }
@@ -266,7 +266,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   int comparetuples(int * t1, int * t2)
   {
-    for(int i = 0; i < arity; i++)
+    for(SysInt i = 0; i < arity; i++)
     {
       if(t1[i] > t2[i])
         return 1;
@@ -288,10 +288,10 @@ struct GACTableConstraint : public AbstractConstraint
       D_ASSERT(_vars.size() == arity);
       current_support=new int*[arity];
       
-      for(int i=0; i<arity; i++)
+      for(SysInt i=0; i<arity; i++)
       {
         current_support[i]= new int[(tuples->dom_size)[i]];
-        for(int j=0; j<(tuples->dom_size)[i]; j++)
+        for(SysInt j=0; j<(tuples->dom_size)[i]; j++)
           current_support[i][j]=-1;
       }
   }
@@ -336,7 +336,7 @@ struct GACTableConstraint : public AbstractConstraint
       // Remember that var gets treated specially, as if its domain is just {val}
       
       bool matchAll=true;
-      for(int valIndex=0; valIndex<arity; valIndex++)
+      for(SysInt valIndex=0; valIndex<arity; valIndex++)
       {
         int curvalue=curtuple.values[valIndex];
         
@@ -370,7 +370,7 @@ struct GACTableConstraint : public AbstractConstraint
       // Remember that var gets treated specially, as if its domain is just {val}
       
       bool matchAll=true;
-      for(int valIndex=0; valIndex<arity; valIndex++)
+      for(SysInt valIndex=0; valIndex<arity; valIndex++)
       {
         int curvalue=curtuple.values[valIndex];
         
@@ -446,7 +446,7 @@ struct GACTableConstraint : public AbstractConstraint
     
     int vars_size = vars.size();
     dt += lit * (vars_size - 1);
-    for(int v = 0; v < vars_size; ++v)
+    for(SysInt v = 0; v < vars_size; ++v)
     {
       if(v != var)
       {
@@ -459,7 +459,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    for(int varIndex = 0; varIndex < vars.size(); ++varIndex) 
+    for(SysInt varIndex = 0; varIndex < vars.size(); ++varIndex) 
     {
       // Propagate variables so they fit inside domains. This is a minor fix
       int tuple_domain_min = (nightingale->tuples->dom_smallest)[varIndex];

@@ -234,7 +234,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    for(int i=0; i<var_array.size(); i++) {
+    for(SysInt i=0; i<var_array.size(); i++) {
         if(var_array[i].isBound() && !var_array[i].isAssigned()) { // isassigned excludes constants.
             cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
         }
@@ -258,14 +258,14 @@ struct ElementConstraintDynamic : public AbstractConstraint
     
     if(getState(stateObj).isFailed()) return;
     
-    for(int i = 0; i < array_size; ++i)
+    for(SysInt i = 0; i < array_size; ++i)
     {
       current_support[i] = initial_result_dom_min-1;        // will be incremented if support sought
       if(indexvar.inDomain(i))
         find_new_support_for_index(i);
     }
     
-    for(int i = 0; i < result_dom_size; ++i)
+    for(SysInt i = 0; i < result_dom_size; ++i)
     {
       current_support[i+array_size] = -1;   // will be incremented if support sought
       if(resultvar.inDomain(i + initial_result_dom_min))
@@ -280,7 +280,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
     dt += var_array.size() * 2 +
       checked_cast<SysInt>((initial_result_dom_max - initial_result_dom_min + 1) * 2);
     
-    // for(int i = initial_result_dom_min; i <= initial_result_dom_max; ++i)
+    // for(SysInt i = initial_result_dom_min; i <= initial_result_dom_max; ++i)
     // {
     // resultvar.addDynamicTrigger(dt, DomainRemoval, i);
     // ++dt;
@@ -392,7 +392,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
       AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<Index>(stateObj, indexvar, r);
       con.push_back(t4);
       
-      for(int i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i<var_array.size(); i++)
       {
           vector<AbstractConstraint*> con2;
           WatchLiteralConstraint<Index>* t=new WatchLiteralConstraint<Index>(stateObj, indexvar, i);

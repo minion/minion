@@ -108,7 +108,7 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    for(int i = 0; i < var_array.size(); i++)
+    for(SysInt i = 0; i < var_array.size(); i++)
       if(v[i] == negs[i])
         return true;
     return false;
@@ -125,7 +125,7 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].inDomain(negs[i]))
       {

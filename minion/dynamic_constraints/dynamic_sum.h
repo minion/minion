@@ -158,7 +158,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     }
     else if(triggers_wanted == 1)      // Then we can propagate 
     {                               // We never even set up triggers
-      for(int i = 0; i < array_size; ++i)
+      for(SysInt i = 0; i < array_size; ++i)
       {
         if(var_array[i].inDomain(1 - VarToCount))
         {
@@ -178,7 +178,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
           // We only look at the elements of vararray that we looked at before
           // Exactly triggers_wanted of them have the val in their domain.
 
-      for(int i = 0; (i < index); ++i)   // remember index was the elts we looked at
+      for(SysInt i = 0; (i < index); ++i)   // remember index was the elts we looked at
       { 
         if(var_array[i].inDomain(1 - VarToCount))
         {
@@ -196,7 +196,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
         }
       }
 
-      for(int i=index; i < array_size; ++i)
+      for(SysInt i=index; i < array_size; ++i)
       {
         unwatched(j) = i;
         ++j;
@@ -261,7 +261,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
 
     DynamicTrigger* dt2 = dynamic_trigger_start();
 
-    for(int z = 0; z < var_sum + 1; ++z)
+    for(SysInt z = 0; z < var_sum + 1; ++z)
     {
       if(dt != dt2)       // that one has just been set the other way
       {
@@ -278,7 +278,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
   {
     D_ASSERT(v_size == var_array.size());
     int count = 0;
-    for(int i = 0; i < v_size; ++i)
+    for(SysInt i = 0; i < v_size; ++i)
       count += (v[i] != VarToCount);
     return count >= var_sum;
   }
@@ -300,7 +300,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     }
     
     int count = 0;
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].inDomain(!VarToCount))
       {
