@@ -1111,7 +1111,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     {
       vector<AnyVarRef> vars;
       vars.reserve(var_array.size());
-      for(unsigned i = 0; i < var_array.size(); ++i)
+      for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
         vars.push_back(var_array[i]);
       return vars;
     }

@@ -1422,9 +1422,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     {
       vector<AnyVarRef> vars;
       vars.reserve(var_array.size());
-      for(unsigned i = 0; i < var_array.size(); ++i)
+      for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
         vars.push_back(var_array[i]);
-      for(unsigned i = 0; i < capacity_array.size(); ++i)
+      for(UnsignedSysInt i = 0; i < capacity_array.size(); ++i)
         vars.push_back(capacity_array[i]);
       return vars;
     }
