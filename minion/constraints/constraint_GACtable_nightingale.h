@@ -22,8 +22,8 @@
 
 struct TupleComparator
 {
-  int significantIndex;
-  int arity;
+  SysInt significantIndex;
+  SysInt arity;
   
   TupleComparator(int i, int a) : significantIndex(i), arity(a)
   { }
@@ -45,11 +45,11 @@ struct TupleComparator
 struct TupleN
 {
   // tuple class for nightingale's
-  int id;  // global array index (can also be used for lex comparison of two tuples.)
+  SysInt id;  // global array index (can also be used for lex comparison of two tuples.)
            // no need for nextPointer
   
-  int * values;
-  int * nextDifferent;    // int index into global array, pointing to the next 
+  SysInt * values;
+  SysInt * nextDifferent;    // int index into global array, pointing to the next 
   
   TupleN(int * _values, int _id, int arity, int* _nD) : 
     id(_id), values(_values), nextDifferent(_nD)
@@ -72,15 +72,15 @@ struct Nightingale
 {
 
  /// Total number of literals in the variables at the start of search.
-  int literal_num;
+  SysInt literal_num;
   
   TupleN * tuplelist;
   TupleN *** tuplelistperlit;
   
-  int ** tuplelistlengths;
+  SysInt ** tuplelistlengths;
 
-  int noTuples;
-  int arity;
+  SysInt noTuples;
+  SysInt arity;
 
   TupleList* tuples;
   Nightingale(TupleList* _tuples) : tuples(_tuples)
@@ -100,9 +100,9 @@ struct Nightingale
       
       for(SysInt i = 0; i < arity; i++)
       {
-        int varmin = (tuples->dom_smallest)[i];
-        int varmax = (tuples->dom_smallest)[i] + (tuples->dom_size)[i];
-        int domsize = (tuples->dom_size)[i];
+        SysInt varmin = (tuples->dom_smallest)[i];
+        SysInt varmax = (tuples->dom_smallest)[i] + (tuples->dom_size)[i];
+        SysInt domsize = (tuples->dom_size)[i];
         tuplelistperlit[i]=new TupleN*[domsize];
         tuplelistlengths[i]=new int[domsize];
         
@@ -153,7 +153,7 @@ struct Nightingale
       tlist[tupleIndex] = TupleN(_values, tupleIndex, arity,
                                  mem_block + arity * (tupleIndex * 2 + 1) );
       // Now iterate backwards through the tuplelist, setting the appropriate forward pointers
-      int numproc=arity;
+      SysInt numproc=arity;
       
       // check how many are the same for the last tuple.
       if(tupleIndex>=1)
@@ -203,7 +203,7 @@ struct Nightingale
   
   void splittuples(TupleList* tuples, vector<vector<vector<vector<DomainInt> > > >& goods)
   {
-    int arity = tuples->tuple_size();   
+    SysInt arity = tuples->tuple_size();   
     goods.resize(arity);
     for(SysInt var = 0; var < arity; var++)
     {
@@ -218,7 +218,7 @@ struct Nightingale
         }
       }
       
-      int tuple_sum = 0;
+      SysInt tuple_sum = 0;
       for(SysInt i = 0; i < goods[var].size(); ++i)
         tuple_sum += goods[var][i].size();
       D_ASSERT(tuple_sum == tuples->size());
@@ -241,7 +241,7 @@ struct GACTableConstraint : public AbstractConstraint
   /// For each literal, the number of the tuple that supports it.
   // This is bad because it might have holes in it, i.e. revints that are not used.
   
-  int ** current_support;
+  SysInt ** current_support;
 
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
   bool check_tuple(const vector<DomainInt>& v)
@@ -264,7 +264,7 @@ struct GACTableConstraint : public AbstractConstraint
     return true;
   }
   
-  int comparetuples(int * t1, int * t2)
+  SysInt comparetuples(int * t1, int * t2)
   {
     for(SysInt i = 0; i < arity; i++)
     {
@@ -276,7 +276,7 @@ struct GACTableConstraint : public AbstractConstraint
     return 0;
   }
 
-  int arity;
+  SysInt arity;
   
   Nightingale* nightingale;
   
@@ -305,19 +305,19 @@ struct GACTableConstraint : public AbstractConstraint
     // and is after the support in watches unless we reach the end and wrap.
     // Else return null.
     
-    int domain_min = (nightingale->tuples->dom_smallest)[var];
-    int domain_max = domain_min + (nightingale->tuples->dom_size)[var];
+    SysInt domain_min = (nightingale->tuples->dom_smallest)[var];
+    SysInt domain_max = domain_min + (nightingale->tuples->dom_size)[var];
     if(val >= domain_max)
       return 0;
-    int ltp = current_support[var][val-domain_min];  // watches must be indexed by the actual value.
+    SysInt ltp = current_support[var][val-domain_min];  // watches must be indexed by the actual value.
     
-    int index = ltp; 
+    SysInt index = ltp; 
     if(index == -1)
       index=0;
     
     // select the list to search through.
     TupleN * tuplelisthere;
-    int listlength;
+    SysInt listlength;
     if(listperliteral){
       tuplelisthere=nightingale->tuplelistperlit[var][val-domain_min];
       listlength=nightingale->tuplelistlengths[var][val-domain_min];
@@ -338,7 +338,7 @@ struct GACTableConstraint : public AbstractConstraint
       bool matchAll=true;
       for(SysInt valIndex=0; valIndex<arity; valIndex++)
       {
-        int curvalue=curtuple.values[valIndex];
+        SysInt curvalue=curtuple.values[valIndex];
         
         if( (valIndex!=var && !vars[valIndex].inDomain(curvalue)) || 
             (valIndex==var && curvalue!=val))
@@ -372,7 +372,7 @@ struct GACTableConstraint : public AbstractConstraint
       bool matchAll=true;
       for(SysInt valIndex=0; valIndex<arity; valIndex++)
       {
-        int curvalue=curtuple.values[valIndex];
+        SysInt curvalue=curtuple.values[valIndex];
         
         if( (valIndex!=var && !vars[valIndex].inDomain(curvalue)) || 
             (valIndex==var && curvalue!=val))
@@ -400,8 +400,8 @@ struct GACTableConstraint : public AbstractConstraint
   bool find_new_support(int literal)
   {
      pair<DomainInt, DomainInt> varval = nightingale->tuples->get_varval_from_literal(literal);
-     int var = varval.first;
-     int val = varval.second;
+     SysInt var = varval.first;
+     SysInt val = varval.second;
      TupleN* new_support = seekNextSupport(var,val);
            
      if (new_support == 0)
@@ -414,14 +414,14 @@ struct GACTableConstraint : public AbstractConstraint
   {
     PROP_INFO_ADDONE(DynGACTable);
     DynamicTrigger* dt = dynamic_trigger_start();
-    int trigger_pos = propagated_trig - dt;
-    int propagated_literal = trigger_pos / (vars.size() - 1);
+    SysInt trigger_pos = propagated_trig - dt;
+    SysInt propagated_literal = trigger_pos / (vars.size() - 1);
     
     BOOL is_new_support = find_new_support(propagated_literal);
     
     pair<DomainInt, DomainInt> varval = nightingale->tuples->get_varval_from_literal(propagated_literal);
-    int varIndex = varval.first;
-    int val = varval.second;
+    SysInt varIndex = varval.first;
+    SysInt val = varval.second;
     
     if(is_new_support)
     {
@@ -435,7 +435,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   void setup_watches(int var, int val, int lit)
   {
-    int domain_min = (nightingale->tuples->dom_smallest)[var];
+    SysInt domain_min = (nightingale->tuples->dom_smallest)[var];
     int* tuple;
     if(!listperliteral)
       tuple=nightingale->tuplelist[current_support[var][val-domain_min]].values;
@@ -444,7 +444,7 @@ struct GACTableConstraint : public AbstractConstraint
     
     DynamicTrigger* dt = dynamic_trigger_start();
     
-    int vars_size = vars.size();
+    SysInt vars_size = vars.size();
     dt += lit * (vars_size - 1);
     for(SysInt v = 0; v < vars_size; ++v)
     {
@@ -462,8 +462,8 @@ struct GACTableConstraint : public AbstractConstraint
     for(SysInt varIndex = 0; varIndex < vars.size(); ++varIndex) 
     {
       // Propagate variables so they fit inside domains. This is a minor fix
-      int tuple_domain_min = (nightingale->tuples->dom_smallest)[varIndex];
-      int tuple_domain_size = (nightingale->tuples->dom_size)[varIndex];
+      SysInt tuple_domain_min = (nightingale->tuples->dom_smallest)[varIndex];
+      SysInt tuple_domain_size = (nightingale->tuples->dom_size)[varIndex];
       
       vars[varIndex].setMin(tuple_domain_min);
       vars[varIndex].setMax(tuple_domain_min + tuple_domain_size);
@@ -477,7 +477,7 @@ struct GACTableConstraint : public AbstractConstraint
       { 
         TupleN* _tuple=seekNextSupport(varIndex, i);
         
-        int sup=current_support[varIndex][i - tuple_domain_min];
+        SysInt sup=current_support[varIndex][i - tuple_domain_min];
         //cout <<sup<<endl;
         // cout << "    var " << varIndex << " val: " << i << " sup " << sup << " " << endl;
         if(_tuple==0)

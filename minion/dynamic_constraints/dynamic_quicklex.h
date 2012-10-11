@@ -114,8 +114,8 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   
   void progress()
   {
-    int a = alpha;
-    int n = var_array1.size();
+    SysInt a = alpha;
+    SysInt n = var_array1.size();
     D_ASSERT(var_array1[a].isAssigned());
     D_ASSERT(var_array2[a].isAssigned());
     D_ASSERT(var_array1[a].getAssignedValue() == var_array2[a].getAssignedValue());
@@ -163,7 +163,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     
     P("Trigger Event:" << dt - base_dt << " alpha:" << (int)alpha);
 
-    int a = alpha;
+    SysInt a = alpha;
 
     if(base_dt == dt)
     { // X triggered

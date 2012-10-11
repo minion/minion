@@ -156,7 +156,7 @@ struct VarNeg
   Var getBaseVar() const { return data.getBaseVar(); }
 
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()

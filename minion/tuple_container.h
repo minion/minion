@@ -209,7 +209,7 @@ public:
   TupleList* getTupleList(DomainInt num)
   { return Internal_TupleList[checked_cast<SysInt>(num)]; }
 
-  int size()
+  SysInt size()
   { return Internal_TupleList.size(); }
 };
 

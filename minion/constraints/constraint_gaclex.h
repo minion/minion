@@ -138,14 +138,14 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   {
     triggerCollection t;
 
-    int x_size = x.size();
+    SysInt x_size = x.size();
     for(SysInt i=0; i < x_size; ++i)
     {
       t.push_back(make_trigger(x[i], Trigger(this, i), LowerBound));
       t.push_back(make_trigger(x[i], Trigger(this, i), UpperBound));
     }
 
-    int y_size = y.size();
+    SysInt y_size = y.size();
     for(SysInt i=0; i < y_size; ++i)
     {
       t.push_back(make_trigger(y[i], Trigger(this, i), LowerBound));
@@ -166,7 +166,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   }
 
   void updateAlpha(int i) {
-    int n = x.size();
+    SysInt n = x.size();
     if(Less)
     {
       if(i == n || i == beta)
@@ -200,7 +200,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   ///////////////////////////////////////////////////////////////////////////////
   // updateBeta()
   void updateBeta(int i) {
-    int a = alpha ;
+    SysInt a = alpha ;
     while (i >= a) {
       if (x[i].getMin() < y[i].getMax()) {
         beta = i+1 ;
@@ -221,7 +221,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     {
       return ;
     }
-    int a = alpha, b = beta;
+    SysInt a = alpha, b = beta;
 
     //Not sure why we need this, but we seem to.
     if(b <= a)
@@ -355,10 +355,10 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
 
   virtual BOOL check_unsat(int unsat_val, DomainDelta)
   {
-    int a = alpha;
+    SysInt a = alpha;
     if(unsat_val >= a)
     {
-      int x_size = x.size();
+      SysInt x_size = x.size();
       for(SysInt i = a; i < x_size; ++i)
       {
         DomainInt xval = x[i].getMin();
@@ -405,7 +405,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     }
     else
     {
-      int n = x.size() ;
+      SysInt n = x.size() ;
       if (i == n-1) return (x[i].getMax() <= y[i].getMin()) ;
       else return (x[i].getMax() < y[i].getMin());
     }
@@ -413,7 +413,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
 
   virtual void full_propagate()
   {
-    int i, n = x.size() ;
+    SysInt i, n = x.size() ;
     for (i = 0; i < n; i++) {
       if (!x[i].isAssigned()) break ;    
       if (!y[i].isAssigned()) break ;
@@ -425,7 +425,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
         F = true ;
         return ;
       }
-      int betaBound = -1 ;
+      SysInt betaBound = -1 ;
       for (; i < n; i++) {
         if (x[i].getMin() > y[i].getMax()) break ;
         if (x[i].getMin() == y[i].getMax()) {

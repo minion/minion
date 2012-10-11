@@ -32,7 +32,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
   VarRef2 y;
   VarRef3 z;
   
-  int xmult, ymult;
+  SysInt xmult, ymult;
 
   SumEqConstraintDynamic(StateObj* _stateObj, int _xmult, int _ymult, VarRef1 _x, VarRef2 _y, VarRef3 _z) :
     AbstractConstraint(stateObj), xmult(_xmult), ymult(_ymult), x(_x), y(_y), z(_z), vals(-1)
@@ -45,7 +45,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 
   }
 
-  int vals;
+  SysInt vals;
   
   virtual SysInt dynamic_trigger_count() //need two watched literals per value in each var (one per support) 
   {
@@ -134,10 +134,10 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 
   //a little data structure we maintain per WL
   struct WLdata {
-    int other; //sequence number of the other WL helping to support the varval
-    int isForX : 1; //the supported var
-    int isForY : 1; //NB. the supported val is stored using dt->trigger_info()
-    int isForZ : 1;
+    SysInt other; //sequence number of the other WL helping to support the varval
+    SysInt isForX : 1; //the supported var
+    SysInt isForY : 1; //NB. the supported val is stored using dt->trigger_info()
+    SysInt isForZ : 1;
   };
 
   //a mapping from WL number to struct of data
@@ -152,9 +152,9 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     //start placing WLs in the right places
     DynamicTrigger* dt = dynamic_trigger_start();  
 
-    int index = 0;
+    SysInt index = 0;
     WLdata workingData;
-    int supp[2] = {0, 0};
+    SysInt supp[2] = {0, 0};
 
     wlToData.reserve(dynamic_trigger_count());
 
@@ -226,14 +226,14 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 
   virtual void propagate(DynamicTrigger* dt)
   {
-    int value = dt->trigger_info(); //the value formerly supported by dt
+    SysInt value = dt->trigger_info(); //the value formerly supported by dt
     DynamicTrigger* dts = dynamic_trigger_start();
-    int wl_no = dt - dts; //sequence number of WL
+    SysInt wl_no = dt - dts; //sequence number of WL
     WLdata data = wlToData[wl_no];
     if(!(data.isForX ? x.inDomain(value) :
      (data.isForY ? y.inDomain(value) : z.inDomain(value))))
       return;
-    int supp[2] = {0, 0};
+    SysInt supp[2] = {0, 0};
     DynamicTrigger* first_dt = (dt < dts + data.other) ? dt : dt - 1;
     if(data.isForX) {
       if(!get_diffsupport(z, y, ymult, value*xmult, supp)) {

@@ -260,13 +260,13 @@ public:
       return unsatcounter;   // return tightness i.e. #forbidden tuples out of 1000
   }
 
-  int getTightnessEstimateVarVal(const size_t var, const DomainInt val)
+  SysInt getTightnessEstimateVarVal(const size_t var, const DomainInt val)
   {
       // Make 100 random tuples and see if they satisfy the constraint
       vector<AnyVarRef> vars=get_vars();
       DomainInt* t=new DomainInt[vars.size()];
       t[var] = val; //fix specified component
-      int unsatcounter=0;
+      SysInt unsatcounter=0;
       srand(12345);
       for(SysInt i=0; i<100; i++)
       {

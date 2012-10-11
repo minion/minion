@@ -260,13 +260,13 @@ public:
   bool split;
 
   // The format of output used (-1 for default)
-  int outputType;
+  SysInt outputType;
   
   /// Disable the use of linux timers
   bool noTimers;
   
-  int Xvarmunge;
-  int Xsymmunge;
+  SysInt Xvarmunge;
+  SysInt Xsymmunge;
 
 
 

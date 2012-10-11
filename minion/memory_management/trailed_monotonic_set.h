@@ -58,14 +58,14 @@ public:
   value_type& array(DomainInt i)
   { 
     D_ASSERT( i >= 0 && i < size());
-    int val = checked_cast<SysInt>(i);
+    SysInt val = checked_cast<SysInt>(i);
     return static_cast<value_type*>(_array.get_ptr())[val]; 
   }
   
   const value_type& array(DomainInt i) const
   { 
     D_ASSERT( i >= 0 && i < size() && _array.get_ptr() != NULL);
-    int val = checked_cast<SysInt>(i);
+    SysInt val = checked_cast<SysInt>(i);
     return static_cast<const value_type*>(_array.get_ptr())[val]; 
   }
 

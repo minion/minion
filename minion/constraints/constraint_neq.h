@@ -67,7 +67,7 @@ struct NeqConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i)
       t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
     return t;
@@ -126,7 +126,7 @@ struct NeqConstraint : public AbstractConstraint
   
   virtual BOOL check_unsat(int i, DomainDelta)
   {
-    int v_size = var_array.size();
+    SysInt v_size = var_array.size();
     D_ASSERT(var_array[i].isAssigned());
     DomainInt assign_val = var_array[i].getAssignedValue();
     for(SysInt loop = 0; loop < v_size; ++loop)
@@ -144,7 +144,7 @@ struct NeqConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i)
       if(var_array[i].isAssigned())
       {

@@ -53,7 +53,7 @@ struct ConcreteFileReader
   string get_string()
   {
     char buffer[1000];
-    int pos = 0;
+    SysInt pos = 0;
     char next_char = get_char();
     while(isalnum(next_char) || next_char == '_')
     {

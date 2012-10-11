@@ -58,7 +58,7 @@ struct SearchManager
   shared_ptr<VariableOrder> var_order;
   
   bool hasauxvars;   // Has a VARORDER AUX
-  int topauxvar;  // lowest index of an aux var.
+  SysInt topauxvar;  // lowest index of an aux var.
   
   shared_ptr<Propagate> prop;  // Propagate is the type of the base class. Method prop->prop(stateObj, var_array)
   
@@ -66,7 +66,7 @@ struct SearchManager
   //vector<DomainInt> first_unassigned_variable;
   
   UnsignedSysInt depth; //number of left branches
-  int ceiling; // index into branches, it is the lowest LB which has been stolen.
+  SysInt ceiling; // index into branches, it is the lowest LB which has been stolen.
   
   SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array,
                 vector<SearchOrder> _order, shared_ptr<VariableOrder> _var_order,
@@ -104,7 +104,7 @@ struct SearchManager
     inline bool finished_search()
     { return depth == 0; }
     
-    int search_depth()
+    SysInt search_depth()
     { return depth; }
     
     // returns false if left branch not possible.
@@ -132,7 +132,7 @@ struct SearchManager
             return false;
         }
         
-        int var = branches.back().var;
+        SysInt var = branches.back().var;
         DomainInt val = branches.back().val;
         
         // remove the left branch.

@@ -66,9 +66,9 @@ struct CheckAssignConstraint : public AbstractConstraint
   virtual BOOL check_unsat(int,DomainDelta)
   {
   
-    int count = assigned_vars;
+    SysInt count = assigned_vars;
     ++count;
-    int v_size = variables.size();
+    SysInt v_size = variables.size();
     D_ASSERT(count <= v_size);
 
     if(count == v_size)

@@ -80,9 +80,9 @@ void print_instance(const ConstraintBlob& blob)
   oss << blob.constraint->name;
   oss << "(";
 
-  int var_pos = 0;
-  int const_pos = 0;
-  int constraint_child_pos = 0;
+  SysInt var_pos = 0;
+  SysInt const_pos = 0;
+  SysInt constraint_child_pos = 0;
 
   for(SysInt i = 0; i < blob.constraint->number_of_params; i++)
   {
@@ -197,7 +197,7 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
   }
 
   // Bounds.
-  int bound_sum = 0;
+  SysInt bound_sum = 0;
   for(SysInt x = 0; x < vars.bound.size(); ++x)
   {
     for(SysInt i = 0; i < vars.bound[x].first; ++i)
@@ -211,7 +211,7 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
 
   // Sparse Bounds.
 
-  int sparse_bound_sum = 0;
+  SysInt sparse_bound_sum = 0;
   for(SysInt x = 0; x < vars.sparse_bound.size(); ++x)
   {
     for(SysInt i = 0; i < vars.sparse_bound[x].first; ++i)
@@ -226,7 +226,7 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
   }
 
   // Bounds.
-  int discrete_sum = 0;
+  SysInt discrete_sum = 0;
   for(SysInt x = 0; x < vars.discrete.size(); ++x)
   {
     for(SysInt i = 0; i < vars.discrete[x].first; ++i)
@@ -282,7 +282,7 @@ void print_search_info(const vector<Var>& var_vec )
     vector<Var> var_order = csp.search_order[i].var_order;
     vector<ValOrderEnum> val_order = csp.search_order[i].val_order;
 
-    int pos = 0;
+    SysInt pos = 0;
     while(pos < var_order.size())
     {
       if(vars.count(var_order[pos]) == 0)

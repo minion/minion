@@ -27,7 +27,7 @@ namespace Controller
     template<typename VarOrder, typename Variables, typename Permutation, typename Propogator>
     void group_solve_loop(StateObj* stateObj, function<void (void)> next_search, VarOrder& original_order, Variables& v, Permutation& perm, Propogator prop = PropagateGAC())
     {
-      int sol_count = 0;
+      SysInt sol_count = 0;
       for(SysInt i = 0; i < perm.size(); ++i)
       {
         perm[i].setMin(1);
@@ -42,7 +42,7 @@ namespace Controller
       {
         for(SysInt j = i + 2; j <= perm.size(); ++j)
         {
-          int world_depth = get_world_depth(stateObj);
+          SysInt world_depth = get_world_depth(stateObj);
           world_push(stateObj);
           for(SysInt k = 0; k < i; ++k)
             perm[k].propagateAssign(k+1);

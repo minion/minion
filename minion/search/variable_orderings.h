@@ -121,7 +121,7 @@ struct MultiBranch : public VariableOrder
     
     pair<SysInt, DomainInt> pickVarVal()
     {
-        int pos2=pos;
+        SysInt pos2=pos;
         
         pair<SysInt, DomainInt> t=vovector[pos2]->pickVarVal();
         while(t.first==-1)   
@@ -182,8 +182,8 @@ struct SDFBranch : public VariableOrder
     pair<int, DomainInt> pickVarVal()
     {
         //cout << "In pickVarVal for SDF (approximation)" <<endl;
-        int length = var_order.size();
-        int smallest_dom = -1;
+        SysInt length = var_order.size();
+        SysInt smallest_dom = -1;
         DomainInt dom_size = DomainInt_Max;
         
         for(SysInt i = 0; i < length; ++i)
@@ -251,8 +251,8 @@ struct WdegBranch : public VariableOrder
     
     pair<int, DomainInt> pickVarVal()
     {
-    int best = var_order.size(); //the variable with the best score so far (init to none)
-    int best_score = -1; //... and its score (all true scores are positive)
+    SysInt best = var_order.size(); //the variable with the best score so far (init to none)
+    SysInt best_score = -1; //... and its score (all true scores are positive)
     size_t var_order_size = var_order.size();
     for(size_t i = 0; i < var_order_size; i++) { //we will find the score for each var
       //cout << "i=" << i << endl;
@@ -263,7 +263,7 @@ struct WdegBranch : public VariableOrder
         //cout << "assigned -- stop" << endl;
         continue;
       }
-      int base_wdeg = v.getBaseWdeg();
+      SysInt base_wdeg = v.getBaseWdeg();
       //cout << "basewdeg=" << base_wdeg << endl;
       if(base_wdeg <= best_score) {
         //cout << "too low before deductions" << endl;
@@ -276,7 +276,7 @@ struct WdegBranch : public VariableOrder
         //cout << "con wdeg=" << c->getWdeg() << endl;
         vector<AnyVarRef>* c_vars = c->get_vars_singleton();
         size_t c_vars_size = c_vars->size();
-        int uninst = 0;
+        SysInt uninst = 0;
         for(size_t k = 0; k < c_vars_size; k++) 
           if(!(*c_vars)[k].isAssigned())
             if(++uninst > 1) { //when multiple unassigned we needn't deduct
@@ -323,7 +323,7 @@ struct DomOverWdegBranch : VariableOrder
     pair<int, DomainInt> pickVarVal()
     {
     //cout << "using domoverwdeg" << endl;
-    int best = var_order.size(); //the variable with the best score so far (init to none)
+    SysInt best = var_order.size(); //the variable with the best score so far (init to none)
     float best_score = FLT_MAX; //... and its score (all true scores are positive)
     size_t var_order_size = var_order.size();
     bool anyUnassigned = false;
@@ -341,8 +341,8 @@ struct DomOverWdegBranch : VariableOrder
         best = i;
         anyUnassigned = true;
       }
-      int dom_size_approx = v.getMax() - v.getMin() + 1;
-      int base_wdeg = v.getBaseWdeg();
+      SysInt dom_size_approx = v.getMax() - v.getMin() + 1;
+      SysInt base_wdeg = v.getBaseWdeg();
       //cout << "basewdeg=" << base_wdeg << endl;
       if((float)dom_size_approx/base_wdeg >= best_score) {
         //cout << "too high before deductions" << endl;
@@ -355,7 +355,7 @@ struct DomOverWdegBranch : VariableOrder
         //cout << "con wdeg=" << c->getWdeg() << endl;
         vector<AnyVarRef>* c_vars = c->get_vars_singleton();
         size_t c_vars_size = c_vars->size();
-        int uninst = 0;
+        SysInt uninst = 0;
         for(size_t k = 0; k < c_vars_size; k++) 
           if(!(*c_vars)[k].isAssigned())
             if(++uninst > 1) { //when multiple unassigned we needn't deduct
@@ -406,8 +406,8 @@ struct SRFBranch : VariableOrder
     
     pair<int, DomainInt> pickVarVal()
     {
-    int length = var_order.size();
-    int smallest_dom = length;
+    SysInt length = var_order.size();
+    SysInt smallest_dom = length;
     
     float ratio = 2;
     
@@ -448,9 +448,9 @@ struct LDFBranch : VariableOrder
     
     pair<int, DomainInt> pickVarVal()
     {
-    int length = var_order.size();
+    SysInt length = var_order.size();
     
-    int pos = 0;
+    SysInt pos = 0;
     while(pos < length && var_order[pos].isAssigned())
       ++pos;
     if(pos == length)
@@ -458,7 +458,7 @@ struct LDFBranch : VariableOrder
         return make_pair(-1, 0);
     }
     
-    int largest_dom = pos;
+    SysInt largest_dom = pos;
     DomainInt dom_size = var_order[pos].getMax() - var_order[pos].getMin();
     
     ++pos;
@@ -506,9 +506,9 @@ struct ConflictBranch : VariableOrder
     
     // pos and pos2 are used to see if we have backtracked.
     
-    int pos2;
+    SysInt pos2;
     
-    int last_returned_var;
+    SysInt last_returned_var;
     bool in_conflict;
     
     pair<int, DomainInt> pickVarVal()

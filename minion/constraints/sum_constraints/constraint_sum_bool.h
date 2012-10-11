@@ -52,7 +52,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     
     count = 0;    
     
@@ -83,7 +83,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
   
   void limit_reached()
   {
-    int one_vars = 0;
+    SysInt one_vars = 0;
     typename VarArray::value_type* it = &*var_array.begin();
     typename VarArray::value_type* end_it = it + var_array.size();
     for(; it < end_it; ++it)
@@ -103,7 +103,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     PROP_INFO_ADDONE(BoolSum);
     D_ASSERT(var_array[checked_cast<SysInt>(i)].getAssignedValue() == 0 ||
              var_array[checked_cast<SysInt>(i)].getAssignedValue() == 1);
-    int c = count + 1;
+    SysInt c = count + 1;
     count = c;
     if(c == occ_count())
       limit_reached();
@@ -111,8 +111,8 @@ struct BoolLessSumConstraint : public AbstractConstraint
   
   virtual BOOL full_check_unsat()
   {
-    int occs = 0;
-    int array_size = var_array.size();
+    SysInt occs = 0;
+    SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i)
       if(var_array[i].isAssignedValue(VarToCount))
         occs++;
@@ -124,7 +124,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
   
   virtual BOOL check_unsat(int, DomainDelta)
   {
-    int i = count + 1;
+    SysInt i = count + 1;
     count = i;
     if(i > occ_count())
       return true;
@@ -134,8 +134,8 @@ struct BoolLessSumConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    int occs = 0;
-    int array_size = var_array.size();
+    SysInt occs = 0;
+    SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i)
       if(var_array[i].isAssignedValue(VarToCount))
         occs++;
@@ -161,8 +161,8 @@ struct BoolLessSumConstraint : public AbstractConstraint
   // TODO : Optimise for booleans
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    int sum_value = 0;
-    int v_size = var_array.size();
+    SysInt sum_value = 0;
+    SysInt v_size = var_array.size();
     if(VarToCount)
     {
       for(SysInt i = 0; i < v_size; ++i)
@@ -194,9 +194,9 @@ struct BoolLessSumConstraint : public AbstractConstraint
     else
       sum_limit = var_sum;
 
-    int ValToFind = 1 - VarToCount;
+    SysInt ValToFind = 1 - VarToCount;
 
-    int val_count = 0;
+    SysInt val_count = 0;
     
     for(SysInt i = 0; i < v_size && val_count < sum_limit; ++i)
     {

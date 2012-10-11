@@ -220,10 +220,10 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
 
   // unfinished new stuff starts here.
 
-  int watch_unassigned_in_vector(int avoidindex, int oldsupport, DynamicTrigger* dt)
+  SysInt watch_unassigned_in_vector(int avoidindex, int oldsupport, DynamicTrigger* dt)
   {
       // move dt to an index other than avoidindex, or return -1.
-      int newsupport=oldsupport+1;
+      SysInt newsupport=oldsupport+1;
       for( ; newsupport<var_array.size(); newsupport++)
       {
           if(newsupport!=avoidindex)
@@ -250,13 +250,13 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       return -1;
   }
 
-  int trigger1index;
-  int trigger2index;
+  SysInt trigger1index;
+  SysInt trigger2index;
 
   void vector_assigned()
   {
       // count occurrences of val
-      int occ=0;
+      SysInt occ=0;
       for(SysInt i=0; i<var_array.size(); i++)
       {
           if(var_array[i].getAssignedValue()==value)
@@ -428,7 +428,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   void not_occurrence_limit_reached()
   {
     D_ASSERT(not_occurrences_count >= checked_cast<SysInt>(var_array.size() - val_count_min));
-    int occs = 0;
+    SysInt occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for( typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
     {
@@ -470,8 +470,8 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
 
   void setup_counters()
   {
-    int occs = 0;
-      int not_occs = 0;
+    SysInt occs = 0;
+      SysInt not_occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for(typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
     {
@@ -603,7 +603,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   void occurrence_limit_reached()
   {
     D_ASSERT(val_count.getMax() <= occurrences_count);
-    int occs = 0;
+    SysInt occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for(typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
     {
@@ -623,7 +623,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   void not_occurrence_limit_reached()
   {
     D_ASSERT(not_occurrences_count >= static_cast<int>(var_array.size()) - val_count.getMin());
-    int occs = 0;
+    SysInt occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for( typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
     {
@@ -668,8 +668,8 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
 
   void setup_counters()
   {
-    int occs = 0;
-    int not_occs = 0;
+    SysInt occs = 0;
+    SysInt not_occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for(typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
     {

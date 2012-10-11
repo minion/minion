@@ -84,7 +84,7 @@ class BoolContainer
 {
   StateObj* stateObj;
   MoveablePointer backtrack_ptr;
-  int offset;
+  SysInt offset;
 public:
   BoolContainer(StateObj* _stateObj) : stateObj(_stateObj), offset(sizeof(int)*8)
   {}

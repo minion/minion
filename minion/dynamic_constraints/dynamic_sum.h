@@ -173,7 +173,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     {
       D_ASSERT(triggers_wanted == 0);
 
-      int j = 0;
+      SysInt j = 0;
 
           // We only look at the elements of vararray that we looked at before
           // Exactly triggers_wanted of them have the val in their domain.
@@ -221,15 +221,15 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
   {
     PROP_INFO_ADDONE(DynSum);
     D_ASSERT(check_consistency());
-    int propval = dt->trigger_info();
+    SysInt propval = dt->trigger_info();
     D_ASSERT(var_array[propval].getAssignedValue() == VarToCount);
   // should generalise
   // and will need to loop round for watched lits
 
     bool found_new_support = false;
 
-    int loop;
-    int j;
+    SysInt loop;
+    SysInt j;
 
     for(loop = 0 ; (!found_new_support) && loop < num_unwatched ; ++loop )
     {
@@ -277,7 +277,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
-    int count = 0;
+    SysInt count = 0;
     for(SysInt i = 0; i < v_size; ++i)
       count += (v[i] != VarToCount);
     return count >= var_sum;
@@ -299,7 +299,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
       return true;
     }
     
-    int count = 0;
+    SysInt count = 0;
     for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].inDomain(!VarToCount))

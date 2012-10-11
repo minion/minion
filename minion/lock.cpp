@@ -28,7 +28,7 @@ void lock(StateObj* stateObj)
 {  
   getVars(stateObj).lock();
   
-  int size = getState(stateObj).getConstraintList().size();
+  SysInt size = getState(stateObj).getConstraintList().size();
   for(SysInt i = 0 ; i < size;i++)
   getState(stateObj).getConstraintList()[i]->setup();
   

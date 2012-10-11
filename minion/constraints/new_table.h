@@ -173,8 +173,8 @@ public:
   template<typename VarArray>
   vector<DomainInt>* findSupportingTuple(const VarArray& vars, Literal lit)
   {
-    int tuple_size = data->getVarCount();
-    int length = data->getNumOfTuples();
+    SysInt tuple_size = data->getVarCount();
+    SysInt length = data->getNumOfTuples();
     int* tuple_data = data->getPointer();
 
     for(SysInt i = 0; i < length; ++i)
@@ -241,8 +241,8 @@ struct NewTableConstraint : public AbstractConstraint
     PROP_INFO_ADDONE(DynGACTable);
 
     DynamicTrigger* dt = dynamic_trigger_start();
-    int trigger_pos = propagated_trig - dt;
-    int propagated_literal = trigger_pos / (vars.size() - 1);
+    SysInt trigger_pos = propagated_trig - dt;
+    SysInt propagated_literal = trigger_pos / (vars.size() - 1);
 
     Literal lit = data->getLiteralFromPos(propagated_literal);
 
@@ -291,7 +291,7 @@ struct NewTableConstraint : public AbstractConstraint
   {
     DynamicTrigger* dt = dynamic_trigger_start();
     D_ASSERT(data->getLiteralPos(lit) == lit_pos);
-    int vars_size = vars.size();
+    SysInt vars_size = vars.size();
     dt += lit_pos * (vars_size - 1);
     for(SysInt v = 0; v < vars_size; ++v)
     {

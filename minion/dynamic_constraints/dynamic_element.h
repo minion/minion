@@ -105,7 +105,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
   
   virtual SysInt dynamic_trigger_count()
   {
-    int count = var_array.size() * 2 + 
+    SysInt count = var_array.size() * 2 + 
     checked_cast<SysInt>(initial_result_dom_max - initial_result_dom_min + 1) * 2 
     + 1 
     + 1; 
@@ -120,7 +120,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
     if(!resultvar.inDomain(realj))
       return;
     
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     
     // support is value of index
     DomainInt oldsupport = max(current_support[j + array_size], indexvar.getMin());  // old support probably just removed
@@ -208,7 +208,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
   void deal_with_assigned_index()
   {
     D_ASSERT(indexvar.isAssigned());
-    int indexval = checked_cast<SysInt>(indexvar.getAssignedValue());
+    SysInt indexval = checked_cast<SysInt>(indexvar.getAssignedValue());
     VarRef& var = var_array[indexval];
     
     DomainInt lower = resultvar.getMin(); 
@@ -244,7 +244,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
         cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
     }
     
-    int array_size = var_array.size(); 
+    SysInt array_size = var_array.size(); 
     DomainInt result_dom_size = initial_result_dom_max - initial_result_dom_min + 1;
     
     // Setup SupportLostForIndexValue(i,j)

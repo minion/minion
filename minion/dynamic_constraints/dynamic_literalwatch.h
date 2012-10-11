@@ -67,7 +67,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   LiteralSumConstraintDynamic(StateObj* _stateObj,const VarArray& _var_array, ValueArray _val_array, VarSum _var_sum) :
     AbstractConstraint(_stateObj), var_array(_var_array), value_array(_val_array), var_sum(_var_sum)
   {   
-      int array_size = var_array.size();
+      SysInt array_size = var_array.size();
       
       num_unwatched = array_size - var_sum - 1 ;
       if(num_unwatched < 0)
@@ -129,7 +129,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
     {
       D_ASSERT(triggers_wanted == 0);
       
-      int j = 0;
+      SysInt j = 0;
       
       // We only look at the elements of vararray that we looked at before
       // Exactly triggers_wanted of them have the val in their domain.
@@ -174,7 +174,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   {
     PROP_INFO_ADDONE(DynLitWatch);
     D_ASSERT(check_consistency());
-    int propval = dt->trigger_info();
+    SysInt propval = dt->trigger_info();
 
     D_ASSERT(!var_array[propval].inDomain(value_array[propval]));
     
@@ -230,7 +230,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
-    int count = 0;
+    SysInt count = 0;
     for(SysInt i = 0; i < v_size; ++i)
       count += (v[i] == value_array[i]);
     return count >= var_sum;
@@ -248,7 +248,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
       if(var_sum<=0) return true;
-      int lit_match_count = 0;
+      SysInt lit_match_count = 0;
       
     for(SysInt i = 0; i < var_array.size(); ++i)
     {

@@ -155,7 +155,7 @@ template<typename FileReader>
 BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reified) {
   string id = infile->getline('(');
   
-  int constraint_num = -1;
+  SysInt constraint_num = -1;
   for(SysInt i = 0; i < num_of_constraints; ++i)
   {
     if(constraint_list[i].name == id)
@@ -299,9 +299,9 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
   parser_info( "reading a table ct (unreifiable)" ) ;
   
   char delim = ' ';
-  int count;
+  SysInt count;
   vector<Var> vectorOfVars(readVectorExpression(infile)) ;
-  int tupleSize = vectorOfVars.size() ;
+  SysInt tupleSize = vectorOfVars.size() ;
   
   infile->check_sym(',');
   
@@ -668,7 +668,7 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
   
 
   parser_info("No order generated, auto-generating complete order");
-  int var_count = 0;
+  SysInt var_count = 0;
   var_count += instance->vars.BOOLs;
   for(UnsignedSysInt i = 0; i < instance->vars.bound.size(); ++i)
     var_count += instance->vars.bound[i].first;
@@ -817,8 +817,8 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 vector<Var> MinionInputReader<FileReader>::readVectorExpression(FileReader* infile) {
-  int row, col, plane ;
-  int input_val;
+  SysInt row, col, plane ;
+  SysInt input_val;
   char idChar = infile->get_char();
   switch (idChar) {
     case '[':

@@ -75,7 +75,7 @@ template<typename Var>
     // If we are in here, we have a bounds variable.
     D_ASSERT(var.isBound());
     //lower loop
-    int lower_index = 0;
+    SysInt lower_index = 0;
     
     while(lower_index < (int)vals.size() && vals[lower_index] <= var.getMin())
     {
@@ -83,7 +83,7 @@ template<typename Var>
       lower_index++;
     }
     
-    int upper_index = vals.size() - 1;
+    SysInt upper_index = vals.size() - 1;
     
     while(upper_index > 0 && vals[upper_index] >= var.getMax())
     {

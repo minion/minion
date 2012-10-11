@@ -227,7 +227,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     }
     
     DynamicTrigger* dt = dynamic_trigger_start();
-    int dt_count = dynamic_trigger_count();
+    SysInt dt_count = dynamic_trigger_count();
     // Clean up triggers
     for(SysInt i = 0; i < dt_count; ++i)
         releaseTrigger(stateObj, dt);

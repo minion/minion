@@ -53,7 +53,7 @@ partition_graph(const tuple<int,vector<set<int> >,vector<set<int> > >& graph_tup
 {
   std::vector<std::set<int> > graph;
   std::vector<std::set<int> > partition;
-  int blank;
+  SysInt blank;
   tie(blank, graph, partition) = graph_tuple;
 
   std::vector<SysInt> partition_num(graph.size());
@@ -64,17 +64,17 @@ partition_graph(const tuple<int,vector<set<int> >,vector<set<int> > >& graph_tup
       partition_num[*it] = i;
   }
 
-  int partition_count = 0;
+  SysInt partition_count = 0;
   bool done = false;
   while(!done)
   {
-    int new_partition_count= repartition(graph, partition_num);
+    SysInt new_partition_count= repartition(graph, partition_num);
     if(partition_count == new_partition_count)
       done = true;
     partition_count = new_partition_count;
   }
 
-  int diff_count = 0;
+  SysInt diff_count = 0;
   for(SysInt i = 0; i < partition_num.size(); ++i)
     for(SysInt j = 0; j < partition_num.size(); ++j)
       if(partition_num[i] != partition_num[j])
@@ -90,7 +90,7 @@ struct Graph
   set<pair<Name, Name> > graph;
   map<Name, set<Colour> > aux_vertex_colour;
   map<Name, set<Colour> > var_vertex_colour;
-  int free_vertices;
+  SysInt free_vertices;
   
   Graph() : free_vertices(0) { }
     
@@ -146,7 +146,7 @@ struct Graph
 
      map<string, int> v_num;
 
-     int var_vertex_count = 0, aux_vertex_count = 0;
+     SysInt var_vertex_count = 0, aux_vertex_count = 0;
      for(map<string, set<string> >::iterator it = var_vertex_colour.begin(); it != var_vertex_colour.end(); ++it)  
        var_vertex_count += it->second.size();
 
@@ -163,7 +163,7 @@ struct Graph
        }
      if(print_names)
        cout << "];" << endl;
-     int vertex_counter = v_num.size() + 1;
+     SysInt vertex_counter = v_num.size() + 1;
 
      // Now output partitions
 
@@ -210,8 +210,8 @@ struct Graph
        //cout << it->first << ":" << it->second << endl;
        D_ASSERT(v_num.count(it->first) == 1);
        D_ASSERT(v_num.count(it->second) == 1);
-       int first_v = v_num[it->first];
-       int second_v = v_num[it->second];
+       SysInt first_v = v_num[it->first];
+       SysInt second_v = v_num[it->second];
        D_ASSERT(first_v != 0 && second_v != 0 && first_v != second_v);
        edges[first_v].insert(second_v);
      }
@@ -221,7 +221,7 @@ struct Graph
 
    void output_nauty_graph(CSPInstance& csp)
    {
-     int var_vertex_count;
+     SysInt var_vertex_count;
      vector<set<int> > edges;
      vector<set<int> > partitions;
 
@@ -928,7 +928,7 @@ struct InstanceStats
       string s("stats_"); // common prefix
       // Variables statistics
       VarContainer& v=csp.vars;
-      int varcount=v.BOOLs+v.bound.size()+v.sparse_bound.size()+v.discrete.size();
+      SysInt varcount=v.BOOLs+v.bound.size()+v.sparse_bound.size()+v.discrete.size();
       cout << s << "varcount:" << varcount <<endl;
       cout << s << "var_bool:" <<v.BOOLs <<endl;
       cout << s << "var_discrete:" << v.discrete.size() << endl;
@@ -957,13 +957,13 @@ struct InstanceStats
       SysInt totaldom=checked_cast<SysInt>(std::accumulate(domsizes.begin(), domsizes.end(), (DomainInt)0));
       cout << s << "dom_mean:" << ((double)totaldom)/(double) domsizes.size() << endl;
       
-      int num2s= std::count(domsizes.begin(), domsizes.end(), (DomainInt)2);
+      SysInt num2s= std::count(domsizes.begin(), domsizes.end(), (DomainInt)2);
       cout << s << "dom_not2_2_ratio:" << ((double) (varcount-num2s) )/(double)num2s << endl;
       
       cout << s << "discrete_bool_ratio:" << ((double) v.discrete.size())/(double)v.BOOLs <<endl;
       
-      int branchingvars=0;
-      int auxvars=0;
+      SysInt branchingvars=0;
+      SysInt auxvars=0;
       for(SysInt i=0; i<csp.search_order.size(); i++)
       {
           if(csp.search_order[i].find_one_assignment)
@@ -1007,8 +1007,8 @@ struct InstanceStats
       vector<double> alldiffdomovervars;
       
       // six categories of constraint, output their proportion and count
-      int alldiff=0, sums=0, or_atleastk=0, ternary=0, binary=0, table=0; 
-      int reify=0, lex=0, unary=0, nullary=0, element=0, minmax=0, occurrence=0;
+      SysInt alldiff=0, sums=0, or_atleastk=0, ternary=0, binary=0, table=0; 
+      SysInt reify=0, lex=0, unary=0, nullary=0, element=0, minmax=0, occurrence=0;
       for(list<ConstraintBlob>::iterator i=c.begin(); i!=c.end(); ++i)
       {
           classifyConstraint(*i, &alldiff, &sums, &or_atleastk, &ternary, &binary, &table, &reify, &lex, &unary, &nullary, &element, &minmax, &occurrence, &alldiffdomovervars, v);
@@ -1059,7 +1059,7 @@ struct InstanceStats
       
       // Count the number of pairs of constraints that overlap by two or more
       // variables.
-      int count_2_overlaps=0;
+      SysInt count_2_overlaps=0;
       
       vector<vector<Var> > var_sets;
       
@@ -1085,7 +1085,7 @@ struct InstanceStats
           }
       }
       
-      int conspairs=((double)(c.size()*(c.size()-1)))/2.0;
+      SysInt conspairs=((double)(c.size()*(c.size()-1)))/2.0;
      
       double proportion = 0;
       if(conspairs >0)
@@ -1095,10 +1095,10 @@ struct InstanceStats
       
       // Edge density of primal graph
       std::set<pair<Var, Var> > seen_pairs;
-      int count_pairs=0;
+      SysInt count_pairs=0;
       for(SysInt i = 0; i < var_sets.size(); ++i) 
       {
-          int size=var_sets[i].size();
+          SysInt size=var_sets[i].size();
           for(SysInt j = 0; j < size; ++j)
           {
               for(SysInt k=j+1; k<size; ++k)
@@ -1182,7 +1182,7 @@ struct InstanceStats
       cout << s << "literal_coeff_of_variation:" << st_dev / lt_mean << endl;
   }
   
-  int arity(ConstraintBlob& ct)
+  SysInt arity(ConstraintBlob& ct)
   {
       return find_all_vars(ct).size();
   }

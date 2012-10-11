@@ -118,7 +118,7 @@ struct ConstantVar
   Var getBaseVar() const { return Var(VAR_CONSTANT, val); }
 
 #ifdef WDEG
-  int getBaseWdeg() { return 0; } //wdeg is irrelevant for non-search var
+  SysInt getBaseWdeg() { return 0; } //wdeg is irrelevant for non-search var
 
   void incWdeg() { ; }
 #endif

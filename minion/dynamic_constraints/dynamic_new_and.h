@@ -67,7 +67,7 @@ struct Dynamic_AND : public ParentConstraint
 
     
   bool constraint_locked;
-  int propagated_to;
+  SysInt propagated_to;
   Dynamic_AND(StateObj* _stateObj, vector<AbstractConstraint*> _con) : 
     ParentConstraint(_stateObj, _con), constraint_locked(false)
     { }

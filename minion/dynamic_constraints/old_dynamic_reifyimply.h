@@ -80,7 +80,7 @@ struct Dynamic_reify_true_old: public AbstractConstraint
 
         poscon->setup();
         DynamicTrigger* start = poscon->dynamic_trigger_start();
-        int trigs = poscon->dynamic_trigger_count();
+        SysInt trigs = poscon->dynamic_trigger_count();
 
         for (int i = 0; i < trigs; ++i)
             (start + i)->constraint = this;

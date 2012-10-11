@@ -33,8 +33,8 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   VarArray var_array;
   vector<DomainInt> negs; //negs[i]==0 iff var_array[i] is negated, NB. this
             //is also the value that must be watched
-  int watched[2];
-  int last;
+  SysInt watched[2];
+  SysInt last;
 
   BoolOrConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array,
                    const vector<DomainInt>& _negs) :

@@ -189,7 +189,7 @@ struct InfoRefType
   }
 
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getBaseWdeg);
     return data.getBaseWdeg(); 

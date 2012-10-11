@@ -92,7 +92,7 @@ struct reify : public ParentConstraint
   { return "Reify:" + child_constraints[0]->constraint_name(); }
 
   BoolVar reify_var;
-  int reify_var_num;
+  SysInt reify_var_num;
 
   bool constraint_locked;
   Reversible<bool> full_propagate_called;
@@ -101,8 +101,8 @@ struct reify : public ParentConstraint
   unsigned long long reifysetnode;
   #endif
 
-  int dtcount;
-  int c0vars;  // how many vars for child_constraints[0]
+  SysInt dtcount;
+  SysInt c0vars;  // how many vars for child_constraints[0]
 
   typedef vector<vector<pair<DomainInt, DomainInt> > > triggerpairstype;
   D_DATA(triggerpairstype triggerpairs);
@@ -426,7 +426,7 @@ struct reify : public ParentConstraint
       P("Pass triggers to children");
       D_ASSERT(reify_var.isAssigned());
 
-      int child=getChildDynamicTrigger(trig);
+      SysInt child=getChildDynamicTrigger(trig);
       if(reify_var.getAssignedValue() == child)
       {
           P("Removing leftover trigger from other child constraint");
@@ -473,7 +473,7 @@ struct reify : public ParentConstraint
       }
     }
     // put the triggers into triggerpairs to check later.
-    int cid=((trig==dynamic_trigger_start())?0:1);
+    SysInt cid=((trig==dynamic_trigger_start())?0:1);
     triggerpairs[cid].clear();
     for(SysInt i=0; i<assignment.size(); i++)
     {

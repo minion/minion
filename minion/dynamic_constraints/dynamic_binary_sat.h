@@ -71,7 +71,7 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
   virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(Dyn2SAT);
-    int propval = dt->trigger_info();
+    SysInt propval = dt->trigger_info();
     
     if(propval)
       var1.propagateAssign(true);

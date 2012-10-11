@@ -425,7 +425,7 @@ struct SparseBoundVarContainer {
   { return Var(VAR_SPARSEBOUND, b.var_num); }
 
 #ifdef WDEG
-  int getBaseWdeg(const SparseBoundVarRef_internal<BoundType>& b)
+  SysInt getBaseWdeg(const SparseBoundVarRef_internal<BoundType>& b)
   { return wdegs[b.var_num]; }
 
   void incWdeg(const SparseBoundVarRef_internal<BoundType>& b)
@@ -449,7 +449,7 @@ struct SparseBoundVarContainer {
   {
     D_ASSERT(lock_m);
     stringstream s;
-    int char_count = 0;
+    SysInt char_count = 0;
     for(UnsignedSysInt i=0;i<var_count_m;i++)
     {
       if(!isAssigned(SparseBoundVarRef_internal<BoundType>(i)))

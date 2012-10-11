@@ -22,7 +22,7 @@ template<typename Container>
 bool increment_vector(Container& vals, const Container& maxvals)
 {
   bool carry = true;
-  int position = vals.size() - 1;
+  SysInt position = vals.size() - 1;
   while(position >= 0 && carry == true)
   {
     D_ASSERT(maxvals[position] != 0);

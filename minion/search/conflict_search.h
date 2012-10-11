@@ -30,7 +30,7 @@ namespace Controller
   inline void conflict_solve_loop(StateObj* stateObj, function<void (void)> next_search, VarOrder& order, Variables& v, Propogator prop = PropagateGAC())
   {
     maybe_print_search_state(stateObj, "Node: ", v);
-    int last_conflict_var = -1;
+    SysInt last_conflict_var = -1;
     while(true)
     {
       getState(stateObj).incrementNodeCount();

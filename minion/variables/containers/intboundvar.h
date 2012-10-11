@@ -161,7 +161,7 @@ struct BoundVarRef_internal
   Var getBaseVar() const { return Var(VAR_BOUND, var_num); }
   
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return GET_LOCAL_CON().getBaseWdeg(*this); }
 
   void incWdeg()
@@ -439,7 +439,7 @@ struct BoundVarContainer {
   }
 
 #ifdef WDEG
-  int getBaseWdeg(const BoundVarRef_internal<BoundType>& b)
+  SysInt getBaseWdeg(const BoundVarRef_internal<BoundType>& b)
   { return wdegs[checked_cast<SysInt>(b.var_num)]; }
 
   void incWdeg(const BoundVarRef_internal<BoundType>& b)
@@ -463,7 +463,7 @@ struct BoundVarContainer {
   {
     D_ASSERT(lock_m);
     stringstream s;
-    int char_count = 0;
+    SysInt char_count = 0;
     for(UnsignedSysInt i=0;i<var_count_m;i++)
     {
       if(!isAssigned(BoundVarRef_internal<BoundType>(i)))

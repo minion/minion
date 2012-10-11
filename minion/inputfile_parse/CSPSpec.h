@@ -87,7 +87,7 @@ struct ConstraintDef
 {
   std::string name;
   ConstraintType type;
-  int number_of_params;
+  SysInt number_of_params;
   array<ReadTypes,4> read_types;
 };
 
@@ -332,7 +332,7 @@ struct ConstraintBlob
       return make_pair(Bound_No, dom);
     case VAR_BOUND:
       {
-        int bound_size = 0;
+        SysInt bound_size = 0;
         for(UnsignedSysInt x = 0; x < bound.size(); ++x)
         {
           bound_size += bound[x].first;
@@ -347,7 +347,7 @@ struct ConstraintBlob
       }
     case VAR_SPARSEBOUND:
       {
-        int sparse_bound_size = 0;
+        SysInt sparse_bound_size = 0;
         for(UnsignedSysInt x=0;x<sparse_bound.size();++x)
         {
           sparse_bound_size += sparse_bound[x].first;
@@ -358,7 +358,7 @@ struct ConstraintBlob
       }
     case VAR_DISCRETE:
     {
-      int discrete_size = 0;
+      SysInt discrete_size = 0;
       for(UnsignedSysInt x = 0; x < discrete.size(); ++x)
       {
         discrete_size += discrete[x].first;
@@ -373,7 +373,7 @@ struct ConstraintBlob
     }
     case VAR_SPARSEDISCRETE:
     {
-      int sparse_discrete_size = 0;
+      SysInt sparse_discrete_size = 0;
       for(UnsignedSysInt x = 0; x < sparse_discrete.size(); ++x)
       {
         sparse_discrete_size += sparse_discrete[x].first;
@@ -398,7 +398,7 @@ struct ConstraintBlob
       return Bounds(0,1);
     case VAR_BOUND:
       {
-        int bound_size = 0;
+        SysInt bound_size = 0;
         for(UnsignedSysInt x = 0; x < bound.size(); ++x)
         {
           bound_size += bound[x].first;
@@ -410,7 +410,7 @@ struct ConstraintBlob
 
     case VAR_SPARSEBOUND:
       {
-        int sparse_bound_size = 0;
+        SysInt sparse_bound_size = 0;
         for(UnsignedSysInt x=0;x<sparse_bound.size();++x)
         {
           sparse_bound_size += sparse_bound[x].first;
@@ -421,7 +421,7 @@ struct ConstraintBlob
       }
     case VAR_DISCRETE:
     {
-      int discrete_size = 0;
+      SysInt discrete_size = 0;
       for(UnsignedSysInt x = 0; x < discrete.size(); ++x)
       {
         discrete_size += discrete[x].first;
@@ -432,7 +432,7 @@ struct ConstraintBlob
     }
     case VAR_SPARSEDISCRETE:
     {
-      int sparse_discrete_size = 0;
+      SysInt sparse_discrete_size = 0;
       for(UnsignedSysInt x = 0; x < sparse_discrete.size(); ++x)
       {
         sparse_discrete_size += sparse_discrete[x].first;
@@ -453,7 +453,7 @@ struct ConstraintBlob
       return Var(VAR_BOOL, i);
     i -= BOOLs;
     {
-      int bound_size = 0;
+      SysInt bound_size = 0;
       for(UnsignedSysInt x = 0; x < bound.size(); ++x)
         bound_size += bound[x].first;
       if(i < bound_size)
@@ -461,7 +461,7 @@ struct ConstraintBlob
       i -= bound_size;
     }
     {
-      int sparse_bound_size = 0;
+      SysInt sparse_bound_size = 0;
       for(UnsignedSysInt x=0;x<sparse_bound.size();++x)
         sparse_bound_size += sparse_bound[x].first;
       if(i < sparse_bound_size)
@@ -470,7 +470,7 @@ struct ConstraintBlob
     }
 
     {
-      int discrete_size = 0;
+      SysInt discrete_size = 0;
       for(UnsignedSysInt x=0;x<discrete.size();++x)
         discrete_size += discrete[x].first;
       if(i < discrete_size)
@@ -478,7 +478,7 @@ struct ConstraintBlob
       i -= discrete_size;
     }
     {
-      int sparse_discrete_size = 0;
+      SysInt sparse_discrete_size = 0;
       for(UnsignedSysInt x=0;x<sparse_discrete.size();++x)
         sparse_discrete_size += sparse_discrete[x].first;
       if(i < sparse_discrete_size)
@@ -533,7 +533,7 @@ struct ConstraintBlob
 
   vector<Var> get_all_vars() const
   {
-    int total_var_count = 0;
+    SysInt total_var_count = 0;
     total_var_count += BOOLs;
 
     for(UnsignedSysInt x = 0; x < bound.size(); ++x)
@@ -678,7 +678,7 @@ public:
   {
     if(table_nametable.count(tuplelist) != 0)
       throw parse_exception("Unnamed Tuplelist double registered!");
-    int pos = table_symboltable.size();
+    SysInt pos = table_symboltable.size();
     while( table_symboltable.count("_Unnamed__" + pos) != 0)
       pos++;
 

@@ -153,7 +153,7 @@ struct MinConstraint : public AbstractConstraint
     
   virtual void full_propagate()
   {
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     if(array_size == 0)
     {
       getState(stateObj).setFailed(true);

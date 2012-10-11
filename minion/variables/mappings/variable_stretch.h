@@ -77,10 +77,10 @@ struct MultiplyHelp<BoolVarRef>
 #if 0
 struct TrivialMapData
 {
-  int multiply()
+  SysInt multiply()
     { return 1 };
     
-  int shift()
+  SysInt shift()
     { return 1 };
     
   static BoundType ;
@@ -241,7 +241,7 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
   { return VarIdent(stretchT, Multiply, data.getIdent()); }
 
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()
@@ -440,7 +440,7 @@ struct MultiplyVar
   Var getBaseVar() const { return data.getBaseVar(); }
 
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()

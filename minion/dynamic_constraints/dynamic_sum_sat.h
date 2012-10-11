@@ -30,7 +30,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
   
   VarArray var_array;
 
-  int last;
+  SysInt last;
   
   BoolSATConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array) :
     AbstractConstraint(_stateObj), var_array(_var_array)
@@ -50,9 +50,9 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
   {
     DynamicTrigger* dt = dynamic_trigger_start();
     
-    int array_size = var_array.size(); 
-    int trig1, trig2;
-    int index = 0;
+    SysInt array_size = var_array.size(); 
+    SysInt trig1, trig2;
+    SysInt index = 0;
     
     while(index < array_size && !var_array[index].inDomain(1))
       ++index;
@@ -92,10 +92,10 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
   virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(DynSumSat);
-    int var_size = var_array.size();
+    SysInt var_size = var_array.size();
     
     DynamicTrigger* base_dt = dynamic_trigger_start();
-    int other_propval;
+    SysInt other_propval;
     
     if(base_dt == dt)
       other_propval = (base_dt + 1)->trigger_info();
@@ -109,7 +109,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
 
     bool found_new_support = false;
 
-    int loop = last;
+    SysInt loop = last;
     
     while(loop < var_size && !found_new_support)
     {
@@ -148,7 +148,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
-    int count = 0;
+    SysInt count = 0;
     for(SysInt i = 0; i < v_size; ++i)
       count += (v[i] == 1);
     return count > 0;

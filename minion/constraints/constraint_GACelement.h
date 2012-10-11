@@ -53,7 +53,7 @@ struct GACElementConstraint : public AbstractConstraint
     if(var_array.empty())
       return t;
       
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     DomainInt min_val = var_array[0].getInitialMin();
     DomainInt max_val = var_array[0].getInitialMax();
     for(SysInt i = 1; i < array_size; ++i)
@@ -81,8 +81,8 @@ struct GACElementConstraint : public AbstractConstraint
   
   void index_assigned()
   {
-    int index = checked_cast<SysInt>(indexvar.getAssignedValue());
-    int array_size = var_array.size();
+    SysInt index = checked_cast<SysInt>(indexvar.getAssignedValue());
+    SysInt array_size = var_array.size();
     
     if(index < 0 || index >= array_size)
     {
@@ -105,7 +105,7 @@ struct GACElementConstraint : public AbstractConstraint
   
   BOOL support_for_val_in_result(DomainInt val)
   {
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i)
     {
       if(indexvar.inDomain(i) && var_array[i].inDomain(val))
@@ -116,7 +116,7 @@ struct GACElementConstraint : public AbstractConstraint
   
   BOOL support_for_val_in_index(DomainInt dom_index)
   {
-    int index = checked_cast<SysInt>(dom_index);
+    SysInt index = checked_cast<SysInt>(dom_index);
     DomainInt min_val = max(var_array[index].getMin(), resultvar.getMin());
     DomainInt max_val = min(var_array[index].getMax(), resultvar.getMax());
     for(DomainInt i = min_val; i <= max_val; ++i)
@@ -200,7 +200,7 @@ struct GACElementConstraint : public AbstractConstraint
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    int length = v_size;
+    SysInt length = v_size;
     if(v[length-2] < 0 ||
        v[length-2] > length - 3)
       return false;

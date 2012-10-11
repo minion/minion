@@ -43,7 +43,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
   const vector<Var>& vars = b.vars[pos];
   
   // type needs to be something for empty arrays
-  int type = VAR_CONSTANT;
+  SysInt type = VAR_CONSTANT;
   bool same_type = true;
   // Suppress unused warning
   (void)same_type;

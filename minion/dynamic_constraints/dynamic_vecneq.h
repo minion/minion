@@ -386,8 +386,8 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   {
     P("VecNeq full prop");
     DynamicTrigger* dt = dynamic_trigger_start();
-    int size = var_array1.size();
-    int index = 0;
+    SysInt size = var_array1.size();
+    SysInt index = 0;
 
     // Find first pair we could watch.
     while(index < size && no_support_for_index(index))
@@ -441,15 +441,15 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     else
     { P("Watching " << watched_index0 << "," << watched_index1); }
 
-    int trigger_activated = dt - dynamic_trigger_start();
-    int triggerpair = trigger_activated / 2;
+    SysInt trigger_activated = dt - dynamic_trigger_start();
+    SysInt triggerpair = trigger_activated / 2;
     D_ASSERT(triggerpair == 0 || triggerpair == 1);
     // Var arrays are numbered 1 and 2
-    int triggerarray = (trigger_activated % 2) + 1;
+    SysInt triggerarray = (trigger_activated % 2) + 1;
     D_ASSERT(triggerarray == 1 || triggerarray == 2);
 
-    int original_index;
-    int other_index;
+    SysInt original_index;
+    SysInt other_index;
 
     if(triggerpair == 0)
     { 
@@ -483,9 +483,9 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     if(!no_support_for_index(original_index))
       return;
 
-    int index = original_index + 1;
+    SysInt index = original_index + 1;
 
-    int size = var_array1.size();
+    SysInt size = var_array1.size();
 
     while( (index < size && no_support_for_index(index) ) || index == other_index )
       ++index;

@@ -222,7 +222,7 @@ struct BoolVarContainer
     D_ASSERT(!lock_m);
     var_count_m = bool_count;
 
-    int required_mem = var_count_m / 8 + 1;
+    SysInt required_mem = var_count_m / 8 + 1;
     // Round up to nearest data_type block
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
     assign_offset = getMemory(stateObj).backTrack().request_bytes(required_mem);
@@ -370,7 +370,7 @@ struct BoolVarContainer
   }
 
 #ifdef WDEG
-  int getBaseWdeg(const BoolVarRef_internal& b)
+  SysInt getBaseWdeg(const BoolVarRef_internal& b)
   { return wdegs[b.var_num]; }
 
   void incWdeg(const BoolVarRef_internal& b)

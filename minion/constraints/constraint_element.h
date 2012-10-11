@@ -133,7 +133,7 @@ struct ElementConstraint : public AbstractConstraint
     PROP_INFO_ADDONE(NonGACElement);
     if(index_ref.isAssigned())
     {
-      int index = checked_cast<SysInt>(index_ref.getAssignedValue());
+      SysInt index = checked_cast<SysInt>(index_ref.getAssignedValue());
       if(index < 0 || index >= (int)var_array.size())
       {
         getState(stateObj).setFailed(true);
@@ -169,7 +169,7 @@ struct ElementConstraint : public AbstractConstraint
       {
         D_ASSERT(prop_val == -2);
         DomainInt assigned_val = result_var.getAssignedValue();
-        int array_size = var_array.size();
+        SysInt array_size = var_array.size();
         for(SysInt i = 0; i < array_size; ++i)
         {
           if(index_ref.inDomain(i) && !var_array[i].inDomain(assigned_val)) // fixed here.
@@ -193,7 +193,7 @@ struct ElementConstraint : public AbstractConstraint
   {
     if(index_ref.isAssigned())
     {
-      int index = checked_cast<SysInt>(index_ref.getAssignedValue());
+      SysInt index = checked_cast<SysInt>(index_ref.getAssignedValue());
       if(index < 0 || index >= (int)var_array.size())
       {
         getState(stateObj).setFailed(true);
@@ -207,7 +207,7 @@ struct ElementConstraint : public AbstractConstraint
       var_array[index].setMax(val_max);
     }
     
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     // Constrain the index variable to have only indices in range.
     if(index_ref.getMin()<0)
     {
@@ -335,7 +335,7 @@ struct ElementConstraint : public AbstractConstraint
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    int length = v_size;
+    SysInt length = v_size;
     if(v[length-2] < 0 || v[length-2] > length - 3)
       return false;
     return v[checked_cast<SysInt>(v[length-2])] == v[length-1];

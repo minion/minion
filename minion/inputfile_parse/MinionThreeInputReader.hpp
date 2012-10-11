@@ -484,7 +484,7 @@ template<typename FileReader>
 ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reified) {
   string id = infile->getline('(');
 
-  int constraint_num = -1;
+  SysInt constraint_num = -1;
   for(SysInt i = 0; i < num_of_constraints; ++i)
   {
     if(constraint_list[i].name == id)
@@ -647,7 +647,7 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
     infile->check_sym('{');
     char delim = infile->peek_char();
     
-    int tupleSize = 0;
+    SysInt tupleSize = 0;
     
     while (delim != '}') 
     {

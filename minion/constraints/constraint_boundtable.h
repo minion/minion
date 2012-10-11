@@ -71,7 +71,7 @@ struct BoundsTableConstraint : public AbstractConstraint
     PROP_INFO_ADDONE(BoundTable);
     for(UnsignedSysInt check_var = 0; check_var < vars.size(); check_var++)
     {
-      int check_dom;
+      SysInt check_dom;
       //cerr << vars[check_var].data.var_num << vars[check_var].getMin() << "```" << vars[check_var].getMax() << vars[check_var].inDomain(0) <<  endl;
       for(check_dom = vars[check_var].getMin();
           check_dom <= vars[check_var].getMax(); check_dom++)

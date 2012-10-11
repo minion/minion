@@ -114,7 +114,7 @@ struct VarRefType
   { return GET_CONTAINER().getBaseVar(data); }
 
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return GET_CONTAINER().getBaseWdeg(data); }
 
   void incWdeg()
@@ -221,7 +221,7 @@ struct QuickVarRefType
   { return data.getBaseVar(); }
 
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return GET_CONTAINER().getBaseWdeg(data); }
 
   void incWdeg()

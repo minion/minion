@@ -77,13 +77,13 @@ class RandomAccessPriorityQ {
     pair<Data, size_t>& init_data_pos = mapping.find(init_k)->second;
     size_t heap_s = heap.size();
     while(true) {
-      int left = left(pos);
+      SysInt left = left(pos);
       if(left >= heap_s) //no children
     break;
       else { //left child at least
         Key left_k = heap[left];
         pair<Data, size_t>& left_data_pos = mapping.find(left_k)->second;
-        int right = right(pos);
+        SysInt right = right(pos);
         if(right >= heap_s) { //no right child
           if(init_data_pos.first < left_data_pos.first) { //but left child is larger
             heap[pos] = left_k; //so swap the left child and current around and then stop
@@ -234,7 +234,7 @@ RandomAccessPriorityQ<UnsignedSysInt, int> test(stateObj);
   
   cout << test.heap << endl;
   
-  int nums[] = {6,11,21,2,1,29,30,5,13,12,14,17,20,22,3,4,25,26,10,23,28,18,16,7,27,9,8,15,19,24};
+  SysInt nums[] = {6,11,21,2,1,29,30,5,13,12,14,17,20,22,3,4,25,26,10,23,28,18,16,7,27,9,8,15,19,24};
   for(SysInt j = 0; j < 30; j++) {
   test.getData(test.getMax().first) = -nums[j];
   test.fixOrder();

@@ -84,7 +84,7 @@ public:
   }
   
   /// Returns the current number of stored copies of the state.
-  int current_depth()
+  SysInt current_depth()
   { return backtrack_data.size(); }
 
   ~BackTrackMemory()

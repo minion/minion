@@ -409,7 +409,7 @@ void munge_container(Con& con, int type)
     case 2:
     {
       Con con2;
-      int size = con.size();
+      SysInt size = con.size();
       if(size%2==1)
       {
         size--;

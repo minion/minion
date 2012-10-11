@@ -61,7 +61,7 @@ struct Check_Assign : public AbstractConstraint
   virtual void propagate(DynamicTrigger*)
   {
     DynamicTrigger* dt = dynamic_trigger_start();
-    int size = child->get_vars_singleton()->size();
+    SysInt size = child->get_vars_singleton()->size();
     vector<AnyVarRef>* vars = child->get_vars_singleton();
     
     for(SysInt i = 0; i < size; ++i)

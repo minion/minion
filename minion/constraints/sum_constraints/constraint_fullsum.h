@@ -90,7 +90,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
   {
     triggerCollection t;
     
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i)
     {
       t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
@@ -209,7 +209,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
   {
     P("GSA");
     DomainInt sum_value = 0;
-    int v_size = var_array.size();
+    SysInt v_size = var_array.size();
     
     if(no_negatives)   // How are the two cases different? They look identical.
     {

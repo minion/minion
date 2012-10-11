@@ -242,7 +242,7 @@ namespace Controller
     printer.build_instance(false);
     string inst(printer.getInstance());
 
-    int i = 0;
+    SysInt i = 0;
     for(vector<string>::iterator s = splits.begin(); s != splits.end(); s++) {
         string basename = getOptions(stateObj).instance_name;
         size_t mpos = basename.find(".minion");

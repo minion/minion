@@ -47,9 +47,9 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   {
     DynamicTrigger* dt = dynamic_trigger_start();
     
-    int array_size = var_array.size(); 
-    int trig1, trig2;
-    int index = 0;
+    SysInt array_size = var_array.size(); 
+    SysInt trig1, trig2;
+    SysInt index = 0;
     
     while(index < array_size && !var_array[index].inDomain(1))
       ++index;
@@ -101,11 +101,11 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(Dyn3SAT);
-    int propval = dt->trigger_info();
+    SysInt propval = dt->trigger_info();
     //int var_size = var_array.size();
     
     DynamicTrigger* base_dt = dynamic_trigger_start();
-    int other_propval;
+    SysInt other_propval;
     
     if(base_dt == dt)
       other_propval = (base_dt + 1)->trigger_info();
@@ -113,7 +113,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
       other_propval = base_dt->trigger_info();
     
 
-    int unchecked_val = other_val(propval, other_propval);
+    SysInt unchecked_val = other_val(propval, other_propval);
     
     if(var_array[unchecked_val].inDomain(1))
     {
@@ -128,7 +128,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
-    int count = 0;
+    SysInt count = 0;
     for(SysInt i = 0; i < v_size; ++i)
       count += (v[i] == 1);
     return count > 0;

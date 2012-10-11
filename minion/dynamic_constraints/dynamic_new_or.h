@@ -57,11 +57,11 @@ struct Dynamic_OR : public ParentConstraint
   Reversible<bool> full_propagate_called;
   bool constraint_locked;
 
-  int assign_size;
+  SysInt assign_size;
 
-  int propagated_constraint;
+  SysInt propagated_constraint;
 
-  int watched_constraint[2];
+  SysInt watched_constraint[2];
 
   Dynamic_OR(StateObj* _stateObj, vector<AbstractConstraint*> _con) :
     ParentConstraint(_stateObj, _con), full_propagate_called(_stateObj, false), constraint_locked(false),
@@ -175,8 +175,8 @@ struct Dynamic_OR : public ParentConstraint
       if(full_propagate_called)
         return;
 
-      int tripped_constraint = (trig - dt) / assign_size;
-      int other_constraint = 1 - tripped_constraint;
+      SysInt tripped_constraint = (trig - dt) / assign_size;
+      SysInt other_constraint = 1 - tripped_constraint;
       P("Tripped: " << tripped_constraint << ":" << watched_constraint[tripped_constraint]);
       D_ASSERT(tripped_constraint == 0 || tripped_constraint == 1);
 
@@ -194,8 +194,8 @@ struct Dynamic_OR : public ParentConstraint
 
       const size_t cons_s = child_constraints.size();
 
-      int loop_start = watched_constraint[tripped_constraint] + 1;
-      int skip_pos = watched_constraint[other_constraint];
+      SysInt loop_start = watched_constraint[tripped_constraint] + 1;
+      SysInt skip_pos = watched_constraint[other_constraint];
 
       for(SysInt i = loop_start; i < cons_s; ++i)
       {

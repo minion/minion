@@ -44,7 +44,7 @@ public:
     
     bool fail_flag;
     
-    int get_raw_pos()
+    SysInt get_raw_pos()
     { return stream_pos - stream_start; }
         
     void reset_stream()
@@ -105,7 +105,7 @@ public:
     
     void getline(char* buf, int buf_length, char deliminator = '\n')
     {
-        int length = std::min((int)buf_length, (int)(stream_end - stream_pos));
+        SysInt length = std::min((int)buf_length, (int)(stream_end - stream_pos));
         P(length << ":");
         for(SysInt i = 0; i < length; ++i)
         {
@@ -128,7 +128,7 @@ public:
 template<typename T>
 void operator>>(CheapStream& cs, T& ret)
 {
-    int neg_flag = 1;
+    SysInt neg_flag = 1;
     
     long long i = 1;
     long long limit = std::numeric_limits<SysInt>::max() / 2;

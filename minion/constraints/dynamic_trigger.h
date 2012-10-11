@@ -35,7 +35,7 @@ public:
   /// The constraint to be triggered.
   AbstractConstraint* constraint;
   /// A small space for constraints to store trigger-specific information.
-  int _trigger_info;
+  SysInt _trigger_info;
 
   DynamicTrigger* prev;
   DynamicTrigger* next;
