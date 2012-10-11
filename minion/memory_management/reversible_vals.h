@@ -86,15 +86,15 @@ class BoolContainer
   MoveablePointer backtrack_ptr;
   SysInt offset;
 public:
-  BoolContainer(StateObj* _stateObj) : stateObj(_stateObj), offset(sizeof(int)*8)
+  BoolContainer(StateObj* _stateObj) : stateObj(_stateObj), offset(sizeof(SysInt)*8)
   {}
   
   pair<MoveablePointer, UnsignedSysInt> returnBacktrackBool()
   {
-    if(offset == sizeof(int)*8)
+    if(offset == sizeof(SysInt)*8)
     {
       offset = 0;
-      backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(int));
+      backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(SysInt));
     }
     
     pair<MoveablePointer,UnsignedSysInt> ret(backtrack_ptr, ((UnsignedSysInt)1) << offset);

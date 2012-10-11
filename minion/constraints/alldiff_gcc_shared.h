@@ -39,13 +39,13 @@ struct smallset
     // constant time and direct iteration.
     // Add an item is constant time, remove is not.
     
-    unsigned int cert;
+    UnsignedSysInt cert;
     
-    vector<unsigned int> membership;
+    vector<UnsignedSysInt> membership;
     
-    vector<int> list;
+    vector<SysInt> list;
     
-    void reserve(int size)
+    void reserve(SysInt size)
     {
         // This must be called before anything is put in the set.
         D_ASSERT(membership.size()==0);
@@ -54,12 +54,12 @@ struct smallset
         cert=1;
     }
     
-    inline bool in(int val)
+    inline bool in(SysInt val)
     {
         return membership[val]==cert;
     }
     
-    inline void insert(int val)
+    inline void insert(SysInt val)
     {
         D_ASSERT(membership[val]<cert);
         D_ASSERT(val>=0);
@@ -67,12 +67,12 @@ struct smallset
         membership[val]=cert;
     }
     
-    inline int size()
+    inline SysInt size()
     {
         return list.size();
     }
     
-    inline void remove(int val)
+    inline void remove(SysInt val)
     {
         D_DATA(cout << "Warning: smallset::remove is slow and untested." <<endl );
         if(in(val))
@@ -82,7 +82,7 @@ struct smallset
         }
     }
     
-    inline vector<int>& getlist()
+    inline vector<SysInt>& getlist()
     {
         return list;
     }
@@ -117,7 +117,7 @@ struct smallset_nolist
     
     vector<UnsignedSysInt> membership;
     
-    void reserve(int size)
+    void reserve(SysInt size)
     {
         D_ASSERT(membership.size()==0);
         // This must be called before anything is put in the set.
@@ -385,7 +385,7 @@ struct FlowConstraint : public AbstractConstraint
                 adjlistpos[i].resize(numvars);
                 for(SysInt j=0; j<numvars; j++) adjlistpos[i][j]=j;
             }
-            adjlistlength=getMemory(stateObj).backTrack().template requestArray<int>(numvars+numvals);
+            adjlistlength=getMemory(stateObj).backTrack().template requestArray<SysInt>(numvars+numvals);
             for(SysInt i=0; i<numvars; i++) adjlistlength[i]=numvals;
             for(SysInt i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
         }
@@ -394,8 +394,8 @@ struct FlowConstraint : public AbstractConstraint
         varvalmatching.resize(numvars); // maps var to actual value
         valvarmatching.resize(numvals); // maps val-dom_min to var.
         #else
-        varvalmatching=getMemory(stateObj).backTrack().template requestArray<int>(numvars);
-        valvarmatching=getMemory(stateObj).backTrack().template requestArray<int>(numvals);
+        varvalmatching=getMemory(stateObj).backTrack().template requestArray<SysInt>(numvars);
+        valvarmatching=getMemory(stateObj).backTrack().template requestArray<SysInt>(numvals);
         #endif
     }
     
@@ -406,24 +406,24 @@ struct FlowConstraint : public AbstractConstraint
     bool constraint_locked;
     
     #ifndef BTMATCHING
-    vector<int> varvalmatching; // For each var, give the matching value.
+    vector<SysInt> varvalmatching; // For each var, give the matching value.
     // valvarmatching is from val-dom_min to var.
-    vector<int> valvarmatching;   // need to set size somewhere.
+    vector<SysInt> valvarmatching;   // need to set size somewhere.
     // -1 means unmatched.
     #else
-    MoveableArray<int> varvalmatching;
-    MoveableArray<int> valvarmatching;
+    MoveableArray<SysInt> varvalmatching;
+    MoveableArray<SysInt> valvarmatching;
     #endif
     
     // ------------------ Incremental adjacency lists --------------------------
     
     // adjlist[varnum or val-dom_min+numvars] is the vector of vals in the 
     // domain of the variable, or variables with val in their domain.
-    vector<vector<int> > adjlist;
-    MoveableArray<int> adjlistlength;
-    vector<vector<int> > adjlistpos;   // position of a variable in adjlist.
+    vector<vector<SysInt> > adjlist;
+    MoveableArray<SysInt> adjlistlength;
+    vector<vector<SysInt> > adjlistpos;   // position of a variable in adjlist.
     
-    inline void adjlist_remove(int var, int val)
+    inline void adjlist_remove(SysInt var, SysInt val)
     {
         // swap item at position varidx to the end, then reduce the length by 1.
         SysInt validx=val-dom_min+numvars;
@@ -434,7 +434,7 @@ struct FlowConstraint : public AbstractConstraint
         delfromlist(var, adjlistpos[var][val-dom_min]);
     }
     
-    inline void delfromlist(int i, int j)
+    inline void delfromlist(SysInt i, SysInt j)
     {
         // delete item in list i at position j
         SysInt t=adjlist[i][adjlistlength[i]-1];
@@ -487,15 +487,15 @@ struct FlowConstraint : public AbstractConstraint
     // Uprevious (pred) gives (for each CSP value) the value-dom_min
     // it was matched to in the previous layer. If it was unmatched,
     // -1 is used.
-    vector<int> uprevious;  // -2 means unset, -1 labelled unmatched. 
+    vector<SysInt> uprevious;  // -2 means unset, -1 labelled unmatched. 
     
-    vector<vector<int> > vprevious;  // map val-dom_min to vector of vars.
+    vector<vector<SysInt> > vprevious;  // map val-dom_min to vector of vars.
     smallset_nolist invprevious;     // is there a mapping in vprevious for val? Allows fast unset.
     
     smallset layer;
     smallset unmatched;   // contains vals-dom_min.
     
-    vector<vector<int> > newlayer;
+    vector<vector<SysInt> > newlayer;
     smallset innewlayer;
     
     void initialize_hopcroft()
@@ -526,7 +526,7 @@ struct FlowConstraint : public AbstractConstraint
     
     // Hopcroft-Karp which takes start and end indices.
     
-    inline bool hopcroft_wrapper(int sccstart, int sccend, vector<int>& SCCs)
+    inline bool hopcroft_wrapper(SysInt sccstart, SysInt sccend, vector<SysInt>& SCCs)
     {
         // Call hopcroft for the whole matching.
         if(!hopcroft(sccstart, sccend, SCCs))
@@ -548,7 +548,7 @@ struct FlowConstraint : public AbstractConstraint
         // Using valinlocalmatching left over from hopcroft.
         // This must not be done when failing, because it might mess
         // up varvalmatching for the next invocation.
-        {vector<int>& toiterate=valinlocalmatching.getlist();
+        {vector<SysInt>& toiterate=valinlocalmatching.getlist();
             for(SysInt j=0; j<toiterate.size(); j++)
             {
                 SysInt tempval=toiterate[j];
@@ -558,7 +558,7 @@ struct FlowConstraint : public AbstractConstraint
         return true;
     }
     
-    inline bool hopcroft(int sccstart, int sccend, vector<int>& SCCs)
+    inline bool hopcroft(SysInt sccstart, SysInt sccend, vector<SysInt>& SCCs)
     {
         // Domain value convention:
         // Within hopcroft and recurse,
@@ -626,7 +626,7 @@ struct FlowConstraint : public AbstractConstraint
             // Because it's left over from a bad state when do_prop was last invoked, and failed.
             varinlocalmatching.clear();
             {
-                vector<int>& toiterate=valinlocalmatching.getlist();
+                vector<SysInt>& toiterate=valinlocalmatching.getlist();
                 for(SysInt i=0; i<toiterate.size(); ++i)
                 {
                     if(!varinlocalmatching.in(valvarmatching[toiterate[i]]))   // This should not be conditional --BUG
@@ -671,7 +671,7 @@ struct FlowConstraint : public AbstractConstraint
                             newLayer.setdefault(v,[]).append(u)
                 */
                 {
-                vector<int>& toiterate=layer.getlist();
+                vector<SysInt>& toiterate=layer.getlist();
                 for(SysInt i=0; i<toiterate.size(); ++i)
                 {
                     //cout<<"Layer item: "<<(*setit)<<endl;
@@ -710,7 +710,7 @@ struct FlowConstraint : public AbstractConstraint
                 
                 /*cout<<"Local matching state:"<<endl;
                 {
-                vector<int>& toiterate = valinlocalmatching.getlist();
+                vector<SysInt>& toiterate = valinlocalmatching.getlist();
                 for(SysInt i=0; i<toiterate.size(); ++i)
                 {
                     SysInt temp=toiterate[i];
@@ -720,7 +720,7 @@ struct FlowConstraint : public AbstractConstraint
                 }*/
                 
                 {
-                vector<int>& toiterate = innewlayer.getlist();
+                vector<SysInt>& toiterate = innewlayer.getlist();
                 for(SysInt i=0; i<toiterate.size(); ++i)
                 {
                     SysInt tempval = toiterate[i]; // for v in newlayer.
@@ -786,7 +786,7 @@ struct FlowConstraint : public AbstractConstraint
             for v in unmatched: recurse(v)
             */
             {
-            vector<int>& toiterate=unmatched.getlist();
+            vector<SysInt>& toiterate=unmatched.getlist();
             for(SysInt i=0; i<toiterate.size(); ++i)
             {
                 SysInt tempval=toiterate[i];
@@ -800,14 +800,14 @@ struct FlowConstraint : public AbstractConstraint
     }
     
     
-    bool recurse(int val)
+    bool recurse(SysInt val)
     {
         // Again values are val-dom_min in this function.
         // Clearly this should be turned into a loop.
         //cout << "Entering recurse with value " <<val <<endl;
         if(invprevious.in(val))
         {
-            vector<int>& listvars=vprevious[val];  //L
+            vector<SysInt>& listvars=vprevious[val];  //L
             
             // Remove the value from vprevious.
             invprevious.remove(val);
@@ -848,11 +848,11 @@ struct FlowConstraint : public AbstractConstraint
     // Oh no -- does this work with SCCs??
     // First do it without using SCCs.
     
-    vector<vector<int> > edges; // turn this into a box of boxes??
+    vector<vector<SysInt> > edges; // turn this into a box of boxes??
     smallset_nolist varvalused;
     smallset thislayer;
-    deque<int> fifo;
-    vector<int> augpath; // alternating path stored here with vars and val-dom_min
+    deque<SysInt> fifo;
+    vector<SysInt> augpath; // alternating path stored here with vars and val-dom_min
     
     void hopcroft2_setup()
     {
@@ -869,7 +869,7 @@ struct FlowConstraint : public AbstractConstraint
         thislayer.reserve(numvars+numvals);
     }
     
-    inline bool hopcroft_wrapper2(vector<int>& vars_in_scc, vector<int>& matching, vector<int>& upper, vector<int>& usage)
+    inline bool hopcroft_wrapper2(vector<SysInt>& vars_in_scc, vector<SysInt>& matching, vector<SysInt>& upper, vector<SysInt>& usage)
     {
         if(!hopcroft2(vars_in_scc, matching, upper, usage))
         {
@@ -879,7 +879,7 @@ struct FlowConstraint : public AbstractConstraint
         return true;
     }
     
-    inline bool hopcroft2(vector<int>& vars_in_scc, vector<int>& matching, vector<int>& upper, vector<int>& usage)
+    inline bool hopcroft2(vector<SysInt>& vars_in_scc, vector<SysInt>& matching, vector<SysInt>& upper, vector<SysInt>& usage)
     {
         // The return value is whether the matching is complete over teh variables
         // in the SCC.
@@ -971,7 +971,7 @@ struct FlowConstraint : public AbstractConstraint
                 }
                 
                 // transfer things from thislayer to varvalused.
-                vector<int>& temp1 = thislayer.getlist();
+                vector<SysInt>& temp1 = thislayer.getlist();
                 for(SysInt i=0; i<temp1.size(); i++)
                 {
                     varvalused.insert(temp1[i]);
@@ -1011,7 +1011,7 @@ struct FlowConstraint : public AbstractConstraint
                 }
                 
                 // transfer things from thislayer to varvalused.
-                vector<int>& temp2 = thislayer.getlist();
+                vector<SysInt>& temp2 = thislayer.getlist();
                 for(SysInt i=0; i<temp2.size(); i++)
                 {
                     varvalused.insert(temp2[i]);
@@ -1048,10 +1048,10 @@ struct FlowConstraint : public AbstractConstraint
     // return value indicates whether an augmenting path was found.
     // DFS can visit a value vertex multiple times up to upper-usage,
     // but can only use an edge once.
-    bool dfs_hopcroft2(vector<int>& augpath, vector<int>& upper, vector<int>& usage, vector<int>& matching, vector<vector<int> >& edges)
+    bool dfs_hopcroft2(vector<SysInt>& augpath, vector<SysInt>& upper, vector<SysInt>& usage, vector<SysInt>& matching, vector<vector<SysInt> >& edges)
     {
         SysInt var=augpath.back();
-        vector<int>& outedges=edges[var];
+        vector<SysInt>& outedges=edges[var];
         
         while(!outedges.empty())
         {
@@ -1067,7 +1067,7 @@ struct FlowConstraint : public AbstractConstraint
                 return true;
             }
             
-            vector<int>& outedges2 = edges[validx];
+            vector<SysInt>& outedges2 = edges[validx];
             
             augpath.push_back(validx);
             while(!outedges2.empty())
@@ -1087,7 +1087,7 @@ struct FlowConstraint : public AbstractConstraint
         return false;
     }
     
-    inline void apply_augmenting_path(vector<int>& augpath, vector<int>& matching, vector<int>& usage)
+    inline void apply_augmenting_path(vector<SysInt>& augpath, vector<SysInt>& matching, vector<SysInt>& usage)
     {
         D_ASSERT((augpath.size() & 1) == 0);
         for(SysInt i=0; i<augpath.size(); i=i+2)
@@ -1110,7 +1110,7 @@ struct deque_fixed_size
 {
     // replacement for stl deque. This one is a fixed size circular array.
     // pluggable for deque in gcc_common.h -- no faster.
-    vector<int> list;
+    vector<SysInt> list;
     SysInt head, tail;
     
     deque_fixed_size()
@@ -1118,7 +1118,7 @@ struct deque_fixed_size
         head=tail=0;
     }
     
-    void reserve(int size)
+    void reserve(SysInt size)
     {
         list.resize(size);
     }
@@ -1133,7 +1133,7 @@ struct deque_fixed_size
         return head==tail;
     }
     
-    inline void push_back(int val)
+    inline void push_back(SysInt val)
     {
         list[tail]=val;
         if(++tail == list.size())
@@ -1142,7 +1142,7 @@ struct deque_fixed_size
         }
     }
     
-    inline int front()
+    inline SysInt front()
     {
         D_ASSERT(head!=tail);
         return list[head];
@@ -1174,7 +1174,7 @@ struct InternalDynamicTriggers
     
     VarArray var_array;  // not nice to have this in here.. 
     
-    InternalDynamicTriggers(StateObj* _stateObj, int _numvars, int numvals, VarArray _var_array) : numvars(_numvars), var_array(_var_array)
+    InternalDynamicTriggers(StateObj* _stateObj, SysInt _numvars, SysInt numvals, VarArray _var_array) : numvars(_numvars), var_array(_var_array)
     {
         watches=getMemory(_stateObj).backTrack().template requestArray<short>(numvars+1 + 4*numvars+2*numvals); 
         
@@ -1187,7 +1187,7 @@ struct InternalDynamicTriggers
         watches[numvars+1 + 4*numvars+2*numvals-1]=-1;
     }
     
-    inline bool doesItTrigger(int var)
+    inline bool doesItTrigger(SysInt var)
     {   // does the changed variable var trigger propagation on the target variables. 
         SysInt idx=watches[var];  // start of linked list.
         if(idx==-1)
@@ -1205,7 +1205,7 @@ struct InternalDynamicTriggers
         return false;
     }
     
-    inline void addwatch(int var, int val)
+    inline void addwatch(SysInt var, SysInt val)
     {
         //cout << "In addwatch. var:" << var << " val:" << val << endl;
         //printlist(var);
@@ -1225,7 +1225,7 @@ struct InternalDynamicTriggers
         //cout << "Exiting addwatch" <<endl;
     }
     
-    void printlist(int var)
+    void printlist(SysInt var)
     {
         cout <<"Var: "<< var << " values: ";
         SysInt idx=watches[var];
@@ -1237,7 +1237,7 @@ struct InternalDynamicTriggers
         cout << endl;
     }
     
-    inline void clearwatches(int var)
+    inline void clearwatches(SysInt var)
     {
         // go through and find end of list.
         //cout << "In clearwatches for var: "<<var <<endl;

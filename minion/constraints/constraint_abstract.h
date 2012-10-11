@@ -115,7 +115,7 @@ public:
   /// Checks incrementaly if constraint cannot be satisfied.
   /// Returns TRUE if constraint cannot be satisfied.
   /** This function should not be called unless check_unsat_full is called first. This is used by rarification */
-  virtual BOOL check_unsat(int,DomainDelta)
+  virtual BOOL check_unsat(SysInt,DomainDelta)
   {
     cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
     exit(1);

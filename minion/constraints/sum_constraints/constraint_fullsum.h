@@ -141,7 +141,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
       return;
     }
 
-    if(looseness < max_looseness)
+    if(looseness < (DomainInt)max_looseness)
     {
       // max_looseness.set(looseness);
       for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
@@ -149,7 +149,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     }
   }
   
-  virtual BOOL check_unsat(int prop_val, DomainDelta domain_change)
+  virtual BOOL check_unsat(SysInt prop_val, DomainDelta domain_change)
   {
     DomainInt sum = var_array_min_sum;
     if(prop_val != -1)

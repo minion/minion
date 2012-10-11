@@ -40,7 +40,7 @@ void inline maybe_print_search_assignment(StateObj* stateObj, T& var, DomainInt 
     }
 }
 
-// instead of carrying around the pos everywhere, the VariableOrder object has pos in it as a reversible<int>. 
+// instead of carrying around the pos everywhere, the VariableOrder object has pos in it as a reversible<SysInt>. 
 
 // replace find_next_unassigned with all_vars_assigned (which maybe uses something like a watch).
 
@@ -96,7 +96,7 @@ struct SearchManager
   // Returns true if all variables assigned
   inline bool all_vars_assigned()
   {
-    pair<int, DomainInt> picked = var_order->pickVarVal();
+    pair<SysInt, DomainInt> picked = var_order->pickVarVal();
     return picked.first == -1;
   }
     
@@ -108,7 +108,7 @@ struct SearchManager
     { return depth; }
     
     // returns false if left branch not possible.
-    inline void branch_left(pair<int, DomainInt> picked)
+    inline void branch_left(pair<SysInt, DomainInt> picked)
     {
         D_ASSERT(picked.first!=-1);
         D_ASSERT(!var_array[picked.first].isAssigned());
@@ -126,7 +126,7 @@ struct SearchManager
             branches.pop_back();
         }
         
-        if((((int)branches.size())-1)<=ceiling)
+        if((((SysInt)branches.size())-1)<=ceiling)
         {   // if idx of last element is less than or equal the ceiling. 
             // Also catches the empty case.
             return false;
@@ -174,7 +174,7 @@ struct SearchManager
         }
     }
     
-    pair<int, DomainInt> steal_work()
+    pair<SysInt, DomainInt> steal_work()
     {   // steal the topmost left branch from this search.
         UnsignedSysInt newceiling=ceiling+1;
         UnsignedSysInt b_size=branches.size();
@@ -206,7 +206,7 @@ struct SearchManager
             
             do_checks(stateObj, var_array, branches);
             
-            pair<int, DomainInt> varval= var_order->pickVarVal();
+            pair<SysInt, DomainInt> varval= var_order->pickVarVal();
             
             if(varval.first==-1)
             {

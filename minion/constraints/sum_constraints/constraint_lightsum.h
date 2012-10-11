@@ -120,7 +120,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
   virtual BOOL full_check_unsat()
   { return check_unsat(0, DomainDelta::empty()); }
   
-  virtual BOOL check_unsat(int, DomainDelta)
+  virtual BOOL check_unsat(SysInt, DomainDelta)
   {
     DomainInt min_sum = 0;
     for(UnsignedSysInt i = 0; i < size; ++i)

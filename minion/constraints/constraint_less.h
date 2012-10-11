@@ -80,7 +80,7 @@ struct LeqConstraint : public AbstractConstraint
     }
   }
   
-  virtual BOOL check_unsat(int,DomainDelta)
+  virtual BOOL check_unsat(SysInt,DomainDelta)
   { return (x.getMin() > y.getMax() + offset); }
   
   virtual BOOL full_check_unsat()
@@ -140,6 +140,6 @@ ImpliesCon(StateObj* stateObj, VarRef v1, VarRef v2)
 // This is mainly inline to avoid multiple definitions.
 template<typename VarRef1, typename VarRef2, typename Offset>
 inline AbstractConstraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint()
-{ return LeqCon(stateObj,y,x, offset.negminusone()); }
+{ return LeqCon(stateObj,y,x, const_negminusone(offset)); }
 
 #endif

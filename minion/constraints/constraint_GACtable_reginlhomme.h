@@ -25,7 +25,7 @@ struct TupleComparator
   SysInt significantIndex;
   SysInt arity;
   
-  TupleComparator(int i, int a)
+  TupleComparator(SysInt i, SysInt a)
   {
     significantIndex = i;
     arity = a; 
@@ -53,20 +53,20 @@ struct TupleH
   SysInt arity;
   
   SysInt * values;
-  SysInt * nextValue;    // int index into global array, pointing to the next 
+  SysInt * nextValue;    // SysInt index into global array, pointing to the next 
   
   SysInt * redundantValues;
   SysInt * redundantNextValue;
   
-  TupleH(int * _values, int * _redundantValues, int _id, int _arity)
+  TupleH(SysInt * _values, SysInt * _redundantValues, SysInt _id, SysInt _arity)
   {
     values=_values;
     redundantValues=_redundantValues;
     id=_id;
     arity=_arity;
     
-    nextValue=new int[arity];
-    redundantNextValue=new int[arity];
+    nextValue=new SysInt[arity];
+    redundantNextValue=new SysInt[arity];
     for(SysInt i=0; i<arity; i++)
     {
       nextValue[i]=-1;
@@ -109,7 +109,7 @@ struct Regin
   void setuplist()
   {
     
-    SysInt * redvalues=new int[arity];
+    SysInt * redvalues=new SysInt[arity];
     for(SysInt i=0; i<arity; i++){ 
       redvalues[i]=(tupleList->dom_smallest)[i];
     }
@@ -117,11 +117,11 @@ struct Regin
     for(SysInt i=0; i<tuples.size(); i++)
     {
       // copy redvalues
-      SysInt * newredvalues= new int[arity]; 
+      SysInt * newredvalues= new SysInt[arity]; 
       for(SysInt j=0; j<arity; j++)
         newredvalues[j]=redvalues[j];
       
-      SysInt * valuesarray= new int[arity];
+      SysInt * valuesarray= new SysInt[arity];
       for(SysInt j=0; j<arity; j++)
         valuesarray[j]=tuples[i][j];
       
@@ -202,7 +202,7 @@ struct GACTableConstraint : public AbstractConstraint
     return true;
   }
   
-  BOOL check_tuple(int * v)
+  BOOL check_tuple(SysInt * v)
   {
     for(UnsignedSysInt i = 0; i < arity; ++i)
     {
@@ -212,7 +212,7 @@ struct GACTableConstraint : public AbstractConstraint
     return true;
   }
   
-  SysInt comparetuples(int * t1, int * t2)
+  SysInt comparetuples(SysInt * t1, SysInt * t2)
   {
     for(SysInt i=0; i<arity; i++)
     {
@@ -260,14 +260,14 @@ struct GACTableConstraint : public AbstractConstraint
           current_support[i][j]->set(-1);
         }
       }
-      upperboundtuple=new int[arity];      
+      upperboundtuple=new SysInt[arity];      
 
   }
   
   virtual SysInt dynamic_trigger_count()
   { return tupleList->literal_num * ( vars.size() - 1) ; }
   
-   TupleH* seekNextSupport(int var, int val)
+   TupleH* seekNextSupport(SysInt var, SysInt val)
   {
     SysInt last_pointer=current_support[var][val+offset[var]]->get();
     
@@ -366,7 +366,7 @@ struct GACTableConstraint : public AbstractConstraint
     return curtuple;
   }
   
-  SysInt nextin(int var, int val, int curtuple)
+  SysInt nextin(SysInt var, SysInt val, SysInt curtuple)
   { // returns curtuple if curtuple contains var,val. So not strictly 'next'. If there is not one, returns -1.
     TupleH* temp=regin->tuplelist[curtuple];
     
@@ -387,7 +387,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   // End of regin-lhomme code.
   
-  bool find_new_support(int literal)
+  bool find_new_support(SysInt literal)
   {
     pair<DomainInt, DomainInt> varval = tupleList->get_varval_from_literal(literal);
     SysInt var = varval.first;
@@ -423,7 +423,7 @@ struct GACTableConstraint : public AbstractConstraint
     }
   }
   
-  void setup_watches(int var, int val, int lit)
+  void setup_watches(SysInt var, SysInt val, SysInt lit)
   {
     SysInt domain_min = (tupleList->dom_smallest)[var];
     SysInt * tuple=regin->tuplelist[current_support[var][val+offset[var]]->get()]->values;

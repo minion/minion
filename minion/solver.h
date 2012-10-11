@@ -169,7 +169,7 @@ public:
   void clearAlarm()
   { alarm_trigger = false; }  
   
-  void setupAlarm(bool alarm_active, int timeout, bool CPU_time)
+  void setupAlarm(bool alarm_active, SysInt timeout, bool CPU_time)
   { activate_trigger(&alarm_trigger, alarm_active, timeout, CPU_time);}
   
   bool isCtrlcPressed()

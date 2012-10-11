@@ -64,13 +64,13 @@ public:
   DomainInt getLiteralCount()
   { return tuple_data->literal_num; }
 
-  Literal getLiteralFromPos(int pos)
+  Literal getLiteralFromPos(SysInt pos)
   {
     pair<SysInt, DomainInt> lit = tuple_data->get_varval_from_literal(pos);
     return Literal(lit.first, lit.second);
   }
 
-  pair<DomainInt,DomainInt> getDomainBounds(int var)
+  pair<DomainInt,DomainInt> getDomainBounds(SysInt var)
   {
     return make_pair(tuple_data->dom_smallest[var],
       tuple_data->dom_smallest[var] + tuple_data->dom_size[var]);
@@ -90,7 +90,7 @@ public:
   { }
 
   // TODO: Optimise possibly?
-  bool checkTuple(DomainInt* tuple, int tuple_size)
+  bool checkTuple(DomainInt* tuple, SysInt tuple_size)
    {
      D_ASSERT(tuple_size == getVarCount());
      for(SysInt i = 0; i < getNumOfTuples(); ++i)
@@ -152,7 +152,7 @@ struct LightTableConstraint : public AbstractConstraint
       }
   }
   
-  void propagate_var(int varidx)
+  void propagate_var(SysInt varidx)
   {
       VarRef var=vars[varidx];
       

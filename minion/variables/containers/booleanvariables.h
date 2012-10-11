@@ -180,7 +180,7 @@ struct BoolVarContainer
 #define LOCK_BOOL_MUTEX
 #endif
 
-  static const int width = 7;
+  static const SysInt width = 7;
   MoveablePointer assign_offset;
   MemOffset values_mem;
   vector<vector<AbstractConstraint*> > constraints;
@@ -217,7 +217,7 @@ struct BoolVarContainer
   /// Returns a new Boolean Variable.
   //BoolVarRef get_new_var();
 
-  void setVarCount(int bool_count)
+  void setVarCount(SysInt bool_count)
   {
     D_ASSERT(!lock_m);
     var_count_m = bool_count;
@@ -380,7 +380,7 @@ struct BoolVarContainer
 
 inline BoolVarRef BoolVarContainer::get_var_num(DomainInt i)
 {
-  D_ASSERT(i < (int)var_count_m);
+  D_ASSERT(i < (SysInt)var_count_m);
   return BoolVarRef(BoolVarRef_internal(i, this));
 }
 

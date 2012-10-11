@@ -220,7 +220,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
 
   // unfinished new stuff starts here.
 
-  SysInt watch_unassigned_in_vector(int avoidindex, int oldsupport, DynamicTrigger* dt)
+  SysInt watch_unassigned_in_vector(SysInt avoidindex, SysInt oldsupport, DynamicTrigger* dt)
   {
       // move dt to an index other than avoidindex, or return -1.
       SysInt newsupport=oldsupport+1;
@@ -440,7 +440,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
       else
       { it->propagateAssign(value); }
     }
-    if(val_count_min > static_cast<int>(var_array.size()) - occs)
+    if(val_count_min > static_cast<SysInt>(var_array.size()) - occs)
       getState(stateObj).setFailed(true);
   }
 
@@ -461,9 +461,9 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
     else
     {
       ++not_occurrences_count;
-      if(val_count_min > static_cast<int>(var_array.size()) - not_occurrences_count)
+      if(val_count_min > static_cast<SysInt>(var_array.size()) - not_occurrences_count)
         getState(stateObj).setFailed(true);
-      if(not_occurrences_count == static_cast<int>(var_array.size()) - val_count_min )
+      if(not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count_min )
         not_occurrence_limit_reached();
     }
   }
@@ -489,19 +489,19 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
 
   virtual void full_propagate()
   {
-    if(val_count_max < 0 || val_count_min > (int)var_array.size())
+    if(val_count_max < 0 || val_count_min > (SysInt)var_array.size())
       getState(stateObj).setFailed(true);
     setup_counters();
 
     if(val_count_max < occurrences_count)
       getState(stateObj).setFailed(true);
 
-    if(val_count_min > static_cast<int>(var_array.size()) - not_occurrences_count)
+    if(val_count_min > static_cast<SysInt>(var_array.size()) - not_occurrences_count)
       getState(stateObj).setFailed(true);
 
     if(occurrences_count == val_count_max)
       occurrence_limit_reached();
-    if(not_occurrences_count == static_cast<int>(var_array.size()) - val_count_min)
+    if(not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count_min)
       not_occurrence_limit_reached();
   }
 
@@ -622,7 +622,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
 
   void not_occurrence_limit_reached()
   {
-    D_ASSERT(not_occurrences_count >= static_cast<int>(var_array.size()) - val_count.getMin());
+    D_ASSERT(not_occurrences_count >= static_cast<SysInt>(var_array.size()) - val_count.getMin());
     SysInt occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for( typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
@@ -635,7 +635,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
       else
       { it->propagateAssign(value); }
     }
-    val_count.setMax(static_cast<int>(var_array.size()) - occs);
+    val_count.setMax(static_cast<SysInt>(var_array.size()) - occs);
   }
 
   virtual void propagate(DomainInt i, DomainDelta)
@@ -645,7 +645,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
     { // val_count changed
       if(occurrences_count == val_count.getMax())
         occurrence_limit_reached();
-      if(not_occurrences_count == static_cast<int>(var_array.size()) - val_count.getMin() )
+      if(not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count.getMin() )
         not_occurrence_limit_reached();
       return;
     }
@@ -660,8 +660,8 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
     else
     {
       ++not_occurrences_count;
-      val_count.setMax(static_cast<int>(var_array.size()) - not_occurrences_count);
-      if(not_occurrences_count == static_cast<int>(var_array.size()) - val_count.getMin() )
+      val_count.setMax(static_cast<SysInt>(var_array.size()) - not_occurrences_count);
+      if(not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count.getMin() )
         not_occurrence_limit_reached();
     }
   }

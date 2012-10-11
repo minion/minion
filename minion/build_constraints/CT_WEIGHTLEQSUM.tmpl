@@ -27,7 +27,7 @@ BuildCT_LEQSUM(StateObj* stateObj, const VarArray& _var_array, const vector<VarS
 inline AbstractConstraint*
 BuildCT_LEQSUM(StateObj* stateObj, const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum, ConstraintBlob&)
 { 
-  runtime_val t2(checked_cast<SysInt>(var_sum[0].getAssignedValue()));
+  SysInt t2(checked_cast<SysInt>(var_sum[0].getAssignedValue()));
   return BoolLessEqualSumCon(stateObj, var_array, t2);
 }
  

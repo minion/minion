@@ -235,15 +235,15 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     }
     
     CapArray capacity_array;   // capacities for values of interest
-    vector<int> val_array;   // values of interest
+    vector<SysInt> val_array;   // values of interest
     
-    vector<int> val_to_cap_index;
+    vector<SysInt> val_to_cap_index;
     
-    vector<int> vars_in_scc;
-    vector<int> vals_in_scc;  // Actual values.
+    vector<SysInt> vars_in_scc;
+    vector<SysInt> vals_in_scc;  // Actual values.
     
     #if DomainCounting || InternalDT
-    vector<vector<int> > changed_vars_per_scc;
+    vector<vector<SysInt> > changed_vars_per_scc;
     #endif
     
     #if InternalDT
@@ -431,7 +431,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     }
     
     #ifdef CAPBOUNDSCACHE
-    vector<int> boundsupported;  // does the bound need to be updated? Indexed as validx*2 for lowerbound, validx*2+1 for ub
+    vector<SysInt> boundsupported;  // does the bound need to be updated? Indexed as validx*2 for lowerbound, validx*2+1 for ub
     // Contains the capacity value which is supported. Reset to -1 if the support is lost.
     #endif
     
@@ -453,7 +453,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
       D_ASSERT(dom_max-dom_min+1 == numvals);
       // Check if the matching is OK.
@@ -655,8 +655,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         prop_capacity();
     }
     
-    vector<int> lbcmatching;
-    vector<int> lbcusage;
+    vector<SysInt> lbcmatching;
+    vector<SysInt> lbcusage;
     
     void do_gcc_prop_quimper()
     {
@@ -763,7 +763,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         
         sccs_to_process.clear(); 
         {
-        vector<int>& toiterate = to_process.getlist();
+        vector<SysInt>& toiterate = to_process.getlist();
         GCCPRINT("About to loop for to_process.");
         
         // to_process contains var indexes and vals:
@@ -797,7 +797,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         }
         to_process.clear();
         {
-        vector<int>& toiterate = sccs_to_process.getlist();
+        vector<SysInt>& toiterate = sccs_to_process.getlist();
         GCCPRINT("About to loop for sccs_to_process:"<< toiterate);
         for(SysInt i=0; i<toiterate.size(); i++)
         {
@@ -848,7 +848,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             #if DomainCounting || InternalDT // need to check through triggers to see if broken....
             {
                 run_propagator=false;
-                vector<int>& vars_changed=changed_vars_per_scc[sccindex_start];
+                vector<SysInt>& vars_changed=changed_vars_per_scc[sccindex_start];
                 #if DomainCounting
                     SysInt varcount=vars_in_scc.size();
                     for(SysInt i=0; i<vars_changed.size(); i++)
@@ -926,23 +926,23 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #endif
     }
     
-    deque<int> fifo;
+    deque<SysInt> fifo;
     // deque_fixed_size was not faster.
     //deque_fixed_size fifo;
-    vector<int> prev;
+    vector<SysInt> prev;
     
-    vector<int> matchbac;
+    vector<SysInt> matchbac;
     
-    vector<int> lower;
-    vector<int> upper;
-    vector<int> usage;
-    vector<int> usagebac;
+    vector<SysInt> lower;
+    vector<SysInt> upper;
+    vector<SysInt> usage;
+    vector<SysInt> usagebac;
     
     // Incremental SCC data.
-    vector<int> SCCs;    // Variable numbers and values as val-dom_min+numvars
+    vector<SysInt> SCCs;    // Variable numbers and values as val-dom_min+numvars
     ReversibleMonotonicSet SCCSplit;
     
-    vector<int> varToSCCIndex;  // Mirror of the SCCs array.
+    vector<SysInt> varToSCCIndex;  // Mirror of the SCCs array.
     
     smallset to_process;
     
@@ -1307,7 +1307,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         } // End of !UseTranspose
     }
     
-    inline void apply_augmenting_path(int unwindnode, int startnode)
+    inline void apply_augmenting_path(SysInt unwindnode, SysInt startnode)
     {
         augpath.clear();
         // starting at unwindnode, unwind the path and put it in augpath.
@@ -1348,7 +1348,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         GCCPRINT("varvalmatching: "<<varvalmatching);
     }
     
-    inline void apply_augmenting_path_reverse(int unwindnode, int startnode)
+    inline void apply_augmenting_path_reverse(SysInt unwindnode, SysInt startnode)
     {
         augpath.clear();
         // starting at unwindnode, unwind the path and put it in augpath.
@@ -1469,13 +1469,13 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     // Tarjan's algorithm 
     
     
-    vector<int> tstack;
+    vector<SysInt> tstack;
     smallset_nolist in_tstack;
     smallset_nolist visited;
-    vector<int> dfsnum;
-    vector<int> lowlink;
+    vector<SysInt> dfsnum;
+    vector<SysInt> lowlink;
     
-    vector<int> curnodestack;
+    vector<SysInt> curnodestack;
     
     bool scc_split;
     
@@ -1484,7 +1484,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     SysInt max_dfs;
     
     SysInt varcount, valcount;
-    //int localmin,localmax;
+    //SysInt localmin,localmax;
     
     void initialize_tarjan()
     {
@@ -1504,9 +1504,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         //varinlocalmatching.reserve(numvars);
     }
     
-    void tarjan_recursive(int sccindex_start,
-        vector<int>& upper, 
-        vector<int>& lower, vector<int>& matching, vector<int>& usage)
+    void tarjan_recursive(SysInt sccindex_start,
+        vector<SysInt>& upper, 
+        vector<SysInt>& lower, vector<SysInt>& matching, vector<SysInt>& usage)
     {
         tstack.clear();
         in_tstack.clear();
@@ -1591,7 +1591,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #endif
     }
     
-    void visit(int curnode, bool toplevel, vector<int>& upper, vector<int>& lower, vector<int>& matching, vector<int>& usage)
+    void visit(SysInt curnode, bool toplevel, vector<SysInt>& upper, vector<SysInt>& lower, vector<SysInt>& matching, vector<SysInt>& usage)
     {
         // toplevel is true iff this is the top level of the recursion.
         tstack.push_back(curnode);
@@ -1809,7 +1809,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 
                 GCCPRINT("Writing new SCC:");
                 bool containsvars=false, containsvals=false;
-                for(vector<int>::iterator tstackit=tstack.end()-1;  ; --tstackit)
+                for(vector<SysInt>::iterator tstackit=tstack.end()-1;  ; --tstackit)
                 {
                     SysInt copynode=(*tstackit);
                     
@@ -1991,7 +1991,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         }
     }
     
-    void prop_capacity_simple(int val)
+    void prop_capacity_simple(SysInt val)
     {
         SysInt i=val_to_cap_index[val-dom_min];
         D_ASSERT(i!=-1);
@@ -2058,7 +2058,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         }
     }
     
-    void prop_capacity_strong_scc(int value)
+    void prop_capacity_strong_scc(SysInt value)
     {
         GCCPRINT("In prop_capacity_strong_scc(value)");
         // use the matching -- change it by lowering flow to value.
@@ -2092,7 +2092,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     // Changed copy of bfsmatching_gcc method above.
     
     // should stop when we reach the existing bound.
-    inline int bfsmatching_card_lowerbound(int forbiddenval, int existinglb)
+    inline SysInt bfsmatching_card_lowerbound(SysInt forbiddenval, SysInt existinglb)
     {
         // lower and upper are indexed by value-dom_min and provide the capacities.
         // usage is the number of times a value is used in the matching.
@@ -2296,7 +2296,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     // therefore occurrences of b might be reduced. 
     // overall though, not sure if worst-case analysis is not compromised. 
     
-    inline int card_upperbound(int value, int existingub)
+    inline SysInt card_upperbound(SysInt value, SysInt existingub)
     {
         // lower and upper are indexed by value-dom_min and provide the capacities.
         // usage is the number of times a value is used in the matching.

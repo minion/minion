@@ -51,13 +51,13 @@ void _NORETURN FAIL_EXIT(string s)
   cerr.flush();
   if(debug_crash)
   { 
-    int* i = NULL;
+    SysInt* i = NULL;
     *i = 0;
   }
   throw 9;
 }
 
-void assert_function(BOOL x, const char* a, const char* f, int line)
+void assert_function(BOOL x, const char* a, const char* f, SysInt line)
 { 
   if(!x) 
   {

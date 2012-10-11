@@ -140,7 +140,7 @@ class TimerClass
   Output_Type output;
 public:
   
-  void setOutputType(int version)
+  void setOutputType(short version)
   {
     switch(version)
     {

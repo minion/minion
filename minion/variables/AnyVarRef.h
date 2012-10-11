@@ -174,7 +174,7 @@ struct AnyVarRef_Abstract
   virtual DomainInt getBaseVal(DomainInt) const = 0;
   virtual Var getBaseVar() const = 0;
 #ifdef WDEG
-  virtual int getBaseWdeg() = 0;
+  virtual SysInt getBaseWdeg() = 0;
   virtual void incWdeg() = 0;
 #endif
 
@@ -266,7 +266,7 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   { return data.getBaseVar(); }
 
 #ifdef WDEG
-  virtual int getBaseWdeg() 
+  virtual SysInt getBaseWdeg() 
   { return data.getBaseWdeg(); }
   virtual void incWdeg()
   { data.incWdeg(); }

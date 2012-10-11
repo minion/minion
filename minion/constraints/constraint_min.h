@@ -78,7 +78,7 @@ struct MinConstraint : public AbstractConstraint
       t.push_back(make_trigger(var_array[i], Trigger(this, -(i + 1)), UpperBound));
     }
     t.push_back(make_trigger(min_var, Trigger(this, var_array.size() + 1 ),LowerBound));
-    t.push_back(make_trigger(min_var, Trigger(this, -((int)var_array.size() + 1) ),UpperBound));
+    t.push_back(make_trigger(min_var, Trigger(this, -((SysInt)var_array.size() + 1) ),UpperBound));
     
     return t;
   }
@@ -94,7 +94,7 @@ struct MinConstraint : public AbstractConstraint
     //Had to add 1 to fix "0th array" problem.
       --prop_val;
 
-      if(prop_val == (int)(var_array.size()))  
+      if(prop_val == (SysInt)(var_array.size()))  
       {
         DomainInt new_min = min_var.getMin();
         typename VarArray::iterator end = var_array.end();
@@ -120,7 +120,7 @@ struct MinConstraint : public AbstractConstraint
     {// Upper Bound Changed
       // See above for reason behind "-1".
       prop_val = -prop_val - 1;
-      if(prop_val == (int)(var_array.size()))
+      if(prop_val == (SysInt)(var_array.size()))
       {
         typename VarArray::iterator it = var_array.begin();
         DomainInt minvar_max = min_var.getMax();

@@ -113,7 +113,7 @@ struct SparseBoundVarContainer {
   vector<BoundType>& get_domain(SparseBoundVarRef_internal<BoundType> i)
   { return domains[checked_cast<SysInt>(domain_reference[i.var_num])]; }
  
-  vector<BoundType>& get_domain_from_int(int i)
+  vector<BoundType>& get_domain_from_int(SysInt i)
   { return domains[checked_cast<SysInt>(domain_reference[i])]; }
   
   const BoundType& lower_bound(SparseBoundVarRef_internal<BoundType> i) const
@@ -171,7 +171,7 @@ struct SparseBoundVarContainer {
     lock_m = true;
  }
 
-  void addVariables(const vector<pair<int, vector<DomainInt> > >& new_domains)
+  void addVariables(const vector<pair<SysInt, vector<DomainInt> > >& new_domains)
 {
   D_ASSERT(!lock_m);
   
@@ -189,7 +189,7 @@ struct SparseBoundVarContainer {
     D_ASSERT(new_domains[i].second.front() >= DomainInt_Min);
     D_ASSERT(new_domains[i].second.back() <= DomainInt_Max);
     
-    for(SysInt loop=0;loop<(int)(new_domains[i].second.size()) - 1; ++loop) 
+    for(SysInt loop=0;loop<(SysInt)(new_domains[i].second.size()) - 1; ++loop) 
     { D_ASSERT(new_domains[i].second[loop] < new_domains[i].second[loop+1]); }
   
     vector<BoundType> t_dom(new_domains[i].second.size());

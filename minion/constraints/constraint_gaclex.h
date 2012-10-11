@@ -165,7 +165,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     return new GacLexLeqConstraint<VarArray2, VarArray1,!Less>(stateObj,y,x);
   }
 
-  void updateAlpha(int i) {
+  void updateAlpha(SysInt i) {
     SysInt n = x.size();
     if(Less)
     {
@@ -199,7 +199,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
 
   ///////////////////////////////////////////////////////////////////////////////
   // updateBeta()
-  void updateBeta(int i) {
+  void updateBeta(SysInt i) {
     SysInt a = alpha ;
     while (i >= a) {
       if (x[i].getMin() < y[i].getMax()) {
@@ -265,7 +265,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   {
     SysInt a = alpha;
     SysInt n = x.size();
-    //int b = beta;
+    //SysInt b = beta;
     
     if(x[a].getMax() == y[a].getMax())
     { 
@@ -344,7 +344,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
         if(x_val > y_val)
         {
           //cout << "Prop trigger!" << endl;
-          //cout << a << ":" << i << ":" << (int)(beta) << endl;
+          //cout << a << ":" << i << ":" << (SysInt)(beta) << endl;
           y[a].setMin(x[a].getMin() + 1);
           return;
         }
@@ -353,7 +353,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
 
   }
 
-  virtual BOOL check_unsat(int unsat_val, DomainDelta)
+  virtual BOOL check_unsat(SysInt unsat_val, DomainDelta)
   {
     SysInt a = alpha;
     if(unsat_val >= a)
@@ -398,7 +398,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     return check_unsat(0, DomainDelta::empty());
   }
 
-  BOOL checkLex(int i) {
+  BOOL checkLex(SysInt i) {
     if(Less)
     {
       return x[i].getMax() < y[i].getMin();

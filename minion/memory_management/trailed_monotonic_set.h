@@ -154,7 +154,7 @@ void after_branch_right()  // nothing to do
     }
   
     // This should no longer be used. Use request_storage and lock instead.
-  //void initialise(const int& new_size, const int& max_undos, StateObj stateObj);
+  //void initialise(const SysInt& new_size, const SysInt& max_undos, StateObj stateObj);
 
   // Must be run before the lock for nonbacktrack.
   void lock(StateObj * stateObj);

@@ -22,7 +22,7 @@
 
 #include "tries.h"
 
-template<typename VarArray, int negative>
+template<typename VarArray, SysInt negative>
 struct GACTableConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
@@ -205,8 +205,8 @@ struct GACTableConstraint : public AbstractConstraint
                 if(sup < 0)
                 {
                   //cout <<"No valid support for " + to_string(i) + " in var " + to_string(varIndex) << endl;
-                  //volatile int * myptr=NULL;
-                  //int crashit=*(myptr);
+                  //volatile SysInt * myptr=NULL;
+                  //SysInt crashit=*(myptr);
                   vars[varIndex].removeFromDomain(i);
                 }
                 else

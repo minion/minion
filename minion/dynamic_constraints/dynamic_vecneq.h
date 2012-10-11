@@ -373,11 +373,11 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   }
 #endif
   
-  bool no_support_for_index(int index)
+  bool no_support_for_index(SysInt index)
   { return Operator::no_support_for_pair(var_array1[index], var_array2[index]); }
 
 
-  void add_triggers(int index, DynamicTrigger* dt)
+  void add_triggers(SysInt index, DynamicTrigger* dt)
   {
     Operator::add_triggers(var_array1[index], var_array2[index], dt);
   }
@@ -425,10 +425,10 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     add_triggers(watched_index1, dt + 2);
   }
 
-  void propagate_from_var1(int index)
+  void propagate_from_var1(SysInt index)
   { Operator::propagate_from_var1(var_array1[index], var_array2[index]); }
   
-  void propagate_from_var2(int index)
+  void propagate_from_var2(SysInt index)
   {  Operator::propagate_from_var2(var_array1[index], var_array2[index]); }
 
   virtual void propagate(DynamicTrigger* dt)

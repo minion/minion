@@ -24,21 +24,21 @@
 #include <limits.h> /* INT_MIN, INT_MAX */
 
 std::vector<std::vector<DomainInt> > 
-build_graph(std::vector<std::set<int> > graph, const std::vector<std::set<int> >& partition);
+build_graph(std::vector<std::set<SysInt> > graph, const std::vector<std::set<SysInt> >& partition);
 
-int
-repartition(const std::vector<std::set<int> >& graph, std::vector<SysInt> partition_num)
+SysInt
+repartition(const std::vector<std::set<SysInt> >& graph, std::vector<SysInt> partition_num)
 {
-  std::vector<std::multiset<int> > partition_loop(graph.size());
+  std::vector<std::multiset<SysInt> > partition_loop(graph.size());
   for(SysInt i = 0; i < graph.size(); ++i)
-    for(set<int>::const_iterator it = graph[i].begin(); it != graph[i].end(); ++it)
+    for(set<SysInt>::const_iterator it = graph[i].begin(); it != graph[i].end(); ++it)
     {
       partition_loop[i].insert(partition_num[*it]);
       partition_loop[*it].insert(partition_num[i]);
     }
 
-  std::set<std::multiset<int> > partition_set(partition_loop.begin(), partition_loop.end());
-  std::vector<std::multiset<int> > partition_vec(partition_set.begin(), partition_set.end());
+  std::set<std::multiset<SysInt> > partition_set(partition_loop.begin(), partition_loop.end());
+  std::vector<std::multiset<SysInt> > partition_vec(partition_set.begin(), partition_set.end());
 
   for(SysInt i = 0; i < graph.size(); ++i)
   {
@@ -49,10 +49,10 @@ repartition(const std::vector<std::set<int> >& graph, std::vector<SysInt> partit
 }
 
 double
-partition_graph(const tuple<int,vector<set<int> >,vector<set<int> > >& graph_tuple)
+partition_graph(const tuple<SysInt,vector<set<SysInt> >,vector<set<SysInt> > >& graph_tuple)
 {
-  std::vector<std::set<int> > graph;
-  std::vector<std::set<int> > partition;
+  std::vector<std::set<SysInt> > graph;
+  std::vector<std::set<SysInt> > partition;
   SysInt blank;
   tie(blank, graph, partition) = graph_tuple;
 
@@ -60,7 +60,7 @@ partition_graph(const tuple<int,vector<set<int> >,vector<set<int> > >& graph_tup
 
   for(SysInt i = 0; i < partition.size(); ++i)
   {
-    for(std::set<int>::iterator it = partition[i].begin(); it != partition[i].end(); ++it)
+    for(std::set<SysInt>::iterator it = partition[i].begin(); it != partition[i].end(); ++it)
       partition_num[*it] = i;
   }
 
@@ -141,10 +141,10 @@ struct Graph
      }
    }
 
-   tuple<int,vector<set<int> >,vector<set<int> > >  build_graph_info(CSPInstance& csp, bool print_names = true)
+   tuple<SysInt,vector<set<SysInt> >,vector<set<SysInt> > >  build_graph_info(CSPInstance& csp, bool print_names = true)
    {
 
-     map<string, int> v_num;
+     map<string, SysInt> v_num;
 
      SysInt var_vertex_count = 0, aux_vertex_count = 0;
      for(map<string, set<string> >::iterator it = var_vertex_colour.begin(); it != var_vertex_colour.end(); ++it)  
@@ -167,9 +167,9 @@ struct Graph
 
      // Now output partitions
 
-     vector<set<int> > partitions;
+     vector<set<SysInt> > partitions;
      
-     set<int> zero;
+     set<SysInt> zero;
      zero.insert(0);
      partitions.push_back(zero);
      
@@ -178,7 +178,7 @@ struct Graph
      ++it)
      {
        D_ASSERT(it->second.size() > 0);
-       set<int> partition;
+       set<SysInt> partition;
        for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
          partition.insert(v_num[*it2]);
        
@@ -190,7 +190,7 @@ struct Graph
      it != aux_vertex_colour.end();
      ++it)
      {
-       set<int> partition;
+       set<SysInt> partition;
        D_ASSERT(it->second.size() > 0);
        for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
        {
@@ -202,7 +202,7 @@ struct Graph
        partitions.push_back(partition);
      }
 
-     vector<set<int> > edges(var_vertex_count + aux_vertex_count + 1);
+     vector<set<SysInt> > edges(var_vertex_count + aux_vertex_count + 1);
     
      
      for(set<pair<string, string> >::iterator it = graph.begin(); it != graph.end(); ++it)
@@ -222,8 +222,8 @@ struct Graph
    void output_nauty_graph(CSPInstance& csp)
    {
      SysInt var_vertex_count;
-     vector<set<int> > edges;
-     vector<set<int> > partitions;
+     vector<set<SysInt> > edges;
+     vector<set<SysInt> > partitions;
 
      tie(var_vertex_count, edges, partitions) = build_graph_info(csp);
 #ifdef USE_NAUTY
@@ -805,7 +805,7 @@ struct InstanceStats
   InstanceStats(CSPInstance& _csp, StateObj* _stateObj) : csp(_csp), stateObj(_stateObj)
   { }
 
-  void classifyConstraint(ConstraintBlob i, int* alldiff, int* sums, int* or_atleastk, int* ternary, int* binary, int* table, int* reify, int* lex, int* unary, int* nullary, int* element, int* minmax, int* occurrence, vector<double>* alldiffdomovervars, VarContainer& v) {
+  void classifyConstraint(ConstraintBlob i, SysInt* alldiff, SysInt* sums, SysInt* or_atleastk, SysInt* ternary, SysInt* binary, SysInt* table, SysInt* reify, SysInt* lex, SysInt* unary, SysInt* nullary, SysInt* element, SysInt* minmax, SysInt* occurrence, vector<double>* alldiffdomovervars, VarContainer& v) {
       ConstraintType ct=i.constraint->type;
       switch(ct)
       {

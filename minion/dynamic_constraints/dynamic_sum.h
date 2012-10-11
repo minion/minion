@@ -69,7 +69,7 @@
 #define CONSTRAINT_DYNAMIC_SUM_H
 
 // VarToCount = 1 means leq, = 0 means geq.
-template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reversed = false >
+template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reversed = false >
   struct BoolLessSumConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
@@ -244,7 +244,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
 
     if (found_new_support)         // so we have found a new literal to watch
     {
-      int& unwatched_index = unwatched(j);
+      SysInt& unwatched_index = unwatched(j);
 
       dt->trigger_info() = unwatched_index;
       var_array[unwatched_index].addDynamicTrigger(
@@ -335,7 +335,7 @@ AbstractConstraint*
   BoolLessEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 {
   return new BoolLessSumConstraintDynamic<VarArray,VarSum>(stateObj, _var_array,
-    runtime_val(_var_array.size() - (DomainInt)(_var_sum)));
+    _var_array.size() - (SysInt)(_var_sum));
 }
 
 template<typename VarArray,  typename VarSum>

@@ -31,13 +31,14 @@ typedef long long BigInt;
 struct EmptyType
 {};
 
-/// A big constant, when such a thing is needed.
-const int big_constant = 999999;
+
 
 
 typedef int SysInt;
 typedef unsigned UnsignedSysInt;
 
+/// A big constant, when such a thing is needed.
+const SysInt big_constant = 999999;
 
 #ifdef MINION_DEBUG
 #ifndef BOUNDS_CHECK
@@ -70,130 +71,31 @@ To checked_cast(const Wrapper<From>& t)
 template<SysInt i>
 struct compiletime_val
 { 
-  operator DomainInt() const
+  operator SysInt() const
 { return i; }
-  
-  compiletime_val<-i-1> negminusone() const
-{ return compiletime_val<-i-1>(); }
-  
-  compiletime_val<-i> neg() const
-{ return compiletime_val<-i>(); }
   
   friend std::ostream& operator<<(std::ostream& o, const compiletime_val& v)
 { return o << "CompiletimeConst:" << i; }
   
 };
 
+template<typename T>
+T const_negminusone(T t)
+{ return -1-t; }
 
-/// A constant chosen at run time.
-/// Create with the notation runtime_val(6).
-struct runtime_val
-{
-  DomainInt i;
-  runtime_val(DomainInt _i) : i(_i)
-  {}
+template<SysInt i>
+inline compiletime_val<-i-1> const_negminusone(compiletime_val<i>)
+{ return compiletime_val<-i-1>(); }
 
-#ifdef MINION_DEBUG
-  runtime_val(SysInt _i) : i(_i)
-  {}
-#endif
+template<typename T>
+T const_neg(T t)
+{ return -t; }
 
-  operator DomainInt() const
-  { return i; }
-
-  
-  runtime_val negminusone() const
-  { return runtime_val(-1-i); }
-  
-  template<int j>
-  runtime_val neg() const
-  { return runtime_val(-i); }
-  
-  friend std::ostream& operator<<(std::ostream& o, const runtime_val& v)
-  { return o << v.i; }
-
-};
-
-#ifdef WRAP_BOOL_OPS
-#undef WRAP_BOOL_OPS
-#endif
-
-#ifdef MINION_DEBUG
-#define WRAP_BOOL_OPS(op) \
-inline bool operator op (const runtime_val& t1, const runtime_val& t2) \
-{ return t1.i op t2.i; } \
-\
-inline bool operator op (const DomainInt& t1, const runtime_val& t2) \
-{ return t1 op t2.i; } \
-\
-inline bool operator op (const runtime_val& t1, const DomainInt& t2) \
-{ return t1.i op t2; } \
-\
-inline bool operator op (const SysInt& t1, const runtime_val& t2) \
-{ return t1 op t2.i; } \
-\
-inline bool operator op (const runtime_val& t1, const SysInt& t2) \
-{ return t1.i op t2; } 
-#else
-#define WRAP_BOOL_OPS(op) \
-inline bool operator op (const runtime_val& t1, const runtime_val& t2) \
-{ return t1.i op t2.i; } \
-\
-inline bool operator op (const SysInt& t1, const runtime_val& t2) \
-{ return t1 op t2.i; } \
-\
-inline bool operator op (const runtime_val& t1, const SysInt& t2) \
-{ return t1.i op t2; } 
-#endif
-
-WRAP_BOOL_OPS(==)
-WRAP_BOOL_OPS(!=)
-WRAP_BOOL_OPS(<)
-WRAP_BOOL_OPS(>)
-WRAP_BOOL_OPS(<=)
-WRAP_BOOL_OPS(>=)
-
-#ifdef WRAP_ARITHMETIC_OPS
-#undef WRAP_ARITHMETIC_OPS
-#endif
-
-#ifdef MINION_DEBUG
-#define WRAP_ARITHMETIC_OPS(op) \
-inline DomainInt operator op (const runtime_val& t1, const runtime_val& t2) \
-{ return t1.i op t2.i; } \
-\
-inline DomainInt operator op(const DomainInt& t1, const runtime_val& t2) \
-{ return t1 op t2.i; } \
-\
-inline DomainInt operator op(const SysInt& t1, const runtime_val& t2) \
-{ return t1 op t2.i; } \
-\
-inline DomainInt operator op(const runtime_val& t1, const DomainInt& t2) \
-{ return t1.i op t2; } \
-\
-inline DomainInt operator op(const runtime_val& t1, const SysInt& t2) \
-{ return t1.i op t2; } 
-#else
-#define WRAP_ARITHMETIC_OPS(op) \
-inline DomainInt operator op (const runtime_val& t1, const runtime_val& t2) \
-{ return t1.i op t2.i; } \
-\
-inline DomainInt operator op(const SysInt& t1, const runtime_val& t2) \
-{ return t1 op t2.i; } \
-\
-inline DomainInt operator op(const runtime_val& t1, const SysInt& t2) \
-{ return t1.i op t2; } 
-#endif
-
-WRAP_ARITHMETIC_OPS(+)
-WRAP_ARITHMETIC_OPS(-)
-WRAP_ARITHMETIC_OPS(*)
-WRAP_ARITHMETIC_OPS(/)
-WRAP_ARITHMETIC_OPS(%)
+template<SysInt i>
+inline compiletime_val<-i> const_neg(compiletime_val<i>)
+{ return compiletime_val<-i>(); }
 
 
-inline runtime_val abs(const runtime_val& in)
-{ return runtime_val(abs(in.i)); }
 
 template<typename T>
 inline T mymin(T t1, T t2)

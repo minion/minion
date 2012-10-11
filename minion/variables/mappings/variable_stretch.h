@@ -59,7 +59,7 @@ static inline DomainInt divide_exact(DomainInt val, DomainInt divisor)
 template<>
 struct MultiplyHelp<BoolVarRef>
 {
-  static inline int round_down(int val, int divisor)
+  static inline SysInt round_down(SysInt val, SysInt divisor)
   {
     if(val < divisor)
       return 0;
@@ -67,7 +67,7 @@ struct MultiplyHelp<BoolVarRef>
       return 1;
   }
   
-  static inline int round_up(int val, int divisor)
+  static inline SysInt round_up(SysInt val, SysInt divisor)
   {
     if(
   }
@@ -469,7 +469,7 @@ struct MultiplyType<array<T, i> >
 
 template<typename VRef>
 typename MultiplyType<VRef>::type
-MultiplyVarRef(VRef var_ref, int i)
+MultiplyVarRef(VRef var_ref, SysInt i)
 { return MultiplyVar<VRef>(var_ref, i); }
 
 template<typename VarRef>
@@ -496,7 +496,7 @@ MultiplyVarRef(const vector<VarRef>& var_array, const vector<DomainInt>& multipl
 
 template<typename VarRef, std::size_t i>
 array<MultiplyVar<VarRef>, i>
-MultiplyVarRef(const array<VarRef, i>& var_array, const array<int, i>& multiplies)
+MultiplyVarRef(const array<VarRef, i>& var_array, const array<SysInt, i>& multiplies)
 {
   array<MultiplyVar<VarRef>, i> Multiply_array;
   for(UnsignedSysInt l = 0; l < i; ++l)

@@ -551,7 +551,7 @@ public:
   {   LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(b.var_num >= 0);
-    D_ASSERT(b.var_num <= (int)var_count_m);
+    D_ASSERT(b.var_num <= (SysInt)var_count_m);
     D_ASSERT(type != DomainRemoval || (pos >= getInitialMin(b) && pos <= getInitialMax(b)));
     trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL); 
   }

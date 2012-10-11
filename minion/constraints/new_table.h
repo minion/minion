@@ -99,7 +99,7 @@ public:
   { }
 
   // TODO: Optimise possibly?
-  bool checkTuple(DomainInt* tuple, int tuple_size)
+  bool checkTuple(DomainInt* tuple, SysInt tuple_size)
    {
      D_ASSERT(tuple_size == getVarCount());
      for(SysInt i = 0; i < getNumOfTuples(); ++i)
@@ -133,9 +133,9 @@ public:
   template<typename VarArray>
   vector<DomainInt>* findSupportingTuple(const VarArray& vars, Literal lit)
   {
-    //int tuple_size = data->getVarCount();
-    //int length = data->getNumOfTuples();
-    //int* tuple_data = data->getPointer();
+    //SysInt tuple_size = data->getVarCount();
+    //SysInt length = data->getNumOfTuples();
+    //SysInt* tuple_data = data->getPointer();
 
     SysInt varIndex = lit.var;
     DomainInt val = lit.val;
@@ -175,11 +175,11 @@ public:
   {
     SysInt tuple_size = data->getVarCount();
     SysInt length = data->getNumOfTuples();
-    int* tuple_data = data->getPointer();
+    SysInt* tuple_data = data->getPointer();
 
     for(SysInt i = 0; i < length; ++i)
     {
-      int* tuple_start = tuple_data + i*tuple_size;
+      SysInt* tuple_start = tuple_data + i*tuple_size;
       bool success = true;
       if(tuple_start[checked_cast<SysInt>(lit.var)] != lit.val)
         success = false;
@@ -287,7 +287,7 @@ struct NewTableConstraint : public AbstractConstraint
     }
   }
 
-  void clear_watches(Literal lit, int lit_pos)
+  void clear_watches(Literal lit, SysInt lit_pos)
   {
     DynamicTrigger* dt = dynamic_trigger_start();
     D_ASSERT(data->getLiteralPos(lit) == lit_pos);
@@ -331,8 +331,8 @@ struct NewTableConstraint : public AbstractConstraint
     }
   }
   
-//  inline DomainInt min(int x, int y) {return (x<y)?x:y; }
-//  inline DomainInt max(int x, int y) {return (x>y)?x:y; }
+//  inline DomainInt min(SysInt x, SysInt y) {return (x<y)?x:y; }
+//  inline DomainInt max(SysInt x, SysInt y) {return (x>y)?x:y; }
   
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {

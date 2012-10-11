@@ -103,9 +103,9 @@ public:
     { return stream_pos == stream_end; }
         
     
-    void getline(char* buf, int buf_length, char deliminator = '\n')
+    void getline(char* buf, SysInt buf_length, char deliminator = '\n')
     {
-        SysInt length = std::min((int)buf_length, (int)(stream_end - stream_pos));
+        SysInt length = std::min((SysInt)buf_length, (SysInt)(stream_end - stream_pos));
         P(length << ":");
         for(SysInt i = 0; i < length; ++i)
         {
@@ -166,7 +166,7 @@ void operator>>(CheapStream& cs, T& ret)
     }
     
     ret = i * neg_flag;
-    P(">>int Got: " << i);
+    P(">>SysInt Got: " << i);
 }
 
 template<typename T>

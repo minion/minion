@@ -46,7 +46,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   VarArray2 var_array2;
 
 
-  Reversible<int> alpha;
+  Reversible<SysInt> alpha;
 
   QuickLexDynamic(StateObj* _stateObj, const VarArray1& _array1,
     const VarArray2& _array2) :
@@ -60,7 +60,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     { return 2; }
 
   
-  void attach_triggers(int i)
+  void attach_triggers(SysInt i)
   {
       P("Attach Trigger: " << i);
       DynamicTrigger* dt = dynamic_trigger_start();
@@ -161,7 +161,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   {
     DynamicTrigger* base_dt = dynamic_trigger_start();
     
-    P("Trigger Event:" << dt - base_dt << " alpha:" << (int)alpha);
+    P("Trigger Event:" << dt - base_dt << " alpha:" << (SysInt)alpha);
 
     SysInt a = alpha;
 
@@ -197,7 +197,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     D_ASSERT(v_size == var_array1.size() + var_array2.size());
     size_t x_size = var_array1.size();
 
-    P("Check Assignment: " << (int)alpha);
+    P("Check Assignment: " << (SysInt)alpha);
     for(size_t i = 0;i < x_size; i++)
     {
       if(v[i] < v[i + x_size])

@@ -70,7 +70,7 @@ class TupleList
   { return tuple_length; }
   
   // This function is temporary while the new interface is being designed.
-  vector<DomainInt> get_vector(int pos) const
+  vector<DomainInt> get_vector(SysInt pos) const
   {
     vector<DomainInt> vec(tuple_length);
     for(SysInt i = 0; i < tuple_length; ++i)
@@ -95,10 +95,10 @@ class TupleList
     number_of_tuples(checked_cast<SysInt>(_numtuples)), tuples_locked(false)
   { tuple_data = new DomainInt[number_of_tuples * tuple_length]; }
   
-  const DomainInt* operator[](int pos) const
+  const DomainInt* operator[](SysInt pos) const
   { return get_tupleptr(pos); }
   
-  const DomainInt* get_tupleptr(int pos) const
+  const DomainInt* get_tupleptr(SysInt pos) const
   { 
     D_ASSERT(pos >= 0 && (pos < number_of_tuples || (number_of_tuples==0 && pos==0)));
     return tuple_data + pos*tuple_length;

@@ -109,11 +109,11 @@ struct ElementConstraintDynamic : public AbstractConstraint
     checked_cast<SysInt>(initial_result_dom_max - initial_result_dom_min + 1) * 2 
     + 1 
     + 1; 
-    current_support.resize(count / 2);           // is int the right type?
+    current_support.resize(count / 2);           // is SysInt the right type?
     return count;
   }
   
-  void find_new_support_for_result(int j)
+  void find_new_support_for_result(SysInt j)
   {
     DomainInt realj = j + initial_result_dom_min;
     
@@ -152,7 +152,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
     current_support[j + array_size] = support;
   }
   
-  void find_new_support_for_index(int i)
+  void find_new_support_for_index(SysInt i)
   {
     if(!indexvar.inDomain(i))
       return;
@@ -181,7 +181,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
     DomainInt maxsupport = resultvarmax;
     DomainInt support = oldsupport;
     
-    //int support = initial_result_dom_min;
+    //SysInt support = initial_result_dom_min;
     while(support <= maxsupport &&
           !(resultvar.inDomain_noBoundCheck(support) && var_array[i].inDomain(support)))
       ++support;
@@ -302,7 +302,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
     UnsignedSysInt result_support_triggers = 
       checked_cast<UnsignedSysInt>((initial_result_dom_max - initial_result_dom_min + 1) * 2);
     UnsignedSysInt index_support_triggers =  array_size * 2;
-    // int when_index_assigned_triggers = (initial_result_dom_max - initial_result_dom_min + 1);
+    // SysInt when_index_assigned_triggers = (initial_result_dom_max - initial_result_dom_min + 1);
     if(pos < result_support_triggers)
     {// It was a value in the result var which lost support
       find_new_support_for_result(pos / 2);
@@ -337,7 +337,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
       D_ASSERT(v_size == var_array.size() + 2);
       DomainInt resultvariable = v[v_size - 1];
       DomainInt indexvariable = v[v_size - 2];
-      if(indexvariable < 0 || indexvariable >= (int)v_size - 2)
+      if(indexvariable < 0 || indexvariable >= (SysInt)v_size - 2)
         return false;
       return v[checked_cast<SysInt>(indexvariable)] == resultvariable;
     }

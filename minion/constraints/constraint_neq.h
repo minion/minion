@@ -124,7 +124,7 @@ struct NeqConstraint : public AbstractConstraint
     return false;
   }
   
-  virtual BOOL check_unsat(int i, DomainDelta)
+  virtual BOOL check_unsat(SysInt i, DomainDelta)
   {
     SysInt v_size = var_array.size();
     D_ASSERT(var_array[i].isAssigned());
@@ -173,7 +173,7 @@ struct NeqConstraint : public AbstractConstraint
       D_ASSERT(v_size == var_array.size());
       SysInt array_size = checked_cast<SysInt>(v_size);
       for(SysInt i=0;i<array_size;i++)
-        for( int j=i+1;j<array_size;j++)
+        for( SysInt j=i+1;j<array_size;j++)
           if(v[i]==v[j]) return false;
       return true;
     }

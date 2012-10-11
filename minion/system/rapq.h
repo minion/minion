@@ -198,7 +198,7 @@ class RandomAccessPriorityQ {
 /* Below is the code that I used to test this ADT. Both require access to
 a definition like   
 
-RandomAccessPriorityQ<UnsignedSysInt, int> test(stateObj);
+RandomAccessPriorityQ<UnsignedSysInt, SysInt> test(stateObj);
 
   cout << "begin rapq BT test" << endl;
   

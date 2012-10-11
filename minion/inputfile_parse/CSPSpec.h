@@ -746,7 +746,7 @@ public:
 }
 
 extern ConstraintDef constraint_list[];  // why is this here twice?
-extern int num_of_constraints;
+extern SysInt num_of_constraints;
 
 inline ConstraintDef* get_constraint(ConstraintType t)
 {

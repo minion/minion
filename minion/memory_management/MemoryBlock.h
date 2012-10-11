@@ -65,7 +65,7 @@ public:
   explicit MoveablePointer(void* ptr);
 
   /// Constructs a MoveablePointer from a MoveablePointer and an offset in bytes.
-  explicit MoveablePointer(const MoveablePointer& mp, int offset);
+  explicit MoveablePointer(const MoveablePointer& mp, SysInt offset);
 
   /// In debug mode, gets the pointer without checking if it is valid.
   /** This can be used in non-debug mode, but does not do anything. It is used
@@ -128,13 +128,13 @@ public:
 
   // A common C++ requiement - declaring two identical methods, one for const, one without.
   
-  T& operator[](int pos)
+  T& operator[](SysInt pos)
   { 
     D_ASSERT(pos >= 0 && pos < size);
     return *(static_cast<T*>(ptr.get_ptr()) + pos);
   }
 
-  const T& operator[](int pos) const
+  const T& operator[](SysInt pos) const
   { 
     D_ASSERT(pos >= 0 && pos < size);
     return *(static_cast<T*>(ptr.get_ptr()) + pos);
@@ -248,8 +248,8 @@ public:
       return MoveablePointer(NULL);
       
     // TODO: is the following line necessary?
-    if(byte_count % sizeof(int) != 0)
-      byte_count += sizeof(int) - (byte_count % sizeof(int));
+    if(byte_count % sizeof(SysInt) != 0)
+      byte_count += sizeof(SysInt) - (byte_count % sizeof(SysInt));
 
     if(maximum_bytes < allocated_bytes + byte_count)
     { reallocate(byte_count); }
@@ -305,7 +305,7 @@ inline MoveablePointer::MoveablePointer(void* _ptr) : ptr(_ptr)
 inline MoveablePointer::~MoveablePointer()
 { }
 
-inline MoveablePointer::MoveablePointer(const MoveablePointer& b, int offset) : ptr(((char*)b.ptr) + offset)
+inline MoveablePointer::MoveablePointer(const MoveablePointer& b, SysInt offset) : ptr(((char*)b.ptr) + offset)
 { D_ASSERT(b.get_ptr() != NULL); }
 
 

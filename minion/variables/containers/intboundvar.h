@@ -373,10 +373,10 @@ struct BoundVarContainer {
   }
   
 //  BoundVarRef get_new_var();
-//  BoundVarRef get_new_var(int i, int j);
+//  BoundVarRef get_new_var(SysInt i, SysInt j);
   BoundVarRef get_var_num(DomainInt i);
   
-  void addVariables(const vector<pair<int, Bounds > >& vars)
+  void addVariables(const vector<pair<SysInt, Bounds > >& vars)
   {
     D_ASSERT(!lock_m);
     for(SysInt i = 0; i < vars.size(); ++i)
@@ -486,7 +486,7 @@ struct BoundVarContainer {
 /*
 template<typename T>
 inline BoundVarRef
-BoundVarContainer<T>::get_new_var(int i, int j)
+BoundVarContainer<T>::get_new_var(SysInt i, SysInt j)
 {
 
   return BoundVarRef(BoundVarRef_internal<BoundType>(var_count_m++));

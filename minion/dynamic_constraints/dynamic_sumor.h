@@ -181,7 +181,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);
 
     /*printf("propmode=%d, triggerpair=%d, trigger_activated=%d\n",
-      (int)propagate_mode, (int)triggerpair, (int)trigger_activated);
+      (SysInt)propagate_mode, (SysInt)triggerpair, (SysInt)trigger_activated);
 
     for(SysInt i = 0; i < watched_values.size(); ++i)
       printf("%d,", watched_values[i]);
@@ -231,7 +231,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       index_to_not_propagate = watched_values[triggerpair];
       
 //     printf("!propmode=%d, triggerpair=%d, trigger_activated=%d, nopropindex=%d\n",
-//        (int)propagate_mode, (int)triggerpair, (int)trigger_activated, (int)index_to_not_propagate);
+//        (SysInt)propagate_mode, (SysInt)triggerpair, (SysInt)trigger_activated, (SysInt)index_to_not_propagate);
         
       for(SysInt i = 0; i < watched_values.size(); ++i)
       {
@@ -303,7 +303,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
    typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
    {
      return new VecCountDynamic<VarArray1, VarArray2, typename Operator::reverse_operator, true>
-         (stateObj, var_array1, var_array2, (int)var_array1.size()-hamming_distance+1);
+         (stateObj, var_array1, var_array2, (SysInt)var_array1.size()-hamming_distance+1);
    }
 
    template<bool b>

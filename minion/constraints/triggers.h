@@ -28,7 +28,7 @@ class AbstractConstraint;
 
 /** @brief Represents a change in domain. 
  *
- * This is used instead of a simple int as the use of various mappers on variables might mean the domain change needs
+ * This is used instead of a simple SysInt as the use of various mappers on variables might mean the domain change needs
  * to be corrected. Every variable should implement the function getDomainChange which uses this and corrects the domain.
  */
 class DomainDelta

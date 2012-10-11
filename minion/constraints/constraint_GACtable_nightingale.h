@@ -25,7 +25,7 @@ struct TupleComparator
   SysInt significantIndex;
   SysInt arity;
   
-  TupleComparator(int i, int a) : significantIndex(i), arity(a)
+  TupleComparator(SysInt i, SysInt a) : significantIndex(i), arity(a)
   { }
   
   // returns tuple1 <= tuple2 under our ordering.
@@ -49,9 +49,9 @@ struct TupleN
            // no need for nextPointer
   
   SysInt * values;
-  SysInt * nextDifferent;    // int index into global array, pointing to the next 
+  SysInt * nextDifferent;    // SysInt index into global array, pointing to the next 
   
-  TupleN(int * _values, int _id, int arity, int* _nD) : 
+  TupleN(SysInt * _values, SysInt _id, SysInt arity, SysInt* _nD) : 
     id(_id), values(_values), nextDifferent(_nD)
   {
     for(SysInt i = 0; i < arity; i++)
@@ -96,7 +96,7 @@ struct Nightingale
       vector<vector<vector<vector<DomainInt> > > > goods;
       // Pass goods to splittuples just to avoid copying it on return.
       splittuples(tuples, goods);
-      tuplelistlengths = new int*[arity];
+      tuplelistlengths = new SysInt*[arity];
       
       for(SysInt i = 0; i < arity; i++)
       {
@@ -104,7 +104,7 @@ struct Nightingale
         SysInt varmax = (tuples->dom_smallest)[i] + (tuples->dom_size)[i];
         SysInt domsize = (tuples->dom_size)[i];
         tuplelistperlit[i]=new TupleN*[domsize];
-        tuplelistlengths[i]=new int[domsize];
+        tuplelistlengths[i]=new SysInt[domsize];
         
         for(SysInt val = varmin; val < varmax; val++)
         {   
@@ -120,7 +120,7 @@ struct Nightingale
     }  
   }
   
-  void printhologram(TupleN* tlpl, int size)
+  void printhologram(TupleN* tlpl, SysInt size)
   {
     for(SysInt i = 0; i < size; ++i)
     {
@@ -137,13 +137,13 @@ struct Nightingale
   template<typename T>
   TupleN* buildhologram(T& tupleref)
   {
-    // turn a list of int [] into an n-holo
+    // turn a list of SysInt [] into an n-holo
     TupleN* tlist=new TupleN[tupleref.size()];
     
-    int* mem_block = new int[arity * 2 * tupleref.size()];
+    SysInt* mem_block = new SysInt[arity * 2 * tupleref.size()];
     for(SysInt tupleIndex = 0; tupleIndex < tupleref.size(); tupleIndex++)
     {
-      int* _values = mem_block + arity * (tupleIndex * 2) ;
+      SysInt* _values = mem_block + arity * (tupleIndex * 2) ;
       
       // This line is messy, but is here because we want this code to work
       // for both vector<vector<DomainInt> >s and tuple containers. I'll clean it up
@@ -254,7 +254,7 @@ struct GACTableConstraint : public AbstractConstraint
     return true;
   }
   
-  bool check_tuple(int * v)
+  bool check_tuple(SysInt * v)
   {
     for(UnsignedSysInt i = 0; i < arity; ++i)
     {
@@ -264,7 +264,7 @@ struct GACTableConstraint : public AbstractConstraint
     return true;
   }
   
-  SysInt comparetuples(int * t1, int * t2)
+  SysInt comparetuples(SysInt * t1, SysInt * t2)
   {
     for(SysInt i = 0; i < arity; i++)
     {
@@ -286,11 +286,11 @@ struct GACTableConstraint : public AbstractConstraint
       nightingale = tuples->getNightingale();
       arity = nightingale->tuples->tuple_size();     
       D_ASSERT(_vars.size() == arity);
-      current_support=new int*[arity];
+      current_support=new SysInt*[arity];
       
       for(SysInt i=0; i<arity; i++)
       {
-        current_support[i]= new int[(tuples->dom_size)[i]];
+        current_support[i]= new SysInt[(tuples->dom_size)[i]];
         for(SysInt j=0; j<(tuples->dom_size)[i]; j++)
           current_support[i][j]=-1;
       }
@@ -299,7 +299,7 @@ struct GACTableConstraint : public AbstractConstraint
   virtual SysInt dynamic_trigger_count()
   { return (nightingale->tuples->literal_num) * ( vars.size() - 1) ; }
     
-  TupleN* seekNextSupport(int var, int val)
+  TupleN* seekNextSupport(SysInt var, SysInt val)
   {
     // find a support which conforms to var and val, and the current domains,
     // and is after the support in watches unless we reach the end and wrap.
@@ -397,7 +397,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   // Below is shared with regin-lhomme file.
   
-  bool find_new_support(int literal)
+  bool find_new_support(SysInt literal)
   {
      pair<DomainInt, DomainInt> varval = nightingale->tuples->get_varval_from_literal(literal);
      SysInt var = varval.first;
@@ -433,10 +433,10 @@ struct GACTableConstraint : public AbstractConstraint
     }
   }
   
-  void setup_watches(int var, int val, int lit)
+  void setup_watches(SysInt var, SysInt val, SysInt lit)
   {
     SysInt domain_min = (nightingale->tuples->dom_smallest)[var];
-    int* tuple;
+    SysInt* tuple;
     if(!listperliteral)
       tuple=nightingale->tuplelist[current_support[var][val-domain_min]].values;
     else

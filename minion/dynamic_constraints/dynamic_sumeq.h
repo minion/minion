@@ -34,7 +34,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
   
   SysInt xmult, ymult;
 
-  SumEqConstraintDynamic(StateObj* _stateObj, int _xmult, int _ymult, VarRef1 _x, VarRef2 _y, VarRef3 _z) :
+  SumEqConstraintDynamic(StateObj* _stateObj, SysInt _xmult, SysInt _ymult, VarRef1 _x, VarRef2 _y, VarRef3 _z) :
     AbstractConstraint(stateObj), xmult(_xmult), ymult(_ymult), x(_x), y(_y), z(_z), vals(-1)
   { 
 #ifndef WATCHEDLITERALS
@@ -73,13 +73,13 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     return a;
   }
 
-  BOOL check_assignment(DomainInt* v, int v_size) {
+  BOOL check_assignment(DomainInt* v, SysInt v_size) {
     return xmult*v[0] + ymult*v[1] == v[2];
   }
 
   //use smart algorithm to find out if any a + b = c in linear time
   //puts supports for c in resArr and returns T, or F if none exist
-  BOOL get_sumsupport(VarRef1& a, VarRef2& b, DomainInt c, int (&resArr)[2]) {
+  BOOL get_sumsupport(VarRef1& a, VarRef2& b, DomainInt c, SysInt (&resArr)[2]) {
     DomainInt bMin = b.getMin();
     DomainInt bMax = b.getMax();
     DomainInt aCurr = max(a.getMin(), (c - bMax*ymult)/xmult);
@@ -107,7 +107,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 
   //variation on get_sumsupport to do a - b*bmult = c
   template<typename VarType1>
-  BOOL get_diffsupport(VarRef3& a, VarType1& b, int bmult, DomainInt c, int (&resArr)[2]) {
+  BOOL get_diffsupport(VarRef3& a, VarType1& b, SysInt bmult, DomainInt c, SysInt (&resArr)[2]) {
     DomainInt bMin = b.getMin();
     DomainInt bMax = b.getMax();
     DomainInt aCurr = max(a.getMin(), (c + bMin*bmult));

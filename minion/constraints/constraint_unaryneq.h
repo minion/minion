@@ -49,7 +49,7 @@ struct UnaryNeqConstraint : public AbstractConstraint
   { D_FATAL_ERROR("This method should never be called"); }
   
   
-  virtual BOOL check_unsat(int,DomainDelta)
+  virtual BOOL check_unsat(SysInt,DomainDelta)
   { return !x.inDomain(offset); }
   
   virtual void full_propagate()

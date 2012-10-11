@@ -77,7 +77,7 @@ template<typename Var>
     //lower loop
     SysInt lower_index = 0;
     
-    while(lower_index < (int)vals.size() && vals[lower_index] <= var.getMin())
+    while(lower_index < (SysInt)vals.size() && vals[lower_index] <= var.getMin())
     {
       var.setMin(vals[lower_index] + 1);
       lower_index++;

@@ -21,7 +21,7 @@
 
 extern bool in_cspcomp_for_failexit;
 
-void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char** argv)
+void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, char** argv)
 {
  for(SysInt i = 1; i < argc; ++i)
   {
@@ -123,7 +123,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       ++i;
       try
       {
-        getOptions(stateObj).sollimit = from_string_checked<int>(argv[i]);
+        getOptions(stateObj).sollimit = from_string_checked<SysInt>(argv[i]);
         if(getOptions(stateObj).sollimit <= 0)
           throw "Invalid lower bound";
       }
@@ -144,7 +144,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       getOptions(stateObj).timeout_active = true;
       try
       {
-        getOptions(stateObj).time_limit = from_string_checked<int>(argv[i]);
+        getOptions(stateObj).time_limit = from_string_checked<SysInt>(argv[i]);
         getOptions(stateObj).time_limit_is_CPU_time = false;
       }
       catch(...)
@@ -164,7 +164,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       getOptions(stateObj).timeout_active = true;
       try
       {
-        getOptions(stateObj).search_limit = from_string_checked<int>(argv[i]);
+        getOptions(stateObj).search_limit = from_string_checked<SysInt>(argv[i]);
       }
       catch(...)
       {
@@ -183,7 +183,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char**
       getOptions(stateObj).timeout_active = true;
       try
       {
-        getOptions(stateObj).time_limit = from_string_checked<int>(argv[i]);
+        getOptions(stateObj).time_limit = from_string_checked<SysInt>(argv[i]);
         getOptions(stateObj).time_limit_is_CPU_time = true;
       }
       catch(...)

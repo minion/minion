@@ -47,7 +47,7 @@ struct UnaryEqualConstraint : public AbstractConstraint
   { D_FATAL_ERROR("This method should never be called"); }
   
   
-  virtual BOOL check_unsat(int,DomainDelta)
+  virtual BOOL check_unsat(SysInt,DomainDelta)
   { return (x.getMin() <= offset) && (x.getMax() >= offset); }
   
   virtual void full_propagate()

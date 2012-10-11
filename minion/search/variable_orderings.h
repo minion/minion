@@ -90,7 +90,7 @@ struct VariableOrder
     
     // returns a pair of variable index, domain value.
     // returning the variable index == -1 means no branch possible.
-    virtual pair<int, DomainInt> pickVarVal() = 0;
+    virtual pair<SysInt, DomainInt> pickVarVal() = 0;
 
     virtual ~VariableOrder() {}
 };
@@ -99,7 +99,7 @@ struct VariableOrder
 struct MultiBranch : public VariableOrder
 {
     vector<shared_ptr<VariableOrder> > vovector;
-    Reversible<int> pos;
+    Reversible<SysInt> pos;
     
     // need to patch up the returned variable index
     vector<DomainInt> variable_offset;
@@ -143,7 +143,7 @@ struct MultiBranch : public VariableOrder
 struct StaticBranch : public VariableOrder
 {
     vector<ValOrderEnum> val_order;
-    Reversible<int> pos;
+    Reversible<SysInt> pos;
     
     StaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
         val_order(_val_order), pos(_stateObj)
@@ -152,7 +152,7 @@ struct StaticBranch : public VariableOrder
         D_ASSERT(var_order.size() == val_order.size());
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
         UnsignedSysInt v_size = var_order.size();
         
@@ -179,7 +179,7 @@ struct SDFBranch : public VariableOrder
     
     // THIS DOES NOT DO SDF -- just an approximation with the bounds.
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
         //cout << "In pickVarVal for SDF (approximation)" <<endl;
         SysInt length = var_order.size();
@@ -222,7 +222,7 @@ struct SlowStaticBranch : public VariableOrder
     {
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
         UnsignedSysInt v_size = var_order.size();
         UnsignedSysInt pos = 0;
@@ -249,7 +249,7 @@ struct WdegBranch : public VariableOrder
     {
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
     SysInt best = var_order.size(); //the variable with the best score so far (init to none)
     SysInt best_score = -1; //... and its score (all true scores are positive)
@@ -320,7 +320,7 @@ struct DomOverWdegBranch : VariableOrder
     {
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
     //cout << "using domoverwdeg" << endl;
     SysInt best = var_order.size(); //the variable with the best score so far (init to none)
@@ -404,7 +404,7 @@ struct SRFBranch : VariableOrder
     {
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
     SysInt length = var_order.size();
     SysInt smallest_dom = length;
@@ -446,7 +446,7 @@ struct LDFBranch : VariableOrder
     {
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
     SysInt length = var_order.size();
     
@@ -486,7 +486,7 @@ struct ConflictBranch : VariableOrder
     // "Last Conflict based Reasoning", Lecoutre et al, ECAI 06.
     vector<ValOrderEnum> val_order;
     
-    Reversible<int> pos;
+    Reversible<SysInt> pos;
     
     VariableOrder* innervarorder;
     
@@ -511,7 +511,7 @@ struct ConflictBranch : VariableOrder
     SysInt last_returned_var;
     bool in_conflict;
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
         if(in_conflict && var_order[last_returned_var].isAssigned())
         {
@@ -545,7 +545,7 @@ struct ConflictBranch : VariableOrder
         }
         else
         {
-            pair<int, DomainInt> temp= innervarorder->pickVarVal();
+            pair<SysInt, DomainInt> temp= innervarorder->pickVarVal();
             last_returned_var=temp.first;
             D_ASSERT(temp.first==-1 || var_order[temp.first].inDomain(temp.second));
             return temp;

@@ -31,7 +31,7 @@ using namespace std;
 #include "get_info/get_info.h"
 
 // XXX : Provide access to this.
-const int ShowUnused = 0;
+const SysInt ShowUnused = 0;
 
 string EventNames[] = {
 #define VAR_EVENT(x,y) #x ,
@@ -41,7 +41,7 @@ string EventNames[] = {
 };
 
 // 0 - ignore, 1 - read, 2 - write
-int EventCategory[] = {
+SysInt EventCategory[] = {
 #define NULL_EVENT 0
 #define READ_EVENT 1
 #define WRITE_EVENT 2
@@ -97,14 +97,14 @@ struct VarInfo
 
 VarInfo var_info;
 
-string pad(string s, int length = 18)
+string pad(string s, SysInt length = 18)
 {
   s.resize(length,' ');
   return s;
 }
 
 // There must be a neater way of doing this...
-string pad_start(string s, int length = 12)
+string pad_start(string s, SysInt length = 12)
 {
   string output;
   output.resize(length - s.size(), ' ');

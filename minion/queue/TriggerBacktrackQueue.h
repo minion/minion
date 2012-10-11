@@ -67,7 +67,7 @@ struct TriggerBacktrackQueue
         P("TBQ: World_pop");
         TriggerList& tl = queue.back();
 
-        for (int i = tl.size() - 1; i >= 0; --i)
+        for (SysInt i = tl.size() - 1; i >= 0; --i)
         {
             if (tl[i].second == NULL)
             {

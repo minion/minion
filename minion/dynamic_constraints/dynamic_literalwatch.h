@@ -199,7 +199,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
     
     if (found_new_support)         // so we have found a new literal to watch
     {
-      int& unwatched_index = unwatched(j);
+      SysInt& unwatched_index = unwatched(j);
       
       // propval gives array index of old watched lit
       

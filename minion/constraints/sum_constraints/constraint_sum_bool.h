@@ -21,7 +21,7 @@
 #define CONSTRAINT_SUM_H_FGHJ
 
 // VarToCount = 1 means leq, = 0 means geq.
-template<typename VarArray, typename VarSum, int VarToCount = 1 >
+template<typename VarArray, typename VarSum, SysInt VarToCount = 1 >
 struct BoolLessSumConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
@@ -67,9 +67,9 @@ struct BoolLessSumConstraint : public AbstractConstraint
   virtual AbstractConstraint* reverse_constraint()
   { 
     if(VarToCount)
-      return new BoolLessSumConstraint<VarArray, runtime_val, 0>(stateObj, var_array, runtime_val(var_sum + 1)); 
+      return new BoolLessSumConstraint<VarArray, SysInt, 0>(stateObj, var_array, var_sum + 1); 
     else
-      return new BoolLessSumConstraint<VarArray, runtime_val, 1>(stateObj, var_array, runtime_val(var_sum - 1));
+      return new BoolLessSumConstraint<VarArray, SysInt, 1>(stateObj, var_array, var_sum - 1);
   }
   
   DomainInt occ_count()
@@ -122,7 +122,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     return false;
   }
   
-  virtual BOOL check_unsat(int, DomainDelta)
+  virtual BOOL check_unsat(SysInt, DomainDelta)
   {
     SysInt i = count + 1;
     count = i;

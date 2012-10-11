@@ -29,7 +29,7 @@ public:
   /// In debug mode, a value set to 1234 if this is a DynamicTrigger, or 4321 if this
   /// is a BacktrackableTrigger. This allows a check that a DynamicTrigger*
   /// actually points to a valid object.
-  D_DATA(int sanity_check;)
+  D_DATA(SysInt sanity_check;)
 
   /// In debug mode, a value set to
   /// The constraint to be triggered.
@@ -41,7 +41,7 @@ public:
   DynamicTrigger* next;
 
   /// Wrapper function for _trigger_info.
-  int& trigger_info()
+  SysInt& trigger_info()
   { return _trigger_info; }
 
 

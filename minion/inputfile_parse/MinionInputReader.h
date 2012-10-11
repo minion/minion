@@ -212,9 +212,9 @@ class MinionInputReader {
   vector< vector<Var> > Vectors ;
   vector< vector<vector<Var> > > Matrices ;
   vector< vector<vector<vector<Var> > > > Tensors ;
-  vector<Var> flatten(char type, int index) ;
-  vector<Var> getColOfMatrix(vector<vector<Var> >& m, int c) ;
-  vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,int r,int c) ;
+  vector<Var> flatten(char type, SysInt index) ;
+  vector<Var> getColOfMatrix(vector<vector<Var> >& m, SysInt c) ;
+  vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,SysInt r,SysInt c) ;
   BOOL readConstraint(FileReader* infile, BOOL reified) ;
   void readConstraintElement(FileReader* infile, ConstraintDef*) ;
   void readConstraintTable(FileReader* infile, ConstraintDef*) ;
@@ -252,9 +252,9 @@ class MinionThreeInputReader {
   vector< vector<Var> > Vectors ;
   vector< vector<vector<Var> > > Matrices ;
   vector< vector<vector<vector<Var> > > > Tensors ;
-  vector<Var> flatten(char type, int index) ;
-  vector<Var> getColOfMatrix(vector<vector<Var> >& m, int c) ;
-  vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,int r,int c) ;
+  vector<Var> flatten(char type, SysInt index) ;
+  vector<Var> getColOfMatrix(vector<vector<Var> >& m, SysInt c) ;
+  vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,SysInt r,SysInt c) ;
   ConstraintBlob readConstraint(FileReader* infile, BOOL reified = false) ;
   ConstraintBlob readConstraintTable(FileReader* infile, ConstraintDef* def);
   void readGadget(FileReader* infile) ;

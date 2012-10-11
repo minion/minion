@@ -81,7 +81,7 @@ template<typename Var>
     PROP_INFO_ADDONE(WatchInSet);
     // If we are in here, we have a bounds variable.
     D_ASSERT(var.isBound());
-    // This is basically lifted from "sparse int bound vars"
+    // This is basically lifted from "sparse SysInt bound vars"
     vector<DomainInt>::iterator it_low = std::lower_bound(vals.begin(), vals.end(), var.getMin());
     if(it_low == vals.end())
     {

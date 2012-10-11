@@ -96,7 +96,7 @@ void _NORETURN FAIL_EXIT(string s = "");
 
 struct assert_fail {};
 
-void assert_function(BOOL x, const char* a, const char* f, int line);
+void assert_function(BOOL x, const char* a, const char* f, SysInt line);
 
 // Unlike Asserts, Checks are always enabled.
 #define CHECK(x, y) {assert_function(x, y, __FILE__, __LINE__);}
@@ -134,7 +134,7 @@ inline bool DOMAIN_CHECK(BigInt v)
 // These are just to catch cases where the user didn't cast to BigInt
 // themselves, which makes the function useless.
 inline void DOMAIN_CHECK(DomainInt);
-inline void DOMAIN_CHECK(int);
+inline void DOMAIN_CHECK(SysInt);
 inline void DOMAIN_CHECK(UnsignedSysInt);
         
 #endif //DEBUG_H

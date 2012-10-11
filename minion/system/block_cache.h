@@ -23,7 +23,7 @@ struct BlockCache
 {
   std::vector<char*> blocks;
   
-  BlockCache(int size)
+  BlockCache(SysInt size)
   { blocks.resize(size); }
   
   char* do_malloc(size_t size)

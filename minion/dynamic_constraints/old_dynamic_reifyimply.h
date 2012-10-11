@@ -82,7 +82,7 @@ struct Dynamic_reify_true_old: public AbstractConstraint
         DynamicTrigger* start = poscon->dynamic_trigger_start();
         SysInt trigs = poscon->dynamic_trigger_count();
 
-        for (int i = 0; i < trigs; ++i)
+        for (SysInt i = 0; i < trigs; ++i)
             (start + i)->constraint = this;
     }
 
@@ -137,7 +137,7 @@ struct Dynamic_reify_true_old: public AbstractConstraint
                 vector<AnyVarRef>& poscon_vars =
                         *(poscon->get_vars_singleton());
 
-                for (int i = 0; i < assignment.size(); ++i)
+                for (SysInt i = 0; i < assignment.size(); ++i)
                 {
                     const SysInt aif = checked_cast<SysInt>(assignment[i].first);
                     D_ASSERT(poscon_vars[aif].inDomain(assignment[i].second));
@@ -190,7 +190,7 @@ struct Dynamic_reify_true_old: public AbstractConstraint
 
         vector<AnyVarRef>& poscon_vars = *(poscon->get_vars_singleton());
 
-        for (int i = 0; i < assignment.size(); ++i)
+        for (SysInt i = 0; i < assignment.size(); ++i)
         {
             const SysInt aif = checked_cast<SysInt>(assignment[i].first);
             D_ASSERT(poscon_vars[aif].inDomain(assignment[i].second));

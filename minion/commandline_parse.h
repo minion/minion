@@ -22,6 +22,6 @@
 
 #include "minion.h"
 
-void parse_command_line(StateObj* stateObj, SearchMethod& args, int argc, char** argv);
+void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, char** argv);
 
 #endif

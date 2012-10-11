@@ -398,7 +398,7 @@ void worker()
 }
 
 template<typename Con>
-void munge_container(Con& con, int type)
+void munge_container(Con& con, SysInt type)
 {
   switch(type)
   {
@@ -442,7 +442,7 @@ void munge_container(Con& con, int type)
   }
 }
 
-int main(int argc, char** argv) {
+SysInt main(SysInt argc, char** argv) {
 // Wrap main in a try/catch just to stop exceptions leaving main,
 // as windows gets really annoyed when that happens.
 #ifdef THREADSAFE
@@ -496,7 +496,7 @@ try {
     cout << "# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug" << endl;
     cout << "# Input filename: " << getOptions(stateObj).instance_name << endl;
     cout << "# Command line: " ;
-    for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; }
+    for (SysInt i=0; i < argc; ++i) { cout << argv[i] << " " ; }
     cout << endl;
   }
 

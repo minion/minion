@@ -127,7 +127,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         return "GacAlldiff";
     }
     
-    vector<int> SCCs;    // Variable numbers
+    vector<SysInt> SCCs;    // Variable numbers
     ReversibleMonotonicSet SCCSplit;
     // If !SCCSplit.isMember(anIndex) then anIndex is the last index in an SCC.
     
@@ -135,7 +135,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     D_DATA(MoveablePointer SCCSplit2);
     
-    vector<int> varToSCCIndex;  // Mirror of the SCCs array.
+    vector<SysInt> varToSCCIndex;  // Mirror of the SCCs array.
     
     GacAlldiffConstraint(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
         SCCSplit(_stateObj, _var_array.size())
@@ -206,7 +206,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   }
   
   #ifdef DYNAMICALLDIFF
-  inline DynamicTrigger * get_dt(int var, int counter)
+  inline DynamicTrigger * get_dt(SysInt var, SysInt counter)
   {
       // index the square array of dynamic triggers from dt
       D_ASSERT(bt_triggers_start == dynamic_trigger_start()+numvars);
@@ -256,7 +256,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   vector<smallset_list_bt> watches;
   #endif
   
-  virtual void propagate(int prop_var, DomainDelta)
+  virtual void propagate(SysInt prop_var, DomainDelta)
   {
     D_ASSERT(prop_var>=0 && prop_var<var_array.size());
     
@@ -516,7 +516,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(SCCs[i]!=SCCs[j]);
         }
         D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2.get_ptr())[i]==1));
-        cout << (int)SCCSplit.isMember(i) << ", " << (int) (((char*)SCCSplit2.get_ptr())[i]==1) << endl;
+        cout << (SysInt)SCCSplit.isMember(i) << ", " << (SysInt) (((char*)SCCSplit2.get_ptr())[i]==1) << endl;
         // The matches correspond.
         #ifndef BFSMATCHING
         D_ASSERT(valvarmatching[varvalmatching[i]-dom_min]==i);
@@ -562,7 +562,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     sccs_to_process.clear();
     {
-    vector<int>& toiterate = to_process.getlist();
+    vector<SysInt>& toiterate = to_process.getlist();
     P("About to loop for to_process variables.");
     
     for(SysInt i=0; i<toiterate.size(); ++i)
@@ -705,7 +705,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     // Call Tarjan's for each disturbed SCC.
     {
-    vector<int> & toiterate=sccs_to_process.getlist();
+    vector<SysInt> & toiterate=sccs_to_process.getlist();
     for(SysInt i=0; i<toiterate.size(); i++)
     {
         SysInt j=toiterate[i];
@@ -807,7 +807,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(SCCs[i]!=SCCs[j]);
         }
         D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2.get_ptr())[i]==1));
-        cout << (int)SCCSplit.isMember(i) << ", " << (int) (((char*)SCCSplit2.get_ptr())[i]==1) << endl;
+        cout << (SysInt)SCCSplit.isMember(i) << ", " << (SysInt) (((char*)SCCSplit2.get_ptr())[i]==1) << endl;
         // The matches correspond.
         D_ASSERT(valvarmatching[varvalmatching[i]-dom_min]==i);
     }
@@ -890,7 +890,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   }
   
   /*
-  inline bool greedymatch(int tempvar, int sccindex_start, int sccindex_end)
+  inline bool greedymatch(SysInt tempvar, SysInt sccindex_start, SysInt sccindex_end)
   {
     D_ASSERT(!var_array[tempvar].inDomain(varvalmatching[tempvar]));
     
@@ -912,7 +912,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     return false;
   }
   
-  inline bool greedymatch2(int , int sccindex_start, int sccindex_end)
+  inline bool greedymatch2(SysInt , SysInt sccindex_start, SysInt sccindex_end)
   {
       // process all the broken matchings.
     
@@ -974,7 +974,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     return false;
   }
   
-  virtual BOOL check_unsat(int i, DomainDelta)
+  virtual BOOL check_unsat(SysInt i, DomainDelta)
   {
     SysInt v_size = var_array.size();
     if(!var_array[i].isAssigned()) return false;
@@ -1102,7 +1102,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     {
       D_ASSERT(array_size == var_array.size());
       for(SysInt i=0;i<array_size;i++)
-        for( int j=i+1;j<array_size;j++)
+        for( SysInt j=i+1;j<array_size;j++)
           if(v[i]==v[j]) return false;
       return true;
     }
@@ -1203,14 +1203,14 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         end if
         */
     
-    vector<int> tstack;
+    vector<SysInt> tstack;
     smallset_nolist in_tstack;
     smallset_nolist visited;
-    vector<int> dfsnum;
-    vector<int> lowlink;
+    vector<SysInt> dfsnum;
+    vector<SysInt> lowlink;
     
-    //vector<int> iterationstack;
-    vector<int> curnodestack;
+    //vector<SysInt> iterationstack;
+    vector<SysInt> curnodestack;
     
     // Filled in before calling tarjan's.
     bool scc_split;
@@ -1219,16 +1219,16 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     SysInt max_dfs;
     
-    vector<int> spare_values;
+    vector<SysInt> spare_values;
     bool include_sink;
-    vector<int> var_indices;  // Should be a pointer so it can be changed.
+    vector<SysInt> var_indices;  // Should be a pointer so it can be changed.
     
     smallset sccs_to_process;   // Indices to the first var in the SCC to process.
     
     SysInt varcount;
     
     #ifdef DYNAMICALLDIFF
-    vector<int> triggercount; // number of triggers on the variable
+    vector<SysInt> triggercount; // number of triggers on the variable
     DynamicTrigger * bt_triggers_start;   // points at dynamic_trigger_start()+numvars
     #endif
     
@@ -1255,7 +1255,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         #endif
     }
     
-    void tarjan_recursive(int sccindex_start)
+    void tarjan_recursive(SysInt sccindex_start)
     {
         valinlocalmatching.clear();
         
@@ -1385,7 +1385,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         #endif
     }
     
-    void visit(int curnode, bool toplevel, int sccindex_start)
+    void visit(SysInt curnode, bool toplevel, SysInt sccindex_start)
     {
         tstack.push_back(curnode);
         in_tstack.insert(curnode);
@@ -1592,7 +1592,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 
                 P("Writing new SCC:");
                 bool containsvars=false;
-                for(vector<int>::iterator tstackit=(tstack.end()-1);  ; --tstackit)
+                for(vector<SysInt>::iterator tstackit=(tstack.end()-1);  ; --tstackit)
                 {
                     SysInt copynode=(*tstackit);
                     //cout << "SCC element: "<< copynode<<endl;
@@ -1679,7 +1679,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     }
     
     
-    inline bool matching_wrapper(int sccstart, int sccend)
+    inline bool matching_wrapper(SysInt sccstart, SysInt sccend)
     {
         #ifdef BFSMATCHING
         return bfs_wrapper(sccstart,sccend);
@@ -1687,9 +1687,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         #ifdef NEWHK
         // This is just to test the new HK implementation. 
         // to use this, must not be using SCCs and must be using incgraph.
-        vector<int> upper;
+        vector<SysInt> upper;
         upper.resize(numvals, 1);
-        vector<int> usage;
+        vector<SysInt> usage;
         usage.resize(numvals, 0);
         for(SysInt i=0; i<numvars; i++)
         {
@@ -1708,7 +1708,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     // BFS alternative to hopcroft. --------------------------------------------
     
-    inline bool bfs_wrapper(int sccstart, int sccend)
+    inline bool bfs_wrapper(SysInt sccstart, SysInt sccend)
     {
         // Call hopcroft for the whole matching.
         if(!bfsmatching(sccstart, sccend))
@@ -1722,15 +1722,15 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         return true;
     }
     
-    deque<int> fifo;
-    vector<int> prev;
-    vector<int> matchbac;
+    deque<SysInt> fifo;
+    vector<SysInt> prev;
+    vector<SysInt> matchbac;
     // use push_back to push, front() and pop_front() to pop.
     
     //Also use invprevious to record which values are matched.
     // (recording val-dom_min)
     
-    inline bool bfsmatching(int sccstart, int sccend)
+    inline bool bfsmatching(SysInt sccstart, SysInt sccend)
     {
         // construct the set of matched values.
         invprevious.clear();

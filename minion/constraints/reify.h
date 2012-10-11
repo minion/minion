@@ -328,7 +328,7 @@ struct reify : public ParentConstraint
       return;
 
     DynamicTrigger* dt = dynamic_trigger_start();
-    //int numtriggers=dynamic_trigger_count();
+    //SysInt numtriggers=dynamic_trigger_count();
 
     if(!full_propagate_called)
     {
@@ -453,7 +453,7 @@ struct reify : public ParentConstraint
       }
     }
     // clear a contiguous block of used triggers up to (not including) endtrig
-    D_DATA(int firstunattached = -1);
+    D_DATA(SysInt firstunattached = -1);
     for(SysInt i=assignment.size(); (trig+i)<endtrig; i++)
     {
         if(!(trig+i)->isAttached())
@@ -507,7 +507,7 @@ struct reify : public ParentConstraint
     }
 
     DynamicTrigger* dt = dynamic_trigger_start();
-    //int dt_count = dynamic_trigger_count();
+    //SysInt dt_count = dynamic_trigger_count();
     // Clean up triggers
     for(SysInt i = 0; i < dtcount; ++i)
       releaseTrigger(stateObj, dt + i);

@@ -25,20 +25,20 @@ namespace BuildCon
 
 /// General case in iteratively build constraints.
 /// This isn't inline, as we don't want the compiler to waste time inlining it.
-template<ConstraintType constraint, int size>
+template<ConstraintType constraint, SysInt size>
 struct BuildConObj
 {
   template<typename ConData>
   static 
-  AbstractConstraint* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos) _NOINLINE;
+  AbstractConstraint* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysInt pos) _NOINLINE;
 };
 
 
-template<ConstraintType constraint, int size>
+template<ConstraintType constraint, SysInt size>
 template<typename ConData>
 AbstractConstraint* 
 BuildConObj<constraint, size>::
-build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos)
+build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysInt pos)
 {
   const vector<Var>& vars = b.vars[pos];
   

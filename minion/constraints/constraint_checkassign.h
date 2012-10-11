@@ -63,7 +63,7 @@ struct CheckAssignConstraint : public AbstractConstraint
       getState(stateObj).setFailed(true);
   }
   
-  virtual BOOL check_unsat(int,DomainDelta)
+  virtual BOOL check_unsat(SysInt,DomainDelta)
   {
   
     SysInt count = assigned_vars;

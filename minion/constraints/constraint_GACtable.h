@@ -110,7 +110,7 @@ struct GACTableConstraint : public AbstractConstraint
       support[i] = vars[i].getMin();
   }
   
-  SysInt setNextValid(vector<DomainInt>& support, int var_considered, int first_broken_val)
+  SysInt setNextValid(vector<DomainInt>& support, SysInt var_considered, SysInt first_broken_val)
   {
     for(SysInt i = first_broken_val + 1; i < support.size(); ++i)
       support[i] = vars[i].getMin();
@@ -141,11 +141,11 @@ struct GACTableConstraint : public AbstractConstraint
   
   MemOffset _current_support;
   
-  int* current_support()
-  { return (int*)(_current_support.get_ptr()); }
+  SysInt* current_support()
+  { return (SysInt*)(_current_support.get_ptr()); }
   
   /// Returns the tuple currently supporting a given literal.
-  vector<DomainInt>& supporting_tuple(int i)
+  vector<DomainInt>& supporting_tuple(SysInt i)
   { return (lists->literal_specific_tuples)[i][current_support()[i]]; }
   
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
@@ -164,11 +164,11 @@ struct GACTableConstraint : public AbstractConstraint
     vars(_vars), lists(_tuples->getLitLists())
   {
     CheckNotBound(vars, "table constraints","");
-    if((int)_vars.size() != lists->tuples->tuple_size())
+    if((SysInt)_vars.size() != lists->tuples->tuple_size())
     {
       FAIL_EXIT("In table constraint, number of variables is not equal to length of tuples.");
     }
-    _current_support.request_bytes(lists->tuples->literal_num * sizeof(int));
+    _current_support.request_bytes(lists->tuples->literal_num * sizeof(SysInt));
   }
   
   virtual SysInt dynamic_trigger_count()
@@ -176,7 +176,7 @@ struct GACTableConstraint : public AbstractConstraint
   
 
   
-  bool find_new_support(int literal, int var)
+  bool find_new_support(SysInt literal, SysInt var)
   {
     SysInt support = current_support()[literal];
     vector<vector<DomainInt> >& tuples = (lists->literal_specific_tuples)[literal];
@@ -253,7 +253,7 @@ struct GACTableConstraint : public AbstractConstraint
     }
   }  
   
-  void setup_watches(int var, int val)
+  void setup_watches(SysInt var, SysInt val)
   {
     SysInt lit = (lists->tuples->get_literal)(var, val);
     vector<DomainInt>& support = supporting_tuple(lit);

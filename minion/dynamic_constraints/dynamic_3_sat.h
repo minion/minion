@@ -87,7 +87,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   }
   
   /// Finds the value out of 0,1 and 2 which is not a or b.
-  inline int other_val(int a, int b)
+  inline SysInt other_val(SysInt a, SysInt b)
   {
     if(a != 0 && b != 0)
       return 0;
@@ -102,7 +102,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   {
     PROP_INFO_ADDONE(Dyn3SAT);
     SysInt propval = dt->trigger_info();
-    //int var_size = var_array.size();
+    //SysInt var_size = var_array.size();
     
     DynamicTrigger* base_dt = dynamic_trigger_start();
     SysInt other_propval;

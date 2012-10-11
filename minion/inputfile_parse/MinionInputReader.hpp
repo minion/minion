@@ -29,7 +29,7 @@
 //ConstraintDef* constraint_list;
 
 // Defined in MinionThreeInputReader, cos it can only be in one place.
-extern int num_of_constraints;
+extern SysInt num_of_constraints;
 
 template<typename T>
 typename T::value_type& index(T& container, DomainInt index_pos)
@@ -53,7 +53,7 @@ void MinionInputReader<FileReader>::parser_info(string s)
 // Flattening is row-wise (2d), plane-wise row-wise (3d).
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-vector<Var> MinionInputReader<FileReader>::flatten(char type, int index) {
+vector<Var> MinionInputReader<FileReader>::flatten(char type, SysInt index) {
   UnsignedSysInt rowIndex, colIndex, planeIndex ;
   vector<Var> flattened ;
   // flatten row-wise
@@ -84,7 +84,7 @@ vector<Var> MinionInputReader<FileReader>::flatten(char type, int index) {
 // getColOfMatrix
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-vector<Var> MinionInputReader<FileReader>::getColOfMatrix(vector<vector<Var> >& matrix, int colNo) {
+vector<Var> MinionInputReader<FileReader>::getColOfMatrix(vector<vector<Var> >& matrix, SysInt colNo) {
   vector<Var> result ;
   for (UnsignedSysInt rowIndex = 0; rowIndex < matrix.size(); rowIndex++) {
     result.push_back(matrix.at(rowIndex).at(colNo)) ;
@@ -97,7 +97,7 @@ vector<Var> MinionInputReader<FileReader>::getColOfMatrix(vector<vector<Var> >& 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 vector<Var> MinionInputReader<FileReader>::getRowThroughTensor(
-                                                   vector< vector< vector<Var> > >& tensor, int rowNo, int colNo) {
+                                                   vector< vector< vector<Var> > >& tensor, SysInt rowNo, SysInt colNo) {
   vector<Var> result ;
   for (UnsignedSysInt planeIndex = 0; planeIndex < tensor.size() ; planeIndex ++) {
     vector< vector<Var> >& plane = tensor.at(planeIndex) ;
@@ -291,7 +291,7 @@ void MinionInputReader<FileReader>::readConstraintElement(FileReader* infile, Co
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readConstraintTable
 // table(<vectorOfVars>, {<tuple> [, <tuple>]})
-// Tuples represented as a vector of int arrays.
+// Tuples represented as a vector of SysInt arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, ConstraintDef* def) 

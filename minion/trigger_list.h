@@ -377,7 +377,7 @@ void inline TriggerMem::finaliseTriggerLists()
       trigger_lists[i]->allocateMem(triggerlist_offset);
       triggerlist_offset += offset;
     }
-    D_ASSERT(triggerlist_offset - getTriggerMem(stateObj).getTriggerListDataPtr() == (int)trigger_size);
+    D_ASSERT(triggerlist_offset - getTriggerMem(stateObj).getTriggerListDataPtr() == (SysInt)trigger_size);
   }
 
 inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t BT_FUNDEF_NODEFAULT)
