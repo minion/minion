@@ -87,15 +87,15 @@ struct LexLeqConstraint : public AbstractConstraint
   {
     triggerCollection t;
     
-    int x_size = x.size();
-    for(int i=0; i < x_size; ++i)
+    SysInt x_size = x.size();
+    for(SysInt i=0; i < x_size; ++i)
     {
       t.push_back(make_trigger(x[i], Trigger(this, i), LowerBound));
       t.push_back(make_trigger(x[i], Trigger(this, i), UpperBound));
     }
     
-    int y_size = y.size();
-    for(int i=0; i < y_size; ++i)
+    SysInt y_size = y.size();
+    for(SysInt i=0; i < y_size; ++i)
     {
       t.push_back(make_trigger(y[i], Trigger(this, i), LowerBound));
       t.push_back(make_trigger(y[i], Trigger(this, i), UpperBound));
@@ -114,8 +114,8 @@ struct LexLeqConstraint : public AbstractConstraint
     return new LexLeqConstraint<VarArray2, VarArray1,!Less>(stateObj,y,x);
   }
   
-  void updateAlpha(int i) {
-    int n = x.size();
+  void updateAlpha(SysInt i) {
+    SysInt n = x.size();
     if(Less)
     {
       if(i == n || i == beta)
@@ -126,7 +126,7 @@ struct LexLeqConstraint : public AbstractConstraint
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
           x[i].getAssignedValue() != y[i].getAssignedValue())  {
         alpha = i;
-        propagate(i,0);
+        propagate(i,DomainDelta::empty());
       }
       else updateAlpha(i+1);
     }
@@ -136,7 +136,7 @@ struct LexLeqConstraint : public AbstractConstraint
         if (!x[i].isAssigned() || !y[i].isAssigned() ||
             x[i].getAssignedValue() != y[i].getAssignedValue())  {
           alpha = i ;
-          propagate(i,0) ;
+          propagate(i,DomainDelta::empty()) ;
           return ;
         }
         i++ ;
@@ -148,12 +148,12 @@ struct LexLeqConstraint : public AbstractConstraint
   
   ///////////////////////////////////////////////////////////////////////////////
   // updateBeta()
-  void updateBeta(int i) {
-    int a = alpha ;
+  void updateBeta(SysInt i) {
+    SysInt a = alpha ;
     while (i >= a) {
       if (x[i].getMin() < y[i].getMax()) {
         beta = i+1 ;
-        if (!(x[i].getMax() < y[i].getMin())) propagate(i,0) ;
+        if (!(x[i].getMax() < y[i].getMin())) propagate(i,DomainDelta::empty()) ;
         return ;
       }
       i-- ;    
@@ -162,14 +162,15 @@ struct LexLeqConstraint : public AbstractConstraint
     
   }
   
-  virtual void propagate(int i, DomainDelta)
+  virtual void propagate(DomainInt i_in, DomainDelta)
   {
+    const SysInt i = checked_cast<SysInt>(i_in);
     PROP_INFO_ADDONE(Lex);
     if (F)
     {
       return ;
     }
-    int a = alpha, b = beta;
+    SysInt a = alpha, b = beta;
     
     //Not sure why we need this, but we seem to.
     if(b <= a)
@@ -207,13 +208,13 @@ struct LexLeqConstraint : public AbstractConstraint
     }
   }
   
-  virtual BOOL check_unsat(int unsat_val, DomainDelta)
+  virtual BOOL check_unsat(SysInt unsat_val, DomainDelta)
   {
-    int a = alpha;
+    SysInt a = alpha;
     if(unsat_val >= a)
     {
-      int x_size = x.size();
-      for(int i = a; i < x_size; ++i)
+      SysInt x_size = x.size();
+      for(SysInt i = a; i < x_size; ++i)
       {
         DomainInt xval = x[i].getMin();
         DomainInt yval = y[i].getMax();
@@ -249,17 +250,17 @@ struct LexLeqConstraint : public AbstractConstraint
   virtual BOOL full_check_unsat()
   {
     alpha = 0;
-    return check_unsat(0, 0);
+    return check_unsat(0, DomainDelta::empty());
   }
   
-  BOOL checkLex(int i) {
+  BOOL checkLex(SysInt i) {
     if(Less)
     {
       return x[i].getMax() < y[i].getMin();
     }
     else
     {
-      int n = x.size() ;
+      SysInt n = x.size() ;
       if (i == n-1) return (x[i].getMax() <= y[i].getMin()) ;
       else return (x[i].getMax() < y[i].getMin());
     }
@@ -267,7 +268,7 @@ struct LexLeqConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    int i, n = x.size() ;
+    SysInt i, n = x.size() ;
     for (i = 0; i < n; i++) {
       if (!x[i].isAssigned()) break ;    
       if (!y[i].isAssigned()) break ;
@@ -279,7 +280,7 @@ struct LexLeqConstraint : public AbstractConstraint
         F = true ;
         return ;
       }
-      int betaBound = -1 ;
+      SysInt betaBound = -1 ;
       for (; i < n; i++) {
         if (x[i].getMin() > y[i].getMax()) break ;
         if (x[i].getMin() == y[i].getMax()) {
@@ -300,7 +301,7 @@ struct LexLeqConstraint : public AbstractConstraint
         else beta = betaBound ;
       }
       if (alpha >= beta) getState(stateObj).setFailed(true);
-      propagate(alpha,0) ;             //initial propagation, if necessary.
+      propagate((SysInt)alpha,DomainDelta::empty()) ;             //initial propagation, if necessary.
     }
     else 
     {
@@ -311,7 +312,7 @@ struct LexLeqConstraint : public AbstractConstraint
     }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == x.size() + y.size());
     size_t x_size = x.size();
@@ -329,7 +330,7 @@ struct LexLeqConstraint : public AbstractConstraint
       return true;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     size_t x_size = x.size();
     for(size_t i = 0; i < x_size; ++i)
@@ -356,10 +357,10 @@ struct LexLeqConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> array_copy;
-    for(unsigned int i=0;i<x.size();i++)
+    for(UnsignedSysInt i=0;i<x.size();i++)
       array_copy.push_back(AnyVarRef(x[i]));
     
-    for(unsigned int i=0;i<y.size();i++)
+    for(UnsignedSysInt i=0;i<y.size();i++)
       array_copy.push_back(AnyVarRef(y[i]));
     return array_copy;
   }

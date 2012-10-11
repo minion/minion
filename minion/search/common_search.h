@@ -58,12 +58,12 @@ namespace Controller
   void check_constraint(StateObj* stateObj, T* con)
   {
       vector<AnyVarRef>& variables = *(con->get_vars_singleton());
-      unsigned vec_size = variables.size();  
+      UnsignedSysInt vec_size = variables.size();  
       
     DomainInt* values = (DomainInt*) alloca(vec_size * sizeof(DomainInt)); 
       //vector<DomainInt> values(vec_size);
 
-      for(unsigned loop = 0; loop < vec_size; ++loop)
+      for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
       {
         if(!variables[loop].isAssigned())
         {
@@ -78,11 +78,11 @@ namespace Controller
       {
         cerr << "A " << con->constraint_name() << " constraint is not satisfied by this sol!" << endl;
         cerr << "The constraint is over the following variables:" << endl;
-        for(unsigned loop = 0; loop < vec_size; ++loop)
+        for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
           cerr << variables[loop] << ",";
         cerr << endl;
         cerr << "Variables were assigned:" << endl;
-        for(unsigned loop = 0; loop < vec_size; ++loop)
+        for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
           cerr << values[loop] << ",";
         cerr << endl;
         cerr << "This is an internal bug. It shouldn't happen!!" << endl;
@@ -97,17 +97,17 @@ namespace Controller
       if(getOptions(stateObj).cspcomp)
       {
         sout << "v ";
-        for(unsigned i = 0; i < print_matrix.size(); ++i)
-          for(unsigned j = 0; j < print_matrix[i].size(); ++j)
+        for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
+          for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j)
           sout << print_matrix[i][j].getAssignedValue() << " ";
         sout << endl;
       }
       else if(!print_matrix.empty())
       {
-        for(unsigned i = 0; i < print_matrix.size(); ++i)
+        for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
         {
           if (!getOptions(stateObj).silent) sout << "Sol: ";  
-          for(unsigned j = 0; j < print_matrix[i].size(); ++j)
+          for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j)
           {
             if(!print_matrix[i][j].isAssigned())
               sout  << "[" << print_matrix[i][j].getMin() << "," << 
@@ -142,8 +142,8 @@ namespace Controller
     if(getOptions(stateObj).solsoutWrite)
     {
       vector<vector<AnyVarRef> > print_matrix = getState(stateObj).getPrintMatrix();
-      for(unsigned i = 0; i < print_matrix.size(); ++i)
-        for(unsigned j = 0; j < print_matrix[i].size(); ++j)
+      for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
+        for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j)
         {
           if(!print_matrix[i][j].isAssigned())
             INPUT_ERROR("Some variable was unassigned while writing solution to file.");
@@ -166,7 +166,7 @@ namespace Controller
 
     if(!getOptions(stateObj).nocheck)
     {
-      for(unsigned i = 0 ; i < getState(stateObj).getConstraintList().size();i++)
+      for(UnsignedSysInt i = 0 ; i < getState(stateObj).getConstraintList().size();i++)
         check_constraint(stateObj, getState(stateObj).getConstraintList()[i]);
     }
   }
@@ -177,10 +177,10 @@ namespace Controller
   //repeat declaration
   struct triple {
     bool isLeft;
-    unsigned var;
+    UnsignedSysInt var;
     DomainInt val;
     
-    triple(bool _isLeft, unsigned _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
+    triple(bool _isLeft, UnsignedSysInt _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
     friend std::ostream& operator<<(std::ostream& o, const triple& t)
     { o << "(" << t.isLeft << "," << t.var << "," << t.val << ")"; return o; }
   };
@@ -222,7 +222,7 @@ namespace Controller
             curvar = getState(stateObj).getInstance()->vars.getName(var.getBaseVar());
             DomainInt min = var.getMin();
             DomainInt max = var.getMax();
-            int med = (min+max)/2;
+            DomainInt med = (min+max)/2;
             string left("ineq(");
             left += curvar + string(", ") + to_string(med) + string(", 0)\n");
             splits.push_back(left + opt);

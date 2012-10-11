@@ -29,7 +29,7 @@ struct TupleComparator
   { }
   
   // returns tuple1 <= tuple2 under our ordering.
-  bool operator()(const vector<int>& tuple1, const vector<int>& tuple2)
+  bool operator()(const vector<DomainInt>& tuple1, const vector<DomainInt>& tuple2)
   {
     if(tuple1[significantIndex] != tuple2[significantIndex])
       return tuple1[significantIndex] < tuple2[significantIndex];
@@ -93,7 +93,7 @@ struct Nightingale
     {
       tuplelistperlit=new TupleN**[arity];
       
-      vector<vector<vector<vector<int> > > > goods;
+      vector<vector<vector<vector<DomainInt> > > > goods;
       // Pass goods to splittuples just to avoid copying it on return.
       splittuples(tuples, goods);
       tuplelistlengths = new int*[arity];
@@ -146,7 +146,7 @@ struct Nightingale
       int* _values = mem_block + arity * (tupleIndex * 2) ;
       
       // This line is messy, but is here because we want this code to work
-      // for both vector<vector<int> >s and tuple containers. I'll clean it up
+      // for both vector<vector<DomainInt> >s and tuple containers. I'll clean it up
       // sometime.
       std::copy(&tupleref[tupleIndex][0], &tupleref[tupleIndex][0] + arity, _values);
       
@@ -201,7 +201,7 @@ struct Nightingale
     return tlist;
   }
   
-  void splittuples(TupleList* tuples, vector<vector<vector<vector<int> > > >& goods)
+  void splittuples(TupleList* tuples, vector<vector<vector<vector<DomainInt> > > >& goods)
   {
     int arity = tuples->tuple_size();   
     goods.resize(arity);
@@ -244,9 +244,9 @@ struct GACTableConstraint : public AbstractConstraint
   int ** current_support;
 
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
-  bool check_tuple(const vector<int>& v)
+  bool check_tuple(const vector<DomainInt>& v)
   {
-    for(unsigned i = 0; i < v.size(); ++i)
+    for(UnsignedSysInt i = 0; i < v.size(); ++i)
     {
       if(!vars[i].inDomain(v[i]))
         return false;
@@ -256,7 +256,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   bool check_tuple(int * v)
   {
-    for(unsigned i = 0; i < arity; ++i)
+    for(UnsignedSysInt i = 0; i < arity; ++i)
     {
       if(!vars[i].inDomain(v[i]))
         return false;
@@ -296,7 +296,7 @@ struct GACTableConstraint : public AbstractConstraint
       }
   }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { return (nightingale->tuples->literal_num) * ( vars.size() - 1) ; }
     
   TupleN* seekNextSupport(int var, int val)
@@ -399,7 +399,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   bool find_new_support(int literal)
   {
-     pair<int,int> varval = nightingale->tuples->get_varval_from_literal(literal);
+     pair<DomainInt, DomainInt> varval = nightingale->tuples->get_varval_from_literal(literal);
      int var = varval.first;
      int val = varval.second;
      TupleN* new_support = seekNextSupport(var,val);
@@ -419,7 +419,7 @@ struct GACTableConstraint : public AbstractConstraint
     
     BOOL is_new_support = find_new_support(propagated_literal);
     
-    pair<int,int> varval = nightingale->tuples->get_varval_from_literal(propagated_literal);
+    pair<DomainInt, DomainInt> varval = nightingale->tuples->get_varval_from_literal(propagated_literal);
     int varIndex = varval.first;
     int val = varval.second;
     
@@ -471,9 +471,9 @@ struct GACTableConstraint : public AbstractConstraint
       if(getState(stateObj).isFailed()) 
         return;
       
-      int max = vars[varIndex].getMax();
+      DomainInt max = vars[varIndex].getMax();
       
-      for(int i = vars[varIndex].getMin(); i <= max; ++i) 
+      for(DomainInt i = vars[varIndex].getMin(); i <= max; ++i) 
       { 
         TupleN* _tuple=seekNextSupport(varIndex, i);
         
@@ -494,9 +494,9 @@ struct GACTableConstraint : public AbstractConstraint
     // cout << endl; cout << "  fp: finished finding supports: " << endl ;
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    for(unsigned i = 0; i < (nightingale->tuples)->size(); ++i)
+    for(UnsignedSysInt i = 0; i < (nightingale->tuples)->size(); ++i)
     {
       if( std::equal(v, v + size, (*nightingale->tuples)[i]) )
         return true;
@@ -507,7 +507,7 @@ struct GACTableConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> anyvars;
-    for(unsigned i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);
     return anyvars;
   }

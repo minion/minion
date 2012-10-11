@@ -44,7 +44,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    for(unsigned i = 0; i < variables.size(); ++i)
+    for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       t.push_back(make_trigger(variables[i], Trigger(this, i), Assigned));
     return t;
   }
@@ -56,10 +56,10 @@ struct CheckAssignConstraint : public AbstractConstraint
     return NULL;
   }
   
-  virtual void propagate(int prop_val,DomainDelta delta)
+  virtual void propagate(DomainInt prop_val,DomainDelta delta)
   {
     PROP_INFO_ADDONE(CheckAssign);
-    if(check_unsat(prop_val, delta))
+    if(check_unsat(checked_cast<SysInt>(prop_val), delta))
       getState(stateObj).setFailed(true);
   }
   
@@ -89,14 +89,14 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   virtual BOOL full_check_unsat()
   {
-    unsigned counter = 0;
-    for(unsigned i = 0; i < variables.size(); ++i)
+    UnsignedSysInt counter = 0;
+    for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       if(variables[i].isAssigned()) ++counter;
     assigned_vars = counter;
     
     if(counter == variables.size())
     {
-      for(unsigned i = 0; i < variables.size(); ++i)
+      for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       {
         D_ASSERT(variables[i].isAssigned());
         assignment[i] = variables[i].getAssignedValue();
@@ -115,7 +115,7 @@ struct CheckAssignConstraint : public AbstractConstraint
       getState(stateObj).setFailed(true);
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == variables.size());
     return !originalcon.check_assignment(v, v_size);
@@ -125,13 +125,13 @@ struct CheckAssignConstraint : public AbstractConstraint
   { 
     vector<AnyVarRef> vars;
     vars.reserve(variables.size());
-    for(unsigned i = 0; i < variables.size(); ++i)
+    for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       vars.push_back(variables[i]);
     return vars;
   }
   
   // Getting a satisfying assignment here is too hard
-     virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
    {
      MAKE_STACK_BOX(c, DomainInt, variables.size());
      

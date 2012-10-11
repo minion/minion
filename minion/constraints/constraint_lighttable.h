@@ -37,9 +37,9 @@ For full documentation, see the help for the table constraint.
 
 struct Literal
 {
-  int var;
+  SysInt var;
   DomainInt val;
-  Literal(int _var, DomainInt _val) : var(_var), val(_val) { }
+  Literal(SysInt _var, DomainInt _val) : var(_var), val(_val) { }
 };
 
 
@@ -49,24 +49,24 @@ protected:
   TupleList* tuple_data;
 
 public:
-  int getVarCount()
+  DomainInt getVarCount()
     { return tuple_data->tuple_size(); }
 
-  int getNumOfTuples()
+  DomainInt getNumOfTuples()
     { return tuple_data->size(); }
 
-  int getLiteralPos(Literal l)
+  DomainInt getLiteralPos(Literal l)
     { return tuple_data->get_literal(l.var, l.val); }
 
-  int* getPointer()
+  DomainInt* getPointer()
     { return tuple_data->getPointer(); }
 
-  int getLiteralCount()
+  DomainInt getLiteralCount()
   { return tuple_data->literal_num; }
 
   Literal getLiteralFromPos(int pos)
   {
-    pair<int,int> lit = tuple_data->get_varval_from_literal(pos);
+    pair<SysInt, DomainInt> lit = tuple_data->get_varval_from_literal(pos);
     return Literal(lit.first, lit.second);
   }
 
@@ -140,7 +140,7 @@ struct LightTableConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(int changed_var, DomainDelta)
+  virtual void propagate(DomainInt changed_var, DomainDelta)
   {
       // Propagate to all vars except the one that changed.
       for(int i=0; i<vars.size(); i++)
@@ -182,7 +182,7 @@ struct LightTableConstraint : public AbstractConstraint
       }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     return data->checkTuple(v, v_size);
   }
@@ -190,7 +190,7 @@ struct LightTableConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   {
     vector<AnyVarRef> anyvars;
-    for(unsigned i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);
     return anyvars;
   }

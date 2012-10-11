@@ -198,24 +198,24 @@ class RandomAccessPriorityQ {
 /* Below is the code that I used to test this ADT. Both require access to
 a definition like   
 
-RandomAccessPriorityQ<unsigned, int> test(stateObj);
+RandomAccessPriorityQ<UnsignedSysInt, int> test(stateObj);
 
   cout << "begin rapq BT test" << endl;
   
   bttest.clear();
   
-  for(unsigned j = 0; j < 10; j++) {
+  for(UnsignedSysInt j = 0; j < 10; j++) {
   bttest.add(j, j);
   }
   
   cout << bttest.heap << endl;
   getMemory(stateObj).backTrack().world_push();
-  for(unsigned j = 0; j < 5; j++) {
+  for(UnsignedSysInt j = 0; j < 5; j++) {
   bttest.removeMax();
   }
   cout << bttest.heap << endl;
   getMemory(stateObj).backTrack().world_push();
-  for(unsigned j = 0; j < 5; j++) {
+  for(UnsignedSysInt j = 0; j < 5; j++) {
   bttest.removeMax();
   }
   cout << bttest.size() << endl;
@@ -228,7 +228,7 @@ RandomAccessPriorityQ<unsigned, int> test(stateObj);
   
   cout << "begin testing rapq" << endl;
   
-  for(unsigned j = 0; j < 30; j++) {
+  for(UnsignedSysInt j = 0; j < 30; j++) {
   test.add(j, j);
   }
   
@@ -243,7 +243,7 @@ RandomAccessPriorityQ<unsigned, int> test(stateObj);
   cout << test.heap << endl;
   
   cout << test.getData(test.heap[0]);
-  for(unsigned j = 1; j < 30; j++)
+  for(UnsignedSysInt j = 1; j < 30; j++)
   cout << "," <<  test.getData(test.heap[j]);
   cout << endl;
   

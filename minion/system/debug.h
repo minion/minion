@@ -20,6 +20,8 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include "basic_headers.h"
+
 template<typename T>
 inline void CheckNotBound(const T& t, std::string s, std::string s2 = "")
 {
@@ -104,7 +106,9 @@ void assert_function(BOOL x, const char* a, const char* f, int line);
 
 #ifdef MINION_DEBUG
 
+#ifndef BOUNDS_CHECK
 #define BOUNDS_CHECK
+#endif
 
 #define D_ASSERT(x) assert_function(x, #x, __FILE__, __LINE__);
 #define D_DATA(x) x
@@ -131,7 +135,7 @@ inline bool DOMAIN_CHECK(BigInt v)
 // themselves, which makes the function useless.
 inline void DOMAIN_CHECK(DomainInt);
 inline void DOMAIN_CHECK(int);
-inline void DOMAIN_CHECK(unsigned int);
+inline void DOMAIN_CHECK(UnsignedSysInt);
         
 #endif //DEBUG_H
 

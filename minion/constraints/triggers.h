@@ -33,15 +33,18 @@ class AbstractConstraint;
  */
 class DomainDelta
 { 
-  int domain_change; 
+  DomainInt domain_change; 
 public:
   /// This function shouldn't be called directly. This object should be passed to a variables, which will do any "massaging" which 
   /// is required.
-  int XXX_get_domain_diff()
+  DomainInt XXX_get_domain_diff()
 { return domain_change; }
 
-  DomainDelta(int i) : domain_change(i)
+  DomainDelta(DomainInt i) : domain_change(i)
 {}
+
+  static DomainDelta empty()
+  { return DomainDelta(0); }
 };
 
 ///The classes which are used to build the queue.
@@ -51,13 +54,13 @@ public:
   /// The constraint to be propagated.
   AbstractConstraint* constraint;
   /// The first value to be passed to the propagate function.
-  int info;
+  DomainInt info;
 #ifdef WEIGHTED_TRIGGERS
-  int weight;
+  SysInt weight;
 #endif
   
   template<typename T>
-    Trigger(T* _sc, int _info) : constraint(_sc), info(_info)
+    Trigger(T* _sc, DomainInt _info) : constraint(_sc), info(_info)
   {
 #ifdef WEIGHTED_TRIGGERS
     weight = _sc->get_vars_singleton()->size();
@@ -110,11 +113,11 @@ public:
   /// The domain delta from the domain change.
   /** This may not contain the actual delta, but contains data from which a variable can
    construct it, by passing it to getDomainChange. */
-  int data;
+  DomainInt data;
 #ifdef WEIGHTED_TRIGGERS
-  int weight;
+  SysInt weight;
 #endif
-  TriggerRange(Trigger* s, Trigger* e, int _data) : start(s), finish(e), data(_data)
+  TriggerRange(Trigger* s, Trigger* e, DomainInt _data) : start(s), finish(e), data(_data)
   { 
     D_ASSERT(data >= DomainInt_Min);
     D_ASSERT(data <= DomainInt_Max);

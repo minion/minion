@@ -56,11 +56,11 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   VarArray var_array;
   ValueArray value_array;
   MemOffset unwatched_indexes;
-  int last;
-  int num_unwatched;
+  DomainInt last;
+  DomainInt num_unwatched;
     
-  int& unwatched(int i)
-  { return static_cast<int*>(unwatched_indexes.get_ptr())[i]; }
+  SysInt& unwatched(DomainInt i)
+  { return static_cast<SysInt*>(unwatched_indexes.get_ptr())[checked_cast<SysInt>(i)]; }
   
   VarSum var_sum;
   
@@ -74,18 +74,18 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
           num_unwatched=0;
       if(num_unwatched > var_array.size()) num_unwatched=var_array.size();
       
-      unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(unsigned) * num_unwatched);
+      unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(UnsignedSysInt) * num_unwatched);
       // above line might request 0 bytes
       last = 0;
   }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   {
     if(var_sum <= 0)
       return 0;
     if(var_sum > var_array.size())
       return var_array.size() + 1;
-    return var_sum + 1;
+    return checked_cast<SysInt>(var_sum + 1);
   }
     
   virtual void full_propagate()
@@ -95,9 +95,9 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
       
     DynamicTrigger* dt = dynamic_trigger_start();
     
-    int array_size = var_array.size(); 
-    int triggers_wanted = var_sum + 1;
-    int index;
+    SysInt array_size = var_array.size(); 
+    DomainInt triggers_wanted = var_sum + 1;
+    SysInt index;
     
     for(index = 0; (index < array_size) && (triggers_wanted > 0); ++index) 
     {
@@ -180,7 +180,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
     
     BOOL found_new_support = false;
     
-    int j = 0;
+    DomainInt j = 0;
     
     for(int loop = 0 ; (!found_new_support) && loop < num_unwatched ; )
     {
@@ -227,7 +227,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
     }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
     int count = 0;
@@ -240,12 +240,12 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   { 
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     return vars;  
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
       if(var_sum<=0) return true;
       int lit_match_count = 0;

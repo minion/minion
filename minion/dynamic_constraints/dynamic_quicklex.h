@@ -56,7 +56,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
       CHECK(var_array1.size() == var_array2.size(), "QuickLexLeq and QuickLexLess only work with equal length vectors");
     }
 
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
     { return 2; }
 
   
@@ -192,7 +192,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array1.size() + var_array2.size());
     size_t x_size = var_array1.size();
@@ -209,7 +209,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     return !Less;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
     {
       size_t array_size = var_array1.size();
       for(size_t i = 0; i < array_size; ++i)
@@ -240,9 +240,9 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   { 
     vector<AnyVarRef> vars;
     vars.reserve(var_array1.size() + var_array2.size());
-    for(unsigned i = 0; i < var_array1.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
       vars.push_back(AnyVarRef(var_array1[i]));
-    for(unsigned i = 0; i < var_array2.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array2.size(); ++i)
       vars.push_back(AnyVarRef(var_array2[i]));
     return vars;  
   }

@@ -20,7 +20,7 @@
 namespace Controller
 {
 
-inline int get_world_depth(StateObj* stateObj)
+inline SysInt get_world_depth(StateObj* stateObj)
 { return getMemory(stateObj).backTrack().current_depth(); }
 
 /// Pushes the state of the whole world.
@@ -43,7 +43,7 @@ inline void world_pop(StateObj* stateObj)
   getQueue(stateObj).getTbq().world_pop();
 
   vector<set<AbstractConstraint*> >& constraintList = getState(stateObj).getConstraintsToPropagate();
-  int propagateDepth = get_world_depth(stateObj) + 1;
+  SysInt propagateDepth = get_world_depth(stateObj) + 1;
   if(constraintList.size() > propagateDepth)
   {
     for(set<AbstractConstraint*>::iterator it = constraintList[propagateDepth].begin();
@@ -61,7 +61,7 @@ inline void world_pop(StateObj* stateObj)
 }
 
 
-inline void world_pop_to_depth(StateObj* stateObj, int depth)
+inline void world_pop_to_depth(StateObj* stateObj, SysInt depth)
 {
   // TODO: Speed up this method. It shouldn't call world_pop repeatedly.
   // The main problem is this requires adding additions to things like
@@ -73,7 +73,7 @@ inline void world_pop_to_depth(StateObj* stateObj, int depth)
 
 inline void world_pop_all(StateObj* stateObj)
 {
-int depth = getMemory(stateObj).backTrack().current_depth();
+SysInt depth = getMemory(stateObj).backTrack().current_depth();
 for(; depth > 0; depth--)
   world_pop(stateObj);
 }

@@ -35,12 +35,42 @@ struct EmptyType
 const int big_constant = 999999;
 
 
+typedef int SysInt;
+typedef unsigned UnsignedSysInt;
+
+
+#ifdef MINION_DEBUG
+#ifndef BOUNDS_CHECK
+#define BOUNDS_CHECK
+#endif
+#endif
+
+#ifdef BOUNDS_CHECK
+typedef Wrapper<SysInt> DomainInt;
+#else
+typedef SysInt DomainInt;
+#endif
+
+// Put a ' -1, +1 ' just to have some slack
+const DomainInt DomainInt_Max = std::numeric_limits<SysInt>::max() - 1;
+const DomainInt DomainInt_Min = std::numeric_limits<SysInt>::min() + 1;
+
+template<typename To, typename From>
+To checked_cast(const From& t)
+{ return static_cast<To>(t); }
+
+template<typename To, typename From>
+To checked_cast(const Wrapper<From>& t)
+{ return static_cast<To>(t.t); }
+
+
+
 /// A constant chosen at compile time.
 /// Create with the notation compiletime_val<6>().
-template<int i>
+template<SysInt i>
 struct compiletime_val
 { 
-  operator int() const
+  operator DomainInt() const
 { return i; }
   
   compiletime_val<-i-1> negminusone() const
@@ -59,15 +89,21 @@ struct compiletime_val
 /// Create with the notation runtime_val(6).
 struct runtime_val
 {
-  int i;
-  runtime_val(int _i) : i(_i)
+  DomainInt i;
+  runtime_val(DomainInt _i) : i(_i)
   {}
-  
-  operator int() const
+
+#ifdef MINION_DEBUG
+  runtime_val(SysInt _i) : i(_i)
+  {}
+#endif
+
+  operator DomainInt() const
   { return i; }
+
   
   runtime_val negminusone() const
-  { return runtime_val(-i-1); }
+  { return runtime_val(-1-i); }
   
   template<int j>
   runtime_val neg() const
@@ -77,6 +113,87 @@ struct runtime_val
   { return o << v.i; }
 
 };
+
+#ifdef WRAP_BOOL_OPS
+#undef WRAP_BOOL_OPS
+#endif
+
+#ifdef MINION_DEBUG
+#define WRAP_BOOL_OPS(op) \
+inline bool operator op (const runtime_val& t1, const runtime_val& t2) \
+{ return t1.i op t2.i; } \
+\
+inline bool operator op (const DomainInt& t1, const runtime_val& t2) \
+{ return t1 op t2.i; } \
+\
+inline bool operator op (const runtime_val& t1, const DomainInt& t2) \
+{ return t1.i op t2; } \
+\
+inline bool operator op (const SysInt& t1, const runtime_val& t2) \
+{ return t1 op t2.i; } \
+\
+inline bool operator op (const runtime_val& t1, const SysInt& t2) \
+{ return t1.i op t2; } 
+#else
+#define WRAP_BOOL_OPS(op) \
+inline bool operator op (const runtime_val& t1, const runtime_val& t2) \
+{ return t1.i op t2.i; } \
+\
+inline bool operator op (const SysInt& t1, const runtime_val& t2) \
+{ return t1 op t2.i; } \
+\
+inline bool operator op (const runtime_val& t1, const SysInt& t2) \
+{ return t1.i op t2; } 
+#endif
+
+WRAP_BOOL_OPS(==)
+WRAP_BOOL_OPS(!=)
+WRAP_BOOL_OPS(<)
+WRAP_BOOL_OPS(>)
+WRAP_BOOL_OPS(<=)
+WRAP_BOOL_OPS(>=)
+
+#ifdef WRAP_ARITHMETIC_OPS
+#undef WRAP_ARITHMETIC_OPS
+#endif
+
+#ifdef MINION_DEBUG
+#define WRAP_ARITHMETIC_OPS(op) \
+inline DomainInt operator op (const runtime_val& t1, const runtime_val& t2) \
+{ return t1.i op t2.i; } \
+\
+inline DomainInt operator op(const DomainInt& t1, const runtime_val& t2) \
+{ return t1 op t2.i; } \
+\
+inline DomainInt operator op(const SysInt& t1, const runtime_val& t2) \
+{ return t1 op t2.i; } \
+\
+inline DomainInt operator op(const runtime_val& t1, const DomainInt& t2) \
+{ return t1.i op t2; } \
+\
+inline DomainInt operator op(const runtime_val& t1, const SysInt& t2) \
+{ return t1.i op t2; } 
+#else
+#define WRAP_ARITHMETIC_OPS(op) \
+inline DomainInt operator op (const runtime_val& t1, const runtime_val& t2) \
+{ return t1.i op t2.i; } \
+\
+inline DomainInt operator op(const SysInt& t1, const runtime_val& t2) \
+{ return t1 op t2.i; } \
+\
+inline DomainInt operator op(const runtime_val& t1, const SysInt& t2) \
+{ return t1.i op t2; } 
+#endif
+
+WRAP_ARITHMETIC_OPS(+)
+WRAP_ARITHMETIC_OPS(-)
+WRAP_ARITHMETIC_OPS(*)
+WRAP_ARITHMETIC_OPS(/)
+WRAP_ARITHMETIC_OPS(%)
+
+
+inline runtime_val abs(const runtime_val& in)
+{ return runtime_val(abs(in.i)); }
 
 template<typename T>
 inline T mymin(T t1, T t2)
@@ -95,29 +212,8 @@ inline T mymax(T t1, T t2)
   else
     return t1;
 }
-#if defined(__CYGWIN__) || defined(_WIN32) 
-typedef int MachineInt;
-#else
-typedef int32_t MachineInt;
-#endif
 
-#ifdef BOUNDS_CHECK
-typedef Wrapper<MachineInt> DomainInt;
-#else
-typedef MachineInt DomainInt;
-#endif
 
-// Put a ' -1, +1 ' just to have some slack
-const DomainInt DomainInt_Max = std::numeric_limits<MachineInt>::max() - 1;
-const DomainInt DomainInt_Min = std::numeric_limits<MachineInt>::min() + 1;
-
-template<typename To, typename From>
-To checked_cast(const From& t)
-{ return static_cast<To>(t); }
-
-template<typename To, typename From>
-To checked_cast(const Wrapper<From>& t)
-{ return static_cast<To>(t.t); }
 
 
 #endif // _SYS_CONSTANTS_H

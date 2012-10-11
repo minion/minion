@@ -183,7 +183,7 @@ struct AnyVarRef_Abstract
   virtual ~AnyVarRef_Abstract()
   {}
   
-  virtual int getDomainChange(DomainDelta d) = 0;
+  virtual DomainInt getDomainChange(DomainDelta d) = 0;
   virtual void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF) = 0;
 };
 
@@ -278,7 +278,7 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   virtual ~AnyVarRef_Concrete()
   {}
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
 
 #ifdef DYNAMICTRIGGERS
@@ -382,7 +382,7 @@ public:
   friend std::ostream& operator<<(std::ostream& o, const AnyVarRef& avr)
   { return o << "AnyVarRef:" << avr.data->virtual_to_string(); }
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return data->getDomainChange(d); }
   
 #ifdef DYNAMICTRIGGERS

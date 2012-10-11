@@ -42,7 +42,7 @@ enum TrigOp
     TO_Backtrack
 };
 
-static const int NoDomainValue = -98765;
+static const SysInt NoDomainValue = -98765;
 #define BAD_POINTER (void*)(-1)
 
 #ifdef BTWLDEF
@@ -93,7 +93,7 @@ struct EndOfSearch
 {};
 
 #ifndef CONTAINER_TYPE
-typedef unsigned int BitContainerType;
+typedef UnsignedSysInt BitContainerType;
 #else
 typedef CONTAINER_TYPE BitContainerType;
 #endif

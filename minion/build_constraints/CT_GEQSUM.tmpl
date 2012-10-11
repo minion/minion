@@ -14,7 +14,7 @@ BuildCT_GEQSUM(StateObj* stateObj, const vector<VarArray>& _var_array, const vec
   if(_var_array.size() == 2)
   {
     array<VarArray, 2> v_array;
-    for(int i = 0; i < 2; ++i)
+    for(SysInt i = 0; i < 2; ++i)
       v_array[i] = _var_array[i];
     return LightGreaterEqualSumCon(stateObj, v_array, _var_sum[0]);
   }
@@ -28,7 +28,7 @@ BuildCT_GEQSUM(StateObj* stateObj, const vector<VarArray>& _var_array, const vec
 inline AbstractConstraint*
 BuildCT_GEQSUM(StateObj* stateObj, const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum, ConstraintBlob&)
 { 
-  runtime_val t2(checked_cast<int>(var_sum[0].getAssignedValue()));
+  runtime_val t2(checked_cast<SysInt>(var_sum[0].getAssignedValue()));
   return BoolGreaterEqualSumCon(stateObj, var_array, t2);
 }
 

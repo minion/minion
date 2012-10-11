@@ -11,7 +11,7 @@ template<typename T1, typename T3>
 AbstractConstraint*
 BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T3& t3, ConstraintBlob& b)
 {
-  int val_to_count = b.constants[0][0];
+  const SysInt val_to_count = checked_cast<SysInt>(b.constants[0][0]);
   return OccEqualCon(stateObj, t1, runtime_val(val_to_count), t3[0]);
 }
 

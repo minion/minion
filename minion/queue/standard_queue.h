@@ -196,11 +196,11 @@ public:
     {
 #ifdef WEIGHTED_TRIGGERS
       TriggerRange t = propagate_trigger_list.top();
-      int data_val = t.data;
+      DomainInt data_val = t.data;
       propagate_trigger_list.pop();
 #else
       TriggerRange t = propagate_trigger_list.queueTop();
-      int data_val = t.data;
+      DomainInt data_val = t.data;
       propagate_trigger_list.queuePop();
 #endif
 
@@ -332,11 +332,11 @@ public:
     {
 #ifdef WEIGHTED_TRIGGERS
       TriggerRange t = propagate_trigger_list.top();
-      int data_val = t.data;
+      DomainInt data_val = t.data;
       propagate_trigger_list.pop();
 #else
       TriggerRange t = propagate_trigger_list.queueTop();
-      int data_val = t.data;
+      DomainInt data_val = t.data;
       propagate_trigger_list.queuePop();
 #endif
 

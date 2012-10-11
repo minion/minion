@@ -56,7 +56,7 @@ string get_dom_as_string(vector<T>& vec)
   if(!vec.empty())
   {
     output += get_dom_as_string(vec[0]);
-    for(unsigned i = 1; i < vec.size(); ++i)
+    for(UnsignedSysInt i = 1; i < vec.size(); ++i)
     {
       output += ",";
       output += get_dom_as_string(vec[i]);

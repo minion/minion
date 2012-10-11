@@ -49,7 +49,7 @@ DomainInt chooseVal(T& var, ValOrderEnum vo)
             }
             DomainInt min_val = var.getMin();
             DomainInt max_val = var.getMax();
-            int val = (rand() % (max_val - min_val + 1)) + min_val;
+            DomainInt val = (rand() % (max_val - min_val + 1)) + min_val;
             D_ASSERT(val >= min_val);
             D_ASSERT(val <= max_val);
             if(var.inDomain(val))
@@ -102,7 +102,7 @@ struct MultiBranch : public VariableOrder
     Reversible<int> pos;
     
     // need to patch up the returned variable index
-    vector<int> variable_offset;
+    vector<DomainInt> variable_offset;
     
     MultiBranch(const vector<shared_ptr<VariableOrder> > _vovector,
 		StateObj* _stateObj):
@@ -119,11 +119,11 @@ struct MultiBranch : public VariableOrder
         }
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
         int pos2=pos;
         
-        pair<int, DomainInt> t=vovector[pos2]->pickVarVal();
+        pair<SysInt, DomainInt> t=vovector[pos2]->pickVarVal();
         while(t.first==-1)   
         {
             pos2++;
@@ -135,7 +135,7 @@ struct MultiBranch : public VariableOrder
             t=vovector[pos2]->pickVarVal();
         }
         pos=pos2;
-        t.first+=variable_offset[pos2];
+        t.first+=checked_cast<SysInt>(variable_offset[pos2]);
         return t;
     }
 };
@@ -154,7 +154,7 @@ struct StaticBranch : public VariableOrder
     
     pair<int, DomainInt> pickVarVal()
     {
-        unsigned v_size = var_order.size();
+        UnsignedSysInt v_size = var_order.size();
         
         while(pos < v_size && var_order[pos].isAssigned())
             pos=pos+1;
@@ -224,8 +224,8 @@ struct SlowStaticBranch : public VariableOrder
     
     pair<int, DomainInt> pickVarVal()
     {
-        unsigned v_size = var_order.size();
-        unsigned pos = 0;
+        UnsignedSysInt v_size = var_order.size();
+        UnsignedSysInt pos = 0;
         while(pos < v_size && var_order[pos].isAssigned())
             ++pos;
         

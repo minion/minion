@@ -47,7 +47,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 
   int vals;
   
-  int dynamic_trigger_count() //need two watched literals per value in each var (one per support) 
+  virtual SysInt dynamic_trigger_count() //need two watched literals per value in each var (one per support) 
   {
     if(vals == -1) { //not already calculated 
       vals = 0;
@@ -160,8 +160,8 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 
     //place a WL for each value
     //z first:
-    int max = z.getMax();
-    for(int i = z.getMin(); i <= max; i++) {
+    DomainInt max = z.getMax();
+    for(DomainInt i = z.getMin(); i <= max; i++) {
       if(z.inDomain(i)) {
     if(!get_sumsupport(x, y, i, supp)) {
       z.removeFromDomain(i);
@@ -182,7 +182,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     }
     //supports for x:
     max = x.getMax();
-    for(int i = x.getMin(); i <= max; i++) {
+    for(DomainInt i = x.getMin(); i <= max; i++) {
       if(x.inDomain(i)) {
     if(!get_diffsupport(z, y, ymult, i*xmult, supp)) {
       x.removeFromDomain(i);
@@ -203,7 +203,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     }
     //supports for y:
     max = y.getMax();
-    for(int i = y.getMin(); i <= max; i++) {
+    for(DomainInt i = y.getMin(); i <= max; i++) {
       if(y.inDomain(i)) {
     if(!get_diffsupport(z, x, xmult, i*ymult, supp)) {
       y.removeFromDomain(i);
@@ -262,7 +262,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 
 template<typename VarArray, typename Var>
 AbstractConstraint*
-BuildCT_GACSUM(StateObj* stateObj, const vector<int>& consts, const VarArray& _var_array, const Var& var, ConstraintBlob&)
+BuildCT_GACSUM(StateObj* stateObj, const vector<DomainInt>& consts, const VarArray& _var_array, const Var& var, ConstraintBlob&)
 {
   typedef typename VarArray::value_type ValT;
   typedef typename Var::value_type VarT;

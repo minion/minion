@@ -113,9 +113,9 @@ struct smallset_nolist
     // constant time, no iteration
     // Add and remove item is constant time
     
-    unsigned int cert;
+    UnsignedSysInt cert;
     
-    vector<unsigned int> membership;
+    vector<UnsignedSysInt> membership;
     
     void reserve(int size)
     {
@@ -125,28 +125,28 @@ struct smallset_nolist
         cert=1;
     }
     
-    inline bool in(int val)
+    inline bool in(DomainInt val)
     {
-        return membership[val]==cert;
+        return membership[checked_cast<SysInt>(val)]==cert;
     }
     
-    inline void insert(int val)
+    inline void insert(DomainInt val)
     {
-        D_ASSERT(membership[val]<cert);
+        D_ASSERT(membership[checked_cast<SysInt>(val)]<cert);
         D_ASSERT(val>=0);
-        membership[val]=cert;
+        membership[checked_cast<SysInt>(val)]=cert;
     }
     
-    inline void remove(int val)
+    inline void remove(DomainInt val)
     {
-        membership[val]=0;
+        membership[checked_cast<SysInt>(val)]=0;
     }
     
     // Use only in debugging/stats functions
-    inline int size()
+    inline SysInt size()
     {
-        int counter=0;
-        for(int i=0; i<membership.size(); i++) {
+        SysInt counter=0;
+        for(SysInt i=0; i<membership.size(); i++) {
             if(in(i)) counter++;
         }
         return counter;
@@ -157,7 +157,7 @@ struct smallset_nolist
         if(cert>2000000000)
         {
             cert=1;
-            for(int i=0; i<membership.size(); i++)
+            for(SysInt i=0; i<membership.size(); i++)
             {
                 membership[i]=0;
             }
@@ -174,51 +174,51 @@ struct smallset_nolist_bt
 {
     MoveablePointer membership;
     
-    int arraysize;
+    SysInt arraysize;
     
-    void reserve(int size, StateObj * stateObj)
+    void reserve(SysInt size, StateObj * stateObj)
     {
         // This must be called before anything is put in the set.
         
-        int required_mem = size / 8 + 1;
+        SysInt required_mem = size / 8 + 1;
         // Round up to nearest data_type block
-        required_mem += sizeof(int) - (required_mem % sizeof(int));
+        required_mem += sizeof(SysInt) - (required_mem % sizeof(SysInt));
         
-        arraysize=required_mem/sizeof(int);
+        arraysize=required_mem/sizeof(SysInt);
         
         membership= getMemory(stateObj).backTrack().request_bytes(required_mem);
     }
     
-    inline bool in(int val)
+    inline bool in(SysInt val)
     {
-        D_ASSERT(val/(sizeof(int)*8) <arraysize);
-        int shift_offset = 1 << (val % (sizeof(int)*8));
-        return ((int *)membership.get_ptr())[val/(sizeof(int)*8)] & shift_offset;
+        D_ASSERT(val/(sizeof(SysInt)*8) <arraysize);
+        SysInt shift_offset = 1 << (val % (sizeof(SysInt)*8));
+        return ((SysInt *)membership.get_ptr())[val/(sizeof(SysInt)*8)] & shift_offset;
     }
     
-    inline void insert(int val)
+    inline void insert(SysInt val)
     {
-        D_ASSERT(val/(sizeof(int)*8) <arraysize);
+        D_ASSERT(val/(sizeof(SysInt)*8) <arraysize);
         
-        int shift_offset = 1 << (val % (sizeof(int)*8));
+        SysInt shift_offset = 1 << (val % (sizeof(SysInt)*8));
         
-        ((int *)membership.get_ptr())[val/(sizeof(int)*8)] |= shift_offset;
+        ((SysInt *)membership.get_ptr())[val/(sizeof(SysInt)*8)] |= shift_offset;
     }
     
-    inline void remove(int val)
+    inline void remove(SysInt val)
     {
-        D_ASSERT(val/(sizeof(int)*8) <arraysize);
+        D_ASSERT(val/(sizeof(SysInt)*8) <arraysize);
         
-        int shift_offset = 1 << (val % (sizeof(int)*8));
+        SysInt shift_offset = 1 << (val % (sizeof(SysInt)*8));
         
-        ((int *)membership.get_ptr())[val/(sizeof(int)*8)] &= shift_offset;
+        ((SysInt *)membership.get_ptr())[val/(sizeof(SysInt)*8)] &= shift_offset;
     }
     
     inline void clear()
     {
-        for(int i=0; i<arraysize; i++)
+        for(SysInt i=0; i<arraysize; i++)
         {
-            ((int *)membership.get_ptr())[i]=0;
+            ((SysInt *)membership.get_ptr())[i]=0;
         }
     }
 };
@@ -231,34 +231,34 @@ struct smallset_list_bt
     // a new node, then populated some more.
     // Membership array does not backtrack, clearly.
     
-    unsigned int cert;
+    UnsignedSysInt cert;
     
-    vector<unsigned int> membership;
+    vector<UnsignedSysInt> membership;
     
     MoveablePointer list;
-    int maxsize;
+    SysInt maxsize;
     
-    void reserve(int size, StateObj * stateObj)
+    void reserve(SysInt size, StateObj * stateObj)
     {
         // This must be called before anything is put in the set.
         maxsize=size;
         membership.resize(size);
         
-        for(int i=0; i<size; i++) membership[i]=0;
+        for(SysInt i=0; i<size; i++) membership[i]=0;
         
         cert=1;
         list= getMemory(stateObj).backTrack().request_bytes((size+1)*sizeof(short));
         ((short*)list.get_ptr())[maxsize]=0;   // The count is stored in the last element of the array.
     }
     
-    inline bool in(int val)
+    inline bool in(SysInt val)
     {
         D_ASSERT(val<maxsize && val>=0);
         
         return membership[val]==cert;
     }
     
-    inline void insert(int val)
+    inline void insert(SysInt val)
     {
         D_ASSERT(val<maxsize && val>=0);
         //D_DATA(print());
@@ -270,7 +270,7 @@ struct smallset_list_bt
         }
         membership[val]=cert;
         short * ptr=((short*) list.get_ptr());
-        int count=ptr[maxsize];
+        SysInt count=ptr[maxsize];
         D_ASSERT(count<maxsize);
         ptr[maxsize]=(short)count+1;
         ptr[count]=(short)val;
@@ -286,7 +286,7 @@ struct smallset_list_bt
         if(cert>2000000000)
         {
             cert=1;
-            for(int i=0; i<membership.size(); i++)
+            for(SysInt i=0; i<membership.size(); i++)
             {
                 membership[i]=0;
             }
@@ -299,17 +299,17 @@ struct smallset_list_bt
         ((short *)list.get_ptr())[maxsize]=0;
     }
     
-    int size()
+    SysInt size()
     {
-        return (int) ((short *)list.get_ptr())[maxsize];
+        return (SysInt) ((short *)list.get_ptr())[maxsize];
     }
     
     void sanitycheck()
     {
         short* l = (short *) list.get_ptr();
-        for(int i=0; i<l[maxsize]; i++)
+        for(SysInt i=0; i<l[maxsize]; i++)
         {
-            for(int j=i+1; j<l[maxsize]; j++)
+            for(SysInt j=i+1; j<l[maxsize]; j++)
             {
                 D_ASSERT(l[i]!=l[j]);
             }
@@ -323,7 +323,7 @@ struct smallset_list_bt
     {
         short * l = (short *)list.get_ptr();
         cout << "smallset_list_bt length:" << l[maxsize] << " at location "<< (&l[maxsize]) << endl;
-        for(int i=0; i<maxsize; i++)
+        for(SysInt i=0; i<maxsize; i++)
         {
             cout << "smallset_list_bt item:" << l[i] << " at location "<< (&l[i]) << endl;
         
@@ -351,15 +351,15 @@ struct FlowConstraint : public AbstractConstraint
     {
         if(var_array.size()>0)
         {
-            dom_min=var_array[0].getInitialMin();
-            dom_max=var_array[0].getInitialMax();
+            dom_min=checked_cast<SysInt>(var_array[0].getInitialMin());
+            dom_max=checked_cast<SysInt>(var_array[0].getInitialMax());
         }
         for(int i=0; i<var_array.size(); ++i)
         {
             if(var_array[i].getInitialMin()<dom_min)
-                dom_min=var_array[i].getInitialMin();
+                dom_min=checked_cast<SysInt>(var_array[i].getInitialMin());
             if(var_array[i].getInitialMax()>dom_max)
-                dom_max=var_array[i].getInitialMax();
+                dom_max=checked_cast<SysInt>(var_array[i].getInitialMax());
         }
         numvars=var_array.size();  // number of variables in the constraint
         numvals=dom_max-dom_min+1;

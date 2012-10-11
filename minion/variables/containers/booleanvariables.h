@@ -67,11 +67,11 @@ struct BoolVarRef_internal
   { return false;}
   
   data_type shift_offset;
-  unsigned var_num;
+  SysInt var_num;
   MoveablePointer data_position;
   MemOffset value_position;
 
-  unsigned data_offset() const
+  UnsignedSysInt data_offset() const
   { return var_num / (sizeof(data_type)*8); }
   
 #ifdef MANY_VAR_CONTAINERS
@@ -96,7 +96,7 @@ struct BoolVarRef_internal
   { }
 #endif
   
-  BoolVarRef_internal(int value, BoolVarContainer* b_con);
+  BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con);
   
   data_type& assign_ptr() const
   { return *static_cast<data_type*>(data_position.get_ptr()); }
@@ -115,7 +115,7 @@ struct BoolVarRef_internal
   
   BOOL inDomain(DomainInt b) const
   {
-    if((b|1) != 1)
+    if((checked_cast<SysInt>(b)|1) != 1)
       return false;
     return (!isAssigned()) || (b == getAssignedValue());
   }
@@ -185,9 +185,9 @@ struct BoolVarContainer
   MemOffset values_mem;
   vector<vector<AbstractConstraint*> > constraints;
 #ifdef WDEG
-  vector<unsigned int> wdegs;
+  vector<UnsignedSysInt> wdegs;
 #endif
-  unsigned var_count_m;
+  UnsignedSysInt var_count_m;
   TriggerList trigger_list;
   /// When false, no variable can be altered. When true, no variables can be created.
   BOOL lock_m;
@@ -234,7 +234,7 @@ struct BoolVarContainer
   }
   
   /// Returns a reference to the ith Boolean variable which was previously created.
-  BoolVarRef get_var_num(int i);
+  BoolVarRef get_var_num(DomainInt i);
   
   
   void setMax(const BoolVarRef_internal& d, DomainInt i) 
@@ -265,7 +265,7 @@ struct BoolVarContainer
   void removeFromDomain(const BoolVarRef_internal& d, DomainInt b)
   {LOCK_BOOL_MUTEX
     D_ASSERT(lock_m && d.var_num < var_count_m);
-    if((b|1) != 1)
+    if((checked_cast<SysInt>(b)|1) != 1)
       return;
       
     if(d.isAssigned())
@@ -281,7 +281,7 @@ struct BoolVarContainer
   {LOCK_BOOL_MUTEX
     D_ASSERT(lock_m && d.var_num < var_count_m);
     D_ASSERT(!d.isAssigned());
-    if((b|1) != 1)
+    if((checked_cast<SysInt>(b)|1) != 1)
     {
       getState(stateObj).setFailed(true);
       return;
@@ -378,20 +378,20 @@ struct BoolVarContainer
 #endif
 };
 
-inline BoolVarRef BoolVarContainer::get_var_num(int i)
+inline BoolVarRef BoolVarContainer::get_var_num(DomainInt i)
 {
   D_ASSERT(i < (int)var_count_m);
   return BoolVarRef(BoolVarRef_internal(i, this));
 }
 
-inline BoolVarRef_internal::BoolVarRef_internal(int value, BoolVarContainer* b_con) : 
-  var_num(value),  
+inline BoolVarRef_internal::BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con) : 
+  var_num(checked_cast<UnsignedSysInt>(value)),  
   data_position(b_con->assign_offset, data_offset()*sizeof(data_type)),
   value_position(b_con->values_mem, data_offset()*sizeof(data_type))
 #ifdef MANY_VAR_CONTAINERS
 , boolCon(b_con)
 #endif
-{ shift_offset = one << (value % (sizeof(data_type)*8)); }
+{ shift_offset = one << (checked_cast<UnsignedSysInt>(value) % (sizeof(data_type)*8)); }
 
 
 #endif

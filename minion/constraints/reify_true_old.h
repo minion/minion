@@ -54,10 +54,10 @@ struct reify_true_old : public AbstractConstraint
   virtual AbstractConstraint* reverse_constraint()
   { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     
-    DomainInt back_val = *(v + v_size - 1);
+    DomainInt back_val = *(v + checked_cast<SysInt>(v_size - 1));
     //v.pop_back();
     if(back_val != 0)
       return poscon->check_assignment(v, v_size - 1);
@@ -76,7 +76,7 @@ struct reify_true_old : public AbstractConstraint
   {
     triggerCollection postrig = poscon->setup_internal();
     triggerCollection triggers;
-    for(unsigned int i=0;i<postrig.size();i++)
+    for(UnsignedSysInt i=0;i<postrig.size();i++)
     {
       postrig[i]->trigger.constraint = this;
       D_ASSERT(postrig[i]->trigger.info != -99999);
@@ -100,8 +100,9 @@ struct reify_true_old : public AbstractConstraint
     constraint_locked = false;
   }
   
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i_in, DomainDelta domain)
   {
+    const SysInt i = checked_cast<SysInt>(i_in);
     PROP_INFO_ADDONE(ReifyTrue);
     if(constraint_locked)
       return;

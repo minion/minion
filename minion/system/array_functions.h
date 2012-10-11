@@ -26,7 +26,7 @@ bool increment_vector(Container& vals, const Container& maxvals)
   while(position >= 0 && carry == true)
   {
     D_ASSERT(maxvals[position] != 0);
-    vals[position]++;
+    ++vals[position];
     if(vals[position] == maxvals[position])
       vals[position] = 0;
     else
@@ -39,9 +39,9 @@ bool increment_vector(Container& vals, const Container& maxvals)
 /// A simple wrapper for a pair of bounds.
 struct Bounds
 {
-  int lower_bound;
-  int upper_bound;
-  Bounds(int _lower, int _upper) : lower_bound(_lower), upper_bound(_upper)
+  DomainInt lower_bound;
+  DomainInt upper_bound;
+  Bounds(DomainInt _lower, DomainInt _upper) : lower_bound(_lower), upper_bound(_upper)
   { }
 };
 

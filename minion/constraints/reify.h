@@ -104,7 +104,7 @@ struct reify : public ParentConstraint
   int dtcount;
   int c0vars;  // how many vars for child_constraints[0]
 
-  typedef vector<vector<pair<int,int> > > triggerpairstype;
+  typedef vector<vector<pair<DomainInt, DomainInt> > > triggerpairstype;
   D_DATA(triggerpairstype triggerpairs);
 
   reify(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar _rar_var) :
@@ -170,13 +170,13 @@ struct reify : public ParentConstraint
       return new reify<BoolVar>(stateObj, child_constraints[0], reify_var, true);
   }
 
-  virtual int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   {
     return child_constraints[0]->get_vars_singleton()->size()*2
         +child_constraints[1]->get_vars_singleton()->size()*2;  // *2 for each child constraint.
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(reify_var.inDomain(1))
     {
@@ -202,9 +202,9 @@ struct reify : public ParentConstraint
     return false;
   }
 
-  virtual BOOL check_assignment(DomainInt* vals, int v_size)
+  virtual BOOL check_assignment(DomainInt* vals, SysInt v_size)
   {
-    DomainInt back_val = *(vals + (v_size - 1));
+    DomainInt back_val = *(vals + v_size - 1);
     if(back_val == 1)
     {
       return child_constraints[0]->check_assignment(vals, c0vars);
@@ -266,7 +266,7 @@ struct reify : public ParentConstraint
     constraint_locked = false;
   }
 
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(Reify);
     P("Static propagate start");
@@ -298,7 +298,7 @@ struct reify : public ParentConstraint
       D_ASSERT(reify_var.isAssigned());
       if(reify_var.getAssignedValue() == 1)
       {
-          pair<int,int> childTrigger = getChildStaticTrigger(i);
+          pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
           if(childTrigger.first != 0)
           {
               return;
@@ -309,7 +309,7 @@ struct reify : public ParentConstraint
       else
       {
           D_ASSERT(reify_var.getAssignedValue()==0)
-          pair<int,int> childTrigger = getChildStaticTrigger(i);
+          pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
           if(childTrigger.first != 1)
           {
               return;
@@ -342,11 +342,12 @@ struct reify : public ParentConstraint
 
             for(int i=0; i<triggerpairs[0].size(); i++)
             {
-                if(!t1[triggerpairs[0][i].first].inDomain(triggerpairs[0][i].second))
+                if(!t1[checked_cast<SysInt>(triggerpairs[0][i].first)].inDomain(triggerpairs[0][i].second))
                 {
                     wllost=true;
                 }
             }
+            (void)wllost;
             //D_ASSERT(wllost); This is not true because some WLs may be translated to domainchanged triggers.
             #endif
             bool flag;
@@ -380,11 +381,12 @@ struct reify : public ParentConstraint
 
             for(int i=0; i<triggerpairs[1].size(); i++)
             {
-                if(!t1[triggerpairs[1][i].first].inDomain(triggerpairs[1][i].second))
+                if(!t1[checked_cast<SysInt>(triggerpairs[1][i].first)].inDomain(triggerpairs[1][i].second))
                 {
                     wllost=true;
                 }
             }
+            (void)wllost;
             //D_ASSERT(wllost);
             #endif
             bool flag;
@@ -441,12 +443,13 @@ struct reify : public ParentConstraint
   {
     for(int i = 0; i < assignment.size(); ++i)
     {
-      D_ASSERT(vars[assignment[i].first].inDomain(assignment[i].second));
+      const SysInt aif = checked_cast<SysInt>(assignment[i].first);
+      D_ASSERT(vars[aif].inDomain(assignment[i].second));
       D_ASSERT(trig+i < endtrig);
-      if(vars[assignment[i].first].isBound()) {
-        vars[assignment[i].first].addDynamicTrigger(trig + i, DomainChanged);
+      if(vars[aif].isBound()) {
+        vars[aif].addDynamicTrigger(trig + i, DomainChanged);
       } else {
-        vars[assignment[i].first].addDynamicTrigger(trig + i, DomainRemoval, assignment[i].second);
+        vars[aif].addDynamicTrigger(trig + i, DomainRemoval, assignment[i].second);
       }
     }
     // clear a contiguous block of used triggers up to (not including) endtrig
@@ -571,7 +574,7 @@ struct reify : public AbstractConstraint
     FAIL_EXIT();
   }
 
-  virtual BOOL check_assignment(DomainInt* vals, int v_size)
+  virtual BOOL check_assignment(DomainInt* vals, SysInt v_size)
   {
     DomainInt back_val = *(vals + (v_size - 1));
     if(back_val != 0)
@@ -592,7 +595,7 @@ struct reify : public AbstractConstraint
     vector<AnyVarRef> vec1 = poscon->get_vars();
     vector<AnyVarRef> vec2 = negcon->get_vars();
     vec1.reserve(vec1.size() + vec2.size() + 1);
-    for(unsigned i = 0; i < vec2.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vec2.size(); ++i)
       vec1.push_back(vec2[i]);
     vec1.push_back(rar_var);
     return vec1;
@@ -603,14 +606,14 @@ struct reify : public AbstractConstraint
     triggerCollection postrig = poscon->setup_internal();
     triggerCollection negtrig = negcon->setup_internal();
     triggerCollection triggers;
-    for(unsigned int i=0;i<postrig.size();i++)
+    for(UnsignedSysInt i=0;i<postrig.size();i++)
     {
       postrig[i]->trigger.info = postrig[i]->trigger.info * 2;
       postrig[i]->trigger.constraint = this;
       triggers.push_back(postrig[i]);
     }
 
-    for(unsigned int i=0;i<negtrig.size();i++)
+    for(UnsignedSysInt i=0;i<negtrig.size();i++)
     {
       negtrig[i]->trigger.info = negtrig[i]->trigger.info * 2 + 1;
       negtrig[i]->trigger.constraint = this;
@@ -641,7 +644,7 @@ struct reify : public AbstractConstraint
       constraint_locked = false;
   }
 
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(Reify);
 

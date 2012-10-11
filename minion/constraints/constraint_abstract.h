@@ -68,7 +68,7 @@ protected:
 public:
 
   #ifdef WDEG
-  unsigned int wdeg;
+  UnsignedSysInt wdeg;
   #endif
 
   BOOL full_propagate_done;
@@ -79,12 +79,12 @@ public:
 
   /// Defines the number of dynamic triggers the constraint wants.
   /// Must be implemented by any constraint.
-  virtual int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
     { return 0; }
 
   /// Returns the number of dynamic triggers for this constraint, and all the children of
   /// this constraint. Only differs from the above for things like 'reify', 'reifyimply' and 'or'.
-  virtual int dynamic_trigger_count_with_children()
+  virtual SysInt dynamic_trigger_count_with_children()
     { return dynamic_trigger_count(); }
 
   /// Gets all the triggers a constraint wants to set up.
@@ -99,7 +99,7 @@ public:
 
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
-  virtual void propagate(int, DomainDelta)
+  virtual void propagate(DomainInt, DomainDelta)
     { D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + constraint_name()); }
 
   /// Checks if a constraint cannot be satisfied, and sets up any data structures for future incremental checks.
@@ -126,7 +126,7 @@ public:
   /** The return value (in the box) is pairs of <varnum, domain value>, where varnum is in the same position
   *  as returned by get_vars.
    */
-    virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+    virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     cerr << "Finding assignment is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
     exit(1);
@@ -167,7 +167,7 @@ public:
   }
 
 #ifdef WDEG
-  inline unsigned int getWdeg() { return wdeg; }
+  inline DomainInt getWdeg() { return wdeg; }
 
   inline void incWdeg()
   {
@@ -180,7 +180,7 @@ public:
 #endif
 
   // Weights the constraint for ordering in trigger lists (bigger is later)
-  virtual int getTrigWeight()
+  virtual DomainInt getTrigWeight()
   {
     return get_vars_singleton()->size();
   }
@@ -202,7 +202,7 @@ public:
 
   /// Checks if an assignment is satisfied.
   /** This takes the variable order returned by, and is mainly only used by, get_table_constraint() */
-  virtual BOOL check_assignment(DomainInt* v, int v_size) = 0;
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) = 0;
 
   virtual ~AbstractConstraint()
     {}
@@ -221,12 +221,12 @@ public:
   virtual void setup()
   {
     // Dynamic initialisation
-    int trigs = dynamic_trigger_count();
+    const SysInt trigs = checked_cast<SysInt>(dynamic_trigger_count());
     D_ASSERT(trigs >= 0);
     setup_dynamic_triggers(getMemory(stateObj).nonBackTrack().request_bytes((sizeof(DynamicTrigger) * trigs)));
 
     DynamicTrigger* start = dynamic_trigger_start();
-    for(int i = 0 ; i < trigs; ++i)
+    for(SysInt i = 0 ; i < trigs; ++i)
       new (start+i) DynamicTrigger(this);
 
     // Static initialisation
@@ -237,19 +237,19 @@ public:
     }
   }
   
-  int getTightnessEstimate()
+  SysInt getTightnessEstimate()
   {
       // Make 1000 random tuples and see if they satisfy the constraint
       vector<AnyVarRef> vars=get_vars();
       DomainInt* t=new DomainInt[vars.size()];
-      int unsatcounter=0;
+      SysInt unsatcounter=0;
       srand(12345);
       for(int i=0; i<1000; i++)
       {
-          for(int j=0; j<vars.size(); j++)
+          for(SysInt j=0; j<vars.size(); j++)
           {
-              int dsize=vars[j].getInitialMax()-vars[j].getInitialMin()+1;
-              t[j]=(rand()%dsize)+vars[j].getInitialMin();
+              DomainInt dsize=vars[j].getInitialMax()-vars[j].getInitialMin()+1;
+              t[j]=(rand()%checked_cast<SysInt>(dsize))+vars[j].getInitialMin();
           }
           if(!check_assignment(t, vars.size()))
           {
@@ -273,7 +273,7 @@ public:
           for(int j=0; j<vars.size(); j++)
           {
 	    if(j != var) {
-              int dsize=vars[j].getInitialMax()-vars[j].getInitialMin()+1;
+              DomainInt dsize=vars[j].getInitialMax()-vars[j].getInitialMin()+1;
               t[j]=(rand()%dsize)+vars[j].getInitialMin();
 	    }
           }
@@ -293,19 +293,20 @@ class ParentConstraint : public AbstractConstraint
 protected:
   vector<AbstractConstraint*> child_constraints;
   // Maps a dynamic trigger to the constraint which it belongs to.
-  vector<int> _dynamic_trigger_to_constraint;
+  // SysInt as they never change, and are always used to index arrays
+  vector<SysInt> _dynamic_trigger_to_constraint;
   // Maps a static trigger to a pair { constraint, trigger for that constraint }
-  vector< pair<int, int> > _static_trigger_to_constraint;
+  vector< pair<DomainInt, DomainInt> > _static_trigger_to_constraint;
   // Maps variables to constraints
-  vector<int> variable_to_constraint;
+  vector<DomainInt> variable_to_constraint;
   // Gets start of each constraint
-  vector<int> start_of_constraint;
+  vector<DomainInt> start_of_constraint;
 public:
 
-  pair<int,int> getChildStaticTrigger(int i)
-    { return _static_trigger_to_constraint[i]; }
+  pair<DomainInt, DomainInt> getChildStaticTrigger(DomainInt i)
+    { return _static_trigger_to_constraint[checked_cast<SysInt>(i)]; }
 
-  int getChildDynamicTrigger(DynamicTrigger* ptr)
+  SysInt getChildDynamicTrigger(DynamicTrigger* ptr)
   {
     return _dynamic_trigger_to_constraint[ptr - dynamic_trigger_start()];
   }
@@ -316,10 +317,10 @@ public:
   {
     triggerCollection newTriggers;
 
-    for(int i = 0; i < child_constraints.size(); i++)
+    for(UnsignedSysInt i = 0; i < child_constraints.size(); i++)
     {
       triggerCollection childTrigs = child_constraints[i]->setup_internal_gather_triggers();
-      for(int j = 0; j < childTrigs.size(); ++j)
+      for(UnsignedSysInt j = 0; j < childTrigs.size(); ++j)
       {
         // Record each original trigger value, then add the modified trigger to the collection.
         _static_trigger_to_constraint.push_back(make_pair(i, childTrigs[j]->trigger.info));
@@ -331,7 +332,7 @@ public:
     }
 
     triggerCollection parentTrigs = setup_internal();
-    for(int i = 0; i < parentTrigs.size(); ++i)
+    for(UnsignedSysInt i = 0; i < parentTrigs.size(); ++i)
       D_ASSERT(parentTrigs[i]->trigger.info < 0);
     newTriggers.insert(newTriggers.end(), parentTrigs.begin(), parentTrigs.end());
 
@@ -341,12 +342,12 @@ public:
   ParentConstraint(StateObj* _stateObj, const vector<AbstractConstraint*> _children = vector<AbstractConstraint*>()) :
   AbstractConstraint(_stateObj), child_constraints(_children)
   {
-    int var_count = 0;
-    for(int i = 0; i < child_constraints.size(); ++i)
+    SysInt var_count = 0;
+    for(SysInt i = 0; i < child_constraints.size(); ++i)
     {
       start_of_constraint.push_back(var_count);
-      int con_size = child_constraints[i]->get_vars_singleton()->size();
-      for(int j = 0; j < con_size; ++j)
+      SysInt con_size = child_constraints[i]->get_vars_singleton()->size();
+      for(SysInt j = 0; j < con_size; ++j)
       {
         variable_to_constraint.push_back(i);
       }
@@ -354,10 +355,10 @@ public:
     }
   }
 
-  virtual int dynamic_trigger_count_with_children()
+  virtual SysInt dynamic_trigger_count_with_children()
   {
-    int trigger_count = dynamic_trigger_count();
-    for(int i = 0; i < child_constraints.size(); ++i)
+    SysInt trigger_count = dynamic_trigger_count();
+    for(SysInt i = 0; i < child_constraints.size(); ++i)
       trigger_count += child_constraints[i]->dynamic_trigger_count_with_children();
     return trigger_count;
   }
@@ -366,12 +367,12 @@ public:
   {
     _DynamicTriggerCache = dynamicTriggerPointer;
 
-    int current_trigger_count = dynamic_trigger_count();
+    SysInt current_trigger_count = dynamic_trigger_count();
 
-    for(int count = 0; count < current_trigger_count; count++)
+    for(SysInt count = 0; count < current_trigger_count; ++count)
       _dynamic_trigger_to_constraint.push_back(child_constraints.size());
 
-    for(int i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < child_constraints.size(); ++i)
     {
       // We need this check to ensure we don't try constructing a "start of trigger" block one off the
       // the end of memory array.
@@ -379,12 +380,12 @@ public:
         return;
 
       // Get start child's dynamic triggers.
-      MemOffset childPtr = dynamicTriggerPointer.getOffset(current_trigger_count * sizeof(DynamicTrigger));
+      MemOffset childPtr = dynamicTriggerPointer.getOffset(checked_cast<SysInt>(current_trigger_count) * sizeof(DynamicTrigger));
       child_constraints[i]->setup_dynamic_triggers(childPtr);
 
-      int child_trig_count = child_constraints[i]->dynamic_trigger_count_with_children();
+      SysInt child_trig_count = child_constraints[i]->dynamic_trigger_count_with_children();
 
-      for(int count = current_trigger_count; count < current_trigger_count + child_trig_count; ++count)
+      for(SysInt count = current_trigger_count; count < current_trigger_count + child_trig_count; ++count)
         _dynamic_trigger_to_constraint.push_back(i);
 
       current_trigger_count += child_trig_count;
@@ -396,9 +397,9 @@ public:
   virtual void setup()
   {
     // Dynamic initialisation
-    int all_trigs = dynamic_trigger_count_with_children();
+    const SysInt all_trigs = checked_cast<SysInt>(dynamic_trigger_count_with_children());
 
-    D_DATA(int trigs = dynamic_trigger_count());
+    D_DATA(DomainInt trigs = dynamic_trigger_count());
     D_ASSERT(trigs >= 0);
     D_ASSERT(all_trigs >= trigs);
 
@@ -406,7 +407,7 @@ public:
 
     // Start by allocating triggers in the memory block
     DynamicTrigger* start = static_cast<DynamicTrigger*>(trigMem.get_ptr());
-    for(int i = 0 ; i < all_trigs; ++i)
+    for(SysInt i = 0 ; i < all_trigs; ++i)
       new (start+i) DynamicTrigger(this);
 
     setup_dynamic_triggers(trigMem);

@@ -50,7 +50,7 @@ public:
   TriggerMem(StateObj* _stateObj) : triggerlist_data(NULL), stateObj(_stateObj)
   {}
 
-  void allocateTriggerListData(unsigned mem)
+  void allocateTriggerListData(UnsignedSysInt mem)
   {
     D_ASSERT(triggerlist_data == NULL);
     triggerlist_data = new char[mem];
@@ -96,25 +96,25 @@ public:
 
   Trigger** trigger_data_m;
 
-  int var_count_m;
-  int lock_first;
-  int lock_second;
+  SysInt var_count_m;
+  SysInt lock_first;
+  SysInt lock_second;
 
   DomainInt vars_min_domain_val;
   DomainInt vars_max_domain_val;
-  unsigned vars_domain_size;
+  UnsignedSysInt vars_domain_size;
 
-  void lock(int size, DomainInt min_domain_val, DomainInt max_domain_val)
+  void lock(SysInt size, DomainInt min_domain_val, DomainInt max_domain_val)
   {
     D_ASSERT(!lock_first && !lock_second);
     lock_first = true;
     var_count_m = size;
     vars_min_domain_val = min_domain_val;
     vars_max_domain_val = max_domain_val;
-    vars_domain_size = checked_cast<unsigned>(max_domain_val - min_domain_val + 1);
+    vars_domain_size = checked_cast<UnsignedSysInt>(max_domain_val - min_domain_val + 1);
 
     triggers.resize(4);
-    for(unsigned i = 0; i < 4; ++i)
+    for(UnsignedSysInt i = 0; i < 4; ++i)
       triggers[i].resize(var_count_m);
 
 #ifdef DYNAMICTRIGGERS
@@ -135,9 +135,9 @@ public:
   {
     D_ASSERT(lock_first && !lock_second);
     size_t storage = 0;
-    for(unsigned i = 0; i < 4; ++i)
+    for(UnsignedSysInt i = 0; i < 4; ++i)
     {
-      for(unsigned j = 0; j < triggers[i].size(); ++j)
+      for(UnsignedSysInt j = 0; j < triggers[i].size(); ++j)
         storage += triggers[i][j].size();
     }
     return storage * sizeof(Trigger) + 4 * (var_count_m + 1) * sizeof(Trigger*);
@@ -153,9 +153,9 @@ public:
   {
 #ifdef SORT_TRIGGERRANGES
     // We can sort triggers if you like here!
-    for(unsigned type = 0; type < 4; ++type)
+    for(UnsignedSysInt type = 0; type < 4; ++type)
     {
-      for(unsigned i = 0; i < triggers[type].size(); ++i)
+      for(UnsignedSysInt i = 0; i < triggers[type].size(); ++i)
       {
         std::sort(triggers[type][i].begin(), triggers[type][i].end(), CompareMem());
       }
@@ -168,13 +168,13 @@ public:
     trigger_data_m = trigger_ranges;
     Trigger* trigger_data = (Trigger*)(mem_start + 4 * (triggers[UpperBound].size() + 1) * sizeof(Trigger*));
 
-    for(unsigned int type = 0; type < 4; ++type)
+    for(UnsignedSysInt type = 0; type < 4; ++type)
     {
-      for(unsigned int i = 0; i < triggers[type].size(); ++i)
+      for(UnsignedSysInt i = 0; i < triggers[type].size(); ++i)
       {
         *trigger_ranges = trigger_data;
         ++trigger_ranges;
-        for(unsigned int j = 0; j < triggers[type][i].size(); ++j)
+        for(UnsignedSysInt j = 0; j < triggers[type][i].size(); ++j)
         {
           *trigger_data = triggers[type][i][j];
           trigger_data++;
@@ -196,24 +196,24 @@ public:
 
     DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr());
 
-    int trigger_types = ( only_bounds ? 4 : (4 + vars_domain_size));
-    for(unsigned i = 0; i < var_count_m * trigger_types; ++i)
+    DomainInt trigger_types = ( only_bounds ? 4 : (4 + vars_domain_size));
+    for(UnsignedSysInt i = 0; i < var_count_m * trigger_types; ++i)
     {
       new (trigger_ptr + i) DynamicTrigger;
       D_ASSERT((trigger_ptr + i)->sanity_check_list());
     }
   }
 
-  pair<Trigger*, Trigger*> get_trigger_range(int var_num, TrigType type)
+  pair<Trigger*, Trigger*> get_trigger_range(DomainInt var_num, TrigType type)
   {
-    Trigger** first_trig = trigger_data_m + var_num + (var_count_m + 1) * type;
+    Trigger** first_trig = trigger_data_m + checked_cast<SysInt>(var_num) + (var_count_m + 1) * type;
     Trigger* trig_range_start = *first_trig;
     first_trig++;
     Trigger* trig_range_end = *first_trig;
     return pair<Trigger*,Trigger*>(trig_range_start, trig_range_end);
   }
 
-  void dynamic_propagate(int var_num, TrigType type, DomainInt val_removed = NoDomainValue)
+  void dynamic_propagate(DomainInt var_num, TrigType type, DomainInt val_removed = NoDomainValue)
   {
     LOCK_MUTEX;
     D_ASSERT(val_removed == NoDomainValue || ( type == DomainRemoval && val_removed != NoDomainValue) );
@@ -222,7 +222,7 @@ public:
     if(type != DomainRemoval)
     {
       trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
-        + var_num + type*var_count_m;
+        + checked_cast<SysInt>(var_num + type*var_count_m);
     }
     else
     {
@@ -230,7 +230,7 @@ public:
       D_ASSERT(vars_min_domain_val <= val_removed);
       D_ASSERT(vars_max_domain_val >= val_removed);
       trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
-        + checked_cast<int>(var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m);
+        + checked_cast<SysInt>(var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m);
     }
     D_ASSERT(trig->next != NULL);
     // This is an optimisation, no need to push empty lists.
@@ -238,7 +238,7 @@ public:
       getQueue(stateObj).pushDynamicTriggers(trig);
   }
 
-  void push_upper(int var_num, DomainInt upper_delta)
+  void push_upper(DomainInt var_num, DomainInt upper_delta)
   {
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, UpperBound);
     D_ASSERT(lock_second);
@@ -247,10 +247,10 @@ public:
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
     if(range.first != range.second)
       getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second,
-                                                   checked_cast<int>(upper_delta)));
+                                                   checked_cast<SysInt>(upper_delta)));
   }
 
-  void push_lower(int var_num, DomainInt lower_delta)
+  void push_lower(DomainInt var_num, DomainInt lower_delta)
   {
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, LowerBound);
     D_ASSERT(lock_second);
@@ -258,11 +258,11 @@ public:
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
     if(range.first != range.second)
       getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second,
-                                                   checked_cast<int>(lower_delta)));
+                                                   checked_cast<SysInt>(lower_delta)));
   }
 
 
-  void push_assign(int var_num, DomainInt)
+  void push_assign(DomainInt var_num, DomainInt)
   {
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, Assigned);
     D_ASSERT(lock_second);
@@ -271,7 +271,7 @@ public:
       getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1));
   }
 
-  void push_domain_changed(int var_num)
+  void push_domain_changed(DomainInt var_num)
   {
     if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);
 
@@ -281,31 +281,31 @@ public:
       getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1));
   }
 
-  void push_domain_removal(int var_num, DomainInt val_removed)
+  void push_domain_removal(DomainInt var_num, DomainInt val_removed)
   {
     D_ASSERT(!only_bounds);
     dynamic_propagate(var_num, DomainRemoval, val_removed);
     D_ASSERT(lock_second);
   }
 
-  void add_domain_trigger(int b, Trigger t)
+  void add_domain_trigger(DomainInt b, Trigger t)
   {
         LOCK_MUTEX;
     D_ASSERT(!only_bounds);
     D_ASSERT(lock_first && !lock_second);
-    triggers[DomainChanged][b].push_back(t);
+    triggers[DomainChanged][checked_cast<SysInt>(b)].push_back(t);
   }
 
-  void add_trigger(int b, Trigger t, TrigType type)
+  void add_trigger(DomainInt b, Trigger t, TrigType type)
   {
         LOCK_MUTEX;
     D_ASSERT(type != DomainRemoval);
     D_ASSERT(lock_first && !lock_second);
-    triggers[type][b].push_back(t);
+    triggers[type][checked_cast<SysInt>(b)].push_back(t);
   }
 
 
-  void addDynamicTrigger(int b, DynamicTrigger* t, TrigType type, DomainInt val BT_FUNDEF)
+  void addDynamicTrigger(DomainInt b, DynamicTrigger* t, TrigType type, DomainInt val BT_FUNDEF)
   {
         LOCK_MUTEX;
     D_ASSERT(lock_second);
@@ -314,12 +314,13 @@ public:
     D_ASSERT(t->sanity_check == 1234);
   // This variable is only use in debug mode, and will be optimised away at any optimisation level.
     DynamicTrigger* old_list;
+    (void)old_list;
     old_list = t->next;
     DynamicTrigger* queue;
     if(type != DomainRemoval)
     {
       queue = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
-        + b + type*var_count_m;
+        + checked_cast<SysInt>(b + type*var_count_m);
     }
     else
     {
@@ -327,7 +328,7 @@ public:
       D_ASSERT(vars_min_domain_val <= val);
       D_ASSERT(vars_max_domain_val >= val);
       queue = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
-        + checked_cast<int>(b + (DomainRemoval + (val - vars_min_domain_val)) * var_count_m);
+        + checked_cast<SysInt>(b + (DomainRemoval + (val - vars_min_domain_val)) * var_count_m);
     }
     D_ASSERT(queue->sanity_check_list());
 
@@ -364,13 +365,13 @@ public:
 void inline TriggerMem::finaliseTriggerLists()
   {
     size_t trigger_size = 0;
-    for(unsigned int i = 0;i < trigger_lists.size(); i++)
+    for(UnsignedSysInt i = 0;i < trigger_lists.size(); i++)
       trigger_size += trigger_lists[i]->memRequirement();
     getTriggerMem(stateObj).allocateTriggerListData(trigger_size);
 
     char* triggerlist_offset = getTriggerMem(stateObj).getTriggerListDataPtr();
 
-    for(unsigned int i=0;i<trigger_lists.size();i++)
+    for(UnsignedSysInt i=0;i<trigger_lists.size();i++)
     {
       size_t offset = trigger_lists[i]->memRequirement();
       trigger_lists[i]->allocateMem(triggerlist_offset);

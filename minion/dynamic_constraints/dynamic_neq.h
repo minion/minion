@@ -37,7 +37,7 @@ struct WatchNeqConstraint : public AbstractConstraint
     CheckNotBoundSingle(var1, "watchneq","neq");
   }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { return 2; }
   
   virtual void full_propagate()
@@ -86,7 +86,7 @@ struct WatchNeqConstraint : public AbstractConstraint
       }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 2);
     return v[0] != v[1];
@@ -101,7 +101,7 @@ struct WatchNeqConstraint : public AbstractConstraint
     return vars;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(var1.isAssigned() && var2.isAssigned() && var1.getAssignedValue() == var2.getAssignedValue())
       return false;

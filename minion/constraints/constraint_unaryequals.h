@@ -43,7 +43,7 @@ struct UnaryEqualConstraint : public AbstractConstraint
   
   //  virtual AbstractConstraint* reverse_constraint()
   
-  virtual void propagate(int,DomainDelta)
+  virtual void propagate(DomainInt,DomainDelta)
   { D_FATAL_ERROR("This method should never be called"); }
   
   
@@ -55,7 +55,7 @@ struct UnaryEqualConstraint : public AbstractConstraint
     x.propagateAssign(offset);
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v.size() == 1);
     return v[0] == offset;

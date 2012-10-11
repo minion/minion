@@ -89,7 +89,7 @@ public:
   BoolContainer(StateObj* _stateObj) : stateObj(_stateObj), offset(sizeof(int)*8)
   {}
   
-  pair<MoveablePointer, unsigned> returnBacktrackBool()
+  pair<MoveablePointer, UnsignedSysInt> returnBacktrackBool()
   {
     if(offset == sizeof(int)*8)
     {
@@ -97,7 +97,7 @@ public:
       backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(int));
     }
     
-    pair<MoveablePointer,unsigned> ret(backtrack_ptr, ((unsigned)1) << offset);
+    pair<MoveablePointer,UnsignedSysInt> ret(backtrack_ptr, ((UnsignedSysInt)1) << offset);
     offset++;
     return ret;
   }
@@ -107,21 +107,21 @@ template<>
 class Reversible<bool>
 {
   MoveablePointer backtrack_ptr;
-  unsigned mask;
+  UnsignedSysInt mask;
   
 public:
   
   /// Automatic conversion to the type.
   operator bool() const
   {  
-    unsigned* ptr = (unsigned*)(backtrack_ptr.get_ptr());
+    UnsignedSysInt* ptr = (UnsignedSysInt*)(backtrack_ptr.get_ptr());
     return (*ptr & mask);
   }
 
   /// Assignment operator.
   void operator=(const bool& newval)
   {
-    unsigned* ptr = (unsigned*)(backtrack_ptr.get_ptr());
+    UnsignedSysInt* ptr = (UnsignedSysInt*)(backtrack_ptr.get_ptr());
     if(newval)
       *ptr |= mask;
     else
@@ -131,7 +131,7 @@ public:
   /// Constructs a new backtrackable type connected to stateObj.
   Reversible(StateObj* stateObj)
   { 
-    pair<MoveablePointer, unsigned> state = getBools(stateObj).returnBacktrackBool();
+    pair<MoveablePointer, UnsignedSysInt> state = getBools(stateObj).returnBacktrackBool();
     backtrack_ptr = state.first;
     mask = state.second;
   }
@@ -139,7 +139,7 @@ public:
   /// Constructs and assigns in one step.
   Reversible(StateObj* stateObj, bool b)
   {
-    pair<MoveablePointer, unsigned> state = getBools(stateObj).returnBacktrackBool();
+    pair<MoveablePointer, UnsignedSysInt> state = getBools(stateObj).returnBacktrackBool();
     backtrack_ptr = state.first;
     mask = state.second;
     (*this) = b;
@@ -152,7 +152,7 @@ public:
 };
 
 /// Specialisation for backwards compatability.
-typedef Reversible<int> ReversibleInt;
+typedef Reversible<SysInt> ReversibleInt;
 
 // @}
 

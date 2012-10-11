@@ -41,7 +41,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
     last = 0;
   }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   {
       return 2;
   }
@@ -145,7 +145,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
     var_array[loop].addDynamicTrigger(dt, UpperBound);
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
     int count = 0;
@@ -158,12 +158,12 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
   { 
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     return vars;  
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     for(int i = 0; i < var_array.size(); ++i)
     {

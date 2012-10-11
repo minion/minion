@@ -37,7 +37,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
     D_ASSERT(var_array.size() == 3);
   }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { 
     return 2;
   }
@@ -125,7 +125,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
     { var_array[other_propval].propagateAssign(1); }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
     int count = 0;
@@ -138,12 +138,12 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   { 
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     return vars;  
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     for(int i = 0; i < var_array.size(); ++i)
     {

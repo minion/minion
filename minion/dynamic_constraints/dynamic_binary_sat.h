@@ -36,7 +36,7 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
     AbstractConstraint(_stateObj), var1(_var_array[0]), var2(_var_array[1])
   { D_ASSERT(_var_array.size() == 2); }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   {
     return 2;
   }
@@ -79,7 +79,7 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
       var2.propagateAssign(true);
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     return (v[0] != 0) || (v[1] != 0);
   }
@@ -93,7 +93,7 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
     return vars;  
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(var1.getMax() > 0)
     {

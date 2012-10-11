@@ -94,15 +94,20 @@ struct ConcreteFileReader
     return s;
   }
   
-  int read_num()
-  { 
-      int i;
-      infile >> i;
-      if(infile.fail())
+  SysInt read_int()
+  {
+    SysInt i = 0;
+    infile >> i;
+    if(infile.fail())
       throw parse_exception("Problem parsing number");
-      return i;
+    return i;
   }
   
+  DomainInt read_num()
+  { 
+    return this->read_int();
+  }
+
   char simplepeek_char()
   {
     char peek = infile.peek();
@@ -217,8 +222,8 @@ class MinionInputReader {
   vector<Var> readPossibleMatrixIdentifier(FileReader* infile);
   vector< vector<Var> > readLiteralMatrix(FileReader* infile) ;
   vector<Var> readLiteralVector(FileReader* infile) ;
-  vector<int> readConstantVector(FileReader* infile, char start, char end, bool = false);
-  vector<int> readRange(FileReader* infile);
+  vector<DomainInt> readConstantVector(FileReader* infile, char start, char end, bool = false);
+  vector<DomainInt> readRange(FileReader* infile);
   void readObjective(FileReader* infile) ;
   void readTuples(FileReader* infile) ;
   void readMatrices(FileReader* infile) ;
@@ -260,8 +265,8 @@ class MinionThreeInputReader {
   vector<Var> readPossibleMatrixIdentifier(FileReader* infile, bool mustBeMatrix = false);
   vector< vector<Var> > readLiteralMatrix(FileReader* infile) ;
   vector<Var> readLiteralVector(FileReader* infile) ;
-  vector<int> readConstantVector(FileReader* infile, char start = '[', char end = ']', bool = false);
-  vector<int> readRange(FileReader* infile);
+  vector<DomainInt> readConstantVector(FileReader* infile, char start = '[', char end = ']', bool = false);
+  vector<DomainInt> readRange(FileReader* infile);
   void readObjective(FileReader* infile) ;
   void readTuples(FileReader* infile) ;
   void readMatrices(FileReader* infile) ;
@@ -272,7 +277,7 @@ class MinionThreeInputReader {
   void readSearch(FileReader* infile) ;
   vector<vector<Var> > read2DMatrix(FileReader* infile); 
   vector<vector<Var> > read2DMatrixVariable(FileReader* infile);
-  void readAliasMatrix(FileReader* infile, const vector<int>& max_indices, vector<int> indices, string name);
+  void readAliasMatrix(FileReader* infile, const vector<DomainInt>& max_indices, vector<DomainInt> indices, string name);
   vector<Var> readVectorExpression(FileReader* infile) ;
   ConstraintBlob readGeneralConstraint(FileReader*, ConstraintDef*) ;
   vector<ConstraintBlob> readConstraintList(FileReader* infile);

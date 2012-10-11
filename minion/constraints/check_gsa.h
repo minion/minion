@@ -46,13 +46,13 @@ struct Check_GSA : public AbstractConstraint
   virtual ~Check_GSA()
       { delete child; }
   
-  virtual int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
    { return child->get_vars_singleton()->size()*2; }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   { return child->get_satisfying_assignment(assignment); }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   { return child->check_assignment(v, v_size); }
 
   virtual vector<AnyVarRef> get_vars()

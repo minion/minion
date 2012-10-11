@@ -50,15 +50,15 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
 
   VarArray1 var_array1;
   VarArray2 var_array2;
-  int num_to_watch;
-  int hamming_distance;
-  vector<int> watched_values;
-  vector<int> unwatched_values;
+  DomainInt num_to_watch;
+  DomainInt hamming_distance;
+  vector<DomainInt> watched_values;
+  vector<DomainInt> unwatched_values;
 
   Reversible<bool> propagate_mode;
-  int index_to_not_propagate;
+  DomainInt index_to_not_propagate;
 
-  VecCountDynamic(StateObj* _stateObj, const VarArray1& _array1, const VarArray2& _array2, int _hamming_distance) :
+  VecCountDynamic(StateObj* _stateObj, const VarArray1& _array1, const VarArray2& _array2, DomainInt _hamming_distance) :
   AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_hamming_distance + 1), hamming_distance(_hamming_distance),
     propagate_mode(_stateObj, false), index_to_not_propagate(-1)
     {
@@ -67,15 +67,19 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
        D_ASSERT(var_array1.size() == var_array2.size()); 
     }
 
-  int dynamic_trigger_count()
-  { return Operator::dynamic_trigger_count() * num_to_watch; }
+  virtual SysInt dynamic_trigger_count()
+  { return checked_cast<SysInt>(Operator::dynamic_trigger_count() * num_to_watch); }
 
-  bool no_support_for_index(int index)
-  { return Operator::no_support_for_pair(var_array1[index], var_array2[index]); }
+  bool no_support_for_index(DomainInt index_in)
+  { 
+    const SysInt index = checked_cast<SysInt>(index_in);
+    return Operator::no_support_for_pair(var_array1[index], var_array2[index]); 
+  }
 
 
-  void add_triggers(int index, DynamicTrigger* dt)
+  void add_triggers(DomainInt index_in, DynamicTrigger* dt)
   {
+    const SysInt index = checked_cast<SysInt>(index_in);
     Operator::add_triggers(var_array1[index], var_array2[index], dt);
   }
 
@@ -86,12 +90,12 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     if(num_to_watch <= 1)
       return;
       
-    watched_values.resize(num_to_watch);
+    watched_values.resize(checked_cast<SysInt>(num_to_watch));
       
     DynamicTrigger* dt = dynamic_trigger_start();
-    int size = var_array1.size();
-    int index = 0;
-    int found_matches = 0;
+    SysInt size = var_array1.size();
+    SysInt index = 0;
+    SysInt found_matches = 0;
     // Find first pair we could watch.
     
     while(found_matches < num_to_watch && index < size)
@@ -130,7 +134,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     }
 
     // Found enough values to watch, no propagation yet!
-    for(int i = 0; i < num_to_watch; ++i)
+    for(SysInt i = 0; i < num_to_watch; ++i)
     {
       add_triggers(watched_values[i], dt + Operator::dynamic_trigger_count()*i);
     }
@@ -142,10 +146,10 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   void initalise_unwatched_values()
   {
     unwatched_values.resize(0);
-    for(int i = 0; i < var_array1.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
     {
       bool found = false;
-      for(int j = 0; j < watched_values.size(); ++j)
+      for(UnsignedSysInt j = 0; j < watched_values.size(); ++j)
       {
         if(i == watched_values[j])
           found = true;
@@ -157,17 +161,23 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     random_shuffle(unwatched_values.begin(), unwatched_values.end());
   }
 
-  void propagate_from_var1(int index)
-  { Operator::propagate_from_var1(var_array1[index], var_array2[index]); }
+  void propagate_from_var1(DomainInt index_in)
+  {
+    const SysInt index = checked_cast<SysInt>(index_in);
+    Operator::propagate_from_var1(var_array1[index], var_array2[index]);
+  }
   
-  void propagate_from_var2(int index)
-  {  Operator::propagate_from_var2(var_array1[index], var_array2[index]); }
+  void propagate_from_var2(DomainInt index_in)
+  {
+    const SysInt index = checked_cast<SysInt>(index_in);
+    Operator::propagate_from_var2(var_array1[index], var_array2[index]);
+  }
 
   virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(DynVecNeq);
-    int trigger_activated = dt - dynamic_trigger_start();
-    int triggerpair = trigger_activated / Operator::dynamic_trigger_count();   
+    SysInt trigger_activated = dt - dynamic_trigger_start();
+    SysInt triggerpair = trigger_activated / Operator::dynamic_trigger_count();   
     D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);
 
     /*printf("propmode=%d, triggerpair=%d, trigger_activated=%d\n",
@@ -209,8 +219,8 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     if(!no_support_for_index(watched_values[triggerpair]))
       return;
 
-    int index = 0;
-    int unwatched_size = unwatched_values.size();
+    SysInt index = 0;
+    SysInt unwatched_size = unwatched_values.size();
     while(index < unwatched_size && no_support_for_index(unwatched_values[index]))
       index++;
       
@@ -223,7 +233,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
 //     printf("!propmode=%d, triggerpair=%d, trigger_activated=%d, nopropindex=%d\n",
 //        (int)propagate_mode, (int)triggerpair, (int)trigger_activated, (int)index_to_not_propagate);
         
-      for(int i = 0; i < watched_values.size(); ++i)
+      for(SysInt i = 0; i < watched_values.size(); ++i)
       {
         if(i != triggerpair)
         {
@@ -240,11 +250,11 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     add_triggers(watched_values[triggerpair], trigs + triggerpair * Operator::dynamic_trigger_count());
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    int v_size1 = var_array1.size();
-    int count = 0;
-    for(int i = 0; i < v_size1; ++i)
+    UnsignedSysInt v_size1 = var_array1.size();
+    SysInt count = 0;
+    for(UnsignedSysInt i = 0; i < v_size1; ++i)
       if(Operator::check_assignment(v[i], v[i + v_size1]))
         count++;
     return (count >= hamming_distance);
@@ -254,21 +264,21 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   { 
     vector<AnyVarRef> vars;
     vars.reserve(var_array1.size() + var_array2.size());
-    for(unsigned i = 0; i < var_array1.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
       vars.push_back(AnyVarRef(var_array1[i]));
-    for(unsigned i = 0; i < var_array2.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array2.size(); ++i)
       vars.push_back(AnyVarRef(var_array2[i]));
     return vars;  
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(num_to_watch <= 1)
       return true;
     
-    pair<int, int> assign;
-    int found_satisfying = 0;
-    for(int i = 0; i < var_array1.size(); ++i)
+    pair<DomainInt, DomainInt> assign;
+    SysInt found_satisfying = 0;
+    for(SysInt i = 0; i < var_array1.size(); ++i)
     {
       if(Operator::get_satisfying_assignment(var_array1[i], var_array2[i], assign))
       {
@@ -306,11 +316,11 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
 
 template<typename VarArray1,  typename VarArray2>
 AbstractConstraint*
-  VecOrCountConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, int i)
+  VecOrCountConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, DomainInt i)
   { return new VecCountDynamic<VarArray1,VarArray2>(stateObj, varray1, varray2, i); }
 
 template<typename VarArray1,  typename VarArray2>
 AbstractConstraint*
-  NotVecOrCountConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, int i)
-  { return new VecCountDynamic<VarArray1,VarArray2,EqIterated>(stateObj, varray1, varray2, (int)varray1.size() - i + 1); }
+  NotVecOrCountConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, DomainInt i)
+  { return new VecCountDynamic<VarArray1,VarArray2,EqIterated>(stateObj, varray1, varray2, (SysInt)varray1.size() - i + 1); }
 #endif

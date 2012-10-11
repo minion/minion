@@ -125,15 +125,14 @@ public:
 };
 
 
-void operator>>(CheapStream& cs, int& ret)
+template<typename T>
+void operator>>(CheapStream& cs, T& ret)
 {
     int neg_flag = 1;
     
-    long long i;
-    long long limit = 1 << 30;
+    long long i = 1;
+    long long limit = std::numeric_limits<SysInt>::max() / 2;
 
-    // Set initial value
-    i = 1;
     while(isspace(cs.peek()))
         cs.get();
     
@@ -168,6 +167,14 @@ void operator>>(CheapStream& cs, int& ret)
     
     ret = i * neg_flag;
     P(">>int Got: " << i);
+}
+
+template<typename T>
+void operator>>(CheapStream& cs, Wrapper<T>& ret)
+{
+    T t = 0;
+    cs >> t;
+    ret = Wrapper<T>(t);
 }
 
 

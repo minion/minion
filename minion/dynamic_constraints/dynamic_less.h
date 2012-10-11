@@ -44,7 +44,7 @@ struct WatchLessConstraint : public AbstractConstraint
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
   { }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { return 2; }
   
   virtual void full_propagate()
@@ -72,7 +72,7 @@ struct WatchLessConstraint : public AbstractConstraint
       { var1.setMax(var2.getMax() - 1); }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 2);
     return v[0] < v[1];
@@ -87,7 +87,7 @@ struct WatchLessConstraint : public AbstractConstraint
     return vars;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(var1.getMin() < var2.getMax())
     {

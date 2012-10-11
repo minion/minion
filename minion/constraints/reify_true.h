@@ -53,7 +53,7 @@ template<typename BoolVar, bool DoWatchAssignment>
   virtual AbstractConstraint* reverse_constraint()
   { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
 
-  virtual int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   {
     if(DoWatchAssignment)
       return child_constraints[0]->get_vars_singleton()->size()*2;
@@ -61,7 +61,7 @@ template<typename BoolVar, bool DoWatchAssignment>
       return 0;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(rar_var.inDomain(0))
     {
@@ -85,9 +85,9 @@ template<typename BoolVar, bool DoWatchAssignment>
       return false;
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    DomainInt back_val = *(v + v_size - 1);
+    DomainInt back_val = *(v + checked_cast<SysInt>(v_size - 1));
     //v.pop_back();
     if(back_val == 1)
       return child_constraints[0]->check_assignment(v, v_size - 1);
@@ -124,7 +124,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     constraint_locked = false;
   }
 
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(ReifyTrue);
     P("Static propagate start");
@@ -146,7 +146,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     {
       P("Already doing static full propagate");
       D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
-      pair<int,int> childTrigger = getChildStaticTrigger(i);
+      pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
       D_ASSERT(childTrigger.first == 0);
       P("Passing trigger" << childTrigger.second << "on");
       child_constraints[0]->propagate(childTrigger.second, domain);

@@ -94,7 +94,7 @@ public:
   }
   
   /// Produces a new MoveablePointer offset from the current one by a given number of bytes.
-  MoveablePointer getOffset(unsigned bytes)
+  MoveablePointer getOffset(UnsignedSysInt bytes)
   { 
     return MoveablePointer(((char*)ptr) + bytes); 
   }
@@ -114,13 +114,13 @@ class MoveableArray
   /// Pointer to start of array.
   MoveablePointer ptr;
   /// Size of array.
-  unsigned size;
+  DomainInt size;
   
 public:
   /// Main constructor, takes a MoveablePointer and the size of the array.
   /** While this can be called manually, it would normally be called by allocateArray
    */
-  explicit MoveableArray(MoveablePointer _ptr, unsigned _size) : ptr(_ptr), size(_size)
+  explicit MoveableArray(MoveablePointer _ptr, DomainInt _size) : ptr(_ptr), size(_size)
   { }
 
   MoveableArray()
@@ -168,14 +168,14 @@ class NewMemoryBlock
   
   char* current_data;
   
-  unsigned allocated_bytes;
-  unsigned maximum_bytes;
+  size_t allocated_bytes;
+  size_t maximum_bytes;
   
-  vector<pair<char*, unsigned> > stored_blocks;
-  int total_stored_bytes;
+  vector<pair<char*, size_t> > stored_blocks;
+  size_t total_stored_bytes;
 
 #ifndef BLOCK_SIZE
-#define BLOCK_SIZE (64*1024*1024)
+#define BLOCK_SIZE (size_t)(64*1024*1024)
 #endif
   
   SET_TYPE<MoveablePointer*> pointers;
@@ -184,7 +184,7 @@ public:
   void storeMem(char* store_ptr)
   {
     P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
-    unsigned current_offset = 0;
+    UnsignedSysInt current_offset = 0;
     for(int i = 0; i < stored_blocks.size(); ++i)
     {
       P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].first << " " << stored_blocks[i].second);
@@ -205,7 +205,7 @@ private:
       
       size_t data_copy = 0;
       // If these is some data to copy, then we do so. We write the code this way
-      // to avoid unsigned underflow.
+      // to avoid UnsignedSysInt underflow.
       if(copy_start <= data.second)
           data_copy = std::min(data.second - copy_start, copy_length);
       
@@ -217,7 +217,7 @@ public:
   void retrieveMem(pair<char*,size_t> store_ptr)
   {
     P("RetrieveMem: " << (void*)this << " : " << (void*)store_ptr);
-    unsigned current_offset = 0;
+    UnsignedSysInt current_offset = 0;
     for(int i = 0; i < stored_blocks.size(); ++i)
     {
       copyMemBlock(stored_blocks[i].first, store_ptr, current_offset, stored_blocks[i].second);
@@ -228,7 +228,7 @@ public:
   }
   
   /// Returns the size of the allocated memory in bytes.
-  unsigned getDataSize()
+  UnsignedSysInt getDataSize()
     { return total_stored_bytes + allocated_bytes; }
 
   NewMemoryBlock() : current_data(NULL), allocated_bytes(0), maximum_bytes(0),
@@ -241,7 +241,7 @@ public:
   }
   
   /// Request a new block of memory and returns a \ref MoveablePointer to it's start.
-  MoveablePointer request_bytes(unsigned byte_count)
+  MoveablePointer request_bytes(DomainInt byte_count)
   {
     P("Request: " << (void*)this << " : " << byte_count);
     if(byte_count == 0)
@@ -255,22 +255,22 @@ public:
     { reallocate(byte_count); }
 
     D_ASSERT(maximum_bytes >= allocated_bytes + byte_count);
-    char* return_val = current_data + allocated_bytes;
+    char* return_val = current_data + checked_cast<SysInt>(allocated_bytes);
     P("Return val:" << (void*)current_data);
-    allocated_bytes += byte_count;
+    allocated_bytes += checked_cast<size_t>(byte_count);
     return MoveablePointer(return_val);
   }
 
   /// Request a \ref MoveableArray.
   template<typename T>
-  MoveableArray<T> requestArray(unsigned size)
+  MoveableArray<T> requestArray(DomainInt size)
   {
     MoveablePointer ptr = request_bytes(size * sizeof(T));
     return MoveableArray<T>(ptr, size);
   }
 
 private:
-  void reallocate(unsigned byte_count_new_request)
+  void reallocate(DomainInt byte_count_new_request)
   {
     P("Reallocate: " << (void*)this << " : " << byte_count_new_request);
     D_ASSERT(allocated_bytes + byte_count_new_request > maximum_bytes);
@@ -279,7 +279,7 @@ private:
     P((void*)current_data << ":" << allocated_bytes << " of " << maximum_bytes);
     total_stored_bytes += allocated_bytes;
 
-    unsigned new_block_size = max((unsigned)BLOCK_SIZE, byte_count_new_request);
+    size_t new_block_size = max(BLOCK_SIZE, checked_cast<size_t>(byte_count_new_request));
     current_data = (char*)calloc(new_block_size, sizeof(char));
     if(current_data == NULL)
     { D_FATAL_ERROR("calloc failed - Memory exausted! Aborting."); }

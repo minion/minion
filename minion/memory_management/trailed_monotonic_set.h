@@ -20,21 +20,25 @@
 #ifndef TRAILED_MONOTONIC_SET_H
 #define TRAILED_MONOTONIC_SET_H
 
-typedef bool value_type;
+#include "../system/system.h"
+
+
 
 class TrailedMonotonicSet
 {
+  typedef bool value_type;
+
   StateObj* stateObj;
 
   static const value_type tms_in_set = 1;
   
   D_DATA(bool locked);
   
-  int _size;
-  int _max_undos;
-  int _max_depth;             
+  DomainInt _size;
+  DomainInt _max_undos;
+  DomainInt _max_depth;             
 
-  int _local_depth;             // could be unsigned 
+  DomainInt _local_depth;             // could be UnsignedSysInt 
   
   MoveablePointer _backtrack_depth_ptr;
   
@@ -43,9 +47,9 @@ class TrailedMonotonicSet
   
   //MoveablePointer backtrack_ptr;
 
-  int& undo_indexes(int i)
+  DomainInt& undo_indexes(DomainInt i)
   {
-    return static_cast<int*>(_undo_indexes.get_ptr())[i]; 
+    return static_cast<DomainInt*>(_undo_indexes.get_ptr())[checked_cast<SysInt>(i)]; 
   }
 
 public:
@@ -54,27 +58,27 @@ public:
   value_type& array(DomainInt i)
   { 
     D_ASSERT( i >= 0 && i < size());
-    int val = checked_cast<int>(i);
+    int val = checked_cast<SysInt>(i);
     return static_cast<value_type*>(_array.get_ptr())[val]; 
   }
   
   const value_type& array(DomainInt i) const
   { 
     D_ASSERT( i >= 0 && i < size() && _array.get_ptr() != NULL);
-    int val = checked_cast<int>(i);
+    int val = checked_cast<SysInt>(i);
     return static_cast<const value_type*>(_array.get_ptr())[val]; 
   }
 
   bool needs_undoing()
   {
-    D_ASSERT( _local_depth < _max_depth && _local_depth >= (*((int*)_backtrack_depth_ptr.get_ptr())) );
+    D_ASSERT( _local_depth < _max_depth && _local_depth >= (*((DomainInt*)_backtrack_depth_ptr.get_ptr())) );
 
-    return _local_depth > (*((int*)_backtrack_depth_ptr.get_ptr()));
+    return _local_depth > (*((DomainInt*)_backtrack_depth_ptr.get_ptr()));
   }
 
   void undo()
   {
-    int bt_depth = (*((int*)_backtrack_depth_ptr.get_ptr()));
+    DomainInt bt_depth = (*((DomainInt*)_backtrack_depth_ptr.get_ptr()));
 
 #ifdef DEBUG_TMS
     cout << "About to undo: " ; print_state(); 
@@ -100,7 +104,7 @@ public:
          D_ASSERT( 0 <= index && index < size());
           if (array(index)) 
       { 
-          undo_indexes(_local_depth) = checked_cast<int>(index);
+          undo_indexes(_local_depth) = index;
           ++_local_depth;
          array(index) = 0;    
          return 1;
@@ -117,19 +121,19 @@ public:
   void unchecked_remove(DomainInt index)
   {
     D_ASSERT( 0 <= index && index < size());
-    undo_indexes(_local_depth) = checked_cast<int>(index);
+    undo_indexes(_local_depth) = checked_cast<SysInt>(index);
     ++_local_depth;
     array(index) = 0;
   }
   
   
-  int size() const
+  DomainInt size() const
   {
     return _size;    
   }
 
 void before_branch_left()
-  { *((int*)_backtrack_depth_ptr.get_ptr()) = _local_depth;
+  { *((DomainInt*)_backtrack_depth_ptr.get_ptr()) = _local_depth;
     return ; }
     
  void after_branch_left()  // nothing to do
@@ -140,11 +144,11 @@ void  before_branch_right()  // nothing to do
 void after_branch_right()  // nothing to do
   { return ; }
 
-    int request_storage(int allocsize)
+    DomainInt request_storage(DomainInt allocsize)
     {
         D_ASSERT(!locked);
         // returns the index of the first element allocated.
-        int blockindex=_size;
+        DomainInt blockindex=_size;
         _size=_size+allocsize;
         return blockindex;
     }
@@ -170,7 +174,7 @@ void print_state()
   cout << "printing state of TrailedMonotonicSet: " ;
   cout << "array size: " << _size;
   cout << " local depth: " << _local_depth;
-  cout << " backtracking depth: " << *((int*)_backtrack_depth_ptr.get_ptr()) ; 
+  cout << " backtracking depth: " << *((DomainInt*)_backtrack_depth_ptr.get_ptr()) ; 
   cout << " max depth: " << _max_depth; 
   cout << endl << "   values: " ;
   for(int i = 0; i < _size; ++i) 

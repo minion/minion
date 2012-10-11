@@ -123,7 +123,7 @@ struct ConstantVar
   void incWdeg() { ; }
 #endif
 
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   {
     D_ASSERT(d.XXX_get_domain_diff() == 0);
     return 0;

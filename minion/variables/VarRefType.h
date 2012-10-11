@@ -124,7 +124,7 @@ struct VarRefType
   friend std::ostream& operator<<(std::ostream& o, const VarRefType& v)
   { return o << InternalRefType::name() << v.data.var_num; }
     
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
   
 #ifdef DYNAMICTRIGGERS
@@ -231,7 +231,7 @@ struct QuickVarRefType
   friend std::ostream& operator<<(std::ostream& o, const QuickVarRefType& b)
   { return o << "Bool:" << b.data; }
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
   
 #ifdef DYNAMICTRIGGERS

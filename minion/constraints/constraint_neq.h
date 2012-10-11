@@ -76,12 +76,13 @@ struct NeqConstraint : public AbstractConstraint
   virtual AbstractConstraint* reverse_constraint()
   { return new CheckAssignConstraint<VarArray, NeqConstraint>(stateObj, var_array, *this); }
   
-  virtual void propagate(int prop_val, DomainDelta)
+  virtual void propagate(DomainInt prop_val_in, DomainDelta)
   {
+    const SysInt prop_val = checked_cast<SysInt>(prop_val_in);
     PROP_INFO_ADDONE(ArrayNeq);
     DomainInt remove_val = var_array[prop_val].getAssignedValue();
-    int array_size = var_array.size();
-    for(int i = 0; i < array_size; ++i)
+    SysInt array_size = var_array.size();
+    for(SysInt i = 0; i < array_size; ++i)
     {
       if(i != prop_val)
       {
@@ -102,8 +103,8 @@ struct NeqConstraint : public AbstractConstraint
   
   virtual BOOL full_check_unsat()
   { 
-    int v_size = var_array.size();
-    for(int i = 0; i < v_size; ++i)
+    SysInt v_size = var_array.size();
+    for(SysInt i = 0; i < v_size; ++i)
     {
       if(var_array[i].isAssigned())
       {
@@ -167,10 +168,10 @@ struct NeqConstraint : public AbstractConstraint
       }
   }
     
-    virtual BOOL check_assignment(DomainInt* v, int v_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
     {
       D_ASSERT(v_size == var_array.size());
-      int array_size = v_size;
+      SysInt array_size = checked_cast<SysInt>(v_size);
       for(int i=0;i<array_size;i++)
         for( int j=i+1;j<array_size;j++)
           if(v[i]==v[j]) return false;
@@ -181,7 +182,7 @@ struct NeqConstraint : public AbstractConstraint
     {
       vector<AnyVarRef> vars;
       vars.reserve(var_array.size());
-      for(unsigned i = 0; i < var_array.size(); ++i)
+      for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
         vars.push_back(var_array[i]);
       return vars;
     }
@@ -189,7 +190,7 @@ struct NeqConstraint : public AbstractConstraint
     
      // Getting a satisfying assignment here is too hard, we don't want to have to
      // build a matching.
-     virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
    {
      MAKE_STACK_BOX(c, DomainInt, var_array.size());
      

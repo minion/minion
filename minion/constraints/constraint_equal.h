@@ -122,10 +122,10 @@ struct ReifiedEqualConstraint : public AbstractConstraint
     }
   }
   
-  virtual void propagate(int i, DomainDelta)
+  virtual void propagate(DomainInt i, DomainDelta)
   {
     PROP_INFO_ADDONE(ReifyEqual);
-    switch(i)
+    switch(checked_cast<SysInt>(i))
     {
       case 10:
           // var1 lower bound has moved
@@ -284,7 +284,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
       }
   }
 
-   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     bool hasFalse = var3.inDomain(0);
     bool hasTrue  = var3.inDomain(1);
@@ -336,7 +336,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
     return false;
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     D_ASSERT(v[2] == 0 || v[2] == 1);
@@ -404,7 +404,7 @@ struct NeqConstraintBinary : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(int prop_val, DomainDelta)
+  virtual void propagate(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(BinaryNeq);
     if (prop_val == 1) {
@@ -537,14 +537,14 @@ struct NeqConstraintBinary : public AbstractConstraint
     }
   }
     
-    virtual BOOL check_assignment(DomainInt* v, int v_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
     {
       D_ASSERT(v_size == 2); 
       if(v[0]==v[1]) return false;
       return true;
     }
     
-    virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+    virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
       D_ASSERT(var1.getMin()<=var1.getMax());
       D_ASSERT(var2.getMin()<=var2.getMax());
@@ -604,16 +604,16 @@ struct EqualConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    propagate(1,0);
-    propagate(2,0);
-    propagate(3,0);
-    propagate(4,0);
+    propagate(1,DomainDelta::empty());
+    propagate(2,DomainDelta::empty());
+    propagate(3,DomainDelta::empty());
+    propagate(4,DomainDelta::empty());
   }
   
-  virtual void propagate(int i, DomainDelta)
+  virtual void propagate(DomainInt i, DomainDelta)
   {
     PROP_INFO_ADDONE(Equal);
-    switch(i)
+    switch(checked_cast<SysInt>(i))
     {
       case 1:
         var2.setMax(var1.getMax());
@@ -631,7 +631,7 @@ struct EqualConstraint : public AbstractConstraint
   }
   
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 2);
     return (v[0] == v[1]);
@@ -646,7 +646,7 @@ struct EqualConstraint : public AbstractConstraint
     return vars;
   }
   
-   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
    {
      DomainInt min_val = max(var1.getMin(), var2.getMin());
      DomainInt max_val = min(var1.getMax(), var2.getMax());

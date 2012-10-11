@@ -293,7 +293,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     //if(!constraint_locked)
     {
         int count=0;
-        for(int i=var_array[prop_var].getMin(); i<=var_array[prop_var].getMax(); i++)
+        for(DomainInt i=var_array[prop_var].getMin(); i<=var_array[prop_var].getMax(); i++)
         {
             if(var_array[prop_var].inDomain(i))
             {
@@ -311,7 +311,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     #ifdef STAGED
     if(var_array[prop_var].isAssigned())
     {
-        int assignedval=var_array[prop_var].getAssignedValue();
+        DomainInt assignedval=var_array[prop_var].getAssignedValue();
         for(int i=0; i<numvars; i++)
         {
             if(i!=prop_var && var_array[i].inDomain(assignedval))
@@ -401,7 +401,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     // If the domain size is >= numvars, then return.
     // WHY IS THIS HERE WHEN checkdomsize and dynamic triggers don't work together??
     int count=0;
-    for(int i=var_array[prop_var].getMin(); i<=var_array[prop_var].getMax(); i++)
+    for(DomainInt i=var_array[prop_var].getMin(); i<=var_array[prop_var].getMax(); i++)
     {
         if(var_array[prop_var].inDomain(i))
         {
@@ -415,7 +415,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     #ifdef STAGED
     if(var_array[prop_var].isAssigned())
     {
-        int assignedval=var_array[prop_var].getAssignedValue();
+        DomainInt assignedval=var_array[prop_var].getAssignedValue();
         for(int i=0; i<numvars; i++)
         {
             if(i!=prop_var && var_array[i].inDomain(assignedval))
@@ -649,7 +649,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 D_DATA(((char*)SCCSplit2.get_ptr())[sccindex_start]=0);
                 
                 sccindex_start++;
-                int tempval=var_array[tempvar].getAssignedValue();
+                DomainInt tempval=var_array[tempvar].getAssignedValue();
                 
                 // Now remove the value from the reduced SCC
                 for(int i=sccindex_start; i<=sccindex_end; i++)
@@ -900,7 +900,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         valinlocalmatching.insert(varvalmatching[SCCs[j]]-dom_min);
     }
     
-    for(int val=var_array[tempvar].getMin(); val<=var_array[tempvar].getMax(); val++)
+    for(DomainInt val=var_array[tempvar].getMin(); val<=var_array[tempvar].getMax(); val++)
     {
         if(var_array[tempvar].inDomain(val) && !valinlocalmatching.in(val-dom_min))
         {
@@ -929,7 +929,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         if(var_array[tempvar].inDomain(varvalmatching[tempvar]))
         {
             bool found=false;
-            for(int val=var_array[tempvar].getMin(); val<=var_array[tempvar].getMax(); val++)
+            for(DomainInt val=var_array[tempvar].getMin(); val<=var_array[tempvar].getMax(); val++)
             {
                 if(var_array[tempvar].inDomain(val) && !valinlocalmatching.in(val-dom_min))
                 {
@@ -1098,7 +1098,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       #endif
   }
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
       D_ASSERT(array_size == var_array.size());
       for(int i=0;i<array_size;i++)
@@ -1117,7 +1117,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     }
     
     
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
       bool matchok=true;
       for(int i=0; i<numvars; i++)
@@ -1259,15 +1259,15 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     {
         valinlocalmatching.clear();
         
-        int localmax=var_array[var_indices[0]].getMax();
-        int localmin=var_array[var_indices[0]].getMin();
+        DomainInt localmax=var_array[var_indices[0]].getMax();
+        DomainInt localmin=var_array[var_indices[0]].getMin();
         valinlocalmatching.insert(varvalmatching[var_indices[0]]-dom_min);
         
-        for(int i=1; i<var_indices.size(); i++)
+        for(SysInt i=1; i<var_indices.size(); i++)
         {
-            int tempvar=var_indices[i];
-            int tempmax=var_array[tempvar].getMax();
-            int tempmin=var_array[tempvar].getMin();
+            SysInt tempvar=var_indices[i];
+            DomainInt tempmax=var_array[tempvar].getMax();
+            DomainInt tempmin=var_array[tempvar].getMin();
             if(tempmax>localmax) localmax=tempmax;
             if(tempmin<localmin) localmin=tempmin;
             valinlocalmatching.insert(varvalmatching[var_indices[i]]-dom_min);
@@ -1304,15 +1304,15 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         {
         #endif
             spare_values.clear();
-            for(int val=localmin; val<=localmax; ++val)
+            for(DomainInt val=localmin; val<=localmax; ++val)
             {
-                if(!valinlocalmatching.in(val-dom_min))
+                if(!valinlocalmatching.in(checked_cast<SysInt>(val-dom_min)))
                 {
                     for(int j=0; j<var_indices.size(); j++)
                     {
                         if(var_array[var_indices[j]].inDomain(val))
                         {
-                            spare_values.push_back(val-dom_min+numvars);
+                            spare_values.push_back(checked_cast<SysInt>(val-dom_min+numvars));
                             break;
                         }
                     }
@@ -1770,7 +1770,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                         // put all corresponding values in the fifo. 
                         // Need to check if we are completing an even alternating path.
                         #if !UseIncGraph
-                        for(int val=var_array[curnode].getMin(); val<=var_array[curnode].getMax(); val++)
+                        for(DomainInt val=var_array[curnode].getMin(); val<=var_array[curnode].getMax(); val++)
                         {
                         #else
                         for(int vali=0; vali<adjlistlength[curnode]; vali++)
@@ -1783,13 +1783,13 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                             #endif
                                 )
                             {
-                                if(!invprevious.in(val-dom_min))
+                                if(!invprevious.in(checked_cast<SysInt>(val-dom_min)))
                                 {
                                     // This vertex completes an even alternating path. 
                                     // Unwind and apply the path here
                                     P("Found augmenting path:");
-                                    int unwindvar=curnode;
-                                    int unwindval=val;
+                                    SysInt unwindvar=curnode;
+                                    DomainInt unwindval=val;
                                     P("unwindvar: "<< unwindvar<<"unwindval: "<< unwindval );
                                     while(true)
                                     {
@@ -1797,7 +1797,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                         D_ASSERT(var_array[unwindvar].inDomain(unwindval));
                                         D_ASSERT(varvalmatching[unwindvar]!=unwindval);
                                         
-                                        varvalmatching[unwindvar]=unwindval;
+                                        varvalmatching[unwindvar]=checked_cast<SysInt>(unwindval);
                                         P("Setting var "<< unwindvar << " to "<< unwindval);
                                         
                                         if(unwindvar==startvar)
@@ -1806,7 +1806,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                         }
                                         
                                         unwindval=prev[unwindvar];
-                                        unwindvar=prev[unwindval-dom_min+numvars];
+                                        unwindvar=prev[checked_cast<SysInt>(unwindval-dom_min+numvars)];
                                     }
                                     
                                     #ifdef PLONG
@@ -1837,8 +1837,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                     if(!visited.in(val-dom_min+numvars))
                                     {
                                         visited.insert(val-dom_min+numvars);
-                                        prev[val-dom_min+numvars]=curnode;
-                                        fifo.push_back(val-dom_min+numvars);
+                                        prev[checked_cast<SysInt>(val-dom_min+numvars)]=curnode;
+                                        fifo.push_back(checked_cast<SysInt>(val-dom_min+numvars));
                                     }
                                 }
                             }
@@ -1847,8 +1847,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                     else
                     { // popped a value from the stack. Follow the edge in the matching.
                         D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
-                        int stackval=curnode+dom_min-numvars;
-                        int vartoqueue=-1;
+                        DomainInt stackval=curnode+dom_min-numvars;
+                        SysInt vartoqueue=-1;
                         D_DATA(bool found=false);
                         #if !UseIncGraph
                         for(int scci=sccstart; scci<=sccend; scci++)
@@ -1873,7 +1873,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                         if(!visited.in(vartoqueue)) // I think it's impossible for this test to be false.
                         {
                             visited.insert(vartoqueue);
-                            prev[vartoqueue]=stackval;
+                            prev[checked_cast<SysInt>(vartoqueue)]=checked_cast<SysInt>(stackval);
                             fifo.push_back(vartoqueue);
                         }
                     }

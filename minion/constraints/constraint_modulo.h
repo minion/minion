@@ -92,7 +92,7 @@ struct NotModConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(int flag, DomainDelta)
+  virtual void propagate(DomainInt flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Mod);
     // propagate var1 % var2 != var3 by forward checking
@@ -167,10 +167,10 @@ struct NotModConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    propagate(1,0);
+    propagate(1,DomainDelta::empty());
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     return v[0] % v[1] != v[2];
@@ -185,7 +185,7 @@ struct NotModConstraint : public AbstractConstraint
     return v;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
     for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
     {
@@ -252,7 +252,7 @@ struct ModConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(int flag, DomainDelta)
+  virtual void propagate(DomainInt flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Mod);
     // aiming at bounds(D)-consistency. 
@@ -387,15 +387,15 @@ struct ModConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    propagate(1,0); 
-    /*propagate(2,0);
-    propagate(3,0);
-    propagate(-1,0);
-    propagate(-2,0);
-    propagate(-3,0);*/
+    propagate(1,DomainDelta::empty()); 
+    /*propagate(2,DomainDelta::empty());
+    propagate(3,DomainDelta::empty());
+    propagate(-1,DomainDelta::empty());
+    propagate(-2,DomainDelta::empty());
+    propagate(-3,DomainDelta::empty());*/
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     return v[0] % v[1] == v[2];
@@ -410,7 +410,7 @@ struct ModConstraint : public AbstractConstraint
     return v;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
     for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
     {

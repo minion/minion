@@ -67,10 +67,10 @@ struct LeqConstraint : public AbstractConstraint
   // Needs to be at end of file
   virtual AbstractConstraint* reverse_constraint();
   
-  virtual void propagate(int prop_val,DomainDelta)
+  virtual void propagate(DomainInt prop_val,DomainDelta)
   {
     PROP_INFO_ADDONE(BinaryLeq);
-    if(prop_val)
+    if(checked_cast<SysInt>(prop_val))
     {// y changed
       x.setMax(y.getMax() + offset);
     }
@@ -88,20 +88,20 @@ struct LeqConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    propagate(0,0);
-    propagate(1,0);
+    propagate(0,DomainDelta::empty());
+    propagate(1,DomainDelta::empty());
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 2);
     return v[0] <= (v[1] + offset);
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    int x_min = x.getMin();
-    int y_max = y.getMax();
+    DomainInt x_min = x.getMin();
+    DomainInt y_max = y.getMax();
     
     if(x_min <= y_max + offset)
     {

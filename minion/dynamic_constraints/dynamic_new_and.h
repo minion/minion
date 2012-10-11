@@ -72,22 +72,22 @@ struct Dynamic_AND : public ParentConstraint
     ParentConstraint(_stateObj, _con), constraint_locked(false)
     { }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    for(int i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < child_constraints.size(); ++i)
     {
-      if(! child_constraints[i]->check_assignment(v + start_of_constraint[i],
+      if(! child_constraints[i]->check_assignment(v + checked_cast<SysInt>(start_of_constraint[i]),
          child_constraints[i]->get_vars_singleton()->size()))
          return false;
     }
     return true;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
       // get all satisfying assignments of child constraints and stick
       // them together. Even if they contradict each other.
-      typedef pair<int,DomainInt> temptype;
+      typedef pair<SysInt, DomainInt> temptype;
       MAKE_STACK_BOX(localassignment, temptype, assignment.capacity());
       P("GetSat for And");
       for(int i=0; i<child_constraints.size(); ++i)
@@ -102,10 +102,10 @@ struct Dynamic_AND : public ParentConstraint
           P(localassignment[0] << ":" << localassignment[1]);
           for(int j=0; j<localassignment.size(); j++)
           {
-              assignment.push_back(make_pair(localassignment[j].first+start_of_constraint[i],
+              assignment.push_back(make_pair(checked_cast<SysInt>(localassignment[j].first+start_of_constraint[i]),
                   localassignment[j].second));
-              D_ASSERT((*(this->get_vars_singleton()))[localassignment[j].first+start_of_constraint[i]].inDomain(localassignment[j].second));
-              D_ASSERT((*(child_constraints[i]->get_vars_singleton()))[localassignment[j].first].inDomain(localassignment[j].second));
+              D_ASSERT((*(this->get_vars_singleton()))[checked_cast<SysInt>(localassignment[j].first+start_of_constraint[i])].inDomain(localassignment[j].second));
+              D_ASSERT((*(child_constraints[i]->get_vars_singleton()))[checked_cast<SysInt>(localassignment[j].first)].inDomain(localassignment[j].second));
           }
       }
       return true;
@@ -122,7 +122,7 @@ struct Dynamic_AND : public ParentConstraint
     return vecs;
   }
   
-  virtual int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { 
     return 0;
   }
@@ -153,15 +153,15 @@ struct Dynamic_AND : public ParentConstraint
     constraint_locked = false;
   }
   
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i, DomainDelta domain)
   {
     //PROP_INFO_ADDONE(WatchedOR);
     P("Static propagate start");
-    pair<int,int> childTrigger = getChildStaticTrigger(i);
+    pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
     P("Got trigger: " << i << ", maps to: " << childTrigger.first << "." << childTrigger.second);
     P("Passing trigger " << childTrigger.second << " on");
     if(!constraint_locked || childTrigger.first < propagated_to)
-    child_constraints[childTrigger.first]->propagate(childTrigger.second, domain);
+    child_constraints[checked_cast<SysInt>(childTrigger.first)]->propagate(childTrigger.second, domain);
   }
   
   virtual void propagate(DynamicTrigger* trig)
@@ -172,7 +172,7 @@ struct Dynamic_AND : public ParentConstraint
     // pass the trigger down
     P("Propagating child");
     // need to know which child to prop.
-    int child = getChildDynamicTrigger(trig);
+    SysInt child = getChildDynamicTrigger(trig);
     if(!constraint_locked || child < propagated_to)
     child_constraints[child]->propagate(trig);
   }

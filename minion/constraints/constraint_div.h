@@ -76,7 +76,7 @@ struct DivConstraint : public AbstractConstraint
     return t;
   }
     
-  virtual void propagate(int flag, DomainDelta)
+  virtual void propagate(DomainInt flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Pow);
     if(var1.isAssigned() && var2.isAssigned())
@@ -91,15 +91,15 @@ struct DivConstraint : public AbstractConstraint
   { 
     var2.setMin(1);   // oBVIOUSLY only works because it's all non-negative.
       
-    propagate(1,0); 
-    propagate(2,0);
-    propagate(3,0);
-    propagate(-1,0);
-    propagate(-2,0);
-    propagate(-3,0);
+    propagate(1,DomainDelta::empty()); 
+    propagate(2,DomainDelta::empty());
+    propagate(3,DomainDelta::empty());
+    propagate(-1,DomainDelta::empty());
+    propagate(-2,DomainDelta::empty());
+    propagate(-3,DomainDelta::empty());
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     if(v[1] == 0)
@@ -116,7 +116,7 @@ struct DivConstraint : public AbstractConstraint
     return v;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
    for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
    {

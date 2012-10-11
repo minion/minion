@@ -129,7 +129,7 @@ struct ShiftVar
   friend std::ostream& operator<<(std::ostream& o, const ShiftVar& sv)
   { return o << "Shift " << sv.data << "+" << sv.shift; }
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
 
   vector<AbstractConstraint*>* getConstraints()
@@ -183,7 +183,7 @@ vector<ShiftVar<VarRef, Shift> >
 ShiftVarRef(const vector<VarRef>& var_array, const Shift& shift)
 {
   vector<ShiftVar<VarRef, Shift> > shift_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     shift_array[i] = ShiftVarRef(var_array[i], shift);
   return shift_array;
 }
@@ -194,7 +194,7 @@ vector<ShiftVar<VarRef, Shift> >
 ShiftVarRef(const vector<VarRef>& var_array, const Shift& shift)
 {
   vector<ShiftVar<VarRef, Shift> > shift_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     shift_array[i] = ShiftVarRef(var_array[i], shift);
   return shift_array;
 }
@@ -205,7 +205,7 @@ array<ShiftVar<VarRef, Shift>, i>
 ShiftVarRef(const array<VarRef, i>& var_array, const Shift& shift)
 {
   array<ShiftVar<VarRef, Shift>, i> shift_array;
-  for(unsigned int l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     shift_array[l] = ShiftVarRef(var_array[l], shift);
   return shift_array;
 }

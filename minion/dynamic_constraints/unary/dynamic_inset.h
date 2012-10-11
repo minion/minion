@@ -47,7 +47,7 @@ template<typename Var>
   AbstractConstraint(_stateObj), var(_var), vals(_vals.begin(), _vals.end())
     { stable_sort(vals.begin(), vals.end()); }
 
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
     { return 2; }
 
   virtual void full_propagate()
@@ -111,7 +111,7 @@ template<typename Var>
     var.setMax(*(it_high - 1));
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 1);
     return binary_search(vals.begin(), vals.end(), v[0]);
@@ -125,7 +125,7 @@ template<typename Var>
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
     /// TODO: Make faster
     for(int i = 0; i < vals.size(); ++i)

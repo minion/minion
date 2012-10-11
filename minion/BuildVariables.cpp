@@ -28,7 +28,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, const vector<Var>& vec)
   vector<AnyVarRef> ret_vec;
   ret_vec.reserve(vec.size());
   
-  for(int i = 0; i < vec.size(); ++i)
+  for(SysInt i = 0; i < vec.size(); ++i)
     ret_vec.push_back(get_AnyVarRef_from_Var(stateObj, vec[i]));
   
   return ret_vec;
@@ -69,7 +69,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
     getVars(stateObj).sparseBoundVarContainer.addVariables(vars.sparse_bound);
     getVars(stateObj).bigRangeVarContainer.addVariables(vars.discrete);
     
-    for(unsigned int i = 0; i < vars.sparse_discrete.size(); ++i)
+    for(SysInt i = 0; i < vars.sparse_discrete.size(); ++i)
     { INPUT_ERROR("Sparse discrete disabled at present due to bugs. Sorry."); }
   }
     

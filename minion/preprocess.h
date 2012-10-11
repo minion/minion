@@ -68,7 +68,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
   while(reduced)
   {
     reduced = false;
-    for(int i = 0; i < vararray.size(); ++i)
+    for(SysInt i = 0; i < vararray.size(); ++i)
     {
       Var& var = vararray[i];
       if(onlyCheckBounds || var.isBound())
@@ -157,6 +157,7 @@ struct PropagateSSAC_Bounds
 // Class heirarchy to allow virtual function calls to the above.
 struct Propagate
 {
+    virtual ~Propagate() {}
     virtual void prop(StateObj* stateObj, vector<AnyVarRef>& vars) {};
 };
 

@@ -68,7 +68,7 @@ struct GadgetConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   { 
     cout << "Gadget Assignment:" << v << endl;
     return true;
@@ -78,7 +78,7 @@ struct GadgetConstraint : public AbstractConstraint
   {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(var_array[i]);
     return vars;
   }
@@ -96,7 +96,7 @@ struct GadgetConstraint : public AbstractConstraint
     constraint_locked = false;
   }
   
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(Gadget);
     if(constraint_locked)

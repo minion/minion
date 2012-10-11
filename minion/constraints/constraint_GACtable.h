@@ -94,9 +94,9 @@ struct GACTableConstraint : public AbstractConstraint
   VarArray vars;
   
 #ifdef BINARY_SEARCH
-  int find_first_inconsistency(const vector<int>& v)
+  int find_first_inconsistency(const vector<DomainInt>& v)
   {
-    for(unsigned i = 0; i < v.size(); ++i)
+    for(UnsignedSysInt i = 0; i < v.size(); ++i)
     {
       if(!vars[i].inDomain(v[i]))
         return i;
@@ -104,13 +104,13 @@ struct GACTableConstraint : public AbstractConstraint
     return -1;
   }
   
-  void setFirstValid(vector<int>& support)
+  void setFirstValid(vector<DomainInt>& support)
   {
     for(int i = 0; i < support.size(); ++i)
       support[i] = vars[i].getMin();
   }
   
-  int setNextValid(vector<int>& support, int var_considered, int first_broken_val)
+  int setNextValid(vector<DomainInt>& support, int var_considered, int first_broken_val)
   {
     for(int i = first_broken_val + 1; i < support.size(); ++i)
       support[i] = vars[i].getMin();
@@ -145,13 +145,13 @@ struct GACTableConstraint : public AbstractConstraint
   { return (int*)(_current_support.get_ptr()); }
   
   /// Returns the tuple currently supporting a given literal.
-  vector<int>& supporting_tuple(int i)
+  vector<DomainInt>& supporting_tuple(int i)
   { return (lists->literal_specific_tuples)[i][current_support()[i]]; }
   
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
-  bool check_tuple(const vector<int>& v)
+  bool check_tuple(const vector<DomainInt>& v)
   {
-    for(unsigned i = 0; i < v.size(); ++i)
+    for(UnsignedSysInt i = 0; i < v.size(); ++i)
     {
       if(!vars[i].inDomain(v[i]))
         return false;
@@ -171,7 +171,7 @@ struct GACTableConstraint : public AbstractConstraint
     _current_support.request_bytes(lists->tuples->literal_num * sizeof(int));
   }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { return (lists->tuples->literal_num) * ( vars.size() - 1) ; }
   
 
@@ -179,20 +179,20 @@ struct GACTableConstraint : public AbstractConstraint
   bool find_new_support(int literal, int var)
   {
     int support = current_support()[literal];
-    vector<vector<int> >& tuples = (lists->literal_specific_tuples)[literal];
+    vector<vector<DomainInt> >& tuples = (lists->literal_specific_tuples)[literal];
     int support_size = tuples.size();
     
     // These slightly nasty lines get us some nice raw pointers to the list of tuples.
-    vector<int>* start_position = &*(tuples.begin());
-    vector<int>* end_position = &*(tuples.begin()) + tuples.size();
+    vector<DomainInt>* start_position = &*(tuples.begin());
+    vector<DomainInt>* end_position = &*(tuples.begin()) + tuples.size();
 
     
 #ifdef BINARY_SEARCH
-    vector<int> new_support_tuple(vars.size());
+    vector<DomainInt> new_support_tuple(vars.size());
     setFirstValid(new_support_tuple);
     while(true)
     {
-      vector<int>* new_pos = lower_bound(start_position, end_position, new_support_tuple);
+      vector<DomainInt>* new_pos = lower_bound(start_position, end_position, new_support_tuple);
       if(new_pos == end_position)
         return false;
       
@@ -239,7 +239,7 @@ struct GACTableConstraint : public AbstractConstraint
     int trigger_pos = propagated_trig - dt;
     int propagated_literal = trigger_pos / (vars.size() - 1);
 
-    pair<int,int> varval = (lists->tuples->get_varval_from_literal)(propagated_literal);
+    pair<DomainInt, DomainInt> varval = (lists->tuples->get_varval_from_literal)(propagated_literal);
     BOOL is_new_support = find_new_support(propagated_literal, varval.first);
     if(is_new_support)
     {
@@ -256,7 +256,7 @@ struct GACTableConstraint : public AbstractConstraint
   void setup_watches(int var, int val)
   {
     int lit = (lists->tuples->get_literal)(var, val);
-    vector<int>& support = supporting_tuple(lit);
+    vector<DomainInt>& support = supporting_tuple(lit);
 
     DynamicTrigger* dt = dynamic_trigger_start();
     
@@ -274,7 +274,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    for(unsigned i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
     {
       int dom_min = (lists->tuples->dom_smallest)[i];
       int dom_max = (lists->tuples->dom_smallest)[i] + (lists->tuples->dom_size)[i];
@@ -283,7 +283,7 @@ struct GACTableConstraint : public AbstractConstraint
       
       if(getState(stateObj).isFailed()) return;
       
-      for(int x = vars[i].getMin(); x <= vars[i].getMax(); ++x)
+      for(DomainInt x = vars[i].getMin(); x <= vars[i].getMax(); ++x)
       {
         int literal = (lists->tuples->get_literal)(i, x);
         if((lists->literal_specific_tuples)[literal].empty())
@@ -306,7 +306,7 @@ struct GACTableConstraint : public AbstractConstraint
     }
   }
   
-   virtual BOOL check_assignment(DomainInt* v, int v_size)
+   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     for(int i = 0; i < (lists->tuples)->size(); ++i)
     {
@@ -319,7 +319,7 @@ struct GACTableConstraint : public AbstractConstraint
     virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> anyvars;
-    for(unsigned i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);
     return anyvars;
   }

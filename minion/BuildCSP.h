@@ -30,8 +30,8 @@ struct SearchMethod
   VarOrderEnum order;
   enum PropagationLevel preprocess;
   enum PropagationLevel prop_method;
-  unsigned random_seed;
-  SearchMethod() : order(ORDER_NONE), preprocess(PropLevel_None), prop_method(PropLevel_GAC), random_seed((unsigned)time(NULL) ^ getpid())
+  UnsignedSysInt random_seed;
+  SearchMethod() : order(ORDER_NONE), preprocess(PropLevel_None), prop_method(PropLevel_GAC), random_seed((UnsignedSysInt)time(NULL) ^ getpid())
   { }
   
 };

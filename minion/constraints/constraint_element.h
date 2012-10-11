@@ -117,23 +117,23 @@ struct ElementConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    int array_size = var_array.size();
-    DomainInt loop_start = std::max(0, index_ref.getInitialMin());
-    DomainInt loop_max = std::min(array_size , index_ref.getInitialMax() + 1);
-    for(int i = loop_start; i < loop_max; ++i)
-      t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
+    SysInt array_size = var_array.size();
+    DomainInt loop_start = std::max(DomainInt(0), index_ref.getInitialMin());
+    DomainInt loop_max = std::min(DomainInt(array_size) , index_ref.getInitialMax() + 1);
+    for(DomainInt i = loop_start; i < loop_max; ++i)
+      t.push_back(make_trigger(var_array[checked_cast<SysInt>(i)], Trigger(this, i), Assigned));
     
     t.push_back(make_trigger(index_ref, Trigger(this, -1), Assigned));
     t.push_back(make_trigger(result_var, Trigger(this, -2), Assigned));
     return t;
   }
   
-  virtual void propagate(int prop_val, DomainDelta)
+  virtual void propagate(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(NonGACElement);
     if(index_ref.isAssigned())
     {
-      int index = checked_cast<int>(index_ref.getAssignedValue());
+      int index = checked_cast<SysInt>(index_ref.getAssignedValue());
       if(index < 0 || index >= (int)var_array.size())
       {
         getState(stateObj).setFailed(true);
@@ -150,7 +150,7 @@ struct ElementConstraint : public AbstractConstraint
     {
       if(prop_val>=0)
       {
-        DomainInt assigned_val = var_array[prop_val].getAssignedValue();
+        DomainInt assigned_val = var_array[checked_cast<SysInt>(prop_val)].getAssignedValue();
         if(index_ref.inDomain(prop_val) && !result_var.inDomain(assigned_val))  //perhaps the check if prop_val is indomain of index_ref is not necessary.
         {
             if(index_ref.isBound())
@@ -193,7 +193,7 @@ struct ElementConstraint : public AbstractConstraint
   {
     if(index_ref.isAssigned())
     {
-      int index = checked_cast<int>(index_ref.getAssignedValue());
+      int index = checked_cast<SysInt>(index_ref.getAssignedValue());
       if(index < 0 || index >= (int)var_array.size())
       {
         getState(stateObj).setFailed(true);
@@ -231,7 +231,7 @@ struct ElementConstraint : public AbstractConstraint
                 BOOL supported=false;
                 for(DomainInt j=index_ref.getMin(); j<=index_ref.getMax(); j++)
                 {
-                    if(var_array[j].inDomain(i))
+                    if(var_array[checked_cast<SysInt>(j)].inDomain(i))
                     {
                         supported=true;
                         break;
@@ -253,7 +253,7 @@ struct ElementConstraint : public AbstractConstraint
             BOOL supported=false;
             for(DomainInt j=index_ref.getMin(); j<=index_ref.getMax(); j++)
             {
-                if(var_array[j].inDomain(i))
+                if(var_array[checked_cast<SysInt>(j)].inDomain(i))
                 {
                     supported=true;
                     break;
@@ -273,7 +273,7 @@ struct ElementConstraint : public AbstractConstraint
             BOOL supported=false;
             for(DomainInt j=index_ref.getMin(); j<=index_ref.getMax(); j++)
             {
-                if(var_array[j].inDomain(i))
+                if(var_array[checked_cast<SysInt>(j)].inDomain(i))
                 {
                     supported=true;
                     break;
@@ -290,11 +290,11 @@ struct ElementConstraint : public AbstractConstraint
     
     if(getState(stateObj).isFailed()) return;
     
-    for(int i = index_ref.getMin();i <= index_ref.getMax(); i++)
+    for(DomainInt i = index_ref.getMin();i <= index_ref.getMax(); i++)
     {
-      if(index_ref.inDomain(i) && var_array[i].isAssigned())
+      if(index_ref.inDomain(i) && var_array[checked_cast<SysInt>(i)].isAssigned())
       {
-        DomainInt assigned_val = var_array[i].getAssignedValue();
+        DomainInt assigned_val = var_array[checked_cast<SysInt>(i)].getAssignedValue();
         if(!result_var.inDomain(assigned_val))
         {
             if(index_ref.isBound())
@@ -333,37 +333,37 @@ struct ElementConstraint : public AbstractConstraint
     
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     int length = v_size;
     if(v[length-2] < 0 || v[length-2] > length - 3)
       return false;
-    return v[checked_cast<int>(v[length-2])] == v[length-1];
+    return v[checked_cast<SysInt>(v[length-2])] == v[length-1];
   }
   
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> array;
     array.reserve(var_array.size() + 2);
-    for(unsigned int i=0;i<var_array.size(); ++i)
+    for(UnsignedSysInt i=0;i<var_array.size(); ++i)
       array.push_back(var_array[i]);
     array.push_back(index_ref);
     array.push_back(result_var);
     return array;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
-    int array_start = max(DomainInt(0), index_ref.getMin());
-    int array_end   = min((DomainInt)var_array.size() - 1, index_ref.getMax());
+    SysInt array_start = checked_cast<SysInt>(max(DomainInt(0), index_ref.getMin()));
+    SysInt array_end   = checked_cast<SysInt>(min((DomainInt)var_array.size() - 1, index_ref.getMax()));
 
-    for(int i = array_start; i <= array_end; ++i)
+    for(SysInt i = array_start; i <= array_end; ++i)
     {
       if(index_ref.inDomain(i))
       {
-        int dom_start = max(raw(result_var.getMin()), raw(var_array[i].getMin()));
-        int dom_end   = min(raw(result_var.getMax()), raw(var_array[i].getMax()));
-        for(int domval = dom_start; domval <= dom_end; ++domval)
+        DomainInt dom_start = max(result_var.getMin(), var_array[i].getMin());
+        DomainInt dom_end   = min(result_var.getMax(), var_array[i].getMax());
+        for(DomainInt domval = dom_start; domval <= dom_end; ++domval)
         {
           if(var_array[i].inDomain(domval) && result_var.inDomain(domval))
           {
@@ -387,7 +387,7 @@ struct ElementConstraint : public AbstractConstraint
       // (i=1 and X[1]!=r) or (i=2 ...
       vector<AbstractConstraint*> con;
       // or the index is out of range:
-      vector<int> r; r.push_back(0); r.push_back(var_array.size()-1);
+      vector<DomainInt> r; r.push_back(0); r.push_back(var_array.size()-1);
       AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<IndexRef>(stateObj, index_ref, r);
       con.push_back(t4);
       

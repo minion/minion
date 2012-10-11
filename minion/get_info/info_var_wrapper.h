@@ -207,7 +207,7 @@ struct InfoRefType
     return o << "InfoRef " << ir.data;
   }
  
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getDomainChange);
     return d.XXX_get_domain_diff(); 

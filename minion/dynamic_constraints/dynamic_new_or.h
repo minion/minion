@@ -73,30 +73,30 @@ struct Dynamic_OR : public ParentConstraint
       assign_size = max_size * 2;
     }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     for(int i = 0; i < child_constraints.size(); ++i)
     {
-      if(child_constraints[i]->check_assignment(v + start_of_constraint[i],
+      if(child_constraints[i]->check_assignment(v + checked_cast<SysInt>(start_of_constraint[i]),
          child_constraints[i]->get_vars_singleton()->size()))
          return true;
     }
     return false;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    for(int i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < child_constraints.size(); ++i)
     {
       assignment.clear();
       bool flag=child_constraints[i]->get_satisfying_assignment(assignment);
       if(flag)
       {
         // Fix up assignment
-        for(int j = 0; j < assignment.size(); ++j) {
-          assignment[j].first += start_of_constraint[i];
-          D_ASSERT((*(child_constraints[i]->get_vars_singleton()))[assignment[j].first-start_of_constraint[i]].inDomain(assignment[j].second));
-          D_ASSERT((*(this->get_vars_singleton()))[assignment[j].first].inDomain(assignment[j].second));
+        for(SysInt j = 0; j < assignment.size(); ++j) {
+          assignment[j].first += checked_cast<SysInt>(start_of_constraint[i]);
+          D_ASSERT((*(child_constraints[i]->get_vars_singleton()))[checked_cast<SysInt>(assignment[j].first-start_of_constraint[i])].inDomain(assignment[j].second));
+          D_ASSERT((*(this->get_vars_singleton()))[checked_cast<SysInt>(assignment[j].first)].inDomain(assignment[j].second));
         }
         return true;
       }
@@ -116,7 +116,7 @@ struct Dynamic_OR : public ParentConstraint
     return vecs;
   }
 
-  virtual int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   {
     return assign_size * 2;
   }
@@ -136,7 +136,7 @@ struct Dynamic_OR : public ParentConstraint
     constraint_locked = false;
   }
 
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i, DomainDelta domain)
   {
     //PROP_INFO_ADDONE(WatchedOR);
     P("Static propagate start");
@@ -146,7 +146,7 @@ struct Dynamic_OR : public ParentConstraint
     if(full_propagate_called)
     {
       P("Already doing static full propagate");
-      pair<int,int> childTrigger = getChildStaticTrigger(i);
+      pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
       P("Got trigger: " << i << ", maps to: " << childTrigger.first << "." << childTrigger.second);
       if(childTrigger.first == propagated_constraint)
       {
@@ -255,16 +255,17 @@ struct Dynamic_OR : public ParentConstraint
     }
   }
 
-  void watch_assignment(AbstractConstraint* con, DynamicTrigger* dt, box<pair<int,DomainInt> >& assignment)
+  void watch_assignment(AbstractConstraint* con, DynamicTrigger* dt, box<pair<SysInt,DomainInt> >& assignment)
   {
     vector<AnyVarRef>& vars = *(con->get_vars_singleton());
     D_ASSERT(assignment.size() <= assign_size);
     for(int i = 0; i < assignment.size(); ++i)
     {
-        if(vars[assignment[i].first].isBound())
-            vars[assignment[i].first].addDynamicTrigger(dt + i, DomainChanged);
+      const SysInt af = checked_cast<SysInt>(assignment[i].first);
+        if(vars[af].isBound())
+            vars[af].addDynamicTrigger(dt + i, DomainChanged);
         else
-            vars[assignment[i].first].addDynamicTrigger(dt + i, DomainRemoval, assignment[i].second);
+            vars[af].addDynamicTrigger(dt + i, DomainRemoval, assignment[i].second);
     }
   }
 
@@ -274,10 +275,10 @@ struct Dynamic_OR : public ParentConstraint
     DynamicTrigger* dt = dynamic_trigger_start();
 
     // Clean up triggers
-    for(int i = 0; i < assign_size * 2; ++i)
+    for(SysInt i = 0; i < assign_size * 2; ++i)
       releaseTrigger(stateObj, dt + i);
 
-    int loop = 0;
+    SysInt loop = 0;
 
     bool found_watch = false;
 

@@ -86,11 +86,11 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
   VarSum var_sum;
 
   MemOffset unwatched_indexes;
-  int last;
-  int num_unwatched;
+  SysInt last;
+  SysInt num_unwatched;
 
-  int& unwatched(int i)
-    { return static_cast<int*>(unwatched_indexes.get_ptr())[i]; }
+  SysInt& unwatched(SysInt i)
+    { return static_cast<SysInt*>(unwatched_indexes.get_ptr())[i]; }
 
   BoolLessSumConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
   AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), last(0)
@@ -104,7 +104,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
   // == Number of 0's is <= N-K
 
 
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
 
     if (var_sum >= array_size || var_sum < 0)
     {
@@ -114,18 +114,18 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     }
     else
     {
-      num_unwatched = array_size - var_sum - 1 ;
+      num_unwatched = checked_cast<SysInt>(array_size - var_sum - 1);
       D_ASSERT(num_unwatched >= 0);
-      unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(unsigned) * num_unwatched);
+      unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(UnsignedSysInt) * num_unwatched);
     }
   }
 
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { 
     if(var_sum >= var_array.size() || var_sum < 0)
       return 0;
     else
-      return var_sum + 1; 
+      return checked_cast<SysInt>(var_sum + 1); 
   }
 
   virtual void full_propagate()
@@ -136,9 +136,9 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
       // Constraint trivially satisfied
       return;
 
-    int array_size = var_array.size(); 
-    int triggers_wanted = var_sum + 1;
-    int index;
+    SysInt array_size = var_array.size(); 
+    DomainInt triggers_wanted = var_sum + 1;
+    SysInt index;
 
     for(index = 0; (index < array_size) && (triggers_wanted > 0); ++index) 
     {
@@ -274,7 +274,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
     int count = 0;
@@ -287,12 +287,12 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
   { 
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     return vars;  
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(var_sum <= 0)
     {
@@ -335,7 +335,7 @@ AbstractConstraint*
   BoolLessEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 {
   return new BoolLessSumConstraintDynamic<VarArray,VarSum>(stateObj, _var_array,
-    runtime_val(_var_array.size() - _var_sum)); 
+    runtime_val(_var_array.size() - (DomainInt)(_var_sum)));
 }
 
 template<typename VarArray,  typename VarSum>

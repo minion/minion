@@ -228,7 +228,7 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
   friend std::ostream& operator<<(std::ostream& o, const MultiplyVar& n)
   { return o << "Mult:" << n.data << "*" << n.Multiply; }
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return abs(Multiply) * data.getDomainChange(d); }
 
   vector<AbstractConstraint*>* getConstraints()
@@ -260,11 +260,11 @@ struct MultiplyVar
   { return true; }
   
   VarRef data;
-  int Multiply;
-  MultiplyVar(const VarRef& _data, int _Multiply) : data(_data), Multiply(_Multiply)
+  DomainInt Multiply;
+  MultiplyVar(const VarRef& _data, DomainInt _Multiply) : data(_data), Multiply(_Multiply)
   { 
-    DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMax()) * Multiply);
-    DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMin()) * Multiply);
+    DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMax()) * checked_cast<BigInt>(Multiply));
+    DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMin()) * checked_cast<BigInt>(Multiply));
     CHECK(Multiply != 0, "Cannot divide variable by 0"); 
   }
   
@@ -425,8 +425,8 @@ struct MultiplyVar
   friend std::ostream& operator<<(std::ostream& o, const MultiplyVar& n)
   { return o << "Mult:" << n.data << "*" << n.Multiply; }
   
-  int getDomainChange(DomainDelta d)
-  { return abs(Multiply) * data.getDomainChange(d); }
+  DomainInt getDomainChange(DomainDelta d)
+  { return abs(checked_cast<SysInt>(Multiply)) * data.getDomainChange(d); }
 
   vector<AbstractConstraint*>* getConstraints()
   { return data.getConstraints(); }
@@ -474,10 +474,10 @@ MultiplyVarRef(VRef var_ref, int i)
 
 template<typename VarRef>
 vector<MultiplyVar<VarRef> >
-MultiplyVarRef(const vector<VarRef>& var_array, const vector<int>& multiplies)
+MultiplyVarRef(const vector<VarRef>& var_array, const vector<DomainInt>& multiplies)
 {
   vector<MultiplyVar<VarRef> > Multiply_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     Multiply_array[i] = MultiplyVarRef(var_array[i], multiplies[i]);
   return Multiply_array;
 }
@@ -485,10 +485,10 @@ MultiplyVarRef(const vector<VarRef>& var_array, const vector<int>& multiplies)
 #ifdef LIGHT_VECTOR
 template<typename VarRef>
 vector<MultiplyVar<VarRef> >
-MultiplyVarRef(const vector<VarRef>& var_array, const vector<int>& multiplies)
+MultiplyVarRef(const vector<VarRef>& var_array, const vector<DomainInt>& multiplies)
 {
   vector<MultiplyVar<VarRef> > Multiply_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     Multiply_array[i] = MultiplyVarRef(var_array[i], multiplies[i]);
   return Multiply_array;
 }
@@ -499,7 +499,7 @@ array<MultiplyVar<VarRef>, i>
 MultiplyVarRef(const array<VarRef, i>& var_array, const array<int, i>& multiplies)
 {
   array<MultiplyVar<VarRef>, i> Multiply_array;
-  for(unsigned int l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     Multiply_array[l] = MultiplyVarRef(var_array[l], multiplies[i]);
   return Multiply_array;
 }

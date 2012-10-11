@@ -117,7 +117,7 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
       if(test_name != "MINION")
         INPUT_ERROR("All Minion input files must begin 'MINION'");
   
-      int inputFileVersionNumber = infile.read_num();
+      int inputFileVersionNumber = infile.read_int();
   
       if(inputFileVersionNumber > 3)
         INPUT_ERROR("This version of Minion only supports formats up to 3");

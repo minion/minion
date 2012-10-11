@@ -81,7 +81,7 @@ struct GACElementConstraint : public AbstractConstraint
   
   void index_assigned()
   {
-    int index = checked_cast<int>(indexvar.getAssignedValue());
+    int index = checked_cast<SysInt>(indexvar.getAssignedValue());
     int array_size = var_array.size();
     
     if(index < 0 || index >= array_size)
@@ -116,7 +116,7 @@ struct GACElementConstraint : public AbstractConstraint
   
   BOOL support_for_val_in_index(DomainInt dom_index)
   {
-    int index = checked_cast<int>(dom_index);
+    int index = checked_cast<SysInt>(dom_index);
     DomainInt min_val = max(var_array[index].getMin(), resultvar.getMin());
     DomainInt max_val = min(var_array[index].getMax(), resultvar.getMax());
     for(DomainInt i = min_val; i <= max_val; ++i)
@@ -127,10 +127,10 @@ struct GACElementConstraint : public AbstractConstraint
     return false;
   }
   
-  virtual void propagate(int prop_val, DomainDelta)
+  virtual void propagate(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(GACElement);
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     // DomainInt domain_size = (var_array_max_val - var_array_min_val + 1);
     
     if(indexvar.isAssigned())
@@ -143,7 +143,7 @@ struct GACElementConstraint : public AbstractConstraint
         indexvar.removeFromDomain(prop_val);
       }
       
-      typename VarArray::value_type& var = var_array[prop_val];
+      typename VarArray::value_type& var = var_array[checked_cast<SysInt>(prop_val)];
       
       DomainInt min_val = var.getInitialMin();
       DomainInt max_val = var.getInitialMax();
@@ -194,31 +194,31 @@ struct GACElementConstraint : public AbstractConstraint
     indexvar.setMax(var_array.size() - 1);
     resultvar.setMin(var_array_min_val);
     resultvar.setMax(var_array_max_val);
-    for(unsigned i = 0; i < var_array.size() + 2; ++i)
-      propagate(i,0);
+    for(UnsignedSysInt i = 0; i < var_array.size() + 2; ++i)
+      propagate(i,DomainDelta::empty());
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     int length = v_size;
     if(v[length-2] < 0 ||
        v[length-2] > length - 3)
       return false;
-    return v[checked_cast<int>(v[length-2])] == v[length-1];
+    return v[checked_cast<SysInt>(v[length-2])] == v[length-1];
   }
   
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> array;
     array.reserve(var_array.size() + 2);
-    for(unsigned int i=0;i<var_array.size(); ++i)
+    for(UnsignedSysInt i=0;i<var_array.size(); ++i)
       array.push_back(var_array[i]);
     array.push_back(indexvar);
     array.push_back(resultvar);
     return array;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     DomainInt array_start = max(DomainInt(0), indexvar.getMin());
     DomainInt array_end   = min((DomainInt)var_array.size() - 1, indexvar.getMax());
@@ -227,18 +227,18 @@ struct GACElementConstraint : public AbstractConstraint
     {
       if(indexvar.inDomain(i))
       {
-        DomainInt dom_start = max(resultvar.getMin(), var_array[i].getMin());
-        DomainInt dom_end   = min(resultvar.getMax(), var_array[i].getMax());
+        DomainInt dom_start = max(resultvar.getMin(), var_array[checked_cast<SysInt>(i)].getMin());
+        DomainInt dom_end   = min(resultvar.getMax(), var_array[checked_cast<SysInt>(i)].getMax());
         for(DomainInt domval = dom_start; domval <= dom_end; ++domval)
         {
-          if(var_array[i].inDomain(domval) && resultvar.inDomain(domval))
+          if(var_array[checked_cast<SysInt>(i)].inDomain(domval) && resultvar.inDomain(domval))
           {
             // indexvar = i
             assignment.push_back(make_pair(var_array.size(), i));
             // resultvar = domval
             assignment.push_back(make_pair(var_array.size() + 1, domval));
             // vararray[i] = domval
-            assignment.push_back(make_pair(i, domval));
+            assignment.push_back(make_pair(checked_cast<SysInt>(i), domval));
             return true;
           }
         }
@@ -253,7 +253,7 @@ struct GACElementConstraint : public AbstractConstraint
       // (i=1 and X[1]!=r) or (i=2 ...
       vector<AbstractConstraint*> con;
       // or the index is out of range:
-      vector<int> r; r.push_back(0); r.push_back(var_array.size()-1);
+      vector<DomainInt> r; r.push_back(0); r.push_back(var_array.size()-1);
       AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<IndexRef>(stateObj, indexvar, r);
       con.push_back(t4);
       

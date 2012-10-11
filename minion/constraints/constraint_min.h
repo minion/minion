@@ -85,7 +85,7 @@ struct MinConstraint : public AbstractConstraint
   
   //  virtual AbstractConstraint* reverse_constraint()
   
-  virtual void propagate(int prop_val, DomainDelta)
+  virtual void propagate(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(Min);
     if(prop_val > 0)
@@ -144,7 +144,7 @@ struct MinConstraint : public AbstractConstraint
       }
       else
       {
-        min_var.setMax(var_array[prop_val].getMax());
+        min_var.setMax(var_array[checked_cast<SysInt>(prop_val)].getMax());
       }
     }
 
@@ -162,33 +162,33 @@ struct MinConstraint : public AbstractConstraint
     {
       for(int i = 1;i <= array_size + 1; ++i)
       {
-        propagate(i,0);
-        propagate(-i,0);
+        propagate(i,DomainDelta::empty());
+        propagate(-i,DomainDelta::empty());
       }
     }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size() + 1);
     if(v_size == 1)
       return false;
       
     DomainInt min_val = big_constant;
-    for(int i = 0;i < v_size - 1;i++)
+    for(SysInt i = 0;i < v_size - 1;i++)
       min_val = min(min_val, v[i]);
     return min_val == *(v + v_size - 1);
   }
 
   // Bah: This could be much better!
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    for(int i = min_var.getMin(); i <= min_var.getMax(); ++i)
+    for(DomainInt i = min_var.getMin(); i <= min_var.getMax(); ++i)
     {
       if(min_var.inDomain(i))
       {
         bool flag_domain = false;
-        for(int j = 0; j < var_array.size(); ++j)
+        for(SysInt j = 0; j < var_array.size(); ++j)
         {
           if(var_array[j].inDomain(i))
           {
@@ -233,7 +233,7 @@ struct MinConstraint : public AbstractConstraint
   {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size() + 1);
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     vars.push_back(AnyVarRef(min_var));
     return vars;

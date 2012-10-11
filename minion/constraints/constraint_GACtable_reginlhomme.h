@@ -32,7 +32,7 @@ struct TupleComparator
   }
   
   // returns tuple1 <= tuple2 under our ordering.
-  BOOL operator()(const vector<int>& tuple1, const vector<int>& tuple2)
+  BOOL operator()(const vector<DomainInt>& tuple1, const vector<DomainInt>& tuple2)
   {
     if(tuple1[significantIndex] != tuple2[significantIndex])
       return tuple1[significantIndex] < tuple2[significantIndex];
@@ -103,7 +103,7 @@ struct Regin
   }
   
   TupleH ** tuplelist;
-  vector<vector<int> > tuples;
+  vector<vector<DomainInt> > tuples;
 
   // set up the list
   void setuplist()
@@ -187,14 +187,14 @@ struct GACTableConstraint : public AbstractConstraint
   ReversibleInt *** current_support;
   //vector<vector<ReversibleInt> > current_support;  // current_support[var][val+offset[var]];
   
-  vector<int> offset;
+  vector<DomainInt> offset;
   
   TupleList* tupleList;
   
   /// Check if all allowed values in a given tuple are still in the domains of the variables.
-  BOOL check_tuple(const vector<int>& v)
+  BOOL check_tuple(const vector<DomainInt>& v)
   {
-    for(unsigned i = 0; i < v.size(); ++i)
+    for(UnsignedSysInt i = 0; i < v.size(); ++i)
     {
       if(!vars[i].inDomain(v[i]))
         return false;
@@ -204,7 +204,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   BOOL check_tuple(int * v)
   {
-    for(unsigned i = 0; i < arity; ++i)
+    for(UnsignedSysInt i = 0; i < arity; ++i)
     {
       if(!vars[i].inDomain(v[i]))
         return false;
@@ -264,7 +264,7 @@ struct GACTableConstraint : public AbstractConstraint
 
   }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { return tupleList->literal_num * ( vars.size() - 1) ; }
   
    TupleH* seekNextSupport(int var, int val)
@@ -331,7 +331,7 @@ struct GACTableConstraint : public AbstractConstraint
       {
         if(y!=var)
         {
-          int b=vars[y].getMin();
+          DomainInt b=vars[y].getMin();
           int off=offset[y];
           int ltp=current_support[y][b+off]->get();
           int nextinminallvals=nextin(y, b, (ltp>curtupleIndex)?ltp:curtupleIndex);
@@ -389,7 +389,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   bool find_new_support(int literal)
   {
-    pair<int,int> varval = tupleList->get_varval_from_literal(literal);
+    pair<DomainInt, DomainInt> varval = tupleList->get_varval_from_literal(literal);
     int var = varval.first;
     int val = varval.second;
     TupleH* new_support = seekNextSupport(var,val);
@@ -409,7 +409,7 @@ struct GACTableConstraint : public AbstractConstraint
     
     BOOL is_new_support = find_new_support(propagated_literal);
     
-    pair<int,int> varval = tupleList->get_varval_from_literal(propagated_literal);
+    pair<DomainInt, DomainInt> varval = tupleList->get_varval_from_literal(propagated_literal);
     int varIndex = varval.first;
     int val = varval.second;
     
@@ -457,9 +457,9 @@ struct GACTableConstraint : public AbstractConstraint
       if(getState(stateObj).isFailed()) 
         return;
       
-      int max = vars[varIndex].getMax();
+      DomainInt max = vars[varIndex].getMax();
       
-      for(int i = vars[varIndex].getMin(); i <= max; ++i) 
+      for(DomainInt i = vars[varIndex].getMin(); i <= max; ++i) 
       { 
         TupleH* _tuple=seekNextSupport(varIndex, i);
         
@@ -476,9 +476,9 @@ struct GACTableConstraint : public AbstractConstraint
     }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    for(unsigned i = 0; i < (tupleList)->size(); ++i)
+    for(UnsignedSysInt i = 0; i < (tupleList)->size(); ++i)
     {
       if( std::equal(v, v + size, (*tupleList)[i]) )
         return true;
@@ -489,7 +489,7 @@ struct GACTableConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> anyvars;
-    for(unsigned i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);
     return anyvars;
   }

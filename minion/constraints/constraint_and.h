@@ -53,10 +53,10 @@ struct AndConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(int i, DomainDelta)
+  virtual void propagate(DomainInt i, DomainDelta)
   {
     PROP_INFO_ADDONE(And);
-    switch(i)
+    switch(checked_cast<SysInt>(i))
     {
       case 1:
         if(var2.isAssignedValue(true))
@@ -126,13 +126,13 @@ struct AndConstraint : public AbstractConstraint
     
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     return ((v[0] != 0) && (v[1] != 0)) == (v[2] != 0);
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(var3.getMax() == 1)
     {

@@ -35,7 +35,12 @@ struct MinionInstancePrinter
   string getInstance()
   { return oss.str(); }
 
-  void print_instance(const int& i)
+#ifdef MINION_DEBUG
+  void print_instance(const DomainInt& i)
+  { oss << checked_cast<SysInt>(i); }
+#endif
+  
+  void print_instance(const SysInt& i)
   { oss << i; }
 
   void print_instance(const string& s)
@@ -184,7 +189,7 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
 
   return;
 
-  for(int i = 0; i < vars.BOOLs; ++i)
+  for(SysInt i = 0; i < vars.BOOLs; ++i)
   {
     oss << "BOOL ";
     print_instance( Var(VAR_BOOL, i));
@@ -242,14 +247,14 @@ void print_tuples( )
   for(it_type it = csp.table_symboltable.begin(); it != csp.table_symboltable.end(); ++it)
   {
     oss << it->first << " ";
-    int tuple_size = it->second->tuple_size();
-    int num_tuples = it->second->size();
-    int* tuple_ptr = it->second->getPointer();
+    DomainInt tuple_size = it->second->tuple_size();
+    DomainInt num_tuples = it->second->size();
+    DomainInt* tuple_ptr = it->second->getPointer();
     oss << num_tuples << " " << tuple_size << endl;
-    for(int i = 0; i < num_tuples; ++i)
+    for(DomainInt i = 0; i < num_tuples; ++i)
     {
-      for(int j = 0; j < tuple_size; ++j)
-        oss << *(tuple_ptr + (i * tuple_size) + j) << " ";
+      for(DomainInt j = 0; j < tuple_size; ++j)
+        oss << *(tuple_ptr + checked_cast<SysInt>((i * tuple_size) + j)) << " ";
       oss << endl;
     }
     oss << endl;

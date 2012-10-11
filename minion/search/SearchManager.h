@@ -50,6 +50,9 @@ void inline maybe_print_search_assignment(StateObj* stateObj, T& var, DomainInt 
 
 struct SearchManager 
 {
+
+  virtual ~SearchManager() {}
+  
   StateObj* stateObj;
   vector<AnyVarRef> var_array;
   shared_ptr<VariableOrder> var_order;
@@ -60,9 +63,9 @@ struct SearchManager
   shared_ptr<Propagate> prop;  // Propagate is the type of the base class. Method prop->prop(stateObj, var_array)
   
   vector<Controller::triple> branches; //L & R branches so far (isLeftBranch?,var,value)
-  //vector<int> first_unassigned_variable;
+  //vector<DomainInt> first_unassigned_variable;
   
-  unsigned depth; //number of left branches
+  UnsignedSysInt depth; //number of left branches
   int ceiling; // index into branches, it is the lowest LB which has been stolen.
   
   SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array,
@@ -173,8 +176,8 @@ struct SearchManager
     
     pair<int, DomainInt> steal_work()
     {   // steal the topmost left branch from this search.
-        unsigned newceiling=ceiling+1;
-        unsigned b_size=branches.size();
+        UnsignedSysInt newceiling=ceiling+1;
+        UnsignedSysInt b_size=branches.size();
         
         while(newceiling<b_size)
         {

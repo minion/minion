@@ -69,10 +69,10 @@ struct LessEqualSumConstraint : public AbstractConstraint
   {
       BigInt accumulator=0;
       for(int i=0; i<var_array.size(); i++) {
-          accumulator+= max( abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin()) );
+          accumulator+= checked_cast<SysInt>(max( abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin()) ));
           CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
       }
-      accumulator+= max( abs(var_sum.getInitialMax()), abs(var_sum.getInitialMin()) );
+      accumulator+= checked_cast<SysInt>(max( abs(var_sum.getInitialMax()), abs(var_sum.getInitialMin()) ));
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
       
     no_negatives = true;
@@ -115,14 +115,14 @@ struct LessEqualSumConstraint : public AbstractConstraint
     return max_diff;
   }
   
-  virtual void propagate(int prop_val, DomainDelta domain_change)
+  virtual void propagate(DomainInt prop_val, DomainDelta domain_change)
   {
     P("Prop: " << prop_val);
     PROP_INFO_ADDONE(FullSum);
     DomainInt sum = var_array_min_sum;
     if(prop_val != -1)
     { // One of the array changed
-      int change = var_array[prop_val].getDomainChange(domain_change);
+      DomainInt change = var_array[checked_cast<SysInt>(prop_val)].getDomainChange(domain_change);
       P(" Change: " << change);
       D_ASSERT(change >= 0);
       sum += change;
@@ -168,7 +168,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     var_array_min_sum = min_sum;
     max_looseness = max_diff;
     if(!var_array.empty())
-      return check_unsat(0,0);
+      return check_unsat(0,DomainDelta::empty());
     else
     { 
       // Just set sum = 0 from check_unsat
@@ -191,12 +191,12 @@ struct LessEqualSumConstraint : public AbstractConstraint
     D_ASSERT(min_sum == get_real_min_sum());
     max_looseness = max_diff;
     if(!var_array.empty())
-      propagate(0,0);
+      propagate(0,DomainDelta::empty());
     else
       var_sum.setMin(0);
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size() + 1);
     DomainInt sum = 0;
@@ -205,19 +205,19 @@ struct LessEqualSumConstraint : public AbstractConstraint
     return sum <= *(v + v_size - 1);
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     P("GSA");
-    int sum_value = 0;
+    DomainInt sum_value = 0;
     int v_size = var_array.size();
     
     if(no_negatives)   // How are the two cases different? They look identical.
     {
-      int max_sum = var_sum.getMax();
+      DomainInt max_sum = var_sum.getMax();
       assignment.push_back(make_pair(v_size, max_sum));
       for(int i = 0; i < v_size && sum_value <= max_sum; ++i)
       {
-        int min_val = var_array[i].getMin();
+        DomainInt min_val = var_array[i].getMin();
         assignment.push_back(make_pair(i, min_val));
         sum_value += min_val;
       }
@@ -244,7 +244,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> array_copy(var_array.size() + 1);
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       array_copy[i] = var_array[i];
     array_copy[var_array.size()] = var_sum;
     return array_copy;
@@ -257,7 +257,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
   typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
   {
     typename NegType<VarArray>::type new_var_array(var_array.size());
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       new_var_array[i] = VarNegRef(var_array[i]);
 
     typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<-1> >::type SumType;

@@ -130,7 +130,7 @@ struct VarNot
   friend std::ostream& operator<<(std::ostream& o, const VarNot& n)
   { return o << "Not " << n.data; }
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
   
 #ifdef DYNAMICTRIGGERS
@@ -207,7 +207,7 @@ VarNotRef(const vector<VarRef>& var_array)
 {
   vector<VarNot<VarRef> > Not_array;
   Not_array.reserve(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     Not_array.push_back(VarNotRef(var_array[i]));
   return Not_array;
 }
@@ -218,7 +218,7 @@ vector<VarNot<VarRef> >
 VarNotRef(const vector<VarRef>& var_array)
 {
   vector<VarNot<VarRef> > Not_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     Not_array[i] = VarNotRef(var_array[i]);
   return Not_array;
 }
@@ -229,7 +229,7 @@ array<VarNot<VarRef>, i>
 VarNotRef(const array<VarRef, i>& var_array)
 {
   array<VarNot<VarRef>, i> Not_array;
-  for(unsigned int l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     Not_array[l] = VarNotRef(var_array[l]);
   return Not_array;
 }

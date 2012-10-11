@@ -79,8 +79,8 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   VarArray1 x;
   VarArray2 y;
 
-  vector<pair<int, int> > earliest_occurrence_x;
-  vector<pair<int, int> > earliest_occurrence_y;
+  vector<pair<DomainInt, DomainInt> > earliest_occurrence_x;
+  vector<pair<DomainInt, DomainInt> > earliest_occurrence_y;
 
   GacLexLeqConstraint(StateObj* _stateObj,const VarArray1& _x, const VarArray2& _y) :
   AbstractConstraint(_stateObj), alpha(_stateObj), beta(_stateObj), F(_stateObj), x(_x), y(_y)
@@ -95,7 +95,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     for(int i = 0; i < x.size(); ++i)
     {
       Var base = x[i].getBaseVar();
-      pair<int, int> pos = make_pair(0, i);
+      pair<DomainInt, DomainInt> pos = make_pair(0, i);
       for(int j = 0; j < i; ++j)
       {
         if(x[j].getBaseVar() == base)
@@ -115,7 +115,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     for(int i = 0; i < y.size(); ++i)
     {
       Var base = y[i].getBaseVar();
-      pair<int, int> pos = make_pair(1, i);
+      pair<DomainInt, DomainInt> pos = make_pair(1, i);
       for(int j = 0; j < i; ++j)
       {
         if(x[j].getBaseVar() == base)
@@ -177,7 +177,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
       x[i].getAssignedValue() != y[i].getAssignedValue())  {
         alpha = i;
-        propagate(i,0);
+        propagate(i,DomainDelta::empty());
       }
       else updateAlpha(i+1);
     }
@@ -187,7 +187,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
         if (!x[i].isAssigned() || !y[i].isAssigned() ||
         x[i].getAssignedValue() != y[i].getAssignedValue())  {
           alpha = i ;
-          propagate(i,0) ;
+          propagate(i,DomainDelta::empty()) ;
           return ;
         }
         i++ ;
@@ -204,7 +204,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     while (i >= a) {
       if (x[i].getMin() < y[i].getMax()) {
         beta = i+1 ;
-        if (!(x[i].getMax() < y[i].getMin())) propagate(i,0) ;
+        if (!(x[i].getMax() < y[i].getMin())) propagate(i,DomainDelta::empty()) ;
         return ;
       }
       i-- ;    
@@ -213,8 +213,9 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
 
   }
 
-  virtual void propagate(int i, DomainDelta)
+  virtual void propagate(DomainInt i_in, DomainDelta)
   {
+    const SysInt i = checked_cast<SysInt>(i_in);
     PROP_INFO_ADDONE(Lex);
     if (F)
     {
@@ -262,17 +263,17 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
 
   void gacpass()
   {
-    int a = alpha;
-    int n = x.size();
+    SysInt a = alpha;
+    SysInt n = x.size();
     //int b = beta;
     
     if(x[a].getMax() == y[a].getMax())
     { 
       // We need to find support for x[a] = max.
-      for(int i = a+1; i < n; ++i)
+      for(SysInt i = a+1; i < n; ++i)
       {
-        int x_val;
-        int y_val;
+        DomainInt x_val;
+        DomainInt y_val;
         if(earliest_occurrence_x[i].second != a)
         {
           if(earliest_occurrence_x[i].first == 0)
@@ -310,10 +311,10 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     if(x[a].getMin() == y[a].getMin())
     { 
         // We need to find support for y[a] = min.
-      for(int i = a+1; i < n; ++i)
+      for(SysInt i = a+1; i < n; ++i)
       {
-        int x_val;
-        int y_val;
+        DomainInt x_val;
+        DomainInt y_val;
         if(earliest_occurrence_x[i].second != a)
         {
           if(earliest_occurrence_x[i].first == 0)
@@ -394,7 +395,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   virtual BOOL full_check_unsat()
   {
     alpha = 0;
-    return check_unsat(0, 0);
+    return check_unsat(0, DomainDelta::empty());
   }
 
   BOOL checkLex(int i) {
@@ -445,7 +446,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
         else beta = betaBound ;
       }
       if (alpha >= beta) getState(stateObj).setFailed(true);
-      propagate(alpha,0) ;             //initial propagation, if necessary.
+      propagate((SysInt)alpha,DomainDelta::empty()) ;             //initial propagation, if necessary.
     }
     else 
     {
@@ -456,7 +457,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == x.size() + y.size());
     size_t x_size = x.size();
@@ -474,7 +475,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
       return true;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     size_t x_size = x.size();
     for(size_t i = 0; i < x_size; ++i)
@@ -501,10 +502,10 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> array_copy;
-    for(unsigned int i=0;i<x.size();i++)
+    for(UnsignedSysInt i=0;i<x.size();i++)
       array_copy.push_back(AnyVarRef(x[i]));
 
-    for(unsigned int i=0;i<y.size();i++)
+    for(UnsignedSysInt i=0;i<y.size();i++)
       array_copy.push_back(AnyVarRef(y[i]));
     return array_copy;
   }

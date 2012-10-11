@@ -23,11 +23,11 @@
 
 #include <limits.h> /* INT_MIN, INT_MAX */
 
-std::vector<std::vector<int> > 
+std::vector<std::vector<DomainInt> > 
 build_graph(std::vector<std::set<int> > graph, const std::vector<std::set<int> >& partition);
 
 int
-repartition(const std::vector<std::set<int> >& graph, std::vector<int> partition_num)
+repartition(const std::vector<std::set<int> >& graph, std::vector<SysInt> partition_num)
 {
   std::vector<std::multiset<int> > partition_loop(graph.size());
   for(int i = 0; i < graph.size(); ++i)
@@ -56,7 +56,7 @@ partition_graph(const tuple<int,vector<set<int> >,vector<set<int> > >& graph_tup
   int blank;
   tie(blank, graph, partition) = graph_tuple;
 
-  std::vector<int> partition_num(graph.size());
+  std::vector<SysInt> partition_num(graph.size());
 
   for(int i = 0; i < partition.size(); ++i)
   {
@@ -227,7 +227,7 @@ struct Graph
 
      tie(var_vertex_count, edges, partitions) = build_graph_info(csp);
 #ifdef USE_NAUTY
-     vector<vector<int> > perms = build_graph(edges, partitions);
+     vector<vector<DomainInt> > perms = build_graph(edges, partitions);
      cout << "generators := [()" << endl;  
      for(int i = 0; i < perms.size(); ++i)
      {
@@ -821,18 +821,18 @@ struct InstanceStats
         case CT_GACALLDIFF:
             {
                 (*alldiff)++;
-                int num = 0;
-                int upper = INT_MIN;
-                int lower = INT_MAX;
-                for(int j = 0; j < i.vars.size(); j++) {
-                    for(int k = 0; k < i.vars[j].size(); k++) {
+                SysInt num = 0;
+                DomainInt upper = INT_MIN;
+                DomainInt lower = INT_MAX;
+                for(SysInt j = 0; j < i.vars.size(); j++) {
+                    for(SysInt k = 0; k < i.vars[j].size(); k++) {
                         num++;
                         Bounds bounds = v.get_bounds(i.vars[j][k]);
                         lower = lower > bounds.lower_bound ? bounds.lower_bound : lower;
                         upper = upper < bounds.upper_bound ? bounds.upper_bound : upper;
                     }
                 }
-                alldiffdomovervars->push_back(((double) upper - (double) lower + 1.0) / (double) num);
+                alldiffdomovervars->push_back((double)(checked_cast<SysInt>( upper -  lower + 1)) / (double) num);
             }
             break;
         case CT_GEQSUM:
@@ -936,7 +936,7 @@ struct InstanceStats
       cout << s << "var_sparsebound:" << v.sparse_bound.size() << endl;
       
       // collect all domain sizes into an array
-      vector<int> domsizes;
+      vector<DomainInt> domsizes;
       for(int i=0; i<v.BOOLs; i++)
           domsizes.push_back(2);
       for(int i=0; i<v.bound.size(); i++)
@@ -954,10 +954,10 @@ struct InstanceStats
       cout << s << "dom_75:" << domsizes[(domsizes.size()*3)/4] <<endl;
       cout << s << "dom_100:" << domsizes.back() <<endl;
       
-      int totaldom=std::accumulate(domsizes.begin(), domsizes.end(), 0);
+      SysInt totaldom=checked_cast<SysInt>(std::accumulate(domsizes.begin(), domsizes.end(), (DomainInt)0));
       cout << s << "dom_mean:" << ((double)totaldom)/(double) domsizes.size() << endl;
       
-      int num2s= std::count(domsizes.begin(), domsizes.end(), 2);
+      int num2s= std::count(domsizes.begin(), domsizes.end(), (DomainInt)2);
       cout << s << "dom_not2_2_ratio:" << ((double) (varcount-num2s) )/(double)num2s << endl;
       
       cout << s << "discrete_bool_ratio:" << ((double) v.discrete.size())/(double)v.BOOLs <<endl;
@@ -984,7 +984,7 @@ struct InstanceStats
       list<ConstraintBlob> & c=csp.constraints;
       
       cout <<s << "conscount:" << c.size() <<endl;
-      vector<int> arities;
+      vector<DomainInt> arities;
       for(list<ConstraintBlob>::iterator i=c.begin(); i!=c.end(); ++i)
       {
           arities.push_back(arity(*i));
@@ -997,7 +997,7 @@ struct InstanceStats
       cout << s << "arity_75:" << arities[(arities.size()*3)/4] <<endl;
       cout << s << "arity_100:" << arities.back() <<endl;
       
-      int totalarity=std::accumulate(arities.begin(), arities.end(), 0);
+      const SysInt totalarity=checked_cast<SysInt>(std::accumulate(arities.begin(), arities.end(), (DomainInt)0));
       cout << s << "arity_mean:" << ((double)totalarity)/(double) arities.size() << endl;
       cout << s << "arity_mean_normalised:" << (((double)totalarity)/(double) arities.size())/((double) varcount) << endl;
       cout << s << "cts_per_var_mean:" << ((double)totalarity)/(double) varcount << endl;
@@ -1123,7 +1123,7 @@ struct InstanceStats
   
   void output_stats_tightness(vector<AbstractConstraint*> cons)
   {
-      vector<int> tightness;
+      vector<DomainInt> tightness;
       string s("stats_");
       for(int i=0; i<cons.size(); i++)
       {
@@ -1137,11 +1137,11 @@ struct InstanceStats
       cout << s << "tightness_75:" << tightness[(tightness.size()*3)/4] <<endl;
       cout << s << "tightness_100:" << tightness.back() <<endl;
       
-      int totaltightness=std::accumulate(tightness.begin(), tightness.end(), 0);
+      const SysInt totaltightness=checked_cast<SysInt>(std::accumulate(tightness.begin(), tightness.end(), (DomainInt)0));
       cout << s << "tightness_mean:" << ((double)totaltightness)/(double) tightness.size() << endl;
 
       //now literal tightness
-      map<pair<Var,DomainInt>,vector<int> > scores_for_varval; //all available tightnesses for varvals
+      map<pair<Var,DomainInt>,vector<DomainInt> > scores_for_varval; //all available tightnesses for varvals
       //iterate over constraints, collecting all available tightnesses for varvals involved in con
       for(int con = 0; con < cons.size(); con++)
       {
@@ -1155,11 +1155,11 @@ struct InstanceStats
       }
       //now average the tightnesses
       vector<double> lit_tightness;
-      for(map<pair<Var,DomainInt>,vector<int> >::iterator curr = scores_for_varval.begin();
+      for(map<pair<Var,DomainInt>,vector<DomainInt> >::iterator curr = scores_for_varval.begin();
 	  curr != scores_for_varval.end();
 	  curr++) {
-	vector<int> nums = curr->second;
-	lit_tightness.push_back((double)std::accumulate(nums.begin(), nums.end(), 0) / (double)nums.size()); //mean literal tightness
+	vector<DomainInt> nums = curr->second;
+	lit_tightness.push_back((double)checked_cast<SysInt>(std::accumulate(nums.begin(), nums.end(), (DomainInt)0)) / (double)nums.size()); //mean literal tightness
       }
 
       std::sort(lit_tightness.begin(), lit_tightness.end());
@@ -1170,8 +1170,8 @@ struct InstanceStats
       cout << s << "literal_tightness_75:" << lit_tightness[(lit_tightness.size()*3)/4] <<endl;
       cout << s << "literal_tightness_100:" << lit_tightness.back() <<endl;
       
-      totaltightness=std::accumulate(lit_tightness.begin(), lit_tightness.end(), 0.0);
-      double lt_mean = (double)totaltightness / (double)lit_tightness.size();
+      double new_totaltightness=std::accumulate(lit_tightness.begin(), lit_tightness.end(), 0.0);
+      double lt_mean = (double)new_totaltightness / (double)lit_tightness.size();
       cout << s << "literal_tightness_mean:" << lt_mean << endl;
       //coefficient of variation
       double st_dev = 0;
