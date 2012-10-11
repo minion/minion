@@ -442,7 +442,7 @@ void munge_container(Con& con, SysInt type)
   }
 }
 
-SysInt main(SysInt argc, char** argv) {
+int main(int argc, char** argv) {
 // Wrap main in a try/catch just to stop exceptions leaving main,
 // as windows gets really annoyed when that happens.
 #ifdef THREADSAFE

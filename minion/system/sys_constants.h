@@ -31,11 +31,15 @@ typedef long long BigInt;
 struct EmptyType
 {};
 
+//#define DOMAINS64
 
-
-
+#ifdef DOMAINS64
+typedef int64_t SysInt;
+typedef uint64_t UnsignedSysInt;
+#else
 typedef int SysInt;
 typedef unsigned UnsignedSysInt;
+#endif
 
 /// A big constant, when such a thing is needed.
 const SysInt big_constant = 999999;
