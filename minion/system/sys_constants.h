@@ -20,12 +20,9 @@
 #ifndef _SYS_CONSTANTS_H
 #define _SYS_CONSTANTS_H
 
-#ifdef USE_GMP
-#include <gmpxx.h>
-typedef mpz_class BigInt;
-#else
-typedef long long BigInt;
-#endif
+
+
+
 
 /// A placeholder type.
 struct EmptyType
@@ -34,9 +31,11 @@ struct EmptyType
 //#define DOMAINS64
 
 #ifdef DOMAINS64
+typedef __int128 BigInt;
 typedef int64_t SysInt;
 typedef uint64_t UnsignedSysInt;
 #else
+typedef long long BigInt;
 typedef int SysInt;
 typedef unsigned int UnsignedSysInt;
 #endif
