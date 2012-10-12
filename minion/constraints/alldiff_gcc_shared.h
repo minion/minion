@@ -170,59 +170,6 @@ struct smallset_nolist
 };
 
 
-struct smallset_nolist_bt
-{
-    MoveablePointer membership;
-    
-    SysInt arraysize;
-    
-    void reserve(SysInt size, StateObj * stateObj)
-    {
-        // This must be called before anything is put in the set.
-        
-        SysInt required_mem = size / 8 + 1;
-        // Round up to nearest data_type block
-        required_mem += sizeof(SysInt) - (required_mem % sizeof(SysInt));
-        
-        arraysize=required_mem/sizeof(SysInt);
-        
-        membership= getMemory(stateObj).backTrack().request_bytes(required_mem);
-    }
-    
-    inline bool in(SysInt val)
-    {
-        D_ASSERT(val/(sizeof(SysInt)*8) <arraysize);
-        SysInt shift_offset = 1 << (val % (sizeof(SysInt)*8));
-        return ((SysInt *)membership.get_ptr())[val/(sizeof(SysInt)*8)] & shift_offset;
-    }
-    
-    inline void insert(SysInt val)
-    {
-        D_ASSERT(val/(sizeof(SysInt)*8) <arraysize);
-        
-        SysInt shift_offset = 1 << (val % (sizeof(SysInt)*8));
-        
-        ((SysInt *)membership.get_ptr())[val/(sizeof(SysInt)*8)] |= shift_offset;
-    }
-    
-    inline void remove(SysInt val)
-    {
-        D_ASSERT(val/(sizeof(SysInt)*8) <arraysize);
-        
-        SysInt shift_offset = 1 << (val % (sizeof(SysInt)*8));
-        
-        ((SysInt *)membership.get_ptr())[val/(sizeof(SysInt)*8)] &= shift_offset;
-    }
-    
-    inline void clear()
-    {
-        for(SysInt i=0; i<arraysize; i++)
-        {
-            ((SysInt *)membership.get_ptr())[i]=0;
-        }
-    }
-};
-
 
 struct smallset_list_bt
 {
