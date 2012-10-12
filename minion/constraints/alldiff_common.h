@@ -256,8 +256,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   vector<smallset_list_bt> watches;
   #endif
   
-  virtual void propagate(SysInt prop_var, DomainDelta)
+  virtual void propagate(DomainInt prop_var_in, DomainDelta)
   {
+    const SysInt prop_var = checked_cast<SysInt>(prop_var_in);
     D_ASSERT(prop_var>=0 && prop_var<var_array.size());
     
     // return if all the watches are still in place.
