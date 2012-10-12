@@ -174,8 +174,8 @@ struct MinConstraint : public AbstractConstraint
     if(v_size == 1)
       return false;
       
-    DomainInt min_val = big_constant;
-    for(SysInt i = 0;i < v_size - 1;i++)
+    DomainInt min_val = v[0];
+    for(SysInt i = 1;i < v_size - 1;i++)
       min_val = min(min_val, v[i]);
     return min_val == *(v + v_size - 1);
   }
