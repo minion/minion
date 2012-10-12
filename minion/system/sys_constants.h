@@ -31,7 +31,7 @@ struct EmptyType
 //#define DOMAINS64
 
 #ifdef DOMAINS64
-typedef __int128 BigInt;
+typedef long long BigInt;
 typedef int64_t SysInt;
 typedef uint64_t UnsignedSysInt;
 #else
