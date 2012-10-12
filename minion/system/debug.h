@@ -102,7 +102,7 @@ void assert_function(BOOL x, const char* a, const char* f, SysInt line);
 #define CHECK(x, y) {assert_function(x, y, __FILE__, __LINE__);}
 
 // Check a value doesn't overflow, to be used in ctor of cts 
-#define CHECKSIZE( x, message ) CHECK( x <= ((BigInt) (1<<30)) && x>= ((BigInt) -(1<<30)) , message )
+#define CHECKSIZE( x, message ) CHECK( x <= ((BigInt) checked_cast<SysInt>(DomainInt_Max)) && x>= ((BigInt) checked_cast<SysInt>(DomainInt_Min)) , message )
 
 #ifdef MINION_DEBUG
 
