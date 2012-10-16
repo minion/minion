@@ -161,14 +161,14 @@ else()
     option(NAUTY "" ON)
 endif()
 
-if(NAUTY)
-  message(STATUS "Please be naughty")
-  add_definitions(-DUSE_NAUTY)
-  list(APPEND SRCS ${PROJECT_SOURCE_DIR}/nauty24b7/nautycxx.cpp
-                   ${PROJECT_SOURCE_DIR}/nauty24b7/nauty.c
-                   ${PROJECT_SOURCE_DIR}/nauty24b7/nautil.c
-                   ${PROJECT_SOURCE_DIR}/nauty24b7/nausparse.c)
-endif()
+#if(NAUTY)
+#  message(STATUS "Please be naughty")
+#  add_definitions(-DUSE_NAUTY)
+#  list(APPEND SRCS ${PROJECT_SOURCE_DIR}/nauty24b7/nautycxx.cpp
+#                   ${PROJECT_SOURCE_DIR}/nauty24b7/nauty.c
+#                   ${PROJECT_SOURCE_DIR}/nauty24b7/nautil.c
+#                   ${PROJECT_SOURCE_DIR}/nauty24b7/nausparse.c)
+#endif()
 
 # This used to be in Static, but there is no reason not to always do it
 
