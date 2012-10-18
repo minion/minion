@@ -136,7 +136,7 @@ struct ConcreteFileReader
     char idChar = get_char();
     if(idChar != sym)
     {
-      throw parse_exception(string("Expected '") + sym + "'. Recieved '" + idChar + "'.");
+      throw parse_exception(string("Expected '") + sym + "'. Received '" + idChar + "'.");
     }
   }
   
