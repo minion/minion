@@ -23,7 +23,7 @@ exec=$1
 #Remove exec from $*, so it only contains parameters
 shift
 
-for i in big-tests/*.minion; do
+for i in *.minion tests-64domains/*.minion; do
   j=$(($j + 1))
 
   # This gives the value that the program should return.

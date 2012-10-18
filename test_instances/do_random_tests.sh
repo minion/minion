@@ -22,7 +22,7 @@ echo Random testing $exec with options .$*.
 
 j=0
 pass=0
-for i in `grep -l "#TEST SOLCOUNT" *.minion`; do
+for i in `grep -l "#TEST SOLCOUNT" *.minion tests-32domains/*.minion`; do
   LOOP=0
   if grep "#FAIL\|#BUG\|maximising\|minimising\|MAXIMISING\|MINIMISING" $i &> /dev/null;
   then
