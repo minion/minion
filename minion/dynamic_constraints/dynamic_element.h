@@ -78,7 +78,7 @@ template<typename VarArray, typename Index, typename Result>
 struct ElementConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "ElementDynamic"; }
+  { return "watchelement"; }
   
   //  typedef BoolLessSumConstraintDynamic<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;

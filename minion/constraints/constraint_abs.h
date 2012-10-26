@@ -37,7 +37,7 @@ template<typename AbsVarRef1, typename AbsVarRef2>
 struct AbsConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Abs"; }
+  { return "abs"; }
   
   AbsVarRef1 var1;
   AbsVarRef2 var2;

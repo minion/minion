@@ -34,8 +34,12 @@
 
 struct Check_Assign : public AbstractConstraint
 {
+
+  virtual string extended_name()
+  { return constraint_name() + ":" + child->extended_name(); }
+
   virtual string constraint_name()
-    { return "Check_FC:" + child->constraint_name(); }
+    { return "check[assign]"; }
 
   AbstractConstraint* child;
 

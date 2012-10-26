@@ -26,7 +26,7 @@ template<typename Var1, typename Var2>
 struct WatchNeqConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "WatchedNEQ"; }
+  { return "watchneq"; }
   
   Var1 var1;
   Var2 var2;

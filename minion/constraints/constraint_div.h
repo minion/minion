@@ -47,7 +47,7 @@ template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct DivConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Div"; }
+  { return "div"; }
   
   VarRef1 var1;
   VarRef2 var2;

@@ -25,8 +25,11 @@
 template<typename VarArray, SysInt negative>
 struct GACTableConstraint : public AbstractConstraint
 {
+    virtual string extended_name()
+  { return "table(trie)"; }
+
   virtual string constraint_name()
-  { return "TableTrie"; }
+  { return "table"; }
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;

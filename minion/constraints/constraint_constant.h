@@ -23,8 +23,9 @@
 template<bool truth>
 struct ConstantConstraint : public AbstractConstraint
 {
+
   virtual string constraint_name()
-  { return "Constant" + to_string(truth); }
+  { if(truth) return "true"; else return "false"; }
   
   ConstantConstraint(StateObj* _stateObj) : AbstractConstraint(_stateObj)
   { }

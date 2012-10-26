@@ -72,7 +72,7 @@ template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
 struct ReifiedEqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "ReifiedEqual"; }
+  { return "__reify_eq"; }
   
   EqualVarRef1 var1;
   EqualVarRef2 var2;
@@ -364,7 +364,7 @@ template<typename VarRef1, typename VarRef2>
 struct NeqConstraintBinary : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Neq(Binary)"; }
+  { return "diseq"; }
   
   VarRef1 var1;
   VarRef2 var2;
@@ -584,7 +584,7 @@ template<typename EqualVarRef1, typename EqualVarRef2>
 struct EqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Equal"; }
+  { return "eq"; }
   
   EqualVarRef1 var1;
   EqualVarRef2 var2;

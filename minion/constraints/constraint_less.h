@@ -44,7 +44,7 @@ template<typename VarRef1, typename VarRef2, typename Offset>
 struct LeqConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Leq"; }
+  { return "ineq"; }
   
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   const Offset offset;

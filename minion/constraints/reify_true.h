@@ -35,8 +35,11 @@
 template<typename BoolVar, bool DoWatchAssignment>
   struct reify_true : public ParentConstraint
 {
+  virtual string extended_name()
+  { return constraint_name() + ":" + child_constraints[0]->extended_name(); }
+
   virtual string constraint_name()
-    { return "ReifyTrue:" + child_constraints[0]->constraint_name(); }
+  { return "reifyimply" + child_constraints[0]->constraint_name(); }
 
   BoolVar rar_var;
   bool constraint_locked;

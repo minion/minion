@@ -28,7 +28,7 @@ template<typename VarArray, typename OriginalConstraint>
 struct CheckAssignConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "CheckAssign"; }
+  { return "!!CheckAssign"; }
   
   OriginalConstraint& originalcon;
   VarArray variables;

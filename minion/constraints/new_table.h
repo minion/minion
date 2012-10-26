@@ -205,7 +205,7 @@ template<typename VarArray, typename TableDataType = TrieData, typename TableSta
 struct NewTableConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "TableDynamic"; }
+    { return "table"; }
 
   typedef typename VarArray::value_type VarRef;
   VarArray vars;

@@ -24,7 +24,7 @@ template<typename VarArray>
 struct TableConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Table"; }
+  { return "table"; }
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;

@@ -43,7 +43,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   struct VecCountDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "VecCountDynamic"; }
+    { return "hamming"; }
 
   typedef typename VarArray1::value_type VarRef1;
   typedef typename VarArray2::value_type VarRef2;

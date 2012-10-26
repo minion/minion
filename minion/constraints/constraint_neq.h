@@ -53,7 +53,7 @@ template<typename VarArray>
 struct NeqConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Neq"; }
+  { return "alldiff"; }
   
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;

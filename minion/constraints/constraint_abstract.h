@@ -159,19 +159,19 @@ public:
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
   virtual void propagate(DynamicTrigger*)
-    { D_FATAL_ERROR("Fatal error in 'Dynamic Propagate' in " + constraint_name()); }
+    { D_FATAL_ERROR("Fatal error in 'Dynamic Propagate' in " + extended_name()); }
 
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
   virtual void propagate(DomainInt, DomainDelta)
-    { D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + constraint_name()); }
+    { D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + extended_name()); }
 
   /// Checks if a constraint cannot be satisfied, and sets up any data structures for future incremental checks.
   /// Returns TRUE if constraint cannot be satisfied.
   /** This function is used by rarification */
   virtual BOOL full_check_unsat()
   {
-    cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    cerr << "Static reification is not supported by the " << extended_name() << " constraint. Sorry" << endl;
     exit(1);
     return false;
   }
@@ -181,7 +181,7 @@ public:
   /** This function should not be called unless check_unsat_full is called first. This is used by rarification */
   virtual BOOL check_unsat(SysInt,DomainDelta)
   {
-    cerr << "Static reification is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    cerr << "Static reification is not supported by the " << extended_name() << " constraint. Sorry" << endl;
     exit(1);
     return false;
   }
@@ -192,7 +192,7 @@ public:
    */
     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    cerr << "Finding assignment is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    cerr << "Finding assignment is not supported by the " << extended_name() << " constraint. Sorry" << endl;
     exit(1);
     return false;
   }
@@ -201,7 +201,7 @@ public:
   /** Used by rarification */
   virtual AbstractConstraint* reverse_constraint()
   {
-    cerr << "Negation is not supported by the " << constraint_name() << " constraint. Sorry" << endl;
+    cerr << "Negation is not supported by the " << extended_name() << " constraint. Sorry" << endl;
     exit(1);
     return NULL;
   }
@@ -214,8 +214,13 @@ public:
     full_propagate_done(false)
     {}
 
-  /// Method to get constraint name for debugging.
+  /// Method to get constraint name for output.
   virtual string constraint_name() = 0;
+
+  /// Method to get constraint name for debugging.
+  virtual string extended_name()
+  { return constraint_name(); }
+
 
   /// Performs a full round of propagation and sets up any data needs by propagate().
   /** This function can be called during search if the function is reified */

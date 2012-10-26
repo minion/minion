@@ -105,7 +105,7 @@ template<typename VarArray, typename IndexRef, typename VarRef>
 struct ElementConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Element"; }
+  { return "watchelement"; }
   
   VarArray var_array;
   IndexRef index_ref;

@@ -49,7 +49,7 @@ template<typename VarArray, typename ValueArray, typename VarSum>
 struct LiteralSumConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "LiteralSumDynamic"; }
+  { return "litsumgeq"; }
   
  typedef typename VarArray::value_type VarRef;
   

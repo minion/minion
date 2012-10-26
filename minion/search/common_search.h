@@ -76,7 +76,7 @@ namespace Controller
       
       if(!con->check_assignment(values, vec_size))
       {
-        cerr << "A " << con->constraint_name() << " constraint is not satisfied by this sol!" << endl;
+        cerr << "A " << con->extended_name() << " constraint is not satisfied by this sol!" << endl;
         cerr << "The constraint is over the following variables:" << endl;
         for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
           cerr << variables[loop] << ",";

@@ -31,7 +31,7 @@ template<typename VarArray, typename IndexRef, typename VarRef>
 struct GACElementConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "GACElement"; }
+  { return "gacelement-deprecated"; }
   
   VarArray var_array;
   IndexRef indexvar;

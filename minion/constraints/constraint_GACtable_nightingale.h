@@ -232,8 +232,11 @@ struct Nightingale
 template<typename VarArray>
 struct GACTableConstraint : public AbstractConstraint
 {
+    virtual string extended_name()
+  { return "table(nightingale)"; }
+
   virtual string constraint_name()
-  { return "TableNightingale"; }
+  { return "table"; }
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;

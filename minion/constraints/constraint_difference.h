@@ -47,7 +47,7 @@ template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct DifferenceConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Difference"; }
+  { return "difference"; }
   
   VarRef1 var1;
   VarRef2 var2;

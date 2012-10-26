@@ -88,8 +88,12 @@ ALL constraints are reifyimplyable.
 template<typename BoolVar>
 struct reify : public ParentConstraint
 {
+
+  virtual string extended_name()
+  { return constraint_name() + ":" + child_constraints[0]->extended_name(); }
+
   virtual string constraint_name()
-  { return "Reify:" + child_constraints[0]->constraint_name(); }
+  { return "reify"; }
 
   BoolVar reify_var;
   SysInt reify_var_num;

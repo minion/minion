@@ -56,7 +56,7 @@ template<typename VarArray, typename MinVarRef>
 struct MinConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Min"; }
+  { return "min"; }
   
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type ArrayVarRef;

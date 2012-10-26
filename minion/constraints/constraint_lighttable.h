@@ -109,7 +109,7 @@ template<typename VarArray, typename TableDataType = TrieData>
 struct LightTableConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "LightTable"; }
+  { return "lighttable"; }
 
   typedef typename VarArray::value_type VarRef;
   VarArray vars;

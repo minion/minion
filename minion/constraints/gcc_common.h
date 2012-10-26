@@ -1389,9 +1389,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     virtual string constraint_name()
     {
         if(Strongcards)
-            return "GCC";
+            return "gcc";
         else
-            return "GCCWeak";
+            return "gccweak";
     }
     
     virtual triggerCollection setup_internal()

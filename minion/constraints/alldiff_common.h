@@ -124,7 +124,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     virtual string constraint_name()
     { 
-        return "GacAlldiff";
+        return "gacalldiff";
     }
     
     vector<SysInt> SCCs;    // Variable numbers

@@ -34,8 +34,11 @@
 
 struct Check_GSA : public AbstractConstraint
 {
+  virtual string extended_name()
+  { return constraint_name() + ":" + child->extended_name(); }
+
   virtual string constraint_name()
-    { return "Check_GSA:" + child->constraint_name(); }
+    { return "check[gsa]"; }
 
   AbstractConstraint* child;
 
