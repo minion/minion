@@ -30,6 +30,7 @@
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include "dump_state.hpp"
 
 using boost::function;
 using boost::bind;
@@ -122,20 +123,24 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     
     getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions(stateObj).silent);
     try {
-    
-    PropogateCSP(stateObj, args.preprocess, preprocess_vars, !getOptions(stateObj).silent);
-    getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions(stateObj).silent);
-    getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions(stateObj).silent);
-    
-  if(!getState(stateObj).isFailed())
-  {
+
+      PropogateCSP(stateObj, args.preprocess, preprocess_vars, !getOptions(stateObj).silent);
+      getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions(stateObj).silent);
+      getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions(stateObj).silent);
+      
+
+      if(getOptions(stateObj).outputCompressed != "")
+        dump_solver(stateObj, getOptions(stateObj).outputCompressed);
+
+      if(!getState(stateObj).isFailed())
+      {
         if(!getOptions(stateObj).noTimers && getOptions(stateObj).search_limit > 0)
         {
-            getState(stateObj).setupAlarm(getOptions(stateObj).timeout_active, getOptions(stateObj).search_limit, getOptions(stateObj).time_limit_is_CPU_time);
-            getState(stateObj).setupCtrlc();
+          getState(stateObj).setupAlarm(getOptions(stateObj).timeout_active, getOptions(stateObj).search_limit, getOptions(stateObj).time_limit_is_CPU_time);
+          getState(stateObj).setupCtrlc();
         }
         sm->search();
-  }
+      }
     }
     catch(EndOfSearch)
     { }

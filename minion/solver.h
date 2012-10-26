@@ -258,6 +258,9 @@ public:
   // The format of output used (-1 for default)
   SysInt outputType;
   
+  /// Output a compressed file
+  string outputCompressed;
+  
   /// Disable the use of linux timers
   bool noTimers;
   

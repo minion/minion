@@ -37,6 +37,11 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
 
     else if(command == string("-redump"))
     { getOptions(stateObj).redump = true; }
+    else if(command == string("-outputCompressed"))
+    { 
+      ++i;
+      getOptions(stateObj).outputCompressed = argv[i];
+    }
     else if(command == string("-instancestats"))
     { getOptions(stateObj).instance_stats = true; }
     else if(command == string("-Xgraph"))
