@@ -372,6 +372,7 @@ struct NeqConstraintBinary : public AbstractConstraint
   VarRef1 var1;
   VarRef2 var2;
   
+  CONSTRAINT_ARG_LIST2(var1, var2);
   
   NeqConstraintBinary(StateObj* _stateObj, const VarRef1& _var1, const VarRef2& _var2 ) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
@@ -588,6 +589,9 @@ struct EqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "eq"; }
+  
+
+  CONSTRAINT_ARG_LIST2(var1, var2);
   
   EqualVarRef1 var1;
   EqualVarRef2 var2;
