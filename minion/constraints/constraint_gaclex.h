@@ -17,46 +17,29 @@
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-/** @help constraints;gaclexless Description
+
+/** @help constraints;lexleq[rv] Description
   The constraint
 
-  gaclexless(vec0, vec1)
-
-  takes two vectors vec0 and vec1 of the same length and ensures that
-  vec0 is lexicographically less than vec1 in any solution.
-*/
-
-/** @help constraints;gaclexless Notes
-  This constraint maintains GAC.
-*/
-
-/** @help constraints;gaclexless References
-  See also
-
-  help constraints gaclexleq
-
-  for a similar constraint with non-strict lexicographic inequality.
-*/
-
-/** @help constraints;gaclexleq Description
-  The constraint
-
-  gaclexleq(vec0, vec1)
+  lexle[rv](vec0, vec1)
 
   takes two vectors vec0 and vec1 of the same length and ensures that
   vec0 is lexicographically less than or equal to vec1 in any solution.
 */
 
-/** @help constraints;gaclexleq Notes
-  This constraints achieves GAC.
+/** @help constraints;lexleq[rv] Notes
+  This constraint achieves GAC even when some variables are repeated in
+  vec0 and vec1. However, the extra propagation this achieves is rarely 
+  worth the extra work.
 */
 
-/** @help constraints;gaclexleq References
+/** @help constraints;lexleq[rv] References
   See also
 
-  help constraints gaclexless
+  help constraints lexleq[quick]
 
-  for a similar constraint with strict lexicographic inequality.
+  for a much faster logically identical constraint, with lower
+  propagation.
 */
 
 #ifndef CONSTRAINT_GACLEX_H
@@ -66,7 +49,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   struct GacLexLeqConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-    { if(Less) return "LexLess"; else return "GacLexLeq"; }
+    { if(Less) return "GacLexLess"; else return "GacLexLeq"; }
 
   typedef GacLexLeqConstraint<VarArray2, VarArray1,!Less> NegConstraintType;
   typedef typename VarArray1::value_type ArrayVarRef1;
