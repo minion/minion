@@ -40,6 +40,7 @@ namespace Controller
       getState(stateObj).setOptimiseVar(new AnyVarRef(var));
       getState(stateObj).setOptimisationProblem(true);
       getState(stateObj).setRawOptimiseVar(new AnyVarRef(var));
+      getState(stateObj).setMaximise(true);
 
   }
   
@@ -51,6 +52,7 @@ namespace Controller
       getState(stateObj).setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
       getState(stateObj).setOptimisationProblem(true);
       getState(stateObj).setRawOptimiseVar(new AnyVarRef(var));
+      getState(stateObj).setMaximise(false);
   }
   
   /// Ensures a particular constraint is satisfied by the solution.
