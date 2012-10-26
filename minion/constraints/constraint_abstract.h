@@ -172,7 +172,7 @@ public:
   BOOL full_propagate_done;
 
   virtual string full_output_name()
-  { D_FATAL_ERROR("Unimplemented output"); }
+  { D_FATAL_ERROR("Unimplemented output in " + extended_name()); }
 
 
   /// Returns a point to the first dynamic trigger of the constraint.
