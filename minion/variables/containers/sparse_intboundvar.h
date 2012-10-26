@@ -398,6 +398,12 @@ struct SparseBoundVarContainer {
   SparseBoundVarRef get_new_var(const vector<T>&);
   SparseBoundVarRef get_var_num(DomainInt i);
 
+  vector<DomainInt> get_raw_domain(DomainInt i)
+  { return this->domains[checked_cast<SysInt>(i)]; }
+
+  UnsignedSysInt var_count()
+  { return var_count_m; }
+
   void addTrigger(SparseBoundVarRef_internal<BoundType> b, Trigger t, TrigType type)
   { LOCK_CON_MUTEX
     D_ASSERT(lock_m); 

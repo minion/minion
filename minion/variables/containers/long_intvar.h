@@ -541,6 +541,10 @@ public:
   }
   
   BigRangeVarRef get_var_num(DomainInt i);
+  
+  UnsignedSysInt var_count()
+  { return var_count_m; }
+
   BigRangeVarRef get_new_var(DomainInt i, DomainInt j);
 
   void addTrigger(BigRangeVarRef_internal b, Trigger t, TrigType type)

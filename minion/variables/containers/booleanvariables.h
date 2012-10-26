@@ -239,6 +239,9 @@ struct BoolVarContainer
   
   /// Returns a reference to the ith Boolean variable which was previously created.
   BoolVarRef get_var_num(DomainInt i);
+
+  UnsignedSysInt var_count()
+  { return var_count_m; }
   
   
   void setMax(const BoolVarRef_internal& d, DomainInt i) 

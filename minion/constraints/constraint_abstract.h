@@ -62,7 +62,10 @@ namespace ConOutput
     vector<Mapper> v;
     t.getMapperStack(v);
     D_ASSERT(v.empty());
-    return t.getBaseVar().get_name(); 
+    if(t.isAssigned())
+      return to_string(t.getAssignedValue());
+    else
+      return t.getBaseVar().get_name(); 
   }
 
   inline

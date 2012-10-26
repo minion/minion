@@ -376,6 +376,11 @@ struct BoundVarContainer {
     }
   }
   
+  UnsignedSysInt var_count()
+  {
+    return var_count_m;
+  }
+  
 //  BoundVarRef get_new_var();
 //  BoundVarRef get_new_var(SysInt i, SysInt j);
   BoundVarRef get_var_num(DomainInt i);
