@@ -18,3 +18,4 @@
 */
 
 void dump_solver(StateObj* state, ostream& os);
+void dump_solver(StateObj* state, std::string filename);

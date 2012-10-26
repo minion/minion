@@ -83,5 +83,43 @@ void dump_solver(StateObj* state, ostream& os)
         }
     }
 
+    // tuples
+
+    SearchState& search_state = getState(state);
+
+    for(UnsignedSysInt i = 0; i < search_state.getTupleListContainer()->size(); ++i)
+    {
+        TupleList* tl = search_state.getTupleListContainer()->getTupleList(i);
+        os << tl->getName() << " " << tl->tuple_size() << " " << tl->size() << "\n";
+        for(SysInt i = 0; i < tl->size() * tl->tuple_size(); ++i)
+        {
+            os << (*tl)[i] << " ";
+        }
+        os << endl;
+    }
+
+    os << "**SEARCH**" << endl;
+    if(getState(state).getRawOptimiseVar() &&
+        !(getState(state).getRawOptimiseVar()->isAssigned()))
+    {
+        if(getState(state).isMaximise())
+            os << "MAXIMISING ";
+        else
+            os << "MINIMISING ";
+        os << getState(state).getRawOptimiseVar()->getBaseVar().get_name() << "\n";
+    }
+    os << 
+    os << "**CONSTRAINTS**" << endl;
+    for(UnsignedSysInt i = 0; i < search_state.getConstraintList().size(); ++i)
+    {
+        os << search_state.getConstraintList()[i]->full_output_name() << "\n";
+    }
     
+    os << "**EOF**" << endl;
+}
+
+void dump_solver(StateObj* state, string filename)
+{
+    ofstream ofs(filename.c_str());
+    dump_solver(state, ofs);
 }
