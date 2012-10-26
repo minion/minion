@@ -108,7 +108,9 @@ void dump_solver(StateObj* state, ostream& os)
             os << "MINIMISING ";
         os << getState(state).getRawOptimiseVar()->getBaseVar().get_name() << "\n";
     }
-    os << 
+    os << "PRINT ";
+    os << ConOutput::print_vars(getState(state).getPrintMatrix());
+    os << endl;
     os << "**CONSTRAINTS**" << endl;
     for(UnsignedSysInt i = 0; i < search_state.getConstraintList().size(); ++i)
     {
