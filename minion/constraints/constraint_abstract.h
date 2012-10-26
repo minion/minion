@@ -70,7 +70,7 @@ namespace ConOutput
 
   inline
   string print_vars(const TupleList*& t)
-  { return to_string(t->globalTupleIndex()); }
+  { return t->getName(); }
 
   inline
   string print_vars(const DomainInt& i)

@@ -684,6 +684,7 @@ public:
 
     table_symboltable["_Unnamed__" + to_string(pos) + "_"] = tuplelist;
     table_nametable[tuplelist] = "_Unnamed__" + to_string(pos) + "_";
+    tuplelist->setName("_Unnamed__" + to_string(pos) + "_");
   }
 
   void addTableSymbol(string name, TupleList* tuplelist)
@@ -694,6 +695,7 @@ public:
       throw parse_exception("Named tuplelist double registered!");
     table_symboltable[name] = tuplelist;
     table_nametable[tuplelist] = name;
+    tuplelist->setName(name);
   }
 
   TupleList* getTableSymbol(string name) const
