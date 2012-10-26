@@ -52,6 +52,9 @@ public:
     D_ASSERT(type_m != MAP_NEG && type_m != MAP_INVALID);
     return val_m; 
   }
+
+  friend bool operator==(Mapper m1, Mapper m2)
+  { return (m1.type_m == m2.type_m) && (m1.val_m == m2.val_m); }
 };
 
 namespace ProbSpec
