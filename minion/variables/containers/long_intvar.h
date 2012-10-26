@@ -577,6 +577,10 @@ public:
   Var getBaseVar(const BigRangeVarRef_internal& b) const
   { return Var(VAR_DISCRETE, b.var_num); }
 
+  void getMapperStack(vector<Mapper>& v) const
+  { }
+
+
 #ifdef WDEG
   DomainInt getBaseWdeg(const BigRangeVarRef_internal& b)
   { return wdegs[b.var_num]; }

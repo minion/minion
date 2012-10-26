@@ -110,6 +110,9 @@ struct VarRefType
   DomainInt getBaseVal(DomainInt v) const
   { return GET_CONTAINER().getBaseVal(data, v); }
 
+  void getMapperStack(vector<Mapper>&) const
+  {  }
+
   Var getBaseVar() const
   { return GET_CONTAINER().getBaseVar(data); }
 
@@ -219,6 +222,9 @@ struct QuickVarRefType
 
   Var getBaseVar() const
   { return data.getBaseVar(); }
+
+  void getMapperStack(vector<Mapper>&) const
+  {  }
 
 #ifdef WDEG
   SysInt getBaseWdeg()

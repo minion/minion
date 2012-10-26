@@ -173,6 +173,7 @@ struct AnyVarRef_Abstract
   virtual void addConstraint(AbstractConstraint* c) = 0;
   virtual DomainInt getBaseVal(DomainInt) const = 0;
   virtual Var getBaseVar() const = 0;
+  virtual void getMapperStack(vector<Mapper>&) const = 0;
 #ifdef WDEG
   virtual SysInt getBaseWdeg() = 0;
   virtual void incWdeg() = 0;
@@ -261,6 +262,9 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 
   virtual DomainInt getBaseVal(DomainInt v) const
   { return data.getBaseVal(v); }
+
+  virtual void getMapperStack(vector<Mapper>& v) const
+  { data.getMapperStack(v); }
 
   virtual Var getBaseVar() const
   { return data.getBaseVar(); }
@@ -370,6 +374,9 @@ public:
 
   Var getBaseVar() const
   { return data->getBaseVar(); }
+
+  void getMapperStack(vector<Mapper>& v) const
+  { data->getMapperStack(v); }
 
 #ifdef WDEG
   SysInt getBaseWdeg()

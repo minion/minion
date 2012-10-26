@@ -16,6 +16,44 @@ enum VariableType
   VAR_INVALID
 };
 
+enum MapperType
+{
+  MAP_NEG,
+  MAP_NOT,
+  MAP_MULT,
+  MAP_SHIFT,
+  MAP_SWITCH_NEG,
+  MAP_INVALID
+};
+
+class Mapper
+{
+  MapperType type_m;
+  DomainInt val_m;
+
+public:
+
+  Mapper(MapperType m, DomainInt v = 0)
+  : type_m(m), val_m(v)
+  { }
+
+  Mapper()
+  : type_m(MAP_INVALID), val_m(0)
+  { }
+
+  MapperType type() const 
+  { 
+    D_ASSERT(type_m != MAP_INVALID);
+    return type_m; 
+  }
+  
+  DomainInt val() const 
+  { 
+    D_ASSERT(type_m != MAP_NEG && type_m != MAP_INVALID);
+    return val_m; 
+  }
+};
+
 namespace ProbSpec
 {
 struct CSPInstance;
@@ -40,6 +78,25 @@ public:
   
   friend std::ostream& operator<<(std::ostream& o, const Var& v)
   { return o << "Var. Type:" << v.type_m << " Pos:" << v.pos_m << "."; }
+
+   string get_name() const
+   {
+      ostringstream o;
+      switch(type_m)
+      {
+        case VAR_BOOL: o << "bool"; break;
+        case VAR_NOTBOOL: o << "!bool"; break;
+        case VAR_BOUND: o << "bound"; break;
+        case VAR_SPARSEBOUND: o << "sparsebound"; break;
+        case VAR_DISCRETE: o << "discrete"; break;
+        case VAR_SPARSEDISCRETE: o << "sparsedis"; break;
+        case VAR_CONSTANT: break; // No need for name, just the number!
+        default: abort();
+      }
+      
+      o << pos_m;
+      return o.str();
+   }
    
    bool operator==(const Var& var) const
    { return type_m == var.type_m && pos_m == var.pos_m; }

@@ -144,6 +144,13 @@ struct ShiftVar
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
+  void getMapperStack(vector<Mapper>& v) const
+  { 
+    data.getMapperStack(v);
+    v.push_back(Mapper(MAP_SHIFT, (DomainInt)shift)); 
+  }
+
+
 #ifdef WDEG
   SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }

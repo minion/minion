@@ -151,6 +151,10 @@ struct BoolVarRef_internal
   }
 
   Var getBaseVar() const { return Var(VAR_BOOL, var_num); }
+
+  void getMapperStack(vector<Mapper>&) const
+  { }
+
  
   friend std::ostream& operator<<(std::ostream& o, const BoolVarRef_internal& b)
   { return o << "Bool:" << b.var_num; }

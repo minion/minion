@@ -54,6 +54,64 @@ class DynamicTrigger;
 struct AbstractTriggerCreator;
 typedef vector<shared_ptr<AbstractTriggerCreator> > triggerCollection;
 
+namespace ConOutput
+{
+  template<typename T>
+  string print_vars(const T& t)
+  { return t.get_name(); }
+
+  template<typename T>
+  string print_vars(std::vector<T>& t)
+  {
+    ostringstream o;
+    o << "[";
+    bool first = true;
+    for(size_t i = 0; i < t.size(); ++i)
+    {
+      if(!first)
+        o << ",";
+      else
+        first = false;
+      {
+        vector<Mapper> v;
+        t[i].getMapperStack(v);
+        D_ASSERT(v.empty());
+      }
+      o << t[i].getBaseVar();
+    }
+    return o.str();
+  }
+
+  inline
+  string print_con(string name)
+  { return name + "()"; }
+
+  template<typename T>
+  string print_con(string name, const T& args)
+  { 
+    string s = print_vars(args); 
+    return name + "(" + args + ")";
+  }
+
+  template<typename T1, typename T2>
+  string print_con(string name, const T1& args1, const T2& args2)
+  { 
+    string s1 = print_vars(args1);
+    string s2 = print_vars(args2); 
+    return name + "(" + args1 + "," + args2 + ")";
+  }
+  
+  template<typename T1, typename T2, typename T3>
+  string print_con(string name, const T1& args1, const T2& args2, const T3& args3)
+  { 
+    string s1 = print_vars(args1); 
+    string s2 = print_vars(args2);
+    string s3 = print_vars(args3);
+    return name + "(" + args1 + "," + args2 + "," + args3 + ")";
+  }
+
+}
+
 /// Base type from which all constraints are derived.
 class AbstractConstraint
 {
@@ -72,6 +130,12 @@ public:
   #endif
 
   BOOL full_propagate_done;
+
+
+  
+  virtual string print_constraint()
+  { D_FATAL_ERROR("Unimplemented print"); }
+
 
   /// Returns a point to the first dynamic trigger of the constraint.
   DynamicTrigger* dynamic_trigger_start()

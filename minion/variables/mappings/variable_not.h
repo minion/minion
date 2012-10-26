@@ -168,6 +168,13 @@ struct VarNot
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
+  void getMapperStack(vector<Mapper>& v) const
+  { 
+    data.getMapperStack(v);
+    v.push_back(Mapper(MAP_NOT)); 
+  }
+
+
 #ifdef WDEG
   SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }

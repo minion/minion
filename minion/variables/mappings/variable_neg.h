@@ -155,6 +155,12 @@ struct VarNeg
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
+  void getMapperStack(vector<Mapper>& v) const
+  { 
+    data.getMapperStack(v);
+    v.push_back(Mapper(MAP_NEG)); 
+  }
+
 #ifdef WDEG
   SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }

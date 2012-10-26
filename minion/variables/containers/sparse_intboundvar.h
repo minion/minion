@@ -424,6 +424,10 @@ struct SparseBoundVarContainer {
   Var getBaseVar(const SparseBoundVarRef_internal<BoundType>& b) const
   { return Var(VAR_SPARSEBOUND, b.var_num); }
 
+  void getMapperStack(vector<Mapper>& v) const
+  { }
+
+
 #ifdef WDEG
   SysInt getBaseWdeg(const SparseBoundVarRef_internal<BoundType>& b)
   { return wdegs[b.var_num]; }

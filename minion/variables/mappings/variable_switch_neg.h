@@ -191,6 +191,13 @@ struct SwitchNeg
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
+  void getMapperStack(vector<Mapper>& v) const
+  { 
+    data.getMapperStack(v);
+    v.push_back(Mapper(MAP_SWITCH_NEG, multiplier)); 
+  }
+
+
 #ifdef WDEG
   SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }

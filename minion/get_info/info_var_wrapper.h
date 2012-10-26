@@ -182,6 +182,12 @@ struct InfoRefType
     return data.getBaseVal(v);
   }
 
+  void getMapperStack(vector<Mapper>& v) const
+  {
+    VAR_INFO_ADDONE(VAR_TYPE, getMapperStack);
+    data.getMapperStack(v);
+  }
+
   Var getBaseVar() const 
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getBaseVar);
