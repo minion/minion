@@ -133,6 +133,40 @@ namespace ConOutput
     return name + "(" + s1 + "," + s2 + "," + s3 + ")";
   }
 
+  template<typename T1, typename T2>
+  string print_sum_con(string name, bool neg, const T1& sumvars, const T2& result)
+  {
+    {
+      vector<Mapper> v;
+      result.getMapperStack(v);
+      if(neg)
+      {
+        D_ASSERT(v.size() == 1 && v[0] == Mapper(MAP_SHIFT, -1));
+      }
+      else
+      {
+        D_ASSERT(v.size() == 0);
+      }
+    }
+
+    if(!sumvars.empty())
+    {
+      vector<Mapper> v;
+      sumvars[0].getMapperStack(v);
+      if(v.empty())
+      {
+        for(int i = 0; i < v.size(); ++i)
+        {
+          vector<Mapper> w;
+          sumvars[i].getMapperStack(w);
+          D_ASSERT(w.empty());
+        }
+      }
+      
+    }
+    return "";
+  }
+
 }
 
 #define CONSTRAINT_ARG_LIST0() \

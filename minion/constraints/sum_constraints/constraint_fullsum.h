@@ -52,7 +52,9 @@ template<typename VarArray, typename VarSum, BOOL is_reversed = false>
 struct LessEqualSumConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "<=Sumup"; }
+  { return "sumleq"; }
+
+  CONSTRAINT_ARG_LIST2(var_array, var_sum);
   
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
