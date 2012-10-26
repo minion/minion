@@ -53,6 +53,8 @@ struct PowConstraint : public AbstractConstraint
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;
+
+  CONSTRAINT_ARG_LIST3(var1, var2, var3);
   
   PowConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)

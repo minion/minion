@@ -51,7 +51,7 @@ ensures that at least one of the constraints C1,...,Cn is true.
 struct Dynamic_OR : public ParentConstraint
 {
   virtual string constraint_name()
-    { return "Dynamic OR:"; }
+    { return "watched-or"; }
 
 
   Reversible<bool> full_propagate_called;

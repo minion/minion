@@ -79,6 +79,8 @@ struct LexLeqConstraint : public AbstractConstraint
   VarArray1 x;
   VarArray2 y;
   
+  CONSTRAINT_ARG_LIST2(x, y);
+  
   LexLeqConstraint(StateObj* _stateObj,const VarArray1& _x, const VarArray2& _y) :
     AbstractConstraint(_stateObj), alpha(_stateObj), beta(_stateObj), F(_stateObj), x(_x), y(_y)
   { CHECK(x.size() == y.size(), "LexLeq and LexLess only work with equal length vectors"); }

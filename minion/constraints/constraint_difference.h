@@ -49,6 +49,8 @@ struct DifferenceConstraint : public AbstractConstraint
   virtual string constraint_name()
   { return "difference"; }
   
+  CONSTRAINT_ARG_LIST3(var1,var2,var3);
+  
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;

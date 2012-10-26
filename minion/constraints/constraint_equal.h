@@ -77,6 +77,9 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   EqualVarRef1 var1;
   EqualVarRef2 var2;
   BoolVarRef var3;
+
+  CONSTRAINT_ARG_LIST3(var1,var2,var3);
+  
   ReifiedEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {

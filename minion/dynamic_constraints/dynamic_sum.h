@@ -73,11 +73,13 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
   struct BoolLessSumConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-    { if(VarToCount) return "Bool<=SumDynamic"; else return "Bool>=SumDynamic"; }
+    { if(VarToCount) return "watchsumleq"; else return "watchsumgeq"; }
 
   typedef BoolLessSumConstraintDynamic<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   
+  CONSTRAINT_ARG_LIST2(var_array, var_sum);
+
   // When VarToCount=1 this constraint actually counts 0's and ensures there are var_sum or more.
   // Name of the class should really be changed, and VarToCount changed to val.. and values flipped
   // for it to make sense.

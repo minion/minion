@@ -110,6 +110,9 @@ struct ElementConstraint : public AbstractConstraint
   VarArray var_array;
   IndexRef index_ref;
   VarRef result_var;
+
+  CONSTRAINT_ARG_LIST3(var_array, index_ref, result_var);
+
   ElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexRef& _index_ref, const VarRef& _result_var) :
     AbstractConstraint(_stateObj), var_array(_var_array), index_ref(_index_ref), result_var(_result_var)
   { }

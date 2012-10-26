@@ -31,6 +31,8 @@ struct WatchNeqConstraint : public AbstractConstraint
   Var1 var1;
   Var2 var2;
 
+  CONSTRAINT_ARG_LIST2(var1, var2);
+
   WatchNeqConstraint(StateObj* _stateObj, const Var1& _var1, const Var2& _var2) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
   { 

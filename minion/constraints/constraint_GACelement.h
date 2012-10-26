@@ -32,6 +32,8 @@ struct GACElementConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "gacelement-deprecated"; }
+
+  CONSTRAINT_ARG_LIST3(var_array, indexvar, resultvar);
   
   VarArray var_array;
   IndexRef indexvar;

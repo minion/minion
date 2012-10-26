@@ -27,6 +27,8 @@ struct ConstantConstraint : public AbstractConstraint
   virtual string constraint_name()
   { if(truth) return "true"; else return "false"; }
   
+  CONSTRAINT_ARG_LIST0();
+
   ConstantConstraint(StateObj* _stateObj) : AbstractConstraint(_stateObj)
   { }
   

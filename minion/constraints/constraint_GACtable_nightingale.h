@@ -232,14 +232,18 @@ struct Nightingale
 template<typename VarArray>
 struct GACTableConstraint : public AbstractConstraint
 {
-    virtual string extended_name()
+  virtual string extended_name()
   { return "table(nightingale)"; }
 
   virtual string constraint_name()
   { return "table"; }
+
+  CONSTRAINT_ARG_LIST2(vars, tuples);
+
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
+  TupleList* tuples;
   
   /// For each literal, the number of the tuple that supports it.
   // This is bad because it might have holes in it, i.e. revints that are not used.
@@ -283,8 +287,8 @@ struct GACTableConstraint : public AbstractConstraint
   
   Nightingale* nightingale;
   
-  GACTableConstraint(const VarArray& _vars, TupleList* tuples) :
-    vars(_vars)
+  GACTableConstraint(const VarArray& _vars, TupleList* _tuples) :
+    vars(_vars), tuples(_tuples)
   {
       nightingale = tuples->getNightingale();
       arity = nightingale->tuples->tuple_size();     

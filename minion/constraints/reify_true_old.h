@@ -37,8 +37,11 @@
 template<typename BoolVar>
 struct reify_true_old : public AbstractConstraint
 {
+  virtual string extended_name()
+  { return constraint_name() + ":" + poscon->extended_name(); }
+
   virtual string constraint_name()
-  { return "ReifyTrue:" + poscon->constraint_name(); }
+  { return "reifyimply-old"; }
   
   AbstractConstraint* poscon;
   BoolVar rar_var;

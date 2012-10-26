@@ -47,12 +47,14 @@ struct LeqConstraint : public AbstractConstraint
   { return "ineq"; }
   
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
-  const Offset offset;
   VarRef1 x;
   VarRef2 y;
+  const Offset offset;
+  
+  CONSTRAINT_ARG_LIST3(x, y, offset);
   
   LeqConstraint(StateObj* _stateObj,VarRef1 _x, VarRef2 _y, Offset _o) :
-    AbstractConstraint(_stateObj), offset(_o), x(_x), y(_y)
+    AbstractConstraint(_stateObj), x(_x), y(_y), offset(_o)
   { }
   
   virtual triggerCollection setup_internal()

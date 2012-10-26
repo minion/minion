@@ -92,9 +92,13 @@ struct GACTableConstraint : public AbstractConstraint
   
   virtual string constraint_name()
   { return "table"; }
+
+  CONSTRAINT_ARG_LIST2(vars, tuples);
+
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
+  TupleList* tuples;
   
 #ifdef BINARY_SEARCH
   SysInt find_first_inconsistency(const vector<DomainInt>& v)
@@ -164,7 +168,7 @@ struct GACTableConstraint : public AbstractConstraint
   
   
   GACTableConstraint(const VarArray& _vars, TupleList* _tuples) :
-    vars(_vars), lists(_tuples->getLitLists())
+    vars(_vars), tuples(_tuples), lists(_tuples->getLitLists())
   {
     CheckNotBound(vars, "table constraints","");
     if((SysInt)_vars.size() != lists->tuples->tuple_size())

@@ -59,6 +59,8 @@ struct NeqConstraint : public AbstractConstraint
   typedef typename VarArray::value_type VarRef;
   
   VarArray var_array;
+
+  CONSTRAINT_ARG_LIST1(var_array);
   
   NeqConstraint(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
     var_array(_var_array)

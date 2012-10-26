@@ -24,8 +24,14 @@
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct AndConstraint : public AbstractConstraint
 {
+
+  virtual string extended_name()
+  { return "product: and"; }
+  
   virtual string constraint_name()
-  { return "watched-and"; }
+  { return "product"; }
+  
+  CONSTRAINT_ARG_LIST3(var1,var2,var3);
   
   VarRef1 var1;
   VarRef2 var2;

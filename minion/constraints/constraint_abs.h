@@ -38,6 +38,9 @@ struct AbsConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "abs"; }
+
+  CONSTRAINT_ARG_LIST2(var1, var2);
+
   
   AbsVarRef1 var1;
   AbsVarRef2 var2;

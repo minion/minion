@@ -35,10 +35,12 @@ template<typename Var1, typename Var2, bool Negated=false>
 struct WatchLessConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "WatchedLess"; }
+  { return "watchless"; }
   
   Var1 var1;
   Var2 var2;
+
+  CONSTRAINT_ARG_LIST2(var1, var2);
 
   WatchLessConstraint(StateObj* _stateObj, const Var1& _var1, const Var2& _var2) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2)

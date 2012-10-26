@@ -62,6 +62,8 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   VarArray1 x;
   VarArray2 y;
 
+  CONSTRAINT_ARG_LIST2(x, y);
+
   vector<pair<DomainInt, DomainInt> > earliest_occurrence_x;
   vector<pair<DomainInt, DomainInt> > earliest_occurrence_y;
 

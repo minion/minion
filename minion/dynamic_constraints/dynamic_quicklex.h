@@ -34,9 +34,9 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   virtual string constraint_name()
     { 
         if(Less)
-            return "QuickLexLessDynamic";
+            return "lexless[quick]";
         else
-            return "QuickLexDynamic"; 
+            return "lexleq[quick]"; 
     }
 
   typedef typename VarArray1::value_type VarRef1;
@@ -45,6 +45,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   VarArray1 var_array1;
   VarArray2 var_array2;
 
+  CONSTRAINT_ARG_LIST2(var_array1, var_array2);
 
   Reversible<SysInt> alpha;
 

@@ -90,6 +90,8 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   ValCount val_count;
   Val value;
 
+  CONSTRAINT_ARG_LIST3(var_array, value, val_count);
+
   NotOccurrenceEqualConstraint(StateObj* _stateObj, const VarArray& _var_array, const Val& _value, const ValCount& _val_count) :
     AbstractConstraint(_stateObj), occurrences_count(_stateObj), not_occurrences_count(_stateObj),
     var_array(_var_array), val_count(_val_count), value(_value), trigger1index(-1), trigger2index(-1)

@@ -58,6 +58,8 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   MemOffset unwatched_indexes;
   DomainInt last;
   DomainInt num_unwatched;
+
+  CONSTRAINT_ARG_LIST3(var_array, value_array, var_sum);
     
   SysInt& unwatched(DomainInt i)
   { return static_cast<SysInt*>(unwatched_indexes.get_ptr())[checked_cast<SysInt>(i)]; }

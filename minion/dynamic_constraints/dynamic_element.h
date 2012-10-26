@@ -87,6 +87,8 @@ struct ElementConstraintDynamic : public AbstractConstraint
   VarArray var_array;
   Index indexvar;
   Result resultvar;
+
+  CONSTRAINT_ARG_LIST3(var_array, indexvar, resultvar);
   
   DomainInt initial_result_dom_min;
   DomainInt initial_result_dom_max;

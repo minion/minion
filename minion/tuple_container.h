@@ -38,6 +38,7 @@ class Regin;
 
 class TupleList
 {
+  size_t tuple_index;
 
   LiteralSpecificLists* litlists;
   Nightingale* nightingale;
@@ -78,8 +79,9 @@ class TupleList
     return vec;
   }
   
-  TupleList(const vector<vector<DomainInt> >& tuple_list) : litlists(NULL), 
-    nightingale(NULL), triearray(NULL), regin(NULL),  tuples_locked(false)
+  TupleList(size_t _tuple_index, const vector<vector<DomainInt> >& tuple_list) : 
+    tuple_index(_tuple_index), litlists(NULL), nightingale(NULL), triearray(NULL), 
+    regin(NULL),  tuples_locked(false)
   {
     number_of_tuples = tuple_list.size();
     tuple_length = tuple_list[0].size();
@@ -90,9 +92,10 @@ class TupleList
     finalise_tuples();
   }
   
-  TupleList(DomainInt _numtuples, DomainInt _tuplelength) : litlists(NULL),
-     nightingale(NULL), triearray(NULL), regin(NULL), tuple_length(checked_cast<SysInt>(_tuplelength)),
-    number_of_tuples(checked_cast<SysInt>(_numtuples)), tuples_locked(false)
+  TupleList(size_t _tuple_index, DomainInt _numtuples, DomainInt _tuplelength) :
+     tuple_index(_tuple_index), litlists(NULL), nightingale(NULL), triearray(NULL),
+     regin(NULL), tuple_length(checked_cast<SysInt>(_tuplelength)),
+     number_of_tuples(checked_cast<SysInt>(_numtuples)), tuples_locked(false)
   { tuple_data = new DomainInt[number_of_tuples * tuple_length]; }
   
   const DomainInt* operator[](SysInt pos) const
@@ -104,7 +107,8 @@ class TupleList
     return tuple_data + pos*tuple_length;
   }
   
-
+  size_t globalTupleIndex() const
+  { return tuple_index; }
   
  /// Original smallest value from each domain.
   vector<DomainInt> dom_smallest;
@@ -194,14 +198,14 @@ class TupleListContainer
 public:
   TupleList* getNewTupleList(DomainInt numtuples, DomainInt tuplelength)
   {
-    TupleList* tuplelist_ptr = new TupleList(numtuples, tuplelength);
+    TupleList* tuplelist_ptr = new TupleList(Internal_TupleList.size(), numtuples, tuplelength);
     Internal_TupleList.push_back(tuplelist_ptr);
     return tuplelist_ptr;
   }
 
   TupleList* getNewTupleList(const vector<vector<DomainInt> >& tuples)
   { 
-    TupleList* tuplelist_ptr = new TupleList(tuples);
+    TupleList* tuplelist_ptr = new TupleList(Internal_TupleList.size(), tuples);
     Internal_TupleList.push_back(tuplelist_ptr);
     return tuplelist_ptr;
   }

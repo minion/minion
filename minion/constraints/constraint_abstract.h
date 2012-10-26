@@ -58,10 +58,27 @@ namespace ConOutput
 {
   template<typename T>
   string print_vars(const T& t)
-  { return t.get_name(); }
+  {
+    vector<Mapper> v;
+    t.getMapperStack(v);
+    D_ASSERT(v.empty());
+    return t.getBaseVar().get_name(); 
+  }
+
+  inline
+  string print_vars(const TupleList*& t)
+  { return to_string(t->globalTupleIndex()); }
+
+  inline
+  string print_vars(const DomainInt& i)
+  { return to_string(i); }
+
+  template<SysInt i>
+  string print_vars(const compiletime_val<i>)
+  { return to_string(i); }
 
   template<typename T>
-  string print_vars(std::vector<T>& t)
+  string print_vars(const std::vector<T>& t)
   {
     ostringstream o;
     o << "[";
@@ -72,25 +89,28 @@ namespace ConOutput
         o << ",";
       else
         first = false;
-      {
-        vector<Mapper> v;
-        t[i].getMapperStack(v);
-        D_ASSERT(v.empty());
-      }
-      o << t[i].getBaseVar();
+      o << ConOutput::print_vars(t[i]);
     }
+    o << "]";
     return o.str();
   }
+  
+#ifdef MINION_DEBUG
+  inline
+  string print_vars(SysInt i)
+  { return to_string(i); }
+#endif
 
   inline
   string print_con(string name)
   { return name + "()"; }
 
+
   template<typename T>
   string print_con(string name, const T& args)
   { 
     string s = print_vars(args); 
-    return name + "(" + args + ")";
+    return name + "(" + s + ")";
   }
 
   template<typename T1, typename T2>
@@ -98,7 +118,7 @@ namespace ConOutput
   { 
     string s1 = print_vars(args1);
     string s2 = print_vars(args2); 
-    return name + "(" + args1 + "," + args2 + ")";
+    return name + "(" + s1 + "," + s2 + ")";
   }
   
   template<typename T1, typename T2, typename T3>
@@ -107,10 +127,27 @@ namespace ConOutput
     string s1 = print_vars(args1); 
     string s2 = print_vars(args2);
     string s3 = print_vars(args3);
-    return name + "(" + args1 + "," + args2 + "," + args3 + ")";
+    return name + "(" + s1 + "," + s2 + "," + s3 + ")";
   }
 
 }
+
+#define CONSTRAINT_ARG_LIST0() \
+virtual string full_output_name() \
+{ return ConOutput::print_con(constraint_name()); }
+
+#define CONSTRAINT_ARG_LIST1(x) \
+virtual string full_output_name() \
+{ return ConOutput::print_con(constraint_name(), x); }
+
+#define CONSTRAINT_ARG_LIST2(x, y) \
+virtual string full_output_name() \
+{ return ConOutput::print_con(constraint_name(), x, y); }
+
+#define CONSTRAINT_ARG_LIST3(x, y, z) \
+virtual string full_output_name() \
+{ return ConOutput::print_con(constraint_name(), x, y, z); }
+
 
 /// Base type from which all constraints are derived.
 class AbstractConstraint
@@ -131,10 +168,8 @@ public:
 
   BOOL full_propagate_done;
 
-
-  
-  virtual string print_constraint()
-  { D_FATAL_ERROR("Unimplemented print"); }
+  virtual string full_output_name()
+  { D_FATAL_ERROR("Unimplemented output"); }
 
 
   /// Returns a point to the first dynamic trigger of the constraint.
