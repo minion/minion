@@ -156,10 +156,6 @@ inline SearchState::~SearchState()
 { 
   for(SysInt i = 0; i < constraints.size(); ++i)
     delete constraints[i];
-#ifdef DYNAMICTRIGGERS
-  for(SysInt i = 0; i < dynamic_constraints.size(); ++i)
-    delete dynamic_constraints[i];
-#endif
 }
 
 

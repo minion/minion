@@ -54,10 +54,6 @@ class SearchState
   
   vector<set<AbstractConstraint*> > constraints_to_propagate;
   
-#ifdef DYNAMICTRIGGERS
-  vector<AbstractConstraint*> dynamic_constraints;
-#endif
-  
   long long int solutions;
   
   bool dynamic_triggers_used;
