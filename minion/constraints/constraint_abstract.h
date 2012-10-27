@@ -59,11 +59,22 @@ namespace ConOutput
   template<typename T>
   string print_vars(const T& t)
   {
-    D_ASSERT(t.getMapperStack().empty());
     if(t.isAssigned())
       return to_string(t.getAssignedValue());
     else
-      return t.getBaseVar().get_name(); 
+    {
+      vector<Mapper> m = t.getMapperStack();
+      if(m.size() == 1)
+      {
+        D_ASSERT(m[0] == Mapper(MAP_NOT));
+        return "!" + t.getBaseVar().get_name();
+      }
+      else
+      {
+        D_ASSERT(m.empty());
+        return t.getBaseVar().get_name();
+      }
+    }
   }
 
   inline
@@ -80,6 +91,24 @@ namespace ConOutput
   template<SysInt i>
   string print_vars(const compiletime_val<i>)
   { return to_string(i); }
+
+  inline
+  string print_vars(const std::vector<AbstractConstraint*>& t)
+  {
+    ostringstream o;
+    o << "{";
+    bool first = true;
+    for(size_t i = 0; i < t.size(); ++i)
+    {
+      if(!first)
+        o << ",";
+      else
+        first = false;
+      o << ConOutput::print_vars(t[i]);
+    }
+    o << "}";
+    return o.str();
+  }
 
   template<typename T>
   string print_vars(const std::vector<T>& t)

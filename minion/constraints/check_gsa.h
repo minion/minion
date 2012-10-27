@@ -40,6 +40,8 @@ struct Check_GSA : public AbstractConstraint
   virtual string constraint_name()
     { return "check[gsa]"; }
 
+  CONSTRAINT_ARG_LIST1(child);
+
   AbstractConstraint* child;
 
   Check_GSA(StateObj* _stateObj, AbstractConstraint* _con) :
