@@ -22,10 +22,20 @@
 
 void dump_searchorder(StateObj* state, const SearchOrder& order, ostream& os)
 {
-    vector<bool> variable_output;
+
+    vector<SysInt> non_assigned_vars;
+    for(int i = 0; i < order.var_order.size(); ++i)
+    {
+        AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(state, order.var_order[i]);
+        if(!v.isAssigned())
+            non_assigned_vars.push_back(i);
+    }
+
+    if(non_assigned_vars.size() == 0)
+        return;
 
     os << "VARORDER ";
-   // if(order.find_one_solution)
+    if(order.find_one_assignment)
         os << "AUX ";
 
     switch(order.order)
@@ -37,6 +47,35 @@ void dump_searchorder(StateObj* state, const SearchOrder& order, ostream& os)
         default: abort();
     }
 
+
+    os << "[";
+    bool first=true;
+    for(int i = 0; i < non_assigned_vars.size(); ++i)
+    {
+        AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(state, order.var_order[non_assigned_vars[i]]);
+        D_ASSERT(!v.isAssigned());
+        if(first) first=false; else os << ",";
+        os << v.getBaseVar().get_name();
+    }
+    os << "]\n";
+
+    os << "VALORDER [";
+    first=true;
+    for(int i = 0; i < non_assigned_vars.size(); ++i)
+    {
+        if(first) first=false; else os << ",";
+        switch(order.val_order[non_assigned_vars[i]])
+        {
+            case VALORDER_ASCEND:
+                os << "a"; break;
+            case VALORDER_DESCEND:
+                os << "d"; break;
+            case VALORDER_RANDOM:
+                os << "r"; break;
+            default: abort();
+        }
+    }
+    os << "]\n";
 
 
 }
@@ -133,6 +172,13 @@ void dump_solver(StateObj* state, ostream& os)
     os << "PRINT ";
     os << ConOutput::print_vars(getState(state).getPrintMatrix());
     os << endl;
+
+
+    for(UnsignedSysInt i = 0; i < getState(state).getInstance()->search_order.size(); ++i)
+    {
+        dump_searchorder(state, getState(state).getInstance()->search_order[i], os);
+    }
+
     os << "**CONSTRAINTS**" << endl;
     for(UnsignedSysInt i = 0; i < search_state.getConstraintList().size(); ++i)
     {
