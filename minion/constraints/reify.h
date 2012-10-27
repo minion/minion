@@ -95,6 +95,8 @@ struct reify : public ParentConstraint
   virtual string constraint_name()
   { return "reify"; }
 
+  CONSTRAINT_ARG_LIST2(child_constraints[0], reify_var);
+
   BoolVar reify_var;
   SysInt reify_var_num;
 

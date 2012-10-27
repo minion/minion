@@ -430,8 +430,8 @@ struct SparseBoundVarContainer {
   Var getBaseVar(const SparseBoundVarRef_internal<BoundType>& b) const
   { return Var(VAR_SPARSEBOUND, b.var_num); }
 
-  void getMapperStack(vector<Mapper>& v) const
-  { }
+  vector<Mapper> getMapperStack() const
+  { return vector<Mapper>(); }
 
 
 #ifdef WDEG

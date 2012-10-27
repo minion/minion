@@ -160,9 +160,8 @@ struct BoundVarRef_internal
 
   Var getBaseVar() const { return Var(VAR_BOUND, var_num); }
 
-  void getMapperStack(vector<Mapper>& v) const
-  { }
-
+  vector<Mapper> getMapperStack() const
+  { return vector<Mapper>(); }
   
 #ifdef WDEG
   SysInt getBaseWdeg()

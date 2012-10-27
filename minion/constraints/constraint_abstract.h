@@ -59,9 +59,7 @@ namespace ConOutput
   template<typename T>
   string print_vars(const T& t)
   {
-    vector<Mapper> v;
-    t.getMapperStack(v);
-    D_ASSERT(v.empty());
+    D_ASSERT(t.getMapperStack().empty());
     if(t.isAssigned())
       return to_string(t.getAssignedValue());
     else
@@ -69,8 +67,11 @@ namespace ConOutput
   }
 
   inline
-  string print_vars(const TupleList*& t)
+  string print_vars(TupleList* const& t)
   { return t->getName(); }
+
+  inline
+  string print_vars(AbstractConstraint* const& c);
 
   inline
   string print_vars(const DomainInt& i)
@@ -137,8 +138,7 @@ namespace ConOutput
   string print_sum_con(string name, bool neg, const T1& sumvars, const T2& result)
   {
     {
-      vector<Mapper> v;
-      result.getMapperStack(v);
+      vector<Mapper> v = result.getMapperStack();
       if(neg)
       {
         D_ASSERT(v.size() == 1 && v[0] == Mapper(MAP_SHIFT, -1));
@@ -151,16 +151,9 @@ namespace ConOutput
 
     if(!sumvars.empty())
     {
-      vector<Mapper> v;
-      sumvars[0].getMapperStack(v);
-      if(v.empty())
+      for(int i = 1; i < sumvars.size(); ++i)
       {
-        for(int i = 0; i < v.size(); ++i)
-        {
-          vector<Mapper> w;
-          sumvars[i].getMapperStack(w);
-          D_ASSERT(w.empty());
-        }
+        D_ASSERT(sumvars[0].getMapperStack().size() == sumvars[i].getMapperStack().size());
       }
       
     }
@@ -572,6 +565,13 @@ inline void DynamicTrigger::propagate()
 {
   D_ASSERT(sanity_check == 1234);
   constraint->propagate(this);
+}
+
+namespace ConOutput
+{
+  inline
+  string print_vars(AbstractConstraint* const& c)
+  { return c->full_output_name(); }
 }
 
 #endif

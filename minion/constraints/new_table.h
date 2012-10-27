@@ -204,9 +204,14 @@ public:
 template<typename VarArray, typename TableDataType = TrieData, typename TableStateType = TrieState>
 struct NewTableConstraint : public AbstractConstraint
 {
-  virtual string constraint_name()
-    { return "table"; }
+  virtual string extended_name()
+  { return "table(new)"; }
 
+  virtual string constraint_name()
+  { return "table"; }
+
+  CONSTRAINT_ARG_LIST2(vars, tuples);
+  
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
 

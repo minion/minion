@@ -144,10 +144,11 @@ struct ShiftVar
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
-  void getMapperStack(vector<Mapper>& v) const
+  vector<Mapper> getMapperStack() const
   { 
-    data.getMapperStack(v);
+    vector<Mapper> v = data.getMapperStack();
     v.push_back(Mapper(MAP_SHIFT, (DomainInt)shift)); 
+    return v;
   }
 
 

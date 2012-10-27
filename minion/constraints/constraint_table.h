@@ -23,6 +23,10 @@
 template<typename VarArray>
 struct TableConstraint : public AbstractConstraint
 {
+
+  virtual string extended_name()
+  { return "table(basic)"; }
+
   virtual string constraint_name()
   { return "table"; }
   

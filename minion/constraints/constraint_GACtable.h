@@ -87,7 +87,7 @@ help input tuplelist
 template<typename VarArray>
 struct GACTableConstraint : public AbstractConstraint
 {
-    virtual string extended_name()
+  virtual string extended_name()
   { return "table(bound)"; }
   
   virtual string constraint_name()

@@ -191,10 +191,11 @@ struct SwitchNeg
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
-  void getMapperStack(vector<Mapper>& v) const
+  vector<Mapper> getMapperStack() const
   { 
-    data.getMapperStack(v);
-    v.push_back(Mapper(MAP_SWITCH_NEG, multiplier)); 
+    vector<Mapper> v = data.getMapperStack();
+    v.push_back(Mapper(MAP_SWITCH_NEG, multiplier));
+    return v;
   }
 
 

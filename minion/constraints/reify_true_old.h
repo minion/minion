@@ -43,6 +43,8 @@ struct reify_true_old : public AbstractConstraint
   virtual string constraint_name()
   { return "reifyimply-old"; }
   
+    CONSTRAINT_ARG_LIST2(poscon, rar_var);
+
   AbstractConstraint* poscon;
   BoolVar rar_var;
   bool constraint_locked;

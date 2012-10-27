@@ -27,7 +27,8 @@ struct BoundsTableConstraint : public AbstractConstraint
   { return "table(bound)"; }
   
   virtual string constraint_name()
-{ return "table"; }
+  { return "table"; }
+  
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;

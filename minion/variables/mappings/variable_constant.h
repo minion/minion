@@ -117,8 +117,8 @@ struct ConstantVar
 
   Var getBaseVar() const { return Var(VAR_CONSTANT, val); }
 
-  void getMapperStack(vector<Mapper>&) const
-  {  }
+  vector<Mapper> getMapperStack() const
+  { return vector<Mapper>(); }
 
 #ifdef WDEG
   SysInt getBaseWdeg() { return 0; } //wdeg is irrelevant for non-search var

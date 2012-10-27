@@ -581,8 +581,8 @@ public:
   Var getBaseVar(const BigRangeVarRef_internal& b) const
   { return Var(VAR_DISCRETE, b.var_num); }
 
-  void getMapperStack(vector<Mapper>& v) const
-  { }
+  vector<Mapper> getMapperStack() const
+  { return vector<Mapper>(); }
 
 
 #ifdef WDEG

@@ -175,12 +175,14 @@ struct Regin
 template<typename VarArray>
 struct GACTableConstraint : public AbstractConstraint
 {
-    virtual string extended_name()
+  virtual string extended_name()
   { return "table(regin)"; }
 
   virtual string constraint_name()
   { return "table"; }
   
+  CONSTRAINT_ARG_LIST2(vars, tupleList);
+
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
   

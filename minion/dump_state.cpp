@@ -19,6 +19,28 @@
 
 #include "minion.h"
 
+
+void dump_searchorder(StateObj* state, const SearchOrder& order, ostream& os)
+{
+    vector<bool> variable_output;
+
+    os << "VARORDER ";
+    if(order.find_one_solution)
+        os << "AUX ";
+
+    switch(order.order)
+    {
+#define Z(x) case ORDER_##x: os << #x << " "; break;
+        Z(STATIC) Z(SDF) Z(SRF) Z(LDF) Z(ORIGINAL)
+        Z(WDEG) Z(CONFLICT) Z(DOMOVERWDEG)
+#undef Z
+        default: abort();
+    }
+
+
+
+}
+
 void dump_solver(StateObj* state, ostream& os)
 {
     os << "# Redumped during search" << endl;
@@ -84,16 +106,16 @@ void dump_solver(StateObj* state, ostream& os)
     }
 
     // tuples
-
+    os << "**TUPLELIST**" << endl;
     SearchState& search_state = getState(state);
 
     for(UnsignedSysInt i = 0; i < search_state.getTupleListContainer()->size(); ++i)
     {
         TupleList* tl = search_state.getTupleListContainer()->getTupleList(i);
-        os << tl->getName() << " " << tl->tuple_size() << " " << tl->size() << "\n";
+        os << tl->getName() << " " << tl->size() << " " << tl->tuple_size() << "\n";
         for(SysInt i = 0; i < tl->size() * tl->tuple_size(); ++i)
         {
-            os << (*tl)[i] << " ";
+            os << (tl->getPointer())[i] << " ";
         }
         os << endl;
     }

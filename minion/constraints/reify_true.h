@@ -46,6 +46,8 @@ template<typename BoolVar, bool DoWatchAssignment>
       return "reifyimply-quick";
   }
 
+  CONSTRAINT_ARG_LIST2(child_constraints[0], rar_var);
+
   BoolVar rar_var;
   bool constraint_locked;
 
