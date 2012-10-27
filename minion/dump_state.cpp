@@ -25,7 +25,7 @@ void dump_searchorder(StateObj* state, const SearchOrder& order, ostream& os)
     vector<bool> variable_output;
 
     os << "VARORDER ";
-    if(order.find_one_solution)
+   // if(order.find_one_solution)
         os << "AUX ";
 
     switch(order.order)
