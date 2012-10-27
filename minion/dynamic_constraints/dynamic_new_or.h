@@ -53,6 +53,7 @@ struct Dynamic_OR : public ParentConstraint
   virtual string constraint_name()
     { return "watched-or"; }
 
+  CONSTRAINT_ARG_LIST1(child_constraints);
 
   Reversible<bool> full_propagate_called;
   bool constraint_locked;

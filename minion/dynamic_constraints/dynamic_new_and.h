@@ -63,8 +63,9 @@ of another constraint, for example in a reification:
 struct Dynamic_AND : public ParentConstraint
 {
   virtual string constraint_name()
-    { return "watched-and"; }
+  { return "watched-and"; }
 
+  CONSTRAINT_ARG_LIST1(child_constraints);
     
   bool constraint_locked;
   SysInt propagated_to;

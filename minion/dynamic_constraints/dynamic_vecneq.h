@@ -321,7 +321,9 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   struct ConName : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return STRINGIFY(VEC_NAME) "VecNeqDynamic"; }
+    { return "?"; }
+
+  CONSTRAINT_ARG_LIST2(var_array1, var_array2);
 
   typedef typename VarArray1::value_type VarRef1;
   typedef typename VarArray2::value_type VarRef2;
