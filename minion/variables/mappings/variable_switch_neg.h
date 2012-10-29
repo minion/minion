@@ -29,6 +29,8 @@ struct SwitchNeg
   BOOL isBound() const
   { return data.isBound();}
   
+  AnyVarRef popOneMapper() const
+  { return data; }
 
   DomainInt multiplier;
   SwitchNeg(VarT _data, DomainInt _multiplier) : data(_data), multiplier(_multiplier)

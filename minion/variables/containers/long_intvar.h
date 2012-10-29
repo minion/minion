@@ -52,6 +52,9 @@ struct BigRangeVarRef_internal_template
   BOOL isBound() const
   { return false;}
   
+  AnyVarRef popOneMapper() const
+  { FATAL_REPORTABLE_ERROR(); }
+
   SysInt var_num;
 
 #ifdef MANY_VAR_CONTAINERS

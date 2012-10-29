@@ -35,6 +35,9 @@ struct VarNeg
   static const BoundType isBoundConst = VarT::isBoundConst;
   VarT data;
 
+  AnyVarRef popOneMapper() const
+  { return data; }
+
   BOOL isBound() const
   { return data.isBound();}
   

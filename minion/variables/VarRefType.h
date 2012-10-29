@@ -40,6 +40,9 @@ struct VarRefType
   
   BOOL isBound() const
   { return data.isBound();}
+
+  AnyVarRef popOneMapper() const
+  { FATAL_REPORTABLE_ERROR(); }
   
   VarRefType(const InternalRefType& _data) : data(_data)
   {}
@@ -149,6 +152,9 @@ struct QuickVarRefType
   static const BoundType isBoundConst = InternalRefType::isBoundConst;
   InternalRefType data;
   
+  AnyVarRef popOneMapper() const
+  { FATAL_REPORTABLE_ERROR(); }
+
   BOOL isBound() const
   { return data.isBound();}
   

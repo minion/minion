@@ -35,6 +35,9 @@ struct ConstantVar
 
   DomainInt val;
 
+  AnyVarRef popOneMapper() const
+  { FATAL_REPORTABLE_ERROR(); }
+
   explicit ConstantVar(StateObj* _stateObj, DomainInt _val) : stateObj(_stateObj), val(_val)
   {}
 

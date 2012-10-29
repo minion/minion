@@ -54,6 +54,9 @@ struct BoundVarRef_internal
   BOOL isBound() const
   { return true;}
 
+  AnyVarRef popOneMapper() const
+  { FATAL_REPORTABLE_ERROR(); }
+  
   MoveablePointer var_bound_data;
   DomainInt var_num;
   

@@ -65,6 +65,9 @@ struct BoolVarRef_internal
   static string name() { return "Bool"; }
   BOOL isBound() const
   { return false;}
+
+  AnyVarRef popOneMapper() const
+  { FATAL_REPORTABLE_ERROR(); }
   
   data_type shift_offset;
   SysInt var_num;

@@ -258,6 +258,9 @@ struct MultiplyVar
   static const BoundType isBoundConst = Bound_Yes;
   BOOL isBound() const
   { return true; }
+
+  AnyVarRef popOneMapper() const
+  { return data; }
   
   VarRef data;
   DomainInt Multiply;

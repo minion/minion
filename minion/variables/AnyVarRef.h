@@ -153,6 +153,7 @@ class DynamicTrigger;
 struct AnyVarRef_Abstract
 {
   virtual BOOL isBound() const = 0;
+  virtual AnyVarRef popOneMapper() const = 0;
   virtual BOOL isAssigned() const = 0;  
   virtual DomainInt getAssignedValue() const = 0;
   virtual BOOL isAssignedValue(DomainInt i) const = 0;
@@ -195,6 +196,8 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 
   virtual BOOL isBound() const
   { return data.isBound();}
+
+  AnyVarRef popOneMapper() const;
   
   VarRef data;
   AnyVarRef_Concrete(const VarRef& _data) : data(_data)
@@ -301,6 +304,9 @@ public:
   
   BOOL isBound() const
   { return data->isBound();}
+
+  AnyVarRef popOneMapper() const
+  { return data->popOneMapper(); }
   
   template<typename VarRef>
     AnyVarRef(const VarRef& _data) 
@@ -397,5 +403,10 @@ public:
   {  data->addDynamicTrigger(t, type, pos BT_CALL); }
 #endif
 };
+
+
+template<typename VarRef>
+AnyVarRef AnyVarRef_Concrete<VarRef>::popOneMapper() const
+{ return data.popOneMapper(); }
 
 #endif

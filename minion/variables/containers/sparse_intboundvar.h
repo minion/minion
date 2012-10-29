@@ -55,6 +55,9 @@ struct SparseBoundVarRef_internal
   static string name() { return "SparseBound"; }
   BOOL isBound() const
   { return true;}
+
+  AnyVarRef popOneMapper() const
+  { FATAL_REPORTABLE_ERROR(); }
   
   SysInt var_num;
 

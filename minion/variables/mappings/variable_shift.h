@@ -28,6 +28,9 @@ struct ShiftVar
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
   
+  AnyVarRef popOneMapper() const
+  { return data; }
+
   BOOL isBound() const
   { return data.isBound();}
   
