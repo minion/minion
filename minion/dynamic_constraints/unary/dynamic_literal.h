@@ -37,8 +37,9 @@ template<typename Var>
   struct WatchLiteralConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "WatchedLiteral"; }
+    { return "w-literal"; }
 
+  CONSTRAINT_ARG_LIST2(var, val);
   Var var;
 
   DomainInt val;

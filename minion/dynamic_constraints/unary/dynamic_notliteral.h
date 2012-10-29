@@ -34,11 +34,13 @@
 template<typename Var>
   struct WatchNotLiteralConstraint : public AbstractConstraint
 {
-  virtual string constraint_name() { return "WatchedNotLiteral"; }
+  virtual string constraint_name() { return "w-notliteral"; }
 
   Var var;
 
   DomainInt val;
+
+  CONSTRAINT_ARG_LIST2(var, val);
 
   template<typename T>
   WatchNotLiteralConstraint(StateObj* _stateObj, const Var& _var, const T& _val) :

@@ -36,7 +36,9 @@ template<typename Var>
   struct WatchInSetConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "WatchedInSet"; }
+    { return "w-inset"; }
+
+  CONSTRAINT_ARG_LIST2(var, vals);
 
   Var var;
 

@@ -35,8 +35,9 @@ template<typename Var>
   struct WatchInRangeConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "WatchedInRange"; }
+    { return "w-inrange"; }
 
+  CONSTRAINT_ARG_LIST2(var, make_vec(range_min, range_max));
   Var var;
 
   DomainInt range_min;
