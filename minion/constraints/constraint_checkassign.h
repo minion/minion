@@ -37,7 +37,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   vector<DomainInt> assignment;
   
   
-  CheckAssignConstraint(StateObj* _stateObj, VarArray& vars, OriginalConstraint& con)
+  CheckAssignConstraint(StateObj* _stateObj, const VarArray& vars, OriginalConstraint& con)
   : AbstractConstraint(_stateObj), originalcon(con),variables(vars), assigned_vars(stateObj), assignment(variables.size())
   { }
   

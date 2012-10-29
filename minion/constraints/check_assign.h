@@ -49,6 +49,12 @@ struct Check_Assign : public AbstractConstraint
   AbstractConstraint(_stateObj), child(_con)
   { }
 
+  virtual AbstractConstraint* reverse_constraint()
+  {
+    return new Check_Assign(stateObj, child->reverse_constraint());
+  }
+
+
   virtual ~Check_Assign()
     { delete child; }
 

@@ -24,6 +24,8 @@
 #include "../memory_management/reversible_vals.h"
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
+#include "../dynamic_constraints/dynamic_new_and.h"
+#include "../dynamic_constraints/unary/dynamic_literal.h"
 
 #ifdef P
 #undef P
@@ -60,8 +62,14 @@ template<typename BoolVar, bool DoWatchAssignment>
     child_constraints.push_back(_poscon);
   }
 
+  // (var -> C) is equiv to (!var \/ C), so reverse is (var /\ !C)
   virtual AbstractConstraint* reverse_constraint()
-  { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
+  { 
+    vector<AbstractConstraint*> con;
+    con.push_back(new WatchLiteralConstraint<BoolVar>(stateObj, rar_var, 1));
+    con.push_back(child_constraints[0]->reverse_constraint());
+    return new Dynamic_AND(stateObj, con);
+  }
 
   virtual SysInt dynamic_trigger_count()
   {

@@ -26,6 +26,12 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
   virtual string constraint_name()
   { return "watchsumgeq"; }
   
+  virtual AbstractConstraint* reverse_constraint()
+  {
+    return new BoolLessSumConstraintDynamic<VarArray, DomainInt, 1>
+               (stateObj, var_array, var_array.size());
+  }
+
   typedef typename VarArray::value_type VarRef;
   
   CONSTRAINT_ARG_LIST2(var_array, (DomainInt)1);

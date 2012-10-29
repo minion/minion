@@ -32,7 +32,8 @@
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 #include "../dynamic_constraints/old_dynamic_reifyimply.h"
-
+#include "../dynamic_constraints/dynamic_new_and.h"
+#include "../dynamic_constraints/unary/dynamic_literal.h"
 
 template<typename BoolVar>
 struct reify_true_old : public AbstractConstraint
@@ -56,9 +57,15 @@ struct reify_true_old : public AbstractConstraint
                                                                             full_propagate_called(stateObj, false)
   { }
   
+  // (var -> C) is equiv to (!var \/ C), so reverse is (var /\ !C)
   virtual AbstractConstraint* reverse_constraint()
-  { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
-  
+  { 
+    vector<AbstractConstraint*> con;
+    con.push_back(new WatchLiteralConstraint<BoolVar>(stateObj, rar_var, 1));
+    con.push_back(poscon->reverse_constraint());
+    return new Dynamic_AND(stateObj, con);
+  }
+
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     

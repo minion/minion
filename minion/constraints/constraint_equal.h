@@ -78,6 +78,12 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   EqualVarRef2 var2;
   BoolVarRef var3;
 
+  virtual AbstractConstraint* reverse_constraint()
+  {
+    return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, typename NotType<BoolVarRef>::type>
+                 (stateObj, var1, var2, VarNotRef(var3));
+  }
+
   virtual string full_output_name()
   {
     vector<Mapper> v = var2.getMapperStack();

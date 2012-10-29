@@ -51,6 +51,11 @@ struct Check_GSA : public AbstractConstraint
   virtual ~Check_GSA()
       { delete child; }
   
+  virtual AbstractConstraint* reverse_constraint()
+  {
+    return new Check_GSA(stateObj, child->reverse_constraint());
+  }
+
   virtual SysInt dynamic_trigger_count()
    { return child->get_vars_singleton()->size()*2; }
 

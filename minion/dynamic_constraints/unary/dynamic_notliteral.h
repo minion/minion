@@ -115,7 +115,9 @@ template<typename Var>
 
 struct WatchNotLiteralBoolConstraint : public AbstractConstraint
 {
-  virtual string constraint_name() { return "WatchedNotLiteral"; }
+   virtual string constraint_name() { return "w-notliteral"; }
+
+  CONSTRAINT_ARG_LIST2(var, val);
 
   BoolVarRef var;
 

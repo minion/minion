@@ -19,6 +19,13 @@
 
 #include "minion.h"
 
+bool constraint_entailed(AbstractConstraint* c)
+{
+    AbstractConstraint* rev_c = c->reverse_constraint();
+    bool flag;
+    GET_ASSIGNMENT(a, rev_c);
+    return !flag;
+}
 
 void dump_searchorder(StateObj* state, const SearchOrder& order, ostream& os)
 {
@@ -118,6 +125,39 @@ void dump_solver(StateObj* state, ostream& os)
             os << "DISCRETE " << bv.getBaseVar().get_name() << " ";
             os << "{" << bv.getMin() << ".." << bv.getMax() << "}" << endl;
         }
+        vector<DomainInt> deleted_values;
+        for(DomainInt i = bv.getMin() + 1; i < bv.getMax(); ++i)
+        {
+            if(!bv.inDomain(i))
+                deleted_values.push_back(i);
+        }
+        if(!deleted_values.empty())
+        {
+            os << "**CONSTRAINTS**" << endl;
+            if(deleted_values.size() < bv.getMax() - bv.getMin() + 1)
+            {
+                os << "w-notinset(" << bv.getBaseVar().get_name() << ", [";
+                bool first=true;
+                for(size_t i = 0; i < deleted_values.size(); ++i)
+                {
+                    if(first) first = false; else os << ",";
+                    os << deleted_values[i];
+                }
+                os << "])" << endl;
+            }
+            else
+            {
+                os << "w-inset(" << bv.getBaseVar().get_name() << ", [";
+                os << bv.getMin();
+                for(DomainInt i = bv.getMin() + 1; i <= bv.getMax(); ++i)
+                {
+                    if(bv.inDomain(i))
+                        os << "," << i;
+                }
+                os << "])" << endl;
+            }
+            os << "**VARIABLES**" << endl;
+        }
     }
     
 
@@ -183,11 +223,20 @@ void dump_solver(StateObj* state, ostream& os)
     }
 
     os << "**CONSTRAINTS**" << endl;
-    for(UnsignedSysInt i = 0; i < search_state.getConstraintList().size(); ++i)
+
+    if(getState(state).isFailed())
+        os << "false()" << endl;
+    else
     {
-        os << search_state.getConstraintList()[i]->full_output_name() << "\n";
+        for(UnsignedSysInt i = 0; i < search_state.getConstraintList().size(); ++i)
+        {
+            AbstractConstraint* c = search_state.getConstraintList()[i];
+            // If it wasn't for the fact we are going to exit straight after printing this out, this would be a disaster!
+            if(!constraint_entailed(c))
+                os << search_state.getConstraintList()[i]->full_output_name() << "\n";
+        }
     }
-    
+
     os << "**EOF**" << endl;
 }
 
@@ -195,4 +244,5 @@ void dump_solver(StateObj* state, string filename)
 {
     ofstream ofs(filename.c_str());
     dump_solver(state, ofs);
+    exit(0);
 }

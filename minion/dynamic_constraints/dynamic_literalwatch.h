@@ -61,6 +61,13 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 
   CONSTRAINT_ARG_LIST3(var_array, value_array, var_sum);
     
+
+         // Function to make it reifiable in the lousiest way.
+  virtual AbstractConstraint* reverse_constraint()
+  {
+      return new CheckAssignConstraint<vector<AnyVarRef>, LiteralSumConstraintDynamic>(stateObj, get_vars(), *this);
+  }
+
   SysInt& unwatched(DomainInt i)
   { return static_cast<SysInt*>(unwatched_indexes.get_ptr())[checked_cast<SysInt>(i)]; }
   

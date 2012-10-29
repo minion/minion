@@ -192,6 +192,11 @@ template<typename T>
 struct NotType
 { typedef VarNot<T> type; };
 
+// not(not(T)) = T
+template<typename T>
+struct NotType<VarNot<T> >
+{ typedef T type; };
+
 template<typename T>
 struct NotType<vector<T> >
 { typedef vector<VarNot<T> > type; };
@@ -211,6 +216,11 @@ template<typename VRef>
 typename NotType<VRef>::type
 VarNotRef(const VRef& var_ref)
 { return VarNot<VRef>(var_ref); }
+
+template<typename VRef>
+typename NotType<VRef>::type
+VarNotRef(const VarNot<VRef>& var_ref)
+{ return var_ref.data; }
 
 template<typename VarRef>
 vector<VarNot<VarRef> >
