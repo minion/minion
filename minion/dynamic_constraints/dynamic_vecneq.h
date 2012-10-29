@@ -321,7 +321,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   struct ConName : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "?"; }
+    { return "watchvecneq"; }
 
   CONSTRAINT_ARG_LIST2(var_array1, var_array2);
 
