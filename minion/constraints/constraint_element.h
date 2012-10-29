@@ -105,13 +105,24 @@ template<typename VarArray, typename IndexRef, typename VarRef>
 struct ElementConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "watchelement"; }
+  { return "element"; }
   
   VarArray var_array;
   IndexRef index_ref;
   VarRef result_var;
 
-  CONSTRAINT_ARG_LIST3(var_array, index_ref, result_var);
+  virtual string full_output_name()
+  {
+    vector<Mapper> v = index_ref.getMapperStack();
+    if(!v.empty() && v.back() == Mapper(MAP_SHIFT, -1))
+    {
+      return ConOutput::print_con("element_one", var_array, index_ref.popOneMapper(), result_var);
+    }
+    else
+    {
+      return ConOutput::print_con("element", var_array, index_ref, result_var);
+    }
+  }
 
   ElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexRef& _index_ref, const VarRef& _result_var) :
     AbstractConstraint(_stateObj), var_array(_var_array), index_ref(_index_ref), result_var(_result_var)

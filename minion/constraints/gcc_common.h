@@ -1394,6 +1394,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             return "gccweak";
     }
     
+    CONSTRAINT_ARG_LIST3(var_array, val_array, capacity_array);
+
     virtual triggerCollection setup_internal()
     {
         triggerCollection t;

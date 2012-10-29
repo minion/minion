@@ -29,7 +29,7 @@ struct GACTableConstraint : public AbstractConstraint
   { return "table(trie)"; }
 
   virtual string constraint_name()
-  { return "table"; }
+  { if(negative) return "negativetable"; else return "table"; }
   
   CONSTRAINT_ARG_LIST2(vars, tuples);
 

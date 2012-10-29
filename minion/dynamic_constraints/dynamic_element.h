@@ -88,7 +88,18 @@ struct ElementConstraintDynamic : public AbstractConstraint
   Index indexvar;
   Result resultvar;
 
-  CONSTRAINT_ARG_LIST3(var_array, indexvar, resultvar);
+  virtual string full_output_name()
+  {
+    vector<Mapper> v = indexvar.getMapperStack();
+    if(!v.empty() && v.back() == Mapper(MAP_SHIFT, -1))
+    {
+      return ConOutput::print_con("watchelement_one", var_array, indexvar.popOneMapper(), resultvar);
+    }
+    else
+    {
+      return ConOutput::print_con("watchelement", var_array, indexvar, resultvar);
+    }
+  }
   
   DomainInt initial_result_dom_min;
   DomainInt initial_result_dom_max;
