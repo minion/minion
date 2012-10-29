@@ -127,6 +127,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         return "gacalldiff";
     }
     
+    CONSTRAINT_ARG_LIST1(var_array);
+
     vector<SysInt> SCCs;    // Variable numbers
     ReversibleMonotonicSet SCCSplit;
     // If !SCCSplit.isMember(anIndex) then anIndex is the last index in an SCC.
