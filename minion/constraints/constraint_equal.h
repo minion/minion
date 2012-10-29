@@ -80,8 +80,10 @@ struct ReifiedEqualConstraint : public AbstractConstraint
 
   virtual AbstractConstraint* reverse_constraint()
   {
-    return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, typename NotType<BoolVarRef>::type>
-                 (stateObj, var1, var2, VarNotRef(var3));
+    typedef typename NotType<BoolVarRef>::type NotTypedef;
+    NotTypedef v = VarNotRef(var3);
+    return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, NotTypedef>
+                 (stateObj, var1, var2, var3);
   }
 
   virtual string full_output_name()
