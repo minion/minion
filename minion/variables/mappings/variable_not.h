@@ -218,7 +218,7 @@ VarNotRef(const VRef& var_ref)
 { return VarNot<VRef>(var_ref); }
 
 template<typename VRef>
-typename NotType<VRef>::type
+VRef
 VarNotRef(const VarNot<VRef>& var_ref)
 { return var_ref.data; }
 
