@@ -130,33 +130,57 @@ struct CheckAssignConstraint : public AbstractConstraint
     return vars;
   }
   
-  // Getting a satisfying assignment here is too hard
-     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-   {
-     MAKE_STACK_BOX(c, DomainInt, variables.size());
-     
-     for(SysInt i = 0; i < variables.size(); ++i)
-     {
-       if(!variables[i].isAssigned()) 
-       {
-         assignment.push_back(make_pair(i, variables[i].getMin()));
-         assignment.push_back(make_pair(i, variables[i].getMax()));
-         return true;
-       }
-       else
-         c.push_back(variables[i].getAssignedValue());
-     }
-    
-    if(check_assignment(c.begin(), c.size()))
-    {  // Put the complete assignment in the box.
-      for(SysInt i = 0; i < variables.size(); ++i)
+  // Getting a satisfying assignment here is too hard.
+  // Let's at least try forward checking!
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
+  {
+    MAKE_STACK_BOX(c, DomainInt, variables.size());
+
+    SysInt free_var = -1;
+    for(SysInt i = 0; i < variables.size(); ++i)
+    {
+      if(!variables[i].isAssigned()) 
       {
-        assignment.push_back(make_pair(i, c[i]));
+        if(free_var != -1)
+        {
+          assignment.push_back(make_pair(i, variables[i].getMin()));
+          assignment.push_back(make_pair(i, variables[i].getMax()));
+          return true;
+        }
+      else
+        c.push_back(0);
       }
-      return true;
+      else
+        c.push_back(variables[i].getAssignedValue());
+    }
+
+    if(free_var == -1)
+    {
+      if(check_assignment(c.begin(), c.size()))
+      {  // Put the complete assignment in the box.
+        for(SysInt i = 0; i < variables.size(); ++i)
+        {
+          assignment.push_back(make_pair(i, c[i]));
+        }
+        return true;
+      }
+    }
+    else
+    {
+      for(DomainInt i = variables[free_var].getMin() ; i <= variables[free_var].getMax(); ++i)
+      {
+        c[free_var] = i;
+        if(check_assignment(c.begin(), c.size()))
+        {
+          // Put the complete assignment in the box.
+          for(SysInt i = 0; i < variables.size(); ++i)
+            assignment.push_back(make_pair(i, c[i]));
+          return true;
+        }
+      }
     }
     return false;
-   }
+  }
 };
 
 #endif
