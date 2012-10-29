@@ -88,6 +88,12 @@ namespace ConOutput
   string print_vars(const DomainInt& i)
   { return to_string(i); }
 
+#ifdef MINION_DEBUG
+  inline
+  string print_vars(const SysInt& i)
+  { return to_string(i); }
+#endif
+
   template<SysInt i>
   string print_vars(const compiletime_val<i>)
   { return to_string(i); }
@@ -147,12 +153,6 @@ namespace ConOutput
     return o.str();
   }
   
-#ifdef MINION_DEBUG
-  inline
-  string print_vars(SysInt i)
-  { return to_string(i); }
-#endif
-
   inline
   string print_con(string name)
   { return name + "()"; }
