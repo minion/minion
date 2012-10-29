@@ -25,8 +25,11 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1 >
 struct BoolLessSumConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { if(VarToCount) return "Bool<=Sum"; else return "Bool>=Sum"; }
+  { if(VarToCount) return "sumleq"; else return "sumgeq"; }
   
+  CONSTRAINT_ARG_LIST2(var_array, ConstantVar(stateObj, var_sum));
+
+
   typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   

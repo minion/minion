@@ -96,10 +96,13 @@ void _NORETURN FAIL_EXIT(string s = "");
 
 struct assert_fail {};
 
-void assert_function(BOOL x, const char* a, const char* f, SysInt line);
+void error_printing_function(const char* a, const char* f, SysInt line) __attribute__ ((noreturn));
 
-// Unlike Asserts, Checks are always enabled.
-#define CHECK(x, y) {assert_function(x, y, __FILE__, __LINE__);}
+void FATAL_REPORTABLE_ERROR()  __attribute__ ((noreturn));
+
+
+// Unlike Asserts, Checks are always enabled. The 'abort' is there just to stop the compiler complaining.
+#define CHECK(x, y) { if(!(x)) {error_printing_function(y, __FILE__, __LINE__); } }
 
 // Check a value doesn't overflow, to be used in ctor of cts 
 #define CHECKSIZE( x, message ) CHECK( x <= ((BigInt) checked_cast<SysInt>(DomainInt_Max)) && x>= ((BigInt) checked_cast<SysInt>(DomainInt_Min)) , message )
@@ -110,7 +113,7 @@ void assert_function(BOOL x, const char* a, const char* f, SysInt line);
 #define BOUNDS_CHECK
 #endif
 
-#define D_ASSERT(x) assert_function(x, #x, __FILE__, __LINE__);
+#define D_ASSERT(x) {if(!(x)) {error_printing_function(#x, __FILE__, __LINE__); } }
 #define D_DATA(x) x
 
 enum DebugTypes

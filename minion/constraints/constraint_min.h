@@ -58,7 +58,7 @@ struct MinConstraint : public AbstractConstraint
   virtual string constraint_name()
   { return "min"; }
   
-  CONSTRAINT_ARG_LIST2(var_array, min_var);
+  CONSTRAINT_REVERSIBLE_ARG_LIST2("min", "max", var_array, min_var);
 
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type ArrayVarRef;

@@ -52,3 +52,12 @@ vector<T> make_vec(const T& t)
   vec[0] = t;
   return vec;
 }
+
+template<typename T>
+vector<T> make_vec(const T& t1, const T& t2)
+{
+  vector<T> vec(2);
+  vec[0] = t1;
+  vec[1] = t2;
+  return vec;
+}

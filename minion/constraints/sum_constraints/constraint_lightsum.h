@@ -30,6 +30,9 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
   virtual string constraint_name()
   { return "Light<=Sum"; }
   
+  CONSTRAINT_WEIGHTED_REVERSIBLE_ARG_LIST2("weighted", "sumleq", "sumgeq", var_array, var_sum);
+
+
   bool no_negatives;
   
   array<VarRef, size> var_array;  

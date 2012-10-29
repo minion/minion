@@ -25,6 +25,17 @@ bool debug_crash = false;
 
 bool in_cspcomp_for_failexit = false;
 
+void FATAL_REPORTABLE_ERROR()
+{
+  cerr << "Minion has had an internal error, due to the instance you are using." << endl;
+  cerr << "This is (probably) not your fault, but instead a bug in Minion." << endl;
+  cerr << "We would appreciate it if you could report this output, and the instance which" << endl;
+  cerr << "caused the problem to us. Thank you." << endl;
+  cerr.flush();
+  cout.flush();
+  FAIL_EXIT();
+}
+
 void D_FATAL_ERROR2(string s, string file, string line)
 { 
   cerr << "Sorry, there has been some kind of error." << endl;
@@ -57,17 +68,14 @@ void _NORETURN FAIL_EXIT(string s)
   throw 9;
 }
 
-void assert_function(BOOL x, const char* a, const char* f, SysInt line)
+void error_printing_function(const char* a, const char* f, SysInt line)
 { 
-  if(!x) 
-  {
-    cerr << "Assert Error!" << endl;
-    cerr << "Test '" << a << "' failed." << endl;
-    cerr << "In file " << f << ", line " << line << endl;
-    cerr << "\n";
-    cout << "\n";
-    cout.flush();
-    cerr.flush();
-    FAIL_EXIT();
-  }
+  cerr << "Assert Error!" << endl;
+  cerr << "Test '" << a << "' failed." << endl;
+  cerr << "In file " << f << ", line " << line << endl;
+  cerr << "\n";
+  cout << "\n";
+  cout.flush();
+  cerr.flush();
+  FAIL_EXIT();
 }

@@ -24,10 +24,12 @@ template<typename VarArray>
 struct BoolSATConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "BoolSATDynamic"; }
+  { return "watchsumgeq"; }
   
   typedef typename VarArray::value_type VarRef;
   
+  CONSTRAINT_ARG_LIST2(var_array, (DomainInt)1);
+
   VarArray var_array;
 
   SysInt last;

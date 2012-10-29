@@ -33,6 +33,11 @@ struct InfoRefType
   BOOL isBound() const
   { return data.isBound();}
   
+  // Here we just pass through, as we don't know if this is the bottom or not.
+  AnyVarRef popOneMapper() const
+  { return data.popOneMapper(); }
+
+
   InfoRefType(const WrapType& _data) : data(_data)
   { VAR_INFO_ADDONE(VAR_TYPE, copy); }
   

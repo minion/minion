@@ -110,8 +110,27 @@ namespace ConOutput
     return o.str();
   }
 
+
   template<typename T>
   string print_vars(const std::vector<T>& t)
+  {
+    ostringstream o;
+    o << "[";
+    bool first = true;
+    for(size_t i = 0; i < t.size(); ++i)
+    {
+      if(!first)
+        o << ",";
+      else
+        first = false;
+      o << ConOutput::print_vars(t[i]);
+    }
+    o << "]";
+    return o.str();
+  }
+
+  template<typename T, size_t len>
+  string print_vars(const array<T,len>& t)
   {
     ostringstream o;
     o << "[";
@@ -163,30 +182,78 @@ namespace ConOutput
     return name + "(" + s1 + "," + s2 + "," + s3 + ")";
   }
 
-  template<typename T1, typename T2>
-  string print_sum_con(string name, bool neg, const T1& sumvars, const T2& result)
-  {
-    {
-      vector<Mapper> v = result.getMapperStack();
-      if(neg)
-      {
-        D_ASSERT(v.size() == 1 && v[0] == Mapper(MAP_SHIFT, -1));
-      }
-      else
-      {
-        D_ASSERT(v.size() == 0);
-      }
-    }
 
-    if(!sumvars.empty())
+
+
+  template<typename T1, typename T2>
+  string print_reversible_con(string name, string neg_name, const T1& vars, const T2& res)
+  {
+    vector<Mapper> m = res.getMapperStack();
+    if(!m.empty() && m.back() == Mapper(MAP_NEG))
     {
-      for(int i = 1; i < sumvars.size(); ++i)
+      vector<AnyVarRef> pops;
+      for(size_t i = 0; i < vars.size(); ++i)
       {
-        D_ASSERT(sumvars[0].getMapperStack().size() == sumvars[i].getMapperStack().size());
+        vector<Mapper> mapi = vars[i].getMapperStack();
+        if(mapi.empty() || mapi.back() != Mapper(MAP_NEG))
+          FATAL_REPORTABLE_ERROR();
+        pops.push_back(vars[i].popOneMapper());
       }
-      
+      return print_con(neg_name, pops, res.popOneMapper());
     }
-    return "";
+    else
+    {
+      return print_con(name, vars, res);
+    }
+  }
+
+template<typename T1, typename T2>
+  string print_weighted_con(string weight, string name, const T1& sumvars, const T2& result)
+  {
+    if(sumvars.empty())
+      return print_con(name, sumvars, result);
+
+    vector<Mapper> v = sumvars[0].getMapperStack();
+    if(!v.empty() && (v.back().type() == MAP_MULT || v.back().type() == MAP_SWITCH_NEG))
+    {
+      vector<AnyVarRef> pops;
+      vector<DomainInt> weights;
+      for(size_t i = 0; i < sumvars.size(); ++i)
+      {
+        vector<Mapper> mapi = sumvars[i].getMapperStack();
+        if(mapi.empty() || (mapi.back().type() != MAP_MULT && mapi.back().type() != MAP_SWITCH_NEG))
+          FATAL_REPORTABLE_ERROR();
+        pops.push_back(sumvars[i].popOneMapper());
+        weights.push_back(mapi.back().val());
+      }
+      return print_con(weight + name,  weights, pops,  result);
+    }
+    else
+    {
+      return print_con(name, sumvars, result);
+    }
+  }
+
+template<typename T1, typename T2>
+  string print_weighted_reversible_con(string weight, string name, string neg_name, const T1& vars, const T2& res)
+  {
+    vector<Mapper> m = res.getMapperStack();
+    if(!m.empty() && m.back() == Mapper(MAP_NEG))
+    {
+      vector<AnyVarRef> pops;
+      for(size_t i = 0; i < vars.size(); ++i)
+      {
+        vector<Mapper> mapi = vars[i].getMapperStack();
+        if(mapi.empty() || mapi.back() != Mapper(MAP_NEG))
+          FATAL_REPORTABLE_ERROR();
+        pops.push_back(vars[i].popOneMapper());
+      }
+      return print_weighted_con(weight, neg_name, pops, res.popOneMapper());
+    }
+    else
+    {
+      return print_weighted_con(weight, name, vars, res);
+    }
   }
 
 }
@@ -202,6 +269,14 @@ virtual string full_output_name() \
 #define CONSTRAINT_ARG_LIST2(x, y) \
 virtual string full_output_name() \
 { return ConOutput::print_con(constraint_name(), x, y); }
+
+#define CONSTRAINT_REVERSIBLE_ARG_LIST2(name, revname, x, y) \
+virtual string full_output_name() \
+{ return ConOutput::print_reversible_con(name, revname, x, y); }
+
+#define CONSTRAINT_WEIGHTED_REVERSIBLE_ARG_LIST2(weight, name, revname, x, y) \
+virtual string full_output_name() \
+{ return ConOutput::print_weighted_reversible_con(weight, name, revname, x, y); }
 
 #define CONSTRAINT_ARG_LIST3(x, y, z) \
 virtual string full_output_name() \

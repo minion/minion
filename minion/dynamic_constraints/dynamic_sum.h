@@ -78,7 +78,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
   typedef BoolLessSumConstraintDynamic<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   
-  CONSTRAINT_ARG_LIST2(var_array, var_sum);
+  CONSTRAINT_ARG_LIST2(var_array, VarToCount ? (DomainInt)(var_array.size() - var_sum) : (DomainInt)(var_sum));
 
   // When VarToCount=1 this constraint actually counts 0's and ensures there are var_sum or more.
   // Name of the class should really be changed, and VarToCount changed to val.. and values flipped

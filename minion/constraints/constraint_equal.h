@@ -78,7 +78,18 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   EqualVarRef2 var2;
   BoolVarRef var3;
 
-  CONSTRAINT_ARG_LIST3(var1,var2,var3);
+  virtual string full_output_name()
+  {
+    vector<Mapper> v = var2.getMapperStack();
+    if(!v.empty() && v.back() == Mapper(MAP_NEG))
+    {
+      return ConOutput::print_con("__reify_minuseq", var1, var2.popOneMapper(), var3);
+    }
+    else
+    {
+      return ConOutput::print_con("__reify_eq", var1, var2, var3);
+    }
+  }
   
   ReifiedEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
@@ -591,7 +602,18 @@ struct EqualConstraint : public AbstractConstraint
   { return "eq"; }
   
 
-  CONSTRAINT_ARG_LIST2(var1, var2);
+  virtual string full_output_name()
+  {
+    vector<Mapper> v = var2.getMapperStack();
+    if(!v.empty() && v.back() == Mapper(MAP_NEG))
+    {
+      return ConOutput::print_con("minuseq", var1, var2.popOneMapper());
+    }
+    else
+    {
+      return ConOutput::print_con("eq", var1, var2);
+    }
+  }
   
   EqualVarRef1 var1;
   EqualVarRef2 var2;

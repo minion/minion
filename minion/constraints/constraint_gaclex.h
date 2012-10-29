@@ -49,7 +49,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   struct GacLexLeqConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-    { if(Less) return "GacLexLess"; else return "GacLexLeq"; }
+    { if(Less) return "lexless[rv]"; else return "lexleq[rv]"; }
 
   typedef GacLexLeqConstraint<VarArray2, VarArray1,!Less> NegConstraintType;
   typedef typename VarArray1::value_type ArrayVarRef1;

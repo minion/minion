@@ -25,8 +25,10 @@ template<typename VarArray>
 struct BoolBinarySATConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "BoolBinarySATDynamic"; }
+  { return "watchsumgeq"; }
   
+  CONSTRAINT_ARG_LIST2(get_vars(), (DomainInt)1);
+
   typedef typename VarArray::value_type VarRef;
   
   VarRef var1;

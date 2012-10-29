@@ -380,6 +380,19 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   virtual string constraint_name()
   { return "OccurrenceLeq/Geq"; }
 
+  virtual string full_output_name()
+  { 
+    if(val_count_min == 0)
+    {
+      return ConOutput::print_con("occurrenceleq",var_array, value, val_count_max);
+    }
+    else
+    {
+      D_ASSERT(val_count_max == var_array.size());
+      return ConOutput::print_con("occurrencegeq",var_array,value, val_count_min);
+    }
+  }
+
   typedef typename VarArray::value_type VarRef;
 
   ReversibleInt occurrences_count;
@@ -574,7 +587,9 @@ template<typename VarArray, typename Val, typename ValCount>
 struct OccurrenceEqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "OccurrenceEqual"; }
+  { return "occurrence"; }
+
+  CONSTRAINT_ARG_LIST3(var_array, value, val_count);
 
   typedef typename VarArray::value_type VarRef;
 

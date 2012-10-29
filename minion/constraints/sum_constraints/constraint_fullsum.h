@@ -54,7 +54,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
   virtual string constraint_name()
   { return "sumleq"; }
 
-  CONSTRAINT_ARG_LIST2(var_array, var_sum);
+  CONSTRAINT_WEIGHTED_REVERSIBLE_ARG_LIST2("weighted", "sumleq", "sumgeq", var_array, var_sum);
   
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
