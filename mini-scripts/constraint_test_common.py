@@ -1679,7 +1679,7 @@ def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist
     file1=open(filename, "w")
     printminionfile(file1, variables, constraint, tuplelist=tuplelist, opt=opt)
     file1.close()
-    cmd=minionbin+" -dumptree -findallsols "+cmd+" "+filename+" >"+outfilename
+    cmd=minionbin+" "+filename+" -dumptree -findallsols "+cmd+" >"+outfilename
     if printcmd:
         print("Executing command: "+cmd)
     return os.system(cmd)
