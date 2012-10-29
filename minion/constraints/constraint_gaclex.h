@@ -62,7 +62,22 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
   VarArray1 x;
   VarArray2 y;
 
-  CONSTRAINT_ARG_LIST2(x, y);
+  virtual string full_output_name()
+  {
+    VarArray1 cx(x);
+    VarArray2 cy(y);
+    for(int i = 0; i < cx.size(); ++i)
+    {
+      if(cx[i].isAssigned() && cy[i].isAssigned() && (cx[i].getAssignedValue() == cy[i].getAssignedValue()))
+      {
+        cx.erase(cx.begin() + i);
+        cy.erase(cy.begin() + i);
+        i--;
+      }
+    }
+    return ConOutput::print_con(constraint_name(), cx, cy); 
+  }
+
 
   vector<pair<DomainInt, DomainInt> > earliest_occurrence_x;
   vector<pair<DomainInt, DomainInt> > earliest_occurrence_y;

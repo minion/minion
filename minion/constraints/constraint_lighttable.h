@@ -111,6 +111,11 @@ struct LightTableConstraint : public AbstractConstraint
   virtual string constraint_name()
   { return "lighttable"; }
 
+   virtual AbstractConstraint* reverse_constraint()
+  {
+      return new CheckAssignConstraint<VarArray, LightTableConstraint>(stateObj, vars, *this);
+  }
+
   CONSTRAINT_ARG_LIST2(vars, tuples);
 
   typedef typename VarArray::value_type VarRef;

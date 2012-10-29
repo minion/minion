@@ -47,6 +47,9 @@ struct NeqIterated; // because it is used in EqIterated before it is defn
 // for the reverse of the hamming constraint:
 struct EqIterated
 {
+  static string constraint_name()
+  { return "not-hamming"; }
+
   static SysInt dynamic_trigger_count()
     { return 4; }
   
@@ -113,6 +116,9 @@ struct EqIterated
 
 struct NeqIterated
 {
+  static string constraint_name()
+  { return "not-hamming"; }
+
   static SysInt dynamic_trigger_count()
     { return 2; }
   

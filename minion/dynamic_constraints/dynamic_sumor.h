@@ -43,7 +43,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   struct VecCountDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "hamming"; }
+  { return Operator::constraint_name(); }
 
    CONSTRAINT_ARG_LIST3(var_array1, var_array2, hamming_distance);
 
