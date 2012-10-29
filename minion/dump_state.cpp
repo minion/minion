@@ -27,7 +27,7 @@ void dump_searchorder(StateObj* state, const SearchOrder& order, ostream& os)
     for(int i = 0; i < order.var_order.size(); ++i)
     {
         AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(state, order.var_order[i]);
-        if(!v.isAssigned())
+        // XXX : To get tester to work.. for now. if(!v.isAssigned())
             non_assigned_vars.push_back(i);
     }
 
@@ -53,9 +53,12 @@ void dump_searchorder(StateObj* state, const SearchOrder& order, ostream& os)
     for(int i = 0; i < non_assigned_vars.size(); ++i)
     {
         AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(state, order.var_order[non_assigned_vars[i]]);
-        D_ASSERT(!v.isAssigned());
+        // XXX : see above! D_ASSERT(!v.isAssigned());
         if(first) first=false; else os << ",";
-        os << v.getBaseVar().get_name();
+        if(v.isAssigned())
+            os << v.getAssignedValue();
+        else
+            os << v.getBaseVar().get_name();
     }
     os << "]\n";
 
