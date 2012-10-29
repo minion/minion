@@ -83,7 +83,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
     typedef typename NotType<BoolVarRef>::type NotTypedef;
     NotTypedef v = VarNotRef(var3);
     return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, NotTypedef>
-                 (stateObj, var1, var2, var3);
+                 (stateObj, var1, var2, v);
   }
 
   virtual string full_output_name()
