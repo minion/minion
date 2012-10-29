@@ -111,14 +111,16 @@ struct LightTableConstraint : public AbstractConstraint
   virtual string constraint_name()
   { return "lighttable"; }
 
+  CONSTRAINT_ARG_LIST2(vars, tuples);
+
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
-
+  TupleList* tuples;
   TableDataType* data;   // Assuming this is a TrieData for the time being.
   // Can this be the thing instead of a *??
   
   LightTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
-  AbstractConstraint(stateObj), vars(_vars), data(new TableDataType(_tuples))
+  AbstractConstraint(stateObj), vars(_vars), tuples(_tuples), data(new TableDataType(_tuples))
   {
       CheckNotBound(vars, "table constraints","");
       if(_tuples->tuple_size()!=_vars.size())
