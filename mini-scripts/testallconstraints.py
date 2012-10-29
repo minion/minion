@@ -58,15 +58,13 @@ conslist+=["watchneq", "watchless"]
 
 conslist+=["w-inset", "w-notinset", "w-inrange", "w-notinrange", "w-literal", "w-notliteral"]
 
-reifyexceptions=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
-reifyimplyexceptions=["not-hamming"]
+conslist+=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
+conslist+=["not-hamming"]
 # add reifyimply variant of all constraints,
 # and reify variant of all except those in reifyexceptions
 it=conslist[:]
 for c in it:
-    if c not in reifyimplyexceptions:
         conslist+=["reifyimply"+c]
-    if c not in reifyexceptions:
         conslist+=["reify"+c]
 
 numtests=100
