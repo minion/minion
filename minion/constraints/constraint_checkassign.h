@@ -156,30 +156,46 @@ struct CheckAssignConstraint : public AbstractConstraint
 
     if(free_var == -1)
     {
-      if(check_assignment(c.begin(), c.size()))
-      {  // Put the complete assignment in the box.
-        for(SysInt i = 0; i < variables.size(); ++i)
-        {
-          assignment.push_back(make_pair(i, c[i]));
-        }
+      if(try_assignment(assignment, c))
         return true;
-      }
     }
     else
     {
-      for(DomainInt i = variables[free_var].getMin() ; i <= variables[free_var].getMax(); ++i)
+      c[free_var]=variables[free_var].getMin();
+      if(try_assignment(assignment, c))
+        return true;
+      c[free_var]=variables[free_var].getMax();
+      if(try_assignment(assignment, c))
+        return false;
+
+      if(!variables[free_var].isBound())
       {
-        c[free_var] = i;
-        if(check_assignment(c.begin(), c.size()))
+        for(DomainInt i = variables[free_var].getMin() + 1; i < variables[free_var].getMax(); ++i)
         {
-          // Put the complete assignment in the box.
-          for(SysInt i = 0; i < variables.size(); ++i)
-            assignment.push_back(make_pair(i, c[i]));
-          return true;
+          if(variables[free_var].inDomain(i))
+          {
+            c[free_var] = i;
+            if(try_assignment(assignment, c))
+              return true;
+          }
         }
       }
     }
     return false;
+  }
+
+  template<typename Box, typename Check>
+  bool try_assignment(Box& assign, Check& check)
+  {
+    if(check_assignment(check.begin(), check.size()))
+    {
+      // Put the complete assignment in the box.
+      for(SysInt i = 0; i < check.size(); ++i)
+        assign.push_back(make_pair(i, check[i]));
+      return true;
+    }
+    else
+      return false;
   }
 };
 
