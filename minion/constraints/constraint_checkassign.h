@@ -161,10 +161,12 @@ struct CheckAssignConstraint : public AbstractConstraint
     }
     else
     {
-      c[free_var]=variables[free_var].getMin();
+      DomainInt free_min = variables[free_var].getMin();
+      c[free_var]=free_min;
       if(try_assignment(assignment, c))
         return true;
-      c[free_var]=variables[free_var].getMax();
+      DomainInt free_max = variables[free_var].getMax();
+      c[free_var]=free_max;
       if(try_assignment(assignment, c))
         return false;
 
@@ -179,6 +181,12 @@ struct CheckAssignConstraint : public AbstractConstraint
               return true;
           }
         }
+      }
+      else
+      {
+          assignment.push_back(make_pair(free_var, free_min));
+          assignment.push_back(make_pair(free_var, free_max));
+          return true;
       }
     }
     return false;
