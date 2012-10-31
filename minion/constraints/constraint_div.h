@@ -143,11 +143,7 @@ struct DivConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      vector<AnyVarRef> t;
-      t.push_back(var1);
-      t.push_back(var2);
-      t.push_back(var3);
-      return new CheckAssignConstraint<vector<AnyVarRef>, DivConstraint>(stateObj, t, *this);
+      return new CheckAssignConstraint<vector<AnyVarRef>, DivConstraint>(stateObj, get_vars(), *this);
   }
 };
 #endif

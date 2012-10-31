@@ -148,7 +148,7 @@ struct CheckAssignConstraint : public AbstractConstraint
       else
         {
           free_var = i;
-          c.push_back(0);
+          c.push_back(-9999); // this value should never be used
         }
       }
       else
@@ -185,6 +185,7 @@ struct CheckAssignConstraint : public AbstractConstraint
       }
       else
       {
+          D_ASSERT(free_min != free_max);
           ret_box.push_back(make_pair(free_var, free_min));
           ret_box.push_back(make_pair(free_var, free_max));
           return true;
