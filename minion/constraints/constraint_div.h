@@ -36,6 +36,7 @@ help constraints modulo
 #ifndef CONSTRAINT_DIV_H
 #define CONSTRAINT_DIV_H
 
+#include "../constraints/constraint_checkassign.h"
 #include <math.h>
 
 #ifndef LRINT

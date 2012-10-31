@@ -45,6 +45,8 @@ See also
 #ifndef CONSTRAINT_DYNAMIC_LITWATCH_H
 #define CONSTRAINT_DYNAMIC_LITWATCH_H
 
+#include "../constraints/constraint_checkassign.h"
+   
 template<typename VarArray, typename ValueArray, typename VarSum>
 struct LiteralSumConstraintDynamic : public AbstractConstraint
 {

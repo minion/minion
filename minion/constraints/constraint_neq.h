@@ -49,6 +49,8 @@ for the same constraint that enforces GAC.
 #ifndef CONSTRAINT_NEQ_H
 #define CONSTRAINT_NEQ_H
 
+#include "../constraints/constraint_checkassign.h"
+  
 template<typename VarArray>
 struct NeqConstraint : public AbstractConstraint
 {

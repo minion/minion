@@ -39,6 +39,8 @@ positive numbers.
 #ifndef CONSTRAINT_PRODUCT_H
 #define CONSTRAINT_PRODUCT_H
 
+#include "../constraints/constraint_checkassign.h"
+
 /// var1 * var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct ProductConstraint : public AbstractConstraint

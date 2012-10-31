@@ -66,7 +66,7 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 // This constraint must be listed early so that it can
 // be called by all constraints.
-#include "constraints/constraint_checkassign.h"
+//#include "../constraints/constraint_checkassign.h"
 
 #include "lock.h"
 #ifndef DOMINION

@@ -22,6 +22,7 @@
 #include "../constraints/constraint_less.h"
 #include "../constraints/constraint_equal.h"
 #include "../constraints/constraint_product.h"
+#include "../constraints/constraint_checkassign.h"
 
 /** @help constraints;watchvecneq Description
 The constraint

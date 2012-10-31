@@ -21,6 +21,7 @@
 #define CONSTRAINT_GACTABLE_TRIES_H
 
 #include "tries.h"
+#include "../constraints/constraint_checkassign.h"
 
 template<typename VarArray, SysInt negative>
 struct GACTableConstraint : public AbstractConstraint
