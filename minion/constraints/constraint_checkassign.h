@@ -33,12 +33,9 @@ struct CheckAssignConstraint : public AbstractConstraint
   OriginalConstraint& originalcon;
   VarArray variables;
   ReversibleInt assigned_vars;
-  // To avoid allocating many vectors.
-  vector<DomainInt> assignment;
-  
   
   CheckAssignConstraint(StateObj* _stateObj, const VarArray& vars, OriginalConstraint& con)
-  : AbstractConstraint(_stateObj), originalcon(con),variables(vars), assigned_vars(stateObj), assignment(variables.size())
+  : AbstractConstraint(_stateObj), originalcon(con),variables(vars), assigned_vars(stateObj)
   { }
   
   virtual triggerCollection setup_internal()
@@ -65,7 +62,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   virtual BOOL check_unsat(SysInt,DomainDelta)
   {
-  
+    MAKE_STACK_BOX(assignment, DomainInt, variables.size());
     SysInt count = assigned_vars;
     ++count;
     SysInt v_size = variables.size();
@@ -76,7 +73,7 @@ struct CheckAssignConstraint : public AbstractConstraint
       for(SysInt i = 0; i < v_size; ++i)
       {
         D_ASSERT(variables[i].isAssigned());
-        assignment[i] = variables[i].getAssignedValue();
+        assignment.push_back(variables[i].getAssignedValue());
       }
       if(assignment.size() == 0)
           return !check_assignment(NULL, 0);
@@ -89,6 +86,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   virtual BOOL full_check_unsat()
   {
+    MAKE_STACK_BOX(assignment, DomainInt, variables.size());
     UnsignedSysInt counter = 0;
     for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       if(variables[i].isAssigned()) ++counter;
@@ -99,7 +97,7 @@ struct CheckAssignConstraint : public AbstractConstraint
       for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       {
         D_ASSERT(variables[i].isAssigned());
-        assignment[i] = variables[i].getAssignedValue();
+        assignment.push_back(variables[i].getAssignedValue());
       }
       if(assignment.size() == 0)
           return !check_assignment(NULL, 0);
@@ -132,7 +130,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   // Getting a satisfying assignment here is too hard.
   // Let's at least try forward checking!
-  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& ret_box)
   {
     MAKE_STACK_BOX(c, DomainInt, variables.size());
 
@@ -143,12 +141,15 @@ struct CheckAssignConstraint : public AbstractConstraint
       {
         if(free_var != -1)
         {
-          assignment.push_back(make_pair(i, variables[i].getMin()));
-          assignment.push_back(make_pair(i, variables[i].getMax()));
+          ret_box.push_back(make_pair(i, variables[i].getMin()));
+          ret_box.push_back(make_pair(i, variables[i].getMax()));
           return true;
         }
       else
-        c.push_back(0);
+        {
+          free_var = i;
+          c.push_back(0);
+        }
       }
       else
         c.push_back(variables[i].getAssignedValue());
@@ -156,18 +157,18 @@ struct CheckAssignConstraint : public AbstractConstraint
 
     if(free_var == -1)
     {
-      if(try_assignment(assignment, c))
+      if(try_assignment(ret_box, c))
         return true;
     }
     else
     {
       DomainInt free_min = variables[free_var].getMin();
       c[free_var]=free_min;
-      if(try_assignment(assignment, c))
+      if(try_assignment(ret_box, c))
         return true;
       DomainInt free_max = variables[free_var].getMax();
       c[free_var]=free_max;
-      if(try_assignment(assignment, c))
+      if(try_assignment(ret_box, c))
         return false;
 
       if(!variables[free_var].isBound())
@@ -177,15 +178,15 @@ struct CheckAssignConstraint : public AbstractConstraint
           if(variables[free_var].inDomain(i))
           {
             c[free_var] = i;
-            if(try_assignment(assignment, c))
+            if(try_assignment(ret_box, c))
               return true;
           }
         }
       }
       else
       {
-          assignment.push_back(make_pair(free_var, free_min));
-          assignment.push_back(make_pair(free_var, free_max));
+          ret_box.push_back(make_pair(free_var, free_min));
+          ret_box.push_back(make_pair(free_var, free_max));
           return true;
       }
     }
