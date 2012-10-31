@@ -62,15 +62,22 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   virtual BOOL check_unsat(SysInt,DomainDelta)
   {
-    MAKE_STACK_BOX(assignment, DomainInt, variables.size());
     SysInt count = assigned_vars;
     ++count;
+    assigned_vars = count; 
     SysInt v_size = variables.size();
     D_ASSERT(count <= v_size);
 
     if(count == v_size)
-    {
-      for(SysInt i = 0; i < v_size; ++i)
+     return check_full_assignment();
+    
+    return false;
+  }
+
+  bool check_full_assignment()
+  {
+    MAKE_STACK_BOX(assignment, DomainInt, variables.size());
+    for(SysInt i = 0; i < variables.size(); ++i)
       {
         D_ASSERT(variables[i].isAssigned());
         assignment.push_back(variables[i].getAssignedValue());
@@ -79,31 +86,17 @@ struct CheckAssignConstraint : public AbstractConstraint
           return !check_assignment(NULL, 0);
       else
           return !check_assignment(&assignment.front(), assignment.size());
-    }
-    assigned_vars = count; 
-    return false;
   }
   
   virtual BOOL full_check_unsat()
   {
-    MAKE_STACK_BOX(assignment, DomainInt, variables.size());
     UnsignedSysInt counter = 0;
     for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       if(variables[i].isAssigned()) ++counter;
     assigned_vars = counter;
     
     if(counter == variables.size())
-    {
-      for(UnsignedSysInt i = 0; i < variables.size(); ++i)
-      {
-        D_ASSERT(variables[i].isAssigned());
-        assignment.push_back(variables[i].getAssignedValue());
-      }
-      if(assignment.size() == 0)
-          return !check_assignment(NULL, 0);
-      else
-          return !check_assignment(&assignment.front(), assignment.size());
-    }
+      return check_full_assignment();
     return false;
   }
   
@@ -133,19 +126,23 @@ struct CheckAssignConstraint : public AbstractConstraint
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& ret_box)
   {
     MAKE_STACK_BOX(c, DomainInt, variables.size());
+    D_ASSERT(variables.size() == originalcon.get_vars().size());
+    D_ASSERT(ret_box.size() == 0);
 
     SysInt free_var = -1;
+    
     for(SysInt i = 0; i < variables.size(); ++i)
     {
       if(!variables[i].isAssigned()) 
       {
         if(free_var != -1)
         {
+          D_ASSERT(variables[i].getMin() != variables[i].getMax());
           ret_box.push_back(make_pair(i, variables[i].getMin()));
           ret_box.push_back(make_pair(i, variables[i].getMax()));
           return true;
         }
-      else
+        else
         {
           free_var = i;
           c.push_back(-9999); // this value should never be used
@@ -155,13 +152,20 @@ struct CheckAssignConstraint : public AbstractConstraint
         c.push_back(variables[i].getAssignedValue());
     }
 
+   
+
     if(free_var == -1)
     {
       if(try_assignment(ret_box, c))
         return true;
+      else
+        return false;
     }
     else
     {
+      D_ASSERT(c[free_var] == -9999);
+      D_ASSERT(variables[free_var].getMin() != variables[free_var].getMax());
+
       DomainInt free_min = variables[free_var].getMin();
       c[free_var]=free_min;
       if(try_assignment(ret_box, c))
@@ -169,7 +173,7 @@ struct CheckAssignConstraint : public AbstractConstraint
       DomainInt free_max = variables[free_var].getMax();
       c[free_var]=free_max;
       if(try_assignment(ret_box, c))
-        return false;
+        return true;
 
       if(!variables[free_var].isBound())
       {
@@ -191,6 +195,7 @@ struct CheckAssignConstraint : public AbstractConstraint
           return true;
       }
     }
+//    abort();
     return false;
   }
 
