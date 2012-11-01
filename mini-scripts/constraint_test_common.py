@@ -816,7 +816,7 @@ class testwatchneq:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("watchneq", False, options, [1,1], ["num", "num"], self, True)
+        return runtestgeneral("watchneq", False, options, [1,1], ["num", "num"], self, not options['reify'])
 
 class testwatchless:
     def printtable(self, domains):
@@ -876,7 +876,7 @@ class testhamming:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("hamming", False, options, [4,4,1], ["smallnum", "smallnum", "const"], self, False)
+        return runtestgeneral("hamming", False, options, [4,4,1], ["smallnum", "smallnum", "const"], self, True)
 
 class testnot__minus__hamming:
     def printtable(self, domains):
@@ -892,7 +892,7 @@ class testnot__minus__hamming:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("not-hamming", False, options, [4,4,1], ["smallnum", "smallnum", "const"], self, False)
+        return runtestgeneral("not-hamming", False, options, [4,4,1], ["smallnum", "smallnum", "const"], self, True)
 
 class testlitsumgeq:
     def printtable(self, domains):
@@ -956,7 +956,7 @@ class testlexleq_rv:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("lexleq[rv]", True, options, [4,4], ["smallnum", "smallnum"], self, False)
+        return runtestgeneral("lexleq[rv]", True, options, [4,4], ["smallnum", "smallnum"], self, True)
 
 
 class testlexless_quick(testlexleq):
