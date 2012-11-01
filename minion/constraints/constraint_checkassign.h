@@ -195,7 +195,6 @@ struct CheckAssignConstraint : public AbstractConstraint
           return true;
       }
     }
-//    abort();
     return false;
   }
 
