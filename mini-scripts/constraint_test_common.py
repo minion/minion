@@ -474,6 +474,27 @@ class testgacelement__minus__deprecated:
     def runtest(self, options=dict()):
         return runtestgeneral("gacelement-deprecated", False, options, [4,1,1], ["smallnum", "num", "num"], self, not options['reify'])
 
+class testwatchelement_undefzero:
+    def printtable(self, domains): 
+        out=[]
+        # given a list of lists for the domains, generate the table for gacelement 
+        numvars=len(domains)
+        vectordoms=domains[:-2]
+        otherdoms=domains[-2:]
+        tocross=domains[:-1]
+        cross=[]
+        crossprod(tocross, [], cross)
+        for l in cross:
+            if l[-1] >=0 and l[-1]<(len(l)-1):
+                if l[l[-1]] in otherdoms[1]:
+                    out.append(l+[l[l[-1]]])
+            else:
+                out.append(l+[0])
+        return out
+    
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchelement_undefzero", False, options, [4,1,1], ["smallnum", "num", "num"], self, not options['reify'])
+
 class testgac2delement:
     def printtable(self, domains): 
         const=self.constants[0]

@@ -610,6 +610,9 @@ struct GraphBuilder
 #ifdef CT_WATCHED_ELEMENT_ABC
       case CT_WATCHED_ELEMENT: return colour_element(b, "ELEMENT");
 #endif
+#ifdef CT_WATCHED_ELEMENT_UNDEFZERO_ABC
+      case CT_WATCHED_ELEMENT_UNDEFZERO: return colour_element(b, "ELEMENT_UNDEFZERO");
+#endif
 #ifdef CT_GACELEMENT_ABC
       case CT_GACELEMENT: return colour_element(b, "ELEMENT");
 #endif
@@ -904,6 +907,7 @@ struct InstanceStats
         case CT_WATCHED_ELEMENT:
         case CT_WATCHED_ELEMENT_ONE:
         case CT_GACELEMENT:
+        case CT_WATCHED_ELEMENT_UNDEFZERO:
             (*element)++;
             break;
         case CT_MIN:

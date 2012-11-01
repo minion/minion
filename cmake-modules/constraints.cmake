@@ -1,4 +1,4 @@
-set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one"
+set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one" "watchelement_undefzero"
                     "gacelement-deprecated" "alldiff" "gacalldiff" "gcc" "gccweak" "watchneq"
                     "diseq" "__reify_diseq" "eq" "__reify_eq" "minuseq" "__reify_minuseq"
                     "abs" "ineq" "watchless" "lexleq[rv]" "lexleq[quick]" "lexleq" "lexless" "lexless[quick]"
@@ -31,6 +31,9 @@ set(NAME_READ_element_one "read_list" "read_var" "read_var")
 
 set(NAME_ID_watchelement "CT_WATCHED_ELEMENT")
 set(NAME_READ_watchelement "read_list" "read_var" "read_var")
+
+set(NAME_ID_watchelement_undefzero "CT_WATCHED_ELEMENT_UNDEFZERO")
+set(NAME_READ_watchelement_undefzero "read_list" "read_var" "read_var")
 
 set(NAME_ID_watchelement_one "CT_WATCHED_ELEMENT_ONE")
 set(NAME_READ_watchelement_one "read_list" "read_var" "read_var")
