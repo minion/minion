@@ -111,30 +111,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     if(c == occ_count())
       limit_reached();
   }
-  
-  virtual BOOL full_check_unsat()
-  {
-    SysInt occs = 0;
-    SysInt array_size = var_array.size();
-    for(SysInt i = 0; i < array_size; ++i)
-      if(var_array[i].isAssignedValue(VarToCount))
-        occs++;
-    count = occs;
-    if(occs > occ_count())
-      return true;
-    return false;
-  }
-  
-  virtual BOOL check_unsat(SysInt, DomainDelta)
-  {
-    SysInt i = count + 1;
-    count = i;
-    if(i > occ_count())
-      return true;
-    else
-      return false;
-  }
-  
+
   virtual void full_propagate()
   {
     SysInt occs = 0;

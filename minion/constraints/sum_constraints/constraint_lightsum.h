@@ -120,17 +120,6 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
       var_array[i].setMax(var_array[i].getMin() + slack);
   }
   
-  virtual BOOL full_check_unsat()
-  { return check_unsat(0, DomainDelta::empty()); }
-  
-  virtual BOOL check_unsat(SysInt, DomainDelta)
-  {
-    DomainInt min_sum = 0;
-    for(UnsignedSysInt i = 0; i < size; ++i)
-      min_sum += var_array[i].getMin();
-    return min_sum > var_sum.getMax();
-  }
-  
   virtual void full_propagate()
   {
     propagate(-1,DomainDelta::empty());

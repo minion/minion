@@ -82,12 +82,6 @@ struct LeqConstraint : public AbstractConstraint
     }
   }
   
-  virtual BOOL check_unsat(SysInt,DomainDelta)
-  { return (x.getMin() > y.getMax() + offset); }
-  
-  virtual BOOL full_check_unsat()
-  { return (x.getMin() > y.getMax() + offset); }
-  
   virtual void full_propagate()
   {
     propagate(0,DomainDelta::empty());

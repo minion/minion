@@ -335,25 +335,6 @@ public:
   virtual void propagate(DomainInt, DomainDelta)
     { D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + extended_name()); }
 
-  /// Checks if a constraint cannot be satisfied, and sets up any data structures for future incremental checks.
-  /// Returns TRUE if constraint cannot be satisfied.
-  /** This function is used by rarification */
-  virtual BOOL full_check_unsat()
-  {
-    cerr << "Static reification is not supported by the " << extended_name() << " constraint. Sorry" << endl;
-    exit(1);
-    return false;
-  }
-
-  /// Checks incrementaly if constraint cannot be satisfied.
-  /// Returns TRUE if constraint cannot be satisfied.
-  /** This function should not be called unless check_unsat_full is called first. This is used by rarification */
-  virtual BOOL check_unsat(SysInt,DomainDelta)
-  {
-    cerr << "Static reification is not supported by the " << extended_name() << " constraint. Sorry" << endl;
-    exit(1);
-    return false;
-  }
 
   /// Looks for a valid partial assignment to a constraint.
   /** The return value (in the box) is pairs of <varnum, domain value>, where varnum is in the same position

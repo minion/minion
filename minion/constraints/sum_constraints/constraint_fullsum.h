@@ -151,33 +151,6 @@ struct LessEqualSumConstraint : public AbstractConstraint
     }
   }
   
-  virtual BOOL check_unsat(SysInt prop_val, DomainDelta domain_change)
-  {
-    DomainInt sum = var_array_min_sum;
-    if(prop_val != -1)
-    { // One of the array changed
-      sum += var_array[prop_val].getDomainChange(domain_change);
-      var_array_min_sum = sum;
-    }
-    return var_sum.getMax() < sum;
-  }
-  
-  virtual BOOL full_check_unsat()
-  {
-    DomainInt min_sum = get_real_min_sum();
-    DomainInt max_diff = get_real_max_diff();
-    
-    var_array_min_sum = min_sum;
-    max_looseness = max_diff;
-    if(!var_array.empty())
-      return check_unsat(0,DomainDelta::empty());
-    else
-    { 
-      // Just set sum = 0 from check_unsat
-      return var_sum.getMax() < 0;
-    }
-  }
-  
   virtual void full_propagate()
   {
     P("Full Prop");

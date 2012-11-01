@@ -878,8 +878,6 @@ struct InstanceStats
         case CT_MINUSEQ_REIFY:
         case CT_REIFYIMPLY_QUICK:
         case CT_REIFYIMPLY:
-        case CT_REIFYIMPLY_OLD:
-        case CT_REIFYIMPLY_NEW:
             (*reify)++;
             for(vector<ConstraintBlob>::iterator j=i.internal_constraints.begin(); j!=i.internal_constraints.end(); ++j)
             {

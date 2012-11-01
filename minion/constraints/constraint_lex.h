@@ -210,50 +210,6 @@ struct LexLeqConstraint : public AbstractConstraint
     }
   }
   
-  virtual BOOL check_unsat(SysInt unsat_val, DomainDelta)
-  {
-    SysInt a = alpha;
-    if(unsat_val >= a)
-    {
-      SysInt x_size = x.size();
-      for(SysInt i = a; i < x_size; ++i)
-      {
-        DomainInt xval = x[i].getMin();
-        DomainInt yval = y[i].getMax();
-        if(xval < yval) 
-        {
-          alpha = i;
-          return false;
-        }
-        if(xval > yval)
-          return true;
-      }
-      if(Less)
-        return true;
-      else
-      {
-        alpha = x.size();
-        return false;
-      }
-      
-    }
-    else
-    {
-      DomainInt xval = x[unsat_val].getMin();
-      DomainInt yval = y[unsat_val].getMax();
-      if (xval > yval)
-        return true;
-      else
-        return false;
-    }
-    FAIL_EXIT();
-  }
-  
-  virtual BOOL full_check_unsat()
-  {
-    alpha = 0;
-    return check_unsat(0, DomainDelta::empty());
-  }
   
   BOOL checkLex(SysInt i) {
     if(Less)

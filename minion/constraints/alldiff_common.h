@@ -955,47 +955,6 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   }
   */
   
-  virtual BOOL full_check_unsat()
-  { 
-    SysInt v_size = var_array.size();
-    for(SysInt i = 0; i < v_size; ++i)
-    {
-      if(var_array[i].isAssigned())
-      {
-      
-        for(SysInt j = i + 1; j < v_size; ++j)
-        {
-          if(var_array[j].isAssigned())
-          {
-            if(var_array[i].getAssignedValue() == var_array[j].getAssignedValue())
-              return true;
-          }
-        }
-        
-      }
-    }
-    
-    return false;
-  }
-  
-  virtual BOOL check_unsat(SysInt i, DomainDelta)
-  {
-    SysInt v_size = var_array.size();
-    if(!var_array[i].isAssigned()) return false;
-    
-    DomainInt assign_val = var_array[i].getAssignedValue();
-    for(SysInt loop = 0; loop < v_size; ++loop)
-    {
-      if(loop != i)
-      {
-        if(var_array[loop].isAssigned() && 
-           var_array[loop].getAssignedValue() == assign_val)
-        return true;
-      }
-    }
-    return false;
-  }
-  
   virtual void full_propagate()
   { 
       #if UseIncGraph

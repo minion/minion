@@ -24,7 +24,7 @@
 #ifndef CONSTRAINT_CHECKASSIGN_H
 #define CONSTRAINT_CHECKASSIGN_H
 
-template<typename VarArray, typename OriginalConstraint>
+template<typename VarArray, typename OriginalConstraint, bool negate = false>
 struct CheckAssignConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
@@ -70,7 +70,6 @@ struct CheckAssignConstraint : public AbstractConstraint
 
     if(count == v_size)
      return check_full_assignment();
-    
     return false;
   }
 
@@ -109,7 +108,10 @@ struct CheckAssignConstraint : public AbstractConstraint
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == variables.size());
-    return !originalcon.check_assignment(v, v_size);
+    if(negate)
+      return !originalcon.check_assignment(v, v_size);
+    else
+      return originalcon.check_assignment(v, v_size);
   }
   
   virtual vector<AnyVarRef> get_vars()

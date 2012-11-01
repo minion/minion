@@ -9,8 +9,8 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one" "w
                     "pow" "div" "modulo" "gadget" "disabled-or"
                     "hamming" "not-hamming" "watched-or" "watched-and"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
-                    "w-notliteral" "reify" "reifyimply-quick" "reifyimply" "reifyimply-old"
-                    "reifyimply-new" "true" "false" "check[gsa]" "check[assign]"
+                    "w-notliteral" "reify" "reifyimply-quick" "reifyimply"
+                    "true" "false" "check[gsa]" "check[assign]"
                     "watchvecexists_less" "lighttable"
                     )
 
@@ -214,12 +214,6 @@ set(NAME_READ_check[assign] "read_constraint")
 
 set(NAME_ID_reifyimply "CT_REIFYIMPLY")
 set(NAME_READ_reifyimply "read_constraint" "read_var")
-
-set(NAME_ID_reifyimply-old "CT_REIFYIMPLY_OLD")
-set(NAME_READ_reifyimply-old "read_constraint" "read_var")
-
-set(NAME_ID_reifyimply-new "CT_REIFYIMPLY_NEW")
-set(NAME_READ_reifyimply-new "read_constraint" "read_var")
 
 set(NAME_ID_true "CT_TRUE")
 set(NAME_READ_true )
