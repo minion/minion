@@ -24,7 +24,7 @@
 #ifndef CONSTRAINT_CHECKASSIGN_H
 #define CONSTRAINT_CHECKASSIGN_H
 
-template<typename VarArray, typename OriginalConstraint, bool negate = false>
+template<typename VarArray, typename OriginalConstraint, bool negate = true>
 struct CheckAssignConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
