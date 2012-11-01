@@ -45,8 +45,17 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   virtual string constraint_name()
   { return Operator::constraint_name(); }
 
-   CONSTRAINT_ARG_LIST3(var_array1, var_array2, hamming_distance);
+  CONSTRAINT_ARG_LIST3(var_array1, var_array2, original_distance());
 
+
+// 10 - 3 + 1 = 8
+// 10 - 8 + 1 = 3
+  DomainInt original_distance()
+  {
+    if(constraint_name() == "hamming") return hamming_distance;
+    if(constraint_name() == "not-hamming") return (SysInt)var_array1.size() - hamming_distance + 1;
+    abort();
+  }
   typedef typename VarArray1::value_type VarRef1;
   typedef typename VarArray2::value_type VarRef2;
 
