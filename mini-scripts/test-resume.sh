@@ -31,7 +31,7 @@ for i in ./test_instances/resume_instances/*.minion; do
     
     echo complete nodes$completenodes sols$completesols walltime$completewalltime solvetime$completesolvetime timeout$timeout;
     
-    $MINION $INSTANCE > $FIRSTPARTIALOUTPUT &
+    $MINION $INSTANCE -makeresume > $FIRSTPARTIALOUTPUT &
     PID=$!;
     sleep $timeout;
     kill -2 $PID;
