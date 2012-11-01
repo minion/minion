@@ -280,6 +280,10 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
         exit(1);
       }
     }
+    else if(command == string("-makeresume"))
+    {
+      getOptions(stateObj).noresumefile = false;
+    }
     else if(command == string("-noresume"))
     {
       getOptions(stateObj).noresumefile = true;
@@ -287,6 +291,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     else if(command == string("-split"))
     {
       getOptions(stateObj).split = true;
+      getOptions(stateObj).noresumefile = false;
     }
     else if(command[0] == '-' && command != string("--"))
     {

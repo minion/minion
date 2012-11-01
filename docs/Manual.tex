@@ -366,14 +366,14 @@ has been solved to completion (see Appendix~\ref{chap:all}). Furthermore Minion
 can of course be interrupted manually while it is running, for example by
 pressing Control-C.
 
-The default behaviour in such a case is for Minion to output a new input file
+Minion can output a new input file
 that enables resuming the search from where it was stopped. The new file
 contains the original problem specification and additional constraints to rule
 out the search that has been done already. To resume, simply run Minion on this
 new file without any special flags.
 
-To disable this behaviour and have Minion terminate without creating a resume
-file, run it with the flag \texttt{-noresume}.
+To enable this behaviour and have Minion create a resume
+file on termination, run it with the flag \texttt{-makeresume}.
 
 \chapter{Minion Internals}
 

@@ -283,7 +283,7 @@ public:
     time_limit_is_CPU_time(false),
     randomise_valvarorder(false), parser_verbose(false), 
     redump(false), graph(false), instance_stats(false), 
-    noresumefile(false), split(false),
+    noresumefile(true), split(false),
     outputType(-1), noTimers(false),
     Xvarmunge(-1), Xsymmunge(-1)
   {}

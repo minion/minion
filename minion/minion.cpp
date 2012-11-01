@@ -338,7 +338,11 @@ specified a random permutation of all the variables is used.
 */
 
 /** @help switches;-noresume Description
-Do not write a resume file on timeout or being killed.
+Do not write a resume file on timeout or being killed. (default)
+*/
+
+/** @help switches;-makeresume Description
+Write a resume file on timeout or being killed.
 */
 
 /** @help switches;-split Description
@@ -366,6 +370,8 @@ The new input files can be run without any special flags.
 This flag is intended to be used with the -timelimit, -sollimit, -nodelimit
 ,-searchlimit or -cpulimit flags. Please note that changing other flags between
 runs (such as -varorder) may have unintended consequences.
+
+Implies -makeresume automatically.
 */
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
