@@ -59,9 +59,6 @@ cout << "NOCATCH" << " ";
 #ifdef NO_DEBUG
 cout << "NO_DEBUG" << " "; 
 #endif
-#ifdef NO_DYN_CHECK
-cout << "NO_DYN_CHECK" << " "; 
-#endif
 #ifdef OLDTABLE
 cout << "OLDTABLE" << " "; 
 #endif

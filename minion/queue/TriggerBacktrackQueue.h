@@ -77,12 +77,7 @@ struct TriggerBacktrackQueue
             else
             {
                 P("Add " << tl[i].first << " to " << tl[i].second);
-#ifdef NO_DYN_CHECK
                 tl[i].first->add_after(tl[i].second);
-#else
-                DynamicTrigger* nulldt = NULL;
-                tl[i].first->add_after(tl[i].second, nulldt);
-#endif
                 tl[i].first->setQueue(tl[i].second);
             }
         }

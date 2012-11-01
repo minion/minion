@@ -352,11 +352,7 @@ public:
     }
 #endif
 
-#ifdef NO_DYN_CHECK
     t->add_after(queue);
-#else
-    t->add_after(queue, getQueue(stateObj).getNextQueuePtrRef());
-#endif
     D_ASSERT(old_list == NULL || old_list->sanity_check_list(false));
   }
 
@@ -402,11 +398,7 @@ inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t BT_FUNDEF_NODEF
     }
 #endif
 
-#ifdef NO_DYN_CHECK
     t->remove();
-#else
-    t->remove(getQueue(stateObj).getNextQueuePtrRef());
-#endif
 }
 
 #endif //TRIGGERLIST_H
