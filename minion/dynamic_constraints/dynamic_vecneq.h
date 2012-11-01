@@ -118,7 +118,7 @@ struct EqIterated
 struct NeqIterated
 {
   static string constraint_name()
-  { return "not-hamming"; }
+  { return "hamming"; }
 
   static SysInt dynamic_trigger_count()
     { return 2; }
