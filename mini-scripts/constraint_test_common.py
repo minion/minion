@@ -1149,12 +1149,12 @@ class testdiv:
         crossprod(domains, [], cross)
         out=[]
         for l in cross:
-            if l[0]//l[1] == l[2]:
+            if l[1] != 0 and l[0]//l[1] == l[2]:
                 out.append(l)
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("div", True, options, [1,1,1], ["posnum", "posnum", "posnum"], self, False)
+        return runtestgeneral("div", True, options, [1,1,1], ["num", "num", "num"], self, False)
 
 class testweightedsumgeq(testsumgeq):
     def printtable(self, domains):

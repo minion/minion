@@ -43,107 +43,50 @@ help constraints modulo
 #define LRINT(x) static_cast<DomainInt>(x + 0.5)
 #endif
 
-/// var1 / var2 = var3
-template<typename VarRef1, typename VarRef2, typename VarRef3>
-struct DivConstraint : public AbstractConstraint
-{
-  virtual string constraint_name()
-  { return "div"; }
-  
-  CONSTRAINT_ARG_LIST3(var1,var2,var3);
-  
-  VarRef1 var1;
-  VarRef2 var2;
-  VarRef3 var3;
 
-  DivConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) : AbstractConstraint(_stateObj),
-    var1(_var1), var2(_var2), var3(_var3)
+template<typename T1, typename T2, typename T3>
+class DivConstraint
+{
+public:
+  typedef typename common_var_type3<T1,T2,T3>::type var_common;
+  typedef array<var_common, 3> var_type;
+private:
+   var_type vars;
+public:
+
+  DivConstraint(const T1& v1, const T2& v2, const T3& v3)
   {
-  
-      if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
-         var3.getInitialMin() < 0)
-      { 
-      FAIL_EXIT("The 'div' constraint only supports positive numbers at present.");
-      }
+    vars[0] = v1; vars[1] = v2; vars[2] = v3;
+    // I do this test here because technically the behaviour is implementation
+    // defined, and this tiny cheap test will hopefully stop people suffering
+    // wrong answers if they recompile minion on a strange CPU.
+    DomainInt check1[3] = {-3,2,-2};
+    DomainInt check2[3] = {3,-2,-2};
+    DomainInt check3[3] = {-3,-2,1};
+    CHECK(check_assignment(check1, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
+    CHECK(check_assignment(check2, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
+    CHECK(check_assignment(check3, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
   }
-  
-  virtual triggerCollection setup_internal()
-  {
-    triggerCollection t;
-    t.push_back(make_trigger(var1, Trigger(this, -1), LowerBound));
-    t.push_back(make_trigger(var2, Trigger(this, -2), LowerBound));
-    t.push_back(make_trigger(var3, Trigger(this, -3), LowerBound));
-    t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-    t.push_back(make_trigger(var2, Trigger(this, 2), UpperBound));
-    t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
-    return t;
-  }
-    
-  virtual void propagate(DomainInt flag, DomainDelta)
-  {
-    PROP_INFO_ADDONE(Pow);
-    if(var1.isAssigned() && var2.isAssigned())
-      {
-        if(var2.getAssignedValue() == 0)
-          getState(stateObj).setFailed(true);
-      var3.propagateAssign(var1.getAssignedValue() / var2.getAssignedValue() );
-    }
-  }
-  
-  virtual void full_propagate()
-  { 
-    var2.setMin(1);   // oBVIOUSLY only works because it's all non-negative.
-      
-    propagate(1,DomainDelta::empty()); 
-    propagate(2,DomainDelta::empty());
-    propagate(3,DomainDelta::empty());
-    propagate(-1,DomainDelta::empty());
-    propagate(-2,DomainDelta::empty());
-    propagate(-3,DomainDelta::empty());
-  }
-  
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
+  string getName() const
+  { return "div"; }
+
+  var_type& get_vars()
+  { return vars; }
+
+  virtual bool check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     if(v[1] == 0)
-        return false;
-    return v[0] / v[1] == v[2];
-  }
-  
-  virtual vector<AnyVarRef> get_vars()
-  { 
-    vector<AnyVarRef> v;
-    v.push_back(var1);
-    v.push_back(var2);
-    v.push_back(var3);
-    return v;
-  }
-  
-  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  {  
-   for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
-   {
-     if(var1.inDomain(v1))
-     {
-       for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2)
-       {
-         if(var2.inDomain(v2) && v2 != 0 && var3.inDomain(v1 / v2))
-         {
-           assignment.push_back(make_pair(0, v1));
-           assignment.push_back(make_pair(1, v2));
-           assignment.push_back(make_pair(2, v1 / v2));
-           return true;
-         }
-       }
-     }
-   }
-   return false;
-  }
- 
-     // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint()
-  {
-      return forward_check_negation(stateObj, this);
+      return false;
+
+    bool negsign = (v[0] < 0 || v[1] < 0) && (v[0] > 0 || v[1] > 0);
+    DomainInt r = v[0]/v[1];
+    if(negsign && r * v[1] != v[0])
+      r--;
+    return r == v[2];
+//    return v[2] == (v[0] / v[1] - (v[0] < 0 && v[0] % v[1] != 0 ? 1 : 0));
   }
 };
+
+
 #endif

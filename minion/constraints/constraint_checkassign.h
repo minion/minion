@@ -54,9 +54,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   virtual AbstractConstraint* reverse_constraint()
   { 
-    cerr << "Check assign constraints shouldn't get reversed." << endl;
-    FAIL_EXIT();
-    return NULL;
+    return new CheckAssignConstraint<OriginalConstraint, !negate>(stateObj, originalcon);
   }
   
   virtual void propagate(DomainInt prop_val,DomainDelta delta)
