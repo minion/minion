@@ -60,9 +60,9 @@ public:
     // I do this test here because technically the behaviour is implementation
     // defined, and this tiny cheap test will hopefully stop people suffering
     // wrong answers if they recompile minion on a strange CPU.
-    DomainInt check1[3] = {-3,2,-2};
-    DomainInt check2[3] = {3,-2,-2};
-    DomainInt check3[3] = {-3,-2,1};
+    DomainInt check1[3] = {-10,3,-4};
+    DomainInt check2[3] = {-10,-3,3};
+    DomainInt check3[3] = {10,-3,-4};
     CHECK(check_assignment(check1, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
     CHECK(check_assignment(check2, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
     CHECK(check_assignment(check3, 3), "You copy of Minion has a broken div operator. Please report to the developers!");

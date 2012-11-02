@@ -447,12 +447,13 @@ class testmodulo:
         numtuples=0
         for i in domains[0]:
             for j in domains[1]:
-                if(i%j in domains[2]):
-                    out.append([i, j, i%j])
+                if j != 0:
+                    if(i%j in domains[2]):
+                        out.append([i, j, i%j])
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("modulo", True, options, [1,1,1], ["posnum", "posnum", "posnum"], self, False)
+        return runtestgeneral("modulo", True, options, [1,1,1], ["num", "num", "num"], self, False)
 
 class testgacelement__minus__deprecated:
     def printtable(self, domains): 

@@ -441,4 +441,50 @@ struct ModConstraint : public AbstractConstraint
         return new NotModConstraint<VarRef1, VarRef2, VarRef3>(stateObj, var1, var2, var3);
     }
 };
+
+
+
+template<typename T1, typename T2, typename T3>
+class SlowModConstraint
+{
+public:
+  typedef typename common_var_type3<T1,T2,T3>::type var_common;
+  typedef array<var_common, 3> var_type;
+private:
+   var_type vars;
+public:
+
+  SlowModConstraint(const T1& v1, const T2& v2, const T3& v3)
+  {
+    vars[0] = v1; vars[1] = v2; vars[2] = v3;
+     DomainInt check1[3] = {-3,5,2};
+    DomainInt check2[3] = {3,-5,-2};
+    DomainInt check3[3] = {-3,-5,-3};
+    CHECK(check_assignment(check1, 3), "You copy of Minion has a broken mod operator. Please report to the developers!");
+    CHECK(check_assignment(check2, 3), "You copy of Minion has a broken mod operator. Please report to the developers!");
+    CHECK(check_assignment(check3, 3), "You copy of Minion has a broken mod operator. Please report to the developers!");
+  }
+  string getName() const
+  { return "modulo"; }
+
+  var_type& get_vars()
+  { return vars; }
+
+  virtual bool check_assignment(DomainInt* v, SysInt v_size)
+  {
+    D_ASSERT(v_size == 3);
+    if(v[1] == 0)
+      return false;
+    // There might well be a slightly better way to do this, but I can't be bothered to figure it out.
+    DomainInt r = v[0] % abs(v[1]);
+    if(r < 0)
+      r += abs(v[1]);
+    if(v[1] < 0 && r > 0)
+      r -= abs(v[1]);
+    return r == v[2];
+  }
+};
+
+
+
 #endif
