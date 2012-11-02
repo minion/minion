@@ -2,7 +2,7 @@
 MINION 3
 **VARIABLES**
 BOOL b[4]
-DISCRETE x {1..4}
+DISCRETE x {1..1}
 **CONSTRAINTS**
 
 reifyimply(sumgeq([b[0],b[1],b[2],b[3]],2),x)

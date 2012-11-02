@@ -110,6 +110,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   ReifiedEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
+     CHECK(var3.getInitialMin() >= 0 && var3.getInitialMax() <= 1, "reify only works on Boolean variables");
     //CHECK(var3.getInitialMin() < 0, "Reification variables must have domain within {0,1}");
     //CHECK(var3.getInitialMax() > 1, "Reification variables must have domain within {0,1}");
   }
@@ -128,8 +129,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   // rewrite the following two functions.
   virtual void full_propagate()
   {
-    var3.setMin(0);
-    var3.setMax(1);
+    D_ASSERT(var3.getMin() >= 0);
+    D_ASSERT(var3.getMax() <= 1);
     if(var3.isAssigned())
     {
       if(var3.getAssignedValue() == true_value())

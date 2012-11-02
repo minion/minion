@@ -59,6 +59,7 @@ template<typename BoolVar, bool DoWatchAssignment>
   ParentConstraint(_stateObj), rar_var(_rar_var), constraint_locked(false),
     full_propagate_called(stateObj, false)
   {
+    CHECK(rar_var.getInitialMin() >= 0 && rar_var.getInitialMax() <= 1, "reifyimply only works on Boolean variables");
     child_constraints.push_back(_poscon);
   }
 
@@ -87,9 +88,9 @@ template<typename BoolVar, bool DoWatchAssignment>
       assignment.push_back(make_pair(child_constraints[0]->get_vars_singleton()->size(), 0));
       return true;
     }
-    else if(rar_var.inDomain(1))
+    else
     { 
-
+      D_ASSERT(rar_var.inDomain(1));
       bool ret = child_constraints[0]->get_satisfying_assignment(assignment);
       if(ret)
       {
@@ -99,8 +100,6 @@ template<typename BoolVar, bool DoWatchAssignment>
       else
         return false;
     }
-    else
-      return false;
   }
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
@@ -235,8 +234,8 @@ template<typename BoolVar, bool DoWatchAssignment>
   {
     P("Full prop");    
     P(child_constraints[0]->constraint_name());
-    rar_var.setMin(0);
-    rar_var.setMax(1);
+    D_ASSERT(rar_var.getMin() >= 0);
+    D_ASSERT(rar_var.getMax() <= 1);
     if(rar_var.isAssigned() && rar_var.getAssignedValue() == 1)
     {
       child_constraints[0]->full_propagate();

@@ -1439,10 +1439,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     if reify or reifyimply:
         # add extra bool variable.
         varnums=[1]+varnums
-        if random.randint(0,3)==0:
-            vartypes=["othernum"]+vartypes
-        else:
-            vartypes=["boolean"]+vartypes # no longer bool but 01
+        vartypes=["boolean"]+vartypes # no longer bool but 01
     
     isvector=[a>1 for a in varnums]  # Is it to be printed as a vector. This seems to suffice at the moment.
     

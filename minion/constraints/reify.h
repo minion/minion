@@ -117,7 +117,7 @@ struct reify : public ParentConstraint
   ParentConstraint(_stateObj), reify_var(_rar_var), constraint_locked(false),
     full_propagate_called(stateObj, false)
   {
-      
+      CHECK(reify_var.getInitialMin() >= 0 && reify_var.getInitialMax() <= 1, "reify only works on Boolean variables");
       #ifdef NODETRICK
       numeric_limits<unsigned long long> ull;
       reifysetnode=ull.max();
@@ -130,25 +130,7 @@ struct reify : public ParentConstraint
     //dtcount=dynamic_trigger_count();
     dtcount=child_constraints[0]->get_vars_singleton()->size()*2 + child_constraints[1]->get_vars_singleton()->size()*2;
     c0vars=child_constraints[0]->get_vars_singleton()->size();
-    bool hasbound=false;
-    vector<AnyVarRef>& t1=*(child_constraints[0]->get_vars_singleton());
-    for(SysInt i=0; i<t1.size(); i++)
-    {
-        if(t1[i].isBound() && t1[i].getInitialMin()!=t1[i].getInitialMax()) {
-            hasbound=true;
-        }
-    }
-    vector<AnyVarRef>& t2=*(child_constraints[1]->get_vars_singleton());
-    for(SysInt i=0; i<t2.size(); i++)
-    {
-        if(t2[i].isBound() && t2[i].getInitialMin()!=t2[i].getInitialMax()) {
-            hasbound=true;
-        }
-    }
-    if(hasbound)
-    {
-        cout<<"Warning: bound variables in reify degrade performance, because DomainRemoval triggers are translated into DomainChanged triggers." <<endl;
-    }
+
     D_DATA(triggerpairs.resize(2));
   }
 
@@ -494,8 +476,8 @@ struct reify : public ParentConstraint
     P("reify " << child_constraints[0]->constraint_name());
     P("negation: " << child_constraints[1]->constraint_name());
 
-    reify_var.setMin(0);
-    reify_var.setMax(1);
+    D_ASSERT(reify_var.getMin() >= 0);
+    D_ASSERT(reify_var.getMax() <= 1);
     if(getState(stateObj).isFailed()) return;
     
     if(reify_var.isAssigned())
