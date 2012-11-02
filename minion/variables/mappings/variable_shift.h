@@ -111,10 +111,10 @@ struct ShiftVar
     switch(type)
     {
       case UpperBound:
-        data.addDynamicTrigger(t, LowerBound, pos BT_CALL);
+        data.addDynamicTrigger(t, UpperBound, pos BT_CALL);
         break;
       case LowerBound:
-        data.addDynamicTrigger(t, UpperBound, pos BT_CALL);
+        data.addDynamicTrigger(t, LowerBound, pos BT_CALL);
         break;
       case Assigned:
       case DomainChanged:
