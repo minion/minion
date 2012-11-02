@@ -466,7 +466,7 @@ try {
     return EXIT_SUCCESS;
   }
 
-  if(!strcmp(argv[1], "help")) {
+  if(argv[1] == string("help") || argv[1] == string("--help") || argv[1] == string("-help") || argv[1] == string("-h")) {
     std::string sect("");
     if(argc != 2) {
       for(size_t i = 2; i < argc - 1; i++)
