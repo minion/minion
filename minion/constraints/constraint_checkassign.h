@@ -30,11 +30,14 @@ struct CheckAssignConstraint : public AbstractConstraint
   virtual string constraint_name()
   {
     if(negate)
-      return "!" + originalcon.getName();
+      return "!" + originalcon.constraint_name();
     return
-      originalcon.getName(); 
+      originalcon.constraint_name(); 
   }
   
+  virtual string full_output_name()
+  { return originalcon.full_output_name(); }
+
   OriginalConstraint originalcon;
 
   ReversibleInt assigned_vars;
@@ -241,7 +244,11 @@ public:
   AbstractWrapper(AbstractConstraint* _c) : c(_c)
   { }
 
-  string getName() const
+
+  string full_output_name() const
+  { return ""; }
+
+  string constraint_name() const
   { return c->constraint_name(); }
 
   vector<AnyVarRef>& get_vars()
