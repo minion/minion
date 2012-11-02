@@ -32,7 +32,7 @@ for i in `grep -l "#TEST SOLCOUNT" *.minion tests-64domains/*.minion`; do
     while [ $LOOP -lt $tests ]; do
       j=$(($j + 1));
       
-      numsols=`$exec -randomseed $LOOP -findallsols $* $i 2>/dev/null | ../mini-scripts/solutions.sh`
+      numsols=`$exec $i -randomseed $LOOP -findallsols $* 2>/dev/null | ../mini-scripts/solutions.sh`
       testnumsols=`grep "#TEST SOLCOUNT" $i  | awk '{print $3}' | tr -d '\015' `
     	if [[ "$numsols" != "$testnumsols" ]]; then
     	  testpass=0
