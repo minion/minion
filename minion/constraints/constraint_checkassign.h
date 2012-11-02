@@ -118,6 +118,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     typename OriginalConstraint::var_type& variables = originalcon.get_vars();
+    (void)variables;
     D_ASSERT(v_size == variables.size());
     if(negate)
       return !originalcon.check_assignment(v, v_size);
