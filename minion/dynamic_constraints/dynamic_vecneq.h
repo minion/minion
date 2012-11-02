@@ -577,7 +577,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       /*vector<AnyVarRef> t;
       for(SysInt i=0; i<var_array1.size(); i++) t.push_back(var_array1[i]);
       for(SysInt i=0; i<var_array2.size(); i++) t.push_back(var_array2[i]);
-      return new CheckAssignConstraint<vector<AnyVarRef>, VecNeqDynamic>(stateObj, t, *this);*/
+      return forward_check_negation(stateObj, this);*/
   }
 };
 #endif

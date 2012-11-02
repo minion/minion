@@ -24,23 +24,29 @@
 #ifndef CONSTRAINT_CHECKASSIGN_H
 #define CONSTRAINT_CHECKASSIGN_H
 
-template<typename VarArray, typename OriginalConstraint, bool negate = true>
+template<typename OriginalConstraint, bool negate = true>
 struct CheckAssignConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "!!CheckAssign"; }
+  {
+    if(negate)
+      return "!" + originalcon.getName();
+    return
+      originalcon.getName(); 
+  }
   
-  OriginalConstraint& originalcon;
-  VarArray variables;
+  OriginalConstraint originalcon;
+
   ReversibleInt assigned_vars;
   
-  CheckAssignConstraint(StateObj* _stateObj, const VarArray& vars, OriginalConstraint& con)
-  : AbstractConstraint(_stateObj), originalcon(con),variables(vars), assigned_vars(stateObj)
+  CheckAssignConstraint(StateObj* _stateObj, const OriginalConstraint& con)
+  : AbstractConstraint(_stateObj), originalcon(con), assigned_vars(stateObj)
   { }
   
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
+    typename OriginalConstraint::var_type& variables = originalcon.get_vars();
     for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       t.push_back(make_trigger(variables[i], Trigger(this, i), Assigned));
     return t;
@@ -62,6 +68,8 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   virtual BOOL check_unsat(SysInt,DomainDelta)
   {
+    typename OriginalConstraint::var_type& variables = originalcon.get_vars();
+
     SysInt count = assigned_vars;
     ++count;
     assigned_vars = count; 
@@ -75,6 +83,8 @@ struct CheckAssignConstraint : public AbstractConstraint
 
   bool check_full_assignment()
   {
+    typename OriginalConstraint::var_type& variables = originalcon.get_vars();
+
     MAKE_STACK_BOX(assignment, DomainInt, variables.size());
     for(SysInt i = 0; i < variables.size(); ++i)
       {
@@ -89,6 +99,8 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   virtual BOOL full_check_unsat()
   {
+    typename OriginalConstraint::var_type& variables = originalcon.get_vars();
+
     UnsignedSysInt counter = 0;
     for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       if(variables[i].isAssigned()) ++counter;
@@ -107,6 +119,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
+    typename OriginalConstraint::var_type& variables = originalcon.get_vars();
     D_ASSERT(v_size == variables.size());
     if(negate)
       return !originalcon.check_assignment(v, v_size);
@@ -116,6 +129,8 @@ struct CheckAssignConstraint : public AbstractConstraint
   
   virtual vector<AnyVarRef> get_vars()
   { 
+    typename OriginalConstraint::var_type& variables = originalcon.get_vars();
+
     vector<AnyVarRef> vars;
     vars.reserve(variables.size());
     for(UnsignedSysInt i = 0; i < variables.size(); ++i)
@@ -127,6 +142,8 @@ struct CheckAssignConstraint : public AbstractConstraint
   // Let's at least try forward checking!
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& ret_box)
   {
+    typename OriginalConstraint::var_type& variables = originalcon.get_vars();
+
     MAKE_STACK_BOX(c, DomainInt, variables.size());
     D_ASSERT(variables.size() == originalcon.get_vars().size());
     D_ASSERT(ret_box.size() == 0);
@@ -215,4 +232,27 @@ struct CheckAssignConstraint : public AbstractConstraint
   }
 };
 
+class AbstractWrapper
+{
+  AbstractConstraint* c;
+public:
+
+  typedef vector<AnyVarRef> var_type;
+
+  AbstractWrapper(AbstractConstraint* _c) : c(_c)
+  { }
+
+  string getName() const
+  { return c->constraint_name(); }
+
+  vector<AnyVarRef>& get_vars()
+  { return *(c->get_vars_singleton()); }
+
+  virtual bool check_assignment(DomainInt* v, SysInt v_size)
+  { return c->check_assignment(v, v_size); }
+
+};
+
+inline AbstractConstraint* forward_check_negation(StateObj* stateobj, AbstractConstraint* c)
+{ return new CheckAssignConstraint<AbstractWrapper>(stateobj, AbstractWrapper(c)); }
 #endif

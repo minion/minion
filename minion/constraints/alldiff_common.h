@@ -239,7 +239,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   { // w-or of pairwise equality.
       
       /// solely for reify exps
-      return new CheckAssignConstraint<VarArray, GacAlldiffConstraint>(stateObj, var_array, *this);
+      return forward_check_negation(stateObj, this);
       
       vector<AbstractConstraint*> con;
       for(SysInt i=0; i<var_array.size(); i++)

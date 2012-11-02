@@ -97,7 +97,7 @@ struct Check_Assign : public AbstractConstraint
   { propagate(NULL); }
 };
 
-AbstractConstraint*
+inline AbstractConstraint*
 checkAssignCon(StateObj* stateObj, AbstractConstraint* c)
 { return new Check_Assign(stateObj, c); }
 

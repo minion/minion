@@ -225,7 +225,7 @@ struct MinConstraint : public AbstractConstraint
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      return new CheckAssignConstraint<vector<AnyVarRef>, MinConstraint>(stateObj, get_vars(), *this);
+      return forward_check_negation(stateObj, this);
   }
 
   virtual vector<AnyVarRef> get_vars()

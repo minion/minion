@@ -78,7 +78,7 @@ struct NeqConstraint : public AbstractConstraint
   }
   
   virtual AbstractConstraint* reverse_constraint()
-  { return new CheckAssignConstraint<VarArray, NeqConstraint>(stateObj, var_array, *this); }
+  { return forward_check_negation(stateObj, this); }
   
   virtual void propagate(DomainInt prop_val_in, DomainDelta)
   {
