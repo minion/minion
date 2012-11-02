@@ -26,16 +26,14 @@ for i in ./test_instances/resume_instances/*.minion; do
 	continue;
     fi
 
-    #timeout is supposed to be roughly half way through search
-    timeout=`echo "scale=9;(($completefirstnodetime+$completewalltime)/2)" | bc`;
+    #choose a random number of nodes to search
+    nodeout=$(($RANDOM % completenodes))
+
+
     
-    echo complete nodes$completenodes sols$completesols walltime$completewalltime solvetime$completesolvetime timeout$timeout;
+    echo complete nodes$completenodes sols$completesols walltime$completewalltime solvetime$completesolvetime nodeout$nodeout;
     
-    $MINION $INSTANCE -makeresume > $FIRSTPARTIALOUTPUT &
-    PID=$!;
-    sleep $timeout;
-    kill -2 $PID;
-    wait $PID;
+    $MINION $INSTANCE -makeresume -nodelimit $nodeout > $FIRSTPARTIALOUTPUT
     resumefile=`grep "Output resume file" $FIRSTPARTIALOUTPUT | cut -d' ' -f5 `;
     resumefile=${resumefile#\"}; #remove leading quote
     resumefile=${resumefile%\"}; #remove trailing quote
