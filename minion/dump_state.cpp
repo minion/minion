@@ -203,14 +203,16 @@ void dump_solver(StateObj* state, ostream& os)
     }
 
     os << "**SEARCH**" << endl;
-    if(getState(state).getRawOptimiseVar() &&
-        !(getState(state).getRawOptimiseVar()->isAssigned()))
+    if(getState(state).getRawOptimiseVar())
     {
         if(getState(state).isMaximise())
             os << "MAXIMISING ";
         else
             os << "MINIMISING ";
-        os << getState(state).getRawOptimiseVar()->getBaseVar().get_name() << "\n";
+        if(getState(state).getRawOptimiseVar()->isAssigned())
+            os << getState(state).getRawOptimiseVar()->getAssignedValue() << "\n";
+        else
+            os << getState(state).getRawOptimiseVar()->getBaseVar().get_name() << "\n";
     }
     os << "PRINT ";
     os << ConOutput::print_vars(getState(state).getPrintMatrix());
