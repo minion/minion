@@ -68,7 +68,7 @@ diseq(v0,v1)
 
 // New version written by PN with bound triggers.
 // Also stronger in eq case: copies bounds across rather than just propagating on assignment. 
-template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
+template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef, bool negated = false>
 struct ReifiedEqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
@@ -78,24 +78,32 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   EqualVarRef2 var2;
   BoolVarRef var3;
 
+  DomainInt true_value() const
+  { if(negated) return 0; else return 1; }
+
+  DomainInt false_value() const
+  { if(negated) return 1; else return 0; }
+
   virtual AbstractConstraint* reverse_constraint()
   {
-    typedef typename NotType<BoolVarRef>::type NotTypedef;
-    NotTypedef v = VarNotRef(var3);
-    return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, NotTypedef>
-                 (stateObj, var1, var2, v);
+    return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, BoolVarRef, !negated>
+                 (stateObj, var1, var2, var3);
   }
 
   virtual string full_output_name()
   {
+ 
     vector<Mapper> v = var2.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_NEG))
     {
+      if(negated)
+      { FATAL_REPORTABLE_ERROR(); }
       return ConOutput::print_con("__reify_minuseq", var1, var2.popOneMapper(), var3);
     }
     else
     {
-      return ConOutput::print_con("__reify_eq", var1, var2, var3);
+
+      return ConOutput::print_con(negated ? "__reify_diseq" : "__reify_eq", var1, var2, var3);
     }
   }
   
@@ -124,7 +132,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
     var3.setMax(1);
     if(var3.isAssigned())
     {
-      if(var3.getAssignedValue() == 1)
+      if(var3.getAssignedValue() == true_value())
         eqprop();
       else
       {
@@ -153,7 +161,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
           // var1 lower bound has moved
           if(var3.isAssigned())
           {
-              if(var3.getAssignedValue()==1)
+              if(var3.getAssignedValue()==true_value())
               {
                   var2.setMin(var1.getMin());
               }
@@ -172,7 +180,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
         // var1 upper bound has moved.
           if(var3.isAssigned())
           {
-              if(var3.getAssignedValue()==1)
+              if(var3.getAssignedValue()==true_value())
               {
                   var2.setMax(var1.getMax());
               }
@@ -191,7 +199,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
           // var2 lower bound has moved.
           if(var3.isAssigned())
           {
-              if(var3.getAssignedValue()==1)
+              if(var3.getAssignedValue()==true_value())
               {
                   var1.setMin(var2.getMin());
               }
@@ -210,7 +218,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
           // var2 upper bound has moved.
           if(var3.isAssigned())
           {
-              if(var3.getAssignedValue()==1)
+              if(var3.getAssignedValue()==true_value())
               {
                   var1.setMax(var2.getMax());
               }
@@ -227,11 +235,11 @@ struct ReifiedEqualConstraint : public AbstractConstraint
           
       case 3:
           DomainInt assigned_val = var3.getAssignedValue();
-          if(assigned_val==1)
+          if(assigned_val==true_value())
           {
               eqprop();
           }
-          else if(assigned_val==0)
+          else if(assigned_val==false_value())
           {
               diseq();
           }
@@ -255,12 +263,12 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   {   // var1 or var2 has changed, so check
       if(var1.getMax()<var2.getMin() || var1.getMin()>var2.getMax())
       {   // not equal
-          var3.propagateAssign(0);
+          var3.propagateAssign(false_value());
       }
       if(var1.isAssigned() && var2.isAssigned()
           && var1.getAssignedValue()==var2.getAssignedValue())
       {   // equal
-          var3.propagateAssign(1);
+          var3.propagateAssign(true_value());
       }
   }
   
@@ -308,8 +316,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint
 
    virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    bool hasFalse = var3.inDomain(0);
-    bool hasTrue  = var3.inDomain(1);
+    bool hasFalse = var3.inDomain(false_value());
+    bool hasTrue  = var3.inDomain(true_value());
     //D_ASSERT(hasFalse || hasTrue); No longer true
     if(hasFalse)
     {
@@ -317,7 +325,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
       {
         assignment.push_back(make_pair(0, var1.getMin()));
         assignment.push_back(make_pair(1, var2.getMax()));
-        assignment.push_back(make_pair(2, 0));
+        assignment.push_back(make_pair(2, false_value()));
         return true; 
       }
     
@@ -325,7 +333,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
       {
         assignment.push_back(make_pair(0, var1.getMax()));
         assignment.push_back(make_pair(1, var2.getMin()));
-        assignment.push_back(make_pair(2, 0));
+        assignment.push_back(make_pair(2, false_value()));
         return true;
       }
     
@@ -336,7 +344,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
       {
         assignment.push_back(make_pair(0, var1.getAssignedValue()));
         assignment.push_back(make_pair(1, var2.getAssignedValue()));
-        assignment.push_back(make_pair(2, 1));
+        assignment.push_back(make_pair(2, true_value()));
         return true;
       }
     }
@@ -350,7 +358,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
         {
           assignment.push_back(make_pair(0,i));
           assignment.push_back(make_pair(1,i));
-          assignment.push_back(make_pair(2,1));
+          assignment.push_back(make_pair(2,true_value()));
           return true;
         }
       }
@@ -362,7 +370,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   {
     D_ASSERT(v_size == 3);
     D_ASSERT(v[2] == 0 || v[2] == 1);
-    return (v[0] == v[1]) == v[2];
+    return (v[0] == v[1]) == (v[2] == true_value());
   }
   
   virtual vector<AnyVarRef> get_vars()
