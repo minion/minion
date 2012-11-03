@@ -72,6 +72,8 @@ public:
   }
 
   friend void releaseTrigger(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF);
+  friend void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF);
+
 private:
   /// Remove from whatever list this trigger is currently stored in.
 

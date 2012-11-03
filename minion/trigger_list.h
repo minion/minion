@@ -401,5 +401,32 @@ inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t BT_FUNDEF_NODEF
     t->remove();
 }
 
+ inline void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* t BT_FUNDEF_NODEFAULT)
+ {    static DynamicTrigger dt;
+    DynamicTrigger* queue = &dt;
+
+#ifdef BTWLDEF
+    switch(op)
+    {
+        case TO_Default:
+            D_DATA(t->setQueue((DynamicTrigger*)BAD_POINTER));
+        break;
+        case TO_Store:
+        t->setQueue(queue);
+        break;
+        case TO_Backtrack:
+            D_ASSERT(t->getQueue() != (DynamicTrigger*)BAD_POINTER);
+            getQueue(stateObj).getTbq().addTrigger(t);
+            // Add to queue.
+            t->setQueue(queue);
+        break;
+        default:
+        abort();
+    }
+#endif
+    t->add_after(queue);
+ }
+
+
 #endif //TRIGGERLIST_H
 
