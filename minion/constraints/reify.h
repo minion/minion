@@ -444,11 +444,12 @@ struct reify : public ParentConstraint
     D_DATA(SysInt firstunattached = -1);
     for(SysInt i=assignment.size(); (trig+i)<endtrig; i++)
     {
-        if(!(trig+i)->isAttached())
+      /// XXX : This is inefficent, but required for constant variables
+      /*  if(!(trig+i)->isAttached())
         {
             D_DATA(firstunattached=i);
             break;
-        }
+        } */
         releaseTrigger(stateObj, trig + i);
     }
 
