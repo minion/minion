@@ -294,6 +294,13 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 #endif
 };
 
+
+template<>
+class AnyVarRef_Concrete<DomainInt> {};
+
+template<typename T>
+class AnyVarRef_Concrete<vector<T> > {};
+
 /// Provides a method of wrapping any variable type in a general wrapper.
 class AnyVarRef
 {
@@ -443,31 +450,31 @@ struct make_AnyVarRef_type<array<T, i> >
 {
   typedef vector<typename make_AnyVarRef_type<T>::type> type;
 };
-
+/*
 template<typename T>
-AnyVarRef
+typename make_AnyVarRef_type<T>::type
 make_AnyVarRef(T t)
 {
   return AnyVarRef(t);
 }
-
+*/
 template<typename T>
-AnyVarRef
+typename make_AnyVarRef_type<vector<T> >::type
 make_AnyVarRef(vector<T> t)
 {
   vector<AnyVarRef> v;
   for(size_t i = 0; i < t.size(); ++i)
-    v.push_back(AnyVarRef(t));
+    v.push_back(AnyVarRef(t[i]));
   return v;
 }
 
 template<typename T, size_t param>
-AnyVarRef
+typename make_AnyVarRef_type<array<T,param> >::type
 make_AnyVarRef(array<T,param> t)
 {
   vector<AnyVarRef> v;
   for(size_t i = 0; i < t.size(); ++i)
-    v.push_back(AnyVarRef(t));
+    v.push_back(AnyVarRef(t[i]));
   return v;
 }
 

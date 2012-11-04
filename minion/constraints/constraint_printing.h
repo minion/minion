@@ -142,15 +142,17 @@ namespace ConOutput
     if(name.find("sum") != string::npos)
     {
       vector<DomainInt> res = filter_constants(vars);
-      DomainInt sum;
+      DomainInt sum = 0;
       for(size_t i = 0; i < res.size(); ++i)
         sum += res[i];
 
-      if(result.isAssigned())
-        result = ConstantVar(stateObj, result.getAssignedValue() - sum);
-      else
-        vars.push_back(ConstantVar(stateObj, sum));
-
+      if(result != 0)
+      {
+        if(result.isAssigned())
+          result = ConstantVar(stateObj, result.getAssignedValue() - sum);
+        else
+          vars.push_back(ConstantVar(stateObj, sum));
+      }
     }
   }
   
@@ -174,6 +176,15 @@ namespace ConOutput
     string s2 = print_vars(args2); 
     return name + "(" + s1 + "," + s2 + ")";
   }
+
+  inline
+  string print_array_var_con(StateObj* stateObj, string name, vector<AnyVarRef> args1, AnyVarRef args2)
+  { 
+    compress_arrays(stateObj, name, args1, args2);
+    string s1 = print_vars(args1);
+    string s2 = print_vars(args2); 
+    return name + "(" + s1 + "," + s2 + ")";
+  }
   
   template<typename T1, typename T2, typename T3>
   string print_con(StateObj* stateObj, string name, const T1& args1, const T2& args2, const T3& args3)
@@ -184,7 +195,15 @@ namespace ConOutput
     return name + "(" + s1 + "," + s2 + "," + s3 + ")";
   }
 
-
+  inline
+  string print_weight_array_var_con(StateObj* stateObj, string name, vector<DomainInt> args1,
+                                    vector<AnyVarRef> args2, const AnyVarRef& args3)
+  { 
+    string s1 = print_vars(args1); 
+    string s2 = print_vars(args2);
+    string s3 = print_vars(args3);
+    return name + "(" + s1 + "," + s2 + "," + s3 + ")";
+  }
 
 
   template<typename T1, typename T2>
@@ -201,11 +220,11 @@ namespace ConOutput
           FATAL_REPORTABLE_ERROR();
         pops.push_back(vars[i].popOneMapper());
       }
-      return print_con(stateObj, neg_name, pops, res.popOneMapper());
+      return print_array_var_con(stateObj, neg_name, pops, AnyVarRef(res.popOneMapper()));
     }
     else
     {
-      return print_con(stateObj, name, vars, res);
+      return print_array_var_con(stateObj, name, make_AnyVarRef(vars), AnyVarRef(res));
     }
   }
 
@@ -228,11 +247,11 @@ template<typename T1, typename T2>
         pops.push_back(sumvars[i].popOneMapper());
         weights.push_back(mapi.back().val());
       }
-      return print_con(stateObj, weight + name,  weights, pops,  result);
+      return print_weight_array_var_con(stateObj, weight + name,  weights, pops,  AnyVarRef(result));
     }
     else
     {
-      return print_con(stateObj, name, sumvars, result);
+      return print_array_var_con(stateObj, name, make_AnyVarRef(sumvars), AnyVarRef(result));
     }
   }
 
