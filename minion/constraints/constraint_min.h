@@ -69,7 +69,7 @@ struct MinConstraint : public AbstractConstraint
       for(size_t i = 0; i < var_array.size(); ++i)
       {
         if(var_array[i].isAssigned() && min_var.getAssignedValue() == var_array[i].getAssignedValue())
-          return "";
+          return "true()";
       }
     }
 
