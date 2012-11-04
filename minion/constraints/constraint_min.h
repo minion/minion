@@ -59,8 +59,23 @@ struct MinConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "min"; }
-  
-  CONSTRAINT_REVERSIBLE_ARG_LIST2("min", "max", var_array, min_var);
+
+  virtual string full_output_name() \
+  {
+    // We assume constraint is propagated here, we will do a simple check
+    // to see if it is true.
+    if(min_var.isAssigned())
+    {
+      for(size_t i = 0; i < var_array.size(); ++i)
+      {
+        if(var_array[i].isAssigned() && min_var.getAssignedValue() == var_array[i].getAssignedValue())
+          return "";
+      }
+    }
+
+    return ConOutput::print_reversible_con(stateObj, "min", "max", var_array, min_var); 
+  }
+
 
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type ArrayVarRef;

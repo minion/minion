@@ -146,12 +146,40 @@ namespace ConOutput
       for(size_t i = 0; i < res.size(); ++i)
         sum += res[i];
 
-      if(result != 0)
+      if(sum != 0)
       {
         if(result.isAssigned())
           result = ConstantVar(stateObj, result.getAssignedValue() - sum);
         else
           vars.push_back(ConstantVar(stateObj, sum));
+      }
+    }
+
+    if(name.find("min") != string::npos)
+    {
+      vector<DomainInt> res = filter_constants(vars);
+      if(!res.empty())
+      {
+        DomainInt val = res[0];
+        for(size_t i = 1; i < res.size(); ++i)
+        {
+          val = std::min(val, res[i]);
+        }
+        vars.push_back(ConstantVar(stateObj, val));
+      }
+    }
+
+    if(name.find("max") != string::npos)
+    {
+      vector<DomainInt> res = filter_constants(vars);
+      if(!res.empty())
+      {
+        DomainInt val = res[0];
+        for(size_t i = 1; i < res.size(); ++i)
+        {
+          val = std::max(val, res[i]);
+        }
+        vars.push_back(ConstantVar(stateObj, val));
       }
     }
   }
