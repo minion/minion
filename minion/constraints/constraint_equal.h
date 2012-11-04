@@ -98,12 +98,12 @@ struct ReifiedEqualConstraint : public AbstractConstraint
     {
       if(negated)
       { FATAL_REPORTABLE_ERROR(); }
-      return ConOutput::print_con("__reify_minuseq", var1, var2.popOneMapper(), var3);
+      return ConOutput::print_con(stateObj, "__reify_minuseq", var1, var2.popOneMapper(), var3);
     }
     else
     {
 
-      return ConOutput::print_con(negated ? "__reify_diseq" : "__reify_eq", var1, var2, var3);
+      return ConOutput::print_con(stateObj, negated ? "__reify_diseq" : "__reify_eq", var1, var2, var3);
     }
   }
   
@@ -624,11 +624,11 @@ struct EqualConstraint : public AbstractConstraint
     vector<Mapper> v = var2.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_NEG))
     {
-      return ConOutput::print_con("minuseq", var1, var2.popOneMapper());
+      return ConOutput::print_con(stateObj, "minuseq", var1, var2.popOneMapper());
     }
     else
     {
-      return ConOutput::print_con("eq", var1, var2);
+      return ConOutput::print_con(stateObj, "eq", var1, var2);
     }
   }
   

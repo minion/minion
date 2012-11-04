@@ -98,11 +98,11 @@ struct ElementConstraintDynamic : public AbstractConstraint
     vector<Mapper> v = indexvar.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_SHIFT, -1))
     {
-      return ConOutput::print_con("watchelement_one"+undef_name, var_array, indexvar.popOneMapper(), resultvar);
+      return ConOutput::print_con(stateObj, "watchelement_one"+undef_name, var_array, indexvar.popOneMapper(), resultvar);
     }
     else
     {
-      return ConOutput::print_con("watchelement"+undef_name, var_array, indexvar, resultvar);
+      return ConOutput::print_con(stateObj, "watchelement"+undef_name, var_array, indexvar, resultvar);
     }
   }
   

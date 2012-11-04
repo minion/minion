@@ -426,5 +426,50 @@ template<typename T>
 struct common_var_type3<T,T,T>
 { typedef T type; };
 
+template<typename T>
+struct make_AnyVarRef_type
+{
+  typedef AnyVarRef type; 
+};
+
+template<typename T>
+struct make_AnyVarRef_type<vector<T> >
+{
+  typedef vector<typename make_AnyVarRef_type<T>::type> type;
+};
+
+template<typename T, size_t i>
+struct make_AnyVarRef_type<array<T, i> >
+{
+  typedef vector<typename make_AnyVarRef_type<T>::type> type;
+};
+
+template<typename T>
+AnyVarRef
+make_AnyVarRef(T t)
+{
+  return AnyVarRef(t);
+}
+
+template<typename T>
+AnyVarRef
+make_AnyVarRef(vector<T> t)
+{
+  vector<AnyVarRef> v;
+  for(size_t i = 0; i < t.size(); ++i)
+    v.push_back(AnyVarRef(t));
+  return v;
+}
+
+template<typename T, size_t param>
+AnyVarRef
+make_AnyVarRef(array<T,param> t)
+{
+  vector<AnyVarRef> v;
+  for(size_t i = 0; i < t.size(); ++i)
+    v.push_back(AnyVarRef(t));
+  return v;
+}
+
 
 #endif

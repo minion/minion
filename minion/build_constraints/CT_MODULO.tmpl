@@ -18,7 +18,7 @@ BuildCT_MODULO(StateObj* stateObj, const V1& vars, const V2& var2, ConstraintBlo
          var2[0].getInitialMin() < 0)
   {
     typedef SlowModConstraint<typename V1::value_type, typename V1::value_type, typename V2::value_type> ModCon;
-    return new CheckAssignConstraint<ModCon, false>(stateObj, ModCon(vars[0], vars[1], var2[0]));
+    return new CheckAssignConstraint<ModCon, false>(stateObj, ModCon(stateObj, vars[0], vars[1], var2[0]));
   }
   else
     return new ModConstraint<typename V1::value_type, typename V1::value_type,

@@ -106,7 +106,7 @@ struct PowConstraint : public AbstractConstraint
     }
     else
     {
-      return x;  
+      return checked_cast<SysInt>(x);  
     }
   }
   

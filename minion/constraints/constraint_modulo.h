@@ -447,6 +447,7 @@ struct ModConstraint : public AbstractConstraint
 template<typename T1, typename T2, typename T3>
 class SlowModConstraint
 {
+  StateObj* stateObj;
 public:
   typedef typename common_var_type3<T1,T2,T3>::type var_common;
   typedef array<var_common, 3> var_type;
@@ -454,7 +455,8 @@ private:
    var_type vars;
 public:
 
-  SlowModConstraint(const T1& v1, const T2& v2, const T3& v3)
+  SlowModConstraint(StateObj* _stateObj, const T1& v1, const T2& v2, const T3& v3) :
+  stateObj(_stateObj)
   {
     vars[0] = v1; vars[1] = v2; vars[2] = v3;
      DomainInt check1[3] = {-3,5,2};

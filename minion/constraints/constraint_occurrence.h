@@ -384,12 +384,12 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   { 
     if(val_count_min == 0)
     {
-      return ConOutput::print_con("occurrenceleq",var_array, value, val_count_max);
+      return ConOutput::print_con(stateObj, "occurrenceleq",var_array, value, val_count_max);
     }
     else
     {
       D_ASSERT(val_count_max == var_array.size());
-      return ConOutput::print_con("occurrencegeq",var_array,value, val_count_min);
+      return ConOutput::print_con(stateObj, "occurrencegeq",var_array,value, val_count_min);
     }
   }
 

@@ -75,7 +75,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
         i--;
       }
     }
-    return ConOutput::print_con(constraint_name(), cx, cy); 
+    return ConOutput::print_con(stateObj, constraint_name(), cx, cy); 
   }
 
 

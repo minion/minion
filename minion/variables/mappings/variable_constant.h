@@ -17,9 +17,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTANT_VAR_FDSK
+#define CONSTANT_VAR_FDSK
 
-
-#include "../../constraints/constraint_abstract.h"
+struct AbstractConstraint;
 
 struct ConstantVar
 {
@@ -135,3 +136,4 @@ struct ConstantVar
   { return o << "Constant" << constant.val; }
 };
 
+#endif

@@ -116,11 +116,11 @@ struct ElementConstraint : public AbstractConstraint
     vector<Mapper> v = index_ref.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_SHIFT, -1))
     {
-      return ConOutput::print_con("element_one", var_array, index_ref.popOneMapper(), result_var);
+      return ConOutput::print_con(stateObj, "element_one", var_array, index_ref.popOneMapper(), result_var);
     }
     else
     {
-      return ConOutput::print_con("element", var_array, index_ref, result_var);
+      return ConOutput::print_con(stateObj, "element", var_array, index_ref, result_var);
     }
   }
 
