@@ -465,7 +465,7 @@ public:
     CHECK(check_assignment(check3, 3), "You copy of Minion has a broken mod operator. Please report to the developers!");
   }
   string constraint_name() const
-  { return "modulo"; }
+  { if(undef_zero) return "modulo_undefzero"; else return "modulo"; }
 
   CONSTRAINT_ARG_LIST3(vars[0], vars[1], vars[2])
 

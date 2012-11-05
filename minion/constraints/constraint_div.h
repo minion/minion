@@ -71,7 +71,7 @@ public:
   }
 
   string constraint_name() const
-  { return "div"; }
+  { if(undef_zero) return "div_undefzero"; else return "div"; }
 
   CONSTRAINT_ARG_LIST3(vars[0], vars[1], vars[2])
 

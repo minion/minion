@@ -98,13 +98,58 @@ void dump_searchorder(StateObj* stateObj, const SearchOrder& order, ostream& os)
 
 
 
-void just_domain_dump(StateObj* state, ostream& os)
+void just_domain_dump(StateObj* stateObj, ostream& os)
 {
+    VariableContainer& vc = getVars(stateObj);
+    vector<AnyVarRef> vars;
+  // booleans;
+    for(UnsignedSysInt i = 0; i < vc.boolVarContainer.var_count(); ++i)
+        vars.push_back(vc.boolVarContainer.get_var_num(i));
 
+    // bound vars
+    for(UnsignedSysInt i = 0; i < vc.boundVarContainer.var_count(); ++i)
+        vars.push_back(vc.boundVarContainer.get_var_num(i));
+
+    // bigRangeVar
+    for(UnsignedSysInt i = 0; i < vc.bigRangeVarContainer.var_count(); ++i)
+        vars.push_back(vc.bigRangeVarContainer.get_var_num(i));
+    
+
+    // sparseBound
+    for(UnsignedSysInt i = 0; i < vc.sparseBoundVarContainer.var_count(); ++i)
+        vars.push_back(vc.sparseBoundVarContainer.get_var_num(i));
+
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
+    {
+        os << "find " << getNameFromVar(stateObj, vars[i]) << " : int(";
+
+        if(vars[i].isBound())
+        {
+            os << vars[i].getMin() << ".." << vars[i].getMax();
+        }
+        else
+        {
+            bool first = false;
+            for(DomainInt val = vars[i].getMin(); val < vars[i].getMax(); ++val)
+            {
+                if(vars[i].inDomain(val))
+                {
+                    if(first) first=false; else os << ",";
+                    os << val;
+                }
+            }
+        }
+        os << ")\n";
+    }
 }
 
 void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
 {
+    if(just_domains)
+    {
+        just_domain_dump(stateObj, os);
+        return;
+    }
     os << "# Redumped during search" << endl;
     os << "MINION 3" << endl;
     os << "**VARIABLES**" << endl;
@@ -257,7 +302,14 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
 
 void dump_solver(StateObj* state, string filename, bool just_domains)
 {
-    ofstream ofs(filename.c_str());
-    dump_solver(state, ofs, just_domains);
+    if(filename == "" || filename == "--")
+    {
+        dump_solver(state, cout, just_domains);
+    }
+    else
+    {
+        ofstream ofs(filename.c_str());
+        dump_solver(state, ofs, just_domains);
+    }
     exit(0);
 }
