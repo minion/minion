@@ -429,7 +429,7 @@ inline void DynamicTrigger::propagate()
 namespace ConOutput
 {
   inline
-  string print_vars(AbstractConstraint* const& c)
+  string print_vars(StateObj* stateObj, AbstractConstraint* const& c)
   { return c->full_output_name(); }
 }
 

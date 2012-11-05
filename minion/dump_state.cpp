@@ -27,13 +27,19 @@ bool constraint_entailed(AbstractConstraint* c)
     return !flag;
 }
 
-void dump_searchorder(StateObj* state, const SearchOrder& order, ostream& os)
+template<typename T>
+inline 
+string getNameFromVar(StateObj* stateObj, const T& v)
+{ return getState(stateObj).getInstance()->vars.getName(v.getBaseVar()); }
+
+
+void dump_searchorder(StateObj* stateObj, const SearchOrder& order, ostream& os)
 {
 
     vector<SysInt> non_assigned_vars;
     for(int i = 0; i < order.var_order.size(); ++i)
     {
-        AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(state, order.var_order[i]);
+        AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(stateObj, order.var_order[i]);
         // XXX : To get tester to work.. for now. if(!v.isAssigned())
             non_assigned_vars.push_back(i);
     }
@@ -59,13 +65,13 @@ void dump_searchorder(StateObj* state, const SearchOrder& order, ostream& os)
     bool first=true;
     for(int i = 0; i < non_assigned_vars.size(); ++i)
     {
-        AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(state, order.var_order[non_assigned_vars[i]]);
+        AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(stateObj, order.var_order[non_assigned_vars[i]]);
         // XXX : see above! D_ASSERT(!v.isAssigned());
         if(first) first=false; else os << ",";
         if(v.isAssigned())
             os << v.getAssignedValue();
         else
-            os << v.getBaseVar().get_name();
+            os << getNameFromVar(stateObj, v);
     }
     os << "]\n";
 
@@ -90,19 +96,26 @@ void dump_searchorder(StateObj* state, const SearchOrder& order, ostream& os)
 
 }
 
-void dump_solver(StateObj* state, ostream& os)
+
+
+void just_domain_dump(StateObj* state, ostream& os)
+{
+
+}
+
+void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
 {
     os << "# Redumped during search" << endl;
     os << "MINION 3" << endl;
     os << "**VARIABLES**" << endl;
-    VariableContainer& vc = getVars(state);
+    VariableContainer& vc = getVars(stateObj);
 
     // booleans;
     for(UnsignedSysInt i = 0; i < vc.boolVarContainer.var_count(); ++i)
     {
         BoolVarRef bv = vc.boolVarContainer.get_var_num(i);
         if(!bv.isAssigned())
-            os << "BOOL " << bv.getBaseVar().get_name() << endl;
+            os << "BOOL " << getNameFromVar(stateObj, bv) << endl;
     }
 
     // bound vars
@@ -111,7 +124,7 @@ void dump_solver(StateObj* state, ostream& os)
         BoundVarRef bv = vc.boundVarContainer.get_var_num(i);
         if(!bv.isAssigned())
         {
-            os << "BOUND " << bv.getBaseVar().get_name() << " ";
+            os << "BOUND " << getNameFromVar(stateObj, bv) << " ";
             os << "{" << bv.getMin() << ".." << bv.getMax() << "}" << endl;
         }
     }
@@ -122,7 +135,7 @@ void dump_solver(StateObj* state, ostream& os)
         BigRangeVarRef bv = vc.bigRangeVarContainer.get_var_num(i);
         if(!bv.isAssigned())
         {
-            os << "DISCRETE " << bv.getBaseVar().get_name() << " ";
+            os << "DISCRETE " << getNameFromVar(stateObj, bv) << " ";
             os << "{" << bv.getMin() << ".." << bv.getMax() << "}" << endl;
         }
         vector<DomainInt> deleted_values;
@@ -136,7 +149,7 @@ void dump_solver(StateObj* state, ostream& os)
             os << "**CONSTRAINTS**" << endl;
             if(deleted_values.size() < bv.getMax() - bv.getMin() + 1)
             {
-                os << "w-notinset(" << bv.getBaseVar().get_name() << ", [";
+                os << "w-notinset(" << getNameFromVar(stateObj, bv) << ", [";
                 bool first=true;
                 for(size_t i = 0; i < deleted_values.size(); ++i)
                 {
@@ -147,7 +160,7 @@ void dump_solver(StateObj* state, ostream& os)
             }
             else
             {
-                os << "w-inset(" << bv.getBaseVar().get_name() << ", [";
+                os << "w-inset(" << getNameFromVar(stateObj, bv) << ", [";
                 os << bv.getMin();
                 for(DomainInt i = bv.getMin() + 1; i <= bv.getMax(); ++i)
                 {
@@ -169,7 +182,7 @@ void dump_solver(StateObj* state, ostream& os)
         if(!bv.isAssigned())
         {
 
-            os << "SPARSEBOUND " << bv.getBaseVar().get_name() << " ";
+            os << "SPARSEBOUND " << getNameFromVar(stateObj, bv) << " ";
             os << "{" ;
             bool first = true;
             for(size_t j = 0; j < dom.size(); ++j)
@@ -189,7 +202,7 @@ void dump_solver(StateObj* state, ostream& os)
 
     // tuples
     os << "**TUPLELIST**" << endl;
-    SearchState& search_state = getState(state);
+    SearchState& search_state = getState(stateObj);
 
     for(UnsignedSysInt i = 0; i < search_state.getTupleListContainer()->size(); ++i)
     {
@@ -203,30 +216,30 @@ void dump_solver(StateObj* state, ostream& os)
     }
 
     os << "**SEARCH**" << endl;
-    if(getState(state).getRawOptimiseVar())
+    if(getState(stateObj).getRawOptimiseVar())
     {
-        if(getState(state).isMaximise())
+        if(getState(stateObj).isMaximise())
             os << "MAXIMISING ";
         else
             os << "MINIMISING ";
-        if(getState(state).getRawOptimiseVar()->isAssigned())
-            os << getState(state).getRawOptimiseVar()->getAssignedValue() << "\n";
+        if(getState(stateObj).getRawOptimiseVar()->isAssigned())
+            os << getState(stateObj).getRawOptimiseVar()->getAssignedValue() << "\n";
         else
-            os << getState(state).getRawOptimiseVar()->getBaseVar().get_name() << "\n";
+            os << getNameFromVar(stateObj, *getState(stateObj).getRawOptimiseVar()) << "\n";
     }
     os << "PRINT ";
-    os << ConOutput::print_vars(getState(state).getPrintMatrix());
+    os << ConOutput::print_vars(stateObj, getState(stateObj).getPrintMatrix());
     os << endl;
 
 
-    for(UnsignedSysInt i = 0; i < getState(state).getInstance()->search_order.size(); ++i)
+    for(UnsignedSysInt i = 0; i < getState(stateObj).getInstance()->search_order.size(); ++i)
     {
-        dump_searchorder(state, getState(state).getInstance()->search_order[i], os);
+        dump_searchorder(stateObj, getState(stateObj).getInstance()->search_order[i], os);
     }
 
     os << "**CONSTRAINTS**" << endl;
 
-    if(getState(state).isFailed())
+    if(getState(stateObj).isFailed())
         os << "false()" << endl;
     else
     {
@@ -242,9 +255,9 @@ void dump_solver(StateObj* state, ostream& os)
     os << "**EOF**" << endl;
 }
 
-void dump_solver(StateObj* state, string filename)
+void dump_solver(StateObj* state, string filename, bool just_domains)
 {
     ofstream ofs(filename.c_str());
-    dump_solver(state, ofs);
+    dump_solver(state, ofs, just_domains);
     exit(0);
 }

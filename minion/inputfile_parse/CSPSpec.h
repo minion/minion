@@ -761,6 +761,7 @@ inline ConstraintDef* get_constraint(ConstraintType t)
   D_FATAL_ERROR("Constraint not found");
 }
 
+
 using namespace ProbSpec;
 
 #endif

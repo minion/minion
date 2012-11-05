@@ -18,53 +18,56 @@
 */
 
 #include "../variables/mappings/variable_constant.h"
+#include "../inputfile_parse/CSPSpec.h"
 
 namespace ConOutput
 {
   template<typename T>
-  string print_vars(const T& t)
+  string print_vars(StateObj* stateObj, const T& t)
   {
     if(t.isAssigned())
       return to_string(t.getAssignedValue());
     else
     {
       vector<Mapper> m = t.getMapperStack();
+      string prefix = "";
       if(m.size() == 1)
       {
         D_ASSERT(m[0] == Mapper(MAP_NOT));
-        return "!" + t.getBaseVar().get_name();
+        prefix = "!";
       }
       else
       {
         D_ASSERT(m.empty());
-        return t.getBaseVar().get_name();
       }
+
+        return prefix + getState(stateObj).getInstance()->vars.getName(t.getBaseVar());
     }
   }
 
   inline
-  string print_vars(TupleList* const& t)
+  string print_vars(StateObj* stateObj,TupleList* const& t)
   { return t->getName(); }
 
   inline
-  string print_vars(AbstractConstraint* const& c);
+  string print_vars(StateObj* stateObj,AbstractConstraint* const& c);
 
   inline
-  string print_vars(const DomainInt& i)
+  string print_vars(StateObj* stateObj, const DomainInt& i)
   { return to_string(i); }
 
 #ifdef MINION_DEBUG
   inline
-  string print_vars(const SysInt& i)
+  string print_vars(StateObj* stateObj, const SysInt& i)
   { return to_string(i); }
 #endif
 
   template<SysInt i>
-  string print_vars(const compiletime_val<i>)
+  string print_vars(StateObj* stateObj, const compiletime_val<i>)
   { return to_string(i); }
 
   inline
-  string print_vars(const std::vector<AbstractConstraint*>& t)
+  string print_vars(StateObj* stateObj, const std::vector<AbstractConstraint*>& t)
   {
     ostringstream o;
     o << "{";
@@ -75,7 +78,7 @@ namespace ConOutput
         o << ",";
       else
         first = false;
-      o << ConOutput::print_vars(t[i]);
+      o << ConOutput::print_vars(stateObj, t[i]);
     }
     o << "}";
     return o.str();
@@ -83,7 +86,7 @@ namespace ConOutput
 
 
   template<typename T>
-  string print_vars(const std::vector<T>& t)
+  string print_vars(StateObj* stateObj, const std::vector<T>& t)
   {
     ostringstream o;
     o << "[";
@@ -94,14 +97,14 @@ namespace ConOutput
         o << ",";
       else
         first = false;
-      o << ConOutput::print_vars(t[i]);
+      o << ConOutput::print_vars(stateObj, t[i]);
     }
     o << "]";
     return o.str();
   }
 
   template<typename T, size_t len>
-  string print_vars(const array<T,len>& t)
+  string print_vars(StateObj* stateObj, const array<T,len>& t)
   {
     ostringstream o;
     o << "[";
@@ -112,7 +115,7 @@ namespace ConOutput
         o << ",";
       else
         first = false;
-      o << ConOutput::print_vars(t[i]);
+      o << ConOutput::print_vars(stateObj, t[i]);
     }
     o << "]";
     return o.str();
@@ -192,7 +195,7 @@ namespace ConOutput
   template<typename T>
   string print_con(StateObj* stateObj, string name, const T& args)
   { 
-    string s = print_vars(args); 
+    string s = print_vars(stateObj, args); 
     return name + "(" + s + ")";
   }
 
@@ -200,8 +203,8 @@ namespace ConOutput
   string print_con(StateObj* stateObj, string name, const T1& args1, const T2& args2)
   { 
 
-    string s1 = print_vars(args1);
-    string s2 = print_vars(args2); 
+    string s1 = print_vars(stateObj, args1);
+    string s2 = print_vars(stateObj, args2); 
     return name + "(" + s1 + "," + s2 + ")";
   }
 
@@ -209,17 +212,17 @@ namespace ConOutput
   string print_array_var_con(StateObj* stateObj, string name, vector<AnyVarRef> args1, AnyVarRef args2)
   { 
     compress_arrays(stateObj, name, args1, args2);
-    string s1 = print_vars(args1);
-    string s2 = print_vars(args2); 
+    string s1 = print_vars(stateObj, args1);
+    string s2 = print_vars(stateObj, args2); 
     return name + "(" + s1 + "," + s2 + ")";
   }
   
   template<typename T1, typename T2, typename T3>
   string print_con(StateObj* stateObj, string name, const T1& args1, const T2& args2, const T3& args3)
   { 
-    string s1 = print_vars(args1); 
-    string s2 = print_vars(args2);
-    string s3 = print_vars(args3);
+    string s1 = print_vars(stateObj, args1); 
+    string s2 = print_vars(stateObj, args2);
+    string s3 = print_vars(stateObj, args3);
     return name + "(" + s1 + "," + s2 + "," + s3 + ")";
   }
 
@@ -227,9 +230,9 @@ namespace ConOutput
   string print_weight_array_var_con(StateObj* stateObj, string name, vector<DomainInt> args1,
                                     vector<AnyVarRef> args2, const AnyVarRef& args3)
   { 
-    string s1 = print_vars(args1); 
-    string s2 = print_vars(args2);
-    string s3 = print_vars(args3);
+    string s1 = print_vars(stateObj, args1); 
+    string s2 = print_vars(stateObj, args2);
+    string s3 = print_vars(stateObj, args3);
     return name + "(" + s1 + "," + s2 + "," + s3 + ")";
   }
 

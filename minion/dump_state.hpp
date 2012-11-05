@@ -17,5 +17,5 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-void dump_solver(StateObj* state, ostream& os);
-void dump_solver(StateObj* state, std::string filename);
+void dump_solver(StateObj* state, ostream& os, bool just_domains);
+void dump_solver(StateObj* state, std::string filename, bool just_domains);

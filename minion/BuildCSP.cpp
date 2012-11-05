@@ -129,8 +129,8 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
       getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions(stateObj).silent);
       
 
-      if(getOptions(stateObj).outputCompressed != "")
-        dump_solver(stateObj, getOptions(stateObj).outputCompressed);
+      if(getOptions(stateObj).outputCompressed != "" || getOptions(stateObj).outputCompressedDomains)
+        dump_solver(stateObj, getOptions(stateObj).outputCompressed, getOptions(stateObj).outputCompressedDomains);
 
       if(!getState(stateObj).isFailed())
       {

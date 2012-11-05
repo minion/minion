@@ -37,6 +37,11 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
 
     else if(command == string("-redump"))
     { getOptions(stateObj).redump = true; }
+    else if(command == string("-outputCompressedDomains"))
+    {
+      ++i;
+      getOptions(stateObj).outputCompressedDomains = true;
+    }
     else if(command == string("-outputCompressed"))
     { 
       ++i;
