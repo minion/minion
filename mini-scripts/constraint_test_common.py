@@ -455,6 +455,24 @@ class testmodulo:
     def runtest(self, options=dict()):
         return runtestgeneral("modulo", True, options, [1,1,1], ["num", "num", "num"], self, False)
 
+class testmodulo_undefzero:
+    def printtable(self, domains): 
+        out=[]
+        # given a list of lists for the domains, generate the table for modulo 
+        numtuples=0
+        for i in domains[0]:
+            for j in domains[1]:
+                if j != 0:
+                    result = i%j
+                else:
+                    result = 0
+                if(result in domains[2]):
+                    out.append([i, j, result])
+        return out
+        
+    def runtest(self, options=dict()):
+        return runtestgeneral("modulo_undefzero", True, options, [1,1,1], ["num", "num", "num"], self, False)
+
 class testgacelement__minus__deprecated:
     def printtable(self, domains): 
         out=[]
@@ -1156,6 +1174,19 @@ class testdiv:
         
     def runtest(self, options=dict()):
         return runtestgeneral("div", True, options, [1,1,1], ["num", "num", "num"], self, False)
+
+class testdiv_undefzero:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            if (l[1] == 0 and l[2] == 0) or (l[1] != 0 and l[0]//l[1] == l[2]):
+                out.append(l)
+        return out
+        
+    def runtest(self, options=dict()):
+        return runtestgeneral("div_undefzero", True, options, [1,1,1], ["num", "num", "num"], self, False)
 
 class testweightedsumgeq(testsumgeq):
     def printtable(self, domains):

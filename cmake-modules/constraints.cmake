@@ -6,7 +6,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one" "w
                     "occurrenceleq" "occurrencegeq" "product" "difference"
                     "weightedsumleq" "weightedsumgeq" "sumgeq" "sumleq" "watchsumgeq"
                     "watchsumleq" "table" "negativetable" "watchvecneq" "staticvecneq" "litsumgeq"
-                    "pow" "div" "modulo" "gadget" "disabled-or"
+                    "pow" "div" "div_undefzero" "modulo" "modulo_undefzero" "gadget" "disabled-or"
                     "hamming" "not-hamming" "watched-or" "watched-and"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply"
@@ -161,8 +161,15 @@ set(NAME_READ_pow "read_2_vars" "read_var")
 set(NAME_ID_div "CT_DIV")
 set(NAME_READ_div "read_2_vars" "read_var")
 
+set(NAME_ID_div_undefzero "CT_DIV_UNDEFZERO")
+set(NAME_READ_div_undefzero "read_2_vars" "read_var")
+
 set(NAME_ID_modulo "CT_MODULO")
 set(NAME_READ_modulo "read_2_vars" "read_var")
+
+set(NAME_ID_modulo_undefzero "CT_MODULO_UNDEFZERO")
+set(NAME_READ_modulo_undefzero "read_2_vars" "read_var")
+
 
 set(NAME_ID_gadget "CT_GADGET")
 set(NAME_READ_gadget "read_list")

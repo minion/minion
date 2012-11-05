@@ -44,7 +44,7 @@ help constraints modulo
 #endif
 
 
-template<typename T1, typename T2, typename T3>
+template<typename T1, typename T2, typename T3, bool undef_zero>
 class DivConstraint
 {
   StateObj* stateObj;
@@ -82,7 +82,12 @@ public:
   {
     D_ASSERT(v_size == 3);
     if(v[1] == 0)
-      return false;
+    {
+      if(undef_zero)
+        return v[2] == 0;
+      else
+        return false;
+    }
 
     bool negsign = (v[0] < 0 || v[1] < 0) && (v[0] > 0 || v[1] > 0);
     DomainInt r = v[0]/v[1];

@@ -33,7 +33,7 @@ conslist+=["element", "gacelement-deprecated", "watchelement"]
 conslist+=["watchelement_one", "element_one"]
 
 # arithmetic constraints
-conslist+=["modulo", "pow", "minuseq", "product", "div", "abs"]
+conslist+=["modulo", "modulo_undefzero", "pow", "minuseq", "product", "div", "div_undefzero", "abs"]
 
 conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "staticvecneq", "hamming", "not-hamming"]
 conslist+=["weightedsumleq", "weightedsumgeq"]

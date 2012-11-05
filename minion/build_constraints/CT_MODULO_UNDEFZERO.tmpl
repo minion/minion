@@ -10,14 +10,14 @@
 
 template<typename V1, typename V2>
 inline AbstractConstraint*
-BuildCT_MODULO(StateObj* stateObj, const V1& vars, const V2& var2, ConstraintBlob&)
+BuildCT_MODULO_UNDEFZERO(StateObj* stateObj, const V1& vars, const V2& var2, ConstraintBlob&)
 {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   if(vars[0].getInitialMin() < 0 || vars[1].getInitialMin() < 1 ||
          var2[0].getInitialMin() < 0)
   {
-    typedef SlowModConstraint<typename V1::value_type, typename V1::value_type, typename V2::value_type, false> ModCon;
+    typedef SlowModConstraint<typename V1::value_type, typename V1::value_type, typename V2::value_type, true> ModCon;
     return new CheckAssignConstraint<ModCon, false>(stateObj, ModCon(stateObj, vars[0], vars[1], var2[0]));
   }
   else
@@ -25,4 +25,4 @@ BuildCT_MODULO(StateObj* stateObj, const V1& vars, const V2& var2, ConstraintBlo
                              typename V2::value_type>(stateObj, vars[0], vars[1], var2[0]);
 }
 
-BUILD_CT(CT_MODULO, 2)
+BUILD_CT(CT_MODULO_UNDEFZERO, 2)

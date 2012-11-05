@@ -51,7 +51,6 @@ struct NotModConstraint : public AbstractConstraint
   NotModConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
-  
       if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
          var3.getInitialMin() < 0)
       { 
@@ -236,7 +235,6 @@ struct ModConstraint : public AbstractConstraint
   ModConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
-  
       if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
          var3.getInitialMin() < 0)
       { 
@@ -444,7 +442,7 @@ struct ModConstraint : public AbstractConstraint
 
 
 
-template<typename T1, typename T2, typename T3>
+template<typename T1, typename T2, typename T3, bool undef_zero>
 class SlowModConstraint
 {
   StateObj* stateObj;
@@ -478,7 +476,12 @@ public:
   {
     D_ASSERT(v_size == 3);
     if(v[1] == 0)
-      return false;
+    {
+      if(undef_zero)
+        return (v[2] == 0);
+      else
+        return false;
+    }
     // There might well be a slightly better way to do this, but I can't be bothered to figure it out.
     DomainInt r = v[0] % abs(v[1]);
     if(r < 0)
