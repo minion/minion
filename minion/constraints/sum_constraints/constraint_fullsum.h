@@ -63,10 +63,10 @@ struct LessEqualSumConstraint : public AbstractConstraint
     
   VarArray var_array;  
   VarSum var_sum;
-  Reversible<DomainInt> max_looseness;
+  DomainInt max_looseness;
   Reversible<DomainInt> var_array_min_sum;
   LessEqualSumConstraint(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
-    AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), max_looseness(_stateObj), 
+    AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum),
     var_array_min_sum(_stateObj)
   {
       BigInt accumulator=0;
@@ -109,14 +109,6 @@ struct LessEqualSumConstraint : public AbstractConstraint
     return min_sum;
   }
   
-  DomainInt get_real_max_diff()
-  {
-    DomainInt max_diff = 0;
-    for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
-      max_diff = max(max_diff, it->getMax() - it->getMin());
-    return max_diff;
-  }
-  
   virtual void propagate(DomainInt prop_val, DomainDelta domain_change)
   {
     P("Prop: " << prop_val);
@@ -143,9 +135,8 @@ struct LessEqualSumConstraint : public AbstractConstraint
       return;
     }
 
-    if(looseness < (DomainInt)max_looseness)
+    if(looseness < max_looseness)
     {
-      // max_looseness.set(looseness);
       for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
         it->setMax(it->getMin() + looseness);
     }
