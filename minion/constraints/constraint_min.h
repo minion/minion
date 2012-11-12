@@ -66,11 +66,17 @@ struct MinConstraint : public AbstractConstraint
     // to see if it is true.
     if(min_var.isAssigned())
     {
+      bool found_assigned_min = false;
+      bool found_lesser_value = false;
       for(size_t i = 0; i < var_array.size(); ++i)
       {
         if(var_array[i].isAssigned() && min_var.getAssignedValue() == var_array[i].getAssignedValue())
-          return "true()";
+          found_assigned_min = true;
+        if(var_array[i].getMin() < min_var.getMin())
+          found_lesser_value = true;
       }
+      if(found_assigned_min && !found_lesser_value)
+        return "true()";
     }
 
     return ConOutput::print_reversible_con(stateObj, "min", "max", var_array, min_var); 
