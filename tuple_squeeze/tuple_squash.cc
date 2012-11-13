@@ -286,7 +286,7 @@ int main(int argc, char** argv)
 {
     if(argc != 4)
     {
-        std::cout << "prog <life|brain> <N: normal, E: eager, L: lazy> <random seed>" << std::endl;
+        std::cout << "prog <life|briansbrain|immigration|quadlife> <N: normal, E: eager, L: lazy> <random seed>" << std::endl;
         exit(1);
     }
 
@@ -297,7 +297,7 @@ int main(int argc, char** argv)
         tuples = make_life_tuples();
         domain_max = Vint(10,2);
     }
-    else if(argv[1] == std::string("brain"))
+    else if(argv[1] == std::string("briansbrain"))
     {
         tuples = make_brain_tuples();
         domain_max = Vint(10,3);
@@ -348,7 +348,5 @@ int main(int argc, char** argv)
         tuples = pair_ret.second;
     }
 
-
-    std::cout << constraint << std::endl;
     print(argv[1], argv[2], constraint);
 }
