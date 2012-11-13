@@ -276,7 +276,7 @@ void print(std::string name, std::string type, const std::set<Vint>& tuples)
         }
         push_back(output, -1, -1);
     }
-    std::cout << "constraint " << 0 << " " << output.size() << "\n";
+    std::cout << "constraint " << 1 << " " << output.size() << "\n";
     for(auto i : output)
         std::cout << i << " ";
     std::cout << "\n";
