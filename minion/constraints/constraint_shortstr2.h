@@ -180,52 +180,42 @@ struct ReversibleArrayset {
 
 #define UseShort true
 
-template<typename VarArray>
-struct ShortSTR2 : public AbstractConstraint
+struct ShortTupleData
 {
-    VarArray vars;
-    
-    bool constraint_locked;
-    
     vector<vector<int> > tuples;
     vector<vector<pair<int,int> > > compressed_tuples;
 
-    vector<int> tupindices;
-    
-    ReversibleInt limit;   // In tupindices, indices less than limit are not known to be invalid.
-    
-    ShortSTR2(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj), 
-    vars(_var_array), constraint_locked(false), limit(_stateObj)
-    //, ssup_permanent(_stateObj)
+    ShortTupleData(TupleList* _tuples, size_t varsize)
     {
         // Decode the tuples, they are all encoded in one tuple.
-        if(UseShort) {
+        if(UseShort)
+        {
             D_ASSERT(_tuples->size()==1);
-            
+
             vector<DomainInt> encoded = _tuples->get_vector(0);
-            
+
             vector<int> temp;
-            temp.resize(vars.size(), -1000000);
+            temp.resize(varsize, -1000000);
 
             vector<pair<int,int> > compressed_temp;
-            
+
             for(int i=0; i<encoded.size(); i=i+2) {
                 if(encoded[i]==-1) {
-                    // end of a short support.
+                // end of a short support.
                     if(encoded[i+1]!=-1) {
                         cout << "Split marker is -1,-1 in tuple for supportsgac." << endl;
                         abort();
                     }
                     tuples.push_back(temp);
-                    
+
                     temp.clear();
-                    temp.resize(vars.size(), -1000000);
+                    temp.resize(varsize, -1000000);
                     compressed_tuples.push_back(compressed_temp);
                     compressed_temp.clear();
                 }
                 else
                 {
-                    if(encoded[i]<0 || encoded[i]>=vars.size()) {
+                    if(encoded[i]<0 || encoded[i]>=varsize) {
                         cout << "Tuple passed into supportsgac does not correctly encode a set of short supports." << endl;
                         abort();
                     }
@@ -233,11 +223,11 @@ struct ShortSTR2 : public AbstractConstraint
                     compressed_temp.push_back(make_pair(encoded[i], encoded[i+1]));
                 }
             }
-            
+
             if(encoded[encoded.size()-2]!=-1 || encoded[encoded.size()-1]!=-1) {
                 cout << "Last -1,-1 marker missing from tuple in supportsgac."<< endl;
                 abort();
-            }
+            }   
         }
         else {
             // Normal table constraint.             
@@ -246,10 +236,39 @@ struct ShortSTR2 : public AbstractConstraint
                 tuples.push_back(_tuples->get_vector(i));
             }
         }
-        
-        
-        tupindices.resize(tuples.size());
-        for(int i=0; i<tuples.size(); i++) {
+    }
+};
+
+inline ShortTupleData* TupleList::getShortTupleList(size_t varcount)
+{
+    if(st == NULL)
+        st = new ShortTupleData(this, varcount);
+    return st;
+}
+
+template<typename VarArray>
+struct ShortSTR2 : public AbstractConstraint
+{
+    VarArray vars;
+    
+    bool constraint_locked;
+    
+    vector<int> tupindices;
+    
+    ReversibleInt limit;   // In tupindices, indices less than limit are not known to be invalid.
+    
+    ShortTupleData* sct;
+
+    ShortSTR2(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj), 
+    vars(_var_array), constraint_locked(false), limit(_stateObj), sct(_tuples->getShortTupleList(_var_array.size()))
+    //, ssup_permanent(_stateObj)
+    {   
+        if(sct->tuples.size() > 0)
+        {
+            CHECK(sct->tuples[0].size() == vars.size(), "Fatal Internal Error");
+        }
+        tupindices.resize(sct->tuples.size());
+        for(int i=0; i<sct->tuples.size(); i++) {
             tupindices[i]=i;
         }
         
@@ -284,7 +303,7 @@ struct ShortSTR2 : public AbstractConstraint
     }
     
     virtual void full_propagate() {
-        limit=tuples.size();
+        limit=sct->tuples.size();
         
         // pretend all variables have changed.
         for(int i=0; i<vars.size(); i++) sval.insert(i);
@@ -305,7 +324,7 @@ struct ShortSTR2 : public AbstractConstraint
         D_ASSERT(v_size == vars.size());
         vector<int> temp;
         for(int i=0; i<v_size; i++) temp.push_back(v[i]);
-        return std::find(tuples.begin(), tuples.end(), temp)!=tuples.end();
+        return std::find(sct->tuples.begin(), sct->tuples.end(), temp)!=sct->tuples.end();
     }
     
     virtual void propagate(int prop_var, DomainDelta)
@@ -359,7 +378,7 @@ struct ShortSTR2 : public AbstractConstraint
     bool validTuple(int i)
     {
              int index=tupindices[i];
-            vector<int> & tau=tuples[index];
+            vector<int> & tau=sct->tuples[index];
 
         bool isvalid=true;
 
@@ -417,7 +436,7 @@ struct ShortSTR2 : public AbstractConstraint
                 bool isvalid=validTuple(i);
                 
                 if(isvalid) {
-                    vector<pair<int,int> >& compressed_tau = compressed_tuples[index];
+                    vector<pair<int,int> >& compressed_tau = sct->compressed_tuples[index];
                     for(int i = 0; i < compressed_tau.size(); ++i)
                         ssup.insert(compressed_tau[i].first);
                     pass_first_loop = true;
@@ -442,7 +461,7 @@ struct ShortSTR2 : public AbstractConstraint
 
         while(i<limit) {
             int index=tupindices[i];
-            vector<int> & tau=tuples[index];
+            vector<int> & tau=sct->tuples[index];
             
             // check validity
             bool isvalid=validTuple(i);

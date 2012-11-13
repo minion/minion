@@ -36,14 +36,15 @@ class LiteralSpecificLists;
 class Nightingale;
 class TupleTrieArray;
 class Regin;
+class ShortTupleData;
 
 class TupleList
 {
-
   LiteralSpecificLists* litlists;
   Nightingale* nightingale;
   TupleTrieArray* triearray;
   Regin* regin;
+  ShortTupleData* st;
   
   int* tuple_data;
   int tuple_length;
@@ -57,6 +58,7 @@ class TupleList
   Nightingale* getNightingale();
   TupleTrieArray* getTries();
   Regin* getRegin();
+  ShortTupleData* getShortTupleList(size_t varcount);
   
   /// Get raw pointer to the tuples.
   int* getPointer()
@@ -80,7 +82,7 @@ class TupleList
   }
   
   TupleList(const vector<vector<int> >& tuple_list) : litlists(NULL), 
-    nightingale(NULL), triearray(NULL), regin(NULL),  tuples_locked(false)
+    nightingale(NULL), triearray(NULL), regin(NULL),  st(NULL), tuples_locked(false)
   {
     number_of_tuples = tuple_list.size();
     tuple_length = tuple_list[0].size();
@@ -92,7 +94,7 @@ class TupleList
   }
   
   TupleList(int _numtuples, int _tuplelength) : litlists(NULL),
-     nightingale(NULL), triearray(NULL), regin(NULL), tuple_length(_tuplelength),
+     nightingale(NULL), triearray(NULL), regin(NULL), st(NULL), tuple_length(_tuplelength),
     number_of_tuples(_numtuples), tuples_locked(false)
   { tuple_data = new int[number_of_tuples * tuple_length]; }
   
