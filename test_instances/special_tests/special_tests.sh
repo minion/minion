@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-solscript=../../mini-scripts/solutions.sh
+solscript=../mini-scripts/get_info.sh solutions
 
 if [ $# -lt 1 ]; then
   echo Must give a minion binary to test.

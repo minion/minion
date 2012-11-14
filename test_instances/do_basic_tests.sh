@@ -44,7 +44,7 @@ for i in *.minion; do
   extraflags=`grep "#TEST EXTRAFLAGS" $i | awk '{print $3}'`
   if grep -q "#TEST SOLCOUNT" $i;
     then
-    numsols=`$exec $i $extraflags -findallsols $* 2>/dev/null | ../mini-scripts/solutions.sh`
+    numsols=`$exec $i $extraflags -findallsols $* 2>/dev/null | ../mini-scripts/get_info.sh solutions`
     testnumsols=`grep "#TEST SOLCOUNT" $i  | awk '{print $3}' | tr -d '\015' `
     if [[ "$numsols" != "$testnumsols" ]]; then
       testpass=0
@@ -71,7 +71,7 @@ for i in *.minion; do
     else
       if grep -q "#TEST NODECOUNT" $i;
         then
-        numnodes=`$exec $i $* $extraflags 2>/dev/null | ../mini-scripts/nodecount.sh`
+        numnodes=`$exec $i $* $extraflags 2>/dev/null | ../mini-scripts/get_info.sh nodes`
         testnumnodes=`grep "#TEST NODECOUNT" $i  | awk '{print $3}' | tr -d '\015' `
         if [[ "$numnodes" != "$testnumnodes" ]]; then
           testpass=0
