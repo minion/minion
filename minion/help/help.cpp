@@ -10,938 +10,6 @@ cout << "   minion help variables" << endl << endl;
 cout << "You can find out what other entries are available, if any, by looking at the 'subentries'" << endl;
 cout << "section at the end of an entry." << endl << endl;
 } else
-if("switches" == request) {
-cout << "Help entry: " << "switches" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Minion supports a number of switches to augment default behaviour. To" << endl
-<< "see more information on any switch, use the help system. The list" << endl
-<< "below contains all available switches. For example to see help on" << endl
-<< "-quiet type something similar to" << endl
-<< "" << endl
-<< " minion help switches -quiet" << endl
-<< "" << endl
-<< "replacing 'minion' by the name of the executable you're using." << endl << endl << endl;
-} else
-if("switches -redump" == request) {
-cout << "Help entry: " << "switches -redump" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Print the minion input instance file to standard out. No search is" << endl
-<< "carried out when this switch is used." << endl << endl << endl;
-} else
-if("switches -findallsols" == request) {
-cout << "Help entry: " << "switches -findallsols" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Find all solutions and count them. This option is ignored if the" << endl
-<< "problem contains any minimising or maximising objective." << endl << endl << endl;
-} else
-if("switches -quiet" == request) {
-cout << "Help entry: " << "switches -quiet" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Do not print parser progress." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -verbose" << endl << endl << endl;
-} else
-if("switches -verbose" == request) {
-cout << "Help entry: " << "switches -verbose" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Print parser progress." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -quiet" << endl << endl << endl;
-} else
-if("switches -printsols" == request) {
-cout << "Help entry: " << "switches -printsols" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Print solutions." << endl << endl << endl;
-} else
-if("switches -noprintsols" == request) {
-cout << "Help entry: " << "switches -noprintsols" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Do not print solutions." << endl << endl << endl;
-} else
-if("switches -printsolsonly" == request) {
-cout << "Help entry: " << "switches -printsolsonly" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Print only solutions and a summary at the end." << endl << endl << endl;
-} else
-if("switches -printonlyoptimal" == request) {
-cout << "Help entry: " << "switches -printonlyoptimal" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "In optimisation problems, only print the optimal value, and" << endl
-<< "not intermediate values." << endl << endl << endl;
-} else
-if("switches -preprocess" == request) {
-cout << "Help entry: " << "switches -preprocess" << endl << endl;
-cout << "" << "--------------------------------------------------------------------------------" << endl;
-cout << "" << endl
-<< "This switch allows the user to choose what level of preprocess is" << endl
-<< "applied to their model before search commences." << endl
-<< "" << endl
-<< "The choices are:" << endl
-<< "" << endl
-<< "- GAC" << endl
-<< "- generalised arc consistency (default)" << endl
-<< "- all propagators are run to a fixed point" << endl
-<< "- if some propagators enforce less than GAC then the model will" << endl
-<< "not necessarily be fully GAC at the outset" << endl
-<< "" << endl
-<< "- SACBounds" << endl
-<< "- singleton arc consistency on the bounds of each variable" << endl
-<< "- AC can be achieved when any variable lower or upper bound is a" << endl
-<< "singleton in its own domain" << endl
-<< "" << endl
-<< "- SAC" << endl
-<< "- singleton arc consistency" << endl
-<< "- AC can be achieved in the model if any value is a singleton in" << endl
-<< "its own domain" << endl
-<< "" << endl
-<< "- SSACBounds" << endl
-<< "- singleton singleton bounds arc consistency" << endl
-<< "- SAC can be achieved in the model when domains are replaced by either" << endl
-<< "the singleton containing their upper bound, or the singleton containing" << endl
-<< "their lower bound" << endl
-<< "" << endl
-<< "- SSAC" << endl
-<< "- singleton singleton arc consistency" << endl
-<< "- SAC can be achieved when any value is a singleton in its own domain" << endl
-<< "" << endl
-<< "These are listed in order of roughly how long they take to" << endl
-<< "achieve. Preprocessing is a one off cost at the start of search. The" << endl
-<< "success of higher levels of preprocessing is problem specific; SAC" << endl
-<< "preprocesses may take a long time to complete, but may reduce search" << endl
-<< "time enough to justify the cost." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "To enforce SAC before search:" << endl
-<< "" << endl
-<< " minion -preprocess SAC myinputfile.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -X-prop-node" << endl << endl << endl;
-} else
-if("switches -X-prop-node" == request) {
-cout << "Help entry: " << "switches -X-prop-node" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Allows the user to choose the level of consistency to be enforced" << endl
-<< "during search." << endl
-<< "" << endl
-<< "See entry 'help switches -preprocess' for details of the available" << endl
-<< "levels of consistency." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "To enforce SSAC during search:" << endl
-<< "" << endl
-<< " minion -X-prop-node SSAC input.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -preprocess" << endl << endl << endl;
-} else
-if("switches -dumptree" == request) {
-cout << "Help entry: " << "switches -dumptree" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Print out the branching decisions and variable states at each node." << endl << endl << endl;
-} else
-if("switches -fullprop" == request) {
-cout << "Help entry: " << "switches -fullprop" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Disable incremental propagation." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This should always slow down search while producing exactly the same" << endl
-<< "search tree." << endl
-<< "" << endl
-<< "Only available in a DEBUG executable." << endl << endl << endl;
-} else
-if("switches -nocheck" == request) {
-cout << "Help entry: " << "switches -nocheck" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Do not check solutions for correctness before printing them out." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This option is the default on non-DEBUG executables." << endl << endl << endl;
-} else
-if("switches -check" == request) {
-cout << "Help entry: " << "switches -check" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Check solutions for correctness before printing them out." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This option is the default for DEBUG executables." << endl << endl << endl;
-} else
-if("switches -nodelimit" == request) {
-cout << "Help entry: " << "switches -nodelimit" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "To stop search after N nodes, do" << endl
-<< "" << endl
-<< " minion -nodelimit N myinput.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -cpulimit" << endl
-<< "help switches -timelimit" << endl
-<< "help switches -searchlimit" << endl
-<< "help switches -sollimit" << endl << endl << endl;
-} else
-if("switches -timelimit" == request) {
-cout << "Help entry: " << "switches -timelimit" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "To stop search after N seconds (real time), do" << endl
-<< "" << endl
-<< " minion -timelimit N myinput.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -cpulimit" << endl
-<< "help switches -nodelimit" << endl
-<< "help switches -searchlimit" << endl
-<< "help switches -sollimit" << endl << endl << endl;
-} else
-if("switches -cpulimit" == request) {
-cout << "Help entry: " << "switches -cpulimit" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "To stop search after N seconds (CPU time), do" << endl
-<< "" << endl
-<< " minion -cpulimit N myinput.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -timelimit" << endl
-<< "help switches -nodelimit" << endl
-<< "help switches -searchlimit" << endl
-<< "help switches -sollimit" << endl << endl << endl;
-} else
-if("switches -searchlimit" == request) {
-cout << "Help entry: " << "switches -searchlimit" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "To stop search after N seconds search time (real time), do" << endl
-<< "" << endl
-<< " minion -searchlimit N myinput.minion" << endl
-<< "" << endl
-<< "This does not include any time spent in preprocessing." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -timelimit" << endl
-<< "help switches -cpulimit" << endl
-<< "help switches -nodelimit" << endl
-<< "help switches -sollimit" << endl << endl << endl;
-} else
-if("switches -sollimit" == request) {
-cout << "Help entry: " << "switches -sollimit" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "To stop search after N solutions have been found, do" << endl
-<< "" << endl
-<< " minion -sollimit N myinput.minion" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help switches -cpulimit" << endl
-<< "help switches -nodelimit" << endl
-<< "help switches -searchlimit" << endl
-<< "help switches -timelimit" << endl << endl << endl;
-} else
-if("switches -varorder" == request) {
-cout << "Help entry: " << "switches -varorder" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "" << endl
-<< "Enable a particular variable ordering for the search process. This" << endl
-<< "flag is experimental and minion's default ordering might be faster." << endl
-<< "" << endl
-<< "The available orders are:" << endl
-<< "" << endl
-<< "- sdf - smallest domain first, break ties lexicographically" << endl
-<< "" << endl
-<< "- sdf-random - sdf, but break ties randomly" << endl
-<< "" << endl
-<< "- srf - smallest ratio first, chooses unassigned variable with smallest" << endl
-<< " percentage of its initial values remaining, break ties lexicographically" << endl
-<< "" << endl
-<< "- srf-random - srf, but break ties randomly" << endl
-<< "" << endl
-<< "- ldf - largest domain first, break ties lexicographically" << endl
-<< "" << endl
-<< "- ldf-random - ldf, but break ties randomly" << endl
-<< "" << endl
-<< "- random - random variable ordering" << endl
-<< "" << endl
-<< "- static - lexicographical ordering" << endl << endl << endl;
-} else
-if("switches -randomseed" == request) {
-cout << "Help entry: " << "switches -randomseed" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Set the pseudorandom seed to N. This allows 'random' behaviour to be" << endl
-<< "repeated in different runs of minion." << endl << endl << endl;
-} else
-if("switches -tableout" == request) {
-cout << "Help entry: " << "switches -tableout" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Append a line of data about the current run of minion to a named file." << endl
-<< "This data includes minion version information, arguments to the" << endl
-<< "executable, build and solve time statistics, etc. See the file itself" << endl
-<< "for a precise schema of the supplied information." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "To add statistics about solving myproblem.minion to mystats.txt do" << endl
-<< "" << endl
-<< " minion -tableout mystats.txt myproblem.minion" << endl << endl << endl;
-} else
-if("switches -solsout" == request) {
-cout << "Help entry: " << "switches -solsout" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Append all solutionsto a named file." << endl
-<< "Each solution is placed on a line, with no extra formatting." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "To add the solutions of myproblem.minion to mysols.txt do" << endl
-<< "" << endl
-<< " minion -solsout mysols.txt myproblem.minion" << endl << endl << endl;
-} else
-if("switches -randomiseorder" == request) {
-cout << "Help entry: " << "switches -randomiseorder" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Randomises the ordering of the decision variables. If the input file" << endl
-<< "specifies as ordering it will randomly permute this. If no ordering is" << endl
-<< "specified a random permutation of all the variables is used." << endl << endl << endl;
-} else
-if("switches -noresume" == request) {
-cout << "Help entry: " << "switches -noresume" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Do not write a resume file on timeout or being killed." << endl << endl << endl;
-} else
-if("switches -split" == request) {
-cout << "Help entry: " << "switches -split" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "When Minion is terminated before the end of search, write out two new input" << endl
-<< "files that split the remaining search space in half. Each of the files will have" << endl
-<< "all the variables and constraints of the original file plus constraints that" << endl
-<< "rule out the search already done. In addition, the domain of the variable under" << endl
-<< "consideration when Minion was stopped is split in half with each of the new" << endl
-<< "input files considering a different half." << endl
-<< "" << endl
-<< "This feature is experimental and intended to facilitate parallelisation -- to" << endl
-<< "parallelise the solving of a single constraint problem, stop and split" << endl
-<< "repeatedly. Please note that large-scale testing of this feature was limited to" << endl
-<< "Linux systems and it might not work on others (especially Windows)." << endl
-<< "" << endl
-<< "The name of the new input files is composed of the name of the original" << endl
-<< "instance, the string 'resume', a timestamp, the process ID of Minion, the name" << endl
-<< "of the variable whose domain is being split and 0 or 1. Each of the new input" << endl
-<< "files has a comment identifying the name of the input file which it was split" << endl
-<< "from. Similarly, Minion's output identifies the new input files it writes when" << endl
-<< "splitting." << endl
-<< "" << endl
-<< "The new input files can be run without any special flags." << endl
-<< "" << endl
-<< "This flag is intended to be used with the -timelimit, -sollimit, -nodelimit" << endl
-<< ",-searchlimit or -cpulimit flags. Please note that changing other flags between" << endl
-<< "runs (such as -varorder) may have unintended consequences." << endl << endl << endl;
-} else
-if("constraints occurrence" == request) {
-cout << "Help entry: " << "constraints occurrence" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " occurrence(vec, elem, count)" << endl
-<< "" << endl
-<< "ensures that there are count occurrences of the value elem in the" << endl
-<< "vector vec." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "elem must be a constant, not a variable." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints occurrenceleq" << endl
-<< "help constraints occurrencegeq" << endl << endl << endl;
-} else
-if("constraints occurrenceleq" == request) {
-cout << "Help entry: " << "constraints occurrenceleq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " occurrenceleq(vec, elem, count)" << endl
-<< "" << endl
-<< "ensures that there are AT MOST count occurrences of the value elem in" << endl
-<< "the vector vec." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "elem and count must be constants" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints occurrence" << endl
-<< "help constraints occurrencegeq" << endl << endl << endl;
-} else
-if("constraints occurrencegeq" == request) {
-cout << "Help entry: " << "constraints occurrencegeq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " occurrencegeq(vec, elem, count)" << endl
-<< "" << endl
-<< "ensures that there are AT LEAST count occurrences of the value elem in" << endl
-<< "the vector vec." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "elem and count must be constants" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints occurrence" << endl
-<< "help constraints occurrenceleq" << endl << endl << endl;
-} else
-if("constraints difference" == request) {
-cout << "Help entry: " << "constraints difference" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " difference(x,y,z)" << endl
-<< "" << endl
-<< "ensures that z=|x-y| in any solution." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint can be expressed in a much longer form, this form both avoids" << endl
-<< "requiring an extra variable, and also gets better propagation. It gets bounds" << endl
-<< "consistency." << endl << endl << endl;
-} else
-if("constraints abs" == request) {
-cout << "Help entry: " << "constraints abs" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " abs(x,y)" << endl
-<< "" << endl
-<< "makes sure that x=|y|, i.e. x is the absolute value of y." << endl << endl << endl;
-cout << "Reference" << "-----------------------------------------------------------------------" << endl;
-cout << "help constraints abs" << endl << endl << endl;
-} else
-if("constraints lexless" == request) {
-cout << "Help entry: " << "constraints lexless" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " lexless(vec0, vec1)" << endl
-<< "" << endl
-<< "takes two vectors vec0 and vec1 of the same length and ensures that" << endl
-<< "vec0 is lexicographically less than vec1 in any solution." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint maintains GAC." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
-<< "" << endl
-<< " help constraints lexleq" << endl
-<< "" << endl
-<< "for a similar constraint with non-strict lexicographic inequality." << endl << endl << endl;
-} else
-if("constraints lexleq" == request) {
-cout << "Help entry: " << "constraints lexleq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " lexleq(vec0, vec1)" << endl
-<< "" << endl
-<< "takes two vectors vec0 and vec1 of the same length and ensures that" << endl
-<< "vec0 is lexicographically less than or equal to vec1 in any solution." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraints achieves GAC." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
-<< "" << endl
-<< " help constraints lexless" << endl
-<< "" << endl
-<< "for a similar constraint with strict lexicographic inequality." << endl << endl << endl;
-} else
-if("constraints gacalldiff" == request) {
-cout << "Help entry: " << "constraints gacalldiff" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Forces the input vector of variables to take distinct values." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "Suppose the input file had the following vector of variables defined:" << endl
-<< "" << endl
-<< "DISCRETE myVec[9] {1..9}" << endl
-<< "" << endl
-<< "To ensure that each variable takes a different value include the" << endl
-<< "following constraint:" << endl
-<< "" << endl
-<< "gacalldiff(myVec)" << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint enforces generalized arc consistency." << endl << endl << endl;
-} else
-if("constraints element_one" == request) {
-cout << "Help entry: " << "constraints element_one" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint element one is identical to element, except that the" << endl
-<< "vector is indexed from 1 rather than from 0." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See" << endl
-<< "" << endl
-<< " help constraints element" << endl
-<< "" << endl
-<< "for details of the element constraint which is almost identical to this" << endl
-<< "one." << endl << endl << endl;
-} else
-if("constraints element" == request) {
-cout << "Help entry: " << "constraints element" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint " << endl
-<< "" << endl
-<< " element(vec, i, e)" << endl
-<< "" << endl
-<< "specifies that, in any solution, vec[i] = e and i is in the range " << endl
-<< "[0 .. |vec|-1]." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "" << endl
-<< "Warning: This constraint is not confluent. Depending on the order the" << endl
-<< "propagators are called in Minion, the number of search nodes may vary when" << endl
-<< "using element. To avoid this problem, use watchelement instead. More details" << endl
-<< "below." << endl
-<< "" << endl
-<< "The level of propagation enforced by this constraint is not named, however it" << endl
-<< "works as follows. For constraint vec[i]=e:" << endl
-<< "" << endl
-<< "- After i is assigned, ensures that min(vec[i]) = min(e) and " << endl
-<< " max(vec[i]) = max(e)." << endl
-<< "" << endl
-<< "- When e is assigned, removes idx from the domain of i whenever e is not an" << endl
-<< " element of the domain of vec[idx]." << endl
-<< "" << endl
-<< "- When m[idx] is assigned, removes idx from i when m[idx] is not in the domain" << endl
-<< " of e." << endl
-<< "" << endl
-<< "This level of consistency is designed to avoid the propagator having to scan" << endl
-<< "through vec, except when e is assigned. It does a quantity of cheap propagation" << endl
-<< "and may work well in practise on certain problems." << endl
-<< "" << endl
-<< "Element is not confluent, which may cause the number of search nodes to vary" << endl
-<< "depending on the order in which constraints are listed in the input file, or " << endl
-<< "the order they are called in Minion. For example, the following input causes" << endl
-<< "Minion to search 41 nodes." << endl
-<< "" << endl
-<< "MINION 3" << endl
-<< "**VARIABLES**" << endl
-<< "DISCRETE x[5] {1..5}" << endl
-<< "**CONSTRAINTS**" << endl
-<< "element([x[0],x[1],x[2]], x[3], x[4])" << endl
-<< "alldiff([x])" << endl
-<< "**EOF**" << endl
-<< "" << endl
-<< "However if the two constraints are swapped over, Minion explores 29 nodes." << endl
-<< "As a rule of thumb, to get a lower node count, move element constraints" << endl
-<< "to the end of the list." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See the entry " << endl
-<< "" << endl
-<< " constraints watchelement" << endl
-<< "" << endl
-<< "for details of an identical constraint that enforces generalised arc" << endl
-<< "consistency." << endl << endl << endl;
-} else
-if("constraints lighttable" == request) {
-cout << "Help entry: " << "constraints lighttable" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "An extensional constraint that enforces GAC. The constraint is" << endl
-<< "specified via a list of tuples. lighttable is a variant of the " << endl
-<< "table constraint that is stateless and potentially faster" << endl
-<< "for small constraints." << endl
-<< "" << endl
-<< "For full documentation, see the help for the table constraint." << endl << endl << endl;
-} else
-if("constraints alldiff" == request) {
-cout << "Help entry: " << "constraints alldiff" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Forces the input vector of variables to take distinct values." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "Suppose the input file had the following vector of variables defined:" << endl
-<< "" << endl
-<< "DISCRETE myVec[9] {1..9}" << endl
-<< "" << endl
-<< "To ensure that each variable takes a different value include the" << endl
-<< "following constraint:" << endl
-<< "" << endl
-<< "alldiff(myVec)" << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "Enforces the same level of consistency as a clique of not equals " << endl
-<< "constraints." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See" << endl
-<< "" << endl
-<< " help constraints gacalldiff" << endl
-<< "" << endl
-<< "for the same constraint that enforces GAC." << endl << endl << endl;
-} else
-if("constraints max" == request) {
-cout << "Help entry: " << "constraints max" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " max(vec, x)" << endl
-<< "" << endl
-<< "ensures that x is equal to the maximum value of any variable in vec." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See" << endl
-<< "" << endl
-<< " help constraints min" << endl
-<< "" << endl
-<< "for the opposite constraint." << endl << endl << endl;
-} else
-if("constraints min" == request) {
-cout << "Help entry: " << "constraints min" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " min(vec, x)" << endl
-<< "" << endl
-<< "ensures that x is equal to the minimum value of any variable in vec." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See" << endl
-<< "" << endl
-<< " help constraints max" << endl
-<< "" << endl
-<< "for the opposite constraint." << endl << endl << endl;
-} else
-if("constraints table" == request) {
-cout << "Help entry: " << "constraints table" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "An extensional constraint that enforces GAC. The constraint is" << endl
-<< "specified via a list of tuples." << endl
-<< "" << endl
-<< "The variables used in the constraint have to be BOOL or DISCRETE variables." << endl
-<< "Other types are not supported." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "To specify a constraint over 3 variables that allows assignments" << endl
-<< "(0,0,0), (1,0,0), (0,1,0) or (0,0,1) do the following." << endl
-<< "" << endl
-<< "1) Add a tuplelist to the **TUPLELIST** section, e.g.:" << endl
-<< "" << endl
-<< "**TUPLELIST**" << endl
-<< "myext 4 3" << endl
-<< "0 0 0" << endl
-<< "1 0 0" << endl
-<< "0 1 0" << endl
-<< "0 0 1" << endl
-<< "" << endl
-<< "N.B. the number 4 is the number of tuples in the constraint, the " << endl
-<< "number 3 is the -arity." << endl
-<< "" << endl
-<< "2) Add a table constraint to the **CONSTRAINTS** section, e.g.:" << endl
-<< "" << endl
-<< "**CONSTRAINTS**" << endl
-<< "table(myvec, myext)" << endl
-<< "" << endl
-<< "and now the variables of myvec will satisfy the constraint myext." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "The constraints extension can also be specified in the constraint" << endl
-<< "definition, e.g.:" << endl
-<< "" << endl
-<< "table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help input tuplelist" << endl
-<< "help input negativetable" << endl << endl << endl;
-} else
-if("constraints negativetable" == request) {
-cout << "Help entry: " << "constraints negativetable" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "An extensional constraint that enforces GAC. The constraint is" << endl
-<< "specified via a list of disallowed tuples." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "See entry " << endl
-<< "" << endl
-<< " help input negativetable" << endl
-<< "" << endl
-<< "for how to specify a table constraint in minion input. The only" << endl
-<< "difference for negativetable is that the specified tuples are" << endl
-<< "disallowed." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help input table" << endl
-<< "help input tuplelist" << endl << endl << endl;
-} else
-if("constraints gcc" == request) {
-cout << "Help entry: " << "constraints gcc" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The Generalized Cardinality Constraint (GCC) constrains the number of each value" << endl
-<< "that a set of variables can take." << endl
-<< "" << endl
-<< "gcc([primary variables], [values of interest], [capacity variables])" << endl
-<< "" << endl
-<< "For each value of interest, there must be a capacity variable, which specifies" << endl
-<< "the number of occurrences of the value in the primary variables." << endl
-<< "" << endl
-<< "This constraint only restricts the number of occurrences of the values in" << endl
-<< "the value list. There is no restriction on the occurrences of other values." << endl
-<< "Therefore the semantics of gcc are identical to a set of occurrence " << endl
-<< "constraints:" << endl
-<< "" << endl
-<< "occurrence([primary variables], val1, cap1)" << endl
-<< "occurrence([primary variables], val2, cap2)" << endl
-<< "..." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "Suppose the input file had the following vectors of variables defined:" << endl
-<< "" << endl
-<< "DISCRETE myVec[9] {1..9}" << endl
-<< "BOUND cap[9] {0..2}" << endl
-<< "" << endl
-<< "The following constraint would restrict the occurrence of values 1..9 in myVec" << endl
-<< "to be at most 2 each initially, and finally equal to the values of the cap" << endl
-<< "vector." << endl
-<< "" << endl
-<< "gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)" << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint enforces a hybrid consistency. It reads the bounds of the" << endl
-<< "capacity variables, then enforces GAC over the primary variables only. Then the" << endl
-<< "bounds of the capacity variables are updated using flow algorithms similar to" << endl
-<< "those proposed by Quimper et al, Improved Algorithms for the Global Cardinality" << endl
-<< "Constraint (CP 2004)." << endl
-<< "" << endl
-<< "This constraint provides stronger propagation to the capacity variables than the" << endl
-<< "gccweak constraint." << endl << endl << endl;
-} else
-if("constraints div" == request) {
-cout << "Help entry: " << "constraints div" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< " " << endl
-<< " div(x,y,z)" << endl
-<< "" << endl
-<< "ensures that floor(x/y)=z." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint is only available for positive domains x, y and z." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints modulo" << endl << endl << endl;
-} else
-if("constraints modulo" == request) {
-cout << "Help entry: " << "constraints modulo" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< " " << endl
-<< " modulo(x,y,z)" << endl
-<< "" << endl
-<< "ensures that x%y=z i.e. z is the remainder of dividing x by y." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint is only available for positive domains x, y and z." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints div" << endl << endl << endl;
-} else
-if("constraints pow" == request) {
-cout << "Help entry: " << "constraints pow" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< " " << endl
-<< " pow(x,y,z)" << endl
-<< "" << endl
-<< "ensures that x^y=z." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint is only available for positive domains x, y and z." << endl << endl << endl;
-} else
-if("constraints weightedsumleq" == request) {
-cout << "Help entry: " << "constraints weightedsumleq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " weightedsumleq(constantVec, varVec, total)" << endl
-<< "" << endl
-<< "ensures that constantVec.varVec <= total, where constantVec.varVec is" << endl
-<< "the scalar dot product of constantVec and varVec." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints weightedsumgeq" << endl
-<< "help constraints sumleq" << endl
-<< "help constraints sumgeq" << endl << endl << endl;
-} else
-if("constraints weightedsumgeq" == request) {
-cout << "Help entry: " << "constraints weightedsumgeq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " weightedsumgeq(constantVec, varVec, total)" << endl
-<< "" << endl
-<< "ensures that constantVec.varVec >= total, where constantVec.varVec is" << endl
-<< "the scalar dot product of constantVec and varVec." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints weightedsumleq" << endl
-<< "help constraints sumleq" << endl
-<< "help constraints sumgeq" << endl << endl << endl;
-} else
-if("constraints sumleq" == request) {
-cout << "Help entry: " << "constraints sumleq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " sumleq(vec, c)" << endl
-<< "" << endl
-<< "ensures that sum(vec) <= c." << endl << endl << endl;
-} else
-if("constraints sumgeq" == request) {
-cout << "Help entry: " << "constraints sumgeq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " sumgeq(vec, c)" << endl
-<< "" << endl
-<< "ensures that sum(vec) >= c." << endl << endl << endl;
-} else
-if("constraints" == request) {
-cout << "Help entry: " << "constraints" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Minion supports many constraints and these are regularly being" << endl
-<< " improved and added to. In some cases multiple implementations of the" << endl
-<< " same constraints are provided and we would appreciate additional" << endl
-<< " feedback on their relative merits in your problem." << endl
-<< "" << endl
-<< " Minion does not support nesting of constraints, however this can be" << endl
-<< " achieved by auxiliary variables and reification." << endl
-<< "" << endl
-<< " Variables can be replaced by constants. You can find out more on" << endl
-<< " expressions for variables, vectors, etc. in the section on variables." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help variables" << endl << endl << endl;
-} else
-if("constraints ineq" == request) {
-cout << "Help entry: " << "constraints ineq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " ineq(x, y, k)" << endl
-<< "" << endl
-<< "ensures that " << endl
-<< "" << endl
-<< " x <= y + k " << endl
-<< "" << endl
-<< "in any solution." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "Minion has no strict inequality (<) constraints. However x < y can be" << endl
-<< "achieved by" << endl
-<< "" << endl
-<< " ineq(x, y, -1)" << endl << endl << endl;
-} else
-if("constraints gccweak" == request) {
-cout << "Help entry: " << "constraints gccweak" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The Generalized Cardinality Constraint (GCC) (weak variant) constrains the " << endl
-<< "number of each value that a set of variables can take." << endl
-<< "" << endl
-<< "gccweak([primary variables], [values of interest], [capacity variables])" << endl
-<< "" << endl
-<< "For each value of interest, there must be a capacity variable, which specifies" << endl
-<< "the number of occurrences of the value in the primary variables." << endl
-<< "" << endl
-<< "This constraint only restricts the number of occurrences of the values in" << endl
-<< "the value list. There is no restriction on the occurrences of other values." << endl
-<< "Therefore the semantics of gccweak are identical to a set of occurrence " << endl
-<< "constraints:" << endl
-<< "" << endl
-<< "occurrence([primary variables], val1, cap1)" << endl
-<< "occurrence([primary variables], val2, cap2)" << endl
-<< "..." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "Suppose the input file had the following vectors of variables defined:" << endl
-<< "" << endl
-<< "DISCRETE myVec[9] {1..9}" << endl
-<< "BOUND cap[9] {0..2}" << endl
-<< "" << endl
-<< "The following constraint would restrict the occurrence of values 1..9 in myVec" << endl
-<< "to be at most 2 each initially, and finally equal to the values of the cap" << endl
-<< "vector." << endl
-<< "" << endl
-<< "gccweak(myVec, [1,2,3,4,5,6,7,8,9], cap)" << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint enforces a hybrid consistency. It reads the bounds of the" << endl
-<< "capacity variables, then enforces GAC over the primary variables only. Then the" << endl
-<< "bounds of the capacity variables are updated by counting values in the domains" << endl
-<< "of the primary variables." << endl
-<< "" << endl
-<< "The consistency over the capacity variables is weaker than the gcc constraint, " << endl
-<< "hence the name gccweak." << endl << endl << endl;
-} else
-if("constraints gaclexless" == request) {
-cout << "Help entry: " << "constraints gaclexless" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " gaclexless(vec0, vec1)" << endl
-<< "" << endl
-<< " takes two vectors vec0 and vec1 of the same length and ensures that" << endl
-<< " vec0 is lexicographically less than vec1 in any solution." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint maintains GAC." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
-<< "" << endl
-<< " help constraints gaclexleq" << endl
-<< "" << endl
-<< " for a similar constraint with non-strict lexicographic inequality." << endl << endl << endl;
-} else
-if("constraints gaclexleq" == request) {
-cout << "Help entry: " << "constraints gaclexleq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " gaclexleq(vec0, vec1)" << endl
-<< "" << endl
-<< " takes two vectors vec0 and vec1 of the same length and ensures that" << endl
-<< " vec0 is lexicographically less than or equal to vec1 in any solution." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraints achieves GAC." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
-<< "" << endl
-<< " help constraints gaclexless" << endl
-<< "" << endl
-<< " for a similar constraint with strict lexicographic inequality." << endl << endl << endl;
-} else
-if("constraints product" == request) {
-cout << "Help entry: " << "constraints product" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " product(x,y,z)" << endl
-<< "" << endl
-<< "ensures that z=xy in any solution." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint can be used for (and, in fact, has a specialised" << endl
-<< "implementation for) achieving boolean AND, i.e. x & y=z can be modelled" << endl
-<< "as" << endl
-<< "" << endl
-<< " product(x,y,z)" << endl
-<< "" << endl
-<< "The general constraint achieves bounds generalised arc consistency for" << endl
-<< "positive numbers." << endl << endl << endl;
-} else
-if("constraints reify" == request) {
-cout << "Help entry: " << "constraints reify" << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See" << endl
-<< " help constraints reification" << endl << endl << endl;
-} else
-if("constraints reifyimply" == request) {
-cout << "Help entry: " << "constraints reifyimply" << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See" << endl
-<< " help constraints reification" << endl << endl << endl;
-} else
-if("constraints reification" == request) {
-cout << "Help entry: " << "constraints reification" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Reification is provided in two forms: reify and reifyimply." << endl
-<< "" << endl
-<< " reify(constraint, r) where r is a 0/1 var" << endl
-<< "" << endl
-<< "ensures that r is set to 1 if and only if constraint is satisfied. That is, if r" << endl
-<< "is 0 the constraint must NOT be satisfied; and if r is 1 it must be satisfied as" << endl
-<< "normal. Conversely, if the constraint is satisfied then r must be 1, and if not" << endl
-<< "then r must be 0." << endl
-<< "" << endl
-<< " reifyimply(constraint, r)" << endl
-<< "" << endl
-<< "only checks that if r is set to 1 then constraint must be satisfied. If r is not" << endl
-<< "1, constraint may be either satisfied or unsatisfied. Furthermore r is never set" << endl
-<< "by propagation, only by search; that is, satisfaction of constraint does not" << endl
-<< "affect the value of r." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "ALMOST ALL constraints are are reifiable. Individual constraint entries mention" << endl
-<< "if the constraint is NOT reifiable." << endl
-<< "" << endl
-<< "ALL constraints are reifyimplyable." << endl << endl << endl;
-} else
-if("constraints eq" == request) {
-cout << "Help entry: " << "constraints eq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Constrain two variables to take equal values." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "eq(x0,x1)" << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "Achieves bounds consistency." << endl << endl << endl;
-cout << "Reference" << "-----------------------------------------------------------------------" << endl;
-cout << "help constraints minuseq" << endl << endl << endl;
-} else
-if("constraints minuseq" == request) {
-cout << "Help entry: " << "constraints minuseq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Constraint" << endl
-<< "" << endl
-<< " minuseq(x,y)" << endl
-<< "" << endl
-<< "ensures that x=-y." << endl << endl << endl;
-cout << "Reference" << "-----------------------------------------------------------------------" << endl;
-cout << "help constraints eq" << endl << endl << endl;
-} else
-if("constraints diseq" == request) {
-cout << "Help entry: " << "constraints diseq" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Constrain two variables to take different values." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "Achieves arc consistency." << endl << endl << endl;
-cout << "Example" << "-------------------------------------------------------------------------" << endl;
-cout << "diseq(v0,v1)" << endl << endl << endl;
-} else
 if("input" == request) {
 cout << "Help entry: " << "input" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -1232,153 +300,992 @@ cout << "Below is a complete minion input file with commentary, as an example." 
 << "Any text down here is ignored, so you can write whatever you like (or" << endl
 << "nothing at all...)" << endl << endl << endl;
 } else
-if("constraints watchvecneq" == request) {
-cout << "Help entry: " << "constraints watchvecneq" << endl << endl;
+if("constraints lexless" == request) {
+cout << "Help entry: " << "constraints lexless" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "The constraint" << endl
 << "" << endl
-<< " watchvecneq(A, B)" << endl
+<< " lexless(vec0, vec1)" << endl
 << "" << endl
-<< "ensures that A and B are not the same vector, i.e., there exists some index i" << endl
-<< "such that A[i] != B[i]." << endl << endl << endl;
-} else
-if("constraints w-notliteral" == request) {
-cout << "Help entry: " << "constraints w-notliteral" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint w-notliteral(x, a) ensures that x =/= a." << endl << endl << endl;
+<< "takes two vectors vec0 and vec1 of the same length and ensures that" << endl
+<< "vec0 is lexicographically less than vec1 in any solution." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint maintains GAC." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See also" << endl
 << "" << endl
-<< " help constraints w-literal" << endl << endl << endl;
+<< " help constraints lexleq" << endl
+<< "" << endl
+<< "for a similar constraint with non-strict lexicographic inequality." << endl << endl << endl;
 } else
-if("constraints w-notinrange" == request) {
-cout << "Help entry: " << "constraints w-notinrange" << endl << endl;
+if("constraints lexleq" == request) {
+cout << "Help entry: " << "constraints lexleq" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x." << endl << endl << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " lexleq(vec0, vec1)" << endl
+<< "" << endl
+<< "takes two vectors vec0 and vec1 of the same length and ensures that" << endl
+<< "vec0 is lexicographically less than or equal to vec1 in any solution." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraints achieves GAC." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See also" << endl
 << "" << endl
-<< " help constraints w-inrange" << endl << endl << endl;
+<< " help constraints lexless" << endl
+<< "" << endl
+<< "for a similar constraint with strict lexicographic inequality." << endl << endl << endl;
 } else
-if("constraints w-literal" == request) {
-cout << "Help entry: " << "constraints w-literal" << endl << endl;
+if("constraints abs" == request) {
+cout << "Help entry: " << "constraints abs" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint w-literal(x, a) ensures that x=a." << endl << endl << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " abs(x,y)" << endl
+<< "" << endl
+<< "makes sure that x=|y|, i.e. x is the absolute value of y." << endl << endl << endl;
+cout << "Reference" << "-----------------------------------------------------------------------" << endl;
+cout << "help constraints abs" << endl << endl << endl;
+} else
+if("constraints sumleq" == request) {
+cout << "Help entry: " << "constraints sumleq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " sumleq(vec, c)" << endl
+<< "" << endl
+<< "ensures that sum(vec) <= c." << endl << endl << endl;
+} else
+if("constraints sumgeq" == request) {
+cout << "Help entry: " << "constraints sumgeq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " sumgeq(vec, c)" << endl
+<< "" << endl
+<< "ensures that sum(vec) >= c." << endl << endl << endl;
+} else
+if("constraints weightedsumleq" == request) {
+cout << "Help entry: " << "constraints weightedsumleq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " weightedsumleq(constantVec, varVec, total)" << endl
+<< "" << endl
+<< "ensures that constantVec.varVec <= total, where constantVec.varVec is" << endl
+<< "the scalar dot product of constantVec and varVec." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints weightedsumgeq" << endl
+<< "help constraints sumleq" << endl
+<< "help constraints sumgeq" << endl << endl << endl;
+} else
+if("constraints weightedsumgeq" == request) {
+cout << "Help entry: " << "constraints weightedsumgeq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " weightedsumgeq(constantVec, varVec, total)" << endl
+<< "" << endl
+<< "ensures that constantVec.varVec >= total, where constantVec.varVec is" << endl
+<< "the scalar dot product of constantVec and varVec." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints weightedsumleq" << endl
+<< "help constraints sumleq" << endl
+<< "help constraints sumgeq" << endl << endl << endl;
+} else
+if("constraints eq" == request) {
+cout << "Help entry: " << "constraints eq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Constrain two variables to take equal values." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "eq(x0,x1)" << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "Achieves bounds consistency." << endl << endl << endl;
+cout << "Reference" << "-----------------------------------------------------------------------" << endl;
+cout << "help constraints minuseq" << endl << endl << endl;
+} else
+if("constraints minuseq" == request) {
+cout << "Help entry: " << "constraints minuseq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Constraint" << endl
+<< "" << endl
+<< " minuseq(x,y)" << endl
+<< "" << endl
+<< "ensures that x=-y." << endl << endl << endl;
+cout << "Reference" << "-----------------------------------------------------------------------" << endl;
+cout << "help constraints eq" << endl << endl << endl;
+} else
+if("constraints diseq" == request) {
+cout << "Help entry: " << "constraints diseq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Constrain two variables to take different values." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "Achieves arc consistency." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "diseq(v0,v1)" << endl << endl << endl;
+} else
+if("constraints product" == request) {
+cout << "Help entry: " << "constraints product" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " product(x,y,z)" << endl
+<< "" << endl
+<< "ensures that z=xy in any solution." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint can be used for (and, in fact, has a specialised" << endl
+<< "implementation for) achieving boolean AND, i.e. x & y=z can be modelled" << endl
+<< "as" << endl
+<< "" << endl
+<< " product(x,y,z)" << endl
+<< "" << endl
+<< "The general constraint achieves bounds generalised arc consistency for" << endl
+<< "positive numbers." << endl << endl << endl;
+} else
+if("constraints lighttable" == request) {
+cout << "Help entry: " << "constraints lighttable" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "An extensional constraint that enforces GAC. The constraint is" << endl
+<< "specified via a list of tuples. lighttable is a variant of the " << endl
+<< "table constraint that is stateless and potentially faster" << endl
+<< "for small constraints." << endl
+<< "" << endl
+<< "For full documentation, see the help for the table constraint." << endl << endl << endl;
+} else
+if("constraints max" == request) {
+cout << "Help entry: " << "constraints max" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " max(vec, x)" << endl
+<< "" << endl
+<< "ensures that x is equal to the maximum value of any variable in vec." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See" << endl
+<< "" << endl
+<< " help constraints min" << endl
+<< "" << endl
+<< "for the opposite constraint." << endl << endl << endl;
+} else
+if("constraints min" == request) {
+cout << "Help entry: " << "constraints min" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " min(vec, x)" << endl
+<< "" << endl
+<< "ensures that x is equal to the minimum value of any variable in vec." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See" << endl
+<< "" << endl
+<< " help constraints max" << endl
+<< "" << endl
+<< "for the opposite constraint." << endl << endl << endl;
+} else
+if("constraints gcc" == request) {
+cout << "Help entry: " << "constraints gcc" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The Generalized Cardinality Constraint (GCC) constrains the number of each value" << endl
+<< "that a set of variables can take." << endl
+<< "" << endl
+<< "gcc([primary variables], [values of interest], [capacity variables])" << endl
+<< "" << endl
+<< "For each value of interest, there must be a capacity variable, which specifies" << endl
+<< "the number of occurrences of the value in the primary variables." << endl
+<< "" << endl
+<< "This constraint only restricts the number of occurrences of the values in" << endl
+<< "the value list. There is no restriction on the occurrences of other values." << endl
+<< "Therefore the semantics of gcc are identical to a set of occurrence " << endl
+<< "constraints:" << endl
+<< "" << endl
+<< "occurrence([primary variables], val1, cap1)" << endl
+<< "occurrence([primary variables], val2, cap2)" << endl
+<< "..." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "Suppose the input file had the following vectors of variables defined:" << endl
+<< "" << endl
+<< "DISCRETE myVec[9] {1..9}" << endl
+<< "BOUND cap[9] {0..2}" << endl
+<< "" << endl
+<< "The following constraint would restrict the occurrence of values 1..9 in myVec" << endl
+<< "to be at most 2 each initially, and finally equal to the values of the cap" << endl
+<< "vector." << endl
+<< "" << endl
+<< "gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)" << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint enforces a hybrid consistency. It reads the bounds of the" << endl
+<< "capacity variables, then enforces GAC over the primary variables only. Then the" << endl
+<< "bounds of the capacity variables are updated using flow algorithms similar to" << endl
+<< "those proposed by Quimper et al, Improved Algorithms for the Global Cardinality" << endl
+<< "Constraint (CP 2004)." << endl
+<< "" << endl
+<< "This constraint provides stronger propagation to the capacity variables than the" << endl
+<< "gccweak constraint." << endl << endl << endl;
+} else
+if("constraints alldiff" == request) {
+cout << "Help entry: " << "constraints alldiff" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Forces the input vector of variables to take distinct values." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "Suppose the input file had the following vector of variables defined:" << endl
+<< "" << endl
+<< "DISCRETE myVec[9] {1..9}" << endl
+<< "" << endl
+<< "To ensure that each variable takes a different value include the" << endl
+<< "following constraint:" << endl
+<< "" << endl
+<< "alldiff(myVec)" << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "Enforces the same level of consistency as a clique of not equals " << endl
+<< "constraints." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See" << endl
+<< "" << endl
+<< " help constraints gacalldiff" << endl
+<< "" << endl
+<< "for the same constraint that enforces GAC." << endl << endl << endl;
+} else
+if("constraints reify" == request) {
+cout << "Help entry: " << "constraints reify" << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See" << endl
+<< " help constraints reification" << endl << endl << endl;
+} else
+if("constraints reifyimply" == request) {
+cout << "Help entry: " << "constraints reifyimply" << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See" << endl
+<< " help constraints reification" << endl << endl << endl;
+} else
+if("constraints reification" == request) {
+cout << "Help entry: " << "constraints reification" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Reification is provided in two forms: reify and reifyimply." << endl
+<< "" << endl
+<< " reify(constraint, r) where r is a 0/1 var" << endl
+<< "" << endl
+<< "ensures that r is set to 1 if and only if constraint is satisfied. That is, if r" << endl
+<< "is 0 the constraint must NOT be satisfied; and if r is 1 it must be satisfied as" << endl
+<< "normal. Conversely, if the constraint is satisfied then r must be 1, and if not" << endl
+<< "then r must be 0." << endl
+<< "" << endl
+<< " reifyimply(constraint, r)" << endl
+<< "" << endl
+<< "only checks that if r is set to 1 then constraint must be satisfied. If r is not" << endl
+<< "1, constraint may be either satisfied or unsatisfied. Furthermore r is never set" << endl
+<< "by propagation, only by search; that is, satisfaction of constraint does not" << endl
+<< "affect the value of r." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "ALMOST ALL constraints are are reifiable. Individual constraint entries mention" << endl
+<< "if the constraint is NOT reifiable." << endl
+<< "" << endl
+<< "ALL constraints are reifyimplyable." << endl << endl << endl;
+} else
+if("constraints gccweak" == request) {
+cout << "Help entry: " << "constraints gccweak" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The Generalized Cardinality Constraint (GCC) (weak variant) constrains the " << endl
+<< "number of each value that a set of variables can take." << endl
+<< "" << endl
+<< "gccweak([primary variables], [values of interest], [capacity variables])" << endl
+<< "" << endl
+<< "For each value of interest, there must be a capacity variable, which specifies" << endl
+<< "the number of occurrences of the value in the primary variables." << endl
+<< "" << endl
+<< "This constraint only restricts the number of occurrences of the values in" << endl
+<< "the value list. There is no restriction on the occurrences of other values." << endl
+<< "Therefore the semantics of gccweak are identical to a set of occurrence " << endl
+<< "constraints:" << endl
+<< "" << endl
+<< "occurrence([primary variables], val1, cap1)" << endl
+<< "occurrence([primary variables], val2, cap2)" << endl
+<< "..." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "Suppose the input file had the following vectors of variables defined:" << endl
+<< "" << endl
+<< "DISCRETE myVec[9] {1..9}" << endl
+<< "BOUND cap[9] {0..2}" << endl
+<< "" << endl
+<< "The following constraint would restrict the occurrence of values 1..9 in myVec" << endl
+<< "to be at most 2 each initially, and finally equal to the values of the cap" << endl
+<< "vector." << endl
+<< "" << endl
+<< "gccweak(myVec, [1,2,3,4,5,6,7,8,9], cap)" << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint enforces a hybrid consistency. It reads the bounds of the" << endl
+<< "capacity variables, then enforces GAC over the primary variables only. Then the" << endl
+<< "bounds of the capacity variables are updated by counting values in the domains" << endl
+<< "of the primary variables." << endl
+<< "" << endl
+<< "The consistency over the capacity variables is weaker than the gcc constraint, " << endl
+<< "hence the name gccweak." << endl << endl << endl;
+} else
+if("constraints occurrence" == request) {
+cout << "Help entry: " << "constraints occurrence" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " occurrence(vec, elem, count)" << endl
+<< "" << endl
+<< "ensures that there are count occurrences of the value elem in the" << endl
+<< "vector vec." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "elem must be a constant, not a variable." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints occurrenceleq" << endl
+<< "help constraints occurrencegeq" << endl << endl << endl;
+} else
+if("constraints occurrenceleq" == request) {
+cout << "Help entry: " << "constraints occurrenceleq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " occurrenceleq(vec, elem, count)" << endl
+<< "" << endl
+<< "ensures that there are AT MOST count occurrences of the value elem in" << endl
+<< "the vector vec." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "elem and count must be constants" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints occurrence" << endl
+<< "help constraints occurrencegeq" << endl << endl << endl;
+} else
+if("constraints occurrencegeq" == request) {
+cout << "Help entry: " << "constraints occurrencegeq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " occurrencegeq(vec, elem, count)" << endl
+<< "" << endl
+<< "ensures that there are AT LEAST count occurrences of the value elem in" << endl
+<< "the vector vec." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "elem and count must be constants" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints occurrence" << endl
+<< "help constraints occurrenceleq" << endl << endl << endl;
+} else
+if("constraints difference" == request) {
+cout << "Help entry: " << "constraints difference" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " difference(x,y,z)" << endl
+<< "" << endl
+<< "ensures that z=|x-y| in any solution." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint can be expressed in a much longer form, this form both avoids" << endl
+<< "requiring an extra variable, and also gets better propagation. It gets bounds" << endl
+<< "consistency." << endl << endl << endl;
+} else
+if("constraints pow" == request) {
+cout << "Help entry: " << "constraints pow" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< " " << endl
+<< " pow(x,y,z)" << endl
+<< "" << endl
+<< "ensures that x^y=z." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint is only available for positive domains x, y and z." << endl << endl << endl;
+} else
+if("constraints table" == request) {
+cout << "Help entry: " << "constraints table" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "An extensional constraint that enforces GAC. The constraint is" << endl
+<< "specified via a list of tuples." << endl
+<< "" << endl
+<< "The variables used in the constraint have to be BOOL or DISCRETE variables." << endl
+<< "Other types are not supported." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "To specify a constraint over 3 variables that allows assignments" << endl
+<< "(0,0,0), (1,0,0), (0,1,0) or (0,0,1) do the following." << endl
+<< "" << endl
+<< "1) Add a tuplelist to the **TUPLELIST** section, e.g.:" << endl
+<< "" << endl
+<< "**TUPLELIST**" << endl
+<< "myext 4 3" << endl
+<< "0 0 0" << endl
+<< "1 0 0" << endl
+<< "0 1 0" << endl
+<< "0 0 1" << endl
+<< "" << endl
+<< "N.B. the number 4 is the number of tuples in the constraint, the " << endl
+<< "number 3 is the -arity." << endl
+<< "" << endl
+<< "2) Add a table constraint to the **CONSTRAINTS** section, e.g.:" << endl
+<< "" << endl
+<< "**CONSTRAINTS**" << endl
+<< "table(myvec, myext)" << endl
+<< "" << endl
+<< "and now the variables of myvec will satisfy the constraint myext." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "The constraints extension can also be specified in the constraint" << endl
+<< "definition, e.g.:" << endl
+<< "" << endl
+<< "table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help input tuplelist" << endl
+<< "help input negativetable" << endl << endl << endl;
+} else
+if("constraints negativetable" == request) {
+cout << "Help entry: " << "constraints negativetable" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "An extensional constraint that enforces GAC. The constraint is" << endl
+<< "specified via a list of disallowed tuples." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "See entry " << endl
+<< "" << endl
+<< " help input negativetable" << endl
+<< "" << endl
+<< "for how to specify a table constraint in minion input. The only" << endl
+<< "difference for negativetable is that the specified tuples are" << endl
+<< "disallowed." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help input table" << endl
+<< "help input tuplelist" << endl << endl << endl;
+} else
+if("constraints lexleq[rv]" == request) {
+cout << "Help entry: " << "constraints lexleq[rv]" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " lexle[rv](vec0, vec1)" << endl
+<< "" << endl
+<< " takes two vectors vec0 and vec1 of the same length and ensures that" << endl
+<< " vec0 is lexicographically less than or equal to vec1 in any solution." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint achieves GAC even when some variables are repeated in" << endl
+<< " vec0 and vec1. However, the extra propagation this achieves is rarely " << endl
+<< " worth the extra work." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "See also" << endl
 << "" << endl
-<< " help constraints w-notliteral" << endl << endl << endl;
+<< " help constraints lexleq[quick]" << endl
+<< "" << endl
+<< " for a much faster logically identical constraint, with lower" << endl
+<< " propagation." << endl << endl << endl;
 } else
-if("constraints w-inrange" == request) {
-cout << "Help entry: " << "constraints w-inrange" << endl << endl;
+if("constraints modulo" == request) {
+cout << "Help entry: " << "constraints modulo" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint w-inrange(x, [a,b]) ensures that a <= x <= b." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
+cout << "The constraint" << endl
+<< " " << endl
+<< " modulo(x,y,z)" << endl
 << "" << endl
-<< " help constraints w-notinrange" << endl << endl << endl;
+<< "ensures that x%y=z i.e. z is the remainder of dividing x by y." << endl
+<< "For negative values, we ensure that:" << endl
+<< "" << endl
+<< "y(x/y) + x%y = x" << endl
+<< "" << endl
+<< "To be fully concrete, here are some examples:" << endl
+<< "" << endl
+<< "3 % 5 = 3" << endl
+<< "-3 % 5 = 2" << endl
+<< "3 % -5 = -2" << endl
+<< "-3 % -5 = -3" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints div" << endl << endl << endl;
 } else
-if("constraints w-notinset" == request) {
-cout << "Help entry: " << "constraints w-notinset" << endl << endl;
+if("constraints mod_undefzero" == request) {
+cout << "Help entry: " << "constraints mod_undefzero" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong to the" << endl
-<< "set {a1,..,an}." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
+cout << "The constraint" << endl
+<< " " << endl
+<< " mod_undefzero(x,y,z)" << endl
 << "" << endl
-<< " help constraints w-inset" << endl << endl << endl;
+<< "is the same as mod except the constraint is always " << endl
+<< "true when y = 0, instead of false." << endl
+<< "" << endl
+<< "This constraint exists for certain special requirements." << endl
+<< "In general, if you are unsure what constraint to use," << endl
+<< "then what you want is a plain mod constraint!" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints mod" << endl << endl << endl;
 } else
-if("constraints w-inset" == request) {
-cout << "Help entry: " << "constraints w-inset" << endl << endl;
+if("constraints ineq" == request) {
+cout << "Help entry: " << "constraints ineq" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set " << endl
-<< "{a1,..,an}." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
+cout << "The constraint" << endl
 << "" << endl
-<< " help constraints w-notinset" << endl << endl << endl;
+<< " ineq(x, y, k)" << endl
+<< "" << endl
+<< "ensures that " << endl
+<< "" << endl
+<< " x <= y + k " << endl
+<< "" << endl
+<< "in any solution." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "Minion has no strict inequality (<) constraints. However x < y can be" << endl
+<< "achieved by" << endl
+<< "" << endl
+<< " ineq(x, y, -1)" << endl << endl << endl;
 } else
-if("constraints watchless" == request) {
-cout << "Help entry: " << "constraints watchless" << endl << endl;
+if("constraints" == request) {
+cout << "Help entry: " << "constraints" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint watchless(x,y) ensures that x is less than y." << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
+cout << "Minion supports many constraints and these are regularly being" << endl
+<< " improved and added to. In some cases multiple implementations of the" << endl
+<< " same constraints are provided and we would appreciate additional" << endl
+<< " feedback on their relative merits in your problem." << endl
 << "" << endl
-<< " help constraints ineq" << endl << endl << endl;
+<< " Minion does not support nesting of constraints, however this can be" << endl
+<< " achieved by auxiliary variables and reification." << endl
+<< "" << endl
+<< " Variables can be replaced by constants. You can find out more on" << endl
+<< " expressions for variables, vectors, etc. in the section on variables." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help variables" << endl << endl << endl;
 } else
-if("constraints watchelement_one" == request) {
-cout << "Help entry: " << "constraints watchelement_one" << endl << endl;
+if("constraints element_one" == request) {
+cout << "Help entry: " << "constraints element_one" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "This constraint is identical to watchelement, except the vector" << endl
-<< "is indexed from 1 rather than from 0." << endl << endl << endl;
+cout << "The constraint element one is identical to element, except that the" << endl
+<< "vector is indexed from 1 rather than from 0." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See entry" << endl
+cout << "See" << endl
 << "" << endl
-<< " help constraints watchelement" << endl
+<< " help constraints element" << endl
 << "" << endl
-<< "for details of watchelement which watchelement_one is based on." << endl << endl << endl;
+<< "for details of the element constraint which is almost identical to this" << endl
+<< "one." << endl << endl << endl;
 } else
-if("constraints watchelement" == request) {
-cout << "Help entry: " << "constraints watchelement" << endl << endl;
+if("constraints element" == request) {
+cout << "Help entry: " << "constraints element" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "The constraint " << endl
 << "" << endl
-<< " watchelement(vec, i, e)" << endl
+<< " element(vec, i, e)" << endl
 << "" << endl
 << "specifies that, in any solution, vec[i] = e and i is in the range " << endl
 << "[0 .. |vec|-1]." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "Enforces generalised arc consistency." << endl << endl << endl;
+cout << "" << endl
+<< "Warning: This constraint is not confluent. Depending on the order the" << endl
+<< "propagators are called in Minion, the number of search nodes may vary when" << endl
+<< "using element. To avoid this problem, use watchelement instead. More details" << endl
+<< "below." << endl
+<< "" << endl
+<< "The level of propagation enforced by this constraint is not named, however it" << endl
+<< "works as follows. For constraint vec[i]=e:" << endl
+<< "" << endl
+<< "- After i is assigned, ensures that min(vec[i]) = min(e) and " << endl
+<< " max(vec[i]) = max(e)." << endl
+<< "" << endl
+<< "- When e is assigned, removes idx from the domain of i whenever e is not an" << endl
+<< " element of the domain of vec[idx]." << endl
+<< "" << endl
+<< "- When m[idx] is assigned, removes idx from i when m[idx] is not in the domain" << endl
+<< " of e." << endl
+<< "" << endl
+<< "This level of consistency is designed to avoid the propagator having to scan" << endl
+<< "through vec, except when e is assigned. It does a quantity of cheap propagation" << endl
+<< "and may work well in practise on certain problems." << endl
+<< "" << endl
+<< "Element is not confluent, which may cause the number of search nodes to vary" << endl
+<< "depending on the order in which constraints are listed in the input file, or " << endl
+<< "the order they are called in Minion. For example, the following input causes" << endl
+<< "Minion to search 41 nodes." << endl
+<< "" << endl
+<< "MINION 3" << endl
+<< "**VARIABLES**" << endl
+<< "DISCRETE x[5] {1..5}" << endl
+<< "**CONSTRAINTS**" << endl
+<< "element([x[0],x[1],x[2]], x[3], x[4])" << endl
+<< "alldiff([x])" << endl
+<< "**EOF**" << endl
+<< "" << endl
+<< "However if the two constraints are swapped over, Minion explores 29 nodes." << endl
+<< "As a rule of thumb, to get a lower node count, move element constraints" << endl
+<< "to the end of the list." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See entry" << endl
+cout << "See the entry " << endl
 << "" << endl
-<< " help constraints element" << endl
+<< " constraints watchelement" << endl
 << "" << endl
-<< "for details of an identical constraint that enforces a lower level of" << endl
+<< "for details of an identical constraint that enforces generalised arc" << endl
 << "consistency." << endl << endl << endl;
 } else
-if("constraints hamming" == request) {
-cout << "Help entry: " << "constraints hamming" << endl << endl;
+if("constraints div" == request) {
+cout << "Help entry: " << "constraints div" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "The constraint" << endl
+<< " " << endl
+<< " div(x,y,z)" << endl
 << "" << endl
-<< " hamming(X,Y,c)" << endl
+<< "ensures that floor(x/y)=z." << endl
 << "" << endl
-<< "ensures that the hamming distance between X and Y is at least c. That is, that" << endl
-<< "the size of the set {i | X[i] != y[i]} is greater than or equal to c." << endl << endl << endl;
-} else
-if("constraints watched-or" == request) {
-cout << "Help entry: " << "constraints watched-or" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
+<< "For example:" << endl
 << "" << endl
-<< " watched-or({C1,...,Cn})" << endl
+<< "10/3 = 3" << endl
+<< "(-10)/3 = -4" << endl
+<< "10/(-3) = -4" << endl
+<< "(-10)/(-3) = 3" << endl
 << "" << endl
-<< "ensures that at least one of the constraints C1,...,Cn is true." << endl << endl << endl;
+<< "div and mod satisfy together the condition that:" << endl
+<< "" << endl
+<< "y*(x/y) + x % y = x" << endl
+<< "" << endl
+<< "The constraint is always false when y = 0" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
-<< "" << endl
-<< " help constraints watched-and" << endl << endl << endl;
+cout << "help constraints modulo" << endl << endl << endl;
 } else
-if("constraints watched-and" == request) {
-cout << "Help entry: " << "constraints watched-and" << endl << endl;
+if("constraints div_undefzero" == request) {
+cout << "Help entry: " << "constraints div_undefzero" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "The constraint" << endl
+<< " " << endl
+<< " div_undefzero(x,y,z)" << endl
 << "" << endl
-<< " watched-and({C1,...,Cn})" << endl
+<< "is the same as div (it ensures that floor(x/y)=z)" << endl
+<< "except the constraint is always true when y = 0," << endl
+<< "instead of false." << endl
 << "" << endl
-<< "ensures that the constraints C1,...,Cn are all true." << endl << endl << endl;
+<< "This constraint exists for certain special requirements." << endl
+<< "In general, if you are unsure what constraint to use," << endl
+<< "then what you want is a plain div constraint!" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints div" << endl << endl << endl;
+} else
+if("constraints gacalldiff" == request) {
+cout << "Help entry: " << "constraints gacalldiff" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Forces the input vector of variables to take distinct values." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "Suppose the input file had the following vector of variables defined:" << endl
+<< "" << endl
+<< "DISCRETE myVec[9] {1..9}" << endl
+<< "" << endl
+<< "To ensure that each variable takes a different value include the" << endl
+<< "following constraint:" << endl
+<< "" << endl
+<< "gacalldiff(myVec)" << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "pointless, bearing in mind that a CSP is simply a conjunction of constraints" << endl
-<< "already! However sometimes it may be necessary to use a conjunction as a child" << endl
-<< "of another constraint, for example in a reification:" << endl
+cout << "This constraint enforces generalized arc consistency." << endl << endl << endl;
+} else
+if("switches" == request) {
+cout << "Help entry: " << "switches" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Minion supports a number of switches to augment default behaviour. To" << endl
+<< "see more information on any switch, use the help system. The list" << endl
+<< "below contains all available switches. For example to see help on" << endl
+<< "-quiet type something similar to" << endl
 << "" << endl
-<< " reify(watched-and({...}),r)" << endl << endl << endl;
+<< " minion help switches -quiet" << endl
+<< "" << endl
+<< "replacing 'minion' by the name of the executable you're using." << endl << endl << endl;
+} else
+if("switches -outputCompressed" == request) {
+cout << "Help entry: " << "switches -outputCompressed" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Output a Minion instance with some basic reasoning performed to" << endl
+<< "reduce the size of the file. This file should produce identical" << endl
+<< "output the original instance but may solve faster." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "To compress a file 'infile.minion' to a file 'smaller.minion'" << endl
+<< "" << endl
+<< " minion infile.minion -outputCompressed smaller.minion" << endl << endl << endl;
+} else
+if("switches -redump" == request) {
+cout << "Help entry: " << "switches -redump" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print the minion input instance file to standard out. No search is" << endl
+<< "carried out when this switch is used." << endl << endl << endl;
+} else
+if("switches -findallsols" == request) {
+cout << "Help entry: " << "switches -findallsols" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Find all solutions and count them. This option is ignored if the" << endl
+<< "problem contains any minimising or maximising objective." << endl << endl << endl;
+} else
+if("switches -quiet" == request) {
+cout << "Help entry: " << "switches -quiet" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Do not print parser progress." << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "See also" << endl
+cout << "help switches -verbose" << endl << endl << endl;
+} else
+if("switches -verbose" == request) {
+cout << "Help entry: " << "switches -verbose" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print parser progress." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -quiet" << endl << endl << endl;
+} else
+if("switches -printsols" == request) {
+cout << "Help entry: " << "switches -printsols" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print solutions." << endl << endl << endl;
+} else
+if("switches -noprintsols" == request) {
+cout << "Help entry: " << "switches -noprintsols" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Do not print solutions." << endl << endl << endl;
+} else
+if("switches -printsolsonly" == request) {
+cout << "Help entry: " << "switches -printsolsonly" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print only solutions and a summary at the end." << endl << endl << endl;
+} else
+if("switches -printonlyoptimal" == request) {
+cout << "Help entry: " << "switches -printonlyoptimal" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "In optimisation problems, only print the optimal value, and" << endl
+<< "not intermediate values." << endl << endl << endl;
+} else
+if("switches -preprocess" == request) {
+cout << "Help entry: " << "switches -preprocess" << endl << endl;
+cout << "" << "--------------------------------------------------------------------------------" << endl;
+cout << "" << endl
+<< "This switch allows the user to choose what level of preprocess is" << endl
+<< "applied to their model before search commences." << endl
 << "" << endl
-<< " help constraints watched-or" << endl << endl << endl;
+<< "The choices are:" << endl
+<< "" << endl
+<< "- GAC" << endl
+<< "- generalised arc consistency (default)" << endl
+<< "- all propagators are run to a fixed point" << endl
+<< "- if some propagators enforce less than GAC then the model will" << endl
+<< "not necessarily be fully GAC at the outset" << endl
+<< "" << endl
+<< "- SACBounds" << endl
+<< "- singleton arc consistency on the bounds of each variable" << endl
+<< "- AC can be achieved when any variable lower or upper bound is a" << endl
+<< "singleton in its own domain" << endl
+<< "" << endl
+<< "- SAC" << endl
+<< "- singleton arc consistency" << endl
+<< "- AC can be achieved in the model if any value is a singleton in" << endl
+<< "its own domain" << endl
+<< "" << endl
+<< "- SSACBounds" << endl
+<< "- singleton singleton bounds arc consistency" << endl
+<< "- SAC can be achieved in the model when domains are replaced by either" << endl
+<< "the singleton containing their upper bound, or the singleton containing" << endl
+<< "their lower bound" << endl
+<< "" << endl
+<< "- SSAC" << endl
+<< "- singleton singleton arc consistency" << endl
+<< "- SAC can be achieved when any value is a singleton in its own domain" << endl
+<< "" << endl
+<< "These are listed in order of roughly how long they take to" << endl
+<< "achieve. Preprocessing is a one off cost at the start of search. The" << endl
+<< "success of higher levels of preprocessing is problem specific; SAC" << endl
+<< "preprocesses may take a long time to complete, but may reduce search" << endl
+<< "time enough to justify the cost." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "To enforce SAC before search:" << endl
+<< "" << endl
+<< " minion -preprocess SAC myinputfile.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -X-prop-node" << endl << endl << endl;
+} else
+if("switches -X-prop-node" == request) {
+cout << "Help entry: " << "switches -X-prop-node" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Allows the user to choose the level of consistency to be enforced" << endl
+<< "during search." << endl
+<< "" << endl
+<< "See entry 'help switches -preprocess' for details of the available" << endl
+<< "levels of consistency." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "To enforce SSAC during search:" << endl
+<< "" << endl
+<< " minion -X-prop-node SSAC input.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -preprocess" << endl << endl << endl;
+} else
+if("switches -dumptree" == request) {
+cout << "Help entry: " << "switches -dumptree" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print out the branching decisions and variable states at each node." << endl << endl << endl;
+} else
+if("switches -fullprop" == request) {
+cout << "Help entry: " << "switches -fullprop" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Disable incremental propagation." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This should always slow down search while producing exactly the same" << endl
+<< "search tree." << endl
+<< "" << endl
+<< "Only available in a DEBUG executable." << endl << endl << endl;
+} else
+if("switches -nocheck" == request) {
+cout << "Help entry: " << "switches -nocheck" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Do not check solutions for correctness before printing them out." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This option is the default on non-DEBUG executables." << endl << endl << endl;
+} else
+if("switches -check" == request) {
+cout << "Help entry: " << "switches -check" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Check solutions for correctness before printing them out." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This option is the default for DEBUG executables." << endl << endl << endl;
+} else
+if("switches -nodelimit" == request) {
+cout << "Help entry: " << "switches -nodelimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "To stop search after N nodes, do" << endl
+<< "" << endl
+<< " minion -nodelimit N myinput.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -cpulimit" << endl
+<< "help switches -timelimit" << endl
+<< "help switches -searchlimit" << endl
+<< "help switches -sollimit" << endl << endl << endl;
+} else
+if("switches -timelimit" == request) {
+cout << "Help entry: " << "switches -timelimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "To stop search after N seconds (real time), do" << endl
+<< "" << endl
+<< " minion -timelimit N myinput.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -cpulimit" << endl
+<< "help switches -nodelimit" << endl
+<< "help switches -searchlimit" << endl
+<< "help switches -sollimit" << endl << endl << endl;
+} else
+if("switches -cpulimit" == request) {
+cout << "Help entry: " << "switches -cpulimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "To stop search after N seconds (CPU time), do" << endl
+<< "" << endl
+<< " minion -cpulimit N myinput.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -timelimit" << endl
+<< "help switches -nodelimit" << endl
+<< "help switches -searchlimit" << endl
+<< "help switches -sollimit" << endl << endl << endl;
+} else
+if("switches -searchlimit" == request) {
+cout << "Help entry: " << "switches -searchlimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "To stop search after N seconds search time (real time), do" << endl
+<< "" << endl
+<< " minion -searchlimit N myinput.minion" << endl
+<< "" << endl
+<< "This does not include any time spent in preprocessing." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -timelimit" << endl
+<< "help switches -cpulimit" << endl
+<< "help switches -nodelimit" << endl
+<< "help switches -sollimit" << endl << endl << endl;
+} else
+if("switches -sollimit" == request) {
+cout << "Help entry: " << "switches -sollimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "To stop search after N solutions have been found, do" << endl
+<< "" << endl
+<< " minion -sollimit N myinput.minion" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help switches -cpulimit" << endl
+<< "help switches -nodelimit" << endl
+<< "help switches -searchlimit" << endl
+<< "help switches -timelimit" << endl << endl << endl;
+} else
+if("switches -varorder" == request) {
+cout << "Help entry: " << "switches -varorder" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "" << endl
+<< "Enable a particular variable ordering for the search process. This" << endl
+<< "flag is experimental and minion's default ordering might be faster." << endl
+<< "" << endl
+<< "The available orders are:" << endl
+<< "" << endl
+<< "- sdf - smallest domain first, break ties lexicographically" << endl
+<< "" << endl
+<< "- sdf-random - sdf, but break ties randomly" << endl
+<< "" << endl
+<< "- srf - smallest ratio first, chooses unassigned variable with smallest" << endl
+<< " percentage of its initial values remaining, break ties lexicographically" << endl
+<< "" << endl
+<< "- srf-random - srf, but break ties randomly" << endl
+<< "" << endl
+<< "- ldf - largest domain first, break ties lexicographically" << endl
+<< "" << endl
+<< "- ldf-random - ldf, but break ties randomly" << endl
+<< "" << endl
+<< "- random - random variable ordering" << endl
+<< "" << endl
+<< "- static - lexicographical ordering" << endl << endl << endl;
+} else
+if("switches -randomseed" == request) {
+cout << "Help entry: " << "switches -randomseed" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Set the pseudorandom seed to N. This allows 'random' behaviour to be" << endl
+<< "repeated in different runs of minion." << endl << endl << endl;
+} else
+if("switches -tableout" == request) {
+cout << "Help entry: " << "switches -tableout" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Append a line of data about the current run of minion to a named file." << endl
+<< "This data includes minion version information, arguments to the" << endl
+<< "executable, build and solve time statistics, etc. See the file itself" << endl
+<< "for a precise schema of the supplied information." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "To add statistics about solving myproblem.minion to mystats.txt do" << endl
+<< "" << endl
+<< " minion -tableout mystats.txt myproblem.minion" << endl << endl << endl;
+} else
+if("switches -solsout" == request) {
+cout << "Help entry: " << "switches -solsout" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Append all solutionsto a named file." << endl
+<< "Each solution is placed on a line, with no extra formatting." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "To add the solutions of myproblem.minion to mysols.txt do" << endl
+<< "" << endl
+<< " minion -solsout mysols.txt myproblem.minion" << endl << endl << endl;
+} else
+if("switches -randomiseorder" == request) {
+cout << "Help entry: " << "switches -randomiseorder" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Randomises the ordering of the decision variables. If the input file" << endl
+<< "specifies as ordering it will randomly permute this. If no ordering is" << endl
+<< "specified a random permutation of all the variables is used." << endl << endl << endl;
+} else
+if("switches -noresume" == request) {
+cout << "Help entry: " << "switches -noresume" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Do not write a resume file on timeout or being killed. (default)" << endl << endl << endl;
+} else
+if("switches -makeresume" == request) {
+cout << "Help entry: " << "switches -makeresume" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Write a resume file on timeout or being killed." << endl << endl << endl;
+} else
+if("switches -split" == request) {
+cout << "Help entry: " << "switches -split" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "When Minion is terminated before the end of search, write out two new input" << endl
+<< "files that split the remaining search space in half. Each of the files will have" << endl
+<< "all the variables and constraints of the original file plus constraints that" << endl
+<< "rule out the search already done. In addition, the domain of the variable under" << endl
+<< "consideration when Minion was stopped is split in half with each of the new" << endl
+<< "input files considering a different half." << endl
+<< "" << endl
+<< "This feature is experimental and intended to facilitate parallelisation -- to" << endl
+<< "parallelise the solving of a single constraint problem, stop and split" << endl
+<< "repeatedly. Please note that large-scale testing of this feature was limited to" << endl
+<< "Linux systems and it might not work on others (especially Windows)." << endl
+<< "" << endl
+<< "The name of the new input files is composed of the name of the original" << endl
+<< "instance, the string 'resume', a timestamp, the process ID of Minion, the name" << endl
+<< "of the variable whose domain is being split and 0 or 1. Each of the new input" << endl
+<< "files has a comment identifying the name of the input file which it was split" << endl
+<< "from. Similarly, Minion's output identifies the new input files it writes when" << endl
+<< "splitting." << endl
+<< "" << endl
+<< "The new input files can be run without any special flags." << endl
+<< "" << endl
+<< "This flag is intended to be used with the -timelimit, -sollimit, -nodelimit" << endl
+<< ",-searchlimit or -cpulimit flags. Please note that changing other flags between" << endl
+<< "runs (such as -varorder) may have unintended consequences." << endl
+<< "" << endl
+<< "Implies -makeresume." << endl << endl << endl;
 } else
 if("constraints watchsumgeq" == request) {
 cout << "Help entry: " << "constraints watchsumgeq" << endl << endl;
@@ -1414,6 +1321,167 @@ cout << "See also" << endl
 << " help constraints watchsumgeq " << endl
 << " help constraints litsumgeq" << endl << endl << endl;
 } else
+if("constraints watchvecneq" == request) {
+cout << "Help entry: " << "constraints watchvecneq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " watchvecneq(A, B)" << endl
+<< "" << endl
+<< "ensures that A and B are not the same vector, i.e., there exists some index i" << endl
+<< "such that A[i] != B[i]." << endl << endl << endl;
+} else
+if("constraints watchelement_one" == request) {
+cout << "Help entry: " << "constraints watchelement_one" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "This constraint is identical to watchelement, except the vector" << endl
+<< "is indexed from 1 rather than from 0." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See entry" << endl
+<< "" << endl
+<< " help constraints watchelement" << endl
+<< "" << endl
+<< "for details of watchelement which watchelement_one is based on." << endl << endl << endl;
+} else
+if("constraints watchelement" == request) {
+cout << "Help entry: " << "constraints watchelement" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint " << endl
+<< "" << endl
+<< " watchelement(vec, i, e)" << endl
+<< "" << endl
+<< "specifies that, in any solution, vec[i] = e and i is in the range " << endl
+<< "[0 .. |vec|-1]." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "Enforces generalised arc consistency." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See entry" << endl
+<< "" << endl
+<< " help constraints element" << endl
+<< "" << endl
+<< "for details of an identical constraint that enforces a lower level of" << endl
+<< "consistency." << endl << endl << endl;
+} else
+if("constraints watchelement_undefzero" == request) {
+cout << "Help entry: " << "constraints watchelement_undefzero" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint " << endl
+<< "" << endl
+<< " watchelement_undefzero(vec, i, e)" << endl
+<< "" << endl
+<< "specifies that, in any solution, either:" << endl
+<< "a) vec[i] = e and i is in the range [0 .. |vec|-1]" << endl
+<< "b) i is outside the index range of vec, and e = 0" << endl
+<< "" << endl
+<< "Unlike watchelement (and element) which are false if i is outside" << endl
+<< "the index range of vec." << endl
+<< "" << endl
+<< "In general, use watchelement unless you have a special reason to" << endl
+<< "use this constraint!" << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "Enforces generalised arc consistency." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See entry" << endl
+<< "" << endl
+<< " help constraints watchelement" << endl
+<< "" << endl
+<< "for details of the standard element constraint, which is false" << endl
+<< "when the array value is out of bounds." << endl << endl << endl;
+} else
+if("constraints watched-and" == request) {
+cout << "Help entry: " << "constraints watched-and" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " watched-and({C1,...,Cn})" << endl
+<< "" << endl
+<< "ensures that the constraints C1,...,Cn are all true." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "pointless, bearing in mind that a CSP is simply a conjunction of constraints" << endl
+<< "already! However sometimes it may be necessary to use a conjunction as a child" << endl
+<< "of another constraint, for example in a reification:" << endl
+<< "" << endl
+<< " reify(watched-and({...}),r)" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See also" << endl
+<< "" << endl
+<< " help constraints watched-or" << endl << endl << endl;
+} else
+if("constraints watchless" == request) {
+cout << "Help entry: " << "constraints watchless" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint watchless(x,y) ensures that x is less than y." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See also" << endl
+<< "" << endl
+<< " help constraints ineq" << endl << endl << endl;
+} else
+if("constraints hamming" == request) {
+cout << "Help entry: " << "constraints hamming" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " hamming(X,Y,c)" << endl
+<< "" << endl
+<< "ensures that the hamming distance between X and Y is at least c. That is, that" << endl
+<< "the size of the set {i | X[i] != y[i]} is greater than or equal to c." << endl << endl << endl;
+} else
+if("constraints w-inrange" == request) {
+cout << "Help entry: " << "constraints w-inrange" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint w-inrange(x, [a,b]) ensures that a <= x <= b." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See also" << endl
+<< "" << endl
+<< " help constraints w-notinrange" << endl << endl << endl;
+} else
+if("constraints w-notinset" == request) {
+cout << "Help entry: " << "constraints w-notinset" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong to the" << endl
+<< "set {a1,..,an}." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See also" << endl
+<< "" << endl
+<< " help constraints w-inset" << endl << endl << endl;
+} else
+if("constraints w-notliteral" == request) {
+cout << "Help entry: " << "constraints w-notliteral" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint w-notliteral(x, a) ensures that x =/= a." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See also" << endl
+<< "" << endl
+<< " help constraints w-literal" << endl << endl << endl;
+} else
+if("constraints w-literal" == request) {
+cout << "Help entry: " << "constraints w-literal" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint w-literal(x, a) ensures that x=a." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See also" << endl
+<< "" << endl
+<< " help constraints w-notliteral" << endl << endl << endl;
+} else
+if("constraints w-inset" == request) {
+cout << "Help entry: " << "constraints w-inset" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set " << endl
+<< "{a1,..,an}." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See also" << endl
+<< "" << endl
+<< " help constraints w-notinset" << endl << endl << endl;
+} else
+if("constraints w-notinrange" == request) {
+cout << "Help entry: " << "constraints w-notinrange" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See also" << endl
+<< "" << endl
+<< " help constraints w-inrange" << endl << endl << endl;
+} else
 if("constraints litsumgeq" == request) {
 cout << "Help entry: " << "constraints litsumgeq" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -1433,6 +1501,19 @@ cout << "See also" << endl
 << "" << endl
 << " help constraints watchsumleq" << endl
 << " help constraints watchsumgeq" << endl << endl << endl;
+} else
+if("constraints watched-or" == request) {
+cout << "Help entry: " << "constraints watched-or" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " watched-or({C1,...,Cn})" << endl
+<< "" << endl
+<< "ensures that at least one of the constraints C1,...,Cn is true." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See also" << endl
+<< "" << endl
+<< " help constraints watched-and" << endl << endl << endl;
 } else
 if("variables 01" == request) {
 cout << "Help entry: " << "variables 01" << endl << endl;
@@ -1633,17 +1714,17 @@ cout << "help constraints alldiff" << endl;
 cout << "help constraints difference" << endl;
 cout << "help constraints diseq" << endl;
 cout << "help constraints div" << endl;
+cout << "help constraints div_undefzero" << endl;
 cout << "help constraints element" << endl;
 cout << "help constraints element_one" << endl;
 cout << "help constraints eq" << endl;
 cout << "help constraints gacalldiff" << endl;
-cout << "help constraints gaclexleq" << endl;
-cout << "help constraints gaclexless" << endl;
 cout << "help constraints gcc" << endl;
 cout << "help constraints gccweak" << endl;
 cout << "help constraints hamming" << endl;
 cout << "help constraints ineq" << endl;
 cout << "help constraints lexleq" << endl;
+cout << "help constraints lexleq[rv]" << endl;
 cout << "help constraints lexless" << endl;
 cout << "help constraints lighttable" << endl;
 cout << "help constraints litsumgeq" << endl;
@@ -1651,6 +1732,7 @@ cout << "help constraints max" << endl;
 cout << "help constraints min" << endl;
 cout << "help constraints minuseq" << endl;
 cout << "help constraints modulo" << endl;
+cout << "help constraints mod_undefzero" << endl;
 cout << "help constraints negativetable" << endl;
 cout << "help constraints occurrence" << endl;
 cout << "help constraints occurrencegeq" << endl;
@@ -1667,6 +1749,7 @@ cout << "help constraints watched-and" << endl;
 cout << "help constraints watched-or" << endl;
 cout << "help constraints watchelement" << endl;
 cout << "help constraints watchelement_one" << endl;
+cout << "help constraints watchelement_undefzero" << endl;
 cout << "help constraints watchless" << endl;
 cout << "help constraints watchsumgeq" << endl;
 cout << "help constraints watchsumleq" << endl;
@@ -1695,10 +1778,12 @@ cout << "help switches -cpulimit" << endl;
 cout << "help switches -dumptree" << endl;
 cout << "help switches -findallsols" << endl;
 cout << "help switches -fullprop" << endl;
+cout << "help switches -makeresume" << endl;
 cout << "help switches -nocheck" << endl;
 cout << "help switches -nodelimit" << endl;
 cout << "help switches -noprintsols" << endl;
 cout << "help switches -noresume" << endl;
+cout << "help switches -outputCompressed" << endl;
 cout << "help switches -preprocess" << endl;
 cout << "help switches -printonlyoptimal" << endl;
 cout << "help switches -printsols" << endl;

@@ -121,18 +121,48 @@ The constraint
    div(x,y,z)
 
 ensures that floor(x/y)=z.
-\end{verbatim}
-}
-\paragraph{Notes}
-{\footnotesize
-\begin{verbatim}
-This constraint is only available for positive domains x, y and z.
+
+For example:
+
+10/3 = 3
+(-10)/3 = -4
+10/(-3) = -4
+(-10)/(-3) = 3
+
+div and mod satisfy together the condition that:
+
+y*(x/y) + x % y = x
+
+The constraint is always false when y = 0
 \end{verbatim}
 }
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
 help constraints modulo
+\end{verbatim}
+}
+\section{constraints div\textunderscore undefzero}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+ 
+   div_undefzero(x,y,z)
+
+is the same as div (it ensures that floor(x/y)=z)
+except the constraint is always true when y = 0,
+instead of false.
+
+This constraint exists for certain special requirements.
+In general, if you are unsure what constraint to use,
+then what you want is a plain div constraint!
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints div
 \end{verbatim}
 }
 \section{constraints element}
@@ -269,62 +299,6 @@ gacalldiff(myVec)
 {\footnotesize
 \begin{verbatim}
 This constraint enforces generalized arc consistency.
-\end{verbatim}
-}
-\section{constraints gaclexleq}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-  The constraint
-
-  gaclexleq(vec0, vec1)
-
-  takes two vectors vec0 and vec1 of the same length and ensures that
-  vec0 is lexicographically less than or equal to vec1 in any solution.
-\end{verbatim}
-}
-\paragraph{Notes}
-{\footnotesize
-\begin{verbatim}
-  This constraints achieves GAC.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints gaclexless
-
-  for a similar constraint with strict lexicographic inequality.
-\end{verbatim}
-}
-\section{constraints gaclexless}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-  The constraint
-
-  gaclexless(vec0, vec1)
-
-  takes two vectors vec0 and vec1 of the same length and ensures that
-  vec0 is lexicographically less than vec1 in any solution.
-\end{verbatim}
-}
-\paragraph{Notes}
-{\footnotesize
-\begin{verbatim}
-  This constraint maintains GAC.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints gaclexleq
-
-  for a similar constraint with non-strict lexicographic inequality.
 \end{verbatim}
 }
 \section{constraints gcc}
@@ -490,6 +464,37 @@ See also
 for a similar constraint with strict lexicographic inequality.
 \end{verbatim}
 }
+\section{constraints lexleq[rv]}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint
+
+  lexle[rv](vec0, vec1)
+
+  takes two vectors vec0 and vec1 of the same length and ensures that
+  vec0 is lexicographically less than or equal to vec1 in any solution.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+  This constraint achieves GAC even when some variables are repeated in
+  vec0 and vec1. However, the extra propagation this achieves is rarely 
+  worth the extra work.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints lexleq[quick]
+
+  for a much faster logically identical constraint, with lower
+  propagation.
+\end{verbatim}
+}
 \section{constraints lexless}
 \paragraph{Description}
 {\footnotesize
@@ -632,18 +637,44 @@ The constraint
    modulo(x,y,z)
 
 ensures that x%y=z i.e. z is the remainder of dividing x by y.
-\end{verbatim}
-}
-\paragraph{Notes}
-{\footnotesize
-\begin{verbatim}
-This constraint is only available for positive domains x, y and z.
+For negative values, we ensure that:
+
+y(x/y) + x%y = x
+
+To be fully concrete, here are some examples:
+
+3 % 5 = 3
+-3 % 5 = 2
+3 % -5 = -2
+-3 % -5 = -3
 \end{verbatim}
 }
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
 help constraints div
+\end{verbatim}
+}
+\section{constraints mod\textunderscore undefzero}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+ 
+   mod_undefzero(x,y,z)
+
+is the same as mod except the constraint is always 
+true when y = 0, instead of false.
+
+This constraint exists for certain special requirements.
+In general, if you are unsure what constraint to use,
+then what you want is a plain mod constraint!
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints mod
 \end{verbatim}
 }
 \section{constraints negativetable}
@@ -1003,6 +1034,42 @@ See entry
    help constraints watchelement
 
 for details of watchelement which watchelement_one is based on.
+\end{verbatim}
+}
+\section{constraints watchelement\textunderscore undefzero}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint 
+
+   watchelement_undefzero(vec, i, e)
+
+specifies that, in any solution, either:
+a)  vec[i] = e and i is in the range [0 .. |vec|-1]
+b)  i is outside the index range of vec, and e = 0
+
+Unlike watchelement (and element) which are false if i is outside
+the index range of vec.
+
+In general, use watchelement unless you have a special reason to
+use this constraint!
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+Enforces generalised arc consistency.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+See entry
+
+   help constraints watchelement
+
+for details of the standard element constraint, which is false
+when the array value is out of bounds.
 \end{verbatim}
 }
 \section{constraints watchless}
@@ -1632,6 +1699,13 @@ search tree.
 Only available in a DEBUG executable.
 \end{verbatim}
 }
+\section{switches -makeresume}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Write a resume file on timeout or being killed.
+\end{verbatim}
+}
 \section{switches -nocheck}
 \paragraph{Description}
 {\footnotesize
@@ -1674,7 +1748,24 @@ Do not print solutions.
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
-Do not write a resume file on timeout or being killed.
+Do not write a resume file on timeout or being killed. (default)
+\end{verbatim}
+}
+\section{switches -outputCompressed}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Output a Minion instance with some basic reasoning performed to
+reduce the size of the file. This file should produce identical
+output the original instance but may solve faster.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+To compress a file 'infile.minion' to a file 'smaller.minion'
+
+   minion infile.minion -outputCompressed smaller.minion
 \end{verbatim}
 }
 \section{switches -preprocess}
@@ -1876,6 +1967,8 @@ The new input files can be run without any special flags.
 This flag is intended to be used with the -timelimit, -sollimit, -nodelimit
 ,-searchlimit or -cpulimit flags. Please note that changing other flags between
 runs (such as -varorder) may have unintended consequences.
+
+Implies -makeresume.
 \end{verbatim}
 }
 \section{switches -tableout}
