@@ -21,6 +21,9 @@
 
 extern bool in_cspcomp_for_failexit;
 
+#define INCREMENT_i(flag) \
+{ ++i; if(i == argc || argv[i][0] == '-') { cerr << #flag << " requires a value\n"; exit(1); }}
+
 void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, char** argv)
 {
  for(SysInt i = 1; i < argc; ++i)
@@ -39,12 +42,12 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     { getOptions(stateObj).redump = true; }
     else if(command == string("-outputCompressedDomains"))
     {
-      ++i;
+      INCREMENT_i(-outputCompressedDomains);
       getOptions(stateObj).outputCompressedDomains = true;
     }
     else if(command == string("-outputCompressed"))
     { 
-      ++i;
+      INCREMENT_i(-outputCompressed);
       getOptions(stateObj).outputCompressed = argv[i];
     }
     else if(command == string("-instancestats"))
@@ -56,7 +59,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     }
     else if(command == string("-outputType"))
     {
-      ++i;
+      INCREMENT_i(-outputType);
       getOptions(stateObj).outputType = atoi(argv[i]);
     }
     else if(command == string("-printsols"))
@@ -80,7 +83,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     else if(command == string("-X-prop-node"))
     {
       cout << "# WARNING: -X-prop-node is experimental. Do not use for benchmarking!" << endl;
-      ++i;
+      INCREMENT_i(-X-prop-node);
       string prop_mode(argv[i]);
       args.prop_method = GetPropMethodFromString(prop_mode);
       if(args.prop_method == PropLevel_None)
@@ -91,7 +94,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     }
     else if(command == string("-preprocess"))
     {
-      ++i;
+      INCREMENT_i(-preprocess);
       string prop_mode(argv[i]);
       args.preprocess = GetPropMethodFromString(prop_mode);
     }
@@ -115,7 +118,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     { getOptions(stateObj).dumptree = true; }
     else if(command == string("-nodelimit"))
     {
-      ++i;
+      INCREMENT_i(-nodelimit);
       try
       {
         getOptions(stateObj).nodelimit = from_string_checked<long long int>(argv[i]);
@@ -130,7 +133,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     }
     else if(command == string("-sollimit"))
     {
-      ++i;
+      INCREMENT_i(-sollimit);
       try
       {
         getOptions(stateObj).sollimit = from_string_checked<SysInt>(argv[i]);
@@ -145,7 +148,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     }
     else if(command == string("-timelimit"))
     {
-      ++i;
+      INCREMENT_i(-timelimit);
       if(getOptions(stateObj).timeout_active)
       {
         cout << "Only one '-cpulimit', '-searchlimit' or '-timelimit' per instance" << endl;
@@ -165,7 +168,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     }
     else if(command == string("-searchlimit"))
     {
-      ++i;
+      INCREMENT_i(-searchlimit);
       if(getOptions(stateObj).timeout_active)
       {
         cout << "Only one '-cpulimit', '-searchlimit' or '-timelimit' per instance" << endl;
@@ -184,7 +187,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     }
     else if(command == string("-cpulimit"))
     {
-      ++i;
+      INCREMENT_i(-cpulimit);
       if(getOptions(stateObj).timeout_active)
       {
         cout << "Only one '-cpulimit', '-searchlimit' or '-timelimit' per instance" << endl;
@@ -204,8 +207,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     } // TODO : Should remove -varorder for beta orderings.
     else if(command == string("-varorder") || command == string("-X-varorder") )
     { 
-        cout << "# -varorder is experimental and slower than minion's standard branching." << endl;
-        ++i;
+        INCREMENT_i(-varorder);
         
         string order(argv[i]);
         
@@ -255,29 +257,29 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     }
     else if(command == string("-randomseed"))
     {
-      ++i;
+      INCREMENT_i(-randomseed);
       args.random_seed = atoi(argv[i]);
     }
     else if(command == string("-Xvarmunge"))
     {
-      ++i;
+      INCREMENT_i(-Xvarmunge);   
       getOptions(stateObj).Xvarmunge = atoi(argv[i]);
     }
     else if(command == string("-Xsymmunge"))
     {
-      ++i;
+      INCREMENT_i(-Xsymmunge);
       getOptions(stateObj).Xsymmunge = atoi(argv[i]);
     }
     else if(command == string("-tableout") || command == string("-tableout0"))
     {
         getOptions(stateObj).tableout=true;
-        ++i;
+        INCREMENT_i(-tableout);
         getTableOut().set_filename(argv[i]);
     }
     else if(command == string("-solsout") || command == string("-solsout0"))
     {
       getOptions(stateObj).solsoutWrite=true;
-      ++i;
+      INCREMENT_i(-solsout);
       solsoutFile.open(argv[i], ios::app);
       if(!solsoutFile)
       {
