@@ -52,6 +52,36 @@ for details of an identical constraint that enforces a lower level of
 consistency.
 */
 
+/** @help constraints;watchelement_undefzero Description
+The constraint 
+
+   watchelement_undefzero(vec, i, e)
+
+specifies that, in any solution, either:
+a)  vec[i] = e and i is in the range [0 .. |vec|-1]
+b)  i is outside the index range of vec, and e = 0
+
+Unlike watchelement (and element) which are false if i is outside
+the index range of vec.
+
+In general, use watchelement unless you have a special reason to
+use this constraint!
+
+*/
+
+/** @help constraints;watchelement_undefzero Notes
+Enforces generalised arc consistency.
+*/
+
+/** @help constraints;watchelement_undefzero References
+See entry
+
+   help constraints watchelement
+
+for details of the standard element constraint, which is false
+when the array value is out of bounds.
+*/
+
 // The triggers in this constraint are set up as follows:
 // If the length of the vector is L.
 

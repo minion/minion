@@ -23,15 +23,46 @@ The constraint
    div(x,y,z)
 
 ensures that floor(x/y)=z.
+
+For example:
+
+10/3 = 3
+(-10)/3 = -4
+10/(-3) = -4
+(-10)/(-3) = 3
+
+div and mod satisfy together the condition that:
+
+y*(x/y) + x % y = x
+
+The constraint is always false when y = 0
 */
 
-/** @help constraints;div Notes
-This constraint is only available for positive domains x, y and z.
-*/
 
 /** @help constraints;div References
 help constraints modulo
 */
+
+
+/** @help constraints;div_undefzero Description
+The constraint
+ 
+   div_undefzero(x,y,z)
+
+is the same as div (it ensures that floor(x/y)=z)
+except the constraint is always true when y = 0,
+instead of false.
+
+This constraint exists for certain special requirements.
+In general, if you are unsure what constraint to use,
+then what you want is a plain div constraint!
+*/
+
+
+/** @help constraints;div_undefzero References
+help constraints div
+*/
+
 
 #ifndef CONSTRAINT_DIV_H
 #define CONSTRAINT_DIV_H

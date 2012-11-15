@@ -23,15 +23,40 @@ The constraint
    modulo(x,y,z)
 
 ensures that x%y=z i.e. z is the remainder of dividing x by y.
-*/
+For negative values, we ensure that:
 
-/** @help constraints;modulo Notes
-This constraint is only available for positive domains x, y and z.
+y(x/y) + x%y = x
+
+To be fully concrete, here are some examples:
+
+3 % 5 = 3
+-3 % 5 = 2
+3 % -5 = -2
+-3 % -5 = -3
 */
 
 /** @help constraints;modulo References
 help constraints div
 */
+
+/** @help constraints;mod_undefzero Description
+The constraint
+ 
+   mod_undefzero(x,y,z)
+
+is the same as mod except the constraint is always 
+true when y = 0, instead of false.
+
+This constraint exists for certain special requirements.
+In general, if you are unsure what constraint to use,
+then what you want is a plain mod constraint!
+*/
+
+
+/** @help constraints;mod_undefzero References
+help constraints mod
+*/
+
 
 #ifndef CONSTRAINT_MODULO_H
 #define CONSTRAINT_MODULO_H

@@ -60,6 +60,18 @@ below contains all available switches. For example to see help on
 replacing 'minion' by the name of the executable you're using.
 */
 
+/** @help switches;-outputCompressed Description
+Output a Minion instance with some basic reasoning performed to
+reduce the size of the file. This file should produce identical
+output the original instance but may solve faster.
+*/
+
+/** @help switches;-outputCompressed Example
+To compress a file 'infile.minion' to a file 'smaller.minion'
+
+   minion infile.minion -outputCompressed smaller.minion
+*/
+
 /** @help switches;-redump Description
 Print the minion input instance file to standard out. No search is
 carried out when this switch is used.
@@ -371,7 +383,7 @@ This flag is intended to be used with the -timelimit, -sollimit, -nodelimit
 ,-searchlimit or -cpulimit flags. Please note that changing other flags between
 runs (such as -varorder) may have unintended consequences.
 
-Implies -makeresume automatically.
+Implies -makeresume.
 */
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
