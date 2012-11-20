@@ -229,9 +229,6 @@ struct BigRangeVarContainer {
 #endif
     }
 
- 
-    bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m * 2 * sizeof(domain_bound_type));
-    DomainInt temp1=bms_array->request_storage(var_offset.back());
     bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m * BOUND_DATA_SIZE * sizeof(domain_bound_type));
     DomainInt temp1=bms_array->request_storage(var_offset.back());
     

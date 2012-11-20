@@ -78,34 +78,34 @@ struct GACEqualConstraint : public AbstractConstraint
     var1(_var1), var2(_var2)
   { }
   
-  int dynamic_trigger_count() {
-      return var1.getInitialMax()-var1.getInitialMin()+var2.getInitialMax()-var2.getInitialMin()+2;
+  SysInt dynamic_trigger_count() {
+      return checked_cast<SysInt>(var1.getInitialMax()-var1.getInitialMin()+var2.getInitialMax()-var2.getInitialMin()+2);
   }
   
   virtual void full_propagate() {
-      dtvar2=dynamic_trigger_start() + var1.getInitialMax()-var1.getInitialMin() +1;
+      dtvar2=dynamic_trigger_start() + checked_cast<SysInt>(var1.getInitialMax()-var1.getInitialMin() +1);
       
-      for(int val=var1.getMin(); val<=var1.getMax(); val++) {
+      for(DomainInt val=var1.getMin(); val<=var1.getMax(); val++) {
           if(!var2.inDomain(val)) {
               var1.removeFromDomain(val);
           }
       }
-      for(int val=var2.getMin(); val<=var2.getMax(); val++) {
+      for(DomainInt val=var2.getMin(); val<=var2.getMax(); val++) {
           if(!var1.inDomain(val)) {
               var2.removeFromDomain(val);
           }
       }
       
       
-      for(int val=var1.getInitialMin(); val<=var1.getMax(); val++) {
+      for(DomainInt val=var1.getInitialMin(); val<=var1.getMax(); val++) {
           if(var1.inDomain(val)) {
-              var1.addDynamicTrigger(dynamic_trigger_start()+val-var1.getInitialMin(), DomainRemoval, val );
+              var1.addDynamicTrigger(dynamic_trigger_start()+checked_cast<SysInt>(val-var1.getInitialMin()), DomainRemoval, val );
           }
       }
       
-      for(int val=var2.getInitialMin(); val<=var2.getMax(); val++) {
+      for(DomainInt val=var2.getInitialMin(); val<=var2.getMax(); val++) {
           if(var2.inDomain(val)) {
-              var2.addDynamicTrigger(dtvar2+val-var2.getInitialMin(), DomainRemoval, val );
+              var2.addDynamicTrigger(dtvar2+checked_cast<SysInt>(val-var2.getInitialMin()), DomainRemoval, val );
           }
       }
       
@@ -115,11 +115,11 @@ struct GACEqualConstraint : public AbstractConstraint
   virtual void propagate(DynamicTrigger* dt)
   {
       if(dt<dtvar2) {
-          int val=dt-dynamic_trigger_start()+var1.getInitialMin();
+          DomainInt val=dt-dynamic_trigger_start()+var1.getInitialMin();
           var2.removeFromDomain(val);
       }
       else {
-          int val=dt-dtvar2+var2.getInitialMin();
+          DomainInt val=dt-dtvar2+var2.getInitialMin();
           var1.removeFromDomain(val);
       }
   }
@@ -140,7 +140,7 @@ struct GACEqualConstraint : public AbstractConstraint
     return vars;
   }
   
-   virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
    {
      DomainInt min_val = max(var1.getMin(), var2.getMin());
      DomainInt max_val = min(var1.getMax(), var2.getMax());

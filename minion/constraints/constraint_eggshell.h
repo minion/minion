@@ -17,7 +17,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-/** @help constraints;shortstr2 Description
+/** @help constraSysInts;shortstr2 Description
 Another type of table constraint.
 */
 
@@ -66,17 +66,17 @@ using namespace std;
 
 
 struct arrayset {
-    vector<int> vals;
-    vector<int> vals_pos;
-    int size;
-    int minval;
+    vector<SysInt> vals;
+    vector<SysInt> vals_pos;
+    DomainInt size;
+    DomainInt minval;
     
-    void initialise(int low, int high) {
+    void initialise(DomainInt low, DomainInt high) {
         minval=low;
-        vals_pos.resize(high-low+1);
-        vals.resize(high-low+1);
-        for(int i=0; i<high-low+1; i++) {
-            vals[i]=i+low;
+        vals_pos.resize(checked_cast<SysInt>(high-low+1));
+        vals.resize(checked_cast<SysInt>(high-low+1));
+        for(SysInt i=0; i<checked_cast<SysInt>(high-low+1); i++) {
+            vals[i]=checked_cast<SysInt>(i+low);
             vals_pos[i]=i;
         }
         size=0;
@@ -86,48 +86,48 @@ struct arrayset {
         size=0;
     }
     
-    bool in(int val) {
-        return vals_pos[val-minval]<size;
+    bool in(DomainInt val) {
+        return vals_pos[checked_cast<SysInt>(val-minval)]<size;
     }
     
 
-    void unsafe_insert(int val)
+    void unsafe_insert(DomainInt val)
     {
         D_ASSERT(!in(val));
-        int validx=val-minval;
-        int swapval=vals[size];
+        const SysInt validx=checked_cast<SysInt>(val-minval);
+        const SysInt swapval=vals[checked_cast<SysInt>(size)];
         vals[vals_pos[validx]]=swapval;
-        vals[size]=val;
+        vals[checked_cast<SysInt>(size)]=checked_cast<SysInt>(val);
         
-        vals_pos[swapval-minval]=vals_pos[validx];
-        vals_pos[validx]=size;
+        vals_pos[checked_cast<SysInt>(swapval-minval)]=vals_pos[validx];
+        vals_pos[validx]=checked_cast<SysInt>(size);
         
         size++;
 
     }
 
-    void insert(int val) {
+    void insert(DomainInt val) {
         if(!in(val)) {
             unsafe_insert(val);
         }
     }
     
-    void unsafe_remove(int val)
+    void unsafe_remove(DomainInt val)
     {
         // swap to posiition size-1 then reduce size
         D_ASSERT(in(val));
-        int validx=val-minval;
-        int swapval=vals[size-1];
+        const SysInt validx=checked_cast<SysInt>(val-minval);
+        const SysInt swapval=vals[checked_cast<SysInt>(size-1)];
         vals[vals_pos[validx]]=swapval;
-        vals[size-1]=val;
+        vals[checked_cast<SysInt>(size-1)]=checked_cast<SysInt>(val);
         
-        vals_pos[swapval-minval]=vals_pos[validx];
-        vals_pos[validx]=size-1;
+        vals_pos[checked_cast<SysInt>(swapval-minval)]=vals_pos[validx];
+        vals_pos[validx]=checked_cast<SysInt>(size-1);
         
         size--;
     }
 
-    void remove(int val) {
+    void remove(DomainInt val) {
         if(in(val)) {
             unsafe_remove(val);
         }
@@ -140,35 +140,37 @@ struct arrayset {
 
 struct ReversibleArrayset {
     // Only allows deletion.
-    vector<int> vals;
-    vector<int> vals_pos;
+    vector<SysInt> vals;
+    vector<SysInt> vals_pos;
     ReversibleInt size;
-    int minval;
+    SysInt minval;
     
     ReversibleArrayset(StateObj * _so) : size(_so) {}
     
-    void initialise(int low, int high) {
+    void initialise(DomainInt low_, DomainInt high_) {
+        const SysInt low = checked_cast<SysInt>(low_);
+        const SysInt high = checked_cast<SysInt>(high_);
         minval=low;
         vals_pos.resize(high-low+1);
         vals.resize(high-low+1);
-        for(int i=0; i<high-low+1; i++) {
+        for(SysInt i=0; i<high-low+1; i++) {
             vals[i]=i+low;
             vals_pos[i]=i;
         }
         size=vals.size();
     }
     
-    bool in(int val) {
-        return vals_pos[val-minval]<size;
+    bool in(DomainInt val) {
+        return vals_pos[checked_cast<SysInt>(val-minval)]<size;
     }
     
-    void remove(int val) {
+    void remove(DomainInt val) {
         // swap to posiition size-1 then reduce size
         if(in(val)) {
-            int validx=val-minval;
-            int swapval=vals[size-1];
+            const SysInt validx=checked_cast<SysInt>(val-minval);
+            const SysInt swapval=vals[size-1];
             vals[vals_pos[validx]]=swapval;
-            vals[size-1]=val;
+            vals[size-1]=checked_cast<SysInt>(val);
             
             vals_pos[swapval-minval]=vals_pos[validx];
             vals_pos[validx]=size-1;
@@ -182,8 +184,8 @@ struct ReversibleArrayset {
 
 struct EggShellData
 {
-    vector<vector<int> > tuples;
-    vector<vector<pair<int,int> > > compressed_tuples;
+    vector<vector<DomainInt> > tuples;
+    vector<vector<pair<SysInt,DomainInt> > > compressed_tuples;
 
     EggShellData(TupleList* _tuples, size_t varsize)
     {
@@ -194,12 +196,12 @@ struct EggShellData
 
             vector<DomainInt> encoded = _tuples->get_vector(0);
 
-            vector<int> temp;
+            vector<DomainInt> temp;
             temp.resize(varsize, -1000000);
 
-            vector<pair<int,int> > compressed_temp;
+            vector<pair<SysInt,DomainInt> > compressed_temp;
 
-            for(int i=0; i<encoded.size(); i=i+2) {
+            for(SysInt i=0; i<encoded.size(); i=i+2) {
                 if(encoded[i]==-1) {
                 // end of a short support.
                     if(encoded[i+1]!=-1) {
@@ -219,8 +221,8 @@ struct EggShellData
                         cout << "Tuple passed into supportsgac does not correctly encode a set of short supports." << endl;
                         abort();
                     }
-                    temp[encoded[i]]=encoded[i+1]; 
-                    compressed_temp.push_back(make_pair(encoded[i], encoded[i+1]));
+                    temp[checked_cast<SysInt>(encoded[i])]=encoded[i+1]; 
+                    compressed_temp.push_back(make_pair(checked_cast<SysInt>(encoded[i]), encoded[i+1]));
                 }
             }
 
@@ -232,7 +234,7 @@ struct EggShellData
         else {
             // Normal table constraint.             
             // Hacky hacky hack -- copy the tuples.
-            for(int i=0; i<_tuples->size(); i++) {
+            for(SysInt i=0; i<_tuples->size(); i++) {
                 tuples.push_back(_tuples->get_vector(i));
             }
         }
@@ -254,7 +256,7 @@ struct EggShell : public AbstractConstraint
     
     bool constraint_locked;
     
-    vector<int> tupindices;
+    vector<SysInt> tupindices;
     
     ReversibleInt limit;   // In tupindices, indices less than limit are not known to be invalid.
     
@@ -269,7 +271,7 @@ struct EggShell : public AbstractConstraint
             CHECK(sct->tuples[0].size() == vars.size(), "Cannot use same table for two constraints with different numbers of variables!");
         }
         tupindices.resize(sct->tuples.size());
-        for(int i=0; i<sct->tuples.size(); i++) {
+        for(SysInt i=0; i<sct->tuples.size(); i++) {
             tupindices[i]=i;
         }
         
@@ -279,7 +281,7 @@ struct EggShell : public AbstractConstraint
         //ssup_permanent.initialise(0, vars.size()-1);
         
         gacvalues.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) {
+        for(SysInt i=0; i<vars.size(); i++) {
             gacvalues[i].initialise(vars[i].getInitialMin(), vars[i].getInitialMax());
         }
 
@@ -296,8 +298,8 @@ struct EggShell : public AbstractConstraint
     virtual triggerCollection setup_internal()
     {
         triggerCollection t;
-        int array_size = vars.size();
-        for(int i = 0; i < array_size; ++i) {
+        SysInt array_size = vars.size();
+        for(SysInt i = 0; i < array_size; ++i) {
             t.push_back(make_trigger(vars[i], Trigger(this, i), DomainChanged));
         }
         return t;
@@ -307,7 +309,7 @@ struct EggShell : public AbstractConstraint
         limit=sct->tuples.size();
         
         // pretend all variables have changed.
-        for(int i=0; i<vars.size(); i++) sval.insert(i);
+        for(SysInt i=0; i<vars.size(); i++) sval.insert(i);
         
         do_prop();
     }
@@ -321,14 +323,14 @@ struct EggShell : public AbstractConstraint
       return ret;
     }
     
-    virtual bool check_assignment(DomainInt* v, int v_size) {
+    virtual bool check_assignment(DomainInt* v, SysInt v_size) {
         D_ASSERT(v_size == vars.size());
-        vector<int> temp;
-        for(int i=0; i<v_size; i++) temp.push_back(v[i]);
+        vector<DomainInt> temp;
+        for(SysInt i=0; i<v_size; i++) temp.push_back(v[i]);
         return std::find(sct->tuples.begin(), sct->tuples.end(), temp)!=sct->tuples.end();
     }
     
-    virtual void propagate(int prop_var, DomainDelta)
+    virtual void propagate(SysInt prop_var, DomainDelta)
     {
         sval.insert(prop_var);
         
@@ -376,15 +378,15 @@ struct EggShell : public AbstractConstraint
     vector<arrayset> gacvalues;
     
 
-    bool validTuple(int i)
+    bool validTuple(SysInt i)
     {
-             int index=tupindices[i];
-            vector<int> & tau=sct->tuples[index];
+        SysInt index=tupindices[i];
+        vector<DomainInt> & tau=sct->tuples[index];
 
         bool isvalid=true;
 
-        for(int j=0; j<sval.size; j++) {
-            int var=sval.vals[j];
+        for(SysInt j=0; j<sval.size; j++) {
+            SysInt var=sval.vals[j];
             if(UseShort) {
                 if( (tau[var]!=-1000000) && !vars[var].inDomain(tau[var])) {
                     isvalid=false;
@@ -404,7 +406,7 @@ struct EggShell : public AbstractConstraint
     }
 
     void do_prop() {
-        int numvars=vars.size();
+        SysInt numvars=vars.size();
         
         // Basic impl of ssup for now. 
         // For 'removing assigned vars' optimization, need them to be both
@@ -419,11 +421,11 @@ struct EggShell : public AbstractConstraint
         //ssup.clear();
         //for(int j=0; j<ssup_permanent.size; j++) ssup.insert(ssup_permanent.vals[j]); 
         
-        for(int i=0; i<numvars; i++) {
+        for(SysInt i=0; i<numvars; i++) {
             gacvalues[i].clear();
         }
         
-        int i=0;
+        SysInt i=0;
 
 
         if(UseShort)
@@ -432,13 +434,13 @@ struct EggShell : public AbstractConstraint
             
             bool pass_first_loop=false;
             while(i<limit) {
-                int index=tupindices[i];
+                SysInt index=tupindices[i];
                 // check validity
                 bool isvalid=validTuple(i);
                 
                 if(isvalid) {
-                    vector<pair<int,int> >& compressed_tau = sct->compressed_tuples[index];
-                    for(int i = 0; i < compressed_tau.size(); ++i)
+                    const vector<pair<SysInt, DomainInt> >& compressed_tau = sct->compressed_tuples[index];
+                    for(SysInt i = 0; i < compressed_tau.size(); ++i)
                         ssup.insert(compressed_tau[i].first);
                     pass_first_loop = true;
                     break;
@@ -461,8 +463,8 @@ struct EggShell : public AbstractConstraint
         }
 
         while(i<limit) {
-            int index=tupindices[i];
-            vector<int> & tau=sct->tuples[index];
+            SysInt index=tupindices[i];
+            const vector<DomainInt> & tau=sct->tuples[index];
             
             // check validity
             bool isvalid=validTuple(i);
@@ -470,8 +472,8 @@ struct EggShell : public AbstractConstraint
             if(isvalid) {
                 
                 // do stuff
-                for(int j=0; j<ssup.size; j++) {
-                    int var=ssup.vals[j];
+                for(SysInt j=0; j<ssup.size; j++) {
+                    SysInt var=ssup.vals[j];
                     
                     if(UseShort && tau[var]==-1000000) {
                         ssup.unsafe_remove(var);
@@ -499,9 +501,9 @@ struct EggShell : public AbstractConstraint
         }
 
         // Prune the domains.
-        for(int j=0; j<ssup.size; j++) {
-            int var=ssup.vals[j];
-            for(int val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
+        for(SysInt j=0; j<ssup.size; j++) {
+            SysInt var=ssup.vals[j];
+            for(DomainInt val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
                 if(!gacvalues[var].in(val)) {
                     vars[var].removeFromDomain(val);
                 }
@@ -511,10 +513,10 @@ struct EggShell : public AbstractConstraint
         sval.clear();
     }
     
-    inline void removeTuple(int i) {
+    inline void removeTuple(SysInt i) {
         // Swap to end
         D_ASSERT(i<limit);
-        int tmp=tupindices[limit-1];
+        SysInt tmp=tupindices[limit-1];
         tupindices[limit-1]=tupindices[i];
         tupindices[i]=tmp;
         limit=limit-1;

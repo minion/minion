@@ -254,7 +254,8 @@ struct TupleTrie
     bool search_trie_nostate(DomainInt domain_val, const VarArray& _vars)
   {
       MAKE_STACK_BOX(obj_list, TrieObj* , _vars.size());
-      
+      if(trie_data == NULL)
+        return false;
       TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
       if(first_ptr == NULL)
         return false;

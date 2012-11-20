@@ -519,17 +519,11 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
     break;
 #endif
 
-#ifdef CT_WATCHED_TABLE_ABC
-    case CT_WATCHED_TABLE:
-#endif
-#ifdef CT_WATCHED_NEGATIVE_TABLE_ABC
-    case CT_WATCHED_NEGATIVE_TABLE:
-#endif
-    return readConstraintTable(infile, constraint);
-    break;
-
     default:
-    return readGeneralConstraint(infile, constraint);
+    if(constraint->read_types.size() >= 2 && constraint->read_types[1] == read_tuples)
+      return readConstraintTable(infile, constraint);
+    else
+      return readGeneralConstraint(infile, constraint);
   }
   // g++ seems to think compilation can get here. I disagree, but putting a catch doesn't hurt.
   throw parse_exception("Fatal error in parsing constraints");

@@ -156,6 +156,9 @@ set(NAME_READ_negativetable "read_list" "read_tuples")
 set(NAME_ID_lighttable "CT_LIGHTTABLE")
 set(NAME_READ_lighttable "read_list" "read_tuples")
 
+set(NAME_ID_gacschema "CT_GACSCHEMA")
+set(NAME_READ_gacschema "read_list" "read_tuples")
+
 set(NAME_ID_watchvecneq "CT_WATCHED_VECNEQ")
 set(NAME_READ_watchvecneq "read_list" "read_list")
 
@@ -237,9 +240,6 @@ set(NAME_READ_true )
 
 set(NAME_ID_false "CT_FALSE")
 set(NAME_READ_false )
-
-set(NAME_ID_gacschema "CT_GACSCHEMA")
-set(NAME_READ_gacschema "read_list" "read_constant_list")
 
 set(NAME_ID_gaceq "CT_GACEQ")
 set(NAME_READ_gaceq "read_var" "read_var")

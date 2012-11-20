@@ -4,11 +4,11 @@
 // LIST BASED CODE WONT BE WORKING
 
 // Started on git branch  supportsgac+bstable+adaptive
-//  	intended for supportsgac 
-//  	+ long supports 
-//  	+ better memory 
-//  	+ backtrack stability
-//  	+ adaptive use or ignoring of full length supports
+//      intended for supportsgac 
+//      + long supports 
+//      + better memory 
+//      + backtrack stability
+//      + adaptive use or ignoring of full length supports
 
 /*
 * Minion http://minion.sourceforge.net
@@ -154,36 +154,36 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     struct Support ; 
 
     struct SupportCell { 
-	    int literal ; 
-	    Support* sup ; 
-	    SupportCell* next ; 
-	    SupportCell* prev ; 
+            SysInt literal ; 
+            Support* sup ; 
+            SupportCell* next ; 
+            SupportCell* prev ; 
     };
 
     struct Literal { 
-	int var ; 
-	int val ;
-	SupportCell* supportCellList; 
-//	Literal() { supportCellList = 0 ;} 
+        SysInt var ; 
+        DomainInt val ;
+        SupportCell* supportCellList; 
+//      Literal() { supportCellList = 0 ;} 
     };
 
     struct Support {
         vector<SupportCell> supportCells ;   // Size can't be more than r, but can be less.
 
-	int arity; 		// could use vector.size() but don't want to destruct SupportCells when arity decreases
-				// or reconstruct existing ones when it increases.
+        int arity;              // could use vector.size() but don't want to destruct SupportCells when arity decreases
+                                // or reconstruct existing ones when it increases.
 
-	Support* nextFree ; // for when Support is in Free List.
-	bool active;  
-	int  numLastSupported;
+        Support* nextFree ; // for when Support is in Free List.
+        bool active;  
+        int  numLastSupported;
         
         Support()
         {
             supportCells.resize(0);
-	    arity=0;
-	    nextFree=0;
-	    active = true;  
-	    numLastSupported=0;
+            arity=0;
+            nextFree=0;
+            active = true;  
+            numLastSupported=0;
         }
     };
     
@@ -194,10 +194,10 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     
     VarArray vars;
 
-    vector<pair<int,int> > literalsScratch;   // used instead of per-Support list, as scratch space
+    vector<pair<int,DomainInt> > literalsScratch;   // used instead of per-Support list, as scratch space
     
-    int numvals;
-    int numlits;
+    SysInt numvals;
+    SysInt numlits;
     
     // Counters
     int supports;   // 0 to rd.  
@@ -231,10 +231,10 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     
     #if UseList
     #if !SupportsGacNoCopyList
-    vector<vector<vector<vector<pair<int,int> > > > > tuple_lists;  // tuple_lists[var][val] is a vector 
+    vector<vector<vector<vector<pair<SysInt, DomainInt> > > > > tuple_lists;  // tuple_lists[var][val] is a vector 
     // of short supports for that var, val. Includes any supports that do not contain var at all.
     #else
-    vector<vector<vector<vector<pair<int,int> > * > > > tuple_lists;
+    vector<vector<vector<vector<pair<SysInt, DomainInt> > * > > > tuple_lists;
     #endif
     #endif
     
@@ -242,7 +242,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     vector<vector<tuple<int,int,int> > > tuple_nd_list; // The inner type is var,val,next-different-pos.
     #endif
     
-    vector<vector<int> > tuple_list_pos;    // current position in tuple_lists (for each var and val). Wraps around.
+    vector<vector<SysInt> > tuple_list_pos;    // current position in tuple_lists (for each var and val). Wraps around.
     
     struct SupportDeref
     {
@@ -260,11 +260,11 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     HaggisGACStable(StateObj* _stateObj, const VarArray& _var_array, TupleList* tuples) : AbstractConstraint(_stateObj), 
     vars(_var_array), supportFreeList(0)
     {
-	int numvars = vars.size(); 
-	
-	// literalsScratch.reserve(numvars);
+        int numvars = vars.size(); 
+        
+        // literalsScratch.reserve(numvars);
 
-	literalsScratch.resize(0);
+        literalsScratch.resize(0);
 
         // Register this with the backtracker.
         getState(stateObj).getGenericBacktracker().add(this);
@@ -273,58 +273,63 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         supports=0;
         supportsPerVar.resize(numvars, 0);
         
-	firstLiteralPerVar.resize(numvars); 
+        firstLiteralPerVar.resize(numvars); 
 
-	int litCounter = 0 ; 
-	numvals = 0 ; 		// only used now by tuple list stuff
+    {
+        DomainInt litCounter = 0 ; 
+        numvals = 0 ;           // only used now by tuple list stuff
 
-        for(int i=0; i<numvars; i++) {
+        for(SysInt i=0; i<numvars; i++) {
 
-	    firstLiteralPerVar[i] = litCounter; 
-	    int thisvalmin = vars[i].getInitialMin();
-	    int numvals_i = vars[i].getInitialMax()-thisvalmin+1;
-	    if(numvals_i > numvals) numvals = numvals_i;
-	    litCounter += numvals_i; 
+            firstLiteralPerVar[i] = checked_cast<SysInt>(litCounter); 
+            DomainInt thisvalmin = vars[i].getInitialMin();
+            DomainInt numvals_i = vars[i].getInitialMax()-thisvalmin+1;
+            if(numvals_i > numvals) numvals = checked_cast<SysInt>(numvals_i);
+            litCounter += numvals_i; 
         }
 
-	literalList.resize(litCounter); 
+        literalList.resize(checked_cast<SysInt>(litCounter)); 
+    }
 
-	litCounter = 0 ; 
-        for(int i=0; i<numvars; i++) {
-	    int thisvalmin = vars[i].getInitialMin();
-	    int numvals_i = vars[i].getInitialMax()-thisvalmin+1;
-            for(int j=0; j<numvals_i; j++) {
-		    literalList[litCounter].var = i; 
-		    literalList[litCounter].val = j+thisvalmin; 
-		    literalList[litCounter].supportCellList = 0;
-		    litCounter++;
-	    }
+    {
+           SysInt litCounter = 0 ; 
+        for(SysInt i=0; i<numvars; i++) {
+            DomainInt thisvalmin = vars[i].getInitialMin();
+            DomainInt numvals_i = vars[i].getInitialMax()-thisvalmin+1;
+        for(DomainInt j=0; j<numvals_i; j++) {
+                    literalList[litCounter].var = i; 
+                    literalList[litCounter].val = j+thisvalmin; 
+                    literalList[litCounter].supportCellList = 0;
+                    litCounter++;
+            }
         }
 
-	numlits = litCounter;
+        numlits = litCounter;
+    }
+
         
         zeroLits.resize(numvars);
         for(int i=0 ; i < numvars ; i++) {
-	    int numvals_i = vars[i].getInitialMax()- vars[i].getInitialMin()+1; 
+            SysInt numvals_i = checked_cast<SysInt>(vars[i].getInitialMax()- vars[i].getInitialMin()+1); 
             zeroLits[i].reserve(numvals_i);  // reserve the maximum length.
             zeroLits[i].resize(0); 
-	    int thisvarstart = firstLiteralPerVar[i];
+            SysInt thisvarstart = firstLiteralPerVar[i];
             for(int j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
         }
         inZeroLits.resize(numlits,true); 
-	
-	// Lists (vectors) of literals/vars that have lost support.
-	// Set this up to insist that everything needs to have support found for it on full propagate.
-	
+        
+        // Lists (vectors) of literals/vars that have lost support.
+        // Set this up to insist that everything needs to have support found for it on full propagate.
+        
         // litsWithLostExplicitSupport.reserve(numlits); // max poss size, not necessarily optimal choice here
         varsWithLostImplicitSupport.reserve(vars.size());
 
-	// Pointers to the last implicit/explicit support for a var/literal
-	//
-	lastSupportPerVar.resize(numvars,0);	// actually don't think we care what initial val is
-	lastSupportPerLit.resize(numlits,0);
+        // Pointers to the last implicit/explicit support for a var/literal
+        //
+        lastSupportPerVar.resize(numvars,0);    // actually don't think we care what initial val is
+        lastSupportPerLit.resize(numlits,0);
     
-	deletedSupports.reserve(numlits);   // max poss size, not necessarily best choice
+        deletedSupports.reserve(numlits);   // max poss size, not necessarily best choice
 
         // Partition
         varsPerSupport.resize(vars.size());
@@ -351,12 +356,12 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         vector<DomainInt> encoded = tuples->get_vector(0);
         
         #if UseList && SupportsGacNoCopyList
-        vector<vector<pair<int, int> > * > shortsupports;
+        vector<vector<pair<SysInt, DomainInt> > * > shortsupports;
         #else
-        vector<vector<pair<int, int> > > shortsupports;
+        vector<vector<pair<SysInt, DomainInt> > > shortsupports;
         #endif
         
-        vector<pair<int, int> > temp;
+        vector<pair<SysInt, DomainInt> > temp;
         for(int i=0; i<encoded.size(); i=i+2) {
             if(encoded[i]==-1) {
                 // end of a short support.
@@ -365,7 +370,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
                     abort();
                 }
                 #if UseList && SupportsGacNoCopyList
-                shortsupports.push_back(new vector<pair<int, int> >(temp));
+                shortsupports.push_back(new vector<pair<SysInt, DomainInt> >(temp));
                 #else
                 shortsupports.push_back(temp);
                 #endif
@@ -377,7 +382,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
                     cout << "Tuple passed into supportsgac does not correctly encode a set of short supports." << endl;
                     abort();
                 }
-                temp.push_back(make_pair(encoded[i], encoded[i+1])); 
+                temp.push_back(make_pair(checked_cast<SysInt>(encoded[i]), encoded[i+1])); 
             }
         }
         if(encoded[encoded.size()-2]!=-1 || encoded[encoded.size()-1]!=-1) {
@@ -386,7 +391,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         }
         
         // Sort it. Might not work when it's pointers.
-        for(int i=0; i<shortsupports.size(); i++) {
+        for(SysInt i=0; i<shortsupports.size(); i++) {
             // Sort each short support
             #if UseList && SupportsGacNoCopyList
             sort(shortsupports[i]->begin(), shortsupports[i]->end());
@@ -398,23 +403,24 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         
         tuple_lists.resize(vars.size());
         tuple_list_pos.resize(vars.size());
-        for(int var=0; var<vars.size(); var++) {
-            tuple_lists[var].resize(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
-            tuple_list_pos[var].resize(vars[var].getInitialMax()-vars[var].getInitialMin()+1, 0);
+        for(SysInt var=0; var<vars.size(); var++) {
+            const SysInt domsize = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
+            tuple_lists[var].resize(domsize);
+            tuple_list_pos[var].resize(domsize, 0);
             
-            for(int val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
+            for(DomainInt val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
                 // get short supports relevant to var,val.
-                for(int i=0; i<shortsupports.size(); i++) {
+                for(SysInt i=0; i<shortsupports.size(); i++) {
                     bool varin=false;
                     bool valmatches=true;
                     
                     #if SupportsGacNoCopyList
-                    vector<pair<int,int> > & shortsup=*(shortsupports[i]);
+                    vector<pair<SysInt, DomainInt> > & shortsup=*(shortsupports[i]);
                     #else
-                    vector<pair<int,int> > & shortsup=shortsupports[i];
+                    vector<pair<SysInt, DomainInt> > & shortsup=shortsupports[i];
                     #endif
                     
-                    for(int j=0; j<shortsup.size(); j++) {
+                    for(SysInt j=0; j<shortsup.size(); j++) {
                         if(shortsup[j].first==var) {
                             varin=true;
                             if(shortsup[j].second!=val) {
@@ -426,7 +432,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
                     if(!varin || valmatches) {
                         // If the support doesn't include the var, or it 
                         // does include var,val then add it to the list.
-                        tuple_lists[var][val-vars[var].getInitialMin()].push_back(shortsupports[i]);
+                        tuple_lists[var][checked_cast<SysInt>(val-vars[var].getInitialMin())].push_back(shortsupports[i]);
                     }
                 }
             }
@@ -486,10 +492,10 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     vars(_var_array), supportFreeList(0)
     {
         int numvars = vars.size(); 
-	
-	// literalsScratch.reserve(numvars);
+        
+        // literalsScratch.reserve(numvars);
 
-	literalsScratch.resize(0);
+        literalsScratch.resize(0);
 
         // Register this with the backtracker.
         getState(stateObj).getGenericBacktracker().add(this);
@@ -498,58 +504,58 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         supports=0;
         supportsPerVar.resize(numvars, 0);
         
-	firstLiteralPerVar.resize(numvars); 
+        firstLiteralPerVar.resize(numvars); 
 
-	int litCounter = 0 ; 
-	numvals = 0 ; 		// only used now by tuple list stuff
+        int litCounter = 0 ; 
+        numvals = 0 ;           // only used now by tuple list stuff
 
         for(int i=0; i<numvars; i++) {
 
-	    firstLiteralPerVar[i] = litCounter; 
-	    int thisvalmin = vars[i].getInitialMin();
-	    int numvals_i = vars[i].getInitialMax()-thisvalmin+1;
-	    if(numvals_i > numvals) numvals = numvals_i;
-	    litCounter += numvals_i; 
+            firstLiteralPerVar[i] = litCounter; 
+            int thisvalmin = vars[i].getInitialMin();
+            int numvals_i = vars[i].getInitialMax()-thisvalmin+1;
+            if(numvals_i > numvals) numvals = numvals_i;
+            litCounter += numvals_i; 
         }
 
-	literalList.resize(litCounter); 
+        literalList.resize(litCounter); 
 
-	litCounter = 0 ; 
+        litCounter = 0 ; 
         for(int i=0; i<numvars; i++) {
-	    int thisvalmin = vars[i].getInitialMin();
-	    int numvals_i = vars[i].getInitialMax()-thisvalmin+1;
+            int thisvalmin = vars[i].getInitialMin();
+            int numvals_i = vars[i].getInitialMax()-thisvalmin+1;
             for(int j=0; j<numvals_i; j++) {
-		    literalList[litCounter].var = i; 
-		    literalList[litCounter].val = j+thisvalmin; 
-		    literalList[litCounter].supportCellList = 0;
-		    litCounter++;
-	    }
+                    literalList[litCounter].var = i; 
+                    literalList[litCounter].val = j+thisvalmin; 
+                    literalList[litCounter].supportCellList = 0;
+                    litCounter++;
+            }
         }
 
-	numlits = litCounter;
+        numlits = litCounter;
         
         zeroLits.resize(numvars);
         for(int i=0 ; i < numvars ; i++) {
-	    int numvals_i = vars[i].getInitialMax()- vars[i].getInitialMin()+1; 
+            int numvals_i = vars[i].getInitialMax()- vars[i].getInitialMin()+1; 
             zeroLits[i].reserve(numvals_i);  // reserve the maximum length.
             zeroLits[i].resize(0); 
-	    int thisvarstart = firstLiteralPerVar[i];
+            int thisvarstart = firstLiteralPerVar[i];
             for(int j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
         }
         inZeroLits.resize(numlits,true); 
-	
-	// Lists (vectors) of literals/vars that have lost support.
-	// Set this up to insist that everything needs to have support found for it on full propagate.
-	
+        
+        // Lists (vectors) of literals/vars that have lost support.
+        // Set this up to insist that everything needs to have support found for it on full propagate.
+        
         // litsWithLostExplicitSupport.reserve(numlits); // max poss size, not necessarily optimal choice here
         varsWithLostImplicitSupport.reserve(vars.size());
 
-	// Pointers to the last implicit/explicit support for a var/literal
-	//
-	lastSupportPerVar.resize(numvars,0);	// actually don't think we care what initial val is
-	lastSupportPerLit.resize(numlits,0);
+        // Pointers to the last implicit/explicit support for a var/literal
+        //
+        lastSupportPerVar.resize(numvars,0);    // actually don't think we care what initial val is
+        lastSupportPerLit.resize(numlits,0);
     
-	deletedSupports.reserve(numlits);   // max poss size, not necessarily best choice
+        deletedSupports.reserve(numlits);   // max poss size, not necessarily best choice
 
         // Partition
         varsPerSupport.resize(vars.size());
@@ -681,28 +687,28 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         //printStructures();
         set<Support*> myset;
 
-	/* 
+        /* 
         for(int i=0; i<vars.size(); i++) {
-	    cout << "     i " << i << " Initial Max " << vars[i].getInitialMax() << endl ; 
-	    int numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
+            cout << "     i " << i << " Initial Max " << vars[i].getInitialMax() << endl ; 
+            int numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
             for(int j=0; j<numvals_i; j++) {
-	      cout << "     i j SupportListPerLit[var][val].next = " << i << " " << j << " " << supportListPerLit[i][j].next << endl ; 
-	    }
+              cout << "     i j SupportListPerLit[var][val].next = " << i << " " << j << " " << supportListPerLit[i][j].next << endl ; 
+            }
         }
-	*/
+        */
         
 
-	// Want to find all active support objects so we can delete them 
+        // Want to find all active support objects so we can delete them 
         for(int lit=0; lit<numlits; lit++) {
                SupportCell* supCell = literalList[lit].supportCellList; 
 
-	      // cout << "     destructor 2: sup*= " << sup << endl ; 
+              // cout << "     destructor 2: sup*= " << sup << endl ; 
                 while(supCell!=0) {
-                    myset.insert(supCell->sup);	// may get inserted multiple times but it's a set.
-		    supCell = supCell->next;
+                    myset.insert(supCell->sup); // may get inserted multiple times but it's a set.
+                    supCell = supCell->next;
                 }
-	}
-	
+        }
+        
         // Go through supportFreeList
         
         while(supportFreeList!=0) {
@@ -711,7 +717,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
             myset.insert(sup);
         }
         
-	// Anything remaining on bracktrack stack
+        // Anything remaining on bracktrack stack
         for(int i=0; i<backtrack_stack.size(); i++) {
             if(backtrack_stack[i].sup!=0) {
                 myset.insert(backtrack_stack[i].sup);
@@ -730,15 +736,15 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     
     struct BTRecord {
         // bool is_removal;   // removal or addition was made. 
-	int var;  
-	int lit;
+        int var;  
+        int lit;
         Support* sup;
         
         friend std::ostream& operator<<(std::ostream& o, const BTRecord& rec)
         {
             if(rec.sup==0) return o<<"ZeroMarker";
             o<<"BTRecord:" ; 
-	    o<<rec.var<<","<<rec.lit;
+            o<<rec.var<<","<<rec.lit;
             // o<< rec.sup->literals;
             return o;
         }
@@ -766,30 +772,30 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
             BTRecord temp=backtrack_stack.back();
             backtrack_stack.pop_back();
             // BTStable Change
-	    if (! (temp.sup->active)) {
-		 if (hasNoKnownSupport(temp.var,temp.lit)) {
-			 // we need to add support back in
-			 addSupportInternal(temp.sup); 
-		 }
-		 else {
-			 // could be clever with -- here but let's play safe
-			 if(temp.sup->numLastSupported == 1){ 
-				 // we can add tempsup to supportFreeList
-				 // cout << "adding support to Free List " << temp.sup->literals << endl ; 
-				 addToSupportFreeList(temp.sup);
-			 }
-			 else { 
-				 temp.sup->numLastSupported--;
-			 }
-		 }
-	    }
-	    // Might possibly have to add lit back onto zeroLits 
-	    //
-	    // Hard to be certain zeroLits is correct so play safe and test it
-	    if(!inZeroLits[temp.lit] && literalList[temp.lit].supportCellList == 0){
-		    inZeroLits[temp.lit]=true; 
-		    zeroLits[temp.var].push_back(temp.lit); 
-	    }
+            if (! (temp.sup->active)) {
+                 if (hasNoKnownSupport(temp.var,temp.lit)) {
+                         // we need to add support back in
+                         addSupportInternal(temp.sup); 
+                 }
+                 else {
+                         // could be clever with -- here but let's play safe
+                         if(temp.sup->numLastSupported == 1){ 
+                                 // we can add tempsup to supportFreeList
+                                 // cout << "adding support to Free List " << temp.sup->literals << endl ; 
+                                 addToSupportFreeList(temp.sup);
+                         }
+                         else { 
+                                 temp.sup->numLastSupported--;
+                         }
+                 }
+            }
+            // Might possibly have to add lit back onto zeroLits 
+            //
+            // Hard to be certain zeroLits is correct so play safe and test it
+            if(!inZeroLits[temp.lit] && literalList[temp.lit].supportCellList == 0){
+                    inZeroLits[temp.lit]=true; 
+                    zeroLits[temp.var].push_back(temp.lit); 
+            }
 
         }
         
@@ -813,22 +819,22 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
        newsup->arity = newsize;
 
        if(newsize > oldsize) { 
-	       supCells.resize(newsize) ; 
-	       // make sure pointers to support cell are correct
-	       // need only be done once as will always point to
-	       // its own support
-	       for(int i=oldsize; i < newsize ; i++) { 
-		       supCells[i].sup = newsup; 
-	       }
+               supCells.resize(newsize) ; 
+               // make sure pointers to support cell are correct
+               // need only be done once as will always point to
+               // its own support
+               for(int i=oldsize; i < newsize ; i++) { 
+                       supCells[i].sup = newsup; 
+               }
        }
 
        for(int i=0; i<newsize ; i++) {
             int var=literalsScratch[i].first;
-	    int valoriginal=literalsScratch[i].second;
-            int lit=firstLiteralPerVar[var]+valoriginal-vars[var].getInitialMin();
-	    supCells[i].literal = lit;
+            DomainInt valoriginal=literalsScratch[i].second;
+            const SysInt lit=checked_cast<SysInt>(firstLiteralPerVar[var]+valoriginal-vars[var].getInitialMin());
+            supCells[i].literal = lit;
        }
-	// now have enough supCells, and sup and literal of each is correct
+        // now have enough supCells, and sup and literal of each is correct
 
         addSupportInternal(newsup);
     }
@@ -838,11 +844,11 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     //
     
     // Takes a support which has: 
-    //  	arity correct
-    //  	supCells containing at least arity elements
-    //  	each supCells[i[ in range has 
-    //  	      literal correct
-    //  	      sup correct
+    //          arity correct
+    //          supCells containing at least arity elements
+    //          each supCells[i[ in range has 
+    //                literal correct
+    //                sup correct
 
     void addSupportInternal(Support* sup_internal)
     {
@@ -851,34 +857,34 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
 
         //cout << "Adding support (internal) :" << litlist_internal << endl;
         //D_ASSERT(litlist_internal.size()>0);  
-	//// It should be possible to deal with empty supports, but currently they wil
+        //// It should be possible to deal with empty supports, but currently they wil
         // cause a memory leak. 
         
         vector<SupportCell>& supCells=sup_internal->supportCells;
 
-	int litsize = sup_internal->arity;
-	
-	sup_internal->active = true;   
-		
-	if(litsize < vars.size() ) {	
-		// it's a short support, so update supportsPerVar and supports 
+        int litsize = sup_internal->arity;
+        
+        sup_internal->active = true;   
+                
+        if(litsize < vars.size() ) {    
+                // it's a short support, so update supportsPerVar and supports 
           for(int i=0; i<litsize; i++) {
 
-	    int lit=supCells[i].literal;
-	    int var=literalList[lit].var;
-	    
+            int lit=supCells[i].literal;
+            int var=literalList[lit].var;
+            
             // Stitch it into the start of literalList.supportCellList
-	    
+            
             supCells[i].prev = 0;
             supCells[i].next = literalList[lit].supportCellList;  
             if(literalList[lit].supportCellList!=0) {
                 literalList[lit].supportCellList->prev = &(supCells[i]);
             }
-	    else { 
+            else { 
             // Attach trigger if this is the first support containing var,val.
                 attach_trigger(var, literalList[lit].val, lit);
             }
-	    literalList[lit].supportCellList = &(supCells[i]);
+            literalList[lit].supportCellList = &(supCells[i]);
 
             //update counters
             supportsPerVar[var]++;
@@ -887,30 +893,30 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
             partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]]-1]);
             // Move the boundary so var is now in the higher cell.
             supportNumPtrs[supportsPerVar[var]]--; 
-	  }
+          }
           supports++;
-	}
-	else {
-		// it's a full length support so don't update those counters
+        }
+        else {
+                // it's a full length support so don't update those counters
           for(int i=0; i<litsize; i++) {
 
-	    int lit=supCells[i].literal;
-	    int var=literalList[lit].var;
-	    
+            int lit=supCells[i].literal;
+            int var=literalList[lit].var;
+            
             // Stitch it into the start of literalList.supportCellList
-	    
+            
             supCells[i].prev = 0;
             supCells[i].next = literalList[lit].supportCellList;  
             if(literalList[lit].supportCellList!=0) {
                 literalList[lit].supportCellList->prev = &(supCells[i]);
             }
-	    else { 
+            else { 
             // Attach trigger if this is the first support containing var,val.
                 attach_trigger(var, literalList[lit].val, lit);
             }
-	    literalList[lit].supportCellList = &(supCells[i]);
-	  }
-	}
+            literalList[lit].supportCellList = &(supCells[i]);
+          }
+        }
 
 
         
@@ -926,205 +932,205 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     void deleteSupportInternal(Support* sup, bool Backtracking) {
         D_ASSERT(sup!=0);
                 
-	sup->active = false; 		
-	sup->numLastSupported = 0; 
+        sup->active = false;            
+        sup->numLastSupported = 0; 
         
         vector<SupportCell>& supCells=sup->supportCells;
-	int supArity = sup->arity; 
+        int supArity = sup->arity; 
 
-	if(supArity < vars.size() ) { 
-		// it's a short support 
+        if(supArity < vars.size() ) { 
+                // it's a short support 
 
-		int oldIndex  = supportNumPtrs[supports];
-		
-		for(int i=0; i<supArity; i++) {
+                int oldIndex  = supportNumPtrs[supports];
+                
+                for(int i=0; i<supArity; i++) {
 
-		    SupportCell& supCell = supCells[i];
-		    int lit=supCell.literal;
-		    int var=literalList[lit].var ;
+                    SupportCell& supCell = supCells[i];
+                    int lit=supCell.literal;
+                    int var=literalList[lit].var ;
 
-		    // D_ASSERT(prev[var]!=0);
-		    // decrement counters
-		    supportsPerVar[var]--;
+                    // D_ASSERT(prev[var]!=0);
+                    // decrement counters
+                    supportsPerVar[var]--;
 
-		    if(supCell.prev==0) { 	// this was the first support in list
+                    if(supCell.prev==0) {       // this was the first support in list
 
-			    literalList[lit].supportCellList = supCell.next; 
+                            literalList[lit].supportCellList = supCell.next; 
 
-			    if(supCell.next==0) { 
-				    // We have lost the last support for lit
-				    //
-		    // I believe that each literal can only be marked once here in a call to update_counters.
-		    // so we should be able to push it onto a list
-		    //
-		    // As long as we do not actually call find_new_support.
-		    // So probably should shove things onto a list and then call find supports later
+                            if(supCell.next==0) { 
+                                    // We have lost the last support for lit
+                                    //
+                    // I believe that each literal can only be marked once here in a call to update_counters.
+                    // so we should be able to push it onto a list
+                    //
+                    // As long as we do not actually call find_new_support.
+                    // So probably should shove things onto a list and then call find supports later
 
-				if (!Backtracking && supportsPerVar[var] == (supports - 1)) {	// since supports not decremented yet
-					litsWithLostExplicitSupport.push_back(lit);
-					lastSupportPerLit[lit] = sup;
-				}
-				else 
-				
-				// PREVIOUSLY there was no else here.   We had to add to zerolits even if above true
-				//
-				// But now we don't because if we remove the value then we would remove it from zerolits
-				// and put it back on going back throug hthe backtrack stack.
-				//
-				// Only case where we need to add it is if we DO find a new support which is implicit
-				// And that case is covered elsewhere - search for NOTEAAA.   
-				//
-				// However if test above is false then we have to check for zeroLits 
-				//
+                                if (!Backtracking && supportsPerVar[var] == (supports - 1)) {   // since supports not decremented yet
+                                        litsWithLostExplicitSupport.push_back(lit);
+                                        lastSupportPerLit[lit] = sup;
+                                }
+                                else 
+                                
+                                // PREVIOUSLY there was no else here.   We had to add to zerolits even if above true
+                                //
+                                // But now we don't because if we remove the value then we would remove it from zerolits
+                                // and put it back on going back throug hthe backtrack stack.
+                                //
+                                // Only case where we need to add it is if we DO find a new support which is implicit
+                                // And that case is covered elsewhere - search for NOTEAAA.   
+                                //
+                                // However if test above is false then we have to check for zeroLits 
+                                //
 
-				if(!inZeroLits[lit]) {
-				    inZeroLits[lit]=true;
-				    zeroLits[var].push_back(lit);
-				}
-			    // Remove trigger since this is the last support containing var,val.
-			       if(SupportsGACUseDT) { detach_trigger(lit); }
-			    }
-			    else { 
-				    supCell.next->prev=0;
-			    }
-		    }
-		    else {
-			    supCell.prev->next = supCell.next;
-			    if(supCell.next!=0){
-				    supCell.next->prev = supCell.prev;
-			    }
-		    }
-		    
-		    
+                                if(!inZeroLits[lit]) {
+                                    inZeroLits[lit]=true;
+                                    zeroLits[var].push_back(lit);
+                                }
+                            // Remove trigger since this is the last support containing var,val.
+                               if(SupportsGACUseDT) { detach_trigger(lit); }
+                            }
+                            else { 
+                                    supCell.next->prev=0;
+                            }
+                    }
+                    else {
+                            supCell.prev->next = supCell.next;
+                            if(supCell.next!=0){
+                                    supCell.next->prev = supCell.prev;
+                            }
+                    }
+                    
+                    
 
-		    // Update partition
-		    // swap var to the start of its cell.  
-		    // This plays a crucial role in moving together the vars which previously
-		    // had 1 less than numsupports and soon will have numsupports.
+                    // Update partition
+                    // swap var to the start of its cell.  
+                    // This plays a crucial role in moving together the vars which previously
+                    // had 1 less than numsupports and soon will have numsupports.
 
-		    partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]+1]]);
-		    //
-		    // Move the boundary so var is now in the lower cell.
-		    supportNumPtrs[supportsPerVar[var]+1]++;
+                    partition_swap(var, varsPerSupport[supportNumPtrs[supportsPerVar[var]+1]]);
+                    //
+                    // Move the boundary so var is now in the lower cell.
+                    supportNumPtrs[supportsPerVar[var]+1]++;
 
-		    
-		}
-		supports--;
-		
-		// For following code it is essential that partition swaps compress 
-		// vars together which used to have SupportsPerVar[i] = supports-1 and 
-		// now have supportsPerVar[i] = supports (because supports has been decremented
-		// 
-		//
-		    //
-		    // Similarly to the above, each var can only be added to this list once per call to update_counters
-		    // Because it can only lose its last implicit support once since we are only deleting supports.
-		    //
-		
-		// I hope we only need to do this when NOT backtracking, at least for non backtrack-stable version
-		// When we backtrack we will add supports which did support it so there is no need to find new supports
+                    
+                }
+                supports--;
+                
+                // For following code it is essential that partition swaps compress 
+                // vars together which used to have SupportsPerVar[i] = supports-1 and 
+                // now have supportsPerVar[i] = supports (because supports has been decremented
+                // 
+                //
+                    //
+                    // Similarly to the above, each var can only be added to this list once per call to update_counters
+                    // Because it can only lose its last implicit support once since we are only deleting supports.
+                    //
+                
+                // I hope we only need to do this when NOT backtracking, at least for non backtrack-stable version
+                // When we backtrack we will add supports which did support it so there is no need to find new supports
 
-	// 	cout << supportNumPtrs[supports] << " " << oldIndex << endl;
-		
-		if (!Backtracking) {
-			for(int i=supportNumPtrs[supports]; i < oldIndex; i++) { 
-				varsWithLostImplicitSupport.push_back(varsPerSupport[i]);
-				lastSupportPerVar[varsPerSupport[i]] = sup ;
-			}
-			deletedSupports.push_back(sup);
-		} 
-		else { 
-		    // We are Backtracking 
-		    // Can re-use the support when it is removed by BT. 
-		    // Stick it on the free list 
-		    addToSupportFreeList(sup); 
-		}
-	    }
-	else {
-		// it's a full length support 
+        //      cout << supportNumPtrs[supports] << " " << oldIndex << endl;
+                
+                if (!Backtracking) {
+                        for(int i=supportNumPtrs[supports]; i < oldIndex; i++) { 
+                                varsWithLostImplicitSupport.push_back(varsPerSupport[i]);
+                                lastSupportPerVar[varsPerSupport[i]] = sup ;
+                        }
+                        deletedSupports.push_back(sup);
+                } 
+                else { 
+                    // We are Backtracking 
+                    // Can re-use the support when it is removed by BT. 
+                    // Stick it on the free list 
+                    addToSupportFreeList(sup); 
+                }
+            }
+        else {
+                // it's a full length support 
 
-		for(int i=0; i<supArity; i++) {
+                for(int i=0; i<supArity; i++) {
 
-		    SupportCell& supCell = supCells[i];
-		    int lit=supCell.literal;
-		    int var=literalList[lit].var ;
+                    SupportCell& supCell = supCells[i];
+                    int lit=supCell.literal;
+                    int var=literalList[lit].var ;
 
-		    if(supCell.prev==0) { 	// this was the first support in list
+                    if(supCell.prev==0) {       // this was the first support in list
 
-			    literalList[lit].supportCellList = supCell.next; 
+                            literalList[lit].supportCellList = supCell.next; 
 
-			    if(supCell.next==0) { 
-				    // We have lost the last support for lit
-				    //
-		    // I believe that each literal can only be marked once here in a call to update_counters.
-		    // so we should be able to push it onto a list
-		    //
-		    // As long as we do not actually call find_new_support.
-		    // So probably should shove things onto a list and then call find supports later
+                            if(supCell.next==0) { 
+                                    // We have lost the last support for lit
+                                    //
+                    // I believe that each literal can only be marked once here in a call to update_counters.
+                    // so we should be able to push it onto a list
+                    //
+                    // As long as we do not actually call find_new_support.
+                    // So probably should shove things onto a list and then call find supports later
 
-				if (!Backtracking && supportsPerVar[var] == supports) {		// supports won't be decremented
-					litsWithLostExplicitSupport.push_back(lit);
-					lastSupportPerLit[lit] = sup;
-				}
-				else 
-				
-				// PREVIOUSLY there was no else here.   We had to add to zerolits even if above true
-				//
-				// But now we don't because if we remove the value then we would remove it from zerolits
-				// and put it back on going back throug hthe backtrack stack.
-				//
-				// Only case where we need to add it is if we DO find a new support which is implicit
-				// And that case is covered elsewhere - search for NOTEAAA.   
-				//
-				// However if test above is false then we have to check for zeroLits 
-				//
+                                if (!Backtracking && supportsPerVar[var] == supports) {         // supports won't be decremented
+                                        litsWithLostExplicitSupport.push_back(lit);
+                                        lastSupportPerLit[lit] = sup;
+                                }
+                                else 
+                                
+                                // PREVIOUSLY there was no else here.   We had to add to zerolits even if above true
+                                //
+                                // But now we don't because if we remove the value then we would remove it from zerolits
+                                // and put it back on going back throug hthe backtrack stack.
+                                //
+                                // Only case where we need to add it is if we DO find a new support which is implicit
+                                // And that case is covered elsewhere - search for NOTEAAA.   
+                                //
+                                // However if test above is false then we have to check for zeroLits 
+                                //
 
-				if(!inZeroLits[lit]) {
-				    inZeroLits[lit]=true;
-				    zeroLits[var].push_back(lit);
-				}
-			    // Remove trigger since this is the last support containing var,val.
-			       if(SupportsGACUseDT) { detach_trigger(lit); }
-			    }
-			    else { 
-				    supCell.next->prev=0;
-			    }
-		    }
-		    else {
-			    supCell.prev->next = supCell.next;
-			    if(supCell.next!=0){
-				    supCell.next->prev = supCell.prev;
-			    }
-		    }
-		    
-		}
-		
-		// Since this was a full length supports no var has lost its last implicit support
-		
-		if (!Backtracking) {
-			deletedSupports.push_back(sup);
-		} 
-		else { 
-		    // We are Backtracking 
-		    // Can re-use the support when it is removed by BT. 
-		    // Stick it on the free list 
-		    addToSupportFreeList(sup); 
-		}
-	}
+                                if(!inZeroLits[lit]) {
+                                    inZeroLits[lit]=true;
+                                    zeroLits[var].push_back(lit);
+                                }
+                            // Remove trigger since this is the last support containing var,val.
+                               if(SupportsGACUseDT) { detach_trigger(lit); }
+                            }
+                            else { 
+                                    supCell.next->prev=0;
+                            }
+                    }
+                    else {
+                            supCell.prev->next = supCell.next;
+                            if(supCell.next!=0){
+                                    supCell.next->prev = supCell.prev;
+                            }
+                    }
+                    
+                }
+                
+                // Since this was a full length supports no var has lost its last implicit support
+                
+                if (!Backtracking) {
+                        deletedSupports.push_back(sup);
+                } 
+                else { 
+                    // We are Backtracking 
+                    // Can re-use the support when it is removed by BT. 
+                    // Stick it on the free list 
+                    addToSupportFreeList(sup); 
+                }
+        }
     }
 
 
     BOOL hasNoKnownSupport(int var,int lit) {
-	    //
-	    // Either implicitly supported or counter is non zero
-	    // Note that even if we have an explicit support which may be invalid, we can return true
-	    // i.e. code does not guarantee that it has a valid support, only that it has a support.
-	    // If we have no valid supports then (if algorithms are right) we will eventually delete
-	    // the last known valid support and at that time start looking for a new one.
+            //
+            // Either implicitly supported or counter is non zero
+            // Note that even if we have an explicit support which may be invalid, we can return true
+            // i.e. code does not guarantee that it has a valid support, only that it has a support.
+            // If we have no valid supports then (if algorithms are right) we will eventually delete
+            // the last known valid support and at that time start looking for a new one.
 
-	    D_ASSERT(var == literalList[lit].var); 
+            D_ASSERT(var == literalList[lit].var); 
 
-	    return supportsPerVar[var] == supports && (literalList[lit].supportCellList == 0);
+            return supportsPerVar[var] == supports && (literalList[lit].supportCellList == 0);
     }
     //
     ////////////////////////////////////////////////////////////////////////////
@@ -1145,7 +1151,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         }
         cout << "zeroLits:" << zeroLits << endl;
         cout << "inZeroLits:" << inZeroLits << endl;
-	/*
+        /*
         
         cout << "Supports for each literal:"<<endl;
         for(int var=0; var<vars.size(); var++) {
@@ -1166,7 +1172,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
                 }
             }
         }
-	*/
+        */
     }
     
     #if !SupportsGACUseDT
@@ -1191,25 +1197,25 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         }
     }
 
-    bool findSupportsIncrementalHelper(int var, int val) { 
+    bool findSupportsIncrementalHelper(int var, DomainInt val) { 
 
-	    typedef pair<int,DomainInt> temptype;
-	    // MAKE_STACK_BOX(newsupportbox, temptype, vars.size()); 
-	    literalsScratch.clear(); 
-	    // bool foundsupport=findNewSupport(newsupportbox, var, val);
-	    bool foundsupport=findNewSupport(var, val);
-	    
-	    if(!foundsupport) {
-		vars[var].removeFromDomain(val);	
-			// note we are not doing this internally, 
-			// i.e. trying to update counters etc. 
-			// So counters won't have changed until we are retriggered on the removal
-	    }
-	    else {
-		// addSupport(&newsupportbox);
-		addSupport();
-	    }
-	    return foundsupport;
+            typedef pair<int,DomainInt> temptype;
+            // MAKE_STACK_BOX(newsupportbox, temptype, vars.size()); 
+            literalsScratch.clear(); 
+            // bool foundsupport=findNewSupport(newsupportbox, var, val);
+            bool foundsupport=findNewSupport(var, val);
+            
+            if(!foundsupport) {
+                vars[var].removeFromDomain(val);        
+                        // note we are not doing this internally, 
+                        // i.e. trying to update counters etc. 
+                        // So counters won't have changed until we are retriggered on the removal
+            }
+            else {
+                // addSupport(&newsupportbox);
+                addSupport();
+            }
+            return foundsupport;
     }
 
 
@@ -1217,134 +1223,134 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     void findSupportsInitial()
     {
         // called from Full Propagate
-	// We do not assign responsibility for removals as this is called at the root.
+        // We do not assign responsibility for removals as this is called at the root.
 
         for(int i = varsWithLostImplicitSupport.size()-1; i >= 0; i--) { 
 
             int var= varsWithLostImplicitSupport[i];
-	    varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
+            varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
 
-	    if (supportsPerVar[var] == supports) { 	// otherwise has found implicit support in the meantime
-		    for(int j=0; j<zeroLits[var].size(); j++) {
-			int lit=zeroLits[var][j];
+            if (supportsPerVar[var] == supports) {      // otherwise has found implicit support in the meantime
+                    for(int j=0; j<zeroLits[var].size(); j++) {
+                        int lit=zeroLits[var][j];
                         if(literalList[lit].supportCellList != 0){
-			    // No longer a zero val. remove from vector.
-			    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
-			    zeroLits[var].pop_back();
-			    inZeroLits[lit]=false;
-			    j--;
-			    continue;
-			}
-			int val=literalList[lit].val;
+                            // No longer a zero val. remove from vector.
+                            zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
+                            zeroLits[var].pop_back();
+                            inZeroLits[lit]=false;
+                            j--;
+                            continue;
+                        }
+                        DomainInt val=literalList[lit].val;
 
-			if(vars[var].inDomain(val)) {	// tested supportCellList  above
-		            findSupportsIncrementalHelper(var,val) ;
-			} 
-		    }    
-		}
-	}
+                        if(vars[var].inDomain(val)) {   // tested supportCellList  above
+                            findSupportsIncrementalHelper(var,val) ;
+                        } 
+                    }    
+                }
+        }
     }
 
     void findSupportsIncremental()
     {
-	// For list of vars which have lost their last implicit support
-	// do this ... 
-	// but don't need to redo if we have stored that list ahead of time 
-	//  ... and we can check if it still has support 
-	//
+        // For list of vars which have lost their last implicit support
+        // do this ... 
+        // but don't need to redo if we have stored that list ahead of time 
+        //  ... and we can check if it still has support 
+        //
         // For each variable where the number of supports is equal to the total...
 
 
-	for(int i=litsWithLostExplicitSupport.size()-1; i >= 0; i--) { 
-	    int lit=litsWithLostExplicitSupport[i];
-	    int var=literalList[lit].var;
-	    int val=literalList[lit].val;
-	    
-	    litsWithLostExplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
-	    
-	    
-	    if(vars[var].inDomain(val)) {
-		    if (hasNoKnownSupport(var,lit) && ! findSupportsIncrementalHelper(var,val) ) { 
-			    // removed val so must annotate why
-			    lastSupportPerLit[lit]->numLastSupported++ ;
-        		    struct BTRecord backtrackInfo = { var, lit, lastSupportPerLit[lit] };
-			    backtrack_stack.push_back(backtrackInfo);
-		    }
-		    else {  // We now have an alternative support for this literal 
-			    // so we need to do nothing EXCEPT ... 
-			    //  ... add it to zeroLits if necessary
-			    //
-			    //  Note this is the only case where we need to add the lit to zeroLits from NOTEAAA
+        for(int i=litsWithLostExplicitSupport.size()-1; i >= 0; i--) { 
+            int lit=litsWithLostExplicitSupport[i];
+            SysInt var=literalList[lit].var;
+            DomainInt val=literalList[lit].val;
+            
+            litsWithLostExplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
+            
+            
+            if(vars[var].inDomain(val)) {
+                    if (hasNoKnownSupport(var,lit) && ! findSupportsIncrementalHelper(var,val) ) { 
+                            // removed val so must annotate why
+                            lastSupportPerLit[lit]->numLastSupported++ ;
+                            struct BTRecord backtrackInfo = { var, lit, lastSupportPerLit[lit] };
+                            backtrack_stack.push_back(backtrackInfo);
+                    }
+                    else {  // We now have an alternative support for this literal 
+                            // so we need to do nothing EXCEPT ... 
+                            //  ... add it to zeroLits if necessary
+                            //
+                            //  Note this is the only case where we need to add the lit to zeroLits from NOTEAAA
 
-			    if(!inZeroLits[lit] && literalList[lit].supportCellList == 0){
-				    inZeroLits[lit]=true;
-				    zeroLits[var].push_back(lit); 
-			    }
-		    }
-	    }
-	    else {  // Need to cover out of domain lits but has known support so it will have support on BT.
-		  lastSupportPerLit[lit]->numLastSupported++ ;
-        	  struct BTRecord backtrackInfo = { var, lit, lastSupportPerLit[lit] };
-		  backtrack_stack.push_back(backtrackInfo);
-	    }
-	}
+                            if(!inZeroLits[lit] && literalList[lit].supportCellList == 0){
+                                    inZeroLits[lit]=true;
+                                    zeroLits[var].push_back(lit); 
+                            }
+                    }
+            }
+            else {  // Need to cover out of domain lits but has known support so it will have support on BT.
+                  lastSupportPerLit[lit]->numLastSupported++ ;
+                  struct BTRecord backtrackInfo = { var, lit, lastSupportPerLit[lit] };
+                  backtrack_stack.push_back(backtrackInfo);
+            }
+        }
 
         for(int i = varsWithLostImplicitSupport.size()-1; i >= 0; i--) { 
 
             int var= varsWithLostImplicitSupport[i];
-	    varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
+            varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
 
-	    if (supportsPerVar[var] == supports) { 	// otherwise has found implicit support in the meantime
-		    for(int j=0; j<zeroLits[var].size() && supportsPerVar[var] == supports; j++) {
-			int lit=zeroLits[var][j];
+            if (supportsPerVar[var] == supports) {      // otherwise has found implicit support in the meantime
+                    for(int j=0; j<zeroLits[var].size() && supportsPerVar[var] == supports; j++) {
+                        int lit=zeroLits[var][j];
                         if(literalList[lit].supportCellList != 0){
-			    // No longer a zero val. remove from vector.
-			    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
-			    zeroLits[var].pop_back();
-			    inZeroLits[lit]=false;
-			    j--;
-			    continue;
-			}
-			int val=literalList[lit].val;
+                            // No longer a zero val. remove from vector.
+                            zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
+                            zeroLits[var].pop_back();
+                            inZeroLits[lit]=false;
+                            j--;
+                            continue;
+                        }
+                        DomainInt val=literalList[lit].val;
 
-			if(vars[var].inDomain(val)) {	// tested literalList  above
-		            if (! findSupportsIncrementalHelper(var,val) ) {
-				    lastSupportPerVar[var]->numLastSupported++;
-        		            struct BTRecord backtrackInfo = { var, lit, lastSupportPerVar[var] };
-			            backtrack_stack.push_back(backtrackInfo);
-			            // No longer in domain.  remove from zeroLits vector.
-			            zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
-			            zeroLits[var].pop_back();
-			            inZeroLits[lit]=false;
-			            j--;
-			            continue;
-			    }
-			    // Else we have found new implicit or explicit support is found 
-			    //
-			    // No longer do we remove j from zerovals in this case if explicit support is found.
-			    // However this is correct as it can be removed lazily next time the list is traversed
-			    // And we might even get lucky and save this small amount of work.
-			} 
-			else {
-			    // This is a nasty case because we are doing backtrack stability
-			    // var=val has been removed, and it must have been by something outside this 
-			    // constraint.  Therefore when it is restored we need to make sure it has 
-			    // support in this constraint.   Since it has no explicit support, its last 
-			    // support must be this implicit support we are deleting.  So we have to restore
-			    // it on bracktracking.
-			    lastSupportPerVar[var]->numLastSupported++;
-        		    struct BTRecord backtrackInfo = { var, lit, lastSupportPerVar[var]};
-			    backtrack_stack.push_back(backtrackInfo);
-			    // No longer in domain. remove from vector.
-			    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
-			    zeroLits[var].pop_back();
-			    inZeroLits[lit]=false;
-			    j--;
-			    continue;
-			}
-		    }    
-		}
-	}
+                        if(vars[var].inDomain(val)) {   // tested literalList  above
+                            if (! findSupportsIncrementalHelper(var,val) ) {
+                                    lastSupportPerVar[var]->numLastSupported++;
+                                    struct BTRecord backtrackInfo = { var, lit, lastSupportPerVar[var] };
+                                    backtrack_stack.push_back(backtrackInfo);
+                                    // No longer in domain.  remove from zeroLits vector.
+                                    zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
+                                    zeroLits[var].pop_back();
+                                    inZeroLits[lit]=false;
+                                    j--;
+                                    continue;
+                            }
+                            // Else we have found new implicit or explicit support is found 
+                            //
+                            // No longer do we remove j from zerovals in this case if explicit support is found.
+                            // However this is correct as it can be removed lazily next time the list is traversed
+                            // And we might even get lucky and save this small amount of work.
+                        } 
+                        else {
+                            // This is a nasty case because we are doing backtrack stability
+                            // var=val has been removed, and it must have been by something outside this 
+                            // constraint.  Therefore when it is restored we need to make sure it has 
+                            // support in this constraint.   Since it has no explicit support, its last 
+                            // support must be this implicit support we are deleting.  So we have to restore
+                            // it on bracktracking.
+                            lastSupportPerVar[var]->numLastSupported++;
+                            struct BTRecord backtrackInfo = { var, lit, lastSupportPerVar[var]};
+                            backtrack_stack.push_back(backtrackInfo);
+                            // No longer in domain. remove from vector.
+                            zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
+                            zeroLits[var].pop_back();
+                            inZeroLits[lit]=false;
+                            j--;
+                            continue;
+                        }
+                    }    
+                }
+        }
     }
 
     inline void updateCounters(int lit) {
@@ -1368,7 +1374,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         }
     #endif
     
-  inline void attach_trigger(int var, int val, int lit)
+  inline void attach_trigger(int var, DomainInt val, int lit)
   {
       //P("Attach Trigger: " << i);
       
@@ -1429,10 +1435,10 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
       findSupportsIncremental();
 
       while(deletedSupports.size() > 0) { 
-	      if (deletedSupports.back()->numLastSupported == 0) {
-		      addToSupportFreeList(deletedSupports.back());
-	      }
-	      deletedSupports.pop_back();
+              if (deletedSupports.back()->numLastSupported == 0) {
+                      addToSupportFreeList(deletedSupports.back());
+              }
+              deletedSupports.pop_back();
       }
   }
 
@@ -1883,13 +1889,13 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     //  Table of short supports passed in.
     
     //bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
-    bool findNewSupport(int var, int val) {
+    bool findNewSupport(int var, DomainInt val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         
-        const vector<vector<pair<int, int> > >& tuplist=tuple_lists[var][val-vars[var].getInitialMin()]; 
+        const vector<vector<pair<int, DomainInt> > >& tuplist=tuple_lists[var][val-vars[var].getInitialMin()]; 
         
         int listsize=tuplist.size();
-        for(int i=tuple_list_pos[var][val-vars[var].getInitialMin()]; i<listsize; i++) {
+        for(int i=tuple_list_pos[var][checked_cast<SysInt>(val-vars[var].getInitialMin())]; i<listsize; i++) {
             
             int supsize=tuplist[i].size();
             bool valid=true;
@@ -1905,7 +1911,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
                 for(int j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tuplist[i][j].first, tuplist[i][j].second);  //assignment.push_back(tuplist[i][j]);
                 }
-                tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
+                tuple_list_pos[var][checked_cast<SysInt>(val-vars[var].getInitialMin())]=i;
                 return true;
             }
         }
@@ -1954,14 +1960,14 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     //  Table of short supports passed in.
     
     //bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, int val) {
-    bool findNewSupport(int var, int val) {
+    bool findNewSupport(int var, DomainInt val) {
         D_ASSERT(tuple_lists.size()==vars.size());
-        
-        const vector<vector<pair<int, int> > * >& tuplist=tuple_lists[var][val-vars[var].getInitialMin()]; 
+        const SysInt val_offset = checked_cast<SysInt>(val-vars[var].getInitialMin());
+        const vector<vector<pair<int, DomainInt> > * >& tuplist=tuple_lists[var][val_offset]; 
         
         int listsize=tuplist.size();
-        for(int i=tuple_list_pos[var][val-vars[var].getInitialMin()]; i<listsize; i++) {
-            vector<pair<int,int> > & tup=*(tuplist[i]);
+        for(int i=tuple_list_pos[var][val_offset]; i<listsize; i++) {
+            vector<pair<int,DomainInt> > & tup=*(tuplist[i]);
             
             int supsize=tup.size();
             bool valid=true;
@@ -1977,14 +1983,14 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
                 for(int j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tup[j].first, tup[j].second);  //assignment.push_back(tuplist[i][j]);
                 }
-                tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
+                tuple_list_pos[var][val_offset]=i;
                 return true;
             }
         }
         
         
-        for(int i=0; i<tuple_list_pos[var][val-vars[var].getInitialMin()]; i++) {
-            vector<pair<int,int> > & tup=*(tuplist[i]);
+        for(int i=0; i<tuple_list_pos[var][val_offset]; i++) {
+            vector<pair<int,DomainInt> > & tup=*(tuplist[i]);
             
             int supsize=tup.size();
             bool valid=true;
@@ -2000,7 +2006,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
                 for(int j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tup[j].first, tup[j].second);  //assignment.push_back(tuplist[i][j]);
                 }
-                tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
+                tuple_list_pos[var][val_offset]=i;
                 return true;
             }
         }
@@ -2008,14 +2014,14 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     }
     
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
         // argh, how to do this.
         // test with element first
-        
-        int idx=v[array_size-2];
-        if(idx<0 || idx>=array_size-2) return false;
-        return v[v[array_size-2]] == v[array_size-1];
+        abort();
+//        DomainInt idx=v[array_size-2];
+//        if(idx<0 || idx>=array_size-2) return false;
+//        return v[v[array_size-2]] == v[array_size-1];
     }
 
 #endif
@@ -2477,8 +2483,8 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
 
     inline void addToSupportFreeList(Support* sup)
     { 
-	  sup->nextFree=supportFreeList; 
-	  supportFreeList=sup;
+          sup->nextFree=supportFreeList; 
+          supportFreeList=sup;
     }
     
     virtual void full_propagate()
@@ -2487,7 +2493,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
        varsWithLostImplicitSupport.resize(0); 
 
        for(int i=0; i<vars.size(); i++) { 
-	       varsWithLostImplicitSupport.push_back(i);
+               varsWithLostImplicitSupport.push_back(i);
        }
 
        findSupportsInitial();

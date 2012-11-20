@@ -1631,7 +1631,9 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         
         # tuplelist is actually a set of lists(not yet), so that it can be reformed for reify or reifyimply
         
-        constrainttable="table(["
+        tablename = { 0 : "table", 1 : "lighttable", 2 : "gacschema"} [random.randint(0,2)]
+
+        constrainttable=tablename + "(["
         for i in range(sum(varnums2)):
             constrainttable+="x%d"%i
             if i<(sum(varnums2)-1): constrainttable+=","

@@ -307,11 +307,7 @@ struct NewTableConstraint : public AbstractConstraint
 
   virtual void full_propagate()
   {
-    if(vars.size() == 0)
-    {
-      getState(stateObj).setFailed(true);
-      return;
-    }
+    D_ASSERT(!vars.empty());
 
     for(UnsignedSysInt i = 0; i < vars.size(); ++i)
     {
