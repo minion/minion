@@ -1,0 +1,20 @@
+MINION 3
+#TEST SOLCOUNT 1
+
+**VARIABLES**
+
+
+**CONSTRAINTS**
+
+div(1,2,0)
+div(-1,2,-1)
+div(1,-2,-1)
+div(-1,-2,0)
+
+
+div(3,2,1)
+div(-3,2,-2)
+div(3,-2,-2)
+div(-3,-2,1)
+
+**EOF**

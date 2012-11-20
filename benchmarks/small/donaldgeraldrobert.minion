@@ -1,0 +1,34 @@
+# Minion Version 0.8.1
+# Svn version: 2537
+# Svn last changed date: 2009-04-15 22:05:43 +0100 (Wed, 15 Apr 2009)
+#  Run at: UTC Thu Apr 16 20:18:52 2009
+
+#    http://minion.sourceforge.net
+#  Minion is still very new and in active development.
+#  If you have problems with Minion or find any bugs, please tell us!
+#  Mailing list at: https://mail.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: benchmarks/small/donaldgeraldrobert.minion
+# Command line: ./build/minion -redump benchmarks/small/donaldgeraldrobert.minion 
+MINION 3
+**VARIABLES**
+DISCRETE a{0..9}
+DISCRETE b{0..9}
+DISCRETE d{0..9}
+DISCRETE e{0..9}
+DISCRETE g{0..9}
+DISCRETE l{0..9}
+DISCRETE n{0..9}
+DISCRETE o{0..9}
+DISCRETE r{0..9}
+DISCRETE t{0..9}
+**SEARCH**
+VARORDER [a,b,d,e,g,l,n,o,r,t]
+VALORDER [a,a,a,a,a,a,a,a,a,a]
+SYMORDER [a,b,d,e,g,l,n,o,r,t]
+PRINT[[a],[b],[d],[e],[g],[l],[n],[o],[r],[t]]
+**TUPLELIST**
+**CONSTRAINTS**
+weightedsumleq([100000,10000,1000,100,10,1,100000,10000,1000,100,10,1,-100000,-10000,-1000,-100,-10,-1], [d,o,n,a,l,d,g,e,r,a,l,d,r,o,b,e,r,t], 0)
+weightedsumgeq([100000,10000,1000,100,10,1,100000,10000,1000,100,10,1,-100000,-10000,-1000,-100,-10,-1], [d,o,n,a,l,d,g,e,r,a,l,d,r,o,b,e,r,t], 0)
+gacalldiff([a,b,d,e,g,l,n,o,r,t])
+**EOF**
