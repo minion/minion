@@ -34,7 +34,7 @@ struct BuildConObj<CT_NAME, 0> \
 { \
   template<typename T1, typename T2, typename T3> \
   static  \
-  AbstractConstraint* build(StateObj* stateObj, const pair<pair<pair<EmptyType, vector<T1>* >, vector<T2>* >, vector<T3>*>& vars, ConstraintBlob& b, int) \
+  AbstractConstraint* build(StateObj* stateObj, const pair<pair<pair<EmptyType, vector<T1>* >, vector<T2>* >, vector<T3>*>& vars, ConstraintBlob& b, SysInt) \
   { \
       return Build ## CT_NAME(stateObj, *(vars.first.first.second), *(vars.first.second), *(vars.second), b); \
   } \
@@ -49,7 +49,7 @@ struct BuildConObj<CT_NAME, 0> \
 { \
   template<typename T1, typename T2> \
   static  \
-  AbstractConstraint* build(StateObj* stateObj, const pair<pair<EmptyType, vector<T1>* >, vector<T2>* >& vars, ConstraintBlob& b, int) \
+  AbstractConstraint* build(StateObj* stateObj, const pair<pair<EmptyType, vector<T1>* >, vector<T2>* >& vars, ConstraintBlob& b, SysInt) \
   { \
       return Build ## CT_NAME(stateObj, *(vars.first.second), *(vars.second), b); \
   } \
@@ -64,7 +64,7 @@ struct BuildConObj<CT_NAME, 0> \
 { \
   template<typename T1> \
   static  \
-  AbstractConstraint* build(StateObj* stateObj, const pair<EmptyType, vector<T1>* >& vars, ConstraintBlob& b, int) \
+  AbstractConstraint* build(StateObj* stateObj, const pair<EmptyType, vector<T1>* >& vars, ConstraintBlob& b, SysInt) \
   { \
       return Build ## CT_NAME(stateObj, *(vars.second), b); \
   } \
@@ -78,7 +78,7 @@ template<> \
 struct BuildConObj<CT_NAME, 0> \
 { \
   static  \
-  AbstractConstraint* build(StateObj* stateObj, const EmptyType& vars, ConstraintBlob& b, int) \
+  AbstractConstraint* build(StateObj* stateObj, const EmptyType& vars, ConstraintBlob& b, SysInt) \
   { \
       return Build ## CT_NAME(stateObj, b); \
   } \

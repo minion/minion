@@ -34,6 +34,7 @@ consistency.
 #ifndef CONSTRAINT_DIFFERENCE_H
 #define CONSTRAINT_DIFFERENCE_H
 
+#include "../constraints/constraint_checkassign.h"
 
 #ifdef P
 #undef P
@@ -47,7 +48,9 @@ template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct DifferenceConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Difference"; }
+  { return "difference"; }
+  
+  CONSTRAINT_ARG_LIST3(var1,var2,var3);
   
   VarRef1 var1;
   VarRef2 var2;
@@ -88,7 +91,7 @@ struct DifferenceConstraint : public AbstractConstraint
     }
   }
     
-  virtual void propagate(int, DomainDelta)
+  virtual void propagate(DomainInt, DomainDelta)
   {
       PROP_INFO_ADDONE(Difference);
     
@@ -141,24 +144,24 @@ struct DifferenceConstraint : public AbstractConstraint
   virtual void full_propagate()
   { 
     var3.setMin(0);
-    propagate(0,0);
+    propagate(0,DomainDelta::empty());
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
       D_ASSERT(v_size == 3);
-    int abs_val = v[0] - v[1];
+    DomainInt abs_val = v[0] - v[1];
     if(abs_val < 0) abs_val = - abs_val;
       return abs_val == v[2];
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    for(int i = var1.getMin(); i <= var1.getMax(); ++i)
+    for(DomainInt i = var1.getMin(); i <= var1.getMax(); ++i)
     {
       if(var1.inDomain(i))
       {
-          for(int j = var2.getMin(); j <= var2.getMax(); ++j)
+          for(DomainInt j = var2.getMin(); j <= var2.getMax(); ++j)
           {
             if(var2.inDomain(j) && var3.inDomain(abs(i - j)))
             {
@@ -185,11 +188,7 @@ struct DifferenceConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      vector<AnyVarRef> t;
-      t.push_back(var1);
-      t.push_back(var2);
-      t.push_back(var3);
-      return new CheckAssignConstraint<vector<AnyVarRef>, DifferenceConstraint>(stateObj, t, *this);
+      return forward_check_negation(stateObj, this);
   }
 };
 #endif

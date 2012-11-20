@@ -27,13 +27,13 @@ class ReversibleMonotonicSet
 {
 private:
     MonotonicSet & MS;
-    int offset;
+    DomainInt offset;
     
-    D_DATA(int size);
+    D_DATA(DomainInt size);
     
 public:
     // The constructor must be called before the monotonicset is locked.
-    ReversibleMonotonicSet(StateObj * stateObj, int _size) : MS(getMemory(stateObj).monotonicSet())
+    ReversibleMonotonicSet(StateObj * stateObj, DomainInt _size) : MS(getMemory(stateObj).monotonicSet())
   #ifndef NO_DEBUG  
     , size(_size)
   #endif
@@ -44,19 +44,19 @@ public:
         D_DATA(cout << "Set up ReversibleMonotonicSet with size "<< _size << " and offset " << offset <<endl);
     }
     
-    bool isMember(int ref)
+    bool isMember(DomainInt ref)
     {
         D_ASSERT(ref<size && ref>=0);
         return MS.isMember(ref+offset);
     }
     
-    void remove(int ref)
+    void remove(DomainInt ref)
     {
         D_ASSERT(ref<size && ref>=0);
         MS.ifMember_remove(ref+offset);
     }
     
-    void unchecked_remove(int ref)
+    void unchecked_remove(DomainInt ref)
     {
         D_ASSERT(ref<size && ref>=0);
         MS.unchecked_remove(ref+offset);
@@ -68,7 +68,7 @@ class ReversibleMonotonicBoolean
 {
 private:
     MonotonicSet & MS;
-    int offset;
+    DomainInt offset;
 public:
     // The constructor must be called before the monotonicset is locked.
     ReversibleMonotonicBoolean(StateObj * stateObj) : MS(getMemory(stateObj).monotonicSet())

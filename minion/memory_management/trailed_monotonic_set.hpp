@@ -34,18 +34,18 @@ inline void TrailedMonotonicSet::lock(StateObj * _stateObj)
     _local_depth = 0;
     
     _array = getMemory(stateObj).nonBackTrack().request_bytes(_size*sizeof(value_type)); 
-    _undo_indexes = getMemory(stateObj).nonBackTrack().request_bytes(_max_depth*sizeof(int));
+    _undo_indexes = getMemory(stateObj).nonBackTrack().request_bytes(_max_depth*sizeof(SysInt));
     
-    _backtrack_depth_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(int));
+    _backtrack_depth_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(SysInt));
     
-    *((int*)_backtrack_depth_ptr.get_ptr()) = 0;
+    *((SysInt*)_backtrack_depth_ptr.get_ptr()) = 0;
     
     #ifdef DEBUG_TMS
     cout << "initialising TrailedMonotonicSet with value of size= " << size << endl;
     // print_state();
     #endif
     
-    for(int i=0; i< _size; i++) {
+    for(SysInt i=0; i< _size; i++) {
       array(i) = tms_in_set;
     };
 }

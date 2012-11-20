@@ -77,13 +77,13 @@ class RandomAccessPriorityQ {
     pair<Data, size_t>& init_data_pos = mapping.find(init_k)->second;
     size_t heap_s = heap.size();
     while(true) {
-      int left = left(pos);
+      SysInt left = left(pos);
       if(left >= heap_s) //no children
     break;
       else { //left child at least
         Key left_k = heap[left];
         pair<Data, size_t>& left_data_pos = mapping.find(left_k)->second;
-        int right = right(pos);
+        SysInt right = right(pos);
         if(right >= heap_s) { //no right child
           if(init_data_pos.first < left_data_pos.first) { //but left child is larger
             heap[pos] = left_k; //so swap the left child and current around and then stop
@@ -119,7 +119,7 @@ class RandomAccessPriorityQ {
   }
 
   void checkCorrectSize() {
-    for(int i = heap.size(); i < correctSize; i++) {
+    for(SysInt i = heap.size(); i < correctSize; i++) {
       heap.push_back(removed.back());
       removed.pop_back();
       pullUp(heap.size() - 1);
@@ -151,7 +151,7 @@ class RandomAccessPriorityQ {
 
   void repair() {
     const size_t heap_s = heap.size();
-    for(int i = 0; i < heap_s; i++)
+    for(SysInt i = 0; i < heap_s; i++)
       pullUp(i);
     D_ASSERT(checkHeap());
   }
@@ -198,24 +198,24 @@ class RandomAccessPriorityQ {
 /* Below is the code that I used to test this ADT. Both require access to
 a definition like   
 
-RandomAccessPriorityQ<unsigned, int> test(stateObj);
+RandomAccessPriorityQ<UnsignedSysInt, SysInt> test(stateObj);
 
   cout << "begin rapq BT test" << endl;
   
   bttest.clear();
   
-  for(unsigned j = 0; j < 10; j++) {
+  for(UnsignedSysInt j = 0; j < 10; j++) {
   bttest.add(j, j);
   }
   
   cout << bttest.heap << endl;
   getMemory(stateObj).backTrack().world_push();
-  for(unsigned j = 0; j < 5; j++) {
+  for(UnsignedSysInt j = 0; j < 5; j++) {
   bttest.removeMax();
   }
   cout << bttest.heap << endl;
   getMemory(stateObj).backTrack().world_push();
-  for(unsigned j = 0; j < 5; j++) {
+  for(UnsignedSysInt j = 0; j < 5; j++) {
   bttest.removeMax();
   }
   cout << bttest.size() << endl;
@@ -228,14 +228,14 @@ RandomAccessPriorityQ<unsigned, int> test(stateObj);
   
   cout << "begin testing rapq" << endl;
   
-  for(unsigned j = 0; j < 30; j++) {
+  for(UnsignedSysInt j = 0; j < 30; j++) {
   test.add(j, j);
   }
   
   cout << test.heap << endl;
   
-  int nums[] = {6,11,21,2,1,29,30,5,13,12,14,17,20,22,3,4,25,26,10,23,28,18,16,7,27,9,8,15,19,24};
-  for(int j = 0; j < 30; j++) {
+  SysInt nums[] = {6,11,21,2,1,29,30,5,13,12,14,17,20,22,3,4,25,26,10,23,28,18,16,7,27,9,8,15,19,24};
+  for(SysInt j = 0; j < 30; j++) {
   test.getData(test.getMax().first) = -nums[j];
   test.fixOrder();
   }
@@ -243,11 +243,11 @@ RandomAccessPriorityQ<unsigned, int> test(stateObj);
   cout << test.heap << endl;
   
   cout << test.getData(test.heap[0]);
-  for(unsigned j = 1; j < 30; j++)
+  for(UnsignedSysInt j = 1; j < 30; j++)
   cout << "," <<  test.getData(test.heap[j]);
   cout << endl;
   
-  for(int j = 0; j < 30; j++) {
+  for(SysInt j = 0; j < 30; j++) {
   cout << test.getMax().second << " ";
   test.removeMax();
   }

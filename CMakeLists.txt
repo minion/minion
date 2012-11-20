@@ -116,7 +116,8 @@ list(APPEND SRCS ${PROJECT_SOURCE_DIR}/minion/BuildVariables.cpp
                  ${PROJECT_SOURCE_DIR}/minion/preprocess.cpp
                  ${PROJECT_SOURCE_DIR}/minion/build_constraints/BuildStaticStart.cpp
                  ${PROJECT_SOURCE_DIR}/minion/system/trigger_timer.cpp
-                 ${PROJECT_SOURCE_DIR}/minion/help/help.cpp)
+                 ${PROJECT_SOURCE_DIR}/minion/help/help.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/dump_state.cpp)
 
 set(BINARY minion)
 
@@ -142,17 +143,33 @@ if(WINCYGWIN)
     set(CFLAGS "${CFLAGS} -enable-auto-import")
 endif()
 
-set(BOOST_COMPONENTS iostreams)
+option(THREADSAFE "" OFF)
+if(THREADSAFE)
+    message(STATUS "Compiling thread-safe minion")
+    set(BINARY "${BINARY}-threads")
+    add_definitions(-DTHREADSAFE)
 
-option(NAUTY "" ON)
-if(NAUTY)
-  message(STATUS "Please be naughty")
-  add_definitions(-DUSE_NAUTY)
-  list(APPEND SRCS ${PROJECT_SOURCE_DIR}/nauty24b7/nautycxx.cpp
-                   ${PROJECT_SOURCE_DIR}/nauty24b7/nauty.c
-                   ${PROJECT_SOURCE_DIR}/nauty24b7/nautil.c
-                   ${PROJECT_SOURCE_DIR}/nauty24b7/nausparse.c)
+    set(BOOST_COMPONENTS iostreams thread)
+else()
+    set(BOOST_COMPONENTS iostreams)
 endif()
+
+if(DOMAINS64)
+    option(NAUTY "" OFF)
+    set(BINARY "${BINARY}-dom64")
+    add_definitions(-DDOMAINS64)
+else()
+    option(NAUTY "" ON)
+endif()
+
+#if(NAUTY)
+#  message(STATUS "Please be naughty")
+#  add_definitions(-DUSE_NAUTY)
+#  list(APPEND SRCS ${PROJECT_SOURCE_DIR}/nauty24b7/nautycxx.cpp
+#                   ${PROJECT_SOURCE_DIR}/nauty24b7/nauty.c
+#                   ${PROJECT_SOURCE_DIR}/nauty24b7/nautil.c
+#                   ${PROJECT_SOURCE_DIR}/nauty24b7/nausparse.c)
+#endif()
 
 # This used to be in Static, but there is no reason not to always do it
 
@@ -281,12 +298,7 @@ if(DEBUG)
 endif()
 
 
-option(THREADSAFE "" OFF)
-if(THREADSAFE)
-    message(STATUS "Compiling thread-safe minion")
-    set(BINARY "${BINARY}-threads")
-    add_definitions(-DTHREADSAFE)
-endif()
+
 
 if(WIN32 AND NOT CYGWIN)
     set(CFLAGS "${CFLAGS} /EHsc")

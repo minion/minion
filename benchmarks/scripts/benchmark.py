@@ -15,6 +15,6 @@ for root, dirs, files in os.walk(benchmarks):
       else:
         time = timer.repeat(3,1)
         mintime = min(time)
-      print name.ljust(30) + '%7.3f' % mintime
+      print(name.ljust(30) + '%7.3f' % mintime)
       totaltime = totaltime + mintime
-print "total".ljust(30) + '%7.3f' % totaltime
+print("total".ljust(30) + '%7.3f' % totaltime)

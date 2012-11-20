@@ -23,8 +23,12 @@
 template<typename VarArray>
 struct TableConstraint : public AbstractConstraint
 {
+
+  virtual string extended_name()
+  { return "table(basic)"; }
+
   virtual string constraint_name()
-  { return "Table"; }
+  { return "table"; }
   
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
@@ -39,13 +43,13 @@ struct TableConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { return vars; }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   { return constraint->check_assignment(v, v_size); }
   
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    for(unsigned int i=0; i < vars.size(); ++i)
+    for(UnsignedSysInt i=0; i < vars.size(); ++i)
     {
       t.push_back(make_trigger(vars[i],Trigger(this, 0), DomainChanged));
     }
@@ -53,9 +57,9 @@ struct TableConstraint : public AbstractConstraint
   }
   
   
-  bool increment(vector<int>& v, unsigned int check_var)
+  bool increment(vector<DomainInt>& v, UnsignedSysInt check_var)
   {
-    for(unsigned int i=0;i<v.size();i++)
+    for(UnsignedSysInt i=0;i<v.size();i++)
     {
       if(i == check_var)
         continue;
@@ -69,17 +73,17 @@ struct TableConstraint : public AbstractConstraint
     return false;
   }
   
-  virtual void propagate(int, DomainDelta)
+  virtual void propagate(DomainInt, DomainDelta)
   {
     PROP_INFO_ADDONE(Table);
-    for(unsigned int check_var = 0; check_var < vars.size(); check_var++)
+    for(UnsignedSysInt check_var = 0; check_var < vars.size(); check_var++)
     {
       //cerr << vars[check_var].data.var_num << vars[check_var].getMin() << "```" << vars[check_var].getMax() << vars[check_var].inDomain(0) <<  endl;
-      for(int check_dom = vars[check_var].getMin();
+      for(DomainInt check_dom = vars[check_var].getMin();
           check_dom <= vars[check_var].getMax(); check_dom++)
       {
         vector<DomainInt> v(vars.size());
-        for(unsigned int i=0;i<vars.size();i++)
+        for(UnsignedSysInt i=0;i<vars.size();i++)
           v[i] = vars[i].getMin();
         v[check_var] = check_dom;
         BOOL satisfied = false;
@@ -99,7 +103,7 @@ struct TableConstraint : public AbstractConstraint
   }  
   
   virtual void full_propagate()
-  { propagate(0,0); }
+  { propagate(0,DomainDelta::empty()); }
 };
 
 #endif

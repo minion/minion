@@ -23,7 +23,7 @@ for (ident, value) in optargs:
     elif ident=="--filelist": 
         filelist+=open(value, "r").readlines()
     elif ident=="--benchdir":
-        print "benchdir=" + value
+        print("benchdir=" + value)
         for root, dirs, files in os.walk(value):
             for name in files:
                 if name.endswith('.minion') or name.endswith('.minion.bz2'):
@@ -49,16 +49,16 @@ for l in othercopy:
         filelist.append(l)
 
 if len(other)!=1:
-    print "Usage: runminion.py [--minion=<location of minion binary>]"
-    print "       [--filelist=... | --benchdir=...] [--timelimit=...] [--tableout=..]"
-    print "       instance.minion ... "
-    print " Any number of instance directories, instances and filelists can be specified, they"
-    print " will all be used."
+    print("Usage: runminion.py [--minion=<location of minion binary>]")
+    print("       [--filelist=... | --benchdir=...] [--timelimit=...] [--tableout=..]")
+    print("       instance.minion ... ")
+    print(" Any number of instance directories, instances and filelists can be specified, they")
+    print(" will all be used.")
     sys.exit(1)
 
 # This script assumes it can use the current directory for temporary files.
 assert filelist!=[] , "You need to specify some instance files in some way"
-print filelist
+print(filelist)
 
 if xgrid:
     os.system("export XGRID_CONTROLLER_HOSTNAME=xgrid.cs.st-andrews.ac.uk")
@@ -68,7 +68,7 @@ for i in filelist:
     minioncommand1=minion+args+" -tableout "+tableout+" "+timeout+nodelimit+" "+i+" >>1."+str(rand)
     if xgrid:
         minioncommand1="xgrid -job submit "+minioncommand1
-    print "Executing command:"+minioncommand1
+    print("Executing command:"+minioncommand1)
     for sam in range(sample):
         status1=os.system(minioncommand1)
         assert status1 == 0 , "A minion exited in non-standard way on instance %s"%i

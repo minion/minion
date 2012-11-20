@@ -17,9 +17,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef CONSTANT_VAR_FDSK
+#define CONSTANT_VAR_FDSK
 
-
-#include "../../constraints/constraint_abstract.h"
+struct AbstractConstraint;
 
 struct ConstantVar
 {
@@ -34,6 +35,9 @@ struct ConstantVar
   { return false;}
 
   DomainInt val;
+
+  AnyVarRef popOneMapper() const
+  { FATAL_REPORTABLE_ERROR(); }
 
   explicit ConstantVar(StateObj* _stateObj, DomainInt _val) : stateObj(_stateObj), val(_val)
   {}
@@ -101,11 +105,7 @@ struct ConstantVar
 
   void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = NoDomainValue BT_FUNDEF)
   {
-#ifdef BTWLDEF
-      // XXX : Todo. Sensibly move this trigger...
-#endif
-    releaseTrigger(stateObj, dt BT_CALL);
-//      dt->remove(getQueue(stateObj).getNextQueuePtrRef());
+    attachTriggerToNullList(stateObj, dt BT_CALL);
   }
 
   vector<AbstractConstraint*>* getConstraints() { return NULL; }
@@ -120,13 +120,16 @@ struct ConstantVar
 
   Var getBaseVar() const { return Var(VAR_CONSTANT, val); }
 
+  vector<Mapper> getMapperStack() const
+  { return vector<Mapper>(); }
+
 #ifdef WDEG
-  int getBaseWdeg() { return 0; } //wdeg is irrelevant for non-search var
+  SysInt getBaseWdeg() { return 0; } //wdeg is irrelevant for non-search var
 
   void incWdeg() { ; }
 #endif
 
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   {
     D_ASSERT(d.XXX_get_domain_diff() == 0);
     return 0;
@@ -136,3 +139,4 @@ struct ConstantVar
   { return o << "Constant" << constant.val; }
 };
 
+#endif

@@ -69,15 +69,17 @@
 #define CONSTRAINT_DYNAMIC_SUM_H
 
 // VarToCount = 1 means leq, = 0 means geq.
-template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reversed = false >
+template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reversed = false >
   struct BoolLessSumConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-    { if(VarToCount) return "Bool<=SumDynamic"; else return "Bool>=SumDynamic"; }
+    { if(VarToCount) return "watchsumleq"; else return "watchsumgeq"; }
 
   typedef BoolLessSumConstraintDynamic<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
   
+  CONSTRAINT_ARG_LIST2(var_array, VarToCount ? (DomainInt)(var_array.size() - var_sum) : (DomainInt)(var_sum));
+
   // When VarToCount=1 this constraint actually counts 0's and ensures there are var_sum or more.
   // Name of the class should really be changed, and VarToCount changed to val.. and values flipped
   // for it to make sense.
@@ -86,11 +88,11 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
   VarSum var_sum;
 
   MemOffset unwatched_indexes;
-  int last;
-  int num_unwatched;
+  SysInt last;
+  SysInt num_unwatched;
 
-  int& unwatched(int i)
-    { return static_cast<int*>(unwatched_indexes.get_ptr())[i]; }
+  SysInt& unwatched(SysInt i)
+    { return static_cast<SysInt*>(unwatched_indexes.get_ptr())[i]; }
 
   BoolLessSumConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
   AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), last(0)
@@ -104,7 +106,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
   // == Number of 0's is <= N-K
 
 
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
 
     if (var_sum >= array_size || var_sum < 0)
     {
@@ -114,18 +116,18 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     }
     else
     {
-      num_unwatched = array_size - var_sum - 1 ;
+      num_unwatched = checked_cast<SysInt>(array_size - var_sum - 1);
       D_ASSERT(num_unwatched >= 0);
-      unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(unsigned) * num_unwatched);
+      unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(UnsignedSysInt) * num_unwatched);
     }
   }
 
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { 
     if(var_sum >= var_array.size() || var_sum < 0)
       return 0;
     else
-      return var_sum + 1; 
+      return checked_cast<SysInt>(var_sum + 1); 
   }
 
   virtual void full_propagate()
@@ -136,9 +138,9 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
       // Constraint trivially satisfied
       return;
 
-    int array_size = var_array.size(); 
-    int triggers_wanted = var_sum + 1;
-    int index;
+    SysInt array_size = var_array.size(); 
+    DomainInt triggers_wanted = var_sum + 1;
+    SysInt index;
 
     for(index = 0; (index < array_size) && (triggers_wanted > 0); ++index) 
     {
@@ -158,7 +160,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     }
     else if(triggers_wanted == 1)      // Then we can propagate 
     {                               // We never even set up triggers
-      for(int i = 0; i < array_size; ++i)
+      for(SysInt i = 0; i < array_size; ++i)
       {
         if(var_array[i].inDomain(1 - VarToCount))
         {
@@ -173,12 +175,12 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     {
       D_ASSERT(triggers_wanted == 0);
 
-      int j = 0;
+      SysInt j = 0;
 
           // We only look at the elements of vararray that we looked at before
           // Exactly triggers_wanted of them have the val in their domain.
 
-      for(int i = 0; (i < index); ++i)   // remember index was the elts we looked at
+      for(SysInt i = 0; (i < index); ++i)   // remember index was the elts we looked at
       { 
         if(var_array[i].inDomain(1 - VarToCount))
         {
@@ -196,7 +198,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
         }
       }
 
-      for(int i=index; i < array_size; ++i)
+      for(SysInt i=index; i < array_size; ++i)
       {
         unwatched(j) = i;
         ++j;
@@ -221,15 +223,15 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
   {
     PROP_INFO_ADDONE(DynSum);
     D_ASSERT(check_consistency());
-    int propval = dt->trigger_info();
+    SysInt propval = dt->trigger_info();
     D_ASSERT(var_array[propval].getAssignedValue() == VarToCount);
   // should generalise
   // and will need to loop round for watched lits
 
     bool found_new_support = false;
 
-    int loop;
-    int j;
+    SysInt loop;
+    SysInt j;
 
     for(loop = 0 ; (!found_new_support) && loop < num_unwatched ; ++loop )
     {
@@ -244,7 +246,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
 
     if (found_new_support)         // so we have found a new literal to watch
     {
-      int& unwatched_index = unwatched(j);
+      SysInt& unwatched_index = unwatched(j);
 
       dt->trigger_info() = unwatched_index;
       var_array[unwatched_index].addDynamicTrigger(
@@ -261,7 +263,7 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
 
     DynamicTrigger* dt2 = dynamic_trigger_start();
 
-    for(int z = 0; z < var_sum + 1; ++z)
+    for(SysInt z = 0; z < var_sum + 1; ++z)
     {
       if(dt != dt2)       // that one has just been set the other way
       {
@@ -274,11 +276,11 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
-    int count = 0;
-    for(int i = 0; i < v_size; ++i)
+    SysInt count = 0;
+    for(SysInt i = 0; i < v_size; ++i)
       count += (v[i] != VarToCount);
     return count >= var_sum;
   }
@@ -287,20 +289,20 @@ template<typename VarArray, typename VarSum, int VarToCount = 1, BOOL is_reverse
   { 
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     return vars;  
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(var_sum <= 0)
     {
       return true;
     }
     
-    int count = 0;
-    for(int i = 0; i < var_array.size(); ++i)
+    SysInt count = 0;
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].inDomain(!VarToCount))
       {
@@ -335,7 +337,7 @@ AbstractConstraint*
   BoolLessEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 {
   return new BoolLessSumConstraintDynamic<VarArray,VarSum>(stateObj, _var_array,
-    runtime_val(_var_array.size() - _var_sum)); 
+    _var_array.size() - (SysInt)(_var_sum));
 }
 
 template<typename VarArray,  typename VarSum>

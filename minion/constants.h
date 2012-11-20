@@ -42,7 +42,7 @@ enum TrigOp
     TO_Backtrack
 };
 
-static const int NoDomainValue = -98765;
+static const SysInt NoDomainValue = -98765;
 #define BAD_POINTER (void*)(-1)
 
 #ifdef BTWLDEF
@@ -81,7 +81,11 @@ inline PropagationLevel GetPropMethodFromString(std::string s)
   else if(s == "SACBounds") return PropLevel_SACBounds;
   else if(s == "SSACBounds") return PropLevel_SSACBounds;
   else
-    throw parse_exception(s + " is not a valid Propagation Method");
+  {
+    std::cerr << "'" << s << "'' is not a valid Propagation Method!" << std::endl;
+    std::cerr << "Valid Values: None, GAC, SAC, SSAC, SACBounds, SSACBounds" << std::endl;
+    exit(1);
+  }
 }
 
 
@@ -89,7 +93,7 @@ struct EndOfSearch
 {};
 
 #ifndef CONTAINER_TYPE
-typedef unsigned int BitContainerType;
+typedef UnsignedSysInt BitContainerType;
 #else
 typedef CONTAINER_TYPE BitContainerType;
 #endif

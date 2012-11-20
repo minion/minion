@@ -53,10 +53,10 @@ enum Info_PropEvent {
 PropEvent_END
  };
  
-const int VarEventCount=VarEvent_END;
-const int VarTypeCount=VarType_END;
-const int ConEventCount=ConEvent_END;
-const int PropEventCount=PropEvent_END;
+const SysInt VarEventCount=VarEvent_END;
+const SysInt VarTypeCount=VarType_END;
+const SysInt ConEventCount=ConEvent_END;
+const SysInt PropEventCount=PropEvent_END;
 
 #ifdef MORE_SEARCH_INFO
 

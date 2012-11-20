@@ -39,6 +39,9 @@ namespace Controller
       getOptions(stateObj).findAllSolutions();
       getState(stateObj).setOptimiseVar(new AnyVarRef(var));
       getState(stateObj).setOptimisationProblem(true);
+      getState(stateObj).setRawOptimiseVar(new AnyVarRef(var));
+      getState(stateObj).setMaximise(true);
+
   }
   
   /// Sets optimisation variable.
@@ -48,6 +51,8 @@ namespace Controller
       getOptions(stateObj).findAllSolutions();
       getState(stateObj).setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
       getState(stateObj).setOptimisationProblem(true);
+      getState(stateObj).setRawOptimiseVar(new AnyVarRef(var));
+      getState(stateObj).setMaximise(false);
   }
   
   /// Ensures a particular constraint is satisfied by the solution.
@@ -55,12 +60,12 @@ namespace Controller
   void check_constraint(StateObj* stateObj, T* con)
   {
       vector<AnyVarRef>& variables = *(con->get_vars_singleton());
-      unsigned vec_size = variables.size();  
+      UnsignedSysInt vec_size = variables.size();  
       
     DomainInt* values = (DomainInt*) alloca(vec_size * sizeof(DomainInt)); 
       //vector<DomainInt> values(vec_size);
 
-      for(unsigned loop = 0; loop < vec_size; ++loop)
+      for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
       {
         if(!variables[loop].isAssigned())
         {
@@ -73,19 +78,58 @@ namespace Controller
       
       if(!con->check_assignment(values, vec_size))
       {
-        cerr << "A " << con->constraint_name() << " constraint is not satisfied by this sol!" << endl;
+        cerr << "A " << con->extended_name() << " constraint is not satisfied by this sol!" << endl;
         cerr << "The constraint is over the following variables:" << endl;
-        for(unsigned loop = 0; loop < vec_size; ++loop)
+        for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
           cerr << variables[loop] << ",";
         cerr << endl;
         cerr << "Variables were assigned:" << endl;
-        for(unsigned loop = 0; loop < vec_size; ++loop)
+        for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
           cerr << values[loop] << ",";
         cerr << endl;
         cerr << "This is an internal bug. It shouldn't happen!!" << endl;
         cerr << "Please report this instance to the developers." << endl;
         FAIL_EXIT();
       }
+  }
+
+  template<typename Stream, typename PrintMatrix>
+  void print_solution(StateObj* stateObj, Stream& sout, const PrintMatrix& print_matrix)
+  {
+      if(getOptions(stateObj).cspcomp)
+      {
+        sout << "v ";
+        for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
+          for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j)
+          sout << print_matrix[i][j].getAssignedValue() << " ";
+        sout << endl;
+      }
+      else if(!print_matrix.empty())
+      {
+        for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
+        {
+          if (!getOptions(stateObj).silent) sout << "Sol: ";  
+          for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j)
+          {
+            if(!print_matrix[i][j].isAssigned())
+              sout  << "[" << print_matrix[i][j].getMin() << "," << 
+              print_matrix[i][j].getMax() << "]";
+            else
+              sout << print_matrix[i][j].getAssignedValue() << " ";
+          }
+          sout << endl;
+        }
+        if (!getOptions(stateObj).silent) sout << endl;
+      }
+
+    // TODO : Make this more easily changable.
+      if (!getOptions(stateObj).silent) 
+      {
+        sout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
+        getState(stateObj).getOldTimer().printTimestepWithoutReset(sout, Output_Always, "Time:");
+        sout << "Nodes: " << getState(stateObj).getNodeCount() << endl << endl;
+      }
+
   }
 
   /// All operations to be performed when a solution is found.
@@ -95,13 +139,13 @@ namespace Controller
     if(getOptions(stateObj).solCallBack)
       getOptions(stateObj).solCallBack(stateObj);
 
-
     getState(stateObj).incrementSolutionCount();
+    
     if(getOptions(stateObj).solsoutWrite)
     {
       vector<vector<AnyVarRef> > print_matrix = getState(stateObj).getPrintMatrix();
-      for(unsigned i = 0; i < print_matrix.size(); ++i)
-        for(unsigned j = 0; j < print_matrix[i].size(); ++j)
+      for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
+        for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j)
         {
           if(!print_matrix[i][j].isAssigned())
             INPUT_ERROR("Some variable was unassigned while writing solution to file.");
@@ -112,58 +156,33 @@ namespace Controller
     
     if(getOptions(stateObj).print_solution)
     {
-      vector<vector<AnyVarRef> > print_matrix = getState(stateObj).getPrintMatrix();  
-      if(getOptions(stateObj).cspcomp)
+      if(getOptions(stateObj).printonlyoptimal)
       {
-        cout << "v ";
-        for(unsigned i = 0; i < print_matrix.size(); ++i)
-          for(unsigned j = 0; j < print_matrix[i].size(); ++j)
-          cout << print_matrix[i][j].getAssignedValue() << " ";
-        cout << endl;
+        std::ostringstream oss;
+        print_solution(stateObj, oss, getState(stateObj).getPrintMatrix());
+        getState(stateObj).storedSolution = oss.str();
       }
-      else if(!print_matrix.empty())
-      {
-        for(unsigned i = 0; i < print_matrix.size(); ++i)
-        {
-          if (!getOptions(stateObj).silent) cout << "Sol: ";  
-          for(unsigned j = 0; j < print_matrix[i].size(); ++j)
-          {
-            if(!print_matrix[i][j].isAssigned())
-              cout  << "[" << print_matrix[i][j].getMin() << "," << 
-              print_matrix[i][j].getMax() << "]";
-            else
-              cout << print_matrix[i][j].getAssignedValue() << " ";
-          }
-          cout << endl;
-        }
-        if (!getOptions(stateObj).silent) cout << endl;
-      }
-
-    // TODO : Make this more easily changable.
-      if (!getOptions(stateObj).silent) 
-      {
-        cout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
-        getState(stateObj).getOldTimer().printTimestepWithoutReset(Output_Always, "Time:");
-        cout << "Nodes: " << getState(stateObj).getNodeCount() << endl << endl;
-      }
+      else
+        print_solution(stateObj, cout, getState(stateObj).getPrintMatrix());
     }
 
     if(!getOptions(stateObj).nocheck)
     {
-      for(unsigned i = 0 ; i < getState(stateObj).getConstraintList().size();i++)
+      for(UnsignedSysInt i = 0 ; i < getState(stateObj).getConstraintList().size();i++)
         check_constraint(stateObj, getState(stateObj).getConstraintList()[i]);
     }
   }
 
 #include <fstream>
+#include "../MILtools/print_CSP.h"
 
   //repeat declaration
   struct triple {
     bool isLeft;
-    unsigned var;
+    UnsignedSysInt var;
     DomainInt val;
     
-    triple(bool _isLeft, unsigned _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
+    triple(bool _isLeft, UnsignedSysInt _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
     friend std::ostream& operator<<(std::ostream& o, const triple& t)
     { o << "(" << t.isLeft << "," << t.var << "," << t.val << ")"; return o; }
   };
@@ -174,40 +193,103 @@ namespace Controller
     if(getOptions(stateObj).noresumefile) {
         return;
     }
-    string filename = string("minion-resume-") + to_string(getpid());
-    cout << "Output resume file to \"" << filename << "\"" << endl;
-    ofstream fileout(filename.c_str());
-    fileout << "MINION 3" << endl;
-    fileout << "**CONSTRAINTS**" << endl;
-    vector<triple> left_branches_so_far;
-    left_branches_so_far.reserve(branches.size());
-    for(vector<triple>::const_iterator curr = branches.begin(); curr != branches.end(); curr++) {
-      if(curr->isLeft) {
-        left_branches_so_far.push_back(*curr);
-      } else {
-        fileout << "watched-or({";
-        for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
-            lb != left_branches_so_far.end();
-            lb++) {
-          fileout << "w-notliteral(";
-          inputPrint(fileout, stateObj, var_array[lb->var].getBaseVar());
-          fileout << "," << lb->val << "),";
+
+    vector<string> splits;
+    string curvar = "(no_split_variable)";
+    string opt = "";
+
+    if(getOptions(stateObj).split)
+    {
+        if(getState(stateObj).isOptimisationProblem()) {
+            AnyVarRef *optVarRef = getState(stateObj).getOptimiseVar();
+            string optVar = getState(stateObj).getInstance()->vars.getName(optVarRef->getBaseVar());
+            DomainInt optVal = getState(stateObj).getOptimiseValue();
+            opt += "ineq(";
+            if(getState(stateObj).isMaximise()) {
+                opt += to_string(optVal) + string(", ") + optVar + string(", 0)\n");
+            } else {
+                opt += optVar + string(", ") + to_string(-optVal) + string(", 0)\n");
+            }
         }
-        fileout << "w-notliteral(";
-        inputPrint(fileout, stateObj, var_array[curr->var].getBaseVar());
-        fileout << "," << curr->val << ")})" << endl;
-      }
+        if(branches.empty())
+        {
+            // TODO: We should check if any variable has non-empty domain, but this will do for now.
+            // The most likely case is we have just caught the end of search.
+            splits.push_back("");
+        }
+        else
+        {
+            typedef typename VarArray::value_type VarRef;
+            VarRef& var = var_array[branches.back().var];
+            curvar = getState(stateObj).getInstance()->vars.getName(var.getBaseVar());
+            DomainInt min = var.getMin();
+            DomainInt max = var.getMax();
+            DomainInt med = (min+max)/2;
+            string left("ineq(");
+            left += curvar + string(", ") + to_string(med) + string(", 0)\n");
+            splits.push_back(left + opt);
+
+            string right("ineq(");
+            right += to_string(med) + string(", ");
+            right += curvar + string(", -1)\n");
+            splits.push_back(right + opt);
+        }
     }
-    fileout << "**EOF**" << endl;
+    else
+    {
+        splits.push_back("");
+    }
+
+    ProbSpec::MinionInstancePrinter printer(*getState(stateObj).getInstance());
+    printer.build_instance(false);
+    string inst(printer.getInstance());
+
+    SysInt i = 0;
+    for(vector<string>::iterator s = splits.begin(); s != splits.end(); s++) {
+        string basename = getOptions(stateObj).instance_name;
+        size_t mpos = basename.find(".minion");
+        size_t rpos = basename.find("-resume-");
+        if(rpos != string::npos) {
+            basename = basename.substr(0, rpos);
+        } else if(mpos != string::npos) {
+            basename = basename.substr(0, mpos);
+        }
+        string filename = basename + "-resume-" + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
+        cout << "Output resume file to \"" << filename << "\"" << endl;
+        ofstream fileout(filename.c_str());
+        fileout << "# original instance: " << getOptions(stateObj).instance_name << endl;
+        fileout << inst;
+        fileout << *s;
+        vector<triple> left_branches_so_far;
+        left_branches_so_far.reserve(branches.size());
+        for(vector<triple>::const_iterator curr = branches.begin(); curr != branches.end(); curr++) {
+          if(curr->isLeft) {
+            left_branches_so_far.push_back(*curr);
+          } else {
+            fileout << "watched-or({";
+            for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
+                lb != left_branches_so_far.end();
+                lb++) {
+              fileout << "w-notliteral(";
+              inputPrint(fileout, stateObj, var_array[lb->var].getBaseVar());
+              fileout << "," << lb->val << "),";
+            }
+            fileout << "w-notliteral(";
+            inputPrint(fileout, stateObj, var_array[curr->var].getBaseVar());
+            fileout << "," << curr->val << ")})" << endl;
+          }
+        }
+        fileout << "**EOF**" << endl;
+    }
   }
    
   /// Check if timelimit has been exceeded.
   template<typename VarArray, typename BranchList>
-  inline bool do_checks(StateObj* stateObj, VarArray& var_array, BranchList& branches)
+  inline void do_checks(StateObj* stateObj, VarArray& var_array, BranchList& branches)
   {
     if(getState(stateObj).getNodeCount() >= getOptions(stateObj).nodelimit) {
       generateRestartFile(stateObj, var_array, branches);
-      return true;
+      throw EndOfSearch();
     }
     
     if(getState(stateObj).isAlarmActivated())
@@ -215,7 +297,7 @@ namespace Controller
       generateRestartFile(stateObj, var_array, branches);
       getState(stateObj).clearAlarm();
       if(getState(stateObj).isCtrlcPressed()) {
-        return true;
+        throw EndOfSearch();
       }
 
       if(getOptions(stateObj).cspcomp)
@@ -225,9 +307,9 @@ namespace Controller
       
       getOptions(stateObj).printLine("Time out.");
       getTableOut().set("TimeOut", 1);
-      return true;
+
+      throw EndOfSearch();
     }
-    return false;
   }
   
 
@@ -256,12 +338,20 @@ namespace Controller
       {
         cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
         cerr << "Put it in the variable ordering?" << endl;
-    cerr << "Aborting Search" << endl;
+        cerr << "Aborting Search" << endl;
         exit(1);
       }
       
-      cout << "Solution found with Value: " 
-      << getState(stateObj).getOptimiseVar()->getAssignedValue() << endl;
+      if(getOptions(stateObj).printonlyoptimal)
+      {
+        getState(stateObj).storedSolution += "Solution found with Value: "
+          + to_string(getState(stateObj).getRawOptimiseVar()->getAssignedValue()) + "\n";
+      }
+      else
+      {
+        cout << "Solution found with Value: " 
+             << getState(stateObj).getRawOptimiseVar()->getAssignedValue() << endl;
+      }
       
       getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getAssignedValue() + 1);         
     }
@@ -270,11 +360,13 @@ namespace Controller
       throw EndOfSearch();
   }
 
-  void inline set_optimise_and_propagate_queue(StateObj* stateObj)
+  template<typename Prop, typename Vars>
+  void inline set_optimise_and_propagate_queue(StateObj* stateObj, Prop& propagator, Vars& vars)
   {
     if(getState(stateObj).isOptimisationProblem())
       getState(stateObj).getOptimiseVar()->setMin(getState(stateObj).getOptimiseValue());
-    getQueue(stateObj).propagateQueue();
+    propagator.prop(stateObj, vars);
+//    getQueue(stateObj).propagateQueue();
   }
 
   void inline initalise_search(StateObj* stateObj)
@@ -289,7 +381,7 @@ namespace Controller
     }
     lock(stateObj);
     if (!getOptions(stateObj).silent) 
-      getState(stateObj).getOldTimer().printTimestepWithoutReset(Output_1, "First Node Time: ");
+      getState(stateObj).getOldTimer().printTimestepWithoutReset(cout, Output_1, "First Node Time: ");
     /// Failed initially propagating constraints!
     if(getState(stateObj).isFailed())
       return;

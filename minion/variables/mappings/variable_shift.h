@@ -28,6 +28,9 @@ struct ShiftVar
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
   
+  AnyVarRef popOneMapper() const
+  { return data; }
+
   BOOL isBound() const
   { return data.isBound();}
   
@@ -111,10 +114,10 @@ struct ShiftVar
     switch(type)
     {
       case UpperBound:
-        data.addDynamicTrigger(t, LowerBound, pos BT_CALL);
+        data.addDynamicTrigger(t, UpperBound, pos BT_CALL);
         break;
       case LowerBound:
-        data.addDynamicTrigger(t, UpperBound, pos BT_CALL);
+        data.addDynamicTrigger(t, LowerBound, pos BT_CALL);
         break;
       case Assigned:
       case DomainChanged:
@@ -132,7 +135,7 @@ struct ShiftVar
   friend std::ostream& operator<<(std::ostream& o, const ShiftVar& sv)
   { return o << "Shift " << sv.data << "+" << sv.shift; }
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
 
   vector<AbstractConstraint*>* getConstraints()
@@ -147,8 +150,16 @@ struct ShiftVar
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
+  vector<Mapper> getMapperStack() const
+  { 
+    vector<Mapper> v = data.getMapperStack();
+    v.push_back(Mapper(MAP_SHIFT, (DomainInt)shift)); 
+    return v;
+  }
+
+
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()
@@ -186,7 +197,7 @@ vector<ShiftVar<VarRef, Shift> >
 ShiftVarRef(const vector<VarRef>& var_array, const Shift& shift)
 {
   vector<ShiftVar<VarRef, Shift> > shift_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     shift_array[i] = ShiftVarRef(var_array[i], shift);
   return shift_array;
 }
@@ -197,7 +208,7 @@ vector<ShiftVar<VarRef, Shift> >
 ShiftVarRef(const vector<VarRef>& var_array, const Shift& shift)
 {
   vector<ShiftVar<VarRef, Shift> > shift_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     shift_array[i] = ShiftVarRef(var_array[i], shift);
   return shift_array;
 }
@@ -208,7 +219,7 @@ array<ShiftVar<VarRef, Shift>, i>
 ShiftVarRef(const array<VarRef, i>& var_array, const Shift& shift)
 {
   array<ShiftVar<VarRef, Shift>, i> shift_array;
-  for(unsigned int l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     shift_array[l] = ShiftVarRef(var_array[l], shift);
   return shift_array;
 }

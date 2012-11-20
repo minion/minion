@@ -20,10 +20,12 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include "basic_headers.h"
+
 template<typename T>
 inline void CheckNotBound(const T& t, std::string s, std::string s2 = "")
 {
-  for(int i = 0; i < t.size(); ++i)
+  for(SysInt i = 0; i < t.size(); ++i)
   {
     if(t[i].isBound())
     {
@@ -94,16 +96,24 @@ void _NORETURN FAIL_EXIT(string s = "");
 
 struct assert_fail {};
 
-void assert_function(BOOL x, const char* a, const char* f, int line);
+void error_printing_function(const char* a, const char* f, SysInt line) __attribute__ ((noreturn));
 
-// Unlike Asserts, Checks are always enabled.
-#define CHECK(x, y) {assert_function(x, y, __FILE__, __LINE__);}
+void FATAL_REPORTABLE_ERROR()  __attribute__ ((noreturn));
+
+
+// Unlike Asserts, Checks are always enabled. The 'abort' is there just to stop the compiler complaining.
+#define CHECK(x, y) { if(!(x)) {error_printing_function(y, __FILE__, __LINE__); } }
+
+// Check a value doesn't overflow, to be used in ctor of cts 
+#define CHECKSIZE( x, message ) CHECK( x <= ((BigInt) checked_cast<SysInt>(DomainInt_Max)) && x>= ((BigInt) checked_cast<SysInt>(DomainInt_Min)) , message )
 
 #ifdef MINION_DEBUG
 
+#ifndef BOUNDS_CHECK
 #define BOUNDS_CHECK
+#endif
 
-#define D_ASSERT(x) assert_function(x, #x, __FILE__, __LINE__);
+#define D_ASSERT(x) {if(!(x)) {error_printing_function(#x, __FILE__, __LINE__); } }
 #define D_DATA(x) x
 
 enum DebugTypes
@@ -127,8 +137,8 @@ inline bool DOMAIN_CHECK(BigInt v)
 // These are just to catch cases where the user didn't cast to BigInt
 // themselves, which makes the function useless.
 inline void DOMAIN_CHECK(DomainInt);
-inline void DOMAIN_CHECK(int);
-inline void DOMAIN_CHECK(unsigned int);
+inline void DOMAIN_CHECK(SysInt);
+inline void DOMAIN_CHECK(UnsignedSysInt);
         
 #endif //DEBUG_H
 

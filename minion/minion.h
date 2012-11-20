@@ -33,7 +33,7 @@
 //#ifdef WATCHEDLITERALS
 //#define DYNAMICTRIGGERS
 //#endif
-#define VERSION "Minion Version 0.12"
+#define VERSION "Minion Version 0.15RC1"
 #define REVISION "Git revision $Revision$"
 // above line will work but only gives revision of this file,
 //  not the current global revision
@@ -66,7 +66,7 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 // This constraint must be listed early so that it can
 // be called by all constraints.
-#include "constraints/constraint_checkassign.h"
+//#include "../constraints/constraint_checkassign.h"
 
 #include "lock.h"
 #ifndef DOMINION

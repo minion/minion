@@ -39,6 +39,9 @@ struct VarNot
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
   
+  AnyVarRef popOneMapper() const
+  { return data; }
+
   BOOL isBound()  const
   { return data.isBound();}
   
@@ -133,7 +136,7 @@ struct VarNot
   friend std::ostream& operator<<(std::ostream& o, const VarNot& n)
   { return o << "Not " << n.data; }
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
   
 #ifdef DYNAMICTRIGGERS
@@ -171,8 +174,16 @@ struct VarNot
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
+  vector<Mapper> getMapperStack() const
+  { 
+    vector<Mapper> v = data.getMapperStack();
+    v.push_back(Mapper(MAP_NOT));
+    return v;
+  }
+
+
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()
@@ -183,6 +194,11 @@ struct VarNot
 template<typename T>
 struct NotType
 { typedef VarNot<T> type; };
+
+// not(not(T)) = T
+template<typename T>
+struct NotType<VarNot<T> >
+{ typedef T type; };
 
 template<typename T>
 struct NotType<vector<T> >
@@ -204,13 +220,18 @@ typename NotType<VRef>::type
 VarNotRef(const VRef& var_ref)
 { return VarNot<VRef>(var_ref); }
 
+template<typename VRef>
+VRef
+VarNotRef(const VarNot<VRef>& var_ref)
+{ return var_ref.data; }
+
 template<typename VarRef>
 vector<VarNot<VarRef> >
 VarNotRef(const vector<VarRef>& var_array)
 {
   vector<VarNot<VarRef> > Not_array;
   Not_array.reserve(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     Not_array.push_back(VarNotRef(var_array[i]));
   return Not_array;
 }
@@ -221,7 +242,7 @@ vector<VarNot<VarRef> >
 VarNotRef(const vector<VarRef>& var_array)
 {
   vector<VarNot<VarRef> > Not_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     Not_array[i] = VarNotRef(var_array[i]);
   return Not_array;
 }
@@ -232,7 +253,7 @@ array<VarNot<VarRef>, i>
 VarNotRef(const array<VarRef, i>& var_array)
 {
   array<VarNot<VarRef>, i> Not_array;
-  for(unsigned int l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     Not_array[l] = VarNotRef(var_array[l]);
   return Not_array;
 }

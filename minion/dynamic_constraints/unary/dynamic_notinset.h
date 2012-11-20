@@ -38,7 +38,9 @@ template<typename Var>
   struct WatchNotInSetConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "WatchedNotInSet"; }
+    { return "w-notinset"; }
+
+  CONSTRAINT_ARG_LIST2(var, vals);
 
   Var var;
 
@@ -49,7 +51,7 @@ template<typename Var>
   AbstractConstraint(_stateObj), var(_var), vals(_vals.begin(), _vals.end())
     { stable_sort(vals.begin(), vals.end()); }
 
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
     { return 2; }
 
   virtual void full_propagate()
@@ -63,7 +65,7 @@ template<typename Var>
     }
     else
     {
-      for(DomainInt i = 0; i < vals.size(); ++i)
+      for(SysInt i = 0; i < vals.size(); ++i)
         var.removeFromDomain(vals[i]);
     }
   }
@@ -75,15 +77,15 @@ template<typename Var>
     // If we are in here, we have a bounds variable.
     D_ASSERT(var.isBound());
     //lower loop
-    int lower_index = 0;
+    SysInt lower_index = 0;
     
-    while(lower_index < (int)vals.size() && vals[lower_index] <= var.getMin())
+    while(lower_index < (SysInt)vals.size() && vals[lower_index] <= var.getMin())
     {
       var.setMin(vals[lower_index] + 1);
       lower_index++;
     }
     
-    int upper_index = vals.size() - 1;
+    SysInt upper_index = vals.size() - 1;
     
     while(upper_index > 0 && vals[upper_index] >= var.getMax())
     {
@@ -92,7 +94,7 @@ template<typename Var>
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 1);
     return !binary_search(vals.begin(), vals.end(), v[0]);
@@ -106,7 +108,7 @@ template<typename Var>
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
     /// TODO: Make faster
     for(DomainInt i = var.getMin(); i <= var.getMax(); ++i)

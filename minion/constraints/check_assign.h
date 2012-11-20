@@ -34,8 +34,14 @@
 
 struct Check_Assign : public AbstractConstraint
 {
+
+  virtual string extended_name()
+  { return constraint_name() + ":" + child->extended_name(); }
+
   virtual string constraint_name()
-    { return "Check_FC:" + child->constraint_name(); }
+  { return "check[assign]"; }
+
+  CONSTRAINT_ARG_LIST1(child);
 
   AbstractConstraint* child;
 
@@ -43,16 +49,22 @@ struct Check_Assign : public AbstractConstraint
   AbstractConstraint(_stateObj), child(_con)
   { }
 
+  virtual AbstractConstraint* reverse_constraint()
+  {
+    return new Check_Assign(stateObj, child->reverse_constraint());
+  }
+
+
   virtual ~Check_Assign()
     { delete child; }
 
-  virtual int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
    { return 1; }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   { return child->get_satisfying_assignment(assignment); }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   { return child->check_assignment(v, v_size); }
 
   virtual vector<AnyVarRef> get_vars()
@@ -61,10 +73,10 @@ struct Check_Assign : public AbstractConstraint
   virtual void propagate(DynamicTrigger*)
   {
     DynamicTrigger* dt = dynamic_trigger_start();
-    int size = child->get_vars_singleton()->size();
+    SysInt size = child->get_vars_singleton()->size();
     vector<AnyVarRef>* vars = child->get_vars_singleton();
     
-    for(int i = 0; i < size; ++i)
+    for(SysInt i = 0; i < size; ++i)
     {
         if(!(*vars)[i].isAssigned())
         {
@@ -74,7 +86,7 @@ struct Check_Assign : public AbstractConstraint
     }
     
     MAKE_STACK_BOX(b, DomainInt, size);
-    for(int i = 0; i < size; ++i)
+    for(SysInt i = 0; i < size; ++i)
         b.push_back((*vars)[i].getAssignedValue());
     
     if(!check_assignment(&b[0], size))
@@ -85,7 +97,7 @@ struct Check_Assign : public AbstractConstraint
   { propagate(NULL); }
 };
 
-AbstractConstraint*
+inline AbstractConstraint*
 checkAssignCon(StateObj* stateObj, AbstractConstraint* c)
 { return new Check_Assign(stateObj, c); }
 

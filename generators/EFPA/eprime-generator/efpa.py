@@ -7,8 +7,8 @@ minionbin="./minion"
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["q=", "lambda=", "d=", "numcodes=", "numsols=", "timelimit="])
 
 if len(other)!=1:
-    print "Usage: efpa.py --q=<alphabet size> --lambda=<occurrences of each symbol>"
-    print "   --d=<Hamming distance> --numcodes=<number of codewords>"
+    print("Usage: efpa.py --q=<alphabet size> --lambda=<occurrences of each symbol>")
+    print("   --d=<Hamming distance> --numcodes=<number of codewords>")
     sys.exit(1)
 
 q=-1     # size of alphabet
@@ -35,9 +35,9 @@ for (a1,a2) in optargs:
 # Make a parameter file
 
 if (q==-1) or (lam==-1) or (d==-1) or (numcodes==-1):
-    print "Not all of the four parameters were specified."
-    print "Usage: efpa.py --q=<alphabet size> --lambda=<occurrences of each symbol>"
-    print "   --d=<Hamming distance> --numcodes=<number of codewords>"
+    print("Not all of the four parameters were specified.")
+    print("Usage: efpa.py --q=<alphabet size> --lambda=<occurrences of each symbol>")
+    print("   --d=<Hamming distance> --numcodes=<number of codewords>")
     sys.exit(1)
 
 f=open("efpa-temp.param","w") 
@@ -82,9 +82,9 @@ while minout1:
 #sol1=filter(lambda a: a[0:4]=="Sol:", minout1)
 
 if len(sols)==0:
-    print "No solution found."
+    print("No solution found.")
     if nodeout or timeout:
-        print "Solver reached node or time limit. There may be a solution, but it was not found"
+        print("Solver reached node or time limit. There may be a solution, but it was not found")
     sys.exit(0)
 
 for sol1 in sols:
@@ -93,20 +93,20 @@ for sol1 in sols:
     for line in sol1:
         sol2.append([int(a)-1 for a in line.split()[1:]])
     
-    print "Solution found. Codewords:"
+    print("Solution found. Codewords:")
     for l in sol2:
-        print ", ".join([str(a) for a in l])
+        print(", ".join([str(a) for a in l]))
     
-    print ""
+    print("")
     
     pad=numcodes*2+1
     
-    print "".join([st.ljust(pad) for st in ["Position:"]+[str(a) for a in range(1,q*lam+1)]])
-    print ""
+    print("".join([st.ljust(pad) for st in ["Position:"]+[str(a) for a in range(1,q*lam+1)]]))
+    print("")
     for symbol in range(q):
         st="%d"%(symbol)+" "*(pad-1)
         for position in range(q*lam):
-            # print numbers of codewords that have symbol at position
+            # print(numbers of codewords that have symbol at position)
             cwdset=[]
             for codeword in range(numcodes):
                 if sol2[codeword][position]==symbol:
@@ -115,8 +115,8 @@ for sol1 in sols:
             st+=(",".join([str(a) for a in cwdset])).ljust(pad)
             
         
-        print st
-    print ""
-    print ""
+        print(st)
+    print("")
+    print("")
 
-print "%d solutions found." %(len(sols))
+print("%d solutions found." %(len(sols)))

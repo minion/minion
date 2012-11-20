@@ -23,15 +23,40 @@ The constraint
    modulo(x,y,z)
 
 ensures that x%y=z i.e. z is the remainder of dividing x by y.
-*/
+For negative values, we ensure that:
 
-/** @help constraints;modulo Notes
-This constraint is only available for positive domains x, y and z.
+y(x/y) + x%y = x
+
+To be fully concrete, here are some examples:
+
+3 % 5 = 3
+-3 % 5 = 2
+3 % -5 = -2
+-3 % -5 = -3
 */
 
 /** @help constraints;modulo References
 help constraints div
 */
+
+/** @help constraints;mod_undefzero Description
+The constraint
+ 
+   mod_undefzero(x,y,z)
+
+is the same as mod except the constraint is always 
+true when y = 0, instead of false.
+
+This constraint exists for certain special requirements.
+In general, if you are unsure what constraint to use,
+then what you want is a plain mod constraint!
+*/
+
+
+/** @help constraints;mod_undefzero References
+help constraints mod
+*/
+
 
 #ifndef CONSTRAINT_MODULO_H
 #define CONSTRAINT_MODULO_H
@@ -40,16 +65,17 @@ template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct NotModConstraint : public AbstractConstraint
 {
     virtual string constraint_name()
-  { return "NotModulo"; }
+  { return "notmodulo"; }
   
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;
 
+  CONSTRAINT_ARG_LIST3(var1, var2, var3);
+
   NotModConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
-  
       if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
          var3.getInitialMin() < 0)
       { 
@@ -92,7 +118,7 @@ struct NotModConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(int flag, DomainDelta)
+  virtual void propagate(DomainInt flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Mod);
     // propagate var1 % var2 != var3 by forward checking
@@ -167,10 +193,10 @@ struct NotModConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    propagate(1,0);
+    propagate(1,DomainDelta::empty());
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     return v[0] % v[1] != v[2];
@@ -185,7 +211,7 @@ struct NotModConstraint : public AbstractConstraint
     return v;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
     for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
     {
@@ -223,16 +249,17 @@ template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct ModConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Modulo"; }
+  { return "modulo"; }
   
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;
 
+  CONSTRAINT_ARG_LIST3(var1, var2, var3);
+
   ModConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
-  
       if(var1.getInitialMin() < 0 || var2.getInitialMin() < 1 ||
          var3.getInitialMin() < 0)
       { 
@@ -252,7 +279,7 @@ struct ModConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(int flag, DomainDelta)
+  virtual void propagate(DomainInt flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Mod);
     // aiming at bounds(D)-consistency. 
@@ -387,15 +414,15 @@ struct ModConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    propagate(1,0); 
-    /*propagate(2,0);
-    propagate(3,0);
-    propagate(-1,0);
-    propagate(-2,0);
-    propagate(-3,0);*/
+    propagate(1,DomainDelta::empty()); 
+    /*propagate(2,DomainDelta::empty());
+    propagate(3,DomainDelta::empty());
+    propagate(-1,DomainDelta::empty());
+    propagate(-2,DomainDelta::empty());
+    propagate(-3,DomainDelta::empty());*/
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     return v[0] % v[1] == v[2];
@@ -410,7 +437,7 @@ struct ModConstraint : public AbstractConstraint
     return v;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
     for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
     {
@@ -437,4 +464,59 @@ struct ModConstraint : public AbstractConstraint
         return new NotModConstraint<VarRef1, VarRef2, VarRef3>(stateObj, var1, var2, var3);
     }
 };
+
+
+
+template<typename T1, typename T2, typename T3, bool undef_zero>
+class SlowModConstraint
+{
+  StateObj* stateObj;
+public:
+  typedef typename common_var_type3<T1,T2,T3>::type var_common;
+  typedef array<var_common, 3> var_type;
+private:
+   var_type vars;
+public:
+
+  SlowModConstraint(StateObj* _stateObj, const T1& v1, const T2& v2, const T3& v3) :
+  stateObj(_stateObj)
+  {
+    vars[0] = v1; vars[1] = v2; vars[2] = v3;
+     DomainInt check1[3] = {-3,5,2};
+    DomainInt check2[3] = {3,-5,-2};
+    DomainInt check3[3] = {-3,-5,-3};
+    CHECK(check_assignment(check1, 3), "You copy of Minion has a broken mod operator. Please report to the developers!");
+    CHECK(check_assignment(check2, 3), "You copy of Minion has a broken mod operator. Please report to the developers!");
+    CHECK(check_assignment(check3, 3), "You copy of Minion has a broken mod operator. Please report to the developers!");
+  }
+  string constraint_name() const
+  { if(undef_zero) return "modulo_undefzero"; else return "modulo"; }
+
+  CONSTRAINT_ARG_LIST3(vars[0], vars[1], vars[2])
+
+  var_type& get_vars()
+  { return vars; }
+
+  virtual bool check_assignment(DomainInt* v, SysInt v_size)
+  {
+    D_ASSERT(v_size == 3);
+    if(v[1] == 0)
+    {
+      if(undef_zero)
+        return (v[2] == 0);
+      else
+        return false;
+    }
+    // There might well be a slightly better way to do this, but I can't be bothered to figure it out.
+    DomainInt r = v[0] % abs(v[1]);
+    if(r < 0)
+      r += abs(v[1]);
+    if(v[1] < 0 && r > 0)
+      r -= abs(v[1]);
+    return r == v[2];
+  }
+};
+
+
+
 #endif

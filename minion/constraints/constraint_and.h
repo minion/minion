@@ -20,12 +20,20 @@
 #ifndef CONSTRAINT_AND_H
 #define CONSTRAINT_AND_H
 
+#include "../constraints/constraint_checkassign.h"
+
 /// var1 /\ var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct AndConstraint : public AbstractConstraint
 {
+
+  virtual string extended_name()
+  { return "product: and"; }
+  
   virtual string constraint_name()
-  { return "And"; }
+  { return "product"; }
+  
+  CONSTRAINT_ARG_LIST3(var1,var2,var3);
   
   VarRef1 var1;
   VarRef2 var2;
@@ -53,10 +61,10 @@ struct AndConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(int i, DomainDelta)
+  virtual void propagate(DomainInt i, DomainDelta)
   {
     PROP_INFO_ADDONE(And);
-    switch(i)
+    switch(checked_cast<SysInt>(i))
     {
       case 1:
         if(var2.isAssignedValue(true))
@@ -126,13 +134,13 @@ struct AndConstraint : public AbstractConstraint
     
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     return ((v[0] != 0) && (v[1] != 0)) == (v[2] != 0);
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(var3.getMax() == 1)
     {
@@ -176,11 +184,7 @@ struct AndConstraint : public AbstractConstraint
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      vector<AnyVarRef> t;
-      t.push_back(var1);
-      t.push_back(var2);
-      t.push_back(var3);
-      return new CheckAssignConstraint<vector<AnyVarRef>, AndConstraint>(stateObj, t, *this);
+      return forward_check_negation(stateObj, this);
   }
      
 };

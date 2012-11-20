@@ -32,14 +32,20 @@
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
 #include "../dynamic_constraints/old_dynamic_reifyimply.h"
-
+#include "../dynamic_constraints/dynamic_new_and.h"
+#include "../dynamic_constraints/unary/dynamic_literal.h"
 
 template<typename BoolVar>
 struct reify_true_old : public AbstractConstraint
 {
+  virtual string extended_name()
+  { return constraint_name() + ":" + poscon->extended_name(); }
+
   virtual string constraint_name()
-  { return "ReifyTrue:" + poscon->constraint_name(); }
+  { return "reifyimply-old"; }
   
+    CONSTRAINT_ARG_LIST2(poscon, rar_var);
+
   AbstractConstraint* poscon;
   BoolVar rar_var;
   bool constraint_locked;
@@ -51,13 +57,19 @@ struct reify_true_old : public AbstractConstraint
                                                                             full_propagate_called(stateObj, false)
   { }
   
+  // (var -> C) is equiv to (!var \/ C), so reverse is (var /\ !C)
   virtual AbstractConstraint* reverse_constraint()
-  { D_FATAL_ERROR("You can't reverse a reified Constraint!"); }
-  
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  { 
+    vector<AbstractConstraint*> con;
+    con.push_back(new WatchLiteralConstraint<BoolVar>(stateObj, rar_var, 1));
+    con.push_back(poscon->reverse_constraint());
+    return new Dynamic_AND(stateObj, con);
+  }
+
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     
-    DomainInt back_val = *(v + v_size - 1);
+    DomainInt back_val = *(v + checked_cast<SysInt>(v_size - 1));
     //v.pop_back();
     if(back_val != 0)
       return poscon->check_assignment(v, v_size - 1);
@@ -76,7 +88,7 @@ struct reify_true_old : public AbstractConstraint
   {
     triggerCollection postrig = poscon->setup_internal();
     triggerCollection triggers;
-    for(unsigned int i=0;i<postrig.size();i++)
+    for(UnsignedSysInt i=0;i<postrig.size();i++)
     {
       postrig[i]->trigger.constraint = this;
       D_ASSERT(postrig[i]->trigger.info != -99999);
@@ -100,8 +112,9 @@ struct reify_true_old : public AbstractConstraint
     constraint_locked = false;
   }
   
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i_in, DomainDelta domain)
   {
+    const SysInt i = checked_cast<SysInt>(i_in);
     PROP_INFO_ADDONE(ReifyTrue);
     if(constraint_locked)
       return;

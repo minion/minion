@@ -30,14 +30,14 @@ namespace Controller
   inline void conflict_solve_loop(StateObj* stateObj, function<void (void)> next_search, VarOrder& order, Variables& v, Propogator prop = PropagateGAC())
   {
     maybe_print_search_state(stateObj, "Node: ", v);
-    int last_conflict_var = -1;
+    SysInt last_conflict_var = -1;
     while(true)
     {
       getState(stateObj).incrementNodeCount();
       if(do_checks(stateObj, order))
         return;
       
-      D_ASSERT(last_conflict_var >= -1 && last_conflict_var < (int)v.size());
+      D_ASSERT(last_conflict_var >= -1 && last_conflict_var < (SysInt)v.size());
       // Clear the 'last conflict var if it has got assigned'
       if(last_conflict_var != -1 && v[last_conflict_var].isAssigned())
         last_conflict_var = -1;
@@ -86,7 +86,7 @@ namespace Controller
 
           order.branch_right();
 
-          set_optimise_and_propagate_queue(stateObj);
+          set_optimise_and_propagate_queue(stateObj, prop, v);
         }
       }
     }

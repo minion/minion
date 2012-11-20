@@ -25,31 +25,33 @@ namespace BuildCon
 
 /// General case in iteratively build constraints.
 /// This isn't inline, as we don't want the compiler to waste time inlining it.
-template<ConstraintType constraint, int size>
+template<ConstraintType constraint, SysInt size>
 struct BuildConObj
 {
   template<typename ConData>
   static 
-  AbstractConstraint* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos) _NOINLINE;
+  AbstractConstraint* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysInt pos) _NOINLINE;
 };
 
 
-template<ConstraintType constraint, int size>
+template<ConstraintType constraint, SysInt size>
 template<typename ConData>
 AbstractConstraint* 
 BuildConObj<constraint, size>::
-build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int pos)
+build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysInt pos)
 {
   const vector<Var>& vars = b.vars[pos];
   
   // type needs to be something for empty arrays
-  int type = VAR_CONSTANT;
+  SysInt type = VAR_CONSTANT;
   bool same_type = true;
-  
+  // Suppress unused warning
+  (void)same_type;
+
   if(!vars.empty())
   {
     type = vars[0].type();
-    for(unsigned i = 1; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 1; i < vars.size(); ++i)
     {
         if(vars[i].type() != type)
         {
@@ -66,7 +68,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
       case VAR_BOOL:
       {
         vector<BoolVarRef> v(vars.size());
-        for(unsigned i = 0; i < vars.size(); ++i)
+        for(UnsignedSysInt i = 0; i < vars.size(); ++i)
           v[i] = getVars(stateObj).boolVarContainer.get_var_num(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
           build(stateObj, make_pair(partial_build, &v), b, pos + 1);
@@ -74,7 +76,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
       case VAR_NOTBOOL:
       {
         vector<VarNot<BoolVarRef> > v(vars.size());
-        for(unsigned i = 0; i < vars.size(); ++i)
+        for(UnsignedSysInt i = 0; i < vars.size(); ++i)
           v[i] = VarNotRef(getVars(stateObj).boolVarContainer.get_var_num(vars[i].pos()));
         return BuildConObj<constraint, size - 1>::
           build(stateObj, make_pair(partial_build, &v), b, pos + 1);
@@ -82,7 +84,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
       case VAR_BOUND:
       {
         vector<BoundVarRef> v(vars.size());
-        for(unsigned i = 0; i < vars.size(); ++i)
+        for(UnsignedSysInt i = 0; i < vars.size(); ++i)
           v[i] = getVars(stateObj).boundVarContainer.get_var_num(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
           build(stateObj, make_pair(partial_build, &v), b, pos + 1);
@@ -90,7 +92,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
       case VAR_SPARSEBOUND:
       {
         vector<SparseBoundVarRef> v(vars.size());
-        for(unsigned i = 0; i < vars.size(); ++i)
+        for(UnsignedSysInt i = 0; i < vars.size(); ++i)
           v[i] = getVars(stateObj).sparseBoundVarContainer.get_var_num(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
           build(stateObj, make_pair(partial_build, &v), b, pos + 1);
@@ -98,7 +100,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
       case VAR_DISCRETE:
       {
         vector<BigRangeVarRef> v(vars.size());
-        for(unsigned i = 0; i < vars.size(); ++i)
+        for(UnsignedSysInt i = 0; i < vars.size(); ++i)
           v[i] = getVars(stateObj).bigRangeVarContainer.get_var_num(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
           build(stateObj, make_pair(partial_build, &v), b, pos + 1);
@@ -109,7 +111,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
       case VAR_CONSTANT:
       {
         vector<ConstantVar> v(vars.size());
-        for(unsigned i = 0; i < vars.size(); ++i)
+        for(UnsignedSysInt i = 0; i < vars.size(); ++i)
           v[i] = ConstantVar(stateObj, vars[i].pos());
         return BuildConObj<constraint, size - 1>::
           build(stateObj, make_pair(partial_build, &v), b, pos + 1);
@@ -120,7 +122,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, int p
   #endif
   {
     vector<AnyVarRef> v(vars.size());
-    for(unsigned i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       v[i] = get_AnyVarRef_from_Var(stateObj, vars[i]);
     
     return BuildConObj<constraint, size - 1>::

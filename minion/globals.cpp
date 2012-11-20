@@ -33,4 +33,4 @@
 
 #include "build_constraints/constraint_defs.h"
 
-int num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);
+SysInt num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);

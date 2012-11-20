@@ -21,13 +21,13 @@ for (ident, value) in optargs:
     elif ident=="--filelist": 
         filelist+=open(value, "r").readlines()
     elif ident=="--benchdir":
-        print "benchdir=" + value
+        print("benchdir=" + value)
         for root, dirs, files in os.walk(value):
             for name in files:
                 if name.endswith('.minion'):
                     filelist.append(os.path.join(root,name))
     elif ident=="--xgrid":
-        print "xgrid not implemneted"
+        print("xgrid not implemneted")
     elif ident=="--timelimit":
         timeout="-timelimit "+str(value)
     elif ident=="--name1":
@@ -48,16 +48,16 @@ for l in othercopy:
         filelist.append(l)
 
 if len(other)!=1:
-    print "Usage: regression-test.py [--minion1=<location of minion binary>] [--minion2=...]"
-    print "       [--filelist=... | --benchdir=...] [--xgrid] [--timelimit=...]"
-    print "       instance.minion ... "
-    print " Any number of instance directories, instances and filelists can be specified, they"
-    print " will all be used."
+    print("Usage: regression-test.py [--minion1=<location of minion binary>] [--minion2=...]")
+    print("       [--filelist=... | --benchdir=...] [--xgrid] [--timelimit=...]")
+    print("       instance.minion ... ")
+    print(" Any number of instance directories, instances and filelists can be specified, they")
+    print(" will all be used.")
     sys.exit(1)
 
 # This script assumes it can use the current directory for temporary files.
 assert filelist!=[] , "You need to specify some instance files in some way"
-print filelist
+print(filelist)
 
 if os.path.exists("tablefile1"):
     os.remove("tablefile1")
@@ -67,10 +67,10 @@ if os.path.exists("tablefile2"):
 for i in filelist:
     minioncommand1=minion1+" -tableout tablefile1 "+timeout+" "+i+" >>1."+str(rand)
     minioncommand2=minion2+" -tableout tablefile2 "+timeout+" "+i+" >>2."+str(rand)
-    print "Executing command:"+minioncommand1
+    print("Executing command:"+minioncommand1)
     status1=os.system(minioncommand1)
     if status1==0:
-        print "Executing command:"+minioncommand2
+        print("Executing command:"+minioncommand2)
         status2=os.system(minioncommand2)
     
     assert status1+status2 == 0 , "A minion exited in non-standard way on instance %s"%i

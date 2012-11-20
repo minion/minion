@@ -54,9 +54,9 @@ struct Dynamic_reify_true_old: public AbstractConstraint
                 constraint_locked(false), full_propagate_called(stateObj, false)
     { }
 
-    virtual BOOL check_assignment(DomainInt* v, int v_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
     {
-        DomainInt back_val = *(v + v_size - 1);
+        DomainInt back_val = *(v + checked_cast<SysInt>(v_size - 1));
         if (back_val != 0)
             return poscon->check_assignment(v, v_size - 1);
         else
@@ -70,7 +70,7 @@ struct Dynamic_reify_true_old: public AbstractConstraint
         return vec;
     }
 
-    virtual int dynamic_trigger_count()
+    virtual SysInt dynamic_trigger_count()
     { return 1 + poscon->get_vars_singleton()->size(); }
 
     // Override setup!
@@ -80,9 +80,9 @@ struct Dynamic_reify_true_old: public AbstractConstraint
 
         poscon->setup();
         DynamicTrigger* start = poscon->dynamic_trigger_start();
-        int trigs = poscon->dynamic_trigger_count();
+        SysInt trigs = poscon->dynamic_trigger_count();
 
-        for (int i = 0; i < trigs; ++i)
+        for (SysInt i = 0; i < trigs; ++i)
             (start + i)->constraint = this;
     }
 
@@ -137,16 +137,17 @@ struct Dynamic_reify_true_old: public AbstractConstraint
                 vector<AnyVarRef>& poscon_vars =
                         *(poscon->get_vars_singleton());
 
-                for (int i = 0; i < assignment.size(); ++i)
+                for (SysInt i = 0; i < assignment.size(); ++i)
                 {
-                    D_ASSERT(poscon_vars[assignment[i].first].inDomain(assignment[i].second));
-                    if (poscon_vars[assignment[i].first].isBound())
+                    const SysInt aif = checked_cast<SysInt>(assignment[i].first);
+                    D_ASSERT(poscon_vars[aif].inDomain(assignment[i].second));
+                    if (poscon_vars[aif].isBound())
                     {
-                        poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainChanged);
+                        poscon_vars[aif].addDynamicTrigger(assign_trigs + i, DomainChanged);
                     }
                     else
                     {
-                        poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs + i, DomainRemoval,
+                        poscon_vars[aif].addDynamicTrigger(assign_trigs + i, DomainRemoval,
                                 assignment[i].second);
                     }
                 }
@@ -171,9 +172,9 @@ struct Dynamic_reify_true_old: public AbstractConstraint
         P("Reifyimply FullProp");
         DynamicTrigger* dt = dynamic_trigger_start();
         DynamicTrigger* assign_trigs = dt + 1;
-        int dt_count = dynamic_trigger_count();
+        SysInt dt_count = dynamic_trigger_count();
         // Clean up triggers
-        for (int i = 0; i < dt_count; ++i)
+        for (SysInt i = 0; i < dt_count; ++i)
             releaseTrigger(stateObj, dt + i);
 
         rar_var.addDynamicTrigger(dt, LowerBound);
@@ -189,17 +190,18 @@ struct Dynamic_reify_true_old: public AbstractConstraint
 
         vector<AnyVarRef>& poscon_vars = *(poscon->get_vars_singleton());
 
-        for (int i = 0; i < assignment.size(); ++i)
+        for (SysInt i = 0; i < assignment.size(); ++i)
         {
-            D_ASSERT(poscon_vars[assignment[i].first].inDomain(assignment[i].second));
-            if (poscon_vars[assignment[i].first].isBound())
+            const SysInt aif = checked_cast<SysInt>(assignment[i].first);
+            D_ASSERT(poscon_vars[aif].inDomain(assignment[i].second));
+            if (poscon_vars[aif].isBound())
             {
-                poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs
+                poscon_vars[aif].addDynamicTrigger(assign_trigs
                         + i, DomainChanged);
             }
             else
             {
-                poscon_vars[assignment[i].first].addDynamicTrigger(assign_trigs
+                poscon_vars[aif].addDynamicTrigger(assign_trigs
                         + i, DomainRemoval, assignment[i].second);
             }
         }

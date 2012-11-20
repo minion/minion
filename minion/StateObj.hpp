@@ -156,12 +156,8 @@ inline BigRangeVarContainer<d_type>& BigRangeVarRef_internal_template<d_type>::g
 // Must be defined later.
 inline SearchState::~SearchState()
 { 
-  for(int i = 0; i < constraints.size(); ++i)
+  for(SysInt i = 0; i < constraints.size(); ++i)
     delete constraints[i];
-#ifdef DYNAMICTRIGGERS
-  for(int i = 0; i < dynamic_constraints.size(); ++i)
-    delete dynamic_constraints[i];
-#endif
 }
 
 

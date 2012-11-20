@@ -1,0 +1,21 @@
+MINION 3
+#TEST SOLCOUNT 1
+
+**VARIABLES**
+
+DISCRETE X[8] {-10..10}
+
+**CONSTRAINTS**
+
+modulo(1,2,X[0])
+modulo(-1,2,X[1])
+modulo(1,-2,X[2])
+modulo(-1,-2,X[3])
+
+
+modulo(3,2,X[4])
+modulo(3,-2,X[6])
+modulo(-3,2,X[5])
+modulo(-3,-2,X[7])
+
+**EOF**

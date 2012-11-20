@@ -35,7 +35,10 @@ Use of this variable in a constraint:
 eq(myvar, 4) #variable myvar equals 4
 */
 
-
+#ifdef THREADSAFE
+#include <boost/thread/thread.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+#endif
 
 #include "../../constraints/constraint_abstract.h"
 
@@ -51,8 +54,11 @@ struct BoundVarRef_internal
   BOOL isBound() const
   { return true;}
 
+  AnyVarRef popOneMapper() const
+  { FATAL_REPORTABLE_ERROR(); }
+  
   MoveablePointer var_bound_data;
-  int var_num;
+  DomainInt var_num;
   
   const DomType& lower_bound() const
   { return *static_cast<DomType*>(var_bound_data.get_ptr()); }
@@ -67,7 +73,7 @@ struct BoundVarRef_internal
   BoundVarRef_internal() : var_num(-1), boundCon(NULL)
   { }
   
-  explicit BoundVarRef_internal(BoundVarContainer<DomType>* con, int i, DomType* ptr) : 
+  explicit BoundVarRef_internal(BoundVarContainer<DomType>* con, DomainInt i, DomType* ptr) : 
   var_bound_data(ptr), var_num(i), boundCon(con)
   { }
   
@@ -76,7 +82,7 @@ struct BoundVarRef_internal
   BoundVarRef_internal() : var_num(-1)
   { }
 
-  explicit BoundVarRef_internal(BoundVarContainer<DomType>*, int i, DomType* ptr) : 
+  explicit BoundVarRef_internal(BoundVarContainer<DomType>*, DomainInt i, DomType* ptr) : 
   var_bound_data(ptr), var_num(i)
   { }
 #endif
@@ -159,9 +165,12 @@ struct BoundVarRef_internal
   }
 
   Var getBaseVar() const { return Var(VAR_BOUND, var_num); }
+
+  vector<Mapper> getMapperStack() const
+  { return vector<Mapper>(); }
   
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return GET_LOCAL_CON().getBaseWdeg(*this); }
 
   void incWdeg()
@@ -171,7 +180,7 @@ struct BoundVarRef_internal
   friend std::ostream& operator<<(std::ostream& o, const BoundVarRef_internal& v)
   { return o << "BoundVar:" << v.var_num; }
     
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
   
 #ifdef DYNAMICTRIGGERS
@@ -199,23 +208,30 @@ struct BoundVarContainer {
   vector<pair<BoundType, BoundType> > initial_bounds;
   vector<vector<AbstractConstraint*> > constraints;
 #ifdef WDEG
-  vector<unsigned int> wdegs;
+  vector<UnsignedSysInt> wdegs;
 #endif
-  unsigned var_count_m;
+  UnsignedSysInt var_count_m;
   BOOL lock_m;
   
+#ifdef THREADSAFE
+  mutable boost::recursive_mutex con_mutex;
+#define LOCK_CON_MUTEX boost::recursive_mutex::scoped_lock lock(con_mutex);
+#else
+#define LOCK_CON_MUTEX
+#endif
+
 
   const BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i) const
-  { return static_cast<const BoundType*>(bound_data.get_ptr())[i.var_num*2]; }
+  { return static_cast<const BoundType*>(bound_data.get_ptr())[checked_cast<SysInt>(i.var_num*2)]; }
   
   const BoundType& upper_bound(const BoundVarRef_internal<BoundType>& i) const
-  { return static_cast<const BoundType*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
+  { return static_cast<const BoundType*>(bound_data.get_ptr())[checked_cast<SysInt>(i.var_num*2 + 1)]; }
 
   BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i)
-  { return static_cast<BoundType*>(bound_data.get_ptr())[i.var_num*2]; }
+  { return static_cast<BoundType*>(bound_data.get_ptr())[checked_cast<SysInt>(i.var_num*2)]; }
   
   BoundType& upper_bound(const BoundVarRef_internal<BoundType>& i)
-  { return static_cast<BoundType*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
+  { return static_cast<BoundType*>(bound_data.get_ptr())[checked_cast<SysInt>(i.var_num*2 + 1)]; }
 
   
   void lock()
@@ -225,20 +241,20 @@ struct BoundVarContainer {
   }
 
   BOOL isAssigned(const BoundVarRef_internal<BoundType>& d) const
-  { 
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     return lower_bound(d) == upper_bound(d); 
   }
   
   DomainInt getAssignedValue(const BoundVarRef_internal<BoundType>& d) const
-  {
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return lower_bound(d);
   }
   
   BOOL inDomain(const BoundVarRef_internal<BoundType>& d, DomainInt i) const
-  {
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
       return false;
@@ -246,7 +262,7 @@ struct BoundVarContainer {
   }
   
   BOOL inDomain_noBoundCheck(const BoundVarRef_internal<BoundType>& d, DomainInt i) const
-  {
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(i >= lower_bound(d));
     D_ASSERT(i <= upper_bound(d));
@@ -254,24 +270,24 @@ struct BoundVarContainer {
   }
   
   DomainInt getMin(const BoundVarRef_internal<BoundType>& d) const
-  {
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(getState(stateObj).isFailed() || inDomain(d,lower_bound(d)));
     return lower_bound(d);
   }
   
   DomainInt getMax(const BoundVarRef_internal<BoundType>& d) const
-  {
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m);
     D_ASSERT(getState(stateObj).isFailed() || inDomain(d,upper_bound(d)));
     return upper_bound(d);
   }
  
   DomainInt getInitialMin(const BoundVarRef_internal<BoundType>& d) const
-  { return initial_bounds[d.var_num].first; }
+  { return initial_bounds[checked_cast<SysInt>(d.var_num)].first; }
   
   DomainInt getInitialMax(const BoundVarRef_internal<BoundType>& d) const
-  { return initial_bounds[d.var_num].second; }
+  { return initial_bounds[checked_cast<SysInt>(d.var_num)].second; }
    
   void removeFromDomain(const BoundVarRef_internal<BoundType>&, DomainInt )
   {
@@ -280,7 +296,7 @@ struct BoundVarContainer {
   }
 
   void internalAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  {
+  { 
     DomainInt min_val = getMin(d);
     DomainInt max_val = getMax(d);
     if(min_val > i || max_val < i)
@@ -308,20 +324,20 @@ struct BoundVarContainer {
   }
   
   void propagateAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  { internalAssign(d, i); }
+  { LOCK_CON_MUTEX internalAssign(d, i); }
   
   // TODO : Optimise
   void uncheckedAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  { 
+  { LOCK_CON_MUTEX
     D_ASSERT(inDomain(d,i));
     internalAssign(d, i);
   }
 
   void decisionAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  { internalAssign(d, i); }
+  { LOCK_CON_MUTEX internalAssign(d, i); }
   
   void setMax(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  {
+  { LOCK_CON_MUTEX
     DomainInt low_bound = lower_bound(d);
     DomainInt up_bound = upper_bound(d);
     
@@ -344,7 +360,7 @@ struct BoundVarContainer {
   }
   
   void setMin(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  {
+  { LOCK_CON_MUTEX
     DomainInt low_bound = lower_bound(d);
     DomainInt up_bound = upper_bound(d);
     
@@ -365,18 +381,23 @@ struct BoundVarContainer {
     }
   }
   
-//  BoundVarRef get_new_var();
-//  BoundVarRef get_new_var(int i, int j);
-  BoundVarRef get_var_num(int i);
+  UnsignedSysInt var_count()
+  {
+    return var_count_m;
+  }
   
-  void addVariables(const vector<pair<int, Bounds > >& vars)
+//  BoundVarRef get_new_var();
+//  BoundVarRef get_new_var(SysInt i, SysInt j);
+  BoundVarRef get_var_num(DomainInt i);
+  
+  void addVariables(const vector<pair<SysInt, Bounds > >& vars)
   {
     D_ASSERT(!lock_m);
-    for(int i = 0; i < vars.size(); ++i)
+    for(SysInt i = 0; i < vars.size(); ++i)
     {
       D_ASSERT(vars[i].second.lower_bound >= DomainInt_Min);
       D_ASSERT(vars[i].second.upper_bound <= DomainInt_Max);
-      for(int j = 0; j < vars[i].first; ++j)
+      for(SysInt j = 0; j < vars[i].first; ++j)
       {
         var_count_m++;
         initial_bounds.push_back(make_pair(vars[i].second.lower_bound, vars[i].second.upper_bound));
@@ -390,7 +411,7 @@ struct BoundVarContainer {
 
     bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
     BoundType* bound_ptr = static_cast<BoundType*>(bound_data.get_ptr());
-    for(unsigned int i = 0; i < var_count_m; ++i)
+    for(UnsignedSysInt i = 0; i < var_count_m; ++i)
     {
       bound_ptr[2*i] = initial_bounds[i].first;
       bound_ptr[2*i+1] = initial_bounds[i].second;
@@ -402,7 +423,7 @@ struct BoundVarContainer {
     {
       min_domain_val = initial_bounds[0].first;
       max_domain_val = initial_bounds[0].second;
-      for(unsigned int i = 0; i < var_count_m; ++i)
+      for(UnsignedSysInt i = 0; i < var_count_m; ++i)
       {
         bound_ptr[2*i] = initial_bounds[i].first;
         bound_ptr[2*i+1] = initial_bounds[i].second;
@@ -415,33 +436,33 @@ struct BoundVarContainer {
   }
 
   void addTrigger(const BoundVarRef_internal<BoundType>& b, Trigger t, TrigType type)
-  { 
+  {  LOCK_CON_MUTEX
     D_ASSERT(lock_m);  
     trigger_list.add_trigger(b.var_num, t, type); 
   }
 
   vector<AbstractConstraint*>* getConstraints(const BoundVarRef_internal<BoundType>& b)
-  { return &constraints[b.var_num]; }
+  { return &constraints[checked_cast<SysInt>(b.var_num)]; }
   
   void addConstraint(const BoundVarRef_internal<BoundType>& b, AbstractConstraint* c)
   { 
-    constraints[b.var_num].push_back(c); 
+    constraints[checked_cast<SysInt>(b.var_num)].push_back(c); 
 #ifdef WDEG
     if(getOptions(stateObj).wdeg_on) wdegs[b.var_num] += c->getWdeg(); //add constraint score to base var wdeg
 #endif
   }
 
 #ifdef WDEG
-  int getBaseWdeg(const BoundVarRef_internal<BoundType>& b)
-  { return wdegs[b.var_num]; }
+  SysInt getBaseWdeg(const BoundVarRef_internal<BoundType>& b)
+  { return wdegs[checked_cast<SysInt>(b.var_num)]; }
 
   void incWdeg(const BoundVarRef_internal<BoundType>& b)
-  { wdegs[b.var_num]++; }
+  { wdegs[checked_cast<SysInt>(b.var_num)]++; }
 #endif
 
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  {
+  { LOCK_CON_MUTEX
     D_ASSERT(lock_m); 
     if(type == DomainRemoval)
     {
@@ -456,8 +477,8 @@ struct BoundVarContainer {
   {
     D_ASSERT(lock_m);
     stringstream s;
-    int char_count = 0;
-    for(unsigned int i=0;i<var_count_m;i++)
+    SysInt char_count = 0;
+    for(UnsignedSysInt i=0;i<var_count_m;i++)
     {
       if(!isAssigned(BoundVarRef_internal<BoundType>(i)))
     s << "X";
@@ -479,7 +500,7 @@ struct BoundVarContainer {
 /*
 template<typename T>
 inline BoundVarRef
-BoundVarContainer<T>::get_new_var(int i, int j)
+BoundVarContainer<T>::get_new_var(SysInt i, SysInt j)
 {
 
   return BoundVarRef(BoundVarRef_internal<BoundType>(var_count_m++));
@@ -488,10 +509,10 @@ BoundVarContainer<T>::get_new_var(int i, int j)
 
 template<typename T>
 inline BoundVarRef
-BoundVarContainer<T>::get_var_num(int i)
+BoundVarContainer<T>::get_var_num(DomainInt i)
 {
   D_ASSERT(i < var_count_m);
   // Note we assume in BoundVarRef_internal that upper_bound(i) is just after lower_bound(i)...
-  return BoundVarRef(BoundVarRef_internal<>(this, i, static_cast<DomainInt*>(bound_data.get_ptr()) + i*2));
+  return BoundVarRef(BoundVarRef_internal<>(this, i, static_cast<DomainInt*>(bound_data.get_ptr()) + checked_cast<SysInt>(i)*2));
 }
 

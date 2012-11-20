@@ -41,26 +41,25 @@ struct Wrapper
 
   Wrapper& operator*=(const Wrapper& w)
   { 
-    t += w.t; 
+    t *= w.t; 
     return *this;
   }
 
   Wrapper& operator-=(const Wrapper& w)
   { 
-    t += w.t; 
+    t -= w.t; 
     return *this;
   }
 
   Wrapper& operator/=(const Wrapper& w)
   { 
-    t += w.t; 
+    t /= w.t; 
     return *this;
   }
   
-  Wrapper& operator-()
+  Wrapper operator-() const
   {
-    t = -t;
-    return *this;
+    return -t;
   }
   
   void operator++()
@@ -68,11 +67,33 @@ struct Wrapper
   
   void operator--()
   { t--; }
+
+  Wrapper operator++(int)
+  {
+    Wrapper t(*this);
+    ++(*this);
+    return t;
+  }
+
+  Wrapper operator--(int)
+  {
+    Wrapper t(*this);
+    --(*this);
+    return t;
+  }
+
   
   friend std::ostream& operator<<(std::ostream& o, Wrapper v)
   { return o << v.t; }
+
+  friend std::ostream& operator>>(std::ostream& o, Wrapper v)
+  { return o >> v.t; }
   
 };
+
+#ifdef WRAP_BOOL_OPS
+#undef WRAP_BOOL_OPS
+#endif
 
 #define WRAP_BOOL_OPS(op) \
 template<typename T> \
@@ -81,11 +102,11 @@ bool operator op (const Wrapper<T>& t1, const Wrapper<T>& t2) \
 \
 template<typename T, typename U> \
 bool operator op (const U& t1, const Wrapper<T>& t2) \
-{ return Wrapper<T>(t1) op t2.t; } \
+{ return t1 op t2.t; } \
 \
 template<typename T, typename U> \
 bool operator op (const Wrapper<T>& t1, const U& t2) \
-{ return t1.t op Wrapper<T>(t2); } \
+{ return t1.t op t2; } \
 
 WRAP_BOOL_OPS(==)
 WRAP_BOOL_OPS(!=)
@@ -93,6 +114,10 @@ WRAP_BOOL_OPS(<)
 WRAP_BOOL_OPS(>)
 WRAP_BOOL_OPS(<=)
 WRAP_BOOL_OPS(>=)
+
+#ifdef WRAP_ARITHMETIC_OPS
+#undef WRAP_ARITHMETIC_OPS
+#endif
 
 #define WRAP_ARITHMETIC_OPS(op) \
 template<typename T> \
@@ -116,13 +141,5 @@ WRAP_ARITHMETIC_OPS(%)
 template<typename T>
 Wrapper<T> abs(const Wrapper<T>& in)
 { return Wrapper<T>(abs(in.t)); }
-
-template<typename T>
-T raw(const T& t)
-  { return t;}
-  
-template<typename T>
-T raw(const Wrapper<T>& t)
-{  return raw(t); }
 
 #endif // _WRAPPER_H

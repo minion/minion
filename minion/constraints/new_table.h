@@ -28,9 +28,9 @@
 
   struct Literal
 {
-  int var;
+  SysInt var;
   DomainInt val;
-  Literal(int _var, DomainInt _val) : var(_var), val(_val) { }
+  Literal(SysInt _var, DomainInt _val) : var(_var), val(_val) { }
 };
 
 class BaseTableData
@@ -39,31 +39,32 @@ protected:
   TupleList* tuple_data;
 
 public:
-  int getVarCount()
+  DomainInt getVarCount()
     { return tuple_data->tuple_size(); }
 
-  int getNumOfTuples()
+  DomainInt getNumOfTuples()
     { return tuple_data->size(); }
 
-  int getLiteralPos(Literal l)
+  DomainInt getLiteralPos(Literal l)
     { return tuple_data->get_literal(l.var, l.val); }
 
-  int* getPointer()
+  DomainInt* getPointer()
     { return tuple_data->getPointer(); }
 
-  int getLiteralCount()
+  DomainInt getLiteralCount()
   { return tuple_data->literal_num; }
 
-  Literal getLiteralFromPos(int pos)
+  Literal getLiteralFromPos(DomainInt pos)
   {
-    pair<int,int> lit = tuple_data->get_varval_from_literal(pos);
+    pair<SysInt,DomainInt> lit = tuple_data->get_varval_from_literal(pos);
     return Literal(lit.first, lit.second);
   }
 
-  pair<DomainInt,DomainInt> getDomainBounds(int var)
+  pair<DomainInt,DomainInt> getDomainBounds(DomainInt var_in)
   {
+    SysInt var = checked_cast<SysInt>(var_in);
     return make_pair(tuple_data->dom_smallest[var],
-      tuple_data->dom_smallest[var] + tuple_data->dom_size[var]);
+      tuple_data->dom_smallest[var] + tuple_data->dom_size[var] - 1);
   }
 
   BaseTableData(TupleList* _tuple_data) : tuple_data(_tuple_data) { }
@@ -75,10 +76,10 @@ public:
    TableData(TupleList* _tuple_data) : BaseTableData(_tuple_data) { }
 
    // TODO : Optimise possibly?
-   bool checkTuple(DomainInt* tuple, int tuple_size)
+   bool checkTuple(DomainInt* tuple, SysInt tuple_size)
    {
      D_ASSERT(tuple_size == getVarCount());
-     for(int i = 0; i < getNumOfTuples(); ++i)
+     for(SysInt i = 0; i < checked_cast<SysInt>(getNumOfTuples()); ++i)
      {
        if(std::equal(tuple, tuple + tuple_size, tuple_data->get_tupleptr(i)))
          return true;
@@ -98,10 +99,10 @@ public:
   { }
 
   // TODO: Optimise possibly?
-  bool checkTuple(DomainInt* tuple, int tuple_size)
+  bool checkTuple(DomainInt* tuple, SysInt tuple_size)
    {
      D_ASSERT(tuple_size == getVarCount());
-     for(int i = 0; i < getNumOfTuples(); ++i)
+     for(SysInt i = 0; i < getNumOfTuples(); ++i)
      {
        if(std::equal(tuple, tuple + tuple_size, tuple_data->get_tupleptr(i)))
          return true;
@@ -118,37 +119,38 @@ class TrieState
 public:
   TrieState(TrieData* _data) : data(_data)
   {
-    trie_current_support.resize(data->getLiteralCount());
-    for(int i = 0; i < data->getLiteralCount(); ++i)
+    const SysInt litcount = checked_cast<SysInt>(data->getLiteralCount());
+    trie_current_support.resize(litcount);
+    for(SysInt i = 0; i < litcount; ++i)
     {
-      trie_current_support[i] = new TrieObj*[data->getVarCount()];
-      for(int j = 0; j < data->getVarCount(); ++j)
+      trie_current_support[i] = new TrieObj*[litcount];
+      for(SysInt j = 0; j < data->getVarCount(); ++j)
         trie_current_support[i][j] = NULL;
     }
-    scratch_tuple.resize(data->getVarCount());
+    scratch_tuple.resize(litcount);
   }
 
   template<typename VarArray>
   vector<DomainInt>* findSupportingTuple(const VarArray& vars, Literal lit)
   {
-    //int tuple_size = data->getVarCount();
-    //int length = data->getNumOfTuples();
-    //int* tuple_data = data->getPointer();
+    //SysInt tuple_size = data->getVarCount();
+    //SysInt length = data->getNumOfTuples();
+    //SysInt* tuple_data = data->getPointer();
 
-    int varIndex = lit.var;
-    int val = lit.val;
+    SysInt varIndex = lit.var;
+    DomainInt val = lit.val;
 
-    int litnum = data->getLiteralPos(lit);
+    DomainInt litnum = data->getLiteralPos(lit);
 
-    int new_support = data->tupleTrieArrayptr->getTrie(varIndex).
-      nextSupportingTuple(val, vars, trie_current_support[litnum]);
+    DomainInt new_support = data->tupleTrieArrayptr->getTrie(varIndex).
+      nextSupportingTuple(val, vars, trie_current_support[checked_cast<SysInt>(litnum)]);
 
     if(new_support < 0)
       return NULL;
     else
     {
       data->tupleTrieArrayptr->getTrie(varIndex).
-      reconstructTuple(&scratch_tuple.front(), trie_current_support[litnum]);
+      reconstructTuple(&scratch_tuple.front(), trie_current_support[checked_cast<SysInt>(litnum)]);
     return &scratch_tuple;
     }
   }
@@ -163,7 +165,7 @@ class TableState
   /// default values. It should not look for actual valid supports.
 public:
   TableState(TableData* _data) : data(_data)
-  { scratch_tuple.resize(data->getVarCount()); }
+  { scratch_tuple.resize(checked_cast<SysInt>(data->getVarCount())); }
 
   /// This function should return a pointer to a valid tuple, if one exists,
   /// and return NULL if none exists. The vector should be stored inside the
@@ -171,17 +173,17 @@ public:
   template<typename VarArray>
   vector<DomainInt>* findSupportingTuple(const VarArray& vars, Literal lit)
   {
-    int tuple_size = data->getVarCount();
-    int length = data->getNumOfTuples();
-    int* tuple_data = data->getPointer();
+    SysInt tuple_size = data->getVarCount();
+    SysInt length = data->getNumOfTuples();
+    SysInt* tuple_data = data->getPointer();
 
-    for(int i = 0; i < length; ++i)
+    for(SysInt i = 0; i < length; ++i)
     {
-      int* tuple_start = tuple_data + i*tuple_size;
+      SysInt* tuple_start = tuple_data + i*tuple_size;
       bool success = true;
-      if(tuple_start[lit.var] != lit.val)
+      if(tuple_start[checked_cast<SysInt>(lit.var)] != lit.val)
         success = false;
-      for(int j = 0; j < tuple_size && success; ++j)
+      for(SysInt j = 0; j < tuple_size && success; ++j)
       {
         if(!vars[j].inDomain(tuple_start[j]))
           success = false;
@@ -202,18 +204,25 @@ public:
 template<typename VarArray, typename TableDataType = TrieData, typename TableStateType = TrieState>
 struct NewTableConstraint : public AbstractConstraint
 {
-  virtual string constraint_name()
-    { return "TableDynamic"; }
+  virtual string extended_name()
+  { return "table(new)"; }
 
+  virtual string constraint_name()
+  { return "table"; }
+
+  CONSTRAINT_ARG_LIST2(vars, tuples);
+  
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
 
   TableDataType* data;
 
   TableStateType state;
+  
+  TupleList* tuples;
 
   NewTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
-  AbstractConstraint(stateObj), vars(_vars), data(new TableDataType(_tuples)), state(data)
+  AbstractConstraint(stateObj), vars(_vars), data(new TableDataType(_tuples)), state(data), tuples(_tuples)
   {
     CheckNotBound(vars, "table constraint");
       if(_tuples->tuple_size()!=_vars.size())
@@ -229,16 +238,16 @@ struct NewTableConstraint : public AbstractConstraint
 
   MemOffset _current_support;
 
-  int dynamic_trigger_count()
-    { return data->getLiteralCount() * ( vars.size() - 1) ; }
+  virtual SysInt dynamic_trigger_count()
+    { return checked_cast<SysInt>(data->getLiteralCount() * ( vars.size() - 1)) ; }
 
   virtual void propagate(DynamicTrigger* propagated_trig)
   {
     PROP_INFO_ADDONE(DynGACTable);
 
     DynamicTrigger* dt = dynamic_trigger_start();
-    int trigger_pos = propagated_trig - dt;
-    int propagated_literal = trigger_pos / (vars.size() - 1);
+    SysInt trigger_pos = propagated_trig - dt;
+    SysInt propagated_literal = trigger_pos / (vars.size() - 1);
 
     Literal lit = data->getLiteralFromPos(propagated_literal);
 
@@ -264,13 +273,13 @@ struct NewTableConstraint : public AbstractConstraint
     }
   }
 
-  void setup_watches(Literal lit, int lit_pos, const vector<DomainInt>& support)
+  void setup_watches(Literal lit, DomainInt lit_pos, const vector<DomainInt>& support)
   {
     DynamicTrigger* dt = dynamic_trigger_start();
     D_ASSERT(data->getLiteralPos(lit) == lit_pos);
-    int vars_size = vars.size();
-    dt += lit_pos * (vars_size - 1);
-    for(int v = 0; v < vars_size; ++v)
+    SysInt vars_size = vars.size();
+    dt += checked_cast<SysInt>(lit_pos * (vars_size - 1));
+    for(SysInt v = 0; v < vars_size; ++v)
     {
       if(v != lit.var)
       {
@@ -283,13 +292,13 @@ struct NewTableConstraint : public AbstractConstraint
     }
   }
 
-  void clear_watches(Literal lit, int lit_pos)
+  void clear_watches(Literal lit, SysInt lit_pos)
   {
     DynamicTrigger* dt = dynamic_trigger_start();
     D_ASSERT(data->getLiteralPos(lit) == lit_pos);
-    int vars_size = vars.size();
+    SysInt vars_size = vars.size();
     dt += lit_pos * (vars_size - 1);
-    for(int v = 0; v < vars_size; ++v)
+    for(SysInt v = 0; v < vars_size; ++v)
     {
       releaseTrigger(stateObj, dt BT_CALL_BACKTRACK);
       ++dt;
@@ -304,7 +313,7 @@ struct NewTableConstraint : public AbstractConstraint
       return;
     }
 
-    for(unsigned i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
     {
       pair<DomainInt, DomainInt> bounds = data->getDomainBounds(i);
       vars[i].setMin(bounds.first);
@@ -326,8 +335,38 @@ struct NewTableConstraint : public AbstractConstraint
       }
     }
   }
+  
+//  inline DomainInt min(SysInt x, SysInt y) {return (x<y)?x:y; }
+//  inline DomainInt max(SysInt x, SysInt y) {return (x>y)?x:y; }
+  
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
+  {
+      pair<DomainInt, DomainInt> bounds = data->getDomainBounds(0);
+      
+      for(DomainInt x = max(vars[0].getMin(), bounds.first); x <= min(vars[0].getMax(), bounds.second); ++x)
+      {
+          if(vars[0].inDomain(x)) {
+            vector<DomainInt>* support = state.findSupportingTuple(vars, Literal(0, x));
+            if(support)
+            {
+                for(SysInt i=0; i<vars.size(); i++) {
+                    D_ASSERT(vars[i].inDomain((*support)[i]));
+                    assignment.push_back(make_pair(i, (*support)[i]));
+                }
+                return true;
+            }
+          }
+      }
+      
+      return false;
+  }
+  
+  virtual AbstractConstraint* reverse_constraint()
+  {
+    return GACNegativeTableCon(stateObj, vars, tuples);
+  }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     return data->checkTuple(v, v_size);
   }
@@ -335,7 +374,7 @@ struct NewTableConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   {
     vector<AnyVarRef> anyvars;
-    for(unsigned i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);
     return anyvars;
   }

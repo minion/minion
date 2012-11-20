@@ -33,6 +33,11 @@ struct InfoRefType
   BOOL isBound() const
   { return data.isBound();}
   
+  // Here we just pass through, as we don't know if this is the bottom or not.
+  AnyVarRef popOneMapper() const
+  { return data.popOneMapper(); }
+
+
   InfoRefType(const WrapType& _data) : data(_data)
   { VAR_INFO_ADDONE(VAR_TYPE, copy); }
   
@@ -190,6 +195,12 @@ struct InfoRefType
     return data.getBaseVal(v);
   }
 
+  vector<Mapper> getMapperStack() const
+  {
+    VAR_INFO_ADDONE(VAR_TYPE, getMapperStack);
+    return data.getMapperStack();
+  }
+
   Var getBaseVar() const 
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getBaseVar);
@@ -197,7 +208,7 @@ struct InfoRefType
   }
 
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getBaseWdeg);
     return data.getBaseWdeg(); 
@@ -215,7 +226,7 @@ struct InfoRefType
     return o << "InfoRef " << ir.data;
   }
  
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { 
     VAR_INFO_ADDONE(VAR_TYPE, getDomainChange);
     return d.XXX_get_domain_diff(); 

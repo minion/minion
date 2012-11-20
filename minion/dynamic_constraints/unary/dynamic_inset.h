@@ -36,7 +36,9 @@ template<typename Var>
   struct WatchInSetConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "WatchedInSet"; }
+    { return "w-inset"; }
+
+  CONSTRAINT_ARG_LIST2(var, vals);
 
   Var var;
 
@@ -47,7 +49,7 @@ template<typename Var>
   AbstractConstraint(_stateObj), var(_var), vals(_vals.begin(), _vals.end())
     { stable_sort(vals.begin(), vals.end()); }
 
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
     { return 2; }
 
   virtual void full_propagate()
@@ -69,7 +71,7 @@ template<typename Var>
     }
     else
     {
-      for(int i = 0; i < vals.size() - 1; ++i)
+      for(SysInt i = 0; i < vals.size() - 1; ++i)
         for(DomainInt pos = vals[i] + 1; pos < vals[i+1]; ++pos)
         var.removeFromDomain(pos);
     }
@@ -81,7 +83,7 @@ template<typename Var>
     PROP_INFO_ADDONE(WatchInSet);
     // If we are in here, we have a bounds variable.
     D_ASSERT(var.isBound());
-    // This is basically lifted from "sparse int bound vars"
+    // This is basically lifted from "sparse SysInt bound vars"
     vector<DomainInt>::iterator it_low = std::lower_bound(vals.begin(), vals.end(), var.getMin());
     if(it_low == vals.end())
     {
@@ -111,7 +113,7 @@ template<typename Var>
     var.setMax(*(it_high - 1));
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 1);
     return binary_search(vals.begin(), vals.end(), v[0]);
@@ -125,10 +127,10 @@ template<typename Var>
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
     /// TODO: Make faster
-    for(int i = 0; i < vals.size(); ++i)
+    for(SysInt i = 0; i < vals.size(); ++i)
     { 
       if(var.inDomain(vals[i]))
       {

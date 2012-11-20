@@ -26,16 +26,14 @@ for i in ./test_instances/resume_instances/*.minion; do
 	continue;
     fi
 
-    #timeout is supposed to be roughly half way through search
-    timeout=`echo "scale=9;(($completefirstnodetime+$completewalltime)/2)" | bc`;
+    #choose a random number of nodes to search
+    nodeout=$(($RANDOM % completenodes))
+
+
     
-    echo complete nodes$completenodes sols$completesols walltime$completewalltime solvetime$completesolvetime timeout$timeout;
+    echo complete nodes$completenodes sols$completesols walltime$completewalltime solvetime$completesolvetime nodeout$nodeout;
     
-    $MINION $INSTANCE > $FIRSTPARTIALOUTPUT &
-    PID=$!;
-    sleep $timeout;
-    kill -2 $PID;
-    wait $PID;
+    $MINION $INSTANCE -makeresume -nodelimit $nodeout > $FIRSTPARTIALOUTPUT
     resumefile=`grep "Output resume file" $FIRSTPARTIALOUTPUT | cut -d' ' -f5 `;
     resumefile=${resumefile#\"}; #remove leading quote
     resumefile=${resumefile%\"}; #remove trailing quote
@@ -43,7 +41,7 @@ for i in ./test_instances/resume_instances/*.minion; do
     firstpartialsols=`grep "Solutions Found" $FIRSTPARTIALOUTPUT | cut -d' ' -f3`;
     echo first pid$PID res$resumefile nodes$firstpartialnodes sols$firstpartialsols;
     
-    $MINION -resume-file $resumefile $INSTANCE > $SECONDPARTIALOUTPUT;
+    $MINION $resumefile > $SECONDPARTIALOUTPUT;
     secondpartialnodes=`grep "Total Nodes" $SECONDPARTIALOUTPUT | cut -d' ' -f3`;
     secondpartialsols=`grep "Solutions Found" $SECONDPARTIALOUTPUT | cut -d' ' -f3`;
     echo second nodes$secondpartialnodes sols$secondpartialsols;

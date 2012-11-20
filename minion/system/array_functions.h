@@ -22,11 +22,11 @@ template<typename Container>
 bool increment_vector(Container& vals, const Container& maxvals)
 {
   bool carry = true;
-  int position = vals.size() - 1;
+  SysInt position = vals.size() - 1;
   while(position >= 0 && carry == true)
   {
     D_ASSERT(maxvals[position] != 0);
-    vals[position]++;
+    ++vals[position];
     if(vals[position] == maxvals[position])
       vals[position] = 0;
     else
@@ -39,9 +39,9 @@ bool increment_vector(Container& vals, const Container& maxvals)
 /// A simple wrapper for a pair of bounds.
 struct Bounds
 {
-  int lower_bound;
-  int upper_bound;
-  Bounds(int _lower, int _upper) : lower_bound(_lower), upper_bound(_upper)
+  DomainInt lower_bound;
+  DomainInt upper_bound;
+  Bounds(DomainInt _lower, DomainInt _upper) : lower_bound(_lower), upper_bound(_upper)
   { }
 };
 
@@ -50,5 +50,14 @@ vector<T> make_vec(const T& t)
 {
   vector<T> vec(1);
   vec[0] = t;
+  return vec;
+}
+
+template<typename T>
+vector<T> make_vec(const T& t1, const T& t2)
+{
+  vector<T> vec(2);
+  vec[0] = t1;
+  vec[1] = t2;
   return vec;
 }

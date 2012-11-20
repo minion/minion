@@ -18,6 +18,7 @@
 */
 
 #include "tries.h"
+#include "../constraints/constraint_checkassign.h"
 
 /** @help constraints;lighttable Description
 An extensional constraint that enforces GAC. The constraint is
@@ -37,9 +38,9 @@ For full documentation, see the help for the table constraint.
 
 struct Literal
 {
-  int var;
+  SysInt var;
   DomainInt val;
-  Literal(int _var, DomainInt _val) : var(_var), val(_val) { }
+  Literal(SysInt _var, DomainInt _val) : var(_var), val(_val) { }
 };
 
 
@@ -49,28 +50,28 @@ protected:
   TupleList* tuple_data;
 
 public:
-  int getVarCount()
+  DomainInt getVarCount()
     { return tuple_data->tuple_size(); }
 
-  int getNumOfTuples()
+  DomainInt getNumOfTuples()
     { return tuple_data->size(); }
 
-  int getLiteralPos(Literal l)
+  DomainInt getLiteralPos(Literal l)
     { return tuple_data->get_literal(l.var, l.val); }
 
-  int* getPointer()
+  DomainInt* getPointer()
     { return tuple_data->getPointer(); }
 
-  int getLiteralCount()
+  DomainInt getLiteralCount()
   { return tuple_data->literal_num; }
 
-  Literal getLiteralFromPos(int pos)
+  Literal getLiteralFromPos(SysInt pos)
   {
-    pair<int,int> lit = tuple_data->get_varval_from_literal(pos);
+    pair<SysInt, DomainInt> lit = tuple_data->get_varval_from_literal(pos);
     return Literal(lit.first, lit.second);
   }
 
-  pair<DomainInt,DomainInt> getDomainBounds(int var)
+  pair<DomainInt,DomainInt> getDomainBounds(SysInt var)
   {
     return make_pair(tuple_data->dom_smallest[var],
       tuple_data->dom_smallest[var] + tuple_data->dom_size[var]);
@@ -90,10 +91,10 @@ public:
   { }
 
   // TODO: Optimise possibly?
-  bool checkTuple(DomainInt* tuple, int tuple_size)
+  bool checkTuple(DomainInt* tuple, SysInt tuple_size)
    {
      D_ASSERT(tuple_size == getVarCount());
-     for(int i = 0; i < getNumOfTuples(); ++i)
+     for(SysInt i = 0; i < getNumOfTuples(); ++i)
      {
        if(std::equal(tuple, tuple + tuple_size, tuple_data->get_tupleptr(i)))
          return true;
@@ -109,16 +110,23 @@ template<typename VarArray, typename TableDataType = TrieData>
 struct LightTableConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "LightTable"; }
+  { return "lighttable"; }
+
+   virtual AbstractConstraint* reverse_constraint()
+  {
+      return forward_check_negation(stateObj, this);
+  }
+
+  CONSTRAINT_ARG_LIST2(vars, tuples);
 
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
-
+  TupleList* tuples;
   TableDataType* data;   // Assuming this is a TrieData for the time being.
   // Can this be the thing instead of a *??
   
   LightTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
-  AbstractConstraint(stateObj), vars(_vars), data(new TableDataType(_tuples))
+  AbstractConstraint(stateObj), vars(_vars), tuples(_tuples), data(new TableDataType(_tuples))
   {
       CheckNotBound(vars, "table constraints","");
       if(_tuples->tuple_size()!=_vars.size())
@@ -133,17 +141,17 @@ struct LightTableConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    for(int i=0; i<vars.size(); i++)
+    for(SysInt i=0; i<vars.size(); i++)
     {
         t.push_back(make_trigger(vars[i], Trigger(this, i), DomainChanged));
     }
     return t;
   }
   
-  virtual void propagate(int changed_var, DomainDelta)
+  virtual void propagate(DomainInt changed_var, DomainDelta)
   {
       // Propagate to all vars except the one that changed.
-      for(int i=0; i<vars.size(); i++)
+      for(SysInt i=0; i<vars.size(); i++)
       {
           if(i!=changed_var)
           {
@@ -152,7 +160,7 @@ struct LightTableConstraint : public AbstractConstraint
       }
   }
   
-  void propagate_var(int varidx)
+  void propagate_var(SysInt varidx)
   {
       VarRef var=vars[varidx];
       
@@ -176,13 +184,13 @@ struct LightTableConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-      for(int i=0; i<vars.size(); i++)
+      for(SysInt i=0; i<vars.size(); i++)
       {
           propagate_var(i);
       }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     return data->checkTuple(v, v_size);
   }
@@ -190,7 +198,7 @@ struct LightTableConstraint : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   {
     vector<AnyVarRef> anyvars;
-    for(unsigned i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);
     return anyvars;
   }

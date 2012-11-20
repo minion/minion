@@ -31,24 +31,22 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   { return "BoolOr"; }
   
   VarArray var_array;
-  vector<int> negs; //negs[i]==0 iff var_array[i] is negated, NB. this
+  vector<DomainInt> negs; //negs[i]==0 iff var_array[i] is negated, NB. this
             //is also the value that must be watched
-  size_t no_vars;
-  int watched[2];
-  int last;
+  SysInt watched[2];
+  SysInt last;
 
   BoolOrConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array,
-                   const vector<int>& _negs) :
+                   const vector<DomainInt>& _negs) :
     AbstractConstraint(_stateObj), var_array(_var_array), negs(_negs), last(0)
   { 
     watched[0] = watched[1] = -2;
-    no_vars = _var_array.size();
 #ifndef WATCHEDLITERALS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
 #endif
   }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   {
     return 2;
   }
@@ -56,10 +54,10 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   virtual void full_propagate()
   {
     DynamicTrigger* dt = dynamic_trigger_start();
-    int found = 0; //num literals that can be T found so far
-    int first_found = -1;
-    int next_found = -1;
-    for(int i = 0; i < no_vars; i++) {
+    SysInt found = 0; //num literals that can be T found so far
+    SysInt first_found = -1;
+    SysInt next_found = -1;
+    for(SysInt i = 0; i < var_array.size(); i++) {
       if(var_array[i].inDomain(negs[i])) { //can literal be T?
         found++;
         if(found == 1) 
@@ -92,10 +90,10 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   {
     size_t prev_var = dt->trigger_info();
     size_t other_var = watched[0] == prev_var ? watched[1] : watched[0];
-    for(int i = 1; i < no_vars; i++) {
-      size_t j = (last + i) % no_vars;
+    for(SysInt i = 1; i < var_array.size(); i++) {
+      size_t j = (last + i) % var_array.size();
       VarRef& v = var_array[j];
-      int neg = negs[j];
+      DomainInt neg = negs[j];
       if(j != other_var && v.inDomain(neg)) {
     v.addDynamicTrigger(dt, DomainRemoval, neg);
     dt->trigger_info() = j;
@@ -108,9 +106,9 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
     var_array[other_var].propagateAssign(negs[other_var]);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    for(int i = 0; i < no_vars; i++)
+    for(SysInt i = 0; i < var_array.size(); i++)
       if(v[i] == negs[i])
         return true;
     return false;
@@ -119,15 +117,15 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vars;
-    vars.reserve(no_vars);
-    for(unsigned i = 0; i < no_vars; ++i)
+    vars.reserve(var_array.size());
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     return vars;  
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].inDomain(negs[i]))
       {

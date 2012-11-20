@@ -29,15 +29,15 @@
 //ConstraintDef* constraint_list;
 
 // Defined in MinionThreeInputReader, cos it can only be in one place.
-extern int num_of_constraints;
+extern SysInt num_of_constraints;
 
 template<typename T>
-typename T::value_type& index(T& container, int index_pos)
+typename T::value_type& index(T& container, DomainInt index_pos)
 {
-  if(index_pos < 0 || index_pos >= (int)container.size())
+  if(index_pos < 0 || index_pos >= (SysInt)container.size())
     throw parse_exception("Index position " + to_string(index_pos) + 
                           " out of range");
-  return container[index_pos];
+  return container[checked_cast<SysInt>(index_pos)];
 }
 
 template<typename FileReader>
@@ -53,8 +53,8 @@ void MinionInputReader<FileReader>::parser_info(string s)
 // Flattening is row-wise (2d), plane-wise row-wise (3d).
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-vector<Var> MinionInputReader<FileReader>::flatten(char type, int index) {
-  unsigned int rowIndex, colIndex, planeIndex ;
+vector<Var> MinionInputReader<FileReader>::flatten(char type, SysInt index) {
+  UnsignedSysInt rowIndex, colIndex, planeIndex ;
   vector<Var> flattened ;
   // flatten row-wise
   if (type == 'm') {
@@ -84,9 +84,9 @@ vector<Var> MinionInputReader<FileReader>::flatten(char type, int index) {
 // getColOfMatrix
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-vector<Var> MinionInputReader<FileReader>::getColOfMatrix(vector<vector<Var> >& matrix, int colNo) {
+vector<Var> MinionInputReader<FileReader>::getColOfMatrix(vector<vector<Var> >& matrix, SysInt colNo) {
   vector<Var> result ;
-  for (unsigned int rowIndex = 0; rowIndex < matrix.size(); rowIndex++) {
+  for (UnsignedSysInt rowIndex = 0; rowIndex < matrix.size(); rowIndex++) {
     result.push_back(matrix.at(rowIndex).at(colNo)) ;
   }
   return result ;
@@ -97,9 +97,9 @@ vector<Var> MinionInputReader<FileReader>::getColOfMatrix(vector<vector<Var> >& 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 vector<Var> MinionInputReader<FileReader>::getRowThroughTensor(
-                                                   vector< vector< vector<Var> > >& tensor, int rowNo, int colNo) {
+                                                   vector< vector< vector<Var> > >& tensor, SysInt rowNo, SysInt colNo) {
   vector<Var> result ;
-  for (unsigned int planeIndex = 0; planeIndex < tensor.size() ; planeIndex ++) {
+  for (UnsignedSysInt planeIndex = 0; planeIndex < tensor.size() ; planeIndex ++) {
     vector< vector<Var> >& plane = tensor.at(planeIndex) ;
     vector<Var>& row = plane.at(rowNo) ;
     result.push_back(row.at(colNo)) ;
@@ -155,8 +155,8 @@ template<typename FileReader>
 BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reified) {
   string id = infile->getline('(');
   
-  int constraint_num = -1;
-  for(int i = 0; i < num_of_constraints; ++i)
+  SysInt constraint_num = -1;
+  for(SysInt i = 0; i < num_of_constraints; ++i)
   {
     if(constraint_list[i].name == id)
     {
@@ -206,9 +206,9 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
   instance->add_constraint(ConstraintBlob(def));
   ConstraintBlob& con = instance->constraints.back();
   vector<vector<Var> >& varsblob = instance->constraints.back().vars;
-  vector<vector<int> >& constblob = instance->constraints.back().constants;
+  vector<vector<DomainInt> >& constblob = instance->constraints.back().constants;
   
-  for(int i = 0; i < def->number_of_params; ++i)
+  for(SysInt i = 0; i < def->number_of_params; ++i)
   {
     switch(def->read_types[i])
     {
@@ -218,11 +218,6 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
       case read_var:
         varsblob.push_back(make_vec(readIdentifier(infile)));
         break;
-        case read_bool_var:
-      varsblob.push_back(make_vec(readIdentifier(infile)));
-      if(varsblob.back().back().type() != VAR_BOOL)
-        throw parse_exception("Expected Boolean variable!");
-    break;
     
       case read_2_vars:
       {
@@ -251,8 +246,8 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
       case read_constant_list:
       {
         vector<Var> vectorOfConst(readVectorExpression(infile)) ;
-    vector<int> vals;
-        for(unsigned int loop = 0; loop < vectorOfConst.size(); ++loop)
+    vector<DomainInt> vals;
+        for(UnsignedSysInt loop = 0; loop < vectorOfConst.size(); ++loop)
         {
           if(vectorOfConst[loop].type() != VAR_CONSTANT)
               throw parse_exception("Vector must only contain constants.");
@@ -296,7 +291,7 @@ void MinionInputReader<FileReader>::readConstraintElement(FileReader* infile, Co
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readConstraintTable
 // table(<vectorOfVars>, {<tuple> [, <tuple>]})
-// Tuples represented as a vector of int arrays.
+// Tuples represented as a vector of SysInt arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, ConstraintDef* def) 
@@ -304,9 +299,9 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
   parser_info( "reading a table ct (unreifiable)" ) ;
   
   char delim = ' ';
-  int count, elem ;
+  SysInt count;
   vector<Var> vectorOfVars(readVectorExpression(infile)) ;
-  int tupleSize = vectorOfVars.size() ;
+  SysInt tupleSize = vectorOfVars.size() ;
   
   infile->check_sym(',');
   
@@ -319,7 +314,7 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
   if(next_char == 't')
   {
     infile->check_sym('t');
-    int tuple_num = infile->read_num();
+    DomainInt tuple_num = infile->read_num();
     if(tuple_num >= instance->tupleListContainer->size())
     {
       throw parse_exception("There are only " + to_string(instance->tupleListContainer->size()) +
@@ -329,13 +324,13 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
   }
   else
   {
-    vector<vector<int> > tuples ;
+    vector<vector<DomainInt> > tuples ;
     infile->check_sym('{');
     while (delim != '}') 
     {
       infile->check_sym('<');
-      vector<int> tuple(tupleSize);
-      elem = infile->read_num() ;
+      vector<DomainInt> tuple(tupleSize);
+      DomainInt elem = infile->read_num() ;
       tuple[0] = elem ;
       for (count = 1; count < tupleSize; count++) 
       {
@@ -370,10 +365,10 @@ template<typename FileReader>
 Var MinionInputReader<FileReader>::readIdentifier(FileReader* infile) {
   char idChar = infile->peek_char();
   if ((('0' <= idChar) && ('9' >= idChar)) || idChar == '-') {
-    int i = infile->read_num();
+    DomainInt i = infile->read_num();
     return Var(VAR_CONSTANT, i);
   }
-  int index = -1 ;
+  DomainInt index = -1 ;
   
   if(idChar != 'x' && idChar != 'n')
   {
@@ -476,24 +471,23 @@ vector<Var> MinionInputReader<FileReader>::readLiteralVector(FileReader* infile)
 template<typename FileReader>
 void MinionInputReader<FileReader>::readMatrices(FileReader* infile) {
   char delim ;
-  int count1 ;
   // Read Vectors%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  int noOfMatrixType = infile->read_num();
+  DomainInt noOfMatrixType = infile->read_num();
   if(parser_verbose)
     cout << "Number of 1d vectors: " << noOfMatrixType << endl ;
-  for (count1 = 0; count1 < noOfMatrixType; count1++)
+  for (DomainInt count1 = 0; count1 < noOfMatrixType; ++count1)
     Vectors.push_back(readLiteralVector(infile)) ;
   // Read 2dMatrices%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   noOfMatrixType = infile->read_num();
   if(parser_verbose)
     cout << "Number of 2d matrices: " << noOfMatrixType << endl ;
-  for (count1 = 0; count1 < noOfMatrixType; count1++)
+  for (DomainInt count1 = 0; count1 < noOfMatrixType; ++count1)
     Matrices.push_back(readLiteralMatrix(infile)) ;
   // Read 3dMatrices%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   noOfMatrixType = infile->read_num();
   if(parser_verbose)
     cout << "Number of 3d tensors: " << noOfMatrixType << endl ;
-  for (count1 = 0; count1 < noOfMatrixType; count1++) {
+  for (DomainInt count1 = 0; count1 < noOfMatrixType; ++count1) {
     vector< vector< vector <Var> > > newTensor ;
     delim = infile->get_char();                                           // [
     while (delim != ']') {
@@ -509,18 +503,18 @@ void MinionInputReader<FileReader>::readMatrices(FileReader* infile) {
 // 'tuplelists' <val>  ( <num_tuples> <tuple_length> <vals> ...
 template<typename FileReader>
 void MinionInputReader<FileReader>::readTuples(FileReader* infile) {
-  int tuple_count = infile->read_num();
-  for(int counter = 0; counter < tuple_count; counter++)
+  DomainInt tuple_count = infile->read_num();
+  for(DomainInt counter = 0; counter < tuple_count; ++counter)
   {
-    int num_of_tuples = infile->read_num();
-    int tuple_length = infile->read_num();
+    DomainInt num_of_tuples = infile->read_num();
+    DomainInt tuple_length = infile->read_num();
     TupleList* tuplelist = instance->tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
     instance->addUnnamedTableSymbol(tuplelist);
-    int* tuple_ptr = tuplelist->getPointer();
-    for(int i = 0; i < num_of_tuples; ++i)
-      for(int j = 0; j < tuple_length; ++j)
+    DomainInt* tuple_ptr = tuplelist->getPointer();
+    for(DomainInt i = 0; i < num_of_tuples; ++i)
+      for(DomainInt j = 0; j < tuple_length; ++j)
       {
-        tuple_ptr[i * tuple_length + j] = infile->read_num();
+        tuple_ptr[checked_cast<SysInt>(i * tuple_length + j)] = infile->read_num();
       }
     tuplelist->finalise_tuples();
   }
@@ -579,7 +573,7 @@ void MinionInputReader<FileReader>::readPrint(FileReader* infile) {
   }
   else if(letter == 'm')
   {
-    int matrix_num = infile->read_num();
+    DomainInt matrix_num = infile->read_num();
     instance->print_matrix = index(Matrices, matrix_num);
     if(parser_verbose)
       cout << "print m" << matrix_num << endl;
@@ -587,7 +581,7 @@ void MinionInputReader<FileReader>::readPrint(FileReader* infile) {
   }
   else if(letter == 'v')
   {
-    int vec_num = infile->read_num();
+    DomainInt vec_num = infile->read_num();
     instance->print_matrix = make_vec(index(Vectors, vec_num));
     if(parser_verbose)
       cout << "print v" << vec_num << endl;
@@ -613,7 +607,7 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   
   char delim = infile->peek_char();
   
-  vector<char> valOrder ;
+  vector<ValOrderEnum> valOrder ;
      
   if(delim == ']')
   {
@@ -625,9 +619,20 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   {
     while (delim != ']') {
       char valOrderIdentifier = infile->get_char();
-      if(valOrderIdentifier != 'a' && valOrderIdentifier != 'd')
-        throw parse_exception("Expected 'a' or 'd'");
-      valOrder.push_back(valOrderIdentifier == 'a');
+      switch(valOrderIdentifier)
+      {
+        case 'a':
+          valOrder.push_back(VALORDER_ASCEND);
+          break;
+        case 'd':
+          valOrder.push_back(VALORDER_DESCEND);
+          break;
+        case 'r':
+          valOrder.push_back(VALORDER_RANDOM);
+          break;
+        default:
+          throw parse_exception("Expected 'a' or 'd' or 'r'");
+      }
       delim = infile->get_char();                                 // , or ]
     }
 
@@ -639,9 +644,12 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   if(valOrder.empty())
   {
     parser_info("No value order given, generating automatically");
-    valOrder = vector<char>(instance->search_order.back().var_order.size(), true);
+    valOrder = vector<ValOrderEnum>(instance->search_order[0].var_order.size(), VALORDER_ASCEND);
   }
-  instance->search_order.back().val_order = valOrder;
+  instance->search_order[0].val_order = valOrder;
+
+  for(SysInt i = 0; i < instance->search_order.size(); ++i)
+    instance->search_order[i].setupValueOrder();
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -652,46 +660,69 @@ template<typename FileReader>
 void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
   parser_info( "Reading var order" ) ;
   vector<Var> varOrder = readLiteralVector(infile);
-  
+  set<Var> used_variables(varOrder.begin(), varOrder.end());
+
   ostringstream s;
   s << "Read var order. Length: " << varOrder.size();
   
+  
+
+  parser_info("No order generated, auto-generating complete order");
+  SysInt var_count = 0;
+  var_count += instance->vars.BOOLs;
+  for(UnsignedSysInt i = 0; i < instance->vars.bound.size(); ++i)
+    var_count += instance->vars.bound[i].first;
+  for(UnsignedSysInt i = 0; i < instance->vars.sparse_bound.size(); ++i)
+    var_count += instance->vars.sparse_bound[i].first;
+  for(UnsignedSysInt i = 0; i < instance->vars.discrete.size(); ++i)
+    var_count += instance->vars.discrete[i].first;
+  for(UnsignedSysInt i = 0; i < instance->vars.sparse_discrete.size(); ++i)
+    var_count += instance->vars.sparse_discrete[i].first;
+  
+  varOrder.reserve(var_count);
+
+  vector<Var> extra_vars;
+
   if(varOrder.empty())
   {
-    parser_info("No order generated, auto-generating complete order");
-    int var_count = 0;
-    var_count += instance->vars.BOOLs;
-    for(unsigned i = 0; i < instance->vars.bound.size(); ++i)
-      var_count += instance->vars.bound[i].first;
-    for(unsigned i = 0; i < instance->vars.sparse_bound.size(); ++i)
-      var_count += instance->vars.sparse_bound[i].first;
-    for(unsigned i = 0; i < instance->vars.discrete.size(); ++i)
-      var_count += instance->vars.discrete[i].first;
-    for(unsigned i = 0; i < instance->vars.sparse_discrete.size(); ++i)
-      var_count += instance->vars.sparse_discrete[i].first;
-    
-    varOrder.reserve(var_count);
-    for(int i = 0; i < var_count; ++i)
+    for(SysInt i = 0; i < var_count; ++i)
       varOrder.push_back(instance->vars.get_var('x',i));
   }
-  
+  else
+  {
+    for(SysInt i = 0; i < var_count; ++i)
+    {
+      Var v = instance->vars.get_var('x', i);
+      if(used_variables.count(v) == 0)
+      {
+        extra_vars.push_back(v);
+      }
+    }
+  }
   
   instance->search_order.push_back(varOrder);
-  //var_order = varOrder;
+  if(!extra_vars.empty())
+  {
+    instance->search_order.push_back(extra_vars);
+    instance->search_order.back().find_one_assignment = true;
+  }
+
+  
+
   parser_info(s.str());
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 void MinionInputReader<FileReader>::readVars(FileReader* infile) {
-  int lb, ub, count ;
+  DomainInt lb, ub, count ;
   char delim ;
   ProbSpec::VarContainer var_obj;
   // Read 01Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  int noOfVarType = infile->read_num();
+  DomainInt noOfVarType = infile->read_num();
   if(parser_verbose)
     cout << "Number of 01 Vars: " << noOfVarType << endl ;
-  var_obj.BOOLs = noOfVarType;
+  var_obj.BOOLs = checked_cast<SysInt>(noOfVarType);
   
   
   // **** Construct this many 01Vars
@@ -707,7 +738,7 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
     count = infile->read_num();
     if(parser_verbose)
       cout << count << " of " << lb << ", " << ub << endl ;
-    var_obj.bound.push_back(make_pair(count, Bounds(lb, ub)));
+    var_obj.bound.push_back(make_pair(checked_cast<SysInt>(count), Bounds(lb, ub)));
     noOfVarType -= count ;
   }
   
@@ -715,9 +746,9 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
   noOfVarType = infile->read_num();
   if(parser_verbose)
     cout << "Number of Sparse Bounds Vars: " << noOfVarType << endl ;
-  int domainElem ;
+  DomainInt domainElem ;
   while (noOfVarType > 0) {
-    vector<int> domainElements ;
+    vector<DomainInt> domainElements ;
     delim = infile->get_char();                                 // {
     while (delim != '}') {
       domainElem = infile->read_num();
@@ -734,7 +765,7 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
     if(parser_verbose)
       cout << count << " of these " << endl ;
     // **** Construct this many discrete vars.
-    var_obj.sparse_bound.push_back(make_pair(count, domainElements));
+    var_obj.sparse_bound.push_back(make_pair(checked_cast<SysInt>(count), domainElements));
     noOfVarType -= count ;
   }
   
@@ -750,7 +781,7 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
       throw parse_exception("Lower bound must be less than upper bound!");
     if(parser_verbose)
       cout << count << " of " << lb << ", " << ub << endl ;
-    var_obj.discrete.push_back(make_pair(count, Bounds(lb, ub)));
+    var_obj.discrete.push_back(make_pair(checked_cast<SysInt>(count), Bounds(lb, ub)));
     // **** Construct this many discrete bounds vars.
     noOfVarType -= count ;
   }
@@ -759,7 +790,7 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
   if(parser_verbose)
     cout << "Number of Sparse Discrete Vars: " << noOfVarType << endl ;
   while (noOfVarType > 0) {
-    vector<int> domainElements ;
+    vector<DomainInt> domainElements ;
     delim = infile->get_char();                                 // {
     while (delim != '}') {
       domainElem = infile->read_num();
@@ -770,7 +801,7 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
     if(parser_verbose)
       cout << count << " of these " << endl ;
     // **** Construct this many discrete vars.
-    var_obj.sparse_discrete.push_back(make_pair(count, domainElements));
+    var_obj.sparse_discrete.push_back(make_pair(checked_cast<SysInt>(count), domainElements));
     noOfVarType -= count ;
   }
   
@@ -786,9 +817,8 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
 vector<Var> MinionInputReader<FileReader>::readVectorExpression(FileReader* infile) {
-  char  delim ;
-  int row, col, plane ;
-  int input_val;
+  SysInt row, col, plane ;
+  SysInt input_val;
   char idChar = infile->get_char();
   switch (idChar) {
     case '[':
@@ -798,17 +828,17 @@ vector<Var> MinionInputReader<FileReader>::readVectorExpression(FileReader* infi
     case 'v':                                        // vector identifier
       parser_info( "Reading vector identifier" ) ;
       //infile->putback(idChar) ;
-      input_val = infile->read_num();
+      input_val = infile->read_int();
       return Vectors.at(input_val) ;
     case 'm':                                       // matrix identifier
       parser_info( "Reading matrix identifier (will flatten)" ) ;
       //infile->putback(idChar) ;
-      input_val = infile->read_num();
+      input_val = infile->read_int();
       return flatten('m', input_val) ;
     case 't':                                        // matrix identifier
       parser_info( "Reading tensor identifier (will flatten)" ) ;
       //infile->putback(idChar) ;
-      input_val = infile->read_num();
+      input_val = infile->read_int();
       return flatten('t', input_val) ;
     case 'r':                                       // row of a mx/tensor
       infile->check_sym('o');
@@ -818,35 +848,35 @@ vector<Var> MinionInputReader<FileReader>::readVectorExpression(FileReader* infi
         case '(':                                        // row of a matrix
         {parser_info( "Reading row of a matrix" ) ;
           infile->check_sym('m');
-          input_val = infile->read_num();
+          input_val = infile->read_int();
           vector< vector<Var> > matrix = Matrices.at(input_val) ;
-          delim = infile->get_char();
-          row = infile->read_num();
-          delim = infile->get_char();
+          infile->get_char();
+          row = infile->read_int();
+          infile->get_char();
           return matrix.at(row) ;}
         case 'x':                             // row of a plane of a tensor
         {parser_info( "Reading row of a plane of a tensor" ) ;
           infile->check_sym('(');
           infile->check_sym('t');
-          input_val = infile->read_num();
+          input_val = infile->read_int();
           vector< vector< vector<Var> > >& tensor = Tensors.at(input_val) ;
           infile->check_sym(',');
-          input_val = infile->read_num();
+          input_val = infile->read_int();
           vector< vector <Var> >& tensorPlane = tensor.at(input_val) ;
           infile->check_sym(',');
-          input_val = infile->read_num();
+          input_val = infile->read_int();
           infile->check_sym(')');
           return tensorPlane.at(input_val);
         }
         case 'z':                         // Row through planes of a tensor
         {parser_info( "Reading row through planes of a tensor" ) ;
           infile->check_sym('(');
-          input_val = infile->read_num();
+          input_val = infile->read_int();
           vector< vector< vector<Var> > >& tensor = Tensors.at(input_val) ;
           infile->check_sym(',');
-          row = infile->read_num();
+          row = infile->read_int();
           infile->check_sym(',');
-          col = infile->read_num();
+          col = infile->read_int();
           infile->check_sym(')');
           return getRowThroughTensor(tensor, row, col) ;}
         default:
@@ -862,22 +892,22 @@ vector<Var> MinionInputReader<FileReader>::readVectorExpression(FileReader* infi
       if(infile->peek_char() == 'm') {
         parser_info( "Reading col of matrix" ) ;
         infile->check_sym('m');
-        input_val = infile->read_num();
+        input_val = infile->read_int();
         vector< vector<Var> >& matrix = Matrices.at(input_val) ;
         infile->check_sym(',');
-        col = infile->read_num();
+        col = infile->read_int();
         infile->check_sym(')');
         return getColOfMatrix(matrix, col) ;
       }
         else {
           parser_info( "Reading col of tensor" ) ;
           infile->check_sym('t');
-          input_val = infile->read_num();
+          input_val = infile->read_int();
           vector< vector< vector<Var> > >& tensor = Tensors.at(input_val);
           infile->check_sym(',');
-          plane = infile->read_num();
+          plane = infile->read_int();
           infile->check_sym(',');
-          col = infile->read_num();
+          col = infile->read_int();
           infile->check_sym(')');
           return getColOfMatrix(tensor.at(plane), col) ;
         }

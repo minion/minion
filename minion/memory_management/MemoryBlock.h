@@ -65,7 +65,7 @@ public:
   explicit MoveablePointer(void* ptr);
 
   /// Constructs a MoveablePointer from a MoveablePointer and an offset in bytes.
-  explicit MoveablePointer(const MoveablePointer& mp, int offset);
+  explicit MoveablePointer(const MoveablePointer& mp, SysInt offset);
 
   /// In debug mode, gets the pointer without checking if it is valid.
   /** This can be used in non-debug mode, but does not do anything. It is used
@@ -94,7 +94,7 @@ public:
   }
   
   /// Produces a new MoveablePointer offset from the current one by a given number of bytes.
-  MoveablePointer getOffset(unsigned bytes)
+  MoveablePointer getOffset(UnsignedSysInt bytes)
   { 
     return MoveablePointer(((char*)ptr) + bytes); 
   }
@@ -114,13 +114,13 @@ class MoveableArray
   /// Pointer to start of array.
   MoveablePointer ptr;
   /// Size of array.
-  unsigned size;
+  DomainInt size;
   
 public:
   /// Main constructor, takes a MoveablePointer and the size of the array.
   /** While this can be called manually, it would normally be called by allocateArray
    */
-  explicit MoveableArray(MoveablePointer _ptr, unsigned _size) : ptr(_ptr), size(_size)
+  explicit MoveableArray(MoveablePointer _ptr, DomainInt _size) : ptr(_ptr), size(_size)
   { }
 
   MoveableArray()
@@ -128,13 +128,13 @@ public:
 
   // A common C++ requiement - declaring two identical methods, one for const, one without.
   
-  T& operator[](int pos)
+  T& operator[](SysInt pos)
   { 
     D_ASSERT(pos >= 0 && pos < size);
     return *(static_cast<T*>(ptr.get_ptr()) + pos);
   }
 
-  const T& operator[](int pos) const
+  const T& operator[](SysInt pos) const
   { 
     D_ASSERT(pos >= 0 && pos < size);
     return *(static_cast<T*>(ptr.get_ptr()) + pos);
@@ -168,14 +168,14 @@ class NewMemoryBlock
   
   char* current_data;
   
-  unsigned allocated_bytes;
-  unsigned maximum_bytes;
+  size_t allocated_bytes;
+  size_t maximum_bytes;
   
-  vector<pair<char*, unsigned> > stored_blocks;
-  int total_stored_bytes;
+  vector<pair<char*, size_t> > stored_blocks;
+  size_t total_stored_bytes;
 
 #ifndef BLOCK_SIZE
-#define BLOCK_SIZE (512*1024)
+#define BLOCK_SIZE (size_t)(64*1024*1024)
 #endif
   
   SET_TYPE<MoveablePointer*> pointers;
@@ -184,8 +184,8 @@ public:
   void storeMem(char* store_ptr)
   {
     P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
-    unsigned current_offset = 0;
-    for(int i = 0; i < stored_blocks.size(); ++i)
+    UnsignedSysInt current_offset = 0;
+    for(SysInt i = 0; i < stored_blocks.size(); ++i)
     {
       P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].first << " " << stored_blocks[i].second);
       memcpy(store_ptr + current_offset, stored_blocks[i].first, stored_blocks[i].second);
@@ -205,7 +205,7 @@ private:
       
       size_t data_copy = 0;
       // If these is some data to copy, then we do so. We write the code this way
-      // to avoid unsigned underflow.
+      // to avoid UnsignedSysInt underflow.
       if(copy_start <= data.second)
           data_copy = std::min(data.second - copy_start, copy_length);
       
@@ -217,8 +217,8 @@ public:
   void retrieveMem(pair<char*,size_t> store_ptr)
   {
     P("RetrieveMem: " << (void*)this << " : " << (void*)store_ptr);
-    unsigned current_offset = 0;
-    for(int i = 0; i < stored_blocks.size(); ++i)
+    UnsignedSysInt current_offset = 0;
+    for(SysInt i = 0; i < stored_blocks.size(); ++i)
     {
       copyMemBlock(stored_blocks[i].first, store_ptr, current_offset, stored_blocks[i].second);
       current_offset += stored_blocks[i].second;
@@ -228,7 +228,7 @@ public:
   }
   
   /// Returns the size of the allocated memory in bytes.
-  unsigned getDataSize()
+  UnsignedSysInt getDataSize()
     { return total_stored_bytes + allocated_bytes; }
 
   NewMemoryBlock() : current_data(NULL), allocated_bytes(0), maximum_bytes(0),
@@ -241,36 +241,36 @@ public:
   }
   
   /// Request a new block of memory and returns a \ref MoveablePointer to it's start.
-  MoveablePointer request_bytes(unsigned byte_count)
+  MoveablePointer request_bytes(DomainInt byte_count)
   {
     P("Request: " << (void*)this << " : " << byte_count);
     if(byte_count == 0)
       return MoveablePointer(NULL);
       
     // TODO: is the following line necessary?
-    if(byte_count % sizeof(int) != 0)
-      byte_count += sizeof(int) - (byte_count % sizeof(int));
+    if(byte_count % sizeof(SysInt) != 0)
+      byte_count += sizeof(SysInt) - (byte_count % sizeof(SysInt));
 
     if(maximum_bytes < allocated_bytes + byte_count)
     { reallocate(byte_count); }
 
     D_ASSERT(maximum_bytes >= allocated_bytes + byte_count);
-    char* return_val = current_data + allocated_bytes;
+    char* return_val = current_data + checked_cast<SysInt>(allocated_bytes);
     P("Return val:" << (void*)current_data);
-    allocated_bytes += byte_count;
+    allocated_bytes += checked_cast<size_t>(byte_count);
     return MoveablePointer(return_val);
   }
 
   /// Request a \ref MoveableArray.
   template<typename T>
-  MoveableArray<T> requestArray(unsigned size)
+  MoveableArray<T> requestArray(DomainInt size)
   {
     MoveablePointer ptr = request_bytes(size * sizeof(T));
     return MoveableArray<T>(ptr, size);
   }
 
 private:
-  void reallocate(unsigned byte_count_new_request)
+  void reallocate(DomainInt byte_count_new_request)
   {
     P("Reallocate: " << (void*)this << " : " << byte_count_new_request);
     D_ASSERT(allocated_bytes + byte_count_new_request > maximum_bytes);
@@ -279,9 +279,10 @@ private:
     P((void*)current_data << ":" << allocated_bytes << " of " << maximum_bytes);
     total_stored_bytes += allocated_bytes;
 
-    unsigned new_block_size = max((unsigned)BLOCK_SIZE, byte_count_new_request);
-    current_data = (char*)malloc(new_block_size);
-    memset(current_data, 0, new_block_size);
+    size_t new_block_size = max(BLOCK_SIZE, checked_cast<size_t>(byte_count_new_request));
+    current_data = (char*)calloc(new_block_size, sizeof(char));
+    if(current_data == NULL)
+    { D_FATAL_ERROR("calloc failed - Memory exhausted! Aborting."); }
     P((void*)current_data << " " << new_block_size);
     maximum_bytes = new_block_size;
     allocated_bytes = 0; 
@@ -304,7 +305,7 @@ inline MoveablePointer::MoveablePointer(void* _ptr) : ptr(_ptr)
 inline MoveablePointer::~MoveablePointer()
 { }
 
-inline MoveablePointer::MoveablePointer(const MoveablePointer& b, int offset) : ptr(((char*)b.ptr) + offset)
+inline MoveablePointer::MoveablePointer(const MoveablePointer& b, SysInt offset) : ptr(((char*)b.ptr) + offset)
 { D_ASSERT(b.get_ptr() != NULL); }
 
 

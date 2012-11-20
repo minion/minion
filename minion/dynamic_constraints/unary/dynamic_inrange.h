@@ -35,8 +35,9 @@ template<typename Var>
   struct WatchInRangeConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "WatchedInRange"; }
+    { return "w-inrange"; }
 
+  CONSTRAINT_ARG_LIST2(var, make_vec(range_min, range_max));
   Var var;
 
   DomainInt range_min;
@@ -56,7 +57,7 @@ template<typename Var>
     range_max = _vals[1];
   }
 
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
     { return 2; }
 
   virtual void full_propagate()
@@ -72,7 +73,7 @@ template<typename Var>
     D_FATAL_ERROR("Propagation is never called for 'in range'");
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 1);
     return (v[0] >= range_min && v[0] <= range_max);
@@ -86,12 +87,12 @@ template<typename Var>
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {  
     /// TODO: Make faster
-    int min_val = max(range_min, var.getMin());
-    int max_val = min(range_max, var.getMax());
-    for(int i = min_val; i <= max_val; ++i)
+    DomainInt min_val = max(range_min, var.getMin());
+    DomainInt max_val = min(range_max, var.getMax());
+    for(DomainInt i = min_val; i <= max_val; ++i)
     { 
       if(var.inDomain(i))
       {

@@ -29,10 +29,13 @@ ensures that x^y=z.
 This constraint is only available for positive domains x, y and z.
 */
 
+
+
 #ifndef CONSTRAINT_POW_H
 #define CONSTRAINT_POW_H
 
 #include <math.h>
+#include "../constraints/constraint_checkassign.h"
 
 // This constraint is half-way to being changed from using
 // LRINT to roundup and rounddown. Still don't quite have my head around
@@ -40,7 +43,7 @@ This constraint is only available for positive domains x, y and z.
 // at least now it passes test_nightingale_pow.minion.
 
 #ifndef LRINT
-#define LRINT(x) static_cast<DomainInt>(x + 0.5)
+#define LRINT(x) static_cast<SysInt>(x + 0.5)
 #endif
 
 /// var1 ^ var2 = var3
@@ -48,25 +51,27 @@ template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct PowConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Pow"; }
+  { return "pow"; }
   
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;
+
+  CONSTRAINT_ARG_LIST3(var1, var2, var3);
   
   PowConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
   {
-  
-      if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
-         var3.getInitialMin() < 0)
-      { 
-          FAIL_EXIT("The 'pow' constraint only supports non-negative numbers at present.");
-      }
-      if(var2.getInitialMin()==0)
-      {
-          FAIL_EXIT("The 'pow' constraint (x^y = z) does not allow y to contain 0, to avoid the case 0^0.");
-      }
+      CHECK( (var1.getInitialMin() >=0 && var2.getInitialMin() >= 0 && var3.getInitialMin() >= 0), "The 'pow' constraint only supports non-negative numbers at present.");
+      CHECK( var2.getInitialMin()!=0, "The 'pow' constraint (x^y = z) does not allow y to contain 0, to avoid the case 0^0.");
+      
+      // Take this check out for now; it seems to be too restrictive. The propagator
+      // uses doubles anyway so integer overflow is not the problem.
+      //BigInt pow=1;
+      //for(SysInt i=0; i<var2.getInitialMax(); i++) {
+      //    pow=pow*var1.getInitialMax();
+      //    CHECKSIZE(pow, "Magnitude of domain bounds is too large in 'pow' constraint.");
+      //}
   }
   
   virtual triggerCollection setup_internal()
@@ -81,29 +86,29 @@ struct PowConstraint : public AbstractConstraint
     return t;
   }
   
-  inline DomainInt roundup(double x)
+  inline SysInt roundup(double x)
   {
     // remember all numbers are non-negative in here, so
     // how are we going to hit the lower limit for ints?
-    if(x<std::numeric_limits<DomainInt>::min())
+    if(x<std::numeric_limits<SysInt>::min())
     {
-      return std::numeric_limits<DomainInt>::min();
+      return std::numeric_limits<SysInt>::min();
     }
     else
     {
-      return static_cast<DomainInt>(x);  // Actually this should round up!
+      return static_cast<SysInt>(x);  // Actually this should round up!
     }
 }
     
-  inline DomainInt rounddown(double x)
+  inline SysInt rounddown(double x)
   {
-    if(x>std::numeric_limits<DomainInt>::max())
+    if(x>std::numeric_limits<SysInt>::max())
     {
-      return std::numeric_limits<DomainInt>::max();
+      return std::numeric_limits<SysInt>::max();
     }
     else
     {
-      return static_cast<DomainInt>(x);  
+      return checked_cast<SysInt>(x);  
     }
   }
   
@@ -117,10 +122,10 @@ struct PowConstraint : public AbstractConstraint
   double my_x(DomainInt y, DomainInt z)
   { return exp(log(checked_cast<double>(z)) / checked_cast<double>(y)); }
   
-  virtual void propagate(int flag, DomainDelta)
+  virtual void propagate(DomainInt flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Pow);
-    switch(flag)
+    switch(checked_cast<SysInt>(flag))
     {
       case -1:
       {
@@ -172,15 +177,15 @@ struct PowConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    propagate(1,0); 
-    propagate(2,0);
-    propagate(3,0);
-    propagate(-1,0);
-    propagate(-2,0);
-    propagate(-3,0);
+    propagate(1,DomainDelta::empty()); 
+    propagate(2,DomainDelta::empty());
+    propagate(3,DomainDelta::empty());
+    propagate(-1,DomainDelta::empty());
+    propagate(-2,DomainDelta::empty());
+    propagate(-3,DomainDelta::empty());
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     return my_pow(v[0],v[1]) == v[2];
@@ -195,7 +200,7 @@ struct PowConstraint : public AbstractConstraint
     return v;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
    {  
      for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
      {
@@ -219,11 +224,7 @@ struct PowConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      vector<AnyVarRef> t;
-      t.push_back(var1);
-      t.push_back(var2);
-      t.push_back(var3);
-      return new CheckAssignConstraint<vector<AnyVarRef>, PowConstraint>(stateObj, t, *this);
+      return forward_check_negation(stateObj, this);
   }
 };
 #endif

@@ -52,12 +52,37 @@ for the opposite constraint.
 #ifndef CONSTRAINT_MIN_H
 #define CONSTRAINT_MIN_H
 
+#include "../constraints/constraint_checkassign.h"
+
 template<typename VarArray, typename MinVarRef>
 struct MinConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Min"; }
-  
+  { return "min"; }
+
+  virtual string full_output_name() \
+  {
+    // We assume constraint is propagated here, we will do a simple check
+    // to see if it is true.
+    if(min_var.isAssigned())
+    {
+      bool found_assigned_min = false;
+      bool found_lesser_value = false;
+      for(size_t i = 0; i < var_array.size(); ++i)
+      {
+        if(var_array[i].isAssigned() && min_var.getAssignedValue() == var_array[i].getAssignedValue())
+          found_assigned_min = true;
+        if(var_array[i].getMin() < min_var.getMin())
+          found_lesser_value = true;
+      }
+      if(found_assigned_min && !found_lesser_value)
+        return "true()";
+    }
+
+    return ConOutput::print_reversible_con(stateObj, "min", "max", var_array, min_var); 
+  }
+
+
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type ArrayVarRef;
   
@@ -72,20 +97,20 @@ struct MinConstraint : public AbstractConstraint
   {
     triggerCollection t;
     
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     { // Have to add 1 else the 0th element will be lost.
       t.push_back(make_trigger(var_array[i], Trigger(this, i + 1), LowerBound));
       t.push_back(make_trigger(var_array[i], Trigger(this, -(i + 1)), UpperBound));
     }
     t.push_back(make_trigger(min_var, Trigger(this, var_array.size() + 1 ),LowerBound));
-    t.push_back(make_trigger(min_var, Trigger(this, -((int)var_array.size() + 1) ),UpperBound));
+    t.push_back(make_trigger(min_var, Trigger(this, -((SysInt)var_array.size() + 1) ),UpperBound));
     
     return t;
   }
   
   //  virtual AbstractConstraint* reverse_constraint()
   
-  virtual void propagate(int prop_val, DomainDelta)
+  virtual void propagate(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(Min);
     if(prop_val > 0)
@@ -94,7 +119,7 @@ struct MinConstraint : public AbstractConstraint
     //Had to add 1 to fix "0th array" problem.
       --prop_val;
 
-      if(prop_val == (int)(var_array.size()))  
+      if(prop_val == (SysInt)(var_array.size()))  
       {
         DomainInt new_min = min_var.getMin();
         typename VarArray::iterator end = var_array.end();
@@ -120,7 +145,7 @@ struct MinConstraint : public AbstractConstraint
     {// Upper Bound Changed
       // See above for reason behind "-1".
       prop_val = -prop_val - 1;
-      if(prop_val == (int)(var_array.size()))
+      if(prop_val == (SysInt)(var_array.size()))
       {
         typename VarArray::iterator it = var_array.begin();
         DomainInt minvar_max = min_var.getMax();
@@ -144,7 +169,7 @@ struct MinConstraint : public AbstractConstraint
       }
       else
       {
-        min_var.setMax(var_array[prop_val].getMax());
+        min_var.setMax(var_array[checked_cast<SysInt>(prop_val)].getMax());
       }
     }
 
@@ -153,42 +178,42 @@ struct MinConstraint : public AbstractConstraint
     
   virtual void full_propagate()
   {
-    int array_size = var_array.size();
+    SysInt array_size = var_array.size();
     if(array_size == 0)
     {
       getState(stateObj).setFailed(true);
     }
     else
     {
-      for(int i = 1;i <= array_size + 1; ++i)
+      for(SysInt i = 1;i <= array_size + 1; ++i)
       {
-        propagate(i,0);
-        propagate(-i,0);
+        propagate(i,DomainDelta::empty());
+        propagate(-i,DomainDelta::empty());
       }
     }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size() + 1);
     if(v_size == 1)
       return false;
       
-    DomainInt min_val = big_constant;
-    for(int i = 0;i < v_size - 1;i++)
+    DomainInt min_val = v[0];
+    for(SysInt i = 1;i < v_size - 1;i++)
       min_val = min(min_val, v[i]);
     return min_val == *(v + v_size - 1);
   }
 
   // Bah: This could be much better!
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    for(int i = min_var.getMin(); i <= min_var.getMax(); ++i)
+    for(DomainInt i = min_var.getMin(); i <= min_var.getMax(); ++i)
     {
       if(min_var.inDomain(i))
       {
         bool flag_domain = false;
-        for(int j = 0; j < var_array.size(); ++j)
+        for(SysInt j = 0; j < var_array.size(); ++j)
         {
           if(var_array[j].inDomain(i))
           {
@@ -221,19 +246,14 @@ struct MinConstraint : public AbstractConstraint
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      vector<AnyVarRef> t;
-      for(int i=0; i<var_array.size(); i++)
-          t.push_back(var_array[i]);
-      t.push_back(min_var);
-      
-      return new CheckAssignConstraint<vector<AnyVarRef>, MinConstraint>(stateObj, t, *this);
+      return forward_check_negation(stateObj, this);
   }
 
   virtual vector<AnyVarRef> get_vars()
   {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size() + 1);
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     vars.push_back(AnyVarRef(min_var));
     return vars;

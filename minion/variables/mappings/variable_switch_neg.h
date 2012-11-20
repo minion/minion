@@ -29,9 +29,11 @@ struct SwitchNeg
   BOOL isBound() const
   { return data.isBound();}
   
+  AnyVarRef popOneMapper() const
+  { return data; }
 
   DomainInt multiplier;
-  SwitchNeg(VarT _data, int _multiplier) : data(_data), multiplier(_multiplier)
+  SwitchNeg(VarT _data, DomainInt _multiplier) : data(_data), multiplier(_multiplier)
   { D_ASSERT(multiplier == -1 || multiplier == 1); }
   
   SwitchNeg() : data()
@@ -122,7 +124,7 @@ struct SwitchNeg
   { data.removeFromDomain(b * multiplier); }
   
   /// There isn't a minus sign here as domain changes from both the top and bottom of the domain are positive numbers.
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
 
   void addTrigger(Trigger t, TrigType type)
@@ -194,8 +196,16 @@ struct SwitchNeg
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
+  vector<Mapper> getMapperStack() const
+  { 
+    vector<Mapper> v = data.getMapperStack();
+    v.push_back(Mapper(MAP_SWITCH_NEG, multiplier));
+    return v;
+  }
+
+
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()
@@ -235,7 +245,7 @@ SwitchNegRef(const vector<VarRef>& var_array)
 {
   vector<SwitchNeg<VarRef> > neg_array;
   neg_array.reserve(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     neg_array.push_back(SwitchNegRef(var_array[i]));
   return neg_array;
 }
@@ -246,7 +256,7 @@ vector<SwitchNeg<VarRef> >
 SwitchNegRef(const vector<VarRef>& var_array)
 {
   vector<SwitchNeg<VarRef> > neg_array(var_array.size);
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     neg_array[i] = SwitchNegRef(var_array[i]);
   return neg_array;
 }
@@ -257,7 +267,7 @@ array<SwitchNeg<VarRef>, i>
 SwitchNegRef(const array<VarRef, i>& var_array)
 {
   array<SwitchNeg<VarRef>, i> neg_array;
-  for(unsigned int l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     neg_array[l] = SwitchNegRef(var_array[l]);
   return neg_array;
 }

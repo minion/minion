@@ -4,15 +4,15 @@
 
 import sys, os, getopt
 from constraint_test_common import *
+from multiprocessing import Pool, Manager
 import random
-from sendemail import *
-from string import split
+#from sendemail import *
 import time
 
 (optargs, other)=getopt.gnu_getopt(sys.argv, "", ["minion=", "numtests=", "email", "fullprop", "64bit", "procs=", "seed=", "conslist="])
 
 if len(other)>1:
-    print "Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email] [--procs=...] [--seed=...] [--conslist=...]"
+    print("Usage: testallconstraints.py [--minion=<location of minion binary>] [--numtests=...] [--email] [--procs=...] [--seed=...] [--conslist=...]")
     sys.exit(1)
 
 # This one tests all the constraints in the following list.
@@ -34,7 +34,7 @@ conslist+=["element", "gacelement-deprecated", "watchelement"]
 conslist+=["watchelement_one", "element_one"]
 
 # arithmetic constraints
-conslist+=["modulo", "pow", "minuseq", "product", "div", "abs"]
+conslist+=["modulo", "modulo_undefzero", "pow", "minuseq", "product", "div", "div_undefzero", "abs"]
 
 conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "staticvecneq", "hamming", "not-hamming"]
 conslist+=["weightedsumleq", "weightedsumgeq"]
@@ -51,7 +51,7 @@ conslist+=["negativetable", "lighttable"]
 
 # symmetry-breaking constraints
 
-conslist+=["lexleq", "lexless", "lexleq_quick", "lexless_quick"]
+conslist+=["lexleq", "lexless", "lexleq_rv", "lexleq_quick", "lexless_quick"]
 
 conslist+=["max", "min"]
 
@@ -59,15 +59,13 @@ conslist+=["watchneq", "watchless"]
 
 conslist+=["w-inset", "w-notinset", "w-inrange", "w-notinrange", "w-literal", "w-notliteral"]
 
-reifyexceptions=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
-reifyimplyexceptions=["not-hamming"]
+conslist+=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
+conslist+=["not-hamming"]
 # add reifyimply variant of all constraints,
 # and reify variant of all except those in reifyexceptions
 it=conslist[:]
 for c in it:
-    if c not in reifyimplyexceptions:
         conslist+=["reifyimply"+c]
-    if c not in reifyexceptions:
         conslist+=["reify"+c]
 
 numtests=100
@@ -94,88 +92,44 @@ for i in optargs:
     elif a1=="--seed":
         seed=int(a2)
     elif a1=="--conslist":
-        conslist=split(a2, ",")
+        conslist=a2.split(",")
 
-workers = []
-readers = []
-for procNum in range(procs):
-    if procNum == procs - 1:
-        num = (len(conslist) // procs) + (len(conslist) % procs)
-    else:
-        num = (len(conslist) // procs)
-    r, w = os.pipe()
-    pid = os.fork()
-    if pid:
-        workers.append(pid)
-        readers.append(r)
-        os.close(w)
-    else:
-        os.close(r)
-        sys.stdout = os.fdopen(w, 'w')
-        offset = procNum * (len(conslist) // procs)
-        for consname1 in conslist[offset:(offset + num)]:
-            print "Testing %s, seed %i, time: %s"%(consname1, seed, time.asctime())
-            starttime=time.time()
-            sys.stdout.flush()
-            random.seed(seed)
-        
-            reify=False
-            reifyimply=False
-            consname=consname1
-            if consname[0:10]=="reifyimply":
-                reifyimply=True
-                consname=consname[10:]
-            
-            if consname[0:5]=="reify":
-                reify=True
-                consname=consname[5:]
-            consname=consname.replace("-", "__minus__")
-            testobj=eval("test"+consname+"()")
-            testobj.solver=minionbin
-            
-            for testnum in range(numtests):
-                options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False, 'fixlength':False}
-                if not testobj.runtest(options):
-                    print "Failed when testing %s"%consname1
-                    sys.stdout.flush()
-                    sys.exit(1)
-            print "Completed testing %s, time: %s, duration: %d"%(consname1, time.asctime(), time.time()-starttime)
-        sys.stdout.close()
-        sys.exit(0)
-
-for worker, reader in zip(workers, readers):
-    read = os.fdopen(reader)
-    s = []
-    for tmp in read.readlines():
-        s.append(tmp)
-    (pid, exitcode) = os.waitpid(worker, 0)
-    sys.stdout.write("\n".join(s))
-    read.close()
-    if exitcode != 0:
-        if email:
-            mailstring="Mail from testallconstraints.py.\n"
-            mailstring+="Problem with constraint %s. Run testconstraint.py %s on current SVN to replicate the test.\n"%(consname1, consname1)
-            if fullprop:
-                mailstring+="Testing equivalence of -fullprop and normal propagation.\n"
-            else:
-                mailstring+="Testing correctness against table representation.\n"
-            if bit64:
-                mailstring+="Testing 64bit variant.\n"
-            mailstring+="Using binary %s\n"%minionbin
-            mail(mailstring)
-        print "Test failed"
-        sys.exit(1)
-
-print "Test succeeded"
-# if we got here, send an email indicating success.
-if email:
-    mailstring="Mail from testallconstraints.py.\n"
-    mailstring+="Using binary %s\n"%minionbin
-    mailstring+="Tested the following constraints with no errors.\n"
-    mailstring+=str(conslist)
-    if bit64:
-        mailstring+="Testing 64bit variant.\n"
+def runtest(consname):
+    cachename = consname
+    starttime=time.time()
+    sys.stdout.flush()
+    random.seed(seed)
+    reify=False
+    reifyimply=False
+    if consname[0:10]=="reifyimply":
+        reifyimply=True
+        consname=consname[10:]
     
-    mail(mailstring, subject="Minion test successful.")
+    if consname[0:5]=="reify":
+        reify=True
+        consname=consname[5:]
+    consname=consname.replace("-", "__minus__")
+    testobj=eval("test"+consname+"()")
+    testobj.solver=minionbin
+    for testnum in range(numtests):
+        options = {'reify': reify, 'reifyimply': reifyimply, 'fullprop': fullprop, 'printcmd': False, 'fixlength':False, 'getsatisfyingassignment':True}
+        if not testobj.runtest(options):
+            print("Failed when testing %s"%cachename)
+            sys.stdout.flush()
+            return False
+    print("Completed testing %s, duration: %d"%(cachename, time.time()-starttime))
+    return True
+
+if __name__ == '__main__':
+
+    p = Pool(procs)
+    retval = p.map(runtest, conslist)
+
+    if all(retval):
+        print("Success")
+        exit(0)
+    else:
+        print("Failure")
+        exit(1)
     
 

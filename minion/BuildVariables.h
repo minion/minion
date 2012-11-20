@@ -39,9 +39,6 @@ get_AnyVarRef_from_Var(StateObj* stateObj, const vector<Var>& v);
 /// Create all the variables used in the CSP.
 void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars);
 
-/// Build the variable and value ordering used.
-/// The var order is placed, the val order is returned.
-pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order(StateObj* stateObj, SearchOrder instance);
 
 }
 

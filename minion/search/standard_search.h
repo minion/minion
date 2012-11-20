@@ -58,8 +58,8 @@ namespace Controller
         // This is not for overall solution counting, but auxillary variables.
         if(findOneSol) 
         {
-          int search_depth = order.search_depth();
-          for(int i = 0; i < search_depth; ++i)
+          SysInt search_depth = order.search_depth();
+          for(SysInt i = 0; i < search_depth; ++i)
             world_pop(stateObj);
           // One more to remove the initial save.
           order.reset();

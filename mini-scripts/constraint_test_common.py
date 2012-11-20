@@ -22,10 +22,10 @@ class sol:
     
     def equal(self, sol2):
         if not hasattr(sol2, "solution"):
-            print "Spurious node (should be a solution) in tree 2: node %d" %sol2.nodenum
+            print("Spurious node (should be a solution) in tree 2: node %d" %sol2.nodenum)
             return False
         if self.solution!=sol2.solution:
-            print "Solutions different:"+str(self.solution)+" "+str(sol2.solution)
+            print("Solutions different:"+str(self.solution)+" "+str(sol2.solution))
             return False
         else:
             return True
@@ -36,10 +36,10 @@ class sol:
             return self.equal(sol2)
         # sol2 is a node.
         if not sol2.solutionbelow():
-            print "Solution missing in tree 2 below node %d"%sol2.nodenum
+            print("Solution missing in tree 2 below node %d"%sol2.nodenum)
             return False
         if hasattr(sol2, "left") and hasattr(sol2, "right") and sol2.left.solutionbelow() and sol2.right.solutionbelow():
-            print "Too many solutions in tree 2 below node %d"%sol2.nodenum
+            print("Too many solutions in tree 2 below node %d"%sol2.nodenum)
             return False
         if hasattr(sol2, "left") and sol2.left.solutionbelow():
             return self.subset(sol2.left)
@@ -48,7 +48,7 @@ class sol:
             return self.subset(sol2.right)
         
     def solutionbelow(self):
-        #print "Superfluous solution: "+str(self.solution)
+        #print("Superfluous solution: "+str(self.solution))
         return True
     
     def outputdot(self, fileh):
@@ -85,33 +85,33 @@ class node:
             domaincount=domaincount+1
             if len(line)>0 and line[0]==",": line=line[1:]
             if False:
-                print "stored domain "+str((domaincount-1))+" "+str(self.domains[domaincount-1])
+                print("stored domain "+str((domaincount-1))+" "+str(self.domains[domaincount-1]))
         return True
     
     def equal(self, node2):
         # Compare the internal state here with the state of node2
         if not hasattr(node2, "domains"):
-            print "Node %d in tree 1 corresponds to solution in tree 2"%self.nodenum
+            print("Node %d in tree 1 corresponds to solution in tree 2"%self.nodenum)
             return False
         if self.domains!=node2.domains:
-            print "Domains not equal at node %d"%self.nodenum
+            print("Domains not equal at node %d"%self.nodenum)
             return False
         if self.nodenum!=node2.nodenum:
-            print "Different tree structure near nodes %d and %d"%(self.nodenum, node2.nodenum)
+            print("Different tree structure near nodes %d and %d"%(self.nodenum, node2.nodenum))
             return False
         if hasattr(self, "left")!=hasattr(node2, "left"):
-            print "Different tree structure (left branch) after node "+str(self.nodenum)
+            print("Different tree structure (left branch) after node "+str(self.nodenum))
             return False
         if hasattr(self, "right")!=hasattr(node2, "right"):
-            print "Different tree structure (right branch) after node "+str(self.nodenum)
+            print("Different tree structure (right branch) after node "+str(self.nodenum))
             return False
         if hasattr(self, "left"):
             if not self.left.equal(node2.left):
-                print "False on left branch"
+                print("False on left branch")
                 return False
         if hasattr(self, "right"):
             if not self.right.equal(node2.right):
-                print "False on right branch"
+                print("False on right branch")
                 return False
         return True
     
@@ -155,12 +155,12 @@ class node:
         
         if not hasattr(node2, "domains"):
             assert hasattr(node2, "solution")
-            print "Tree 2 reached a solution before tree 1, therefore the constraint is overpropagating."
-            print "This happened below node %d with solution %d" %(self.nodenum, node2.solnum)
+            print("Tree 2 reached a solution before tree 1, therefore the constraint is overpropagating.")
+            print("This happened below node %d with solution %d" %(self.nodenum, node2.solnum))
             return False
         
         if not subsetdomains(self.domains, node2.domains):
-            print "Domains not a subset when comparing nodes %d (in tree 1) and %d (in tree 2)"%(self.nodenum, node2.nodenum)
+            print("Domains not a subset when comparing nodes %d (in tree 1) and %d (in tree 2)"%(self.nodenum, node2.nodenum))
             return False
         
         if self.nodenum==0:   # special handling for weird node 0
@@ -168,7 +168,7 @@ class node:
             return self.left.subset(node2.left)
             
         if self.nodenum>node2.nodenum:
-            print "Problem with node numbers with nodes %d and %d"%(self.nodenum, node2.nodenum)
+            print("Problem with node numbers with nodes %d and %d"%(self.nodenum, node2.nodenum))
             return False
         
         # work out which value was instantiated for left in tree2
@@ -180,7 +180,7 @@ class node:
         if val1>val2:
             # need to descend the right branch of node2 while keeping the same position in tree1.
             if hasattr(node2, "left") and node2.left.solutionbelow():
-                print "Spurious solution below left branch from node %d in tree 2"%node2.nodenum
+                print("Spurious solution below left branch from node %d in tree 2"%node2.nodenum)
                 return False
             return self.subset(node2.right)
         
@@ -188,15 +188,15 @@ class node:
         # tree1 (because the variable is instantiated in tree 1)
         if val1==val2 and len(self.domains[var])==1:
             if hasattr(node2, "right") and node2.right.solutionbelow():
-                print "Spurious solution(s) below node %d in tree 2"%node2.nodenum
+                print("Spurious solution(s) below node %d in tree 2"%node2.nodenum)
                 return False
             return self.subset(node2.left)
         
         if hasattr(self, "left") and not hasattr(node2, "left"):
-            print "Node %d has left child (%d) in smaller tree, but node %d does not in larger tree."%(self.nodenum, self.left.nodenum, node2.nodenum)
+            print("Node %d has left child (%d) in smaller tree, but node %d does not in larger tree."%(self.nodenum, self.left.nodenum, node2.nodenum))
             return False
         if hasattr(self, "right") and not hasattr(node2, "right"):
-            print "Node %d has right child (%d) in smaller tree, but node %d does not in larger tree."%(self.nodenum, self.right.nodenum, node2.nodenum)
+            print("Node %d has right child (%d) in smaller tree, but node %d does not in larger tree."%(self.nodenum, self.right.nodenum, node2.nodenum))
             return False
         if hasattr(self, "left") and not self.left.subset(node2.left):
             return False
@@ -204,11 +204,11 @@ class node:
             return False
         if hasattr(node2, "left") and not hasattr(self, "left"):
             if node2.left.solutionbelow():
-                print "Spurious solution below node %d in tree 2"% node2.left.nodenum
+                print("Spurious solution below node %d in tree 2"% node2.left.nodenum)
                 return False
         if hasattr(node2, "right") and not hasattr(self, "right"):
             if node2.right.solutionbelow():
-                print "Spurious solution below node %d in tree 2"% node2.right.nodenum
+                print("Spurious solution below node %d in tree 2"% node2.right.nodenum)
                 return False
         return True
 
@@ -273,7 +273,7 @@ class tree:
                 newstring=rest.strip()+" "+rest2.strip()
                 splitlines[i:i+2]=[("Sol", newstring)]
         
-        #print "Entering buildtree"
+        #print("Entering buildtree")
         rootnode=False
         curnode=False
         curassign=False
@@ -344,14 +344,14 @@ class tree:
             if not curnode:
                 return
         if hasattr(curnode, "nodenum"):
-            print curnode.nodenum
+            print(curnode.nodenum)
         else:
-            print curnode.solution
+            print(curnode.solution)
         if hasattr(curnode, "left"):
-            print "left branch:"
+            print("left branch:")
             self.printtree(curnode.left)
         if hasattr(curnode, "right"):
-            print "right branch:"
+            print("right branch:")
             self.printtree(curnode.right)
     
     def outputdot(self, fileh):
@@ -361,7 +361,7 @@ class tree:
     
     def equal(self, tree2):
         if self.solvable!= tree2.solvable:
-            print "Problem 1 solvable: "+str(self.solvable)+", problem 2 solvable: "+str(tree2.solvable)
+            print("Problem 1 solvable: "+str(self.solvable)+", problem 2 solvable: "+str(tree2.solvable))
             return False
         if self.rootnode==False or tree2.rootnode==False:
             return self.rootnode==tree2.rootnode
@@ -369,7 +369,7 @@ class tree:
     
     def subset(self, tree2):
         if self.solvable!=tree2.solvable:
-            print "Problem 1 solvable: "+str(self.solvable)+", problem 2 solvable: "+str(tree2.solvable)
+            print("Problem 1 solvable: "+str(self.solvable)+", problem 2 solvable: "+str(tree2.solvable))
             return False
         if self.rootnode==False:
             if tree2.rootnode==False:
@@ -378,7 +378,7 @@ class tree:
                 return not tree2.rootnode.solutionbelow()
         else:
             if tree2.rootnode==False:
-                print "No nodes present in tree 2."
+                print("No nodes present in tree 2.")
                 return False
             else:
                 return self.rootnode.subset(tree2.rootnode)
@@ -463,12 +463,31 @@ class testmodulo:
         numtuples=0
         for i in domains[0]:
             for j in domains[1]:
-                if(i%j in domains[2]):
-                    out.append([i, j, i%j])
+                if j != 0:
+                    if(i%j in domains[2]):
+                        out.append([i, j, i%j])
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("modulo", True, options, [1,1,1], ["posnum", "posnum", "posnum"], self, False)
+        return runtestgeneral("modulo", True, options, [1,1,1], ["num", "num", "num"], self, False)
+
+class testmodulo_undefzero:
+    def printtable(self, domains): 
+        out=[]
+        # given a list of lists for the domains, generate the table for modulo 
+        numtuples=0
+        for i in domains[0]:
+            for j in domains[1]:
+                if j != 0:
+                    result = i%j
+                else:
+                    result = 0
+                if(result in domains[2]):
+                    out.append([i, j, result])
+        return out
+        
+    def runtest(self, options=dict()):
+        return runtestgeneral("modulo_undefzero", True, options, [1,1,1], ["num", "num", "num"], self, False)
 
 class testgacelement__minus__deprecated:
     def printtable(self, domains): 
@@ -489,6 +508,27 @@ class testgacelement__minus__deprecated:
     
     def runtest(self, options=dict()):
         return runtestgeneral("gacelement-deprecated", False, options, [4,1,1], ["smallnum", "num", "num"], self, not options['reify'])
+
+class testwatchelement_undefzero:
+    def printtable(self, domains): 
+        out=[]
+        # given a list of lists for the domains, generate the table for gacelement 
+        numvars=len(domains)
+        vectordoms=domains[:-2]
+        otherdoms=domains[-2:]
+        tocross=domains[:-1]
+        cross=[]
+        crossprod(tocross, [], cross)
+        for l in cross:
+            if l[-1] >=0 and l[-1]<(len(l)-1):
+                if l[l[-1]] in otherdoms[1]:
+                    out.append(l+[l[l[-1]]])
+            else:
+                out.append(l+[0])
+        return out
+    
+    def runtest(self, options=dict()):
+        return runtestgeneral("watchelement_undefzero", False, options, [4,1,1], ["smallnum", "num", "num"], self, not options['reify'])
 
 class testgac2delement:
     def printtable(self, domains): 
@@ -574,12 +614,22 @@ class testelement(testgacelement__minus__deprecated):
         return runtestgeneral("element", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
 
 class testelement_one(testgacelement__minus__deprecated):
-    def printtable(self, domains):
-        tab=testgacelement__minus__deprecated.printtable(self, domains)
-        for t in tab:
-            t[-2]=t[-2]+1
-        return tab
-    
+    def printtable(self, domains): 
+        out=[]
+        # given a list of lists for the domains, generate the table for gacelement 
+        numvars=len(domains)
+        vectordoms=domains[:-2]
+        otherdoms=domains[-2:]
+        tocross=domains[:-1]
+        cross=[]
+        crossprod(tocross, [], cross)
+        for l in cross:
+            if l[-1] >=1 and l[-1]<(len(l)):
+                if l[l[-1]-1] in otherdoms[1]:
+                    out.append(l+[l[l[-1]-1]])
+                    
+        return out
+
     def runtest(self, options=dict()):
         return runtestgeneral("element_one", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
 
@@ -606,7 +656,7 @@ class testlighttable:
         tablegen=self
         treesame=True
         
-        (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, False)
+        (domlists, modvars, tablevars, constants, diseq_constraints)=generatevariables(varnums, vartypes, False)
         
         curvar=0
         constraint=constraintname+"("
@@ -694,7 +744,7 @@ class testlighttable:
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
         retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, tuplelist=negtuplestring, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
-            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
             return False
         return comparetrees(treesame)  # tree subset
 
@@ -720,7 +770,7 @@ class testnegativetable:
         tablegen=self
         treesame=True
         
-        (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, False)
+        (domlists, modvars, tablevars, constants, diseq_constraints)=generatevariables(varnums, vartypes, False)
         
         curvar=0
         constraint=constraintname+"("
@@ -808,7 +858,7 @@ class testnegativetable:
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
         retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, tuplelist=negtuplestring, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
-            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
             return False
         return comparetrees(treesame)  # tree subset
 
@@ -878,7 +928,7 @@ class testwatchneq:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("watchneq", False, options, [1,1], ["num", "num"], self, True)
+        return runtestgeneral("watchneq", False, options, [1,1], ["num", "num"], self, not options['reify'])
 
 class testwatchless:
     def printtable(self, domains):
@@ -938,7 +988,7 @@ class testhamming:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("hamming", False, options, [4,4,1], ["smallnum", "smallnum", "const"], self, False)
+        return runtestgeneral("hamming", False, options, [4,4,1], ["smallnum", "smallnum", "const"], self, True)
 
 class testnot__minus__hamming:
     def printtable(self, domains):
@@ -954,7 +1004,7 @@ class testnot__minus__hamming:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("not-hamming", False, options, [4,4,1], ["smallnum", "smallnum", "const"], self, False)
+        return runtestgeneral("not-hamming", False, options, [4,4,1], ["smallnum", "smallnum", "const"], self, True)
 
 class testlitsumgeq:
     def printtable(self, domains):
@@ -988,6 +1038,23 @@ class testlexleq_quick:
     def runtest(self, options=dict()):
         return runtestgeneral("lexleq[quick]", True, options, [4,4], ["smallnum", "smallnum"], self, False)
 
+class testlexleq_rv:
+    def printtable(self, domains, less=False):
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            l1=l[:len(l)/2]
+            l2=l[len(l)/2:]
+
+            if (not less and l1 <= l2) or (less and l1<l2):
+                out.append(l)
+        return out
+
+    def runtest(self, options=dict()):
+        return runtestgeneral("lexleq[rv]", True, options, [4,4], ["smallnum", "smallnum"], self, True)
+
+
 class testlexless_quick(testlexleq):
     def printtable(self, domains):
         return testlexleq.printtable(self, domains, less=True)
@@ -1001,26 +1068,6 @@ class testlexless(testlexleq):
     
     def runtest(self, options=dict()):
         return runtestgeneral("lexless", True, options, [4,4], ["smallnum", "smallnum"], self, True)
-
-class testlexleq_repeatedvars:
-    def printtable(self, domains, less=False):
-        cross=[]
-        crossprod(domains, [], cross)
-        out=[]
-        for l in cross:
-            l1=l[:len(l)/2]
-            l2=l[len(l)/2:]
-            
-            if (not less and l1 <= l2) or (less and l1<l2):
-                out.append(l)
-        return out
-    
-    def runtest(self, options=dict()):
-        (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, boundsallowed)
-        setattr(self, "constants", constants)
-        
-        
-        #return runtestgeneral("lexleq", True, options, [4,4], ["smallnum", "smallnum"], self, True)
 
 class testmax:
     def printtable(self, domains, ismax=True):
@@ -1177,12 +1224,25 @@ class testdiv:
         crossprod(domains, [], cross)
         out=[]
         for l in cross:
-            if l[0]//l[1] == l[2]:
+            if l[1] != 0 and l[0]//l[1] == l[2]:
                 out.append(l)
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("div", True, options, [1,1,1], ["posnum", "posnum", "posnum"], self, False)
+        return runtestgeneral("div", True, options, [1,1,1], ["num", "num", "num"], self, False)
+
+class testdiv_undefzero:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            if (l[1] == 0 and l[2] == 0) or (l[1] != 0 and l[0]//l[1] == l[2]):
+                out.append(l)
+        return out
+        
+    def runtest(self, options=dict()):
+        return runtestgeneral("div_undefzero", True, options, [1,1,1], ["num", "num", "num"], self, False)
 
 class testweightedsumgeq(testsumgeq):
     def printtable(self, domains):
@@ -1467,7 +1527,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     if reify or reifyimply:
         # add extra bool variable.
         varnums=[1]+varnums
-        vartypes=["boolean"]+vartypes # no longer bool since all var types now allowed.
+        vartypes=["boolean"]+vartypes # no longer bool but 01
     
     isvector=[a>1 for a in varnums]  # Is it to be printed as a vector. This seems to suffice at the moment.
     
@@ -1486,7 +1546,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
                 if varnums[i]==oldvalue:
                     varnums[i]=newvalue
     
-    (domlists, modvars, tablevars, constants)=generatevariables(varnums, vartypes, boundsallowed)
+    (domlists, modvars, tablevars, constants, diseq_constraints)=generatevariables(varnums, vartypes, boundsallowed)
     setattr(tablegen, "constants", constants)
     
     if modvars.find("BOUND")!=-1:
@@ -1547,15 +1607,20 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     if reifyimply:
         constraint="reifyimply("+constraint+", x0)"
     
-
-    tree_choice = random.randint(0,5)    
-    while tree_choice <= 1:
-      treesame = False
-      if tree_choice==0:
-          constraint = "watched-and({"+ ",".join([constraint] * random.randint(1,5)) +"})"
-      if tree_choice==1:
-          constraint = "watched-or({"+ ",".join([constraint] * random.randint(1,5)) +"})"
-      tree_choice = random.randint(0,5)
+    if options['getsatisfyingassignment']:
+        watched_depth = 0
+        tree_choice = random.randint(0,5)    
+        while tree_choice <= 1:
+          treesame = False
+          if tree_choice==0:
+              constraint = "watched-and({"+ ",".join([constraint] * random.randint(1,3)) +"})"
+          if tree_choice==1:
+              constraint = "watched-or({"+ ",".join([constraint] * random.randint(1,3)) +"})"
+          watched_depth = watched_depth + 1
+          if watched_depth < 4:
+              tree_choice = random.randint(0,5)
+          else:
+              tree_choice = 5
 
     varnums2=varnums[:]
     for (i,t) in zip(range(len(varnums)), vartypes):
@@ -1584,47 +1649,82 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         # as being a case that the constraint is not specified to work on.
         return True
     
-    if reify:
-        tuplelist2=[]
-        cross=[]
-        crossprod(domlists[1:], [], cross)
-        for c in cross:
-            if c in tuplelist:
-                if 1 in domlists[0]:
-                    tuplelist2.append([1]+c)
-            else:
-                if 0 in domlists[0]:
-                    tuplelist2.append([0]+c)
-        tuplelist=tuplelist2
-    if reifyimply:
-        tuplelist2=[]
-        cross=[]
-        crossprod(domlists[1:], [], cross)
-        for c in cross:
-            if c in tuplelist:
-                if 1 in domlists[0]:
-                    tuplelist2.append([1]+c)
-                if 0 in domlists[0]:
-                    tuplelist2.append([0]+c)   # compatible with both values of the reification var.
-            else:
-                if 0 in domlists[0]:
-                    tuplelist2.append([0]+c)
-        tuplelist=tuplelist2
-    
-    # now convert tuplelist into a string.
-    tuplestring="modtable %d %d \n"%(len(tuplelist), sum(varnums2))
-    for l in tuplelist:
-        for e in l:
-            tuplestring+="%d "%e
-        tuplestring+="\n"
-    
-    # tuplelist is actually a set of lists(not yet), so that it can be reformed for reify or reifyimply
-    
-    constrainttable="table(["
-    for i in range(sum(varnums2)):
-        constrainttable+="x%d"%i
-        if i<(sum(varnums2)-1): constrainttable+=","
-    constrainttable+="], modtable)"
+    if random.randint(0,1)==0:
+        # Deal with reify and reifyimply in the old way, i.e. tack an extra
+        # variable onto the (start of the) table constraint and extend the table.
+        if reify:
+            tuplelist2=[]
+            cross=[]
+            crossprod(domlists[1:], [], cross)
+            for c in cross:
+                if c in tuplelist:
+                    if 1 in domlists[0]:
+                        tuplelist2.append([1]+c)
+                else:
+                    if 0 in domlists[0]:
+                        tuplelist2.append([0]+c)
+            tuplelist=tuplelist2
+        if reifyimply:
+            tuplelist2=[]
+            cross=[]
+            crossprod(domlists[1:], [], cross)
+            for c in cross:
+                if c in tuplelist:
+                    if 1 in domlists[0]:
+                        tuplelist2.append([1]+c)
+                    if 0 in domlists[0]:
+                        tuplelist2.append([0]+c)   # compatible with both values of the reification var.
+                else:
+                    if 0 in domlists[0]:
+                        tuplelist2.append([0]+c)
+            tuplelist=tuplelist2
+        
+        # now convert tuplelist into a string.
+        tuplestring="modtable %d %d \n"%(len(tuplelist), sum(varnums2))
+        for l in tuplelist:
+            for e in l:
+                tuplestring+="%d "%e
+            tuplestring+="\n"
+        
+        # tuplelist is actually a set of lists(not yet), so that it can be reformed for reify or reifyimply
+        
+        constrainttable="table(["
+        for i in range(sum(varnums2)):
+            constrainttable+="x%d"%i
+            if i<(sum(varnums2)-1): constrainttable+=","
+        constrainttable+="], modtable)"
+    else:
+        # Deal with reify or reifyimply by using reify(table(...)) or reifyimply(table(..))
+        
+        # now convert tuplelist into a string.
+        numtablevars=sum(varnums2)
+        if reify or reifyimply: numtablevars-=1
+        
+        tuplestring="modtable %d %d \n"%(len(tuplelist), numtablevars)
+        for l in tuplelist:
+            for e in l:
+                tuplestring+="%d "%e
+            tuplestring+="\n"
+        
+        constrainttable=""
+        if reify:
+            constrainttable="reify("
+        if reifyimply:
+            constrainttable="reifyimply("
+        
+        constrainttable+="table(["
+        
+        startidx=0
+        if reify or reifyimply: startidx=1
+        
+        for i in range(startidx, sum(varnums2)):
+            constrainttable+="x%d"%i
+            if i<(sum(varnums2)-1): constrainttable+=","
+        constrainttable+="], modtable)"
+        
+        if reify or reifyimply:
+            constrainttable+=",x0)"   # add on reification variable
+        
     
     constraintlist = []
     # add some other constraints at random into the constraint and constrainttable strings
@@ -1662,12 +1762,15 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         random.shuffle(constraintlist)
         constraint = "\n".join(constraintlist)
 
-
+    # Add any diseq constraitns generated when replacing a sparsebound with a discrete
+    for c in diseq_constraints:
+        constrainttable+="\n"+c
+    
     if not fullprop:
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
         retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
-            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
             return False
         if boundsallowed and modvars.rfind("SPARSEBOUND")!=-1:   
             # This is a temporary hack while sparsebound does not print its domain properly.
@@ -1677,7 +1780,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'], cmd="-fullprop")
         retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
-            print "Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2)
+            print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
             return False
         if boundsallowed and modvars.rfind("SPARSEBOUND")!=-1:   
             # This is a temporary hack while sparsebound does not print its domain properly.
@@ -1688,23 +1791,24 @@ def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist
     file1=open(filename, "w")
     printminionfile(file1, variables, constraint, tuplelist=tuplelist, opt=opt)
     file1.close()
-    cmd=minionbin+" -dumptree -findallsols "+cmd+" "+filename+" >"+outfilename
+    cmd=minionbin+" "+filename+" -dumptree -findallsols "+cmd+" >"+outfilename
     if printcmd:
-        print "Executing command: "+cmd
+        print("Executing command: "+cmd)
     return os.system(cmd)
 
 def generatevariables(varblocks, types, boundallowed):
+    assert len(types)==len(varblocks)
     # generate a set of variables with random domains and types
     # Varblocks specifies the groups which should be of the same type
     # sum(varblocks) is the total number of variables/constants.
     # types specifies num, posnum, nonnegnum or boolean for each block
     # boundallowed specifies if it is appropriate to have bound variables.
-    st_nontable=""
-    st_table=""
+    st_nontable=[]
+    st_table=[]
     domainlists=[]
     constants=[]
-    typesinczero=["num", "smallnum", "quitesmallnum",  "nonnegnum", "boolean"]
     typesconst=["const", "smallconst", "smallconst_distinct"]
+    constraints=[]   # extra constraints needed to adjust domain when Discrete is substituted for Sparsebound
     varblocks2=varblocks[:]
     for (i,t) in zip(range(len(varblocks)), types):
         if t in typesconst:
@@ -1714,35 +1818,35 @@ def generatevariables(varblocks, types, boundallowed):
         # randomly choose the type of the variables
         if types[i] not in typesconst:
             if boundallowed:
-                if types[i] in typesinczero:
+                if types[i]=="boolean":
                     t=random.randint(1,4)  # bound sparsebound bool or discrete
                 else:
-                    t=random.randint(1,3)  # must be of type posnum, so not allowed to be a bool.
+                    t=random.randint(1,3)  # bound sparsebound, discrete
             else:
-                if types[i] in typesinczero:
+                if types[i]=="boolean":
                     t=random.randint(1,2)*2   # discrete or bool
                 else:
-                    t=2   # can't be bool, must be discrete.
+                    t=2   # discrete
             
             if t==1:
                 ty="BOUND "
             elif t==2:
                 ty="DISCRETE "
             elif t==3:
-                ty="SPARSEBOUND "  # Should be sparsebound
+                ty="SPARSEBOUND "
             else:
                 ty="BOOL "
-            
-#            if types[i]=="boolean":  # This is a hack put in place until reify is fixed, if ever.
-#                ty="BOOL "          # reify refuses to work unless the reification var is a bool.
         else:
             ty=None
         
         for j in range(varblocks[i]):
             # now for each variable generate a domain
             if types[i]=="num":
-                lb=random.randint(-20, 0)
-                ub=random.randint(1, 20)
+                lb=random.randint(-20, 5)
+                ub=lb+random.randint(0, 15)
+            elif types[i]=="othernum":     # An extra type that does not necessarily includ 0 and 1
+                lb=random.randint(-20,10)
+                ub=lb+random.randint(0, 15)
             elif types[i]=="smallnum":
                 lb=random.randint(-2, 0)
                 ub=random.randint(0, 2)
@@ -1757,13 +1861,13 @@ def generatevariables(varblocks, types, boundallowed):
                 ub=random.randint(0, 1)
             elif types[i]=="posnum":
                 lb=random.randint(1, 20)
-                ub=random.randint(21, 40)
+                ub=lb+random.randint(0, 15)
             elif types[i]=="smallposnum":
                 lb=1
                 ub=random.randint(2, 15)
             elif types[i]=="nonnegnum":
                 lb=random.randint(0, 20)
-                ub=random.randint(21, 40)
+                ub=lb+random.randint(0, 15)
             elif types[i]=="boolean":
                 lb=0
                 ub=1
@@ -1786,25 +1890,29 @@ def generatevariables(varblocks, types, boundallowed):
             if ty=="SPARSEBOUND ":
                 # take a random subset between lb and ub
                 dom=random.sample(range(lb, ub+1), max((ub-lb)/2, 1))
-                dom.sort(cmp)
+                dom.sort()
                 domainlists.append(dom)
                 strdom=""
                 for j in dom[:-1]:
                     strdom+=str(j)+","
                 strdom+=str(dom[-1])
-                st_nontable+=ty+"x%d {%s}\n"%(varnum, strdom)
-                st_table+="DISCRETE x%d {%d..%d}\n"%(varnum, lb, ub)
+                st_nontable.append(ty+"x%d {%s}"%(varnum, strdom))
+                st_table.append("DISCRETE x%d {%d..%d}"%(varnum, lb, ub))
+                for val in range(lb, ub+1):
+                    if val not in dom:
+                        # Make a constraint for the Table version to remove the spurious value.
+                        constraints+=["diseq(x%d, %d)"%(varnum, val)]
             elif ty=="BOOL ":
-                st_nontable+=ty+"x%d\n"%(varnum)
-                st_table   +=ty+"x%d\n"%(varnum)
+                st_nontable.append(ty+"x%d"%(varnum))
+                st_table.append(ty+"x%d"%(varnum))
                 domainlists.append([0,1])
             elif ty=="BOUND ":
-                st_nontable+=ty+"x%d {%d..%d}\n"%(varnum, lb, ub)
-                st_table+="DISCRETE x%d {%d..%d}\n"%(varnum, lb, ub)
+                st_nontable.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
+                st_table.append("DISCRETE x%d {%d..%d}"%(varnum, lb, ub))
                 domainlists.append(range(lb, ub+1))
             elif ty=="DISCRETE ":
-                st_nontable+=ty+"x%d {%d..%d}\n"%(varnum, lb, ub)
-                st_table   +=ty+"x%d {%d..%d}\n"%(varnum, lb, ub)
+                st_nontable.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
+                st_table.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
                 domainlists.append(range(lb, ub+1))
             else:
                 # a constant type. Do not append to domainlists
@@ -1814,16 +1922,27 @@ def generatevariables(varblocks, types, boundallowed):
     # co-sort the lines of st_nontable and st_table
     # This is to avoid the problem of variables coming out in different
     # orders in minion's dumptree output.
-    deco=zip(st_nontable.strip().split("\n"), st_table.strip().split("\n"))
+    deco=zip(st_nontable, st_table)
     
-    def comparefunc(x,y):   # sort in order: bool, bound, sparsebound, discrete
-        t1=x[0][:4]
-        t2=y[0][:4]
-        dic={"BOOL":1, "BOUN":2, "SPAR":3, "DISC":4}
-        return dic[t1]-dic[t2]
+    # decorate the list with a key from dic.
+    dic={"BOOL":1, "BOUN":2, "SPAR":3, "DISC":4}
+    deco2=list(zip( map(lambda x: dic[x[0][:4]], deco), deco))
     
-    deco.sort(cmp=comparefunc)
+    #def comparefunc(x,y):   # sort in order: bool, bound, sparsebound, discrete
+    #    t1=x[0][:4]
+    #    t2=y[0][:4]
+    #    dic={"BOOL":1, "BOUN":2, "SPAR":3, "DISC":4}
+    #    return dic[t1]-dic[t2]
+    
+    deco2.sort()
+    
+    # get rid of the index decoration.
+    if len(deco2)>0:
+        (throwaway, deco)=zip(*deco2)
+    else:
+        deco=[("","")]   # initial value, to avoid problem with reduce.
+    
     st_nontable=reduce(lambda x,y:x+"\n"+y, [i[0] for i in deco])+"\n"
     st_table=reduce(lambda x,y:x+"\n"+y, [i[1] for i in deco])+"\n"
-    return (domainlists, st_nontable, st_table, constants)
+    return (domainlists, st_nontable, st_table, constants, constraints)
 

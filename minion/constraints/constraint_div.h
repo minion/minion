@@ -23,128 +23,111 @@ The constraint
    div(x,y,z)
 
 ensures that floor(x/y)=z.
+
+For example:
+
+10/3 = 3
+(-10)/3 = -4
+10/(-3) = -4
+(-10)/(-3) = 3
+
+div and mod satisfy together the condition that:
+
+y*(x/y) + x % y = x
+
+The constraint is always false when y = 0
 */
 
-/** @help constraints;div Notes
-This constraint is only available for positive domains x, y and z.
-*/
 
 /** @help constraints;div References
 help constraints modulo
 */
 
+
+/** @help constraints;div_undefzero Description
+The constraint
+ 
+   div_undefzero(x,y,z)
+
+is the same as div (it ensures that floor(x/y)=z)
+except the constraint is always true when y = 0,
+instead of false.
+
+This constraint exists for certain special requirements.
+In general, if you are unsure what constraint to use,
+then what you want is a plain div constraint!
+*/
+
+
+/** @help constraints;div_undefzero References
+help constraints div
+*/
+
+
 #ifndef CONSTRAINT_DIV_H
 #define CONSTRAINT_DIV_H
 
+#include "../constraints/constraint_checkassign.h"
 #include <math.h>
 
 #ifndef LRINT
 #define LRINT(x) static_cast<DomainInt>(x + 0.5)
 #endif
 
-/// var1 / var2 = var3
-template<typename VarRef1, typename VarRef2, typename VarRef3>
-struct DivConstraint : public AbstractConstraint
-{
-  virtual string constraint_name()
-  { return "Div"; }
-  
-  VarRef1 var1;
-  VarRef2 var2;
-  VarRef3 var3;
 
-  DivConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) : AbstractConstraint(_stateObj),
-    var1(_var1), var2(_var2), var3(_var3)
+template<typename T1, typename T2, typename T3, bool undef_zero>
+class DivConstraint
+{
+  StateObj* stateObj;
+public:
+  typedef typename common_var_type3<T1,T2,T3>::type var_common;
+  typedef array<var_common, 3> var_type;
+private:
+   var_type vars;
+public:
+
+  DivConstraint(StateObj* _stateObj, const T1& v1, const T2& v2, const T3& v3)
+  : stateObj(_stateObj)
   {
-  
-      if(var1.getInitialMin() < 0 || var2.getInitialMin() < 0 ||
-         var3.getInitialMin() < 0)
-      { 
-      FAIL_EXIT("The 'div' constraint only supports positive numbers at present.");
-      }
+    vars[0] = v1; vars[1] = v2; vars[2] = v3;
+    // I do this test here because technically the behaviour is implementation
+    // defined, and this tiny cheap test will hopefully stop people suffering
+    // wrong answers if they recompile minion on a strange CPU.
+    DomainInt check1[3] = {-10,3,-4};
+    DomainInt check2[3] = {-10,-3,3};
+    DomainInt check3[3] = {10,-3,-4};
+    CHECK(check_assignment(check1, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
+    CHECK(check_assignment(check2, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
+    CHECK(check_assignment(check3, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
   }
-  
-  virtual triggerCollection setup_internal()
-  {
-    triggerCollection t;
-    t.push_back(make_trigger(var1, Trigger(this, -1), LowerBound));
-    t.push_back(make_trigger(var2, Trigger(this, -2), LowerBound));
-    t.push_back(make_trigger(var3, Trigger(this, -3), LowerBound));
-    t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-    t.push_back(make_trigger(var2, Trigger(this, 2), UpperBound));
-    t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
-    return t;
-  }
-    
-  virtual void propagate(int flag, DomainDelta)
-  {
-    PROP_INFO_ADDONE(Pow);
-    if(var1.isAssigned() && var2.isAssigned())
-      {
-        if(var2.getAssignedValue() == 0)
-          getState(stateObj).setFailed(true);
-      var3.propagateAssign(var1.getAssignedValue() / var2.getAssignedValue() );
-    }
-  }
-  
-  virtual void full_propagate()
-  { 
-    if(!var2.isBound()) {
-      var2.removeFromDomain(0);
-    }
-      
-    propagate(1,0); 
-    propagate(2,0);
-    propagate(3,0);
-    propagate(-1,0);
-    propagate(-2,0);
-    propagate(-3,0);
-  }
-  
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+
+  string constraint_name() const
+  { if(undef_zero) return "div_undefzero"; else return "div"; }
+
+  CONSTRAINT_ARG_LIST3(vars[0], vars[1], vars[2])
+
+  var_type& get_vars()
+  { return vars; }
+
+  virtual bool check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
-    return v[0] / v[1] == v[2];
-  }
-  
-  virtual vector<AnyVarRef> get_vars()
-  { 
-    vector<AnyVarRef> v;
-    v.push_back(var1);
-    v.push_back(var2);
-    v.push_back(var3);
-    return v;
-  }
-  
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
-  {  
-   for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
-   {
-     if(var1.inDomain(v1))
-     {
-       for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2)
-       {
-         if(var2.inDomain(v2) && var3.inDomain(v1 / v2))
-         {
-           assignment.push_back(make_pair(0, v1));
-           assignment.push_back(make_pair(1, v2));
-           assignment.push_back(make_pair(2, v1 / v2));
-           return true;
-         }
-       }
-     }
-   }
-   return false;
-  }
- 
-     // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint()
-  {
-      vector<AnyVarRef> t;
-      t.push_back(var1);
-      t.push_back(var2);
-      t.push_back(var3);
-      return new CheckAssignConstraint<vector<AnyVarRef>, DivConstraint>(stateObj, t, *this);
+    if(v[1] == 0)
+    {
+      if(undef_zero)
+        return v[2] == 0;
+      else
+        return false;
+    }
+
+    bool negsign = (v[0] < 0 || v[1] < 0) && (v[0] > 0 || v[1] > 0);
+    DomainInt r = v[0]/v[1];
+    if(negsign && r * v[1] != v[0])
+      r--;
+    return r == v[2];
+//    return v[2] == (v[0] / v[1] - (v[0] < 0 && v[0] % v[1] != 0 ? 1 : 0));
   }
 };
+
+
 #endif

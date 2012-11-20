@@ -39,11 +39,11 @@ using namespace std;
 
 #include "../build_constraints/ConstraintEnum.h"
 
-inline string to_var_name(const vector<int>& params)
+inline string to_var_name(const vector<DomainInt>& params)
 {
   ostringstream s;
   s << "_";
-  for(int i = 0; i < params.size(); ++i)
+  for(SysInt i = 0; i < params.size(); ++i)
     s << to_string(params[i]) << "_";
   s << "_";
   return s.str();
@@ -59,7 +59,6 @@ enum ReadTypes
   read_tuples,
   read_constraint,
   read_constraint_list,
-  read_bool_var,
   read_nothing
 };
 
@@ -77,11 +76,18 @@ enum VarOrderEnum
   ORDER_CONFLICT
 };
 
+enum ValOrderEnum
+{
+  VALORDER_ASCEND,
+  VALORDER_DESCEND,
+  VALORDER_RANDOM
+};
+
 struct ConstraintDef
 {
   std::string name;
   ConstraintType type;
-  int number_of_params;
+  SysInt number_of_params;
   array<ReadTypes,4> read_types;
 };
 
@@ -104,10 +110,10 @@ struct ConstraintBlob
   /// Pointer to list of tuples. Only used in Table Constraints.
   TupleList* tuples;
   /// A vector of signs. Only used for SAT clause "or" constraint.
-  vector<int> negs;
+  vector<DomainInt> negs;
 
   /// A vector of constants, for any constraint which reads a constant array
-  vector<vector<int> > constants;
+  vector<vector<DomainInt> > constants;
 
   /// For use in Gadget constraints, lists the propagation level to be achieved.
   PropagationLevel gadget_prop_type;
@@ -166,14 +172,14 @@ struct ConstraintBlob
 /// Contains all the variables in a CSP instance.
   struct VarContainer
 {
-  int BOOLs;
+  SysInt BOOLs;
   INPUT_MAP_TYPE<string, Var> symbol_table;
   INPUT_MAP_TYPE<Var, string> name_table;
-  vector<pair<int, Bounds> > bound;
-  vector<pair<int, vector<int> > > sparse_bound;
-  vector<pair<int, Bounds> > discrete;
-  vector<pair<int, vector<int> > > sparse_discrete;
-  INPUT_MAP_TYPE<string, vector<int> > matrix_table;
+  vector<pair<SysInt, Bounds> > bound;
+  vector<pair<SysInt, vector<DomainInt> > > sparse_bound;
+  vector<pair<SysInt, Bounds> > discrete;
+  vector<pair<SysInt, vector<DomainInt> > > sparse_discrete;
+  INPUT_MAP_TYPE<string, vector<DomainInt> > matrix_table;
   VarContainer() : BOOLs(0)
   {}
 
@@ -187,16 +193,16 @@ struct ConstraintBlob
 
   /// Given a matrix variable and a parameter list, returns a slice of the matrix.
   /// Params can either be wildcards (denoted -999), or a value for the matrix.
-  vector<Var> buildVarList(const string& name, const vector<int>& params)
+  vector<Var> buildVarList(const string& name, const vector<DomainInt>& params)
   {
      vector<Var> return_list;
 
-     vector<int> max_index = getMatrixSymbol(name);
+     vector<DomainInt> max_index = getMatrixSymbol(name);
      if(params.size() != max_index.size())
       throw parse_exception("Can't index a " + to_string(max_index.size()) +
                             "-d matrix with " + to_string(params.size()) +
                             " indices.");
-    for(int i = 0; i < params.size(); ++i)
+    for(SysInt i = 0; i < params.size(); ++i)
     {
       // Horrible hack: -999 means it was an _
       if(params[i] != -999 && (params[i] < 0 || params[i] >= max_index[i]))
@@ -205,8 +211,8 @@ struct ConstraintBlob
 
     // Set all fixed indices to 1, so they won't move.
     // Set all variable indices to their max value.
-    vector<int> modified_max(params.size());
-    for(int i = 0; i < max_index.size(); i++)
+    vector<DomainInt> modified_max(params.size());
+    for(SysInt i = 0; i < max_index.size(); i++)
     {
       if(max_index[i]==0)
       {   // matrix is empty, all slices are empty.
@@ -220,13 +226,13 @@ struct ConstraintBlob
     }
     
     // Iterates through the variable indices
-    vector<int> current_index(params.size());
+    vector<DomainInt> current_index(params.size());
     
     // Vector which actually contains the output
-    vector<int> output(params);
+    vector<DomainInt> output(params);
     do
     {
-      for(int i = 0; i < max_index.size(); i++)
+      for(SysInt i = 0; i < max_index.size(); i++)
         if(params[i] == -999)
           output[i] = current_index[i];
       return_list.push_back(getSymbol(name + to_var_name(output)));
@@ -242,20 +248,20 @@ struct ConstraintBlob
     // The idea is that we use buildVarList with all but the last parameter wild to get
     // out 'slices' of the matrix for each value to the last index. Then glue these together
     // and for any sized matrix, we get a list of vectors, with all but the last dimension flattened!
-    vector<int> indices = getMatrixSymbol(name);
-    vector<int> loop_indices(indices.size());
-    for(int i = 0; i < indices.size() - 1; ++i)
+    vector<DomainInt> indices = getMatrixSymbol(name);
+    vector<DomainInt> loop_indices(indices.size());
+    for(SysInt i = 0; i < indices.size() - 1; ++i)
       loop_indices[i] = -999;
 
     vector<vector<Var> > terms;
 
-    for(int i = 0; i < indices.back(); ++i)
+    for(SysInt i = 0; i < indices.back(); ++i)
     {
       loop_indices.back() = i;
       vector<Var> slice = buildVarList(name, loop_indices);
       // This line should only do something first pass through the loop.
       terms.resize(slice.size());
-      for(int i = 0; i < slice.size(); ++i)
+      for(SysInt i = 0; i < slice.size(); ++i)
         terms[i].push_back(slice[i]);
     }
     return terms;
@@ -277,7 +283,7 @@ struct ConstraintBlob
       name_table[variable] = name;
   }
 
-  void addMatrixSymbol(const string& name, const vector<int>& indices)
+  void addMatrixSymbol(const string& name, const vector<DomainInt>& indices)
   {
     Var var(VAR_MATRIX, matrix_table.size());
     addSymbol(name, var);
@@ -303,9 +309,9 @@ struct ConstraintBlob
     return it->second;
   }
 
-  vector<int> getMatrixSymbol(const string& name)
+  vector<DomainInt> getMatrixSymbol(const string& name)
   {
-    INPUT_MAP_TYPE<string, vector<int> >::iterator it = matrix_table.find(name);
+    INPUT_MAP_TYPE<string, vector<DomainInt> >::iterator it = matrix_table.find(name);
     if(it == matrix_table.end())
       throw parse_exception("Undefined matrix: '" + name + "'");
     return it->second;
@@ -326,8 +332,8 @@ struct ConstraintBlob
       return make_pair(Bound_No, dom);
     case VAR_BOUND:
       {
-        int bound_size = 0;
-        for(unsigned int x = 0; x < bound.size(); ++x)
+        SysInt bound_size = 0;
+        for(UnsignedSysInt x = 0; x < bound.size(); ++x)
         {
           bound_size += bound[x].first;
           if(v.pos() < bound_size)
@@ -341,8 +347,8 @@ struct ConstraintBlob
       }
     case VAR_SPARSEBOUND:
       {
-        int sparse_bound_size = 0;
-        for(unsigned int x=0;x<sparse_bound.size();++x)
+        SysInt sparse_bound_size = 0;
+        for(UnsignedSysInt x=0;x<sparse_bound.size();++x)
         {
           sparse_bound_size += sparse_bound[x].first;
           if(v.pos() < sparse_bound_size)
@@ -352,8 +358,8 @@ struct ConstraintBlob
       }
     case VAR_DISCRETE:
     {
-      int discrete_size = 0;
-      for(unsigned int x = 0; x < discrete.size(); ++x)
+      SysInt discrete_size = 0;
+      for(UnsignedSysInt x = 0; x < discrete.size(); ++x)
       {
         discrete_size += discrete[x].first;
         if(v.pos() < discrete_size)
@@ -367,8 +373,8 @@ struct ConstraintBlob
     }
     case VAR_SPARSEDISCRETE:
     {
-      int sparse_discrete_size = 0;
-      for(unsigned int x = 0; x < sparse_discrete.size(); ++x)
+      SysInt sparse_discrete_size = 0;
+      for(UnsignedSysInt x = 0; x < sparse_discrete.size(); ++x)
       {
         sparse_discrete_size += sparse_discrete[x].first;
         if(v.pos() < sparse_discrete_size)
@@ -392,8 +398,8 @@ struct ConstraintBlob
       return Bounds(0,1);
     case VAR_BOUND:
       {
-        int bound_size = 0;
-        for(unsigned int x = 0; x < bound.size(); ++x)
+        SysInt bound_size = 0;
+        for(UnsignedSysInt x = 0; x < bound.size(); ++x)
         {
           bound_size += bound[x].first;
           if(v.pos() < bound_size)
@@ -404,8 +410,8 @@ struct ConstraintBlob
 
     case VAR_SPARSEBOUND:
       {
-        int sparse_bound_size = 0;
-        for(unsigned int x=0;x<sparse_bound.size();++x)
+        SysInt sparse_bound_size = 0;
+        for(UnsignedSysInt x=0;x<sparse_bound.size();++x)
         {
           sparse_bound_size += sparse_bound[x].first;
           if(v.pos() < sparse_bound_size)
@@ -415,8 +421,8 @@ struct ConstraintBlob
       }
     case VAR_DISCRETE:
     {
-      int discrete_size = 0;
-      for(unsigned int x = 0; x < discrete.size(); ++x)
+      SysInt discrete_size = 0;
+      for(UnsignedSysInt x = 0; x < discrete.size(); ++x)
       {
         discrete_size += discrete[x].first;
         if(v.pos() < discrete_size)
@@ -426,8 +432,8 @@ struct ConstraintBlob
     }
     case VAR_SPARSEDISCRETE:
     {
-      int sparse_discrete_size = 0;
-      for(unsigned int x = 0; x < sparse_discrete.size(); ++x)
+      SysInt sparse_discrete_size = 0;
+      for(UnsignedSysInt x = 0; x < sparse_discrete.size(); ++x)
       {
         sparse_discrete_size += sparse_discrete[x].first;
         if(v.pos() < sparse_discrete_size)
@@ -440,22 +446,23 @@ struct ConstraintBlob
     }
   }
 
-  Var get_var(char, int i) const
+  Var get_var(char, DomainInt in) const
   {
+    SysInt i = checked_cast<SysInt>(in);
     if(i < BOOLs)
       return Var(VAR_BOOL, i);
     i -= BOOLs;
     {
-      int bound_size = 0;
-      for(unsigned int x = 0; x < bound.size(); ++x)
+      SysInt bound_size = 0;
+      for(UnsignedSysInt x = 0; x < bound.size(); ++x)
         bound_size += bound[x].first;
       if(i < bound_size)
         return Var(VAR_BOUND, i);
       i -= bound_size;
     }
     {
-      int sparse_bound_size = 0;
-      for(unsigned int x=0;x<sparse_bound.size();++x)
+      SysInt sparse_bound_size = 0;
+      for(UnsignedSysInt x=0;x<sparse_bound.size();++x)
         sparse_bound_size += sparse_bound[x].first;
       if(i < sparse_bound_size)
         return Var(VAR_SPARSEBOUND, i);
@@ -463,16 +470,16 @@ struct ConstraintBlob
     }
 
     {
-      int discrete_size = 0;
-      for(unsigned int x=0;x<discrete.size();++x)
+      SysInt discrete_size = 0;
+      for(UnsignedSysInt x=0;x<discrete.size();++x)
         discrete_size += discrete[x].first;
       if(i < discrete_size)
         return Var(VAR_DISCRETE, i);
       i -= discrete_size;
     }
     {
-      int sparse_discrete_size = 0;
-      for(unsigned int x=0;x<sparse_discrete.size();++x)
+      SysInt sparse_discrete_size = 0;
+      for(UnsignedSysInt x=0;x<sparse_discrete.size();++x)
         sparse_discrete_size += sparse_discrete[x].first;
       if(i < sparse_discrete_size)
         return Var(VAR_SPARSEDISCRETE, i);
@@ -482,7 +489,7 @@ struct ConstraintBlob
   }
 
 
-  Var getNewVar(VariableType type, vector<int> bounds)
+  Var getNewVar(VariableType type, vector<DomainInt> bounds)
   {
     switch(type)
     {
@@ -506,19 +513,19 @@ struct ConstraintBlob
     return newBool;
   }
 
-  Var getNewBoundVar(int lower, int upper)
+  Var getNewBoundVar(DomainInt lower, DomainInt upper)
   {
      bound.push_back(make_pair(1, Bounds(lower, upper)));
      return Var(VAR_BOUND, bound.size() - 1);
   }
 
-  Var getNewSparseBoundVar(const vector<int>& vals)
+  Var getNewSparseBoundVar(const vector<DomainInt>& vals)
   {
     sparse_bound.push_back(make_pair(1, vals));
     return Var(VAR_SPARSEBOUND, sparse_bound.size() - 1);
   }
 
-  Var getNewDiscreteVar(int lower, int upper)
+  Var getNewDiscreteVar(DomainInt lower, DomainInt upper)
   {
     discrete.push_back(make_pair(1, Bounds(lower, upper)));
     return Var(VAR_DISCRETE, discrete.size() - 1);
@@ -526,19 +533,19 @@ struct ConstraintBlob
 
   vector<Var> get_all_vars() const
   {
-    int total_var_count = 0;
+    SysInt total_var_count = 0;
     total_var_count += BOOLs;
 
-    for(unsigned int x = 0; x < bound.size(); ++x)
+    for(UnsignedSysInt x = 0; x < bound.size(); ++x)
       total_var_count += bound[x].first;
-    for(unsigned int x=0;x<sparse_bound.size();++x)
+    for(UnsignedSysInt x=0;x<sparse_bound.size();++x)
       total_var_count += sparse_bound[x].first;
-    for(unsigned int x=0;x<discrete.size();++x)
+    for(UnsignedSysInt x=0;x<discrete.size();++x)
       total_var_count += discrete[x].first;
-    for(unsigned int x=0;x<sparse_discrete.size();++x)
+    for(UnsignedSysInt x=0;x<sparse_discrete.size();++x)
       total_var_count += sparse_discrete[x].first;
     vector<Var> all_vars(total_var_count);
-    for(int i = 0; i < total_var_count; ++i)
+    for(SysInt i = 0; i < total_var_count; ++i)
       all_vars[i] = get_var('x',i);
     return all_vars;
   }
@@ -547,7 +554,7 @@ struct ConstraintBlob
 struct SearchOrder
 {
   vector<Var> var_order;
-  vector<char> val_order;
+  vector<ValOrderEnum> val_order;
   VarOrderEnum order;
   bool find_one_assignment;
 
@@ -565,7 +572,10 @@ struct SearchOrder
   void setupValueOrder()
   {
     if(val_order.empty())
-      val_order.resize(var_order.size(), 'a');
+      val_order.resize(var_order.size(), VALORDER_ASCEND);
+    while(val_order.size() < var_order.size())
+      val_order.push_back(val_order.back());
+    D_ASSERT(val_order.size() == var_order.size());
   }
 };
 
@@ -576,8 +586,6 @@ struct CSPInstance
   shared_ptr<TupleListContainer> tupleListContainer;
 
   vector<SearchOrder> search_order;
-  //vector<Var> var_order;
-  //vector<char> val_order;
   vector<Var> permutation;
   vector<Var> sym_order;
 
@@ -647,7 +655,7 @@ public:
         BigInt a = checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound);
         BigInt b = checked_cast<BigInt>(vars.get_bounds(con.vars[0][1]).upper_bound);
         BigInt out = 1;
-        for(int i = 0; i < b; ++i)
+        for(SysInt i = 0; i < b; ++i)
         {
           out *= a;
           if(!DOMAIN_CHECK(out))
@@ -670,12 +678,13 @@ public:
   {
     if(table_nametable.count(tuplelist) != 0)
       throw parse_exception("Unnamed Tuplelist double registered!");
-    int pos = table_symboltable.size();
+    SysInt pos = table_symboltable.size();
     while( table_symboltable.count("_Unnamed__" + pos) != 0)
       pos++;
 
     table_symboltable["_Unnamed__" + to_string(pos) + "_"] = tuplelist;
     table_nametable[tuplelist] = "_Unnamed__" + to_string(pos) + "_";
+    tuplelist->setName("_Unnamed__" + to_string(pos) + "_");
   }
 
   void addTableSymbol(string name, TupleList* tuplelist)
@@ -686,6 +695,7 @@ public:
       throw parse_exception("Named tuplelist double registered!");
     table_symboltable[name] = tuplelist;
     table_nametable[tuplelist] = name;
+    tuplelist->setName(name);
   }
 
   TupleList* getTableSymbol(string name) const
@@ -726,7 +736,7 @@ public:
       // This was a MINION 1 or MINION 2 input file. Let's fix it!
       vector<Var> all_vars = vars.get_all_vars();
 
-      for(int i = 0; i < all_vars.size(); ++i)
+      for(SysInt i = 0; i < all_vars.size(); ++i)
         vars.addSymbol("x" + to_string(i), all_vars[i]);
     }
 
@@ -738,11 +748,11 @@ public:
 }
 
 extern ConstraintDef constraint_list[];  // why is this here twice?
-extern int num_of_constraints;
+extern SysInt num_of_constraints;
 
 inline ConstraintDef* get_constraint(ConstraintType t)
 {
-  for(int i = 0; i < num_of_constraints; ++i)
+  for(SysInt i = 0; i < num_of_constraints; ++i)
   {
     if(constraint_list[i].type == t)
       return constraint_list + i;
@@ -750,6 +760,7 @@ inline ConstraintDef* get_constraint(ConstraintType t)
 
   D_FATAL_ERROR("Constraint not found");
 }
+
 
 using namespace ProbSpec;
 

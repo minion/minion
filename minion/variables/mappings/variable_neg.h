@@ -35,6 +35,9 @@ struct VarNeg
   static const BoundType isBoundConst = VarT::isBoundConst;
   VarT data;
 
+  AnyVarRef popOneMapper() const
+  { return data; }
+
   BOOL isBound() const
   { return data.isBound();}
   
@@ -99,7 +102,7 @@ struct VarNeg
   { data.removeFromDomain(-b); }
   
   /// There isn't a minus sign here as domain changes from both the top and bottom of the domain are positive numbers.
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
   
  void addTrigger(Trigger t, TrigType type)
@@ -158,8 +161,15 @@ struct VarNeg
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
+  vector<Mapper> getMapperStack() const
+  { 
+    vector<Mapper> v = data.getMapperStack();
+    v.push_back(Mapper(MAP_NEG));
+    return v;
+  }
+
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()
@@ -209,7 +219,7 @@ VarNegRef(const vector<VarRef>& var_array)
 {
   vector<typename NegType<VarRef>::type> neg_array;
   neg_array.reserve(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     neg_array.push_back(VarNegRef(var_array[i]));
   return neg_array;
 }
@@ -220,7 +230,7 @@ vector<typename NegType<VarRef>::type>
 VarNegRef(const vector<VarRef>& var_array)
 {
   vector<typename NegType<VarRef>::type> neg_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     neg_array[i] = VarNegRef(var_array[i]);
   return neg_array;
 }
@@ -231,7 +241,7 @@ array<typename NegType<VarRef>::type, i>
 VarNegRef(const array<VarRef, i>& var_array)
 {
   array<typename NegType<VarRef>::type, i> neg_array;
-  for(unsigned int l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     neg_array[l] = VarNegRef(var_array[l]);
   return neg_array;
 }

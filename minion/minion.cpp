@@ -60,6 +60,18 @@ below contains all available switches. For example to see help on
 replacing 'minion' by the name of the executable you're using.
 */
 
+/** @help switches;-outputCompressed Description
+Output a Minion instance with some basic reasoning performed to
+reduce the size of the file. This file should produce identical
+output the original instance but may solve faster.
+*/
+
+/** @help switches;-outputCompressed Example
+To compress a file 'infile.minion' to a file 'smaller.minion'
+
+   minion infile.minion -outputCompressed smaller.minion
+*/
+
 /** @help switches;-redump Description
 Print the minion input instance file to standard out. No search is
 carried out when this switch is used.
@@ -96,6 +108,11 @@ Do not print solutions.
 
 /** @help switches;-printsolsonly Description
 Print only solutions and a summary at the end.
+*/
+
+/** @help switches;-printonlyoptimal Description
+In optimisation problems, only print the optimal value, and
+not intermediate values.
 */
 
 /** @help switches;-preprocess
@@ -332,18 +349,41 @@ specifies as ordering it will randomly permute this. If no ordering is
 specified a random permutation of all the variables is used.
 */
 
-/** @help switches;-resume-file Description
-Resume solving from a resume file.
-*/
-
-/** @help switches;-resume-file Example
-To resume the solving of problem.minion from the file resume.minion do
-
-   minion -resume-file resume.minion problem.minion
-*/
-
 /** @help switches;-noresume Description
-Do not write a resume file on timeout or being killed.
+Do not write a resume file on timeout or being killed. (default)
+*/
+
+/** @help switches;-makeresume Description
+Write a resume file on timeout or being killed.
+*/
+
+/** @help switches;-split Description
+When Minion is terminated before the end of search, write out two new input
+files that split the remaining search space in half. Each of the files will have
+all the variables and constraints of the original file plus constraints that
+rule out the search already done. In addition, the domain of the variable under
+consideration when Minion was stopped is split in half with each of the new
+input files considering a different half.
+
+This feature is experimental and intended to facilitate parallelisation -- to
+parallelise the solving of a single constraint problem, stop and split
+repeatedly. Please note that large-scale testing of this feature was limited to
+Linux systems and it might not work on others (especially Windows).
+
+The name of the new input files is composed of the name of the original
+instance, the string 'resume', a timestamp, the process ID of Minion, the name
+of the variable whose domain is being split and 0 or 1. Each of the new input
+files has a comment identifying the name of the input file which it was split
+from. Similarly, Minion's output identifies the new input files it writes when
+splitting.
+
+The new input files can be run without any special flags.
+
+This flag is intended to be used with the -timelimit, -sollimit, -nodelimit
+,-searchlimit or -cpulimit flags. Please note that changing other flags between
+runs (such as -varorder) may have unintended consequences.
+
+Implies -makeresume.
 */
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -370,11 +410,62 @@ void print_default_help(char** argv)
   print_constraints();
 }
 
+void worker()
+{
+  while(1) {;}
+}
+
+template<typename Con>
+void munge_container(Con& con, SysInt type)
+{
+  switch(type)
+  {
+    case 0: return;
+    case 1: 
+      std::reverse(con.begin(), con.end());
+      return;
+    case 2:
+    {
+      Con con2;
+      SysInt size = con.size();
+      if(size%2==1)
+      {
+        size--;
+        con2.push_back(con[size/2]);
+        size--;
+      }
+      else
+        size-=2;
+
+      for(SysInt i = size/2; i >= 0; --i)
+      {
+        con2.push_back(con[i]);
+        con2.push_back(con[con.size() - i - 1]);
+      }
+      D_ASSERT(con2.size() == con.size());
+      con = con2;
+      return;
+    }
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    {
+      srand(type);
+      std::random_shuffle(con.begin(), con.end());
+      return;
+    }
+    default:
+      abort();
+  }
+}
 
 int main(int argc, char** argv) {
 // Wrap main in a try/catch just to stop exceptions leaving main,
 // as windows gets really annoyed when that happens.
-
+#ifdef THREADSAFE
+boost::thread t(worker);
+#endif
 try {
   StateObj* stateObj = new StateObj();
 
@@ -387,7 +478,7 @@ try {
     return EXIT_SUCCESS;
   }
 
-  if(!strcmp(argv[1], "help")) {
+  if(argv[1] == string("help") || argv[1] == string("--help") || argv[1] == string("-help") || argv[1] == string("-h")) {
     std::string sect("");
     if(argc != 2) {
       for(size_t i = 2; i < argc - 1; i++)
@@ -419,23 +510,27 @@ try {
     time(&rawtime);
     cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
     cout << "#    http://minion.sourceforge.net" << endl;
-    cout << "#  Minion is still very new and in active development." << endl;
-    cout << "#  If you have problems with Minion or find any bugs, please tell us!" << endl;
-    cout << "#  Mailing list at: https://mail.cs.st-andrews.ac.uk/mailman/listinfo/mug" << endl;
+    cout << "# If you have problems with Minion or find any bugs, please tell us!" << endl;
+    cout << "# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug" << endl;
     cout << "# Input filename: " << getOptions(stateObj).instance_name << endl;
     cout << "# Command line: " ;
-    for (int i=0; i < argc; ++i) { cout << argv[i] << " " ; }
+    for (SysInt i=0; i < argc; ++i) { cout << argv[i] << " " ; }
     cout << endl;
   }
 
   vector<string> files(1, getOptions(stateObj).instance_name);
-  if(getOptions(stateObj).resume) {
-    cout << "Resuming from " << getOptions(stateObj).resume_file << endl;
-    files.reserve(2);
-    files.push_back(getOptions(stateObj).resume_file);
+  readInputFromFiles(instance, files, getOptions(stateObj).parser_verbose);
+
+  if(getOptions(stateObj).Xvarmunge != -1)
+  {
+    assert(instance.search_order.size() == 1);
+    munge_container(instance.search_order[0].var_order, getOptions(stateObj).Xvarmunge);  
   }
 
-  readInputFromFiles(instance, files, getOptions(stateObj).parser_verbose);
+  if(getOptions(stateObj).Xsymmunge != -1)
+  {
+    munge_container(instance.sym_order, getOptions(stateObj).Xsymmunge);
+  }
 
   if(getOptions(stateObj).graph)
   {
@@ -496,7 +591,7 @@ try {
   // should be one for varorder as well.
   getTableOut().set("MinionVersion", GIT_VER_STRING);
   getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions(stateObj).silent);
+  getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions(stateObj).silent);
 
   BuildCSP(stateObj, instance);
   SolveCSP(stateObj, instance, args);
@@ -507,6 +602,9 @@ try {
 
 }
 catch(...)
-{ cerr << "Minion exited abnormally via an exception." << endl; }
+{ 
+  cerr << "Minion exited abnormally via an exception." << endl; 
+  exit(9);
+}
 }
 
