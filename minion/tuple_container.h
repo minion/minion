@@ -35,6 +35,7 @@ class LiteralSpecificLists;
 class Nightingale;
 class TupleTrieArray;
 class Regin;
+class EggShellData;
 
 class TupleList
 {
@@ -44,6 +45,8 @@ class TupleList
   Nightingale* nightingale;
   TupleTrieArray* triearray;
   Regin* regin;
+  EggShellData* egg;
+  
   
   DomainInt* tuple_data;
   SysInt tuple_length;
@@ -57,6 +60,7 @@ class TupleList
   Nightingale* getNightingale();
   TupleTrieArray* getTries();
   Regin* getRegin();
+  EggShellData* getEggShellData(size_t varcount);
   
   /// Get raw pointer to the tuples.
   DomainInt* getPointer()
