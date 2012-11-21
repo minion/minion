@@ -863,6 +863,12 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     virtual void full_propagate()
     {
         D_ASSERT(backtrack_stack.size()==0);
+        if(tuples->size() == 0)
+        {
+            getState(stateObj).setFailed(true);
+            return;
+        }
+
         // For each literal, find a support for it or delete it. 
         for(int var=0; var<vars.size(); var++) {
             for(DomainInt val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
