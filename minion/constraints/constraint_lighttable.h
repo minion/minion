@@ -109,6 +109,32 @@ public:
 template<typename VarArray, typename TableDataType = TrieData>
 struct LightTableConstraint : public AbstractConstraint
 {
+
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
+  {
+    const SysInt tuple_size = checked_cast<SysInt>(data->getVarCount());
+    const SysInt length = checked_cast<SysInt>(data->getNumOfTuples());
+    DomainInt* tuple_data = data->getPointer();
+
+    for(SysInt i = 0; i < length; ++i)
+    {
+      DomainInt* tuple_start = tuple_data + i*tuple_size;
+      bool success = true;
+      for(SysInt j = 0; j < tuple_size && success; ++j)
+      {
+        if(!vars[j].inDomain(tuple_start[j]))
+          success = false;
+      }
+      if(success)
+      {
+        for(SysInt i = 0; i < tuple_size; ++i)
+          assignment.push_back(make_pair(i, tuple_start[i]));
+        return true;
+      }
+    }
+    return false;
+  }
+
   virtual string constraint_name()
   { return "lighttable"; }
 

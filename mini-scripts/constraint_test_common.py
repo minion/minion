@@ -1592,9 +1592,9 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         # as being a case that the constraint is not specified to work on.
         return True
     
-    if random.randint(0,1)==0:
-        # Deal with reify and reifyimply in the old way, i.e. tack an extra
-        # variable onto the (start of the) table constraint and extend the table.
+    mergereifyintotable = random.choice([True, False])
+
+    if mergereifyintotable:
         if reify:
             tuplelist2=[]
             cross=[]
@@ -1621,58 +1621,41 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
                     if 0 in domlists[0]:
                         tuplelist2.append([0]+c)
             tuplelist=tuplelist2
-        
-        # now convert tuplelist into a string.
-        tuplestring="modtable %d %d \n"%(len(tuplelist), sum(varnums2))
-        for l in tuplelist:
-            for e in l:
-                tuplestring+="%d "%e
-            tuplestring+="\n"
-        
-        # tuplelist is actually a set of lists(not yet), so that it can be reformed for reify or reifyimply
-        
-        tablename = { 0 : "table", 1 : "lighttable", 2 : "gacschema"} [random.randint(0,2)]
+    
+    numtablevars = sum(varnums2)
+    varoffset = 0
+    
+    if not mergereifyintotable and (reify or reifyimply):
+        numtablevars -= 1
+        varoffset = 1
 
-        constrainttable=tablename + "(["
-        for i in range(sum(varnums2)):
-            constrainttable+="x%d"%i
-            if i<(sum(varnums2)-1): constrainttable+=","
-        constrainttable+="], modtable)"
-    else:
-        # Deal with reify or reifyimply by using reify(table(...)) or reifyimply(table(..))
-        
-        # now convert tuplelist into a string.
-        numtablevars=sum(varnums2)
-        if reify or reifyimply: numtablevars-=1
-        
-        tuplestring="modtable %d %d \n"%(len(tuplelist), numtablevars)
-        for l in tuplelist:
-            for e in l:
-                tuplestring+="%d "%e
-            tuplestring+="\n"
-        
-        constrainttable=""
+    # now convert tuplelist into a string.
+    tuplestring="modtable %d %d \n"%(len(tuplelist), numtablevars)
+    for l in tuplelist:
+        for e in l:
+            tuplestring+="%d "%e
+        tuplestring+="\n"
+   
+    constrainttable = ""
+
+    if not mergereifyintotable:
         if reify:
             constrainttable="reify("
         if reifyimply:
             constrainttable="reifyimply("
-        
-        tablename = { 0 : "table", 1 : "lighttable", 2 : "gacschema"} [random.randint(0,2)]
 
-        constrainttable+=tablename + "(["
-        
-        startidx=0
-        if reify or reifyimply: startidx=1
-        
-        for i in range(startidx, sum(varnums2)):
-            constrainttable+="x%d"%i
-            if i<(sum(varnums2)-1): constrainttable+=","
-        constrainttable+="], modtable)"
-        
+    constrainttable+=("table([")
+    for i in range(numtablevars):
+        constrainttable+="x%d"%(i+varoffset)
+        if i<(numtablevars-1): constrainttable+=","
+    constrainttable+="], modtable)"
+
+
+    if not mergereifyintotable:
         if reify or reifyimply:
             constrainttable+=",x0)"   # add on reification variable
-        
-    
+
+    print(constrainttable)    
     constraintlist = []
     # add some other constraints at random into the constraint and constrainttable strings
     if random.randint(0,1)==0:

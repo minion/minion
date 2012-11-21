@@ -27,6 +27,31 @@
 template<typename VarArray>
 struct GACSchema : public AbstractConstraint, Backtrackable
 {
+    virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
+  {
+    const SysInt tuple_size = checked_cast<SysInt>(data->tuple_size());
+    const SysInt length = checked_cast<SysInt>(data->size());
+    DomainInt* tuple_data = data->getPointer();
+
+    for(SysInt i = 0; i < length; ++i)
+    {
+      DomainInt* tuple_start = tuple_data + i*tuple_size;
+      bool success = true;
+      for(SysInt j = 0; j < tuple_size && success; ++j)
+      {
+        if(!vars[j].inDomain(tuple_start[j]))
+          success = false;
+      }
+      if(success)
+      {
+        for(SysInt i = 0; i < tuple_size; ++i)
+          assignment.push_back(make_pair(i, tuple_start[i]));
+        return true;
+      }
+    }
+    return false;
+  }
+
     virtual AbstractConstraint* reverse_constraint()
     { return forward_check_negation(stateObj, this); }
 
@@ -80,15 +105,15 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     Support* supportFreeList;       // singly-linked list of spare Support objects.
 
     // Stuff to do with tuples.
-    TupleList* tuples;
+    TupleList* data;
     vector<vector<vector<vector<DomainInt> * > > > tuple_lists;
     vector<MoveableArray<unsigned int> > tuple_list_pos;  // indexed by var, val.
 
     ////////////////////////////////////////////////////////////////////////////
     // Ctor
     
-    GACSchema(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj), 
-    vars(_var_array), supportFreeList(0), tuples(_tuples)
+    GACSchema(StateObj* _stateObj, const VarArray& _var_array, TupleList* _data) : AbstractConstraint(_stateObj), 
+    vars(_var_array), supportFreeList(0), data(_data)
     {
         // Register this with the backtracker.
         getState(stateObj).getGenericBacktracker().add(this);
@@ -123,8 +148,8 @@ struct GACSchema : public AbstractConstraint, Backtrackable
             tuple_lists[var].resize(domsize);
         }
          
-        DomainInt numtuples=tuples->size();
-        DomainInt* tupdata=tuples->getPointer();
+        DomainInt numtuples=data->size();
+        DomainInt* tupdata=data->getPointer();
         for(DomainInt i=0; i<numtuples; i++) {
             vector<DomainInt>* tup=new vector<DomainInt>(tupdata, tupdata+vars.size() );
             
@@ -672,19 +697,15 @@ struct GACSchema : public AbstractConstraint, Backtrackable
         return false;
     }
     
-   
-    
+
     virtual BOOL check_assignment(DomainInt* v, int array_size)
     {
-        /// XXXXX : Fix
-        return true;
-/*        D_ASSERT(array_size%2==0);
-        for(int i=0; i<array_size/2; i++)
+       for(SysInt i = 0; i < checked_cast<SysInt>(data->size()); ++i)
         {
-            if(v[i]<v[i+array_size/2]) return true;
-            if(v[i]>v[i+array_size/2]) return false;
+            if(std::equal(v, v + array_size, data->get_tupleptr(i)))
+                return true;
         }
-        return true;*/
+        return false;
     }
     
     
@@ -869,7 +890,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     virtual void full_propagate()
     {
         D_ASSERT(backtrack_stack.size()==0);
-        if(tuples->size() == 0)
+        if(data->size() == 0)
         {
             getState(stateObj).setFailed(true);
             return;
