@@ -149,14 +149,14 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     struct Support ; 
 
     struct SupportCell { 
-            int literal ; 
+            SysInt literal ; 
             Support* sup ; 
             SupportCell* next ; 
             SupportCell* prev ; 
     };
 
     struct Literal { 
-        int var ; 
+        SysInt var ; 
         DomainInt val ;
         SupportCell* supportCellList; 
 //      Literal() { supportCellList = 0 ;} 
@@ -165,7 +165,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     struct Support {
         vector<SupportCell> supportCells ;   // Size can't be more than r, but can be less.
 
-        int arity;              // could use vector.size() but don't want to destruct SupportCells when arity decreases
+        SysInt arity;              // could use vector.size() but don't want to destruct SupportCells when arity decreases
                                 // or reconstruct existing ones when it increases.
 
         Support* nextFree ; // for when Support is in Free List.
@@ -188,34 +188,34 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
 
     vector<pair<SysInt, DomainInt> > literalsScratch;   // used instead of per-Support list, as scratch space
     
-    int numvals;
-    int numlits;
+    SysInt numvals;
+    SysInt numlits;
     
     // Counters
-    int supports;   // 0 to rd.  
-    vector<int> supportsPerVar;
+    SysInt supports;   // 0 to rd.  
+    vector<SysInt> supportsPerVar;
 
-    vector<int> litsWithLostExplicitSupport;
-    vector<int> varsWithLostImplicitSupport;
+    vector<SysInt> litsWithLostExplicitSupport;
+    vector<SysInt> varsWithLostImplicitSupport;
     
     // 2d array (indexed by var then val) of sentinels,
     // at the head of list of supports. 
     // Needs a sentinel at the start so that dlx-style removals work correctly.
     vector<Literal>  literalList;
-    vector<int> firstLiteralPerVar;
+    vector<SysInt> firstLiteralPerVar;
     
     // For each variable, a vector of values with 0 supports (or had 0 supports
     // when added to the vector).
     #if SupportsGACUseZeroVals
-    vector<vector<int> > zeroLits;
+    vector<vector<SysInt> > zeroLits;
     vector<char> inZeroLits;  // is a literal in zeroVals
     #endif
     
     // Partition of variables by number of supports.
-    vector<int> varsPerSupport;    // Permutation of the variables
-    vector<int> varsPerSupInv;   // Inverse mapping of the above.
+    vector<SysInt> varsPerSupport;    // Permutation of the variables
+    vector<SysInt> varsPerSupInv;   // Inverse mapping of the above.
     
-    vector<int> supportNumPtrs;   // rd+1 indices into varsPerSupport representing the partition
+    vector<SysInt> supportNumPtrs;   // rd+1 indices into varsPerSupport representing the partition
     
     Support* supportFreeList;       // singly-linked list of spare Support objects.
     
@@ -229,10 +229,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     #endif
     
     #if UseNDOneList
-    vector<vector<tuple<int,int,int> > > tuple_nd_list; // The inner type is var,val,next-different-pos.
+    vector<vector<tuple<SysInt,SysInt,SysInt> > > tuple_nd_list; // The inner type is var,val,next-different-pos.
     #endif
     
-    vector<vector<int> > tuple_list_pos;    // current position in tuple_lists (for each var and val). Wraps around.
+    vector<vector<SysInt> > tuple_list_pos;    // current position in tuple_lists (for each var and val). Wraps around.
     
     struct SupportDeref
     {
@@ -250,7 +250,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     HaggisGAC(StateObj* _stateObj, const VarArray& _var_array, TupleList* tuples) : AbstractConstraint(_stateObj), 
     vars(_var_array), supportFreeList(0)
     {
-        int numvars = vars.size(); 
+        SysInt numvars = vars.size(); 
         
         // literalsScratch.reserve(numvars);
 
@@ -269,7 +269,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         DomainInt litCounter = 0 ; 
         numvals = 0 ;           // only used now by tuple list stuff
 
-        for(int i=0; i<numvars; i++) {
+        for(SysInt i=0; i<numvars; i++) {
 
             firstLiteralPerVar[i] = checked_cast<SysInt>(litCounter); 
             DomainInt numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
@@ -280,7 +280,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     }
     {
         SysInt litCounter = 0 ; 
-        for(int i=0; i<numvars; i++) {
+        for(SysInt i=0; i<numvars; i++) {
             DomainInt thisvalmin = vars[i].getInitialMin();
             DomainInt numvals_i = vars[i].getInitialMax()-thisvalmin+1;
             for(DomainInt j=0; j<numvals_i; j++) {
@@ -295,12 +295,12 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     }
         #if SupportsGACUseZeroVals
         zeroLits.resize(numvars);
-        for(int i=0 ; i < numvars ; i++) {
+        for(SysInt i=0 ; i < numvars ; i++) {
             const SysInt numvals_i = checked_cast<SysInt>(vars[i].getInitialMax()- vars[i].getInitialMin()+1); 
             zeroLits[i].reserve(numvals_i);  // reserve the maximum length.
             zeroLits[i].resize(0); 
-            int thisvarstart = firstLiteralPerVar[i];
-            for(int j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
+            SysInt thisvarstart = firstLiteralPerVar[i];
+            for(SysInt j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
         }
         inZeroLits.resize(numlits,true); 
         #endif
@@ -314,7 +314,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         // Partition
         varsPerSupport.resize(vars.size());
         varsPerSupInv.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) {
+        for(SysInt i=0; i<vars.size(); i++) {
             varsPerSupport[i]=i;
             varsPerSupInv[i]=i;
         }
@@ -322,7 +322,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         // Start with 1 cell in partition, for 0 supports. 
         supportNumPtrs.resize(numlits+1);
         supportNumPtrs[0]=0;
-        for(int i=1; i<= numlits; i++) supportNumPtrs[i]=vars.size();
+        for(SysInt i=1; i<= numlits; i++) supportNumPtrs[i]=vars.size();
         
         // Extract short supports from tuples if necessary.
         if(tuples->size()>1) {
@@ -342,7 +342,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         #endif
         
         vector<pair<SysInt, DomainInt> > temp;
-        for(int i=0; i<encoded.size(); i=i+2) {
+        for(SysInt i=0; i<encoded.size(); i=i+2) {
             if(encoded[i]==-1) {
                 // end of a short support.
                 if(encoded[i+1]!=-1) {
@@ -371,7 +371,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
         
         // Sort it. Might not work when it's pointers.
-        for(int i=0; i<shortsupports.size(); i++) {
+        for(SysInt i=0; i<shortsupports.size(); i++) {
             // Sort each short support
             #if UseList && SupportsGacNoCopyList
             sort(shortsupports[i]->begin(), shortsupports[i]->end());
@@ -383,14 +383,14 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
         tuple_lists.resize(vars.size());
         tuple_list_pos.resize(vars.size());
-        for(int var=0; var<vars.size(); var++) {
+        for(SysInt var=0; var<vars.size(); var++) {
             SysInt domsize = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
             tuple_lists[var].resize(domsize);
             tuple_list_pos[var].resize(domsize, 0);
             
             for(DomainInt val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
                 // get short supports relevant to var,val.
-                for(int i=0; i<shortsupports.size(); i++) {
+                for(SysInt i=0; i<shortsupports.size(); i++) {
                     bool varin=false;
                     bool valmatches=true;
                     
@@ -400,7 +400,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                     vector<pair<SysInt, DomainInt> > & shortsup=shortsupports[i];
                     #endif
                     
-                    for(int j=0; j<shortsup.size(); j++) {
+                    for(SysInt j=0; j<shortsup.size(); j++) {
                         if(shortsup[j].first==var) {
                             varin=true;
                             if(shortsup[j].second!=val) {
@@ -423,8 +423,8 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         D_ASSERT(tuples->size()==1);
         vector<DomainInt> encoded = tuples->get_vector(0);
         
-        vector<tuple<int, int,int> > temp;
-        for(int i=0; i<encoded.size(); i=i+2) {
+        vector<tuple<SysInt, SysInt,SysInt> > temp;
+        for(SysInt i=0; i<encoded.size(); i=i+2) {
             if(encoded[i]==-1) {
                 // end of a short support.
                 if(encoded[i+1]!=-1) {
@@ -449,7 +449,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
         
         // Sort it. 
-        for(int i=0; i<tuple_nd_list.size(); i++) {
+        for(SysInt i=0; i<tuple_nd_list.size(); i++) {
             // Sort each short support
             sort(tuple_nd_list[i].begin(), tuple_nd_list[i].end());
         }
@@ -458,7 +458,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         setup_tuple_list();
         
         tuple_list_pos.resize(vars.size());
-        for(int var=0; var<vars.size(); var++) {
+        for(SysInt var=0; var<vars.size(); var++) {
             tuple_list_pos[var].resize(vars[var].getInitialMax()-vars[var].getInitialMin()+1, 0);
         }
         
@@ -468,10 +468,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     // A Second constructor for supportsgaclist constraint, that takes a list of
     // full-length tuples and should be identical in behaviour to the table constraint.
     
-    HaggisGAC(StateObj* _stateObj, const VarArray& _var_array, TupleList* tuples, int) : AbstractConstraint(_stateObj), 
+    HaggisGAC(StateObj* _stateObj, const VarArray& _var_array, TupleList* tuples, SysInt) : AbstractConstraint(_stateObj), 
     vars(_var_array), supportFreeList(0)
     {
-        int numvars = vars.size(); 
+        SysInt numvars = vars.size(); 
         
         // literalsScratch.reserve(numvars);
 
@@ -486,14 +486,14 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
         firstLiteralPerVar.resize(numvars); 
 
-        int litCounter = 0 ; 
+        SysInt litCounter = 0 ; 
         numvals = 0 ;           // only used now by tuple list stuff
 
-        for(int i=0; i<numvars; i++) {
+        for(SysInt i=0; i<numvars; i++) {
 
             firstLiteralPerVar[i] = litCounter; 
-            int thisvalmin = vars[i].getInitialMin();
-            int numvals_i = vars[i].getInitialMax()-thisvalmin+1;
+            SysInt thisvalmin = vars[i].getInitialMin();
+            SysInt numvals_i = vars[i].getInitialMax()-thisvalmin+1;
             if(numvals_i > numvals) numvals = numvals_i;
             litCounter += numvals_i; 
         }
@@ -501,10 +501,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         literalList.resize(litCounter); 
 
         litCounter = 0 ; 
-        for(int i=0; i<numvars; i++) {
-            int thisvalmin = vars[i].getInitialMin();
-            int numvals_i = vars[i].getInitialMax()-thisvalmin+1;
-            for(int j=0; j<numvals_i; j++) {
+        for(SysInt i=0; i<numvars; i++) {
+            SysInt thisvalmin = vars[i].getInitialMin();
+            SysInt numvals_i = vars[i].getInitialMax()-thisvalmin+1;
+            for(SysInt j=0; j<numvals_i; j++) {
                     literalList[litCounter].var = i; 
                     literalList[litCounter].val = j+thisvalmin; 
                     literalList[litCounter].supportCellList = 0;
@@ -516,12 +516,12 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
         #if SupportsGACUseZeroVals
         zeroLits.resize(numvars);
-        for(int i=0 ; i < numvars ; i++) {
-            int numvals_i = vars[i].getInitialMax()- vars[i].getInitialMin()+1; 
+        for(SysInt i=0 ; i < numvars ; i++) {
+            SysInt numvals_i = vars[i].getInitialMax()- vars[i].getInitialMin()+1; 
             zeroLits[i].reserve(numvals_i);  // reserve the maximum length.
             zeroLits[i].resize(0); 
-            int thisvarstart = firstLiteralPerVar[i];
-            for(int j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
+            SysInt thisvarstart = firstLiteralPerVar[i];
+            for(SysInt j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
         }
         inZeroLits.resize(numlits,true); 
         #endif
@@ -535,7 +535,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         // Partition
         varsPerSupport.resize(vars.size());
         varsPerSupInv.resize(vars.size());
-        for(int i=0; i<vars.size(); i++) {
+        for(SysInt i=0; i<vars.size(); i++) {
             varsPerSupport[i]=i;
             varsPerSupInv[i]=i;
         }
@@ -543,7 +543,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         // Start with 1 cell in partition, for 0 supports. 
         supportNumPtrs.resize(numlits+1);
         supportNumPtrs[0]=0;
-        for(int i=1; i<= numlits; i++) supportNumPtrs[i]=vars.size();
+        for(SysInt i=1; i<= numlits; i++) supportNumPtrs[i]=vars.size();
         
         CHECK( (UseList || UseNDOneList), "Attempt to use supportsgaclist with wrong version of supportsgac");
         
@@ -558,10 +558,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         #endif
         
         vector<pair<SysInt, DomainInt> > temp;
-        for(int i=0; i<tuples->size(); i++) {
-            const int* tup =tuples->get_tupleptr(i);
+        for(SysInt i=0; i<tuples->size(); i++) {
+            const SysInt* tup =tuples->get_tupleptr(i);
             
-            for(int j=0; j<vars.size(); j++) {
+            for(SysInt j=0; j<vars.size(); j++) {
                 temp.push_back(make_pair(j,tup[j]));
             }
             
@@ -575,7 +575,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
         // Same as other ctor from here.
         // Sort it. Might not work when it's pointers.
-        for(int i=0; i<shortsupports.size(); i++) {
+        for(SysInt i=0; i<shortsupports.size(); i++) {
             // Sort each short support
             #if UseList && SupportsGacNoCopyList
             sort(shortsupports[i]->begin(), shortsupports[i]->end());
@@ -587,13 +587,13 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
         tuple_lists.resize(vars.size());
         tuple_list_pos.resize(vars.size());
-        for(int var=0; var<vars.size(); var++) {
+        for(SysInt var=0; var<vars.size(); var++) {
             tuple_lists[var].resize(numvals);
             tuple_list_pos[var].resize(numvals, 0);
             
             for(DomainInt val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
                 // get short supports relevant to var,val.
-                for(int i=0; i<shortsupports.size(); i++) {
+                for(SysInt i=0; i<shortsupports.size(); i++) {
                     bool varin=false;
                     bool valmatches=true;
                     
@@ -603,7 +603,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                     vector<pair<SysInt, DomainInt> > & shortsup=shortsupports[i];
                     #endif
                     
-                    for(int j=0; j<shortsup.size(); j++) {
+                    for(SysInt j=0; j<shortsup.size(); j++) {
                         if(shortsup[j].first==var) {
                             varin=true;
                             if(shortsup[j].second!=val) {
@@ -625,11 +625,11 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
 #if UseNDOneList
         D_ASSERT(tuples->size()==1);
         
-        vector<tuple<int, int,int> > temp;
-        for(int i=0; i<tuples->size(); i++) {
-            const int* tup =tuples->get_tupleptr(i);
+        vector<tuple<SysInt, SysInt,SysInt> > temp;
+        for(SysInt i=0; i<tuples->size(); i++) {
+            const SysInt* tup =tuples->get_tupleptr(i);
             
-            for(int j=0; j<vars.size(); j++) {
+            for(SysInt j=0; j<vars.size(); j++) {
                 temp.push_back(make_tuple(j,tup[j], 0));
             }
             
@@ -638,7 +638,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
         
         // Sort it. 
-        for(int i=0; i<tuple_nd_list.size(); i++) {
+        for(SysInt i=0; i<tuple_nd_list.size(); i++) {
             // Sort each short support
             sort(tuple_nd_list[i].begin(), tuple_nd_list[i].end());
         }
@@ -647,7 +647,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         setup_tuple_list();
         
         tuple_list_pos.resize(vars.size());
-        for(int var=0; var<vars.size(); var++) {
+        for(SysInt var=0; var<vars.size(); var++) {
             tuple_list_pos[var].resize(numvals, 0);
         }
         
@@ -664,10 +664,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         set<Support*> myset;
 
         /* 
-        for(int i=0; i<vars.size(); i++) {
+        for(SysInt i=0; i<vars.size(); i++) {
             cout << "     i " << i << " Initial Max " << vars[i].getInitialMax() << endl ; 
-            int numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
-            for(int j=0; j<numvals_i; j++) {
+            SysInt numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
+            for(SysInt j=0; j<numvals_i; j++) {
               cout << "     i j SupportListPerLit[var][val].next = " << i << " " << j << " " << supportListPerLit[i][j].next << endl ; 
             }
         }
@@ -675,7 +675,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
 
         // Want to find all active support objects so we can delete them 
-        for(int lit=0; lit<numlits; lit++) {
+        for(SysInt lit=0; lit<numlits; lit++) {
                SupportCell* supCell = literalList[lit].supportCellList; 
 
               // cout << "     destructor 2: sup*= " << sup << endl ; 
@@ -694,7 +694,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
         
         // Anything remaining on bracktrack stack
-        for(int i=0; i<backtrack_stack.size(); i++) {
+        for(SysInt i=0; i<backtrack_stack.size(); i++) {
             if(backtrack_stack[i].sup!=0) {
                 myset.insert(backtrack_stack[i].sup);
             }
@@ -753,13 +753,13 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     
     // don't need argument?   Just use litlist member?  
     //
-    //Support* addSupport(box<pair<int, DomainInt> >* litlist)
+    //Support* addSupport(box<pair<SysInt, DomainInt> >* litlist)
     void addSupport()
     {
        Support* newsup = getFreeSupport(); 
        vector<SupportCell>& supCells=newsup->supportCells;
-       int oldsize = supCells.size() ;
-       int newsize = literalsScratch.size() ;
+       SysInt oldsize = supCells.size() ;
+       SysInt newsize = literalsScratch.size() ;
 
        newsup->arity = newsize;
 
@@ -768,13 +768,13 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                // make sure pointers to support cell are correct
                // need only be done once as will always point to
                // its own support
-               for(int i=oldsize; i < newsize ; i++) { 
+               for(SysInt i=oldsize; i < newsize ; i++) { 
                        supCells[i].sup = newsup; 
                }
        }
 
-       for(int i=0; i<newsize ; i++) {
-            int var=literalsScratch[i].first;
+       for(SysInt i=0; i<newsize ; i++) {
+            SysInt var=literalsScratch[i].first;
             DomainInt valoriginal=literalsScratch[i].second;
             DomainInt lit=firstLiteralPerVar[var]+valoriginal-vars[var].getInitialMin();
             supCells[i].literal = checked_cast<SysInt>(lit);
@@ -812,12 +812,12 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
         vector<SupportCell>& supCells=sup_internal->supportCells;
 
-        int litsize = sup_internal->arity;
+        SysInt litsize = sup_internal->arity;
 
-        for(int i=0; i<litsize; i++) {
+        for(SysInt i=0; i<litsize; i++) {
 
-            int lit=supCells[i].literal;
-            int var=literalList[lit].var;
+            SysInt lit=supCells[i].literal;
+            SysInt var=literalList[lit].var;
             
             // Stitch it into the start of literalList.supportCellList
             
@@ -862,19 +862,19 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         D_ASSERT(sup!=0);
         
         vector<SupportCell>& supCells=sup->supportCells;
-        int supArity = sup->arity; 
+        SysInt supArity = sup->arity; 
         //cout << "Removing support (internal) :" << litlist << endl;
         
         // oldIndex is where supportsPerVar = numsupports used to be 
         // Off by 1 error?
 
-        int oldIndex  = supportNumPtrs[supports];
+        SysInt oldIndex  = supportNumPtrs[supports];
         
-        for(int i=0; i<supArity; i++) {
+        for(SysInt i=0; i<supArity; i++) {
 
             SupportCell& supCell = supCells[i];
-            int lit=supCell.literal;
-            int var=literalList[lit].var ;
+            SysInt lit=supCell.literal;
+            SysInt var=literalList[lit].var ;
 
             // D_ASSERT(prev[var]!=0);
             // decrement counters
@@ -952,7 +952,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
 //      cout << supportNumPtrs[supports] << " " << oldIndex << endl;
         
         if (!Backtracking) {
-                for(int i=supportNumPtrs[supports]; i < oldIndex; i++) { 
+                for(SysInt i=supportNumPtrs[supports]; i < oldIndex; i++) { 
                         varsWithLostImplicitSupport.push_back(varsPerSupport[i]);
                 }
         } 
@@ -966,7 +966,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         // else can't re-use it because a ptr to it is on the BT stack. 
     }
 
-    BOOL hasNoKnownSupport(int var,int lit) {
+    BOOL hasNoKnownSupport(SysInt var,SysInt lit) {
             //
             // Either implicitly supported or counter is non zero
             // Note that even if we have an explicit support which may be invalid, we can return true
@@ -987,9 +987,9 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         cout << "supports:" << supports <<endl;
         cout << "supportsPerVar:" << supportsPerVar << endl;
         cout << "partition:" <<endl;
-        for(int i=0; i<supportNumPtrs.size()-1; i++) {
+        for(SysInt i=0; i<supportNumPtrs.size()-1; i++) {
             cout << "supports: "<< i<< "  vars: ";
-            for(int j=supportNumPtrs[i]; j<supportNumPtrs[i+1]; j++) {
+            for(SysInt j=supportNumPtrs[i]; j<supportNumPtrs[i+1]; j++) {
                 cout << varsPerSupport[j]<< ", ";
             }
             cout << endl;
@@ -1002,7 +1002,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         /*
         
         cout << "Supports for each literal:"<<endl;
-        for(int var=0; var<vars.size(); var++) {
+        for(SysInt var=0; var<vars.size(); var++) {
             cout << "Variable: "<<var<<endl;
             for(DomainInt val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
                 cout << "Value: "<<val<<endl;
@@ -1010,7 +1010,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                 while(sup!=0) {
                     cout << "Support: " << sup->literals << endl;
                     bool contains_varval=false;
-                    for(int i=0; i<sup->literals.size(); i++) {
+                    for(SysInt i=0; i<sup->literals.size(); i++) {
                         if(sup->literals[i].first==var && sup->literals[i].second==val)
                             contains_varval=true;
                     }
@@ -1027,27 +1027,27 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         virtual triggerCollection setup_internal()
         {
             triggerCollection t;
-            int array_size = vars.size();
-            for(int i = 0; i < array_size; ++i)
+            SysInt array_size = vars.size();
+            for(SysInt i = 0; i < array_size; ++i)
               t.push_back(make_trigger(vars[i], Trigger(this, i), DomainChanged));
             return t;
         }
     #endif
     
-    void partition_swap(int xi, int xj)
+    void partition_swap(SysInt xi, SysInt xj)
     {
         if(xi != xj) {
             varsPerSupport[varsPerSupInv[xj]]=xi;
             varsPerSupport[varsPerSupInv[xi]]=xj;
-            int temp=varsPerSupInv[xi];
+            SysInt temp=varsPerSupInv[xi];
             varsPerSupInv[xi]=varsPerSupInv[xj];
             varsPerSupInv[xj]=temp;
         }
     }
 
-    void findSupportsIncrementalHelper(int var, DomainInt val) { 
+    void findSupportsIncrementalHelper(SysInt var, DomainInt val) { 
 
-            typedef pair<int,DomainInt> temptype;
+            typedef pair<SysInt,DomainInt> temptype;
             // MAKE_STACK_BOX(newsupportbox, temptype, vars.size()); 
             literalsScratch.clear(); 
             // bool foundsupport=findNewSupport(newsupportbox, var, val);
@@ -1074,9 +1074,9 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         //
         // For each variable where the number of supports is equal to the total...
 
-        for(int i=litsWithLostExplicitSupport.size()-1; i >= 0; i--) { 
-            int lit=litsWithLostExplicitSupport[i];
-            int var=literalList[lit].var;
+        for(SysInt i=litsWithLostExplicitSupport.size()-1; i >= 0; i--) { 
+            SysInt lit=litsWithLostExplicitSupport[i];
+            SysInt var=literalList[lit].var;
             DomainInt val=literalList[lit].val;
             
             litsWithLostExplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
@@ -1086,18 +1086,18 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             }
         }
 
-        for(int i = varsWithLostImplicitSupport.size()-1; i >= 0; i--) { 
+        for(SysInt i = varsWithLostImplicitSupport.size()-1; i >= 0; i--) { 
 
-            int var= varsWithLostImplicitSupport[i];
+            SysInt var= varsWithLostImplicitSupport[i];
             varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
 
             if (supportsPerVar[var] == supports) {      // otherwise has found implicit support in the meantime
                     #if !SupportsGACUseZeroVals
                     for(DomainInt val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
-                        int lit=firstLiteralPerVar[var]+val-vars[var].getInitialMin();
+                        SysInt lit=firstLiteralPerVar[var]+val-vars[var].getInitialMin();
                     #else
-                    for(int j=0; j<zeroLits[var].size() && supportsPerVar[var]==supports; j++) {
-                        int lit=zeroLits[var][j];
+                    for(SysInt j=0; j<zeroLits[var].size() && supportsPerVar[var]==supports; j++) {
+                        SysInt lit=zeroLits[var][j];
             if(literalList[lit].supportCellList != 0){
                             // No longer a zero val. remove from vector.
                             zeroLits[var][j]=zeroLits[var][zeroLits[var].size()-1];
@@ -1126,7 +1126,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
     }
 
-    inline void updateCounters(int lit) {
+    inline void updateCounters(SysInt lit) {
 
         SupportCell* supCellList = literalList[lit].supportCellList ;
 
@@ -1142,12 +1142,12 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     
     
     #if SupportsGACUseDT
-        int dynamic_trigger_count() { 
+        SysInt dynamic_trigger_count() { 
             return literalList.size();
         }
     #endif
     
-  inline void attach_trigger(int var, DomainInt val, int lit)
+  inline void attach_trigger(SysInt var, DomainInt val, SysInt lit)
   {
       //P("Attach Trigger: " << i);
       
@@ -1159,7 +1159,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
       vars[var].addDynamicTrigger(dt, DomainRemoval, val );   //BT_CALL_BACKTRACK
   }
   
-  inline void detach_trigger(int lit)
+  inline void detach_trigger(SysInt lit)
   {
       //P("Detach Triggers");
       
@@ -1170,7 +1170,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
       releaseTrigger(stateObj, dt);   // BT_CALL_BACKTRACK
   }
     
-  virtual void propagate(int prop_var, DomainDelta)
+  virtual void propagate(SysInt prop_var, DomainDelta)
   {
   /* 
    Probably won't work
@@ -1196,7 +1196,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
   
     virtual void propagate(DynamicTrigger* dt)
   {
-      int lit=dt-dynamic_trigger_start();
+      SysInt lit=dt-dynamic_trigger_start();
 
     //  cout << "Propagate called: var= " << var << "val = " << val << endl;
       //printStructures();
@@ -1223,11 +1223,11 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     // Methods for pair-equals. a=b or c=d.
     
     /*
-    bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
+    bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
         // a=b or c=d
         D_ASSERT(vars[var].inDomain(val));
         D_ASSERT(vars.size()==4);
-        int othervar;
+        SysInt othervar;
         if(var<=1) othervar=1-var;
         else othervar=(var==2? 3: 2);
         
@@ -1240,7 +1240,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
         // Otherwise, try to satisfy the other equality.
         if(var<=1) {
-            for(int otherval=vars[2].getMin(); otherval<=vars[2].getMax(); otherval++) {
+            for(SysInt otherval=vars[2].getMin(); otherval<=vars[2].getMax(); otherval++) {
                 if(vars[2].inDomain(otherval) && vars[3].inDomain(otherval)) {
                     assignment.push_back(make_pair(2, otherval));
                     assignment.push_back(make_pair(3, otherval));
@@ -1249,7 +1249,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             }
         }
         else {
-            for(int otherval=vars[0].getMin(); otherval<=vars[0].getMax(); otherval++) {
+            for(SysInt otherval=vars[0].getMin(); otherval<=vars[0].getMax(); otherval++) {
                 if(vars[0].inDomain(otherval) && vars[1].inDomain(otherval)) {
                     assignment.push_back(make_pair(0, otherval));
                     assignment.push_back(make_pair(1, otherval));
@@ -1260,7 +1260,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         return false;
     }
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
       D_ASSERT(array_size == 4);
       
@@ -1274,8 +1274,8 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
 
 #if UseElementShort
     
-    // bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
-    bool findNewSupport(int var, DomainInt val) {
+    // bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    bool findNewSupport(SysInt var, DomainInt val) {
         typedef typename VarArray::value_type VarRef;
         VarRef idxvar=vars[vars.size()-2];
         VarRef resultvar=vars[vars.size()-1];
@@ -1284,9 +1284,9 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         if(var<vars.size()-2) {
             // var is in the vector.
             
-            for(int i=idxvar.getMin(); i<=idxvar.getMax(); i++) {
+            for(SysInt i=idxvar.getMin(); i<=idxvar.getMax(); i++) {
                 if(idxvar.inDomain(i) && i>=0 && i<vars.size()-2) {
-                    for(int j=resultvar.getMin(); j<=resultvar.getMax(); j++) {
+                    for(SysInt j=resultvar.getMin(); j<=resultvar.getMax(); j++) {
                         if(resultvar.inDomain(j) && vars[i].inDomain(j) &&
                             (i!=var || j==val) ) {   // Either the support includes both var, val or neither -- if neither, it will be a support for var,val.
                             ADDTOASSIGNMENT(i,j);
@@ -1304,7 +1304,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                 return false;
             }
             
-            for(int i=resultvar.getMin(); i<=resultvar.getMax(); i++) {
+            for(SysInt i=resultvar.getMin(); i<=resultvar.getMax(); i++) {
                 if(resultvar.inDomain(i) && vars[val].inDomain(i)) {
                     ADDTOASSIGNMENT(vars.size()-2, val);
                     ADDTOASSIGNMENT(vars.size()-1, i);
@@ -1316,7 +1316,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
         else if(var==vars.size()-1) {
             // The result variable.
-            for(int i=0; i<vars.size()-2; i++) {
+            for(SysInt i=0; i<vars.size()-2; i++) {
                 if(vars[i].inDomain(val) && idxvar.inDomain(i)) {
                     ADDTOASSIGNMENT(vars.size()-2, i);
                     ADDTOASSIGNMENT(vars.size()-1, val);
@@ -1330,9 +1330,9 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
     }
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
-        int idx=v[array_size-2];
+        SysInt idx=v[array_size-2];
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
     }
@@ -1344,8 +1344,8 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
 
 #if UseElementLong
 
-    // bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
-    bool findNewSupport(int var, DomainInt val) {
+    // bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    bool findNewSupport(SysInt var, DomainInt val) {
         typedef typename VarArray::value_type VarRef;
         VarRef idxvar=vars[vars.size()-2];
         VarRef resultvar=vars[vars.size()-1];
@@ -1354,15 +1354,15 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         if(var<vars.size()-2) {
             // var is in the vector.
             
-            for(int i=idxvar.getMin(); i<=idxvar.getMax(); i++) {
+            for(SysInt i=idxvar.getMin(); i<=idxvar.getMax(); i++) {
                 if(idxvar.inDomain(i) && i>=0 && i<vars.size()-2) {
-                    for(int j=resultvar.getMin(); j<=resultvar.getMax(); j++) {
+                    for(SysInt j=resultvar.getMin(); j<=resultvar.getMax(); j++) {
                         if(resultvar.inDomain(j) && vars[i].inDomain(j) &&
                             (i!=var || j==val) ) {   // Either the support includes both var, val or neither -- if neither, it will be a support for var,val.
                             ADDTOASSIGNMENTFL(i, j);
                             ADDTOASSIGNMENTFL(vars.size()-2, i);
                             ADDTOASSIGNMENTFL(vars.size()-1, j);
-                            for(int k=0; k<vars.size()-2; k++) {
+                            for(SysInt k=0; k<vars.size()-2; k++) {
                                 if(k!=i) {
                                     if(k==var) { 
                                         ADDTOASSIGNMENTFL(k, val); } 
@@ -1382,12 +1382,12 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                 return false;
             }
             
-            for(int i=resultvar.getMin(); i<=resultvar.getMax(); i++) {
+            for(SysInt i=resultvar.getMin(); i<=resultvar.getMax(); i++) {
                 if(resultvar.inDomain(i) && vars[val].inDomain(i)) {
                     ADDTOASSIGNMENTFL(vars.size()-2, val);
                     ADDTOASSIGNMENTFL(vars.size()-1, i);
                     ADDTOASSIGNMENTFL(val, i);
-                    for(int k=0; k<vars.size()-2; k++) {
+                    for(SysInt k=0; k<vars.size()-2; k++) {
                         if(k!=val) {ADDTOASSIGNMENTFL(k, vars[k].getMin()); }
                     }
                     return true;
@@ -1397,12 +1397,12 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
         else if(var==vars.size()-1) {
             // The result variable.
-            for(int i=0; i<vars.size()-2; i++) {
+            for(SysInt i=0; i<vars.size()-2; i++) {
                 if(vars[i].inDomain(val) && idxvar.inDomain(i)) {
                     ADDTOASSIGNMENTFL(vars.size()-2, i);
                     ADDTOASSIGNMENTFL(vars.size()-1, val);
                     ADDTOASSIGNMENTFL(i, val);
-                    for(int k=0; k<vars.size()-2; k++) {
+                    for(SysInt k=0; k<vars.size()-2; k++) {
                         if(k!=i) { ADDTOASSIGNMENTFL(k, vars[k].getMin()); } 
                     }
                     return true;
@@ -1414,9 +1414,9 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
     }
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
-        int idx=v[array_size-2];
+        SysInt idx=v[array_size-2];
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
     }
@@ -1429,17 +1429,17 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     
 #if UseLexLeqShort
     
-    // bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
-    bool findNewSupport(int var, DomainInt val) {
+    // bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    bool findNewSupport(SysInt var, DomainInt val) {
         D_ASSERT(vars[var].inDomain(val));
         D_ASSERT(vars.size()%2==0);
         // First part of vars is vector 1.
-        int vecsize=vars.size()/2;
+        SysInt vecsize=vars.size()/2;
         
-        for(int i=0; i<vecsize; i++) {
-            int j=i+vecsize;
-            int jmax=vars[j].getMax();
-            int imin=vars[i].getMin();
+        for(SysInt i=0; i<vecsize; i++) {
+            SysInt j=i+vecsize;
+            SysInt jmax=vars[j].getMax();
+            SysInt imin=vars[i].getMin();
             
             // CASE 1   It is not possible for the pair to be equal or less.
             if(imin>jmax) {
@@ -1499,7 +1499,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                 
                 
                 // BETTER NOT TO USE min and max here, should watch something in the middle of the domain...
-                //int mid=imin + (jmax-imin)/2;
+                //SysInt mid=imin + (jmax-imin)/2;
                 //if(vars[i].inDomain(mid-1) && vars[j].inDomain(mid)) {
                 //    ADDTOASSIGNMENT(i,mid-1);
                 //    ADDTOASSIGNMENT(j,mid);
@@ -1518,10 +1518,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         return true;
     }
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
         D_ASSERT(array_size%2==0);
-        for(int i=0; i<array_size/2; i++)
+        for(SysInt i=0; i<array_size/2; i++)
         {
             if(v[i]<v[i+array_size/2]) return true;
             if(v[i]>v[i+array_size/2]) return false;
@@ -1539,17 +1539,17 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
 
 #if UseLexLeqLong
     
-    // bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
-    bool findNewSupport(int var, DomainInt val) {
+    // bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    bool findNewSupport(SysInt var, DomainInt val) {
         D_ASSERT(vars[var].inDomain(val));
         D_ASSERT(vars.size()%2==0);
         // First part of vars is vector 1.
-        int vecsize=vars.size()/2;
+        SysInt vecsize=vars.size()/2;
         
-        for(int i=0; i<vecsize; i++) {
-            int j=i+vecsize;
-            int jmax=vars[j].getMax();
-            int imin=vars[i].getMin();
+        for(SysInt i=0; i<vecsize; i++) {
+            SysInt j=i+vecsize;
+            SysInt jmax=vars[j].getMax();
+            SysInt imin=vars[i].getMin();
             
             // CASE 1   It is not possible for the pair to be equal or less.
             if(imin>jmax) {
@@ -1587,7 +1587,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                     else {   //  val<jmax
                         ADDTOASSIGNMENTFL(var, val);
                         ADDTOASSIGNMENTFL(j, jmax);
-                        for(int k=i+1; k<vecsize; k++) {
+                        for(SysInt k=i+1; k<vecsize; k++) {
                             PADOUT(k);
                             PADOUT(k+vecsize);
                         }
@@ -1608,7 +1608,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                     else {   //  val>imin
                         ADDTOASSIGNMENTFL(var, val);
                         ADDTOASSIGNMENTFL(i, imin);
-                        for(int k=i+1; k<vecsize; k++) {
+                        for(SysInt k=i+1; k<vecsize; k++) {
                             PADOUT(k);
                             PADOUT(k+vecsize);
                         }
@@ -1619,7 +1619,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                 
                 ADDTOASSIGNMENTFL(i,imin);
                 ADDTOASSIGNMENTFL(j,jmax);
-                for(int k=i+1; k<vecsize; k++) {
+                for(SysInt k=i+1; k<vecsize; k++) {
                     PADOUT(k);
                     PADOUT(k+vecsize);
                 }
@@ -1634,10 +1634,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         return true;
     }
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
         D_ASSERT(array_size%2==0);
-        for(int i=0; i<array_size/2; i++)
+        for(SysInt i=0; i<array_size/2; i++)
         {
             if(v[i]<v[i+array_size/2]) return true;
             if(v[i]>v[i+array_size/2]) return false;
@@ -1653,19 +1653,19 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     //
     //  Table of short supports passed in.
     
-    //bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
-    bool findNewSupport(int var, DomainInt val) {
+    //bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    bool findNewSupport(SysInt var, DomainInt val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         
         const vector<vector<pair<SysInt, DomainInt> > >& tuplist=tuple_lists[var][val-vars[var].getInitialMin()]; 
         
-        int listsize=tuplist.size();
-        for(int i=tuple_list_pos[var][val-vars[var].getInitialMin()]; i<listsize; i++) {
+        SysInt listsize=tuplist.size();
+        for(SysInt i=tuple_list_pos[var][val-vars[var].getInitialMin()]; i<listsize; i++) {
             
-            int supsize=tuplist[i].size();
+            SysInt supsize=tuplist[i].size();
             bool valid=true;
             
-            for(int j=0; j<supsize; j++) {
+            for(SysInt j=0; j<supsize; j++) {
                 if(! vars[tuplist[i][j].first].inDomain(tuplist[i][j].second)) {
                     valid=false;
                     break;
@@ -1673,7 +1673,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             }
             
             if(valid) {
-                for(int j=0; j<supsize; j++) {
+                for(SysInt j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tuplist[i][j].first, tuplist[i][j].second);  //assignment.push_back(tuplist[i][j]);
                 }
                 tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
@@ -1682,12 +1682,12 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
         
         
-        for(int i=0; i<tuple_list_pos[var][val-vars[var].getInitialMin()]; i++) {
+        for(SysInt i=0; i<tuple_list_pos[var][val-vars[var].getInitialMin()]; i++) {
             
-            int supsize=tuplist[i].size();
+            SysInt supsize=tuplist[i].size();
             bool valid=true;
             
-            for(int j=0; j<supsize; j++) {
+            for(SysInt j=0; j<supsize; j++) {
                 if(! vars[tuplist[i][j].first].inDomain(tuplist[i][j].second)) {
                     valid=false;
                     break;
@@ -1695,7 +1695,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             }
             
             if(valid) {
-                for(int j=0; j<supsize; j++) {
+                for(SysInt j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tuplist[i][j].first, tuplist[i][j].second);  //assignment.push_back(tuplist[i][j]);
                 }
                 tuple_list_pos[var][val-vars[var].getInitialMin()]=i;
@@ -1706,12 +1706,12 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     }
     
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
         // argh, how to do this.
         // test with element first
         
-        int idx=v[array_size-2];
+        SysInt idx=v[array_size-2];
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
     }
@@ -1724,20 +1724,20 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     //
     //  Table of short supports passed in.
     
-    //bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
-    bool findNewSupport(int var, DomainInt val) {
+    //bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    bool findNewSupport(SysInt var, DomainInt val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         const SysInt val_offset = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
         const vector<vector<pair<SysInt, DomainInt> > * >& tuplist=tuple_lists[var][val_offset]; 
         
-        int listsize=tuplist.size();
-        for(int i=tuple_list_pos[var][val_offset]; i<listsize; i++) {
+        SysInt listsize=tuplist.size();
+        for(SysInt i=tuple_list_pos[var][val_offset]; i<listsize; i++) {
             vector<pair<SysInt, DomainInt> > & tup=*(tuplist[i]);
             
-            int supsize=tup.size();
+            SysInt supsize=tup.size();
             bool valid=true;
             
-            for(int j=0; j<supsize; j++) {
+            for(SysInt j=0; j<supsize; j++) {
                 if(! vars[tup[j].first].inDomain(tup[j].second)) {
                     valid=false;
                     break;
@@ -1745,7 +1745,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             }
             
             if(valid) {
-                for(int j=0; j<supsize; j++) {
+                for(SysInt j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tup[j].first, tup[j].second);  //assignment.push_back(tuplist[i][j]);
                 }
                 tuple_list_pos[var][val_offset]=i;
@@ -1754,13 +1754,13 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
         
         
-        for(int i=0; i<tuple_list_pos[var][val_offset]; i++) {
+        for(SysInt i=0; i<tuple_list_pos[var][val_offset]; i++) {
             vector<pair<SysInt, DomainInt> > & tup=*(tuplist[i]);
             
-            int supsize=tup.size();
+            SysInt supsize=tup.size();
             bool valid=true;
             
-            for(int j=0; j<supsize; j++) {
+            for(SysInt j=0; j<supsize; j++) {
                 if(! vars[tup[j].first].inDomain(tup[j].second)) {
                     valid=false;
                     break;
@@ -1768,7 +1768,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             }
             
             if(valid) {
-                for(int j=0; j<supsize; j++) {
+                for(SysInt j=0; j<supsize; j++) {
                     ADDTOASSIGNMENT(tup[j].first, tup[j].second);  //assignment.push_back(tuplist[i][j]);
                 }
                 tuple_list_pos[var][val_offset]=i;
@@ -1779,7 +1779,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     }
     
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
         // XXXXXXX : Fix this
         return true;
@@ -1804,10 +1804,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     {
         /*tuple_nd_list.reserve(shortsupports.size());
         // Copy them in.
-        vector<tuple<int,int,int> > temp;
-        for(int i=0; i<shortsupports.size(); i++) {
+        vector<tuple<SysInt,SysInt,SysInt> > temp;
+        for(SysInt i=0; i<shortsupports.size(); i++) {
             temp.clear();
-            for(int j=0; j<shortsupports[i].size(); j++) {
+            for(SysInt j=0; j<shortsupports[i].size(); j++) {
                 temp.push_back(make_tuple(shortsupports[i][j].first, shortsupports[i][j].second, 0));
             }
             tuple_nd_list.push_back(temp);
@@ -1815,20 +1815,20 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
         // Uses fact that no forward pointer can ever be 0.
         
-        for(int i=0; i<tuple_nd_list.size(); i++) {
-            vector<tuple<int,int,int> > & tup=tuple_nd_list[i];
+        for(SysInt i=0; i<tuple_nd_list.size(); i++) {
+            vector<tuple<SysInt,SysInt,SysInt> > & tup=tuple_nd_list[i];
             
-            for(int j=i+1; j<tuple_nd_list.size(); j++) {
+            for(SysInt j=i+1; j<tuple_nd_list.size(); j++) {
                 bool all_lits_ptr_set=true;
                 
                 // Iterate through tup and set some ptrs to j if possible.
-                for(int litnum=0; litnum<tup.size(); litnum++) {
+                for(SysInt litnum=0; litnum<tup.size(); litnum++) {
                     if(tup[litnum].get<2>()==0) {
-                        int var=tup[litnum].get<0>();
+                        SysInt var=tup[litnum].get<0>();
                         DomainInt val=tup[litnum].get<1>();
                         // Is j different for var 
                         bool jdiff=true;
-                        for(int litnumj=0; litnumj<tuple_nd_list[j].size(); litnumj++) {
+                        for(SysInt litnumj=0; litnumj<tuple_nd_list[j].size(); litnumj++) {
                             if(tuple_nd_list[j][litnumj].get<0>()==var && tuple_nd_list[j][litnumj].get<1>()==val) {
                                 jdiff=false;  // Found the exact same literal. So tuple j is same for var.
                                 break;
@@ -1847,7 +1847,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             }
             
             // set any remaining 0's to infinity -- i.e. jump past the end.
-            for(int litnum=0; litnum<tup.size(); litnum++) {
+            for(SysInt litnum=0; litnum<tup.size(); litnum++) {
                 if(tup[litnum].get<2>()==0) {
                     tup[litnum].get<2>()=tuple_nd_list.size();
                 }
@@ -1855,17 +1855,17 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
     }
     
-    //bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
-    bool findNewSupport(int var, DomainInt val) {
-        int pos=tuple_list_pos[var][val-vars[var].getInitialMin()];
-        int listsize=tuple_nd_list.size();
+    //bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    bool findNewSupport(SysInt var, DomainInt val) {
+        SysInt pos=tuple_list_pos[var][val-vars[var].getInitialMin()];
+        SysInt listsize=tuple_nd_list.size();
         
         while(pos<listsize) {
-            vector<tuple<int,int,int> > & tup=tuple_nd_list[pos];
+            vector<tuple<SysInt,SysInt,SysInt> > & tup=tuple_nd_list[pos];
             bool valid=true;
             
-            int tupsize=tup.size();
-            for(int j=0; j<tupsize; j++) {
+            SysInt tupsize=tup.size();
+            for(SysInt j=0; j<tupsize; j++) {
                 // If the literal is out of domain, OR includes var but not val, then jump.
                 if((! vars[tup[j].get<0>()].inDomain(tup[j].get<1>()) ) || 
                     (tup[j].get<0>()==var && tup[j].get<1>()!=val) ) {
@@ -1876,7 +1876,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             }
             if(valid) {
                 // Found a support
-                for(int j=0; j<tupsize; j++) {
+                for(SysInt j=0; j<tupsize; j++) {
                     ADDTOASSIGNMENT(tup[j].get<0>(), tup[j].get<1>());
                 }
                 tuple_list_pos[var][val-vars[var].getInitialMin()]=pos;
@@ -1887,14 +1887,14 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         // Restart at position 0
         pos=0;
         
-        int oldpos=tuple_list_pos[var][val-vars[var].getInitialMin()];
+        SysInt oldpos=tuple_list_pos[var][val-vars[var].getInitialMin()];
         
         while(pos<oldpos) {
-            vector<tuple<int,int,int> > & tup=tuple_nd_list[pos];
+            vector<tuple<SysInt,SysInt,SysInt> > & tup=tuple_nd_list[pos];
             bool valid=true;
             
-            int tupsize=tup.size();
-            for(int j=0; j<tupsize; j++) {
+            SysInt tupsize=tup.size();
+            for(SysInt j=0; j<tupsize; j++) {
                 // If the literal is out of domain, OR includes var but not val, then jump.
                 if((! vars[tup[j].get<0>()].inDomain(tup[j].get<1>()) ) || 
                     (tup[j].get<0>()==var && tup[j].get<1>()!=val) ) {
@@ -1905,7 +1905,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             }
             if(valid) {
                 // Found a support
-                for(int j=0; j<tupsize; j++) {
+                for(SysInt j=0; j<tupsize; j++) {
                     ADDTOASSIGNMENT(tup[j].get<0>(), tup[j].get<1>());
                 }
                 tuple_list_pos[var][val-vars[var].getInitialMin()]=pos;
@@ -1915,12 +1915,12 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         return false;
     }
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
         // argh, how to do this.
         // test with element first
         
-        int idx=v[array_size-2];
+        SysInt idx=v[array_size-2];
         if(idx<0 || idx>=array_size-2) return false;
         return v[v[array_size-2]] == v[array_size-1];
     }
@@ -1934,13 +1934,13 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     //  Square packing.
     // Expects x1,y1, x2,y2, boxsize1, boxsize2 (constant)
 
-    // bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
-    bool findNewSupport(int var, DomainInt val) {
+    // bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    bool findNewSupport(SysInt var, DomainInt val) {
         D_ASSERT(vars[4].isAssigned());
         D_ASSERT(vars[5].isAssigned());
         
-        int i=vars[4].getAssignedValue();
-        int j=vars[5].getAssignedValue();
+        SysInt i=vars[4].getAssignedValue();
+        SysInt j=vars[5].getAssignedValue();
         
         // If objects totally disjoint in either dimension...
         // x
@@ -2050,7 +2050,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         return false;
     }
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
         // argh, how to do this.
         // test with element first
@@ -2085,13 +2085,13 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     //  Square packing with full-length supports
     // Expects x1,y1, x2,y2, boxsize1, boxsize2 (constant).
 
-    // bool findNewSupport(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
-    bool findNewSupport(int var, DomainInt val) {
+    // bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    bool findNewSupport(SysInt var, DomainInt val) {
         D_ASSERT(vars[4].isAssigned());
         D_ASSERT(vars[5].isAssigned());
         
-        int i=vars[4].getAssignedValue();
-        int j=vars[5].getAssignedValue();
+        SysInt i=vars[4].getAssignedValue();
+        SysInt j=vars[5].getAssignedValue();
         
         // object i below object j.
         if(vars[1].getMin()+i <=vars[3].getMax()) {
@@ -2213,7 +2213,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         return false;
     }
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
         // argh, how to do this.
         // test with element first
@@ -2261,7 +2261,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
        litsWithLostExplicitSupport.resize(0);
        varsWithLostImplicitSupport.resize(0); 
 
-       for(int i=0; i<vars.size(); i++) { 
+       for(SysInt i=0; i<vars.size(); i++) { 
                varsWithLostImplicitSupport.push_back(i);
        }
 
