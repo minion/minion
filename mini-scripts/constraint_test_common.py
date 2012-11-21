@@ -1657,7 +1657,9 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         if reifyimply:
             constrainttable="reifyimply("
         
-        constrainttable+="table(["
+        tablename = { 0 : "table", 1 : "lighttable", 2 : "gacschema"} [random.randint(0,2)]
+
+        constrainttable+=tablename + "(["
         
         startidx=0
         if reify or reifyimply: startidx=1

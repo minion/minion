@@ -22,9 +22,15 @@
 // Does it place dynamic triggers for the supports.
 //#define SupportsGACUseDT true
 
+#include "../constraints/constraint_checkassign.h"
+
 template<typename VarArray>
 struct GACSchema : public AbstractConstraint, Backtrackable
 {
+    virtual AbstractConstraint* reverse_constraint()
+    { return forward_check_negation(stateObj, this); }
+
+
     struct Support {
         vector<Support*> prev;   // Size r -- some entries null.
         vector<Support*> next;   

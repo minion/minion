@@ -31,6 +31,7 @@
 
 #include <algorithm>
 #include "boost/tuple/tuple_comparison.hpp"
+#include "../constraints/constraint_checkassign.h"
 
 // Default will be List.   
 // If any special case is defined list will be switched off
@@ -151,6 +152,9 @@
 template<typename VarArray>
 struct HaggisGACStable : public AbstractConstraint, Backtrackable
 {
+    virtual AbstractConstraint* reverse_constraint()
+    { return forward_check_negation(stateObj, this); }
+
     struct Support ; 
 
     struct SupportCell { 

@@ -164,6 +164,7 @@ class TableState
   /// The constructor of TableState should set up all structures to 'sensible'
   /// default values. It should not look for actual valid supports.
 public:
+
   TableState(TableData* _data) : data(_data)
   { scratch_tuple.resize(checked_cast<SysInt>(data->getVarCount())); }
 
@@ -204,6 +205,7 @@ public:
 template<typename VarArray, typename TableDataType = TrieData, typename TableStateType = TrieState>
 struct NewTableConstraint : public AbstractConstraint
 {
+
   virtual string extended_name()
   { return "table(new)"; }
 
