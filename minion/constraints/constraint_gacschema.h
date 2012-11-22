@@ -536,18 +536,18 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     
     #define ADDTOASSIGNMENTFL(var, val) assignment.push_back(make_pair(var,val));
   
-      bool findNewSupportList(box<pair<int, DomainInt> >& assignment, int var, DomainInt val) {
+      bool findNewSupportList(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
         D_ASSERT(vars[var].inDomain(val));
         
         vector<vector<DomainInt>* > & tups=tuple_lists[var][checked_cast<SysInt>(val-vars[var].getInitialMin())];
         
-        int cur=tuple_list_pos[var][checked_cast<SysInt>(val-vars[var].getInitialMin())];
-        int numtups=tups.size();
-        int numvars=vars.size();
+        SysInt cur=tuple_list_pos[var][checked_cast<SysInt>(val-vars[var].getInitialMin())];
+        SysInt numtups=tups.size();
+        SysInt numvars=vars.size();
         for( ; cur<numtups; cur++) {
             vector<DomainInt>& tup=*(tups[cur]);
             bool valid=true;
-            for(int i=0; i<numvars; i++) {
+            for(SysInt i=0; i<numvars; i++) {
                 if(!vars[i].inDomain(tup[i])) {
                     valid=false;
                     break;
@@ -555,7 +555,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
             }
             if(valid) {
                 // Copy into the box
-                for(int i=0; i<numvars; i++) {
+                for(SysInt i=0; i<numvars; i++) {
                     assignment.push_back(make_pair(i,tup[i]));
                 }
                 tuple_list_pos[var][checked_cast<SysInt>(val-vars[var].getInitialMin())]=cur;
