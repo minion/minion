@@ -173,13 +173,16 @@ endif()
 
 # This used to be in Static, but there is no reason not to always do it
 
+if(MACRELEASE)
+    set(CFLAGS "${CFLAGS} -m32 -mtune=prescott -march=prescott -ffast-math")
+    set(CMAKE_CXX_COMPILER "g++-4.2")
+    set(CMAKE_C_COMPILER "gcc-4.2")
+endif()
+
 if(APPLEMAC)
     set(Boost_USE_STATIC_LIBS true)
 #    add_definitions(-mmacosx-version-min=10.5)
 #    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.5 )
-    set(CFLAGS "${CFLAGS} -m32 -mtune=prescott -march=prescott -ffast-math")
-    set(CMAKE_CXX_COMPILER "g++-4.2")
-    set(CMAKE_C_COMPILER "gcc-4.2")
  endif()
 
 option(STATIC "" OFF)
