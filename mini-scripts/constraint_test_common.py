@@ -660,7 +660,6 @@ class testhaggisgac:
     def printtable(self, domains):
         cross=[]
         crossprod(domains, [], cross)
-        print("!!")
         return makeRandomShortTuples(cross)
 
     def runtest(self, options=dict()):
