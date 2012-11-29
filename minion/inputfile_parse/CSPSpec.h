@@ -57,6 +57,7 @@ enum ReadTypes
   read_constant,
   read_constant_list,
   read_tuples,
+  read_short_tuples,
   read_constraint,
   read_constraint_list,
   read_nothing

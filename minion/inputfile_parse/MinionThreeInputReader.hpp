@@ -520,7 +520,8 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 #endif
 
     default:
-    if(constraint->read_types.size() >= 2 && constraint->read_types[1] == read_tuples)
+    if(constraint->read_types.size() >= 2 && 
+         (constraint->read_types[1] == read_tuples || constraint->read_types[1] == read_short_tuples) )
       return readConstraintTable(infile, constraint);
     else
       return readGeneralConstraint(infile, constraint);
@@ -539,23 +540,54 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
   con.tuples = readConstraintTupleList(infile);
   infile->check_sym(')');
   
-  if(con.vars[0].size() != con.tuples->tuple_size())
+  if(def->read_types[1] == read_tuples)
   {
-    throw parse_exception("Tuple constraint with " + to_string(con.vars[0].size()) + 
-                          " variables cannot have tuples of length " + to_string(con.tuples->tuple_size()));
+    if(con.vars[0].size() != con.tuples->tuple_size())
+    {
+      throw parse_exception("Tuple constraint with " + to_string(con.vars[0].size()) + 
+                            " variables cannot have tuples of length " + to_string(con.tuples->tuple_size()));
+    }
   }
-  
+  else
+  {
+    D_ASSERT(def->read_types[1] == read_short_tuples);
+    if(con.tuples->size() != 1)
+    {
+      throw parse_exception("The tuplelist for a constraint using short tuples must have 1 tuple in it!");
+    }
+  }
+
+  if(def->read_types[1] == read_short_tuples)
+  {
+    D_ASSERT(con.tuples->size() == 1)
+    DomainInt* tup_data = con.tuples->getPointer();
+    if(con.tuples->tuple_size() == 2)
+    {
+      if(tup_data[0] == -1 && tup_data[1] == -1)
+        return ConstraintBlob(get_constraint(CT_FALSE));
+    }
+
+    if(con.tuples->tuple_size() == 4)
+    {
+      if(tup_data[0] == -1 && tup_data[1] == -1 && tup_data[2] == -1 && tup_data[3] == -1)
+        return ConstraintBlob(get_constraint(CT_TRUE));
+    }
+  }
+
   if(con.vars[0].size() == 0)
   {
-#if defined(CT_TRUE_ABC) && defined(CT_FALSE_ABC)
-    // Either trivially true, or trivially false, depending on how many tuples there are.
-    if(con.tuples->size() != 0)
-      return ConstraintBlob(get_constraint(CT_TRUE));
+    if(def->read_types[1] == read_tuples)
+    {
+      // Either trivially true, or trivially false, depending on how many tuples there are.
+      if(con.tuples->size() != 0)
+        return ConstraintBlob(get_constraint(CT_TRUE));
+      else
+        return ConstraintBlob(get_constraint(CT_FALSE));
+    }
     else
-      return ConstraintBlob(get_constraint(CT_FALSE));
-#else
-    throw parse_exception("Need the 'true' and 'false' constraints enable for empty table constraints!");
-#endif
+    {
+      throw parse_exception("Not a valid list of short tuples for a constraint with no variables!");
+    }
   }  
   
   return con;
@@ -612,6 +644,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
       con.internal_constraints = readConstraintList(infile);
       break;
       case read_tuples:
+      case read_short_tuples:
       con.tuples = readConstraintTupleList(infile);
       break;
       default:

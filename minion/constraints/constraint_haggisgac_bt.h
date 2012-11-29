@@ -1727,7 +1727,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     //bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
     bool findNewSupport(SysInt var, DomainInt val) {
         D_ASSERT(tuple_lists.size()==vars.size());
-        const SysInt val_offset = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
+        const SysInt val_offset = checked_cast<SysInt>(val-vars[var].getInitialMin());
         const vector<vector<pair<SysInt, DomainInt> > * >& tuplist=tuple_lists[var][val_offset]; 
         
         SysInt listsize=tuplist.size();

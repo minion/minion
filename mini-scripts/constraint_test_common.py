@@ -438,6 +438,56 @@ def comparetrees2(name1, name2, same):
 
 import random
 
+def makeRandomTuples(domainlist):
+    if random.randint(0,30) == 0:
+        return []
+    if random.randint(0,30) == 0:
+        return domainlist
+    randchance = random.random()
+    return list(filter(lambda x : random.random() < randchance, domainlist))
+
+def makeRandomShortTuples(domainlist):
+    if len(domainlist) == 0:
+        return (domainlist,domainlist)
+    size = random.randint(0,len(domainlist))
+    freechance = random.random()
+    shorttuples = []
+    for i in range(size):
+        tup = list(random.choice(domainlist))
+        for i in range(len(tup)):
+            if(random.random() > freechance):
+                tup[i] = None
+        shorttuples += [tup]
+
+    # Now make the long tuples
+
+    longtuples = []
+    for tup in domainlist:
+        found = False
+        for short in shorttuples:
+            match = True
+            for i in range(len(tup)):
+                if (short[i] != None) and (tup[i] != short[i]):
+                    match = False
+            if match == True:
+                found = True
+        if found:
+            longtuples += [tup]
+
+    # Make output short tuples
+
+    outputshort = []
+    if len(shorttuples) == 0:
+        outputshort = [-1, -1]
+    
+    for tup in shorttuples:
+        for i in range(len(tup)):
+            if tup[i] != None:
+                outputshort += [i, tup[i]]
+        outputshort += [-1,-1]
+    return ([outputshort], longtuples)
+
+
 sys.setrecursionlimit(5000)
 
 class testlexleq:
@@ -587,116 +637,57 @@ class testwatchelement_one(testelement_one):
         return runtestgeneral("watchelement_one", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
 
 class testlighttable:
-    def printtable(self, domains, tab):
-        return tab
-    
-    def randomtable(self, domains):
+    def printtable(self, domains):
         cross=[]
-        crossprod(domains,[], cross)
-        temp=random.sample(cross, len(cross)/10)
-        temp.sort()
-        return temp
-    
-    def runtest(self, options=dict()):
-        constraintname="lighttable"
-        varnums=[5]
-        vartypes=["quitesmallnum"]
-        howprintvars=[5]
-        tablegen=self
-        treesame=True
-        
-        (domlists, modvars, tablevars, constants, diseq_constraints)=generatevariables(varnums, vartypes, False)
-        
-        curvar=0
-        constraint=constraintname+"("
-        
-        constnum=1   # number of the current const.
-        
-        for i in howprintvars:
-            if i=="const":
-                const=random.randint(-20, 20)
-                setattr(tablegen, "const%d"%constnum, const)
-                constraint+="%d,"%const
-                constnum+=1
-            elif i=="smallconst":
-                const=random.randint(-5, 5)
-                setattr(tablegen, "const%d"%constnum, const)
-                constraint+="%d,"%const
-                constnum+=1
-            elif i>1:
-                #print vector
-                constraint+="[x%d"%curvar
-                curvar+=1
-                for e in range(i-1):
-                    constraint+=", x%d"%curvar
-                    curvar+=1
-                constraint+="],"
-            else:
-                assert i==1
-                #print single variable.
-                constraint+="x%d,"%curvar
-                curvar+=1
-        
-        constraint=constraint[:-1]+",modtable)"   # hack off the last comma and put a bracket
-        
-        toopt=random.randint(0,3)
-        optvar=random.randint(0, sum(varnums)-1)
-        
-        optline=False
-        if toopt==0:
-            # 1 in 4 chance
-            minmax=random.randint(0,1)
-            if minmax==1:
-                optline="MAXIMIZING x%d"%optvar
-            else:
-                optline="MINIMIZING x%d"%optvar
-        
-        negtuplelist=tablegen.randomtable(domlists)
-        tuplelist=tablegen.printtable(domlists, negtuplelist)
-        
-        # now convert tuplelist into a string.
-        tuplestring="modtable %d %d \n"%(len(tuplelist), sum(varnums))
-        for l in tuplelist:
-            for e in l:
-                tuplestring+="%d "%e
-            tuplestring+="\n"
-        
-        negtuplestring="modtable %d %d \n"%(len(negtuplelist), sum(varnums))
-        for l in negtuplelist:
-            for e in l:
-                negtuplestring+="%d "%e
-            negtuplestring+="\n"
-        # tuplelist is actually a set of lists(not yet), so that it can be reformed for reify or reifyimply
-        
-        constrainttable="table([x0"
-        for i in range(1,sum(varnums)):
-            constrainttable+=",x%d"%i
-        constrainttable+="], modtable)"
-        
-        # add some other constraints at random into the constraint and constrainttable strings
-        if random.randint(0,1)==0:
-            for i in range(sum(varnums)-2):
-                var1=random.randint(0, sum(varnums)-1)
-                var2=random.randint(0, sum(varnums)-1)
-                while var1==var2: 
-                    var2=random.randint(0, sum(varnums)-1)
-                ctype=random.randint(0,2)
-                if ctype==0:
-                    c="diseq(x%d, x%d)"%(var1, var2)
-                elif ctype==1:
-                    c="eq(x%d, x%d)"%(var1, var2)
-                elif ctype==2:
-                    c="ineq(x%d, x%d, 0)"%(var1, var2)
-                constraint+="\n"+c
-                constrainttable+="\n"+c
-        
-        retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
-        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, tuplelist=negtuplestring, opt=optline, printcmd=options['printcmd'])
-        if retval1!=0 or retval2!=0:
-            print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
-            return False
-        return comparetrees(treesame)  # tree subset
+        crossprod(domains, [], cross)
+        tups=makeRandomTuples(cross)
+        return (tups,tups)
 
+    def runtest(self, options=dict()):
+        options['tabletype'] = "longtable"
+        return runtestgeneral("lighttable", False, options, [4], ["smallnum"], self, not options['reify'])
+
+class testgacschema:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        tups=makeRandomTuples(cross)
+        return (tups, tups)
+
+    def runtest(self, options=dict()):
+        options['tabletype'] = "longtable"
+        return runtestgeneral("gacschema", False, options, [4], ["smallnum"], self, not options['reify'])
+
+class testhaggisgac:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        print("!!")
+        return makeRandomShortTuples(cross)
+
+    def runtest(self, options=dict()):
+        options['tabletype'] = "shorttable"
+        return runtestgeneral("haggisgac", False, options, [4], ["smallnum"], self, not options['reify'])
+
+class testhaggisgac__minus__stable:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        return makeRandomShortTuples(cross)
+
+    def runtest(self, options=dict()):
+        options['tabletype'] = "shorttable"
+        return runtestgeneral("haggisgac-stable", False, options, [4], ["smallnum"], self, not options['reify'])
+
+class testeggshell:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        return makeRandomShortTuples(cross)
+
+    def runtest(self, options=dict()):
+        options['tabletype'] = "shorttable"
+        return runtestgeneral("eggshell", False, options, [4], ["smallnum"], self, not options['reify'])
 
 class testnegativetable:
     def printtable(self, domains, tab):
@@ -1471,6 +1462,11 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     reifyimply=options['reifyimply']
     reify=options['reify']
     fullprop=options['fullprop']
+
+    tabletype = None
+    if options.has_key('tabletype'):
+        tabletype = options['tabletype']
+
     
     # some constraints require arrays of a certain length. THis stops the length being randomly changed.
     if reify or reifyimply:
@@ -1512,6 +1508,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         isvector3=isvector[1:]
     
     constraint=constraintname+"("
+    basictable=None
     
     constnum=0   # number of the current constant
     
@@ -1543,6 +1540,9 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
             constraint+="x%d,"%curvar
             curvar+=1
     
+    if tabletype != None:
+        constraint += "basictable,"
+
     constraint=constraint[:-1]+")"   # hack off the last comma and put a bracket
     
     if reify:
@@ -1586,6 +1586,15 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         tuplelist=tablegen.printtable(domlists[1:])
     else:
         tuplelist=tablegen.printtable(domlists)
+
+    # Yuk! At this point, if we have a short set of tuples we have to
+    # seperate them out. Let's do that here!
+
+    if tabletype != None:
+        print(tuplelist)
+        (basictable, rawtuples) = tuplelist
+        tuplelist = rawtuples
+
     
     if tuplelist is False:
         # For some reason the printtable function rejected the domlists
@@ -1635,6 +1644,19 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         for e in l:
             tuplestring+="%d "%e
         tuplestring+="\n"
+
+    output2tuples = ""
+    if tabletype != None:
+        if tabletype == "longtable":
+            output2tuples="basictable %d %d \n"%(len(basictable), numtablevars)
+        if tabletype == "shorttable":
+            output2tuples="basictable %d %d \n"%(len(basictable[0]), 1)
+        for l in basictable:
+            for e in l:
+                output2tuples+="%d "%e
+            output2tuples+="\n"
+
+
    
     constrainttable = ""
 
@@ -1654,8 +1676,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     if not mergereifyintotable:
         if reify or reifyimply:
             constrainttable+=",x0)"   # add on reification variable
-
-    print(constrainttable)    
+   
     constraintlist = []
     # add some other constraints at random into the constraint and constrainttable strings
     if random.randint(0,1)==0:
@@ -1698,7 +1719,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     
     if not fullprop:
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
-        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, opt=optline, printcmd=options['printcmd'])
+        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, tuplelist=output2tuples, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
             print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
             return False
@@ -1737,7 +1758,7 @@ def generatevariables(varblocks, types, boundallowed):
     st_table=[]
     domainlists=[]
     constants=[]
-    typesconst=["const", "smallconst", "smallconst_distinct"]
+    typesconst=["const", "smallconst", "smallconst_distinct", "longtable"]
     constraints=[]   # extra constraints needed to adjust domain when Discrete is substituted for Sparsebound
     varblocks2=varblocks[:]
     for (i,t) in zip(range(len(varblocks)), types):

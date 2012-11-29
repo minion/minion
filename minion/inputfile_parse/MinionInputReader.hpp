@@ -258,7 +258,7 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
       }
         break;  
       default:
-        D_FATAL_ERROR("Internal Error!");
+        D_FATAL_ERROR("short tuple constraints cannot be used in a MINION 1 or 2 format file. Sorry.");
     }
     if(i != def->number_of_params - 1)
       infile->check_sym(',');

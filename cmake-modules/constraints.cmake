@@ -142,13 +142,13 @@ set(NAME_ID_table "CT_WATCHED_TABLE")
 set(NAME_READ_table "read_list" "read_tuples")
 
 set(NAME_ID_haggisgac "CT_HAGGISGAC")
-set(NAME_READ_haggisgac "read_list" "read_tuples")
+set(NAME_READ_haggisgac "read_list" "read_short_tuples")
 
 set(NAME_ID_haggisgac-stable "CT_HAGGISGAC_STABLE")
-set(NAME_READ_haggisgac-stable "read_list" "read_tuples")
+set(NAME_READ_haggisgac-stable "read_list" "read_short_tuples")
 
 set(NAME_ID_eggshell "CT_EGGSHELL")
-set(NAME_READ_eggshell "read_list" "read_tuples")
+set(NAME_READ_eggshell "read_list" "read_short_tuples")
 
 set(NAME_ID_negativetable "CT_WATCHED_NEGATIVE_TABLE")
 set(NAME_READ_negativetable "read_list" "read_tuples")

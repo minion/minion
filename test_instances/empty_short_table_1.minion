@@ -1,0 +1,21 @@
+MINION 3
+#TEST SOLCOUNT 0
+
+**VARIABLES**
+
+DISCRETE d[2] {0..9}
+
+**TUPLELIST**
+
+Second 1 2
+-1 -1
+
+**SEARCH**
+
+PRINT [d]
+
+**CONSTRAINTS**
+
+haggisgac([d[0],d[1]],Second)
+
+**EOF**

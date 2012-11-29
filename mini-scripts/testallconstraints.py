@@ -20,7 +20,7 @@ conslist=[]
 
 
 # equality constraints
-conslist+=["diseq", "eq"]
+conslist+=["diseq", "eq", "gaceq"]
 
 # alldiffs
 conslist+=["alldiff", "gacalldiff"]
@@ -61,6 +61,8 @@ conslist+=["w-inset", "w-notinset", "w-inrange", "w-notinrange", "w-literal", "w
 
 conslist+=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
 conslist+=["not-hamming"]
+
+conslist+=["gacschema", "haggisgac", "haggisgac-stable", "eggshell"]
 # add reifyimply variant of all constraints,
 # and reify variant of all except those in reifyexceptions
 it=conslist[:]

@@ -111,6 +111,7 @@ void print_instance(const ConstraintBlob& blob)
         print_instance( blob.constants[const_pos++]);
         break;
       case read_tuples:
+      case read_short_tuples:
         oss << csp.getTableName(blob.tuples);
       break;
       case read_constraint:
