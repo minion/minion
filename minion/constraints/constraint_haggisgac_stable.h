@@ -152,6 +152,8 @@
 template<typename VarArray>
 struct HaggisGACStable : public AbstractConstraint, Backtrackable
 {
+    #include "constraint_haggisgac_common.h"
+
     virtual AbstractConstraint* reverse_constraint()
     { return forward_check_negation(stateObj, this); }
 
@@ -1207,7 +1209,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
             // MAKE_STACK_BOX(newsupportbox, temptype, vars.size()); 
             literalsScratch.clear(); 
             // bool foundsupport=findNewSupport(newsupportbox, var, val);
-            bool foundsupport=findNewSupport(var, val);
+            bool foundsupport=findNewSupport<false>(var, val);
             
             if(!foundsupport) {
                 vars[var].removeFromDomain(val);        
@@ -1945,15 +1947,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     }
     
     
-    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
-    {
-        // argh, how to do this.
-        // test with element first
-        
-        SysInt idx=v[array_size-2];
-        if(idx<0 || idx>=array_size-2) return false;
-        return v[v[array_size-2]] == v[array_size-1];
-    }
+
 
 #endif
 
@@ -1964,6 +1958,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     //  Table of short supports passed in.
     
     //bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, SysInt val) {
+    template<bool keepassigned>
     bool findNewSupport(SysInt var, DomainInt val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         const SysInt val_offset = checked_cast<SysInt>(val-vars[var].getInitialMin());
@@ -2017,16 +2012,6 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         return false;
     }
     
-    
-    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
-    {
-        // argh, how to do this.
-        // test with element first
-        abort();
-//        DomainInt idx=v[array_size-2];
-//        if(idx<0 || idx>=array_size-2) return false;
-//        return v[v[array_size-2]] == v[array_size-1];
-    }
 
 #endif
 
