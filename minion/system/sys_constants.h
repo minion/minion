@@ -40,8 +40,7 @@ typedef int SysInt;
 typedef unsigned int UnsignedSysInt;
 #endif
 
-/// A big constant, when such a thing is needed.
-const SysInt big_constant = 999999;
+
 
 #ifdef MINION_DEBUG
 #ifndef BOUNDS_CHECK
@@ -58,6 +57,9 @@ typedef SysInt DomainInt;
 // Put a ' -1, +1 ' just to have some slack
 const DomainInt DomainInt_Max = std::numeric_limits<SysInt>::max() / 2 - 1;
 const DomainInt DomainInt_Min = std::numeric_limits<SysInt>::min() / 2 + 1;
+
+/// A big constant, when such a thing is needed.
+const SysInt DomainInt_Skip = std::numeric_limits<SysInt>::max();
 
 template<typename To, typename From>
 To checked_cast(const From& t)

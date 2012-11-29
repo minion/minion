@@ -85,7 +85,7 @@ class TupleList
   
   TupleList(const vector<vector<DomainInt> >& tuple_list) : 
     litlists(NULL), nightingale(NULL), triearray(NULL), 
-    regin(NULL),  tuples_locked(false)
+    regin(NULL),  egg(NULL), tuples_locked(false)
   {
     number_of_tuples = tuple_list.size();
     tuple_length = tuple_list[0].size();
@@ -98,7 +98,7 @@ class TupleList
   
   TupleList(DomainInt _numtuples, DomainInt _tuplelength) :
      litlists(NULL), nightingale(NULL), triearray(NULL),
-     regin(NULL), tuple_length(checked_cast<SysInt>(_tuplelength)),
+     regin(NULL), egg(NULL), tuple_length(checked_cast<SysInt>(_tuplelength)),
      number_of_tuples(checked_cast<SysInt>(_numtuples)), tuples_locked(false)
   { tuple_data = new DomainInt[number_of_tuples * tuple_length]; }
   

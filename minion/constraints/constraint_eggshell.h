@@ -61,6 +61,7 @@ This constraint enforces generalized arc consistency.
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include "../constraints/constraint_checkassign.h"
 
 using namespace std;
 
@@ -197,7 +198,7 @@ struct EggShellData
             vector<DomainInt> encoded = _tuples->get_vector(0);
 
             vector<DomainInt> temp;
-            temp.resize(varsize, -1000000);
+            temp.resize(varsize, DomainInt_Skip);
 
             vector<pair<SysInt,DomainInt> > compressed_temp;
 
@@ -211,7 +212,7 @@ struct EggShellData
                     tuples.push_back(temp);
 
                     temp.clear();
-                    temp.resize(varsize, -1000000);
+                    temp.resize(varsize, DomainInt_Skip);
                     compressed_tuples.push_back(compressed_temp);
                     compressed_temp.clear();
                 }
@@ -323,14 +324,56 @@ struct EggShell : public AbstractConstraint
       return ret;
     }
     
-    virtual bool check_assignment(DomainInt* v, SysInt v_size) {
-        D_ASSERT(v_size == vars.size());
-        vector<DomainInt> temp;
-        for(SysInt i=0; i<v_size; i++) temp.push_back(v[i]);
-        return std::find(sct->tuples.begin(), sct->tuples.end(), temp)!=sct->tuples.end();
+    virtual bool check_assignment(DomainInt* v, SysInt v_size)
+    {
+        for(SysInt i = 0; i < sct->compressed_tuples.size(); ++i)
+        {
+            bool sat = true;
+            for(SysInt j = 0; j < sct->compressed_tuples[i].size(); ++j)
+            {
+                if(v[sct->compressed_tuples[i][j].first] != sct->compressed_tuples[i][j].second)
+                {
+                    sat = false;
+                    break;
+                }
+            }
+
+            if(sat)
+                return true;
+        }
+
+        return false;
     }
-    
-    virtual void propagate(SysInt prop_var, DomainDelta)
+
+    virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
+    {
+        for(SysInt i = 0; i < sct->compressed_tuples.size(); ++i)
+        {
+            bool sat = true;
+            for(SysInt j = 0; j < sct->compressed_tuples[i].size(); ++j)
+            {
+                if(!vars[sct->compressed_tuples[i][j].first].inDomain(sct->compressed_tuples[i][j].second))
+                {
+                    sat = false;
+                    break;
+                }
+            }
+
+            if(sat)
+            {
+                for(SysInt j = 0; j < sct->compressed_tuples[i].size(); ++j)
+                    assignment.push_back(sct->compressed_tuples[i][j]);
+                return true;
+            }
+        }
+
+        return false;
+    }
+  
+    virtual AbstractConstraint* reverse_constraint()
+    { return forward_check_negation(stateObj, this); }
+
+    virtual void propagate(DomainInt prop_var, DomainDelta)
     {
         sval.insert(prop_var);
         
@@ -388,7 +431,7 @@ struct EggShell : public AbstractConstraint
         for(SysInt j=0; j<sval.size; j++) {
             SysInt var=sval.vals[j];
             if(UseShort) {
-                if( (tau[var]!=-1000000) && !vars[var].inDomain(tau[var])) {
+                if( (tau[var]!=DomainInt_Skip) && !vars[var].inDomain(tau[var])) {
                     isvalid=false;
                     break;
                 }
@@ -475,7 +518,7 @@ struct EggShell : public AbstractConstraint
                 for(SysInt j=0; j<ssup.size; j++) {
                     SysInt var=ssup.vals[j];
                     
-                    if(UseShort && tau[var]==-1000000) {
+                    if(UseShort && tau[var]==DomainInt_Skip) {
                         ssup.unsafe_remove(var);
                         j--;
                         //if(vars[var].isAssigned()) ssup_permanent.remove(var);

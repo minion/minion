@@ -27,30 +27,31 @@
 template<typename VarArray>
 struct GACSchema : public AbstractConstraint, Backtrackable
 {
+    
     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  {
-    const SysInt tuple_size = checked_cast<SysInt>(data->tuple_size());
-    const SysInt length = checked_cast<SysInt>(data->size());
-    DomainInt* tuple_data = data->getPointer();
-
-    for(SysInt i = 0; i < length; ++i)
     {
-      DomainInt* tuple_start = tuple_data + i*tuple_size;
-      bool success = true;
-      for(SysInt j = 0; j < tuple_size && success; ++j)
-      {
-        if(!vars[j].inDomain(tuple_start[j]))
-          success = false;
-      }
-      if(success)
-      {
-        for(SysInt i = 0; i < tuple_size; ++i)
-          assignment.push_back(make_pair(i, tuple_start[i]));
-        return true;
-      }
+        const SysInt tuple_size = checked_cast<SysInt>(data->tuple_size());
+        const SysInt length = checked_cast<SysInt>(data->size());
+        DomainInt* tuple_data = data->getPointer();
+
+        for(SysInt i = 0; i < length; ++i)
+        {
+          DomainInt* tuple_start = tuple_data + i*tuple_size;
+          bool success = true;
+          for(SysInt j = 0; j < tuple_size && success; ++j)
+          {
+            if(!vars[j].inDomain(tuple_start[j]))
+              success = false;
+          }
+          if(success)
+          {
+            for(SysInt i = 0; i < tuple_size; ++i)
+                assignment.push_back(make_pair(i, tuple_start[i]));
+            return true;
+          }
+        }
+        return false;
     }
-    return false;
-  }
 
     virtual AbstractConstraint* reverse_constraint()
     { return forward_check_negation(stateObj, this); }
