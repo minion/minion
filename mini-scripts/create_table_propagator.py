@@ -587,6 +587,48 @@ def old_print_tree(tree, indent="    "):
             print indent+"}"
     return
 
+# dot output
+
+def outputdot(tree):
+    print "digraph test {"
+    
+    node2id={}
+    id2node={}
+    numbertree(tree, "0", node2id, id2node)
+    dotout=[]
+    treetodot(tree, dotout, node2id, id2node)
+    
+    print "\n".join(dotout)
+    print "}"
+
+# Give an arbitrary unique number to each node.
+# returns highest number used.
+def numbertree(tree, st, node2id, id2node):
+    tree['id']=st
+    node2id[tree['nodelabel']]=st
+    id2node[st]=tree['nodelabel']
+    if tree.has_key('left'):
+        numbertree(tree['left'], st+"0", node2id, id2node)
+    if tree.has_key('right'):
+        numbertree(tree['right'], st+"1", node2id, id2node)
+
+def treetodot(tree, dotout, node2id, id2node):
+    nodenumber=tree['id']
+    
+    if(tree.has_key('goto')):
+        dotout+=[ nodenumber+' [label="",shape=box];' ]
+        dotout+=[ nodenumber+" -> "+str(node2id[tree['goto']])+' [style=dashed]' ]
+    else:
+        dotout+=[ nodenumber+' [label="",shape=circle,color=red];']
+        
+    if tree.has_key('left'):
+        dotout+=[ nodenumber+" -> "+str(node2id[tree['left']['nodelabel']]) ]
+        treetodot(tree['left'], dotout, node2id, id2node)
+    if tree.has_key('right'):
+        dotout+=[ nodenumber+" -> "+str(node2id[tree['right']['nodelabel']]) ]
+        treetodot(tree['right'], dotout, node2id, id2node)
+    
+
 def vm_tree(tree, nodestarts, jumppoints, currentvm):
     nodestarts[tree['nodelabel']] = len(currentvm)
     if(tree.has_key('pruning')):
@@ -844,6 +886,8 @@ def choose_print_tree(t):
     print Comment, " Number of nodes explored by algorithm: "+str(calls_build_tree)
     if EnableVMOutput:
         print "**EOF**"
+    if EnableDotOutput:
+        outputdot(t)
 
 
 ################################################################################
@@ -1426,6 +1470,7 @@ if len(sys.argv) == 6:
 
 EnableVMOutput = eval(sys.argv[2])
 EnableSymDetection = eval(sys.argv[3])
+EnableDotOutput= False
 
 if EnableVMOutput:
     Comment = '#'
