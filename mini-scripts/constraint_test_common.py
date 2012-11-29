@@ -477,9 +477,7 @@ def makeRandomShortTuples(domainlist):
     # Make output short tuples
 
     outputshort = []
-    if len(shorttuples) == 0:
-        outputshort = [-1, -1]
-    
+
     for tup in shorttuples:
         for i in range(len(tup)):
             if tup[i] != None:
@@ -667,7 +665,7 @@ class testhaggisgac:
 
     def runtest(self, options=dict()):
         options['tabletype'] = "shorttable"
-        return runtestgeneral("haggisgac", False, options, [4], ["smallnum"], self, not options['reify'])
+        return runtestgeneral("haggisgac", False, options, [2], ["smallnum"], self, not options['reify'])
 
 class testhaggisgac__minus__stable:
     def printtable(self, domains):
@@ -1477,14 +1475,14 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     isvector=[a>1 for a in varnums]  # Is it to be printed as a vector. This seems to suffice at the moment.
     
     # sometimes (1/4) test very short constraints to find edge cases
-    shortvector=random.randint(0,3)
+    shortvector=random.randint(0,2)
     if shortvector==0 and not options["fixlength"]:
         # for each item in varnums which is greater than 1...
         varnumsused=[a for a in list(set(varnums)) if a>1]
         # pick one at random
         if len(varnumsused)>0:
             oldvalue=varnumsused[random.randint(0,len(varnumsused)-1)]
-            newvalue=random.randint(0,2)
+            newvalue=random.randint(0,oldvalue)
             # replace every instance of oldvalue so that we don't end up with
             # non-matching array lengths. But it could make arrays non-matching..perhaps
             for i in range(len(varnums)):
@@ -1591,7 +1589,6 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     # seperate them out. Let's do that here!
 
     if tabletype != None:
-        print(tuplelist)
         (basictable, rawtuples) = tuplelist
         tuplelist = rawtuples
 
@@ -1650,7 +1647,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         if tabletype == "longtable":
             output2tuples="basictable %d %d \n"%(len(basictable), numtablevars)
         if tabletype == "shorttable":
-            output2tuples="basictable %d %d \n"%(len(basictable[0]), 1)
+            output2tuples="basictable %d %d \n"%(1, len(basictable[0]))
         for l in basictable:
             for e in l:
                 output2tuples+="%d "%e

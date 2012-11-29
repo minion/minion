@@ -1051,7 +1051,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             // MAKE_STACK_BOX(newsupportbox, temptype, vars.size()); 
             literalsScratch.clear(); 
             // bool foundsupport=findNewSupport(newsupportbox, var, val);
-            bool foundsupport=findNewSupport(var, val);
+            bool foundsupport=findNewSupport<false>(var, val);
             
             if(!foundsupport) {
                 vars[var].removeFromDomain(val);        
@@ -1208,10 +1208,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
 
     // HERE will need to be changed for backtrack stability, i.e. added even if isAssigned. Or use FL
     
-    #define ADDTOASSIGNMENT(var, val) if(!vars[var].isAssigned()) literalsScratch.push_back(make_pair(var,val));
+    #define ADDTOASSIGNMENT(var, val) if(keepassigned || !vars[var].isAssigned()) literalsScratch.push_back(make_pair(var,val));
     
     // For full-length support variant:
-    #define ADDTOASSIGNMENTFL(var, val) if(!vars[var].isAssigned()) literalsScratch.push_back(make_pair(var,val));
+    #define ADDTOASSIGNMENTFL(var, val) if(keepassigned || !vars[var].isAssigned()) literalsScratch.push_back(make_pair(var,val));
     // #define ADDTOASSIGNMENTFL(var, val) literalsScratch.push_back(make_pair(var,val));
     
     
@@ -1705,16 +1705,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         return false;
     }
     
-    
-    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
-    {
-        // argh, how to do this.
-        // test with element first
-        
-        SysInt idx=v[array_size-2];
-        if(idx<0 || idx>=array_size-2) return false;
-        return v[v[array_size-2]] == v[array_size-1];
-    }
+
 
 #endif
 
@@ -1725,6 +1716,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     //  Table of short supports passed in.
     
     //bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    template<bool keepassigned>
     bool findNewSupport(SysInt var, DomainInt val) {
         D_ASSERT(tuple_lists.size()==vars.size());
         const SysInt val_offset = checked_cast<SysInt>(val-vars[var].getInitialMin());
@@ -1778,20 +1770,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         return false;
     }
     
-    
-    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
-    {
-        // XXXXXXX : Fix this
-        return true;
-        // argh, how to do this.
-        // test with element first
-        abort();
-//        DomainInt idx=v[array_size-2];
-  //      if(idx<0 || idx>=array_size-2) return false;
-    //    return v[checked_cast<SysInt>(v[array_size-2])] == v[array_size-1];
-    }
-
 #endif
+
+
+#include "constraint_haggisgac_common.h"
 
 #if UseNDOneList
 

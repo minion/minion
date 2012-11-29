@@ -7,8 +7,8 @@ DISCRETE d[2] {0..9}
 
 **TUPLELIST**
 
-Second 1 4
--1 -1 -1 -1
+Second 1 2
+-1 -1
 
 **SEARCH**
 

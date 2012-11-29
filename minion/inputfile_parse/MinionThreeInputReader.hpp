@@ -561,15 +561,14 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
   {
     D_ASSERT(con.tuples->size() == 1)
     DomainInt* tup_data = con.tuples->getPointer();
-    if(con.tuples->tuple_size() == 2)
+    if(con.tuples->tuple_size() == 0)
     {
-      if(tup_data[0] == -1 && tup_data[1] == -1)
         return ConstraintBlob(get_constraint(CT_FALSE));
     }
 
-    if(con.tuples->tuple_size() == 4)
+    if(con.tuples->tuple_size() == 2)
     {
-      if(tup_data[0] == -1 && tup_data[1] == -1 && tup_data[2] == -1 && tup_data[3] == -1)
+      if(tup_data[0] == -1 && tup_data[1] == -1)
         return ConstraintBlob(get_constraint(CT_TRUE));
     }
   }
