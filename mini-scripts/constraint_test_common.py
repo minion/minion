@@ -1645,7 +1645,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     output2tuples = ""
     if tabletype != None:
         if tabletype == "longtable":
-            output2tuples="basictable %d %d \n"%(len(basictable), numtablevars)
+            output2tuples="basictable %d %d \n"%(len(basictable), sum(varnums3))
         if tabletype == "shorttable":
             output2tuples="basictable %d %d \n"%(1, len(basictable[0]))
         for l in basictable:
