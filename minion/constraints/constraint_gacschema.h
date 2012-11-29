@@ -27,7 +27,7 @@
 template<typename VarArray>
 struct GACSchema : public AbstractConstraint, Backtrackable
 {
-    
+
     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
     {
         const SysInt tuple_size = checked_cast<SysInt>(data->tuple_size());
@@ -602,7 +602,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     
     virtual void full_propagate()
     {
-        D_ASSERT(backtrack_stack.size()==0);
+        //D_ASSERT(backtrack_stack.size()==0);
         if(data->size() == 0)
         {
             getState(stateObj).setFailed(true);
