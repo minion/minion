@@ -248,6 +248,12 @@ public:
 #ifdef WDEG
       if(getOptions(stateObj).wdeg_on && getState(stateObj).isFailed()) trig->incWdeg();
 #endif
+
+      if(getState(stateObj).isFailed())
+      {
+        clearQueues();
+        return;
+      }
     } // while(true)
 
   } // end Function
@@ -368,7 +374,10 @@ public:
       trig->special_check();
 
       if(getState(stateObj).isFailed())
+      {
+        clearQueues();
         return;
+      }
 
     } // while(true)
 
