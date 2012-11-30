@@ -125,7 +125,7 @@ struct GACEqualConstraint : public AbstractConstraint
   }
   
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 2);
     return (v[0] == v[1]);

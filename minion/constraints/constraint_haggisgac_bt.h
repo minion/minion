@@ -143,6 +143,12 @@
 template<typename VarArray>
 struct HaggisGAC : public AbstractConstraint, Backtrackable
 {
+
+    virtual string constraint_name()
+    { return "haggisgac"; }
+
+    CONSTRAINT_ARG_LIST2(vars, data);
+
     virtual AbstractConstraint* reverse_constraint()
     { return forward_check_negation(stateObj, this); }
 
@@ -178,11 +184,6 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
             nextFree=0;
         }
     };
-    
-    virtual string constraint_name()
-    {
-        return "HaggisGAC";
-    }
     
     VarArray vars;
 
@@ -247,8 +248,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     // Ctor
     
+    TupleList* data;
+    
     HaggisGAC(StateObj* _stateObj, const VarArray& _var_array, TupleList* tuples) : AbstractConstraint(_stateObj), 
-    vars(_var_array), supportFreeList(0)
+    vars(_var_array), supportFreeList(0), data(tuples)
     {
         SysInt numvars = vars.size(); 
         

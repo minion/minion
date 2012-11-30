@@ -28,6 +28,11 @@ template<typename VarArray>
 struct GACSchema : public AbstractConstraint, Backtrackable
 {
 
+  virtual string constraint_name()
+  { return "gacschema"; }
+
+  CONSTRAINT_ARG_LIST2(vars, data);
+
     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
     {
         const SysInt tuple_size = checked_cast<SysInt>(data->tuple_size());
@@ -83,12 +88,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
             return o;
         }
     };
-    
-    virtual string constraint_name()
-    {
-        return "GACSchema";
-    }
-    
+
     VarArray vars;
     
     SysInt numvals;
@@ -567,7 +567,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     }
     
 
-    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
+    virtual bool check_assignment(DomainInt* v, SysInt array_size)
     {
        for(SysInt i = 0; i < checked_cast<SysInt>(data->size()); ++i)
         {
