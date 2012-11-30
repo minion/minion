@@ -367,6 +367,9 @@ public:
       CON_INFO_ADDONE(SpecialTrigger);
       trig->special_check();
 
+      if(getState(stateObj).isFailed())
+        return;
+
     } // while(true)
 
   } // end Function
