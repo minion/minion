@@ -39,6 +39,8 @@ void lock(StateObj* stateObj)
   // No longer AC1, thank goodness.
   for(SysInt i = 0; i < size; ++i)
   {
+    if(getState(stateObj).isFailed()) 
+      return;
     getState(stateObj).getConstraintList()[i]->full_propagate();
     getState(stateObj).getConstraintList()[i]->full_propagate_done=true;
     if(getState(stateObj).isFailed()) 

@@ -232,7 +232,8 @@ template<typename BoolVar, bool DoWatchAssignment>
 
   virtual void full_propagate()
   {
-    P("Full prop");    
+    P("Full prop");
+    D_ASSERT(!getState(stateObj).isFailed());
     P(child_constraints[0]->constraint_name());
     D_ASSERT(rar_var.getMin() >= 0);
     D_ASSERT(rar_var.getMax() <= 1);
