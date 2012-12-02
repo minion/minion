@@ -253,6 +253,13 @@ inline EggShellData* TupleList::getEggShellData(size_t varcount)
 template<typename VarArray>
 struct EggShell : public AbstractConstraint
 {
+    virtual string constraint_name()
+    { return "eggshell"; }
+
+    CONSTRAINT_ARG_LIST2(vars, tupleList);
+
+    TupleList* tupleList;
+
     VarArray vars;
     
     bool constraint_locked;
@@ -264,6 +271,7 @@ struct EggShell : public AbstractConstraint
     EggShellData* sct;
 
     EggShell(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj), 
+    tupleList(_tuples),
     vars(_var_array), constraint_locked(false), limit(_stateObj), sct(_tuples->getEggShellData(_var_array.size()))
     //, ssup_permanent(_stateObj)
     {   
@@ -287,11 +295,6 @@ struct EggShell : public AbstractConstraint
         }
 
         std::random_shuffle(tupindices.begin(), tupindices.end());
-    }
-    
-    virtual string constraint_name()
-    {
-        return "ShortSTR2";
     }
     
     
