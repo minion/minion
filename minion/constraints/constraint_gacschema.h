@@ -108,7 +108,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     // Stuff to do with tuples.
     TupleList* data;
     vector<vector<vector<vector<DomainInt> * > > > tuple_lists;
-    vector<MoveableArray<unsigned int> > tuple_list_pos;  // indexed by var, val.
+    vector<MoveableArray<UnsignedSysInt> > tuple_list_pos;  // indexed by var, val.
 
     ////////////////////////////////////////////////////////////////////////////
     // Ctor
@@ -142,7 +142,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
         tuple_lists.resize(vars.size());
         for(SysInt var=0; var<vars.size(); var++) {
             const SysInt domsize = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
-            tuple_list_pos[var]=getMemory(_stateObj).backTrack().template requestArray<unsigned int>(domsize);
+            tuple_list_pos[var]=getMemory(_stateObj).backTrack().template requestArray<UnsignedSysInt>(domsize);
             for(SysInt validx=0; validx<domsize; validx++) {
                 tuple_list_pos[var][validx]=0;
             }
