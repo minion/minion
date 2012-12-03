@@ -267,6 +267,7 @@ struct SparseBoundVarContainer {
   DomainInt getDomSize(SparseBoundVarRef_internal<BoundType> d) const
   {
     assert(0);
+    return 0; // Just to shut up compiler complaints.
   }
 
   DomainInt getMin(SparseBoundVarRef_internal<BoundType> d) const
