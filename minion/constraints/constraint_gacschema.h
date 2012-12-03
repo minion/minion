@@ -633,6 +633,11 @@ struct GACSchema : public AbstractConstraint, Backtrackable
                       }
                 }
                 
+                // This is because when the domain of a constant variable is emptied,
+                // we still have 'inDomain' return true.
+                if(getState(stateObj).isFailed())
+                    return;
+
                 if(vars[var].inDomain(val)) {
                     // If the value is still there, Put trigger on.
                     attach_trigger(var,val);
