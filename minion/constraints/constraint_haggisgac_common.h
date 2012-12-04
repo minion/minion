@@ -286,3 +286,147 @@
         }
 #endif
     }
+
+        void printStructures()
+    {
+        cout << "PRINTING ALL DATA STRUCTURES" <<endl;
+        cout << "supports:" << supports <<endl;
+        cout << "supportsPerVar:" << supportsPerVar << endl;
+        cout << "partition:" <<endl;
+        for(SysInt i=0; i<supportNumPtrs.size()-1; i++) {
+            cout << "supports: "<< i<< "  vars: ";
+            for(SysInt j=supportNumPtrs[i]; j<supportNumPtrs[i+1]; j++) {
+                cout << varsPerSupport[j]<< ", ";
+            }
+            cout << endl;
+            if(supportNumPtrs[i+1]==vars.size()) break;
+        }
+        cout << "zeroLits:" << zeroLits << endl;
+        cout << "inZeroLits:" << inZeroLits << endl;
+    }
+
+            SysInt dynamic_trigger_count() { 
+            return literalList.size();
+        }
+
+    inline void updateCounters(SysInt lit) {
+
+        SupportCell* supCellList = literalList[lit].supportCellList ;
+
+        litsWithLostExplicitSupport.resize(0);   
+        varsWithLostImplicitSupport.resize(0);
+
+        while(supCellList != 0) {
+            SupportCell* next=supCellList->next;
+            deleteSupport(supCellList->sup);
+            supCellList=next;
+        }
+    }
+
+  inline void attach_trigger(SysInt var, DomainInt val, SysInt lit)
+  {
+      //P("Attach Trigger: " << i);
+      
+      DynamicTrigger* dt = dynamic_trigger_start();
+      // find the trigger for var, val.
+      dt=dt+lit;
+      D_ASSERT(!dt->isAttached());
+      
+      vars[var].addDynamicTrigger(dt, DomainRemoval, val );   //BT_CALL_BACKTRACK
+  }
+  
+  inline void detach_trigger(SysInt lit)
+  {
+      //P("Detach Triggers");
+      
+      // D_ASSERT(supportListPerLit[var][val-vars[var].getInitialMin()].next[var] == 0);
+      
+      DynamicTrigger* dt = dynamic_trigger_start();
+      dt=dt+lit;
+      releaseTrigger(stateObj, dt);   // BT_CALL_BACKTRACK
+  }
+
+      BOOL hasNoKnownSupport(SysInt var,SysInt lit) {
+            //
+            // Either implicitly supported or counter is non zero
+            // Note that even if we have an explicit support which may be invalid, we can return true
+            // i.e. code does not guarantee that it has a valid support, only that it has a support.
+            // If we have no valid supports then (if algorithms are right) we will eventually delete
+            // the last known valid support and at that time start looking for a new one.
+
+            D_ASSERT(var == literalList[lit].var); 
+
+            return supportsPerVar[var] == supports && (literalList[lit].supportCellList == 0);
+    }
+
+    void partition_swap(SysInt xi, SysInt xj)
+    {
+        if(xi != xj) {
+            varsPerSupport[varsPerSupInv[xj]]=xi;
+            varsPerSupport[varsPerSupInv[xi]]=xj;
+            SysInt temp=varsPerSupInv[xi];
+            varsPerSupInv[xi]=varsPerSupInv[xj];
+            varsPerSupInv[xj]=temp;
+        }
+    }
+
+      ////////////////////////////////////////////////////////////////////////////
+    //
+    //  Table of short supports passed in.
+    
+  #define ADDTOASSIGNMENT(var, val) literalsScratch.push_back(make_pair(var,val));
+  
+    //bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
+    template<bool keepassigned>
+    bool findNewSupport(SysInt var, DomainInt val) {
+        D_ASSERT(tuple_lists.size()==vars.size());
+        const SysInt val_offset = checked_cast<SysInt>(val-vars[var].getInitialMin());
+        const vector<vector<pair<SysInt, DomainInt> > * >& tuplist=tuple_lists[var][val_offset]; 
+        
+        SysInt listsize=tuplist.size();
+        for(SysInt i=tuple_list_pos[var][val_offset]; i<listsize; i++) {
+            vector<pair<SysInt, DomainInt> > & tup=*(tuplist[i]);
+            
+            SysInt supsize=tup.size();
+            bool valid=true;
+            
+            for(SysInt j=0; j<supsize; j++) {
+                if(! vars[tup[j].first].inDomain(tup[j].second)) {
+                    valid=false;
+                    break;
+                }
+            }
+            
+            if(valid) {
+                for(SysInt j=0; j<supsize; j++) {
+                    ADDTOASSIGNMENT(tup[j].first, tup[j].second);  //assignment.push_back(tuplist[i][j]);
+                }
+                tuple_list_pos[var][val_offset]=i;
+                return true;
+            }
+        }
+        
+        
+        for(SysInt i=0; i<tuple_list_pos[var][val_offset]; i++) {
+            vector<pair<SysInt, DomainInt> > & tup=*(tuplist[i]);
+            
+            SysInt supsize=tup.size();
+            bool valid=true;
+            
+            for(SysInt j=0; j<supsize; j++) {
+                if(! vars[tup[j].first].inDomain(tup[j].second)) {
+                    valid=false;
+                    break;
+                }
+            }
+            
+            if(valid) {
+                for(SysInt j=0; j<supsize; j++) {
+                    ADDTOASSIGNMENT(tup[j].first, tup[j].second);  //assignment.push_back(tuplist[i][j]);
+                }
+                tuple_list_pos[var][val_offset]=i;
+                return true;
+            }
+        }
+        return false;
+    }
