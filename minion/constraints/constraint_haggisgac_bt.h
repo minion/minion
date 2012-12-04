@@ -140,6 +140,7 @@
 // 
 #define SupportsGACUseZeroVals true
 
+#define CLASSNAME HaggisGAC
 template<typename VarArray>
 struct HaggisGAC : public AbstractConstraint, Backtrackable
 {
@@ -147,26 +148,11 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     virtual string constraint_name()
     { return "haggisgac"; }
 
+#include "constraint_haggisgac_common.h"
+
     CONSTRAINT_ARG_LIST2(vars, data);
 
-    virtual AbstractConstraint* reverse_constraint()
-    { return forward_check_negation(stateObj, this); }
 
-    struct Support ; 
-
-    struct SupportCell { 
-            SysInt literal ; 
-            Support* sup ; 
-            SupportCell* next ; 
-            SupportCell* prev ; 
-    };
-
-    struct Literal { 
-        SysInt var ; 
-        DomainInt val ;
-        SupportCell* supportCellList; 
-//      Literal() { supportCellList = 0 ;} 
-    };
 
     struct Support {
         vector<SupportCell> supportCells ;   // Size can't be more than r, but can be less.
@@ -235,16 +221,6 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     
     vector<vector<SysInt> > tuple_list_pos;    // current position in tuple_lists (for each var and val). Wraps around.
     
-    struct SupportDeref
-    {
-        template<typename T>
-        bool operator()(const T& lhs, const T& rhs)
-        #if SupportsGacNoCopyList
-        { return *lhs < *rhs; }
-        #else
-        { return lhs < rhs; }
-        #endif
-    };
     ////////////////////////////////////////////////////////////////////////////
     // Ctor
     
@@ -399,61 +375,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         
     }
     
-   
-    
-    
-    
-    ////////////////////////////////////////////////////////////////////////////
-    // Dtor
-    
-    virtual ~HaggisGAC() {
-        //printStructures();
-        set<Support*> myset;
 
-        /* 
-        for(SysInt i=0; i<vars.size(); i++) {
-            cout << "     i " << i << " Initial Max " << vars[i].getInitialMax() << endl ; 
-            SysInt numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
-            for(SysInt j=0; j<numvals_i; j++) {
-              cout << "     i j SupportListPerLit[var][val].next = " << i << " " << j << " " << supportListPerLit[i][j].next << endl ; 
-            }
-        }
-        */
-        
-
-        // Want to find all active support objects so we can delete them 
-        for(SysInt lit=0; lit<numlits; lit++) {
-               SupportCell* supCell = literalList[lit].supportCellList; 
-
-              // cout << "     destructor 2: sup*= " << sup << endl ; 
-                while(supCell!=0) {
-                    myset.insert(supCell->sup); // may get inserted multiple times but it's a set.
-                    supCell = supCell->next;
-                }
-        }
-        
-        // Go through supportFreeList
-        
-        while(supportFreeList!=0) {
-            Support* sup=supportFreeList;
-            supportFreeList=sup->nextFree;
-            myset.insert(sup);
-        }
-        
-        // Anything remaining on bracktrack stack
-        for(SysInt i=0; i<backtrack_stack.size(); i++) {
-            if(backtrack_stack[i].sup!=0) {
-                myset.insert(backtrack_stack[i].sup);
-            }
-        }
-        
-        typename set<Support*>::iterator it;
-        for ( it=myset.begin() ; it != myset.end(); it++ ) {
-            delete *it;
-        }
-    }
-
-    
     ////////////////////////////////////////////////////////////////////////////
     // Backtracking mechanism
     
@@ -1520,7 +1442,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
 #endif
 
 
-#include "constraint_haggisgac_common.h"
+
 
 #if UseNDOneList
 
