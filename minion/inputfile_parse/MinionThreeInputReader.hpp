@@ -431,6 +431,8 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
       readSearch(infile);
     else if(s == "**TUPLELIST**")
       readTuples(infile);
+    else if(s == "**SHORTTUPLELIST**")
+      readShortTuples(infile);
     else if(s =="**CONSTRAINTS**")
     {
       while(infile->peek_char() != '*')
@@ -537,7 +539,14 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
   
   con.vars.push_back(readLiteralVector(infile));
   infile->check_sym(',');
-  con.tuples = readConstraintTupleList(infile);
+
+  if(def->read_types[1] == read_tuples)
+    con.tuples = readConstraintTupleList(infile);
+  else if(def->read_types[1] == read_short_tuples)
+    con.short_tuples = readConstraintShortTupleList(infile);
+  else
+    assert(0);
+
   infile->check_sym(')');
   
   if(def->read_types[1] == read_tuples)
@@ -548,30 +557,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
                             " variables cannot have tuples of length " + to_string(con.tuples->tuple_size()));
     }
   }
-  else
-  {
-    D_ASSERT(def->read_types[1] == read_short_tuples);
-    if(con.tuples->size() != 1)
-    {
-      throw parse_exception("The tuplelist for a constraint using short tuples must have 1 tuple in it!");
-    }
-  }
 
-  if(def->read_types[1] == read_short_tuples)
-  {
-    D_ASSERT(con.tuples->size() == 1)
-    DomainInt* tup_data = con.tuples->getPointer();
-    if(con.tuples->tuple_size() == 0)
-    {
-        return ConstraintBlob(get_constraint(CT_FALSE));
-    }
-
-    if(con.tuples->tuple_size() == 2)
-    {
-      if(tup_data[0] == -1 && tup_data[1] == -1)
-        return ConstraintBlob(get_constraint(CT_TRUE));
-    }
-  }
 
   if(con.vars[0].size() == 0)
   {
@@ -585,7 +571,11 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
     }
     else
     {
-      throw parse_exception("Not a valid list of short tuples for a constraint with no variables!");
+      if(con.short_tuples->size() == 0)
+        return ConstraintBlob(get_constraint(CT_FALSE));
+      else if((*con.short_tuples->tuplePtr())[0].empty())
+          return ConstraintBlob(get_constraint(CT_TRUE));
+      else throw parse_exception("Not a valid list of short tuples for a constraint with no variables!");
     }
   }  
   
@@ -643,7 +633,6 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
       con.internal_constraints = readConstraintList(infile);
       break;
       case read_tuples:
-      case read_short_tuples:
       con.tuples = readConstraintTupleList(infile);
       break;
       default:
@@ -655,6 +644,14 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
   infile->check_sym(')');
   
   return con;
+}
+
+template<typename FileReader>
+ShortTupleList* MinionThreeInputReader<FileReader>::readConstraintShortTupleList(FileReader* infile)
+{
+  
+  string name = infile->get_string();
+  return instance->getShortTableSymbol(name);
 }
 
 template<typename FileReader>
@@ -1070,6 +1067,31 @@ vector<DomainInt> MinionThreeInputReader<FileReader>::readConstantVector
   return newVector;
 }
 
+// Note: allowNulls maps '_' to -999 (a horrible hack I know).
+// That last parameter defaults to false.
+// The start and end default to '[' and ']'
+template<typename FileReader>
+vector<pair<SysInt,DomainInt> > MinionThreeInputReader<FileReader>::readShortTuple(FileReader* infile) 
+{
+  vector<pair<SysInt, DomainInt> > newVector;
+  infile->check_sym('[');
+
+  while(infile->peek_char() == '(')
+  {
+    infile->check_sym('(');
+    SysInt var = checked_cast<SysInt>(infile->read_num());
+    infile->check_sym(',');
+    DomainInt val = infile->read_num();
+    infile->check_sym(')');
+    newVector.push_back(make_pair(var, val));
+    if(infile->peek_char() == ',')
+      infile->check_sym(',');
+  }
+  infile->check_sym(']');
+
+  return newVector;
+}
+
 /// Read an expression of the type ' {<num>..<num>} '
 template<typename FileReader>
 vector<DomainInt> MinionThreeInputReader<FileReader>::readRange(FileReader* infile) 
@@ -1090,6 +1112,23 @@ vector<DomainInt> MinionThreeInputReader<FileReader>::readRange(FileReader* infi
 
 /// Read a list of tuples
 template<typename FileReader>
+void MinionThreeInputReader<FileReader>::readShortTuples(FileReader* infile)
+{
+  while(infile->peek_char() != '*')
+  {
+    string name = infile->get_string();
+    DomainInt num_of_short_tuples = infile->read_num();
+    vector<vector<pair<SysInt, DomainInt> > > tups;
+
+    for(DomainInt i = 0; i < num_of_short_tuples; ++i)
+      tups.push_back(readShortTuple(infile));
+
+    ShortTupleList* stl = instance->shortTupleListContainer->getNewShortTupleList(tups);
+    instance->addShortTableSymbol(name, stl);
+  }
+}
+
+template<typename FileReader>
 void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile)
 {
   while(infile->peek_char() != '*')
@@ -1109,7 +1148,6 @@ void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile)
     tuplelist->finalise_tuples();
     instance->addTableSymbol(name, tuplelist);
   }
-
 }
 
 template<typename FileReader>

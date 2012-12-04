@@ -547,6 +547,8 @@ try {
       
       // Do the minimal amount of setting up to create the constraint objects.
       getState(stateObj).setTupleListContainer(instance.tupleListContainer);
+      getState(stateObj).setShortTupleListContainer(instance.shortTupleListContainer);
+      
       BuildCon::build_variables(stateObj, instance.vars);
       
       // Create Constraints

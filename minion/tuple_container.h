@@ -224,6 +224,51 @@ public:
   { return Internal_TupleList.size(); }
 };
 
+class ShortTupleList
+{
+  vector<vector<pair<SysInt, DomainInt> > > short_tuples;
+  string tuple_name;
+
+public:
+  ShortTupleList(const vector<vector<pair<SysInt, DomainInt> > >& _short_tuples)
+  : short_tuples(_short_tuples)
+  { }
+
+  void setName(string name)
+  { tuple_name = name; }
+
+  string getName() const
+  { return tuple_name; }
+
+  SysInt size() const
+  { return short_tuples.size(); }
+
+  vector<vector<pair<SysInt, DomainInt> > > const*  tuplePtr() const
+  { return &short_tuples; }
+
+
+};
+
+class ShortTupleListContainer
+{
+  std::vector<ShortTupleList*> Internal_TupleList;
+
+public:
+
+  ShortTupleList* getNewShortTupleList(const vector<vector<pair<SysInt, DomainInt> > >& tuples)
+  { 
+    ShortTupleList* tuplelist_ptr = new ShortTupleList(tuples);
+    Internal_TupleList.push_back(tuplelist_ptr);
+    return tuplelist_ptr;
+  }
+
+  ShortTupleList* getShortTupleList(DomainInt num)
+  { return Internal_TupleList[checked_cast<SysInt>(num)]; }
+
+  SysInt size()
+  { return Internal_TupleList.size(); }
+};
+
 
 /// The first GACtable implementation.
 class LiteralSpecificLists

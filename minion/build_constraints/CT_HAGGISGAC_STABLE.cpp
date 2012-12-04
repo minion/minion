@@ -10,6 +10,6 @@
 template <typename T>
 AbstractConstraint*
 BuildCT_HAGGISGAC_STABLE(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return new HaggisGACStable<T>(stateObj, t1, b.tuples); }
+{ return new HaggisGACStable<T>(stateObj, t1, b.short_tuples); }
 
 BUILD_CT(CT_HAGGISGAC_STABLE, 1)

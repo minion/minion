@@ -59,7 +59,7 @@ const DomainInt DomainInt_Max = std::numeric_limits<SysInt>::max() / 2 - 1;
 const DomainInt DomainInt_Min = std::numeric_limits<SysInt>::min() / 2 + 1;
 
 /// A big constant, when such a thing is needed.
-const SysInt DomainInt_Skip = std::numeric_limits<SysInt>::max();
+static const DomainInt DomainInt_Skip = std::numeric_limits<SysInt>::max();
 
 template<typename To, typename From>
 To checked_cast(const From& t)

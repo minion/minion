@@ -248,9 +248,9 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     // Ctor
     
-    TupleList* data;
+    ShortTupleList* data;
     
-    HaggisGAC(StateObj* _stateObj, const VarArray& _var_array, TupleList* tuples) : AbstractConstraint(_stateObj), 
+    HaggisGAC(StateObj* _stateObj, const VarArray& _var_array, ShortTupleList* tuples) : AbstractConstraint(_stateObj), 
     vars(_var_array), supportFreeList(0), data(tuples)
     {
         SysInt numvars = vars.size(); 
@@ -327,16 +327,8 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         supportNumPtrs[0]=0;
         for(SysInt i=1; i<= numlits; i++) supportNumPtrs[i]=vars.size();
         
-        // Extract short supports from tuples if necessary.
-        if(tuples->size()>1) {
-            cout << "Tuple list passed to supportgac constraint should only contain one tuple, encoding a list of short supports." << endl; 
-            abort();
-        }
-        
 #if UseList
         // Read in the short supports.
-        D_ASSERT(tuples->size()==1);
-        vector<DomainInt> encoded = tuples->get_vector(0);
         
         #if UseList && SupportsGacNoCopyList
         vector<vector<pair<SysInt, DomainInt> > * > shortsupports;
@@ -344,34 +336,17 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         vector<vector<pair<SysInt, DomainInt> > > shortsupports;
         #endif
         
-        vector<pair<SysInt, DomainInt> > temp;
-        for(SysInt i=0; i<encoded.size(); i=i+2) {
-            if(encoded[i]==-1) {
-                // end of a short support.
-                if(encoded[i+1]!=-1) {
-                    cout << "Split marker is -1,-1 in tuple for supportsgac." << endl;
-                    abort();
-                }
-                #if UseList && SupportsGacNoCopyList
-                shortsupports.push_back(new vector<pair<SysInt, DomainInt> >(temp));
-                #else
-                shortsupports.push_back(temp);
-                #endif
-                temp.clear();
-            }
-            else
-            {
-                if(encoded[i]<0 || encoded[i]>=vars.size()) {
-                    cout << "Tuple passed into supportsgac does not correctly encode a set of short supports." << endl;
-                    abort();
-                }
-                temp.push_back(make_pair(checked_cast<SysInt>(encoded[i]), encoded[i+1])); 
-            }
+        const vector<vector<pair<SysInt, DomainInt> > >& tupleRef = (*tuples->tuplePtr());
+        
+        for(SysInt i=0; i<tupleRef.size(); i++) {
+            
+            #if UseList && SupportsGacNoCopyList
+            shortsupports.push_back(new vector<pair<SysInt, DomainInt> >(tupleRef[i]));
+            #else
+            shortsupports.push_back(tupleRef[i]);
+            #endif
         }
-        if(encoded[encoded.size()-2]!=-1 || encoded[encoded.size()-1]!=-1) {
-            cout << "Last -1,-1 marker missing from tuple in supportsgac."<< endl;
-            abort();
-        }
+
         
         // Sort it. Might not work when it's pointers.
         for(SysInt i=0; i<shortsupports.size(); i++) {
@@ -422,240 +397,9 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
         }
 #endif
         
-#if UseNDOneList
-        D_ASSERT(tuples->size()==1);
-        vector<DomainInt> encoded = tuples->get_vector(0);
-        
-        vector<tuple<SysInt, SysInt,SysInt> > temp;
-        for(SysInt i=0; i<encoded.size(); i=i+2) {
-            if(encoded[i]==-1) {
-                // end of a short support.
-                if(encoded[i+1]!=-1) {
-                    cout << "Split marker is -1,-1 in tuple for supportsgac." << endl;
-                    abort();
-                }
-                tuple_nd_list.push_back(temp);
-                temp.clear();
-            }
-            else
-            {
-                if(encoded[i]<0 || encoded[i]>=vars.size()) {
-                    cout << "Tuple passed into supportsgac does not correctly encode a set of short supports." << endl;
-                    abort();
-                }
-                temp.push_back(make_tuple(encoded[i], encoded[i+1], 0)); 
-            }
-        }
-        if(encoded[encoded.size()-2]!=-1 || encoded[encoded.size()-1]!=-1) {
-            cout << "Last -1,-1 marker missing from tuple in supportsgac."<< endl;
-            abort();
-        }
-        
-        // Sort it. 
-        for(SysInt i=0; i<tuple_nd_list.size(); i++) {
-            // Sort each short support
-            sort(tuple_nd_list[i].begin(), tuple_nd_list[i].end());
-        }
-        sort(tuple_nd_list.begin(), tuple_nd_list.end());
-        
-        setup_tuple_list();
-        
-        tuple_list_pos.resize(vars.size());
-        for(SysInt var=0; var<vars.size(); var++) {
-            tuple_list_pos[var].resize(vars[var].getInitialMax()-vars[var].getInitialMin()+1, 0);
-        }
-        
-#endif
     }
     
-    // A Second constructor for supportsgaclist constraint, that takes a list of
-    // full-length tuples and should be identical in behaviour to the table constraint.
-    
-    HaggisGAC(StateObj* _stateObj, const VarArray& _var_array, TupleList* tuples, SysInt) : AbstractConstraint(_stateObj), 
-    vars(_var_array), supportFreeList(0)
-    {
-        SysInt numvars = vars.size(); 
-        
-        // literalsScratch.reserve(numvars);
-
-        literalsScratch.resize(0);
-
-        // Register this with the backtracker.
-        getState(stateObj).getGenericBacktracker().add(this);
-        
-        // Initialise counters
-        supports=0;
-        supportsPerVar.resize(numvars, 0);
-        
-        firstLiteralPerVar.resize(numvars); 
-
-        SysInt litCounter = 0 ; 
-        numvals = 0 ;           // only used now by tuple list stuff
-
-        for(SysInt i=0; i<numvars; i++) {
-
-            firstLiteralPerVar[i] = litCounter; 
-            SysInt thisvalmin = vars[i].getInitialMin();
-            SysInt numvals_i = vars[i].getInitialMax()-thisvalmin+1;
-            if(numvals_i > numvals) numvals = numvals_i;
-            litCounter += numvals_i; 
-        }
-
-        literalList.resize(litCounter); 
-
-        litCounter = 0 ; 
-        for(SysInt i=0; i<numvars; i++) {
-            SysInt thisvalmin = vars[i].getInitialMin();
-            SysInt numvals_i = vars[i].getInitialMax()-thisvalmin+1;
-            for(SysInt j=0; j<numvals_i; j++) {
-                    literalList[litCounter].var = i; 
-                    literalList[litCounter].val = j+thisvalmin; 
-                    literalList[litCounter].supportCellList = 0;
-                    litCounter++;
-            }
-        }
-
-        numlits = litCounter;
-        
-        #if SupportsGACUseZeroVals
-        zeroLits.resize(numvars);
-        for(SysInt i=0 ; i < numvars ; i++) {
-            SysInt numvals_i = vars[i].getInitialMax()- vars[i].getInitialMin()+1; 
-            zeroLits[i].reserve(numvals_i);  // reserve the maximum length.
-            zeroLits[i].resize(0); 
-            SysInt thisvarstart = firstLiteralPerVar[i];
-            for(SysInt j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
-        }
-        inZeroLits.resize(numlits,true); 
-        #endif
-        
-        // Lists (vectors) of literals/vars that have lost support.
-        // Set this up to insist that everything needs to have support found for it on full propagate.
-        
-        litsWithLostExplicitSupport.reserve(numlits); // max poss size, not necessarily optimal choice here
-        varsWithLostImplicitSupport.reserve(vars.size());
-       
-        // Partition
-        varsPerSupport.resize(vars.size());
-        varsPerSupInv.resize(vars.size());
-        for(SysInt i=0; i<vars.size(); i++) {
-            varsPerSupport[i]=i;
-            varsPerSupInv[i]=i;
-        }
-        
-        // Start with 1 cell in partition, for 0 supports. 
-        supportNumPtrs.resize(numlits+1);
-        supportNumPtrs[0]=0;
-        for(SysInt i=1; i<= numlits; i++) supportNumPtrs[i]=vars.size();
-        
-        CHECK( (UseList || UseNDOneList), "Attempt to use supportsgaclist with wrong version of supportsgac");
-        
-#if UseList
-        // Read in the full-length supports.
-        vector<DomainInt> encoded = tuples->get_vector(0);
-        
-        #if UseList && SupportsGacNoCopyList
-        vector<vector<pair<SysInt, DomainInt> > * > shortsupports;
-        #else
-        vector<vector<pair<SysInt, DomainInt> > > shortsupports;
-        #endif
-        
-        vector<pair<SysInt, DomainInt> > temp;
-        for(SysInt i=0; i<tuples->size(); i++) {
-            const SysInt* tup =tuples->get_tupleptr(i);
-            
-            for(SysInt j=0; j<vars.size(); j++) {
-                temp.push_back(make_pair(j,tup[j]));
-            }
-            
-            #if UseList && SupportsGacNoCopyList
-            shortsupports.push_back(new vector<pair<SysInt, DomainInt> >(temp));
-            #else
-            shortsupports.push_back(temp);
-            #endif
-            
-            temp.clear();
-        }
-        // Same as other ctor from here.
-        // Sort it. Might not work when it's pointers.
-        for(SysInt i=0; i<shortsupports.size(); i++) {
-            // Sort each short support
-            #if UseList && SupportsGacNoCopyList
-            sort(shortsupports[i]->begin(), shortsupports[i]->end());
-            #else
-            sort(shortsupports[i].begin(), shortsupports[i].end());
-            #endif
-        }
-        sort(shortsupports.begin(), shortsupports.end(), SupportDeref());
-        
-        tuple_lists.resize(vars.size());
-        tuple_list_pos.resize(vars.size());
-        for(SysInt var=0; var<vars.size(); var++) {
-            tuple_lists[var].resize(numvals);
-            tuple_list_pos[var].resize(numvals, 0);
-            
-            for(DomainInt val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
-                // get short supports relevant to var,val.
-                for(SysInt i=0; i<shortsupports.size(); i++) {
-                    bool varin=false;
-                    bool valmatches=true;
-                    
-                    #if SupportsGacNoCopyList
-                    vector<pair<SysInt, DomainInt> > & shortsup=*(shortsupports[i]);
-                    #else
-                    vector<pair<SysInt, DomainInt> > & shortsup=shortsupports[i];
-                    #endif
-                    
-                    for(SysInt j=0; j<shortsup.size(); j++) {
-                        if(shortsup[j].first==var) {
-                            varin=true;
-                            if(shortsup[j].second!=val) {
-                                valmatches=false;
-                            }
-                        }
-                    }
-                    
-                    if(!varin || valmatches) {
-                        // If the support doesn't include the var, or it 
-                        // does include var,val then add it to the list.
-                        tuple_lists[var][val-vars[var].getInitialMin()].push_back(shortsupports[i]);
-                    }
-                }
-            }
-        }
-#endif
-        
-#if UseNDOneList
-        D_ASSERT(tuples->size()==1);
-        
-        vector<tuple<SysInt, SysInt,SysInt> > temp;
-        for(SysInt i=0; i<tuples->size(); i++) {
-            const SysInt* tup =tuples->get_tupleptr(i);
-            
-            for(SysInt j=0; j<vars.size(); j++) {
-                temp.push_back(make_tuple(j,tup[j], 0));
-            }
-            
-            tuple_nd_list.push_back(temp);
-            temp.clear();
-        }
-        
-        // Sort it. 
-        for(SysInt i=0; i<tuple_nd_list.size(); i++) {
-            // Sort each short support
-            sort(tuple_nd_list[i].begin(), tuple_nd_list[i].end());
-        }
-        sort(tuple_nd_list.begin(), tuple_nd_list.end());
-        
-        setup_tuple_list();
-        
-        tuple_list_pos.resize(vars.size());
-        for(SysInt var=0; var<vars.size(); var++) {
-            tuple_list_pos[var].resize(numvals, 0);
-        }
-        
-#endif
-    }
+   
     
     
     

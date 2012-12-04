@@ -70,6 +70,7 @@ class SearchState
   TimerClass oldtimer;
   
   shared_ptr<TupleListContainer> tupleListContainer;
+  shared_ptr<ShortTupleListContainer> shortTupleListContainer;
 
   bool is_locked;
   
@@ -146,9 +147,13 @@ public:
   jmp_buf* getJmpBufPtr() { return &g_env; }
   
   TupleListContainer* getTupleListContainer() { return &*tupleListContainer; }
+  ShortTupleListContainer* getShortTupleListContainer() { return &*shortTupleListContainer; }
   
   void setTupleListContainer(shared_ptr<TupleListContainer> _tupleList) 
   { tupleListContainer = _tupleList; }
+
+  void setShortTupleListContainer(shared_ptr<ShortTupleListContainer> _tupleList) 
+  { shortTupleListContainer = _tupleList; }
                           
   SearchState(StateObj* _stateObj) : stateObj(_stateObj), nodes(0), optimise_var(NULL), 
     raw_optimise_var(NULL),

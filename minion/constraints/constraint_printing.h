@@ -49,6 +49,10 @@ namespace ConOutput
   string print_vars(StateObj* stateObj,TupleList* const& t)
   { return t->getName(); }
 
+    inline
+  string print_vars(StateObj* stateObj,ShortTupleList* const& t)
+  { return t->getName(); }
+
   inline
   string print_vars(StateObj* stateObj,AbstractConstraint* const& c);
 

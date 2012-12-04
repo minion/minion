@@ -263,9 +263,9 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     // Ctor
     
-    TupleList* data; 
+    ShortTupleList* data; 
 
-    HaggisGACStable(StateObj* _stateObj, const VarArray& _var_array, TupleList* tuples) : AbstractConstraint(_stateObj), 
+    HaggisGACStable(StateObj* _stateObj, const VarArray& _var_array, ShortTupleList* tuples) : AbstractConstraint(_stateObj), 
     vars(_var_array), supportFreeList(0), data(tuples)
     {
         SysInt numvars = vars.size(); 
@@ -359,43 +359,22 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         }
         
 #if UseList
-        // Read in the short supports.
-        D_ASSERT(tuples->size()==1);
-        vector<DomainInt> encoded = tuples->get_vector(0);
-        
+       
         #if UseList && SupportsGacNoCopyList
         vector<vector<pair<SysInt, DomainInt> > * > shortsupports;
         #else
         vector<vector<pair<SysInt, DomainInt> > > shortsupports;
         #endif
         
-        vector<pair<SysInt, DomainInt> > temp;
-        for(SysInt i=0; i<encoded.size(); i=i+2) {
-            if(encoded[i]==-1) {
-                // end of a short support.
-                if(encoded[i+1]!=-1) {
-                    cout << "Split marker is -1,-1 in tuple for supportsgac." << endl;
-                    abort();
-                }
-                #if UseList && SupportsGacNoCopyList
-                shortsupports.push_back(new vector<pair<SysInt, DomainInt> >(temp));
-                #else
-                shortsupports.push_back(temp);
-                #endif
-                temp.clear();
-            }
-            else
-            {
-                if(encoded[i]<0 || encoded[i]>=vars.size()) {
-                    cout << "Tuple passed into supportsgac does not correctly encode a set of short supports." << endl;
-                    abort();
-                }
-                temp.push_back(make_pair(checked_cast<SysInt>(encoded[i]), encoded[i+1])); 
-            }
-        }
-        if(encoded[encoded.size()-2]!=-1 || encoded[encoded.size()-1]!=-1) {
-            cout << "Last -1,-1 marker missing from tuple in supportsgac."<< endl;
-            abort();
+        const vector<vector<pair<SysInt, DomainInt> > >& tupleRef = (*tuples->tuplePtr());
+        
+        for(SysInt i=0; i<tupleRef.size(); i++) {
+            
+            #if UseList && SupportsGacNoCopyList
+            shortsupports.push_back(new vector<pair<SysInt, DomainInt> >(tupleRef[i]));
+            #else
+            shortsupports.push_back(tupleRef[i]);
+            #endif
         }
         
         // Sort it. Might not work when it's pointers.

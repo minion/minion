@@ -268,6 +268,7 @@ class MinionThreeInputReader {
   vector<DomainInt> readConstantVector(FileReader* infile, char start = '[', char end = ']', bool = false);
   vector<DomainInt> readRange(FileReader* infile);
   void readObjective(FileReader* infile) ;
+  void readShortTuples(FileReader* infile) ;
   void readTuples(FileReader* infile) ;
   void readMatrices(FileReader* infile) ;
   void readValOrder(FileReader* infile) ;
@@ -275,6 +276,8 @@ class MinionThreeInputReader {
   void readPrint(FileReader* infile) ;
   void readVars(FileReader* infile) ;
   void readSearch(FileReader* infile) ;
+  vector<pair<SysInt, DomainInt> >readShortTuple(FileReader*) ;
+  ShortTupleList* readConstraintShortTupleList(FileReader*) ;
   vector<vector<Var> > read2DMatrix(FileReader* infile); 
   vector<vector<Var> > read2DMatrixVariable(FileReader* infile);
   void readAliasMatrix(FileReader* infile, const vector<DomainInt>& max_indices, vector<DomainInt> indices, string name);

@@ -5,10 +5,10 @@ MINION 3
 
 DISCRETE d[2] {0..9}
 
-**TUPLELIST**
+**SHORTTUPLELIST**
 
-Second 1 2
--1 -1
+Second 1
+[ ]
 
 **SEARCH**
 

@@ -478,12 +478,10 @@ def makeRandomShortTuples(domainlist):
 
     outputshort = []
 
+
     for tup in shorttuples:
-        for i in range(len(tup)):
-            if tup[i] != None:
-                outputshort += [i, tup[i]]
-        outputshort += [-1,-1]
-    return ([outputshort], longtuples)
+        outputshort.append([(i,tup[i]) for i in range(len(tup)) if tup[i] != None])
+    return (outputshort, longtuples)
 
 
 sys.setrecursionlimit(5000)
@@ -1423,7 +1421,7 @@ def product(list):
     return reduce(lambda x,y:x*y, list)
 
 # print the minion file header
-def printminionfile(fileh, variables, constraint, tuplelist=False, opt=False):
+def printminionfile(fileh, variables, constraint, tuplelist=False, shorttuplelist=False, opt=False):
     # constraint parameter must include reify if required.
     fileh.write("MINION 3\n")
     fileh.write("\n**VARIABLES**\n")
@@ -1431,6 +1429,9 @@ def printminionfile(fileh, variables, constraint, tuplelist=False, opt=False):
     if tuplelist:
         fileh.write("\n**TUPLELIST**\n")
         fileh.write(tuplelist)
+    if(shorttuplelist):
+        fileh.write("\n**SHORTTUPLELIST**\n")
+        fileh.write(shorttuplelist)
     if opt:
         fileh.write("\n**SEARCH**\n")
         fileh.write(opt)
@@ -1506,6 +1507,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     
     constraint=constraintname+"("
     basictable=None
+    shorttable=None
     
     constnum=0   # number of the current constant
     
@@ -1642,15 +1644,19 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
         tuplestring+="\n"
 
     output2tuples = ""
+    output2shorttuples = ""
     if tabletype != None:
         if tabletype == "longtable":
             output2tuples="basictable %d %d \n"%(len(basictable), sum(varnums3))
+            for l in basictable:
+                for e in l:
+                    output2tuples+="%d "%e
+                output2tuples+="\n"
+
         if tabletype == "shorttable":
-            output2tuples="basictable %d %d \n"%(1, len(basictable[0]))
-        for l in basictable:
-            for e in l:
-                output2tuples+="%d "%e
-            output2tuples+="\n"
+            output2shorttuples="basictable %d \n"%(len(basictable))
+            for t in basictable:
+                output2shorttuples += str(t) + "\n"
 
 
    
@@ -1715,7 +1721,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     
     if not fullprop:
         retval1=runminion(str(os.getpid())+"infile1.minion", str(os.getpid())+"outfile1", tablegen.solver, tablevars, constrainttable, tuplelist=tuplestring, opt=optline, printcmd=options['printcmd'])
-        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, tuplelist=output2tuples, opt=optline, printcmd=options['printcmd'])
+        retval2=runminion(str(os.getpid())+"infile2.minion", str(os.getpid())+"outfile2", tablegen.solver, modvars, constraint, tuplelist=output2tuples, shorttuplelist=output2shorttuples, opt=optline, printcmd=options['printcmd'])
         if retval1!=0 or retval2!=0:
             print("Minion exit values for infile1.minion, infile2.minion: %d, %d"%(retval1, retval2))
             return False
@@ -1734,9 +1740,9 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
             treesame=False
         return comparetrees(True)  # trees same.
     
-def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist=False, opt=False, printcmd=False, cmd=""):
+def runminion(filename, outfilename, minionbin, variables, constraint, tuplelist=False, shorttuplelist=False, opt=False, printcmd=False, cmd=""):
     file1=open(filename, "w")
-    printminionfile(file1, variables, constraint, tuplelist=tuplelist, opt=opt)
+    printminionfile(file1, variables, constraint, tuplelist=tuplelist, shorttuplelist=shorttuplelist, opt=opt)
     file1.close()
     cmd=minionbin+" "+filename+" -dumptree -findallsols "+cmd+" >"+outfilename
     if printcmd:

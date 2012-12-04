@@ -110,6 +110,10 @@ struct ConstraintBlob
   vector<vector<Var> > vars;
   /// Pointer to list of tuples. Only used in Table Constraints.
   TupleList* tuples;
+
+  /// Pointer to a list of short tuples. Only used in Short Table constraints.
+  ShortTupleList* short_tuples;
+
   /// A vector of signs. Only used for SAT clause "or" constraint.
   vector<DomainInt> negs;
 
@@ -585,6 +589,7 @@ struct CSPInstance
   VarContainer vars;
   list<ConstraintBlob> constraints;
   shared_ptr<TupleListContainer> tupleListContainer;
+  shared_ptr<ShortTupleListContainer> shortTupleListContainer;
 
   vector<SearchOrder> search_order;
   vector<Var> permutation;
@@ -605,11 +610,16 @@ struct CSPInstance
   map<string, TupleList*> table_symboltable;
   map<TupleList*, string> table_nametable;
 
+  map<string, ShortTupleList*> shorttable_symboltable;
+  map<ShortTupleList*, string> shorttable_nametable;
+
+
   /// We make these shared_ptrs so they automatically clear up after themselves.
   map<string, shared_ptr<CSPInstance> > gadgetMap;
 
 
-  CSPInstance() : tupleListContainer(new TupleListContainer), is_optimisation_problem(false)
+  CSPInstance() : tupleListContainer(new TupleListContainer), shortTupleListContainer(new ShortTupleListContainer),
+    is_optimisation_problem(false)
   {}
 
 private:
@@ -618,7 +628,8 @@ public:
 
 #ifdef USE_CXX0X
   CSPInstance(CSPInstance&& i) :
-  CXXMOVE(vars, i), CXXMOVE(constraints, i), CXXMOVE(tupleListContainer, i), CXXMOVE(search_order, i),
+  CXXMOVE(vars, i), CXXMOVE(constraints, i), CXXMOVE(tupleListContainer, i), CXXMOVE(shortTupleListContainer, i),
+  CXXMOVE(search_order, i),
   CXXMOVE(permutation, i), CXXMOVE(sym_order, i), CXXMOVE(constructionSite, i), CXXMOVE(is_optimisation_problem, i),
   CXXMOVE(optimise_minimising, i), CXXMOVE(optimise_variable, i), CXXMOVE(print_matrix, i), CXXMOVE(all_vars_list, i),
   CXXMOVE(table_symboltable, i), CXXMOVE(table_nametable, i), CXXMOVE(gadgetMap, i)
@@ -699,6 +710,17 @@ public:
     tuplelist->setName(name);
   }
 
+  void addShortTableSymbol(string name, ShortTupleList* tuplelist)
+  {
+    if(shorttable_symboltable.count(name) != 0)
+      throw parse_exception("ShortTuplename '"+name+"' already in use");
+    if(shorttable_nametable.count(tuplelist) != 0)
+      throw parse_exception("Named tuplelist double registered!");
+    shorttable_symboltable[name] = tuplelist;
+    shorttable_nametable[tuplelist] = name;
+    tuplelist->setName(name);
+  }
+
   TupleList* getTableSymbol(string name) const
   {
     map<string, TupleList*>::const_iterator it = table_symboltable.find(name);
@@ -712,6 +734,22 @@ public:
     map<TupleList*, string>::const_iterator it = table_nametable.find(tuples);
     if(it == table_nametable.end())
       throw parse_exception("Undefined tuplelist: '" + to_string(size_t(tuples)) + "'");
+    return it->second;
+  }
+
+  ShortTupleList* getShortTableSymbol(string name) const
+  {
+    map<string, ShortTupleList*>::const_iterator it = shorttable_symboltable.find(name);
+    if(it == shorttable_symboltable.end())
+      throw parse_exception("Undefined shorttuplelist: '" + name + "'");
+    return it->second;
+  }
+
+  string getShortTableName(ShortTupleList* tuples) const
+  {
+    map<ShortTupleList*, string>::const_iterator it = shorttable_nametable.find(tuples);
+    if(it == shorttable_nametable.end())
+      throw parse_exception("Undefined shorttuplelist: '" + to_string(size_t(tuples)) + "'");
     return it->second;
   }
 
