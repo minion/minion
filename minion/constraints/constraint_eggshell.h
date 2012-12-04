@@ -188,67 +188,29 @@ struct EggShellData
     vector<vector<DomainInt> > tuples;
     vector<vector<pair<SysInt,DomainInt> > > compressed_tuples;
 
-    EggShellData(TupleList* _tuples, size_t varsize)
+    EggShellData(ShortTupleList* _tuples, size_t varsize)
     {
         // Decode the tuples, they are all encoded in one tuple.
         if(UseShort)
         {
-            D_ASSERT(_tuples->size()==1);
+            compressed_tuples = *(_tuples->tuplePtr());
 
-            vector<DomainInt> encoded = _tuples->get_vector(0);
-
-            vector<DomainInt> temp;
-            temp.resize(varsize, DomainInt_Skip);
-
-            vector<pair<SysInt,DomainInt> > compressed_temp;
-
-            for(SysInt i=0; i<encoded.size(); i=i+2) {
-                if(encoded[i]==-1) {
-                // end of a short support.
-                    if(encoded[i+1]!=-1) {
-                        cout << "Split marker is -1,-1 in tuple for supportsgac." << endl;
-                        abort();
-                    }
-                    tuples.push_back(temp);
-
-                    temp.clear();
-                    temp.resize(varsize, DomainInt_Skip);
-                    compressed_tuples.push_back(compressed_temp);
-                    compressed_temp.clear();
-                }
-                else
+            for(SysInt i = 0; i < compressed_tuples.size(); ++i)
+            {
+                vector<DomainInt> temp(varsize, DomainInt_Skip);
+                for(SysInt j = 0; j < compressed_tuples[i].size(); ++j)
                 {
-                    if(encoded[i]<0 || encoded[i]>=varsize) {
-                        cout << "Tuple passed into supportsgac does not correctly encode a set of short supports." << endl;
-                        abort();
-                    }
-                    temp[checked_cast<SysInt>(encoded[i])]=encoded[i+1]; 
-                    compressed_temp.push_back(make_pair(checked_cast<SysInt>(encoded[i]), encoded[i+1]));
+                    temp[compressed_tuples[i][j].first] = compressed_tuples[i][j].second;
                 }
-            }
+                tuples.push_back(temp);
 
-            if(encoded[encoded.size()-2]!=-1 || encoded[encoded.size()-1]!=-1) {
-                cout << "Last -1,-1 marker missing from tuple in supportsgac."<< endl;
-                abort();
-            }   
+            }
         }
         else {
-            // Normal table constraint.             
-            // Hacky hacky hack -- copy the tuples.
-            for(SysInt i=0; i<_tuples->size(); i++) {
-                tuples.push_back(_tuples->get_vector(i));
-            }
+            abort();
         }
     }
 };
-
-inline EggShellData* TupleList::getEggShellData(size_t varcount)
-{
-    if(egg == NULL)
-        egg = new EggShellData(this, varcount);
-
-    return egg;
-}
 
 template<typename VarArray>
 struct EggShell : public AbstractConstraint
@@ -258,7 +220,7 @@ struct EggShell : public AbstractConstraint
 
     CONSTRAINT_ARG_LIST2(vars, tupleList);
 
-    TupleList* tupleList;
+    ShortTupleList* tupleList;
 
     VarArray vars;
     
@@ -270,9 +232,9 @@ struct EggShell : public AbstractConstraint
     
     EggShellData* sct;
 
-    EggShell(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj), 
+    EggShell(StateObj* _stateObj, const VarArray& _var_array, ShortTupleList* _tuples) : AbstractConstraint(_stateObj), 
     tupleList(_tuples),
-    vars(_var_array), constraint_locked(false), limit(_stateObj), sct(_tuples->getEggShellData(_var_array.size()))
+    vars(_var_array), constraint_locked(false), limit(_stateObj), sct(new EggShellData(_tuples, _var_array.size()))
     //, ssup_permanent(_stateObj)
     {   
         if(sct->tuples.size() > 0)

@@ -10,6 +10,6 @@
 template <typename T>
 AbstractConstraint*
 BuildCT_EGGSHELL(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return new EggShell<T>(stateObj, t1, b.tuples); }
+{ return new EggShell<T>(stateObj, t1, b.short_tuples); }
 
 BUILD_CT(CT_EGGSHELL, 1)
