@@ -112,6 +112,7 @@ void print_instance(const ConstraintBlob& blob)
         break;
       case read_tuples:
         oss << blob.tuples->getName();
+        break;
       case read_short_tuples:
         oss << blob.short_tuples->getName();
       break;
