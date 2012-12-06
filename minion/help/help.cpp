@@ -152,8 +152,8 @@ cout << "**SHORTTUPLELIST**" << endl
 << "" << endl
 << "[(0,0),(3,0)]" << endl
 << "" << endl
-<< "Represents "If the variable at index 0 is 0, and the variable at index" << endl
-<< "3 is 0, then the constraint is true"." << endl
+<< "Represents 'If the variable at index 0 is 0, and the variable at index" << endl
+<< "3 is 0, then the constraint is true'." << endl
 << "" << endl
 << "" << endl
 << "Note that some tuples are double-represented in the example 'mycon'." << endl
@@ -605,7 +605,7 @@ if("constraints haggisgac" == request) {
 cout << "Help entry: " << "constraints haggisgac" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "An extensional constraint that enforces GAC. This constraint make uses" << endl
-<< "of 'short tuples', which allow some values to be marked as "don't care"." << endl
+<< "of 'short tuples', which allow some values to be marked as don't care." << endl
 << "When this allows the set of tuples to be reduced in size, this leads to" << endl
 << "performance gains." << endl
 << "" << endl
@@ -613,7 +613,7 @@ cout << "An extensional constraint that enforces GAC. This constraint make uses"
 << "Other types are not supported." << endl << endl << endl;
 cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "" << endl
-<< "Consider the constraint "min([x1,x2,x3],x4)" on Booleans variables" << endl
+<< "Consider the constraint 'min([x1,x2,x3],x4)'' on Booleans variables" << endl
 << "x1,x2,x3,x4." << endl
 << "" << endl
 << "Represented as a TUPLELIST for a table or gacschema constraint, this would" << endl
@@ -636,8 +636,8 @@ cout << "" << endl
 << "" << endl
 << "[(0,0),(3,0)]" << endl
 << "" << endl
-<< "Represents "If the variable at index 0 is 0, and the variable at index" << endl
-<< "3 is 0, then the constraint is true"." << endl
+<< "Represents 'If the variable at index 0 is 0, and the variable at index" << endl
+<< "3 is 0, then the constraint is true'." << endl
 << "" << endl
 << "This allows us to represent our constraint as follows:" << endl
 << "" << endl

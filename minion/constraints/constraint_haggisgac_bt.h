@@ -36,7 +36,7 @@ help input haggisgac-stable
 
 /** @help constraints;haggisgac Description
 An extensional constraint that enforces GAC. This constraint make uses
-of 'short tuples', which allow some values to be marked as "don't care".
+of 'short tuples', which allow some values to be marked as don't care.
 When this allows the set of tuples to be reduced in size, this leads to
 performance gains.
 
@@ -46,7 +46,7 @@ Other types are not supported.
 
 /** @help constraints;haggisgac Example
 
-Consider the constraint "min([x1,x2,x3],x4)" on Booleans variables
+Consider the constraint 'min([x1,x2,x3],x4)'' on Booleans variables
 x1,x2,x3,x4.
 
 Represented as a TUPLELIST for a table or gacschema constraint, this would
@@ -69,8 +69,8 @@ variable. For example:
 
 [(0,0),(3,0)]
 
-Represents "If the variable at index 0 is 0, and the variable at index
-3 is 0, then the constraint is true".
+Represents 'If the variable at index 0 is 0, and the variable at index
+3 is 0, then the constraint is true'.
 
 This allows us to represent our constraint as follows:
 
