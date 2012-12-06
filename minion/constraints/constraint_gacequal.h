@@ -67,10 +67,12 @@ template<typename EqualVarRef1, typename EqualVarRef2>
 struct GACEqualConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "GACEqual"; }
+  { return "gaceq"; }
   
   EqualVarRef1 var1;
   EqualVarRef2 var2;
+  
+  CONSTRAINT_ARG_LIST2(var1, var2);
   
   DynamicTrigger* dtvar2;   // The start of the block related to var2
   
