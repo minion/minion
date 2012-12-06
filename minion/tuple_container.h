@@ -246,6 +246,39 @@ public:
   vector<vector<pair<SysInt, DomainInt> > > const*  tuplePtr() const
   { return &short_tuples; }
 
+  // This validates a short c-tuple. This just means check no out of bound
+  // variables
+  void validateShortCTuples(SysInt var_count)
+  {
+    for(SysInt i = 0; i < short_tuples.size(); ++i)
+    {
+      for(SysInt j = 0; j < short_tuples[i].size(); ++j)
+      {
+        SysInt v = short_tuples[i][j].first;
+        CHECK(v >= 0, "Short Tuple " + tuple_name + " contains the negative variable index " + to_string(v));
+        CHECK(v < var_count, "Short tuple " + tuple_name + " contains variable index " + to_string(v) + ", but only contains " + to_string(var_count) + " variables (0 indexed)");
+      }
+    }
+  }
+
+  // This function validates a list of short tuples,
+  // so checks for no repeated variables, no multiple literals
+  void validateShortTuples(SysInt var_count)
+  {
+    validateShortCTuples(var_count);
+   for(SysInt i = 0; i < short_tuples.size(); ++i)
+    {
+      for(SysInt j = 0; j < short_tuples[i].size(); ++j)
+      {
+        for(SysInt k = j+1; k < short_tuples[i].size(); ++k)
+        {
+          SysInt v1 = short_tuples[i][j].first;
+          SysInt v2 = short_tuples[i][k].first;
+          CHECK(v1 != v2, "Short Tuple " + tuple_name + " contains two literals refering to " + to_string(v1) + " in the same short tuple!");
+        }
+      }
+    } 
+  }
 
 };
 
@@ -267,6 +300,7 @@ public:
 
   SysInt size()
   { return Internal_TupleList.size(); }
+
 };
 
 

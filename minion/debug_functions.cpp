@@ -68,13 +68,22 @@ void _NORETURN FAIL_EXIT(string s)
   throw 9;
 }
 
-void error_printing_function(const char* a, const char* f, SysInt line)
+void error_printing_function(std::string a, std::string f, SysInt line)
 { 
   cerr << "Assert Error!" << endl;
   cerr << "Test '" << a << "' failed." << endl;
   cerr << "In file " << f << ", line " << line << endl;
   cerr << "\n";
   cout << "\n";
+  cout.flush();
+  cerr.flush();
+  FAIL_EXIT();
+}
+
+void user_error_printing_function(std::string a, std::string f, SysInt line)
+{ 
+  cerr << "An error occurred while solving your instance!" << endl;
+  cerr << a << endl;
   cout.flush();
   cerr.flush();
   FAIL_EXIT();

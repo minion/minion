@@ -96,13 +96,13 @@ void _NORETURN FAIL_EXIT(string s = "");
 
 struct assert_fail {};
 
-void error_printing_function(const char* a, const char* f, SysInt line) __attribute__ ((noreturn));
+void error_printing_function(std::string a, std::string f, SysInt line) __attribute__ ((noreturn));
+void user_error_printing_function(std::string a, std::string f, SysInt line) __attribute__ ((noreturn));
 
 void FATAL_REPORTABLE_ERROR()  __attribute__ ((noreturn));
 
 
-// Unlike Asserts, Checks are always enabled. The 'abort' is there just to stop the compiler complaining.
-#define CHECK(x, y) { if(!(x)) {error_printing_function(y, __FILE__, __LINE__); } }
+#define CHECK(x, y) { if(!(x)) { user_error_printing_function(y, __FILE__, __LINE__); } }
 
 // Check a value doesn't overflow, to be used in ctor of cts 
 #define CHECKSIZE( x, message ) CHECK( x <= ((BigInt) checked_cast<SysInt>(DomainInt_Max)) && x>= ((BigInt) checked_cast<SysInt>(DomainInt_Min)) , message )
