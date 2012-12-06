@@ -26,6 +26,7 @@ cout << "" << endl
 << " | <SearchSection>" << endl
 << " | <ConstraintsSection> " << endl
 << " | <TuplelistSection>" << endl
+<< " | <ShortTuplelistSection>" << endl
 << "" << endl
 << "i.e. 'MINION 3' followed by any number of variable, search," << endl
 << "constraints and tuplelists sections (can repeat) followed by" << endl
@@ -86,7 +87,7 @@ cout << "See help entries for individual constraints under" << endl
 if("input tuplelist" == request) {
 cout << "Help entry: " << "input tuplelist" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "In a tuplelist section lists of allowed tuples for table constraints" << endl
+cout << "A tuplelist section lists of allowed tuples for table constraints" << endl
 << "can be specified. This technique is preferable to specifying the" << endl
 << "tuples in the constraint declaration, since the tuplelists can be" << endl
 << "shared between constraints and named for readability." << endl
@@ -105,7 +106,64 @@ cout << "**TUPLELIST**" << endl
 << "0 1 0" << endl
 << "1 0 0" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints table" << endl << endl << endl;
+cout << "help constraints table" << endl
+<< "help input shorttuplelist" << endl << endl << endl;
+} else
+if("input shorttuplelist" == request) {
+cout << "Help entry: " << "input shorttuplelist" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "A shorttuplelist section lists of allowed tuples for haggisgac" << endl
+<< "and other constraints which accept short tuple lists." << endl
+<< "" << endl
+<< "The required format is" << endl
+<< "" << endl
+<< "TuplelistSection::= **TUPLELIST**" << endl
+<< " <Tuplelist>*" << endl
+<< "" << endl
+<< "Tuplelist::= <name> <num_tuples> <short_tuple>+" << endl
+<< "" << endl
+<< "short_tuple ::= [ <literal>*, ]" << endl
+<< "" << endl
+<< "literal ::= (<num>, <num>)" << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "**SHORTTUPLELIST**" << endl
+<< "mycon 4" << endl
+<< "[(0,0),(3,0)]" << endl
+<< "[(1,0),(3,0)]" << endl
+<< "[(2,0),(3,0)]" << endl
+<< "[(0,1),(1,1),(2,1),(3,1)]" << endl
+<< "" << endl
+<< "Represents the same constraint as:" << endl
+<< "" << endl
+<< "**TUPLELIST**" << endl
+<< "mycon 8 4" << endl
+<< "0 0 0 0" << endl
+<< "0 0 1 0" << endl
+<< "0 1 0 0" << endl
+<< "0 1 1 0" << endl
+<< "1 0 0 0" << endl
+<< "1 0 1 0" << endl
+<< "1 1 0 0" << endl
+<< "1 1 1 1" << endl
+<< "" << endl
+<< "Short tuples give us a way of shrinking this list. Short tuples consist" << endl
+<< "of pairs (x,y), where x is a varible position, and y is a value for that " << endl
+<< "variable. For example:" << endl
+<< "" << endl
+<< "[(0,0),(3,0)]" << endl
+<< "" << endl
+<< "Represents "If the variable at index 0 is 0, and the variable at index" << endl
+<< "3 is 0, then the constraint is true"." << endl
+<< "" << endl
+<< "" << endl
+<< "Note that some tuples are double-represented in the example 'mycon'." << endl
+<< "The first 3 short tuples all allow the assignment '0 0 0 0'. This is fine." << endl
+<< "The important thing for efficency is to try to give a small list of " << endl
+<< "short tuples." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints haggisgac" << endl
+<< "help constraints haggisgac-stable" << endl
+<< "help input tuplelist" << endl << endl << endl;
 } else
 if("input search" == request) {
 cout << "Help entry: " << "input search" << endl << endl;
@@ -300,6 +358,37 @@ cout << "Below is a complete minion input file with commentary, as an example." 
 << "Any text down here is ignored, so you can write whatever you like (or" << endl
 << "nothing at all...)" << endl << endl << endl;
 } else
+if("constraints eq" == request) {
+cout << "Help entry: " << "constraints eq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Constrain two variables to take equal values." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "eq(x0,x1)" << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "Achieves bounds consistency." << endl << endl << endl;
+cout << "Reference" << "-----------------------------------------------------------------------" << endl;
+cout << "help constraints minuseq" << endl << endl << endl;
+} else
+if("constraints minuseq" == request) {
+cout << "Help entry: " << "constraints minuseq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Constraint" << endl
+<< "" << endl
+<< " minuseq(x,y)" << endl
+<< "" << endl
+<< "ensures that x=-y." << endl << endl << endl;
+cout << "Reference" << "-----------------------------------------------------------------------" << endl;
+cout << "help constraints eq" << endl << endl << endl;
+} else
+if("constraints diseq" == request) {
+cout << "Help entry: " << "constraints diseq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Constrain two variables to take different values." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "Achieves arc consistency." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "diseq(v0,v1)" << endl << endl << endl;
+} else
 if("constraints lexless" == request) {
 cout << "Help entry: " << "constraints lexless" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -452,6 +541,23 @@ cout << "An extensional constraint that enforces GAC. The constraint is" << endl
 << "" << endl
 << "For full documentation, see the help for the table constraint." << endl << endl << endl;
 } else
+if("constraints gacschema" == request) {
+cout << "Help entry: " << "constraints gacschema" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "An extensional constraint that enforces GAC. The constraint is" << endl
+<< "specified via a list of tuples." << endl
+<< "" << endl
+<< "The format, and usage of gacschema, is identical to the 'table' constraint." << endl
+<< "It is difficult to predict which out of 'table' and 'gacschema' will be faster" << endl
+<< "for any particular problem." << endl << endl << endl;
+} else
+if("constraints table" == request) {
+cout << "Help entry: " << "constraints table" << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help input tuplelist" << endl
+<< "help input table" << endl
+<< "help input haggisgac" << endl << endl << endl;
+} else
 if("constraints max" == request) {
 cout << "Help entry: " << "constraints max" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -481,6 +587,84 @@ cout << "See" << endl
 << " help constraints max" << endl
 << "" << endl
 << "for the opposite constraint." << endl << endl << endl;
+} else
+if("constraints haggisgac-stable" == request) {
+cout << "Help entry: " << "constraints haggisgac-stable" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "An extensional constraint that enforces GAC. haggisgac-stable" << endl
+<< "is a variant of haggisgac which uses less memory in some cases," << endl
+<< "and can also be faster (or slower). The input is identical to" << endl
+<< "haggisgac." << endl << endl << endl;
+} else
+if("constraints table" == request) {
+cout << "Help entry: " << "constraints table" << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help input haggisgac-stable" << endl << endl << endl;
+} else
+if("constraints haggisgac" == request) {
+cout << "Help entry: " << "constraints haggisgac" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "An extensional constraint that enforces GAC. This constraint make uses" << endl
+<< "of 'short tuples', which allow some values to be marked as "don't care"." << endl
+<< "When this allows the set of tuples to be reduced in size, this leads to" << endl
+<< "performance gains." << endl
+<< "" << endl
+<< "The variables used in the constraint have to be BOOL or DISCRETE variables." << endl
+<< "Other types are not supported." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "" << endl
+<< "Consider the constraint "min([x1,x2,x3],x4)" on Booleans variables" << endl
+<< "x1,x2,x3,x4." << endl
+<< "" << endl
+<< "Represented as a TUPLELIST for a table or gacschema constraint, this would" << endl
+<< "look like:" << endl
+<< "" << endl
+<< "**TUPLELIST**" << endl
+<< "mycon 8 4" << endl
+<< "0 0 0 0" << endl
+<< "0 0 1 0" << endl
+<< "0 1 0 0" << endl
+<< "0 1 1 0" << endl
+<< "1 0 0 0" << endl
+<< "1 0 1 0" << endl
+<< "1 1 0 0" << endl
+<< "1 1 1 1" << endl
+<< "" << endl
+<< "Short tuples give us a way of shrinking this list. Short tuples consist" << endl
+<< "of pairs (x,y), where x is a varible position, and y is a value for that " << endl
+<< "variable. For example:" << endl
+<< "" << endl
+<< "[(0,0),(3,0)]" << endl
+<< "" << endl
+<< "Represents "If the variable at index 0 is 0, and the variable at index" << endl
+<< "3 is 0, then the constraint is true"." << endl
+<< "" << endl
+<< "This allows us to represent our constraint as follows:" << endl
+<< "" << endl
+<< "**SHORTTUPLELIST**" << endl
+<< "mycon 4" << endl
+<< "[(0,0),(3,0)]" << endl
+<< "[(1,0),(3,0)]" << endl
+<< "[(2,0),(3,0)]" << endl
+<< "[(0,1),(1,1),(2,1),(3,1)]" << endl
+<< "" << endl
+<< "Note that some tuples are double-represented here. The first 3 short" << endl
+<< "tuples all allow the assignment '0 0 0 0'. This is fine. The important" << endl
+<< "thing for efficency is to try to give a small list of short tuples." << endl
+<< "" << endl
+<< "" << endl
+<< "We use this tuple by writing:" << endl
+<< "" << endl
+<< "haggisgac([x1,x2,x3,x4], mycon)" << endl
+<< "" << endl
+<< "and now the variables [x1,x2,x3,x4] will satisfy the constraint mycon." << endl << endl << endl;
+} else
+if("constraints table" == request) {
+cout << "Help entry: " << "constraints table" << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help input shorttuplelist" << endl
+<< "help input negativetable" << endl
+<< "help input haggisgac" << endl << endl << endl;
 } else
 if("constraints gcc" == request) {
 cout << "Help entry: " << "constraints gcc" << endl << endl;
@@ -580,6 +764,19 @@ cout << "ALMOST ALL constraints are are reifiable. Individual constraint entries
 << "if the constraint is NOT reifiable." << endl
 << "" << endl
 << "ALL constraints are reifyimplyable." << endl << endl << endl;
+} else
+if("constraints shortstr2" == request) {
+cout << "Help entry: " << "constraints shortstr2" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Another type of table constraint." << endl << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "" << endl
+<< "ShortSTR2 is an implementation of STR2 by Christophe Lecoutre, adapted for" << endl
+<< "short supports." << endl
+<< "" << endl
+<< "shortstr2([x,y,z], [[1,2,3], [1,3,2]])" << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint enforces generalized arc consistency." << endl << endl << endl;
 } else
 if("constraints gccweak" == request) {
 cout << "Help entry: " << "constraints gccweak" << endl << endl;
@@ -689,6 +886,22 @@ cout << "The constraint" << endl
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This constraint is only available for positive domains x, y and z." << endl << endl << endl;
 } else
+if("constraSysInts shortstr2" == request) {
+cout << "Help entry: " << "constraSysInts shortstr2" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Another type of table constraint." << endl << endl << endl;
+} else
+if("constraints shortstr2" == request) {
+cout << "Help entry: " << "constraints shortstr2" << endl << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
+cout << "" << endl
+<< "ShortSTR2 is an implementation of STR2 by Christophe Lecoutre, adapted for" << endl
+<< "short supports." << endl
+<< "" << endl
+<< "shortstr2([x,y,z], [[1,2,3], [1,3,2]])" << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint enforces generalized arc consistency." << endl << endl << endl;
+} else
 if("constraints table" == request) {
 cout << "Help entry: " << "constraints table" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -726,7 +939,9 @@ cout << "The constraints extension can also be specified in the constraint" << e
 << "table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help input tuplelist" << endl
-<< "help input negativetable" << endl << endl << endl;
+<< "help input gacschema" << endl
+<< "help input negativetable" << endl
+<< "help input haggisgac" << endl << endl << endl;
 } else
 if("constraints negativetable" == request) {
 cout << "Help entry: " << "constraints negativetable" << endl << endl;
@@ -1719,8 +1934,11 @@ cout << "help constraints element" << endl;
 cout << "help constraints element_one" << endl;
 cout << "help constraints eq" << endl;
 cout << "help constraints gacalldiff" << endl;
+cout << "help constraints gacschema" << endl;
 cout << "help constraints gcc" << endl;
 cout << "help constraints gccweak" << endl;
+cout << "help constraints haggisgac" << endl;
+cout << "help constraints haggisgac-stable" << endl;
 cout << "help constraints hamming" << endl;
 cout << "help constraints ineq" << endl;
 cout << "help constraints lexleq" << endl;
@@ -1742,6 +1960,7 @@ cout << "help constraints product" << endl;
 cout << "help constraints reification" << endl;
 cout << "help constraints reify" << endl;
 cout << "help constraints reifyimply" << endl;
+cout << "help constraints shortstr2" << endl;
 cout << "help constraints sumgeq" << endl;
 cout << "help constraints sumleq" << endl;
 cout << "help constraints table" << endl;
@@ -1763,11 +1982,16 @@ cout << "help constraints w-notinrange" << endl;
 cout << "help constraints w-notinset" << endl;
 cout << "help constraints w-notliteral" << endl;
 } else
+if("constraSysInts" == request) {
+cout << "Available subentries:" << endl;
+cout << "help constraSysInts shortstr2" << endl;
+} else
 if("input" == request) {
 cout << "Available subentries:" << endl;
 cout << "help input constraints" << endl;
 cout << "help input example" << endl;
 cout << "help input search" << endl;
+cout << "help input shorttuplelist" << endl;
 cout << "help input tuplelist" << endl;
 cout << "help input variables" << endl;
 } else

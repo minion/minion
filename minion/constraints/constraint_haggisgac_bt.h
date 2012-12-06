@@ -23,6 +23,83 @@
 #include "boost/tuple/tuple_comparison.hpp"
 #include "../constraints/constraint_checkassign.h"
 
+/** @help constraints;haggisgac-stable Description
+An extensional constraint that enforces GAC. haggisgac-stable
+is a variant of haggisgac which uses less memory in some cases,
+and can also be faster (or slower). The input is identical to
+haggisgac.
+*/
+
+/** @help constraints;table References
+help input haggisgac-stable
+*/
+
+/** @help constraints;haggisgac Description
+An extensional constraint that enforces GAC. This constraint make uses
+of 'short tuples', which allow some values to be marked as "don't care".
+When this allows the set of tuples to be reduced in size, this leads to
+performance gains.
+
+The variables used in the constraint have to be BOOL or DISCRETE variables.
+Other types are not supported.
+*/
+
+/** @help constraints;haggisgac Example
+
+Consider the constraint "min([x1,x2,x3],x4)" on Booleans variables
+x1,x2,x3,x4.
+
+Represented as a TUPLELIST for a table or gacschema constraint, this would
+look like:
+
+**TUPLELIST**
+mycon 8 4
+0 0 0 0
+0 0 1 0
+0 1 0 0
+0 1 1 0
+1 0 0 0
+1 0 1 0
+1 1 0 0
+1 1 1 1
+
+Short tuples give us a way of shrinking this list. Short tuples consist
+of pairs (x,y), where x is a varible position, and y is a value for that 
+variable. For example:
+
+[(0,0),(3,0)]
+
+Represents "If the variable at index 0 is 0, and the variable at index
+3 is 0, then the constraint is true".
+
+This allows us to represent our constraint as follows:
+
+**SHORTTUPLELIST**
+mycon 4
+[(0,0),(3,0)]
+[(1,0),(3,0)]
+[(2,0),(3,0)]
+[(0,1),(1,1),(2,1),(3,1)]
+
+Note that some tuples are double-represented here. The first 3 short
+tuples all allow the assignment '0 0 0 0'. This is fine. The important
+thing for efficency is to try to give a small list of short tuples.
+
+
+We use this tuple by writing:
+
+haggisgac([x1,x2,x3,x4], mycon)
+
+and now the variables [x1,x2,x3,x4] will satisfy the constraint mycon.
+*/
+
+
+/** @help constraints;table References
+help input shorttuplelist
+help input negativetable
+help input haggisgac
+*/
+
 // Default will be List.   
 // If any special case is defined list will be switched off
 // If two options given compile errors are expected to result.

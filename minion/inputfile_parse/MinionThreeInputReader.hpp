@@ -34,6 +34,7 @@ InputSection::= <VariablesSection>
               | <SearchSection>
               | <ConstraintsSection> 
               | <TuplelistSection>
+              | <ShortTuplelistSection>
 
 i.e. 'MINION 3' followed by any number of variable, search,
 constraints and tuplelists sections (can repeat) followed by
@@ -101,7 +102,7 @@ for details on constraint declarations.
 */
 
 /** @help input;tuplelist Description
-In a tuplelist section lists of allowed tuples for table constraints
+A tuplelist section lists of allowed tuples for table constraints
 can be specified. This technique is preferable to specifying the
 tuples in the constraint declaration, since the tuplelists can be
 shared between constraints and named for readability.
@@ -125,7 +126,69 @@ AtMostOne 4 3
 
 /** @help input;tuplelist References
 help constraints table
+help input shorttuplelist
 */
+
+/** @help input;shorttuplelist Description
+A shorttuplelist section lists of allowed tuples for haggisgac
+and other constraints which accept short tuple lists.
+
+The required format is
+
+TuplelistSection::= **TUPLELIST**
+                    <Tuplelist>*
+
+Tuplelist::= <name> <num_tuples> <short_tuple>+
+
+short_tuple ::= [ <literal>*, ]
+
+literal ::= (<num>, <num>)
+*/
+
+/** @help input;shorttuplelist Example
+**SHORTTUPLELIST**
+mycon 4
+[(0,0),(3,0)]
+[(1,0),(3,0)]
+[(2,0),(3,0)]
+[(0,1),(1,1),(2,1),(3,1)]
+
+Represents the same constraint as:
+
+**TUPLELIST**
+mycon 8 4
+0 0 0 0
+0 0 1 0
+0 1 0 0
+0 1 1 0
+1 0 0 0
+1 0 1 0
+1 1 0 0
+1 1 1 1
+
+Short tuples give us a way of shrinking this list. Short tuples consist
+of pairs (x,y), where x is a varible position, and y is a value for that 
+variable. For example:
+
+[(0,0),(3,0)]
+
+Represents "If the variable at index 0 is 0, and the variable at index
+3 is 0, then the constraint is true".
+
+
+Note that some tuples are double-represented in the example 'mycon'.
+The first 3 short tuples all allow the assignment '0 0 0 0'. This is fine.
+The important thing for efficency is to try to give a small list of 
+short tuples.
+*/
+
+/** @help input;shorttuplelist References
+help constraints haggisgac
+help constraints haggisgac-stable
+help input tuplelist
+*/
+
+
 
 /** @help input;search Description 
 

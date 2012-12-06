@@ -58,7 +58,9 @@ table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})
 
 /** @help constraints;table References
 help input tuplelist
+help input gacschema
 help input negativetable
+help input haggisgac
 */
 
 /** @help constraints;negativetable Description
