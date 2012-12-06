@@ -266,25 +266,21 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
     {
         ShortTupleList* tl = search_state.getShortTupleListContainer()->getShortTupleList(i);
         os << tl->getName() << " " << tl->size() << "\n";
-        for(SysInt i = 0; i < tl->size(); ++i)
+
+        const vector<vector<pair<SysInt, DomainInt> > >& tupleRef = *(tl->tuplePtr());
+        
+        for(SysInt j = 0; j < tupleRef.size(); ++j)
         {
-            const vector<vector<pair<SysInt, DomainInt> > >& tupleRef = *(tl->tuplePtr());
             os << "[";
-            for(SysInt j = 0; j < tupleRef.size(); ++j)
+            bool first = true;
+            for(SysInt k = 0; k < tupleRef[j].size(); ++k)
             {
-                os << "[";
-                bool first = true;
-                for(SysInt k = 0; k < tupleRef[j].size(); ++k)
-                {
-                    if(first) first=false; else os << ", ";
-                    os << "(" << tupleRef[j][k].first << "," << tupleRef[j][k].second << ")";
-                }
-                os << "]";
+                if(first) first=false; else os << ", ";
+                os << "(" << tupleRef[j][k].first << "," << tupleRef[j][k].second << ")";
             }
-
-
-            os << "]";
+            os << "]\n";
         }
+
         os << endl;
     }
 
