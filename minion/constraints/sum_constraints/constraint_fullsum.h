@@ -220,7 +220,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
   { return rev_implement<is_reversed>(); }
 
  template<bool b> 
-  typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
+  typename boost::disable_if_c<b, AbstractConstraint*>::type rev_implement()
   {
     typename NegType<VarArray>::type new_var_array(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -234,7 +234,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
   }
 
   template<bool b>
-  typename enable_if_c<b, AbstractConstraint*>::type rev_implement()
+  typename boost::enable_if_c<b, AbstractConstraint*>::type rev_implement()
     { FAIL_EXIT(); }
     
   };  

@@ -320,14 +320,14 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
    { return rev_implement<is_reversed>(); }
 
   template<bool b> 
-   typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
+   typename boost::disable_if_c<b, AbstractConstraint*>::type rev_implement()
    {
       return new BoolLessSumConstraintDynamic<VarArray, VarSum, 1-VarToCount, true>
                (stateObj, var_array, var_array.size()-var_sum+1);
    }
 
    template<bool b>
-   typename enable_if_c<b, AbstractConstraint*>::type rev_implement()
+   typename boost::enable_if_c<b, AbstractConstraint*>::type rev_implement()
      { FAIL_EXIT(); }
 
 };

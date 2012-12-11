@@ -149,7 +149,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
   { return rev_implement<is_reversed>(); }
 
  template<bool b> 
-  typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
+  typename boost::disable_if_c<b, AbstractConstraint*>::type rev_implement()
   {
      typedef minion_array<typename NegType<VarRef>::type, size> VarArray;
       VarArray new_var_array;
@@ -164,7 +164,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
   }
 
   template<bool b>
-  typename enable_if_c<b, AbstractConstraint*>::type rev_implement()
+  typename boost::enable_if_c<b, AbstractConstraint*>::type rev_implement()
     { FAIL_EXIT(); }
 
 };
