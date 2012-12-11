@@ -124,7 +124,7 @@ struct ConstraintBlob
   PropagationLevel gadget_prop_type;
 
   /// For use in Gadget constraints, gives the actual gadget.
-  shared_ptr<CSPInstance> gadget;
+  minion_shared_ptr<CSPInstance> gadget;
 
   /// For use in nested constraints.
   vector<ConstraintBlob> internal_constraints;
@@ -588,8 +588,8 @@ struct CSPInstance
 {
   VarContainer vars;
   list<ConstraintBlob> constraints;
-  shared_ptr<TupleListContainer> tupleListContainer;
-  shared_ptr<ShortTupleListContainer> shortTupleListContainer;
+  minion_shared_ptr<TupleListContainer> tupleListContainer;
+  minion_shared_ptr<ShortTupleListContainer> shortTupleListContainer;
 
   vector<SearchOrder> search_order;
   vector<Var> permutation;
@@ -614,8 +614,8 @@ struct CSPInstance
   map<ShortTupleList*, string> shorttable_nametable;
 
 
-  /// We make these shared_ptrs so they automatically clear up after themselves.
-  map<string, shared_ptr<CSPInstance> > gadgetMap;
+  /// We make these minion_shared_ptrs so they automatically clear up after themselves.
+  map<string, minion_shared_ptr<CSPInstance> > gadgetMap;
 
 
   CSPInstance() : tupleListContainer(new TupleListContainer), shortTupleListContainer(new ShortTupleListContainer),
@@ -753,16 +753,16 @@ public:
     return it->second;
   }
 
-  void addGadgetSymbol(string name, shared_ptr<CSPInstance> gadget)
+  void addGadgetSymbol(string name, minion_shared_ptr<CSPInstance> gadget)
   {
     if(gadgetMap.count(name) != 0)
       throw parse_exception("Gadget name "+ name + " already in use.");
     gadgetMap[name] = gadget;
   }
 
-  shared_ptr<CSPInstance> getGadgetSymbol(string name)
+  minion_shared_ptr<CSPInstance> getGadgetSymbol(string name)
   {
-    map<string, shared_ptr<CSPInstance> >::iterator it = gadgetMap.find(name);
+    map<string, minion_shared_ptr<CSPInstance> >::iterator it = gadgetMap.find(name);
     if(it == gadgetMap.end())
       throw parse_exception("Undefined gadget name '" + name + "'");
     return it->second;

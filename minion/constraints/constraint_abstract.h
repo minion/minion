@@ -52,7 +52,7 @@ class DynamicTrigger;
 #include "dynamic_trigger.h"
 
 struct AbstractTriggerCreator;
-typedef vector<shared_ptr<AbstractTriggerCreator> > triggerCollection;
+typedef vector<minion_shared_ptr<AbstractTriggerCreator> > triggerCollection;
 
 #include "constraint_printing.h"
 

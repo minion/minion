@@ -98,13 +98,13 @@ struct VariableOrder
 // Container for multiple variable orderings
 struct MultiBranch : public VariableOrder
 {
-    vector<shared_ptr<VariableOrder> > vovector;
+    vector<minion_shared_ptr<VariableOrder> > vovector;
     Reversible<SysInt> pos;
     
     // need to patch up the returned variable index
     vector<DomainInt> variable_offset;
     
-    MultiBranch(const vector<shared_ptr<VariableOrder> > _vovector,
+    MultiBranch(const vector<minion_shared_ptr<VariableOrder> > _vovector,
 		StateObj* _stateObj):
     VariableOrder(_vovector[0]->var_order), // It doesn't matter what var_order is set to
     vovector(_vovector),

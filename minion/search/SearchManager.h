@@ -55,12 +55,12 @@ struct SearchManager
   
   StateObj* stateObj;
   vector<AnyVarRef> var_array;
-  shared_ptr<VariableOrder> var_order;
+  minion_shared_ptr<VariableOrder> var_order;
   
   bool hasauxvars;   // Has a VARORDER AUX
   SysInt topauxvar;  // lowest index of an aux var.
   
-  shared_ptr<Propagate> prop;  // Propagate is the type of the base class. Method prop->prop(stateObj, var_array)
+  minion_shared_ptr<Propagate> prop;  // Propagate is the type of the base class. Method prop->prop(stateObj, var_array)
   
   vector<Controller::triple> branches; //L & R branches so far (isLeftBranch?,var,value)
   //vector<DomainInt> first_unassigned_variable;
@@ -69,8 +69,8 @@ struct SearchManager
   SysInt ceiling; // index into branches, it is the lowest LB which has been stolen.
   
   SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array,
-                vector<SearchOrder> _order, shared_ptr<VariableOrder> _var_order,
-                shared_ptr<Propagate> _prop)
+                vector<SearchOrder> _order, minion_shared_ptr<VariableOrder> _var_order,
+                minion_shared_ptr<Propagate> _prop)
   : stateObj(_stateObj), var_array(_var_array), var_order(_var_order),
     topauxvar(0), prop(_prop), depth(0), ceiling(-1)
   {

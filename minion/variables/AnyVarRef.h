@@ -311,7 +311,7 @@ class AnyVarRef
 public:
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Maybe;
-  shared_ptr<AnyVarRef_Abstract> data;
+  minion_shared_ptr<AnyVarRef_Abstract> data;
   
   BOOL isBound() const
   { return data->isBound();}
@@ -321,7 +321,7 @@ public:
   
   template<typename VarRef>
     AnyVarRef(const VarRef& _data) 
-  { data = shared_ptr<AnyVarRef_Abstract>(new AnyVarRef_Concrete<VarRef>(_data)); }
+  { data = minion_shared_ptr<AnyVarRef_Abstract>(new AnyVarRef_Concrete<VarRef>(_data)); }
   
   AnyVarRef() 
   {}
