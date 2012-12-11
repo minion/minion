@@ -96,10 +96,10 @@ void _NORETURN FAIL_EXIT(string s = "");
 
 struct assert_fail {};
 
-void error_printing_function(std::string a, std::string f, SysInt line) __attribute__ ((noreturn));
-void user_error_printing_function(std::string a, std::string f, SysInt line) __attribute__ ((noreturn));
+void error_printing_function(std::string a, std::string f, SysInt line) _NORETURN;
+void user_error_printing_function(std::string a, std::string f, SysInt line) _NORETURN;
 
-void FATAL_REPORTABLE_ERROR()  __attribute__ ((noreturn));
+void FATAL_REPORTABLE_ERROR()  _NORETURN;
 
 
 #define CHECK(x, y) { if(!(x)) { user_error_printing_function(y, __FILE__, __LINE__); } }
