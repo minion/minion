@@ -74,11 +74,7 @@
     {
         template<typename T>
         bool operator()(const T& lhs, const T& rhs)
-        #if SupportsGacNoCopyList
         { return *lhs < *rhs; }
-        #else
-        { return lhs < rhs; }
-        #endif
     };
 
        virtual ~CLASSNAME() {

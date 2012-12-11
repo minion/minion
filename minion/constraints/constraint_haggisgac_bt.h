@@ -104,25 +104,25 @@ help input haggisgac
 // If any special case is defined list will be switched off
 // If two options given compile errors are expected to result.
 
-#define UseElementShort false
-#define UseElementLong false
-#define UseLexLeqShort false
-#define UseLexLeqLong false
-#define UseSquarePackingShort false
-#define UseSquarePackingLong false
-#define UseList true
-#define UseNDOneList false
-#define SupportsGacNoCopyList true
+#define UseElementShort 0
+#define UseElementLong 0
+#define UseLexLeqShort 0
+#define UseLexLeqLong 0
+#define UseSquarePackingShort 0
+#define UseSquarePackingLong 0
+#define UseList 1
+#define UseNDOneList 0
+#define SupportsGacNoCopyList 1
 
 // The algorithm iGAC or short-supports-gac
 
 // Does it place dynamic triggers for the supports.
-#define SupportsGACUseDT true
+#define SupportsGACUseDT 1
 
 // Switches on the zeroLits array. 
 // This flag is a small slowdown on qg-supportsgac-7-9 -findallsols
 // 
-#define SupportsGACUseZeroVals true
+#define SupportsGACUseZeroVals 1
 
 #define CLASSNAME HaggisGAC
 template<typename VarArray>
