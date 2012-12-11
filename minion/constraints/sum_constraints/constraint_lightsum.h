@@ -35,9 +35,9 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
 
   bool no_negatives;
   
-  array<VarRef, size> var_array;  
+  minion_array<VarRef, size> var_array;  
   VarSum var_sum;
-  LightLessEqualSumConstraint(StateObj* _stateObj, const array<VarRef, size>& _var_array, const VarSum& _var_sum) :
+  LightLessEqualSumConstraint(StateObj* _stateObj, const minion_array<VarRef, size>& _var_array, const VarSum& _var_sum) :
     AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
   {
       BigInt accumulator=0;
@@ -151,7 +151,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
  template<bool b> 
   typename disable_if_c<b, AbstractConstraint*>::type rev_implement()
   {
-     typedef array<typename NegType<VarRef>::type, size> VarArray;
+     typedef minion_array<typename NegType<VarRef>::type, size> VarArray;
       VarArray new_var_array;
       for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
         new_var_array[i] = VarNegRef(var_array[i]);
@@ -171,7 +171,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
 
 template<typename VarRef, std::size_t size, typename VarSum>
 AbstractConstraint*
-LightLessEqualSumCon(StateObj* stateObj, const array<VarRef,size>& _var_array,  const VarSum& _var_sum)
+LightLessEqualSumCon(StateObj* stateObj, const minion_array<VarRef,size>& _var_array,  const VarSum& _var_sum)
 { 
   return (new LightLessEqualSumConstraint<VarRef, size, VarSum>(stateObj, _var_array,_var_sum)); 
 }
@@ -179,7 +179,7 @@ LightLessEqualSumCon(StateObj* stateObj, const array<VarRef,size>& _var_array,  
 
 template<typename VarRef, std::size_t size, typename VarSum>
 AbstractConstraint*
-LightGreaterEqualSumCon(StateObj* stateObj, const array<VarRef,size>& _var_array, const VarSum& _var_sum)
+LightGreaterEqualSumCon(StateObj* stateObj, const minion_array<VarRef,size>& _var_array, const VarSum& _var_sum)
 { 
   return 
   (new LightLessEqualSumConstraint<typename NegType<VarRef>::type, size, 

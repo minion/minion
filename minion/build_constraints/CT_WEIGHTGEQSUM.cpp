@@ -13,7 +13,7 @@ BuildCT_GEQSUM(StateObj* stateObj, const vector<VarArray>& _var_array, const vec
 { 
   if(_var_array.size() == 2)
   {
-    array<VarArray, 2> v_array;
+    minion_array<VarArray, 2> v_array;
     for(SysInt i = 0; i < 2; ++i)
       v_array[i] = _var_array[i];
     return LightGreaterEqualSumCon(stateObj, v_array, _var_sum[0]);

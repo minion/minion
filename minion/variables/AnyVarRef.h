@@ -454,7 +454,7 @@ struct make_AnyVarRef_type<vector<T> >
 };
 
 template<typename T, size_t i>
-struct make_AnyVarRef_type<array<T, i> >
+struct make_AnyVarRef_type<minion_array<T, i> >
 {
   typedef vector<typename make_AnyVarRef_type<T>::type> type;
 };
@@ -477,8 +477,8 @@ make_AnyVarRef(vector<T> t)
 }
 
 template<typename T, size_t param>
-typename make_AnyVarRef_type<array<T,param> >::type
-make_AnyVarRef(array<T,param> t)
+typename make_AnyVarRef_type<minion_array<T,param> >::type
+make_AnyVarRef(minion_array<T,param> t)
 {
   vector<AnyVarRef> v;
   for(size_t i = 0; i < t.size(); ++i)

@@ -89,7 +89,7 @@ struct ConstraintDef
   std::string name;
   ConstraintType type;
   SysInt number_of_params;
-  array<ReadTypes,4> read_types;
+  minion_array<ReadTypes,4> read_types;
 };
 
 extern ConstraintDef constraint_list[];

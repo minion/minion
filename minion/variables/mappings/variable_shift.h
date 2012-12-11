@@ -182,8 +182,8 @@ struct ShiftType<vector<T>, U>
 #endif
 
 template<typename T, std::size_t i, typename U>
-struct ShiftType<array<T, i>, U >
-{ typedef array<ShiftVar<T, U>, i> type; };
+struct ShiftType<minion_array<T, i>, U >
+{ typedef minion_array<ShiftVar<T, U>, i> type; };
 
 
 template<typename VRef, typename Shift>
@@ -215,10 +215,10 @@ ShiftVarRef(const vector<VarRef>& var_array, const Shift& shift)
 #endif
 
 template<typename VarRef, typename Shift, std::size_t i>
-array<ShiftVar<VarRef, Shift>, i>
-ShiftVarRef(const array<VarRef, i>& var_array, const Shift& shift)
+minion_array<ShiftVar<VarRef, Shift>, i>
+ShiftVarRef(const minion_array<VarRef, i>& var_array, const Shift& shift)
 {
-  array<ShiftVar<VarRef, Shift>, i> shift_array;
+  minion_array<ShiftVar<VarRef, Shift>, i> shift_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
     shift_array[l] = ShiftVarRef(var_array[l], shift);
   return shift_array;
