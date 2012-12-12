@@ -255,8 +255,8 @@ public:
       for(SysInt j = 0; j < short_tuples[i].size(); ++j)
       {
         SysInt v = short_tuples[i][j].first;
-        CHECK(v >= 0, "Short Tuple " + tuple_name + " contains the negative variable index " + to_string(v));
-        CHECK(v < var_count, "Short tuple " + tuple_name + " contains variable index " + to_string(v) + ", but only contains " + to_string(var_count) + " variables (0 indexed)");
+        CHECK(v >= 0, "The short tuple '" + tuple_name + "' contains the negative variable index " + to_string(v));
+        CHECK(v < var_count, "The short tuple '" + tuple_name + "' contains variable index " + to_string(v) + ", but only contains " + to_string(var_count) + " variables (0 indexed)");
       }
     }
   }
@@ -274,10 +274,27 @@ public:
         {
           SysInt v1 = short_tuples[i][j].first;
           SysInt v2 = short_tuples[i][k].first;
-          CHECK(v1 != v2, "Short Tuple " + tuple_name + " contains two literals refering to " + to_string(v1) + " in the same short tuple!");
+          if(v1 == v2)
+          {
+            if(short_tuples[i][j].second == short_tuples[i][k].second)
+            {
+              std::ostringstream oss;
+              oss << "The short tuple '" + tuple_name + "' contains a tuple with the repeated literal ";
+              oss << "(" << short_tuples[i][j].first << "," << short_tuples[i][j].second << ")";
+              CHECK(false, oss.str());
+            }
+            else
+            {
+              std::ostringstream oss;
+              oss << "The short tuple '" + tuple_name + "' contains a short tuple with the literals:\n";
+              oss << "  (" << short_tuples[i][j].first << "," << short_tuples[i][j].second << ") and ";
+              oss << "(" << short_tuples[i][k].first << "," << short_tuples[i][k].second << "), which both refer to the same variable.";
+              CHECK(false, oss.str());
+            }
+          }
         }
       }
-    } 
+    }
   }
 
 };

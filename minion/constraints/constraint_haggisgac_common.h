@@ -138,9 +138,9 @@
 
     void init()
     {
-
-
         SysInt numvars = vars.size(); 
+
+        data->validateShortTuples(numvars);
         
         // literalsScratch.reserve(numvars);
 
