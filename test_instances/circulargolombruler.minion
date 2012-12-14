@@ -1,0 +1,100 @@
+MINION 1
+#TEST SOLCOUNT 10
+# Minion Spec for propogation on reduced set test
+0
+0
+0
+25
+
+
+0 7 4
+0 0 1
+0 7 15
+-7 0 4
+0 42 1
+
+0
+[
+x0,x1,x2,x3,
+x4,x20,x21,x22,x23,
+x5,x6,x7,x8,
+x9,x10,x11,x12,
+x13,x14,x15,x16,
+x17,x18,x19,x24
+]
+[
+a,a,a,a,a,
+a,a,a,a,a,
+a,a,a,a,a,
+a,a,a,a,a,
+a,a,a,a,a
+]
+1
+[x0,x1,x2,x3]
+2
+[
+[x4,x5,x6,x7],
+[x8,x9,x10,x11],
+[x12,x13,x14,x15],
+[x16,x17,x18,x19]
+]
+[
+[x0,x1,x2,x3],
+[0,0,0,0],
+[x4,x5,x6,x7],
+[x8,x9,x10,x11],
+[x12,x13,x14,x15],
+[x16,x17,x18,x19]
+]
+0
+objective none
+
+print m1
+
+sumleq([x5,x6,x7,x10,x11,x15],x24)
+sumgeq([x5,x6,x7,x10,x11,x15],x24)
+
+
+alldiff([x1,x2,x0,x3])
+minuseq(x0,x20)
+minuseq(x1,x21)
+minuseq(x2,x22)
+minuseq(x3,x23)
+
+
+
+alldiff([x5,x6,x7,x10,x11,x15])
+
+eq(x5,x8)
+eq(x6,x12)
+eq(x7,x16)
+eq(x10,x13)
+eq(x11,x17)
+eq(x15,x18)
+
+eq(x4,x9)
+eq(x4,x14)
+eq(x4,x19)
+
+sumleq([x0,x21],x5)
+sumleq([x0,x22],x6)
+sumleq([x0,x23],x7)
+sumleq([x1,x22],x10)
+sumleq([x1,x23],x11)
+sumleq([x2,x23],x15)
+
+sumgeq([x0,x21],x5)
+sumgeq([x0,x22],x6)
+sumgeq([x0,x23],x7)
+sumgeq([x1,x22],x10)
+sumgeq([x1,x23],x11)
+sumgeq([x2,x23],x15)
+
+
+
+
+
+
+
+
+

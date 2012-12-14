@@ -1,0 +1,8 @@
+language ESSENCE' 1.b.a
+
+find pigs, hens: int(0..7)
+
+such that
+
+pigs + hens = 7,
+pigs * 4 + hens * 2 = 22

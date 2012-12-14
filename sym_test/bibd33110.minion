@@ -1,0 +1,54 @@
+MINION 3
+#TEST GROUP 3*2*3*2
+**VARIABLES**
+BOOL x0
+BOOL x1
+BOOL x2
+BOOL x3
+BOOL x4
+BOOL x5
+BOOL x6
+BOOL x7
+BOOL x8
+BOOL x9
+BOOL x10
+BOOL x11
+BOOL x12
+BOOL x13
+BOOL x14
+BOOL x15
+BOOL x16
+BOOL x17
+**SEARCH**
+VARORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8]
+VALORDER [a,a,a,a,a,a,a,a,a]
+**TUPLELIST**
+**CONSTRAINTS**
+sumleq([x0,x1,x2], 1)
+sumgeq([x0,x1,x2], 1)
+sumleq([x3,x4,x5], 1)
+sumgeq([x3,x4,x5], 1)
+sumleq([x6,x7,x8], 1)
+sumgeq([x6,x7,x8], 1)
+sumleq([x0,x3,x6], 1)
+sumgeq([x0,x3,x6], 1)
+sumleq([x1,x4,x7], 1)
+sumgeq([x1,x4,x7], 1)
+sumleq([x2,x5,x8], 1)
+sumgeq([x2,x5,x8], 1)
+product(x0,x3, x9)
+product(x1,x4, x10)
+product(x2,x5, x11)
+sumleq([x9,x10,x11], 0)
+sumgeq([x9,x10,x11], 0)
+product(x0,x6, x12)
+product(x1,x7, x13)
+product(x2,x8, x14)
+sumleq([x12,x13,x14], 0)
+sumgeq([x12,x13,x14], 0)
+product(x3,x6, x15)
+product(x4,x7, x16)
+product(x5,x8, x17)
+sumleq([x15,x16,x17], 0)
+sumgeq([x15,x16,x17], 0)
+**EOF**
