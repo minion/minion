@@ -22,6 +22,7 @@
 #include <algorithm>
 #include "boost/tuple/tuple_comparison.hpp"
 #include "../constraints/constraint_checkassign.h"
+#include "constraint_haggisgac_tuples.h"
 
 /** @help constraints;haggisgac-stable Description
 An extensional constraint that enforces GAC. haggisgac-stable
@@ -190,18 +191,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
     
     Support* supportFreeList;       // singly-linked list of spare Support objects.
     
-    #if UseList
-    #if !SupportsGacNoCopyList
-    vector<vector<vector<vector<pair<SysInt, DomainInt> > > > > tuple_lists;  // tuple_lists[var][val] is a vector 
-    // of short supports for that var, val. Includes any supports that do not contain var at all.
-    #else
-    vector<vector<vector<vector<pair<SysInt, DomainInt> > * > > > tuple_lists;
-    #endif
-    #endif
-    
-    #if UseNDOneList
-    vector<vector<tuple<SysInt,SysInt,SysInt> > > tuple_nd_list; // The inner type is var,val,next-different-pos.
-    #endif
+    HaggisGACTuples* tuple_list;
     
     vector<vector<SysInt> > tuple_list_pos;    // current position in tuple_lists (for each var and val). Wraps around.
     

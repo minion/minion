@@ -47,9 +47,9 @@
         return false;
 
     const SysInt val_offset = checked_cast<SysInt>(v[0]-vars[0].getInitialMin());
-    const vector<vector<pair<SysInt, DomainInt> > * >& tuplist=tuple_lists[0][val_offset];
+    const vector<vector<pair<SysInt, DomainInt> > * >& tuplist=tuple_list->get_tl()[0][val_offset];
 
-    for(SysInt i=0; i<tuple_lists[0][val_offset].size(); i++) 
+    for(SysInt i=0; i<tuple_list->get_tl()[0][val_offset].size(); i++) 
     {
         const vector<pair<SysInt,DomainInt> > & tup=*(tuplist[i]);
         
@@ -70,12 +70,7 @@
     return false;
   }
 
-      struct SupportDeref
-    {
-        template<typename T>
-        bool operator()(const T& lhs, const T& rhs)
-        { return *lhs < *rhs; }
-    };
+     
 
        virtual ~CLASSNAME() {
         //printStructures();
@@ -212,75 +207,13 @@
         supportNumPtrs[0]=0;
         for(SysInt i=1; i<= numlits; i++) supportNumPtrs[i]=vars.size();
         
-#if UseList
-        // Read in the short supports.
-        
-        #if UseList && SupportsGacNoCopyList
-        vector<vector<pair<SysInt, DomainInt> > * > shortsupports;
-        #else
-        vector<vector<pair<SysInt, DomainInt> > > shortsupports;
-        #endif
-        
-        const vector<vector<pair<SysInt, DomainInt> > >& tupleRef = (*data->tuplePtr());
-        
-        for(SysInt i=0; i<tupleRef.size(); i++) {
-            
-            #if UseList && SupportsGacNoCopyList
-            shortsupports.push_back(new vector<pair<SysInt, DomainInt> >(tupleRef[i]));
-            #else
-            shortsupports.push_back(tupleRef[i]);
-            #endif
-        }
-
-        
-        // Sort it. Might not work when it's pointers.
-        for(SysInt i=0; i<shortsupports.size(); i++) {
-            // Sort each short support
-            #if UseList && SupportsGacNoCopyList
-            sort(shortsupports[i]->begin(), shortsupports[i]->end());
-            #else
-            sort(shortsupports[i].begin(), shortsupports[i].end());
-            #endif
-        }
-        sort(shortsupports.begin(), shortsupports.end(), SupportDeref());
-        
-        tuple_lists.resize(vars.size());
         tuple_list_pos.resize(vars.size());
         for(SysInt var=0; var<vars.size(); var++) {
             SysInt domsize = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
-            tuple_lists[var].resize(domsize);
             tuple_list_pos[var].resize(domsize, 0);
-            
-            for(DomainInt val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
-                // get short supports relevant to var,val.
-                for(SysInt i=0; i<shortsupports.size(); i++) {
-                    bool varin=false;
-                    bool valmatches=true;
-                    
-                    #if SupportsGacNoCopyList
-                    vector<pair<SysInt, DomainInt> > & shortsup=*(shortsupports[i]);
-                    #else
-                    vector<pair<SysInt, DomainInt> > & shortsup=shortsupports[i];
-                    #endif
-                    
-                    for(SysInt j=0; j<shortsup.size(); j++) {
-                        if(shortsup[j].first==var) {
-                            varin=true;
-                            if(shortsup[j].second!=val) {
-                                valmatches=false;
-                            }
-                        }
-                    }
-                    
-                    if(!varin || valmatches) {
-                        // If the support doesn't include the var, or it 
-                        // does include var,val then add it to the list.
-                        tuple_lists[var][checked_cast<SysInt>(val-vars[var].getInitialMin())].push_back(shortsupports[i]);
-                    }
-                }
-            }
         }
-#endif
+
+        tuple_list = data->getHaggisData(vars);
     }
 
         void printStructures()
@@ -375,9 +308,9 @@
     //bool findNewSupport(box<pair<SysInt, DomainInt> >& assignment, SysInt var, DomainInt val) {
     template<bool keepassigned>
     bool findNewSupport(SysInt var, DomainInt val) {
-        D_ASSERT(tuple_lists.size()==vars.size());
+        D_ASSERT(tuple_list->get_tl().size()==vars.size());
         const SysInt val_offset = checked_cast<SysInt>(val-vars[var].getInitialMin());
-        const vector<vector<pair<SysInt, DomainInt> > * >& tuplist=tuple_lists[var][val_offset]; 
+        const vector<vector<pair<SysInt, DomainInt> > * >& tuplist=tuple_list->get_tl()[var][val_offset]; 
         
         SysInt listsize=tuplist.size();
         for(SysInt i=tuple_list_pos[var][val_offset]; i<listsize; i++) {

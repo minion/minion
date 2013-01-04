@@ -36,6 +36,7 @@ class Nightingale;
 class TupleTrieArray;
 class Regin;
 class EggShellData;
+class HaggisGACTuples;
 
 class TupleList
 {
@@ -61,6 +62,7 @@ class TupleList
   TupleTrieArray* getTries();
   Regin* getRegin();
   EggShellData* getEggShellData(size_t varcount);
+
   
   /// Get raw pointer to the tuples.
   DomainInt* getPointer()
@@ -229,9 +231,16 @@ class ShortTupleList
   vector<vector<pair<SysInt, DomainInt> > > short_tuples;
   string tuple_name;
 
+  HaggisGACTuples* hgt;
+
 public:
+  template<typename Vars>
+  HaggisGACTuples* getHaggisData(const Vars& vars);
+
+
+
   ShortTupleList(const vector<vector<pair<SysInt, DomainInt> > >& _short_tuples)
-  : short_tuples(_short_tuples)
+  : short_tuples(_short_tuples), hgt(NULL)
   { }
 
   void setName(string name)
