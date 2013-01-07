@@ -231,7 +231,7 @@ class ShortTupleList
   vector<vector<pair<SysInt, DomainInt> > > short_tuples;
   string tuple_name;
 
-  HaggisGACTuples* hgt;
+  std::map<std::vector<std::pair<DomainInt, DomainInt> >, HaggisGACTuples*> hgt;
 
 public:
   template<typename Vars>
@@ -240,7 +240,7 @@ public:
 
 
   ShortTupleList(const vector<vector<pair<SysInt, DomainInt> > >& _short_tuples)
-  : short_tuples(_short_tuples), hgt(NULL)
+  : short_tuples(_short_tuples)
   { }
 
   void setName(string name)

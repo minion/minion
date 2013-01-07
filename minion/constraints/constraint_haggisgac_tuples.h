@@ -31,23 +31,8 @@ struct HaggisGACTuples
 {
     typedef vector<vector<vector<vector<pair<SysInt, DomainInt> > * > > > tuple_list_type;
 
-    vector<pair<DomainInt, DomainInt> > doms;
 
     tuple_list_type tuple_list_cpy;
-
-    template<typename Vars>
-    bool verify_domains(const Vars& vars)
-    {
-        if(vars.size() != doms.size())
-            return false;
-
-        for(SysInt i = 0; i < doms.size(); ++i)
-        {
-            if(doms[i] != std::make_pair(vars[i].getInitialMin(), vars[i].getInitialMax()))
-                return false;
-        }
-        return true;
-    }
 
     const tuple_list_type& get_tl() const
     { return tuple_list_cpy; }
@@ -55,9 +40,6 @@ struct HaggisGACTuples
     template<typename Vars, typename Data>
     HaggisGACTuples(const Vars& vars, Data data)
     {
-        for(SysInt i = 0; i < vars.size(); ++i)
-            doms.push_back(std::make_pair(vars[i].getInitialMin(), vars[i].getInitialMax()));
-
         // Read in the short supports.
         vector<vector<pair<SysInt, DomainInt> > * > shortsupports;
         
@@ -110,18 +92,17 @@ struct HaggisGACTuples
 template<typename Vars>
 inline HaggisGACTuples* ShortTupleList::getHaggisData(const Vars& vars)
 {
-  if(hgt == NULL)
-    hgt = new HaggisGACTuples(vars, this);
+    vector<pair<DomainInt, DomainInt> > doms;
 
-  std::ostringstream oss;
-  oss << "The short tuple '" + tuple_name + "' is used in two haggisgac constraints\n";
-  oss << "With either different numbers of variables, or different domains.\n";
-  oss << "This is currently not allowed, for a boring technical reason (sorry).\n";
-  oss << "You could duplicate the short tuple for each different set of domains,\n";
-  oss << "or, if you complain to the minion developers we promise to fix it!\n";
-  CHECK(hgt->verify_domains(vars), oss.str());
+    for(SysInt i = 0; i < vars.size(); ++i)
+        doms.push_back(std::make_pair(vars[i].getInitialMin(), vars[i].getInitialMax()));
 
-  return hgt;
+    if(hgt.count(doms) == 0)
+    {
+        hgt[doms] = new HaggisGACTuples(vars, this);
+    }
+
+    return hgt[doms];
 }
 
 #endif
