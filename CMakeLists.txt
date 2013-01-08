@@ -255,7 +255,7 @@ endif()
 #   message(STATUS "Compiler does not support C++0x")
 #endif()
 
-set(WFLAGS "-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter -fwrapv")
+set(WFLAGS "-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter")
 check_cxx_compiler_flag(${WFLAGS} CheckWarnings)
 if(CheckWarnings AND NOT SUNOS AND CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(${WFLAGS})
@@ -312,10 +312,12 @@ endif()
 
 option(PROFILE "" OFF)
 option(GPROF "" OFF)
+option(UNOPTIMISED "" OFF)
+
 if(PROFILE)
     message(STATUS "Enabling profiling")
     set(BINARY "${BINARY}-profile")
-    set(CFLAGS "${CFLAGS} -g -fno-inline -fno-inline-functions")
+    set(CFLAGS "${CFLAGS} -g -fno-inline -fno-inline-functions -O")
     if(GPROF)
         message(STATUS "Enabling gprof")
         set(CFLAGS "${CFLAGS} -pg")
@@ -323,7 +325,7 @@ if(PROFILE)
     set(UNOPTIMISED ON) # Profiing can't cope with -fomit-frame-pointer
 endif()
 
-option(UNOPTIMISED "" OFF)
+
 option(COVERAGE "" OFF)
 option(SKYESTATICFIX "" OFF)
 if(COVERAGE)
