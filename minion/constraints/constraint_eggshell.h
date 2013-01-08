@@ -92,19 +92,24 @@ struct arrayset {
     }
     
 
+    // This method looks a bit messy, due to stupid C++ optimisers not being
+    // clever enough to realise various things don't alias, and this method
+    // being called as much as it is.
     void unsafe_insert(DomainInt val)
     {
         D_ASSERT(!in(val));
-        const SysInt validx=checked_cast<SysInt>(val-minval);
-        const SysInt swapval=vals[checked_cast<SysInt>(size)];
-        vals[vals_pos[validx]]=swapval;
-        vals[checked_cast<SysInt>(size)]=checked_cast<SysInt>(val);
+        const SysInt minval_cpy = checked_cast<SysInt>(minval);
+        const SysInt validx = checked_cast<SysInt>(val-minval_cpy);
+        const SysInt size_cpy = checked_cast<SysInt>(size);
+        const SysInt swapval = vals[size_cpy];
+        const SysInt vpvx = vals_pos[validx];
+        vals[vpvx]=swapval;
+        vals[size_cpy]=checked_cast<SysInt>(val);
         
-        vals_pos[checked_cast<SysInt>(swapval-minval)]=vals_pos[validx];
-        vals_pos[validx]=checked_cast<SysInt>(size);
+        vals_pos[checked_cast<SysInt>(swapval-minval_cpy)]=vpvx;
+        vals_pos[validx]=size_cpy;
         
         size++;
-
     }
 
     void insert(DomainInt val) {
@@ -354,12 +359,7 @@ struct EggShell : public AbstractConstraint
     virtual void special_check()
     {
         constraint_locked = false;
-        
-        if(getState(stateObj).isFailed())
-        {
-            return;
-        }
-        
+        D_ASSERT(!getState(stateObj).isFailed());
         do_prop();
     }
     
@@ -389,32 +389,29 @@ struct EggShell : public AbstractConstraint
     bool validTuple(SysInt i)
     {
         SysInt index=tupindices[i];
-        vector<DomainInt> & tau=sct->tuples[index];
-
-        bool isvalid=true;
+        const vector<DomainInt> & tau=sct->tuples[index];
 
         for(SysInt j=0; j<sval.size; j++) {
-            SysInt var=sval.vals[j];
+            const SysInt var=sval.vals[j];
             if(UseShort) {
-                if( (tau[var]!=DomainInt_Skip) && !vars[var].inDomain(tau[var])) {
-                    isvalid=false;
-                    break;
+                const DomainInt tv = tau[var];
+                if( (tv!=DomainInt_Skip) && !vars[var].inDomain(tv)) {
+                    return false;
                 }
             }
             else {
                 if(!vars[var].inDomain(tau[var])) {
-                    isvalid=false;
-                    break;
+                    return false;
                 }
             }
             
         }
 
-        return isvalid;
+        return true;
     }
 
     void do_prop() {
-        SysInt numvars=vars.size();
+        const SysInt numvars=vars.size();
         
         // Basic impl of ssup for now. 
         // For 'removing assigned vars' optimization, need them to be both
@@ -429,12 +426,9 @@ struct EggShell : public AbstractConstraint
         //ssup.clear();
         //for(int j=0; j<ssup_permanent.size; j++) ssup.insert(ssup_permanent.vals[j]); 
         
-        for(SysInt i=0; i<numvars; i++) {
-            gacvalues[i].clear();
-        }
+
         
         SysInt i=0;
-
 
         if(UseShort)
         {
@@ -442,14 +436,18 @@ struct EggShell : public AbstractConstraint
             
             bool pass_first_loop=false;
             while(i<limit) {
-                SysInt index=tupindices[i];
+                const SysInt index=tupindices[i];
                 // check validity
                 bool isvalid=validTuple(i);
                 
                 if(isvalid) {
                     const vector<pair<SysInt, DomainInt> >& compressed_tau = sct->compressed_tuples[index];
-                    for(SysInt i = 0; i < compressed_tau.size(); ++i)
-                        ssup.insert(compressed_tau[i].first);
+                    for(SysInt t = 0; t < compressed_tau.size(); ++t)
+                    {
+                        const SysInt ctf = compressed_tau[t].first;
+                        ssup.unsafe_insert(ctf);
+                        gacvalues[ctf].clear();
+                    }
                     pass_first_loop = true;
                     break;
                 }
@@ -467,21 +465,33 @@ struct EggShell : public AbstractConstraint
         }
         else
         {
+            for(SysInt t=0; t<numvars; t++)
+                gacvalues[t].clear();
             ssup.fill();
         }
 
+        vector<vector<DomainInt> >::iterator tup_start = sct->tuples.begin();
+
+        i++;
+
+       
         while(i<limit) {
-            SysInt index=tupindices[i];
-            const vector<DomainInt> & tau=sct->tuples[index];
-            
             // check validity
-            bool isvalid=validTuple(i);
-            
-            if(isvalid) {
-                
+            if(!validTuple(i))
+                removeTuple(i);
+            else
+                i++;
+        }
+
+        i=0;
+        SysInt lim_cpy = checked_cast<SysInt>(limit);
+        while(i<lim_cpy && ssup.size>0)
+        {
+            const SysInt index=tupindices[i];
+                const vector<DomainInt> & tau=tup_start[index];    
                 // do stuff
                 for(SysInt j=0; j<ssup.size; j++) {
-                    SysInt var=ssup.vals[j];
+                    const SysInt var=ssup.vals[j];
                     
                     if(UseShort && tau[var]==DomainInt_Skip) {
                         ssup.unsafe_remove(var);
@@ -500,12 +510,7 @@ struct EggShell : public AbstractConstraint
                         }
                     }
                 }
-                
-                i++;
-            }
-            else {
-                removeTuple(i);
-            }
+            i++;
         }
 
         // Prune the domains.
