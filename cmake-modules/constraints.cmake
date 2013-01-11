@@ -10,7 +10,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one" "w
                     "hamming" "not-hamming" "watched-or" "watched-and"
                     "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply"
-                    "true" "false" "check[gsa]" "check[assign]"
+                    "true" "false" "check[gsa]" "check[assign]" "forwardchecking"
                     "watchvecexists_less" "lighttable"
                     "haggisgac" "haggisgac-stable" "eggshell" "gaceq" "gacschema"
                     )
@@ -231,6 +231,9 @@ set(NAME_READ_check[gsa] "read_constraint")
 
 set(NAME_ID_check[assign] "CT_CHECK_ASSIGN")
 set(NAME_READ_check[assign] "read_constraint")
+
+set(NAME_ID_forwardchecking "CT_FORWARD_CHECKING")
+set(NAME_READ_forwardchecking "read_constraint")
 
 set(NAME_ID_reifyimply "CT_REIFYIMPLY")
 set(NAME_READ_reifyimply "read_constraint" "read_var")

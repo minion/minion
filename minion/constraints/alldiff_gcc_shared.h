@@ -74,7 +74,6 @@ struct smallset
     
     inline void remove(SysInt val)
     {
-        D_DATA(cout << "Warning: smallset::remove is slow and untested." <<endl );
         if(in(val))
         {
             membership[val]=0;
