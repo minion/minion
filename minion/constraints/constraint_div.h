@@ -70,11 +70,6 @@ help constraints div
 #include "../constraints/constraint_checkassign.h"
 #include <math.h>
 
-#ifndef LRINT
-#define LRINT(x) static_cast<DomainInt>(x + 0.5)
-#endif
-
-
 template<typename T1, typename T2, typename T3, bool undef_zero>
 class DivConstraint
 {
