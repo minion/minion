@@ -501,8 +501,6 @@ struct EggShell : public AbstractConstraint
                     else if(!gacvalues[var].in(tau[var])) {
                         gacvalues[var].unsafe_insert(tau[var]);
                         
-                        // Next line NOT the correct implementation!
-                        // Dominion has dom size
                         if(gacvalues[var].size == vars[var].getDomSize()) {
                             ssup.unsafe_remove(var);
                             j--;
