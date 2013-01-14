@@ -34,7 +34,9 @@
 
 struct Forward_Checking : public AbstractConstraint
 {
-
+  ReversibleMonotonicSet FCPruning;  // need one bit to support bound vars
+  SysInt pruningvar;
+  
   virtual string extended_name()
   { return constraint_name() + ":" + child->extended_name(); }
 
@@ -46,7 +48,9 @@ struct Forward_Checking : public AbstractConstraint
   AbstractConstraint* child;
 
   Forward_Checking(StateObj* _stateObj, AbstractConstraint* _con) :
-  AbstractConstraint(_stateObj), child(_con), trig1(-1), trig2(-1)
+  AbstractConstraint(_stateObj), FCPruning(_stateObj, 1), pruningvar(-1), 
+  child(_con), 
+  trig1(-1), trig2(-1)
   { }
 
   virtual AbstractConstraint* reverse_constraint()
@@ -59,7 +63,7 @@ struct Forward_Checking : public AbstractConstraint
     { delete child; }
 
   virtual SysInt dynamic_trigger_count()
-   { return 2; }
+   { return 3; }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   { return child->get_satisfying_assignment(assignment); }
@@ -94,7 +98,7 @@ struct Forward_Checking : public AbstractConstraint
           trig2=find_new_trigger(trig1, -1, dtstart+1, size, vars);
           
           if(trig2==-1) {   // One variable unassigned
-              perform_forward_checking(trig1, size, vars);
+              start_fc_pruning(trig1, size, vars);
           }
           return;
       }
@@ -108,7 +112,7 @@ struct Forward_Checking : public AbstractConstraint
           }
           else {
               // At most one var is unassigned.
-              perform_forward_checking(trig2, size, vars);
+              start_fc_pruning(trig2, size, vars);
           }
           return;
       }
@@ -122,9 +126,21 @@ struct Forward_Checking : public AbstractConstraint
           }
           else {
               // At most one var is unassigned.
-              perform_forward_checking(trig1, size, vars);
+              start_fc_pruning(trig1, size, vars);
           }
           return;
+      }
+      else if(dt==dtstart+2) {
+          // If this is a stale trigger, release it.
+          if(FCPruning.isMember(0)) {
+              releaseTrigger(stateObj, dt);
+              return;
+          }
+          else {
+              // Continue doing the bounds pruning.
+              fc_pruning_bound(pruningvar, size, vars);
+              return;
+          }
       }
       else {
           D_ASSERT(false);
@@ -149,7 +165,7 @@ struct Forward_Checking : public AbstractConstraint
       for(; i<size ; i++) {
           if(i!=toavoid  &&  !(*vars)[i].isAssigned())
           {
-              (*vars)[i].addDynamicTrigger(dtthis, DomainChanged);
+              (*vars)[i].addDynamicTrigger(dtthis, Assigned);
               return i;
           }
       }
@@ -158,7 +174,7 @@ struct Forward_Checking : public AbstractConstraint
       for(i=0; i<=start; i++) {
           if(i!=toavoid  &&  !(*vars)[i].isAssigned())
           {
-              (*vars)[i].addDynamicTrigger(dtthis, DomainChanged);
+              (*vars)[i].addDynamicTrigger(dtthis, Assigned);
               return i;
           }
       }
@@ -166,7 +182,22 @@ struct Forward_Checking : public AbstractConstraint
       return -1;
   }
   
-  void perform_forward_checking(SysInt var, SysInt size, vector<AnyVarRef>* vars) {
+  void start_fc_pruning(SysInt var, SysInt size, vector<AnyVarRef>* vars) {
+      if( ! (*vars)[var].isBound()) {
+          fc_pruning_discrete(var, size, vars);
+      }
+      else {
+          // It's a bound var. 
+          FCPruning.remove(0);  // go into 'pruning' mode
+          (*vars)[var].addDynamicTrigger(dynamic_trigger_start()+2, DomainChanged);
+          pruningvar=var;
+          fc_pruning_bound(var, size, vars);
+      }
+  }
+  
+  
+  void fc_pruning_discrete(SysInt var, SysInt size, vector<AnyVarRef>* vars) {
+      // Can poke holes so do full FC
       MAKE_STACK_BOX(b, DomainInt, size);
       AnyVarRef v=(*vars)[var];
       
@@ -192,7 +223,48 @@ struct Forward_Checking : public AbstractConstraint
       }
   }
   
-  
+  void fc_pruning_bound(SysInt var, SysInt size, vector<AnyVarRef>* vars) {
+      
+      MAKE_STACK_BOX(b, DomainInt, size);
+      AnyVarRef v=(*vars)[var];
+      
+      for(SysInt i = 0; i < size; ++i) {
+          if(i!=var) {
+              D_ASSERT((*vars)[i].isAssigned());
+              b.push_back((*vars)[i].getAssignedValue());
+          }
+          else {
+              b.push_back(-1000000);
+          }
+      }
+      
+      DomainInt maxval=v.getMax();
+      
+      // Scan up from lower bound.
+      for(DomainInt value=v.getMin(); value<=maxval; value++) {
+          b[var]=value;
+          if(!check_assignment(&b[0], size)) {
+              v.setMin(value+1);
+          }
+          else {
+              break;
+          }
+      }
+      
+      DomainInt minval=v.getMin();
+      
+      // Scan down from upper bound
+      for(DomainInt value=v.getMax(); value>=minval; value--) {
+          b[var]=value;
+          if(!check_assignment(&b[0], size)) {
+              v.setMax(value-1);
+          }
+          else {
+              break;
+          }
+      }
+      
+  }
   
   virtual void full_propagate()
   { propagate(NULL); }
