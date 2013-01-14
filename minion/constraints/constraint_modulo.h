@@ -60,7 +60,7 @@ help constraints mod
 
 #ifndef CONSTRAINT_MODULO_H
 #define CONSTRAINT_MODULO_H
-
+/*
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct NotModConstraint : public AbstractConstraint
 {
@@ -415,11 +415,11 @@ struct ModConstraint : public AbstractConstraint
   virtual void full_propagate()
   { 
     propagate(1,DomainDelta::empty()); 
-    /*propagate(2,DomainDelta::empty());
-    propagate(3,DomainDelta::empty());
-    propagate(-1,DomainDelta::empty());
-    propagate(-2,DomainDelta::empty());
-    propagate(-3,DomainDelta::empty());*/
+    //propagate(2,DomainDelta::empty());
+    //propagate(3,DomainDelta::empty());
+    //propagate(-1,DomainDelta::empty());
+    //propagate(-2,DomainDelta::empty());
+    //propagate(-3,DomainDelta::empty());
   }
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
@@ -464,7 +464,7 @@ struct ModConstraint : public AbstractConstraint
         return new NotModConstraint<VarRef1, VarRef2, VarRef3>(stateObj, var1, var2, var3);
     }
 };
-
+*/
 
 
 template<typename T1, typename T2, typename T3, bool undef_zero>
