@@ -31,10 +31,10 @@ st=sys.stdin.readline()
 while st:
     arr=st.split(" ")
     for i in ind:
-        if colheads[i]=="Filename":
-            sys.stdout.write(os.path.basename(arr[i])+" ")
-        else:
-            sys.stdout.write(arr[i]+" ") 
+        #if colheads[i]=="Filename":
+        #    sys.stdout.write(os.path.basename(arr[i])+" ")
+        #else:
+        sys.stdout.write(arr[i]+" ") 
     sys.stdout.write('\n')
     st=sys.stdin.readline()
     

@@ -428,17 +428,16 @@ struct EggShell : public AbstractConstraint
         
 
         
-        SysInt i=0;
+        
 
         if(UseShort)
         {
             ssup.clear();
             
-            bool pass_first_loop=false;
-            while(i<limit) {
-                const SysInt index=tupindices[i];
+            while(limit > 0) {
+                const SysInt index=tupindices[0];
                 // check validity
-                bool isvalid=validTuple(i);
+                bool isvalid=validTuple(0);
                 
                 if(isvalid) {
                     const vector<pair<SysInt, DomainInt> >& compressed_tau = sct->compressed_tuples[index];
@@ -448,15 +447,15 @@ struct EggShell : public AbstractConstraint
                         ssup.unsafe_insert(ctf);
                         gacvalues[ctf].clear();
                     }
-                    pass_first_loop = true;
+
                     break;
                 }
                 else {
-                    removeTuple(i);
+                    removeTuple(0);
                 }
             }
 
-            if(!pass_first_loop)
+            if(limit == 0)
             {
                 // We found no valid tuples!
                 getState(stateObj).setFailed(true);
@@ -472,7 +471,7 @@ struct EggShell : public AbstractConstraint
 
         vector<vector<DomainInt> >::iterator tup_start = sct->tuples.begin();
 
-        i++;
+        SysInt i=1;
 
        
         while(i<limit) {
