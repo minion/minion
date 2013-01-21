@@ -689,7 +689,7 @@ public:
   void addUnnamedTableSymbol(TupleList* tuplelist)
   {
     if(table_nametable.count(tuplelist) != 0)
-      throw parse_exception("Unnamed Tuplelist double registered!");
+      return;
     SysInt pos = table_symboltable.size();
     while( table_symboltable.count("_Unnamed__" + pos) != 0)
       pos++;

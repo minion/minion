@@ -38,6 +38,35 @@ class Regin;
 class EggShellData;
 class HaggisGACTuples;
 
+inline SysInt get_hash_val(DomainInt* ptr, SysInt length)
+{
+    SysInt hash_code = 1234;
+    for(SysInt i = 0; i < length; ++i)
+    {
+      SysInt val = checked_cast<SysInt>(ptr[i]);
+      hash_code = (hash_code << 5)-hash_code+val;
+    }
+    hash_code += length;
+    return hash_code;
+}
+
+inline SysInt get_hash_val(const vector<vector<DomainInt> >& vecs)
+{
+    SysInt hash_code = 1234;
+    for(SysInt i = 0; i < vecs.size(); ++i)
+      for(SysInt j = 0; j < vecs[i].size(); ++j)
+    {
+      SysInt val = checked_cast<SysInt>(vecs[i][j]);
+      hash_code = (hash_code << 5)-hash_code+val;
+    }
+
+    SysInt total_size = 0;
+    for(SysInt i = 0; i < vecs.size(); ++i)
+      total_size += vecs[i].size();
+    hash_code += total_size;
+    return hash_code;
+}
+
 class TupleList
 {
   string tuple_name;
@@ -54,9 +83,17 @@ class TupleList
   SysInt number_of_tuples;
   bool tuples_locked;
  
-  
+  SysInt hash_code;
   public:
   
+  size_t get_hash()
+  {
+    if(hash_code != 0)
+      return hash_code;
+
+    hash_code = get_hash_val(tuple_data, tuple_length*number_of_tuples);
+    return hash_code;
+  }
   LiteralSpecificLists* getLitLists();
   Nightingale* getNightingale();
   TupleTrieArray* getTries();
@@ -87,7 +124,7 @@ class TupleList
   
   TupleList(const vector<vector<DomainInt> >& tuple_list) : 
     litlists(NULL), nightingale(NULL), triearray(NULL), 
-    regin(NULL),  egg(NULL), tuples_locked(false)
+    regin(NULL),  egg(NULL), tuples_locked(false), hash_code(0)
   {
     number_of_tuples = tuple_list.size();
     tuple_length = tuple_list[0].size();
@@ -101,7 +138,7 @@ class TupleList
   TupleList(DomainInt _numtuples, DomainInt _tuplelength) :
      litlists(NULL), nightingale(NULL), triearray(NULL),
      regin(NULL), egg(NULL), tuple_length(checked_cast<SysInt>(_tuplelength)),
-     number_of_tuples(checked_cast<SysInt>(_numtuples)), tuples_locked(false)
+     number_of_tuples(checked_cast<SysInt>(_numtuples)), tuples_locked(false), hash_code(0)
   { tuple_data = new DomainInt[number_of_tuples * tuple_length]; }
   
   const DomainInt* operator[](SysInt pos) const
@@ -214,6 +251,24 @@ public:
 
   TupleList* getNewTupleList(const vector<vector<DomainInt> >& tuples)
   { 
+    SysInt tuple_hash = get_hash_val(tuples);
+    for(SysInt i = 0; i < Internal_TupleList.size(); ++i)
+    {
+      if(Internal_TupleList[i]->get_hash() == tuple_hash)
+      {
+        TupleList* ptr = Internal_TupleList[i];
+        if(tuples.size() != ptr->size() || tuples[0].size() != ptr->tuple_size())
+          throw parse_exception("Internal error: Hash error. Please report to the developers!");
+        for(SysInt j = 0; j < tuples.size(); ++j)
+        {
+          for(SysInt k = 0; k < tuples[i].size(); ++k)
+          if(tuples[j][k] != ptr->get_tupleptr(j)[k])
+            throw parse_exception("Internal error: Hash error. Please report to the developers!");            
+        }
+        return Internal_TupleList[i];
+      }
+    }
+
     TupleList* tuplelist_ptr = new TupleList(tuples);
     Internal_TupleList.push_back(tuplelist_ptr);
     return tuplelist_ptr;
