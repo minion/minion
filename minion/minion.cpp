@@ -519,7 +519,7 @@ try {
   }
 
   vector<string> files(1, getOptions(stateObj).instance_name);
-  readInputFromFiles(instance, files, getOptions(stateObj).parser_verbose);
+  readInputFromFiles(instance, files, getOptions(stateObj).parser_verbose, getOptions(stateObj).map_long_short);
 
   if(getOptions(stateObj).Xvarmunge != -1)
   {

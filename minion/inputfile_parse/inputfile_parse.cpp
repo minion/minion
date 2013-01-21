@@ -45,9 +45,9 @@ template<typename Reader, typename Stream>
     getTableOut().set(string("Filename"), infile->filename);  
 }
 
-void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, bool parser_verbose)
+void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, bool parser_verbose, MapLongTuplesToShort mltts)
 {
-  MinionThreeInputReader<ConcreteFileReader<CheapStream> > readerThree(parser_verbose);
+  MinionThreeInputReader<ConcreteFileReader<CheapStream> > readerThree(parser_verbose, mltts);
   MinionInputReader<ConcreteFileReader<CheapStream> > reader(parser_verbose);
   bool needs_finalise_three = false;
   for(vector<string>::const_iterator fname = fnames.begin(); fname != fnames.end(); fname++) {

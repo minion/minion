@@ -22,6 +22,11 @@
 
 #include "system/system.h"
 
+#define TUPLE_SQUASH
+#ifdef TUPLE_SQUASH
+#include "../tuple_squeeze/squash.hpp"
+#endif
+
 using namespace std;
 
 #include <vector>
@@ -281,9 +286,12 @@ public:
   { return Internal_TupleList.size(); }
 };
 
+
+
 class ShortTupleList
 {
   vector<vector<pair<SysInt, DomainInt> > > short_tuples;
+  vector<set<DomainInt> > initial_domains;
   string tuple_name;
 
   std::map<std::vector<std::pair<DomainInt, DomainInt> >, HaggisGACTuples*> hgt;
@@ -292,11 +300,40 @@ public:
   template<typename Vars>
   HaggisGACTuples* getHaggisData(const Vars& vars);
 
+  void setInitialDomains(const vector<set<DomainInt> >& doms)
+  { initial_domains = doms; }
 
+  // NOTE: initial domains may be empty, in which case they should be ignored.
+  vector<set<DomainInt> > getInitialDomains()
+  { return initial_domains; }
 
   ShortTupleList(const vector<vector<pair<SysInt, DomainInt> > >& _short_tuples)
   : short_tuples(_short_tuples)
   { }
+
+  // method : 0 - nothing, 1 - long tuples, 2 - eager, 3 - lazy
+  ShortTupleList(TupleList* long_tuples,  MapLongTuplesToShort method)
+  {
+    D_ASSERT(method != MLTTS_NoMap);
+
+    set<vector<DomainInt> > tuple_set;
+
+    for(SysInt i = 0; i < long_tuples->size(); ++i)
+      tuple_set.insert(long_tuples->get_vector(i));
+
+
+    if(method == MLTTS_KeepLong)
+    {
+      short_tuples = makeShortTupleList(tuple_set);
+      return;
+    }
+
+    D_ASSERT(method == MLTTS_Lazy || method == MLTTS_Eager);
+
+    initial_domains = gather_domains(tuple_set);
+    set<vector<DomainInt> > squashed = full_squeeze_tuples(tuple_set, initial_domains, (method == MLTTS_Eager));
+    short_tuples = makeShortTupleList(squashed);
+  }
 
   void setName(string name)
   { tuple_name = name; }
@@ -372,6 +409,13 @@ public:
   ShortTupleList* getNewShortTupleList(const vector<vector<pair<SysInt, DomainInt> > >& tuples)
   { 
     ShortTupleList* tuplelist_ptr = new ShortTupleList(tuples);
+    Internal_TupleList.push_back(tuplelist_ptr);
+    return tuplelist_ptr;
+  }
+
+  ShortTupleList* getNewShortTupleList(TupleList* long_tuples, MapLongTuplesToShort method)
+  {
+    ShortTupleList* tuplelist_ptr = new ShortTupleList(long_tuples, method);
     Internal_TupleList.push_back(tuplelist_ptr);
     return tuplelist_ptr;
   }

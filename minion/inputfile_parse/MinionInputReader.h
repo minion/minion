@@ -292,6 +292,7 @@ public:
   ProbSpec::CSPInstance* instance ;
   bool parser_verbose;
   bool print_all_vars;
+  MapLongTuplesToShort map_long_short_mode;
   
   bool isGadgetReader_m;
   
@@ -300,8 +301,8 @@ public:
   bool isGadgetReader()
   { return isGadgetReader_m; }
   
-  MinionThreeInputReader(bool _parser_verbose) : parser_verbose(_parser_verbose), print_all_vars(true),
-    isGadgetReader_m(false)
+  MinionThreeInputReader(bool _parser_verbose, MapLongTuplesToShort mls) : parser_verbose(_parser_verbose), print_all_vars(true),
+    map_long_short_mode(mls), isGadgetReader_m(false)
   {}
 };
 

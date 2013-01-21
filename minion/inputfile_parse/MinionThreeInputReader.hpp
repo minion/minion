@@ -528,7 +528,7 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
   string name = infile->get_string();
   MAYBE_PARSER_INFO("Gadget name:" + name);
 
-  MinionThreeInputReader gadget(parser_verbose);
+  MinionThreeInputReader gadget(parser_verbose, map_long_short_mode);
   CSPInstance* new_instance = new CSPInstance;
   gadget.instance = new_instance;
   gadget.setGadgetReader();
@@ -1210,6 +1210,12 @@ void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile)
     }
     tuplelist->finalise_tuples();
     instance->addTableSymbol(name, tuplelist);
+
+    if(map_long_short_mode != MLTTS_NoMap)
+    {
+      ShortTupleList* stl = instance->shortTupleListContainer->getNewShortTupleList(tuplelist, map_long_short_mode);
+      instance->addShortTableSymbol(name, stl);
+    }
   }
 }
 

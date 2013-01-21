@@ -92,6 +92,25 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
         exit(1);
       }
     }
+    else if(command == string("-X-map-long-short"))
+    {
+      cout << "# WARNING: -X-prop-node is experimental. Do not use for benchmarking!" << endl;
+      INCREMENT_i(-X-prop-node);
+      string prop_mode(argv[i]);
+      if(prop_mode == "none")
+        getOptions(stateObj).map_long_short = MLTTS_NoMap;
+      else if(prop_mode == "keeplong")
+        getOptions(stateObj).map_long_short = MLTTS_KeepLong;
+      else if(prop_mode == "eager")
+        getOptions(stateObj).map_long_short = MLTTS_Eager;
+      else if(prop_mode == "lazy")
+        getOptions(stateObj).map_long_short = MLTTS_Lazy;
+      else
+      {
+        cerr << " -X-map-long-short <none|keeplong|eager|lazy> " << endl;
+        exit(1);
+      }
+    }
     else if(command == string("-preprocess"))
     {
       INCREMENT_i(-preprocess);

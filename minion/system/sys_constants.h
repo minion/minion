@@ -121,6 +121,14 @@ inline T mymax(T t1, T t2)
 }
 
 
+enum MapLongTuplesToShort
+{
+  MLTTS_NoMap,
+  MLTTS_KeepLong,
+  MLTTS_Eager,
+  MLTTS_Lazy
+};
+
 
 
 #endif // _SYS_CONSTANTS_H

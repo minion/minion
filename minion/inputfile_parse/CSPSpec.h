@@ -135,12 +135,7 @@ struct ConstraintBlob
   ConstraintBlob(ConstraintDef* _con, const vector<vector<Var> >& _vars) : constraint(_con), vars(_vars)
   {}
 
-#ifdef USE_CXX0X
-  ConstraintBlob(ConstraintBlob&& b) :
-  CXXMOVE(constraint, b), CXXMOVE(vars, b), CXXMOVE(tuples, b), CXXMOVE(negs, b), CXXMOVE(constants, b),
-  CXXMOVE(gadget_prop_type, b), CXXMOVE(gadget, b), CXXMOVE(internal_constraints, b)
-  { }
-#endif
+
 
   /// A helper constructor for when only a SingleVar is passed.
   ConstraintBlob(ConstraintDef* _con, vector<Var>& _var) : constraint(_con)
@@ -188,12 +183,6 @@ struct ConstraintBlob
   VarContainer() : BOOLs(0)
   {}
 
-#ifdef USE_CXX0X
-  VarContainer(VarContainer&& v) :
-  CXXMOVE(BOOLs, v), CXXMOVE(symbol_table, v), CXXMOVE(name_table, v), CXXMOVE(bound, v), CXXMOVE(sparse_bound, v),
-  CXXMOVE(discrete, v), CXXMOVE(sparse_discrete, v), CXXMOVE(matrix_table, v)
-  { }
-#endif
 
 
   /// Given a matrix variable and a parameter list, returns a slice of the matrix.
@@ -626,16 +615,6 @@ private:
     CSPInstance(const CSPInstance&);
 public:
 
-#ifdef USE_CXX0X
-  CSPInstance(CSPInstance&& i) :
-  CXXMOVE(vars, i), CXXMOVE(constraints, i), CXXMOVE(tupleListContainer, i), CXXMOVE(shortTupleListContainer, i),
-  CXXMOVE(search_order, i),
-  CXXMOVE(permutation, i), CXXMOVE(sym_order, i), CXXMOVE(constructionSite, i), CXXMOVE(is_optimisation_problem, i),
-  CXXMOVE(optimise_minimising, i), CXXMOVE(optimise_variable, i), CXXMOVE(print_matrix, i), CXXMOVE(all_vars_list, i),
-  CXXMOVE(table_symboltable, i), CXXMOVE(table_nametable, i), CXXMOVE(gadgetMap, i)
-  { }
-
-#endif
 
   void set_optimise(BOOL _minimising, Var var)
   {

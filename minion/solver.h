@@ -282,7 +282,8 @@ public:
   SysInt Xvarmunge;
   SysInt Xsymmunge;
 
-
+  // How (if at all) to autogenerate short tuples from long ones.
+  MapLongTuplesToShort map_long_short;
 
   SearchOptions() : 
     wdeg_on(false), find_generators(false), 
@@ -300,7 +301,7 @@ public:
     redump(false), graph(false), instance_stats(false), 
     noresumefile(true), split(false),
     outputType(-1), outputCompressedDomains(false), noTimers(false),
-    Xvarmunge(-1), Xsymmunge(-1)
+    Xvarmunge(-1), Xsymmunge(-1), map_long_short(MLTTS_NoMap)
   {}
   
   /// Denotes all solutions should be found, by setting sollimit to -1.
