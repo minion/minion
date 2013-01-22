@@ -112,6 +112,7 @@ makeShortTupleList(const std::set<Vint>& tuples)
                 short_tup.push_back(std::make_pair(i,(*it)[i]));
             }
         }
+        out.push_back(short_tup);
     }
     return out;
 }
