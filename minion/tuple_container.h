@@ -274,7 +274,7 @@ public:
         {
           for(SysInt j = 0; j < tuples.size() && equal; ++j)
           {
-            for(SysInt k = 0; k < tuples[i].size() && equal; ++k)
+            for(SysInt k = 0; k < tuples[j].size() && equal; ++k)
               if(tuples[j][k] != ptr->get_tupleptr(j)[k])
                 { equal = false; }            
           }
