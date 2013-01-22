@@ -344,6 +344,8 @@ public:
     initial_domains = gather_domains(tuple_set);
     set<vector<DomainInt> > squashed = full_squeeze_tuples(tuple_set, initial_domains, (method == MLTTS_Eager));
     short_tuples = makeShortTupleList(squashed);
+
+    cout << "# Squashed " + long_tuples->getName() + " : " <<  long_tuples->size() << " -> " << short_tuples.size() << "\n";
   }
 
   void setName(string name)
