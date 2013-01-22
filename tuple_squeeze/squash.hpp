@@ -105,7 +105,7 @@ makeShortTupleList(const std::set<Vint>& tuples)
     for(std::set<Vint>::iterator it = tuples.begin(); it != tuples.end(); ++it)
     {
         std::vector<std::pair<SysInt,DomainInt> > short_tup;
-        for(SysInt i = 0; i < it->size(); ++it)
+        for(SysInt i = 0; i < it->size(); ++i)
         {
             if((*it)[i] != free_value)
             {

@@ -94,7 +94,6 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     }
     else if(command == string("-X-map-long-short"))
     {
-      cout << "# WARNING: -X-prop-node is experimental. Do not use for benchmarking!" << endl;
       INCREMENT_i(-X-prop-node);
       string prop_mode(argv[i]);
       if(prop_mode == "none")
