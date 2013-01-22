@@ -259,18 +259,29 @@ public:
     SysInt tuple_hash = get_hash_val(tuples);
     for(SysInt i = 0; i < Internal_TupleList.size(); ++i)
     {
-      if(Internal_TupleList[i]->get_hash() == tuple_hash)
+      bool equal = true;
+
+      if(Internal_TupleList[i]->get_hash() != tuple_hash)
+        equal = false;
+      else
       {
         TupleList* ptr = Internal_TupleList[i];
         if(tuples.size() != ptr->size() || tuples[0].size() != ptr->tuple_size())
-          throw parse_exception("Internal error: Hash error. Please report to the developers!");
-        for(SysInt j = 0; j < tuples.size(); ++j)
         {
-          for(SysInt k = 0; k < tuples[i].size(); ++k)
-          if(tuples[j][k] != ptr->get_tupleptr(j)[k])
-            throw parse_exception("Internal error: Hash error. Please report to the developers!");            
+          equal = false;
         }
-        return Internal_TupleList[i];
+        else
+        {
+          for(SysInt j = 0; j < tuples.size() && equal; ++j)
+          {
+            for(SysInt k = 0; k < tuples[i].size() && equal; ++k)
+              if(tuples[j][k] != ptr->get_tupleptr(j)[k])
+                { equal = false; }            
+          }
+        }
+
+        if(equal)
+          return Internal_TupleList[i];
       }
     }
 
