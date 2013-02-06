@@ -102,7 +102,7 @@ inline std::vector<std::vector<std::pair<SysInt,DomainInt> > >
 makeShortTupleList(const std::set<Vint>& tuples)
 {
     std::vector<std::vector<std::pair<SysInt,DomainInt> > > out;
-    for(std::set<Vint>::iterator it = tuples.begin(); it != tuples.end(); ++it)
+    for(std::set<Vint>::const_iterator it = tuples.begin(); it != tuples.end(); ++it)
     {
         std::vector<std::pair<SysInt,DomainInt> > short_tup;
         for(SysInt i = 0; i < it->size(); ++i)
