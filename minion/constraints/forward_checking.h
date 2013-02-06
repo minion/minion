@@ -76,33 +76,44 @@ struct Forward_Checking : public AbstractConstraint
   
   SysInt trig1, trig2;
   
+  virtual void full_propagate()
+  {
+      DynamicTrigger* dtstart = dynamic_trigger_start();
+      SysInt size = child->get_vars_singleton()->size();
+      vector<AnyVarRef>* vars = child->get_vars_singleton();
+
+      trig1=trig2=-1;
+      
+      trig1=find_new_trigger(-1, -1, dtstart, size, vars);
+      
+      // if all variables assigned
+      if(trig1==-1) {
+          if(full_assignment_failed(size, vars)) {
+              getState(stateObj).setFailed(true);
+          }
+          return;
+      }
+      
+      trig2=find_new_trigger(trig1, -1, dtstart+1, size, vars);
+      
+      if(trig2==-1) {   // One variable unassigned
+          // make sure we put trig2 somewhere!
+          trig2 = trig1;
+
+          start_fc_pruning(trig1, size, vars);
+      }
+      return;
+
+  }
+
   virtual void propagate(DynamicTrigger* dt)
   {
       DynamicTrigger* dtstart = dynamic_trigger_start();
       SysInt size = child->get_vars_singleton()->size();
       vector<AnyVarRef>* vars = child->get_vars_singleton();
       
-      if(dt==NULL) {
-          trig1=trig2=-1;
-          
-          trig1=find_new_trigger(-1, -1, dtstart, size, vars);
-          
-          // if all variables assigned
-          if(trig1==-1) {
-              if(full_assignment_failed(size, vars)) {
-                  getState(stateObj).setFailed(true);
-              }
-              return;
-          }
-          
-          trig2=find_new_trigger(trig1, -1, dtstart+1, size, vars);
-          
-          if(trig2==-1) {   // One variable unassigned
-              start_fc_pruning(trig1, size, vars);
-          }
-          return;
-      }
-      else if(dt==dtstart) {
+      D_ASSERT(dt != NULL);
+      if(dt==dtstart) {
           // Find trigger 1 again.
           
           SysInt temp=find_new_trigger(trig2, trig1, dtstart, size, vars);
@@ -207,7 +218,7 @@ struct Forward_Checking : public AbstractConstraint
               b.push_back((*vars)[i].getAssignedValue());
           }
           else {
-              b.push_back(-1000000);
+              b.push_back(DomainInt_Skip);
           }
       }
       
@@ -234,7 +245,7 @@ struct Forward_Checking : public AbstractConstraint
               b.push_back((*vars)[i].getAssignedValue());
           }
           else {
-              b.push_back(-1000000);
+              b.push_back(DomainInt_Skip);
           }
       }
       
@@ -266,8 +277,7 @@ struct Forward_Checking : public AbstractConstraint
       
   }
   
-  virtual void full_propagate()
-  { propagate(NULL); }
+
 };
 
 inline AbstractConstraint*
