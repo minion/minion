@@ -15,7 +15,7 @@ BuildCT_DIV_UNDEFZERO(StateObj* stateObj, const V1& vars, const V2& var2, Constr
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   typedef DivConstraint<typename V1::value_type, typename V1::value_type, typename V2::value_type, true> DivCon;
-  AbstractConstraint* div=new CheckAssignConstraint<DivCon, true>(stateObj, DivCon(stateObj, vars[0], vars[1], var2[0]));
+  AbstractConstraint* div=new CheckAssignConstraint<DivCon, false>(stateObj, DivCon(stateObj, vars[0], vars[1], var2[0]));
   return forwardCheckingCon(stateObj, div);
 }
 
