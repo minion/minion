@@ -67,8 +67,9 @@ help constraints div
 #ifndef CONSTRAINT_DIV_H
 #define CONSTRAINT_DIV_H
 
-#include "../constraints/constraint_checkassign.h"
 #include <math.h>
+
+// Not a constraint -- just contains a checker.
 
 template<typename T1, typename T2, typename T3, bool undef_zero>
 class DivConstraint
@@ -91,9 +92,9 @@ public:
     DomainInt check1[3] = {-10,3,-4};
     DomainInt check2[3] = {-10,-3,3};
     DomainInt check3[3] = {10,-3,-4};
-    CHECK(check_assignment(check1, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
-    CHECK(check_assignment(check2, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
-    CHECK(check_assignment(check3, 3), "You copy of Minion has a broken div operator. Please report to the developers!");
+    CHECK(check_assignment(check1, 3), "Your copy of Minion has a broken div operator. Please report to the developers!");
+    CHECK(check_assignment(check2, 3), "Your copy of Minion has a broken div operator. Please report to the developers!");
+    CHECK(check_assignment(check3, 3), "Your copy of Minion has a broken div operator. Please report to the developers!");
   }
 
   string constraint_name() const
