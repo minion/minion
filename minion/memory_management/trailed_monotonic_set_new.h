@@ -50,10 +50,11 @@ public:
         trailstack_marks.pop_back();
         
         for( ; i>=j ; i--) {
-            D_ASSERT(!data[i]);
-            data[i]=true;
+            D_ASSERT(!data[trailstack[i]]);
+            data[trailstack[i]]=true;
+            trailstack.pop_back();
         }
-        
+        D_ASSERT(trailstack.size()==j);
     }
     
     bool ifMember_remove(DomainInt index) {
