@@ -154,6 +154,7 @@ else()
     set(BOOST_COMPONENTS iostreams)
 endif()
 
+option(DOMAINS64 "" OFF)
 if(DOMAINS64)
     option(NAUTY "" OFF)
     set(BINARY "${BINARY}-dom64")
