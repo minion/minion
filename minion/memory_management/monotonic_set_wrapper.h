@@ -41,7 +41,6 @@ public:
         D_ASSERT(&getMemory(stateObj).monotonicSet() !=NULL);
         D_ASSERT(size>=0);
         offset=MS.request_storage(_size);
-        D_DATA(cout << "Set up ReversibleMonotonicSet with size "<< _size << " and offset " << offset <<endl);
     }
     
     bool isMember(DomainInt ref)
