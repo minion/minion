@@ -493,13 +493,9 @@ if(NAME)
 endif()
 message(STATUS "Executable name set to \"${BINARY}\"")
 
-#add_library(inputfile_parse STATIC ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp)
-
 add_library(${BINARY}-lib STATIC EXCLUDE_FROM_ALL ${SRCS})
 
 add_executable(${BINARY} ${SRCS} ${PROJECT_SOURCE_DIR}/minion/minion.cpp)
-#target_link_libraries(${BINARY} inputfile_parse)
-#target_link_libraries(${BINARY} ${BINARY}-lib)
 
 # when we're building minion-something, add a "minion" target that does the sa~
 if(NOT ${BINARY} STREQUAL minion)
