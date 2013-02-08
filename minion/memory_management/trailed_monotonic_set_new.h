@@ -26,9 +26,6 @@
 
 class TrailedMonotonicSet
 {
-    StateObj* stateObj;
-    
-    
     vector<char> data;
     
     vector<SysInt> trailstack;
@@ -36,8 +33,7 @@ class TrailedMonotonicSet
     vector<SysInt> trailstack_marks;
     
 public:
-    TrailedMonotonicSet(StateObj* _stateObj) :
-    stateObj(_stateObj)
+    TrailedMonotonicSet( )
     {
         trailstack_marks.push_back(0);
     }
