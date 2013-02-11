@@ -31,10 +31,12 @@
 class Memory
 {
   BackTrackMemory backtrack_memory;
+  NewMemoryBlock nwb;
   MonotonicSet monotonic_set;
   
 public:
 
+  void* allocate(size_t mem) { return nwb.request_bytes(mem); }
   BackTrackMemory& backTrack() { return backtrack_memory; }
   MonotonicSet& monotonicSet() { return monotonic_set; }
 };

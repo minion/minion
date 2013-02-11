@@ -216,7 +216,7 @@ public:
     // Dynamic initialisation
     const SysInt trigs = checked_cast<SysInt>(dynamic_trigger_count());
     D_ASSERT(trigs >= 0);
-    setup_dynamic_triggers(malloc((sizeof(DynamicTrigger) * trigs)));
+    setup_dynamic_triggers(getMemory(stateObj).allocate((sizeof(DynamicTrigger) * trigs)));
 
     DynamicTrigger* start = dynamic_trigger_start();
     for(SysInt i = 0 ; i < trigs; ++i)
@@ -396,7 +396,7 @@ public:
     D_ASSERT(trigs >= 0);
     D_ASSERT(all_trigs >= trigs);
 
-    void* trigMem = malloc(sizeof(DynamicTrigger) * all_trigs);
+    void* trigMem = getMemory(stateObj).allocate(sizeof(DynamicTrigger) * all_trigs);
 
     // Start by allocating triggers in the memory block
     DynamicTrigger* start = static_cast<DynamicTrigger*>(trigMem);
