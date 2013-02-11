@@ -357,8 +357,8 @@ struct FlowConstraint : public AbstractConstraint
     vector<SysInt> valvarmatching;   // need to set size somewhere.
     // -1 means unmatched.
     #else
-    MoveableArray<SysInt> varvalmatching;
-    MoveableArray<SysInt> valvarmatching;
+    SysInt* varvalmatching;
+    SysInt* valvarmatching;
     #endif
     
     // ------------------ Incremental adjacency lists --------------------------
@@ -366,7 +366,7 @@ struct FlowConstraint : public AbstractConstraint
     // adjlist[varnum or val-dom_min+numvars] is the vector of vals in the 
     // domain of the variable, or variables with val in their domain.
     vector<vector<SysInt> > adjlist;
-    MoveableArray<SysInt> adjlistlength;
+    SysInt* adjlistlength;
     vector<vector<SysInt> > adjlistpos;   // position of a variable in adjlist.
     
     inline void adjlist_remove(SysInt var, SysInt val)
@@ -1109,7 +1109,7 @@ struct deque_fixed_size
 template<typename VarArray>
 struct InternalDynamicTriggers
 {
-    MoveableArray<short> watches;   // should also template on the type here.
+    short* watches;   // should also template on the type here.
     
     // watches contains:
     // [0.. numvars-1]  indices to the start of the list for each variable.

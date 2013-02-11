@@ -54,7 +54,7 @@ public:
   
   /// Wraps requestArray of the internal \ref NewMemoryBlock.
   template<typename T>
-  MoveableArray<T> requestArray(UnsignedSysInt size)
+  T* requestArray(UnsignedSysInt size)
   { 
     return new_memory_block.requestArray<T>(size);
   }

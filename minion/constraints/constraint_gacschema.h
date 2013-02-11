@@ -123,7 +123,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     // Stuff to do with tuples.
     TupleList* data;
     vector<vector<vector<vector<DomainInt> * > > > tuple_lists;
-    vector<MoveableArray<UnsignedSysInt> > tuple_list_pos;  // indexed by var, val.
+    vector<UnsignedSysInt*> tuple_list_pos;  // indexed by var, val.
 
     ////////////////////////////////////////////////////////////////////////////
     // Ctor

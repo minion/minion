@@ -86,13 +86,8 @@ public:
 
   vector<vector<vector<Trigger> > > triggers;
 
-#ifdef DYNAMICTRIGGERS
-#ifdef WATCHEDLITERALS
   void* dynamic_triggers;
-#else
-  BackTrackOffset dynamic_triggers;
-#endif
-#endif
+
 
   Trigger** trigger_data_m;
 

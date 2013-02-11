@@ -51,52 +51,6 @@
  *
  */
 
-
-
-/// Provides a wrapper around \ref void* which makes an array.
-template<typename T>
-class MoveableArray
-{
-  /// Pointer to start of array.
-  void* ptr;
-  /// Size of array.
-  DomainInt size;
-  
-public:
-  /// Main constructor, takes a void* and the size of the array.
-  /** While this can be called manually, it would normally be called by allocateArray
-   */
-  explicit MoveableArray(void* _ptr, DomainInt _size) : ptr(_ptr), size(_size)
-  { }
-
-  MoveableArray()
-  {}
-
-  // A common C++ requiement - declaring two identical methods, one for const, one without.
-  
-  T& operator[](SysInt pos)
-  { 
-    D_ASSERT(pos >= 0 && pos < size);
-    return *(static_cast<T*>(ptr) + pos);
-  }
-
-  const T& operator[](SysInt pos) const
-  { 
-    D_ASSERT(pos >= 0 && pos < size);
-    return *(static_cast<T*>(ptr) + pos);
-  }
-
-  /// Gets a raw pointer to the start of the array.
-  T* get_ptr()
-  { return static_cast<T*>(ptr); }
-
-  /// Gets a const raw pointer to the start of the array.
-  const T* get_ptr() const
-  { return static_cast<const T*>(ptr); }
-};
-
-typedef void* BackTrackOffset;
-
 /// Looks after all \ref void* to a block of memory, and also the memory itself.
 /** A NewMemoryBlock is basically an extendable, moveable block of memory which
  * keeps track of all pointers into it, and moves them when approriate.
@@ -209,10 +163,9 @@ public:
 
   /// Request a \ref MoveableArray.
   template<typename T>
-  MoveableArray<T> requestArray(DomainInt size)
+  T* requestArray(DomainInt size)
   {
-    void* ptr = request_bytes(size * sizeof(T));
-    return MoveableArray<T>(ptr, size);
+    return (T*)request_bytes(size * sizeof(T));
   }
 
 private:
