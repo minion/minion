@@ -181,7 +181,7 @@ struct smallset_list_bt
     
     vector<UnsignedSysInt> membership;
     
-    MoveablePointer list;
+    void* list;
     SysInt maxsize;
     
     void reserve(SysInt size, StateObj * stateObj)
@@ -194,7 +194,7 @@ struct smallset_list_bt
         
         cert=1;
         list= getMemory(stateObj).backTrack().request_bytes((size+1)*sizeof(short));
-        ((short*)list.get_ptr())[maxsize]=0;   // The count is stored in the last element of the array.
+        ((short*)list)[maxsize]=0;   // The count is stored in the last element of the array.
     }
     
     inline bool in(SysInt val)
@@ -215,7 +215,7 @@ struct smallset_list_bt
             return;
         }
         membership[val]=cert;
-        short * ptr=((short*) list.get_ptr());
+        short * ptr=((short*) list);
         SysInt count=ptr[maxsize];
         D_ASSERT(count<maxsize);
         ptr[maxsize]=(short)count+1;
@@ -226,7 +226,7 @@ struct smallset_list_bt
     
     inline void clear()
     {
-        D_DATA(cout << "clearing list "<< (list.get_ptr()) << endl);
+        D_DATA(cout << "clearing list "<< (list) << endl);
         D_ASSERT(cert< 2000000000);
         
         if(cert>2000000000)
@@ -242,17 +242,17 @@ struct smallset_list_bt
             cert++;
         }
         
-        ((short *)list.get_ptr())[maxsize]=0;
+        ((short *)list)[maxsize]=0;
     }
     
     SysInt size()
     {
-        return (SysInt) ((short *)list.get_ptr())[maxsize];
+        return (SysInt) ((short *)list)[maxsize];
     }
     
     void sanitycheck()
     {
-        short* l = (short *) list.get_ptr();
+        short* l = (short *) list;
         for(SysInt i=0; i<l[maxsize]; i++)
         {
             for(SysInt j=i+1; j<l[maxsize]; j++)
@@ -267,7 +267,7 @@ struct smallset_list_bt
     
     void print()
     {
-        short * l = (short *)list.get_ptr();
+        short * l = (short *)list;
         cout << "smallset_list_bt length:" << l[maxsize] << " at location "<< (&l[maxsize]) << endl;
         for(SysInt i=0; i<maxsize; i++)
         {

@@ -47,7 +47,7 @@ public:
     
   
   /// Wraps request_bytes of the internal \ref NewMemoryBlock.
-  MoveablePointer request_bytes(UnsignedSysInt byte_count)
+  void* request_bytes(UnsignedSysInt byte_count)
   { 
     return new_memory_block.request_bytes(byte_count); 
   }

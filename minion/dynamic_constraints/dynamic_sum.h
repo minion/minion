@@ -87,12 +87,12 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
   VarArray var_array;
   VarSum var_sum;
 
-  MemOffset unwatched_indexes;
+  void* unwatched_indexes;
   SysInt last;
   SysInt num_unwatched;
 
   SysInt& unwatched(SysInt i)
-    { return static_cast<SysInt*>(unwatched_indexes.get_ptr())[i]; }
+    { return static_cast<SysInt*>(unwatched_indexes)[i]; }
 
   BoolLessSumConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
   AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), last(0)
@@ -118,7 +118,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
     {
       num_unwatched = checked_cast<SysInt>(array_size - var_sum - 1);
       D_ASSERT(num_unwatched >= 0);
-      unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(UnsignedSysInt) * num_unwatched);
+      unwatched_indexes = malloc(sizeof(UnsignedSysInt) * num_unwatched);
     }
   }
 

@@ -57,7 +57,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   
   VarArray var_array;
   ValueArray value_array;
-  MemOffset unwatched_indexes;
+  void* unwatched_indexes;
   DomainInt last;
   DomainInt num_unwatched;
 
@@ -71,7 +71,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   }
 
   SysInt& unwatched(DomainInt i)
-  { return static_cast<SysInt*>(unwatched_indexes.get_ptr())[checked_cast<SysInt>(i)]; }
+  { return static_cast<SysInt*>(unwatched_indexes)[checked_cast<SysInt>(i)]; }
   
   VarSum var_sum;
   
@@ -85,7 +85,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
           num_unwatched=0;
       if(num_unwatched > var_array.size()) num_unwatched=var_array.size();
       
-      unwatched_indexes = getMemory(stateObj).nonBackTrack().request_bytes(sizeof(UnsignedSysInt) * num_unwatched);
+      unwatched_indexes = malloc(checked_cast<SysInt>(sizeof(UnsignedSysInt) * num_unwatched));
       // above line might request 0 bytes
       last = 0;
   }

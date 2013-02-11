@@ -148,10 +148,10 @@ struct GACTableConstraint : public AbstractConstraint
   
   LiteralSpecificLists* lists;
   
-  MemOffset _current_support;
+  void* _current_support;
   
   SysInt* current_support()
-  { return (SysInt*)(_current_support.get_ptr()); }
+  { return (SysInt*)(_current_support); }
   
   /// Returns the tuple currently supporting a given literal.
   vector<DomainInt>& supporting_tuple(SysInt i)

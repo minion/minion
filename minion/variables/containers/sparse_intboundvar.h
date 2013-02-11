@@ -92,7 +92,7 @@ typedef VarRefType<SparseBoundVarRef_internal<> > SparseBoundVarRef;
 template<typename BoundType = DomainInt>
 struct SparseBoundVarContainer {
   StateObj* stateObj;
-  MoveablePointer bound_data;
+  void* bound_data;
   TriggerList trigger_list;
   vector<vector<BoundType> > domains;
   vector<DomainInt> domain_reference;
@@ -120,16 +120,16 @@ struct SparseBoundVarContainer {
   { return domains[checked_cast<SysInt>(domain_reference[i])]; }
   
   const BoundType& lower_bound(SparseBoundVarRef_internal<BoundType> i) const
-  { return static_cast<const BoundType*>(bound_data.get_ptr())[i.var_num*2]; }
+  { return static_cast<const BoundType*>(bound_data)[i.var_num*2]; }
   
   const BoundType& upper_bound(SparseBoundVarRef_internal<BoundType> i) const
-  { return static_cast<const BoundType*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
+  { return static_cast<const BoundType*>(bound_data)[i.var_num*2 + 1]; }
   
   BoundType& lower_bound(SparseBoundVarRef_internal<BoundType> i)
-  { return static_cast<BoundType*>(bound_data.get_ptr())[i.var_num*2]; }
+  { return static_cast<BoundType*>(bound_data)[i.var_num*2]; }
   
   BoundType& upper_bound(SparseBoundVarRef_internal<BoundType> i)
-  { return static_cast<BoundType*>(bound_data.get_ptr())[i.var_num*2 + 1]; }
+  { return static_cast<BoundType*>(bound_data)[i.var_num*2 + 1]; }
   
   /// find the small possible lower bound above new_lower_bound.
   /// Does not actually change the lower bound.  
@@ -217,7 +217,7 @@ struct SparseBoundVarContainer {
 #endif
 
   bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
-  BoundType* bound_ptr = static_cast<BoundType*>(bound_data.get_ptr());
+  BoundType* bound_ptr = static_cast<BoundType*>(bound_data);
   for(UnsignedSysInt i = 0; i < var_count_m; ++i)
   {
     bound_ptr[2*i] = get_domain_from_int(i).front();

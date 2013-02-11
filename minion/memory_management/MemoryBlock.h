@@ -50,77 +50,23 @@
  *
  *
  */
-class MoveablePointer
-{
-  /// The physical pointer being wrapped.
-  void* ptr;
-public:
-  /// Copy constructor for MoveablePointer.
-  MoveablePointer(const MoveablePointer& b);
-  
-  /// Assignment for MoveablePointer.
-  void operator=(const MoveablePointer& b);
 
-  /// Constructs a MoveablePointer from a raw pointer ptr.
-  explicit MoveablePointer(void* ptr);
 
-  /// Constructs a MoveablePointer from a MoveablePointer and an offset in bytes.
-  explicit MoveablePointer(const MoveablePointer& mp, SysInt offset);
 
-  /// In debug mode, gets the pointer without checking if it is valid.
-  /** This can be used in non-debug mode, but does not do anything. It is used
-   *  by the code which does checking of get_ptr in debug mode.
-   */
-  void* get_ptr_noCheck() const
-  { return ptr; }
-
-  /// Returns the pointer.
-  void* get_ptr() const
-#ifndef SLOW_DEBUG
-  { return ptr; }
-#else
-    ; // Defined at bottom of file.
-#endif
-
-  bool is_null() const
-  { return ptr == NULL; }
-
-  /// Manually alters the pointer being watched. This function should only
-  /// be used by those with a complete understanding of the whole memory system,
-  /// and in special circumstances.
-  void set_raw_ptr(void* _ptr) 
-  { 
-    ptr = _ptr; 
-  }
-  
-  /// Produces a new MoveablePointer offset from the current one by a given number of bytes.
-  MoveablePointer getOffset(UnsignedSysInt bytes)
-  { 
-    return MoveablePointer(((char*)ptr) + bytes); 
-  }
-
-  /// Default constructor.
-  MoveablePointer() : ptr(NULL)
-  { }
-  
-  /// Destructor.
-  ~MoveablePointer();
-};
-
-/// Provides a wrapper around \ref MoveablePointer which makes an array.
+/// Provides a wrapper around \ref void* which makes an array.
 template<typename T>
 class MoveableArray
 {
   /// Pointer to start of array.
-  MoveablePointer ptr;
+  void* ptr;
   /// Size of array.
   DomainInt size;
   
 public:
-  /// Main constructor, takes a MoveablePointer and the size of the array.
+  /// Main constructor, takes a void* and the size of the array.
   /** While this can be called manually, it would normally be called by allocateArray
    */
-  explicit MoveableArray(MoveablePointer _ptr, DomainInt _size) : ptr(_ptr), size(_size)
+  explicit MoveableArray(void* _ptr, DomainInt _size) : ptr(_ptr), size(_size)
   { }
 
   MoveableArray()
@@ -131,27 +77,27 @@ public:
   T& operator[](SysInt pos)
   { 
     D_ASSERT(pos >= 0 && pos < size);
-    return *(static_cast<T*>(ptr.get_ptr()) + pos);
+    return *(static_cast<T*>(ptr) + pos);
   }
 
   const T& operator[](SysInt pos) const
   { 
     D_ASSERT(pos >= 0 && pos < size);
-    return *(static_cast<T*>(ptr.get_ptr()) + pos);
+    return *(static_cast<T*>(ptr) + pos);
   }
 
   /// Gets a raw pointer to the start of the array.
   T* get_ptr()
-  { return static_cast<T*>(ptr.get_ptr()); }
+  { return static_cast<T*>(ptr); }
 
   /// Gets a const raw pointer to the start of the array.
   const T* get_ptr() const
-  { return static_cast<const T*>(ptr.get_ptr()); }
+  { return static_cast<const T*>(ptr); }
 };
 
-typedef MoveablePointer BackTrackOffset;
+typedef void* BackTrackOffset;
 
-/// Looks after all \ref MoveablePointer to a block of memory, and also the memory itself.
+/// Looks after all \ref void* to a block of memory, and also the memory itself.
 /** A NewMemoryBlock is basically an extendable, moveable block of memory which
  * keeps track of all pointers into it, and moves them when approriate.
  *
@@ -178,7 +124,7 @@ class NewMemoryBlock
 #define BLOCK_SIZE (size_t)(64*1024*1024)
 #endif
   
-  SET_TYPE<MoveablePointer*> pointers;
+  SET_TYPE<void**> pointers;
 public:
   
   void storeMem(char* store_ptr)
@@ -240,12 +186,12 @@ public:
     free(current_data);
   }
   
-  /// Request a new block of memory and returns a \ref MoveablePointer to it's start.
-  MoveablePointer request_bytes(DomainInt byte_count)
+  /// Request a new block of memory and returns a \ref void* to it's start.
+  void* request_bytes(DomainInt byte_count)
   {
     P("Request: " << (void*)this << " : " << byte_count);
     if(byte_count == 0)
-      return MoveablePointer(NULL);
+      return NULL;
       
     // TODO: is the following line necessary?
     if(byte_count % sizeof(SysInt) != 0)
@@ -258,14 +204,14 @@ public:
     char* return_val = current_data + checked_cast<SysInt>(allocated_bytes);
     P("Return val:" << (void*)current_data);
     allocated_bytes += checked_cast<size_t>(byte_count);
-    return MoveablePointer(return_val);
+    return (void*)return_val;
   }
 
   /// Request a \ref MoveableArray.
   template<typename T>
   MoveableArray<T> requestArray(DomainInt size)
   {
-    MoveablePointer ptr = request_bytes(size * sizeof(T));
+    void* ptr = request_bytes(size * sizeof(T));
     return MoveableArray<T>(ptr, size);
   }
 
@@ -293,25 +239,6 @@ private:
 // @}
 
 
-inline MoveablePointer::MoveablePointer(const MoveablePointer& b) : ptr(b.ptr)
-{ }
 
-inline void MoveablePointer::operator=(const MoveablePointer& b)
-{ ptr = b.ptr; }
-
-inline MoveablePointer::MoveablePointer(void* _ptr) : ptr(_ptr)
-{ }
-
-inline MoveablePointer::~MoveablePointer()
-{ }
-
-inline MoveablePointer::MoveablePointer(const MoveablePointer& b, SysInt offset) : ptr(((char*)b.ptr) + offset)
-{ D_ASSERT(b.get_ptr() != NULL); }
-
-
-#ifdef SLOW_DEBUG
-inline void* MoveablePointer::get_ptr() const
-{ return ptr; }
-#endif
 
 #endif

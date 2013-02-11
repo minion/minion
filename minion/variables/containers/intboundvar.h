@@ -57,14 +57,14 @@ struct BoundVarRef_internal
   AnyVarRef popOneMapper() const
   { FATAL_REPORTABLE_ERROR(); }
   
-  MoveablePointer var_bound_data;
+  void* var_bound_data;
   DomainInt var_num;
   
   const DomType& lower_bound() const
-  { return *static_cast<DomType*>(var_bound_data.get_ptr()); }
+  { return *static_cast<DomType*>(var_bound_data); }
   
   const DomType& upper_bound() const
-  { return *(static_cast<DomType*>(var_bound_data.get_ptr())+ 1); }
+  { return *(static_cast<DomType*>(var_bound_data)+ 1); }
 
 #ifdef MANY_VAR_CONTAINERS
   BoundVarContainer<DomType>* boundCon;
@@ -203,7 +203,7 @@ struct BoundVarContainer {
                                             var_count_m(0), lock_m(0)
   {}
     
-  MoveablePointer bound_data;
+  void* bound_data;
   TriggerList trigger_list;
   vector<pair<BoundType, BoundType> > initial_bounds;
   vector<vector<AbstractConstraint*> > constraints;
@@ -222,16 +222,16 @@ struct BoundVarContainer {
 
 
   const BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i) const
-  { return static_cast<const BoundType*>(bound_data.get_ptr())[checked_cast<SysInt>(i.var_num*2)]; }
+  { return static_cast<const BoundType*>(bound_data)[checked_cast<SysInt>(i.var_num*2)]; }
   
   const BoundType& upper_bound(const BoundVarRef_internal<BoundType>& i) const
-  { return static_cast<const BoundType*>(bound_data.get_ptr())[checked_cast<SysInt>(i.var_num*2 + 1)]; }
+  { return static_cast<const BoundType*>(bound_data)[checked_cast<SysInt>(i.var_num*2 + 1)]; }
 
   BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i)
-  { return static_cast<BoundType*>(bound_data.get_ptr())[checked_cast<SysInt>(i.var_num*2)]; }
+  { return static_cast<BoundType*>(bound_data)[checked_cast<SysInt>(i.var_num*2)]; }
   
   BoundType& upper_bound(const BoundVarRef_internal<BoundType>& i)
-  { return static_cast<BoundType*>(bound_data.get_ptr())[checked_cast<SysInt>(i.var_num*2 + 1)]; }
+  { return static_cast<BoundType*>(bound_data)[checked_cast<SysInt>(i.var_num*2 + 1)]; }
 
   
   void lock()
@@ -410,7 +410,7 @@ struct BoundVarContainer {
 #endif
 
     bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
-    BoundType* bound_ptr = static_cast<BoundType*>(bound_data.get_ptr());
+    BoundType* bound_ptr = static_cast<BoundType*>(bound_data);
     for(UnsignedSysInt i = 0; i < var_count_m; ++i)
     {
       bound_ptr[2*i] = initial_bounds[i].first;
@@ -513,6 +513,6 @@ BoundVarContainer<T>::get_var_num(DomainInt i)
 {
   D_ASSERT(i < var_count_m);
   // Note we assume in BoundVarRef_internal that upper_bound(i) is just after lower_bound(i)...
-  return BoundVarRef(BoundVarRef_internal<>(this, i, static_cast<DomainInt*>(bound_data.get_ptr()) + checked_cast<SysInt>(i)*2));
+  return BoundVarRef(BoundVarRef_internal<>(this, i, static_cast<DomainInt*>(bound_data) + checked_cast<SysInt>(i)*2));
 }
 

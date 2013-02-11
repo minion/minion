@@ -31,13 +31,11 @@
 class Memory
 {
   BackTrackMemory backtrack_memory;
-  NewMemoryBlock nonbacktrack_memory;
   MonotonicSet monotonic_set;
   
 public:
 
   BackTrackMemory& backTrack() { return backtrack_memory; }
-  NewMemoryBlock& nonBackTrack() { return nonbacktrack_memory; }
   MonotonicSet& monotonicSet() { return monotonic_set; }
 };
 

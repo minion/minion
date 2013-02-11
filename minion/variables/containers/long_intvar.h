@@ -108,7 +108,7 @@ struct BigRangeVarContainer {
 #endif
 
   typedef DomainInt domain_bound_type;
-  MoveablePointer bound_data;
+  void* bound_data;
   MonotonicSet *bms_array;
   TriggerList trigger_list;
 
@@ -133,17 +133,17 @@ struct BigRangeVarContainer {
 #endif
 
   domain_bound_type& lower_bound(BigRangeVarRef_internal i) const
-  { return static_cast<domain_bound_type*>(bound_data.get_ptr())[i.var_num*BOUND_DATA_SIZE]; }
+  { return static_cast<domain_bound_type*>(bound_data)[i.var_num*BOUND_DATA_SIZE]; }
   
   domain_bound_type& upper_bound(BigRangeVarRef_internal i) const
-  { return static_cast<domain_bound_type*>(bound_data.get_ptr())[i.var_num*BOUND_DATA_SIZE + 1]; }
+  { return static_cast<domain_bound_type*>(bound_data)[i.var_num*BOUND_DATA_SIZE + 1]; }
 
 #ifdef SLOW_DOM_SIZE
   void reduce_dom_size(BigRangeVarRef_internal i)
   {}
 #else    
   domain_bound_type& dom_size(BigRangeVarRef_internal i) const
-  { return static_cast<domain_bound_type*>(bound_data.get_ptr())[i.var_num*BOUND_DATA_SIZE + 2]; }
+  { return static_cast<domain_bound_type*>(bound_data)[i.var_num*BOUND_DATA_SIZE + 2]; }
 
   void reduce_dom_size(BigRangeVarRef_internal i)
   { dom_size(i)-=1; }
@@ -242,7 +242,7 @@ struct BigRangeVarContainer {
            var_offset[j] = var_offset[j] - initial_bounds[j].first;  
     };
     
-    domain_bound_type* bound_ptr = static_cast<domain_bound_type*>(bound_data.get_ptr());
+    domain_bound_type* bound_ptr = static_cast<domain_bound_type*>(bound_data);
     
     DomainInt min_domain_val = 0;
     DomainInt max_domain_val = 0;

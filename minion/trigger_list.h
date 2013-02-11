@@ -88,7 +88,7 @@ public:
 
 #ifdef DYNAMICTRIGGERS
 #ifdef WATCHEDLITERALS
-  MemOffset dynamic_triggers;
+  void* dynamic_triggers;
 #else
   BackTrackOffset dynamic_triggers;
 #endif
@@ -119,9 +119,9 @@ public:
 
 #ifdef DYNAMICTRIGGERS
     if(only_bounds)
-      dynamic_triggers = getMemory(stateObj).nonBackTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);
+      dynamic_triggers = malloc(size * sizeof(DynamicTrigger) * 4);
     else
-      dynamic_triggers = getMemory(stateObj).nonBackTrack().request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
+      dynamic_triggers = malloc(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
 #else
     if(only_bounds)
       dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);
@@ -194,7 +194,7 @@ public:
       triggers.swap(t);
     }
 
-    DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr());
+    DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers);
 
     DomainInt trigger_types = ( only_bounds ? 4 : (4 + vars_domain_size));
     for(UnsignedSysInt i = 0; i < var_count_m * trigger_types; ++i)
@@ -221,7 +221,7 @@ public:
     DynamicTrigger* trig;
     if(type != DomainRemoval)
     {
-      trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
+      trig = static_cast<DynamicTrigger*>(dynamic_triggers)
         + checked_cast<SysInt>(var_num + type*var_count_m);
     }
     else
@@ -229,7 +229,7 @@ public:
       D_ASSERT(!only_bounds);
       D_ASSERT(vars_min_domain_val <= val_removed);
       D_ASSERT(vars_max_domain_val >= val_removed);
-      trig = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
+      trig = static_cast<DynamicTrigger*>(dynamic_triggers)
         + checked_cast<SysInt>(var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m);
     }
     D_ASSERT(trig->next != NULL);
@@ -319,7 +319,7 @@ public:
     DynamicTrigger* queue;
     if(type != DomainRemoval)
     {
-      queue = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
+      queue = static_cast<DynamicTrigger*>(dynamic_triggers)
         + checked_cast<SysInt>(b + type*var_count_m);
     }
     else
@@ -327,7 +327,7 @@ public:
       D_ASSERT(!only_bounds);
       D_ASSERT(vars_min_domain_val <= val);
       D_ASSERT(vars_max_domain_val >= val);
-      queue = static_cast<DynamicTrigger*>(dynamic_triggers.get_ptr())
+      queue = static_cast<DynamicTrigger*>(dynamic_triggers)
         + checked_cast<SysInt>(b + (DomainRemoval + (val - vars_min_domain_val)) * var_count_m);
     }
     D_ASSERT(queue->sanity_check_list());

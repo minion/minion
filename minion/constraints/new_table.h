@@ -238,7 +238,7 @@ struct NewTableConstraint : public AbstractConstraint
 
   LiteralSpecificLists* lists;
 
-  MemOffset _current_support;
+  void* _current_support;
 
   virtual SysInt dynamic_trigger_count()
     { return checked_cast<SysInt>(data->getLiteralCount() * ( vars.size() - 1)) ; }

@@ -136,7 +136,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     //ReversibleMonotonicSet sparevaluespresent;
     
-    D_DATA(MoveablePointer SCCSplit2);
+    D_DATA(void* SCCSplit2);
     
     vector<SysInt> varToSCCIndex;  // Mirror of the SCCs array.
     
@@ -184,7 +184,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       }
       
       D_DATA(SCCSplit2=getMemory(stateObj).backTrack().request_bytes((sizeof(char) * numvars)));
-      D_DATA(for(SysInt i=0; i<numvars; i++) ((char *)SCCSplit2.get_ptr())[i]=1);
+      D_DATA(for(SysInt i=0; i<numvars; i++) ((char *)SCCSplit2)[i]=1);
       
   }
   
@@ -273,7 +273,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     #endif
     {
         smallset_list_bt& watch = watches[prop_var];
-        short * list = ((short *) watch.list.get_ptr());
+        short * list = ((short *) watch.list);
         SysInt count=list[watch.maxsize];
         bool valout=false;
         
@@ -378,7 +378,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     if(var_array[prop_var].inDomain(varvalmatching[prop_var]))
     {
         smallset_list_bt& watch = watches[prop_var];
-        short * list = ((short *) watch.list.get_ptr());
+        short * list = ((short *) watch.list);
         SysInt count=list[watch.maxsize];
         bool valout=false;
         
@@ -519,8 +519,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(varvalmatching[i]!=varvalmatching[j]);
             D_ASSERT(SCCs[i]!=SCCs[j]);
         }
-        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2.get_ptr())[i]==1));
-        cout << (SysInt)SCCSplit.isMember(i) << ", " << (SysInt) (((char*)SCCSplit2.get_ptr())[i]==1) << endl;
+        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2)[i]==1));
+        cout << (SysInt)SCCSplit.isMember(i) << ", " << (SysInt) (((char*)SCCSplit2)[i]==1) << endl;
         // The matches correspond.
         #ifndef BFSMATCHING
         D_ASSERT(valvarmatching[varvalmatching[i]-dom_min]==i);
@@ -650,7 +650,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 
                 // Split the SCCs
                 SCCSplit.remove(sccindex_start);
-                D_DATA(((char*)SCCSplit2.get_ptr())[sccindex_start]=0);
+                D_DATA(((char*)SCCSplit2)[sccindex_start]=0);
                 
                 sccindex_start++;
                 DomainInt tempval=var_array[tempvar].getAssignedValue();
@@ -702,7 +702,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(varvalmatching[i]!=varvalmatching[j]);
             D_ASSERT(SCCs[i]!=SCCs[j]);
         }
-        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2.get_ptr())[i]==1));
+        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2)[i]==1));
         D_ASSERT(SCCs[varToSCCIndex[i]]==i);
     }
     #endif
@@ -810,8 +810,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(varvalmatching[i]!=varvalmatching[j]);
             D_ASSERT(SCCs[i]!=SCCs[j]);
         }
-        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2.get_ptr())[i]==1));
-        cout << (SysInt)SCCSplit.isMember(i) << ", " << (SysInt) (((char*)SCCSplit2.get_ptr())[i]==1) << endl;
+        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2)[i]==1));
+        cout << (SysInt)SCCSplit.isMember(i) << ", " << (SysInt) (((char*)SCCSplit2)[i]==1) << endl;
         // The matches correspond.
         D_ASSERT(valvarmatching[varvalmatching[i]-dom_min]==i);
     }
@@ -876,7 +876,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(varvalmatching[i]!=varvalmatching[j]);
             D_ASSERT(SCCs[i]!=SCCs[j]);
         }
-        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2.get_ptr())[i]==1));
+        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2)[i]==1));
         D_ASSERT(SCCs[varToSCCIndex[i]]==i);
     }
     #endif
@@ -1578,7 +1578,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                         {
                             P("Inserting split point.");
                             SCCSplit.remove(sccindex-1);
-                            D_DATA(((char*)SCCSplit2.get_ptr())[sccindex-1]=0);
+                            D_DATA(((char*)SCCSplit2)[sccindex-1]=0);
                         }
                         // The one written last was the last one in the SCC.
                         break;

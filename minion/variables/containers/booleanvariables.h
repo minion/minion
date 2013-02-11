@@ -71,8 +71,8 @@ struct BoolVarRef_internal
   
   data_type shift_offset;
   SysInt var_num;
-  MoveablePointer data_position;
-  MemOffset value_position;
+  void* data_position;
+  void* value_position;
 
   UnsignedSysInt data_offset() const
   { return var_num / (sizeof(data_type)*8); }
@@ -102,10 +102,10 @@ struct BoolVarRef_internal
   BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con);
   
   data_type& assign_ptr() const
-  { return *static_cast<data_type*>(data_position.get_ptr()); }
+  { return *static_cast<data_type*>(data_position); }
   
   data_type& value_ptr() const
-  { return *static_cast<data_type*>(value_position.get_ptr()); }
+  { return *static_cast<data_type*>(value_position); }
   
   BOOL isAssigned() const
   { return assign_ptr() & shift_offset; }
@@ -193,8 +193,8 @@ struct BoolVarContainer
 #endif
 
   static const SysInt width = 7;
-  MoveablePointer assign_offset;
-  MemOffset values_mem;
+  void* assign_offset;
+  void* values_mem;
   vector<vector<AbstractConstraint*> > constraints;
 #ifdef WDEG
   vector<UnsignedSysInt> wdegs;
@@ -205,16 +205,16 @@ struct BoolVarContainer
   BOOL lock_m;
   
   data_type* value_ptr()
-  { return static_cast<data_type*>(values_mem.get_ptr()); }
+  { return static_cast<data_type*>(values_mem); }
   
   const data_type* value_ptr() const
-  { return static_cast<const data_type*>(values_mem.get_ptr()); }
+  { return static_cast<const data_type*>(values_mem); }
   
   data_type* assign_ptr()
-  { return static_cast<data_type*>(assign_offset.get_ptr()); }
+  { return static_cast<data_type*>(assign_offset); }
   
   const data_type* assign_ptr() const
-  { return static_cast<const data_type*>(assign_offset.get_ptr()); }
+  { return static_cast<const data_type*>(assign_offset); }
   
   void lock_thread()
   { LOCK_BOOL_MUTEX }
@@ -238,7 +238,7 @@ struct BoolVarContainer
     // Round up to nearest data_type block
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
     assign_offset = getMemory(stateObj).backTrack().request_bytes(required_mem);
-    values_mem = getMemory(stateObj).nonBackTrack().request_bytes(required_mem);
+    values_mem = malloc(required_mem);
     constraints.resize(bool_count);
 #ifdef WDEG
     if(getOptions(stateObj).wdeg_on) wdegs.resize(bool_count);
@@ -401,8 +401,8 @@ inline BoolVarRef BoolVarContainer::get_var_num(DomainInt i)
 
 inline BoolVarRef_internal::BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con) : 
   var_num(checked_cast<UnsignedSysInt>(value)),  
-  data_position(b_con->assign_offset, data_offset()*sizeof(data_type)),
-  value_position(b_con->values_mem, data_offset()*sizeof(data_type))
+  data_position((char*)(b_con->assign_offset) + data_offset()*sizeof(data_type)),
+  value_position((char*)(b_con->values_mem) + data_offset()*sizeof(data_type))
 #ifdef MANY_VAR_CONTAINERS
 , boolCon(b_con)
 #endif
