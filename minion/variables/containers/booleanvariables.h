@@ -238,7 +238,7 @@ struct BoolVarContainer
     // Round up to nearest data_type block
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
     assign_offset = getMemory(stateObj).backTrack().request_bytes(required_mem);
-    values_mem = getMemory(stateObj).allocate(required_mem);
+    values_mem = malloc(required_mem);
     constraints.resize(bool_count);
 #ifdef WDEG
     if(getOptions(stateObj).wdeg_on) wdegs.resize(bool_count);

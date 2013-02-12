@@ -67,7 +67,7 @@ public:
   void world_push()
   {
     UnsignedSysInt data_size = new_memory_block.getDataSize();
-    char *tmp = (char *) block_cache.doMalloc(data_size);//calloc(data_size, sizeof(char));
+    char *tmp = (char *) block_cache.do_malloc(data_size);//calloc(data_size, sizeof(char));
 
     new_memory_block.storeMem(tmp);
     backtrack_data.push_back(std::make_pair(tmp, data_size));

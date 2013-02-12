@@ -118,7 +118,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
     {
       num_unwatched = checked_cast<SysInt>(array_size - var_sum - 1);
       D_ASSERT(num_unwatched >= 0);
-      unwatched_indexes = getMemory(stateObj).allocate(sizeof(UnsignedSysInt) * num_unwatched);
+      unwatched_indexes = malloc(sizeof(UnsignedSysInt) * num_unwatched);
     }
   }
 

@@ -26,7 +26,7 @@ struct BlockCache
   BlockCache(SysInt size)
   { blocks.resize(size); }
   
-  char* doMalloc(size_t size)
+  char* do_malloc(size_t size)
   {
     // This is because realloc/malloc will sometimes return 0 with size=0
     if(size == 0)
@@ -37,7 +37,7 @@ struct BlockCache
       char* ptr = static_cast<char*>(malloc(size));
       if(ptr == NULL)
       { D_FATAL_ERROR("Malloc failed - Memory exausted! Aborting."); }
-      return ptr;      
+      return static_cast<char*>(malloc(size));      
     }
     else
     {      
