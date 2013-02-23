@@ -101,25 +101,27 @@ public:
         
     bool eof()
     { return stream_pos == stream_end; }
-        
     
-    void getline(char* buf, SysInt buf_length, char deliminator = '\n')
+
+    
+    string getline(char deliminator = '\n')
     {
-        SysInt length = std::min((SysInt)buf_length, (SysInt)(stream_end - stream_pos));
-        P(length << ":");
-        for(SysInt i = 0; i < length; ++i)
+        std::vector<char> output;
+        while(stream_pos != stream_end)
         {
-            P(i << ":" << *stream_pos << ":");
-             if(*stream_pos == deliminator)
-             {
-                 *buf = '\0';
-                 stream_pos++;
-                 return;
-             }
-            *buf = *stream_pos;
-            buf++; stream_pos++;           
+            if(*stream_pos == deliminator)
+            {
+                stream_pos++;
+                return string(output.begin(), output.end());
+            }
+            else
+            {
+                output.push_back(*stream_pos);
+                stream_pos++;
+            }
         }
-        *buf = '\0';
+        // reached end of stream
+        return string(output.begin(), output.end());
     }
     
 };

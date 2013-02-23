@@ -147,15 +147,7 @@ struct ConcreteFileReader
   }
   
   string simplegetline()
-  {
-    char buf[10000];
-    infile.getline(buf,10000);
-    char* buf_start = buf;
-    while(buf_start < buf + 10000 && isspace(*buf_start))
-      buf_start++;
-    
-    return string(buf_start);
-  }
+  { return infile.getline(); }
   
   /// Cleans rubbish off start of string.
   void clean_string(string& s)
@@ -167,14 +159,15 @@ struct ConcreteFileReader
   string getline(char deliminator)
   {
     check_for_comments();
-    char buf[10000];
-    infile.getline(buf,10000, deliminator);
+    std::string s = infile.getline(deliminator);
+    // avoid copy for no reason
+    if(s.empty() || (!isspace(s[0])))
+      return s;
 
-    char* buf_start = buf;
-    while(buf_start < buf + 10000 && isspace(*buf_start))
-      buf_start++;
-    
-    return string(buf_start);
+    int pos = 1;
+    while(pos < s.size() && isspace(s[pos]))
+      pos++;
+    return string(s.begin() + pos, s.end());
   }
   
   char get_char()
