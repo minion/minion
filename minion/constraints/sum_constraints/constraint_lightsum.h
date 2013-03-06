@@ -165,7 +165,18 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
 
   template<bool b>
   typename boost::enable_if_c<b, AbstractConstraint*>::type rev_implement()
-    { FAIL_EXIT(); }
+  {      
+      typedef minion_array<AnyVarRef, size> VarArray;
+      VarArray new_var_array;
+      for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
+        new_var_array[i] = VarNegRef(var_array[i]);
+      
+      typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<-1> >::type SumType;
+      SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<-1>());
+      
+      return new LightLessEqualSumConstraint<AnyVarRef, size, AnyVarRef, true>
+        (stateObj, new_var_array, new_sum);
+  }
 
 };
 

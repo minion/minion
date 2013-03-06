@@ -235,7 +235,17 @@ struct LessEqualSumConstraint : public AbstractConstraint
 
   template<bool b>
   typename boost::enable_if_c<b, AbstractConstraint*>::type rev_implement()
-    { FAIL_EXIT(); }
+  {
+    vector<AnyVarRef> new_var_array(var_array.size());
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
+    new_var_array[i] = VarNegRef(var_array[i]);
+
+    typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<-1> >::type SumType;
+    SumType new_sum = ShiftVarRef( VarNegRef(var_sum), compiletime_val<-1>());
+
+    return new LessEqualSumConstraint<vector<AnyVarRef>, AnyVarRef, true>
+      (stateObj, new_var_array, new_sum); 
+       }
     
   };  
   
