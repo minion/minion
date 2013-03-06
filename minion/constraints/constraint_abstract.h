@@ -198,7 +198,12 @@ public:
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size) = 0;
 
   virtual ~AbstractConstraint()
-    {}
+    {
+      // This is a simple way to check if an AbstractConstraint is ever
+      // double-destroyed.
+      D_ASSERT(stateObj != 0);
+      D_DATA(stateObj = 0);
+    }
 
 
 

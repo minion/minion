@@ -39,7 +39,7 @@ the size of the set {i | X[i] != y[i]} is greater than or equal to c.
 // For operators
 #include "dynamic_vecneq.h"
 
-template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated, BOOL is_reversed = false>
+template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
   struct VecCountDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
@@ -308,19 +308,8 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   }
   
   virtual AbstractConstraint* reverse_constraint()
-   { return rev_implement<is_reversed>(); }
-
-  template<bool b> 
-   typename boost::disable_if_c<b, AbstractConstraint*>::type rev_implement()
-   {
-     return new VecCountDynamic<VarArray1, VarArray2, typename Operator::reverse_operator, true>
-         (stateObj, var_array1, var_array2, (SysInt)var_array1.size()-hamming_distance+1);
-   }
-
-   template<bool b>
-   typename boost::enable_if_c<b, AbstractConstraint*>::type rev_implement()
-     { FAIL_EXIT(); }
-  
+   { return new VecCountDynamic<VarArray1, VarArray2, typename Operator::reverse_operator>
+         (stateObj, var_array1, var_array2, (SysInt)var_array1.size()-hamming_distance+1); }
   
   
 };
