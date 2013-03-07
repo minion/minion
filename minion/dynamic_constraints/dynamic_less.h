@@ -100,16 +100,24 @@ struct WatchLessConstraint : public AbstractConstraint
     return false;
   }
 
-  template<typename T>
-  AbstractConstraint* rev_implement(const ShiftVar<T,compiletime_val<-1> >& var2)
+  template<bool b, typename T>
+  typename boost::enable_if_c<b, AbstractConstraint*>::type
+   rev_implement(const ShiftVar<T,compiletime_val<1> >& var2)
   {
-    return new WatchLessConstraint<T, Var1>(stateObj, var2.data, var1);
+    return new WatchLessConstraint<T, Var1, false>(stateObj, var2.data, var1);
   }
 
-  template<typename T>
-  AbstractConstraint* rev_implement(const T& var2)
-  { return new WatchLessConstraint<Var2,ShiftVar<Var1,compiletime_val<-1> >,true>(stateObj, var2, ShiftVar<Var1,compiletime_val<-1> >(var1, compiletime_val<-1>())); }
+ template<bool b, typename T>
+  typename boost::enable_if_c<b, AbstractConstraint*>::type
+   rev_implement(const T& var2)
+  {
+    return new WatchLessConstraint<AnyVarRef, AnyVarRef, true>(stateObj, var2, ShiftVar<Var1,compiletime_val<1> >(var1, compiletime_val<1>()));
+  }
 
-  virtual AbstractConstraint* reverse_constraint() { return rev_implement(var2); }
+  template<bool b,typename T>
+  typename boost::enable_if_c<!b, AbstractConstraint*>::type rev_implement(const T& var2)
+  { return new WatchLessConstraint<Var2,ShiftVar<Var1,compiletime_val<1> >,true>(stateObj, var2, ShiftVar<Var1,compiletime_val<1> >(var1, compiletime_val<1>())); }
+
+  virtual AbstractConstraint* reverse_constraint() { return rev_implement<Negated>(var2); }
 };
 #endif
