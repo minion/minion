@@ -74,6 +74,8 @@ help constraints occurrenceleq
 #ifndef CONSTRAINT_OCCURRENCE_H
 #define CONSTRAINT_OCCURRENCE_H
 
+
+
 // Negated occurrence; used in reverse_constraint for OccurrenceEqualConstraint
 template<typename VarArray, typename Val, typename ValCount>
 struct NotOccurrenceEqualConstraint : public AbstractConstraint
@@ -372,6 +374,8 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
     }
     return false;
   }
+
+  AbstractConstraint* reverse_constraint();
 };
 
 template<typename VarArray, typename Val>
@@ -775,16 +779,14 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   AbstractConstraint* reverse_constraint()
   {
       return new NotOccurrenceEqualConstraint<VarArray, Val, ValCount>(stateObj, var_array, value, val_count);
-      /*vector<AnyVarRef> v;
-      for(SysInt i=0; i<var_array.size(); i++)
-      {
-          v.push_back((AnyVarRef) var_array[i]);
-      }
-      v.push_back(val_count);
-      return new ForwardCheckingConstraint<vector<AnyVarRef>, FCNotOccurrence>(stateObj, v, value);*/
   }
 };
 
+template<typename VarArray, typename Val, typename ValCount>
+AbstractConstraint* NotOccurrenceEqualConstraint<VarArray,Val,ValCount>::reverse_constraint()
+{
+  return new OccurrenceEqualConstraint<VarArray, Val, ValCount>(stateObj, var_array, value, val_count);
+}
 
 
 template<typename VarArray, typename Val, typename ValCount>
