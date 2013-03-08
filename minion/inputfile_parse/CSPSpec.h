@@ -670,7 +670,7 @@ public:
     if(table_nametable.count(tuplelist) != 0)
       return;
     SysInt pos = table_symboltable.size();
-    while( table_symboltable.count("_Unnamed__" + pos) != 0)
+    while( table_symboltable.count("_Unnamed__" + to_string(pos)) != 0)
       pos++;
 
     table_symboltable["_Unnamed__" + to_string(pos) + "_"] = tuplelist;
