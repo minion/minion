@@ -949,14 +949,14 @@ struct InstanceStats
       }
       for(SysInt i=0; i<v.bound.size(); i++)
       {
-          SysInt dom_size = v.bound[i].second.upper_bound-v.bound[i].second.lower_bound+1;
+          SysInt dom_size = checked_cast<SysInt>(v.bound[i].second.upper_bound-v.bound[i].second.lower_bound+1);
           domsizes.push_back(dom_size);
           var_memory_usage += 64;
           domain_product += log(dom_size);
       }
       for(SysInt i=0; i<v.discrete.size(); i++)
       {
-          SysInt dom_size = v.discrete[i].second.upper_bound-v.discrete[i].second.lower_bound+1;
+          SysInt dom_size = checked_cast<SysInt>(v.discrete[i].second.upper_bound-v.discrete[i].second.lower_bound+1);
           domsizes.push_back(dom_size);
           var_memory_usage += dom_size;
           domain_product += log(dom_size);
