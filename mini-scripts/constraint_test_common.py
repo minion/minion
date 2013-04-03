@@ -1275,11 +1275,17 @@ class testpow:
         crossprod(domains[:-1], [], cross)
         out=[]
         for l in cross:
-            if l[0]**l[1] in domains[-1]:
-                out.append(l+[l[0]**l[1]])
+            if (l[0] == 0):
+                if(l[1] == 0) and 1 in domains[-1]:
+                    out.append(l+[1])
+                if(l[1] > 0) and 0 in domains[-1]:
+                    out.append(l+[0])
+            else:
+                if l[0]**l[1] in domains[-1]:
+                    out.append(l+[l[0]**l[1]])
         return out
     def runtest(self, options=dict()):
-        return runtestgeneral("pow", True, options, [1,1,1], ["nonnegnum","posnum","nonnegnum"], self, False)
+        return runtestgeneral("pow", True, options, [1,1,1], ["num","num","num"], self, False)
     
 class testgcc:
     def printtable(self, domains):

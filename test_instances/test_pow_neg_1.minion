@@ -21,4 +21,4 @@ print m0
 pow(1,0,1)
 pow(2,0,1)
 pow(0,2,0)
-reify(pow(0,0,0),0)
+pow(0,0,1)

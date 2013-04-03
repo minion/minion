@@ -17,6 +17,16 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/*****
+
+  General pow semantics:
+  0^neg : undef
+  0^pos : 1
+  (nonzero)^0 : 0
+
+  So, only leaves 0^0. Lets make it 1 (agreed between C, Python and Java).
+
+*****/
 
 
 
@@ -59,21 +69,17 @@ public:
   virtual bool check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
-    if(v[1] == 0)
+    if(v[0] == 0)
     {
-      if(v[0] == 0)
-        return false;
-      else
+      if(v[1] == 0)
         return v[2] == 1;
-    }
-    if(v[1] < 0)
-    {
-      return my_pow(v[2], -v[1]) == v[0];
+      if(v[1] > 0)
+        return v[2] == 0;
+      else
+        return false;
     }
     else
-    {
       return my_pow(v[0], v[1]) == v[2];
-    }
   }
 };
 
