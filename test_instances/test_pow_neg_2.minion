@@ -1,6 +1,6 @@
 MINION 1
-#TEST SOLCOUNT 16
-#This just sanity checks a number of powers
+#TEST SOLCOUNT 4
+#This just sanity checks negative numbers
 
 0
 3
