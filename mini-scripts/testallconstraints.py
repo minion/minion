@@ -62,7 +62,7 @@ conslist+=["w-inset", "w-notinset", "w-inrange", "w-notinrange", "w-literal", "w
 conslist+=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
 conslist+=["not-hamming"]
 
-conslist+=["gacschema", "haggisgac", "haggisgac-stable", "eggshell"]
+conslist+=["gacschema", "haggisgac", "haggisgac-stable", "str", "shortstr"]
 # add reifyimply variant of all constraints,
 # and reify variant of all except those in reifyexceptions
 it=conslist[:]

@@ -186,46 +186,67 @@ struct ReversibleArrayset {
     }
 };
 
-#define UseShort true
 
-struct EggShellData
+
+struct STRData
 {
     vector<vector<DomainInt> > tuples;
     vector<vector<pair<SysInt,DomainInt> > > compressed_tuples;
 
-    EggShellData(ShortTupleList* _tuples, size_t varsize)
+    STRData(ShortTupleList* _tuples, size_t varsize)
     {
-        // Decode the tuples, they are all encoded in one tuple.
-        if(UseShort)
+        compressed_tuples = *(_tuples->tuplePtr());
+
+        for(SysInt i = 0; i < compressed_tuples.size(); ++i)
         {
-            compressed_tuples = *(_tuples->tuplePtr());
-
-            for(SysInt i = 0; i < compressed_tuples.size(); ++i)
+            vector<DomainInt> temp(varsize, DomainInt_Skip);
+            for(SysInt j = 0; j < compressed_tuples[i].size(); ++j)
             {
-                vector<DomainInt> temp(varsize, DomainInt_Skip);
-                for(SysInt j = 0; j < compressed_tuples[i].size(); ++j)
-                {
-                    temp[compressed_tuples[i][j].first] = compressed_tuples[i][j].second;
-                }
-                tuples.push_back(temp);
-
+                temp[compressed_tuples[i][j].first] = compressed_tuples[i][j].second;
             }
+            tuples.push_back(temp);
         }
-        else {
-            abort();
+    }
+
+    STRData(TupleList* _tuples, size_t varsize)
+    {
+        DomainInt tuple_count = _tuples->size();
+        for(SysInt i = 0; i < tuple_count; ++i)
+        {
+            vector<DomainInt> t = _tuples->get_vector(i);
+            vector<pair<SysInt, DomainInt> > comp;
+            for(int j = 0; j < t.size(); ++j)
+                comp.push_back(std::make_pair(j, t[j]));
+            tuples.push_back(t);
+            compressed_tuples.push_back(comp);
         }
     }
 };
 
-template<typename VarArray>
-struct EggShell : public AbstractConstraint
+
+template<typename VarArray, bool UseShort>
+struct STR : public AbstractConstraint
 {
     virtual string constraint_name()
-    { return "eggshell"; }
+    { 
+        if(UseShort)
+            return "ShortSTR2"; 
+        else
+            return "STR2plus";
+    }
 
-    CONSTRAINT_ARG_LIST2(vars, tupleList);
+//    CONSTRAINT_ARG_LIST2(vars, tupleList);
 
-    ShortTupleList* tupleList;
+    virtual string full_output_name()
+    {
+        if(UseShort)
+            return ConOutput::print_con(stateObj, constraint_name(), vars, shortTupleList);
+        else
+            return ConOutput::print_con(stateObj, constraint_name(), vars, longTupleList); 
+    }
+
+    ShortTupleList* shortTupleList;
+    TupleList* longTupleList;
 
     VarArray vars;
     
@@ -235,13 +256,10 @@ struct EggShell : public AbstractConstraint
     
     ReversibleInt limit;   // In tupindices, indices less than limit are not known to be invalid.
     
-    EggShellData* sct;
+    STRData* sct;
 
-    EggShell(StateObj* _stateObj, const VarArray& _var_array, ShortTupleList* _tuples) : AbstractConstraint(_stateObj), 
-    tupleList(_tuples),
-    vars(_var_array), constraint_locked(false), limit(_stateObj), sct(new EggShellData(_tuples, _var_array.size()))
-    //, ssup_permanent(_stateObj)
-    {   
+    void init()
+    {
         if(sct->tuples.size() > 0)
         {
             CHECK(sct->tuples[0].size() == vars.size(), "Cannot use same table for two constraints with different numbers of variables!");
@@ -262,6 +280,24 @@ struct EggShell : public AbstractConstraint
         }
 
         std::random_shuffle(tupindices.begin(), tupindices.end());
+    }
+
+    STR(StateObj* _stateObj, const VarArray& _var_array, ShortTupleList* _tuples) : AbstractConstraint(_stateObj), 
+    shortTupleList(_tuples), longTupleList(0),
+    vars(_var_array), constraint_locked(false), limit(_stateObj), sct(new STRData(_tuples, _var_array.size()))
+    //, ssup_permanent(_stateObj)
+    {   
+        CHECK(UseShort, "Internal error in ShortSTR2");
+      init();
+    }
+
+    STR(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj), 
+    shortTupleList(0), longTupleList(_tuples),
+    vars(_var_array), constraint_locked(false), limit(_stateObj), sct(new STRData(_tuples, _var_array.size()))
+    //, ssup_permanent(_stateObj)
+    {   
+        CHECK(!UseShort, "Internal error in STR2plus");
+      init();
     }
     
     
@@ -400,6 +436,7 @@ struct EggShell : public AbstractConstraint
                 }
             }
             else {
+                D_ASSERT(tau[var] != DomainInt_Skip);
                 if(!vars[var].inDomain(tau[var])) {
                     return false;
                 }
@@ -471,7 +508,8 @@ struct EggShell : public AbstractConstraint
 
         vector<vector<DomainInt> >::iterator tup_start = sct->tuples.begin();
 
-        SysInt i=1;
+        // We dealt with the first tuple, if we are in 'Short' mode.
+        SysInt i= UseShort?1:0;
 
        
         while(i<limit) {
@@ -514,6 +552,7 @@ struct EggShell : public AbstractConstraint
         for(SysInt j=0; j<ssup.size; j++) {
             SysInt var=ssup.vals[j];
             for(DomainInt val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
+                printf("!! %d,%d,%d,%d\n", var, checked_cast<SysInt>(val), (int)vars[var].inDomain(val),(int)gacvalues[var].in(val));
                 if(!gacvalues[var].in(val)) {
                     vars[var].removeFromDomain(val);
                 }
