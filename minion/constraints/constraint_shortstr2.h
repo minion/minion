@@ -230,9 +230,9 @@ struct STR : public AbstractConstraint
     virtual string constraint_name()
     { 
         if(UseShort)
-            return "ShortSTR2"; 
+            return "shortstr2"; 
         else
-            return "STR2plus";
+            return "str2plus";
     }
 
 //    CONSTRAINT_ARG_LIST2(vars, tupleList);
@@ -296,7 +296,7 @@ struct STR : public AbstractConstraint
     vars(_var_array), constraint_locked(false), limit(_stateObj), sct(new STRData(_tuples, _var_array.size()))
     //, ssup_permanent(_stateObj)
     {   
-        CHECK(!UseShort, "Internal error in STR2plus");
+        CHECK(!UseShort, "Internal error in str2plus");
       init();
     }
     

@@ -12,7 +12,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one" "w
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply"
                     "true" "false" "check[gsa]" "check[assign]" "forwardchecking"
                     "watchvecexists_less" "lighttable"
-                    "haggisgac" "haggisgac-stable" "STR2plus" "shortSTR2" "gaceq" "gacschema"
+                    "haggisgac" "haggisgac-stable" "str2plus" "shortstr2" "gaceq" "gacschema"
                     )
 
 set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
@@ -147,11 +147,11 @@ set(NAME_READ_haggisgac "read_list" "read_short_tuples")
 set(NAME_ID_haggisgac-stable "CT_HAGGISGAC_STABLE")
 set(NAME_READ_haggisgac-stable "read_list" "read_short_tuples")
 
-set(NAME_ID_STR2plus "CT_STR")
-set(NAME_READ_STR2plus "read_list" "read_tuples")
+set(NAME_ID_str2plus "CT_STR")
+set(NAME_READ_str2plus "read_list" "read_tuples")
 
-set(NAME_ID_shortSTR2 "CT_SHORTSTR")
-set(NAME_READ_shortSTR2 "read_list" "read_short_tuples")
+set(NAME_ID_shortstr2 "CT_SHORTSTR")
+set(NAME_READ_shortstr2 "read_list" "read_short_tuples")
 
 set(NAME_ID_negativetable "CT_WATCHED_NEGATIVE_TABLE")
 set(NAME_READ_negativetable "read_list" "read_tuples")
