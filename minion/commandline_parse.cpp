@@ -221,7 +221,7 @@ To enforce SSAC during search:
 /** @help switches;-prop-node References
 help switches -preprocess
 */
-    else if(command == string("-prop-node") || comamnd == string("-X-prop-node"))
+    else if(command == string("-prop-node") || command == string("-X-prop-node"))
     {
       INCREMENT_i(-X-prop-node);
       string prop_mode(argv[i]);
