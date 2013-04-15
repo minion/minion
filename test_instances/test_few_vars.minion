@@ -1,0 +1,19 @@
+MINION 3
+#TEST SOLCOUNT 0
+**VARIABLES**
+
+BOOL b[3]
+DISCRETE d {1..3}
+
+**SEARCH**
+
+VARORDER [d]
+VALORDER [a]
+
+**CONSTRAINTS**
+
+diseq(b[0],b[1])
+diseq(b[1],b[2])
+diseq(b[2],b[0])
+
+**EOF**

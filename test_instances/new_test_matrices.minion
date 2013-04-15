@@ -1,0 +1,47 @@
+# This test is really here to prove it parses
+#TEST CHECKONESOL 0
+
+MINION 3
+
+# While the variable section doesn't have to come first, you can't really do anything until
+# You have one...
+**VARIABLES**
+
+# There are 4 type of variables
+BOOL b[3,3]
+BOOL c[2]
+BOOL d[2,2,2]
+BOOL e
+
+**CONSTRAINTS**
+
+sumgeq(b,1)
+sumgeq([b],1)
+sumgeq([b,c],1)
+sumgeq(b[1,_],1)
+sumgeq([d],1)
+sumgeq(d,1)
+
+#sumgeq(e,1)
+
+
+#The search section is entirely optional
+**SEARCH** 
+
+# Note that everything in SEARCH is optional, and can only be given at most once!
+
+# You can have one objective function.
+#MAXIMISING bool
+# MINIMISING x3
+
+
+# Print statement takes a matrix of things to print
+
+PRINT [ [e] ]
+
+# You can also give:
+# PRINT ALL (the default)
+# PRINT NONE
+
+
+**EOF**
