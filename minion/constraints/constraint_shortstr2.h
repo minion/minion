@@ -552,7 +552,6 @@ struct STR : public AbstractConstraint
         for(SysInt j=0; j<ssup.size; j++) {
             SysInt var=ssup.vals[j];
             for(DomainInt val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
-                printf("!! %d,%d,%d,%d\n", var, checked_cast<SysInt>(val), (int)vars[var].inDomain(val),(int)gacvalues[var].in(val));
                 if(!gacvalues[var].in(val)) {
                     vars[var].removeFromDomain(val);
                 }
