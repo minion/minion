@@ -674,7 +674,7 @@ class testhaggisgac__minus__stable:
         options['tabletype'] = "shorttable"
         return runtestgeneral("haggisgac-stable", False, options, [4], ["smallnum"], self, not options['reify'])
 
-class teststr:
+class teststr2plus:
     def printtable(self, domains):
         cross=[]
         crossprod(domains, [], cross)
@@ -686,7 +686,7 @@ class teststr:
         return runtestgeneral("str2plus", False, options, [4], ["smallnum"], self, not options['reify'])
 
 
-class testshortstr:
+class testshortstr2:
     def printtable(self, domains):
         cross=[]
         crossprod(domains, [], cross)
@@ -695,6 +695,19 @@ class testshortstr:
     def runtest(self, options=dict()):
         options['tabletype'] = "shorttable"
         return runtestgeneral("shortstr2", False, options, [4], ["smallnum"], self, not options['reify'])
+
+
+class testmddc:
+    def printtable(self, domains):
+        cross=[]
+        crossprod(domains, [], cross)
+        tups=makeRandomTuples(cross)
+        return (tups, tups)
+
+    def runtest(self, options=dict()):
+        options['tabletype'] = "longtable"
+        return runtestgeneral("mddc", False, options, [4], ["smallnum"], self, not options['reify'])
+
 
 class testnegativetable:
     def printtable(self, domains, tab):

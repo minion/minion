@@ -263,7 +263,9 @@ struct MDDC : public AbstractConstraint
         
     }
     
-    void init(TupleList* tuples) {
+    //
+    // This one accepts an mdd written in a fairly difficult format. 
+    void old_init(TupleList* tuples) {
         // convert tuples into mdd nodes
         int tlsize=tuples->size();
         
@@ -300,6 +302,81 @@ struct MDDC : public AbstractConstraint
         }
     }
     
+    // This one converts a list of tuples (i.e. a standard table constraint) to an mdd. 
+    void init(TupleList* tuples) {
+        // First build a trie by inserting the tuples one by one.
+        
+        int tlsize=tuples->size();
+        
+        int tuplelen=tuples->tuple_size();
+        
+        DomainInt* tupdata=tuples->getPointer();
+        
+        // Make the top node.
+        MDDNode node0;
+        node0.id=0;
+        mddnodes.push_back(node0);
+        
+        // Make the t-terminal node.
+        MDDNode node1;
+        node1.id=-1;
+        mddnodes.push_back(node1);
+        
+        for(int tupid=0; tupid<tlsize; tupid++) {
+            vector<DomainInt> tup(tupdata+(tuplelen*tupid), tupdata+(tuplelen*(tupid+1) ));   // inefficient.
+            
+            MDDNode* curnode=&(mddnodes[0]);
+            for(int i=0; i<tuplelen; i++) {
+                
+                // Linear search for value.
+                // Should be replaced with binary search.
+                int idx=-1;
+                for(int j=0; j<curnode->links.size(); j=j+2) {
+                    if(curnode->links[j]==tup[i]) {
+                        idx=j;
+                        break;
+                    }
+                }
+                
+                if(idx==-1) {
+                    // New node needed.
+                    MDDNode newnode;
+                    if(i<tuplelen-1) {
+                        newnode.id=mddnodes.size();
+                    }
+                    else {
+                        newnode.id=-1;   // At the end of the tuple -- make a tt node. 
+                    }
+                    mddnodes.push_back(newnode);  // copies it into the vector
+                    
+                    // Make the link
+                    for(int j=0; j<curnode->links.size(); j=j+2) {
+                        if(curnode->links[j]>tup[i]) {
+                            // this is the point to insert it. 
+                            curnode->links.insert(curnode->links.begin()+j, tup[i]);
+                            curnode->links.insert(curnode->links.begin()+j+1, newnode.id);
+                            break;
+                        }
+                    }
+                    
+                    // Move to this new node. 
+                    curnode=&(mddnodes[newnode.id]);
+                }
+                else {
+                    // Follow the link.
+                    curnode=&(mddnodes[curnode->links[idx+1]]);
+                }
+            }
+            
+        }
+        
+        // Now MDDNodes is a trie with lots of tt nodes as the leaves.
+        // Start merging from the leaves upwards. 
+        
+        return;
+    }
+    
+    
     // Set up triggers.
     virtual triggerCollection setup_internal()
     {
@@ -325,29 +402,37 @@ struct MDDC : public AbstractConstraint
       return ret;
     }
     
-    virtual bool check_assignment(DomainInt* v, SysInt v_size)
+    virtual bool check_assignment(DomainInt* tup, SysInt v_size)
     {
-        /*for(SysInt i = 0; i < sct->compressed_tuples.size(); ++i)
-        {
-            bool sat = true;
-            for(SysInt j = 0; j < sct->compressed_tuples[i].size(); ++j)
-            {
-                if(v[sct->compressed_tuples[i][j].first] != sct->compressed_tuples[i][j].second)
-                {
-                    sat = false;
+        MDDNode* curnode=&(mddnodes[0]);
+        for(SysInt i=0; i<v_size; i++) {
+            // Linear search for value.
+            // Should be replaced with binary search.
+            int idx=-1;
+            for(int j=0; j<curnode->links.size(); j=j+2) {
+                if(curnode->links[j]==tup[i]) {
+                    idx=j;
                     break;
                 }
             }
-
-            if(sat)
-                return true;
+            
+            if(idx==-1) return false;
+            
+            curnode=&(mddnodes[curnode->links[idx+1]]);
         }
-*/
+        D_ASSERT(curnode->id==-1);
+        
         return false;
     }
 
     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
     {
+        // Run the propagator to cut off (add to gno) all parts of the MDD that
+        // cannot be in a satisfying tuple. 
+        
+        
+        
+        
         /*for(SysInt i = 0; i < sct->compressed_tuples.size(); ++i)
         {
             bool sat = true;
