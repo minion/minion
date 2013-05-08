@@ -369,10 +369,12 @@ struct MDDC : public AbstractConstraint
         
         // Now mdd is a trie with lots of tt nodes as the leaves.
         // Start merging from the leaves upwards. 
+        // label the nodes with a unique integer.
+        for(int i=0; i<mddnodes.size(); i++) {
+            mddnodes[i]->id=i;
+        }
         
-        
-        for(int layer=vars.size()-1; layer>=0; layer--) {
-            
+        for(int layer=vars.size(); layer>=0; layer--) {
             // Need a list of all nodes in this layer, with the index of their
             // parent. 
             
@@ -381,15 +383,36 @@ struct MDDC : public AbstractConstraint
             find_layer(0, layer, top, nodelist);
             
             // Use stupid algorithm to find duplicates.
-            for(int i=0; i<nodelist.size(); i++) {
+            // Only need to look at layers 1..n where n is number of vars. 
+            // Layer 0 only contains 
+            for(int i=1; i<nodelist.size(); i++) {
                 for(int j=i+1; j<nodelist.size(); j++) {
-                    if(nodelist[i]->links == nodelist[j]->links) {
+                    bool match=true;
+                    MDDNode* n1=nodelist[i];
+                    MDDNode* n2=nodelist[j];
+                    
+                    if(n1->type != n2->type) match=false;
+                    if(n1->links.size() != n2->links.size()) match=false;
+                    for(int k=0; k<n1->links.size() && match; k++) {
+                        if(n1->links[k] != n2->links[k]) match=false;
+                    }
+                    
+                    if(match) {
                         // we have a match.
                         // Delete nodelist[j].
                         
                         MDDNode* todelete=nodelist[j];
                         nodelist[j]=nodelist.back();
                         nodelist.pop_back();
+                        j--;
+                        
+                        
+                        mddnodes[todelete->id]=mddnodes.back();
+                        mddnodes.pop_back();
+                        if(todelete->id != mddnodes.size()) {
+                            // If we didn't just delete the last element...
+                            mddnodes[todelete->id]->id=todelete->id;    // fix the id of the moved node.
+                        }
                         
                         vector<std::pair<DomainInt, MDDNode*> >& parlinks=todelete->parent->links;
                         //  Search parlinks for the pointer to change
@@ -402,19 +425,16 @@ struct MDDC : public AbstractConstraint
                         }
                         
                         delete todelete;
-                        
-                        j--;
                     }
                 }
             }
-            
             
             
         }
         
         // label the nodes with a unique integer.
         for(int i=0; i<mddnodes.size(); i++) {
-            mddnodes[i]->id=i;
+            D_ASSERT(mddnodes[i]->id == i);
         }
         
         return;
@@ -463,8 +483,6 @@ struct MDDC : public AbstractConstraint
     {
         MDDNode* curnode=top;
         for(SysInt i=0; i<v_size; i++) {
-            // Linear search for value.
-            // Should be replaced with binary search.
             vector<std::pair<DomainInt, MDDNode*> >& links=curnode->links;
             int idx=find_link(links, tup[i]);
             
@@ -683,12 +701,14 @@ struct MDDC : public AbstractConstraint
     
     void print_mdd() {
         for(int i=0; i<mddnodes.size(); i++) {
-            std::cout << "Node:"<< i<<", " << mddnodes[i]->links << std::endl;
+            print_mdd_node(mddnodes[i]);
         }
         
         
     }
-    
+    void print_mdd_node(MDDNode* n) {
+        std::cout <<"Node id:"<<n->id << " type:" << ((int)n->type) << " links: "<<n->links << endl;
+    }
 };
 
 
