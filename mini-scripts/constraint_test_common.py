@@ -706,7 +706,7 @@ class testmddc:
 
     def runtest(self, options=dict()):
         options['tabletype'] = "longtable"
-        return runtestgeneral("mddc", False, options, [4], ["smallnum"], self, not options['reify'])
+        return runtestgeneral("mddc", False, options, [8], ["smallnum"], self, not options['reify'])
 
 
 class testnegativetable:

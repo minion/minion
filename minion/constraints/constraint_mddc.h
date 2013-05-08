@@ -210,8 +210,13 @@ struct arrayset_bt {
 };
 
 struct MDDNode {
-    SysInt id;  // should really be redundant
-    vector<SysInt> links;  // pairs val,id
+    MDDNode(MDDNode* _parent, char _type) : parent(_parent), type(_type)
+    { }
+    
+    MDDNode* parent;
+    vector<std::pair<DomainInt, MDDNode*> > links;  // pairs val,next
+    SysInt id;   // Integer that uniquely defines this node. 
+    char type;  //   -1 is tt, 0 is normal, -2 is ff.
 };
 
 template<typename VarArray>
@@ -236,8 +241,10 @@ struct MDDC : public AbstractConstraint
     // gno is the set of removed mdd nodes.
     arrayset_bt gno;
     
-    // The mdd. Top node is at index 0. 
-    vector<MDDNode> mddnodes;
+    // All nodes of the mdd, used for freeing.
+    vector<MDDNode*> mddnodes;
+    
+    MDDNode* top;
     
     vector<arrayset> gacvalues;   // Opposite of the sets in the Cheng and Yap paper: these start empty and are fille d
     
@@ -263,9 +270,9 @@ struct MDDC : public AbstractConstraint
         
     }
     
-    //
-    // This one accepts an mdd written in a fairly difficult format. 
-    void old_init(TupleList* tuples) {
+    // 
+    // This one accepted an mdd written in a fairly difficult format. 
+    /*void old_init(TupleList* tuples) {
         // convert tuples into mdd nodes
         int tlsize=tuples->size();
         
@@ -287,8 +294,7 @@ struct MDDC : public AbstractConstraint
                     
                     CHECK(tup[pair+1] >0 && tup[pair+1]<tlsize, "Links in MDD must be in range 1 up to the number of nodes");
                     
-                    mddnodes[nodeid].links.push_back(tup[pair]);  // push the domain value
-                    mddnodes[nodeid].links.push_back(tup[pair+1]);  // push the id number for the link.
+                    mddnodes[nodeid].links.push_back(std::make_pair(tup[pair], checked_cast<SysInt>(tup[pair+1])));  // push the domain value
                 }
                 
                 mddnodes[nodeid].id=nodeid;
@@ -300,39 +306,36 @@ struct MDDC : public AbstractConstraint
                 mddnodes[nodeid].id=-1;
             }
         }
-    }
+    }*/
     
     // This one converts a list of tuples (i.e. a standard table constraint) to an mdd. 
     void init(TupleList* tuples) {
         // First build a trie by inserting the tuples one by one.
         
-        int tlsize=tuples->size();
+        SysInt tlsize=checked_cast<SysInt>(tuples->size());
         
-        int tuplelen=tuples->tuple_size();
+        SysInt tuplelen=checked_cast<SysInt>(tuples->tuple_size());
         
         DomainInt* tupdata=tuples->getPointer();
         
         // Make the top node.
-        MDDNode node0;
-        node0.id=0;
-        mddnodes.push_back(node0);
-        
-        // Make the t-terminal node.
-        MDDNode node1;
-        node1.id=-1;
-        mddnodes.push_back(node1);
+        top=new MDDNode(NULL, 0);
+        mddnodes.push_back(top);
         
         for(int tupid=0; tupid<tlsize; tupid++) {
             vector<DomainInt> tup(tupdata+(tuplelen*tupid), tupdata+(tuplelen*(tupid+1) ));   // inefficient.
             
-            MDDNode* curnode=&(mddnodes[0]);
+            MDDNode* curnode=top;
+            
             for(int i=0; i<tuplelen; i++) {
                 
                 // Linear search for value.
                 // Should be replaced with binary search.
                 int idx=-1;
-                for(int j=0; j<curnode->links.size(); j=j+2) {
-                    if(curnode->links[j]==tup[i]) {
+                vector<std::pair<DomainInt, MDDNode*> >& links=curnode->links;
+                
+                for(int j=0; j<links.size(); j++) {
+                    if(links[j].first==tup[i]) {
                         idx=j;
                         break;
                     }
@@ -340,40 +343,102 @@ struct MDDC : public AbstractConstraint
                 
                 if(idx==-1) {
                     // New node needed.
-                    MDDNode newnode;
-                    if(i<tuplelen-1) {
-                        newnode.id=mddnodes.size();
+                    MDDNode* newnode=new MDDNode(curnode, 0);
+                    if(i==tuplelen-1) {
+                        newnode->type=-1;  // At the end of the tuple -- make a tt node.
                     }
-                    else {
-                        newnode.id=-1;   // At the end of the tuple -- make a tt node. 
-                    }
-                    mddnodes.push_back(newnode);  // copies it into the vector
+                    mddnodes.push_back(newnode);
                     
                     // Make the link
-                    for(int j=0; j<curnode->links.size(); j=j+2) {
-                        if(curnode->links[j]>tup[i]) {
-                            // this is the point to insert it. 
-                            curnode->links.insert(curnode->links.begin()+j, tup[i]);
-                            curnode->links.insert(curnode->links.begin()+j+1, newnode.id);
+                    links.push_back(std::make_pair(tup[i], newnode));
+                    
+                    // Swap it into place. 
+                    for(int i=links.size()-1; i>0; i--) {
+                        if(links[i].first<links[i-1].first) {
+                            std::pair<DomainInt, MDDNode*> temp=links[i];
+                            links[i]=links[i-1];
+                            links[i-1]=temp;
+                        }
+                        else {
                             break;
                         }
                     }
                     
                     // Move to this new node. 
-                    curnode=&(mddnodes[newnode.id]);
+                    curnode=newnode; 
                 }
                 else {
                     // Follow the link.
-                    curnode=&(mddnodes[curnode->links[idx+1]]);
+                    curnode=links[idx].second;
+                }
+            }
+            D_ASSERT(curnode->type == -1);  // tt node.
+        }
+        
+        // Now mdd is a trie with lots of tt nodes as the leaves.
+        // Start merging from the leaves upwards. 
+        
+        
+        for(int layer=vars.size()-1; layer>=0; layer--) {
+            
+            // Need a list of all nodes in this layer, with the index of their
+            // parent. 
+            
+            vector<MDDNode* > nodelist;
+            
+            find_layer(0, layer, top, nodelist);
+            
+            // Use stupid algorithm to find duplicates.
+            for(int i=0; i<nodelist.size(); i++) {
+                for(int j=i+1; j<nodelist.size(); j++) {
+                    if(nodelist[i]->links == nodelist[j]->links) {
+                        // we have a match.
+                        // Delete nodelist[j].
+                        
+                        MDDNode* todelete=nodelist[j];
+                        nodelist[j]=nodelist.back();
+                        nodelist.pop_back();
+                        
+                        vector<std::pair<DomainInt, MDDNode*> >& parlinks=todelete->parent->links;
+                        //  Search parlinks for the pointer to change
+                        for(int k=0; k<parlinks.size(); k++) {
+                            if(parlinks[k].second == todelete) {
+                                // todelete is being deleted so rewire this pointer to nodelinks[i]
+                                parlinks[k].second = nodelist[i];
+                                break;
+                            }
+                        }
+                        
+                        delete todelete;
+                        
+                        j--;
+                    }
                 }
             }
             
+            
+            
         }
         
-        // Now MDDNodes is a trie with lots of tt nodes as the leaves.
-        // Start merging from the leaves upwards. 
+        // label the nodes with a unique integer.
+        for(int i=0; i<mddnodes.size(); i++) {
+            mddnodes[i]->id=i;
+        }
         
         return;
+    }
+    
+    void find_layer(int currentlayer, int targetlayer, MDDNode* curnode, vector<MDDNode* >& nodelist) {
+        if(currentlayer<targetlayer) {
+            for(int i=0; i<curnode->links.size(); i++) {
+                find_layer(currentlayer+1, targetlayer, curnode->links[i].second, nodelist);
+            }
+        }
+        else {
+            D_ASSERT(currentlayer==targetlayer);
+            
+            nodelist.push_back(curnode);
+        }
     }
     
     
@@ -404,13 +469,14 @@ struct MDDC : public AbstractConstraint
     
     virtual bool check_assignment(DomainInt* tup, SysInt v_size)
     {
-        MDDNode* curnode=&(mddnodes[0]);
+        MDDNode* curnode=top;
         for(SysInt i=0; i<v_size; i++) {
             // Linear search for value.
             // Should be replaced with binary search.
+            vector<std::pair<DomainInt, MDDNode*> >& links=curnode->links;
             int idx=-1;
-            for(int j=0; j<curnode->links.size(); j=j+2) {
-                if(curnode->links[j]==tup[i]) {
+            for(int j=0; j<links.size(); j++) {
+                if(links[j].first==tup[i]) {
                     idx=j;
                     break;
                 }
@@ -418,42 +484,20 @@ struct MDDC : public AbstractConstraint
             
             if(idx==-1) return false;
             
-            curnode=&(mddnodes[curnode->links[idx+1]]);
+            curnode=links[idx].second;
         }
-        D_ASSERT(curnode->id==-1);
+        D_ASSERT(curnode->type==-1);
         
-        return false;
+        return true;
     }
 
     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
     {
-        // Run the propagator to cut off (add to gno) all parts of the MDD that
-        // cannot be in a satisfying tuple. 
+        // Run a depth-first search that is similar to the propagator
         
+        bool flag=mddcrecurse_assignment(top, 0, assignment);
         
-        
-        
-        /*for(SysInt i = 0; i < sct->compressed_tuples.size(); ++i)
-        {
-            bool sat = true;
-            for(SysInt j = 0; j < sct->compressed_tuples[i].size(); ++j)
-            {
-                if(!vars[sct->compressed_tuples[i][j].first].inDomain(sct->compressed_tuples[i][j].second))
-                {
-                    sat = false;
-                    break;
-                }
-            }
-
-            if(sat)
-            {
-                for(SysInt j = 0; j < sct->compressed_tuples[i].size(); ++j)
-                    assignment.push_back(sct->compressed_tuples[i][j]);
-                return true;
-            }
-        }*/
-
-        return false;
+        return flag;
     }
     
     virtual AbstractConstraint* reverse_constraint()
@@ -494,7 +538,7 @@ struct MDDC : public AbstractConstraint
         delta=vars.size();    // Horizon for the dfs. All vars from delta onwards are considered to have full support. 
         
         
-        mddcrecurse(mddnodes[0], 0);
+        mddcrecurse(top, 0);
         
         
         // Prune the domains.
@@ -510,8 +554,8 @@ struct MDDC : public AbstractConstraint
     }
     
     // DFS of the MDD. 
-    bool mddcrecurse(MDDNode& curnode, SysInt level) {
-        if(curnode.id==-1) {
+    bool mddcrecurse(MDDNode* curnode, SysInt level) {
+        if(curnode->type==-1) {
             //  special value indicating this is node tt.
             if(level<delta) {
                 delta=level; // This variable and all >= are now fully supported.
@@ -519,17 +563,17 @@ struct MDDC : public AbstractConstraint
             return true;
         }
         
-        if(curnode.id==-2) {
+        if(curnode->type==-2) {
             // special value for ff.  This is never used.
             return false;
         }
         
-        if(gyes.in(curnode.id)) {
+        if(gyes.in(curnode->id)) {
             // if curnode is in the gyes set
             return true;
         }
         
-        if(gno.in(curnode.id)) {
+        if(gno.in(curnode->id)) {
             // if in gno set
             return false;
         }
@@ -538,14 +582,14 @@ struct MDDC : public AbstractConstraint
         
         // Iterate through links from this MDD node. 
         
-        vector<SysInt>& links=curnode.links;
+        vector<std::pair<DomainInt, MDDNode*> >& links=curnode->links;
         
-        for(int k=0; k<links.size(); k=k+2) {
-            DomainInt val=curnode.links[k];
-            SysInt idx=curnode.links[k+1];
+        for(int k=0; k<links.size(); k++) {
+            DomainInt val=links[k].first;
+            MDDNode* newnode=links[k].second;
             
             if(vars[level].inDomain(val)) {
-                bool returnvalue=mddcrecurse(mddnodes[idx], level+1);
+                bool returnvalue=mddcrecurse(newnode, level+1);
                 
                 if(returnvalue) {
                     res=true;
@@ -562,16 +606,78 @@ struct MDDC : public AbstractConstraint
         
         if(res) {
             // add to gyes
-            D_ASSERT(!gyes.in(curnode.id));
-            gyes.insert(curnode.id);
+            D_ASSERT(!gyes.in(curnode->id));
+            gyes.insert(curnode->id);
         }
         else {
             // add to gno
-            D_ASSERT(!gno.in(curnode.id));
-            gno.insert(curnode.id);
+            D_ASSERT(!gno.in(curnode->id));
+            gno.insert(curnode->id);
         }
         
         return res;
+    }
+    
+    
+    // Modified version of the above to do the getSatisfyingAssignment
+    // DFS of the MDD. Doesn't use g_yes because there is no need to 
+    // visit the same node twice.  
+    // It does use gno as usual.
+    // It does NOT use delta. 
+    bool mddcrecurse_assignment(MDDNode* curnode, SysInt level, box<pair<SysInt,DomainInt> >& assignment) {
+        if(curnode->type==-1) {
+            //  special value indicating this is node tt.
+            return true;
+        }
+        
+        if(curnode->type==-2) {
+            // special value for ff.  This is never used.
+            return false;
+        }
+        
+        if(gno.in(curnode->id)) {
+            // if in gno set
+            return false;
+        }
+        
+        // Iterate through links from this MDD node. 
+        
+        vector<std::pair<DomainInt, MDDNode* > >& links=curnode->links;
+        
+        for(int k=0; k<links.size(); k++) {
+            DomainInt val=links[k].first;
+            MDDNode* newnode=links[k].second;
+            
+            if(vars[level].inDomain(val)) {
+                assignment.push_back(std::make_pair(level, val));
+                bool returnvalue=mddcrecurse_assignment(newnode, level+1, assignment);
+                
+                if(returnvalue) {
+                    // Found an assignment, unwind the recursion. 
+                    return true;
+                }
+                else {
+                    assignment.pop_back();
+                }
+                
+            }
+            
+        }
+        
+        // This node cannot be extended to an assignment.
+        // add to gno
+        D_ASSERT(!gno.in(curnode->id));
+        gno.insert(curnode->id);
+        
+        return false;
+    }
+    
+    void print_mdd() {
+        for(int i=0; i<mddnodes.size(); i++) {
+            std::cout << "Node:"<< i<<", " << mddnodes[i]->links << std::endl;
+        }
+        
+        
     }
     
 };
