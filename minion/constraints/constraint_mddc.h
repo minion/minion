@@ -328,18 +328,10 @@ struct MDDC : public AbstractConstraint
             MDDNode* curnode=top;
             
             for(int i=0; i<tuplelen; i++) {
-                
-                // Linear search for value.
-                // Should be replaced with binary search.
-                int idx=-1;
+                // Search for value.
                 vector<std::pair<DomainInt, MDDNode*> >& links=curnode->links;
                 
-                for(int j=0; j<links.size(); j++) {
-                    if(links[j].first==tup[i]) {
-                        idx=j;
-                        break;
-                    }
-                }
+                int idx=find_link(links, tup[i]);
                 
                 if(idx==-1) {
                     // New node needed.
@@ -474,13 +466,7 @@ struct MDDC : public AbstractConstraint
             // Linear search for value.
             // Should be replaced with binary search.
             vector<std::pair<DomainInt, MDDNode*> >& links=curnode->links;
-            int idx=-1;
-            for(int j=0; j<links.size(); j++) {
-                if(links[j].first==tup[i]) {
-                    idx=j;
-                    break;
-                }
-            }
+            int idx=find_link(links, tup[i]);
             
             if(idx==-1) return false;
             
@@ -490,7 +476,30 @@ struct MDDC : public AbstractConstraint
         
         return true;
     }
-
+    
+    // Binary search for a value in a vector
+    inline SysInt find_link(vector<std::pair<DomainInt, MDDNode*> > links, DomainInt value) {
+        // Binary search to find the index where the first element of the pair equals value. 
+        SysInt first=0;
+        SysInt last=links.size()-1;
+        
+        while(first<=last) {
+            SysInt mid=((last-first)>>1) + first;
+            if(links[mid].first==value) {
+                return mid;
+            }
+            if(links[mid].first<value) {
+                
+                first=mid+1;
+            }
+            else {
+                last=mid-1;
+            }
+        }
+        
+        return -1;
+    }
+    
     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
     {
         // Run a depth-first search that is similar to the propagator
