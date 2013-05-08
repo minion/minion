@@ -49,7 +49,7 @@ using namespace std;
 // Implemented as close as possible to the paper by Cheng and Yap. 
 // Uses sparse sets. 
 
-// Copied from STR2 -- version that is Chris-optimised. Used for internal domain sets. 
+// Copied from STR2. Used for internal domain sets and gyes set.  
 struct arrayset {
     vector<SysInt> vals;
     vector<SysInt> vals_pos;
@@ -128,7 +128,7 @@ struct arrayset {
     }
 };
 
-// Backtracking version of above. 
+// Backtracking version of above. Used for gno set.
 struct arrayset_bt {
     vector<SysInt> vals;
     vector<SysInt> vals_pos;
@@ -610,8 +610,8 @@ struct MDDC : public AbstractConstraint
         // Iterate through links from this MDD node. 
         
         vector<std::pair<DomainInt, MDDNode*> >& links=curnode->links;
-        
-        for(int k=0; k<links.size(); k++) {
+        SysInt linksize=links.size();
+        for(int k=0; k<linksize; k++) {
             DomainInt val=links[k].first;
             MDDNode* newnode=links[k].second;
             
@@ -670,8 +670,8 @@ struct MDDC : public AbstractConstraint
         // Iterate through links from this MDD node. 
         
         vector<std::pair<DomainInt, MDDNode* > >& links=curnode->links;
-        
-        for(int k=0; k<links.size(); k++) {
+        SysInt linksize=links.size();
+        for(int k=0; k<linksize; k++) {
             DomainInt val=links[k].first;
             MDDNode* newnode=links[k].second;
             
