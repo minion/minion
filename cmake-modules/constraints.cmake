@@ -13,6 +13,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one" "w
                     "true" "false" "check[gsa]" "check[assign]" "forwardchecking"
                     "watchvecexists_less" "lighttable"
                     "haggisgac" "haggisgac-stable" "str2plus" "shortstr2" "gaceq" "gacschema"
+                    "mddc"
                     )
 
 set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
@@ -149,6 +150,9 @@ set(NAME_READ_haggisgac-stable "read_list" "read_short_tuples")
 
 set(NAME_ID_str2plus "CT_STR")
 set(NAME_READ_str2plus "read_list" "read_tuples")
+
+set(NAME_ID_mddc "CT_MDDC")
+set(NAME_READ_mddc "read_list" "read_tuples")
 
 set(NAME_ID_shortstr2 "CT_SHORTSTR")
 set(NAME_READ_shortstr2 "read_list" "read_short_tuples")
