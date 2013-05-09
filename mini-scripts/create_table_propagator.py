@@ -141,40 +141,8 @@ def binary_search(tuples, x):
     return -1
 
 
-def gac_prunings(nogoods, domains):
-    # take a domain list, and a set of nogoods, and calculate the prunings GAC 
-    # would do.
-    #print "nogoods:"+str(nogoods)
-    #print "domains:"+str(domains)
-    
-    prunings=[]
-    for var in xrange(len(domains)):
-        for val in domains[var]:
-            domains2=domains[:]
-            domains2[var]=[val]
-            nogoods2=[]
-            for t in nogoods:
-                flag=True
-                for i in xrange(len(domains)):
-                    if t[i] not in domains2[i]:
-                        flag=False
-                        break
-                if flag:
-                    nogoods2.append(t)
-            tuplecount=reduce(lambda x,y:x*y, map(lambda z:len(z), domains2))
-            if len(nogoods2) == tuplecount:
-                prunings.append((var, val))
-    
-    #print "prunings:"+str(prunings)
-    return prunings
 
-def tuple_valid(tup, domains):
-    for i in xrange(len(tup)):
-        if tup[i] not in domains[i]:
-            return False
-    return True
-
-def gac_prunings2(domains):
+def gac2001_prunings(domains):
     prunings=[]
     for var in xrange(len(domains)):
         for val in domains[var]:
@@ -286,7 +254,7 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     #print "domains:"+str(whole_domain)
     #print "domains_out:"+str(domains_out)
     
-    prun=gac_prunings2(whole_domain)
+    prun=gac2001_prunings(whole_domain)
     
     if len(prun)>0:
         tree['pruning']=prun[:]
@@ -651,21 +619,22 @@ def vm_tree(tree, nodestarts, jumppoints, currentvm):
     if(tree.has_key('left') or tree.has_key('right')):
         currentvm += [-1010]
         currentvm += [tree['var'], tree['val']]
-        left_val = -3
+        
         right_val = -3
-        if tree.has_key('left'):
-            left_val = tree['left']['nodelabel'] + 10000
-            jumppoints.append(len(currentvm))
         if tree.has_key('right'):
             right_val = tree['right']['nodelabel'] + 10000
-            jumppoints.append(len(currentvm) + 1)
-        currentvm += [left_val, right_val]
+            jumppoints.append(len(currentvm))
+        currentvm += [right_val]
         
         if tree.has_key('left'):
             ret = vm_tree(tree['left'], nodestarts, jumppoints, currentvm)
             nodestarts = ret[0]
             jumppoints = ret[1]
             currentvm = ret[2]
+        else:
+            # need an 'end execution' instruction
+            currentvm += [-1000]
+        
         if tree.has_key('right'):
             ret = vm_tree(tree['right'], nodestarts, jumppoints, currentvm)
             nodestarts = ret[0]
@@ -1479,4 +1448,5 @@ else:
 
 eval(sys.argv[1]+"()")
 
-print(Comment + "Group Size: " + str(GetGroupSize(Group)))
+if EnableSymDetection:
+    print(Comment + "Group Size: " + str(GetGroupSize(Group)))
