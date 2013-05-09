@@ -153,11 +153,13 @@ class DynamicTrigger;
 struct AnyVarRef_Abstract
 {
   virtual BOOL isBound() const = 0;
+  virtual AnyVarRef popOneMapper() const = 0;
   virtual BOOL isAssigned() const = 0;  
   virtual DomainInt getAssignedValue() const = 0;
   virtual BOOL isAssignedValue(DomainInt i) const = 0;
   virtual BOOL inDomain(DomainInt b) const = 0;
   virtual BOOL inDomain_noBoundCheck(DomainInt b) const = 0;
+  virtual DomainInt getDomSize() const = 0;
   virtual DomainInt getMax() const = 0;
   virtual DomainInt getMin() const = 0;
   virtual DomainInt getInitialMax() const = 0;
@@ -173,8 +175,9 @@ struct AnyVarRef_Abstract
   virtual void addConstraint(AbstractConstraint* c) = 0;
   virtual DomainInt getBaseVal(DomainInt) const = 0;
   virtual Var getBaseVar() const = 0;
+  virtual vector<Mapper> getMapperStack() const = 0;
 #ifdef WDEG
-  virtual int getBaseWdeg() = 0;
+  virtual SysInt getBaseWdeg() = 0;
   virtual void incWdeg() = 0;
 #endif
 
@@ -183,7 +186,7 @@ struct AnyVarRef_Abstract
   virtual ~AnyVarRef_Abstract()
   {}
   
-  virtual int getDomainChange(DomainDelta d) = 0;
+  virtual DomainInt getDomainChange(DomainDelta d) = 0;
   virtual void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF) = 0;
 };
 
@@ -194,6 +197,8 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 
   virtual BOOL isBound() const
   { return data.isBound();}
+
+  AnyVarRef popOneMapper() const;
   
   VarRef data;
   AnyVarRef_Concrete(const VarRef& _data) : data(_data)
@@ -220,6 +225,9 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   virtual BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain_noBoundCheck(b); }
   
+  virtual DomainInt getDomSize() const
+  { return data.getDomSize(); }
+
   virtual DomainInt getMax() const
   { return data.getMax(); }
   
@@ -262,11 +270,14 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   virtual DomainInt getBaseVal(DomainInt v) const
   { return data.getBaseVal(v); }
 
+  virtual vector<Mapper> getMapperStack() const
+  { return data.getMapperStack(); }
+
   virtual Var getBaseVar() const
   { return data.getBaseVar(); }
 
 #ifdef WDEG
-  virtual int getBaseWdeg() 
+  virtual SysInt getBaseWdeg() 
   { return data.getBaseWdeg(); }
   virtual void incWdeg()
   { data.incWdeg(); }
@@ -278,7 +289,7 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   virtual ~AnyVarRef_Concrete()
   {}
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
 
 #ifdef DYNAMICTRIGGERS
@@ -287,20 +298,30 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 #endif
 };
 
+
+template<>
+class AnyVarRef_Concrete<DomainInt> {};
+
+template<typename T>
+class AnyVarRef_Concrete<vector<T> > {};
+
 /// Provides a method of wrapping any variable type in a general wrapper.
 class AnyVarRef
 {
 public:
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Maybe;
-  shared_ptr<AnyVarRef_Abstract> data;
+  minion_shared_ptr<AnyVarRef_Abstract> data;
   
   BOOL isBound() const
   { return data->isBound();}
+
+  AnyVarRef popOneMapper() const
+  { return data->popOneMapper(); }
   
   template<typename VarRef>
     AnyVarRef(const VarRef& _data) 
-  { data = shared_ptr<AnyVarRef_Abstract>(new AnyVarRef_Concrete<VarRef>(_data)); }
+  { data = minion_shared_ptr<AnyVarRef_Abstract>(new AnyVarRef_Concrete<VarRef>(_data)); }
   
   AnyVarRef() 
   {}
@@ -325,6 +346,10 @@ public:
 
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data->inDomain_noBoundCheck(b); }
+  
+
+  DomainInt getDomSize() const
+  { return data->getDomSize(); }
   
   DomainInt getMax() const
   { return data->getMax(); }
@@ -371,8 +396,11 @@ public:
   Var getBaseVar() const
   { return data->getBaseVar(); }
 
+  vector<Mapper> getMapperStack() const
+  { return data->getMapperStack(); }
+
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return data->getBaseWdeg(); }
 
   void incWdeg()
@@ -382,7 +410,7 @@ public:
   friend std::ostream& operator<<(std::ostream& o, const AnyVarRef& avr)
   { return o << "AnyVarRef:" << avr.data->virtual_to_string(); }
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return data->getDomainChange(d); }
   
 #ifdef DYNAMICTRIGGERS
@@ -390,5 +418,73 @@ public:
   {  data->addDynamicTrigger(t, type, pos BT_CALL); }
 #endif
 };
+
+
+template<typename VarRef>
+AnyVarRef AnyVarRef_Concrete<VarRef>::popOneMapper() const
+{ return data.popOneMapper(); }
+
+
+template<typename T, typename U>
+struct common_var_type2
+{ typedef AnyVarRef type; };
+
+template<typename T>
+struct common_var_type2<T,T>
+{ typedef T type; };
+
+template<typename T, typename U, typename V>
+struct common_var_type3
+{ typedef AnyVarRef type; };
+
+template<typename T>
+struct common_var_type3<T,T,T>
+{ typedef T type; };
+
+template<typename T>
+struct make_AnyVarRef_type
+{
+  typedef AnyVarRef type; 
+};
+
+template<typename T>
+struct make_AnyVarRef_type<vector<T> >
+{
+  typedef vector<typename make_AnyVarRef_type<T>::type> type;
+};
+
+template<typename T, size_t i>
+struct make_AnyVarRef_type<minion_array<T, i> >
+{
+  typedef vector<typename make_AnyVarRef_type<T>::type> type;
+};
+/*
+template<typename T>
+typename make_AnyVarRef_type<T>::type
+make_AnyVarRef(T t)
+{
+  return AnyVarRef(t);
+}
+*/
+template<typename T>
+typename make_AnyVarRef_type<vector<T> >::type
+make_AnyVarRef(vector<T> t)
+{
+  vector<AnyVarRef> v;
+  for(size_t i = 0; i < t.size(); ++i)
+    v.push_back(AnyVarRef(t[i]));
+  return v;
+}
+
+template<typename T, size_t param>
+typename make_AnyVarRef_type<minion_array<T,param> >::type
+make_AnyVarRef(minion_array<T,param> t)
+{
+  vector<AnyVarRef> v;
+  for(size_t i = 0; i < t.size(); ++i)
+    v.push_back(AnyVarRef(t[i]));
+  return v;
+}
+
 
 #endif

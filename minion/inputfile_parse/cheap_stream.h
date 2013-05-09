@@ -44,7 +44,7 @@ public:
     
     bool fail_flag;
     
-    int get_raw_pos()
+    SysInt get_raw_pos()
     { return stream_pos - stream_start; }
         
     void reset_stream()
@@ -101,36 +101,40 @@ public:
         
     bool eof()
     { return stream_pos == stream_end; }
-        
     
-    void getline(char* buf, int buf_length, char deliminator = '\n')
+
+    
+    string getline(char deliminator = '\n')
     {
-        int length = std::min((int)buf_length, (int)(stream_end - stream_pos));
-        P(length << ":");
-        for(int i = 0; i < length; ++i)
+        std::vector<char> output;
+        while(stream_pos != stream_end)
         {
-            P(i << ":" << *stream_pos << ":");
-             if(*stream_pos == deliminator)
-             {
-                 *buf = '\0';
-                 stream_pos++;
-                 return;
-             }
-            *buf = *stream_pos;
-            buf++; stream_pos++;           
+            if(*stream_pos == deliminator)
+            {
+                stream_pos++;
+                return string(output.begin(), output.end());
+            }
+            else
+            {
+                output.push_back(*stream_pos);
+                stream_pos++;
+            }
         }
-        *buf = '\0';
+        // reached end of stream
+        return string(output.begin(), output.end());
     }
     
 };
 
 
-void operator>>(CheapStream& cs, int& i)
+template<typename T>
+void operator>>(CheapStream& cs, T& ret)
 {
-    int neg_flag = 1;
+    SysInt neg_flag = 1;
     
-    // Set initial value
-    i = 1;
+    long long i = 1;
+    long long limit = std::numeric_limits<SysInt>::max() / 2;
+
     while(isspace(cs.peek()))
         cs.get();
     
@@ -143,7 +147,6 @@ void operator>>(CheapStream& cs, int& i)
     if(cs.peek() >= '0' && cs.peek() <= '9')
     {
         i *= (cs.get() - '0');
-        P(": " << i);
     }
     else
     {
@@ -155,11 +158,25 @@ void operator>>(CheapStream& cs, int& i)
     {
         char c = cs.get();
         i = i * 10 + c - '0';
+        if(i > limit)
+        {
+            std::cerr << "Magnitude of number too large!\n";
+            cs.fail_flag = true;
+            return;
+        }
         P(": '" << c << "' :" << i);
     }
     
-    i *= neg_flag;
-    P(">>int Got: " << i);
+    ret = i * neg_flag;
+    P(">>SysInt Got: " << i);
+}
+
+template<typename T>
+void operator>>(CheapStream& cs, Wrapper<T>& ret)
+{
+    T t = 0;
+    cs >> t;
+    ret = Wrapper<T>(t);
 }
 
 

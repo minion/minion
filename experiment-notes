@@ -1,0 +1,31 @@
+To do:
+
+Compare Quimper's algorithm with standard.
+=========================================
+No SCC's, no SCCCARDS, use gccweak. 
+Other options switched on: specialqueue, incrementalmatch, incgraph, onecall
+
+Obviously standard algorithm always wins....
+
+
+
+Standard algorithm from now on..
+
+Compare plain, specialq, incmatch, incgraph (including onecall prob.)
+=====================================================================
+
+Use gccweak.
+
+This is up to the current state-of-the-art?? 
+
+
+Compare baseline with SCC
+=========================
+
+Baseline is specialq-incmatch-incgraph-onecall.
+
+compare baseline to SCC. 
+
+
+What about domain counting?? 
+Perhaps both domain counting and WL's can be discounted because of the need to prop onto cap vars.

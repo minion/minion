@@ -52,12 +52,16 @@ for($arg=0;$arg < @ARGV; $arg++) {
                   $resbin = 0;
                   $res = "";
                   $timeout = "Completed";
+		  $git_version = "0";
                   $version = $field[3] ;
                   @parsing_time = -1;
                   @setup_time = -1;
                   @first_node_time = -1;
+                  @first_node_time2 = -1;
+                  @initial_propagate = -1;
                   $solve_time = 0;
                   $total_time = 0;
+                  $wall_time = -1;
                   @bytes_used = -1;
                   @total_nodes = -1;
                   @num_solutions = -1;
@@ -78,12 +82,16 @@ for($arg=0;$arg < @ARGV; $arg++) {
                   $resbin = 0;
               } 
               #if ($line =~ /^Parsing Time=/) { @heuristic =  split(/,/,$field[2]); }
+              if ($line =~ /^# Git version/) { $git_version = $field[3] } 
               if ($line =~ /^Parsing Time/) { @parsing_time =  $field[2] ; }
               if ($line =~ /^Setup Time/) { @setup_time =  $field[2] ; }
               if ($line =~ /^First node time/) { @first_node_time =  $field[3] ; }
+              if ($line =~ /^First Node Time/) { @first_node_time2 =  $field[3] ; }
+              if ($line =~ /^Initial Propagate/) { @initial_propagate =  $field[2] ; }
               if ($line =~ /^Solve Time/) { $solve_time =  $field[2] ; }
               if ($line =~ /^Total Time/) { $total_time =  $field[2] ; }
-              if ($line =~ /^Bytes used in Backtrackable Memory/) { @bytes_used = $field[6] ; }
+              if ($line =~ /^Total Wall Time/) { $wall_time =  $field[3] ; }
+              if ($line =~ /^Maximum Memory/) { @bytes_used = $field[3] ; }
               if ($line =~ /^Total Nodes/) { $total_nodes =  $field[2]; }
               if ($line =~ /^Solutions Found/) { $num_solutions =  $field[2]; }
             }
@@ -107,11 +115,11 @@ sub print_line
 
   #if changing this remember to update print_headers!
 
-  print "$instance_name $version $res $num_solutions $total_time $total_nodes $nodesper $timeout @parsing_time @setup_time @first_node_time $solve_time $nodesper_solving @bytes_used $filename \n" 
+  print "$instance_name $version $git_version $res $num_solutions $total_time $total_nodes $nodesper $timeout @parsing_time @setup_time @first_node_time @first_node_time2 @initial_propagate $solve_time $wall_time $nodesper_solving @bytes_used $filename \n" 
     if (!($res eq ""));
 }  
 
 sub print_headers
 {
-  print "instance_filename minion_version solvable_or_unsolvable num_solutions total_time total_nodes nodes_per_sec completed_or_timeout parsing_time setup_time first_node_time solve_time nodes_per_sec_solving bytes_in_bt_memory data_filename\n" ;
+  print "instance_filename minion_version git_version solvable_or_unsolvable num_solutions total_time total_nodes nodes_per_sec completed_or_timeout parsing_time setup_time first_node_time First_Node_time initial_propagate_time solve_time wall_time nodes_per_sec_solving max_memory_kb data_filename\n" ;
 }  

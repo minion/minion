@@ -50,10 +50,10 @@ struct VMConstraint : public AbstractConstraint
   // Note: This is max - min, not the number of values per domain.
   static const int MaxDomSize = 14;
   static const int MaxVarSize = 13;
-  array<VarRef, MaxVarSize> vars;
-  array<signed char, MaxVarSize> domain_min;
-  array<array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
-  array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
+  minion_array<VarRef, MaxVarSize> vars;
+  minion_array<signed char, MaxVarSize> domain_min;
+  minion_array<minion_array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
+  minion_array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
   int total_lits;
 
   int vars_size;

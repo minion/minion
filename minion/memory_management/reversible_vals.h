@@ -35,21 +35,21 @@
 template<typename Type>
 class Reversible
 {
-  MoveablePointer backtrack_ptr;
+  void* backtrack_ptr;
   
 public:
   
   /// Automatic conversion to the type.
   operator Type() const
   {  
-    Type* ptr = (Type*)(backtrack_ptr.get_ptr());
+    Type* ptr = (Type*)(backtrack_ptr);
     return *ptr;
   }
 
   /// Assignment operator.
   void operator=(const Type& newval)
   {
-    Type* ptr = (Type*)(backtrack_ptr.get_ptr());
+    Type* ptr = (Type*)(backtrack_ptr);
     *ptr = newval;
   }
   
@@ -63,14 +63,14 @@ public:
   Reversible(StateObj* stateObj)
   { 
      backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(Type));
-     D_ASSERT( (size_t)(backtrack_ptr.get_ptr()) % sizeof(Type) == 0);
+     D_ASSERT( (size_t)(backtrack_ptr) % sizeof(Type) == 0);
   }
   
   /// Constructs and assigns in one step.
   Reversible(StateObj* stateObj, Type t)
   {
     backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(Type));
-    D_ASSERT( (size_t)(backtrack_ptr.get_ptr()) % sizeof(Type) == 0);
+    D_ASSERT( (size_t)(backtrack_ptr) % sizeof(Type) == 0);
     (*this) = t;
   }
 
@@ -83,21 +83,21 @@ public:
 class BoolContainer
 {
   StateObj* stateObj;
-  MoveablePointer backtrack_ptr;
-  int offset;
+  void* backtrack_ptr;
+  SysInt offset;
 public:
-  BoolContainer(StateObj* _stateObj) : stateObj(_stateObj), offset(sizeof(int)*8)
+  BoolContainer(StateObj* _stateObj) : stateObj(_stateObj), offset(sizeof(SysInt)*8)
   {}
   
-  pair<MoveablePointer, unsigned> returnBacktrackBool()
+  pair<void*, UnsignedSysInt> returnBacktrackBool()
   {
-    if(offset == sizeof(int)*8)
+    if(offset == sizeof(SysInt)*8)
     {
       offset = 0;
-      backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(int));
+      backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(SysInt));
     }
     
-    pair<MoveablePointer,unsigned> ret(backtrack_ptr, ((unsigned)1) << offset);
+    pair<void*,UnsignedSysInt> ret(backtrack_ptr, ((UnsignedSysInt)1) << offset);
     offset++;
     return ret;
   }
@@ -106,22 +106,22 @@ public:
 template<>
 class Reversible<bool>
 {
-  MoveablePointer backtrack_ptr;
-  unsigned mask;
+  void* backtrack_ptr;
+  UnsignedSysInt mask;
   
 public:
   
   /// Automatic conversion to the type.
   operator bool() const
   {  
-    unsigned* ptr = (unsigned*)(backtrack_ptr.get_ptr());
+    UnsignedSysInt* ptr = (UnsignedSysInt*)(backtrack_ptr);
     return (*ptr & mask);
   }
 
   /// Assignment operator.
   void operator=(const bool& newval)
   {
-    unsigned* ptr = (unsigned*)(backtrack_ptr.get_ptr());
+    UnsignedSysInt* ptr = (UnsignedSysInt*)(backtrack_ptr);
     if(newval)
       *ptr |= mask;
     else
@@ -131,7 +131,7 @@ public:
   /// Constructs a new backtrackable type connected to stateObj.
   Reversible(StateObj* stateObj)
   { 
-    pair<MoveablePointer, unsigned> state = getBools(stateObj).returnBacktrackBool();
+    pair<void*, UnsignedSysInt> state = getBools(stateObj).returnBacktrackBool();
     backtrack_ptr = state.first;
     mask = state.second;
   }
@@ -139,7 +139,7 @@ public:
   /// Constructs and assigns in one step.
   Reversible(StateObj* stateObj, bool b)
   {
-    pair<MoveablePointer, unsigned> state = getBools(stateObj).returnBacktrackBool();
+    pair<void*, UnsignedSysInt> state = getBools(stateObj).returnBacktrackBool();
     backtrack_ptr = state.first;
     mask = state.second;
     (*this) = b;
@@ -152,7 +152,7 @@ public:
 };
 
 /// Specialisation for backwards compatability.
-typedef Reversible<int> ReversibleInt;
+typedef Reversible<SysInt> ReversibleInt;
 
 // @}
 

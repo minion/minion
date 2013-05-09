@@ -32,12 +32,17 @@ help constraints abs
 #ifndef CONSTRAINT_ABS_H
 #define CONSTRAINT_ABS_H
 
+#include "../constraints/constraint_checkassign.h"
+
 // X = abs(Y)
 template<typename AbsVarRef1, typename AbsVarRef2>
 struct AbsConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Abs"; }
+  { return "abs"; }
+
+  CONSTRAINT_ARG_LIST2(var1, var2);
+
   
   AbsVarRef1 var1;
   AbsVarRef2 var2;
@@ -58,8 +63,8 @@ struct AbsConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     var1.setMin(0);
-    for(int i = 0; i < 4 && !getState(stateObj).isFailed(); ++i)
-      propagate(i, 0);
+    for(SysInt i = 0; i < 4 && !getState(stateObj).isFailed(); ++i)
+      propagate(i, DomainDelta::empty());
   }
   
   // Assume values passed in in order.
@@ -91,13 +96,13 @@ struct AbsConstraint : public AbstractConstraint
     
   }
   
-  virtual void propagate(int i, DomainDelta)
+  virtual void propagate(DomainInt i, DomainDelta)
   {
     // Assume this in the algorithm.
     D_ASSERT(var1.getMin() >= 0);
     
     PROP_INFO_ADDONE(Abs);
-    switch(i)
+    switch(checked_cast<SysInt>(i))
     {
     case 1: //var1 upper
       var2.setMax(var1.getMax());
@@ -123,7 +128,7 @@ struct AbsConstraint : public AbstractConstraint
   }
   
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 2);
     if(v[1] >= 0)
@@ -132,7 +137,7 @@ struct AbsConstraint : public AbstractConstraint
       return v[0] == -v[1];
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     DomainInt x_dom_max = var1.getMax();
     DomainInt y_dom_max = max(abs(var2.getMin()), abs(var2.getMax()));
@@ -175,10 +180,7 @@ struct AbsConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      vector<AnyVarRef> t;
-      t.push_back(var1);
-      t.push_back(var2);
-      return new CheckAssignConstraint<vector<AnyVarRef>, AbsConstraint>(stateObj, t, *this);
+      return forward_check_negation(stateObj, this);
   }
 };
 

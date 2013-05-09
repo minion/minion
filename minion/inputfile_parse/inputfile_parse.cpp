@@ -45,9 +45,9 @@ template<typename Reader, typename Stream>
     getTableOut().set(string("Filename"), infile->filename);  
 }
 
-void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parser_verbose)
+void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, bool parser_verbose, MapLongTuplesToShort mltts)
 {
-  MinionThreeInputReader<ConcreteFileReader<CheapStream> > readerThree(parser_verbose);
+  MinionThreeInputReader<ConcreteFileReader<CheapStream> > readerThree(parser_verbose, mltts);
   MinionInputReader<ConcreteFileReader<CheapStream> > reader(parser_verbose);
   bool needs_finalise_three = false;
   for(vector<string>::const_iterator fname = fnames.begin(); fname != fnames.end(); fname++) {
@@ -69,7 +69,7 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
         in.push(gzip_decompressor());
 #else
         cerr << "Error: Built without gzip support" << endl;
-        exit(0);
+        exit(1);
 #endif
       }    
   
@@ -81,7 +81,7 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
         in.push(bzip2_decompressor());
 #else
         cerr << "Error: Built without bzip2 support" << endl;
-        exit(0);
+        exit(1);
 #endif
 
       }
@@ -117,7 +117,7 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
       if(test_name != "MINION")
         INPUT_ERROR("All Minion input files must begin 'MINION'");
   
-      int inputFileVersionNumber = infile.read_num();
+      SysInt inputFileVersionNumber = infile.read_int();
   
       if(inputFileVersionNumber > 3)
         INPUT_ERROR("This version of Minion only supports formats up to 3");
@@ -146,27 +146,25 @@ void readInputFromFiles(CSPInstance& instance, vector<string> fnames, bool parse
       cerr << "Error in input!" << endl;
       cerr << s.what() << endl;
       
-      int pos = cs.get_raw_pos();
+      SysInt pos = cs.get_raw_pos();
       cs.reset_stream();
       
       string current_line;
-      int start_of_line = 0;
-      int line_count = -1;
+      SysInt start_of_line = 0;
+      SysInt line_count = -1;
       
       do
       {
           line_count++;
           start_of_line = cs.get_raw_pos();
-          char buf[10000];
-          cs.getline(buf, 9999);
-          current_line = buf;
+          current_line = cs.getline();
       }
       while(cs.get_raw_pos() < pos);
       
       cerr << "Error occurred on line " << line_count << endl;
       cerr << "Parser gave up around:" << endl;
       cerr << current_line << endl;
-      for(int i = 0; i < pos - start_of_line - 1; ++i)
+      for(SysInt i = 0; i < pos - start_of_line - 1; ++i)
           cerr << "-";
       cerr << "^" << endl;
         exit(1);

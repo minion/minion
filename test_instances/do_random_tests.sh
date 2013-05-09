@@ -22,7 +22,7 @@ echo Random testing $exec with options .$*.
 
 j=0
 pass=0
-for i in `grep -l "#TEST SOLCOUNT" *.minion`; do
+for i in `grep -l "#TEST SOLCOUNT" *.minion tests-32domains/*.minion`; do
   LOOP=0
   if grep "#FAIL\|#BUG\|maximising\|minimising\|MAXIMISING\|MINIMISING" $i &> /dev/null;
   then
@@ -32,7 +32,7 @@ for i in `grep -l "#TEST SOLCOUNT" *.minion`; do
     while [ $LOOP -lt $tests ]; do
       j=$(($j + 1));
       
-      numsols=`$exec -randomseed $LOOP -findallsols $* $i 2>/dev/null | ../mini-scripts/solutions.sh`
+      numsols=`$exec $i -randomseed $LOOP -findallsols $*  2>/dev/null | ../mini-scripts/get_info.sh solutions`
       testnumsols=`grep "#TEST SOLCOUNT" $i  | awk '{print $3}' | tr -d '\015' `
     	if [[ "$numsols" != "$testnumsols" ]]; then
     	  testpass=0

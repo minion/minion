@@ -24,6 +24,62 @@
 //#include "../system/system.h"
 //#include "../memory_management/reversible_vals.h"
 
+
+template<typename T>
+DomainInt chooseVal(T& var, ValOrderEnum vo)
+{
+    switch(vo)
+    {
+        case VALORDER_ASCEND:
+            return var.getMin();
+        case VALORDER_DESCEND:
+            return var.getMax();
+        
+
+        case VALORDER_RANDOM:
+        {
+            if(var.isBound())
+            {
+                switch(rand()%2)
+                {
+                    case 0: return var.getMin();
+                    case 1: return var.getMax();
+                    default: abort();
+                }
+            }
+            DomainInt min_val = var.getMin();
+            DomainInt max_val = var.getMax();
+            DomainInt val = (rand() % (max_val - min_val + 1)) + min_val;
+            D_ASSERT(val >= min_val);
+            D_ASSERT(val <= max_val);
+            if(var.inDomain(val))
+                return val;
+            switch(rand()%2)
+            {
+                case 0:
+                {
+                    val--;
+                    while(!var.inDomain(val))
+                        val--;
+                    return val;
+                }
+                case 1:
+                {
+                    val++;
+                    while(!var.inDomain(val))
+                        val++;
+                    return val;
+                }
+                default: abort();
+            }
+
+        }
+
+        default:
+            abort();
+    }
+}
+
 struct VariableOrder
 {
     vector<AnyVarRef> var_order;  // can assume this is anyvarref? May need to template
@@ -34,7 +90,7 @@ struct VariableOrder
     
     // returns a pair of variable index, domain value.
     // returning the variable index == -1 means no branch possible.
-    virtual pair<int, DomainInt> pickVarVal() = 0;
+    virtual pair<SysInt, DomainInt> pickVarVal() = 0;
 
     virtual ~VariableOrder() {}
 };
@@ -42,13 +98,13 @@ struct VariableOrder
 // Container for multiple variable orderings
 struct MultiBranch : public VariableOrder
 {
-    vector<shared_ptr<VariableOrder> > vovector;
-    Reversible<int> pos;
+    vector<minion_shared_ptr<VariableOrder> > vovector;
+    Reversible<SysInt> pos;
     
     // need to patch up the returned variable index
-    vector<int> variable_offset;
+    vector<DomainInt> variable_offset;
     
-    MultiBranch(const vector<shared_ptr<VariableOrder> > _vovector,
+    MultiBranch(const vector<minion_shared_ptr<VariableOrder> > _vovector,
 		StateObj* _stateObj):
     VariableOrder(_vovector[0]->var_order), // It doesn't matter what var_order is set to
     vovector(_vovector),
@@ -57,17 +113,17 @@ struct MultiBranch : public VariableOrder
         pos=0;
         variable_offset.resize(vovector.size());
         variable_offset[0]=0;
-        for(int i=1; i<vovector.size(); i++)
+        for(SysInt i=1; i<vovector.size(); i++)
         {
             variable_offset[i]=variable_offset[i-1]+vovector[i-1]->var_order.size();
         }
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
-        int pos2=pos;
+        SysInt pos2=pos;
         
-        pair<int, DomainInt> t=vovector[pos2]->pickVarVal();
+        pair<SysInt, DomainInt> t=vovector[pos2]->pickVarVal();
         while(t.first==-1)   
         {
             pos2++;
@@ -79,25 +135,26 @@ struct MultiBranch : public VariableOrder
             t=vovector[pos2]->pickVarVal();
         }
         pos=pos2;
-        t.first+=variable_offset[pos2];
+        t.first+=checked_cast<SysInt>(variable_offset[pos2]);
         return t;
     }
 };
 
 struct StaticBranch : public VariableOrder
 {
-    vector<char> val_order;
-    Reversible<int> pos;
+    vector<ValOrderEnum> val_order;
+    Reversible<SysInt> pos;
     
-    StaticBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
+    StaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
         val_order(_val_order), pos(_stateObj)
     {
         pos=0;
+        D_ASSERT(var_order.size() == val_order.size());
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
-        unsigned v_size = var_order.size();
+        UnsignedSysInt v_size = var_order.size();
         
         while(pos < v_size && var_order[pos].isAssigned())
             pos=pos+1;
@@ -105,11 +162,7 @@ struct StaticBranch : public VariableOrder
         if(pos == v_size)
             return make_pair(-1, 0);
         
-        DomainInt val=0;
-        if(val_order[pos])
-            val=var_order[pos].getMin();
-        else
-            val=var_order[pos].getMax();
+        DomainInt val=chooseVal(var_order[pos], val_order[pos]);
         
         return make_pair(pos, val);
     }
@@ -117,23 +170,23 @@ struct StaticBranch : public VariableOrder
 
 struct SDFBranch : public VariableOrder
 {
-    vector<char> val_order;
+    vector<ValOrderEnum> val_order;
     
-    SDFBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : 
+    SDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : 
         VariableOrder(_var_order), val_order(_val_order)
     {
     }
     
     // THIS DOES NOT DO SDF -- just an approximation with the bounds.
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
-        cout << "In pickVarVal for SDF (approximation)" <<endl;
-        int length = var_order.size();
-        int smallest_dom = -1;
+        //cout << "In pickVarVal for SDF (approximation)" <<endl;
+        SysInt length = var_order.size();
+        SysInt smallest_dom = -1;
         DomainInt dom_size = DomainInt_Max;
         
-        for(int i = 0; i < length; ++i)
+        for(SysInt i = 0; i < length; ++i)
         {
             DomainInt maxval = var_order[i].getMax();
             DomainInt minval = var_order[i].getMin();
@@ -154,11 +207,7 @@ struct SDFBranch : public VariableOrder
             return make_pair(-1, 0);
         }
         
-        DomainInt val=0;
-        if(val_order[smallest_dom])
-            val=var_order[smallest_dom].getMin();
-        else
-            val=var_order[smallest_dom].getMax();
+        DomainInt val=chooseVal(var_order[smallest_dom], val_order[smallest_dom]);
         
         return make_pair(smallest_dom, val);
     }
@@ -166,28 +215,24 @@ struct SDFBranch : public VariableOrder
 
 struct SlowStaticBranch : public VariableOrder
 {
-    vector<char> val_order;
+    vector<ValOrderEnum> val_order;
     
-    SlowStaticBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : 
+    SlowStaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : 
         VariableOrder(_var_order), val_order(_val_order)
     {
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
-        unsigned v_size = var_order.size();
-        unsigned pos = 0;
+        UnsignedSysInt v_size = var_order.size();
+        UnsignedSysInt pos = 0;
         while(pos < v_size && var_order[pos].isAssigned())
             ++pos;
         
         if(pos == v_size)
             return make_pair(-1, 0);
         
-        DomainInt val=0;
-        if(val_order[pos])
-            val=var_order[pos].getMin();
-        else
-            val=var_order[pos].getMax();
+        DomainInt val=chooseVal(var_order[pos], val_order[pos]);
         
         return make_pair(pos, val);
     }
@@ -197,17 +242,17 @@ struct SlowStaticBranch : public VariableOrder
 //see Boosting Systematic Search by Weighting Constraints by Boussemart et al
 struct WdegBranch : public VariableOrder
 {
-    vector<char> val_order;
+    vector<ValOrderEnum> val_order;
     
-    WdegBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
+    WdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
         val_order(_val_order)
     {
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
-    int best = var_order.size(); //the variable with the best score so far (init to none)
-    int best_score = -1; //... and its score (all true scores are positive)
+    SysInt best = var_order.size(); //the variable with the best score so far (init to none)
+    SysInt best_score = -1; //... and its score (all true scores are positive)
     size_t var_order_size = var_order.size();
     for(size_t i = 0; i < var_order_size; i++) { //we will find the score for each var
       //cout << "i=" << i << endl;
@@ -218,7 +263,7 @@ struct WdegBranch : public VariableOrder
         //cout << "assigned -- stop" << endl;
         continue;
       }
-      int base_wdeg = v.getBaseWdeg();
+      SysInt base_wdeg = v.getBaseWdeg();
       //cout << "basewdeg=" << base_wdeg << endl;
       if(base_wdeg <= best_score) {
         //cout << "too low before deductions" << endl;
@@ -231,7 +276,7 @@ struct WdegBranch : public VariableOrder
         //cout << "con wdeg=" << c->getWdeg() << endl;
         vector<AnyVarRef>* c_vars = c->get_vars_singleton();
         size_t c_vars_size = c_vars->size();
-        int uninst = 0;
+        SysInt uninst = 0;
         for(size_t k = 0; k < c_vars_size; k++) 
           if(!(*c_vars)[k].isAssigned())
             if(++uninst > 1) { //when multiple unassigned we needn't deduct
@@ -261,26 +306,24 @@ struct WdegBranch : public VariableOrder
     if(best==var_order.size())
         return make_pair(-1, 0);
     
-    if(val_order[best])
-        return make_pair(best, var_order[best].getMin());
-    else
-        return make_pair(best, var_order[best].getMax());
+    DomainInt val = chooseVal(var_order[best], val_order[best]);
+    return make_pair(best, val);
   }
 };
 
 struct DomOverWdegBranch : VariableOrder
 {
-    vector<char> val_order;
+    vector<ValOrderEnum> val_order;
     
-    DomOverWdegBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
+    DomOverWdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
         val_order(_val_order)
     {
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
     //cout << "using domoverwdeg" << endl;
-    int best = var_order.size(); //the variable with the best score so far (init to none)
+    SysInt best = var_order.size(); //the variable with the best score so far (init to none)
     float best_score = FLT_MAX; //... and its score (all true scores are positive)
     size_t var_order_size = var_order.size();
     bool anyUnassigned = false;
@@ -298,8 +341,8 @@ struct DomOverWdegBranch : VariableOrder
         best = i;
         anyUnassigned = true;
       }
-      int dom_size_approx = v.getMax() - v.getMin() + 1;
-      int base_wdeg = v.getBaseWdeg();
+      SysInt dom_size_approx = v.getMax() - v.getMin() + 1;
+      SysInt base_wdeg = v.getBaseWdeg();
       //cout << "basewdeg=" << base_wdeg << endl;
       if((float)dom_size_approx/base_wdeg >= best_score) {
         //cout << "too high before deductions" << endl;
@@ -312,7 +355,7 @@ struct DomOverWdegBranch : VariableOrder
         //cout << "con wdeg=" << c->getWdeg() << endl;
         vector<AnyVarRef>* c_vars = c->get_vars_singleton();
         size_t c_vars_size = c_vars->size();
-        int uninst = 0;
+        SysInt uninst = 0;
         for(size_t k = 0; k < c_vars_size; k++) 
           if(!(*c_vars)[k].isAssigned())
             if(++uninst > 1) { //when multiple unassigned we needn't deduct
@@ -344,10 +387,8 @@ struct DomOverWdegBranch : VariableOrder
     if(best==var_order.size())
         return make_pair(-1, 0);
     
-    if(val_order[best])
-        return make_pair(best, var_order[best].getMin());
-    else
-        return make_pair(best, var_order[best].getMax());
+    DomainInt val = chooseVal(var_order[best], val_order[best]);
+    return make_pair(best, val);
   }
 };
 #endif
@@ -356,22 +397,22 @@ struct DomOverWdegBranch : VariableOrder
 
 struct SRFBranch : VariableOrder
 {
-    vector<char> val_order;
+    vector<ValOrderEnum> val_order;
     
-    SRFBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
+    SRFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
         val_order(_val_order)
     {
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
-    int length = var_order.size();
-    int smallest_dom = length;
+    SysInt length = var_order.size();
+    SysInt smallest_dom = length;
     
     float ratio = 2;
     
     
-    for(int i = 0; i < length; ++i)
+    for(SysInt i = 0; i < length; ++i)
     {
       DomainInt maxval = var_order[i].getMax();
       DomainInt minval = var_order[i].getMin();
@@ -390,28 +431,26 @@ struct SRFBranch : VariableOrder
     if(smallest_dom==length)
         return make_pair(-1, 0);
     
-    if(val_order[smallest_dom])
-        return make_pair(smallest_dom, var_order[smallest_dom].getMin());
-    else
-        return make_pair(smallest_dom, var_order[smallest_dom].getMax());
+    DomainInt val = chooseVal(var_order[smallest_dom], val_order[smallest_dom]);
+    return make_pair(smallest_dom, val);
     }
 };
 
 
 struct LDFBranch : VariableOrder
 {
-    vector<char> val_order;
+    vector<ValOrderEnum> val_order;
     
-    LDFBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
+    LDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order), 
         val_order(_val_order)
     {
     }
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
-    int length = var_order.size();
+    SysInt length = var_order.size();
     
-    int pos = 0;
+    SysInt pos = 0;
     while(pos < length && var_order[pos].isAssigned())
       ++pos;
     if(pos == length)
@@ -419,7 +458,7 @@ struct LDFBranch : VariableOrder
         return make_pair(-1, 0);
     }
     
-    int largest_dom = pos;
+    SysInt largest_dom = pos;
     DomainInt dom_size = var_order[pos].getMax() - var_order[pos].getMin();
     
     ++pos;
@@ -436,10 +475,8 @@ struct LDFBranch : VariableOrder
       }
     }
     
-    if(val_order[largest_dom])
-        return make_pair(largest_dom, var_order[largest_dom].getMin());
-    else
-        return make_pair(largest_dom, var_order[largest_dom].getMax());
+    DomainInt val = chooseVal(var_order[largest_dom], val_order[largest_dom]);
+    return make_pair(largest_dom, val);
   }
 };
 
@@ -447,13 +484,13 @@ struct ConflictBranch : VariableOrder
 {
     // Implements the conflict variable ordering from 
     // "Last Conflict based Reasoning", Lecoutre et al, ECAI 06.
-    vector<char> val_order;
+    vector<ValOrderEnum> val_order;
     
-    Reversible<int> pos;
+    Reversible<SysInt> pos;
     
     VariableOrder* innervarorder;
     
-    ConflictBranch(const vector<AnyVarRef>& _var_order, const vector<char>& _val_order, 
+    ConflictBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, 
         VariableOrder* _innervarorder, StateObj* _stateObj) : 
     VariableOrder(_var_order), 
     val_order(_val_order),
@@ -469,12 +506,12 @@ struct ConflictBranch : VariableOrder
     
     // pos and pos2 are used to see if we have backtracked.
     
-    int pos2;
+    SysInt pos2;
     
-    int last_returned_var;
+    SysInt last_returned_var;
     bool in_conflict;
     
-    pair<int, DomainInt> pickVarVal()
+    pair<SysInt, DomainInt> pickVarVal()
     {
         if(in_conflict && var_order[last_returned_var].isAssigned())
         {
@@ -502,18 +539,13 @@ struct ConflictBranch : VariableOrder
         
         if(in_conflict)
         {
-            if(val_order[last_returned_var])
-            {
-                return make_pair(last_returned_var, var_order[last_returned_var].getMin());
-            }
-            else
-            {
-                return make_pair(last_returned_var, var_order[last_returned_var].getMax());
-            }
+
+            DomainInt val = chooseVal(var_order[last_returned_var], val_order[last_returned_var]);
+            return make_pair(last_returned_var, val);
         }
         else
         {
-            pair<int, DomainInt> temp= innervarorder->pickVarVal();
+            pair<SysInt, DomainInt> temp= innervarorder->pickVarVal();
             last_returned_var=temp.first;
             D_ASSERT(temp.first==-1 || var_order[temp.first].inDomain(temp.second));
             return temp;

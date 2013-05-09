@@ -50,12 +50,12 @@ struct TestConstraint : public AbstractConstraint
 
   static const int MaxDomSize = 14;
   static const int MaxVarSize = 13;
-  array<ArrayVarRef,MaxVarSize> vars;
+  minion_array<ArrayVarRef,MaxVarSize> vars;
 
 #ifdef SYMMETRIC
-  array<signed char, MaxVarSize> domain_min;
-  array<array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
-  array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
+  minion_array<signed char, MaxVarSize> domain_min;
+  minion_array<minion_array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
+  minion_array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
   int total_lits;  
 #endif 
   

@@ -40,7 +40,7 @@ void inline maybe_print_search_assignment(StateObj* stateObj, T& var, DomainInt 
     }
 }
 
-// instead of carrying around the pos everywhere, the VariableOrder object has pos in it as a reversible<int>. 
+// instead of carrying around the pos everywhere, the VariableOrder object has pos in it as a reversible<SysInt>. 
 
 // replace find_next_unassigned with all_vars_assigned (which maybe uses something like a watch).
 
@@ -50,24 +50,27 @@ void inline maybe_print_search_assignment(StateObj* stateObj, T& var, DomainInt 
 
 struct SearchManager 
 {
+
+  virtual ~SearchManager() {}
+  
   StateObj* stateObj;
   vector<AnyVarRef> var_array;
-  shared_ptr<VariableOrder> var_order;
+  minion_shared_ptr<VariableOrder> var_order;
   
   bool hasauxvars;   // Has a VARORDER AUX
-  int topauxvar;  // lowest index of an aux var.
+  SysInt topauxvar;  // lowest index of an aux var.
   
-  shared_ptr<Propagate> prop;  // Propagate is the type of the base class. Method prop->prop(stateObj, var_array)
+  minion_shared_ptr<Propagate> prop;  // Propagate is the type of the base class. Method prop->prop(stateObj, var_array)
   
   vector<Controller::triple> branches; //L & R branches so far (isLeftBranch?,var,value)
-  //vector<int> first_unassigned_variable;
+  //vector<DomainInt> first_unassigned_variable;
   
-  unsigned depth; //number of left branches
-  int ceiling; // index into branches, it is the lowest LB which has been stolen.
+  UnsignedSysInt depth; //number of left branches
+  SysInt ceiling; // index into branches, it is the lowest LB which has been stolen.
   
   SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array,
-                vector<SearchOrder> _order, shared_ptr<VariableOrder> _var_order,
-                shared_ptr<Propagate> _prop)
+                vector<SearchOrder> _order, minion_shared_ptr<VariableOrder> _var_order,
+                minion_shared_ptr<Propagate> _prop)
   : stateObj(_stateObj), var_array(_var_array), var_order(_var_order),
     topauxvar(0), prop(_prop), depth(0), ceiling(-1)
   {
@@ -77,7 +80,7 @@ struct SearchManager
     hasauxvars=_order.back().find_one_assignment;
     if(hasauxvars)
     {
-        for(int i=0; i<_order.size()-1; i++)
+        for(SysInt i=0; i<_order.size()-1; i++)
         {
             topauxvar+=_order[i].var_order.size();
         }
@@ -93,7 +96,7 @@ struct SearchManager
   // Returns true if all variables assigned
   inline bool all_vars_assigned()
   {
-    pair<int, DomainInt> picked = var_order->pickVarVal();
+    pair<SysInt, DomainInt> picked = var_order->pickVarVal();
     return picked.first == -1;
   }
     
@@ -101,11 +104,11 @@ struct SearchManager
     inline bool finished_search()
     { return depth == 0; }
     
-    int search_depth()
+    SysInt search_depth()
     { return depth; }
     
     // returns false if left branch not possible.
-    inline void branch_left(pair<int, DomainInt> picked)
+    inline void branch_left(pair<SysInt, DomainInt> picked)
     {
         D_ASSERT(picked.first!=-1);
         D_ASSERT(!var_array[picked.first].isAssigned());
@@ -123,13 +126,13 @@ struct SearchManager
             branches.pop_back();
         }
         
-        if((((int)branches.size())-1)<=ceiling)
+        if((((SysInt)branches.size())-1)<=ceiling)
         {   // if idx of last element is less than or equal the ceiling. 
             // Also catches the empty case.
             return false;
         }
         
-        int var = branches.back().var;
+        SysInt var = branches.back().var;
         DomainInt val = branches.back().val;
         
         // remove the left branch.
@@ -159,7 +162,7 @@ struct SearchManager
     
     inline void jump_out_aux_vars()
     {
-        while(branches.back().var >= topauxvar)
+        while(!branches.empty() && branches.back().var >= topauxvar)
         {
             if(branches.back().isLeft)
             {
@@ -171,10 +174,10 @@ struct SearchManager
         }
     }
     
-    pair<int, DomainInt> steal_work()
+    pair<SysInt, DomainInt> steal_work()
     {   // steal the topmost left branch from this search.
-        unsigned newceiling=ceiling+1;
-        unsigned b_size=branches.size();
+        UnsignedSysInt newceiling=ceiling+1;
+        UnsignedSysInt b_size=branches.size();
         
         while(newceiling<b_size)
         {
@@ -201,10 +204,9 @@ struct SearchManager
             
             getState(stateObj).incrementNodeCount();
             
-            if(do_checks(stateObj, var_array, branches))
-                return;
+            do_checks(stateObj, var_array, branches);
             
-            pair<int, DomainInt> varval= var_order->pickVarVal();
+            pair<SysInt, DomainInt> varval= var_order->pickVarVal();
             
             if(varval.first==-1)
             {
@@ -240,7 +242,7 @@ struct SearchManager
                 {   // No remaining left branches to branch right.
                     return;
                 }
-                set_optimise_and_propagate_queue(stateObj);
+                set_optimise_and_propagate_queue(stateObj, *prop, var_array);
             }
         }
     }

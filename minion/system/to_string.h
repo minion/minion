@@ -29,32 +29,16 @@
 #include <sstream>
 
 template<typename T>
-T from_string_checked(const std::string& str)
-{
-  std::istringstream iss(str);
-  T obj;
-  iss >> std::ws >> obj >> std::ws;
-  if(!iss.eof()) throw "Failed Conversion";
-  return obj; 
-}
+std::ostream& operator<<(std::ostream& o, const std::vector<T>& t);
 
 template<typename T>
-std::string
-to_string(T t)
-{
-  std::ostringstream streamOut;
-  streamOut << t;
-  return streamOut.str();
-}
+std::ostream& operator<<(std::ostream& o, const std::list<T>& t);
 
-template<typename T1, typename T2>
-std::string
-to_string(T1 t1, T2 t2)
-{
-  std::ostringstream streamOut;
-  streamOut << t1 << " " << t2;
-  return streamOut.str();
-}
+template<typename T>
+std::ostream& operator<<(std::ostream& o, const std::set<T>& t);
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o, const std::multiset<T>& t);
 
 template<typename T, typename U>
 std::ostream& operator<<(std::ostream& o, const std::pair<T,U>& p)
@@ -102,6 +86,34 @@ std::ostream& operator<<(std::ostream& o, const std::multiset<T>& t)
 {
   output_container(o, t);
   return o;
+}
+
+template<typename T>
+T from_string_checked(const std::string& str)
+{
+  std::istringstream iss(str);
+  T obj;
+  iss >> std::ws >> obj >> std::ws;
+  if(!iss.eof()) throw "Failed Conversion";
+  return obj; 
+}
+
+template<typename T>
+std::string
+to_string(T t)
+{
+  std::ostringstream streamOut;
+  streamOut << t;
+  return streamOut.str();
+}
+
+template<typename T1, typename T2>
+std::string
+to_string(T1 t1, T2 t2)
+{
+  std::ostringstream streamOut;
+  streamOut << t1 << " " << t2;
+  return streamOut.str();
 }
 
 #endif

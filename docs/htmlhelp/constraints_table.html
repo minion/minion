@@ -5,10 +5,29 @@
 </head>
 <body>
 <h1>Help on <tt>constraints table</tt></h1>
+<h3>References</h3>
+<pre>
+help input tuplelist
+help input table
+help input haggisgac
+</pre>
+<h3>References</h3>
+<pre>
+help input haggisgac-stable
+</pre>
+<h3>References</h3>
+<pre>
+help input shorttuplelist
+help input negativetable
+help input haggisgac
+</pre>
 <h3>Description</h3>
 <pre>
 An extensional constraint that enforces GAC. The constraint is
 specified via a list of tuples.
+
+The variables used in the constraint have to be BOOL or DISCRETE variables.
+Other types are not supported.
 </pre>
 <h3>Example</h3>
 <pre>
@@ -44,7 +63,9 @@ table(myvec, {&lt;0,0,0&gt;,&lt;1,0,0&gt;,&lt;0,1,0&gt;,&lt;0,0,1&gt;})
 <h3>References</h3>
 <pre>
 help input tuplelist
+help input gacschema
 help input negativetable
+help input haggisgac
 </pre>
 <p><a href="index.html">Home</a></p>
 </body>

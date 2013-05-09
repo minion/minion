@@ -35,7 +35,12 @@ struct MinionInstancePrinter
   string getInstance()
   { return oss.str(); }
 
-  void print_instance(const int& i)
+#ifdef MINION_DEBUG
+  void print_instance(const DomainInt& i)
+  { oss << checked_cast<SysInt>(i); }
+#endif
+  
+  void print_instance(const SysInt& i)
   { oss << i; }
 
   void print_instance(const string& s)
@@ -61,7 +66,7 @@ void print_instance( const vector<T>& vars, char start = '[', char end = ']')
   if(!vars.empty())
   {
     print_instance( vars[0]);
-    for(int i = 1; i < vars.size(); ++i)
+    for(SysInt i = 1; i < vars.size(); ++i)
     {
       oss << ",";
       print_instance( vars[i]);
@@ -75,11 +80,11 @@ void print_instance(const ConstraintBlob& blob)
   oss << blob.constraint->name;
   oss << "(";
 
-  int var_pos = 0;
-  int const_pos = 0;
-  int constraint_child_pos = 0;
+  SysInt var_pos = 0;
+  SysInt const_pos = 0;
+  SysInt constraint_child_pos = 0;
 
-  for(int i = 0; i < blob.constraint->number_of_params; i++)
+  for(SysInt i = 0; i < blob.constraint->number_of_params; i++)
   {
     if(i != 0)
       oss << ", ";
@@ -90,7 +95,6 @@ void print_instance(const ConstraintBlob& blob)
         print_instance( blob.vars[var_pos++]);
         break;
       case read_var:
-      case read_bool_var:
         print_instance( blob.vars[var_pos++][0]);
         break;
       case read_2_vars:
@@ -107,7 +111,10 @@ void print_instance(const ConstraintBlob& blob)
         print_instance( blob.constants[const_pos++]);
         break;
       case read_tuples:
-        oss << csp.getTableName(blob.tuples);
+        oss << blob.tuples->getName();
+        break;
+      case read_short_tuples:
+        oss << blob.short_tuples->getName();
       break;
       case read_constraint:
         print_instance(blob.internal_constraints[constraint_child_pos]);
@@ -116,7 +123,7 @@ void print_instance(const ConstraintBlob& blob)
       case read_constraint_list:
         oss << "{";
         print_instance(blob.internal_constraints[0]);
-        for(int j = 1; j < blob.internal_constraints.size(); ++j)
+        for(SysInt j = 1; j < blob.internal_constraints.size(); ++j)
         {
           oss << ", ";
           print_instance(blob.internal_constraints[j]);
@@ -135,7 +142,7 @@ void print_instance(const ConstraintBlob& blob)
 
 void print_instance(const VarContainer& vars, const vector<Var>& varlist)
 {
-  for(int i = 0; i < varlist.size(); ++i)
+  for(SysInt i = 0; i < varlist.size(); ++i)
   {
     switch(varlist[i].type())
     {
@@ -185,7 +192,7 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
 
   return;
 
-  for(int i = 0; i < vars.BOOLs; ++i)
+  for(SysInt i = 0; i < vars.BOOLs; ++i)
   {
     oss << "BOOL ";
     print_instance( Var(VAR_BOOL, i));
@@ -193,10 +200,10 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
   }
 
   // Bounds.
-  int bound_sum = 0;
-  for(int x = 0; x < vars.bound.size(); ++x)
+  SysInt bound_sum = 0;
+  for(SysInt x = 0; x < vars.bound.size(); ++x)
   {
-    for(int i = 0; i < vars.bound[x].first; ++i)
+    for(SysInt i = 0; i < vars.bound[x].first; ++i)
     {
       oss << "BOUND ";
       print_instance( Var(VAR_BOUND, i + bound_sum));
@@ -207,10 +214,10 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
 
   // Sparse Bounds.
 
-  int sparse_bound_sum = 0;
-  for(int x = 0; x < vars.sparse_bound.size(); ++x)
+  SysInt sparse_bound_sum = 0;
+  for(SysInt x = 0; x < vars.sparse_bound.size(); ++x)
   {
-    for(int i = 0; i < vars.sparse_bound[x].first; ++i)
+    for(SysInt i = 0; i < vars.sparse_bound[x].first; ++i)
     {
       oss << "SPARSEBOUND ";
       print_instance( Var(VAR_BOUND, i + sparse_bound_sum));
@@ -222,10 +229,10 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
   }
 
   // Bounds.
-  int discrete_sum = 0;
-  for(int x = 0; x < vars.discrete.size(); ++x)
+  SysInt discrete_sum = 0;
+  for(SysInt x = 0; x < vars.discrete.size(); ++x)
   {
-    for(int i = 0; i < vars.discrete[x].first; ++i)
+    for(SysInt i = 0; i < vars.discrete[x].first; ++i)
     {
       oss << "DISCRETE ";
       print_instance( Var(VAR_DISCRETE, i + discrete_sum));
@@ -243,14 +250,14 @@ void print_tuples( )
   for(it_type it = csp.table_symboltable.begin(); it != csp.table_symboltable.end(); ++it)
   {
     oss << it->first << " ";
-    int tuple_size = it->second->tuple_size();
-    int num_tuples = it->second->size();
-    int* tuple_ptr = it->second->getPointer();
+    DomainInt tuple_size = it->second->tuple_size();
+    DomainInt num_tuples = it->second->size();
+    DomainInt* tuple_ptr = it->second->getPointer();
     oss << num_tuples << " " << tuple_size << endl;
-    for(int i = 0; i < num_tuples; ++i)
+    for(DomainInt i = 0; i < num_tuples; ++i)
     {
-      for(int j = 0; j < tuple_size; ++j)
-        oss << *(tuple_ptr + (i * tuple_size) + j) << " ";
+      for(DomainInt j = 0; j < tuple_size; ++j)
+        oss << *(tuple_ptr + checked_cast<SysInt>((i * tuple_size) + j)) << " ";
       oss << endl;
     }
     oss << endl;
@@ -271,14 +278,14 @@ void print_search_info(const vector<Var>& var_vec )
     oss << endl;
   }
 
-  for(int i = 0; i < csp.search_order.size(); ++i)
+  for(SysInt i = 0; i < csp.search_order.size(); ++i)
   {
     // Filter the var and val orders.
 
     vector<Var> var_order = csp.search_order[i].var_order;
-    vector<char> val_order = csp.search_order[i].val_order;
+    vector<ValOrderEnum> val_order = csp.search_order[i].val_order;
 
-    int pos = 0;
+    SysInt pos = 0;
     while(pos < var_order.size())
     {
       if(vars.count(var_order[pos]) == 0)
@@ -301,8 +308,19 @@ void print_search_info(const vector<Var>& var_vec )
     {
       oss << "VALORDER ";
       vector<string> output_vars;
-      for(int j = 0; j < val_order.size(); ++j)
-        output_vars.push_back(val_order[j] ? "a" : "d");
+      for(SysInt j = 0; j < val_order.size(); ++j)
+        switch(val_order[j])
+        {
+          case VALORDER_ASCEND:
+            output_vars.push_back("a");
+            break;
+          case VALORDER_DESCEND:
+            output_vars.push_back("d");
+            break;
+          case VALORDER_RANDOM:
+            output_vars.push_back("r");
+            break;
+        }
       print_instance( output_vars);
       oss << endl;
     }
@@ -327,10 +345,10 @@ void print_search_info(const vector<Var>& var_vec )
   else
   {
     vector<vector<Var> > new_print_matrix;
-    for(int i = 0; i < csp.print_matrix.size(); ++i)
+    for(SysInt i = 0; i < csp.print_matrix.size(); ++i)
     {
       new_print_matrix.push_back(vector<Var>());
-      for(int j = 0; j < csp.print_matrix[i].size(); ++j)
+      for(SysInt j = 0; j < csp.print_matrix[i].size(); ++j)
       {
         if(vars.count(csp.print_matrix[i][j]))
           new_print_matrix[i].push_back(csp.print_matrix[i][j]);
@@ -345,10 +363,13 @@ void print_search_info(const vector<Var>& var_vec )
 }
 
 void build_instance()
-{ build_instance(csp.constraints, csp.vars.get_all_vars()); }
+{ build_instance(csp.constraints, csp.vars.get_all_vars(), true); }
+
+void build_instance(bool printEof)
+{ build_instance(csp.constraints, csp.vars.get_all_vars(), printEof); }
 
 
-void build_instance(const vector<Var>& varlist_vec)
+void build_instance(const vector<Var>& varlist_vec, bool printEof)
 {
   list<ConstraintBlob> new_constraint_list;
 
@@ -362,11 +383,11 @@ void build_instance(const vector<Var>& varlist_vec)
       new_constraint_list.push_back(*it);
   }
 
-  build_instance( new_constraint_list, varlist_vec);
+  build_instance( new_constraint_list, varlist_vec, printEof);
 }
 
 void build_instance(const list<ConstraintBlob>& constraints,
-                          const vector<Var>& varlist)
+                          const vector<Var>& varlist, bool printEof)
 {
   oss << "MINION 3" << endl;
 
@@ -387,7 +408,7 @@ void build_instance(const list<ConstraintBlob>& constraints,
   {
     print_instance( *it);
   }
-  oss << "**EOF**" << endl;
+  if(printEof) oss << "**EOF**" << endl;
 }
 
 };

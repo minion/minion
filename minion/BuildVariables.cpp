@@ -28,7 +28,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, const vector<Var>& vec)
   vector<AnyVarRef> ret_vec;
   ret_vec.reserve(vec.size());
   
-  for(int i = 0; i < vec.size(); ++i)
+  for(SysInt i = 0; i < vec.size(); ++i)
     ret_vec.push_back(get_AnyVarRef_from_Var(stateObj, vec[i]));
   
   return ret_vec;
@@ -59,37 +59,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
         }
 }
 
-  /// Build the variable and value ordering used.
-  /// The var order is placed, the val order is returned.
-  pair<vector<AnyVarRef>, vector<int> > build_val_and_var_order(StateObj* stateObj, SearchOrder instance)
-  {
-      vector<int> final_val_order;
-      vector<AnyVarRef> final_var_order;
-      
-      
-      if(instance.var_order.size() < instance.val_order.size())
-      INPUT_ERROR("Variable order cannot be shorter than value order.");
-    
-      if(instance.var_order.size() > instance.val_order.size())
-      {
-        getOptions(stateObj).print("# Var order size = " + to_string(instance.var_order.size()));  
-        getOptions(stateObj).print( ", Val order size = " + to_string(instance.val_order.size()));
-        getOptions(stateObj).printLine( ", so padding val order.");
-      
-        instance.val_order.insert(instance.val_order.end(), 
-          instance.var_order.size() - instance.val_order.size(), instance.val_order.back());
-      }
-      
-      CHECK(instance.val_order.size() == instance.var_order.size(), "Variable and Value orderings must be the same size!");
-        
-    
-      for(unsigned int i = 0 ;i < instance.var_order.size(); ++i)
-      {
-        final_val_order.push_back(instance.val_order[i]);
-        final_var_order.push_back(get_AnyVarRef_from_Var(stateObj, instance.var_order[i]));
-      }
-      return make_pair(final_var_order, final_val_order);
-  } 
+  
 
   /// Create all the variables used in the CSP.
   void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars)
@@ -99,7 +69,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
     getVars(stateObj).sparseBoundVarContainer.addVariables(vars.sparse_bound);
     getVars(stateObj).bigRangeVarContainer.addVariables(vars.discrete);
     
-    for(unsigned int i = 0; i < vars.sparse_discrete.size(); ++i)
+    for(SysInt i = 0; i < vars.sparse_discrete.size(); ++i)
     { INPUT_ERROR("Sparse discrete disabled at present due to bugs. Sorry."); }
   }
     

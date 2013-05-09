@@ -37,8 +37,9 @@ template<typename Var>
   struct WatchLiteralConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-    { return "WatchedLiteral"; }
+    { return "w-literal"; }
 
+  CONSTRAINT_ARG_LIST2(var, val);
   Var var;
 
   DomainInt val;
@@ -47,7 +48,7 @@ template<typename Var>
   WatchLiteralConstraint(StateObj* _stateObj, const Var& _var, const T& _val) :
     AbstractConstraint(_stateObj), var(_var), val(_val) {}
 
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { return 0; }
 
   virtual void full_propagate()
@@ -60,7 +61,7 @@ template<typename Var>
     var.propagateAssign(val);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 1);
     return (v[0] == val);
@@ -74,7 +75,7 @@ template<typename Var>
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   { 
     if(var.inDomain(val))
     {

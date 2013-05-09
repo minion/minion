@@ -59,7 +59,7 @@ static inline DomainInt divide_exact(DomainInt val, DomainInt divisor)
 template<>
 struct MultiplyHelp<BoolVarRef>
 {
-  static inline int round_down(int val, int divisor)
+  static inline SysInt round_down(SysInt val, SysInt divisor)
   {
     if(val < divisor)
       return 0;
@@ -67,7 +67,7 @@ struct MultiplyHelp<BoolVarRef>
       return 1;
   }
   
-  static inline int round_up(int val, int divisor)
+  static inline SysInt round_up(SysInt val, SysInt divisor)
   {
     if(
   }
@@ -77,10 +77,10 @@ struct MultiplyHelp<BoolVarRef>
 #if 0
 struct TrivialMapData
 {
-  int multiply()
+  SysInt multiply()
     { return 1 };
     
-  int shift()
+  SysInt shift()
     { return 1 };
     
   static BoundType ;
@@ -136,7 +136,10 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
       return false;
     return data.inDomain(MapHelp::divide_exact(b - dataMap.shift(), dataMap));
   }
-  
+
+  DomainInt getDomSize() const
+  { return data.getDomSize(); }
+
   DomainInt getMax() const
   {  
     if(dataMap.multiply() >= 0)
@@ -228,7 +231,7 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
   friend std::ostream& operator<<(std::ostream& o, const MultiplyVar& n)
   { return o << "Mult:" << n.data << "*" << n.Multiply; }
   
-  int getDomainChange(DomainDelta d)
+  DomainInt getDomainChange(DomainDelta d)
   { return abs(Multiply) * data.getDomainChange(d); }
 
   vector<AbstractConstraint*>* getConstraints()
@@ -241,7 +244,7 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
   { return VarIdent(stretchT, Multiply, data.getIdent()); }
 
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()
@@ -258,13 +261,16 @@ struct MultiplyVar
   static const BoundType isBoundConst = Bound_Yes;
   BOOL isBound() const
   { return true; }
+
+  AnyVarRef popOneMapper() const
+  { return data; }
   
   VarRef data;
-  int Multiply;
-  MultiplyVar(const VarRef& _data, int _Multiply) : data(_data), Multiply(_Multiply)
+  DomainInt Multiply;
+  MultiplyVar(const VarRef& _data, DomainInt _Multiply) : data(_data), Multiply(_Multiply)
   { 
-    DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMax()) * Multiply);
-    DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMin()) * Multiply);
+    DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMax()) * checked_cast<BigInt>(Multiply));
+    DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMin()) * checked_cast<BigInt>(Multiply));
     CHECK(Multiply != 0, "Cannot divide variable by 0"); 
   }
   
@@ -301,6 +307,9 @@ struct MultiplyVar
     return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
   
+  DomainInt getDomSize() const
+  { return data.getDomSize(); }
+
   DomainInt getMax() const
   {  
     if(Multiply >= 0)
@@ -425,8 +434,8 @@ struct MultiplyVar
   friend std::ostream& operator<<(std::ostream& o, const MultiplyVar& n)
   { return o << "Mult:" << n.data << "*" << n.Multiply; }
   
-  int getDomainChange(DomainDelta d)
-  { return abs(Multiply) * data.getDomainChange(d); }
+  DomainInt getDomainChange(DomainDelta d)
+  { return abs(checked_cast<SysInt>(Multiply)) * data.getDomainChange(d); }
 
   vector<AbstractConstraint*>* getConstraints()
   { return data.getConstraints(); }
@@ -439,8 +448,16 @@ struct MultiplyVar
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
+  vector<Mapper> getMapperStack() const
+  { 
+    vector<Mapper> v = data.getMapperStack();
+    v.push_back(Mapper(MAP_MULT, (DomainInt)Multiply));
+    return v;
+  }
+
+
 #ifdef WDEG
-  int getBaseWdeg()
+  SysInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()
@@ -463,21 +480,21 @@ struct MultiplyType<vector<T> >
 #endif
 
 template<typename T, std::size_t i>
-struct MultiplyType<array<T, i> >
-{ typedef array<MultiplyVar<T>, i> type; };
+struct MultiplyType<minion_array<T, i> >
+{ typedef minion_array<MultiplyVar<T>, i> type; };
 
 
 template<typename VRef>
 typename MultiplyType<VRef>::type
-MultiplyVarRef(VRef var_ref, int i)
+MultiplyVarRef(VRef var_ref, SysInt i)
 { return MultiplyVar<VRef>(var_ref, i); }
 
 template<typename VarRef>
 vector<MultiplyVar<VarRef> >
-MultiplyVarRef(const vector<VarRef>& var_array, const vector<int>& multiplies)
+MultiplyVarRef(const vector<VarRef>& var_array, const vector<DomainInt>& multiplies)
 {
   vector<MultiplyVar<VarRef> > Multiply_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     Multiply_array[i] = MultiplyVarRef(var_array[i], multiplies[i]);
   return Multiply_array;
 }
@@ -485,21 +502,21 @@ MultiplyVarRef(const vector<VarRef>& var_array, const vector<int>& multiplies)
 #ifdef LIGHT_VECTOR
 template<typename VarRef>
 vector<MultiplyVar<VarRef> >
-MultiplyVarRef(const vector<VarRef>& var_array, const vector<int>& multiplies)
+MultiplyVarRef(const vector<VarRef>& var_array, const vector<DomainInt>& multiplies)
 {
   vector<MultiplyVar<VarRef> > Multiply_array(var_array.size());
-  for(unsigned int i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     Multiply_array[i] = MultiplyVarRef(var_array[i], multiplies[i]);
   return Multiply_array;
 }
 #endif
 
 template<typename VarRef, std::size_t i>
-array<MultiplyVar<VarRef>, i>
-MultiplyVarRef(const array<VarRef, i>& var_array, const array<int, i>& multiplies)
+minion_array<MultiplyVar<VarRef>, i>
+MultiplyVarRef(const minion_array<VarRef, i>& var_array, const minion_array<SysInt, i>& multiplies)
 {
-  array<MultiplyVar<VarRef>, i> Multiply_array;
-  for(unsigned int l = 0; l < i; ++l)
+  minion_array<MultiplyVar<VarRef>, i> Multiply_array;
+  for(UnsignedSysInt l = 0; l < i; ++l)
     Multiply_array[l] = MultiplyVarRef(var_array[l], multiplies[i]);
   return Multiply_array;
 }

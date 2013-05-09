@@ -116,7 +116,9 @@ list(APPEND SRCS ${PROJECT_SOURCE_DIR}/minion/BuildVariables.cpp
                  ${PROJECT_SOURCE_DIR}/minion/preprocess.cpp
                  ${PROJECT_SOURCE_DIR}/minion/build_constraints/BuildStaticStart.cpp
                  ${PROJECT_SOURCE_DIR}/minion/system/trigger_timer.cpp
-                 ${PROJECT_SOURCE_DIR}/minion/help/help.cpp)
+                 ${PROJECT_SOURCE_DIR}/minion/help/help.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp
+                 ${PROJECT_SOURCE_DIR}/minion/dump_state.cpp)
 
 set(BINARY minion)
 
@@ -128,32 +130,62 @@ if(UNAME)
         set(APPLEMAC 1)
     elseif(UNAME_OUT MATCHES "CYGWIN.*")
         set(WINCYGWIN 1)
+    elseif(UNAME_OUT MATCHES "SunOS.*")
+        set(SUNOS 1)
     endif()
+endif()
+
+if(SUNOS AND NOT CMAKE_COMPILER_IS_GNUCXX)
+    set(CFLAGS "${CFLAGS} -library=stlport4")
+    message(STATUS "Setting Sun Studio flags")
 endif()
 
 if(WINCYGWIN)
     set(CFLAGS "${CFLAGS} -enable-auto-import")
 endif()
 
-set(BOOST_COMPONENTS iostreams)
+option(THREADSAFE "" OFF)
+if(THREADSAFE)
+    message(STATUS "Compiling thread-safe minion")
+    set(BINARY "${BINARY}-threads")
+    add_definitions(-DTHREADSAFE)
 
-option(NAUTY "" ON)
-if(NAUTY)
-  message(STATUS "Please be naughty")
-  add_definitions(-DUSE_NAUTY)
-  list(APPEND SRCS ${PROJECT_SOURCE_DIR}/nauty24b7/nautycxx.cpp
-                   ${PROJECT_SOURCE_DIR}/nauty24b7/nauty.c
-                   ${PROJECT_SOURCE_DIR}/nauty24b7/nautil.c
-                   ${PROJECT_SOURCE_DIR}/nauty24b7/nausparse.c)
+    set(BOOST_COMPONENTS iostreams thread)
+else()
+    set(BOOST_COMPONENTS iostreams)
 endif()
 
+option(DOMAINS64 "" OFF)
+if(DOMAINS64)
+    option(NAUTY "" OFF)
+    set(BINARY "${BINARY}-dom64")
+    add_definitions(-DDOMAINS64)
+else()
+    option(NAUTY "" ON)
+endif()
+
+#if(NAUTY)
+#  message(STATUS "Please be naughty")
+#  add_definitions(-DUSE_NAUTY)
+#  list(APPEND SRCS ${PROJECT_SOURCE_DIR}/nauty24b7/nautycxx.cpp
+#                   ${PROJECT_SOURCE_DIR}/nauty24b7/nauty.c
+#                   ${PROJECT_SOURCE_DIR}/nauty24b7/nautil.c
+#                   ${PROJECT_SOURCE_DIR}/nauty24b7/nausparse.c)
+#endif()
+
 # This used to be in Static, but there is no reason not to always do it
+
+if(MACRELEASE)
+    set(CFLAGS "${CFLAGS} -m32 -mtune=prescott -march=prescott -ffast-math")
+    set(CMAKE_CXX_COMPILER "g++-4.2")
+    set(CMAKE_C_COMPILER "gcc-4.2")
+endif()
 
 if(APPLEMAC)
     set(Boost_USE_STATIC_LIBS true)
 #    add_definitions(-mmacosx-version-min=10.5)
 #    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.5 )
-endif()
+ endif()
 
 option(STATIC "" OFF)
 if(STATIC)
@@ -225,9 +257,9 @@ endif()
 #   message(STATUS "Compiler does not support C++0x")
 #endif()
 
-set(WFLAGS "-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter -fwrapv")
+set(WFLAGS "-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter")
 check_cxx_compiler_flag(${WFLAGS} CheckWarnings)
-if(CheckWarnings)
+if(CheckWarnings AND NOT SUNOS AND CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(${WFLAGS})
 endif()
 
@@ -274,12 +306,7 @@ if(DEBUG)
 endif()
 
 
-option(THREADSAFE "" OFF)
-if(THREADSAFE)
-    message(STATUS "Compiling thread-safe minion")
-    set(BINARY "${BINARY}-threads")
-    add_definitions(-DTHREADSAFE)
-endif()
+
 
 if(WIN32 AND NOT CYGWIN)
     set(CFLAGS "${CFLAGS} /EHsc")
@@ -287,10 +314,12 @@ endif()
 
 option(PROFILE "" OFF)
 option(GPROF "" OFF)
+option(UNOPTIMISED "" OFF)
+
 if(PROFILE)
     message(STATUS "Enabling profiling")
     set(BINARY "${BINARY}-profile")
-    set(CFLAGS "${CFLAGS} -O -g -fno-inline -fno-inline-functions")
+    set(CFLAGS "${CFLAGS} -g -fno-inline -fno-inline-functions -O")
     if(GPROF)
         message(STATUS "Enabling gprof")
         set(CFLAGS "${CFLAGS} -pg")
@@ -298,8 +327,9 @@ if(PROFILE)
     set(UNOPTIMISED ON) # Profiing can't cope with -fomit-frame-pointer
 endif()
 
-option(UNOPTIMISED "" OFF)
+
 option(COVERAGE "" OFF)
+option(SKYESTATICFIX "" OFF)
 if(COVERAGE)
   set(CFLAGS "${CFLAGS} -ftest-coverage -fprofile-arcs")
   set(BINARY "${BINARY}-coverage")
@@ -315,6 +345,8 @@ else()
     # on machines where this doesn't affect debugging
     if(WIN32 AND NOT CYGWIN)
         set(CFLAGS "${CFLAGS} /O2")
+    elseif(SUNOS AND NOT CMAKE_COMPILER_IS_GNUCXX)
+        set(CFLAGS "${CFLAGS} -O3")
     else()
         set(CFLAGS "${CFLAGS} -O3 -fomit-frame-pointer")
         check_cxx_compiler_flag("-mdynamic-no-pic" MAC_MDYNAMIC)
@@ -322,7 +354,9 @@ else()
             set(CFLAGS "${CFLAGS} -mdynamic-no-pic")
         endif()
     endif()
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
+    if (NOT SKYESTATICFIX)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
+    endif()
 endif()
 
 
@@ -382,6 +416,69 @@ if(REENTER)
     add_definitions(-DREENTER)
 endif()
 
+option(SUPPORTSGACELEMENT "" OFF)
+if(SUPPORTSGACELEMENT)
+    message(STATUS "Enabling SUPPORTSGACELEMENT")
+    set(BINARY "${BINARY}-igac-element")
+    add_definitions(-DSUPPORTSGACELEMENT)
+endif()
+
+option(SUPPORTSGACELEMENTLONG "" OFF)
+if(SUPPORTSGACELEMENTLONG)
+    message(STATUS "Enabling SUPPORTSGACELEMENTLONG")
+    set(BINARY "${BINARY}-igac-elementlong")
+    add_definitions(-DSUPPORTSGACELEMENTLONG)
+endif()
+
+option(SUPPORTSGACLEX "" OFF)
+if(SUPPORTSGACLEX)
+    message(STATUS "Enabling SUPPORTSGACLEX")
+    set(BINARY "${BINARY}-igac-lex")
+    add_definitions(-DSUPPORTSGACLEX)
+endif()
+
+option(SUPPORTSGACLEXLONG "" OFF)
+if(SUPPORTSGACLEXLONG)
+    message(STATUS "Enabling SUPPORTSGACLEXLONG")
+    set(BINARY "${BINARY}-igac-lexlong")
+    add_definitions(-DSUPPORTSGACLEXLONG)
+endif()
+
+option(SUPPORTSGACSQUAREPACK "" OFF)
+if(SUPPORTSGACSQUAREPACK)
+    message(STATUS "Enabling SUPPORTSGACSQUAREPACK")
+    set(BINARY "${BINARY}-igac-squarepack")
+    add_definitions(-DSUPPORTSGACSQUAREPACK)
+endif()
+
+option(SUPPORTSGACSQUAREPACKLONG "" OFF)
+if(SUPPORTSGACSQUAREPACKLONG)
+    message(STATUS "Enabling SUPPORTSGACSQUAREPACKLONG")
+    set(BINARY "${BINARY}-igac-squarepacklong")
+    add_definitions(-DSUPPORTSGACSQUAREPACKLONG)
+endif()
+
+option(SUPPORTSGACLIST "" OFF)
+if(SUPPORTSGACLIST)
+    message(STATUS "Enabling SUPPORTSGACLIST")
+    set(BINARY "${BINARY}-igac-list")
+    add_definitions(-DSUPPORTSGACLIST)
+endif()
+
+option(SUPPORTSGACNDLIST "" OFF)
+if(SUPPORTSGACNDLIST)
+    message(STATUS "Enabling SUPPORTSGACNDLIST")
+    set(BINARY "${BINARY}-igac-ndlist")
+    add_definitions(-DSUPPORTSGACNDLIST)
+endif()
+
+option(SUPPORTSGACLISTNOCOPY "" OFF)
+if(SUPPORTSGACLISTNOCOPY)
+    message(STATUS "Enabling SUPPORTSGACLISTNOCOPY")
+    set(BINARY "${BINARY}-igac-listnc")
+    add_definitions(-DSUPPORTSGACLISTNOCOPY)
+endif()
+
 if(DEFINED ENV{CPU})
     message(STATUS "Using CPU-specific flags $ENV{CPU}")
     set(CFLAGS "${CFLAGS} $ENV{CPU}")
@@ -396,13 +493,9 @@ if(NAME)
 endif()
 message(STATUS "Executable name set to \"${BINARY}\"")
 
-add_library(inputfile_parse STATIC ${PROJECT_SOURCE_DIR}/minion/inputfile_parse/inputfile_parse.cpp)
-
 add_library(${BINARY}-lib STATIC EXCLUDE_FROM_ALL ${SRCS})
 
 add_executable(${BINARY} ${SRCS} ${PROJECT_SOURCE_DIR}/minion/minion.cpp)
-target_link_libraries(${BINARY} inputfile_parse)
-#target_link_libraries(${BINARY} ${BINARY}-lib)
 
 # when we're building minion-something, add a "minion" target that does the sa~
 if(NOT ${BINARY} STREQUAL minion)

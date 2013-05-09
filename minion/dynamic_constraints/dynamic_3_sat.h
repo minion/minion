@@ -25,8 +25,16 @@ template<typename VarArray>
 struct BoolThreeSATConstraintDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "BoolSATDynamic"; }
+  { return "watchsumgeq"; }
   
+    virtual AbstractConstraint* reverse_constraint()
+  {
+    return new BoolLessSumConstraintDynamic<VarArray, DomainInt, 1>
+               (stateObj, var_array, 3);
+  }
+
+  CONSTRAINT_ARG_LIST2(var_array, (DomainInt)1);
+
   typedef typename VarArray::value_type VarRef;
   
   VarArray var_array;
@@ -37,7 +45,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
     D_ASSERT(var_array.size() == 3);
   }
   
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { 
     return 2;
   }
@@ -47,9 +55,9 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   {
     DynamicTrigger* dt = dynamic_trigger_start();
     
-    int array_size = var_array.size(); 
-    int trig1, trig2;
-    int index = 0;
+    SysInt array_size = var_array.size(); 
+    SysInt trig1, trig2;
+    SysInt index = 0;
     
     while(index < array_size && !var_array[index].inDomain(1))
       ++index;
@@ -87,7 +95,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   }
   
   /// Finds the value out of 0,1 and 2 which is not a or b.
-  inline int other_val(int a, int b)
+  inline SysInt other_val(SysInt a, SysInt b)
   {
     if(a != 0 && b != 0)
       return 0;
@@ -101,11 +109,11 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   virtual void propagate(DynamicTrigger* dt)
   {
     PROP_INFO_ADDONE(Dyn3SAT);
-    int propval = dt->trigger_info();
-    //int var_size = var_array.size();
+    SysInt propval = dt->trigger_info();
+    //SysInt var_size = var_array.size();
     
     DynamicTrigger* base_dt = dynamic_trigger_start();
-    int other_propval;
+    SysInt other_propval;
     
     if(base_dt == dt)
       other_propval = (base_dt + 1)->trigger_info();
@@ -113,7 +121,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
       other_propval = base_dt->trigger_info();
     
 
-    int unchecked_val = other_val(propval, other_propval);
+    SysInt unchecked_val = other_val(propval, other_propval);
     
     if(var_array[unchecked_val].inDomain(1))
     {
@@ -125,11 +133,11 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
     { var_array[other_propval].propagateAssign(1); }
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
-    int count = 0;
-    for(int i = 0; i < v_size; ++i)
+    SysInt count = 0;
+    for(SysInt i = 0; i < v_size; ++i)
       count += (v[i] == 1);
     return count > 0;
   }
@@ -138,14 +146,14 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   { 
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     return vars;  
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       if(var_array[i].getMax() > 0)
       {

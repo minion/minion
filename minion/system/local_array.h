@@ -42,7 +42,7 @@
   /// @brief  struct array [6.2.2].
   /// NB: Requires complete type _Tp.
   template<typename _Tp, size_t _Nm = 1>
-    struct array
+    struct minion_array
     {
       typedef _Tp                   value_type;
       typedef value_type&                       reference;
@@ -66,7 +66,7 @@
       assign(const value_type& u); 
 
       void 
-      swap(array&);
+      swap(minion_array&);
 
       // Iterators.
       iterator 
@@ -158,17 +158,17 @@
   // Array comparisons.
  template<typename _Tp, size_t _Nm>
    inline bool 
-   operator==(const array<_Tp, _Nm>& __one, const array<_Tp, _Nm>& __two)
+   operator==(const minion_array<_Tp, _Nm>& __one, const minion_array<_Tp, _Nm>& __two)
    { return std::equal(__one.begin(), __one.end(), __two.begin()); }
 
  template<typename _Tp, size_t _Nm>
    inline bool 
-   operator!=(const array<_Tp, _Nm>& __one, const array<_Tp, _Nm>& __two)
+   operator!=(const minion_array<_Tp, _Nm>& __one, const minion_array<_Tp, _Nm>& __two)
    { return !(__one == __two); }
 
  template<typename _Tp, size_t _Nm>
    inline bool 
-   operator<(const array<_Tp, _Nm>& a, const array<_Tp, _Nm>& b)
+   operator<(const minion_array<_Tp, _Nm>& a, const minion_array<_Tp, _Nm>& b)
    { 
      return std::lexicographical_compare(a.begin(), a.end(), 
                      b.begin(), b.end()); 
@@ -176,23 +176,23 @@
 
  template<typename _Tp, size_t _Nm>
    inline bool 
-   operator>(const array<_Tp, _Nm>& __one, const array<_Tp, _Nm>& __two)
+   operator>(const minion_array<_Tp, _Nm>& __one, const minion_array<_Tp, _Nm>& __two)
    { return __two < __one; }
 
  template<typename _Tp, size_t _Nm>
    inline bool 
-   operator<=(const array<_Tp, _Nm>& __one, const array<_Tp, _Nm>& __two)
+   operator<=(const minion_array<_Tp, _Nm>& __one, const minion_array<_Tp, _Nm>& __two)
    { return !(__one > __two); }
 
  template<typename _Tp, size_t _Nm>
    inline bool 
-   operator>=(const array<_Tp, _Nm>& __one, const array<_Tp, _Nm>& __two)
+   operator>=(const minion_array<_Tp, _Nm>& __one, const minion_array<_Tp, _Nm>& __two)
    { return !(__one < __two); }
 
   // Specialized algorithms [6.2.2.2].
  template<typename _Tp, size_t _Nm>
    inline void
-   swap(array<_Tp, _Nm>& __one, array<_Tp, _Nm>& __two)
+   swap(minion_array<_Tp, _Nm>& __one, minion_array<_Tp, _Nm>& __two)
    { swap_ranges(__one.begin(), __one.end(), __two.begin()); }
 
 

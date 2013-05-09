@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-solscript=../../mini-scripts/solutions.sh
+solscript=../mini-scripts/get_info.sh solutions
 
 if [ $# -lt 1 ]; then
   echo Must give a minion binary to test.
@@ -29,17 +29,17 @@ if [[ "`$exec test_gzip.minion.gz | $solscript`" != "1" ]]; then
   exit 1
 fi
 
-if [[ "`$exec bibd.minion.bz2 -preprocess SAC | grep ^SAC | awk '{print $3}'`" != "13" ]]; then
+if [[ "`$exec bibd.minion.bz2 -preprocess SAC | grep ^SAC | awk '{print $3}'`" != "36" ]]; then
   echo SAC test failed
   exit 1
 fi
 
-if [[ "`$exec bibd.minion.bz2 -preprocess SSAC | grep ^SAC | awk '{print $3}'`" != "13" ]]; then
+if [[ "`$exec bibd.minion.bz2 -preprocess SSAC | grep ^SAC | awk '{print $3}'`" != "36" ]]; then
   echo SSAC test 1 failed
   exit 1
 fi
 
-if [[ "`$exec bibd.minion.bz2 -preprocess SSAC | grep ^SSAC | awk '{print $3}'`" != "54" ]]; then
+if [[ "`$exec bibd.minion.bz2 -preprocess SSAC | grep ^SSAC | awk '{print $3}'`" != "244" ]]; then
   echo SSAC test 2 failed
   exit 1
 fi

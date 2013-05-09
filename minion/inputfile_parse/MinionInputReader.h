@@ -51,17 +51,22 @@ struct ConcreteFileReader
   
   
   string get_string()
-  { 
-    string s;
+  {
+    char buffer[1000];
+    SysInt pos = 0;
     char next_char = get_char();
     while(isalnum(next_char) || next_char == '_')
     {
-      s += next_char;
+      buffer[pos] = next_char;
+      pos++;
+      if(pos >= 999)
+      { D_FATAL_ERROR("Identifer too long!"); }
       next_char = infile.get();
     }
     
     putback(next_char);
-    return s;
+    buffer[pos] = '\0';
+    return string(buffer);
   }
   
   void check_string(const string& string_in)
@@ -89,15 +94,20 @@ struct ConcreteFileReader
     return s;
   }
   
-  int read_num()
-  { 
-      int i;
-      infile >> i;
-      if(infile.fail())
+  SysInt read_int()
+  {
+    SysInt i = 0;
+    infile >> i;
+    if(infile.fail())
       throw parse_exception("Problem parsing number");
-      return i;
+    return i;
   }
   
+  DomainInt read_num()
+  { 
+    return this->read_int();
+  }
+
   char simplepeek_char()
   {
     char peek = infile.peek();
@@ -126,7 +136,7 @@ struct ConcreteFileReader
     char idChar = get_char();
     if(idChar != sym)
     {
-      throw parse_exception(string("Expected '") + sym + "'. Recieved '" + idChar + "'.");
+      throw parse_exception(string("Expected '") + sym + "'. Received '" + idChar + "'.");
     }
   }
   
@@ -137,15 +147,7 @@ struct ConcreteFileReader
   }
   
   string simplegetline()
-  {
-    char buf[10000];
-    infile.getline(buf,10000);
-    char* buf_start = buf;
-    while(buf_start < buf + 10000 && isspace(*buf_start))
-      buf_start++;
-    
-    return string(buf_start);
-  }
+  { return infile.getline(); }
   
   /// Cleans rubbish off start of string.
   void clean_string(string& s)
@@ -157,14 +159,15 @@ struct ConcreteFileReader
   string getline(char deliminator)
   {
     check_for_comments();
-    char buf[10000];
-    infile.getline(buf,10000, deliminator);
+    std::string s = infile.getline(deliminator);
+    // avoid copy for no reason
+    if(s.empty() || (!isspace(s[0])))
+      return s;
 
-    char* buf_start = buf;
-    while(buf_start < buf + 10000 && isspace(*buf_start))
-      buf_start++;
-    
-    return string(buf_start);
+    int pos = 1;
+    while(pos < s.size() && isspace(s[pos]))
+      pos++;
+    return string(s.begin() + pos, s.end());
   }
   
   char get_char()
@@ -202,9 +205,9 @@ class MinionInputReader {
   vector< vector<Var> > Vectors ;
   vector< vector<vector<Var> > > Matrices ;
   vector< vector<vector<vector<Var> > > > Tensors ;
-  vector<Var> flatten(char type, int index) ;
-  vector<Var> getColOfMatrix(vector<vector<Var> >& m, int c) ;
-  vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,int r,int c) ;
+  vector<Var> flatten(char type, SysInt index) ;
+  vector<Var> getColOfMatrix(vector<vector<Var> >& m, SysInt c) ;
+  vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,SysInt r,SysInt c) ;
   BOOL readConstraint(FileReader* infile, BOOL reified) ;
   void readConstraintElement(FileReader* infile, ConstraintDef*) ;
   void readConstraintTable(FileReader* infile, ConstraintDef*) ;
@@ -212,8 +215,8 @@ class MinionInputReader {
   vector<Var> readPossibleMatrixIdentifier(FileReader* infile);
   vector< vector<Var> > readLiteralMatrix(FileReader* infile) ;
   vector<Var> readLiteralVector(FileReader* infile) ;
-  vector<int> readConstantVector(FileReader* infile, char start, char end, bool = false);
-  vector<int> readRange(FileReader* infile);
+  vector<DomainInt> readConstantVector(FileReader* infile, char start, char end, bool = false);
+  vector<DomainInt> readRange(FileReader* infile);
   void readObjective(FileReader* infile) ;
   void readTuples(FileReader* infile) ;
   void readMatrices(FileReader* infile) ;
@@ -242,9 +245,9 @@ class MinionThreeInputReader {
   vector< vector<Var> > Vectors ;
   vector< vector<vector<Var> > > Matrices ;
   vector< vector<vector<vector<Var> > > > Tensors ;
-  vector<Var> flatten(char type, int index) ;
-  vector<Var> getColOfMatrix(vector<vector<Var> >& m, int c) ;
-  vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,int r,int c) ;
+  vector<Var> flatten(char type, SysInt index) ;
+  vector<Var> getColOfMatrix(vector<vector<Var> >& m, SysInt c) ;
+  vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,SysInt r,SysInt c) ;
   ConstraintBlob readConstraint(FileReader* infile, BOOL reified = false) ;
   ConstraintBlob readConstraintTable(FileReader* infile, ConstraintDef* def);
   void readGadget(FileReader* infile) ;
@@ -255,9 +258,10 @@ class MinionThreeInputReader {
   vector<Var> readPossibleMatrixIdentifier(FileReader* infile, bool mustBeMatrix = false);
   vector< vector<Var> > readLiteralMatrix(FileReader* infile) ;
   vector<Var> readLiteralVector(FileReader* infile) ;
-  vector<int> readConstantVector(FileReader* infile, char start = '[', char end = ']', bool = false);
-  vector<int> readRange(FileReader* infile);
+  vector<DomainInt> readConstantVector(FileReader* infile, char start = '[', char end = ']', bool = false);
+  vector<DomainInt> readRange(FileReader* infile);
   void readObjective(FileReader* infile) ;
+  void readShortTuples(FileReader* infile) ;
   void readTuples(FileReader* infile) ;
   void readMatrices(FileReader* infile) ;
   void readValOrder(FileReader* infile) ;
@@ -265,9 +269,11 @@ class MinionThreeInputReader {
   void readPrint(FileReader* infile) ;
   void readVars(FileReader* infile) ;
   void readSearch(FileReader* infile) ;
+  vector<pair<SysInt, DomainInt> >readShortTuple(FileReader*) ;
+  ShortTupleList* readConstraintShortTupleList(FileReader*) ;
   vector<vector<Var> > read2DMatrix(FileReader* infile); 
   vector<vector<Var> > read2DMatrixVariable(FileReader* infile);
-  void readAliasMatrix(FileReader* infile, const vector<int>& max_indices, vector<int> indices, string name);
+  void readAliasMatrix(FileReader* infile, const vector<DomainInt>& max_indices, vector<DomainInt> indices, string name);
   vector<Var> readVectorExpression(FileReader* infile) ;
   ConstraintBlob readGeneralConstraint(FileReader*, ConstraintDef*) ;
   vector<ConstraintBlob> readConstraintList(FileReader* infile);
@@ -279,6 +285,7 @@ public:
   ProbSpec::CSPInstance* instance ;
   bool parser_verbose;
   bool print_all_vars;
+  MapLongTuplesToShort map_long_short_mode;
   
   bool isGadgetReader_m;
   
@@ -287,8 +294,8 @@ public:
   bool isGadgetReader()
   { return isGadgetReader_m; }
   
-  MinionThreeInputReader(bool _parser_verbose) : parser_verbose(_parser_verbose), print_all_vars(true),
-    isGadgetReader_m(false)
+  MinionThreeInputReader(bool _parser_verbose, MapLongTuplesToShort mls) : parser_verbose(_parser_verbose), print_all_vars(true),
+    map_long_short_mode(mls), isGadgetReader_m(false)
   {}
 };
 

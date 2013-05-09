@@ -33,7 +33,7 @@
 //#ifdef WATCHEDLITERALS
 //#define DYNAMICTRIGGERS
 //#endif
-#define VERSION "Minion Version 0.10"
+#define VERSION "Minion Version 0.15"
 #define REVISION "Git revision $Revision$"
 // above line will work but only gives revision of this file,
 //  not the current global revision
@@ -42,11 +42,11 @@
 VARDEF(ofstream solsoutFile);
 
 #include "memory_management/backtrackable_memory.h"
-typedef MoveablePointer MemOffset;
 
-#include "memory_management/trailed_monotonic_set.h"
+
+#include "memory_management/trailed_monotonic_set_new.h"
 #include "memory_management/nonbacktrack_memory.h"
-#include "memory_management/trailed_monotonic_set.hpp"
+//#include "memory_management/trailed_monotonic_set.hpp"
 #include "memory_management/monotonic_set_wrapper.h"
 #include "memory_management/reversible_vals.h"
 
@@ -66,7 +66,7 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 // This constraint must be listed early so that it can
 // be called by all constraints.
-#include "constraints/constraint_checkassign.h"
+//#include "../constraints/constraint_checkassign.h"
 
 #include "lock.h"
 #ifndef DOMINION

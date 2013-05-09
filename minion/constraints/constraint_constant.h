@@ -20,13 +20,15 @@
 #ifndef CONSTRAINT_CONSTANT_H
 #define CONSTRAINT_CONSTANT_H
 
-/// var1 /\ var2 = var3
 template<bool truth>
 struct ConstantConstraint : public AbstractConstraint
 {
+
   virtual string constraint_name()
-  { return "Constant" + to_string(truth); }
+  { if(truth) return "true"; else return "false"; }
   
+  CONSTRAINT_ARG_LIST0();
+
   ConstantConstraint(StateObj* _stateObj) : AbstractConstraint(_stateObj)
   { }
   
@@ -36,7 +38,7 @@ struct ConstantConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(int i, DomainDelta)
+  virtual void propagate(DomainInt i, DomainDelta)
   {  }
   
   virtual void full_propagate()
@@ -45,14 +47,19 @@ struct ConstantConstraint : public AbstractConstraint
       getState(stateObj).setFailed(true);
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 0);
     return truth;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   { return truth; }
+  
+  AbstractConstraint* reverse_constraint()
+  {
+    return new ConstantConstraint<!truth>(stateObj);
+  }
   
   virtual vector<AnyVarRef> get_vars()
   { 

@@ -16,9 +16,24 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include <stdlib.h>
+#include <iostream>
+#include <vector>
+#include <deque>
+#include <algorithm>
+#include <utility>
+
+using namespace std;
+
+#include "alldiff_gcc_shared.h"
+
+// includes for reverse constraint.
+#include "constraint_equal.h"
+#include "../dynamic_constraints/dynamic_new_or.h"
+#include "../constraints/constraint_checkassign.h"
 
 // The implementation of the alldiff GAC algorithm,
-// shared between alldiffgacslow and dynamicalldiff.
+// shared between gacalldiff and the (now defunct) dynamicalldiff.
 
 
 // whether to backtrack the matching.
@@ -38,8 +53,8 @@
 // Process SCCs independently
 #define SCC
 
-// Warning: if this is not defined, then watchedalldiff probably won't do anything.
-//#define USEWATCHES
+// Warning: if this is not defined true, then watchedalldiff probably won't do anything.
+#define UseWatches 0
 
 // Optimize the case where a value was assigned. Only works in the presence of SCC
 #define ASSIGNOPT 
@@ -53,26 +68,14 @@
 // Use BFS instead of HK
 #define BFSMATCHING
 
+// Use the new hopcroft-karp implementation.
+//#define NEWHK
+
+// Incremental graph stored in adjlist
+#define UseIncGraph 0
+
 // Use staging a la Schulte and Stuckey
 #define STAGED
-
-//Incremental graph -- maintains adjacency lists for values and vars
-//#define INCGRAPH
-
-#include <stdlib.h>
-#include <iostream>
-#include <vector>
-#include <deque>
-#include <algorithm>
-#include <utility>
-
-using namespace std;
-
-#include "alldiff_gcc_shared.h"
-
-// includes for reverse constraint.
-#include "constraint_equal.h"
-#include "../dynamic_constraints/dynamic_new_or.h"
 
 #ifdef P
 #undef P
@@ -86,7 +89,14 @@ using namespace std;
 //#define P(x) cout << x << endl
 //#define PLONG
 
-template<typename VarArray, bool UseIncGraph>
+#ifdef PHALLSETSIZE
+#undef PHALLSETSIZE
+#endif
+
+//#define PHALLSETSIZE(x) cout << x << endl
+#define PHALLSETSIZE(x)
+
+template<typename VarArray>
 struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
 {
     using FlowConstraint<VarArray, UseIncGraph>::stateObj;
@@ -101,30 +111,43 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     using FlowConstraint<VarArray, UseIncGraph>::dom_max;
     using FlowConstraint<VarArray, UseIncGraph>::numvars;
     using FlowConstraint<VarArray, UseIncGraph>::numvals;
+    using FlowConstraint<VarArray, UseIncGraph>::varvalmatching;
+    using FlowConstraint<VarArray, UseIncGraph>::valvarmatching;
     
-  virtual string constraint_name()
-  { 
-      return "GacAlldiff";
-  }
-  
-  vector<int> SCCs;    // Variable numbers
-  ReversibleMonotonicSet SCCSplit;
-  // If !SCCSplit.isMember(anIndex) then anIndex is the last index in an SCC.
-  
-  //ReversibleMonotonicSet sparevaluespresent;
-  
-  D_DATA(MoveablePointer SCCSplit2);
-  
-  vector<int> varToSCCIndex;  // Mirror of the SCCs array.
-  
-  GacAlldiffConstraint(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
-    SCCSplit(_stateObj, _var_array.size())
+    
+    using FlowConstraint<VarArray, UseIncGraph>::varinlocalmatching;
+    using FlowConstraint<VarArray, UseIncGraph>::valinlocalmatching;
+    using FlowConstraint<VarArray, UseIncGraph>::invprevious;
+    
+    using FlowConstraint<VarArray, UseIncGraph>::initialize_hopcroft;
+    using FlowConstraint<VarArray, UseIncGraph>::hopcroft_wrapper;
+    using FlowConstraint<VarArray, UseIncGraph>::hopcroft2_setup;
+    
+    virtual string constraint_name()
+    { 
+        return "gacalldiff";
+    }
+    
+    CONSTRAINT_ARG_LIST1(var_array);
+
+    vector<SysInt> SCCs;    // Variable numbers
+    ReversibleMonotonicSet SCCSplit;
+    // If !SCCSplit.isMember(anIndex) then anIndex is the last index in an SCC.
+    
+    //ReversibleMonotonicSet sparevaluespresent;
+    
+    D_DATA(void* SCCSplit2);
+    
+    vector<SysInt> varToSCCIndex;  // Mirror of the SCCs array.
+    
+    GacAlldiffConstraint(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
+        SCCSplit(_stateObj, _var_array.size())
     //sparevaluespresent(_stateObj, _var_array.size())
-  {
-      
+    {
+      CheckNotBound(var_array, "gacalldiff", "alldiff");
       SCCs.resize(var_array.size());
       varToSCCIndex.resize(var_array.size());
-      for(int i=0; i<var_array.size(); ++i)
+      for(SysInt i=0; i<var_array.size(); ++i)
       {
           SCCs[i]=i;
           varToSCCIndex[i]=i;
@@ -133,17 +156,12 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       to_process.reserve(var_array.size());
       
       // Set up data structures
+      prev.resize(numvars+numvals, -1);
       initialize_hopcroft();
       initialize_tarjan();
       
-      // The matching in both directions.
-      
-      #ifndef BTMATCHING
-      varvalmatching.resize(numvars); // maps var to actual value
-      valvarmatching.resize(numvals); // maps val-dom_min to var.
-      #else
-      varvalmatching=getMemory(stateObj).backTrack().template requestArray<int>(numvars);
-      valvarmatching=getMemory(stateObj).backTrack().template requestArray<int>(numvals);
+      #ifdef NEWHK
+      hopcroft2_setup();
       #endif
       
       sccs_to_process.reserve(numvars);
@@ -152,33 +170,34 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       // that the values are all different in varvalmatching.
       // watches DS is used in alldiffgacslow and in debugging.
       #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
-      if(usewatches()) watches.resize(numvars);
+      if(UseWatches) watches.resize(numvars);
       #endif
       
-      for(int i=0; i<numvars ; i++) //&& i<numvals
+      for(SysInt i=0; i<numvars ; i++) //&& i<numvals
       {
           varvalmatching[i]=i+dom_min;
           if(i<numvals) valvarmatching[i]=i;
           
           #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
-          if(usewatches()) watches[i].reserve(numvals, stateObj);
+          if(UseWatches) watches[i].reserve(numvals, stateObj);
           #endif
       }
       
       D_DATA(SCCSplit2=getMemory(stateObj).backTrack().request_bytes((sizeof(char) * numvars)));
-      D_DATA(for(int i=0; i<numvars; i++) ((char *)SCCSplit2.get_ptr())[i]=1);
+      D_DATA(for(SysInt i=0; i<numvars; i++) ((char *)SCCSplit2)[i]=1);
       
   }
   
   // only used in dynamic version.
-  int dynamic_trigger_count()
+  SysInt dynamic_trigger_count()
   {
     // First an array of watches for the matching, then a 2d array of mixed triggers
     // indexed by [var][count] where count is increased from 0 as the triggers are used.
-    int numtrigs=0;
-    #ifdef INCGRAPH
-    numtrigs+=numvars*numvals; // one for each var-val pair so we know when it is removed.
-    #endif
+    SysInt numtrigs=0;
+    if(UseIncGraph)
+    {
+        numtrigs+=numvars*numvals; // one for each var-val pair so we know when it is removed.
+    }
     
     #ifdef DYNAMICALLDIFF
     numtrigs+= numvars+numvars*numvals;
@@ -190,7 +209,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   }
   
   #ifdef DYNAMICALLDIFF
-  inline DynamicTrigger * get_dt(int var, int counter)
+  inline DynamicTrigger * get_dt(SysInt var, SysInt counter)
   {
       // index the square array of dynamic triggers from dt
       D_ASSERT(bt_triggers_start == dynamic_trigger_start()+numvars);
@@ -208,8 +227,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    int array_size = var_array.size();
-    for(int i = 0; i < array_size; ++i)
+    SysInt array_size = var_array.size();
+    for(SysInt i = 0; i < array_size; ++i)
       t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
     return t;
   }
@@ -220,12 +239,12 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   { // w-or of pairwise equality.
       
       /// solely for reify exps
-      return new CheckAssignConstraint<VarArray, GacAlldiffConstraint>(stateObj, var_array, *this);
+      return forward_check_negation(stateObj, this);
       
       vector<AbstractConstraint*> con;
-      for(int i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i<var_array.size(); i++)
       {
-          for(int j=i+1; j<var_array.size(); j++)
+          for(SysInt j=i+1; j<var_array.size(); j++)
           {
               EqualConstraint<VarRef, VarRef>* t=new EqualConstraint<VarRef, VarRef>(stateObj, var_array[i], var_array[j]);
               con.push_back((AbstractConstraint*) t);
@@ -240,37 +259,25 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   vector<smallset_list_bt> watches;
   #endif
   
-  #ifdef USEWATCHES
-  inline bool usewatches()
+  virtual void propagate(DomainInt prop_var_in, DomainDelta)
   {
-      return true;
-  }
-  #else
-  inline bool usewatches()
-  {
-      return false;
-  }
-  #endif
-  
-  
-  virtual void propagate(int prop_var, DomainDelta)
-  {
+    const SysInt prop_var = checked_cast<SysInt>(prop_var_in);
     D_ASSERT(prop_var>=0 && prop_var<var_array.size());
     
     // return if all the watches are still in place.
     #ifndef BTMATCHING 
-    if(usewatches() && !to_process.in(prop_var) 
+    if(UseWatches && !to_process.in(prop_var) 
         && var_array[prop_var].inDomain(varvalmatching[prop_var]))     // This still has to be here, because we still wake up if the matchingis broken.
     #else
-    if(usewatches() && !to_process.in(prop_var))
+    if(UseWatches && !to_process.in(prop_var))
     #endif
     {
         smallset_list_bt& watch = watches[prop_var];
-        short * list = ((short *) watch.list.get_ptr());
-        int count=list[watch.maxsize];
+        short * list = ((short *) watch.list);
+        SysInt count=list[watch.maxsize];
         bool valout=false;
         
-        for(int i=0; i<count; i++)
+        for(SysInt i=0; i<count; i++)
         {
             P("Checking var "<< prop_var << " val " << list[i]+dom_min);
             if(!var_array[prop_var].inDomain(list[i]+dom_min))
@@ -289,8 +296,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     // If the domain size is >= numvars, then return.
     //if(!constraint_locked)
     {
-        int count=0;
-        for(int i=var_array[prop_var].getMin(); i<=var_array[prop_var].getMax(); i++)
+        SysInt count=0;
+        for(DomainInt i=var_array[prop_var].getMin(); i<=var_array[prop_var].getMax(); i++)
         {
             if(var_array[prop_var].inDomain(i))
             {
@@ -308,13 +315,14 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     #ifdef STAGED
     if(var_array[prop_var].isAssigned())
     {
-        int assignedval=var_array[prop_var].getAssignedValue();
-        for(int i=0; i<numvars; i++)
+        DomainInt assignedval=var_array[prop_var].getAssignedValue();
+        for(SysInt i=0; i<numvars; i++)
         {
             if(i!=prop_var && var_array[i].inDomain(assignedval))
             {
                 var_array[i].removeFromDomain(assignedval);
-                #ifdef INCGRAPH
+                PHALLSETSIZE(1);
+                #if UseIncGraph
                     adjlist_remove(i, assignedval);
                 #endif
             }
@@ -344,16 +352,16 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   
   virtual void propagate(DynamicTrigger* trig)
   {
-      #ifdef INCGRAPH
+      #if UseIncGraph
       DynamicTrigger* dtstart=dynamic_trigger_start();
       #ifdef DYNAMICALLDIFF
       dtstart+=numvars+numvars*numvals;
       #endif
       if(trig>=dtstart && trig< dtstart+numvars*numvals)  // does this trigger belong to incgraph?
       {
-          int diff=trig-dtstart;
-            int var=diff/numvals;
-            int validx=diff%numvals;
+          SysInt diff=trig-dtstart;
+            SysInt var=diff/numvals;
+            SysInt validx=diff%numvals;
             if(adjlistpos[validx+numvars][var]<adjlistlength[validx+numvars])
             {
                 P("Removing var, val " << var << ","<< (validx+dom_min) << " from adjacency list.");
@@ -364,17 +372,17 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       #endif
       
       // get variable number from the trigger
-    int prop_var = trig->trigger_info();
+    SysInt prop_var = trig->trigger_info();
     #ifdef PLONG
     // check that some value has been disturbed; otherwise the watches are malfunctioning.
     if(var_array[prop_var].inDomain(varvalmatching[prop_var]))
     {
         smallset_list_bt& watch = watches[prop_var];
-        short * list = ((short *) watch.list.get_ptr());
-        int count=list[watch.maxsize];
+        short * list = ((short *) watch.list);
+        SysInt count=list[watch.maxsize];
         bool valout=false;
         
-        for(int i=0; i<count; i++)
+        for(SysInt i=0; i<count; i++)
         {
             P("Checking var "<< prop_var << " val " << list[i]+dom_min);
             if(!var_array[prop_var].inDomain(list[i]+dom_min))
@@ -396,8 +404,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     #ifdef CHECKDOMSIZE
     // If the domain size is >= numvars, then return.
     // WHY IS THIS HERE WHEN checkdomsize and dynamic triggers don't work together??
-    int count=0;
-    for(int i=var_array[prop_var].getMin(); i<=var_array[prop_var].getMax(); i++)
+    SysInt count=0;
+    for(DomainInt i=var_array[prop_var].getMin(); i<=var_array[prop_var].getMax(); i++)
     {
         if(var_array[prop_var].inDomain(i))
         {
@@ -411,13 +419,14 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     #ifdef STAGED
     if(var_array[prop_var].isAssigned())
     {
-        int assignedval=var_array[prop_var].getAssignedValue();
-        for(int i=0; i<numvars; i++)
+        DomainInt assignedval=var_array[prop_var].getAssignedValue();
+        for(SysInt i=0; i<numvars; i++)
         {
             if(i!=prop_var && var_array[i].inDomain(assignedval))
             {
                 var_array[i].removeFromDomain(assignedval);
-                #ifdef INCGRAPH
+                PHALLSETSIZE(1);
+                #if UseIncGraph
                     adjlist_remove(i, assignedval);
                 #endif
             }
@@ -479,17 +488,17 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     cout << "Varvalmatching:" <<varvalmatching<<endl;
     cout << "SCCs:" << SCCs <<endl;
     cout << "SCCSplit: ";
-    for(int i=0; i<numvars; i++)
+    for(SysInt i=0; i<numvars; i++)
     {
         cout << (SCCSplit.isMember(i)?"1, ":"0, ");
     }
     cout <<endl;
     cout << "varToSCCIndex: "<< varToSCCIndex<<endl;
     cout << "Domains (remember that var_array is reversed):" <<endl;
-    for(int i=0; i<numvars; i++)
+    for(SysInt i=0; i<numvars; i++)
     {
         cout << "var:" << i << " vals:" ;
-        for(int j=dom_min; j<=dom_max; j++)
+        for(SysInt j=dom_min; j<=dom_max; j++)
         {
             if(var_array[i].inDomain(j))
             {
@@ -499,19 +508,19 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         cout << endl;
     }
     // Check the matching is valid.
-    for(int i=0; i<numvars; i++)
+    for(SysInt i=0; i<numvars; i++)
     {
         if(!var_array[i].inDomain(varvalmatching[i]))
         {
             cout << "val in matching removed: " << i << ", " << varvalmatching[i] <<endl;
         }
-        for(int j=i+1; j<numvars; j++)
+        for(SysInt j=i+1; j<numvars; j++)
         {
             D_ASSERT(varvalmatching[i]!=varvalmatching[j]);
             D_ASSERT(SCCs[i]!=SCCs[j]);
         }
-        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2.get_ptr())[i]==1));
-        cout << (int)SCCSplit.isMember(i) << ", " << (int) (((char*)SCCSplit2.get_ptr())[i]==1) << endl;
+        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2)[i]==1));
+        cout << (SysInt)SCCSplit.isMember(i) << ", " << (SysInt) (((char*)SCCSplit2)[i]==1) << endl;
         // The matches correspond.
         #ifndef BFSMATCHING
         D_ASSERT(valvarmatching[varvalmatching[i]-dom_min]==i);
@@ -521,9 +530,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     #ifdef DYNAMICALLDIFF
     // Can't yet check all the watches are in the right place, but can check
     // there are the right number of them on each var.
-    for(int i=0; i<var_array.size(); i++)
+    for(SysInt i=0; i<var_array.size(); i++)
     {
-        int count=0;
+        SysInt count=0;
         DynamicTrigger* trig=get_dt(i, 0);
         while(trig->queue!=NULL && count<numvals)
         {
@@ -536,7 +545,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     // Check that if an element of the matching is removed, then the var is 
     // in to_process.
-    for(int i=0; i<var_array.size(); i++)
+    for(SysInt i=0; i<var_array.size(); i++)
     {
         if(!var_array[i].inDomain(varvalmatching[i]))
         {
@@ -548,7 +557,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     #ifndef INCREMENTALMATCH
     // clear the matching.
-    for(int i=0; i<numvars && i<numvals; i++)
+    for(SysInt i=0; i<numvars && i<numvals; i++)
     {
       varvalmatching[i]=i+dom_min;
       valvarmatching[i]=i;
@@ -557,16 +566,16 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     sccs_to_process.clear();
     {
-    vector<int>& toiterate = to_process.getlist();
+    vector<SysInt>& toiterate = to_process.getlist();
     P("About to loop for to_process variables.");
     
-    for(int i=0; i<toiterate.size(); ++i)
+    for(SysInt i=0; i<toiterate.size(); ++i)
     {
-        int tempvar=toiterate[i];
+        SysInt tempvar=toiterate[i];
         
         
-        int sccindex_start=varToSCCIndex[tempvar];
-        int sccindex_end=varToSCCIndex[tempvar];
+        SysInt sccindex_start=varToSCCIndex[tempvar];
+        SysInt sccindex_end=varToSCCIndex[tempvar];
         
         while(sccindex_start>0 && SCCSplit.isMember(sccindex_start-1))
         {
@@ -600,7 +609,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             // since the matching has just changed.
             #ifndef BTMATCHING
             DynamicTrigger * trig = dynamic_trigger_start();
-            for(int j=0; j<numvars; j++)
+            for(SysInt j=0; j<numvars; j++)
             {
                 var_array[j].addWatchTrigger(trig + j, DomainRemoval, varvalmatching[j]);
                 P("Adding watch for var " << j << " val " << varvalmatching[j]);
@@ -629,7 +638,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 //cout <<"Before swap:" <<SCCs<<endl;
                 sccs_to_process.remove(sccindex_start);
                 
-                int swapvar=SCCs[sccindex_start];
+                SysInt swapvar=SCCs[sccindex_start];
                 SCCs[sccindex_start]=SCCs[varToSCCIndex[tempvar]];
                 SCCs[varToSCCIndex[tempvar]]=swapvar;
                 
@@ -641,19 +650,20 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 
                 // Split the SCCs
                 SCCSplit.remove(sccindex_start);
-                D_DATA(((char*)SCCSplit2.get_ptr())[sccindex_start]=0);
+                D_DATA(((char*)SCCSplit2)[sccindex_start]=0);
                 
                 sccindex_start++;
-                int tempval=var_array[tempvar].getAssignedValue();
+                DomainInt tempval=var_array[tempvar].getAssignedValue();
                 
                 // Now remove the value from the reduced SCC
-                for(int i=sccindex_start; i<=sccindex_end; i++)
+                for(SysInt i=sccindex_start; i<=sccindex_end; i++)
                 {
                     if(var_array[SCCs[i]].inDomain(tempval))
                     {
                         P("Removing var: "<< SCCs[i] << " val:" << tempval);
                         var_array[SCCs[i]].removeFromDomain(tempval);
-                        #ifdef INCGRAPH
+                        PHALLSETSIZE(1);
+                        #if UseIncGraph
                             adjlist_remove(SCCs[i], tempval);
                         #endif
                         if(getState(stateObj).isFailed()) return;
@@ -684,34 +694,34 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     #ifndef NO_DEBUG
     // Check the matching is valid.
-    for(int i=0; i<numvars; i++)
+    for(SysInt i=0; i<numvars; i++)
     {
         D_ASSERT(var_array[i].inDomain(varvalmatching[i]));
-        for(int j=i+1; j<numvars; j++)
+        for(SysInt j=i+1; j<numvars; j++)
         {
             D_ASSERT(varvalmatching[i]!=varvalmatching[j]);
             D_ASSERT(SCCs[i]!=SCCs[j]);
         }
-        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2.get_ptr())[i]==1));
+        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2)[i]==1));
         D_ASSERT(SCCs[varToSCCIndex[i]]==i);
     }
     #endif
     
     // Call Tarjan's for each disturbed SCC.
     {
-    vector<int> & toiterate=sccs_to_process.getlist();
-    for(int i=0; i<toiterate.size(); i++)
+    vector<SysInt> & toiterate=sccs_to_process.getlist();
+    for(SysInt i=0; i<toiterate.size(); i++)
     {
-        int j=toiterate[i];
+        SysInt j=toiterate[i];
         
         // remake var_indices for this SCC.
         var_indices.clear();
-        for(int k=j; k<numvars; k++)
+        for(SysInt k=j; k<numvars; k++)
         {
             #ifdef CHECKDOMSIZE
             if(!var_array[SCCs[k]].inDomain(varvalmatching[SCCs[k]]))
             {
-                int l=j; while(SCCSplit.isMember(l) && l<(numvars-1)) l++;
+                SysInt l=j; while(SCCSplit.isMember(l) && l<(numvars-1)) l++;
                 if(!matching_wrapper(j, l))
                     return;
             }
@@ -731,12 +741,12 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     /*
     cout<<"SCCs:"<<endl;
-    for(int i=0; i<SCCs.size(); i++)
+    for(SysInt i=0; i<SCCs.size(); i++)
     {
         cout<< SCCs[i] <<endl;
     }
     cout<<"SCCSplit:"<<endl;
-    for(int i=0; i<SCCs.size(); i++)
+    for(SysInt i=0; i<SCCs.size(); i++)
     {
         cout << ((SCCSplit.isMember(i))?"Nosplit":"Split") <<endl;
     }*/
@@ -756,7 +766,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     #ifndef INCREMENTALMATCH
     // clear the matching.
-    for(int i=0; i<numvars && i<numvals; i++)
+    for(SysInt i=0; i<numvars && i<numvals; i++)
     {
       varvalmatching[i]=i+dom_min;
       valvarmatching[i]=i;
@@ -768,17 +778,17 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     cout << "Varvalmatching:" <<varvalmatching<<endl;
     cout << "SCCs:" << SCCs <<endl;
     cout << "SCCSplit: ";
-    for(int i=0; i<numvars; i++)
+    for(SysInt i=0; i<numvars; i++)
     {
         cout << (SCCSplit.isMember(i)?"1, ":"0, ");
     }
     cout <<endl;
     cout << "varToSCCIndex: "<< varToSCCIndex<<endl;
     cout << "Domains (remember that the var array is reversed):" <<endl;
-    for(int i=0; i<numvars; i++)
+    for(SysInt i=0; i<numvars; i++)
     {
         cout << "var:" << i << " vals:" ;
-        for(int j=dom_min; j<=dom_max; j++)
+        for(SysInt j=dom_min; j<=dom_max; j++)
         {
             if(var_array[i].inDomain(j))
             {
@@ -789,19 +799,19 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     }
     
     // Check the matching is valid.
-    for(int i=0; i<numvars; i++)
+    for(SysInt i=0; i<numvars; i++)
     {
         if(!var_array[i].inDomain(varvalmatching[i]))
         {
             cout << "val in matching removed, var: " << i << ", val:" << varvalmatching[i] <<endl;
         }
-        for(int j=i+1; j<numvars; j++)
+        for(SysInt j=i+1; j<numvars; j++)
         {
             D_ASSERT(varvalmatching[i]!=varvalmatching[j]);
             D_ASSERT(SCCs[i]!=SCCs[j]);
         }
-        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2.get_ptr())[i]==1));
-        cout << (int)SCCSplit.isMember(i) << ", " << (int) (((char*)SCCSplit2.get_ptr())[i]==1) << endl;
+        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2)[i]==1));
+        cout << (SysInt)SCCSplit.isMember(i) << ", " << (SysInt) (((char*)SCCSplit2)[i]==1) << endl;
         // The matches correspond.
         D_ASSERT(valvarmatching[varvalmatching[i]-dom_min]==i);
     }
@@ -809,9 +819,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     #ifdef DYNAMICALLDIFF
     // Can't yet check all the watches are in the right place, but can check
     // there are the right number of them on each var.
-    for(int i=0; i<var_array.size(); i++)
+    for(SysInt i=0; i<var_array.size(); i++)
     {
-        int count=0;
+        SysInt count=0;
         DynamicTrigger* trig=get_dt(i, 0);
         while(trig->queue!=NULL && count<numvals)
         {
@@ -824,7 +834,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     // Check that if an element of the matching is removed, then the var is 
     // in to_process.
-    for(int i=0; i<var_array.size(); i++)
+    for(SysInt i=0; i<var_array.size(); i++)
     {
         if(!var_array[i].inDomain(varvalmatching[i]))
         {
@@ -842,7 +852,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     // since the matching has just changed.
     #ifndef BTMATCHING
     DynamicTrigger * trig = dynamic_trigger_start();
-    for(int j=0; j<numvars; j++)
+    for(SysInt j=0; j<numvars; j++)
     {
         var_array[j].addWatchTrigger(trig + j, DomainRemoval, varvalmatching[j]);
     }
@@ -858,15 +868,15 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     #ifndef NO_DEBUG
     // Check the matching is valid.
-    for(int i=0; i<numvars; i++)
+    for(SysInt i=0; i<numvars; i++)
     {
         D_ASSERT(var_array[i].inDomain(varvalmatching[i]));
-        for(int j=i+1; j<numvars; j++)
+        for(SysInt j=i+1; j<numvars; j++)
         {
             D_ASSERT(varvalmatching[i]!=varvalmatching[j]);
             D_ASSERT(SCCs[i]!=SCCs[j]);
         }
-        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2.get_ptr())[i]==1));
+        D_ASSERT(SCCSplit.isMember(i) == (((char*)SCCSplit2)[i]==1));
         D_ASSERT(SCCs[varToSCCIndex[i]]==i);
     }
     #endif
@@ -875,24 +885,26 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     // Call Tarjan's for all vars
     
     var_indices.clear();
-    for(int i=0; i<numvars; i++) var_indices.push_back(i);
+    for(SysInt i=0; i<numvars; i++) var_indices.push_back(i);
     
-    tarjan_recursive(0);
+    if(numvars>0)
+        tarjan_recursive(0);
     
     return;
   }
   
-  inline bool greedymatch(int tempvar, int sccindex_start, int sccindex_end)
+  /*
+  inline bool greedymatch(SysInt tempvar, SysInt sccindex_start, SysInt sccindex_end)
   {
     D_ASSERT(!var_array[tempvar].inDomain(varvalmatching[tempvar]));
     
     valinlocalmatching.clear();
-    for(int j=sccindex_start; j<=sccindex_end; j++)
+    for(SysInt j=sccindex_start; j<=sccindex_end; j++)
     {
         valinlocalmatching.insert(varvalmatching[SCCs[j]]-dom_min);
     }
     
-    for(int val=var_array[tempvar].getMin(); val<=var_array[tempvar].getMax(); val++)
+    for(DomainInt val=var_array[tempvar].getMin(); val<=var_array[tempvar].getMax(); val++)
     {
         if(var_array[tempvar].inDomain(val) && !valinlocalmatching.in(val-dom_min))
         {
@@ -904,24 +916,24 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     return false;
   }
   
-  inline bool greedymatch2(int , int sccindex_start, int sccindex_end)
+  inline bool greedymatch2(SysInt , SysInt sccindex_start, SysInt sccindex_end)
   {
       // process all the broken matchings.
     
     valinlocalmatching.clear();
-    for(int j=sccindex_start; j<=sccindex_end; j++)
+    for(SysInt j=sccindex_start; j<=sccindex_end; j++)
     {
         valinlocalmatching.insert(varvalmatching[SCCs[j]]-dom_min);
     }
     
-    for(int j=sccindex_start; j<=sccindex_end; j++)
+    for(SysInt j=sccindex_start; j<=sccindex_end; j++)
     {
-        int tempvar=SCCs[j];
+        SysInt tempvar=SCCs[j];
         
         if(var_array[tempvar].inDomain(varvalmatching[tempvar]))
         {
             bool found=false;
-            for(int val=var_array[tempvar].getMin(); val<=var_array[tempvar].getMax(); val++)
+            for(DomainInt val=var_array[tempvar].getMin(); val<=var_array[tempvar].getMax(); val++)
             {
                 if(var_array[tempvar].inDomain(val) && !valinlocalmatching.in(val-dom_min))
                 {
@@ -941,62 +953,22 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     return true;
   }
-  
-  virtual BOOL full_check_unsat()
-  { 
-    int v_size = var_array.size();
-    for(int i = 0; i < v_size; ++i)
-    {
-      if(var_array[i].isAssigned())
-      {
-      
-        for(int j = i + 1; j < v_size; ++j)
-        {
-          if(var_array[j].isAssigned())
-          {
-            if(var_array[i].getAssignedValue() == var_array[j].getAssignedValue())
-              return true;
-          }
-        }
-        
-      }
-    }
-    
-    return false;
-  }
-  
-  virtual BOOL check_unsat(int i, DomainDelta)
-  {
-    int v_size = var_array.size();
-    if(!var_array[i].isAssigned()) return false;
-    
-    DomainInt assign_val = var_array[i].getAssignedValue();
-    for(int loop = 0; loop < v_size; ++loop)
-    {
-      if(loop != i)
-      {
-        if(var_array[loop].isAssigned() && 
-           var_array[loop].getAssignedValue() == assign_val)
-        return true;
-      }
-    }
-    return false;
-  }
+  */
   
   virtual void full_propagate()
   { 
-      #ifdef INCGRAPH
+      #if UseIncGraph
         {
             // update the adjacency lists. and place dts
             DynamicTrigger* dt=dynamic_trigger_start();
             #ifdef DYNAMICALLDIFF
             dt+=numvars+numvars*numvals;
             #endif
-            for(int i=dom_min; i<=dom_max; i++)
+            for(SysInt i=dom_min; i<=dom_max; i++)
             {
-                for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
+                for(SysInt j=0; j<adjlistlength[i-dom_min+numvars]; j++)
                 {
-                    int var=adjlist[i-dom_min+numvars][j];
+                    SysInt var=adjlist[i-dom_min+numvars][j];
                     if(!var_array[var].inDomain(i))
                     {
                         adjlist_remove(var, i);
@@ -1014,13 +986,13 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         }
       #endif
       
-      #if defined(USEWATCHES) && defined(CHECKDOMSIZE)
+      #if UseWatches && defined(CHECKDOMSIZE)
       cout << "Watches and Quimper&Walsh's criterion do not safely co-exist." <<endl;
       FAIL_EXIT();
       #endif
       
-      #if defined(DYNAMICALLDIFF) && !defined(USEWATCHES)
-      cout << "watchedalldiff does not work if USEWATCHES is not defined." << endl;
+      #if defined(DYNAMICALLDIFF) && !UseWatches
+      cout << "watchedalldiff does not work if UseWatches is not defined true." << endl;
       FAIL_EXIT();
       #endif
       
@@ -1035,7 +1007,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       // process all variables.
       to_process.clear();    // It seems like this is called twice at the top of the tree, so the clear is necessary.
       
-      for(int i=0; i<numvars; i++)
+      for(SysInt i=0; i<numvars; i++)
       {
           to_process.insert(i);
       }
@@ -1044,10 +1016,10 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         // Clear all the BT triggers. This is so that the tests at
         // the start of do_prop will work.
         bt_triggers_start=dynamic_trigger_start()+numvars;
-        for(int i=0; i<var_indices.size(); i++)
+        for(SysInt i=0; i<var_indices.size(); i++)
         {
-            int var=var_indices[i];
-            for(int j=triggercount[var]; j<numvals; j++)
+            SysInt var=var_indices[i];
+            for(SysInt j=triggercount[var]; j<numvals; j++)
             {
                 if( get_dt(var, j)->queue == NULL)
                 {
@@ -1059,13 +1031,13 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         
       // set the variable numbers in the watches.
       DynamicTrigger * trig=dynamic_trigger_start();
-      for(int i=0; i<numvars; i++)
+      for(SysInt i=0; i<numvars; i++)
       {
           (trig+i)->trigger_info() = i;
       }
-      for(int i=0; i<numvars; i++)
+      for(SysInt i=0; i<numvars; i++)
       {
-          for(int j=0; j<numvals; j++)
+          for(SysInt j=0; j<numvals; j++)
           {
               (trig+numvars+(i*numvals)+j)->trigger_info() = i;
           }
@@ -1074,7 +1046,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       #ifndef BTMATCHING
       // set the watches here so that they start synced to the varvalmatching.
         trig = dynamic_trigger_start();
-        for(int j=0; j<numvars; j++)
+        for(SysInt j=0; j<numvars; j++)
         {
             var_array[j].addWatchTrigger(trig + j, DomainRemoval, varvalmatching[j]);
             P("Adding watch for var " << j << " val " << varvalmatching[j]);
@@ -1089,11 +1061,11 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       #endif
   }
     
-    virtual BOOL check_assignment(DomainInt* v, int array_size)
+    virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
       D_ASSERT(array_size == var_array.size());
-      for(int i=0;i<array_size;i++)
-        for( int j=i+1;j<array_size;j++)
+      for(SysInt i=0;i<array_size;i++)
+        for( SysInt j=i+1;j<array_size;j++)
           if(v[i]==v[j]) return false;
       return true;
     }
@@ -1102,16 +1074,16 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     {
       vector<AnyVarRef> vars;
       vars.reserve(var_array.size());
-      for(unsigned i = 0; i < var_array.size(); ++i)
+      for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
         vars.push_back(var_array[i]);
       return vars;
     }
     
     
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
       bool matchok=true;
-      for(int i=0; i<numvars; i++)
+      for(SysInt i=0; i<numvars; i++)
       {
           if(!var_array[i].inDomain(varvalmatching[i]))
           {
@@ -1123,13 +1095,13 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       if(!matchok)
       {
           if(numvals<numvars) return false; // there can't be a matching.
-          #ifdef INCGRAPH
+          #if UseIncGraph
             // update the adjacency lists.
-            for(int i=dom_min; i<=dom_max; i++)
+            for(SysInt i=dom_min; i<=dom_max; i++)
             {
-                for(int j=0; j<adjlistlength[i-dom_min+numvars]; j++)
+                for(SysInt j=0; j<adjlistlength[i-dom_min+numvars]; j++)
                 {
-                    int var=adjlist[i-dom_min+numvars][j];
+                    SysInt var=adjlist[i-dom_min+numvars][j];
                     if(!var_array[var].inDomain(i))
                     {
                         // swap with the last element and remove
@@ -1150,7 +1122,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       }
       else
       {
-          for(int i=0; i<numvars; i++)
+          for(SysInt i=0; i<numvars; i++)
           {
               assignment.push_back(make_pair(i, varvalmatching[i]));
           }
@@ -1194,42 +1166,32 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         end if
         */
     
-    vector<int> tstack;
+    vector<SysInt> tstack;
     smallset_nolist in_tstack;
     smallset_nolist visited;
-    vector<int> dfsnum;
-    vector<int> lowlink;
+    vector<SysInt> dfsnum;
+    vector<SysInt> lowlink;
     
-    //vector<int> iterationstack;
-    vector<int> curnodestack;
-    
-    #ifndef BTMATCHING
-    vector<int> varvalmatching; // For each var, give the matching value.
-    // valvarmatching is from val-dom_min to var.
-    vector<int> valvarmatching;   // need to set size somewhere.
-    // -1 means unmatched.
-    #else
-    MoveableArray<int> varvalmatching;
-    MoveableArray<int> valvarmatching;
-    #endif
+    //vector<SysInt> iterationstack;
+    vector<SysInt> curnodestack;
     
     // Filled in before calling tarjan's.
     bool scc_split;
     
-    int sccindex;
+    SysInt sccindex;
     
-    int max_dfs;
+    SysInt max_dfs;
     
-    vector<int> spare_values;
+    vector<SysInt> spare_values;
     bool include_sink;
-    vector<int> var_indices;  // Should be a pointer so it can be changed.
+    vector<SysInt> var_indices;  // Should be a pointer so it can be changed.
     
     smallset sccs_to_process;   // Indices to the first var in the SCC to process.
     
-    int varcount;
+    SysInt varcount;
     
     #ifdef DYNAMICALLDIFF
-    vector<int> triggercount; // number of triggers on the variable
+    vector<SysInt> triggercount; // number of triggers on the variable
     DynamicTrigger * bt_triggers_start;   // points at dynamic_trigger_start()+numvars
     #endif
     
@@ -1240,7 +1202,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     
     void initialize_tarjan()
     {
-        int numnodes=numvars+numvals+1;  // One sink node.
+        SysInt numnodes=numvars+numvals+1;  // One sink node.
         tstack.reserve(numnodes);
         in_tstack.reserve(numnodes);
         visited.reserve(numnodes);
@@ -1256,28 +1218,27 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         #endif
     }
     
-    void tarjan_recursive(int sccindex_start)
+    void tarjan_recursive(SysInt sccindex_start)
     {
-        
         valinlocalmatching.clear();
         
-        int localmax=var_array[var_indices[0]].getMax();
-        int localmin=var_array[var_indices[0]].getMin();
+        DomainInt localmax=var_array[var_indices[0]].getMax();
+        DomainInt localmin=var_array[var_indices[0]].getMin();
         valinlocalmatching.insert(varvalmatching[var_indices[0]]-dom_min);
         
-        for(int i=1; i<var_indices.size(); i++)
+        for(SysInt i=1; i<var_indices.size(); i++)
         {
-            int tempvar=var_indices[i];
-            int tempmax=var_array[tempvar].getMax();
-            int tempmin=var_array[tempvar].getMin();
+            SysInt tempvar=var_indices[i];
+            DomainInt tempmax=var_array[tempvar].getMax();
+            DomainInt tempmin=var_array[tempvar].getMin();
             if(tempmax>localmax) localmax=tempmax;
             if(tempmin<localmin) localmin=tempmin;
             valinlocalmatching.insert(varvalmatching[var_indices[i]]-dom_min);
         }
         
-        if(usewatches())
+        if(UseWatches)
         {
-            for(int i=0; i<var_indices.size(); i++)
+            for(SysInt i=0; i<var_indices.size(); i++)
             {
                 #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
                 watches[var_indices[i]].clear();
@@ -1288,7 +1249,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 
                 #ifdef DYNAMICALLDIFF
                 // Clear all the triggers on this variable. At end now.
-                int var=var_indices[i];
+                SysInt var=var_indices[i];
                 triggercount[var]=1;
                 
                 var_array[var].addDynamicTriggerBT(get_dt(var, 0), 
@@ -1306,15 +1267,15 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         {
         #endif
             spare_values.clear();
-            for(int val=localmin; val<=localmax; ++val)
+            for(DomainInt val=localmin; val<=localmax; ++val)
             {
-                if(!valinlocalmatching.in(val-dom_min))
+                if(!valinlocalmatching.in(checked_cast<SysInt>(val-dom_min)))
                 {
-                    for(int j=0; j<var_indices.size(); j++)
+                    for(SysInt j=0; j<var_indices.size(); j++)
                     {
                         if(var_array[var_indices[j]].inDomain(val))
                         {
-                            spare_values.push_back(val-dom_min+numvars);
+                            spare_values.push_back(checked_cast<SysInt>(val-dom_min+numvars));
                             break;
                         }
                     }
@@ -1327,7 +1288,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             if(!include_sink)
             {
                 // Set some bits in sparevaluespresent.
-                for(int scci=sccindex_start; ; scci++)
+                for(SysInt scci=sccindex_start; ; scci++)
                 {
                     D_ASSERT(sparevaluespresent.isMember(scci));
                     sparevaluespresent.remove(scci);
@@ -1355,9 +1316,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         scc_split=false;
         sccindex=sccindex_start;
         
-        for(int i=0; i<var_indices.size(); ++i)
+        for(SysInt i=0; i<var_indices.size(); ++i)
         {
-            int curnode=var_indices[i];
+            SysInt curnode=var_indices[i];
             if(!visited.in(curnode))
             {
                 P("(Re)starting tarjan's algorithm, value:"<< curnode);
@@ -1369,12 +1330,12 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         
         // Clear any extra watches.
         #ifdef DYNAMICALLDIFF
-        if(usewatches())
+        if(UseWatches)
         {
-            for(int i=0; i<var_indices.size(); i++)
+            for(SysInt i=0; i<var_indices.size(); i++)
             {
-                int var=var_indices[i];
-                for(int j=triggercount[var]; j<numvals; j++)
+                SysInt var=var_indices[i];
+                for(SysInt j=triggercount[var]; j<numvals; j++)
                 {
                     if( get_dt(var, j)->queue == NULL)
                     {
@@ -1387,7 +1348,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         #endif
     }
     
-    void visit(int curnode, bool toplevel, int sccindex_start)
+    void visit(SysInt curnode, bool toplevel, SysInt sccindex_start)
     {
         tstack.push_back(curnode);
         in_tstack.insert(curnode);
@@ -1403,9 +1364,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(include_sink);
             // It's the sink so it links to all spare values.
             
-            for(int i=0; i<spare_values.size(); ++i)
+            for(SysInt i=0; i<spare_values.size(); ++i)
             {
-                int newnode=spare_values[i];
+                SysInt newnode=spare_values[i];
                 //cout << "About to visit spare value: " << newnode-numvars+dom_min <<endl;
                 if(!visited.in(newnode))
                 {
@@ -1430,7 +1391,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(find(var_indices.begin(), var_indices.end(), curnode)!=var_indices.end());
             varcount++;
             //cout << "Visiting node variable: "<< curnode<<endl;
-            int newnode=varvalmatching[curnode]-dom_min+numvars;
+            SysInt newnode=varvalmatching[curnode]-dom_min+numvars;
             D_ASSERT(var_array[curnode].inDomain(newnode+dom_min-numvars));
             
             if(!visited.in(newnode))
@@ -1459,7 +1420,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(curnode>=numvars && curnode<(numvars+numvals));
             #ifndef NO_DEBUG
             bool found=false;
-            for(int i=0; i<var_indices.size(); i++)
+            for(SysInt i=0; i<var_indices.size(); i++)
             {
                 if(var_array[var_indices[i]].inDomain(curnode+dom_min-numvars))
                 {
@@ -1469,19 +1430,19 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             D_ASSERT(found);
             #endif
             
-            int lowlinkvar=-1;
-            #ifndef INCGRAPH
-            for(int i=0; i<var_indices.size(); i++)
+            SysInt lowlinkvar=-1;
+            #if !UseIncGraph
+            for(SysInt i=0; i<var_indices.size(); i++)
             {
-                int newnode=var_indices[i];
+                SysInt newnode=var_indices[i];
             #else
-            for(int i=0; i<adjlistlength[curnode]; i++)
+            for(SysInt i=0; i<adjlistlength[curnode]; i++)
             {
-                int newnode=adjlist[curnode][i];
+                SysInt newnode=adjlist[curnode][i];
             #endif
                 if(varvalmatching[newnode]!=curnode-numvars+dom_min)   // if the value is not in the matching.
                 {
-                    #ifndef INCGRAPH
+                    #if !UseIncGraph
                     if(var_array[newnode].inDomain(curnode+dom_min-numvars))
                     #endif
                     {
@@ -1490,7 +1451,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                         if(!visited.in(newnode))
                         {
                             // set a watch
-                            if(usewatches())
+                            if(UseWatches)
                             {
                                 P("Adding DT for var " << newnode << " val " << curnode-numvars+dom_min);
                                 
@@ -1531,7 +1492,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             if(include_sink && valinlocalmatching.in(curnode-numvars))
             //    find(varvalmatching.begin(), varvalmatching.end(), curnode+dom_min-numvars)!=varvalmatching.end())
             {
-                int newnode=numvars+numvals;
+                SysInt newnode=numvars+numvals;
                 if(!visited.in(newnode))
                 {
                     visit(newnode, false, sccindex_start);
@@ -1553,7 +1514,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             }
             
             // Where did the low link value come from? insert that edge into watches.
-            if(usewatches() && lowlinkvar!=-1)
+            if(UseWatches && lowlinkvar!=-1)
             {
                 P("Adding DT for var " << lowlinkvar << " val " << curnode-numvars+dom_min);
                 
@@ -1594,9 +1555,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 
                 P("Writing new SCC:");
                 bool containsvars=false;
-                for(vector<int>::iterator tstackit=(--tstack.end());  ; --tstackit)
+                for(vector<SysInt>::iterator tstackit=(tstack.end()-1);  ; --tstackit)
                 {
-                    int copynode=(*tstackit);
+                    SysInt copynode=(*tstackit);
                     //cout << "SCC element: "<< copynode<<endl;
                     if(copynode<numvars)
                     {
@@ -1617,7 +1578,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                         {
                             P("Inserting split point.");
                             SCCSplit.remove(sccindex-1);
-                            D_DATA(((char*)SCCSplit2.get_ptr())[sccindex-1]=0);
+                            D_DATA(((char*)SCCSplit2)[sccindex-1]=0);
                         }
                         // The one written last was the last one in the SCC.
                         break;
@@ -1637,7 +1598,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 {
                     while(true)
                     {
-                        int copynode=(*(--tstack.end()));
+                        SysInt copynode=(*(tstack.end()-1));
                         
                         tstack.pop_back();
                         in_tstack.remove(copynode);
@@ -1647,9 +1608,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                             // It's a value. Iterate through old SCC and remove it from
                             // any variables not in tempset.
                             //cout << "Trashing value "<< copynode+dom_min-numvars << endl;
-                            for(int i=0; i<var_indices.size(); i++)
+                            for(SysInt i=0; i<var_indices.size(); i++)
                             {
-                                int curvar=var_indices[i];
+                                SysInt curvar=var_indices[i];
                                 if(!varinlocalmatching.in(curvar))
                                 {
                                     // var not in tempset so might have to do some test against matching.
@@ -1660,7 +1621,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                         if(var_array[curvar].inDomain(copynode+dom_min-numvars))
                                         {
                                             var_array[curvar].removeFromDomain(copynode+dom_min-numvars);
-                                            #ifdef INCGRAPH
+                                            PHALLSETSIZE(var_indices.size()-varinlocalmatching.size());
+                                            #if UseIncGraph
                                                 adjlist_remove(curvar, copynode-numvars+dom_min);
                                             #endif
                                         }
@@ -1679,425 +1641,37 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         }
     }
     
-  // -------------------------Hopcroft-Karp algorithm -----------------------------
-  // Can be applied to a subset of var_array as required.
-  
-  // Each domain value has a label which is numvars+
-  
-  
-  // These two are for the valvar version of hopcroft.
-  smallset_nolist varinlocalmatching;    // indicates whether a var is recorded in localmatching.
-  smallset valinlocalmatching;
-  
-  //smallset varinlocalmatching;    // indicates whether a var is recorded in localmatching.
-  //smallset_nolist valinlocalmatching;
-  
-  
-  // Uprevious (pred) gives (for each CSP value) the value-dom_min
-  // it was matched to in the previous layer. If it was unmatched,
-  // -1 is used.
-  vector<int> uprevious;  // -2 means unset, -1 labelled unmatched. 
-  
-  vector<vector<int> > vprevious;  // map val-dom_min to vector of vars.
-  smallset_nolist invprevious;     // is there a mapping in vprevious for val? Allows fast unset.
-  
-  smallset layer;
-  smallset unmatched;   // contains vals-dom_min.
-  
-  vector<vector<int> > newlayer;
-  smallset innewlayer;
-  
-  void initialize_hopcroft()
-  {
-      // Initialize all datastructures to do with hopcroft-karp
-      // Surely could reduce the number of arrays etc used for hopcroft-karp??
-      int numvals=dom_max-dom_min+1;
-      
-      varinlocalmatching.reserve(numvars);
-      valinlocalmatching.reserve(numvals);
-      uprevious.resize(numvars, -2);
-      
-      vprevious.resize(numvals);
-      for(int i=0; i<numvals; ++i)
-      {
-          vprevious[i].reserve(numvars);
-      }
-      invprevious.reserve(numvals);
-      
-      layer.reserve(numvars);
-      unmatched.reserve(numvals);
-      
-      newlayer.resize(numvals);
-      for(int i=0; i<numvals; ++i)
-      {
-          newlayer[i].reserve(numvars);
-      }
-      innewlayer.reserve(numvals);
-      
-      // for BFS algorithm
-      prev.resize(numvars+numvals, -1);
-  }
-  
-  
     
-// ------------------------- Hopcroft which takes start and end indices.
-    
-    inline bool matching_wrapper(int sccstart, int sccend)
+    inline bool matching_wrapper(SysInt sccstart, SysInt sccend)
     {
         #ifdef BFSMATCHING
         return bfs_wrapper(sccstart,sccend);
         #else
-        return hopcroft_wrapper(sccstart,sccend);
+        #ifdef NEWHK
+        // This is just to test the new HK implementation. 
+        // to use this, must not be using SCCs and must be using incgraph.
+        vector<SysInt> upper;
+        upper.resize(numvals, 1);
+        vector<SysInt> usage;
+        usage.resize(numvals, 0);
+        for(SysInt i=0; i<numvars; i++)
+        {
+            if(varvalmatching[i]!=dom_min-1)
+            {
+                D_ASSERT(usage[varvalmatching[i]-dom_min]==0);
+                usage[varvalmatching[i]-dom_min]=1;
+            }
+        }
+        return hopcroft_wrapper2(SCCs, varvalmatching, upper, usage);
+        #else
+        return hopcroft_wrapper(sccstart,sccend, SCCs);
         #endif
-    }
-
-    inline bool hopcroft_wrapper(int sccstart, int sccend)
-    {
-        // Call hopcroft for the whole matching.
-        if(!hopcroft(sccstart, sccend))
-        {
-            // The constraint is unsatisfiable (no matching).
-            P("About to fail. Changed varvalmatching: "<< varvalmatching);
-            
-            // temporary mess to see if hopcroft is failing prematurely.
-            /*vector<int> t=varvalmatching;
-            vector<int> t2=valvarmatching;
-            if(bfs_wrapper(sccstart, sccend))
-            {
-                cout << "BFS fixed matching, but hopcroft did not!" <<endl;
-                cout << "hopcroft varvalmatching:"<< t<<endl;
-                cout << "hopcroft valvarmatching:"<< t2<<endl;
-                cout << "BFS varvalmatching:" << varvalmatching <<endl;
-                
-                {vector<int>& toiterate=valinlocalmatching.getlist();
-                    for(int j=0; j<toiterate.size(); j++)
-                    {
-                        int tempval=toiterate[j];
-                        t[t2[tempval]]=tempval+dom_min;
-                    }
-                }
-                cout << "copied back hopcroft varvalmatching:" << t <<endl;
-                
-                BOOL bfsflag=true, hopflag=true;
-                for(int scci=sccstart; scci<=sccend; scci++)
-                {
-                    if(!var_array[SCCs[scci]].inDomain(t[SCCs[scci]]))
-                        hopflag=false;
-                    if(!var_array[SCCs[scci]].inDomain(t[SCCs[scci]]))
-                        bfsflag=false;
-                }
-                cout << "hopcroft matching valid: "<< hopflag <<endl;
-                cout << "bfs matching valid: "<< bfsflag <<endl;
-            }*/
-            
-            for(int j=0; j<numvars; j++)
-            {
-                // Restore valvarmatching because it might be messed up by Hopcroft.
-                valvarmatching[varvalmatching[j]-dom_min]=j;
-            }
-            
-            getState(stateObj).setFailed(true);
-            return false;
-        }
-        
-        // Here, copy from valvarmatching to varvalmatching.
-        // Using valinlocalmatching left over from hopcroft.
-        // This must not be done when failing, because it might mess
-        // up varvalmatching for the next invocation.
-        {vector<int>& toiterate=valinlocalmatching.getlist();
-            for(int j=0; j<toiterate.size(); j++)
-            {
-                int tempval=toiterate[j];
-                varvalmatching[valvarmatching[tempval]]=tempval+dom_min;
-            }
-        }
-        return true;
-    }
-    
-    inline bool hopcroft(int sccstart, int sccend)
-    {
-        // Domain value convention:
-        // Within hopcroft and recurse,
-        // a domain value is represented as val-dom_min always.
-        
-        // Variables are always represented as their index in
-        // var_array. sccstart and sccend indicates which variables
-        // we are allowed to use here.
-        
-        int localnumvars=sccend-sccstart+1;
-        
-        // Construct the valinlocalmatching for this SCC, checking each val
-        // to see it's in the relevant domain.
-        valinlocalmatching.clear();
-        
-        for(int i=sccstart; i<=sccend; i++)
-        {
-            int tempvar=SCCs[i];
-            if(var_array[tempvar].inDomain(varvalmatching[tempvar]))
-            {
-                valinlocalmatching.insert(varvalmatching[tempvar]-dom_min);
-                // Check the two matching arrays correspond.
-                //D_ASSERT(valvarmatching[varvalmatching[tempvar]-dom_min]==tempvar);
-            }
-        }
-        
-        /*# initialize greedy matching (redundant, but faster than full search)
-        matching = {}
-        for u in graph:
-            for v in graph[u]:
-                if v not in matching:
-                    matching[v] = u
-                    break
-        */
-        
-        if(valinlocalmatching.size()==localnumvars)
-        {
-            return true;
-        }
-        
-        // uprevious == pred
-        // vprevious == preds
-        
-        // need sets u and v
-        // u is easy, v is union of domains[0..numvar-1]
-        
-        while(true)
-        {
-            /*
-            preds = {}
-            unmatched = []
-            pred = dict([(u,unmatched) for u in graph])
-            for v in matching:
-                del pred[matching[v]]
-            layer = list(pred)
-            */
-            // Set up layer and uprevious.
-            invprevious.clear();
-            unmatched.clear();
-            
-            layer.clear();
-            
-            // Reconstruct varinlocalmatching here.
-            // WHY end up with duplicates in valvarmatching here???????
-            // Because it's left over from a bad state when do_prop was last invoked, and failed.
-            varinlocalmatching.clear();
-            {
-                vector<int>& toiterate=valinlocalmatching.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
-                {
-                    if(!varinlocalmatching.in(valvarmatching[toiterate[i]]))   // This should not be conditional --BUG
-                        varinlocalmatching.insert(valvarmatching[toiterate[i]]);
-                }
-            }
-            
-            for(int i=sccstart; i<=sccend; ++i)
-            {
-                int tempvar=SCCs[i];
-                if(varinlocalmatching.in(tempvar))  // The only use of varinlocalmatching.
-                {
-                    uprevious[tempvar]=-2;   // Out of uprevious
-                }
-                else
-                {
-                    layer.insert(tempvar);
-                    uprevious[tempvar]=-1;  // In layer, and set to unmatched in uprevious.
-                }
-            }
-            
-            /*cout<< "Uprevious:" <<endl;
-            for(int i=0; i<localnumvars; ++i)
-            {
-                cout<< "for variable "<<var_indices[i]<<" value "<< uprevious[i]<<endl;
-            }*/
-            
-            // we have now calculated layer
-            /*
-            while layer and not unmatched:
-                newLayer = {}
-            */
-            
-            while(layer.size()!=0 && unmatched.size()==0)
-            {
-                innewlayer.clear();
-                
-                /*
-                for u in layer:
-                    for v in graph[u]:
-                        if v not in preds:
-                            newLayer.setdefault(v,[]).append(u)
-                */
-                {
-                vector<int>& toiterate=layer.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
-                {
-                    //cout<<"Layer item: "<<(*setit)<<endl;
-                    int tempvar=toiterate[i];
-                    for(DomainInt realval=var_array[tempvar].getMin(); realval<=var_array[tempvar].getMax(); realval++)
-                    {
-                        if(var_array[tempvar].inDomain(realval))
-                        {
-                            int tempval=realval-dom_min;
-                            
-                            if(!invprevious.in(tempval))  // if tempval not found in vprevious
-                            {
-                                if(!innewlayer.in(tempval))
-                                {
-                                    innewlayer.insert(tempval);
-                                    newlayer[tempval].clear();
-                                }
-                                newlayer[tempval].push_back(tempvar);
-                            }
-                        }
-                    }
-                }
-                }
-                /*
-                layer = []
-                for v in newLayer:
-                    preds[v] = newLayer[v]
-                    if v in matching:
-                        layer.append(matching[v])
-                        pred[matching[v]] = v
-                    else:
-                        unmatched.append(v)
-                */
-                
-                layer.clear();
-                
-                /*cout<<"Local matching state:"<<endl;
-                {
-                vector<int>& toiterate = valinlocalmatching.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
-                {
-                    int temp=toiterate[i];
-                    D_ASSERT(varinlocalmatching.in(localmatching[temp]));
-                    cout << "mapping "<< localmatching[temp] << " to value " << temp <<endl; 
-                }
-                }*/
-                
-                {
-                vector<int>& toiterate = innewlayer.getlist();
-                for(int i=0; i<toiterate.size(); ++i)
-                {
-                    int tempval = toiterate[i]; // for v in newlayer.
-                    //cout << "Looping for value "<< tempval <<endl;
-                    
-                    D_ASSERT(innewlayer.in(tempval));
-                    // insert mapping in vprevious
-                    invprevious.insert(tempval);
-                    
-                    vprevious[tempval]=newlayer[tempval];  // This should be a copy???
-                    /*vprevious[tempval].resize(newlayer[tempval].size());
-                    for(int x=0; x<newlayer[tempval].size(); x++)
-                    {
-                        vprevious[tempval][x]=newlayer[tempval][x];
-                    }*/
-                    
-                    if(valinlocalmatching.in(tempval))
-                    {
-                        int match=valvarmatching[tempval];
-                        //cout << "Matched to variable:" << match << endl;
-                        layer.insert(match);
-                        uprevious[match]=tempval;
-                    }
-                    else
-                    {
-                        //cout<<"inserting value into unmatched:"<<tempval<<endl;
-                        unmatched.insert(tempval);
-                    }
-                }
-                }
-                
-                //cout << "At end of layering loop." << endl;
-            }
-            //cout << "Out of layering loop."<<endl;
-            // did we finish layering without finding any alternating paths?
-            // we do not need to calculate unlayered here.
-            /*
-            # did we finish layering without finding any alternating paths?
-            if not unmatched:
-                unlayered = {}
-                for u in graph:
-                    for v in graph[u]:
-                        if v not in preds:
-                            unlayered[v] = None
-                return (matching,list(pred),list(unlayered))
-            */
-            //cout << "Unmatched size:" << unmatched.size() << endl;
-            if(unmatched.size()==0)
-            {
-                //cout << "Size of matching:" << valinlocalmatching.size() << endl;
-                
-                if(valinlocalmatching.size()==localnumvars)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            
-            /*
-            for v in unmatched: recurse(v)
-            */
-            {
-            vector<int>& toiterate=unmatched.getlist();
-            for(int i=0; i<toiterate.size(); ++i)
-            {
-                int tempval=toiterate[i];
-                //cout<<"unmatched value:"<<tempval<<endl;
-                recurse(tempval);
-                //cout <<"Returned from recursion."<<endl;
-            }
-            }
-        }
-        return false;
-    }
-    
-    
-    bool recurse(int val)
-    {
-        // Again values are val-dom_min in this function.
-        // Clearly this should be turned into a loop.
-        //cout << "Entering recurse with value " <<val <<endl;
-        if(invprevious.in(val))
-        {
-            vector<int>& listvars=vprevious[val];  //L
-            
-            // Remove the value from vprevious.
-            invprevious.remove(val);
-            
-            for(int i=0; i<listvars.size(); ++i)  //for u in L
-            {
-                int tempvar=listvars[i];
-                int pu=uprevious[tempvar];
-                if(pu!=-2)   // if u in pred:
-                {
-                    uprevious[tempvar]=-2;
-                    //cout<<"Variable: "<<tempvar<<endl;
-                    if(pu==-1 || recurse(pu))
-                    {
-                        //cout << "Setting "<< tempvar << " to " << val <<endl;
-                        
-                        if(!valinlocalmatching.in(val))  // If we are not replacing a mapping
-                        {
-                            valinlocalmatching.insert(val);
-                        }
-                        
-                        valvarmatching[val]=tempvar;
-                        //varvalmatching[tempvar]=val+dom_min;  // This will be 
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        #endif
     }
     
     // BFS alternative to hopcroft. --------------------------------------------
     
-    inline bool bfs_wrapper(int sccstart, int sccend)
+    inline bool bfs_wrapper(SysInt sccstart, SysInt sccend)
     {
         // Call hopcroft for the whole matching.
         if(!bfsmatching(sccstart, sccend))
@@ -2111,21 +1685,21 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         return true;
     }
     
-    deque<int> fifo;
-    vector<int> prev;
-    vector<int> matchbac;
+    deque<SysInt> fifo;
+    vector<SysInt> prev;
+    vector<SysInt> matchbac;
     // use push_back to push, front() and pop_front() to pop.
     
     //Also use invprevious to record which values are matched.
     // (recording val-dom_min)
     
-    inline bool bfsmatching(int sccstart, int sccend)
+    inline bool bfsmatching(SysInt sccstart, SysInt sccend)
     {
         // construct the set of matched values.
         invprevious.clear();
-        for(int sccindex=sccstart; sccindex<=sccend; sccindex++)
+        for(SysInt sccindex=sccstart; sccindex<=sccend; sccindex++)
         {
-            int var=SCCs[sccindex];
+            SysInt var=SCCs[sccindex];
             if(var_array[var].inDomain(varvalmatching[var]))
             {
                 invprevious.insert(varvalmatching[var]-dom_min);
@@ -2136,9 +1710,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         matchbac=varvalmatching;
         
         // iterate through the SCC looking for broken matches
-        for(int sccindex=sccstart; sccindex<=sccend; sccindex++)
+        for(SysInt sccindex=sccstart; sccindex<=sccend; sccindex++)
         {
-            int startvar=SCCs[sccindex];
+            SysInt startvar=SCCs[sccindex];
             if(!var_array[startvar].inDomain(varvalmatching[startvar]))
             {
                 P("Searching for augmenting path for var: " << startvar);
@@ -2151,34 +1725,34 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 while(!fifo.empty() && !finished)
                 {
                     // pop a vertex and expand it.
-                    int curnode=fifo.front();
+                    SysInt curnode=fifo.front();
                     fifo.pop_front();
                     P("Popped vertex " << (curnode<numvars? "(var)":"(val)") << (curnode<numvars? curnode : curnode+dom_min-numvars ));
                     if(curnode<numvars)
                     { // it's a variable
                         // put all corresponding values in the fifo. 
                         // Need to check if we are completing an even alternating path.
-                        #ifndef INCGRAPH
-                        for(int val=var_array[curnode].getMin(); val<=var_array[curnode].getMax(); val++)
+                        #if !UseIncGraph
+                        for(DomainInt val=var_array[curnode].getMin(); val<=var_array[curnode].getMax(); val++)
                         {
                         #else
-                        for(int vali=0; vali<adjlistlength[curnode]; vali++)
+                        for(SysInt vali=0; vali<adjlistlength[curnode]; vali++)
                         {
-                            int val=adjlist[curnode][vali];
+                            SysInt val=adjlist[curnode][vali];
                         #endif
                             if(val!=varvalmatching[curnode]
-                            #ifndef INCGRAPH
+                            #if !UseIncGraph
                                 && var_array[curnode].inDomain(val)
                             #endif
                                 )
                             {
-                                if(!invprevious.in(val-dom_min))
+                                if(!invprevious.in(checked_cast<SysInt>(val-dom_min)))
                                 {
                                     // This vertex completes an even alternating path. 
                                     // Unwind and apply the path here
                                     P("Found augmenting path:");
-                                    int unwindvar=curnode;
-                                    int unwindval=val;
+                                    SysInt unwindvar=curnode;
+                                    DomainInt unwindval=val;
                                     P("unwindvar: "<< unwindvar<<"unwindval: "<< unwindval );
                                     while(true)
                                     {
@@ -2186,7 +1760,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                         D_ASSERT(var_array[unwindvar].inDomain(unwindval));
                                         D_ASSERT(varvalmatching[unwindvar]!=unwindval);
                                         
-                                        varvalmatching[unwindvar]=unwindval;
+                                        varvalmatching[unwindvar]=checked_cast<SysInt>(unwindval);
                                         P("Setting var "<< unwindvar << " to "<< unwindval);
                                         
                                         if(unwindvar==startvar)
@@ -2195,12 +1769,12 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                         }
                                         
                                         unwindval=prev[unwindvar];
-                                        unwindvar=prev[unwindval-dom_min+numvars];
+                                        unwindvar=prev[checked_cast<SysInt>(unwindval-dom_min+numvars)];
                                     }
                                     
                                     #ifdef PLONG
                                     cout << "varvalmatching:";
-                                    for(int sccindex=sccstart; sccindex<=sccend; sccindex++)
+                                    for(SysInt sccindex=sccstart; sccindex<=sccend; sccindex++)
                                     {
                                         if(var_array[SCCs[sccindex]].inDomain(varvalmatching[SCCs[sccindex]]))
                                             cout << SCCs[sccindex] << "->" << varvalmatching[SCCs[sccindex]] << ", ";
@@ -2209,9 +1783,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                     #endif
                                     
                                     invprevious.clear();  // THIS SHOULD BE CHANGED -- RECOMPUTING THIS EVERY TIME IS STUPID.
-                                    for(int sccindex=sccstart; sccindex<=sccend; sccindex++)
+                                    for(SysInt sccindex=sccstart; sccindex<=sccend; sccindex++)
                                     {
-                                        int var=SCCs[sccindex];
+                                        SysInt var=SCCs[sccindex];
                                         if(var_array[var].inDomain(varvalmatching[var]))
                                         {
                                             invprevious.insert(varvalmatching[var]-dom_min);
@@ -2226,8 +1800,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                     if(!visited.in(val-dom_min+numvars))
                                     {
                                         visited.insert(val-dom_min+numvars);
-                                        prev[val-dom_min+numvars]=curnode;
-                                        fifo.push_back(val-dom_min+numvars);
+                                        prev[checked_cast<SysInt>(val-dom_min+numvars)]=curnode;
+                                        fifo.push_back(checked_cast<SysInt>(val-dom_min+numvars));
                                     }
                                 }
                             }
@@ -2236,20 +1810,20 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                     else
                     { // popped a value from the stack. Follow the edge in the matching.
                         D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
-                        int stackval=curnode+dom_min-numvars;
-                        int vartoqueue=-1;
+                        DomainInt stackval=curnode+dom_min-numvars;
+                        SysInt vartoqueue=-1;
                         D_DATA(bool found=false);
-                        #ifndef INCGRAPH
-                        for(int scci=sccstart; scci<=sccend; scci++)
+                        #if !UseIncGraph
+                        for(SysInt scci=sccstart; scci<=sccend; scci++)
                         {
                             vartoqueue=SCCs[scci];
                         #else
-                        for(int vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
+                        for(SysInt vartoqueuei=0; vartoqueuei<adjlistlength[curnode]; vartoqueuei++)
                         {
                             vartoqueue=adjlist[curnode][vartoqueuei];
                         #endif
                             if(varvalmatching[vartoqueue]==stackval
-                                #ifndef INCGRAPH
+                                #if !UseIncGraph
                                 && var_array[vartoqueue].inDomain(stackval)
                                 #endif
                                 )
@@ -2262,7 +1836,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                         if(!visited.in(vartoqueue)) // I think it's impossible for this test to be false.
                         {
                             visited.insert(vartoqueue);
-                            prev[vartoqueue]=stackval;
+                            prev[checked_cast<SysInt>(vartoqueue)]=checked_cast<SysInt>(stackval);
                             fifo.push_back(vartoqueue);
                         }
                     }

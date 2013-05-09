@@ -40,31 +40,33 @@ struct StateObj
   void operator=(const StateObj&);
   
   Memory* searchMem_m;
-  SearchOptions* options_m;
-  SearchState state_m;
-  Queues* queues_m;
-  TriggerMem* triggerMem_m;
   VariableContainer* varContainer_m;
   BoolContainer* backtrack_bools; 
+  SearchOptions* options_m;
+  SearchState* state_m;
+  Queues* queues_m;
+  TriggerMem* triggerMem_m;
+
 public:
 
   StateObj() :
     searchMem_m(new Memory),
-    options_m(new SearchOptions),
-    state_m(this),
-    queues_m(new Queues(this)),
-    triggerMem_m(new TriggerMem(this)),
     varContainer_m(new VariableContainer(this)),
-    backtrack_bools(new BoolContainer(this))
+    backtrack_bools(new BoolContainer(this)),
+    options_m(new SearchOptions),
+    state_m(new SearchState(this)),
+    queues_m(new Queues(this)),
+    triggerMem_m(new TriggerMem(this))
   { }
 
   ~StateObj()
   { 
-    delete backtrack_bools;
-    delete varContainer_m;
     delete triggerMem_m;
     delete queues_m;
+    delete state_m;
     delete options_m;
+    delete backtrack_bools;
+    delete varContainer_m;
     delete searchMem_m;   
   }
 };
@@ -83,7 +85,7 @@ inline BoolContainer& getBools(StateObj* stateObj)
 inline SearchOptions& getOptions(StateObj* stateObj)
 { return *(stateObj->options_m); }
 inline SearchState& getState(StateObj* stateObj)
-{ return stateObj->state_m; }
+{ return *(stateObj->state_m); }
 inline Queues& getQueue(StateObj* stateObj)
 { return *(stateObj->queues_m); }
 inline Memory& getMemory(StateObj* stateObj)
@@ -154,12 +156,8 @@ inline BigRangeVarContainer<d_type>& BigRangeVarRef_internal_template<d_type>::g
 // Must be defined later.
 inline SearchState::~SearchState()
 { 
-  for(int i = 0; i < constraints.size(); ++i)
+  for(SysInt i = 0; i < constraints.size(); ++i)
     delete constraints[i];
-#ifdef DYNAMICTRIGGERS
-  for(int i = 0; i < dynamic_constraints.size(); ++i)
-    delete dynamic_constraints[i];
-#endif
 }
 
 

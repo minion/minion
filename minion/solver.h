@@ -26,6 +26,8 @@
 
 #include "StateObj_forward.h"
 
+#include "memory_management/GenericBacktracker.h"
+
 // Some advanced definitions, we don't actually need to know anything about these
 // types for SearchState, simply that they exist.
 class AbstractConstraint;
@@ -42,8 +44,10 @@ class SearchState
   StateObj* stateObj;
   unsigned long long nodes;
   AnyVarRef* optimise_var;
+  AnyVarRef* raw_optimise_var;
   DomainInt current_optimise_position;
   bool optimise;
+  bool maximise;
   
   // The variables to print when a solution is found.
   vector<vector<AnyVarRef> > print_matrix;
@@ -51,10 +55,6 @@ class SearchState
   vector<AbstractConstraint*> constraints;
   
   vector<set<AbstractConstraint*> > constraints_to_propagate;
-  
-#ifdef DYNAMICTRIGGERS
-  vector<AbstractConstraint*> dynamic_constraints;
-#endif
   
   long long int solutions;
   
@@ -69,18 +69,26 @@ class SearchState
   
   TimerClass oldtimer;
   
-  shared_ptr<TupleListContainer> tupleListContainer;
+  minion_shared_ptr<TupleListContainer> tupleListContainer;
+  minion_shared_ptr<ShortTupleListContainer> shortTupleListContainer;
 
   bool is_locked;
   
   volatile bool alarm_trigger;
   
   volatile bool ctrl_c_pressed;
-    
+  
+  GenericBacktracker generic_backtracker;
 public:
 
+  std::string storedSolution;
+  
   vector<vector<AnyVarRef> >& getPrintMatrix()
   { return print_matrix; }
+  
+  GenericBacktracker& getGenericBacktracker() {
+      return generic_backtracker;
+  }
   
   ProbSpec::CSPInstance* getInstance() { return csp_instance; }
    
@@ -95,13 +103,19 @@ public:
   
   AnyVarRef* getOptimiseVar() { return optimise_var; }
   void setOptimiseVar(AnyVarRef* _var) { optimise_var = _var; }
+
+  AnyVarRef* getRawOptimiseVar() { return raw_optimise_var; }
+  void setRawOptimiseVar(AnyVarRef* _var) { raw_optimise_var = _var; }
   
   DomainInt getOptimiseValue() { return current_optimise_position; }
   void setOptimiseValue(DomainInt optimise_pos) { current_optimise_position = optimise_pos; }
-  
+
   bool isOptimisationProblem() { return optimise; }
   void setOptimisationProblem(bool _optimise) { optimise = _optimise; }
   
+  bool isMaximise() { return maximise; }
+  void setMaximise(bool _maximise) { maximise = _maximise; }
+
   void addConstraint(AbstractConstraint* c);
   vector<AbstractConstraint*>& getConstraintList() { return constraints; }
   
@@ -133,11 +147,16 @@ public:
   jmp_buf* getJmpBufPtr() { return &g_env; }
   
   TupleListContainer* getTupleListContainer() { return &*tupleListContainer; }
+  ShortTupleListContainer* getShortTupleListContainer() { return &*shortTupleListContainer; }
   
-  void setTupleListContainer(shared_ptr<TupleListContainer> _tupleList) 
+  void setTupleListContainer(minion_shared_ptr<TupleListContainer> _tupleList) 
   { tupleListContainer = _tupleList; }
+
+  void setShortTupleListContainer(minion_shared_ptr<ShortTupleListContainer> _tupleList) 
+  { shortTupleListContainer = _tupleList; }
                           
   SearchState(StateObj* _stateObj) : stateObj(_stateObj), nodes(0), optimise_var(NULL), 
+    raw_optimise_var(NULL),
     current_optimise_position(0), optimise(false), constraints_to_propagate(1),
     solutions(0), dynamic_triggers_used(false), finished(false), failed(false), 
     is_locked(false), alarm_trigger(false), ctrl_c_pressed(false)
@@ -158,7 +177,7 @@ public:
   void clearAlarm()
   { alarm_trigger = false; }  
   
-  void setupAlarm(bool alarm_active, int timeout, bool CPU_time)
+  void setupAlarm(bool alarm_active, SysInt timeout, bool CPU_time)
   { activate_trigger(&alarm_trigger, alarm_active, timeout, CPU_time);}
   
   bool isCtrlcPressed()
@@ -186,7 +205,10 @@ public:
   
   /// Denotes if minion should print no output, other than that explicitally requested
   bool silent;
-  
+
+  /// Denotes if minion prints only the optimal solution for optimisation problems.
+  bool printonlyoptimal;
+
   /// Denotes if the search tree should be printed.
   bool dumptree;
   /// Gives the solutions which should be found. 
@@ -239,22 +261,34 @@ public:
   bool graph;
   bool instance_stats;
 
-  //do we resume from a previous run and, if so, what file
-  bool resume;
-  string resume_file;
-
   // Do not write a resume file.
   bool noresumefile;
 
+  // split search tree in half on time out
+  bool split;
+
   // The format of output used (-1 for default)
-  int outputType;
+  SysInt outputType;
   
+  /// Output a compressed file
+  string outputCompressed;
+  
+  /// output a compressed list of domains
+  bool outputCompressedDomains;
+
   /// Disable the use of linux timers
   bool noTimers;
   
+  SysInt Xvarmunge;
+  SysInt Xsymmunge;
+
+  // How (if at all) to autogenerate short tuples from long ones.
+  MapLongTuplesToShort map_long_short;
+
   SearchOptions() : 
     wdeg_on(false), find_generators(false), 
-    cspcomp(false), silent(false), dumptree(false), sollimit(1), fullpropagate(false), 
+    cspcomp(false), silent(false), printonlyoptimal(false),
+     dumptree(false), sollimit(1), fullpropagate(false), 
 #ifdef NO_DEBUG
     nocheck(true),
 #else
@@ -265,8 +299,9 @@ public:
     time_limit_is_CPU_time(false),
     randomise_valvarorder(false), parser_verbose(false), 
     redump(false), graph(false), instance_stats(false), 
-    resume(false), noresumefile(false),
-    outputType(-1), noTimers(false)
+    noresumefile(true), split(false),
+    outputType(-1), outputCompressedDomains(false), noTimers(false),
+    Xvarmunge(-1), Xsymmunge(-1), map_long_short(MLTTS_NoMap)
   {}
   
   /// Denotes all solutions should be found, by setting sollimit to -1.

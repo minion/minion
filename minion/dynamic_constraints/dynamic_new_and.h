@@ -53,8 +53,8 @@ of another constraint, for example in a reification:
 #undef P
 #endif
 
-#define P(x) cout << x << endl
-//#define P(x)
+//#define P(x) cout << x << endl
+#define P(x)
 
 // Similar to watched or, but has no watching phase, just propagates all
 // the time, and propagates all constraints of course.
@@ -63,47 +63,50 @@ of another constraint, for example in a reification:
 struct Dynamic_AND : public ParentConstraint
 {
   virtual string constraint_name()
-    { return "Dynamic AND:"; }
+  { return "watched-and"; }
 
+  CONSTRAINT_ARG_LIST1(child_constraints);
     
-  Reversible<bool> full_propagate_called;
   bool constraint_locked;
-  
+  SysInt propagated_to;
   Dynamic_AND(StateObj* _stateObj, vector<AbstractConstraint*> _con) : 
-    ParentConstraint(_stateObj, _con), full_propagate_called(_stateObj, false), constraint_locked(false)
+    ParentConstraint(_stateObj, _con), constraint_locked(false)
     { }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    for(int i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < child_constraints.size(); ++i)
     {
-      if(! child_constraints[i]->check_assignment(v + start_of_constraint[i],
+      if(! child_constraints[i]->check_assignment(v + checked_cast<SysInt>(start_of_constraint[i]),
          child_constraints[i]->get_vars_singleton()->size()))
          return false;
     }
     return true;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
       // get all satisfying assignments of child constraints and stick
       // them together. Even if they contradict each other.
-      typedef pair<int,DomainInt> temptype;
+      typedef pair<SysInt, DomainInt> temptype;
       MAKE_STACK_BOX(localassignment, temptype, assignment.capacity());
-      
-      for(int i=0; i<child_constraints.size(); ++i)
+      P("GetSat for And");
+      for(SysInt i=0; i<child_constraints.size(); ++i)
       {
           localassignment.clear();
           bool flag=child_constraints[i]->get_satisfying_assignment(localassignment);
           if(!flag)
           {
+              assignment.clear();
               return false;
           }
-          
-          for(int j=0; j<localassignment.size(); j++)
+          P(localassignment[0] << ":" << localassignment[1]);
+          for(SysInt j=0; j<localassignment.size(); j++)
           {
-              assignment.push_back(make_pair(localassignment[j].first+start_of_constraint[i],
+              assignment.push_back(make_pair(checked_cast<SysInt>(localassignment[j].first+start_of_constraint[i]),
                   localassignment[j].second));
+              D_ASSERT((*(this->get_vars_singleton()))[checked_cast<SysInt>(localassignment[j].first+start_of_constraint[i])].inDomain(localassignment[j].second));
+              D_ASSERT((*(child_constraints[i]->get_vars_singleton()))[checked_cast<SysInt>(localassignment[j].first)].inDomain(localassignment[j].second));
           }
       }
       return true;
@@ -112,7 +115,7 @@ struct Dynamic_AND : public ParentConstraint
   virtual vector<AnyVarRef> get_vars()
   { 
     vector<AnyVarRef> vecs;
-    for(int i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < child_constraints.size(); ++i)
     {
       vector<AnyVarRef>* var_ptr = child_constraints[i]->get_vars_singleton(); 
       vecs.insert(vecs.end(), var_ptr->begin(), var_ptr->end());
@@ -120,7 +123,7 @@ struct Dynamic_AND : public ParentConstraint
     return vecs;
   }
   
-  virtual int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
   { 
     return 0;
   }
@@ -128,13 +131,21 @@ struct Dynamic_AND : public ParentConstraint
   virtual void special_check()
   {
     D_ASSERT(constraint_locked);
-    constraint_locked = false;
     P("Full propagating all constraints in AND");
-    for(int i=0; i<child_constraints.size(); i++)
+    if(child_constraints.size() == 0)
     {
-        child_constraints[i]->full_propagate();
+      constraint_locked = false;
+      return;
     }
-    full_propagate_called = true;
+
+    child_constraints[propagated_to]->full_propagate();
+    propagated_to++;
+    if(propagated_to != child_constraints.size())
+      getQueue(stateObj).pushSpecialTrigger(this);
+    else
+    {
+       constraint_locked = false;
+    }
   }
 
   virtual void special_unlock()
@@ -143,75 +154,52 @@ struct Dynamic_AND : public ParentConstraint
     constraint_locked = false;
   }
   
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i, DomainDelta domain)
   {
     //PROP_INFO_ADDONE(WatchedOR);
     P("Static propagate start");
-    if(constraint_locked)
-      return;
-
-    if(full_propagate_called)
-    {
-      pair<int,int> childTrigger = getChildStaticTrigger(i);
-      P("Got trigger: " << i << ", maps to: " << childTrigger.first << "." << childTrigger.second);
-      P("Passing trigger" << childTrigger.second << "on");
-      child_constraints[childTrigger.first]->propagate(childTrigger.second, domain);
-    }
-    else
-    {
-        // add to the special queue so it can be full_propagated later.
-        constraint_locked = true;
-        getQueue(stateObj).pushSpecialTrigger(this);
-    }
+    pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
+    P("Got trigger: " << i << ", maps to: " << childTrigger.first << "." << childTrigger.second);
+    P("Passing trigger " << childTrigger.second << " on");
+    if(!constraint_locked || childTrigger.first < propagated_to)
+    child_constraints[checked_cast<SysInt>(childTrigger.first)]->propagate(childTrigger.second, domain);
   }
   
   virtual void propagate(DynamicTrigger* trig)
   {
     //PROP_INFO_ADDONE(WatchedOr);
     P("Prop");
-    P("FullProp: " << (bool)full_propagate_called);
     P("Locked:" << constraint_locked);
-    if(constraint_locked)
-      return;
-    
-      if(!full_propagate_called)
-      {
-          // how did we get here?
-          constraint_locked = true;
-            getQueue(stateObj).pushSpecialTrigger(this);
-            return;
-      }
-  
     // pass the trigger down
     P("Propagating child");
     // need to know which child to prop.
-    int child = getChildDynamicTrigger(trig);
+    SysInt child = getChildDynamicTrigger(trig);
+    if(!constraint_locked || child < propagated_to)
     child_constraints[child]->propagate(trig);
   }
   
   virtual void full_propagate()
   {
-    P("Full Propagate");
-    
+    P("AND Full Propagate");
     // push it on the special queue to be full_propagated later.
     D_ASSERT(!constraint_locked);
     constraint_locked = true;
+    propagated_to = 0;
     getQueue(stateObj).pushSpecialTrigger(this);
   }
   
-  // This breaks everything.
-  //virtual AbstractConstraint* reverse_constraint();
+  virtual AbstractConstraint* reverse_constraint();
 };
 
-//#include "dynamic_new_or.h"
+#include "dynamic_new_or.h"
 
-/*virtual AbstractConstraint* Dynamic_AND::reverse_constraint()
+inline AbstractConstraint* Dynamic_AND::reverse_constraint()
 { // OR of the reverse of all the child constraints..
   vector<AbstractConstraint*> con;
-  for(int i=0; i<child_constraints.size(); i++)
+  for(SysInt i=0; i<child_constraints.size(); i++)
   {
       con.push_back(child_constraints[i]->reverse_constraint());
   }
   return new Dynamic_OR(stateObj, con);
-}*/
+}
 #endif

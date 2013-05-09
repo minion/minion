@@ -30,26 +30,27 @@
 
 #ifndef LINKED_PTR_H
 #define LINKED_PTR_H
-template <class X> class shared_ptr
+
+template <class X> class minion_shared_ptr
 {
 public:
 
 
 #define TEMPLATE_FUNCTION template <class Y>  
-TEMPLATE_FUNCTION friend class shared_ptr;
+TEMPLATE_FUNCTION friend class minion_shared_ptr;
 
   typedef X element_type;
-  explicit shared_ptr(X* p = 0) throw()
+  explicit minion_shared_ptr(X* p = 0) throw()
         : itsPtr(p) {itsPrev = itsNext = this;}
         
         
-    ~shared_ptr()
+    ~minion_shared_ptr()
         {release();}
 
-    shared_ptr(const shared_ptr& r) throw()
+    minion_shared_ptr(const minion_shared_ptr& r) throw()
         {acquire(r);}
 
-    shared_ptr& operator=(const shared_ptr& r)
+    minion_shared_ptr& operator=(const minion_shared_ptr& r)
 
     {
         if (this != &r) {
@@ -61,13 +62,13 @@ TEMPLATE_FUNCTION friend class shared_ptr;
 
 
 #ifdef PRIV
-    template <class Y> friend class shared_ptr;
+    template <class Y> friend class minion_shared_ptr;
 #endif
 
-    template <class Y> shared_ptr(const shared_ptr<Y>& r) throw()
+    template <class Y> minion_shared_ptr(const minion_shared_ptr<Y>& r) throw()
         {acquire(r);}
 
-    template <class Y> shared_ptr& operator=(const shared_ptr<Y>& r)
+    template <class Y> minion_shared_ptr& operator=(const minion_shared_ptr<Y>& r)
     {
         if (this != &r) {
             release();
@@ -86,10 +87,10 @@ private:
 #endif
 
     X*                          itsPtr;
-    mutable const shared_ptr*   itsPrev;
-    mutable const shared_ptr*   itsNext;
+    mutable const minion_shared_ptr*   itsPrev;
+    mutable const minion_shared_ptr*   itsNext;
 
-    void acquire(const shared_ptr& r) throw()
+    void acquire(const minion_shared_ptr& r) throw()
 
     { // insert this to the list
         itsPtr = r.itsPtr;
@@ -101,7 +102,7 @@ private:
 
 
 
-    template <class Y> void acquire(const shared_ptr<Y>& r) throw()
+    template <class Y> void acquire(const minion_shared_ptr<Y>& r) throw()
     { // insert this to the list
         itsPtr = r.itsPtr;
         itsNext = r.itsNext;
@@ -125,11 +126,11 @@ private:
 };
 
 template<typename T>
-bool operator<(const shared_ptr<T>& lhs, const shared_ptr<T>& rhs)
+bool operator<(const minion_shared_ptr<T>& lhs, const minion_shared_ptr<T>& rhs)
 { return lhs.get() < rhs.get(); }
 
 template<typename T>
-bool operator==(const shared_ptr<T>& lhs, const shared_ptr<T>& rhs)
+bool operator==(const minion_shared_ptr<T>& lhs, const minion_shared_ptr<T>& rhs)
 { return lhs.get() == rhs.get(); }
 
 #endif // LINKED_PTR_H

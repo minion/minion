@@ -20,63 +20,87 @@
 #ifndef _SYS_CONSTANTS_H
 #define _SYS_CONSTANTS_H
 
-#ifdef USE_GMP
-#include <gmpxx.h>
-typedef mpz_class BigInt;
-#else
-typedef long long BigInt;
-#endif
+
+
+
 
 /// A placeholder type.
 struct EmptyType
 {};
 
+//#define DOMAINS64
+
+#ifdef DOMAINS64
+typedef long long BigInt;
+typedef int64_t SysInt;
+typedef uint64_t UnsignedSysInt;
+#else
+typedef long long BigInt;
+typedef int SysInt;
+typedef unsigned int UnsignedSysInt;
+#endif
+
+
+
+#ifdef MINION_DEBUG
+#ifndef BOUNDS_CHECK
+#define BOUNDS_CHECK
+#endif
+#endif
+
+#ifdef BOUNDS_CHECK
+typedef Wrapper<SysInt> DomainInt;
+#else
+typedef SysInt DomainInt;
+#endif
+
+// Put a ' -1, +1 ' just to have some slack
+const DomainInt DomainInt_Max = std::numeric_limits<SysInt>::max() / 2 - 1;
+const DomainInt DomainInt_Min = std::numeric_limits<SysInt>::min() / 2 + 1;
+
 /// A big constant, when such a thing is needed.
-const int big_constant = 999999;
+static const DomainInt DomainInt_Skip = std::numeric_limits<SysInt>::max();
+
+template<typename To, typename From>
+To checked_cast(const From& t)
+{ return static_cast<To>(t); }
+
+template<typename To, typename From>
+To checked_cast(const Wrapper<From>& t)
+{ return static_cast<To>(t.t); }
+
 
 
 /// A constant chosen at compile time.
 /// Create with the notation compiletime_val<6>().
-template<int i>
+template<SysInt i>
 struct compiletime_val
 { 
-  operator int() const
+  operator SysInt() const
 { return i; }
-  
-  compiletime_val<-i-1> negminusone() const
-{ return compiletime_val<-i-1>(); }
-  
-  compiletime_val<-i> neg() const
-{ return compiletime_val<-i>(); }
   
   friend std::ostream& operator<<(std::ostream& o, const compiletime_val& v)
 { return o << "CompiletimeConst:" << i; }
   
 };
 
+template<typename T>
+T const_negminusone(T t)
+{ return -1-t; }
 
-/// A constant chosen at run time.
-/// Create with the notation runtime_val(6).
-struct runtime_val
-{
-  int i;
-  runtime_val(int _i) : i(_i)
-  {}
-  
-  operator int() const
-  { return i; }
-  
-  runtime_val negminusone() const
-  { return runtime_val(-i-1); }
-  
-  template<int j>
-  runtime_val neg() const
-  { return runtime_val(-i); }
-  
-  friend std::ostream& operator<<(std::ostream& o, const runtime_val& v)
-  { return o << v.i; }
+template<SysInt i>
+inline compiletime_val<-i-1> const_negminusone(compiletime_val<i>)
+{ return compiletime_val<-i-1>(); }
 
-};
+template<typename T>
+T const_neg(T t)
+{ return -t; }
+
+template<SysInt i>
+inline compiletime_val<-i> const_neg(compiletime_val<i>)
+{ return compiletime_val<-i>(); }
+
+
 
 template<typename T>
 inline T mymin(T t1, T t2)
@@ -95,29 +119,16 @@ inline T mymax(T t1, T t2)
   else
     return t1;
 }
-#if defined(__CYGWIN__) || defined(_WIN32) 
-typedef int MachineInt;
-#else
-typedef int32_t MachineInt;
-#endif
 
-#ifdef BOUNDS_CHECK
-typedef Wrapper<MachineInt> DomainInt;
-#else
-typedef MachineInt DomainInt;
-#endif
 
-// Put a ' -1, +1 ' just to have some slack
-const DomainInt DomainInt_Max = std::numeric_limits<MachineInt>::max() - 1;
-const DomainInt DomainInt_Min = std::numeric_limits<MachineInt>::min() + 1;
+enum MapLongTuplesToShort
+{
+  MLTTS_NoMap,
+  MLTTS_KeepLong,
+  MLTTS_Eager,
+  MLTTS_Lazy
+};
 
-template<typename To, typename From>
-To checked_cast(const From& t)
-{ return static_cast<To>(t); }
-
-template<typename To, typename From>
-To checked_cast(const Wrapper<From>& t)
-{ return static_cast<To>(t.t); }
 
 
 #endif // _SYS_CONSTANTS_H

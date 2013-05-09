@@ -34,9 +34,9 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   virtual string constraint_name()
     { 
         if(Less)
-            return "QuickLexLessDynamic";
+            return "lexless[quick]";
         else
-            return "QuickLexDynamic"; 
+            return "lexleq[quick]"; 
     }
 
   typedef typename VarArray1::value_type VarRef1;
@@ -45,20 +45,23 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   VarArray1 var_array1;
   VarArray2 var_array2;
 
+  CONSTRAINT_ARG_LIST2(var_array1, var_array2);
 
-  Reversible<int> alpha;
+  Reversible<SysInt> alpha;
 
   QuickLexDynamic(StateObj* _stateObj, const VarArray1& _array1,
     const VarArray2& _array2) :
   AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
     alpha(_stateObj, -1)
-    { D_ASSERT(var_array1.size() == var_array2.size()); }
+    { 
+      CHECK(var_array1.size() == var_array2.size(), "QuickLexLeq and QuickLexLess only work with equal length vectors");
+    }
 
-  int dynamic_trigger_count()
+  virtual SysInt dynamic_trigger_count()
     { return 2; }
 
   
-  void attach_triggers(int i)
+  void attach_triggers(SysInt i)
   {
       P("Attach Trigger: " << i);
       DynamicTrigger* dt = dynamic_trigger_start();
@@ -76,6 +79,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   
   virtual void full_propagate()
   {
+    P("Full Prop");
     DynamicTrigger* dt = dynamic_trigger_start();
 
     if(var_array1.size() == 0)
@@ -87,14 +91,21 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     
     alpha = 0;
     
-    var_array2[0].setMin(var_array1[0].getMin());
-    var_array1[0].setMax(var_array2[0].getMax());
-    
+    if(Less && var_array1.size() == 1)
+    {
+      var_array2[0].setMin(var_array1[0].getMin() + 1);
+      var_array1[0].setMax(var_array2[0].getMax() - 1);
+    }
+    else
+    {
+      var_array2[0].setMin(var_array1[0].getMin());
+      var_array1[0].setMax(var_array2[0].getMax());
+    }
+
     // Set these up, just so they are stored.
     var_array1[0].addDynamicTrigger(dt, LowerBound, NoDomainValue BT_CALL_STORE);
     var_array2[0].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue BT_CALL_STORE);
     
-
     if(var_array1[0].isAssigned() && var_array2[0].isAssigned() &&
        var_array1[0].getAssignedValue() == var_array2[0].getAssignedValue())
     {
@@ -104,8 +115,8 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   
   void progress()
   {
-    int a = alpha;
-    int n = var_array1.size();
+    SysInt a = alpha;
+    SysInt n = var_array1.size();
     D_ASSERT(var_array1[a].isAssigned());
     D_ASSERT(var_array2[a].isAssigned());
     D_ASSERT(var_array1[a].getAssignedValue() == var_array2[a].getAssignedValue());
@@ -114,8 +125,17 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     
     while(a < n)
     {
-      var_array1[a].setMax(var_array2[a].getMax());
-      var_array2[a].setMin(var_array1[a].getMin());
+      if(Less && a >= n-1)
+      {
+         var_array2[a].setMin(var_array1[a].getMin() + 1);
+         var_array1[a].setMax(var_array2[a].getMax() - 1);
+      }
+      else
+      {
+         var_array1[a].setMax(var_array2[a].getMax());
+         var_array2[a].setMin(var_array1[a].getMin());
+      }
+
       if(var_array1[a].isAssigned() && var_array2[a].isAssigned() &&
          var_array1[a].getAssignedValue() == var_array2[a].getAssignedValue())
          {
@@ -142,17 +162,23 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   {
     DynamicTrigger* base_dt = dynamic_trigger_start();
     
-    P("Trigger Event:" << dt - base_dt << " alpha:" << (int)alpha);
+    P("Trigger Event:" << dt - base_dt << " alpha:" << (SysInt)alpha);
 
-    int a = alpha;
+    SysInt a = alpha;
 
     if(base_dt == dt)
     { // X triggered
-      var_array2[a].setMin(var_array1[a].getMin());
+      if(Less && a >= var_array1.size() - 1)
+        var_array2[a].setMin(var_array1[a].getMin() + 1);
+      else
+        var_array2[a].setMin(var_array1[a].getMin());
     }
     else
     { // Y triggered
-      var_array1[a].setMax(var_array2[a].getMax());
+      if(Less && a >= var_array1.size() - 1)
+        var_array1[a].setMax(var_array2[a].getMax() - 1);
+      else
+        var_array1[a].setMax(var_array2[a].getMax());
     }
 
     if(var_array1[a].isAssigned() && var_array2[a].isAssigned() &&
@@ -167,12 +193,12 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array1.size() + var_array2.size());
     size_t x_size = var_array1.size();
 
-    P("Check Assignment: " << (int)alpha);
+    P("Check Assignment: " << (SysInt)alpha);
     for(size_t i = 0;i < x_size; i++)
     {
       if(v[i] < v[i + x_size])
@@ -184,7 +210,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     return !Less;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
     {
       size_t array_size = var_array1.size();
       for(size_t i = 0; i < array_size; ++i)
@@ -215,9 +241,9 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   { 
     vector<AnyVarRef> vars;
     vars.reserve(var_array1.size() + var_array2.size());
-    for(unsigned i = 0; i < var_array1.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
       vars.push_back(AnyVarRef(var_array1[i]));
-    for(unsigned i = 0; i < var_array2.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array2.size(); ++i)
       vars.push_back(AnyVarRef(var_array2[i]));
     return vars;  
   }

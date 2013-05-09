@@ -32,20 +32,20 @@ struct GadgetConstraint : public AbstractConstraint
   
   vector<AnyVarRef> construction_vars;
   
-  shared_ptr<CSPInstance> gadget_instance;
+  minion_shared_ptr<CSPInstance> gadget_instance;
   StateObj* gadget_stateObj;
   PropagationLevel gadget_prop_type;
   
   bool constraint_locked;
   
-  GadgetConstraint(StateObj* _stateObj, const VarArray& _vars, shared_ptr<CSPInstance> _gadget, PropagationLevel _proptype) : 
+  GadgetConstraint(StateObj* _stateObj, const VarArray& _vars, minion_shared_ptr<CSPInstance> _gadget, PropagationLevel _proptype) : 
   AbstractConstraint(_stateObj), var_array(_vars), gadget_instance(_gadget),
   gadget_stateObj(new StateObj), gadget_prop_type(_proptype), 
   constraint_locked(false)
   { 
     BuildCSP(gadget_stateObj, *gadget_instance); 
     construction_vars.reserve(gadget_instance->constructionSite.size());
-    for(int i = 0; i < gadget_instance->constructionSite.size(); ++i)
+    for(SysInt i = 0; i < gadget_instance->constructionSite.size(); ++i)
       construction_vars.push_back(get_AnyVarRef_from_Var(gadget_stateObj, gadget_instance->constructionSite[i]));
     if(construction_vars.size() != var_array.size())
       INPUT_ERROR("Gadgets construction site is incorrect size");
@@ -63,12 +63,12 @@ struct GadgetConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
       t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
     return t;
   }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   { 
     cout << "Gadget Assignment:" << v << endl;
     return true;
@@ -78,7 +78,7 @@ struct GadgetConstraint : public AbstractConstraint
   {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
-    for(unsigned i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(var_array[i]);
     return vars;
   }
@@ -96,7 +96,7 @@ struct GadgetConstraint : public AbstractConstraint
     constraint_locked = false;
   }
   
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(Gadget);
     if(constraint_locked)
@@ -121,14 +121,14 @@ struct GadgetConstraint : public AbstractConstraint
     D_ASSERT(!getState(gadget_stateObj).isFailed());
     Controller::world_push(gadget_stateObj);
     
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       DomainInt min_val = var_array[i].getMin();
       DomainInt max_val = var_array[i].getMax();
       construction_vars[i].setMin(min_val);
       construction_vars[i].setMax(max_val);
       
-      for(int j = min_val + 1; j < max_val; ++j)
+      for(SysInt j = min_val + 1; j < max_val; ++j)
         if(!var_array[i].inDomain(j))
           construction_vars[i].removeFromDomain(j);
     }
@@ -143,14 +143,14 @@ struct GadgetConstraint : public AbstractConstraint
       return;
     }
         
-    for(int i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < var_array.size(); ++i)
     {
       DomainInt min_val = construction_vars[i].getMin();
       DomainInt max_val = construction_vars[i].getMax();
       var_array[i].setMin(min_val);
       var_array[i].setMax(max_val);
       
-      for(int j = min_val + 1; j < max_val; ++j)
+      for(SysInt j = min_val + 1; j < max_val; ++j)
       {
         if(!construction_vars[i].inDomain(j))
         { 

@@ -47,14 +47,14 @@ public:
     
   
   /// Wraps request_bytes of the internal \ref NewMemoryBlock.
-  MoveablePointer request_bytes(unsigned byte_count)
+  void* request_bytes(UnsignedSysInt byte_count)
   { 
     return new_memory_block.request_bytes(byte_count); 
   }
   
   /// Wraps requestArray of the internal \ref NewMemoryBlock.
   template<typename T>
-  MoveableArray<T> requestArray(unsigned size)
+  T* requestArray(UnsignedSysInt size)
   { 
     return new_memory_block.requestArray<T>(size);
   }
@@ -66,7 +66,7 @@ public:
   /// Copies the current state of backtrackable memory.
   void world_push()
   {
-    unsigned data_size = new_memory_block.getDataSize();
+    UnsignedSysInt data_size = new_memory_block.getDataSize();
     char *tmp = (char *) block_cache.do_malloc(data_size);//calloc(data_size, sizeof(char));
 
     new_memory_block.storeMem(tmp);
@@ -84,12 +84,12 @@ public:
   }
   
   /// Returns the current number of stored copies of the state.
-  int current_depth()
+  SysInt current_depth()
   { return backtrack_data.size(); }
 
   ~BackTrackMemory()
   {
-    for(int i = 0; i < backtrack_data.size(); ++i)
+    for(SysInt i = 0; i < backtrack_data.size(); ++i)
       block_cache.do_free(backtrack_data[i].first);
   }
 };

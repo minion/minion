@@ -39,19 +39,31 @@ positive numbers.
 #ifndef CONSTRAINT_PRODUCT_H
 #define CONSTRAINT_PRODUCT_H
 
+#include "../constraints/constraint_checkassign.h"
+
 /// var1 * var2 = var3
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 struct ProductConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
-  { return "Product"; }
+  { return "product"; }
   
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;
+
+  CONSTRAINT_ARG_LIST3(var1, var2, var3);
+
   ProductConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
     AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
-  { }
+  {
+      CHECKSIZE(  checked_cast<BigInt>(var1.getInitialMax())*checked_cast<BigInt>(var2.getInitialMax()) , "Magnitude of domain bounds is too large in product constraint");
+      CHECKSIZE(  checked_cast<BigInt>(var1.getInitialMin())*checked_cast<BigInt>(var2.getInitialMin()) , "Magnitude of domain bounds is too large in product constraint");
+      
+      CHECKSIZE(  checked_cast<BigInt>(var1.getInitialMax())*checked_cast<BigInt>(var2.getInitialMin()) , "Magnitude of domain bounds is too large in product constraint");
+      CHECKSIZE(  checked_cast<BigInt>(var1.getInitialMin())*checked_cast<BigInt>(var2.getInitialMax()) , "Magnitude of domain bounds is too large in product constraint");
+      
+  }
   
   virtual triggerCollection setup_internal()
   {
@@ -89,7 +101,7 @@ struct ProductConstraint : public AbstractConstraint
     return x / y; 
   }
   
-  virtual void propagate(int, DomainDelta)
+  virtual void propagate(DomainInt, DomainDelta)
   {
     PROP_INFO_ADDONE(Product);
     DomainInt var1_min = var1.getMin();
@@ -156,9 +168,9 @@ struct ProductConstraint : public AbstractConstraint
   }
   
   virtual void full_propagate()
-  { propagate(0,0); }
+  { propagate(0,DomainDelta::empty()); }
   
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == 3);
     return (v[0] * v[1]) == v[2];
@@ -173,7 +185,7 @@ struct ProductConstraint : public AbstractConstraint
     return v;
   }
   
-  virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
     {  
       for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1)
       {
@@ -198,11 +210,7 @@ struct ProductConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      vector<AnyVarRef> t;
-      t.push_back(var1);
-      t.push_back(var2);
-      t.push_back(var3);
-      return new CheckAssignConstraint<vector<AnyVarRef>, ProductConstraint>(stateObj, t, *this);
+      return forward_check_negation(stateObj, this);
   }
 };
 #endif

@@ -13,7 +13,7 @@ class BThread (Thread):
 
   def run (self):
     for name in self.benchmarks:
-      print 'Running ' + name
+      print('Running ' + name)
       if name.endswith('.minion'):
         timer = timeit.Timer('os.system("'+program+' '+name+' > '+name+'.benchmark.out")','import os')
         time = timer.timeit(1)

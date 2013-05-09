@@ -32,7 +32,8 @@
   * representations about the suitability of this  software for any
   * purpose.  It is provided "as is" without express or implied warranty.
   */
- 
+
+
 
 #include <algorithm>
 
@@ -298,7 +299,18 @@ public:
   void
     clear()
     { erase(begin(), end()); }
-
+  
+  friend std::ostream& operator<<(std::ostream& o, const box<T>& sp)
+    {
+        o<<"[";
+        for(int i=0; i<sp.size(); i++) {
+            o<<sp[i];
+            if(i!=sp.size()-1) o<<", ";
+        }
+        o<<"]";
+        return o;
+    }
+    
 protected:
 
       // Called by the range constructor to implement [23.1.1]/9
@@ -605,6 +617,6 @@ M_range_insert(iterator position, _ForwardIterator first,
 // Now requires bool flag to be declared before the macro is used.
 #define GET_ASSIGNMENT(c, constraint) \
 const size_t num_vars##c = constraint->get_vars_singleton()->size();\
-box<pair<int, DomainInt> > c((pair<int,DomainInt>*)( alloca(sizeof(pair<int, int>) * num_vars##c * 2) ), num_vars##c * 2);\
+box<pair<SysInt, DomainInt> > c((pair<SysInt,DomainInt>*)( alloca(sizeof(pair<SysInt,DomainInt>) * num_vars##c * 2) ), num_vars##c * 2);\
 flag=constraint->get_satisfying_assignment(c); 
 

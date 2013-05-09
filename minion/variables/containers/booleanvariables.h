@@ -51,6 +51,12 @@ static const data_type max_data = one << ( sizeof(data_type) - 1 );
 
 struct BoolVarContainer;
 
+#ifdef THREADSAFE
+#include <boost/thread/thread.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+#endif
+
+
 /// A reference to a boolean variable
 struct BoolVarRef_internal
 {
@@ -59,13 +65,16 @@ struct BoolVarRef_internal
   static string name() { return "Bool"; }
   BOOL isBound() const
   { return false;}
+
+  AnyVarRef popOneMapper() const
+  { FATAL_REPORTABLE_ERROR(); }
   
   data_type shift_offset;
-  unsigned var_num;
-  MoveablePointer data_position;
-  MemOffset value_position;
+  SysInt var_num;
+  void* data_position;
+  void* value_position;
 
-  unsigned data_offset() const
+  UnsignedSysInt data_offset() const
   { return var_num / (sizeof(data_type)*8); }
   
 #ifdef MANY_VAR_CONTAINERS
@@ -90,13 +99,13 @@ struct BoolVarRef_internal
   { }
 #endif
   
-  BoolVarRef_internal(int value, BoolVarContainer* b_con);
+  BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con);
   
   data_type& assign_ptr() const
-  { return *static_cast<data_type*>(data_position.get_ptr()); }
+  { return *static_cast<data_type*>(data_position); }
   
   data_type& value_ptr() const
-  { return *static_cast<data_type*>(value_position.get_ptr()); }
+  { return *static_cast<data_type*>(value_position); }
   
   BOOL isAssigned() const
   { return assign_ptr() & shift_offset; }
@@ -109,7 +118,7 @@ struct BoolVarRef_internal
   
   BOOL inDomain(DomainInt b) const
   {
-    if((b|1) != 1)
+    if((checked_cast<SysInt>(b)|1) != 1)
       return false;
     return (!isAssigned()) || (b == getAssignedValue());
   }
@@ -124,6 +133,12 @@ struct BoolVarRef_internal
   {
     if(!isAssigned()) return 0;
     return getAssignedValue();
+  }
+  
+  DomainInt getDomSize() const
+  {
+    if(isAssigned()) return 1;
+    else return 2;
   }
   
   DomainInt getMax() const
@@ -145,6 +160,9 @@ struct BoolVarRef_internal
   }
 
   Var getBaseVar() const { return Var(VAR_BOOL, var_num); }
+
+  vector<Mapper> getMapperStack() const
+  { return vector<Mapper>(); }
  
   friend std::ostream& operator<<(std::ostream& o, const BoolVarRef_internal& b)
   { return o << "Bool:" << b.var_num; }
@@ -167,30 +185,40 @@ struct BoolVarContainer
                                           trigger_list(stateObj, false), lock_m(false)
   {}
   
-  static const int width = 7;
-  MoveablePointer assign_offset;
-  MemOffset values_mem;
+#ifdef THREADSAFE
+  mutable boost::recursive_mutex con_mutex;
+#define LOCK_BOOL_MUTEX boost::recursive_mutex::scoped_lock lock(con_mutex);
+#else
+#define LOCK_BOOL_MUTEX
+#endif
+
+  static const SysInt width = 7;
+  void* assign_offset;
+  void* values_mem;
   vector<vector<AbstractConstraint*> > constraints;
 #ifdef WDEG
-  vector<unsigned int> wdegs;
+  vector<UnsignedSysInt> wdegs;
 #endif
-  unsigned var_count_m;
+  UnsignedSysInt var_count_m;
   TriggerList trigger_list;
   /// When false, no variable can be altered. When true, no variables can be created.
   BOOL lock_m;
   
   data_type* value_ptr()
-  { return static_cast<data_type*>(values_mem.get_ptr()); }
+  { return static_cast<data_type*>(values_mem); }
   
   const data_type* value_ptr() const
-  { return static_cast<const data_type*>(values_mem.get_ptr()); }
+  { return static_cast<const data_type*>(values_mem); }
   
   data_type* assign_ptr()
-  { return static_cast<data_type*>(assign_offset.get_ptr()); }
+  { return static_cast<data_type*>(assign_offset); }
   
   const data_type* assign_ptr() const
-  { return static_cast<const data_type*>(assign_offset.get_ptr()); }
+  { return static_cast<const data_type*>(assign_offset); }
   
+  void lock_thread()
+  { LOCK_BOOL_MUTEX }
+
   void lock()
   { 
    lock_m = true;
@@ -201,16 +229,16 @@ struct BoolVarContainer
   /// Returns a new Boolean Variable.
   //BoolVarRef get_new_var();
 
-  void setVarCount(int bool_count)
+  void setVarCount(SysInt bool_count)
   {
     D_ASSERT(!lock_m);
     var_count_m = bool_count;
 
-    int required_mem = var_count_m / 8 + 1;
+    SysInt required_mem = var_count_m / 8 + 1;
     // Round up to nearest data_type block
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
     assign_offset = getMemory(stateObj).backTrack().request_bytes(required_mem);
-    values_mem = getMemory(stateObj).nonBackTrack().request_bytes(required_mem);
+    values_mem = malloc(required_mem);
     constraints.resize(bool_count);
 #ifdef WDEG
     if(getOptions(stateObj).wdeg_on) wdegs.resize(bool_count);
@@ -218,11 +246,14 @@ struct BoolVarContainer
   }
   
   /// Returns a reference to the ith Boolean variable which was previously created.
-  BoolVarRef get_var_num(int i);
+  BoolVarRef get_var_num(DomainInt i);
+
+  UnsignedSysInt var_count()
+  { return var_count_m; }
   
   
   void setMax(const BoolVarRef_internal& d, DomainInt i) 
-  {
+  {LOCK_BOOL_MUTEX
     if(i < 0)
     {
       getState(stateObj).setFailed(true);
@@ -235,7 +266,7 @@ struct BoolVarContainer
   }
   
   void setMin(const BoolVarRef_internal& d, DomainInt i) 
-  {
+  {LOCK_BOOL_MUTEX
     if(i > 1)
     {
       getState(stateObj).setFailed(true);
@@ -247,9 +278,9 @@ struct BoolVarContainer
   }
   
   void removeFromDomain(const BoolVarRef_internal& d, DomainInt b)
-  {
+  {LOCK_BOOL_MUTEX
     D_ASSERT(lock_m && d.var_num < var_count_m);
-    if((b|1) != 1)
+    if((checked_cast<SysInt>(b)|1) != 1)
       return;
       
     if(d.isAssigned())
@@ -262,10 +293,10 @@ struct BoolVarContainer
   }
 
   void internalAssign(const BoolVarRef_internal& d, DomainInt b)
-  {
+  {LOCK_BOOL_MUTEX
     D_ASSERT(lock_m && d.var_num < var_count_m);
     D_ASSERT(!d.isAssigned());
-    if((b|1) != 1)
+    if((checked_cast<SysInt>(b)|1) != 1)
     {
       getState(stateObj).setFailed(true);
       return;
@@ -291,10 +322,10 @@ struct BoolVarContainer
   }
   
   void uncheckedAssign(const BoolVarRef_internal& d, DomainInt b)
-  { internalAssign(d, b); }
+  {LOCK_BOOL_MUTEX internalAssign(d, b); }
   
   void propagateAssign(const BoolVarRef_internal& d, DomainInt b)
-  {
+  {LOCK_BOOL_MUTEX
     if(!d.isAssigned()) 
       internalAssign(d,b);
     else
@@ -305,10 +336,10 @@ struct BoolVarContainer
   }
 
   void decisionAssign(const BoolVarRef_internal& d, DomainInt b)
-  { internalAssign(d, b); }
+  {LOCK_BOOL_MUTEX internalAssign(d, b); }
 
   void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type)
-  { 
+  { LOCK_BOOL_MUTEX
     D_ASSERT(lock_m); 
 #ifdef FEW_BOOLEAN_TRIGGERS
     if(type == DomainChanged)
@@ -320,7 +351,7 @@ struct BoolVarContainer
   }
     
   void addDynamicTrigger(BoolVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  { 
+  { LOCK_BOOL_MUTEX
     D_ASSERT(pos == NoDomainValue || ( type == DomainRemoval && pos != NoDomainValue ) );
     D_ASSERT(lock_m);
     
@@ -354,7 +385,7 @@ struct BoolVarContainer
   }
 
 #ifdef WDEG
-  int getBaseWdeg(const BoolVarRef_internal& b)
+  SysInt getBaseWdeg(const BoolVarRef_internal& b)
   { return wdegs[b.var_num]; }
 
   void incWdeg(const BoolVarRef_internal& b)
@@ -362,20 +393,20 @@ struct BoolVarContainer
 #endif
 };
 
-inline BoolVarRef BoolVarContainer::get_var_num(int i)
+inline BoolVarRef BoolVarContainer::get_var_num(DomainInt i)
 {
-  D_ASSERT(i < (int)var_count_m);
+  D_ASSERT(i < (SysInt)var_count_m);
   return BoolVarRef(BoolVarRef_internal(i, this));
 }
 
-inline BoolVarRef_internal::BoolVarRef_internal(int value, BoolVarContainer* b_con) : 
-  var_num(value),  
-  data_position(b_con->assign_offset, data_offset()*sizeof(data_type)),
-  value_position(b_con->values_mem, data_offset()*sizeof(data_type))
+inline BoolVarRef_internal::BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con) : 
+  var_num(checked_cast<UnsignedSysInt>(value)),  
+  data_position((char*)(b_con->assign_offset) + data_offset()*sizeof(data_type)),
+  value_position((char*)(b_con->values_mem) + data_offset()*sizeof(data_type))
 #ifdef MANY_VAR_CONTAINERS
 , boolCon(b_con)
 #endif
-{ shift_offset = one << (value % (sizeof(data_type)*8)); }
+{ shift_offset = one << (checked_cast<UnsignedSysInt>(value) % (sizeof(data_type)*8)); }
 
 
 #endif
