@@ -332,6 +332,16 @@ struct STR : public AbstractConstraint
     
     virtual bool check_assignment(DomainInt* v, SysInt v_size)
     {
+        if(UseShort)
+        {
+            const vector<set<DomainInt> >& doms = shortTupleList->getInitialDomains();
+            for(SysInt i = 0; i < v_size; ++i)
+            {
+                if(doms[i].count(v[i]) == 0)
+                    return false;
+            }
+        }
+
         for(SysInt i = 0; i < sct->compressed_tuples.size(); ++i)
         {
             bool sat = true;
@@ -353,6 +363,8 @@ struct STR : public AbstractConstraint
 
     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
     {
+
+
         for(SysInt i = 0; i < sct->compressed_tuples.size(); ++i)
         {
             bool sat = true;
