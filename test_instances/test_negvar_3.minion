@@ -1,0 +1,22 @@
+MINION 1
+#TEST CHECKONESOL -1
+#
+# Fails in debug mode of build at time of writing (r65), works in optimised build
+
+0
+0
+0
+1
+-1 -1 1
+0
+[x0]
+[a]
+0
+1
+[[x0]]
+0
+objective none
+print m0
+sumgeq([x0] ,x0)
+
+

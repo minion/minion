@@ -1,0 +1,21 @@
+MINION 3
+#TEST SOLCOUNT 64
+**VARIABLES**
+
+BOOL b[6]
+
+ALIAS a[2] = [ b[0],b[1] ]
+
+ALIAS c[2,2] = [ [ b[0],b[1] ] , [ b[2],b[3] ] ]
+
+ALIAS d[1,2,3] = [ [ [b[0],b[1],b[2]] , [b[3],b[4],b[5]] ] ]
+**CONSTRAINTS**
+
+eq(b[0], a[0])
+eq(c[0,0], b[0])
+eq(c[0,1], b[1])
+eq(c[1,0], b[2])
+eq(d[0,1,0], b[3])
+
+
+**EOF**

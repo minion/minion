@@ -1,0 +1,32 @@
+MINION 3
+#TEST CHECKONESOL 2 4 5
+# Minion Graceful Graph Instance
+#   Version with alldiff from -Q to Q
+# K3 x P2
+
+**VARIABLES**
+
+DISCRETE d[3] {0..9}
+
+**TUPLELIST**
+
+First
+2 3 
+1 2 3
+2 4 5
+
+Second
+2 2
+3 4
+4 5
+
+**SEARCH**
+
+PRINT [d]
+
+**CONSTRAINTS**
+
+table([d[0],d[1],d[2]],First)
+table([d[1],d[2]],Second)
+
+**EOF**
