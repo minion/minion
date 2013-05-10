@@ -28,15 +28,20 @@
 #define P(x)
 
 #ifdef MINION_DEBUG
-#define D(X,V) X.at(V)
+#define D(X,V) X.at(checked_cast<SysInt>(V))
 #else
-#define D(X,V) X[V]
+#define D(X,V) X[checked_cast<SysInt>(V)]
 #endif
 
 //#define SPECIAL_VM
 
 #define UseStatePtr false
 #define UseStatePtrSym false
+
+#if UseStatePtr
+#error Chris broke this in the 'if' instruction in the VM
+#endif
+
 // UseStatePtr not finished:at least have to do the Jump instruction and also make sure the vm is not using Perm instructions.
 
 template<typename VarArray, bool UseSymmetricVM>
@@ -54,12 +59,12 @@ struct VMConstraint : public AbstractConstraint
   minion_array<signed char, MaxVarSize> domain_min;
   minion_array<minion_array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
   minion_array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
-  int total_lits;
+  SysInt total_lits;
 
-  int vars_size;
+  SysInt vars_size;
 
-  int* VM_data;
-  int VM_size;
+  DomainInt* VM_data;
+  DomainInt VM_size;
   
   #if UseStatePtr
   Reversible<int> StatePtr;
@@ -93,8 +98,8 @@ struct VMConstraint : public AbstractConstraint
       
       
       
-      int* mapping = _mapping_tuples->getPointer();
-      int mapping_size = _mapping_tuples->tuple_size();
+      DomainInt* mapping = _mapping_tuples->getPointer();
+      DomainInt mapping_size = _mapping_tuples->tuple_size();
       if(mapping_size % 2 != 0)
       {
         cout << "Mapping must be of even length";
@@ -111,14 +116,14 @@ struct VMConstraint : public AbstractConstraint
       if(mapping_size == 0)
         return;
 
-      total_lits = mapping_size / 2;
+      total_lits = checked_cast<SysInt>(mapping_size / 2);
       
       #if UseStatePtr && UseStatePtrSym
       StatePtrPerm=getMemory(stateObj).backTrack().template requestArray<char>(total_lits);
       for(int i=0; i<total_lits; i++) StatePtrPerm[i]=i;
       #endif
       
-      vector<set<int> > domains(vars_size);
+      vector<set<DomainInt> > domains(vars_size);
       for(int i = 0; i < mapping_size; i+=2)
       {
         D(domains, mapping[i]).insert(mapping[i+1]);
@@ -134,9 +139,9 @@ struct VMConstraint : public AbstractConstraint
           FAIL_EXIT();
         }
         
-        domain_min[i] = *domains[i].begin();
+        domain_min[i] = checked_cast<char>(*domains[i].begin());
 
-        set<int>::iterator last = domains[i].end();
+        set<DomainInt>::iterator last = domains[i].end();
         last--;
         if(*last - domain_min[i] >= MaxDomSize)
         {
@@ -144,10 +149,10 @@ struct VMConstraint : public AbstractConstraint
           FAIL_EXIT();
         }
 
-        for(set<int>::iterator it = domains[i].begin(); it != domains[i].end(); ++it)
+        for(set<DomainInt>::iterator it = domains[i].begin(); it != domains[i].end(); ++it)
         {
           D(D(domain_vals,i), (*it - domain_min[i]) ) = literal;
-          D(literal_map,literal) = std::pair<signed char, signed char>(i, *it);
+          D(literal_map,literal) = std::pair<signed char, signed char>(i, checked_cast<SysInt>(*it));
           literal++;
         }
       }
@@ -191,20 +196,20 @@ struct VMConstraint : public AbstractConstraint
 #endif
 
   template<typename Data>
-  Data checked_get(Data* VM_start, int length, int pos)
+  Data checked_get(Data* VM_start, DomainInt length, DomainInt pos)
   {
       if(pos < 0 || pos >= length)
       {
           std::cerr << "Accessed instruction " << pos << " of " << length << std::endl;
           FAIL_EXIT();
       }
-      return VM_start[pos];
+      return VM_start[checked_cast<SysInt>(pos)];
   }
 
 #ifdef MINION_DEBUG
-#define get(x) checked_get(VM_start, length, x)
+#define get(x) checked_cast<SysInt>(checked_get(VM_start, length, x))
 #else
-#define get(x) VM_start[x]
+#define get(x) checked_cast<SysInt>(VM_start[checked_cast<SysInt>(x)])
 #endif
 
 // MINION-VM
@@ -214,14 +219,16 @@ struct VMConstraint : public AbstractConstraint
 //         For example:
 //             -1001, 1, 2, 1, 1, -1
 //             Removes var[1]=2 and var[1]=1
-// -1010 : Branch var, val, i1, i2
-//         if(var.inDomain(val)) jump to i1 else jump to i2
+// -1010 : Branch var, val, i2
+//         if(!var.inDomain(val)) jump to i2
 //          NOTE: jumping to '-3' is a special value,
 //                which signifies exiting the program (with true)
 // -1100 : goto i1
 //         Jump to i1
+
+
   template<typename Data>
-  void execute_vm(Data* VM_start, int length)
+  void execute_vm(Data* VM_start, DomainInt length)
   {
     int InPtr = 0;
     while(true)
@@ -245,9 +252,9 @@ struct VMConstraint : public AbstractConstraint
             {
                 InPtr++;
                 if(vars[get(InPtr)].inDomain(get(InPtr+1)))
-                        InPtr = get(InPtr+2);
+                        InPtr += 3;
                 else
-                        InPtr = get(InPtr+3);
+                        InPtr = get(InPtr+2);
                 if(InPtr == -3)
                         return;
             }
@@ -265,13 +272,14 @@ struct VMConstraint : public AbstractConstraint
     }
   }
 
-  inline int get_lit_from_varval(int var, int val)
+  inline DomainInt get_lit_from_varval(DomainInt var, DomainInt val)
   {
-    return D(D(domain_vals,var), (val - domain_min[var]));
+    return D(D(domain_vals,var), (val - domain_min[checked_cast<SysInt>(var)]));
   }
 
-  inline pair<int,int> get_varval_from_lit(int lit)
+  inline pair<SysInt, DomainInt> get_varval_from_lit(DomainInt _lit)
   {
+    const SysInt lit = checked_cast<SysInt>(_lit);
     D_ASSERT(lit >= 0 && lit < MaxVarSize * MaxDomSize);
     D_ASSERT(vars[literal_map[lit].first].getInitialMin() <= literal_map[lit].second);
     D_ASSERT(vars[literal_map[lit].first].getInitialMax() >= literal_map[lit].second);
@@ -281,7 +289,7 @@ struct VMConstraint : public AbstractConstraint
 
 
   template<typename CVal>
-  pair<int,int> get_varval(CVal cval, int* perm1, int* perm2, int* perm3, int var, int val)
+  pair<SysInt, DomainInt> get_varval(CVal cval, DomainInt* perm1, DomainInt* perm2, DomainInt* perm3, int var, DomainInt val)
   { 
     switch((int)cval)
     {
@@ -289,20 +297,20 @@ struct VMConstraint : public AbstractConstraint
         return make_pair(var, val); 
       case 1:
       { 
-        int lit = get_lit_from_varval(var, val);
-        int mapped_lit = perm1[lit];
+        SysInt lit = checked_cast<SysInt>(get_lit_from_varval(var, val));
+        DomainInt mapped_lit = perm1[lit];
         return get_varval_from_lit(mapped_lit);
       }
       case 2:
       { 
-        int lit = get_lit_from_varval(var, val);
-        int mapped_lit = perm2[lit];
+        SysInt lit = checked_cast<SysInt>(get_lit_from_varval(var, val));
+        DomainInt mapped_lit = perm2[lit];
         return get_varval_from_lit(mapped_lit);
       }
       case 3:
       { 
-        int lit = get_lit_from_varval(var, val);
-        int mapped_lit = perm3[lit];
+        SysInt lit = checked_cast<SysInt>(get_lit_from_varval(var, val));
+        DomainInt mapped_lit = perm3[lit];
         return get_varval_from_lit(mapped_lit);
       }
       default:
@@ -311,7 +319,7 @@ struct VMConstraint : public AbstractConstraint
   }
 
   template<typename Data>
-  void execute_symmetric_vm_start(Data* VM_start, int length)
+  void execute_symmetric_vm_start(Data* VM_start, DomainInt length)
   {
     #if UseStatePtr
       AllChoicesFixed=true;
@@ -319,9 +327,9 @@ struct VMConstraint : public AbstractConstraint
     
     if(total_lits > 0)
     {
-      int vals[total_lits];
-      int newvals[total_lits];
-      int* perm = 0;
+      DomainInt vals[total_lits];
+      DomainInt newvals[total_lits];
+      DomainInt* perm = 0;
       
       #if UseStatePtr && UseStatePtrSym
       for(int i=0; i<total_lits; i++) vals[i]=StatePtrPerm[i];
@@ -358,13 +366,13 @@ struct VMConstraint : public AbstractConstraint
 
 
   template<typename Data, typename CVal>
-  inline void increment_vm_perm(CVal cval, Data* VM_start, int length, int InPtr, int* perm, int* vals, int* newvals)
+  inline void increment_vm_perm(CVal cval, Data* VM_start, DomainInt length, DomainInt InPtr, DomainInt* perm, DomainInt* vals, DomainInt* newvals)
   {
       switch((int)cval)
       {
         case 0:
         {
-          perm = VM_start + InPtr;
+          perm = VM_start + checked_cast<SysInt>(InPtr);
           InPtr += total_lits;
           #if UseStatePtr && UseStatePtrSym
           if(AllChoicesFixed) { 
@@ -424,7 +432,7 @@ struct VMConstraint : public AbstractConstraint
   }
 
   template<typename Data, int CV>
-  inline void execute_symmetric_vm(compiletime_val<CV> cv, Data* VM_start, int length, int InPtr, int* perm, int* vals, int* newvals)
+  inline void execute_symmetric_vm(compiletime_val<CV> cv, Data* VM_start, DomainInt length, DomainInt InPtr, DomainInt* perm, DomainInt* vals, DomainInt* newvals)
   {
     //int state = 0;
     
@@ -446,7 +454,7 @@ struct VMConstraint : public AbstractConstraint
                 InPtr++;
                 while(get(InPtr) != -1)
                 {
-                    pair<int,int> varval = get_varval(cv, perm, vals, newvals, get(InPtr), get(InPtr+1));
+                    pair<SysInt, DomainInt> varval = get_varval(cv, perm, vals, newvals, get(InPtr), get(InPtr+1));
                     P("  Deleting " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
                     vars[varval.first].removeFromDomain(varval.second);
                     InPtr+=2;
@@ -458,12 +466,12 @@ struct VMConstraint : public AbstractConstraint
             {
                 P(InPtr << ". If");
                 InPtr++;
-                pair<int,int> varval = get_varval(cv, perm, vals, newvals, get(InPtr), get(InPtr+1));
+                pair<SysInt, DomainInt> varval = get_varval(cv, perm, vals, newvals, get(InPtr), get(InPtr+1));
                 P(" Jump based on " << varval << ", original " << get(InPtr) << "," << get(InPtr+1));
                 if(vars[varval.first].inDomain(varval.second))
                 {
-                    P(" True, jump to " << get(InPtr+2));
-                    InPtr = get(InPtr+2);
+                    P(" True, no jump");
+                    InPtr += 3;
                     #if UseStatePtr
                         if(AllChoicesFixed)
                         {
@@ -480,8 +488,8 @@ struct VMConstraint : public AbstractConstraint
                 }
                 else
                 {
-                    P(" False, jump to " << get(InPtr+3));
-                    InPtr = get(InPtr+3);
+                    P(" False, jump to " << get(InPtr+2));
+                    InPtr = get(InPtr+2);
                     #if UseStatePtr
                         if(AllChoicesFixed) {
                             StatePtr=InPtr;   // 'domain value out' is always fixed. 
