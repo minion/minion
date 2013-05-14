@@ -335,10 +335,13 @@ struct STR : public AbstractConstraint
         if(UseShort)
         {
             const vector<set<DomainInt> >& doms = shortTupleList->getInitialDomains();
-            for(SysInt i = 0; i < v_size; ++i)
+            if(doms.size() > 0)
             {
-                if(doms[i].count(v[i]) == 0)
-                    return false;
+                for(SysInt i = 0; i < v_size; ++i)
+                {
+                    if(doms[i].count(v[i]) == 0)
+                        return false;
+                }
             }
         }
 
