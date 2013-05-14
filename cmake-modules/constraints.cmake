@@ -14,6 +14,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one" "w
                     "watchvecexists_less" "lighttable"
                     "haggisgac" "haggisgac-stable" "str2plus" "shortstr2" "gaceq" "gacschema"
                     "mddc" "test" "vm" "vmsym"
+                    "tablevm" "negativetablevm"
                     )
 
 set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
@@ -24,6 +25,12 @@ set(BUILD_STATIC_START "${GEN_FILES_DIR}/BuildStaticStart.cpp")
 
 set(NAME_ID_watchvecexists_less "CT_WATCHED_VEC_OR_LESS")
 set(NAME_READ_watchvecexists_less "read_list" "read_list")
+
+set(NAME_ID_tablevm "CT_TABLE_VM")
+set(NAME_READ_tablevm "read_list" "read_tuples")
+
+set(NAME_ID_negativetablevm "CT_NEG_TABLE_VM")
+set(NAME_READ_negativetablevm "read_list" "read_tuples")
 
 set(NAME_ID_element "CT_ELEMENT")
 set(NAME_READ_element "read_list" "read_var" "read_var")
