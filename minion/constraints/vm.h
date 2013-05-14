@@ -53,8 +53,8 @@ struct VMConstraint : public AbstractConstraint
   typedef typename VarArray::value_type VarRef;
 
   // Note: This is max - min, not the number of values per domain.
-  static const int MaxDomSize = 14;
-  static const int MaxVarSize = 13;
+  enum { MaxDomSize = 14 };
+  enum { MaxVarSize = 13 };
   minion_array<VarRef, MaxVarSize> vars;
   minion_array<signed char, MaxVarSize> domain_min;
   minion_array<minion_array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
