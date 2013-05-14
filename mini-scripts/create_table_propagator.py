@@ -324,9 +324,11 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
                     
                     if curnode.has_key('left') or curnode.has_key('right'):
                         # branch instruction
-                        gotonodecounter+=4
+                        gotonodecounter+=4  # for the branch instruction itself.
                         if curnode.has_key('left'):
                             gotonodelist.append(curnode['left'])
+                        else:
+                            gotonodecounter+=1  # for the 'end' instruction used for the left branch. 
                         if curnode.has_key('right'):
                             gotonodelist.append(curnode['right'])
                         
