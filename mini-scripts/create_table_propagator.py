@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/pypy 
 
 # take a list of unsatisfying tuples for a constraint, and create a tree listing
 # the propagations that need to be done for that constraint.
