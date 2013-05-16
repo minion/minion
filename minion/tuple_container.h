@@ -311,9 +311,6 @@ public:
   template<typename Vars>
   HaggisGACTuples* getHaggisData(const Vars& vars);
 
-  void setInitialDomains(const vector<set<DomainInt> >& doms)
-  { initial_domains = doms; }
-
   // NOTE: initial domains may be empty, in which case they should be ignored.
   vector<set<DomainInt> > getInitialDomains()
   { return initial_domains; }

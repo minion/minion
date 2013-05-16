@@ -12,11 +12,12 @@ template <typename T>
 AbstractConstraint*
 output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* type)
 { 
-    char name[] = "~/tableout/table.XXXXXXXX";
+    char name[] = "tableout/table.XXXXXXXX";
     int f = mkstemp(name);
     if(f == -1)
     {
-        std::cerr << "This outputs to ~/tableout. Please create that directory\n";
+        std::cerr << "This outputs to tableout. Please create that directory\n";
+        perror("Given error");
         abort();
     }
 
