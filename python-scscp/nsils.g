@@ -1,3 +1,4 @@
+LoadPackage("grape");
 
 MapListSet := function(L,p)
   local x, y;
@@ -33,3 +34,21 @@ end;
 CAJ_GroupSizeImpl := function(perms)
   return Size(Group(List(perms, PermList)));
 end;
+
+CAJ_GetGraphGens := function(tuples)
+  local maxpoint, graphsize,graph, i, j, grapegraph;
+  
+  maxpoint := Maximum(List(tuples, x -> Maximum(x)));
+  graphsize := maxpoint + Size(tuples);
+  graph := List([1..graphsize], x -> List([1..graphsize], y -> 0));
+  for i in [1..Size(tuples)] do
+    for j in tuples[i] do
+      graph[i + maxpoint][j] := 1;
+      graph[j][i + maxpoint] := 1;
+    od;
+  od;
+
+
+  grapegraph := Graph( Group(()),  [1..graphsize], OnPoints, function(x,y) return graph[x][y]=1; end, true );
+  return AutGroupGraph( rec(graph:=grapegraph, colourClasses := [[1..maxpoint],[maxpoint+1..graphsize]]));
+end; 

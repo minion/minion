@@ -6,55 +6,60 @@
 */
 
 #include "../constraints/vm.h"
-   #include "../constraints/constraint_constant.h"
+#include "../constraints/constraint_constant.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 template <typename T>
 AbstractConstraint*
 output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* type)
 { 
-    char name[] = "tableout/table.XXXXXXXX";
-    int f = mkstemp(name);
-    if(f == -1)
-    {
-        std::cerr << "This outputs to tableout. Please create that directory\n";
-        perror("Given error");
-        abort();
-    }
-
-    dprintf(f,"{\n");
-    dprintf(f,"\"doms\" : [");
+    std::ostringstream oss;
+    oss << "{\n";
+    oss << "\"doms\" : [";
     for(int i = 0; i < t1.size(); ++i)
     {
-        if(i > 0) dprintf(f, ",");
-        dprintf(f,"[");
-        dprintf(f,"%d",checked_cast<SysInt>(t1[i].getInitialMin()));
+        if(i > 0) oss <<  ",";
+        oss << "[";
+        oss << checked_cast<SysInt>(t1[i].getInitialMin());
         for(DomainInt j = t1[i].getInitialMin() + 1; j <= t1[i].getInitialMax(); ++j)
         {
-            dprintf(f,",%d",checked_cast<SysInt>(j));
+            oss << "," << checked_cast<SysInt>(j);
         }
-        dprintf(f,"]");
+        oss << "]";
     }
-    dprintf(f,"],\n");
+    oss << "],\n";
 
-    dprintf(f, "\"table\" : [");
+    oss <<  "\"table\" : [";
     for(int i = 0; i < b.tuples->size(); ++i)
     {
         vector<DomainInt> v = b.tuples->get_vector(i);
-        if(i > 0) dprintf(f, ",\n");
-        dprintf(f,"[");
-        dprintf(f,"%d",checked_cast<SysInt>(v[0]));
+        if(i > 0) oss <<  ",\n";
+        oss << "[";
+        oss << checked_cast<SysInt>(v[0]);
         for(int j = 1; j < v.size(); ++j)
         {
-            dprintf(f,",%d",checked_cast<SysInt>(v[j]));
+            oss << "," << checked_cast<SysInt>(v[j]);
         }
-        dprintf(f,"]");
+        oss << "]";
     }
-    dprintf(f,"],\n");
+    oss << "],\n";
 
-    dprintf(f, "\"type\" : \"%s\" }\n", type);
+    oss <<  "\"type\" : \"" << type << "\" }\n";
 
-    close(f);
-    
+    std::string s = oss.str();
+
+    std::string hash = sha1_hash(s);
+
+    std::string outname = "tableout/table." + hash;
+    int f = open(outname.c_str(), O_RDWR | O_CREAT | O_EXCL, S_IRWXU);
+    if(f >= 0)
+    {
+        dprintf(f, "%s", s.c_str());
+        close(f);
+    }
     return (new ConstantConstraint<false>(stateObj)); 
 
 } 

@@ -37,4 +37,7 @@
 #include "trigger_timer.h"
 #include "box.h"
 #include "test_functions.h"
+
+// from sha1.cpp
+std::string sha1_hash(const std::string& s);
 #endif

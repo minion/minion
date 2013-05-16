@@ -1,6 +1,16 @@
 import scscp 
 from VarValToDomain import *
 
+def groupFromTuples(tuples):
+    edges = []
+    for t in tuples:
+      edge = []
+      for i in range(len(t)):
+        edge.append(get_lit(i, t[i]))
+      edges.append(edge)
+
+    CAJ_GraphGenerators
+
 def VariablePermSwap(var1, var2):
     L = range(1, get_total_litcount() + 1)
     assert(get_domain(var1) == get_domain(var2))
@@ -69,6 +79,14 @@ def MultPerm(m1, m2):
    return [ newm2[newm1[i] - 1] for i in range(length) ]
 
 socket = False
+
+def GetGraphGens(T):
+    global socket
+    if socket == False:
+        socket = scscp.make_connection()
+    command = scscp.build_call("CAJ_GetGraphGens", [ scscp.listint_node(T) ] )
+    reply = scscp.execute(socket, command)
+    return scscp.parse_reply(reply)
 
 def GetMinimalImage(G, L):
     global socket

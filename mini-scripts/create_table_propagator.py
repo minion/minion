@@ -1451,6 +1451,8 @@ def readTable():
     domains_init=c['doms']
     table=c['table']
     tabletype=c['type']
+
+    initialize_domain(domains_init);
     
     if tabletype=='pos':
         tablepositive=True
