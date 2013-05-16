@@ -53,6 +53,8 @@ output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* t
 
     dprintf(f, "\"type\" : \"%s\" }\n", type);
 
+    close(f);
+    
     return (new ConstantConstraint<false>(stateObj)); 
 
 } 
