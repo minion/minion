@@ -76,12 +76,14 @@ A million repetitions of "a"
   34AA973C D4C4DAA4 F61EEB2B DBAD2731 6534016F
 */
 
-/* #define SHA1HANDSOFF  */
+// Do not modify original data.
+#define SHA1HANDSOFF
 
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
 #include <string>
+#include <iostream>
 
 typedef struct {
     uint32_t state[5];
@@ -292,7 +294,7 @@ std::string sha1_hash(const std::string& s)
     char output[80];
     SHA1_CTX context;
     SHA1_Init(&context);
-    SHA1_Update(&context, (uint8_t*)s.c_str(), s.size());
+    SHA1_Update(&context, (const uint8_t*)s.c_str(), s.size());
     SHA1_Final(&context, digest);
     digest_to_hex(digest, output);
     return output;
