@@ -53,7 +53,19 @@ output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* t
 
     std::string hash = sha1_hash(s);
 
-    std::string outname = "tableout/table." + hash;
+
+    std::string outname = "tableout/table." + hash + ".vm";
+    std::string countname = "tableout/table." + hash + ".count";
+
+    int fd = open(countname.c_str(), O_CREAT|O_APPEND|O_WRONLY, S_IWUSR);
+    if(fd >= 0)
+    {
+        char buf[] = ".";
+        (void)write(fd, buf, 1);
+        close(fd);
+    }
+
+
     int f = open(outname.c_str(), O_RDWR | O_CREAT | O_EXCL, S_IRWXU);
     if(f >= 0)
     {
