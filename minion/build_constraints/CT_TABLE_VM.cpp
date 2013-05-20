@@ -69,7 +69,7 @@ output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* t
     int f = open(outname.c_str(), O_RDWR | O_CREAT | O_EXCL, S_IRWXU);
     if(f >= 0)
     {
-        dprintf(f, "%s", s.c_str());
+        write(f, s.c_str(), s.size());
         close(f);
     }
     return (new ConstantConstraint<false>(stateObj)); 
