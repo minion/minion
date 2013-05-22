@@ -440,39 +440,7 @@ help switches -sollimit
         exit(1);
       }
     }
-/** @help switches;-searchlimit Description
-To stop search after N seconds search time (real time), do
 
-   minion -searchlimit N myinput.minion
-
-This does not include any time spent in preprocessing.
-*/
-
-/** @help switches;-searchlimit References
-help switches -timelimit
-help switches -cpulimit
-help switches -nodelimit
-help switches -sollimit
-*/
-    else if(command == string("-searchlimit"))
-    {
-      INCREMENT_i(-searchlimit);
-      if(getOptions(stateObj).timeout_active)
-      {
-        cout << "Only one '-cpulimit', '-searchlimit' or '-timelimit' per instance" << endl;
-        exit(1);
-      }
-      getOptions(stateObj).timeout_active = true;
-      try
-      {
-        getOptions(stateObj).search_limit = from_string_checked<SysInt>(argv[i]);
-      }
-      catch(...)
-      {
-        cout << "Did not understand the parameter to searchlimit:" << argv[i] << endl;
-        exit(1);
-      }
-    }
 /** @help switches;-cpulimit Description
 To stop search after N seconds (CPU time), do
 
@@ -482,7 +450,6 @@ To stop search after N seconds (CPU time), do
 /** @help switches;-cpulimit References
 help switches -timelimit
 help switches -nodelimit
-help switches -searchlimit
 help switches -sollimit
 */
     else if(command == string("-cpulimit"))

@@ -91,7 +91,6 @@ void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool C
 
   signal(SIGXCPU, trigger_function);
   signal(SIGALRM, trigger_function);
-
   if(timeout_active)
   {
     if(timeout <= 0)
