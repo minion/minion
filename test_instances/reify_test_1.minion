@@ -1,0 +1,10 @@
+#TEST SOLCOUNT 16
+MINION 3
+**VARIABLES**
+BOOL b[4]
+BOOL x
+**CONSTRAINTS**
+
+reify(sumgeq([b[0],b[1],b[2]],2),!x)
+
+**EOF**

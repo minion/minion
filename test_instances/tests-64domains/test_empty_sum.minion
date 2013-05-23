@@ -1,0 +1,15 @@
+MINION 3
+#TEST SOLCOUNT 4
+
+**VARIABLES**
+SPARSEBOUND q {-1800000000000000,0,1800000000000000}
+BOOL b
+
+**CONSTRAINTS**
+
+reifyimply(sumgeq([], q), b)
+reifyimply(sumleq([], q), b)
+
+
+
+**EOF**

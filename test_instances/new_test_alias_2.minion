@@ -1,0 +1,14 @@
+MINION 3
+#TEST SOLCOUNT 2
+**VARIABLES**
+
+DISCRETE X {-10..10}
+
+
+
+ALIAS d[3,3] = [ [0,1,2], [2,0,1], [2,2,2] ]
+**CONSTRAINTS**
+
+watchelement(d, X, 1)
+
+**EOF**
