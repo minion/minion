@@ -85,7 +85,6 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     // varorder block, not just the ones in the 'current' block
     
     
-    
     // Set up variable and value ordering
     // Strange that when using randomise_valvarorder, the variables are
     // only shuffled within the VARORDER blocks from the input file.
@@ -135,11 +134,6 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
 
       if(!getState(stateObj).isFailed())
       {
-        if(!getOptions(stateObj).noTimers && getOptions(stateObj).search_limit > 0)
-        {
-          getState(stateObj).setupAlarm(getOptions(stateObj).timeout_active, getOptions(stateObj).search_limit, getOptions(stateObj).time_limit_is_CPU_time);
-          getState(stateObj).setupCtrlc();
-        }
         sm->search();
       }
     }

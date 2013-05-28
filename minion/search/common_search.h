@@ -374,11 +374,6 @@ namespace Controller
     getState(stateObj).setSolutionCount(0);  
     getState(stateObj).setNodeCount(0);
     
-    if(!getOptions(stateObj).noTimers && getOptions(stateObj).search_limit <= 0)
-    {
-        getState(stateObj).setupAlarm(getOptions(stateObj).timeout_active, getOptions(stateObj).time_limit, getOptions(stateObj).time_limit_is_CPU_time);
-        getState(stateObj).setupCtrlc();
-    }
     lock(stateObj);
     if (!getOptions(stateObj).silent) 
       getState(stateObj).getOldTimer().printTimestepWithoutReset(cout, Output_1, "First Node Time: ");

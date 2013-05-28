@@ -240,9 +240,6 @@ public:
 
   /// Stores the timelimit.
   clock_t time_limit;
-
-  /// solve time limit.
-  clock_t search_limit;
   
   /// Stores if the timelimit is CPU time (yes) or wall-clock time (no)
   bool time_limit_is_CPU_time;
@@ -295,7 +292,7 @@ public:
     nocheck(false),
 #endif
     nodelimit(-1), tableout(false), solsoutWrite(false), 
-    print_solution(true), timeout_active(false), time_limit(0), search_limit(0),
+    print_solution(true), timeout_active(false), time_limit(0),
     time_limit_is_CPU_time(false),
     randomise_valvarorder(false), parser_verbose(false), 
     redump(false), graph(false), instance_stats(false), 
