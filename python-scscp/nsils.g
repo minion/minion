@@ -35,10 +35,9 @@ CAJ_GroupSizeImpl := function(perms)
   return Size(Group(List(perms, PermList)));
 end;
 
-CAJ_GetGraphGens := function(tuples)
-  local maxpoint, graphsize,graph, i, j, grapegraph;
+CAJ_GetGraphGens := function(tuples, maxpoint)
+  local graphsize,graph, i, j, grapegraph,g;
   
-  maxpoint := Maximum(List(tuples, x -> Maximum(x)));
   graphsize := maxpoint + Size(tuples);
   graph := List([1..graphsize], x -> List([1..graphsize], y -> 0));
   for i in [1..Size(tuples)] do
@@ -50,5 +49,6 @@ CAJ_GetGraphGens := function(tuples)
 
 
   grapegraph := Graph( Group(()),  [1..graphsize], OnPoints, function(x,y) return graph[x][y]=1; end, true );
-  return AutGroupGraph( rec(graph:=grapegraph, colourClasses := [[1..maxpoint],[maxpoint+1..graphsize]]));
+  g := AutGroupGraph( rec(graph:=grapegraph, colourClasses := [[1..maxpoint],[maxpoint+1..graphsize]]));
+  return List(GeneratorsOfGroup(g), x->ListPerm(x, maxpoint));
 end; 

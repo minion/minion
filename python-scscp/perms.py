@@ -80,11 +80,11 @@ def MultPerm(m1, m2):
 
 socket = False
 
-def GetGraphGens(T):
+def GetGraphGens(T,n):
     global socket
     if socket == False:
         socket = scscp.make_connection()
-    command = scscp.build_call("CAJ_GetGraphGens", [ scscp.listint_node(T) ] )
+    command = scscp.build_call("CAJ_GetGraphGens", [ scscp.listint_node(T), scscp.int_node(n) ] )
     reply = scscp.execute(socket, command)
     return scscp.parse_reply(reply)
 

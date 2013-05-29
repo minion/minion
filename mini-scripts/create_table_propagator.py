@@ -27,7 +27,7 @@ import cProfile
 import random
 sys.path.append("../python-scscp")
 from VarValToDomain import initialize_domain,get_lit,get_total_litcount,get_lit_mapping
-from perms import GetGroupSize, GetMinimalImage, ValueTotalPerm, ValuePermSwapList, VariableTotalPerm, LiteralPermSwapList, InvPerm, MultPerm, PadPerm, VariablePermSwapList
+from perms import GetGraphGens, GetGroupSize, GetMinimalImage, ValueTotalPerm, ValuePermSwapList, VariableTotalPerm, LiteralPermSwapList, InvPerm, MultPerm, PadPerm, VariablePermSwapList
 nodenumcounter = 0
 
 nodenumprint = 100
@@ -1465,6 +1465,14 @@ def readTable():
     # Do magic Chris stuff here to get the symmetry group.
     
     
+    if EnableSymDetection:
+        maptables=[]
+        for t in table:
+            newt = []
+            for i in range(len(t)):
+                newt.append(get_lit(i,t[i]))
+            maptables.append(newt)
+        Group = GetGraphGens(maptables, get_total_litcount())
     t=generate_tree(table, domains_init, True, tablepositive)
     choose_print_tree(t)
     
