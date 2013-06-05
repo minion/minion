@@ -49,7 +49,7 @@ def listint_node(arg):
         base = et.Element("OMI")
         base.text = str(arg)
         return base
-    assert 0, "Do not understand " + str(arg)
+    assert 0, "Do not understand " + et.tostring(arg)
 
 def read_listint(arg):
     if arg.tag == "OMI":
@@ -67,7 +67,7 @@ def read_listint(arg):
     if arg.tag == "OMS":
         assert arg.attrib == { "cd":"set1", "name":"emptyset" }
         return []
-    assert 0, "Do not understand " + str(arg)
+    assert 0, "Do not understand " + et.tostring(arg)
 
 def parse_reply(arg, check_cd = True):
     return read_listint(arg[0][1][1])
