@@ -10,12 +10,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "../constraints/constraint_GACtable_master.h"
+#include "../inputfile_parse/tiny_constraint_parser.hpp"
 
-
-template <typename T>
-AbstractConstraint*
-output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* type)
-{ 
+template<typename T>
+std::string make_table_string(const T& t1, ConstraintBlob& b, char const* type)
+{
     std::ostringstream oss;
     oss << "{\n";
     oss << "\"doms\" : [";
@@ -49,10 +49,63 @@ output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* t
 
     oss <<  "\"type\" : \"" << type << "\" }\n";
 
-    std::string s = oss.str();
+    return oss.str();
+}
+
+#ifdef READ_TABLE
+
+template <typename T>
+AbstractConstraint*
+read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* type)
+{ 
+    std::string s = make_table_string(t1, b, type);
 
     std::string hash = sha1_hash(s);
 
+    std::string outname = "vms/table." + hash + ".vm.table";
+
+    ifstream ifs(outname.c_str(), ios::in);
+    if(!ifs)
+    {
+        // Opening file failed
+        if(std::string(type) == "pos")
+            return GACTableCon(stateObj, t1, b.tuples);
+        if(std::string(type) == "neg")
+            return GACNegativeTableCon(stateObj, t1, b.tuples);
+        abort();
+    }
+
+    vector<TupleList*> vtl = tiny_parser(ifs);
+
+    return VMSymCon(stateObj, t1, vtl[0], vtl[1]);
+} 
+
+
+template <typename T>
+AbstractConstraint*
+BuildCT_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
+{ return read_table_vm(stateObj, t1, b, "pos"); }
+
+BUILD_CT(CT_TABLE_VM, 1)
+
+template <typename T>
+AbstractConstraint*
+BuildCT_NEG_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
+{ return read_table_vm(stateObj, t1, b, "neg"); }
+
+BUILD_CT(CT_NEG_TABLE_VM, 1)
+
+
+#else
+
+
+template <typename T>
+AbstractConstraint*
+output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* type)
+{ 
+    std::string s = make_table_string(t1, b, type);
+
+    std::string hash = sha1_hash(s);
 
     std::string outname = "tableout/table." + hash + ".vm";
     std::string countname = "tableout/table." + hash + ".count";
@@ -90,3 +143,5 @@ BuildCT_NEG_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
 { return output_table_vm(stateObj, t1, b, "neg"); }
 
 BUILD_CT(CT_NEG_TABLE_VM, 1)
+
+#endif
