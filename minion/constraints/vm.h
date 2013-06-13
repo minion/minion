@@ -183,7 +183,7 @@ struct VMConstraint : public AbstractConstraint
 
   bool constraint_locked;
 
-  virtual void propagate(int, DomainDelta)
+  virtual void propagate(DomainInt, DomainDelta)
   { 
       if(constraint_locked) 
           return;
@@ -191,7 +191,7 @@ struct VMConstraint : public AbstractConstraint
       getQueue(stateObj).pushSpecialTrigger(this); 
   }
 #else
-  virtual void propagate(int, DomainDelta)
+  virtual void propagate(DomainInt, DomainDelta)
   { full_propagate(); }
 #endif
 
