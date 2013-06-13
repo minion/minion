@@ -155,7 +155,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
     return vars;
   }
   
-  virtual void propagate(int i, DomainDelta domain)
+  virtual void propagate(DomainInt i, DomainDelta domain)
   {
     D_ASSERT(!CORINCREMENTAL);
     do_prop();
