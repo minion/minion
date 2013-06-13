@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>switches -split</title>
+</head>
+<body>
+<h1>Help on <tt>switches -split</tt></h1>
+<h3>Description</h3>
+<pre>
+When Minion is terminated before the end of search, write out two new input
+files that split the remaining search space in half. Each of the files will have
+all the variables and constraints of the original file plus constraints that
+rule out the search already done. In addition, the domain of the variable under
+consideration when Minion was stopped is split in half with each of the new
+input files considering a different half.
+
+This feature is experimental and intended to facilitate parallelisation -- to
+parallelise the solving of a single constraint problem, stop and split
+repeatedly. Please note that large-scale testing of this feature was limited to
+Linux systems and it might not work on others (especially Windows).
+
+The name of the new input files is composed of the name of the original
+instance, the string 'resume', a timestamp, the process ID of Minion, the name
+of the variable whose domain is being split and 0 or 1. Each of the new input
+files has a comment identifying the name of the input file which it was split
+from. Similarly, Minion's output identifies the new input files it writes when
+splitting.
+
+The new input files can be run without any special flags.
+
+This flag is intended to be used with the -timelimit, -sollimit, -nodelimit
+,-searchlimit or -cpulimit flags. Please note that changing other flags between
+runs (such as -varorder) may have unintended consequences.
+
+Implies -makeresume.
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>
