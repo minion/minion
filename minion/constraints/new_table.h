@@ -174,13 +174,13 @@ public:
   template<typename VarArray>
   vector<DomainInt>* findSupportingTuple(const VarArray& vars, Literal lit)
   {
-    SysInt tuple_size = data->getVarCount();
-    SysInt length = data->getNumOfTuples();
-    SysInt* tuple_data = data->getPointer();
+    SysInt tuple_size = checked_cast<SysInt>(data->getVarCount());
+    SysInt length = checked_cast<SysInt>(data->getNumOfTuples());
+    DomainInt* tuple_data = data->getPointer();
 
     for(SysInt i = 0; i < length; ++i)
     {
-      SysInt* tuple_start = tuple_data + i*tuple_size;
+      DomainInt* tuple_start = tuple_data + i*tuple_size;
       bool success = true;
       if(tuple_start[checked_cast<SysInt>(lit.var)] != lit.val)
         success = false;
