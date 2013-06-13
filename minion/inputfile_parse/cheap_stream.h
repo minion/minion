@@ -128,7 +128,7 @@ public:
 
 
 template<typename T>
-void operator>>(CheapStream& cs, T& ret)
+void get_num(CheapStream& cs, T& ret)
 {
     SysInt neg_flag = 1;
     
@@ -169,21 +169,42 @@ void operator>>(CheapStream& cs, T& ret)
     
     ret = i * neg_flag;
     P(">>SysInt Got: " << i);
+
+    return;
+}
+
+inline CheapStream& operator>>(CheapStream& cs, SysInt& si)
+{ 
+    get_num(cs, si);
+    return cs;
 }
 
 template<typename T>
-void operator>>(CheapStream& cs, Wrapper<T>& ret)
+CheapStream& operator>>(CheapStream& cs, Wrapper<T>& ret)
 {
     T t = 0;
     cs >> t;
     ret = Wrapper<T>(t);
+    return cs;
 }
 
 
-void operator>>(CheapStream& cs, char& c)
+inline CheapStream& operator>>(CheapStream& cs, char& c)
 {
     while(isspace(cs.peek()))
       cs.get();
     c = cs.get();
+    return cs;
+}
+
+inline CheapStream& operator>>(CheapStream& cs, std::string& s)
+{
+    while(!cs.eof() && isspace(cs.peek()))
+        cs.get();
+    while(!cs.eof() && !isspace(cs.peek()))
+    {
+        s += cs.get();
+    }
+    return cs;
 }
 #endif
