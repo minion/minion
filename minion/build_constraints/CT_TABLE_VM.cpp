@@ -13,6 +13,10 @@
 #include "../constraints/constraint_GACtable_master.h"
 #include "../inputfile_parse/tiny_constraint_parser.hpp"
 
+#ifdef CHECK_TABLE
+#define READ_TABLE
+#endif
+
 template<typename T>
 std::string make_table_string(const T& t1, ConstraintBlob& b, char const* type)
 {
@@ -54,28 +58,54 @@ std::string make_table_string(const T& t1, ConstraintBlob& b, char const* type)
 
 #ifdef READ_TABLE
 
+
+
+
 template <typename T>
 AbstractConstraint*
 read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* type)
 { 
+    // Store a list of vms we have already loaded.
+    static std::map<std::string, std::vector<TupleList*> > cached_vms;
+
     std::string s = make_table_string(t1, b, type);
 
     std::string hash = sha1_hash(s);
 
     std::string outname = "vms/table." + hash + ".vm.table";
 
-    ifstream ifs(outname.c_str(), ios::in);
-    if(!ifs)
+    vector<TupleList*> vtl;
+
+    if(cached_vms.count(hash) > 0)
     {
-        // Opening file failed
-        if(std::string(type) == "pos")
-            return GACTableCon(stateObj, t1, b.tuples);
-        if(std::string(type) == "neg")
-            return GACNegativeTableCon(stateObj, t1, b.tuples);
-        abort();
+#ifdef CHECK_TABLE
+        std::cout << "# Match cached table\n";
+#endif
+        vtl = cached_vms[hash];
+    }
+    else
+    {
+        ifstream ifs(outname.c_str(), ios::in);
+        if(!ifs)
+        {
+#ifdef CHECK_TABLE
+            std::cout << "# No table match\n";
+#endif            
+            // Opening file failed
+            if(std::string(type) == "pos")
+                return GACTableCon(stateObj, t1, b.tuples);
+            if(std::string(type) == "neg")
+                return GACNegativeTableCon(stateObj, t1, b.tuples);
+            abort();
+        }
+#ifdef CHECK_TABLE
+        std::cout << "# Match fresh table\n";
+#endif
+
+        vtl = tiny_parser(ifs);
     }
 
-    vector<TupleList*> vtl = tiny_parser(ifs);
+    cached_vms[hash] = vtl;
 
     return VMSymCon(stateObj, t1, vtl[0], vtl[1]);
 } 
