@@ -280,7 +280,7 @@ int perm[total_lits]; \
 
 
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
    return true;// return (std::min(v[0], v[1]) == v[2]);
   }
