@@ -35,11 +35,11 @@
 
 //#define SPECIAL_VM
 
-#define UseStatePtr false
-#define UseStatePtrSym false
+#define UseStatePtr (0==1)
+#define UseStatePtrSym (0==1)
 
 #if UseStatePtr
-#error Chris broke this in the 'if' instruction in the VM
+#error Chris broke this in the if instruction in the VM
 #endif
 
 // UseStatePtr not finished:at least have to do the Jump instruction and also make sure the vm is not using Perm instructions.
@@ -172,7 +172,7 @@ struct VMConstraint : public AbstractConstraint
   }
 
 
-  int dynamic_trigger_count()
+  SysInt dynamic_trigger_count()
     { return 0; }
 #ifdef SPECIAL_VM
   virtual void special_unlock()
@@ -327,10 +327,18 @@ struct VMConstraint : public AbstractConstraint
     
     if(total_lits > 0)
     {
+#ifdef _WIN32
+// QuickFix: Windows does not support VLAs
+abort();
+// Just to make code compile
+DomainInt* vals = 0;
+DomainInt* newvals = 0;
+#else
       DomainInt vals[total_lits];
       DomainInt newvals[total_lits];
+#endif
       DomainInt* perm = 0;
-      
+
       #if UseStatePtr && UseStatePtrSym
       for(int i=0; i<total_lits; i++) vals[i]=StatePtrPerm[i];
       
@@ -534,7 +542,7 @@ struct VMConstraint : public AbstractConstraint
       execute_vm(VM_data, VM_size);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, int v_size)
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
       return true;
   }
