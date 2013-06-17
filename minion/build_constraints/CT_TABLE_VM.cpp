@@ -5,6 +5,24 @@
    For Licence Information see file LICENSE.txt 
 */
 
+#ifdef _WIN32
+
+template <typename T>
+AbstractConstraint*
+BuildCT_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
+{ return NULL; }
+
+BUILD_CT(CT_TABLE_VM, 1)
+
+template <typename T>
+AbstractConstraint*
+BuildCT_NEG_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
+{ return NULL; }
+
+BUILD_CT(CT_NEG_TABLE_VM, 1)
+
+#else
+
 #include "../constraints/vm.h"
 #include "../constraints/constraint_constant.h"
 #include <sys/types.h>
@@ -173,5 +191,7 @@ BuildCT_NEG_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
 { return output_table_vm(stateObj, t1, b, "neg"); }
 
 BUILD_CT(CT_NEG_TABLE_VM, 1)
+
+#endif // _WIN32
 
 #endif
