@@ -33,13 +33,13 @@ struct EmptyType
 // Windoes does not have a 128-bit integer
 typedef Wrapper<int64_t> BigInt;
 #else
-typedef intmax_t BigInt;
+typedef __int128_t BigInt;
 #endif
 typedef int64_t SysInt;
 typedef uint64_t UnsignedSysInt;
 #else
-typedef long long BigInt;
-typedef int SysInt;
+typedef int64_t BigInt;
+typedef int32_t SysInt;
 typedef unsigned int UnsignedSysInt;
 #endif
 
