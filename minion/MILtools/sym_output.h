@@ -945,27 +945,27 @@ struct InstanceStats
       {
           domsizes.push_back(2);
           var_memory_usage += 1;
-          domain_product += log(2);
+          domain_product += log((double)2);
       }
       for(SysInt i=0; i<v.bound.size(); i++)
       {
           SysInt dom_size = checked_cast<SysInt>(v.bound[i].second.upper_bound-v.bound[i].second.lower_bound+1);
           domsizes.push_back(dom_size);
           var_memory_usage += 64;
-          domain_product += log(dom_size);
+          domain_product += log((double)dom_size);
       }
       for(SysInt i=0; i<v.discrete.size(); i++)
       {
           SysInt dom_size = checked_cast<SysInt>(v.discrete[i].second.upper_bound-v.discrete[i].second.lower_bound+1);
           domsizes.push_back(dom_size);
           var_memory_usage += dom_size;
-          domain_product += log(dom_size);
+          domain_product += log((double)dom_size);
       }
       for(SysInt i=0; i<v.sparse_bound.size(); i++)
       {
           domsizes.push_back(v.sparse_bound[i].second.size());
           var_memory_usage += 64;
-          domain_product += log(v.sparse_bound[i].second.size());
+          domain_product += log((double)v.sparse_bound[i].second.size());
       }
 
       cout << s << "VarMemory: " << var_memory_usage << endl;
