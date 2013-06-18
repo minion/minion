@@ -585,7 +585,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 #endif
 
     default:
-    if(constraint->read_types.size() == 2 && 
+    if(constraint->number_of_params == 2 && 
          (constraint->read_types[1] == read_tuples || constraint->read_types[1] == read_short_tuples) )
       return readConstraintTable(infile, constraint);
     else
