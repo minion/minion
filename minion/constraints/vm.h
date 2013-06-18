@@ -439,7 +439,7 @@ DomainInt* newvals = 0;
       }
   }
 
-  template<typename Data, int CV>
+  template<typename Data, SysInt CV>
   inline void execute_symmetric_vm(compiletime_val<CV> cv, Data* VM_start, DomainInt length, DomainInt InPtr, DomainInt* perm, DomainInt* vals, DomainInt* newvals)
   {
     //int state = 0;
