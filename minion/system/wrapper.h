@@ -32,27 +32,37 @@ struct Wrapper
   
   Wrapper() : t()
   {}
-    
-  Wrapper& operator+=(const Wrapper& w)
+  
+  static void overflow_check(long double d)
   { 
+    if(d >= (long double)std::numeric_limits<T>::max()/1.2 ||
+       d <= (long double)std::numeric_limits<T>::min()/1.2)
+      throw std::runtime_error("Numeric over/underflow");
+  }
+  Wrapper& operator+=(const Wrapper& w)
+  {
+    overflow_check((long double)t + (long double)w.t); 
     t += w.t; 
     return *this;
   }
 
   Wrapper& operator*=(const Wrapper& w)
   { 
+    overflow_check((long double)t * (long double)w.t);
     t *= w.t; 
     return *this;
   }
 
   Wrapper& operator-=(const Wrapper& w)
   { 
+    overflow_check((long double)t - (long double)w.t);
     t -= w.t; 
     return *this;
   }
 
   Wrapper& operator/=(const Wrapper& w)
   { 
+    overflow_check((long double)t / (long double)w.t);
     t /= w.t; 
     return *this;
   }
@@ -63,10 +73,16 @@ struct Wrapper
   }
   
   void operator++()
-  { t++; }
+  { 
+    overflow_check((long double)(t + 1));
+    t++; 
+  }
   
   void operator--()
-  { t--; }
+  {
+    overflow_check((long double)(t + 1));
+    t--;
+  }
 
   Wrapper operator++(int)
   {
