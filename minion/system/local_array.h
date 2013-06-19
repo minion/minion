@@ -124,7 +124,7 @@
       const_reference 
       at(size_type __n) const
       { 
-    if (__builtin_expect(__n > _Nm, false))
+    if (__n > _Nm)
       throw std::runtime_error("Out of bounds access");
     return reinterpret_cast<const_reference>(_M_instance[__n]); 
       }
@@ -132,7 +132,7 @@
       reference 
       at(size_type __n)
       { 
-    if (__builtin_expect(__n > _Nm, false))
+    if (__n > _Nm)
       throw std::runtime_error("Out of bounds access");
     return reinterpret_cast<reference>(_M_instance[__n]); 
       }
