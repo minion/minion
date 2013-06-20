@@ -131,7 +131,9 @@ inline bool DOMAIN_CHECK(BigInt v)
 
 // These are just to catch cases where the user didn't cast to BigInt
 // themselves, which makes the function useless.
+#ifndef _WIN32
 inline void DOMAIN_CHECK(DomainInt);
+#endif
 inline void DOMAIN_CHECK(SysInt);
 inline void DOMAIN_CHECK(UnsignedSysInt);
         
