@@ -51,11 +51,6 @@ inline void CheckNotBoundSingle(const T& t, std::string s, std::string s2 = "")
     }
 }
 
-#ifdef MINION_DEBUG_PRINT
-  #ifndef MINION_DEBUG
-  #define MINION_DEBUG
-  #endif
-#endif
 
 #ifndef MINION_DEBUG
   #ifndef NO_DEBUG
