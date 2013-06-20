@@ -68,14 +68,14 @@ string get_dom_as_string(vector<T>& vec)
 
 // Count number of literals present in an array of variables.
 template<typename Vars>
-BigInt lit_count(Vars& v)
+DomainInt lit_count(Vars& v)
 {
-  BigInt lits = 0;
+  DomainInt lits = 0;
   for(SysInt i = 0; i < v.size(); ++i)
   {
     if(v[i].isBound())
     {
-      lits += checked_cast<BigInt>(v[i].getMax() - v[i].getMin() + 1);
+      lits += v[i].getMax() - v[i].getMin() + 1;
     }
     else
     {
