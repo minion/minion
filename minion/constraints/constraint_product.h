@@ -87,11 +87,10 @@ struct ProductConstraint : public AbstractConstraint
   {
     if(y == 0)
       return 0;
-    ldiv_t division = div(checked_cast<long>(x), checked_cast<long>(y));
-    long return_val = division.quot;
-    if(division.rem != 0)
-      return_val++;
-    return return_val;
+    DomainInt ret = x / y;
+    if(x % y != 0)
+      ret++;
+    return ret;
   }
   
   DomainInt round_down_div(DomainInt x, DomainInt y)
