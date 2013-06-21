@@ -8,7 +8,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one" "w
                     "watchsumleq" "table" "negativetable" "watchvecneq" "staticvecneq" "litsumgeq"
                     "pow" "div" "div_undefzero" "modulo" "modulo_undefzero" "gadget" "disabled-or"
                     "hamming" "not-hamming" "watched-or" "watched-and"
-                    "w-inset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
+                    "w-inset" "w-inintervalset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply"
                     "true" "false" "check[gsa]" "check[assign]" "forwardchecking"
                     "watchvecexists_less" "lighttable"
@@ -229,6 +229,9 @@ set(NAME_READ_watched-and "read_constraint_list")
 
 set(NAME_ID_w-inset "CT_WATCHED_INSET")
 set(NAME_READ_w-inset "read_var" "read_constant_list")
+
+set(NAME_ID_w-inintervalset "CT_WATCHED_ININTERVALSET")
+set(NAME_READ_w-inintervalset "read_var" "read_constant_list")
 
 set(NAME_ID_w-notinset "CT_WATCHED_NOT_INSET")
 set(NAME_READ_w-notinset "read_var" "read_constant_list")

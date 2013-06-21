@@ -1364,6 +1364,26 @@ class testw__minus__inset:
     def runtest(self, options=dict()):
         return runtestgeneral("w-inset", True, options, [1,5], ["num","const"], self, True)
 
+class testw__minus__inintervalset:
+    def printtable(self, domains):
+        intervals=self.constants
+        
+        dom=domains[0]
+        out=[]
+        for v in dom:
+            found=False
+            for i in range(0,len(intervals),2):
+                if v>=intervals[i] and v<=intervals[i+1]:
+                    found=True
+                    break
+            if found:
+                out.append([v])
+        return out
+        
+    def runtest(self, options=dict()):
+        options['fixlength']=True
+        return runtestgeneral("w-inintervalset", True, options, [1,6], ["num","intervals"], self, True)
+
 class testw__minus__notinset:
     def printtable(self, domains):
         vals=self.constants
@@ -1543,7 +1563,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     constnum=0   # number of the current constant
     
     for (num,typ,vect) in zip(varnums3, vartypes3, isvector3):
-        if typ=="const" or typ=="smallconst" or typ=="smallconst_distinct":
+        if typ=="const" or typ=="smallconst" or typ=="smallconst_distinct" or typ=="intervals":
             if vect:
                 # print vector of constants
                 constraint+="["
@@ -1597,7 +1617,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
 
     varnums2=varnums[:]
     for (i,t) in zip(range(len(varnums)), vartypes):
-        if t in ["const", "smallconst", "smallconst_distinct"]:
+        if t in ["const", "smallconst", "smallconst_distinct", "intervals"]:
             varnums2[i]=0   # constants, so don't count as vars.
     
     # add a line to optimise a random variable.
@@ -1791,7 +1811,7 @@ def generatevariables(varblocks, types, boundallowed):
     st_table=[]
     domainlists=[]
     constants=[]
-    typesconst=["const", "smallconst", "smallconst_distinct", "longtable"]
+    typesconst=["const", "smallconst", "smallconst_distinct", "longtable", "intervals"]
     constraints=[]   # extra constraints needed to adjust domain when Discrete is substituted for Sparsebound
     varblocks2=varblocks[:]
     for (i,t) in zip(range(len(varblocks)), types):
@@ -1823,85 +1843,101 @@ def generatevariables(varblocks, types, boundallowed):
         else:
             ty=None
         
-        for j in range(varblocks[i]):
-            # now for each variable generate a domain
-            if types[i]=="num":
-                lb=random.randint(-20, 5)
-                ub=lb+random.randint(0, 15)
-            elif types[i]=="othernum":     # An extra type that does not necessarily includ 0 and 1
-                lb=random.randint(-20,10)
-                ub=lb+random.randint(0, 15)
-            elif types[i]=="smallnum":
-                lb=random.randint(-2, 0)
-                ub=random.randint(0, 2)
-            elif types[i]=="quitesmallnum":
-                lb=random.randint(-4, 0)
-                ub=random.randint(1, 4)
-            elif types[i]=="verysmallnum":
-                lb=random.randint(-2, 0)   # max 4 vals in domain.
-                ub=random.randint(0, 1)
-            elif types[i]=="veryverysmallnum":
-                lb=random.randint(-1, 0)   # max 3 vals in domain.
-                ub=random.randint(0, 1)
-            elif types[i]=="posnum":
-                lb=random.randint(1, 20)
-                ub=lb+random.randint(0, 15)
-            elif types[i]=="smallposnum":
-                lb=1
-                ub=random.randint(2, 15)
-            elif types[i]=="nonnegnum":
-                lb=random.randint(0, 20)
-                ub=lb+random.randint(0, 15)
-            elif types[i]=="boolean":
-                lb=0
-                ub=1
-            elif types[i]=="const":
-                lb=random.randint(-20, 20)
-                ub=lb
-            elif types[i]=="smallconst":
-                lb=random.randint(-5, 5)
-                ub=lb
-            elif types[i]=="smallconst_distinct":
-                assert varblocks[i]<=11
-                lb=random.randint(-5, 5)
-                while lb in constants:
-                    lb=random.randint(-5, 5)
-                ub=lb
-            else:
-                assert False
-            
-            varnum=sum(varblocks2[0:i])+j
-            if ty=="SPARSEBOUND ":
-                # take a random subset between lb and ub
-                dom=random.sample(range(lb, ub+1), max((ub-lb)/2, 1))
-                dom.sort()
-                domainlists.append(dom)
-                strdom=""
-                for j in dom[:-1]:
-                    strdom+=str(j)+","
-                strdom+=str(dom[-1])
-                st_nontable.append(ty+"x%d {%s}"%(varnum, strdom))
-                st_table.append("DISCRETE x%d {%d..%d}"%(varnum, lb, ub))
-                for val in range(lb, ub+1):
-                    if val not in dom:
-                        # Make a constraint for the Table version to remove the spurious value.
-                        constraints+=["diseq(x%d, %d)"%(varnum, val)]
-            elif ty=="BOOL ":
-                st_nontable.append(ty+"x%d"%(varnum))
-                st_table.append(ty+"x%d"%(varnum))
-                domainlists.append([0,1])
-            elif ty=="BOUND ":
-                st_nontable.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
-                st_table.append("DISCRETE x%d {%d..%d}"%(varnum, lb, ub))
-                domainlists.append(range(lb, ub+1))
-            elif ty=="DISCRETE ":
-                st_nontable.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
-                st_table.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
-                domainlists.append(range(lb, ub+1))
-            else:
-                # a constant type. Do not append to domainlists
-                # but return in a constants list
+        if types[i]=="intervals":
+            # deal with intervals specially.
+            assert varblocks[i]%2==0
+            lb=random.randint(-20,-15)
+            ub=random.randint(15,20)
+            # generate some intervals from lb to ub. ub is not a hard constraint. 
+            intervalsleft=varblocks[i]/2
+            for j in range(0,varblocks[i],2):
                 constants.append(lb)
+                intervalwidth=random.randint(0, (ub-lb)/(intervalsleft*2))
+                constants.append(lb+intervalwidth)
+                gap=random.randint(2, ((ub-lb)/(intervalsleft*2))+2)
+                lb=lb+intervalwidth+gap
+                intervalsleft=intervalsleft-1
+            
+        else:
+            for j in range(varblocks[i]):
+                # now for each variable generate a domain
+                if types[i]=="num":
+                    lb=random.randint(-20, 5)
+                    ub=lb+random.randint(0, 15)
+                elif types[i]=="othernum":     # An extra type that does not necessarily includ 0 and 1
+                    lb=random.randint(-20,10)
+                    ub=lb+random.randint(0, 15)
+                elif types[i]=="smallnum":
+                    lb=random.randint(-2, 0)
+                    ub=random.randint(0, 2)
+                elif types[i]=="quitesmallnum":
+                    lb=random.randint(-4, 0)
+                    ub=random.randint(1, 4)
+                elif types[i]=="verysmallnum":
+                    lb=random.randint(-2, 0)   # max 4 vals in domain.
+                    ub=random.randint(0, 1)
+                elif types[i]=="veryverysmallnum":
+                    lb=random.randint(-1, 0)   # max 3 vals in domain.
+                    ub=random.randint(0, 1)
+                elif types[i]=="posnum":
+                    lb=random.randint(1, 20)
+                    ub=lb+random.randint(0, 15)
+                elif types[i]=="smallposnum":
+                    lb=1
+                    ub=random.randint(2, 15)
+                elif types[i]=="nonnegnum":
+                    lb=random.randint(0, 20)
+                    ub=lb+random.randint(0, 15)
+                elif types[i]=="boolean":
+                    lb=0
+                    ub=1
+                elif types[i]=="const":
+                    lb=random.randint(-20, 20)
+                    ub=lb
+                elif types[i]=="smallconst":
+                    lb=random.randint(-5, 5)
+                    ub=lb
+                elif types[i]=="smallconst_distinct":
+                    assert varblocks[i]<=11
+                    lb=random.randint(-5, 5)
+                    while lb in constants:
+                        lb=random.randint(-5, 5)
+                    ub=lb
+                else:
+                    assert False
+                
+                varnum=sum(varblocks2[0:i])+j
+                if ty=="SPARSEBOUND ":
+                    # take a random subset between lb and ub
+                    dom=random.sample(range(lb, ub+1), max((ub-lb)/2, 1))
+                    dom.sort()
+                    domainlists.append(dom)
+                    strdom=""
+                    for j in dom[:-1]:
+                        strdom+=str(j)+","
+                    strdom+=str(dom[-1])
+                    st_nontable.append(ty+"x%d {%s}"%(varnum, strdom))
+                    st_table.append("DISCRETE x%d {%d..%d}"%(varnum, lb, ub))
+                    for val in range(lb, ub+1):
+                        if val not in dom:
+                            # Make a constraint for the Table version to remove the spurious value.
+                            constraints+=["diseq(x%d, %d)"%(varnum, val)]
+                elif ty=="BOOL ":
+                    st_nontable.append(ty+"x%d"%(varnum))
+                    st_table.append(ty+"x%d"%(varnum))
+                    domainlists.append([0,1])
+                elif ty=="BOUND ":
+                    st_nontable.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
+                    st_table.append("DISCRETE x%d {%d..%d}"%(varnum, lb, ub))
+                    domainlists.append(range(lb, ub+1))
+                elif ty=="DISCRETE ":
+                    st_nontable.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
+                    st_table.append(ty+"x%d {%d..%d}"%(varnum, lb, ub))
+                    domainlists.append(range(lb, ub+1))
+                else:
+                    # a constant type. Do not append to domainlists
+                    # but return in a constants list
+                    constants.append(lb)
                 
     # co-sort the lines of st_nontable and st_table
     # This is to avoid the problem of variables coming out in different
@@ -1911,12 +1947,6 @@ def generatevariables(varblocks, types, boundallowed):
     # decorate the list with a key from dic.
     dic={"BOOL":1, "BOUN":2, "SPAR":3, "DISC":4}
     deco2=list(zip( map(lambda x: dic[x[0][:4]], deco), deco))
-    
-    #def comparefunc(x,y):   # sort in order: bool, bound, sparsebound, discrete
-    #    t1=x[0][:4]
-    #    t2=y[0][:4]
-    #    dic={"BOOL":1, "BOUN":2, "SPAR":3, "DISC":4}
-    #    return dic[t1]-dic[t2]
     
     deco2.sort()
     
