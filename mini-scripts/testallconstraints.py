@@ -57,7 +57,7 @@ conslist+=["max", "min"]
 
 conslist+=["watchneq", "watchless"]
 
-conslist+=["w-inset", "w-notinset", "w-inrange", "w-notinrange", "w-literal", "w-notliteral"]
+conslist+=["w-inset", "w-inintervalset", "w-notinset", "w-inrange", "w-notinrange", "w-literal", "w-notliteral"]
 
 conslist+=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
 conslist+=["not-hamming"]
