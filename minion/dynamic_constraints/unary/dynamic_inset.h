@@ -50,7 +50,7 @@ template<typename Var>
     { stable_sort(vals.begin(), vals.end()); }
 
   virtual SysInt dynamic_trigger_count()
-    { return 2; }
+    { return 2; }     // Only uses one!
 
   virtual void full_propagate()
   {  
@@ -97,7 +97,7 @@ template<typename Var>
     vector<DomainInt>::iterator it_high = std::lower_bound(vals.begin(), vals.end(), var.getMax());
     if(it_high == vals.end())
     {
-      var.setMax(*(it_high - 1));
+      var.setMax(*(it_high - 1));  // Wasn't this already done in full_propagate?
       return;
     }
 

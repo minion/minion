@@ -106,6 +106,26 @@ namespace ConOutput
     o << "]";
     return o.str();
   }
+  
+  template<typename T>
+  string print_vars(StateObj* stateObj, const std::vector<std::pair<T,T> >& t)
+  {
+    ostringstream o;
+    o << "[";
+    bool first = true;
+    for(size_t i = 0; i < t.size(); ++i)
+    {
+      if(!first)
+        o << ",";
+      else
+        first = false;
+      o << ConOutput::print_vars(stateObj, t[i].first);
+      o << ",";
+      o << ConOutput::print_vars(stateObj, t[i].second);
+    }
+    o << "]";
+    return o.str();
+  }
 
   template<typename T, size_t len>
   string print_vars(StateObj* stateObj, const minion_array<T,len>& t)
