@@ -132,10 +132,21 @@ template<typename Var>
   {
     D_ASSERT(v_size == 1);
     vector<std::pair<DomainInt,DomainInt> >::iterator it_high = std::lower_bound(intervals.begin(), intervals.end(), std::make_pair(v[0], v[0]));
-    if(it_high==intervals.end()) {
-        return false;
-    }
-    return v[0]>=(*it_high).first && v[0]<=(*it_high).second;
+    // We really need to test two intervals
+    // we could do some much clever reasoning to save two checks, but it's easier
+    // and possibly slightly cheaper to just do this.
+    if(it_high != intervals.end() && (v[0]>=(*it_high).first && v[0]<=(*it_high).second))
+      return true;
+    
+    // Step back one if required (watch out for falling off start!)
+    if(it_high != intervals.begin())
+      it_high--;
+    else
+      return false;
+
+    if(v[0]>=(*it_high).first && v[0]<=(*it_high).second)
+      return true;
+    return false;
   }
 
   virtual vector<AnyVarRef> get_vars()
