@@ -143,7 +143,7 @@ struct VMConstraint : public AbstractConstraint
 
         set<DomainInt>::iterator last = domains[i].end();
         last--;
-        if(*last - domain_min[i] >= MaxDomSize)
+        if(*last - domain_min[i] >= (DomainInt)MaxDomSize)
         {
           cout << "Go into vm.h and increase MaxDomSize\n";
           FAIL_EXIT();
