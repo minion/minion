@@ -25,14 +25,14 @@ end;
 
 CAJ_MinListImage := function(perms, L)
   local g, ret;
-  g := Group(List(perms, PermList));
+  g := GroupByGenerators(List(perms, PermList),());
   ret := NewSmallestImageList(g, L);
   return [ListPerm(ret[1]), MapListSet(L, ret[1])];
 
 end;
 
 CAJ_GroupSizeImpl := function(perms)
-  return Size(Group(List(perms, PermList)));
+  return Size(GroupByGenerators(List(perms, PermList),()));
 end;
 
 CAJ_GetGraphGens := function(tuples, maxpoint)
