@@ -34,7 +34,7 @@ struct BlockCache
 
     if(blocks.empty())
     {
-      char* ptr = static_cast<char*>(malloc(size));
+      char* ptr = static_cast<char*>( checked_malloc(size));
       if(ptr == NULL)
       { D_FATAL_ERROR("Malloc failed - Memory exausted! Aborting."); }
       return ptr;      

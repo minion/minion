@@ -114,9 +114,9 @@ public:
 
 #ifdef DYNAMICTRIGGERS
     if(only_bounds)
-      dynamic_triggers = malloc(size * sizeof(DynamicTrigger) * 4);
+      dynamic_triggers = checked_malloc(size * sizeof(DynamicTrigger) * 4);
     else
-      dynamic_triggers = malloc(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
+      dynamic_triggers = checked_malloc(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
 #else
     if(only_bounds)
       dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);

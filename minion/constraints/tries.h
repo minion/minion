@@ -478,7 +478,7 @@ public:
       vector<DomainInt> offset(arity);
       
       // create one trie for each element of scope.
-      tupleTries = (TupleTrie*) malloc(sizeof(TupleTrie) * arity);
+      tupleTries = (TupleTrie*) checked_malloc(sizeof(TupleTrie) * arity);
       if(!tupleTries)
       {
         cerr << "Out of memory in TupleTrie construction" << endl;

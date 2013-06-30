@@ -66,6 +66,9 @@ public:
   { D_DATA(sanity_check = 1234);}
 
   DynamicTrigger() : constraint(NULL)
+#ifdef BTWLDEF
+  , basequeue(NULL)
+#endif  
   {
     D_DATA(sanity_check = 1234);
     prev = next = this;

@@ -85,7 +85,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
           num_unwatched=0;
       if(num_unwatched > var_array.size()) num_unwatched=var_array.size();
       
-      unwatched_indexes = malloc(checked_cast<SysInt>(sizeof(UnsignedSysInt) * num_unwatched));
+      unwatched_indexes = checked_malloc(checked_cast<SysInt>(sizeof(UnsignedSysInt) * num_unwatched));
       // above line might request 0 bytes
       last = 0;
   }
