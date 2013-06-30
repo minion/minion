@@ -50,5 +50,10 @@ CAJ_GetGraphGens := function(tuples, maxpoint)
 
   grapegraph := Graph( Group(()),  [1..graphsize], OnPoints, function(x,y) return graph[x][y]=1; end, true );
   g := AutGroupGraph( rec(graph:=grapegraph, colourClasses := [[1..maxpoint],[maxpoint+1..graphsize]]));
+
+  if g = Group(()) then
+    g := Group(());
+  fi
+  
   return List(GeneratorsOfGroup(g), x->ListPerm(x, maxpoint));
 end; 
