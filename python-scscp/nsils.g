@@ -53,7 +53,7 @@ CAJ_GetGraphGens := function(tuples, maxpoint)
 
   if g = Group(()) then
     g := Group(());
-  fi
+  fi;
   
   return List(GeneratorsOfGroup(g), x->ListPerm(x, maxpoint));
 end; 
