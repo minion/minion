@@ -220,9 +220,9 @@ def build_tree(ct_init, tree, domains_in, domains_poss, varvalorder, heuristic):
     global calls_build_tree, TreeNodes
     calls_build_tree+=1
     
-    if calls_build_tree>3000000:
+    if (EnableSymDetection and calls_build_tree > 400000) or (calls_build_tree>3000000):
         # silent fail
-        print "#  Reached tree node limit of 3,000,000."
+        print "#  Reached tree node limit of 400,000 (sym) or 3,000,000 (no sym)."
         sys.exit(-1)
     
     # Filter the tuple list -- remove any tuples that are not valid
