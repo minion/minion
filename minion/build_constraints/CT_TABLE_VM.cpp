@@ -97,7 +97,7 @@ read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* typ
     if(cached_vms.count(hash) > 0)
     {
 #ifdef CHECK_TABLE
-        std::cout << "# Match cached table\n";
+        std::cout << "# Match cached table: '" + hash + "'\n";
 #endif
         vtl = cached_vms[hash];
     }
@@ -107,7 +107,7 @@ read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* typ
         if(!ifs)
         {
 #ifdef CHECK_TABLE
-            std::cout << "# No table match\n";
+            std::cout << "# No table match: '" + hash + "'\n";
 #endif            
             // Opening file failed
             if(std::string(type) == "pos")
@@ -117,7 +117,7 @@ read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* typ
             abort();
         }
 #ifdef CHECK_TABLE
-        std::cout << "# Match fresh table\n";
+        std::cout << "# Match fresh table: '" + hash + "'\n";
 #endif
 
         vtl = tiny_parser(ifs);
