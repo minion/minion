@@ -90,7 +90,7 @@ read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* typ
 
     std::string hash = sha1_hash(s);
 
-    std::string outname = "vms/table." + hash + ".vm.table";
+    std::string outname = "table." + hash + ".vm";
 
     vector<TupleList*> vtl;
 
