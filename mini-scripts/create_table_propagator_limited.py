@@ -1475,8 +1475,20 @@ def readTable():
         sys.exit(-1)
     
     if EnableSymDetection:
+        if tabletype=='pos':
+            ntable=table
+        else:
+            # Flip the table.
+            ntable=[]
+            alltups=[]
+            crossprod(domains_init, [], alltups)
+            
+            for t in alltups:
+                if binary_search(table, t)==-1:
+                    ntable.append(t)
+        
         maptables=[]
-        for t in table:
+        for t in ntable:
             newt = []
             for i in range(len(t)):
                 newt.append(get_lit(i,t[i]))
