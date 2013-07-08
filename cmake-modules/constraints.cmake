@@ -13,7 +13,7 @@ set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one" "w
                     "true" "false" "check[gsa]" "check[assign]" "forwardchecking"
                     "watchvecexists_less" "lighttable"
                     "haggisgac" "haggisgac-stable" "str2plus" "shortstr2" "gaceq" "gacschema"
-                    "mddc" "test" "vm" "vmsym"
+                    "mddc" "negativemddc" "test" "vm" "vmsym"
                     "tablevm" "negativetablevm"
                     )
 
@@ -163,6 +163,9 @@ set(NAME_READ_str2plus "read_list" "read_tuples")
 
 set(NAME_ID_mddc "CT_MDDC")
 set(NAME_READ_mddc "read_list" "read_tuples")
+
+set(NAME_ID_negativemddc "CT_NEGATIVEMDDC")
+set(NAME_READ_negativemddc "read_list" "read_tuples")
 
 set(NAME_ID_shortstr2 "CT_SHORTSTR")
 set(NAME_READ_shortstr2 "read_list" "read_short_tuples")
