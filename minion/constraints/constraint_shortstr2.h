@@ -17,22 +17,64 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-/** @help constraSysInts;shortstr2 Description
-Another type of table constraint.
+/** @help constraints;shortstr2 Description
+ShortSTR2 is the algorithm described in the IJCAI 2013 paper by Jefferson and
+Nightingale. It is an extension of STR2+ by Christophe Lecoutre, adapted for
+short supports. 
+
 */
 
 /** @help constraints;shortstr2 Example 
 
-ShortSTR2 is an implementation of STR2 by Christophe Lecoutre, adapted for
-short supports.
+Input format is exactly the same as haggisgac. Refer to the haggisgac and
+shorttuplelist pages for more information. 
 
-shortstr2([x,y,z], [[1,2,3], [1,3,2]])
+Example:
+
+**SHORTTUPLELIST**
+mycon 4
+[(0,0),(3,0)]
+[(1,0),(3,0)]
+[(2,0),(3,0)]
+[(0,1),(1,1),(2,1),(3,1)]
+
+**CONSTRAINTS**
+shortstr2([x1,x2,x3,x4], mycon)
 
 */
 
 /** @help constraints;shortstr2 Notes
 This constraint enforces generalized arc consistency.
 */
+
+
+/** @help constraints;shortstr2 References
+help input shorttuplelist
+help constraints table
+help constraints negativetable
+help constraints haggisgac
+help constraints haggisgac-stable
+*/
+
+
+
+/** @help constraints;str2plus Description
+str2plus is an implementation of the STR2+ algorithm by Christophe Lecoutre.
+*/
+
+/** @help constraints;str2plus Example 
+
+str2plus is invoked in the same way as all other table constraints, such 
+as table and mddc.
+
+str2plus([x,y,z], {<1,2,3>, <1,3,2>})
+
+*/
+
+/** @help constraints;shortstr2 Notes
+This constraint enforces generalized arc consistency.
+*/
+
 
 #ifndef CONSTRAINT_STR2_H
 #define CONSTRAINT_STR2_H
