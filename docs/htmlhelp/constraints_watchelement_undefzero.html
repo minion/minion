@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>constraints watchelement_undefzero</title>
+</head>
+<body>
+<h1>Help on <tt>constraints watchelement_undefzero</tt></h1>
+<h3>Description</h3>
+<pre>
+The constraint 
+
+   watchelement_undefzero(vec, i, e)
+
+specifies that, in any solution, either:
+a)  vec[i] = e and i is in the range [0 .. |vec|-1]
+b)  i is outside the index range of vec, and e = 0
+
+Unlike watchelement (and element) which are false if i is outside
+the index range of vec.
+
+In general, use watchelement unless you have a special reason to
+use this constraint!
+</pre>
+<h3>Notes</h3>
+<pre>
+Enforces generalised arc consistency.
+</pre>
+<h3>References</h3>
+<pre>
+See entry
+
+   help constraints watchelement
+
+for details of the standard element constraint, which is false
+when the array value is out of bounds.
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

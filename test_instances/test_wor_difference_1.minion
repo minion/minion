@@ -1,0 +1,14 @@
+MINION 3
+#TEST SOLCOUNT 48
+**VARIABLES**
+
+DISCRETE c[3] {0..1}
+DISCRETE d[3] {0..1}
+
+
+**CONSTRAINTS**
+
+watched-or({difference(c[0],c[1],c[2]), difference(d[0],d[1],d[2])})
+
+
+**EOF**
