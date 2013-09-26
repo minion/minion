@@ -31,8 +31,8 @@ and can also be faster (or slower). The input is identical to
 haggisgac.
 */
 
-/** @help constraints;table References
-help input haggisgac-stable
+/** @help constraints;haggisgac-stable References
+help constraints haggisgac
 */
 
 /** @help constraints;haggisgac Description
@@ -95,10 +95,11 @@ and now the variables [x1,x2,x3,x4] will satisfy the constraint mycon.
 */
 
 
-/** @help constraints;table References
+/** @help constraints;haggisgac References
 help input shorttuplelist
-help input negativetable
-help input haggisgac
+help constraints table
+help constraints negativetable
+help constraints shortstr2
 */
 
 // Default will be List.   

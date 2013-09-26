@@ -18,20 +18,35 @@
 */
 
 /** @help constraints;mddc Description
-Another type of table constraint.
-*/
+MDDC (mddc) is an implementation of MDDC(sp) by Cheng and Yap. It enforces GAC on a 
+constraint using a multi-valued decision diagram (MDD). 
 
-/** @help constraints;mddc Example 
+The MDD required for the propagator is constructed from a set of satisfying
+tuples. The constraint has the same syntax as 'table' and can function
+as a drop-in replacement. 
 
-MDDC is an implementation of MDDC(sp) by Cheng and Yap.
-
-mddc([x,y,z])
-
+For examples on how to call it, see the help for 'table'. Substitute 'mddc' for
+'table'.
 */
 
 /** @help constraints;mddc Notes
 This constraint enforces generalized arc consistency.
 */
+
+
+/** @help constraints;negativemddc Description
+Negative MDDC (negativemddc) is an implementation of MDDC(sp) by Cheng and Yap. 
+It enforces GAC on a constraint using a multi-valued decision diagram (MDD). 
+
+The MDD required for the propagator is constructed from a set of unsatisfying
+(negative) tuples. The constraint has the same syntax as 'negativetable' and
+can function as a drop-in replacement. 
+*/
+
+/** @help constraints;negativemddc Notes
+This constraint enforces generalized arc consistency.
+*/
+
 
 #ifndef CONSTRAINT_MDDC_H
 #define CONSTRAINT_MDDC_H
@@ -219,7 +234,7 @@ struct MDDNode {
     char type;  //   -1 is tt, 0 is normal, -2 is ff.
 };
 
-template<typename VarArray>
+template<typename VarArray, bool isNegative=false>
 struct MDDC : public AbstractConstraint
 {
     virtual string constraint_name()
@@ -253,8 +268,12 @@ struct MDDC : public AbstractConstraint
     AbstractConstraint(_stateObj), 
     vars(_var_array), constraint_locked(false), gno(_stateObj)
     {
-        
-        init(_tuples);
+        if(isNegative) {
+            init_negative(_tuples);
+        }
+        else {
+            init(_tuples);
+        }
         
         // set up the two sets of mdd nodes.
         
@@ -341,20 +360,7 @@ struct MDDC : public AbstractConstraint
                     }
                     mddnodes.push_back(newnode);
                     
-                    // Make the link
-                    links.push_back(std::make_pair(tup[i], newnode));
-                    
-                    // Swap it into place. 
-                    for(int i=links.size()-1; i>0; i--) {
-                        if(links[i].first<links[i-1].first) {
-                            std::pair<DomainInt, MDDNode*> temp=links[i];
-                            links[i]=links[i-1];
-                            links[i-1]=temp;
-                        }
-                        else {
-                            break;
-                        }
-                    }
+                    mklink(curnode, newnode, tup[i]);
                     
                     // Move to this new node. 
                     curnode=newnode; 
@@ -373,6 +379,112 @@ struct MDDC : public AbstractConstraint
         for(int i=0; i<mddnodes.size(); i++) {
             mddnodes[i]->id=i;
         }
+        
+        compress_from_leaves();
+    }
+    
+    // This one converts a negative list of tuples (i.e. a negative table constraint) to an mdd. 
+    void init_negative(TupleList* tuples) {
+        // First build a trie by inserting the tuples one by one.
+        
+        SysInt tlsize=checked_cast<SysInt>(tuples->size());
+        
+        SysInt tuplelen=checked_cast<SysInt>(tuples->tuple_size());
+        
+        DomainInt* tupdata=tuples->getPointer();
+        
+        // Make the top node.
+        top=new MDDNode(NULL, -1);   // Start with just a tt node. 
+        mddnodes.push_back(top);
+        
+        for(int tupid=0; tupid<tlsize; tupid++) {
+            vector<DomainInt> tup(tupdata+(tuplelen*tupid), tupdata+(tuplelen*(tupid+1) ));   // inefficient.
+            
+            MDDNode* curnode=top;
+            
+            for(int i=0; i<tuplelen; i++) {
+                // Search for value.
+                vector<std::pair<DomainInt, MDDNode*> >& links=curnode->links;
+                
+                int idx=find_link(links, tup[i]);
+                
+                if(idx==-1) {
+                    // New node(s) needed.
+                    
+                    DomainInt tupval=tup[i];
+                    
+                    MDDNode * newnode;
+                    
+                    //D_ASSERT(curnode->type==-1);   // tt node
+                    
+                    curnode->type=0;  // make it an internal node.
+                    
+                    for(DomainInt val=vars[i].getInitialMin(); val<=vars[i].getInitialMax(); val++) {
+                        if(val==tupval) {
+                            // Make the next node in the tuple. 
+                            newnode=new MDDNode(curnode, 0);
+                            if(i==tuplelen-1) {
+                                newnode->type=-2;  // At the end of the tuple -- make it an ff node.
+                            }
+                            mddnodes.push_back(newnode);
+                            mklink(curnode, newnode, val);
+                        }
+                        else {
+                            // Make a tt node. 
+                            MDDNode * tempnode=new MDDNode(curnode, -1);
+                            mddnodes.push_back(tempnode);
+                            mklink(curnode, tempnode, val);
+                        }
+                    }
+                    
+                    // Move to the new node. 
+                    curnode=newnode;
+                }
+                else {
+                    // Follow the link.
+                    curnode=links[idx].second;
+                    if(i==tuplelen-1) {
+                        // This is the case where a tt leaf node already exists. 
+                        D_ASSERT(curnode->type == -1);
+                        // Change it to an ff node. 
+                        curnode->type = -2;   
+                    }
+                }
+            }
+            D_ASSERT(curnode->type == -2);  // ff node at end of tuple. 
+            
+        }
+        // Now mdd is a trie with lots of tt nodes as the leaves.
+        // Start merging from the leaves upwards. 
+        // label the nodes with a unique integer.
+        for(int i=0; i<mddnodes.size(); i++) {
+            mddnodes[i]->id=i;
+        }
+        
+        compress_from_leaves();
+    }
+    
+    void mklink(MDDNode * curnode, MDDNode * newnode, DomainInt value) {
+        
+        vector<std::pair<DomainInt, MDDNode*> >& links=curnode->links;
+        
+        // Make the link
+        links.push_back(std::make_pair(value, newnode));
+        
+        // Swap it into place. 
+        for(int i=links.size()-1; i>0; i--) {
+            if(links[i].first<links[i-1].first) {
+                std::pair<DomainInt, MDDNode*> temp=links[i];
+                links[i]=links[i-1];
+                links[i-1]=temp;
+            }
+            else {
+                break;
+            }
+        }
+    }
+    
+    void compress_from_leaves() {
         
         for(int layer=vars.size(); layer>=0; layer--) {
             // Need a list of all nodes in this layer, with the index of their
@@ -432,12 +544,11 @@ struct MDDC : public AbstractConstraint
             
         }
         
-        // label the nodes with a unique integer.
+        // ensure nodes are labelled with unique integers. 
         for(int i=0; i<mddnodes.size(); i++) {
             D_ASSERT(mddnodes[i]->id == i);
         }
         
-        return;
     }
     
     void find_layer(int currentlayer, int targetlayer, MDDNode* curnode, vector<MDDNode* >& nodelist) {
@@ -483,16 +594,29 @@ struct MDDC : public AbstractConstraint
     {
         MDDNode* curnode=top;
         for(SysInt i=0; i<v_size; i++) {
+            
+            if(curnode->type==-1) {
+                // tt node. 
+                return true;
+            }
+            
             vector<std::pair<DomainInt, MDDNode*> >& links=curnode->links;
             int idx=find_link(links, tup[i]);
             
-            if(idx==-1) return false;
+            if(idx==-1) return false;  // implicit ff node. 
             
             curnode=links[idx].second;
         }
-        D_ASSERT(curnode->type==-1);
         
-        return true;
+        if(curnode->type==-1) {
+            return true;
+        } else if(curnode->type==-2) {
+            return false;
+        }
+        else {
+            D_ASSERT(false);
+            return true;
+        }
     }
     
     // Binary search for a value in a vector

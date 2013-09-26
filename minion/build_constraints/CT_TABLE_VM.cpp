@@ -31,6 +31,8 @@ BUILD_CT(CT_NEG_TABLE_VM, 1)
 #include "../constraints/constraint_GACtable_master.h"
 #include "../inputfile_parse/tiny_constraint_parser.hpp"
 
+#include "../constraints/constraint_mddc.h"
+
 #ifdef CHECK_TABLE
 #define READ_TABLE
 #endif
@@ -110,10 +112,14 @@ read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* typ
             std::cout << "# No table match: '" + hash + "'\n";
 #endif            
             // Opening file failed
-            if(std::string(type) == "pos")
-                return GACTableCon(stateObj, t1, b.tuples);
-            if(std::string(type) == "neg")
-                return GACNegativeTableCon(stateObj, t1, b.tuples);
+            if(std::string(type) == "pos") {
+                // return GACTableCon(stateObj, t1, b.tuples);
+                return new MDDC<T>(stateObj, t1, b.tuples);
+            }
+            if(std::string(type) == "neg") {
+                // return GACNegativeTableCon(stateObj, t1, b.tuples);
+                return new MDDC<T, true>(stateObj, t1, b.tuples);
+            }
             abort();
         }
 #ifdef CHECK_TABLE
