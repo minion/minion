@@ -1,0 +1,92 @@
+MINION 1
+#TEST CHECKONESOL 0 3 4 2 3 4 -4 -3 -1 1 -2 2
+#
+# This is meant to actually be a real instance with two solutions 
+#   We do not break the symmetry which swaps the K2 and P2, since K2=P2.
+#
+# Minion Graceful Graph Instance
+# K2 x P2
+#
+# Minion Constraint Solver Input
+#    http://sourceforge.net/projects/minion
+# Instance created using CLisp generator written by Ian Gent
+# Instance created at 15:34 on 8 Apr 2006
+0
+0
+0
+12
+-4 4 8
+0 4 4
+0
+[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11]
+[a,a,a,a,a,a,a,a,a,a,a,a]
+0
+2
+[[x8,x9,x10,x11,x0,x1,x2,x3,x4,x5,x6,x7]
+]
+[[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11]]
+0
+objective none
+print m0
+alldiff([x11,x10,x9,x8]
+)
+
+sumleq([x8,x0]
+,x9)
+
+sumgeq([x8,x0]
+,x9)
+
+sumleq([x8,x1]
+,x10)
+
+sumgeq([x8,x1]
+,x10)
+
+sumleq([x10,x2]
+,x8)
+
+sumgeq([x10,x2]
+,x8)
+
+sumleq([x9,x3]
+,x8)
+
+sumgeq([x9,x3]
+,x8)
+
+sumleq([x9,x4]
+,x11)
+
+sumgeq([x9,x4]
+,x11)
+
+sumleq([x11,x5]
+,x9)
+
+sumgeq([x11,x5]
+,x9)
+
+sumleq([x10,x6]
+,x11)
+
+sumgeq([x10,x6]
+,x11)
+
+sumleq([x11,x7]
+,x10)
+
+sumgeq([x11,x7]
+,x10)
+
+alldiff([x7,x6,x5,x4,x3,x2,x1,x0]
+)
+
+occurrence([x9,x10]
+,4,1)
+
+occurrence([x9,x10]
+,3,1)
+
+eq(x8,0)
+

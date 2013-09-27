@@ -1,0 +1,29 @@
+MINION 3
+#TEST SOLCOUNT 11
+
+**VARIABLES**
+
+DISCRETE d[2] {0..9}
+
+**SHORTTUPLELIST**
+
+Second 2
+[ (0,1), (1,1) ]
+[ (0,2) ]
+
+
+**SEARCH**
+
+PRINT [d]
+
+**CONSTRAINTS**
+
+haggisgac([d[0],d[1]],Second)
+
+haggisgac([d[0],d[1]], Second)
+
+haggisgac([2,2,2], Second)
+haggisgac([2,2,2,2], Second)
+reify(haggisgac([3,1], Second), 0)
+haggisgac([1,1,1], Second)
+**EOF**
