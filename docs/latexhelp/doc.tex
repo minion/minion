@@ -1,87 +1,3 @@
-\section{/boot}
-\paragraph{/cdrom}
-{\footnotesize
-\begin{verbatim}
-Do not print parser progress (default)
-\end{verbatim}
-}
-\paragraph{/cdrom}
-{\footnotesize
-\begin{verbatim}
-Automatically generate a short tuple list from each long tuple list.
-
-The methods of compression are:
-
-none : No short tuple list generated (default)
-eager : Use a fast algorithm to produce a reasonable short tuple list (best as first choice)
-lazy : Work harder (possibly exponentially) to produce a shorter short tuple list
-keeplong : Make a 'short tuple list' with no short tuples (only for benchmarking)
-\end{verbatim}
-}
-\paragraph{/cdrom}
-{\footnotesize
-\begin{verbatim}
-
-This switch allows the user to choose what level of preprocess is
-applied to their model before search commences.
-
-The choices are:
-
-- GAC
-- generalised arc consistency (default)
-- all propagators are run to a fixed point
-- if some propagators enforce less than GAC then the model will
-not necessarily be fully GAC at the outset
-
-- SACBounds
-- singleton arc consistency on the bounds of each variable
-- AC can be achieved when any variable lower or upper bound is a
-singleton in its own domain
-
-- SAC
-- singleton arc consistency
-- AC can be achieved in the model if any value is a singleton in
-its own domain
-
-- SSACBounds
-- singleton singleton bounds arc consistency
-- SAC can be achieved in the model when domains are replaced by either
-the singleton containing their upper bound, or the singleton containing
-their lower bound
-
-- SSAC
-- singleton singleton arc consistency
-- SAC can be achieved when any value is a singleton in its own domain
-
-These are listed in order of roughly how long they take to
-achieve. Preprocessing is a one off cost at the start of search. The
-success of higher levels of preprocessing is problem specific; SAC
-preprocesses may take a long time to complete, but may reduce search
-time enough to justify the cost.
-\end{verbatim}
-}
-\paragraph{/cdrom}
-{\footnotesize
-\begin{verbatim}
-Do not check solutions for correctness before printing them out.
-\end{verbatim}
-}
-\paragraph{/cdrom}
-{\footnotesize
-\begin{verbatim}
-To stop search after N nodes, do
-
-   minion -nodelimit N myinput.minion
-\end{verbatim}
-}
-\paragraph{/cdrom}
-{\footnotesize
-\begin{verbatim}
-To stop search after N seconds (real time), do
-
-   minion -timelimit N myinput.minion
-\end{verbatim}
-}
 \section{constraints}
 \paragraph{Description}
 {\footnotesize
@@ -2141,7 +2057,27 @@ search tree. Only available in a DEBUG executable.
 Write a resume file on timeout or being killed.
 \end{verbatim}
 }
+\section{switches -map-long-short}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Automatically generate a short tuple list from each long tuple list.
+
+The methods of compression are:
+
+none : No short tuple list generated (default)
+eager : Use a fast algorithm to produce a reasonable short tuple list (best as first choice)
+lazy : Work harder (possibly exponentially) to produce a shorter short tuple list
+keeplong : Make a 'short tuple list' with no short tuples (only for benchmarking)
+\end{verbatim}
+}
 \section{switches -nocheck}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Do not check solutions for correctness before printing them out.
+\end{verbatim}
+}
 \paragraph{Notes}
 {\footnotesize
 \begin{verbatim}
@@ -2149,6 +2085,14 @@ This option is the default on non-DEBUG executables.
 \end{verbatim}
 }
 \section{switches -nodelimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+To stop search after N nodes, do
+
+   minion -nodelimit N myinput.minion
+\end{verbatim}
+}
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
@@ -2197,6 +2141,48 @@ This is in general not useful for users, but is provided for other systems.
 \end{verbatim}
 }
 \section{switches -preprocess}
+\paragraph{}
+{\footnotesize
+\begin{verbatim}
+
+This switch allows the user to choose what level of preprocess is
+applied to their model before search commences.
+
+The choices are:
+
+- GAC
+- generalised arc consistency (default)
+- all propagators are run to a fixed point
+- if some propagators enforce less than GAC then the model will
+not necessarily be fully GAC at the outset
+
+- SACBounds
+- singleton arc consistency on the bounds of each variable
+- AC can be achieved when any variable lower or upper bound is a
+singleton in its own domain
+
+- SAC
+- singleton arc consistency
+- AC can be achieved in the model if any value is a singleton in
+its own domain
+
+- SSACBounds
+- singleton singleton bounds arc consistency
+- SAC can be achieved in the model when domains are replaced by either
+the singleton containing their upper bound, or the singleton containing
+their lower bound
+
+- SSAC
+- singleton singleton arc consistency
+- SAC can be achieved when any value is a singleton in its own domain
+
+These are listed in order of roughly how long they take to
+achieve. Preprocessing is a one off cost at the start of search. The
+success of higher levels of preprocessing is problem specific; SAC
+preprocesses may take a long time to complete, but may reduce search
+time enough to justify the cost.
+\end{verbatim}
+}
 \paragraph{Example}
 {\footnotesize
 \begin{verbatim}
@@ -2259,6 +2245,12 @@ help switches -preprocess
 \end{verbatim}
 }
 \section{switches -quiet}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Do not print parser progress (default)
+\end{verbatim}
+}
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
@@ -2374,6 +2366,14 @@ To add statistics about solving myproblem.minion to mystats.txt do
 \end{verbatim}
 }
 \section{switches -timelimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+To stop search after N seconds (real time), do
+
+   minion -timelimit N myinput.minion
+\end{verbatim}
+}
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}

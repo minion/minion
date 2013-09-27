@@ -1268,13 +1268,10 @@ cout << "" << endl
 << "" << endl
 << "- static - lexicographical ordering" << endl << endl << endl;
 } else
-if("/boot" == request) {
-cout << "Help entry: " << "/boot" << endl << endl;
-cout << "/cdrom" << "--------------------------------------------------------------------------" << endl;
-cout << "Do not print parser progress (default)" << endl << endl << endl;
-} else
 if("switches -quiet" == request) {
 cout << "Help entry: " << "switches -quiet" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Do not print parser progress (default)" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -verbose" << endl << endl << endl;
 } else
@@ -1338,9 +1335,9 @@ cout << "To enforce SSAC during search:" << endl
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -preprocess" << endl << endl << endl;
 } else
-if("/boot" == request) {
-cout << "Help entry: " << "/boot" << endl << endl;
-cout << "/cdrom" << "--------------------------------------------------------------------------" << endl;
+if("switches -map-long-short" == request) {
+cout << "Help entry: " << "switches -map-long-short" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Automatically generate a short tuple list from each long tuple list." << endl
 << "" << endl
 << "The methods of compression are:" << endl
@@ -1349,7 +1346,10 @@ cout << "Automatically generate a short tuple list from each long tuple list." <
 << "eager : Use a fast algorithm to produce a reasonable short tuple list (best as first choice)" << endl
 << "lazy : Work harder (possibly exponentially) to produce a shorter short tuple list" << endl
 << "keeplong : Make a 'short tuple list' with no short tuples (only for benchmarking)" << endl << endl << endl;
-cout << "/cdrom" << "--------------------------------------------------------------------------" << endl;
+} else
+if("switches -preprocess" == request) {
+cout << "Help entry: " << "switches -preprocess" << endl << endl;
+cout << "" << "--------------------------------------------------------------------------------" << endl;
 cout << "" << endl
 << "This switch allows the user to choose what level of preprocess is" << endl
 << "applied to their model before search commences." << endl
@@ -1387,9 +1387,6 @@ cout << "" << endl
 << "success of higher levels of preprocessing is problem specific; SAC" << endl
 << "preprocesses may take a long time to complete, but may reduce search" << endl
 << "time enough to justify the cost." << endl << endl << endl;
-} else
-if("switches -preprocess" == request) {
-cout << "Help entry: " << "switches -preprocess" << endl << endl;
 cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "To enforce SAC before search:" << endl
 << "" << endl
@@ -1403,13 +1400,10 @@ cout << "Description" << "------------------------------------------------------
 cout << "Disable incremental propagation. This should always slow down search while producing exactly the same" << endl
 << "search tree. Only available in a DEBUG executable." << endl << endl << endl;
 } else
-if("/boot" == request) {
-cout << "Help entry: " << "/boot" << endl << endl;
-cout << "/cdrom" << "--------------------------------------------------------------------------" << endl;
-cout << "Do not check solutions for correctness before printing them out." << endl << endl << endl;
-} else
 if("switches -nocheck" == request) {
 cout << "Help entry: " << "switches -nocheck" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Do not check solutions for correctness before printing them out." << endl << endl << endl;
 cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This option is the default on non-DEBUG executables." << endl << endl << endl;
 } else
@@ -1425,15 +1419,12 @@ cout << "Help entry: " << "switches -dumptree" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Print out the branching decisions and variable states at each node." << endl << endl << endl;
 } else
-if("/boot" == request) {
-cout << "Help entry: " << "/boot" << endl << endl;
-cout << "/cdrom" << "--------------------------------------------------------------------------" << endl;
+if("switches -nodelimit" == request) {
+cout << "Help entry: " << "switches -nodelimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "To stop search after N nodes, do" << endl
 << "" << endl
 << " minion -nodelimit N myinput.minion" << endl << endl << endl;
-} else
-if("switches -nodelimit" == request) {
-cout << "Help entry: " << "switches -nodelimit" << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << "help switches -timelimit" << endl
@@ -1450,15 +1441,12 @@ cout << "help switches -cpulimit" << endl
 << "help switches -nodelimit" << endl
 << "help switches -timelimit" << endl << endl << endl;
 } else
-if("/boot" == request) {
-cout << "Help entry: " << "/boot" << endl << endl;
-cout << "/cdrom" << "--------------------------------------------------------------------------" << endl;
+if("switches -timelimit" == request) {
+cout << "Help entry: " << "switches -timelimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "To stop search after N seconds (real time), do" << endl
 << "" << endl
 << " minion -timelimit N myinput.minion" << endl << endl << endl;
-} else
-if("switches -timelimit" == request) {
-cout << "Help entry: " << "switches -timelimit" << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << "help switches -nodelimit" << endl
@@ -1973,7 +1961,6 @@ cout << "Specifying an alias is a way to give a variable another name. Aliases" 
 cout << "Unknown entry, please try again." << endl;
 if("" == request) {
 cout << "Available subentries:" << endl;
-cout << "help /boot" << endl;
 cout << "help constraints" << endl;
 cout << "help input" << endl;
 cout << "help switches" << endl;
@@ -2059,6 +2046,7 @@ cout << "help switches -dumptree" << endl;
 cout << "help switches -findallsols" << endl;
 cout << "help switches -fullprop" << endl;
 cout << "help switches -makeresume" << endl;
+cout << "help switches -map-long-short" << endl;
 cout << "help switches -nocheck" << endl;
 cout << "help switches -nodelimit" << endl;
 cout << "help switches -noprintsols" << endl;

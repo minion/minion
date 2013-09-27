@@ -117,7 +117,7 @@ void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, cha
     { getOptions(stateObj).find_generators = true; }
     else if(command == string("-crash"))
     { debug_crash = true; }
-  /** @help switches;-quiet Description
+/** @help switches;-quiet Description
 Do not print parser progress (default)
 */
 
@@ -231,7 +231,7 @@ help switches -preprocess
         exit(1);
       }
     }
- /** @help switches;-map-long-short Description
+/** @help switches;-map-long-short Description
 Automatically generate a short tuple list from each long tuple list.
 
 The methods of compression are:
@@ -259,7 +259,7 @@ keeplong : Make a 'short tuple list' with no short tuples (only for benchmarking
         exit(1);
       }
     }
-    /** @help switches;-preprocess
+/** @help switches;-preprocess
 
 This switch allows the user to choose what level of preprocess is
 applied to their model before search commences.
@@ -326,7 +326,7 @@ search tree. Only available in a DEBUG executable.
     FAIL_EXIT("This version of minion was not built to support the '-fullprop' command. Sorry");
 #endif
     }
-    /** @help switches;-nocheck Description
+/** @help switches;-nocheck Description
 Do not check solutions for correctness before printing them out.
 */
 
@@ -353,7 +353,7 @@ Print out the branching decisions and variable states at each node.
 */
     else if(command == string("-dumptree"))
     { getOptions(stateObj).dumptree = true; }
-  /** @help switches;-nodelimit Description
+/** @help switches;-nodelimit Description
 To stop search after N nodes, do
 
    minion -nodelimit N myinput.minion
@@ -405,7 +405,7 @@ help switches -timelimit
         exit(1);
       }
     }
-    /** @help switches;-timelimit Description
+/** @help switches;-timelimit Description
 To stop search after N seconds (real time), do
 
    minion -timelimit N myinput.minion
