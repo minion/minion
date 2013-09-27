@@ -26,8 +26,8 @@ git status
 
 5. Push to sourceforge:
 
-git remote add sourceforge ssh://YOURACCOUNTNAME@minion.git.sourceforge.net/gitroot/minion/minion
-git push sourceforge (and enter password for your account if you can remember it).
+git remote add sourceforge ssh://YOURACCOUNTNAME@git.code.sf.net/p/minion/minion-source/
+git push sourceforge master (and enter password for your account if you can remember it).
 
 
 6. Go to jenkins. Find job minion-release and build it.
