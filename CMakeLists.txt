@@ -309,7 +309,7 @@ endif()
 
 
 
-if(WIN32 AND NOT CYGWIN)
+if(WIN32 AND NOT CYGWIN AND NOT MINGW AND NOT MSYS)
     set(CFLAGS "${CFLAGS} /EHsc")
 endif()
 
@@ -344,7 +344,7 @@ if(UNOPTIMISED)
 else()
     # apparently fomit-frame-pointer is only automatically enabled for O* levels
     # on machines where this doesn't affect debugging
-    if(WIN32 AND NOT CYGWIN)
+    if(WIN32 AND NOT CYGWIN AND NOT MINGW AND NOT MSYS)
         set(CFLAGS "${CFLAGS} /O2")
     elseif(SUNOS AND NOT CMAKE_COMPILER_IS_GNUCXX)
         set(CFLAGS "${CFLAGS} -O3")
