@@ -1155,6 +1155,14 @@ ensures that sum(vec) <= c.
 \end{verbatim}
 }
 \section{constraints table}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help input tuplelist
+help input table
+help input haggisgac
+\end{verbatim}
+}
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
@@ -1206,14 +1214,6 @@ table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})
 help input tuplelist
 help input gacschema
 help input negativetable
-help input haggisgac
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-help input tuplelist
-help input table
 help input haggisgac
 \end{verbatim}
 }
@@ -1473,6 +1473,15 @@ help constraints sumleq
 help constraints sumgeq
 \end{verbatim}
 }
+\section{constraints w-inintervalset}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the value 
+of x belongs to one of the intervals  {a1,...,a2}, {b1,...,b2} etc. The list of 
+intervals must be given in numerical order. 
+\end{verbatim}
+}
 \section{constraints w-inrange}
 \paragraph{Description}
 {\footnotesize
@@ -1494,22 +1503,6 @@ help constraints sumgeq
 \begin{verbatim}
 The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set 
 {a1,..,an}.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-notinset
-\end{verbatim}
-}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the value 
-of x belongs to one of the intervals  {a1,...,a2}, {b1,...,b2} etc. The list of 
-intervals must be given in numerical order. 
 \end{verbatim}
 }
 \paragraph{References}
