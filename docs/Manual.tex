@@ -104,7 +104,7 @@ was taken from CSPLib \cite{csplib}:
 \item Bin packing and partitioning (e.g. social golfer problem \cite{harvey01symmetry}),
 \item Frequency assignment (e.g. the Golomb ruler problem \cite{smith99golomb}),
 \item Combinatorial mathematics (e.g. balanced incomplete block design \cite{frisch-symmetry-implied-04}),
-\item Games and puzzles (e.g. maximum density still life \cite{smith-model-life}), 
+\item Games and puzzles (e.g. maximum density still life \cite{smith-model-life}),
 \item Bioinformatics (e.g. discovering protein shapes \cite{protein-structure-problems}).
 \end{itemize}
 
@@ -128,7 +128,7 @@ In this view, both splitting and propagation are transformations,
 where propagation simplifies the CSP by removing values which cannot
 take part in any solution. A splitting operation transforms a CSP
 instance into two or more simpler CSP instances, and by recursive
-application of splitting any CSP can be solved. 
+application of splitting any CSP can be solved.
 
 Since splitting is an exponential-time solution method, it is important
 that splitting is minimized by effective propagation. Much effort
@@ -272,7 +272,7 @@ More details on compile-time options can be found in section~\ref{compiletime}.
 On all platforms, Minion needs to be run from a command shell so that
 the output can be seen. If you go to the Minion directory in a shell
 and run the executable, it should output version information and a
-help message. 
+help message.
 
 
 \subsection{The debug variant}
@@ -304,7 +304,7 @@ supported in Minion.
 \end{description}
 To access the help for the \texttt{alldiff} constraint, for example, the command
 would be \texttt{minion help constraints alldiff}. The full documentation
-provided by the Minion executable is reproduced in the Appendix of 
+provided by the Minion executable is reproduced in the Appendix of
 this manual.
 
 
@@ -394,7 +394,7 @@ One of the most immediately confusing features of Minion are the variable types.
 \item[\SPARSEBOUND] Variable whose domain is an arbitrary range of integers. Otherwise identical to BOUND.
 \end{description}
 
-It appears one obvious variable implementation, \texttt{SPARSEDISCRETE}, is missing. This did exist in some very early versions of Minion but due to bugs and lack of use was removed. 
+It appears one obvious variable implementation, \texttt{SPARSEDISCRETE}, is missing. This did exist in some very early versions of Minion but due to bugs and lack of use was removed.
 
 Some of the differences between the variable types only effect performance, whereas some others can effect search size. We provide these here.
 
@@ -403,7 +403,7 @@ Some of the differences between the variable types only effect performance, wher
 
 \item A \BOUND variable will in general produce a search with more nodes per second, but more nodes overall, than a \DISCRETE variable.
 
-\item Using \SPARSEBOUND or \BOUND variables with a unary constraint imposing the sparse domain should produce identical searches, except the \SPARSEBOUND will be faster if the domain is sparse. 
+\item Using \SPARSEBOUND or \BOUND variables with a unary constraint imposing the sparse domain should produce identical searches, except the \SPARSEBOUND will be faster if the domain is sparse.
 \end{enumerate}
 
 As a basic rule of thumb, Always use \BOOL for Boolean domains, \DISCRETE for domains of size up to around 100, and the \BOUND. With \DISCRETE domains, use the \texttt{w-inset} constraint to limit the domain. When to use \SPARSEBOUND over \BOUND is harder, but usually the choice is clear, as either the domain will be a range, or a set like \(\{1,10,100,100\}\).
@@ -503,38 +503,17 @@ be able to generate the API documentation. If you have a \texttt{pdflatex}
 executable and a UNIX-like system, you will be able to generate the PDF
 documentation.
 
-\subsection{Selective compilation of constraints}
-
-The most time-consuming part of the Minion compilation process is the
-compilation of all the constraints. If not all constraints are required, the
-user may specify the constraints to be compiled into the binary in two ways.
-
-When running \texttt{cmake} one can give it the \verb+-DCONSTRAINTS="<list>"+
-flag to specify the semicolon-separated list of constraints to be compiled,
-e.g.\
-\begin{verbatim}
-cmake -DCONSTRAINTS="sumleq;sumgeq" <path/to/minion>
-\end{verbatim}
-
-Alternatively, one can specify the name of a Minion input file or a file
-containing a list of constraints with the \verb+-DCONSTRAINTS_FILE=<file>+
-option, e.g.\
-\begin{verbatim}
-cmake -DCONSTRAINTS_FILE=input.minion <path/to/minion>
-\end{verbatim}
-Note that this does not work with compressed input files.
-
 \chapter{Minion in Practice}
-The previous chapter clearly outlined what the constructs of a Minion file are, including what the variable types are and which type of constraint should be used when. This chapter takes a more practical role, outlined within are 7 minion example files which are clearly commented so that the user can see what a minion file looks like in practice. Comments in minion start with a $\sharp$, however for reasons of ease of reading all lines of actual code be it Minion or Essence' are shown in typewriter text and comments are inserted in normal text. The first file is a modified version of the one that all the minion developers turn to when modelling a new problem in minion. It shows exactly what a minion file can include and what the syntax is for all the possible sections. If you are modelling a problem as minion than we recommend you take a copy of this file and edit it appropriately, as this will help to guide you through the modelling process. The rest of this chapter contains versions  of the minion input examples introduced in the Tailor chapter of this manual. These are all produced automatically by tailor from the Essence' specification given in that chapter. We hope the comments will clarify exactly what these files mean. These examples can be used as the bases to implement any similar problems. The Minion overview is completed in the last chapter where a full list of all the constraints is given, including a brief overview of how each operates. 
+The previous chapter clearly outlined what the constructs of a Minion file are, including what the variable types are and which type of constraint should be used when. This chapter takes a more practical role, outlined within are 7 minion example files which are clearly commented so that the user can see what a minion file looks like in practice. Comments in minion start with a $\sharp$, however for reasons of ease of reading all lines of actual code be it Minion or Essence' are shown in typewriter text and comments are inserted in normal text. The first file is a modified version of the one that all the minion developers turn to when modelling a new problem in minion. It shows exactly what a minion file can include and what the syntax is for all the possible sections. If you are modelling a problem as minion than we recommend you take a copy of this file and edit it appropriately, as this will help to guide you through the modelling process. The rest of this chapter contains versions  of the minion input examples introduced in the Tailor chapter of this manual. These are all produced automatically by tailor from the Essence' specification given in that chapter. We hope the comments will clarify exactly what these files mean. These examples can be used as the bases to implement any similar problems. The Minion overview is completed in the last chapter where a full list of all the constraints is given, including a brief overview of how each operates.
 
 \section{Minion Example File}
-This file does not really relate to any English problem description, although it does parse and run,  it is an example which clearly shows all of the possible Minion input file constructs. If you are modelling a problem as minion than we recommend you take a copy of this file and edit it appropriately, as this will help to guide you through the modelling process. It can be found in the \begin{verbatim}summer_school\end{verbatim} directory and is called \begin{verbatim}format_example.minion\end{verbatim} we have added comments  to explain the different sections to the novice user. 
+This file does not really relate to any English problem description, although it does parse and run,  it is an example which clearly shows all of the possible Minion input file constructs. If you are modelling a problem as minion than we recommend you take a copy of this file and edit it appropriately, as this will help to guide you through the modelling process. It can be found in the \begin{verbatim}summer_school\end{verbatim} directory and is called \begin{verbatim}format_example.minion\end{verbatim} we have added comments  to explain the different sections to the novice user.
 
 \begin{verbatim}
 MINION 3
 \end{verbatim}
 
-This file includes an example of all the different inputs  you can give to Minion.  It is a very good place to start from when modelling  problem in the Minion specification. 
+This file includes an example of all the different inputs  you can give to Minion.  It is a very good place to start from when modelling  problem in the Minion specification.
 
  The first section is where all the variables are declared.
  \begin{verbatim}
@@ -543,38 +522,38 @@ This file includes an example of all the different inputs  you can give to Minio
 
 There are 4 type of variables. Booleans don't need a domain and are formatted as follows:
  \begin{verbatim}
-BOOL bo    
+BOOL bo
  \end{verbatim}
 
 Internally, Bound variables are stored only as a lower  and upper bound whereas discrete variables allow any sub-domain.
-Bound variables need a domain given as a range as follows: 
+Bound variables need a domain given as a range as follows:
  \begin{verbatim}
-BOUND b {1..3}   
+BOUND b {1..3}
  \end{verbatim}
 
-Discrete variables also need a domain given as a range as follows:   
+Discrete variables also need a domain given as a range as follows:
 \begin{verbatim}
-DISCRETE d {1..3} 
+DISCRETE d {1..3}
 \end{verbatim}
 
 Sparse bound variables take a sorted list of values as follows:
 \begin{verbatim}
-SPARSEBOUND s {1,3,6,7} 
+SPARSEBOUND s {1,3,6,7}
 \end{verbatim}
 
 We can also declare matrices of variables. The first example is a matrix with 3 variables: q[0],q[1] and q[2].
 \begin{verbatim}
-DISCRETE q[3] {0..5} 
+DISCRETE q[3] {0..5}
 \end{verbatim}
 
 The second example is of a 2d matrix, where the variables are bm[0,0], bm[0,1], bm[1,0], bm[1,1].
 \begin{verbatim}
-BOOL bm[2,2] 
+BOOL bm[2,2]
 \end{verbatim}
 
 The third example shows how to declare a matrix with more indices. You can have as many indices as you like!
 \begin{verbatim}
-BOOL bn[2,2,2,2] 
+BOOL bn[2,2,2,2]
 \end{verbatim}
 
 In this next section, which is optional, you can define tuplelists. Tuplelists provide a method of defining sets of tuples which can then be used in \texttt{table} and \texttt{negativetable} constraints. Defining these in a \texttt{**TUPLELIST**} does not change the search, but can save memory by reusing the same list of tuples in multiple constraints.The input is: $\langle$name$\rangle$ $\langle$num$\_$of$\_$tuples$\rangle$ $\langle$tuple$\_$length$\rangle$ $\langle$numbers$\ldots \rangle$.
@@ -601,7 +580,7 @@ Note that except in special cases (the \texttt{reify} and \texttt{reifyimply} co
 
 To get a single variable from a matrix, you index it with square brackets using
 commas to separate the dimensions of the matrix. The first example following
-is a 1D matrix, the second in 4D. 
+is a 1D matrix, the second in 4D.
 \begin{verbatim}
 eq(q[1],0)
 eq(bn[0,1,1,1], bm[1,1])
@@ -634,12 +613,12 @@ table([q],{ <0,2,3>,<2,0,3>,<3,1,3> })
 
 The last section is the search section. This section is optional, and allows some limited control over the way minion searches for a solution. Note that everything in this section can be given at most once.
 \begin{verbatim}
-**SEARCH** 
+**SEARCH**
 \end{verbatim}
 
 You give the variable ordering by listing each of the variables in the order you wish them to be searched. You can either list each of the variables in a matrix individually by giving the index of each variable, or you can just state the matrix in which case it goes through each of the variables in turn. If you miss any of the variables out than these variables are not branched on. Note that this can lead to Minion reporting invalid solutions, so use with care! If you don't give an explicit variable ordering, than one is generated based on the order the variables are declared. If you give a \texttt{-varorder} on the command line, that will only consider the variable given in the \texttt{VARORDER}.
 \begin{verbatim}
-VARORDER [bo,b,d,q[_]] 
+VARORDER [bo,b,d,q[_]]
 \end{verbatim}
 
 You give the value order for each variable as either \texttt{a} for ascending or \texttt{d} for descending. The value orderings are given in the same order as the variable ordering. For example, to make the variable b by searched in descending order you make the second term into a \texttt{d} as the above variable ordering shows it to be the second variable to be searched. The default variable order is ascending order for all variables.
@@ -659,7 +638,7 @@ PRINT [ [bo, q] ]
 \end{verbatim}
 
 
-The file must end with the **EOF** marker! Any text under that is ignored, so you can write 
+The file must end with the **EOF** marker! Any text under that is ignored, so you can write
 whatever you like (or nothing at all...)
 \begin{verbatim}
 **EOF**
@@ -727,7 +706,7 @@ find S,E,N,D,M,O,R,Y : int(0..9)
 
 such that
 
-1000*S + 100*E + 10*N + D + 
+1000*S + 100*E + 10*N + D +
 1000*M + 100*O + 10*R + E =
 10000*M + 1000*O + 100*N + 10*E + Y,
 
@@ -773,7 +752,7 @@ The second constraint represents:$(1000 \times S) + (100 \times E) + (10 \times 
 
 \begin{verbatim}
 weightedsumgeq(
-	[1,10,100,1000,10000,-1,-1,-10,-10,-100,-100,-1000,-1000], 
+	[1,10,100,1000,10000,-1,-1,-10,-10,-100,-100,-1000,-1000],
 	[Y,E,N,O,M,D,E,N,R,E,O,M,S], 0)
 weightedsumleq(
 	[1,10,100,1000,10000,-1,-1,-10,-10,-100,-100,-1000,-1000],
@@ -787,7 +766,7 @@ The eight number puzzle asks you to label the nodes of the graph shown in Figure
 
 \begin{figure}[htp]
 \centering
-\includegraphics[scale=0.25] {EightPuzzleDiagram.pdf} 
+\includegraphics[scale=0.25] {EightPuzzleDiagram.pdf}
 \caption{Graph which represents The Eight Number Puzzle}
 \label{fig:8puzzle}
 \end{figure}
@@ -965,7 +944,7 @@ This problem is stated as follows. A labelling $f$ of the nodes of a graph with 
 
 \begin{figure}[htp]
 \centering
-\includegraphics[scale=0.25] {k4xp2.pdf} 
+\includegraphics[scale=0.25] {k4xp2.pdf}
 \caption{A $K_4 \times P_2$ Graph }
 \label{fig:k4xp2}
 \end{figure}
@@ -1006,7 +985,7 @@ The Minion model is then:
 MINION 3
 \end{verbatim}
 
-There are two 1d arrays of variables one representing all the node variables and one representing all the edge variables. The 8 node variables have domain 0 to 16 and the edge variables have domain 1 to 16. There are also 16 auxiliary variables introduced called aux0 to aux15 there is one of these for each constraint and there is one constraint to represent each edge. 
+There are two 1d arrays of variables one representing all the node variables and one representing all the edge variables. The 8 node variables have domain 0 to 16 and the edge variables have domain 1 to 16. There are also 16 auxiliary variables introduced called aux0 to aux15 there is one of these for each constraint and there is one constraint to represent each edge.
 
 \begin{verbatim}
 **VARIABLES**
@@ -1032,7 +1011,7 @@ DISCRETE aux14 {-16..16}
 DISCRETE aux15 {-16..16}
 \end{verbatim}
 
-The variable order is to branch on the nodes then on the edges then the auxiliary variables. Only the node and the edge variables are printed. 
+The variable order is to branch on the nodes then on the edges then the auxiliary variables. Only the node and the edge variables are printed.
 
 \begin{verbatim}
 **SEARCH**
@@ -1044,7 +1023,7 @@ aux0,aux1,aux2,aux3,aux4,aux5,aux6,aux7,
 aux8,aux9,aux10,aux11,aux12,aux13,aux14,aux15]
 \end{verbatim}
 
-Implicit in the problem is an all different constraint on both the node and edge variables. The other constraints are all of the form |nodes[a] - nodes[b]| = edges[a], the first of these constraints from the Essence' specification is $|nodes[1] - nodes[2]| = edges[1]$  this corresponds to the last three constraints in the minion file as the order of constraints are reversed. Minion starts indexing matrices from 0, whereas Essence' started numbering from 1 so the above constraint becomes $|nodes[0] - nodes[1]| = edges[0]$.  This is broken into $nodes[0] - nodes[1] = aux0$ and $|edges[0]| = aux0$. As minion has no weighted sum equals this is broken into a weighted sum less than or equals to and weighted sum greater than or equals to. So this full constraint is represented as $nodes[0] - nodes[1]  \leq aux0$ and $nodes[0] - nodes[1]  \geq aux0$ and $|edges[0]| = aux0$. 
+Implicit in the problem is an all different constraint on both the node and edge variables. The other constraints are all of the form |nodes[a] - nodes[b]| = edges[a], the first of these constraints from the Essence' specification is $|nodes[1] - nodes[2]| = edges[1]$  this corresponds to the last three constraints in the minion file as the order of constraints are reversed. Minion starts indexing matrices from 0, whereas Essence' started numbering from 1 so the above constraint becomes $|nodes[0] - nodes[1]| = edges[0]$.  This is broken into $nodes[0] - nodes[1] = aux0$ and $|edges[0]| = aux0$. As minion has no weighted sum equals this is broken into a weighted sum less than or equals to and weighted sum greater than or equals to. So this full constraint is represented as $nodes[0] - nodes[1]  \leq aux0$ and $nodes[0] - nodes[1]  \geq aux0$ and $|edges[0]| = aux0$.
 
 \begin{verbatim}
 **CONSTRAINTS**
@@ -1103,7 +1082,7 @@ abs(edges[0],aux0)
 **EOF**
 \end{verbatim}
 
-\section{The Zebra Puzzle} 
+\section{The Zebra Puzzle}
 
 The Zebra Puzzle is a very famous logic puzzle. There are many different versions, but the version we will answer is as follows:
 \begin{enumerate}
@@ -1162,8 +1141,8 @@ find colour: matrix indexed by [int(1..5)] of int(1..5),
 
 such that
 
-$constraints needed as this is a logical problem where 
-$the value allocated to each position of the matrix 
+$constraints needed as this is a logical problem where
+$the value allocated to each position of the matrix
 $represents positon of house
 alldiff(colour),
 alldiff(nationality),
@@ -1186,7 +1165,7 @@ drink[1] = colour[2],
 $The Ukranian drinks tea.
 nationality[3] = drink[2],
 
-$The green house is immediately to the 
+$The green house is immediately to the
 $right of the ivory house.
 colour[2] + 1 = colour[3],
 
@@ -1202,11 +1181,11 @@ drink[3] = 3,
 $The Norwegian lives in the first house
 nationality[4] = 1,
 
-$The man who smokes Chesterfields lives in 
+$The man who smokes Chesterfields lives in
 $the house next to the man with the fox.
 |smoke[3] - pets[3]| = 1,
 
-$Kools are smoked in the house next 
+$Kools are smoked in the house next
 $ to the house where the horse is kept.
 |smoke[2] - pets[4]| = 1,
 
@@ -1221,7 +1200,7 @@ $The Norwegian lives next to the blue house.
 
 \end{verbatim}
 
-The Minion model is then: 
+The Minion model is then:
 
 \begin{verbatim}
 MINION 3
@@ -1253,7 +1232,7 @@ PRINT [colour,nationality,drink,smoke,pets]
 VARORDER [colour,nationality,drink,smoke,pets,aux0,aux1,aux2]
 \end{verbatim}
 
-We will go through each constraint in turn. As usual the constraints in Minion are in the reverse order of the Essence' specification and the minion matrices are indexed from 0 whereas 
+We will go through each constraint in turn. As usual the constraints in Minion are in the reverse order of the Essence' specification and the minion matrices are indexed from 0 whereas
 \begin{verbatim}
 **CONSTRAINTS**
 \end{verbatim}
@@ -1273,7 +1252,7 @@ eq(nationality[4], smoke[4])
 $drink[4] = smoke[4]$ becomes by counting indices from zero: $drink[3] = smoke[3]$.
 \begin{verbatim}
 eq(drink[3], smoke[3])
-\end{verbatim} 
+\end{verbatim}
 
 $|smoke[2] - pets[4]| = 1$ becomes by counting indices from zero: $|smoke[1] - pets[3]| = 1$. This is then decomposed as $smoke[1] - pets[3] \leq aux1$, $smoke[1] - pets[3] \geq aux1$ and $|aux1|=1$.
 \begin{verbatim}
@@ -1309,7 +1288,7 @@ $smoke[1] = pets[2]$ becomes by counting indices from zero: $smoke[0] = pets[1]$
 eq(pets[1], smoke[0])
 \end{verbatim}
 
-$colour[2] + 1 = colour[3]$ becomes by counting indices from zero: $colour[1] + 1 = colour[2]$. This is decomposed as $colour[1] + 1 \leq colour[2]$ and $colour[1] + 1 \geq colour[2]$. 
+$colour[2] + 1 = colour[3]$ becomes by counting indices from zero: $colour[1] + 1 = colour[2]$. This is decomposed as $colour[1] + 1 \leq colour[2]$ and $colour[1] + 1 \geq colour[2]$.
 \begin{verbatim}
 sumleq([1,colour[1]], colour[2])
 sumgeq([1,colour[1]], colour[2])
@@ -1363,7 +1342,7 @@ forall i : int(1..n). forall j : int(i+1..n).
 letting n be 4
 \end{verbatim}
 
-The Minion model is then: 
+The Minion model is then:
 \begin{verbatim}
 MINION 3
 \end{verbatim}
@@ -1437,20 +1416,20 @@ alldiff([queens])
 
 \appendix
 \chapter{All the Minion programming constructs}\label{chap:all}
-You are viewing documentation for minion. The same 
-documentation is available from a minion executable by 
+You are viewing documentation for minion. The same
+documentation is available from a minion executable by
 typing \texttt{minion help} at the command line.
-We intend that the command line help system be the 
+We intend that the command line help system be the
 main source of documentation for the system.
 
 Each of the entries below concerns a different aspect
 of the system, and the entries are arranged hierarchically.
 For example to view information about the set of available
 constraints as a whole view ``constraints'' and to view
-specific information about the alldiff constraint view 
+specific information about the alldiff constraint view
 ``constraints alldiff''.
 
-A good place to start would be viewing the 
+A good place to start would be viewing the
 ``input example'' entry which exhibits a complete
 example of a minion input file.
 
