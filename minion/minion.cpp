@@ -70,8 +70,6 @@ void print_default_help(char** argv)
 #endif
   cout << "The following preprocessor flags were active:" << endl;
   print_macros();
-  cout << "The following constraints were compiled in:" << endl;
-  print_constraints();
 }
 
 void worker()
