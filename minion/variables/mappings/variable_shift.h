@@ -27,73 +27,73 @@ struct ShiftVar
   static const BOOL isBool = false;
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
-  
+
   AnyVarRef popOneMapper() const
   { return data; }
 
   BOOL isBound() const
   { return data.isBound();}
-  
+
   ShiftType shift;
   ShiftVar(const VarRef& _data, ShiftType _shift) : data(_data), shift(_shift)
   { }
-  
+
   ShiftVar() : data(), shift()
   { }
-  
+
   ShiftVar(const ShiftVar& b) : data(b.data), shift(b.shift)
   { }
-  
+
   BOOL isAssigned() const
   { return data.isAssigned(); }
-  
+
   DomainInt getAssignedValue() const
   { return data.getAssignedValue() + shift; }
-  
+
   BOOL isAssignedValue(DomainInt i) const
   { return data.getAssignedValue() == i - shift; }
-  
+
   BOOL inDomain(DomainInt i) const
   { return data.inDomain(i - shift); }
 
   BOOL inDomain_noBoundCheck(DomainInt i) const
   { return data.inDomain(i - shift); }
-  
+
   DomainInt getDomSize() const
   { return data.getDomSize(); }
 
   DomainInt getMax() const
   { return data.getMax() + shift; }
-  
+
   DomainInt getMin() const
   { return data.getMin() + shift; }
 
   DomainInt getInitialMax() const
   { return data.getInitialMax() + shift; }
-  
+
   DomainInt getInitialMin() const
   { return data.getInitialMin() + shift; }
-  
+
   void setMax(DomainInt i)
   { data.setMax(i - shift); }
-  
+
   void setMin(DomainInt i)
   { data.setMin(i - shift); }
-  
+
   void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(b - shift); }
-  
+
   void propagateAssign(DomainInt b)
   { data.propagateAssign(b - shift); }
-  
+
   void decisionAssign(DomainInt b)
   { data.decisionAssign(b - shift); }
-  
+
   void removeFromDomain(DomainInt b)
   { data.removeFromDomain(b - shift); }
-    
+
  void addTrigger(Trigger t, TrigType type)
-  { 
+  {
     switch(type)
     {
       case UpperBound:
@@ -107,10 +107,10 @@ struct ShiftVar
     }
   }
 
-  
+
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  {  
+  {
     switch(type)
     {
       case UpperBound:
@@ -124,7 +124,7 @@ struct ShiftVar
         data.addDynamicTrigger(t, type, pos BT_CALL);
         break;
       case DomainRemoval:
-        data.addDynamicTrigger(t, DomainRemoval, pos - shift BT_CALL); 
+        data.addDynamicTrigger(t, DomainRemoval, pos - shift BT_CALL);
         break;
       default:
         D_FATAL_ERROR("Broken dynamic trigger");
@@ -134,7 +134,7 @@ struct ShiftVar
 
   friend std::ostream& operator<<(std::ostream& o, const ShiftVar& sv)
   { return o << "Shift " << sv.data << "+" << sv.shift; }
-  
+
   DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
 
@@ -151,15 +151,15 @@ struct ShiftVar
   Var getBaseVar() const { return data.getBaseVar(); }
 
   vector<Mapper> getMapperStack() const
-  { 
+  {
     vector<Mapper> v = data.getMapperStack();
-    v.push_back(Mapper(MAP_SHIFT, (DomainInt)shift)); 
+    v.push_back(Mapper(MAP_SHIFT, (DomainInt)shift));
     return v;
   }
 
 
 #ifdef WDEG
-  SysInt getBaseWdeg()
+  DomainInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()

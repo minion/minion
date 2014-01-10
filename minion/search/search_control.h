@@ -26,20 +26,20 @@
 
 namespace Controller
 {
-    
+
     minion_shared_ptr<VariableOrder> make_search_order(SearchOrder order, StateObj* stateObj)
     {
-        // collect the variables in the SearchOrder object 
+        // collect the variables in the SearchOrder object
         vector<AnyVarRef> var_array;
         for(SysInt i=0; i<order.var_order.size(); i++)
         {
             var_array.push_back(get_AnyVarRef_from_Var(stateObj, order.var_order[i]));
             // some check here?
         }
-        
+
         VariableOrder* vo;
         VariableOrder* vo2;
-        
+
         switch(order.order)  // get the VarOrderEnum
         {
         case ORDER_STATIC:
@@ -62,7 +62,7 @@ namespace Controller
             vo2=new StaticBranch(var_array, order.val_order, stateObj);
             vo=new ConflictBranch(var_array, order.val_order, vo2, stateObj);
             break;
-        
+
         #ifdef WDEG
         case ORDER_WDEG:
             vo=new WdegBranch(var_array, order.val_order, stateObj);
@@ -70,20 +70,24 @@ namespace Controller
         case ORDER_DOMOVERWDEG:
             vo=new DomOverWdegBranch(var_array, order.val_order, stateObj);
             break;
+        #else
+        case ORDER_WDEG:
+        case ORDER_DOMOVERWDEG:
+            USER_ERROR("This minion was not compiled with support for wdeg or domoverwdeg orderings (add -WDEG to build options)");
         #endif
-        
+
         default:
             cout << "Order not found in make_search_order." << endl;
             abort();
         }
         return minion_shared_ptr<VariableOrder>(vo);
     }
-    
+
     minion_shared_ptr<VariableOrder> make_search_order_multiple(vector<SearchOrder> order,
                                                          StateObj* stateObj)
     {
         minion_shared_ptr<VariableOrder> vo;
-        
+
         if(order.size()==1)
         {
             return make_search_order(order[0], stateObj);
@@ -100,23 +104,23 @@ namespace Controller
                     abort();
                 }
             }
-            
+
             vo=minion_shared_ptr<VariableOrder>(new MultiBranch(vovector, stateObj));
         }
-        
+
         return vo;
     }
-    
-    
+
+
 // returns an instance of SearchManager with the required variable ordering, propagator etc.
 minion_shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
                                               PropagationLevel prop_method,
                                               vector<SearchOrder> order)
 {
     minion_shared_ptr<VariableOrder> vo;
-    
+
     vo=make_search_order_multiple(order, stateObj);
-    
+
     minion_shared_ptr<Propagate> p;
     switch(prop_method)
     {   // doesn't cover the PropLevel_None case.
@@ -139,9 +143,9 @@ minion_shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
         cout << "Propagation method not found in make_search_manager." << endl;
         abort();
     }
-    
+
     vector<AnyVarRef> all_vars;
-    
+
     for(SysInt i=0; i<order.size(); i++)
     {
         for(SysInt j=0; j<order[i].var_order.size(); j++)
@@ -149,10 +153,10 @@ minion_shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
             all_vars.push_back(get_AnyVarRef_from_Var(stateObj, order[i].var_order[j]));
         }
     }
-    
+
     // need to switch here for different search algorthms. plain, parallel, group
     minion_shared_ptr<SearchManager> sm(new SearchManager(stateObj, all_vars, order, vo, p));
-    
+
     return sm;
 }
 

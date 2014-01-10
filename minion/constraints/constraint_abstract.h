@@ -160,7 +160,7 @@ public:
   }
 
 #ifdef WDEG
-  inline DomainInt getWdeg() { return wdeg; }
+  inline UnsignedSysInt getWdeg() { return wdeg; }
 
   inline void incWdeg()
   {
@@ -234,7 +234,7 @@ public:
       (*it)->post_trigger();
     }
   }
-  
+
   SysInt getTightnessEstimate()
   {
       // Make 1000 random tuples and see if they satisfy the constraint

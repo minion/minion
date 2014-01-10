@@ -68,7 +68,7 @@ struct ConstantVar
 
   DomainInt getDomSize() const
   { return 1; }
-  
+
   DomainInt getMax() const
   { return val; }
 
@@ -124,7 +124,7 @@ struct ConstantVar
   { return vector<Mapper>(); }
 
 #ifdef WDEG
-  SysInt getBaseWdeg() { return 0; } //wdeg is irrelevant for non-search var
+  DomainInt getBaseWdeg() { return 0; } //wdeg is irrelevant for non-search var
 
   void incWdeg() { ; }
 #endif

@@ -30,9 +30,9 @@ Minion3Input::= MINION 3
                 <InputSection>+
                 **EOF**
 
-InputSection::= <VariablesSection> 
+InputSection::= <VariablesSection>
               | <SearchSection>
-              | <ConstraintsSection> 
+              | <ConstraintsSection>
               | <TuplelistSection>
               | <ShortTuplelistSection>
 
@@ -45,7 +45,7 @@ All text from a '#' character to the end of the line is ignored.
 See the associated help entries below for information on each section.
 */
 
-/** @help input Notes 
+/** @help input Notes
 You can give an input file via standard input by specifying '--' as the file
 name, this might help when minion is being used as a tool in a shell script or
 for compressed input, e.g.,
@@ -78,7 +78,7 @@ See the help section
 for detailed information on variable declarations.
 */
 
-/** @help input;constraints Description 
+/** @help input;constraints Description
 
 The constraints section consists of any number of constraint
 declarations on separate lines.
@@ -167,7 +167,7 @@ mycon 8 4
 1 1 1 1
 
 Short tuples give us a way of shrinking this list. Short tuples consist
-of pairs (x,y), where x is a varible position, and y is a value for that 
+of pairs (x,y), where x is a varible position, and y is a value for that
 variable. For example:
 
 [(0,0),(3,0)]
@@ -178,7 +178,7 @@ Represents 'If the variable at index 0 is 0, and the variable at index
 
 Note that some tuples are double-represented in the example 'mycon'.
 The first 3 short tuples all allow the assignment '0 0 0 0'. This is fine.
-The important thing for efficency is to try to give a small list of 
+The important thing for efficency is to try to give a small list of
 short tuples.
 */
 
@@ -190,11 +190,11 @@ help input tuplelist
 
 
 
-/** @help input;search Description 
+/** @help input;search Description
 
 Inside the search section one can specify
 
-- variable orderings, 
+- variable orderings,
 - value orderings,
 - optimisation function, and
 - details of how to print out solutions.
@@ -211,7 +211,7 @@ anything specified in the input file.
 
 Multiple variable orders can be given, each with an optional value ordering:
 
-   VarValOrdering::= <VarOrder> 
+   VarValOrdering::= <VarOrder>
                      <ValOrder>?
 
 In each VarOrder an instantiation order is specified for a subset of
@@ -223,7 +223,7 @@ differing only in the auxiliary variables, only one is reported by minion.
 
       where
 
-   <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMMinionThreeInputReader.hppOVERWDEG
+   <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMOVERWDEG
 
 The value ordering allows the user to specify an instantiation order
 for the variables involved in the variable order, either ascending (a)
@@ -261,7 +261,7 @@ Below is a complete minion input file with commentary, as an example.
 
 MINION 3
 
-# While the variable section doesn't have to come first, you can't 
+# While the variable section doesn't have to come first, you can't
 # really do anything until
 # You have one...
 **VARIABLES**
@@ -436,17 +436,17 @@ void MinionThreeInputReader<FileReader>::finalise() {
       instance->search_order.back().find_one_assignment=true;
     }
   }
-  
+
   for(SysInt i = 0; i < instance->search_order.size(); ++i)
     instance->search_order[i].setupValueOrder();
 
   // This has to be delayed unless not all variables are defined where 'PRINT ALL' occurs.
   if(print_all_vars)
     instance->print_matrix = instance->all_vars_list;
-    
+
   if(instance->sym_order.empty())
     instance->sym_order = instance->vars.get_all_vars();
-    
+
   if(instance->sym_order.size() != instance->vars.get_all_vars().size())
   {
     MAYBE_PARSER_INFO("Extending symmetry order with auxillery variables");
@@ -457,19 +457,19 @@ void MinionThreeInputReader<FileReader>::finalise() {
         instance->sym_order.push_back(*i);
     }
   }
-  
+
   if(instance->sym_order.size() != set<Var>(instance->sym_order.begin(), instance->sym_order.end()).size())
      throw parse_exception("SYMORDER cannot contain any variable more than once");
-     
+
    if(instance->sym_order.size() != instance->vars.get_all_vars().size())
-     throw parse_exception("SYMORDER must contain every variable");   
+     throw parse_exception("SYMORDER must contain every variable");
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // read
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-void MinionThreeInputReader<FileReader>::read(FileReader* infile) {  
+void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
   string s = infile->get_asciistring();
   MAYBE_PARSER_INFO("Read: '" + s + "'");
 
@@ -504,8 +504,8 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
     else if(s == "**GADGET**")
       { readGadget(infile); }
     else if(s == wrong_eof)
-    { 
-      throw parse_exception("Section terminated with " + wrong_eof + 
+    {
+      throw parse_exception("Section terminated with " + wrong_eof +
         " instead of " + eof);
     }
     else
@@ -559,9 +559,9 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
     }
   }
 
-  if(constraint_num == -1) 
+  if(constraint_num == -1)
   {
-    if (infile->eof()) 
+    if (infile->eof())
     {
       throw parse_exception(string("Bad Constraint Name or reached end of file: '") + id + "'");
     }
@@ -585,7 +585,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 #endif
 
     default:
-    if(constraint->number_of_params == 2 && 
+    if(constraint->number_of_params == 2 &&
          (constraint->read_types[1] == read_tuples || constraint->read_types[1] == read_short_tuples) )
       return readConstraintTable(infile, constraint);
     else
@@ -599,7 +599,7 @@ template<typename FileReader>
 ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReader* infile, ConstraintDef* def)
 {
   ConstraintBlob con(def);
-  
+
   con.vars.push_back(readLiteralVector(infile));
   infile->check_sym(',');
 
@@ -611,12 +611,12 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
     assert(0);
 
   infile->check_sym(')');
-  
+
   if(def->read_types[1] == read_tuples)
   {
     if(con.vars[0].size() != con.tuples->tuple_size())
     {
-      throw parse_exception("Tuple constraint with " + to_string(con.vars[0].size()) + 
+      throw parse_exception("Tuple constraint with " + to_string(con.vars[0].size()) +
                             " variables cannot have tuples of length " + to_string(con.tuples->tuple_size()));
     }
   }
@@ -640,8 +640,8 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
           return ConstraintBlob(get_constraint(CT_TRUE));
       else throw parse_exception("Not a valid list of short tuples for a constraint with no variables!");
     }
-  }  
-  
+  }
+
   return con;
 }
 
@@ -688,7 +688,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
           }
           constblob.push_back(MOVE(vals));
       }
-      break;  
+      break;
       case read_constraint:
       con.internal_constraints.push_back(readConstraint(infile, false));
       break;
@@ -709,14 +709,14 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
       infile->check_sym(',');
   }
   infile->check_sym(')');
-  
+
   return con;
 }
 
 template<typename FileReader>
 ShortTupleList* MinionThreeInputReader<FileReader>::readConstraintShortTupleList(FileReader* infile)
 {
-  
+
   string name = infile->get_string();
   return instance->getShortTableSymbol(name);
 }
@@ -725,7 +725,7 @@ template<typename FileReader>
 TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReader* infile)
 {
   TupleList* tuplelist;
-  
+
   if(infile->peek_char() != '{')
   {
     string name = infile->get_string();
@@ -736,16 +736,16 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
     vector<vector<DomainInt> > tuples ;
     infile->check_sym('{');
     char delim = infile->peek_char();
-    
+
     SysInt tupleSize = 0;
-    
-    while (delim != '}') 
+
+    while (delim != '}')
     {
       infile->check_sym('<');
       vector<DomainInt> tuple;
       // Optimisation
       tuple.reserve(tupleSize);
-      
+
       char next_char = ',';
       while(next_char == ',')
       {
@@ -754,7 +754,7 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
       }
       if(next_char != '>')
         throw parse_exception("Expected ',' or '>'");
-      
+
       if(tupleSize == 0)
         tupleSize = tuple.size();
       if(tupleSize != tuple.size())
@@ -768,7 +768,7 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
     tuplelist = instance->tupleListContainer->getNewTupleList(tuples);
     instance->addUnnamedTableSymbol(tuplelist);
   }
-  
+
   return tuplelist;
 }
 
@@ -779,7 +779,7 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #ifdef CT_GADGET_ABC
 template<typename FileReader>
-ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile) 
+ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile)
 {
   MAYBE_PARSER_INFO( "Reading a gadget constraint" ) ;
 
@@ -807,7 +807,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileRead
 // SAT clauses represented as literals and negated literals
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* infile, 
+ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* infile,
   ConstraintDef* ct)
 {
   MAYBE_PARSER_INFO("Reading a SAT clause");
@@ -859,13 +859,13 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
     vector<DomainInt> params = readConstantVector(infile);
     vector<DomainInt> max_index = instance->vars.getMatrixSymbol(name);
     if(params.size() != max_index.size())
-      throw parse_exception("Can't index a " + to_string(max_index.size()) + 
+      throw parse_exception("Can't index a " + to_string(max_index.size()) +
       "-d matrix with " + to_string(params.size()) +
       " indices.");
     for(SysInt i = 0; i < params.size(); ++i)
     {
       if(params[i] < 0 || params[i] >= max_index[i])
-        throw parse_exception(to_string(i) + string("th index is out of bounds,") + 
+        throw parse_exception(to_string(i) + string("th index is out of bounds,") +
         to_string(params[i]) + " is not between 0 and " +
         to_string(max_index[i] - 1));
     }
@@ -935,8 +935,8 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
           {
               throw parse_exception("Sorry, can't negate a non-Boolean variable");
           }
-          returnVec[0].setType(VAR_NOTBOOL); 
-          // The clever thing to do would be to change type of all of returnVec at the end of the function, if necessary. 
+          returnVec[0].setType(VAR_NOTBOOL);
+          // The clever thing to do would be to change type of all of returnVec at the end of the function, if necessary.
       }
     }
     else
@@ -945,7 +945,7 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
         {
             throw parse_exception("Sorry, can't negate a matrix");
         }
-        
+
         vector<DomainInt> maxterms = instance->vars.getMatrixSymbol(name);
         params = vector<DomainInt>(maxterms.size(), -999);
         returnVec = instance->vars.buildVarList(name, params);
@@ -953,7 +953,7 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
     MAYBE_PARSER_INFO("Got matrix:" + to_string(returnVec));
   }
 else
-{ 
+{
   if(mustBeMatrix)
     throw parse_exception("Must give matrix here, not single variable!");
   if(negVar)
@@ -966,16 +966,16 @@ else
   returnVec.push_back(var);
 }
 MAYBE_PARSER_INFO("Read variable '" + name + "', internally: " + to_string(var));
-return returnVec;  
+return returnVec;
 }
 
 template<typename FileReader>
 vector<ConstraintBlob> MinionThreeInputReader<FileReader>::readConstraintList(FileReader* infile) {
   vector<ConstraintBlob> conlist;
-  
+
   infile->check_sym('{');
   conlist.push_back(readConstraint(infile));
-  
+
   char delim = infile->get_char();
   while(delim != '}')
   {
@@ -1026,7 +1026,7 @@ vector<Var> MinionThreeInputReader<FileReader>::readLiteralVector(FileReader* in
         s[s.size() - 3] = delim;
         throw parse_exception(s);
       }
-      
+
       if(delim == ',' && infile->peek_char() == ']')
         delim = infile->get_char();
     }
@@ -1038,7 +1038,7 @@ vector<Var> MinionThreeInputReader<FileReader>::readLiteralVector(FileReader* in
 template<typename FileReader>
 vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrix(FileReader* infile)
 {
-  vector<vector<Var> > return_vals; 
+  vector<vector<Var> > return_vals;
 
   if(infile->peek_char() != '[')
     return read2DMatrixVariable(infile);
@@ -1049,7 +1049,7 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrix(FileReader
   {
     MAYBE_PARSER_INFO("Continuing reading matrix, peeked at " + to_string(']'));
     // See if there is an array, or just a variable.
-    if(infile->peek_char() == '[') 
+    if(infile->peek_char() == '[')
       return_vals.push_back(readLiteralVector(infile));
     else
     {
@@ -1100,7 +1100,7 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrixVariable(Fi
 // The start and end default to '[' and ']'
 template<typename FileReader>
 vector<DomainInt> MinionThreeInputReader<FileReader>::readConstantVector
-  (FileReader* infile, char start, char end, bool allowNulls) 
+  (FileReader* infile, char start, char end, bool allowNulls)
 {
   vector<DomainInt> newVector;
   infile->check_sym(start);
@@ -1116,7 +1116,7 @@ vector<DomainInt> MinionThreeInputReader<FileReader>::readConstantVector
   }
   else
   {
-    while (delim != end) 
+    while (delim != end)
     {
       if(allowNulls && infile->peek_char() == '_')
       {
@@ -1138,7 +1138,7 @@ vector<DomainInt> MinionThreeInputReader<FileReader>::readConstantVector
 // That last parameter defaults to false.
 // The start and end default to '[' and ']'
 template<typename FileReader>
-vector<pair<SysInt,DomainInt> > MinionThreeInputReader<FileReader>::readShortTuple(FileReader* infile) 
+vector<pair<SysInt,DomainInt> > MinionThreeInputReader<FileReader>::readShortTuple(FileReader* infile)
 {
   vector<pair<SysInt, DomainInt> > newVector;
   infile->check_sym('[');
@@ -1161,7 +1161,7 @@ vector<pair<SysInt,DomainInt> > MinionThreeInputReader<FileReader>::readShortTup
 
 /// Read an expression of the type ' {<num>..<num>} '
 template<typename FileReader>
-vector<DomainInt> MinionThreeInputReader<FileReader>::readRange(FileReader* infile) 
+vector<DomainInt> MinionThreeInputReader<FileReader>::readRange(FileReader* infile)
 {
   vector<DomainInt> newVector;
   infile->check_sym('{');
@@ -1224,7 +1224,7 @@ void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile)
 }
 
 template<typename FileReader>
-void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {  
+void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
   while(infile->peek_char() != '*')
   {
     string var_type = infile->get_string();
@@ -1233,7 +1233,7 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
     {
       VarOrderEnum vo = ORDER_ORIGINAL;
       bool find_one_sol = false;
-      
+
       if(infile->peek_char() == 'A')
       {
         string s = infile->get_string();
@@ -1241,17 +1241,23 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
           throw parse_exception("I do not understand " + s);
         find_one_sol = true;
       }
-        
+
       if(infile->peek_char() != '[')
       {
         string s = infile->get_string();
 #define Z(x) if(s == #x) { vo = ORDER_##x; goto found; }
 Z(STATIC) Z(SDF) Z(SRF) Z(LDF) Z(ORIGINAL) Z(WDEG) Z(CONFLICT) Z(DOMOVERWDEG)
-#undef Z        
+#undef Z
+        if(vo == ORDER_WDEG || vo == ORDER_DOMOVERWDEG)
+        {
+#ifndef WDEG
+          USER_ERROR("This minion was not compiled with support for WDEG or DOMOVERWDEG orderings (add -WDEG to build options)");
+#endif
+        }
 throw parse_exception("Don't understand '" + s + "'");
 found: ;
       }
-      
+
       instance->search_order.push_back(SearchOrder(readLiteralVector(infile), vo, find_one_sol));
       MAYBE_PARSER_INFO("Read var order, length " +
         to_string(instance->search_order.back().var_order.size()));
@@ -1262,7 +1268,7 @@ found: ;
         throw parse_exception("Can't have two PERMUTATIONs!");
       instance->permutation = readLiteralVector(infile);
       MAYBE_PARSER_INFO("Read permutation, length " +
-        to_string(instance->permutation.size()));      
+        to_string(instance->permutation.size()));
     }
     else if(var_type == "SYMORDER")
     {
@@ -1270,7 +1276,7 @@ found: ;
         throw parse_exception("Can't have two SYMORDERs!");
       instance->sym_order = readLiteralVector(infile);
       MAYBE_PARSER_INFO("Read Symmetry Ordering, length " +
-        to_string(instance->permutation.size()));      
+        to_string(instance->permutation.size()));
     }
     else if(var_type == "VALORDER")
     {
@@ -1297,7 +1303,7 @@ found: ;
           case 'r':
             valOrder.push_back(VALORDER_RANDOM);
             break;
-          
+
           default:
             throw parse_exception("Expected 'a' or 'd' or 'r'");
         }

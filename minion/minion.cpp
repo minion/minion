@@ -83,7 +83,7 @@ void munge_container(Con& con, SysInt type)
   switch(type)
   {
     case 0: return;
-    case 1: 
+    case 1:
       std::reverse(con.begin(), con.end());
       return;
     case 2:
@@ -192,7 +192,7 @@ try {
   if(getOptions(stateObj).Xvarmunge != -1)
   {
     assert(instance.search_order.size() == 1);
-    munge_container(instance.search_order[0].var_order, getOptions(stateObj).Xvarmunge);  
+    munge_container(instance.search_order[0].var_order, getOptions(stateObj).Xvarmunge);
   }
 
   if(getOptions(stateObj).Xsymmunge != -1)
@@ -207,18 +207,18 @@ try {
     graph.g.output_nauty_graph(instance);
     exit(0);
   }
-  
+
   if(getOptions(stateObj).instance_stats)
   {
-      InstanceStats s(instance, stateObj); 
+      InstanceStats s(instance, stateObj);
       s.output_stats();
-      
+
       // Do the minimal amount of setting up to create the constraint objects.
       getState(stateObj).setTupleListContainer(instance.tupleListContainer);
       getState(stateObj).setShortTupleListContainer(instance.shortTupleListContainer);
-      
+
       BuildCon::build_variables(stateObj, instance.vars);
-      
+
       // Create Constraints
       vector<AbstractConstraint*> cons;
       while(!instance.constraints.empty())
@@ -226,11 +226,11 @@ try {
          cons.push_back(build_constraint(stateObj, instance.constraints.front()));
          instance.constraints.pop_front();
       }
-      
+
       s.output_stats_tightness(cons);
       exit(0);
   }
-  
+
   if(getOptions(stateObj).redump)
   {
     MinionInstancePrinter printer(instance);
@@ -272,8 +272,8 @@ try {
 
 }
 catch(...)
-{ 
-  cerr << "Minion exited abnormally via an exception." << endl; 
+{
+  cerr << "Minion exited abnormally via an exception." << endl;
   exit(9);
 }
 }

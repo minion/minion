@@ -40,58 +40,58 @@ struct VarNeg
 
   BOOL isBound() const
   { return data.isBound();}
-  
+
   VarNeg(VarT _data) : data(_data)
   {}
-  
+
   VarNeg() : data()
   {}
-  
+
   VarNeg(const VarNeg& b) : data(b.data)
   {}
-  
+
   BOOL isAssigned() const
   { return data.isAssigned(); }
-  
+
   DomainInt getAssignedValue() const
   { return -data.getAssignedValue(); }
-  
+
   BOOL isAssignedValue(DomainInt i) const
-  { 
+  {
     return data.isAssigned() &&
     data.getAssignedValue() == -i;
   }
-  
+
   BOOL inDomain(DomainInt b) const
   { return data.inDomain(-b); }
 
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain(-b); }
-  
+
   DomainInt getDomSize() const
   { return data.getDomSize(); }
-  
+
   DomainInt getMax() const
   { return -data.getMin(); }
-  
+
   DomainInt getMin() const
   { return -data.getMax(); }
 
   DomainInt getInitialMax() const
   { return -data.getInitialMin(); }
-  
+
   DomainInt getInitialMin() const
   { return -data.getInitialMax(); }
-  
+
   void setMax(DomainInt i)
   { data.setMin(-i); }
-  
+
   void setMin(DomainInt i)
   { data.setMax(-i); }
-  
+
   void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(-b); }
-  
+
   void propagateAssign(DomainInt b)
   { data.propagateAssign(-b); }
 
@@ -100,13 +100,13 @@ struct VarNeg
 
   void removeFromDomain(DomainInt b)
   { data.removeFromDomain(-b); }
-  
+
   /// There isn't a minus sign here as domain changes from both the top and bottom of the domain are positive numbers.
   DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
-  
+
  void addTrigger(Trigger t, TrigType type)
-  { 
+  {
     switch(type)
     {
       case UpperBound:
@@ -123,13 +123,13 @@ struct VarNeg
       D_FATAL_ERROR("Invalid trigger in 'neg' mapper");
     }
   }
-    
+
   friend std::ostream& operator<<(std::ostream& o, const VarNeg& n)
   { return o << "Neg " << n.data; }
-  
+
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  {  
+  {
     switch(type)
     {
       case UpperBound:
@@ -143,7 +143,7 @@ struct VarNeg
         data.addDynamicTrigger(t, type, pos BT_CALL);
         break;
       case DomainRemoval:
-        data.addDynamicTrigger(t, DomainRemoval, -pos BT_CALL); 
+        data.addDynamicTrigger(t, DomainRemoval, -pos BT_CALL);
         break;
       default:
         D_FATAL_ERROR("Broken dynamic trigger");
@@ -162,14 +162,14 @@ struct VarNeg
   Var getBaseVar() const { return data.getBaseVar(); }
 
   vector<Mapper> getMapperStack() const
-  { 
+  {
     vector<Mapper> v = data.getMapperStack();
     v.push_back(Mapper(MAP_NEG));
     return v;
   }
 
 #ifdef WDEG
-  SysInt getBaseWdeg()
+  DomainInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()

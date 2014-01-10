@@ -17,14 +17,14 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-/** @help variables;01 Description 
+/** @help variables;01 Description
 01 variables are used very commonly for logical expressions, and for
 encoding the characteristic functions of sets and relations. Note that
 wherever a 01 variable can appear, the negation of that variable can
 also appear. A boolean variable x's negation is identified by !x.
 */
 
-/** @help variables;01 Example 
+/** @help variables;01 Example
 Declaration of a 01 variable called bool in input file:
 
 BOOL bool
@@ -44,7 +44,7 @@ eq(bool, 0) #variable bool equals 0
 #include "../../constraints/constraint_abstract.h"
 
 
-/// Standard data type used for storing compressed booleans 
+/// Standard data type used for storing compressed booleans
 typedef unsigned long data_type;
 static const data_type one = 1;
 static const data_type max_data = one << ( sizeof(data_type) - 1 );
@@ -68,7 +68,7 @@ struct BoolVarRef_internal
 
   AnyVarRef popOneMapper() const
   { FATAL_REPORTABLE_ERROR(); }
-  
+
   data_type shift_offset;
   SysInt var_num;
   void* data_position;
@@ -76,7 +76,7 @@ struct BoolVarRef_internal
 
   UnsignedSysInt data_offset() const
   { return var_num / (sizeof(data_type)*8); }
-  
+
 #ifdef MANY_VAR_CONTAINERS
   BoolVarContainer* boolCon;
   BoolVarContainer& getCon() const { return *boolCon; }
@@ -85,88 +85,88 @@ struct BoolVarRef_internal
   shift_offset(b.shift_offset), var_num(b.var_num), data_position(b.data_position),
   value_position(b.value_position) ,boolCon(b.boolCon)
   { }
-  
+
   BoolVarRef_internal() : shift_offset(~1), var_num(~1), boolCon(NULL)
-  { }  
+  { }
 #else
   static BoolVarContainer& getCon_Static();
   BoolVarRef_internal(const BoolVarRef_internal& b) :
   shift_offset(b.shift_offset), var_num(b.var_num), data_position(b.data_position),
   value_position(b.value_position)
   { }
-  
+
   BoolVarRef_internal() : shift_offset(~1), var_num(~1)
   { }
 #endif
-  
+
   BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con);
-  
+
   data_type& assign_ptr() const
   { return *static_cast<data_type*>(data_position); }
-  
+
   data_type& value_ptr() const
   { return *static_cast<data_type*>(value_position); }
-  
+
   BOOL isAssigned() const
   { return assign_ptr() & shift_offset; }
-  
+
   DomainInt getAssignedValue() const
   {
     D_ASSERT(isAssigned());
     return (bool)(value_ptr() & shift_offset);
   }
-  
+
   BOOL inDomain(DomainInt b) const
   {
     if((checked_cast<SysInt>(b)|1) != 1)
       return false;
     return (!isAssigned()) || (b == getAssignedValue());
   }
-  
+
   BOOL inDomain_noBoundCheck(DomainInt b) const
   {
     D_ASSERT(b == 0 || b == 1);
     return (!isAssigned()) || (b == getAssignedValue());
   }
-  
+
   DomainInt getMin() const
   {
     if(!isAssigned()) return 0;
     return getAssignedValue();
   }
-  
+
   DomainInt getDomSize() const
   {
     if(isAssigned()) return 1;
     else return 2;
   }
-  
+
   DomainInt getMax() const
   {
     if(!isAssigned()) return 1;
     return getAssignedValue();
   }
- 
+
   DomainInt getInitialMin() const
   { return 0; }
-  
+
   DomainInt getInitialMax() const
   { return 1; }
 
-  DomainInt getBaseVal(DomainInt v) const 
+  DomainInt getBaseVal(DomainInt v) const
   {
     D_ASSERT(inDomain(v));
-    return v; 
+    return v;
   }
 
   Var getBaseVar() const { return Var(VAR_BOOL, var_num); }
 
   vector<Mapper> getMapperStack() const
   { return vector<Mapper>(); }
- 
+
   friend std::ostream& operator<<(std::ostream& o, const BoolVarRef_internal& b)
   { return o << "Bool:" << b.var_num; }
-  
+
 };
 
 struct GetBoolVarContainer;
@@ -181,10 +181,10 @@ typedef QuickVarRefType<GetBoolVarContainer, BoolVarRef_internal> BoolVarRef;
 struct BoolVarContainer
 {
   StateObj* stateObj;
-  BoolVarContainer(StateObj* _stateObj) : stateObj(_stateObj), var_count_m(0),  
+  BoolVarContainer(StateObj* _stateObj) : stateObj(_stateObj), var_count_m(0),
                                           trigger_list(stateObj, false), lock_m(false)
   {}
-  
+
 #ifdef THREADSAFE
   mutable boost::recursive_mutex con_mutex;
 #define LOCK_BOOL_MUTEX boost::recursive_mutex::scoped_lock lock(con_mutex);
@@ -197,35 +197,35 @@ struct BoolVarContainer
   void* values_mem;
   vector<vector<AbstractConstraint*> > constraints;
 #ifdef WDEG
-  vector<UnsignedSysInt> wdegs;
+  vector<DomainInt> wdegs;
 #endif
   UnsignedSysInt var_count_m;
   TriggerList trigger_list;
   /// When false, no variable can be altered. When true, no variables can be created.
   BOOL lock_m;
-  
+
   data_type* value_ptr()
   { return static_cast<data_type*>(values_mem); }
-  
+
   const data_type* value_ptr() const
   { return static_cast<const data_type*>(values_mem); }
-  
+
   data_type* assign_ptr()
   { return static_cast<data_type*>(assign_offset); }
-  
+
   const data_type* assign_ptr() const
   { return static_cast<const data_type*>(assign_offset); }
-  
+
   void lock_thread()
   { LOCK_BOOL_MUTEX }
 
   void lock()
-  { 
+  {
    lock_m = true;
     // Min domain value = 0, max domain val = 1.
     trigger_list.lock(var_count_m, 0, 1);
   }
-  
+
   /// Returns a new Boolean Variable.
   //BoolVarRef get_new_var();
 
@@ -241,18 +241,18 @@ struct BoolVarContainer
     values_mem = checked_malloc(required_mem);
     constraints.resize(bool_count);
 #ifdef WDEG
-    if(getOptions(stateObj).wdeg_on) wdegs.resize(bool_count);
+     wdegs.resize(bool_count);
 #endif
   }
-  
+
   /// Returns a reference to the ith Boolean variable which was previously created.
   BoolVarRef get_var_num(DomainInt i);
 
   UnsignedSysInt var_count()
   { return var_count_m; }
-  
-  
-  void setMax(const BoolVarRef_internal& d, DomainInt i) 
+
+
+  void setMax(const BoolVarRef_internal& d, DomainInt i)
   {LOCK_BOOL_MUTEX
     if(i < 0)
     {
@@ -264,8 +264,8 @@ struct BoolVarContainer
     if(i==0)
       propagateAssign(d,0);
   }
-  
-  void setMin(const BoolVarRef_internal& d, DomainInt i) 
+
+  void setMin(const BoolVarRef_internal& d, DomainInt i)
   {LOCK_BOOL_MUTEX
     if(i > 1)
     {
@@ -276,16 +276,16 @@ struct BoolVarContainer
     if(i==1)
       propagateAssign(d,1);
   }
-  
+
   void removeFromDomain(const BoolVarRef_internal& d, DomainInt b)
   {LOCK_BOOL_MUTEX
     D_ASSERT(lock_m && d.var_num < var_count_m);
     if((checked_cast<SysInt>(b)|1) != 1)
       return;
-      
+
     if(d.isAssigned())
     {
-      if(b == d.getAssignedValue()) 
+      if(b == d.getAssignedValue())
         getState(stateObj).setFailed(true);
     }
     else
@@ -302,13 +302,13 @@ struct BoolVarContainer
       return;
     }
     assign_ptr()[d.data_offset()] |= d.shift_offset;
-    
+
     trigger_list.push_assign(d.var_num, b);
 #ifndef FEW_BOOLEAN_TRIGGERS
     trigger_list.push_domain_changed(d.var_num);
     trigger_list.push_domain_removal(d.var_num, 1 - b);
 #endif
-    
+
     if(b == 1)
     {
       trigger_list.push_lower(d.var_num, 1);
@@ -320,13 +320,13 @@ struct BoolVarContainer
       value_ptr()[d.data_offset()] &= ~d.shift_offset;
     }
   }
-  
+
   void uncheckedAssign(const BoolVarRef_internal& d, DomainInt b)
   {LOCK_BOOL_MUTEX internalAssign(d, b); }
-  
+
   void propagateAssign(const BoolVarRef_internal& d, DomainInt b)
   {LOCK_BOOL_MUTEX
-    if(!d.isAssigned()) 
+    if(!d.isAssigned())
       internalAssign(d,b);
     else
     {
@@ -340,21 +340,21 @@ struct BoolVarContainer
 
   void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type)
   { LOCK_BOOL_MUTEX
-    D_ASSERT(lock_m); 
+    D_ASSERT(lock_m);
 #ifdef FEW_BOOLEAN_TRIGGERS
     if(type == DomainChanged)
       type = Assigned;
     // Static triggers should never be of this type!
     D_ASSERT(type != DomainRemoval);
 #endif
-    trigger_list.add_trigger(b.var_num, t, type); 
+    trigger_list.add_trigger(b.var_num, t, type);
   }
-    
+
   void addDynamicTrigger(BoolVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   { LOCK_BOOL_MUTEX
     D_ASSERT(pos == NoDomainValue || ( type == DomainRemoval && pos != NoDomainValue ) );
     D_ASSERT(lock_m);
-    
+
 #ifdef FEW_BOOLEAN_TRIGGERS
     TrigType new_type = type;
     switch(type)
@@ -368,8 +368,8 @@ struct BoolVarContainer
           new_type = UpperBound;
     }
     pos = NoDomainValue;
-#endif    
-    trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL); 
+#endif
+    trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL);
   }
 
 
@@ -377,15 +377,15 @@ struct BoolVarContainer
   { return& constraints[b.var_num]; }
 
   void addConstraint(const BoolVarRef_internal& b, AbstractConstraint* c)
-  { 
-    constraints[b.var_num].push_back(c); 
+  {
+    constraints[b.var_num].push_back(c);
 #ifdef WDEG
-    if(getOptions(stateObj).wdeg_on) wdegs[b.var_num] += c->getWdeg(); //add constraint score to base var wdeg
+     wdegs[b.var_num] += checked_cast<SysInt>(c->getWdeg()); //add constraint score to base var wdeg
 #endif
   }
 
 #ifdef WDEG
-  SysInt getBaseWdeg(const BoolVarRef_internal& b)
+  DomainInt getBaseWdeg(const BoolVarRef_internal& b)
   { return wdegs[b.var_num]; }
 
   void incWdeg(const BoolVarRef_internal& b)
@@ -399,8 +399,8 @@ inline BoolVarRef BoolVarContainer::get_var_num(DomainInt i)
   return BoolVarRef(BoolVarRef_internal(i, this));
 }
 
-inline BoolVarRef_internal::BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con) : 
-  var_num(checked_cast<UnsignedSysInt>(value)),  
+inline BoolVarRef_internal::BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con) :
+  var_num(checked_cast<UnsignedSysInt>(value)),
   data_position((char*)(b_con->assign_offset) + data_offset()*sizeof(data_type)),
   value_position((char*)(b_con->values_mem) + data_offset()*sizeof(data_type))
 #ifdef MANY_VAR_CONTAINERS

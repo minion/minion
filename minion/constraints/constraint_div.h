@@ -19,7 +19,7 @@
 
 /** @help constraints;div Description
 The constraint
- 
+
    div(x,y,z)
 
 ensures that floor(x/y)=z.
@@ -46,7 +46,7 @@ help constraints modulo
 
 /** @help constraints;div_undefzero Description
 The constraint
- 
+
    div_undefzero(x,y,z)
 
 is the same as div (it ensures that floor(x/y)=z)

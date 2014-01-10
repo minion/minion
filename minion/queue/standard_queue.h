@@ -157,7 +157,7 @@ public:
         it->propagate();
 
 #ifdef WDEG
-        if(getOptions(stateObj).wdeg_on && *fail_ptr)
+        if(*fail_ptr)
           it->constraint->incWdeg();
 #endif
 
@@ -206,7 +206,7 @@ public:
         }
 #endif
 #ifdef WDEG
-        if(getOptions(stateObj).wdeg_on && *fail_ptr)
+        if(*fail_ptr)
           it->constraint->incWdeg();
 #endif
       }
@@ -239,14 +239,14 @@ public:
 
       if(special_triggers.empty())
         return;
-      
+
         AbstractConstraint* trig = special_triggers.queueTop();
         special_triggers.queuePop();
-      
+
       CON_INFO_ADDONE(SpecialTrigger);
       trig->special_check();
 #ifdef WDEG
-      if(getOptions(stateObj).wdeg_on && getState(stateObj).isFailed()) trig->incWdeg();
+      if(getState(stateObj).isFailed()) trig->incWdeg();
 #endif
 
       if(getState(stateObj).isFailed())

@@ -37,73 +37,73 @@ struct VarRefType
   static const BoundType isBoundConst = InternalRefType::isBoundConst;
 
   InternalRefType data;
-  
+
   BOOL isBound() const
   { return data.isBound();}
 
   AnyVarRef popOneMapper() const
   { FATAL_REPORTABLE_ERROR(); }
-  
+
   VarRefType(const InternalRefType& _data) : data(_data)
   {}
-  
+
   VarRefType() : data()
   {}
-  
+
   VarRefType(const VarRefType& b) : data(b.data)
   {}
-  
+
   BOOL isAssigned() const
   { return GET_CONTAINER().isAssigned(data); }
-  
+
   DomainInt getAssignedValue() const
   { return GET_CONTAINER().getAssignedValue(data); }
-  
+
   BOOL isAssignedValue(DomainInt i) const
-  { 
+  {
     return GET_CONTAINER().isAssigned(data) &&
     GET_CONTAINER().getAssignedValue(data) == i;
   }
-  
+
   BOOL inDomain(DomainInt b) const
   { return GET_CONTAINER().inDomain(data, b); }
 
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { return GET_CONTAINER().inDomain_noBoundCheck(data, b); }
-  
+
   DomainInt getDomSize() const
   { return GET_CONTAINER().getDomSize(data); }
 
   DomainInt getMax() const
   { return GET_CONTAINER().getMax(data); }
-  
+
   DomainInt getMin() const
   { return GET_CONTAINER().getMin(data); }
 
   DomainInt getInitialMax() const
   { return GET_CONTAINER().getInitialMax(data); }
-  
+
   DomainInt getInitialMin() const
   { return GET_CONTAINER().getInitialMin(data); }
-  
+
   void setMax(DomainInt i)
   { GET_CONTAINER().setMax(data,i); }
-  
+
   void setMin(DomainInt i)
   { GET_CONTAINER().setMin(data,i); }
-  
+
   void uncheckedAssign(DomainInt b)
   { GET_CONTAINER().uncheckedAssign(data, b); }
-  
+
   void propagateAssign(DomainInt b)
   { GET_CONTAINER().propagateAssign(data, b); }
-  
+
   void decisionAssign(DomainInt b)
   { GET_CONTAINER().decisionAssign(data, b); }
-  
+
   void removeFromDomain(DomainInt b)
   { GET_CONTAINER().removeFromDomain(data, b); }
-  
+
   void addTrigger(Trigger t, TrigType type)
   { GET_CONTAINER().addTrigger(data, t, type); }
 
@@ -123,7 +123,7 @@ struct VarRefType
   { return GET_CONTAINER().getBaseVar(data); }
 
 #ifdef WDEG
-  SysInt getBaseWdeg()
+  DomainInt getBaseWdeg()
   { return GET_CONTAINER().getBaseWdeg(data); }
 
   void incWdeg()
@@ -132,10 +132,10 @@ struct VarRefType
 
   friend std::ostream& operator<<(std::ostream& o, const VarRefType& v)
   { return o << InternalRefType::name() << v.data.var_num; }
-    
+
   DomainInt getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
-  
+
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos BT_CALL); }
@@ -154,28 +154,28 @@ struct QuickVarRefType
   static const BOOL isBool = InternalRefType::isBool;
   static const BoundType isBoundConst = InternalRefType::isBoundConst;
   InternalRefType data;
-  
+
   AnyVarRef popOneMapper() const
   { FATAL_REPORTABLE_ERROR(); }
 
   BOOL isBound() const
   { return data.isBound();}
-  
+
   QuickVarRefType(const InternalRefType& _data) : data(_data)
   {}
-  
+
   QuickVarRefType() : data()
   {}
-  
+
   QuickVarRefType(const QuickVarRefType& b) : data(b.data)
   {}
-  
+
   BOOL isAssigned() const
   { LOCK_CON return data.isAssigned(); }
-  
+
   DomainInt getAssignedValue() const
   { LOCK_CON return data.getAssignedValue(); }
-  
+
   BOOL isAssignedValue(DomainInt i) const
   { LOCK_CON
     return data.isAssigned() &&
@@ -183,43 +183,43 @@ struct QuickVarRefType
   }
   BOOL inDomain(DomainInt b) const
   { LOCK_CON return data.inDomain(b); }
-  
+
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { LOCK_CON return data.inDomain_noBoundCheck(b); }
 
   DomainInt getDomSize() const
   { return data.getDomSize(); }
-  
+
   DomainInt getMax() const
   { LOCK_CON return data.getMax(); }
-  
+
   DomainInt getMin() const
   { LOCK_CON return data.getMin(); }
 
   DomainInt getInitialMax() const
   { LOCK_CON return data.getInitialMax(); }
-  
+
   DomainInt getInitialMin() const
   { LOCK_CON return data.getInitialMin(); }
-  
+
   void setMax(DomainInt i)
   { GET_CONTAINER().setMax(data,i); }
-  
+
   void setMin(DomainInt i)
   { GET_CONTAINER().setMin(data,i); }
-  
+
   void uncheckedAssign(DomainInt b)
   { GET_CONTAINER().uncheckedAssign(data, b); }
-  
+
   void propagateAssign(DomainInt b)
   { GET_CONTAINER().propagateAssign(data, b); }
-  
+
   void decisionAssign(DomainInt b)
   { GET_CONTAINER().decisionAssign(data, b); }
-  
+
   void removeFromDomain(DomainInt b)
   { GET_CONTAINER().removeFromDomain(data, b); }
-  
+
   void addTrigger(Trigger t, TrigType type)
   { GET_CONTAINER().addTrigger(data, t, type); }
 
@@ -239,7 +239,7 @@ struct QuickVarRefType
   { return vector<Mapper>(); }
 
 #ifdef WDEG
-  SysInt getBaseWdeg()
+  DomainInt getBaseWdeg()
   { return GET_CONTAINER().getBaseWdeg(data); }
 
   void incWdeg()
@@ -248,10 +248,10 @@ struct QuickVarRefType
 
   friend std::ostream& operator<<(std::ostream& o, const QuickVarRefType& b)
   { return o << "Bool:" << b.data; }
-  
+
   DomainInt getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
-  
+
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos BT_CALL); }

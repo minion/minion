@@ -149,14 +149,14 @@ To compress a file 'infile.minion' to a file 'smaller.minion'
    minion infile.minion -outputCompressed smaller.minion
 */
     else if(command == string("-outputCompressed"))
-    { 
+    {
       INCREMENT_i(-outputCompressed);
       getOptions(stateObj).outputCompressed = argv[i];
     }
     else if(command == string("-instancestats"))
     { getOptions(stateObj).instance_stats = true; }
     else if(command == string("-Xgraph"))
-    { 
+    {
       getOptions(stateObj).graph = true;
       getOptions(stateObj).silent = true;
     }
@@ -189,7 +189,7 @@ not intermediate values.
     else if(command == string("-printonlyoptimal"))
     { getOptions(stateObj).printonlyoptimal = true; }
     else if(command == string("-cspcomp"))
-    { 
+    {
       getOptions(stateObj).silent = true;
       getOptions(stateObj).cspcomp = true;
       in_cspcomp_for_failexit = true;
@@ -321,7 +321,7 @@ search tree. Only available in a DEBUG executable.
     else if(command == string("-fullprop"))
     {
 #ifndef NO_DEBUG
-      getOptions(stateObj).fullpropagate = true; 
+      getOptions(stateObj).fullpropagate = true;
 #else
     FAIL_EXIT("This version of minion was not built to support the '-fullprop' command. Sorry");
 #endif
@@ -335,7 +335,7 @@ This option is the default on non-DEBUG executables.
 */
     else if(command == string("-nocheck"))
     {
-      getOptions(stateObj).nocheck = true; 
+      getOptions(stateObj).nocheck = true;
     }
 /** @help switches;-check Description
 Check solutions for correctness before printing them out.
@@ -347,7 +347,7 @@ This option is the default for DEBUG executables.
     else if(command == string("-check"))
     {
       getOptions(stateObj).nocheck = false;
-    } 
+    }
 /** @help switches;-dumptree Description
 Print out the branching decisions and variable states at each node.
 */
@@ -469,11 +469,11 @@ help switches -sollimit
       }
     } // TODO : Should remove -varorder for beta orderings.
     else if(command == string("-varorder"))
-    { 
+    {
         INCREMENT_i(-varorder);
-        
+
         string order(argv[i]);
-        
+
         if(order == "static")
           args.order = ORDER_STATIC;
           else if(order == "srf")
@@ -482,7 +482,7 @@ help switches -sollimit
       {
         args.order = ORDER_SRF;
         getOptions(stateObj).randomise_valvarorder = true;
-      }  
+      }
       else if(order == "sdf")
         args.order = ORDER_SDF;
       else if(order == "sdf-random")
@@ -503,11 +503,9 @@ help switches -sollimit
         args.order = ORDER_CONFLICT;
       else if(order == "wdeg") {
         args.order = ORDER_WDEG;
-        getOptions(stateObj).wdeg_on = true;
       } else if(order == "domoverwdeg") {
         args.order = ORDER_DOMOVERWDEG;
-        getOptions(stateObj).wdeg_on = true;
-      } 
+      }
       else
       {
         cerr << "I do not understand the order:" << order << endl;
@@ -535,7 +533,7 @@ repeated in different runs of minion.
     }
     else if(command == string("-Xvarmunge"))
     {
-      INCREMENT_i(-Xvarmunge);   
+      INCREMENT_i(-Xvarmunge);
       getOptions(stateObj).Xvarmunge = atoi(argv[i]);
     }
     else if(command == string("-Xsymmunge"))
@@ -635,7 +633,7 @@ Implies -makeresume.
       exit(1);
     }
     else
-    { 
+    {
       if(getOptions(stateObj).instance_name == "")
         getOptions(stateObj).instance_name = command;
       else

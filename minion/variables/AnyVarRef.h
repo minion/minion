@@ -43,7 +43,7 @@ alias entry for information on how to multiply name variables for
 convenience.
 */
 
-/** @help variables;constants Description 
+/** @help variables;constants Description
 Minion supports the use of constants anywhere where a variable can be used. For
 example, in a constraint as a replacement for a single variable, or a vector of
 constants as a replacement for a vector of variables.
@@ -56,14 +56,14 @@ Use of a constant:
 
 Use of a constant vector:
 
-   element([10,9,8,7,6,5,4,3,2,1],idx,e) 
+   element([10,9,8,7,6,5,4,3,2,1],idx,e)
 */
 
-/** @help variables;vectors Description 
+/** @help variables;vectors Description
 Vectors, matrices and tensors can be declared in minion
 input. Matrices and tensors are for convenience, as constraints do not
 take these as input; they must first undergo a flattening process to
-convert them to a vector before use. Additional commas at the end of 
+convert them to a vector before use. Additional commas at the end of
 vectors are ignored (see example below).
 */
 
@@ -119,7 +119,7 @@ Additional hanging commas at the end of array are ignored, e.g.
 
 lexleq([A,B,C,],[D,E,F,])
 
-is equivalent to 
+is equivalent to
 
 lexleq([A,B,C],[D,E,F])
 
@@ -154,7 +154,7 @@ struct AnyVarRef_Abstract
 {
   virtual BOOL isBound() const = 0;
   virtual AnyVarRef popOneMapper() const = 0;
-  virtual BOOL isAssigned() const = 0;  
+  virtual BOOL isAssigned() const = 0;
   virtual DomainInt getAssignedValue() const = 0;
   virtual BOOL isAssignedValue(DomainInt i) const = 0;
   virtual BOOL inDomain(DomainInt b) const = 0;
@@ -177,15 +177,15 @@ struct AnyVarRef_Abstract
   virtual Var getBaseVar() const = 0;
   virtual vector<Mapper> getMapperStack() const = 0;
 #ifdef WDEG
-  virtual SysInt getBaseWdeg() = 0;
+  virtual DomainInt getBaseWdeg() = 0;
   virtual void incWdeg() = 0;
 #endif
 
   virtual string virtual_to_string() = 0;
-  
+
   virtual ~AnyVarRef_Abstract()
   {}
-  
+
   virtual DomainInt getDomainChange(DomainDelta d) = 0;
   virtual void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF) = 0;
 };
@@ -199,56 +199,56 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   { return data.isBound();}
 
   AnyVarRef popOneMapper() const;
-  
+
   VarRef data;
   AnyVarRef_Concrete(const VarRef& _data) : data(_data)
   {}
-  
-  AnyVarRef_Concrete() 
+
+  AnyVarRef_Concrete()
   {}
-  
+
   AnyVarRef_Concrete(const AnyVarRef_Concrete& b) : data(b.data)
   {}
-  
+
   virtual BOOL isAssigned() const
   { return data.isAssigned(); }
-  
+
   virtual DomainInt getAssignedValue() const
   { return data.getAssignedValue(); }
-  
+
   virtual BOOL isAssignedValue(DomainInt i) const
   { return data.isAssignedValue(i); }
-  
+
   virtual BOOL inDomain(DomainInt b) const
   { return data.inDomain(b); }
-  
+
   virtual BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain_noBoundCheck(b); }
-  
+
   virtual DomainInt getDomSize() const
   { return data.getDomSize(); }
 
   virtual DomainInt getMax() const
   { return data.getMax(); }
-  
+
   virtual DomainInt getMin() const
   { return data.getMin(); }
 
   virtual DomainInt getInitialMax() const
   { return data.getInitialMax(); }
-  
+
   virtual DomainInt getInitialMin() const
   { return data.getInitialMin(); }
-  
+
   virtual void setMax(DomainInt i)
   { data.setMax(i); }
-  
+
   virtual void setMin(DomainInt i)
   { data.setMin(i); }
-  
+
   virtual void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(b); }
-  
+
   virtual void propagateAssign(DomainInt b)
   { data.propagateAssign(b); }
 
@@ -257,7 +257,7 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
 
   virtual void removeFromDomain(DomainInt b)
   { data.removeFromDomain(b); }
-  
+
   virtual void addTrigger(Trigger t, TrigType type)
   { data.addTrigger(t, type); }
 
@@ -277,18 +277,18 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   { return data.getBaseVar(); }
 
 #ifdef WDEG
-  virtual SysInt getBaseWdeg() 
+  virtual DomainInt getBaseWdeg()
   { return data.getBaseWdeg(); }
   virtual void incWdeg()
   { data.incWdeg(); }
 #endif
-  
+
   virtual string virtual_to_string()
   { return to_string(data); }
-  
+
   virtual ~AnyVarRef_Concrete()
   {}
-  
+
   DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
 
@@ -312,79 +312,79 @@ public:
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Maybe;
   minion_shared_ptr<AnyVarRef_Abstract> data;
-  
+
   BOOL isBound() const
   { return data->isBound();}
 
   AnyVarRef popOneMapper() const
   { return data->popOneMapper(); }
-  
+
   template<typename VarRef>
-    AnyVarRef(const VarRef& _data) 
+    AnyVarRef(const VarRef& _data)
   { data = minion_shared_ptr<AnyVarRef_Abstract>(new AnyVarRef_Concrete<VarRef>(_data)); }
-  
-  AnyVarRef() 
+
+  AnyVarRef()
   {}
-  
+
   AnyVarRef(const AnyVarRef& b) : data(b.data)
   {}
-  
+
   BOOL isAssigned() const
   { return data->isAssigned(); }
-  
+
   DomainInt getAssignedValue() const
   { return data->getAssignedValue(); }
-  
+
   BOOL isAssignedValue(DomainInt i) const
-  { 
+  {
     return data->isAssigned() &&
     data->getAssignedValue() == i;
   }
-  
+
   BOOL inDomain(DomainInt b) const
   { return data->inDomain(b); }
 
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data->inDomain_noBoundCheck(b); }
-  
+
 
   DomainInt getDomSize() const
   { return data->getDomSize(); }
-  
+
   DomainInt getMax() const
   { return data->getMax(); }
-  
+
   DomainInt getMin() const
   { return data->getMin(); }
 
   DomainInt getInitialMax() const
   { return data->getInitialMax(); }
-  
+
   DomainInt getInitialMin() const
   { return data->getInitialMin(); }
-  
+
   void setMax(DomainInt i)
   { data->setMax(i); }
-  
+
   void setMin(DomainInt i)
   { data->setMin(i); }
-  
+
   void uncheckedAssign(DomainInt b)
   { data->uncheckedAssign(b); }
-  
+
   void propagateAssign(DomainInt b)
   { data->propagateAssign(b); }
-  
+
   void decisionAssign(DomainInt b)
   { data->decisionAssign(b); }
-  
+
   void removeFromDomain(DomainInt b)
   { data->removeFromDomain(b); }
 
   void addTrigger(Trigger t, TrigType type)
   { data->addTrigger(t, type); }
 
-  vector<AbstractConstraint*>* getConstraints() 
+  vector<AbstractConstraint*>* getConstraints()
   { return data->getConstraints(); }
 
   void addConstraint(AbstractConstraint* c)
@@ -400,19 +400,19 @@ public:
   { return data->getMapperStack(); }
 
 #ifdef WDEG
-  SysInt getBaseWdeg()
+  DomainInt getBaseWdeg()
   { return data->getBaseWdeg(); }
 
   void incWdeg()
   { data->incWdeg(); }
 #endif
-  
+
   friend std::ostream& operator<<(std::ostream& o, const AnyVarRef& avr)
   { return o << "AnyVarRef:" << avr.data->virtual_to_string(); }
-  
+
   DomainInt getDomainChange(DomainDelta d)
   { return data->getDomainChange(d); }
-  
+
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {  data->addDynamicTrigger(t, type, pos BT_CALL); }
@@ -444,7 +444,7 @@ struct common_var_type3<T,T,T>
 template<typename T>
 struct make_AnyVarRef_type
 {
-  typedef AnyVarRef type; 
+  typedef AnyVarRef type;
 };
 
 template<typename T>

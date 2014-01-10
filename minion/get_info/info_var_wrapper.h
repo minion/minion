@@ -26,13 +26,13 @@ template<typename WrapType, Info_VarType VAR_TYPE>
 struct InfoRefType
 {
   WrapType data;
-  
+
   static const BOOL isBool = WrapType::isBool;
   static const BoundType isBoundConst = WrapType::isBoundConst;
 
   BOOL isBound() const
   { return data.isBound();}
-  
+
   // Here we just pass through, as we don't know if this is the bottom or not.
   AnyVarRef popOneMapper() const
   { return data.popOneMapper(); }
@@ -40,13 +40,13 @@ struct InfoRefType
 
   InfoRefType(const WrapType& _data) : data(_data)
   { VAR_INFO_ADDONE(VAR_TYPE, copy); }
-  
-  InfoRefType() 
+
+  InfoRefType()
   { VAR_INFO_ADDONE(VAR_TYPE, construct); }
-  
+
   InfoRefType(const InfoRefType& b) : data(b.data)
   { VAR_INFO_ADDONE(VAR_TYPE, copy); }
-  
+
   bool isAssigned() const
   {
     VAR_INFO_ADDONE(VAR_TYPE, isAssigned);
@@ -54,31 +54,31 @@ struct InfoRefType
     VAR_INFO_PRINT_0("Assigned", assign);
     return assign;
   }
-  
+
   DomainInt getAssignedValue() const
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, getAssignedValue);
     DomainInt assignValue = data.getAssignedValue();
     VAR_INFO_PRINT_0("isAssignedValue", assignValue);
-    return assignValue; 
+    return assignValue;
   }
-  
+
   bool isAssignedValue(DomainInt i) const
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, isAssignedValue);
     bool isAssignValue = data.isAssignedValue(i);
     VAR_INFO_PRINT_1("is assigned ", i, isAssignValue);
     return isAssignValue;
   }
-  
+
   bool inDomain(DomainInt b) const
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, inDomain);
     bool indom = data.inDomain(b);
     VAR_INFO_PRINT_1("in domain", b, indom);
-    return indom; 
+    return indom;
   }
-  
+
   bool inDomain_noBoundCheck(DomainInt b) const
   {
     VAR_INFO_ADDONE(VAR_TYPE, inDomain_noBoundCheck);
@@ -86,14 +86,14 @@ struct InfoRefType
     VAR_INFO_PRINT_1("in domain, no bound check", b, indom_noBC);
     return indom_noBC;
   }
-  
+
 
   DomainInt getDomSize() const
   {
     VAR_INFO_ADDONE(VAR_TYPE, getDomSize);
     DomainInt domval = data.getDomSize();
     VAR_INFO_PRINT_0("GetDomSize", domval);
-    return domval; 
+    return domval;
   }
 
   DomainInt getMax() const
@@ -101,15 +101,15 @@ struct InfoRefType
     VAR_INFO_ADDONE(VAR_TYPE, getMax);
     DomainInt maxval = data.getMax();
     VAR_INFO_PRINT_0("GetMax", maxval);
-    return maxval; 
+    return maxval;
   }
-  
+
   DomainInt getMin() const
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, getMin);
     DomainInt minval = data.getMin();
     VAR_INFO_PRINT_0("GetMin", minval);
-    return minval; 
+    return minval;
   }
 
   DomainInt getInitialMax() const
@@ -119,70 +119,70 @@ struct InfoRefType
     VAR_INFO_PRINT_0("InitialMax", initialMax);
     return initialMax;
   }
-  
+
   DomainInt getInitialMin() const
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, getInitialMin);
     DomainInt initialMin = data.getInitialMin();
     VAR_INFO_PRINT_0("InitialMin", initialMin);
-    return initialMin; 
+    return initialMin;
   }
-  
+
   void setMax(DomainInt i)
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, setMax);
     VAR_INFO_PRINT_0("SetMax", i);
-    data.setMax(i); 
+    data.setMax(i);
   }
-  
+
   void setMin(DomainInt i)
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, setMin);
     VAR_INFO_PRINT_0("SetMin", i);
-    data.setMin(i); 
+    data.setMin(i);
   }
-  
+
   void uncheckedAssign(DomainInt b)
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, uncheckedAssign);
     VAR_INFO_PRINT_0("uncheckedAssign", b);
-    data.uncheckedAssign( b); 
+    data.uncheckedAssign( b);
   }
-  
+
   void propagateAssign(DomainInt b)
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, propagateAssign);
     VAR_INFO_PRINT_0("propagateAssign", b);
-    data.propagateAssign( b); 
+    data.propagateAssign( b);
   }
-  
+
   void decisionAssign(DomainInt b)
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, decisionAssign);
     VAR_INFO_PRINT_0("decisionAssign", b);
-    data.decisionAssign(b); 
+    data.decisionAssign(b);
   }
-  
+
   void removeFromDomain(DomainInt b)
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, RemoveFromDomain);
     VAR_INFO_PRINT_0("removeFromDomain", b);
-    data.removeFromDomain( b); 
+    data.removeFromDomain( b);
   }
-  
+
   void addTrigger(Trigger t, TrigType type)
   {
     VAR_INFO_ADDONE(VAR_TYPE, addTrigger);
     VAR_INFO_PRINT_0("addTrigger", type);
-    data.addTrigger( t, type); 
+    data.addTrigger( t, type);
   }
 
   vector<AbstractConstraint*>* getConstraints()
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, getConstraints);
     return data.getConstraints();
   }
-  
+
   void addConstraint(AbstractConstraint* c)
   {
     VAR_INFO_ADDONE(VAR_TYPE, addConstraint);
@@ -190,7 +190,7 @@ struct InfoRefType
   }
 
   DomainInt getBaseVal(DomainInt v) const
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, getBaseVal);
     return data.getBaseVal(v);
   }
@@ -201,41 +201,41 @@ struct InfoRefType
     return data.getMapperStack();
   }
 
-  Var getBaseVar() const 
-  { 
+  Var getBaseVar() const
+  {
     VAR_INFO_ADDONE(VAR_TYPE, getBaseVar);
-    return data.getBaseVar(); 
+    return data.getBaseVar();
   }
 
 #ifdef WDEG
-  SysInt getBaseWdeg()
-  { 
+  DomainInt getBaseWdeg()
+  {
     VAR_INFO_ADDONE(VAR_TYPE, getBaseWdeg);
-    return data.getBaseWdeg(); 
+    return data.getBaseWdeg();
   }
 
   void incWdeg()
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, incWdeg);
-    data.incWdeg(); 
+    data.incWdeg();
   }
 #endif
-  
+
   friend std::ostream& operator<<(std::ostream& o, const InfoRefType& ir)
   {
     return o << "InfoRef " << ir.data;
   }
- 
+
   DomainInt getDomainChange(DomainDelta d)
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, getDomainChange);
-    return d.XXX_get_domain_diff(); 
+    return d.XXX_get_domain_diff();
   }
-  
+
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  { 
+  {
     VAR_INFO_ADDONE(VAR_TYPE, addDynamicTrigger);
-    data.addDynamicTrigger( t, type, pos BT_CALL); 
+    data.addDynamicTrigger( t, type, pos BT_CALL);
   }
 };
 

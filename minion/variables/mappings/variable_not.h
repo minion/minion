@@ -38,25 +38,25 @@ struct VarNot
   static const BOOL isBool = true;
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
-  
+
   AnyVarRef popOneMapper() const
   { return data; }
 
   BOOL isBound()  const
   { return data.isBound();}
-  
+
   VarNot(const VarRef& _data) : data(_data)
-  { 
+  {
     //D_ASSERT(data.getInitialMin() == 0);
     //D_ASSERT(data.getInitialMax() == 1);
   }
-  
+
   VarNot() : data()
   {}
-  
+
   VarNot(const VarNot& b) : data(b.data)
   {}
-  
+
   // There is a good reason this is like this. It is because the 'neg' of an BOOL var
   // might be used in arithmetic. This is an extension to all of the integers which
   // swaps 0 and 1.
@@ -65,57 +65,57 @@ struct VarNot
 
   BOOL isAssigned() const
   { return data.isAssigned(); }
-  
+
   DomainInt getAssignedValue() const
   { return swap(data.getAssignedValue()); }
-  
+
   BOOL isAssignedValue(DomainInt i) const
-  { 
+  {
     return data.isAssigned() &&
     swap(data.getAssignedValue()) == i;
   }
-  
+
   BOOL inDomain(DomainInt b) const
   { return data.inDomain(swap(b)); }
 
   BOOL inDomain_noBoundCheck(DomainInt b) const
   { return data.inDomain(swap(b)); }
-  
+
   DomainInt getDomSize() const
   { return data.getDomSize(); }
 
   DomainInt getMax() const
   { return swap(data.getMin()); }
-  
+
   DomainInt getMin() const
   { return swap(data.getMax()); }
 
   DomainInt getInitialMax() const
   { return swap(data.getInitialMin()); }
-  
+
   DomainInt getInitialMin() const
   { return swap(data.getInitialMax()); }
-  
+
   void setMax(DomainInt i)
   { data.setMin(swap(i)); }
-  
+
   void setMin(DomainInt i)
   { data.setMax(swap(i)); }
-  
+
   void uncheckedAssign(DomainInt b)
   { data.uncheckedAssign(swap(b)); }
-  
+
   void propagateAssign(DomainInt b)
   { data.propagateAssign(swap(b)); }
-  
+
   void decisionAssign(DomainInt b)
   { data.decisionAssign(swap(b)); }
-  
+
   void removeFromDomain(DomainInt b)
   { data.removeFromDomain(swap(b)); }
- 
+
   void addTrigger(Trigger t, TrigType type)
-  { 
+  {
     switch(type)
     {
       case UpperBound:
@@ -135,13 +135,13 @@ struct VarNot
 
   friend std::ostream& operator<<(std::ostream& o, const VarNot& n)
   { return o << "Not " << n.data; }
-  
+
   DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
-  
+
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  {  
+  {
     switch(type)
     {
       case UpperBound:
@@ -155,7 +155,7 @@ struct VarNot
         data.addDynamicTrigger(t, type, pos BT_CALL);
         break;
       case DomainRemoval:
-        data.addDynamicTrigger(t, DomainRemoval, -(pos-1) BT_CALL); 
+        data.addDynamicTrigger(t, DomainRemoval, -(pos-1) BT_CALL);
         break;
       default:
         D_FATAL_ERROR("Broken dynamic trigger");
@@ -175,7 +175,7 @@ struct VarNot
   Var getBaseVar() const { return data.getBaseVar(); }
 
   vector<Mapper> getMapperStack() const
-  { 
+  {
     vector<Mapper> v = data.getMapperStack();
     v.push_back(Mapper(MAP_NOT));
     return v;
@@ -183,7 +183,7 @@ struct VarNot
 
 
 #ifdef WDEG
-  SysInt getBaseWdeg()
+  DomainInt getBaseWdeg()
   { return data.getBaseWdeg(); }
 
   void incWdeg()
