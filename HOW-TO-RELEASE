@@ -34,7 +34,7 @@ git pull sourceforge master
 git mergetool (and accept the local version for each conflict). 
 git commit 
 
-Check that the new local version is the same as before the .
+Check that the new local version is the same as before the merge.
 Push to both keith and sourceforge. 
 
 6. Go to jenkins. Find job minion-release and build it.

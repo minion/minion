@@ -1470,6 +1470,8 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
     {
       variable_type = VAR_BOUND;
       domain = readRange(infile);
+      if(domain[0]>domain[1])
+        throw parse_exception("Range in decreasing order e.g. 1..0  in declaration of BOUND variable.");
       if(domain.size() != 2)
         throw parse_exception("Ranges contain 2 numbers!");
     }
@@ -1477,6 +1479,8 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
     {
       variable_type = VAR_DISCRETE;
       domain = readRange(infile);
+      if(domain[0]>domain[1])
+        throw parse_exception("Range in decreasing order e.g. 1..0  in declaration of BOUND variable.");
       if(domain.size() != 2)
         throw parse_exception("Ranges contain 2 numbers!");
     }
@@ -1484,6 +1488,15 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
     {
       variable_type = VAR_SPARSEBOUND;
       domain = readConstantVector(infile, '{', '}');
+      
+      for(unsigned int i=0; i<domain.size()-1; i++) {
+          if(domain[i]>domain[i+1]) {
+              throw parse_exception("Values out of order in SPARSEBOUND domain.");
+          }
+          if(domain[i]==domain[i+1]) {
+              throw parse_exception("Repeated values in SPARSEBOUND domain.");
+          }
+      }
       if(domain.size() < 1)
         throw parse_exception("Don't accept empty domains!");
     }
