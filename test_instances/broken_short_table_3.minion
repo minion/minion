@@ -1,0 +1,24 @@
+MINION 3
+#FAIL
+#TEST CHECKONESOL 0 0
+
+**VARIABLES**
+
+DISCRETE d[2] {0..9}
+
+**SHORTTUPLELIST**
+
+Second 2
+[ (-1,1) ]
+[ (0,2) ]
+
+
+**SEARCH**
+
+PRINT [d]
+
+**CONSTRAINTS**
+
+haggisgac([d[0],d[1]],Second)
+
+**EOF**

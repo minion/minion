@@ -1,0 +1,10 @@
+#TEST SOLCOUNT 2
+MINION 3
+**VARIABLES**
+BOOL b[2]
+
+**CONSTRAINTS**
+
+reify(eq(b[0],b[1]),1)
+
+**EOF**
