@@ -73,10 +73,19 @@ public:
     D_DATA(sanity_check = 1234);
     prev = next = this;
   }
-
-  friend void releaseTrigger(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF);
-  friend void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF);
-
+#ifdef BTWLDEF
+  friend void releaseTrigger(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF_NODEFAULT);
+  friend void releaseTrigger(StateObj* stateObj, DynamicTrigger* trig)
+	  { releaseTrigger(stateObj, trig, TO_Default); }
+  
+  friend void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF_NODEFAULT);
+  friend void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* trig)
+	  { attachTriggerToNullList(stateObj, trig, TO_Default); }
+#else
+  friend void releaseTrigger(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF_NODEFAULT);
+  friend void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* trig BT_FUNDEF_NODEFAULT);
+#endif
+  
 private:
   /// Remove from whatever list this trigger is currently stored in.
 
