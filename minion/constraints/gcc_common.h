@@ -2150,6 +2150,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         // doesn't find one, then looks for a path for x2, it can revisit
         // nodes that were seen in the search for x1.
         
+        // The comment above could perhaps be true for DFS where once a node is 
+        // expanded the subtree under it is explored for aug paths. 
+        
         #if UseIncGraph
         for(SysInt startvari=0; startvari<adjlistlength[forbiddenval-dom_min+numvars] && newlb>existinglb; startvari++)
         {
