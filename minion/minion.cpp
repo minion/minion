@@ -34,20 +34,20 @@
 
 #include "MILtools/sym_output.h"
 
-#ifndef GIT_VER
-#define GIT_VER "0"
+#ifndef HG_VER
+#define HG_VER "0"
 #endif
 
-#ifndef GIT_DATE
-#define GIT_DATE Not from a git checkout
+#ifndef HG_DATE
+#define HG_DATE Not from a git checkout
 #endif
 
 // The marvels of the C pre-processor...
 #define CAJ_EXPAND(x) #x
 #define CAJ_STRING(x) CAJ_EXPAND(x)
 
-#define GIT_DATE_STRING CAJ_STRING(GIT_DATE)
-#define GIT_VER_STRING CAJ_STRING(GIT_VER)
+#define HG_DATE_STRING CAJ_STRING(HG_DATE)
+#define HG_VER_STRING CAJ_STRING(HG_VER)
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -135,7 +135,7 @@ try {
 
   if (argc == 1) {
     getOptions(stateObj).printLine("# " + to_string(VERSION));
-    getOptions(stateObj).printLine("# Git version: " + to_string(GIT_VER_STRING));
+    getOptions(stateObj).printLine("# HG version: " + to_string(HG_VER_STRING));
     print_default_help(argv);
     return EXIT_SUCCESS;
   }
@@ -161,12 +161,12 @@ try {
     getState(stateObj).getOldTimer().setOutputType(getOptions(stateObj).outputType);
 
   getOptions(stateObj).printLine("# " + to_string(VERSION));
-  getOptions(stateObj).printLine("# Git version: " + to_string(GIT_VER_STRING));
+  getOptions(stateObj).printLine("# HG version: " + to_string(HG_VER_STRING));
 
   if (!getOptions(stateObj).silent)
   {
 
-    getOptions(stateObj).printLine("# Git last changed date: " + to_string(GIT_DATE_STRING) );
+    getOptions(stateObj).printLine("# HG last changed date: " + to_string(HG_DATE_STRING) );
 
     time_t rawtime;
     time(&rawtime);
@@ -259,7 +259,7 @@ try {
     getTableOut().set("Preprocess", string(b));
   }
   // should be one for varorder as well.
-  getTableOut().set("MinionVersion", GIT_VER_STRING);
+  getTableOut().set("MinionVersion", HG_VER_STRING);
   getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
   getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions(stateObj).silent);
 

@@ -25,29 +25,29 @@ if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
     message(FATAL_ERROR "You cannot run CMake in the source directory (please take a look at the README).")
 endif()
 
-set(GITVERSION "0")
-set(GITDATE "unknown")
-find_program(GIT git)
-if(GIT)
-    execute_process(COMMAND ${GIT} log -1 --format=format:%H
+set(HGVERSION "0")
+set(HGDATE "unknown")
+find_program(HG hg)
+if(HG)
+    execute_process(COMMAND ${HG} log -l1 --template="{node|short}"
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            OUTPUT_VARIABLE GITVERSIONTMP OUTPUT_STRIP_TRAILING_WHITESPACE)
-    execute_process(COMMAND ${GIT} log -1 --format=format:%ad
+            OUTPUT_VARIABLE HGVERSIONTMP OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${HG} log -l1 --template="{date|isodate}"
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            OUTPUT_VARIABLE GITDATETMP OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if(GITDATETMP STREQUAL "")
-        message(STATUS "Unable to determine git version (no checkout?)")
+            OUTPUT_VARIABLE HGDATETMP OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(HGDATETMP STREQUAL "")
+        message(STATUS "Unable to determine HG version (no checkout?)")
     else()
-        set(GITDATE ${GITDATETMP})
-        set(GITVERSION ${GITVERSIONTMP})
+        set(HGDATE ${HGDATETMP})
+        set(HGVERSION ${HGVERSIONTMP})
     endif()
-    message(STATUS "Git version ${GITVERSION}, date ${GITDATE}")
+    message(STATUS "HG version ${HGVERSION}, date ${HGDATE}")
 else()
-    message(STATUS "No git executable found, unable to determine git version and date")
+    message(STATUS "No HG executable found, unable to determine HG version and date")
 endif()
 
-file(APPEND ${BUILD_DEF_FILE} "#define GIT_VER ${GITVERSION}\n")
-file(APPEND ${BUILD_DEF_FILE} "#define GIT_DATE ${GITDATE}\n")
+file(APPEND ${BUILD_DEF_FILE} "#define HG_VER ${HGVERSION}\n")
+file(APPEND ${BUILD_DEF_FILE} "#define HG_DATE ${HGDATE}\n")
 
 # if we have a bash, generate constraints and help if necessary and add build
 # targets to do that

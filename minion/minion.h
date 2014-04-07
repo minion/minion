@@ -34,7 +34,7 @@
 //#define DYNAMICTRIGGERS
 //#endif
 #define VERSION "Minion Version 1.6.1"
-#define REVISION "Git revision $Revision$"
+#define REVISION "HG revision $Revision$"
 // above line will work but only gives revision of this file,
 //  not the current global revision
 #include "get_info/get_info.h"
