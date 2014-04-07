@@ -39,7 +39,7 @@
 #endif
 
 #ifndef HG_DATE
-#define HG_DATE Not from a git checkout
+#define HG_DATE Not from a HG checkout
 #endif
 
 // The marvels of the C pre-processor...
