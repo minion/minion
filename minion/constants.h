@@ -69,8 +69,10 @@ enum BoundType
 };
 
 enum PropagationLevel
-{ PropLevel_None, PropLevel_GAC, PropLevel_SAC, PropLevel_SSAC,
-PropLevel_SACBounds, PropLevel_SSACBounds };
+{ PropLevel_None, PropLevel_GAC,
+  PropLevel_SACBounds, PropLevel_SAC,
+  PropLevel_SSACBounds, PropLevel_SSAC
+};
 
 inline PropagationLevel GetPropMethodFromString(std::string s)
 {

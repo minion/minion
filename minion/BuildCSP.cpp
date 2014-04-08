@@ -125,7 +125,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     try {
 
       try {
-      PropogateCSP(stateObj, args.preprocess, preprocess_vars, !getOptions(stateObj).silent);
+      PropogateCSP(stateObj, std::max(args.preprocess, args.prop_method), preprocess_vars, !getOptions(stateObj).silent);
       }
       catch(EndOfSearch eos)
       {
