@@ -246,40 +246,68 @@ namespace Controller
 
     SysInt i = 0;
     for(vector<string>::iterator s = splits.begin(); s != splits.end(); s++) {
-        string basename = getOptions(stateObj).instance_name;
-        size_t mpos = basename.find(".minion");
-        size_t rpos = basename.find("-resume-");
-        if(rpos != string::npos) {
-            basename = basename.substr(0, rpos);
-        } else if(mpos != string::npos) {
-            basename = basename.substr(0, mpos);
-        }
-        string filename = basename + "-resume-" + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
-        cout << "Output resume file to \"" << filename << "\"" << endl;
-        ofstream fileout(filename.c_str());
-        fileout << "# original instance: " << getOptions(stateObj).instance_name << endl;
-        fileout << inst;
-        fileout << *s;
-        vector<triple> left_branches_so_far;
-        left_branches_so_far.reserve(branches.size());
-        for(vector<triple>::const_iterator curr = branches.begin(); curr != branches.end(); curr++) {
-          if(curr->isLeft) {
-            left_branches_so_far.push_back(*curr);
-          } else {
-            fileout << "watched-or({";
-            for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
-                lb != left_branches_so_far.end();
-                lb++) {
-              fileout << "w-notliteral(";
-              inputPrint(fileout, stateObj, var_array[lb->var].getBaseVar());
-              fileout << "," << lb->val << "),";
+        if(! getOptions(stateObj).splitstderr) {
+            string basename = getOptions(stateObj).instance_name;
+            size_t mpos = basename.find(".minion");
+            size_t rpos = basename.find("-resume-");
+            if(rpos != string::npos) {
+                basename = basename.substr(0, rpos);
+            } else if(mpos != string::npos) {
+                basename = basename.substr(0, mpos);
             }
-            fileout << "w-notliteral(";
-            inputPrint(fileout, stateObj, var_array[curr->var].getBaseVar());
-            fileout << "," << curr->val << ")})" << endl;
-          }
+            string filename = basename + "-resume-" + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
+            cout << "Output resume file to \"" << filename << "\"" << endl;
+            ofstream fileout(filename.c_str());
+            fileout << "# original instance: " << getOptions(stateObj).instance_name << endl;
+            fileout << inst;
+            fileout << *s;
+            vector<triple> left_branches_so_far;
+            left_branches_so_far.reserve(branches.size());
+            for(vector<triple>::const_iterator curr = branches.begin(); curr != branches.end(); curr++) {
+              if(curr->isLeft) {
+                left_branches_so_far.push_back(*curr);
+              } else {
+                fileout << "watched-or({";
+                for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
+                    lb != left_branches_so_far.end();
+                    lb++) {
+                  fileout << "w-notliteral(";
+                  inputPrint(fileout, stateObj, var_array[lb->var].getBaseVar());
+                  fileout << "," << lb->val << "),";
+                }
+                fileout << "w-notliteral(";
+                inputPrint(fileout, stateObj, var_array[curr->var].getBaseVar());
+                fileout << "," << curr->val << ")})" << endl;
+              }
+            }
+            fileout << "**EOF**" << endl;
         }
-        fileout << "**EOF**" << endl;
+        else {
+            //  For distributed use within BOINC, dump splits into stderr. Accessed by -split-stderr command-line flag. 
+            cerr << "# original instance: " << getOptions(stateObj).instance_name << endl;
+            cerr << inst;
+            cerr << *s;
+            vector<triple> left_branches_so_far;
+            left_branches_so_far.reserve(branches.size());
+            for(vector<triple>::const_iterator curr = branches.begin(); curr != branches.end(); curr++) {
+              if(curr->isLeft) {
+                left_branches_so_far.push_back(*curr);
+              } else {
+                cerr << "watched-or({";
+                for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
+                    lb != left_branches_so_far.end();
+                    lb++) {
+                  cerr << "w-notliteral(";
+                  inputPrint(cerr, stateObj, var_array[lb->var].getBaseVar());
+                  cerr << "," << lb->val << "),";
+                }
+                cerr << "w-notliteral(";
+                inputPrint(cerr, stateObj, var_array[curr->var].getBaseVar());
+                cerr << "," << curr->val << ")})" << endl;
+              }
+            }
+            cerr << "**EOF**" << endl;
+        }
     }
   }
    

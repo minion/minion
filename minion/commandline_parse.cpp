@@ -626,6 +626,13 @@ Implies -makeresume.
     {
       getOptions(stateObj).split = true;
       getOptions(stateObj).noresumefile = false;
+      getOptions(stateObj).splitstderr=false;
+    }
+    else if(command == string("-split-stderr"))
+    {
+        getOptions(stateObj).split=true;
+        getOptions(stateObj).noresumefile=false;
+        getOptions(stateObj).splitstderr=true;
     }
     else if(command[0] == '-' && command != string("--"))
     {

@@ -260,6 +260,8 @@ public:
 
   // split search tree in half on time out
   bool split;
+  
+  bool splitstderr;
 
   // The format of output used (-1 for default)
   SysInt outputType;
