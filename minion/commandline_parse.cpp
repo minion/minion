@@ -628,6 +628,12 @@ Implies -makeresume.
       getOptions(stateObj).noresumefile = false;
       getOptions(stateObj).splitstderr=false;
     }
+/** @help switches;-split-stderr Description
+The flag -split-stderr has the same function as the flag -split, however the
+two new Minion input files are sent to standard error rather than written to files. 
+
+See documentation for -split. 
+*/
     else if(command == string("-split-stderr"))
     {
         getOptions(stateObj).split=true;
