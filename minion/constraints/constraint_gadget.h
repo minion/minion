@@ -128,7 +128,7 @@ struct GadgetConstraint : public AbstractConstraint
       construction_vars[i].setMin(min_val);
       construction_vars[i].setMax(max_val);
       
-      for(SysInt j = min_val + 1; j < max_val; ++j)
+      for(DomainInt j = min_val + 1; j < max_val; ++j)
         if(!var_array[i].inDomain(j))
           construction_vars[i].removeFromDomain(j);
     }
@@ -150,7 +150,7 @@ struct GadgetConstraint : public AbstractConstraint
       var_array[i].setMin(min_val);
       var_array[i].setMax(max_val);
       
-      for(SysInt j = min_val + 1; j < max_val; ++j)
+      for(DomainInt j = min_val + 1; j < max_val; ++j)
       {
         if(!construction_vars[i].inDomain(j))
         { 
