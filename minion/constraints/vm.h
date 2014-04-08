@@ -327,16 +327,12 @@ struct VMConstraint : public AbstractConstraint
     
     if(total_lits > 0)
     {
-#ifdef _WIN32
-// QuickFix: Windows does not support VLAs
-abort();
-// Just to make code compile
-DomainInt* vals = 0;
-DomainInt* newvals = 0;
-#else
-      DomainInt vals[total_lits];
-      DomainInt newvals[total_lits];
-#endif
+      vector<DomainInt> vecvals(total_lits);
+      vector<DomainInt> vecnewvals(total_lits);
+      
+      DomainInt* vals = &(vecvals[0]);
+      DomainInt* newvals = &(vecnewvals[0]);
+      
       DomainInt* perm = 0;
 
       #if UseStatePtr && UseStatePtrSym
