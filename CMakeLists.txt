@@ -177,9 +177,8 @@ endif()
 # This used to be in Static, but there is no reason not to always do it
 
 if(MACRELEASE)
-    set(CFLAGS "${CFLAGS} -m32 -mtune=prescott -march=prescott -ffast-math")
-    set(CMAKE_CXX_COMPILER "g++-4.2")
-    set(CMAKE_C_COMPILER "gcc-4.2")
+    set(CFLAGS "${CFLAGS} -ffast-math")
+    set(Boost_USE_STATIC_LIBS true)
 endif()
 
 if(APPLEMAC)
