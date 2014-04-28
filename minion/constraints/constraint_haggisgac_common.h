@@ -136,6 +136,11 @@
     {
         SysInt numvars = vars.size(); 
         
+        // Initialise counters
+        supports=0;
+        supportsPerVar.clear();
+        supportsPerVar.resize(numvars, 0);
+        
         {
             DomainInt litCounter = 0 ; 
             numvals = 0 ;           // only used now by tuple list stuff
