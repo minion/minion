@@ -731,7 +731,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     
     virtual void full_propagate()
     {
-        for(int i = 0; i < dynamic_trigger_count())
+        for(int i = 0; i < dynamic_trigger_count(); ++i)
             detach_trigger(i);
         
        litsWithLostExplicitSupport.resize(0);
