@@ -565,6 +565,8 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
    
     virtual void full_propagate()
     {
+        full_prop_init();
+        
        litsWithLostExplicitSupport.resize(0);
        varsWithLostImplicitSupport.resize(0); 
 
@@ -584,5 +586,3 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
       return ret;
     }
 };  // end of class
-
-

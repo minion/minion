@@ -731,6 +731,16 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
     
     virtual void full_propagate()
     {
+        full_prop_init();
+        
+        // reset containers defined in constructor
+        lastSupportPerVar.clear();
+        lastSupportPerVar.resize(vars.size(),0);    // actually don't think we care what initial val is
+        lastSupportPerLit.clear();
+        lastSupportPerLit.resize(numlits,0);
+        deletedSupports.clear() ;
+        
+        
         for(int i = 0; i < dynamic_trigger_count(); ++i)
             detach_trigger(i);
         

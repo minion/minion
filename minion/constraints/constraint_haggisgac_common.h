@@ -131,6 +131,83 @@
         }
     }
 
+
+    void full_prop_init()
+    {
+        SysInt numvars = vars.size(); 
+        
+        {
+            DomainInt litCounter = 0 ; 
+            numvals = 0 ;           // only used now by tuple list stuff
+
+            for(SysInt i=0; i<numvars; i++) {
+
+                firstLiteralPerVar[i] = checked_cast<SysInt>(litCounter); 
+                DomainInt numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
+                if(numvals_i > numvals) numvals = checked_cast<SysInt>(numvals_i);
+                litCounter += numvals_i; 
+            }
+            literalList.clear();
+            literalList.resize(checked_cast<SysInt>(litCounter)); 
+        }
+        {
+            SysInt litCounter = 0 ; 
+            for(SysInt i=0; i<numvars; i++) {
+                DomainInt thisvalmin = vars[i].getInitialMin();
+                DomainInt numvals_i = vars[i].getInitialMax()-thisvalmin+1;
+                for(DomainInt j=0; j<numvals_i; j++) {
+                        literalList[litCounter].var = i; 
+                        literalList[litCounter].val = j+thisvalmin; 
+                        literalList[litCounter].supportCellList = 0;
+                        litCounter++;
+                }
+            }
+
+            numlits = litCounter;
+        }
+            zeroLits.clear();
+            zeroLits.resize(numvars);
+            for(SysInt i=0 ; i < numvars ; i++) {
+                const SysInt numvals_i = checked_cast<SysInt>(vars[i].getInitialMax()- vars[i].getInitialMin()+1); 
+                zeroLits[i].reserve(numvals_i);  // reserve the maximum length.
+                zeroLits[i].resize(0); 
+                SysInt thisvarstart = firstLiteralPerVar[i];
+                for(SysInt j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
+            }
+            inZeroLits.clear();
+            inZeroLits.resize(numlits,true); 
+            
+            // Lists (vectors) of literals/vars that have lost support.
+            // Set this up to insist that everything needs to have support found for it on full propagate.
+            
+            varsWithLostImplicitSupport.clear();
+            varsWithLostImplicitSupport.reserve(vars.size());
+           
+            // Partition
+            varsPerSupport.clear();
+            varsPerSupport.resize(vars.size());
+            varsPerSupInv.clear();
+            varsPerSupInv.resize(vars.size());
+            for(SysInt i=0; i<vars.size(); i++) {
+                varsPerSupport[i]=i;
+                varsPerSupInv[i]=i;
+            }
+            
+            // Start with 1 cell in partition, for 0 supports. 
+            supportNumPtrs.clear();
+            supportNumPtrs.resize(numlits+1);
+            supportNumPtrs[0]=0;
+            for(SysInt i=1; i<= numlits; i++) supportNumPtrs[i]=vars.size();
+            
+            tuple_list_pos.clear();
+            tuple_list_pos.resize(vars.size());
+            for(SysInt var=0; var<vars.size(); var++) {
+                SysInt domsize = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
+                tuple_list_pos[var].clear();
+                tuple_list_pos[var].resize(domsize, 0);
+            }
+    }
+    
     void init()
     {
         SysInt numvars = vars.size(); 
@@ -146,8 +223,10 @@
         
         // Initialise counters
         supports=0;
+        supportsPerVar.clear();
         supportsPerVar.resize(numvars, 0);
         
+        firstLiteralPerVar.clear();
         firstLiteralPerVar.resize(numvars); 
 
     {
@@ -161,6 +240,7 @@
             if(numvals_i > numvals) numvals = checked_cast<SysInt>(numvals_i);
             litCounter += numvals_i; 
         }
+        literalList.clear();
         literalList.resize(checked_cast<SysInt>(litCounter)); 
     }
     {
@@ -179,6 +259,7 @@
         numlits = litCounter;
     }
         
+        zeroLits.clear();
         zeroLits.resize(numvars);
         for(SysInt i=0 ; i < numvars ; i++) {
             const SysInt numvals_i = checked_cast<SysInt>(vars[i].getInitialMax()- vars[i].getInitialMin()+1); 
@@ -187,6 +268,7 @@
             SysInt thisvarstart = firstLiteralPerVar[i];
             for(SysInt j=0 ; j < numvals_i; j++) zeroLits[i].push_back(j+thisvarstart);
         }
+        inZeroLits.clear();
         inZeroLits.resize(numlits,true); 
         
         // Lists (vectors) of literals/vars that have lost support.
