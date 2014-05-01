@@ -608,6 +608,10 @@ class testelement(testgacelement__minus__deprecated):
     def runtest(self, options=dict()):
         return runtestgeneral("element", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
 
+class testelement_undefzero(testwatchelement_undefzero):
+    def runtest(self, options=dict()):
+        return runtestgeneral("element_undefzero", False, options, [4,1,1], ["smallnum", "num", "num"], self, False)
+
 class testelement_one(testgacelement__minus__deprecated):
     def printtable(self, domains): 
         out=[]

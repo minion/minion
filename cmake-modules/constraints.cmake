@@ -1,4 +1,4 @@
-set(ALL_CONSTRAINTS "element" "element_one" "watchelement" "watchelement_one" "watchelement_undefzero"
+set(ALL_CONSTRAINTS "element" "element_undefzero" "element_one" "watchelement" "watchelement_one" "watchelement_undefzero"
                     "gacelement-deprecated" "alldiff" "gacalldiff" "gcc" "gccweak" "watchneq"
                     "diseq" "__reify_diseq" "eq" "__reify_eq" "minuseq" "__reify_minuseq"
                     "abs" "ineq" "watchless" "lexleq[rv]" "lexleq[quick]" "lexleq" "lexless" "lexless[quick]"
@@ -34,6 +34,9 @@ set(NAME_READ_negativetablevm "read_list" "read_tuples")
 
 set(NAME_ID_element "CT_ELEMENT")
 set(NAME_READ_element "read_list" "read_var" "read_var")
+
+set(NAME_ID_element_undefzero "CT_ELEMENT_UNDEFZERO")
+set(NAME_READ_element_undefzero "read_list" "read_var" "read_var")
 
 set(NAME_ID_element_one "CT_ELEMENT_ONE")
 set(NAME_READ_element_one "read_list" "read_var" "read_var")
