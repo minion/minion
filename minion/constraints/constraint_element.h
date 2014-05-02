@@ -465,9 +465,13 @@ struct ElementConstraint : public AbstractConstraint
       // (i=1 and X[1]!=r) or (i=2 ...
       vector<AbstractConstraint*> con;
       // or the index is out of range:
-      vector<DomainInt> r; r.push_back(0); r.push_back(var_array.size()-1);
-      AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<Index>(stateObj, indexvar, r);
-      con.push_back(t4);
+      
+      if(!undef_maps_zero) {
+          // Constraint is satisfied if the index is out of range. 
+          vector<DomainInt> r; r.push_back(0); r.push_back(var_array.size()-1);
+          AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<Index>(stateObj, indexvar, r);
+          con.push_back(t4);
+      }
       
       for(SysInt i=0; i<var_array.size(); i++)
       {
@@ -483,8 +487,9 @@ struct ElementConstraint : public AbstractConstraint
       
       if(undef_maps_zero)
       {
+        // or (i not in {0..size-1} /\ r!=0)
         vector<AbstractConstraint*> out_bounds;
-        out_bounds.push_back(new WatchLiteralConstraint<Result>(stateObj, resultvar, 0));
+        out_bounds.push_back(new WatchNotLiteralConstraint<Result>(stateObj, resultvar, 0));
         out_bounds.push_back(new WatchNotInRangeConstraint<Index>(stateObj, indexvar, make_vec<DomainInt>(0, var_array.size() - 1)));
         con.push_back(new Dynamic_AND(stateObj, out_bounds));
       }
