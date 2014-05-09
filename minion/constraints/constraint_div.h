@@ -78,7 +78,7 @@ class DivConstraint
   StateObj* stateObj;
 public:
   typedef typename common_var_type3<T1,T2,T3>::type var_common;
-  typedef minion_array<var_common, 3> var_type;
+  typedef std::array<var_common, 3> var_type;
 private:
    var_type vars;
 public:

@@ -55,10 +55,10 @@ struct VMConstraint : public AbstractConstraint
   // Note: This is max - min, not the number of values per domain.
   enum { MaxDomSize = 14 };
   enum { MaxVarSize = 13 };
-  minion_array<VarRef, MaxVarSize> vars;
-  minion_array<signed char, MaxVarSize> domain_min;
-  minion_array<minion_array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
-  minion_array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
+  std::array<VarRef, MaxVarSize> vars;
+  std::array<signed char, MaxVarSize> domain_min;
+  std::array<std::array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
+  std::array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
   SysInt total_lits;
 
   SysInt vars_size;

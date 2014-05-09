@@ -128,7 +128,7 @@ namespace ConOutput
   }
 
   template<typename T, size_t len>
-  string print_vars(StateObj* stateObj, const minion_array<T,len>& t)
+  string print_vars(StateObj* stateObj, const std::array<T,len>& t)
   {
     ostringstream o;
     o << "[";

@@ -32,13 +32,13 @@ struct GadgetConstraint : public AbstractConstraint
   
   vector<AnyVarRef> construction_vars;
   
-  minion_shared_ptr<CSPInstance> gadget_instance;
+  shared_ptr<CSPInstance> gadget_instance;
   StateObj* gadget_stateObj;
   PropagationLevel gadget_prop_type;
   
   bool constraint_locked;
   
-  GadgetConstraint(StateObj* _stateObj, const VarArray& _vars, minion_shared_ptr<CSPInstance> _gadget, PropagationLevel _proptype) : 
+  GadgetConstraint(StateObj* _stateObj, const VarArray& _vars, shared_ptr<CSPInstance> _gadget, PropagationLevel _proptype) : 
   AbstractConstraint(_stateObj), var_array(_vars), gadget_instance(_gadget),
   gadget_stateObj(new StateObj), gadget_prop_type(_proptype), 
   constraint_locked(false)

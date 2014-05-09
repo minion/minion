@@ -535,7 +535,7 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
   gadget.read(infile);
 
   // Take the CSPInstance out of the Minion3InputReader, and make a copy of it.
-  instance->addGadgetSymbol(name, minion_shared_ptr<CSPInstance>(new_instance));
+  instance->addGadgetSymbol(name, shared_ptr<CSPInstance>(new_instance));
   MAYBE_PARSER_INFO("Exiting gadget parsing");
 }
 
@@ -790,7 +790,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileRead
   string s = infile->get_string();
 
   MAYBE_PARSER_INFO( "Gadget name: '" + s + "'");
-  minion_shared_ptr<CSPInstance> in_gadget = instance->getGadgetSymbol(s);
+  shared_ptr<CSPInstance> in_gadget = instance->getGadgetSymbol(s);
   ConstraintBlob gadgetCon( get_constraint(CT_GADGET) , vectorOfVars);
   gadgetCon.gadget = in_gadget;
   infile->check_sym(',');

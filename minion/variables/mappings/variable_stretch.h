@@ -480,8 +480,8 @@ struct MultiplyType<vector<T> >
 #endif
 
 template<typename T, std::size_t i>
-struct MultiplyType<minion_array<T, i> >
-{ typedef minion_array<MultiplyVar<T>, i> type; };
+struct MultiplyType<std::array<T, i> >
+{ typedef std::array<MultiplyVar<T>, i> type; };
 
 
 template<typename VRef>
@@ -512,10 +512,10 @@ MultiplyVarRef(const vector<VarRef>& var_array, const vector<DomainInt>& multipl
 #endif
 
 template<typename VarRef, std::size_t i>
-minion_array<MultiplyVar<VarRef>, i>
-MultiplyVarRef(const minion_array<VarRef, i>& var_array, const minion_array<SysInt, i>& multiplies)
+std::array<MultiplyVar<VarRef>, i>
+MultiplyVarRef(const std::array<VarRef, i>& var_array, const std::array<SysInt, i>& multiplies)
 {
-  minion_array<MultiplyVar<VarRef>, i> Multiply_array;
+  std::array<MultiplyVar<VarRef>, i> Multiply_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
     Multiply_array[l] = MultiplyVarRef(var_array[l], multiplies[i]);
   return Multiply_array;

@@ -230,8 +230,8 @@ struct SwitchNegType<vector<T> >
 #endif
 
 template<typename T, std::size_t i>
-struct SwitchNegType<minion_array<T, i> >
-{ typedef minion_array<SwitchNeg<T>, i> type; };
+struct SwitchNegType<std::array<T, i> >
+{ typedef std::array<SwitchNeg<T>, i> type; };
 
 
 template<typename VRef>
@@ -263,10 +263,10 @@ SwitchNegRef(const vector<VarRef>& var_array)
 #endif
 
 template<typename VarRef, std::size_t i>
-minion_array<SwitchNeg<VarRef>, i>
-SwitchNegRef(const minion_array<VarRef, i>& var_array)
+std::array<SwitchNeg<VarRef>, i>
+SwitchNegRef(const std::array<VarRef, i>& var_array)
 {
-  minion_array<SwitchNeg<VarRef>, i> neg_array;
+  std::array<SwitchNeg<VarRef>, i> neg_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
     neg_array[l] = SwitchNegRef(var_array[l]);
   return neg_array;

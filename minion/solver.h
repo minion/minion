@@ -69,8 +69,8 @@ class SearchState
 
   TimerClass oldtimer;
 
-  minion_shared_ptr<TupleListContainer> tupleListContainer;
-  minion_shared_ptr<ShortTupleListContainer> shortTupleListContainer;
+  shared_ptr<TupleListContainer> tupleListContainer;
+  shared_ptr<ShortTupleListContainer> shortTupleListContainer;
 
   bool is_locked;
 
@@ -149,10 +149,10 @@ public:
   TupleListContainer* getTupleListContainer() { return &*tupleListContainer; }
   ShortTupleListContainer* getShortTupleListContainer() { return &*shortTupleListContainer; }
 
-  void setTupleListContainer(minion_shared_ptr<TupleListContainer> _tupleList)
+  void setTupleListContainer(shared_ptr<TupleListContainer> _tupleList)
   { tupleListContainer = _tupleList; }
 
-  void setShortTupleListContainer(minion_shared_ptr<ShortTupleListContainer> _tupleList)
+  void setShortTupleListContainer(shared_ptr<ShortTupleListContainer> _tupleList)
   { shortTupleListContainer = _tupleList; }
 
   SearchState(StateObj* _stateObj) : stateObj(_stateObj), nodes(0), optimise_var(NULL),

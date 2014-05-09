@@ -166,9 +166,9 @@ struct TriggerCreator : public AbstractTriggerCreator
 };
 
 template<typename VarRef>
-inline minion_shared_ptr<AbstractTriggerCreator> 
+inline shared_ptr<AbstractTriggerCreator> 
 make_trigger(VarRef& v, Trigger t, TrigType trigger_type)
-{ return minion_shared_ptr<AbstractTriggerCreator>(new TriggerCreator<VarRef>(v,t, trigger_type));}
+{ return shared_ptr<AbstractTriggerCreator>(new TriggerCreator<VarRef>(v,t, trigger_type));}
 
 #endif
 

@@ -36,7 +36,7 @@ greaterEqualSumConstraint(StateObj* stateObj, const vector<VarArray>& _var_array
 {
   if(_var_array.size() == 2)
   {
-    minion_array<VarArray, 2> v_array;
+    std::array<VarArray, 2> v_array;
     for(SysInt i = 0; i < 2; ++i)
       v_array[i] = _var_array[i];
     return LightGreaterEqualSumCon(stateObj, v_array, _var_sum);
@@ -54,7 +54,7 @@ lessEqualSumConstraint(StateObj* stateObj, const vector<VarArray>& _var_array, c
 {
   if(_var_array.size() == 2)
   {
-    minion_array<VarArray, 2> v_array;
+    std::array<VarArray, 2> v_array;
     for(SysInt i = 0; i < 2; ++i)
       v_array[i] = _var_array[i];
     return LightLessEqualSumCon(stateObj, v_array, _var_sum);

@@ -195,8 +195,8 @@ struct NegType<vector<T> >
 #endif
 
 template<typename T, std::size_t i>
-struct NegType<minion_array<T, i> >
-{ typedef minion_array<typename NegType<T>::type, i> type; };
+struct NegType<std::array<T, i> >
+{ typedef std::array<typename NegType<T>::type, i> type; };
 
 // Neg of a neg is the original!
 template<typename T>
@@ -237,10 +237,10 @@ VarNegRef(const vector<VarRef>& var_array)
 #endif
 
 template<typename VarRef, std::size_t i>
-minion_array<typename NegType<VarRef>::type, i>
-VarNegRef(const minion_array<VarRef, i>& var_array)
+std::array<typename NegType<VarRef>::type, i>
+VarNegRef(const std::array<VarRef, i>& var_array)
 {
-  minion_array<typename NegType<VarRef>::type, i> neg_array;
+  std::array<typename NegType<VarRef>::type, i> neg_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
     neg_array[l] = VarNegRef(var_array[l]);
   return neg_array;

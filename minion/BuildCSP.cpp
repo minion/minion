@@ -116,7 +116,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
         D_ASSERT(instance.search_order[i].var_order.size() == instance.search_order[i].val_order.size());
     }
 
-    minion_shared_ptr<Controller::SearchManager> sm=Controller::make_search_manager(stateObj, args.prop_method, instance.search_order);
+    shared_ptr<Controller::SearchManager> sm=Controller::make_search_manager(stateObj, args.prop_method, instance.search_order);
 
     getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions(stateObj).silent);
     try {

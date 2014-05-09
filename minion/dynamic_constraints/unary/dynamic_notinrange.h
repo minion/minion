@@ -145,7 +145,7 @@ template<typename Var>
 
   virtual AbstractConstraint* reverse_constraint()
   {
-      minion_array<DomainInt, 2> a = {range_min, range_max};
+      std::array<DomainInt, 2> a = {range_min, range_max};
       return new WatchInRangeConstraint<Var>(stateObj, var, a);
   }
 };
@@ -154,7 +154,7 @@ template<typename Var>
 template<typename Var>
 AbstractConstraint* WatchInRangeConstraint<Var>::reverse_constraint()
 {
-    minion_array<DomainInt, 2> a = {range_min, range_max};
+    std::array<DomainInt, 2> a = {range_min, range_max};
     return new WatchNotInRangeConstraint<Var>(stateObj, var, a);  
 }
 #endif

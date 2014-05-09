@@ -24,10 +24,10 @@
 
 #include "basic_headers.h"
 
-#include "linked_ptr.h"
+
 #include "wrapper.h"
 #include "to_string.h"
-#include "local_array.h"
+
 #include "tableout.h"
 #include "time_keeping.h"
 

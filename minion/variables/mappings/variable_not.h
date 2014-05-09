@@ -211,8 +211,8 @@ struct NotType<vector<T> >
 #endif
 
 template<typename T, std::size_t i>
-struct NotType<minion_array<T, i> >
-{ typedef minion_array<VarNot<T>, i> type; };
+struct NotType<std::array<T, i> >
+{ typedef std::array<VarNot<T>, i> type; };
 
 
 template<typename VRef>
@@ -249,10 +249,10 @@ VarNotRef(const vector<VarRef>& var_array)
 #endif
 
 template<typename VarRef, std::size_t i>
-minion_array<VarNot<VarRef>, i>
-VarNotRef(const minion_array<VarRef, i>& var_array)
+std::array<VarNot<VarRef>, i>
+VarNotRef(const std::array<VarRef, i>& var_array)
 {
-  minion_array<VarNot<VarRef>, i> Not_array;
+  std::array<VarNot<VarRef>, i> Not_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
     Not_array[l] = VarNotRef(var_array[l]);
   return Not_array;

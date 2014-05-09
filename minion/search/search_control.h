@@ -25,7 +25,7 @@
 namespace Controller
 {
 
-    minion_shared_ptr<VariableOrder> make_search_order(SearchOrder order, StateObj* stateObj)
+    shared_ptr<VariableOrder> make_search_order(SearchOrder order, StateObj* stateObj)
     {
         // collect the variables in the SearchOrder object
         vector<AnyVarRef> var_array;
@@ -78,13 +78,13 @@ namespace Controller
             cout << "Order not found in make_search_order." << endl;
             abort();
         }
-        return minion_shared_ptr<VariableOrder>(vo);
+        return shared_ptr<VariableOrder>(vo);
     }
 
-    minion_shared_ptr<VariableOrder> make_search_order_multiple(vector<SearchOrder> order,
+    shared_ptr<VariableOrder> make_search_order_multiple(vector<SearchOrder> order,
                                                          StateObj* stateObj)
     {
-        minion_shared_ptr<VariableOrder> vo;
+        shared_ptr<VariableOrder> vo;
 
         if(order.size()==1)
         {
@@ -92,7 +92,7 @@ namespace Controller
         }
         else
         {
-            vector<minion_shared_ptr<VariableOrder> > vovector;
+            vector<shared_ptr<VariableOrder> > vovector;
             for(SysInt i=0; i<order.size(); i++)
             {
                 vovector.push_back(make_search_order(order[i], stateObj));
@@ -103,7 +103,7 @@ namespace Controller
                 }
             }
 
-            vo=minion_shared_ptr<VariableOrder>(new MultiBranch(vovector, stateObj));
+            vo=shared_ptr<VariableOrder>(new MultiBranch(vovector, stateObj));
         }
 
         return vo;
@@ -111,31 +111,31 @@ namespace Controller
 
 
 // returns an instance of SearchManager with the required variable ordering, propagator etc.
-minion_shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
+shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
                                               PropagationLevel prop_method,
                                               vector<SearchOrder> order)
 {
-    minion_shared_ptr<VariableOrder> vo;
+    shared_ptr<VariableOrder> vo;
 
     vo=make_search_order_multiple(order, stateObj);
 
-    minion_shared_ptr<Propagate> p;
+    shared_ptr<Propagate> p;
     switch(prop_method)
     {   // doesn't cover the PropLevel_None case.
     case PropLevel_GAC:
-        p= minion_shared_ptr<Propagate>(new PropGAC());
+        p= shared_ptr<Propagate>(new PropGAC());
         break;
     case PropLevel_SAC:
-        p=  minion_shared_ptr<Propagate>(new PropSAC());
+        p=  shared_ptr<Propagate>(new PropSAC());
         break;
     case PropLevel_SSAC:
-        p=  minion_shared_ptr<Propagate>(new PropSSAC());
+        p=  shared_ptr<Propagate>(new PropSSAC());
         break;
     case PropLevel_SACBounds:
-        p=  minion_shared_ptr<Propagate>(new PropSAC_Bounds());
+        p=  shared_ptr<Propagate>(new PropSAC_Bounds());
         break;
     case PropLevel_SSACBounds:
-        p=  minion_shared_ptr<Propagate>(new PropSSAC_Bounds());
+        p=  shared_ptr<Propagate>(new PropSSAC_Bounds());
         break;
     default:
         cout << "Propagation method not found in make_search_manager." << endl;
@@ -153,7 +153,7 @@ minion_shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
     }
 
     // need to switch here for different search algorthms. plain, parallel, group
-    minion_shared_ptr<SearchManager> sm(new SearchManager(stateObj, all_vars, order, vo, p));
+    shared_ptr<SearchManager> sm(new SearchManager(stateObj, all_vars, order, vo, p));
 
     return sm;
 }
