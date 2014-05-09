@@ -69,6 +69,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <array>
+#include <memory>
 
 #define MAP_TYPE std::unordered_map
 #define SET_TYPE std::unordered_set
