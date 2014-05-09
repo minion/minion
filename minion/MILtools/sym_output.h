@@ -49,12 +49,12 @@ repartition(const std::vector<std::set<SysInt> >& graph, std::vector<SysInt> par
 }
 
 double
-partition_graph(const boost::tuple<SysInt,vector<set<SysInt> >,vector<set<SysInt> > >& graph_tuple)
+partition_graph(const std::tuple<SysInt,vector<set<SysInt> >,vector<set<SysInt> > >& graph_tuple)
 {
   std::vector<std::set<SysInt> > graph;
   std::vector<std::set<SysInt> > partition;
   SysInt blank;
-  boost::tie(blank, graph, partition) = graph_tuple;
+  std::tie(blank, graph, partition) = graph_tuple;
 
   std::vector<SysInt> partition_num(graph.size());
 
@@ -141,7 +141,7 @@ struct Graph
      }
    }
 
-   boost::tuple<SysInt,vector<set<SysInt> >,vector<set<SysInt> > >  build_graph_info(CSPInstance& csp, bool print_names = true)
+   std::tuple<SysInt,vector<set<SysInt> >,vector<set<SysInt> > >  build_graph_info(CSPInstance& csp, bool print_names = true)
    {
 
      map<string, SysInt> v_num;
@@ -216,7 +216,7 @@ struct Graph
        edges[first_v].insert(second_v);
      }
 
-     return boost::make_tuple(var_vertex_count, edges, partitions);
+     return std::make_tuple(var_vertex_count, edges, partitions);
    }
 
    void output_nauty_graph(CSPInstance& csp)
@@ -225,7 +225,7 @@ struct Graph
      vector<set<SysInt> > edges;
      vector<set<SysInt> > partitions;
 
-     boost::tie(var_vertex_count, edges, partitions) = build_graph_info(csp);
+     std::tie(var_vertex_count, edges, partitions) = build_graph_info(csp);
 #ifdef USE_NAUTY
      vector<vector<DomainInt> > perms = build_graph(edges, partitions);
      cout << "generators := [()" << endl;  

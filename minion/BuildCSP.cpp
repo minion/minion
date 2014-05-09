@@ -28,12 +28,9 @@
 
 #include "search/search_control.h"
 
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
+
 #include "dump_state.hpp"
 
-using boost::function;
-using boost::bind;
 
 
 using namespace ProbSpec;
@@ -71,7 +68,7 @@ void BuildCSP(StateObj* stateObj, CSPInstance& instance)
   for(list<ConstraintBlob>::iterator it = instance.constraints.begin(); it != instance.constraints.end(); it++) {
      getState(stateObj).addConstraint(build_constraint(stateObj, *it));
   }
-  
+
   // Solve!
   getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Setup Time: ", "SetupTime", getTableOut(), !getOptions(stateObj).silent);
   Controller::initalise_search(stateObj);
@@ -83,33 +80,33 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
 {
     // Check that when searching PropagateSAC does actually do the SAC over all vars in any
     // varorder block, not just the ones in the 'current' block
-    
-    
+
+
     // Set up variable and value ordering
     // Strange that when using randomise_valvarorder, the variables are
     // only shuffled within the VARORDER blocks from the input file.
     // Likewise, using a dynamic variable ordering, it only applies within
     // the VARORDER blocks.
-    
+
     vector<AnyVarRef> preprocess_vars;
-    
+
     for(SysInt i = instance.search_order.size() - 1; i >= 0; --i)
     {
         if(args.order != ORDER_NONE)
             instance.search_order[i].order = args.order;
-        
+
         for(SysInt j=0; j<instance.search_order[i].var_order.size(); j++)
         {   // cobble together all the varorder blocks for preprocessing.
             preprocess_vars.push_back(get_AnyVarRef_from_Var(stateObj, instance.search_order[i].var_order[j]));
         }
-        
+
         if(getOptions(stateObj).randomise_valvarorder)
         {
             getOptions(stateObj).printLine("Using seed: " + to_string(args.random_seed));
             srand( args.random_seed );
-            
-            std::random_shuffle(instance.search_order[i].var_order.begin(), instance.search_order[i].var_order.end()); 
-            
+
+            std::random_shuffle(instance.search_order[i].var_order.begin(), instance.search_order[i].var_order.end());
+
             for(UnsignedSysInt j = 0; j < instance.search_order[i].val_order.size(); ++j)
             {
               instance.search_order[i].val_order[j] = VALORDER_RANDOM;
@@ -118,9 +115,9 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
 
         D_ASSERT(instance.search_order[i].var_order.size() == instance.search_order[i].val_order.size());
     }
-    
+
     minion_shared_ptr<Controller::SearchManager> sm=Controller::make_search_manager(stateObj, args.prop_method, instance.search_order);
-    
+
     getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions(stateObj).silent);
     try {
 
@@ -133,10 +130,10 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
               dump_solver(stateObj, getOptions(stateObj).outputCompressed, getOptions(stateObj).outputCompressedDomains);
           throw;
       }
-      
+
       getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions(stateObj).silent);
       getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions(stateObj).silent);
-   
+
       if(getOptions(stateObj).outputCompressed != "" || getOptions(stateObj).outputCompressedDomains)
         dump_solver(stateObj, getOptions(stateObj).outputCompressed, getOptions(stateObj).outputCompressedDomains);
 
@@ -152,7 +149,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
   {
     cout << getState(stateObj).storedSolution;
   }
-  
+
   getState(stateObj).getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime", getTableOut(), !getOptions(stateObj).silent);
   getOptions(stateObj).printLine("Total Nodes: " + to_string( getState(stateObj).getNodeCount() ));
   getOptions(stateObj).printLine(string("Problem solvable?: ") + (getState(stateObj).getSolutionCount() == 0 ? "no" : "yes"));

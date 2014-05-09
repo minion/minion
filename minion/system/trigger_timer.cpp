@@ -43,17 +43,17 @@ void CALLBACK TimerProc(void* ,  BOOLEAN)
 
 void CALLBACK ReallyStop(void*, BOOLEAN)
 { exit(1); }
-    
+
 void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool CPU_time)
 {
     if(CPU_time)
         cerr << "CPU-time timing not available on windows, falling back on clock" << endl;
-    
+
     trig = b;
     *trig = false;
-    
+
     HANDLE m_timerHandle;
-    
+
     if(timeout_active)
     {
         if(timeout <= 0)
@@ -83,7 +83,7 @@ void install_ctrlc_trigger(volatile bool*)
 void trigger_function(int /* signum */ )
 { *trig = true; }
 
-void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool CPU_time) // CPU_time = false -> real time 
+void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool CPU_time) // CPU_time = false -> real time
 {
   // We still set these, as they are how 'ctrlc' checks if we have got started properly or not.
   trig = b;
@@ -114,15 +114,15 @@ void ctrlc_function(int /* signum */ )
     cerr << "Ctrl+C pressed twice. Exiting immediately." << endl;
     exit(1);
   }
-  
+
   if(trig == NULL)
   {
     cerr << "Search has not started. Exiting immediately." << endl;
     exit(1);
   }
-  
+
   check_double_ctrlc = true;
-  
+
   cerr << "Ctrl+C pressed. Exiting.\n";
   // This is the quickest way to get things to stop.
   *trig = true;
@@ -136,4 +136,3 @@ void install_ctrlc_trigger(volatile bool* ctrl_c_press_)
   signal(SIGINT, ctrlc_function);
 }
 #endif
-

@@ -30,8 +30,8 @@
 
 namespace Controller
 {
-    
-  
+
+
   /// Sets optimisation variable.
   template<typename VarRef>
   void optimise_maximise_var(StateObj* stateObj, VarRef var)
@@ -43,7 +43,7 @@ namespace Controller
       getState(stateObj).setMaximise(true);
 
   }
-  
+
   /// Sets optimisation variable.
   template<typename VarRef>
   void optimise_minimise_var(StateObj* stateObj, VarRef var)
@@ -54,15 +54,15 @@ namespace Controller
       getState(stateObj).setRawOptimiseVar(new AnyVarRef(var));
       getState(stateObj).setMaximise(false);
   }
-  
+
   /// Ensures a particular constraint is satisfied by the solution.
   template<typename T>
   void check_constraint(StateObj* stateObj, T* con)
   {
       vector<AnyVarRef>& variables = *(con->get_vars_singleton());
-      UnsignedSysInt vec_size = variables.size();  
-      
-    DomainInt* values = (DomainInt*) alloca(vec_size * sizeof(DomainInt)); 
+      UnsignedSysInt vec_size = variables.size();
+
+    DomainInt* values = (DomainInt*) alloca(vec_size * sizeof(DomainInt));
       //vector<DomainInt> values(vec_size);
 
       for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
@@ -75,7 +75,7 @@ namespace Controller
         }
         values[loop] = variables[loop].getAssignedValue();
       }
-      
+
       if(!con->check_assignment(values, vec_size))
       {
         cerr << "A " << con->extended_name() << " constraint is not satisfied by this sol!" << endl;
@@ -108,11 +108,11 @@ namespace Controller
       {
         for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
         {
-          if (!getOptions(stateObj).silent) sout << "Sol: ";  
+          if (!getOptions(stateObj).silent) sout << "Sol: ";
           for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j)
           {
             if(!print_matrix[i][j].isAssigned())
-              sout  << "[" << print_matrix[i][j].getMin() << "," << 
+              sout  << "[" << print_matrix[i][j].getMin() << "," <<
               print_matrix[i][j].getMax() << "]";
             else
               sout << print_matrix[i][j].getAssignedValue() << " ";
@@ -123,7 +123,7 @@ namespace Controller
       }
 
     // TODO : Make this more easily changable.
-      if (!getOptions(stateObj).silent) 
+      if (!getOptions(stateObj).silent)
       {
         sout << "Solution Number: " << getState(stateObj).getSolutionCount() << endl;
         getState(stateObj).getOldTimer().printTimestepWithoutReset(sout, Output_Always, "Time:");
@@ -140,7 +140,7 @@ namespace Controller
       getOptions(stateObj).solCallBack(stateObj);
 
     getState(stateObj).incrementSolutionCount();
-    
+
     if(getOptions(stateObj).solsoutWrite)
     {
       vector<vector<AnyVarRef> > print_matrix = getState(stateObj).getPrintMatrix();
@@ -153,7 +153,7 @@ namespace Controller
         }
       solsoutFile << "\n";
     }
-    
+
     if(getOptions(stateObj).print_solution)
     {
       if(getOptions(stateObj).printonlyoptimal)
@@ -181,7 +181,7 @@ namespace Controller
     bool isLeft;
     UnsignedSysInt var;
     DomainInt val;
-    
+
     triple(bool _isLeft, UnsignedSysInt _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
     friend std::ostream& operator<<(std::ostream& o, const triple& t)
     { o << "(" << t.isLeft << "," << t.var << "," << t.val << ")"; return o; }
@@ -283,7 +283,7 @@ namespace Controller
             fileout << "**EOF**" << endl;
         }
         else {
-            //  For distributed use within BOINC, dump splits into stderr. Accessed by -split-stderr command-line flag. 
+            //  For distributed use within BOINC, dump splits into stderr. Accessed by -split-stderr command-line flag.
             cerr << "# original instance: " << getOptions(stateObj).instance_name << endl;
             cerr << inst;
             cerr << *s;
@@ -310,7 +310,7 @@ namespace Controller
         }
     }
   }
-   
+
   /// Check if timelimit has been exceeded.
   template<typename VarArray, typename BranchList>
   inline void do_checks(StateObj* stateObj, VarArray& var_array, BranchList& branches)
@@ -319,7 +319,7 @@ namespace Controller
       generateRestartFile(stateObj, var_array, branches);
       throw EndOfSearch();
     }
-    
+
     if(getState(stateObj).isAlarmActivated())
     { // Either a timeout has occurred, or ctrl+c has been pressed.
       generateRestartFile(stateObj, var_array, branches);
@@ -332,14 +332,14 @@ namespace Controller
       {
         FAIL_EXIT("Time out");
       }
-      
+
       getOptions(stateObj).printLine("Time out.");
       getTableOut().set("TimeOut", 1);
 
       throw EndOfSearch();
     }
   }
-  
+
 
   template<typename T>
   void inline maybe_print_search_state(StateObj* stateObj, const char* name, T& vars)
@@ -359,7 +359,7 @@ namespace Controller
   {
     // We have found a solution!
     check_sol_is_correct(stateObj);
-    
+
     if(getState(stateObj).isOptimisationProblem())
     {
       if(!getState(stateObj).getOptimiseVar()->isAssigned())
@@ -369,7 +369,7 @@ namespace Controller
         cerr << "Aborting Search" << endl;
         exit(1);
       }
-      
+
       if(getOptions(stateObj).printonlyoptimal)
       {
         getState(stateObj).storedSolution += "Solution found with Value: "
@@ -377,11 +377,11 @@ namespace Controller
       }
       else
       {
-        cout << "Solution found with Value: " 
+        cout << "Solution found with Value: "
              << getState(stateObj).getRawOptimiseVar()->getAssignedValue() << endl;
       }
-      
-      getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getAssignedValue() + 1);         
+
+      getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getAssignedValue() + 1);
     }
     // Note that sollimit = -1 if all solutions should be found.
     if(getState(stateObj).getSolutionCount() == getOptions(stateObj).sollimit)
@@ -399,17 +399,17 @@ namespace Controller
 
   void inline initalise_search(StateObj* stateObj)
   {
-    getState(stateObj).setSolutionCount(0);  
+    getState(stateObj).setSolutionCount(0);
     getState(stateObj).setNodeCount(0);
-    
+
     lock(stateObj);
-    if (!getOptions(stateObj).silent) 
+    if (!getOptions(stateObj).silent)
       getState(stateObj).getOldTimer().printTimestepWithoutReset(cout, Output_1, "First Node Time: ");
     /// Failed initially propagating constraints!
     if(getState(stateObj).isFailed())
       return;
     if(getState(stateObj).isOptimisationProblem())
-      getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getMin()); 
+      getState(stateObj).setOptimiseValue(getState(stateObj).getOptimiseVar()->getMin());
   }
 }
 

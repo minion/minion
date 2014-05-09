@@ -19,11 +19,6 @@
 
 #include "../constraints/constraint_abstract.h"
 
-#ifdef THREADSAFE
-#include <boost/thread/thread.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-#endif
-
 #ifndef VARREFTYPE_H
 #define VARREFTYPE_H
 
@@ -142,12 +137,6 @@ struct VarRefType
 #endif
 };
 
-#ifdef THREADSAFE
-#define LOCK_CON boost::recursive_mutex::scoped_lock(GET_CONTAINER().con_mutex);
-#else
-#define LOCK_CON
-#endif
-
 template<typename GetContainer, typename InternalRefType>
 struct QuickVarRefType
 {
@@ -171,36 +160,36 @@ struct QuickVarRefType
   {}
 
   BOOL isAssigned() const
-  { LOCK_CON return data.isAssigned(); }
+  { return data.isAssigned(); }
 
   DomainInt getAssignedValue() const
-  { LOCK_CON return data.getAssignedValue(); }
+  { return data.getAssignedValue(); }
 
   BOOL isAssignedValue(DomainInt i) const
-  { LOCK_CON
+  {
     return data.isAssigned() &&
     data.getAssignedValue() == i;
   }
   BOOL inDomain(DomainInt b) const
-  { LOCK_CON return data.inDomain(b); }
+  { return data.inDomain(b); }
 
   BOOL inDomain_noBoundCheck(DomainInt b) const
-  { LOCK_CON return data.inDomain_noBoundCheck(b); }
+  { return data.inDomain_noBoundCheck(b); }
 
   DomainInt getDomSize() const
   { return data.getDomSize(); }
 
   DomainInt getMax() const
-  { LOCK_CON return data.getMax(); }
+  { return data.getMax(); }
 
   DomainInt getMin() const
-  { LOCK_CON return data.getMin(); }
+  { return data.getMin(); }
 
   DomainInt getInitialMax() const
-  { LOCK_CON return data.getInitialMax(); }
+  { return data.getInitialMax(); }
 
   DomainInt getInitialMin() const
-  { LOCK_CON return data.getInitialMin(); }
+  { return data.getInitialMin(); }
 
   void setMax(DomainInt i)
   { GET_CONTAINER().setMax(data,i); }
@@ -259,4 +248,3 @@ struct QuickVarRefType
 };
 
 #endif
-

@@ -46,6 +46,8 @@ else()
     message(STATUS "No HG executable found, unable to determine HG version and date")
 endif()
 
+set(CFLAGS "${CFLAGS} -std=c++0x")
+
 file(APPEND ${BUILD_DEF_FILE} "#define HG_VER ${HGVERSION}\n")
 file(APPEND ${BUILD_DEF_FILE} "#define HG_DATE ${HGDATE}\n")
 
@@ -150,10 +152,6 @@ if(THREADSAFE)
     message(STATUS "Compiling thread-safe minion")
     set(BINARY "${BINARY}-threads")
     add_definitions(-DTHREADSAFE)
-
-    set(BOOST_COMPONENTS iostreams thread)
-else()
-    set(BOOST_COMPONENTS iostreams)
 endif()
 
 option(DOMAINS64 "" OFF)
@@ -178,11 +176,9 @@ endif()
 
 if(MACRELEASE)
     set(CFLAGS "${CFLAGS} -ffast-math")
-    set(Boost_USE_STATIC_LIBS true)
 endif()
 
 if(APPLEMAC)
-    set(Boost_USE_STATIC_LIBS true)
 #    add_definitions(-mmacosx-version-min=10.5)
 #    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.5 )
  endif()
@@ -192,37 +188,12 @@ if(STATIC)
     message(STATUS "Building static binary")
     set(BINARY "${BINARY}-static")
     if(NOT APPLEMAC)
-        # the line below builds minion with just the boost stuff statically
-        # linked, however, as the location of the other libraries varies between
-        # linux distros, we just stuff everything into the binary
-        #set(Boost_USE_STATIC_LIBS true)
         set(CMAKE_EXE_LINKER_FLAGS "-static")
     endif()
     if(MINGW OR MSYS)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
 	set(CFLAGS "${CFLAGS} -static-libgcc -static-libstdc++")
     endif()
-endif()
-
-set(Boost_ADDITIONAL_VERSIONS "1.41.1" "1.41.0" "1.41" "1.40.1" "1.40.0" "1.40" "1.39.1" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" "1.36.1" "1.36.0" "1.36" "1.35.1" "1.35.0" "1.35" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33")
-find_package(Boost COMPONENTS ${BOOST_COMPONENTS})
-if(Boost_FOUND)
-    set(CFLAGS "${CFLAGS} -I${Boost_INCLUDE_DIRS}")
-    find_package(ZLIB)
-    if(ZLIB_FOUND)
-        find_package(BZip2)
-        if(BZIP2_FOUND OR NOT BZIP2_LIBRARIES)
-            message(STATUS "Boost and all required libraries found, building with boost")
-            add_definitions(-DUSE_BOOST_STREAMS)
-            set(CFLAGS "${CFLAGS} -I${ZLIB_INCLUDE_DIR} -I${BZIP2_INCLUDE_DIR}")
-        else()
-            message(STATUS "Bzip2 not found, building without compressed file support")
-        endif()
-    else()
-        message(STATUS "Zlib not found, building without compressed file support")
-    endif()
-else()
-    message(FATAL_ERROR "Boost not found -- do you have the iostreams component?")
 endif()
 
 find_program(CCONTROL ccontrol)
@@ -265,27 +236,6 @@ set(WFLAGS "-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter
 check_cxx_compiler_flag(${WFLAGS} CheckWarnings)
 if(CheckWarnings AND NOT SUNOS AND CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(${WFLAGS})
-endif()
-
-# slightly weird check to make sure that the boost TR1 libs are there
-
-if(Boost_FOUND)
-    set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${Boost_INCLUDE_DIRS})
-    check_include_file_cxx("boost/unordered_set.hpp" BOOST-TR1)
-endif()
-
-if(BOOST-TR1)
-    message(STATUS "Using Boost TR1 libraries")
-    add_definitions(-DUSE_BOOST)
-else()
-    check_include_file_cxx("tr1/unordered_map" TR1-MAP)
-    check_include_file_cxx("tr1/unordered_set" TR1-SET)
-    if(TR1-MAP AND TR1-SET)
-        message(STATUS "Using TR1 hashed containers")
-        add_definitions(-DUSE_TR1_HASH_MAP_AND_SET)
-    else()
-        message(STATUS "Using tree containers")
-    endif()
 endif()
 
 option(DEBUG "" OFF)
@@ -503,22 +453,6 @@ if(NOT ${BINARY} STREQUAL minion)
     add_custom_target(minion-lib DEPENDS ${BINARY}-lib)
 endif()
 
-if(Boost_FOUND)
-    if(NOT DEFINED Boost_LIBRARIES)
-        # cmake 2.4 doesn't set this variable, so we take care of it manually
-        set(Boost_LIBRARIES "-lboost_iostreams")
-        if(Boost_USE_MULTITHREADED)
-            set(Boost_LIBRARIES "${Boost_LIBRARIES}-mt")
-        endif()
-    endif()
-    link_directories(${Boost_LIBRARY_DIRS})
-    target_link_libraries(${BINARY} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES})
-endif()
-
-#if(GMP_FOUND)
-#    target_link_libraries(${BINARY} ${GMPXX_LIBRARY} ${GMP_LIBRARY})
-#endif()
-
 # generators
 add_executable(bibd "${PROJECT_SOURCE_DIR}/generators/Bibd/MinionBIBDInstanceGenerator.cpp")
 add_executable(golomb "${PROJECT_SOURCE_DIR}/generators/Golomb/GolombMinionGenerator.cpp")
@@ -589,17 +523,17 @@ endif()
 add_custom_target(test-instances-quick DEPENDS ${BINARY}
                   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test_instances"
                   COMMAND "./do_basic_tests.sh" "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
-                  
+
 add_custom_target(test-instances-slow DEPENDS ${BINARY}
                   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test_instances"
                   COMMAND "./run_tests.sh" "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
-                
+
 add_custom_target(test-random-quick DEPENDS ${BINARY}
-                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}            
+                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
                  COMMAND "./mini-scripts/testallconstraints.py"
                     "--numtests=25" "--procs=2"
                     "--minion=${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
-                
+
 add_custom_target(test-random-slow DEPENDS ${BINARY}
                   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
                   COMMAND "./mini-scripts/testallconstraints.py"

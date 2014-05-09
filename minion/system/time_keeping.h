@@ -33,7 +33,7 @@ inline double get_cpu_time()
      if (GetProcessTimes(GetCurrentProcess(), &creat_t, &exit_t, &kernel_t, &user_t))
       return ((double) (((ULL) user_t.dwHighDateTime << 32) + (ULL) user_t.dwLowDateTime)) / 10000 / 1000;
      else
-         abort();   
+         abort();
 }
 
 inline double get_sys_time()
@@ -42,7 +42,7 @@ inline double get_sys_time()
      if (GetProcessTimes(GetCurrentProcess(), &creat_t, &exit_t, &kernel_t, &user_t))
       return ((double) (((ULL) kernel_t.dwHighDateTime << 32) + (ULL) kernel_t.dwLowDateTime)) / 10000 / 1000;
      else
-         abort();   
+         abort();
 }
 
 inline long get_max_rss()
@@ -96,7 +96,7 @@ inline long get_max_rss()
 /*
 inline void get_current_time(TIME_STRUCT& t) { gettimeofday(&t, NULL); }
 inline void get_current_cpu_time(CPU_TIME_STRUCT& t) { getrusage(RUSAGE_SELF, &t); }
-  
+
 inline double diff_cpu_time(const CPU_TIME_STRUCT& end_time, const CPU_TIME_STRUCT& start_time)
 {
   double time = end_time.ru_utime.tv_sec - start_time.ru_utime.tv_sec;
@@ -120,7 +120,7 @@ inline double diff_time(const TIME_STRUCT& end_wallclock, const TIME_STRUCT& sta
 }
 
 inline double cpu_time_elapsed(CPU_TIME_STRUCT& start_time)
-{ 
+{
   CPU_TIME_STRUCT t;
   get_current_cpu_time(t);
   return diff_cpu_time(t, start_time);
@@ -130,7 +130,7 @@ inline double cpu_time_elapsed(CPU_TIME_STRUCT& start_time)
 enum Output_Type
 
 { Output_Always, Output_1, Output_2};
-  
+
 class TimerClass
 {
   double _internal_cpu_start_time;
@@ -140,7 +140,7 @@ class TimerClass
 
   Output_Type output;
 public:
-  
+
   void setOutputType(short version)
   {
     switch(version)
@@ -152,13 +152,13 @@ public:
         abort();
     }
   }
-  
-  TimerClass() : output(Output_1) 
-  { 
-    cout.setf(ios::fixed); 
-    startClock(); 
+
+  TimerClass() : output(Output_1)
+  {
+    cout.setf(ios::fixed);
+    startClock();
   }
-  
+
 void startClock()
 {
   _internal_cpu_start_time = get_cpu_time();
@@ -172,11 +172,11 @@ bool checkTimeout(unsigned seconds)
 
 template<typename Stream>
 void printTimestepWithoutReset(Stream& sout, Output_Type t, const char* time_name)
-{ 
+{
   if(t != Output_Always && t != output)
     return;
-  sout << time_name << get_cpu_time() - _last_check_time << endl; 
-} 
+  sout << time_name << get_cpu_time() - _last_check_time << endl;
+}
 
 template<typename Stream>
 void maybePrintTimestepStore(Stream& sout, Output_Type t, const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
@@ -195,12 +195,12 @@ template<typename Stream>
 void maybePrintFinaltimestepStore(Stream& sout, const char* time_name, const char* store_name, TableOut & tableout, bool toprint)
 {
   double time_wallclock = get_wall_time() - start_wallclock;
-  
+
   double end_cpu_time = get_cpu_time();
   double end_sys_time = get_sys_time();
-  
+
   maybePrintTimestepStore(sout, Output_Always, time_name, store_name, tableout, toprint);
-  if(toprint) 
+  if(toprint)
   {
     sout << "Total Time: " << end_cpu_time - _internal_cpu_start_time << endl;
     sout << "Total System Time: " << end_sys_time - _internal_sys_start_time << endl;
@@ -210,5 +210,3 @@ void maybePrintFinaltimestepStore(Stream& sout, const char* time_name, const cha
   tableout.set(string("TotalTime"), end_cpu_time - _internal_cpu_start_time );
 }
 };
-
-

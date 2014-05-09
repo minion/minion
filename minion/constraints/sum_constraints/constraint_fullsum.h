@@ -31,7 +31,7 @@ The constraint
    sumgeq(vec, c)
 
 ensures that sum(vec) >= c.
-*/ 
+*/
 
 // This is the standard implementation of sumleq (and sumgeq)
 
@@ -55,13 +55,13 @@ struct LessEqualSumConstraint : public AbstractConstraint
   { return "sumleq"; }
 
   CONSTRAINT_WEIGHTED_REVERSIBLE_ARG_LIST2("weighted", "sumleq", "sumgeq", var_array, var_sum);
-  
+
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
-  
+
   bool no_negatives;
-    
-  VarArray var_array;  
+
+  VarArray var_array;
   VarSum var_sum;
   DomainInt max_looseness;
   Reversible<DomainInt> var_array_min_sum;
@@ -76,7 +76,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
       }
       accumulator+= checked_cast<SysInt>(max( abs(var_sum.getInitialMax()), abs(var_sum.getInitialMin()) ));
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
-      
+
     no_negatives = true;
     for(SysInt i = 0; i < var_array.size(); ++i)
     {
@@ -87,20 +87,20 @@ struct LessEqualSumConstraint : public AbstractConstraint
       }
     }
   }
-  
+
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    
+
     SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i)
     {
       t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
     }
     t.push_back(make_trigger(var_sum, Trigger(this, -1), UpperBound));
-    return t;    
+    return t;
   }
-  
+
   DomainInt get_real_min_sum()
   {
     DomainInt min_sum = 0;
@@ -108,7 +108,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
       min_sum += it->getMin();
     return min_sum;
   }
-  
+
   virtual void propagate(DomainInt prop_val, DomainDelta domain_change)
   {
     P("Prop: " << prop_val);
@@ -122,15 +122,15 @@ struct LessEqualSumConstraint : public AbstractConstraint
       sum += change;
       var_array_min_sum = sum;
     }
-    
+
     var_sum.setMin(sum);
     if(getState(stateObj).isFailed())
         return;
     D_ASSERT(sum <= get_real_min_sum());
-    
+
     DomainInt looseness = var_sum.getMax() - sum;
     if(looseness < 0)
-    { 
+    {
       getState(stateObj).setFailed(true);
       return;
     }
@@ -141,7 +141,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
         it->setMax(it->getMin() + looseness);
     }
   }
-  
+
   virtual void full_propagate()
   {
     P("Full Prop");
@@ -152,7 +152,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
       min_sum += it->getMin();
       max_diff = max(max_diff, it->getMax() - it->getMin());
     }
-    
+
     var_array_min_sum = min_sum;
     D_ASSERT(min_sum == get_real_min_sum());
     max_looseness = max_diff;
@@ -161,7 +161,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     else
       var_sum.setMin(0);
   }
-  
+
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size() + 1);
@@ -170,13 +170,13 @@ struct LessEqualSumConstraint : public AbstractConstraint
       sum += v[i];
     return sum <= *(v + v_size - 1);
   }
-  
+
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     P("GSA");
     DomainInt sum_value = 0;
     SysInt v_size = var_array.size();
-    
+
     if(no_negatives)   // How are the two cases different? They look identical.
     {
       DomainInt max_sum = var_sum.getMax();
@@ -205,10 +205,10 @@ struct LessEqualSumConstraint : public AbstractConstraint
       return true;
     }
   }
-  
-  
+
+
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> array_copy(var_array.size() + 1);
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       array_copy[i] = var_array[i];
@@ -219,8 +219,8 @@ struct LessEqualSumConstraint : public AbstractConstraint
   virtual AbstractConstraint* reverse_constraint()
   { return rev_implement<is_reversed>(); }
 
- template<bool b> 
-  typename boost::disable_if_c<b, AbstractConstraint*>::type rev_implement()
+ template<bool b>
+  typename std::enable_if<!b, AbstractConstraint*>::type rev_implement()
   {
     typename NegType<VarArray>::type new_var_array(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -230,11 +230,11 @@ struct LessEqualSumConstraint : public AbstractConstraint
     SumType new_sum = ShiftVarRef( VarNegRef(var_sum), compiletime_val<-1>());
 
     return new LessEqualSumConstraint<typename NegType<VarArray>::type, SumType, true>
-      (stateObj, new_var_array, new_sum);   
+      (stateObj, new_var_array, new_sum);
   }
 
   template<bool b>
-  typename boost::enable_if_c<b, AbstractConstraint*>::type rev_implement()
+  typename std::enable_if<b, AbstractConstraint*>::type rev_implement()
   {
     vector<AnyVarRef> new_var_array(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -244,9 +244,9 @@ struct LessEqualSumConstraint : public AbstractConstraint
     SumType new_sum = ShiftVarRef( VarNegRef(var_sum), compiletime_val<-1>());
 
     return new LessEqualSumConstraint<vector<AnyVarRef>, AnyVarRef, true>
-      (stateObj, new_var_array, new_sum); 
+      (stateObj, new_var_array, new_sum);
        }
-    
-  };  
-  
+
+  };
+
 #endif

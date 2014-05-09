@@ -35,11 +35,6 @@ Use of this variable in a constraint:
 eq(myvar, 4) #variable myvar equals 4
 */
 
-#ifdef THREADSAFE
-#include <boost/thread/thread.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-#endif
-
 #include "../../constraints/constraint_abstract.h"
 
 template<typename BoundType>
@@ -213,14 +208,6 @@ struct BoundVarContainer {
   UnsignedSysInt var_count_m;
   BOOL lock_m;
 
-#ifdef THREADSAFE
-  mutable boost::recursive_mutex con_mutex;
-#define LOCK_CON_MUTEX boost::recursive_mutex::scoped_lock lock(con_mutex);
-#else
-#define LOCK_CON_MUTEX
-#endif
-
-
   const BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i) const
   { return static_cast<const BoundType*>(bound_data)[checked_cast<SysInt>(i.var_num*2)]; }
 
@@ -241,20 +228,20 @@ struct BoundVarContainer {
   }
 
   BOOL isAssigned(const BoundVarRef_internal<BoundType>& d) const
-  { LOCK_CON_MUTEX
+  {
     D_ASSERT(lock_m);
     return lower_bound(d) == upper_bound(d);
   }
 
   DomainInt getAssignedValue(const BoundVarRef_internal<BoundType>& d) const
-  { LOCK_CON_MUTEX
+  {
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return lower_bound(d);
   }
 
   BOOL inDomain(const BoundVarRef_internal<BoundType>& d, DomainInt i) const
-  { LOCK_CON_MUTEX
+  {
     D_ASSERT(lock_m);
     if (i < lower_bound(d) || i > upper_bound(d))
       return false;
@@ -262,7 +249,7 @@ struct BoundVarContainer {
   }
 
   BOOL inDomain_noBoundCheck(const BoundVarRef_internal<BoundType>& d, DomainInt i) const
-  { LOCK_CON_MUTEX
+  {
     D_ASSERT(lock_m);
     D_ASSERT(i >= lower_bound(d));
     D_ASSERT(i <= upper_bound(d));
@@ -270,14 +257,14 @@ struct BoundVarContainer {
   }
 
   DomainInt getMin(const BoundVarRef_internal<BoundType>& d) const
-  { LOCK_CON_MUTEX
+  {
     D_ASSERT(lock_m);
     D_ASSERT(getState(stateObj).isFailed() || inDomain(d,lower_bound(d)));
     return lower_bound(d);
   }
 
   DomainInt getMax(const BoundVarRef_internal<BoundType>& d) const
-  { LOCK_CON_MUTEX
+  {
     D_ASSERT(lock_m);
     D_ASSERT(getState(stateObj).isFailed() || inDomain(d,upper_bound(d)));
     return upper_bound(d);
@@ -324,20 +311,20 @@ struct BoundVarContainer {
   }
 
   void propagateAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  { LOCK_CON_MUTEX internalAssign(d, i); }
+  { internalAssign(d, i); }
 
   // TODO : Optimise
   void uncheckedAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  { LOCK_CON_MUTEX
+  {
     D_ASSERT(inDomain(d,i));
     internalAssign(d, i);
   }
 
   void decisionAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  { LOCK_CON_MUTEX internalAssign(d, i); }
+  { internalAssign(d, i); }
 
   void setMax(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  { LOCK_CON_MUTEX
+  {
     DomainInt low_bound = lower_bound(d);
     DomainInt up_bound = upper_bound(d);
 
@@ -360,7 +347,7 @@ struct BoundVarContainer {
   }
 
   void setMin(const BoundVarRef_internal<BoundType>& d, DomainInt i)
-  { LOCK_CON_MUTEX
+  {
     DomainInt low_bound = lower_bound(d);
     DomainInt up_bound = upper_bound(d);
 
@@ -436,7 +423,7 @@ struct BoundVarContainer {
   }
 
   void addTrigger(const BoundVarRef_internal<BoundType>& b, Trigger t, TrigType type)
-  {  LOCK_CON_MUTEX
+  {
     D_ASSERT(lock_m);
     trigger_list.add_trigger(b.var_num, t, type);
   }
@@ -462,7 +449,7 @@ struct BoundVarContainer {
 
 #ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  { LOCK_CON_MUTEX
+  {
     D_ASSERT(lock_m);
     if(type == DomainRemoval)
     {
@@ -515,4 +502,3 @@ BoundVarContainer<T>::get_var_num(DomainInt i)
   // Note we assume in BoundVarRef_internal that upper_bound(i) is just after lower_bound(i)...
   return BoundVarRef(BoundVarRef_internal<>(this, i, static_cast<DomainInt*>(bound_data) + checked_cast<SysInt>(i)*2));
 }
-

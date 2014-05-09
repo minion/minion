@@ -6,7 +6,7 @@
  *
  *  This code is derived from the original HP STL, with a number of bug-fixes and additions from libstdc++.
  */
- 
+
  /*
   *
   * Copyright (c) 1994
@@ -44,12 +44,12 @@
 #include <alloca.h>
 #endif
 
-#include <boost/type_traits.hpp>
+#include <type_traits>
 
 using namespace std;
 
   template<typename T>
-class box 
+class box
 {
   T*           M_start;
   T*           M_finish;
@@ -81,7 +81,7 @@ public:
 public:
 
   enum IsFull { StartEmpty, StartFull};
-  
+
   box(T* start, T* end, IsFull isFull = StartEmpty) : M_start(start),  M_end_of_storage(end)
   {
     if(isFull == StartEmpty)
@@ -101,8 +101,8 @@ public:
   //    std::uninitialized_fill_n_a(M_start, n, value,
   //                      this->get_allocator());
     }
-  
-//  box(const box& box) : M_start(box.M_start), M_finish(box.M_start), 
+
+//  box(const box& box) : M_start(box.M_start), M_finish(box.M_start),
 //    M_end_of_storage(box.M_end_of_storage)
 //    { }
 
@@ -121,7 +121,7 @@ public:
     assign(_InputIterator first, _InputIterator last)
   {
     // Check whether it's an integral type.  If so, it's not an iterator.
-    typedef typename boost::is_integral<_InputIterator>::__type _Integral;
+    typedef typename std::is_integral<_InputIterator>::__type _Integral;
     M_assign_dispatch(first, last, _Integral());
   }
 
@@ -189,9 +189,9 @@ public:
   // This function is basically ignored in a box
   void
     reserve(size_type n)
-    { 
+    {
       if (n > capacity())
-      throw string("Out of space!"); 
+      throw string("Out of space!");
     }
 
   reference
@@ -207,7 +207,7 @@ public:
   {
     if(n > size())
       throw std::string("Out of range exception");
-    return (*this)[n]; 
+    return (*this)[n];
   }
 
   const_reference
@@ -263,7 +263,7 @@ public:
     _InputIterator last)
   {
     // Check whether it's an integral type.  If so, it's not an iterator.
-    typedef typename boost::is_integral<_InputIterator>::__type _Integral;
+    typedef typename std::is_integral<_InputIterator>::__type _Integral;
     M_insert_dispatch(position, first, last, _Integral());
   }
 
@@ -299,7 +299,7 @@ public:
   void
     clear()
     { erase(begin(), end()); }
-  
+
   friend std::ostream& operator<<(std::ostream& o, const box<T>& sp)
     {
         o<<"[";
@@ -310,13 +310,13 @@ public:
         o<<"]";
         return o;
     }
-    
+
 protected:
 
       // Called by the range constructor to implement [23.1.1]/9
       template<typename _Integer>
   void
-    M_initialize_dispatch(_Integer n, _Integer value, boost::true_type)
+    M_initialize_dispatch(_Integer n, _Integer value, std::true_type)
   {
     M_start = M_allocate(n);
     M_end_of_storage = M_start + n;
@@ -328,7 +328,7 @@ protected:
       template<typename _InputIterator>
   void
     M_initialize_dispatch(_InputIterator first, _InputIterator last,
-    boost::false_type)
+    std::false_type)
   {
     for (; first != last; ++first)
       push_back(*first);
@@ -338,7 +338,7 @@ protected:
       // Called by the range assign to implement [23.1.1]/9
       template<typename _Integer>
   void
-    M_assign_dispatch(_Integer n, _Integer val, boost::true_type)
+    M_assign_dispatch(_Integer n, _Integer val, std::true_type)
   {
     M_fill_assign(static_cast<size_type>(n),
       static_cast<value_type>(val));
@@ -348,7 +348,7 @@ protected:
       template<typename _InputIterator>
   void
     M_assign_dispatch(_InputIterator first, _InputIterator last,
-    boost::false_type)
+    std::false_type)
   {
     iterator cur(begin());
     for (; first != last && cur != end(); ++cur, ++first)
@@ -371,7 +371,7 @@ protected:
       template<typename _Integer>
   void
     M_insert_dispatch(iterator pos, _Integer n, _Integer val,
-    boost::true_type)
+    std::true_type)
   {
     M_fill_insert(pos, static_cast<size_type>(n),
       static_cast<value_type>(val));
@@ -381,7 +381,7 @@ protected:
       template<typename _InputIterator>
   void
     M_insert_dispatch(iterator pos, _InputIterator first,
-    _InputIterator last, boost::false_type)
+    _InputIterator last, std::false_type)
   {
     typedef typename iterator_traits<_InputIterator>::iterator_category
       _IterCategory;
@@ -466,7 +466,7 @@ insert(iterator position, const value_type& x)
     ++M_finish;
   }
   else
-  {      
+  {
     if (M_finish == M_end_of_storage)
       throw string("Out of space!");
 
@@ -476,7 +476,7 @@ insert(iterator position, const value_type& x)
     std::copy_backward(position,
       iterator(M_finish-2),
       iterator(M_finish-1));
-    *position = x_copy; 
+    *position = x_copy;
   }
   return begin() + n;
 }
@@ -618,5 +618,4 @@ M_range_insert(iterator position, _ForwardIterator first,
 #define GET_ASSIGNMENT(c, constraint) \
 const size_t num_vars##c = constraint->get_vars_singleton()->size();\
 box<pair<SysInt, DomainInt> > c((pair<SysInt,DomainInt>*)( alloca(sizeof(pair<SysInt,DomainInt>) * num_vars##c * 2) ), num_vars##c * 2);\
-flag=constraint->get_satisfying_assignment(c); 
-
+flag=constraint->get_satisfying_assignment(c);

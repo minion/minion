@@ -51,11 +51,6 @@ static const data_type max_data = one << ( sizeof(data_type) - 1 );
 
 struct BoolVarContainer;
 
-#ifdef THREADSAFE
-#include <boost/thread/thread.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-#endif
-
 
 /// A reference to a boolean variable
 struct BoolVarRef_internal
@@ -185,13 +180,6 @@ struct BoolVarContainer
                                           trigger_list(stateObj, false), lock_m(false)
   {}
 
-#ifdef THREADSAFE
-  mutable boost::recursive_mutex con_mutex;
-#define LOCK_BOOL_MUTEX boost::recursive_mutex::scoped_lock lock(con_mutex);
-#else
-#define LOCK_BOOL_MUTEX
-#endif
-
   static const SysInt width = 7;
   void* assign_offset;
   void* values_mem;
@@ -215,9 +203,6 @@ struct BoolVarContainer
 
   const data_type* assign_ptr() const
   { return static_cast<const data_type*>(assign_offset); }
-
-  void lock_thread()
-  { LOCK_BOOL_MUTEX }
 
   void lock()
   {
@@ -253,7 +238,7 @@ struct BoolVarContainer
 
 
   void setMax(const BoolVarRef_internal& d, DomainInt i)
-  {LOCK_BOOL_MUTEX
+  {
     if(i < 0)
     {
       getState(stateObj).setFailed(true);
@@ -266,7 +251,7 @@ struct BoolVarContainer
   }
 
   void setMin(const BoolVarRef_internal& d, DomainInt i)
-  {LOCK_BOOL_MUTEX
+  {
     if(i > 1)
     {
       getState(stateObj).setFailed(true);
@@ -278,7 +263,7 @@ struct BoolVarContainer
   }
 
   void removeFromDomain(const BoolVarRef_internal& d, DomainInt b)
-  {LOCK_BOOL_MUTEX
+  {
     D_ASSERT(lock_m && d.var_num < var_count_m);
     if((checked_cast<SysInt>(b)|1) != 1)
       return;
@@ -293,7 +278,7 @@ struct BoolVarContainer
   }
 
   void internalAssign(const BoolVarRef_internal& d, DomainInt b)
-  {LOCK_BOOL_MUTEX
+  {
     D_ASSERT(lock_m && d.var_num < var_count_m);
     D_ASSERT(!d.isAssigned());
     if((checked_cast<SysInt>(b)|1) != 1)
@@ -322,10 +307,10 @@ struct BoolVarContainer
   }
 
   void uncheckedAssign(const BoolVarRef_internal& d, DomainInt b)
-  {LOCK_BOOL_MUTEX internalAssign(d, b); }
+  { internalAssign(d, b); }
 
   void propagateAssign(const BoolVarRef_internal& d, DomainInt b)
-  {LOCK_BOOL_MUTEX
+  {
     if(!d.isAssigned())
       internalAssign(d,b);
     else
@@ -336,10 +321,10 @@ struct BoolVarContainer
   }
 
   void decisionAssign(const BoolVarRef_internal& d, DomainInt b)
-  {LOCK_BOOL_MUTEX internalAssign(d, b); }
+  { internalAssign(d, b); }
 
   void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type)
-  { LOCK_BOOL_MUTEX
+  { 
     D_ASSERT(lock_m);
 #ifdef FEW_BOOLEAN_TRIGGERS
     if(type == DomainChanged)
@@ -351,7 +336,7 @@ struct BoolVarContainer
   }
 
   void addDynamicTrigger(BoolVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  { LOCK_BOOL_MUTEX
+  { 
     D_ASSERT(pos == NoDomainValue || ( type == DomainRemoval && pos != NoDomainValue ) );
     D_ASSERT(lock_m);
 

@@ -28,12 +28,12 @@ bool inline check_fail(StateObj* stateObj, Var& var, DomainInt val, Vars& vars, 
   Controller::world_push(stateObj);
   var.propagateAssign(val);
   prop(stateObj, vars);
-  
+
   bool check_failed = getState(stateObj).isFailed();
   getState(stateObj).setFailed(false);
-  
+
   Controller::world_pop(stateObj);
-  
+
   return check_failed;
 }
 
@@ -81,7 +81,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
           if(getState(stateObj).isFailed())
             return;
         }
-        
+
         while(check_fail(stateObj, var, var.getMin(), vararray, prop))
         {
           if(check_sac_timeout(stateObj)) throw EndOfSearch();
@@ -103,13 +103,13 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
             var.removeFromDomain(val);
             prop(stateObj, vararray);
             if(getState(stateObj).isFailed())
-              return;          
+              return;
           }
         }
       }
     }
   }
-  
+
 }
 
 struct PropagateGAC
@@ -165,7 +165,7 @@ struct PropGAC : Propagate
     PropagateGAC prop_obj;
     inline void prop(StateObj* stateObj, vector<AnyVarRef>& vars)
     {
-        prop_obj(stateObj, vars); 
+        prop_obj(stateObj, vars);
     }
 };
 
@@ -174,7 +174,7 @@ struct PropSAC : Propagate
     PropagateSAC prop_obj;
     inline void prop(StateObj* stateObj, vector<AnyVarRef>& vars)
     {
-        prop_obj(stateObj, vars); 
+        prop_obj(stateObj, vars);
     }
 };
 
@@ -183,7 +183,7 @@ struct PropSSAC : Propagate
     PropagateSSAC prop_obj;
     inline void prop(StateObj* stateObj, vector<AnyVarRef>& vars)
     {
-        prop_obj(stateObj, vars); 
+        prop_obj(stateObj, vars);
     }
 };
 
@@ -192,7 +192,7 @@ struct PropSAC_Bounds : Propagate
     PropagateSAC_Bounds prop_obj;
     inline void prop(StateObj* stateObj, vector<AnyVarRef>& vars)
     {
-        prop_obj(stateObj, vars); 
+        prop_obj(stateObj, vars);
     }
 };
 
@@ -201,7 +201,7 @@ struct PropSSAC_Bounds : Propagate
     PropagateSSAC_Bounds prop_obj;
     inline void prop(StateObj* stateObj, vector<AnyVarRef>& vars)
     {
-        prop_obj(stateObj, vars); 
+        prop_obj(stateObj, vars);
     }
 };
 

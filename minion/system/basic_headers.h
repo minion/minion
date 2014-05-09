@@ -24,7 +24,6 @@
 
 // Stupid visual C++ needs a little hacking
 #ifdef _MSC_VER
-#define BOOST_ALL_NO_LIB
 // We don't want no stupid safe library warnings
 #define _SCL_SECURE_NO_DEPRECATE
 #define DEFAULT_CALL __std_call
@@ -58,56 +57,23 @@
 #include <sstream>
 #include <string>
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<memory.h>
-#include<setjmp.h>
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <memory.h>
+#include <setjmp.h>
 
 #include "cxx0x-helper.h"
 
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-#include <boost/tuple/tuple.hpp>
+#include <tuple>
+#include <utility>
+#include <unordered_set>
+#include <unordered_map>
 
-#ifdef USE_BOOST
-
-//#include <boost/thread/thread.hpp>
-//#include <boost/thread/mutex.hpp>
-//#include <boost/thread/locks.hpp>
-
-#include <boost/unordered_set.hpp>
-#include <boost/unordered_map.hpp>
-
-#define MAP_TYPE boost::unordered_map
-#define SET_TYPE boost::unordered_set
-
-#define INPUT_MAP_TYPE MAP_TYPE
-
-#else
-
-/// Can't be bothered defining hashes for tr1,
-/// as the definition has changed slightly between versions.
-#define INPUT_MAP_TYPE map
-
-#ifdef THREADSAFE
-#error Threading requires boost!
-#endif
-
-#ifdef USE_TR1_HASH_MAP_AND_SET
-#include <tr1/unordered_set>
-#include <tr1/unordered_map>
-
-#define MAP_TYPE std::tr1::unordered_map
-#define SET_TYPE std::tr1::unordered_set
-
-#else
-
-#include <map>
-#define MAP_TYPE map
-#include <set>
-#define SET_TYPE set
-#endif
-#endif
+#define MAP_TYPE std::unordered_map
+#define SET_TYPE std::unordered_set
+#define INPUT_MAP_TYPE std::map
+// TODO: Add hashes
 
 using namespace std;
 

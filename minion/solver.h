@@ -226,7 +226,7 @@ public:
   bool solsoutWrite;
 
   /// A callback function for when a solution is found.
-  boost::function< void (StateObj*)> solCallBack;
+  std::function< void (StateObj*)> solCallBack;
 
   /// Denotes if solutions should be printed.
   /// Initialised to true.
@@ -260,7 +260,7 @@ public:
 
   // split search tree in half on time out
   bool split;
-  
+
   bool splitstderr;
 
   // The format of output used (-1 for default)

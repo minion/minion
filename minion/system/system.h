@@ -38,6 +38,9 @@
 #include "box.h"
 #include "test_functions.h"
 
+#include <sys/types.h>
+#include <unistd.h>
+
 // from sha1.cpp
 std::string sha1_hash(const std::string& s);
 
