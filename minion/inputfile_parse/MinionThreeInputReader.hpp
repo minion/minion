@@ -669,7 +669,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
         vars[0] = readIdentifier(infile);
         infile->check_sym(',');
         vars[1] = readIdentifier(infile);
-        varsblob.push_back(MOVE(vars));
+        varsblob.push_back(std::move(vars));
       }
       break;
       case read_constant:
@@ -686,7 +686,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
               else
           vals.push_back(vectorOfConst[loop].pos());
           }
-          constblob.push_back(MOVE(vals));
+          constblob.push_back(std::move(vals));
       }
       break;
       case read_constraint:
@@ -759,7 +759,7 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
         tupleSize = tuple.size();
       if(tupleSize != tuple.size())
         throw parse_exception("All tuples in each constraint must be the same size!");
-      tuples.push_back(MOVE(tuple)) ;
+      tuples.push_back(std::move(tuple)) ;
 
       delim = infile->get_char();                          // ',' or '}'
       if(delim != ',' && delim!= '}')

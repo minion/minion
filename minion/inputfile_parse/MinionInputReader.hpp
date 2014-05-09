@@ -225,7 +225,7 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
         vars[0] = readIdentifier(infile);
         infile->check_sym(',');
         vars[1] = readIdentifier(infile);
-            varsblob.push_back(MOVE(vars));
+            varsblob.push_back(std::move(vars));
       }
         break;
         case read_constraint:

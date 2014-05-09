@@ -83,14 +83,14 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
       {
         readerThree.instance = &instance;
         ReadCSP(readerThree, &infile);
-        //instance = MOVE(readerThree.instance);
+        //instance = std::move(readerThree.instance);
         needs_finalise_three = true;
       }
       else
       {
         reader.instance = &instance;
         ReadCSP(reader, &infile);
-        //instance = MOVE(reader.instance);
+        //instance = std::move(reader.instance);
         // fix variable names in case we want to write a resume file (which is
         // in Minion 3 format)
         instance.add_variable_names();
@@ -128,6 +128,6 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
   if(needs_finalise_three)
   {
       readerThree.finalise();
-     // instance = MOVE(readerThree.instance);
+     // instance = std::move(readerThree.instance);
   }
 }

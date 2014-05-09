@@ -63,7 +63,6 @@
 #include <memory.h>
 #include <setjmp.h>
 
-#include "cxx0x-helper.h"
 
 #include <tuple>
 #include <utility>
