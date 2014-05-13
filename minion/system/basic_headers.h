@@ -70,6 +70,7 @@
 #include <unordered_map>
 #include <array>
 #include <memory>
+#include <stdexcept>
 
 #define MAP_TYPE std::unordered_map
 #define SET_TYPE std::unordered_set
