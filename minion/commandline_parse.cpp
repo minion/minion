@@ -369,7 +369,7 @@ help switches -sollimit
       INCREMENT_i(-nodelimit);
       try
       {
-        getOptions(stateObj).nodelimit = from_string_checked<long long int>(argv[i]);
+        getOptions(stateObj).nodelimit = fromstring<long long int>(argv[i]);
         if(getOptions(stateObj).nodelimit < 0)
           throw "Invalid lower bound";
       }
@@ -395,7 +395,7 @@ help switches -timelimit
       INCREMENT_i(-sollimit);
       try
       {
-        getOptions(stateObj).sollimit = from_string_checked<SysInt>(argv[i]);
+        getOptions(stateObj).sollimit = fromstring<SysInt>(argv[i]);
         if(getOptions(stateObj).sollimit <= 0)
           throw "Invalid lower bound";
       }
@@ -427,7 +427,7 @@ help switches -sollimit
       getOptions(stateObj).timeout_active = true;
       try
       {
-        getOptions(stateObj).time_limit = from_string_checked<SysInt>(argv[i]);
+        getOptions(stateObj).time_limit = fromstring<SysInt>(argv[i]);
         getOptions(stateObj).time_limit_is_CPU_time = false;
       }
       catch(...)
@@ -459,7 +459,7 @@ help switches -sollimit
       getOptions(stateObj).timeout_active = true;
       try
       {
-        getOptions(stateObj).time_limit = from_string_checked<SysInt>(argv[i]);
+        getOptions(stateObj).time_limit = fromstring<SysInt>(argv[i]);
         getOptions(stateObj).time_limit_is_CPU_time = true;
       }
       catch(...)

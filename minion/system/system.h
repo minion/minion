@@ -22,12 +22,19 @@
 #ifndef _MINION_SYSTEM_H
 #define _MINION_SYSTEM_H
 
+#ifdef MINION_DEBUG
+#define DOM_ASSERT
+#endif
+
+#include "../minlib/minlib.hpp"
+
+#include "box-helper.h"
+
 #include "basic_headers.h"
 
 
 #include "wrapper.h"
-#include "to_string.h"
-
+#include "../minlib/tostring.hpp"
 #include "tableout.h"
 #include "time_keeping.h"
 
@@ -35,8 +42,10 @@
 #include "debug.h"
 #include "array_functions.h"
 #include "trigger_timer.h"
-#include "box.h"
+
 #include "test_functions.h"
+
+#include "../minlib/optional.hpp"
 
 #include <sys/types.h>
 #include <unistd.h>

@@ -215,7 +215,7 @@ struct GACTableConstraint : public AbstractConstraint
                 // cout << "    var " << varIndex << " val: " << i << " sup " << sup << " " << endl;
                 if(sup < 0)
                 {
-                  //cout <<"No valid support for " + to_string(i) + " in var " + to_string(varIndex) << endl;
+                  //cout <<"No valid support for " + tostring(i) + " in var " + tostring(varIndex) << endl;
                   //volatile SysInt * myptr=NULL;
                   //SysInt crashit=*(myptr);
                   vars[varIndex].removeFromDomain(i);

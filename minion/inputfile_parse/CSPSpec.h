@@ -44,7 +44,7 @@ inline string to_var_name(const vector<DomainInt>& params)
   ostringstream s;
   s << "_";
   for(SysInt i = 0; i < params.size(); ++i)
-    s << to_string(params[i]) << "_";
+    s << tostring(params[i]) << "_";
   s << "_";
   return s.str();
 }
@@ -198,14 +198,14 @@ struct ConstraintBlob
 
      vector<DomainInt> max_index = getMatrixSymbol(name);
      if(params.size() != max_index.size())
-      throw parse_exception("Can't index a " + to_string(max_index.size()) +
-                            "-d matrix with " + to_string(params.size()) +
+      throw parse_exception("Can't index a " + tostring(max_index.size()) +
+                            "-d matrix with " + tostring(params.size()) +
                             " indices.");
     for(SysInt i = 0; i < params.size(); ++i)
     {
       // Horrible hack: -999 means it was an _
       if(params[i] != -999 && (params[i] < 0 || params[i] >= max_index[i]))
-        throw parse_exception(to_string(i) + string("th index is invalid"));
+        throw parse_exception(tostring(i) + string("th index is invalid"));
     }
 
     // Set all fixed indices to 1, so they won't move.
@@ -300,7 +300,7 @@ struct ConstraintBlob
   string getName(const Var& var) const
   {
     if(var.type() == VAR_CONSTANT) {
-      return to_string(var.pos()); //special case for constants
+      return tostring(var.pos()); //special case for constants
     }
     INPUT_MAP_TYPE<Var, string>::const_iterator it = name_table.find(var);
     if(it == name_table.end())
@@ -675,12 +675,12 @@ public:
     if(table_nametable.count(tuplelist) != 0)
       return;
     SysInt pos = table_symboltable.size();
-    while( table_symboltable.count("_Unnamed__" + to_string(pos)) != 0)
+    while( table_symboltable.count("_Unnamed__" + tostring(pos)) != 0)
       pos++;
 
-    table_symboltable["_Unnamed__" + to_string(pos) + "_"] = tuplelist;
-    table_nametable[tuplelist] = "_Unnamed__" + to_string(pos) + "_";
-    tuplelist->setName("_Unnamed__" + to_string(pos) + "_");
+    table_symboltable["_Unnamed__" + tostring(pos) + "_"] = tuplelist;
+    table_nametable[tuplelist] = "_Unnamed__" + tostring(pos) + "_";
+    tuplelist->setName("_Unnamed__" + tostring(pos) + "_");
   }
 
   void addTableSymbol(string name, TupleList* tuplelist)
@@ -717,7 +717,7 @@ public:
   {
     map<TupleList*, string>::const_iterator it = table_nametable.find(tuples);
     if(it == table_nametable.end())
-      throw parse_exception("Undefined tuplelist: '" + to_string(size_t(tuples)) + "'");
+      throw parse_exception("Undefined tuplelist: '" + tostring(size_t(tuples)) + "'");
     return it->second;
   }
 
@@ -733,7 +733,7 @@ public:
   {
     map<ShortTupleList*, string>::const_iterator it = shorttable_nametable.find(tuples);
     if(it == shorttable_nametable.end())
-      throw parse_exception("Undefined shorttuplelist: '" + to_string(size_t(tuples)) + "'");
+      throw parse_exception("Undefined shorttuplelist: '" + tostring(size_t(tuples)) + "'");
     return it->second;
   }
 
@@ -760,7 +760,7 @@ public:
       vector<Var> all_vars = vars.get_all_vars();
 
       for(SysInt i = 0; i < all_vars.size(); ++i)
-        vars.addSymbol("x" + to_string(i), all_vars[i]);
+        vars.addSymbol("x" + tostring(i), all_vars[i]);
     }
 
     if(sym_order.empty())

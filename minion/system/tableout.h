@@ -49,7 +49,7 @@ class TableOut
     void set(string propname, Valtype value)
     {
         // create a new, or overwrite the, entry with name propname
-        data[propname] = to_string(value);
+        data[propname] = tostring(value);
     }
     
     void debug_printall()

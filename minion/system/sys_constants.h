@@ -20,12 +20,6 @@
 #ifndef _SYS_CONSTANTS_H
 #define _SYS_CONSTANTS_H
 
-
-
-/// A placeholder type.
-struct EmptyType
-{};
-
 //#define DOMAINS64
 
 #ifdef DOMAINS64
@@ -72,20 +66,6 @@ template<typename To, typename From>
 To checked_cast(const Wrapper<From>& t)
 { return static_cast<To>(t.t); }
 
-
-
-/// A constant chosen at compile time.
-/// Create with the notation compiletime_val<6>().
-template<SysInt i>
-struct compiletime_val
-{ 
-  operator SysInt() const
-{ return i; }
-  
-  friend std::ostream& operator<<(std::ostream& o, const compiletime_val& v)
-{ return o << "CompiletimeConst:" << i; }
-  
-};
 
 template<typename T>
 T const_negminusone(T t)

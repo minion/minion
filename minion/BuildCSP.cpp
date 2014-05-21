@@ -97,7 +97,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
 
         if(getOptions(stateObj).randomise_valvarorder)
         {
-            getOptions(stateObj).printLine("Using seed: " + to_string(args.random_seed));
+            getOptions(stateObj).printLine("Using seed: " + tostring(args.random_seed));
             srand( args.random_seed );
 
             std::random_shuffle(instance.search_order[i].var_order.begin(), instance.search_order[i].var_order.end());
@@ -146,7 +146,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
   }
 
   getState(stateObj).getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime", getTableOut(), !getOptions(stateObj).silent);
-  getOptions(stateObj).printLine("Total Nodes: " + to_string( getState(stateObj).getNodeCount() ));
+  getOptions(stateObj).printLine("Total Nodes: " + tostring( getState(stateObj).getNodeCount() ));
   getOptions(stateObj).printLine(string("Problem solvable?: ") + (getState(stateObj).getSolutionCount() == 0 ? "no" : "yes"));
 
   if(getOptions(stateObj).cspcomp)
@@ -157,9 +157,9 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
       cout << "s UNSATISFIABLE" << endl;
   }
 
-  getOptions(stateObj).printLine("Solutions Found: " + to_string(getState(stateObj).getSolutionCount()));
+  getOptions(stateObj).printLine("Solutions Found: " + tostring(getState(stateObj).getSolutionCount()));
 
-  getTableOut().set("Nodes", to_string(getState(stateObj).getNodeCount()));
+  getTableOut().set("Nodes", tostring(getState(stateObj).getNodeCount()));
   getTableOut().set("Satisfiable", (getState(stateObj).getSolutionCount()==0 ? 0 : 1));
   getTableOut().set("SolutionsFound", getState(stateObj).getSolutionCount());
 

@@ -616,8 +616,8 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
   {
     if(con.vars[0].size() != con.tuples->tuple_size())
     {
-      throw parse_exception("Tuple constraint with " + to_string(con.vars[0].size()) +
-                            " variables cannot have tuples of length " + to_string(con.tuples->tuple_size()));
+      throw parse_exception("Tuple constraint with " + tostring(con.vars[0].size()) +
+                            " variables cannot have tuples of length " + tostring(con.tuples->tuple_size()));
     }
   }
 
@@ -859,15 +859,15 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
     vector<DomainInt> params = readConstantVector(infile);
     vector<DomainInt> max_index = instance->vars.getMatrixSymbol(name);
     if(params.size() != max_index.size())
-      throw parse_exception("Can't index a " + to_string(max_index.size()) +
-      "-d matrix with " + to_string(params.size()) +
+      throw parse_exception("Can't index a " + tostring(max_index.size()) +
+      "-d matrix with " + tostring(params.size()) +
       " indices.");
     for(SysInt i = 0; i < params.size(); ++i)
     {
       if(params[i] < 0 || params[i] >= max_index[i])
-        throw parse_exception(to_string(i) + string("th index is out of bounds,") +
-        to_string(params[i]) + " is not between 0 and " +
-        to_string(max_index[i] - 1));
+        throw parse_exception(tostring(i) + string("th index is out of bounds,") +
+        tostring(params[i]) + " is not between 0 and " +
+        tostring(max_index[i] - 1));
     }
     name += to_var_name(params);
     var = instance->vars.getSymbol(name);
@@ -881,7 +881,7 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
       var.setType(VAR_NOTBOOL);
   }
 
-  MAYBE_PARSER_INFO("Read variable '" + name + "', internally: " + to_string(var));
+  MAYBE_PARSER_INFO("Read variable '" + name + "', internally: " + tostring(var));
   return var;
 }
 
@@ -950,7 +950,7 @@ vector<Var> MinionThreeInputReader<FileReader>::readPossibleMatrixIdentifier(Fil
         params = vector<DomainInt>(maxterms.size(), -999);
         returnVec = instance->vars.buildVarList(name, params);
     }
-    MAYBE_PARSER_INFO("Got matrix:" + to_string(returnVec));
+    MAYBE_PARSER_INFO("Got matrix:" + tostring(returnVec));
   }
 else
 {
@@ -965,7 +965,7 @@ else
   }
   returnVec.push_back(var);
 }
-MAYBE_PARSER_INFO("Read variable '" + name + "', internally: " + to_string(var));
+MAYBE_PARSER_INFO("Read variable '" + name + "', internally: " + tostring(var));
 return returnVec;
 }
 
@@ -1047,7 +1047,7 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrix(FileReader
 
   while(infile->peek_char() != ']')
   {
-    MAYBE_PARSER_INFO("Continuing reading matrix, peeked at " + to_string(']'));
+    MAYBE_PARSER_INFO("Continuing reading matrix, peeked at " + tostring(']'));
     // See if there is an array, or just a variable.
     if(infile->peek_char() == '[')
       return_vals.push_back(readLiteralVector(infile));
@@ -1203,8 +1203,8 @@ void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile)
     string name = infile->get_string();
     DomainInt num_of_tuples = infile->read_num();
     DomainInt tuple_length = infile->read_num();
-    MAYBE_PARSER_INFO("Reading tuplelist '" + name + "', length " + to_string(num_of_tuples) +
-      ", arity " + to_string(tuple_length) );
+    MAYBE_PARSER_INFO("Reading tuplelist '" + name + "', length " + tostring(num_of_tuples) +
+      ", arity " + tostring(tuple_length) );
     TupleList* tuplelist = instance->tupleListContainer->getNewTupleList(num_of_tuples, tuple_length);
     DomainInt* tuple_ptr = tuplelist->getPointer();
     for(DomainInt i = 0; i < num_of_tuples; ++i)
@@ -1260,7 +1260,7 @@ found: ;
 
       instance->search_order.push_back(SearchOrder(readLiteralVector(infile), vo, find_one_sol));
       MAYBE_PARSER_INFO("Read var order, length " +
-        to_string(instance->search_order.back().var_order.size()));
+        tostring(instance->search_order.back().var_order.size()));
     }
     else if(var_type == "PERMUTATION")
     {
@@ -1268,7 +1268,7 @@ found: ;
         throw parse_exception("Can't have two PERMUTATIONs!");
       instance->permutation = readLiteralVector(infile);
       MAYBE_PARSER_INFO("Read permutation, length " +
-        to_string(instance->permutation.size()));
+        tostring(instance->permutation.size()));
     }
     else if(var_type == "SYMORDER")
     {
@@ -1276,7 +1276,7 @@ found: ;
         throw parse_exception("Can't have two SYMORDERs!");
       instance->sym_order = readLiteralVector(infile);
       MAYBE_PARSER_INFO("Read Symmetry Ordering, length " +
-        to_string(instance->permutation.size()));
+        tostring(instance->permutation.size()));
     }
     else if(var_type == "VALORDER")
     {
@@ -1312,7 +1312,7 @@ found: ;
       instance->search_order.back().val_order = valOrder;
 
       MAYBE_PARSER_INFO("Read val order, length " +
-          to_string(instance->search_order.back().val_order.size()));
+          tostring(instance->search_order.back().val_order.size()));
     }
     else if(var_type == "MAXIMISING" || var_type == "MAXIMIZING")
     {
@@ -1320,7 +1320,7 @@ found: ;
         throw parse_exception("Can only have one min / max per problem!");
 
       Var var = readIdentifier(infile);
-      MAYBE_PARSER_INFO("Maximising " + to_string(var));
+      MAYBE_PARSER_INFO("Maximising " + tostring(var));
       instance->set_optimise(false, var);
     }
     else if(var_type == "MINIMISING" || var_type == "MINIMIZING")
@@ -1329,7 +1329,7 @@ found: ;
         throw parse_exception("Can only have one min / max per problem!");
 
       Var var = readIdentifier(infile);
-      MAYBE_PARSER_INFO("Minimising " + to_string(var));
+      MAYBE_PARSER_INFO("Minimising " + tostring(var));
       instance->set_optimise(true, var);
     }
     else if(var_type == "PRINT")
@@ -1362,7 +1362,7 @@ found: ;
         throw parse_exception("Only have construction sites on gadgets!");
 
       instance->constructionSite = readLiteralVector(infile);
-      MAYBE_PARSER_INFO("Read construction site, size " + to_string(instance->constructionSite.size()));
+      MAYBE_PARSER_INFO("Read construction site, size " + tostring(instance->constructionSite.size()));
     }
     else
       {  throw parse_exception("Don't understand '" + var_type + "' as a variable type."); }
@@ -1390,8 +1390,8 @@ void MinionThreeInputReader<FileReader>::readAliasMatrix(FileReader* infile, con
     }
     if(indices.back() + 1 != max_indices[indices.size() - 1])
       throw parse_exception("Incorrectly sized matrix!, expected index " +
-      to_string(indices.size() - 1) + " to have " + to_string(max_indices[indices.size() - 1]) +
-      " terms, got " + to_string(indices.back() + 1));
+      tostring(indices.size() - 1) + " to have " + tostring(max_indices[indices.size() - 1]) +
+      " terms, got " + tostring(indices.back() + 1));
   }
   else
   {
@@ -1408,8 +1408,8 @@ void MinionThreeInputReader<FileReader>::readAliasMatrix(FileReader* infile, con
     }
     if(indices.back() + 1 != max_indices[indices.size() - 1])
       throw parse_exception("Incorrectly sized matrix!, expected index " +
-      to_string(indices.size() - 1) + " to have " + to_string(max_indices[indices.size() - 1]) +
-      " terms, got " + to_string(indices.back() + 1));
+      tostring(indices.size() - 1) + " to have " + tostring(max_indices[indices.size() - 1]) +
+      " terms, got " + tostring(indices.back() + 1));
   }
 }
 
@@ -1438,8 +1438,8 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       indices = readConstantVector(infile);
       for(UnsignedSysInt i = 0; i < indices.size(); ++i)
         if(indices[i] < 0)
-          throw parse_exception("Matrix " + varname + " has a negative size for index " + to_string(i));
-      MAYBE_PARSER_INFO("Found " + to_string(indices.size()) + " indices");
+          throw parse_exception("Matrix " + varname + " has a negative size for index " + tostring(i));
+      MAYBE_PARSER_INFO("Found " + tostring(indices.size()) + " indices");
     }
 
     VariableType variable_type = VAR_INVALID;

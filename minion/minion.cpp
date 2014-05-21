@@ -125,15 +125,14 @@ void munge_container(Con& con, SysInt type)
 int main(int argc, char** argv) {
 // Wrap main in a try/catch just to stop exceptions leaving main,
 // as windows gets really annoyed when that happens.
-
 try {
   StateObj* stateObj = new StateObj();
 
   getState(stateObj).getOldTimer().startClock();
 
   if (argc == 1) {
-    getOptions(stateObj).printLine("# " + to_string(VERSION));
-    getOptions(stateObj).printLine("# HG version: " + to_string(HG_VER_STRING));
+    getOptions(stateObj).printLine("# " + tostring(VERSION));
+    getOptions(stateObj).printLine("# HG version: " + tostring(HG_VER_STRING));
     print_default_help(argv);
     return EXIT_SUCCESS;
   }
@@ -158,13 +157,13 @@ try {
   if(getOptions(stateObj).outputType != -1)
     getState(stateObj).getOldTimer().setOutputType(getOptions(stateObj).outputType);
 
-  getOptions(stateObj).printLine("# " + to_string(VERSION));
-  getOptions(stateObj).printLine("# HG version: " + to_string(HG_VER_STRING));
+  getOptions(stateObj).printLine("# " + tostring(VERSION));
+  getOptions(stateObj).printLine("# HG version: " + tostring(HG_VER_STRING));
 
   if (!getOptions(stateObj).silent)
   {
 
-    getOptions(stateObj).printLine("# HG last changed date: " + to_string(HG_DATE_STRING) );
+    getOptions(stateObj).printLine("# HG last changed date: " + tostring(HG_DATE_STRING) );
 
     time_t rawtime;
     time(&rawtime);
@@ -238,7 +237,7 @@ try {
   }
 
   // Copy args into tableout
-  getTableOut().set("RandomSeed", to_string(args.random_seed));
+  getTableOut().set("RandomSeed", tostring(args.random_seed));
   {   const char * b = "";
     switch (args.preprocess) {
       case PropLevel_None:

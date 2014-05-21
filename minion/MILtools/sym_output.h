@@ -97,13 +97,13 @@ struct Graph
   Name new_vertex()
   {
     free_vertices++;
-    return "F." + to_string(free_vertices);
+    return "F." + tostring(free_vertices);
   }
   
   Name new_vertex(string colour)
   {
     free_vertices++;
-    string s =  "F." + colour + "." + to_string(free_vertices);
+    string s =  "F." + colour + "." + tostring(free_vertices);
     aux_vertex_colour[colour].insert(s);
     return s;
   }
@@ -259,7 +259,7 @@ struct Graph
    { 
      if(v.type() == VAR_CONSTANT)
      {
-       string const_name = "CONSTANT_" + to_string(v.pos());
+       string const_name = "CONSTANT_" + tostring(v.pos());
        aux_vertex_colour[const_name].insert(const_name);
        return const_name;
      }
@@ -297,7 +297,7 @@ struct GraphBuilder
     vector<Var> vars = csp.vars.get_all_vars();
     for(SysInt i = 0; i < vars.size(); ++i)
     {
-      g.var_vertex_colour[to_string(csp.vars.get_domain(vars[i]))].insert(csp.vars.getName(vars[i]));
+      g.var_vertex_colour[tostring(csp.vars.get_domain(vars[i]))].insert(csp.vars.getName(vars[i]));
     }
   }
   
@@ -305,7 +305,7 @@ struct GraphBuilder
   { 
     if(v.type() == VAR_CONSTANT)
     {
-      string const_name = "CONSTANT_" + to_string(v.pos());
+      string const_name = "CONSTANT_" + tostring(v.pos());
       g.aux_vertex_colour[const_name].insert(const_name);
       return const_name;
     }
@@ -335,7 +335,7 @@ struct GraphBuilder
      string v = g.new_vertex(name + "_MASTER");
      for(SysInt i = 0; i < b.vars[0].size(); ++i)
      {
-       string t = g.new_vertex(name + "_CHILD_" + to_string(i));
+       string t = g.new_vertex(name + "_CHILD_" + tostring(i));
        add_edge(v,t);
        add_edge(t, b.vars[0][i]);
      }
@@ -358,7 +358,7 @@ struct GraphBuilder
       
     for(SysInt i = 0; i < b.vars.size(); ++i)
     {
-      string nv = g.new_vertex(name + "_CHILD" + to_string(i));
+      string nv = g.new_vertex(name + "_CHILD" + tostring(i));
       add_edge(v, nv);
       for(SysInt j = 0; j < b.vars[i].size(); ++j)
         add_edge(nv, b.vars[i][j]);
@@ -366,7 +366,7 @@ struct GraphBuilder
     
     for(SysInt i = 0; i < b.constants.size(); ++i)
     {
-      string nv = g.new_vertex(name + "_CHILD_CONST" + to_string(i));
+      string nv = g.new_vertex(name + "_CHILD_CONST" + tostring(i));
       add_edge(v, nv);
       for(SysInt j = 0; j < b.constants[i].size(); ++j)
         add_edge(nv, Var(VAR_CONSTANT, b.constants[i][j]) );      
@@ -390,7 +390,7 @@ struct GraphBuilder
     for(SysInt i = 0; i < b.vars.size(); ++i)
       for(SysInt j = 0; j < b.vars[i].size(); ++j)
       {
-        string vij = g.new_vertex(name + "_CHILD_" + to_string(i) + ";" + to_string(j));
+        string vij = g.new_vertex(name + "_CHILD_" + tostring(i) + ";" + tostring(j));
         add_edge(v, vij);
         add_edge(vij, b.vars[i][j]);
       }
@@ -428,7 +428,7 @@ struct GraphBuilder
     for(SysInt i = 2; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
-      string vi = g.new_vertex(name + "_POS_" + to_string(i));
+      string vi = g.new_vertex(name + "_POS_" + tostring(i));
       add_edge(v, vi);
     }
     
@@ -457,7 +457,7 @@ struct GraphBuilder
     for(SysInt i = 2; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
-      string vi = g.new_vertex(name + "_POS_" + to_string(i));
+      string vi = g.new_vertex(name + "_POS_" + tostring(i));
       add_edge(v, vi);
     }
     
@@ -487,7 +487,7 @@ struct GraphBuilder
     for(SysInt i = 1; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
-      string vi = g.new_vertex(name + "_POS_" + to_string(i));
+      string vi = g.new_vertex(name + "_POS_" + tostring(i));
       add_edge(v, vi);
     }  
     return v;

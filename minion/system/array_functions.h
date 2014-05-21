@@ -17,24 +17,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-/// increments a container of values. Returns 'true' until the maximum value is reached.
-template<typename Container>
-bool increment_vector(Container& vals, const Container& maxvals)
-{
-  bool carry = true;
-  SysInt position = vals.size() - 1;
-  while(position >= 0 && carry == true)
-  {
-    D_ASSERT(maxvals[position] != 0);
-    ++vals[position];
-    if(vals[position] == maxvals[position])
-      vals[position] = 0;
-    else
-      carry = false;
-    --position;
-  }
-  return !carry;
-}
+
 
 /// A simple wrapper for a pair of bounds.
 struct Bounds

@@ -366,8 +366,8 @@ public:
       for(SysInt j = 0; j < short_tuples[i].size(); ++j)
       {
         SysInt v = short_tuples[i][j].first;
-        CHECK(v >= 0, "The short tuple '" + tuple_name + "' contains the negative variable index " + to_string(v));
-        CHECK(v < var_count, "The short tuple '" + tuple_name + "' contains variable index " + to_string(v) + ", but only contains " + to_string(var_count) + " variables (0 indexed)");
+        CHECK(v >= 0, "The short tuple '" + tuple_name + "' contains the negative variable index " + tostring(v));
+        CHECK(v < var_count, "The short tuple '" + tuple_name + "' contains variable index " + tostring(v) + ", but only contains " + tostring(var_count) + " variables (0 indexed)");
       }
     }
   }

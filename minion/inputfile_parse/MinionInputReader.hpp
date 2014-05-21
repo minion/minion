@@ -35,7 +35,7 @@ template<typename T>
 typename T::value_type& index(T& container, DomainInt index_pos)
 {
   if(index_pos < 0 || index_pos >= (SysInt)container.size())
-    throw parse_exception("Index position " + to_string(index_pos) + 
+    throw parse_exception("Index position " + tostring(index_pos) + 
                           " out of range");
   return container[checked_cast<SysInt>(index_pos)];
 }
@@ -317,8 +317,8 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
     DomainInt tuple_num = infile->read_num();
     if(tuple_num >= instance->tupleListContainer->size())
     {
-      throw parse_exception("There are only " + to_string(instance->tupleListContainer->size()) +
-                                " tuplelists, requested " + to_string(tuple_num) + ".");
+      throw parse_exception("There are only " + tostring(instance->tupleListContainer->size()) +
+                                " tuplelists, requested " + tostring(tuple_num) + ".");
     }
     tuplelist = instance->tupleListContainer->getTupleList(tuple_num);
   }

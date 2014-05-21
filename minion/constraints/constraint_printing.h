@@ -26,7 +26,7 @@ namespace ConOutput
   string print_vars(StateObj* stateObj, const T& t)
   {
     if(t.isAssigned())
-      return to_string(t.getAssignedValue());
+      return tostring(t.getAssignedValue());
     else
     {
       vector<Mapper> m = t.getMapperStack();
@@ -58,17 +58,17 @@ namespace ConOutput
 
   inline
   string print_vars(StateObj* stateObj, const DomainInt& i)
-  { return to_string(i); }
+  { return tostring(i); }
 
 #ifdef MINION_DEBUG
   inline
   string print_vars(StateObj* stateObj, const SysInt& i)
-  { return to_string(i); }
+  { return tostring(i); }
 #endif
 
   template<SysInt i>
   string print_vars(StateObj* stateObj, const compiletime_val<i>)
-  { return to_string(i); }
+  { return tostring(i); }
 
   inline
   string print_vars(StateObj* stateObj, const std::vector<AbstractConstraint*>& t)

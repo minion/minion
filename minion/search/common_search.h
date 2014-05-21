@@ -206,9 +206,9 @@ namespace Controller
             DomainInt optVal = getState(stateObj).getOptimiseValue();
             opt += "ineq(";
             if(getState(stateObj).isMaximise()) {
-                opt += to_string(optVal) + string(", ") + optVar + string(", 0)\n");
+                opt += tostring(optVal) + string(", ") + optVar + string(", 0)\n");
             } else {
-                opt += optVar + string(", ") + to_string(-optVal) + string(", 0)\n");
+                opt += optVar + string(", ") + tostring(-optVal) + string(", 0)\n");
             }
         }
         if(branches.empty())
@@ -226,11 +226,11 @@ namespace Controller
             DomainInt max = var.getMax();
             DomainInt med = (min+max)/2;
             string left("ineq(");
-            left += curvar + string(", ") + to_string(med) + string(", 0)\n");
+            left += curvar + string(", ") + tostring(med) + string(", 0)\n");
             splits.push_back(left + opt);
 
             string right("ineq(");
-            right += to_string(med) + string(", ");
+            right += tostring(med) + string(", ");
             right += curvar + string(", -1)\n");
             splits.push_back(right + opt);
         }
@@ -255,7 +255,7 @@ namespace Controller
             } else if(mpos != string::npos) {
                 basename = basename.substr(0, mpos);
             }
-            string filename = basename + "-resume-" + to_string(time(NULL)) + "-" + to_string(getpid()) + "-" + curvar + "-" + to_string(i++) + ".minion";
+            string filename = basename + "-resume-" + tostring(time(NULL)) + "-" + tostring(getpid()) + "-" + curvar + "-" + tostring(i++) + ".minion";
             cout << "Output resume file to \"" << filename << "\"" << endl;
             ofstream fileout(filename.c_str());
             fileout << "# original instance: " << getOptions(stateObj).instance_name << endl;
@@ -373,7 +373,7 @@ namespace Controller
       if(getOptions(stateObj).printonlyoptimal)
       {
         getState(stateObj).storedSolution += "Solution found with Value: "
-          + to_string(getState(stateObj).getRawOptimiseVar()->getAssignedValue()) + "\n";
+          + tostring(getState(stateObj).getRawOptimiseVar()->getAssignedValue()) + "\n";
       }
       else
       {
