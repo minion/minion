@@ -11,36 +11,36 @@ struct EmptyType
 {};
 
 struct AnyGrab
-{ 
+{
     template<typename T>
     AnyGrab(const T&);
 };
 
 /// A constant chosen at compile time.
 /// Create with the notation compiletime_val<6>().
-template<int i>
+template<typename T, T i>
 struct compiletime_val
-{ 
-  operator int() const
+{
+  operator T() const
 { return i; }
-  
-  compiletime_val<-i-1> negminusone() const
-{ return compiletime_val<-i-1>(); }
-  
+
+  compiletime_val<T, -i-1> negminusone() const
+{ return compiletime_val<T, -i-1>(); }
+
   friend std::ostream& operator<<(std::ostream& o, const compiletime_val&)
 { return o << "CompiletimeConst:" << i; }
 
-  compiletime_val<-i> operator-() const
-{ return compiletime_val<-i>(); }
+  compiletime_val<T, -i> operator-() const
+{ return compiletime_val<T, -i>(); }
 };
 
-template<int i, int j>
-compiletime_val<i+j> operator+(compiletime_val<i>, compiletime_val<j>)
-{ return compiletime_val<i+j>(); }
+template<typename T, T i, T j>
+compiletime_val<T, i+j> operator+(compiletime_val<T,i>, compiletime_val<T,j>)
+{ return compiletime_val<T, i+j>(); }
 
-template<int i, int j>
-compiletime_val<i-j> operator-(compiletime_val<i>, compiletime_val<j>)
-{ return compiletime_val<i-j>(); }
+template<typename T, T i, T j>
+compiletime_val<T, i-j> operator-(compiletime_val<T,i>, compiletime_val<T,j>)
+{ return compiletime_val<T, i-j>(); }
 
 /** @}
  */

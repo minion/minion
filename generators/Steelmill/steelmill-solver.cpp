@@ -218,8 +218,8 @@ int main(int argc, char** argv)
 			 //      orderMCol.push_back(smi.OA[i2*smi.j+i]) ;
 			 CSP.constraint(SumLeq, orderMCol, Var(Constant, 1));
 			 CSP.constraint(SumGeq, orderMCol, Var(Constant, 1));
-			 //    add_constraint(BoolLessEqualSumCon(orderMCol, compiletime_val<1>()));
-			 //    add_constraint(BoolGreaterEqualSumCon(orderMCol, compiletime_val<1>()));
+			 //    add_constraint(BoolLessEqualSumCon(orderMCol, compiletime_val<SysInt, 1>()));
+			 //    add_constraint(BoolGreaterEqualSumCon(orderMCol, compiletime_val<SysInt, 1>()));
   }
   
   for (i = 0; i < smi.j; i++) {   
@@ -272,8 +272,8 @@ int main(int argc, char** argv)
 			   colourMRow.push_back(Var(Bool, start_of_colour_matrix + i*smi.k+i2)) ;
 			 CSP.constraint(SumLeq, colourMRow, Var(Constant, 2));
 			 CSP.constraint(SumGeq, colourMRow, Var(Constant, 2));
-			 //	add_constraint(BoolLessEqualSumCon(colourMRow, compiletime_val<2>())) ;
-			 //    add_constraint(BoolGreaterEqualSumCon(colourMRow, compiletime_val<2>()));
+			 //	add_constraint(BoolLessEqualSumCon(colourMRow, compiletime_val<SysInt, 2>())) ;
+			 //    add_constraint(BoolGreaterEqualSumCon(colourMRow, compiletime_val<SysInt, 2>()));
 			 
   }
   

@@ -27,9 +27,9 @@ template<typename Var1, typename Var2, typename Var3>
 AbstractConstraint*
 BuildCT_ELEMENT_ONE(StateObj* stateObj, const Var1& vararray, const Var2& v1, const Var3& v2, ConstraintBlob& b)
 { 
-  typedef typename ShiftType<typename Var2::value_type, compiletime_val<-1> >::type ShiftVal;
+  typedef typename ShiftType<typename Var2::value_type, compiletime_val<SysInt, -1> >::type ShiftVal;
   vector<ShiftVal> replace_v1;
-  replace_v1.push_back(ShiftVarRef(v1[0], compiletime_val<-1>()));
+  replace_v1.push_back(ShiftVarRef(v1[0], compiletime_val<SysInt, -1>()));
   return BuildCT_ELEMENT(stateObj, vararray, replace_v1, v2, b);
 }
 

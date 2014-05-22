@@ -126,12 +126,12 @@ LeqCon(StateObj* stateObj, VarRef1 v1, VarRef2 v2, Offset o)
 template<typename VarRef1, typename VarRef2>
 AbstractConstraint*
 LeqCon(StateObj* stateObj,VarRef1 v1, VarRef2 v2)
-{ return new LeqConstraint<VarRef1,VarRef2,compiletime_val<0> >(stateObj,v1,v2,compiletime_val<0>()); }
+{ return new LeqConstraint<VarRef1,VarRef2,compiletime_val<SysInt, 0> >(stateObj,v1,v2,compiletime_val<SysInt, 0>()); }
 
 template<typename VarRef>
 AbstractConstraint*
 ImpliesCon(StateObj* stateObj, VarRef v1, VarRef v2)
-{ return new LeqConstraint<VarRef,VarRef,compiletime_val<0> >(stateObj,v1,v2,compiletime_val<0>()); }
+{ return new LeqConstraint<VarRef,VarRef,compiletime_val<SysInt, 0> >(stateObj,v1,v2,compiletime_val<SysInt, 0>()); }
 
 // This is mainly inline to avoid multiple definitions.
 template<typename VarRef1, typename VarRef2, typename Offset>

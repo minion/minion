@@ -226,15 +226,15 @@ int main (int argc, char * const argv[]) {
 	{ 
 	  CSP.constraint(Eq, boards[0][i], Var(Constant, 0));
 	  CSP.constraint(Eq, boards[NOMOVES][i], Var(Constant, 1));
-	  // add_constraint(UnaryEqualCon(boards[0][i], compiletime_val<0>())); 
-	  // add_constraint(UnaryEqualCon(boards[NOMOVES][i], compiletime_val<1>()));
+	  // add_constraint(UnaryEqualCon(boards[0][i], compiletime_val<SysInt, 0>())); 
+	  // add_constraint(UnaryEqualCon(boards[NOMOVES][i], compiletime_val<SysInt, 1>()));
 	}
 	else
 	{
 	  CSP.constraint(Eq, boards[0][i], Var(Constant, 1));
 	  CSP.constraint(Eq, boards[NOMOVES][i], Var(Constant, 0));
-	  //add_constraint(UnaryEqualCon(boards[0][i], compiletime_val<1>())); 
-	  //add_constraint(UnaryEqualCon(boards[NOMOVES][i], compiletime_val<0>()));
+	  //add_constraint(UnaryEqualCon(boards[0][i], compiletime_val<SysInt, 1>())); 
+	  //add_constraint(UnaryEqualCon(boards[NOMOVES][i], compiletime_val<SysInt, 0>()));
 	}
   }
   
@@ -259,7 +259,7 @@ int main (int argc, char * const argv[]) {
 		  for(int loop = 0; loop < v.size(); loop++)
 		  { w[loop] = transition_vars[i][v[loop]]; }
 		  CSP.constraintReify(zero2one[i][curBoardPos], SumGeq, w, Var(Constant, 1));
-		  //	    add_constraint(rareifyCon(BoolGreaterEqualSumCon(w, compiletime_val<1>()), zero2one[i][curBoardPos]));
+		  //	    add_constraint(rareifyCon(BoolGreaterEqualSumCon(w, compiletime_val<SysInt, 1>()), zero2one[i][curBoardPos]));
 		}
 		{
 			vector<Var> and_vars;
@@ -283,7 +283,7 @@ int main (int argc, char * const argv[]) {
 			for(int loop = 0; loop < v.size(); loop++)
 			{ w[loop] = transition_vars[i][v[loop]]; }	      
 			CSP.constraintReify(one2zero[i][curBoardPos], SumGeq, w, Var(Constant,1));
-			//add_constraint(rareifyCon(BoolGreaterEqualSumCon(w, compiletime_val<1>()), one2zero[i][curBoardPos]));
+			//add_constraint(rareifyCon(BoolGreaterEqualSumCon(w, compiletime_val<SysInt, 1>()), one2zero[i][curBoardPos]));
 			
 		  }
 		  {

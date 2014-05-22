@@ -66,8 +66,8 @@ namespace ConOutput
   { return tostring(i); }
 #endif
 
-  template<SysInt i>
-  string print_vars(StateObj* stateObj, const compiletime_val<i>)
+  template<typename T, T i>
+  string print_vars(StateObj* stateObj, const compiletime_val<T,i>)
   { return tostring(i); }
 
   inline
@@ -106,7 +106,7 @@ namespace ConOutput
     o << "]";
     return o.str();
   }
-  
+
   template<typename T>
   string print_vars(StateObj* stateObj, const std::vector<std::pair<T,T> >& t)
   {
@@ -163,7 +163,7 @@ namespace ConOutput
   }
 
 
-  inline 
+  inline
   void compress_arrays(StateObj* stateObj, string name, vector<AnyVarRef>& vars, AnyVarRef& result)
   {
     if(name.find("sum") != string::npos)
@@ -210,7 +210,7 @@ namespace ConOutput
       }
     }
   }
-  
+
   inline
   string print_con(StateObj* stateObj, string name)
   { return name + "()"; }
@@ -218,33 +218,33 @@ namespace ConOutput
 
   template<typename T>
   string print_con(StateObj* stateObj, string name, const T& args)
-  { 
-    string s = print_vars(stateObj, args); 
+  {
+    string s = print_vars(stateObj, args);
     return name + "(" + s + ")";
   }
 
   template<typename T1, typename T2>
   string print_con(StateObj* stateObj, string name, const T1& args1, const T2& args2)
-  { 
+  {
 
     string s1 = print_vars(stateObj, args1);
-    string s2 = print_vars(stateObj, args2); 
+    string s2 = print_vars(stateObj, args2);
     return name + "(" + s1 + "," + s2 + ")";
   }
 
   inline
   string print_array_var_con(StateObj* stateObj, string name, vector<AnyVarRef> args1, AnyVarRef args2)
-  { 
+  {
     compress_arrays(stateObj, name, args1, args2);
     string s1 = print_vars(stateObj, args1);
-    string s2 = print_vars(stateObj, args2); 
+    string s2 = print_vars(stateObj, args2);
     return name + "(" + s1 + "," + s2 + ")";
   }
-  
+
   template<typename T1, typename T2, typename T3>
   string print_con(StateObj* stateObj, string name, const T1& args1, const T2& args2, const T3& args3)
-  { 
-    string s1 = print_vars(stateObj, args1); 
+  {
+    string s1 = print_vars(stateObj, args1);
     string s2 = print_vars(stateObj, args2);
     string s3 = print_vars(stateObj, args3);
     return name + "(" + s1 + "," + s2 + "," + s3 + ")";
@@ -253,8 +253,8 @@ namespace ConOutput
   inline
   string print_weight_array_var_con(StateObj* stateObj, string name, vector<DomainInt> args1,
                                     vector<AnyVarRef> args2, const AnyVarRef& args3)
-  { 
-    string s1 = print_vars(stateObj, args1); 
+  {
+    string s1 = print_vars(stateObj, args1);
     string s2 = print_vars(stateObj, args2);
     string s3 = print_vars(stateObj, args3);
     return name + "(" + s1 + "," + s2 + "," + s3 + ")";

@@ -156,8 +156,8 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
       for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
         new_var_array[i] = VarNegRef(var_array[i]);
 
-      typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<-1> >::type SumType;
-      SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<-1>());
+      typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<SysInt, -1> >::type SumType;
+      SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<SysInt, -1>());
 
       return new LightLessEqualSumConstraint<typename NegType<VarRef>::type, size, SumType, true>
         (stateObj, new_var_array, new_sum);
@@ -171,8 +171,8 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
       for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
         new_var_array[i] = VarNegRef(var_array[i]);
 
-      typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<-1> >::type SumType;
-      SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<-1>());
+      typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<SysInt, -1> >::type SumType;
+      SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<SysInt, -1>());
 
       return new LightLessEqualSumConstraint<AnyVarRef, size, AnyVarRef, true>
         (stateObj, new_var_array, new_sum);

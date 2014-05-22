@@ -65,7 +65,7 @@ struct VMConstraint : public AbstractConstraint
 
   DomainInt* VM_data;
   DomainInt VM_size;
-  
+
   #if UseStatePtr
   Reversible<int> StatePtr;
   bool AllChoicesFixed;
@@ -75,7 +75,7 @@ struct VMConstraint : public AbstractConstraint
   #endif
 
   VMConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples, TupleList* _mapping_tuples) :
-  AbstractConstraint(stateObj), 
+  AbstractConstraint(stateObj),
   total_lits(0), vars_size(-1),
   VM_data(_tuples->getPointer()), VM_size(_tuples->tuple_size())
   #if UseStatePtr
@@ -95,9 +95,9 @@ struct VMConstraint : public AbstractConstraint
           cout << "VM takes tuplelists containing a single tuple" << endl;
           FAIL_EXIT();
       }
-      
-      
-      
+
+
+
       DomainInt* mapping = _mapping_tuples->getPointer();
       DomainInt mapping_size = _mapping_tuples->tuple_size();
       if(mapping_size % 2 != 0)
@@ -117,12 +117,12 @@ struct VMConstraint : public AbstractConstraint
         return;
 
       total_lits = checked_cast<SysInt>(mapping_size / 2);
-      
+
       #if UseStatePtr && UseStatePtrSym
       StatePtrPerm=getMemory(stateObj).backTrack().template requestArray<char>(total_lits);
       for(int i=0; i<total_lits; i++) StatePtrPerm[i]=i;
       #endif
-      
+
       vector<set<DomainInt> > domains(vars_size);
       for(int i = 0; i < mapping_size; i+=2)
       {
@@ -138,7 +138,7 @@ struct VMConstraint : public AbstractConstraint
           cout << "empty domain?";
           FAIL_EXIT();
         }
-        
+
         domain_min[i] = checked_cast<char>(*domains[i].begin());
 
         set<DomainInt>::iterator last = domains[i].end();
@@ -164,10 +164,10 @@ struct VMConstraint : public AbstractConstraint
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    
+
     for(int i = 0; i < vars_size; ++i)
       t.push_back(make_trigger(vars[i], Trigger(this, 1), DomainChanged));
-   
+
     return t;
   }
 
@@ -184,11 +184,11 @@ struct VMConstraint : public AbstractConstraint
   bool constraint_locked;
 
   virtual void propagate(DomainInt, DomainDelta)
-  { 
-      if(constraint_locked) 
+  {
+      if(constraint_locked)
           return;
-      constraint_locked = true; 
-      getQueue(stateObj).pushSpecialTrigger(this); 
+      constraint_locked = true;
+      getQueue(stateObj).pushSpecialTrigger(this);
   }
 #else
   virtual void propagate(DomainInt, DomainDelta)
@@ -283,32 +283,32 @@ struct VMConstraint : public AbstractConstraint
     D_ASSERT(lit >= 0 && lit < MaxVarSize * MaxDomSize);
     D_ASSERT(vars[literal_map[lit].first].getInitialMin() <= literal_map[lit].second);
     D_ASSERT(vars[literal_map[lit].first].getInitialMax() >= literal_map[lit].second);
-    
-    return D(literal_map,lit); 
+
+    return D(literal_map,lit);
   }
 
 
   template<typename CVal>
   pair<SysInt, DomainInt> get_varval(CVal cval, DomainInt* perm1, DomainInt* perm2, DomainInt* perm3, int var, DomainInt val)
-  { 
+  {
     switch((int)cval)
     {
       case 0:
-        return make_pair(var, val); 
+        return make_pair(var, val);
       case 1:
-      { 
+      {
         SysInt lit = checked_cast<SysInt>(get_lit_from_varval(var, val));
         DomainInt mapped_lit = perm1[lit];
         return get_varval_from_lit(mapped_lit);
       }
       case 2:
-      { 
+      {
         SysInt lit = checked_cast<SysInt>(get_lit_from_varval(var, val));
         DomainInt mapped_lit = perm2[lit];
         return get_varval_from_lit(mapped_lit);
       }
       case 3:
-      { 
+      {
         SysInt lit = checked_cast<SysInt>(get_lit_from_varval(var, val));
         DomainInt mapped_lit = perm3[lit];
         return get_varval_from_lit(mapped_lit);
@@ -324,47 +324,47 @@ struct VMConstraint : public AbstractConstraint
     #if UseStatePtr
       AllChoicesFixed=true;
     #endif
-    
+
     if(total_lits > 0)
     {
       vector<DomainInt> vecvals(total_lits);
       vector<DomainInt> vecnewvals(total_lits);
-      
+
       DomainInt* vals = &(vecvals[0]);
       DomainInt* newvals = &(vecnewvals[0]);
-      
+
       DomainInt* perm = 0;
 
       #if UseStatePtr && UseStatePtrSym
       for(int i=0; i<total_lits; i++) vals[i]=StatePtrPerm[i];
-      
-      // 2 means start in the state where the permutation is in 'vals'... I think... 
-      execute_symmetric_vm(compiletime_val<2>(), VM_start, length, StatePtr, perm, vals, newvals);
-      
+
+      // 2 means start in the state where the permutation is in 'vals'... I think...
+      execute_symmetric_vm(compiletime_val<SysInt, 2>(), VM_start, length, StatePtr, perm, vals, newvals);
+
       #else
-      
-      execute_symmetric_vm(compiletime_val<0>(), VM_start, length,  
+
+      execute_symmetric_vm(compiletime_val<SysInt, 0>(), VM_start, length,
   #if UseStatePtr
-      StatePtr, 
+      StatePtr,
   #else
       0,
   #endif
       perm, vals, newvals);
-      
+
       #endif
-      
+
     }
     else
     {
 
-      execute_symmetric_vm(compiletime_val<0>(), VM_start, length, 
+      execute_symmetric_vm(compiletime_val<SysInt, 0>(), VM_start, length,
   #if UseStatePtr
-      StatePtr, 
+      StatePtr,
   #else
       0,
   #endif
       0, 0, 0);
-      
+
     }
   }
 
@@ -379,12 +379,12 @@ struct VMConstraint : public AbstractConstraint
           perm = VM_start + checked_cast<SysInt>(InPtr);
           InPtr += total_lits;
           #if UseStatePtr && UseStatePtrSym
-          if(AllChoicesFixed) { 
+          if(AllChoicesFixed) {
             StatePtr=InPtr;
             for(int i=0; i<total_lits; i++) StatePtrPerm[i]=perm[i];
           }
           #endif
-          return execute_symmetric_vm(compiletime_val<1>(), VM_start, length, InPtr, perm, vals, newvals);
+          return execute_symmetric_vm(compiletime_val<SysInt, 1>(), VM_start, length, InPtr, perm, vals, newvals);
         }
         break;
         case 1:
@@ -393,12 +393,12 @@ struct VMConstraint : public AbstractConstraint
             vals[i] = perm[get(InPtr+i)];
           InPtr += total_lits;
           #if UseStatePtr && UseStatePtrSym
-          if(AllChoicesFixed) { 
+          if(AllChoicesFixed) {
             StatePtr=InPtr;
             for(int i=0; i<total_lits; i++) StatePtrPerm[i]=vals[i];
           }
           #endif
-          return execute_symmetric_vm(compiletime_val<2>(), VM_start, length, InPtr, perm, vals, newvals);
+          return execute_symmetric_vm(compiletime_val<SysInt, 2>(), VM_start, length, InPtr, perm, vals, newvals);
         }
         break;
         case 2:
@@ -407,12 +407,12 @@ struct VMConstraint : public AbstractConstraint
             newvals[i] = vals[get(InPtr+i)];
           InPtr += total_lits;
           #if UseStatePtr && UseStatePtrSym
-          if(AllChoicesFixed) { 
+          if(AllChoicesFixed) {
             StatePtr=InPtr;
             for(int i=0; i<total_lits; i++) StatePtrPerm[i]=newvals[i];
           }
           #endif
-          return execute_symmetric_vm(compiletime_val<3>(), VM_start, length, InPtr, perm, vals, newvals);
+          return execute_symmetric_vm(compiletime_val<SysInt, 3>(), VM_start, length, InPtr, perm, vals, newvals);
         }
         break;
         case 3:
@@ -421,12 +421,12 @@ struct VMConstraint : public AbstractConstraint
             vals[i] = newvals[get(InPtr+i)];
           InPtr += total_lits;
           #if UseStatePtr && UseStatePtrSym
-          if(AllChoicesFixed) { 
+          if(AllChoicesFixed) {
             StatePtr=InPtr;
             for(int i=0; i<total_lits; i++) StatePtrPerm[i]=vals[i];
           }
           #endif
-          return execute_symmetric_vm(compiletime_val<2>(), VM_start, length, InPtr, perm, vals, newvals);
+          return execute_symmetric_vm(compiletime_val<SysInt, 2>(), VM_start, length, InPtr, perm, vals, newvals);
 
         }
         break;
@@ -436,10 +436,10 @@ struct VMConstraint : public AbstractConstraint
   }
 
   template<typename Data, SysInt CV>
-  inline void execute_symmetric_vm(compiletime_val<CV> cv, Data* VM_start, DomainInt length, DomainInt InPtr, DomainInt* perm, DomainInt* vals, DomainInt* newvals)
+  inline void execute_symmetric_vm(compiletime_val<SysInt, CV> cv, Data* VM_start, DomainInt length, DomainInt InPtr, DomainInt* perm, DomainInt* vals, DomainInt* newvals)
   {
     //int state = 0;
-    
+
     while(true)
     {
         if(InPtr == -3)
@@ -485,7 +485,7 @@ struct VMConstraint : public AbstractConstraint
                           }
                           else
                           {
-                            AllChoicesFixed = false;  // not assigned; this value could be removed so stop updating state pointer from now on. 
+                            AllChoicesFixed = false;  // not assigned; this value could be removed so stop updating state pointer from now on.
                           }
                         }
                     #endif
@@ -496,7 +496,7 @@ struct VMConstraint : public AbstractConstraint
                     InPtr = get(InPtr+2);
                     #if UseStatePtr
                         if(AllChoicesFixed) {
-                            StatePtr=InPtr;   // 'domain value out' is always fixed. 
+                            StatePtr=InPtr;   // 'domain value out' is always fixed.
                         }
                     #endif
                 }
@@ -533,7 +533,7 @@ struct VMConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     if(UseSymmetricVM)
-      execute_symmetric_vm_start(VM_data, VM_size); 
+      execute_symmetric_vm_start(VM_data, VM_size);
     else
       execute_vm(VM_data, VM_size);
   }

@@ -154,7 +154,7 @@ struct TestConstraint : public AbstractConstraint
     return D(literal_map,lit); 
   }
 
-  pair<int,int> apply_perm(compiletime_val<0>, int const* perm, int var, int val)
+  pair<int,int> apply_perm(compiletime_val<SysInt, 0>, int const* perm, int var, int val)
   {
     int lit = get_lit_from_varval(var, val);
     D_ASSERT(lit >= 0 && lit < total_lits);
@@ -163,7 +163,7 @@ struct TestConstraint : public AbstractConstraint
     return get_varval_from_lit(mapped_lit);
   }
 /*
-  pair<int,int> apply_perm(compiletime_val<1>, int const* perm, int var, int val)
+  pair<int,int> apply_perm(compiletime_val<SysInt, 1>, int const* perm, int var, int val)
   { return std::pair<int, int>(perm[var], val); }
 */
   template<typename CVal>
@@ -175,15 +175,15 @@ struct TestConstraint : public AbstractConstraint
         return make_pair(var, val); 
       case 1:
       { 
-        return apply_perm(compiletime_val<0>(), perm1, var, val);
+        return apply_perm(compiletime_val<SysInt, 0>(), perm1, var, val);
       }
       case 2:
       {
-        return apply_perm(compiletime_val<0>(), perm2, var, val);
+        return apply_perm(compiletime_val<SysInt, 0>(), perm2, var, val);
       }
       case 3:
       { 
-        return apply_perm(compiletime_val<0>(), perm3, var, val);
+        return apply_perm(compiletime_val<SysInt, 0>(), perm3, var, val);
       }
       default:
         abort();

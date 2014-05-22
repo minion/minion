@@ -250,7 +250,7 @@ struct LessIterated
   template<typename Var1, typename Var2>
   static AbstractConstraint* reverse_constraint(StateObj* stateObj, const Var1& var1, const Var2& var2)
   {
-      LeqConstraint<Var2, Var1, compiletime_val<0> >* t=new LeqConstraint<Var2, Var1, compiletime_val<0> >(stateObj, var2, var1, compiletime_val<0>());
+      LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0> >* t=new LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0> >(stateObj, var2, var1, compiletime_val<SysInt, 0>());
       return (AbstractConstraint*) t;
   }
 };
