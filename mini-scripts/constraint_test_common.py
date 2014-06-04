@@ -1,6 +1,8 @@
 import sys, os
 from weakref import ref   ## why?
 
+import math
+
 ################################################################################
 #
 #   Code for comparing two search trees dumped by -dumptree.
@@ -966,6 +968,39 @@ class testgacalldiffb(testalldiff):
     def runtest(self, options=dict()):
         options["fixlength"]=True
         return runtestgeneral("gacalldiffb", False, options, [9], ["quitesmallnum"], self, not options['reify'])
+
+class testalldiffmatrix:
+    def printtable(self, domains):
+        val=self.constants[0]
+        sqsize=int(math.sqrt(len(domains)))
+        if sqsize**2 != len(domains):
+            return False
+        cross=[]
+        crossprod(domains, [], cross)
+        out=[]
+        for l in cross:
+            isalldiff=True
+            
+            for row in range(sqsize):
+                counter=0
+                for col in range(sqsize):
+                    if l[row*sqsize+col]==val: counter+=1
+                if counter!=1:
+                    isalldiff=False
+                    break
+            for col in range(sqsize):
+                counter=0
+                for row in range(sqsize):
+                    if l[row*sqsize+col]==val: counter+=1
+                if counter!=1:
+                    isalldiff=False
+                    break
+            if isalldiff:
+                out.append(l)
+        return out
+        
+    def runtest(self, options=dict()):
+        return runtestgeneral("alldiffmatrix", False, options, [9,1], ["quitesmallnum", "const"], self, not options['reify'])
 
 
 class testdiseq(testalldiff):
