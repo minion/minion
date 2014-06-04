@@ -53,7 +53,8 @@ using namespace std;
 #include "constraint_occurrence.h"
 #include "../dynamic_constraints/dynamic_new_or.h"
 
-#define GCCPRINT(x) 
+#define ADMPRINT(x)
+//#define ADMPRINT(x) std::cout << x << std::endl;
 
 
 template<typename VarArrayType, typename ValueType>
@@ -80,6 +81,9 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
         
         prev.resize(squaresize*2);
         visited.reserve(squaresize*2);
+        
+        initialize_tarjan();
+        
     }
     
     int squaresize;
@@ -219,22 +223,24 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
         vars.push_back(var_array[i]);
       return vars;
     }
-  
-  
-  
-  //   Above is basically interface with Minion, below is the flow algo
-  
-  void do_prop()
-  {
-      bool matchok=bfsmatching();
-      
-      if(!matchok) {
-          getState(stateObj).setFailed(true);
-      }
-      
-  }
-  
-  
+    
+    
+    
+    //   Above is basically interface with Minion, below is the flow algo
+    
+    void do_prop()
+    {
+        bool matchok=bfsmatching();
+        
+        if(!matchok) {
+            getState(stateObj).setFailed(true);
+        }
+        else {
+            tarjan_recursive();
+        }
+    }
+    
+    
     vector<SysInt> augpath;
     deque<SysInt> fifo;
     
@@ -334,7 +340,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
         
         std::reverse(augpath.begin(), augpath.end());
         
-        GCCPRINT("Found augmenting path:" << augpath);
+        ADMPRINT("Found augmenting path:" << augpath);
         
         // now apply the path.
         for(SysInt i=0; i<augpath.size()-1; i++)
@@ -343,13 +349,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
             if(curnode<squaresize)
             {
                 // if it's a row:
-                
-                if(rowcolmatching[curnode]>-1) {
-                    // Delete the existing edge. 
-                    colrowmatching[rowcolmatching[curnode]]=-1;
-                    rowcolmatching[curnode]=-1;   // not necessary.
-                }
-                
+                // Overwrites existing edges using same row or column. 
                 rowcolmatching[curnode]=augpath[i+1]-squaresize;   // convert next node to a column number.
                 colrowmatching[augpath[i+1]-squaresize]=curnode;
             }
@@ -359,10 +359,191 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
             }
         }
         
-        GCCPRINT("rowcolmatching: "<<rowcolmatching);
-        GCCPRINT("colrowmatching: "<<colrowmatching);
+        ADMPRINT("rowcolmatching: "<<rowcolmatching);
+        ADMPRINT("colrowmatching: "<<colrowmatching);
     }
     
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    //   Tarjan's algorithm.
+    //   Edges in matching map from row to column. Edges not in matching map 
+    //   from column to row. 
+    
+    vector<SysInt> tstack;
+    smallset_nolist in_tstack;
+    
+    vector<SysInt> dfsnum;
+    vector<SysInt> lowlink;
+    
+    vector<SysInt> curnodestack;
+    
+    SysInt max_dfs;
+
+    SysInt varcount, valcount;
+    //SysInt localmin,localmax;
+    
+    smallset_nolist rowinscc;
+    
+    
+    void initialize_tarjan()
+    {
+        tstack.reserve(squaresize*2);
+        in_tstack.reserve(squaresize*2);
+        //visited.reserve(squaresize*2);
+        max_dfs=1;
+        dfsnum.resize(squaresize*2);
+        lowlink.resize(squaresize*2);
+
+        curnodestack.reserve(squaresize*2);
+        
+        rowinscc.reserve(squaresize);
+    }
+    
+    void tarjan_recursive() {
+        tstack.clear();
+        in_tstack.clear();
+
+        visited.clear();
+        max_dfs=1;
+        
+        // Make sure all rows and columns are visited by Tarjans.
+        
+        for(SysInt row=0; row<squaresize; row++)
+        {
+            if(!visited.in(row))
+            {
+                ADMPRINT("(Re)starting tarjan's algorithm, at node:"<< row);
+                visit(row, true);
+                ADMPRINT("Returned from tarjan's algorithm.");
+            }
+        }
+        
+        for(SysInt col=0; col<squaresize; col++) {
+            if(!visited.in(col+squaresize))
+            {
+                ADMPRINT("(Re)starting tarjan's algorithm, at node:"<< col+squaresize);
+                visit(col+squaresize, true);
+                ADMPRINT("Returned from tarjan's algorithm.");
+            }
+        }
+        
+    }
+
+    void visit(SysInt curnode, bool toplevel)
+    {
+        // toplevel is true iff this is the top level of the recursion.
+        tstack.push_back(curnode);
+        in_tstack.insert(curnode);
+        dfsnum[curnode]=max_dfs;
+        lowlink[curnode]=max_dfs;
+        max_dfs++;
+        visited.insert(curnode);
+        ADMPRINT("Visiting node: " <<curnode);
+        
+        if(curnode<squaresize)
+        {
+            SysInt newnode=rowcolmatching[curnode]+squaresize;
+            
+            if(!visited.in(newnode))
+            {
+                visit(newnode, false);
+                if(lowlink[newnode]<lowlink[curnode])
+                {
+                    lowlink[curnode]=lowlink[newnode];
+                }
+            }
+            else
+            {
+                // Already visited newnode
+                if(in_tstack.in(newnode) && dfsnum[newnode]<lowlink[curnode])
+                {
+                    lowlink[curnode]=dfsnum[newnode];  // Why dfsnum not lowlink?
+                }
+            }
+        }
+        else
+        {
+            // curnode is a column
+            SysInt col=curnode-squaresize;
+            
+            for(SysInt row=0; row<squaresize; row++)
+            {
+                if(rowcolmatching[row]!=col)   // if the edge is not in the matching.
+                {
+                    if(hasValue(row, col))     // and the value 
+                    {
+                        if(!visited.in(row))
+                        {
+                            visit(row, false);
+                            if(lowlink[row]<lowlink[curnode])
+                            {
+                                lowlink[curnode]=lowlink[row];
+                            }
+                        }
+                        else
+                        {
+                            // Already visited row
+                            if(in_tstack.in(row) && dfsnum[row]<lowlink[curnode])
+                            {
+                                lowlink[curnode]=dfsnum[row];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        //cout << "On way back up, curnode:" << curnode<< ", lowlink:"<<lowlink[curnode]<< ", dfsnum:"<<dfsnum[curnode]<<endl;
+        if(lowlink[curnode]==dfsnum[curnode])
+        {
+            // At the root of a strongly connected component. 
+            rowinscc.clear();
+                
+            for(vector<SysInt>::iterator tstackit=(tstack.end()-1);  ; --tstackit)
+            {
+                SysInt copynode=(*tstackit);
+                if(copynode<squaresize)   // It's a row. 
+                {
+                    rowinscc.insert(copynode);
+                }
+                
+                if(copynode==curnode)
+                {
+                    break;
+                }
+            }
+            
+            while(true)
+            {
+                SysInt copynode=(*(tstack.end()-1));
+                
+                tstack.pop_back();
+                in_tstack.remove(copynode);
+                
+                if(copynode>=squaresize)
+                {
+                    // It's a column. Iterate through rows and prune whenever the row is not in same scc as this column.
+                    
+                    for(SysInt row=0; row<squaresize; row++)
+                    {
+                        if(!rowinscc.in(row))
+                        {
+                            if(rowcolmatching[row]!=copynode-squaresize) {
+                                var_array[row*squaresize + copynode-squaresize].removeFromDomain(value);
+                            }
+                        }
+                    }
+                }
+
+                if(copynode==curnode)
+                {
+                    break;
+                }
+            }
+                
+            
+        }
+    }
   
   
   
