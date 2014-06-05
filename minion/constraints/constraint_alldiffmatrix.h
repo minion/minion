@@ -94,7 +94,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
     vector<SysInt> colrowmatching;   // For each column, the matching row. 
     
     virtual string constraint_name()
-    { 
+    {
         return "alldiffmatrix";
     }
     
@@ -104,13 +104,9 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
   SysInt dynamic_trigger_count()
   {
       // Need one per variable on the value of interest, and one on any other value. 
-      // Two blocks : first the triggers on the value of interest (for all vars) then triggers on some other value. 
-      return var_array.size();
-  }
-  
-  inline DynamicTrigger * get_dt(SysInt var)
-  {
-      return dynamic_trigger_start() + var;
+      // Two blocks : first the triggers on the value of interest (for all vars) then triggers for assignment.
+      // Need to know when assigned to value. 
+      return var_array.size()*2;
   }
   
   inline bool hasValue(int row, int col) {
@@ -118,6 +114,10 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
       return var_array[row*squaresize+col].inDomain(value);
   }
   
+  inline bool assignedValue(int row, int col) {
+      return var_array[row*squaresize+col].isAssigned() 
+            && var_array[row*squaresize+col].getAssignedValue()==value;
+  }
   
   
   typedef typename VarArrayType::value_type VarRef;
@@ -156,11 +156,33 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
   
   virtual void propagate(DynamicTrigger* trig)
   {
-      // One of the value has been pruned somewhere. 
-      if(!constraint_locked)
-      {
-          constraint_locked = true;
-          getQueue(stateObj).pushSpecialTrigger(this);
+      if(trig-dynamic_trigger_start() < var_array.size()) {
+          // One of the value has been pruned somewhere
+          // Need to propagate.
+          if(!constraint_locked)
+          {
+              constraint_locked = true;
+              getQueue(stateObj).pushSpecialTrigger(this);
+          }
+      }
+      else {
+          D_ASSERT(trig-dynamic_trigger_start() < var_array.size()*2);
+          // In the second block. Something was assigned.
+          SysInt vidx=trig-dynamic_trigger_start()-var_array.size();
+          
+          
+          if(var_array[vidx].getAssignedValue()==value) {
+              SysInt row=vidx/squaresize;
+              SysInt col=vidx%squaresize;
+              
+              update_matching_assignment(row, col);
+              
+              // If it was assigned to value, then we need to propagate. 
+              if(!constraint_locked) {
+                  constraint_locked = true;
+                  getQueue(stateObj).pushSpecialTrigger(this);
+              }
+          }
       }
   }
   
@@ -185,6 +207,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
       for(int i=0; i<var_array.size(); i++) {
           if(var_array[i].inDomain(value)) {
               var_array[i].addDynamicTrigger(dynamic_trigger_start()+i, DomainRemoval, value);
+              var_array[i].addDynamicTrigger(dynamic_trigger_start()+i+var_array.size(), Assigned);
           }
       }
       
@@ -248,21 +271,39 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
     
     smallset_nolist visited;
     
+    
+    inline void update_matching_assignment(int row, int col) {
+        D_ASSERT(assignedValue(row, col));
+        
+        if(rowcolmatching[row]!=col) {
+            // First free up row and col. 
+            if(rowcolmatching[row]>-1) {
+                colrowmatching[rowcolmatching[row]]=-1;
+                // rowcolmatching[row]=-1;    // not really necessary
+            }
+            if(colrowmatching[col]>-1) {
+                rowcolmatching[colrowmatching[col]]=-1;
+                // colrowmatching[col]=-1;    // not really necessary
+            }
+            
+            rowcolmatching[row]=col;
+            colrowmatching[col]=row;
+            
+        }
+    }
+    
     inline bool bfsmatching()
     {
-        
         // iterate through the matching looking for broken matches. 
-        for(SysInt row=0; row<squaresize; row++) {
-            if(rowcolmatching[row]>-1  &&  !hasValue(row, rowcolmatching[row])) {
-                SysInt col=rowcolmatching[row];
-                rowcolmatching[row]=-1;
-                colrowmatching[col]=-1;
-            }
-        }
-        
         
         for(SysInt initialrow=0; initialrow<squaresize; initialrow++)
         {
+            if(rowcolmatching[initialrow]>-1  &&  !hasValue(initialrow, rowcolmatching[initialrow])) {
+                SysInt col=rowcolmatching[initialrow];
+                rowcolmatching[initialrow]=-1;
+                colrowmatching[col]=-1;
+            }
+            
             if(rowcolmatching[initialrow]==-1) {
                 augpath.clear();
                 
@@ -305,10 +346,13 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
                             apply_augmenting_path(curnode, initialrow);
                         }
                         else {
-                            if(!visited.in(newnode)) {
-                                visited.insert(newnode);
-                                prev[newnode]=curnode;
-                                fifo.push_back(newnode);
+                            // If the row/col is assigned to value, then we can't traverse the reverse edge. 
+                            if(!assignedValue(newnode, curnode-squaresize)) {
+                                if(!visited.in(newnode)) {
+                                    visited.insert(newnode);
+                                    prev[newnode]=curnode;
+                                    fifo.push_back(newnode);
+                                }
                             }
                         }
                     }
@@ -428,7 +472,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
         }
         
     }
-
+    
     void visit(SysInt curnode, bool toplevel)
     {
         // toplevel is true iff this is the top level of the recursion.
@@ -442,22 +486,26 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
         
         if(curnode<squaresize)
         {
-            SysInt newnode=rowcolmatching[curnode]+squaresize;
-            
-            if(!visited.in(newnode))
-            {
-                visit(newnode, false);
-                if(lowlink[newnode]<lowlink[curnode])
+            // Not allowed to traverse this edge if it is 'assigned' (i.e.
+            // fixed to value 1), because it may be traversed only if it can be
+            // reversed. 
+            if(!assignedValue(curnode, rowcolmatching[curnode])) {
+                SysInt newnode=rowcolmatching[curnode]+squaresize;
+                if(!visited.in(newnode))
                 {
-                    lowlink[curnode]=lowlink[newnode];
+                    visit(newnode, false);
+                    if(lowlink[newnode]<lowlink[curnode])
+                    {
+                        lowlink[curnode]=lowlink[newnode];
+                    }
                 }
-            }
-            else
-            {
-                // Already visited newnode
-                if(in_tstack.in(newnode) && dfsnum[newnode]<lowlink[curnode])
+                else
                 {
-                    lowlink[curnode]=dfsnum[newnode];  // Why dfsnum not lowlink?
+                    // Already visited newnode
+                    if(in_tstack.in(newnode) && dfsnum[newnode]<lowlink[curnode])
+                    {
+                        lowlink[curnode]=dfsnum[newnode];  // Why dfsnum not lowlink?
+                    }
                 }
             }
         }
@@ -550,7 +598,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
             
         }
     }
-  
+    
   
   
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
