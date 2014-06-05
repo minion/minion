@@ -498,7 +498,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
         {
             // At the root of a strongly connected component. 
             rowinscc.clear();
-                
+            
             for(vector<SysInt>::iterator tstackit=(tstack.end()-1);  ; --tstackit)
             {
                 SysInt copynode=(*tstackit);
@@ -528,13 +528,19 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
                     {
                         if(!rowinscc.in(row))
                         {
+                            
                             if(rowcolmatching[row]!=copynode-squaresize) {
+                                ADMPRINT("Pruning row: " << row << " column: "<< copynode-squaresize << " removing value." );
                                 var_array[row*squaresize + copynode-squaresize].removeFromDomain(value);
+                            }
+                            else {
+                                ADMPRINT("Setting row: " << row << " column: "<< copynode-squaresize << " to value.");
+                                var_array[row*squaresize + copynode-squaresize].propagateAssign(value);
                             }
                         }
                     }
                 }
-
+                
                 if(copynode==curnode)
                 {
                     break;
