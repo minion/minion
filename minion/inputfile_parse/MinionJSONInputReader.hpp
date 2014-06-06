@@ -22,6 +22,8 @@
 
 #include "MinionInputReader.h"
 #include "../minlib/gason/gason.h"
+#include "../minlib/gason/gason-helper.h"
+
 
 #define MAYBE_PARSER_INFO(X) { if(this->parser_verbose) { this->parser_info(X); } }
 
