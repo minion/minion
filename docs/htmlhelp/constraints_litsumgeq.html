@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>constraints litsumgeq</title>
+</head>
+<body>
+<h1>Help on <tt>constraints litsumgeq</tt></h1>
+<h3>Description</h3>
+<pre>
+The constraint litsumgeq(vec1, vec2, c) ensures that there exists at least c
+distinct indices i such that vec1[i] = vec2[i].
+</pre>
+<h3>Notes</h3>
+<pre>
+A SAT clause {x,y,z} can be created using:
+
+   litsumgeq([x,y,z],[1,1,1],1)
+
+Note also that this constraint is more efficient for smaller values of c. For
+large values consider using watchsumleq.
+</pre>
+<h3>Reifiability</h3>
+<pre>
+This constraint is not reifiable.
+</pre>
+<h3>References</h3>
+<pre>
+See also
+
+   help constraints watchsumleq
+   help constraints watchsumgeq
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

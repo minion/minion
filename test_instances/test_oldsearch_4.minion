@@ -1,0 +1,22 @@
+MINION 1
+#TEST SOLCOUNT 1
+1
+0
+0
+3
+0 2 3
+0
+[x0]
+[a]
+1
+[x0,x1,x2,x3]
+0
+0
+objective none
+print v0
+ineq(x0,x1,0)
+ineq(x0,x2,0)
+ineq(x0,x3,0)
+diseq(x1,x2)
+diseq(x2,x3)
+diseq(x3,x1)

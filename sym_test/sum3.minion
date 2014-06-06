@@ -1,0 +1,17 @@
+MINION 3
+#TEST GROUP 24*24
+
+**VARIABLES**
+
+DISCRETE b[4] {1..3}
+
+DISCRETE c[4] {1..3}
+**CONSTRAINTS**
+
+sumleq(b, 1)
+sumgeq(b, 1)
+
+
+**EOF**
+
+
