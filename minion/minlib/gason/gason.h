@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 #include <assert.h>
 
 #define JSON_VALUE_PAYLOAD_MASK 0x00007FFFFFFFFFFFULL
@@ -120,7 +121,3 @@ public:
 };
 
 JsonParseStatus jsonParse(char *str, char **endptr, JsonValue *value, JsonAllocator &allocator);
-
-void gason_print_error(const char *filename, JsonParseStatus status, char *endptr, char *source, size_t size);
-
-const char* jsonTagToString(JsonTag tag);
