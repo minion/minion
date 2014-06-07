@@ -159,6 +159,16 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
       if(trig-dynamic_trigger_start() < var_array.size()) {
           // One of the value has been pruned somewhere
           // Need to propagate.
+          
+          SysInt vidx=trig-dynamic_trigger_start();
+          SysInt row=vidx/squaresize;
+          SysInt col=vidx%squaresize;
+          
+          if(rowcolmatching[row]==col) {
+              colrowmatching[col]=-1;
+              rowcolmatching[row]=-1;
+          }
+          
           if(!constraint_locked)
           {
               constraint_locked = true;
@@ -202,6 +212,12 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
+      // Clear the two matching arrays
+      for(int i=0; i<squaresize; i++) {
+          rowcolmatching[i]=-1;
+          colrowmatching[i]=-1;
+      }
+      
       // Set up triggers. 
       
       for(int i=0; i<var_array.size(); i++) {
@@ -209,15 +225,28 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
               var_array[i].addDynamicTrigger(dynamic_trigger_start()+i, DomainRemoval, value);
               var_array[i].addDynamicTrigger(dynamic_trigger_start()+i+var_array.size(), Assigned);
           }
+          
+          if(var_array[i].isAssigned() && var_array[i].getAssignedValue()==value) {
+              SysInt row=i/squaresize;
+              SysInt col=i%squaresize;
+              
+              // If two assignments in one row or column...
+              if(rowcolmatching[row]!=-1  ||  colrowmatching[col]!=-1) {
+                  getState(stateObj).setFailed(true);
+                  return;
+              }
+              else {
+                  rowcolmatching[row]=col;
+                  colrowmatching[col]=row;
+              }
+          }
       }
       
-      // Clear the two matching arrays
       
-      for(int i=0; i<squaresize; i++) {
-          rowcolmatching[i]=-1;
-          colrowmatching[i]=-1;
+      if(getState(stateObj).isFailed())
+      {
+          return;
       }
-      
       do_prop();
   }
   
@@ -276,14 +305,25 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
         D_ASSERT(assignedValue(row, col));
         
         if(rowcolmatching[row]!=col) {
-            // First free up row and col. 
+            // Could be the row or column is already assigned
+            if(rowcolmatching[row]!=-1 && assignedValue(row, rowcolmatching[row])) {
+                getState(stateObj).setFailed(true);
+                return;
+            }
+            
+            if(colrowmatching[col]!=-1 && assignedValue(colrowmatching[col], col)) {
+                getState(stateObj).setFailed(true);
+                return;
+            }
+            
+            // First free up row and col.
             if(rowcolmatching[row]>-1) {
                 colrowmatching[rowcolmatching[row]]=-1;
-                // rowcolmatching[row]=-1;    // not really necessary
+                // rowcolmatching[row]=-1;    // not necessary
             }
             if(colrowmatching[col]>-1) {
                 rowcolmatching[colrowmatching[col]]=-1;
-                // colrowmatching[col]=-1;    // not really necessary
+                // colrowmatching[col]=-1;    // not necessary
             }
             
             rowcolmatching[row]=col;
@@ -294,15 +334,35 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
     
     inline bool bfsmatching()
     {
+        for(int row=0; row<squaresize; row++) {
+            for(int col=0; col<squaresize; col++) {
+                if(rowcolmatching[row]==col) {
+                    D_ASSERT(colrowmatching[col]==row);
+                }
+                
+                if(! hasValue(row, col)) {
+                    D_ASSERT(rowcolmatching[row]!=col);
+                    D_ASSERT(colrowmatching[col]!=row);
+                }
+                
+                if( assignedValue(row, col)) {
+                    D_ASSERT(rowcolmatching[row]==col);
+                    D_ASSERT(colrowmatching[col]==row);
+                }
+            }
+        }
+        
+        
+        
         // iterate through the matching looking for broken matches. 
         
         for(SysInt initialrow=0; initialrow<squaresize; initialrow++)
         {
-            if(rowcolmatching[initialrow]>-1  &&  !hasValue(initialrow, rowcolmatching[initialrow])) {
+            /*if(rowcolmatching[initialrow]>-1  &&  !hasValue(initialrow, rowcolmatching[initialrow])) {
                 SysInt col=rowcolmatching[initialrow];
                 rowcolmatching[initialrow]=-1;
                 colrowmatching[col]=-1;
-            }
+            }*/
             
             if(rowcolmatching[initialrow]==-1) {
                 augpath.clear();
