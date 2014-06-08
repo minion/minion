@@ -185,7 +185,11 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
               SysInt row=vidx/squaresize;
               SysInt col=vidx%squaresize;
               
-              update_matching_assignment(row, col);
+              bool f=update_matching_assignment(row, col);
+              if(!f) {
+                  getState(stateObj).setFailed(true);
+                  return;
+              }
               
               // If it was assigned to value, then we need to propagate. 
               if(!constraint_locked) {
@@ -301,19 +305,17 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
     smallset_nolist visited;
     
     
-    inline void update_matching_assignment(int row, int col) {
+    inline bool update_matching_assignment(int row, int col) {
         D_ASSERT(assignedValue(row, col));
         
         if(rowcolmatching[row]!=col) {
             // Could be the row or column is already assigned
             if(rowcolmatching[row]!=-1 && assignedValue(row, rowcolmatching[row])) {
-                getState(stateObj).setFailed(true);
-                return;
+                return false;
             }
             
             if(colrowmatching[col]!=-1 && assignedValue(colrowmatching[col], col)) {
-                getState(stateObj).setFailed(true);
-                return;
+                return false;
             }
             
             // First free up row and col.
@@ -330,10 +332,16 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
             colrowmatching[col]=row;
             
         }
+        return true;
     }
     
     inline bool bfsmatching()
     {
+        // This function assumes the matching has been 'cleaned up' 
+        // i.e. there are no matching edges if the value is not in domain,
+        // and if the variable is assigned to value then the edge is in the matching. 
+        
+        D_DATA(
         for(int row=0; row<squaresize; row++) {
             for(int col=0; col<squaresize; col++) {
                 if(rowcolmatching[row]==col) {
@@ -350,23 +358,12 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
                     D_ASSERT(colrowmatching[col]==row);
                 }
             }
-        }
-        
-        
+        })
         
         // iterate through the matching looking for broken matches. 
         
-        for(SysInt initialrow=0; initialrow<squaresize; initialrow++)
-        {
-            /*if(rowcolmatching[initialrow]>-1  &&  !hasValue(initialrow, rowcolmatching[initialrow])) {
-                SysInt col=rowcolmatching[initialrow];
-                rowcolmatching[initialrow]=-1;
-                colrowmatching[col]=-1;
-            }*/
-            
+        for(SysInt initialrow=0; initialrow<squaresize; initialrow++) {
             if(rowcolmatching[initialrow]==-1) {
-                augpath.clear();
-                
                 // starting from a row, find a path to a free column. 
                 
                 // No adjacency lists.
@@ -663,13 +660,44 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
   
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
+      // Clean up the matching first.
+      for(int row=0; row<squaresize; row++) {
+          if(rowcolmatching[row]>-1 && ! hasValue(row, rowcolmatching[row])) {
+              colrowmatching[rowcolmatching[row]]=-1;
+              rowcolmatching[row]=-1;
+          }
+      }
+      
+      for(int row=0; row<squaresize; row++) {
+          for(int col=0; col<squaresize; col++) {
+              if(assignedValue(row, col)) {
+                  bool f=update_matching_assignment(row, col);
+                  if(!f) return false;
+              }
+          }
+      }
+      
       bool matchok=bfsmatching();
+      
+      ADMPRINT(rowcolmatching);
+      ADMPRINT(colrowmatching);
       
       if(!matchok) return false;
       
       for(SysInt row=0; row<squaresize; row++) {
-          SysInt col=rowcolmatching[row];
-          assignment.push_back(make_pair((row*squaresize)+col, value));
+          for(SysInt col=0; col<squaresize; col++) {
+              if(rowcolmatching[row]==col) {
+                  assignment.push_back(make_pair((row*squaresize)+col, value));
+              }
+              else {
+                  if(var_array[row*squaresize+col].getMax()!=value) {
+                      assignment.push_back(make_pair((row*squaresize)+col, var_array[row*squaresize+col].getMax()));
+                  }
+                  else {
+                      assignment.push_back(make_pair((row*squaresize)+col, var_array[row*squaresize+col].getMin()));
+                  }
+              }
+          }
       }
       return true;
   }
