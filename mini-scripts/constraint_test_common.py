@@ -1000,7 +1000,7 @@ class testalldiffmatrix:
         return out
         
     def runtest(self, options=dict()):
-        return runtestgeneral("alldiffmatrix", False, options, [9,1], ["quitesmallnum", "const"], self, not options['reify'])
+        return runtestgeneral("alldiffmatrix", False, options, [9,1], ["smallnum", "const"], self, not options['reify'])
 
 
 class testdiseq(testalldiff):

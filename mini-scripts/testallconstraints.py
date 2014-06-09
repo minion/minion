@@ -23,7 +23,7 @@ conslist=[]
 conslist+=["diseq", "eq", "gaceq"]
 
 # alldiffs
-conslist+=["alldiff", "gacalldiff"]
+conslist+=["alldiff", "gacalldiff", "alldiffmatrix"]
 
 # capacity constraints
 conslist+=["gcc", "gccweak", "occurrence", "occurrenceleq", "occurrencegeq"]
