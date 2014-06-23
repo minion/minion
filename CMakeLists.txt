@@ -46,7 +46,7 @@ else()
     message(STATUS "No HG executable found, unable to determine HG version and date")
 endif()
 
-set(CFLAGS "${CFLAGS} -std=c++0x")
+set(CFLAGS "${CFLAGS} -std=gnu++11")
 
 file(APPEND ${BUILD_DEF_FILE} "#define HG_VER ${HGVERSION}\n")
 file(APPEND ${BUILD_DEF_FILE} "#define HG_DATE ${HGDATE}\n")
