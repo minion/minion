@@ -582,7 +582,7 @@ vector<vector<Var> > MinionJSONInputReader::read2DMatrix(JsonValue infile)
 vector<vector<Var> > MinionJSONInputReader::read2DMatrixVariable(JsonValue infile) {
   assert(0);
   string name; /*= infile->get_string();
-/*
+
   Var var = instance->vars.getSymbol(name);
   // Check it is a matrix
   if(var.type() != VAR_MATRIX)
@@ -950,6 +950,29 @@ void MinionJSONInputReader::readAliasMatrix(JsonValue infile, const vector<Domai
 
 void MinionJSONInputReader::readVars(JsonValue infile) {
   assert(0);
+
+  check_tag(infile, JSON_TAG_OBJECT, "variables must be an object");
+
+  for(auto i : infile)
+  {
+    std::string name = i->key;
+    JsonValue domain = i->value;
+    check_tag(domain, JSON_TAG_OBJECT, "variable description must be an object");
+
+    JsonValue type_json = jsonGetKey(domain, "type");
+    check_tag(type_json, JSON_TAG_STRING, "variable type must be a string");
+    std::string var_type = type_json.toString();
+    if(var_type != "BOOL" && var_type != "BOUND" && var_type != "SPARSEBOUND"
+      && var_type != "DISCRETE" && var_type != "ALIAS")
+      throw parse_exception(string("Unknown variable type: '") + var_type + "'");
+
+    VariableType variable_type = VAR_INVALID;
+
+    if(var_type == "BOOL")
+    { variable_type = VAR_BOOL; }
+    else if(var_type == "BOUND")
+    { variable_type = VAR_BOUND; }
+  }
   /*
   while(infile->peek_char() != '*')
   {
@@ -963,44 +986,11 @@ void MinionJSONInputReader::readVars(JsonValue infile) {
     string varname = infile->get_string();
     MAYBE_PARSER_INFO("Name:" + varname);
 
-    bool isArray = false;
     vector<DomainInt> indices;
 
-    if(infile->peek_char() == '[')
-    {
-      MAYBE_PARSER_INFO("Is array!");
-      isArray = true;
-      indices = readConstantVector(infile);
-      for(UnsignedSysInt i = 0; i < indices.size(); ++i)
-        if(indices[i] < 0)
-          throw parse_exception("Matrix " + varname + " has a negative size for index " + tostring(i));
-      MAYBE_PARSER_INFO("Found " + tostring(indices.size()) + " indices");
-    }
 
-    VariableType variable_type = VAR_INVALID;
     vector<DomainInt> domain;
 
-    if(var_type == "ALIAS")
-    {
-      if(isArray == false)
-      {
-        infile->check_sym('='); // XYZ
-        Var v = readIdentifier(infile);
-        instance->vars.addSymbol(varname, v);
-      }
-      else
-      {
-        instance->vars.addMatrixSymbol(varname, indices);
-        infile->check_sym('=');
-        infile->check_sym('[');
-        readAliasMatrix(infile, indices, vector<DomainInt>(), varname);
-        infile->check_sym(']');
-      }
-    }
-    else if(var_type == "BOOL")
-    {
-      variable_type = VAR_BOOL;
-    }
     else if(var_type == "BOUND")
     {
       variable_type = VAR_BOUND;
@@ -1038,30 +1028,6 @@ void MinionJSONInputReader::readVars(JsonValue infile) {
     else
       throw parse_exception("I don't know about var_type '" + var_type + "'");
 
-    if(var_type != "ALIAS")
-    {
-      if(isArray)
-      {
-        instance->vars.addMatrixSymbol(varname, indices);
-        // If any index is 0, don't add any variables.
-        if(find(indices.begin(), indices.end(), 0) == indices.end())
-        {
-          vector<DomainInt> current_index(indices.size(), 0);
-          MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(current_index));
-          instance->vars.addSymbol(varname + to_var_name(current_index),
-            instance->vars.getNewVar(variable_type, domain));
-          while(increment_vector(current_index, indices))
-          {
-            MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(current_index));
-            instance->vars.addSymbol(varname + to_var_name(current_index),
-              instance->vars.getNewVar(variable_type, domain));
-          }
-
-          vector<vector<Var> > matrix_list = instance->vars.flattenTo2DMatrix(varname);
-          for(SysInt i = 0; i < matrix_list.size(); ++i)
-            instance->all_vars_list.push_back(matrix_list[i]);
-        }
-      }
       else
       {
         Var v = instance->vars.getNewVar(variable_type, domain);

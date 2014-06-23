@@ -40,6 +40,7 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
   MinionJSONInputReader readerJSON(parser_verbose, mltts);
 
   bool needs_finalise_three = false;
+  bool needs_finalise_json = false;
   for(vector<string>::const_iterator fname = fnames.begin(); fname != fnames.end(); fname++) {
     const char* filename = fname->c_str();
     string extension;
@@ -71,6 +72,7 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
 
     try
     {
+#if 0
       if(cs.peek() == '{' || cs.peek() == '/')
       {
           std::string stripped = removeComments(cs.get_raw_string());
@@ -83,9 +85,10 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
           readerJSON.instance = &instance;
           readerJSON.read(value);
           getTableOut().set(string("Filename"), filename);
-          needs_finalise_three = true;
+          needs_finalise_json = true;
       }
       else
+#endif
       {
         string test_name = infile.get_string();
         if(test_name != "MINION")
@@ -146,5 +149,9 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
   {
       readerThree.finalise();
      // instance = std::move(readerThree.instance);
+  }
+  if(needs_finalise_json)
+  {
+    readerJSON.finalise();
   }
 }

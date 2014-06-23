@@ -1,4 +1,6 @@
 #include "gason.h"
+#include "gason-helper.h"
+
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -60,4 +62,15 @@ const char* jsonTagToString(JsonTag tag)
 		case JSON_TAG_NULL: return "null";
 		default: abort();
 	}
+}
+
+JsonValue jsonGetKey(JsonValue js, std::string key)
+{
+	assert(js.getTag() == JSON_TAG_OBJECT);
+	for(auto i : js)
+	{
+		if(i->key == key)
+			return i->value;
+	}
+	return JsonValue{};
 }
