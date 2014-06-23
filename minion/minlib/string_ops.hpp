@@ -78,6 +78,7 @@ inline void writeFile(std::string fileName, std::string contents)
 	t << contents;
 }
 
+#ifndef _WIN32
 /// Execute a program and return a pair 'retval, output'
 inline std::pair<int, std::string> executeProgram(std::string cmd) {
 	std::string data;
@@ -97,6 +98,7 @@ inline std::pair<int, std::string> executeProgram(std::string cmd) {
 	int retval = pclose(stream);
 	return make_pair(retval, data);
 }
+#endif
 /** @}
  */
 

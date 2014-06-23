@@ -33,6 +33,9 @@ inline long get_max_rss()
 #else
 
 #ifdef _WIN32
+#include <ctime.h>
+#include <windows.h>
+
 #define ULL unsigned __int64
 
 inline long double get_wall_time()
