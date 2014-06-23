@@ -43,6 +43,12 @@ inline long double get_wall_time()
     return (long double)(clock()) / CLOCKS_PER_SEC;
 }
 
+inline long double get_raw_wall_time()
+{
+    return get_wall_time();
+}
+
+
 inline long double get_cpu_time()
 {
     FILETIME creat_t, exit_t, kernel_t, user_t;
