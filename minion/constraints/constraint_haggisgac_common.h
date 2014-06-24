@@ -29,7 +29,7 @@
         literalsScratch.clear();
         if(findNewSupport<true>(0, i))
         {
-            for(SysInt j = 0; j < literalsScratch.size(); ++j)
+            for(SysInt j = 0; j < (SysInt)literalsScratch.size(); ++j)
                 assignment.push_back(literalsScratch[j]);
             return true;
         }
@@ -77,7 +77,7 @@
         set<Support*> myset;
 
         /*
-        for(SysInt i=0; i<vars.size(); i++) {
+        for(SysInt i=0; i<(SysInt)vars.size(); i++) {
             cout << "     i " << i << " Initial Max " << vars[i].getInitialMax() << endl ;
             SysInt numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
             for(SysInt j=0; j<numvals_i; j++) {
@@ -193,7 +193,7 @@
             varsPerSupport.resize(vars.size());
             varsPerSupInv.clear();
             varsPerSupInv.resize(vars.size());
-            for(SysInt i=0; i<vars.size(); i++) {
+            for(SysInt i=0; i<(SysInt)vars.size(); i++) {
                 varsPerSupport[i]=i;
                 varsPerSupInv[i]=i;
             }
@@ -206,7 +206,7 @@
 
             tuple_list_pos.clear();
             tuple_list_pos.resize(vars.size());
-            for(SysInt var=0; var<vars.size(); var++) {
+            for(SysInt var=0; var<(SysInt)vars.size(); var++) {
                 SysInt domsize = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
                 tuple_list_pos[var].clear();
                 tuple_list_pos[var].resize(domsize, 0);
@@ -284,7 +284,7 @@
         // Partition
         varsPerSupport.resize(vars.size());
         varsPerSupInv.resize(vars.size());
-        for(SysInt i=0; i<vars.size(); i++) {
+        for(SysInt i=0; i<(SysInt)vars.size(); i++) {
             varsPerSupport[i]=i;
             varsPerSupInv[i]=i;
         }
@@ -295,7 +295,7 @@
         for(SysInt i=1; i<= numlits; i++) supportNumPtrs[i]=vars.size();
 
         tuple_list_pos.resize(vars.size());
-        for(SysInt var=0; var<vars.size(); var++) {
+        for(SysInt var=0; var<(SysInt)vars.size(); var++) {
             SysInt domsize = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
             tuple_list_pos[var].resize(domsize, 0);
         }

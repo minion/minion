@@ -22,7 +22,7 @@
 
 /** @help constraints;lighttable Description
 An extensional constraint that enforces GAC. The constraint is
-specified via a list of tuples. lighttable is a variant of the 
+specified via a list of tuples. lighttable is a variant of the
 table constraint that is stateless and potentially faster
 for small constraints.
 
@@ -150,12 +150,12 @@ struct LightTableConstraint : public AbstractConstraint
   TupleList* tuples;
   TableDataType* data;   // Assuming this is a TrieData for the time being.
   // Can this be the thing instead of a *??
-  
+
   LightTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
   AbstractConstraint(stateObj), vars(_vars), tuples(_tuples), data(new TableDataType(_tuples))
   {
       CheckNotBound(vars, "table constraints","");
-      if(_tuples->tuple_size()!=_vars.size())
+      if(_tuples->tuple_size()!=(SysInt)_vars.size())
       {
           cout << "Table constraint: Number of variables "
             << _vars.size() << " does not match length of tuples "
@@ -163,21 +163,21 @@ struct LightTableConstraint : public AbstractConstraint
           FAIL_EXIT();
       }
   }
-  
+
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    for(SysInt i=0; i<vars.size(); i++)
+    for(SysInt i=0; i<(SysInt)vars.size(); i++)
     {
         t.push_back(make_trigger(vars[i], Trigger(this, i), DomainChanged));
     }
     return t;
   }
-  
+
   virtual void propagate(DomainInt changed_var, DomainDelta)
   {
       // Propagate to all vars except the one that changed.
-      for(SysInt i=0; i<vars.size(); i++)
+      for(SysInt i=0; i<(SysInt)vars.size(); i++)
       {
           if(i!=changed_var)
           {
@@ -185,21 +185,21 @@ struct LightTableConstraint : public AbstractConstraint
           }
       }
   }
-  
+
   void propagate_var(SysInt varidx)
   {
       VarRef var=vars[varidx];
-      
+
       for(DomainInt val=var.getMin(); val<=var.getMax(); val++)
       {
           if(var.inDomain(val))
           {
               // find the right trie first.
-              
+
               TupleTrie& trie =data->tupleTrieArrayptr->getTrie(varidx);
-              
+
               bool support=trie.search_trie_nostate(val, vars);
-              
+
               if(!support)
               {
                   var.removeFromDomain(val);
@@ -207,15 +207,15 @@ struct LightTableConstraint : public AbstractConstraint
           }
       }
   }
-  
+
   virtual void full_propagate()
   {
-      for(SysInt i=0; i<vars.size(); i++)
+      for(SysInt i=0; i<(SysInt)vars.size(); i++)
       {
           propagate_var(i);
       }
   }
-  
+
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     return data->checkTuple(v, v_size);

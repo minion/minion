@@ -93,7 +93,7 @@ namespace Controller
         else
         {
             vector<shared_ptr<VariableOrder> > vovector;
-            for(SysInt i=0; i<order.size(); i++)
+            for(SysInt i=0; i<(SysInt)order.size(); i++)
             {
                 vovector.push_back(make_search_order(order[i], stateObj));
                 if(order[i].find_one_assignment && i!= order.size()-1)
@@ -144,7 +144,7 @@ shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
 
     vector<AnyVarRef> all_vars;
 
-    for(SysInt i=0; i<order.size(); i++)
+    for(SysInt i=0; i<(SysInt)order.size(); i++)
     {
         for(SysInt j=0; j<order[i].var_order.size(); j++)
         {

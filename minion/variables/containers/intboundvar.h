@@ -380,7 +380,7 @@ struct BoundVarContainer {
   void addVariables(const vector<pair<SysInt, Bounds > >& vars)
   {
     D_ASSERT(!lock_m);
-    for(SysInt i = 0; i < vars.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)vars.size(); ++i)
     {
       D_ASSERT(vars[i].second.lower_bound >= DomainInt_Min);
       D_ASSERT(vars[i].second.upper_bound <= DomainInt_Max);

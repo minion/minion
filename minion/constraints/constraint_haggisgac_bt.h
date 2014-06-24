@@ -519,7 +519,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
                     for(DomainInt val=vars[var].getMin(); val<=vars[var].getMax(); val++) {
                         SysInt lit=firstLiteralPerVar[var]+val-vars[var].getInitialMin();
                     #else
-                    for(SysInt j=0; j<zeroLits[var].size() && supportsPerVar[var]==supports; j++) {
+                    for(SysInt j=0; j<(SysInt)zeroLits[var].size() && supportsPerVar[var]==supports; j++) {
                         SysInt lit=zeroLits[var][j];
             if(literalList[lit].supportCellList != 0){
                             // No longer a zero val. remove from vector.
@@ -569,7 +569,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
        litsWithLostExplicitSupport.resize(0);
        varsWithLostImplicitSupport.resize(0);
 
-       for(SysInt i=0; i<vars.size(); i++) {
+       for(SysInt i=0; i<(SysInt)vars.size(); i++) {
                varsWithLostImplicitSupport.push_back(i);
        }
 

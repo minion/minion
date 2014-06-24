@@ -65,7 +65,7 @@ template<typename Var>
     }
     else
     {
-      for(SysInt i = 0; i < vals.size(); ++i)
+      for(SysInt i = 0; i < (SysInt)vals.size(); ++i)
         var.removeFromDomain(vals[i]);
     }
   }

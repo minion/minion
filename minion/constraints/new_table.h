@@ -347,7 +347,7 @@ struct NewTableConstraint : public AbstractConstraint
             vector<DomainInt>* support = state.findSupportingTuple(vars, Literal(0, x));
             if(support)
             {
-                for(SysInt i=0; i<vars.size(); i++) {
+                for(SysInt i=0; i<(SysInt)vars.size(); i++) {
                     D_ASSERT(vars[i].inDomain((*support)[i]));
                     assignment.push_back(make_pair(i, (*support)[i]));
                 }

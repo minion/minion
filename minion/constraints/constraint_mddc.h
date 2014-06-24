@@ -283,7 +283,7 @@ struct MDDC : public AbstractConstraint
         // Set up gacvalues.
 
         gacvalues.resize(vars.size());
-        for(SysInt i=0; i<vars.size(); i++) {
+        for(SysInt i=0; i<(SysInt)vars.size(); i++) {
             gacvalues[i].initialise(vars[i].getInitialMin(), vars[i].getInitialMax());
         }
 
@@ -681,7 +681,7 @@ struct MDDC : public AbstractConstraint
         gyes.clear();
 
         // Clear gacvalues
-        for(SysInt var=0; var<vars.size(); var++) {
+        for(SysInt var=0; var<(SysInt)vars.size(); var++) {
             gacvalues[var].clear();
         }
 

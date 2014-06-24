@@ -23,7 +23,7 @@
 
 #include <limits.h> /* INT_MIN, INT_MAX */
 
-std::vector<std::vector<DomainInt> > 
+std::vector<std::vector<DomainInt> >
 build_graph(std::vector<std::set<SysInt> > graph, const std::vector<std::set<SysInt> >& partition);
 
 SysInt
@@ -81,7 +81,7 @@ partition_graph(const std::tuple<SysInt,vector<set<SysInt> >,vector<set<SysInt> 
         diff_count++;
 
   return (double)(diff_count) / (double)(partition_num.size() * partition_num.size());
- 
+
 }
 
 template<typename Name = string, typename Colour = string>
@@ -91,15 +91,15 @@ struct Graph
   map<Name, set<Colour> > aux_vertex_colour;
   map<Name, set<Colour> > var_vertex_colour;
   SysInt free_vertices;
-  
+
   Graph() : free_vertices(0) { }
-    
+
   Name new_vertex()
   {
     free_vertices++;
     return "F." + tostring(free_vertices);
   }
-  
+
   Name new_vertex(string colour)
   {
     free_vertices++;
@@ -107,7 +107,7 @@ struct Graph
     aux_vertex_colour[colour].insert(s);
     return s;
   }
-  
+
   void output_graph()
    {
      for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
@@ -147,12 +147,12 @@ struct Graph
      map<string, SysInt> v_num;
 
      SysInt var_vertex_count = 0, aux_vertex_count = 0;
-     for(map<string, set<string> >::iterator it = var_vertex_colour.begin(); it != var_vertex_colour.end(); ++it)  
+     for(map<string, set<string> >::iterator it = var_vertex_colour.begin(); it != var_vertex_colour.end(); ++it)
        var_vertex_count += it->second.size();
 
      for(map<string, set<string> >::iterator it = aux_vertex_colour.begin(); it != aux_vertex_colour.end(); ++it)
        aux_vertex_count += it->second.size();
-         
+
      if(print_names)
        cout << "varnames := [";
      for(SysInt i = 0; i < csp.sym_order.size(); ++i)
@@ -168,11 +168,11 @@ struct Graph
      // Now output partitions
 
      vector<set<SysInt> > partitions;
-     
+
      set<SysInt> zero;
      zero.insert(0);
      partitions.push_back(zero);
-     
+
      for(map<string, set<string> >::iterator it = var_vertex_colour.begin();
      it != var_vertex_colour.end();
      ++it)
@@ -181,11 +181,11 @@ struct Graph
        set<SysInt> partition;
        for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
          partition.insert(v_num[*it2]);
-       
+
        partitions.push_back(partition);
      }
 
-    
+
      for(map<string, set<string> >::iterator it = aux_vertex_colour.begin();
      it != aux_vertex_colour.end();
      ++it)
@@ -198,13 +198,13 @@ struct Graph
          partition.insert(vertex_counter);
          vertex_counter++;
        }
-       
+
        partitions.push_back(partition);
      }
 
      vector<set<SysInt> > edges(var_vertex_count + aux_vertex_count + 1);
-    
-     
+
+
      for(set<pair<string, string> >::iterator it = graph.begin(); it != graph.end(); ++it)
      {
        //cout << it->first << ":" << it->second << endl;
@@ -228,7 +228,7 @@ struct Graph
      std::tie(var_vertex_count, edges, partitions) = build_graph_info(csp);
 #ifdef USE_NAUTY
      vector<vector<DomainInt> > perms = build_graph(edges, partitions);
-     cout << "generators := [()" << endl;  
+     cout << "generators := [()" << endl;
      for(SysInt i = 0; i < perms.size(); ++i)
      {
        cout << ", PermList([";
@@ -251,12 +251,12 @@ struct Graph
 #else
      cerr << "Need to compile Minion with nauty included!" << endl;
      exit(1);
-#endif     
+#endif
    }
-   
-   
+
+
    string name(Var v, CSPInstance& csp)
-   { 
+   {
      if(v.type() == VAR_CONSTANT)
      {
        string const_name = "CONSTANT_" + tostring(v.pos());
@@ -264,34 +264,34 @@ struct Graph
        return const_name;
      }
      else
-       return csp.vars.getName(v); 
+       return csp.vars.getName(v);
    }
 };
 
 struct GraphBuilder
 {
   CSPInstance& csp;
-  Graph<> g;  
- 
-  
+  Graph<> g;
+
+
   GraphBuilder(CSPInstance& _csp) : csp(_csp)
-  { 
+  {
     csp.add_variable_names();
     if(csp.sym_order.empty())
       D_FATAL_ERROR("Symmetry detection doesn't work with input formats 1 and 2. Upgrade!");
-    
-    build_graph(); 
+
+    build_graph();
   }
-  
-  
+
+
   void build_graph()
   {
     colour_vertices();
-    for(list<ConstraintBlob>::iterator it = csp.constraints.begin(); 
+    for(list<ConstraintBlob>::iterator it = csp.constraints.begin();
         it != csp.constraints.end(); ++it)
       colour_constraint(*it);
   }
-  
+
   void colour_vertices()
   {
     vector<Var> vars = csp.vars.get_all_vars();
@@ -300,9 +300,9 @@ struct GraphBuilder
       g.var_vertex_colour[tostring(csp.vars.get_domain(vars[i]))].insert(csp.vars.getName(vars[i]));
     }
   }
-  
+
   string name(Var v)
-  { 
+  {
     if(v.type() == VAR_CONSTANT)
     {
       string const_name = "CONSTANT_" + tostring(v.pos());
@@ -318,18 +318,18 @@ struct GraphBuilder
 //      return aux_v;
     }
     else
-      return csp.vars.getName(v); 
+      return csp.vars.getName(v);
   }
-  
+
   void add_edge(string s1, string s2)
   { g.graph.insert(make_pair(s1, s2)); }
-  
+
   void add_edge(Var v1, string s2)
   { g.graph.insert(make_pair(name(v1), s2)); }
-  
+
   void add_edge(string s1, Var v2)
   { g.graph.insert(make_pair(s1, name(v2))); }
-  
+
   string colour_element(const ConstraintBlob& b, string name)
   {
      string v = g.new_vertex(name + "_MASTER");
@@ -339,23 +339,23 @@ struct GraphBuilder
        add_edge(v,t);
        add_edge(t, b.vars[0][i]);
      }
-     
+
      string v_index = g.new_vertex(name + "_INDEX");
      add_edge(v, v_index);
      add_edge(v_index, b.vars[1][0]);
-     
+
      string v_result = g.new_vertex(name + "_RESULT");
      add_edge(v, v_result);
      add_edge(v_result, b.vars[2][0]);
-     
+
      return v;
   }
-  
+
   // A constraint where each array is independantly symmetric
   string colour_symmetric_constraint(const ConstraintBlob& b, string name)
   {
-    string v = g.new_vertex(name + "_MASTER");  
-      
+    string v = g.new_vertex(name + "_MASTER");
+
     for(SysInt i = 0; i < b.vars.size(); ++i)
     {
       string nv = g.new_vertex(name + "_CHILD" + tostring(i));
@@ -363,18 +363,18 @@ struct GraphBuilder
       for(SysInt j = 0; j < b.vars[i].size(); ++j)
         add_edge(nv, b.vars[i][j]);
     }
-    
+
     for(SysInt i = 0; i < b.constants.size(); ++i)
     {
       string nv = g.new_vertex(name + "_CHILD_CONST" + tostring(i));
       add_edge(v, nv);
       for(SysInt j = 0; j < b.constants[i].size(); ++j)
-        add_edge(nv, Var(VAR_CONSTANT, b.constants[i][j]) );      
+        add_edge(nv, Var(VAR_CONSTANT, b.constants[i][j]) );
     }
-    
+
     return v;
   }
-  
+
   string colour_eq(const ConstraintBlob& b, string name)
   {
     string v = g.new_vertex(name + "_MASTER");
@@ -382,11 +382,11 @@ struct GraphBuilder
     add_edge(v, b.vars[1][0]);
     return v;
   }
-  
+
   string colour_no_symmetry(const ConstraintBlob& b, string name)
   {
     string v = g.new_vertex(name + "_MASTER");
-    
+
     for(SysInt i = 0; i < b.vars.size(); ++i)
       for(SysInt j = 0; j < b.vars[i].size(); ++j)
       {
@@ -394,10 +394,10 @@ struct GraphBuilder
         add_edge(v, vij);
         add_edge(vij, b.vars[i][j]);
       }
-      
+
     return v;
   }
-  
+
   // Symmetries where the first array can be permuted, if the same permutation
   // is applied to the second array, and also pairs X[i] and Y[i] can be independantly swapped.
   // Other variables are assumed not symmetric.
@@ -405,9 +405,9 @@ struct GraphBuilder
   string colour_array_swap_each_index(const ConstraintBlob& b, string name)
   {
     D_ASSERT(b.vars[0].size() == b.vars[1].size());
-    
+
     string v = g.new_vertex(name + "_MASTER");
-    
+
     // Force each array to stay together.
     for(SysInt i = 0; i < 2; ++i)
     {
@@ -416,7 +416,7 @@ struct GraphBuilder
       for(SysInt j = 0; j < b.vars[i].size(); ++j)
         add_edge(vi, b.vars[i][j]);
     }
-    
+
     for(SysInt i = 0; i < b.vars[0].size(); ++i)
     {
       string vi = g.new_vertex(name + "_INDEX");
@@ -424,43 +424,43 @@ struct GraphBuilder
       add_edge(vi, b.vars[0][i]);
       add_edge(vi, b.vars[1][i]);
     }
-    
+
     for(SysInt i = 2; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
       string vi = g.new_vertex(name + "_POS_" + tostring(i));
       add_edge(v, vi);
     }
-    
+
     return v;
   }
-  
+
   // The first array can be permuted, if the same permutation is applied to the second array.
   string colour_symmetric_indexes(const ConstraintBlob& b, string name)
   {
-   
+
     string v = g.new_vertex(name + "_MASTER");
-    
+
     for(SysInt i = 0; i < b.vars[0].size(); ++i)
     {
       string vm = g.new_vertex(name + "_INDEX");
       string v1 = g.new_vertex(name + "_ARRAY1");
       string v2 = g.new_vertex(name + "_ARRAY2");
-      
+
       add_edge(v,vm);
       add_edge(vm,v1);
       add_edge(vm,v2);
       add_edge(v1, b.vars[0][i]);
       add_edge(v2, b.vars[1][i]);
     }
-    
+
     for(SysInt i = 2; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
       string vi = g.new_vertex(name + "_POS_" + tostring(i));
       add_edge(v, vi);
     }
-    
+
     return v;
   }
 
@@ -470,26 +470,26 @@ struct GraphBuilder
     D_ASSERT(b.vars[0].size() == b.constants[0].size());
 
     string v = g.new_vertex(name + "_MASTER");
-    
+
     for(SysInt i = 0; i < b.vars[0].size(); ++i)
     {
       string vm = g.new_vertex(name + "_INDEX");
       string v1 = g.new_vertex(name + "_ARRAY1");
       string v2 = g.new_vertex(name + "_ARRAY2");
-      
+
       add_edge(v,vm);
       add_edge(vm,v1);
       add_edge(vm,v2);
       add_edge(v1, b.vars[0][i]);
       add_edge(v2, Var(VAR_CONSTANT, b.constants[0][i]));
     }
-    
+
     for(SysInt i = 1; i < b.vars.size(); ++i)
     {
       D_ASSERT(b.vars[i].size() == 1);
       string vi = g.new_vertex(name + "_POS_" + tostring(i));
       add_edge(v, vi);
-    }  
+    }
     return v;
   }
 
@@ -526,13 +526,13 @@ struct GraphBuilder
     D_ASSERT(b.vars[1].size() == b.constants[0].size());
 
     string v = g.new_vertex(name + "_SECOND_MASTER");
-    
+
     for(SysInt i = 0; i < b.vars[1].size(); ++i)
     {
       string vm = g.new_vertex(name + "_INDEX");
       string v1 = g.new_vertex(name + "_ARRAY1");
       string v2 = g.new_vertex(name + "_ARRAY2");
-      
+
       add_edge(v,vm);
       add_edge(vm,v1);
       add_edge(vm,v2);
@@ -541,7 +541,7 @@ struct GraphBuilder
     }
 
     string w = g.new_vertex(name + "_FIRST_MASTER");
-    
+
     for(SysInt j = 0; j < b.vars[0].size(); ++j)
         add_edge(w, b.vars[0][j]);
 
@@ -552,23 +552,23 @@ struct GraphBuilder
 
     return x;
   }
-  
+
   string colour_reify(const ConstraintBlob& b, string name)
   {
     D_ASSERT(b.vars.size() == 1 && b.vars[0].size() == 1);
     D_ASSERT(b.internal_constraints.size() == 1);
-        
+
     string v = g.new_vertex(name + "_HEAD");
-    
+
     string reify_var = g.new_vertex(name + "_REIFYVAR");
-    
+
     add_edge(v, reify_var);
     add_edge(reify_var, b.vars[0][0]);
-    
+
     string child_con = colour_constraint(b.internal_constraints[0]);
-    
+
     add_edge(v, child_con);
-    
+
     return v;
   }
 
@@ -584,7 +584,7 @@ struct GraphBuilder
     }
     return v;
   }
-  
+
   string colour_constraint(const ConstraintBlob& b)
   {
     switch(b.constraint->type)
@@ -622,14 +622,14 @@ struct GraphBuilder
 #ifdef CT_WATCHED_ELEMENT_ONE_ABC
       case CT_WATCHED_ELEMENT_ONE: return colour_element(b, "ELEMENT_ONE");
 #endif
-      
+
 #ifdef CT_ALLDIFF_ABC
       case CT_ALLDIFF: return colour_symmetric_constraint(b, "ALLDIFF");
 #endif
 #ifdef CT_GACALLDIFF_ABC
       case CT_GACALLDIFF: return colour_symmetric_constraint(b, "ALLDIFF");
 #endif
-        
+
 #ifdef CT_WATCHED_NEQ_ABC
       case CT_WATCHED_NEQ: return colour_eq(b, "DISEQ");
 #endif
@@ -639,7 +639,7 @@ struct GraphBuilder
 #ifdef CT_EQ_ABC
       case CT_EQ:    return colour_eq(b, "EQ");
 #endif
-      
+
 #ifdef CT_MINUSEQ_ABC
       case CT_MINUSEQ: return colour_no_symmetry(b, "MINUSEQ");
 #endif
@@ -652,7 +652,7 @@ struct GraphBuilder
 #ifdef CT_WATCHED_LESS_ABC
       case CT_WATCHED_LESS: return colour_no_symmetry(b, "LESS");
 #endif
-      
+
 #ifdef CT_LEXLEQ_ABC
       case CT_LEXLEQ: return colour_no_symmetry(b, "LEXLEQ");
 #endif
@@ -671,14 +671,14 @@ struct GraphBuilder
 #ifdef CT_QUICK_LEXLESS_ABC
       case CT_QUICK_LEXLESS: return colour_no_symmetry(b, "LEXLESS");
 #endif
-      
+
 #ifdef CT_MAX_ABC
       case CT_MAX: return colour_symmetric_constraint(b, "MAX");
 #endif
 #ifdef CT_MIN_ABC
       case CT_MIN: return colour_symmetric_constraint(b, "MIN");
 #endif
-      
+
 #ifdef CT_OCCURRENCE_ABC
       case CT_OCCURRENCE: return colour_symmetric_constraint(b, "OCCURRENCE");
 #endif
@@ -688,50 +688,50 @@ struct GraphBuilder
 #ifdef CT_GEQ_OCCURRENCE_ABC
       case CT_GEQ_OCCURRENCE: return colour_symmetric_constraint(b, "OCC_GEQ");
 #endif
-      
+
 #ifdef CT_PRODUCT2_ABC
       case CT_PRODUCT2: return colour_symmetric_constraint(b, "PRODUCT");
 #endif
-      
+
 #ifdef CT_DIFFERENCE_ABC
       case CT_DIFFERENCE: return colour_symmetric_constraint(b, "DIFFERENCE");
 #endif
-      
+
 #ifdef CT_WEIGHTGEQSUM_ABC
       case CT_WEIGHTGEQSUM: return colour_weighted_sum(b, "WEIGHT_GEQSUM");
 #endif
 #ifdef CT_WEIGHTLEQSUM_ABC
       case CT_WEIGHTLEQSUM: return colour_weighted_sum(b, "WEIGHT_LEQSUM");
 #endif
-      
+
 #ifdef CT_GEQSUM_ABC
       case CT_GEQSUM: return colour_symmetric_constraint(b, "GEQSUM");
 #endif
 #ifdef CT_WATCHED_GEQSUM_ABC
       case CT_WATCHED_GEQSUM: return colour_symmetric_constraint(b, "GEQSUM");
 #endif
-      
+
 #ifdef CT_LEQSUM_ABC
       case CT_LEQSUM: return colour_symmetric_constraint(b, "LEQSUM");
 #endif
 #ifdef CT_WATCHED_LEQSUM_ABC
       case CT_WATCHED_LEQSUM: return colour_symmetric_constraint(b, "LEQSUM");
 #endif
-      
+
 #ifdef CT_WATCHED_TABLE_ABC
       case CT_WATCHED_TABLE: return colour_no_symmetry(b, "TABLE");
 #endif
 #ifdef CT_WATCHED_NEGATIVE_TABLE_ABC
       case CT_WATCHED_NEGATIVE_TABLE: return colour_no_symmetry(b, "NEG_TABLE");
 #endif
-      
+
 #ifdef CT_WATCHED_VECNEQ_ABC
       case CT_WATCHED_VECNEQ: return colour_array_swap_each_index(b, "VECNEQ");
 #endif
 #ifdef CT_WATCHED_LITSUM_ABC
       case CT_WATCHED_LITSUM: return colour_no_symmetry(b, "LITSUM");
 #endif
-      
+
 #ifdef CT_POW_ABC
       case CT_POW: return colour_no_symmetry(b, "POW");
 #endif
@@ -741,11 +741,11 @@ struct GraphBuilder
 #ifdef CT_MODULO_ABC
       case CT_MODULO: return colour_no_symmetry(b, "MOD");
 #endif
-      
+
 #ifdef CT_WATCHED_VEC_OR_AND_ABC
       case CT_WATCHED_VEC_OR_AND: return colour_array_swap_each_index(b, "VEC_OR_AND");
 #endif
-      
+
 #ifdef CT_WATCHED_VEC_OR_LESS_ABC
       case CT_WATCHED_VEC_OR_LESS: return colour_symmetric_indexes(b, "VEC_OR_LESS");
 #endif
@@ -794,9 +794,9 @@ struct GraphBuilder
         cerr << "No colouring defined for " << b.constraint->name << endl;
         abort();
     }
-    
+
   }
-  
+
 };
 
 
@@ -804,7 +804,7 @@ struct InstanceStats
 {
   CSPInstance& csp;
   StateObj* stateObj;
-  
+
   InstanceStats(CSPInstance& _csp, StateObj* _stateObj) : csp(_csp), stateObj(_stateObj)
   { }
 
@@ -924,7 +924,7 @@ struct InstanceStats
             // constraints missing: CT_GADGET, CT_CHECK_GSA, CT_CHECK_ASSIGN.
       }
   }
-  
+
   void output_stats()
   {
       string s("stats_"); // common prefix
@@ -936,7 +936,7 @@ struct InstanceStats
       cout << s << "var_discrete:" << v.discrete.size() << endl;
       cout << s << "var_bound:" << v.bound.size() << endl;
       cout << s << "var_sparsebound:" << v.sparse_bound.size() << endl;
-      
+
       // collect all domain sizes into an array
       vector<DomainInt> domsizes;
       long long int var_memory_usage = 0;
@@ -947,14 +947,14 @@ struct InstanceStats
           var_memory_usage += 1;
           domain_product += log((double)2);
       }
-      for(SysInt i=0; i<v.bound.size(); i++)
+      for(SysInt i=0; i<(SysInt)v.bound.size(); i++)
       {
           SysInt dom_size = checked_cast<SysInt>(v.bound[i].second.upper_bound-v.bound[i].second.lower_bound+1);
           domsizes.push_back(dom_size);
           var_memory_usage += 64;
           domain_product += log((double)dom_size);
       }
-      for(SysInt i=0; i<v.discrete.size(); i++)
+      for(SysInt i=0; i<(SysInt)v.discrete.size(); i++)
       {
           SysInt dom_size = checked_cast<SysInt>(v.discrete[i].second.upper_bound-v.discrete[i].second.lower_bound+1);
           domsizes.push_back(dom_size);
@@ -977,15 +977,15 @@ struct InstanceStats
       cout << s << "dom_50:" << domsizes[domsizes.size()/2] <<endl;
       cout << s << "dom_75:" << domsizes[(domsizes.size()*3)/4] <<endl;
       cout << s << "dom_100:" << domsizes.back() <<endl;
-      
+
       SysInt totaldom=checked_cast<SysInt>(std::accumulate(domsizes.begin(), domsizes.end(), (DomainInt)0));
       cout << s << "dom_mean:" << ((double)totaldom)/(double) domsizes.size() << endl;
-      
+
       SysInt num2s= std::count(domsizes.begin(), domsizes.end(), (DomainInt)2);
       cout << s << "dom_not2_2_ratio:" << ((double) (varcount-num2s) )/(double)num2s << endl;
-      
+
       cout << s << "discrete_bool_ratio:" << ((double) v.discrete.size())/(double)v.BOOLs <<endl;
-      
+
       SysInt branchingvars=0;
       SysInt auxvars=0;
       for(SysInt i=0; i<csp.search_order.size(); i++)
@@ -1002,11 +1002,11 @@ struct InstanceStats
       cout << s << "branchingvars:" << branchingvars <<endl;
       cout << s << "auxvars:" << auxvars <<endl;
       cout << s << "auxvar_branching_ratio:" << ((double)auxvars)/(double)branchingvars <<endl;
-      
+
       //////////////////////////////////////////////////////////////////////////
       // Constraint stats
       list<ConstraintBlob> & c=csp.constraints;
-      
+
       cout <<s << "conscount:" << c.size() <<endl;
       vector<DomainInt> arities;
       for(list<ConstraintBlob>::iterator i=c.begin(); i!=c.end(); ++i)
@@ -1014,13 +1014,13 @@ struct InstanceStats
           arities.push_back(arity(*i));
       }
       std::sort(arities.begin(), arities.end());
-      
+
       cout << s << "arity_0:" << arities[0] <<endl;
       cout << s << "arity_25:" << arities[arities.size()/4] <<endl;
       cout << s << "arity_50:" << arities[arities.size()/2] <<endl;
       cout << s << "arity_75:" << arities[(arities.size()*3)/4] <<endl;
       cout << s << "arity_100:" << arities.back() <<endl;
-      
+
       const SysInt totalarity=checked_cast<SysInt>(std::accumulate(arities.begin(), arities.end(), (DomainInt)0));
 
       cout << s << "TotalArity: " << totalarity << endl;
@@ -1031,15 +1031,15 @@ struct InstanceStats
 
       // alldiff stats
       vector<double> alldiffdomovervars;
-      
+
       // six categories of constraint, output their proportion and count
-      SysInt alldiff=0, sums=0, or_atleastk=0, ternary=0, binary=0, table=0; 
+      SysInt alldiff=0, sums=0, or_atleastk=0, ternary=0, binary=0, table=0;
       SysInt reify=0, lex=0, unary=0, nullary=0, element=0, minmax=0, occurrence=0;
       for(list<ConstraintBlob>::iterator i=c.begin(); i!=c.end(); ++i)
       {
           classifyConstraint(*i, &alldiff, &sums, &or_atleastk, &ternary, &binary, &table, &reify, &lex, &unary, &nullary, &element, &minmax, &occurrence, &alldiffdomovervars, v);
       }
-      
+
       if(alldiffdomovervars.size() == 0) {
         alldiffdomovervars.push_back(0.0);
       }
@@ -1081,27 +1081,27 @@ struct InstanceStats
       cout << s << "minmax_proportion:" << ((double)minmax)/(double)c.size() << endl;
       cout << s << "occurrence_count:" << occurrence << endl;
       cout << s << "occurrence_proportion:" << ((double)occurrence)/(double)c.size() << endl;
-      
-      
+
+
       // Count the number of pairs of constraints that overlap by two or more
       // variables.
       SysInt count_2_overlaps=0;
-      
+
       vector<vector<Var> > var_sets;
-      
+
       for(list<ConstraintBlob>::iterator i = c.begin(); i != c.end(); ++i)
       {
         set<Var> v = find_all_vars(*i);
         var_sets.push_back(vector<Var>(v.begin(), v.end()));
       }
-      
+
       vector<Var> inter;
-      for(SysInt i = 0; i < var_sets.size(); ++i) 
+      for(SysInt i = 0; i < var_sets.size(); ++i)
       {
           for(SysInt j = i+1; j < var_sets.size(); ++j)
           {
               inter.clear();
-              
+
               if(!( !var_sets[i].empty() && !var_sets[j].empty() &&  ((var_sets[i].back() < var_sets[j].front()) || (var_sets[j].back() < var_sets[i].front()))))
                 set_intersection(var_sets[i].begin(), var_sets[i].end(), var_sets[j].begin(), var_sets[j].end(), back_inserter(inter));
               if(inter.size()>=2)
@@ -1110,19 +1110,19 @@ struct InstanceStats
               }
           }
       }
-      
+
       SysInt conspairs=((double)(c.size()*(c.size()-1)))/2.0;
-     
+
       double proportion = 0;
       if(conspairs >0)
         proportion =((double)count_2_overlaps)/conspairs;
       // proportion of pairs of constraints that share two or more variables.
       cout << s << "multi_shared_vars:" << proportion <<endl;
-      
+
       // Edge density of primal graph
       std::set<pair<Var, Var> > seen_pairs;
       SysInt count_pairs=0;
-      for(SysInt i = 0; i < var_sets.size(); ++i) 
+      for(SysInt i = 0; i < var_sets.size(); ++i)
       {
           SysInt size=var_sets[i].size();
           for(SysInt j = 0; j < size; ++j)
@@ -1141,28 +1141,28 @@ struct InstanceStats
           }
       }
       cout << s << "edge_density:" << ((double)count_pairs)/(((double)(varcount*(varcount-1)))/2.0) << endl;
-      
+
       GraphBuilder graph(csp);
       cout << s << "Local_Variance:" << partition_graph(graph.g.build_graph_info(csp, false)) << endl;
-      
+
   }
-  
+
   void output_stats_tightness(vector<AbstractConstraint*> cons)
   {
       vector<DomainInt> tightness;
       string s("stats_");
-      for(SysInt i=0; i<cons.size(); i++)
+      for(SysInt i=0; i<(SysInt)cons.size(); i++)
       {
           tightness.push_back(cons[i]->getTightnessEstimate());
       }
       std::sort(tightness.begin(), tightness.end());
-      
+
       cout << s << "tightness_0:" << tightness[0] <<endl;
       cout << s << "tightness_25:" << tightness[tightness.size()/4] <<endl;
       cout << s << "tightness_50:" << tightness[tightness.size()/2] <<endl;
       cout << s << "tightness_75:" << tightness[(tightness.size()*3)/4] <<endl;
       cout << s << "tightness_100:" << tightness.back() <<endl;
-      
+
       const SysInt totaltightness=checked_cast<SysInt>(std::accumulate(tightness.begin(), tightness.end(), (DomainInt)0));
       cout << s << "tightness_mean:" << ((double)totaltightness)/(double) tightness.size() << endl;
 
@@ -1189,13 +1189,13 @@ struct InstanceStats
       }
 
       std::sort(lit_tightness.begin(), lit_tightness.end());
-      
+
       cout << s << "literal_tightness_0:" << lit_tightness[0] <<endl;
       cout << s << "literal_tightness_25:" << lit_tightness[lit_tightness.size()/4] <<endl;
       cout << s << "literal_tightness_50:" << lit_tightness[lit_tightness.size()/2] <<endl;
       cout << s << "literal_tightness_75:" << lit_tightness[(lit_tightness.size()*3)/4] <<endl;
       cout << s << "literal_tightness_100:" << lit_tightness.back() <<endl;
-      
+
       double new_totaltightness=std::accumulate(lit_tightness.begin(), lit_tightness.end(), 0.0);
       double lt_mean = (double)new_totaltightness / (double)lit_tightness.size();
       cout << s << "literal_tightness_mean:" << lt_mean << endl;
@@ -1207,24 +1207,24 @@ struct InstanceStats
       st_dev = sqrt(st_dev / lit_tightness.size());
       cout << s << "literal_coeff_of_variation:" << st_dev / lt_mean << endl;
   }
-  
+
   SysInt arity(ConstraintBlob& ct)
   {
       return find_all_vars(ct).size();
   }
-  
+
   set<Var> find_all_vars(ConstraintBlob& ct)
   {
       set<Var> t2;
       for(SysInt i = 0; i < ct.vars.size(); ++i )
       {
-          for(SysInt j=0; j<ct.vars[i].size(); j++)
+          for(SysInt j=0; j<(SysInt)ct.vars[i].size(); j++)
           {
             t2.insert(ct.vars[i][j]);
           }
       }
-      
-      for(SysInt i=0; i<ct.internal_constraints.size(); i++)
+
+      for(SysInt i=0; i<(SysInt)ct.internal_constraints.size(); i++)
       {
           set<Var> t3=find_all_vars(ct.internal_constraints[i]);
           for(set<Var>::iterator j=t3.begin(); j!=t3.end(); ++j)
@@ -1232,7 +1232,7 @@ struct InstanceStats
               t2.insert(*j);
           }
       }
-      
+
       // filter out constants here.
       for(set<Var>::iterator i=t2.begin(); i!=t2.end(); )
       {
@@ -1247,9 +1247,9 @@ struct InstanceStats
               i++;
           }
       }
-      
+
       return t2;
   }
-  
-  
+
+
 };

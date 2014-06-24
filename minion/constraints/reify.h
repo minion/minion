@@ -164,7 +164,7 @@ struct reify : public ParentConstraint
         bool flag=child_constraints[1]->get_satisfying_assignment(assignment);
         if(flag)
         {
-            for(SysInt i = 0; i < assignment.size(); ++i)
+            for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
               assignment[i].first += c0vars;
             assignment.push_back(make_pair(reify_var_num, 0));
             return true;
@@ -412,7 +412,7 @@ struct reify : public ParentConstraint
   template<typename T, typename Vars, typename Trigger>
   void watch_assignment(const T& assignment, Vars& vars, Trigger* trig, Trigger* endtrig)
   {
-    for(SysInt i = 0; i < assignment.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
     {
       const SysInt aif = checked_cast<SysInt>(assignment[i].first);
       D_ASSERT(vars[aif].inDomain(assignment[i].second));
@@ -447,7 +447,7 @@ struct reify : public ParentConstraint
     // put the triggers into triggerpairs to check later.
     SysInt cid=((trig==dynamic_trigger_start())?0:1);
     triggerpairs[cid].clear();
-    for(SysInt i=0; i<assignment.size(); i++)
+    for(SysInt i=0; i<(SysInt)assignment.size(); i++)
     {
         triggerpairs[cid].push_back(assignment[i]);
     }

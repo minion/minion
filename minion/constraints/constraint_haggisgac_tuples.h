@@ -45,31 +45,31 @@ struct HaggisGACTuples
         
         const vector<vector<pair<SysInt, DomainInt> > >& tupleRef = (*data->tuplePtr());
         
-        for(SysInt i=0; i<tupleRef.size(); i++) {
+        for(SysInt i=0; i<(SysInt)tupleRef.size(); i++) {
             shortsupports.push_back(new vector<pair<SysInt, DomainInt> >(tupleRef[i]));
         }
 
         
         // Sort it. Might not work when it's pointers.
-        for(SysInt i=0; i<shortsupports.size(); i++) {
+        for(SysInt i=0; i<(SysInt)shortsupports.size(); i++) {
             sort(shortsupports[i]->begin(), shortsupports[i]->end());
         }
         sort(shortsupports.begin(), shortsupports.end(), SupportDeref());
         
         tuple_list_cpy.resize(vars.size());
-        for(SysInt var=0; var<vars.size(); var++) {
+        for(SysInt var=0; var<(SysInt)vars.size(); var++) {
             SysInt domsize = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
             tuple_list_cpy[var].resize(domsize);
             
             for(DomainInt val=vars[var].getInitialMin(); val<=vars[var].getInitialMax(); val++) {
                 // get short supports relevant to var,val.
-                for(SysInt i=0; i<shortsupports.size(); i++) {
+                for(SysInt i=0; i<(SysInt)shortsupports.size(); i++) {
                     bool varin=false;
                     bool valmatches=true;
                     
                     vector<pair<SysInt, DomainInt> > & shortsup=*(shortsupports[i]);
                     
-                    for(SysInt j=0; j<shortsup.size(); j++) {
+                    for(SysInt j=0; j<(SysInt)shortsup.size(); j++) {
                         if(shortsup[j].first==var) {
                             varin=true;
                             if(shortsup[j].second!=val) {
@@ -94,7 +94,7 @@ inline HaggisGACTuples* ShortTupleList::getHaggisData(const Vars& vars)
 {
     vector<pair<DomainInt, DomainInt> > doms;
 
-    for(SysInt i = 0; i < vars.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)vars.size(); ++i)
         doms.push_back(std::make_pair(vars[i].getInitialMin(), vars[i].getInitialMax()));
 
     if(hgt.count(doms) == 0)

@@ -71,7 +71,7 @@ template<typename Vars>
 DomainInt lit_count(Vars& v)
 {
   DomainInt lits = 0;
-  for(SysInt i = 0; i < v.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)v.size(); ++i)
   {
     if(v[i].isBound())
     {

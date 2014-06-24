@@ -13,20 +13,20 @@ int numsearchvars;
 
 vector<int> searchvars;
 
-void outvar (int var) 
-{ 
-  cout << "x" << var ; 
+void outvar (int var)
+{
+  cout << "x" << var ;
 }
 
 
 int varinfo (int k, int p)
-{ 
+{
   cout << 0 << endl ;  // booleans
   cout << 0 << endl ;  // bounds of type 1
   cout << 0 << endl ;  // bounds of type 2
 
   numdiffs = p*(k*(k-1))/2 + (p-1)*k;
-  numsearchvars = k*p + numdiffs - k; 
+  numsearchvars = k*p + numdiffs - k;
   int numvars = numsearchvars + 2*numdiffs;    // -k for nodevars used for diffs
 
   cout << numvars << endl ; // number of discrete vars
@@ -39,36 +39,36 @@ int varinfo (int k, int p)
   return numvars;
 }
 
-int nodevar (int i, int clique, int k, int p) 
+int nodevar (int i, int clique, int k, int p)
 {
   return clique*k + i;
 }
 
 // Returns -1 to mean that no such difference var exists
 //
-// We will insist that x0 = 0 
+// We will insist that x0 = 0
 // It is more efficient in propagation to use ti for diff(ti,t0)
 
-// the first n vars are 0 ... k*p-1 for the ticks 
+// the first n vars are 0 ... k*p-1 for the ticks
 // then we have k*(p-1) - 1 for differences along the paths
 // then the remainder for differences in a clique
 
-int diffvar (int i, int j, int k, int p) 
+int diffvar (int i, int j, int k, int p)
 {
 
-  if ( (i >= k*p) or 
-       (j >= k*p) or 
-       (i == j) or 
+  if ( (i >= k*p) or
+       (j >= k*p) or
+       (i == j) or
        ((i/k) > (j/k) +1) or
-       ((j/k) > (i/k) +1) or 
-       ((i/k) != (j/k) and  (i%k != j%k) ) 
+       ((j/k) > (i/k) +1) or
+       ((i/k) != (j/k) and  (i%k != j%k) )
      )
   {
     //cerr << i << " " << j << " " <<  endl;
     return -1;
   }
 
-  int result;
+  int result = -1;
   int first  = ( i < j ? i : j);
   int second = ( i < j ? j : i);
   //int clique = first / k;
@@ -77,20 +77,20 @@ int diffvar (int i, int j, int k, int p)
     result= (second);
   else if ( (first/k) != (second/k) )            //
   {
-    result= (k*p) + (first) - 1; 
+    result= (k*p) + (first) - 1;
   }
-  else if ( (first/k) == (second/k) ) 
+  else if ( (first/k) == (second/k) )
   { int newi = first%k;
     int newj = second%k;
     int count = 0;
     for( int loop = 0 ; loop < newi ; ++loop) count += (k-1-loop);
 
-    result= (k*p) + k*(p-2) + 
-           (k*(k-1)/2) * (first/k) + 
+    result= (k*p) + k*(p-2) +
+           (k*(k-1)/2) * (first/k) +
            count + (newj-newi) - 1;
   }
-  else 
-  { 
+  else
+  {
      cerr << "Error: k= " << k << "i= " << i << "j = " << j << endl;
   }
 
@@ -101,18 +101,18 @@ int diffvar (int i, int j, int k, int p)
 }
 
 
-void heuristicinfo (int k, int p) 
+void heuristicinfo (int k, int p)
 {
-  for(int clique = 0; clique < p; clique++) 
+  for(int clique = 0; clique < p; clique++)
   {
     for(int i=0; i < k; i++)
     {
       int thisnode = nodevar(i,clique,k,p);
       searchvars.push_back(thisnode);
-      if ((clique > 0) and (i>0)) 
+      if ((clique > 0) and (i>0))
       {
         int arraysize = searchvars.size();
-        for(int j=0; j<arraysize; ++j) 
+        for(int j=0; j<arraysize; ++j)
         {
           int diff = diffvar(thisnode,searchvars[j],k,p);
           if (diff > -1)
@@ -128,18 +128,18 @@ void heuristicinfo (int k, int p)
 
   numsearchvars = searchvars.size();
 
-  cout << "[" ; 
-  for(int j=0; j< numsearchvars; ++j) 
-  { 
+  cout << "[" ;
+  for(int j=0; j< numsearchvars; ++j)
+  {
     outvar(searchvars[j]);
     if (j < numsearchvars-1) (cout << ",") ;
   }
   cout << "]" << endl;
 
-  cout << "[" ; 
-  for(int i=0; i< numsearchvars; i++) 
-  { 
-    cout << "a" ; 
+  cout << "[" ;
+  for(int i=0; i< numsearchvars; i++)
+  {
+    cout << "a" ;
     if (i < numsearchvars-1) (cout << ",") ;
   }
   cout << "]" << endl;
@@ -154,16 +154,16 @@ void all_different (int k, int p)
   for (int i=0; i < k*p ; i++)
   {
       outvar(i);                        // note lack of information hiding
-      if (i < k*p-1) cout << ",";    
+      if (i < k*p-1) cout << ",";
   }
   cout << "])" << endl;
 
   cout << "alldiff([" ;                 // all diffs must be different
   for (int clique = 0; clique < p ; clique++)
   {
-    for (int i=0; i < k ; i++) 
+    for (int i=0; i < k ; i++)
     {
-      if (clique < p-1) 
+      if (clique < p-1)
       {
         outvar(diffvar(nodevar(i,clique,k,p),nodevar(i,clique+1,k,p),k,p));
         cout << ",";
@@ -172,14 +172,14 @@ void all_different (int k, int p)
       {
         outvar(diffvar(nodevar(i,clique,k,p),nodevar(j,clique,k,p),k,p));
         if ((clique != p-1) or (i < k-2)) cout << ",";
-                // only false for last pair 
+                // only false for last pair
       }
     }
   }
   cout << "])" << endl;
 }
 
-void onediff_print (int var1, int var2, int k, int p) 
+void onediff_print (int var1, int var2, int k, int p)
 {
         int diff = diffvar(var1,var2,k,p);
         int newmin = diff + numdiffs;
@@ -197,15 +197,15 @@ void onediff_print (int var1, int var2, int k, int p)
         outvar(newmin);
         cout << ",";
         outvar(diff);
-        cout << "]," ; 
+        cout << "]," ;
         outvar(newmax);
         cout << ")" << endl;
-      
+
         cout << "sumgeq([" ;
         outvar(newmin);
         cout << ",";
         outvar(diff);
-        cout << "]," ; 
+        cout << "]," ;
         outvar(newmax);
         cout << ")" << endl;
 #endif
@@ -216,7 +216,7 @@ void onediff_print (int var1, int var2, int k, int p)
         cout << "]," ;
         outvar(newmin);
         cout << ")" << endl;
-        
+
         cout << "max([" ;
         outvar(var1);
         cout << "," ;
@@ -224,22 +224,22 @@ void onediff_print (int var1, int var2, int k, int p)
         cout << "]," ;
         outvar(newmax);
         cout << ")" << endl;
-        
+
 }
 
 void diffs_setup (int k, int p)
 {
-  for (int clique = 0 ; clique < p ; ++clique) 
+  for (int clique = 0 ; clique < p ; ++clique)
   {
     for (int i=0; i < k ; i++)
     {
       if (clique>0 or i>0)
       {
-        if (clique < p-1) 
+        if (clique < p-1)
         {
           onediff_print(nodevar(i,clique,k,p),nodevar(i,clique+1,k,p),k,p);
         }
-        for (int j=i+1; j < k ; j++) 
+        for (int j=i+1; j < k ; j++)
         {
           onediff_print(nodevar(i,clique,k,p),nodevar(j,clique,k,p),k,p);
         }
@@ -257,7 +257,7 @@ void symmetry_break (int k, int p, int q)
 
   cout << "occurrence([" ;
   outvar(1);
-  for (int i = 2; i < k+1 ; i++) 
+  for (int i = 2; i < k+1 ; i++)
   {
     cout << ",";
     outvar(i);
@@ -266,14 +266,14 @@ void symmetry_break (int k, int p, int q)
 
   cout << "occurrence([" ;
   outvar(1);
-  for (int i = 2; i < k+1 ; i++) 
+  for (int i = 2; i < k+1 ; i++)
   {
     cout << ",";
     outvar(i);
   }
   cout << "]," << q-1 << "," << "1)" << endl;
-    
-  for(int i = 1; i<k-1 ; ++i) 
+
+  for(int i = 1; i<k-1 ; ++i)
   {
     cout << "ineq(" ;
     outvar(nodevar(i,0,k,p));
@@ -282,10 +282,10 @@ void symmetry_break (int k, int p, int q)
     cout << ",-1)" << endl;
   }
 }
-    
+
 
   //
-  /* 
+  /*
   // ticks are in strictly increasing order
   for (int i=0;i<nticks-1;i++)
   {
@@ -313,18 +313,18 @@ void implied_constraints (int nticks)
 
   for (int i=0; i < nticks ; i++)
   {
-    for (int j=i+1; j < nticks ; j++) 
+    for (int j=i+1; j < nticks ; j++)
     {
       int diff = diffvar(i,j,nticks);
 
   // d(i,j) >= (j-i)(j-i+1)/2
-      // Below is a Hack.  
-      // We want A >= constant, 
+      // Below is a Hack.
+      // We want A >= constant,
       // Achieve by 0 <= A - constant
       // And achieve 0 by x0 which we have set to 0 elsewhere
-      
+
       cout << "ineq(" ;
-      outvar(tickvar(0,nticks));        
+      outvar(tickvar(0,nticks));
       cout << ",";
       outvar(diff);
       cout << ",-" << ((j-i)*(j-i+1) )/2 << ")" << endl;
@@ -334,7 +334,7 @@ void implied_constraints (int nticks)
       cout << "ineq(" ;
       outvar(diff);
       cout << ",";
-      outvar(tickvar(nticks-1,nticks));        
+      outvar(tickvar(nticks-1,nticks));
       cout << ",-" << ((nticks-1-j+i)*(nticks-j+i))/2 << ")" << endl;
 
     }
@@ -342,15 +342,15 @@ void implied_constraints (int nticks)
 }
 
 */
-    
+
 
 int main(int argc, char** argv)
 {
 
   if(argc < 3 or atoi(argv[2]) < 2)
   {
-        cerr << "usage: GolombMinionGenerator nticks maxlength [optimising]" 
-             << endl 
+        cerr << "usage: GolombMinionGenerator nticks maxlength [optimising]"
+             << endl
              << "       k is number in clique"
              << endl
              << "       p is number of cliques (p > 1)"
@@ -362,7 +362,7 @@ int main(int argc, char** argv)
   int p = atoi(argv[2]);
 
 
-  time_t timenow; 
+  time_t timenow;
   time(&timenow);
   cout << "MINION 1" << endl;
   cout << "# Input file for Minion built for Version 0.2" << endl;
@@ -375,20 +375,20 @@ int main(int argc, char** argv)
   cout << "#  " << endl;
   cout << endl;
 
-  numvars = varinfo(k, p); 
+  numvars = varinfo(k, p);
 
 
   heuristicinfo(k,p);
 
   cout << 0 << endl; // no vectors
-  cout << 1 << endl ; // 1 matrix, for printing 
+  cout << 1 << endl ; // 1 matrix, for printing
   cout << "[" ;
-  for(int clique = 0 ; clique < p ; clique++) 
-  {  
+  for(int clique = 0 ; clique < p ; clique++)
+  {
     cout << "[" ;
     outvar( nodevar(0,clique,k,p) );
-    for(int i=1; i < k ; i++) 
-    { 
+    for(int i=1; i < k ; i++)
+    {
       cout << "," ;
       outvar( nodevar(i,clique,k,p) );
     }
@@ -396,8 +396,8 @@ int main(int argc, char** argv)
     cout << "," << endl;
   }
   cout << "[" ;
-  for(int j=0; j< numsearchvars; ++j) 
-  { 
+  for(int j=0; j< numsearchvars; ++j)
+  {
     outvar(searchvars[j]);
     if (j < numsearchvars-1) (cout << ",") ;
   }

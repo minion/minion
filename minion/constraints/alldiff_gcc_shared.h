@@ -657,7 +657,7 @@ struct FlowConstraint : public AbstractConstraint
                 /*cout<<"Local matching state:"<<endl;
                 {
                 vector<SysInt>& toiterate = valinlocalmatching.getlist();
-                for(SysInt i=0; i<toiterate.size(); ++i)
+                for(SysInt i=0; i<(SysInt)toiterate.size(); ++i)
                 {
                     SysInt temp=toiterate[i];
                     D_ASSERT(varinlocalmatching.in(localmatching[temp]));
@@ -678,7 +678,7 @@ struct FlowConstraint : public AbstractConstraint
 
                     vprevious[tempval]=newlayer[tempval];  // This should be a copy???
                     /*vprevious[tempval].resize(newlayer[tempval].size());
-                    for(SysInt x=0; x<newlayer[tempval].size(); x++)
+                    for(SysInt x=0; x<(SysInt)newlayer[tempval].size(); x++)
                     {
                         vprevious[tempval][x]=newlayer[tempval][x];
                     }*/

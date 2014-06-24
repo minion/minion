@@ -1,8 +1,8 @@
 #include "../minion.h"
 /* Minion Constraint Solver
    http://minion.sourceforge.net
-   
-   For Licence Information see file LICENSE.txt 
+
+   For Licence Information see file LICENSE.txt
 */
 
 #ifdef _WIN32
@@ -43,7 +43,7 @@ std::string make_table_string(const T& t1, ConstraintBlob& b, char const* type)
     std::ostringstream oss;
     oss << "{\n";
     oss << "\"doms\" : [";
-    for(int i = 0; i < t1.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)t1.size(); ++i)
     {
         if(i > 0) oss <<  ",";
         oss << "[";
@@ -63,7 +63,7 @@ std::string make_table_string(const T& t1, ConstraintBlob& b, char const* type)
         if(i > 0) oss <<  ",\n";
         oss << "[";
         oss << checked_cast<SysInt>(v[0]);
-        for(int j = 1; j < v.size(); ++j)
+        for(SysInt j = 1; j < (SysInt)v.size(); ++j)
         {
             oss << "," << checked_cast<SysInt>(v[j]);
         }
@@ -84,7 +84,7 @@ std::string make_table_string(const T& t1, ConstraintBlob& b, char const* type)
 template <typename T>
 AbstractConstraint*
 read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* type)
-{ 
+{
     // Store a list of vms we have already loaded.
     static std::map<std::string, std::vector<TupleList*> > cached_vms;
 
@@ -110,7 +110,7 @@ read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* typ
         {
 #ifdef CHECK_TABLE
             std::cout << "# No table match: '" + hash + "'\n";
-#endif            
+#endif
             // Opening file failed
             if(std::string(type) == "pos") {
                 // return GACTableCon(stateObj, t1, b.tuples);
@@ -132,7 +132,7 @@ read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* typ
     cached_vms[hash] = vtl;
 
     return VMSymCon(stateObj, t1, vtl[0], vtl[1]);
-} 
+}
 
 
 template <typename T>
@@ -156,7 +156,7 @@ BUILD_CT(CT_NEG_TABLE_VM, 1)
 template <typename T>
 AbstractConstraint*
 output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* type)
-{ 
+{
     std::string s = make_table_string(t1, b, type);
 
     std::string hash = sha1_hash(s);
@@ -179,9 +179,9 @@ output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* t
         write(f, s.c_str(), s.size());
         close(f);
     }
-    return (new ConstantConstraint<false>(stateObj)); 
+    return (new ConstantConstraint<false>(stateObj));
 
-} 
+}
 
 
 template <typename T>

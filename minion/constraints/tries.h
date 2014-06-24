@@ -484,7 +484,7 @@ public:
         cerr << "Out of memory in TupleTrie construction" << endl;
         FAIL_EXIT();
       }
-      for (UnsignedSysInt varIndex = 0; varIndex < arity; varIndex++)
+      for (SysInt varIndex = 0; varIndex < arity; varIndex++)
         new (tupleTries + varIndex) TupleTrie(varIndex, tuplelist);
   }
 };

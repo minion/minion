@@ -573,7 +573,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
             varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
 
             if (supportsPerVar[var] == supports) {      // otherwise has found implicit support in the meantime
-                    for(SysInt j=0; j<zeroLits[var].size(); j++) {
+                    for(SysInt j=0; j<(SysInt)zeroLits[var].size(); j++) {
                         SysInt lit=zeroLits[var][j];
                         if(literalList[lit].supportCellList != 0){
                             // No longer a zero val. remove from vector.
@@ -643,7 +643,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
             varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
 
             if (supportsPerVar[var] == supports) {      // otherwise has found implicit support in the meantime
-                    for(SysInt j=0; j<zeroLits[var].size() && supportsPerVar[var] == supports; j++) {
+                    for(SysInt j=0; j<(SysInt)zeroLits[var].size() && supportsPerVar[var] == supports; j++) {
                         SysInt lit=zeroLits[var][j];
                         if(literalList[lit].supportCellList != 0){
                             // No longer a zero val. remove from vector.
@@ -746,7 +746,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
        litsWithLostExplicitSupport.resize(0);
        varsWithLostImplicitSupport.resize(0);
 
-       for(SysInt i=0; i<vars.size(); i++) {
+       for(SysInt i=0; i<(SysInt)vars.size(); i++) {
                varsWithLostImplicitSupport.push_back(i);
        }
 

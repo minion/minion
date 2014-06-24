@@ -113,7 +113,7 @@ struct MultiBranch : public VariableOrder
         pos=0;
         variable_offset.resize(vovector.size());
         variable_offset[0]=0;
-        for(SysInt i=1; i<vovector.size(); i++)
+        for(SysInt i=1; i<(SysInt)vovector.size(); i++)
         {
             variable_offset[i]=variable_offset[i-1]+vovector[i-1]->var_order.size();
         }

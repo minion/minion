@@ -115,7 +115,7 @@ struct GACTableConstraint : public AbstractConstraint
 
   void setFirstValid(vector<DomainInt>& support)
   {
-    for(SysInt i = 0; i < support.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)support.size(); ++i)
       support[i] = vars[i].getMin();
   }
 

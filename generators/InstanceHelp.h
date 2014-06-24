@@ -64,8 +64,8 @@ struct instance {
   vector<SparseList> sparse_bound;
   vector<BoundsList> discrete;
   vector<SparseList> sparse_discrete;
-  
-    
+
+
   string str(Var v)
   {
     ostringstream s;
@@ -74,27 +74,27 @@ struct instance {
 	  case Constant:
 	   s << v.val;
 		break;
-		
+
 	  case Bool:
 		s << "x" << v.val;
 		break;
-		
+
 	  case NotBool:
 	   s << "nx" << v.val;
 	   break;
-	  
+
 	  case Bound:
 		v.val += bools;
 		s << "x" << v.val;
 		break;
-		
+
 	  case SparseBound:
 		v.val += bools;
 		for(unsigned i = 0; i < bound.size(); ++i)
 		  v.val += bound[i].count;
 		  s << "x" << v.val;
 		break;
-		
+
 	  case Discrete:
 		v.val += bools;
 		for(unsigned i = 0; i < bound.size(); ++i)
@@ -103,7 +103,7 @@ struct instance {
 			v.val += sparse_bound[i].count;
 			s << "x" << v.val;
 		break;
-		
+
 	  case SparseDiscrete:
 		v.val += bools;
 		for(unsigned i = 0; i < bound.size(); ++i)
@@ -112,15 +112,15 @@ struct instance {
 			v.val += sparse_bound[i].count;
 			for(unsigned i = 0; i < discrete.size(); ++i)
 			  v.val += discrete[i].count;
-			  
+
 			  s << "x" << v.val;
 		break;
-		
+
 	}
     return s.str();
   }
-  
-  
+
+
   string str(vector<Var> v)
   {
 	ostringstream s;
@@ -130,7 +130,7 @@ struct instance {
 	s << "]";
 	return s.str();
   }
-  
+
   string str(vector<int> v)
   {
     ostringstream s;
@@ -148,7 +148,7 @@ struct instance {
     s << "#    http://sourceforge.net/projects/minion" << endl;
     return s.str();
   }
-  
+
   #define STR_CASE(X,Y) case X: s << #Y; break;
   string str(ConstraintName c)
   {
@@ -173,46 +173,46 @@ STR_CASE( Product,product)
 	}
   return s.str();
   }
-  
+
   instance() : bools(0)
   {}
-  
-  
+
+
   void print_bound_vars(vector<BoundsList>& b)
   {
 	int bound_count = 0;
-	for(int i=0; i < b.size(); ++i)
+	for(int i=0; i < (int)b.size(); ++i)
 	  bound_count += b[i].count;
-	
+
 	cout << bound_count << endl;
-	
-	for(int i=0; i < b.size(); ++i)
+
+	for(int i=0; i < (int)b.size(); ++i)
 	  cout << b[i].lower << " " << b[i].upper << " " << b[i].count << endl;
   }
-  
+
   void print_sparse_vars(vector<SparseList>& s)
   {
 	int sparse_count = 0;
-	for(int i=0 ; i < s.size(); ++i)
+	for(int i=0 ; i < (int)s.size(); ++i)
 	  sparse_count += s[i].count;
-	
+
 	cout << sparse_count << endl;;
-	
-	for(int i=0; i < s.size(); ++i)
+
+	for(int i=0; i < (int)s.size(); ++i)
 	{
 	  cout << "{";
 	  cout << s[i].vals[0];
-	  for(int j = 1;j < s[i].vals.size(); ++j)
+	  for(int j = 1;j < (int)s[i].vals.size(); ++j)
 		cout << "," << s[i].vals[j];
 	  cout << "}" << " " << s[i].count << endl;
 	}
   }
-  
+
   void print_vars()
   {
 	cout << bools << endl;
 	cout << endl;
-	
+
 	print_bound_vars(bound);
 	cout << endl;
 	print_sparse_vars(sparse_bound);
@@ -222,31 +222,31 @@ STR_CASE( Product,product)
 	print_sparse_vars(sparse_discrete);
 	cout << endl;
   }
-  
+
   template<typename X, typename Y>
 	void constraint(ConstraintName c, const X& x,const Y& y)
   { cout << str(c) << "(" << str(x) << " , " << str(y) << ")" << endl; }
-  
+
   template<typename X, typename Y, typename Z>
   	void constraint(ConstraintName c, const X& x,const Y& y, const Z& z)
   { cout << str(c) << "(" << str(x) << " , " << str(y) << "," << str(z) << ")" << endl; }
-  
-  
+
+
   void constraintScalarLeq(vector<int> x, vector<Var> y,  Var z)
   { cout << "weightedsumleq(" << str(x) << "," << str(y) << "," <<  str(z) << ")" << endl; }
-  
+
   void constraintScalarGeq( vector<int> x, vector<Var> y, Var z)
   { cout << "weightedsumgeq(" << str(x) << "," << str(y) << "," <<  str(z) << ")" << endl; }
-  
-  
+
+
   template<typename X, typename Y>
 	void constraintReify(Var v , ConstraintName c, X x, Y y)
-  { 
+  {
 	cout << "reify("  ;
 	cout << str(c) << "(" << str(x) << " , " << str(y) << ")";
 	cout << "," << str(v)  << ")" << endl;
   }
-  
+
   template<typename X, typename Y>
 	void constraintReifyTrue(Var v, ConstraintName c, X x, Y y)
   {
@@ -254,10 +254,10 @@ STR_CASE( Product,product)
 	cout << str(c) << "(" << str(x) << " , " << str(y) << ")";
 	cout << "," <<  str(v) << ")" << endl;
   }
-  
+
   void print_var_order(vector<Var> v)
   { cout << str(v) << endl; }
-  
+
   void print_val_order(vector<char> v)
   {
     cout << "[" << v[0];
@@ -265,14 +265,14 @@ STR_CASE( Product,product)
 	{ cout << "," << v[i]; }
 	cout << "]" << endl;
   }
-  
+
   void optimise_min(Var v)
   { cout << "objective minimising " << str(v) << endl; }
-  
+
   void optimise_max(Var v)
   { cout << "objective maximising " << str(v) << endl; }
-  
+
   void optimise_none()
   { cout << "objective none" << endl; }
-  
+
 };

@@ -141,7 +141,7 @@ struct Nightingale
     TupleN* tlist=new TupleN[tupleref.size()];
 
     SysInt* mem_block = new SysInt[arity * 2 * tupleref.size()];
-    for(SysInt tupleIndex = 0; tupleIndex < tupleref.size(); tupleIndex++)
+    for(SysInt tupleIndex = 0; tupleIndex < (SysInt)tupleref.size(); tupleIndex++)
     {
       SysInt* _values = mem_block + arity * (tupleIndex * 2) ;
 
@@ -211,7 +211,7 @@ struct Nightingale
       for(SysInt val = (tuples->dom_smallest)[var];
           val <= (tuples->dom_smallest)[var] + (tuples->dom_size)[var]; val++)
       {
-        for(SysInt tupleindex = 0; tupleindex < tuples->size(); tupleindex++)
+        for(SysInt tupleindex = 0; tupleindex < (SysInt)tuples->size(); tupleindex++)
         {
           if((*tuples)[tupleindex][var] == val)
             goods[var][val-(tuples->dom_smallest)[var]].push_back(tuples->get_vector(tupleindex));
@@ -219,7 +219,7 @@ struct Nightingale
       }
 
       SysInt tuple_sum = 0;
-      for(SysInt i = 0; i < goods[var].size(); ++i)
+      for(SysInt i = 0; i < (SysInt)goods[var].size(); ++i)
         tuple_sum += goods[var][i].size();
       D_ASSERT(tuple_sum == tuples->size());
     }
@@ -466,7 +466,7 @@ struct GACTableConstraint : public AbstractConstraint
 
   virtual void full_propagate()
   {
-    for(SysInt varIndex = 0; varIndex < vars.size(); ++varIndex)
+    for(SysInt varIndex = 0; varIndex < (SysInt)vars.size(); ++varIndex)
     {
       // Propagate variables so they fit inside domains. This is a minor fix
       SysInt tuple_domain_min = (nightingale->tuples->dom_smallest)[varIndex];

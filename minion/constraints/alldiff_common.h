@@ -741,12 +741,12 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
 
     /*
     cout<<"SCCs:"<<endl;
-    for(SysInt i=0; i<SCCs.size(); i++)
+    for(SysInt i=0; i<(SysInt)SCCs.size(); i++)
     {
         cout<< SCCs[i] <<endl;
     }
     cout<<"SCCSplit:"<<endl;
-    for(SysInt i=0; i<SCCs.size(); i++)
+    for(SysInt i=0; i<(SysInt)SCCs.size(); i++)
     {
         cout << ((SCCSplit.isMember(i))?"Nosplit":"Split") <<endl;
     }*/

@@ -130,7 +130,7 @@ template<typename Var>
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     /// TODO: Make faster
-    for(SysInt i = 0; i < vals.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)vals.size(); ++i)
     {
       if(var.inDomain(vals[i]))
       {

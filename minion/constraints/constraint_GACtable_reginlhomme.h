@@ -92,7 +92,7 @@ struct Regin
           tuples.resize(tupleList->size());
 
           // Need a copy so we can sort it and such things.
-          for(SysInt i = 0; i < tupleList->size(); ++i)
+          for(SysInt i = 0; i < (SysInt)tupleList->size(); ++i)
             tuples[i] = tupleList->get_vector(i);
 
           // sort, required for correctness.
@@ -114,7 +114,7 @@ struct Regin
       redvalues[i]=(tupleList->dom_smallest)[i];
     }
 
-    for(SysInt i=0; i<tuples.size(); i++)
+    for(SysInt i=0; i<(SysInt)tuples.size(); i++)
     {
       // copy redvalues
       SysInt * newredvalues= new SysInt[arity];
@@ -450,7 +450,7 @@ struct GACTableConstraint : public AbstractConstraint
 
   virtual void full_propagate()
   {
-    for(SysInt varIndex = 0; varIndex < vars.size(); ++varIndex)
+    for(SysInt varIndex = 0; varIndex < (SysInt)vars.size(); ++varIndex)
     {
       // Propagate variables so they fit inside domains. This is a minor fix
       SysInt tuple_domain_min = (tupleList->dom_smallest)[varIndex];
