@@ -66,14 +66,14 @@ inline void CheckNotBoundSingle(const T& t, std::string s, std::string s2 = "")
 
 extern bool debug_crash;
 void D_FATAL_ERROR2(string s, string file, string line);
-void _NORETURN FAIL_EXIT(string s = "");
+void DOM_NORETURN FAIL_EXIT(string s = "");
 
 struct assert_fail {};
 
-void error_printing_function(std::string a, std::string f, SysInt line) _NORETURN;
-void user_error_printing_function(std::string a, std::string f, SysInt line) _NORETURN;
+void error_printing_function(std::string a, std::string f, SysInt line) DOM_NORETURN;
+void user_error_printing_function(std::string a, std::string f, SysInt line) DOM_NORETURN;
 
-void FATAL_REPORTABLE_ERROR()  _NORETURN;
+void FATAL_REPORTABLE_ERROR()  DOM_NORETURN;
 
 
 #define CHECK(x, y) { if(!(x)) { user_error_printing_function(y, __FILE__, __LINE__); } }

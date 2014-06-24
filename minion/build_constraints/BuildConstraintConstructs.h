@@ -21,7 +21,7 @@
 #include "../inputfile_parse/CSPSpec.h"
 
 namespace BuildCon
-{  
+{
 
 /// General case in iteratively build constraints.
 /// This isn't inline, as we don't want the compiler to waste time inlining it.
@@ -29,19 +29,19 @@ template<ConstraintType constraint, SysInt size>
 struct BuildConObj
 {
   template<typename ConData>
-  static 
-  AbstractConstraint* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysInt pos) _NOINLINE;
+  static
+  AbstractConstraint* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysInt pos) DOM_NOINLINE;
 };
 
 
 template<ConstraintType constraint, SysInt size>
 template<typename ConData>
-AbstractConstraint* 
+AbstractConstraint*
 BuildConObj<constraint, size>::
 build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysInt pos)
 {
   const vector<Var>& vars = b.vars[pos];
-  
+
   // type needs to be something for empty arrays
   SysInt type = VAR_CONSTANT;
   bool same_type = true;
@@ -88,7 +88,7 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysIn
           v[i] = getVars(stateObj).boundVarContainer.get_var_num(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
           build(stateObj, make_pair(partial_build, &v), b, pos + 1);
-      }     
+      }
       case VAR_SPARSEBOUND:
       {
         vector<SparseBoundVarRef> v(vars.size());
@@ -105,9 +105,9 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysIn
         return BuildConObj<constraint, size - 1>::
           build(stateObj, make_pair(partial_build, &v), b, pos + 1);
       }
-      case VAR_SPARSEDISCRETE:  
+      case VAR_SPARSEDISCRETE:
         INPUT_ERROR( "Sparse Discrete Variables current broken. Sorry");
-        
+
       case VAR_CONSTANT:
       {
         vector<ConstantVar> v(vars.size());
@@ -124,13 +124,13 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysIn
     vector<AnyVarRef> v(vars.size());
     for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       v[i] = get_AnyVarRef_from_Var(stateObj, vars[i]);
-    
+
     return BuildConObj<constraint, size - 1>::
       build(stateObj, make_pair(partial_build, &v), b, pos + 1);
   }
   // This FAIL_EXIT is here to stop a "no return in non-void function" warning. It should never be reached.
   INPUT_ERROR( "This should never be reached..");
-}  
+}
 
 
 
@@ -138,6 +138,3 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysIn
 
 AbstractConstraint*
 build_constraint(StateObj* stateObj, ProbSpec::ConstraintBlob& b);
-
-
-

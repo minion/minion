@@ -28,7 +28,7 @@ bool constraint_entailed(AbstractConstraint* c)
 }
 
 template<typename T>
-inline 
+inline
 string getNameFromVar(StateObj* stateObj, const T& v)
 { return getState(stateObj).getInstance()->vars.getName(v.getBaseVar()); }
 
@@ -113,7 +113,7 @@ void just_domain_dump(StateObj* stateObj, ostream& os)
     // bigRangeVar
     for(UnsignedSysInt i = 0; i < vc.bigRangeVarContainer.var_count(); ++i)
         vars.push_back(vc.bigRangeVarContainer.get_var_num(i));
-    
+
 
     // sparseBound
     for(UnsignedSysInt i = 0; i < vc.sparseBoundVarContainer.var_count(); ++i)
@@ -223,7 +223,7 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
             os << "**VARIABLES**" << endl;
         }
     }
-    
+
 
     // sparseBound
     for(UnsignedSysInt i = 0; i < vc.sparseBoundVarContainer.var_count(); ++i)
@@ -274,7 +274,7 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
         os << tl->getName() << " " << tl->size() << "\n";
 
         const vector<vector<pair<SysInt, DomainInt> > >& tupleRef = *(tl->tuplePtr());
-        
+
         for(SysInt j = 0; j < tupleRef.size(); ++j)
         {
             os << "[";

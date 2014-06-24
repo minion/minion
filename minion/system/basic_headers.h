@@ -6,15 +6,9 @@
 #ifdef __GNUC__
 #define SYSTEM_LONGJMP _longjmp
 #define SYSTEM_SETJMP  _setjmp
-
-#define _NORETURN __attribute__ ((noreturn))
-#define _NOINLINE __attribute__((noinline))
 #else
 #define SYSTEM_LONGJMP longjmp
 #define SYSTEM_SETJMP  setjmp
-
-#define _NORETURN
-#define _NOINLINE
 #endif
 
 #ifdef _WIN32

@@ -37,7 +37,7 @@ void FATAL_REPORTABLE_ERROR()
 }
 
 void D_FATAL_ERROR2(string s, string file, string line)
-{ 
+{
   cerr << "Sorry, there has been some kind of error." << endl;
   cerr << "This could be caused by a misformed input file, or by an internal bug." << endl;
   cerr << "If you can't figure out what is causing the problem, please report it at http://www.sourceforge.net/projects/minion." << endl;
@@ -47,21 +47,21 @@ void D_FATAL_ERROR2(string s, string file, string line)
   cerr << "The error was in the file " << file << " on line " << line << endl;
 }
 
-void _NORETURN FAIL_EXIT(string s) 
-{ 
+void DOM_NORETURN FAIL_EXIT(string s) 
+{
   if(in_cspcomp_for_failexit)
   {
     if(s != "")
       cout << "c " << s << endl;
-    cout << "s UNKNOWN" << endl;  
+    cout << "s UNKNOWN" << endl;
     exit(1);
   }
-  
+
   cerr << "Unrecoverable error. Exiting." << endl;
   cerr << s << endl;
   cerr.flush();
   if(debug_crash)
-  { 
+  {
     SysInt* i = NULL;
     *i = 0;
   }
@@ -69,7 +69,7 @@ void _NORETURN FAIL_EXIT(string s)
 }
 
 void error_printing_function(std::string a, std::string f, SysInt line)
-{ 
+{
   cerr << "Assert Error!" << endl;
   cerr << "Test '" << a << "' failed." << endl;
   cerr << "In file " << f << ", line " << line << endl;
@@ -81,7 +81,7 @@ void error_printing_function(std::string a, std::string f, SysInt line)
 }
 
 void user_error_printing_function(std::string a, std::string f, SysInt line)
-{ 
+{
   cerr << "An error occurred while solving your instance!" << endl;
   cerr << a << endl;
   cout.flush();

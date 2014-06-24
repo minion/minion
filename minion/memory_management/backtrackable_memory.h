@@ -41,28 +41,28 @@ class BackTrackMemory
 {
   NewMemoryBlock new_memory_block;
   BlockCache block_cache;
-  
-  vector<pair<char*, size_t> > backtrack_data; 
+
+  vector<pair<char*, UnsignedSysInt> > backtrack_data; 
 public:
-    
-  
+
+
   /// Wraps request_bytes of the internal \ref NewMemoryBlock.
   void* request_bytes(UnsignedSysInt byte_count)
-  { 
-    return new_memory_block.request_bytes(byte_count); 
+  {
+    return new_memory_block.request_bytes(byte_count);
   }
-  
+
   /// Wraps requestArray of the internal \ref NewMemoryBlock.
   template<typename T>
   T* requestArray(UnsignedSysInt size)
-  { 
+  {
     return new_memory_block.requestArray<T>(size);
   }
-  
+
   BackTrackMemory() :
   block_cache(100), backtrack_data()
   { }
- 
+
   /// Copies the current state of backtrackable memory.
   void world_push()
   {
@@ -72,7 +72,7 @@ public:
     new_memory_block.storeMem(tmp);
     backtrack_data.push_back(std::make_pair(tmp, data_size));
   }
-  
+
   /// Restores the state of backtrackable memory to the last stored state.
   void world_pop()
   {
@@ -82,7 +82,7 @@ public:
     backtrack_data.pop_back();
     block_cache.do_free(tmp.first);
   }
-  
+
   /// Returns the current number of stored copies of the state.
   SysInt current_depth()
   { return backtrack_data.size(); }
