@@ -41,7 +41,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
     AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
   {
       BigInt accumulator=0;
-      for(SysInt i=0; i<var_array.size(); i++) {
+      for(SysInt i=0; i<(SysInt)var_array.size(); i++) {
           accumulator+= checked_cast<SysInt>(max( abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin()) ));
           CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
       }
@@ -50,7 +50,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
 
 
     no_negatives = true;
-    for(SysInt i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
     {
       if(var_array[i].getInitialMin() < 0)
       {

@@ -223,7 +223,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
             myset.insert(sup);
         }
 
-        for(SysInt i=0; i<backtrack_stack.size(); i++) {
+        for(SysInt i=0; i<(SysInt)backtrack_stack.size(); i++) {
             if(backtrack_stack[i].typ==1) {
                 myset.insert(backtrack_stack[i].sup);
             }

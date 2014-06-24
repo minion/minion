@@ -166,7 +166,7 @@ struct ConcreteFileReader
       return s;
 
     int pos = 1;
-    while(pos < s.size() && isspace(s[pos]))
+    while(pos < (int)s.size() && isspace(s[pos]))
       pos++;
     return string(s.begin() + pos, s.end());
   }

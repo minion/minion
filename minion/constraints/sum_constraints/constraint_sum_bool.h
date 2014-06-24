@@ -42,7 +42,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     AbstractConstraint(_stateObj), count(_stateObj), var_array(_var_array), var_sum(_var_sum)
   { CHECK((VarToCount == 0) || (VarToCount == 1), "Fatal Internal Bug");
       BigInt accumulator=0;
-      for(SysInt i=0; i<var_array.size(); i++) {
+      for(SysInt i=0; i<(SysInt)var_array.size(); i++) {
           accumulator+= checked_cast<SysInt>((DomainInt)max( abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin()) ));
           CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
       }

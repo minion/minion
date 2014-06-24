@@ -111,7 +111,7 @@ struct Rep
 	vector<vector<bool> > get_satisfying_tuples(F f)
   {
 	  vector<vector<bool> > output;
-	  for(int i = 0; i < function.size(); ++i)
+	  for(int i = 0; i < (SysInt)function.size(); ++i)
 	  {
 		if(f(function[i]))
 		  output.push_back(int_to_vec(i, rep_size));    
@@ -128,9 +128,9 @@ struct Rep
 	
 	function.reserve(original_rep.size() * rep.function.size());
 	
-	for(int i = 0; i < original_rep.size(); ++i)
+	for(int i = 0; i < (SysInt)original_rep.size(); ++i)
 	{
-	  for(int j = 0; j < rep.function.size(); ++j)
+	  for(int j = 0; j < (SysInt)rep.function.size(); ++j)
 	  {
 		//function.push_back(original_rep[i]);
 		//function.back().insert(function.back().end(), rep.function[j].begin(),
@@ -156,7 +156,7 @@ int var_pos(int i, int j, int offset)
 
 void print_tuple(const vector<bool>& vec)
 {
-  for(int i = 0; i < vec.size(); ++i)
+  for(int i = 0; i < (SysInt)vec.size(); ++i)
 	cout << vec[i] << " ";
   cout << endl;
 }
@@ -165,7 +165,7 @@ void print_tuple_list(vector<vector<bool> > vecs)
 {
   sort(vecs.begin(),vecs.end());
   cout << vecs.size() << " " << vecs[0].size() << endl;
-  for(int i = 0; i < vecs.size(); ++i)
+  for(int i = 0; i < (SysInt)vecs.size(); ++i)
   {
 	print_tuple(vecs[i]);
   }
@@ -231,11 +231,11 @@ void build_constraints(Rep& rep)
   for(int j = 0; j < b; ++j)
   {
 	vector<vector<bool> > true_tuples = rep.get_satisfying_tuples(in_set(j));
-	for(int loop = 0; loop < true_tuples.size(); ++loop)
+	for(int loop = 0; loop < (SysInt)true_tuples.size(); ++loop)
 	  true_tuples[loop].push_back(1);
 	
 	vector<vector<bool> > false_tuples = rep.get_satisfying_tuples(not_in_set(j));
-	for(int loop = 0; loop < false_tuples.size(); ++loop)
+	for(int loop = 0; loop < (SysInt)false_tuples.size(); ++loop)
 	  false_tuples[loop].push_back(0);
 	
 	true_tuples.insert(true_tuples.end(), false_tuples.begin(), false_tuples.end());
@@ -352,12 +352,12 @@ int main(int argc, char** argv)
     cout << atoi(argv[8 + i]) << ",";
   cout << endl;
   
-  for(int i = 0; i < rep.size(); ++i)
+  for(int i = 0; i < (SysInt)rep.size(); ++i)
   {  
 	cout << "#";
-    for(int j = 0; j < rep[i].function.size(); ++j)
+    for(int j = 0; j < (SysInt)rep[i].function.size(); ++j)
 	{
-	  for(int k = 0; k < rep[i].function[j].size(); ++k)
+	  for(int k = 0; k < (SysInt)rep[i].function[j].size(); ++k)
 		cout << rep[i].function[j][k];
 	  cout << " ";
 	}

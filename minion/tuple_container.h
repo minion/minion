@@ -41,7 +41,7 @@ class Nightingale;
 class TupleTrieArray;
 class Regin;
 class EggShellData;
-class HaggisGACTuples;
+struct HaggisGACTuples;
 
 inline size_t get_hash_val(DomainInt* ptr, SysInt length)
 {

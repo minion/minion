@@ -35,7 +35,7 @@ template<typename T>
 typename T::value_type& index(T& container, DomainInt index_pos)
 {
   if(index_pos < 0 || index_pos >= (SysInt)container.size())
-    throw parse_exception("Index position " + tostring(index_pos) + 
+    throw parse_exception("Index position " + tostring(index_pos) +
                           " out of range");
   return container[checked_cast<SysInt>(index_pos)];
 }
@@ -111,8 +111,8 @@ vector<Var> MinionInputReader<FileReader>::getRowThroughTensor(
 // read
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-void MinionInputReader<FileReader>::read(FileReader* infile) {  
-  
+void MinionInputReader<FileReader>::read(FileReader* infile) {
+
   while(infile->peek_char() == '#')
     parser_info(string("Read comment line:") + infile->getline());
 
@@ -121,7 +121,7 @@ void MinionInputReader<FileReader>::read(FileReader* infile) {
     readVarOrder(infile) ;
     readValOrder(infile) ;
     readMatrices(infile) ;
-    
+
     // At this point, may or may not have a tuples entry
     {
       string s = infile->get_string();
@@ -139,7 +139,7 @@ void MinionInputReader<FileReader>::read(FileReader* infile) {
       }
     }
     readPrint(infile);
-    
+
     while(readConstraint(infile, false)) ;
 
 }
@@ -154,7 +154,7 @@ void MinionInputReader<FileReader>::read(FileReader* infile) {
 template<typename FileReader>
 BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reified) {
   string id = infile->getline('(');
-  
+
   SysInt constraint_num = -1;
   for(SysInt i = 0; i < num_of_constraints; ++i)
   {
@@ -164,10 +164,10 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
       break;
     }
   }
-  
-  if(constraint_num == -1) 
+
+  if(constraint_num == -1)
   {
-    if (infile->eof()) 
+    if (infile->eof())
     {
       parser_info("Done.") ;
       return false;
@@ -176,7 +176,7 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
     { throw parse_exception(string("Unknown Constraint: '") + id + string("'")); }
   }
   ConstraintDef* constraint = constraint_list + constraint_num;
- 
+
   switch(constraint->type)
   {
 #ifdef CT_WATCHED_TABLE_ABC
@@ -193,7 +193,7 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
     default:
       readGeneralConstraint(infile, constraint);
   }
-  
+
   instance->bounds_check_last_constraint();
   return true ;
 }
@@ -207,7 +207,7 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
   ConstraintBlob& con = instance->constraints.back();
   vector<vector<Var> >& varsblob = instance->constraints.back().vars;
   vector<vector<DomainInt> >& constblob = instance->constraints.back().constants;
-  
+
   for(SysInt i = 0; i < def->number_of_params; ++i)
   {
     switch(def->read_types[i])
@@ -218,7 +218,7 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
       case read_var:
         varsblob.push_back(make_vec(readIdentifier(infile)));
         break;
-    
+
       case read_2_vars:
       {
         vector<Var> vars(2);
@@ -256,7 +256,7 @@ void MinionInputReader<FileReader>::readGeneralConstraint(FileReader* infile, Co
         }
         constblob.push_back(vals);
       }
-        break;  
+        break;
       default:
         D_FATAL_ERROR("short tuple constraints cannot be used in a MINION 1 or 2 format file. Sorry.");
     }
@@ -294,23 +294,23 @@ void MinionInputReader<FileReader>::readConstraintElement(FileReader* infile, Co
 // Tuples represented as a vector of SysInt arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 template<typename FileReader>
-void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, ConstraintDef* def) 
+void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, ConstraintDef* def)
 {
   parser_info( "reading a table ct (unreifiable)" ) ;
-  
+
   char delim = ' ';
   SysInt count;
   vector<Var> vectorOfVars(readVectorExpression(infile)) ;
   SysInt tupleSize = vectorOfVars.size() ;
-  
+
   infile->check_sym(',');
-  
+
   char next_char = infile->peek_char();
   if(next_char != 't' && next_char != '{')
     throw parse_exception("Expected either 't' or a tuple list");
-  
+
   TupleList* tuplelist;
-  
+
   if(next_char == 't')
   {
     infile->check_sym('t');
@@ -326,13 +326,13 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
   {
     vector<vector<DomainInt> > tuples ;
     infile->check_sym('{');
-    while (delim != '}') 
+    while (delim != '}')
     {
       infile->check_sym('<');
       vector<DomainInt> tuple(tupleSize);
       DomainInt elem = infile->read_num() ;
       tuple[0] = elem ;
-      for (count = 1; count < tupleSize; count++) 
+      for (count = 1; count < tupleSize; count++)
       {
         infile->check_sym(',');
         elem = infile->read_num() ;
@@ -347,7 +347,7 @@ void MinionInputReader<FileReader>::readConstraintTable(FileReader* infile, Cons
     tuplelist = instance->tupleListContainer->getNewTupleList(tuples);
   instance->addUnnamedTableSymbol(tuplelist);
   }
-    
+
     infile->check_sym(')');
     ConstraintBlob tableCon(def, vectorOfVars);
     tableCon.tuples = tuplelist;
@@ -369,14 +369,14 @@ Var MinionInputReader<FileReader>::readIdentifier(FileReader* infile) {
     return Var(VAR_CONSTANT, i);
   }
   DomainInt index = -1 ;
-  
+
   if(idChar != 'x' && idChar != 'n')
   {
     string s("Found 'X', expected 'x' or 'n' at start of a variable");
     s[7] = idChar;
     throw parse_exception(s);
   }
-  
+
   if(idChar == 'x')
   {
     // Eat the 'x'.
@@ -384,7 +384,7 @@ Var MinionInputReader<FileReader>::readIdentifier(FileReader* infile) {
     index = infile->read_num();
     return instance->vars.get_var(idChar, index);
   }
-  
+
   // Must have found an 'n'.
   infile->check_sym('n');
   infile->check_sym('x');
@@ -403,7 +403,7 @@ template<typename FileReader>
 vector< vector<Var> > MinionInputReader<FileReader>::readLiteralMatrix(FileReader* infile) {
 
   infile->check_sym('[');
-  
+
   // Delim here might end up being "x" or something similar. The reason
   // that we peek it is in case whis is an empty vector.
   char delim = infile->peek_char();
@@ -434,12 +434,12 @@ template<typename FileReader>
 vector<Var> MinionInputReader<FileReader>::readLiteralVector(FileReader* infile) {
   vector<Var> newVector ;
   infile->check_sym('[');
- 
+
   // Delim here might end up being "x" or something similar. The reason
   // that we peek it is in case whis is an empty vector.
-  
+
   char delim = infile->peek_char();
-        
+
   if(delim == ']')
   {
     // Eat the ']'
@@ -462,7 +462,7 @@ vector<Var> MinionInputReader<FileReader>::readLiteralVector(FileReader* infile)
   }
   // Squeeze vector to smallest size.
   return vector<Var>(newVector.begin(), newVector.end());
-  
+
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -533,13 +533,13 @@ void MinionInputReader<FileReader>::readObjective(FileReader* infile) {
     parser_info( "objective none" );
     return;
   }
-  
+
   if(s != "minimising" && s != "maximising")
   {
     throw parse_exception(string("Expected 'none', 'maximising'") +
                               string("or 'minimising'. Got '") + s + "'");
   }
-  
+
   BOOL minimising = (s == "minimising");
   Var var = readIdentifier(infile) ;
   if(parser_verbose)
@@ -552,7 +552,7 @@ void MinionInputReader<FileReader>::readPrint(FileReader* infile) {
   string s = infile->get_string();
   if(s != "print")
     throw parse_exception(string("Expected 'print', recieved '")+s+"'");
-  
+
   char letter = infile->get_char();
   if(letter == 'n')
   {
@@ -567,7 +567,7 @@ void MinionInputReader<FileReader>::readPrint(FileReader* infile) {
     s = infile->get_string();
     if(s != "ll")
       throw parse_exception(string("I don't understand '" + s + "'"));
-                              
+
     instance->print_matrix = make_vec(instance->vars.get_all_vars());
     return;
   }
@@ -599,16 +599,16 @@ void MinionInputReader<FileReader>::readPrint(FileReader* infile) {
 template<typename FileReader>
 void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   parser_info( "Reading val order" ) ;
-  
+
   infile->check_sym('[');
-  
+
   // Delim here might end up being "x" or something similar. The reason
   // that we peek it is in case whis is an empty vector.
-  
+
   char delim = infile->peek_char();
-  
+
   vector<ValOrderEnum> valOrder ;
-     
+
   if(delim == ']')
   {
     // Eat the ']'
@@ -640,7 +640,7 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
     s << "Read val order. Length: " << valOrder.size();
     parser_info(s.str());
   }
-  
+
   if(valOrder.empty())
   {
     parser_info("No value order given, generating automatically");
@@ -648,7 +648,7 @@ void MinionInputReader<FileReader>::readValOrder(FileReader* infile) {
   }
   instance->search_order[0].val_order = valOrder;
 
-  for(SysInt i = 0; i < instance->search_order.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)instance->search_order.size(); ++i)
     instance->search_order[i].setupValueOrder();
 }
 
@@ -664,8 +664,8 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
 
   ostringstream s;
   s << "Read var order. Length: " << varOrder.size();
-  
-  
+
+
 
   parser_info("No order generated, auto-generating complete order");
   SysInt var_count = 0;
@@ -678,7 +678,7 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
     var_count += instance->vars.discrete[i].first;
   for(UnsignedSysInt i = 0; i < instance->vars.sparse_discrete.size(); ++i)
     var_count += instance->vars.sparse_discrete[i].first;
-  
+
   varOrder.reserve(var_count);
 
   vector<Var> extra_vars;
@@ -699,7 +699,7 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
       }
     }
   }
-  
+
   instance->search_order.push_back(varOrder);
   if(!extra_vars.empty())
   {
@@ -707,7 +707,7 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
     instance->search_order.back().find_one_assignment = true;
   }
 
-  
+
 
   parser_info(s.str());
 }
@@ -723,8 +723,8 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
   if(parser_verbose)
     cout << "Number of 01 Vars: " << noOfVarType << endl ;
   var_obj.BOOLs = checked_cast<SysInt>(noOfVarType);
-  
-  
+
+
   // **** Construct this many 01Vars
   // Read Bounds Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   noOfVarType = infile->read_num();
@@ -741,7 +741,7 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
     var_obj.bound.push_back(make_pair(checked_cast<SysInt>(count), Bounds(lb, ub)));
     noOfVarType -= count ;
   }
-  
+
   // Read Sparse Bounds Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   noOfVarType = infile->read_num();
   if(parser_verbose)
@@ -768,7 +768,7 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
     var_obj.sparse_bound.push_back(make_pair(checked_cast<SysInt>(count), domainElements));
     noOfVarType -= count ;
   }
-  
+
   // Read Discrete Bounds Vars%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   noOfVarType = infile->read_num();
   if(parser_verbose)
@@ -804,7 +804,7 @@ void MinionInputReader<FileReader>::readVars(FileReader* infile) {
     var_obj.sparse_discrete.push_back(make_pair(checked_cast<SysInt>(count), domainElements));
     noOfVarType -= count ;
   }
-  
+
   instance->vars = var_obj;
 }
 
@@ -824,7 +824,7 @@ vector<Var> MinionInputReader<FileReader>::readVectorExpression(FileReader* infi
     case '[':
       parser_info( "Reading Literal Vector of vars or consts" ) ;
       infile->putback(idChar) ;
-      return readLiteralVector(infile) ;      
+      return readLiteralVector(infile) ;
     case 'v':                                        // vector identifier
       parser_info( "Reading vector identifier" ) ;
       //infile->putback(idChar) ;
@@ -917,6 +917,3 @@ vector<Var> MinionInputReader<FileReader>::readVectorExpression(FileReader* infi
   }
   FAIL_EXIT("?");
 }
-
-
-

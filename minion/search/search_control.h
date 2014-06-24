@@ -29,7 +29,7 @@ namespace Controller
     {
         // collect the variables in the SearchOrder object
         vector<AnyVarRef> var_array;
-        for(SysInt i=0; i<order.var_order.size(); i++)
+        for(SysInt i=0; i<(SysInt)order.var_order.size(); i++)
         {
             var_array.push_back(get_AnyVarRef_from_Var(stateObj, order.var_order[i]));
             // some check here?
@@ -146,7 +146,7 @@ shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
 
     for(SysInt i=0; i<(SysInt)order.size(); i++)
     {
-        for(SysInt j=0; j<order[i].var_order.size(); j++)
+        for(SysInt j=0; j<(SysInt)order[i].var_order.size(); j++)
         {
             all_vars.push_back(get_AnyVarRef_from_Var(stateObj, order[i].var_order[j]));
         }

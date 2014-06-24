@@ -74,7 +74,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
     void mark() {
         failed_stack.push_back(-1);  // marker.
         
-        for(int i=0; i<gadget_stateObj.size(); i++) {
+        for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) {
             if(!getState(gadget_stateObj[i]).isFailed()) {
                 Controller::world_push(gadget_stateObj[i]);
             }
@@ -93,7 +93,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         failed_stack.pop_back();
         
         // Backtrack each of the child CSPs.
-        for(int i=0; i<gadget_stateObj.size(); i++) {
+        for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) {
             if(!getState(gadget_stateObj[i]).isFailed()) {
                 Controller::world_pop(gadget_stateObj[i]);
             }
@@ -103,7 +103,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
   
   
   virtual ~ConstructiveOr()
-  { for(int i=0; i<gadget_stateObj.size(); i++) delete gadget_stateObj[i]; }
+  { for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) delete gadget_stateObj[i]; }
   
   virtual AbstractConstraint* reverse_constraint()
   {
@@ -122,7 +122,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
   {
     triggerCollection t;
     if(!CORINCREMENTAL) {
-        for(int i = 0; i < var_array.size(); ++i) {
+        for(int i = 0; i < (SysInt)var_array.size(); ++i) {
             t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
         }
     }
@@ -172,7 +172,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
       int val=pos-(var*numvals)+dom_min;
       
       // Prune val in all child CSPs that have not failed.
-      for(int i=0; i<gadget_stateObj.size(); i++) {
+      for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) {
           if(!getState(gadget_stateObj[i]).isFailed()) {
               inner_vars[i][var].removeFromDomain(val);
               if(getState(gadget_stateObj[i]).isFailed()) {
@@ -189,35 +189,35 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
   
   virtual void full_propagate()
   {
-      //for(int i=0; i<gadget_stateObj.size(); i++) D_ASSERT(!getState(gadget_stateObj[i]).isFailed());
+      //for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) D_ASSERT(!getState(gadget_stateObj[i]).isFailed());
       // Actually child constraints can already be failed since BuildCSP does an initial propagation.
       
       if(CORINCREMENTAL) {
           if(getState(stateObj).isFailed()) return;
           
           // Copy domains
-          for(int i = 0; i < var_array.size(); ++i)
+          for(int i = 0; i < (SysInt)var_array.size(); ++i)
           {
               DomainInt min_val = var_array[i].getMin();
               DomainInt max_val = var_array[i].getMax();
-              for(int j=0; j<inner_vars.size(); j++) {
+              for(int j=0; j<(SysInt)inner_vars.size(); j++) {
                   inner_vars[j][i].setMin(min_val);
                   inner_vars[j][i].setMax(max_val);
               }
               
               for(int j = min_val + 1; j < max_val; ++j)
               if(!var_array[i].inDomain(j)) {
-                  for(int k=0; k<inner_vars.size(); k++) {
+                  for(int k=0; k<(SysInt)inner_vars.size(); k++) {
                       inner_vars[k][i].removeFromDomain(j);
                   }
               }
           }
           
-          //for(int i=0; i<gadget_stateObj.size(); i++) D_ASSERT(!getState(gadget_stateObj[i]).isFailed());
+          //for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) D_ASSERT(!getState(gadget_stateObj[i]).isFailed());
           
           do_prop_incremental();
           
-          for(int var=0; var<var_array.size(); var++) {
+          for(int var=0; var<(SysInt)var_array.size(); var++) {
               for(int val=dom_min; val<=dom_max; val++) {
                   if(var_array[var].inDomain(val)) {
                       attach_trigger(var, val);
@@ -235,7 +235,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
   void do_prop()
   { 
     D_ASSERT(!CORINCREMENTAL);
-    for(int i=0; i<gadget_stateObj.size(); i++) {
+    for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) {
         if(getState(gadget_stateObj[i]).isFailed()) {
             getState(gadget_stateObj[i]).setFailed(false);
         }
@@ -244,24 +244,24 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         Controller::world_push(gadget_stateObj[i]);
     }
     
-    for(int i = 0; i < var_array.size(); ++i)
+    for(int i = 0; i < (SysInt)var_array.size(); ++i)
     {
       DomainInt min_val = var_array[i].getMin();
       DomainInt max_val = var_array[i].getMax();
-      for(int j=0; j<inner_vars.size(); j++) {
+      for(int j=0; j<(SysInt)inner_vars.size(); j++) {
           inner_vars[j][i].setMin(min_val);
           inner_vars[j][i].setMax(max_val);
       }
       
       for(int j = min_val + 1; j < max_val; ++j)
       if(!var_array[i].inDomain(j)) {
-          for(int k=0; k<inner_vars.size(); k++) {
+          for(int k=0; k<(SysInt)inner_vars.size(); k++) {
               inner_vars[k][i].removeFromDomain(j);
           }
       }
     }
     
-    for(int i=0; i<gadget_stateObj.size(); i++) {
+    for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) {
         //cout << "About to propagate CSP "<< i << endl;
         //cout << "x0:" << inner_vars[i][0].getMin() << "," <<inner_vars[i][0].getMax()<<endl;
         //cout << "x1:" << inner_vars[i][1].getMin() << "," <<inner_vars[i][1].getMax()<<endl;
@@ -270,12 +270,12 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         
     }
     
-    for(int i=0; i<var_array.size(); i++) {
+    for(int i=0; i<(SysInt)var_array.size(); i++) {
         for(int val=var_array[i].getMin(); val<=var_array[i].getMax(); val++) {
             // Search for a disjunct supporting val.
             bool supported=false;
             
-            for(int j=0; j<gadget_stateObj.size(); j++) {
+            for(int j=0; j<(SysInt)gadget_stateObj.size(); j++) {
                 //if(getState(gadget_stateObj[j]).isFailed()) cout << "Child CSP " << j << " failed."<<endl;
                 
                 if(!(getState(gadget_stateObj[j]).isFailed()) && inner_vars[j][i].inDomain(val)) {
@@ -289,7 +289,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         }
     }
     
-    for(int i=0; i<gadget_stateObj.size(); i++) {
+    for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) {
         Controller::world_pop(gadget_stateObj[i]);
     }
     
@@ -304,9 +304,9 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
     // Propagate the child CSPs
     
     /*cout << "Child CSP variables before propagation: " << endl;
-    for(int i=0; i<gadget_stateObj.size(); i++) {
+    for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) {
         cout <<"Child "<<i << " failed:"<<getState(gadget_stateObj[i]).isFailed()<< endl;
-        for(int j=0; j<var_array.size(); j++) {
+        for(int j=0; j<(SysInt)var_array.size(); j++) {
             cout << "var:"<<j<<endl;
             for(int k=inner_vars[i][j].getMin(); k<=inner_vars[i][j].getMax(); k++) {
                 if(inner_vars[i][j].inDomain(k)) cout << k << ",";
@@ -315,7 +315,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
     }*/
     
     
-    for(int i=0; i<gadget_stateObj.size(); i++) {
+    for(int i=0; i<(SysInt)gadget_stateObj.size(); i++) {
         if(!getState(gadget_stateObj[i]).isFailed()) {
             PropogateCSP(gadget_stateObj[i], PropLevel_GAC, inner_vars[i]);
             
@@ -328,13 +328,13 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         
     }
     
-    for(int i=0; i<var_array.size(); i++) {
+    for(int i=0; i<(SysInt)var_array.size(); i++) {
         for(int val=var_array[i].getMin(); val<=var_array[i].getMax(); val++) {
             if(var_array[i].inDomain(val)) {
                 // Search for a disjunct supporting val.
                 bool supported=false;
                 
-                for(int j=0; j<gadget_stateObj.size(); j++) {
+                for(int j=0; j<(SysInt)gadget_stateObj.size(); j++) {
                     if(!(getState(gadget_stateObj[j]).isFailed()) && inner_vars[j][i].inDomain(val)) {
                         supported=true; break;
                     }
@@ -419,7 +419,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         // Copy variables 
         vector<Bounds> varbounds;
         vector<vector<int> > vardoms;
-        for(int i=0; i<var_array.size(); i++) {
+        for(int i=0; i<(SysInt)var_array.size(); i++) {
             Bounds b(var_array[i].getInitialMin(), var_array[i].getInitialMax());
             varbounds.push_back(b);
             
@@ -428,7 +428,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         }
         
         // One disjunct per variable in vector
-        for(int i=0; i<var_array.size()-2; i++) {
+        for(int i=0; i<(SysInt)var_array.size()-2; i++) {
             StateObj* temp=new StateObj();
             gadget_stateObj.push_back(temp);
         }
@@ -437,7 +437,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         
         // Put vars into cspi
         vector<Var> vars;
-        for(int i=0; i<var_array.size(); i++) {
+        for(int i=0; i<(SysInt)var_array.size(); i++) {
             Var vari = cspi.vars.getNewVar(VAR_DISCRETE, vardoms[i]);
             
             std::stringstream ss; ss << i;  // convert int to string in ridiculous C++ fashion.
@@ -449,7 +449,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         
         // Put constraint into cspi
         inner_vars.resize(var_array.size()-2);
-        for(int i=0; i<var_array.size()-2; i++) {
+        for(int i=0; i<(SysInt)var_array.size()-2; i++) {
             
             vector<vector<Var> > eqvars;
             eqvars.resize(2);
@@ -472,7 +472,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
             
             BuildCSP(gadget_stateObj[i], cspi);
             
-            for(int j=0; j<var_array.size(); j++)
+            for(int j=0; j<(SysInt)var_array.size(); j++)
                 inner_vars[i].push_back(get_AnyVarRef_from_Var(gadget_stateObj[i], vars[j]));
         }
     }
@@ -487,7 +487,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         // Copy variables 
         vector<Bounds> varbounds;
         vector<vector<int> > vardoms;
-        for(int i=0; i<var_array.size(); i++) {
+        for(int i=0; i<(SysInt)var_array.size(); i++) {
             Bounds b(var_array[i].getInitialMin(), var_array[i].getInitialMax());
             varbounds.push_back(b);
             
@@ -505,7 +505,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         
         // Put vars into cspi
         vector<Var> vars;
-        for(int i=0; i<var_array.size(); i++) {
+        for(int i=0; i<(SysInt)var_array.size(); i++) {
             Var vari = cspi.vars.getNewVar(VAR_DISCRETE, vardoms[i]);
             
             std::stringstream ss; ss << i;  // convert int to string in ridiculous C++ fashion.
@@ -577,7 +577,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         
         inner_vars.resize(4);
         for(int i=0; i<4; i++) {
-            for(int j=0; j<var_array.size(); j++)
+            for(int j=0; j<(SysInt)var_array.size(); j++)
                 inner_vars[i].push_back(get_AnyVarRef_from_Var(gadget_stateObj[i], vars[j]));
         }
     }*/
@@ -591,7 +591,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         // Copy variables 
         vector<Bounds> varbounds;
         vector<vector<int> > vardoms;
-        for(int i=0; i<var_array.size(); i++) {
+        for(int i=0; i<(SysInt)var_array.size(); i++) {
             Bounds b(var_array[i].getInitialMin(), var_array[i].getInitialMax());
             varbounds.push_back(b);
             
@@ -609,7 +609,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
         
         // Put vars into cspi
         vector<Var> vars;
-        for(int i=0; i<var_array.size(); i++) {
+        for(int i=0; i<(SysInt)var_array.size(); i++) {
             Var vari = cspi.vars.getNewVar(VAR_DISCRETE, vardoms[i]);
             
             std::stringstream ss; ss << i;  // convert int to string in ridiculous C++ fashion.
@@ -650,7 +650,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
             
             BuildCSP(gadget_stateObj[i], cspi);
             
-            for(int j=0; j<var_array.size(); j++)
+            for(int j=0; j<(SysInt)var_array.size(); j++)
                 inner_vars[i].push_back(get_AnyVarRef_from_Var(gadget_stateObj[i], vars[j]));
         }
     }

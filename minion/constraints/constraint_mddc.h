@@ -308,7 +308,7 @@ struct MDDC : public AbstractConstraint
 
             if(nodeid<tlsize-1) {
                 // Not final tt node.
-                for(int pair=0; pair<tup.size(); pair=pair+2) {
+                for(int pair=0; pair<(SysInt)tup.size(); pair=pair+2) {
                     if(tup[pair]==-1 && tup[pair+1]==-1) break;
 
                     CHECK(tup[pair+1] >0 && tup[pair+1]<tlsize, "Links in MDD must be in range 1 up to the number of nodes");
@@ -376,7 +376,7 @@ struct MDDC : public AbstractConstraint
         // Now mdd is a trie with lots of tt nodes as the leaves.
         // Start merging from the leaves upwards.
         // label the nodes with a unique integer.
-        for(int i=0; i<mddnodes.size(); i++) {
+        for(int i=0; i<(SysInt)mddnodes.size(); i++) {
             mddnodes[i]->id=i;
         }
 
@@ -457,7 +457,7 @@ struct MDDC : public AbstractConstraint
         // Now mdd is a trie with lots of tt nodes as the leaves.
         // Start merging from the leaves upwards.
         // label the nodes with a unique integer.
-        for(int i=0; i<mddnodes.size(); i++) {
+        for(int i=0; i<(SysInt)mddnodes.size(); i++) {
             mddnodes[i]->id=i;
         }
 
@@ -497,15 +497,15 @@ struct MDDC : public AbstractConstraint
             // Use stupid algorithm to find duplicates.
             // Only need to look at layers 1..n where n is number of vars.
             // Layer 0 only contains
-            for(int i=1; i<nodelist.size(); i++) {
-                for(int j=i+1; j<nodelist.size(); j++) {
+            for(int i=1; i<(SysInt)nodelist.size(); i++) {
+                for(int j=i+1; j<(SysInt)nodelist.size(); j++) {
                     bool match=true;
                     MDDNode* n1=nodelist[i];
                     MDDNode* n2=nodelist[j];
 
                     if(n1->type != n2->type) match=false;
                     if(n1->links.size() != n2->links.size()) match=false;
-                    for(int k=0; k<n1->links.size() && match; k++) {
+                    for(int k=0; k<(SysInt)(n1->links.size()) && match; k++) {
                         if(n1->links[k] != n2->links[k]) match=false;
                     }
 
@@ -521,14 +521,14 @@ struct MDDC : public AbstractConstraint
 
                         mddnodes[todelete->id]=mddnodes.back();
                         mddnodes.pop_back();
-                        if(todelete->id != mddnodes.size()) {
+                        if(todelete->id != (SysInt)mddnodes.size()) {
                             // If we didn't just delete the last element...
                             mddnodes[todelete->id]->id=todelete->id;    // fix the id of the moved node.
                         }
 
                         vector<std::pair<DomainInt, MDDNode*> >& parlinks=todelete->parent->links;
                         //  Search parlinks for the pointer to change
-                        for(int k=0; k<parlinks.size(); k++) {
+                        for(int k=0; k<(SysInt)parlinks.size(); k++) {
                             if(parlinks[k].second == todelete) {
                                 // todelete is being deleted so rewire this pointer to nodelinks[i]
                                 parlinks[k].second = nodelist[i];
@@ -545,7 +545,7 @@ struct MDDC : public AbstractConstraint
         }
 
         // ensure nodes are labelled with unique integers.
-        for(int i=0; i<mddnodes.size(); i++) {
+        for(int i=0; i<(SysInt)mddnodes.size(); i++) {
             D_ASSERT(mddnodes[i]->id == i);
         }
 
@@ -553,7 +553,7 @@ struct MDDC : public AbstractConstraint
 
     void find_layer(int currentlayer, int targetlayer, MDDNode* curnode, vector<MDDNode* >& nodelist) {
         if(currentlayer<targetlayer) {
-            for(int i=0; i<curnode->links.size(); i++) {
+            for(int i=0; i<(SysInt)curnode->links.size(); i++) {
                 find_layer(currentlayer+1, targetlayer, curnode->links[i].second, nodelist);
             }
         }
@@ -824,7 +824,7 @@ struct MDDC : public AbstractConstraint
     }
 
     void print_mdd() {
-        for(int i=0; i<mddnodes.size(); i++) {
+        for(int i=0; i<(SysInt)mddnodes.size(); i++) {
             print_mdd_node(mddnodes[i]);
         }
 

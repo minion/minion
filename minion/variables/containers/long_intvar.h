@@ -201,7 +201,7 @@ struct BigRangeVarContainer {
   void addVariables(const vector<pair<SysInt, Bounds> >& new_domains)
   {
     D_ASSERT(!lock_m);
-    for(SysInt i = 0; i < new_domains.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)new_domains.size(); ++i)
     {
       for(DomainInt j = 0; j < new_domains[i].first; ++j)
       {
@@ -223,7 +223,7 @@ struct BigRangeVarContainer {
     // correct var_offsets to start at the start of our block.
     if(temp1>0)
     {
-        for(SysInt i=0;i<var_offset.size(); ++i) var_offset[i]+=temp1;
+        for(SysInt i=0;i<(SysInt)var_offset.size(); ++i) var_offset[i]+=temp1;
     }
 
     for(SysInt j = 0; j < var_count_m; ++j) {
@@ -634,6 +634,6 @@ template<typename T>
 inline BigRangeVarRef
 BigRangeVarContainer<T>::get_var_num(DomainInt i)
 {
-  D_ASSERT(i < var_count_m);
+  D_ASSERT(i < (DomainInt)var_count_m);
   return BigRangeVarRef(BigRangeVarRef_internal(this, i));
 }

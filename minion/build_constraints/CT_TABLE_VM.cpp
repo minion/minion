@@ -57,7 +57,7 @@ std::string make_table_string(const T& t1, ConstraintBlob& b, char const* type)
     oss << "],\n";
 
     oss <<  "\"table\" : [";
-    for(int i = 0; i < b.tuples->size(); ++i)
+    for(SysInt i = 0; i < (DomainInt)b.tuples->size(); ++i)
     {
         vector<DomainInt> v = b.tuples->get_vector(i);
         if(i > 0) oss <<  ",\n";

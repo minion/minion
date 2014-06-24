@@ -181,7 +181,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
         return;
       }
 
-      if(indexvar.getMax() >= var_array.size())
+      if(indexvar.getMax() >= (SysInt)var_array.size())
       {
         indexvar.addDynamicTrigger(dt+2*j, DomainRemoval, indexvar.getMax());
         releaseTrigger(stateObj, (dt+2*j+1));
@@ -332,7 +332,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
 
   virtual void full_propagate()
   {
-    for(SysInt i=0; i<var_array.size(); i++) {
+    for(SysInt i=0; i<(SysInt)var_array.size(); i++) {
         if(var_array[i].isBound() && !var_array[i].isAssigned()) { // isassigned excludes constants.
             cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
         }
@@ -493,7 +493,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
           assignment.push_back(make_pair(var_array.size() + 1, 0));
           return true;
         }
-        if(indexvar.getMax() >= var_array.size())
+        if(indexvar.getMax() >= (SysInt)var_array.size())
         {
           assignment.push_back(make_pair(var_array.size(), indexvar.getMax()));
           assignment.push_back(make_pair(var_array.size() + 1, 0));
@@ -540,7 +540,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
           con.push_back(t4);
       }
 
-      for(SysInt i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i<(SysInt)var_array.size(); i++)
       {
           vector<AbstractConstraint*> con2;
           WatchLiteralConstraint<Index>* t=new WatchLiteralConstraint<Index>(stateObj, indexvar, i);

@@ -45,7 +45,7 @@ struct GadgetConstraint : public AbstractConstraint
   {
     BuildCSP(gadget_stateObj, *gadget_instance);
     construction_vars.reserve(gadget_instance->constructionSite.size());
-    for(SysInt i = 0; i < gadget_instance->constructionSite.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)gadget_instance->constructionSite.size(); ++i)
       construction_vars.push_back(get_AnyVarRef_from_Var(gadget_stateObj, gadget_instance->constructionSite[i]));
     if(construction_vars.size() != var_array.size())
       INPUT_ERROR("Gadgets construction site is incorrect size");

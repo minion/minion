@@ -124,7 +124,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
 
   virtual SysInt dynamic_trigger_count()
   {
-    if(var_sum >= var_array.size() || var_sum < 0)
+    if(var_sum >= (SysInt)var_array.size() || var_sum < 0)
       return 0;
     else
       return checked_cast<SysInt>(var_sum + 1);
@@ -302,7 +302,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
     }
 
     SysInt count = 0;
-    for(SysInt i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
     {
       if(var_array[i].inDomain(!VarToCount))
       {

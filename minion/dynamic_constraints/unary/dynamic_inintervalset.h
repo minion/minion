@@ -45,7 +45,7 @@ template<typename Var>
     {
         CHECK(_vals.size()%2==0, "Second argument of w-inintervalset constraint represents a list of pairs so it must have an even number of values.");
         CHECK(_vals.size()>0,"w-inintervalset constraint requires at least one interval.");
-        for(int i=0; i<_vals.size(); i=i+2) {
+        for(int i=0; i<(SysInt)_vals.size(); i=i+2) {
             CHECK(_vals[i]<=_vals[i+1], "Malformed interval in w-inintervalset constraint.");
             // Allow intervals with just one value.
             intervals.push_back(std::make_pair(_vals[i], _vals[i+1]));

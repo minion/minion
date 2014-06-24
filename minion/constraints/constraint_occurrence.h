@@ -392,7 +392,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
     }
     else
     {
-      D_ASSERT(val_count_max == var_array.size());
+      D_ASSERT(val_count_max == (SysInt)var_array.size());
       return ConOutput::print_con(stateObj, "occurrencegeq",var_array,value, val_count_min);
     }
   }
@@ -578,7 +578,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
       {
           return new ConstantOccurrenceEqualConstraint<VarArray, Val>(stateObj, var_array, value, val_count_max+1, var_array.size());
       }
-      if(val_count_max==var_array.size())
+      if(val_count_max==(SysInt)var_array.size())
       {
           return new ConstantOccurrenceEqualConstraint<VarArray, Val>(stateObj, var_array, value, 0, val_count_min-1);
       }

@@ -51,7 +51,7 @@ void MinionThreeInputReader<FileReader>::finalise() {
 
   vector<Var> all_vars = instance->vars.get_all_vars();
   set<Var> unused_vars(all_vars.begin(), all_vars.end());
-  for(SysInt i = 0; i < instance->search_order.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)instance->search_order.size(); ++i)
   {
     const vector<Var>& vars_ref = instance->search_order[i].var_order;
     for(vector<Var>::const_iterator it = vars_ref.begin(); it != vars_ref.end(); ++it)
@@ -75,7 +75,7 @@ void MinionThreeInputReader<FileReader>::finalise() {
     }
   }
 
-  for(SysInt i = 0; i < instance->search_order.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)instance->search_order.size(); ++i)
     instance->search_order[i].setupValueOrder();
 
   // This has to be delayed unless not all variables are defined where 'PRINT ALL' occurs.
@@ -252,7 +252,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
 
   if(def->read_types[1] == read_tuples)
   {
-    if(con.vars[0].size() != con.tuples->tuple_size())
+    if((SysInt)con.vars[0].size() != con.tuples->tuple_size())
     {
       throw parse_exception("Tuple constraint with " + tostring(con.vars[0].size()) +
                             " variables cannot have tuples of length " + tostring(con.tuples->tuple_size()));
@@ -395,7 +395,7 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
 
       if(tupleSize == 0)
         tupleSize = tuple.size();
-      if(tupleSize != tuple.size())
+      if(tupleSize != (SysInt)tuple.size())
         throw parse_exception("All tuples in each constraint must be the same size!");
       tuples.push_back(std::move(tuple)) ;
 
@@ -460,7 +460,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* 
   }
   infile->check_sym(']');
   infile->check_sym(')');
-  for(SysInt i = 0; i < clause_vars.size(); i++) {
+  for(SysInt i = 0; i < (SysInt)clause_vars.size(); i++) {
     if(clause_vars[i].type() == VAR_NOTBOOL) {
       negs.push_back(0);
       clause_vars[i].setType(VAR_BOOL);
@@ -500,7 +500,7 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
       throw parse_exception("Can't index a " + tostring(max_index.size()) +
       "-d matrix with " + tostring(params.size()) +
       " indices.");
-    for(SysInt i = 0; i < params.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)params.size(); ++i)
     {
       if(params[i] < 0 || params[i] >= max_index[i])
         throw parse_exception(tostring(i) + string("th index is out of bounds,") +
@@ -692,7 +692,7 @@ vector<vector<Var> > MinionThreeInputReader<FileReader>::read2DMatrix(FileReader
     else
     {
       vector<vector<Var> > vars = read2DMatrixVariable(infile);
-      for(SysInt i = 0; i < vars.size(); ++i)
+      for(SysInt i = 0; i < (SysInt)vars.size(); ++i)
         return_vals.push_back(vars[i]);
     }
     // Eat a comma if there is one there.
@@ -990,7 +990,7 @@ found: ;
       {
         print_all_vars = false;
         vector<vector<Var> > new_matrix = read2DMatrix(infile);
-        for(SysInt i = 0; i < new_matrix.size(); ++i)
+        for(SysInt i = 0; i < (SysInt)new_matrix.size(); ++i)
           instance->print_matrix.push_back(new_matrix[i]);
       }
     }
@@ -1161,7 +1161,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
           }
 
           vector<vector<Var> > matrix_list = instance->vars.flattenTo2DMatrix(varname);
-          for(SysInt i = 0; i < matrix_list.size(); ++i)
+          for(SysInt i = 0; i < (SysInt)matrix_list.size(); ++i)
             instance->all_vars_list.push_back(matrix_list[i]);
         }
       }

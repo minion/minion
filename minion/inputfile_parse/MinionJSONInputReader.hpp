@@ -48,7 +48,7 @@ void MinionJSONInputReader::finalise() {
 
   vector<Var> all_vars = instance->vars.get_all_vars();
   set<Var> unused_vars(all_vars.begin(), all_vars.end());
-  for(SysInt i = 0; i < instance->search_order.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)instance->search_order.size(); ++i)
   {
     const vector<Var>& vars_ref = instance->search_order[i].var_order;
     for(vector<Var>::const_iterator it = vars_ref.begin(); it != vars_ref.end(); ++it)
@@ -72,7 +72,7 @@ void MinionJSONInputReader::finalise() {
     }
   }
 
-  for(SysInt i = 0; i < instance->search_order.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)instance->search_order.size(); ++i)
     instance->search_order[i].setupValueOrder();
 
   // This has to be delayed unless not all variables are defined where 'PRINT ALL' occurs.

@@ -246,7 +246,7 @@ double get_entropy(const T& data, int pos)
 
     double entropy = 0;
 
-    for(int i = 0; i < c_true.first.size(); ++i)
+    for(int i = 0; i < (SysInt)c_true.first.size(); ++i)
     {
         entropy += e_log(c_true.first[i]);
         entropy += e_log(c_true.second[i]);

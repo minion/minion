@@ -62,7 +62,7 @@ struct TestConstraint : public AbstractConstraint
   TestConstraint(StateObj* _stateObj, const VarArray& _vars) :
     AbstractConstraint(_stateObj)
   {
-      for(int i=0; i<_vars.size(); i++)
+      for(int i=0; i<(SysInt)_vars.size(); i++)
       {
           vars[i] = _vars[i];
       }

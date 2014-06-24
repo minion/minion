@@ -175,7 +175,7 @@ struct SparseBoundVarContainer {
   DomainInt min_domain_val = DomainInt_Min;
   DomainInt max_domain_val = DomainInt_Max;
 
-  for(SysInt i = 0; i < new_domains.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)new_domains.size(); ++i)
   {
     D_ASSERT(new_domains[i].second.front() >= DomainInt_Min);
     D_ASSERT(new_domains[i].second.back() <= DomainInt_Max);

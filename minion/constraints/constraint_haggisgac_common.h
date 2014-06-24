@@ -49,7 +49,7 @@
     const SysInt val_offset = checked_cast<SysInt>(v[0]-vars[0].getInitialMin());
     const vector<vector<pair<SysInt, DomainInt> > * >& tuplist=tuple_list->get_tl()[0][val_offset];
 
-    for(SysInt i=0; i<tuple_list->get_tl()[0][val_offset].size(); i++)
+    for(SysInt i=0; i<(SysInt)tuple_list->get_tl()[0][val_offset].size(); i++)
     {
         const vector<pair<SysInt,DomainInt> > & tup=*(tuplist[i]);
 
@@ -107,7 +107,7 @@
         }
 
         // Anything remaining on bracktrack stack
-        for(SysInt i=0; i<backtrack_stack.size(); i++) {
+        for(SysInt i=0; i<(SysInt)backtrack_stack.size(); i++) {
             if(backtrack_stack[i].sup!=0) {
                 myset.insert(backtrack_stack[i].sup);
             }

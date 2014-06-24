@@ -87,7 +87,7 @@ struct VMConstraint : public AbstractConstraint
   {
       if(_vars.size() > MaxVarSize)
           FAIL_EXIT("Only MaxVarSize (13?) variables allowed!");
-      for(int i = 0; i < _vars.size(); ++i)
+      for(int i = 0; i < (SysInt)_vars.size(); ++i)
         D(vars,i) = D(_vars,i);
       vars_size = _vars.size();
       if(_tuples->size() != 1 || _mapping_tuples->size() != 1)

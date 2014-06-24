@@ -86,7 +86,7 @@ struct GACTableConstraint : public AbstractConstraint
   ~GACTableConstraint()
   {
     delete[] recyclableTuple;
-    for(SysInt i = 0; i < trie_current_support.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)trie_current_support.size(); ++i)
       delete[] trie_current_support[i];
   }
 

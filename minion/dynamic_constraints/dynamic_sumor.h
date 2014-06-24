@@ -1,7 +1,7 @@
 /* Minion Constraint Solver
 http://minion.sourceforge.net
 
-For Licence Information see file LICENSE.txt 
+For Licence Information see file LICENSE.txt
 
   $Id: dynamic_vecneq.h 1117 2008-02-15 17:19:14Z caj $
 */
@@ -75,16 +75,16 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     {
        if(num_to_watch <= 1)
          num_to_watch = 0;
-       D_ASSERT(var_array1.size() == var_array2.size()); 
+       D_ASSERT(var_array1.size() == var_array2.size());
     }
 
   virtual SysInt dynamic_trigger_count()
   { return checked_cast<SysInt>(Operator::dynamic_trigger_count() * num_to_watch); }
 
   bool no_support_for_index(DomainInt index_in)
-  { 
+  {
     const SysInt index = checked_cast<SysInt>(index_in);
-    return Operator::no_support_for_pair(var_array1[index], var_array2[index]); 
+    return Operator::no_support_for_pair(var_array1[index], var_array2[index]);
   }
 
 
@@ -96,19 +96,19 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
 
   virtual void full_propagate()
   {
-    
+
     // Check if the constraint is trivial, if so just exit now.
     if(num_to_watch <= 1)
       return;
-      
+
     watched_values.resize(checked_cast<SysInt>(num_to_watch));
-      
+
     DynamicTrigger* dt = dynamic_trigger_start();
     SysInt size = var_array1.size();
     SysInt index = 0;
     SysInt found_matches = 0;
     // Find first pair we could watch.
-    
+
     while(found_matches < num_to_watch && index < size)
     {
       while(index < size && no_support_for_index(index))
@@ -122,7 +122,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
         ++index;
       }
     }
-    
+
     // Failed to find enough watches
     if(found_matches < num_to_watch - 1)
     {
@@ -149,26 +149,26 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     {
       add_triggers(watched_values[i], dt + Operator::dynamic_trigger_count()*i);
     }
-    
+
     // Setup the 'unwatched values' array.
     initalise_unwatched_values();
   }
-  
+
   void initalise_unwatched_values()
   {
     unwatched_values.resize(0);
-    for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)var_array1.size(); ++i)
     {
       bool found = false;
-      for(UnsignedSysInt j = 0; j < watched_values.size(); ++j)
+      for(SysInt j = 0; j < (SysInt)watched_values.size(); ++j)
       {
         if(i == watched_values[j])
           found = true;
       }
       if(!found)
-        unwatched_values.push_back(i); 
+        unwatched_values.push_back(i);
     }
-    
+
     random_shuffle(unwatched_values.begin(), unwatched_values.end());
   }
 
@@ -177,7 +177,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     const SysInt index = checked_cast<SysInt>(index_in);
     Operator::propagate_from_var1(var_array1[index], var_array2[index]);
   }
-  
+
   void propagate_from_var2(DomainInt index_in)
   {
     const SysInt index = checked_cast<SysInt>(index_in);
@@ -188,42 +188,42 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   {
     PROP_INFO_ADDONE(DynVecNeq);
     SysInt trigger_activated = dt - dynamic_trigger_start();
-    SysInt triggerpair = trigger_activated / Operator::dynamic_trigger_count();   
+    SysInt triggerpair = trigger_activated / Operator::dynamic_trigger_count();
     D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);
 
     /*printf("propmode=%d, triggerpair=%d, trigger_activated=%d\n",
       (SysInt)propagate_mode, (SysInt)triggerpair, (SysInt)trigger_activated);
 
-    for(SysInt i = 0; i < watched_values.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)watched_values.size(); ++i)
       printf("%d,", watched_values[i]);
-    
-    printf(":");  
-    for(SysInt i = 0; i < unwatched_values.size(); ++i)
+
+    printf(":");
+    for(SysInt i = 0; i < (SysInt)unwatched_values.size(); ++i)
       printf("%d,", unwatched_values[i]);
     printf("\n");
-    
+
     for(SysInt i = 0; i < var_array1.size(); ++i)
       cout << var_array1[i].getMin() << ":" << var_array1[i].getMax() << ",";
-    
+
     cout << endl;
-    
+
     for(SysInt i = 0; i < var_array2.size(); ++i)
       cout << var_array2[i].getMin() << ":" << var_array2[i].getMax() << ",";
-    
+
     cout << endl;*/
-    
-    
+
+
     if(propagate_mode)
     {
       if(index_to_not_propagate == watched_values[triggerpair])
         return;
-        
+
     // assumes that the first set of Operator::dynamic_trigger_count()/2 triggers are on var1, and the other set are on var2.
       if(trigger_activated % Operator::dynamic_trigger_count() < Operator::dynamic_trigger_count()/2)
       { propagate_from_var1(watched_values[triggerpair]); }
       else
       { propagate_from_var2(watched_values[triggerpair]); }
-      return;   
+      return;
     }
 
     // Check if propagation has caused a loss of support.
@@ -234,17 +234,17 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     SysInt unwatched_size = unwatched_values.size();
     while(index < unwatched_size && no_support_for_index(unwatched_values[index]))
       index++;
-      
+
     if(index == unwatched_size)
     {
       // This is the only possible non-equal index.
       propagate_mode = true;
       index_to_not_propagate = watched_values[triggerpair];
-      
+
 //     printf("!propmode=%d, triggerpair=%d, trigger_activated=%d, nopropindex=%d\n",
 //        (SysInt)propagate_mode, (SysInt)triggerpair, (SysInt)trigger_activated, (SysInt)index_to_not_propagate);
-        
-      for(SysInt i = 0; i < watched_values.size(); ++i)
+
+      for(SysInt i = 0; i < (SysInt)watched_values.size(); ++i)
       {
         if(i != triggerpair)
         {
@@ -256,7 +256,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     }
 
     swap(watched_values[triggerpair], unwatched_values[index]);
-    
+
     DynamicTrigger* trigs = dynamic_trigger_start();
     add_triggers(watched_values[triggerpair], trigs + triggerpair * Operator::dynamic_trigger_count());
   }
@@ -272,24 +272,24 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   }
 
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> vars;
     vars.reserve(var_array1.size() + var_array2.size());
     for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
       vars.push_back(AnyVarRef(var_array1[i]));
     for(UnsignedSysInt i = 0; i < var_array2.size(); ++i)
       vars.push_back(AnyVarRef(var_array2[i]));
-    return vars;  
+    return vars;
   }
-  
+
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     if(num_to_watch <= 1)
       return true;
-    
+
     pair<DomainInt, DomainInt> assign;
     SysInt found_satisfying = 0;
-    for(SysInt i = 0; i < var_array1.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)var_array1.size(); ++i)
     {
       if(Operator::get_satisfying_assignment(var_array1[i], var_array2[i], assign))
       {
@@ -303,15 +303,15 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
           return true;
       }
     }
-    // If we didn't get enough, 
+    // If we didn't get enough,
     return false;
   }
-  
+
   virtual AbstractConstraint* reverse_constraint()
    { return new VecCountDynamic<VarArray1, VarArray2, typename Operator::reverse_operator>
          (stateObj, var_array1, var_array2, (SysInt)var_array1.size()-hamming_distance+1); }
-  
-  
+
+
 };
 
 template<typename VarArray1,  typename VarArray2>

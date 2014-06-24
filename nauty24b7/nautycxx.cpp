@@ -28,13 +28,13 @@ std::vector<std::vector<int> > build_graph(std::vector<std::set<int> > graph, co
   
   int edge_count = 0;
 
-   for(int i = 0; i < graph.size(); ++i)
+   for(int i = 0; i < (SysInt)graph.size(); ++i)
    {
      for(std::set<int>::const_iterator it = graph[i].begin(); it != graph[i].end(); ++it)
        graph[*it].insert(i);
    }
 
-   for(int i = 0; i < graph.size(); ++i)
+   for(int i = 0; i < (SysInt)graph.size(); ++i)
      edge_count += graph[i].size();
      
 //  options.writeautoms = TRUE;
@@ -72,7 +72,7 @@ std::vector<std::vector<int> > build_graph(std::vector<std::set<int> > graph, co
   
   // Now for partitioning
   current_pos = 0;
-  for(int i = 0; i < partition.size(); ++i)
+  for(int i = 0; i < (SysInt)partition.size(); ++i)
   {
     for(std::set<int>::const_iterator it = partition[i].begin(); it != partition[i].end(); ++it)
     {
@@ -119,9 +119,9 @@ int main(void)
  
   std::vector<std::vector<int> > perms = build_graph(verts, partitions);
   
-  for(int i = 0; i < perms.size(); ++i)
+  for(int i = 0; i < (SysInt)perms.size(); ++i)
    {
-     for(int j = 0; j < perms[i].size(); ++j)
+     for(int j = 0; j < (SysInt)perms[i].size(); ++j)
        printf("%d,", perms[i][j]);
      printf("\n");
   }

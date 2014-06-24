@@ -173,7 +173,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
   
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    for(SysInt i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
     {
       if(var_array[i].inDomain(1))
       {

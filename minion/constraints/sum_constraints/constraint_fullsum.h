@@ -70,7 +70,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     var_array_min_sum(_stateObj)
   {
       BigInt accumulator=0;
-      for(SysInt i=0; i<var_array.size(); i++) {
+      for(SysInt i=0; i<(SysInt)var_array.size(); i++) {
           accumulator+= checked_cast<SysInt>(max( abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin()) ));
           CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
       }
@@ -78,7 +78,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
 
     no_negatives = true;
-    for(SysInt i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
     {
       if(var_array[i].getInitialMin() < 0)
       {

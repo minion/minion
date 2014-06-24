@@ -63,12 +63,12 @@ int main(int argc, char** argv)
   printf("**TUPLELIST**\n");
   
   printf("PosList %d 2\n", tuplelist.size());
-  for(int i = 0; i < tuplelist.size(); ++i)
+  for(int i = 0; i < (SysInt)tuplelist.size(); ++i)
     printf("%d %d \n", tuplelist[i].first + 1, tuplelist[i].second + 1);
   printf("\n");
 
   printf("NegList %d 2\n", revlist.size());
-  for(int i = 0; i < revlist.size(); ++i)
+  for(int i = 0; i < (SysInt)revlist.size(); ++i)
     printf("%d %d \n", revlist[i].first + 1, revlist[i].second + 1);
   printf("\n");
   
