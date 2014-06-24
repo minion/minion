@@ -61,6 +61,7 @@ class TriggerList
   StateObj* stateObj;
 
   TriggerList(const TriggerList&);
+  TriggerList();
   void operator=(const TriggerList&);
   bool only_bounds;
 
@@ -70,6 +71,12 @@ public:
   {
     var_count_m = 0;
     lock_first = lock_second = 0;
+
+    dynamic_triggers = 0;
+    trigger_data_m = 0;
+    vars_min_domain_val = 0;
+    vars_max_domain_val = 0;
+    vars_domain_size = 0;
   }
 
   vector<vector<vector<Trigger> > > triggers;
