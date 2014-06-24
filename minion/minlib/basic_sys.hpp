@@ -1,6 +1,10 @@
 #ifndef BASIC_SYS_CQP
 #define BASIC_SYS_CQP
 
+#ifdef _WIN32
+#define NOMINMAX
+#endif
+
 #include <string>
 #include <vector>
 #include <array>
@@ -19,6 +23,8 @@
 #include <exception>
 #include <stdexcept>
 #include <tuple>
+#include <functional>
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -37,5 +43,11 @@
 /// the containers, which is horrible
 template<typename... Class>
 struct TypeDefs;
+
+#ifdef _WIN32
+#define DOM_NOINLINE
+#else
+#define DOM_NOINLINE __attribute__ ((noinline))
+#endif
 
 #endif
