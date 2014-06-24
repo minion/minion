@@ -198,7 +198,7 @@ public:
                         else array_pointer[c_lvl] = 0;  }
 
                     else if (!needcomma && get_int(var_value)) {    // add value
-                        if (depth == 0){ depth = array_pointer.size()-1;  }
+                        if (depth == 0){ depth = (SysInt)array_pointer.size()-1;  }
                         if (c_lvl != depth) {
                             p_error("Array dimensions do not match:",
                                     charnum - 1);  }

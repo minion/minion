@@ -55,7 +55,7 @@ template<typename Var>
     { return 2; }
 
   virtual void full_propagate()
-  {  
+  {
     DynamicTrigger* dt = dynamic_trigger_start();
 
     if(var.isBound())
@@ -78,15 +78,15 @@ template<typename Var>
     D_ASSERT(var.isBound());
     //lower loop
     SysInt lower_index = 0;
-    
+
     while(lower_index < (SysInt)vals.size() && vals[lower_index] <= var.getMin())
     {
       var.setMin(vals[lower_index] + 1);
       lower_index++;
     }
-    
-    SysInt upper_index = vals.size() - 1;
-    
+
+    SysInt upper_index = (SysInt)vals.size() - 1;
+
     while(upper_index > 0 && vals[upper_index] >= var.getMax())
     {
       var.setMax(vals[upper_index] - 1);
@@ -101,7 +101,7 @@ template<typename Var>
   }
 
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
@@ -109,10 +109,10 @@ template<typename Var>
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  {  
+  {
     /// TODO: Make faster
     for(DomainInt i = var.getMin(); i <= var.getMax(); ++i)
-    { 
+    {
       if(var.inDomain(i) && !binary_search(vals.begin(), vals.end(), i))
       {
         assignment.push_back(make_pair(0, i));

@@ -277,8 +277,8 @@ struct MDDC : public AbstractConstraint
 
         // set up the two sets of mdd nodes.
 
-        gyes.initialise(0,mddnodes.size()-1);
-        gno.initialise(0,mddnodes.size()-1);
+        gyes.initialise(0,(SysInt)mddnodes.size()-1);
+        gno.initialise(0,(SysInt)mddnodes.size()-1);
 
         // Set up gacvalues.
 
@@ -623,7 +623,7 @@ struct MDDC : public AbstractConstraint
     inline SysInt find_link(vector<std::pair<DomainInt, MDDNode*> > links, DomainInt value) {
         // Binary search to find the index where the first element of the pair equals value.
         SysInt first=0;
-        SysInt last=links.size()-1;
+        SysInt last=(SysInt)links.size()-1;
 
         while(first<=last) {
             SysInt mid=((last-first)>>1) + first;

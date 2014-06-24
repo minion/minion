@@ -32,11 +32,11 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   struct QuickLexDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
-    { 
+    {
         if(Less)
             return "lexless[quick]";
         else
-            return "lexleq[quick]"; 
+            return "lexleq[quick]";
     }
 
   typedef typename VarArray1::value_type VarRef1;
@@ -53,14 +53,14 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     const VarArray2& _array2) :
   AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
     alpha(_stateObj, -1)
-    { 
+    {
       CHECK(var_array1.size() == var_array2.size(), "QuickLexLeq and QuickLexLess only work with equal length vectors");
     }
 
   virtual SysInt dynamic_trigger_count()
     { return 2; }
 
-  
+
   void attach_triggers(SysInt i)
   {
       P("Attach Trigger: " << i);
@@ -68,7 +68,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
       var_array1[i].addDynamicTrigger(dt, LowerBound, NoDomainValue BT_CALL_BACKTRACK);
       var_array2[i].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue BT_CALL_BACKTRACK);
   }
-  
+
   void detach_triggers()
   {
       P("Detach Triggers");
@@ -76,7 +76,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
       releaseTrigger(stateObj, dt BT_CALL_BACKTRACK);
       releaseTrigger(stateObj, dt + 1 BT_CALL_BACKTRACK);
   }
-  
+
   virtual void full_propagate()
   {
     P("Full Prop");
@@ -88,9 +88,9 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
             getState(stateObj).setFailed(true);
         return;
     }
-    
+
     alpha = 0;
-    
+
     if(Less && var_array1.size() == 1)
     {
       var_array2[0].setMin(var_array1[0].getMin() + 1);
@@ -105,14 +105,14 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     // Set these up, just so they are stored.
     var_array1[0].addDynamicTrigger(dt, LowerBound, NoDomainValue BT_CALL_STORE);
     var_array2[0].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue BT_CALL_STORE);
-    
+
     if(var_array1[0].isAssigned() && var_array2[0].isAssigned() &&
        var_array1[0].getAssignedValue() == var_array2[0].getAssignedValue())
     {
         progress();
     }
   }
-  
+
   void progress()
   {
     SysInt a = alpha;
@@ -120,9 +120,9 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     D_ASSERT(var_array1[a].isAssigned());
     D_ASSERT(var_array2[a].isAssigned());
     D_ASSERT(var_array1[a].getAssignedValue() == var_array2[a].getAssignedValue());
-    
+
     a++;
-    
+
     while(a < n)
     {
       if(Less && a >= n-1)
@@ -148,7 +148,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
            return;
          }
     }
-    
+
     if(Less)
         getState(stateObj).setFailed(true);
     else
@@ -157,25 +157,25 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
         alpha = n;
     }
   }
-  
+
   virtual void propagate(DynamicTrigger* dt)
   {
     DynamicTrigger* base_dt = dynamic_trigger_start();
-    
+
     P("Trigger Event:" << dt - base_dt << " alpha:" << (SysInt)alpha);
 
     SysInt a = alpha;
 
     if(base_dt == dt)
     { // X triggered
-      if(Less && a >= var_array1.size() - 1)
+      if(Less && a >= (SysInt)var_array1.size() - 1)
         var_array2[a].setMin(var_array1[a].getMin() + 1);
       else
         var_array2[a].setMin(var_array1[a].getMin());
     }
     else
     { // Y triggered
-      if(Less && a >= var_array1.size() - 1)
+      if(Less && a >= (SysInt)var_array1.size() - 1)
         var_array1[a].setMax(var_array2[a].getMax() - 1);
       else
         var_array1[a].setMax(var_array2[a].getMax());
@@ -206,10 +206,10 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
       if(v[i] > v[i + x_size])
         return false;
     }
-    
+
     return !Less;
   }
-  
+
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
     {
       size_t array_size = var_array1.size();
@@ -236,16 +236,16 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   {
       return new QuickLexDynamic<VarArray2, VarArray1,!Less>(stateObj,var_array2,var_array1);
   }
-    
+
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> vars;
     vars.reserve(var_array1.size() + var_array2.size());
     for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
       vars.push_back(AnyVarRef(var_array1[i]));
     for(UnsignedSysInt i = 0; i < var_array2.size(); ++i)
       vars.push_back(AnyVarRef(var_array2[i]));
-    return vars;  
+    return vars;
   }
 
 };

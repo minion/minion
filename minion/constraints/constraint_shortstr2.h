@@ -20,14 +20,14 @@
 /** @help constraints;shortstr2 Description
 ShortSTR2 is the algorithm described in the IJCAI 2013 paper by Jefferson and
 Nightingale. It is an extension of STR2+ by Christophe Lecoutre, adapted for
-short supports. 
+short supports.
 
 */
 
-/** @help constraints;shortstr2 Example 
+/** @help constraints;shortstr2 Example
 
 Input format is exactly the same as haggisgac. Refer to the haggisgac and
-shorttuplelist pages for more information. 
+shorttuplelist pages for more information.
 
 Example:
 
@@ -62,9 +62,9 @@ help constraints haggisgac-stable
 str2plus is an implementation of the STR2+ algorithm by Christophe Lecoutre.
 */
 
-/** @help constraints;str2plus Example 
+/** @help constraints;str2plus Example
 
-str2plus is invoked in the same way as all other table constraints, such 
+str2plus is invoked in the same way as all other table constraints, such
 as table and mddc.
 
 str2plus([x,y,z], {<1,2,3>, <1,3,2>})
@@ -113,7 +113,7 @@ struct arrayset {
     vector<SysInt> vals_pos;
     DomainInt size;
     DomainInt minval;
-    
+
     void initialise(DomainInt low, DomainInt high) {
         minval=low;
         vals_pos.resize(checked_cast<SysInt>(high-low+1));
@@ -124,15 +124,15 @@ struct arrayset {
         }
         size=0;
     }
-    
+
     void clear() {
         size=0;
     }
-    
+
     bool in(DomainInt val) {
         return vals_pos[checked_cast<SysInt>(val-minval)]<size;
     }
-    
+
 
     // This method looks a bit messy, due to stupid C++ optimisers not being
     // clever enough to realise various things don't alias, and this method
@@ -147,10 +147,10 @@ struct arrayset {
         const SysInt vpvx = vals_pos[validx];
         vals[vpvx]=swapval;
         vals[size_cpy]=checked_cast<SysInt>(val);
-        
+
         vals_pos[checked_cast<SysInt>(swapval-minval_cpy)]=vpvx;
         vals_pos[validx]=size_cpy;
-        
+
         size++;
     }
 
@@ -159,7 +159,7 @@ struct arrayset {
             unsafe_insert(val);
         }
     }
-    
+
     void unsafe_remove(DomainInt val)
     {
         // swap to posiition size-1 then reduce size
@@ -168,10 +168,10 @@ struct arrayset {
         const SysInt swapval=vals[checked_cast<SysInt>(size-1)];
         vals[vals_pos[validx]]=swapval;
         vals[checked_cast<SysInt>(size-1)]=checked_cast<SysInt>(val);
-        
+
         vals_pos[checked_cast<SysInt>(swapval-minval)]=vals_pos[validx];
         vals_pos[validx]=checked_cast<SysInt>(size-1);
-        
+
         size--;
     }
 
@@ -180,7 +180,7 @@ struct arrayset {
             unsafe_remove(val);
         }
     }
-    
+
     void fill() {
         size=vals.size();
     }
@@ -192,9 +192,9 @@ struct ReversibleArrayset {
     vector<SysInt> vals_pos;
     ReversibleInt size;
     SysInt minval;
-    
+
     ReversibleArrayset(StateObj * _so) : size(_so) {}
-    
+
     void initialise(DomainInt low_, DomainInt high_) {
         const SysInt low = checked_cast<SysInt>(low_);
         const SysInt high = checked_cast<SysInt>(high_);
@@ -207,11 +207,11 @@ struct ReversibleArrayset {
         }
         size=vals.size();
     }
-    
+
     bool in(DomainInt val) {
         return vals_pos[checked_cast<SysInt>(val-minval)]<size;
     }
-    
+
     void remove(DomainInt val) {
         // swap to posiition size-1 then reduce size
         if(in(val)) {
@@ -219,10 +219,10 @@ struct ReversibleArrayset {
             const SysInt swapval=vals[size-1];
             vals[vals_pos[validx]]=swapval;
             vals[size-1]=checked_cast<SysInt>(val);
-            
+
             vals_pos[swapval-minval]=vals_pos[validx];
             vals_pos[validx]=size-1;
-            
+
             size=size-1;
         }
     }
@@ -270,9 +270,9 @@ template<typename VarArray, bool UseShort>
 struct STR : public AbstractConstraint
 {
     virtual string constraint_name()
-    { 
+    {
         if(UseShort)
-            return "shortstr2"; 
+            return "shortstr2";
         else
             return "str2plus";
     }
@@ -284,20 +284,20 @@ struct STR : public AbstractConstraint
         if(UseShort)
             return ConOutput::print_con(stateObj, constraint_name(), vars, shortTupleList);
         else
-            return ConOutput::print_con(stateObj, constraint_name(), vars, longTupleList); 
+            return ConOutput::print_con(stateObj, constraint_name(), vars, longTupleList);
     }
 
     ShortTupleList* shortTupleList;
     TupleList* longTupleList;
 
     VarArray vars;
-    
+
     bool constraint_locked;
-    
+
     vector<SysInt> tupindices;
-    
+
     ReversibleInt limit;   // In tupindices, indices less than limit are not known to be invalid.
-    
+
     STRData* sct;
 
     void init()
@@ -310,12 +310,12 @@ struct STR : public AbstractConstraint
         for(SysInt i=0; i<sct->tuples.size(); i++) {
             tupindices[i]=i;
         }
-        
-        ssup.initialise(0, vars.size()-1);
-        sval.initialise(0, vars.size()-1);
-        
-        //ssup_permanent.initialise(0, vars.size()-1);
-        
+
+        ssup.initialise(0, (SysInt)vars.size()-1);
+        sval.initialise(0, (SysInt)vars.size()-1);
+
+        //ssup_permanent.initialise(0, (SysInt)vars.size()-1);
+
         gacvalues.resize(vars.size());
         for(SysInt i=0; i<vars.size(); i++) {
             gacvalues[i].initialise(vars[i].getInitialMin(), vars[i].getInitialMax());
@@ -324,25 +324,25 @@ struct STR : public AbstractConstraint
         std::random_shuffle(tupindices.begin(), tupindices.end());
     }
 
-    STR(StateObj* _stateObj, const VarArray& _var_array, ShortTupleList* _tuples) : AbstractConstraint(_stateObj), 
+    STR(StateObj* _stateObj, const VarArray& _var_array, ShortTupleList* _tuples) : AbstractConstraint(_stateObj),
     shortTupleList(_tuples), longTupleList(0),
     vars(_var_array), constraint_locked(false), limit(_stateObj), sct(new STRData(_tuples, _var_array.size()))
     //, ssup_permanent(_stateObj)
-    {   
+    {
         CHECK(UseShort, "Internal error in ShortSTR2");
       init();
     }
 
-    STR(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj), 
+    STR(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj),
     shortTupleList(0), longTupleList(_tuples),
     vars(_var_array), constraint_locked(false), limit(_stateObj), sct(new STRData(_tuples, _var_array.size()))
     //, ssup_permanent(_stateObj)
-    {   
+    {
         CHECK(!UseShort, "Internal error in str2plus");
       init();
     }
-    
-    
+
+
     // Set up triggers.
     virtual triggerCollection setup_internal()
     {
@@ -353,16 +353,16 @@ struct STR : public AbstractConstraint
         }
         return t;
     }
-    
+
     virtual void full_propagate() {
         limit=sct->tuples.size();
-        
+
         // pretend all variables have changed.
         for(SysInt i=0; i<vars.size(); i++) sval.insert(i);
-        
+
         do_prop();
     }
-    
+
     virtual vector<AnyVarRef> get_vars()
     {
       vector<AnyVarRef> ret;
@@ -371,7 +371,7 @@ struct STR : public AbstractConstraint
         ret.push_back(vars[i]);
       return ret;
     }
-    
+
     virtual bool check_assignment(DomainInt* v, SysInt v_size)
     {
         if(UseShort)
@@ -432,52 +432,52 @@ struct STR : public AbstractConstraint
 
         return false;
     }
-  
+
     virtual AbstractConstraint* reverse_constraint()
     { return forward_check_negation(stateObj, this); }
 
     virtual void propagate(DomainInt prop_var, DomainDelta)
     {
         sval.insert(prop_var);
-        
+
         if(!constraint_locked)
         {
             constraint_locked = true;
             getQueue(stateObj).pushSpecialTrigger(this);
         }
     }
-    
+
     virtual void special_unlock() { constraint_locked = false; sval.clear(); }
-    
+
     virtual void special_check()
     {
         constraint_locked = false;
         D_ASSERT(!getState(stateObj).isFailed());
         do_prop();
     }
-    
-    // S_sup is the set of unset (by the search procedure) variables with 
+
+    // S_sup is the set of unset (by the search procedure) variables with
     // at least one unsupported val.
     // Iterate only on S_Sup in the main loops looking for support.
     // Unfortunately can't do this exactly as in STR2 paper.
     arrayset ssup;
-    
-    //ReversibleArrayset ssup_permanent;  // when a var is assigned and after str2 has been run, it is removed from here. 
-    
+
+    //ReversibleArrayset ssup_permanent;  // when a var is assigned and after str2 has been run, it is removed from here.
+
     // S_val is the set of "unassigned" vars whose domain has been reduced since
-    // previous call.  
+    // previous call.
     // Unassigned here I think means not assigned by the search procedure.
     // Also contains the last assigned var (i.e. last assigned by the search procedure)
-    // if it belongs to the scope of the constraint. 
-    
+    // if it belongs to the scope of the constraint.
+
     // Here interpreted as the set of variables that triggered this call.
     arrayset sval;
-    
+
     // lastSize array dropped. Only need to keep a list of the triggering vars.
-    
-    
+
+
     vector<arrayset> gacvalues;
-    
+
 
     bool validTuple(SysInt i)
     {
@@ -498,7 +498,7 @@ struct STR : public AbstractConstraint
                     return false;
                 }
             }
-            
+
         }
 
         return true;
@@ -506,33 +506,33 @@ struct STR : public AbstractConstraint
 
     void do_prop() {
         const SysInt numvars=vars.size();
-        
-        // Basic impl of ssup for now. 
+
+        // Basic impl of ssup for now.
         // For 'removing assigned vars' optimization, need them to be both
         // assigned and to have done the table reduction after assignment!
-        
+
         // Actually this thing below is OK: as soon as we find a valid tuple,
         // any assigned vars will be removed from ssup.
-        
+
         //ssup.fill();
-        
+
         // copy ssup_permanent into ssup.
         //ssup.clear();
-        //for(int j=0; j<ssup_permanent.size; j++) ssup.insert(ssup_permanent.vals[j]); 
-        
+        //for(int j=0; j<ssup_permanent.size; j++) ssup.insert(ssup_permanent.vals[j]);
 
-        
-        
+
+
+
 
         if(UseShort)
         {
             ssup.clear();
-            
+
             while(limit > 0) {
                 const SysInt index=tupindices[0];
                 // check validity
                 bool isvalid=validTuple(0);
-                
+
                 if(isvalid) {
                     const vector<pair<SysInt, DomainInt> >& compressed_tau = sct->compressed_tuples[index];
                     for(SysInt t = 0; t < compressed_tau.size(); ++t)
@@ -568,7 +568,7 @@ struct STR : public AbstractConstraint
         // We dealt with the first tuple, if we are in 'Short' mode.
         SysInt i= UseShort?1:0;
 
-       
+
         while(i<limit) {
             // check validity
             if(!validTuple(i))
@@ -582,11 +582,11 @@ struct STR : public AbstractConstraint
         while(i<lim_cpy && ssup.size>0)
         {
             const SysInt index=tupindices[i];
-                const vector<DomainInt> & tau=tup_start[index];    
+                const vector<DomainInt> & tau=tup_start[index];
                 // do stuff
                 for(SysInt j=0; j<ssup.size; j++) {
                     const SysInt var=ssup.vals[j];
-                    
+
                     if(UseShort && tau[var]==DomainInt_Skip) {
                         ssup.unsafe_remove(var);
                         j--;
@@ -594,7 +594,7 @@ struct STR : public AbstractConstraint
                     }
                     else if(!gacvalues[var].in(tau[var])) {
                         gacvalues[var].unsafe_insert(tau[var]);
-                        
+
                         if(gacvalues[var].size == vars[var].getDomSize()) {
                             ssup.unsafe_remove(var);
                             j--;
@@ -614,10 +614,10 @@ struct STR : public AbstractConstraint
                 }
             }
         }
-        
+
         sval.clear();
     }
-    
+
     inline void removeTuple(SysInt i) {
         // Swap to end
         D_ASSERT(i<limit);
@@ -626,7 +626,7 @@ struct STR : public AbstractConstraint
         tupindices[i]=tmp;
         limit=limit-1;
     }
-    
+
 };
 
 

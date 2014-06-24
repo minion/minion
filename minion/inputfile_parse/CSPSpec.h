@@ -133,7 +133,7 @@ struct ConstraintBlob
 
   ConstraintBlob()
   { assert(0); }
-  
+
   ConstraintBlob(ConstraintDef* _con) : constraint(_con), tuples(0), tuples2(0)
   {}
 
@@ -217,16 +217,16 @@ struct ConstraintBlob
       {   // matrix is empty, all slices are empty.
           return return_list;
       }
-      
+
       if(params[i] == -999)
         modified_max[i] = max_index[i];
       else
         modified_max[i] = 1;
     }
-    
+
     // Iterates through the variable indices
     vector<DomainInt> current_index(params.size());
-    
+
     // Vector which actually contains the output
     vector<DomainInt> output(params);
     do
@@ -237,7 +237,7 @@ struct ConstraintBlob
       return_list.push_back(getSymbol(name + to_var_name(output)));
     }
     while(increment_vector(current_index, modified_max));
-    
+
     return return_list;
   }
 
@@ -249,7 +249,7 @@ struct ConstraintBlob
     // and for any sized matrix, we get a list of vectors, with all but the last dimension flattened!
     vector<DomainInt> indices = getMatrixSymbol(name);
     vector<DomainInt> loop_indices(indices.size());
-    for(SysInt i = 0; i < indices.size() - 1; ++i)
+    for(SysInt i = 0; i < (SysInt)indices.size() - 1; ++i)
       loop_indices[i] = -999;
 
     vector<vector<Var> > terms;
@@ -515,19 +515,19 @@ struct ConstraintBlob
   Var getNewBoundVar(DomainInt lower, DomainInt upper)
   {
      bound.push_back(make_pair(1, Bounds(lower, upper)));
-     return Var(VAR_BOUND, bound.size() - 1);
+     return Var(VAR_BOUND, (SysInt)bound.size() - 1);
   }
 
   Var getNewSparseBoundVar(const vector<DomainInt>& vals)
   {
     sparse_bound.push_back(make_pair(1, vals));
-    return Var(VAR_SPARSEBOUND, sparse_bound.size() - 1);
+    return Var(VAR_SPARSEBOUND, (SysInt)sparse_bound.size() - 1);
   }
 
   Var getNewDiscreteVar(DomainInt lower, DomainInt upper)
   {
     discrete.push_back(make_pair(1, Bounds(lower, upper)));
-    return Var(VAR_DISCRETE, discrete.size() - 1);
+    return Var(VAR_DISCRETE, (SysInt)discrete.size() - 1);
   }
 
   vector<Var> get_all_vars() const
@@ -788,4 +788,3 @@ inline ConstraintDef* get_constraint(ConstraintType t)
 using namespace ProbSpec;
 
 #endif
-

@@ -1127,7 +1127,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       variable_type = VAR_SPARSEBOUND;
       domain = readConstantVector(infile, '{', '}');
 
-      for(unsigned int i=0; i<domain.size()-1; i++) {
+      for(unsigned int i=0; i<(SysInt)domain.size()-1; i++) {
           if(domain[i]>domain[i+1]) {
               throw parse_exception("Values out of order in SPARSEBOUND domain.");
           }

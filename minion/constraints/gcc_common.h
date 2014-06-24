@@ -1326,7 +1326,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         GCCPRINT("Found augmenting path:" << augpath);
 
         // now apply the path.
-        for(SysInt i=0; i<augpath.size()-1; i++)
+        for(SysInt i=0; i<(SysInt)augpath.size()-1; i++)
         {
             if(augpath[i]<numvars)
             {
@@ -1366,7 +1366,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         GCCPRINT("Found augmenting path:" << augpath);
 
         // now apply the path.
-        for(SysInt i=0; i<augpath.size()-1; i++)
+        for(SysInt i=0; i<(SysInt)augpath.size()-1; i++)
         {
             if(augpath[i]<numvars)
             {

@@ -18,7 +18,7 @@
 */
 
 /** @help constraints;w-inset Description
-The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set 
+The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set
 {a1,..,an}.
 */
 
@@ -53,7 +53,7 @@ template<typename Var>
     { return 2; }     // Only uses one!
 
   virtual void full_propagate()
-  {  
+  {
     DynamicTrigger* dt = dynamic_trigger_start();
     if(vals.empty())
     {
@@ -71,7 +71,7 @@ template<typename Var>
     }
     else
     {
-      for(SysInt i = 0; i < vals.size() - 1; ++i)
+      for(SysInt i = 0; i < (SysInt)vals.size() - 1; ++i)
         for(DomainInt pos = vals[i] + 1; pos < vals[i+1]; ++pos)
         var.removeFromDomain(pos);
     }
@@ -120,7 +120,7 @@ template<typename Var>
   }
 
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
@@ -128,10 +128,10 @@ template<typename Var>
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  {  
+  {
     /// TODO: Make faster
     for(SysInt i = 0; i < vals.size(); ++i)
-    { 
+    {
       if(var.inDomain(vals[i]))
       {
         assignment.push_back(make_pair(0, vals[i]));

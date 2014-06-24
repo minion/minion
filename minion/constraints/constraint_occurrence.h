@@ -385,7 +385,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   { return "OccurrenceLeq/Geq"; }
 
   virtual string full_output_name()
-  { 
+  {
     if(val_count_min == 0)
     {
       return ConOutput::print_con(stateObj, "occurrenceleq",var_array, value, val_count_max);
@@ -446,7 +446,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
 
   void not_occurrence_limit_reached()
   {
-    D_ASSERT(not_occurrences_count >= checked_cast<SysInt>(var_array.size() - val_count_min));
+    D_ASSERT(not_occurrences_count >= checked_cast<SysInt>((SysInt)var_array.size() - val_count_min));
     SysInt occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for( typename VarArray::iterator it=var_array.begin(); it < end_it; ++it)
@@ -712,7 +712,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
     val_count.setMax(var_array.size());
     setup_counters();
     val_count.setMin((DomainInt)occurrences_count);
-    val_count.setMax(var_array.size() - not_occurrences_count);
+    val_count.setMax((DomainInt)var_array.size() - not_occurrences_count);
 
     if(occurrences_count == val_count.getMax())
       occurrence_limit_reached();

@@ -32,15 +32,15 @@ one.
 */
 
 /** @help constraints;element Description
-The constraint 
+The constraint
 
    element(vec, i, e)
 
-specifies that, in any solution, vec[i] = e and i is in the range 
+specifies that, in any solution, vec[i] = e and i is in the range
 [0 .. |vec|-1].
 */
 
-/** @help constraints;element Notes 
+/** @help constraints;element Notes
 
 Warning: This constraint is not confluent. Depending on the order the
 propagators are called in Minion, the number of search nodes may vary when
@@ -50,7 +50,7 @@ below.
 The level of propagation enforced by this constraint is not named, however it
 works as follows. For constraint vec[i]=e:
 
-- After i is assigned, ensures that min(vec[i]) = min(e) and 
+- After i is assigned, ensures that min(vec[i]) = min(e) and
   max(vec[i]) = max(e).
 
 - When e is assigned, removes idx from the domain of i whenever e is not an
@@ -64,7 +64,7 @@ through vec, except when e is assigned. It does a quantity of cheap propagation
 and may work well in practise on certain problems.
 
 Element is not confluent, which may cause the number of search nodes to vary
-depending on the order in which constraints are listed in the input file, or 
+depending on the order in which constraints are listed in the input file, or
 the order they are called in Minion. For example, the following input causes
 Minion to search 41 nodes.
 
@@ -81,8 +81,8 @@ As a rule of thumb, to get a lower node count, move element constraints
 to the end of the list.
 */
 
-/** @help constraints;element References 
-See the entry 
+/** @help constraints;element References
+See the entry
 
    constraints watchelement
 
@@ -106,7 +106,7 @@ struct ElementConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "element"; }
-  
+
   VarArray var_array;
   Index indexvar;
   Result resultvar;
@@ -116,7 +116,7 @@ struct ElementConstraint : public AbstractConstraint
     string undef_name = "";
     if(undef_maps_zero)
       undef_name = "_undefzero";
-    
+
     vector<Mapper> v = indexvar.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_SHIFT, -1))
     {
@@ -131,7 +131,7 @@ struct ElementConstraint : public AbstractConstraint
   ElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const Index& _indexvar, const Result& _resultvar) :
     AbstractConstraint(_stateObj), var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar)
   { }
-  
+
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
@@ -140,12 +140,12 @@ struct ElementConstraint : public AbstractConstraint
     DomainInt loop_max = std::min(DomainInt(array_size) , indexvar.getInitialMax() + 1);
     for(DomainInt i = loop_start; i < loop_max; ++i)
       t.push_back(make_trigger(var_array[checked_cast<SysInt>(i)], Trigger(this, i), Assigned));
-    
+
     t.push_back(make_trigger(indexvar, Trigger(this, -1), Assigned));
     t.push_back(make_trigger(resultvar, Trigger(this, -2), Assigned));
     return t;
   }
-  
+
   virtual void propagate(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(NonGACElement);
@@ -163,8 +163,8 @@ struct ElementConstraint : public AbstractConstraint
               return;
           }
       }
-      
-      // Index is within bounds. Now both undefzero and standard ct behave the same. 
+
+      // Index is within bounds. Now both undefzero and standard ct behave the same.
       DomainInt val_min = max(resultvar.getMin(), var_array[index].getMin());
       DomainInt val_max = min(resultvar.getMax(), var_array[index].getMax());
       resultvar.setMin(val_min);
@@ -189,7 +189,7 @@ struct ElementConstraint : public AbstractConstraint
                 indexvar.removeFromDomain(prop_val);
             }
         }
-        
+
       }
       else
       {
@@ -235,8 +235,8 @@ struct ElementConstraint : public AbstractConstraint
             return;
           }
       }
-      
-      // Index assigned and within range. 
+
+      // Index assigned and within range.
       DomainInt val_min = max(resultvar.getMin(), var_array[index].getMin());
       DomainInt val_max = min(resultvar.getMax(), var_array[index].getMax());
       resultvar.setMin(val_min);
@@ -244,9 +244,9 @@ struct ElementConstraint : public AbstractConstraint
       resultvar.setMax(val_max);
       var_array[index].setMax(val_max);
     }
-    
+
     SysInt array_size = var_array.size();
-    // Constrain the index variable to have only indices in range, if undef_maps_zero is false. 
+    // Constrain the index variable to have only indices in range, if undef_maps_zero is false.
     if(indexvar.getMin()<0 && !undef_maps_zero)
     {
         indexvar.setMin(0);
@@ -256,16 +256,16 @@ struct ElementConstraint : public AbstractConstraint
         indexvar.setMax(array_size-1);
     }
     if(getState(stateObj).isFailed()) return;
-    
-    // Should use the new iterators here. Check each value of resultvar to see 
-    // if it's in one of var_array. 
+
+    // Should use the new iterators here. Check each value of resultvar to see
+    // if it's in one of var_array.
     // Only done at root, so who cares that it takes a while?
     if(!resultvar.isBound())
     {
         for(DomainInt i=resultvar.getMin(); i<=resultvar.getMax(); i++)
         {
             if(i==0 && undef_maps_zero && (indexvar.getMin()<0 || indexvar.getMax()>=array_size) ) {
-                // 0 is supported. 
+                // 0 is supported.
                 continue;
             }
             if(resultvar.inDomain(i))
@@ -302,7 +302,7 @@ struct ElementConstraint : public AbstractConstraint
                 }
             }
             if(i==0 && undef_maps_zero && (indexvar.getMin()<0 || indexvar.getMax()>=array_size) ) {
-                // 0 is supported. 
+                // 0 is supported.
                 supported=true;
             }
             if(!supported)
@@ -326,7 +326,7 @@ struct ElementConstraint : public AbstractConstraint
                 }
             }
             if(i==0 && undef_maps_zero && (indexvar.getMin()<0 || indexvar.getMax()>=array_size) ) {
-                // 0 is supported. 
+                // 0 is supported.
                 supported=true;
             }
             if(!supported)
@@ -337,9 +337,9 @@ struct ElementConstraint : public AbstractConstraint
                 break;
         }
     }
-    
+
     if(getState(stateObj).isFailed()) return;
-    
+
     // Check values of index variable for support.
     for(DomainInt i = max(indexvar.getMin(),(DomainInt)0);i <= min(indexvar.getMax(), (DomainInt)array_size-1); i++)
     {
@@ -355,13 +355,13 @@ struct ElementConstraint : public AbstractConstraint
             }
             else
             {
-                
+
                 indexvar.removeFromDomain(i);
             }
         }
       }
     }
-    
+
     if(resultvar.isAssigned())
     {
       DomainInt assigned_val = resultvar.getAssignedValue();
@@ -381,9 +381,9 @@ struct ElementConstraint : public AbstractConstraint
         }
       }
     }
-    
+
   }
-  
+
     virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
     {
       D_ASSERT(v_size == var_array.size() + 2);
@@ -399,9 +399,9 @@ struct ElementConstraint : public AbstractConstraint
 
       return v[checked_cast<SysInt>(indexvariable)] == resultvariable;
     }
-    
+
     virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size() + 2);
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -410,9 +410,9 @@ struct ElementConstraint : public AbstractConstraint
     vars.push_back(resultvar);
     return vars;
   }
-  
+
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  {  
+  {
     DomainInt array_start = max(DomainInt(0), indexvar.getMin());
     DomainInt array_end   = min(DomainInt(var_array.size()) - 1, indexvar.getMax());
 
@@ -458,21 +458,21 @@ struct ElementConstraint : public AbstractConstraint
     }
     return false;
   }
-  
+
   virtual AbstractConstraint* reverse_constraint()
   {
       // This is a slow-ish temporary solution.
       // (i=1 and X[1]!=r) or (i=2 ...
       vector<AbstractConstraint*> con;
       // or the index is out of range:
-      
+
       if(!undef_maps_zero) {
-          // Constraint is satisfied if the index is out of range. 
-          vector<DomainInt> r; r.push_back(0); r.push_back(var_array.size()-1);
+          // Constraint is satisfied if the index is out of range.
+          vector<DomainInt> r; r.push_back(0); r.push_back((DomainInt)var_array.size()-1);
           AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<Index>(stateObj, indexvar, r);
           con.push_back(t4);
       }
-      
+
       for(SysInt i=0; i<var_array.size(); i++)
       {
           vector<AbstractConstraint*> con2;
@@ -480,17 +480,17 @@ struct ElementConstraint : public AbstractConstraint
           con2.push_back((AbstractConstraint*) t);
           NeqConstraintBinary<AnyVarRef, Result>* t2=new NeqConstraintBinary<AnyVarRef, Result>(stateObj, var_array[i], resultvar);
           con2.push_back((AbstractConstraint*) t2);
-          
+
           Dynamic_AND* t3= new Dynamic_AND(stateObj, con2);
           con.push_back((AbstractConstraint*) t3);
       }
-      
+
       if(undef_maps_zero)
       {
         // or (i not in {0..size-1} /\ r!=0)
         vector<AbstractConstraint*> out_bounds;
         out_bounds.push_back(new WatchNotLiteralConstraint<Result>(stateObj, resultvar, 0));
-        out_bounds.push_back(new WatchNotInRangeConstraint<Index>(stateObj, indexvar, make_vec<DomainInt>(0, var_array.size() - 1)));
+        out_bounds.push_back(new WatchNotInRangeConstraint<Index>(stateObj, indexvar, make_vec<DomainInt>(0, (DomainInt)var_array.size() - 1)));
         con.push_back(new Dynamic_AND(stateObj, out_bounds));
       }
       return new Dynamic_OR(stateObj, con);

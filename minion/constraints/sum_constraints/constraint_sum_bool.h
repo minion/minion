@@ -26,18 +26,18 @@ struct BoolLessSumConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { if(VarToCount) return "sumleq"; else return "sumgeq"; }
-  
+
   CONSTRAINT_ARG_LIST2(var_array, ConstantVar(stateObj, var_sum));
 
 
   typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
-  
+
   ReversibleInt count;
   VarArray var_array;
-  
+
   VarSum var_sum;
-  
+
   BoolLessSumConstraint(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
     AbstractConstraint(_stateObj), count(_stateObj), var_array(_var_array), var_sum(_var_sum)
   { CHECK((VarToCount == 0) || (VarToCount == 1), "Fatal Internal Bug");
@@ -48,17 +48,17 @@ struct BoolLessSumConstraint : public AbstractConstraint
       }
       accumulator+= checked_cast<SysInt>((DomainInt)abs(var_sum));
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
-      
-      
+
+
   }
-  
+
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
     SysInt array_size = var_array.size();
-    
-    count = 0;    
-    
+
+    count = 0;
+
     for(SysInt i = 0; i < array_size; ++i)
       if(VarToCount)
         t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
@@ -66,24 +66,24 @@ struct BoolLessSumConstraint : public AbstractConstraint
         t.push_back(make_trigger(var_array[i], Trigger(this, i), UpperBound));
     return t;
   }
-  
+
   virtual AbstractConstraint* reverse_constraint()
-  { 
+  {
     if(VarToCount)
-      return new BoolLessSumConstraint<VarArray, SysInt, 0>(stateObj, var_array, var_sum + 1); 
+      return new BoolLessSumConstraint<VarArray, SysInt, 0>(stateObj, var_array, var_sum + 1);
     else
       return new BoolLessSumConstraint<VarArray, SysInt, 1>(stateObj, var_array, var_sum - 1);
   }
-  
+
   DomainInt occ_count()
   {
     if (VarToCount)
       return var_sum;
     else
-      return var_array.size() - var_sum;
+      return (SysInt)var_array.size() - var_sum;
   }
-  
-  
+
+
   void limit_reached()
   {
     SysInt one_vars = 0;
@@ -100,7 +100,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     if(one_vars > occ_count())
       getState(stateObj).setFailed(true);
   }
-  
+
   virtual void propagate(DomainInt i, DomainDelta)
   {
     PROP_INFO_ADDONE(BoolSum);
@@ -123,9 +123,9 @@ struct BoolLessSumConstraint : public AbstractConstraint
     if(occs > occ_count())
       getState(stateObj).setFailed(true);
     if(occs == occ_count())
-      limit_reached();  
+      limit_reached();
   }
-  
+
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
     D_ASSERT(v_size == var_array.size());
@@ -136,7 +136,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
     else
       return std::accumulate(v, v + v_size, DomainInt(0)) >= var_sum;
   }
-  
+
   /*
   // TODO : Optimise for booleans
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
@@ -163,21 +163,21 @@ struct BoolLessSumConstraint : public AbstractConstraint
     }
   }
   */
-  
+
   // TODO : Optimise for booleans
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     SysInt v_size = var_array.size();
     DomainInt sum_limit;
     if(VarToCount)
-      sum_limit = var_array.size() - var_sum;
+      sum_limit = (SysInt)var_array.size() - var_sum;
     else
       sum_limit = var_sum;
 
     SysInt ValToFind = 1 - VarToCount;
 
     SysInt val_count = 0;
-    
+
     for(SysInt i = 0; i < v_size && val_count < sum_limit; ++i)
     {
       if(var_array[i].inDomain(ValToFind))
@@ -188,10 +188,10 @@ struct BoolLessSumConstraint : public AbstractConstraint
     }
     return val_count >= sum_limit;
   }
-  
-  
+
+
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -203,15 +203,15 @@ struct BoolLessSumConstraint : public AbstractConstraint
 template<typename VarArray,  typename VarSum>
 AbstractConstraint*
 BoolLessEqualSumCon(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
-{ 
-  return (new BoolLessSumConstraint<VarArray,VarSum>(stateObj, _var_array,_var_sum)); 
+{
+  return (new BoolLessSumConstraint<VarArray,VarSum>(stateObj, _var_array,_var_sum));
 }
 
 template<typename VarArray,  typename VarSum>
 AbstractConstraint*
 BoolGreaterEqualSumCon(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
-{ 
-  return (new BoolLessSumConstraint<VarArray,VarSum,0>(stateObj, _var_array,_var_sum)); 
+{
+  return (new BoolLessSumConstraint<VarArray,VarSum,0>(stateObj, _var_array,_var_sum));
 }
 
 #endif

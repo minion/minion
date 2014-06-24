@@ -17,7 +17,7 @@ template<typename Container>
 bool increment_vector(Container& vals, const Container& maxvals)
 {
   bool carry = true;
-  int position = vals.size() - 1;
+  int position = (int)vals.size() - 1;
   while(position >= 0 && carry == true)
   {
     D_ASSERT(maxvals[position] > 0);
@@ -46,7 +46,7 @@ template<typename Container, typename IntervalContainer>
 bool increment_vector_from_intervals(Container& vals, const IntervalContainer& intervals)
 {
   bool carry = true;
-  int position = vals.size() - 1;
+  int position = (int)vals.size() - 1;
   while(position >= 0 && carry == true)
   {
     D_ASSERT(!interval_empty(intervals[position]));

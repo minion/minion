@@ -18,9 +18,9 @@
 */
 
 /** @help constraints;w-inintervalset Description
-The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the value 
-of x belongs to one of the intervals  {a1,...,a2}, {b1,...,b2} etc. The list of 
-intervals must be given in numerical order. 
+The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the value
+of x belongs to one of the intervals  {a1,...,a2}, {b1,...,b2} etc. The list of
+intervals must be given in numerical order.
 */
 
 #ifndef CONSTRAINT_DYNAMIC_UNARY_ININTERVALSET_H
@@ -47,16 +47,16 @@ template<typename Var>
         CHECK(_vals.size()>0,"w-inintervalset constraint requires at least one interval.");
         for(int i=0; i<_vals.size(); i=i+2) {
             CHECK(_vals[i]<=_vals[i+1], "Malformed interval in w-inintervalset constraint.");
-            // Allow intervals with just one value. 
+            // Allow intervals with just one value.
             intervals.push_back(std::make_pair(_vals[i], _vals[i+1]));
         }
-        
+
         std::stable_sort(intervals.begin(), intervals.end());
-        
-        for(int i=0; i<intervals.size()-1; i++) {
+
+        for(SysInt i=0; i<(SysInt)intervals.size()-1; i++) {
             CHECK(intervals[i].second<intervals[i+1].first-1, "Intervals overlapping or touching in w-inintervalset constraint.");
         }
-        
+
     }
 
   virtual SysInt dynamic_trigger_count()
@@ -81,8 +81,8 @@ template<typename Var>
     }
     else
     {
-        // Prune everything between intervals. 
-      for(SysInt i = 0; i < intervals.size() - 1; ++i)
+        // Prune everything between intervals.
+      for(SysInt i = 0; i < (SysInt)intervals.size() - 1; ++i)
         for(DomainInt pos = intervals[i].second + 1; pos < intervals[i+1].first; ++pos)
         var.removeFromDomain(pos);
     }
@@ -98,27 +98,27 @@ template<typename Var>
     vector<std::pair<DomainInt,DomainInt> >::iterator it_low = std::lower_bound(intervals.begin(), intervals.end(), std::make_pair(var.getMin(), var.getMin()));
     if(it_low == intervals.end())
     {
-        // we must have reached the lower bound of the last interval, in which case nothing more needs to be done. 
+        // we must have reached the lower bound of the last interval, in which case nothing more needs to be done.
         return;
     }
     else
     {
-        // Check if the lower bound is in the interval below the one found.  
+        // Check if the lower bound is in the interval below the one found.
         if( it_low!=intervals.begin() && (*(it_low-1)).second<var.getMin()) {
             // Lower bound of var is not in the interval below it_low. Prune it to the bottom of it_low.
             cout << "Pruning lower bound:"<< (*it_low).first << endl;
             var.setMin((*it_low).first);
         }
-        
+
     }
-    
+
     vector<std::pair<DomainInt,DomainInt> >::iterator it_high = std::lower_bound(intervals.begin(), intervals.end(), std::make_pair(var.getMax(), var.getMax()));
     if(it_high == intervals.end())
     {
       //var.setMax(*(it_high - 1).second);  // didn't we already do this in full prop?
       return;
     }
-    
+
     var.setMax((*it_high).second);
   }
 
@@ -131,7 +131,7 @@ template<typename Var>
     // and possibly slightly cheaper to just do this.
     if(it_high != intervals.end() && (v[0]>=(*it_high).first && v[0]<=(*it_high).second))
       return true;
-    
+
     // Step back one if required (watch out for falling off start!)
     if(it_high != intervals.begin())
       it_high--;
@@ -144,7 +144,7 @@ template<typename Var>
   }
 
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
@@ -152,7 +152,7 @@ template<typename Var>
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  {  
+  {
     /// TODO: Make faster
     for(SysInt i = 0; i < intervals.size(); ++i)
     {
@@ -165,30 +165,30 @@ template<typename Var>
     }
     return false;
   }
-  
+
   virtual AbstractConstraint* reverse_constraint()
   {
-      // It is its own reverse. 
+      // It is its own reverse.
       vector<DomainInt> negintervals;
-      
+
       DomainInt lowerbound=var.getInitialMin()<intervals.front().first-1?var.getInitialMin():intervals.front().first-1;
       DomainInt upperbound=var.getInitialMax()>intervals.back().second+1?var.getInitialMax():intervals.back().second+1;
-      
+
       negintervals.push_back(lowerbound);   // first interval starts at lowerbound
       negintervals.push_back(intervals.front().first-1);
-      
-      // Make negintervals between intervals. 
-      for(int i=0; i<intervals.size()-1; i++) {
+
+      // Make negintervals between intervals.
+      for(int i=0; i<(SysInt)intervals.size()-1; i++) {
           negintervals.push_back(intervals[i].second+1);
           negintervals.push_back(intervals[i+1].first-1);
       }
-      
+
       negintervals.push_back(intervals.back().second+1);
       negintervals.push_back(upperbound);
-      
+
       return new WatchInIntervalSetConstraint<Var>(stateObj, var, negintervals);
   }
-  
+
 };
 
 #endif

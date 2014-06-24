@@ -20,7 +20,7 @@
 /*
   Chris, note there is a bit where I comment out how I really want to propagate instead
   of calling limit_reached, but I couldn't remember if you told me I could have
-  that method or not.    It saves going through the whole clause. 
+  that method or not.    It saves going through the whole clause.
  */
 
 /** @help constraints;watchsumgeq Description
@@ -42,7 +42,7 @@
 /** @help constraints;watchsumgeq References
   See also
 
-  help constraints watchsumleq 
+  help constraints watchsumleq
   help constraints litsumgeq
 */
 
@@ -61,7 +61,7 @@
 /** @help constraints;watchsumleq References
   See also
 
-  help constraints watchsumgeq 
+  help constraints watchsumgeq
   help constraints litsumgeq
 */
 
@@ -77,8 +77,8 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
 
   typedef BoolLessSumConstraintDynamic<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
-  
-  CONSTRAINT_ARG_LIST2(var_array, VarToCount ? (DomainInt)(var_array.size() - var_sum) : (DomainInt)(var_sum));
+
+  CONSTRAINT_ARG_LIST2(var_array, VarToCount ? (DomainInt)(var_array.size()) - var_sum : (DomainInt)(var_sum));
 
   // When VarToCount=1 this constraint actually counts 0's and ensures there are var_sum or more.
   // Name of the class should really be changed, and VarToCount changed to val.. and values flipped
@@ -96,7 +96,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
 
   BoolLessSumConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
   AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), last(0)
-  { 
+  {
     D_ASSERT((VarToCount == 0) || (VarToCount == 1));
 #ifndef DYNAMICTRIGGERS
     cerr << "This almost certainly isn't going to work... sorry" << endl;
@@ -123,11 +123,11 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
   }
 
   virtual SysInt dynamic_trigger_count()
-  { 
+  {
     if(var_sum >= var_array.size() || var_sum < 0)
       return 0;
     else
-      return checked_cast<SysInt>(var_sum + 1); 
+      return checked_cast<SysInt>(var_sum + 1);
   }
 
   virtual void full_propagate()
@@ -138,18 +138,18 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
       // Constraint trivially satisfied
       return;
 
-    SysInt array_size = var_array.size(); 
+    SysInt array_size = var_array.size();
     DomainInt triggers_wanted = var_sum + 1;
     SysInt index;
 
-    for(index = 0; (index < array_size) && (triggers_wanted > 0); ++index) 
+    for(index = 0; (index < array_size) && (triggers_wanted > 0); ++index)
     {
-      if(var_array[index].inDomain(1 - VarToCount))              
+      if(var_array[index].inDomain(1 - VarToCount))
       {
     // delay setting up triggers in case we don't need to
         --triggers_wanted;
       }
-    }       
+    }
 
     D_ASSERT(triggers_wanted >= 0);
 
@@ -158,7 +158,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
       getState(stateObj).setFailed(true);
       return;
     }
-    else if(triggers_wanted == 1)      // Then we can propagate 
+    else if(triggers_wanted == 1)      // Then we can propagate
     {                               // We never even set up triggers
       for(SysInt i = 0; i < array_size; ++i)
       {
@@ -167,7 +167,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
           if(VarToCount)
             var_array[i].setMax(0);
           else
-            var_array[i].setMin(1);          
+            var_array[i].setMin(1);
         }
       }
     }
@@ -181,7 +181,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
           // Exactly triggers_wanted of them have the val in their domain.
 
       for(SysInt i = 0; (i < index); ++i)   // remember index was the elts we looked at
-      { 
+      {
         if(var_array[i].inDomain(1 - VarToCount))
         {
           dt->trigger_info() = i;
@@ -213,7 +213,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
   /// Checks the consistency of the constraint's data structures
   //
   //  NOT updated for new type of watched data structure
-  //  
+  //
   BOOL check_consistency()
   {
     return true;
@@ -237,7 +237,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
     {
       D_ASSERT(num_unwatched > 0);
 
-      j = (last+1+loop) % num_unwatched; 
+      j = (last+1+loop) % num_unwatched;
       if(var_array[unwatched(j)].inDomain(1 - VarToCount))
       {
         found_new_support = true;
@@ -250,10 +250,10 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
 
       dt->trigger_info() = unwatched_index;
       var_array[unwatched_index].addDynamicTrigger(
-        dt, 
-        VarToCount ? LowerBound : UpperBound); 
+        dt,
+        VarToCount ? LowerBound : UpperBound);
 
-      unwatched_index = propval;       
+      unwatched_index = propval;
       last = j;
 
       return;
@@ -286,12 +286,12 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
   }
 
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
-    return vars;  
+    return vars;
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
@@ -300,7 +300,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
     {
       return true;
     }
-    
+
     SysInt count = 0;
     for(SysInt i = 0; i < var_array.size(); ++i)
     {
@@ -315,14 +315,14 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
     // We didn't make a complete assignment
     return false;
   }
-  
+
   virtual AbstractConstraint* reverse_constraint()
-  { 
+  {
      return new BoolLessSumConstraintDynamic<VarArray, VarSum, 1-VarToCount, true>
-               (stateObj, var_array, var_array.size()-var_sum+1); 
+               (stateObj, var_array, var_array.size()-var_sum+1);
   }
 
- 
+
 };
 
 template<typename VarArray,  typename VarSum>
@@ -330,14 +330,14 @@ AbstractConstraint*
   BoolLessEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
 {
   return new BoolLessSumConstraintDynamic<VarArray,VarSum>(stateObj, _var_array,
-    _var_array.size() - (SysInt)(_var_sum));
+    (SysInt)_var_array.size() - (SysInt)(_var_sum));
 }
 
 template<typename VarArray,  typename VarSum>
 AbstractConstraint*
   BoolGreaterEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
-{ 
-  return new BoolLessSumConstraintDynamic<VarArray,VarSum,0>(stateObj, _var_array, _var_sum); 
+{
+  return new BoolLessSumConstraintDynamic<VarArray,VarSum,0>(stateObj, _var_array, _var_sum);
 }
 
 

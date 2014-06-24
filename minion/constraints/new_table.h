@@ -213,14 +213,14 @@ struct NewTableConstraint : public AbstractConstraint
   { return "table"; }
 
   CONSTRAINT_ARG_LIST2(vars, tuples);
-  
+
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
 
   TableDataType* data;
 
   TableStateType state;
-  
+
   TupleList* tuples;
 
   NewTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
@@ -241,7 +241,7 @@ struct NewTableConstraint : public AbstractConstraint
   void* _current_support;
 
   virtual SysInt dynamic_trigger_count()
-    { return checked_cast<SysInt>(data->getLiteralCount() * ( vars.size() - 1)) ; }
+    { return checked_cast<SysInt>(data->getLiteralCount() * ( (SysInt)vars.size() - 1)) ; }
 
   virtual void propagate(DynamicTrigger* propagated_trig)
   {
@@ -249,7 +249,7 @@ struct NewTableConstraint : public AbstractConstraint
 
     DynamicTrigger* dt = dynamic_trigger_start();
     SysInt trigger_pos = propagated_trig - dt;
-    SysInt propagated_literal = trigger_pos / (vars.size() - 1);
+    SysInt propagated_literal = trigger_pos / ((SysInt)vars.size() - 1);
 
     Literal lit = data->getLiteralFromPos(propagated_literal);
 
@@ -333,14 +333,14 @@ struct NewTableConstraint : public AbstractConstraint
       }
     }
   }
-  
+
 //  inline DomainInt min(SysInt x, SysInt y) {return (x<y)?x:y; }
 //  inline DomainInt max(SysInt x, SysInt y) {return (x>y)?x:y; }
-  
+
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
       pair<DomainInt, DomainInt> bounds = data->getDomainBounds(0);
-      
+
       for(DomainInt x = max(vars[0].getMin(), bounds.first); x <= min(vars[0].getMax(), bounds.second); ++x)
       {
           if(vars[0].inDomain(x)) {
@@ -355,10 +355,10 @@ struct NewTableConstraint : public AbstractConstraint
             }
           }
       }
-      
+
       return false;
   }
-  
+
   virtual AbstractConstraint* reverse_constraint()
   {
     return GACNegativeTableCon(stateObj, vars, tuples);

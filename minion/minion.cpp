@@ -102,7 +102,7 @@ void munge_container(Con& con, SysInt type)
       for(SysInt i = size/2; i >= 0; --i)
       {
         con2.push_back(con[i]);
-        con2.push_back(con[con.size() - i - 1]);
+        con2.push_back(con[(SysInt)con.size() - i - 1]);
       }
       D_ASSERT(con2.size() == con.size());
       con = con2;
