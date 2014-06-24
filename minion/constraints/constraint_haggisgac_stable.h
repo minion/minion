@@ -567,7 +567,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         // called from Full Propagate
         // We do not assign responsibility for removals as this is called at the root.
 
-        for(SysInt i = varsWithLostImplicitSupport.size()-1; i >= 0; i--) {
+        for(SysInt i = (SysInt)varsWithLostImplicitSupport.size()-1; i >= 0; i--) {
 
             SysInt var= varsWithLostImplicitSupport[i];
             varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later
@@ -603,7 +603,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         // For each variable where the number of supports is equal to the total...
 
 
-        for(SysInt i=litsWithLostExplicitSupport.size()-1; i >= 0; i--) {
+        for(SysInt i = (SysInt)litsWithLostExplicitSupport.size()-1; i >= 0; i--) {
             SysInt lit=litsWithLostExplicitSupport[i];
             SysInt var=literalList[lit].var;
             DomainInt val=literalList[lit].val;
@@ -637,7 +637,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
             }
         }
 
-        for(SysInt i = varsWithLostImplicitSupport.size()-1; i >= 0; i--) {
+        for(SysInt i = (SysInt)varsWithLostImplicitSupport.size()-1; i >= 0; i--) {
 
             SysInt var= varsWithLostImplicitSupport[i];
             varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary - will get resized to 0 later

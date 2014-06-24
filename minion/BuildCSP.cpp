@@ -85,7 +85,7 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
 
     vector<AnyVarRef> preprocess_vars;
 
-    for(SysInt i = instance.search_order.size() - 1; i >= 0; --i)
+    for(SysInt i = (SysInt)instance.search_order.size() - 1; i >= 0; --i)
     {
         if(args.order != ORDER_NONE)
             instance.search_order[i].order = args.order;
