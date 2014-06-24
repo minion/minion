@@ -48,7 +48,9 @@
 #include "../minlib/optional.hpp"
 
 #include <sys/types.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 // from sha1.cpp
 std::string sha1_hash(const std::string& s);

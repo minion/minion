@@ -322,7 +322,7 @@ bool operator==(const MultiDimCon<Index, Result>& l,
 { return l.indices == r.indices; }
 
 template<typename Index, typename Result>
-__attribute__ ((noinline))
+DOM_NOINLINE
 MultiDimCon<Index,Result>
 mdc_join(const std::vector<MultiDimCon<Index, Result> >& v)
 {
@@ -357,7 +357,7 @@ mdc_join(const std::vector<MultiDimCon<Index, Result> >& v)
 }
 
 template<typename Index, typename Result>
-__attribute__ ((noinline))
+DOM_NOINLINE
 MultiDimCon<Index, Result> mdc_make(const std::vector<Result>& v)
 {
 	std::vector<int> temp(1);
@@ -375,7 +375,7 @@ MultiDimCon<Index, Result> mdc_make(const std::vector<Result>& v)
 }
 
 template<typename Index, typename Result, typename... Args>
-__attribute__ ((noinline))
+DOM_NOINLINE
 MultiDimCon<Index, Result>
 project(const MultiDimCon<Index, Result>& mdc, Args... args)
 {
@@ -401,12 +401,12 @@ project(const MultiDimCon<Index, Result>& mdc, Args... args)
 
 
 template<typename Index, typename Result>
-__attribute__ ((noinline))
+DOM_NOINLINE
 MultiDimCon<Index,Result> project(const MultiDimCon<Index, Result>& mdc)
 { return mdc; }
 
 template<typename Index, typename Result>
-__attribute__ ((noinline))
+DOM_NOINLINE
 MultiDimCon<Index, Result> flat(const MultiDimCon<Index, Result>& mdc)
 { return mdc.flatten(); }
 
@@ -416,12 +416,12 @@ MultiDimCon<Index, Result> flat(const MultiDimCon<Index, Result>& mdc)
 //{ return mdc; }
 
 template<typename Index, typename Result, typename Index2, typename Result2>
-__attribute__ ((noinline))
+DOM_NOINLINE
 MultiDimCon<Index, Result> mdc_convert(const MultiDimCon<Index2, Result2>& mdc)
 { return mdc; }
 
 template<typename Index, typename Result, typename Result2>
-__attribute__ ((noinline))
+DOM_NOINLINE
 MultiDimCon<Index, Result> mdc_convert(const Result2& r)
 { return MultiDimCon<Index, Result>(static_cast<Result>(r)); }
 

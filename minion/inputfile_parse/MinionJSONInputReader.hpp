@@ -86,7 +86,7 @@ void MinionJSONInputReader::finalise() {
   {
     MAYBE_PARSER_INFO("Extending symmetry order with auxillery variables");
     vector<Var> all_vars = instance->vars.get_all_vars();
-    for(typename vector<Var>::iterator i = all_vars.begin(); i != all_vars.end(); ++i)
+    for(vector<Var>::iterator i = all_vars.begin(); i != all_vars.end(); ++i)
     {
       if(find(instance->sym_order.begin(), instance->sym_order.end(), *i) == instance->sym_order.end() )
         instance->sym_order.push_back(*i);
