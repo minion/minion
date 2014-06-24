@@ -24,14 +24,14 @@ struct compiletime_val
   operator T() const
 { return i; }
 
-  compiletime_val<T, -i-1> negminusone() const
-{ return compiletime_val<T, -i-1>(); }
+  compiletime_val<T, (T)(-1)-i> negminusone() const
+{ return compiletime_val<T, (T)(-1)-i>(); }
 
   friend std::ostream& operator<<(std::ostream& o, const compiletime_val&)
 { return o << "CompiletimeConst:" << i; }
 
-  compiletime_val<T, -i> operator-() const
-{ return compiletime_val<T, -i>(); }
+  compiletime_val<T, (T)0-i> operator-() const
+{ return compiletime_val<T, (T)0-i>(); }
 };
 
 template<typename T, T i, T j>
