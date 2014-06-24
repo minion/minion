@@ -59,13 +59,28 @@ make(const FirstArg& fa, const Args&... args)
     return t;
 }
 
+// Needed for windows
+template<typename FirstArg, typename... Args>
+std::vector<FirstArg>
+make_vector(const FirstArg& fa, const Args&... args)
+{
+    std::vector<FirstArg> t;
+    t.reserve(SizeOf<Args...>::size);
+    push_back(t,fa, args...);
+    return t;
+}
+
 template<typename FirstArg, typename... Args>
 std::vector<FirstArg> make_vec(const FirstArg& fa, const Args&... args)
-{ return make<std::vector>(fa, args...); }
+{
+  std::vector<FirstArg> v;
+  v = make_vector(fa, args...);
+  return v;
+}
 
 template<typename VecArg, typename FirstArg, typename... Args>
 std::vector<VecArg> make_vec_with_type(const FirstArg& fa, const Args&... args)
-{ return make<std::vector>(static_cast<VecArg>(fa), args...); }
+{ return make_vector(static_cast<VecArg>(fa), args...); }
 
 template<typename Arg, typename... Args>
 std::array<Arg, SizeOf<Args...>::size> make_array_with_type(const Args&... args)
