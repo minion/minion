@@ -42,7 +42,7 @@ namespace ProbSpec {
 class SearchState
 {
   StateObj* stateObj;
-  unsigned long long nodes;
+  long long nodes;
   AnyVarRef* optimise_var;
   AnyVarRef* raw_optimise_var;
   DomainInt current_optimise_position;
@@ -97,8 +97,8 @@ public:
   vector<set<AbstractConstraint*> >& getConstraintsToPropagate()
   { return constraints_to_propagate; }
 
-  unsigned long long getNodeCount() { return nodes; }
-  void setNodeCount(unsigned long long _nodes) { nodes = _nodes; }
+  long long getNodeCount() { return nodes; }
+  void setNodeCount(long long _nodes) { nodes = _nodes; }
   void incrementNodeCount() { nodes++; }
 
   AnyVarRef* getOptimiseVar() { return optimise_var; }
@@ -290,7 +290,7 @@ public:
 #else
     nocheck(false),
 #endif
-    nodelimit(-1), tableout(false), solsoutWrite(false),
+    nodelimit(std::numeric_limits<long long>::max()), tableout(false), solsoutWrite(false),
     print_solution(true), timeout_active(false), time_limit(0),
     time_limit_is_CPU_time(false),
     randomise_valvarorder(false), parser_verbose(false),

@@ -63,7 +63,7 @@ struct SearchManager
   vector<Controller::triple> branches; //L & R branches so far (isLeftBranch?,var,value)
   //vector<DomainInt> first_unassigned_variable;
 
-  UnsignedSysInt depth; //number of left branches
+  SysInt depth; //number of left branches
 
   SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array,
                 vector<SearchOrder> _order, shared_ptr<VariableOrder> _var_order,

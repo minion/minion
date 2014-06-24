@@ -140,7 +140,7 @@ try {
   if(argv[1] == string("help") || argv[1] == string("--help") || argv[1] == string("-help") || argv[1] == string("-h")) {
     std::string sect("");
     if(argc != 2) {
-      for(size_t i = 2; i < argc - 1; i++)
+      for(int i = 2; i < argc - 1; i++)
         sect.append(argv[i]).append(" ");
       sect.append(argv[argc - 1]);
     }

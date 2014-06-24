@@ -227,7 +227,7 @@ struct NewTableConstraint : public AbstractConstraint
   AbstractConstraint(stateObj), vars(_vars), data(new TableDataType(_tuples)), state(data), tuples(_tuples)
   {
     CheckNotBound(vars, "table constraint");
-      if(_tuples->tuple_size()!=_vars.size())
+      if(_tuples->tuple_size()!=(SysInt)_vars.size())
       {
           cout << "Table constraint: Number of variables "
             << _vars.size() << " does not match length of tuples "

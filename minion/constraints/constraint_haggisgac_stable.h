@@ -285,7 +285,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
 
         sup_internal->active = true;
 
-        if(litsize < vars.size() ) {
+        if(litsize < (SysInt)vars.size() ) {
                 // it's a short support, so update supportsPerVar and supports
           for(SysInt i=0; i<litsize; i++) {
 
@@ -357,7 +357,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         vector<SupportCell>& supCells=sup->supportCells;
         SysInt supArity = sup->arity;
 
-        if(supArity < vars.size() ) {
+        if(supArity < (SysInt)vars.size() ) {
                 // it's a short support
 
                 SysInt oldIndex  = supportNumPtrs[supports];

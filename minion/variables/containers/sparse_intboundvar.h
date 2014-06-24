@@ -478,6 +478,6 @@ template<typename T>
 inline SparseBoundVarRef
 SparseBoundVarContainer<T>::get_var_num(DomainInt i)
 {
-  D_ASSERT(i < var_count_m);
+  D_ASSERT(i < (SysInt)var_count_m);
   return SparseBoundVarRef(SparseBoundVarRef_internal<T>(this, i));
 }

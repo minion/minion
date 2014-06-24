@@ -42,9 +42,9 @@ struct TestConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "Test"; }
-  
+
    typedef typename VarArray::value_type ArrayVarRef;
-  
+
 
   int vars_size;
 
@@ -56,9 +56,9 @@ struct TestConstraint : public AbstractConstraint
   std::array<signed char, MaxVarSize> domain_min;
   std::array<std::array<signed char, MaxDomSize>, MaxVarSize> domain_vals;
   std::array<pair<signed char, signed char>, MaxVarSize * MaxDomSize> literal_map;
-  int total_lits;  
-#endif 
-  
+  int total_lits;
+#endif
+
   TestConstraint(StateObj* _stateObj, const VarArray& _vars) :
     AbstractConstraint(_stateObj)
   {
@@ -101,7 +101,7 @@ struct TestConstraint : public AbstractConstraint
           cout << "empty domain?";
           FAIL_EXIT();
         }
-        
+
         domain_min[i] = *domains[i].begin();
 
         set<int>::iterator last = domains[i].end();
@@ -123,21 +123,21 @@ struct TestConstraint : public AbstractConstraint
       D_ASSERT(literal == total_lits);
 #endif
   }
-  
+
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    
+
     for(int i = 0; i < vars_size; ++i)
     { // Have to add 1 else the 0th element will be lost.
       //t.push_back(make_trigger(var_array[i], Trigger(this, 2*i), LowerBound));
       //t.push_back(make_trigger(var_array[i], Trigger(this, 2*i+1), UpperBound));
       t.push_back(make_trigger(vars[i], Trigger(this, 2*i+1), DomainChanged));
     }
-    
+
     return t;
   }
-  
+
 #ifdef SYMMETRIC
 
   inline int get_lit_from_varval(int var, int val)
@@ -150,8 +150,8 @@ struct TestConstraint : public AbstractConstraint
     D_ASSERT(lit >= 0 && lit < MaxVarSize * MaxDomSize);
     D_ASSERT(vars[literal_map[lit].first].getInitialMin() <= literal_map[lit].second);
     D_ASSERT(vars[literal_map[lit].first].getInitialMax() >= literal_map[lit].second);
-    
-    return D(literal_map,lit); 
+
+    return D(literal_map,lit);
   }
 
   pair<int,int> apply_perm(compiletime_val<SysInt, 0>, int const* perm, int var, int val)
@@ -168,13 +168,13 @@ struct TestConstraint : public AbstractConstraint
 */
   template<typename CVal>
   pair<int,int> get_varval(CVal cval, int const* perm1, int const* perm2, int const* perm3, int var, int val)
-  { 
+  {
     switch((int)cval)
     {
       case 0:
-        return make_pair(var, val); 
+        return make_pair(var, val);
       case 1:
-      { 
+      {
         return apply_perm(compiletime_val<SysInt, 0>(), perm1, var, val);
       }
       case 2:
@@ -182,7 +182,7 @@ struct TestConstraint : public AbstractConstraint
         return apply_perm(compiletime_val<SysInt, 0>(), perm2, var, val);
       }
       case 3:
-      { 
+      {
         return apply_perm(compiletime_val<SysInt, 0>(), perm3, var, val);
       }
       default:
@@ -258,7 +258,7 @@ struct TestConstraint : public AbstractConstraint
     D_ASSERT(vars[varval.first].getInitialMax() >= varval.second);
     vars[varval.first].removeFromDomain(varval.second);
   }
-  
+
 #endif
 
   virtual void propagate(DomainInt lit, DomainDelta)
@@ -289,7 +289,7 @@ int perm[total_lits]; \
   {
     vector<AnyVarRef> varRet;
     varRet.reserve(vars.size());
-    for(unsigned i = 0; i < vars_size; ++i)
+    for(int i = 0; i < vars_size; ++i)
       varRet.push_back(AnyVarRef(vars[i]));
     return varRet;
   }

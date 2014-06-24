@@ -127,7 +127,7 @@ struct MultiBranch : public VariableOrder
         while(t.first==-1)
         {
             pos2++;
-            if(pos2== vovector.size())
+            if(pos2== (SysInt)vovector.size())
             {
                 return make_pair(-1, 0);
             }
@@ -154,7 +154,7 @@ struct StaticBranch : public VariableOrder
 
     pair<SysInt, DomainInt> pickVarVal()
     {
-        UnsignedSysInt v_size = var_order.size();
+        SysInt v_size = var_order.size();
 
         while(pos < v_size && var_order[pos].isAssigned())
             pos=pos+1;

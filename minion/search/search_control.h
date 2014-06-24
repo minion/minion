@@ -96,7 +96,7 @@ namespace Controller
             for(SysInt i=0; i<(SysInt)order.size(); i++)
             {
                 vovector.push_back(make_search_order(order[i], stateObj));
-                if(order[i].find_one_assignment && i!= order.size()-1)
+                if(order[i].find_one_assignment && i!= (SysInt)order.size()-1)
                 {
                     cout << "Only one VARORDER AUX is allowed, and it must be the final VARORDER command." << endl;
                     abort();

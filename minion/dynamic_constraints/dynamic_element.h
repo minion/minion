@@ -300,7 +300,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
     SysInt indexval = checked_cast<SysInt>(indexvar.getAssignedValue());
     if(undef_maps_zero)
     {
-      if(indexval < 0 || indexval >= var_array.size())
+      if(indexval < 0 || indexval >= (SysInt)var_array.size())
       {
         resultvar.propagateAssign(0);
         return;

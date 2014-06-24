@@ -70,7 +70,7 @@ struct GACTableConstraint : public AbstractConstraint
     CheckNotBound(vars, "table constraints","");
     tupleTrieArrayptr = tuples->getTries();
     const SysInt arity = checked_cast<SysInt>(tuples->tuple_size());
-    D_ASSERT(_vars.size() == arity);
+    D_ASSERT((SysInt)_vars.size() == arity);
     const SysInt litnum = checked_cast<SysInt>(tuples->literal_num);
     trie_current_support.resize(litnum);
     for(SysInt i = 0; i < litnum; ++i)
@@ -269,7 +269,7 @@ struct GACTableConstraint : public AbstractConstraint
                   // are valid. Just make something up.
                   if(negative) {
                       assignment.push_back(make_pair(0,i));
-                      for(SysInt varidx = 1; varidx < vars.size(); ++varidx) {
+                      for(SysInt varidx = 1; varidx < (SysInt)vars.size(); ++varidx) {
                           assignment.push_back(make_pair(varidx, vars[varidx].getMin()));
                       }
                       return true;
@@ -296,7 +296,7 @@ struct GACTableConstraint : public AbstractConstraint
   {
     if(negative==0)
     {
-        for(UnsignedSysInt i = 0; i < tuples->size(); ++i)
+        for(SysInt i = 0; i < tuples->size(); ++i)
         {
           if( std::equal(v, v + checked_cast<SysInt>(v_size), (*tuples)[i]) )
             return true;
@@ -305,7 +305,7 @@ struct GACTableConstraint : public AbstractConstraint
     }
     else
     {
-        for(UnsignedSysInt i = 0; i < tuples->size(); ++i)
+        for(SysInt i = 0; i < tuples->size(); ++i)
         {
           if( std::equal(v, v + checked_cast<SysInt>(v_size), (*tuples)[i]) )
             return false;

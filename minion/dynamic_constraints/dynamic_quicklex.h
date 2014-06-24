@@ -195,7 +195,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    D_ASSERT(v_size == (SysInt)var_array1.size() + var_array2.size());
+    D_ASSERT(v_size == (SysInt)var_array1.size() + (SysInt)var_array2.size());
     size_t x_size = var_array1.size();
 
     P("Check Assignment: " << (SysInt)alpha);

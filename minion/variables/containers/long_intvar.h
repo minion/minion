@@ -226,7 +226,7 @@ struct BigRangeVarContainer {
         for(SysInt i=0;i<(SysInt)var_offset.size(); ++i) var_offset[i]+=temp1;
     }
 
-    for(SysInt j = 0; j < var_count_m; ++j) {
+    for(SysInt j = 0; j < (SysInt)var_count_m; ++j) {
            var_offset[j] = var_offset[j] - initial_bounds[j].first;
     };
 

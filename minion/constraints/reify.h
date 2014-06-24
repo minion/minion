@@ -196,9 +196,9 @@ struct reify : public ParentConstraint
     vector<AnyVarRef> vec1 = * child_constraints[1]->get_vars_singleton();
     vector<AnyVarRef> c;
     c.reserve(vec0.size() + vec1.size() + 1);
-    for(SysInt i=0; i<vec0.size(); i++)
+    for(SysInt i=0; i<(SysInt)vec0.size(); i++)
         c.push_back(vec0[i]);
-    for(SysInt i=0; i<vec1.size(); i++)
+    for(SysInt i=0; i<(SysInt)vec1.size(); i++)
         c.push_back(vec1[i]);
     c.push_back(reify_var);
     return c;
@@ -256,13 +256,13 @@ struct reify : public ParentConstraint
               return;
             }
             #endif
-            
+
             constraint_locked = true;
             getQueue(stateObj).pushSpecialTrigger(this);
         }
         return;
     }
-    
+
     if(full_propagate_called)
     {
       P("Already doing static full propagate");
@@ -311,7 +311,7 @@ struct reify : public ParentConstraint
             bool wllost=false;
             vector<AnyVarRef> t1=*(child_constraints[0]->get_vars_singleton());
 
-            for(SysInt i=0; i<triggerpairs[0].size(); i++)
+            for(SysInt i=0; i<(SysInt)triggerpairs[0].size(); i++)
             {
                 if(!t1[checked_cast<SysInt>(triggerpairs[0][i].first)].inDomain(triggerpairs[0][i].second))
                 {
@@ -350,7 +350,7 @@ struct reify : public ParentConstraint
             bool wllost=false;
             vector<AnyVarRef> t1=*(child_constraints[1]->get_vars_singleton());
 
-            for(SysInt i=0; i<triggerpairs[1].size(); i++)
+            for(SysInt i=0; i<(SysInt)triggerpairs[1].size(); i++)
             {
                 if(!t1[checked_cast<SysInt>(triggerpairs[1][i].first)].inDomain(triggerpairs[1][i].second))
                 {
@@ -463,7 +463,7 @@ struct reify : public ParentConstraint
     D_ASSERT(reify_var.getMin() >= 0);
     D_ASSERT(reify_var.getMax() <= 1);
     if(getState(stateObj).isFailed()) return;
-    
+
     if(reify_var.isAssigned())
     {
         if(reify_var.getAssignedValue() == 1)

@@ -362,7 +362,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   {
     triggerCollection t;
 
-    for(SysInt i=0; i < var_array1.size(); ++i)
+    for(SysInt i=0; i < (SysInt)var_array1.size(); ++i)
     {
       t.push_back(make_trigger(var_array1[i], Trigger(this, i), LowerBound));
       t.push_back(make_trigger(var_array1[i], Trigger(this, i), UpperBound));
@@ -550,7 +550,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
     pair<DomainInt, DomainInt> assign;
-    for(SysInt i = 0; i < var_array1.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)var_array1.size(); ++i)
     {
       if(Operator::get_satisfying_assignment(var_array1[i], var_array2[i], assign))
       {
@@ -568,7 +568,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   virtual AbstractConstraint* reverse_constraint()
   {
       vector<AbstractConstraint*> con;
-      for(SysInt i=0; i<var_array1.size(); i++)
+      for(SysInt i=0; i<(SysInt)var_array1.size(); i++)
       {
           con.push_back(Operator::reverse_constraint(stateObj, var_array1[i], var_array2[i]));
       }

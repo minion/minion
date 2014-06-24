@@ -179,10 +179,10 @@ namespace Controller
   //repeat declaration
   struct triple {
     bool isLeft;
-    UnsignedSysInt var;
+    SysInt var;
     DomainInt val;
 
-    triple(bool _isLeft, UnsignedSysInt _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
+    triple(bool _isLeft, SysInt _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
     friend std::ostream& operator<<(std::ostream& o, const triple& t)
     { o << "(" << t.isLeft << "," << t.var << "," << t.val << ")"; return o; }
   };
