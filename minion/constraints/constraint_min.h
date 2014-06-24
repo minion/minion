@@ -79,37 +79,37 @@ struct MinConstraint : public AbstractConstraint
         return "true()";
     }
 
-    return ConOutput::print_reversible_con(stateObj, "min", "max", var_array, min_var); 
+    return ConOutput::print_reversible_con(stateObj, "min", "max", var_array, min_var);
   }
 
 
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type ArrayVarRef;
-  
+
   VarArray var_array;
   MinVarRef min_var;
-  
+
   MinConstraint(StateObj* _stateObj, const VarArray& _var_array, const MinVarRef& _min_var) :
     AbstractConstraint(_stateObj), var_array(_var_array), min_var(_min_var)
   { }
-  
+
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
-    
-    for(SysInt i = 0; i < var_array.size(); ++i)
+
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
     { // Have to add 1 else the 0th element will be lost.
       t.push_back(make_trigger(var_array[i], Trigger(this, i + 1), LowerBound));
       t.push_back(make_trigger(var_array[i], Trigger(this, -(i + 1)), UpperBound));
     }
     t.push_back(make_trigger(min_var, Trigger(this, var_array.size() + 1 ),LowerBound));
     t.push_back(make_trigger(min_var, Trigger(this, -((SysInt)var_array.size() + 1) ),UpperBound));
-    
+
     return t;
   }
-  
+
   //  virtual AbstractConstraint* reverse_constraint()
-  
+
   virtual void propagate(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(Min);
@@ -119,7 +119,7 @@ struct MinConstraint : public AbstractConstraint
     //Had to add 1 to fix "0th array" problem.
       --prop_val;
 
-      if(prop_val == (SysInt)(var_array.size()))  
+      if(prop_val == (SysInt)(var_array.size()))
       {
         DomainInt new_min = min_var.getMin();
         typename VarArray::iterator end = var_array.end();
@@ -174,8 +174,8 @@ struct MinConstraint : public AbstractConstraint
     }
 
   }
-  
-    
+
+
   virtual void full_propagate()
   {
     SysInt array_size = var_array.size();
@@ -192,13 +192,13 @@ struct MinConstraint : public AbstractConstraint
       }
     }
   }
-  
+
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    D_ASSERT(v_size == var_array.size() + 1);
+    D_ASSERT(v_size == (SysInt)var_array.size() + 1);
     if(v_size == 1)
       return false;
-      
+
     DomainInt min_val = v[0];
     for(SysInt i = 1;i < v_size - 1;i++)
       min_val = min(min_val, v[i]);
@@ -213,7 +213,7 @@ struct MinConstraint : public AbstractConstraint
       if(min_var.inDomain(i))
       {
         bool flag_domain = false;
-        for(SysInt j = 0; j < var_array.size(); ++j)
+        for(SysInt j = 0; j < (SysInt)var_array.size(); ++j)
         {
           if(var_array[j].inDomain(i))
           {
@@ -230,7 +230,7 @@ struct MinConstraint : public AbstractConstraint
               assignment.push_back(make_pair(j, var_array[j].getMax()));
           }
         }
-      
+
         if(flag_domain)
         {
           assignment.push_back(make_pair(var_array.size(), i));
@@ -242,7 +242,7 @@ struct MinConstraint : public AbstractConstraint
     }
     return false;
   }
-  
+
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {

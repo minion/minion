@@ -453,7 +453,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
 
     virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
     {
-      D_ASSERT(v_size == var_array.size() + 2);
+      D_ASSERT(v_size == (SysInt)var_array.size() + 2);
       DomainInt resultvariable = v[v_size - 1];
       DomainInt indexvariable = v[v_size - 2];
       if(indexvariable < 0 || indexvariable >= (SysInt)v_size - 2)

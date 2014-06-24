@@ -239,10 +239,10 @@ struct STRData
     {
         compressed_tuples = *(_tuples->tuplePtr());
 
-        for(SysInt i = 0; i < compressed_tuples.size(); ++i)
+        for(SysInt i = 0; i < (SysInt)compressed_tuples.size(); ++i)
         {
             vector<DomainInt> temp(varsize, DomainInt_Skip);
-            for(SysInt j = 0; j < compressed_tuples[i].size(); ++j)
+            for(SysInt j = 0; j < (SysInt)compressed_tuples[i].size(); ++j)
             {
                 temp[compressed_tuples[i][j].first] = compressed_tuples[i][j].second;
             }
@@ -257,7 +257,7 @@ struct STRData
         {
             vector<DomainInt> t = _tuples->get_vector(i);
             vector<pair<SysInt, DomainInt> > comp;
-            for(int j = 0; j < t.size(); ++j)
+            for(int j = 0; j < (SysInt)t.size(); ++j)
                 comp.push_back(std::make_pair(j, t[j]));
             tuples.push_back(t);
             compressed_tuples.push_back(comp);
@@ -302,12 +302,12 @@ struct STR : public AbstractConstraint
 
     void init()
     {
-        if(sct->tuples.size() > 0)
+        if((SysInt)sct->tuples.size() > 0)
         {
             CHECK(sct->tuples[0].size() == vars.size(), "Cannot use same table for two constraints with different numbers of variables!");
         }
         tupindices.resize(sct->tuples.size());
-        for(SysInt i=0; i<sct->tuples.size(); i++) {
+        for(SysInt i=0; i<(SysInt)sct->tuples.size(); i++) {
             tupindices[i]=i;
         }
 
@@ -317,7 +317,7 @@ struct STR : public AbstractConstraint
         //ssup_permanent.initialise(0, (SysInt)vars.size()-1);
 
         gacvalues.resize(vars.size());
-        for(SysInt i=0; i<vars.size(); i++) {
+        for(SysInt i=0; i<(SysInt)vars.size(); i++) {
             gacvalues[i].initialise(vars[i].getInitialMin(), vars[i].getInitialMax());
         }
 
@@ -358,7 +358,7 @@ struct STR : public AbstractConstraint
         limit=sct->tuples.size();
 
         // pretend all variables have changed.
-        for(SysInt i=0; i<vars.size(); i++) sval.insert(i);
+        for(SysInt i=0; i<(SysInt)vars.size(); i++) sval.insert(i);
 
         do_prop();
     }
@@ -387,10 +387,10 @@ struct STR : public AbstractConstraint
             }
         }
 
-        for(SysInt i = 0; i < sct->compressed_tuples.size(); ++i)
+        for(SysInt i = 0; i < (SysInt)sct->compressed_tuples.size(); ++i)
         {
             bool sat = true;
-            for(SysInt j = 0; j < sct->compressed_tuples[i].size(); ++j)
+            for(SysInt j = 0; j < (SysInt)sct->compressed_tuples[i].size(); ++j)
             {
                 if(v[sct->compressed_tuples[i][j].first] != sct->compressed_tuples[i][j].second)
                 {
@@ -410,10 +410,10 @@ struct STR : public AbstractConstraint
     {
 
 
-        for(SysInt i = 0; i < sct->compressed_tuples.size(); ++i)
+        for(SysInt i = 0; i < (SysInt)sct->compressed_tuples.size(); ++i)
         {
             bool sat = true;
-            for(SysInt j = 0; j < sct->compressed_tuples[i].size(); ++j)
+            for(SysInt j = 0; j < (SysInt)sct->compressed_tuples[i].size(); ++j)
             {
                 if(!vars[sct->compressed_tuples[i][j].first].inDomain(sct->compressed_tuples[i][j].second))
                 {
@@ -424,7 +424,7 @@ struct STR : public AbstractConstraint
 
             if(sat)
             {
-                for(SysInt j = 0; j < sct->compressed_tuples[i].size(); ++j)
+                for(SysInt j = 0; j < (SysInt)sct->compressed_tuples[i].size(); ++j)
                     assignment.push_back(sct->compressed_tuples[i][j]);
                 return true;
             }
@@ -535,7 +535,7 @@ struct STR : public AbstractConstraint
 
                 if(isvalid) {
                     const vector<pair<SysInt, DomainInt> >& compressed_tau = sct->compressed_tuples[index];
-                    for(SysInt t = 0; t < compressed_tau.size(); ++t)
+                    for(SysInt t = 0; t < (SysInt)compressed_tau.size(); ++t)
                     {
                         const SysInt ctf = compressed_tau[t].first;
                         ssup.unsafe_insert(ctf);

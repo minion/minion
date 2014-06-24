@@ -65,34 +65,34 @@ class NewMemoryBlock
   NewMemoryBlock(const NewMemoryBlock&);
   /// Forbid copying.
   void operator=(const NewMemoryBlock&);
-  
+
   char* current_data;
-  
+
   size_t allocated_bytes;
   size_t maximum_bytes;
-  
+
   vector<pair<char*, size_t> > stored_blocks;
   size_t total_stored_bytes;
 
 #ifndef BLOCK_SIZE
 #define BLOCK_SIZE (size_t)(64*1024*1024)
 #endif
-  
+
   SET_TYPE<void**> pointers;
 public:
-  
+
   void storeMem(char* store_ptr)
   {
     P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
-    for(SysInt i = 0; i < stored_blocks.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i)
     {
       P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].first << " " << stored_blocks[i].second);
       memcpy(store_ptr + current_offset, stored_blocks[i].first, stored_blocks[i].second);
       current_offset += stored_blocks[i].second;
     }
 
-    P((void*)(store_ptr + current_offset) << " " << (void*)current_data << " " << allocated_bytes);    
+    P((void*)(store_ptr + current_offset) << " " << (void*)current_data << " " << allocated_bytes);
     memcpy(store_ptr + current_offset, current_data, allocated_bytes);
     D_ASSERT(getDataSize() == current_offset + allocated_bytes);
   }
@@ -102,23 +102,23 @@ private:
   {
       D_ASSERT(data.second >= copy_start + copy_length);
       //memcpy(location, data.first + copy_start, copy_length);
-      
+
       size_t data_copy = 0;
       // If these is some data to copy, then we do so. We write the code this way
       // to avoid UnsignedSysInt underflow.
       if(copy_start <= data.second)
           data_copy = std::min(data.second - copy_start, copy_length);
-      
+
       memcpy(location, data.first + copy_start, data_copy);
       memset(location + data_copy, 0, copy_length - data_copy);
   }
 public:
-    
+
   void retrieveMem(pair<char*,size_t> store_ptr)
   {
     P("RetrieveMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
-    for(SysInt i = 0; i < stored_blocks.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i)
     {
       copyMemBlock(stored_blocks[i].first, store_ptr, current_offset, stored_blocks[i].second);
       current_offset += stored_blocks[i].second;
@@ -126,7 +126,7 @@ public:
     copyMemBlock(current_data, store_ptr, current_offset, allocated_bytes);
     D_ASSERT(getDataSize() == current_offset + allocated_bytes);
   }
-  
+
   /// Returns the size of the allocated memory in bytes.
   UnsignedSysInt getDataSize()
     { return total_stored_bytes + allocated_bytes; }
@@ -134,27 +134,27 @@ public:
   NewMemoryBlock() : current_data(NULL), allocated_bytes(0), maximum_bytes(0),
                   total_stored_bytes(0)
   {  }
-  
+
   ~NewMemoryBlock()
-  { 
+  {
     free(current_data);
   }
-  
+
   /// Request a new block of memory and returns a \ref void* to it's start.
   void* request_bytes(DomainInt byte_count)
   {
     P("Request: " << (void*)this << " : " << byte_count);
     if(byte_count == 0)
       return NULL;
-      
+
     // TODO: is the following line necessary?
     if(byte_count % sizeof(SysInt) != 0)
       byte_count += sizeof(SysInt) - (byte_count % sizeof(SysInt));
 
-    if(maximum_bytes < allocated_bytes + byte_count)
+    if((DomainInt)maximum_bytes < allocated_bytes + byte_count)
     { reallocate(byte_count); }
 
-    D_ASSERT(maximum_bytes >= allocated_bytes + byte_count);
+    D_ASSERT((DomainInt)maximum_bytes >= allocated_bytes + byte_count);
     char* return_val = current_data + checked_cast<SysInt>(allocated_bytes);
     P("Return val:" << (void*)current_data);
     allocated_bytes += checked_cast<size_t>(byte_count);
@@ -172,7 +172,7 @@ private:
   void reallocate(DomainInt byte_count_new_request)
   {
     P("Reallocate: " << (void*)this << " : " << byte_count_new_request);
-    D_ASSERT(allocated_bytes + byte_count_new_request > maximum_bytes);
+    D_ASSERT(allocated_bytes + byte_count_new_request > (DomainInt)maximum_bytes);
 
     stored_blocks.push_back(make_pair(current_data, allocated_bytes));
     P((void*)current_data << ":" << allocated_bytes << " of " << maximum_bytes);
@@ -184,9 +184,9 @@ private:
     { D_FATAL_ERROR("calloc failed - Memory exhausted! Aborting."); }
     P((void*)current_data << " " << new_block_size);
     maximum_bytes = new_block_size;
-    allocated_bytes = 0; 
+    allocated_bytes = 0;
   }
-   
+
 };
 
 // @}

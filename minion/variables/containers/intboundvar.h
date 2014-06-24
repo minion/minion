@@ -498,7 +498,7 @@ template<typename T>
 inline BoundVarRef
 BoundVarContainer<T>::get_var_num(DomainInt i)
 {
-  D_ASSERT(i < var_count_m);
+  D_ASSERT(i < (DomainInt)var_count_m);
   // Note we assume in BoundVarRef_internal that upper_bound(i) is just after lower_bound(i)...
   return BoundVarRef(BoundVarRef_internal<>(this, i, static_cast<DomainInt*>(bound_data) + checked_cast<SysInt>(i)*2));
 }

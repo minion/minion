@@ -47,10 +47,10 @@ struct Check_GSA : public AbstractConstraint
   Check_GSA(StateObj* _stateObj, AbstractConstraint* _con) :
   AbstractConstraint(_stateObj), child(_con)
   { }
-  
+
   virtual ~Check_GSA()
       { delete child; }
-  
+
   virtual AbstractConstraint* reverse_constraint()
   {
     return new Check_GSA(stateObj, child->reverse_constraint());
@@ -82,7 +82,7 @@ struct Check_GSA : public AbstractConstraint
   template<typename T, typename Vars, typename Trigger>
   void watch_assignment(const T& assignment, Vars& vars, Trigger* trig)
   {
-    for(SysInt i = 0; i < assignment.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
     {
       D_ASSERT(vars[assignment[i].first].inDomain(assignment[i].second));
       if(vars[assignment[i].first].isBound()) {

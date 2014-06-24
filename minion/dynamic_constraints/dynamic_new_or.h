@@ -69,14 +69,14 @@ struct Dynamic_OR : public ParentConstraint
     assign_size(-1), propagated_constraint(-1)
     {
       size_t max_size = 0;
-      for(SysInt i = 0; i < child_constraints.size(); ++i)
+      for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
         max_size = max(max_size, child_constraints[i]->get_vars_singleton()->size());
       assign_size = max_size * 2;
     }
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    for(SysInt i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
     {
       if(child_constraints[i]->check_assignment(v + checked_cast<SysInt>(start_of_constraint[i]),
          child_constraints[i]->get_vars_singleton()->size()))
@@ -87,14 +87,14 @@ struct Dynamic_OR : public ParentConstraint
 
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    for(SysInt i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
     {
       assignment.clear();
       bool flag=child_constraints[i]->get_satisfying_assignment(assignment);
       if(flag)
       {
         // Fix up assignment
-        for(SysInt j = 0; j < assignment.size(); ++j) {
+        for(SysInt j = 0; j < (SysInt)assignment.size(); ++j) {
           assignment[j].first += checked_cast<SysInt>(start_of_constraint[i]);
           D_ASSERT((*(child_constraints[i]->get_vars_singleton()))[checked_cast<SysInt>(assignment[j].first-start_of_constraint[i])].inDomain(assignment[j].second));
           D_ASSERT((*(this->get_vars_singleton()))[checked_cast<SysInt>(assignment[j].first)].inDomain(assignment[j].second));
@@ -109,7 +109,7 @@ struct Dynamic_OR : public ParentConstraint
   virtual vector<AnyVarRef> get_vars()
   {
     vector<AnyVarRef> vecs;
-    for(SysInt i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
     {
       vector<AnyVarRef>* var_ptr = child_constraints[i]->get_vars_singleton();
       vecs.insert(vecs.end(), var_ptr->begin(), var_ptr->end());
@@ -187,13 +187,13 @@ struct Dynamic_OR : public ParentConstraint
       { // Found new support without having to move.
         watch_assignment(child_constraints[watched_constraint[tripped_constraint]],
                          dt + tripped_constraint * assign_size, assignment_try);
-        for(SysInt i = 0; i < assignment_try.size(); ++i)
+        for(SysInt i = 0; i < (SysInt)assignment_try.size(); ++i)
           P(assignment_try[i].first << "." << assignment_try[i].second << "  ");
         P(" -- Fixed, returning");
         return;
       }
 
-      const size_t cons_s = child_constraints.size();
+      const SysInt cons_s = child_constraints.size();
 
       SysInt loop_start = watched_constraint[tripped_constraint] + 1;
       SysInt skip_pos = watched_constraint[other_constraint];
@@ -259,8 +259,8 @@ struct Dynamic_OR : public ParentConstraint
   void watch_assignment(AbstractConstraint* con, DynamicTrigger* dt, box<pair<SysInt,DomainInt> >& assignment)
   {
     vector<AnyVarRef>& vars = *(con->get_vars_singleton());
-    D_ASSERT(assignment.size() <= assign_size);
-    for(SysInt i = 0; i < assignment.size(); ++i)
+    D_ASSERT((SysInt)assignment.size() <= assign_size);
+    for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
     {
       const SysInt af = checked_cast<SysInt>(assignment[i].first);
         if(vars[af].isBound())
@@ -283,7 +283,7 @@ struct Dynamic_OR : public ParentConstraint
 
     bool found_watch = false;
 
-    while(loop < child_constraints.size() && !found_watch)
+    while(loop < (SysInt)child_constraints.size() && !found_watch)
     {
       bool flag;
       GET_ASSIGNMENT(assignment, child_constraints[loop]);
@@ -292,7 +292,7 @@ struct Dynamic_OR : public ParentConstraint
         found_watch = true;
         watched_constraint[0] = loop;
         watch_assignment(child_constraints[loop], dt, assignment);
-        for(SysInt i = 0; i < assignment.size(); ++i)
+        for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
           P(assignment[i].first << "." << assignment[i].second << "  ");
       }
       else
@@ -310,7 +310,7 @@ struct Dynamic_OR : public ParentConstraint
 
     found_watch = false;
 
-    while(loop < child_constraints.size() && !found_watch)
+    while(loop < (SysInt)child_constraints.size() && !found_watch)
     {
       bool flag;
       GET_ASSIGNMENT(assignment, child_constraints[loop]);
@@ -319,7 +319,7 @@ struct Dynamic_OR : public ParentConstraint
         found_watch = true;
         watched_constraint[1] = loop;
         watch_assignment(child_constraints[loop], dt + assign_size, assignment);
-        for(SysInt i = 0; i < assignment.size(); ++i)
+        for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
           P(assignment[i].first << "." << assignment[i].second << "  ");
         P(" -- Found watch 1: " << loop);
         return;
@@ -345,7 +345,7 @@ struct Dynamic_OR : public ParentConstraint
 inline AbstractConstraint* Dynamic_OR::reverse_constraint()
 {// and of the reverse of all the child constraints..
       vector<AbstractConstraint*> con;
-      for(SysInt i=0; i<child_constraints.size(); i++)
+      for(SysInt i=0; i < (SysInt)child_constraints.size(); i++)
       {
           con.push_back(child_constraints[i]->reverse_constraint());
       }

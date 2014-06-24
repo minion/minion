@@ -72,7 +72,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
 
     {
         squaresize = (int) sqrt(var_array.size());
-        CHECK( (squaresize*squaresize == var_array.size()), "Length of array is not a square.");
+        CHECK( (squaresize*squaresize == (SysInt)var_array.size()), "Length of array is not a square.");
 
         CheckNotBound(var_array, "alldiffmatrix", "no alternative");
 
@@ -156,7 +156,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
 
   virtual void propagate(DynamicTrigger* trig)
   {
-      if(trig-dynamic_trigger_start() < var_array.size()) {
+      if(trig-dynamic_trigger_start() < (SysInt)var_array.size()) {
           // One of the value has been pruned somewhere
           // Need to propagate.
 
@@ -176,9 +176,9 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
           }
       }
       else {
-          D_ASSERT(trig-dynamic_trigger_start() < var_array.size()*2);
+          D_ASSERT(trig-dynamic_trigger_start() < (SysInt)var_array.size()*2);
           // In the second block. Something was assigned.
-          SysInt vidx=trig-dynamic_trigger_start()-var_array.size();
+          SysInt vidx=trig-dynamic_trigger_start()-(SysInt)var_array.size();
 
 
           if(var_array[vidx].getAssignedValue()==value) {
@@ -224,7 +224,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
 
       // Set up triggers.
 
-      for(int i=0; i<var_array.size(); i++) {
+      for(int i=0; i < (SysInt)var_array.size(); i++) {
           if(var_array[i].inDomain(value)) {
               var_array[i].addDynamicTrigger(dynamic_trigger_start()+i, DomainRemoval, value);
               var_array[i].addDynamicTrigger(dynamic_trigger_start()+i+var_array.size(), Assigned);
@@ -257,7 +257,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
 
     virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
-        D_ASSERT(array_size == var_array.size());
+        D_ASSERT(array_size == (SysInt)var_array.size());
         for(SysInt i=0; i<squaresize; i++) {
             SysInt count=0;
             for(SysInt j=0; j<squaresize; j++) if(v[i*squaresize+j]==value) count++;

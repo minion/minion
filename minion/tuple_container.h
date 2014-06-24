@@ -43,12 +43,12 @@ class Regin;
 class EggShellData;
 class HaggisGACTuples;
 
-inline SysInt get_hash_val(DomainInt* ptr, SysInt length)
+inline size_t get_hash_val(DomainInt* ptr, SysInt length)
 {
-    SysInt hash_code = 1234;
+    size_t hash_code = 1234;
     for(SysInt i = 0; i < length; ++i)
     {
-      SysInt val = checked_cast<SysInt>(ptr[i]);
+      size_t val = checked_cast<SysInt>(ptr[i]);
       hash_code = (hash_code << 5)-hash_code+val;
     }
     hash_code += length;
@@ -58,15 +58,15 @@ inline SysInt get_hash_val(DomainInt* ptr, SysInt length)
 inline SysInt get_hash_val(const vector<vector<DomainInt> >& vecs)
 {
     SysInt hash_code = 1234;
-    for(SysInt i = 0; i < vecs.size(); ++i)
-      for(SysInt j = 0; j < vecs[i].size(); ++j)
+    for(SysInt i = 0; i < (SysInt)vecs.size(); ++i)
+      for(SysInt j = 0; j < (SysInt)vecs[i].size(); ++j)
     {
       SysInt val = checked_cast<SysInt>(vecs[i][j]);
       hash_code = (hash_code << 5)-hash_code+val;
     }
 
     SysInt total_size = 0;
-    for(SysInt i = 0; i < vecs.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)vecs.size(); ++i)
       total_size += vecs[i].size();
     hash_code += total_size;
     return hash_code;
@@ -81,16 +81,16 @@ class TupleList
   TupleTrieArray* triearray;
   Regin* regin;
   EggShellData* egg;
-  
-  
+
+
   DomainInt* tuple_data;
   SysInt tuple_length;
   SysInt number_of_tuples;
   bool tuples_locked;
- 
+
   SysInt hash_code;
   public:
-  
+
   size_t get_hash()
   {
     if(hash_code != 0)
@@ -105,19 +105,19 @@ class TupleList
   Regin* getRegin();
   EggShellData* getEggShellData(size_t varcount);
 
-  
+
   /// Get raw pointer to the tuples.
   DomainInt* getPointer()
   { return tuple_data; }
-  
+
   /// Get number of tuples.
   DomainInt size() const
   { return number_of_tuples; }
-  
+
   // Get size of a particular tuple.
   DomainInt tuple_size() const
   { return tuple_length; }
-  
+
   // This function is temporary while the new interface is being designed.
   vector<DomainInt> get_vector(SysInt pos) const
   {
@@ -126,9 +126,9 @@ class TupleList
       vec[i] = tuple_data[pos * tuple_length + i];
     return vec;
   }
-  
-  TupleList(const vector<vector<DomainInt> >& tuple_list) : 
-    litlists(NULL), nightingale(NULL), triearray(NULL), 
+
+  TupleList(const vector<vector<DomainInt> >& tuple_list) :
+    litlists(NULL), nightingale(NULL), triearray(NULL),
     regin(NULL),  egg(NULL), tuples_locked(false), hash_code(0)
   {
     number_of_tuples = tuple_list.size();
@@ -139,42 +139,42 @@ class TupleList
       { tuple_data[i * tuple_length + j] = tuple_list[i][j]; }
     finalise_tuples();
   }
-  
+
   TupleList(DomainInt _numtuples, DomainInt _tuplelength) :
      litlists(NULL), nightingale(NULL), triearray(NULL),
      regin(NULL), egg(NULL), tuple_length(checked_cast<SysInt>(_tuplelength)),
      number_of_tuples(checked_cast<SysInt>(_numtuples)), tuples_locked(false), hash_code(0)
   { tuple_data = new DomainInt[number_of_tuples * tuple_length]; }
-  
+
   const DomainInt* operator[](SysInt pos) const
   { return get_tupleptr(pos); }
-  
+
   const DomainInt* get_tupleptr(SysInt pos) const
-  { 
+  {
     D_ASSERT(pos >= 0 && (pos < number_of_tuples || (number_of_tuples==0 && pos==0)));
     return tuple_data + pos*tuple_length;
   }
-  
+
   void setName(string name)
   { tuple_name = name; }
 
   string getName() const
   { return tuple_name; }
-  
+
  /// Original smallest value from each domain.
   vector<DomainInt> dom_smallest;
   /// Original size of each domain.
   vector<DomainInt> dom_size;
-  
+
   /// Total number of literals in the variables at the start of search.
   DomainInt literal_num;
-  
+
   /// Used by get_literal.
   vector<vector<DomainInt> > _map_vars_to_literal;
-  
+
   /// Used to get a variable/value pair from a literal
   vector<pair<SysInt,DomainInt> > _map_literal_to_vars;
-  
+
   /// Maps a variable/value pair to a literal.
   DomainInt get_literal(DomainInt var_num_in, DomainInt dom_num)
   {
@@ -182,9 +182,9 @@ class TupleList
      D_ASSERT(var_num >= 0 && var_num < tuple_size());
      D_ASSERT(dom_num >= dom_smallest[var_num]);
      D_ASSERT(dom_num < dom_smallest[var_num] + dom_size[var_num]);
-    return _map_vars_to_literal[var_num][checked_cast<SysInt>(dom_num - dom_smallest[var_num])]; 
+    return _map_vars_to_literal[var_num][checked_cast<SysInt>(dom_num - dom_smallest[var_num])];
   }
-  
+
   pair<SysInt,DomainInt> get_varval_from_literal(DomainInt literal)
   { return _map_literal_to_vars[checked_cast<SysInt>(literal)]; }
 
@@ -195,7 +195,7 @@ class TupleList
       return;
     tuples_locked = true;
 
-    DomainInt arity = tuple_size();   
+    DomainInt arity = tuple_size();
 
     // Set up the table of tuples.
     for(SysInt i = 0; i < arity; ++i)
@@ -255,9 +255,9 @@ public:
   }
 
   TupleList* getNewTupleList(const vector<vector<DomainInt> >& tuples)
-  { 
-    SysInt tuple_hash = get_hash_val(tuples);
-    for(SysInt i = 0; i < Internal_TupleList.size(); ++i)
+  {
+    size_t tuple_hash = get_hash_val(tuples);
+    for(SysInt i = 0; i < (SysInt)Internal_TupleList.size(); ++i)
     {
       bool equal = true;
 
@@ -266,17 +266,17 @@ public:
       else
       {
         TupleList* ptr = Internal_TupleList[i];
-        if(tuples.size() != ptr->size() || tuples[0].size() != ptr->tuple_size())
+        if((SysInt)tuples.size() != ptr->size() || (SysInt)tuples[0].size() != ptr->tuple_size())
         {
           equal = false;
         }
         else
         {
-          for(SysInt j = 0; j < tuples.size() && equal; ++j)
+          for(SysInt j = 0; j < (SysInt)tuples.size() && equal; ++j)
           {
-            for(SysInt k = 0; k < tuples[j].size() && equal; ++k)
+            for(SysInt k = 0; k < (SysInt)tuples[j].size() && equal; ++k)
               if(tuples[j][k] != ptr->get_tupleptr(j)[k])
-                { equal = false; }            
+                { equal = false; }
           }
         }
 
@@ -361,9 +361,9 @@ public:
   // variables
   void validateShortCTuples(SysInt var_count)
   {
-    for(SysInt i = 0; i < short_tuples.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)short_tuples.size(); ++i)
     {
-      for(SysInt j = 0; j < short_tuples[i].size(); ++j)
+      for(SysInt j = 0; j < (SysInt)short_tuples[i].size(); ++j)
       {
         SysInt v = short_tuples[i][j].first;
         CHECK(v >= 0, "The short tuple '" + tuple_name + "' contains the negative variable index " + tostring(v));
@@ -377,11 +377,11 @@ public:
   void validateShortTuples(SysInt var_count)
   {
     validateShortCTuples(var_count);
-   for(SysInt i = 0; i < short_tuples.size(); ++i)
+   for(SysInt i = 0; i < (SysInt)short_tuples.size(); ++i)
     {
-      for(SysInt j = 0; j < short_tuples[i].size(); ++j)
+      for(SysInt j = 0; j < (SysInt)short_tuples[i].size(); ++j)
       {
-        for(SysInt k = j+1; k < short_tuples[i].size(); ++k)
+        for(SysInt k = j+1; k < (SysInt)short_tuples[i].size(); ++k)
         {
           SysInt v1 = short_tuples[i][j].first;
           SysInt v2 = short_tuples[i][k].first;
@@ -417,7 +417,7 @@ class ShortTupleListContainer
 public:
 
   ShortTupleList* getNewShortTupleList(const vector<vector<pair<SysInt, DomainInt> > >& tuples)
-  { 
+  {
     ShortTupleList* tuplelist_ptr = new ShortTupleList(tuples);
     Internal_TupleList.push_back(tuplelist_ptr);
     return tuplelist_ptr;
@@ -444,17 +444,17 @@ class LiteralSpecificLists
 {
 public:
   TupleList* tuples;
-  
-  /// For each literal, a list of the tuples it is present in.  
+
+  /// For each literal, a list of the tuples it is present in.
   vector<vector<vector<DomainInt> > > literal_specific_tuples;
-  
+
   LiteralSpecificLists(TupleList* _tuples) : tuples(_tuples)
-  { 
+  {
       tuples->finalise_tuples();
       // For each literal, store the set of tuples which it allows.
       for(UnsignedSysInt i = 0; i < tuples->dom_size.size(); ++i)
       {
-        for(DomainInt j = tuples->dom_smallest[i]; 
+        for(DomainInt j = tuples->dom_smallest[i];
                       j <= tuples->dom_smallest[i] + tuples->dom_size[i];
                       ++j)
         {

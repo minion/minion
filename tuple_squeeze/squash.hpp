@@ -69,12 +69,12 @@ std::vector<std::set<DomainInt> > gather_domains(const Tuples& tuples)
 {
     if(tuples.size() == 0)
         return std::vector<std::set<DomainInt> >();
-    
+
     std::vector<std::set<DomainInt> > domains((tuples.begin())->size());
 
     for(std::set<Vint>::iterator it = tuples.begin(); it != tuples.end(); ++it)
     {
-        for(SysInt i = 0; i < it->size(); ++i)
+        for(SysInt i = 0; i < (SysInt)it->size(); ++i)
         {
             domains[i].insert((*it)[i]);
         }
@@ -105,7 +105,7 @@ makeShortTupleList(const std::set<Vint>& tuples)
     for(std::set<Vint>::const_iterator it = tuples.begin(); it != tuples.end(); ++it)
     {
         std::vector<std::pair<SysInt,DomainInt> > short_tup;
-        for(SysInt i = 0; i < it->size(); ++i)
+        for(SysInt i = 0; i < (SysInt)it->size(); ++i)
         {
             if((*it)[i] != free_value)
             {

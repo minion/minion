@@ -135,7 +135,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    D_ASSERT(v_size == var_array.size());
+    D_ASSERT(v_size == (SysInt)var_array.size());
     SysInt count = 0;
     for(SysInt i = 0; i < v_size; ++i)
       count += (v[i] == 1);

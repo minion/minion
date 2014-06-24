@@ -20,17 +20,17 @@
 #include "minion.h"
 
 namespace BuildCon
-{  
+{
 
 vector<AnyVarRef>
 get_AnyVarRef_from_Var(StateObj* stateObj, const vector<Var>& vec)
 {
   vector<AnyVarRef> ret_vec;
   ret_vec.reserve(vec.size());
-  
-  for(SysInt i = 0; i < vec.size(); ++i)
+
+  for(SysInt i = 0; i < (SysInt)vec.size(); ++i)
     ret_vec.push_back(get_AnyVarRef_from_Var(stateObj, vec[i]));
-  
+
   return ret_vec;
 }
 
@@ -50,7 +50,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
             return AnyVarRef(getVars(stateObj).sparseBoundVarContainer.get_var_num(v.pos()));
           case VAR_DISCRETE:
             return AnyVarRef(getVars(stateObj).bigRangeVarContainer.get_var_num(v.pos()));
-          case VAR_SPARSEDISCRETE:  
+          case VAR_SPARSEDISCRETE:
             INPUT_ERROR("Sparse Discrete not supported at present");
           case VAR_CONSTANT:
             return AnyVarRef(ConstantVar(stateObj, v.pos()));
@@ -59,7 +59,7 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
         }
 }
 
-  
+
 
   /// Create all the variables used in the CSP.
   void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars)
@@ -68,12 +68,9 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
     getVars(stateObj).boundVarContainer.addVariables(vars.bound);
     getVars(stateObj).sparseBoundVarContainer.addVariables(vars.sparse_bound);
     getVars(stateObj).bigRangeVarContainer.addVariables(vars.discrete);
-    
-    for(SysInt i = 0; i < vars.sparse_discrete.size(); ++i)
+
+    for(SysInt i = 0; i < (SysInt)vars.sparse_discrete.size(); ++i)
     { INPUT_ERROR("Sparse discrete disabled at present due to bugs. Sorry."); }
   }
-    
+
 }
-
-
-

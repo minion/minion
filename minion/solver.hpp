@@ -46,7 +46,7 @@ inline void world_pop(StateObj* stateObj)
 
   vector<set<AbstractConstraint*> >& constraintList = getState(stateObj).getConstraintsToPropagate();
   SysInt propagateDepth = get_world_depth(stateObj) + 1;
-  if(constraintList.size() > propagateDepth)
+  if((SysInt)constraintList.size() > propagateDepth)
   {
     for(set<AbstractConstraint*>::iterator it = constraintList[propagateDepth].begin();
         it != constraintList[propagateDepth].end(); it++)

@@ -38,10 +38,10 @@ struct StateObj
   // Forbid copying this type!
   StateObj(const StateObj&);
   void operator=(const StateObj&);
-  
+
   Memory* searchMem_m;
   VariableContainer* varContainer_m;
-  BoolContainer* backtrack_bools; 
+  BoolContainer* backtrack_bools;
   SearchOptions* options_m;
   SearchState* state_m;
   Queues* queues_m;
@@ -60,14 +60,14 @@ public:
   { }
 
   ~StateObj()
-  { 
+  {
     delete triggerMem_m;
     delete queues_m;
     delete state_m;
     delete options_m;
     delete backtrack_bools;
     delete varContainer_m;
-    delete searchMem_m;   
+    delete searchMem_m;
   }
 };
 
@@ -155,8 +155,8 @@ inline BigRangeVarContainer<d_type>& BigRangeVarRef_internal_template<d_type>::g
 
 // Must be defined later.
 inline SearchState::~SearchState()
-{ 
-  for(SysInt i = 0; i < constraints.size(); ++i)
+{
+  for(SysInt i = 0; i < (SysInt)constraints.size(); ++i)
     delete constraints[i];
 }
 

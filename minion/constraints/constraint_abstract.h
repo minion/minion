@@ -244,7 +244,7 @@ public:
       srand(12345);
       for(SysInt i=0; i<1000; i++)
       {
-          for(SysInt j=0; j<vars.size(); j++)
+          for(SysInt j=0; j<(SysInt)vars.size(); j++)
           {
               DomainInt dsize=vars[j].getInitialMax()-vars[j].getInitialMin()+1;
               t[j]=(rand()%checked_cast<SysInt>(dsize))+vars[j].getInitialMin();
@@ -268,7 +268,7 @@ public:
       srand(12345);
       for(SysInt i=0; i<100; i++)
       {
-          for(SysInt j=0; j<vars.size(); j++)
+          for(size_t j=0; j<vars.size(); j++)
           {
 	    if(j != var) {
               DomainInt dsize=vars[j].getInitialMax()-vars[j].getInitialMin()+1;
@@ -341,7 +341,7 @@ public:
   AbstractConstraint(_stateObj), child_constraints(_children)
   {
     SysInt var_count = 0;
-    for(SysInt i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
     {
       start_of_constraint.push_back(var_count);
       SysInt con_size = child_constraints[i]->get_vars_singleton()->size();
@@ -356,7 +356,7 @@ public:
   virtual SysInt dynamic_trigger_count_with_children()
   {
     SysInt trigger_count = dynamic_trigger_count();
-    for(SysInt i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
       trigger_count += child_constraints[i]->dynamic_trigger_count_with_children();
     return trigger_count;
   }
@@ -370,7 +370,7 @@ public:
     for(SysInt count = 0; count < current_trigger_count; ++count)
       _dynamic_trigger_to_constraint.push_back(child_constraints.size());
 
-    for(SysInt i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
     {
       // We need this check to ensure we don't try constructing a "start of trigger" block one off the
       // the end of memory array.
@@ -420,7 +420,7 @@ public:
 
   virtual ~ParentConstraint()
   {
-    for(SysInt i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
       delete child_constraints[i];
   }
 };

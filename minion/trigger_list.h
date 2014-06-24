@@ -187,7 +187,7 @@ public:
     DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers);
 
     DomainInt trigger_types = ( only_bounds ? 4 : (4 + vars_domain_size));
-    for(UnsignedSysInt i = 0; i < var_count_m * trigger_types; ++i)
+    for(SysInt i = 0; i < var_count_m * trigger_types; ++i)
     {
       new (trigger_ptr + i) DynamicTrigger;
       D_ASSERT((trigger_ptr + i)->sanity_check_list());

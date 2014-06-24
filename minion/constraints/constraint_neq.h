@@ -22,7 +22,7 @@
 Forces the input vector of variables to take distinct values.
 */
 
-/** @help constraints;alldiff Example 
+/** @help constraints;alldiff Example
 Suppose the input file had the following vector of variables defined:
 
 DISCRETE myVec[9] {1..9}
@@ -34,7 +34,7 @@ alldiff(myVec)
 */
 
 /** @help constraints;alldiff Notes
-Enforces the same level of consistency as a clique of not equals 
+Enforces the same level of consistency as a clique of not equals
 constraints.
 */
 
@@ -50,24 +50,24 @@ for the same constraint that enforces GAC.
 #define CONSTRAINT_NEQ_H
 
 #include "../constraints/constraint_checkassign.h"
-  
+
 template<typename VarArray>
 struct NeqConstraint : public AbstractConstraint
 {
   virtual string constraint_name()
   { return "alldiff"; }
-  
+
   //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
-  
+
   VarArray var_array;
 
   CONSTRAINT_ARG_LIST1(var_array);
-  
+
   NeqConstraint(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
     var_array(_var_array)
   { }
-  
+
   virtual triggerCollection setup_internal()
   {
     triggerCollection t;
@@ -76,10 +76,10 @@ struct NeqConstraint : public AbstractConstraint
       t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
     return t;
   }
-  
+
   virtual AbstractConstraint* reverse_constraint()
   { return forward_check_negation(stateObj, this); }
-  
+
   virtual void propagate(DomainInt prop_val_in, DomainDelta)
   {
     const SysInt prop_val = checked_cast<SysInt>(prop_val_in);
@@ -102,9 +102,9 @@ struct NeqConstraint : public AbstractConstraint
         }
       }
     }
-    
+
   }
-  
+
   virtual void full_propagate()
   {
     SysInt array_size = var_array.size();
@@ -130,17 +130,17 @@ struct NeqConstraint : public AbstractConstraint
         }
       }
   }
-    
+
     virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
     {
-      D_ASSERT(v_size == var_array.size());
+      D_ASSERT(v_size == (SysInt)var_array.size());
       SysInt array_size = checked_cast<SysInt>(v_size);
       for(SysInt i=0;i<array_size;i++)
         for( SysInt j=i+1;j<array_size;j++)
           if(v[i]==v[j]) return false;
       return true;
     }
-    
+
     virtual vector<AnyVarRef> get_vars()
     {
       vector<AnyVarRef> vars;
@@ -149,18 +149,18 @@ struct NeqConstraint : public AbstractConstraint
         vars.push_back(var_array[i]);
       return vars;
     }
-    
-    
+
+
      // Getting a satisfying assignment here is too hard, we don't want to have to
      // build a matching.
      virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
    {
      MAKE_STACK_BOX(c, DomainInt, var_array.size());
-     
-     for(SysInt i = 0; i < var_array.size(); ++i)
+
+     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
      {
-       if(!var_array[i].isAssigned()) 
-       {  
+       if(!var_array[i].isAssigned())
+       {
          assignment.push_back(make_pair(i, var_array[i].getMin()));
          assignment.push_back(make_pair(i, var_array[i].getMax()));
          return true;
@@ -168,16 +168,16 @@ struct NeqConstraint : public AbstractConstraint
        else
          c.push_back(var_array[i].getAssignedValue());
      }
-    
+
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
-      for(SysInt i = 0; i < var_array.size(); ++i)
-        assignment.push_back(make_pair(i, c[i])); 
+      for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
+        assignment.push_back(make_pair(i, c[i]));
       return true;
     }
     return false;
    }
-   
-   
+
+
   };
 #endif

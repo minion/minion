@@ -39,7 +39,7 @@ struct MinionInstancePrinter
   void print_instance(const DomainInt& i)
   { oss << checked_cast<SysInt>(i); }
 #endif
-  
+
   void print_instance(const SysInt& i)
   { oss << i; }
 
@@ -66,7 +66,7 @@ void print_instance( const vector<T>& vars, char start = '[', char end = ']')
   if(!vars.empty())
   {
     print_instance( vars[0]);
-    for(SysInt i = 1; i < vars.size(); ++i)
+    for(SysInt i = 1; i < (SysInt)vars.size(); ++i)
     {
       oss << ",";
       print_instance( vars[i]);
@@ -123,7 +123,7 @@ void print_instance(const ConstraintBlob& blob)
       case read_constraint_list:
         oss << "{";
         print_instance(blob.internal_constraints[0]);
-        for(SysInt j = 1; j < blob.internal_constraints.size(); ++j)
+        for(SysInt j = 1; j < (SysInt)blob.internal_constraints.size(); ++j)
         {
           oss << ", ";
           print_instance(blob.internal_constraints[j]);
@@ -142,7 +142,7 @@ void print_instance(const ConstraintBlob& blob)
 
 void print_instance(const VarContainer& vars, const vector<Var>& varlist)
 {
-  for(SysInt i = 0; i < varlist.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)varlist.size(); ++i)
   {
     switch(varlist[i].type())
     {
@@ -158,7 +158,7 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
         print_instance(varlist[i]);
         pair<BoundType, vector<DomainInt> > bound = vars.get_domain(varlist[i]);
         D_ASSERT(bound.first == Bound_Yes);
-        D_ASSERT(bound.second.size() == 2);
+        D_ASSERT((SysInt)bound.second.size() == 2);
         oss << "{" << bound.second[0] << ".." << bound.second[1] << "}" << endl;
       }
       break;
@@ -180,7 +180,7 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
         print_instance(varlist[i]);
         pair<BoundType, vector<DomainInt> > bound = vars.get_domain(varlist[i]);
         D_ASSERT(bound.first == Bound_Yes);
-        D_ASSERT(bound.second.size() == 2);
+        D_ASSERT((SysInt)bound.second.size() == 2);
         oss << "{" << bound.second[0] << ".." << bound.second[1] << "}" << endl;
       }
       break;
@@ -201,7 +201,7 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
 
   // Bounds.
   SysInt bound_sum = 0;
-  for(SysInt x = 0; x < vars.bound.size(); ++x)
+  for(SysInt x = 0; x < (SysInt)vars.bound.size(); ++x)
   {
     for(SysInt i = 0; i < vars.bound[x].first; ++i)
     {
@@ -215,7 +215,7 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
   // Sparse Bounds.
 
   SysInt sparse_bound_sum = 0;
-  for(SysInt x = 0; x < vars.sparse_bound.size(); ++x)
+  for(SysInt x = 0; x < (SysInt)vars.sparse_bound.size(); ++x)
   {
     for(SysInt i = 0; i < vars.sparse_bound[x].first; ++i)
     {
@@ -230,7 +230,7 @@ void print_instance(const VarContainer& vars, const vector<Var>& varlist)
 
   // Bounds.
   SysInt discrete_sum = 0;
-  for(SysInt x = 0; x < vars.discrete.size(); ++x)
+  for(SysInt x = 0; x < (SysInt)vars.discrete.size(); ++x)
   {
     for(SysInt i = 0; i < vars.discrete[x].first; ++i)
     {
@@ -278,7 +278,7 @@ void print_search_info(const vector<Var>& var_vec )
     oss << endl;
   }
 
-  for(SysInt i = 0; i < csp.search_order.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)csp.search_order.size(); ++i)
   {
     // Filter the var and val orders.
 
@@ -286,7 +286,7 @@ void print_search_info(const vector<Var>& var_vec )
     vector<ValOrderEnum> val_order = csp.search_order[i].val_order;
 
     SysInt pos = 0;
-    while(pos < var_order.size())
+    while(pos < (SysInt)var_order.size())
     {
       if(vars.count(var_order[pos]) == 0)
       {
@@ -308,7 +308,7 @@ void print_search_info(const vector<Var>& var_vec )
     {
       oss << "VALORDER ";
       vector<string> output_vars;
-      for(SysInt j = 0; j < val_order.size(); ++j)
+      for(SysInt j = 0; j < (SysInt)val_order.size(); ++j)
         switch(val_order[j])
         {
           case VALORDER_ASCEND:
@@ -345,10 +345,10 @@ void print_search_info(const vector<Var>& var_vec )
   else
   {
     vector<vector<Var> > new_print_matrix;
-    for(SysInt i = 0; i < csp.print_matrix.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)csp.print_matrix.size(); ++i)
     {
       new_print_matrix.push_back(vector<Var>());
-      for(SysInt j = 0; j < csp.print_matrix[i].size(); ++j)
+      for(SysInt j = 0; j < (SysInt)csp.print_matrix[i].size(); ++j)
       {
         if(vars.count(csp.print_matrix[i][j]))
           new_print_matrix[i].push_back(csp.print_matrix[i][j]);

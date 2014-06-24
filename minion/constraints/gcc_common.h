@@ -127,15 +127,15 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     #endif
     ,SCCSplit(_stateObj, numvars+numvals)
     {
-        for(SysInt i = 0; i < _val_array.size(); ++i)
+        for(SysInt i = 0; i < (SysInt)_val_array.size(); ++i)
             val_array.push_back(checked_cast<SysInt>(_val_array[i]));
 
         CheckNotBound(_var_array, "gcc");
         CHECK(capacity_array.size()==val_array.size(), "GCC: Vector of values and vector of cardinality variables must be same length.");
 
-        for(SysInt i=0; i<val_array.size(); i++)
+        for(SysInt i=0; i < (SysInt)val_array.size(); i++)
         {
-            for(SysInt j=i+1; j<val_array.size(); j++)
+            for(SysInt j=i+1; j < (SysInt)val_array.size(); j++)
             {
                 CHECK(val_array[i]!=val_array[j], "GCC: Repeated values are not allowed in value list.");
             }
@@ -191,7 +191,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         {
             bool found=false;
             SysInt j;
-            for(j=0; j<val_array.size(); j++)
+            for(j=0; j < (SysInt)val_array.size(); j++)
             {
                 if(val_array[j]==i+dom_min)
                 {
@@ -252,7 +252,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 
     virtual void full_propagate()
     {
-        for(SysInt i=0; i<capacity_array.size(); i++)
+        for(SysInt i=0; i < (SysInt)capacity_array.size(); i++)
         {
             if(val_array[i]>=dom_min && val_array[i]<=dom_max)
             {
@@ -300,16 +300,16 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #ifdef CAPBOUNDSCACHE
             DynamicTrigger* dt=dynamic_trigger_start();
             dt+=(numvars*numvals);
-            for(SysInt i=0; i<val_array.size(); i++)
+            for(SysInt i=0; i < (SysInt)val_array.size(); i++)
             {
                 // lowerbound first
-                for(SysInt j=0; j<(val_array.size()+numvars); j++)
+                for(SysInt j=0; j<((SysInt)val_array.size()+numvars); j++)
                 {
                     dt->trigger_info()=(val_array[i]-dom_min)*2;
                     dt++;
                 }
                 // upperbound
-                for(SysInt j=0; j<(val_array.size()+numvars); j++)
+                for(SysInt j=0; j<((SysInt)val_array.size()+numvars); j++)
                 {
                     dt->trigger_info()=(val_array[i]-dom_min)*2+1;
                     dt++;
@@ -469,7 +469,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
       if(matchok)
       {
           // now check occurrences
-          for(SysInt i=0; i<val_array.size(); i++)
+          for(SysInt i=0; i<(SysInt)val_array.size(); i++)
           {
               SysInt val=val_array[i];
               if( (val<dom_min || val>dom_max) && !capacity_array[i].inDomain(0))
@@ -490,7 +490,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
           // run matching algorithm
           // populate lower and upper
           // Also check if bounds are well formed.
-        for(SysInt i=0; i<val_array.size(); i++)
+        for(SysInt i=0; i<(SysInt)val_array.size(); i++)
         {
             if(val_array[i]>=dom_min && val_array[i]<=dom_max)
             {
@@ -556,7 +556,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
               D_ASSERT(var_array[i].inDomain(varvalmatching[i]));
               assignment.push_back(make_pair(i, varvalmatching[i]));
           }
-          for(SysInt i=0; i<val_array.size(); i++)
+          for(SysInt i=0; i<(SysInt)val_array.size(); i++)
           {
               SysInt occ;
               if(val_array[i]<dom_min || val_array[i]>dom_max)
@@ -610,7 +610,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #endif
 
         // populate lower and upper
-        for(SysInt i=0; i<val_array.size(); i++)
+        for(SysInt i=0; i<(SysInt)val_array.size(); i++)
         {
             if(val_array[i]>=dom_min && val_array[i]<=dom_max)
             {
@@ -673,7 +673,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #endif
 
         // populate lower and upper
-        for(SysInt i=0; i<val_array.size(); i++)
+        for(SysInt i=0; i<(SysInt)val_array.size(); i++)
         {
             if(val_array[i]>=dom_min && val_array[i]<=dom_max)
             {
@@ -769,7 +769,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         // to_process contains var indexes and vals:
         // (val-dom_min +numvars)
 
-        for(SysInt i=0; i<toiterate.size(); ++i)
+        for(SysInt i=0; i<(SysInt)toiterate.size(); ++i)
         {
             SysInt tempidx=toiterate[i];
 
@@ -799,7 +799,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         {
         vector<SysInt>& toiterate = sccs_to_process.getlist();
         GCCPRINT("About to loop for sccs_to_process:"<< toiterate);
-        for(SysInt i=0; i<toiterate.size(); i++)
+        for(SysInt i=0; i<(SysInt)toiterate.size(); i++)
         {
             SysInt sccindex_start=toiterate[i];
             vars_in_scc.clear();
@@ -832,7 +832,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             }
 
             // populate lower and upper
-            for(SysInt i=0; i<vals_in_scc.size(); i++)
+            for(SysInt i=0; i<(SysInt)vals_in_scc.size(); i++)
             {
                 SysInt validx=vals_in_scc[i]-dom_min;
                 SysInt capi=val_to_cap_index[validx];
@@ -851,7 +851,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 vector<SysInt>& vars_changed=changed_vars_per_scc[sccindex_start];
                 #if DomainCounting
                     SysInt varcount=vars_in_scc.size();
-                    for(SysInt i=0; i<vars_changed.size(); i++)
+                    for(SysInt i=0; i<(SysInt)vars_changed.size(); i++)
                     {
                         SysInt var=vars_changed[i];
                         if(var>=numvars || adjlistlength[var]<varcount)
@@ -863,7 +863,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     }
                 #endif
                 #if InternalDT
-                    for(SysInt i=0; i<vars_changed.size() && !run_propagator; i++)
+                    for(SysInt i=0; i<(SysInt)vars_changed.size() && !run_propagator; i++)
                     {
                         SysInt var=vars_changed[i];
                         if(var>=numvars)
@@ -902,7 +902,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 
             #ifdef SCCCARDS
                 // Propagate to capacity variables for all values in vals_in_scc
-                for(SysInt valinscc=0; valinscc<vals_in_scc.size(); valinscc++)
+                for(SysInt valinscc=0; valinscc<(SysInt)vals_in_scc.size(); valinscc++)
                 {
                     SysInt v=vals_in_scc[valinscc];
                     if(val_to_cap_index[v-dom_min]!=-1 && lower[v-dom_min]!=upper[v-dom_min])
@@ -960,7 +960,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         // clear out unmatched variables -- unless this has already been done
         // when the adjacency lists were updated.
         #if !UseIncGraph
-        for(SysInt scci=0; scci<vars_in_scc.size(); scci++)
+        for(SysInt scci=0; scci<(SysInt)vars_in_scc.size(); scci++)
         {
             SysInt i=vars_in_scc[scci];
             if(varvalmatching[i]!=dom_min-1
@@ -976,12 +976,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         // the usage[val] of some value is greater than upper[val]. This is impossible
         // in the flow graph, so it must be corrected before we run the algorithm.
         // Some values in the matching are changed to blank (dom_min-1).
-        for(SysInt valsccindex=0; valsccindex<vals_in_scc.size(); valsccindex++)
+        for(SysInt valsccindex=0; valsccindex<(SysInt)vals_in_scc.size(); valsccindex++)
         {
             SysInt valindex=vals_in_scc[valsccindex]-dom_min;
             if(usage[valindex]>upper[valindex] && upper[valindex]>=0)
             {
-                for(SysInt i=0; i<vars_in_scc.size() && usage[valindex]>upper[valindex]; i++)
+                for(SysInt i=0; i<(SysInt)vars_in_scc.size() && usage[valindex]>upper[valindex]; i++)
                 {
                     SysInt j=vars_in_scc[i];
                     if(varvalmatching[j]==valindex+dom_min)
@@ -995,7 +995,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         }
 
         // iterate through the values looking for ones which are below their lower capacity bound.
-        for(SysInt startvalsccindex=0; startvalsccindex<vals_in_scc.size(); startvalsccindex++)
+        for(SysInt startvalsccindex=0; startvalsccindex<(SysInt)vals_in_scc.size(); startvalsccindex++)
         {
             SysInt startvalindex=vals_in_scc[startvalsccindex]-dom_min;
             while(usage[startvalindex]<lower[startvalindex])
@@ -1044,7 +1044,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                         D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
                         SysInt stackval=curnode+dom_min-numvars;
                         #if !UseIncGraph
-                        for(SysInt vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
+                        for(SysInt vartoqueuescc=0; vartoqueuescc<(SysInt)vars_in_scc.size(); vartoqueuescc++)
                         {
                             SysInt vartoqueue=vars_in_scc[vartoqueuescc];
                         #else
@@ -1102,7 +1102,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             // Flip the graph around, so it's like the alldiff case now.
             // follow an edge in the matching from a value to a variable,
             // follow edges not in the matching from variables to values.
-            for(SysInt startvarscc=0; startvarscc<vars_in_scc.size(); startvarscc++)
+            for(SysInt startvarscc=0; startvarscc<(SysInt)vars_in_scc.size(); startvarscc++)
             {
                 SysInt startvar=vars_in_scc[startvarscc];
                 if(varvalmatching[startvar]==dom_min-1)
@@ -1165,7 +1165,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                             D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
                             SysInt stackval=curnode+dom_min-numvars;
                             #if !UseIncGraph
-                            for(SysInt vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
+                            for(SysInt vartoqueuescc=0; vartoqueuescc<(SysInt)vars_in_scc.size(); vartoqueuescc++)
                             {
                                 SysInt vartoqueue=vars_in_scc[vartoqueuescc];
                             #else
@@ -1209,14 +1209,14 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 
             // First count unmatched.
             SysInt unmatched=0;
-            for(SysInt varidx=0; varidx<vars_in_scc.size(); varidx++)
+            for(SysInt varidx=0; varidx<(SysInt)vars_in_scc.size(); varidx++)
             {
                 if(varvalmatching[vars_in_scc[varidx]]==dom_min-1)
                     unmatched++;
             }
             if(unmatched==0)
                 return true;  // matching already complete.
-            for(SysInt startvalsccindex=0; startvalsccindex<vals_in_scc.size(); startvalsccindex++)
+            for(SysInt startvalsccindex=0; startvalsccindex<(SysInt)vals_in_scc.size(); startvalsccindex++)
             {
                 SysInt startvalindex=vals_in_scc[startvalsccindex]-dom_min;
                 while(usage[startvalindex]<upper[startvalindex])
@@ -1254,7 +1254,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                             D_ASSERT(curnode>=numvars && curnode < numvars+numvals);
                             SysInt stackval=curnode+dom_min-numvars;
                             #if !UseIncGraph
-                            for(SysInt vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
+                            for(SysInt vartoqueuescc=0; vartoqueuescc<(SysInt)vars_in_scc.size(); vartoqueuescc++)
                             {
                                 SysInt vartoqueue=vars_in_scc[vartoqueuescc];
                             #else
@@ -1433,10 +1433,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 
     virtual BOOL check_assignment(DomainInt* v, SysInt vsize)
     {
-      D_ASSERT(vsize == var_array.size()+capacity_array.size());
+      D_ASSERT(vsize == (SysInt)var_array.size()+(SysInt)capacity_array.size());
       // borrow augpath array
       GCCPRINT("In check_assignment with array:[");
-      for(SysInt i=0; i<vsize; i++) GCCPRINT( v[i] <<",");
+      for(SysInt i=0; i<vsize; i++)
+      { GCCPRINT( v[i] <<","); }
       GCCPRINT("]");
       augpath.clear();
       augpath.resize(numvals, 0);
@@ -1445,7 +1446,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
       {   // count the values.
           augpath[checked_cast<SysInt>(v[i]-dom_min)]++;
       }
-      for(SysInt i=0; i<val_array.size(); i++)
+      for(SysInt i=0; i<(SysInt)val_array.size(); i++)
       {
           SysInt val=val_array[i];
           if(val>=dom_min && val<=dom_max)
@@ -1520,7 +1521,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         sccindex=sccindex_start;
 
         #if InternalDT
-            for(SysInt i=0; i<vars_in_scc.size(); i++)
+            for(SysInt i=0; i<(SysInt)vars_in_scc.size(); i++)
             {
                 SysInt varidx=vars_in_scc[i];
                 idt.clearwatches(varidx);
@@ -1529,7 +1530,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             }
         #endif
 
-        for(SysInt i=0; i<vars_in_scc.size(); ++i)
+        for(SysInt i=0; i<(SysInt)vars_in_scc.size(); ++i)
         {
             SysInt curnode=vars_in_scc[i];
             if(!visited.in(curnode))
@@ -1543,7 +1544,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 
         // Also make sure all vals have been visited, so that values which
         // are in singleton SCCs are removed from all vars.
-        for(SysInt i=0; i<vals_in_scc.size(); ++i)
+        for(SysInt i=0; i<(SysInt)vals_in_scc.size(); ++i)
         {
             SysInt curnode=vals_in_scc[i]-dom_min+numvars;
             if(!visited.in(curnode))
@@ -1636,7 +1637,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             GCCPRINT("usage:"<<usage);
             GCCPRINT("upper:"<<upper);
 
-            for(SysInt j=0; j<vals_in_scc.size(); j++)
+            for(SysInt j=0; j<(SysInt)vals_in_scc.size(); j++)
             {
                 SysInt i=vals_in_scc[j];
                 SysInt newnode=i+numvars-dom_min;
@@ -1709,7 +1710,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 
             SysInt lowlinkvar=-1;
             #if !UseIncGraph
-            for(SysInt i=0; i<vars_in_scc.size(); i++)
+            for(SysInt i=0; i<(SysInt)vars_in_scc.size(); i++)
             {
                 SysInt newnode=vars_in_scc[i];
             #else
@@ -1792,7 +1793,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             // Perhaps we traversed all vars but didn't unroll the recursion right to the top.
             // !toplevel . Or perhaps we didn't traverse all the variables. (or all values.)
             // I think these two cases cover everything.
-            if(!toplevel || varcount<vars_in_scc.size() || valcount<vals_in_scc.size())
+            if(!toplevel || varcount<(SysInt)vars_in_scc.size() || valcount<(SysInt)vals_in_scc.size())
             {
                 scc_split=true;  // The SCC has split and there is some work to do later.
             }
@@ -1880,7 +1881,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                             // It's a value. Iterate through old SCC and remove it from
                             // any variables not in tempset.
                             //cout << "Trashing value "<< copynode+dom_min-numvars << endl;
-                            for(SysInt i=0; i<vars_in_scc.size(); i++)
+                            for(SysInt i=0; i<(SysInt)vars_in_scc.size(); i++)
                             {
                                 SysInt curvar=vars_in_scc[i];
                                 if(!varinlocalmatching.in(curvar))
@@ -1934,7 +1935,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         augpath.clear();
         augpath.resize(numvals, 0);
 
-        for(SysInt i=0; i<var_array.size(); i++)
+        for(SysInt i=0; i<(SysInt)var_array.size(); i++)
         {
             if(var_array[i].isAssigned())
             {
@@ -1943,7 +1944,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             }
         }
         // Set bounds
-        for(SysInt i=0; i<val_array.size(); i++)
+        for(SysInt i=0; i<(SysInt)val_array.size(); i++)
         {
             SysInt val=val_array[i];
             capacity_array[i].setMin(augpath[val-dom_min]);
@@ -1957,7 +1958,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         // NEEDS TO BE IMPROVED. but it would be quadratic (nd) whatever I do.
         // Nope, when using incgraph only need to count assignments of each variable
         // which is linear in r.
-        for(SysInt i=0; i<val_array.size(); i++)
+        for(SysInt i=0; i<(SysInt)val_array.size(); i++)
         {
             SysInt val=val_array[i];
             if(lower[val-dom_min] != upper[val-dom_min])
@@ -1975,7 +1976,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         // Count assigned values using augpath as a temporary.
         augpath.clear();
         augpath.resize(numvals,0);
-        for(SysInt i=0; i<vars_in_scc.size(); i++)
+        for(SysInt i=0; i<(SysInt)vars_in_scc.size(); i++)
         {
             SysInt var=vars_in_scc[i];
             if(var_array[var].isAssigned())
@@ -1984,7 +1985,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             }
         }
         // Set bounds
-        for(SysInt i=0; i<vals_in_scc.size(); i++)
+        for(SysInt i=0; i<(SysInt)vals_in_scc.size(); i++)
         {
             SysInt val=vals_in_scc[i];
             SysInt capidx=val_to_cap_index[val-dom_min];
@@ -2048,7 +2049,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         vals_in_scc.clear();
         for(SysInt i=dom_min; i<=dom_max; i++) vals_in_scc.push_back(i);
 
-        for(SysInt validx=0; validx<val_array.size(); validx++)
+        for(SysInt validx=0; validx<(SysInt)val_array.size(); validx++)
         {
             SysInt value=val_array[validx];
 
@@ -2158,7 +2159,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         {
             SysInt startvar=adjlist[forbiddenval-dom_min+numvars][startvari];
         #else
-        for(SysInt startvarscc=0; startvarscc<vars_in_scc.size() && newlb>existinglb; startvarscc++)
+        for(SysInt startvarscc=0; startvarscc<(SysInt)vars_in_scc.size() && newlb>existinglb; startvarscc++)
         {
             SysInt startvar=vars_in_scc[startvarscc];
         #endif
@@ -2230,7 +2231,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                         {
                             SysInt vartoqueue=adjlist[curnode][vartoqueuei];
                         #else
-                        for(SysInt vartoqueuescc=0; vartoqueuescc<vars_in_scc.size(); vartoqueuescc++)
+                        for(SysInt vartoqueuescc=0; vartoqueuescc<(SysInt)vars_in_scc.size(); vartoqueuescc++)
                         {
                             SysInt vartoqueue=vars_in_scc[vartoqueuescc];
                         #endif
@@ -2450,7 +2451,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     {
         // use a watched-or of NotOccurrenceEqualConstraint, i.e. the negation of occurrence
         vector<AbstractConstraint*> con;
-        for(SysInt i=0; i<capacity_array.size(); i++)
+        for(SysInt i=0; i<(SysInt)capacity_array.size(); i++)
         {
             NotOccurrenceEqualConstraint<VarArray, DomainInt, CapVarRef>*
                 t=new NotOccurrenceEqualConstraint<VarArray, DomainInt, CapVarRef>(

@@ -43,7 +43,7 @@ inline string to_var_name(const vector<DomainInt>& params)
 {
   ostringstream s;
   s << "_";
-  for(SysInt i = 0; i < params.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)params.size(); ++i)
     s << tostring(params[i]) << "_";
   s << "_";
   return s.str();
@@ -201,7 +201,7 @@ struct ConstraintBlob
       throw parse_exception("Can't index a " + tostring(max_index.size()) +
                             "-d matrix with " + tostring(params.size()) +
                             " indices.");
-    for(SysInt i = 0; i < params.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)params.size(); ++i)
     {
       // Horrible hack: -999 means it was an _
       if(params[i] != -999 && (params[i] < 0 || params[i] >= max_index[i]))
@@ -211,7 +211,7 @@ struct ConstraintBlob
     // Set all fixed indices to 1, so they won't move.
     // Set all variable indices to their max value.
     vector<DomainInt> modified_max(params.size());
-    for(SysInt i = 0; i < max_index.size(); i++)
+    for(SysInt i = 0; i < (SysInt)max_index.size(); i++)
     {
       if(max_index[i]==0)
       {   // matrix is empty, all slices are empty.
@@ -231,7 +231,7 @@ struct ConstraintBlob
     vector<DomainInt> output(params);
     do
     {
-      for(SysInt i = 0; i < max_index.size(); i++)
+      for(SysInt i = 0; i < (SysInt)max_index.size(); i++)
         if(params[i] == -999)
           output[i] = current_index[i];
       return_list.push_back(getSymbol(name + to_var_name(output)));
@@ -260,7 +260,7 @@ struct ConstraintBlob
       vector<Var> slice = buildVarList(name, loop_indices);
       // This line should only do something first pass through the loop.
       terms.resize(slice.size());
-      for(SysInt i = 0; i < slice.size(); ++i)
+      for(SysInt i = 0; i < (SysInt)slice.size(); ++i)
         terms[i].push_back(slice[i]);
     }
     return terms;
@@ -759,7 +759,7 @@ public:
       // This was a MINION 1 or MINION 2 input file. Let's fix it!
       vector<Var> all_vars = vars.get_all_vars();
 
-      for(SysInt i = 0; i < all_vars.size(); ++i)
+      for(SysInt i = 0; i < (SysInt)all_vars.size(); ++i)
         vars.addSymbol("x" + tostring(i), all_vars[i]);
     }
 

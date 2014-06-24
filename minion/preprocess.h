@@ -67,7 +67,7 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
   while(reduced)
   {
     reduced = false;
-    for(SysInt i = 0; i < vararray.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)vararray.size(); ++i)
     {
       Var& var = vararray[i];
       if(onlyCheckBounds || var.isBound())

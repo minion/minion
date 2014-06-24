@@ -42,7 +42,7 @@ class BackTrackMemory
   NewMemoryBlock new_memory_block;
   BlockCache block_cache;
 
-  vector<pair<char*, UnsignedSysInt> > backtrack_data; 
+  vector<pair<char*, UnsignedSysInt> > backtrack_data;
 public:
 
 
@@ -89,7 +89,7 @@ public:
 
   ~BackTrackMemory()
   {
-    for(SysInt i = 0; i < backtrack_data.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)backtrack_data.size(); ++i)
       block_cache.do_free(backtrack_data[i].first);
   }
 };

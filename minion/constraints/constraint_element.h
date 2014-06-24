@@ -386,7 +386,7 @@ struct ElementConstraint : public AbstractConstraint
 
     virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
     {
-      D_ASSERT(v_size == var_array.size() + 2);
+      D_ASSERT(v_size == (SysInt)var_array.size() + 2);
       DomainInt resultvariable = v[v_size - 1];
       DomainInt indexvariable = v[v_size - 2];
       if(indexvariable < 0 || indexvariable >= (SysInt)v_size - 2)
@@ -426,7 +426,7 @@ struct ElementConstraint : public AbstractConstraint
           assignment.push_back(make_pair(var_array.size() + 1, 0));
           return true;
         }
-        if(indexvar.getMax() >= var_array.size())
+        if(indexvar.getMax() >= (SysInt)var_array.size())
         {
           assignment.push_back(make_pair(var_array.size(), indexvar.getMax()));
           assignment.push_back(make_pair(var_array.size() + 1, 0));
@@ -473,7 +473,7 @@ struct ElementConstraint : public AbstractConstraint
           con.push_back(t4);
       }
 
-      for(SysInt i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i < (SysInt)var_array.size(); i++)
       {
           vector<AbstractConstraint*> con2;
           WatchLiteralConstraint<Index>* t=new WatchLiteralConstraint<Index>(stateObj, indexvar, i);

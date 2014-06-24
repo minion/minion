@@ -123,7 +123,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {;
-    D_ASSERT(v_size == var_array.size() + 1);
+    D_ASSERT(v_size == (SysInt)var_array.size() + 1);
     DomainInt count = 0;
     for(SysInt i = 0; i < v_size - 1; ++i)
       count += (*(v + i) == value);
@@ -228,7 +228,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   {
       // move dt to an index other than avoidindex, or return -1.
       SysInt newsupport=oldsupport+1;
-      for( ; newsupport<var_array.size(); newsupport++)
+      for( ; newsupport<(SysInt)var_array.size(); newsupport++)
       {
           if(newsupport!=avoidindex)
           {
@@ -261,7 +261,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   {
       // count occurrences of val
       SysInt occ=0;
-      for(SysInt i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i < (SysInt)var_array.size(); i++)
       {
           if(var_array[i].getAssignedValue()==value)
               occ++;
@@ -279,7 +279,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       SysInt occ=0;
       SysInt unassigned=-1;
       D_ASSERT(val_count.isAssigned());
-      for(SysInt i=0; i<var_array.size(); i++)
+      for(SysInt i=0; i < (SysInt)var_array.size(); i++)
       {
           if(var_array[i].isAssigned())
           {
@@ -345,7 +345,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   {
     MAKE_STACK_BOX(c, DomainInt, var_array.size() + 1);
 
-    for(SysInt i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
     {
       if(!var_array[i].isAssigned())
       {
@@ -368,7 +368,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
 
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
-      for(SysInt i = 0; i < var_array.size() + 1; ++i)
+      for(SysInt i = 0; i < (SysInt)var_array.size() + 1; ++i)
         assignment.push_back(make_pair(i, c[i]));
       return true;
     }
@@ -526,7 +526,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    D_ASSERT(v_size == var_array.size());
+    D_ASSERT(v_size == (SysInt)var_array.size());
     DomainInt count = 0;
     for(SysInt i = 0; i < v_size; ++i)
       count += (*(v + i) == (DomainInt)value);
@@ -548,7 +548,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   {
     MAKE_STACK_BOX(c, DomainInt, var_array.size());
 
-    for(SysInt i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
     {
       if(!var_array[i].isAssigned())
       {
@@ -562,7 +562,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
 
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
-      for(SysInt i = 0; i < var_array.size(); ++i)
+      for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
         assignment.push_back(make_pair(i, c[i]));
       return true;
     }
@@ -722,7 +722,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    D_ASSERT(v_size == var_array.size() + 1);
+    D_ASSERT(v_size == (SysInt)var_array.size() + 1);
     DomainInt count = 0;
     for(SysInt i = 0; i < v_size - 1; ++i)
       count += (*(v + i) == value);
@@ -745,7 +745,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   {
     MAKE_STACK_BOX(c, DomainInt, var_array.size() + 1);
 
-    for(SysInt i = 0; i < var_array.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
     {
       if(!var_array[i].isAssigned())
       {
@@ -769,7 +769,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
 
     if(check_assignment(c.begin(), c.size()))
     {  // Put the complete assignment in the box.
-      for(SysInt i = 0; i < var_array.size() + 1; ++i)
+      for(SysInt i = 0; i < (SysInt)var_array.size() + 1; ++i)
         assignment.push_back(make_pair(i, c[i]));
       return true;
     }

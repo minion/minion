@@ -234,9 +234,10 @@ endif()
 #   message(STATUS "Compiler does not support C++0x")
 #endif()
 
-set(WFLAGS "-W -Wall -Wno-sign-compare -Wno-missing-braces -Wno-unused-parameter")
+set(WFLAGS "-W -Wall -Wno-missing-braces -Wno-unused-parameter")
 check_cxx_compiler_flag(${WFLAGS} CheckWarnings)
-if(CheckWarnings AND NOT SUNOS AND CMAKE_COMPILER_IS_GNUCXX)
+if(CheckWarnings AND NOT SUNOS AND UNIX )
+    message(STATUS "Warning flags: ${WFLAGS}")
     add_definitions(${WFLAGS})
 endif()
 

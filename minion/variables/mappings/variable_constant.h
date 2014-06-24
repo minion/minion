@@ -20,7 +20,7 @@
 #ifndef CONSTANT_VAR_FDSK
 #define CONSTANT_VAR_FDSK
 
-struct AbstractConstraint;
+class AbstractConstraint;
 
 struct ConstantVar
 {

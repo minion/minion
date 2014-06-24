@@ -66,16 +66,16 @@ struct Dynamic_AND : public ParentConstraint
   { return "watched-and"; }
 
   CONSTRAINT_ARG_LIST1(child_constraints);
-    
+
   bool constraint_locked;
   SysInt propagated_to;
-  Dynamic_AND(StateObj* _stateObj, vector<AbstractConstraint*> _con) : 
+  Dynamic_AND(StateObj* _stateObj, vector<AbstractConstraint*> _con) :
     ParentConstraint(_stateObj, _con), constraint_locked(false)
     { }
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    for(SysInt i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
     {
       if(! child_constraints[i]->check_assignment(v + checked_cast<SysInt>(start_of_constraint[i]),
          child_constraints[i]->get_vars_singleton()->size()))
@@ -83,7 +83,7 @@ struct Dynamic_AND : public ParentConstraint
     }
     return true;
   }
-  
+
   virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
       // get all satisfying assignments of child constraints and stick
@@ -91,7 +91,7 @@ struct Dynamic_AND : public ParentConstraint
       typedef pair<SysInt, DomainInt> temptype;
       MAKE_STACK_BOX(localassignment, temptype, assignment.capacity());
       P("GetSat for And");
-      for(SysInt i=0; i<child_constraints.size(); ++i)
+      for(SysInt i=0; i<(SysInt)child_constraints.size(); ++i)
       {
           localassignment.clear();
           bool flag=child_constraints[i]->get_satisfying_assignment(localassignment);
@@ -101,7 +101,7 @@ struct Dynamic_AND : public ParentConstraint
               return false;
           }
           P(localassignment[0] << ":" << localassignment[1]);
-          for(SysInt j=0; j<localassignment.size(); j++)
+          for(SysInt j=0; j < (SysInt)localassignment.size(); j++)
           {
               assignment.push_back(make_pair(checked_cast<SysInt>(localassignment[j].first+start_of_constraint[i]),
                   localassignment[j].second));
@@ -111,20 +111,20 @@ struct Dynamic_AND : public ParentConstraint
       }
       return true;
   }
-  
+
   virtual vector<AnyVarRef> get_vars()
-  { 
+  {
     vector<AnyVarRef> vecs;
-    for(SysInt i = 0; i < child_constraints.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
     {
-      vector<AnyVarRef>* var_ptr = child_constraints[i]->get_vars_singleton(); 
+      vector<AnyVarRef>* var_ptr = child_constraints[i]->get_vars_singleton();
       vecs.insert(vecs.end(), var_ptr->begin(), var_ptr->end());
     }
     return vecs;
   }
-  
+
   virtual SysInt dynamic_trigger_count()
-  { 
+  {
     return 0;
   }
 
@@ -140,7 +140,7 @@ struct Dynamic_AND : public ParentConstraint
 
     child_constraints[propagated_to]->full_propagate();
     propagated_to++;
-    if(propagated_to != child_constraints.size())
+    if(propagated_to != (SysInt)child_constraints.size())
       getQueue(stateObj).pushSpecialTrigger(this);
     else
     {
@@ -153,7 +153,7 @@ struct Dynamic_AND : public ParentConstraint
     D_ASSERT(constraint_locked);
     constraint_locked = false;
   }
-  
+
   virtual void propagate(DomainInt i, DomainDelta domain)
   {
     //PROP_INFO_ADDONE(WatchedOR);
@@ -164,7 +164,7 @@ struct Dynamic_AND : public ParentConstraint
     if(!constraint_locked || childTrigger.first < propagated_to)
     child_constraints[checked_cast<SysInt>(childTrigger.first)]->propagate(childTrigger.second, domain);
   }
-  
+
   virtual void propagate(DynamicTrigger* trig)
   {
     //PROP_INFO_ADDONE(WatchedOr);
@@ -177,7 +177,7 @@ struct Dynamic_AND : public ParentConstraint
     if(!constraint_locked || child < propagated_to)
     child_constraints[child]->propagate(trig);
   }
-  
+
   virtual void full_propagate()
   {
     P("AND Full Propagate");
@@ -187,7 +187,7 @@ struct Dynamic_AND : public ParentConstraint
     propagated_to = 0;
     getQueue(stateObj).pushSpecialTrigger(this);
   }
-  
+
   virtual AbstractConstraint* reverse_constraint();
 };
 
@@ -196,7 +196,7 @@ struct Dynamic_AND : public ParentConstraint
 inline AbstractConstraint* Dynamic_AND::reverse_constraint()
 { // OR of the reverse of all the child constraints..
   vector<AbstractConstraint*> con;
-  for(SysInt i=0; i<child_constraints.size(); i++)
+  for(SysInt i=0; i < (SysInt)child_constraints.size(); i++)
   {
       con.push_back(child_constraints[i]->reverse_constraint());
   }

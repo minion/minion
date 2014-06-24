@@ -128,7 +128,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {
-    D_ASSERT(v_size == var_array.size() + 1);
+    D_ASSERT(v_size == (SysInt)var_array.size() + 1);
     DomainInt sum = 0;
     for(SysInt i = 0; i < v_size - 1; i++)
       sum += v[i];

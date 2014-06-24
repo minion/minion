@@ -37,7 +37,7 @@ void dump_searchorder(StateObj* stateObj, const SearchOrder& order, ostream& os)
 {
 
     vector<SysInt> non_assigned_vars;
-    for(int i = 0; i < order.var_order.size(); ++i)
+    for(int i = 0; i < (SysInt)order.var_order.size(); ++i)
     {
         AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(stateObj, order.var_order[i]);
         // XXX : To get tester to work.. for now. if(!v.isAssigned())
@@ -63,7 +63,7 @@ void dump_searchorder(StateObj* stateObj, const SearchOrder& order, ostream& os)
 
     os << "[";
     bool first=true;
-    for(int i = 0; i < non_assigned_vars.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)non_assigned_vars.size(); ++i)
     {
         AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(stateObj, order.var_order[non_assigned_vars[i]]);
         // XXX : see above! D_ASSERT(!v.isAssigned());
@@ -77,7 +77,7 @@ void dump_searchorder(StateObj* stateObj, const SearchOrder& order, ostream& os)
 
     os << "VALORDER [";
     first=true;
-    for(int i = 0; i < non_assigned_vars.size(); ++i)
+    for(SysInt i = 0; i < (SysInt)non_assigned_vars.size(); ++i)
     {
         if(first) first=false; else os << ",";
         switch(order.val_order[non_assigned_vars[i]])
@@ -198,7 +198,7 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
         if(!deleted_values.empty())
         {
             os << "**CONSTRAINTS**" << endl;
-            if(deleted_values.size() < bv.getMax() - bv.getMin() + 1)
+            if((DomainInt)deleted_values.size() < bv.getMax() - bv.getMin() + 1)
             {
                 os << "w-notinset(" << getNameFromVar(stateObj, bv) << ", [";
                 bool first=true;
@@ -255,7 +255,7 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
     os << "**TUPLELIST**" << endl;
     SearchState& search_state = getState(stateObj);
 
-    for(UnsignedSysInt i = 0; i < search_state.getTupleListContainer()->size(); ++i)
+    for(SysInt i = 0; i < search_state.getTupleListContainer()->size(); ++i)
     {
         TupleList* tl = search_state.getTupleListContainer()->getTupleList(i);
         os << tl->getName() << " " << tl->size() << " " << tl->tuple_size() << "\n";
@@ -268,18 +268,18 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
 
     os << "**SHORTTUPLELIST**" << endl;
 
-    for(UnsignedSysInt i = 0; i < search_state.getShortTupleListContainer()->size(); ++i)
+    for(SysInt i = 0; i < search_state.getShortTupleListContainer()->size(); ++i)
     {
         ShortTupleList* tl = search_state.getShortTupleListContainer()->getShortTupleList(i);
         os << tl->getName() << " " << tl->size() << "\n";
 
         const vector<vector<pair<SysInt, DomainInt> > >& tupleRef = *(tl->tuplePtr());
 
-        for(SysInt j = 0; j < tupleRef.size(); ++j)
+        for(SysInt j = 0; j < (SysInt)tupleRef.size(); ++j)
         {
             os << "[";
             bool first = true;
-            for(SysInt k = 0; k < tupleRef[j].size(); ++k)
+            for(SysInt k = 0; k < (SysInt)tupleRef[j].size(); ++k)
             {
                 if(first) first=false; else os << ", ";
                 os << "(" << tupleRef[j][k].first << "," << tupleRef[j][k].second << ")";

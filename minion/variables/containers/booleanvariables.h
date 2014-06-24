@@ -264,7 +264,7 @@ struct BoolVarContainer
 
   void removeFromDomain(const BoolVarRef_internal& d, DomainInt b)
   {
-    D_ASSERT(lock_m && d.var_num < var_count_m);
+    D_ASSERT(lock_m && d.var_num < (SysInt)var_count_m);
     if((checked_cast<SysInt>(b)|1) != 1)
       return;
 
@@ -279,7 +279,7 @@ struct BoolVarContainer
 
   void internalAssign(const BoolVarRef_internal& d, DomainInt b)
   {
-    D_ASSERT(lock_m && d.var_num < var_count_m);
+    D_ASSERT(lock_m && d.var_num < (SysInt)var_count_m);
     D_ASSERT(!d.isAssigned());
     if((checked_cast<SysInt>(b)|1) != 1)
     {
@@ -324,7 +324,7 @@ struct BoolVarContainer
   { internalAssign(d, b); }
 
   void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type)
-  { 
+  {
     D_ASSERT(lock_m);
 #ifdef FEW_BOOLEAN_TRIGGERS
     if(type == DomainChanged)
@@ -336,7 +336,7 @@ struct BoolVarContainer
   }
 
   void addDynamicTrigger(BoolVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  { 
+  {
     D_ASSERT(pos == NoDomainValue || ( type == DomainRemoval && pos != NoDomainValue ) );
     D_ASSERT(lock_m);
 

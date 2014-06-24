@@ -25,7 +25,7 @@
 template<typename T>
 inline void CheckNotBound(const T& t, std::string s, std::string s2 = "")
 {
-  for(SysInt i = 0; i < t.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)t.size(); ++i)
   {
     if(t[i].isBound())
     {

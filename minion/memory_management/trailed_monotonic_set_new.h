@@ -54,7 +54,7 @@ public:
             data[trailstack[i]]=true;
             trailstack.pop_back();
         }
-        D_ASSERT(trailstack.size()==j);
+        D_ASSERT((SysInt)trailstack.size()==j);
     }
 
     bool ifMember_remove(DomainInt index) {
