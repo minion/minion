@@ -20,7 +20,8 @@
 /** @help constraints;alldiffmatrix Description
 For a latin square this constraint is placed on the whole matrix once for each value.
 It ensures there is a bipartite matching between rows and columns where the edges
-in the matching correspond to a variable that can be assigned to the given value.
+in the matching correspond to a pair (row, column) where the variable in position
+(row,column) in the matrix may be assigned to the given value. 
 */
 
 /** @help constraints;alldiffmatrix Example
