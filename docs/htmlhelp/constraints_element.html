@@ -7,11 +7,11 @@
 <h1>Help on <tt>constraints element</tt></h1>
 <h3>Description</h3>
 <pre>
-The constraint 
+The constraint
 
    element(vec, i, e)
 
-specifies that, in any solution, vec[i] = e and i is in the range 
+specifies that, in any solution, vec[i] = e and i is in the range
 [0 .. |vec|-1].
 </pre>
 <h3>Notes</h3>
@@ -25,7 +25,7 @@ below.
 The level of propagation enforced by this constraint is not named, however it
 works as follows. For constraint vec[i]=e:
 
-- After i is assigned, ensures that min(vec[i]) = min(e) and 
+- After i is assigned, ensures that min(vec[i]) = min(e) and
   max(vec[i]) = max(e).
 
 - When e is assigned, removes idx from the domain of i whenever e is not an
@@ -39,7 +39,7 @@ through vec, except when e is assigned. It does a quantity of cheap propagation
 and may work well in practise on certain problems.
 
 Element is not confluent, which may cause the number of search nodes to vary
-depending on the order in which constraints are listed in the input file, or 
+depending on the order in which constraints are listed in the input file, or
 the order they are called in Minion. For example, the following input causes
 Minion to search 41 nodes.
 
@@ -57,7 +57,7 @@ to the end of the list.
 </pre>
 <h3>References</h3>
 <pre>
-See the entry 
+See the entry
 
    constraints watchelement
 

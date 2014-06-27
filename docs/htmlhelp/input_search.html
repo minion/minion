@@ -10,7 +10,7 @@
 
 Inside the search section one can specify
 
-- variable orderings, 
+- variable orderings,
 - value orderings,
 - optimisation function, and
 - details of how to print out solutions.
@@ -27,7 +27,7 @@ anything specified in the input file.
 
 Multiple variable orders can be given, each with an optional value ordering:
 
-   VarValOrdering::= &lt;VarOrder&gt; 
+   VarValOrdering::= &lt;VarOrder&gt;
                      &lt;ValOrder&gt;?
 
 In each VarOrder an instantiation order is specified for a subset of
@@ -39,7 +39,7 @@ differing only in the auxiliary variables, only one is reported by minion.
 
       where
 
-   &lt;ORDER&gt;::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMMinionThreeInputReader.hppOVERWDEG
+   &lt;ORDER&gt;::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMOVERWDEG
 
 The value ordering allows the user to specify an instantiation order
 for the variables involved in the variable order, either ascending (a)
