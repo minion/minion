@@ -1,7 +1,17 @@
+If you have downloaded a binary for your OS, the minion binary will be in the
+'bin' directory. 
+
+the "docs" directory contains a full manual for Minion. 
+The "benchmarks" directory contains a range of example programs.
+The "generators" directory contains a number of generators, these are
+in general poorly documented.
+
+
+If you want to build minion from source, read on!
+
 Welcome to the Minion source!
 
-The minimum verson of CMake you'll need is 2.4.7. You'll also need Boost (at
-least version 1.33).
+The minimum verson of CMake you'll need is 2.4.7.
 
 First, create a directory to do the build in, e.g.
 
@@ -50,8 +60,3 @@ To test your Minion installation, you can use the "test-quick", "test", and
 "test-slow" Makefile targets.
 
 To clean all generated files, simply delete the directory you did the build in.
-
-the "docs" directory contains a full manual for Minion. 
-The "benchmarks" directory contains a range of example programs.
-The "generators" directory contains a number of generators, these are
-in general poorly documented.
