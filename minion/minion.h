@@ -33,7 +33,7 @@
 //#ifdef WATCHEDLITERALS
 //#define DYNAMICTRIGGERS
 //#endif
-#define VERSION "Minion Version 1.6.1"
+#define VERSION "Minion Version 1.7"
 #define REVISION "HG revision $Revision$"
 // above line will work but only gives revision of this file,
 //  not the current global revision
