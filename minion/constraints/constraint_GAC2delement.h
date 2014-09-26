@@ -114,9 +114,9 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 	
 	
 	
-	GAC2DElementNOTConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexArray& _indexvar, const VarRef& _resultvar, int _rowlength) :
+	GAC2DElementNOTConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexArray& _indexvar, const VarRef& _resultvar, DomainInt _rowlength) :
 	AbstractConstraint(_stateObj),  var_array(_var_array), indexvar1(_indexvar[0]), indexvar2(_indexvar[1]), resultvar(_resultvar),
-	rowlength(_rowlength),full_propagate_called(_stateObj, false),
+	rowlength(checked_cast<SysInt>(_rowlength)),full_propagate_called(_stateObj, false),
 	var_array_min_val(0), var_array_max_val(0) 
 	{ 
 		
@@ -319,7 +319,7 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 		if(resultvarmin == resultvarmax)
 		{
 			
-			for (int j=indexvar1.getMin();j<indexvar1.getMax()+1;j++)
+			for (SysInt j=checked_cast<SysInt>(indexvar1.getMin());j<checked_cast<SysInt>(indexvar1.getMax()+1);j++)
 			{
 				
 				if (indexvar1.inDomain(j))
@@ -363,8 +363,8 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 		DomainInt support3;		
 		found = false;
 		while (support_index1 <= maxsupport_index1 && !found){
-			support3 = var_array[rowlength*i+support_index1].getMin();
-			maxsupport3 = var_array[rowlength*i+support_index1].getMax();
+			support3 = var_array[checked_cast<SysInt>(rowlength*i+support_index1)].getMin();
+			maxsupport3 = var_array[checked_cast<SysInt>(rowlength*i+support_index1)].getMax();
 			if (support3 != support_result){
 				found =true;
 				break;
@@ -397,8 +397,8 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			DomainInt max_checki = min(oldsupport_index1, maxsupport_index1 + 1);
 			found =false;
 			while (support_index1 < max_checki && !found){				
-				support3 = var_array[rowlength*i+support_index1].getMin();
-				maxsupport3 = var_array[rowlength*i+support_index1].getMax();
+				support3 = var_array[checked_cast<SysInt>(rowlength*i+support_index1)].getMin();
+				maxsupport3 = var_array[checked_cast<SysInt>(rowlength*i+support_index1)].getMax();
 				if (support3 != support_result){
 					found =true;
 					break;
@@ -432,7 +432,7 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			
 		}
 		//add new supporting literal triggers
-		var_array[rowlength*i+support_index1].addDynamicTrigger(dt + 3*i, DomainRemoval, support3);
+		var_array[checked_cast<SysInt>(rowlength*i+support_index1)].addDynamicTrigger(dt + 3*i, DomainRemoval, support3);
 		resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, support_result);
 		indexvar1.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval, support_index1);
 		current_support_index2_index1[i] = support_index1;
@@ -454,11 +454,11 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 		//if result variable is already assigned 
 		if(resultvarmin == resultvarmax)
 		{		
-			for (int j=indexvar2.getMin();j<indexvar2.getMax()+1;j++){
+			for (SysInt j=checked_cast<SysInt>(indexvar2.getMin());j<checked_cast<SysInt>(indexvar2.getMax()+1);j++){
 				if(indexvar2.inDomain(j))
 				{	
 					DomainInt support3;
-					if (var_array[rowlength*j+i].getMin() != resultvarmin){
+					if (var_array[checked_cast<SysInt>(rowlength*j+i)].getMin() != resultvarmin){
 						support3 = var_array[rowlength*j+i].getMin();
 						
 						found =true;
@@ -500,8 +500,8 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 		//int support = initial_result_dom_min;
 		found = false;
 		while (support_index2 <= maxsupport_index2 && !found){			
-			support3 =  var_array[rowlength*support_index2+i].getMin();
-			maxsupport3 = var_array[rowlength*support_index2+i].getMax();
+			support3 =  var_array[checked_cast<SysInt>(rowlength*support_index2+i)].getMin();
+			maxsupport3 = var_array[checked_cast<SysInt>(rowlength*support_index2+i)].getMax();
 			if (support3 != support_result){ //check against bounds
 				found =true;
 				break;
@@ -534,8 +534,8 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			DomainInt max_checki = min(oldsupport_index2, maxsupport_index2 + 1);
 			found =false;
 			while (support_index2 < max_checki && !found){
-				support3 =  var_array[rowlength*support_index2+i].getMin();
-				maxsupport3 = var_array[rowlength*support_index2+i].getMax();
+				support3 =  var_array[checked_cast<SysInt>(rowlength*support_index2+i)].getMin();
+				maxsupport3 = var_array[checked_cast<SysInt>(rowlength*support_index2+i)].getMax();
 				if (support3 != support_result){ //check against bounds
 					found =true;
 					break;
@@ -569,7 +569,7 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			
 		}
 		//add new supporting literal triggers		
-		var_array[rowlength*support_index2+i].addDynamicTrigger(dt + 3*i, DomainRemoval, support3);
+		var_array[checked_cast<SysInt>(rowlength*support_index2+i)].addDynamicTrigger(dt + 3*i, DomainRemoval, support3);
 		resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, support_result);
 		indexvar2.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval, support_index2);
 		current_support_index1_index2[i] = support_index2;
@@ -585,10 +585,10 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 		D_ASSERT(indexvar2.isAssigned());
 		int indexval1 = checked_cast<int>(indexvar1.getAssignedValue());
 		int indexval2 = checked_cast<int>(indexvar2.getAssignedValue());
-		if ((indexvar1.getMin() < 0) || (indexvar2.getMin() < 0) || (indexvar2.getMax() > (var_array.size()/rowlength)-1) || (indexvar1.getMax() > rowlength - 1)){
+		if ((indexvar1.getMin() < 0) || (indexvar2.getMin() < 0) || (indexvar2.getMax() > ((SysInt)var_array.size()/rowlength)-1) || (indexvar1.getMax() > rowlength - 1)){
 			return;
 		}
-		VarArrayMember var = var_array[rowlength*indexval2+indexval1];
+		VarArrayMember var = var_array[checked_cast<SysInt>(rowlength*indexval2+indexval1)];
 		
 		//IF Z is assigned delete values from X that are also in Z
 		if (resultvar.isAssigned()){
@@ -636,7 +636,7 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			indexvar2.addDynamicTrigger(dt, DomainChanged);
 			return true;
 		}
-		else if (indexvar2.getMax() > (var_array.size()/rowlength)-1){
+		else if (indexvar2.getMax() > ((SysInt)(var_array.size())/rowlength)-1){
 			indexvar2.addDynamicTrigger(dt, DomainChanged);
 			return true;
 		}
@@ -648,7 +648,7 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 	virtual void full_propagate()
 	{
 		
-		for(int i=0; i<var_array.size(); i++) {
+		for(SysInt i=0; i<(SysInt)var_array.size(); i++) {
 			if(var_array[i].isBound() && !var_array[i].isAssigned()) { // isassigned excludes constants.
 				cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
 			}
@@ -665,7 +665,7 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			DomainInt result_dom_size = initial_result_dom_max - initial_result_dom_min + 1;
 			
 			if(getState(stateObj).isFailed()) return;
-			for(int i = indexvar1.getMin(); i < indexvar1.getMax()+1; ++i)
+			for(SysInt i = checked_cast<SysInt>(indexvar1.getMin()); i < checked_cast<SysInt>(indexvar1.getMax()+1); ++i)
 			{
 				current_support_index1_result[i] = initial_result_dom_min-1; 
 				current_support_index1_index2[i] = -1; 
@@ -677,7 +677,7 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 				}
 			}
 			
-			for(int i = indexvar2.getMin(); i < indexvar2.getMax()+1; ++i)
+			for(SysInt i = checked_cast<SysInt>(indexvar2.getMin()); i < checked_cast<SysInt>(indexvar2.getMax()+1); ++i)
 			{
 				current_support_index2_result[i] = initial_result_dom_min-1;        // will be incremented if support sought
 				current_support_index2_index1[i] = -1; 
@@ -794,7 +794,7 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 		//	D_ASSERT(v_size == var_array.size() + 2);	
 		
 		int length = v_size;
-		if((v[length-2] < 0) || (v[length-3] < 0) || ((v[length-2])>(var_array.size()/rowlength)-1) || ((v[length-3])>rowlength-1)||
+		if((v[length-2] < 0) || (v[length-3] < 0) || ((v[length-2])>((SysInt)var_array.size()/rowlength)-1) || ((v[length-3])>rowlength-1)||
 		   (v[length-2] > length - 3)){
 			return true;
 		}
@@ -823,33 +823,31 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 	}
 	
 	
-	virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+	virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
 	{  
-		DomainInt array_start = DomainInt(0);
-		DomainInt array_end   = DomainInt(var_array.size()) - 1;
+		SysInt array_start = 0;
+		SysInt array_end   = SysInt(var_array.size()) - 1;
 		DomainInt indexvar2_start = indexvar2.getMin();
 		DomainInt indexvar2_end   = indexvar2.getMax();	
 		DomainInt indexvar1_start = indexvar1.getMin();
 		DomainInt indexvar1_end   = indexvar1.getMax();
+		DomainInt res_start = resultvar.getMin();
+		DomainInt res_end   = resultvar.getMax();
 		
 		// if index1 has an out of range value
 		if ((indexvar1_end> rowlength-1)||(indexvar1_start<0)) {
 			for(DomainInt i1 = indexvar1_start;i1 <= indexvar1_end; ++i1){
 				if (indexvar1.inDomain(i1) && ((i1> rowlength-1)||(i1<0))){		
-					for(int i = array_start; i <= array_end; ++i)
+					for(SysInt i = array_start; i <= array_end; ++i)
 					{
-						DomainInt indexvar2_start = indexvar2.getMin();
-						DomainInt indexvar2_end   = indexvar2.getMax();
 						for(DomainInt i2 = indexvar2_start;i2 <= indexvar2_end; ++i2)
 						{
 							if (indexvar2.inDomain(i2)){
-								DomainInt res_start = resultvar.getMin();
-								DomainInt res_end   = resultvar.getMax();
 								for(DomainInt resval = res_start; resval <= res_end; ++resval)
 								{
 									if (resultvar.inDomain(resval))
 									{
-										DomainInt dom_start =var_array[i].getMin();
+										DomainInt dom_start = var_array[i].getMin();
 										DomainInt dom_end   = var_array[i].getMax();
 										for(DomainInt domval = dom_start; domval <= dom_end; ++domval)
 										{
@@ -875,10 +873,10 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			}
 		}
 		// if index1 has an out of range value
-		else if ((indexvar2_end> (var_array.size()/rowlength)-1)||(indexvar2_start<0)) {
+		else if ((indexvar2_end> ((SysInt)var_array.size()/rowlength)-1)||(indexvar2_start<0)) {
 			for(DomainInt i2 = indexvar2_start;i2 <= indexvar2_end; ++i2)
 			{
-				if (indexvar2.inDomain(i2) && ( (i2> (var_array.size()/rowlength)-1) || (i2<0)) )
+				if (indexvar2.inDomain(i2) && ( (i2> ((SysInt)var_array.size()/rowlength)-1) || (i2<0)) )
 				{		  
 					for(int i = array_start; i <= array_end; ++i)
 					{
@@ -990,9 +988,9 @@ struct GAC2DElementConstraint : public AbstractConstraint
 	
 	
 	//constructor
-	GAC2DElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexArray& _indexvar, const VarRef& _resultvar, int _rowlength) :
+	GAC2DElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexArray& _indexvar, const VarRef& _resultvar, DomainInt _rowlength) :
 	AbstractConstraint(_stateObj), var_array(_var_array), indexvar1(_indexvar[0]), indexvar2(_indexvar[1]), resultvar(_resultvar),
-	rowlength(_rowlength),
+	rowlength(checked_cast<SysInt>(_rowlength)),
 	var_array_min_val(0), var_array_max_val(0) 
 	{ 
 		initial_result_dom_min = resultvar.getInitialMin();
@@ -1050,7 +1048,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 				
 				if (indexvar1.inDomain_noBoundCheck(support) && 
 					indexvar2.inDomain_noBoundCheck(support2) &&
-					var_array[rowlength * checked_cast<int>(support2) + checked_cast<int>(support)].inDomain(realj)){
+					var_array[checked_cast<SysInt>(rowlength * support2 + support)].inDomain(realj)){
 					found = true;
 					break;
 				}
@@ -1064,7 +1062,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 					
 					if (indexvar1.inDomain_noBoundCheck(support) && 
 						indexvar2.inDomain_noBoundCheck(support2) &&
-						var_array[rowlength * checked_cast<int>(support2) + checked_cast<int>(support)].inDomain(realj)){
+						var_array[checked_cast<SysInt>(rowlength * support2 + support)].inDomain(realj)){
 						found = true;
 						break;
 					}
@@ -1090,7 +1088,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 				while (support2 <= maxsupport2 && !found) { 
 					if (indexvar1.inDomain_noBoundCheck(support) && 
 						indexvar2.inDomain_noBoundCheck(support2) &&
-						var_array[rowlength * checked_cast<int>(support2) + checked_cast<int>(support)].inDomain(realj)){
+						var_array[checked_cast<SysInt>(rowlength * support2 + support)].inDomain(realj)){
 						found = true;
 						break;
 					}
@@ -1103,7 +1101,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 					while(support2 < max_check2) { 
 						if (indexvar1.inDomain_noBoundCheck(support) && 
 							indexvar2.inDomain_noBoundCheck(support2) &&
-							var_array[rowlength * checked_cast<int>(support2) + checked_cast<int>(support)].inDomain(realj)){
+							var_array[checked_cast<SysInt>(rowlength * support2 + support)].inDomain(realj)){
 							found = true;
 							break;
 						}
@@ -1124,7 +1122,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 			}
 		}
 		//add new literal triggers on new supporting values
-		var_array[rowlength * checked_cast<int>(support2) + checked_cast<int>(support)].addDynamicTrigger(dt + 3*j, DomainRemoval, realj);
+		var_array[checked_cast<SysInt>(rowlength * support2 + support)].addDynamicTrigger(dt + 3*j, DomainRemoval, realj);
 		indexvar1.addDynamicTrigger(dt + 3*j + 1, DomainRemoval, support);
 		indexvar2.addDynamicTrigger(dt + 3*j + 1+1, DomainRemoval, support2);
 		current_support_result_i1[j] = support;
@@ -1148,7 +1146,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		//if there is only one element in the domain of resultvar
 		if(resultvarmin == resultvarmax)
 		{
-			for (int j=indexvar1.getMin();j<indexvar1.getMax()+1;j++){
+			for (SysInt j=checked_cast<SysInt>(indexvar1.getMin());j<checked_cast<SysInt>(indexvar1.getMax()+1);j++){
 				if (indexvar1.inDomain(j) && var_array[rowlength*i+j].inDomain(resultvarmin)){
 					var_array[rowlength*i+j].addDynamicTrigger(dt + 3*i, DomainRemoval, resultvarmin);
 					resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, resultvarmin);
@@ -1180,7 +1178,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		while (support_index1 <= maxsupport_index1 && !found){
 			support_result = oldsupport_result;
 			while(support_result <= maxsupport_result){
-				if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[rowlength*i+support_index1].inDomain(support_result))){
+				if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[checked_cast<SysInt>(rowlength*i+support_index1)].inDomain(support_result))){
 					found =true;
 					break;
 				}
@@ -1193,7 +1191,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 				found = false;
 				while(support_result < max_check && !found){    
 					if((resultvar.inDomain_noBoundCheck(support_result)) && 
-					   (var_array[rowlength*i+support_index1].inDomain(support_result))){
+					   (var_array[checked_cast<SysInt>(rowlength*i+support_index1)].inDomain(support_result))){
 						found = true; 
 						break;						
 					}
@@ -1214,7 +1212,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 			while (support_index1 < max_checki && !found){			
 				support_result = oldsupport_result;
 				while(support_result <= maxsupport_result){
-					if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[rowlength*i+support_index1].inDomain(support_result))){
+					if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[checked_cast<SysInt>(rowlength*i+support_index1)].inDomain(support_result))){
 						found = true;
 						break;//stop loopong
 					}
@@ -1226,7 +1224,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 					DomainInt max_check = min(oldsupport_result, maxsupport_result + 1);
 					found= false;
 					while(support_result < max_check){     
-						if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[rowlength*i+support_index1].inDomain(support_result))){
+						if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[checked_cast<SysInt>(rowlength*i+support_index1)].inDomain(support_result))){
 							found = true;
 							break;//stop loopong
 						}
@@ -1248,7 +1246,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 			
 		}
 		//add new support literals
-		var_array[rowlength*i+support_index1].addDynamicTrigger(dt + 3*i, DomainRemoval, support_result);
+		var_array[checked_cast<SysInt>(rowlength*i+support_index1)].addDynamicTrigger(dt + 3*i, DomainRemoval, support_result);
 		resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, support_result);
 		indexvar1.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval, support_index1);
 		current_support_index2_index1[i] = support_index1;
@@ -1272,7 +1270,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		//if there is only one value in the domain of resultvar
 		if(resultvarmin == resultvarmax)
 		{
-			for (int j=indexvar2.getMin();j<indexvar2.getMax()+1;j++){
+			for (SysInt j=checked_cast<SysInt>(indexvar2.getMin());j<checked_cast<SysInt>(indexvar2.getMax()+1);j++){
 				if(indexvar2.inDomain(j) && var_array[rowlength*j+i].inDomain(resultvarmin)){
 					var_array[rowlength*j+i].addDynamicTrigger(dt + 3*i, DomainRemoval, resultvarmin);
 					resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, resultvarmin);
@@ -1308,7 +1306,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		while (support_index2 <= maxsupport_index2 && !found){			
 			support_result = oldsupport_result;
 			while(support_result <= maxsupport_result){
-				if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[rowlength*support_index2+i].inDomain(support_result))){	
+				if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[checked_cast<SysInt>(rowlength*support_index2+i)].inDomain(support_result))){	
 					found =true;
 					break;
 				}
@@ -1321,7 +1319,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 				DomainInt max_check = min(oldsupport_result, maxsupport_result + 1);
 				found = false;
 				while(support_result < max_check && !found){    
-					if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[rowlength*support_index2+i].inDomain(support_result))){	
+					if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[checked_cast<SysInt>(rowlength*support_index2+i)].inDomain(support_result))){	
 						found = true; 
 						break;	//stop looping					
 					}					
@@ -1343,7 +1341,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 			while (support_index2 < max_checki && !found){
 				support_result = oldsupport_result;
 				while(support_result <= maxsupport_result){
-					if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[rowlength*support_index2+i].inDomain(support_result))){
+					if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[checked_cast<SysInt>(rowlength*support_index2+i)].inDomain(support_result))){
 						
 						found = true;
 						break;
@@ -1357,7 +1355,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 					DomainInt max_check = min(oldsupport_result, maxsupport_result + 1);
 					found= false;
 					while(support_result < max_check){     
-						if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[rowlength*support_index2+i].inDomain(support_result))){
+						if((resultvar.inDomain_noBoundCheck(support_result)) && (var_array[checked_cast<SysInt>(rowlength*support_index2+i)].inDomain(support_result))){
 							found = true;
 							break;
 						}
@@ -1381,7 +1379,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 			
 		}
 		//add new support literals
-		var_array[rowlength*support_index2+i].addDynamicTrigger(dt + 3*i, DomainRemoval, support_result);
+		var_array[checked_cast<SysInt>(rowlength*support_index2+i)].addDynamicTrigger(dt + 3*i, DomainRemoval, support_result);
 		resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, support_result);
 		indexvar2.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval, support_index2);
 		current_support_index1_index2[i] = support_index2;
@@ -1426,7 +1424,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 	
 	virtual void full_propagate()
 	{
-		for(int i=0; i<var_array.size(); i++) {
+		for(SysInt i=0; i<(SysInt)var_array.size(); i++) {
 			if(var_array[i].isBound() && !var_array[i].isAssigned()) { // isassigned excludes constants.
 				cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
 			}
@@ -1450,7 +1448,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		
 		if(getState(stateObj).isFailed()) return;
 		
-		for(int i = indexvar1.getMin(); i < indexvar1.getMax()+1; ++i)
+		for(SysInt i = checked_cast<SysInt>(indexvar1.getMin()); i < checked_cast<SysInt>(indexvar1.getMax()+1); ++i)
 		{
 			
 			current_support_index1_result[i] = initial_result_dom_min-1; 
@@ -1462,7 +1460,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 			}
 		}
 		
-		for(int i = indexvar2.getMin(); i < indexvar2.getMax()+1; ++i)
+		for(SysInt i = checked_cast<SysInt>(indexvar2.getMin()); i < checked_cast<SysInt>(indexvar2.getMax()+1); ++i)
 		{
 			current_support_index2_result[i] = initial_result_dom_min-1; // will be incremented if support sought
 			current_support_index2_index1[i] = -1; 
@@ -1591,10 +1589,10 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		return array;
 	}
 	
-	virtual bool get_satisfying_assignment(box<pair<int,DomainInt> >& assignment)
+	virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
 	{  
-		DomainInt array_start = DomainInt(0);
-		DomainInt array_end   = DomainInt(var_array.size()) - 1;
+		SysInt array_start = 0;
+		SysInt array_end   = SysInt(var_array.size()) - 1;
 		
 		for(int i = array_start; i <= array_end; ++i)
 		{
