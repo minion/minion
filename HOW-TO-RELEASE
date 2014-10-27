@@ -1,0 +1,51 @@
+
+
+1. Update version numbers:
+In docs/Manual.tex 
+In minion/minion.h
+In minion/Doxyfile
+
+
+2.  Update the documentation.  
+
+Run mini-scripts/make_minion_docs.sh
+
+3.  Check all generated files (e.g. representing a new constraint or commandline switch) are in GIT 
+git status
+
+4. Commit results into git and push.
+
+
+6. Go to jenkins. Find job minion-release and build it.
+
+
+7.  Go to jenkins. Get build artifacts from 
+minion-release:  the src tarfile
+minion-release-linux(64):  binary tarfile
+minion-release-mac:  binary tarfile
+minion-release-windows:  binary tarfile
+
+Make checksums:
+md5sum minion-* >checksum-md5
+sha1sum minion-* >checksum-sha1
+
+8. Go to sourceforge. In the project, go into files, make a new directory with the version number.
+Upload all the files into that. Mark appropriate ones as default version for mac, windows, etc (using the "i" button)
+
+
+
+9.  Update the minion website in the minion-website git repo:
+Add new manual, and new htmlhelp directory. 
+Update manual.html.
+Update link in download.html
+Update index.html with changelog etc. 
+
+After committing and push, jenkins job website-mirror will make it live.
+
+10.  Tag version in git.
+
+11.  Email MUG and sourceforge mailing lists to announce release.
+mug@cs.st-andrews.ac.uk
+minion-general@lists.sourceforge.net
+
+
