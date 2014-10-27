@@ -22,7 +22,6 @@
 
 #include "../system/system.h"
 #include "cheap_stream.h"
-#include "../minlib/gason/gason.h"
 
 template<typename StreamType>
 struct ConcreteFileReader
@@ -296,70 +295,6 @@ public:
   { return isGadgetReader_m; }
 
   MinionThreeInputReader(bool _parser_verbose, MapLongTuplesToShort mls) : parser_verbose(_parser_verbose), print_all_vars(true),
-    map_long_short_mode(mls), isGadgetReader_m(false)
-  {}
-};
-
-
-class MinionJSONInputReader {
-
-  void check_tag(JsonValue json, JsonTag tag, std::string place);
-  void check_keys(JsonValue json, const std::set<std::string>& keys);
-
-  void parser_info(string);
-  vector< vector<Var> > Vectors ;
-  vector< vector<vector<Var> > > Matrices ;
-  vector< vector<vector<vector<Var> > > > Tensors ;
-  vector<Var> flatten(char type, SysInt index) ;
-  vector<Var> getColOfMatrix(vector<vector<Var> >& m, SysInt c) ;
-  vector<Var> getRowThroughTensor(vector<vector<vector <Var> > >& t,SysInt r,SysInt c) ;
-  ConstraintBlob readConstraint(JsonValue infile, BOOL reified = false) ;
-  ConstraintBlob readConstraintTable(JsonValue infile, ConstraintDef* def);
-  void readGadget(JsonValue infile) ;
-  TupleList* readConstraintTupleList(JsonValue infile);
-  ConstraintBlob readConstraintGadget(JsonValue infile);
-  ConstraintBlob readConstraintOr(JsonValue infile, ConstraintDef*);
-  Var readIdentifier(JsonValue infile) ;
-  vector<Var> readPossibleMatrixIdentifier(JsonValue infile, bool mustBeMatrix = false);
-  vector< vector<Var> > readLiteralMatrix(JsonValue infile) ;
-  vector<Var> readLiteralVector(JsonValue infile) ;
-  vector<DomainInt> readConstantVector(JsonValue infile, char start = '[', char end = ']', bool = false);
-  vector<DomainInt> readRange(JsonValue infile);
-  void readObjective(JsonValue infile) ;
-  void readShortTuples(JsonValue infile) ;
-  void readTuples(JsonValue infile) ;
-  void readMatrices(JsonValue infile) ;
-  void readValOrder(JsonValue infile) ;
-  void readVarOrder(JsonValue infile) ;
-  void readPrint(JsonValue infile) ;
-  void readVars(JsonValue infile) ;
-  void readSearch(JsonValue infile) ;
-  vector<pair<SysInt, DomainInt> >readShortTuple(JsonValue) ;
-  ShortTupleList* readConstraintShortTupleList(JsonValue) ;
-  vector<vector<Var> > read2DMatrix(JsonValue infile);
-  vector<vector<Var> > read2DMatrixVariable(JsonValue infile);
-  void readAliasMatrix(JsonValue infile, const vector<DomainInt>& max_indices, vector<DomainInt> indices, string name);
-  vector<Var> readVectorExpression(JsonValue infile) ;
-  ConstraintBlob readGeneralConstraint(JsonValue, ConstraintDef*) ;
-  vector<ConstraintBlob> readConstraintList(JsonValue infile);
-public:
-  void read(JsonValue infile) ;
-
-  void finalise();
-
-  ProbSpec::CSPInstance* instance ;
-  bool parser_verbose;
-  bool print_all_vars;
-  MapLongTuplesToShort map_long_short_mode;
-
-  bool isGadgetReader_m;
-
-  void setGadgetReader()
-  { isGadgetReader_m = true; }
-  bool isGadgetReader()
-  { return isGadgetReader_m; }
-
-  MinionJSONInputReader(bool _parser_verbose, MapLongTuplesToShort mls) : parser_verbose(_parser_verbose), print_all_vars(true),
     map_long_short_mode(mls), isGadgetReader_m(false)
   {}
 };

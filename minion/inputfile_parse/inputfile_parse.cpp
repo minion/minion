@@ -21,7 +21,6 @@
 
 #include "MinionInputReader.hpp"
 #include "MinionThreeInputReader.hpp"
-#include "MinionJSONInputReader.hpp"
 #include <fstream>
 #include <iostream>
 
@@ -37,10 +36,8 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
 {
   MinionThreeInputReader<ConcreteFileReader<CheapStream> > readerThree(parser_verbose, mltts);
   MinionInputReader<ConcreteFileReader<CheapStream> > reader(parser_verbose);
-  MinionJSONInputReader readerJSON(parser_verbose, mltts);
 
   bool needs_finalise_three = false;
-  bool needs_finalise_json = false;
   for(vector<string>::const_iterator fname = fnames.begin(); fname != fnames.end(); fname++) {
     const char* filename = fname->c_str();
     string extension;
@@ -72,23 +69,6 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
 
     try
     {
-#if 0
-      if(cs.peek() == '{' || cs.peek() == '/')
-      {
-          std::string stripped = removeComments(cs.get_raw_string());
-          JsonValue value;
-          JsonAllocator allocator;
-          char* endptr = 0;
-          JsonParseStatus status = jsonParse(&(stripped[0]), &endptr, &value, allocator);
-          if(status != JSON_PARSE_OK)
-          { gason_print_error(filename, status, endptr, &(stripped[0]), stripped.size()); }
-          readerJSON.instance = &instance;
-          readerJSON.read(value);
-          getTableOut().set(string("Filename"), filename);
-          needs_finalise_json = true;
-      }
-      else
-#endif
       {
         string test_name = infile.get_string();
         if(test_name != "MINION")
@@ -149,9 +129,5 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
   {
       readerThree.finalise();
      // instance = std::move(readerThree.instance);
-  }
-  if(needs_finalise_json)
-  {
-    readerJSON.finalise();
   }
 }

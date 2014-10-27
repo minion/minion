@@ -47,7 +47,7 @@ As a basic rule of thumb, Always use \BOOL for Boolean domains, \DISCRETE for do
 
 There are a number of flags which can be given to Minion at compile time to effect the resulting executable. These flags are prone to regular changes. By searching the Minion source code, you may find others. These undocumented ones are prone to breakage without warning.
 
-The following flags are considered "blessed", and are fully tested (although in future versions they may be removed or altered). Adding any of these flags (except BOOST) will probably slow the resulting Minion executable.
+The following flags are considered "blessed", and are fully tested (although in future versions they may be removed or altered). Adding any of these flags will probably slow the resulting Minion executable.
 
 \begin{description}
 \item[NAME=``name":] Overrides Minion's default and names the executable 'name'.
@@ -57,7 +57,6 @@ The following flags are considered "blessed", and are fully tested (although in 
 \item[UNOPTIMISED=1:] Turn off all compiler optimisation, so Minion can be usefully checked in gdb.
 \item[PROFILE=1:] Set compiler optimisation flags that allow Minion to be better profiled.
 \item[REENTER=1:] Compile Minion so it is reenterent (more than one problem can exist in memory at a time). At present reenterence is not used for anything, and will only slightly slow Minion.
-\item[BOOST=1:] Use the 'Boost' library to allow compressed input files. This flag is normally configured by the configure script.
 \end{description}
 
 There is also a method of passing any flag to either the compiler and Minion, using MYFLAGS="<my flags>". Any g++ flag can be given here, some of which may speed up Minion. The only flag which is tested which can be given here is MYFLAGS="-DWEG", which compiles Minion with support for the 'wdeg' variable heuristic. This is not activated by default because it slows down Minion even when it it not in use.
