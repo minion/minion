@@ -29,10 +29,10 @@ set(HGVERSION "0")
 set(HGDATE "unknown")
 find_program(HG hg)
 if(HG)
-    execute_process(COMMAND ${HG} log -l1 --template="{node|short}"
+    execute_process(COMMAND ${HG} parent --template="{node|short}"
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
             OUTPUT_VARIABLE HGVERSIONTMP OUTPUT_STRIP_TRAILING_WHITESPACE)
-    execute_process(COMMAND ${HG} log -l1 --template="{date|isodate}"
+    execute_process(COMMAND ${HG} parent --template="{date|isodate}"
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
             OUTPUT_VARIABLE HGDATETMP OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(HGDATETMP STREQUAL "")
