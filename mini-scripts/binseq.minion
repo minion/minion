@@ -1,0 +1,8 @@
+MINION 3
+**VARIABLES**
+DISCRETE X[5] {0..1}
+
+**CONSTRAINTS**
+
+vmsym(X, con, mapping)
+**EOF**

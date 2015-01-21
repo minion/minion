@@ -1,0 +1,29 @@
+Minlib 0.1
+
+Minlib is a small library of general utility functions. It is built
+on top of both boost and C++0x, which provides much of the functionality.
+
+
+
+Functionality:
+
+Construct<T>(args...) : functional wrapper for construction
+MakeIntList<Size> : Make a list of integers, for use in variadic templates
+TypeJoin: Join types
+
+Tuple type.
+
+You should use 'boost::tuple' when a tuple is required, rather than
+'std::tuple' or 'std::tr1::tuple'
+
+Macros:
+
+FUNCTION_AND_LINE(a,b) : Provide a c++ string which contains the current
+                         line.
+
+D_ASSERT(x) : A pretty-printing assert function.
+
+
+*** Array functions
+make_vec(T t) : Make a vector<T> containing the elements of T.
+                

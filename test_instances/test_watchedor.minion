@@ -1,0 +1,28 @@
+#TEST SOLCOUNT 2
+MINION 3
+**VARIABLES**
+BOOL seq0
+BOOL seq1
+BOOL seq2
+BOOL seq3
+BOOL seq4
+
+**CONSTRAINTS**
+
+# weightedsumleq([1,2,3,4,5],[seq0,seq1,seq2,seq3,seq4],3)
+# weightedsumgeq([1,2,3,4,5],[seq0,seq1,seq2,seq3,seq4],3)
+
+watched-and({
+    weightedsumleq([1,2,3,4,5],[seq0,seq1,seq2,seq3,seq4],3)
+    ,
+    weightedsumgeq([1,2,3,4,5],[seq0,seq1,seq2,seq3,seq4],3)
+    })
+
+**EOF**
+
+# expected solution:
+# 0 0 1 0 0 
+# 0 0 0 0 0 
+# 0 0 0 0 0 
+# 0 0 0 0 0 
+# 0 0 0 0 0
