@@ -1,3 +1,4 @@
+#if 0
 #include "../minion.h"
 /* Minion Constraint Solver
    http://minion.sourceforge.net
@@ -24,3 +25,4 @@ BuildCT_GAC2DELEMENT(StateObj* stateObj, const Var1& vararray, const Var2& index
 }
 
 BUILD_CT(CT_GAC2DELEMENT, 3)
+#endif
