@@ -151,7 +151,7 @@ public:
     if(byte_count % sizeof(SysInt) != 0)
       byte_count += sizeof(SysInt) - (byte_count % sizeof(SysInt));
 
-    if((DomainInt)maximum_bytes < allocated_bytes + byte_count)
+    if((DomainInt)maximum_bytes < (DomainInt)(allocated_bytes) + byte_count)
     { reallocate(byte_count); }
 
     D_ASSERT((DomainInt)maximum_bytes >= allocated_bytes + byte_count);
