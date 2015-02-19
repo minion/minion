@@ -701,7 +701,7 @@ void MinionInputReader<FileReader>::readVarOrder(FileReader* infile) {
   }
 
   instance->search_order.push_back(varOrder);
-  if(!extra_vars.empty())
+  if(!extra_vars.empty() && ensure_branch_on_all_vars)
   {
     instance->search_order.push_back(extra_vars);
     instance->search_order.back().find_one_assignment = true;

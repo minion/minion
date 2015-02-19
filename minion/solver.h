@@ -280,6 +280,8 @@ public:
 
   // How (if at all) to autogenerate short tuples from long ones.
   MapLongTuplesToShort map_long_short;
+  
+  bool ensure_branch_on_all_vars;
 
   SearchOptions() :
     find_generators(false),
@@ -297,7 +299,7 @@ public:
     redump(false), graph(false), instance_stats(false),
     noresumefile(true), split(false),
     outputType(-1), outputCompressedDomains(false), noTimers(false),
-    Xvarmunge(-1), Xsymmunge(-1), map_long_short(MLTTS_NoMap)
+    Xvarmunge(-1), Xsymmunge(-1), map_long_short(MLTTS_NoMap), ensure_branch_on_all_vars(true)
   {}
 
   /// Denotes all solutions should be found, by setting sollimit to -1.

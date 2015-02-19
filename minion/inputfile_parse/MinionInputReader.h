@@ -234,8 +234,8 @@ class MinionInputReader {
   ProbSpec::CSPInstance* instance ;
 
   BOOL parser_verbose ;
-
-  MinionInputReader(bool _parser_verbose) : parser_verbose(_parser_verbose)
+  bool ensure_branch_on_all_vars;
+  MinionInputReader(bool _parser_verbose, bool _e) : parser_verbose(_parser_verbose), ensure_branch_on_all_vars(_e)
   {}
 };
 
@@ -286,6 +286,8 @@ public:
   bool parser_verbose;
   bool print_all_vars;
   MapLongTuplesToShort map_long_short_mode;
+  
+  bool ensure_branch_on_all_vars;
 
   bool isGadgetReader_m;
 
@@ -294,8 +296,9 @@ public:
   bool isGadgetReader()
   { return isGadgetReader_m; }
 
-  MinionThreeInputReader(bool _parser_verbose, MapLongTuplesToShort mls) : parser_verbose(_parser_verbose), print_all_vars(true),
-    map_long_short_mode(mls), isGadgetReader_m(false)
+  MinionThreeInputReader(bool _parser_verbose, MapLongTuplesToShort mls, bool _e) :
+   parser_verbose(_parser_verbose), print_all_vars(true), map_long_short_mode(mls), 
+   ensure_branch_on_all_vars(_e), isGadgetReader_m(false)
   {}
 };
 

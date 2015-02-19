@@ -436,7 +436,20 @@ help switches -sollimit
         exit(1);
       }
     }
-
+/** @help switches;-skipautoaux Description
+By default Minion adds all variables to the varorder, to ensure that all variables
+are branched assigned before a solution is outputted. This option disables that
+behaviour. This means minion Minion may output solutions incorrectly, or incorrect
+numbers of solutions. This flag is provided because some users require this 
+low-level control over the search, but is in general useless and dangerous. In particular,
+it will not speed up search (except when the speed up is due to producing garbage of course!)
+*/
+    else if(command == string("-skipautoaux"))
+    {
+        cout << "# WARNING: -skipautoaux can lead to incorrect solutions being produced\n";
+        cout << "# WARNING: This is by design, but use this option with extreme care\n";
+        getOptions(stateObj).ensure_branch_on_all_vars = false;
+    }
 /** @help switches;-cpulimit Description
 To stop search after N seconds (CPU time), do
 

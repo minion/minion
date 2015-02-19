@@ -424,7 +424,7 @@ void MinionThreeInputReader<FileReader>::finalise() {
     }
   }
 
-  if(!unused_vars.empty())
+  if(!unused_vars.empty() && ensure_branch_on_all_vars)
   {
     vector<Var> unused_vec(unused_vars.begin(), unused_vars.end());
     if(instance->search_order.size() > 1 && instance->search_order.back().find_one_assignment == true)
@@ -530,7 +530,7 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile)
   string name = infile->get_string();
   MAYBE_PARSER_INFO("Gadget name:" + name);
 
-  MinionThreeInputReader gadget(parser_verbose, map_long_short_mode);
+  MinionThreeInputReader gadget(parser_verbose, map_long_short_mode, ensure_branch_on_all_vars);
   CSPInstance* new_instance = new CSPInstance;
   gadget.instance = new_instance;
   gadget.setGadgetReader();
