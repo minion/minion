@@ -60,6 +60,9 @@ namespace Controller
             vo2=new StaticBranch(var_array, order.val_order, stateObj);
             vo=new ConflictBranch(var_array, order.val_order, vo2, stateObj);
             break;
+        case ORDER_STATIC_LIMITED:
+            vo=new StaticBranchLimited(var_array, order.val_order, order.limit, stateObj);
+            break;
 
         #ifdef WDEG
         case ORDER_WDEG:

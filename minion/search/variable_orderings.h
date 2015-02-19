@@ -168,6 +168,37 @@ struct StaticBranch : public VariableOrder
     }
 };
 
+struct StaticBranchLimited : public VariableOrder
+{
+    vector<ValOrderEnum> val_order;
+    Reversible<SysInt> pos;
+    unsigned int limit;
+
+    StaticBranchLimited(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, unsigned int _limit, StateObj* _stateObj) : VariableOrder(_var_order),
+        val_order(_val_order), pos(_stateObj), limit(_limit)
+    {
+        pos=0;
+        D_ASSERT(var_order.size() == val_order.size());
+    }
+
+    pair<SysInt, DomainInt> pickVarVal()
+    {
+        SysInt v_size = var_order.size();
+
+        while(pos < v_size && var_order[pos].isAssigned())
+            pos=pos+1;
+        
+        if(pos>=limit) return make_pair(-1, 0);   /// This is the difference to StaticBranch.
+        
+        if(pos == v_size)
+            return make_pair(-1, 0);
+
+        DomainInt val=chooseVal(var_order[pos], val_order[pos]);
+
+        return make_pair(pos, val);
+    }
+};
+
 struct SDFBranch : public VariableOrder
 {
     vector<ValOrderEnum> val_order;

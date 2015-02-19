@@ -87,9 +87,12 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
 
     for(SysInt i = (SysInt)instance.search_order.size() - 1; i >= 0; --i)
     {
-        if(args.order != ORDER_NONE)
+        if(args.order != ORDER_NONE) {
+            //  For each varorder block, overwrite with order given on the command line.
             instance.search_order[i].order = args.order;
-
+            instance.search_order[i].limit = args.limit;
+        }
+        
         for(SysInt j=0; j<(SysInt)instance.search_order[i].var_order.size(); j++)
         {   // cobble together all the varorder blocks for preprocessing.
             preprocess_vars.push_back(get_AnyVarRef_from_Var(stateObj, instance.search_order[i].var_order[j]));

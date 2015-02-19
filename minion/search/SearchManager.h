@@ -210,7 +210,7 @@ struct SearchManager
                     // Backtrack out of them.
                     jump_out_aux_vars();
                 }
-
+                
                 // If we are not finished, then go into the loop below.
                 getState(stateObj).setFailed(true);
             }

@@ -476,8 +476,19 @@ help switches -sollimit
 
         if(order == "static")
           args.order = ORDER_STATIC;
-          else if(order == "srf")
-      args.order = ORDER_SRF;
+      else if(order == "srf")
+          args.order = ORDER_SRF;
+      else if(order == "staticlimited") {
+          args.order = ORDER_STATIC_LIMITED;
+          INCREMENT_i(staticlimited);
+          // Parse an integer for the limit. 
+          unsigned int tmp;
+          std::istringstream iss( argv[i] );
+          if(! ( iss >> tmp )) {
+              cerr << "-varorder staticlimited requires a positive integer value\n"; exit(1);
+          }
+          args.limit = tmp;
+      }
       else if(order == "srf-random")
       {
         args.order = ORDER_SRF;
