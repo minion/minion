@@ -72,6 +72,7 @@ enum VarOrderEnum
   ORDER_SRF,
   ORDER_LDF,
   ORDER_ORIGINAL,
+  ORDER_STATIC_LIMITED,
   ORDER_WDEG,
   ORDER_DOMOVERWDEG,
   ORDER_CONFLICT
@@ -555,6 +556,7 @@ struct SearchOrder
   vector<Var> var_order;
   vector<ValOrderEnum> val_order;
   VarOrderEnum order;
+  unsigned int limit;
   bool find_one_assignment;
 
   SearchOrder() : order(ORDER_ORIGINAL), find_one_assignment(false)
