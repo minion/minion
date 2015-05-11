@@ -227,8 +227,7 @@ help switches -preprocess
       args.prop_method = GetPropMethodFromString(prop_mode);
       if(args.prop_method == PropLevel_None)
       {
-        cerr << "Cannot use 'None' for -prop-node, must propagate at each node!" << endl;
-        exit(1);
+        output_fatal_error("Cannot use 'None' for -prop-node, must propagate at each node!");
       }
     }
 /** @help switches;-map-long-short Description
@@ -255,8 +254,7 @@ keeplong : Make a 'short tuple list' with no short tuples (only for benchmarking
         getOptions(stateObj).map_long_short = MLTTS_Lazy;
       else
       {
-        cerr << " -X-map-long-short <none|keeplong|eager|lazy> " << endl;
-        exit(1);
+        output_fatal_error(" -X-map-long-short <none|keeplong|eager|lazy>");
       }
     }
 /** @help switches;-preprocess
@@ -498,7 +496,7 @@ help switches -sollimit
           unsigned int tmp;
           std::istringstream iss( argv[i] );
           if(! ( iss >> tmp )) {
-              cerr << "-varorder staticlimited requires a positive integer value\n"; exit(1);
+              output_fatal_error("-varorder staticlimited requires a positive integer value");
           }
           args.limit = tmp;
       }
@@ -532,8 +530,9 @@ help switches -sollimit
       }
       else
       {
-        cerr << "I do not understand the order:" << order << endl;
-        exit(1);
+          ostringstream oss;  
+        oss << "I do not understand the order:" << order;
+        output_fatal_error(oss.str());
       }
     }
 
@@ -600,8 +599,9 @@ To add the solutions of myproblem.minion to mysols.txt do
       solsoutFile.open(argv[i], ios::app);
       if(!solsoutFile)
       {
-        cerr << "Cannot open '" << argv[i] << "' for writing." << endl;
-        exit(1);
+          ostringstream oss;
+        oss << "Cannot open '" << argv[i] << "' for writing.";
+        output_fatal_error(oss.str());
       }
     }
 /** @help switches;-makeresume Description

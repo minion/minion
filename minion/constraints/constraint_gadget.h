@@ -56,8 +56,7 @@ struct GadgetConstraint : public AbstractConstraint
 
   virtual AbstractConstraint* reverse_constraint()
   {
-    cerr << "You can't reverse a gadget Constraint!";
-    FAIL_EXIT();
+    output_fatal_error("You can't reverse a gadget Constraint!");
   }
 
   virtual triggerCollection setup_internal()

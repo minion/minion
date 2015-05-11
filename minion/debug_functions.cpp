@@ -27,24 +27,25 @@ bool in_cspcomp_for_failexit = false;
 
 void FATAL_REPORTABLE_ERROR()
 {
-  cerr << "Minion has had an internal error, due to the instance you are using." << endl;
-  cerr << "This is (probably) not your fault, but instead a bug in Minion." << endl;
-  cerr << "We would appreciate it if you could report this output, and the instance which" << endl;
-  cerr << "caused the problem to us. Thank you." << endl;
-  cerr.flush();
-  cout.flush();
-  FAIL_EXIT();
+  ostringstream oss;
+  oss << "Minion has had an internal error, due to the instance you are using." << endl;
+  oss << "This is (probably) not your fault, but instead a bug in Minion." << endl;
+  oss << "We would appreciate it if you could report this output, and the instance which" << endl;
+  oss << "caused the problem to us. Thank you." << endl;
+ output_fatal_error(oss.str());
 }
 
 void D_FATAL_ERROR2(string s, string file, string line)
 {
-  cerr << "Sorry, there has been some kind of error." << endl;
-  cerr << "This could be caused by a misformed input file, or by an internal bug." << endl;
-  cerr << "If you can't figure out what is causing the problem, please report it at http://www.sourceforge.net/projects/minion." << endl;
-  cerr << "Either on the bug tracker, or on the mailing list." << endl;
-  cerr << endl;
-  cerr << "The generated error message was: " << s << endl;
-  cerr << "The error was in the file " << file << " on line " << line << endl;
+  ostringstream oss;
+  oss << "Sorry, there has been some kind of error." << endl;
+  oss << "This could be caused by a misformed input file, or by an internal bug." << endl;
+  oss << "If you can't figure out what is causing the problem, please report it at http://www.sourceforge.net/projects/minion." << endl;
+  oss << "Either on the bug tracker, or on the mailing list." << endl;
+  oss << endl;
+  oss << "The generated error message was: " << s << endl;
+  oss << "The error was in the file " << file << " on line " << line << endl;
+  output_fatal_error(oss.str());
 }
 
 void DOM_NORETURN FAIL_EXIT(string s) 

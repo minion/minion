@@ -38,7 +38,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     AbstractConstraint(stateObj), xmult(_xmult), ymult(_ymult), x(_x), y(_y), z(_z), vals(-1)
   { 
 #ifndef WATCHEDLITERALS
-    cerr << "This almost certainly isn't going to work... sorry" << endl;
+   output_fatal_error("Need watched literals enabled for constraint");
 #endif
     if(xmult < 1 || ymult < 1)
       INPUT_ERROR("Multipliers on gacsum must be > 0");

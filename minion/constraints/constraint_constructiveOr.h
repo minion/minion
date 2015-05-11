@@ -107,8 +107,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
   
   virtual AbstractConstraint* reverse_constraint()
   {
-    cerr << "You can't reverse a constructive disjunction constraint!";
-    FAIL_EXIT();
+    output_fatal_error("You can't reverse a constructive disjunction constraint!");
   }
   
   int dynamic_trigger_count() { 

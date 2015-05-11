@@ -42,7 +42,7 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   {
     watched[0] = watched[1] = -2;
 #ifndef WATCHEDLITERALS
-    cerr << "This almost certainly isn't going to work... sorry" << endl;
+    output_fatal_error("Need watched literals enabled for constraint");
 #endif
   }
 

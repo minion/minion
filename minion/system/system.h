@@ -26,7 +26,10 @@
 #define DOM_ASSERT
 #endif
 
+
 #include "../minlib/minlib.hpp"
+
+#include "output.h"
 
 #include "box-helper.h"
 

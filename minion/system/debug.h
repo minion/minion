@@ -29,11 +29,12 @@ inline void CheckNotBound(const T& t, std::string s, std::string s2 = "")
   {
     if(t[i].isBound())
     {
-      std::cerr << "Cannot use '" << s << "' with BOUND or SPARSEBOUND variables.\n";
+      ostringstream oss;
+      oss << "Cannot use '" << s << "' with BOUND or SPARSEBOUND variables.\n";
       if(s2 != "")
-        std::cerr << "Please use '" << s2 << "' as a replacement or";
-      std::cerr << "Please use DISCRETE variables instead.\n";
-      abort();
+        oss << "Please use '" << s2 << "' as a replacement or";
+      oss << "Please use DISCRETE variables instead.\n";
+      output_fatal_error(oss.str());
     }
   }
 }
@@ -43,11 +44,12 @@ inline void CheckNotBoundSingle(const T& t, std::string s, std::string s2 = "")
 {
     if(t.isBound())
     {
-      std::cerr << "Cannot use " << s << " with BOUND or SPARSEBOUND variables.\n";
+      ostringstream oss;
+      oss << "Cannot use " << s << " with BOUND or SPARSEBOUND variables.\n";
       if(s2 != "")
-        std::cerr << "Please use " << s2 << " as a replacement or ";
-      std::cerr << "Please use DISCRETE variables instead.\n";
-      abort();
+        oss << "Please use " << s2 << " as a replacement or ";
+      oss << "Please use DISCRETE variables instead.\n";
+      output_fatal_error(oss.str());
     }
 }
 

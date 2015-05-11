@@ -49,8 +49,7 @@ template<typename Var>
   { 
     if(_vals.size() != 2)
     {
-      cerr << "The range of an 'inrange' constraint must contain 2 values!" << endl;
-      abort();
+      output_fatal_error("The range of an 'inrange' constraint must contain 2 values!");
     }
     
     range_min = _vals[0];

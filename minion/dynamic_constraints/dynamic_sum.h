@@ -99,7 +99,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
   {
     D_ASSERT((VarToCount == 0) || (VarToCount == 1));
 #ifndef DYNAMICTRIGGERS
-    cerr << "This almost certainly isn't going to work... sorry" << endl;
+   output_fatal_error("Need watched literals enabled for constraint");
 #endif
   // Sum of 1's is >= K
   // == Number of 1's is >=K         // this is the one I want to do

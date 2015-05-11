@@ -44,7 +44,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
     AbstractConstraint(_stateObj), var_array(_var_array)
   { 
 #ifndef DYNAMICTRIGGERS
-    cerr << "This almost certainly isn't going to work... sorry" << endl;
+   output_fatal_error("Need watched literals enabled for constraint");
 #endif
     last = 0;
   }

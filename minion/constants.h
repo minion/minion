@@ -84,9 +84,10 @@ inline PropagationLevel GetPropMethodFromString(std::string s)
   else if(s == "SSACBounds") return PropLevel_SSACBounds;
   else
   {
-    std::cerr << "'" << s << "'' is not a valid Propagation Method!" << std::endl;
-    std::cerr << "Valid Values: None, GAC, SAC, SSAC, SACBounds, SSACBounds" << std::endl;
-    exit(1);
+    ostringstream oss;
+    oss << "'" << s << "'' is not a valid Propagation Method!" << std::endl;
+    oss << "Valid Values: None, GAC, SAC, SSAC, SACBounds, SSACBounds" << std::endl;
+    output_fatal_error(oss.str());
   }
 }
 

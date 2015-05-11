@@ -481,8 +481,7 @@ public:
       tupleTries = (TupleTrie*) checked_malloc(sizeof(TupleTrie) * arity);
       if(!tupleTries)
       {
-        cerr << "Out of memory in TupleTrie construction" << endl;
-        FAIL_EXIT();
+        output_fatal_error("Out of memory in TupleTrie construction");
       }
       for (SysInt varIndex = 0; varIndex < arity; varIndex++)
         new (tupleTries + varIndex) TupleTrie(varIndex, tuplelist);

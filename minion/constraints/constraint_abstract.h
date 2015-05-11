@@ -116,8 +116,9 @@ public:
    */
     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-    cerr << "Finding assignment is not supported by the " << extended_name() << " constraint. Sorry" << endl;
-    exit(1);
+    ostringstream oss;
+    oss << "Finding assignment is not supported by the " << extended_name() << " constraint. Sorry" << endl;
+    output_fatal_error(oss.str());
     return false;
   }
 
@@ -125,8 +126,9 @@ public:
   /** Used by rarification */
   virtual AbstractConstraint* reverse_constraint()
   {
-    cerr << "Negation is not supported by the " << extended_name() << " constraint. Sorry" << endl;
-    exit(1);
+    ostringstream oss;
+    oss << "Negation is not supported by the " << extended_name() << " constraint. Sorry" << endl;
+    output_fatal_error(oss.str());
     return NULL;
   }
 
@@ -182,15 +184,13 @@ public:
   /// after the normal queue is empty.
   virtual void special_check()
   {
-    cerr << "Serious internal error" << endl;
-    FAIL_EXIT();
+    output_fatal_error("Serious internal error");
   }
 
   // Called if failure occurs without actiating a special trigger, so the constraint can unlock.
   virtual void special_unlock()
   {
-    cerr << "Serious internal error" << endl;
-    FAIL_EXIT();
+    output_fatal_error("Serious internal error");
   }
 
   /// Checks if an assignment is satisfied.

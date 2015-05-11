@@ -650,12 +650,12 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 		
 		for(SysInt i=0; i<(SysInt)var_array.size(); i++) {
 			if(var_array[i].isBound() && !var_array[i].isAssigned()) { // isassigned excludes constants.
-				cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
+				output_fatal_error("watchelement is not designed to be used on bound variables");
 			}
 		}
 		if((indexvar1.isBound() && !indexvar1.isAssigned() ) ||(indexvar2.isBound() && !indexvar2.isAssigned())
 		   || (resultvar.isBound() && !resultvar.isAssigned())) {
-			cerr << "Warning: watchelement is not designed to be used on bound variables and may cause crashes." << endl;
+			output_fatal_error("watchelement is not designed to be used on bound variables");
 		}
 		
 		

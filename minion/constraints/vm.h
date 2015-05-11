@@ -200,8 +200,9 @@ struct VMConstraint : public AbstractConstraint
   {
       if(pos < 0 || pos >= length)
       {
-          std::cerr << "Accessed instruction " << pos << " of " << length << std::endl;
-          FAIL_EXIT();
+          ostringstream oss;
+          oss << "Accessed instruction " << pos << " of " << length;
+          output_fatal_error(oss.str());
       }
       return VM_start[checked_cast<SysInt>(pos)];
   }

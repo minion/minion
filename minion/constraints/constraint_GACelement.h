@@ -186,11 +186,11 @@ struct GACElementConstraint : public AbstractConstraint
   {
     for(SysInt i=0; i<(SysInt)var_array.size(); i++) {
         if(var_array[i].isBound()) {
-            cerr << "Warning: GACElement is not designed to be used on bound variables and may cause crashes." << endl;
+            output_fatal_error("GACElement is not designed to be used on bound variables");
         }
     }
     if(indexvar.isBound() || resultvar.isBound()) {
-        cerr << "Warning: GACElement is not designed to be used on bound variables and may cause crashes." << endl;
+        output_fatal_error("GACElement is not designed to be used on bound variables");
     }
     indexvar.setMin(0);
     indexvar.setMax((SysInt)var_array.size() - 1);
