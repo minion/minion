@@ -618,6 +618,14 @@ Do not write a resume file on timeout or being killed. (default)
     {
       getOptions(stateObj).noresumefile = true;
     }
+/** @help switches;-gap Description
+Give name of gap executable (defaults to gap.sh)
+*/
+   else if(command == string("-gap"))
+    {
+      INCREMENT_i(-gap);
+      getOptions(stateObj).gapname = argv[i];
+    }
 /** @help switches;-split Description
 When Minion is terminated before the end of search, write out two new input
 files that split the remaining search space in half. Each of the files will have

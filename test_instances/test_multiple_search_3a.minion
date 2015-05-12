@@ -7,10 +7,8 @@ MINION 3
 BOOL b[2]
 BOOL c[2]
 BOOL d[3]
-BOOL e[3]
 
 **SEARCH**
-
 
 VARORDER [b]
 VALORDER [d,d]
@@ -18,12 +16,9 @@ VALORDER [d,d]
 VARORDER AUX [c]
 VALORDER [a,a]
 
-VARORDER [d]
-
-VARORDER AUX [e]
 
 **CONSTRAINTS**
 
-
+sumleq([b[1], c[1]], 1)
 
 **EOF**

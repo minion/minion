@@ -275,6 +275,8 @@ public:
   /// Disable the use of linux timers
   bool noTimers;
 
+  string gapname;
+
   SysInt Xvarmunge;
   SysInt Xsymmunge;
 
@@ -299,6 +301,7 @@ public:
     redump(false), graph(false), instance_stats(false),
     noresumefile(true), split(false),
     outputType(-1), outputCompressedDomains(false), noTimers(false),
+    gapname("gap.sh"),
     Xvarmunge(-1), Xsymmunge(-1), map_long_short(MLTTS_NoMap), ensure_branch_on_all_vars(true)
   {}
 
