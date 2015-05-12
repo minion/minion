@@ -29,8 +29,6 @@
 
 #include "../minlib/minlib.hpp"
 
-#include "output.h"
-
 #include "box-helper.h"
 
 #include "basic_headers.h"

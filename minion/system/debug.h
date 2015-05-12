@@ -22,6 +22,8 @@
 
 #include "basic_headers.h"
 
+void output_fatal_error(string s) DOM_NORETURN;
+
 template<typename T>
 inline void CheckNotBound(const T& t, std::string s, std::string s2 = "")
 {
@@ -74,6 +76,7 @@ struct assert_fail {};
 
 void error_printing_function(std::string a, std::string f, SysInt line) DOM_NORETURN;
 void user_error_printing_function(std::string a, std::string f, SysInt line) DOM_NORETURN;
+
 
 void FATAL_REPORTABLE_ERROR()  DOM_NORETURN;
 

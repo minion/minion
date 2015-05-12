@@ -25,6 +25,12 @@ bool debug_crash = false;
 
 bool in_cspcomp_for_failexit = false;
 
+void output_fatal_error(string s)
+{
+  std::cerr << s << "\n";
+  abort();
+}
+
 void FATAL_REPORTABLE_ERROR()
 {
   ostringstream oss;
