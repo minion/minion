@@ -38,7 +38,6 @@ public:
     , size(_size)
   #endif
     {
-        D_ASSERT(&getMemory(stateObj).monotonicSet() !=NULL);
         D_ASSERT(size>=0);
         offset=MS.request_storage(_size);
     }
