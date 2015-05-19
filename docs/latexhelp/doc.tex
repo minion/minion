@@ -926,6 +926,28 @@ help input table
 help input tuplelist
 \end{verbatim}
 }
+\section{constraints nvaluegeq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+ 
+   nvaluegeq(V,x)
+
+ensures that there are >= x different values assigned to the list of variables V.
+\end{verbatim}
+}
+\section{constraints nvalueleq}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+ 
+   nvalueleq(V,x)
+
+ensures that there are <= x different values assigned to the list of variables V.
+\end{verbatim}
+}
 \section{constraints occurrence}
 \paragraph{Description}
 {\footnotesize
@@ -1394,6 +1416,34 @@ ensures that at least one of the constraints C1,...,Cn is true.
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
+ The constraint 
+ 
+ watchelement(vec, i, e)
+ 
+ specifies that, in any solution, vec[i] = e and i is in the range 
+ [0 .. |vec|-1].
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+ Enforces generalised arc consistency.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+ See entry
+ 
+ help constraints element
+ 
+ for details of an identical constraint that enforces a lower level of
+ consistency.
+\end{verbatim}
+}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
 The constraint
 
    watchelement(vec, i, e)
@@ -1420,6 +1470,23 @@ consistency.
 \end{verbatim}
 }
 \section{constraints watchelement\textunderscore one}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+ This constraint is identical to watchelement, except the vector
+ is indexed from 1 rather than from 0.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+ See entry
+ 
+ help constraints watchelement
+ 
+ for details of watchelement which watchelement_one is based on.
+\end{verbatim}
+}
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
@@ -2067,6 +2134,13 @@ Disable incremental propagation. This should always slow down search while produ
 search tree. Only available in a DEBUG executable.
 \end{verbatim}
 }
+\section{switches -gap}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+Give name of gap executable (defaults to gap.sh)
+\end{verbatim}
+}
 \section{switches -makeresume}
 \paragraph{Description}
 {\footnotesize
@@ -2297,6 +2371,18 @@ repeated in different runs of minion.
 \begin{verbatim}
 Print the minion input instance file to standard out. No search is
 carried out when this switch is used.
+\end{verbatim}
+}
+\section{switches -skipautoaux}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+By default Minion adds all variables to the varorder, to ensure that all variables
+are branched assigned before a solution is outputted. This option disables that
+behaviour. This means minion Minion may output solutions incorrectly, or incorrect
+numbers of solutions. This flag is provided because some users require this 
+low-level control over the search, but is in general useless and dangerous. In particular,
+it will not speed up search (except when the speed up is due to producing garbage of course!)
 \end{verbatim}
 }
 \section{switches -sollimit}

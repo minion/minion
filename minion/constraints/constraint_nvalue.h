@@ -20,10 +20,20 @@
 /** @help constraints;nvalueleq Description
 The constraint
  
-   pow(x,y,z)
+   nvalueleq(V,x)
 
-ensures that x^y=z.
+ensures that there are <= x different values assigned to the list of variables V.
 */
+
+
+/** @help constraints;nvaluegeq Description
+The constraint
+ 
+   nvaluegeq(V,x)
+
+ensures that there are >= x different values assigned to the list of variables V.
+*/
+
 
 
 #ifndef CONSTRAINT_NVALUE_H

@@ -244,6 +244,16 @@ cout << "help switches -cpulimit" << endl
 << "help switches -nodelimit" << endl
 << "help switches -sollimit" << endl << endl << endl;
 } else
+if("switches -skipautoaux" == request) {
+cout << "Help entry: " << "switches -skipautoaux" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "By default Minion adds all variables to the varorder, to ensure that all variables" << endl
+<< "are branched assigned before a solution is outputted. This option disables that" << endl
+<< "behaviour. This means minion Minion may output solutions incorrectly, or incorrect" << endl
+<< "numbers of solutions. This flag is provided because some users require this " << endl
+<< "low-level control over the search, but is in general useless and dangerous. In particular," << endl
+<< "it will not speed up search (except when the speed up is due to producing garbage of course!)" << endl << endl << endl;
+} else
 if("switches -cpulimit" == request) {
 cout << "Help entry: " << "switches -cpulimit" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -299,6 +309,11 @@ if("switches -noresume" == request) {
 cout << "Help entry: " << "switches -noresume" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Do not write a resume file on timeout or being killed. (default)" << endl << endl << endl;
+} else
+if("switches -gap" == request) {
+cout << "Help entry: " << "switches -gap" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Give name of gap executable (defaults to gap.sh)" << endl << endl << endl;
 } else
 if("switches -split" == request) {
 cout << "Help entry: " << "switches -split" << endl << endl;
@@ -532,6 +547,37 @@ cout << "Notes" << "------------------------------------------------------------
 cout << "Achieves arc consistency." << endl << endl << endl;
 cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "diseq(v0,v1)" << endl << endl << endl;
+} else
+if("constraints watchelement_one" == request) {
+cout << "Help entry: " << "constraints watchelement_one" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "This constraint is identical to watchelement, except the vector" << endl
+<< " is indexed from 1 rather than from 0." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See entry" << endl
+<< " " << endl
+<< " help constraints watchelement" << endl
+<< " " << endl
+<< " for details of watchelement which watchelement_one is based on." << endl << endl << endl;
+} else
+if("constraints watchelement" == request) {
+cout << "Help entry: " << "constraints watchelement" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint " << endl
+<< " " << endl
+<< " watchelement(vec, i, e)" << endl
+<< " " << endl
+<< " specifies that, in any solution, vec[i] = e and i is in the range " << endl
+<< " [0 .. |vec|-1]." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "Enforces generalised arc consistency." << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "See entry" << endl
+<< " " << endl
+<< " help constraints element" << endl
+<< " " << endl
+<< " for details of an identical constraint that enforces a lower level of" << endl
+<< " consistency." << endl << endl << endl;
 } else
 if("constraints gacalldiff" == request) {
 cout << "Help entry: " << "constraints gacalldiff" << endl << endl;
@@ -1005,6 +1051,24 @@ cout << "See" << endl
 << " help constraints gacalldiff" << endl
 << "" << endl
 << "for the same constraint that enforces GAC." << endl << endl << endl;
+} else
+if("constraints nvalueleq" == request) {
+cout << "Help entry: " << "constraints nvalueleq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< " " << endl
+<< " nvalueleq(V,x)" << endl
+<< "" << endl
+<< "ensures that there are <= x different values assigned to the list of variables V." << endl << endl << endl;
+} else
+if("constraints nvaluegeq" == request) {
+cout << "Help entry: " << "constraints nvaluegeq" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< " " << endl
+<< " nvaluegeq(V,x)" << endl
+<< "" << endl
+<< "ensures that there are >= x different values assigned to the list of variables V." << endl << endl << endl;
 } else
 if("constraints occurrence" == request) {
 cout << "Help entry: " << "constraints occurrence" << endl << endl;
@@ -2017,6 +2081,8 @@ cout << "help constraints mod_undefzero" << endl;
 cout << "help constraints modulo" << endl;
 cout << "help constraints negativemddc" << endl;
 cout << "help constraints negativetable" << endl;
+cout << "help constraints nvaluegeq" << endl;
+cout << "help constraints nvalueleq" << endl;
 cout << "help constraints occurrence" << endl;
 cout << "help constraints occurrencegeq" << endl;
 cout << "help constraints occurrenceleq" << endl;
@@ -2065,6 +2131,7 @@ cout << "help switches -cpulimit" << endl;
 cout << "help switches -dumptree" << endl;
 cout << "help switches -findallsols" << endl;
 cout << "help switches -fullprop" << endl;
+cout << "help switches -gap" << endl;
 cout << "help switches -makeresume" << endl;
 cout << "help switches -map-long-short" << endl;
 cout << "help switches -nocheck" << endl;
@@ -2082,6 +2149,7 @@ cout << "help switches -quiet" << endl;
 cout << "help switches -randomiseorder" << endl;
 cout << "help switches -randomseed" << endl;
 cout << "help switches -redump" << endl;
+cout << "help switches -skipautoaux" << endl;
 cout << "help switches -sollimit" << endl;
 cout << "help switches -solsout" << endl;
 cout << "help switches -split" << endl;
