@@ -64,6 +64,8 @@ conslist+=["not-hamming"]
 
 conslist+=["gacschema", "haggisgac", "haggisgac-stable", "str2plus", "shortstr2"]
 
+conslist+=["nvalueleq", "nvaluegeq"]
+
 # add reifyimply variant of all constraints,
 # and reify variant of all except those in reifyexceptions
 it=conslist[:]

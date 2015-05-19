@@ -15,6 +15,7 @@ set(ALL_CONSTRAINTS "element" "element_undefzero" "element_one" "watchelement" "
                     "haggisgac" "haggisgac-stable" "str2plus" "shortstr2" "gaceq" "gacschema"
                     "mddc" "negativemddc" "test" "vm" "vmsym"
                     "tablevm" "negativetablevm"
+                    "nvalueleq" "nvaluegeq"
                     )
 
 set(GEN_FILES_DIR "${PROJECT_SOURCE_DIR}/minion/build_constraints")
@@ -133,6 +134,12 @@ set(NAME_READ_occurrenceleq "read_list" "read_constant" "read_constant")
 
 set(NAME_ID_occurrencegeq "CT_GEQ_OCCURRENCE")
 set(NAME_READ_occurrencegeq "read_list" "read_constant" "read_constant")
+
+set(NAME_ID_nvalueleq "CT_LEQNVALUE")
+set(NAME_READ_nvalueleq "read_list" "read_var")
+
+set(NAME_ID_nvaluegeq "CT_GEQNVALUE")
+set(NAME_READ_nvaluegeq "read_list" "read_var")
 
 set(NAME_ID_product "CT_PRODUCT2")
 set(NAME_READ_product "read_2_vars" "read_var")

@@ -1464,7 +1464,40 @@ class testpow:
         return out
     def runtest(self, options=dict()):
         return runtestgeneral("pow", True, options, [1,1,1], ["num","num","num"], self, False)
-    
+
+class testnvaluegeq:
+    def printtable(self, domains):
+        cross=[]
+        x=domains[:-1]
+        crossprod(x,[],cross)
+        out=[]
+        for line in cross:
+            count = len(set(line))
+            for d in domains[-1]:
+                if count >= d:
+                    out.append(line+[d])
+        return out
+
+    def runtest(self, options=dict()):
+        return runtestgeneral("nvaluegeq", False, options, [5,1], ["smallnum", "num"], self, False)
+
+class testnvalueleq:
+    def printtable(self, domains):
+        cross=[]
+        x=domains[:-1]
+        crossprod(x,[],cross)
+        out=[]
+        for line in cross:
+            count = len(set(line))
+            for d in domains[-1]:
+                if count <= d:
+                    out.append(line+[d])
+        return out
+
+    def runtest(self, options=dict()):
+        return runtestgeneral("nvalueleq", False, options, [5,1], ["num", "num"], self, False)
+
+
 class testgcc:
     def printtable(self, domains):
         vals=self.constants
