@@ -548,24 +548,51 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   {
     MAKE_STACK_BOX(c, DomainInt, var_array.size());
 
-    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
+    if(val_count_min == 0)
     {
-      if(!var_array[i].isAssigned())
-      {
-        assignment.push_back(make_pair(i, var_array[i].getMin()));
-        assignment.push_back(make_pair(i, var_array[i].getMax()));
+      DomainInt need_vars = (DomainInt)var_array.size() - val_count_max;
+      if(need_vars <= 0)
         return true;
+      for(int i = 0; i < (SysInt)var_array.size(); ++i)
+      {
+        if(var_array[i].getMin() != value)
+        {
+          assignment.push_back(make_pair(i, var_array[i].getMin()));
+          need_vars--;
+        }
+        else if(var_array[i].getMax() != value)
+        {
+          assignment.push_back(make_pair(i, var_array[i].getMax()));
+          need_vars--;
+        }
+        if(need_vars == 0)
+        {
+          return true;
+        }
       }
-      else
-        c.push_back(var_array[i].getAssignedValue());
+      assignment.clear();
+      return false;
+    }
+    else if(val_count_max == (SysInt)var_array.size())
+    {
+      DomainInt need_vars = val_count_min;
+      if(need_vars <= 0)
+        return true;
+      for(int i = 0; i < (SysInt)var_array.size(); ++i)
+      {
+        if(var_array[i].inDomain(value))
+        {
+          assignment.push_back(make_pair(i, value));
+          need_vars--;
+        }
+        if(need_vars == 0)
+          return true;
+      }
+      assignment.clear();
+      return false;
     }
 
-    if(check_assignment(c.begin(), c.size()))
-    {  // Put the complete assignment in the box.
-      for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
-        assignment.push_back(make_pair(i, c[i]));
-      return true;
-    }
+    abort();
     return false;
   }
 
