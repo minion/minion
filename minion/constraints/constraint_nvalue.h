@@ -57,7 +57,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint
       t.push_back(make_trigger(vars[i], Trigger(this, i), Assigned));
     }
     
-    t.push_back(make_trigger(result, Trigger(this, -1), LowerBound));
+    t.push_back(make_trigger(result, Trigger(this, -1), UpperBound));
     return t;
   }
   
@@ -80,12 +80,23 @@ struct LessEqualNvalueConstraint : public AbstractConstraint
 
     result.setMin(assigned.size());
     
-    if(result.getMax() == (DomainInt)assigned.size() && assigned.size() > 0)
+    if((DomainInt)assigned.size() == result.getMax() && assigned.size() > 0)
     {
       for(unsigned i = 0; i < vars.size(); ++i)
       {
-        vars[i].setMin(*assigned.begin());
-        vars[i].setMax(*(--assigned.end()));
+        if(!vars[i].isAssigned())
+        {
+          vars[i].setMin(*assigned.begin());
+          vars[i].setMax(*(--assigned.end()));
+          if(!vars[i].isBound())
+          {
+            for(DomainInt d = vars[i].getMin(); d <= vars[i].getMax(); ++d)
+            {
+              if(assigned.count(d) == 0)
+                vars[i].removeFromDomain(d);
+            }
+          }
+        }
       }
     }
   }
@@ -201,8 +212,43 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint
       result.setMax(assigned.size());
       return;
     }
+
+    // We do two passes over the domains, for efficiency
+    std::set<DomainInt> unassigned_testing;
+    std::set<DomainInt> unassigned_appear; 
+    for(DomainInt i = min_unassigned; i <= max_unassigned; ++i)
+    {
+      if(assigned.count(i) == 0)
+        unassigned_testing.insert(i);
+    }
+
+    for(unsigned i = 0; i < vars.size(); ++i)
+    {
+      if(!vars[i].isAssigned())
+      {
+        std::set<DomainInt>::iterator it = unassigned_testing.begin();
+        while(it != unassigned_testing.end())
+        {
+          if(vars[i].inDomain(*it))
+          {
+            unassigned_appear.insert(*it);
+            std::set<DomainInt>::iterator temp = it;
+            ++it;
+            unassigned_testing.erase(temp);
+          }
+          else
+          {
+            ++it;
+          }
+        }
+        if(unassigned_testing.empty())
+          break;
+      }
+    }
+
+
      
-    DomainInt unassigned_estimate = std::min(unassigned_count, max_unassigned - min_unassigned + 1);
+    DomainInt unassigned_estimate = std::min(unassigned_count, (DomainInt)unassigned_appear.size());
 
     result.setMax(assigned.size() + unassigned_estimate);
   }
