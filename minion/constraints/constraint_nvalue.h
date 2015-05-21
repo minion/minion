@@ -135,18 +135,24 @@ struct LessEqualNvalueConstraint : public AbstractConstraint
      {
        if(vars[i].getMin() != vars[i].getMax())
        {
+         assignment.clear();
          assignment.push_back(make_pair(i, vars[i].getMin()));
          assignment.push_back(make_pair(i, vars[i].getMax()));
          return true;
        }
+       else
+         assignment.push_back(make_pair(i, vars[i].getAssignedValue()));
      }
 
      if(result.getMin() != result.getMax())
      {
+       assignment.clear();
        assignment.push_back(make_pair(vars.size(), result.getMin()));
        assignment.push_back(make_pair(vars.size(), result.getMax()));
        return true;
      }
+     else
+        assignment.push_back(make_pair(vars.size(), result.getAssignedValue()));
 
      std::set<DomainInt> values;
      for(unsigned i = 0; i < vars.size(); ++i)
@@ -154,6 +160,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint
 
      return (DomainInt)values.size() <= result.getAssignedValue();
    }
+    
     
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
@@ -287,18 +294,24 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint
      {
        if(vars[i].getMin() != vars[i].getMax())
        {
+         assignment.clear();
          assignment.push_back(make_pair(i, vars[i].getMin()));
          assignment.push_back(make_pair(i, vars[i].getMax()));
          return true;
        }
+       else
+         assignment.push_back(make_pair(i, vars[i].getAssignedValue()));
      }
 
      if(result.getMin() != result.getMax())
      {
+       assignment.clear();
        assignment.push_back(make_pair(vars.size(), result.getMin()));
        assignment.push_back(make_pair(vars.size(), result.getMax()));
        return true;
      }
+     else
+        assignment.push_back(make_pair(vars.size(), result.getAssignedValue()));
 
      std::set<DomainInt> values;
      for(unsigned i = 0; i < vars.size(); ++i)
