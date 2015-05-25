@@ -93,7 +93,7 @@ using namespace std;
 #undef PHALLSETSIZE
 #endif
 
-//#define PHALLSETSIZE(x) cout << x << endl
+//#define PHALLSETSIZE(x) cout << x << ","
 #define PHALLSETSIZE(x)
 
 template<typename VarArray>
