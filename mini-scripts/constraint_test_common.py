@@ -1495,7 +1495,7 @@ class testnvalueleq:
         return out
 
     def runtest(self, options=dict()):
-        return runtestgeneral("nvalueleq", False, options, [5,1], ["num", "num"], self, False)
+        return runtestgeneral("nvalueleq", False, options, [5,1], ["smallnum", "num"], self, False)
 
 
 class testgcc:
@@ -2145,4 +2145,3 @@ def generatevariables(varblocks, types, boundallowed):
     st_nontable=reduce(lambda x,y:x+"\n"+y, [i[0] for i in deco])+"\n"
     st_table=reduce(lambda x,y:x+"\n"+y, [i[1] for i in deco])+"\n"
     return (domainlists, st_nontable, st_table, constants, constraints)
-
