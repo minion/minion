@@ -29,7 +29,7 @@
 // Windows does not have a 128-bit integer
 #define USE_WRAPPER
 #endif
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 // Javascript does not either
 #define USE_WRAPPER
 #endif
