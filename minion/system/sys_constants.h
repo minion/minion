@@ -23,8 +23,18 @@
 //#define DOMAINS64
 
 #ifdef DOMAINS64
+
+// work out if we need to use the Wrapper<int64_t>
 #ifdef _WIN32
-// Windoes does not have a 128-bit integer
+// Windows does not have a 128-bit integer
+#define USE_WRAPPER
+#endif
+#ifdef EMSCRIPTEN
+// Javascript does not either
+#define USE_WRAPPER
+#endif
+
+#ifdef USE_WRAPPER
 typedef Wrapper<int64_t> BigInt;
 #else
 typedef __int128_t BigInt;
