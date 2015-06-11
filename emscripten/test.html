@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="minion.js"></script>
+    <script>
+    $(document).ready(function(){
+        var model = "MINION 3\
+                    **VARIABLES**\
+                    DISCRETE x #\
+                    {1..5}\
+                    DISCRETE y #\
+                    {1..5}\
+                    DISCRETE aux0 #(x-1*y)\
+                    {-4..4}\
+                    DISCRETE aux1 #|aux0|\
+                    {0..4}\
+                    **SEARCH**\
+                    PRINT[[x],[y]]\
+                    VARORDER STATIC [x, y]\
+                    VARORDER AUX [x,y,aux0,aux1]\
+                    **CONSTRAINTS**\
+                    abs(aux1, aux0)\
+                    w-literal(aux1,2)\
+                    weightedsumleq([1,-1],[x,y],aux0)\
+                    weightedsumgeq([1,-1],[x,y],aux0)\
+                    **EOF**";
+        // the previous one doesn't work for some reason, will look into it later.
+        model = "MINION 3\
+                    **VARIABLES**\
+                    DISCRETE x {1..5}\
+                    DISCRETE y {1..5}\
+                    **EOF**";
+        var numVars = 2;
+        var lastSol = [];
+        minion.run(model, {
+            args: ["-findallsols", "-randomiseorder"],
+            stdout: function(line) {
+                lastSol.push(line);
+                if (lastSol.length == numVars) {
+                    $("#debug").append("solution: " + lastSol.toString() + "\n");
+                    lastSol = [];
+                }
+            }
+        });
+    });
+    </script>
+    <title>minion-js</title>
+</head>
+<body>
+    <pre id="debug"></pre>
+</body>
+</html>
