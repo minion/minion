@@ -6,31 +6,28 @@
     <script src="minion.js"></script>
     <script>
     $(document).ready(function(){
-        var model = "MINION 3\
-                    **VARIABLES**\
-                    DISCRETE x #\
-                    {1..5}\
-                    DISCRETE y #\
-                    {1..5}\
-                    DISCRETE aux0 #(x-1*y)\
-                    {-4..4}\
-                    DISCRETE aux1 #|aux0|\
-                    {0..4}\
-                    **SEARCH**\
-                    PRINT[[x],[y]]\
-                    VARORDER STATIC [x, y]\
-                    VARORDER AUX [x,y,aux0,aux1]\
-                    **CONSTRAINTS**\
-                    abs(aux1, aux0)\
-                    w-literal(aux1,2)\
-                    weightedsumleq([1,-1],[x,y],aux0)\
-                    weightedsumgeq([1,-1],[x,y],aux0)\
-                    **EOF**";
-        // the previous one doesn't work for some reason, will look into it later.
-        model = "MINION 3\
-                    **VARIABLES**\
-                    DISCRETE x {1..5}\
-                    DISCRETE y {1..5}\
+        // output from SR -O0
+        // find x,y : int(1..5)
+        // such that |x=y| = 2
+        var model = "MINION 3\n\
+                    **VARIABLES**\n\
+                    DISCRETE x #\n\
+                    {1..5}\n\
+                    DISCRETE y #\n\
+                    {1..5}\n\
+                    DISCRETE aux0 #(x-1*y)\n\
+                    {-4..4}\n\
+                    DISCRETE aux1 #|aux0|\n\
+                    {0..4}\n\
+                    **SEARCH**\n\
+                    PRINT[[x],[y]]\n\
+                    VARORDER STATIC [x, y]\n\
+                    VARORDER AUX [x,y,aux0,aux1]\n\
+                    **CONSTRAINTS**\n\
+                    abs(aux1, aux0)\n\
+                    w-literal(aux1,2)\n\
+                    weightedsumleq([1,-1],[x,y],aux0)\n\
+                    weightedsumgeq([1,-1],[x,y],aux0)\n\
                     **EOF**";
         var numVars = 2;
         var numSol = 0;
