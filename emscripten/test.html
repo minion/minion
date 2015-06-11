@@ -33,22 +33,40 @@
                     DISCRETE y {1..5}\
                     **EOF**";
         var numVars = 2;
+        var numSol = 0;
         var lastSol = [];
         minion.run(model, {
             args: ["-findallsols", "-randomiseorder"],
-            stdout: function(line) {
+            stdoutHandler: function(line) {
                 lastSol.push(line);
                 if (lastSol.length == numVars) {
-                    $("#debug").append("solution: " + lastSol.toString() + "\n");
+                    numSol++;
+                    $("#solutions").append("solution " + numSol + ": " + lastSol.toString() + "\n");
                     lastSol = [];
+                }
+            },
+            statsHandler: function(stats) {
+                var headers = stats.split("\n")[0].trim().split(" ");
+                var values  = stats.split("\n")[1].trim().split(" ");
+                for (i=0; i < headers.length; i++) {
+                    $("#stats").append(headers[i] + ": " + values[i] + "\n");
                 }
             }
         });
     });
     </script>
+    <style>
+        #solutions {
+            background-color: rgba(0, 255, 0, 0.2);
+        }
+        #stats {
+            background-color: rgba(0, 0, 255, 0.2);
+        }
+    </style>
     <title>minion-js</title>
 </head>
 <body>
-    <pre id="debug"></pre>
+    <pre id="solutions"></pre>
+    <pre id="stats"></pre>
 </body>
 </html>
