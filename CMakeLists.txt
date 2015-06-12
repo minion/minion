@@ -455,50 +455,6 @@ if(NOT ${BINARY} STREQUAL minion)
     add_custom_target(minion-lib DEPENDS ${BINARY}-lib)
 endif()
 
-# generators
-add_executable(bibd "${PROJECT_SOURCE_DIR}/generators/Bibd/MinionBIBDInstanceGenerator.cpp")
-add_executable(golomb "${PROJECT_SOURCE_DIR}/generators/Golomb/GolombMinionGenerator.cpp")
-add_executable(graceful "${PROJECT_SOURCE_DIR}/generators/Graceful/GracefulMinionGenerator.cpp")
-add_executable(indicator "${PROJECT_SOURCE_DIR}/generators/indicator/indicator.cpp")
-add_executable(langford "${PROJECT_SOURCE_DIR}/generators/Langford/langford.cpp")
-add_executable(nqueens "${PROJECT_SOURCE_DIR}/generators/nqueens-JFP/nqueensgen.cpp")
-add_executable(primequeens "${PROJECT_SOURCE_DIR}/generators/PrimeQueens/MinionPrimeQueenInstanceGenerator.cpp")
-add_executable(solitaire "${PROJECT_SOURCE_DIR}/generators/Solitaire/solitaire-solver.cpp")
-add_executable(sports "${PROJECT_SOURCE_DIR}/generators/SportsSchedule/MinionSportsInstanceGenerator.cpp")
-add_executable(steelmill "${PROJECT_SOURCE_DIR}/generators/Steelmill/steelmill-solver.cpp")
-
-add_custom_target(generate DEPENDS bibd golomb graceful indicator langford
-                   nqueens primequeens solitaire steelmill sports)
-
-# lisp stuff
-find_program(CLISP clisp)
-if(CLISP)
-    message(STATUS "Clisp found, generating LISP targets")
-    set(CLISP_FLAGS "-q -q -C -x")
-    add_custom_target(minion-helper ${CLISP} ${CLISP_FLAGS}
-        "(clisp-make-executable \"minion-helper\")"
-        -i "${PROJECT_SOURCE_DIR}/generators/MinionHelper.lsp"
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-        COMMENT "minion-helper" VERBATIM)
-    add_custom_target(minion-sat ${CLISP} ${CLISP_FLAGS}
-        "(clisp-make-executable \"minion-sat\" (function clisp-toplevel-sat))"
-        -i "${PROJECT_SOURCE_DIR}/generators/MinionHelper.lsp"
-        -i "${PROJECT_SOURCE_DIR}/generators/SAT/MinionDimacsSAT.lsp"
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-        COMMENT "minion-sat" VERBATIM)
-    add_custom_target(minion-quasigroup ${CLISP} ${CLISP_FLAGS}
-        "(clisp-make-executable \"minion-quasigroup\" (function clisp-toplevel-quasigroup))"
-        -i "${PROJECT_SOURCE_DIR}/generators/MinionHelper.lsp"
-        -i "${PROJECT_SOURCE_DIR}/generators/Quasigroup/MinionQuasigroup.lsp"
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-        COMMENT "minion-quasigroup" VERBATIM)
-    add_custom_target(lisp-generate WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-    add_dependencies(lisp-generate minion-helper minion-sat minion-quasigroup)
-    set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
-        "${PROJECT_BINARY_DIR}/minion-helper;${PROJECT_BINARY_DIR}/minion-sat;${PROJECT_BINARY_DIR}/minion-quasigroup")
-else()
-    message(STATUS "No clisp executable found, not generating LISP targets")
-endif()
 
 # help
 # no need to check for bash again, if it's a UNIX system the check will have
@@ -511,45 +467,3 @@ if(UNIX AND BASH)
 else()
     message(STATUS "You need a UNIX-like system to generate the documentation")
 endif()
-
-find_program(DOXYGEN doxygen)
-if(DOXYGEN)
-    message(STATUS "Generating doxygen documentation target")
-    add_custom_target(api-doc ${DOXYGEN}
-              WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/minion"
-              COMMENT "api-doc" VERBATIM)
-else()
-    message(STATUS "Doxygen not found, not generating doxygen documentation target")
-endif()
-
-add_custom_target(test-instances-quick DEPENDS ${BINARY}
-                  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test_instances"
-                  COMMAND "./do_basic_tests.sh" "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
-
-add_custom_target(test-instances-slow DEPENDS ${BINARY}
-                  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test_instances"
-                  COMMAND "./run_tests.sh" "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
-
-add_custom_target(test-random-quick DEPENDS ${BINARY}
-                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                 COMMAND "./mini-scripts/testallconstraints.py"
-                    "--numtests=25" "--procs=2"
-                    "--minion=${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
-
-add_custom_target(test-random-slow DEPENDS ${BINARY}
-                  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                  COMMAND "./mini-scripts/testallconstraints.py"
-                    "--numtests=160" "--procs=2"
-                    "--minion=${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
-
-add_custom_target(test-resume DEPENDS ${BINARY}
-                  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                  COMMAND "./mini-scripts/test-resume.sh"
-                   "${PROJECT_BINARY_DIR}/${BINARY}" VERBATIM)
-
-add_custom_target(test-quick)
-add_dependencies(test-quick test-instances-quick)
-add_custom_target(test-standard)
-add_dependencies(test-standard test-instances-slow test-random-quick test-resume)
-add_custom_target(test-slow)
-add_dependencies(test-slow test-instances-slow test-random-slow test-resume)
