@@ -574,17 +574,13 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 
   switch(constraint->type)
   {
-#ifdef CT_WATCHED_OR_ABC
     case CT_WATCHED_OR:
     return readConstraintOr(infile, get_constraint(CT_WATCHED_OR));
     break;
-#endif
 
-#ifdef CT_GADGET_ABC
     case CT_GADGET:
     return readConstraintGadget(infile);
     break;
-#endif
 
     default:
     if(constraint->number_of_params == 2 &&
@@ -779,7 +775,6 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
 // table(<vectorOfVars>, {<tuple> [, <tuple>]})
 // Tuples represented as a vector of SysInt arrays.
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#ifdef CT_GADGET_ABC
 template<typename FileReader>
 ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile)
 {
@@ -801,7 +796,6 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileRead
   MAYBE_PARSER_INFO("End gadget reading");
   return gadgetCon;
 }
-#endif
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // readConstraintOr

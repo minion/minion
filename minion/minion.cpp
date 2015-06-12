@@ -28,7 +28,6 @@
 #include "inputfile_parse/inputfile_parse.h"
 #include "commandline_parse.h"
 
-#include "system/defined_macros.h"
 
 #include "MILtools/print_CSP.h"
 
@@ -68,8 +67,6 @@ void print_default_help(char** argv)
 #else
   "on" << endl;
 #endif
-  cout << "The following preprocessor flags were active:" << endl;
-  print_macros();
 }
 
 void worker()

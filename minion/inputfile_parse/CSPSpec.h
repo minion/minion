@@ -639,15 +639,12 @@ public:
     const ConstraintBlob& con = constraints.back();
     switch(con.constraint->type)
     {
-#ifdef CT_PRODUCT2_ABC
       case CT_PRODUCT2:
         return DOMAIN_CHECK(checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound)*
                      checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound))
         &&
         DOMAIN_CHECK(checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound)*
                      checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound));
-#endif
-#ifdef CT_POW_ABC
       case CT_POW:
       {
         BigInt a = checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound);
@@ -661,7 +658,7 @@ public:
         }
         return true;
       }
-#endif
+
 
       default:
         return true;

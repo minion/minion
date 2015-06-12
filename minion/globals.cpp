@@ -29,7 +29,6 @@
 
 #include "minion.h"
 
-#include "system/defined_macros.h"
 
 #include "build_constraints/constraint_defs.h"
 

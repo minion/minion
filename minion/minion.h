@@ -22,7 +22,6 @@
 #define MANY_VAR_CONTAINERS
 #endif
 #include "system/system.h"
-#include "BuildDefines.h"
 // XXX These could possibly be turned off, but it's possible it will require
 // Some small amount of work to make them work.
 #define FULL_DOMAIN_TRIGGERS

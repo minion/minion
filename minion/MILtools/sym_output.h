@@ -589,206 +589,205 @@ struct GraphBuilder
   {
     switch(b.constraint->type)
     {
-#ifdef CT_REIFY_ABC
+
       case CT_REIFY: return colour_reify(b, "REIFY");
-#endif
-#ifdef CT_CHECK_GSA_ABC
+
+
       case CT_CHECK_GSA : return colour_constraint(b.internal_constraints[0]);
-#endif
-#ifdef CT_CHECK_ASSIGN_ABC
+
+
       case CT_CHECK_ASSIGN : return colour_constraint(b.internal_constraints[0]);
-#endif
-#ifdef CT_REIFYIMPLY_ABC
+
+
       case CT_REIFYIMPLY: return colour_reify(b, "REIFYIMPLY");
-#endif
-#ifdef CT_REIFYIMPLY_QUICK_ABC
+
+
       case CT_REIFYIMPLY_QUICK: return colour_reify(b, "REIFYIMPLY_QUICK");
-#endif
-#ifdef CT_ELEMENT_ABC
+
+
       case CT_ELEMENT: return colour_element(b, "ELEMENT");
-#endif
-#ifdef CT_WATCHED_ELEMENT_ABC
+
+
       case CT_WATCHED_ELEMENT: return colour_element(b, "ELEMENT");
-#endif
-#ifdef CT_WATCHED_ELEMENT_UNDEFZERO_ABC
+
+
       case CT_WATCHED_ELEMENT_UNDEFZERO: return colour_element(b, "ELEMENT_UNDEFZERO");
-#endif
-#ifdef CT_GACELEMENT_ABC
+
+
       case CT_GACELEMENT: return colour_element(b, "ELEMENT");
-#endif
-#ifdef CT_ELEMENT_ONE_ABC
+
+
       case CT_ELEMENT_ONE: return colour_element(b, "ELEMENT_ONE");
-#endif
-#ifdef CT_WATCHED_ELEMENT_ONE_ABC
+
+
       case CT_WATCHED_ELEMENT_ONE: return colour_element(b, "ELEMENT_ONE");
-#endif
 
-#ifdef CT_ALLDIFF_ABC
+
+
       case CT_ALLDIFF: return colour_symmetric_constraint(b, "ALLDIFF");
-#endif
-#ifdef CT_GACALLDIFF_ABC
+
+
       case CT_GACALLDIFF: return colour_symmetric_constraint(b, "ALLDIFF");
-#endif
 
-#ifdef CT_WATCHED_NEQ_ABC
+
+
       case CT_WATCHED_NEQ: return colour_eq(b, "DISEQ");
-#endif
-#ifdef CT_DISEQ_ABC
+
+
       case CT_DISEQ: return colour_eq(b, "DISEQ");
-#endif
-#ifdef CT_EQ_ABC
+
+
       case CT_EQ:    return colour_eq(b, "EQ");
-#endif
 
-#ifdef CT_MINUSEQ_ABC
+
+
       case CT_MINUSEQ: return colour_no_symmetry(b, "MINUSEQ");
-#endif
-#ifdef CT_ABS_ABC
+
+
       case CT_ABS:     return colour_no_symmetry(b, "ABS");
-#endif
-#ifdef CT_INEQ_ABC
+
+
       case CT_INEQ:    return colour_no_symmetry(b, "INEQ");
-#endif
-#ifdef CT_WATCHED_LESS_ABC
+
+
       case CT_WATCHED_LESS: return colour_no_symmetry(b, "LESS");
-#endif
 
-#ifdef CT_LEXLEQ_ABC
+
+
       case CT_LEXLEQ: return colour_no_symmetry(b, "LEXLEQ");
-#endif
-#ifdef CT_LEXLESS_ABC
+
+
       case CT_LEXLESS: return colour_no_symmetry(b, "LEXLESS");
-#endif
 
-#ifdef CT_GACLEXLEQ_ABC
+
+
       case CT_GACLEXLEQ: return colour_no_symmetry(b, "LEXLEQ");
-#endif
 
 
-#ifdef CT_QUICK_LEXLEQ_ABC
+
+
       case CT_QUICK_LEXLEQ: return colour_no_symmetry(b, "LEXLEQ");
-#endif
-#ifdef CT_QUICK_LEXLESS_ABC
+
+
       case CT_QUICK_LEXLESS: return colour_no_symmetry(b, "LEXLESS");
-#endif
 
-#ifdef CT_MAX_ABC
+
+
       case CT_MAX: return colour_symmetric_constraint(b, "MAX");
-#endif
-#ifdef CT_MIN_ABC
+
+
       case CT_MIN: return colour_symmetric_constraint(b, "MIN");
-#endif
 
-#ifdef CT_OCCURRENCE_ABC
+
+
       case CT_OCCURRENCE: return colour_symmetric_constraint(b, "OCCURRENCE");
-#endif
-#ifdef CT_LEQ_OCCURRENCE_ABC
+
+
       case CT_LEQ_OCCURRENCE: return colour_symmetric_constraint(b, "OCC_LEQ");
-#endif
-#ifdef CT_GEQ_OCCURRENCE_ABC
+
+
       case CT_GEQ_OCCURRENCE: return colour_symmetric_constraint(b, "OCC_GEQ");
-#endif
 
-#ifdef CT_PRODUCT2_ABC
+
+
       case CT_PRODUCT2: return colour_symmetric_constraint(b, "PRODUCT");
-#endif
 
-#ifdef CT_DIFFERENCE_ABC
+
+
       case CT_DIFFERENCE: return colour_symmetric_constraint(b, "DIFFERENCE");
-#endif
 
-#ifdef CT_WEIGHTGEQSUM_ABC
+
+
       case CT_WEIGHTGEQSUM: return colour_weighted_sum(b, "WEIGHT_GEQSUM");
-#endif
-#ifdef CT_WEIGHTLEQSUM_ABC
+
+
       case CT_WEIGHTLEQSUM: return colour_weighted_sum(b, "WEIGHT_LEQSUM");
-#endif
 
-#ifdef CT_GEQSUM_ABC
+
+
       case CT_GEQSUM: return colour_symmetric_constraint(b, "GEQSUM");
-#endif
-#ifdef CT_WATCHED_GEQSUM_ABC
+
+
       case CT_WATCHED_GEQSUM: return colour_symmetric_constraint(b, "GEQSUM");
-#endif
 
-#ifdef CT_LEQSUM_ABC
+
+
       case CT_LEQSUM: return colour_symmetric_constraint(b, "LEQSUM");
-#endif
-#ifdef CT_WATCHED_LEQSUM_ABC
+
+
       case CT_WATCHED_LEQSUM: return colour_symmetric_constraint(b, "LEQSUM");
-#endif
 
-#ifdef CT_WATCHED_TABLE_ABC
+
+
       case CT_WATCHED_TABLE: return colour_no_symmetry(b, "TABLE");
-#endif
-#ifdef CT_WATCHED_NEGATIVE_TABLE_ABC
+
+
       case CT_WATCHED_NEGATIVE_TABLE: return colour_no_symmetry(b, "NEG_TABLE");
-#endif
 
-#ifdef CT_WATCHED_VECNEQ_ABC
+
+
       case CT_WATCHED_VECNEQ: return colour_array_swap_each_index(b, "VECNEQ");
-#endif
-#ifdef CT_WATCHED_LITSUM_ABC
+
+
       case CT_WATCHED_LITSUM: return colour_no_symmetry(b, "LITSUM");
-#endif
 
-#ifdef CT_POW_ABC
+
+
       case CT_POW: return colour_no_symmetry(b, "POW");
-#endif
-#ifdef CT_DIV_ABC
+
+
       case CT_DIV: return colour_no_symmetry(b, "DIV");
-#endif
-#ifdef CT_MODULO_ABC
+
+
       case CT_MODULO: return colour_no_symmetry(b, "MOD");
-#endif
 
-#ifdef CT_WATCHED_VEC_OR_AND_ABC
-      case CT_WATCHED_VEC_OR_AND: return colour_array_swap_each_index(b, "VEC_OR_AND");
-#endif
 
-#ifdef CT_WATCHED_VEC_OR_LESS_ABC
+
+
+
+
       case CT_WATCHED_VEC_OR_LESS: return colour_symmetric_indexes(b, "VEC_OR_LESS");
-#endif
-#ifdef CT_WATCHED_HAMMING_ABC
-      case CT_WATCHED_HAMMING: return colour_array_swap_each_index(b, "HAMMING");
-#endif
-#ifdef CT_WATCHED_LIT_ABC
-      case CT_WATCHED_LIT: return colour_lit(b, "WATCHED_LIT");
-#endif
-#ifdef CT_WATCHED_NOTLIT_ABC
-      case CT_WATCHED_NOTLIT: return colour_lit(b, "WATCHED_NOTLIT");
-#endif
-#ifdef CT_WATCHED_INSET_ABC
-      case CT_WATCHED_INSET: return colour_litlist(b, "WATCHED_INSET");
-#endif
-#ifdef CT_WATCHED_NOT_INSET_ABC
-      case CT_WATCHED_NOT_INSET: return colour_litlist(b, "WATCHED_NOT_INSET");
-#endif
-#ifdef CT_WATCHED_INRANGE_ABC
-      case CT_WATCHED_INRANGE: return colour_litlist(b, "WATCHED_INRANGE");
-#endif
-#ifdef CT_WATCHED_NOT_INRANGE_ABC
-      case CT_WATCHED_NOT_INRANGE: return colour_litlist(b, "WATCHED_NOT_INRANGE");
-#endif
 
-#ifdef CT_GCC_ABC
+
+      case CT_WATCHED_HAMMING: return colour_array_swap_each_index(b, "HAMMING");
+
+
+      case CT_WATCHED_LIT: return colour_lit(b, "WATCHED_LIT");
+
+
+      case CT_WATCHED_NOTLIT: return colour_lit(b, "WATCHED_NOTLIT");
+
+
+      case CT_WATCHED_INSET: return colour_litlist(b, "WATCHED_INSET");
+
+
+      case CT_WATCHED_NOT_INSET: return colour_litlist(b, "WATCHED_NOT_INSET");
+
+
+      case CT_WATCHED_INRANGE: return colour_litlist(b, "WATCHED_INRANGE");
+
+
+      case CT_WATCHED_NOT_INRANGE: return colour_litlist(b, "WATCHED_NOT_INRANGE");
+
+
+
       case CT_GCC:  return colour_gcc(b, "GCC");
-#endif
-#ifdef CT_GCCWEAK_ABC
+
+
       case CT_GCCWEAK: return colour_gcc(b, "GCC");
-#endif
-#ifdef CT_FALSE_ABC
+
+
       case CT_FALSE: return g.new_vertex("FALSE");
-#endif
-#ifdef CT_TRUE_ABC
+
+
       case CT_TRUE: return g.new_vertex("TRUE");
-#endif
-#ifdef CT_WATCHED_NEW_OR_ABC
+
+
       case CT_WATCHED_NEW_OR: return colour_symmetric_parent_constraint(b, "OR");
-#endif
-#ifdef CT_WATCHED_NEW_AND_ABC
+
+
       case CT_WATCHED_NEW_AND: return colour_symmetric_parent_constraint(b, "AND");
-#endif
+
 
       default:
         cerr << "No colouring defined for " << b.constraint->name << endl;

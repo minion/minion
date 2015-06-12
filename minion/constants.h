@@ -22,7 +22,6 @@
 
 #include <string>
 
-#include "BuildDefines.h"
 
 #define BTWLDEF
 

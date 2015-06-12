@@ -179,16 +179,12 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
 
   switch(constraint->type)
   {
-#ifdef CT_WATCHED_TABLE_ABC
     case CT_WATCHED_TABLE:
       readConstraintTable(infile, get_constraint(constraint->type));
       break;
-#endif
-#ifdef CT_WATCHED_NEGATIVE_TABLE_ABC
     case CT_WATCHED_NEGATIVE_TABLE:
       readConstraintTable(infile, get_constraint(constraint->type));
       break;
-#endif
 
     default:
       readGeneralConstraint(infile, constraint);
