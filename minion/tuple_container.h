@@ -24,7 +24,7 @@
 
 #define TUPLE_SQUASH
 #ifdef TUPLE_SQUASH
-#include "../tuple_squeeze/squash.hpp"
+#include "squash.hpp"
 #endif
 
 using namespace std;
