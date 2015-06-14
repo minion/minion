@@ -178,8 +178,8 @@ struct BoundVarRef_internal
   DomainInt getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
 
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  {  GET_LOCAL_CON().addDynamicTrigger(*this, t, type, pos BT_CALL); }
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
+  {  GET_LOCAL_CON().addDynamicTrigger(*this, t, type, pos , op); }
 
 };
 
@@ -445,7 +445,7 @@ struct BoundVarContainer {
   { wdegs[checked_cast<SysInt>(b.var_num)]++; }
 #endif
 
-  void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
+  void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
   {
     D_ASSERT(lock_m);
     if(type == DomainRemoval)
@@ -453,7 +453,7 @@ struct BoundVarContainer {
         USER_ERROR("Some constraint you are using does not work with BOUND variables\n"
                    "Unfortunatly we cannot tell you which one. Sorry!");
     }
-    trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL);
+    trigger_list.addDynamicTrigger(b.var_num, t, type, pos , op);
   }
 
   operator std::string()

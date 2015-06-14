@@ -348,7 +348,7 @@
       dt=dt+lit;
       D_ASSERT(!dt->isAttached());
 
-      vars[var].addDynamicTrigger(dt, DomainRemoval, val );   //BT_CALL_BACKTRACK
+      vars[var].addDynamicTrigger(dt, DomainRemoval, val );   //, TO_Backtrack
   }
 
   inline void detach_trigger(SysInt lit)
@@ -359,7 +359,7 @@
 
       DynamicTrigger* dt = dynamic_trigger_start();
       dt=dt+lit;
-      releaseTrigger(stateObj, dt);   // BT_CALL_BACKTRACK
+      releaseTrigger(stateObj, dt);   // , TO_Backtrack
   }
 
       BOOL hasNoKnownSupport(SysInt var,SysInt lit) {

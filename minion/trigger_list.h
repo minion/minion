@@ -285,7 +285,7 @@ public:
   }
 
 
-  void addDynamicTrigger(DomainInt b, DynamicTrigger* t, TrigType type, DomainInt val BT_FUNDEF)
+  void addDynamicTrigger(DomainInt b, DynamicTrigger* t, TrigType type, DomainInt val , TrigOp op = TO_Default)
   {
     D_ASSERT(lock_second);
     D_ASSERT(!only_bounds || type != DomainRemoval);
@@ -311,7 +311,6 @@ public:
     }
     D_ASSERT(queue->sanity_check_list());
 
-#ifdef BTWLDEF
     switch(op)
     {
         case TO_Default:
@@ -329,7 +328,6 @@ public:
         default:
         abort();
     }
-#endif
 
     t->add_after(queue);
     D_ASSERT(old_list == NULL || old_list->sanity_check_list(false));
@@ -355,9 +353,8 @@ void inline TriggerMem::finaliseTriggerLists()
     D_ASSERT(triggerlist_offset - getTriggerMem(stateObj).getTriggerListDataPtr() == (SysInt)trigger_size);
   }
 
-inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t BT_FUNDEF_NODEFAULT)
+inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t , TrigOp op)
 {
-#ifdef BTWLDEF
     switch(op)
     {
         case TO_Default:
@@ -375,16 +372,14 @@ inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t BT_FUNDEF_NODEF
         default:
         abort();
     }
-#endif
 
     t->remove();
 }
 
- inline void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* t BT_FUNDEF_NODEFAULT)
+ inline void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* t , TrigOp op)
  {    static DynamicTrigger dt;
     DynamicTrigger* queue = &dt;
 
-#ifdef BTWLDEF
     switch(op)
     {
         case TO_Default:
@@ -402,7 +397,6 @@ inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t BT_FUNDEF_NODEF
         default:
         abort();
     }
-#endif
     t->add_after(queue);
  }
 

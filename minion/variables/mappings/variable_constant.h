@@ -103,9 +103,9 @@ struct ConstantVar
   { }
 
 
-  void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = NoDomainValue BT_FUNDEF)
+  void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = NoDomainValue , TrigOp op = TO_Default)
   {
-    attachTriggerToNullList(stateObj, dt BT_CALL);
+    attachTriggerToNullList(stateObj, dt , op);
   }
 
   vector<AbstractConstraint*>* getConstraints() { return NULL; }

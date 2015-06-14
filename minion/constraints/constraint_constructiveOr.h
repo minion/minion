@@ -136,7 +136,7 @@ struct ConstructiveOr : public AbstractConstraint, Backtrackable
       dt=dt+(var*numvals)+(val-dom_min);
       D_ASSERT(!dt->isAttached());
       
-      var_array[var].addDynamicTrigger(dt, DomainRemoval, val );   //BT_CALL_BACKTRACK
+      var_array[var].addDynamicTrigger(dt, DomainRemoval, val );   //, TO_Backtrack
   }
   
   virtual BOOL check_assignment(DomainInt* v, int v_size)

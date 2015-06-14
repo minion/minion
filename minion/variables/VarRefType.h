@@ -131,8 +131,8 @@ struct VarRefType
   DomainInt getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
 
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos BT_CALL); }
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
+  {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos , op); }
 };
 
 template<typename GetContainer, typename InternalRefType>
@@ -239,8 +239,8 @@ struct QuickVarRefType
   DomainInt getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
 
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos BT_CALL); }
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
+  {  GET_CONTAINER().addDynamicTrigger(data, t, type, pos , op); }
 };
 
 #endif

@@ -256,7 +256,7 @@ struct NewTableConstraint : public AbstractConstraint
     P(propagated_literal << "." << vars.size() << "." << lit.var << "." << lit.val);
     if(!vars[lit.var].inDomain(lit.val))
     {
-      //releaseTrigger(stateObj, propagated_trig BT_CALL_BACKTRACK);
+      //releaseTrigger(stateObj, propagated_trig , TO_Backtrack);
       P("Quick return");
       return;
     }
@@ -288,7 +288,7 @@ struct NewTableConstraint : public AbstractConstraint
         P(vars.size() << ".Watching " << v << "." << support[v] << " for " << lit.var << "." << lit.val);
         D_ASSERT(vars[v].inDomain(support[v]));
         PROP_INFO_ADDONE(CounterA);
-        vars[v].addDynamicTrigger(dt, DomainRemoval, support[v] BT_CALL_STORE);
+        vars[v].addDynamicTrigger(dt, DomainRemoval, support[v] , TO_Store);
         ++dt;
       }
     }
@@ -302,7 +302,7 @@ struct NewTableConstraint : public AbstractConstraint
     dt += lit_pos * (vars_size - 1);
     for(SysInt v = 0; v < vars_size; ++v)
     {
-      releaseTrigger(stateObj, dt BT_CALL_BACKTRACK);
+      releaseTrigger(stateObj, dt , TO_Backtrack);
       ++dt;
     }
   }

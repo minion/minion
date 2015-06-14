@@ -71,7 +71,7 @@ struct TriggerBacktrackQueue
             if (tl[i].second == NULL)
             {
                 P("Release " << tl[i].first);
-                releaseTrigger(stateObj, tl[i].first BT_CALL_STORE);
+                releaseTrigger(stateObj, tl[i].first , TO_Store);
             }
             else
             {

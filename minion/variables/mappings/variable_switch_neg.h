@@ -156,7 +156,7 @@ struct SwitchNeg
    return o << "SwitchNeg " << v.multiplier << ":" << v.data;
  }
 
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
+  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
   {
     if(multiplier == 1)
     {
@@ -167,17 +167,17 @@ struct SwitchNeg
     switch(type)
     {
       case UpperBound:
-        data.addDynamicTrigger(t, LowerBound, pos BT_CALL);
+        data.addDynamicTrigger(t, LowerBound, pos , op);
         break;
       case LowerBound:
-        data.addDynamicTrigger(t, UpperBound, pos BT_CALL);
+        data.addDynamicTrigger(t, UpperBound, pos , op);
         break;
       case Assigned:
       case DomainChanged:
-        data.addDynamicTrigger(t, type, pos BT_CALL);
+        data.addDynamicTrigger(t, type, pos , op);
         break;
       case DomainRemoval:
-        data.addDynamicTrigger(t, DomainRemoval, -pos BT_CALL);
+        data.addDynamicTrigger(t, DomainRemoval, -pos , op);
         break;
       default:
         D_FATAL_ERROR("Broken dynamic trigger");
