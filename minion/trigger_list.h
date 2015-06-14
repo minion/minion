@@ -134,17 +134,6 @@ public:
 
   void allocateMem(char* mem_start)
   {
-#ifdef SORT_TRIGGERRANGES
-    // We can sort triggers if you like here!
-    for(UnsignedSysInt type = 0; type < 4; ++type)
-    {
-      for(UnsignedSysInt i = 0; i < triggers[type].size(); ++i)
-      {
-        std::sort(triggers[type][i].begin(), triggers[type][i].end(), CompareMem());
-      }
-    }
-#endif
-
     D_ASSERT(lock_first && !lock_second);
     lock_second = true;
     Trigger** trigger_ranges = (Trigger**)(mem_start);
