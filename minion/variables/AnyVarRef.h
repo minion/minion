@@ -292,10 +292,8 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract
   DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {  data.addDynamicTrigger(t, type, pos BT_CALL); }
-#endif
 };
 
 
@@ -413,10 +411,8 @@ public:
   DomainInt getDomainChange(DomainDelta d)
   { return data->getDomainChange(d); }
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {  data->addDynamicTrigger(t, type, pos BT_CALL); }
-#endif
 };
 
 

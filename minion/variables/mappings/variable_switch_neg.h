@@ -156,7 +156,6 @@ struct SwitchNeg
    return o << "SwitchNeg " << v.multiplier << ":" << v.data;
  }
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {
     if(multiplier == 1)
@@ -184,7 +183,6 @@ struct SwitchNeg
         D_FATAL_ERROR("Broken dynamic trigger");
     }
   }
-#endif
 
   vector<AbstractConstraint*>* getConstraints()
   { return data.getConstraints(); }

@@ -222,10 +222,8 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
     }
   }
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {  data.addDynamicTrigger(t, type, pos); }
-#endif
 
 
   friend std::ostream& operator<<(std::ostream& o, const MultiplyVar& n)
@@ -398,7 +396,6 @@ struct MultiplyVar
     }
   }
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {
     switch(type)
@@ -427,7 +424,6 @@ struct MultiplyVar
         D_FATAL_ERROR("Broken dynamic trigger");
     }
   }
-#endif
 
 
 

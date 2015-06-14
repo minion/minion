@@ -139,7 +139,6 @@ struct VarNot
   DomainInt getDomainChange(DomainDelta d)
   { return data.getDomainChange(d); }
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {
     switch(type)
@@ -161,7 +160,6 @@ struct VarNot
         D_FATAL_ERROR("Broken dynamic trigger");
     }
   }
-#endif
 
   vector<AbstractConstraint*>* getConstraints()
   { return data.getConstraints(); }

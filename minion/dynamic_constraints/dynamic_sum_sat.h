@@ -43,9 +43,6 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
   BoolSATConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array) :
     AbstractConstraint(_stateObj), var_array(_var_array)
   { 
-#ifndef DYNAMICTRIGGERS
-   output_fatal_error("Need watched literals enabled for constraint");
-#endif
     last = 0;
   }
   

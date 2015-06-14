@@ -439,7 +439,6 @@ struct SparseBoundVarContainer {
   { wdegs[b.var_num]++; }
 #endif
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {
     D_ASSERT(lock_m);
@@ -450,7 +449,6 @@ struct SparseBoundVarContainer {
     }
     trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL);
   }
-#endif
 
   operator std::string()
   {

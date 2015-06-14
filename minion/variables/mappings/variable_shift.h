@@ -108,7 +108,6 @@ struct ShiftVar
   }
 
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {
     switch(type)
@@ -130,7 +129,6 @@ struct ShiftVar
         D_FATAL_ERROR("Broken dynamic trigger");
     }
   }
-#endif
 
   friend std::ostream& operator<<(std::ostream& o, const ShiftVar& sv)
   { return o << "Shift " << sv.data << "+" << sv.shift; }

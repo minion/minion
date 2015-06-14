@@ -98,9 +98,6 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
   AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), last(0)
   {
     D_ASSERT((VarToCount == 0) || (VarToCount == 1));
-#ifndef DYNAMICTRIGGERS
-   output_fatal_error("Need watched literals enabled for constraint");
-#endif
   // Sum of 1's is >= K
   // == Number of 1's is >=K         // this is the one I want to do
   // == Number of 0's is <= N-K

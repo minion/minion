@@ -127,7 +127,6 @@ struct VarNeg
   friend std::ostream& operator<<(std::ostream& o, const VarNeg& n)
   { return o << "Neg " << n.data; }
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {
     switch(type)
@@ -149,7 +148,6 @@ struct VarNeg
         D_FATAL_ERROR("Broken dynamic trigger");
     }
   }
-#endif
 
   vector<AbstractConstraint*>* getConstraints()
   { return data.getConstraints(); }

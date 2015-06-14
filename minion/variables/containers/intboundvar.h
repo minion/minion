@@ -178,10 +178,8 @@ struct BoundVarRef_internal
   DomainInt getDomainChange(DomainDelta d)
   { return d.XXX_get_domain_diff(); }
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {  GET_LOCAL_CON().addDynamicTrigger(*this, t, type, pos BT_CALL); }
-#endif
 
 };
 
@@ -447,7 +445,6 @@ struct BoundVarContainer {
   { wdegs[checked_cast<SysInt>(b.var_num)]++; }
 #endif
 
-#ifdef DYNAMICTRIGGERS
   void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
   {
     D_ASSERT(lock_m);
@@ -458,7 +455,6 @@ struct BoundVarContainer {
     }
     trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL);
   }
-#endif
 
   operator std::string()
   {

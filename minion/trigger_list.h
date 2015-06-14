@@ -107,17 +107,10 @@ public:
     for(UnsignedSysInt i = 0; i < 4; ++i)
       triggers[i].resize(var_count_m);
 
-#ifdef DYNAMICTRIGGERS
     if(only_bounds)
       dynamic_triggers = checked_malloc(size * sizeof(DynamicTrigger) * 4);
     else
       dynamic_triggers = checked_malloc(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
-#else
-    if(only_bounds)
-      dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * 4);
-    else
-      dynamic_triggers = getMemory(stateObj).backTrack().request_bytes(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
-#endif
     getTriggerMem(stateObj).addTriggerList(this);
   }
 
