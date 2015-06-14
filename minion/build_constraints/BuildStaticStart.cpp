@@ -82,7 +82,6 @@ case CT_GACEQ: return build_constraint_CT_GACEQ(stateObj, b);
 case CT_GACSCHEMA: return build_constraint_CT_GACSCHEMA(stateObj, b);
 case CT_MDDC: return build_constraint_CT_MDDC(stateObj, b);
 case CT_NEGATIVEMDDC: return build_constraint_CT_NEGATIVEMDDC(stateObj, b);
-case CT_TEST: return build_constraint_CT_TEST(stateObj, b);
 case CT_VM: return build_constraint_CT_VM(stateObj, b);
 case CT_VM_SYM: return build_constraint_CT_VM_SYM(stateObj, b);
 case CT_TABLE_VM: return build_constraint_CT_TABLE_VM(stateObj, b);

@@ -13,7 +13,7 @@ set(ALL_CONSTRAINTS "element" "element_undefzero" "element_one" "watchelement" "
                     "true" "false" "check[gsa]" "check[assign]" "forwardchecking"
                     "watchvecexists_less" "lighttable"
                     "haggisgac" "haggisgac-stable" "str2plus" "shortstr2" "gaceq" "gacschema"
-                    "mddc" "negativemddc" "test" "vm" "vmsym"
+                    "mddc" "negativemddc" "vm" "vmsym"
                     "tablevm" "negativetablevm"
                     "nvalueleq" "nvaluegeq"
                     )
@@ -122,9 +122,6 @@ set(NAME_READ_max "read_list" "read_var")
 
 set(NAME_ID_min "CT_MIN")
 set(NAME_READ_min "read_list" "read_var")
-
-set(NAME_ID_test "CT_TEST")
-set(NAME_READ_test "read_list")
 
 set(NAME_ID_occurrence "CT_OCCURRENCE")
 set(NAME_READ_occurrence "read_list" "read_constant" "read_var")
