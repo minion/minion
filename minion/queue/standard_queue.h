@@ -20,18 +20,9 @@
 #ifndef STANDARD_QUEUE_H
 #define STANDARD_QUEUE_H
 
-// use a deque (as a fifo) for the special queue
-#define SQ_DEQUE
-
-#ifdef SQ_DEQUE
 #define QueueCon deque
 #define queueTop front
 #define queuePop pop_front
-#else
-#define QueueCon vector
-#define queueTop back
-#define queuePop pop_back
-#endif
 
 #include <deque>
 #include "../solver.h"

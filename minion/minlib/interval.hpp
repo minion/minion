@@ -5,41 +5,7 @@
 #ifndef INTERVAL_HPP_FDASJKLFDA
 #define INTERVAL_HPP_FDASJKLFDA
 
-//#define ITL_SETS
 
-#ifdef ITL_SETS
-#include <boost/icl/interval.hpp>
-#include <boost/icl/interval_set.hpp>
-
-#define INTERVAL itl::discrete_interval
-#define INTERVAL_SET itl::interval_set
-
-namespace itl
-{ using namespace boost::icl; }
-
-template<typename T>
-bool interval_empty(const INTERVAL<T>& t)
-{ return itl::is_empty(t); }
-
-template<typename T>
-INTERVAL<T> intervalise(T t)
-{ return itl::discrete_interval<T>::closed(t,t); }
-
-template<typename T>
-INTERVAL<T>
-make_interval(T x,T y)
-{ return itl::discrete_interval<T>::closed(x,y); }
-
-
-template<typename T>
-void is_insert(INTERVAL_SET<T>& is, INTERVAL<T> i)
-{ is.insert(i); }
-
-template<typename T>
-void is_insert(INTERVAL_SET<T>& is, T i)
-{ is.insert(i); }
-
-#else
 #include "basic_sys.hpp"
 
 namespace dom
@@ -164,7 +130,6 @@ template<typename T>
 void is_insert(INTERVAL_SET<T>& is, T i)
 { is._s.insert(i); }
 
-#endif
 
 template<typename T>
 bool single_range(const INTERVAL_SET<T>& t)
