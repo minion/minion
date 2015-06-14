@@ -202,11 +202,6 @@ template<typename T>
 struct NotType<vector<T> >
 { typedef vector<VarNot<T> > type; };
 
-#ifdef LIGHT_VECTOR
-template<typename T>
-struct NotType<vector<T> >
-{ typedef vector<VarNot<T> > type; };
-#endif
 
 template<typename T, std::size_t i>
 struct NotType<std::array<T, i> >
@@ -234,17 +229,6 @@ VarNotRef(const vector<VarRef>& var_array)
   return Not_array;
 }
 
-#ifdef LIGHT_VECTOR
-template<typename VarRef>
-vector<VarNot<VarRef> >
-VarNotRef(const vector<VarRef>& var_array)
-{
-  vector<VarNot<VarRef> > Not_array(var_array.size());
-  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-    Not_array[i] = VarNotRef(var_array[i]);
-  return Not_array;
-}
-#endif
 
 template<typename VarRef, std::size_t i>
 std::array<VarNot<VarRef>, i>

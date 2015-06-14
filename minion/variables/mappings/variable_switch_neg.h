@@ -221,11 +221,6 @@ template<typename T>
 struct SwitchNegType<vector<T> >
 { typedef vector<SwitchNeg<T> > type; };
 
-#ifdef LIGHT_VECTOR
-template<typename T>
-struct SwitchNegType<vector<T> >
-{ typedef vector<SwitchNeg<T> > type; };
-#endif
 
 template<typename T, std::size_t i>
 struct SwitchNegType<std::array<T, i> >
@@ -248,17 +243,6 @@ SwitchNegRef(const vector<VarRef>& var_array)
   return neg_array;
 }
 
-#ifdef LIGHT_VECTOR
-template<typename VarRef>
-vector<SwitchNeg<VarRef> >
-SwitchNegRef(const vector<VarRef>& var_array)
-{
-  vector<SwitchNeg<VarRef> > neg_array(var_array.size);
-  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-    neg_array[i] = SwitchNegRef(var_array[i]);
-  return neg_array;
-}
-#endif
 
 template<typename VarRef, std::size_t i>
 std::array<SwitchNeg<VarRef>, i>

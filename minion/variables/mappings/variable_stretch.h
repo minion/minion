@@ -469,11 +469,6 @@ template<typename T>
 struct MultiplyType<vector<T> >
 { typedef vector<MultiplyVar<T> > type; };
 
-#ifdef LIGHT_VECTOR
-template<typename T>
-struct MultiplyType<vector<T> >
-{ typedef vector<MultiplyVar<T> > type; };
-#endif
 
 template<typename T, std::size_t i>
 struct MultiplyType<std::array<T, i> >
@@ -495,17 +490,6 @@ MultiplyVarRef(const vector<VarRef>& var_array, const vector<DomainInt>& multipl
   return Multiply_array;
 }
 
-#ifdef LIGHT_VECTOR
-template<typename VarRef>
-vector<MultiplyVar<VarRef> >
-MultiplyVarRef(const vector<VarRef>& var_array, const vector<DomainInt>& multiplies)
-{
-  vector<MultiplyVar<VarRef> > Multiply_array(var_array.size());
-  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-    Multiply_array[i] = MultiplyVarRef(var_array[i], multiplies[i]);
-  return Multiply_array;
-}
-#endif
 
 template<typename VarRef, std::size_t i>
 std::array<MultiplyVar<VarRef>, i>
