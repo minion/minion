@@ -306,9 +306,7 @@ struct SparseBoundVarContainer {
     trigger_list.push_domain_changed(d.var_num);
     trigger_list.push_assign(d.var_num, i);
 
-#ifdef FULL_DOMAIN_TRIGGERS
     // Can't attach triggers to bound vars!
-#endif
 
     if(min_val != i) {
       trigger_list.push_lower(d.var_num, i - min_val);
@@ -351,9 +349,7 @@ struct SparseBoundVarContainer {
     {
       trigger_list.push_upper(d.var_num, up_bound - i);
       trigger_list.push_domain_changed(d.var_num);
-#ifdef FULL_DOMAIN_TRIGGERS
   // Can't attach triggers to bound vars!
-#endif
 
       upper_bound(d) = i;
       if(low_bound == i) {
@@ -380,9 +376,7 @@ struct SparseBoundVarContainer {
     {
       trigger_list.push_lower(d.var_num, i - low_bound);
       trigger_list.push_domain_changed(d.var_num);
-#ifdef FULL_DOMAIN_TRIGGERS
       // Can't attach triggers to bound vars!
-#endif
       lower_bound(d) = i;
       if(up_bound == i) {
        trigger_list.push_assign(d.var_num, i);

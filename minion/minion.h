@@ -22,10 +22,7 @@
 #define MANY_VAR_CONTAINERS
 #endif
 #include "system/system.h"
-// XXX These could possibly be turned off, but it's possible it will require
-// Some small amount of work to make them work.
-#define FULL_DOMAIN_TRIGGERS
-//#endif
+
 #define VERSION "Minion Version 1.8"
 #define REVISION "HG revision $Revision$"
 // above line will work but only gives revision of this file,

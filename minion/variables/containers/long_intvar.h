@@ -339,10 +339,8 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove
 #endif
       return;
     }
-#ifdef FULL_DOMAIN_TRIGGERS
     trigger_list.push_domain_removal(d.var_num, i);
     reduce_dom_size(d);
-#endif
 #ifndef NO_DOMAIN_TRIGGERS
     trigger_list.push_domain_changed(d.var_num);
 #endif
@@ -422,7 +420,6 @@ private:
   // This function just unifies part of propagateAssign and uncheckedAssign
   void commonAssign(BigRangeVarRef_internal d, DomainInt offset, DomainInt lower, DomainInt upper)
   {
-#ifdef FULL_DOMAIN_TRIGGERS
     // TODO : Optimise this function to only check values in domain.
     DomainInt domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
     for(DomainInt loop = lower; loop <= upper; ++loop)
@@ -433,7 +430,6 @@ private:
         reduce_dom_size(d);
       }
     }
-#endif
     trigger_list.push_domain_changed(d.var_num);
     trigger_list.push_assign(d.var_num, offset);
 
@@ -477,7 +473,6 @@ public:
 
     if(offset < up_bound)
     {
-#ifdef FULL_DOMAIN_TRIGGERS
       // TODO : Optimise this function to only check values in domain.
       DomainInt domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
       for(DomainInt loop = offset + 1; loop <= up_bound; ++loop)
@@ -488,7 +483,6 @@ public:
           reduce_dom_size(d);
         }
       }
-#endif
       upper_bound(d) = offset;
       DomainInt new_upper = find_new_upper_bound(d);
       upper_bound(d) = new_upper;
@@ -534,7 +528,6 @@ public:
 
     if(offset > low_bound)
     {
-#ifdef FULL_DOMAIN_TRIGGERS
       // TODO : Optimise this function to only check values in domain.
       DomainInt domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;
       for(DomainInt loop = low_bound; loop < offset; ++loop)
@@ -545,7 +538,6 @@ public:
           reduce_dom_size(d);
         }
       }
-#endif
     D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
     lower_bound(d) = offset;
