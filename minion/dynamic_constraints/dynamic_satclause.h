@@ -41,9 +41,6 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
     AbstractConstraint(_stateObj), var_array(_var_array), negs(_negs), last(0)
   {
     watched[0] = watched[1] = -2;
-#ifndef WATCHEDLITERALS
-    output_fatal_error("Need watched literals enabled for constraint");
-#endif
   }
 
   virtual SysInt dynamic_trigger_count()
