@@ -31,8 +31,6 @@ ensures that at least one of the constraints C1,...,Cn is true.
   help constraints watched-and
 */
 
-#define SLOW_WOR
-
 #ifndef DYNAMIC_WATCHED_OR_NEW_H
 #define DYNAMIC_WATCHED_OR_NEW_H
 
@@ -232,13 +230,8 @@ struct Dynamic_OR : public ParentConstraint
       // Need to propagate!
       propagated_constraint = watched_constraint[other_constraint];
       //the following may be necessary for correctness for some constraints
-#ifdef SLOW_WOR
       constraint_locked = true;
       getQueue(stateObj).pushSpecialTrigger(this);
-#else
-      child_constraints[propagated_constraint]->full_propagate();
-      full_propagate_called = true;
-#endif
       return;
     }
 
