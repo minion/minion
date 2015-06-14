@@ -50,12 +50,6 @@ typedef unsigned int UnsignedSysInt;
 
 
 #ifdef MINION_DEBUG
-#ifndef BOUNDS_CHECK
-#define BOUNDS_CHECK
-#endif
-#endif
-
-#ifdef BOUNDS_CHECK
 typedef Wrapper<SysInt> DomainInt;
 #else
 typedef SysInt DomainInt;
