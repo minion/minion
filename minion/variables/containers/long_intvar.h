@@ -114,11 +114,7 @@ struct BigRangeVarContainer {
   UnsignedSysInt var_count_m;
   BOOL lock_m;
 
-#ifdef SLOW_DOM_SIZE
-#define BOUND_DATA_SIZE 2
-#else
 #define BOUND_DATA_SIZE 3
-#endif
 
   domain_bound_type& lower_bound(BigRangeVarRef_internal i) const
   { return static_cast<domain_bound_type*>(bound_data)[i.var_num*BOUND_DATA_SIZE]; }
@@ -126,16 +122,11 @@ struct BigRangeVarContainer {
   domain_bound_type& upper_bound(BigRangeVarRef_internal i) const
   { return static_cast<domain_bound_type*>(bound_data)[i.var_num*BOUND_DATA_SIZE + 1]; }
 
-#ifdef SLOW_DOM_SIZE
-  void reduce_dom_size(BigRangeVarRef_internal i)
-  {}
-#else
   domain_bound_type& dom_size(BigRangeVarRef_internal i) const
   { return static_cast<domain_bound_type*>(bound_data)[i.var_num*BOUND_DATA_SIZE + 2]; }
 
   void reduce_dom_size(BigRangeVarRef_internal i)
   { dom_size(i)-=1; }
-#endif
 
   /// Find new "true" upper bound.
   /// This should be used by first setting the value of upper_bound(d), then calling
@@ -242,9 +233,7 @@ struct BigRangeVarContainer {
       {
         bound_ptr[BOUND_DATA_SIZE*i] = initial_bounds[i].first;
         bound_ptr[BOUND_DATA_SIZE*i+1] = initial_bounds[i].second;
-#ifndef SLOW_DOM_SIZE
         bound_ptr[BOUND_DATA_SIZE*i+2] = initial_bounds[i].second - initial_bounds[i].first + 1;
-#endif
         min_domain_val = mymin(initial_bounds[i].first, min_domain_val);
         max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
       }
