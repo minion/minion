@@ -289,10 +289,8 @@ struct BoolVarContainer
     assign_ptr()[d.data_offset()] |= d.shift_offset;
 
     trigger_list.push_assign(d.var_num, b);
-#ifndef FEW_BOOLEAN_TRIGGERS
     trigger_list.push_domain_changed(d.var_num);
     trigger_list.push_domain_removal(d.var_num, 1 - b);
-#endif
 
     if(b == 1)
     {
@@ -326,12 +324,6 @@ struct BoolVarContainer
   void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type)
   {
     D_ASSERT(lock_m);
-#ifdef FEW_BOOLEAN_TRIGGERS
-    if(type == DomainChanged)
-      type = Assigned;
-    // Static triggers should never be of this type!
-    D_ASSERT(type != DomainRemoval);
-#endif
     trigger_list.add_trigger(b.var_num, t, type);
   }
 
@@ -340,20 +332,6 @@ struct BoolVarContainer
     D_ASSERT(pos == NoDomainValue || ( type == DomainRemoval && pos != NoDomainValue ) );
     D_ASSERT(lock_m);
 
-#ifdef FEW_BOOLEAN_TRIGGERS
-    TrigType new_type = type;
-    switch(type)
-    {
-      case DomainChanged:
-        new_type = Assigned; break;
-      case DomainRemoval:
-        if(pos == 0)
-          new_type = LowerBound;
-        else
-          new_type = UpperBound;
-    }
-    pos = NoDomainValue;
-#endif
     trigger_list.addDynamicTrigger(b.var_num, t, type, pos BT_CALL);
   }
 
