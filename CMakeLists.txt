@@ -327,12 +327,6 @@ if(WDEG)
     add_definitions(-DWDEG)
 endif()
 
-option(WTRIG "" OFF)
-if(WTRIG)
-    message(STATUS "Enabling weighted triggers")
-    set(BINARY "${BINARY}-wtrig")
-    add_definitions(-DWEIGHTED_TRIGGERS)
-endif()
 
 option(INFO "" OFF)
 if(INFO)

@@ -30,20 +30,13 @@
 #include "../constraints/triggers.h"
 #include "../constraints/constraint_abstract.h"
 #include "TriggerBacktrackQueue.h"
-#ifdef WEIGHTED_TRIGGERS
-#include <queue>
-#endif
 
 class Queues
 {
   StateObj* stateObj;
 
 
-#ifdef WEIGHTED_TRIGGERS
-  priority_queue<TriggerRange> propagate_trigger_list;
-#else
   QueueCon<TriggerRange> propagate_trigger_list;
-#endif
   QueueCon<DynamicTrigger*> dynamic_trigger_list;
 
   // Special triggers are those which can only be run while the
@@ -73,11 +66,7 @@ public:
   inline void pushTriggers(TriggerRange new_triggers)
   {
     CON_INFO_ADDONE(AddConToQueue);
-#ifdef WEIGHTED_TRIGGERS
-    propagate_trigger_list.push(new_triggers);
-#else
     propagate_trigger_list.push_back(new_triggers);
-#endif
   }
 
   void pushDynamicTriggers(DynamicTrigger* new_dynamic_trig_range)
@@ -90,13 +79,7 @@ public:
 
   void clearQueues()
   {
-#ifdef WEIGHTED_TRIGGERS
-    while(!propagate_trigger_list.empty()) {
-      propagate_trigger_list.pop();
-    }
-#else
     propagate_trigger_list.clear();
-#endif
     dynamic_trigger_list.clear();
 
     if(!special_triggers.empty())
@@ -164,15 +147,9 @@ public:
     bool* fail_ptr = getState(stateObj).getFailedPtr();
     while(!propagate_trigger_list.empty())
     {
-#ifdef WEIGHTED_TRIGGERS
-      TriggerRange t = propagate_trigger_list.top();
-      DomainInt data_val = t.data;
-      propagate_trigger_list.pop();
-#else
       TriggerRange t = propagate_trigger_list.queueTop();
       DomainInt data_val = t.data;
       propagate_trigger_list.queuePop();
-#endif
 
       for(Trigger* it = t.begin(); it != t.end(); it++)
       {
@@ -294,15 +271,9 @@ public:
     bool* fail_ptr = getState(stateObj).getFailedPtr();
     while(!propagate_trigger_list.empty())
     {
-#ifdef WEIGHTED_TRIGGERS
-      TriggerRange t = propagate_trigger_list.top();
-      DomainInt data_val = t.data;
-      propagate_trigger_list.pop();
-#else
       TriggerRange t = propagate_trigger_list.queueTop();
       DomainInt data_val = t.data;
       propagate_trigger_list.queuePop();
-#endif
 
       for(Trigger* it = t.begin(); it != t.end(); it++)
       {

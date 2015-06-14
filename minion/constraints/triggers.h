@@ -55,42 +55,24 @@ public:
   AbstractConstraint* constraint;
   /// The first value to be passed to the propagate function.
   DomainInt info;
-#ifdef WEIGHTED_TRIGGERS
-  SysInt weight;
-#endif
   
   template<typename T>
     Trigger(T* _sc, DomainInt _info) : constraint(_sc), info(_info)
   {
-#ifdef WEIGHTED_TRIGGERS
-    weight = _sc->get_vars_singleton()->size();
-#endif
   }
   
   Trigger(const Trigger& t) : constraint(t.constraint), info(t.info) 
   {
-#ifdef WEIGHTED_TRIGGERS
-    weight = t.weight;
-#endif
   }
   
   Trigger() : constraint(NULL)
   {
-#ifdef WEIGHTED_TRIGGERS
-    weight = 0;
-#endif
   }
   
   void inline propagate(DomainDelta domain_data);
   void full_propagate();
   // In function_defs.hpp.
 
-#ifdef WEIGHTED_TRIGGERS
-  bool operator<(const Trigger &a) const
-  {
-    return weight > a.weight;
-  }
-#endif
 };
 
  
@@ -114,25 +96,12 @@ public:
   /** This may not contain the actual delta, but contains data from which a variable can
    construct it, by passing it to getDomainChange. */
   DomainInt data;
-#ifdef WEIGHTED_TRIGGERS
-  SysInt weight;
-#endif
   TriggerRange(Trigger* s, Trigger* e, DomainInt _data) : start(s), finish(e), data(_data)
   { 
     D_ASSERT(data >= DomainInt_Min);
     D_ASSERT(data <= DomainInt_Max);
-#ifdef WEIGHTED_TRIGGERS
-    std::sort(s, e);
-    weight = s->weight;
-#endif
   }
 
-#ifdef WEIGHTED_TRIGGERS
-  bool operator<(const TriggerRange &a) const
-  {
-    return weight > a.weight;
-  }
-#endif
 };
 
 /// Abstract Type that represents any Trigger Creator.
