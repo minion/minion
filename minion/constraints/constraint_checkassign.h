@@ -42,8 +42,8 @@ struct CheckAssignConstraint : public AbstractConstraint
 
   ReversibleInt assigned_vars;
 
-  CheckAssignConstraint(StateObj* _stateObj, const OriginalConstraint& con)
-  : AbstractConstraint(_stateObj), originalcon(con), assigned_vars(stateObj)
+  CheckAssignConstraint(const OriginalConstraint& con)
+  : originalcon(con), assigned_vars()
   { }
 
   virtual triggerCollection setup_internal()
@@ -57,14 +57,14 @@ struct CheckAssignConstraint : public AbstractConstraint
 
   virtual AbstractConstraint* reverse_constraint()
   {
-    return new CheckAssignConstraint<OriginalConstraint, !negate>(stateObj, originalcon);
+    return new CheckAssignConstraint<OriginalConstraint, !negate>(originalcon);
   }
 
   virtual void propagate(DomainInt prop_val,DomainDelta delta)
   {
     PROP_INFO_ADDONE(CheckAssign);
     if(check_unsat(checked_cast<SysInt>(prop_val), delta))
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
   }
 
   virtual BOOL check_unsat(SysInt,DomainDelta)
@@ -115,7 +115,7 @@ struct CheckAssignConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     if(full_check_unsat())
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
   }
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
@@ -259,6 +259,6 @@ public:
 
 };
 
-inline AbstractConstraint* forward_check_negation(StateObj* stateobj, AbstractConstraint* c)
-{ return new CheckAssignConstraint<AbstractWrapper>(stateobj, AbstractWrapper(c)); }
+inline AbstractConstraint* forward_check_negation(AbstractConstraint* c)
+{ return new CheckAssignConstraint<AbstractWrapper>(AbstractWrapper(c)); }
 #endif

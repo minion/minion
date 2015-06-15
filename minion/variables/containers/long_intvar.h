@@ -84,11 +84,11 @@ template<typename d_type>
 struct BigRangeVarContainer {
   typedef BigRangeVarRef_internal_template<BitContainerType> BigRangeVarRef_internal;
 
-  StateObj* stateObj;
+  
 
-  BigRangeVarContainer(StateObj* _stateObj) : stateObj(_stateObj),
-                                              bms_array(&getMemory(stateObj).monotonicSet()),
-                                              trigger_list(stateObj, false),
+  BigRangeVarContainer() : 
+                                              bms_array(&getMemory().monotonicSet()),
+                                              trigger_list(false),
                                               var_count_m(0), lock_m(0)
   {
     // Store where the first variable will go.
@@ -139,7 +139,7 @@ struct BigRangeVarContainer {
     //DomainInt low_bound = initial_bounds[d.var_num].first;
     if(loopvar < lower)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       /// Here just remove the value which should lead to the least work.
       return upper_bound(d);
     }
@@ -151,7 +151,7 @@ struct BigRangeVarContainer {
       if(bms_array->isMember(var_offset[d.var_num] + loopvar))
         return loopvar;
     }
-    getState(stateObj).setFailed(true);
+    getState().setFailed(true);
     return old_up_bound;
   }
 
@@ -166,7 +166,7 @@ struct BigRangeVarContainer {
     //DomainInt low_bound = initial_bounds[d.var_num].first;
     if(loopvar > upper)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       /// Here just remove the value which should lead to the least work.
       return lower_bound(d);
     }
@@ -178,7 +178,7 @@ struct BigRangeVarContainer {
       if(bms_array->isMember(var_offset[d.var_num] + loopvar))
         return loopvar;
     }
-    getState(stateObj).setFailed(true);
+    getState().setFailed(true);
     return old_low_bound;
   }
 
@@ -186,7 +186,7 @@ struct BigRangeVarContainer {
   {
     D_ASSERT(!lock_m);
     lock_m = true;
-    //bms_array->lock(stateObj); // gets locked in constraint_setup.cpp
+    //bms_array->lock(); // gets locked in constraint_setup.cpp
  }
 
   void addVariables(const vector<pair<SysInt, Bounds> >& new_domains)
@@ -208,7 +208,7 @@ struct BigRangeVarContainer {
 #endif
     }
 
-    bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m * BOUND_DATA_SIZE * sizeof(domain_bound_type));
+    bound_data = getMemory().backTrack().request_bytes(var_count_m * BOUND_DATA_SIZE * sizeof(domain_bound_type));
     DomainInt temp1=bms_array->request_storage(var_offset.back());
 
     // correct var_offsets to start at the start of our block.
@@ -292,14 +292,14 @@ struct BigRangeVarContainer {
   DomainInt getMin(BigRangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     return lower_bound(d);
   }
 
   DomainInt getMax(BigRangeVarRef_internal d) const
   {
     D_ASSERT(lock_m);
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     return upper_bound(d);
   }
 
@@ -320,7 +320,7 @@ struct BigRangeVarContainer {
     bms_array->print_state();
 #endif
     D_ASSERT(lock_m);
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove(var_offset[d.var_num] + i) ))
     {
 #ifdef DEBUG
@@ -353,7 +353,7 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove
       trigger_list.push_assign(d.var_num, getAssignedValue(d));
     }
 
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
 #ifdef DEBUG
     cout << "Exiting removeFromDomain: " << d.var_num << " " << i << " ["
@@ -367,17 +367,17 @@ if((i < lower_bound(d)) || (i > upper_bound(d)) || ! (bms_array->ifMember_remove
 
   BOOL validAssignment(BigRangeVarRef_internal d, DomainInt offset, DomainInt lower, DomainInt upper)
   {
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     if(!inDomain(d,offset))
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return false;
     }
     if(offset == upper && offset == lower)
       return false;
     if(offset > upper || offset < lower)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return false;
     }
     return true;
@@ -435,7 +435,7 @@ private:
       trigger_list.push_upper(d.var_num, up_bound - offset);
       upper_bound(d) = offset;
     }
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
   }
 public:
 
@@ -450,13 +450,13 @@ public:
     bms_array->print_state();
 #endif
 
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
     DomainInt up_bound = upper_bound(d);
     DomainInt low_bound = lower_bound(d);
 
     if(offset < low_bound)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -485,7 +485,7 @@ public:
         trigger_list.push_assign(d.var_num, getAssignedValue(d));
       }
     }
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 #ifdef DEBUG
     cout << "Exiting setMax: " << d.var_num << " " << upper_bound(d) << " ["
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["
@@ -504,14 +504,14 @@ public:
          << endl;
     bms_array->print_state();
 #endif
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
     DomainInt up_bound = upper_bound(d);
     DomainInt low_bound = lower_bound(d);
 
     if(offset > up_bound)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -527,7 +527,7 @@ public:
           reduce_dom_size(d);
         }
       }
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 
     lower_bound(d) = offset;
     DomainInt new_lower = find_new_lower_bound(d);
@@ -541,7 +541,7 @@ public:
       trigger_list.push_assign(d.var_num, getAssignedValue(d));
     }
     }
-    D_ASSERT(getState(stateObj).isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
+    D_ASSERT(getState().isFailed() || ( inDomain(d, lower_bound(d)) && inDomain(d, upper_bound(d)) ) );
 #ifdef DEBUG
     cout << "Exiting setMin: " << d.var_num << " " << lower_bound(d) << " ["
          << lower_bound(d) << ":" << upper_bound(d) << "] original ["

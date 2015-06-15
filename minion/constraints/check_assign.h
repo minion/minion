@@ -45,13 +45,13 @@ struct Check_Assign : public AbstractConstraint
 
   AbstractConstraint* child;
 
-  Check_Assign(StateObj* _stateObj, AbstractConstraint* _con) :
-  AbstractConstraint(_stateObj), child(_con)
+  Check_Assign(AbstractConstraint* _con) :
+  child(_con)
   { }
 
   virtual AbstractConstraint* reverse_constraint()
   {
-    return new Check_Assign(stateObj, child->reverse_constraint());
+    return new Check_Assign(child->reverse_constraint());
   }
 
 
@@ -90,7 +90,7 @@ struct Check_Assign : public AbstractConstraint
         b.push_back((*vars)[i].getAssignedValue());
     
     if(!check_assignment(&b[0], size))
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
   }
 
   virtual void full_propagate()
@@ -98,7 +98,7 @@ struct Check_Assign : public AbstractConstraint
 };
 
 inline AbstractConstraint*
-checkAssignCon(StateObj* stateObj, AbstractConstraint* c)
-{ return new Check_Assign(stateObj, c); }
+checkAssignCon(AbstractConstraint* c)
+{ return new Check_Assign(c); }
 
 #endif

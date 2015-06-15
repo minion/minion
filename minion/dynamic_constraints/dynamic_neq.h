@@ -33,8 +33,8 @@ struct WatchNeqConstraint : public AbstractConstraint
 
   CONSTRAINT_ARG_LIST2(var1, var2);
 
-  WatchNeqConstraint(StateObj* _stateObj, const Var1& _var1, const Var2& _var2) :
-    AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
+  WatchNeqConstraint(const Var1& _var1, const Var2& _var2) :
+    var1(_var1), var2(_var2)
   { 
     CheckNotBoundSingle(var1, "watchneq","neq");
   }
@@ -48,7 +48,7 @@ struct WatchNeqConstraint : public AbstractConstraint
     
       if(var1.isAssigned() && var2.isAssigned() && var1.getAssignedValue() == var2.getAssignedValue())
       {
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
         return;
       }
       
@@ -128,6 +128,6 @@ struct WatchNeqConstraint : public AbstractConstraint
   }
 
   virtual AbstractConstraint* reverse_constraint()
-  { return new EqualConstraint<Var1,Var2>(stateObj, var1, var2); }
+  { return new EqualConstraint<Var1,Var2>(var1, var2); }
 };
 #endif

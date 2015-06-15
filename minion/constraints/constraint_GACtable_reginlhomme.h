@@ -459,7 +459,7 @@ struct GACTableConstraint : public AbstractConstraint
       vars[varIndex].setMin(tuple_domain_min);
       vars[varIndex].setMax(tuple_domain_min + tuple_domain_size);
 
-      if(getState(stateObj).isFailed())
+      if(getState().isFailed())
         return;
 
       DomainInt max = vars[varIndex].getMax();

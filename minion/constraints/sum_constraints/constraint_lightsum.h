@@ -37,8 +37,8 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
 
   std::array<VarRef, size> var_array;
   VarSum var_sum;
-  LightLessEqualSumConstraint(StateObj* _stateObj, const std::array<VarRef, size>& _var_array, const VarSum& _var_sum) :
-    AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum)
+  LightLessEqualSumConstraint(const std::array<VarRef, size>& _var_array, const VarSum& _var_sum) :
+    var_array(_var_array), var_sum(_var_sum)
   {
       BigInt accumulator=0;
       for(SysInt i=0; i<(SysInt)var_array.size(); i++) {
@@ -160,7 +160,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
       SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<SysInt, -1>());
 
       return new LightLessEqualSumConstraint<typename NegType<VarRef>::type, size, SumType, true>
-        (stateObj, new_var_array, new_sum);
+        (new_var_array, new_sum);
   }
 
   template<bool b>
@@ -175,26 +175,26 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
       SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<SysInt, -1>());
 
       return new LightLessEqualSumConstraint<AnyVarRef, size, AnyVarRef, true>
-        (stateObj, new_var_array, new_sum);
+        (new_var_array, new_sum);
   }
 
 };
 
 template<typename VarRef, std::size_t size, typename VarSum>
 AbstractConstraint*
-LightLessEqualSumCon(StateObj* stateObj, const std::array<VarRef,size>& _var_array,  const VarSum& _var_sum)
+LightLessEqualSumCon(const std::array<VarRef,size>& _var_array,  const VarSum& _var_sum)
 {
-  return (new LightLessEqualSumConstraint<VarRef, size, VarSum>(stateObj, _var_array,_var_sum));
+  return (new LightLessEqualSumConstraint<VarRef, size, VarSum>(_var_array,_var_sum));
 }
 
 
 template<typename VarRef, std::size_t size, typename VarSum>
 AbstractConstraint*
-LightGreaterEqualSumCon(StateObj* stateObj, const std::array<VarRef,size>& _var_array, const VarSum& _var_sum)
+LightGreaterEqualSumCon(const std::array<VarRef,size>& _var_array, const VarSum& _var_sum)
 {
   return
   (new LightLessEqualSumConstraint<typename NegType<VarRef>::type, size,
-   typename NegType<VarSum>::type>(stateObj, VarNegRef(_var_array), VarNegRef(_var_sum)));
+   typename NegType<VarSum>::type>(VarNegRef(_var_array), VarNegRef(_var_sum)));
 }
 
 #endif

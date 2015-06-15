@@ -175,9 +175,9 @@ typedef QuickVarRefType<GetBoolVarContainer, BoolVarRef_internal> BoolVarRef;
 /// Container for boolean variables
 struct BoolVarContainer
 {
-  StateObj* stateObj;
-  BoolVarContainer(StateObj* _stateObj) : stateObj(_stateObj), var_count_m(0),
-                                          trigger_list(stateObj, false), lock_m(false)
+  
+  BoolVarContainer() : var_count_m(0),
+                                          trigger_list(false), lock_m(false)
   {}
 
   static const SysInt width = 7;
@@ -222,7 +222,7 @@ struct BoolVarContainer
     SysInt required_mem = var_count_m / 8 + 1;
     // Round up to nearest data_type block
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
-    assign_offset = getMemory(stateObj).backTrack().request_bytes(required_mem);
+    assign_offset = getMemory().backTrack().request_bytes(required_mem);
     values_mem = checked_malloc(required_mem);
     constraints.resize(bool_count);
 #ifdef WDEG
@@ -241,7 +241,7 @@ struct BoolVarContainer
   {
     if(i < 0)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -254,7 +254,7 @@ struct BoolVarContainer
   {
     if(i > 1)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
     D_ASSERT(i <= 1);
@@ -271,7 +271,7 @@ struct BoolVarContainer
     if(d.isAssigned())
     {
       if(b == d.getAssignedValue())
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
     }
     else
       uncheckedAssign(d,1-b);
@@ -283,7 +283,7 @@ struct BoolVarContainer
     D_ASSERT(!d.isAssigned());
     if((checked_cast<SysInt>(b)|1) != 1)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
     assign_ptr()[d.data_offset()] |= d.shift_offset;
@@ -314,7 +314,7 @@ struct BoolVarContainer
     else
     {
       if(d.getAssignedValue() != b)
-    getState(stateObj).setFailed(true);
+    getState().setFailed(true);
     }
   }
 

@@ -47,8 +47,8 @@ template<typename Var>
   vector<DomainInt> vals;
 
   template<typename T>
-  WatchNotInSetConstraint(StateObj* _stateObj, const Var& _var, const T& _vals) :
-  AbstractConstraint(_stateObj), var(_var), vals(_vals.begin(), _vals.end())
+  WatchNotInSetConstraint(const Var& _var, const T& _vals) :
+  var(_var), vals(_vals.begin(), _vals.end())
     { stable_sort(vals.begin(), vals.end()); }
 
   virtual SysInt dynamic_trigger_count()
@@ -123,7 +123,7 @@ template<typename Var>
   }
 
   virtual AbstractConstraint* reverse_constraint()
-  { return new WatchInSetConstraint<Var>(stateObj, var, vals); }
+  { return new WatchInSetConstraint<Var>(var, vals); }
 
 };
 
@@ -131,6 +131,6 @@ template<typename Var>
 // From dynamic_inset.h
 template<typename Var>
 AbstractConstraint* WatchInSetConstraint<Var>::reverse_constraint()
-{ return new WatchNotInSetConstraint<Var>(stateObj, var, vals); }
+{ return new WatchNotInSetConstraint<Var>(var, vals); }
 
 #endif

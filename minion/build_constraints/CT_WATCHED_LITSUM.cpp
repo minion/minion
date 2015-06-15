@@ -9,10 +9,10 @@
 
 template<typename T1>
 AbstractConstraint* 
-BuildCT_WATCHED_LITSUM(StateObj* stateObj,const T1& t1, ConstraintBlob& b)
+BuildCT_WATCHED_LITSUM(const T1& t1, ConstraintBlob& b)
 {
   D_ASSERT(b.constants[1].size());
-  return LiteralSumConDynamic(stateObj, t1, b.constants[0], checked_cast<SysInt>(b.constants[1][0])); 
+  return LiteralSumConDynamic(t1, b.constants[0], checked_cast<SysInt>(b.constants[1][0])); 
 }
 
 BUILD_CT(CT_WATCHED_LITSUM, 1)

@@ -120,16 +120,16 @@ struct ElementConstraint : public AbstractConstraint
     vector<Mapper> v = indexvar.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_SHIFT, -1))
     {
-      return ConOutput::print_con(stateObj, "element_one"+undef_name, var_array, indexvar.popOneMapper(), resultvar);
+      return ConOutput::print_con("element_one"+undef_name, var_array, indexvar.popOneMapper(), resultvar);
     }
     else
     {
-      return ConOutput::print_con(stateObj, "element"+undef_name, var_array, indexvar, resultvar);
+      return ConOutput::print_con("element"+undef_name, var_array, indexvar, resultvar);
     }
   }
 
-  ElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const Index& _indexvar, const Result& _resultvar) :
-    AbstractConstraint(_stateObj), var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar)
+  ElementConstraint(const VarArray& _var_array, const Index& _indexvar, const Result& _resultvar) :
+    var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar)
   { }
 
   virtual triggerCollection setup_internal()
@@ -155,7 +155,7 @@ struct ElementConstraint : public AbstractConstraint
       if(index < 0 || index >= (SysInt)var_array.size())
       {
           if(!undef_maps_zero) {
-              getState(stateObj).setFailed(true);
+              getState().setFailed(true);
               return;
           }
           else {
@@ -223,7 +223,7 @@ struct ElementConstraint : public AbstractConstraint
       if(!undef_maps_zero) {
           if(index < 0 || index >= (SysInt)var_array.size())
           {
-            getState(stateObj).setFailed(true);
+            getState().setFailed(true);
             return;
           }
       }
@@ -255,7 +255,7 @@ struct ElementConstraint : public AbstractConstraint
     {
         indexvar.setMax(array_size-1);
     }
-    if(getState(stateObj).isFailed()) return;
+    if(getState().isFailed()) return;
 
     // Should use the new iterators here. Check each value of resultvar to see
     // if it's in one of var_array.
@@ -289,7 +289,7 @@ struct ElementConstraint : public AbstractConstraint
     else
     {// resultvar is a bound variable
         // iterate up from the minimum
-        while(!getState(stateObj).isFailed())
+        while(!getState().isFailed())
         {
             DomainInt i=resultvar.getMin();
             BOOL supported=false;
@@ -313,7 +313,7 @@ struct ElementConstraint : public AbstractConstraint
                 break;
         }
         // now iterate down from the top.
-        while(!getState(stateObj).isFailed())
+        while(!getState().isFailed())
         {
             DomainInt i=resultvar.getMax();
             BOOL supported=false;
@@ -338,7 +338,7 @@ struct ElementConstraint : public AbstractConstraint
         }
     }
 
-    if(getState(stateObj).isFailed()) return;
+    if(getState().isFailed()) return;
 
     // Check values of index variable for support.
     for(DomainInt i = max(indexvar.getMin(),(DomainInt)0);i <= min(indexvar.getMax(), (DomainInt)array_size-1); i++)
@@ -469,19 +469,19 @@ struct ElementConstraint : public AbstractConstraint
       if(!undef_maps_zero) {
           // Constraint is satisfied if the index is out of range.
           vector<DomainInt> r; r.push_back(0); r.push_back((DomainInt)var_array.size()-1);
-          AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<Index>(stateObj, indexvar, r);
+          AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<Index>(indexvar, r);
           con.push_back(t4);
       }
 
       for(SysInt i=0; i < (SysInt)var_array.size(); i++)
       {
           vector<AbstractConstraint*> con2;
-          WatchLiteralConstraint<Index>* t=new WatchLiteralConstraint<Index>(stateObj, indexvar, i);
+          WatchLiteralConstraint<Index>* t=new WatchLiteralConstraint<Index>(indexvar, i);
           con2.push_back((AbstractConstraint*) t);
-          NeqConstraintBinary<AnyVarRef, Result>* t2=new NeqConstraintBinary<AnyVarRef, Result>(stateObj, var_array[i], resultvar);
+          NeqConstraintBinary<AnyVarRef, Result>* t2=new NeqConstraintBinary<AnyVarRef, Result>(var_array[i], resultvar);
           con2.push_back((AbstractConstraint*) t2);
 
-          Dynamic_AND* t3= new Dynamic_AND(stateObj, con2);
+          Dynamic_AND* t3= new Dynamic_AND(con2);
           con.push_back((AbstractConstraint*) t3);
       }
 
@@ -489,11 +489,11 @@ struct ElementConstraint : public AbstractConstraint
       {
         // or (i not in {0..size-1} /\ r!=0)
         vector<AbstractConstraint*> out_bounds;
-        out_bounds.push_back(new WatchNotLiteralConstraint<Result>(stateObj, resultvar, 0));
-        out_bounds.push_back(new WatchNotInRangeConstraint<Index>(stateObj, indexvar, make_vec<DomainInt>(0, (DomainInt)var_array.size() - 1)));
-        con.push_back(new Dynamic_AND(stateObj, out_bounds));
+        out_bounds.push_back(new WatchNotLiteralConstraint<Result>(resultvar, 0));
+        out_bounds.push_back(new WatchNotInRangeConstraint<Index>(indexvar, make_vec<DomainInt>(0, (DomainInt)var_array.size() - 1)));
+        con.push_back(new Dynamic_AND(out_bounds));
       }
-      return new Dynamic_OR(stateObj, con);
+      return new Dynamic_OR(con);
   }
 };
 #endif

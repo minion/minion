@@ -40,8 +40,8 @@ template<typename Var>
   vector<std::pair<DomainInt, DomainInt> > intervals;
 
   template<typename T>
-  WatchInIntervalSetConstraint(StateObj* _stateObj, const Var& _var, const T& _vals) :
-  AbstractConstraint(_stateObj), var(_var)
+  WatchInIntervalSetConstraint(const Var& _var, const T& _vals) :
+  var(_var)
     {
         CHECK(_vals.size()%2==0, "Second argument of w-inintervalset constraint represents a list of pairs so it must have an even number of values.");
         CHECK(_vals.size()>0,"w-inintervalset constraint requires at least one interval.");
@@ -67,7 +67,7 @@ template<typename Var>
     DynamicTrigger* dt = dynamic_trigger_start();
     if(intervals.empty())
     {
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
         return;
     }
     var.setMin(intervals.front().first);
@@ -186,7 +186,7 @@ template<typename Var>
       negintervals.push_back(intervals.back().second+1);
       negintervals.push_back(upperbound);
 
-      return new WatchInIntervalSetConstraint<Var>(stateObj, var, negintervals);
+      return new WatchInIntervalSetConstraint<Var>(var, negintervals);
   }
 
 };

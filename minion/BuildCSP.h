@@ -37,7 +37,7 @@ struct SearchMethod
   
 };
 
-void BuildCSP(StateObj* stateObj, ProbSpec::CSPInstance& instance);
-void SolveCSP(StateObj* stateObj, ProbSpec::CSPInstance& instance, SearchMethod args);
+void BuildCSP(ProbSpec::CSPInstance& instance);
+void SolveCSP(ProbSpec::CSPInstance& instance, SearchMethod args);
 
 #endif

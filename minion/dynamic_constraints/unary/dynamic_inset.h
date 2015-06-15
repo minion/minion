@@ -45,8 +45,8 @@ template<typename Var>
   vector<DomainInt> vals;
 
   template<typename T>
-  WatchInSetConstraint(StateObj* _stateObj, const Var& _var, const T& _vals) :
-  AbstractConstraint(_stateObj), var(_var), vals(_vals.begin(), _vals.end())
+  WatchInSetConstraint(const Var& _var, const T& _vals) :
+  var(_var), vals(_vals.begin(), _vals.end())
     { stable_sort(vals.begin(), vals.end()); }
 
   virtual SysInt dynamic_trigger_count()
@@ -57,7 +57,7 @@ template<typename Var>
     DynamicTrigger* dt = dynamic_trigger_start();
     if(vals.empty())
     {
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
         return;
     }
     var.setMin(vals.front());
@@ -87,7 +87,7 @@ template<typename Var>
     vector<DomainInt>::iterator it_low = std::lower_bound(vals.begin(), vals.end(), var.getMin());
     if(it_low == vals.end())
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
     }
     else
     {
@@ -106,7 +106,7 @@ template<typename Var>
 
     if(it_high == vals.begin())
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 

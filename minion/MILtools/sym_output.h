@@ -802,9 +802,9 @@ struct GraphBuilder
 struct InstanceStats
 {
   CSPInstance& csp;
-  StateObj* stateObj;
+  
 
-  InstanceStats(CSPInstance& _csp, StateObj* _stateObj) : csp(_csp), stateObj(_stateObj)
+  InstanceStats(CSPInstance& _csp) : csp(_csp)
   { }
 
   void classifyConstraint(ConstraintBlob i, SysInt* alldiff, SysInt* sums, SysInt* or_atleastk, SysInt* ternary, SysInt* binary, SysInt* table, SysInt* reify, SysInt* lex, SysInt* unary, SysInt* nullary, SysInt* element, SysInt* minmax, SysInt* occurrence, vector<double>* alldiffdomovervars, VarContainer& v) {

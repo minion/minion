@@ -10,21 +10,21 @@
 
 template<typename VarRef1, typename BoolVarRef>
 AbstractConstraint*
-BuildCT_DISEQ_REIFY(StateObj* stateObj, const vector<VarRef1>& var1,
+BuildCT_DISEQ_REIFY(const vector<VarRef1>& var1,
                                         const vector<VarRef1>& var2, const vector<BoolVarRef> var3, ConstraintBlob&)
 {
     return new ReifiedEqualConstraint<VarRef1, VarRef1, BoolVarRef, true>
-                                   (stateObj,var1[0],var2[0], var3[0]);
+                                   (var1[0],var2[0], var3[0]);
 
 }
 
 template<typename VarRef1, typename VarRef2, typename BoolVarRef>
 AbstractConstraint*
-BuildCT_DISEQ_REIFY(StateObj* stateObj, const vector<VarRef1>& var1,
+BuildCT_DISEQ_REIFY(const vector<VarRef1>& var1,
                                         const vector<VarRef2>& var2, const vector<BoolVarRef> var3, ConstraintBlob&)
 {
     return new ReifiedEqualConstraint<AnyVarRef, AnyVarRef, BoolVarRef, true>
-                                   (stateObj,AnyVarRef(var1[0]),AnyVarRef(var2[0]), var3[0]);
+                                   (AnyVarRef(var1[0]),AnyVarRef(var2[0]), var3[0]);
 
 }
 

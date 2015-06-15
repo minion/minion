@@ -9,7 +9,7 @@
 
 template<typename VarArray>
 AbstractConstraint*
-BuildCT_ALLDIFF(StateObj* stateObj, const VarArray& var_array, ConstraintBlob&)
-{ return new NeqConstraint<VarArray>(stateObj, var_array); }
+BuildCT_ALLDIFF(const VarArray& var_array, ConstraintBlob&)
+{ return new NeqConstraint<VarArray>(var_array); }
 
 BUILD_CT(CT_ALLDIFF, 1)

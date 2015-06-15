@@ -113,9 +113,9 @@ struct reify : public ParentConstraint
   typedef vector<vector<pair<DomainInt, DomainInt> > > triggerpairstype;
   D_DATA(triggerpairstype triggerpairs);
 
-  reify(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar _rar_var) :
-  ParentConstraint(_stateObj), reify_var(_rar_var), constraint_locked(false),
-    full_propagate_called(stateObj, false)
+  reify(AbstractConstraint* _poscon, BoolVar _rar_var) :
+  ParentConstraint(), reify_var(_rar_var), constraint_locked(false),
+    full_propagate_called(false)
   {
       CHECK(reify_var.getInitialMin() >= 0 && reify_var.getInitialMax() <= 1, "reify only works on Boolean variables");
       #ifdef NODETRICK
@@ -138,7 +138,7 @@ struct reify : public ParentConstraint
   {
       // reverse it by swapping the positive and negative constraints.
       // we call 'reverse_constraint' here to force a new copy of the constraint
-      return new reify<BoolVar>(stateObj, child_constraints[0]->reverse_constraint(), reify_var);
+      return new reify<BoolVar>(child_constraints[0]->reverse_constraint(), reify_var);
   }
 
   virtual SysInt dynamic_trigger_count()
@@ -249,7 +249,7 @@ struct reify : public ParentConstraint
         if(!full_propagate_called) {
             P("reifyvar assigned - Do full propagate");
             #ifdef NODETRICK
-            if(reifysetnode==getState(stateObj).getNodeCount())
+            if(reifysetnode==getState().getNodeCount())
             {
               numeric_limits<unsigned long long> ull;  // I hope the compiler will get rid fo this..
               reifysetnode=ull.max();  // avoid this happening more than once.
@@ -258,7 +258,7 @@ struct reify : public ParentConstraint
             #endif
 
             constraint_locked = true;
-            getQueue(stateObj).pushSpecialTrigger(this);
+            getQueue().pushSpecialTrigger(this);
         }
         return;
     }
@@ -332,7 +332,7 @@ struct reify : public ParentConstraint
               reify_var.propagateAssign(0);
 
               #ifdef NODETRICK
-              reifysetnode=getState(stateObj).getNodeCount();
+              reifysetnode=getState().getNodeCount();
               #endif
 
               return;
@@ -371,7 +371,7 @@ struct reify : public ParentConstraint
               reify_var.propagateAssign(1);
 
               #ifdef NODETRICK
-              reifysetnode=getState(stateObj).getNodeCount();
+              reifysetnode=getState().getNodeCount();
               #endif
 
               return;
@@ -384,7 +384,7 @@ struct reify : public ParentConstraint
         {
           P("Remove unused trigger");
           // This is an optimisation. Remove a trigger from stage 2.
-          releaseTrigger(stateObj, trig);
+          releaseTrigger(trig);
         }
     }
     else // full_propagate_called
@@ -401,7 +401,7 @@ struct reify : public ParentConstraint
       if(reify_var.getAssignedValue() == child)
       {
           P("Removing leftover trigger from other child constraint");
-          releaseTrigger(stateObj, trig);
+          releaseTrigger(trig);
           return;
       }
       child_constraints[getChildDynamicTrigger(trig)]->propagate(trig);
@@ -433,7 +433,7 @@ struct reify : public ParentConstraint
             D_DATA(firstunattached=i);
             break;
         } */
-        releaseTrigger(stateObj, trig + i);
+        releaseTrigger(trig + i);
     }
 
     #ifdef MINION_DEBUG
@@ -462,7 +462,7 @@ struct reify : public ParentConstraint
 
     D_ASSERT(reify_var.getMin() >= 0);
     D_ASSERT(reify_var.getMax() <= 1);
-    if(getState(stateObj).isFailed()) return;
+    if(getState().isFailed()) return;
 
     if(reify_var.isAssigned())
     {
@@ -482,7 +482,7 @@ struct reify : public ParentConstraint
     //SysInt dt_count = dynamic_trigger_count();
     // Clean up triggers
     for(SysInt i = 0; i < dtcount; ++i)
-      releaseTrigger(stateObj, dt + i);
+      releaseTrigger(dt + i);
 
     bool flag;
     GET_ASSIGNMENT(assignment0, child_constraints[0]);
@@ -492,7 +492,7 @@ struct reify : public ParentConstraint
       reify_var.propagateAssign(0);
 
       #ifdef NODETRICK
-      reifysetnode=getState(stateObj).getNodeCount();
+      reifysetnode=getState().getNodeCount();
       #endif
 
       return;
@@ -503,7 +503,7 @@ struct reify : public ParentConstraint
     { // No satisfying assignment to constraint
       reify_var.propagateAssign(1);
       #ifdef NODETRICK
-      reifysetnode=getState(stateObj).getNodeCount();
+      reifysetnode=getState().getNodeCount();
       #endif
 
       return;
@@ -523,6 +523,6 @@ struct reify : public ParentConstraint
 
 template<typename BoolVar>
 reify<BoolVar>*
-reifyCon(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
-{ return new reify<BoolVar>(stateObj, &*c, var); }
+reifyCon(AbstractConstraint* c, BoolVar var)
+{ return new reify<BoolVar>(&*c, var); }
 #endif

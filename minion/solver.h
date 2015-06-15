@@ -41,7 +41,7 @@ namespace ProbSpec {
 
 class SearchState
 {
-  StateObj* stateObj;
+  
   long long nodes;
   AnyVarRef* optimise_var;
   AnyVarRef* raw_optimise_var;
@@ -155,7 +155,7 @@ public:
   void setShortTupleListContainer(shared_ptr<ShortTupleListContainer> _tupleList)
   { shortTupleListContainer = _tupleList; }
 
-  SearchState(StateObj* _stateObj) : stateObj(_stateObj), nodes(0), optimise_var(NULL),
+  SearchState() : nodes(0), optimise_var(NULL),
     raw_optimise_var(NULL),
     current_optimise_position(0), optimise(false), constraints_to_propagate(1),
     solutions(0), dynamic_triggers_used(false), finished(false), failed(false),
@@ -226,7 +226,7 @@ public:
   bool solsoutWrite;
 
   /// A callback function for when a solution is found.
-  std::function< void (StateObj*)> solCallBack;
+  std::function< void ()> solCallBack;
 
   /// Denotes if solutions should be printed.
   /// Initialised to true.
@@ -324,15 +324,15 @@ public:
 
 namespace Controller
 {
-  void lock(StateObj*);
+  void lock();
 
   /// Pushes the state of the whole world.
-  inline void world_push(StateObj* stateObj);
+  inline void world_push();
 
   /// Pops the state of the whole world.
-  inline void world_pop(StateObj* stateObj);
+  inline void world_pop();
 
-  inline void world_pop_all(StateObj* stateObj);
+  inline void world_pop_all();
 }
 
 #endif

@@ -9,10 +9,10 @@
 
 
 inline AbstractConstraint*
-BuildCT_CHECK_GSA(StateObj* stateObj, ConstraintBlob& bl)
+BuildCT_CHECK_GSA(ConstraintBlob& bl)
 {
   D_ASSERT(bl.internal_constraints.size() == 1);
-  return checkGSACon(stateObj, build_constraint(stateObj, bl.internal_constraints[0]));
+  return checkGSACon(build_constraint(bl.internal_constraints[0]));
 }
 
 BUILD_CT(CT_CHECK_GSA, 0)

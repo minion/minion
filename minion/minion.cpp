@@ -123,13 +123,12 @@ int main(int argc, char** argv) {
 // Wrap main in a try/catch just to stop exceptions leaving main,
 // as windows gets really annoyed when that happens.
 try {
-  StateObj* stateObj = new StateObj();
 
-  getState(stateObj).getOldTimer().startClock();
+  getState().getOldTimer().startClock();
 
   if (argc == 1) {
-    getOptions(stateObj).printLine("# " + tostring(VERSION));
-    getOptions(stateObj).printLine("# HG version: " + tostring(HG_VER_STRING));
+    getOptions().printLine("# " + tostring(VERSION));
+    getOptions().printLine("# HG version: " + tostring(HG_VER_STRING));
     print_default_help(argv);
     return EXIT_SUCCESS;
   }
@@ -149,18 +148,18 @@ try {
   CSPInstance instance;
   SearchMethod args;
 
-  parse_command_line(stateObj, args, argc, argv);
+  parse_command_line(args, argc, argv);
 
-  if(getOptions(stateObj).outputType != -1)
-    getState(stateObj).getOldTimer().setOutputType(getOptions(stateObj).outputType);
+  if(getOptions().outputType != -1)
+    getState().getOldTimer().setOutputType(getOptions().outputType);
 
-  getOptions(stateObj).printLine("# " + tostring(VERSION));
-  getOptions(stateObj).printLine("# HG version: " + tostring(HG_VER_STRING));
+  getOptions().printLine("# " + tostring(VERSION));
+  getOptions().printLine("# HG version: " + tostring(HG_VER_STRING));
 
-  if (!getOptions(stateObj).silent)
+  if (!getOptions().silent)
   {
 
-    getOptions(stateObj).printLine("# HG last changed date: " + tostring(HG_DATE_STRING) );
+    getOptions().printLine("# HG last changed date: " + tostring(HG_DATE_STRING) );
 
     time_t rawtime;
     time(&rawtime);
@@ -168,34 +167,34 @@ try {
     cout << "#    http://minion.sourceforge.net" << endl;
     cout << "# If you have problems with Minion or find any bugs, please tell us!" << endl;
     cout << "# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug" << endl;
-    cout << "# Input filename: " << getOptions(stateObj).instance_name << endl;
+    cout << "# Input filename: " << getOptions().instance_name << endl;
     cout << "# Command line: " ;
     for (SysInt i=0; i < argc; ++i) { cout << argv[i] << " " ; }
     cout << endl;
   }
 
-  if(!getOptions(stateObj).noTimers)
+  if(!getOptions().noTimers)
   {
-      getState(stateObj).setupAlarm(getOptions(stateObj).timeout_active, getOptions(stateObj).time_limit, getOptions(stateObj).time_limit_is_CPU_time);
-      getState(stateObj).setupCtrlc();
+      getState().setupAlarm(getOptions().timeout_active, getOptions().time_limit, getOptions().time_limit_is_CPU_time);
+      getState().setupCtrlc();
   }
 
-  vector<string> files(1, getOptions(stateObj).instance_name);
-  readInputFromFiles(instance, files, getOptions(stateObj).parser_verbose,
-                     getOptions(stateObj).map_long_short, getOptions(stateObj).ensure_branch_on_all_vars);
+  vector<string> files(1, getOptions().instance_name);
+  readInputFromFiles(instance, files, getOptions().parser_verbose,
+                     getOptions().map_long_short, getOptions().ensure_branch_on_all_vars);
 
-  if(getOptions(stateObj).Xvarmunge != -1)
+  if(getOptions().Xvarmunge != -1)
   {
     assert(instance.search_order.size() == 1);
-    munge_container(instance.search_order[0].var_order, getOptions(stateObj).Xvarmunge);
+    munge_container(instance.search_order[0].var_order, getOptions().Xvarmunge);
   }
 
-  if(getOptions(stateObj).Xsymmunge != -1)
+  if(getOptions().Xsymmunge != -1)
   {
-    munge_container(instance.sym_order, getOptions(stateObj).Xsymmunge);
+    munge_container(instance.sym_order, getOptions().Xsymmunge);
   }
 
-  if(getOptions(stateObj).graph)
+  if(getOptions().graph)
   {
     GraphBuilder graph(instance);
     //graph.g.output_graph();
@@ -203,22 +202,22 @@ try {
     exit(0);
   }
 
-  if(getOptions(stateObj).instance_stats)
+  if(getOptions().instance_stats)
   {
-      InstanceStats s(instance, stateObj);
+      InstanceStats s(instance);
       s.output_stats();
 
       // Do the minimal amount of setting up to create the constraint objects.
-      getState(stateObj).setTupleListContainer(instance.tupleListContainer);
-      getState(stateObj).setShortTupleListContainer(instance.shortTupleListContainer);
+      getState().setTupleListContainer(instance.tupleListContainer);
+      getState().setShortTupleListContainer(instance.shortTupleListContainer);
 
-      BuildCon::build_variables(stateObj, instance.vars);
+      BuildCon::build_variables(instance.vars);
 
       // Create Constraints
       vector<AbstractConstraint*> cons;
       while(!instance.constraints.empty())
       {
-         cons.push_back(build_constraint(stateObj, instance.constraints.front()));
+         cons.push_back(build_constraint(instance.constraints.front()));
          instance.constraints.pop_front();
       }
 
@@ -226,7 +225,7 @@ try {
       exit(0);
   }
 
-  if(getOptions(stateObj).redump)
+  if(getOptions().redump)
   {
     MinionInstancePrinter printer(instance);
     printer.build_instance();
@@ -256,12 +255,10 @@ try {
   // should be one for varorder as well.
   getTableOut().set("MinionVersion", HG_VER_STRING);
   getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions(stateObj).silent);
+  getState().getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions().silent);
 
-  BuildCSP(stateObj, instance);
-  SolveCSP(stateObj, instance, args);
-
-  delete stateObj;
+  BuildCSP(instance);
+  SolveCSP(instance, args);
 
   return 0;
 

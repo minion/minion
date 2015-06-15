@@ -59,17 +59,16 @@ public:
   void operator--()
   { *this = *this - 1; }
   
-  /// Constructs a new backtrackable type connected to stateObj.
-  Reversible(StateObj* stateObj)
+  Reversible()
   { 
-     backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(Type));
+     backtrack_ptr = getMemory().backTrack().request_bytes(sizeof(Type));
      D_ASSERT( (size_t)(backtrack_ptr) % sizeof(Type) == 0);
   }
   
   /// Constructs and assigns in one step.
-  Reversible(StateObj* stateObj, Type t)
+  Reversible(Type t)
   {
-    backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(Type));
+    backtrack_ptr = getMemory().backTrack().request_bytes(sizeof(Type));
     D_ASSERT( (size_t)(backtrack_ptr) % sizeof(Type) == 0);
     (*this) = t;
   }
@@ -82,11 +81,11 @@ public:
 
 class BoolContainer
 {
-  StateObj* stateObj;
+  
   void* backtrack_ptr;
   SysInt offset;
 public:
-  BoolContainer(StateObj* _stateObj) : stateObj(_stateObj), offset(sizeof(SysInt)*8)
+  BoolContainer() : offset(sizeof(SysInt)*8)
   {}
   
   pair<void*, UnsignedSysInt> returnBacktrackBool()
@@ -94,7 +93,7 @@ public:
     if(offset == sizeof(SysInt)*8)
     {
       offset = 0;
-      backtrack_ptr = getMemory(stateObj).backTrack().request_bytes(sizeof(SysInt));
+      backtrack_ptr = getMemory().backTrack().request_bytes(sizeof(SysInt));
     }
     
     pair<void*,UnsignedSysInt> ret(backtrack_ptr, ((UnsignedSysInt)1) << offset);
@@ -128,18 +127,17 @@ public:
       *ptr &= ~mask;
   }
   
-  /// Constructs a new backtrackable type connected to stateObj.
-  Reversible(StateObj* stateObj)
+  Reversible()
   { 
-    pair<void*, UnsignedSysInt> state = getBools(stateObj).returnBacktrackBool();
+    pair<void*, UnsignedSysInt> state = getBools().returnBacktrackBool();
     backtrack_ptr = state.first;
     mask = state.second;
   }
   
   /// Constructs and assigns in one step.
-  Reversible(StateObj* stateObj, bool b)
+  Reversible(bool b)
   {
-    pair<void*, UnsignedSysInt> state = getBools(stateObj).returnBacktrackBool();
+    pair<void*, UnsignedSysInt> state = getBools().returnBacktrackBool();
     backtrack_ptr = state.first;
     mask = state.second;
     (*this) = b;

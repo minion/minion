@@ -49,9 +49,9 @@ struct Dynamic_reify_true_old: public AbstractConstraint
 
     Reversible<bool> full_propagate_called;
 
-    Dynamic_reify_true_old(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar v) :
-        AbstractConstraint(_stateObj), poscon(_poscon), rar_var(v),
-                constraint_locked(false), full_propagate_called(stateObj, false)
+    Dynamic_reify_true_old(AbstractConstraint* _poscon, BoolVar v) :
+        poscon(_poscon), rar_var(v),
+                constraint_locked(false), full_propagate_called(false)
     { }
 
     virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
@@ -117,7 +117,7 @@ struct Dynamic_reify_true_old: public AbstractConstraint
         {
             D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
             constraint_locked = true;
-            getQueue(stateObj).pushSpecialTrigger(this);
+            getQueue().pushSpecialTrigger(this);
             return;
         }
 
@@ -163,7 +163,7 @@ struct Dynamic_reify_true_old: public AbstractConstraint
         else
         {
             // This is an optimisation.
-            releaseTrigger(stateObj, trig);
+            releaseTrigger(trig);
         }
     }
 
@@ -175,7 +175,7 @@ struct Dynamic_reify_true_old: public AbstractConstraint
         SysInt dt_count = dynamic_trigger_count();
         // Clean up triggers
         for (SysInt i = 0; i < dt_count; ++i)
-            releaseTrigger(stateObj, dt + i);
+            releaseTrigger(dt + i);
 
         rar_var.addDynamicTrigger(dt, LowerBound);
         bool flag;
@@ -216,7 +216,7 @@ struct Dynamic_reify_true_old: public AbstractConstraint
 // Just a placeholder.
 template<typename BoolVar>
 AbstractConstraint*
-truereifyConDynamicOld(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
-{ return new Dynamic_reify_true_old<BoolVar> (stateObj, &*c, var); }
+truereifyConDynamicOld(AbstractConstraint* c, BoolVar var)
+{ return new Dynamic_reify_true_old<BoolVar> (&*c, var); }
 
 #endif

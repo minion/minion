@@ -49,11 +49,11 @@ public:
   SparseBoundVarContainer<> sparseBoundVarContainer;
 
 
-  VariableContainer(StateObj* _stateObj) :
-    boundVarContainer(_stateObj),
-    boolVarContainer(_stateObj),
-    bigRangeVarContainer(_stateObj),
-    sparseBoundVarContainer(_stateObj)
+  VariableContainer() :
+    boundVarContainer(),
+    boolVarContainer(),
+    bigRangeVarContainer(),
+    sparseBoundVarContainer()
   {}
   
   inline void lock() {

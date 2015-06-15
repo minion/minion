@@ -36,9 +36,9 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
   SysInt watched[2];
   SysInt last;
 
-  BoolOrConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array,
+  BoolOrConstraintDynamic(const VarArray& _var_array,
                    const vector<DomainInt>& _negs) :
-    AbstractConstraint(_stateObj), var_array(_var_array), negs(_negs), last(0)
+    var_array(_var_array), negs(_negs), last(0)
   {
     watched[0] = watched[1] = -2;
   }
@@ -66,7 +66,7 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
       }
     }
     if(found == 0) {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
     if(found == 1) { //detect unit clause

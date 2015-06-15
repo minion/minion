@@ -21,13 +21,13 @@
 #include "preprocess.h"
 /// Apply a high level of consistency to a CSP.
 /** This function is not particularly optimised, implementing only the most basic SAC and SSAC algorithms */
-void PropogateCSP(StateObj* stateObj, PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, bool print_info)
+void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, bool print_info)
 {
   if(preprocessLevel == PropLevel_None)
     return;
   
   PropagateGAC propGAC;
-  propGAC(stateObj, vars);
+  propGAC(vars);
   
   if(preprocessLevel == PropLevel_GAC)
     return;
@@ -39,12 +39,12 @@ void PropogateCSP(StateObj* stateObj, PropagationLevel preprocessLevel, vector<A
   if(bounds_check)
   {
     PropagateSAC_Bounds prop_SAC_bounds;
-    prop_SAC_bounds(stateObj, vars);
+    prop_SAC_bounds(vars);
   }
   else
   {
     PropagateSAC prop_SAC;
-    prop_SAC(stateObj, vars);
+    prop_SAC(vars);
   }
   
   if(print_info) 
@@ -57,12 +57,12 @@ void PropogateCSP(StateObj* stateObj, PropagationLevel preprocessLevel, vector<A
   if(bounds_check)
   {
     PropagateSSAC_Bounds prop_SSAC_bounds;
-    prop_SSAC_bounds(stateObj, vars);
+    prop_SSAC_bounds(vars);
   }
   else
   {
     PropagateSSAC prop_SSAC;
-    prop_SSAC(stateObj, vars);
+    prop_SSAC(vars);
   }
   if(print_info) 
   { cout << "SSAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - lit_count(vars)) << " literals" << endl; }

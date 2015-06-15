@@ -23,33 +23,33 @@
 #include "solver.h"
 
 template<typename Var, typename Vars, typename Prop>
-bool inline check_fail(StateObj* stateObj, Var& var, DomainInt val, Vars& vars, Prop prop)
+bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop)
 {
-  Controller::world_push(stateObj);
+  Controller::world_push();
   var.propagateAssign(val);
-  prop(stateObj, vars);
+  prop(vars);
 
-  bool check_failed = getState(stateObj).isFailed();
-  getState(stateObj).setFailed(false);
+  bool check_failed = getState().isFailed();
+  getState().setFailed(false);
 
-  Controller::world_pop(stateObj);
+  Controller::world_pop();
 
   return check_failed;
 }
 
-inline bool check_sac_timeout(StateObj* stateObj)
+inline bool check_sac_timeout()
 {
-    if(getState(stateObj).isAlarmActivated())
+    if(getState().isAlarmActivated())
     {
-        getState(stateObj).clearAlarm();
-        if(getState(stateObj).isCtrlcPressed())
+        getState().clearAlarm();
+        if(getState().isCtrlcPressed())
         {
-            getState(stateObj).setFailed(true);
+            getState().setFailed(true);
             return true;
         }
         else
         {
-            getOptions(stateObj).printLine("Time out in preprocessing.");
+            getOptions().printLine("Time out in preprocessing.");
             getTableOut().set("TimeOut", 1);
             return true;
         }
@@ -58,10 +58,10 @@ inline bool check_sac_timeout(StateObj* stateObj)
 }
 
 template <typename Var, typename Prop>
-void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop, bool onlyCheckBounds)
+void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBounds)
 {
-  getQueue(stateObj).propagateQueue();
-  if(getState(stateObj).isFailed())
+  getQueue().propagateQueue();
+  if(getState().isFailed())
     return;
   bool reduced = true;
   while(reduced)
@@ -72,23 +72,23 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
       Var& var = vararray[i];
       if(onlyCheckBounds || var.isBound())
       {
-        while(check_fail(stateObj, var, var.getMax(), vararray, prop))
+        while(check_fail(var, var.getMax(), vararray, prop))
         {
-          if(check_sac_timeout(stateObj)) throw EndOfSearch();
+          if(check_sac_timeout()) throw EndOfSearch();
           reduced = true;
           var.setMax(var.getMax() - 1);
-          prop(stateObj, vararray);
-          if(getState(stateObj).isFailed())
+          prop(vararray);
+          if(getState().isFailed())
             return;
         }
 
-        while(check_fail(stateObj, var, var.getMin(), vararray, prop))
+        while(check_fail(var, var.getMin(), vararray, prop))
         {
-          if(check_sac_timeout(stateObj)) throw EndOfSearch();
+          if(check_sac_timeout()) throw EndOfSearch();
           reduced = true;
           var.setMin(var.getMin() + 1);
-          prop(stateObj, vararray);
-          if(getState(stateObj).isFailed())
+          prop(vararray);
+          if(getState().isFailed())
             return;
         }
       }
@@ -96,13 +96,13 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
       {
         for(DomainInt val = var.getMin(); val <= var.getMax(); ++val)
         {
-          if(check_sac_timeout(stateObj)) throw EndOfSearch();
-          if(var.inDomain(val) && check_fail(stateObj, var, val, vararray, prop))
+          if(check_sac_timeout()) throw EndOfSearch();
+          if(var.inDomain(val) && check_fail(var, val, vararray, prop))
           {
             reduced = true;
             var.removeFromDomain(val);
-            prop(stateObj, vararray);
-            if(getState(stateObj).isFailed())
+            prop(vararray);
+            if(getState().isFailed())
               return;
           }
         }
@@ -115,41 +115,41 @@ void propagateSAC_internal(StateObj* stateObj, vector<Var>& vararray, Prop prop,
 struct PropagateGAC
 {
   template<typename Vars>
-  void operator()(StateObj* stateObj, Vars&)
-  {getQueue(stateObj).propagateQueue();}
+  void operator()(Vars&)
+  {getQueue().propagateQueue();}
 };
 
 struct PropagateSAC
 {
   template<typename Vars>
-  void operator()(StateObj* stateObj, Vars& vars)
-  {propagateSAC_internal(stateObj, vars, PropagateGAC(), false);}
+  void operator()(Vars& vars)
+  {propagateSAC_internal(vars, PropagateGAC(), false);}
 };
 
 struct PropagateSAC_Bounds
 {
   template<typename Vars>
-  void operator()(StateObj* stateObj, Vars& vars)
-  {propagateSAC_internal(stateObj, vars, PropagateGAC(), true);}
+  void operator()(Vars& vars)
+  {propagateSAC_internal(vars, PropagateGAC(), true);}
 };
 
 struct PropagateSSAC
 {
   template<typename Vars>
-  void operator()(StateObj* stateObj, Vars& vars)
+  void operator()(Vars& vars)
   {
     PropagateSAC sac;
-    propagateSAC_internal(stateObj, vars, sac, false);
+    propagateSAC_internal(vars, sac, false);
   }
 };
 
 struct PropagateSSAC_Bounds
 {
   template<typename Vars>
-  void operator()(StateObj* stateObj, Vars& vars)
+  void operator()(Vars& vars)
   {
     PropagateSAC sac;
-    propagateSAC_internal(stateObj, vars, sac, true);
+    propagateSAC_internal(vars, sac, true);
   }
 };
 
@@ -157,54 +157,54 @@ struct PropagateSSAC_Bounds
 struct Propagate
 {
     virtual ~Propagate() {}
-    virtual void prop(StateObj* stateObj, vector<AnyVarRef>& vars) {};
+    virtual void prop(vector<AnyVarRef>& vars) {};
 };
 
 struct PropGAC : Propagate
 {
     PropagateGAC prop_obj;
-    inline void prop(StateObj* stateObj, vector<AnyVarRef>& vars)
+    inline void prop(vector<AnyVarRef>& vars)
     {
-        prop_obj(stateObj, vars);
+        prop_obj(vars);
     }
 };
 
 struct PropSAC : Propagate
 {
     PropagateSAC prop_obj;
-    inline void prop(StateObj* stateObj, vector<AnyVarRef>& vars)
+    inline void prop(vector<AnyVarRef>& vars)
     {
-        prop_obj(stateObj, vars);
+        prop_obj(vars);
     }
 };
 
 struct PropSSAC : Propagate
 {
     PropagateSSAC prop_obj;
-    inline void prop(StateObj* stateObj, vector<AnyVarRef>& vars)
+    inline void prop(vector<AnyVarRef>& vars)
     {
-        prop_obj(stateObj, vars);
+        prop_obj(vars);
     }
 };
 
 struct PropSAC_Bounds : Propagate
 {
     PropagateSAC_Bounds prop_obj;
-    inline void prop(StateObj* stateObj, vector<AnyVarRef>& vars)
+    inline void prop(vector<AnyVarRef>& vars)
     {
-        prop_obj(stateObj, vars);
+        prop_obj(vars);
     }
 };
 
 struct PropSSAC_Bounds : Propagate
 {
     PropagateSSAC_Bounds prop_obj;
-    inline void prop(StateObj* stateObj, vector<AnyVarRef>& vars)
+    inline void prop(vector<AnyVarRef>& vars)
     {
-        prop_obj(stateObj, vars);
+        prop_obj(vars);
     }
 };
 
-void PropogateCSP(StateObj*, PropagationLevel, vector<AnyVarRef>&, bool print_info = false);
+void PropogateCSP(PropagationLevel, vector<AnyVarRef>&, bool print_info = false);
 
 #endif

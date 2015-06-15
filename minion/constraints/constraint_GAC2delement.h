@@ -114,9 +114,9 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 	
 	
 	
-	GAC2DElementNOTConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexArray& _indexvar, const VarRef& _resultvar, DomainInt _rowlength) :
-	AbstractConstraint(_stateObj),  var_array(_var_array), indexvar1(_indexvar[0]), indexvar2(_indexvar[1]), resultvar(_resultvar),
-	rowlength(checked_cast<SysInt>(_rowlength)),full_propagate_called(_stateObj, false),
+	GAC2DElementNOTConstraint(const VarArray& _var_array, const IndexArray& _indexvar, const VarRef& _resultvar, DomainInt _rowlength) :
+	 var_array(_var_array), indexvar1(_indexvar[0]), indexvar2(_indexvar[1]), resultvar(_resultvar),
+	rowlength(checked_cast<SysInt>(_rowlength)),full_propagate_called(_false),
 	var_array_min_val(0), var_array_max_val(0) 
 	{ 
 		
@@ -664,7 +664,7 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			
 			DomainInt result_dom_size = initial_result_dom_max - initial_result_dom_min + 1;
 			
-			if(getState(stateObj).isFailed()) return;
+			if(getState().isFailed()) return;
 			for(SysInt i = checked_cast<SysInt>(indexvar1.getMin()); i < checked_cast<SysInt>(indexvar1.getMax()+1); ++i)
 			{
 				current_support_index1_result[i] = initial_result_dom_min-1; 
@@ -988,8 +988,8 @@ struct GAC2DElementConstraint : public AbstractConstraint
 	
 	
 	//constructor
-	GAC2DElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexArray& _indexvar, const VarRef& _resultvar, DomainInt _rowlength) :
-	AbstractConstraint(_stateObj), var_array(_var_array), indexvar1(_indexvar[0]), indexvar2(_indexvar[1]), resultvar(_resultvar),
+	GAC2DElementConstraint(const VarArray& _var_array, const IndexArray& _indexvar, const VarRef& _resultvar, DomainInt _rowlength) :
+	var_array(_var_array), indexvar1(_indexvar[0]), indexvar2(_indexvar[1]), resultvar(_resultvar),
 	rowlength(checked_cast<SysInt>(_rowlength)),
 	var_array_min_val(0), var_array_max_val(0) 
 	{ 
@@ -1446,7 +1446,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		indexvar2.setMin(0);
 		indexvar2.setMax((array_size/rowlength)-1);
 		
-		if(getState(stateObj).isFailed()) return;
+		if(getState().isFailed()) return;
 		
 		for(SysInt i = checked_cast<SysInt>(indexvar1.getMin()); i < checked_cast<SysInt>(indexvar1.getMax()+1); ++i)
 		{
@@ -1632,7 +1632,7 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		indexvar.push_back(indexvar1);
 		indexvar.push_back(indexvar2);
 		//calls not element
-		return new GAC2DElementNOTConstraint<VarArray,IndexArray, VarRef>(stateObj, var_array, indexvar, resultvar, rowlength);
+		return new GAC2DElementNOTConstraint<VarArray,IndexArray, VarRef>(var_array, indexvar, resultvar, rowlength);
 		
 	}
 	

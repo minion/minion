@@ -9,7 +9,7 @@
 
 template <typename T>
 AbstractConstraint*
-BuildCT_MDDC(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return new MDDC<T>(stateObj, t1, b.tuples); }
+BuildCT_MDDC(const T& t1, ConstraintBlob& b)
+{ return new MDDC<T>(t1, b.tuples); }
 
 BUILD_CT(CT_MDDC, 1)

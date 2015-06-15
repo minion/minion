@@ -25,7 +25,7 @@ class AbstractConstraint;
 struct ConstantVar
 {
   // TODO: This really only needs enough to get 'fail'
-  StateObj* stateObj;
+  
 
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_No;
@@ -39,13 +39,13 @@ struct ConstantVar
   AnyVarRef popOneMapper() const
   { FATAL_REPORTABLE_ERROR(); }
 
-  explicit ConstantVar(StateObj* _stateObj, DomainInt _val) : stateObj(_stateObj), val(_val)
+  explicit ConstantVar(DomainInt _val) : val(_val)
   {}
 
   ConstantVar()
   {}
 
-  ConstantVar(const ConstantVar& b) : stateObj(b.stateObj), val(b.val)
+  ConstantVar(const ConstantVar& b) : val(b.val)
   {}
 
   BOOL isAssigned() const
@@ -82,22 +82,22 @@ struct ConstantVar
   { return val; }
 
   void setMax(DomainInt i)
-  { if(i<val) getState(stateObj).setFailed(true); }
+  { if(i<val) getState().setFailed(true); }
 
   void setMin(DomainInt i)
-  { if(i>val) getState(stateObj).setFailed(true); }
+  { if(i>val) getState().setFailed(true); }
 
   void uncheckedAssign(DomainInt)
   { FAIL_EXIT(); }
 
   void propagateAssign(DomainInt b)
-  {if(b != val) getState(stateObj).setFailed(true); }
+  {if(b != val) getState().setFailed(true); }
 
   void decisionAssign(DomainInt b)
   { propagateAssign(b); }
 
   void removeFromDomain(DomainInt b)
-  { if(b==val) getState(stateObj).setFailed(true); }
+  { if(b==val) getState().setFailed(true); }
 
   void addTrigger(Trigger, TrigType)
   { }
@@ -105,7 +105,7 @@ struct ConstantVar
 
   void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = NoDomainValue , TrigOp op = TO_Default)
   {
-    attachTriggerToNullList(stateObj, dt , op);
+    attachTriggerToNullList(dt , op);
   }
 
   vector<AbstractConstraint*>* getConstraints() { return NULL; }

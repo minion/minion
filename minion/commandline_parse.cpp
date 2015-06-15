@@ -106,15 +106,15 @@ extern bool in_cspcomp_for_failexit;
 #define INCREMENT_i(flag) \
 { ++i; if(i == argc || argv[i][0] == '-') { cerr << #flag << " requires a value\n"; exit(1); }}
 
-void parse_command_line(StateObj* stateObj, SearchMethod& args, SysInt argc, char** argv)
+void parse_command_line(SearchMethod& args, SysInt argc, char** argv)
 {
  for(SysInt i = 1; i < argc; ++i)
   {
     const string command(argv[i]);
     if(command == string("-findallsols"))
-    { getOptions(stateObj).findAllSolutions(); }
+    { getOptions().findAllSolutions(); }
     else if(command == string("-findgenerators"))
-    { getOptions(stateObj).find_generators = true; }
+    { getOptions().find_generators = true; }
     else if(command == string("-crash"))
     { debug_crash = true; }
 /** @help switches;-quiet Description
@@ -125,17 +125,17 @@ Do not print parser progress (default)
 help switches -verbose
 */
     else if(command == string("-quiet"))
-    { getOptions(stateObj).parser_verbose = false; }
+    { getOptions().parser_verbose = false; }
 
     else if(command == string("-redump"))
-    { getOptions(stateObj).redump = true; }
+    { getOptions().redump = true; }
 /** @help switches;-outputCompressedDomains Description
 Try to rduce the initial domains of variables, and output them.
 This is in general not useful for users, but is provided for other systems.
 */
     else if(command == string("-outputCompressedDomains"))
     {
-      getOptions(stateObj).outputCompressedDomains = true;
+      getOptions().outputCompressedDomains = true;
     }
 /** @help switches;-outputCompressed Description
 Output a Minion instance with some basic reasoning performed to
@@ -151,47 +151,47 @@ To compress a file 'infile.minion' to a file 'smaller.minion'
     else if(command == string("-outputCompressed"))
     {
       INCREMENT_i(-outputCompressed);
-      getOptions(stateObj).outputCompressed = argv[i];
+      getOptions().outputCompressed = argv[i];
     }
     else if(command == string("-instancestats"))
-    { getOptions(stateObj).instance_stats = true; }
+    { getOptions().instance_stats = true; }
     else if(command == string("-Xgraph"))
     {
-      getOptions(stateObj).graph = true;
-      getOptions(stateObj).silent = true;
+      getOptions().graph = true;
+      getOptions().silent = true;
     }
     else if(command == string("-outputType"))
     {
       INCREMENT_i(-outputType);
-      getOptions(stateObj).outputType = atoi(argv[i]);
+      getOptions().outputType = atoi(argv[i]);
     }
 /** @help switches;-printsols Description
 Print solutions (default).
 */
     else if(command == string("-printsols"))
-    { getOptions(stateObj).print_solution = true; }
+    { getOptions().print_solution = true; }
 /** @help switches;-noprintsols Description
 Do not print solutions.
 */
     else if(command == string("-noprintsols"))
-    { getOptions(stateObj).print_solution = false; }
+    { getOptions().print_solution = false; }
     else if(command == string("-notimers"))
-    { getOptions(stateObj).noTimers = true; }
+    { getOptions().noTimers = true; }
 /** @help switches;-printsolsonly Description
 Print only solutions and a summary at the end.
 */
     else if(command == string("-printsolsonly"))
-    { getOptions(stateObj).silent = true; }
+    { getOptions().silent = true; }
 /** @help switches;-printonlyoptimal Description
 In optimisation problems, only print the optimal value, and
 not intermediate values.
 */
     else if(command == string("-printonlyoptimal"))
-    { getOptions(stateObj).printonlyoptimal = true; }
+    { getOptions().printonlyoptimal = true; }
     else if(command == string("-cspcomp"))
     {
-      getOptions(stateObj).silent = true;
-      getOptions(stateObj).cspcomp = true;
+      getOptions().silent = true;
+      getOptions().cspcomp = true;
       in_cspcomp_for_failexit = true;
     }
 /** @help switches;-verbose Description
@@ -202,7 +202,7 @@ Print parser progress.
 help switches -quiet
 */
     else if(command == string("-verbose"))
-    { getOptions(stateObj).parser_verbose = true; }
+    { getOptions().parser_verbose = true; }
 /** @help switches;-prop-node Description
 Allows the user to choose the level of consistency to be enforced
 during search.
@@ -245,13 +245,13 @@ keeplong : Make a 'short tuple list' with no short tuples (only for benchmarking
       INCREMENT_i(-X-prop-node);
       string prop_mode(argv[i]);
       if(prop_mode == "none")
-        getOptions(stateObj).map_long_short = MLTTS_NoMap;
+        getOptions().map_long_short = MLTTS_NoMap;
       else if(prop_mode == "keeplong")
-        getOptions(stateObj).map_long_short = MLTTS_KeepLong;
+        getOptions().map_long_short = MLTTS_KeepLong;
       else if(prop_mode == "eager")
-        getOptions(stateObj).map_long_short = MLTTS_Eager;
+        getOptions().map_long_short = MLTTS_Eager;
       else if(prop_mode == "lazy")
-        getOptions(stateObj).map_long_short = MLTTS_Lazy;
+        getOptions().map_long_short = MLTTS_Lazy;
       else
       {
         output_fatal_error(" -X-map-long-short <none|keeplong|eager|lazy>");
@@ -319,7 +319,7 @@ search tree. Only available in a DEBUG executable.
     else if(command == string("-fullprop"))
     {
 #ifndef NO_DEBUG
-      getOptions(stateObj).fullpropagate = true;
+      getOptions().fullpropagate = true;
 #else
     FAIL_EXIT("This version of minion was not built to support the '-fullprop' command. Sorry");
 #endif
@@ -333,7 +333,7 @@ This option is the default on non-DEBUG executables.
 */
     else if(command == string("-nocheck"))
     {
-      getOptions(stateObj).nocheck = true;
+      getOptions().nocheck = true;
     }
 /** @help switches;-check Description
 Check solutions for correctness before printing them out.
@@ -344,13 +344,13 @@ This option is the default for DEBUG executables.
 */
     else if(command == string("-check"))
     {
-      getOptions(stateObj).nocheck = false;
+      getOptions().nocheck = false;
     }
 /** @help switches;-dumptree Description
 Print out the branching decisions and variable states at each node.
 */
     else if(command == string("-dumptree"))
-    { getOptions(stateObj).dumptree = true; }
+    { getOptions().dumptree = true; }
 /** @help switches;-nodelimit Description
 To stop search after N nodes, do
 
@@ -367,8 +367,8 @@ help switches -sollimit
       INCREMENT_i(-nodelimit);
       try
       {
-        getOptions(stateObj).nodelimit = fromstring<long long int>(argv[i]);
-        if(getOptions(stateObj).nodelimit < 0)
+        getOptions().nodelimit = fromstring<long long int>(argv[i]);
+        if(getOptions().nodelimit < 0)
           throw "Invalid lower bound";
       }
       catch(...)
@@ -393,8 +393,8 @@ help switches -timelimit
       INCREMENT_i(-sollimit);
       try
       {
-        getOptions(stateObj).sollimit = fromstring<SysInt>(argv[i]);
-        if(getOptions(stateObj).sollimit <= 0)
+        getOptions().sollimit = fromstring<SysInt>(argv[i]);
+        if(getOptions().sollimit <= 0)
           throw "Invalid lower bound";
       }
       catch(...)
@@ -417,16 +417,16 @@ help switches -sollimit
     else if(command == string("-timelimit"))
     {
       INCREMENT_i(-timelimit);
-      if(getOptions(stateObj).timeout_active)
+      if(getOptions().timeout_active)
       {
         cout << "Only one '-cpulimit' or '-timelimit' per instance" << endl;
         exit(1);
       }
-      getOptions(stateObj).timeout_active = true;
+      getOptions().timeout_active = true;
       try
       {
-        getOptions(stateObj).time_limit = fromstring<SysInt>(argv[i]);
-        getOptions(stateObj).time_limit_is_CPU_time = false;
+        getOptions().time_limit = fromstring<SysInt>(argv[i]);
+        getOptions().time_limit_is_CPU_time = false;
       }
       catch(...)
       {
@@ -446,7 +446,7 @@ it will not speed up search (except when the speed up is due to producing garbag
     {
         cout << "# WARNING: -skipautoaux can lead to incorrect solutions being produced\n";
         cout << "# WARNING: This is by design, but use this option with extreme care\n";
-        getOptions(stateObj).ensure_branch_on_all_vars = false;
+        getOptions().ensure_branch_on_all_vars = false;
     }
 /** @help switches;-cpulimit Description
 To stop search after N seconds (CPU time), do
@@ -462,16 +462,16 @@ help switches -sollimit
     else if(command == string("-cpulimit"))
     {
       INCREMENT_i(-cpulimit);
-      if(getOptions(stateObj).timeout_active)
+      if(getOptions().timeout_active)
       {
         cout << "Only one '-cpulimit', or '-timelimit' per instance" << endl;
         exit(1);
       }
-      getOptions(stateObj).timeout_active = true;
+      getOptions().timeout_active = true;
       try
       {
-        getOptions(stateObj).time_limit = fromstring<SysInt>(argv[i]);
-        getOptions(stateObj).time_limit_is_CPU_time = true;
+        getOptions().time_limit = fromstring<SysInt>(argv[i]);
+        getOptions().time_limit_is_CPU_time = true;
       }
       catch(...)
       {
@@ -503,24 +503,24 @@ help switches -sollimit
       else if(order == "srf-random")
       {
         args.order = ORDER_SRF;
-        getOptions(stateObj).randomise_valvarorder = true;
+        getOptions().randomise_valvarorder = true;
       }
       else if(order == "sdf")
         args.order = ORDER_SDF;
       else if(order == "sdf-random")
       {
         args.order = ORDER_SDF;
-        getOptions(stateObj).randomise_valvarorder = true;
+        getOptions().randomise_valvarorder = true;
       }
       else if(order == "ldf")
         args.order = ORDER_LDF;
       else if(order == "ldf-random")
       {
         args.order = ORDER_LDF;
-        getOptions(stateObj).randomise_valvarorder = true;
+        getOptions().randomise_valvarorder = true;
       }
       else if(order == "random")
-        getOptions(stateObj).randomise_valvarorder = true;
+        getOptions().randomise_valvarorder = true;
       else if(order == "conflict")
         args.order = ORDER_CONFLICT;
       else if(order == "wdeg") {
@@ -543,7 +543,7 @@ specified a random permutation of all the variables is used.
 */
     else if(command == string("-randomiseorder"))
     {
-      getOptions(stateObj).randomise_valvarorder = true;
+      getOptions().randomise_valvarorder = true;
     }
 /** @help switches;-randomseed Description
 Set the pseudorandom seed to N. This allows 'random' behaviour to be
@@ -557,12 +557,12 @@ repeated in different runs of minion.
     else if(command == string("-Xvarmunge"))
     {
       INCREMENT_i(-Xvarmunge);
-      getOptions(stateObj).Xvarmunge = atoi(argv[i]);
+      getOptions().Xvarmunge = atoi(argv[i]);
     }
     else if(command == string("-Xsymmunge"))
     {
       INCREMENT_i(-Xsymmunge);
-      getOptions(stateObj).Xsymmunge = atoi(argv[i]);
+      getOptions().Xsymmunge = atoi(argv[i]);
     }
 /** @help switches;-tableout Description
 Append a line of data about the current run of minion to a named file.
@@ -578,7 +578,7 @@ To add statistics about solving myproblem.minion to mystats.txt do
 */
     else if(command == string("-tableout") || command == string("-tableout0"))
     {
-        getOptions(stateObj).tableout=true;
+        getOptions().tableout=true;
         INCREMENT_i(-tableout);
         getTableOut().set_filename(argv[i]);
     }
@@ -594,7 +594,7 @@ To add the solutions of myproblem.minion to mysols.txt do
 */
     else if(command == string("-solsout") || command == string("-solsout0"))
     {
-      getOptions(stateObj).solsoutWrite=true;
+      getOptions().solsoutWrite=true;
       INCREMENT_i(-solsout);
       solsoutFile.open(argv[i], ios::app);
       if(!solsoutFile)
@@ -609,14 +609,14 @@ Write a resume file on timeout or being killed.
 */
     else if(command == string("-makeresume"))
     {
-      getOptions(stateObj).noresumefile = false;
+      getOptions().noresumefile = false;
     }
 /** @help switches;-noresume Description
 Do not write a resume file on timeout or being killed. (default)
 */
     else if(command == string("-noresume"))
     {
-      getOptions(stateObj).noresumefile = true;
+      getOptions().noresumefile = true;
     }
 /** @help switches;-gap Description
 Give name of gap executable (defaults to gap.sh)
@@ -624,7 +624,7 @@ Give name of gap executable (defaults to gap.sh)
    else if(command == string("-gap"))
     {
       INCREMENT_i(-gap);
-      getOptions(stateObj).gapname = argv[i];
+      getOptions().gapname = argv[i];
     }
 /** @help switches;-split Description
 When Minion is terminated before the end of search, write out two new input
@@ -656,9 +656,9 @@ Implies -makeresume.
 */
     else if(command == string("-split"))
     {
-      getOptions(stateObj).split = true;
-      getOptions(stateObj).noresumefile = false;
-      getOptions(stateObj).splitstderr=false;
+      getOptions().split = true;
+      getOptions().noresumefile = false;
+      getOptions().splitstderr=false;
     }
 /** @help switches;-split-stderr Description
 The flag -split-stderr has the same function as the flag -split, however the
@@ -668,9 +668,9 @@ See documentation for -split.
 */
     else if(command == string("-split-stderr"))
     {
-        getOptions(stateObj).split=true;
-        getOptions(stateObj).noresumefile=false;
-        getOptions(stateObj).splitstderr=true;
+        getOptions().split=true;
+        getOptions().noresumefile=false;
+        getOptions().splitstderr=true;
     }
     else if(command[0] == '-' && command != string("--"))
     {
@@ -679,8 +679,8 @@ See documentation for -split.
     }
     else
     {
-      if(getOptions(stateObj).instance_name == "")
-        getOptions(stateObj).instance_name = command;
+      if(getOptions().instance_name == "")
+        getOptions().instance_name = command;
       else
       {
         cout << "I was confused by '" << command << "'. Sorry." << endl;

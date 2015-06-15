@@ -62,8 +62,8 @@ struct Dynamic_OR : public ParentConstraint
 
   SysInt watched_constraint[2];
 
-  Dynamic_OR(StateObj* _stateObj, vector<AbstractConstraint*> _con) :
-    ParentConstraint(_stateObj, _con), full_propagate_called(_stateObj, false), constraint_locked(false),
+  Dynamic_OR(vector<AbstractConstraint*> _con) :
+    ParentConstraint(_con), full_propagate_called(false), constraint_locked(false),
     assign_size(-1), propagated_constraint(-1)
     {
       size_t max_size = 0;
@@ -231,7 +231,7 @@ struct Dynamic_OR : public ParentConstraint
       propagated_constraint = watched_constraint[other_constraint];
       //the following may be necessary for correctness for some constraints
       constraint_locked = true;
-      getQueue(stateObj).pushSpecialTrigger(this);
+      getQueue().pushSpecialTrigger(this);
       return;
     }
 
@@ -245,7 +245,7 @@ struct Dynamic_OR : public ParentConstraint
     {
       P("Clean old trigger");
       // This is an optimisation.
-      releaseTrigger(stateObj, trig);
+      releaseTrigger(trig);
     }
   }
 
@@ -270,7 +270,7 @@ struct Dynamic_OR : public ParentConstraint
 
     // Clean up triggers
     for(SysInt i = 0; i < assign_size * 2; ++i)
-      releaseTrigger(stateObj, dt + i);
+      releaseTrigger(dt + i);
 
     SysInt loop = 0;
 
@@ -294,7 +294,7 @@ struct Dynamic_OR : public ParentConstraint
 
     if(found_watch == false)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -325,7 +325,7 @@ struct Dynamic_OR : public ParentConstraint
     {
       propagated_constraint = watched_constraint[0];
       constraint_locked = true;
-      getQueue(stateObj).pushSpecialTrigger(this);
+      getQueue().pushSpecialTrigger(this);
     }
 
   }
@@ -342,7 +342,7 @@ inline AbstractConstraint* Dynamic_OR::reverse_constraint()
       {
           con.push_back(child_constraints[i]->reverse_constraint());
       }
-      return new Dynamic_AND(stateObj, con);
+      return new Dynamic_AND(con);
 }
 
 

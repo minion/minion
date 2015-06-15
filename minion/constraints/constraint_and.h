@@ -38,7 +38,7 @@ struct AndConstraint : public AbstractConstraint
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;
-  AndConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) : AbstractConstraint(_stateObj),
+  AndConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) : 
     var1(_var1), var2(_var2), var3(_var3)
   {
     CHECK(var1.getInitialMin() == 0, "The 'and' constraint works only Booleans");
@@ -184,14 +184,14 @@ struct AndConstraint : public AbstractConstraint
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
      
 };
 
 template<typename VarRef1, typename VarRef2, typename VarRef3>
 AbstractConstraint*
-AndCon(StateObj* stateObj, VarRef1 var1, VarRef2 var2, VarRef3 var3)
-{ return (new AndConstraint<VarRef1,VarRef2,VarRef3>(stateObj, var1,var2,var3)); }
+AndCon(VarRef1 var1, VarRef2 var2, VarRef3 var3)
+{ return (new AndConstraint<VarRef1,VarRef2,VarRef3>(var1,var2,var3)); }
 
 #endif

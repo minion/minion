@@ -40,8 +40,8 @@ struct GACElementConstraint : public AbstractConstraint
   VarRef resultvar;
   DomainInt var_array_min_val;
   DomainInt var_array_max_val;
-  GACElementConstraint(StateObj* _stateObj, const VarArray& _var_array, const IndexRef& _indexvar, const VarRef& _resultvar) :
-    AbstractConstraint(_stateObj), var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar),
+  GACElementConstraint(const VarArray& _var_array, const IndexRef& _indexvar, const VarRef& _resultvar) :
+    var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar),
     var_array_min_val(0), var_array_max_val(0)
   {
     CheckNotBound(var_array, "gacelement-deprecated", "element");
@@ -88,7 +88,7 @@ struct GACElementConstraint : public AbstractConstraint
 
     if(index < 0 || index >= array_size)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -256,22 +256,22 @@ struct GACElementConstraint : public AbstractConstraint
       vector<AbstractConstraint*> con;
       // or the index is out of range:
       vector<DomainInt> r; r.push_back(0); r.push_back((DomainInt)var_array.size()-1);
-      AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<IndexRef>(stateObj, indexvar, r);
+      AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<IndexRef>(indexvar, r);
       con.push_back(t4);
 
       for(SysInt i=0; i<(SysInt)var_array.size(); i++)
       {
           vector<AbstractConstraint*> con2;
-          WatchLiteralConstraint<IndexRef>* t=new WatchLiteralConstraint<IndexRef>(stateObj, indexvar, i);
+          WatchLiteralConstraint<IndexRef>* t=new WatchLiteralConstraint<IndexRef>(indexvar, i);
           con2.push_back((AbstractConstraint*) t);
-          NeqConstraintBinary<AnyVarRef, VarRef>* t2=new NeqConstraintBinary<AnyVarRef, VarRef>(stateObj, var_array[i], resultvar);
+          NeqConstraintBinary<AnyVarRef, VarRef>* t2=new NeqConstraintBinary<AnyVarRef, VarRef>(var_array[i], resultvar);
           con2.push_back((AbstractConstraint*) t2);
 
-          Dynamic_AND* t3= new Dynamic_AND(stateObj, con2);
+          Dynamic_AND* t3= new Dynamic_AND(con2);
           con.push_back((AbstractConstraint*) t3);
       }
 
-      return new Dynamic_OR(stateObj, con);
+      return new Dynamic_OR(con);
   }
 };
 #endif

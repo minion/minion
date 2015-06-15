@@ -69,9 +69,9 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   Reversible<bool> propagate_mode;
   DomainInt index_to_not_propagate;
 
-  VecCountDynamic(StateObj* _stateObj, const VarArray1& _array1, const VarArray2& _array2, DomainInt _hamming_distance) :
-  AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2), num_to_watch(_hamming_distance + 1), hamming_distance(_hamming_distance),
-    propagate_mode(_stateObj, false), index_to_not_propagate(-1)
+  VecCountDynamic(const VarArray1& _array1, const VarArray2& _array2, DomainInt _hamming_distance) :
+  var_array1(_array1), var_array2(_array2), num_to_watch(_hamming_distance + 1), hamming_distance(_hamming_distance),
+    propagate_mode(false), index_to_not_propagate(-1)
     {
        if(num_to_watch <= 1)
          num_to_watch = 0;
@@ -126,7 +126,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     // Failed to find enough watches
     if(found_matches < num_to_watch - 1)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -309,18 +309,18 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
 
   virtual AbstractConstraint* reverse_constraint()
    { return new VecCountDynamic<VarArray1, VarArray2, typename Operator::reverse_operator>
-         (stateObj, var_array1, var_array2, (SysInt)var_array1.size()-hamming_distance+1); }
+         (var_array1, var_array2, (SysInt)var_array1.size()-hamming_distance+1); }
 
 
 };
 
 template<typename VarArray1,  typename VarArray2>
 AbstractConstraint*
-  VecOrCountConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, DomainInt i)
-  { return new VecCountDynamic<VarArray1,VarArray2>(stateObj, varray1, varray2, i); }
+  VecOrCountConDynamic(const VarArray1& varray1, const VarArray2& varray2, DomainInt i)
+  { return new VecCountDynamic<VarArray1,VarArray2>(varray1, varray2, i); }
 
 template<typename VarArray1,  typename VarArray2>
 AbstractConstraint*
-  NotVecOrCountConDynamic(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, DomainInt i)
-  { return new VecCountDynamic<VarArray1,VarArray2,EqIterated>(stateObj, varray1, varray2, (SysInt)varray1.size() - i + 1); }
+  NotVecOrCountConDynamic(const VarArray1& varray1, const VarArray2& varray2, DomainInt i)
+  { return new VecCountDynamic<VarArray1,VarArray2,EqIterated>(varray1, varray2, (SysInt)varray1.size() - i + 1); }
 #endif

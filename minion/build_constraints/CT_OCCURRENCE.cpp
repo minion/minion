@@ -9,10 +9,10 @@
 
 template<typename T1, typename T3>
 AbstractConstraint*
-BuildCT_OCCURRENCE(StateObj* stateObj, const T1& t1, const T3& t3, ConstraintBlob& b)
+BuildCT_OCCURRENCE(const T1& t1, const T3& t3, ConstraintBlob& b)
 {
   const SysInt val_to_count = checked_cast<SysInt>(b.constants[0][0]);
-  return OccEqualCon(stateObj, t1, val_to_count, t3[0]);
+  return OccEqualCon(t1, val_to_count, t3[0]);
 }
 
 BUILD_CT(CT_OCCURRENCE, 2)

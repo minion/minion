@@ -43,8 +43,8 @@ template<typename Var>
   CONSTRAINT_ARG_LIST2(var, val);
 
   template<typename T>
-  WatchNotLiteralConstraint(StateObj* _stateObj, const Var& _var, const T& _val) :
-    AbstractConstraint(_stateObj), var(_var), val(_val) {}
+  WatchNotLiteralConstraint(const Var& _var, const T& _val) :
+    var(_var), val(_val) {}
 
   virtual SysInt dynamic_trigger_count()
   { return 1; }
@@ -124,8 +124,8 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
   DomainInt val;
 
   template<typename T>
-  WatchNotLiteralBoolConstraint(StateObj* _stateObj, const BoolVarRef& _var, const T& _val) :
-    AbstractConstraint(_stateObj), var(_var), val(_val) 
+  WatchNotLiteralBoolConstraint(const BoolVarRef& _var, const T& _val) :
+    var(_var), val(_val) 
   {
     //cout << "using boolean specialisation" << endl;
   }  

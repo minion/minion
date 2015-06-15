@@ -9,7 +9,7 @@
 
 template <typename T>
 AbstractConstraint*
-BuildCT_WATCHED_NEGATIVE_TABLE(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return GACNegativeTableCon(stateObj, t1, b.tuples); }
+BuildCT_WATCHED_NEGATIVE_TABLE(const T& t1, ConstraintBlob& b)
+{ return GACNegativeTableCon(t1, b.tuples); }
 
 BUILD_CT(CT_WATCHED_NEGATIVE_TABLE, 1)

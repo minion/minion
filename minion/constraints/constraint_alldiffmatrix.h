@@ -66,7 +66,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
     bool constraint_locked;
 
 
-    AlldiffMatrixConstraint(StateObj* _stateObj, const VarArrayType& _var_array, const ValueType _value) : AbstractConstraint(_stateObj),
+    AlldiffMatrixConstraint(const VarArrayType& _var_array, const ValueType _value) : 
     var_array(_var_array),
     constraint_locked(false),
     value(_value)
@@ -128,7 +128,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
       // use a watched-or of NotOccurrenceEqualConstraint, i.e. the negation of occurrence
         vector<AbstractConstraint*> con;
 
-        ConstantVar one(stateObj, 1);
+        ConstantVar one(1);
         for(SysInt i=0; i<squaresize; i++)
         {
             std::vector<VarRef> row_var_array;
@@ -136,7 +136,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
 
             NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>*
                 t=new NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>(
-                    stateObj, row_var_array, value, one);
+                    row_var_array, value, one);
             con.push_back((AbstractConstraint*) t);
         }
 
@@ -147,11 +147,11 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
 
             NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>*
                 t=new NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>(
-                    stateObj, col_var_array, value, one);
+                    col_var_array, value, one);
             con.push_back((AbstractConstraint*) t);
         }
 
-        return new Dynamic_OR(stateObj, con);
+        return new Dynamic_OR(con);
 
   }
 
@@ -173,7 +173,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
           if(!constraint_locked)
           {
               constraint_locked = true;
-              getQueue(stateObj).pushSpecialTrigger(this);
+              getQueue().pushSpecialTrigger(this);
           }
       }
       else {
@@ -188,14 +188,14 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
 
               bool f=update_matching_assignment(row, col);
               if(!f) {
-                  getState(stateObj).setFailed(true);
+                  getState().setFailed(true);
                   return;
               }
 
               // If it was assigned to value, then we need to propagate.
               if(!constraint_locked) {
                   constraint_locked = true;
-                  getQueue(stateObj).pushSpecialTrigger(this);
+                  getQueue().pushSpecialTrigger(this);
               }
           }
       }
@@ -207,7 +207,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
   {
     constraint_locked = false;
 
-    if(getState(stateObj).isFailed())
+    if(getState().isFailed())
     {
         return;
     }
@@ -237,7 +237,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
 
               // If two assignments in one row or column...
               if(rowcolmatching[row]!=-1  ||  colrowmatching[col]!=-1) {
-                  getState(stateObj).setFailed(true);
+                  getState().setFailed(true);
                   return;
               }
               else {
@@ -248,7 +248,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
       }
 
 
-      if(getState(stateObj).isFailed())
+      if(getState().isFailed())
       {
           return;
       }
@@ -290,7 +290,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
         bool matchok=bfsmatching();
 
         if(!matchok) {
-            getState(stateObj).setFailed(true);
+            getState().setFailed(true);
         }
         else {
             tarjan_recursive();

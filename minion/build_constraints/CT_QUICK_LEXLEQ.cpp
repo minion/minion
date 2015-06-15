@@ -9,7 +9,7 @@
 
 template<typename VarArray1, typename VarArray2>
 AbstractConstraint*
-BuildCT_QUICK_LEXLEQ(StateObj* stateObj, const VarArray1& x, const VarArray2& y, ConstraintBlob&)
-{ return new QuickLexDynamic<VarArray1, VarArray2, false>(stateObj,x,y); }
+BuildCT_QUICK_LEXLEQ(const VarArray1& x, const VarArray2& y, ConstraintBlob&)
+{ return new QuickLexDynamic<VarArray1, VarArray2, false>(x,y); }
 
 BUILD_CT(CT_QUICK_LEXLEQ, 2)

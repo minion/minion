@@ -54,8 +54,8 @@ struct LessEqualNvalueConstraint : public AbstractConstraint
 
   CONSTRAINT_ARG_LIST2(vars, result);
   
-  LessEqualNvalueConstraint(StateObj* _stateObj, VarArray _vars, VarResult _result) :
-    AbstractConstraint(_stateObj), vars(_vars),result(_result)
+  LessEqualNvalueConstraint(VarArray _vars, VarResult _result) :
+    vars(_vars),result(_result)
   {
   }
   
@@ -165,7 +165,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
 };
 
@@ -181,8 +181,8 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint
 
   CONSTRAINT_ARG_LIST2(vars, result);
   
-  GreaterEqualNvalueConstraint(StateObj* _stateObj, VarArray _vars, VarResult _result) :
-    AbstractConstraint(_stateObj), vars(_vars),result(_result)
+  GreaterEqualNvalueConstraint(VarArray _vars, VarResult _result) :
+    vars(_vars),result(_result)
   {
   }
   
@@ -323,7 +323,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
 };
 

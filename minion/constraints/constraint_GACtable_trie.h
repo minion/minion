@@ -34,7 +34,7 @@ struct GACTableConstraint : public AbstractConstraint
 
    virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
 
   CONSTRAINT_ARG_LIST2(vars, tuples);
@@ -64,8 +64,8 @@ struct GACTableConstraint : public AbstractConstraint
 
   TupleList* tuples;
 
-  GACTableConstraint(StateObj* _stateObj,const VarArray& _vars, TupleList* _tuples) :
-    AbstractConstraint(_stateObj), vars(_vars), tuples(_tuples)
+  GACTableConstraint(const VarArray& _vars, TupleList* _tuples) :
+    vars(_vars), tuples(_tuples)
   {
     CheckNotBound(vars, "table constraints","");
     tupleTrieArrayptr = tuples->getTries();
@@ -178,7 +178,7 @@ struct GACTableConstraint : public AbstractConstraint
   {
       if(negative==0 && tuples->size()==0)
       {   // it seems to work without this explicit check, but I put it in anyway.
-          getState(stateObj).setFailed(true);
+          getState().setFailed(true);
           return;
       }
       for(SysInt varIndex = 0; varIndex < (SysInt)vars.size(); ++varIndex)
@@ -189,7 +189,7 @@ struct GACTableConstraint : public AbstractConstraint
             vars[varIndex].setMax((tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]);
         }
 
-        if(getState(stateObj).isFailed()) return;
+        if(getState().isFailed()) return;
 
         DomainInt max = vars[varIndex].getMax();
         for(DomainInt i = vars[varIndex].getMin(); i <= max; ++i)
@@ -239,7 +239,7 @@ struct GACTableConstraint : public AbstractConstraint
 
     virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
   {
-      D_ASSERT(!getState(stateObj).isFailed());
+      D_ASSERT(!getState().isFailed());
       DomainInt max = vars[0].getMax();
       for(DomainInt i = vars[0].getMin(); i <= max; ++i)
       {
@@ -328,12 +328,12 @@ struct GACTableConstraint : public AbstractConstraint
 
 //template<typename VarArray>
 //AbstractConstraint*
-//GACTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
-//{ return new GACTableConstraint<VarArray, 0>(stateObj, vars, tuples); }
+//GACTableCon(const VarArray& vars, TupleList* tuples)
+//{ return new GACTableConstraint<VarArray, 0>(vars, tuples); }
 
 template<typename VarArray>
 AbstractConstraint*
-GACNegativeTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
-{ return new GACTableConstraint<VarArray, 1>(stateObj, vars, tuples); }
+GACNegativeTableCon(const VarArray& vars, TupleList* tuples)
+{ return new GACTableConstraint<VarArray, 1>(vars, tuples); }
 
 #endif

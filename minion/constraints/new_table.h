@@ -223,8 +223,8 @@ struct NewTableConstraint : public AbstractConstraint
 
   TupleList* tuples;
 
-  NewTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
-  AbstractConstraint(stateObj), vars(_vars), data(new TableDataType(_tuples)), state(data), tuples(_tuples)
+  NewTableConstraint(const VarArray& _vars, TupleList* _tuples) :
+  vars(_vars), data(new TableDataType(_tuples)), state(data), tuples(_tuples)
   {
     CheckNotBound(vars, "table constraint");
       if(_tuples->tuple_size()!=(SysInt)_vars.size())
@@ -256,7 +256,7 @@ struct NewTableConstraint : public AbstractConstraint
     P(propagated_literal << "." << vars.size() << "." << lit.var << "." << lit.val);
     if(!vars[lit.var].inDomain(lit.val))
     {
-      //releaseTrigger(stateObj, propagated_trig , TO_Backtrack);
+      //releaseTrigger(propagated_trig , TO_Backtrack);
       P("Quick return");
       return;
     }
@@ -302,7 +302,7 @@ struct NewTableConstraint : public AbstractConstraint
     dt += lit_pos * (vars_size - 1);
     for(SysInt v = 0; v < vars_size; ++v)
     {
-      releaseTrigger(stateObj, dt , TO_Backtrack);
+      releaseTrigger(dt , TO_Backtrack);
       ++dt;
     }
   }
@@ -317,7 +317,7 @@ struct NewTableConstraint : public AbstractConstraint
       vars[i].setMin(bounds.first);
       vars[i].setMax(bounds.second);
 
-      if(getState(stateObj).isFailed()) return;
+      if(getState().isFailed()) return;
 
       for(DomainInt x = vars[i].getMin(); x <= vars[i].getMax(); ++x)
       {
@@ -361,7 +361,7 @@ struct NewTableConstraint : public AbstractConstraint
 
   virtual AbstractConstraint* reverse_constraint()
   {
-    return GACNegativeTableCon(stateObj, vars, tuples);
+    return GACNegativeTableCon(vars, tuples);
   }
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
@@ -388,5 +388,5 @@ inline TupleTrieArray* TupleList::getTries()
 
 template<typename VarArray>
 AbstractConstraint*
-  GACTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
-  { return new NewTableConstraint<VarArray>(stateObj, vars, tuples); }
+  GACTableCon(const VarArray& vars, TupleList* tuples)
+  { return new NewTableConstraint<VarArray>(vars, tuples); }

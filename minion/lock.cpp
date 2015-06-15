@@ -24,35 +24,35 @@ namespace Controller
 /// Lists all structures that must be locked before search.
 // @todo This could be done more neatly... 
 
-void lock(StateObj* stateObj)
+void lock()
 {  
-  getVars(stateObj).lock();
+  getVars().lock();
   
-  SysInt size = getState(stateObj).getConstraintList().size();
+  SysInt size = getState().getConstraintList().size();
   for(SysInt i = 0 ; i < size;i++)
-  getState(stateObj).getConstraintList()[i]->setup();
+  getState().getConstraintList()[i]->setup();
   
-  getMemory(stateObj).monotonicSet().lock(stateObj);
+  getMemory().monotonicSet().lock();
   
-  getTriggerMem(stateObj).finaliseTriggerLists();
+  getTriggerMem().finaliseTriggerLists();
   
   // No longer AC1, thank goodness.
   for(SysInt i = 0; i < size; ++i)
   {
-    if(getState(stateObj).isFailed()) 
+    if(getState().isFailed()) 
       return;
-    getState(stateObj).getConstraintList()[i]->full_propagate();
-    getState(stateObj).getConstraintList()[i]->full_propagate_done=true;
-    if(getState(stateObj).isFailed()) 
+    getState().getConstraintList()[i]->full_propagate();
+    getState().getConstraintList()[i]->full_propagate_done=true;
+    if(getState().isFailed()) 
       return;
     // If queues not empty, more work to do.
-    if(!getQueue(stateObj).isQueuesEmpty())
+    if(!getQueue().isQueuesEmpty())
     {
-        getQueue(stateObj).propagateQueueRoot();
+        getQueue().propagateQueueRoot();
     }
   }
   
-  getState(stateObj).markLocked();
+  getState().markLocked();
 
 }
 }

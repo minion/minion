@@ -34,8 +34,8 @@ struct SumEqConstraintDynamic : public AbstractConstraint
   
   SysInt xmult, ymult;
 
-  SumEqConstraintDynamic(StateObj* _stateObj, SysInt _xmult, SysInt _ymult, VarRef1 _x, VarRef2 _y, VarRef3 _z) :
-    AbstractConstraint(stateObj), xmult(_xmult), ymult(_ymult), x(_x), y(_y), z(_z), vals(-1)
+  SumEqConstraintDynamic(SysInt _xmult, SysInt _ymult, VarRef1 _x, VarRef2 _y, VarRef3 _z) :
+    xmult(_xmult), ymult(_ymult), x(_x), y(_y), z(_z), vals(-1)
   { 
     if(xmult < 1 || ymult < 1)
       INPUT_ERROR("Multipliers on gacsum must be > 0");
@@ -259,7 +259,7 @@ struct SumEqConstraintDynamic : public AbstractConstraint
 
 template<typename VarArray, typename Var>
 AbstractConstraint*
-BuildCT_GACSUM(StateObj* stateObj, const vector<DomainInt>& consts, const VarArray& _var_array, const Var& var, ConstraintBlob&)
+BuildCT_GACSUM(const vector<DomainInt>& consts, const VarArray& _var_array, const Var& var, ConstraintBlob&)
 {
   typedef typename VarArray::value_type ValT;
   typedef typename Var::value_type VarT;
@@ -267,7 +267,7 @@ BuildCT_GACSUM(StateObj* stateObj, const vector<DomainInt>& consts, const VarArr
   if(consts.size() != 2 || _var_array.size() != 2)
     INPUT_ERROR("gacsum only accepts two variables on the left hand side.");
 
-  return new SumEqConstraintDynamic<ValT,ValT,VarT>(stateObj, 
+  return new SumEqConstraintDynamic<ValT,ValT,VarT>(
    consts[0], consts[1], _var_array[0], _var_array[1], var[0]);
 }
 

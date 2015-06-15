@@ -9,7 +9,7 @@
 
 template<typename T1, typename T2>
 AbstractConstraint*
-BuildCT_EQ(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob&) 
-{ return EqualCon(stateObj, t1[0],t2[0]); }
+BuildCT_EQ(const T1& t1, const T2& t2, ConstraintBlob&) 
+{ return EqualCon(t1[0],t2[0]); }
 
 BUILD_CT(CT_EQ, 2)

@@ -140,7 +140,7 @@ struct LightTableConstraint : public AbstractConstraint
 
    virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
 
   CONSTRAINT_ARG_LIST2(vars, tuples);
@@ -151,8 +151,8 @@ struct LightTableConstraint : public AbstractConstraint
   TableDataType* data;   // Assuming this is a TrieData for the time being.
   // Can this be the thing instead of a *??
 
-  LightTableConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples) :
-  AbstractConstraint(stateObj), vars(_vars), tuples(_tuples), data(new TableDataType(_tuples))
+  LightTableConstraint(const VarArray& _vars, TupleList* _tuples) :
+  vars(_vars), tuples(_tuples), data(new TableDataType(_tuples))
   {
       CheckNotBound(vars, "table constraints","");
       if(_tuples->tuple_size()!=(SysInt)_vars.size())
@@ -240,5 +240,5 @@ inline TupleTrieArray* TupleList::getTries()
 
 template<typename VarArray>
 AbstractConstraint*
-  GACLightTableCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples)
-  { return new LightTableConstraint<VarArray>(stateObj, vars, tuples); }
+  GACLightTableCon(const VarArray& vars, TupleList* tuples)
+  { return new LightTableConstraint<VarArray>(vars, tuples); }

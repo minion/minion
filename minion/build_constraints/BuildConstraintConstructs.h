@@ -30,7 +30,7 @@ struct BuildConObj
 {
   template<typename ConData>
   static
-  AbstractConstraint* build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysInt pos) DOM_NOINLINE;
+  AbstractConstraint* build(const ConData& partial_build, ConstraintBlob& b, SysInt pos) DOM_NOINLINE;
 };
 
 
@@ -38,7 +38,7 @@ template<ConstraintType constraint, SysInt size>
 template<typename ConData>
 AbstractConstraint*
 BuildConObj<constraint, size>::
-build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysInt pos)
+build(const ConData& partial_build, ConstraintBlob& b, SysInt pos)
 {
   const vector<Var>& vars = b.vars[pos];
 
@@ -69,41 +69,41 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysIn
       {
         vector<BoolVarRef> v(vars.size());
         for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-          v[i] = getVars(stateObj).boolVarContainer.get_var_num(vars[i].pos());
+          v[i] = getVars().boolVarContainer.get_var_num(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
-          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+          build(make_pair(partial_build, &v), b, pos + 1);
       }
       case VAR_NOTBOOL:
       {
         vector<VarNot<BoolVarRef> > v(vars.size());
         for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-          v[i] = VarNotRef(getVars(stateObj).boolVarContainer.get_var_num(vars[i].pos()));
+          v[i] = VarNotRef(getVars().boolVarContainer.get_var_num(vars[i].pos()));
         return BuildConObj<constraint, size - 1>::
-          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+          build(make_pair(partial_build, &v), b, pos + 1);
       }
       case VAR_BOUND:
       {
         vector<BoundVarRef> v(vars.size());
         for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-          v[i] = getVars(stateObj).boundVarContainer.get_var_num(vars[i].pos());
+          v[i] = getVars().boundVarContainer.get_var_num(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
-          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+          build(make_pair(partial_build, &v), b, pos + 1);
       }
       case VAR_SPARSEBOUND:
       {
         vector<SparseBoundVarRef> v(vars.size());
         for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-          v[i] = getVars(stateObj).sparseBoundVarContainer.get_var_num(vars[i].pos());
+          v[i] = getVars().sparseBoundVarContainer.get_var_num(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
-          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+          build(make_pair(partial_build, &v), b, pos + 1);
       }
       case VAR_DISCRETE:
       {
         vector<BigRangeVarRef> v(vars.size());
         for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-          v[i] = getVars(stateObj).bigRangeVarContainer.get_var_num(vars[i].pos());
+          v[i] = getVars().bigRangeVarContainer.get_var_num(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
-          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+          build(make_pair(partial_build, &v), b, pos + 1);
       }
       case VAR_SPARSEDISCRETE:
         INPUT_ERROR( "Sparse Discrete Variables current broken. Sorry");
@@ -112,9 +112,9 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysIn
       {
         vector<ConstantVar> v(vars.size());
         for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-          v[i] = ConstantVar(stateObj, vars[i].pos());
+          v[i] = ConstantVar(vars[i].pos());
         return BuildConObj<constraint, size - 1>::
-          build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+          build(make_pair(partial_build, &v), b, pos + 1);
       }
     }
   }
@@ -123,10 +123,10 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysIn
   {
     vector<AnyVarRef> v(vars.size());
     for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-      v[i] = get_AnyVarRef_from_Var(stateObj, vars[i]);
+      v[i] = get_AnyVarRef_from_Var(vars[i]);
 
     return BuildConObj<constraint, size - 1>::
-      build(stateObj, make_pair(partial_build, &v), b, pos + 1);
+      build(make_pair(partial_build, &v), b, pos + 1);
   }
   // This FAIL_EXIT is here to stop a "no return in non-void function" warning. It should never be reached.
   INPUT_ERROR( "This should never be reached..");
@@ -137,4 +137,4 @@ build(StateObj* stateObj, const ConData& partial_build, ConstraintBlob& b, SysIn
 }
 
 AbstractConstraint*
-build_constraint(StateObj* stateObj, ProbSpec::ConstraintBlob& b);
+build_constraint(ProbSpec::ConstraintBlob& b);

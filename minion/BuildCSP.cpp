@@ -30,48 +30,47 @@
 
 using namespace ProbSpec;
 
-/// Builds the CSP given by instance into stateObj.
-void BuildCSP(StateObj* stateObj, CSPInstance& instance)
+void BuildCSP(CSPInstance& instance)
 {
-  getState(stateObj).setTupleListContainer(instance.tupleListContainer);
-  getState(stateObj).setShortTupleListContainer(instance.shortTupleListContainer);
+  getState().setTupleListContainer(instance.tupleListContainer);
+  getState().setShortTupleListContainer(instance.shortTupleListContainer);
 
   // XXX : Hack for reify / reifyimply problem.
-  getState(stateObj).setDynamicTriggersUsed(true);
+  getState().setDynamicTriggersUsed(true);
 
   // Set up variables
-  BuildCon::build_variables(stateObj, instance.vars);
-  getState(stateObj).setInstance(&instance);
+  BuildCon::build_variables(instance.vars);
+  getState().setInstance(&instance);
 
   // Set up optimisation
   if(instance.is_optimisation_problem)
   {
     if(instance.optimise_minimising)
-      Controller::optimise_minimise_var(stateObj, BuildCon::get_AnyVarRef_from_Var(stateObj, instance.optimise_variable));
+      Controller::optimise_minimise_var(BuildCon::get_AnyVarRef_from_Var(instance.optimise_variable));
     else
-      Controller::optimise_maximise_var(stateObj, BuildCon::get_AnyVarRef_from_Var(stateObj, instance.optimise_variable));
+      Controller::optimise_maximise_var(BuildCon::get_AnyVarRef_from_Var(instance.optimise_variable));
   }
 
-  vector<vector<AnyVarRef> >& print_matrix = getState(stateObj).getPrintMatrix();
+  vector<vector<AnyVarRef> >& print_matrix = getState().getPrintMatrix();
 
   // Reserve room in vector - no necessary but more efficent.
   print_matrix.reserve(instance.print_matrix.size());
   for(UnsignedSysInt i = 0; i < instance.print_matrix.size(); ++i)
-      print_matrix.push_back(BuildCon::get_AnyVarRef_from_Var(stateObj, instance.print_matrix[i]));
+      print_matrix.push_back(BuildCon::get_AnyVarRef_from_Var(instance.print_matrix[i]));
 
   // Impose Constraints
   for(list<ConstraintBlob>::iterator it = instance.constraints.begin(); it != instance.constraints.end(); it++) {
-     getState(stateObj).addConstraint(build_constraint(stateObj, *it));
+     getState().addConstraint(build_constraint(*it));
   }
 
   // Solve!
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Setup Time: ", "SetupTime", getTableOut(), !getOptions(stateObj).silent);
-  Controller::initalise_search(stateObj);
-  getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Initial Propagate: ", "InitialPropagate", getTableOut(), !getOptions(stateObj).silent);
+  getState().getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Setup Time: ", "SetupTime", getTableOut(), !getOptions().silent);
+  Controller::initalise_search();
+  getState().getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Initial Propagate: ", "InitialPropagate", getTableOut(), !getOptions().silent);
 
 }
 
-void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
+void SolveCSP(CSPInstance& instance, SearchMethod args)
 {
     // Check that when searching PropagateSAC does actually do the SAC over all vars in any
     // varorder block, not just the ones in the 'current' block
@@ -95,12 +94,12 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
         
         for(SysInt j=0; j<(SysInt)instance.search_order[i].var_order.size(); j++)
         {   // cobble together all the varorder blocks for preprocessing.
-            preprocess_vars.push_back(get_AnyVarRef_from_Var(stateObj, instance.search_order[i].var_order[j]));
+            preprocess_vars.push_back(get_AnyVarRef_from_Var(instance.search_order[i].var_order[j]));
         }
 
-        if(getOptions(stateObj).randomise_valvarorder)
+        if(getOptions().randomise_valvarorder)
         {
-            getOptions(stateObj).printLine("Using seed: " + tostring(args.random_seed));
+            getOptions().printLine("Using seed: " + tostring(args.random_seed));
             srand( args.random_seed );
 
             std::random_shuffle(instance.search_order[i].var_order.begin(), instance.search_order[i].var_order.end());
@@ -114,28 +113,28 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
         D_ASSERT(instance.search_order[i].var_order.size() == instance.search_order[i].val_order.size());
     }
 
-    shared_ptr<Controller::SearchManager> sm=Controller::make_search_manager(stateObj, args.prop_method, instance.search_order);
+    shared_ptr<Controller::SearchManager> sm=Controller::make_search_manager(args.prop_method, instance.search_order);
 
-    getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions(stateObj).silent);
+    getState().getOldTimer().maybePrintTimestepStore(cout, Output_2, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions().silent);
     try {
 
       try {
-      PropogateCSP(stateObj, std::max(args.preprocess, args.prop_method), preprocess_vars, !getOptions(stateObj).silent);
+      PropogateCSP(std::max(args.preprocess, args.prop_method), preprocess_vars, !getOptions().silent);
       }
       catch(EndOfSearch eos)
       {
-          if(getOptions(stateObj).outputCompressed != "" || getOptions(stateObj).outputCompressedDomains)
-              dump_solver(stateObj, getOptions(stateObj).outputCompressed, getOptions(stateObj).outputCompressedDomains);
+          if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
+              dump_solver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
           throw;
       }
 
-      getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions(stateObj).silent);
-      getState(stateObj).getOldTimer().maybePrintTimestepStore(cout, Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions(stateObj).silent);
+      getState().getOldTimer().maybePrintTimestepStore(cout, Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions().silent);
+      getState().getOldTimer().maybePrintTimestepStore(cout, Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions().silent);
 
-      if(getOptions(stateObj).outputCompressed != "" || getOptions(stateObj).outputCompressedDomains)
-        dump_solver(stateObj, getOptions(stateObj).outputCompressed, getOptions(stateObj).outputCompressedDomains);
+      if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
+        dump_solver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
 
-      if(!getState(stateObj).isFailed())
+      if(!getState().isFailed())
       {
         sm->search();
       }
@@ -143,36 +142,36 @@ void SolveCSP(StateObj* stateObj, CSPInstance& instance, SearchMethod args)
     catch(EndOfSearch)
     { }
 
-  if(getOptions(stateObj).printonlyoptimal)
+  if(getOptions().printonlyoptimal)
   {
-    cout << getState(stateObj).storedSolution;
+    cout << getState().storedSolution;
   }
 
-  getState(stateObj).getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime", getTableOut(), !getOptions(stateObj).silent);
-  getOptions(stateObj).printLine("Total Nodes: " + tostring( getState(stateObj).getNodeCount() ));
-  getOptions(stateObj).printLine(string("Problem solvable?: ") + (getState(stateObj).getSolutionCount() == 0 ? "no" : "yes"));
+  getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime", getTableOut(), !getOptions().silent);
+  getOptions().printLine("Total Nodes: " + tostring( getState().getNodeCount() ));
+  getOptions().printLine(string("Problem solvable?: ") + (getState().getSolutionCount() == 0 ? "no" : "yes"));
 
-  if(getOptions(stateObj).cspcomp)
+  if(getOptions().cspcomp)
   {
-    if(getState(stateObj).getSolutionCount() != 0)
+    if(getState().getSolutionCount() != 0)
       cout << "s SATISFIABLE" << endl;
     else
       cout << "s UNSATISFIABLE" << endl;
   }
 
-  getOptions(stateObj).printLine("Solutions Found: " + tostring(getState(stateObj).getSolutionCount()));
+  getOptions().printLine("Solutions Found: " + tostring(getState().getSolutionCount()));
 
-  getTableOut().set("Nodes", tostring(getState(stateObj).getNodeCount()));
-  getTableOut().set("Satisfiable", (getState(stateObj).getSolutionCount()==0 ? 0 : 1));
-  getTableOut().set("SolutionsFound", getState(stateObj).getSolutionCount());
+  getTableOut().set("Nodes", tostring(getState().getNodeCount()));
+  getTableOut().set("Satisfiable", (getState().getSolutionCount()==0 ? 0 : 1));
+  getTableOut().set("SolutionsFound", getState().getSolutionCount());
 
-  if(getOptions(stateObj).tableout)
+  if(getOptions().tableout)
   {
     getTableOut().print_line();  // Outputs a line to the table file.
   }
 
 #ifdef MORE_SEARCH_INFO
-  if(!getOptions(stateObj).silent)
+  if(!getOptions().silent)
     print_search_info();
 #endif
 

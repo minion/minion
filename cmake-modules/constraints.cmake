@@ -6,7 +6,7 @@ set(ALL_CONSTRAINTS "element" "element_undefzero" "element_one" "watchelement" "
                     "occurrenceleq" "occurrencegeq" "product" "difference"
                     "weightedsumleq" "weightedsumgeq" "sumgeq" "sumleq" "watchsumgeq"
                     "watchsumleq" "table" "negativetable" "watchvecneq" "staticvecneq" "litsumgeq"
-                    "pow" "div" "div_undefzero" "modulo" "modulo_undefzero" "gadget" "disabled-or"
+                    "pow" "div" "div_undefzero" "modulo" "modulo_undefzero" "disabled-or"
                     "hamming" "not-hamming" "watched-or" "watched-and"
                     "w-inset" "w-inintervalset" "w-notinset" "w-inrange" "w-notinrange" "w-literal"
                     "w-notliteral" "reify" "reifyimply-quick" "reifyimply"
@@ -225,9 +225,6 @@ set(NAME_ID_modulo_undefzero "CT_MODULO_UNDEFZERO")
 set(NAME_READ_modulo_undefzero "read_2_vars" "read_var")
 
 
-set(NAME_ID_gadget "CT_GADGET")
-set(NAME_READ_gadget "read_list")
-
 set(NAME_ID_disabled-or "CT_WATCHED_OR")
 set(NAME_READ_disabled-or "read_list")
 
@@ -304,7 +301,7 @@ macro(select_constraints)
     file(APPEND ${CONSTRAINT_ENUM} "enum ConstraintType {\n")
     file(APPEND ${BUILD_START} "#include \"../minion.h\"\n")
     file(APPEND ${BUILD_STATIC_START} "#include \"BuildStart.h\"\n")
-    file(APPEND ${BUILD_STATIC_START} "AbstractConstraint* build_constraint(StateObj* stateObj, ConstraintBlob& b) {\n")
+    file(APPEND ${BUILD_STATIC_START} "AbstractConstraint* build_constraint(ConstraintBlob& b) {\n")
     file(APPEND ${BUILD_STATIC_START} "switch(b.constraint->type) {\n")
     set(msg "")
     foreach(constraint ${ARGV})
@@ -338,9 +335,9 @@ macro(select_constraints)
             # ConstraintEnum.h
             file(APPEND ${CONSTRAINT_ENUM} "${NAME_ID_${constraint}},\n")
             # BuildStart.h
-            file(APPEND ${BUILD_START} "AbstractConstraint* build_constraint_${NAME_ID_${constraint}}(StateObj* stateObj, ConstraintBlob&);\n")
+            file(APPEND ${BUILD_START} "AbstractConstraint* build_constraint_${NAME_ID_${constraint}}(ConstraintBlob&);\n")
             # BuildStaticStart.h
-            file(APPEND ${BUILD_STATIC_START} "case ${NAME_ID_${constraint}}: return build_constraint_${NAME_ID_${constraint}}(stateObj, b);\n")
+            file(APPEND ${BUILD_STATIC_START} "case ${NAME_ID_${constraint}}: return build_constraint_${NAME_ID_${constraint}}(b);\n")
 
         endif()
     endforeach()

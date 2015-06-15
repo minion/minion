@@ -65,9 +65,9 @@ struct LessEqualSumConstraint : public AbstractConstraint
   VarSum var_sum;
   DomainInt max_looseness;
   Reversible<DomainInt> var_array_min_sum;
-  LessEqualSumConstraint(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
-    AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum),
-    var_array_min_sum(_stateObj)
+  LessEqualSumConstraint(const VarArray& _var_array, VarSum _var_sum) :
+    var_array(_var_array), var_sum(_var_sum),
+    var_array_min_sum()
   {
       BigInt accumulator=0;
       for(SysInt i=0; i<(SysInt)var_array.size(); i++) {
@@ -124,14 +124,14 @@ struct LessEqualSumConstraint : public AbstractConstraint
     }
 
     var_sum.setMin(sum);
-    if(getState(stateObj).isFailed())
+    if(getState().isFailed())
         return;
     D_ASSERT(sum <= get_real_min_sum());
 
     DomainInt looseness = var_sum.getMax() - sum;
     if(looseness < 0)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -230,7 +230,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     SumType new_sum = ShiftVarRef( VarNegRef(var_sum), compiletime_val<SysInt, -1>());
 
     return new LessEqualSumConstraint<typename NegType<VarArray>::type, SumType, true>
-      (stateObj, new_var_array, new_sum);
+      (new_var_array, new_sum);
   }
 
   template<bool b>
@@ -244,7 +244,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     SumType new_sum = ShiftVarRef( VarNegRef(var_sum), compiletime_val<SysInt, -1>());
 
     return new LessEqualSumConstraint<vector<AnyVarRef>, AnyVarRef, true>
-      (stateObj, new_var_array, new_sum);
+      (new_var_array, new_sum);
        }
 
   };

@@ -30,7 +30,7 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
   virtual AbstractConstraint* reverse_constraint()
   {
     return new BoolLessSumConstraintDynamic<vector<VarRef>, DomainInt, 1>
-               (stateObj, make_vec(var1, var2), 2);
+               (make_vec(var1, var2), 2);
   }
 
   CONSTRAINT_ARG_LIST2(get_vars(), (DomainInt)1);
@@ -40,8 +40,8 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
   VarRef var1;
   VarRef var2;
   
-  BoolBinarySATConstraintDynamic(StateObj* _stateObj,const VarArray& _var_array) :
-    AbstractConstraint(_stateObj), var1(_var_array[0]), var2(_var_array[1])
+  BoolBinarySATConstraintDynamic(const VarArray& _var_array) :
+    var1(_var_array[0]), var2(_var_array[1])
   { D_ASSERT(_var_array.size() == 2); }
   
   virtual SysInt dynamic_trigger_count()
@@ -120,7 +120,7 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
 
 template<typename VarArray>
 AbstractConstraint*
-BoolBinarySATConDynamic(StateObj* stateObj, const VarArray& _var_array)
-{ return new BoolBinarySATConstraintDynamic<VarArray>(stateObj, _var_array); }
+BoolBinarySATConDynamic(const VarArray& _var_array)
+{ return new BoolBinarySATConstraintDynamic<VarArray>(_var_array); }
 
 #endif

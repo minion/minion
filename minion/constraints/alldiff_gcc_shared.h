@@ -184,7 +184,7 @@ struct smallset_list_bt
     void* list;
     SysInt maxsize;
 
-    void reserve(SysInt size, StateObj * stateObj)
+    void reserve(SysInt size)
     {
         // This must be called before anything is put in the set.
         maxsize=size;
@@ -193,7 +193,7 @@ struct smallset_list_bt
         for(SysInt i=0; i<size; i++) membership[i]=0;
 
         cert=1;
-        list= getMemory(stateObj).backTrack().request_bytes((size+1)*sizeof(short));
+        list= getMemory().backTrack().request_bytes((size+1)*sizeof(short));
         ((short*)list)[maxsize]=0;   // The count is stored in the last element of the array.
     }
 
@@ -286,7 +286,7 @@ struct FlowConstraint : public AbstractConstraint
     protected:
 
     // Base class for GAC alldiff and GCC
-    FlowConstraint(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
+    FlowConstraint(const VarArray& _var_array) : 
     numvars(0), numvals(0), dom_min(0), dom_max(0),
     #ifndef REVERSELIST
     var_array(_var_array),
@@ -331,7 +331,7 @@ struct FlowConstraint : public AbstractConstraint
                 adjlistpos[i].resize(numvars);
                 for(SysInt j=0; j<numvars; j++) adjlistpos[i][j]=j;
             }
-            adjlistlength=getMemory(stateObj).backTrack().template requestArray<SysInt>(numvars+numvals);
+            adjlistlength=getMemory().backTrack().template requestArray<SysInt>(numvars+numvals);
             for(SysInt i=0; i<numvars; i++) adjlistlength[i]=numvals;
             for(SysInt i=numvars; i<numvars+numvals; i++) adjlistlength[i]=numvars;
         }
@@ -340,8 +340,8 @@ struct FlowConstraint : public AbstractConstraint
         varvalmatching.resize(numvars); // maps var to actual value
         valvarmatching.resize(numvals); // maps val-dom_min to var.
         #else
-        varvalmatching=getMemory(stateObj).backTrack().template requestArray<SysInt>(numvars);
-        valvarmatching=getMemory(stateObj).backTrack().template requestArray<SysInt>(numvals);
+        varvalmatching=getMemory().backTrack().template requestArray<SysInt>(numvars);
+        valvarmatching=getMemory().backTrack().template requestArray<SysInt>(numvals);
         #endif
     }
 
@@ -486,7 +486,7 @@ struct FlowConstraint : public AbstractConstraint
                 valvarmatching[varvalmatching[j]-dom_min]=j;
             }
 
-            getState(stateObj).setFailed(true);
+            getState().setFailed(true);
             return false;
         }
 
@@ -819,7 +819,7 @@ struct FlowConstraint : public AbstractConstraint
     {
         if(!hopcroft2(vars_in_scc, matching, upper, usage))
         {
-            getState(stateObj).setFailed(true);
+            getState().setFailed(true);
             return false;
         }
         return true;
@@ -1120,9 +1120,9 @@ struct InternalDynamicTriggers
 
     VarArray var_array;  // not nice to have this in here..
 
-    InternalDynamicTriggers(StateObj* _stateObj, SysInt _numvars, SysInt numvals, VarArray _var_array) : numvars(_numvars), var_array(_var_array)
+    InternalDynamicTriggers(SysInt _numvars, SysInt numvals, VarArray _var_array) : numvars(_numvars), var_array(_var_array)
     {
-        watches=getMemory(_stateObj).backTrack().template requestArray<short>(numvars+1 + 4*numvars+2*numvals);
+        watches=getMemory().backTrack().template requestArray<short>(numvars+1 + 4*numvars+2*numvals);
 
         for(SysInt i=0; i<numvars; i++) watches[i]=-1;
         watches[numvars]=numvars+1;

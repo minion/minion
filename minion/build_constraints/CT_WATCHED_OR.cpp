@@ -9,7 +9,7 @@
 
 template<typename T>
 inline AbstractConstraint*
-BuildCT_WATCHED_OR(StateObj* stateObj, const vector<T>& vs, ConstraintBlob& bl)
+BuildCT_WATCHED_OR(const vector<T>& vs, ConstraintBlob& bl)
 {
   SysInt vs_s = vs.size();
   for(SysInt i = 0; i < vs_s; i++)
@@ -18,7 +18,7 @@ BuildCT_WATCHED_OR(StateObj* stateObj, const vector<T>& vs, ConstraintBlob& bl)
       FAIL_EXIT("watched or only works on Boolean variables!");
     }
 
-  return new BoolOrConstraintDynamic<vector<T> >(stateObj, vs, bl.negs);
+  return new BoolOrConstraintDynamic<vector<T> >(vs, bl.negs);
 }
 
 BUILD_CT(CT_WATCHED_OR, 1)

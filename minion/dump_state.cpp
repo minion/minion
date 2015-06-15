@@ -29,17 +29,17 @@ bool constraint_entailed(AbstractConstraint* c)
 
 template<typename T>
 inline
-string getNameFromVar(StateObj* stateObj, const T& v)
-{ return getState(stateObj).getInstance()->vars.getName(v.getBaseVar()); }
+string getNameFromVar(const T& v)
+{ return getState().getInstance()->vars.getName(v.getBaseVar()); }
 
 
-void dump_searchorder(StateObj* stateObj, const SearchOrder& order, ostream& os)
+void dump_searchorder(const SearchOrder& order, ostream& os)
 {
 
     vector<SysInt> non_assigned_vars;
     for(int i = 0; i < (SysInt)order.var_order.size(); ++i)
     {
-        AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(stateObj, order.var_order[i]);
+        AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(order.var_order[i]);
         // XXX : To get tester to work.. for now. if(!v.isAssigned())
             non_assigned_vars.push_back(i);
     }
@@ -65,13 +65,13 @@ void dump_searchorder(StateObj* stateObj, const SearchOrder& order, ostream& os)
     bool first=true;
     for(SysInt i = 0; i < (SysInt)non_assigned_vars.size(); ++i)
     {
-        AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(stateObj, order.var_order[non_assigned_vars[i]]);
+        AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(order.var_order[non_assigned_vars[i]]);
         // XXX : see above! D_ASSERT(!v.isAssigned());
         if(first) first=false; else os << ",";
         if(v.isAssigned())
             os << v.getAssignedValue();
         else
-            os << getNameFromVar(stateObj, v);
+            os << getNameFromVar(v);
     }
     os << "]\n";
 
@@ -98,9 +98,9 @@ void dump_searchorder(StateObj* stateObj, const SearchOrder& order, ostream& os)
 
 
 
-void just_domain_dump(StateObj* stateObj, ostream& os)
+void just_domain_dump(ostream& os)
 {
-    VariableContainer& vc = getVars(stateObj);
+    VariableContainer& vc = getVars();
     vector<AnyVarRef> vars;
   // booleans;
     for(UnsignedSysInt i = 0; i < vc.boolVarContainer.var_count(); ++i)
@@ -121,9 +121,9 @@ void just_domain_dump(StateObj* stateObj, ostream& os)
 
     for(UnsignedSysInt i = 0; i < vars.size(); ++i)
     {
-        os << "find " << getNameFromVar(stateObj, vars[i]) << " : int(";
+        os << "find " << getNameFromVar(vars[i]) << " : int(";
         
-        if(!getState(stateObj).isFailed())
+        if(!getState().isFailed())
         {
             if(vars[i].isBound())
             {
@@ -152,24 +152,24 @@ void just_domain_dump(StateObj* stateObj, ostream& os)
     }
 }
 
-void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
+void dump_solver(ostream& os, bool just_domains)
 {
     if(just_domains)
     {
-        just_domain_dump(stateObj, os);
+        just_domain_dump(os);
         return;
     }
     os << "# Redumped during search" << endl;
     os << "MINION 3" << endl;
     os << "**VARIABLES**" << endl;
-    VariableContainer& vc = getVars(stateObj);
+    VariableContainer& vc = getVars();
 
     // booleans;
     for(UnsignedSysInt i = 0; i < vc.boolVarContainer.var_count(); ++i)
     {
         BoolVarRef bv = vc.boolVarContainer.get_var_num(i);
         if(!bv.isAssigned())
-            os << "BOOL " << getNameFromVar(stateObj, bv) << endl;
+            os << "BOOL " << getNameFromVar(bv) << endl;
     }
 
     // bound vars
@@ -178,7 +178,7 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
         BoundVarRef bv = vc.boundVarContainer.get_var_num(i);
         if(!bv.isAssigned())
         {
-            os << "BOUND " << getNameFromVar(stateObj, bv) << " ";
+            os << "BOUND " << getNameFromVar(bv) << " ";
             os << "{" << bv.getMin() << ".." << bv.getMax() << "}" << endl;
         }
     }
@@ -189,7 +189,7 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
         BigRangeVarRef bv = vc.bigRangeVarContainer.get_var_num(i);
         if(!bv.isAssigned())
         {
-            os << "DISCRETE " << getNameFromVar(stateObj, bv) << " ";
+            os << "DISCRETE " << getNameFromVar(bv) << " ";
             os << "{" << bv.getMin() << ".." << bv.getMax() << "}" << endl;
         }
         vector<DomainInt> deleted_values;
@@ -203,7 +203,7 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
             os << "**CONSTRAINTS**" << endl;
             if((DomainInt)deleted_values.size() < bv.getMax() - bv.getMin() + 1)
             {
-                os << "w-notinset(" << getNameFromVar(stateObj, bv) << ", [";
+                os << "w-notinset(" << getNameFromVar(bv) << ", [";
                 bool first=true;
                 for(size_t i = 0; i < deleted_values.size(); ++i)
                 {
@@ -214,7 +214,7 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
             }
             else
             {
-                os << "w-inset(" << getNameFromVar(stateObj, bv) << ", [";
+                os << "w-inset(" << getNameFromVar(bv) << ", [";
                 os << bv.getMin();
                 for(DomainInt i = bv.getMin() + 1; i <= bv.getMax(); ++i)
                 {
@@ -236,7 +236,7 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
         if(!bv.isAssigned())
         {
 
-            os << "SPARSEBOUND " << getNameFromVar(stateObj, bv) << " ";
+            os << "SPARSEBOUND " << getNameFromVar(bv) << " ";
             os << "{" ;
             bool first = true;
             for(size_t j = 0; j < dom.size(); ++j)
@@ -256,7 +256,7 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
 
     // tuples
     os << "**TUPLELIST**" << endl;
-    SearchState& search_state = getState(stateObj);
+    SearchState& search_state = getState();
 
     for(SysInt i = 0; i < search_state.getTupleListContainer()->size(); ++i)
     {
@@ -294,30 +294,30 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
     }
 
     os << "**SEARCH**" << endl;
-    if(getState(stateObj).getRawOptimiseVar())
+    if(getState().getRawOptimiseVar())
     {
-        if(getState(stateObj).isMaximise())
+        if(getState().isMaximise())
             os << "MAXIMISING ";
         else
             os << "MINIMISING ";
-        if(getState(stateObj).getRawOptimiseVar()->isAssigned())
-            os << getState(stateObj).getRawOptimiseVar()->getAssignedValue() << "\n";
+        if(getState().getRawOptimiseVar()->isAssigned())
+            os << getState().getRawOptimiseVar()->getAssignedValue() << "\n";
         else
-            os << getNameFromVar(stateObj, *getState(stateObj).getRawOptimiseVar()) << "\n";
+            os << getNameFromVar(*getState().getRawOptimiseVar()) << "\n";
     }
     os << "PRINT ";
-    os << ConOutput::print_vars(stateObj, getState(stateObj).getPrintMatrix());
+    os << ConOutput::print_vars(getState().getPrintMatrix());
     os << endl;
 
 
-    for(UnsignedSysInt i = 0; i < getState(stateObj).getInstance()->search_order.size(); ++i)
+    for(UnsignedSysInt i = 0; i < getState().getInstance()->search_order.size(); ++i)
     {
-        dump_searchorder(stateObj, getState(stateObj).getInstance()->search_order[i], os);
+        dump_searchorder(getState().getInstance()->search_order[i], os);
     }
 
     os << "**CONSTRAINTS**" << endl;
 
-    if(getState(stateObj).isFailed())
+    if(getState().isFailed())
         os << "false()" << endl;
     else
     {
@@ -333,16 +333,16 @@ void dump_solver(StateObj* stateObj, ostream& os, bool just_domains)
     os << "**EOF**" << endl;
 }
 
-void dump_solver(StateObj* state, string filename, bool just_domains)
+void dump_solver(string filename, bool just_domains)
 {
     if(filename == "" || filename == "--")
     {
-        dump_solver(state, cout, just_domains);
+        dump_solver(cout, just_domains);
     }
     else
     {
         ofstream ofs(filename.c_str());
-        dump_solver(state, ofs, just_domains);
+        dump_solver(ofs, just_domains);
     }
     exit(0);
 }

@@ -75,15 +75,15 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
         i--;
       }
     }
-    return ConOutput::print_con(stateObj, constraint_name(), cx, cy);
+    return ConOutput::print_con(constraint_name(), cx, cy);
   }
 
 
   vector<pair<DomainInt, DomainInt> > earliest_occurrence_x;
   vector<pair<DomainInt, DomainInt> > earliest_occurrence_y;
 
-  GacLexLeqConstraint(StateObj* _stateObj,const VarArray1& _x, const VarArray2& _y) :
-  AbstractConstraint(_stateObj), alpha(_stateObj), beta(_stateObj), F(_stateObj), x(_x), y(_y)
+  GacLexLeqConstraint(const VarArray1& _x, const VarArray2& _y) :
+  alpha(), beta(), F(), x(_x), y(_y)
   {
     CHECK(x.size() == y.size(), "gaclex only works on vectors of equal length");
     for(SysInt i = 0; i < (SysInt)x.size(); ++i)
@@ -162,7 +162,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
 
   virtual AbstractConstraint* reverse_constraint()
   {
-    return new GacLexLeqConstraint<VarArray2, VarArray1,!Less>(stateObj,y,x);
+    return new GacLexLeqConstraint<VarArray2, VarArray1,!Less>(y,x);
   }
 
   void updateAlpha(SysInt i) {
@@ -171,7 +171,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     {
       if(i == n || i == beta)
       {
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
         return;
       }
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
@@ -209,7 +209,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
       }
       i-- ;
     }
-    getState(stateObj).setFailed(true);
+    getState().setFailed(true);
 
   }
 
@@ -226,7 +226,7 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     //Not sure why we need this, but we seem to.
     if(b <= a)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -401,13 +401,13 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
         if (betaBound == -1) beta = i ;
         else beta = betaBound ;
       }
-      if (alpha >= beta) getState(stateObj).setFailed(true);
+      if (alpha >= beta) getState().setFailed(true);
       propagate((SysInt)alpha,DomainDelta::empty()) ;             //initial propagation, if necessary.
     }
     else
     {
       if(Less)
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
       else
         F = true;
     }

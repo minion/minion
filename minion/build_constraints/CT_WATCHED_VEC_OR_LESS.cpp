@@ -9,7 +9,7 @@
 
 template<typename VarArray1,  typename VarArray2>
 AbstractConstraint*
-BuildCT_WATCHED_VEC_OR_LESS(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, ConstraintBlob&)
-{ return new ConName <VarArray1,VarArray2, LessIterated>(stateObj, varray1, varray2); }
+BuildCT_WATCHED_VEC_OR_LESS(const VarArray1& varray1, const VarArray2& varray2, ConstraintBlob&)
+{ return new ConName <VarArray1,VarArray2, LessIterated>(varray1, varray2); }
 
 BUILD_CT(CT_WATCHED_VEC_OR_LESS, 2)

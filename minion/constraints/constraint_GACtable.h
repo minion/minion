@@ -290,7 +290,7 @@ struct GACTableConstraint : public AbstractConstraint
       vars[i].setMin(dom_min);
       vars[i].setMax(dom_max - 1);
 
-      if(getState(stateObj).isFailed()) return;
+      if(getState().isFailed()) return;
 
       for(DomainInt x = vars[i].getMin(); x <= vars[i].getMax(); ++x)
       {

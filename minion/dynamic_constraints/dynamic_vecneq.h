@@ -106,9 +106,9 @@ struct EqIterated
   }
 
   template<typename Var1, typename Var2>
-  static AbstractConstraint* reverse_constraint(StateObj* stateObj, const Var1& var1, const Var2& var2)
+  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2)
   {
-      NeqConstraintBinary<Var1, Var2>* t=new NeqConstraintBinary<Var1, Var2>(stateObj, var1, var2);
+      NeqConstraintBinary<Var1, Var2>* t=new NeqConstraintBinary<Var1, Var2>(var1, var2);
       return (AbstractConstraint*) t;
   }
 
@@ -193,9 +193,9 @@ struct NeqIterated
   }
 
   template<typename Var1, typename Var2>
-  static AbstractConstraint* reverse_constraint(StateObj* stateObj, const Var1& var1, const Var2& var2)
+  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2)
   {
-      EqualConstraint<Var1, Var2>* t=new EqualConstraint<Var1, Var2>(stateObj, var1, var2);
+      EqualConstraint<Var1, Var2>* t=new EqualConstraint<Var1, Var2>(var1, var2);
       return (AbstractConstraint*) t;
   }
 
@@ -248,9 +248,9 @@ struct LessIterated
   }
 
   template<typename Var1, typename Var2>
-  static AbstractConstraint* reverse_constraint(StateObj* stateObj, const Var1& var1, const Var2& var2)
+  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2)
   {
-      LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0> >* t=new LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0> >(stateObj, var2, var1, compiletime_val<SysInt, 0>());
+      LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0> >* t=new LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0> >(var2, var1, compiletime_val<SysInt, 0>());
       return (AbstractConstraint*) t;
   }
 };
@@ -301,9 +301,9 @@ struct BothNonZeroIterated
   }
 
   template<typename Var1, typename Var2>
-  static AbstractConstraint* reverse_constraint(StateObj* stateObj, const Var1& var1, const Var2& var2)
+  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2)
   {
-      ProductConstraint<Var1, Var2, ConstantVar>* t=new ProductConstraint<Var1, Var2, ConstantVar>(stateObj, var1, var2, ConstantVar(stateObj, 0));
+      ProductConstraint<Var1, Var2, ConstantVar>* t=new ProductConstraint<Var1, Var2, ConstantVar>(var1, var2, ConstantVar(0));
       return (AbstractConstraint*) t;
   }
 };
@@ -343,12 +343,12 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   Reversible<bool> propagate_mode;
   SysInt index_to_propagate;
 
-  ConName (StateObj* _stateObj, const VarArray1& _array1,
+  ConName (const VarArray1& _array1,
     const VarArray2& _array2) :
-  AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
-    propagate_mode(_stateObj, false)
+  var_array1(_array1), var_array2(_array2),
+    propagate_mode(false)
 #ifdef SLOW_VEC_OR
-  , counter(_stateObj)
+  , counter()
 #endif
     { D_ASSERT(var_array1.size() == var_array2.size()); }
 
@@ -404,7 +404,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     // Vectors are assigned and equal.
     if(index == size)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -570,13 +570,13 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       vector<AbstractConstraint*> con;
       for(SysInt i=0; i<(SysInt)var_array1.size(); i++)
       {
-          con.push_back(Operator::reverse_constraint(stateObj, var_array1[i], var_array2[i]));
+          con.push_back(Operator::reverse_constraint(var_array1[i], var_array2[i]));
       }
-      return new Dynamic_AND(stateObj, con);
+      return new Dynamic_AND(con);
       /*vector<AnyVarRef> t;
       for(SysInt i=0; i<var_array1.size(); i++) t.push_back(var_array1[i]);
       for(SysInt i=0; i<var_array2.size(); i++) t.push_back(var_array2[i]);
-      return forward_check_negation(stateObj, this);*/
+      return forward_check_negation(this);*/
   }
 };
 #endif

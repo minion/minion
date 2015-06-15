@@ -94,8 +94,8 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
 
   CONSTRAINT_ARG_LIST3(var_array, value, val_count);
 
-  NotOccurrenceEqualConstraint(StateObj* _stateObj, const VarArray& _var_array, const Val& _value, const ValCount& _val_count) :
-    AbstractConstraint(_stateObj), occurrences_count(_stateObj), not_occurrences_count(_stateObj),
+  NotOccurrenceEqualConstraint(const VarArray& _var_array, const Val& _value, const ValCount& _val_count) :
+    occurrences_count(), not_occurrences_count(),
     var_array(_var_array), val_count(_val_count), value(_value), trigger1index(-1), trigger2index(-1)
   {
     CheckNotBound(var_array, "occurrence");
@@ -204,7 +204,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       D_ASSERT(trig==dt+1);
       if(!val_count.isAssigned())
       {   // don't need two triggers.
-          releaseTrigger(stateObj, trig);
+          releaseTrigger(trig);
           trigger2index=-1;
           return;
       }
@@ -301,7 +301,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
           // just check, everything is assigned.
           if(occ==val_count.getAssignedValue())
           {
-              getState(stateObj).setFailed(true);
+              getState().setFailed(true);
           }
       }
       else
@@ -388,12 +388,12 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   {
     if(val_count_min == 0)
     {
-      return ConOutput::print_con(stateObj, "occurrenceleq",var_array, value, val_count_max);
+      return ConOutput::print_con("occurrenceleq",var_array, value, val_count_max);
     }
     else
     {
       D_ASSERT(val_count_max == (SysInt)var_array.size());
-      return ConOutput::print_con(stateObj, "occurrencegeq",var_array,value, val_count_min);
+      return ConOutput::print_con("occurrencegeq",var_array,value, val_count_min);
     }
   }
 
@@ -407,9 +407,9 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   DomainInt val_count_max;
   Val value;
 
-  ConstantOccurrenceEqualConstraint(StateObj* _stateObj, const VarArray& _var_array, const Val& _value,
+  ConstantOccurrenceEqualConstraint(const VarArray& _var_array, const Val& _value,
                             DomainInt _val_count_min, DomainInt _val_count_max) :
-    AbstractConstraint(_stateObj), occurrences_count(_stateObj), not_occurrences_count(_stateObj),
+    occurrences_count(), not_occurrences_count(),
     var_array(_var_array), val_count_min(_val_count_min), val_count_max(_val_count_max), value(_value)
   { }
 
@@ -441,7 +441,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
       }
     }
     if(val_count_max < occs)
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
   }
 
   void not_occurrence_limit_reached()
@@ -460,7 +460,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
       { it->propagateAssign(value); }
     }
     if(val_count_min > static_cast<SysInt>(var_array.size()) - occs)
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
   }
 
   virtual void propagate(DomainInt in, DomainDelta)
@@ -473,7 +473,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
     {
       ++occurrences_count;
       if(val_count_max < occurrences_count)
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
       if(occurrences_count == val_count_max)
         occurrence_limit_reached();
     }
@@ -481,7 +481,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
     {
       ++not_occurrences_count;
       if(val_count_min > static_cast<SysInt>(var_array.size()) - not_occurrences_count)
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
       if(not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count_min )
         not_occurrence_limit_reached();
     }
@@ -509,14 +509,14 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     if(val_count_max < 0 || val_count_min > (SysInt)var_array.size())
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
     setup_counters();
 
     if(val_count_max < occurrences_count)
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
 
     if(val_count_min > static_cast<SysInt>(var_array.size()) - not_occurrences_count)
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
 
     if(occurrences_count == val_count_max)
       occurrence_limit_reached();
@@ -603,11 +603,11 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
       // and greater-than. So identify the less-than case and make a greater-than, etc.
       if(val_count_min==0)
       {
-          return new ConstantOccurrenceEqualConstraint<VarArray, Val>(stateObj, var_array, value, val_count_max+1, var_array.size());
+          return new ConstantOccurrenceEqualConstraint<VarArray, Val>(var_array, value, val_count_max+1, var_array.size());
       }
       if(val_count_max==(SysInt)var_array.size())
       {
-          return new ConstantOccurrenceEqualConstraint<VarArray, Val>(stateObj, var_array, value, 0, val_count_min-1);
+          return new ConstantOccurrenceEqualConstraint<VarArray, Val>(var_array, value, 0, val_count_min-1);
       }
       FAIL_EXIT("Unable to negate an occurrence-interval constraint, sorry.");
       return NULL;
@@ -631,8 +631,8 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
   ValCount val_count;
   Val value;
 
-  OccurrenceEqualConstraint(StateObj* _stateObj, const VarArray& _var_array, const Val& _value, const ValCount& _val_count) :
-    AbstractConstraint(_stateObj), occurrences_count(_stateObj), not_occurrences_count(_stateObj),
+  OccurrenceEqualConstraint(const VarArray& _var_array, const Val& _value, const ValCount& _val_count) :
+    occurrences_count(), not_occurrences_count(),
     var_array(_var_array), val_count(_val_count), value(_value)
   { }
 
@@ -805,30 +805,30 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
 
   AbstractConstraint* reverse_constraint()
   {
-      return new NotOccurrenceEqualConstraint<VarArray, Val, ValCount>(stateObj, var_array, value, val_count);
+      return new NotOccurrenceEqualConstraint<VarArray, Val, ValCount>(var_array, value, val_count);
   }
 };
 
 template<typename VarArray, typename Val, typename ValCount>
 AbstractConstraint* NotOccurrenceEqualConstraint<VarArray,Val,ValCount>::reverse_constraint()
 {
-  return new OccurrenceEqualConstraint<VarArray, Val, ValCount>(stateObj, var_array, value, val_count);
+  return new OccurrenceEqualConstraint<VarArray, Val, ValCount>(var_array, value, val_count);
 }
 
 
 template<typename VarArray, typename Val, typename ValCount>
 AbstractConstraint*
-OccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& _value, const ValCount& _val_count)
+OccEqualCon(const VarArray& _var_array,  const Val& _value, const ValCount& _val_count)
 {
   return
-  (new OccurrenceEqualConstraint<VarArray,Val, ValCount>(stateObj, _var_array,  _value, _val_count));
+  (new OccurrenceEqualConstraint<VarArray,Val, ValCount>(_var_array,  _value, _val_count));
 }
 
 template<typename VarArray, typename Val>
 AbstractConstraint*
-ConstantOccEqualCon(StateObj* stateObj, const VarArray& _var_array,  const Val& _value, DomainInt _val_count_min, DomainInt _val_count_max)
+ConstantOccEqualCon(const VarArray& _var_array,  const Val& _value, DomainInt _val_count_min, DomainInt _val_count_max)
 {
   return
-  (new ConstantOccurrenceEqualConstraint<VarArray,Val>(stateObj, _var_array,  _value, _val_count_min, _val_count_max));
+  (new ConstantOccurrenceEqualConstraint<VarArray,Val>(_var_array,  _value, _val_count_min, _val_count_max));
 }
 #endif

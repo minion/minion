@@ -42,8 +42,8 @@ struct WatchLessConstraint : public AbstractConstraint
 
   CONSTRAINT_ARG_LIST2(var1, var2);
 
-  WatchLessConstraint(StateObj* _stateObj, const Var1& _var1, const Var2& _var2) :
-    AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
+  WatchLessConstraint(const Var1& _var1, const Var2& _var2) :
+    var1(_var1), var2(_var2)
   { }
 
   virtual SysInt dynamic_trigger_count()
@@ -104,19 +104,19 @@ struct WatchLessConstraint : public AbstractConstraint
   typename std::enable_if<b, AbstractConstraint*>::type
    rev_implement(const ShiftVar<T,compiletime_val<SysInt, 1> >& var2)
   {
-    return new WatchLessConstraint<T, Var1, false>(stateObj, var2.data, var1);
+    return new WatchLessConstraint<T, Var1, false>(var2.data, var1);
   }
 
  template<bool b, typename T>
   typename std::enable_if<b, AbstractConstraint*>::type
    rev_implement(const T& var2)
   {
-    return new WatchLessConstraint<AnyVarRef, AnyVarRef, true>(stateObj, var2, ShiftVar<Var1,compiletime_val<SysInt, 1> >(var1, compiletime_val<SysInt, 1>()));
+    return new WatchLessConstraint<AnyVarRef, AnyVarRef, true>(var2, ShiftVar<Var1,compiletime_val<SysInt, 1> >(var1, compiletime_val<SysInt, 1>()));
   }
 
   template<bool b,typename T>
   typename std::enable_if<!b, AbstractConstraint*>::type rev_implement(const T& var2)
-  { return new WatchLessConstraint<Var2,ShiftVar<Var1,compiletime_val<SysInt, 1> >,true>(stateObj, var2, ShiftVar<Var1,compiletime_val<SysInt, 1> >(var1, compiletime_val<SysInt, 1>())); }
+  { return new WatchLessConstraint<Var2,ShiftVar<Var1,compiletime_val<SysInt, 1> >,true>(var2, ShiftVar<Var1,compiletime_val<SysInt, 1> >(var1, compiletime_val<SysInt, 1>())); }
 
   virtual AbstractConstraint* reverse_constraint() { return rev_implement<Negated>(var2); }
 };

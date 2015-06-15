@@ -33,7 +33,7 @@ private:
     
 public:
     // The constructor must be called before the monotonicset is locked.
-    ReversibleMonotonicSet(StateObj * stateObj, DomainInt _size) : MS(getMemory(stateObj).monotonicSet())
+    ReversibleMonotonicSet(DomainInt _size) : MS(getMemory().monotonicSet())
   #ifndef NO_DEBUG  
     , size(_size)
   #endif
@@ -69,7 +69,7 @@ private:
     DomainInt offset;
 public:
     // The constructor must be called before the monotonicset is locked.
-    ReversibleMonotonicBoolean(StateObj * stateObj) : MS(getMemory(stateObj).monotonicSet())
+    ReversibleMonotonicBoolean() : MS(getMemory().monotonicSet())
     {
         offset=MS.request_storage(1);
         #ifndef NO_DEBUG
@@ -92,5 +92,3 @@ public:
         MS.unchecked_remove(offset);
     }
 };
-
-

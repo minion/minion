@@ -9,7 +9,7 @@
 
 template<typename T1, typename T2>
 AbstractConstraint*
-BuildCT_ABS(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob&) 
-{ return AbsCon(stateObj, t1[0],t2[0]); }
+BuildCT_ABS(const T1& t1, const T2& t2, ConstraintBlob&) 
+{ return AbsCon(t1[0],t2[0]); }
 
 BUILD_CT(CT_ABS, 2)

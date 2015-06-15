@@ -200,7 +200,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable
 
     ShortTupleList* data;
 
-    HaggisGAC(StateObj* _stateObj, const VarArray& _var_array, ShortTupleList* tuples) : AbstractConstraint(_stateObj),
+    HaggisGAC(const VarArray& _var_array, ShortTupleList* tuples) : 
     vars(_var_array), supportFreeList(0), data(tuples)
     {
         init();

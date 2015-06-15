@@ -52,18 +52,18 @@ struct reify_true_old : public AbstractConstraint
   
   Reversible<bool> full_propagate_called;
   
-  reify_true_old(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar v) : AbstractConstraint(_stateObj), poscon(_poscon), 
+  reify_true_old(AbstractConstraint* _poscon, BoolVar v) : poscon(_poscon), 
                                                                             rar_var(v), constraint_locked(false),
-                                                                            full_propagate_called(stateObj, false)
+                                                                            full_propagate_called(false)
   { }
   
   // (var -> C) is equiv to (!var \/ C), so reverse is (var /\ !C)
   virtual AbstractConstraint* reverse_constraint()
   { 
     vector<AbstractConstraint*> con;
-    con.push_back(new WatchLiteralConstraint<BoolVar>(stateObj, rar_var, 1));
+    con.push_back(new WatchLiteralConstraint<BoolVar>(rar_var, 1));
     con.push_back(poscon->reverse_constraint());
-    return new Dynamic_AND(stateObj, con);
+    return new Dynamic_AND(con);
   }
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
@@ -122,7 +122,7 @@ struct reify_true_old : public AbstractConstraint
     if(i == -99999)
     {
       constraint_locked = true;
-      getQueue(stateObj).pushSpecialTrigger(this);
+      getQueue().pushSpecialTrigger(this);
       return;
     }
     
@@ -172,15 +172,15 @@ struct reify_true_old : public AbstractConstraint
 // From dynamic_reifyimply.h
 template<typename BoolVar>
 AbstractConstraint*
-truereifyConDynamicOld(StateObj* stateObj, AbstractConstraint* c, BoolVar var);
+truereifyConDynamicOld(AbstractConstraint* c, BoolVar var);
 
 template<typename BoolVar>
 AbstractConstraint*
-truereifyConOld(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
+truereifyConOld(AbstractConstraint* c, BoolVar var)
 { 
   if(c->dynamic_trigger_count() == 0)
-    return new reify_true_old<BoolVar>(stateObj, &*c, var); 
+    return new reify_true_old<BoolVar>(&*c, var); 
   else
-    return truereifyConDynamicOld(stateObj, c, var);
+    return truereifyConDynamicOld(c, var);
 }
 #endif

@@ -9,7 +9,7 @@
 
 template <typename T>
 AbstractConstraint*
-BuildCT_SHORTSTR(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return new STR<T, true>(stateObj, t1, b.short_tuples); }
+BuildCT_SHORTSTR(const T& t1, ConstraintBlob& b)
+{ return new STR<T, true>(t1, b.short_tuples); }
 
 BUILD_CT(CT_SHORTSTR, 1)

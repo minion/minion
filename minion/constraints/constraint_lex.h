@@ -81,8 +81,8 @@ struct LexLeqConstraint : public AbstractConstraint
 
   CONSTRAINT_ARG_LIST2(x, y);
 
-  LexLeqConstraint(StateObj* _stateObj,const VarArray1& _x, const VarArray2& _y) :
-    AbstractConstraint(_stateObj), alpha(_stateObj), beta(_stateObj), F(_stateObj), x(_x), y(_y)
+  LexLeqConstraint(const VarArray1& _x, const VarArray2& _y) :
+    alpha(), beta(), F(), x(_x), y(_y)
   { CHECK(x.size() == y.size(), "LexLeq and LexLess only work with equal length vectors"); }
 
   virtual triggerCollection setup_internal()
@@ -113,7 +113,7 @@ struct LexLeqConstraint : public AbstractConstraint
 
   virtual AbstractConstraint* reverse_constraint()
   {
-    return new LexLeqConstraint<VarArray2, VarArray1,!Less>(stateObj,y,x);
+    return new LexLeqConstraint<VarArray2, VarArray1,!Less>(y,x);
   }
 
   void updateAlpha(SysInt i) {
@@ -122,7 +122,7 @@ struct LexLeqConstraint : public AbstractConstraint
     {
       if(i == n || i == beta)
       {
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
         return;
       }
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
@@ -160,7 +160,7 @@ struct LexLeqConstraint : public AbstractConstraint
       }
       i-- ;
     }
-    getState(stateObj).setFailed(true);
+    getState().setFailed(true);
 
   }
 
@@ -177,7 +177,7 @@ struct LexLeqConstraint : public AbstractConstraint
     //Not sure why we need this, but we seem to.
     if(b <= a)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -258,13 +258,13 @@ struct LexLeqConstraint : public AbstractConstraint
         if (betaBound == -1) beta = i ;
         else beta = betaBound ;
       }
-      if (alpha >= beta) getState(stateObj).setFailed(true);
+      if (alpha >= beta) getState().setFailed(true);
       propagate((SysInt)alpha,DomainDelta::empty()) ;             //initial propagation, if necessary.
     }
     else
     {
       if(Less)
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
       else
         F = true;
     }

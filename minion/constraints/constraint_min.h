@@ -79,7 +79,7 @@ struct MinConstraint : public AbstractConstraint
         return "true()";
     }
 
-    return ConOutput::print_reversible_con(stateObj, "min", "max", var_array, min_var);
+    return ConOutput::print_reversible_con("min", "max", var_array, min_var);
   }
 
 
@@ -89,8 +89,8 @@ struct MinConstraint : public AbstractConstraint
   VarArray var_array;
   MinVarRef min_var;
 
-  MinConstraint(StateObj* _stateObj, const VarArray& _var_array, const MinVarRef& _min_var) :
-    AbstractConstraint(_stateObj), var_array(_var_array), min_var(_min_var)
+  MinConstraint(const VarArray& _var_array, const MinVarRef& _min_var) :
+    var_array(_var_array), min_var(_min_var)
   { }
 
   virtual triggerCollection setup_internal()
@@ -153,7 +153,7 @@ struct MinConstraint : public AbstractConstraint
           ++it;
         if(it == var_array.end())
         {
-          getState(stateObj).setFailed(true);
+          getState().setFailed(true);
           return;
         }
         // Possibly this variable is the only one that can be the minimum
@@ -181,7 +181,7 @@ struct MinConstraint : public AbstractConstraint
     SysInt array_size = var_array.size();
     if(array_size == 0)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
     }
     else
     {
@@ -246,7 +246,7 @@ struct MinConstraint : public AbstractConstraint
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
 
   virtual vector<AnyVarRef> get_vars()

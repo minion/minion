@@ -99,7 +99,6 @@ using namespace std;
 template<typename VarArray>
 struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
 {
-    using FlowConstraint<VarArray, UseIncGraph>::stateObj;
     using FlowConstraint<VarArray, UseIncGraph>::constraint_locked;
     using FlowConstraint<VarArray, UseIncGraph>::adjlist;
     using FlowConstraint<VarArray, UseIncGraph>::adjlistlength;
@@ -140,9 +139,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
 
     vector<SysInt> varToSCCIndex;  // Mirror of the SCCs array.
 
-    GacAlldiffConstraint(StateObj* _stateObj, const VarArray& _var_array) : FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
-        SCCSplit(_stateObj, _var_array.size())
-    //sparevaluespresent(_stateObj, _var_array.size())
+    GacAlldiffConstraint(const VarArray& _var_array) : FlowConstraint<VarArray, UseIncGraph>(_var_array),
+        SCCSplit(_var_array.size())
+    //sparevaluespresent(_var_array.size())
     {
       CheckNotBound(var_array, "gacalldiff", "alldiff");
       SCCs.resize(var_array.size());
@@ -179,11 +178,11 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
           if(i<numvals) valvarmatching[i]=i;
 
           #if !defined(DYNAMICALLDIFF) || !defined(NO_DEBUG)
-          if(UseWatches) watches[i].reserve(numvals, stateObj);
+          if(UseWatches) watches[i].reserve(numvals);
           #endif
       }
 
-      D_DATA(SCCSplit2=getMemory(stateObj).backTrack().request_bytes((sizeof(char) * numvars)));
+      D_DATA(SCCSplit2=getMemory().backTrack().request_bytes((sizeof(char) * numvars)));
       D_DATA(for(SysInt i=0; i<numvars; i++) ((char *)SCCSplit2)[i]=1);
 
   }
@@ -239,18 +238,18 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   { // w-or of pairwise equality.
 
       /// solely for reify exps
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
 
       vector<AbstractConstraint*> con;
       for(SysInt i=0; i<(SysInt)var_array.size(); i++)
       {
           for(SysInt j=i+1; j<(SysInt)var_array.size(); j++)
           {
-              EqualConstraint<VarRef, VarRef>* t=new EqualConstraint<VarRef, VarRef>(stateObj, var_array[i], var_array[j]);
+              EqualConstraint<VarRef, VarRef>* t=new EqualConstraint<VarRef, VarRef>(var_array[i], var_array[j]);
               con.push_back((AbstractConstraint*) t);
           }
       }
-      return new Dynamic_OR(stateObj, con);
+      return new Dynamic_OR(con);
   }
 
   smallset to_process;  // set of vars to process.
@@ -339,7 +338,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     {
         #ifdef SPECIALQUEUE
         constraint_locked = true;
-        getQueue(stateObj).pushSpecialTrigger(this);
+        getQueue().pushSpecialTrigger(this);
         #else
         #ifndef SCC
         do_prop_noscc();
@@ -443,7 +442,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     {
         #ifdef SPECIALQUEUE
         constraint_locked = true;
-        getQueue(stateObj).pushSpecialTrigger(this);
+        getQueue().pushSpecialTrigger(this);
         #else
         #ifndef SCC
         do_prop_noscc();
@@ -460,7 +459,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   {
     constraint_locked = false;  // should be above the if.
 
-    if(getState(stateObj).isFailed())
+    if(getState().isFailed())
     {
         to_process.clear();
         return;
@@ -666,7 +665,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                         #if UseIncGraph
                             adjlist_remove(SCCs[i], tempval);
                         #endif
-                        if(getState(stateObj).isFailed()) return;
+                        if(getState().isFailed()) return;
                     }
                 }
 
@@ -1000,7 +999,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       // I hope so, because the following test has to be done first.
       if(numvars>numvals)
       {
-          getState(stateObj).setFailed(true);
+          getState().setFailed(true);
           return;
       }
 
@@ -1025,7 +1024,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 {
                     break;
                 }
-                get_dt(var, j)->sleepDynamicTriggerBT(stateObj);
+                get_dt(var, j)->sleepDynamicTriggerBT();
             }
         }
 
@@ -1341,7 +1340,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                     {
                         break;
                     }
-                    get_dt(var, j)->sleepDynamicTriggerBT(stateObj);
+                    get_dt(var, j)->sleepDynamicTriggerBT();
                 }
             }
         }
@@ -1678,7 +1677,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         {
             // The constraint is unsatisfiable (no matching).
             P("About to fail. Changed varvalmatching: "<< varvalmatching);
-            getState(stateObj).setFailed(true);
+            getState().setFailed(true);
             return false;
         }
 

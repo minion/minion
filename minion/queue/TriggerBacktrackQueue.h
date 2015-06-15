@@ -34,12 +34,6 @@
 
 struct TriggerBacktrackQueue
 {
-    StateObj* stateObj;
-
-    TriggerBacktrackQueue(StateObj* _stateObj) :
-        stateObj(_stateObj)
-    {
-    }
 
     typedef vector<pair<DynamicTrigger*, DynamicTrigger*> > TriggerList;
 
@@ -47,6 +41,7 @@ struct TriggerBacktrackQueue
 
     TriggerBacktrackQueue()
     {
+        /// XXX
         queue.resize(1);
     }
 
@@ -71,7 +66,7 @@ struct TriggerBacktrackQueue
             if (tl[i].second == NULL)
             {
                 P("Release " << tl[i].first);
-                releaseTrigger(stateObj, tl[i].first , TO_Store);
+                releaseTrigger(tl[i].first , TO_Store);
             }
             else
             {

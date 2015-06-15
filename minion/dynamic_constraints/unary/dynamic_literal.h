@@ -45,8 +45,8 @@ template<typename Var>
   DomainInt val;
 
   template<typename T>
-  WatchLiteralConstraint(StateObj* _stateObj, const Var& _var, const T& _val) :
-    AbstractConstraint(_stateObj), var(_var), val(_val) {}
+  WatchLiteralConstraint(const Var& _var, const T& _val) :
+    var(_var), val(_val) {}
 
   virtual SysInt dynamic_trigger_count()
   { return 0; }
@@ -87,14 +87,14 @@ template<typename Var>
   }
 
    virtual AbstractConstraint* reverse_constraint()
-  { return new WatchNotLiteralConstraint<Var>(stateObj, var, val); }
+  { return new WatchNotLiteralConstraint<Var>(var, val); }
 };
 
 // From dynamic_notliteral.h
 template<typename Var>
   AbstractConstraint* WatchNotLiteralConstraint<Var>::reverse_constraint()
-  { return new WatchLiteralConstraint<Var>(stateObj, var, val); }
+  { return new WatchLiteralConstraint<Var>(var, val); }
 
   inline AbstractConstraint* WatchNotLiteralBoolConstraint::reverse_constraint()
-  { return new WatchLiteralConstraint<BoolVarRef>(stateObj, var, val); }
+  { return new WatchLiteralConstraint<BoolVarRef>(var, val); }
 #endif

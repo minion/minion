@@ -9,7 +9,7 @@
 
 template <typename T>
 AbstractConstraint*
-BuildCT_HAGGISGAC(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return new HaggisGAC<T>(stateObj, t1, b.short_tuples); }
+BuildCT_HAGGISGAC(const T& t1, ConstraintBlob& b)
+{ return new HaggisGAC<T>(t1, b.short_tuples); }
 
 BUILD_CT(CT_HAGGISGAC, 1)

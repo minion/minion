@@ -193,7 +193,7 @@ struct ReversibleArrayset {
     ReversibleInt size;
     SysInt minval;
 
-    ReversibleArrayset(StateObj * _so) : size(_so) {}
+    ReversibleArrayset() : size() {}
 
     void initialise(DomainInt low_, DomainInt high_) {
         const SysInt low = checked_cast<SysInt>(low_);
@@ -282,9 +282,9 @@ struct STR : public AbstractConstraint
     virtual string full_output_name()
     {
         if(UseShort)
-            return ConOutput::print_con(stateObj, constraint_name(), vars, shortTupleList);
+            return ConOutput::print_con(constraint_name(), vars, shortTupleList);
         else
-            return ConOutput::print_con(stateObj, constraint_name(), vars, longTupleList);
+            return ConOutput::print_con(constraint_name(), vars, longTupleList);
     }
 
     ShortTupleList* shortTupleList;
@@ -324,19 +324,19 @@ struct STR : public AbstractConstraint
         std::random_shuffle(tupindices.begin(), tupindices.end());
     }
 
-    STR(StateObj* _stateObj, const VarArray& _var_array, ShortTupleList* _tuples) : AbstractConstraint(_stateObj),
+    STR(const VarArray& _var_array, ShortTupleList* _tuples) : 
     shortTupleList(_tuples), longTupleList(0),
-    vars(_var_array), constraint_locked(false), limit(_stateObj), sct(new STRData(_tuples, _var_array.size()))
-    //, ssup_permanent(_stateObj)
+    vars(_var_array), constraint_locked(false), limit(), sct(new STRData(_tuples, _var_array.size()))
+    //, ssup_permanent()
     {
         CHECK(UseShort, "Internal error in ShortSTR2");
       init();
     }
 
-    STR(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) : AbstractConstraint(_stateObj),
+    STR(const VarArray& _var_array, TupleList* _tuples) : 
     shortTupleList(0), longTupleList(_tuples),
-    vars(_var_array), constraint_locked(false), limit(_stateObj), sct(new STRData(_tuples, _var_array.size()))
-    //, ssup_permanent(_stateObj)
+    vars(_var_array), constraint_locked(false), limit(), sct(new STRData(_tuples, _var_array.size()))
+    //, ssup_permanent()
     {
         CHECK(!UseShort, "Internal error in str2plus");
       init();
@@ -434,7 +434,7 @@ struct STR : public AbstractConstraint
     }
 
     virtual AbstractConstraint* reverse_constraint()
-    { return forward_check_negation(stateObj, this); }
+    { return forward_check_negation(this); }
 
     virtual void propagate(DomainInt prop_var, DomainDelta)
     {
@@ -443,7 +443,7 @@ struct STR : public AbstractConstraint
         if(!constraint_locked)
         {
             constraint_locked = true;
-            getQueue(stateObj).pushSpecialTrigger(this);
+            getQueue().pushSpecialTrigger(this);
         }
     }
 
@@ -452,7 +452,7 @@ struct STR : public AbstractConstraint
     virtual void special_check()
     {
         constraint_locked = false;
-        D_ASSERT(!getState(stateObj).isFailed());
+        D_ASSERT(!getState().isFailed());
         do_prop();
     }
 
@@ -552,7 +552,7 @@ struct STR : public AbstractConstraint
             if(limit == 0)
             {
                 // We found no valid tuples!
-                getState(stateObj).setFailed(true);
+                getState().setFailed(true);
                 return;
             }
         }

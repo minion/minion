@@ -9,7 +9,7 @@
 
 template <typename T>
 AbstractConstraint*
-BuildCT_LIGHTTABLE(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return GACLightTableCon(stateObj, t1, b.tuples); }
+BuildCT_LIGHTTABLE(const T& t1, ConstraintBlob& b)
+{ return GACLightTableCon(t1, b.tuples); }
 
 BUILD_CT(CT_LIGHTTABLE, 1)

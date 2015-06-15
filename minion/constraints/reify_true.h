@@ -55,9 +55,9 @@ template<typename BoolVar, bool DoWatchAssignment>
 
   Reversible<bool> full_propagate_called;
 
-  reify_true(StateObj* _stateObj, AbstractConstraint* _poscon, BoolVar _rar_var) :
-  ParentConstraint(_stateObj), rar_var(_rar_var), constraint_locked(false),
-    full_propagate_called(stateObj, false)
+  reify_true(AbstractConstraint* _poscon, BoolVar _rar_var) :
+  ParentConstraint(), rar_var(_rar_var), constraint_locked(false),
+    full_propagate_called(false)
   {
     CHECK(rar_var.getInitialMin() >= 0 && rar_var.getInitialMax() <= 1, "reifyimply only works on Boolean variables");
     child_constraints.push_back(_poscon);
@@ -67,9 +67,9 @@ template<typename BoolVar, bool DoWatchAssignment>
   virtual AbstractConstraint* reverse_constraint()
   { 
     vector<AbstractConstraint*> con;
-    con.push_back(new WatchLiteralConstraint<BoolVar>(stateObj, rar_var, 1));
+    con.push_back(new WatchLiteralConstraint<BoolVar>(rar_var, 1));
     con.push_back(child_constraints[0]->reverse_constraint());
-    return new Dynamic_AND(stateObj, con);
+    return new Dynamic_AND(con);
   }
 
   virtual SysInt dynamic_trigger_count()
@@ -155,7 +155,7 @@ template<typename BoolVar, bool DoWatchAssignment>
         D_ASSERT(rar_var.getAssignedValue() == 1);
         P("rarvar assigned to 1- Do full propagate");
         constraint_locked = true;
-        getQueue(stateObj).pushSpecialTrigger(this);
+        getQueue().pushSpecialTrigger(this);
         return;
     }
 
@@ -211,7 +211,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     {
       P("Remove unused trigger");
       // This is an optimisation.
-      releaseTrigger(stateObj, trig);
+      releaseTrigger(trig);
     }
   }
 
@@ -233,7 +233,7 @@ template<typename BoolVar, bool DoWatchAssignment>
   virtual void full_propagate()
   {
     P("Full prop");
-    D_ASSERT(!getState(stateObj).isFailed());
+    D_ASSERT(!getState().isFailed());
     P(child_constraints[0]->constraint_name());
     D_ASSERT(rar_var.getMin() >= 0);
     D_ASSERT(rar_var.getMax() <= 1);
@@ -248,7 +248,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     SysInt dt_count = dynamic_trigger_count();
     // Clean up triggers
     for(SysInt i = 0; i < dt_count; ++i)
-        releaseTrigger(stateObj, dt);
+        releaseTrigger(dt);
     
     if(DoWatchAssignment && !rar_var.isAssigned()) //don't place when rar_var=0
     {
@@ -268,11 +268,11 @@ template<typename BoolVar, bool DoWatchAssignment>
 
 template<typename BoolVar>
 AbstractConstraint*
-truereifyCon(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
-{ return new reify_true<BoolVar, true>(stateObj, &*c, var); }
+truereifyCon(AbstractConstraint* c, BoolVar var)
+{ return new reify_true<BoolVar, true>(&*c, var); }
 
 template<typename BoolVar>
 AbstractConstraint*
-truereifyQuickCon(StateObj* stateObj, AbstractConstraint* c, BoolVar var)
-{ return new reify_true<BoolVar, false>(stateObj, &*c, var); }
+truereifyQuickCon(AbstractConstraint* c, BoolVar var)
+{ return new reify_true<BoolVar, false>(&*c, var); }
 #endif

@@ -47,15 +47,15 @@ struct Forward_Checking : public AbstractConstraint
 
   AbstractConstraint* child;
 
-  Forward_Checking(StateObj* _stateObj, AbstractConstraint* _con) :
-  AbstractConstraint(_stateObj), FCPruning(_stateObj, 1), pruningvar(-1), 
+  Forward_Checking(AbstractConstraint* _con) :
+  FCPruning(1), pruningvar(-1), 
   child(_con), 
   trig1(-1), trig2(-1)
   { }
 
   virtual AbstractConstraint* reverse_constraint()
   {
-    return new Forward_Checking(stateObj, child->reverse_constraint());
+    return new Forward_Checking(child->reverse_constraint());
   }
 
 
@@ -89,7 +89,7 @@ struct Forward_Checking : public AbstractConstraint
       // if all variables assigned
       if(trig1==-1) {
           if(full_assignment_failed(size, vars)) {
-              getState(stateObj).setFailed(true);
+              getState().setFailed(true);
           }
           return;
       }
@@ -144,7 +144,7 @@ struct Forward_Checking : public AbstractConstraint
       else if(dt==dtstart+2) {
           // If this is a stale trigger, release it.
           if(FCPruning.isMember(0)) {
-              releaseTrigger(stateObj, dt);
+              releaseTrigger(dt);
               return;
           }
           else {
@@ -281,7 +281,7 @@ struct Forward_Checking : public AbstractConstraint
 };
 
 inline AbstractConstraint*
-forwardCheckingCon(StateObj* stateObj, AbstractConstraint* c)
-{ return new Forward_Checking(stateObj, c); }
+forwardCheckingCon(AbstractConstraint* c)
+{ return new Forward_Checking(c); }
 
 #endif

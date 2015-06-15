@@ -191,8 +191,8 @@ typedef BoundVarRef_internal<> BoundVarRef;
 
 template<typename BoundType = DomainInt>
 struct BoundVarContainer {
-  StateObj* stateObj;
-  BoundVarContainer(StateObj* _stateObj) : stateObj(_stateObj), trigger_list(stateObj, true),
+  
+  BoundVarContainer() : trigger_list(true),
                                             var_count_m(0), lock_m(0)
   {}
 
@@ -257,14 +257,14 @@ struct BoundVarContainer {
   DomainInt getMin(const BoundVarRef_internal<BoundType>& d) const
   {
     D_ASSERT(lock_m);
-    D_ASSERT(getState(stateObj).isFailed() || inDomain(d,lower_bound(d)));
+    D_ASSERT(getState().isFailed() || inDomain(d,lower_bound(d)));
     return lower_bound(d);
   }
 
   DomainInt getMax(const BoundVarRef_internal<BoundType>& d) const
   {
     D_ASSERT(lock_m);
-    D_ASSERT(getState(stateObj).isFailed() || inDomain(d,upper_bound(d)));
+    D_ASSERT(getState().isFailed() || inDomain(d,upper_bound(d)));
     return upper_bound(d);
   }
 
@@ -286,7 +286,7 @@ struct BoundVarContainer {
     DomainInt max_val = getMax(d);
     if(min_val > i || max_val < i)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -328,7 +328,7 @@ struct BoundVarContainer {
 
     if(i < low_bound)
     {
-       getState(stateObj).setFailed(true);
+       getState().setFailed(true);
        return;
     }
 
@@ -351,7 +351,7 @@ struct BoundVarContainer {
 
     if(i > up_bound)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -394,7 +394,7 @@ struct BoundVarContainer {
      wdegs.resize(var_count_m);
 #endif
 
-    bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
+    bound_data = getMemory().backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
     BoundType* bound_ptr = static_cast<BoundType*>(bound_data);
     for(UnsignedSysInt i = 0; i < var_count_m; ++i)
     {

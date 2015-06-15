@@ -9,11 +9,11 @@
 
 template<typename VarArray>
 inline AbstractConstraint*
-BuildCT_REIFYIMPLY(StateObj* stateObj, const VarArray& vars, ConstraintBlob& bl)
+BuildCT_REIFYIMPLY(const VarArray& vars, ConstraintBlob& bl)
 {
   D_ASSERT(bl.internal_constraints.size() == 1);
   D_ASSERT(vars.size() == 1);
-  return truereifyCon(stateObj, build_constraint(stateObj, bl.internal_constraints[0]), vars[0]);
+  return truereifyCon(build_constraint(bl.internal_constraints[0]), vars[0]);
 }
 
 BUILD_CT(CT_REIFYIMPLY, 1)

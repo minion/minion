@@ -23,37 +23,37 @@ namespace BuildCon
 {
 
 vector<AnyVarRef>
-get_AnyVarRef_from_Var(StateObj* stateObj, const vector<Var>& vec)
+get_AnyVarRef_from_Var(const vector<Var>& vec)
 {
   vector<AnyVarRef> ret_vec;
   ret_vec.reserve(vec.size());
 
   for(SysInt i = 0; i < (SysInt)vec.size(); ++i)
-    ret_vec.push_back(get_AnyVarRef_from_Var(stateObj, vec[i]));
+    ret_vec.push_back(get_AnyVarRef_from_Var(vec[i]));
 
   return ret_vec;
 }
 
 /// Helper function used in a few places.
 AnyVarRef
-get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
+get_AnyVarRef_from_Var(Var v)
 {
   switch(v.type())
         {
           case VAR_BOOL:
-            return AnyVarRef(getVars(stateObj).boolVarContainer.get_var_num(v.pos()));
+            return AnyVarRef(getVars().boolVarContainer.get_var_num(v.pos()));
           case VAR_NOTBOOL:
-          return AnyVarRef(VarNotRef(getVars(stateObj).boolVarContainer.get_var_num(v.pos())));
+          return AnyVarRef(VarNotRef(getVars().boolVarContainer.get_var_num(v.pos())));
           case VAR_BOUND:
-            return AnyVarRef(getVars(stateObj).boundVarContainer.get_var_num(v.pos()));
+            return AnyVarRef(getVars().boundVarContainer.get_var_num(v.pos()));
           case VAR_SPARSEBOUND:
-            return AnyVarRef(getVars(stateObj).sparseBoundVarContainer.get_var_num(v.pos()));
+            return AnyVarRef(getVars().sparseBoundVarContainer.get_var_num(v.pos()));
           case VAR_DISCRETE:
-            return AnyVarRef(getVars(stateObj).bigRangeVarContainer.get_var_num(v.pos()));
+            return AnyVarRef(getVars().bigRangeVarContainer.get_var_num(v.pos()));
           case VAR_SPARSEDISCRETE:
             INPUT_ERROR("Sparse Discrete not supported at present");
           case VAR_CONSTANT:
-            return AnyVarRef(ConstantVar(stateObj, v.pos()));
+            return AnyVarRef(ConstantVar(v.pos()));
           default:
             INPUT_ERROR("Unknown variable type " << v.type() << ".");
         }
@@ -62,12 +62,12 @@ get_AnyVarRef_from_Var(StateObj* stateObj, Var v)
 
 
   /// Create all the variables used in the CSP.
-  void build_variables(StateObj* stateObj, const ProbSpec::VarContainer& vars)
+  void build_variables(const ProbSpec::VarContainer& vars)
   {
-    getVars(stateObj).boolVarContainer.setVarCount(vars.BOOLs);
-    getVars(stateObj).boundVarContainer.addVariables(vars.bound);
-    getVars(stateObj).sparseBoundVarContainer.addVariables(vars.sparse_bound);
-    getVars(stateObj).bigRangeVarContainer.addVariables(vars.discrete);
+    getVars().boolVarContainer.setVarCount(vars.BOOLs);
+    getVars().boundVarContainer.addVariables(vars.bound);
+    getVars().sparseBoundVarContainer.addVariables(vars.sparse_bound);
+    getVars().bigRangeVarContainer.addVariables(vars.discrete);
 
     for(SysInt i = 0; i < (SysInt)vars.sparse_discrete.size(); ++i)
     { INPUT_ERROR("Sparse discrete disabled at present due to bugs. Sorry."); }

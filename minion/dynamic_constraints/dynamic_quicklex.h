@@ -49,10 +49,10 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
 
   Reversible<SysInt> alpha;
 
-  QuickLexDynamic(StateObj* _stateObj, const VarArray1& _array1,
+  QuickLexDynamic(const VarArray1& _array1,
     const VarArray2& _array2) :
-  AbstractConstraint(_stateObj), var_array1(_array1), var_array2(_array2),
-    alpha(_stateObj, -1)
+  var_array1(_array1), var_array2(_array2),
+    alpha(-1)
     {
       CHECK(var_array1.size() == var_array2.size(), "QuickLexLeq and QuickLexLess only work with equal length vectors");
     }
@@ -73,8 +73,8 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   {
       P("Detach Triggers");
       DynamicTrigger* dt = dynamic_trigger_start();
-      releaseTrigger(stateObj, dt , TO_Backtrack);
-      releaseTrigger(stateObj, dt + 1 , TO_Backtrack);
+      releaseTrigger(dt , TO_Backtrack);
+      releaseTrigger(dt + 1 , TO_Backtrack);
   }
 
   virtual void full_propagate()
@@ -85,7 +85,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     if(var_array1.size() == 0)
     {
         if(Less)
-            getState(stateObj).setFailed(true);
+            getState().setFailed(true);
         return;
     }
 
@@ -150,7 +150,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     }
 
     if(Less)
-        getState(stateObj).setFailed(true);
+        getState().setFailed(true);
     else
     {
         detach_triggers();
@@ -234,7 +234,7 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
 
   virtual AbstractConstraint* reverse_constraint()
   {
-      return new QuickLexDynamic<VarArray2, VarArray1,!Less>(stateObj,var_array2,var_array1);
+      return new QuickLexDynamic<VarArray2, VarArray1,!Less>(var_array2,var_array1);
   }
 
   virtual vector<AnyVarRef> get_vars()

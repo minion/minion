@@ -104,11 +104,10 @@ struct MultiBranch : public VariableOrder
     // need to patch up the returned variable index
     vector<DomainInt> variable_offset;
 
-    MultiBranch(const vector<shared_ptr<VariableOrder> > _vovector,
-		StateObj* _stateObj):
+    MultiBranch(const vector<shared_ptr<VariableOrder> > _vovector):
     VariableOrder(_vovector[0]->var_order), // It doesn't matter what var_order is set to
     vovector(_vovector),
-    pos(_stateObj)
+    pos()
     {
         pos=0;
         variable_offset.resize(vovector.size());
@@ -145,8 +144,8 @@ struct StaticBranch : public VariableOrder
     vector<ValOrderEnum> val_order;
     Reversible<SysInt> pos;
 
-    StaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order),
-        val_order(_val_order), pos(_stateObj)
+    StaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order) : VariableOrder(_var_order),
+        val_order(_val_order), pos()
     {
         pos=0;
         D_ASSERT(var_order.size() == val_order.size());
@@ -174,8 +173,8 @@ struct StaticBranchLimited : public VariableOrder
     Reversible<SysInt> pos;
     unsigned int limit;
 
-    StaticBranchLimited(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, unsigned int _limit, StateObj* _stateObj) : VariableOrder(_var_order),
-        val_order(_val_order), pos(_stateObj), limit(_limit)
+    StaticBranchLimited(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, unsigned int _limit) : VariableOrder(_var_order),
+        val_order(_val_order), pos(), limit(_limit)
     {
         pos=0;
         D_ASSERT(var_order.size() == val_order.size());
@@ -203,7 +202,7 @@ struct SDFBranch : public VariableOrder
 {
     vector<ValOrderEnum> val_order;
 
-    SDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) :
+    SDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order) :
         VariableOrder(_var_order), val_order(_val_order)
     {
     }
@@ -248,7 +247,7 @@ struct SlowStaticBranch : public VariableOrder
 {
     vector<ValOrderEnum> val_order;
 
-    SlowStaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) :
+    SlowStaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order) :
         VariableOrder(_var_order), val_order(_val_order)
     {
     }
@@ -275,7 +274,7 @@ struct WdegBranch : public VariableOrder
 {
     vector<ValOrderEnum> val_order;
 
-    WdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order),
+    WdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order) : VariableOrder(_var_order),
         val_order(_val_order)
     {
     }
@@ -346,7 +345,7 @@ struct DomOverWdegBranch : VariableOrder
 {
     vector<ValOrderEnum> val_order;
 
-    DomOverWdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order),
+    DomOverWdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order) : VariableOrder(_var_order),
         val_order(_val_order)
     {
     }
@@ -430,7 +429,7 @@ struct SRFBranch : VariableOrder
 {
     vector<ValOrderEnum> val_order;
 
-    SRFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order),
+    SRFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order) : VariableOrder(_var_order),
         val_order(_val_order)
     {
     }
@@ -472,7 +471,7 @@ struct LDFBranch : VariableOrder
 {
     vector<ValOrderEnum> val_order;
 
-    LDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order, StateObj* _stateObj) : VariableOrder(_var_order),
+    LDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order) : VariableOrder(_var_order),
         val_order(_val_order)
     {
     }
@@ -522,10 +521,10 @@ struct ConflictBranch : VariableOrder
     VariableOrder* innervarorder;
 
     ConflictBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order,
-        VariableOrder* _innervarorder, StateObj* _stateObj) :
+        VariableOrder* _innervarorder) :
     VariableOrder(_var_order),
     val_order(_val_order),
-    pos(_stateObj), innervarorder(_innervarorder), last_returned_var(-1), in_conflict(false)
+    pos(), innervarorder(_innervarorder), last_returned_var(-1), in_conflict(false)
     {
         pos=0;
         pos2=0;

@@ -9,7 +9,7 @@
 
 template<typename T1, typename T2>
 AbstractConstraint*
-BuildCT_INEQ(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob& b) 
-{ return LeqCon(stateObj, t1[0], t2[0], b.constants[0][0]); }
+BuildCT_INEQ(const T1& t1, const T2& t2, ConstraintBlob& b) 
+{ return LeqCon(t1[0], t2[0], b.constants[0][0]); }
 
 BUILD_CT(CT_INEQ, 2)

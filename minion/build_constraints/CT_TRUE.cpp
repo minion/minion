@@ -8,7 +8,7 @@
 #include "../constraints/constraint_constant.h"
 
 inline AbstractConstraint*
-BuildCT_TRUE(StateObj* stateObj, ConstraintBlob&)
-{ return (new ConstantConstraint<true>(stateObj)); }
+BuildCT_TRUE(ConstraintBlob&)
+{ return (new ConstantConstraint<true>()); }
 
 BUILD_CT(CT_TRUE, 0)

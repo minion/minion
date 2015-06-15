@@ -13,8 +13,8 @@
 
 template<typename VarArray1,  typename VarArray2>
 AbstractConstraint*
-BuildCT_STATIC_VECNEQ(StateObj* stateObj,const VarArray1& varray1, const VarArray2& varray2, ConstraintBlob&)
-{ return new ConName <VarArray1,VarArray2>(stateObj, varray1, varray2); }
+BuildCT_STATIC_VECNEQ(const VarArray1& varray1, const VarArray2& varray2, ConstraintBlob&)
+{ return new ConName <VarArray1,VarArray2>(varray1, varray2); }
 
 
 

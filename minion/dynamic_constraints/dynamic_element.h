@@ -128,11 +128,11 @@ struct ElementConstraintDynamic : public AbstractConstraint
     vector<Mapper> v = indexvar.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_SHIFT, -1))
     {
-      return ConOutput::print_con(stateObj, "watchelement_one"+undef_name, var_array, indexvar.popOneMapper(), resultvar);
+      return ConOutput::print_con("watchelement_one"+undef_name, var_array, indexvar.popOneMapper(), resultvar);
     }
     else
     {
-      return ConOutput::print_con(stateObj, "watchelement"+undef_name, var_array, indexvar, resultvar);
+      return ConOutput::print_con("watchelement"+undef_name, var_array, indexvar, resultvar);
     }
   }
 
@@ -141,8 +141,8 @@ struct ElementConstraintDynamic : public AbstractConstraint
 
   vector<DomainInt> current_support;
 
-  ElementConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, const Index& _index, const Result& _result) :
-    AbstractConstraint(_stateObj), var_array(_var_array), indexvar(_index), resultvar(_result)
+  ElementConstraintDynamic(const VarArray& _var_array, const Index& _index, const Result& _result) :
+    var_array(_var_array), indexvar(_index), resultvar(_result)
   {
     CheckNotBound(var_array, "watchelement", "element");
     CheckNotBoundSingle(indexvar, "watchelement", "element");
@@ -177,14 +177,14 @@ struct ElementConstraintDynamic : public AbstractConstraint
       if(indexvar.getMin() < 0)
       {
         indexvar.addDynamicTrigger(dt+2*j, DomainRemoval, indexvar.getMin());
-        releaseTrigger(stateObj, (dt+2*j+1));
+        releaseTrigger((dt+2*j+1));
         return;
       }
 
       if(indexvar.getMax() >= (SysInt)var_array.size())
       {
         indexvar.addDynamicTrigger(dt+2*j, DomainRemoval, indexvar.getMax());
-        releaseTrigger(stateObj, (dt+2*j+1));
+        releaseTrigger((dt+2*j+1));
         return;
       }
     }
@@ -354,7 +354,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
 
     check_out_of_bounds_index();
 
-    if(getState(stateObj).isFailed()) return;
+    if(getState().isFailed()) return;
 
     for(SysInt i = 0; i < array_size; ++i)
     {
@@ -536,19 +536,19 @@ struct ElementConstraintDynamic : public AbstractConstraint
       if(!undef_maps_zero) {
           // Constraint is satisfied if the index is out of range.
           vector<DomainInt> r; r.push_back(0); r.push_back((DomainInt)var_array.size()-1);
-          AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<Index>(stateObj, indexvar, r);
+          AbstractConstraint* t4=(AbstractConstraint*) new WatchNotInRangeConstraint<Index>(indexvar, r);
           con.push_back(t4);
       }
 
       for(SysInt i=0; i<(SysInt)var_array.size(); i++)
       {
           vector<AbstractConstraint*> con2;
-          WatchLiteralConstraint<Index>* t=new WatchLiteralConstraint<Index>(stateObj, indexvar, i);
+          WatchLiteralConstraint<Index>* t=new WatchLiteralConstraint<Index>(indexvar, i);
           con2.push_back((AbstractConstraint*) t);
-          NeqConstraintBinary<AnyVarRef, Result>* t2=new NeqConstraintBinary<AnyVarRef, Result>(stateObj, var_array[i], resultvar);
+          NeqConstraintBinary<AnyVarRef, Result>* t2=new NeqConstraintBinary<AnyVarRef, Result>(var_array[i], resultvar);
           con2.push_back((AbstractConstraint*) t2);
 
-          Dynamic_AND* t3= new Dynamic_AND(stateObj, con2);
+          Dynamic_AND* t3= new Dynamic_AND(con2);
           con.push_back((AbstractConstraint*) t3);
       }
 
@@ -556,11 +556,11 @@ struct ElementConstraintDynamic : public AbstractConstraint
       {
         // or (i not in {0..size-1} /\ r!=0)
         vector<AbstractConstraint*> out_bounds;
-        out_bounds.push_back(new WatchNotLiteralConstraint<Result>(stateObj, resultvar, 0));
-        out_bounds.push_back(new WatchNotInRangeConstraint<Index>(stateObj, indexvar, make_vec<DomainInt>(0, (DomainInt)var_array.size() - 1)));
-        con.push_back(new Dynamic_AND(stateObj, out_bounds));
+        out_bounds.push_back(new WatchNotLiteralConstraint<Result>(resultvar, 0));
+        out_bounds.push_back(new WatchNotInRangeConstraint<Index>(indexvar, make_vec<DomainInt>(0, (DomainInt)var_array.size() - 1)));
+        con.push_back(new Dynamic_AND(out_bounds));
       }
-      return new Dynamic_OR(stateObj, con);
+      return new Dynamic_OR(con);
   }
 };
 

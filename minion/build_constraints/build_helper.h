@@ -34,9 +34,9 @@ struct BuildConObj<CT_NAME, 0> \
 { \
   template<typename T1, typename T2, typename T3> \
   static  \
-  AbstractConstraint* build(StateObj* stateObj, const pair<pair<pair<EmptyType, vector<T1>* >, vector<T2>* >, vector<T3>*>& vars, ConstraintBlob& b, SysInt) \
+  AbstractConstraint* build(const pair<pair<pair<EmptyType, vector<T1>* >, vector<T2>* >, vector<T3>*>& vars, ConstraintBlob& b, SysInt) \
   { \
-      return Build ## CT_NAME(stateObj, *(vars.first.first.second), *(vars.first.second), *(vars.second), b); \
+      return Build ## CT_NAME(*(vars.first.first.second), *(vars.first.second), *(vars.second), b); \
   } \
 }; \
 } \
@@ -49,9 +49,9 @@ struct BuildConObj<CT_NAME, 0> \
 { \
   template<typename T1, typename T2> \
   static  \
-  AbstractConstraint* build(StateObj* stateObj, const pair<pair<EmptyType, vector<T1>* >, vector<T2>* >& vars, ConstraintBlob& b, SysInt) \
+  AbstractConstraint* build(const pair<pair<EmptyType, vector<T1>* >, vector<T2>* >& vars, ConstraintBlob& b, SysInt) \
   { \
-      return Build ## CT_NAME(stateObj, *(vars.first.second), *(vars.second), b); \
+      return Build ## CT_NAME(*(vars.first.second), *(vars.second), b); \
   } \
 }; \
 } \
@@ -64,9 +64,9 @@ struct BuildConObj<CT_NAME, 0> \
 { \
   template<typename T1> \
   static  \
-  AbstractConstraint* build(StateObj* stateObj, const pair<EmptyType, vector<T1>* >& vars, ConstraintBlob& b, SysInt) \
+  AbstractConstraint* build(const pair<EmptyType, vector<T1>* >& vars, ConstraintBlob& b, SysInt) \
   { \
-      return Build ## CT_NAME(stateObj, *(vars.second), b); \
+      return Build ## CT_NAME(*(vars.second), b); \
   } \
 }; \
 } \
@@ -78,9 +78,9 @@ template<> \
 struct BuildConObj<CT_NAME, 0> \
 { \
   static  \
-  AbstractConstraint* build(StateObj* stateObj, const EmptyType& vars, ConstraintBlob& b, SysInt) \
+  AbstractConstraint* build(const EmptyType& vars, ConstraintBlob& b, SysInt) \
   { \
-      return Build ## CT_NAME(stateObj, b); \
+      return Build ## CT_NAME(b); \
   } \
 }; \
 } \
@@ -88,5 +88,5 @@ struct BuildConObj<CT_NAME, 0> \
 #define BUILD_CT(CT_NAME,COUNT) \
 MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME) \
 AbstractConstraint* \
-build_constraint_ ## CT_NAME(StateObj* stateObj, ConstraintBlob& b) \
-{ return BuildConObj<CT_NAME, COUNT>::build(stateObj, EmptyType(), b, 0); }
+build_constraint_ ## CT_NAME(ConstraintBlob& b) \
+{ return BuildConObj<CT_NAME, COUNT>::build(EmptyType(), b, 0); }

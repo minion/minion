@@ -9,33 +9,33 @@
 
 template<typename VarArray,  typename VarSum>
 AbstractConstraint*
-BuildCT_GEQSUM(StateObj* stateObj, const vector<VarArray>& _var_array, const vector<VarSum>& _var_sum, ConstraintBlob&)
+BuildCT_GEQSUM(const vector<VarArray>& _var_array, const vector<VarSum>& _var_sum, ConstraintBlob&)
 { 
   if(_var_array.size() == 2)
   {
     std::array<VarArray, 2> v_array;
     for(SysInt i = 0; i < 2; ++i)
       v_array[i] = _var_array[i];
-    return LightGreaterEqualSumCon(stateObj, v_array, _var_sum[0]);
+    return LightGreaterEqualSumCon(v_array, _var_sum[0]);
   }
   else
   {
     return (new LessEqualSumConstraint<vector<typename NegType<VarArray>::type>, 
-      typename NegType<VarSum>::type>(stateObj, VarNegRef(_var_array), VarNegRef(_var_sum[0]))); 
+      typename NegType<VarSum>::type>(VarNegRef(_var_array), VarNegRef(_var_sum[0]))); 
   }
 }
 
 inline AbstractConstraint*
-BuildCT_GEQSUM(StateObj* stateObj, const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum, ConstraintBlob&)
+BuildCT_GEQSUM(const vector<BoolVarRef>& var_array, const vector<ConstantVar>& var_sum, ConstraintBlob&)
 { 
   SysInt t2(checked_cast<SysInt>(var_sum[0].getAssignedValue()));
-  return BoolGreaterEqualSumCon(stateObj, var_array, t2);
+  return BoolGreaterEqualSumCon(var_array, t2);
 }
 
 // Don't pass in the vectors by reference, as we might need to copy them.
 template<typename T1, typename T2>
 AbstractConstraint*
-BuildCT_WEIGHTGEQSUM(StateObj* stateObj, vector<T1> vec, const vector<T2>& t2, ConstraintBlob& b)
+BuildCT_WEIGHTGEQSUM(vector<T1> vec, const vector<T2>& t2, ConstraintBlob& b)
 {
   vector<DomainInt> scale = b.constants[0];
   // Preprocess to remove any multiplications by 0, both for efficency
@@ -69,14 +69,14 @@ BuildCT_WEIGHTGEQSUM(StateObj* stateObj, vector<T1> vec, const vector<T2>& t2, C
     vector<SwitchNeg<T1> > mult_vars(vec.size());
     for(UnsignedSysInt i = 0; i < vec.size(); ++i)
       mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
-    return BuildCT_GEQSUM(stateObj, mult_vars, t2, b);
+    return BuildCT_GEQSUM(mult_vars, t2, b);
   }
   else
   {
     vector<MultiplyVar<T1> > mult_vars(vec.size());
     for(UnsignedSysInt i = 0; i < vec.size(); ++i)
       mult_vars[i] = MultiplyVar<T1>(vec[i], scale[i]);
-    return BuildCT_GEQSUM(stateObj, mult_vars, t2, b);
+    return BuildCT_GEQSUM(mult_vars, t2, b);
   }
 }
 

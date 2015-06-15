@@ -76,7 +76,7 @@ struct GACEqualConstraint : public AbstractConstraint
   
   DynamicTrigger* dtvar2;   // The start of the block related to var2
   
-  GACEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2) : AbstractConstraint(_stateObj),
+  GACEqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2) : 
     var1(_var1), var2(_var2)
   { }
   
@@ -170,7 +170,7 @@ struct GACEqualConstraint : public AbstractConstraint
    
    virtual AbstractConstraint* reverse_constraint()
    {
-       return new NeqConstraintBinary<EqualVarRef1, EqualVarRef2>(stateObj, var1, var2);
+       return new NeqConstraintBinary<EqualVarRef1, EqualVarRef2>(var1, var2);
    }
 };
 

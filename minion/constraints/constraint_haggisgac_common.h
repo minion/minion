@@ -1,5 +1,5 @@
     virtual AbstractConstraint* reverse_constraint()
-    { return forward_check_negation(stateObj, this); }
+    { return forward_check_negation(this); }
 
     struct Support ;
 
@@ -224,7 +224,7 @@
         literalsScratch.resize(0);
 
         // Register this with the backtracker.
-        getState(stateObj).getGenericBacktracker().add(this);
+        getState().getGenericBacktracker().add(this);
 
         // Initialise counters
         supports=0;
@@ -359,7 +359,7 @@
 
       DynamicTrigger* dt = dynamic_trigger_start();
       dt=dt+lit;
-      releaseTrigger(stateObj, dt);   // , TO_Backtrack
+      releaseTrigger(dt);   // , TO_Backtrack
   }
 
       BOOL hasNoKnownSupport(SysInt var,SysInt lit) {

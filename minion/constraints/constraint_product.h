@@ -54,8 +54,8 @@ struct ProductConstraint : public AbstractConstraint
 
   CONSTRAINT_ARG_LIST3(var1, var2, var3);
 
-  ProductConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
-    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+  ProductConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
+    var1(_var1), var2(_var2), var3(_var3)
   {
       CHECKSIZE(  checked_cast<BigInt>(var1.getInitialMax())*checked_cast<BigInt>(var2.getInitialMax()) , "Magnitude of domain bounds is too large in product constraint");
       CHECKSIZE(  checked_cast<BigInt>(var1.getInitialMin())*checked_cast<BigInt>(var2.getInitialMin()) , "Magnitude of domain bounds is too large in product constraint");
@@ -209,7 +209,7 @@ struct ProductConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
 };
 #endif

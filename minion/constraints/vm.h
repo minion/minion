@@ -74,12 +74,12 @@ struct VMConstraint : public AbstractConstraint
   #endif
   #endif
 
-  VMConstraint(StateObj* stateObj, const VarArray& _vars, TupleList* _tuples, TupleList* _mapping_tuples) :
-  AbstractConstraint(stateObj),
+  VMConstraint(const VarArray& _vars, TupleList* _tuples, TupleList* _mapping_tuples) :
+  
   total_lits(0), vars_size(-1),
   VM_data(_tuples->getPointer()), VM_size(_tuples->tuple_size())
   #if UseStatePtr
-    ,StatePtr(stateObj, 0)
+    ,StatePtr(0)
   #endif
 #ifdef SPECIAL_VM
     ,constraint_locked(false)
@@ -119,7 +119,7 @@ struct VMConstraint : public AbstractConstraint
       total_lits = checked_cast<SysInt>(mapping_size / 2);
 
       #if UseStatePtr && UseStatePtrSym
-      StatePtrPerm=getMemory(stateObj).backTrack().template requestArray<char>(total_lits);
+      StatePtrPerm=getMemory().backTrack().template requestArray<char>(total_lits);
       for(int i=0; i<total_lits; i++) StatePtrPerm[i]=i;
       #endif
 
@@ -188,7 +188,7 @@ struct VMConstraint : public AbstractConstraint
       if(constraint_locked)
           return;
       constraint_locked = true;
-      getQueue(stateObj).pushSpecialTrigger(this);
+      getQueue().pushSpecialTrigger(this);
   }
 #else
   virtual void propagate(DomainInt, DomainDelta)
@@ -556,10 +556,10 @@ struct VMConstraint : public AbstractConstraint
 
 template<typename VarArray>
 AbstractConstraint*
-  VMCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples, TupleList* tuples2)
-  { return new VMConstraint<VarArray,false>(stateObj, vars, tuples, tuples2); }
+  VMCon(const VarArray& vars, TupleList* tuples, TupleList* tuples2)
+  { return new VMConstraint<VarArray,false>(vars, tuples, tuples2); }
 
   template<typename VarArray>
 AbstractConstraint*
-  VMSymCon(StateObj* stateObj, const VarArray& vars, TupleList* tuples, TupleList* tuples2)
-  { return new VMConstraint<VarArray,true>(stateObj, vars, tuples, tuples2); }
+  VMSymCon(const VarArray& vars, TupleList* tuples, TupleList* tuples2)
+  { return new VMConstraint<VarArray,true>(vars, tuples, tuples2); }

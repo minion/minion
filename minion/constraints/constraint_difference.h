@@ -55,8 +55,8 @@ struct DifferenceConstraint : public AbstractConstraint
   VarRef1 var1;
   VarRef2 var2;
   VarRef3 var3;
-  DifferenceConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
-    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+  DifferenceConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
+    var1(_var1), var2(_var2), var3(_var3)
   {  }
   
   virtual triggerCollection setup_internal()
@@ -188,7 +188,7 @@ struct DifferenceConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
 };
 #endif

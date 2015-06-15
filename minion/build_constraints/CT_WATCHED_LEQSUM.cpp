@@ -9,7 +9,7 @@
 
 template<typename T>
 inline AbstractConstraint*
-  BuildCT_WATCHED_LEQSUM(StateObj* stateObj, const vector<T>& t1, ConstraintBlob& b)
+  BuildCT_WATCHED_LEQSUM(const vector<T>& t1, ConstraintBlob& b)
 {
   for(SysInt i = 0; i < (SysInt)t1.size(); ++i)
   {
@@ -17,7 +17,7 @@ inline AbstractConstraint*
       FAIL_EXIT("watched leqsum only works on Boolean variables!");
   }
 
-  return BoolLessEqualSumConDynamic(stateObj, t1, checked_cast<SysInt>(b.constants[0][0]));
+  return BoolLessEqualSumConDynamic(t1, checked_cast<SysInt>(b.constants[0][0]));
 }
 
 BUILD_CT(CT_WATCHED_LEQSUM, 1)

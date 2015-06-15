@@ -87,7 +87,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
   virtual AbstractConstraint* reverse_constraint()
   {
     return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, BoolVarRef, !negated>
-                 (stateObj, var1, var2, var3);
+                 (var1, var2, var3);
   }
 
   virtual string full_output_name()
@@ -98,17 +98,17 @@ struct ReifiedEqualConstraint : public AbstractConstraint
     {
       if(negated)
       { FATAL_REPORTABLE_ERROR(); }
-      return ConOutput::print_con(stateObj, "__reify_minuseq", var1, var2.popOneMapper(), var3);
+      return ConOutput::print_con("__reify_minuseq", var1, var2.popOneMapper(), var3);
     }
     else
     {
 
-      return ConOutput::print_con(stateObj, negated ? "__reify_diseq" : "__reify_eq", var1, var2, var3);
+      return ConOutput::print_con(negated ? "__reify_diseq" : "__reify_eq", var1, var2, var3);
     }
   }
   
-  ReifiedEqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
-    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+  ReifiedEqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3) :
+    var1(_var1), var2(_var2), var3(_var3)
   {
      CHECK(var3.getInitialMin() >= 0 && var3.getInitialMax() <= 1, "reify only works on Boolean variables");
     //CHECK(var3.getInitialMin() < 0, "Reification variables must have domain within {0,1}");
@@ -402,8 +402,8 @@ struct NeqConstraintBinary : public AbstractConstraint
   
   CONSTRAINT_ARG_LIST2(var1, var2);
   
-  NeqConstraintBinary(StateObj* _stateObj, const VarRef1& _var1, const VarRef2& _var2 ) :
-    AbstractConstraint(_stateObj), var1(_var1), var2(_var2)
+  NeqConstraintBinary(const VarRef1& _var1, const VarRef2& _var2 ) :
+    var1(_var1), var2(_var2)
   { }
   
   virtual triggerCollection setup_internal()
@@ -624,17 +624,17 @@ struct EqualConstraint : public AbstractConstraint
     vector<Mapper> v = var2.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_NEG))
     {
-      return ConOutput::print_con(stateObj, "minuseq", var1, var2.popOneMapper());
+      return ConOutput::print_con("minuseq", var1, var2.popOneMapper());
     }
     else
     {
-      return ConOutput::print_con(stateObj, "eq", var1, var2);
+      return ConOutput::print_con("eq", var1, var2);
     }
   }
   
   EqualVarRef1 var1;
   EqualVarRef2 var2;
-  EqualConstraint(StateObj* _stateObj, EqualVarRef1 _var1, EqualVarRef2 _var2) : AbstractConstraint(_stateObj),
+  EqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2) : 
     var1(_var1), var2(_var2)
   {}
   
@@ -711,14 +711,14 @@ struct EqualConstraint : public AbstractConstraint
    
    virtual AbstractConstraint* reverse_constraint()
    {
-       return new NeqConstraintBinary<EqualVarRef1, EqualVarRef2>(stateObj, var1, var2);
+       return new NeqConstraintBinary<EqualVarRef1, EqualVarRef2>(var1, var2);
    }
 };
 
 template<typename VarRef1, typename VarRef2>
 AbstractConstraint* NeqConstraintBinary<VarRef1, VarRef2>::reverse_constraint()
 {
-   return new EqualConstraint<VarRef1, VarRef2>(stateObj, var1, var2);
+   return new EqualConstraint<VarRef1, VarRef2>(var1, var2);
 }
    
    
@@ -726,19 +726,19 @@ AbstractConstraint* NeqConstraintBinary<VarRef1, VarRef2>::reverse_constraint()
 
 template<typename EqualVarRef1, typename EqualVarRef2>
 AbstractConstraint*
-EqualCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
-{ return new EqualConstraint<EqualVarRef1, EqualVarRef2>(stateObj, var1,var2); }
+EqualCon(EqualVarRef1 var1, EqualVarRef2 var2)
+{ return new EqualConstraint<EqualVarRef1, EqualVarRef2>(var1,var2); }
 
 template<typename EqualVarRef1, typename EqualVarRef2>
 AbstractConstraint*
-EqualMinusCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
-{ return new EqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2> >(stateObj, var1,VarNegRef(var2)); }
+EqualMinusCon(EqualVarRef1 var1, EqualVarRef2 var2)
+{ return new EqualConstraint<EqualVarRef1, VarNeg<EqualVarRef2> >(var1,VarNegRef(var2)); }
 
 template<typename Var1, typename Var2>
 AbstractConstraint*
-NeqConBinary(StateObj* stateObj, const Var1& var1, const Var2& var2)
+NeqConBinary(const Var1& var1, const Var2& var2)
 {
-  return new NeqConstraintBinary<Var1, Var2>(stateObj, var1, var2); 
+  return new NeqConstraintBinary<Var1, Var2>(var1, var2); 
 }
 
 #endif

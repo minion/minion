@@ -69,8 +69,8 @@ struct Dynamic_AND : public ParentConstraint
 
   bool constraint_locked;
   SysInt propagated_to;
-  Dynamic_AND(StateObj* _stateObj, vector<AbstractConstraint*> _con) :
-    ParentConstraint(_stateObj, _con), constraint_locked(false)
+  Dynamic_AND(vector<AbstractConstraint*> _con) :
+    ParentConstraint(_con), constraint_locked(false)
     { }
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
@@ -141,7 +141,7 @@ struct Dynamic_AND : public ParentConstraint
     child_constraints[propagated_to]->full_propagate();
     propagated_to++;
     if(propagated_to != (SysInt)child_constraints.size())
-      getQueue(stateObj).pushSpecialTrigger(this);
+      getQueue().pushSpecialTrigger(this);
     else
     {
        constraint_locked = false;
@@ -185,7 +185,7 @@ struct Dynamic_AND : public ParentConstraint
     D_ASSERT(!constraint_locked);
     constraint_locked = true;
     propagated_to = 0;
-    getQueue(stateObj).pushSpecialTrigger(this);
+    getQueue().pushSpecialTrigger(this);
   }
 
   virtual AbstractConstraint* reverse_constraint();
@@ -200,6 +200,6 @@ inline AbstractConstraint* Dynamic_AND::reverse_constraint()
   {
       con.push_back(child_constraints[i]->reverse_constraint());
   }
-  return new Dynamic_OR(stateObj, con);
+  return new Dynamic_OR(con);
 }
 #endif

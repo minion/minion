@@ -63,7 +63,7 @@ class AbstractConstraint
 protected:
   /// Private members of the base class.
 
-  StateObj* stateObj;
+  
   void* _DynamicTriggerCache;
   vector<AnyVarRef> singleton_vars;
 
@@ -132,8 +132,8 @@ public:
     return NULL;
   }
 
-  AbstractConstraint(StateObj* _stateObj) :
-    stateObj(_stateObj), _DynamicTriggerCache(), singleton_vars(),
+  AbstractConstraint() :
+    _DynamicTriggerCache(), singleton_vars(),
 #ifdef WDEG
     wdeg(1),
 #endif
@@ -198,12 +198,7 @@ public:
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size) = 0;
 
   virtual ~AbstractConstraint()
-    {
-      // This is a simple way to check if an AbstractConstraint is ever
-      // double-destroyed.
-      D_ASSERT(stateObj != 0);
-      D_DATA(stateObj = 0);
-    }
+    { }
 
 
 
@@ -337,8 +332,8 @@ public:
     return newTriggers;
   }
 
-  ParentConstraint(StateObj* _stateObj, const vector<AbstractConstraint*> _children = vector<AbstractConstraint*>()) :
-  AbstractConstraint(_stateObj), child_constraints(_children)
+  ParentConstraint(const vector<AbstractConstraint*> _children = vector<AbstractConstraint*>()) :
+  child_constraints(_children)
   {
     SysInt var_count = 0;
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
@@ -434,7 +429,7 @@ inline void DynamicTrigger::propagate()
 namespace ConOutput
 {
   inline
-  string print_vars(StateObj* stateObj, AbstractConstraint* const& c)
+  string print_vars(AbstractConstraint* const& c)
   { return c->full_output_name(); }
 }
 

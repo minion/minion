@@ -67,7 +67,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
          // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
 
   SysInt& unwatched(DomainInt i)
@@ -75,8 +75,8 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 
   VarSum var_sum;
 
-  LiteralSumConstraintDynamic(StateObj* _stateObj,const VarArray& _var_array, ValueArray _val_array, VarSum _var_sum) :
-    AbstractConstraint(_stateObj), var_array(_var_array), value_array(_val_array), var_sum(_var_sum)
+  LiteralSumConstraintDynamic(const VarArray& _var_array, ValueArray _val_array, VarSum _var_sum) :
+    var_array(_var_array), value_array(_val_array), var_sum(_var_sum)
   {
       SysInt array_size = var_array.size();
 
@@ -123,7 +123,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 
     if(triggers_wanted > 1)    // Then we have failed, forget it.
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
     else if(triggers_wanted == 1)      // Then we can propagate
@@ -278,6 +278,6 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 
 template<typename VarArray,  typename ValArray, typename VarSum>
 AbstractConstraint*
-LiteralSumConDynamic(StateObj* stateObj,const VarArray& _var_array,  const ValArray& _val_array, VarSum _var_sum)
-{ return new LiteralSumConstraintDynamic<VarArray,ValArray,VarSum>(stateObj, _var_array, _val_array, _var_sum); }
+LiteralSumConDynamic(const VarArray& _var_array,  const ValArray& _val_array, VarSum _var_sum)
+{ return new LiteralSumConstraintDynamic<VarArray,ValArray,VarSum>(_var_array, _val_array, _var_sum); }
 #endif

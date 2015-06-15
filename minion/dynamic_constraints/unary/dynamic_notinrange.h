@@ -46,8 +46,8 @@ template<typename Var>
   DomainInt range_max;
 
   template<typename T>
-  WatchNotInRangeConstraint(StateObj* _stateObj, const Var& _var, const T& _vals) :
-  AbstractConstraint(_stateObj), var(_var)
+  WatchNotInRangeConstraint(const Var& _var, const T& _vals) :
+  var(_var)
   { 
     if(_vals.size() != 2)
     {
@@ -146,7 +146,7 @@ template<typename Var>
   virtual AbstractConstraint* reverse_constraint()
   {
       std::array<DomainInt, 2> a = {range_min, range_max};
-      return new WatchInRangeConstraint<Var>(stateObj, var, a);
+      return new WatchInRangeConstraint<Var>(var, a);
   }
 };
 
@@ -155,6 +155,6 @@ template<typename Var>
 AbstractConstraint* WatchInRangeConstraint<Var>::reverse_constraint()
 {
     std::array<DomainInt, 2> a = {range_min, range_max};
-    return new WatchNotInRangeConstraint<Var>(stateObj, var, a);  
+    return new WatchNotInRangeConstraint<Var>(var, a);  
 }
 #endif

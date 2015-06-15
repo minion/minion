@@ -91,7 +91,6 @@
 template<typename VarArray, typename CapArray, bool Strongcards>
 struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 {
-    using FlowConstraint<VarArray, UseIncGraph>::stateObj;
     using FlowConstraint<VarArray, UseIncGraph>::constraint_locked;
 
     using FlowConstraint<VarArray, UseIncGraph>::adjlist;
@@ -119,13 +118,13 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     using FlowConstraint<VarArray, UseIncGraph>::hopcroft2;
     using FlowConstraint<VarArray, UseIncGraph>::augpath;
 
-    GCC(StateObj* _stateObj, const VarArray& _var_array, const CapArray& _capacity_array, vector<DomainInt> _val_array) :
-    FlowConstraint<VarArray, UseIncGraph>(_stateObj, _var_array),
+    GCC(const VarArray& _var_array, const CapArray& _capacity_array, vector<DomainInt> _val_array) :
+    FlowConstraint<VarArray, UseIncGraph>(_var_array),
     capacity_array(_capacity_array)//, val_array(_val_array)
     #if InternalDT
-    ,idt(_stateObj, numvars, numvals, _var_array)
+    ,idt(numvars, numvals, _var_array)
     #endif
-    ,SCCSplit(_stateObj, numvars+numvals)
+    ,SCCSplit(numvars+numvals)
     {
         for(SysInt i = 0; i < (SysInt)_val_array.size(); ++i)
             val_array.push_back(checked_cast<SysInt>(_val_array[i]));
@@ -357,7 +356,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         {
             #ifdef SPECIALQUEUE
             constraint_locked = true;
-            getQueue(stateObj).pushSpecialTrigger(this);
+            getQueue().pushSpecialTrigger(this);
             #else
             #ifdef SCC
             do_gcc_prop_scc();
@@ -403,7 +402,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 {
                     #ifdef SPECIALQUEUE
                     constraint_locked = true;
-                    getQueue(stateObj).pushSpecialTrigger(this);
+                    getQueue().pushSpecialTrigger(this);
                     #else
                     #ifdef SCC
                     do_gcc_prop_scc();
@@ -440,7 +439,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
   {
     constraint_locked = false;  // should be above the if.
 
-    if(getState(stateObj).isFailed())
+    if(getState().isFailed())
     {
         to_process.clear();
         return;
@@ -638,7 +637,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 
             if(!flag)
             {
-                getState(stateObj).setFailed(true);
+                getState().setFailed(true);
                 return;
             }
         }
@@ -694,7 +693,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
             {
                 // can't hit the lower bound.
                 GCCPRINT("failing because can't construct lower bound matching.");
-                getState(stateObj).setFailed(true);
+                getState().setFailed(true);
                 return;
             }
         }
@@ -885,7 +884,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                 if(!flag)
                 {
                     GCCPRINT("Failing because no matching");
-                    getState(stateObj).setFailed(true);
+                    getState().setFailed(true);
                     return;
                 }
             }
@@ -2455,10 +2454,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         {
             NotOccurrenceEqualConstraint<VarArray, DomainInt, CapVarRef>*
                 t=new NotOccurrenceEqualConstraint<VarArray, DomainInt, CapVarRef>(
-                    stateObj, var_array, val_array[i], capacity_array[i]);
+                    var_array, val_array[i], capacity_array[i]);
             con.push_back((AbstractConstraint*) t);
         }
-        return new Dynamic_OR(stateObj, con);
+        return new Dynamic_OR(con);
     }
 };
 

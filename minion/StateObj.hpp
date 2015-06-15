@@ -23,44 +23,28 @@
 
 #include "StateObj_forward.h"
 
-// The following is a little trick, to make sure no-one accidentally links together
-// debugging and non-debugging code (which are not link-compatable)
 
-#ifdef MINION_DEBUG
-namespace StateObjNamespace_DEBUG
-#else
-namespace StateObjNamespace_RELEASE
-#endif
-{ struct StateObj {}; }
-
-#ifdef MINION_DEBUG
-using namespace StateObjNamespace_DEBUG;
-#else
-using namespace StateObjNamespace_RELEASE;
-#endif
-
-VARDEF(StateObj _noreenter_stateObj);
 VARDEF(Memory searchMem_m);
 VARDEF(SearchOptions options_m);
-VARDEF_ASSIGN(SearchState state_m, &_noreenter_stateObj);
-VARDEF_ASSIGN(Queues queues_m, &_noreenter_stateObj);
-VARDEF_ASSIGN(TriggerMem triggerMem_m, &_noreenter_stateObj);
-VARDEF_ASSIGN(VariableContainer varContainer_m, &_noreenter_stateObj);
-VARDEF_ASSIGN(BoolContainer bools_m, &_noreenter_stateObj);
+VARDEF(SearchState state_m);
+VARDEF(Queues queues_m);
+VARDEF(TriggerMem triggerMem_m);
+VARDEF(VariableContainer varContainer_m);
+VARDEF(BoolContainer bools_m);
 
-inline BoolContainer& getBools(StateObj* stateObj)
+inline BoolContainer& getBools()
 { return bools_m; }
-inline SearchOptions& getOptions(StateObj* stateObj)
+inline SearchOptions& getOptions()
 { return options_m; }
-inline SearchState& getState(StateObj* stateObj)
+inline SearchState& getState()
 { return state_m; }
-inline Queues& getQueue(StateObj* stateObj)
+inline Queues& getQueue()
 { return queues_m; }
-inline Memory& getMemory(StateObj* stateObj)
+inline Memory& getMemory()
 { return searchMem_m; }
-inline TriggerMem& getTriggerMem(StateObj* stateObj)
+inline TriggerMem& getTriggerMem()
 { return triggerMem_m; }
-inline VariableContainer& getVars(StateObj* stateObj)
+inline VariableContainer& getVars()
 { return varContainer_m; }
 
 template<typename DomType>

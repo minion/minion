@@ -44,8 +44,8 @@ struct Check_GSA : public AbstractConstraint
 
   AbstractConstraint* child;
 
-  Check_GSA(StateObj* _stateObj, AbstractConstraint* _con) :
-  AbstractConstraint(_stateObj), child(_con)
+  Check_GSA(AbstractConstraint* _con) :
+  child(_con)
   { }
 
   virtual ~Check_GSA()
@@ -53,7 +53,7 @@ struct Check_GSA : public AbstractConstraint
 
   virtual AbstractConstraint* reverse_constraint()
   {
-    return new Check_GSA(stateObj, child->reverse_constraint());
+    return new Check_GSA(child->reverse_constraint());
   }
 
   virtual SysInt dynamic_trigger_count()
@@ -74,7 +74,7 @@ struct Check_GSA : public AbstractConstraint
     bool flag = false;
     GET_ASSIGNMENT(assignment, child);
     if(!flag)
-    { getState(stateObj).setFailed(true); }
+    { getState().setFailed(true); }
     else
     { watch_assignment(assignment, *(child->get_vars_singleton()), dt); }
   }
@@ -98,7 +98,7 @@ struct Check_GSA : public AbstractConstraint
 };
 
 AbstractConstraint*
-checkGSACon(StateObj* stateObj, AbstractConstraint* c)
-{ return new Check_GSA(stateObj, c); }
+checkGSACon(AbstractConstraint* c)
+{ return new Check_GSA(c); }
 
 #endif

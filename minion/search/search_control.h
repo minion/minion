@@ -25,13 +25,13 @@
 namespace Controller
 {
 
-    shared_ptr<VariableOrder> make_search_order(SearchOrder order, StateObj* stateObj)
+    shared_ptr<VariableOrder> make_search_order(SearchOrder order)
     {
         // collect the variables in the SearchOrder object
         vector<AnyVarRef> var_array;
         for(SysInt i=0; i<(SysInt)order.var_order.size(); i++)
         {
-            var_array.push_back(get_AnyVarRef_from_Var(stateObj, order.var_order[i]));
+            var_array.push_back(get_AnyVarRef_from_Var(order.var_order[i]));
             // some check here?
         }
 
@@ -41,35 +41,35 @@ namespace Controller
         switch(order.order)  // get the VarOrderEnum
         {
         case ORDER_STATIC:
-            vo=new StaticBranch(var_array, order.val_order, stateObj);
+            vo=new StaticBranch(var_array, order.val_order);
             break;
         case ORDER_ORIGINAL:
-            vo=new StaticBranch(var_array, order.val_order, stateObj);
+            vo=new StaticBranch(var_array, order.val_order);
             break;
         case ORDER_SDF:
-            vo=new SDFBranch(var_array, order.val_order, stateObj);
+            vo=new SDFBranch(var_array, order.val_order);
             break;
         case ORDER_SRF:
-            vo=new SRFBranch(var_array, order.val_order, stateObj);
+            vo=new SRFBranch(var_array, order.val_order);
             break;
         case ORDER_LDF:
-            vo=new LDFBranch(var_array, order.val_order, stateObj);
+            vo=new LDFBranch(var_array, order.val_order);
             break;
         case ORDER_CONFLICT:
             // for the time being, just use static as the underlying order
-            vo2=new StaticBranch(var_array, order.val_order, stateObj);
-            vo=new ConflictBranch(var_array, order.val_order, vo2, stateObj);
+            vo2=new StaticBranch(var_array, order.val_order);
+            vo=new ConflictBranch(var_array, order.val_order, vo2);
             break;
         case ORDER_STATIC_LIMITED:
-            vo=new StaticBranchLimited(var_array, order.val_order, order.limit, stateObj);
+            vo=new StaticBranchLimited(var_array, order.val_order, order.limit);
             break;
 
         #ifdef WDEG
         case ORDER_WDEG:
-            vo=new WdegBranch(var_array, order.val_order, stateObj);
+            vo=new WdegBranch(var_array, order.val_order);
             break;
         case ORDER_DOMOVERWDEG:
-            vo=new DomOverWdegBranch(var_array, order.val_order, stateObj);
+            vo=new DomOverWdegBranch(var_array, order.val_order);
             break;
         #else
         case ORDER_WDEG:
@@ -84,21 +84,20 @@ namespace Controller
         return shared_ptr<VariableOrder>(vo);
     }
 
-    shared_ptr<VariableOrder> make_search_order_multiple(vector<SearchOrder> order,
-                                                         StateObj* stateObj)
+    shared_ptr<VariableOrder> make_search_order_multiple(vector<SearchOrder> order)
     {
         shared_ptr<VariableOrder> vo;
 
         if(order.size()==1)
         {
-            return make_search_order(order[0], stateObj);
+            return make_search_order(order[0]);
         }
         else
         {
             vector<shared_ptr<VariableOrder> > vovector;
             for(SysInt i=0; i<(SysInt)order.size(); i++)
             {
-                vovector.push_back(make_search_order(order[i], stateObj));
+                vovector.push_back(make_search_order(order[i]));
                 if(order[i].find_one_assignment && i!= (SysInt)order.size()-1)
                 {
                     cout << "Only one VARORDER AUX is allowed, and it must be the final VARORDER command." << endl;
@@ -106,7 +105,7 @@ namespace Controller
                 }
             }
 
-            vo=shared_ptr<VariableOrder>(new MultiBranch(vovector, stateObj));
+            vo=shared_ptr<VariableOrder>(new MultiBranch(vovector));
         }
 
         return vo;
@@ -114,13 +113,13 @@ namespace Controller
 
 
 // returns an instance of SearchManager with the required variable ordering, propagator etc.
-shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
+shared_ptr<SearchManager> make_search_manager(
                                               PropagationLevel prop_method,
                                               vector<SearchOrder> order)
 {
     shared_ptr<VariableOrder> vo;
 
-    vo=make_search_order_multiple(order, stateObj);
+    vo=make_search_order_multiple(order);
 
     shared_ptr<Propagate> p;
     switch(prop_method)
@@ -151,12 +150,12 @@ shared_ptr<SearchManager> make_search_manager(StateObj* stateObj,
     {
         for(SysInt j=0; j<(SysInt)order[i].var_order.size(); j++)
         {
-            all_vars.push_back(get_AnyVarRef_from_Var(stateObj, order[i].var_order[j]));
+            all_vars.push_back(get_AnyVarRef_from_Var(order[i].var_order[j]));
         }
     }
 
     // need to switch here for different search algorthms. plain, parallel, group
-    shared_ptr<SearchManager> sm(new SearchManager(stateObj, all_vars, order, vo, p));
+    shared_ptr<SearchManager> sm(new SearchManager(all_vars, order, vo, p));
 
     return sm;
 }

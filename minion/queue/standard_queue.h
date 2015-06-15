@@ -33,7 +33,7 @@
 
 class Queues
 {
-  StateObj* stateObj;
+  
 
 
   QueueCon<TriggerRange> propagate_trigger_list;
@@ -53,7 +53,7 @@ public:
   { return tbq; }
 
 
-  Queues(StateObj* _stateObj) : stateObj(_stateObj)
+  Queues() 
   {}
 
   void pushSpecialTrigger(AbstractConstraint* trigger)
@@ -105,7 +105,7 @@ public:
 
   bool propagateDynamicTriggerLists()
   {
-    bool* fail_ptr = getState(stateObj).getFailedPtr();
+    bool* fail_ptr = getState().getFailedPtr();
     while(!dynamic_trigger_list.empty())
     {
       DynamicTrigger* t = dynamic_trigger_list.queueTop();
@@ -136,7 +136,7 @@ public:
 #endif
 
        it = dummy.next;
-       releaseTrigger(stateObj, &dummy);
+       releaseTrigger(&dummy);
       }
     }
     return false;
@@ -144,7 +144,7 @@ public:
 
   bool propagateStaticTriggerLists()
   {
-    bool* fail_ptr = getState(stateObj).getFailedPtr();
+    bool* fail_ptr = getState().getFailedPtr();
     while(!propagate_trigger_list.empty())
     {
       TriggerRange t = propagate_trigger_list.queueTop();
@@ -160,7 +160,7 @@ public:
         }
 
 #ifndef NO_DEBUG
-        if(getOptions(stateObj).fullpropagate)
+        if(getOptions().fullpropagate)
           it->full_propagate();
         else
         {
@@ -187,7 +187,7 @@ public:
   {
     while(true)
     {
-      if (getState(stateObj).isDynamicTriggersUsed())
+      if (getState().isDynamicTriggersUsed())
       {
         while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
         {
@@ -214,10 +214,10 @@ public:
       CON_INFO_ADDONE(SpecialTrigger);
       trig->special_check();
 #ifdef WDEG
-      if(getState(stateObj).isFailed()) trig->incWdeg();
+      if(getState().isFailed()) trig->incWdeg();
 #endif
 
-      if(getState(stateObj).isFailed())
+      if(getState().isFailed())
       {
         clearQueues();
         return;
@@ -231,7 +231,7 @@ public:
 
   bool propagateDynamicTriggerListsRoot()
   {
-    bool* fail_ptr = getState(stateObj).getFailedPtr();
+    bool* fail_ptr = getState().getFailedPtr();
     while(!dynamic_trigger_list.empty())
     {
       DynamicTrigger* t = dynamic_trigger_list.queueTop();
@@ -260,7 +260,7 @@ public:
         }
 
         it = dummy.next;
-        releaseTrigger(stateObj, &dummy);
+        releaseTrigger(&dummy);
       }
     }
     return false;
@@ -268,7 +268,7 @@ public:
 
   bool propagateStaticTriggerListsRoot()
   {
-    bool* fail_ptr = getState(stateObj).getFailedPtr();
+    bool* fail_ptr = getState().getFailedPtr();
     while(!propagate_trigger_list.empty())
     {
       TriggerRange t = propagate_trigger_list.queueTop();
@@ -285,7 +285,7 @@ public:
         if(it->constraint->full_propagate_done)
         {
 #ifndef NO_DEBUG
-        if(getOptions(stateObj).fullpropagate)
+        if(getOptions().fullpropagate)
           it->full_propagate();
         else
         {
@@ -309,7 +309,7 @@ public:
   {
     while(true)
     {
-      if (getState(stateObj).isDynamicTriggersUsed())
+      if (getState().isDynamicTriggersUsed())
       {
         while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
         {
@@ -335,7 +335,7 @@ public:
       CON_INFO_ADDONE(SpecialTrigger);
       trig->special_check();
 
-      if(getState(stateObj).isFailed())
+      if(getState().isFailed())
       {
         clearQueues();
         return;
@@ -350,7 +350,7 @@ public:
 // and normal propagate to have the same input method.
 // Just checking the bounds doesn't make sense here, so we ignore it.
 //template<typename Vars>
-//inline void propagate_queue_vars(StateObj* stateObj, Vars& vars, bool /*CheckBounds*/)
-//{ getQueue(stateObj).propagateQueue(); }
+//inline void propagate_queue_vars(Vars& vars, bool /*CheckBounds*/)
+//{ getQueue().propagateQueue(); }
 
 #endif

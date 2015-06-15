@@ -44,8 +44,8 @@ template<typename Var>
   DomainInt range_max;
 
   template<typename T>
-  WatchInRangeConstraint(StateObj* _stateObj, const Var& _var, const T& _vals) :
-  AbstractConstraint(_stateObj), var(_var)
+  WatchInRangeConstraint(const Var& _var, const T& _vals) :
+  var(_var)
   { 
     if(_vals.size() != 2)
     {

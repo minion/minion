@@ -94,8 +94,8 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
   SysInt& unwatched(SysInt i)
     { return static_cast<SysInt*>(unwatched_indexes)[i]; }
 
-  BoolLessSumConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array, VarSum _var_sum) :
-  AbstractConstraint(_stateObj), var_array(_var_array), var_sum(_var_sum), last(0)
+  BoolLessSumConstraintDynamic(const VarArray& _var_array, VarSum _var_sum) :
+  var_array(_var_array), var_sum(_var_sum), last(0)
   {
     D_ASSERT((VarToCount == 0) || (VarToCount == 1));
   // Sum of 1's is >= K
@@ -152,7 +152,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
 
     if(triggers_wanted > 1)    // Then we have failed, forget it.
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
     else if(triggers_wanted == 1)      // Then we can propagate
@@ -316,7 +316,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
   virtual AbstractConstraint* reverse_constraint()
   {
      return new BoolLessSumConstraintDynamic<VarArray, VarSum, 1-VarToCount, true>
-               (stateObj, var_array, var_array.size()-var_sum+1);
+               (var_array, var_array.size()-var_sum+1);
   }
 
 
@@ -324,17 +324,17 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
 
 template<typename VarArray,  typename VarSum>
 AbstractConstraint*
-  BoolLessEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
+  BoolLessEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
 {
-  return new BoolLessSumConstraintDynamic<VarArray,VarSum>(stateObj, _var_array,
+  return new BoolLessSumConstraintDynamic<VarArray,VarSum>(_var_array,
     (SysInt)_var_array.size() - (SysInt)(_var_sum));
 }
 
 template<typename VarArray,  typename VarSum>
 AbstractConstraint*
-  BoolGreaterEqualSumConDynamic(StateObj* stateObj, const VarArray& _var_array,  VarSum _var_sum)
+  BoolGreaterEqualSumConDynamic(const VarArray& _var_array,  VarSum _var_sum)
 {
-  return new BoolLessSumConstraintDynamic<VarArray,VarSum,0>(stateObj, _var_array, _var_sum);
+  return new BoolLessSumConstraintDynamic<VarArray,VarSum,0>(_var_array, _var_sum);
 }
 
 

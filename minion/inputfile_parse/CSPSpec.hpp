@@ -17,5 +17,5 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-inline void inputPrint(std::ostream& o, StateObj* stateObj, const Var& v)
-{ o << getState(stateObj).getInstance()->vars.getName(v); }
+inline void inputPrint(std::ostream& o, const Var& v)
+{ o << getState().getInstance()->vars.getName(v); }

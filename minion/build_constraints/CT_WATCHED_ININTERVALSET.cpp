@@ -9,10 +9,10 @@
 
 template<typename VarArray1>
 AbstractConstraint*
-BuildCT_WATCHED_ININTERVALSET(StateObj* stateObj, const VarArray1& _var_array_1, const ConstraintBlob& b)
+BuildCT_WATCHED_ININTERVALSET(const VarArray1& _var_array_1, const ConstraintBlob& b)
 { 
   return new WatchInIntervalSetConstraint<typename VarArray1::value_type>
-    (stateObj, _var_array_1[0], b.constants[0]); 
+    (_var_array_1[0], b.constants[0]); 
 }
 
 BUILD_CT(CT_WATCHED_ININTERVALSET, 1)

@@ -150,7 +150,7 @@ struct arrayset_bt {
     ReversibleInt size;
     DomainInt minval;
 
-    arrayset_bt(StateObj* _stateObj) : size(_stateObj) { }
+    arrayset_bt() : size() { }
 
     void initialise(DomainInt low, DomainInt high) {
         minval=low;
@@ -244,7 +244,7 @@ struct MDDC : public AbstractConstraint
 
     virtual string full_output_name()
     {
-        return ConOutput::print_con(stateObj, constraint_name(), vars);
+        return ConOutput::print_con(constraint_name(), vars);
     }
 
     VarArray vars;
@@ -264,9 +264,9 @@ struct MDDC : public AbstractConstraint
     vector<arrayset> gacvalues;   // Opposite of the sets in the Cheng and Yap paper: these start empty and are fille d
 
 
-    MDDC(StateObj* _stateObj, const VarArray& _var_array, TupleList* _tuples) :
-    AbstractConstraint(_stateObj),
-    vars(_var_array), constraint_locked(false), gno(_stateObj)
+    MDDC(const VarArray& _var_array, TupleList* _tuples) :
+    
+    vars(_var_array), constraint_locked(false), gno()
     {
         if(isNegative) {
             init_negative(_tuples);
@@ -652,7 +652,7 @@ struct MDDC : public AbstractConstraint
     }
 
     virtual AbstractConstraint* reverse_constraint()
-    { return forward_check_negation(stateObj, this); }
+    { return forward_check_negation(this); }
 
 
     virtual void propagate(DomainInt prop_var, DomainDelta)
@@ -660,7 +660,7 @@ struct MDDC : public AbstractConstraint
         if(!constraint_locked)
         {
             constraint_locked = true;
-            getQueue(stateObj).pushSpecialTrigger(this);
+            getQueue().pushSpecialTrigger(this);
         }
     }
 
@@ -669,7 +669,7 @@ struct MDDC : public AbstractConstraint
     virtual void special_check()
     {
         constraint_locked = false;
-        D_ASSERT(!getState(stateObj).isFailed());
+        D_ASSERT(!getState().isFailed());
         do_prop();
     }
 

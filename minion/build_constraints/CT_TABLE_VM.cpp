@@ -9,14 +9,14 @@
 
 template <typename T>
 AbstractConstraint*
-BuildCT_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
+BuildCT_TABLE_VM(const T& t1, ConstraintBlob& b)
 { return NULL; }
 
 BUILD_CT(CT_TABLE_VM, 1)
 
 template <typename T>
 AbstractConstraint*
-BuildCT_NEG_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
+BuildCT_NEG_TABLE_VM(const T& t1, ConstraintBlob& b)
 { return NULL; }
 
 BUILD_CT(CT_NEG_TABLE_VM, 1)
@@ -83,7 +83,7 @@ std::string make_table_string(const T& t1, ConstraintBlob& b, char const* type)
 
 template <typename T>
 AbstractConstraint*
-read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* type)
+read_table_vm(const T& t1, ConstraintBlob& b, char const* type)
 {
     // Store a list of vms we have already loaded.
     static std::map<std::string, std::vector<TupleList*> > cached_vms;
@@ -113,12 +113,12 @@ read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* typ
 #endif
             // Opening file failed
             if(std::string(type) == "pos") {
-                // return GACTableCon(stateObj, t1, b.tuples);
-                return new MDDC<T>(stateObj, t1, b.tuples);
+                // return GACTableCon(t1, b.tuples);
+                return new MDDC<T>(t1, b.tuples);
             }
             if(std::string(type) == "neg") {
-                // return GACNegativeTableCon(stateObj, t1, b.tuples);
-                return new MDDC<T, true>(stateObj, t1, b.tuples);
+                // return GACNegativeTableCon(t1, b.tuples);
+                return new MDDC<T, true>(t1, b.tuples);
             }
             abort();
         }
@@ -131,21 +131,21 @@ read_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* typ
 
     cached_vms[hash] = vtl;
 
-    return VMSymCon(stateObj, t1, vtl[0], vtl[1]);
+    return VMSymCon(t1, vtl[0], vtl[1]);
 }
 
 
 template <typename T>
 AbstractConstraint*
-BuildCT_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return read_table_vm(stateObj, t1, b, "pos"); }
+BuildCT_TABLE_VM(const T& t1, ConstraintBlob& b)
+{ return read_table_vm(t1, b, "pos"); }
 
 BUILD_CT(CT_TABLE_VM, 1)
 
 template <typename T>
 AbstractConstraint*
-BuildCT_NEG_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return read_table_vm(stateObj, t1, b, "neg"); }
+BuildCT_NEG_TABLE_VM(const T& t1, ConstraintBlob& b)
+{ return read_table_vm(t1, b, "neg"); }
 
 BUILD_CT(CT_NEG_TABLE_VM, 1)
 
@@ -155,7 +155,7 @@ BUILD_CT(CT_NEG_TABLE_VM, 1)
 
 template <typename T>
 AbstractConstraint*
-output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* type)
+output_table_vm(const T& t1, ConstraintBlob& b, char const* type)
 {
     std::string s = make_table_string(t1, b, type);
 
@@ -179,22 +179,22 @@ output_table_vm(StateObj* stateObj,const T& t1, ConstraintBlob& b, char const* t
         write(f, s.c_str(), s.size());
         close(f);
     }
-    return (new ConstantConstraint<false>(stateObj));
+    return (new ConstantConstraint<false>());
 
 }
 
 
 template <typename T>
 AbstractConstraint*
-BuildCT_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return output_table_vm(stateObj, t1, b, "pos"); }
+BuildCT_TABLE_VM(const T& t1, ConstraintBlob& b)
+{ return output_table_vm(t1, b, "pos"); }
 
 BUILD_CT(CT_TABLE_VM, 1)
 
 template <typename T>
 AbstractConstraint*
-BuildCT_NEG_TABLE_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return output_table_vm(stateObj, t1, b, "neg"); }
+BuildCT_NEG_TABLE_VM(const T& t1, ConstraintBlob& b)
+{ return output_table_vm(t1, b, "neg"); }
 
 BUILD_CT(CT_NEG_TABLE_VM, 1)
 

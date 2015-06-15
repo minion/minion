@@ -29,9 +29,9 @@ namespace Controller
 
 
 template<typename T>
-void inline maybe_print_search_assignment(StateObj* stateObj, T& var, DomainInt val, BOOL equal, bool force = false)
+void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal, bool force = false)
 {
-    if(getOptions(stateObj).dumptree)
+    if(getOptions().dumptree)
     {
       if(force)
         cout << "ForceAssign: " << var << (equal?" = ":" != ") << val << endl;
@@ -51,24 +51,24 @@ struct SearchManager
 
   virtual ~SearchManager() {}
 
-  StateObj* stateObj;
+  
   vector<AnyVarRef> var_array;
   shared_ptr<VariableOrder> var_order;
 
   bool hasauxvars;   // Has a VARORDER AUX
   SysInt topauxvar;  // lowest index of an aux var.
 
-  shared_ptr<Propagate> prop;  // Propagate is the type of the base class. Method prop->prop(stateObj, var_array)
+  shared_ptr<Propagate> prop;  // Propagate is the type of the base class. Method prop->prop(var_array)
 
   vector<Controller::triple> branches; //L & R branches so far (isLeftBranch?,var,value)
   //vector<DomainInt> first_unassigned_variable;
 
   SysInt depth; //number of left branches
 
-  SearchManager(StateObj* _stateObj, vector<AnyVarRef> _var_array,
+  SearchManager(vector<AnyVarRef> _var_array,
                 vector<SearchOrder> _order, shared_ptr<VariableOrder> _var_order,
                 shared_ptr<Propagate> _prop)
-  : stateObj(_stateObj), var_array(_var_array), var_order(_var_order),
+  : var_array(_var_array), var_order(_var_order),
     topauxvar(0), prop(_prop), depth(0)
   {
     // if this isn't enough room, the vector will autoresize. While that can be slow,
@@ -110,9 +110,9 @@ struct SearchManager
         D_ASSERT(picked.first!=-1);
         D_ASSERT(!var_array[picked.first].isAssigned());
 
-        world_push(stateObj);
+        world_push();
         var_array[picked.first].decisionAssign(picked.second);
-        maybe_print_search_assignment(stateObj, var_array[picked.first], picked.second, true);
+        maybe_print_search_assignment(var_array[picked.first], picked.second, true);
         branches.push_back(Controller::triple(true, picked.first, picked.second));
         depth++;
     }
@@ -133,7 +133,7 @@ struct SearchManager
 
         // remove the left branch.
         branches.pop_back();
-        world_pop(stateObj);
+        world_pop();
         depth--;
 
         D_ASSERT(var_array[var].inDomain(val));
@@ -151,7 +151,7 @@ struct SearchManager
         {
             var_array[var].removeFromDomain(val);
         }
-        maybe_print_search_assignment(stateObj, var_array[var], val, false);
+        maybe_print_search_assignment(var_array[var], val, false);
         branches.push_back(Controller::triple(false, var, val));
         return true;
     }
@@ -162,7 +162,7 @@ struct SearchManager
         {
             if(branches.back().isLeft)
             {
-                world_pop(stateObj);
+                world_pop();
                 depth--;
             }
 
@@ -191,20 +191,20 @@ struct SearchManager
     // Most basic search procedure
     virtual void search()
     {
-        maybe_print_search_state(stateObj, "Node: ", var_array);
+        maybe_print_search_state("Node: ", var_array);
         while(true)
         {
-            D_ASSERT(getQueue(stateObj).isQueuesEmpty());
+            D_ASSERT(getQueue().isQueuesEmpty());
 
-            getState(stateObj).incrementNodeCount();
+            getState().incrementNodeCount();
 
-            do_checks(stateObj, var_array, branches);
+            do_checks(var_array, branches);
 
             pair<SysInt, DomainInt> varval= var_order->pickVarVal();
 
             if(varval.first==-1)
             {
-                deal_with_solution(stateObj);
+                deal_with_solution();
                 if(hasauxvars)
                 {   // There are AUX vars at the end of the var ordering.
                     // Backtrack out of them.
@@ -212,31 +212,31 @@ struct SearchManager
                 }
                 
                 // If we are not finished, then go into the loop below.
-                getState(stateObj).setFailed(true);
+                getState().setFailed(true);
             }
             else
             {
-                maybe_print_search_state(stateObj, "Node: ", var_array);
+                maybe_print_search_state("Node: ", var_array);
                 branch_left(varval);
-                prop->prop(stateObj, var_array);
+                prop->prop(var_array);
             }
 
             // loop to
-            while(getState(stateObj).isFailed())
+            while(getState().isFailed())
             {
-                getState(stateObj).setFailed(false);
+                getState().setFailed(false);
                 if(finished_search())
                 {   // what does this do?
                     return;
                 }
 
-                maybe_print_search_action(stateObj, "bt");
+                maybe_print_search_action("bt");
                 bool flag=branch_right();
                 if(!flag)
                 {   // No remaining left branches to branch right.
                     return;
                 }
-                set_optimise_and_propagate_queue(stateObj, *prop, var_array);
+                set_optimise_and_propagate_queue(*prop, var_array);
             }
         }
     }

@@ -86,7 +86,7 @@ typedef VarRefType<SparseBoundVarRef_internal<> > SparseBoundVarRef;
 
 template<typename BoundType = DomainInt>
 struct SparseBoundVarContainer {
-  StateObj* stateObj;
+  
   void* bound_data;
   TriggerList trigger_list;
   vector<vector<BoundType> > domains;
@@ -98,7 +98,7 @@ struct SparseBoundVarContainer {
   UnsignedSysInt var_count_m;
   BOOL lock_m;
 
-  SparseBoundVarContainer(StateObj* _stateObj) : stateObj(_stateObj), trigger_list(stateObj, true), var_count_m(0), lock_m(false)
+  SparseBoundVarContainer() : trigger_list(true), var_count_m(0), lock_m(false)
   { }
 
   vector<BoundType>& get_domain(SparseBoundVarRef_internal<BoundType> i)
@@ -127,7 +127,7 @@ struct SparseBoundVarContainer {
     typename vector<BoundType>::iterator it = std::lower_bound(bounds.begin(), bounds.end(), new_lower_bound);
     if(it == bounds.end())
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return *(it - 1);
     }
 
@@ -149,7 +149,7 @@ struct SparseBoundVarContainer {
 
     if(it == bounds.begin())
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return bounds.front();
     }
 
@@ -204,7 +204,7 @@ struct SparseBoundVarContainer {
    wdegs.resize(var_count_m);
 #endif
 
-  bound_data = getMemory(stateObj).backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
+  bound_data = getMemory().backTrack().request_bytes(var_count_m*2*sizeof(BoundType));
   BoundType* bound_ptr = static_cast<BoundType*>(bound_data);
   for(UnsignedSysInt i = 0; i < var_count_m; ++i)
   {
@@ -291,12 +291,12 @@ struct SparseBoundVarContainer {
 
     if(!binary_search(bounds.begin(), bounds.end(), i))
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
     if(min_val > i || max_val < i)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -339,7 +339,7 @@ struct SparseBoundVarContainer {
 
     if(i < low_bound)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 
@@ -366,7 +366,7 @@ struct SparseBoundVarContainer {
 
     if(i > up_bound)
     {
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
 

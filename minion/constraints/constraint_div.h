@@ -75,7 +75,7 @@ help constraints div
 template<typename T1, typename T2, typename T3, bool undef_zero>
 class DivConstraint
 {
-  StateObj* stateObj;
+  
 public:
   typedef typename common_var_type3<T1,T2,T3>::type var_common;
   typedef std::array<var_common, 3> var_type;
@@ -83,8 +83,8 @@ private:
    var_type vars;
 public:
 
-  DivConstraint(StateObj* _stateObj, const T1& v1, const T2& v2, const T3& v3)
-  : stateObj(_stateObj)
+  DivConstraint(const T1& v1, const T2& v2, const T3& v3)
+  
   {
     vars[0] = v1; vars[1] = v2; vars[2] = v3;
     // I do this test here because technically the behaviour is implementation

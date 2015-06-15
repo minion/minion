@@ -9,7 +9,7 @@
 
 template<typename T>
 inline AbstractConstraint*
-  BuildCT_WATCHED_GEQSUM(StateObj* stateObj,const vector<T>& t1, ConstraintBlob& b)
+  BuildCT_WATCHED_GEQSUM(const vector<T>& t1, ConstraintBlob& b)
 {
   for(SysInt i = 0; i < (SysInt)t1.size(); ++i)
   {
@@ -21,12 +21,12 @@ inline AbstractConstraint*
     if(sum == 1)
     {
       {
-        return BoolSATConDynamic(stateObj, t1);
+        return BoolSATConDynamic(t1);
       }
     }
     else
     {
-      return BoolGreaterEqualSumConDynamic(stateObj, t1, sum);
+      return BoolGreaterEqualSumConDynamic(t1, sum);
     }
 
 }

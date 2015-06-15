@@ -64,7 +64,7 @@ struct NeqConstraint : public AbstractConstraint
 
   CONSTRAINT_ARG_LIST1(var_array);
 
-  NeqConstraint(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
+  NeqConstraint(const VarArray& _var_array) : 
     var_array(_var_array)
   { }
 
@@ -78,7 +78,7 @@ struct NeqConstraint : public AbstractConstraint
   }
 
   virtual AbstractConstraint* reverse_constraint()
-  { return forward_check_negation(stateObj, this); }
+  { return forward_check_negation(this); }
 
   virtual void propagate(DomainInt prop_val_in, DomainDelta)
   {

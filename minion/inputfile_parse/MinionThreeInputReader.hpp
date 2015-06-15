@@ -578,10 +578,6 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
     return readConstraintOr(infile, get_constraint(CT_WATCHED_OR));
     break;
 
-    case CT_GADGET:
-    return readConstraintGadget(infile);
-    break;
-
     default:
     if(constraint->number_of_params == 2 &&
          (constraint->read_types[1] == read_tuples || constraint->read_types[1] == read_short_tuples) )
@@ -768,33 +764,6 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
   }
 
   return tuplelist;
-}
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// readConstraintGadget
-// table(<vectorOfVars>, {<tuple> [, <tuple>]})
-// Tuples represented as a vector of SysInt arrays.
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-template<typename FileReader>
-ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintGadget(FileReader* infile)
-{
-  MAYBE_PARSER_INFO( "Reading a gadget constraint" ) ;
-
-  vector<Var> vectorOfVars = readLiteralVector(infile) ;
-
-  infile->check_sym(',');
-
-  string s = infile->get_string();
-
-  MAYBE_PARSER_INFO( "Gadget name: '" + s + "'");
-  shared_ptr<CSPInstance> in_gadget = instance->getGadgetSymbol(s);
-  ConstraintBlob gadgetCon( get_constraint(CT_GADGET) , vectorOfVars);
-  gadgetCon.gadget = in_gadget;
-  infile->check_sym(',');
-  gadgetCon.gadget_prop_type = GetPropMethodFromString(infile->get_string());
-  infile->check_sym(')');
-  MAYBE_PARSER_INFO("End gadget reading");
-  return gadgetCon;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

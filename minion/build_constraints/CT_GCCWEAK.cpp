@@ -9,7 +9,7 @@
 
 template<typename VarArray1, typename VarArray2>
 AbstractConstraint*
-BuildCT_GCCWEAK(StateObj* stateObj, const VarArray1& var_array, const VarArray2& cap_array, ConstraintBlob& b)
-{ return new GCC<VarArray1, VarArray2, false>(stateObj, var_array, cap_array, b.constants[0]); }
+BuildCT_GCCWEAK(const VarArray1& var_array, const VarArray2& cap_array, ConstraintBlob& b)
+{ return new GCC<VarArray1, VarArray2, false>(var_array, cap_array, b.constants[0]); }
 
 BUILD_CT(CT_GCCWEAK, 2)

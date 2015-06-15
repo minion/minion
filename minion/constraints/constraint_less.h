@@ -53,8 +53,8 @@ struct LeqConstraint : public AbstractConstraint
   
   CONSTRAINT_ARG_LIST3(x, y, offset);
   
-  LeqConstraint(StateObj* _stateObj,VarRef1 _x, VarRef2 _y, Offset _o) :
-    AbstractConstraint(_stateObj), x(_x), y(_y), offset(_o)
+  LeqConstraint(VarRef1 _x, VarRef2 _y, Offset _o) :
+    x(_x), y(_y), offset(_o)
   { }
   
   virtual triggerCollection setup_internal()
@@ -120,22 +120,22 @@ struct LeqConstraint : public AbstractConstraint
 
 template<typename VarRef1, typename VarRef2, typename Offset>
 AbstractConstraint*
-LeqCon(StateObj* stateObj, VarRef1 v1, VarRef2 v2, Offset o)
-{ return new LeqConstraint<VarRef1,VarRef2,Offset>(stateObj,v1,v2,o); }
+LeqCon(VarRef1 v1, VarRef2 v2, Offset o)
+{ return new LeqConstraint<VarRef1,VarRef2,Offset>(v1,v2,o); }
 
 template<typename VarRef1, typename VarRef2>
 AbstractConstraint*
-LeqCon(StateObj* stateObj,VarRef1 v1, VarRef2 v2)
-{ return new LeqConstraint<VarRef1,VarRef2,compiletime_val<SysInt, 0> >(stateObj,v1,v2,compiletime_val<SysInt, 0>()); }
+LeqCon(VarRef1 v1, VarRef2 v2)
+{ return new LeqConstraint<VarRef1,VarRef2,compiletime_val<SysInt, 0> >(v1,v2,compiletime_val<SysInt, 0>()); }
 
 template<typename VarRef>
 AbstractConstraint*
-ImpliesCon(StateObj* stateObj, VarRef v1, VarRef v2)
-{ return new LeqConstraint<VarRef,VarRef,compiletime_val<SysInt, 0> >(stateObj,v1,v2,compiletime_val<SysInt, 0>()); }
+ImpliesCon(VarRef v1, VarRef v2)
+{ return new LeqConstraint<VarRef,VarRef,compiletime_val<SysInt, 0> >(v1,v2,compiletime_val<SysInt, 0>()); }
 
 // This is mainly inline to avoid multiple definitions.
 template<typename VarRef1, typename VarRef2, typename Offset>
 inline AbstractConstraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint()
-{ return LeqCon(stateObj,y,x, const_negminusone(offset)); }
+{ return LeqCon(y,x, const_negminusone(offset)); }
 
 #endif

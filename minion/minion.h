@@ -70,7 +70,7 @@ typedef TrailedMonotonicSet MonotonicSet;
 #ifndef DOMINION
 #include "inputfile_parse/CSPSpec.hpp"
 #else
-inline void inputPrint(std::ostream&, StateObj*, const Var&) {}
+inline void inputPrint(std::ostream&, const Var&) {}
 #endif
 
 #endif

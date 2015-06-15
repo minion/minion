@@ -9,7 +9,7 @@
 
 template<typename T1, typename T2>
 AbstractConstraint*
-BuildCT_DISEQ(StateObj* stateObj, const T1& t1, const T2& t2, ConstraintBlob& b)
-{ return NeqConBinary(stateObj, t1[0], t2[0]); }
+BuildCT_DISEQ(const T1& t1, const T2& t2, ConstraintBlob& b)
+{ return NeqConBinary(t1[0], t2[0]); }
 
 BUILD_CT(CT_DISEQ, 2)

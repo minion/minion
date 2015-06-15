@@ -29,7 +29,7 @@ struct ConstantConstraint : public AbstractConstraint
   
   CONSTRAINT_ARG_LIST0();
 
-  ConstantConstraint(StateObj* _stateObj) : AbstractConstraint(_stateObj)
+  ConstantConstraint()
   { }
   
   virtual triggerCollection setup_internal()
@@ -44,7 +44,7 @@ struct ConstantConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     if(!truth)
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
   }
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
@@ -58,7 +58,7 @@ struct ConstantConstraint : public AbstractConstraint
   
   AbstractConstraint* reverse_constraint()
   {
-    return new ConstantConstraint<!truth>(stateObj);
+    return new ConstantConstraint<!truth>();
   }
   
   virtual vector<AnyVarRef> get_vars()

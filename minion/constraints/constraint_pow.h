@@ -59,8 +59,8 @@ struct PowConstraint : public AbstractConstraint
 
   CONSTRAINT_ARG_LIST3(var1, var2, var3);
   
-  PowConstraint(StateObj* _stateObj, VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
-    AbstractConstraint(_stateObj), var1(_var1), var2(_var2), var3(_var3)
+  PowConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3) :
+    var1(_var1), var2(_var2), var3(_var3)
   {
       CHECK( (var1.getInitialMin() >=0 && var2.getInitialMin() >= 0 && var3.getInitialMin() >= 0), "The 'pow' constraint only supports non-negative numbers at present.");
       CHECK( var2.getInitialMin()!=0, "The 'pow' constraint (x^y = z) does not allow y to contain 0, to avoid the case 0^0.");
@@ -224,7 +224,7 @@ struct PowConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
 };
 #endif

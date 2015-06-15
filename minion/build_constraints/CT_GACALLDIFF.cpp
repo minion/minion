@@ -9,7 +9,7 @@
 
 template<typename VarArray>
 AbstractConstraint*
-BuildCT_GACALLDIFF(StateObj* stateObj, const VarArray& var_array, ConstraintBlob&)
-{ return new GacAlldiffConstraint<VarArray>(stateObj, var_array); }
+BuildCT_GACALLDIFF(const VarArray& var_array, ConstraintBlob&)
+{ return new GacAlldiffConstraint<VarArray>(var_array); }
 
 BUILD_CT(CT_GACALLDIFF, 1)

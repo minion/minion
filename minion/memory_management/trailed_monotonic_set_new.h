@@ -97,7 +97,7 @@ public:
         return i;
     }
 
-    void lock(StateObj * stateObj) { }
+    void lock() { }
 
 };
 

@@ -46,7 +46,7 @@ struct AbsConstraint : public AbstractConstraint
   
   AbsVarRef1 var1;
   AbsVarRef2 var2;
-  AbsConstraint(StateObj* _stateObj, AbsVarRef1 _var1, AbsVarRef2 _var2) : AbstractConstraint(_stateObj),
+  AbsConstraint(AbsVarRef1 _var1, AbsVarRef2 _var2) : 
     var1(_var1), var2(_var2)
   {}
   
@@ -63,7 +63,7 @@ struct AbsConstraint : public AbstractConstraint
   virtual void full_propagate()
   {
     var1.setMin(0);
-    for(SysInt i = 0; i < 4 && !getState(stateObj).isFailed(); ++i)
+    for(SysInt i = 0; i < 4 && !getState().isFailed(); ++i)
       propagate(i, DomainDelta::empty());
   }
   
@@ -180,12 +180,12 @@ struct AbsConstraint : public AbstractConstraint
      // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint()
   {
-      return forward_check_negation(stateObj, this);
+      return forward_check_negation(this);
   }
 };
 
 template<typename EqualVarRef1, typename EqualVarRef2>
 AbstractConstraint*
-AbsCon(StateObj* stateObj, EqualVarRef1 var1, EqualVarRef2 var2)
-{ return new AbsConstraint<EqualVarRef1, EqualVarRef2>(stateObj, var1,var2); }
+AbsCon(EqualVarRef1 var1, EqualVarRef2 var2)
+{ return new AbsConstraint<EqualVarRef1, EqualVarRef2>(var1,var2); }
 #endif

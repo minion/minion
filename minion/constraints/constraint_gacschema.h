@@ -74,7 +74,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     }
 
     virtual AbstractConstraint* reverse_constraint()
-    { return forward_check_negation(stateObj, this); }
+    { return forward_check_negation(this); }
 
 
     struct Support {
@@ -128,11 +128,11 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     ////////////////////////////////////////////////////////////////////////////
     // Ctor
 
-    GACSchema(StateObj* _stateObj, const VarArray& _var_array, TupleList* _data) : AbstractConstraint(_stateObj),
+    GACSchema(const VarArray& _var_array, TupleList* _data) : 
     vars(_var_array), supportFreeList(0), data(_data)
     {
         // Register this with the backtracker.
-        getState(stateObj).getGenericBacktracker().add(this);
+        getState().getGenericBacktracker().add(this);
 
         if(vars.size()>0) {
             dom_max=vars[0].getInitialMax();
@@ -157,7 +157,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
         tuple_lists.resize(vars.size());
         for(SysInt var=0; var<(SysInt)vars.size(); var++) {
             const SysInt domsize = checked_cast<SysInt>(vars[var].getInitialMax()-vars[var].getInitialMin()+1);
-            tuple_list_pos[var]=getMemory(_stateObj).backTrack().template requestArray<UnsignedSysInt>(domsize);
+            tuple_list_pos[var]=getMemory().backTrack().template requestArray<UnsignedSysInt>(domsize);
             for(SysInt validx=0; validx<domsize; validx++) {
                 tuple_list_pos[var][validx]=0;
             }
@@ -620,7 +620,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
         //D_ASSERT(backtrack_stack.size()==0);
         if(data->size() == 0)
         {
-            getState(stateObj).setFailed(true);
+            getState().setFailed(true);
             return;
         }
 
@@ -650,7 +650,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
 
                 // This is because when the domain of a constant variable is emptied,
                 // we still have 'inDomain' return true.
-                if(getState(stateObj).isFailed())
+                if(getState().isFailed())
                     return;
 
                 if(vars[var].inDomain(val)) {

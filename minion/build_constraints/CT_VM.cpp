@@ -9,7 +9,7 @@
 
 template <typename T>
 AbstractConstraint*
-BuildCT_VM(StateObj* stateObj,const T& t1, ConstraintBlob& b)
-{ return VMCon(stateObj, t1, b.tuples, b.tuples2); }
+BuildCT_VM(const T& t1, ConstraintBlob& b)
+{ return VMCon(t1, b.tuples, b.tuples2); }
 
 BUILD_CT(CT_VM, 1)

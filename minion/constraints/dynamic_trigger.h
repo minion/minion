@@ -67,13 +67,13 @@ public:
     D_DATA(sanity_check = 1234);
     prev = next = this;
   }
-  friend void releaseTrigger(StateObj* stateObj, DynamicTrigger* trig , TrigOp op);
-  friend void releaseTrigger(StateObj* stateObj, DynamicTrigger* trig)
-	  { releaseTrigger(stateObj, trig, TO_Default); }
+  friend void releaseTrigger(DynamicTrigger* trig , TrigOp op);
+  friend void releaseTrigger(DynamicTrigger* trig)
+	  { releaseTrigger(trig, TO_Default); }
   
-  friend void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* trig , TrigOp op);
-  friend void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* trig)
-	  { attachTriggerToNullList(stateObj, trig, TO_Default); }
+  friend void attachTriggerToNullList(DynamicTrigger* trig , TrigOp op);
+  friend void attachTriggerToNullList(DynamicTrigger* trig)
+	  { attachTriggerToNullList(trig, TO_Default); }
   
 private:
   /// Remove from whatever list this trigger is currently stored in.

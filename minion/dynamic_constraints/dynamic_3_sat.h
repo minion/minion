@@ -30,7 +30,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
     virtual AbstractConstraint* reverse_constraint()
   {
     return new BoolLessSumConstraintDynamic<VarArray, DomainInt, 1>
-               (stateObj, var_array, 3);
+               (var_array, 3);
   }
 
   CONSTRAINT_ARG_LIST2(var_array, (DomainInt)1);
@@ -39,8 +39,8 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
   
   VarArray var_array;
 
-  BoolThreeSATConstraintDynamic(StateObj* _stateObj, const VarArray& _var_array) :
-    AbstractConstraint(_stateObj), var_array(_var_array)
+  BoolThreeSATConstraintDynamic(const VarArray& _var_array) :
+    var_array(_var_array)
   { 
     D_ASSERT(var_array.size() == 3);
   }
@@ -66,7 +66,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
 
     if(index == array_size)
     { // Not enough triggers
-      getState(stateObj).setFailed(true);
+      getState().setFailed(true);
       return;
     }
     
@@ -167,7 +167,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
 
 template<typename VarArray>
 AbstractConstraint*
-BoolThreeSATConDynamic(StateObj* stateObj, const VarArray& _var_array)
-{ return new BoolThreeSATConstraintDynamic<VarArray>(stateObj, _var_array); }
+BoolThreeSATConDynamic(const VarArray& _var_array)
+{ return new BoolThreeSATConstraintDynamic<VarArray>(_var_array); }
 
 #endif

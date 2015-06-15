@@ -23,7 +23,7 @@
 namespace ConOutput
 {
   template<typename T>
-  string print_vars(StateObj* stateObj, const T& t)
+  string print_vars(const T& t)
   {
     if(t.isAssigned())
       return tostring(t.getAssignedValue());
@@ -41,37 +41,37 @@ namespace ConOutput
         D_ASSERT(m.empty());
       }
 
-        return prefix + getState(stateObj).getInstance()->vars.getName(t.getBaseVar());
+        return prefix + getState().getInstance()->vars.getName(t.getBaseVar());
     }
   }
 
   inline
-  string print_vars(StateObj* stateObj,TupleList* const& t)
+  string print_vars(TupleList* const& t)
   { return t->getName(); }
 
     inline
-  string print_vars(StateObj* stateObj,ShortTupleList* const& t)
+  string print_vars(ShortTupleList* const& t)
   { return t->getName(); }
 
   inline
-  string print_vars(StateObj* stateObj,AbstractConstraint* const& c);
+  string print_vars(AbstractConstraint* const& c);
 
   inline
-  string print_vars(StateObj* stateObj, const DomainInt& i)
+  string print_vars(const DomainInt& i)
   { return tostring(i); }
 
 #ifdef MINION_DEBUG
   inline
-  string print_vars(StateObj* stateObj, const SysInt& i)
+  string print_vars(const SysInt& i)
   { return tostring(i); }
 #endif
 
   template<typename T, T i>
-  string print_vars(StateObj* stateObj, const compiletime_val<T,i>)
+  string print_vars(const compiletime_val<T,i>)
   { return tostring(i); }
 
   inline
-  string print_vars(StateObj* stateObj, const std::vector<AbstractConstraint*>& t)
+  string print_vars(const std::vector<AbstractConstraint*>& t)
   {
     ostringstream o;
     o << "{";
@@ -82,7 +82,7 @@ namespace ConOutput
         o << ",";
       else
         first = false;
-      o << ConOutput::print_vars(stateObj, t[i]);
+      o << ConOutput::print_vars(t[i]);
     }
     o << "}";
     return o.str();
@@ -90,7 +90,7 @@ namespace ConOutput
 
 
   template<typename T>
-  string print_vars(StateObj* stateObj, const std::vector<T>& t)
+  string print_vars(const std::vector<T>& t)
   {
     ostringstream o;
     o << "[";
@@ -101,14 +101,14 @@ namespace ConOutput
         o << ",";
       else
         first = false;
-      o << ConOutput::print_vars(stateObj, t[i]);
+      o << ConOutput::print_vars(t[i]);
     }
     o << "]";
     return o.str();
   }
 
   template<typename T>
-  string print_vars(StateObj* stateObj, const std::vector<std::pair<T,T> >& t)
+  string print_vars(const std::vector<std::pair<T,T> >& t)
   {
     ostringstream o;
     o << "[";
@@ -119,16 +119,16 @@ namespace ConOutput
         o << ",";
       else
         first = false;
-      o << ConOutput::print_vars(stateObj, t[i].first);
+      o << ConOutput::print_vars(t[i].first);
       o << ",";
-      o << ConOutput::print_vars(stateObj, t[i].second);
+      o << ConOutput::print_vars(t[i].second);
     }
     o << "]";
     return o.str();
   }
 
   template<typename T, size_t len>
-  string print_vars(StateObj* stateObj, const std::array<T,len>& t)
+  string print_vars(const std::array<T,len>& t)
   {
     ostringstream o;
     o << "[";
@@ -139,7 +139,7 @@ namespace ConOutput
         o << ",";
       else
         first = false;
-      o << ConOutput::print_vars(stateObj, t[i]);
+      o << ConOutput::print_vars(t[i]);
     }
     o << "]";
     return o.str();
@@ -164,7 +164,7 @@ namespace ConOutput
 
 
   inline
-  void compress_arrays(StateObj* stateObj, string name, vector<AnyVarRef>& vars, AnyVarRef& result)
+  void compress_arrays(string name, vector<AnyVarRef>& vars, AnyVarRef& result)
   {
     if(name.find("sum") != string::npos)
     {
@@ -176,9 +176,9 @@ namespace ConOutput
       if(sum != 0)
       {
         if(result.isAssigned())
-          result = ConstantVar(stateObj, result.getAssignedValue() - sum);
+          result = ConstantVar(result.getAssignedValue() - sum);
         else
-          vars.push_back(ConstantVar(stateObj, sum));
+          vars.push_back(ConstantVar(sum));
       }
     }
 
@@ -192,7 +192,7 @@ namespace ConOutput
         {
           val = std::min(val, res[i]);
         }
-        vars.push_back(ConstantVar(stateObj, val));
+        vars.push_back(ConstantVar(val));
       }
     }
 
@@ -206,63 +206,63 @@ namespace ConOutput
         {
           val = std::max(val, res[i]);
         }
-        vars.push_back(ConstantVar(stateObj, val));
+        vars.push_back(ConstantVar(val));
       }
     }
   }
 
   inline
-  string print_con(StateObj* stateObj, string name)
+  string print_con(string name)
   { return name + "()"; }
 
 
   template<typename T>
-  string print_con(StateObj* stateObj, string name, const T& args)
+  string print_con(string name, const T& args)
   {
-    string s = print_vars(stateObj, args);
+    string s = print_vars(args);
     return name + "(" + s + ")";
   }
 
   template<typename T1, typename T2>
-  string print_con(StateObj* stateObj, string name, const T1& args1, const T2& args2)
+  string print_con(string name, const T1& args1, const T2& args2)
   {
 
-    string s1 = print_vars(stateObj, args1);
-    string s2 = print_vars(stateObj, args2);
+    string s1 = print_vars(args1);
+    string s2 = print_vars(args2);
     return name + "(" + s1 + "," + s2 + ")";
   }
 
   inline
-  string print_array_var_con(StateObj* stateObj, string name, vector<AnyVarRef> args1, AnyVarRef args2)
+  string print_array_var_con(string name, vector<AnyVarRef> args1, AnyVarRef args2)
   {
-    compress_arrays(stateObj, name, args1, args2);
-    string s1 = print_vars(stateObj, args1);
-    string s2 = print_vars(stateObj, args2);
+    compress_arrays(name, args1, args2);
+    string s1 = print_vars(args1);
+    string s2 = print_vars(args2);
     return name + "(" + s1 + "," + s2 + ")";
   }
 
   template<typename T1, typename T2, typename T3>
-  string print_con(StateObj* stateObj, string name, const T1& args1, const T2& args2, const T3& args3)
+  string print_con(string name, const T1& args1, const T2& args2, const T3& args3)
   {
-    string s1 = print_vars(stateObj, args1);
-    string s2 = print_vars(stateObj, args2);
-    string s3 = print_vars(stateObj, args3);
+    string s1 = print_vars(args1);
+    string s2 = print_vars(args2);
+    string s3 = print_vars(args3);
     return name + "(" + s1 + "," + s2 + "," + s3 + ")";
   }
 
   inline
-  string print_weight_array_var_con(StateObj* stateObj, string name, vector<DomainInt> args1,
+  string print_weight_array_var_con(string name, vector<DomainInt> args1,
                                     vector<AnyVarRef> args2, const AnyVarRef& args3)
   {
-    string s1 = print_vars(stateObj, args1);
-    string s2 = print_vars(stateObj, args2);
-    string s3 = print_vars(stateObj, args3);
+    string s1 = print_vars(args1);
+    string s2 = print_vars(args2);
+    string s3 = print_vars(args3);
     return name + "(" + s1 + "," + s2 + "," + s3 + ")";
   }
 
 
   template<typename T1, typename T2>
-  string print_reversible_con(StateObj* stateObj, string name, string neg_name, const T1& vars, const T2& res)
+  string print_reversible_con(string name, string neg_name, const T1& vars, const T2& res)
   {
     vector<Mapper> m = res.getMapperStack();
     if(!m.empty() && m.back() == Mapper(MAP_NEG))
@@ -275,19 +275,19 @@ namespace ConOutput
           FATAL_REPORTABLE_ERROR();
         pops.push_back(vars[i].popOneMapper());
       }
-      return print_array_var_con(stateObj, neg_name, pops, AnyVarRef(res.popOneMapper()));
+      return print_array_var_con(neg_name, pops, AnyVarRef(res.popOneMapper()));
     }
     else
     {
-      return print_array_var_con(stateObj, name, make_AnyVarRef(vars), AnyVarRef(res));
+      return print_array_var_con(name, make_AnyVarRef(vars), AnyVarRef(res));
     }
   }
 
 template<typename T1, typename T2>
-  string print_weighted_con(StateObj* stateObj, string weight, string name, const T1& sumvars, const T2& result)
+  string print_weighted_con(string weight, string name, const T1& sumvars, const T2& result)
   {
     if(sumvars.empty())
-      return print_con(stateObj, name, sumvars, result);
+      return print_con(name, sumvars, result);
 
     vector<Mapper> v = sumvars[0].getMapperStack();
     if(!v.empty() && (v.back().type() == MAP_MULT || v.back().type() == MAP_SWITCH_NEG))
@@ -302,16 +302,16 @@ template<typename T1, typename T2>
         pops.push_back(sumvars[i].popOneMapper());
         weights.push_back(mapi.back().val());
       }
-      return print_weight_array_var_con(stateObj, weight + name,  weights, pops,  AnyVarRef(result));
+      return print_weight_array_var_con(weight + name,  weights, pops,  AnyVarRef(result));
     }
     else
     {
-      return print_array_var_con(stateObj, name, make_AnyVarRef(sumvars), AnyVarRef(result));
+      return print_array_var_con(name, make_AnyVarRef(sumvars), AnyVarRef(result));
     }
   }
 
 template<typename T1, typename T2>
-  string print_weighted_reversible_con(StateObj* stateObj, string weight, string name, string neg_name, const T1& vars, const T2& res)
+  string print_weighted_reversible_con(string weight, string name, string neg_name, const T1& vars, const T2& res)
   {
     vector<Mapper> m = res.getMapperStack();
     if(!m.empty() && m.back() == Mapper(MAP_NEG))
@@ -324,11 +324,11 @@ template<typename T1, typename T2>
           FATAL_REPORTABLE_ERROR();
         pops.push_back(vars[i].popOneMapper());
       }
-      return print_weighted_con(stateObj, weight, neg_name, pops, res.popOneMapper());
+      return print_weighted_con(weight, neg_name, pops, res.popOneMapper());
     }
     else
     {
-      return print_weighted_con(stateObj, weight, name, vars, res);
+      return print_weighted_con(weight, name, vars, res);
     }
   }
 
@@ -336,24 +336,24 @@ template<typename T1, typename T2>
 
 #define CONSTRAINT_ARG_LIST0() \
 virtual string full_output_name() \
-{ return ConOutput::print_con(stateObj, constraint_name()); }
+{ return ConOutput::print_con(constraint_name()); }
 
 #define CONSTRAINT_ARG_LIST1(x) \
 virtual string full_output_name() \
-{ return ConOutput::print_con(stateObj, constraint_name(), x); }
+{ return ConOutput::print_con(constraint_name(), x); }
 
 #define CONSTRAINT_ARG_LIST2(x, y) \
 virtual string full_output_name() \
-{ return ConOutput::print_con(stateObj, constraint_name(), x, y); }
+{ return ConOutput::print_con(constraint_name(), x, y); }
 
 #define CONSTRAINT_REVERSIBLE_ARG_LIST2(name, revname, x, y) \
 virtual string full_output_name() \
-{ return ConOutput::print_reversible_con(stateObj, name, revname, x, y); }
+{ return ConOutput::print_reversible_con(name, revname, x, y); }
 
 #define CONSTRAINT_WEIGHTED_REVERSIBLE_ARG_LIST2(weight, name, revname, x, y) \
 virtual string full_output_name() \
-{ return ConOutput::print_weighted_reversible_con(stateObj, weight, name, revname, x, y); }
+{ return ConOutput::print_weighted_reversible_con(weight, name, revname, x, y); }
 
 #define CONSTRAINT_ARG_LIST3(x, y, z) \
 virtual string full_output_name() \
-{ return ConOutput::print_con(stateObj, constraint_name(), x, y, z); }
+{ return ConOutput::print_con(constraint_name(), x, y, z); }

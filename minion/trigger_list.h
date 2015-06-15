@@ -34,7 +34,7 @@ class TriggerMem
 {
   vector<TriggerList*> trigger_lists;
   char* triggerlist_data;
-  StateObj* stateObj;
+  
 
 public:
   void addTriggerList(TriggerList* t)
@@ -42,7 +42,7 @@ public:
 
   void finaliseTriggerLists();
 
-  TriggerMem(StateObj* _stateObj) : triggerlist_data(NULL), stateObj(_stateObj)
+  TriggerMem() : triggerlist_data(NULL)
   {}
 
   void allocateTriggerListData(UnsignedSysInt mem)
@@ -58,7 +58,7 @@ public:
 
 class TriggerList
 {
-  StateObj* stateObj;
+  
 
   TriggerList(const TriggerList&);
   TriggerList();
@@ -66,7 +66,7 @@ class TriggerList
   bool only_bounds;
 
 public:
-  TriggerList(StateObj* _stateObj, bool _only_bounds) : stateObj(_stateObj),
+  TriggerList(bool _only_bounds) : 
   only_bounds(_only_bounds)
   {
     var_count_m = 0;
@@ -111,7 +111,7 @@ public:
       dynamic_triggers = checked_malloc(size * sizeof(DynamicTrigger) * 4);
     else
       dynamic_triggers = checked_malloc(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
-    getTriggerMem(stateObj).addTriggerList(this);
+    getTriggerMem().addTriggerList(this);
   }
 
   size_t memRequirement()
@@ -206,50 +206,50 @@ public:
     D_ASSERT(trig->next != NULL);
     // This is an optimisation, no need to push empty lists.
     if(trig->next != trig)
-      getQueue(stateObj).pushDynamicTriggers(trig);
+      getQueue().pushDynamicTriggers(trig);
   }
 
   void push_upper(DomainInt var_num, DomainInt upper_delta)
   {
-    if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, UpperBound);
+    if (getState().isDynamicTriggersUsed()) dynamic_propagate(var_num, UpperBound);
     D_ASSERT(lock_second);
-    D_ASSERT(upper_delta > 0 || getState(stateObj).isFailed());
+    D_ASSERT(upper_delta > 0 || getState().isFailed());
 
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
     if(range.first != range.second)
-      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second,
+      getQueue().pushTriggers(TriggerRange(range.first, range.second,
                                                    checked_cast<SysInt>(upper_delta)));
   }
 
   void push_lower(DomainInt var_num, DomainInt lower_delta)
   {
-    if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, LowerBound);
+    if (getState().isDynamicTriggersUsed()) dynamic_propagate(var_num, LowerBound);
     D_ASSERT(lock_second);
-    D_ASSERT(lower_delta > 0 || getState(stateObj).isFailed());
+    D_ASSERT(lower_delta > 0 || getState().isFailed());
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
     if(range.first != range.second)
-      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second,
+      getQueue().pushTriggers(TriggerRange(range.first, range.second,
                                                    checked_cast<SysInt>(lower_delta)));
   }
 
 
   void push_assign(DomainInt var_num, DomainInt)
   {
-    if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, Assigned);
+    if (getState().isDynamicTriggersUsed()) dynamic_propagate(var_num, Assigned);
     D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
     if(range.first != range.second)
-      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1));
+      getQueue().pushTriggers(TriggerRange(range.first, range.second, -1));
   }
 
   void push_domain_changed(DomainInt var_num)
   {
-    if (getState(stateObj).isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);
+    if (getState().isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);
 
     D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
     if (range.first != range.second)
-      getQueue(stateObj).pushTriggers(TriggerRange(range.first, range.second, -1));
+      getQueue().pushTriggers(TriggerRange(range.first, range.second, -1));
   }
 
   void push_domain_removal(DomainInt var_num, DomainInt val_removed)
@@ -310,7 +310,7 @@ public:
         break;
         case TO_Backtrack:
             D_ASSERT(t->getQueue() != (DynamicTrigger*)BAD_POINTER);
-            getQueue(stateObj).getTbq().addTrigger(t);
+            getQueue().getTbq().addTrigger(t);
             // Add to queue.
             t->setQueue(queue);
         break;
@@ -329,9 +329,9 @@ void inline TriggerMem::finaliseTriggerLists()
     size_t trigger_size = 0;
     for(UnsignedSysInt i = 0;i < trigger_lists.size(); i++)
       trigger_size += trigger_lists[i]->memRequirement();
-    getTriggerMem(stateObj).allocateTriggerListData(trigger_size);
+    getTriggerMem().allocateTriggerListData(trigger_size);
 
-    char* triggerlist_offset = getTriggerMem(stateObj).getTriggerListDataPtr();
+    char* triggerlist_offset = getTriggerMem().getTriggerListDataPtr();
 
     for(UnsignedSysInt i=0;i<trigger_lists.size();i++)
     {
@@ -339,10 +339,10 @@ void inline TriggerMem::finaliseTriggerLists()
       trigger_lists[i]->allocateMem(triggerlist_offset);
       triggerlist_offset += offset;
     }
-    D_ASSERT(triggerlist_offset - getTriggerMem(stateObj).getTriggerListDataPtr() == (SysInt)trigger_size);
+    D_ASSERT(triggerlist_offset - getTriggerMem().getTriggerListDataPtr() == (SysInt)trigger_size);
   }
 
-inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t , TrigOp op)
+inline void releaseTrigger(DynamicTrigger* t , TrigOp op)
 {
     switch(op)
     {
@@ -354,7 +354,7 @@ inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t , TrigOp op)
         break;
         case TO_Backtrack:
             D_ASSERT(t->getQueue() != (DynamicTrigger*)BAD_POINTER);
-            getQueue(stateObj).getTbq().addTrigger(t);
+            getQueue().getTbq().addTrigger(t);
             // Add to queue.
             t->setQueue((DynamicTrigger*)(NULL));
         break;
@@ -365,7 +365,7 @@ inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t , TrigOp op)
     t->remove();
 }
 
- inline void attachTriggerToNullList(StateObj* stateObj, DynamicTrigger* t , TrigOp op)
+ inline void attachTriggerToNullList(DynamicTrigger* t , TrigOp op)
  {    static DynamicTrigger dt;
     DynamicTrigger* queue = &dt;
 
@@ -379,7 +379,7 @@ inline void releaseTrigger(StateObj* stateObj, DynamicTrigger* t , TrigOp op)
         break;
         case TO_Backtrack:
             D_ASSERT(t->getQueue() != (DynamicTrigger*)BAD_POINTER);
-            getQueue(stateObj).getTbq().addTrigger(t);
+            getQueue().getTbq().addTrigger(t);
             // Add to queue.
             t->setQueue(queue);
         break;
