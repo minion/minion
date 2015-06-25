@@ -67,4 +67,30 @@ struct ConstantConstraint : public AbstractConstraint
     return v;
   }
 };
+
+inline AbstractConstraint*
+BuildCT_TRUE(ConstraintBlob&)
+{ return (new ConstantConstraint<true>()); }
+
+inline AbstractConstraint*
+BuildCT_FALSE(ConstraintBlob&)
+{ return (new ConstantConstraint<false>()); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "false",
+  "internal_name": "CT_FALSE",
+  "args": [ ]
+}
+*/
+
+/* JSON
+{ "type": "constraint",
+  "name": "true",
+  "internal_name": "CT_TRUE",
+  "args": [ ]
+}
+*/
+
+
 #endif

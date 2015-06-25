@@ -574,10 +574,11 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 
   switch(constraint->type)
   {
+      /* XXX
     case CT_WATCHED_OR:
     return readConstraintOr(infile, get_constraint(CT_WATCHED_OR));
     break;
-
+*/
     default:
     if(constraint->number_of_params == 2 &&
          (constraint->read_types[1] == read_tuples || constraint->read_types[1] == read_short_tuples) )

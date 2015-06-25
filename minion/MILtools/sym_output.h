@@ -22,6 +22,7 @@
 #include <set>
 
 #include <limits.h> /* INT_MIN, INT_MAX */
+/* XXX
 
 std::vector<std::vector<DomainInt> >
 build_graph(std::vector<std::set<SysInt> > graph, const std::vector<std::set<SysInt> >& partition);
@@ -1252,3 +1253,4 @@ struct InstanceStats
 
 
 };
+*/

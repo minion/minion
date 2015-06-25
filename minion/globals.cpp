@@ -30,6 +30,6 @@
 #include "minion.h"
 
 
-#include "build_constraints/constraint_defs.h"
+#include "constraint_defs.h"
 
 SysInt num_of_constraints = sizeof(constraint_list) / sizeof(ConstraintDef);

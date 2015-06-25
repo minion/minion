@@ -259,4 +259,17 @@ struct MinConstraint : public AbstractConstraint
     return vars;
   }
 };
+
+template<typename VarArray, typename VarRef>
+AbstractConstraint*
+BuildCT_MIN(const VarArray& _var_array,const std::vector<VarRef>& _var_ref, ConstraintBlob&)
+{ return (new MinConstraint<VarArray,VarRef>(_var_array, _var_ref[0])); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "min",
+  "internal_name": "CT_MIN",
+  "args": [ "read_list", "read_var" ]
+}
+*/
 #endif

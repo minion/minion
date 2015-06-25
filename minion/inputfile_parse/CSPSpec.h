@@ -37,7 +37,7 @@ using namespace std;
 
 /// The currently accepted types of Constraints.
 
-#include "../build_constraints/ConstraintEnum.h"
+#include "ConstraintEnum.h"
 
 inline string to_var_name(const vector<DomainInt>& params)
 {
@@ -639,6 +639,7 @@ public:
     const ConstraintBlob& con = constraints.back();
     switch(con.constraint->type)
     {
+        /* XXX
       case CT_PRODUCT2:
         return DOMAIN_CHECK(checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound)*
                      checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound))
@@ -658,7 +659,7 @@ public:
         }
         return true;
       }
-
+*/
 
       default:
         return true;

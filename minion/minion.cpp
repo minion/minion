@@ -193,7 +193,7 @@ try {
   {
     munge_container(instance.sym_order, getOptions().Xsymmunge);
   }
-
+/* XXX
   if(getOptions().graph)
   {
     GraphBuilder graph(instance);
@@ -224,7 +224,7 @@ try {
       s.output_stats_tightness(cons);
       exit(0);
   }
-
+*/
   if(getOptions().redump)
   {
     MinionInstancePrinter printer(instance);
