@@ -180,4 +180,18 @@ struct NeqConstraint : public AbstractConstraint
 
 
   };
+  
+  template<typename VarArray>
+  AbstractConstraint*
+  BuildCT_ALLDIFF(const VarArray& var_array, ConstraintBlob&)
+  { return new NeqConstraint<VarArray>(var_array); }
+  
+  /* JSON
+  { "type": "constraint",
+    "name": "alldiff",
+    "internal_name": "CT_ALLDIFF",
+    "args": [ "read_list" ]
+  }
+  */
+  
 #endif

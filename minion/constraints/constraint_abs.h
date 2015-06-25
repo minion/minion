@@ -189,3 +189,16 @@ AbstractConstraint*
 AbsCon(EqualVarRef1 var1, EqualVarRef2 var2)
 { return new AbsConstraint<EqualVarRef1, EqualVarRef2>(var1,var2); }
 #endif
+
+template<typename T1, typename T2>
+AbstractConstraint*
+BuildCT_ABS(const T1& t1, const T2& t2, ConstraintBlob&) 
+{ return AbsCon(t1[0],t2[0]); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "abs",
+  "internal_name": "CT_ABS",
+  "args": [ "read_var", "read_var" ]
+}
+*/

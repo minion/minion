@@ -101,4 +101,19 @@ AbstractConstraint*
 checkGSACon(AbstractConstraint* c)
 { return new Check_GSA(c); }
 
+inline AbstractConstraint*
+BuildCT_CHECK_GSA(ConstraintBlob& bl)
+{
+  D_ASSERT(bl.internal_constraints.size() == 1);
+  return checkGSACon(build_constraint(bl.internal_constraints[0]));
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "check[gsa]",
+  "internal_name": "CT_CHECK_GSA",
+  "args": [ "read_constraint" ]
+}
+*/
+
 #endif

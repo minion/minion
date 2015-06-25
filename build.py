@@ -196,7 +196,7 @@ if verbose >= 1:
 constraintsrclist = []
 
 for c in constraints:
-    varcount = sum([ m in ["read_list", "read_var"] for m in c["args"]])
+    varcount = sum([ m in ["read_list", "read_var", "read_2_vars"] for m in c["args"]])
     srcname = outsrcdir+"build_"+c["internal_name"]+".cpp"
     constraintsrclist.append(srcname)
     with open(srcname, "w") as conout:

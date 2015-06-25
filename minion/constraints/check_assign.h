@@ -101,4 +101,18 @@ inline AbstractConstraint*
 checkAssignCon(AbstractConstraint* c)
 { return new Check_Assign(c); }
 
+inline AbstractConstraint*
+BuildCT_CHECK_ASSIGN(ConstraintBlob& bl)
+{
+  D_ASSERT(bl.internal_constraints.size() == 1);
+  return checkAssignCon(build_constraint(bl.internal_constraints[0]));
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "check[assign]",
+  "internal_name": "CT_CHECK_ASSIGN",
+  "args": [ "read_constraint" ]
+}
+*/
 #endif

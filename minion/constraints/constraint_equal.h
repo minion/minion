@@ -741,4 +741,30 @@ NeqConBinary(const Var1& var1, const Var2& var2)
   return new NeqConstraintBinary<Var1, Var2>(var1, var2); 
 }
 
+template<typename T1, typename T2>
+AbstractConstraint*
+BuildCT_DISEQ(const T1& t1, const T2& t2, ConstraintBlob& b)
+{ return NeqConBinary(t1[0], t2[0]); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "diseq",
+  "internal_name": "CT_DISEQ",
+  "args": [ "read_var", "read_var" ]
+}
+*/
+
+template<typename T1, typename T2>
+AbstractConstraint*
+BuildCT_EQ(const T1& t1, const T2& t2, ConstraintBlob&) 
+{ return EqualCon(t1[0],t2[0]); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "eq",
+  "internal_name": "CT_EQ",
+  "args": [ "read_var", "read_var" ]
+}
+*/
+
 #endif

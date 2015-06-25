@@ -702,10 +702,17 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
       }
       return true;
   }
-
-
-
-
-
-
 };
+
+template<typename VarArray>
+AbstractConstraint*
+BuildCT_ALLDIFFMATRIX(const VarArray& var_array, ConstraintBlob& b)
+{ return new AlldiffMatrixConstraint<VarArray, decltype(b.constants[0][0])>(var_array, b.constants[0][0]); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "alldiffmatrix",
+  "internal_name": "CT_ALLDIFFMATRIX",
+  "args": [ "read_list", "read_constant" ]
+}
+*/

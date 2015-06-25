@@ -284,4 +284,19 @@ inline AbstractConstraint*
 forwardCheckingCon(AbstractConstraint* c)
 { return new Forward_Checking(c); }
 
+inline AbstractConstraint*
+BuildCT_FORWARD_CHECKING(ConstraintBlob& bl)
+{
+  D_ASSERT(bl.internal_constraints.size() == 1);
+  return forwardCheckingCon(build_constraint(bl.internal_constraints[0]));
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "forwardchecking",
+  "internal_name": "CT_FORWARD_CHECKING",
+  "args": [ "read_constraint" ]
+}
+*/
+
 #endif
