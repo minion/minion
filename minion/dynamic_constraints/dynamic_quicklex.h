@@ -249,4 +249,33 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   }
 
 };
+
+template<typename VarArray1, typename VarArray2>
+AbstractConstraint*
+BuildCT_QUICK_LEXLEQ(const VarArray1& x, const VarArray2& y, ConstraintBlob&)
+{ return new QuickLexDynamic<VarArray1, VarArray2, false>(x,y); }
+
+
+template<typename VarArray1, typename VarArray2>
+AbstractConstraint*
+BuildCT_QUICK_LEXLESS(const VarArray1& x, const VarArray2& y, ConstraintBlob&)
+{ return new QuickLexDynamic<VarArray1, VarArray2, true>(x,y); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "lexleq[quick]",
+  "internal_name": "CT_QUICK_LEXLEQ",
+  "args": [ "read_list", "read_list" ]
+}
+*/
+
+/* JSON
+{ "type": "constraint",
+  "name": "lexless[quick]",
+  "internal_name": "CT_QUICK_LEXLESS",
+  "args": [ "read_list", "read_list" ]
+}
+*/
+
+
 #endif

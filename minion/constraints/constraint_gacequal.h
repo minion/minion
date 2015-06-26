@@ -174,4 +174,17 @@ struct GACEqualConstraint : public AbstractConstraint
    }
 };
 
+
+template<typename T1, typename T2>
+AbstractConstraint*
+BuildCT_GACEQ(const T1& t1, const T2& t2, ConstraintBlob&) 
+{ return new GACEqualConstraint<typename T1::value_type, typename T2::value_type>(t1[0],t2[0]); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "gaceq",
+  "internal_name": "CT_GACEQ",
+  "args": [ "read_var", "read_var" ]
+}
+*/
 #endif

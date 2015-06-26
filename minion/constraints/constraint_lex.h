@@ -323,4 +323,31 @@ struct LexLeqConstraint : public AbstractConstraint
     return array_copy;
   }
 };
+
+template<typename VarArray1, typename VarArray2>
+AbstractConstraint*
+BuildCT_LEXLEQ(const VarArray1& x, const VarArray2& y, ConstraintBlob&)
+{ return new LexLeqConstraint<VarArray1, VarArray2>(x,y); }
+
+template<typename VarArray1, typename VarArray2>
+AbstractConstraint*
+BuildCT_LEXLESS(const VarArray1& x, const VarArray2& y, ConstraintBlob&)
+{ return new LexLeqConstraint<VarArray1, VarArray2,true>(x,y); }
+
+
+/* JSON
+{ "type": "constraint",
+  "name": "lexleq",
+  "internal_name": "CT_LEXLEQ",
+  "args": [ "read_list", "read_list" ]
+}
+*/
+
+/* JSON
+{ "type": "constraint",
+  "name": "lexless",
+  "internal_name": "CT_LEXLESS",
+  "args": [ "read_list", "read_list" ]
+}
+*/
 #endif

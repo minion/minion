@@ -831,4 +831,56 @@ ConstantOccEqualCon(const VarArray& _var_array,  const Val& _value, DomainInt _v
   return
   (new ConstantOccurrenceEqualConstraint<VarArray,Val>(_var_array,  _value, _val_count_min, _val_count_max));
 }
+
+template<typename T1>
+AbstractConstraint*
+BuildCT_GEQ_OCCURRENCE(const T1& t1, ConstraintBlob& b)
+{
+  const SysInt val_to_count = checked_cast<SysInt>(b.constants[0][0]);
+  DomainInt occs = b.constants[1][0];
+  { return ConstantOccEqualCon(t1, val_to_count, occs, t1.size()); }
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "occurrencegeq",
+  "internal_name": "CT_GEQ_OCCURRENCE",
+  "args": [ "read_list", "read_constant", "read_constant" ]
+}
+*/
+
+template<typename T1>
+AbstractConstraint*
+BuildCT_LEQ_OCCURRENCE(const T1& t1, ConstraintBlob& b)
+{
+  const SysInt val_to_count = checked_cast<SysInt>(b.constants[0][0]);
+  DomainInt occs = b.constants[1][0];
+  return ConstantOccEqualCon(t1, val_to_count, 0, occs);
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "occurrenceleq",
+  "internal_name": "CT_LEQ_OCCURRENCE",
+  "args": [ "read_list", "read_constant", "read_constant" ]
+}
+*/
+
+template<typename T1, typename T3>
+AbstractConstraint*
+BuildCT_OCCURRENCE(const T1& t1, const T3& t3, ConstraintBlob& b)
+{
+  const SysInt val_to_count = checked_cast<SysInt>(b.constants[0][0]);
+  return OccEqualCon(t1, val_to_count, t3[0]);
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "occurrence",
+  "internal_name": "CT_OCCURRENCE",
+  "args": [ "read_list", "read_constant", "read_var" ]
+}
+*/
+
+
 #endif

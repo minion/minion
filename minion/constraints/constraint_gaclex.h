@@ -466,4 +466,18 @@ template<typename VarArray1, typename VarArray2, BOOL Less = false>
     return array_copy;
   }
 };
+
+template<typename VarArray1, typename VarArray2>
+AbstractConstraint*
+BuildCT_GACLEXLEQ(const VarArray1& x, const VarArray2& y, ConstraintBlob&)
+{ return new GacLexLeqConstraint<VarArray1, VarArray2>(x,y); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "lexleq[rv]",
+  "internal_name": "CT_GACLEXLEQ",
+  "args": [ "read_list", "read_list" ]
+}
+*/
+
 #endif

@@ -564,4 +564,70 @@ struct ElementConstraintDynamic : public AbstractConstraint
   }
 };
 
+template<typename Var1, typename Var2>
+AbstractConstraint*
+BuildCT_WATCHED_ELEMENT(const Var1& vararray, const Var2& v1, const Var1& v2, ConstraintBlob&)
+{ 
+  return new ElementConstraintDynamic<Var1, typename Var2::value_type, typename Var1::value_type>
+              (vararray, v1[0], v2[0]);  
+}
+
+template<typename Var1, typename Var2, typename Var3>
+AbstractConstraint*
+BuildCT_WATCHED_ELEMENT(Var1 vararray, const Var2& v1, const Var3& v2, ConstraintBlob&)
+{ 
+  return new ElementConstraintDynamic<Var1, typename Var2::value_type, AnyVarRef>
+              (vararray, v1[0], AnyVarRef(v2[0]));  
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "watchelement",
+  "internal_name": "CT_WATCHED_ELEMENT",
+  "args": [ "read_list", "read_var", "read_var" ]
+}
+*/
+
+template<typename Var1, typename Var2, typename Var3>
+AbstractConstraint*
+BuildCT_WATCHED_ELEMENT_ONE(const Var1& vararray, const Var2& v1, const Var3& v2, ConstraintBlob& b)
+{ 
+  typedef typename ShiftType<typename Var2::value_type, compiletime_val<SysInt, -1> >::type ShiftVal;
+  vector<ShiftVal> replace_v1;
+  replace_v1.push_back(ShiftVarRef(v1[0], compiletime_val<SysInt, -1>()));
+  return BuildCT_WATCHED_ELEMENT(vararray, replace_v1, v2, b);
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "watchelement_one",
+  "internal_name": "CT_WATCHED_ELEMENT_ONE",
+  "args": [ "read_list", "read_var", "read_var" ]
+}
+*/
+
+template<typename Var1, typename Var2>
+AbstractConstraint*
+BuildCT_WATCHED_ELEMENT_UNDEFZERO(const Var1& vararray, const Var2& v1, const Var1& v2, ConstraintBlob&)
+{ 
+  return new ElementConstraintDynamic<Var1, typename Var2::value_type, typename Var1::value_type, true>
+              (vararray, v1[0], v2[0]);  
+}
+
+template<typename Var1, typename Var2, typename Var3>
+AbstractConstraint*
+BuildCT_WATCHED_ELEMENT_UNDEFZERO(Var1 vararray, const Var2& v1, const Var3& v2, ConstraintBlob&)
+{ 
+  return new ElementConstraintDynamic<Var1, typename Var2::value_type, AnyVarRef, true>
+              (vararray, v1[0], AnyVarRef(v2[0]));  
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "watchelement_undefzero",
+  "internal_name": "CT_WATCHED_ELEMENT_UNDEFZERO",
+  "args": [ "read_list", "read_var", "read_var" ]
+}
+*/
+
 #endif

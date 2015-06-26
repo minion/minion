@@ -275,4 +275,39 @@ template<typename BoolVar>
 AbstractConstraint*
 truereifyQuickCon(AbstractConstraint* c, BoolVar var)
 { return new reify_true<BoolVar, false>(&*c, var); }
+
+template<typename VarArray>
+inline AbstractConstraint*
+BuildCT_REIFYIMPLY(const VarArray& vars, ConstraintBlob& bl)
+{
+  D_ASSERT(bl.internal_constraints.size() == 1);
+  D_ASSERT(vars.size() == 1);
+  return truereifyCon(build_constraint(bl.internal_constraints[0]), vars[0]);
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "reifyimply",
+  "internal_name": "CT_REIFYIMPLY",
+  "args": [ "read_constraint", "read_var" ]
+}
+*/
+
+template<typename VarArray>
+inline AbstractConstraint*
+BuildCT_REIFYIMPLY_QUICK(const VarArray& vars, ConstraintBlob& bl)
+{
+  D_ASSERT(bl.internal_constraints.size() == 1);
+  D_ASSERT(vars.size() == 1);
+  return truereifyQuickCon(build_constraint(bl.internal_constraints[0]), vars[0]);
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "reifyimply-quick",
+  "internal_name": "CT_REIFYIMPLY_QUICK",
+  "args": [ "read_constraint", "read_var" ]
+}
+*/
+
 #endif

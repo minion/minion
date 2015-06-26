@@ -112,6 +112,46 @@ public:
   }
 };
 
+#include "constraint_checkassign.h"
+#include "forward_checking.h"
 
+template<typename V1, typename V2>
+inline AbstractConstraint*
+BuildCT_MODULO(const V1& vars, const V2& var2, ConstraintBlob&)
+{
+  D_ASSERT(vars.size() == 2);
+  D_ASSERT(var2.size() == 1);
+  typedef SlowModConstraint<typename V1::value_type, typename V1::value_type, typename V2::value_type, false> ModCon;
+  AbstractConstraint* modct=new CheckAssignConstraint<ModCon, false>(ModCon(vars[0], vars[1], var2[0]));
+  return forwardCheckingCon(modct);
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "modulo",
+  "internal_name": "CT_MODULO",
+  "args": [ "read_2_vars", "read_var" ]
+}
+*/
+
+template<typename V1, typename V2>
+inline AbstractConstraint*
+BuildCT_MODULO_UNDEFZERO(const V1& vars, const V2& var2, ConstraintBlob&)
+{
+  D_ASSERT(vars.size() == 2);
+  D_ASSERT(var2.size() == 1);
+  // Do FC. Same as CT_MODULO except for last template parameter of SlowModConstraint
+  typedef SlowModConstraint<typename V1::value_type, typename V1::value_type, typename V2::value_type, true> ModCon;
+  AbstractConstraint* modct=new CheckAssignConstraint<ModCon, false>(ModCon(vars[0], vars[1], var2[0]));
+  return forwardCheckingCon(modct);
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "modulo_undefzero",
+  "internal_name": "CT_MODULO_UNDEFZERO",
+  "args": [ "read_2_vars", "read_var" ]
+}
+*/
 
 #endif

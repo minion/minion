@@ -212,4 +212,31 @@ struct ProductConstraint : public AbstractConstraint
       return forward_check_negation(this);
   }
 };
+
+#include "constraint_and.h"
+
+inline AbstractConstraint*
+BuildCT_PRODUCT2(const vector<BoolVarRef>& vars, const vector<BoolVarRef>& var2, ConstraintBlob&)
+{
+  D_ASSERT(vars.size() == 2);
+  D_ASSERT(var2.size() == 1);
+  return AndCon(vars[0], vars[1], var2[0]);
+}
+
+template<typename VarRef1, typename VarRef2>
+AbstractConstraint*
+BuildCT_PRODUCT2(const vector<VarRef1>& vars, const vector<VarRef2>& var2, ConstraintBlob&)
+{ 
+  D_ASSERT(vars.size() == 2);
+  D_ASSERT(var2.size() == 1);
+  return new ProductConstraint<VarRef1,VarRef1,VarRef2>(vars[0],vars[1],var2[0]); 
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "product",
+  "internal_name": "CT_PRODUCT2",
+  "args": [ "read_2_vars", "read_var" ]
+}
+*/
 #endif

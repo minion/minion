@@ -272,4 +272,19 @@ BuildCT_MIN(const VarArray& _var_array,const std::vector<VarRef>& _var_ref, Cons
   "args": [ "read_list", "read_var" ]
 }
 */
+
+template<typename VarArray, typename VarRef>
+AbstractConstraint*
+BuildCT_MAX(const VarArray& _var_array, const vector<VarRef>& _var_ref, ConstraintBlob&)
+{ return (new MinConstraint<typename NegType<VarArray>::type, typename NegType<VarRef>::type>(
+              VarNegRef(_var_array), VarNegRef(_var_ref[0]))); 
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "max",
+  "internal_name": "CT_MAX",
+  "args": [ "read_list", "read_var" ]
+}
+*/
 #endif

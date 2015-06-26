@@ -345,5 +345,21 @@ inline AbstractConstraint* Dynamic_OR::reverse_constraint()
       return new Dynamic_AND(con);
 }
 
+inline AbstractConstraint*
+BuildCT_WATCHED_NEW_OR(ConstraintBlob& bl)
+{
+  vector<AbstractConstraint*> cons;
+  for(SysInt i = 0; i < (SysInt)bl.internal_constraints.size(); ++i)
+    cons.push_back(build_constraint(bl.internal_constraints[i]));
+  return new Dynamic_OR(cons);
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "watched-or",
+  "internal_name": "CT_WATCHED_NEW_OR",
+  "args": [ "read_constraint_list" ]
+}
+*/
 
 #endif

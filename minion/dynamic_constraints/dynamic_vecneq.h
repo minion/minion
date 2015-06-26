@@ -308,23 +308,13 @@ struct BothNonZeroIterated
   }
 };
 
-#ifdef SLOW_VEC_OR
-#define VEC_NAME STATIC
-#else
-#define VEC_NAME DYNAMIC
-#endif
-
-#define EXPAND(a,b) a ## b
-#define JOIN(a,b) EXPAND(a,b)
-#define ConName JOIN(VEC_NAME, VecNeqDynamic)
-
 
 /** Constraints two vectors of variables to be not equal.
   *
   *  \ingroup Constraints
 */
 template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
-  struct ConName : public AbstractConstraint
+  struct VecNeqDynamic : public AbstractConstraint
 {
   virtual string constraint_name()
     { return "watchvecneq"; }
@@ -343,43 +333,14 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   Reversible<bool> propagate_mode;
   SysInt index_to_propagate;
 
-  ConName (const VarArray1& _array1,
+  VecNeqDynamic(const VarArray1& _array1,
     const VarArray2& _array2) :
   var_array1(_array1), var_array2(_array2),
     propagate_mode(false)
-#ifdef SLOW_VEC_OR
-  , counter()
-#endif
     { D_ASSERT(var_array1.size() == var_array2.size()); }
 
   virtual SysInt dynamic_trigger_count()
     { return Operator::dynamic_trigger_count() * 2; }
-
-#ifdef SLOW_VEC_OR
-  Reversible<SysInt> counter;
-
-  virtual triggerCollection setup_internal()
-  {
-    triggerCollection t;
-
-    for(SysInt i=0; i < (SysInt)var_array1.size(); ++i)
-    {
-      t.push_back(make_trigger(var_array1[i], Trigger(this, i), LowerBound));
-      t.push_back(make_trigger(var_array1[i], Trigger(this, i), UpperBound));
-      t.push_back(make_trigger(var_array2[i], Trigger(this, i), LowerBound));
-      t.push_back(make_trigger(var_array2[i], Trigger(this, i), UpperBound));
-
-    }
-    return t;
-  }
-
-  virtual void propagate(DomainInt in, DomainDelta)
-  {
-    const SysInt i = checked_cast<SysInt>(in);
-    if(var_array1[i].getMin() == var_array2[i].getMax())
-      counter = counter + 1;
-  }
-#endif
 
   bool no_support_for_index(SysInt index)
   { return Operator::no_support_for_pair(var_array1[index], var_array2[index]); }
@@ -579,4 +540,37 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
       return forward_check_negation(this);*/
   }
 };
+
+template<typename VarArray1,  typename VarArray2>
+AbstractConstraint*
+BuildCT_WATCHED_VECNEQ(const VarArray1& varray1, const VarArray2& varray2, ConstraintBlob&)
+{ return new VecNeqDynamic<VarArray1,VarArray2>(varray1, varray2); }
+
+// these two don't seem to be used anywhere
+template<typename VarArray1,  typename VarArray2>
+AbstractConstraint*
+BuildCT_WATCHED_VEC_OR_LESS(const VarArray1& varray1, const VarArray2& varray2, ConstraintBlob&)
+{ return new VecNeqDynamic<VarArray1,VarArray2, LessIterated>(varray1, varray2); }
+
+template<typename VarArray1,  typename VarArray2>
+AbstractConstraint*
+BuildCT_WATCHED_VEC_OR_AND(const VarArray1& varray1, const VarArray2& varray2, ConstraintBlob&)
+{ return new VecNeqDynamic<VarArray1,VarArray2, BothNonZeroIterated>(varray1, varray2); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "watchvecexists_less",
+  "internal_name": "CT_WATCHED_VEC_OR_LESS",
+  "args": [ "read_list", "read_list" ]
+}
+*/
+
+/* JSON
+{ "type": "constraint",
+  "name": "watchvecneq",
+  "internal_name": "CT_WATCHED_VECNEQ",
+  "args": [ "read_list", "read_list" ]
+}
+*/
+
 #endif

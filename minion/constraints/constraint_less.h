@@ -138,4 +138,18 @@ template<typename VarRef1, typename VarRef2, typename Offset>
 inline AbstractConstraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint()
 { return LeqCon(y,x, const_negminusone(offset)); }
 
+template<typename T1, typename T2>
+AbstractConstraint*
+BuildCT_INEQ(const T1& t1, const T2& t2, ConstraintBlob& b) 
+{ return LeqCon(t1[0], t2[0], b.constants[0][0]); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "ineq",
+  "internal_name": "CT_INEQ",
+  "args": [ "read_var", "read_var", "read_constant" ]
+}
+*/
+
+
 #endif

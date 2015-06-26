@@ -767,4 +767,85 @@ BuildCT_EQ(const T1& t1, const T2& t2, ConstraintBlob&)
 }
 */
 
+template<typename T1, typename T2>
+AbstractConstraint*
+BuildCT_MINUSEQ(const T1& t1, const T2& t2, ConstraintBlob&) 
+{ return EqualMinusCon(t1[0],t2[0]); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "minuseq",
+  "internal_name": "CT_MINUSEQ",
+  "args": [ "read_var", "read_var" ]
+}
+*/
+
+template<typename VarRef1, typename BoolVarRef>
+AbstractConstraint*
+BuildCT_DISEQ_REIFY(const vector<VarRef1>& var1,
+                                        const vector<VarRef1>& var2, const vector<BoolVarRef> var3, ConstraintBlob&)
+{
+    return new ReifiedEqualConstraint<VarRef1, VarRef1, BoolVarRef, true>
+                                   (var1[0],var2[0], var3[0]);
+
+}
+
+template<typename VarRef1, typename VarRef2, typename BoolVarRef>
+AbstractConstraint*
+BuildCT_DISEQ_REIFY(const vector<VarRef1>& var1,
+                                        const vector<VarRef2>& var2, const vector<BoolVarRef> var3, ConstraintBlob&)
+{
+    return new ReifiedEqualConstraint<AnyVarRef, AnyVarRef, BoolVarRef, true>
+                                   (AnyVarRef(var1[0]),AnyVarRef(var2[0]), var3[0]);
+
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "__reify_diseq",
+  "internal_name": "CT_DISEQ_REIFY",
+  "args": [ "read_var", "read_var", "read_var" ]
+}
+*/
+
+template<typename EqualVarRef1, typename BoolVarRef>
+AbstractConstraint*
+BuildCT_EQ_REIFY(const vector<EqualVarRef1>& var1,
+                                    const vector<EqualVarRef1>& var2, const vector<BoolVarRef> var3,ConstraintBlob&)
+{ return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef1, BoolVarRef>(var1[0],var2[0],var3[0]); }
+
+template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
+AbstractConstraint*
+BuildCT_EQ_REIFY(const vector<EqualVarRef1>& var1,
+                                    const vector<EqualVarRef2>& var2, const vector<BoolVarRef> var3,ConstraintBlob&)
+{ return new ReifiedEqualConstraint<AnyVarRef, AnyVarRef, BoolVarRef>(AnyVarRef(var1[0]),AnyVarRef(var2[0]),var3[0]); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "__reify_eq",
+  "internal_name": "CT_EQ_REIFY",
+  "args": [ "read_var", "read_var", "read_var" ]
+}
+*/
+
+template<typename EqualVarRef1, typename BoolVarRef>
+AbstractConstraint*
+BuildCT_MINUSEQ_REIFY(const vector<EqualVarRef1>& var1,
+                                         const vector<EqualVarRef1>& var2, const vector<BoolVarRef> var3,ConstraintBlob&)
+{ return new ReifiedEqualConstraint<EqualVarRef1, VarNeg<EqualVarRef1>, BoolVarRef>(var1[0],VarNegRef(var2[0]),var3[0]); }
+
+template<typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef>
+AbstractConstraint*
+BuildCT_MINUSEQ_REIFY(const vector<EqualVarRef1>& var1,
+                                         const vector<EqualVarRef2>& var2, const vector<BoolVarRef> var3,ConstraintBlob&)
+{ return new ReifiedEqualConstraint<AnyVarRef, AnyVarRef, BoolVarRef>(AnyVarRef(var1[0]),AnyVarRef(VarNegRef(var2[0])),var3[0]); }
+
+/* JSON
+{ "type": "constraint",
+  "name": "__reify_minuseq",
+  "internal_name": "CT_MINUSEQ_REIFY",
+  "args": [ "read_var", "read_var", "read_var" ]
+}
+*/
+
 #endif

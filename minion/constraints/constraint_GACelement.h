@@ -274,4 +274,28 @@ struct GACElementConstraint : public AbstractConstraint
       return new Dynamic_OR(con);
   }
 };
+
+template<typename Var1, typename Var2>
+AbstractConstraint*
+BuildCT_GACELEMENT(const Var1& vararray, const Var2& v1, const Var1& v2, ConstraintBlob&)
+{ 
+  return new GACElementConstraint<Var1, typename Var2::value_type, typename Var1::value_type>
+              (vararray, v1[0], v2[0]);  
+}
+
+template<typename Var1, typename Var2, typename Var3>
+AbstractConstraint*
+BuildCT_GACELEMENT(const Var1& vararray, const Var2& v1, const Var3& v2, ConstraintBlob&)
+{ 
+  return new GACElementConstraint<Var1, typename Var2::value_type, AnyVarRef>
+              (vararray, v1[0], AnyVarRef(v2[0]));  
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "gacelement",
+  "internal_name": "CT_GACELEMENT",
+  "args": [ "read_list", "read_var", "read_var" ]
+}
+*/
 #endif
