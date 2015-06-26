@@ -293,7 +293,7 @@ BuildCT_GACELEMENT(const Var1& vararray, const Var2& v1, const Var3& v2, Constra
 
 /* JSON
 { "type": "constraint",
-  "name": "gacelement",
+  "name": "gacelement-deprecated",
   "internal_name": "CT_GACELEMENT",
   "args": [ "read_list", "read_var", "read_var" ]
 }
