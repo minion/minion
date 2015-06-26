@@ -122,6 +122,8 @@ parser.add_argument('--extraflags', help="Add extra compiler options")
 
 parser.add_argument('--setflags', help="Override all other compiler flags (experts only!)")
 
+parser.add_argument('--buildsystem', help="Set build system. Current options: make (default), sh", default="make")
+
 arg = parser.parse_args()
 
 scriptdir = os.path.dirname(os.path.realpath(__file__))
@@ -268,23 +270,42 @@ minionsrclist = ['minion/BuildVariables.cpp',
 
 
 
-with open(currentdir + "/Makefile", "w") as make:
+if arg.buildsystem == "make":
+    outname = currentdir + "/Makefile"
+    qw = ''
+    def varsub(x):
+        return ' $(' + x + ') '
+else:
+    outname = currentdir + "/build.sh"
+    qw = '"'
+    def varsub(x):
+        return ' ${' + x + '} '
+    
+with open(outname, "w") as out:
     constraintobjlist = [objname(x) for x in constraintsrclist]
     minionobjlist = [objname(x) for x in minionsrclist]
     print(minionsrclist)
     print(minionobjlist)
-    make.write('CONSRCS=' + ' '.join(constraintsrclist)+'\n')
-    make.write('CONOBJS=' + ' '.join(constraintobjlist)+'\n')
-    make.write('MINOBJS=' + ' '.join(minionobjlist)+'\n')
-    make.write('FLAGS=' + ' '.join(commandargs)+'\n')
-    make.write('minion: $(CONOBJS) $(MINOBJS)\n')
-    make.write('\t$(CXX) $(FLAGS) $(CONOBJS) $(MINOBJS) -o minion\n')
+    out.write('CONSRCS=' + qw + ' '.join(constraintsrclist)+ qw +'\n')
+    out.write('CONOBJS=' + qw + ' '.join(constraintobjlist)+ qw +'\n')
+    out.write('MINOBJS=' + qw + ' '.join(minionobjlist)+ qw +'\n')
+    out.write('FLAGS=' + qw + ' '.join(commandargs)+ qw +'\n')
+    
+    if arg.buildsystem == "make":
+        out.write('all : minion\n')
+        
     for i in constraintsrclist:
-        make.write(objname(i) + ": "+i+'\n')
-        make.write('\t'+compiler+' $(FLAGS) -c -o ' +
+        if arg.buildsystem == "make":
+            out.write(objname(i) + ": "+i+'\n')
+        out.write('\t'+compiler+' '+varsub('FLAGS') + ' -c -o ' +
                    objname(i) + " " + i +'\n')
     
     for i in minionsrclist:
-        make.write(objname(i)+ " : "+ scriptdir + "/" + i +'\n')
-        make.write('\t'+compiler+' $(FLAGS) -c -o ' +
+        if arg.buildsystem == "make":
+            out.write(objname(i)+ " : "+ scriptdir + "/" + i +'\n')
+        out.write('\t'+compiler+' ' + varsub('FLAGS') + ' -c -o ' +
                    objname(i) + " " + scriptdir + "/" + i +'\n')
+    if arg.buildsystem == "make":
+        out.write('minion: $(CONOBJS) $(MINOBJS)\n')
+    out.write('\t' + compiler + ' ' + varsub('FLAGS') + varsub('CONOBJS') +
+               varsub('MINOBJS') + ' -o minion\n')
