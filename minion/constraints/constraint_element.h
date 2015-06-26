@@ -506,7 +506,7 @@ BuildCT_ELEMENT(const Var1& vararray, const Var2& v1, const Var1& v2, Constraint
 }
 
 template<typename Var1, typename Var2, typename Var3>
-AbstractConstraint*
+inline AbstractConstraint*
 BuildCT_ELEMENT(Var1 vararray, const Var2& v1, const Var3& v2, ConstraintBlob&)
 { 
   return new ElementConstraint<Var1, typename Var2::value_type, AnyVarRef>
@@ -541,7 +541,7 @@ BuildCT_ELEMENT_ONE(const Var1& vararray, const Var2& v1, const Var3& v2, Constr
 */
 
 template<typename Var1, typename Var2>
-AbstractConstraint*
+inline AbstractConstraint*
 BuildCT_ELEMENT_UNDEFZERO(const Var1& vararray, const Var2& v1, const Var1& v2, ConstraintBlob&)
 { 
   return new ElementConstraint<Var1, typename Var2::value_type, typename Var1::value_type, true>

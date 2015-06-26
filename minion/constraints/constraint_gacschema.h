@@ -695,3 +695,16 @@ struct GACSchema : public AbstractConstraint, Backtrackable
     }
 
 };  // end of class
+
+template<typename VarArray>
+AbstractConstraint*
+BuildCT_GACSCHEMA(const VarArray& var_array, ConstraintBlob& b)
+{ return new GACSchema<VarArray>(var_array, b.tuples); }
+
+/* JSON
+  { "type": "constraint",
+    "name": "gacschema",
+    "internal_name": "CT_GACSCHEMA",
+    "args": [ "read_list", "read_tuples" ]
+  }
+*/

@@ -323,4 +323,30 @@ template<typename VarArray1,  typename VarArray2>
 AbstractConstraint*
   NotVecOrCountConDynamic(const VarArray1& varray1, const VarArray2& varray2, DomainInt i)
   { return new VecCountDynamic<VarArray1,VarArray2,EqIterated>(varray1, varray2, (SysInt)varray1.size() - i + 1); }
+
+  template<typename T1, typename T2>
+  AbstractConstraint*
+  BuildCT_WATCHED_HAMMING(const T1& t1, const T2& t2, ConstraintBlob& b) 
+  { return VecOrCountConDynamic(t1, t2, b.constants[0][0]); }
+
+  /* JSON
+  { "type": "constraint",
+    "name": "hamming",
+    "internal_name": "CT_WATCHED_HAMMING",
+    "args": [ "read_list", "read_list", "read_constant" ]
+  }
+*/
+
+  template<typename T1, typename T2>
+  AbstractConstraint*
+  BuildCT_WATCHED_NOT_HAMMING(const T1& t1, const T2& t2, ConstraintBlob& b) 
+  { return NotVecOrCountConDynamic(t1, t2, b.constants[0][0]); }
+  
+  /* JSON
+  { "type": "constraint",
+    "name": "not-hamming",
+    "internal_name": "CT_WATCHED_NOT_HAMMING",
+    "args": [ "read_list", "read_list", "read_constant" ]
+  }
+*/
 #endif

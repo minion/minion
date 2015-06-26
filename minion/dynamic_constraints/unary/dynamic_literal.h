@@ -97,4 +97,21 @@ template<typename Var>
 
   inline AbstractConstraint* WatchNotLiteralBoolConstraint::reverse_constraint()
   { return new WatchLiteralConstraint<BoolVarRef>(var, val); }
+  
+template<typename VarArray1>
+AbstractConstraint*
+BuildCT_WATCHED_LIT(const VarArray1& _var_array_1, const ConstraintBlob& b)
+{ 
+    return new WatchLiteralConstraint<typename VarArray1::value_type>
+        (_var_array_1[0], b.constants[0][0]); 
+}
+
+/* JSON
+  { "type": "constraint",
+    "name": "w-literal",
+    "internal_name": "CT_WATCHED_LIT",
+    "args": [ "read_list", "read_constant" ]
+  }
+*/
+  
 #endif

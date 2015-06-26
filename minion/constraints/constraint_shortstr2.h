@@ -629,5 +629,30 @@ struct STR : public AbstractConstraint
 
 };
 
+template <typename T>
+AbstractConstraint*
+BuildCT_SHORTSTR(const T& t1, ConstraintBlob& b)
+{ return new STR<T, true>(t1, b.short_tuples); }
+
+/* JSON
+  { "type": "constraint",
+    "name": "shortstr2",
+    "internal_name": "CT_SHORTSTR",
+    "args": [ "read_list", "read_tuples" ]
+  }
+  */
+
+template <typename T>
+AbstractConstraint*
+BuildCT_STR(const T& t1, ConstraintBlob& b)
+{ return new STR<T, false>(t1, b.tuples); }
+
+/* JSON
+  { "type": "constraint",
+    "name": "str2plus",
+    "internal_name": "CT_STR",
+    "args": [ "read_list", "read_tuples" ]
+  }
+  */
 
 #endif

@@ -342,4 +342,57 @@ AbstractConstraint*
 #include "dynamic_binary_sat.h"
 #include "dynamic_3_sat.h"
 
+template<typename T>
+inline AbstractConstraint*
+  BuildCT_WATCHED_GEQSUM(const vector<T>& t1, ConstraintBlob& b)
+{
+  for(SysInt i = 0; i < (SysInt)t1.size(); ++i)
+  {
+    if(t1[i].getInitialMin() < 0 || t1[i].getInitialMax() > 1)
+      FAIL_EXIT("watched geqsum only works on Boolean variables!");
+  }
+
+    DomainInt sum = b.constants[0][0];
+    if(sum == 1)
+    {
+      {
+        return BoolSATConDynamic(t1);
+      }
+    }
+    else
+    {
+      return BoolGreaterEqualSumConDynamic(t1, sum);
+    }
+
+}
+
+/* JSON
+  { "type": "constraint",
+    "name": "watchsumgeq",
+    "internal_name": "CT_WATCHED_GEQSUM",
+    "args": [ "read_list", "read_constant" ]
+  }
+*/
+
+template<typename T>
+inline AbstractConstraint*
+  BuildCT_WATCHED_LEQSUM(const vector<T>& t1, ConstraintBlob& b)
+{
+  for(SysInt i = 0; i < (SysInt)t1.size(); ++i)
+  {
+    if(t1[i].getInitialMin() < 0 || t1[i].getInitialMax() > 1)
+      FAIL_EXIT("watched leqsum only works on Boolean variables!");
+  }
+
+  return BoolLessEqualSumConDynamic(t1, checked_cast<SysInt>(b.constants[0][0]));
+}
+
+/* JSON
+  { "type": "constraint",
+    "name": "watchlumgeq",
+    "internal_name": "CT_WATCHED_LEQSUM",
+    "args": [ "read_list", "read_constant" ]
+  }
+*/
+
 #endif

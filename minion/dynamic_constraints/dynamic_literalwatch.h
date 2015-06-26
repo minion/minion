@@ -280,4 +280,21 @@ template<typename VarArray,  typename ValArray, typename VarSum>
 AbstractConstraint*
 LiteralSumConDynamic(const VarArray& _var_array,  const ValArray& _val_array, VarSum _var_sum)
 { return new LiteralSumConstraintDynamic<VarArray,ValArray,VarSum>(_var_array, _val_array, _var_sum); }
+
+template<typename T1>
+AbstractConstraint* 
+BuildCT_WATCHED_LITSUM(const T1& t1, ConstraintBlob& b)
+{
+  D_ASSERT(b.constants[1].size());
+  return LiteralSumConDynamic(t1, b.constants[0], checked_cast<SysInt>(b.constants[1][0])); 
+}
+
+/* JSON
+  { "type": "constraint",
+    "name": "litsumgeq",
+    "internal_name": "CT_WATCHED_LITSUM",
+    "args": [ "read_list", "read_constant_list", "read_constant" ]
+  }
+*/
+
 #endif

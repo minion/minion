@@ -327,4 +327,34 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint
   }
 };
 
+template<typename VarArray,  typename VarSum>
+AbstractConstraint*
+BuildCT_LEQNVALUE(const VarArray& _var_array, const vector<VarSum>& _var_sum, ConstraintBlob&)
+{ 
+    return new LessEqualNvalueConstraint<VarArray, VarSum>(_var_array, _var_sum[0]); 
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "nvalueleq",
+  "internal_name": "CT_LEQNVALUE",
+  "args": [ "read_list", "read_var" ]
+}
+*/
+
+template<typename VarArray,  typename VarSum>
+AbstractConstraint*
+BuildCT_GEQNVALUE(const VarArray& _var_array, const vector<VarSum>& _var_sum, ConstraintBlob&)
+{ 
+  return new GreaterEqualNvalueConstraint<VarArray, VarSum>(_var_array, _var_sum[0]); 
+}
+
+/* JSON
+{ "type": "constraint",
+  "name": "nvaluegeq",
+  "internal_name": "CT_GEQNVALUE",
+  "args": [ "read_list", "read_var" ]
+}
+*/
+
 #endif

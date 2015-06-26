@@ -762,3 +762,17 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
       return ret;
     }
 };  // end of class
+
+template <typename T>
+AbstractConstraint*
+BuildCT_HAGGISGAC_STABLE(const T& t1, ConstraintBlob& b)
+{ return new HaggisGACStable<T>(t1, b.short_tuples); }
+
+
+/* JSON
+  { "type": "constraint",
+    "name": "haggisgac-stable",
+    "internal_name": "CT_HAGGISGAC_STABLE",
+    "args": [ "read_list", "read_short_tuples" ]
+  }
+*/

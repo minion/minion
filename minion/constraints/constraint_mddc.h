@@ -835,5 +835,31 @@ struct MDDC : public AbstractConstraint
     }
 };
 
+template <typename T>
+AbstractConstraint*
+BuildCT_MDDC(const T& t1, ConstraintBlob& b)
+{ return new MDDC<T>(t1, b.tuples); }
 
+/* JSON
+  { "type": "constraint",
+    "name": "mddc",
+    "internal_name": "CT_MDDC",
+    "args": [ "read_list", "read_tuples" ]
+  }
+*/
+
+template <typename T>
+AbstractConstraint*
+BuildCT_NEGATIVEMDDC(const T& t1, ConstraintBlob& b)
+{ return new MDDC<T, true>(t1, b.tuples); }
+
+
+/* JSON
+  { "type": "constraint",
+    "name": "negativemddc",
+    "internal_name": "CT_NEGATIVEMDDC",
+    "args": [ "read_list", "read_tuples" ]
+  }
+*/
+  
 #endif

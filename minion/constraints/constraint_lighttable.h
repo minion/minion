@@ -242,3 +242,16 @@ template<typename VarArray>
 AbstractConstraint*
   GACLightTableCon(const VarArray& vars, TupleList* tuples)
   { return new LightTableConstraint<VarArray>(vars, tuples); }
+  
+template <typename T>
+AbstractConstraint*
+BuildCT_LIGHTTABLE(const T& t1, ConstraintBlob& b)
+{ return GACLightTableCon(t1, b.tuples); }
+
+/* JSON
+{ "type": "constraint",
+"name": "lighttable",
+"internal_name": "CT_LIGHTTABLE",
+"args": [ "read_list", "read_tuples" ]
+}
+*/

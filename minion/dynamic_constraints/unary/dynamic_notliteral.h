@@ -178,4 +178,24 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
 
 // For reverse constraint.
 #include "dynamic_literal.h"
+
+inline AbstractConstraint*
+BuildCT_WATCHED_NOTLIT(const vector<BoolVarRef>& vec, const ConstraintBlob& b)
+{ return new WatchNotLiteralBoolConstraint(vec[0], b.constants[0][0]); }
+
+template<typename VarArray1>
+AbstractConstraint*
+BuildCT_WATCHED_NOTLIT(const VarArray1& _var_array_1, const ConstraintBlob& b)
+{ 
+  return new WatchNotLiteralConstraint<typename VarArray1::value_type>
+    (_var_array_1[0], b.constants[0][0]); 
+}
+
+/* JSON
+  { "type": "constraint",
+    "name": "w-notliteral",
+    "internal_name": "CT_WATCHED_NOTLIT",
+    "args": [ "read_list", "read_constant" ]
+  }
+*/
 #endif

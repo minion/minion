@@ -191,4 +191,19 @@ template<typename Var>
 
 };
 
+template<typename VarArray1>
+AbstractConstraint*
+BuildCT_WATCHED_ININTERVALSET(const VarArray1& _var_array_1, const ConstraintBlob& b)
+{ 
+  return new WatchInIntervalSetConstraint<typename VarArray1::value_type>
+    (_var_array_1[0], b.constants[0]); 
+}
+
+/* JSON
+  { "type": "constraint",
+    "name": "w-inrange",
+    "internal_name": "CT_WATCHED_ININTERVALSET",
+    "args": [ "read_var", "read_constant_list" ]
+  }
+*/
 #endif
