@@ -91,7 +91,7 @@ BuildCT_LEQSUM(const vector<BoolVarRef>& var_array, const vector<ConstantVar>& v
 
 /* JSON
 { "type": "constraint",
-  "name": "leqsum",
+  "name": "sumleq",
   "internal_name": "CT_LEQSUM",
   "args": [ "read_list", "read_var" ]
 }
@@ -124,7 +124,7 @@ BuildCT_GEQSUM(const vector<BoolVarRef>& var_array, const vector<ConstantVar>& v
 
 /* JSON
 { "type": "constraint",
-  "name": "geqsum",
+  "name": "sumgeq",
   "internal_name": "CT_GEQSUM",
   "args": [ "read_list", "read_var" ]
 }
@@ -180,7 +180,7 @@ BuildCT_WEIGHTGEQSUM(vector<T1> vec, const vector<T2>& t2, ConstraintBlob& b)
 
 /* JSON
 { "type": "constraint",
-  "name": "weightedgeqsum",
+  "name": "weightedsumgeq",
   "internal_name": "CT_WEIGHTGEQSUM",
   "args": [ "read_constant_list", "read_list", "read_var" ]
 }
@@ -235,7 +235,7 @@ BuildCT_WEIGHTLEQSUM(vector<T1> vec, const vector<T2>& t2, ConstraintBlob& b)
 
 /* JSON
 { "type": "constraint",
-  "name": "weightedleqsum",
+  "name": "weightedsumleq",
   "internal_name": "CT_WEIGHTLEQSUM",
   "args": [ "read_constant_list", "read_list", "read_var" ]
 }

@@ -102,6 +102,7 @@ parser.add_argument('--wdeg', action='store_const', const=["-DWDEG"],
 parser.add_argument('--quick', action='store_const', const=['-DQUICK_COMPILE'],
                     help='Enable debugging')
 
+parser.add_argument('--compiler', help="Set compiler")
 
 parser.add_argument('--debug', action='store_const',
                     const=['-D_GLIBCXX_DEBUG', '-DMINION_DEBUG', '-DMORE_SEARCH_INFO'],
@@ -146,7 +147,6 @@ if not os.path.exists(objdir):
 if not os.path.exists(objdir):
     fatal_error("ERROR: Can't create dir ", objdir)
 
-
 verbose_print(1, "Current dir: " + currentdir)
 verbose_print(1, "Minion base dir: " + scriptdir)
 
@@ -165,6 +165,11 @@ if arg.setflags:
     
 if not arg.unoptimised:
     commandargs = commandargs + ["-O2"]
+
+if arg.compiler:
+    compiler = arg.compiler
+else:
+    compiler = "ccache c++"
     
 verbose_print(1, "Compiler flags" + str(commandargs))
 
@@ -276,8 +281,10 @@ with open(currentdir + "/Makefile", "w") as make:
     make.write('\t$(CXX) $(FLAGS) $(CONOBJS) $(MINOBJS) -o minion\n')
     for i in constraintsrclist:
         make.write(objname(i) + ": "+i+'\n')
-        make.write('\t$(CXX) $(FLAGS) -c -o ' + objname(i) + " " + i +'\n')
+        make.write('\t'+compiler+' $(FLAGS) -c -o ' +
+                   objname(i) + " " + i +'\n')
     
     for i in minionsrclist:
         make.write(objname(i)+ " : "+ scriptdir + "/" + i +'\n')
-        make.write('\t$(CXX) $(FLAGS) -c -o ' + objname(i) + " " + scriptdir + "/" + i +'\n')
+        make.write('\t'+compiler+' $(FLAGS) -c -o ' +
+                   objname(i) + " " + scriptdir + "/" + i +'\n')
