@@ -99,7 +99,7 @@ parser.add_argument('--domains64', action='store_const', const=["-DDOMAINS64"],
                     help='Enable 64-bit domains')
 parser.add_argument('--wdeg', action='store_const', const=["-DWDEG"],
                     help='Enable wdeg heuristics')
-parser.add_argument('--quick', action='store_const', const=['DQUICK_COMPILE'],
+parser.add_argument('--quick', action='store_const', const=['-DQUICK_COMPILE'],
                     help='Enable debugging')
 
 
@@ -162,6 +162,9 @@ if arg.extraflags:
 
 if arg.setflags:
     commandargs = arg.setflags.split()
+    
+if not arg.unoptimised:
+    commandargs = commandargs + ["-O2"]
     
 verbose_print(1, "Compiler flags" + str(commandargs))
 
