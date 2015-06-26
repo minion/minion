@@ -574,11 +574,6 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraint(FileReader* in
 
   switch(constraint->type)
   {
-      /* XXX
-    case CT_WATCHED_OR:
-    return readConstraintOr(infile, get_constraint(CT_WATCHED_OR));
-    break;
-*/
     default:
     if(constraint->number_of_params == 2 &&
          (constraint->read_types[1] == read_tuples || constraint->read_types[1] == read_short_tuples) )
@@ -767,39 +762,6 @@ TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReade
   return tuplelist;
 }
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// readConstraintOr
-// or(<vectorOfVars>)
-// SAT clauses represented as literals and negated literals
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-template<typename FileReader>
-ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintOr(FileReader* infile,
-  ConstraintDef* ct)
-{
-  MAYBE_PARSER_INFO("Reading a SAT clause");
-  infile->check_sym('[');
-  vector<DomainInt> negs;
-  vector<Var> clause_vars;
-  if(infile->peek_char() != ']')
-    clause_vars.push_back(readIdentifier(infile));
-  while(infile->peek_char() != ']') {
-    infile->check_sym(',');
-    clause_vars.push_back(readIdentifier(infile));
-  }
-  infile->check_sym(']');
-  infile->check_sym(')');
-  for(SysInt i = 0; i < (SysInt)clause_vars.size(); i++) {
-    if(clause_vars[i].type() == VAR_NOTBOOL) {
-      negs.push_back(0);
-      clause_vars[i].setType(VAR_BOOL);
-    } else {
-      negs.push_back(1);
-    }
-  }
-  ConstraintBlob cb(ct, clause_vars);
-  cb.negs = negs;
-  return cb;
-}
 
 /// Reads an identifier which represents a single variable or constant.
 template<typename FileReader>
