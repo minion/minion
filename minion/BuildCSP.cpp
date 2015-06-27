@@ -35,9 +35,6 @@ void BuildCSP(CSPInstance& instance)
   getState().setTupleListContainer(instance.tupleListContainer);
   getState().setShortTupleListContainer(instance.shortTupleListContainer);
 
-  // XXX : Hack for reify / reifyimply problem.
-  getState().setDynamicTriggersUsed(true);
-
   // Set up variables
   BuildCon::build_variables(instance.vars);
   getState().setInstance(&instance);

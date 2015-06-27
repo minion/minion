@@ -211,7 +211,7 @@ public:
 
   void push_upper(DomainInt var_num, DomainInt upper_delta)
   {
-    if (getState().isDynamicTriggersUsed()) dynamic_propagate(var_num, UpperBound);
+    dynamic_propagate(var_num, UpperBound);
     D_ASSERT(lock_second);
     D_ASSERT(upper_delta > 0 || getState().isFailed());
 
@@ -223,7 +223,7 @@ public:
 
   void push_lower(DomainInt var_num, DomainInt lower_delta)
   {
-    if (getState().isDynamicTriggersUsed()) dynamic_propagate(var_num, LowerBound);
+    dynamic_propagate(var_num, LowerBound);
     D_ASSERT(lock_second);
     D_ASSERT(lower_delta > 0 || getState().isFailed());
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
@@ -235,7 +235,7 @@ public:
 
   void push_assign(DomainInt var_num, DomainInt)
   {
-    if (getState().isDynamicTriggersUsed()) dynamic_propagate(var_num, Assigned);
+    dynamic_propagate(var_num, Assigned);
     D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
     if(range.first != range.second)
@@ -244,7 +244,7 @@ public:
 
   void push_domain_changed(DomainInt var_num)
   {
-    if (getState().isDynamicTriggersUsed()) dynamic_propagate(var_num, DomainChanged);
+    dynamic_propagate(var_num, DomainChanged);
 
     D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);

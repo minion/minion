@@ -58,8 +58,6 @@ class SearchState
 
   long long int solutions;
 
-  bool dynamic_triggers_used;
-
   bool finished;
   bool failed;
   jmp_buf g_env;
@@ -126,9 +124,6 @@ public:
   void setSolutionCount(long long int _sol) { solutions = _sol; }
   void incrementSolutionCount() { solutions++; }
 
-  bool isDynamicTriggersUsed() { return dynamic_triggers_used; }
-  void setDynamicTriggersUsed(bool b) { dynamic_triggers_used = b; }
-
   bool isFinished() { return finished; }
   void setFinished(bool b) { finished = b; }
 
@@ -158,7 +153,7 @@ public:
   SearchState() : nodes(0), optimise_var(NULL),
     raw_optimise_var(NULL),
     current_optimise_position(0), optimise(false), constraints_to_propagate(1),
-    solutions(0), dynamic_triggers_used(false), finished(false), failed(false),
+    solutions(0), finished(false), failed(false),
     is_locked(false), alarm_trigger(false), ctrl_c_pressed(false)
   {}
 

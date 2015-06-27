@@ -187,20 +187,12 @@ public:
   {
     while(true)
     {
-      if (getState().isDynamicTriggersUsed())
+      while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
       {
-        while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
-        {
-          if(propagateDynamicTriggerLists())
-            return;
+        if(propagateDynamicTriggerLists())
+          return;
 
-          /* Don't like code duplication here but a slight efficiency gain */
-          if(propagateStaticTriggerLists())
-            return;
-        }
-      }
-      else
-      {
+        /* Don't like code duplication here but a slight efficiency gain */
         if(propagateStaticTriggerLists())
           return;
       }
@@ -309,20 +301,12 @@ public:
   {
     while(true)
     {
-      if (getState().isDynamicTriggersUsed())
+      while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
       {
-        while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
-        {
-          if(propagateDynamicTriggerListsRoot())
-            return;
+        if(propagateDynamicTriggerListsRoot())
+          return;
 
-          /* Don't like code duplication here but a slight efficiency gain */
-          if(propagateStaticTriggerListsRoot())
-            return;
-        }
-      }
-      else
-      {
+        /* Don't like code duplication here but a slight efficiency gain */
         if(propagateStaticTriggerListsRoot())
           return;
       }
