@@ -36,7 +36,7 @@ conslist+=["watchelement_one", "element_one"]
 # arithmetic constraints
 conslist+=["modulo", "modulo_undefzero", "pow", "minuseq", "product", "div", "div_undefzero", "abs"]
 
-conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "staticvecneq", "hamming", "not-hamming"]
+conslist+=["watchsumleq", "watchsumgeq", "watchvecneq",  "hamming", "not-hamming"]
 conslist+=["weightedsumleq", "weightedsumgeq"]
 
 conslist+=["litsumgeq"]  
@@ -137,4 +137,3 @@ if __name__ == '__main__':
         print("Failure")
         exit(1)
     
-
