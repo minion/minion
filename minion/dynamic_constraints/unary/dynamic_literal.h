@@ -110,7 +110,7 @@ BuildCT_WATCHED_LIT(const VarArray1& _var_array_1, const ConstraintBlob& b)
   { "type": "constraint",
     "name": "w-literal",
     "internal_name": "CT_WATCHED_LIT",
-    "args": [ "read_list", "read_constant" ]
+    "args": [ "read_var", "read_constant" ]
   }
 */
   
