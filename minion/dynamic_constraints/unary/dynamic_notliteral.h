@@ -195,7 +195,7 @@ BuildCT_WATCHED_NOTLIT(const VarArray1& _var_array_1, const ConstraintBlob& b)
   { "type": "constraint",
     "name": "w-notliteral",
     "internal_name": "CT_WATCHED_NOTLIT",
-    "args": [ "read_list", "read_constant" ]
+    "args": [ "read_var", "read_constant" ]
   }
 */
 #endif
