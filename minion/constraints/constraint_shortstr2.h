@@ -103,7 +103,7 @@ This constraint enforces generalized arc consistency.
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include "../constraints/constraint_checkassign.h"
+#include "constraint_checkassign.h"
 
 using namespace std;
 

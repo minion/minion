@@ -67,11 +67,11 @@
 #define CONSTRAINT_GAC2DELEMENT_H_OSAFDJ
 
 // for the reverse constraint.
-#include "../constraints/constraint_equal.h"
-#include "../dynamic_constraints/dynamic_new_or.h"
-#include "../dynamic_constraints/dynamic_new_and.h"
-#include "../dynamic_constraints/unary/dynamic_literal.h"
-#include "../dynamic_constraints/unary/dynamic_notinrange.h"
+#include "constraint_equal.h"
+#include "dynamic_new_or.h"
+#include "dynamic_new_and.h"
+#include "unary/dynamic_literal.h"
+#include "unary/dynamic_notinrange.h"
 #include "../memory_management/reversible_vals.h"
 
 template<typename VarArray, typename IndexArray, typename VarRef>

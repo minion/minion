@@ -27,7 +27,7 @@
 #ifndef DYNAMIC_REIFY_TRUE_OLD_H
 #define DYNAMIC_REIFY_TRUE_OLD_H
 
-#include "../constraints/constraint_abstract.h"
+#include "constraint_abstract.h"
 #include "../minion.h"
 
 #ifdef P

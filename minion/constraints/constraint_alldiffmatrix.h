@@ -52,7 +52,7 @@ using namespace std;
 
 // for reverse_constraint,
 #include "constraint_occurrence.h"
-#include "../dynamic_constraints/dynamic_new_or.h"
+#include "dynamic_new_or.h"
 
 #define ADMPRINT(x)
 //#define ADMPRINT(x) std::cout << x << std::endl;

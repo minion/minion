@@ -19,10 +19,10 @@
 
 #include "dynamic_new_and.h"
 #include "unary/dynamic_literal.h"
-#include "../constraints/constraint_less.h"
-#include "../constraints/constraint_equal.h"
-#include "../constraints/constraint_product.h"
-#include "../constraints/constraint_checkassign.h"
+#include "constraint_less.h"
+#include "constraint_equal.h"
+#include "constraint_product.h"
+#include "constraint_checkassign.h"
 
 /** @help constraints;watchvecneq Description
 The constraint

@@ -40,7 +40,7 @@ ensures that there are >= x different values assigned to the list of variables V
 #define CONSTRAINT_NVALUE_H
 
 #include <math.h>
-#include "../constraints/constraint_checkassign.h"
+#include "constraint_checkassign.h"
 
 
 template<typename VarArray, typename VarResult>

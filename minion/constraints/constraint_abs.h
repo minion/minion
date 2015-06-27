@@ -32,7 +32,7 @@ help constraints abs
 #ifndef CONSTRAINT_ABS_H
 #define CONSTRAINT_ABS_H
 
-#include "../constraints/constraint_checkassign.h"
+#include "constraint_checkassign.h"
 
 // X = abs(Y)
 template<typename AbsVarRef1, typename AbsVarRef2>

@@ -24,8 +24,8 @@
 #include "../memory_management/reversible_vals.h"
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
-#include "../dynamic_constraints/dynamic_new_and.h"
-#include "../dynamic_constraints/unary/dynamic_literal.h"
+#include "dynamic_new_and.h"
+#include "unary/dynamic_literal.h"
 
 #ifdef P
 #undef P

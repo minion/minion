@@ -20,7 +20,7 @@
 #ifndef CONSTRAINT_DYNAMIC_NEQ_H
 #define CONSTRAINT_DYNAMIC_NEQ_H
 
-#include "../constraints/constraint_equal.h"
+#include "constraint_equal.h"
 
 template<typename Var1, typename Var2>
 struct WatchNeqConstraint : public AbstractConstraint

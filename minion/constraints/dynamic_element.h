@@ -97,7 +97,7 @@ when the array value is out of bounds.
 #define CONSTRAINT_DYNAMIC_ELEMENT_H
 
 // for the reverse constraint.
-#include "../constraints/constraint_equal.h"
+#include "constraint_equal.h"
 #include "dynamic_new_or.h"
 #include "dynamic_new_and.h"
 #include "unary/dynamic_literal.h"

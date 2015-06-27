@@ -34,7 +34,7 @@ consistency.
 #ifndef CONSTRAINT_DIFFERENCE_H
 #define CONSTRAINT_DIFFERENCE_H
 
-#include "../constraints/constraint_checkassign.h"
+#include "constraint_checkassign.h"
 
 #ifdef P
 #undef P

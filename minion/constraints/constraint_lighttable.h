@@ -18,7 +18,7 @@
 */
 
 #include "tries.h"
-#include "../constraints/constraint_checkassign.h"
+#include "constraint_checkassign.h"
 
 /** @help constraints;lighttable Description
 An extensional constraint that enforces GAC. The constraint is

@@ -31,9 +31,9 @@
 #include "../minion.h"
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"
-#include "../dynamic_constraints/old_dynamic_reifyimply.h"
-#include "../dynamic_constraints/dynamic_new_and.h"
-#include "../dynamic_constraints/unary/dynamic_literal.h"
+#include "old_dynamic_reifyimply.h"
+#include "dynamic_new_and.h"
+#include "unary/dynamic_literal.h"
 
 template<typename BoolVar>
 struct reify_true_old : public AbstractConstraint

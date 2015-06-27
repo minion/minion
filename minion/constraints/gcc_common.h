@@ -30,7 +30,7 @@
 
 // for NotOccurrenceEqualConstraint, used in reverse_constraint,
 #include "constraint_occurrence.h"
-#include "../dynamic_constraints/dynamic_new_or.h"
+#include "dynamic_new_or.h"
 
 
 //#define GCCPRINT(x) cout << x << endl

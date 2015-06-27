@@ -29,8 +29,8 @@ using namespace std;
 
 // includes for reverse constraint.
 #include "constraint_equal.h"
-#include "../dynamic_constraints/dynamic_new_or.h"
-#include "../constraints/constraint_checkassign.h"
+#include "dynamic_new_or.h"
+#include "constraint_checkassign.h"
 
 // The implementation of the alldiff GAC algorithm,
 // shared between gacalldiff and the (now defunct) dynamicalldiff.

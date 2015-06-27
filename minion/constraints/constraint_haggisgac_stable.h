@@ -30,7 +30,7 @@
 */
 
 #include <algorithm>
-#include "../constraints/constraint_checkassign.h"
+#include "constraint_checkassign.h"
 #include "constraint_haggisgac_tuples.h"
 
 // Default will be List.

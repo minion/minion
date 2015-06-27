@@ -37,7 +37,7 @@ help input table
 help input haggisgac
 */
 
-#include "../constraints/constraint_checkassign.h"
+#include "constraint_checkassign.h"
 
 template<typename VarArray>
 struct GACSchema : public AbstractConstraint, Backtrackable

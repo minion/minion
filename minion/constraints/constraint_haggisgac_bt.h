@@ -20,7 +20,7 @@
 */
 
 #include <algorithm>
-#include "../constraints/constraint_checkassign.h"
+#include "constraint_checkassign.h"
 #include "constraint_haggisgac_tuples.h"
 
 /** @help constraints;haggisgac-stable Description

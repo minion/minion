@@ -52,7 +52,7 @@ for the opposite constraint.
 #ifndef CONSTRAINT_MIN_H
 #define CONSTRAINT_MIN_H
 
-#include "../constraints/constraint_checkassign.h"
+#include "constraint_checkassign.h"
 
 template<typename VarArray, typename MinVarRef>
 struct MinConstraint : public AbstractConstraint

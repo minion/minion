@@ -95,10 +95,10 @@ consistency.
 
 
 #include "constraint_equal.h"
-#include "../dynamic_constraints/dynamic_new_or.h"
-#include "../dynamic_constraints/dynamic_new_and.h"
-#include "../dynamic_constraints/unary/dynamic_literal.h"
-#include "../dynamic_constraints/unary/dynamic_notinrange.h"
+#include "dynamic_new_or.h"
+#include "dynamic_new_and.h"
+#include "unary/dynamic_literal.h"
+#include "unary/dynamic_notinrange.h"
 
 
 template<typename VarArray, typename Index, typename Result, bool undef_maps_zero = false>
