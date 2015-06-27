@@ -22,10 +22,20 @@ def verbose_print(level, *args):
 
 ## Capture HG options
 def progout(prog):
-    process = subprocess.Popen(prog, stdout=subprocess.PIPE)
+    process = subprocess.Popen(prog, stdout=subprocess.PIPE,
+                                     stderr=subprocess.DEVNULL)
     (output, err) = process.communicate()
     exit_code = process.wait()
     return (output, err, exit_code)
+    
+#Check if prog can be run
+def progexists(prog):
+    try:
+        subprocess.call([prog], stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL)
+    except OSError as e:
+        return False
+    return True
 
 def gethgDate():
     (out, err, code) = progout(["hg", "parent", '--template="{date|isodate}"'])
@@ -171,7 +181,18 @@ if not arg.unoptimised:
 if arg.compiler:
     compiler = arg.compiler
 else:
-    compiler = "ccache c++"
+    compiler = ""
+    if progexists('ccache'):
+        compiler = "ccache " + compiler
+    
+    if progexists('c++'):
+        compiler = compiler + ' c++'
+    elif progexists('g++'):
+        compiler = compiler + ' g++'
+    elif progexists('clang++'):
+        compiler = compiler + ' clang++'
+    else:
+        fatal_error("Unable to find working C++ compiler.. please use --compiler")
     
 verbose_print(1, "Compiler flags" + str(commandargs))
 
