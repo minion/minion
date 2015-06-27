@@ -30,8 +30,6 @@ using namespace std;
 
 #include "get_info/get_info.h"
 
-// XXX : Provide access to this.
-const SysInt ShowUnused = 0;
 
 string EventNames[] = {
 #define VAR_EVENT(x,y) #x ,
@@ -134,7 +132,7 @@ void print_search_info()
      for(SysInt i = 0; i < VarTypeCount; ++i)
        total += var_info.counters[i][j];
        
-     if(ShowUnused || total != 0)
+     if(total != 0)
      {
        cout << pad(EventNames[j]);
        for(SysInt i = 0; i < VarTypeCount; ++i)
@@ -157,7 +155,7 @@ void print_search_info()
           total += var_info.counters[i][j];
        }
         
-     if(ShowUnused || total != 0)
+     if(total != 0)
      {
        if(check_type == 1)
          cout << pad("TotalChecks");
@@ -184,7 +182,7 @@ void print_search_info()
   cout << "  ** Constraints" << endl;
   for(SysInt i = 0; i < PropEventCount; ++i)
   {
-    if(ShowUnused || var_info.propcount[i] != 0)
+    if(var_info.propcount[i] != 0)
       cout << pad(PropEventNames[i]) << 
               setiosflags(ios::right) << setw(12) <<
               var_info.propcount[i] << endl;
@@ -193,7 +191,7 @@ void print_search_info()
   cout << "  ** Queue Events" << endl;
   for(SysInt i = 0; i < ConEventCount; ++i)
   {
-    if(ShowUnused || var_info.concount[i] != 0)
+    if(var_info.concount[i] != 0)
       cout << pad(ConEventNames[i]) << 
               setiosflags(ios::right) << setw(12) <<
               var_info.concount[i] << endl;
