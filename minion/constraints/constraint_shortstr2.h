@@ -638,7 +638,7 @@ BuildCT_SHORTSTR(const T& t1, ConstraintBlob& b)
   { "type": "constraint",
     "name": "shortstr2",
     "internal_name": "CT_SHORTSTR",
-    "args": [ "read_list", "read_tuples" ]
+    "args": [ "read_list", "read_short_tuples" ]
   }
   */
 
