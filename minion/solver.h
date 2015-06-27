@@ -60,7 +60,6 @@ class SearchState
 
   bool finished;
   bool failed;
-  jmp_buf g_env;
 
   ProbSpec::CSPInstance* csp_instance;
 
@@ -138,9 +137,6 @@ public:
 
   TimerClass& getOldTimer() { return oldtimer; }
 
-
-  jmp_buf* getJmpBufPtr() { return &g_env; }
-
   TupleListContainer* getTupleListContainer() { return &*tupleListContainer; }
   ShortTupleListContainer* getShortTupleListContainer() { return &*shortTupleListContainer; }
 
@@ -206,9 +202,6 @@ public:
   /// Gives the solutions which should be found.
   /// -1 denotes finding all solutions.
   long long sollimit;
-  /// Denotes if non-incremental propagation should be used.
-  /// Only for debugging.
-  bool fullpropagate;
   /// Denotes if solutions should be checked it they satisfy constraints.
   /// Only for debugging.
   bool nocheck;
@@ -283,7 +276,7 @@ public:
   SearchOptions() :
     find_generators(false),
     cspcomp(false), silent(false), printonlyoptimal(false),
-     dumptree(false), sollimit(1), fullpropagate(false),
+     dumptree(false), sollimit(1),
 #ifdef NO_DEBUG
     nocheck(true),
 #else

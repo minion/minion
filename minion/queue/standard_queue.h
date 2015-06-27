@@ -159,20 +159,9 @@ public:
           return true;
         }
 
-#ifndef NO_DEBUG
-        if(getOptions().fullpropagate)
-          it->full_propagate();
-        else
-        {
-          CON_INFO_ADDONE(StaticTrigger);
-          it->propagate(data_val);
-        }
-#else
-        {
-          CON_INFO_ADDONE(StaticTrigger);
-          it->propagate(data_val);
-        }
-#endif
+        CON_INFO_ADDONE(StaticTrigger);
+        it->propagate(data_val);
+
 #ifdef WDEG
         if(*fail_ptr)
           it->constraint->incWdeg();
@@ -276,20 +265,8 @@ public:
         }
         if(it->constraint->full_propagate_done)
         {
-#ifndef NO_DEBUG
-        if(getOptions().fullpropagate)
-          it->full_propagate();
-        else
-        {
           CON_INFO_ADDONE(StaticTrigger);
           it->propagate(data_val);
-        }
-#else
-        {
-          CON_INFO_ADDONE(StaticTrigger);
-          it->propagate(data_val);
-        }
-#endif
         }
       }
     }

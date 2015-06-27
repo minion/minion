@@ -312,18 +312,6 @@ help switches -prop-node
       string prop_mode(argv[i]);
       args.preprocess = GetPropMethodFromString(prop_mode);
     }
-/** @help switches;-fullprop Description
-Disable incremental propagation. This should always slow down search while producing exactly the same
-search tree. Only available in a DEBUG executable.
-*/
-    else if(command == string("-fullprop"))
-    {
-#ifndef NO_DEBUG
-      getOptions().fullpropagate = true;
-#else
-    FAIL_EXIT("This version of minion was not built to support the '-fullprop' command. Sorry");
-#endif
-    }
 /** @help switches;-nocheck Description
 Do not check solutions for correctness before printing them out.
 */
