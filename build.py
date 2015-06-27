@@ -214,11 +214,18 @@ for fname in getfilelist(scriptdir+"/minion"):
             fatal_error("Bad 'type' in JSON: "+str(d)+" in "+fname)
 
 ## Check for validity of JSON, collisions of internal_name
-internal_names = set()
-for c in constraints:
-    if c["internal_name"] in internal_names:
-        fatal_error("Duplicate internal_name: " + c["internal_name"])
+def validate_names(constraints):
+    internal_names = set()
+    names = set()
+    for c in constraints:
+        if c["internal_name"] in internal_names:
+            fatal_error("Duplicate internal_name: " + c["internal_name"])
+        internal_names.add(c["internal_name"])
+        if c["name"] in names:
+            fatal_error("Duplicate name: " + c["name"])
+        names.add(c["name"])
 
+validate_names(constraints)
 
 if verbose >= 1:
     print("Found the following constraints:")
