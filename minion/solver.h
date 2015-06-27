@@ -185,8 +185,6 @@ public:
 class SearchOptions
 {
 public:
-  /// Denotes if only generators for group should be found (only makes sense for groups)
-  bool find_generators;
 
   /// Denotes if we should output in a compatable way to the solver competition.
   bool cspcomp;
@@ -274,7 +272,6 @@ public:
   bool ensure_branch_on_all_vars;
 
   SearchOptions() :
-    find_generators(false),
     cspcomp(false), silent(false), printonlyoptimal(false),
      dumptree(false), sollimit(1),
 #ifdef NO_DEBUG

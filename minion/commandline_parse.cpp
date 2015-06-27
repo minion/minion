@@ -113,8 +113,6 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv)
     const string command(argv[i]);
     if(command == string("-findallsols"))
     { getOptions().findAllSolutions(); }
-    else if(command == string("-findgenerators"))
-    { getOptions().find_generators = true; }
     else if(command == string("-crash"))
     { debug_crash = true; }
 /** @help switches;-quiet Description
