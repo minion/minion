@@ -27,7 +27,7 @@
 #endif
 
 
-#include "../minlib/minlib.hpp"
+#include "minlib/minlib.hpp"
 
 #include "box-helper.h"
 
@@ -35,7 +35,7 @@
 
 
 #include "wrapper.h"
-#include "../minlib/tostring.hpp"
+#include "minlib/tostring.hpp"
 #include "tableout.h"
 #include "time_keeping.h"
 
@@ -46,7 +46,7 @@
 
 #include "test_functions.h"
 
-#include "../minlib/optional.hpp"
+#include "minlib/optional.hpp"
 
 #include <sys/types.h>
 #ifndef _WIN32
