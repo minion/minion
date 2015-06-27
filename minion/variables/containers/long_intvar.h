@@ -75,14 +75,14 @@ struct BigRangeVarRef_internal_template
 };
 
 #ifdef MORE_SEARCH_INFO
-typedef InfoRefType<VarRefType<BigRangeVarRef_internal_template<BitContainerType> >, VAR_INFO_BIGRANGEVAR> BigRangeVarRef;
+typedef InfoRefType<VarRefType<BigRangeVarRef_internal_template<UnsignedSysInt> >, VAR_INFO_BIGRANGEVAR> BigRangeVarRef;
 #else
-typedef VarRefType<BigRangeVarRef_internal_template<BitContainerType> > BigRangeVarRef;
+typedef VarRefType<BigRangeVarRef_internal_template<UnsignedSysInt> > BigRangeVarRef;
 #endif
 
 template<typename d_type>
 struct BigRangeVarContainer {
-  typedef BigRangeVarRef_internal_template<BitContainerType> BigRangeVarRef_internal;
+  typedef BigRangeVarRef_internal_template<UnsignedSysInt> BigRangeVarRef_internal;
 
   
 

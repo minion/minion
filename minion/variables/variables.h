@@ -45,7 +45,7 @@ class VariableContainer
 public:
   BoundVarContainer<> boundVarContainer;
   BoolVarContainer boolVarContainer;
-  BigRangeVarContainer<BitContainerType> bigRangeVarContainer;
+  BigRangeVarContainer<UnsignedSysInt> bigRangeVarContainer;
   SparseBoundVarContainer<> sparseBoundVarContainer;
 
 

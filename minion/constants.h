@@ -76,10 +76,4 @@ inline PropagationLevel GetPropMethodFromString(std::string s)
 struct EndOfSearch
 {};
 
-#ifndef CONTAINER_TYPE
-typedef UnsignedSysInt BitContainerType;
-#else
-typedef CONTAINER_TYPE BitContainerType;
-#endif
-
 #endif // _CONSTANTS_H
