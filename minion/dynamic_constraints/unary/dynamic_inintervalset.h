@@ -201,7 +201,7 @@ BuildCT_WATCHED_ININTERVALSET(const VarArray1& _var_array_1, const ConstraintBlo
 
 /* JSON
   { "type": "constraint",
-    "name": "w-inrange",
+    "name": "w-inintervalset",
     "internal_name": "CT_WATCHED_ININTERVALSET",
     "args": [ "read_var", "read_constant_list" ]
   }
