@@ -389,7 +389,7 @@ inline AbstractConstraint*
 
 /* JSON
   { "type": "constraint",
-    "name": "watchlumgeq",
+    "name": "watchsumleq",
     "internal_name": "CT_WATCHED_LEQSUM",
     "args": [ "read_list", "read_constant" ]
   }
