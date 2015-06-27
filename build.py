@@ -1,9 +1,18 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+
+from __future__ import print_function, absolute_import, division, generators, nested_scopes, with_statement
 
 import os, sys, functools, argparse, re, copy
 from os.path import join, getsize
 import json
 import subprocess
+
+try:
+    from subprocess import DEVNULL # py3k
+except ImportError:
+    import os
+    DEVNULL = open(os.devnull, 'wb')
+    
 
 ## Output functions
 verbose=1
@@ -23,7 +32,7 @@ def verbose_print(level, *args):
 ## Capture HG options
 def progout(prog):
     process = subprocess.Popen(prog, stdout=subprocess.PIPE,
-                                     stderr=subprocess.DEVNULL)
+                                     stderr=DEVNULL)
     (output, err) = process.communicate()
     exit_code = process.wait()
     return (output, err, exit_code)
@@ -31,8 +40,8 @@ def progout(prog):
 #Check if prog can be run
 def progexists(prog):
     try:
-        subprocess.call([prog], stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL)
+        subprocess.call([prog], stdout=DEVNULL,
+                                stderr=DEVNULL)
     except OSError as e:
         return False
     return True
@@ -322,15 +331,21 @@ with open(outname, "w") as out:
     if arg.buildsystem == "make":
         out.write('all : minion\n')
         
+    if arg.buildsystem == "make":
+        out.write(".PHONY: " + 
+        " ".join([objname(i) for i in constraintsrclist]) +
+        " ".join([objname(i) for i in minionsrclist]) + "\n")
     for i in constraintsrclist:
         if arg.buildsystem == "make":
-            out.write(objname(i) + ": "+i+'\n')
+            out.write(objname(i) + ":\n")
+#            out.write(objname(i) + ": "+i+'\n')
         out.write('\t'+compiler+' '+varsub('FLAGS') + ' -c -o ' +
                    objname(i) + " " + i +'\n')
     
     for i in minionsrclist:
         if arg.buildsystem == "make":
-            out.write(objname(i)+ " : "+ scriptdir + "/" + i +'\n')
+            out.write(objname(i)+ " :\n")
+            # out.write(objname(i)+ " : " + scriptdir + "/" + i +'\n')
         out.write('\t'+compiler+' ' + varsub('FLAGS') + ' -c -o ' +
                    objname(i) + " " + scriptdir + "/" + i +'\n')
     if arg.buildsystem == "make":
