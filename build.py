@@ -6,6 +6,7 @@ import os, sys, functools, argparse, re, copy
 from os.path import join, getsize
 import json
 import subprocess
+import platform
 
 try:
     from subprocess import DEVNULL # py3k
@@ -185,7 +186,10 @@ if arg.setflags:
     commandargs = arg.setflags.split()
     
 if not arg.unoptimised:
-    commandargs = commandargs + ["-O2"]
+    if platform.system() == 'Darwin':
+        commandargs = commandargs + ["-O3", "-mdynamic-no-pic", "-fomit-frame-pointer"]
+    else:
+        commandargs = commandargs + ["-O3", "-fomit-frame-pointer"]
 
 if arg.compiler:
     compiler = arg.compiler
