@@ -1,0 +1,14 @@
+MINION 3
+
+#TEST SOLCOUNT 7
+
+**VARIABLES**
+
+DISCRETE X {-2..5}
+DISCRETE Y {-5..-1}
+
+**CONSTRAINTS**
+
+min([X,Y],-1)
+
+**EOF**
