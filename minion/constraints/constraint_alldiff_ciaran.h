@@ -98,11 +98,11 @@ struct AlldiffCiaran : public AbstractConstraint
       
       
       vector<SysInt> sortedvars(var_array.size(), 0);
-      for(int i=0; i<var_array.size(); i++) sortedvars[i]=i;
+      for(unsigned int i=0; i<var_array.size(); i++) sortedvars[i]=i;
       
       // insertion sort
-      for (int i=1; i < ch.size(); i++) {
-        for (int j = i - 1; j >= 0; j--) {
+      for (unsigned int i=1; i < var_array.size(); i++) {
+        for (unsigned int j = i - 1; j >= 0; j--) {
             if (var_array[sortedvars[j+1]].getDomSize() < var_array[sortedvars[j]].getDomSize()) {
                 // swap
                 SysInt tmp=sortedvars[j+1];
@@ -134,7 +134,7 @@ struct AlldiffCiaran : public AbstractConstraint
       D.reserve(dom_max-dom_min+1);
       
       //  for each domain D, from smallest to largest:
-      for(SysInt i=0; i<var_array.size(); i++) {
+      for(unsigned int i=0; i<var_array.size(); i++) {
           SysInt var=sortedvars[i];
           
           //  D gets D \ H (remove previously seen Hall sets from D)
@@ -162,7 +162,7 @@ struct AlldiffCiaran : public AbstractConstraint
           
           //  if D = emptyset or |A| < n then fail
           if(D.size()==0 || A.size()<n) {
-              stateObj.setFailed(true);
+              getState(stateObj).setFailed(true);
               return;
           }
           
@@ -205,4 +205,4 @@ struct AlldiffCiaran : public AbstractConstraint
       return vars;
     }
 };
-
+#endif
