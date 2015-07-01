@@ -969,6 +969,11 @@ class testgacalldiffb(testalldiff):
         options["fixlength"]=True
         return runtestgeneral("gacalldiffb", False, options, [9], ["quitesmallnum"], self, not options['reify'])
 
+class testalldiffciaran(testalldiff):
+    def runtest(self, options=dict()):
+        return runtestgeneral("alldiffciaran", False, options, [5], ["quitesmallnum"], self, False)
+
+
 class testalldiffmatrix:
     def printtable(self, domains):
         val=self.constants[0]

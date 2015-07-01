@@ -188,6 +188,28 @@ struct AlldiffCiaran : public AbstractConstraint
       propagate(0,DomainDelta::empty());
   }
   
+  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
+  {
+      for(SysInt i=0; i< (SysInt) var_array.size(); i++) {
+          if(!var_array[i].isAssigned()) {
+              assignment.push_back(make_pair(i, var_array[i].getMin()));
+              assignment.push_back(make_pair(i, var_array[i].getMax()));
+              return true;
+          }
+      }
+      
+      // Otherwise, check pairwise assignments
+      for(SysInt i=0; i< (SysInt) var_array.size(); i++) {
+          for(SysInt j=i+1; j< (SysInt) var_array.size(); j++) {
+              if(var_array[i].getAssignedValue()==var_array[j].getAssignedValue()) {
+                  return false;
+              }
+          }
+      }
+      return true;
+  }
+    
+    
     virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
     {
       D_ASSERT(array_size == (SysInt)var_array.size());
