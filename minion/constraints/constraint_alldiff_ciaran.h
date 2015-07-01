@@ -95,7 +95,7 @@ struct AlldiffCiaran : public AbstractConstraint
              A gets empty set
              n gets 0
       */
-      
+      if(var_array.size()==0) return;
       
       vector<SysInt> sortedvars(var_array.size(), 0);
       for(unsigned int i=0; i<var_array.size(); i++) sortedvars[i]=i;
