@@ -101,8 +101,9 @@ struct AlldiffCiaran : public AbstractConstraint
       for(unsigned int i=0; i<var_array.size(); i++) sortedvars[i]=i;
       
       // insertion sort
-      for (unsigned int i=1; i < var_array.size(); i++) {
-        for (unsigned int j = i - 1; j >= 0; j--) {
+      for (SysInt i=1; i < (SysInt) var_array.size(); i++) {
+        for (SysInt j = i - 1; j >= 0; j--) {
+            
             if (var_array[sortedvars[j+1]].getDomSize() < var_array[sortedvars[j]].getDomSize()) {
                 // swap
                 SysInt tmp=sortedvars[j+1];
@@ -115,23 +116,23 @@ struct AlldiffCiaran : public AbstractConstraint
         }
       }
       
-      SysInt dom_min=var_array[0].getMin();
-      SysInt dom_max=var_array[0].getMax();
+      DomainInt dom_min=var_array[0].getMin();
+      DomainInt dom_max=var_array[0].getMax();
       for(unsigned int i=1; i<var_array.size(); i++) {
           if(var_array[i].getMin()<dom_min) dom_min=var_array[i].getMin();
           if(var_array[i].getMax()>dom_max) dom_max=var_array[i].getMax();
       }
       
       smallset H;  //  let H be the empty set (this will be a union of Hall sets we've found)
-      H.reserve(dom_max-dom_min+1);
+      H.reserve(checked_cast<SysInt>(dom_max-dom_min+1));
       
       smallset A;  //  let A be the empty set (this will be the accumulated union of domains not in H)
-      A.reserve(dom_max-dom_min+1);
+      A.reserve(checked_cast<SysInt>(dom_max-dom_min+1));
       
       SysInt n=0;  //   (this is the number of domains contributing to A)
       
       smallset D;
-      D.reserve(dom_max-dom_min+1);
+      D.reserve(checked_cast<SysInt>(dom_max-dom_min+1));
       
       //  for each domain D, from smallest to largest:
       for(unsigned int i=0; i<var_array.size(); i++) {
@@ -141,8 +142,8 @@ struct AlldiffCiaran : public AbstractConstraint
           D.clear();
           for(DomainInt j=var_array[var].getMin(); j<=var_array[var].getMax(); j++) {
               if(var_array[var].inDomain(j)) {
-                  if(! H.in(j-dom_min)) { 
-                      D.insert(j-dom_min);
+                  if(! H.in(checked_cast<SysInt>(j-dom_min)) ) { 
+                      D.insert(checked_cast<SysInt>(j-dom_min));
                   }
                   else {
                       var_array[var].removeFromDomain(j);   //  Value is in the union of known Hall sets. 
@@ -184,7 +185,7 @@ struct AlldiffCiaran : public AbstractConstraint
 
   virtual void full_propagate()
   {
-      propagate(0,0);
+      propagate(0,DomainDelta::empty());
   }
   
     virtual BOOL check_assignment(DomainInt* v, SysInt array_size)
