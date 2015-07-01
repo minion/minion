@@ -135,6 +135,9 @@ parser.add_argument('--info', action='store_const', const=['-DMORE_SEARCH_INFO']
 parser.add_argument('--unoptimised', action='store_true',
                     help="Disable optimisation")
                     
+parser.add_argument('--basicopt', action='store_true',
+                    help="Enable basic optimisation")
+                    
 parser.add_argument('--profile', action='store_true',
                     help='Enable compiler flags for profiling')
 
@@ -186,10 +189,13 @@ if arg.setflags:
     commandargs = arg.setflags.split()
     
 if not arg.unoptimised:
-    if platform.system() == 'Darwin':
-        commandargs = commandargs + ["-O3", "-mdynamic-no-pic", "-fomit-frame-pointer"]
+    if arg.basicopt:
+        commandargs = commandargs + ["-O2"]
     else:
-        commandargs = commandargs + ["-O3", "-fomit-frame-pointer"]
+        if platform.system() == 'Darwin':
+            commandargs = commandargs + ["-O3", "-mdynamic-no-pic", "-fomit-frame-pointer"]
+        else:
+            commandargs = commandargs + ["-O3", "-fomit-frame-pointer"]
 
 if arg.compiler:
     compiler = arg.compiler
