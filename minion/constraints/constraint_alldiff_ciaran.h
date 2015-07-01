@@ -33,7 +33,7 @@ This constraint enforces an unknown consistency.
 #include "../dynamic_constraints/dynamic_new_or.h"
 #include "../constraints/constraint_checkassign.h"
 
-#include "alldiff_gcc_common.h"
+#include "alldiff_gcc_shared.h"
 
 template<typename VarArray>
 struct AlldiffCiaran : public AbstractConstraint
