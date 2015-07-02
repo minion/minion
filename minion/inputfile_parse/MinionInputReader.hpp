@@ -177,18 +177,10 @@ BOOL MinionInputReader<FileReader>::readConstraint(FileReader* infile, BOOL reif
   }
   ConstraintDef* constraint = constraint_list + constraint_num;
 
-  switch(constraint->type)
-  {
-    case CT_WATCHED_TABLE:
-      readConstraintTable(infile, get_constraint(constraint->type));
-      break;
-    case CT_WATCHED_NEGATIVE_TABLE:
-      readConstraintTable(infile, get_constraint(constraint->type));
-      break;
-
-    default:
-      readGeneralConstraint(infile, constraint);
-  }
+  if(constraint->read_types[1] == read_tuples)
+    readConstraintTable(infile, get_constraint(constraint->type));
+  else
+    readGeneralConstraint(infile, constraint);
 
   instance->bounds_check_last_constraint();
   return true ;
