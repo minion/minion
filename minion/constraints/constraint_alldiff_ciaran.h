@@ -48,8 +48,10 @@ struct AlldiffCiaran : public AbstractConstraint
     VarArray var_array;
     
     AlldiffCiaran(StateObj* _stateObj, const VarArray& _var_array) : AbstractConstraint(_stateObj),
-        var_array(_var_array)
-    { }
+        var_array(_var_array), H(), A(), D(), sortedvars(_var_array.size(), 0)
+    {
+        for(unsigned int i=0; i<var_array.size(); i++) sortedvars[i]=i;
+    }
     
   virtual triggerCollection setup_internal()
   {
@@ -78,7 +80,15 @@ struct AlldiffCiaran : public AbstractConstraint
       }
       return new Dynamic_OR(stateObj, con);
   }
+  
+  smallset H;  
+  smallset A;  
+  smallset D;
 
+  DomainInt dom_min, dom_max;
+  
+  vector<SysInt> sortedvars;
+  
   virtual void propagate(DomainInt, DomainDelta)
   {
       /*
@@ -97,9 +107,6 @@ struct AlldiffCiaran : public AbstractConstraint
       */
       if(var_array.size()==0) return;
       
-      vector<SysInt> sortedvars(var_array.size(), 0);
-      for(unsigned int i=0; i<var_array.size(); i++) sortedvars[i]=i;
-      
       // insertion sort
       for (SysInt i=1; i < (SysInt) var_array.size(); i++) {
         for (SysInt j = i - 1; j >= 0; j--) {
@@ -116,27 +123,17 @@ struct AlldiffCiaran : public AbstractConstraint
         }
       }
       
-      DomainInt dom_min=var_array[0].getMin();
-      DomainInt dom_max=var_array[0].getMax();
-      for(unsigned int i=1; i<var_array.size(); i++) {
-          if(var_array[i].getMin()<dom_min) dom_min=var_array[i].getMin();
-          if(var_array[i].getMax()>dom_max) dom_max=var_array[i].getMax();
-      }
-      
-      smallset H;  //  let H be the empty set (this will be a union of Hall sets we've found)
-      H.reserve(checked_cast<SysInt>(dom_max-dom_min+1));
-      
-      smallset A;  //  let A be the empty set (this will be the accumulated union of domains not in H)
-      A.reserve(checked_cast<SysInt>(dom_max-dom_min+1));
+      H.clear();   //  let H be the empty set (this will be a union of Hall sets we've found)
+      A.clear();   //  let A be the empty set (this will be the accumulated union of domains not in H)
       
       SysInt n=0;  //   (this is the number of domains contributing to A)
       
-      smallset D;
-      D.reserve(checked_cast<SysInt>(dom_max-dom_min+1));
-      
+      //std::cout << "Starting main loop." << std::endl;
       //  for each domain D, from smallest to largest:
-      for(unsigned int i=0; i<var_array.size(); i++) {
+      for(unsigned int i=0; i<sortedvars.size(); i++) {
           SysInt var=sortedvars[i];
+          
+          //std::cout << "Processing variable :" << var << " ("<< var_array[var].getMin() << " ," << var_array[var].getMax() << ")" <<std::endl;
           
           //  D gets D \ H (remove previously seen Hall sets from D)
           D.clear();
@@ -185,6 +182,20 @@ struct AlldiffCiaran : public AbstractConstraint
 
   virtual void full_propagate()
   {
+      if(var_array.size()==0) return;
+      
+      dom_min=var_array[0].getMin();
+      dom_max=var_array[0].getMax();
+      for(unsigned int i=1; i<var_array.size(); i++) {
+          if(var_array[i].getMin()<dom_min) dom_min=var_array[i].getMin();
+          if(var_array[i].getMax()>dom_max) dom_max=var_array[i].getMax();
+      }
+      
+      //  Set up the smallsets
+      H.reserve(checked_cast<SysInt>(dom_max-dom_min+1));
+      A.reserve(checked_cast<SysInt>(dom_max-dom_min+1));
+      D.reserve(checked_cast<SysInt>(dom_max-dom_min+1));
+      
       propagate(0,DomainDelta::empty());
   }
   
