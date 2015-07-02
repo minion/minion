@@ -124,6 +124,8 @@ parser.add_argument('--quick', action='store_const', const=['-DQUICK_COMPILE'],
 
 parser.add_argument('--compiler', help="Set compiler")
 
+parser.add_argument('--constraints', help="Comma seperated list of constraints to use")
+
 parser.add_argument('--debug', action='store_const',
                     const=['-D_GLIBCXX_DEBUG', '-DMINION_DEBUG', '-DMORE_SEARCH_INFO'],
                     help='Enable debugging')
@@ -249,6 +251,19 @@ validate_names(constraints)
 if verbose >= 1:
     print("Found the following constraints:")
     print([c["name"] for c in constraints])
+
+## Filter list, if variable exists
+if arg.constraints:
+    newcon = []
+    for c in list(set(arg.constraints.split(",") + ['true','false','pow','product'])):
+        found = False
+        for con in constraints:
+            if con["name"] == c or con["internal_name"] == c:
+                found = True
+                newcon = newcon + [con]
+        if not found:
+            fatal_error("Did not find constraint '"+c+"'")
+    constraints = newcon
 
 constraintsrclist = []
 
