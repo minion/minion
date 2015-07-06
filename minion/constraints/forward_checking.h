@@ -176,7 +176,7 @@ struct Forward_Checking : public AbstractConstraint
       for(; i<size ; i++) {
           if(i!=toavoid  &&  !(*vars)[i].isAssigned())
           {
-              (*vars)[i].addDynamicTrigger(dtthis, Assigned);
+              moveTrigger((*vars)[i], dtthis, Assigned);
               return i;
           }
       }
@@ -185,7 +185,7 @@ struct Forward_Checking : public AbstractConstraint
       for(i=0; i<=start; i++) {
           if(i!=toavoid  &&  !(*vars)[i].isAssigned())
           {
-              (*vars)[i].addDynamicTrigger(dtthis, Assigned);
+              moveTrigger((*vars)[i], dtthis, Assigned);
               return i;
           }
       }
@@ -200,7 +200,7 @@ struct Forward_Checking : public AbstractConstraint
       else {
           // It's a bound var. 
           FCPruning.remove(0);  // go into 'pruning' mode
-          (*vars)[var].addDynamicTrigger(dynamic_trigger_start()+2, DomainChanged);
+          moveTrigger((*vars)[var], dynamic_trigger_start()+2, DomainChanged);
           pruningvar=var;
           fc_pruning_bound(var, size, vars);
       }

@@ -74,11 +74,11 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
       return; //don't bother placing any watches on unit clause
     }
     //not failed or unit, place watches
-    var_array[first_found].addDynamicTrigger(dt, DomainRemoval, negs[first_found]);
+    moveTrigger(var_array[first_found], dt, DomainRemoval, negs[first_found]);
     dt->trigger_info() = first_found;
     watched[0] = first_found;
     dt++;
-    var_array[next_found].addDynamicTrigger(dt, DomainRemoval, negs[next_found]);
+    moveTrigger(var_array[next_found], dt, DomainRemoval, negs[next_found]);
     dt->trigger_info() = next_found;
     watched[1] = next_found;
   }
@@ -92,7 +92,7 @@ struct BoolOrConstraintDynamic : public AbstractConstraint
       VarRef& v = var_array[j];
       DomainInt neg = negs[j];
       if(j != other_var && v.inDomain(neg)) {
-    v.addDynamicTrigger(dt, DomainRemoval, neg);
+    moveTrigger(v, dt, DomainRemoval, neg);
     dt->trigger_info() = j;
     last = j;
     watched[watched[0] == prev_var ? 0 : 1] = j;

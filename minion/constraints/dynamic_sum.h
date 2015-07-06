@@ -182,7 +182,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
         if(var_array[i].inDomain(1 - VarToCount))
         {
           dt->trigger_info() = i;
-          var_array[i].addDynamicTrigger(dt, VarToCount ? LowerBound : UpperBound);
+          moveTrigger(var_array[i], dt, VarToCount ? LowerBound : UpperBound);
           ++dt;
         }
         else
@@ -246,7 +246,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
       SysInt& unwatched_index = unwatched(j);
 
       dt->trigger_info() = unwatched_index;
-      var_array[unwatched_index].addDynamicTrigger(
+      moveTrigger(var_array[unwatched_index], 
         dt,
         VarToCount ? LowerBound : UpperBound);
 

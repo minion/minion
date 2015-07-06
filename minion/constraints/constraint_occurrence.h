@@ -234,7 +234,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
           {
               if(!var_array[newsupport].isAssigned())
               {
-                  var_array[newsupport].addDynamicTrigger(dt, Assigned);
+                  moveTrigger(var_array[newsupport], dt, Assigned);
                   return newsupport;
               }
           }
@@ -246,7 +246,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
           {
               if(!var_array[newsupport].isAssigned())
               {
-                  var_array[newsupport].addDynamicTrigger(dt, Assigned);
+                  moveTrigger(var_array[newsupport], dt, Assigned);
                   return newsupport;
               }
           }

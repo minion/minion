@@ -288,7 +288,7 @@ struct NewTableConstraint : public AbstractConstraint
         P(vars.size() << ".Watching " << v << "." << support[v] << " for " << lit.var << "." << lit.val);
         D_ASSERT(vars[v].inDomain(support[v]));
         PROP_INFO_ADDONE(CounterA);
-        vars[v].addDynamicTrigger(dt, DomainRemoval, support[v] , TO_Store);
+        moveTrigger(vars[v], dt, DomainRemoval, support[v] , TO_Store);
         ++dt;
       }
     }

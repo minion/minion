@@ -58,7 +58,7 @@ template<typename Var>
         else if(var.getMax() == val)
             var.setMax(val - 1);
         else
-            var.addDynamicTrigger(dynamic_trigger_start(), DomainChanged);
+            moveTrigger(var, dynamic_trigger_start(), DomainChanged);
     }
     else
       var.removeFromDomain(val); 

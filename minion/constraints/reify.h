@@ -418,9 +418,9 @@ struct reify : public ParentConstraint
       D_ASSERT(vars[aif].inDomain(assignment[i].second));
       D_ASSERT(trig+i < endtrig);
       if(vars[aif].isBound()) {
-        vars[aif].addDynamicTrigger(trig + i, DomainChanged);
+        moveTrigger(vars[aif], trig + i, DomainChanged);
       } else {
-        vars[aif].addDynamicTrigger(trig + i, DomainRemoval, assignment[i].second);
+        moveTrigger(vars[aif], trig + i, DomainRemoval, assignment[i].second);
       }
     }
     // clear a contiguous block of used triggers up to (not including) endtrig

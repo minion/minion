@@ -91,7 +91,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   void add_triggers(DomainInt index_in, DynamicTrigger* dt)
   {
     const SysInt index = checked_cast<SysInt>(index_in);
-    Operator::add_triggers(var_array1[index], var_array2[index], dt);
+    Operator::add_triggers(this, var_array1[index], var_array2[index], dt);
   }
 
   virtual void full_propagate()

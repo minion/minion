@@ -76,7 +76,7 @@ template<typename Var>
     if(var.isBound())
     {
       // May as well pass DomainRemoval
-      var.addDynamicTrigger(dt, DomainChanged);
+      moveTrigger(var, dt, DomainChanged);
       propagate(NULL);
     }
     else

@@ -143,11 +143,11 @@ struct Dynamic_reify_true_old: public AbstractConstraint
                     D_ASSERT(poscon_vars[aif].inDomain(assignment[i].second));
                     if (poscon_vars[aif].isBound())
                     {
-                        poscon_vars[aif].addDynamicTrigger(assign_trigs + i, DomainChanged);
+                        moveTrigger(poscon_vars[aif], assign_trigs + i, DomainChanged);
                     }
                     else
                     {
-                        poscon_vars[aif].addDynamicTrigger(assign_trigs + i, DomainRemoval,
+                        moveTrigger(poscon_vars[aif], assign_trigs + i, DomainRemoval,
                                 assignment[i].second);
                     }
                 }
@@ -177,7 +177,7 @@ struct Dynamic_reify_true_old: public AbstractConstraint
         for (SysInt i = 0; i < dt_count; ++i)
             releaseTrigger(dt + i);
 
-        rar_var.addDynamicTrigger(dt, LowerBound);
+        moveTrigger(rar_var, dt, LowerBound);
         bool flag;
         GET_ASSIGNMENT(assignment, poscon);
 
@@ -196,12 +196,12 @@ struct Dynamic_reify_true_old: public AbstractConstraint
             D_ASSERT(poscon_vars[aif].inDomain(assignment[i].second));
             if (poscon_vars[aif].isBound())
             {
-                poscon_vars[aif].addDynamicTrigger(assign_trigs
+                moveTrigger(poscon_vars[aif], assign_trigs
                         + i, DomainChanged);
             }
             else
             {
-                poscon_vars[aif].addDynamicTrigger(assign_trigs
+                moveTrigger(poscon_vars[aif], assign_trigs
                         + i, DomainRemoval, assignment[i].second);
             }
         }

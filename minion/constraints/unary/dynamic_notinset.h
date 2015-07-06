@@ -60,7 +60,7 @@ template<typename Var>
 
     if(var.isBound())
     {
-      var.addDynamicTrigger(dt, DomainChanged);
+      moveTrigger(var, dt, DomainChanged);
       propagate(NULL);
     }
     else

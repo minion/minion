@@ -66,12 +66,12 @@ struct BoolBinarySATConstraintDynamic : public AbstractConstraint
     }
     
     dt->trigger_info() = 0;
-    var1.addDynamicTrigger(dt, UpperBound);
+    moveTrigger(var1, dt, UpperBound);
     
     ++dt;
     
     dt->trigger_info() = 1;
-    var2.addDynamicTrigger(dt, UpperBound);
+    moveTrigger(var2, dt, UpperBound);
     
     return;
   }

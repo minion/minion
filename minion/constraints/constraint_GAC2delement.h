@@ -294,9 +294,9 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			}
 		}
 		//add new literal triggers
-		var_array[rowlength * checked_cast<int>(support2) + checked_cast<int>(support)].addDynamicTrigger(dt + 3*j, DomainRemoval, support3);
-		indexvar1.addDynamicTrigger(dt + 3*j + 1, DomainRemoval, support);
-		indexvar2.addDynamicTrigger(dt + 3*j + 1+1, DomainRemoval, support2);
+		moveTrigger(var_array[rowlength * checked_cast<int>(support2) + checked_cast<int>(support)], dt + 3*j, DomainRemoval, support3);
+		moveTrigger(indexvar1, dt + 3*j + 1, DomainRemoval, support);
+		moveTrigger(indexvar2, dt + 3*j + 1+1, DomainRemoval, support2);
 		current_support_result_i1[j] = support;
 		current_support_result_i2[j] = support2;
 	}
@@ -337,9 +337,9 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 					
 					if (found)
 					{
-						var_array[rowlength*i+j].addDynamicTrigger(dt + 3*i, DomainRemoval, support3);
-						resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, resultvarmin);
-						indexvar1.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval,j);
+						var_array[rowlength*i+moveTrigger(j], dt + 3*i, DomainRemoval, support3);
+						moveTrigger(resultvar, dt + 3*i + 1, DomainRemoval, resultvarmin);
+						moveTrigger(indexvar1, dt + 3*i + 1+1, DomainRemoval,j);
 						current_support_index2_result[i] = resultvarmin;
 						current_support_index2_index1[i] = j;
 						return;
@@ -432,9 +432,9 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			
 		}
 		//add new supporting literal triggers
-		var_array[checked_cast<SysInt>(rowlength*i+support_index1)].addDynamicTrigger(dt + 3*i, DomainRemoval, support3);
-		resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, support_result);
-		indexvar1.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval, support_index1);
+		moveTrigger(var_array[checked_cast<SysInt>(rowlength*i+support_index1)], dt + 3*i, DomainRemoval, support3);
+		moveTrigger(resultvar, dt + 3*i + 1, DomainRemoval, support_result);
+		moveTrigger(indexvar1, dt + 3*i + 1+1, DomainRemoval, support_index1);
 		current_support_index2_index1[i] = support_index1;
 		current_support_index2_result[i] = support_result;
 	}
@@ -471,9 +471,9 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 					
 					if (found)
 					{
-						var_array[rowlength*j+i].addDynamicTrigger(dt + 3*i, DomainRemoval, support3);
-						resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, resultvarmin);
-						indexvar2.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval,j);
+						var_array[rowlength*j+moveTrigger(i], dt + 3*i, DomainRemoval, support3);
+						moveTrigger(resultvar, dt + 3*i + 1, DomainRemoval, resultvarmin);
+						moveTrigger(indexvar2, dt + 3*i + 1+1, DomainRemoval,j);
 						current_support_index1_result[i] = resultvarmin;
 						current_support_index1_index2[i] = j;
 						return;
@@ -569,9 +569,9 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			
 		}
 		//add new supporting literal triggers		
-		var_array[checked_cast<SysInt>(rowlength*support_index2+i)].addDynamicTrigger(dt + 3*i, DomainRemoval, support3);
-		resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, support_result);
-		indexvar2.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval, support_index2);
+		moveTrigger(var_array[checked_cast<SysInt>(rowlength*support_index2+i)], dt + 3*i, DomainRemoval, support3);
+		moveTrigger(resultvar, dt + 3*i + 1, DomainRemoval, support_result);
+		moveTrigger(indexvar2, dt + 3*i + 1+1, DomainRemoval, support_index2);
 		current_support_index1_index2[i] = support_index2;
 		current_support_index1_result[i] = support_result;
 	}
@@ -625,19 +625,19 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 		++dt;
 		//check for out of range value in Y1/Y2 and setup static trigger
 		if (indexvar1.getMin() < 0){
-			indexvar1.addDynamicTrigger(dt, DomainChanged);
+			moveTrigger(indexvar1, dt, DomainChanged);
 			return true;
 		}
 		else if (indexvar1.getMax() > rowlength - 1){
-			indexvar1.addDynamicTrigger(dt, DomainChanged);
+			moveTrigger(indexvar1, dt, DomainChanged);
 			return true;
 		}
 		else if  (indexvar2.getMin() < 0){
-			indexvar2.addDynamicTrigger(dt, DomainChanged);
+			moveTrigger(indexvar2, dt, DomainChanged);
 			return true;
 		}
 		else if (indexvar2.getMax() > ((SysInt)(var_array.size())/rowlength)-1){
-			indexvar2.addDynamicTrigger(dt, DomainChanged);
+			moveTrigger(indexvar2, dt, DomainChanged);
 			return true;
 		}
 		return false;
@@ -701,9 +701,9 @@ struct GAC2DElementNOTConstraint : public AbstractConstraint
 			DynamicTrigger* dt = dynamic_trigger_start();
 			dt +=  var_array.size()* 3 + var_array.size() *3  + checked_cast<int>((initial_result_dom_max - initial_result_dom_min + 1) * 3) ;
 			
-			indexvar1.addDynamicTrigger(dt, Assigned);
+			moveTrigger(indexvar1, dt, Assigned);
 			++dt;		
-			indexvar2.addDynamicTrigger(dt, Assigned);
+			moveTrigger(indexvar2, dt, Assigned);
 		}
 	}
 	
@@ -1122,9 +1122,9 @@ struct GAC2DElementConstraint : public AbstractConstraint
 			}
 		}
 		//add new literal triggers on new supporting values
-		var_array[checked_cast<SysInt>(rowlength * support2 + support)].addDynamicTrigger(dt + 3*j, DomainRemoval, realj);
-		indexvar1.addDynamicTrigger(dt + 3*j + 1, DomainRemoval, support);
-		indexvar2.addDynamicTrigger(dt + 3*j + 1+1, DomainRemoval, support2);
+		moveTrigger(var_array[checked_cast<SysInt>(rowlength * support2 + support)], dt + 3*j, DomainRemoval, realj);
+		moveTrigger(indexvar1, dt + 3*j + 1, DomainRemoval, support);
+		moveTrigger(indexvar2, dt + 3*j + 1+1, DomainRemoval, support2);
 		current_support_result_i1[j] = support;
 		current_support_result_i2[j] = support2;
 	}
@@ -1148,9 +1148,9 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		{
 			for (SysInt j=checked_cast<SysInt>(indexvar1.getMin());j<checked_cast<SysInt>(indexvar1.getMax()+1);j++){
 				if (indexvar1.inDomain(j) && var_array[rowlength*i+j].inDomain(resultvarmin)){
-					var_array[rowlength*i+j].addDynamicTrigger(dt + 3*i, DomainRemoval, resultvarmin);
-					resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, resultvarmin);
-					indexvar1.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval,j);
+					var_array[rowlength*i+moveTrigger(j], dt + 3*i, DomainRemoval, resultvarmin);
+					moveTrigger(resultvar, dt + 3*i + 1, DomainRemoval, resultvarmin);
+					moveTrigger(indexvar1, dt + 3*i + 1+1, DomainRemoval,j);
 					current_support_index2_result[i] = resultvarmin;
 					current_support_index2_index1[i] = j;
 					found=true;
@@ -1246,9 +1246,9 @@ struct GAC2DElementConstraint : public AbstractConstraint
 			
 		}
 		//add new support literals
-		var_array[checked_cast<SysInt>(rowlength*i+support_index1)].addDynamicTrigger(dt + 3*i, DomainRemoval, support_result);
-		resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, support_result);
-		indexvar1.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval, support_index1);
+		moveTrigger(var_array[checked_cast<SysInt>(rowlength*i+support_index1)], dt + 3*i, DomainRemoval, support_result);
+		moveTrigger(resultvar, dt + 3*i + 1, DomainRemoval, support_result);
+		moveTrigger(indexvar1, dt + 3*i + 1+1, DomainRemoval, support_index1);
 		current_support_index2_index1[i] = support_index1;
 		current_support_index2_result[i] = support_result;
 	}
@@ -1272,9 +1272,9 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		{
 			for (SysInt j=checked_cast<SysInt>(indexvar2.getMin());j<checked_cast<SysInt>(indexvar2.getMax()+1);j++){
 				if(indexvar2.inDomain(j) && var_array[rowlength*j+i].inDomain(resultvarmin)){
-					var_array[rowlength*j+i].addDynamicTrigger(dt + 3*i, DomainRemoval, resultvarmin);
-					resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, resultvarmin);
-					indexvar2.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval,j);
+					var_array[rowlength*j+moveTrigger(i], dt + 3*i, DomainRemoval, resultvarmin);
+					moveTrigger(resultvar, dt + 3*i + 1, DomainRemoval, resultvarmin);
+					moveTrigger(indexvar2, dt + 3*i + 1+1, DomainRemoval,j);
 					current_support_index1_result[i] = resultvarmin;
 					current_support_index1_index2[i] = j;
 					found=true;
@@ -1379,9 +1379,9 @@ struct GAC2DElementConstraint : public AbstractConstraint
 			
 		}
 		//add new support literals
-		var_array[checked_cast<SysInt>(rowlength*support_index2+i)].addDynamicTrigger(dt + 3*i, DomainRemoval, support_result);
-		resultvar.addDynamicTrigger(dt + 3*i + 1, DomainRemoval, support_result);
-		indexvar2.addDynamicTrigger(dt + 3*i + 1+1, DomainRemoval, support_index2);
+		var_array[checked_cast<SysInt>(rowlength*support_index2+i)moveTrigger(], dt + 3*i, DomainRemoval, support_result);
+		moveTrigger(resultvar, dt + 3*i + 1, DomainRemoval, support_result);
+		moveTrigger(indexvar2, dt + 3*i + 1+1, DomainRemoval, support_index2);
 		current_support_index1_index2[i] = support_index2;
 		current_support_index1_result[i] = support_result;
 		
@@ -1486,11 +1486,11 @@ struct GAC2DElementConstraint : public AbstractConstraint
 		dt +=  var_array.size()* 3 + var_array.size() *3  + checked_cast<int>((initial_result_dom_max - initial_result_dom_min + 1) * 3) ;
 		
 		//static triggers
-		resultvar.addDynamicTrigger(dt, DomainChanged);  
+		moveTrigger(resultvar, dt, DomainChanged);  
 		++dt;
-		indexvar1.addDynamicTrigger(dt, Assigned);
+		moveTrigger(indexvar1, dt, Assigned);
 		++dt;		
-		indexvar2.addDynamicTrigger(dt, Assigned);
+		moveTrigger(indexvar2, dt, Assigned);
 	}
 	
 	

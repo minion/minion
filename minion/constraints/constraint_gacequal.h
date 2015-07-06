@@ -108,13 +108,13 @@ struct GACEqualConstraint : public AbstractConstraint
       
       for(DomainInt val=var1.getMin(); val<=var1.getMax(); val++) {
           if(var1.inDomain(val)) {
-              var1.addDynamicTrigger(dynamic_trigger_start()+checked_cast<SysInt>(val-var1.getInitialMin()), DomainRemoval, val );
+              moveTrigger(var1, dynamic_trigger_start()+checked_cast<SysInt>(val-var1.getInitialMin()), DomainRemoval, val );
           }
       }
       
       for(DomainInt val=var2.getMin(); val<=var2.getMax(); val++) {
           if(var2.inDomain(val)) {
-              var2.addDynamicTrigger(dtvar2+checked_cast<SysInt>(val-var2.getInitialMin()), DomainRemoval, val );
+              moveTrigger(var2, dtvar2+checked_cast<SysInt>(val-var2.getInitialMin()), DomainRemoval, val );
           }
       }
       

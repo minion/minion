@@ -80,7 +80,7 @@ struct Check_Assign : public AbstractConstraint
     {
         if(!(*vars)[i].isAssigned())
         {
-            (*vars)[i].addDynamicTrigger(dt, DomainChanged);
+            moveTrigger((*vars)[i], dt, DomainChanged);
             return;
         }
     }

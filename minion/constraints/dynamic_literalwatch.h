@@ -150,7 +150,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
         if(var_array[i].inDomain(value_array[i]))
         {
           dt->trigger_info() = i;
-          var_array[i].addDynamicTrigger(dt, DomainRemoval, value_array[i]);
+          moveTrigger(var_array[i], dt, DomainRemoval, value_array[i]);
           ++dt;
         }
         else
@@ -215,7 +215,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
       // propval gives array index of old watched lit
 
       dt->trigger_info() = unwatched_index;
-      var_array[unwatched_index].addDynamicTrigger(dt,DomainRemoval,
+      moveTrigger(var_array[unwatched_index], dt,DomainRemoval,
                                                    value_array[unwatched_index]);
 
       unwatched_index = propval;

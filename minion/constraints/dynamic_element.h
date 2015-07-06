@@ -176,14 +176,14 @@ struct ElementConstraintDynamic : public AbstractConstraint
     {
       if(indexvar.getMin() < 0)
       {
-        indexvar.addDynamicTrigger(dt+2*j, DomainRemoval, indexvar.getMin());
+        moveTrigger(indexvar, dt+2*j, DomainRemoval, indexvar.getMin());
         releaseTrigger((dt+2*j+1));
         return;
       }
 
       if(indexvar.getMax() >= (SysInt)var_array.size())
       {
-        indexvar.addDynamicTrigger(dt+2*j, DomainRemoval, indexvar.getMax());
+        moveTrigger(indexvar, dt+2*j, DomainRemoval, indexvar.getMax());
         releaseTrigger((dt+2*j+1));
         return;
       }
@@ -227,8 +227,8 @@ struct ElementConstraintDynamic : public AbstractConstraint
         return;
       }
     }
-    var_array[checked_cast<SysInt>(support)].addDynamicTrigger(dt + 2*j, DomainRemoval, realj);
-    indexvar.addDynamicTrigger(dt + 2*j + 1, DomainRemoval, support);
+    moveTrigger(var_array[checked_cast<SysInt>(support)], dt + 2*j, DomainRemoval, realj);
+    moveTrigger(indexvar, dt + 2*j + 1, DomainRemoval, support);
     current_support[j + array_size] = support;
   }
 
@@ -257,8 +257,8 @@ struct ElementConstraintDynamic : public AbstractConstraint
         indexvar.removeFromDomain(i);
       else
       {
-        var_array[i].addDynamicTrigger(dt + 2*i, DomainRemoval, resultvarmin);
-        resultvar.addDynamicTrigger(dt + 2*i + 1, DomainRemoval, resultvarmin);
+        moveTrigger(var_array[i], dt + 2*i, DomainRemoval, resultvarmin);
+        moveTrigger(resultvar, dt + 2*i + 1, DomainRemoval, resultvarmin);
         current_support[i] = resultvarmin;
       }
       return;
@@ -289,8 +289,8 @@ struct ElementConstraintDynamic : public AbstractConstraint
       }
     }
 
-    var_array[i].addDynamicTrigger(dt + 2*i, DomainRemoval, support);
-    resultvar.addDynamicTrigger(dt + 2*i + 1, DomainRemoval, support);
+    moveTrigger(var_array[i], dt + 2*i, DomainRemoval, support);
+    moveTrigger(resultvar, dt + 2*i + 1, DomainRemoval, support);
     current_support[i] = support;
   }
 
@@ -380,19 +380,19 @@ struct ElementConstraintDynamic : public AbstractConstraint
 
     // for(SysInt i = initial_result_dom_min; i <= initial_result_dom_max; ++i)
     // {
-    // resultvar.addDynamicTrigger(dt, DomainRemoval, i);
+    // moveTrigger(resultvar, dt, DomainRemoval, i);
     // ++dt;
     // }
-    resultvar.addDynamicTrigger(dt, DomainChanged);  // Why is this always here-- why not place it when indexvar becomes assigned, lift it
+    moveTrigger(resultvar, dt, DomainChanged);  // Why is this always here-- why not place it when indexvar becomes assigned, lift it
     // whenever it triggers when indexvar is not assigned.
     ++dt;
 
-    indexvar.addDynamicTrigger(dt, Assigned);
+    moveTrigger(indexvar, dt, Assigned);
     if(undef_maps_zero)
     {
       ++dt;
       if(resultvar.inDomain(0))
-        resultvar.addDynamicTrigger(dt, DomainRemoval, 0);
+        moveTrigger(resultvar, dt, DomainRemoval, 0);
     }
   }
 

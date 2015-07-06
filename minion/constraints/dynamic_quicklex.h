@@ -65,8 +65,8 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   {
       P("Attach Trigger: " << i);
       DynamicTrigger* dt = dynamic_trigger_start();
-      var_array1[i].addDynamicTrigger(dt, LowerBound, NoDomainValue , TO_Backtrack);
-      var_array2[i].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue , TO_Backtrack);
+      moveTrigger(var_array1[i], dt, LowerBound, NoDomainValue , TO_Backtrack);
+      moveTrigger(var_array2[i], dt + 1, UpperBound, NoDomainValue , TO_Backtrack);
   }
 
   void detach_triggers()
@@ -103,8 +103,8 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     }
 
     // Set these up, just so they are stored.
-    var_array1[0].addDynamicTrigger(dt, LowerBound, NoDomainValue , TO_Store);
-    var_array2[0].addDynamicTrigger(dt + 1, UpperBound, NoDomainValue , TO_Store);
+    moveTrigger(var_array1[0], dt, LowerBound, NoDomainValue , TO_Store);
+    moveTrigger(var_array2[0], dt + 1, UpperBound, NoDomainValue , TO_Store);
 
     if(var_array1[0].isAssigned() && var_array2[0].isAssigned() &&
        var_array1[0].getAssignedValue() == var_array2[0].getAssignedValue())

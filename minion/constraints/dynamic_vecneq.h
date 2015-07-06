@@ -79,12 +79,12 @@ struct EqIterated
   }
 
   template<typename VarType1, typename VarType2>
-  static void add_triggers(VarType1& var1, VarType2& var2, DynamicTrigger* dt)
+  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DynamicTrigger* dt)
   {
-     var1.addDynamicTrigger(dt, LowerBound);
-     var1.addDynamicTrigger(dt + 1, UpperBound);
-     var2.addDynamicTrigger(dt + 2, LowerBound);
-     var2.addDynamicTrigger(dt + 3, UpperBound);
+     ac->moveTrigger(var1, dt, LowerBound);
+     ac->moveTrigger(var1, dt + 1, UpperBound);
+     ac->moveTrigger(var2, dt + 2, LowerBound);
+     ac->moveTrigger(var2, dt + 3, UpperBound);
   }
 
   template<typename Var1, typename Var2>
@@ -148,10 +148,10 @@ struct NeqIterated
   }
 
   template<typename VarType1, typename VarType2>
-  static void add_triggers(VarType1& var1, VarType2& var2, DynamicTrigger* dt)
+  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DynamicTrigger* dt)
   {
-     var1.addDynamicTrigger(dt, Assigned);
-     var2.addDynamicTrigger(dt + 1, Assigned);
+     ac->moveTrigger(var1, dt, Assigned);
+     ac->moveTrigger(var2, dt + 1, Assigned);
   }
 
   template<typename Var>
@@ -229,10 +229,10 @@ struct LessIterated
   }
 
   template<typename VarType1, typename VarType2>
-  static void add_triggers(VarType1& var1, VarType2& var2, DynamicTrigger* dt)
+  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DynamicTrigger* dt)
   {
-     var1.addDynamicTrigger(dt, LowerBound);
-     var2.addDynamicTrigger(dt + 1, UpperBound);
+     ac->moveTrigger(var1, dt, LowerBound);
+     ac->moveTrigger(var2, dt + 1, UpperBound);
   }
 
   template<typename Var1, typename Var2>
@@ -282,10 +282,10 @@ struct BothNonZeroIterated
   }
 
   template<typename VarType1, typename VarType2>
-  static void add_triggers(VarType1& var1, VarType2& var2, DynamicTrigger* dt)
+  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DynamicTrigger* dt)
   {
-     var1.addDynamicTrigger(dt, UpperBound);
-     var2.addDynamicTrigger(dt + 1, UpperBound);
+     ac->moveTrigger(var1, dt, UpperBound);
+     ac->moveTrigger(var2, dt + 1, UpperBound);
   }
 
   template<typename Var1, typename Var2>
@@ -348,7 +348,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
 
   void add_triggers(SysInt index, DynamicTrigger* dt)
   {
-    Operator::add_triggers(var_array1[index], var_array2[index], dt);
+    Operator::add_triggers(this, var_array1[index], var_array2[index], dt);
   }
 
   virtual void full_propagate()

@@ -491,7 +491,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable
       dt=dt+checked_cast<SysInt>((var*numvals)+(val-dom_min));
       D_ASSERT(!dt->isAttached());
 
-      vars[var].addDynamicTrigger(dt, DomainRemoval, val );
+      moveTrigger(vars[var], dt, DomainRemoval, val );
   }
 
 

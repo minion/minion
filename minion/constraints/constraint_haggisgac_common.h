@@ -348,7 +348,7 @@
       dt=dt+lit;
       D_ASSERT(!dt->isAttached());
 
-      vars[var].addDynamicTrigger(dt, DomainRemoval, val );   //, TO_Backtrack
+      moveTrigger(vars[var], dt, DomainRemoval, val );   //, TO_Backtrack
   }
 
   inline void detach_trigger(SysInt lit)

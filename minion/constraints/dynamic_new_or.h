@@ -257,9 +257,9 @@ struct Dynamic_OR : public ParentConstraint
     {
       const SysInt af = checked_cast<SysInt>(assignment[i].first);
         if(vars[af].isBound())
-            vars[af].addDynamicTrigger(dt + i, DomainChanged);
+            moveTrigger(vars[af], dt + i, DomainChanged);
         else
-            vars[af].addDynamicTrigger(dt + i, DomainRemoval, assignment[i].second);
+            moveTrigger(vars[af], dt + i, DomainRemoval, assignment[i].second);
     }
   }
 

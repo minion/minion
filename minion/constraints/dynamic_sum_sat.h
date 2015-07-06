@@ -84,12 +84,12 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
     }
     
     dt->trigger_info() = trig1;
-    var_array[trig1].addDynamicTrigger(dt, UpperBound);
+    moveTrigger(var_array[trig1], dt, UpperBound);
     
     ++dt;
     
     dt->trigger_info() = trig2;
-    var_array[trig2].addDynamicTrigger(dt, UpperBound);
+    moveTrigger(var_array[trig2], dt, UpperBound);
     
     return;
   }
@@ -147,7 +147,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
     // Found new value to watch
     dt->trigger_info() = loop;
     last = loop;
-    var_array[loop].addDynamicTrigger(dt, UpperBound);
+    moveTrigger(var_array[loop], dt, UpperBound);
   }
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)

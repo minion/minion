@@ -978,7 +978,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                     {
                         // arranged in blocks for each variable, with numvals triggers in each block
                         DynamicTrigger* mydt= dt+(var*numvals)+(i-dom_min);
-                        var_array[var].addDynamicTrigger(mydt, DomainRemoval, i);
+                        moveTrigger(var_array[var], mydt, DomainRemoval, i);
                     }
                 }
             }
@@ -1251,7 +1251,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 SysInt var=var_indices[i];
                 triggercount[var]=1;
 
-                var_array[var].addDynamicTriggerBT(get_dt(var, 0),
+                moveTrigger(var_array[var], get_dt(var, 0),
                     DomainRemoval, varvalmatching[var]);
                 P("Adding DT for var " << var_indices[i] << " val " << varvalmatching[var_indices[i]]);
                 #endif
@@ -1459,7 +1459,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                                 #endif
 
                                 #ifdef DYNAMICALLDIFF
-                                var_array[newnode].addDynamicTriggerBT(get_dt(newnode, triggercount[newnode]),
+                                moveTrigger(var_array[newnode], get_dt(newnode, triggercount[newnode]),
                                     DomainRemoval, curnode-numvars+dom_min);
                                 triggercount[newnode]++;
                                 #endif
@@ -1521,7 +1521,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                 watches[lowlinkvar].insert(curnode-numvars);
                 #endif
                 #ifdef DYNAMICALLDIFF
-                var_array[lowlinkvar].addDynamicTriggerBT(get_dt(lowlinkvar, triggercount[lowlinkvar]),
+                moveTrigger(var_array[lowlinkvar], get_dt(lowlinkvar, triggercount[lowlinkvar]),
                     DomainRemoval, curnode-numvars+dom_min);
                 triggercount[lowlinkvar]++;
                 #endif

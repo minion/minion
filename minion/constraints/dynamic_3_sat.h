@@ -84,12 +84,12 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
     }
     
     dt->trigger_info() = trig1;
-    var_array[trig1].addDynamicTrigger(dt, UpperBound);
+    moveTrigger(var_array[trig1], dt, UpperBound);
     
     ++dt;
     
     dt->trigger_info() = trig2;
-    var_array[trig2].addDynamicTrigger(dt, UpperBound);
+    moveTrigger(var_array[trig2], dt, UpperBound);
     
     return;
   }
@@ -127,7 +127,7 @@ struct BoolThreeSATConstraintDynamic : public AbstractConstraint
     {
       // Found new value to watch
       dt->trigger_info() = unchecked_val;
-      var_array[unchecked_val].addDynamicTrigger(dt, UpperBound);
+      moveTrigger(var_array[unchecked_val], dt, UpperBound);
     }
     else
     { var_array[other_propval].propagateAssign(1); }

@@ -163,8 +163,8 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     if(!get_sumsupport(x, y, i, supp)) {
       z.removeFromDomain(i);
     } else {
-      x.addDynamicTrigger(dt, DomainRemoval, supp[0]);
-      y.addDynamicTrigger(dt+1, DomainRemoval, supp[1]);
+      moveTrigger(x, dt, DomainRemoval, supp[0]);
+      moveTrigger(y, dt+1, DomainRemoval, supp[1]);
       dt->trigger_info() = i;     //keep a note of the value it supports
       (dt+1)->trigger_info() = i;
       workingData.other = index + 1;
@@ -184,8 +184,8 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     if(!get_diffsupport(z, y, ymult, i*xmult, supp)) {
       x.removeFromDomain(i);
     } else {
-      z.addDynamicTrigger(dt, DomainRemoval, supp[0]);
-      y.addDynamicTrigger(dt + 1, DomainRemoval, supp[1]);
+      moveTrigger(z, dt, DomainRemoval, supp[0]);
+      moveTrigger(y, dt + 1, DomainRemoval, supp[1]);
       dt->trigger_info() = i;
       (dt+1)->trigger_info() = i;
       workingData.other = index + 1;
@@ -205,8 +205,8 @@ struct SumEqConstraintDynamic : public AbstractConstraint
     if(!get_diffsupport(z, x, xmult, i*ymult, supp)) {
       y.removeFromDomain(i);
     } else {
-      z.addDynamicTrigger(dt, DomainRemoval, supp[0]);
-      x.addDynamicTrigger(dt + 1, DomainRemoval, supp[1]);
+      moveTrigger(z, dt, DomainRemoval, supp[0]);
+      moveTrigger(x, dt + 1, DomainRemoval, supp[1]);
       dt->trigger_info() = i;
       (dt+1)->trigger_info() = i;
       workingData.other = index + 1;
@@ -236,22 +236,22 @@ struct SumEqConstraintDynamic : public AbstractConstraint
       if(!get_diffsupport(z, y, ymult, value*xmult, supp)) {
     x.removeFromDomain(value);
       } else {
-    z.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
-    y.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
+    moveTrigger(z, first_dt, DomainRemoval, supp[0]);
+    moveTrigger(y, first_dt + 1, DomainRemoval, supp[1]);
       }
     } else if(data.isForY) {
       if(!get_diffsupport(z, x, xmult, value*ymult, supp)) {
     y.removeFromDomain(value);
       } else {
-    z.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
-    x.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
+    moveTrigger(z, first_dt, DomainRemoval, supp[0]);
+    moveTrigger(x, first_dt + 1, DomainRemoval, supp[1]);
       }
     } else {
       if(!get_sumsupport(x, y, value, supp)) {
     z.removeFromDomain(value);
       } else {
-    x.addDynamicTrigger(first_dt, DomainRemoval, supp[0]);
-    y.addDynamicTrigger(first_dt + 1, DomainRemoval, supp[1]);
+    moveTrigger(x, first_dt, DomainRemoval, supp[0]);
+    moveTrigger(y, first_dt + 1, DomainRemoval, supp[1]);
       }
     }
   }

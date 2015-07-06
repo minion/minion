@@ -457,7 +457,7 @@ struct GACTableConstraint : public AbstractConstraint
     {
       if(v != var)
       {
-        vars[v].addDynamicTrigger(dt, DomainRemoval, tuple[v]);
+        moveTrigger(vars[v], dt, DomainRemoval, tuple[v]);
         ++dt;
       }
     }

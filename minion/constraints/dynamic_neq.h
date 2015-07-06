@@ -64,8 +64,8 @@ struct WatchNeqConstraint : public AbstractConstraint
         return;
       }
       
-    var1.addDynamicTrigger(dt    , Assigned);
-    var2.addDynamicTrigger(dt + 1, Assigned);
+    moveTrigger(var1, dt    , Assigned);
+    moveTrigger(var2, dt + 1, Assigned);
   }
   
     

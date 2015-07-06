@@ -288,7 +288,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     {
                         // arranged in blocks for each variable, with numvals triggers in each block
                         DynamicTrigger* mydt= dt+(var*numvals)+(i-dom_min);
-                        var_array[var].addDynamicTrigger(mydt, DomainRemoval, i);
+                        this->moveTrigger(var_array[var], mydt, DomainRemoval, i);
                     }
                 }
             }
@@ -2268,7 +2268,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         for(SysInt i=0; i<numvars; i++)
         {
             D_ASSERT((dt+i)->trigger_info() == (forbiddenval-dom_min)*2);
-            var_array[i].addDynamicTrigger(dt+i, DomainRemoval, varvalmatching[i]);
+            this->moveTrigger(var_array[i], dt+i, DomainRemoval, varvalmatching[i]);
         }
         for(SysInt i=0; i<val_array.size(); i++)
         {
@@ -2276,11 +2276,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 
             if(val_array[i]>= dom_min && val_array[i]<= dom_max)
             {
-                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
+                this->moveTrigger(capacity_array[i], dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
             }
             else
             {
-                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, 0);
+                this->moveTrigger(capacity_array[i], dt+numvars+i, DomainRemoval, 0);
             }
         }
         #endif
@@ -2426,18 +2426,18 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         for(SysInt i=0; i<numvars; i++)
         {
             D_ASSERT((dt+i)->trigger_info() == (value-dom_min)*2+1);
-            var_array[i].addDynamicTrigger(dt+i, DomainRemoval, varvalmatching[i]);
+            this->moveTrigger(var_array[i], dt+i, DomainRemoval, varvalmatching[i]);
         }
         for(SysInt i=0; i<val_array.size(); i++)
         {
             D_ASSERT((dt+numvars+i)->trigger_info() == (value-dom_min)*2+1);
             if(val_array[i]>= dom_min && val_array[i]<= dom_max)
             {
-                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
+                this->moveTrigger(capacity_array[i], dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
             }
             else
             {
-                capacity_array[i].addDynamicTrigger(dt+numvars+i, DomainRemoval, 0);
+                this->moveTrigger(capacity_array[i], dt+numvars+i, DomainRemoval, 0);
             }
         }
         #endif
