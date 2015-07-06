@@ -60,7 +60,6 @@ public:
     var_count_m = 0;
     lock_first = lock_second = 0;
 
-    dynamic_triggers = 0;
     vars_min_domain_val = 0;
     vars_max_domain_val = 0;
     vars_domain_size = 0;
@@ -68,7 +67,10 @@ public:
 
   vector<vector<vector<Trigger> > > triggers;
 
-  void* dynamic_triggers;
+  vector<vector<DynamicTrigger> > dynamic_triggers_vec;
+  vector<vector<DynamicTrigger> > dynamic_triggers_domain_vec;
+  
+  //void* dynamic_triggers;
 
   SysInt var_count_m;
   SysInt lock_first;
@@ -87,14 +89,28 @@ public:
     vars_max_domain_val = max_domain_val;
     vars_domain_size = checked_cast<UnsignedSysInt>(max_domain_val - min_domain_val + 1);
 
+    dynamic_triggers_vec.resize(4);
+    
+    for(int i = 0; i < 4; ++i)
+      dynamic_triggers_vec[i].resize(var_count_m);
+      
+    if(!only_bounds)
+    {
+      dynamic_triggers_domain_vec.resize(vars_domain_size);
+      for(int i = 0; i < vars_domain_size; ++i)
+        dynamic_triggers_domain_vec[i].resize(var_count_m);
+    }
+
     triggers.resize(4);
     for(UnsignedSysInt i = 0; i < 4; ++i)
       triggers[i].resize(var_count_m);
 
-    if(only_bounds)
+/*
+   if(only_bounds)
       dynamic_triggers = checked_malloc(size * sizeof(DynamicTrigger) * 4);
     else
       dynamic_triggers = checked_malloc(size * sizeof(DynamicTrigger) * (4 + vars_domain_size));
+*/
     getTriggerMem().addTriggerList(this);
   }
 
@@ -103,19 +119,19 @@ public:
     D_ASSERT(lock_first && !lock_second);
     lock_second = true;
 
-    DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers);
+/*    DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers);
 
     DomainInt trigger_types = ( only_bounds ? 4 : (4 + vars_domain_size));
     for(SysInt i = 0; i < var_count_m * trigger_types; ++i)
     {
       new (trigger_ptr + i) DynamicTrigger;
       D_ASSERT((trigger_ptr + i)->sanity_check_list());
-    }
+    }*/
   }
 
   pair<Trigger*, Trigger*> get_trigger_range(DomainInt var_num, TrigType type)
   {
-    vector<Trigger>& trigs = triggers[type][var_num];
+    vector<Trigger>& trigs = triggers[type][checked_cast<SysInt>(var_num)];
     return pair<Trigger*,Trigger*>(trigs.data(), trigs.data()+trigs.size());
   }
 
@@ -126,16 +142,18 @@ public:
     DynamicTrigger* trig;
     if(type != DomainRemoval)
     {
-      trig = static_cast<DynamicTrigger*>(dynamic_triggers)
-        + checked_cast<SysInt>(var_num + type*var_count_m);
+      trig = &(dynamic_triggers_vec[type][checked_cast<SysInt>(var_num)]);
+//      trig = static_cast<DynamicTrigger*>(dynamic_triggers)
+//        + checked_cast<SysInt>(var_num + type*var_count_m);
     }
     else
     {
       D_ASSERT(!only_bounds);
       D_ASSERT(vars_min_domain_val <= val_removed);
       D_ASSERT(vars_max_domain_val >= val_removed);
-      trig = static_cast<DynamicTrigger*>(dynamic_triggers)
-        + checked_cast<SysInt>(var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m);
+      trig = &(dynamic_triggers_domain_vec[checked_cast<SysInt>(val_removed - vars_min_domain_val)][checked_cast<SysInt>(var_num)]);
+//      trig = static_cast<DynamicTrigger*>(dynamic_triggers)
+//        + checked_cast<SysInt>(var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m);
     }
     D_ASSERT(trig->next != NULL);
     // This is an optimisation, no need to push empty lists.
@@ -219,19 +237,25 @@ public:
     (void)old_list;
     old_list = t->next;
     DynamicTrigger* queue;
+    
+    
+    
     if(type != DomainRemoval)
     {
-      queue = static_cast<DynamicTrigger*>(dynamic_triggers)
-        + checked_cast<SysInt>(b + type*var_count_m);
+      queue = &dynamic_triggers_vec[type][checked_cast<SysInt>(b)];
+//      trig = static_cast<DynamicTrigger*>(dynamic_triggers)
+//        + checked_cast<SysInt>(var_num + type*var_count_m);
     }
     else
     {
       D_ASSERT(!only_bounds);
       D_ASSERT(vars_min_domain_val <= val);
       D_ASSERT(vars_max_domain_val >= val);
-      queue = static_cast<DynamicTrigger*>(dynamic_triggers)
-        + checked_cast<SysInt>(b + (DomainRemoval + (val - vars_min_domain_val)) * var_count_m);
+      queue = &dynamic_triggers_domain_vec[checked_cast<SysInt>(val - vars_min_domain_val)][checked_cast<SysInt>(b)];
+//      trig = static_cast<DynamicTrigger*>(dynamic_triggers)
+//        + checked_cast<SysInt>(var_num + (DomainRemoval + (val_removed - vars_min_domain_val)) * var_count_m);
     }
+    
     D_ASSERT(queue->sanity_check_list());
 
     switch(op)
