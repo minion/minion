@@ -358,8 +358,7 @@ with open(outname, "w") as out:
         
     if arg.buildsystem == "make":
         out.write(".PHONY: " + 
-        " ".join([objname(i) for i in constraintsrclist]) +
-        " ".join([objname(i) for i in minionsrclist]) + "\n")
+        " ".join([objname(i) for i in constraintsrclist] + [objname(i) for i in minionsrclist]) + "\n")
     for i in constraintsrclist:
         if arg.buildsystem == "make":
             out.write(objname(i) + ":\n")
