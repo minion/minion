@@ -33,8 +33,6 @@ class TriggerList;
 class TriggerMem
 {
   vector<TriggerList*> trigger_lists;
-  char* triggerlist_data;
-  
 
 public:
   void addTriggerList(TriggerList* t)
@@ -42,18 +40,8 @@ public:
 
   void finaliseTriggerLists();
 
-  TriggerMem() : triggerlist_data(NULL)
+  TriggerMem()
   {}
-
-  void allocateTriggerListData(UnsignedSysInt mem)
-  {
-    D_ASSERT(triggerlist_data == NULL);
-    triggerlist_data = new char[mem];
-  }
-
-  char* getTriggerListDataPtr() { return triggerlist_data; }
-  ~TriggerMem()
-  { delete[] triggerlist_data; }
 };
 
 class TriggerList
@@ -73,7 +61,6 @@ public:
     lock_first = lock_second = 0;
 
     dynamic_triggers = 0;
-    trigger_data_m = 0;
     vars_min_domain_val = 0;
     vars_max_domain_val = 0;
     vars_domain_size = 0;
@@ -82,9 +69,6 @@ public:
   vector<vector<vector<Trigger> > > triggers;
 
   void* dynamic_triggers;
-
-
-  Trigger** trigger_data_m;
 
   SysInt var_count_m;
   SysInt lock_first;
@@ -114,57 +98,16 @@ public:
     getTriggerMem().addTriggerList(this);
   }
 
-  size_t memRequirement()
-  {
-    D_ASSERT(lock_first && !lock_second);
-    size_t storage = 0;
-    for(UnsignedSysInt i = 0; i < 4; ++i)
-    {
-      for(UnsignedSysInt j = 0; j < triggers[i].size(); ++j)
-        storage += triggers[i][j].size();
-    }
-    return storage * sizeof(Trigger) + 4 * (var_count_m + 1) * sizeof(Trigger*);
-  }
-
   struct CompareMem
   {
     bool operator()(const Trigger& t1, const Trigger& t2)
     { return t1.constraint->getTrigWeight() < t2.constraint->getTrigWeight(); }
   };
 
-  void allocateMem(char* mem_start)
+  void allocateMem()
   {
     D_ASSERT(lock_first && !lock_second);
     lock_second = true;
-    Trigger** trigger_ranges = (Trigger**)(mem_start);
-    trigger_data_m = trigger_ranges;
-    Trigger* trigger_data = (Trigger*)(mem_start + 4 * (triggers[UpperBound].size() + 1) * sizeof(Trigger*));
-
-    for(UnsignedSysInt type = 0; type < 4; ++type)
-    {
-      for(UnsignedSysInt i = 0; i < triggers[type].size(); ++i)
-      {
-        *trigger_ranges = trigger_data;
-        ++trigger_ranges;
-        for(UnsignedSysInt j = 0; j < triggers[type][i].size(); ++j)
-        {
-          *trigger_data = triggers[type][i][j];
-          trigger_data++;
-        }
-      }
-      *trigger_ranges = trigger_data;
-      ++trigger_ranges;
-    }
-
-    D_ASSERT(static_cast<void*>(mem_start + 4 * (var_count_m + 1) * sizeof(Trigger*)) ==
-      static_cast<void*>(trigger_ranges));
-
-
-  // This is a common C++ trick to completely free the memory of an object.
-    {
-      vector<vector<vector<Trigger> > > t;
-      triggers.swap(t);
-    }
 
     DynamicTrigger* trigger_ptr = static_cast<DynamicTrigger*>(dynamic_triggers);
 
@@ -178,11 +121,8 @@ public:
 
   pair<Trigger*, Trigger*> get_trigger_range(DomainInt var_num, TrigType type)
   {
-    Trigger** first_trig = trigger_data_m + checked_cast<SysInt>(var_num) + (var_count_m + 1) * type;
-    Trigger* trig_range_start = *first_trig;
-    first_trig++;
-    Trigger* trig_range_end = *first_trig;
-    return pair<Trigger*,Trigger*>(trig_range_start, trig_range_end);
+    vector<Trigger>& trigs = triggers[type][var_num];
+    return pair<Trigger*,Trigger*>(trigs.data(), trigs.data()+trigs.size());
   }
 
   void dynamic_propagate(DomainInt var_num, TrigType type, DomainInt val_removed = NoDomainValue)
@@ -326,20 +266,10 @@ public:
 
 void inline TriggerMem::finaliseTriggerLists()
   {
-    size_t trigger_size = 0;
-    for(UnsignedSysInt i = 0;i < trigger_lists.size(); i++)
-      trigger_size += trigger_lists[i]->memRequirement();
-    getTriggerMem().allocateTriggerListData(trigger_size);
-
-    char* triggerlist_offset = getTriggerMem().getTriggerListDataPtr();
-
     for(UnsignedSysInt i=0;i<trigger_lists.size();i++)
     {
-      size_t offset = trigger_lists[i]->memRequirement();
-      trigger_lists[i]->allocateMem(triggerlist_offset);
-      triggerlist_offset += offset;
+      trigger_lists[i]->allocateMem();
     }
-    D_ASSERT(triggerlist_offset - getTriggerMem().getTriggerListDataPtr() == (SysInt)trigger_size);
   }
 
 inline void releaseTrigger(DynamicTrigger* t , TrigOp op)
