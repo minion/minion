@@ -26,7 +26,6 @@ class SearchOptions;
 class SearchState;
 class Queues;
 class Memory;
-class TriggerMem;
 class VariableContainer;
 
 
@@ -35,7 +34,6 @@ inline SearchOptions& getOptions();
 inline SearchState& getState();
 inline Queues& getQueue();
 inline Memory& getMemory();
-inline TriggerMem& getTriggerMem();
 inline VariableContainer& getVars();
 
 

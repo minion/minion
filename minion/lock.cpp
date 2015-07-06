@@ -34,8 +34,6 @@ void lock()
   
   getMemory().monotonicSet().lock();
   
-  getTriggerMem().finaliseTriggerLists();
-  
   // No longer AC1, thank goodness.
   for(SysInt i = 0; i < size; ++i)
   {

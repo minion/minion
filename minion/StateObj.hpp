@@ -28,7 +28,6 @@ VARDEF(Memory searchMem_m);
 VARDEF(SearchOptions options_m);
 VARDEF(SearchState state_m);
 VARDEF(Queues queues_m);
-VARDEF(TriggerMem triggerMem_m);
 VARDEF(VariableContainer varContainer_m);
 VARDEF(BoolContainer bools_m);
 
@@ -42,8 +41,6 @@ inline Queues& getQueue()
 { return queues_m; }
 inline Memory& getMemory()
 { return searchMem_m; }
-inline TriggerMem& getTriggerMem()
-{ return triggerMem_m; }
 inline VariableContainer& getVars()
 { return varContainer_m; }
 
