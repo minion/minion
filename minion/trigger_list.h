@@ -98,12 +98,6 @@ public:
     getTriggerMem().addTriggerList(this);
   }
 
-  struct CompareMem
-  {
-    bool operator()(const Trigger& t1, const Trigger& t2)
-    { return t1.constraint->getTrigWeight() < t2.constraint->getTrigWeight(); }
-  };
-
   void allocateMem()
   {
     D_ASSERT(lock_first && !lock_second);
