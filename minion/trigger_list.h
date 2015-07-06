@@ -42,7 +42,6 @@ public:
   only_bounds(_only_bounds)
   {
     var_count_m = 0;
-    lock_first = lock_second = 0;
 
     vars_min_domain_val = 0;
     vars_max_domain_val = 0;
@@ -57,8 +56,6 @@ public:
   //void* dynamic_triggers;
 
   SysInt var_count_m;
-  SysInt lock_first;
-  SysInt lock_second;
 
   DomainInt vars_min_domain_val;
   DomainInt vars_max_domain_val;
@@ -66,8 +63,6 @@ public:
 
   void lock(SysInt size, DomainInt min_domain_val, DomainInt max_domain_val)
   {
-    D_ASSERT(!lock_first && !lock_second);
-    lock_first = true;
     var_count_m = size;
     vars_min_domain_val = min_domain_val;
     vars_max_domain_val = max_domain_val;
@@ -121,7 +116,6 @@ public:
   void push_upper(DomainInt var_num, DomainInt upper_delta)
   {
     dynamic_propagate(var_num, UpperBound);
-    D_ASSERT(lock_second);
     D_ASSERT(upper_delta > 0 || getState().isFailed());
 
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
@@ -133,7 +127,6 @@ public:
   void push_lower(DomainInt var_num, DomainInt lower_delta)
   {
     dynamic_propagate(var_num, LowerBound);
-    D_ASSERT(lock_second);
     D_ASSERT(lower_delta > 0 || getState().isFailed());
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
     if(range.first != range.second)
@@ -145,7 +138,6 @@ public:
   void push_assign(DomainInt var_num, DomainInt)
   {
     dynamic_propagate(var_num, Assigned);
-    D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
     if(range.first != range.second)
       getQueue().pushTriggers(TriggerRange(range.first, range.second, -1));
@@ -155,7 +147,6 @@ public:
   {
     dynamic_propagate(var_num, DomainChanged);
 
-    D_ASSERT(lock_second);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
     if (range.first != range.second)
       getQueue().pushTriggers(TriggerRange(range.first, range.second, -1));
@@ -165,27 +156,23 @@ public:
   {
     D_ASSERT(!only_bounds);
     dynamic_propagate(var_num, DomainRemoval, val_removed);
-    D_ASSERT(lock_second);
   }
 
   void add_domain_trigger(DomainInt b, Trigger t)
   {
     D_ASSERT(!only_bounds);
-    D_ASSERT(lock_first && !lock_second);
     triggers[DomainChanged][checked_cast<SysInt>(b)].push_back(t);
   }
 
   void add_trigger(DomainInt b, Trigger t, TrigType type)
   {
     D_ASSERT(type != DomainRemoval);
-    D_ASSERT(lock_first && !lock_second);
     triggers[type][checked_cast<SysInt>(b)].push_back(t);
   }
 
 
   void addDynamicTrigger(DomainInt b, DynamicTrigger* t, TrigType type, DomainInt val , TrigOp op = TO_Default)
   {
-    D_ASSERT(lock_second);
     D_ASSERT(!only_bounds || type != DomainRemoval);
     D_ASSERT(t->constraint != NULL);
     D_ASSERT(t->sanity_check == 1234);
