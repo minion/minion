@@ -127,7 +127,7 @@ parser.add_argument('--compiler', help="Set compiler")
 parser.add_argument('--constraints', help="Comma seperated list of constraints to use")
 
 parser.add_argument('--debug', action='store_const',
-                    const=['-D_GLIBCXX_DEBUG', '-DMINION_DEBUG', '-DMORE_SEARCH_INFO'],
+                    const=['-D_GLIBCXX_DEBUG', '-DMINION_DEBUG', '-DMORE_SEARCH_INFO', '-g'],
                     help='Enable debugging')
 parser.add_argument('--print', action='store_const', const=['-DMINION_DEBUG_PRINT'],
                     help='Enable verbose debug printing')
@@ -177,7 +177,7 @@ if not os.path.exists(objdir):
 verbose_print(1, "Current dir: " + currentdir)
 verbose_print(1, "Minion base dir: " + scriptdir)
 
-commandargs = ["-Wall", "-std=gnu++11", "-Wextra", "-Wno-unused-parameter",
+commandargs = ["-Wall", "-std=gnu++11", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
                "-I", scriptdir + "/minion", "-I", outsrcdir]
 
 for c in ['domains64', 'wdeg', 'quick', 'debug', 'print', 'info']:
