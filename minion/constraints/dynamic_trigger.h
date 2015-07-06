@@ -21,9 +21,12 @@
 /// This is a trigger to a constraint, which can be dynamically moved around.
 class DynamicTrigger
 {
-private:
+public:
   /// Hidden, as copying a DynamicTrigger is almost certainly an error.
-  DynamicTrigger(const DynamicTrigger&);
+  DynamicTrigger(const DynamicTrigger&)
+  {
+    abort();
+  }
 public:
 
   /// In debug mode, a value set to 1234 if this is a DynamicTrigger, or 4321 if this
