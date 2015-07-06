@@ -120,7 +120,7 @@ parser.add_argument('--domains64', action='store_const', const=["-DDOMAINS64"],
 parser.add_argument('--wdeg', action='store_const', const=["-DWDEG"],
                     help='Enable wdeg heuristics')
 parser.add_argument('--quick', action='store_const', const=['-DQUICK_COMPILE'],
-                    help='Enable debugging')
+                    help='Quick build')
 
 parser.add_argument('--compiler', help="Set compiler")
 
