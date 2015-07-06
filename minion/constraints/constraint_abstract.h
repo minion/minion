@@ -281,7 +281,7 @@ public:
   
   template<typename Var>
   void moveTrigger(Var& v, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
-  { v.addDynamicTrigger(t, type, pos, op); }
+  { v.addDynamicTrigger(this, t, type, pos, op); }
 };
 
 /// Constraint from which other constraints can be inherited. Extends dynamicconstraint to allow children to be dynamic.

@@ -171,7 +171,7 @@ public:
   }
 
 
-  void addDynamicTrigger(DomainInt b, DynamicTrigger* t, TrigType type, DomainInt val , TrigOp op = TO_Default)
+  void addDynamicTrigger(AbstractConstraint* ac, DomainInt b, DynamicTrigger* t, TrigType type, DomainInt val , TrigOp op = TO_Default)
   {
     D_ASSERT(!only_bounds || type != DomainRemoval);
     D_ASSERT(t->constraint != NULL);

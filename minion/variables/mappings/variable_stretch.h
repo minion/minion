@@ -222,8 +222,8 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
     }
   }
 
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
-  {  data.addDynamicTrigger(t, type, pos); }
+  void addDynamicTrigger(AbstractConstraint* ac, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
+  {  data.addDynamicTrigger(ac, t, type, pos); }
 
 
   friend std::ostream& operator<<(std::ostream& o, const MultiplyVar& n)
@@ -396,28 +396,28 @@ struct MultiplyVar
     }
   }
 
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
+  void addDynamicTrigger(AbstractConstraint* ac, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
   {
     switch(type)
     {
       case UpperBound:
       if(Multiply>=0)
-        data.addDynamicTrigger(t, UpperBound, pos , op);
+        data.addDynamicTrigger(ac, t, UpperBound, pos , op);
       else
-        data.addDynamicTrigger(t, LowerBound, pos , op);
+        data.addDynamicTrigger(ac, t, LowerBound, pos , op);
       break;
       case LowerBound:
       if(Multiply>=0)
-        data.addDynamicTrigger(t, LowerBound, pos , op);
+        data.addDynamicTrigger(ac, t, LowerBound, pos , op);
       else
-        data.addDynamicTrigger(t, UpperBound, pos , op);
+        data.addDynamicTrigger(ac, t, UpperBound, pos , op);
         break;
       case Assigned:
       case DomainChanged:
-        data.addDynamicTrigger(t, type, pos , op);
+        data.addDynamicTrigger(ac, t, type, pos , op);
         break;
       case DomainRemoval:
-        data.addDynamicTrigger(t, DomainRemoval,
+        data.addDynamicTrigger(ac, t, DomainRemoval,
                                MultiplyHelp<VarRef>::divide_exact(pos, Multiply) , op);
         break;
       default:

@@ -433,7 +433,7 @@ struct SparseBoundVarContainer {
   { wdegs[b.var_num]++; }
 #endif
 
-  void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
+  void addDynamicTrigger(AbstractConstraint* ac, SparseBoundVarRef_internal<BoundType> b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
   {
     D_ASSERT(lock_m);
     if(type == DomainRemoval)
@@ -441,7 +441,7 @@ struct SparseBoundVarContainer {
       USER_ERROR("Some constraint you are using does not work with SPARSEBOUND variables\n"
                  "Unfortunatly we cannot tell you which one. Sorry!");
     }
-    trigger_list.addDynamicTrigger(b.var_num, t, type, pos , op);
+    trigger_list.addDynamicTrigger(ac, b.var_num, t, type, pos , op);
   }
 
   operator std::string()

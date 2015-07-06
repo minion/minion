@@ -327,12 +327,12 @@ struct BoolVarContainer
     trigger_list.add_trigger(b.var_num, t, type);
   }
 
-  void addDynamicTrigger(BoolVarRef_internal& b, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
+  void addDynamicTrigger(AbstractConstraint* ac, BoolVarRef_internal& b,  DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
   {
     D_ASSERT(pos == NoDomainValue || ( type == DomainRemoval && pos != NoDomainValue ) );
     D_ASSERT(lock_m);
 
-    trigger_list.addDynamicTrigger(b.var_num, t, type, pos , op);
+    trigger_list.addDynamicTrigger(ac, b.var_num, t, type, pos , op);
   }
 
 

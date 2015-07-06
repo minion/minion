@@ -103,7 +103,7 @@ struct ConstantVar
   { }
 
 
-  void addDynamicTrigger(DynamicTrigger* dt, TrigType, DomainInt = NoDomainValue , TrigOp op = TO_Default)
+  void addDynamicTrigger(AbstractConstraint* ac, DynamicTrigger* dt, TrigType, DomainInt = NoDomainValue , TrigOp op = TO_Default)
   {
     attachTriggerToNullList(dt , op);
   }
