@@ -1,0 +1,12 @@
+#TEST SOLCOUNT 4
+MINION 3
+
+**VARIABLES**
+
+DISCRETE a[3] {10000000000000005..10000000000000006}
+
+**CONSTRAINTS**
+
+check[assign](min([a[0],a[1]], a[2]))
+
+**EOF**
