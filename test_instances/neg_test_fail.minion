@@ -1,0 +1,11 @@
+#TEST SOLCOUNT 0
+#FAIL
+MINION 3
+**VARIABLES**
+BOOL b[4]
+DISCRETE x {1..4}
+**CONSTRAINTS**
+
+reify(sumgeq([b[0],b[1],b[2]],2),!x)
+neq(0,1)
+**EOF**

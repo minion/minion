@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="minion.js"></script>
+    <script>
+    $(document).ready(function(){
+        // output from SR -O0
+        // find x,y : int(1..5)
+        // such that |x=y| = 2
+        var model = "MINION 3\n\
+                    **VARIABLES**\n\
+                    DISCRETE x #\n\
+                    {1..5}\n\
+                    DISCRETE y #\n\
+                    {1..5}\n\
+                    DISCRETE aux0 #(x-1*y)\n\
+                    {-4..4}\n\
+                    DISCRETE aux1 #|aux0|\n\
+                    {0..4}\n\
+                    **SEARCH**\n\
+                    PRINT[[x],[y]]\n\
+                    VARORDER STATIC [x, y]\n\
+                    VARORDER AUX [x,y,aux0,aux1]\n\
+                    **CONSTRAINTS**\n\
+                    abs(aux1, aux0)\n\
+                    w-literal(aux1,2)\n\
+                    weightedsumleq([1,-1],[x,y],aux0)\n\
+                    weightedsumgeq([1,-1],[x,y],aux0)\n\
+                    **EOF**";
+        var numVars = 2;
+        var numSol = 0;
+        var lastSol = [];
+        minion.run(model, {
+            args: ["-findallsols", "-randomiseorder"],
+            stdoutHandler: function(line) {
+                lastSol.push(line);
+                if (lastSol.length == numVars) {
+                    numSol++;
+                    $("#solutions").append("solution " + numSol + ": " + lastSol.toString() + "\n");
+                    lastSol = [];
+                }
+            },
+            statsHandler: function(stats) {
+                var headers = stats.split("\n")[0].trim().split(" ");
+                var values  = stats.split("\n")[1].trim().split(" ");
+                for (i=0; i < headers.length; i++) {
+                    $("#stats").append(headers[i] + ": " + values[i] + "\n");
+                }
+            }
+        });
+    });
+    </script>
+    <style>
+        #solutions {
+            background-color: rgba(0, 255, 0, 0.2);
+        }
+        #stats {
+            background-color: rgba(0, 0, 255, 0.2);
+        }
+    </style>
+    <title>minion-js</title>
+</head>
+<body>
+    <pre id="solutions"></pre>
+    <pre id="stats"></pre>
+</body>
+</html>
