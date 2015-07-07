@@ -115,7 +115,7 @@ struct GACEqualConstraint : public AbstractConstraint
       
       for(DomainInt val=var2.getMin(); val<=var2.getMax(); val++) {
           if(var2.inDomain(val)) {
-              moveTriggerInt(var2, val-var2.getInitialMin(), DomainRemoval, val );
+              moveTriggerInt(var2, dvar2 + val-var2.getInitialMin(), DomainRemoval, val );
           }
       }
       
