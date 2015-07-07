@@ -150,8 +150,8 @@ struct NeqIterated
   template<typename VarType1, typename VarType2>
   static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt)
   {
-     ac->moveTriggerInt(var1, 0, Assigned);
-     ac->moveTriggerInt(var2, 1, Assigned);
+     ac->moveTriggerInt(var1, dt, Assigned);
+     ac->moveTriggerInt(var2, dt + 1, Assigned);
   }
 
   template<typename Var>
@@ -231,8 +231,8 @@ struct LessIterated
   template<typename VarType1, typename VarType2>
   static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt)
   {
-     ac->moveTriggerInt(var1, 0, LowerBound);
-     ac->moveTriggerInt(var2, 1, UpperBound);
+     ac->moveTriggerInt(var1, dt, LowerBound);
+     ac->moveTriggerInt(var2, dt + 1, UpperBound);
   }
 
   template<typename Var1, typename Var2>
@@ -284,8 +284,8 @@ struct BothNonZeroIterated
   template<typename VarType1, typename VarType2>
   static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt)
   {
-     ac->moveTriggerInt(var1, 0, UpperBound);
-     ac->moveTriggerInt(var2, 1, UpperBound);
+     ac->moveTriggerInt(var1, dt, UpperBound);
+     ac->moveTriggerInt(var2, dt + 1, UpperBound);
   }
 
   template<typename Var1, typename Var2>
