@@ -70,25 +70,24 @@ struct Check_GSA : public AbstractConstraint
 
   virtual void propagate(DynamicTrigger*)
   {
-    DynamicTrigger* dt = dynamic_trigger_start();
     bool flag = false;
     GET_ASSIGNMENT(assignment, child);
     if(!flag)
     { getState().setFailed(true); }
     else
-    { watch_assignment(assignment, *(child->get_vars_singleton()), dt); }
+    { watch_assignment(assignment, *(child->get_vars_singleton()), 0); }
   }
 
-  template<typename T, typename Vars, typename Trigger>
-  void watch_assignment(const T& assignment, Vars& vars, Trigger* trig)
+  template<typename T, typename Vars>
+  void watch_assignment(const T& assignment, Vars& vars, DomainInt trig)
   {
     for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
     {
       D_ASSERT(vars[assignment[i].first].inDomain(assignment[i].second));
       if(vars[assignment[i].first].isBound()) {
-        moveTrigger(vars[assignment[i].first], trig + i, DomainChanged);
+        moveTriggerInt(vars[assignment[i].first], trig + i, DomainChanged);
       } else {
-        moveTrigger(vars[assignment[i].first], trig + i, DomainRemoval, assignment[i].second);
+        moveTriggerInt(vars[assignment[i].first], trig + i, DomainRemoval, assignment[i].second);
       }
     }
   }

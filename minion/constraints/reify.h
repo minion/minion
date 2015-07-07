@@ -298,29 +298,15 @@ struct reify : public ParentConstraint
     if(constraint_locked)
       return;
 
-    DynamicTrigger* dt = dynamic_trigger_start();
+    DynamicTrigger* _dt = dynamic_trigger_start();
     //SysInt numtriggers=dynamic_trigger_count();
 
     if(!full_propagate_called)
     {
-        if(trig >= dt && trig < (dt + (c0vars*2)) )
+        if(trig >= _dt && trig < (_dt + (c0vars*2)) )
         {// Lost assignments for positive constraint.
             P("Triggered on an assignment watch for the positive child constraint");
-            #ifdef MINION_DEBUG
-            // make sure that some WL has been lost.
-            bool wllost=false;
-            vector<AnyVarRef> t1=*(child_constraints[0]->get_vars_singleton());
 
-            for(SysInt i=0; i<(SysInt)triggerpairs[0].size(); i++)
-            {
-                if(!t1[checked_cast<SysInt>(triggerpairs[0][i].first)].inDomain(triggerpairs[0][i].second))
-                {
-                    wllost=true;
-                }
-            }
-            (void)wllost;
-            //D_ASSERT(wllost); This is not true because some WLs may be translated to domainchanged triggers.
-            #endif
             bool flag;
             PROP_INFO_ADDONE(ReifyPropGetAssgPosCon);
             GET_ASSIGNMENT(assignment, child_constraints[0]);
@@ -338,28 +324,14 @@ struct reify : public ParentConstraint
               return;
             }
             P("Found new assignment");
-            watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt, dt+(c0vars*2));
+            watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), 0, c0vars*2);
 
             return;
         }
-        else if(trig>= (dt+ (c0vars*2)) && trig < dt+dtcount)
+        else if(trig>= (_dt+ (c0vars*2)) && trig < _dt+dtcount)
         {// Lost assignments for negative constraint.
             P("Triggered on an assignment watch for the negative child constraint");
-            #ifdef MINION_DEBUG
-            // make sure that some WL has been lost.
-            bool wllost=false;
-            vector<AnyVarRef> t1=*(child_constraints[1]->get_vars_singleton());
 
-            for(SysInt i=0; i<(SysInt)triggerpairs[1].size(); i++)
-            {
-                if(!t1[checked_cast<SysInt>(triggerpairs[1][i].first)].inDomain(triggerpairs[1][i].second))
-                {
-                    wllost=true;
-                }
-            }
-            (void)wllost;
-            //D_ASSERT(wllost);
-            #endif
             bool flag;
             GET_ASSIGNMENT(assignment, child_constraints[1]);
             PROP_INFO_ADDONE(ReifyPropGetAssgNegCon);
@@ -377,7 +349,7 @@ struct reify : public ParentConstraint
               return;
             }
             P("Found new assignment");
-            watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), dt+(c0vars*2), dt+dtcount);
+            watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), c0vars*2, dtcount);
             return;
         }
         else
@@ -389,7 +361,7 @@ struct reify : public ParentConstraint
     }
     else // full_propagate_called
     {
-        if(trig>= dt && trig < dt+dtcount)
+        if(trig>= _dt && trig < _dt+dtcount)
         {   // is it a trigger from stage 1 .. if so, ignore.
             P("In stage 2, ignoring trigger from stage 1");
             return;
@@ -409,8 +381,8 @@ struct reify : public ParentConstraint
 
   }
 
-  template<typename T, typename Vars, typename Trigger>
-  void watch_assignment(const T& assignment, Vars& vars, Trigger* trig, Trigger* endtrig)
+  template<typename T, typename Vars>
+  void watch_assignment(const T& assignment, Vars& vars, DomainInt trig, DomainInt endtrig)
   {
     for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
     {
@@ -418,13 +390,12 @@ struct reify : public ParentConstraint
       D_ASSERT(vars[aif].inDomain(assignment[i].second));
       D_ASSERT(trig+i < endtrig);
       if(vars[aif].isBound()) {
-        moveTrigger(vars[aif], trig + i, DomainChanged);
+        moveTriggerInt(vars[aif], trig + i, DomainChanged);
       } else {
-        moveTrigger(vars[aif], trig + i, DomainRemoval, assignment[i].second);
+        moveTriggerInt(vars[aif], trig + i, DomainRemoval, assignment[i].second);
       }
     }
     // clear a contiguous block of used triggers up to (not including) endtrig
-    D_DATA(SysInt firstunattached = -1);
     for(SysInt i=assignment.size(); (trig+i)<endtrig; i++)
     {
       /// XXX : This is inefficent, but required for constant variables
@@ -433,25 +404,8 @@ struct reify : public ParentConstraint
             D_DATA(firstunattached=i);
             break;
         } */
-        releaseTrigger(trig + i);
+        releaseTriggerInt(trig + i);
     }
-
-    #ifdef MINION_DEBUG
-    if(firstunattached != -1)
-    {
-      for(SysInt i=firstunattached; (trig+i)<endtrig; i++)
-      {
-          D_ASSERT(!(trig+i)->isAttached());
-      }
-    }
-    // put the triggers into triggerpairs to check later.
-    SysInt cid=((trig==dynamic_trigger_start())?0:1);
-    triggerpairs[cid].clear();
-    for(SysInt i=0; i<(SysInt)assignment.size(); i++)
-    {
-        triggerpairs[cid].push_back(assignment[i]);
-    }
-    #endif
   }
 
   virtual void full_propagate()
@@ -509,8 +463,8 @@ struct reify : public ParentConstraint
       return;
     }
 
-    watch_assignment(assignment0, *(child_constraints[0]->get_vars_singleton()), dt, dt+(c0vars*2));
-    watch_assignment(assignment1, *(child_constraints[1]->get_vars_singleton()), dt+(c0vars*2), dt+dtcount);
+    watch_assignment(assignment0, *(child_constraints[0]->get_vars_singleton()), 0, (c0vars*2));
+    watch_assignment(assignment1, *(child_constraints[1]->get_vars_singleton()), (c0vars*2), dtcount);
   }
 };
 

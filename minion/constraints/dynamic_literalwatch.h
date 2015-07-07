@@ -104,7 +104,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
     if(var_sum <= 0)
       return;
 
-    DynamicTrigger* dt = dynamic_trigger_start();
+    DomainInt trig_pos = 0;
 
     SysInt array_size = var_array.size();
     DomainInt triggers_wanted = var_sum + 1;
@@ -149,9 +149,9 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
       {
         if(var_array[i].inDomain(value_array[i]))
         {
-          dt->trigger_info() = i;
-          moveTrigger(var_array[i], dt, DomainRemoval, value_array[i]);
-          ++dt;
+          triggerInfo(trig_pos) = i;
+          moveTriggerInt(var_array[i], trig_pos, DomainRemoval, value_array[i]);
+          ++trig_pos;
         }
         else
         {

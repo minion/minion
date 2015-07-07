@@ -53,8 +53,6 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
     
   virtual void full_propagate()
   {
-    DynamicTrigger* dt = dynamic_trigger_start();
-    
     SysInt array_size = var_array.size(); 
     SysInt trig1, trig2;
     SysInt index = 0;
@@ -83,13 +81,11 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
       return;
     }
     
-    dt->trigger_info() = trig1;
-    moveTrigger(var_array[trig1], dt, UpperBound);
+    triggerInfo(0) = trig1;
+    moveTriggerInt(var_array[trig1], 0, UpperBound);
     
-    ++dt;
-    
-    dt->trigger_info() = trig2;
-    moveTrigger(var_array[trig2], dt, UpperBound);
+    triggerInfo(1) = trig2;
+    moveTriggerInt(var_array[trig2], 1, UpperBound);
     
     return;
   }

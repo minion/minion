@@ -145,10 +145,9 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   {
       // val_count has been assigned.
       D_ASSERT(z==-1);
-      DynamicTrigger* dt = dynamic_trigger_start();
       if(trigger1index==-1 || var_array[trigger1index].isAssigned())
       {
-          trigger1index=watch_unassigned_in_vector(-1, trigger1index, dt);
+          trigger1index=watch_unassigned_in_vector(-1, trigger1index, 0);
           if(trigger1index==-1)
           {
               valcount_assigned();
@@ -157,7 +156,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       }
       if(trigger2index==-1 || var_array[trigger2index].isAssigned())
       {
-          trigger2index=watch_unassigned_in_vector(trigger1index, trigger2index, dt+1);
+          trigger2index=watch_unassigned_in_vector(trigger1index, trigger2index, 0);
           if(trigger2index==-1)
           {
               valcount_assigned();
@@ -168,13 +167,13 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
 
   virtual void propagate(DynamicTrigger* trig)
   {
-      DynamicTrigger* dt = dynamic_trigger_start();
+    DynamicTrigger* dt = dynamic_trigger_start();
       if(trig==dt || trigger1index==-1)
       {
           if(val_count.isAssigned())
           {
               // make sure both triggers are in place.
-              trigger1index=watch_unassigned_in_vector(-1, trigger1index, dt);
+              trigger1index=watch_unassigned_in_vector(-1, trigger1index, 0);
               if(trigger1index==-1)
               {
                   valcount_assigned();
@@ -182,7 +181,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
               }
               if(trigger2index==-1 || var_array[trigger2index].isAssigned())
               {
-                  trigger2index=watch_unassigned_in_vector(trigger1index, trigger2index, dt+1);
+                  trigger2index=watch_unassigned_in_vector(trigger1index, trigger2index, 1);
                   if(trigger2index==-1)
                   {
                       valcount_assigned();
@@ -192,7 +191,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
           }
           else
           {
-              trigger1index=watch_unassigned_in_vector(-1, trigger1index, dt);
+              trigger1index=watch_unassigned_in_vector(-1, trigger1index, 0);
               if(trigger1index==-1)
               {
                   vector_assigned();
@@ -215,7 +214,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
           return;
       }
 
-      trigger2index=watch_unassigned_in_vector(trigger1index, trigger2index, dt+1);
+      trigger2index=watch_unassigned_in_vector(trigger1index, trigger2index, 1);
       if(trigger2index==-1)
       {
           valcount_assigned();
@@ -224,7 +223,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
 
   // unfinished new stuff starts here.
 
-  SysInt watch_unassigned_in_vector(SysInt avoidindex, SysInt oldsupport, DynamicTrigger* dt)
+  SysInt watch_unassigned_in_vector(SysInt avoidindex, SysInt oldsupport, DomainInt dt)
   {
       // move dt to an index other than avoidindex, or return -1.
       SysInt newsupport=oldsupport+1;
@@ -234,7 +233,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
           {
               if(!var_array[newsupport].isAssigned())
               {
-                  moveTrigger(var_array[newsupport], dt, Assigned);
+                  moveTriggerInt(var_array[newsupport], dt, Assigned);
                   return newsupport;
               }
           }
@@ -246,7 +245,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
           {
               if(!var_array[newsupport].isAssigned())
               {
-                  moveTrigger(var_array[newsupport], dt, Assigned);
+                  moveTriggerInt(var_array[newsupport], dt, Assigned);
                   return newsupport;
               }
           }
@@ -319,8 +318,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
 
   virtual void full_propagate()
   {
-    DynamicTrigger* dt = dynamic_trigger_start();
-    trigger1index=watch_unassigned_in_vector(-1, -1, dt);
+    trigger1index=watch_unassigned_in_vector(-1, -1, 0);
     if(trigger1index==-1)
     {
         vector_assigned();
@@ -330,7 +328,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
     if(val_count.isAssigned())
     {
         // watch a second place in the vector.
-        trigger2index=watch_unassigned_in_vector(trigger1index, trigger1index, dt+1);
+        trigger2index=watch_unassigned_in_vector(trigger1index, trigger1index, 1);
         if(trigger2index==-1)
         {
             valcount_assigned();

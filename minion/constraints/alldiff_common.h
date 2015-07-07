@@ -736,7 +736,6 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       #if UseIncGraph
         {
             // update the adjacency lists. and place dts
-            DynamicTrigger* dt=dynamic_trigger_start();
             for(SysInt i=dom_min; i<=dom_max; i++)
             {
                 for(SysInt j=0; j<adjlistlength[i-dom_min+numvars]; j++)
@@ -751,7 +750,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                     else
                     {
                         // arranged in blocks for each variable, with numvals triggers in each block
-                        DynamicTrigger* mydt= dt+(var*numvals)+(i-dom_min);
+                        DomainInt mydt = (var*numvals)+(i-dom_min);
                         this->moveTrigger(var_array[var], mydt, DomainRemoval, i);
                     }
                 }

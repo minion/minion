@@ -277,10 +277,9 @@ struct NewTableConstraint : public AbstractConstraint
 
   void setup_watches(Literal lit, DomainInt lit_pos, const vector<DomainInt>& support)
   {
-    DynamicTrigger* dt = dynamic_trigger_start();
     D_ASSERT(data->getLiteralPos(lit) == lit_pos);
     SysInt vars_size = vars.size();
-    dt += checked_cast<SysInt>(lit_pos * (vars_size - 1));
+    DomainInt trig_pos = checked_cast<SysInt>(lit_pos * (vars_size - 1));
     for(SysInt v = 0; v < vars_size; ++v)
     {
       if(v != lit.var)
@@ -288,8 +287,8 @@ struct NewTableConstraint : public AbstractConstraint
         P(vars.size() << ".Watching " << v << "." << support[v] << " for " << lit.var << "." << lit.val);
         D_ASSERT(vars[v].inDomain(support[v]));
         PROP_INFO_ADDONE(CounterA);
-        moveTrigger(vars[v], dt, DomainRemoval, support[v] , TO_Store);
-        ++dt;
+        moveTriggerInt(vars[v], trig_pos, DomainRemoval, support[v] , TO_Store);
+        ++trig_pos;
       }
     }
   }

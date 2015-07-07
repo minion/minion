@@ -284,10 +284,16 @@ public:
     v.addDynamicTrigger(this, dt + checked_cast<SysInt>(t), type, pos, op);
   }
   
-  SysInt& triggerInfo(SysInt t)
+  SysInt& triggerInfo(DomainInt t)
   {
     DynamicTrigger* dt = static_cast<DynamicTrigger*>(_DynamicTriggerCache);
-    return (dt+t)->trigger_info();
+    return (dt+checked_cast<SysInt>(t))->trigger_info();
+  }
+  
+  void releaseTriggerInt(DomainInt t)
+  {
+    DynamicTrigger* dt = static_cast<DynamicTrigger*>(_DynamicTriggerCache);
+    releaseTrigger(dt+checked_cast<SysInt>(t));
   }
   
 };

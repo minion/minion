@@ -165,8 +165,6 @@ struct ElementConstraintDynamic : public AbstractConstraint
 
   void find_new_support_for_result(SysInt j)
   {
-    DynamicTrigger* dt = dynamic_trigger_start();
-
     DomainInt realj = j + initial_result_dom_min;
 
     if(!resultvar.inDomain(realj))
@@ -176,15 +174,15 @@ struct ElementConstraintDynamic : public AbstractConstraint
     {
       if(indexvar.getMin() < 0)
       {
-        moveTrigger(indexvar, dt+2*j, DomainRemoval, indexvar.getMin());
-        releaseTrigger((dt+2*j+1));
+        moveTriggerInt(indexvar, 2*j, DomainRemoval, indexvar.getMin());
+        releaseTriggerInt(2*j+1);
         return;
       }
 
       if(indexvar.getMax() >= (SysInt)var_array.size())
       {
-        moveTrigger(indexvar, dt+2*j, DomainRemoval, indexvar.getMax());
-        releaseTrigger((dt+2*j+1));
+        moveTriggerInt(indexvar, 2*j, DomainRemoval, indexvar.getMax());
+        releaseTriggerInt(2*j+1);
         return;
       }
     }
@@ -227,8 +225,8 @@ struct ElementConstraintDynamic : public AbstractConstraint
         return;
       }
     }
-    moveTrigger(var_array[checked_cast<SysInt>(support)], dt + 2*j, DomainRemoval, realj);
-    moveTrigger(indexvar, dt + 2*j + 1, DomainRemoval, support);
+    moveTriggerInt(var_array[checked_cast<SysInt>(support)], 2*j, DomainRemoval, realj);
+    moveTriggerInt(indexvar, 2*j + 1, DomainRemoval, support);
     current_support[j + array_size] = support;
   }
 
@@ -248,8 +246,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
 
     DomainInt resultvarmin = resultvar.getMin();
     DomainInt resultvarmax = resultvar.getMax();
-    DynamicTrigger* dt = dynamic_trigger_start() +
-                         checked_cast<SysInt>((initial_result_dom_max - initial_result_dom_min + 1) * 2);
+    DomainInt trig_pos = (initial_result_dom_max - initial_result_dom_min + 1) * 2;
 
     if(resultvarmin == resultvarmax)
     {
@@ -257,8 +254,8 @@ struct ElementConstraintDynamic : public AbstractConstraint
         indexvar.removeFromDomain(i);
       else
       {
-        moveTrigger(var_array[i], dt + 2*i, DomainRemoval, resultvarmin);
-        moveTrigger(resultvar, dt + 2*i + 1, DomainRemoval, resultvarmin);
+        moveTriggerInt(var_array[i], trig_pos + 2*i, DomainRemoval, resultvarmin);
+        moveTriggerInt(resultvar, trig_pos + 2*i + 1, DomainRemoval, resultvarmin);
         current_support[i] = resultvarmin;
       }
       return;
@@ -289,8 +286,8 @@ struct ElementConstraintDynamic : public AbstractConstraint
       }
     }
 
-    moveTrigger(var_array[i], dt + 2*i, DomainRemoval, support);
-    moveTrigger(resultvar, dt + 2*i + 1, DomainRemoval, support);
+    moveTriggerInt(var_array[i], trig_pos + 2*i, DomainRemoval, support);
+    moveTriggerInt(resultvar, trig_pos + 2*i + 1, DomainRemoval, support);
     current_support[i] = support;
   }
 
@@ -373,9 +370,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
     if(indexvar.isAssigned())
       deal_with_assigned_index();
 
-    DynamicTrigger* dt = dynamic_trigger_start();
-
-    dt += var_array.size() * 2 +
+    DomainInt trig_pos = var_array.size() * 2 +
       checked_cast<SysInt>((initial_result_dom_max - initial_result_dom_min + 1) * 2);
 
     // for(SysInt i = initial_result_dom_min; i <= initial_result_dom_max; ++i)
@@ -383,16 +378,16 @@ struct ElementConstraintDynamic : public AbstractConstraint
     // moveTrigger(resultvar, dt, DomainRemoval, i);
     // ++dt;
     // }
-    moveTrigger(resultvar, dt, DomainChanged);  // Why is this always here-- why not place it when indexvar becomes assigned, lift it
+    moveTriggerInt(resultvar, trig_pos, DomainChanged);  // Why is this always here-- why not place it when indexvar becomes assigned, lift it
     // whenever it triggers when indexvar is not assigned.
-    ++dt;
+    ++trig_pos;
 
-    moveTrigger(indexvar, dt, Assigned);
+    moveTriggerInt(indexvar, trig_pos, Assigned);
     if(undef_maps_zero)
     {
-      ++dt;
+      ++trig_pos;
       if(resultvar.inDomain(0))
-        moveTrigger(resultvar, dt, DomainRemoval, 0);
+        moveTriggerInt(resultvar, trig_pos, DomainRemoval, 0);
     }
   }
 

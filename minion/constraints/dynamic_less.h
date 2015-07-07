@@ -51,8 +51,6 @@ struct WatchLessConstraint : public AbstractConstraint
 
   virtual void full_propagate()
   {
-    DynamicTrigger* dt = dynamic_trigger_start();
-
     moveTriggerInt(var1, 0, LowerBound);
     moveTriggerInt(var2, 1, UpperBound);
 
