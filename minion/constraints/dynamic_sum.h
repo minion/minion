@@ -339,8 +339,6 @@ AbstractConstraint*
 
 
 #include "dynamic_sum_sat.h"
-#include "dynamic_binary_sat.h"
-#include "dynamic_3_sat.h"
 
 template<typename T>
 inline AbstractConstraint*

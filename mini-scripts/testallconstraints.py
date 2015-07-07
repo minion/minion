@@ -29,7 +29,7 @@ conslist+=["alldiff", "gacalldiff", "alldiffmatrix"]
 conslist+=["gcc", "gccweak", "occurrence", "occurrenceleq", "occurrencegeq"]
 
 #element constraints
-conslist+=["element", "element_undefzero", "gacelement-deprecated", "watchelement", "watchelement_undefzero"]
+conslist+=["element", "element_undefzero", "watchelement", "watchelement_undefzero"]
 
 conslist+=["watchelement_one", "element_one"]
 
