@@ -472,7 +472,7 @@ struct FlowConstraint : public AbstractConstraint
 
     // Hopcroft-Karp which takes start and end indices.
 
-    inline bool hopcroft_wrapper(SysInt sccstart, SysInt sccend, vector<SysInt>& SCCs)
+    inline bool hopcroft_wrapper(SysInt sccstart, SysInt sccend, vector<SysInt>& SCCs, bool allowed_to_fail)
     {
         // Call hopcroft for the whole matching.
         if(!hopcroft(sccstart, sccend, SCCs))
@@ -486,7 +486,7 @@ struct FlowConstraint : public AbstractConstraint
                 valvarmatching[varvalmatching[j]-dom_min]=j;
             }
 
-            getState().setFailed(true);
+            if(allowed_to_fail) getState().setFailed(true);
             return false;
         }
 

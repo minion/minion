@@ -513,7 +513,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
 
             P("start:" << sccindex_start << " end:"<< sccindex_end);
 
-            if(!matching_wrapper(sccindex_start, sccindex_end))
+            if(!matching_wrapper(sccindex_start, sccindex_end, true))
                 return;
             
             P("Fixed varvalmatching:" << varvalmatching);
@@ -619,7 +619,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             if(!var_array[SCCs[k]].inDomain(varvalmatching[SCCs[k]]))
             {
                 SysInt l=j; while(SCCSplit.isMember(l) && l<(numvars-1)) l++;
-                if(!matching_wrapper(j, l))
+                if(!matching_wrapper(j, l, true))
                     return;
             }
             #endif
@@ -695,7 +695,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     #endif
 
     // Call hopcroft for the whole matching.
-    if(!matching_wrapper(0, numvars-1))
+    if(!matching_wrapper(0, numvars-1, true))
         return;
     
     P("Fixed varvalmatching:" << varvalmatching);
@@ -834,7 +834,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             }
           #endif
 
-          matchok=bfsmatching(0, numvars-1);
+          matchok=matching_wrapper(0, numvars-1, false);
       }
 
       if(!matchok)
@@ -1296,25 +1296,25 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     }
 
 
-    inline bool matching_wrapper(SysInt sccstart, SysInt sccend)
+    inline bool matching_wrapper(SysInt sccstart, SysInt sccend, bool allowed_to_fail)
     {
         #ifdef BFSMATCHING
-        return bfs_wrapper(sccstart,sccend);
+        return bfs_wrapper(sccstart,sccend, allowed_to_fail);
         #else
-        return hopcroft_wrapper(sccstart,sccend, SCCs);
+        return hopcroft_wrapper(sccstart,sccend, SCCs, allowed_to_fail);
         #endif
     }
     
     // BFS alternative to hopcroft. --------------------------------------------
 
-    inline bool bfs_wrapper(SysInt sccstart, SysInt sccend)
+    inline bool bfs_wrapper(SysInt sccstart, SysInt sccend, bool allowed_to_fail)
     {
         // Call hopcroft for the whole matching.
         if(!bfsmatching(sccstart, sccend))
         {
             // The constraint is unsatisfiable (no matching).
-            P("About to fail. Changed varvalmatching: "<< varvalmatching);
-            getState().setFailed(true);
+            P("No complete matching found. Changed varvalmatching: "<< varvalmatching);
+            if(allowed_to_fail) getState().setFailed(true);
             return false;
         }
 
