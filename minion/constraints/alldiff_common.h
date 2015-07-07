@@ -834,7 +834,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
             }
           #endif
 
-          matchok=matching_wrapper(0, numvars-1);   //  Selects BFS or HK
+          matchok=bfsmatching(0, numvars-1);
       }
 
       if(!matchok)
@@ -1304,7 +1304,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
         return hopcroft_wrapper(sccstart,sccend, SCCs);
         #endif
     }
-
+    
     // BFS alternative to hopcroft. --------------------------------------------
 
     inline bool bfs_wrapper(SysInt sccstart, SysInt sccend)
