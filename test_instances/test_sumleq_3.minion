@@ -1,0 +1,21 @@
+MINION 1
+#TEST CHECKONESOL 1 1 0
+
+3
+0
+0
+0
+0
+
+[x0,x1,x2]
+[d,d,d]
+
+0 
+1
+[ [ x0,x1,x2] ]
+0
+objective none
+print m0
+
+reify(sumleq([x0,x1],1),x2)
+eq(x2,0)

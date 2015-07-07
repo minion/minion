@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>constraints watched-and</title>
+</head>
+<body>
+<h1>Help on <tt>constraints watched-and</tt></h1>
+<h3>Description</h3>
+<pre>
+The constraint
+
+  watched-and({C1,...,Cn})
+
+ensures that the constraints C1,...,Cn are all true.
+</pre>
+<h3>Notes</h3>
+<pre>
+pointless, bearing in mind that a CSP is simply a conjunction of constraints
+already! However sometimes it may be necessary to use a conjunction as a child
+of another constraint, for example in a reification:
+
+   reify(watched-and({...}),r)
+</pre>
+<h3>References</h3>
+<pre>
+  See also
+
+  help constraints watched-or
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>
