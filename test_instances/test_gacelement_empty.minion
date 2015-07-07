@@ -7,6 +7,6 @@ BOOL Y
 
 **CONSTRAINTS**
 
-gacelement-deprecated([], X, Y)
+element([], X, Y)
 
 **EOF**
