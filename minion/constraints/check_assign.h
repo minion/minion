@@ -72,7 +72,6 @@ struct Check_Assign : public AbstractConstraint
 
   virtual void propagate(DynamicTrigger*)
   {
-    DynamicTrigger* dt = dynamic_trigger_start();
     SysInt size = child->get_vars_singleton()->size();
     vector<AnyVarRef>* vars = child->get_vars_singleton();
     
@@ -80,7 +79,7 @@ struct Check_Assign : public AbstractConstraint
     {
         if(!(*vars)[i].isAssigned())
         {
-            moveTrigger((*vars)[i], dt, DomainChanged);
+            moveTriggerInt((*vars)[i], 0, DomainChanged);
             return;
         }
     }

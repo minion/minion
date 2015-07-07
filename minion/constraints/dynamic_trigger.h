@@ -37,6 +37,9 @@ public:
   /// In debug mode, a value set to
   /// The constraint to be triggered.
   AbstractConstraint* constraint;
+  
+  SysInt trig_pos;
+  
   /// A small space for constraints to store trigger-specific information.
   SysInt _trigger_info;
 
@@ -60,8 +63,9 @@ public:
   }
 
 
-  DynamicTrigger(AbstractConstraint* c) : constraint(c), prev(NULL), next(NULL)
-  , basequeue(NULL)
+  DynamicTrigger(AbstractConstraint* c, SysInt _trig_pos)
+  : constraint(c), trig_pos(_trig_pos), _trigger_info(-9999),
+    prev(NULL), next(NULL), basequeue(NULL)
   { D_DATA(sanity_check = 1234);}
 
   DynamicTrigger() : constraint(NULL)

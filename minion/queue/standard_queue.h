@@ -121,7 +121,7 @@ public:
         }
 
 #ifdef MINION_DEBUG
-        DynamicTrigger dummy((AbstractConstraint*)(BAD_POINTER));
+        DynamicTrigger dummy((AbstractConstraint*)(BAD_POINTER), -1);
 #else
         DynamicTrigger dummy;
 #endif
@@ -228,7 +228,7 @@ public:
         }
 
 #ifdef MINION_DEBUG
-        DynamicTrigger dummy((AbstractConstraint*)(BAD_POINTER));
+        DynamicTrigger dummy((AbstractConstraint*)(BAD_POINTER), -1);
 #else
         DynamicTrigger dummy;
 #endif

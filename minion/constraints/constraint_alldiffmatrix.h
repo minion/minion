@@ -227,8 +227,8 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
 
       for(int i=0; i < (SysInt)var_array.size(); i++) {
           if(var_array[i].inDomain(value)) {
-              moveTrigger(var_array[i], dynamic_trigger_start()+i, DomainRemoval, value);
-              moveTrigger(var_array[i], dynamic_trigger_start()+i+var_array.size(), Assigned);
+              moveTriggerInt(var_array[i], i, DomainRemoval, value);
+              moveTriggerInt(var_array[i], i+var_array.size(), Assigned);
           }
 
           if(var_array[i].isAssigned() && var_array[i].getAssignedValue()==value) {

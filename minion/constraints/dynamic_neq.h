@@ -44,8 +44,6 @@ struct WatchNeqConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {  
-    DynamicTrigger* dt = dynamic_trigger_start();
-    
       if(var1.isAssigned() && var2.isAssigned() && var1.getAssignedValue() == var2.getAssignedValue())
       {
         getState().setFailed(true);
@@ -64,8 +62,8 @@ struct WatchNeqConstraint : public AbstractConstraint
         return;
       }
       
-    moveTrigger(var1, dt    , Assigned);
-    moveTrigger(var2, dt + 1, Assigned);
+    moveTriggerInt(var1, 0, Assigned);
+    moveTriggerInt(var2, 1, Assigned);
   }
   
     

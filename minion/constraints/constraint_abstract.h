@@ -214,7 +214,7 @@ public:
 
     DynamicTrigger* start = dynamic_trigger_start();
     for(SysInt i = 0 ; i < trigs; ++i)
-      new (start+i) DynamicTrigger(this);
+      new (start+i) DynamicTrigger(this, i);
 
     // Static initialisation
     triggerCollection t = setup_internal_gather_triggers();
@@ -276,6 +276,20 @@ public:
   template<typename Var>
   void moveTrigger(Var& v, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
   { v.addDynamicTrigger(this, t, type, pos, op); }
+  
+  template<typename Var>
+  void moveTriggerInt(Var& v, DomainInt t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
+  {
+    DynamicTrigger* dt = static_cast<DynamicTrigger*>(_DynamicTriggerCache);
+    v.addDynamicTrigger(this, dt + checked_cast<SysInt>(t), type, pos, op);
+  }
+  
+  SysInt& triggerInfo(SysInt t)
+  {
+    DynamicTrigger* dt = static_cast<DynamicTrigger*>(_DynamicTriggerCache);
+    return (dt+t)->trigger_info();
+  }
+  
 };
 
 /// Constraint from which other constraints can be inherited. Extends dynamicconstraint to allow children to be dynamic.
@@ -399,7 +413,7 @@ public:
     // Start by allocating triggers in the memory block
     DynamicTrigger* start = static_cast<DynamicTrigger*>(trigMem);
     for(SysInt i = 0 ; i < all_trigs; ++i)
-      new (start+i) DynamicTrigger(this);
+      new (start+i) DynamicTrigger(this, i);
 
     setup_dynamic_triggers(trigMem);
 

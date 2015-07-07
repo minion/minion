@@ -74,7 +74,8 @@ struct GACEqualConstraint : public AbstractConstraint
   
   CONSTRAINT_ARG_LIST2(var1, var2);
   
-  DynamicTrigger* dtvar2;   // The start of the block related to var2
+  SysInt dvar2;
+  //DynamicTrigger* dtvar2;   // The start of the block related to var2
   
   GACEqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2) : 
     var1(_var1), var2(_var2)
@@ -85,7 +86,7 @@ struct GACEqualConstraint : public AbstractConstraint
   }
   
   virtual void full_propagate() {
-      dtvar2=dynamic_trigger_start() + checked_cast<SysInt>(var1.getInitialMax()-var1.getInitialMin() +1);
+      dvar2 = checked_cast<SysInt>(var1.getInitialMax()-var1.getInitialMin() +1);
       
       DomainInt maxlim = min(var1.getMax(), var2.getMax());
       DomainInt minlim = max(var1.getMin(), var2.getMin());
@@ -108,28 +109,29 @@ struct GACEqualConstraint : public AbstractConstraint
       
       for(DomainInt val=var1.getMin(); val<=var1.getMax(); val++) {
           if(var1.inDomain(val)) {
-              moveTrigger(var1, dynamic_trigger_start()+checked_cast<SysInt>(val-var1.getInitialMin()), DomainRemoval, val );
+              moveTriggerInt(var1, val-var1.getInitialMin(), DomainRemoval, val );
           }
       }
       
       for(DomainInt val=var2.getMin(); val<=var2.getMax(); val++) {
           if(var2.inDomain(val)) {
-              moveTrigger(var2, dtvar2+checked_cast<SysInt>(val-var2.getInitialMin()), DomainRemoval, val );
+              moveTriggerInt(var2, val-var2.getInitialMin(), DomainRemoval, val );
           }
       }
       
       
   }
   
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagate(DynamicTrigger* dt_)
   {
-      if(dt<dtvar2) {
-          DomainInt val=dt-dynamic_trigger_start()+var1.getInitialMin();
+    SysInt pos = dt_ - dynamic_trigger_start();
+      if(pos<dvar2) {
+          DomainInt val=pos+var1.getInitialMin();
           D_ASSERT(!var1.inDomain(val));
           var2.removeFromDomain(val);
       }
       else {
-          DomainInt val=dt-dtvar2+var2.getInitialMin();
+          DomainInt val=pos-dvar2+var2.getInitialMin();
           D_ASSERT(!var2.inDomain(val));
           var1.removeFromDomain(val);
       }

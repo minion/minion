@@ -268,15 +268,15 @@ struct GACTableConstraint : public AbstractConstraint
     vector<DomainInt>& support = supporting_tuple(lit);
 
     DynamicTrigger* dt = dynamic_trigger_start();
-
+    
     SysInt vars_size = vars.size();
-    dt += lit * (vars_size - 1);
+    SysInt trig_pos = lit * (vars_size - 1);
     for(SysInt v = 0; v < vars_size; ++v)
     {
       if(v != var)
       {
-        moveTrigger(vars[v], dt, DomainRemoval, support[v]);
-        ++dt;
+        moveTriggerInt(vars[v], trig_pos, DomainRemoval, support[v]);
+        ++trig_pos;
       }
     }
   }
