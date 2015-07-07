@@ -1,0 +1,23 @@
+MINION 1
+#TEST CHECKONESOL 0 1 1
+#
+#test of watched sum propagator
+
+
+3
+0
+0
+0
+0
+
+[x0,x1,x2]
+[a,a,a]
+
+0 
+1
+[ [ x0,x1,x2] ]
+0
+objective none
+print m0
+
+watchsumgeq([x0,x1,x2],2)

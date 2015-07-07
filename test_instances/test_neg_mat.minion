@@ -1,0 +1,9 @@
+MINION 3
+#TEST SOLCOUNT 1
+#FAIL
+
+**VARIABLES**
+
+BOOL B[-2]
+
+**EOF**

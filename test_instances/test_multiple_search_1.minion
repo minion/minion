@@ -1,0 +1,18 @@
+MINION 3
+#TEST SOLCOUNT 16
+#This just sanity checks a number of powers
+
+**VARIABLES**
+
+BOOL b[2]
+BOOL c[2]
+
+**SEARCH**
+
+VARORDER [b]
+VALORDER [d,d]
+
+VARORDER [c]
+VALORDER [a,a]
+
+**EOF**
