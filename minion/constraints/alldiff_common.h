@@ -751,7 +751,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
                     {
                         // arranged in blocks for each variable, with numvals triggers in each block
                         DomainInt mydt = (var*numvals)+(i-dom_min);
-                        this->moveTrigger(var_array[var], mydt, DomainRemoval, i);
+                        this->moveTriggerInt(var_array[var], mydt, DomainRemoval, i);
                     }
                 }
             }
