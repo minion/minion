@@ -144,7 +144,7 @@ struct Forward_Checking : public AbstractConstraint
       else if(dt==dtstart+2) {
           // If this is a stale trigger, release it.
           if(FCPruning.isMember(0)) {
-              releaseTrigger(dt);
+              releaseTriggerInt(2);
               return;
           }
           else {

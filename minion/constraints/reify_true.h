@@ -248,7 +248,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     SysInt dt_count = dynamic_trigger_count();
     // Clean up triggers
     for(SysInt i = 0; i < dt_count; ++i)
-        releaseTrigger(dt);
+        releaseTriggerInt(i);
     
     if(DoWatchAssignment && !rar_var.isAssigned()) //don't place when rar_var=0
     {

@@ -373,11 +373,7 @@ struct ElementConstraintDynamic : public AbstractConstraint
     DomainInt trig_pos = var_array.size() * 2 +
       checked_cast<SysInt>((initial_result_dom_max - initial_result_dom_min + 1) * 2);
 
-    // for(SysInt i = initial_result_dom_min; i <= initial_result_dom_max; ++i)
-    // {
-    // moveTrigger(resultvar, dt, DomainRemoval, i);
-    // ++dt;
-    // }
+
     moveTriggerInt(resultvar, trig_pos, DomainChanged);  // Why is this always here-- why not place it when indexvar becomes assigned, lift it
     // whenever it triggers when indexvar is not assigned.
     ++trig_pos;

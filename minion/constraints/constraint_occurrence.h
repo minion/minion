@@ -203,7 +203,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       D_ASSERT(trig==dt+1);
       if(!val_count.isAssigned())
       {   // don't need two triggers.
-          releaseTrigger(trig);
+          releaseTriggerInt(1);
           trigger2index=-1;
           return;
       }

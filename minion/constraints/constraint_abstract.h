@@ -295,6 +295,12 @@ public:
     DynamicTrigger* dt = static_cast<DynamicTrigger*>(_DynamicTriggerCache);
     releaseTrigger(dt+checked_cast<SysInt>(t));
   }
+
+  void releaseTriggerInt(DomainInt t , TrigOp op)
+  {
+    DynamicTrigger* dt = static_cast<DynamicTrigger*>(_DynamicTriggerCache);
+    releaseTrigger(dt+checked_cast<SysInt>(t), op);
+  }
   
 };
 

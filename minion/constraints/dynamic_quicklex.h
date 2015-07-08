@@ -64,23 +64,20 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
   void attach_triggers(SysInt i)
   {
       P("Attach Trigger: " << i);
-      DynamicTrigger* dt = dynamic_trigger_start();
-      moveTrigger(var_array1[i], dt, LowerBound, NoDomainValue , TO_Backtrack);
-      moveTrigger(var_array2[i], dt + 1, UpperBound, NoDomainValue , TO_Backtrack);
+      moveTriggerInt(var_array1[i], 0, LowerBound, NoDomainValue , TO_Backtrack);
+      moveTriggerInt(var_array2[i], 1, UpperBound, NoDomainValue , TO_Backtrack);
   }
 
   void detach_triggers()
   {
       P("Detach Triggers");
-      DynamicTrigger* dt = dynamic_trigger_start();
-      releaseTrigger(dt , TO_Backtrack);
-      releaseTrigger(dt + 1 , TO_Backtrack);
+      releaseTriggerInt(0 , TO_Backtrack);
+      releaseTriggerInt(1 , TO_Backtrack);
   }
 
   virtual void full_propagate()
   {
     P("Full Prop");
-    DynamicTrigger* dt = dynamic_trigger_start();
 
     if(var_array1.size() == 0)
     {
@@ -103,8 +100,8 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     }
 
     // Set these up, just so they are stored.
-    moveTrigger(var_array1[0], dt, LowerBound, NoDomainValue , TO_Store);
-    moveTrigger(var_array2[0], dt + 1, UpperBound, NoDomainValue , TO_Store);
+    moveTriggerInt(var_array1[0], 0, LowerBound, NoDomainValue , TO_Store);
+    moveTriggerInt(var_array2[0], 1, UpperBound, NoDomainValue , TO_Store);
 
     if(var_array1[0].isAssigned() && var_array2[0].isAssigned() &&
        var_array1[0].getAssignedValue() == var_array2[0].getAssignedValue())

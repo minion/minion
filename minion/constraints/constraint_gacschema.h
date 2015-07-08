@@ -486,12 +486,8 @@ struct GACSchema : public AbstractConstraint, Backtrackable
   {
       //P("Attach Trigger: " << i);
 
-      DynamicTrigger* dt = dynamic_trigger_start();
-      // find the trigger for var, val.
-      dt=dt+checked_cast<SysInt>((var*numvals)+(val-dom_min));
-      D_ASSERT(!dt->isAttached());
-
-      moveTrigger(vars[var], dt, DomainRemoval, val );
+      DomainInt dt = (var*numvals)+(val-dom_min);
+      moveTriggerInt(vars[var], dt, DomainRemoval, val );
   }
 
 
