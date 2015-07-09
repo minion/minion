@@ -100,7 +100,7 @@ struct ProductConstraint : public AbstractConstraint
     return x / y; 
   }
   
-  virtual void propagate(DomainInt, DomainDelta)
+  virtual void propagateStatic(DomainInt, DomainDelta)
   {
     PROP_INFO_ADDONE(Product);
     DomainInt var1_min = var1.getMin();
@@ -167,7 +167,7 @@ struct ProductConstraint : public AbstractConstraint
   }
   
   virtual void full_propagate()
-  { propagate(0,DomainDelta::empty()); }
+  { propagateStatic(0,DomainDelta::empty()); }
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
   {

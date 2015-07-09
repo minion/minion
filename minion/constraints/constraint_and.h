@@ -61,7 +61,7 @@ struct AndConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(DomainInt i, DomainDelta)
+  virtual void propagateStatic(DomainInt i, DomainDelta)
   {
     PROP_INFO_ADDONE(And);
     switch(checked_cast<SysInt>(i))

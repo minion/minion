@@ -153,7 +153,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint
     }
   }
   
-  virtual void propagate(DomainInt i, DomainDelta)
+  virtual void propagateStatic(DomainInt i, DomainDelta)
   {
     PROP_INFO_ADDONE(ReifyEqual);
     switch(checked_cast<SysInt>(i))
@@ -436,7 +436,7 @@ struct NeqConstraintBinary : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(DomainInt prop_val, DomainDelta)
+  virtual void propagateStatic(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(BinaryNeq);
     if (prop_val == 1) {
@@ -650,13 +650,13 @@ struct EqualConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    propagate(1,DomainDelta::empty());
-    propagate(2,DomainDelta::empty());
-    propagate(3,DomainDelta::empty());
-    propagate(4,DomainDelta::empty());
+    propagateStatic(1,DomainDelta::empty());
+    propagateStatic(2,DomainDelta::empty());
+    propagateStatic(3,DomainDelta::empty());
+    propagateStatic(4,DomainDelta::empty());
   }
   
-  virtual void propagate(DomainInt i, DomainDelta)
+  virtual void propagateStatic(DomainInt i, DomainDelta)
   {
     PROP_INFO_ADDONE(Equal);
     switch(checked_cast<SysInt>(i))

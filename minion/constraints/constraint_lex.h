@@ -128,7 +128,7 @@ struct LexLeqConstraint : public AbstractConstraint
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
           x[i].getAssignedValue() != y[i].getAssignedValue())  {
         alpha = i;
-        propagate(i,DomainDelta::empty());
+        propagateStatic(i,DomainDelta::empty());
       }
       else updateAlpha(i+1);
     }
@@ -138,7 +138,7 @@ struct LexLeqConstraint : public AbstractConstraint
         if (!x[i].isAssigned() || !y[i].isAssigned() ||
             x[i].getAssignedValue() != y[i].getAssignedValue())  {
           alpha = i ;
-          propagate(i,DomainDelta::empty()) ;
+          propagateStatic(i,DomainDelta::empty()) ;
           return ;
         }
         i++ ;
@@ -155,7 +155,7 @@ struct LexLeqConstraint : public AbstractConstraint
     while (i >= a) {
       if (x[i].getMin() < y[i].getMax()) {
         beta = i+1 ;
-        if (!(x[i].getMax() < y[i].getMin())) propagate(i,DomainDelta::empty()) ;
+        if (!(x[i].getMax() < y[i].getMin())) propagateStatic(i,DomainDelta::empty()) ;
         return ;
       }
       i-- ;
@@ -164,7 +164,7 @@ struct LexLeqConstraint : public AbstractConstraint
 
   }
 
-  virtual void propagate(DomainInt i_in, DomainDelta)
+  virtual void propagateStatic(DomainInt i_in, DomainDelta)
   {
     const SysInt i = checked_cast<SysInt>(i_in);
     PROP_INFO_ADDONE(Lex);
@@ -259,7 +259,7 @@ struct LexLeqConstraint : public AbstractConstraint
         else beta = betaBound ;
       }
       if (alpha >= beta) getState().setFailed(true);
-      propagate((SysInt)alpha,DomainDelta::empty()) ;             //initial propagation, if necessary.
+      propagateStatic((SysInt)alpha,DomainDelta::empty()) ;             //initial propagation, if necessary.
     }
     else
     {

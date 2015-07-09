@@ -135,7 +135,7 @@ struct Dynamic_OR : public ParentConstraint
     constraint_locked = false;
   }
 
-  virtual void propagate(DomainInt i, DomainDelta domain)
+  virtual void propagateStatic(DomainInt i, DomainDelta domain)
   {
     //PROP_INFO_ADDONE(WatchedOR);
     P("Static propagate start");
@@ -150,7 +150,7 @@ struct Dynamic_OR : public ParentConstraint
       if(childTrigger.first == propagated_constraint)
       {
         P("Passing trigger" << childTrigger.second << "on");
-        child_constraints[propagated_constraint]->propagate(childTrigger.second, domain);
+        child_constraints[propagated_constraint]->propagateStatic(childTrigger.second, domain);
       }
     }
   }

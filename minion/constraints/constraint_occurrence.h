@@ -141,7 +141,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
   }
 
 
-  virtual void propagate(DomainInt z, DomainDelta)
+  virtual void propagateStatic(DomainInt z, DomainDelta)
   {
       // val_count has been assigned.
       D_ASSERT(z==-1);
@@ -460,7 +460,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint
       getState().setFailed(true);
   }
 
-  virtual void propagate(DomainInt in, DomainDelta)
+  virtual void propagateStatic(DomainInt in, DomainDelta)
   {
     const SysInt i = checked_cast<SysInt>(in);
       PROP_INFO_ADDONE(OccEqual);
@@ -683,7 +683,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint
     val_count.setMax(static_cast<SysInt>(var_array.size()) - occs);
   }
 
-  virtual void propagate(DomainInt i, DomainDelta)
+  virtual void propagateStatic(DomainInt i, DomainDelta)
   {
     PROP_INFO_ADDONE(OccEqual);
     if(i < 0)

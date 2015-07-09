@@ -207,7 +207,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       return new Dynamic_OR(con);
   }
   
-  virtual void propagate(DomainInt prop_var_in, DomainDelta)
+  virtual void propagateStatic(DomainInt prop_var_in, DomainDelta)
   {
     const SysInt prop_var = checked_cast<SysInt>(prop_var_in);
     D_ASSERT(prop_var>=0 && prop_var<(SysInt)var_array.size());

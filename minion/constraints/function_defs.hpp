@@ -21,9 +21,9 @@
 // everything else. In an ideal world, this would live in a
 // .c file, but we want them to be inlinable.
 
-inline void Trigger::propagate(DomainDelta domain_data)
+inline void Trigger::propagateStatic(DomainDelta domain_data)
 {
-    constraint->propagate(info, domain_data); 
+    constraint->propagateStatic(info, domain_data); 
 }
 
 inline void Trigger::full_propagate()

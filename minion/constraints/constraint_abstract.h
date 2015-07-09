@@ -106,7 +106,7 @@ public:
 
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
-  virtual void propagate(DomainInt, DomainDelta)
+  virtual void propagateStatic(DomainInt, DomainDelta)
     { D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + extended_name()); }
 
 
@@ -148,7 +148,7 @@ public:
   { return constraint_name(); }
 
 
-  /// Performs a full round of propagation and sets up any data needs by propagate().
+  /// Performs a full round of propagation and sets up any data needs by propagateStatic().
   /** This function can be called during search if the function is reified */
   virtual void full_propagate() = 0;
 

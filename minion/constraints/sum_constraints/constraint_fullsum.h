@@ -109,7 +109,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     return min_sum;
   }
 
-  virtual void propagate(DomainInt prop_val, DomainDelta domain_change)
+  virtual void propagateStatic(DomainInt prop_val, DomainDelta domain_change)
   {
     P("Prop: " << prop_val);
     PROP_INFO_ADDONE(FullSum);
@@ -157,7 +157,7 @@ struct LessEqualSumConstraint : public AbstractConstraint
     D_ASSERT(min_sum == get_real_min_sum());
     max_looseness = max_diff;
     if(!var_array.empty())
-      propagate(0,DomainDelta::empty());
+      propagateStatic(0,DomainDelta::empty());
     else
       var_sum.setMin(0);
   }

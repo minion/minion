@@ -105,7 +105,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
   }
 
 
-  virtual void propagate(DomainInt prop_val, DomainDelta)
+  virtual void propagateStatic(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(LightSum);
     DomainInt min_sum = 0;
@@ -122,8 +122,8 @@ struct LightLessEqualSumConstraint : public AbstractConstraint
 
   virtual void full_propagate()
   {
-    propagate(-1,DomainDelta::empty());
-    propagate(0,DomainDelta::empty());
+    propagateStatic(-1,DomainDelta::empty());
+    propagateStatic(0,DomainDelta::empty());
   }
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)

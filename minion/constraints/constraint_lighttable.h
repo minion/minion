@@ -174,7 +174,7 @@ struct LightTableConstraint : public AbstractConstraint
     return t;
   }
 
-  virtual void propagate(DomainInt changed_var, DomainDelta)
+  virtual void propagateStatic(DomainInt changed_var, DomainDelta)
   {
       // Propagate to all vars except the one that changed.
       for(SysInt i=0; i<(SysInt)vars.size(); i++)

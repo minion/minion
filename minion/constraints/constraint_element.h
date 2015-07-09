@@ -146,7 +146,7 @@ struct ElementConstraint : public AbstractConstraint
     return t;
   }
 
-  virtual void propagate(DomainInt prop_val, DomainDelta)
+  virtual void propagateStatic(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(NonGACElement);
     if(indexvar.isAssigned())

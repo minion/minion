@@ -69,7 +69,7 @@ struct LeqConstraint : public AbstractConstraint
   // Needs to be at end of file
   virtual AbstractConstraint* reverse_constraint();
   
-  virtual void propagate(DomainInt prop_val,DomainDelta)
+  virtual void propagateStatic(DomainInt prop_val,DomainDelta)
   {
     PROP_INFO_ADDONE(BinaryLeq);
     if(checked_cast<SysInt>(prop_val))
@@ -84,8 +84,8 @@ struct LeqConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   {
-    propagate(0,DomainDelta::empty());
-    propagate(1,DomainDelta::empty());
+    propagateStatic(0,DomainDelta::empty());
+    propagateStatic(1,DomainDelta::empty());
   }
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)

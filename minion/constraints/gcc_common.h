@@ -340,7 +340,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #endif
     }
 
-    virtual void propagate(DomainInt prop_var_in, DomainDelta)
+    virtual void propagateStatic(DomainInt prop_var_in, DomainDelta)
     {
         SysInt prop_var = checked_cast<SysInt>(prop_var_in);
         D_ASSERT(!UseIncGraph || (prop_var>=numvars && prop_var<numvars+numvals ) );

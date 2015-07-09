@@ -101,7 +101,7 @@ struct BoolLessSumConstraint : public AbstractConstraint
       getState().setFailed(true);
   }
 
-  virtual void propagate(DomainInt i, DomainDelta)
+  virtual void propagateStatic(DomainInt i, DomainDelta)
   {
     PROP_INFO_ADDONE(BoolSum);
     D_ASSERT(var_array[checked_cast<SysInt>(i)].getAssignedValue() == 0 ||

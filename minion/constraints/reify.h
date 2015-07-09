@@ -237,7 +237,7 @@ struct reify : public ParentConstraint
     constraint_locked = false;
   }
 
-  virtual void propagate(DomainInt i, DomainDelta domain)
+  virtual void propagateStatic(DomainInt i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(Reify);
     P("Static propagate start");
@@ -275,7 +275,7 @@ struct reify : public ParentConstraint
               return;
           }
           P("Passing trigger " << childTrigger.first <<","<< childTrigger.second << " on");
-          child_constraints[0]->propagate(childTrigger.second, domain);
+          child_constraints[0]->propagateStatic(childTrigger.second, domain);
       }
       else
       {
@@ -286,7 +286,7 @@ struct reify : public ParentConstraint
               return;
           }
           P("Passing trigger " << childTrigger.first <<","<< childTrigger.second << " on");
-          child_constraints[1]->propagate(childTrigger.second, domain);
+          child_constraints[1]->propagateStatic(childTrigger.second, domain);
       }
     }
   }

@@ -69,7 +69,7 @@ public:
   {
   }
   
-  void inline propagate(DomainDelta domain_data);
+  void inline propagateStatic(DomainDelta domain_data);
   void full_propagate();
   // In function_defs.hpp.
 
@@ -140,4 +140,3 @@ make_trigger(VarRef& v, Trigger t, TrigType trigger_type)
 { return shared_ptr<AbstractTriggerCreator>(new TriggerCreator<VarRef>(v,t, trigger_type));}
 
 #endif
-

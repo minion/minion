@@ -91,7 +91,7 @@ struct DifferenceConstraint : public AbstractConstraint
     }
   }
     
-  virtual void propagate(DomainInt, DomainDelta)
+  virtual void propagateStatic(DomainInt, DomainDelta)
   {
       PROP_INFO_ADDONE(Difference);
     
@@ -144,7 +144,7 @@ struct DifferenceConstraint : public AbstractConstraint
   virtual void full_propagate()
   { 
     var3.setMin(0);
-    propagate(0,DomainDelta::empty());
+    propagateStatic(0,DomainDelta::empty());
   }
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)

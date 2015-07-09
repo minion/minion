@@ -160,7 +160,7 @@ public:
         }
 
         CON_INFO_ADDONE(StaticTrigger);
-        it->propagate(data_val);
+        it->propagateStatic(data_val);
 
 #ifdef WDEG
         if(*fail_ptr)
@@ -266,7 +266,7 @@ public:
         if(it->constraint->full_propagate_done)
         {
           CON_INFO_ADDONE(StaticTrigger);
-          it->propagate(data_val);
+          it->propagateStatic(data_val);
         }
       }
     }

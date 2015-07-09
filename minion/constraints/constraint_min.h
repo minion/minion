@@ -110,7 +110,7 @@ struct MinConstraint : public AbstractConstraint
 
   //  virtual AbstractConstraint* reverse_constraint()
 
-  virtual void propagate(DomainInt prop_val, DomainDelta)
+  virtual void propagateStatic(DomainInt prop_val, DomainDelta)
   {
     PROP_INFO_ADDONE(Min);
     if(prop_val > 0)
@@ -187,8 +187,8 @@ struct MinConstraint : public AbstractConstraint
     {
       for(SysInt i = 1;i <= array_size + 1; ++i)
       {
-        propagate(i,DomainDelta::empty());
-        propagate(-i,DomainDelta::empty());
+        propagateStatic(i,DomainDelta::empty());
+        propagateStatic(-i,DomainDelta::empty());
       }
     }
   }

@@ -60,7 +60,7 @@ struct CheckAssignConstraint : public AbstractConstraint
     return new CheckAssignConstraint<OriginalConstraint, !negate>(originalcon);
   }
 
-  virtual void propagate(DomainInt prop_val,DomainDelta delta)
+  virtual void propagateStatic(DomainInt prop_val,DomainDelta delta)
   {
     PROP_INFO_ADDONE(CheckAssign);
     if(check_unsat(checked_cast<SysInt>(prop_val), delta))

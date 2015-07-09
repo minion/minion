@@ -141,7 +141,7 @@ template<typename BoolVar, bool DoWatchAssignment>
     constraint_locked = false;
   }
 
-  virtual void propagate(DomainInt i, DomainDelta domain)
+  virtual void propagateStatic(DomainInt i, DomainDelta domain)
   {
     PROP_INFO_ADDONE(ReifyTrue);
     P("Static propagate start");
@@ -166,7 +166,7 @@ template<typename BoolVar, bool DoWatchAssignment>
       pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
       D_ASSERT(childTrigger.first == 0);
       P("Passing trigger" << childTrigger.second << "on");
-      child_constraints[0]->propagate(childTrigger.second, domain);
+      child_constraints[0]->propagateStatic(childTrigger.second, domain);
     }
   }
 

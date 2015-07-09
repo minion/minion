@@ -122,7 +122,7 @@ struct PowConstraint : public AbstractConstraint
   double my_x(DomainInt y, DomainInt z)
   { return exp(log(checked_cast<double>(z)) / checked_cast<double>(y)); }
   
-  virtual void propagate(DomainInt flag, DomainDelta)
+  virtual void propagateStatic(DomainInt flag, DomainDelta)
   {
     PROP_INFO_ADDONE(Pow);
     switch(checked_cast<SysInt>(flag))
@@ -177,12 +177,12 @@ struct PowConstraint : public AbstractConstraint
   
   virtual void full_propagate()
   { 
-    propagate(1,DomainDelta::empty()); 
-    propagate(2,DomainDelta::empty());
-    propagate(3,DomainDelta::empty());
-    propagate(-1,DomainDelta::empty());
-    propagate(-2,DomainDelta::empty());
-    propagate(-3,DomainDelta::empty());
+    propagateStatic(1,DomainDelta::empty()); 
+    propagateStatic(2,DomainDelta::empty());
+    propagateStatic(3,DomainDelta::empty());
+    propagateStatic(-1,DomainDelta::empty());
+    propagateStatic(-2,DomainDelta::empty());
+    propagateStatic(-3,DomainDelta::empty());
   }
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)

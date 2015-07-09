@@ -64,7 +64,7 @@ struct AbsConstraint : public AbstractConstraint
   {
     var1.setMin(0);
     for(SysInt i = 0; i < 4 && !getState().isFailed(); ++i)
-      propagate(i, DomainDelta::empty());
+      propagateStatic(i, DomainDelta::empty());
   }
   
   // Assume values passed in in order.
@@ -96,7 +96,7 @@ struct AbsConstraint : public AbstractConstraint
     
   }
   
-  virtual void propagate(DomainInt i, DomainDelta)
+  virtual void propagateStatic(DomainInt i, DomainDelta)
   {
     // Assume this in the algorithm.
     D_ASSERT(var1.getMin() >= 0);

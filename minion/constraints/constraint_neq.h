@@ -80,7 +80,7 @@ struct NeqConstraint : public AbstractConstraint
   virtual AbstractConstraint* reverse_constraint()
   { return forward_check_negation(this); }
 
-  virtual void propagate(DomainInt prop_val_in, DomainDelta)
+  virtual void propagateStatic(DomainInt prop_val_in, DomainDelta)
   {
     const SysInt prop_val = checked_cast<SysInt>(prop_val_in);
     PROP_INFO_ADDONE(ArrayNeq);

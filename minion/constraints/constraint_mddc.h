@@ -655,7 +655,7 @@ struct MDDC : public AbstractConstraint
     { return forward_check_negation(this); }
 
 
-    virtual void propagate(DomainInt prop_var, DomainDelta)
+    virtual void propagateStatic(DomainInt prop_var, DomainDelta)
     {
         if(!constraint_locked)
         {

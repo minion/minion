@@ -71,7 +71,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(DomainInt flag, DomainDelta)
+  virtual void propagateStatic(DomainInt flag, DomainDelta)
   {
     full_propagate();
   }
@@ -198,7 +198,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint
     return t;
   }
   
-  virtual void propagate(DomainInt flag, DomainDelta)
+  virtual void propagateStatic(DomainInt flag, DomainDelta)
   {
     full_propagate();
   }
