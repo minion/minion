@@ -99,7 +99,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
     using FlowConstraint<VarArray, UseIncGraph>::adjlist_remove;
     using FlowConstraint<VarArray, UseIncGraph>::check_adjlists;
 
-    using FlowConstraint<VarArray, UseIncGraph>::dynamic_trigger_start;
     using FlowConstraint<VarArray, UseIncGraph>::var_array;
     using FlowConstraint<VarArray, UseIncGraph>::dom_min;
     using FlowConstraint<VarArray, UseIncGraph>::dom_max;
@@ -266,7 +265,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #if UseIncGraph
         {
             // update the adjacency lists. and place dts
-            DynamicTrigger* dt=dynamic_trigger_start();
             for(SysInt i=dom_min; i<=dom_max; i++)
             {
                 for(SysInt j=0; j<adjlistlength[i-dom_min+numvars]; j++)
@@ -287,8 +285,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
                     else
                     {
                         // arranged in blocks for each variable, with numvals triggers in each block
-                        DynamicTrigger* mydt= dt+(var*numvals)+(i-dom_min);
-                        this->moveTrigger(var_array[var], mydt, DomainRemoval, i);
+                        DomainInt mydt= (var*numvals)+(i-dom_min);
+                        this->moveTriggerInt(var_array[var], mydt, DomainRemoval, i);
                     }
                 }
             }
@@ -297,20 +295,19 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         #endif
 
         #ifdef CAPBOUNDSCACHE
-            DynamicTrigger* dt=dynamic_trigger_start();
-            dt+=(numvars*numvals);
+            DomainInt dt =(numvars*numvals);
             for(SysInt i=0; i < (SysInt)val_array.size(); i++)
             {
                 // lowerbound first
                 for(SysInt j=0; j<((SysInt)val_array.size()+numvars); j++)
                 {
-                    dt->trigger_info()=(val_array[i]-dom_min)*2;
+                    this->triggerInfo(dt)=(val_array[i]-dom_min)*2;
                     dt++;
                 }
                 // upperbound
                 for(SysInt j=0; j<((SysInt)val_array.size()+numvars); j++)
                 {
-                    dt->trigger_info()=(val_array[i]-dom_min)*2+1;
+                    this->triggerInfo(dt)=(val_array[i]-dom_min)*2+1;
                     dt++;
                 }
             }
@@ -367,10 +364,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         }
     }
 
-    virtual void propagate(DynamicTrigger* trig)
+    virtual void propagateDynInt(SysInt  trig)
     {
         #if defined(CAPBOUNDSCACHE) || UseIncGraph
-        DynamicTrigger* dtstart=dynamic_trigger_start();
+        SysInt dtstart=0;
         #endif
 
         #ifdef CAPBOUNDSCACHE
@@ -420,7 +417,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         else
         {
             D_ASSERT(trig>= dtstart && trig<dtstart+(2*val_array.size()*(numvars+val_array.size())) );
-            boundsupported[trig->trigger_info()]=-1;
+            boundsupported[this->triggerInfo(trig)]=-1;
         }
         #endif
 
@@ -2260,15 +2257,14 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 
         #ifdef CAPBOUNDSCACHE
         boundsupported[(forbiddenval-dom_min)*2]=usage[forbiddenval-dom_min];
-        DynamicTrigger* dt=dynamic_trigger_start();
-        dt+=(numvars*numvals);  // skip over the first block of triggers
+        DomainInt dt=(numvars*numvals);  // skip over the first block of triggers
         dt+=val_to_cap_index[forbiddenval-dom_min]*(val_array.size()+numvars)*2;  // move to the area for the value.
         //dt+=(val_array.size()+numvars);  // move to upper bound area
         // now put down the triggers for varvalmatching and usage
         for(SysInt i=0; i<numvars; i++)
         {
-            D_ASSERT((dt+i)->trigger_info() == (forbiddenval-dom_min)*2);
-            this->moveTrigger(var_array[i], dt+i, DomainRemoval, varvalmatching[i]);
+            D_ASSERT(this->triggerInfo(dt+i) == (forbiddenval-dom_min)*2);
+            this->moveTriggerInt(var_array[i], dt+i, DomainRemoval, varvalmatching[i]);
         }
         for(SysInt i=0; i<val_array.size(); i++)
         {
@@ -2276,11 +2272,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
 
             if(val_array[i]>= dom_min && val_array[i]<= dom_max)
             {
-                this->moveTrigger(capacity_array[i], dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
+                this->moveTriggerInt(capacity_array[i], dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
             }
             else
             {
-                this->moveTrigger(capacity_array[i], dt+numvars+i, DomainRemoval, 0);
+                this->moveTriggerInt(capacity_array[i], dt+numvars+i, DomainRemoval, 0);
             }
         }
         #endif
@@ -2418,26 +2414,25 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph>
         //usage=usagebac;
         #ifdef CAPBOUNDSCACHE
         boundsupported[(value-dom_min)*2+1]=usage[startvalindex];
-        DynamicTrigger* dt=dynamic_trigger_start();
-        dt+=(numvars*numvals);  // skip over the first block of triggers
+        DomainInt dt+=(numvars*numvals);  // skip over the first block of triggers
         dt+=val_to_cap_index[value-dom_min]*(val_array.size()+numvars)*2;  // move to the area for the value.
         dt+=(val_array.size()+numvars);  // move to upper bound area
         // now put down the triggers for varvalmatching and usage
         for(SysInt i=0; i<numvars; i++)
         {
-            D_ASSERT((dt+i)->trigger_info() == (value-dom_min)*2+1);
-            this->moveTrigger(var_array[i], dt+i, DomainRemoval, varvalmatching[i]);
+            D_ASSERT(this->triggerInfo(dt+i) == (value-dom_min)*2+1);
+            this->moveTriggerInt(var_array[i], dt+i, DomainRemoval, varvalmatching[i]);
         }
         for(SysInt i=0; i<val_array.size(); i++)
         {
-            D_ASSERT((dt+numvars+i)->trigger_info() == (value-dom_min)*2+1);
+            D_ASSERT(this->triggerInfo(dt+numvars+i) == (value-dom_min)*2+1);
             if(val_array[i]>= dom_min && val_array[i]<= dom_max)
             {
-                this->moveTrigger(capacity_array[i], dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
+                this->moveTriggerInt(capacity_array[i], dt+numvars+i, DomainRemoval, usage[val_array[i]-dom_min]);
             }
             else
             {
-                this->moveTrigger(capacity_array[i], dt+numvars+i, DomainRemoval, 0);
+                this->moveTriggerInt(capacity_array[i], dt+numvars+i, DomainRemoval, 0);
             }
         }
         #endif

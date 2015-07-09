@@ -296,7 +296,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
     }
   }
 
-  virtual void propagate(DynamicTrigger* trig)
+  virtual void propagateDynInt(SysInt  trig)
   {
       #if UseIncGraph
       DynamicTrigger* dtstart=dynamic_trigger_start();
@@ -315,7 +315,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
       #endif
 
       // get variable number from the trigger
-    SysInt prop_var = trig->trigger_info();
+    SysInt prop_var = this->triggerInfo(trig);
     #ifdef PLONG
     // check that some value has been disturbed; otherwise the watches are malfunctioning.
     if(var_array[prop_var].inDomain(varvalmatching[prop_var]))

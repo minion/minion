@@ -129,7 +129,7 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
 
   virtual void full_propagate()
   {
-    DynamicTrigger* dt = dynamic_trigger_start();
+    SysInt dt = 0;
 
     if(var_sum <= 0)
       // Constraint trivially satisfied
@@ -181,8 +181,8 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
       {
         if(var_array[i].inDomain(1 - VarToCount))
         {
-          dt->trigger_info() = i;
-          moveTrigger(var_array[i], dt, VarToCount ? LowerBound : UpperBound);
+          triggerInfo(dt) = i;
+          moveTriggerInt(var_array[i], dt, VarToCount ? LowerBound : UpperBound);
           ++dt;
         }
         else
@@ -216,11 +216,11 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
     return true;
   }
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
     PROP_INFO_ADDONE(DynSum);
     D_ASSERT(check_consistency());
-    SysInt propval = dt->trigger_info();
+    SysInt propval = triggerInfo(dt);
     D_ASSERT(var_array[propval].getAssignedValue() == VarToCount);
   // should generalise
   // and will need to loop round for watched lits
@@ -245,8 +245,8 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
     {
       SysInt& unwatched_index = unwatched(j);
 
-      dt->trigger_info() = unwatched_index;
-      moveTrigger(var_array[unwatched_index], 
+      triggerInfo(dt) = unwatched_index;
+      moveTriggerInt(var_array[unwatched_index], 
         dt,
         VarToCount ? LowerBound : UpperBound);
 
@@ -258,16 +258,16 @@ template<typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reve
 
   // there is no literal to watch, we need to propagate
 
-    DynamicTrigger* dt2 = dynamic_trigger_start();
+    SysInt dt2 = 0;
 
     for(SysInt z = 0; z < var_sum + 1; ++z)
     {
       if(dt != dt2)       // that one has just been set the other way
       {
         if(VarToCount)
-          var_array[dt2->trigger_info()].setMax(0);
+          var_array[triggerInfo(dt2)].setMax(0);
         else
-          var_array[dt2->trigger_info()].setMin(1);
+          var_array[triggerInfo(dt2)].setMin(1);
       }
       dt2++;
     }

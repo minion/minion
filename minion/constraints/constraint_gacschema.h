@@ -491,9 +491,8 @@ struct GACSchema : public AbstractConstraint, Backtrackable
   }
 
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt pos)
   {
-      const SysInt pos=dt-dynamic_trigger_start();
       const SysInt var=pos/numvals;
       DomainInt val=pos-(var*numvals)+dom_min;
       const SysInt validx= checked_cast<SysInt>(val-dom_min);

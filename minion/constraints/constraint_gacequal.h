@@ -122,9 +122,8 @@ struct GACEqualConstraint : public AbstractConstraint
       
   }
   
-  virtual void propagate(DynamicTrigger* dt_)
+  virtual void propagateDynInt(SysInt pos)
   {
-    SysInt pos = dt_ - dynamic_trigger_start();
       if(pos<dvar2) {
           DomainInt val=pos+var1.getInitialMin();
           D_ASSERT(!var1.inDomain(val));

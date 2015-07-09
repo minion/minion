@@ -165,10 +165,9 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
       }
   }
 
-  virtual void propagate(DynamicTrigger* trig)
+  virtual void propagateDynInt(SysInt  trig)
   {
-    DynamicTrigger* dt = dynamic_trigger_start();
-      if(trig==dt || trigger1index==-1)
+      if(trig==0 || trigger1index==-1)
       {
           if(val_count.isAssigned())
           {
@@ -200,7 +199,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint
           }
           return;
       }
-      D_ASSERT(trig==dt+1);
+      D_ASSERT(trig==1);
       if(!val_count.isAssigned())
       {   // don't need two triggers.
           releaseTriggerInt(1);

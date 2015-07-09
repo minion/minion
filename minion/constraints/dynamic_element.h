@@ -388,11 +388,9 @@ struct ElementConstraintDynamic : public AbstractConstraint
   }
 
 
-  virtual void propagate(DynamicTrigger* trig)
+  virtual void propagateDynInt(SysInt pos)
   {
     PROP_INFO_ADDONE(DynElement);
-    DynamicTrigger* dt = dynamic_trigger_start();
-    UnsignedSysInt pos = trig - dt;
     UnsignedSysInt array_size = var_array.size();
     UnsignedSysInt result_support_triggers =
       checked_cast<UnsignedSysInt>((initial_result_dom_max - initial_result_dom_min + 1) * 2);

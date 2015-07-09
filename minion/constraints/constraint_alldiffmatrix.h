@@ -155,13 +155,13 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
 
   }
 
-  virtual void propagate(DynamicTrigger* trig)
+  virtual void propagateDynInt(SysInt  trig)
   {
-      if(trig-dynamic_trigger_start() < (SysInt)var_array.size()) {
+      if(trig < (SysInt)var_array.size()) {
           // One of the value has been pruned somewhere
           // Need to propagate.
 
-          SysInt vidx=trig-dynamic_trigger_start();
+          SysInt vidx=trig;
           SysInt row=vidx/squaresize;
           SysInt col=vidx%squaresize;
 
@@ -177,9 +177,9 @@ struct AlldiffMatrixConstraint : public AbstractConstraint
           }
       }
       else {
-          D_ASSERT(trig-dynamic_trigger_start() < (SysInt)var_array.size()*2);
+          D_ASSERT(trig < (SysInt)var_array.size()*2);
           // In the second block. Something was assigned.
-          SysInt vidx=trig-dynamic_trigger_start()-(SysInt)var_array.size();
+          SysInt vidx=checked_cast<SysInt>(trig)-(SysInt)var_array.size();
 
 
           if(var_array[vidx].getAssignedValue()==value) {

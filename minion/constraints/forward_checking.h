@@ -78,13 +78,12 @@ struct Forward_Checking : public AbstractConstraint
   
   virtual void full_propagate()
   {
-      DynamicTrigger* dtstart = dynamic_trigger_start();
       SysInt size = child->get_vars_singleton()->size();
       vector<AnyVarRef>* vars = child->get_vars_singleton();
 
       trig1=trig2=-1;
       
-      trig1=find_new_trigger(-1, -1, dtstart, size, vars);
+      trig1=find_new_trigger(-1, -1, 0, size, vars);
       
       // if all variables assigned
       if(trig1==-1) {
@@ -94,7 +93,7 @@ struct Forward_Checking : public AbstractConstraint
           return;
       }
       
-      trig2=find_new_trigger(trig1, -1, dtstart+1, size, vars);
+      trig2=find_new_trigger(trig1, -1, 1, size, vars);
       
       if(trig2==-1) {   // One variable unassigned
           // make sure we put trig2 somewhere!
@@ -106,17 +105,15 @@ struct Forward_Checking : public AbstractConstraint
 
   }
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
-      DynamicTrigger* dtstart = dynamic_trigger_start();
       SysInt size = child->get_vars_singleton()->size();
       vector<AnyVarRef>* vars = child->get_vars_singleton();
       
-      D_ASSERT(dt != NULL);
-      if(dt==dtstart) {
+      if(dt==0) {
           // Find trigger 1 again.
           
-          SysInt temp=find_new_trigger(trig2, trig1, dtstart, size, vars);
+          SysInt temp=find_new_trigger(trig2, trig1, 0, size, vars);
           
           if(temp!=-1) {
               trig1=temp;
@@ -127,10 +124,10 @@ struct Forward_Checking : public AbstractConstraint
           }
           return;
       }
-      else if(dt==dtstart+1) {
+      else if(dt==1) {
           // Find trigger 2 again.
           
-          SysInt temp=find_new_trigger(trig1, trig2, dtstart+1, size, vars);
+          SysInt temp=find_new_trigger(trig1, trig2, 1, size, vars);
           
           if(temp!=-1) {
               trig2=temp;
@@ -141,7 +138,7 @@ struct Forward_Checking : public AbstractConstraint
           }
           return;
       }
-      else if(dt==dtstart+2) {
+      else if(dt==2) {
           // If this is a stale trigger, release it.
           if(FCPruning.isMember(0)) {
               releaseTriggerInt(2);
@@ -171,12 +168,12 @@ struct Forward_Checking : public AbstractConstraint
     }
   }
   
-  SysInt find_new_trigger(SysInt toavoid, SysInt start, DynamicTrigger* dtthis, SysInt size, vector<AnyVarRef>* vars) {
+  SysInt find_new_trigger(SysInt toavoid, SysInt start, DomainInt dtthis, SysInt size, vector<AnyVarRef>* vars) {
       SysInt i=start+1;
       for(; i<size ; i++) {
           if(i!=toavoid  &&  !(*vars)[i].isAssigned())
           {
-              moveTrigger((*vars)[i], dtthis, Assigned);
+              moveTriggerInt((*vars)[i], dtthis, Assigned);
               return i;
           }
       }
@@ -185,7 +182,7 @@ struct Forward_Checking : public AbstractConstraint
       for(i=0; i<=start; i++) {
           if(i!=toavoid  &&  !(*vars)[i].isAssigned())
           {
-              moveTrigger((*vars)[i], dtthis, Assigned);
+              moveTriggerInt((*vars)[i], dtthis, Assigned);
               return i;
           }
       }
@@ -200,7 +197,7 @@ struct Forward_Checking : public AbstractConstraint
       else {
           // It's a bound var. 
           FCPruning.remove(0);  // go into 'pruning' mode
-          moveTrigger((*vars)[var], dynamic_trigger_start()+2, DomainChanged);
+          moveTriggerInt((*vars)[var], 2, DomainChanged);
           pruningvar=var;
           fc_pruning_bound(var, size, vars);
       }

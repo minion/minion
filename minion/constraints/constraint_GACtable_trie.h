@@ -124,11 +124,9 @@ struct GACTableConstraint : public AbstractConstraint
      return true;
   }
 
-  virtual void propagate(DynamicTrigger* propagated_trig)
+  virtual void propagateDynInt(SysInt trigger_pos)
   {
     PROP_INFO_ADDONE(DynGACTable);
-    DynamicTrigger* dt = dynamic_trigger_start();
-    SysInt trigger_pos = propagated_trig - dt;
     SysInt propagated_literal = trigger_pos / ( (SysInt)vars.size() - 1);
 
     BOOL is_new_support = find_new_support(propagated_literal);

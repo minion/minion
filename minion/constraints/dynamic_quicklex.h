@@ -155,15 +155,11 @@ template<typename VarArray1, typename VarArray2, bool Less = false>
     }
   }
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
-    DynamicTrigger* base_dt = dynamic_trigger_start();
-
-    P("Trigger Event:" << dt - base_dt << " alpha:" << (SysInt)alpha);
-
     SysInt a = alpha;
 
-    if(base_dt == dt)
+    if(0 == dt)
     { // X triggered
       if(Less && a >= (SysInt)var_array1.size() - 1)
         var_array2[a].setMin(var_array1[a].getMin() + 1);

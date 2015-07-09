@@ -65,7 +65,7 @@ template<typename Var>
   }
 
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
     PROP_INFO_ADDONE(WatchInRange);
     if(var.isBound())
@@ -138,7 +138,7 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
     var.removeFromDomain(val); 
   }
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
     PROP_INFO_ADDONE(WatchInRange);
     var.removeFromDomain(val); 

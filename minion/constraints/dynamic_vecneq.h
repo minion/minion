@@ -399,7 +399,7 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
   void propagate_from_var2(SysInt index)
   {  Operator::propagate_from_var2(var_array1[index], var_array2[index]); }
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt trigger_activated)
   {
     PROP_INFO_ADDONE(DynVecNeq);
     P("VecNeq prop");
@@ -409,7 +409,6 @@ template<typename VarArray1, typename VarArray2, typename Operator = NeqIterated
     else
     { P("Watching " << watched_index0 << "," << watched_index1); }
 
-    SysInt trigger_activated = dt - dynamic_trigger_start();
     SysInt triggerpair = trigger_activated / 2;
     D_ASSERT(triggerpair == 0 || triggerpair == 1);
     // Var arrays are numbered 1 and 2

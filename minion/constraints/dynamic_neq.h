@@ -67,14 +67,13 @@ struct WatchNeqConstraint : public AbstractConstraint
   }
   
     
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
       PROP_INFO_ADDONE(WatchNEQ);
-      DynamicTrigger* dt_start = dynamic_trigger_start();
       
-    D_ASSERT(dt == dt_start || dt == dt_start + 1);
+    D_ASSERT(dt == 0 || dt == 1);
     
-      if(dt == dt_start)
+      if(dt == 0)
       {
         D_ASSERT(var1.isAssigned());
         var2.removeFromDomain(var1.getAssignedValue());

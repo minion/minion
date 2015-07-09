@@ -59,7 +59,7 @@ template<typename Var>
     if(var.isBound())
     {
       moveTriggerInt(var, 0, DomainChanged);
-      propagate(NULL);
+      propagateDynInt(0);
     }
     else
     {
@@ -69,7 +69,7 @@ template<typename Var>
   }
 
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
     PROP_INFO_ADDONE(WatchInSet);
     // If we are in here, we have a bounds variable.

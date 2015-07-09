@@ -101,7 +101,7 @@ public:
 
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate */
-  virtual void propagate(DynamicTrigger*)
+  virtual void propagateDynInt(SysInt )
     { D_FATAL_ERROR("Fatal error in 'Dynamic Propagate' in " + extended_name()); }
 
   /// Iterative propagation function.
@@ -312,6 +312,9 @@ protected:
   // Maps a dynamic trigger to the constraint which it belongs to.
   // SysInt as they never change, and are always used to index arrays
   vector<SysInt> _dynamic_trigger_to_constraint;
+  // Offset into array
+  vector<SysInt> _dynamic_trigger_child_offset;
+  
   // Maps a static trigger to a pair { constraint, trigger for that constraint }
   vector< pair<DomainInt, DomainInt> > _static_trigger_to_constraint;
   // Maps variables to constraints
@@ -323,9 +326,17 @@ public:
   pair<DomainInt, DomainInt> getChildStaticTrigger(DomainInt i)
     { return _static_trigger_to_constraint[checked_cast<SysInt>(i)]; }
 
-  SysInt getChildDynamicTrigger(DynamicTrigger* ptr)
+  SysInt getChildDynamicTrigger(DomainInt p)
   {
-    return _dynamic_trigger_to_constraint[ptr - dynamic_trigger_start()];
+    return _dynamic_trigger_to_constraint[checked_cast<SysInt>(p)];
+  }
+  
+  void passDynTriggerToChild(SysInt trig)
+  {
+    SysInt child = getChildDynamicTrigger(trig);
+    SysInt offset = _dynamic_trigger_child_offset[child];
+    D_ASSERT(trig >= offset);
+    child_constraints[child]->propagateDynInt(trig - offset);
   }
 
   /// Gets all the triggers a constraint wants to set up.
@@ -391,6 +402,7 @@ public:
 
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
     {
+      _dynamic_trigger_child_offset.push_back(current_trigger_count);
       // We need this check to ensure we don't try constructing a "start of trigger" block one off the
       // the end of memory array.
       if(current_trigger_count == dynamic_trigger_count_with_children())
@@ -447,7 +459,7 @@ public:
 inline void DynamicTrigger::propagate()
 {
   D_ASSERT(sanity_check == 1234);
-  constraint->propagate(this);
+  constraint->propagateDynInt(trig_pos);
 }
 
 namespace ConOutput

@@ -291,14 +291,14 @@ struct reify : public ParentConstraint
     }
   }
 
-  virtual void propagate(DynamicTrigger* trig)
+  virtual void propagateDynInt(SysInt  trig)
   {
     PROP_INFO_ADDONE(Reify);
     P("Dynamic prop start");
     if(constraint_locked)
       return;
 
-    DynamicTrigger* _dt = dynamic_trigger_start();
+    const SysInt _dt = 0;
     //SysInt numtriggers=dynamic_trigger_count();
 
     if(!full_propagate_called)
@@ -356,7 +356,7 @@ struct reify : public ParentConstraint
         {
           P("Remove unused trigger");
           // This is an optimisation. Remove a trigger from stage 2.
-          releaseTrigger(trig);
+          releaseTriggerInt(trig);
         }
     }
     else // full_propagate_called
@@ -373,10 +373,11 @@ struct reify : public ParentConstraint
       if(reify_var.getAssignedValue() == child)
       {
           P("Removing leftover trigger from other child constraint");
-          releaseTrigger(trig);
+          releaseTriggerInt(trig);
           return;
       }
-      child_constraints[getChildDynamicTrigger(trig)]->propagate(trig);
+      passDynTriggerToChild(trig);
+      //child_constraints[getChildDynamicTrigger(trig)]->propagateDynInt(trig);
     }
 
   }

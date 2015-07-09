@@ -170,14 +170,14 @@ template<typename BoolVar, bool DoWatchAssignment>
     }
   }
 
-  virtual void propagate(DynamicTrigger* trig)
+  virtual void propagateDynInt(SysInt  trig)
   {
     PROP_INFO_ADDONE(ReifyTrue);
     P("Dynamic prop start");
     if(constraint_locked)
       return;
 
-    DynamicTrigger* dt = dynamic_trigger_start();
+    const SysInt dt = 0;
 
     if(DoWatchAssignment && trig >= dt && trig < dt + dynamic_trigger_count())
     {// Lost assignment, but don't replace when rar_var=0
@@ -205,26 +205,27 @@ template<typename BoolVar, bool DoWatchAssignment>
     {
       P("Pass triggers to children");
       D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
-      child_constraints[0]->propagate(trig);
+      passDynTriggerToChild(trig);
+      //child_constraints[0]->propagateDynInt(trig);
     }
     else
     {
       P("Remove unused trigger");
       // This is an optimisation.
-      releaseTrigger(trig);
+      releaseTriggerInt(trig);
     }
   }
 
   template<typename T, typename Vars, typename Trigger>
-  void watch_assignment(const T& assignment, Vars& vars, Trigger* trig)
+  void watch_assignment(const T& assignment, Vars& vars, Trigger trig)
   {
     for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
     {
       D_ASSERT(vars[assignment[i].first].inDomain(assignment[i].second));
       if(vars[assignment[i].first].isBound()) {
-        moveTrigger(vars[assignment[i].first], trig + i, DomainChanged);
+        moveTriggerInt(vars[assignment[i].first], trig + i, DomainChanged);
       } else {
-        moveTrigger(vars[assignment[i].first], trig + i, DomainRemoval, assignment[i].second);
+        moveTriggerInt(vars[assignment[i].first], trig + i, DomainRemoval, assignment[i].second);
       }
     }
 
@@ -244,7 +245,7 @@ template<typename BoolVar, bool DoWatchAssignment>
       return;
     }
     
-    DynamicTrigger* dt = dynamic_trigger_start();
+    const SysInt dt = 0;
     SysInt dt_count = dynamic_trigger_count();
     // Clean up triggers
     for(SysInt i = 0; i < dt_count; ++i)

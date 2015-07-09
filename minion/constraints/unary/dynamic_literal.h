@@ -55,7 +55,7 @@ template<typename Var>
   { var.propagateAssign(val); }
 
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
     PROP_INFO_ADDONE(WatchInRange);
     var.propagateAssign(val);

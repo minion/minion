@@ -155,7 +155,7 @@ struct Dynamic_OR : public ParentConstraint
     }
   }
 
-  virtual void propagate(DynamicTrigger* trig)
+  virtual void propagateDynInt(SysInt  trig)
   {
     //PROP_INFO_ADDONE(WatchedOr);
     P("Prop");
@@ -165,17 +165,13 @@ struct Dynamic_OR : public ParentConstraint
     if(constraint_locked)
       return;
 
-    DynamicTrigger* dt = dynamic_trigger_start();
-
-    P("Trig: " << trig - dt);
-
-    if(trig >= dt && trig < dt + assign_size * 2)
+    if(trig >= 0 && trig < assign_size * 2)
     {
       if(full_propagate_called)
         return;
 
-      SysInt tripped_constraint = (trig - dt) / assign_size;
-      SysInt other_constraint = 1 - tripped_constraint;
+      SysInt tripped_constraint = checked_cast<SysInt>(trig / assign_size);
+      SysInt other_constraint = checked_cast<SysInt>(1 - tripped_constraint);
       P("Tripped: " << tripped_constraint << ":" << watched_constraint[tripped_constraint]);
       D_ASSERT(tripped_constraint == 0 || tripped_constraint == 1);
 
@@ -239,13 +235,14 @@ struct Dynamic_OR : public ParentConstraint
     if(full_propagate_called && getChildDynamicTrigger(trig) == propagated_constraint)
     {
       P("Propagating child");
-      child_constraints[propagated_constraint]->propagate(trig);
+      passDynTriggerToChild(trig);
+      //child_constraints[propagated_constraint]->propagateDynInt(trig);
     }
     else
     {
       P("Clean old trigger");
       // This is an optimisation.
-      releaseTrigger(trig);
+      releaseTriggerInt(trig);
     }
   }
 

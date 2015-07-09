@@ -181,11 +181,11 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
   BOOL check_consistency()
   { return true; }
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
     PROP_INFO_ADDONE(DynLitWatch);
     D_ASSERT(check_consistency());
-    SysInt propval = dt->trigger_info();
+    SysInt propval = triggerInfo(dt);
 
     D_ASSERT(!var_array[propval].inDomain(value_array[propval]));
 
@@ -214,8 +214,8 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 
       // propval gives array index of old watched lit
 
-      dt->trigger_info() = unwatched_index;
-      moveTrigger(var_array[unwatched_index], dt,DomainRemoval,
+      triggerInfo(dt) = unwatched_index;
+      moveTriggerInt(var_array[unwatched_index], dt,DomainRemoval,
                                                    value_array[unwatched_index]);
 
       unwatched_index = propval;
@@ -226,13 +226,13 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint
 
     // there is no literal to watch, we need to propagate
 
-    DynamicTrigger* dt2 = dynamic_trigger_start();
+    SysInt dt2 = 0;
 
     for(SysInt z = 0; z < var_sum + 1; ++z)
     {
       if(dt != dt2)       // that one has just been set the other way
       {
-        var_array[dt2->trigger_info()].propagateAssign(value_array[dt2->trigger_info()]);
+        var_array[triggerInfo(dt2)].propagateAssign(value_array[triggerInfo(dt2)]);
       }
       dt2++;
     }

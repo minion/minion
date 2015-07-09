@@ -70,7 +70,7 @@ struct Check_Assign : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { return child->get_vars(); }
 
-  virtual void propagate(DynamicTrigger*)
+  virtual void propagateDynInt(SysInt )
   {
     SysInt size = child->get_vars_singleton()->size();
     vector<AnyVarRef>* vars = child->get_vars_singleton();
@@ -93,7 +93,7 @@ struct Check_Assign : public AbstractConstraint
   }
 
   virtual void full_propagate()
-  { propagate(NULL); }
+  { propagateDynInt(0); }
 };
 
 inline AbstractConstraint*

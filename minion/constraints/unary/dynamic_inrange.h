@@ -66,7 +66,7 @@ template<typename Var>
   }
 
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
     PROP_INFO_ADDONE(WatchInRange);
     D_FATAL_ERROR("Propagation is never called for 'in range'");

@@ -243,12 +243,10 @@ struct NewTableConstraint : public AbstractConstraint
   virtual SysInt dynamic_trigger_count()
     { return checked_cast<SysInt>(data->getLiteralCount() * ( (SysInt)vars.size() - 1)) ; }
 
-  virtual void propagate(DynamicTrigger* propagated_trig)
+  virtual void propagateDynInt(SysInt trigger_pos)
   {
     PROP_INFO_ADDONE(DynGACTable);
 
-    DynamicTrigger* dt = dynamic_trigger_start();
-    SysInt trigger_pos = propagated_trig - dt;
     SysInt propagated_literal = trigger_pos / ((SysInt)vars.size() - 1);
 
     Literal lit = data->getLiteralFromPos(propagated_literal);
@@ -295,14 +293,13 @@ struct NewTableConstraint : public AbstractConstraint
 
   void clear_watches(Literal lit, SysInt lit_pos)
   {
-    DynamicTrigger* dt = dynamic_trigger_start();
     D_ASSERT(data->getLiteralPos(lit) == lit_pos);
     SysInt vars_size = vars.size();
-    dt += lit_pos * (vars_size - 1);
+    SysInt pos = lit_pos * (vars_size - 1);
     for(SysInt v = 0; v < vars_size; ++v)
     {
-      releaseTrigger(dt , TO_Backtrack);
-      ++dt;
+      releaseTriggerInt(pos , TO_Backtrack);
+      ++pos;
     }
   }
 

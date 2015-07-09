@@ -240,7 +240,7 @@ struct GACTableConstraint : public AbstractConstraint
 #endif
   }
 
-  virtual void propagate(DynamicTrigger* propagated_trig)
+  virtual void propagateDynInt(SysInt  propagated_trig)
   {
     PROP_INFO_ADDONE(DynGACTable);
 

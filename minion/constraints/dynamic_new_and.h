@@ -165,7 +165,7 @@ struct Dynamic_AND : public ParentConstraint
     child_constraints[checked_cast<SysInt>(childTrigger.first)]->propagate(childTrigger.second, domain);
   }
 
-  virtual void propagate(DynamicTrigger* trig)
+  virtual void propagateDynInt(SysInt  trig)
   {
     //PROP_INFO_ADDONE(WatchedOr);
     P("Prop");
@@ -175,7 +175,10 @@ struct Dynamic_AND : public ParentConstraint
     // need to know which child to prop.
     SysInt child = getChildDynamicTrigger(trig);
     if(!constraint_locked || child < propagated_to)
-    child_constraints[child]->propagate(trig);
+    {
+      passDynTriggerToChild(trig);
+      //child_constraints[child]->propagateDynInt(trig);
+    }
   }
 
   virtual void full_propagate()

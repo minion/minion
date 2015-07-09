@@ -695,9 +695,8 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable
         }
     }
 
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt lit)
   {
-      SysInt lit=dt-dynamic_trigger_start();
 
     //  cout << "Propagate called: var= " << var << "val = " << val << endl;
       //printStructures();

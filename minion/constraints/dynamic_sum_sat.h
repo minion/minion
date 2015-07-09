@@ -90,18 +90,17 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
     return;
   }
     
-  virtual void propagate(DynamicTrigger* dt)
+  virtual void propagateDynInt(SysInt  dt)
   {
     PROP_INFO_ADDONE(DynSumSat);
     SysInt var_size = var_array.size();
     
-    DynamicTrigger* base_dt = dynamic_trigger_start();
     SysInt other_propval;
     
-    if(base_dt == dt)
-      other_propval = (base_dt + 1)->trigger_info();
+    if(0 == dt)
+      other_propval = triggerInfo(1);
     else
-      other_propval = base_dt->trigger_info();
+      other_propval = triggerInfo(0);
     
 // I thought this would make the code go faster. But it doesn't!
 //  if(var_array[other_propval].isAssignedValue(1))
@@ -141,9 +140,9 @@ struct BoolSATConstraintDynamic : public AbstractConstraint
     }
     
     // Found new value to watch
-    dt->trigger_info() = loop;
+    triggerInfo(dt) = loop;
     last = loop;
-    moveTrigger(var_array[loop], dt, UpperBound);
+    moveTriggerInt(var_array[loop], dt, UpperBound);
   }
   
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size)

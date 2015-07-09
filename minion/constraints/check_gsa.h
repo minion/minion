@@ -68,7 +68,7 @@ struct Check_GSA : public AbstractConstraint
   virtual vector<AnyVarRef> get_vars()
   { return child->get_vars(); }
 
-  virtual void propagate(DynamicTrigger*)
+  virtual void propagateDynInt(SysInt )
   {
     bool flag = false;
     GET_ASSIGNMENT(assignment, child);
@@ -93,7 +93,7 @@ struct Check_GSA : public AbstractConstraint
   }
 
   virtual void full_propagate()
-  { propagate(NULL); }
+  { propagateDynInt(0); }
 };
 
 AbstractConstraint*
