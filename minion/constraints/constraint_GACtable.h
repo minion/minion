@@ -240,12 +240,9 @@ struct GACTableConstraint : public AbstractConstraint
 #endif
   }
 
-  virtual void propagateDynInt(SysInt  propagated_trig)
+  virtual void propagateDynInt(SysInt trigger_pos)
   {
     PROP_INFO_ADDONE(DynGACTable);
-
-    DynamicTrigger* dt = dynamic_trigger_start();
-    SysInt trigger_pos = propagated_trig - dt;
     SysInt propagated_literal = trigger_pos / ((SysInt)vars.size() - 1);
 
     pair<DomainInt, DomainInt> varval = (lists->tuples->get_varval_from_literal)(propagated_literal);
@@ -267,8 +264,6 @@ struct GACTableConstraint : public AbstractConstraint
     SysInt lit = (lists->tuples->get_literal)(var, val);
     vector<DomainInt>& support = supporting_tuple(lit);
 
-    DynamicTrigger* dt = dynamic_trigger_start();
-    
     SysInt vars_size = vars.size();
     SysInt trig_pos = lit * (vars_size - 1);
     for(SysInt v = 0; v < vars_size; ++v)

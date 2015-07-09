@@ -75,7 +75,6 @@ struct GACEqualConstraint : public AbstractConstraint
   CONSTRAINT_ARG_LIST2(var1, var2);
   
   SysInt dvar2;
-  //DynamicTrigger* dtvar2;   // The start of the block related to var2
   
   GACEqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2) : 
     var1(_var1), var2(_var2)

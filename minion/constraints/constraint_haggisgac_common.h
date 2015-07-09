@@ -342,24 +342,13 @@
   inline void attach_trigger(SysInt var, DomainInt val, SysInt lit)
   {
       //P("Attach Trigger: " << i);
-
-      DynamicTrigger* dt = dynamic_trigger_start();
-      // find the trigger for var, val.
-      dt=dt+lit;
-      D_ASSERT(!dt->isAttached());
-
-      moveTrigger(vars[var], dt, DomainRemoval, val );   //, TO_Backtrack
+      moveTriggerInt(vars[var], lit, DomainRemoval, val );   //, TO_Backtrack
   }
 
   inline void detach_trigger(SysInt lit)
   {
       //P("Detach Triggers");
-
-      // D_ASSERT(supportListPerLit[var][val-vars[var].getInitialMin()].next[var] == 0);
-
-      DynamicTrigger* dt = dynamic_trigger_start();
-      dt=dt+lit;
-      releaseTrigger(dt);   // , TO_Backtrack
+      releaseTriggerInt(lit);   // , TO_Backtrack
   }
 
       BOOL hasNoKnownSupport(SysInt var,SysInt lit) {

@@ -157,16 +157,14 @@ struct GACTableConstraint : public AbstractConstraint
     // cout << "  " << var << ", literal" << lit << ":";
     // for(SysInt z = 0; z < (SysInt)vars.size(); ++z) cout << recyclableTuple[z] << " "; cout << endl;
 
-    DynamicTrigger* dt = dynamic_trigger_start();
-
     const SysInt vars_size = vars.size();
-    dt += checked_cast<SysInt>(lit * (vars_size - 1));
+    SysInt dt = checked_cast<SysInt>(lit * (vars_size - 1));
     for(SysInt v = 0; v < vars_size; ++v)
     {
       if(v != var)
       {
         D_ASSERT(vars[v].inDomain(recyclableTuple[v]));
-        moveTrigger(vars[v], dt, DomainRemoval, recyclableTuple[v]);
+        moveTriggerInt(vars[v], dt, DomainRemoval, recyclableTuple[v]);
         ++dt;
       }
     }

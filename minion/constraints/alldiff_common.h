@@ -299,10 +299,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph>
   virtual void propagateDynInt(SysInt  trig)
   {
       #if UseIncGraph
-      DynamicTrigger* dtstart=dynamic_trigger_start();
-      if(trig>=dtstart && trig< dtstart+numvars*numvals)  // does this trigger belong to incgraph?
+      if(trig>=0 && trig< numvars*numvals)  // does this trigger belong to incgraph?
       {
-          SysInt diff=trig-dtstart;
+          SysInt diff=trig;
             SysInt var=diff/numvals;
             SysInt validx=diff%numvals;
             if(adjlistpos[validx+numvars][var]<adjlistlength[validx+numvars])

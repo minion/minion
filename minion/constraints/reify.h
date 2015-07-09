@@ -433,11 +433,9 @@ struct reify : public ParentConstraint
         return;
     }
 
-    DynamicTrigger* dt = dynamic_trigger_start();
-    //SysInt dt_count = dynamic_trigger_count();
     // Clean up triggers
     for(SysInt i = 0; i < dtcount; ++i)
-      releaseTrigger(dt + i);
+      releaseTriggerInt(i);
 
     bool flag;
     GET_ASSIGNMENT(assignment0, child_constraints[0]);
