@@ -21,7 +21,7 @@
 #define ALLDIFF_GCC_SHARED_H
 
 #include <vector>
-#include "constraint_abstract.h"
+#include "../triggering/constraint_abstract.h"
 
 #define REVERSELIST   // Is this really necessary now?
 

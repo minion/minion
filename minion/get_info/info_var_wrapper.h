@@ -17,7 +17,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "../constraints/constraint_abstract.h"
+#include "../triggering/constraint_abstract.h"
 
 #define VAR_INFO_PRINT_0(X,Y)
 #define VAR_INFO_PRINT_1(X,Y,Z)

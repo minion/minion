@@ -20,7 +20,7 @@
 #ifndef FORWARD_CHECKING_H_HIUO
 #define FORWARD_CHECKING_H_HIUO
 
-#include "constraint_abstract.h"
+#include "../triggering/constraint_abstract.h"
 #include "../memory_management/reversible_vals.h"
 #include "../get_info/get_info.h"
 #include "../queue/standard_queue.h"

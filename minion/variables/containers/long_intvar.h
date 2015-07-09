@@ -33,7 +33,7 @@ Use of this variable in a constraint:
 eq(x, 2) #variable x equals 2
 */
 
-#include "../../constraints/constraint_abstract.h"
+#include "../../triggering/constraint_abstract.h"
 
 template<typename d_type>
 struct BigRangeVarContainer;

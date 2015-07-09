@@ -41,7 +41,7 @@ eq(bool, 0) #variable bool equals 0
 
 #include "../../memory_management/backtrackable_memory.h"
 
-#include "../../constraints/constraint_abstract.h"
+#include "../../triggering/constraint_abstract.h"
 
 
 /// Standard data type used for storing compressed booleans

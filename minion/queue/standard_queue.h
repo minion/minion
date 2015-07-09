@@ -27,8 +27,8 @@
 #include <deque>
 #include "../solver.h"
 #include "../get_info/get_info.h"
-#include "../constraints/triggers.h"
-#include "../constraints/constraint_abstract.h"
+#include "../triggering/triggers.h"
+#include "../triggering/constraint_abstract.h"
 #include "TriggerBacktrackQueue.h"
 
 class Queues

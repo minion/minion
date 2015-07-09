@@ -20,7 +20,7 @@
 #ifndef VARIABLE_NEG_H
 #define VARIABLE_NEG_H
 
-#include "../../constraints/constraint_abstract.h"
+#include "../../triggering/constraint_abstract.h"
 
 // This is a temporary fix to get around the fact that 'VarNeg' is defined in some windows header.
 // Long term, probably need a better solution.

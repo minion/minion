@@ -23,7 +23,7 @@
 // This container stores a list of triggers and queues. On backtrack
 // It puts the triggers back onto the queue they were on previously.
 
-#include "../constraints/constraint_abstract.h"
+#include "../triggering/constraint_abstract.h"
 
 #ifdef P
 #undef P

@@ -19,7 +19,7 @@
 
 
 
-#include "../../constraints/constraint_abstract.h"
+#include "../../triggering/constraint_abstract.h"
 
 template<typename T>
 struct MultiplyHelp

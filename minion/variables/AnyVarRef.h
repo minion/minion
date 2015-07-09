@@ -144,7 +144,7 @@ ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 #include "../constants.h"
 #include "../system/system.h"
 #include "../solver.h"
-#include "../constraints/triggers.h"
+#include "../triggering/triggers.h"
 class AbstractConstraint;
 class DynamicTrigger;
 

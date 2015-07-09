@@ -35,7 +35,7 @@ Use of this variable in a constraint:
 eq(myvar, 4) #variable myvar equals 4
 */
 
-#include "../../constraints/constraint_abstract.h"
+#include "../../triggering/constraint_abstract.h"
 
 template<typename BoundType>
 struct BoundVarContainer;

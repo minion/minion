@@ -42,11 +42,11 @@ VARDEF(ofstream solsoutFile);
 
 typedef TrailedMonotonicSet MonotonicSet;
 
-#include "constraints/constraint_abstract.h"
+#include "triggering/constraint_abstract.h"
 
 #include "queue/standard_queue.h"
 
-#include "trigger_list.h"
+#include "triggering/trigger_list.h"
 
 #include "variables/variables.h"
 
@@ -65,7 +65,7 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 #include "StateObj.hpp"
 #include "solver.hpp"
-#include "constraints/function_defs.hpp"
+#include "triggering/function_defs.hpp"
 
 #ifndef DOMINION
 #include "inputfile_parse/CSPSpec.hpp"
