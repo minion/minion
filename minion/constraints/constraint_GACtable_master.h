@@ -22,20 +22,7 @@
 
 #include "new_table.h"
 
-#ifdef OLDTABLE
-#include "constraint_GACtable.h"
-#else
-#ifdef REGINLHOMME
-#include "constraint_GACtable_reginlhomme.h"
-#else
-#ifdef NIGHTINGALE
-#include "constraint_GACtable_nightingale.h"
-#else
 #include "constraint_GACtable_trie.h"
-#endif 
-#endif
-#endif
-#endif
 
 
 template <typename T>
@@ -63,3 +50,5 @@ BuildCT_WATCHED_NEGATIVE_TABLE(const T& t1, ConstraintBlob& b)
     "args": [ "read_list", "read_tuples" ]
   }
 */
+
+#endif
