@@ -28,6 +28,9 @@
 #include "memory_management/backtrackable_memory.h"
 #include "memory_management/nonbacktrack_memory.h"
 
+
+
+
 class TriggerList
 {
   
@@ -50,8 +53,8 @@ public:
 
   vector<vector<vector<Trigger> > > triggers;
 
-  vector<vector<DynamicTrigger> > dynamic_triggers_vec;
-  vector<vector<DynamicTrigger> > dynamic_triggers_domain_vec;
+  vector<vector<DynamicTriggerList> > dynamic_triggers_vec;
+  vector<vector<DynamicTriggerList> > dynamic_triggers_domain_vec;
   
   //void* dynamic_triggers;
 
@@ -91,11 +94,11 @@ public:
     return pair<Trigger*,Trigger*>(trigs.data(), trigs.data()+trigs.size());
   }
 
-  void dynamic_propagate(DomainInt var_num, TrigType type, DomainInt val_removed = NoDomainValue)
+  void dynamic_propagate(DomainInt var_num, TrigType type, DomainInt domain_delta, DomainInt val_removed = NoDomainValue)
   {
     D_ASSERT(val_removed == NoDomainValue || ( type == DomainRemoval && val_removed != NoDomainValue) );
     D_ASSERT(!only_bounds || type != DomainRemoval);
-    DynamicTrigger* trig;
+    DynamicTriggerList* trig;
     if(type != DomainRemoval)
     {
       trig = &(dynamic_triggers_vec[type][checked_cast<SysInt>(var_num)]);
@@ -107,15 +110,15 @@ public:
       D_ASSERT(vars_max_domain_val >= val_removed);
       trig = &(dynamic_triggers_domain_vec[checked_cast<SysInt>(val_removed - vars_min_domain_val)][checked_cast<SysInt>(var_num)]);
     }
-    D_ASSERT(trig->next != NULL);
+
     // This is an optimisation, no need to push empty lists.
-    if(trig->next != trig)
-      getQueue().pushDynamicTriggers(trig);
+    if(!trig->empty())
+      getQueue().pushDynamicTriggers(DynamicTriggerEvent(trig, checked_cast<SysInt>(domain_delta)));
   }
 
   void push_upper(DomainInt var_num, DomainInt upper_delta)
   {
-    dynamic_propagate(var_num, UpperBound);
+    dynamic_propagate(var_num, UpperBound, upper_delta);
     D_ASSERT(upper_delta > 0 || getState().isFailed());
 
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
@@ -126,7 +129,7 @@ public:
 
   void push_lower(DomainInt var_num, DomainInt lower_delta)
   {
-    dynamic_propagate(var_num, LowerBound);
+    dynamic_propagate(var_num, LowerBound, lower_delta);
     D_ASSERT(lower_delta > 0 || getState().isFailed());
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
     if(range.first != range.second)
@@ -137,7 +140,7 @@ public:
 
   void push_assign(DomainInt var_num, DomainInt)
   {
-    dynamic_propagate(var_num, Assigned);
+    dynamic_propagate(var_num, Assigned, -1);
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
     if(range.first != range.second)
       getQueue().pushTriggers(TriggerRange(range.first, range.second, -1));
@@ -145,7 +148,7 @@ public:
 
   void push_domain_changed(DomainInt var_num)
   {
-    dynamic_propagate(var_num, DomainChanged);
+    dynamic_propagate(var_num, DomainChanged, -1);
 
     pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
     if (range.first != range.second)
@@ -155,7 +158,7 @@ public:
   void push_domain_removal(DomainInt var_num, DomainInt val_removed)
   {
     D_ASSERT(!only_bounds);
-    dynamic_propagate(var_num, DomainRemoval, val_removed);
+    dynamic_propagate(var_num, DomainRemoval, -1, val_removed);
   }
 
   void add_domain_trigger(DomainInt b, Trigger t)
@@ -176,11 +179,7 @@ public:
     D_ASSERT(!only_bounds || type != DomainRemoval);
     D_ASSERT(t->constraint != NULL);
     D_ASSERT(t->sanity_check == 1234);
-  // This variable is only use in debug mode, and will be optimised away at any optimisation level.
-    DynamicTrigger* old_list;
-    (void)old_list;
-    old_list = t->next;
-    DynamicTrigger* queue;
+    DynamicTriggerList* queue;
     
     if(type != DomainRemoval)
     {
@@ -199,13 +198,13 @@ public:
     switch(op)
     {
         case TO_Default:
-            D_DATA(t->setQueue((DynamicTrigger*)BAD_POINTER));
+            D_DATA(t->setQueue((DynamicTriggerList*)BAD_POINTER));
         break;
         case TO_Store:
         t->setQueue(queue);
         break;
         case TO_Backtrack:
-            D_ASSERT(t->getQueue() != (DynamicTrigger*)BAD_POINTER);
+            D_ASSERT(t->getQueue() != (DynamicTriggerList*)BAD_POINTER);
             getQueue().getTbq().addTrigger(t);
             // Add to queue.
             t->setQueue(queue);
@@ -214,8 +213,7 @@ public:
         abort();
     }
 
-    t->add_after(queue);
-    D_ASSERT(old_list == NULL || old_list->sanity_check_list(false));
+    queue->add(t);
   }
 
 };
@@ -225,16 +223,16 @@ inline void releaseTrigger(DynamicTrigger* t , TrigOp op)
     switch(op)
     {
         case TO_Default:
-            D_DATA(t->setQueue((DynamicTrigger*)BAD_POINTER));
+            D_DATA(t->setQueue((DynamicTriggerList*)BAD_POINTER));
         break;
         case TO_Store:
-        t->setQueue((DynamicTrigger*)(NULL));
+        t->setQueue((DynamicTriggerList*)(NULL));
         break;
         case TO_Backtrack:
-            D_ASSERT(t->getQueue() != (DynamicTrigger*)BAD_POINTER);
+            D_ASSERT(t->getQueue() != (DynamicTriggerList*)BAD_POINTER);
             getQueue().getTbq().addTrigger(t);
             // Add to queue.
-            t->setQueue((DynamicTrigger*)(NULL));
+            t->setQueue((DynamicTriggerList*)(NULL));
         break;
         default:
         abort();
@@ -244,19 +242,20 @@ inline void releaseTrigger(DynamicTrigger* t , TrigOp op)
 }
 
  inline void attachTriggerToNullList(DynamicTrigger* t , TrigOp op)
- {    static DynamicTrigger dt;
-    DynamicTrigger* queue = &dt;
+ {    
+    static DynamicTriggerList dt;
+    DynamicTriggerList* queue = &dt;
 
     switch(op)
     {
         case TO_Default:
-            D_DATA(t->setQueue((DynamicTrigger*)BAD_POINTER));
+            D_DATA(t->setQueue((DynamicTriggerList*)BAD_POINTER));
         break;
         case TO_Store:
         t->setQueue(queue);
         break;
         case TO_Backtrack:
-            D_ASSERT(t->getQueue() != (DynamicTrigger*)BAD_POINTER);
+            D_ASSERT(t->getQueue() != (DynamicTriggerList*)BAD_POINTER);
             getQueue().getTbq().addTrigger(t);
             // Add to queue.
             t->setQueue(queue);
@@ -264,7 +263,7 @@ inline void releaseTrigger(DynamicTrigger* t , TrigOp op)
         default:
         abort();
     }
-    t->add_after(queue);
+    queue->add(t);
  }
 
 

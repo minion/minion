@@ -35,7 +35,7 @@
 struct TriggerBacktrackQueue
 {
 
-    typedef vector<pair<DynamicTrigger*, DynamicTrigger*> > TriggerList;
+    typedef vector<pair<DynamicTrigger*, DynamicTriggerList*> > TriggerList;
 
     vector<TriggerList> queue;
 
@@ -71,7 +71,7 @@ struct TriggerBacktrackQueue
             else
             {
                 P("Add " << tl[i].first << " to " << tl[i].second);
-                tl[i].first->add_after(tl[i].second);
+                tl[i].second->add(tl[i].first);
                 tl[i].first->setQueue(tl[i].second);
             }
         }

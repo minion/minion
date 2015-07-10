@@ -63,13 +63,18 @@ class AbstractConstraint
 protected:
   /// Private members of the base class.
 
+
+  vector<TriggerPositionInfo> trig_info_vec;
   
   void* _DynamicTriggerCache;
   vector<AnyVarRef> singleton_vars;
-
-
 public:
-
+  
+  void reportTriggerMovement(SysInt trigger, TriggerPositionInfo tpi)
+  {
+    trig_info_vec[trigger] = tpi;
+  }
+  
   #ifdef WDEG
   UnsignedSysInt wdeg;
   #endif
@@ -197,7 +202,10 @@ public:
 
 
   virtual void setup_dynamic_triggers(void* DynamicTriggerPointer)
-    { _DynamicTriggerCache = DynamicTriggerPointer; }
+  {
+    _DynamicTriggerCache = DynamicTriggerPointer; 
+    trig_info_vec.resize(dynamic_trigger_count());
+  }
 
 
   virtual triggerCollection setup_internal_gather_triggers()
@@ -304,6 +312,11 @@ public:
   
 };
 
+inline void reportTriggerMovement(AbstractConstraint* ac, SysInt pos, TriggerPositionInfo tpi)
+{
+  ac->reportTriggerMovement(pos, tpi);
+}
+
 /// Constraint from which other constraints can be inherited. Extends dynamicconstraint to allow children to be dynamic.
 class ParentConstraint : public AbstractConstraint
 {
@@ -394,6 +407,7 @@ public:
   virtual void setup_dynamic_triggers(void* dynamicTriggerPointer)
   {
     _DynamicTriggerCache = dynamicTriggerPointer;
+    trig_info_vec.resize(dynamic_trigger_count_with_children());
 
     SysInt current_trigger_count = dynamic_trigger_count();
 

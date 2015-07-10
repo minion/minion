@@ -37,7 +37,7 @@ class Queues
 
 
   QueueCon<TriggerRange> propagate_trigger_list;
-  QueueCon<DynamicTrigger*> dynamic_trigger_list;
+  QueueCon<DynamicTriggerEvent> dynamic_trigger_list;
 
   // Special triggers are those which can only be run while the
   // normal queue is empty. This list is at the moment only used
@@ -69,10 +69,9 @@ public:
     propagate_trigger_list.push_back(new_triggers);
   }
 
-  void pushDynamicTriggers(DynamicTrigger* new_dynamic_trig_range)
+  void pushDynamicTriggers(DynamicTriggerEvent new_dynamic_trig_range)
   {
     CON_INFO_ADDONE(AddDynToQueue);
-    D_ASSERT(new_dynamic_trig_range->sanity_check_list());
     dynamic_trigger_list.push_back(new_dynamic_trig_range);
   }
 
@@ -108,7 +107,7 @@ public:
     bool* fail_ptr = getState().getFailedPtr();
     while(!dynamic_trigger_list.empty())
     {
-      DynamicTrigger* t = dynamic_trigger_list.queueTop();
+      DynamicTrigger* t = dynamic_trigger_list.queueTop().event()->basePtr();
       dynamic_trigger_list.queuePop();
       DynamicTrigger* it = t->next;
 
@@ -215,7 +214,7 @@ public:
     bool* fail_ptr = getState().getFailedPtr();
     while(!dynamic_trigger_list.empty())
     {
-      DynamicTrigger* t = dynamic_trigger_list.queueTop();
+      DynamicTrigger* t = dynamic_trigger_list.queueTop().event()->basePtr();
       dynamic_trigger_list.queuePop();
       DynamicTrigger* it = t->next;
 

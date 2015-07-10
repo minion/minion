@@ -17,6 +17,24 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+class DynamicTriggerList;
+
+/// Used in constraints to denote the position of a trigger
+struct TriggerPositionInfo
+{
+  DynamicTriggerList* dtl;
+  SysInt pos;
+  
+  TriggerPositionInfo() : dtl(0), pos(-1)
+  { }
+  
+  TriggerPositionInfo(DynamicTriggerList* _dtl, SysInt _pos)
+  : dtl(_dtl), pos(_pos)
+  { }
+};
+
+// forward declaration
+void reportTriggerMovement(AbstractConstraint*, SysInt pos, TriggerPositionInfo tpi);
 
 /// This is a trigger to a constraint, which can be dynamically moved around.
 class DynamicTrigger
@@ -52,12 +70,12 @@ public:
 
 
 private:
-  DynamicTrigger* basequeue;
+  DynamicTriggerList* basequeue;
 public:
-  DynamicTrigger* getQueue()
+  DynamicTriggerList* getQueue()
   { return basequeue; }
 
-  void setQueue(DynamicTrigger* ptr)
+  void setQueue(DynamicTriggerList* ptr)
   {
     basequeue = ptr;
   }
@@ -163,4 +181,63 @@ public:
     }
     return true;
   }
+  
+  void movingTo(TriggerPositionInfo tpi)
+  {
+    // Can't use "constraint->" here due to header ordering
+    reportTriggerMovement(constraint, trig_pos, tpi);
+  }
+};
+
+class DynamicTriggerList
+{
+  DynamicTrigger base;
+
+public:
+  
+  DynamicTriggerList()
+  { }
+  
+  DynamicTriggerList(const DynamicTriggerList&)
+  { abort(); }
+    
+    
+  bool sanity_check_list()
+  { // XXX
+    return base.sanity_check_list();
+  }
+  
+  void add(DynamicTrigger* t)
+  {
+    t->movingTo(TriggerPositionInfo{this, 0});
+    t->add_after(&base);
+  }
+  
+  bool empty()
+  { return base.next == &base; }
+  
+  DynamicTrigger* basePtr()
+  { return &base; }
+};
+
+/// Container for a range of triggers
+class DynamicTriggerEvent
+{
+  DynamicTriggerList* trigs;
+
+public:
+    
+  DynamicTriggerList* event() const
+  { return trigs; }
+  
+  /// The domain delta from the domain change.
+  /** This may not contain the actual delta, but contains data from which a variable can
+   construct it, by passing it to getDomainChange. */
+  DomainInt data;
+  DynamicTriggerEvent(DynamicTriggerList* t, DomainInt _data) : trigs(t), data(_data)
+  { 
+    D_ASSERT(data >= DomainInt_Min);
+    D_ASSERT(data <= DomainInt_Max);
+  }
+
 };
