@@ -33,7 +33,7 @@
 
 class Queues
 {
-  
+
 
 
   QueueCon<TriggerRange> propagate_trigger_list;
@@ -53,7 +53,7 @@ public:
   { return tbq; }
 
 
-  Queues() 
+  Queues()
   {}
 
   void pushSpecialTrigger(AbstractConstraint* trigger)
@@ -102,6 +102,7 @@ public:
 
   // Subclass this class and change the following three methods.
 
+  template<bool is_root_node>
   bool propagateDynamicTriggerLists()
   {
     bool* fail_ptr = getState().getFailedPtr();
@@ -126,8 +127,11 @@ public:
 #endif
         dummy.add_after(it);
 
-        CON_INFO_ADDONE(DynamicTrigger);
-        it->propagate();
+        if(!is_root_node || it->constraint->full_propagate_done)
+        {
+          CON_INFO_ADDONE(DynamicTrigger);
+          it->propagate();
+        }
 
 #ifdef WDEG
         if(*fail_ptr)
@@ -141,6 +145,7 @@ public:
     return false;
   }
 
+  template<bool is_root_node>
   bool propagateStaticTriggerLists()
   {
     bool* fail_ptr = getState().getFailedPtr();
@@ -158,8 +163,11 @@ public:
           return true;
         }
 
-        CON_INFO_ADDONE(StaticTrigger);
-        it->propagateStatic(data_val);
+        if(!is_root_node || it->constraint->full_propagate_done)
+        {
+          CON_INFO_ADDONE(StaticTrigger);
+          it->propagateStatic(data_val);
+        }
 
 #ifdef WDEG
         if(*fail_ptr)
@@ -171,25 +179,26 @@ public:
     return false;
   }
 
-  inline void propagateQueue()
+  template<bool is_root_node>
+  inline void propagateQueueImpl()
   {
     while(true)
     {
       while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
       {
-        if(propagateDynamicTriggerLists())
+        if(propagateDynamicTriggerLists<is_root_node>())
           return;
 
         /* Don't like code duplication here but a slight efficiency gain */
-        if(propagateStaticTriggerLists())
+        if(propagateStaticTriggerLists<is_root_node>())
           return;
       }
 
       if(special_triggers.empty())
         return;
 
-        AbstractConstraint* trig = special_triggers.queueTop();
-        special_triggers.queuePop();
+      AbstractConstraint* trig = special_triggers.queueTop();
+      special_triggers.queuePop();
 
       CON_INFO_ADDONE(SpecialTrigger);
       trig->special_check();
@@ -206,111 +215,12 @@ public:
 
   } // end Function
 
-// ******************************************************************************************
-// Second copy of the propagate queue methods, adapted for the root node only.
-
-  bool propagateDynamicTriggerListsRoot()
-  {
-    bool* fail_ptr = getState().getFailedPtr();
-    while(!dynamic_trigger_list.empty())
-    {
-      DynamicTrigger* t = dynamic_trigger_list.queueTop().event()->basePtr();
-      dynamic_trigger_list.queuePop();
-      DynamicTrigger* it = t->next;
-
-      while(it != t)
-      {
-        if(*fail_ptr)
-        {
-          clearQueues();
-          return true;
-        }
-
-#ifdef MINION_DEBUG
-        DynamicTrigger dummy((AbstractConstraint*)(BAD_POINTER), -1);
-#else
-        DynamicTrigger dummy;
-#endif
-        dummy.add_after(it);
-
-        if(it->constraint->full_propagate_done)
-        {
-            CON_INFO_ADDONE(DynamicTrigger);
-            it->propagate();
-        }
-
-        it = dummy.next;
-        releaseTrigger(&dummy);
-      }
-    }
-    return false;
-  }
-
-  bool propagateStaticTriggerListsRoot()
-  {
-    bool* fail_ptr = getState().getFailedPtr();
-    while(!propagate_trigger_list.empty())
-    {
-      TriggerRange t = propagate_trigger_list.queueTop();
-      DomainInt data_val = t.data;
-      propagate_trigger_list.queuePop();
-
-      for(Trigger* it = t.begin(); it != t.end(); it++)
-      {
-        if(*fail_ptr)
-        {
-          clearQueues();
-          return true;
-        }
-        if(it->constraint->full_propagate_done)
-        {
-          CON_INFO_ADDONE(StaticTrigger);
-          it->propagateStatic(data_val);
-        }
-      }
-    }
-
-    return false;
-  }
-
   inline void propagateQueueRoot()
-  {
-    while(true)
-    {
-      while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty())
-      {
-        if(propagateDynamicTriggerListsRoot())
-          return;
+  { return propagateQueueImpl<true>(); }
 
-        /* Don't like code duplication here but a slight efficiency gain */
-        if(propagateStaticTriggerListsRoot())
-          return;
-      }
+  inline void propagateQueue()
+  { return propagateQueueImpl<false>(); }
 
-      if(special_triggers.empty())
-        return;
-
-      AbstractConstraint* trig = special_triggers.queueTop();
-      special_triggers.queuePop();
-      CON_INFO_ADDONE(SpecialTrigger);
-      trig->special_check();
-
-      if(getState().isFailed())
-      {
-        clearQueues();
-        return;
-      }
-
-    } // while(true)
-
-  } // end Function
 };
-
-// This just allows SAC (which wants a list of vars)
-// and normal propagate to have the same input method.
-// Just checking the bounds doesn't make sense here, so we ignore it.
-//template<typename Vars>
-//inline void propagate_queue_vars(Vars& vars, bool /*CheckBounds*/)
-//{ getQueue().propagateQueue(); }
 
 #endif
