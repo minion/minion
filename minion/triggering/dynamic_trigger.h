@@ -23,18 +23,21 @@ class DynamicTriggerList;
 struct TriggerPositionInfo
 {
   DynamicTriggerList* dtl;
-  SysInt pos;
-  
-  TriggerPositionInfo() : dtl(0), pos(-1)
+  SysInt triggerListPos;
+
+  TriggerPositionInfo() : dtl(0), triggerListPos(-1)
   { }
-  
+
   TriggerPositionInfo(DynamicTriggerList* _dtl, SysInt _pos)
-  : dtl(_dtl), pos(_pos)
+  : dtl(_dtl), triggerListPos(_pos)
   { }
 };
 
 // forward declaration
 void reportTriggerMovement(AbstractConstraint*, SysInt pos, TriggerPositionInfo tpi);
+
+void reportTriggerRemoval(AbstractConstraint*, SysInt pos);
+
 
 /// This is a trigger to a constraint, which can be dynamically moved around.
 class DynamicTrigger
@@ -55,9 +58,9 @@ public:
   /// In debug mode, a value set to
   /// The constraint to be triggered.
   AbstractConstraint* constraint;
-  
+
   SysInt trig_pos;
-  
+
   /// A small space for constraints to store trigger-specific information.
   SysInt _trigger_info;
 
@@ -95,16 +98,17 @@ public:
   friend void releaseTrigger(DynamicTrigger* trig , TrigOp op);
   friend void releaseTrigger(DynamicTrigger* trig)
 	  { releaseTrigger(trig, TO_Default); }
-  
+
   friend void attachTriggerToNullList(DynamicTrigger* trig , TrigOp op);
   friend void attachTriggerToNullList(DynamicTrigger* trig)
 	  { attachTriggerToNullList(trig, TO_Default); }
-  
+
 private:
   /// Remove from whatever list this trigger is currently stored in.
 
   void remove()
   {
+    removing();
     D_ASSERT(constraint != NULL);
     D_ASSERT(sanity_check == 1234);
     D_ASSERT( (prev == NULL) == (next == NULL) );
@@ -181,12 +185,23 @@ public:
     }
     return true;
   }
-  
+
   void movingTo(TriggerPositionInfo tpi)
   {
     // Can't use "constraint->" here due to header ordering
     reportTriggerMovement(constraint, trig_pos, tpi);
   }
+
+  void removing()
+  {
+    if(constraint) {
+#ifdef MINION_DEBUG
+      if(constraint != (AbstractConstraint*)BAD_POINTER)
+#endif
+      reportTriggerRemoval(constraint, trig_pos);
+    }
+  }
+
 };
 
 class DynamicTriggerList
@@ -194,28 +209,28 @@ class DynamicTriggerList
   DynamicTrigger base;
 
 public:
-  
+
   DynamicTriggerList()
   { }
-  
+
   DynamicTriggerList(const DynamicTriggerList&)
   { abort(); }
-    
-    
+
+
   bool sanity_check_list()
   { // XXX
     return base.sanity_check_list();
   }
-  
+
   void add(DynamicTrigger* t)
   {
     t->movingTo(TriggerPositionInfo{this, 0});
     t->add_after(&base);
   }
-  
+
   bool empty()
   { return base.next == &base; }
-  
+
   DynamicTrigger* basePtr()
   { return &base; }
 };
@@ -226,16 +241,16 @@ class DynamicTriggerEvent
   DynamicTriggerList* trigs;
 
 public:
-    
+
   DynamicTriggerList* event() const
   { return trigs; }
-  
+
   /// The domain delta from the domain change.
   /** This may not contain the actual delta, but contains data from which a variable can
    construct it, by passing it to getDomainChange. */
   DomainInt data;
   DynamicTriggerEvent(DynamicTriggerList* t, DomainInt _data) : trigs(t), data(_data)
-  { 
+  {
     D_ASSERT(data >= DomainInt_Min);
     D_ASSERT(data <= DomainInt_Max);
   }

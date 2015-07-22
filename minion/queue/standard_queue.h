@@ -110,6 +110,7 @@ public:
     {
       DynamicTrigger* t = dynamic_trigger_list.queueTop().event()->basePtr();
       dynamic_trigger_list.queuePop();
+
       DynamicTrigger* it = t->next;
 
       while(it != t)

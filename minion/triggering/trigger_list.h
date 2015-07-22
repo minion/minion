@@ -33,7 +33,7 @@
 
 class TriggerList
 {
-  
+
 
   TriggerList(const TriggerList&);
   TriggerList();
@@ -41,7 +41,7 @@ class TriggerList
   bool only_bounds;
 
 public:
-  TriggerList(bool _only_bounds) : 
+  TriggerList(bool _only_bounds) :
   only_bounds(_only_bounds)
   {
     var_count_m = 0;
@@ -55,7 +55,7 @@ public:
 
   vector<vector<DynamicTriggerList> > dynamic_triggers_vec;
   vector<vector<DynamicTriggerList> > dynamic_triggers_domain_vec;
-  
+
   //void* dynamic_triggers;
 
   SysInt var_count_m;
@@ -72,10 +72,10 @@ public:
     vars_domain_size = checked_cast<UnsignedSysInt>(max_domain_val - min_domain_val + 1);
 
     dynamic_triggers_vec.resize(4);
-    
+
     for(int i = 0; i < 4; ++i)
       dynamic_triggers_vec[i].resize(var_count_m);
-      
+
     if(!only_bounds)
     {
       dynamic_triggers_domain_vec.resize(vars_domain_size);
@@ -180,7 +180,7 @@ public:
     D_ASSERT(t->constraint != NULL);
     D_ASSERT(t->sanity_check == 1234);
     DynamicTriggerList* queue;
-    
+
     if(type != DomainRemoval)
     {
       queue = &dynamic_triggers_vec[type][checked_cast<SysInt>(b)];
@@ -192,7 +192,7 @@ public:
       D_ASSERT(vars_max_domain_val >= val);
       queue = &dynamic_triggers_domain_vec[checked_cast<SysInt>(val - vars_min_domain_val)][checked_cast<SysInt>(b)];
     }
-    
+
     D_ASSERT(queue->sanity_check_list());
 
     switch(op)
@@ -242,7 +242,7 @@ inline void releaseTrigger(DynamicTrigger* t , TrigOp op)
 }
 
  inline void attachTriggerToNullList(DynamicTrigger* t , TrigOp op)
- {    
+ {
     static DynamicTriggerList dt;
     DynamicTriggerList* queue = &dt;
 

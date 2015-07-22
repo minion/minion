@@ -65,16 +65,21 @@ protected:
 
 
   vector<TriggerPositionInfo> trig_info_vec;
-  
+
   void* _DynamicTriggerCache;
   vector<AnyVarRef> singleton_vars;
 public:
-  
+
   void reportTriggerMovement(SysInt trigger, TriggerPositionInfo tpi)
   {
     trig_info_vec[trigger] = tpi;
   }
-  
+
+  void reportTriggerRemoval(SysInt trigger)
+  {
+    trig_info_vec[trigger] = TriggerPositionInfo{};
+  }
+
   #ifdef WDEG
   UnsignedSysInt wdeg;
   #endif
@@ -203,7 +208,7 @@ public:
 
   virtual void setup_dynamic_triggers(void* DynamicTriggerPointer)
   {
-    _DynamicTriggerCache = DynamicTriggerPointer; 
+    _DynamicTriggerCache = DynamicTriggerPointer;
     trig_info_vec.resize(dynamic_trigger_count());
   }
 
@@ -280,24 +285,24 @@ public:
       delete[] t;
       return unsatcounter;   // return tightness i.e. #forbidden tuples out of 100
   }
-  
+
   template<typename Var>
   void moveTrigger(Var& v, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
   { v.addDynamicTrigger(this, t, type, pos, op); }
-  
+
   template<typename Var>
   void moveTriggerInt(Var& v, DomainInt t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
   {
     DynamicTrigger* dt = static_cast<DynamicTrigger*>(_DynamicTriggerCache);
     v.addDynamicTrigger(this, dt + checked_cast<SysInt>(t), type, pos, op);
   }
-  
+
   SysInt& triggerInfo(DomainInt t)
   {
     DynamicTrigger* dt = static_cast<DynamicTrigger*>(_DynamicTriggerCache);
     return (dt+checked_cast<SysInt>(t))->trigger_info();
   }
-  
+
   void releaseTriggerInt(DomainInt t)
   {
     DynamicTrigger* dt = static_cast<DynamicTrigger*>(_DynamicTriggerCache);
@@ -309,12 +314,17 @@ public:
     DynamicTrigger* dt = static_cast<DynamicTrigger*>(_DynamicTriggerCache);
     releaseTrigger(dt+checked_cast<SysInt>(t), op);
   }
-  
+
 };
 
 inline void reportTriggerMovement(AbstractConstraint* ac, SysInt pos, TriggerPositionInfo tpi)
 {
   ac->reportTriggerMovement(pos, tpi);
+}
+
+inline void reportTriggerRemoval(AbstractConstraint* ac, SysInt pos)
+{
+  ac->reportTriggerRemoval(pos);
 }
 
 /// Constraint from which other constraints can be inherited. Extends dynamicconstraint to allow children to be dynamic.
@@ -327,7 +337,7 @@ protected:
   vector<SysInt> _dynamic_trigger_to_constraint;
   // Offset into array
   vector<SysInt> _dynamic_trigger_child_offset;
-  
+
   // Maps a static trigger to a pair { constraint, trigger for that constraint }
   vector< pair<DomainInt, DomainInt> > _static_trigger_to_constraint;
   // Maps variables to constraints
@@ -343,7 +353,7 @@ public:
   {
     return _dynamic_trigger_to_constraint[checked_cast<SysInt>(p)];
   }
-  
+
   void passDynTriggerToChild(SysInt trig)
   {
     SysInt child = getChildDynamicTrigger(trig);
