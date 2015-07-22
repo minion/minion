@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef _BUILDCSP_H
@@ -25,19 +26,18 @@
 #define getpid _getpid
 #endif
 
-struct SearchMethod
-{
+struct SearchMethod {
   VarOrderEnum order;
-  unsigned int limit;  // for static limited.
+  unsigned int limit; // for static limited.
   enum PropagationLevel preprocess;
   enum PropagationLevel prop_method;
   UnsignedSysInt random_seed;
-  SearchMethod() : order(ORDER_NONE), preprocess(PropLevel_None), prop_method(PropLevel_GAC), random_seed((UnsignedSysInt)time(NULL) ^ getpid())
-  { }
-  
+  SearchMethod()
+      : order(ORDER_NONE), preprocess(PropLevel_None), prop_method(PropLevel_GAC),
+        random_seed((UnsignedSysInt)time(NULL) ^ getpid()) {}
 };
 
-void BuildCSP(ProbSpec::CSPInstance& instance);
-void SolveCSP(ProbSpec::CSPInstance& instance, SearchMethod args);
+void BuildCSP(ProbSpec::CSPInstance &instance);
+void SolveCSP(ProbSpec::CSPInstance &instance, SearchMethod args);
 
 #endif

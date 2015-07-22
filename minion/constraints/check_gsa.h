@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef CHECK_GSA_H_HIUO
@@ -32,59 +33,50 @@
 //#define P(x) cout << x << endl
 #define P(x)
 
-struct Check_GSA : public AbstractConstraint
-{
-  virtual string extended_name()
-  { return constraint_name() + ":" + child->extended_name(); }
+struct Check_GSA : public AbstractConstraint {
+  virtual string extended_name() { return constraint_name() + ":" + child->extended_name(); }
 
-  virtual string constraint_name()
-    { return "check[gsa]"; }
+  virtual string constraint_name() { return "check[gsa]"; }
 
   CONSTRAINT_ARG_LIST1(child);
 
-  AbstractConstraint* child;
+  AbstractConstraint *child;
 
-  Check_GSA(AbstractConstraint* _con) :
-  child(_con)
-  { }
+  Check_GSA(AbstractConstraint *_con) : child(_con) {}
 
-  virtual ~Check_GSA()
-      { delete child; }
+  virtual ~Check_GSA() { delete child; }
 
-  virtual AbstractConstraint* reverse_constraint()
-  {
+  virtual AbstractConstraint *reverse_constraint() {
     return new Check_GSA(child->reverse_constraint());
   }
 
-  virtual SysInt dynamic_trigger_count()
-   { return child->get_vars_singleton()->size()*2; }
+  virtual SysInt dynamic_trigger_count() { return child->get_vars_singleton()->size() * 2; }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  { return child->get_satisfying_assignment(assignment); }
-
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
-  { return child->check_assignment(v, v_size); }
-
-  virtual vector<AnyVarRef> get_vars()
-  { return child->get_vars(); }
-
-  virtual void propagateDynInt(SysInt )
-  {
-    bool flag = false;
-    GET_ASSIGNMENT(assignment, child);
-    if(!flag)
-    { getState().setFailed(true); }
-    else
-    { watch_assignment(assignment, *(child->get_vars_singleton()), 0); }
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+    return child->get_satisfying_assignment(assignment);
   }
 
-  template<typename T, typename Vars>
-  void watch_assignment(const T& assignment, Vars& vars, DomainInt trig)
-  {
-    for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
-    {
+  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+    return child->check_assignment(v, v_size);
+  }
+
+  virtual vector<AnyVarRef> get_vars() { return child->get_vars(); }
+
+  virtual void propagateDynInt(SysInt) {
+    bool flag = false;
+    GET_ASSIGNMENT(assignment, child);
+    if (!flag) {
+      getState().setFailed(true);
+    } else {
+      watch_assignment(assignment, *(child->get_vars_singleton()), 0);
+    }
+  }
+
+  template <typename T, typename Vars>
+  void watch_assignment(const T &assignment, Vars &vars, DomainInt trig) {
+    for (SysInt i = 0; i < (SysInt)assignment.size(); ++i) {
       D_ASSERT(vars[assignment[i].first].inDomain(assignment[i].second));
-      if(vars[assignment[i].first].isBound()) {
+      if (vars[assignment[i].first].isBound()) {
         moveTriggerInt(vars[assignment[i].first], trig + i, DomainChanged);
       } else {
         moveTriggerInt(vars[assignment[i].first], trig + i, DomainRemoval, assignment[i].second);
@@ -92,17 +84,12 @@ struct Check_GSA : public AbstractConstraint
     }
   }
 
-  virtual void full_propagate()
-  { propagateDynInt(0); }
+  virtual void full_propagate() { propagateDynInt(0); }
 };
 
-AbstractConstraint*
-checkGSACon(AbstractConstraint* c)
-{ return new Check_GSA(c); }
+AbstractConstraint *checkGSACon(AbstractConstraint *c) { return new Check_GSA(c); }
 
-inline AbstractConstraint*
-BuildCT_CHECK_GSA(ConstraintBlob& bl)
-{
+inline AbstractConstraint *BuildCT_CHECK_GSA(ConstraintBlob &bl) {
   D_ASSERT(bl.internal_constraints.size() == 1);
   return checkGSACon(build_constraint(bl.internal_constraints[0]));
 }

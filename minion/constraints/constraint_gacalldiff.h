@@ -14,14 +14,15 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 /** @help constraints;gacalldiff Description
 Forces the input vector of variables to take distinct values.
 */
 
-/** @help constraints;gacalldiff Example 
+/** @help constraints;gacalldiff Example
 Suppose the input file had the following vector of variables defined:
 
 DISCRETE myVec[9] {1..9}
@@ -41,10 +42,10 @@ This constraint enforces generalized arc consistency.
 
 #include "alldiff_common.h"
 
-template<typename VarArray>
-AbstractConstraint*
-BuildCT_GACALLDIFF(const VarArray& var_array, ConstraintBlob&)
-{ return new GacAlldiffConstraint<VarArray>(var_array); }
+template <typename VarArray>
+AbstractConstraint *BuildCT_GACALLDIFF(const VarArray &var_array, ConstraintBlob &) {
+  return new GacAlldiffConstraint<VarArray>(var_array);
+}
 
 /* JSON
 { "type": "constraint",

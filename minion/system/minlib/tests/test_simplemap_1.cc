@@ -1,14 +1,12 @@
 #include <minlib/minlib.hpp>
 
 struct Component {
-   std::string id;
+  std::string id;
 };
 
+int main(void) {
+  SimpleMap<std::string, Component> sm;
 
-int main(void)
-{
-   SimpleMap<std::string, Component> sm;
-
-   Component c;
-   sm.add(c.id, c);
+  Component c;
+  sm.add(c.id, c);
 };

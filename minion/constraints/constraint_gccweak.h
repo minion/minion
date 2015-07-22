@@ -14,12 +14,12 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
-
-/** @help constraints;gccweak Description 
-The Generalized Cardinality Constraint (GCC) (weak variant) constrains the 
+/** @help constraints;gccweak Description
+The Generalized Cardinality Constraint (GCC) (weak variant) constrains the
 number of each value that a set of variables can take.
 
 gccweak([primary variables], [values of interest], [capacity variables])
@@ -29,7 +29,7 @@ the number of occurrences of the value in the primary variables.
 
 This constraint only restricts the number of occurrences of the values in
 the value list. There is no restriction on the occurrences of other values.
-Therefore the semantics of gccweak are identical to a set of occurrence 
+Therefore the semantics of gccweak are identical to a set of occurrence
 constraints:
 
 occurrence([primary variables], val1, cap1)
@@ -38,7 +38,7 @@ occurrence([primary variables], val2, cap2)
 
 */
 
-/** @help constraints;gccweak Example 
+/** @help constraints;gccweak Example
 Suppose the input file had the following vectors of variables defined:
 
 DISCRETE myVec[9] {1..9}
@@ -51,13 +51,13 @@ vector.
 gccweak(myVec, [1,2,3,4,5,6,7,8,9], cap)
 */
 
-/** @help constraints;gccweak Notes 
+/** @help constraints;gccweak Notes
 This constraint enforces a hybrid consistency. It reads the bounds of the
 capacity variables, then enforces GAC over the primary variables only.  Then the
 bounds of the capacity variables are updated by counting values in the domains
 of the primary variables.
 
-The consistency over the capacity variables is weaker than the gcc constraint, 
+The consistency over the capacity variables is weaker than the gcc constraint,
 hence the name gccweak.
 */
 
@@ -66,10 +66,11 @@ hence the name gccweak.
 
 #include "gcc_common.h"
 
-template<typename VarArray1, typename VarArray2>
-AbstractConstraint*
-BuildCT_GCCWEAK(const VarArray1& var_array, const VarArray2& cap_array, ConstraintBlob& b)
-{ return new GCC<VarArray1, VarArray2, false>(var_array, cap_array, b.constants[0]); }
+template <typename VarArray1, typename VarArray2>
+AbstractConstraint *BuildCT_GCCWEAK(const VarArray1 &var_array, const VarArray2 &cap_array,
+                                    ConstraintBlob &b) {
+  return new GCC<VarArray1, VarArray2, false>(var_array, cap_array, b.constants[0]);
+}
 
 /* JSON
 { "type": "constraint",

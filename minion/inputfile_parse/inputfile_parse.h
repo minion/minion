@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef INPUTFILE_PARSE_H
@@ -22,7 +23,7 @@
 
 #include "CSPSpec.h"
 
-void readInputFromFiles(CSPInstance& inst, vector<string> fnames, bool parser_verbose,
+void readInputFromFiles(CSPInstance &inst, vector<string> fnames, bool parser_verbose,
                         MapLongTuplesToShort mltts, bool ensure_branch_on_all_vars);
 
 #endif

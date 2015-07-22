@@ -25,13 +25,11 @@
 #include <tuple>
 #include <functional>
 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
 #include <assert.h>
-
 
 #define SHARED_PTR std::shared_ptr
 #define TUPLE std::tuple
@@ -41,7 +39,7 @@
 /// Stores typedefs for containers.
 /// The reason we do this is to templates in templates in
 /// the containers, which is horrible
-template<typename... Class>
+template <typename... Class>
 struct TypeDefs;
 
 #ifdef _WIN32
@@ -49,7 +47,7 @@ struct TypeDefs;
 #define DOM_NOINLINE
 #else
 #define DOM_NORETURN __attribute__((noreturn))
-#define DOM_NOINLINE __attribute__ ((noinline))
+#define DOM_NOINLINE __attribute__((noinline))
 #endif
 
 #endif

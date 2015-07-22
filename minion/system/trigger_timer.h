@@ -14,17 +14,18 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
-
 
 #ifndef TRIG_TIMER_H
 #define TRIG_TIMER_H
 
-/// This function will cause the boolean passed to be set to 'true' after timeout.
-void activate_trigger(volatile bool*, bool timeout_active, int timeout, bool CPU_time);
+/// This function will cause the boolean passed to be set to 'true' after
+/// timeout.
+void activate_trigger(volatile bool *, bool timeout_active, int timeout, bool CPU_time);
 
 // This takes a point to a bool*, which will be switch when ctrl+c is pressed.
-void install_ctrlc_trigger(volatile bool*);
+void install_ctrlc_trigger(volatile bool *);
 
 #endif

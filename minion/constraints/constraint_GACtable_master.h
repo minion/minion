@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef CONSTRAINT_GACTABLE_MASTER_H_QPQP
@@ -24,11 +25,10 @@
 
 #include "constraint_GACtable_trie.h"
 
-
 template <typename T>
-AbstractConstraint*
-BuildCT_WATCHED_TABLE(const T& t1, ConstraintBlob& b)
-{ return GACTableCon(t1, b.tuples); }
+AbstractConstraint *BuildCT_WATCHED_TABLE(const T &t1, ConstraintBlob &b) {
+  return GACTableCon(t1, b.tuples);
+}
 
 /* JSON
   { "type": "constraint",
@@ -39,9 +39,9 @@ BuildCT_WATCHED_TABLE(const T& t1, ConstraintBlob& b)
 */
 
 template <typename T>
-AbstractConstraint*
-BuildCT_WATCHED_NEGATIVE_TABLE(const T& t1, ConstraintBlob& b)
-{ return GACNegativeTableCon(t1, b.tuples); }
+AbstractConstraint *BuildCT_WATCHED_NEGATIVE_TABLE(const T &t1, ConstraintBlob &b) {
+  return GACNegativeTableCon(t1, b.tuples);
+}
 
 /* JSON
   { "type": "constraint",

@@ -14,11 +14,11 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
-
-/** @help constraints;gcc Description 
+/** @help constraints;gcc Description
 The Generalized Cardinality Constraint (GCC) constrains the number of each value
 that a set of variables can take.
 
@@ -29,7 +29,7 @@ the number of occurrences of the value in the primary variables.
 
 This constraint only restricts the number of occurrences of the values in
 the value list. There is no restriction on the occurrences of other values.
-Therefore the semantics of gcc are identical to a set of occurrence 
+Therefore the semantics of gcc are identical to a set of occurrence
 constraints:
 
 occurrence([primary variables], val1, cap1)
@@ -38,7 +38,7 @@ occurrence([primary variables], val2, cap2)
 
 */
 
-/** @help constraints;gcc Example 
+/** @help constraints;gcc Example
 Suppose the input file had the following vectors of variables defined:
 
 DISCRETE myVec[9] {1..9}
@@ -51,7 +51,7 @@ vector.
 gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)
 */
 
-/** @help constraints;gcc Notes 
+/** @help constraints;gcc Notes
 This constraint enforces a hybrid consistency. It reads the bounds of the
 capacity variables, then enforces GAC over the primary variables only.  Then the
 bounds of the capacity variables are updated using flow algorithms similar to
@@ -67,10 +67,11 @@ gccweak constraint.
 
 #include "gcc_common.h"
 
-template<typename VarArray1, typename VarArray2>
-AbstractConstraint*
-BuildCT_GCC(const VarArray1& var_array, const VarArray2& cap_array, ConstraintBlob& b)
-{ return new GCC<VarArray1, VarArray2, true>(var_array, cap_array, b.constants[0]); }
+template <typename VarArray1, typename VarArray2>
+AbstractConstraint *BuildCT_GCC(const VarArray1 &var_array, const VarArray2 &cap_array,
+                                ConstraintBlob &b) {
+  return new GCC<VarArray1, VarArray2, true>(var_array, cap_array, b.constants[0]);
+}
 
 /* JSON
 { "type": "constraint",

@@ -14,12 +14,14 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #include "../../triggering/constraint_abstract.h"
 
-// This is a temporary fix to get around the fact that 'VarNot' is defined in some windows header.
+// This is a temporary fix to get around the fact that 'VarNot' is defined in
+// some windows header.
 // Long term, probably need a better solution.
 #ifdef _WIN32
 #define VarNot Minion_VarNot
@@ -28,215 +30,165 @@
 /**
  * @brief Nots a variable reference.
  *
- * Takes a variable, and returns a new 'psuedo-variable', which is the same as the not of the
- * original. This new variable takes up no extra space of any kind after compilation
+ * Takes a variable, and returns a new 'psuedo-variable', which is the same as
+ * the not of the
+ * original. This new variable takes up no extra space of any kind after
+ * compilation
  * is performed
  */
-template<typename VarRef>
-struct VarNot
-{
+template <typename VarRef>
+struct VarNot {
   static const BOOL isBool = true;
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
 
-  AnyVarRef popOneMapper() const
-  { return data; }
+  AnyVarRef popOneMapper() const { return data; }
 
-  BOOL isBound()  const
-  { return data.isBound();}
+  BOOL isBound() const { return data.isBound(); }
 
-  VarNot(const VarRef& _data) : data(_data)
-  {
-    //D_ASSERT(data.getInitialMin() == 0);
-    //D_ASSERT(data.getInitialMax() == 1);
+  VarNot(const VarRef &_data) : data(_data) {
+    // D_ASSERT(data.getInitialMin() == 0);
+    // D_ASSERT(data.getInitialMax() == 1);
   }
 
-  VarNot() : data()
-  {}
+  VarNot() : data() {}
 
-  VarNot(const VarNot& b) : data(b.data)
-  {}
+  VarNot(const VarNot &b) : data(b.data) {}
 
-  // There is a good reason this is like this. It is because the 'neg' of an BOOL var
-  // might be used in arithmetic. This is an extension to all of the integers which
+  // There is a good reason this is like this. It is because the 'neg' of an
+  // BOOL var
+  // might be used in arithmetic. This is an extension to all of the integers
+  // which
   // swaps 0 and 1.
-  DomainInt swap(DomainInt i) const
-  { return -i+1; }
+  DomainInt swap(DomainInt i) const { return -i + 1; }
 
-  BOOL isAssigned() const
-  { return data.isAssigned(); }
+  BOOL isAssigned() const { return data.isAssigned(); }
 
-  DomainInt getAssignedValue() const
-  { return swap(data.getAssignedValue()); }
+  DomainInt getAssignedValue() const { return swap(data.getAssignedValue()); }
 
-  BOOL isAssignedValue(DomainInt i) const
-  {
-    return data.isAssigned() &&
-    swap(data.getAssignedValue()) == i;
+  BOOL isAssignedValue(DomainInt i) const {
+    return data.isAssigned() && swap(data.getAssignedValue()) == i;
   }
 
-  BOOL inDomain(DomainInt b) const
-  { return data.inDomain(swap(b)); }
+  BOOL inDomain(DomainInt b) const { return data.inDomain(swap(b)); }
 
-  BOOL inDomain_noBoundCheck(DomainInt b) const
-  { return data.inDomain(swap(b)); }
+  BOOL inDomain_noBoundCheck(DomainInt b) const { return data.inDomain(swap(b)); }
 
-  DomainInt getDomSize() const
-  { return data.getDomSize(); }
+  DomainInt getDomSize() const { return data.getDomSize(); }
 
-  DomainInt getMax() const
-  { return swap(data.getMin()); }
+  DomainInt getMax() const { return swap(data.getMin()); }
 
-  DomainInt getMin() const
-  { return swap(data.getMax()); }
+  DomainInt getMin() const { return swap(data.getMax()); }
 
-  DomainInt getInitialMax() const
-  { return swap(data.getInitialMin()); }
+  DomainInt getInitialMax() const { return swap(data.getInitialMin()); }
 
-  DomainInt getInitialMin() const
-  { return swap(data.getInitialMax()); }
+  DomainInt getInitialMin() const { return swap(data.getInitialMax()); }
 
-  void setMax(DomainInt i)
-  { data.setMin(swap(i)); }
+  void setMax(DomainInt i) { data.setMin(swap(i)); }
 
-  void setMin(DomainInt i)
-  { data.setMax(swap(i)); }
+  void setMin(DomainInt i) { data.setMax(swap(i)); }
 
-  void uncheckedAssign(DomainInt b)
-  { data.uncheckedAssign(swap(b)); }
+  void uncheckedAssign(DomainInt b) { data.uncheckedAssign(swap(b)); }
 
-  void propagateAssign(DomainInt b)
-  { data.propagateAssign(swap(b)); }
+  void propagateAssign(DomainInt b) { data.propagateAssign(swap(b)); }
 
-  void decisionAssign(DomainInt b)
-  { data.decisionAssign(swap(b)); }
+  void decisionAssign(DomainInt b) { data.decisionAssign(swap(b)); }
 
-  void removeFromDomain(DomainInt b)
-  { data.removeFromDomain(swap(b)); }
+  void removeFromDomain(DomainInt b) { data.removeFromDomain(swap(b)); }
 
-  void addTrigger(Trigger t, TrigType type)
-  {
-    switch(type)
-    {
-      case UpperBound:
-        data.addTrigger(t, LowerBound);
-        break;
-      case LowerBound:
-        data.addTrigger(t, UpperBound);
-        break;
-      case Assigned:
-      case DomainChanged:
-        data.addTrigger(t, type);
-      break;
-      default:
-      D_FATAL_ERROR("Invalid trigger in 'not' mapper");
+  void addTrigger(Trigger t, TrigType type) {
+    switch (type) {
+    case UpperBound: data.addTrigger(t, LowerBound); break;
+    case LowerBound: data.addTrigger(t, UpperBound); break;
+    case Assigned:
+    case DomainChanged: data.addTrigger(t, type); break;
+    default: D_FATAL_ERROR("Invalid trigger in 'not' mapper");
     }
   }
 
-  friend std::ostream& operator<<(std::ostream& o, const VarNot& n)
-  { return o << "Not " << n.data; }
+  friend std::ostream &operator<<(std::ostream &o, const VarNot &n) {
+    return o << "Not " << n.data;
+  }
 
-  DomainInt getDomainChange(DomainDelta d)
-  { return data.getDomainChange(d); }
+  DomainInt getDomainChange(DomainDelta d) { return data.getDomainChange(d); }
 
-  void addDynamicTrigger(AbstractConstraint* ac, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
-  {
-    switch(type)
-    {
-      case UpperBound:
-        data.addDynamicTrigger(ac, t, LowerBound, pos , op);
-        break;
-      case LowerBound:
-        data.addDynamicTrigger(ac, t, UpperBound, pos , op);
-        break;
-      case Assigned:
-      case DomainChanged:
-        data.addDynamicTrigger(ac, t, type, pos , op);
-        break;
-      case DomainRemoval:
-        data.addDynamicTrigger(ac, t, DomainRemoval, -(pos-1) , op);
-        break;
-      default:
-        D_FATAL_ERROR("Broken dynamic trigger");
+  void addDynamicTrigger(AbstractConstraint *ac, DynamicTrigger *t, TrigType type,
+                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
+    switch (type) {
+    case UpperBound: data.addDynamicTrigger(ac, t, LowerBound, pos, op); break;
+    case LowerBound: data.addDynamicTrigger(ac, t, UpperBound, pos, op); break;
+    case Assigned:
+    case DomainChanged: data.addDynamicTrigger(ac, t, type, pos, op); break;
+    case DomainRemoval: data.addDynamicTrigger(ac, t, DomainRemoval, -(pos - 1), op); break;
+    default: D_FATAL_ERROR("Broken dynamic trigger");
     }
   }
 
-  vector<AbstractConstraint*>* getConstraints()
-  { return data.getConstraints(); }
+  vector<AbstractConstraint *> *getConstraints() { return data.getConstraints(); }
 
-  void addConstraint(AbstractConstraint* c)
-  { data.addConstraint(c); }
+  void addConstraint(AbstractConstraint *c) { data.addConstraint(c); }
 
-  DomainInt getBaseVal(DomainInt v) const
-  { return data.getBaseVal(swap(v)); }
+  DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(swap(v)); }
 
   Var getBaseVar() const { return data.getBaseVar(); }
 
-  vector<Mapper> getMapperStack() const
-  {
+  vector<Mapper> getMapperStack() const {
     vector<Mapper> v = data.getMapperStack();
     v.push_back(Mapper(MAP_NOT));
     return v;
   }
 
-
 #ifdef WDEG
-  DomainInt getBaseWdeg()
-  { return data.getBaseWdeg(); }
+  DomainInt getBaseWdeg() { return data.getBaseWdeg(); }
 
-  void incWdeg()
-  { data.incWdeg(); }
+  void incWdeg() { data.incWdeg(); }
 #endif
 };
 
-template<typename T>
-struct NotType
-{ typedef VarNot<T> type; };
+template <typename T>
+struct NotType {
+  typedef VarNot<T> type;
+};
 
 // not(not(T)) = T
-template<typename T>
-struct NotType<VarNot<T> >
-{ typedef T type; };
+template <typename T>
+struct NotType<VarNot<T>> {
+  typedef T type;
+};
 
-template<typename T>
-struct NotType<vector<T> >
-{ typedef vector<VarNot<T> > type; };
+template <typename T>
+struct NotType<vector<T>> {
+  typedef vector<VarNot<T>> type;
+};
 
+template <typename T, std::size_t i>
+struct NotType<std::array<T, i>> {
+  typedef std::array<VarNot<T>, i> type;
+};
 
-template<typename T, std::size_t i>
-struct NotType<std::array<T, i> >
-{ typedef std::array<VarNot<T>, i> type; };
+template <typename VRef>
+typename NotType<VRef>::type VarNotRef(const VRef &var_ref) {
+  return VarNot<VRef>(var_ref);
+}
 
+template <typename VRef>
+VRef VarNotRef(const VarNot<VRef> &var_ref) {
+  return var_ref.data;
+}
 
-template<typename VRef>
-typename NotType<VRef>::type
-VarNotRef(const VRef& var_ref)
-{ return VarNot<VRef>(var_ref); }
-
-template<typename VRef>
-VRef
-VarNotRef(const VarNot<VRef>& var_ref)
-{ return var_ref.data; }
-
-template<typename VarRef>
-vector<VarNot<VarRef> >
-VarNotRef(const vector<VarRef>& var_array)
-{
-  vector<VarNot<VarRef> > Not_array;
+template <typename VarRef>
+vector<VarNot<VarRef>> VarNotRef(const vector<VarRef> &var_array) {
+  vector<VarNot<VarRef>> Not_array;
   Not_array.reserve(var_array.size());
-  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
+  for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
     Not_array.push_back(VarNotRef(var_array[i]));
   return Not_array;
 }
 
-
-template<typename VarRef, std::size_t i>
-std::array<VarNot<VarRef>, i>
-VarNotRef(const std::array<VarRef, i>& var_array)
-{
+template <typename VarRef, std::size_t i>
+std::array<VarNot<VarRef>, i> VarNotRef(const std::array<VarRef, i> &var_array) {
   std::array<VarNot<VarRef>, i> Not_array;
-  for(UnsignedSysInt l = 0; l < i; ++l)
+  for (UnsignedSysInt l = 0; l < i; ++l)
     Not_array[l] = VarNotRef(var_array[l]);
   return Not_array;
 }
-

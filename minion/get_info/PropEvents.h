@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef VAR_EVENT
@@ -24,11 +25,10 @@
 #endif
 
 #ifdef VAR_EVENT
-#define PROP_EVENT(x) 
+#define PROP_EVENT(x)
 #else
-#define VAR_EVENT(x,y) 
+#define VAR_EVENT(x, y)
 #endif
-
 
 VAR_EVENT(construct, NULL_EVENT)
 VAR_EVENT(copy, NULL_EVENT)

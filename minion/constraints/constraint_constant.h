@@ -14,67 +14,61 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef CONSTRAINT_CONSTANT_H
 #define CONSTRAINT_CONSTANT_H
 
-template<bool truth>
-struct ConstantConstraint : public AbstractConstraint
-{
+template <bool truth>
+struct ConstantConstraint : public AbstractConstraint {
 
-  virtual string constraint_name()
-  { if(truth) return "true"; else return "false"; }
-  
+  virtual string constraint_name() {
+    if (truth)
+      return "true";
+    else
+      return "false";
+  }
+
   CONSTRAINT_ARG_LIST0();
 
-  ConstantConstraint()
-  { }
-  
-  virtual triggerCollection setup_internal()
-  {
+  ConstantConstraint() {}
+
+  virtual triggerCollection setup_internal() {
     triggerCollection t;
     return t;
   }
-  
-  virtual void propagateStatic(DomainInt i, DomainDelta)
-  {  }
-  
-  virtual void full_propagate()
-  {
-    if(!truth)
+
+  virtual void propagateStatic(DomainInt i, DomainDelta) {}
+
+  virtual void full_propagate() {
+    if (!truth)
       getState().setFailed(true);
   }
-  
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
-  {
+
+  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
     D_ASSERT(v_size == 0);
     return truth;
   }
-  
-  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  { return truth; }
-  
-  AbstractConstraint* reverse_constraint()
-  {
-    return new ConstantConstraint<!truth>();
-  }
-  
-  virtual vector<AnyVarRef> get_vars()
-  { 
+
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) { return truth; }
+
+  AbstractConstraint *reverse_constraint() { return new ConstantConstraint<!truth>(); }
+
+  virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> v;
     return v;
   }
 };
 
-inline AbstractConstraint*
-BuildCT_TRUE(ConstraintBlob&)
-{ return (new ConstantConstraint<true>()); }
+inline AbstractConstraint *BuildCT_TRUE(ConstraintBlob &) {
+  return (new ConstantConstraint<true>());
+}
 
-inline AbstractConstraint*
-BuildCT_FALSE(ConstraintBlob&)
-{ return (new ConstantConstraint<false>()); }
+inline AbstractConstraint *BuildCT_FALSE(ConstraintBlob &) {
+  return (new ConstantConstraint<false>());
+}
 
 /* JSON
 { "type": "constraint",
@@ -91,6 +85,5 @@ BuildCT_FALSE(ConstraintBlob&)
   "args": [ ]
 }
 */
-
 
 #endif

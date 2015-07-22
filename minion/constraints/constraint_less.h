@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 /** @help constraints;ineq Description
@@ -22,9 +23,9 @@ The constraint
 
    ineq(x, y, k)
 
-ensures that 
+ensures that
 
-   x <= y + k 
+   x <= y + k
 
 in any solution.
 */
@@ -40,76 +41,62 @@ achieved by
 #define CONSTRAINT_LESS_H
 
 // x <= y + offset
-template<typename VarRef1, typename VarRef2, typename Offset>
-struct LeqConstraint : public AbstractConstraint
-{
-  virtual string constraint_name()
-  { return "ineq"; }
-  
-  //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
+template <typename VarRef1, typename VarRef2, typename Offset>
+struct LeqConstraint : public AbstractConstraint {
+  virtual string constraint_name() { return "ineq"; }
+
+  // typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount>
+  // NegConstraintType;
   VarRef1 x;
   VarRef2 y;
   const Offset offset;
-  
+
   CONSTRAINT_ARG_LIST3(x, y, offset);
-  
-  LeqConstraint(VarRef1 _x, VarRef2 _y, Offset _o) :
-    x(_x), y(_y), offset(_o)
-  { }
-  
-  virtual triggerCollection setup_internal()
-  {
+
+  LeqConstraint(VarRef1 _x, VarRef2 _y, Offset _o) : x(_x), y(_y), offset(_o) {}
+
+  virtual triggerCollection setup_internal() {
     triggerCollection t;
     t.push_back(make_trigger(x, Trigger(this, 0), LowerBound));
     t.push_back(make_trigger(y, Trigger(this, 1), UpperBound));
     return t;
-    
   }
 
   // Needs to be at end of file
-  virtual AbstractConstraint* reverse_constraint();
-  
-  virtual void propagateStatic(DomainInt prop_val,DomainDelta)
-  {
+  virtual AbstractConstraint *reverse_constraint();
+
+  virtual void propagateStatic(DomainInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(BinaryLeq);
-    if(checked_cast<SysInt>(prop_val))
-    {// y changed
+    if (checked_cast<SysInt>(prop_val)) { // y changed
       x.setMax(y.getMax() + offset);
-    }
-    else
-    {// x changed
+    } else { // x changed
       y.setMin(x.getMin() - offset);
     }
   }
-  
-  virtual void full_propagate()
-  {
-    propagateStatic(0,DomainDelta::empty());
-    propagateStatic(1,DomainDelta::empty());
+
+  virtual void full_propagate() {
+    propagateStatic(0, DomainDelta::empty());
+    propagateStatic(1, DomainDelta::empty());
   }
-  
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
-  {
+
+  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
     D_ASSERT(v_size == 2);
     return v[0] <= (v[1] + offset);
   }
-  
-  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  {
+
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
     DomainInt x_min = x.getMin();
     DomainInt y_max = y.getMax();
-    
-    if(x_min <= y_max + offset)
-    {
+
+    if (x_min <= y_max + offset) {
       assignment.push_back(make_pair(0, x_min));
       assignment.push_back(make_pair(1, y_max));
       return true;
-    } 
+    }
     return false;
   }
-  
-  virtual vector<AnyVarRef> get_vars()
-  { 
+
+  virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> array;
     array.reserve(2);
     array.push_back(x);
@@ -118,30 +105,33 @@ struct LeqConstraint : public AbstractConstraint
   }
 };
 
-template<typename VarRef1, typename VarRef2, typename Offset>
-AbstractConstraint*
-LeqCon(VarRef1 v1, VarRef2 v2, Offset o)
-{ return new LeqConstraint<VarRef1,VarRef2,Offset>(v1,v2,o); }
+template <typename VarRef1, typename VarRef2, typename Offset>
+AbstractConstraint *LeqCon(VarRef1 v1, VarRef2 v2, Offset o) {
+  return new LeqConstraint<VarRef1, VarRef2, Offset>(v1, v2, o);
+}
 
-template<typename VarRef1, typename VarRef2>
-AbstractConstraint*
-LeqCon(VarRef1 v1, VarRef2 v2)
-{ return new LeqConstraint<VarRef1,VarRef2,compiletime_val<SysInt, 0> >(v1,v2,compiletime_val<SysInt, 0>()); }
+template <typename VarRef1, typename VarRef2>
+AbstractConstraint *LeqCon(VarRef1 v1, VarRef2 v2) {
+  return new LeqConstraint<VarRef1, VarRef2, compiletime_val<SysInt, 0>>(
+      v1, v2, compiletime_val<SysInt, 0>());
+}
 
-template<typename VarRef>
-AbstractConstraint*
-ImpliesCon(VarRef v1, VarRef v2)
-{ return new LeqConstraint<VarRef,VarRef,compiletime_val<SysInt, 0> >(v1,v2,compiletime_val<SysInt, 0>()); }
+template <typename VarRef>
+AbstractConstraint *ImpliesCon(VarRef v1, VarRef v2) {
+  return new LeqConstraint<VarRef, VarRef, compiletime_val<SysInt, 0>>(
+      v1, v2, compiletime_val<SysInt, 0>());
+}
 
 // This is mainly inline to avoid multiple definitions.
-template<typename VarRef1, typename VarRef2, typename Offset>
-inline AbstractConstraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint()
-{ return LeqCon(y,x, const_negminusone(offset)); }
+template <typename VarRef1, typename VarRef2, typename Offset>
+inline AbstractConstraint *LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint() {
+  return LeqCon(y, x, const_negminusone(offset));
+}
 
-template<typename T1, typename T2>
-AbstractConstraint*
-BuildCT_INEQ(const T1& t1, const T2& t2, ConstraintBlob& b) 
-{ return LeqCon(t1[0], t2[0], b.constants[0][0]); }
+template <typename T1, typename T2>
+AbstractConstraint *BuildCT_INEQ(const T1 &t1, const T2 &t2, ConstraintBlob &b) {
+  return LeqCon(t1[0], t2[0], b.constants[0][0]);
+}
 
 /* JSON
 { "type": "constraint",
@@ -150,6 +140,5 @@ BuildCT_INEQ(const T1& t1, const T2& t2, ConstraintBlob& b)
   "args": [ "read_var", "read_var", "read_constant" ]
 }
 */
-
 
 #endif

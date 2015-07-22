@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 /*****
@@ -28,8 +29,6 @@
 
 *****/
 
-
-
 #ifndef CONSTRAINT_POW_CHECK_H
 #define CONSTRAINT_POW_CHECK_H
 
@@ -38,68 +37,67 @@
 
 // Not a constraint -- just contains a checker.
 
-template<typename T1, typename T2, typename T3, bool undef_zero>
-class PowConstraint_Check
-{
-  
-public:
-  typedef typename common_var_type3<T1,T2,T3>::type var_common;
-  typedef std::array<var_common, 3> var_type;
-private:
-   var_type vars;
-public:
+template <typename T1, typename T2, typename T3, bool undef_zero>
+class PowConstraint_Check {
 
-  PowConstraint_Check(const T1& v1, const T2& v2, const T3& v3)
-  
+public:
+  typedef typename common_var_type3<T1, T2, T3>::type var_common;
+  typedef std::array<var_common, 3> var_type;
+
+private:
+  var_type vars;
+
+public:
+  PowConstraint_Check(const T1 &v1, const T2 &v2, const T3 &v3)
+
   {
-    vars[0] = v1; vars[1] = v2; vars[2] = v3;
+    vars[0] = v1;
+    vars[1] = v2;
+    vars[2] = v3;
   }
 
-  string constraint_name() const
-  { if(undef_zero) return "pow_undefzero"; else return "pow"; }
+  string constraint_name() const {
+    if (undef_zero)
+      return "pow_undefzero";
+    else
+      return "pow";
+  }
 
   CONSTRAINT_ARG_LIST3(vars[0], vars[1], vars[2])
 
-  var_type& get_vars()
-  { return vars; }
+  var_type &get_vars() { return vars; }
 
-  double my_pow(DomainInt x, DomainInt y)
-  { return pow(checked_cast<double>(x), checked_cast<double>(y));}
+  double my_pow(DomainInt x, DomainInt y) {
+    return pow(checked_cast<double>(x), checked_cast<double>(y));
+  }
 
-  virtual bool check_assignment(DomainInt* v, SysInt v_size)
-  {
+  virtual bool check_assignment(DomainInt *v, SysInt v_size) {
     D_ASSERT(v_size == 3);
-    if(v[0] == 0)
-    {
-      if(v[1] == 0)
+    if (v[0] == 0) {
+      if (v[1] == 0)
         return v[2] == 1;
-      if(v[1] > 0)
+      if (v[1] > 0)
         return v[2] == 0;
       else
         return false;
-    }
-    else
+    } else
       return my_pow(v[0], v[1]) == v[2];
   }
 };
 
-
 #include "constraint_pow.h"
 #include "forward_checking.h"
 
-template<typename V1, typename V2>
-inline AbstractConstraint*
-BuildCT_POW(const V1& vars, const V2& var2, ConstraintBlob&)
-{
+template <typename V1, typename V2>
+inline AbstractConstraint *BuildCT_POW(const V1 &vars, const V2 &var2, ConstraintBlob &) {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   // vars1 is special to avoid 0^0
-  if(vars[0].getInitialMin() < 0 ||
-     vars[1].getInitialMin() <= 0 ||
-     var2[0].getInitialMin() < 0)
-  {
-    typedef PowConstraint_Check<typename V1::value_type, typename V1::value_type, typename V2::value_type, false> PowConC;
-    AbstractConstraint* pow=new CheckAssignConstraint<PowConC, false>(PowConC(vars[0], vars[1], var2[0]));
+  if (vars[0].getInitialMin() < 0 || vars[1].getInitialMin() <= 0 || var2[0].getInitialMin() < 0) {
+    typedef PowConstraint_Check<typename V1::value_type, typename V1::value_type,
+                                typename V2::value_type, false> PowConC;
+    AbstractConstraint *pow =
+        new CheckAssignConstraint<PowConC, false>(PowConC(vars[0], vars[1], var2[0]));
     // Now wrap it in new FC thing. Horrible hackery.
     return forwardCheckingCon(pow);
   }

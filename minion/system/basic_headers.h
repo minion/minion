@@ -5,10 +5,10 @@
 // system signals, which Minion doesn't use.
 #ifdef __GNUC__
 #define SYSTEM_LONGJMP _longjmp
-#define SYSTEM_SETJMP  _setjmp
+#define SYSTEM_SETJMP _setjmp
 #else
 #define SYSTEM_LONGJMP longjmp
-#define SYSTEM_SETJMP  setjmp
+#define SYSTEM_SETJMP setjmp
 #endif
 
 #ifdef _WIN32
@@ -23,20 +23,22 @@
 // We don't want no stupid safe library warnings
 #define _SCL_SECURE_NO_DEPRECATE
 #define DEFAULT_CALL __std_call
-#pragma warning(disable: 4715)
+#pragma warning(disable : 4715)
 // Supress 'size_t -> SysInt' warnings.
-#pragma warning(disable: 4267)
+#pragma warning(disable : 4267)
 // I don't even get this warning.
-#pragma warning(disable: 4244)
+#pragma warning(disable : 4244)
 // I'll buy a pint for anyone who can figure how to fix this..
-// 'unsigned long' : forcing value to BOOL 'true' or 'false'. Of course I am, that's what I want to test!
-#pragma warning(disable: 4800)
+// 'unsigned long' : forcing value to BOOL 'true' or 'false'. Of course I am,
+// that's what I want to test!
+#pragma warning(disable : 4800)
 // At some point I might fix these "signed/UnsignedSysInt mismatch" warnings...
-#pragma warning(disable: 4018)
+#pragma warning(disable : 4018)
 // Why can't you realise that abort() means the function doesn't have to return?
-#pragma warning(disable: 4716)
-// Another annoying warning. I'm not sure why Microsoft want to warn about this, it's perfectly common
-#pragma warning(disable: 4355)
+#pragma warning(disable : 4716)
+// Another annoying warning. I'm not sure why Microsoft want to warn about this,
+// it's perfectly common
+#pragma warning(disable : 4355)
 #else
 #define DEFAULT_CALL
 #endif // _MSC_VER
@@ -59,7 +61,6 @@
 #include <memory.h>
 #include <setjmp.h>
 
-
 #include <tuple>
 #include <utility>
 #include <unordered_set>
@@ -76,10 +77,10 @@
 using namespace std;
 
 #ifndef IN_MAIN
-#define VARDEF_ASSIGN(x,y) extern x
+#define VARDEF_ASSIGN(x, y) extern x
 #define VARDEF(x) extern x
 #else
-#define VARDEF_ASSIGN(x,y) x(y)
+#define VARDEF_ASSIGN(x, y) x(y)
 #define VARDEF(x) x
 #endif
 

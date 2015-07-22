@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef TEST_FUNCTIONS_H
@@ -25,23 +26,18 @@
 
 #include <vector>
 
-template<typename Var>
-string get_dom_as_string(Var& v)
-{
+template <typename Var>
+string get_dom_as_string(Var &v) {
   ostringstream s;
-  if(v.isAssigned())
-  {
+  if (v.isAssigned()) {
     s << v.getAssignedValue();
-  }
-  else
-  {
-    if(v.isBound())
-    { s << "[" << v.getMin() << "," << v.getMax() << "]"; }
-    else
-    {
+  } else {
+    if (v.isBound()) {
+      s << "[" << v.getMin() << "," << v.getMax() << "]";
+    } else {
       s << "{" << v.getMin();
-      for(DomainInt i = v.getMin() + 1; i <= v.getMax(); ++i)
-        if(v.inDomain(i))
+      for (DomainInt i = v.getMin() + 1; i <= v.getMax(); ++i)
+        if (v.inDomain(i))
           s << "," << i;
       s << "}";
     }
@@ -49,15 +45,12 @@ string get_dom_as_string(Var& v)
   return s.str();
 }
 
-template<typename T>
-string get_dom_as_string(vector<T>& vec)
-{
+template <typename T>
+string get_dom_as_string(vector<T> &vec) {
   string output("<");
-  if(!vec.empty())
-  {
+  if (!vec.empty()) {
     output += get_dom_as_string(vec[0]);
-    for(UnsignedSysInt i = 1; i < vec.size(); ++i)
-    {
+    for (UnsignedSysInt i = 1; i < vec.size(); ++i) {
       output += ",";
       output += get_dom_as_string(vec[i]);
     }
@@ -67,20 +60,15 @@ string get_dom_as_string(vector<T>& vec)
 }
 
 // Count number of literals present in an array of variables.
-template<typename Vars>
-DomainInt lit_count(Vars& v)
-{
+template <typename Vars>
+DomainInt lit_count(Vars &v) {
   DomainInt lits = 0;
-  for(SysInt i = 0; i < (SysInt)v.size(); ++i)
-  {
-    if(v[i].isBound())
-    {
+  for (SysInt i = 0; i < (SysInt)v.size(); ++i) {
+    if (v[i].isBound()) {
       lits += v[i].getMax() - v[i].getMin() + 1;
-    }
-    else
-    {
-      for(DomainInt j = v[i].getMin(); j <= v[i].getMax(); ++j)
-        if(v[i].inDomain(j))
+    } else {
+      for (DomainInt j = v[i].getMin(); j <= v[i].getMax(); ++j)
+        if (v[i].inDomain(j))
           lits++;
     }
   }

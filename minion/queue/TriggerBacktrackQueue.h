@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #ifndef TRIG_BACKTRACK_QUEUE_H
@@ -32,54 +33,45 @@
 #define P(x)
 //#define P(x) cout << x << endl
 
-struct TriggerBacktrackQueue
-{
+struct TriggerBacktrackQueue {
 
-    typedef vector<pair<DynamicTrigger*, DynamicTriggerList*> > TriggerList;
+  typedef vector<pair<DynamicTrigger *, DynamicTriggerList *>> TriggerList;
 
-    vector<TriggerList> queue;
+  vector<TriggerList> queue;
 
-    TriggerBacktrackQueue()
-    {
-        /// XXX
-        queue.resize(1);
+  TriggerBacktrackQueue() {
+    /// XXX
+    queue.resize(1);
+  }
+
+  void addTrigger(DynamicTrigger *trig) {
+    PROP_INFO_ADDONE(Counter3);
+    queue.back().push_back(make_pair(trig, trig->getQueue()));
+  }
+
+  void world_push() {
+    P("TBQ:World_push");
+    queue.push_back(TriggerList());
+  }
+
+  void world_pop() {
+    P("TBQ: World_pop");
+    TriggerList &tl = queue.back();
+    for (SysInt i = (SysInt)tl.size() - 1; i >= 0; --i) {
+      if (tl[i].second == NULL) {
+        P("Release " << tl[i].first);
+        releaseTrigger(tl[i].first, TO_Store);
+      } else {
+        P("Add " << tl[i].first << " to " << tl[i].second);
+        tl[i].second->add(tl[i].first);
+        tl[i].first->setQueue(tl[i].second);
+      }
     }
-
-    void addTrigger(DynamicTrigger* trig)
-    {
-        PROP_INFO_ADDONE(Counter3);
-        queue.back().push_back(make_pair(trig, trig->getQueue()));
-    }
-
-    void world_push()
-    {
-        P("TBQ:World_push");
-        queue.push_back(TriggerList());
-    }
-
-    void world_pop()
-    {
-        P("TBQ: World_pop");
-        TriggerList& tl = queue.back();
-        for (SysInt i = (SysInt)tl.size() - 1; i >= 0; --i)
-        {
-            if (tl[i].second == NULL)
-            {
-                P("Release " << tl[i].first);
-                releaseTrigger(tl[i].first , TO_Store);
-            }
-            else
-            {
-                P("Add " << tl[i].first << " to " << tl[i].second);
-                tl[i].second->add(tl[i].first);
-                tl[i].first->setQueue(tl[i].second);
-            }
-        }
-        queue.pop_back();
-        // The first layer of the queue consists of things added in full_propagate()
-        // So should never get popped.
-        D_ASSERT(!queue.empty());
-    }
+    queue.pop_back();
+    // The first layer of the queue consists of things added in full_propagate()
+    // So should never get popped.
+    D_ASSERT(!queue.empty());
+  }
 };
 
 #endif

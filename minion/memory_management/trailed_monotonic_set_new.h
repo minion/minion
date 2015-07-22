@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef TRAILED_MONOTONIC_SET_H
@@ -22,83 +23,71 @@
 
 #include "../system/system.h"
 
+class TrailedMonotonicSet {
+  vector<char> data;
 
+  vector<SysInt> trailstack;
 
-class TrailedMonotonicSet
-{
-    vector<char> data;
-
-    vector<SysInt> trailstack;
-
-    vector<SysInt> trailstack_marks;
+  vector<SysInt> trailstack_marks;
 
 public:
-    TrailedMonotonicSet( )
-    {
-        trailstack_marks.push_back(0);
+  TrailedMonotonicSet() { trailstack_marks.push_back(0); }
+
+  DomainInt size() const { return data.size(); }
+
+  void undo() {
+    SysInt i = (SysInt)trailstack.size() - 1;
+
+    SysInt j = trailstack_marks.back();
+    trailstack_marks.pop_back();
+
+    for (; i >= j; i--) {
+      D_ASSERT(!data[trailstack[i]]);
+      data[trailstack[i]] = true;
+      trailstack.pop_back();
     }
+    D_ASSERT((SysInt)trailstack.size() == j);
+  }
 
-    DomainInt size() const
-    {
-        return data.size();
+  bool ifMember_remove(DomainInt index) {
+    SysInt i = checked_cast<SysInt>(index);
+    if (data[i]) {
+      data[i] = false;
+      trailstack.push_back(i);
+      return true;
     }
+    return false;
+  }
 
-    void undo() {
-        SysInt i=(SysInt)trailstack.size()-1;
+  bool isMember(DomainInt index) {
+    SysInt i = checked_cast<SysInt>(index);
+    return data[i];
+  }
 
-        SysInt j=trailstack_marks.back();
-        trailstack_marks.pop_back();
+  void unchecked_remove(DomainInt index) {
+    SysInt i = checked_cast<SysInt>(index);
+    D_ASSERT(data[i]);
+    data[i] = false;
+    trailstack.push_back(i);
+  }
 
-        for( ; i>=j ; i--) {
-            D_ASSERT(!data[trailstack[i]]);
-            data[trailstack[i]]=true;
-            trailstack.pop_back();
-        }
-        D_ASSERT((SysInt)trailstack.size()==j);
-    }
+  void before_branch_left() { trailstack_marks.push_back(trailstack.size()); }
 
-    bool ifMember_remove(DomainInt index) {
-        SysInt i=checked_cast<SysInt>(index);
-        if(data[i]) {
-            data[i]=false;
-            trailstack.push_back(i);
-            return true;
-        }
-        return false;
-    }
+  void after_branch_left() // nothing to do
+  {}
 
-    bool isMember(DomainInt index) {
-        SysInt i=checked_cast<SysInt>(index);
-        return data[i];
-    }
+  void before_branch_right() // nothing to do
+  {}
+  void after_branch_right() // nothing to do
+  {}
 
-    void unchecked_remove(DomainInt index) {
-        SysInt i=checked_cast<SysInt>(index);
-        D_ASSERT(data[i]);
-        data[i]=false;
-        trailstack.push_back(i);
-    }
+  DomainInt request_storage(DomainInt allocsize) {
+    SysInt i = data.size();
+    data.resize(i + checked_cast<SysInt>(allocsize), true);
+    return i;
+  }
 
-    void before_branch_left() {
-        trailstack_marks.push_back(trailstack.size());
-    }
-
-    void after_branch_left()  // nothing to do
-    { }
-
-    void  before_branch_right()  // nothing to do
-    { }
-    void after_branch_right()  // nothing to do
-    { }
-
-    DomainInt request_storage(DomainInt allocsize) {
-        SysInt i=data.size();
-        data.resize(i+checked_cast<SysInt>(allocsize), true);
-        return i;
-    }
-
-    void lock() { }
-
+  void lock() {}
 };
 
 typedef TrailedMonotonicSet MonotonicSet;

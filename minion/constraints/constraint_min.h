@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 /** @help constraints;max Description
@@ -54,189 +55,152 @@ for the opposite constraint.
 
 #include "constraint_checkassign.h"
 
-template<typename VarArray, typename MinVarRef>
-struct MinConstraint : public AbstractConstraint
-{
-  virtual string constraint_name()
-  { return "min"; }
+template <typename VarArray, typename MinVarRef>
+struct MinConstraint : public AbstractConstraint {
+  virtual string constraint_name() { return "min"; }
 
-  virtual string full_output_name() \
-  {
+  virtual string full_output_name() {
     // We assume constraint is propagated here, we will do a simple check
     // to see if it is true.
-    if(min_var.isAssigned())
-    {
+    if (min_var.isAssigned()) {
       bool found_assigned_min = false;
       bool found_lesser_value = false;
-      for(size_t i = 0; i < var_array.size(); ++i)
-      {
-        if(var_array[i].isAssigned() && min_var.getAssignedValue() == var_array[i].getAssignedValue())
+      for (size_t i = 0; i < var_array.size(); ++i) {
+        if (var_array[i].isAssigned() &&
+            min_var.getAssignedValue() == var_array[i].getAssignedValue())
           found_assigned_min = true;
-        if(var_array[i].getMin() < min_var.getMin())
+        if (var_array[i].getMin() < min_var.getMin())
           found_lesser_value = true;
       }
-      if(found_assigned_min && !found_lesser_value)
+      if (found_assigned_min && !found_lesser_value)
         return "true()";
     }
 
     return ConOutput::print_reversible_con("min", "max", var_array, min_var);
   }
 
-
-  //typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount> NegConstraintType;
+  // typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount>
+  // NegConstraintType;
   typedef typename VarArray::value_type ArrayVarRef;
 
   VarArray var_array;
   MinVarRef min_var;
 
-  MinConstraint(const VarArray& _var_array, const MinVarRef& _min_var) :
-    var_array(_var_array), min_var(_min_var)
-  { }
+  MinConstraint(const VarArray &_var_array, const MinVarRef &_min_var)
+      : var_array(_var_array), min_var(_min_var) {}
 
-  virtual triggerCollection setup_internal()
-  {
+  virtual triggerCollection setup_internal() {
     triggerCollection t;
 
-    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
-    { // Have to add 1 else the 0th element will be lost.
+    for (SysInt i = 0; i < (SysInt)var_array.size();
+         ++i) { // Have to add 1 else the 0th element will be lost.
       t.push_back(make_trigger(var_array[i], Trigger(this, i + 1), LowerBound));
       t.push_back(make_trigger(var_array[i], Trigger(this, -(i + 1)), UpperBound));
     }
-    t.push_back(make_trigger(min_var, Trigger(this, var_array.size() + 1 ),LowerBound));
-    t.push_back(make_trigger(min_var, Trigger(this, -((SysInt)var_array.size() + 1) ),UpperBound));
+    t.push_back(make_trigger(min_var, Trigger(this, var_array.size() + 1), LowerBound));
+    t.push_back(make_trigger(min_var, Trigger(this, -((SysInt)var_array.size() + 1)), UpperBound));
 
     return t;
   }
 
   //  virtual AbstractConstraint* reverse_constraint()
 
-  virtual void propagateStatic(DomainInt prop_val, DomainDelta)
-  {
+  virtual void propagateStatic(DomainInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(Min);
-    if(prop_val > 0)
-    {// Lower Bound Changed
+    if (prop_val > 0) { // Lower Bound Changed
 
-    //Had to add 1 to fix "0th array" problem.
+      // Had to add 1 to fix "0th array" problem.
       --prop_val;
 
-      if(prop_val == (SysInt)(var_array.size()))
-      {
+      if (prop_val == (SysInt)(var_array.size())) {
         DomainInt new_min = min_var.getMin();
         typename VarArray::iterator end = var_array.end();
-        for(typename VarArray::iterator it = var_array.begin(); it < end; ++it)
+        for (typename VarArray::iterator it = var_array.begin(); it < end; ++it)
           (*it).setMin(new_min);
-      }
-      else
-      {
+      } else {
         typename VarArray::iterator it = var_array.begin();
         typename VarArray::iterator end = var_array.end();
         DomainInt min = it->getMin();
         ++it;
-        for(; it < end; ++it)
-        {
+        for (; it < end; ++it) {
           DomainInt it_min = it->getMin();
-          if(it_min < min)
+          if (it_min < min)
             min = it_min;
         }
         min_var.setMin(min);
       }
-    }
-    else
-    {// Upper Bound Changed
+    } else { // Upper Bound Changed
       // See above for reason behind "-1".
       prop_val = -prop_val - 1;
-      if(prop_val == (SysInt)(var_array.size()))
-      {
+      if (prop_val == (SysInt)(var_array.size())) {
         typename VarArray::iterator it = var_array.begin();
         DomainInt minvar_max = min_var.getMax();
-        while(it != var_array.end() && (*it).getMin() > minvar_max)
+        while (it != var_array.end() && (*it).getMin() > minvar_max)
           ++it;
-        if(it == var_array.end())
-        {
+        if (it == var_array.end()) {
           getState().setFailed(true);
           return;
         }
         // Possibly this variable is the only one that can be the minimum
         typename VarArray::iterator it_copy(it);
         ++it;
-        while(it != var_array.end() && (*it).getMin() > minvar_max)
+        while (it != var_array.end() && (*it).getMin() > minvar_max)
           ++it;
-        if(it != var_array.end())
-        { // No, another variable can be the minimum
+        if (it != var_array.end()) { // No, another variable can be the minimum
           return;
         }
         it_copy->setMax(minvar_max);
-      }
-      else
-      {
+      } else {
         min_var.setMax(var_array[checked_cast<SysInt>(prop_val)].getMax());
       }
     }
-
   }
 
-
-  virtual void full_propagate()
-  {
+  virtual void full_propagate() {
     SysInt array_size = var_array.size();
-    if(array_size == 0)
-    {
+    if (array_size == 0) {
       getState().setFailed(true);
-    }
-    else
-    {
-      for(SysInt i = 1;i <= array_size + 1; ++i)
-      {
-        propagateStatic(i,DomainDelta::empty());
-        propagateStatic(-i,DomainDelta::empty());
+    } else {
+      for (SysInt i = 1; i <= array_size + 1; ++i) {
+        propagateStatic(i, DomainDelta::empty());
+        propagateStatic(-i, DomainDelta::empty());
       }
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
-  {
+  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size() + 1);
-    if(v_size == 1)
+    if (v_size == 1)
       return false;
 
     DomainInt min_val = v[0];
-    for(SysInt i = 1;i < v_size - 1;i++)
+    for (SysInt i = 1; i < v_size - 1; i++)
       min_val = min(min_val, v[i]);
     return min_val == *(v + v_size - 1);
   }
 
   // Bah: This could be much better!
-  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  {
-    for(DomainInt i = min_var.getMin(); i <= min_var.getMax(); ++i)
-    {
-      if(min_var.inDomain(i))
-      {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+    for (DomainInt i = min_var.getMin(); i <= min_var.getMax(); ++i) {
+      if (min_var.inDomain(i)) {
         bool flag_domain = false;
-        for(SysInt j = 0; j < (SysInt)var_array.size(); ++j)
-        {
-          if(var_array[j].inDomain(i))
-          {
+        for (SysInt j = 0; j < (SysInt)var_array.size(); ++j) {
+          if (var_array[j].inDomain(i)) {
             flag_domain = true;
             assignment.push_back(make_pair(j, i));
-          }
-          else
-          {
-            if(var_array[j].getMax() < i)
-            {
+          } else {
+            if (var_array[j].getMax() < i) {
               return false;
             }
-            if(var_array[j].getInitialMin() < i)
+            if (var_array[j].getInitialMin() < i)
               assignment.push_back(make_pair(j, var_array[j].getMax()));
           }
         }
 
-        if(flag_domain)
-        {
+        if (flag_domain) {
           assignment.push_back(make_pair(var_array.size(), i));
           return true;
-        }
-        else
+        } else
           assignment.clear();
       }
     }
@@ -244,26 +208,23 @@ struct MinConstraint : public AbstractConstraint
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint()
-  {
-      return forward_check_negation(this);
-  }
+  virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
 
-  virtual vector<AnyVarRef> get_vars()
-  {
+  virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size() + 1);
-    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
+    for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     vars.push_back(AnyVarRef(min_var));
     return vars;
   }
 };
 
-template<typename VarArray, typename VarRef>
-AbstractConstraint*
-BuildCT_MIN(const VarArray& _var_array,const std::vector<VarRef>& _var_ref, ConstraintBlob&)
-{ return (new MinConstraint<VarArray,VarRef>(_var_array, _var_ref[0])); }
+template <typename VarArray, typename VarRef>
+AbstractConstraint *BuildCT_MIN(const VarArray &_var_array, const std::vector<VarRef> &_var_ref,
+                                ConstraintBlob &) {
+  return (new MinConstraint<VarArray, VarRef>(_var_array, _var_ref[0]));
+}
 
 /* JSON
 { "type": "constraint",
@@ -273,11 +234,11 @@ BuildCT_MIN(const VarArray& _var_array,const std::vector<VarRef>& _var_ref, Cons
 }
 */
 
-template<typename VarArray, typename VarRef>
-AbstractConstraint*
-BuildCT_MAX(const VarArray& _var_array, const vector<VarRef>& _var_ref, ConstraintBlob&)
-{ return (new MinConstraint<typename NegType<VarArray>::type, typename NegType<VarRef>::type>(
-              VarNegRef(_var_array), VarNegRef(_var_ref[0]))); 
+template <typename VarArray, typename VarRef>
+AbstractConstraint *BuildCT_MAX(const VarArray &_var_array, const vector<VarRef> &_var_ref,
+                                ConstraintBlob &) {
+  return (new MinConstraint<typename NegType<VarArray>::type, typename NegType<VarRef>::type>(
+      VarNegRef(_var_array), VarNegRef(_var_ref[0])));
 }
 
 /* JSON

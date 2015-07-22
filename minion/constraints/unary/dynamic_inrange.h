@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 /** @help constraints;w-inrange Description
@@ -31,11 +32,9 @@
 #define CONSTRAINT_DYNAMIC_UNARY_INRANGE_H
 
 // Checks if a variable is in a fixed Range.
-template<typename Var>
-  struct WatchInRangeConstraint : public AbstractConstraint
-{
-  virtual string constraint_name()
-    { return "w-inrange"; }
+template <typename Var>
+struct WatchInRangeConstraint : public AbstractConstraint {
+  virtual string constraint_name() { return "w-inrange"; }
 
   CONSTRAINT_ARG_LIST2(var, make_vec(range_min, range_max));
   Var var;
@@ -43,58 +42,47 @@ template<typename Var>
   DomainInt range_min;
   DomainInt range_max;
 
-  template<typename T>
-  WatchInRangeConstraint(const Var& _var, const T& _vals) :
-  var(_var)
-  { 
-    if(_vals.size() != 2)
-    {
+  template <typename T>
+  WatchInRangeConstraint(const Var &_var, const T &_vals)
+      : var(_var) {
+    if (_vals.size() != 2) {
       output_fatal_error("The range of an 'inrange' constraint must contain 2 values!");
     }
-    
+
     range_min = _vals[0];
     range_max = _vals[1];
   }
 
-  virtual SysInt dynamic_trigger_count()
-    { return 2; }
+  virtual SysInt dynamic_trigger_count() { return 2; }
 
-  virtual void full_propagate()
-  {  
+  virtual void full_propagate() {
     var.setMin(range_min);
     var.setMax(range_max);
   }
 
-
-  virtual void propagateDynInt(SysInt  dt)
-  {
+  virtual void propagateDynInt(SysInt dt) {
     PROP_INFO_ADDONE(WatchInRange);
     D_FATAL_ERROR("Propagation is never called for 'in range'");
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
-  {
+  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] >= range_min && v[0] <= range_max);
   }
 
-  virtual vector<AnyVarRef> get_vars()
-  { 
+  virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  {  
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
     /// TODO: Make faster
     DomainInt min_val = max(range_min, var.getMin());
     DomainInt max_val = min(range_max, var.getMax());
-    for(DomainInt i = min_val; i <= max_val; ++i)
-    { 
-      if(var.inDomain(i))
-      {
+    for (DomainInt i = min_val; i <= max_val; ++i) {
+      if (var.inDomain(i)) {
         assignment.push_back(make_pair(0, i));
         return true;
       }
@@ -102,18 +90,17 @@ template<typename Var>
     return false;
   }
 
-   virtual AbstractConstraint* reverse_constraint();
+  virtual AbstractConstraint *reverse_constraint();
 };
 
 // To get reverse_constraint
 #include "dynamic_notinrange.h"
 
-template<typename VarArray1>
-AbstractConstraint*
-BuildCT_WATCHED_INRANGE(const VarArray1& _var_array_1, const ConstraintBlob& b)
-{ 
-  return new WatchInRangeConstraint<typename VarArray1::value_type>
-    (_var_array_1[0], b.constants[0]); 
+template <typename VarArray1>
+AbstractConstraint *BuildCT_WATCHED_INRANGE(const VarArray1 &_var_array_1,
+                                            const ConstraintBlob &b) {
+  return new WatchInRangeConstraint<typename VarArray1::value_type>(_var_array_1[0],
+                                                                    b.constants[0]);
 }
 
 /* JSON

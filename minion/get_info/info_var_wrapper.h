@@ -14,227 +14,194 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #include "../triggering/constraint_abstract.h"
 
-#define VAR_INFO_PRINT_0(X,Y)
-#define VAR_INFO_PRINT_1(X,Y,Z)
+#define VAR_INFO_PRINT_0(X, Y)
+#define VAR_INFO_PRINT_1(X, Y, Z)
 
-template<typename WrapType, Info_VarType VAR_TYPE>
-struct InfoRefType
-{
+template <typename WrapType, Info_VarType VAR_TYPE>
+struct InfoRefType {
   WrapType data;
 
   static const BOOL isBool = WrapType::isBool;
   static const BoundType isBoundConst = WrapType::isBoundConst;
 
-  BOOL isBound() const
-  { return data.isBound();}
+  BOOL isBound() const { return data.isBound(); }
 
   // Here we just pass through, as we don't know if this is the bottom or not.
-  AnyVarRef popOneMapper() const
-  { return data.popOneMapper(); }
+  AnyVarRef popOneMapper() const { return data.popOneMapper(); }
 
+  InfoRefType(const WrapType &_data) : data(_data) { VAR_INFO_ADDONE(VAR_TYPE, copy); }
 
-  InfoRefType(const WrapType& _data) : data(_data)
-  { VAR_INFO_ADDONE(VAR_TYPE, copy); }
+  InfoRefType() { VAR_INFO_ADDONE(VAR_TYPE, construct); }
 
-  InfoRefType()
-  { VAR_INFO_ADDONE(VAR_TYPE, construct); }
+  InfoRefType(const InfoRefType &b) : data(b.data) { VAR_INFO_ADDONE(VAR_TYPE, copy); }
 
-  InfoRefType(const InfoRefType& b) : data(b.data)
-  { VAR_INFO_ADDONE(VAR_TYPE, copy); }
-
-  bool isAssigned() const
-  {
+  bool isAssigned() const {
     VAR_INFO_ADDONE(VAR_TYPE, isAssigned);
     bool assign = data.isAssigned();
     VAR_INFO_PRINT_0("Assigned", assign);
     return assign;
   }
 
-  DomainInt getAssignedValue() const
-  {
+  DomainInt getAssignedValue() const {
     VAR_INFO_ADDONE(VAR_TYPE, getAssignedValue);
     DomainInt assignValue = data.getAssignedValue();
     VAR_INFO_PRINT_0("isAssignedValue", assignValue);
     return assignValue;
   }
 
-  bool isAssignedValue(DomainInt i) const
-  {
+  bool isAssignedValue(DomainInt i) const {
     VAR_INFO_ADDONE(VAR_TYPE, isAssignedValue);
     bool isAssignValue = data.isAssignedValue(i);
     VAR_INFO_PRINT_1("is assigned ", i, isAssignValue);
     return isAssignValue;
   }
 
-  bool inDomain(DomainInt b) const
-  {
+  bool inDomain(DomainInt b) const {
     VAR_INFO_ADDONE(VAR_TYPE, inDomain);
     bool indom = data.inDomain(b);
     VAR_INFO_PRINT_1("in domain", b, indom);
     return indom;
   }
 
-  bool inDomain_noBoundCheck(DomainInt b) const
-  {
+  bool inDomain_noBoundCheck(DomainInt b) const {
     VAR_INFO_ADDONE(VAR_TYPE, inDomain_noBoundCheck);
     bool indom_noBC = data.inDomain_noBoundCheck(b);
     VAR_INFO_PRINT_1("in domain, no bound check", b, indom_noBC);
     return indom_noBC;
   }
 
-
-  DomainInt getDomSize() const
-  {
+  DomainInt getDomSize() const {
     VAR_INFO_ADDONE(VAR_TYPE, getDomSize);
     DomainInt domval = data.getDomSize();
     VAR_INFO_PRINT_0("GetDomSize", domval);
     return domval;
   }
 
-  DomainInt getMax() const
-  {
+  DomainInt getMax() const {
     VAR_INFO_ADDONE(VAR_TYPE, getMax);
     DomainInt maxval = data.getMax();
     VAR_INFO_PRINT_0("GetMax", maxval);
     return maxval;
   }
 
-  DomainInt getMin() const
-  {
+  DomainInt getMin() const {
     VAR_INFO_ADDONE(VAR_TYPE, getMin);
     DomainInt minval = data.getMin();
     VAR_INFO_PRINT_0("GetMin", minval);
     return minval;
   }
 
-  DomainInt getInitialMax() const
-  {
+  DomainInt getInitialMax() const {
     VAR_INFO_ADDONE(VAR_TYPE, getInitialMax);
     DomainInt initialMax = data.getInitialMax();
     VAR_INFO_PRINT_0("InitialMax", initialMax);
     return initialMax;
   }
 
-  DomainInt getInitialMin() const
-  {
+  DomainInt getInitialMin() const {
     VAR_INFO_ADDONE(VAR_TYPE, getInitialMin);
     DomainInt initialMin = data.getInitialMin();
     VAR_INFO_PRINT_0("InitialMin", initialMin);
     return initialMin;
   }
 
-  void setMax(DomainInt i)
-  {
+  void setMax(DomainInt i) {
     VAR_INFO_ADDONE(VAR_TYPE, setMax);
     VAR_INFO_PRINT_0("SetMax", i);
     data.setMax(i);
   }
 
-  void setMin(DomainInt i)
-  {
+  void setMin(DomainInt i) {
     VAR_INFO_ADDONE(VAR_TYPE, setMin);
     VAR_INFO_PRINT_0("SetMin", i);
     data.setMin(i);
   }
 
-  void uncheckedAssign(DomainInt b)
-  {
+  void uncheckedAssign(DomainInt b) {
     VAR_INFO_ADDONE(VAR_TYPE, uncheckedAssign);
     VAR_INFO_PRINT_0("uncheckedAssign", b);
-    data.uncheckedAssign( b);
+    data.uncheckedAssign(b);
   }
 
-  void propagateAssign(DomainInt b)
-  {
+  void propagateAssign(DomainInt b) {
     VAR_INFO_ADDONE(VAR_TYPE, propagateAssign);
     VAR_INFO_PRINT_0("propagateAssign", b);
-    data.propagateAssign( b);
+    data.propagateAssign(b);
   }
 
-  void decisionAssign(DomainInt b)
-  {
+  void decisionAssign(DomainInt b) {
     VAR_INFO_ADDONE(VAR_TYPE, decisionAssign);
     VAR_INFO_PRINT_0("decisionAssign", b);
     data.decisionAssign(b);
   }
 
-  void removeFromDomain(DomainInt b)
-  {
+  void removeFromDomain(DomainInt b) {
     VAR_INFO_ADDONE(VAR_TYPE, RemoveFromDomain);
     VAR_INFO_PRINT_0("removeFromDomain", b);
-    data.removeFromDomain( b);
+    data.removeFromDomain(b);
   }
 
-  void addTrigger(Trigger t, TrigType type)
-  {
+  void addTrigger(Trigger t, TrigType type) {
     VAR_INFO_ADDONE(VAR_TYPE, addTrigger);
     VAR_INFO_PRINT_0("addTrigger", type);
-    data.addTrigger( t, type);
+    data.addTrigger(t, type);
   }
 
-  vector<AbstractConstraint*>* getConstraints()
-  {
+  vector<AbstractConstraint *> *getConstraints() {
     VAR_INFO_ADDONE(VAR_TYPE, getConstraints);
     return data.getConstraints();
   }
 
-  void addConstraint(AbstractConstraint* c)
-  {
+  void addConstraint(AbstractConstraint *c) {
     VAR_INFO_ADDONE(VAR_TYPE, addConstraint);
     data.addConstraint(c);
   }
 
-  DomainInt getBaseVal(DomainInt v) const
-  {
+  DomainInt getBaseVal(DomainInt v) const {
     VAR_INFO_ADDONE(VAR_TYPE, getBaseVal);
     return data.getBaseVal(v);
   }
 
-  vector<Mapper> getMapperStack() const
-  {
+  vector<Mapper> getMapperStack() const {
     VAR_INFO_ADDONE(VAR_TYPE, getMapperStack);
     return data.getMapperStack();
   }
 
-  Var getBaseVar() const
-  {
+  Var getBaseVar() const {
     VAR_INFO_ADDONE(VAR_TYPE, getBaseVar);
     return data.getBaseVar();
   }
 
 #ifdef WDEG
-  DomainInt getBaseWdeg()
-  {
+  DomainInt getBaseWdeg() {
     VAR_INFO_ADDONE(VAR_TYPE, getBaseWdeg);
     return data.getBaseWdeg();
   }
 
-  void incWdeg()
-  {
+  void incWdeg() {
     VAR_INFO_ADDONE(VAR_TYPE, incWdeg);
     data.incWdeg();
   }
 #endif
 
-  friend std::ostream& operator<<(std::ostream& o, const InfoRefType& ir)
-  {
+  friend std::ostream &operator<<(std::ostream &o, const InfoRefType &ir) {
     return o << "InfoRef " << ir.data;
   }
 
-  DomainInt getDomainChange(DomainDelta d)
-  {
+  DomainInt getDomainChange(DomainDelta d) {
     VAR_INFO_ADDONE(VAR_TYPE, getDomainChange);
     return d.XXX_get_domain_diff();
   }
 
-  void addDynamicTrigger(AbstractConstraint* ac, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
-  {
+  void addDynamicTrigger(AbstractConstraint *ac, DynamicTrigger *t, TrigType type,
+                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     VAR_INFO_ADDONE(VAR_TYPE, addDynamicTrigger);
-    data.addDynamicTrigger(ac, t, type, pos , op);
+    data.addDynamicTrigger(ac, t, type, pos, op);
   }
 };

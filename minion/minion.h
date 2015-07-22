@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 #ifndef MINION_H
 #define MINION_H
@@ -32,7 +33,6 @@
 VARDEF(ofstream solsoutFile);
 
 #include "memory_management/backtrackable_memory.h"
-
 
 #include "memory_management/trailed_monotonic_set_new.h"
 #include "memory_management/nonbacktrack_memory.h"
@@ -70,7 +70,7 @@ typedef TrailedMonotonicSet MonotonicSet;
 #ifndef DOMINION
 #include "inputfile_parse/CSPSpec.hpp"
 #else
-inline void inputPrint(std::ostream&, const Var&) {}
+inline void inputPrint(std::ostream &, const Var &) {}
 #endif
 
 #endif

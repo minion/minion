@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 /** @help constraints;w-notliteral Description
@@ -31,9 +32,8 @@
 #define CONSTRAINT_DYNAMIC_UNARY_NOT_INLITERAL_H
 
 // Checks if a variable is equal to a value.
-template<typename Var>
-  struct WatchNotLiteralConstraint : public AbstractConstraint
-{
+template <typename Var>
+struct WatchNotLiteralConstraint : public AbstractConstraint {
   virtual string constraint_name() { return "w-notliteral"; }
 
   Var var;
@@ -42,80 +42,65 @@ template<typename Var>
 
   CONSTRAINT_ARG_LIST2(var, val);
 
-  template<typename T>
-  WatchNotLiteralConstraint(const Var& _var, const T& _val) :
-    var(_var), val(_val) {}
+  template <typename T>
+  WatchNotLiteralConstraint(const Var &_var, const T &_val)
+      : var(_var), val(_val) {}
 
-  virtual SysInt dynamic_trigger_count()
-  { return 1; }
+  virtual SysInt dynamic_trigger_count() { return 1; }
 
-  virtual void full_propagate()
-  { 
-    if(var.isBound())
-    {
-        if(var.getMin() == val)
-            var.setMin(val + 1);
-        else if(var.getMax() == val)
-            var.setMax(val - 1);
-        else
-            moveTriggerInt(var, 0, DomainChanged);
-    }
-    else
-      var.removeFromDomain(val); 
+  virtual void full_propagate() {
+    if (var.isBound()) {
+      if (var.getMin() == val)
+        var.setMin(val + 1);
+      else if (var.getMax() == val)
+        var.setMax(val - 1);
+      else
+        moveTriggerInt(var, 0, DomainChanged);
+    } else
+      var.removeFromDomain(val);
   }
 
-
-  virtual void propagateDynInt(SysInt  dt)
-  {
+  virtual void propagateDynInt(SysInt dt) {
     PROP_INFO_ADDONE(WatchInRange);
-    if(var.isBound())
-    {
-        if(var.getMin() == val)
-            var.setMin(val + 1);
-        else if(var.getMax() == val)
-            var.setMax(val - 1);
-    }
-    else
-      var.removeFromDomain(val); 
+    if (var.isBound()) {
+      if (var.getMin() == val)
+        var.setMin(val + 1);
+      else if (var.getMax() == val)
+        var.setMax(val - 1);
+    } else
+      var.removeFromDomain(val);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
-  {
+  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] != val);
   }
 
-  virtual vector<AnyVarRef> get_vars()
-  { 
+  virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  { 
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
     D_ASSERT(var.inDomain(var.getMin()) && var.inDomain(var.getMax()));
     DomainInt tmp;
-    if((tmp = var.getMin()) != val)
-    {
-        assignment.push_back(make_pair(0, tmp));
-        return true;
-    }
-    else if((tmp = var.getMax()) != val)
-    {
-        assignment.push_back(make_pair(0, tmp));
-        return true;
+    if ((tmp = var.getMin()) != val) {
+      assignment.push_back(make_pair(0, tmp));
+      return true;
+    } else if ((tmp = var.getMax()) != val) {
+      assignment.push_back(make_pair(0, tmp));
+      return true;
     }
     return false;
   }
 
-   AbstractConstraint* reverse_constraint();
+  AbstractConstraint *reverse_constraint();
 };
 
-struct WatchNotLiteralBoolConstraint : public AbstractConstraint
-{
-   virtual string constraint_name() { return "w-notliteral"; }
+struct WatchNotLiteralBoolConstraint : public AbstractConstraint {
+  virtual string constraint_name() { return "w-notliteral"; }
 
   CONSTRAINT_ARG_LIST2(var, val);
 
@@ -123,72 +108,60 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint
 
   DomainInt val;
 
-  template<typename T>
-  WatchNotLiteralBoolConstraint(const BoolVarRef& _var, const T& _val) :
-    var(_var), val(_val) 
-  {
-    //cout << "using boolean specialisation" << endl;
-  }  
-
-  virtual SysInt dynamic_trigger_count()
-  { return 0; }
-
-  virtual void full_propagate()
-  { 
-    var.removeFromDomain(val); 
+  template <typename T>
+  WatchNotLiteralBoolConstraint(const BoolVarRef &_var, const T &_val)
+      : var(_var), val(_val) {
+    // cout << "using boolean specialisation" << endl;
   }
 
-  virtual void propagateDynInt(SysInt  dt)
-  {
+  virtual SysInt dynamic_trigger_count() { return 0; }
+
+  virtual void full_propagate() { var.removeFromDomain(val); }
+
+  virtual void propagateDynInt(SysInt dt) {
     PROP_INFO_ADDONE(WatchInRange);
-    var.removeFromDomain(val); 
+    var.removeFromDomain(val);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size)
-  {
+  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] != val);
   }
 
-  virtual vector<AnyVarRef> get_vars()
-  { 
+  virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
-  
-  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >& assignment)
-  {
-    if(var.getMin() != val)
-    {
-        assignment.push_back(make_pair(0, var.getMin()));
-        return true;
+
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+    if (var.getMin() != val) {
+      assignment.push_back(make_pair(0, var.getMin()));
+      return true;
     }
-    if(var.getMax() != val)
-    {
-        assignment.push_back(make_pair(0, var.getMax()));
-        return true;
+    if (var.getMax() != val) {
+      assignment.push_back(make_pair(0, var.getMax()));
+      return true;
     }
     return false;
   }
 
-   AbstractConstraint* reverse_constraint();
+  AbstractConstraint *reverse_constraint();
 };
 
 // For reverse constraint.
 #include "dynamic_literal.h"
 
-inline AbstractConstraint*
-BuildCT_WATCHED_NOTLIT(const vector<BoolVarRef>& vec, const ConstraintBlob& b)
-{ return new WatchNotLiteralBoolConstraint(vec[0], b.constants[0][0]); }
+inline AbstractConstraint *BuildCT_WATCHED_NOTLIT(const vector<BoolVarRef> &vec,
+                                                  const ConstraintBlob &b) {
+  return new WatchNotLiteralBoolConstraint(vec[0], b.constants[0][0]);
+}
 
-template<typename VarArray1>
-AbstractConstraint*
-BuildCT_WATCHED_NOTLIT(const VarArray1& _var_array_1, const ConstraintBlob& b)
-{ 
-  return new WatchNotLiteralConstraint<typename VarArray1::value_type>
-    (_var_array_1[0], b.constants[0][0]); 
+template <typename VarArray1>
+AbstractConstraint *BuildCT_WATCHED_NOTLIT(const VarArray1 &_var_array_1, const ConstraintBlob &b) {
+  return new WatchNotLiteralConstraint<typename VarArray1::value_type>(_var_array_1[0],
+                                                                       b.constants[0][0]);
 }
 
 /* JSON

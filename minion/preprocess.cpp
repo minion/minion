@@ -14,57 +14,55 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #include "minion.h"
 #include "preprocess.h"
 /// Apply a high level of consistency to a CSP.
-/** This function is not particularly optimised, implementing only the most basic SAC and SSAC algorithms */
-void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, bool print_info)
-{
-  if(preprocessLevel == PropLevel_None)
+/** This function is not particularly optimised, implementing only the most
+ * basic SAC and SSAC algorithms */
+void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef> &vars, bool print_info) {
+  if (preprocessLevel == PropLevel_None)
     return;
-  
+
   PropagateGAC propGAC;
   propGAC(vars);
-  
-  if(preprocessLevel == PropLevel_GAC)
+
+  if (preprocessLevel == PropLevel_GAC)
     return;
-  
+
   DomainInt lits = lit_count(vars);
-  bool bounds_check = ( (preprocessLevel == PropLevel_SACBounds) ||
-                        (preprocessLevel == PropLevel_SSACBounds) );
-  
-  if(bounds_check)
-  {
+  bool bounds_check =
+      ((preprocessLevel == PropLevel_SACBounds) || (preprocessLevel == PropLevel_SSACBounds));
+
+  if (bounds_check) {
     PropagateSAC_Bounds prop_SAC_bounds;
     prop_SAC_bounds(vars);
-  }
-  else
-  {
+  } else {
     PropagateSAC prop_SAC;
     prop_SAC(vars);
   }
-  
-  if(print_info) 
-  { cout << "SAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - lit_count(vars)) << " literals" << endl; }
-  
-  if(preprocessLevel == PropLevel_SAC || preprocessLevel == PropLevel_SACBounds)
+
+  if (print_info) {
+    cout << "SAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - lit_count(vars))
+         << " literals" << endl;
+  }
+
+  if (preprocessLevel == PropLevel_SAC || preprocessLevel == PropLevel_SACBounds)
     return;
 
   lits = lit_count(vars);
-  if(bounds_check)
-  {
+  if (bounds_check) {
     PropagateSSAC_Bounds prop_SSAC_bounds;
     prop_SSAC_bounds(vars);
-  }
-  else
-  {
+  } else {
     PropagateSSAC prop_SSAC;
     prop_SSAC(vars);
   }
-  if(print_info) 
-  { cout << "SSAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - lit_count(vars)) << " literals" << endl; }
-
+  if (print_info) {
+    cout << "SSAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - lit_count(vars))
+         << " literals" << endl;
+  }
 }

@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifdef MANY_VAR_CONTAINERS
@@ -37,25 +38,21 @@
 #include "containers/intboundvar.h"
 #include "containers/sparse_intboundvar.h"
 
-class VariableContainer
-{
+class VariableContainer {
   // Stop copying!
-  VariableContainer(const VariableContainer&);
-  void operator=(const VariableContainer&);
+  VariableContainer(const VariableContainer &);
+  void operator=(const VariableContainer &);
+
 public:
   BoundVarContainer<> boundVarContainer;
   BoolVarContainer boolVarContainer;
   BigRangeVarContainer<UnsignedSysInt> bigRangeVarContainer;
   SparseBoundVarContainer<> sparseBoundVarContainer;
 
+  VariableContainer()
+      : boundVarContainer(), boolVarContainer(), bigRangeVarContainer(), sparseBoundVarContainer() {
+  }
 
-  VariableContainer() :
-    boundVarContainer(),
-    boolVarContainer(),
-    bigRangeVarContainer(),
-    sparseBoundVarContainer()
-  {}
-  
   inline void lock() {
     boundVarContainer.lock();
     boolVarContainer.lock();
@@ -70,5 +67,3 @@ public:
 #include "mappings/variable_constant.h"
 #include "mappings/variable_not.h"
 #include "mappings/variable_shift.h"
-
-
