@@ -19,21 +19,37 @@
 */
 
 class DynamicTriggerList;
+class AbstractConstraint;
 
 /// Used in constraints to denote the position of a trigger
-struct TriggerPositionInfo {
+struct Con_TrigRef {
   DynamicTriggerList *dtl;
   SysInt triggerListPos;
 
-  TriggerPositionInfo() : dtl(0), triggerListPos(-1) {}
+  Con_TrigRef() : dtl(0), triggerListPos(-1) {}
 
-  TriggerPositionInfo(DynamicTriggerList *_dtl, SysInt _pos) : dtl(_dtl), triggerListPos(_pos) {}
+  Con_TrigRef(DynamicTriggerList *_dtl, SysInt _pos) : dtl(_dtl), triggerListPos(_pos) {}
+};
+
+struct Trig_ConRef {
+  AbstractConstraint *con;
+  SysInt conListPos;
+
+  Trig_ConRef() : con(0), conListPos(-1) {}
+
+  Trig_ConRef(AbstractConstraint *_con, SysInt _pos) : con(_con), conListPos(_pos) {}
 };
 
 // forward declaration
-void reportTriggerMovement(AbstractConstraint *, SysInt pos, TriggerPositionInfo tpi);
 
-void reportTriggerRemoval(AbstractConstraint *, SysInt pos);
+void releaseMergedTrigger(Con_TrigRef);
+void releaseMergedTrigger(Trig_ConRef);
+
+void addMergedTrigger(Trig_ConRef, SysInt conListPos);
+
+void _reportTriggerMovementToConstraint(AbstractConstraint *, SysInt pos, Con_TrigRef tpi);
+
+void _reportTriggerRemovalToConstraint(AbstractConstraint *, SysInt pos);
 
 /// This is a trigger to a constraint, which can be dynamically moved around.
 class DynamicTrigger {
@@ -167,9 +183,9 @@ public:
     return true;
   }
 
-  void movingTo(TriggerPositionInfo tpi) {
+  void movingTo(Con_TrigRef tpi) {
     // Can't use "constraint->" here due to header ordering
-    reportTriggerMovement(constraint, trig_pos, tpi);
+    _reportTriggerMovementToConstraint(constraint, trig_pos, tpi);
   }
 
   void removing() {
@@ -177,7 +193,7 @@ public:
 #ifdef MINION_DEBUG
       if (constraint != (AbstractConstraint *)BAD_POINTER)
 #endif
-        reportTriggerRemoval(constraint, trig_pos);
+        _reportTriggerRemovalToConstraint(constraint, trig_pos);
     }
   }
 };
@@ -195,7 +211,7 @@ public:
   }
 
   void add(DynamicTrigger *t) {
-    t->movingTo(TriggerPositionInfo{this, 0});
+    t->movingTo(Con_TrigRef{this, 0});
     t->add_after(&base);
   }
 

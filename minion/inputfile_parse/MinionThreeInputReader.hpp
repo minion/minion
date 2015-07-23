@@ -1096,7 +1096,8 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader *infile) {
         Z(SRF)
         Z(LDF)
         Z(ORIGINAL)
-        Z(WDEG) Z(CONFLICT) Z(DOMOVERWDEG)
+        Z(WDEG)
+        Z(CONFLICT) Z(DOMOVERWDEG)
 #undef Z
             if (vo == ORDER_WDEG || vo == ORDER_DOMOVERWDEG) {
 #ifndef WDEG

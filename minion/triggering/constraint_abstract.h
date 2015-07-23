@@ -62,17 +62,17 @@ class AbstractConstraint {
 protected:
   /// Private members of the base class.
 
-  vector<TriggerPositionInfo> trig_info_vec;
+  vector<Con_TrigRef> trig_info_vec;
 
   void *_DynamicTriggerCache;
   vector<AnyVarRef> singleton_vars;
 
 public:
-  void reportTriggerMovement(SysInt trigger, TriggerPositionInfo tpi) {
+  void _reportTriggerMovementToConstraint(SysInt trigger, Con_TrigRef tpi) {
     trig_info_vec[trigger] = tpi;
   }
 
-  void reportTriggerRemoval(SysInt trigger) { trig_info_vec[trigger] = TriggerPositionInfo{}; }
+  void _reportTriggerRemovalToConstraint(SysInt trigger) { trig_info_vec[trigger] = Con_TrigRef{}; }
 
 #ifdef WDEG
   UnsignedSysInt wdeg;
@@ -291,12 +291,13 @@ public:
   }
 };
 
-inline void reportTriggerMovement(AbstractConstraint *ac, SysInt pos, TriggerPositionInfo tpi) {
-  ac->reportTriggerMovement(pos, tpi);
+inline void _reportTriggerMovementToConstraint(AbstractConstraint *ac, SysInt pos,
+                                               Con_TrigRef tpi) {
+  ac->_reportTriggerMovementToConstraint(pos, tpi);
 }
 
-inline void reportTriggerRemoval(AbstractConstraint *ac, SysInt pos) {
-  ac->reportTriggerRemoval(pos);
+inline void _reportTriggerRemovalToConstraint(AbstractConstraint *ac, SysInt pos) {
+  ac->_reportTriggerRemovalToConstraint(pos);
 }
 
 /// Constraint from which other constraints can be inherited. Extends
