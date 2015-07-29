@@ -56,11 +56,10 @@ struct reify_true : public ParentConstraint {
   Reversible<bool> full_propagate_called;
 
   reify_true(AbstractConstraint *_poscon, BoolVar _rar_var)
-      : ParentConstraint(), rar_var(_rar_var), constraint_locked(false),
+      : ParentConstraint({_poscon}), rar_var(_rar_var), constraint_locked(false),
         full_propagate_called(false) {
     CHECK(rar_var.getInitialMin() >= 0 && rar_var.getInitialMax() <= 1,
           "reifyimply only works on Boolean variables");
-    child_constraints.push_back(_poscon);
   }
 
   // (var -> C) is equiv to (!var \/ C), so reverse is (var /\ !C)

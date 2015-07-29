@@ -155,11 +155,13 @@ public:
     triggers[type][checked_cast<SysInt>(b)].push_back(t);
   }
 
-  void addDynamicTrigger(AbstractConstraint *ac, DomainInt b, DynamicTrigger *t, TrigType type,
+  void addDynamicTrigger(DomainInt b, Trig_ConRef t, TrigType type,
                          DomainInt val, TrigOp op = TO_Default) {
     D_ASSERT(!only_bounds || type != DomainRemoval);
-    D_ASSERT(t->constraint != NULL);
-    D_ASSERT(t->sanity_check == 1234);
+    D_ASSERT(t.con != NULL);
+
+
+
     DynamicTriggerList *queue;
 
     if (type != DomainRemoval) {
@@ -172,43 +174,42 @@ public:
           val - vars_min_domain_val)][checked_cast<SysInt>(b)];
     }
 
-    D_ASSERT(queue->sanity_check_list());
 
+
+    D_ASSERT(queue->sanity_check_list());
+/* XXX
     switch (op) {
-    case TO_Default: D_DATA(t->setQueue((DynamicTriggerList *)BAD_POINTER)); break;
-    case TO_Store: t->setQueue(queue); break;
+    case TO_Default: break;
+    case TO_Store: break;
     case TO_Backtrack:
-      D_ASSERT(t->getQueue() != (DynamicTriggerList *)BAD_POINTER);
-      getQueue().getTbq().addTrigger(t);
+      getQueue().getTbq().restoreTriggerOnBacktrack(t);
       // Add to queue.
       t->setQueue(queue);
       break;
     default: abort();
     }
+*/
+
+if(op == TO_Backtrack)
+{
+  getQueue().getTbq().restoreTriggerOnBacktrack(t);
+}
 
     queue->add(t);
   }
 };
 
-inline void releaseTrigger(DynamicTrigger *t, TrigOp op) {
-  switch (op) {
-  case TO_Default: D_DATA(t->setQueue((DynamicTriggerList *)BAD_POINTER)); break;
-  case TO_Store: t->setQueue((DynamicTriggerList *)(NULL)); break;
-  case TO_Backtrack:
-    D_ASSERT(t->getQueue() != (DynamicTriggerList *)BAD_POINTER);
-    getQueue().getTbq().addTrigger(t);
-    // Add to queue.
-    t->setQueue((DynamicTriggerList *)(NULL));
-    break;
-  default: abort();
-  }
 
-  t->remove();
-}
-
-inline void attachTriggerToNullList(DynamicTrigger *t, TrigOp op) {
+inline void attachTriggerToNullList(Trig_ConRef t, TrigOp op) {
   static DynamicTriggerList dt;
   DynamicTriggerList *queue = &dt;
+
+  if(op == TO_Backtrack)
+  {
+    getQueue().getTbq().restoreTriggerOnBacktrack(t);
+  }
+
+  /* XXX
 
   switch (op) {
   case TO_Default: D_DATA(t->setQueue((DynamicTriggerList *)BAD_POINTER)); break;
@@ -220,7 +221,7 @@ inline void attachTriggerToNullList(DynamicTrigger *t, TrigOp op) {
     t->setQueue(queue);
     break;
   default: abort();
-  }
+}*/
   queue->add(t);
 }
 

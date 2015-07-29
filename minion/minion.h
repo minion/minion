@@ -73,4 +73,5 @@ typedef TrailedMonotonicSet MonotonicSet;
 inline void inputPrint(std::ostream &, const Var &) {}
 #endif
 
+#include "triggering/dynamic_trigger.hpp"
 #endif

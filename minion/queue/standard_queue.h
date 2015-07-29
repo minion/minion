@@ -91,36 +91,29 @@ public:
   bool propagateDynamicTriggerLists() {
     bool *fail_ptr = getState().getFailedPtr();
     while (!dynamic_trigger_list.empty()) {
-      DynamicTrigger *t = dynamic_trigger_list.queueTop().event()->basePtr();
+      DynamicTriggerEvent dte = dynamic_trigger_list.queueTop();
       dynamic_trigger_list.queuePop();
 
-      DynamicTrigger *it = t->next;
+      DynamicTriggerList& dtl = *(dte.event());
 
-      while (it != t) {
+      SysInt pos = 0;
+
+      while(pos < dtl.size()) {
         if (*fail_ptr) {
           clearQueues();
           return true;
         }
 
-#ifdef MINION_DEBUG
-        DynamicTrigger dummy((AbstractConstraint *)(BAD_POINTER), -1);
-#else
-        DynamicTrigger dummy;
-#endif
-        dummy.add_after(it);
-
-        if (!is_root_node || it->constraint->full_propagate_done) {
-          CON_INFO_ADDONE(DynamicTrigger);
-          it->propagate();
+        if (!dtl[pos].empty() && (!is_root_node || dtl[pos].con->full_propagate_done)) {
+          dtl[pos].propagate();
         }
 
 #ifdef WDEG
         if (*fail_ptr)
-          it->constraint->incWdeg();
+          dtl[pos].constraint()->incWdeg();
 #endif
 
-        it = dummy.next;
-        releaseTrigger(&dummy);
+        pos++;
       }
     }
     return false;

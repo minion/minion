@@ -91,9 +91,9 @@ struct ConstantVar {
 
   void addTrigger(Trigger, TrigType) {}
 
-  void addDynamicTrigger(AbstractConstraint *ac, DynamicTrigger *dt, TrigType,
+  void addDynamicTrigger(Trig_ConRef t, TrigType,
                          DomainInt = NoDomainValue, TrigOp op = TO_Default) {
-    attachTriggerToNullList(dt, op);
+    attachTriggerToNullList(t, op);
   }
 
   vector<AbstractConstraint *> *getConstraints() { return NULL; }

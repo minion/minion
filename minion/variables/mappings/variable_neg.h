@@ -98,14 +98,14 @@ struct VarNeg {
     return o << "Neg " << n.data;
   }
 
-  void addDynamicTrigger(AbstractConstraint *ac, DynamicTrigger *t, TrigType type,
+  void addDynamicTrigger(Trig_ConRef t, TrigType type,
                          DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     switch (type) {
-    case UpperBound: data.addDynamicTrigger(ac, t, LowerBound, pos, op); break;
-    case LowerBound: data.addDynamicTrigger(ac, t, UpperBound, pos, op); break;
+    case UpperBound: data.addDynamicTrigger(t, LowerBound, pos, op); break;
+    case LowerBound: data.addDynamicTrigger(t, UpperBound, pos, op); break;
     case Assigned:
-    case DomainChanged: data.addDynamicTrigger(ac, t, type, pos, op); break;
-    case DomainRemoval: data.addDynamicTrigger(ac, t, DomainRemoval, -pos, op); break;
+    case DomainChanged: data.addDynamicTrigger(t, type, pos, op); break;
+    case DomainRemoval: data.addDynamicTrigger(t, DomainRemoval, -pos, op); break;
     default: D_FATAL_ERROR("Broken dynamic trigger");
     }
   }

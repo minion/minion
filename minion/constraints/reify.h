@@ -114,7 +114,7 @@ struct reify : public ParentConstraint {
   D_DATA(triggerpairstype triggerpairs);
 
   reify(AbstractConstraint *_poscon, BoolVar _rar_var)
-      : ParentConstraint(), reify_var(_rar_var), constraint_locked(false),
+      : ParentConstraint({_poscon, _poscon->reverse_constraint()}), reify_var(_rar_var), constraint_locked(false),
         full_propagate_called(false) {
     CHECK(reify_var.getInitialMin() >= 0 && reify_var.getInitialMax() <= 1,
           "reify only works on Boolean variables");
@@ -122,9 +122,6 @@ struct reify : public ParentConstraint {
     numeric_limits<unsigned long long> ull;
     reifysetnode = ull.max();
 #endif
-    child_constraints.push_back(_poscon);
-    AbstractConstraint *_negcon = _poscon->reverse_constraint();
-    child_constraints.push_back(_negcon);
     // assume for the time being that the two child constraints have the same
     // number of vars.
     reify_var_num = child_constraints[0]->get_vars_singleton()->size() +

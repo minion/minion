@@ -30,27 +30,34 @@
 #undef P
 #endif
 
-#define P(x)
-//#define P(x) cout << x << endl
+//#define P(x)
+#define P(x) cout << x << endl
 
 struct TriggerBacktrackQueue {
 
-  typedef vector<pair<DynamicTrigger *, DynamicTriggerList *>> TriggerList;
+  typedef vector<pair<DynamicTriggerList*, Trig_ConRef>> TriggerList;
 
   vector<TriggerList> queue;
 
   TriggerBacktrackQueue() {
-    /// XXX
     queue.resize(1);
   }
 
+  void restoreTriggerOnBacktrack(Trig_ConRef t)
+  {
+    Con_TrigRef conref = t.con->_getTrigRef(t.conListPos);
+    P("TBQ: Restore on backtrack:" << conref.dtl << ":" << t);
+    queue.back().push_back(make_pair(conref.dtl, t));
+
+  }
+/* XXX
   void addTrigger(DynamicTrigger *trig) {
     PROP_INFO_ADDONE(Counter3);
     queue.back().push_back(make_pair(trig, trig->getQueue()));
   }
-
+*/
   void world_push() {
-    P("TBQ:World_push");
+    P("TBQ: World_push");
     queue.push_back(TriggerList());
   }
 
@@ -58,13 +65,12 @@ struct TriggerBacktrackQueue {
     P("TBQ: World_pop");
     TriggerList &tl = queue.back();
     for (SysInt i = (SysInt)tl.size() - 1; i >= 0; --i) {
-      if (tl[i].second == NULL) {
-        P("Release " << tl[i].first);
-        releaseTrigger(tl[i].first, TO_Store);
+      if (tl[i].first == NULL) {
+        P("TBQ: Release " << tl[i].second);
+        releaseMergedTrigger(tl[i].second);
       } else {
-        P("Add " << tl[i].first << " to " << tl[i].second);
-        tl[i].second->add(tl[i].first);
-        tl[i].first->setQueue(tl[i].second);
+        P("TBQ: Add " << tl[i].second << " to " << tl[i].first);
+        tl[i].first->add(tl[i].second);
       }
     }
     queue.pop_back();

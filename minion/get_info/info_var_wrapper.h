@@ -199,9 +199,9 @@ struct InfoRefType {
     return d.XXX_get_domain_diff();
   }
 
-  void addDynamicTrigger(AbstractConstraint *ac, DynamicTrigger *t, TrigType type,
+  void addDynamicTrigger(Trig_ConRef tcr, TrigType type,
                          DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     VAR_INFO_ADDONE(VAR_TYPE, addDynamicTrigger);
-    data.addDynamicTrigger(ac, t, type, pos, op);
+    data.addDynamicTrigger(tcr, type, pos, op);
   }
 };

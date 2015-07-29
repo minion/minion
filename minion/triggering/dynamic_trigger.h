@@ -18,6 +18,12 @@
 * USA.
 */
 
+#ifndef DYN_TRIG_H_FFJJKKTEA
+#define DYN_TRIG_H_FFJJKKTEA
+
+#define TRIGP(x) std::cerr << x << "\n";
+//#define TRIGP(x)
+
 class DynamicTriggerList;
 class AbstractConstraint;
 
@@ -26,198 +32,74 @@ struct Con_TrigRef {
   DynamicTriggerList *dtl;
   SysInt triggerListPos;
 
-  Con_TrigRef() : dtl(0), triggerListPos(-1) {}
+  Con_TrigRef() : dtl(nullptr), triggerListPos(-1) {}
 
   Con_TrigRef(DynamicTriggerList *_dtl, SysInt _pos) : dtl(_dtl), triggerListPos(_pos) {}
+
+  bool empty()
+  { return dtl == nullptr; }
+
+  friend bool operator==(Con_TrigRef lhs, Con_TrigRef rhs)
+  { return lhs.dtl == rhs.dtl && lhs.triggerListPos == rhs.triggerListPos; }
+
+  friend std::ostream& operator<<(std::ostream& o, Con_TrigRef ctr)
+  { return o << "ctr:(" << ctr.dtl << ":" << ctr.triggerListPos << ")"; }
 };
 
 struct Trig_ConRef {
   AbstractConstraint *con;
   SysInt conListPos;
 
-  Trig_ConRef() : con(0), conListPos(-1) {}
+  Trig_ConRef() : con(nullptr), conListPos(-1) {}
 
   Trig_ConRef(AbstractConstraint *_con, SysInt _pos) : con(_con), conListPos(_pos) {}
+
+  void propagate();
+
+  bool empty()
+  { return con == nullptr; }
+
+  friend bool operator==(Trig_ConRef lhs, Trig_ConRef rhs)
+  { return lhs.con == rhs.con && lhs.conListPos == rhs.conListPos; }
+
+  friend std::ostream& operator<<(std::ostream& o, Trig_ConRef tcr)
+  { return o << "tcr:(" << tcr.con << ":" << tcr.conListPos << ")"; }
 };
 
 // forward declaration
 
-void releaseMergedTrigger(Con_TrigRef);
-void releaseMergedTrigger(Trig_ConRef);
+void releaseMergedTrigger(Con_TrigRef, TrigOp op = TO_Default);
+void releaseMergedTrigger(Trig_ConRef, TrigOp op = TO_Default);
 
-void addMergedTrigger(Trig_ConRef, SysInt conListPos);
-
-void _reportTriggerMovementToConstraint(AbstractConstraint *, SysInt pos, Con_TrigRef tpi);
-
-void _reportTriggerRemovalToConstraint(AbstractConstraint *, SysInt pos);
-
-/// This is a trigger to a constraint, which can be dynamically moved around.
-class DynamicTrigger {
-public:
-  /// Hidden, as copying a DynamicTrigger is almost certainly an error.
-  DynamicTrigger(const DynamicTrigger &) { abort(); }
-
-public:
-  /// In debug mode, a value set to 1234 if this is a DynamicTrigger, or 4321 if
-  /// this
-  /// is a BacktrackableTrigger. This allows a check that a DynamicTrigger*
-  /// actually points to a valid object.
-  D_DATA(SysInt sanity_check;)
-
-  /// In debug mode, a value set to
-  /// The constraint to be triggered.
-  AbstractConstraint *constraint;
-
-  SysInt trig_pos;
-
-  /// A small space for constraints to store trigger-specific information.
-  SysInt _trigger_info;
-
-  DynamicTrigger *prev;
-  DynamicTrigger *next;
-
-  /// Wrapper function for _trigger_info.
-  SysInt &trigger_info() { return _trigger_info; }
-
-private:
-  DynamicTriggerList *basequeue;
-
-public:
-  DynamicTriggerList *getQueue() { return basequeue; }
-
-  void setQueue(DynamicTriggerList *ptr) { basequeue = ptr; }
-
-  DynamicTrigger(AbstractConstraint *c, SysInt _trig_pos)
-      : constraint(c), trig_pos(_trig_pos), _trigger_info(-9999), prev(NULL), next(NULL),
-        basequeue(NULL) {
-    D_DATA(sanity_check = 1234);
-  }
-
-  DynamicTrigger() : constraint(NULL), basequeue(NULL) {
-    D_DATA(sanity_check = 1234);
-    prev = next = this;
-  }
-  friend void releaseTrigger(DynamicTrigger *trig, TrigOp op);
-  friend void releaseTrigger(DynamicTrigger *trig) { releaseTrigger(trig, TO_Default); }
-
-  friend void attachTriggerToNullList(DynamicTrigger *trig, TrigOp op);
-  friend void attachTriggerToNullList(DynamicTrigger *trig) {
-    attachTriggerToNullList(trig, TO_Default);
-  }
-
-private:
-  /// Remove from whatever list this trigger is currently stored in.
-
-  void remove() {
-    removing();
-    D_ASSERT(constraint != NULL);
-    D_ASSERT(sanity_check == 1234);
-    D_ASSERT((prev == NULL) == (next == NULL));
-    DynamicTrigger *old_prev = prev;
-    DynamicTrigger *old_next = next;
-    if (old_prev != NULL) {
-      old_prev->next = old_next;
-    }
-    if (old_next != NULL) {
-      old_next->prev = old_prev;
-    }
-    D_ASSERT(old_prev == NULL || old_prev->sanity_check_list(false));
-    D_ASSERT(old_next == NULL || old_next->sanity_check_list(false));
-    next = NULL;
-    prev = NULL;
-  }
-
-public:
-  inline bool isAttached() { return prev != NULL; }
-
-private:
-  void add_after_implementation(DynamicTrigger *new_prev) {
-    if (prev != NULL) {
-      remove();
-    }
-    DynamicTrigger *new_next = new_prev->next;
-    prev = new_prev;
-    next = new_next;
-    new_prev->next = this;
-    new_next->prev = this;
-    D_ASSERT(prev->next == this);
-    D_ASSERT(next->prev == this);
-    D_ASSERT(new_prev->sanity_check_list(false));
-  }
-
-public:
-  /// Add this trigger after another one in a list.
-  /// This function will remove this trigger from any list it currently lives
-  /// in.
-  // next_queue_ptr is a '*&' as it is a pointer which we want a reference to,
-  // so we can change it!
-  void add_after(DynamicTrigger *new_prev) {
-    D_ASSERT(constraint != NULL);
-    D_ASSERT(sanity_check == 1234);
-    D_ASSERT(new_prev->sanity_check_list(false));
-    add_after_implementation(new_prev);
-  }
-
-  /// Propagates the constraint stored in the trigger.
-  /** Out of line as it needs the full definition of DynamicConstraint */
-  void propagate();
-
-  ~DynamicTrigger() {
-    D_ASSERT(sanity_check == 1234);
-    D_DATA(sanity_check = -1);
-  }
-
-  BOOL sanity_check_list(BOOL is_head_of_list = true) {
-    if (is_head_of_list) {
-      D_ASSERT(this->constraint == NULL);
-    }
-    D_ASSERT(this->sanity_check == 1234);
-    for (DynamicTrigger *it = this->next; it != this; it = it->next) {
-      D_ASSERT(it->sanity_check == 1234);
-      if (is_head_of_list) {
-        D_ASSERT(it->constraint != NULL);
-      }
-      D_ASSERT(it->prev->next == it);
-      D_ASSERT(it->next->prev == it);
-    }
-    return true;
-  }
-
-  void movingTo(Con_TrigRef tpi) {
-    // Can't use "constraint->" here due to header ordering
-    _reportTriggerMovementToConstraint(constraint, trig_pos, tpi);
-  }
-
-  void removing() {
-    if (constraint) {
-#ifdef MINION_DEBUG
-      if (constraint != (AbstractConstraint *)BAD_POINTER)
-#endif
-        _reportTriggerRemovalToConstraint(constraint, trig_pos);
-    }
-  }
-};
 
 class DynamicTriggerList {
-  DynamicTrigger base;
+  vector<Trig_ConRef> elems;
 
 public:
+
+  Trig_ConRef _getConRef(SysInt pos)
+  { return elems[pos]; }
+
   DynamicTriggerList() {}
 
   DynamicTriggerList(const DynamicTriggerList &) { abort(); }
 
-  bool sanity_check_list() { // XXX
-    return base.sanity_check_list();
+  bool sanity_check_list();
+
+  void add(Trig_ConRef t);
+
+  bool empty() { return elems.size() == 0; }
+  size_t size() { return elems.size(); }
+
+  Trig_ConRef operator[](SysInt s)
+  { return elems[s]; }
+
+  void _reportTriggerRemovalToList(SysInt pos)
+  {
+    TRIGP("TRL:" << pos << ":" << elems[pos]);
+    elems[pos] = Trig_ConRef{};
   }
 
-  void add(DynamicTrigger *t) {
-    t->movingTo(Con_TrigRef{this, 0});
-    t->add_after(&base);
-  }
-
-  bool empty() { return base.next == &base; }
-
-  DynamicTrigger *basePtr() { return &base; }
 };
 
 /// Container for a range of triggers
@@ -237,3 +119,9 @@ public:
     D_ASSERT(data <= DomainInt_Max);
   }
 };
+
+
+inline void attachTriggerToNullList(Trig_ConRef t, TrigOp op = TO_Default);
+inline void _restoreTriggerOnBacktrack(Trig_ConRef tcr);
+
+#endif

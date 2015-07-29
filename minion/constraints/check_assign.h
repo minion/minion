@@ -69,7 +69,7 @@ struct Check_Assign : public AbstractConstraint {
 
     for (SysInt i = 0; i < size; ++i) {
       if (!(*vars)[i].isAssigned()) {
-        moveTriggerInt((*vars)[i], 0, DomainChanged);
+        moveTriggerInt((*vars)[i], 0, Assigned);
         return;
       }
     }

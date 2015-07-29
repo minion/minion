@@ -517,13 +517,13 @@ public:
     trigger_list.add_trigger(b.var_num, t, type);
   }
 
-  void addDynamicTrigger(AbstractConstraint *ac, BigRangeVarRef_internal b, DynamicTrigger *t,
+  void addDynamicTrigger(BigRangeVarRef_internal b, Trig_ConRef t,
                          TrigType type, DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     D_ASSERT(lock_m);
     D_ASSERT(b.var_num >= 0);
     D_ASSERT(b.var_num <= (SysInt)var_count_m);
     D_ASSERT(type != DomainRemoval || (pos >= getInitialMin(b) && pos <= getInitialMax(b)));
-    trigger_list.addDynamicTrigger(ac, b.var_num, t, type, pos, op);
+    trigger_list.addDynamicTrigger(b.var_num, t, type, pos, op);
   }
 
   vector<AbstractConstraint *> *getConstraints(const BigRangeVarRef_internal &b) {

@@ -89,7 +89,6 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
   using FlowConstraint<VarArray, UseIncGraph>::adjlist;
   using FlowConstraint<VarArray, UseIncGraph>::adjlistlength;
   using FlowConstraint<VarArray, UseIncGraph>::adjlistpos;
-  using FlowConstraint<VarArray, UseIncGraph>::dynamic_trigger_start;
   using FlowConstraint<VarArray, UseIncGraph>::adjlist_remove;
   using FlowConstraint<VarArray, UseIncGraph>::var_array;
   using FlowConstraint<VarArray, UseIncGraph>::dom_min;
