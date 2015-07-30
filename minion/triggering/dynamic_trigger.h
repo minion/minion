@@ -21,8 +21,8 @@
 #ifndef DYN_TRIG_H_FFJJKKTEA
 #define DYN_TRIG_H_FFJJKKTEA
 
-#define TRIGP(x) std::cerr << x << "\n";
-//#define TRIGP(x)
+//#define TRIGP(x) std::cerr << x << "\n";
+#define TRIGP(x)
 
 class DynamicTriggerList;
 class AbstractConstraint;
@@ -56,7 +56,7 @@ struct Trig_ConRef {
 
   void propagate();
 
-  bool empty()
+  bool empty() const
   { return con == nullptr; }
 
   friend bool operator==(Trig_ConRef lhs, Trig_ConRef rhs)
@@ -74,13 +74,13 @@ void releaseMergedTrigger(Trig_ConRef, TrigOp op = TO_Default);
 
 class DynamicTriggerList {
   vector<Trig_ConRef> elems;
-
+  int slack;
 public:
 
   Trig_ConRef _getConRef(SysInt pos)
   { return elems[pos]; }
 
-  DynamicTriggerList() {}
+  DynamicTriggerList() : slack(0) {}
 
   DynamicTriggerList(const DynamicTriggerList &) { abort(); }
 
@@ -88,16 +88,21 @@ public:
 
   void add(Trig_ConRef t);
 
-  bool empty() { return elems.size() == 0; }
-  size_t size() { return elems.size(); }
+  bool empty() const { return elems.size() == 0; }
+  size_t size() const { return elems.size(); }
 
   Trig_ConRef operator[](SysInt s)
   { return elems[s]; }
+
+  void verify_slack() const;
+
+  void tryCompressList();
 
   void _reportTriggerRemovalToList(SysInt pos)
   {
     TRIGP("TRL:" << pos << ":" << elems[pos]);
     elems[pos] = Trig_ConRef{};
+    slack++;
   }
 
 };

@@ -115,6 +115,7 @@ public:
 
         pos++;
       }
+      dtl.tryCompressList();
     }
     return false;
   }

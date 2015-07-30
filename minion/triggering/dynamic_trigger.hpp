@@ -26,6 +26,83 @@ inline bool DynamicTriggerList::sanity_check_list() {
     return true;
   }
 
+  inline void DynamicTriggerList::verify_slack() const
+  {
+    // Note: In non-debug mode, this does nothing
+    #ifdef MINION_DEBUG
+        size_t slack_debug_count = 0;
+        for(int i = 0; i < elems.size(); ++i) {
+          if(elems[i].empty())
+          slack_debug_count++;
+        }
+        D_ASSERT(slack == slack_debug_count);
+    #endif
+  }
+
+  // Warning: This method is horrible.
+  // We go through the list of triggers, compressing and removing
+  // any blank spaces. We want to move as few triggers as possible.
+  // Therefore, we go forward through the list looking for spaces,
+  // moving the last trigger into that space. We make sure to skip
+  // any spaces we find at the end of the list.
+  inline void DynamicTriggerList::tryCompressList()
+  {
+    // In debug mode, let's check our slack counter is correct
+    verify_slack();
+
+    // Quick early return
+    if(slack == 0) return;
+
+
+    size_t elemsize = elems.size();
+    // Begin by removing any empty members at the end
+    while(elemsize > 0 && elems.back().empty())
+    {
+      elems.pop_back();
+      elemsize--;
+      slack--;
+    }
+
+    // Stop if either there is small enough slack.
+    // Note that this test will catch elemsize==0 or slack==0
+    if(slack <= elemsize/4)
+      return;
+
+    size_t pos = 0;
+    while(true) {
+      D_ASSERT(elems.size() > 0);
+      D_ASSERT(!elems.back().empty());
+      // Scan for first space
+      while(pos < elemsize && !elems[pos].empty()) {
+          pos++;
+      }
+      if(pos == elemsize)
+        return;
+      // Move last trigger back into space
+      Trig_ConRef old_ref = elems.back();
+      elems[pos] = old_ref;
+      elems.pop_back();
+      Con_TrigRef new_con_ref{this, (SysInt)pos};
+      old_ref.con->_reportTriggerMovementToConstraint(old_ref.conListPos, new_con_ref);
+      elemsize--;
+      slack--;
+      // The first pass around this loop will get rid of the now moved element
+      // then we search for a non-empty cell.
+      // We do not have to check slack (as either we will find a non-empty position,
+      // or empty the list)
+       while(elemsize > 0 && elems.back().empty()) {
+        elems.pop_back();
+        elemsize--;
+        slack--;
+      }
+      verify_slack();
+      D_ASSERT(slack >= 0);
+      if(slack == 0)
+        return;
+      D_ASSERT(pos < elemsize && elemsize == elems.size());
+    }
+  }
+
 
 inline void releaseMergedTrigger(Con_TrigRef t, TrigOp op) {
   TRIGP("CTR_Release:" << t);
