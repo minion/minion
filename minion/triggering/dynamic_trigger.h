@@ -74,13 +74,13 @@ void releaseMergedTrigger(Trig_ConRef, TrigOp op = TO_Default);
 
 class DynamicTriggerList {
   vector<Trig_ConRef> elems;
-  int slack;
+  vector<SysInt> slack;
 public:
 
   Trig_ConRef _getConRef(SysInt pos)
   { return elems[pos]; }
 
-  DynamicTriggerList() : slack(0) {}
+  DynamicTriggerList() {}
 
   DynamicTriggerList(const DynamicTriggerList &) { abort(); }
 
@@ -102,7 +102,7 @@ public:
   {
     TRIGP("TRL:" << pos << ":" << elems[pos]);
     elems[pos] = Trig_ConRef{};
-    slack++;
+    slack.push_back(pos);
   }
 
 };

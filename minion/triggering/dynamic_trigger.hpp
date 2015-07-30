@@ -8,9 +8,25 @@ inline void Trig_ConRef::propagate()
 
 inline void DynamicTriggerList::add(Trig_ConRef t) {
     releaseMergedTrigger(t);
-    elems.push_back(t);
+    if(slack.empty())
+    {
+      elems.push_back(t);
+      TRIGP("LA:" << elems.size() << ":" << t);
+      Con_TrigRef ctr{this, (SysInt)(elems.size()-1)};
+      t.con->_reportTriggerMovementToConstraint(t.conListPos,ctr);
+    }
+    else
+    {
+      SysInt pos = slack.back();
+      slack.pop_back();
+      D_ASSERT(elems.size() > pos && elems[pos].empty());
+      elems[pos] = t;
+      TRIGP("LApos:" << pos << ":" << t);
+      Con_TrigRef ctr{this, pos};
+      t.con->_reportTriggerMovementToConstraint(t.conListPos,ctr);
+    }
+
     TRIGP("LA:" << elems.size() << ":" << t);
-    t.con->_reportTriggerMovementToConstraint(t.conListPos, Con_TrigRef{this, (SysInt)(elems.size()-1)});
   }
 
 inline bool DynamicTriggerList::sanity_check_list() {
@@ -33,9 +49,9 @@ inline bool DynamicTriggerList::sanity_check_list() {
         size_t slack_debug_count = 0;
         for(int i = 0; i < elems.size(); ++i) {
           if(elems[i].empty())
-          slack_debug_count++;
+            slack_debug_count++;
         }
-        D_ASSERT(slack == slack_debug_count);
+        D_ASSERT(slack.size() == slack_debug_count);
     #endif
   }
 
@@ -46,27 +62,31 @@ inline bool DynamicTriggerList::sanity_check_list() {
   // moving the last trigger into that space. We make sure to skip
   // any spaces we find at the end of the list.
   inline void DynamicTriggerList::tryCompressList()
-  {
+  {/*
     // In debug mode, let's check our slack counter is correct
     verify_slack();
 
+    SysInt slacksize = slack.size();
     // Quick early return
-    if(slack == 0) return;
+    if(slacksize <= elems.size() / 4) return;
 
+    // Now we are here until we clear the slack!
+    slack.clear();
 
-    size_t elemsize = elems.size();
+    SysInt elemsize = elems.size();
     // Begin by removing any empty members at the end
     while(elemsize > 0 && elems.back().empty())
     {
       elems.pop_back();
       elemsize--;
-      slack--;
+      slacksize--;
     }
 
-    // Stop if either there is small enough slack.
-    // Note that this test will catch elemsize==0 or slack==0
-    if(slack <= elemsize/4)
+    if(slacksize == 0)
+    {
+      verify_slack();
       return;
+    }
 
     size_t pos = 0;
     while(true) {
@@ -85,7 +105,7 @@ inline bool DynamicTriggerList::sanity_check_list() {
       Con_TrigRef new_con_ref{this, (SysInt)pos};
       old_ref.con->_reportTriggerMovementToConstraint(old_ref.conListPos, new_con_ref);
       elemsize--;
-      slack--;
+      slacksize--;
       // The first pass around this loop will get rid of the now moved element
       // then we search for a non-empty cell.
       // We do not have to check slack (as either we will find a non-empty position,
@@ -93,14 +113,13 @@ inline bool DynamicTriggerList::sanity_check_list() {
        while(elemsize > 0 && elems.back().empty()) {
         elems.pop_back();
         elemsize--;
-        slack--;
+        slacksize--;
       }
-      verify_slack();
-      D_ASSERT(slack >= 0);
-      if(slack == 0)
+      D_ASSERT(slacksize >= 0);
+      if(slacksize == 0)
         return;
       D_ASSERT(pos < elemsize && elemsize == elems.size());
-    }
+    }*/
   }
 
 
