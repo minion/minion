@@ -107,14 +107,10 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
   // remove v from its domain to avoid the value of val_count.
 
   virtual SysInt dynamic_trigger_count() { // two moving assignment triggers.
-    return 2;
+    return 3;
   }
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    t.push_back(make_trigger(val_count, Trigger(this, -1), Assigned));
-    return t;
-  }
+  virtual void trigger_setup() { moveTriggerInt(val_count, 2, Assigned); }
 
   virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
     ;
@@ -134,9 +130,8 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual void propagateStatic(DomainInt z, DomainDelta) {
+  void propagateValCount() {
     // val_count has been assigned.
-    D_ASSERT(z == -1);
     if (trigger1index == -1 || var_array[trigger1index].isAssigned()) {
       trigger1index = watch_unassigned_in_vector(-1, trigger1index, 0);
       if (trigger1index == -1) {
@@ -154,6 +149,11 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   virtual void propagateDynInt(SysInt trig) {
+    if (trig == 2) {
+      propagateValCount();
+      return;
+    }
+
     if (trig == 0 || trigger1index == -1) {
       if (val_count.isAssigned()) {
         // make sure both triggers are in place.
@@ -272,6 +272,8 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    trigger_setup();
+
     trigger1index = watch_unassigned_in_vector(-1, -1, 0);
     if (trigger1index == -1) {
       vector_assigned();
@@ -348,13 +350,18 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
       : occurrences_count(), not_occurrences_count(), var_array(_var_array),
         val_count_min(_val_count_min), val_count_max(_val_count_max), value(_value) {}
 
+  virtual SysInt dynamic_trigger_count() { return var_array.size(); }
+
   virtual triggerCollection setup_internal() {
-    triggerCollection t;
     occurrences_count = 0;
     not_occurrences_count = 0;
+
+    return triggerCollection{};
+  }
+
+  virtual void trigger_setup() {
     for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
-      t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
-    return t;
+      moveTriggerInt(var_array[i], i, Assigned);
   }
 
   void occurrence_limit_reached() {
@@ -390,7 +397,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
       getState().setFailed(true);
   }
 
-  virtual void propagateStatic(DomainInt in, DomainDelta) {
+  virtual void propagateDynInt(SysInt in) {
     const SysInt i = checked_cast<SysInt>(in);
     PROP_INFO_ADDONE(OccEqual);
     D_ASSERT(i >= 0);
@@ -427,6 +434,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    trigger_setup();
     if (val_count_max < 0 || val_count_min > (SysInt)var_array.size())
       getState().setFailed(true);
     setup_counters();
@@ -542,15 +550,12 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
       : occurrences_count(), not_occurrences_count(), var_array(_var_array), val_count(_val_count),
         value(_value) {}
 
+  virtual SysInt dynamic_trigger_count() { return var_array.size() + 2; }
+
   virtual triggerCollection setup_internal() {
-    triggerCollection t;
     occurrences_count = 0;
     not_occurrences_count = 0;
-    for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
-      t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
-    t.push_back(make_trigger(val_count, Trigger(this, -1), UpperBound));
-    t.push_back(make_trigger(val_count, Trigger(this, -2), LowerBound));
-    return t;
+    return triggerCollection{};
   }
 
   void occurrence_limit_reached() {
@@ -583,9 +588,9 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     val_count.setMax(static_cast<SysInt>(var_array.size()) - occs);
   }
 
-  virtual void propagateStatic(DomainInt i, DomainDelta) {
+  virtual void propagateDynInt(SysInt i) {
     PROP_INFO_ADDONE(OccEqual);
-    if (i < 0) { // val_count changed
+    if (i >= var_array.size()) { // val_count changed
       if (occurrences_count == val_count.getMax())
         occurrence_limit_reached();
       if (not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count.getMin())
@@ -622,7 +627,16 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     not_occurrences_count = not_occs;
   }
 
+  virtual void trigger_setup() {
+    for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
+      moveTriggerInt(var_array[i], i, Assigned);
+    moveTriggerInt(val_count, var_array.size(), UpperBound);
+    moveTriggerInt(val_count, var_array.size() + 1, LowerBound);
+  }
+
   virtual void full_propagate() {
+    trigger_setup();
+
     val_count.setMin(0);
     val_count.setMax(var_array.size());
     setup_counters();

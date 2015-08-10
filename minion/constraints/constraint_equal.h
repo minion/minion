@@ -119,21 +119,20 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     // within {0,1}");
   }
 
-  virtual triggerCollection setup_internal() {
+  virtual SysInt dynamic_trigger_count() { return 5; }
+
+  virtual void trigger_setup() {
     moveTriggerInt(var1, 0, LowerBound);
     moveTriggerInt(var1, 1, UpperBound);
     moveTriggerInt(var2, 2, LowerBound);
     moveTriggerInt(var2, 3, UpperBound);
     moveTriggerInt(var3, 4, Assigned);
-
-    triggerCollection t;
-    return t;
   }
-
-  virtual SysInt dynamic_trigger_count() { return 5; }
 
   // rewrite the following two functions.
   virtual void full_propagate() {
+    trigger_setup();
+
     D_ASSERT(var3.getMin() >= 0);
     D_ASSERT(var3.getMax() <= 1);
     if (var3.isAssigned()) {
@@ -341,24 +340,6 @@ struct NeqConstraintBinary : public AbstractConstraint {
 
   virtual SysInt dynamic_trigger_count() { return 6; }
 
-  virtual triggerCollection setup_internal() {
-
-    if (var1.isBound()) {
-      moveTriggerInt(var1, 3, UpperBound);
-      moveTriggerInt(var1, 4, LowerBound);
-    } else {
-      moveTriggerInt(var1, 1, Assigned);
-    }
-
-    if (var2.isBound()) {
-      moveTriggerInt(var2, 5, UpperBound);
-      moveTriggerInt(var2, 0, LowerBound);
-    } else {
-      moveTriggerInt(var2, 2, Assigned);
-    }
-    return triggerCollection{};
-  }
-
   virtual void propagateDynInt(SysInt prop_val) {
     PROP_INFO_ADDONE(BinaryNeq);
     if (prop_val == 1) {
@@ -433,7 +414,25 @@ struct NeqConstraintBinary : public AbstractConstraint {
     }
   }
 
+  virtual void trigger_setup() {
+    if (var1.isBound()) {
+      moveTriggerInt(var1, 3, UpperBound);
+      moveTriggerInt(var1, 4, LowerBound);
+    } else {
+      moveTriggerInt(var1, 1, Assigned);
+    }
+
+    if (var2.isBound()) {
+      moveTriggerInt(var2, 5, UpperBound);
+      moveTriggerInt(var2, 0, LowerBound);
+    } else {
+      moveTriggerInt(var2, 2, Assigned);
+    }
+  }
+
   virtual void full_propagate() {
+    trigger_setup();
+
     if (var1.isAssigned()) {
       DomainInt remove_val = var1.getAssignedValue();
       if (var2.isBound()) {
@@ -514,15 +513,15 @@ struct EqualConstraint : public AbstractConstraint {
 
   virtual SysInt dynamic_trigger_count() { return 4; }
 
-  virtual triggerCollection setup_internal() {
+  virtual void trigger_setup() {
     moveTriggerInt(var1, 0, UpperBound);
     moveTriggerInt(var1, 1, LowerBound);
     moveTriggerInt(var2, 2, UpperBound);
     moveTriggerInt(var2, 3, LowerBound);
-    return triggerCollection{};
   }
 
   virtual void full_propagate() {
+    trigger_setup();
     propagateDynInt(1);
     propagateDynInt(2);
     propagateDynInt(3);
