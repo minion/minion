@@ -46,19 +46,22 @@ struct AbsConstraint : public AbstractConstraint {
   AbsVarRef2 var2;
   AbsConstraint(AbsVarRef1 _var1, AbsVarRef2 _var2) : var1(_var1), var2(_var2) {}
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-    t.push_back(make_trigger(var1, Trigger(this, 2), LowerBound));
-    t.push_back(make_trigger(var2, Trigger(this, 3), UpperBound));
-    t.push_back(make_trigger(var2, Trigger(this, 4), LowerBound));
-    return t;
+  virtual SysInt dynamic_trigger_count() {
+    return 4;
+  }
+
+  void trigger_setup() {
+    moveTriggerInt(var1, 0, UpperBound);
+    moveTriggerInt(var1, 1, LowerBound);
+    moveTriggerInt(var2, 2, UpperBound);
+    moveTriggerInt(var2, 3, LowerBound);
   }
 
   virtual void full_propagate() {
+    trigger_setup();
     var1.setMin(0);
     for (SysInt i = 0; i < 4 && !getState().isFailed(); ++i)
-      propagateStatic(i, DomainDelta::empty());
+      propagateDynInt(i);
   }
 
   // Assume values passed in in order.
@@ -84,17 +87,17 @@ struct AbsConstraint : public AbstractConstraint {
       return x;
   }
 
-  virtual void propagateStatic(DomainInt i, DomainDelta) {
+  virtual void propagateDynInt(SysInt i) {
     // Assume this in the algorithm.
     D_ASSERT(var1.getMin() >= 0);
 
     PROP_INFO_ADDONE(Abs);
-    switch (checked_cast<SysInt>(i)) {
-    case 1: // var1 upper
+    switch (i) {
+    case 0: // var1 upper
       var2.setMax(var1.getMax());
       var2.setMin(-var1.getMax());
       return;
-    case 2: // var1 lower
+    case 1: // var1 lower
       if (var2.getMax() < var1.getMin())
         var2.setMax(-var1.getMin());
       if (var2.getMin() > -var1.getMin())
@@ -102,8 +105,8 @@ struct AbsConstraint : public AbstractConstraint {
       else
         var2.setMin(-var1.getMax());
       return;
-    case 3: // var 2 upper
-    case 4: // var 2 lower
+    case 2: // var 2 upper
+    case 3: // var 2 lower
       var1.setMax(absmax(var2.getMin(), var2.getMax()));
       var1.setMin(absmin(var2.getMin(), var2.getMax()));
       if (var2.getMin() > -var1.getMin())
