@@ -110,7 +110,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     return 3;
   }
 
-  virtual void trigger_setup() { moveTriggerInt(val_count, 2, Assigned); }
+  void trigger_setup() { moveTriggerInt(val_count, 2, Assigned); }
 
   virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
     ;
@@ -359,7 +359,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     return triggerCollection{};
   }
 
-  virtual void trigger_setup() {
+  void trigger_setup() {
     for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
       moveTriggerInt(var_array[i], i, Assigned);
   }
@@ -627,7 +627,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     not_occurrences_count = not_occs;
   }
 
-  virtual void trigger_setup() {
+  void trigger_setup() {
     for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
       moveTriggerInt(var_array[i], i, Assigned);
     moveTriggerInt(val_count, var_array.size(), UpperBound);
