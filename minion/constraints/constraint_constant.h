@@ -35,13 +35,6 @@ struct ConstantConstraint : public AbstractConstraint {
 
   ConstantConstraint() {}
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    return t;
-  }
-
-  virtual void propagateStatic(DomainInt i, DomainDelta) {}
-
   virtual void full_propagate() {
     if (!truth)
       getState().setFailed(true);
