@@ -522,10 +522,8 @@ struct EqualConstraint : public AbstractConstraint {
 
   virtual void full_propagate() {
     trigger_setup();
-    propagateDynInt(1);
-    propagateDynInt(2);
-    propagateDynInt(3);
-    propagateDynInt(4);
+    for(int i = 0; i < 4; ++i)
+      propagateDynInt(i);
   }
 
   virtual void propagateDynInt(SysInt i) {
