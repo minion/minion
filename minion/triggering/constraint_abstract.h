@@ -84,12 +84,14 @@ public:
 
   void _reportTriggerMovementToConstraint(SysInt trigger, Con_TrigRef tpi) {
     D_ASSERT(parent == nullptr);
+    D_ASSERT(trigger >= 0 && trigger < trig_info_vec.size());
     TRIGP("CM" << trig_info_vec[trigger] << "->" << trigger << ":" << tpi);
     trig_info_vec[trigger] = tpi;
   }
 
   void _reportTriggerRemovalToConstraint(SysInt trigger) {
     D_ASSERT(parent == nullptr);
+    D_ASSERT(trigger >= 0 && trigger < trig_info_vec.size());
     TRIGP("CR" << trig_info_vec[trigger] << ":" << trigger);
     trig_info_vec[trigger] = Con_TrigRef{};
   }
@@ -99,11 +101,13 @@ public:
   virtual Con_TrigRef _parent_map_Con_TrigRef(SysInt child, SysInt trigger) { INTERNAL_ERROR("?"); }
 
   void restoreTriggerOnBacktrack(SysInt trigger) {
+
     Con_TrigRef t;
 
     if (parent == nullptr) {
       t = parent->_parent_map_Con_TrigRef(childpos, trigger);
     } else {
+      D_ASSERT(trigger >= 0 && trigger < trig_info_vec.size());
       t = trig_info_vec[trigger];
     }
     Trig_ConRef tcr = t.dtl->_getConRef(t.triggerListPos);
