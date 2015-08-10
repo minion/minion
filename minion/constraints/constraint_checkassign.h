@@ -41,21 +41,13 @@ struct CheckAssignConstraint : public AbstractConstraint {
 
   CheckAssignConstraint(const OriginalConstraint &con) : originalcon(con), assigned_vars() {}
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    typename OriginalConstraint::var_type &variables = originalcon.get_vars();
-    for (UnsignedSysInt i = 0; i < variables.size(); ++i)
-      t.push_back(make_trigger(variables[i], Trigger(this, i), Assigned));
-    return t;
-  }
-
   virtual AbstractConstraint *reverse_constraint() {
     return new CheckAssignConstraint<OriginalConstraint, !negate>(originalcon);
   }
 
-  virtual void propagateStatic(DomainInt prop_val, DomainDelta delta) {
+  virtual void propagateDynInt(SysInt prop_val) {
     PROP_INFO_ADDONE(CheckAssign);
-    if (check_unsat(checked_cast<SysInt>(prop_val), delta))
+    if (check_unsat(prop_val, DomainDelta::empty()))
       getState().setFailed(true);
   }
 
@@ -101,7 +93,19 @@ struct CheckAssignConstraint : public AbstractConstraint {
     return false;
   }
 
+  virtual SysInt dynamic_trigger_count() {
+    typename OriginalConstraint::var_type &variables = originalcon.get_vars();
+    return variables.size();
+  }
+
+  void trigger_setup() {
+    typename OriginalConstraint::var_type &variables = originalcon.get_vars();
+    for (UnsignedSysInt i = 0; i < variables.size(); ++i)
+      moveTriggerInt(variables[i], i, Assigned);
+  }
+
   virtual void full_propagate() {
+    trigger_setup();
     if (full_check_unsat())
       getState().setFailed(true);
   }
