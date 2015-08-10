@@ -53,19 +53,22 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
 
   LessEqualNvalueConstraint(VarArray _vars, VarResult _result) : vars(_vars), result(_result) {}
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
+  void trigger_setup() {
     for (unsigned i = 0; i < vars.size(); ++i) {
-      t.push_back(make_trigger(vars[i], Trigger(this, i), Assigned));
+      moveTriggerInt(vars[i], i, Assigned);
     }
 
-    t.push_back(make_trigger(result, Trigger(this, -1), UpperBound));
-    return t;
+    moveTriggerInt(result, vars.size(), UpperBound);
   }
 
-  virtual void propagateStatic(DomainInt flag, DomainDelta) { full_propagate(); }
+  virtual SysInt dynamic_trigger_count() {
+    return vars.size() + 1;
+  }
+
+  virtual void propagateDynInt(SysInt flag) { full_propagate(); }
 
   virtual void full_propagate() {
+    trigger_setup();
     std::set<DomainInt> assigned;
     for (unsigned i = 0; i < vars.size(); ++i) {
       if (vars[i].isAssigned()) {
