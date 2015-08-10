@@ -121,7 +121,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
 
   virtual SysInt dynamic_trigger_count() { return 5; }
 
-  virtual void trigger_setup() {
+  void trigger_setup() {
     moveTriggerInt(var1, 0, LowerBound);
     moveTriggerInt(var1, 1, UpperBound);
     moveTriggerInt(var2, 2, LowerBound);
@@ -414,7 +414,7 @@ struct NeqConstraintBinary : public AbstractConstraint {
     }
   }
 
-  virtual void trigger_setup() {
+  void trigger_setup() {
     if (var1.isBound()) {
       moveTriggerInt(var1, 3, UpperBound);
       moveTriggerInt(var1, 4, LowerBound);
@@ -513,7 +513,7 @@ struct EqualConstraint : public AbstractConstraint {
 
   virtual SysInt dynamic_trigger_count() { return 4; }
 
-  virtual void trigger_setup() {
+  void trigger_setup() {
     moveTriggerInt(var1, 0, UpperBound);
     moveTriggerInt(var1, 1, LowerBound);
     moveTriggerInt(var2, 2, UpperBound);
