@@ -151,19 +151,30 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
 
   GreaterEqualNvalueConstraint(VarArray _vars, VarResult _result) : vars(_vars), result(_result) {}
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
+  virtual SysInt dynamic_trigger_count() {
+    return vars.size() + 1;
+  }
+  
+  void trigger_setup() {
     for (unsigned i = 0; i < vars.size(); ++i) {
-      t.push_back(make_trigger(vars[i], Trigger(this, i), Assigned));
+      moveTriggerInt(vars[i], i, Assigned);
     }
 
-    t.push_back(make_trigger(result, Trigger(this, -1), LowerBound));
-    return t;
+    moveTriggerInt(result, vars.size(), LowerBound);
   }
 
-  virtual void propagateStatic(DomainInt flag, DomainDelta) { full_propagate(); }
+  virtual void propagateDynInt(SysInt flag)
+  {
+    propagateImpl();
+  }
 
-  virtual void full_propagate() {
+  virtual void full_propagate()
+  {
+    trigger_setup();
+    propagateImpl();
+  }
+
+  void propagateImpl() {
     std::set<DomainInt> assigned;
     DomainInt min_unassigned = INT_MAX;
     DomainInt max_unassigned = INT_MIN;
