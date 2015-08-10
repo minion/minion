@@ -60,7 +60,7 @@ void dump_searchorder(const SearchOrder &order, ostream &os) {
     Z(CONFLICT)
     Z(DOMOVERWDEG)
 #undef Z
-        default : abort();
+  default: abort();
   }
 
   os << "[";

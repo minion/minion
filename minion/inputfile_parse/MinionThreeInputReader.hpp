@@ -1100,7 +1100,7 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader *infile) {
         Z(CONFLICT)
         Z(DOMOVERWDEG)
 #undef Z
-            if (vo == ORDER_WDEG || vo == ORDER_DOMOVERWDEG) {
+        if (vo == ORDER_WDEG || vo == ORDER_DOMOVERWDEG) {
 #ifndef WDEG
           USER_ERROR("This minion was not compiled with support for WDEG or "
                      "DOMOVERWDEG orderings (add -WDEG to build options)");
