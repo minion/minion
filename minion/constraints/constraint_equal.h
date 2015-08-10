@@ -120,14 +120,17 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
   }
 
   virtual triggerCollection setup_internal() {
+    moveTriggerInt(var1, 0, LowerBound);
+    moveTriggerInt(var1, 1, UpperBound);
+    moveTriggerInt(var2, 2, LowerBound);
+    moveTriggerInt(var2, 3, UpperBound);
+    moveTriggerInt(var3, 4, Assigned);
+
     triggerCollection t;
-    t.push_back(make_trigger(var1, Trigger(this, 10), LowerBound));
-    t.push_back(make_trigger(var1, Trigger(this, 11), UpperBound));
-    t.push_back(make_trigger(var2, Trigger(this, 20), LowerBound));
-    t.push_back(make_trigger(var2, Trigger(this, 21), UpperBound));
-    t.push_back(make_trigger(var3, Trigger(this, 3), Assigned));
     return t;
   }
+
+  virtual SysInt dynamic_trigger_count() { return 5; }
 
   // rewrite the following two functions.
   virtual void full_propagate() {
@@ -149,10 +152,10 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void propagateStatic(DomainInt i, DomainDelta) {
+  virtual void propagateDynInt(SysInt i) {
     PROP_INFO_ADDONE(ReifyEqual);
     switch (checked_cast<SysInt>(i)) {
-    case 10:
+    case 0:
       // var1 lower bound has moved
       if (var3.isAssigned()) {
         if (var3.getAssignedValue() == true_value()) {
@@ -165,7 +168,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
       }
       break;
 
-    case 11:
+    case 1:
       // var1 upper bound has moved.
       if (var3.isAssigned()) {
         if (var3.getAssignedValue() == true_value()) {
@@ -178,7 +181,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
       }
       break;
 
-    case 20:
+    case 2:
       // var2 lower bound has moved.
       if (var3.isAssigned()) {
         if (var3.getAssignedValue() == true_value()) {
@@ -191,7 +194,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
       }
       break;
 
-    case 21:
+    case 3:
       // var2 upper bound has moved.
       if (var3.isAssigned()) {
         if (var3.getAssignedValue() == true_value()) {
@@ -204,7 +207,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
       }
       break;
 
-    case 3:
+    case 4:
       DomainInt assigned_val = var3.getAssignedValue();
       if (assigned_val == true_value()) {
         eqprop();
@@ -325,12 +328,6 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
   }
 };
 
-// This is required for the following to have bound triggers
-// when the variables are bound,
-// and propagate confluently.
-// Remove the define to go back to assignment triggers in all cases.
-#define MAKECONFLUENT
-
 template <typename VarRef1, typename VarRef2>
 struct NeqConstraintBinary : public AbstractConstraint {
   virtual string constraint_name() { return "diseq"; }
@@ -342,30 +339,27 @@ struct NeqConstraintBinary : public AbstractConstraint {
 
   NeqConstraintBinary(const VarRef1 &_var1, const VarRef2 &_var2) : var1(_var1), var2(_var2) {}
 
+  virtual SysInt dynamic_trigger_count() { return 6; }
+
   virtual triggerCollection setup_internal() {
-    triggerCollection t;
-#ifndef MAKECONFLUENT
-    t.push_back(make_trigger(var1, Trigger(this, 1), Assigned));
-    t.push_back(make_trigger(var2, Trigger(this, 2), Assigned));
-#else
+
     if (var1.isBound()) {
-      t.push_back(make_trigger(var1, Trigger(this, 3), UpperBound));
-      t.push_back(make_trigger(var1, Trigger(this, 4), LowerBound));
+      moveTriggerInt(var1, 3, UpperBound);
+      moveTriggerInt(var1, 4, LowerBound);
     } else {
-      t.push_back(make_trigger(var1, Trigger(this, 1), Assigned));
+      moveTriggerInt(var1, 1, Assigned);
     }
 
     if (var2.isBound()) {
-      t.push_back(make_trigger(var2, Trigger(this, 5), UpperBound));
-      t.push_back(make_trigger(var2, Trigger(this, 6), LowerBound));
+      moveTriggerInt(var2, 5, UpperBound);
+      moveTriggerInt(var2, 0, LowerBound);
     } else {
-      t.push_back(make_trigger(var2, Trigger(this, 2), Assigned));
+      moveTriggerInt(var2, 2, Assigned);
     }
-#endif
-    return t;
+    return triggerCollection{};
   }
 
-  virtual void propagateStatic(DomainInt prop_val, DomainDelta) {
+  virtual void propagateDynInt(SysInt prop_val) {
     PROP_INFO_ADDONE(BinaryNeq);
     if (prop_val == 1) {
       DomainInt remove_val = var1.getAssignedValue();
@@ -377,9 +371,7 @@ struct NeqConstraintBinary : public AbstractConstraint {
       } else {
         var2.removeFromDomain(remove_val);
       }
-    }
-#ifdef MAKECONFLUENT
-    else if (prop_val == 3) { // ub moved var1
+    } else if (prop_val == 3) { // ub moved var1
       if (var2.isAssigned() && var2.getAssignedValue() == var1.getMax())
         var1.setMax(var1.getMax() - 1);
       if (var1.isAssigned()) {
@@ -397,15 +389,13 @@ struct NeqConstraintBinary : public AbstractConstraint {
       if (var2.isAssigned()) {
         var2assigned();
       }
-    } else if (prop_val == 6) { // lb moved var2
+    } else if (prop_val == 0) { // lb moved var2
       if (var1.isAssigned() && var1.getAssignedValue() == var2.getMin())
         var2.setMin(var2.getMin() + 1);
       if (var2.isAssigned()) {
         var2assigned();
       }
-    }
-#endif
-    else {
+    } else {
       D_ASSERT(prop_val == 2);
       DomainInt remove_val = var2.getAssignedValue();
       if (var1.isBound()) {
@@ -522,29 +512,30 @@ struct EqualConstraint : public AbstractConstraint {
   EqualVarRef2 var2;
   EqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2) : var1(_var1), var2(_var2) {}
 
+  virtual SysInt dynamic_trigger_count() { return 4; }
+
   virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-    t.push_back(make_trigger(var1, Trigger(this, 2), LowerBound));
-    t.push_back(make_trigger(var2, Trigger(this, 3), UpperBound));
-    t.push_back(make_trigger(var2, Trigger(this, 4), LowerBound));
-    return t;
+    moveTriggerInt(var1, 0, UpperBound);
+    moveTriggerInt(var1, 1, LowerBound);
+    moveTriggerInt(var2, 2, UpperBound);
+    moveTriggerInt(var2, 3, LowerBound);
+    return triggerCollection{};
   }
 
   virtual void full_propagate() {
-    propagateStatic(1, DomainDelta::empty());
-    propagateStatic(2, DomainDelta::empty());
-    propagateStatic(3, DomainDelta::empty());
-    propagateStatic(4, DomainDelta::empty());
+    propagateDynInt(1);
+    propagateDynInt(2);
+    propagateDynInt(3);
+    propagateDynInt(4);
   }
 
-  virtual void propagateStatic(DomainInt i, DomainDelta) {
+  virtual void propagateDynInt(SysInt i) {
     PROP_INFO_ADDONE(Equal);
     switch (checked_cast<SysInt>(i)) {
-    case 1: var2.setMax(var1.getMax()); return;
-    case 2: var2.setMin(var1.getMin()); return;
-    case 3: var1.setMax(var2.getMax()); return;
-    case 4: var1.setMin(var2.getMin()); return;
+    case 0: var2.setMax(var1.getMax()); return;
+    case 1: var2.setMin(var1.getMin()); return;
+    case 2: var1.setMax(var2.getMax()); return;
+    case 3: var1.setMin(var2.getMin()); return;
     }
   }
 
