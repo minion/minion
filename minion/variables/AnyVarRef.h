@@ -186,8 +186,8 @@ struct AnyVarRef_Abstract {
   virtual ~AnyVarRef_Abstract() {}
 
   virtual DomainInt getDomainChange(DomainDelta d) = 0;
-  virtual void addDynamicTrigger(Trig_ConRef t, TrigType type,
-                                 DomainInt pos = NoDomainValue, TrigOp op = TO_Default) = 0;
+  virtual void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
+                                 TrigOp op = TO_Default) = 0;
 };
 
 /// Internal type used by AnyVarRef.
@@ -260,8 +260,8 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract {
 
   DomainInt getDomainChange(DomainDelta d) { return data.getDomainChange(d); }
 
-  void addDynamicTrigger(Trig_ConRef t, TrigType type,
-                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
+  void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
+                         TrigOp op = TO_Default) {
     data.addDynamicTrigger(t, type, pos, op);
   }
 };
@@ -350,8 +350,8 @@ public:
 
   DomainInt getDomainChange(DomainDelta d) { return data->getDomainChange(d); }
 
-  void addDynamicTrigger(Trig_ConRef t, TrigType type,
-                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
+  void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
+                         TrigOp op = TO_Default) {
     data->addDynamicTrigger(t, type, pos, op);
   }
 };

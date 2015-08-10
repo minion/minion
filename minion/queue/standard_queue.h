@@ -94,11 +94,11 @@ public:
       DynamicTriggerEvent dte = dynamic_trigger_list.queueTop();
       dynamic_trigger_list.queuePop();
 
-      DynamicTriggerList& dtl = *(dte.event());
+      DynamicTriggerList &dtl = *(dte.event());
 
       SysInt pos = 0;
 
-      while(pos < dtl.size()) {
+      while (pos < dtl.size()) {
         if (*fail_ptr) {
           clearQueues();
           return true;

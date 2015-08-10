@@ -144,8 +144,8 @@ struct BoundVarRef_internal {
 
   DomainInt getDomainChange(DomainDelta d) { return d.XXX_get_domain_diff(); }
 
-  void addDynamicTrigger(Trig_ConRef t, TrigType type,
-                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
+  void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
+                         TrigOp op = TO_Default) {
     GET_LOCAL_CON().addDynamicTrigger(*this, t, type, pos, op);
   }
 };
@@ -391,9 +391,8 @@ struct BoundVarContainer {
   }
 #endif
 
-  void addDynamicTrigger(BoundVarRef_internal<BoundType> &b,
-                         Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
-                         TrigOp op = TO_Default) {
+  void addDynamicTrigger(BoundVarRef_internal<BoundType> &b, Trig_ConRef t, TrigType type,
+                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     D_ASSERT(lock_m);
     if (type == DomainRemoval) {
       USER_ERROR("Some constraint you are using does not work with BOUND variables\n"

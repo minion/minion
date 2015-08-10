@@ -57,7 +57,8 @@ void dump_searchorder(const SearchOrder &order, ostream &os) {
     Z(LDF)
     Z(ORIGINAL)
     Z(WDEG)
-    Z(CONFLICT) Z(DOMOVERWDEG)
+    Z(CONFLICT)
+    Z(DOMOVERWDEG)
 #undef Z
         default : abort();
   }

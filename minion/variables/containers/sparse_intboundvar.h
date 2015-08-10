@@ -406,9 +406,8 @@ struct SparseBoundVarContainer {
   void incWdeg(const SparseBoundVarRef_internal<BoundType> &b) { wdegs[b.var_num]++; }
 #endif
 
-  void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b,
-                         Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
-                         TrigOp op = TO_Default) {
+  void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, Trig_ConRef t, TrigType type,
+                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     D_ASSERT(lock_m);
     if (type == DomainRemoval) {
       USER_ERROR("Some constraint you are using does not work with SPARSEBOUND "

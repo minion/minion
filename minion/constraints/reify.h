@@ -114,8 +114,8 @@ struct reify : public ParentConstraint {
   D_DATA(triggerpairstype triggerpairs);
 
   reify(AbstractConstraint *_poscon, BoolVar _rar_var)
-      : ParentConstraint({_poscon, _poscon->reverse_constraint()}), reify_var(_rar_var), constraint_locked(false),
-        full_propagate_called(false) {
+      : ParentConstraint({_poscon, _poscon->reverse_constraint()}), reify_var(_rar_var),
+        constraint_locked(false), full_propagate_called(false) {
     CHECK(reify_var.getInitialMin() >= 0 && reify_var.getInitialMax() <= 1,
           "reify only works on Boolean variables");
 #ifdef NODETRICK

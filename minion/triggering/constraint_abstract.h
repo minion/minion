@@ -59,8 +59,7 @@ typedef vector<shared_ptr<AbstractTriggerCreator>> triggerCollection;
 /// Base type from which all constraints are derived.
 class AbstractConstraint {
 protected:
-
-  AbstractConstraint* parent;
+  AbstractConstraint *parent;
   SysInt childpos;
 
   /// Private members of the base class.
@@ -72,17 +71,16 @@ protected:
   vector<SysInt> _trigger_info;
 
 public:
-
-  void _setParent(AbstractConstraint* _parent, SysInt _childpos)
-  {
-    D_ASSERT(parent == (AbstractConstraint*)BAD_POINTER);
+  void _setParent(AbstractConstraint *_parent, SysInt _childpos) {
+    D_ASSERT(parent == (AbstractConstraint *)BAD_POINTER);
     parent = _parent;
     childpos = _childpos;
   }
 
-  Con_TrigRef _getTrigRef(SysInt trigger)
-  {  D_ASSERT(parent == nullptr);
-    return trig_info_vec[trigger]; }
+  Con_TrigRef _getTrigRef(SysInt trigger) {
+    D_ASSERT(parent == nullptr);
+    return trig_info_vec[trigger];
+  }
 
   void _reportTriggerMovementToConstraint(SysInt trigger, Con_TrigRef tpi) {
     D_ASSERT(parent == nullptr);
@@ -93,21 +91,19 @@ public:
   void _reportTriggerRemovalToConstraint(SysInt trigger) {
     D_ASSERT(parent == nullptr);
     TRIGP("CR" << trig_info_vec[trigger] << ":" << trigger);
-    trig_info_vec[trigger] = Con_TrigRef{}; }
+    trig_info_vec[trigger] = Con_TrigRef{};
+  }
 
-  virtual Trig_ConRef _parent_map_Trig_ConRef(SysInt child, SysInt trigger)
-  { INTERNAL_ERROR("?"); }
+  virtual Trig_ConRef _parent_map_Trig_ConRef(SysInt child, SysInt trigger) { INTERNAL_ERROR("?"); }
 
-  virtual Con_TrigRef _parent_map_Con_TrigRef(SysInt child, SysInt trigger)
-  { INTERNAL_ERROR("?"); }
+  virtual Con_TrigRef _parent_map_Con_TrigRef(SysInt child, SysInt trigger) { INTERNAL_ERROR("?"); }
 
   void restoreTriggerOnBacktrack(SysInt trigger) {
     Con_TrigRef t;
 
-    if(parent == nullptr) {
+    if (parent == nullptr) {
       t = parent->_parent_map_Con_TrigRef(childpos, trigger);
-    }
-    else {
+    } else {
       t = trig_info_vec[trigger];
     }
     Trig_ConRef tcr = t.dtl->_getConRef(t.triggerListPos);
@@ -175,7 +171,7 @@ public:
   }
 
   AbstractConstraint()
-      : parent((AbstractConstraint*)BAD_POINTER), childpos(-1), singleton_vars(),
+      : parent((AbstractConstraint *)BAD_POINTER), childpos(-1), singleton_vars(),
 #ifdef WDEG
         wdeg(1),
 #endif
@@ -230,13 +226,9 @@ public:
 
   virtual ~AbstractConstraint() {}
 
-  virtual void setup_dynamic_triggers() {
-    trig_info_vec.resize(dynamic_trigger_count());
-  }
+  virtual void setup_dynamic_triggers() { trig_info_vec.resize(dynamic_trigger_count()); }
 
-  virtual void setup_dynamic_trigger_datastructures()
-  { }
-
+  virtual void setup_dynamic_trigger_datastructures() {}
 
   virtual triggerCollection setup_internal_gather_triggers() { return setup_internal(); }
 
@@ -244,7 +236,7 @@ public:
   /// function to get
   /// the number of triggers required.
   virtual void setup() {
-    D_ASSERT(parent == (AbstractConstraint*)BAD_POINTER);
+    D_ASSERT(parent == (AbstractConstraint *)BAD_POINTER);
     parent = NULL;
     // Dynamic initialisation
     const SysInt trigs = checked_cast<SysInt>(dynamic_trigger_count());
@@ -302,27 +294,25 @@ public:
   template <typename Var>
   void moveTriggerInt(Var &v, DomainInt t, TrigType type, DomainInt pos = NoDomainValue,
                       TrigOp op = TO_Default) {
-    if(parent != nullptr) {
+    if (parent != nullptr) {
       Trig_ConRef trig = parent->_parent_map_Trig_ConRef(childpos, checked_cast<SysInt>(t));
       v.addDynamicTrigger(trig, type, pos, op);
-    }
-    else
+    } else
       v.addDynamicTrigger(Trig_ConRef{this, checked_cast<SysInt>(t)}, type, pos, op);
   }
 
   SysInt &triggerInfo(DomainInt t) {
-    if(_trigger_info.size() <= t)
+    if (_trigger_info.size() <= t)
       _trigger_info.resize(checked_cast<SysInt>(t) + 1);
     return _trigger_info[checked_cast<SysInt>(t)];
   }
 
   void releaseTriggerInt(DomainInt t, TrigOp op = TO_Default) {
-    D_ASSERT(parent != (AbstractConstraint*)BAD_POINTER);
-    if(parent != nullptr) {
+    D_ASSERT(parent != (AbstractConstraint *)BAD_POINTER);
+    if (parent != nullptr) {
       Trig_ConRef trig = parent->_parent_map_Trig_ConRef(childpos, checked_cast<SysInt>(t));
       releaseMergedTrigger(trig, op);
-    }
-    else {
+    } else {
       releaseMergedTrigger(Trig_ConRef{this, checked_cast<SysInt>(t)}, op);
     }
   }
@@ -355,7 +345,6 @@ public:
     return _dynamic_trigger_to_constraint[checked_cast<SysInt>(p)];
   }
 
-
   void passDynTriggerToChild(SysInt trig) {
     SysInt child = getChildDynamicTrigger(trig);
     SysInt offset = _dynamic_trigger_child_offset[child];
@@ -363,30 +352,25 @@ public:
     child_constraints[child]->propagateDynInt(trig - offset);
   }
 
-  Trig_ConRef _parent_map_Trig_ConRef(SysInt child, SysInt trigger)
-  {
+  Trig_ConRef _parent_map_Trig_ConRef(SysInt child, SysInt trigger) {
     SysInt offset = _dynamic_trigger_child_offset[child];
     SysInt trignum = offset + trigger;
-    if(parent != nullptr) {
+    if (parent != nullptr) {
       return parent->_parent_map_Trig_ConRef(childpos, trignum);
+    } else {
+      return Trig_ConRef{this, trignum};
     }
-    else {
-    return Trig_ConRef{this, trignum};
-  }
   }
 
-  Con_TrigRef _parent_map_Con_TrigRef(SysInt child, SysInt trigger)
-  {
+  Con_TrigRef _parent_map_Con_TrigRef(SysInt child, SysInt trigger) {
     SysInt offset = _dynamic_trigger_child_offset[child];
     SysInt trignum = offset + trigger;
-    if(parent != nullptr) {
+    if (parent != nullptr) {
       return parent->_parent_map_Con_TrigRef(childpos, trignum);
-    }
-    else {
+    } else {
       return _getTrigRef(trignum);
     }
   }
-
 
   /// Gets all the triggers a constraint wants to set up.
   /** This function shouldn't do any propagation. That is full_propagate's
@@ -415,8 +399,7 @@ public:
     return newTriggers;
   }
 
-  ParentConstraint(const vector<AbstractConstraint *> _children)
-      : child_constraints(_children) {
+  ParentConstraint(const vector<AbstractConstraint *> _children) : child_constraints(_children) {
     SysInt var_count = 0;
     for (SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
       child_constraints[i]->_setParent(this, i);
@@ -461,7 +444,6 @@ public:
 
       current_trigger_count += child_trig_count;
     }
-
   }
 
   virtual void setup_dynamic_triggers() {
@@ -480,8 +462,6 @@ public:
     D_ASSERT(trigs >= 0);
     D_ASSERT(all_trigs >= trigs);
 
-
-
     setup_dynamic_triggers();
     setup_dynamic_trigger_datastructures();
 
@@ -497,7 +477,6 @@ public:
       delete child_constraints[i];
   }
 };
-
 
 namespace ConOutput {
 inline string print_vars(AbstractConstraint *const &c) { return c->full_output_name(); }

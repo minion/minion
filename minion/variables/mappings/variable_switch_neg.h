@@ -125,8 +125,8 @@ struct SwitchNeg {
     return o << "SwitchNeg " << v.multiplier << ":" << v.data;
   }
 
-  void addDynamicTrigger(Trig_ConRef t, TrigType type,
-                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
+  void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
+                         TrigOp op = TO_Default) {
     if (multiplier == 1) {
       data.addDynamicTrigger(t, type, pos, op);
       return;

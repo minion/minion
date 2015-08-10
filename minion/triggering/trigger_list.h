@@ -155,12 +155,10 @@ public:
     triggers[type][checked_cast<SysInt>(b)].push_back(t);
   }
 
-  void addDynamicTrigger(DomainInt b, Trig_ConRef t, TrigType type,
-                         DomainInt val, TrigOp op = TO_Default) {
+  void addDynamicTrigger(DomainInt b, Trig_ConRef t, TrigType type, DomainInt val,
+                         TrigOp op = TO_Default) {
     D_ASSERT(!only_bounds || type != DomainRemoval);
     D_ASSERT(t.con != NULL);
-
-
 
     DynamicTriggerList *queue;
 
@@ -174,38 +172,33 @@ public:
           val - vars_min_domain_val)][checked_cast<SysInt>(b)];
     }
 
-
-
     D_ASSERT(queue->sanity_check_list());
-/* XXX
-    switch (op) {
-    case TO_Default: break;
-    case TO_Store: break;
-    case TO_Backtrack:
-      getQueue().getTbq().restoreTriggerOnBacktrack(t);
-      // Add to queue.
-      t->setQueue(queue);
-      break;
-    default: abort();
-    }
-*/
+    /* XXX
+        switch (op) {
+        case TO_Default: break;
+        case TO_Store: break;
+        case TO_Backtrack:
+          getQueue().getTbq().restoreTriggerOnBacktrack(t);
+          // Add to queue.
+          t->setQueue(queue);
+          break;
+        default: abort();
+        }
+    */
 
-if(op == TO_Backtrack)
-{
-  getQueue().getTbq().restoreTriggerOnBacktrack(t);
-}
+    if (op == TO_Backtrack) {
+      getQueue().getTbq().restoreTriggerOnBacktrack(t);
+    }
 
     queue->add(t);
   }
 };
 
-
 inline void attachTriggerToNullList(Trig_ConRef t, TrigOp op) {
   static DynamicTriggerList dt;
   DynamicTriggerList *queue = &dt;
 
-  if(op == TO_Backtrack)
-  {
+  if (op == TO_Backtrack) {
     getQueue().getTbq().restoreTriggerOnBacktrack(t);
   }
 

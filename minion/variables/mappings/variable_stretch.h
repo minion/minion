@@ -369,8 +369,8 @@ struct MultiplyVar {
     }
   }
 
-  void addDynamicTrigger(Trig_ConRef t, TrigType type,
-                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
+  void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
+                         TrigOp op = TO_Default) {
     switch (type) {
     case UpperBound:
       if (Multiply >= 0)
@@ -387,8 +387,8 @@ struct MultiplyVar {
     case Assigned:
     case DomainChanged: data.addDynamicTrigger(t, type, pos, op); break;
     case DomainRemoval:
-      data.addDynamicTrigger(t, DomainRemoval,
-                             MultiplyHelp<VarRef>::divide_exact(pos, Multiply), op);
+      data.addDynamicTrigger(t, DomainRemoval, MultiplyHelp<VarRef>::divide_exact(pos, Multiply),
+                             op);
       break;
     default: D_FATAL_ERROR("Broken dynamic trigger");
     }

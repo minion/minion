@@ -103,8 +103,8 @@ struct VarRefType {
 
   DomainInt getDomainChange(DomainDelta d) { return d.XXX_get_domain_diff(); }
 
-  void addDynamicTrigger(Trig_ConRef t, TrigType type,
-                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
+  void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
+                         TrigOp op = TO_Default) {
     GET_CONTAINER().addDynamicTrigger(data, t, type, pos, op);
   }
 };
@@ -182,8 +182,8 @@ struct QuickVarRefType {
 
   DomainInt getDomainChange(DomainDelta d) { return d.XXX_get_domain_diff(); }
 
-  void addDynamicTrigger(Trig_ConRef t, TrigType type,
-                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
+  void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
+                         TrigOp op = TO_Default) {
     GET_CONTAINER().addDynamicTrigger(data, t, type, pos, op);
   }
 };

@@ -36,14 +36,15 @@ struct Con_TrigRef {
 
   Con_TrigRef(DynamicTriggerList *_dtl, SysInt _pos) : dtl(_dtl), triggerListPos(_pos) {}
 
-  bool empty()
-  { return dtl == nullptr; }
+  bool empty() { return dtl == nullptr; }
 
-  friend bool operator==(Con_TrigRef lhs, Con_TrigRef rhs)
-  { return lhs.dtl == rhs.dtl && lhs.triggerListPos == rhs.triggerListPos; }
+  friend bool operator==(Con_TrigRef lhs, Con_TrigRef rhs) {
+    return lhs.dtl == rhs.dtl && lhs.triggerListPos == rhs.triggerListPos;
+  }
 
-  friend std::ostream& operator<<(std::ostream& o, Con_TrigRef ctr)
-  { return o << "ctr:(" << ctr.dtl << ":" << ctr.triggerListPos << ")"; }
+  friend std::ostream &operator<<(std::ostream &o, Con_TrigRef ctr) {
+    return o << "ctr:(" << ctr.dtl << ":" << ctr.triggerListPos << ")";
+  }
 };
 
 struct Trig_ConRef {
@@ -56,14 +57,15 @@ struct Trig_ConRef {
 
   void propagate();
 
-  bool empty() const
-  { return con == nullptr; }
+  bool empty() const { return con == nullptr; }
 
-  friend bool operator==(Trig_ConRef lhs, Trig_ConRef rhs)
-  { return lhs.con == rhs.con && lhs.conListPos == rhs.conListPos; }
+  friend bool operator==(Trig_ConRef lhs, Trig_ConRef rhs) {
+    return lhs.con == rhs.con && lhs.conListPos == rhs.conListPos;
+  }
 
-  friend std::ostream& operator<<(std::ostream& o, Trig_ConRef tcr)
-  { return o << "tcr:(" << tcr.con << ":" << tcr.conListPos << ")"; }
+  friend std::ostream &operator<<(std::ostream &o, Trig_ConRef tcr) {
+    return o << "tcr:(" << tcr.con << ":" << tcr.conListPos << ")";
+  }
 };
 
 // forward declaration
@@ -71,14 +73,12 @@ struct Trig_ConRef {
 void releaseMergedTrigger(Con_TrigRef, TrigOp op = TO_Default);
 void releaseMergedTrigger(Trig_ConRef, TrigOp op = TO_Default);
 
-
 class DynamicTriggerList {
   vector<Trig_ConRef> elems;
   vector<SysInt> slack;
-public:
 
-  Trig_ConRef _getConRef(SysInt pos)
-  { return elems[pos]; }
+public:
+  Trig_ConRef _getConRef(SysInt pos) { return elems[pos]; }
 
   DynamicTriggerList() {}
 
@@ -91,20 +91,17 @@ public:
   bool empty() const { return elems.size() == 0; }
   size_t size() const { return elems.size(); }
 
-  Trig_ConRef operator[](SysInt s)
-  { return elems[s]; }
+  Trig_ConRef operator[](SysInt s) { return elems[s]; }
 
   void verify_slack() const;
 
   void tryCompressList();
 
-  void _reportTriggerRemovalToList(SysInt pos)
-  {
+  void _reportTriggerRemovalToList(SysInt pos) {
     TRIGP("TRL:" << pos << ":" << elems[pos]);
     elems[pos] = Trig_ConRef{};
     slack.push_back(pos);
   }
-
 };
 
 /// Container for a range of triggers
@@ -124,7 +121,6 @@ public:
     D_ASSERT(data <= DomainInt_Max);
   }
 };
-
 
 inline void attachTriggerToNullList(Trig_ConRef t, TrigOp op = TO_Default);
 inline void _restoreTriggerOnBacktrack(Trig_ConRef tcr);

@@ -35,27 +35,23 @@
 
 struct TriggerBacktrackQueue {
 
-  typedef vector<pair<DynamicTriggerList*, Trig_ConRef>> TriggerList;
+  typedef vector<pair<DynamicTriggerList *, Trig_ConRef>> TriggerList;
 
   vector<TriggerList> queue;
 
-  TriggerBacktrackQueue() {
-    queue.resize(1);
-  }
+  TriggerBacktrackQueue() { queue.resize(1); }
 
-  void restoreTriggerOnBacktrack(Trig_ConRef t)
-  {
+  void restoreTriggerOnBacktrack(Trig_ConRef t) {
     Con_TrigRef conref = t.con->_getTrigRef(t.conListPos);
     P("TBQ: Restore on backtrack:" << conref.dtl << ":" << t);
     queue.back().push_back(make_pair(conref.dtl, t));
-
   }
-/* XXX
-  void addTrigger(DynamicTrigger *trig) {
-    PROP_INFO_ADDONE(Counter3);
-    queue.back().push_back(make_pair(trig, trig->getQueue()));
-  }
-*/
+  /* XXX
+    void addTrigger(DynamicTrigger *trig) {
+      PROP_INFO_ADDONE(Counter3);
+      queue.back().push_back(make_pair(trig, trig->getQueue()));
+    }
+  */
   void world_push() {
     P("TBQ: World_push");
     queue.push_back(TriggerList());

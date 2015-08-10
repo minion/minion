@@ -517,8 +517,8 @@ public:
     trigger_list.add_trigger(b.var_num, t, type);
   }
 
-  void addDynamicTrigger(BigRangeVarRef_internal b, Trig_ConRef t,
-                         TrigType type, DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
+  void addDynamicTrigger(BigRangeVarRef_internal b, Trig_ConRef t, TrigType type,
+                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     D_ASSERT(lock_m);
     D_ASSERT(b.var_num >= 0);
     D_ASSERT(b.var_num <= (SysInt)var_count_m);

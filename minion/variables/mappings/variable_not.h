@@ -112,8 +112,8 @@ struct VarNot {
 
   DomainInt getDomainChange(DomainDelta d) { return data.getDomainChange(d); }
 
-  void addDynamicTrigger(Trig_ConRef t, TrigType type,
-                         DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
+  void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
+                         TrigOp op = TO_Default) {
     switch (type) {
     case UpperBound: data.addDynamicTrigger(t, LowerBound, pos, op); break;
     case LowerBound: data.addDynamicTrigger(t, UpperBound, pos, op); break;
