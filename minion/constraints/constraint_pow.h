@@ -75,15 +75,17 @@ struct PowConstraint : public AbstractConstraint {
     //}
   }
 
+  virtual SysInt dynamic_trigger_count() { return 6; }
+
   virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    t.push_back(make_trigger(var1, Trigger(this, -1), LowerBound));
-    t.push_back(make_trigger(var2, Trigger(this, -2), LowerBound));
-    t.push_back(make_trigger(var3, Trigger(this, -3), LowerBound));
-    t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-    t.push_back(make_trigger(var2, Trigger(this, 2), UpperBound));
-    t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
-    return t;
+    moveTriggerInt(var1, 3, LowerBound);
+    moveTriggerInt(var2, 4, LowerBound);
+    moveTriggerInt(var3, 5, LowerBound);
+    moveTriggerInt(var1, 0, UpperBound);
+    moveTriggerInt(var2, 1, UpperBound);
+    moveTriggerInt(var3, 2, UpperBound);
+
+    return triggerCollection{};
   }
 
   inline SysInt roundup(double x) {
@@ -116,10 +118,10 @@ struct PowConstraint : public AbstractConstraint {
     return exp(log(checked_cast<double>(z)) / checked_cast<double>(y));
   }
 
-  virtual void propagateStatic(DomainInt flag, DomainDelta) {
+  virtual void propagateDynInt(SysInt flag) {
     PROP_INFO_ADDONE(Pow);
     switch (checked_cast<SysInt>(flag)) {
-    case -1: {
+    case 3: {
       // var3 >= min(var1) ^ min(var2)
       var3.setMin(LRINT(my_pow(var1.getMin(), var2.getMin())));
       DomainInt var1_min = var1.getMin();
@@ -128,20 +130,20 @@ struct PowConstraint : public AbstractConstraint {
         var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
       break;
     }
-    case -2:
+    case 4:
       // var3>= min(var1) ^ min(var2)
       var3.setMin(LRINT(my_pow(var1.getMin(), var2.getMin())));
       var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
       break;
 
-    case -3: {
+    case 5: {
       var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
       DomainInt var1_max = var1.getMax();
       if (var1_max > 1)
         var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
       break;
     }
-    case 1: {
+    case 0: {
       var3.setMax(
           rounddown(my_pow(var1.getMax(),
                            var2.getMax()))); // wraparound was occurring here, so use rounddown
@@ -150,12 +152,12 @@ struct PowConstraint : public AbstractConstraint {
         var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
       break;
     }
-    case 2:
+    case 1:
       var3.setMax(rounddown(my_pow(var1.getMax(), var2.getMax()))); // wraparound here.
       var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
       break;
 
-    case 3: {
+    case 2: {
       var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
       DomainInt var1_min = var1.getMin();
       if (var1_min > 1)
@@ -166,12 +168,8 @@ struct PowConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
-    propagateStatic(1, DomainDelta::empty());
-    propagateStatic(2, DomainDelta::empty());
-    propagateStatic(3, DomainDelta::empty());
-    propagateStatic(-1, DomainDelta::empty());
-    propagateStatic(-2, DomainDelta::empty());
-    propagateStatic(-3, DomainDelta::empty());
+    for (int i = 0; i < 6; ++i)
+      propagateDynInt(i);
   }
 
   virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
