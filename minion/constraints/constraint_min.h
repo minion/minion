@@ -89,30 +89,26 @@ struct MinConstraint : public AbstractConstraint {
   MinConstraint(const VarArray &_var_array, const MinVarRef &_min_var)
       : var_array(_var_array), min_var(_min_var) {}
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-
-    for (SysInt i = 0; i < (SysInt)var_array.size();
-         ++i) { // Have to add 1 else the 0th element will be lost.
-      t.push_back(make_trigger(var_array[i], Trigger(this, i + 1), LowerBound));
-      t.push_back(make_trigger(var_array[i], Trigger(this, -(i + 1)), UpperBound));
-    }
-    t.push_back(make_trigger(min_var, Trigger(this, var_array.size() + 1), LowerBound));
-    t.push_back(make_trigger(min_var, Trigger(this, -((SysInt)var_array.size() + 1)), UpperBound));
-
-    return t;
+  virtual SysInt dynamic_trigger_count() {
+    return (var_array.size() + 1) * 2;
   }
 
-  //  virtual AbstractConstraint* reverse_constraint()
+  void setup_triggers() {
+    SysInt v_size = var_array.size();
+    for (SysInt i = 0; i < v_size; ++i) {
+      moveTriggerInt(var_array[i], i, LowerBound);
+      moveTriggerInt(var_array[i], i + v_size + 1, UpperBound);
+    }
+    moveTriggerInt(min_var, v_size, LowerBound);
+    moveTriggerInt(min_var, v_size * 2 + 1, UpperBound);
+  }
 
-  virtual void propagateStatic(DomainInt prop_val, DomainDelta) {
+  virtual void propagateDynInt(SysInt prop_val) {
     PROP_INFO_ADDONE(Min);
-    if (prop_val > 0) { // Lower Bound Changed
-
+    SysInt v_size = var_array.size();
+    if (prop_val <= v_size) { // Lower Bound Changed
       // Had to add 1 to fix "0th array" problem.
-      --prop_val;
-
-      if (prop_val == (SysInt)(var_array.size())) {
+      if (prop_val == v_size) {
         DomainInt new_min = min_var.getMin();
         typename VarArray::iterator end = var_array.end();
         for (typename VarArray::iterator it = var_array.begin(); it < end; ++it)
@@ -130,9 +126,8 @@ struct MinConstraint : public AbstractConstraint {
         min_var.setMin(min);
       }
     } else { // Upper Bound Changed
-      // See above for reason behind "-1".
-      prop_val = -prop_val - 1;
-      if (prop_val == (SysInt)(var_array.size())) {
+      prop_val -= (v_size + 1);
+      if (prop_val == v_size) {
         typename VarArray::iterator it = var_array.begin();
         DomainInt minvar_max = min_var.getMax();
         while (it != var_array.end() && (*it).getMin() > minvar_max)
@@ -157,13 +152,13 @@ struct MinConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    setup_triggers();
     SysInt array_size = var_array.size();
     if (array_size == 0) {
       getState().setFailed(true);
     } else {
-      for (SysInt i = 1; i <= array_size + 1; ++i) {
-        propagateStatic(i, DomainDelta::empty());
-        propagateStatic(-i, DomainDelta::empty());
+      for (SysInt i = 0; i < (array_size+1) * 2; ++i) {
+        propagateDynInt(i);
       }
     }
   }
