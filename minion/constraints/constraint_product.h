@@ -70,15 +70,17 @@ struct ProductConstraint : public AbstractConstraint {
               "Magnitude of domain bounds is too large in product constraint");
   }
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    t.push_back(make_trigger(var1, Trigger(this, 1), LowerBound));
-    t.push_back(make_trigger(var2, Trigger(this, 2), LowerBound));
-    t.push_back(make_trigger(var3, Trigger(this, 3), LowerBound));
-    t.push_back(make_trigger(var1, Trigger(this, 1), UpperBound));
-    t.push_back(make_trigger(var2, Trigger(this, 2), UpperBound));
-    t.push_back(make_trigger(var3, Trigger(this, 3), UpperBound));
-    return t;
+  virtual SysInt dynamic_trigger_count() {
+    return 6;
+  }
+
+  void setup_triggers() {
+    moveTriggerInt(var1, 0, LowerBound);
+    moveTriggerInt(var1, 1, UpperBound);
+    moveTriggerInt(var2, 2, LowerBound);
+    moveTriggerInt(var2, 3, UpperBound);
+    moveTriggerInt(var3, 4, LowerBound);
+    moveTriggerInt(var3, 5, UpperBound);
   }
 
   DomainInt mult_max(DomainInt min1, DomainInt max1, DomainInt min2, DomainInt max2) {
@@ -104,7 +106,7 @@ struct ProductConstraint : public AbstractConstraint {
     return x / y;
   }
 
-  virtual void propagateStatic(DomainInt, DomainDelta) {
+  virtual void propagateDynInt(SysInt) {
     PROP_INFO_ADDONE(Product);
     DomainInt var1_min = var1.getMin();
     DomainInt var1_max = var1.getMax();
@@ -158,7 +160,10 @@ struct ProductConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() { propagateStatic(0, DomainDelta::empty()); }
+  virtual void full_propagate() {
+    setup_triggers();
+    propagateDynInt(0);
+  }
 
   virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
     D_ASSERT(v_size == 3);
