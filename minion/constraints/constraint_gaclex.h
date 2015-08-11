@@ -121,29 +121,32 @@ struct GacLexLeqConstraint : public AbstractConstraint {
       }
       earliest_occurrence_y.push_back(pos);
     }
-  }
-
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
 
     SysInt x_size = x.size();
-    for (SysInt i = 0; i < x_size; ++i) {
-      t.push_back(make_trigger(x[i], Trigger(this, i), LowerBound));
-      t.push_back(make_trigger(x[i], Trigger(this, i), UpperBound));
-    }
-
-    SysInt y_size = y.size();
-    for (SysInt i = 0; i < y_size; ++i) {
-      t.push_back(make_trigger(y[i], Trigger(this, i), LowerBound));
-      t.push_back(make_trigger(y[i], Trigger(this, i), UpperBound));
-    }
     alpha = 0;
     if (Less)
       beta = x_size;
     else
       beta = 100000;
     F = 0;
-    return t;
+  }
+
+  virtual SysInt dynamic_trigger_count() {
+    return std::max(x.size(), y.size()) * 4;
+  }
+
+  void setup_triggers() {
+    SysInt x_size = x.size();
+    for (SysInt i = 0; i < x_size; ++i) {
+      moveTriggerInt(x[i], i*4, LowerBound);
+      moveTriggerInt(x[i], i*4 + 1, UpperBound);
+    }
+
+    SysInt y_size = y.size();
+    for (SysInt i = 0; i < y_size; ++i) {
+      moveTriggerInt(y[i], i*4 + 2, LowerBound);
+      moveTriggerInt(y[i], i*4 + 3, UpperBound);
+    }
   }
 
   virtual AbstractConstraint *reverse_constraint() {
@@ -160,7 +163,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
           x[i].getAssignedValue() != y[i].getAssignedValue()) {
         alpha = i;
-        propagateStatic(i, DomainDelta::empty());
+        propagateDynInt(i*4);
       } else
         updateAlpha(i + 1);
     } else {
@@ -168,7 +171,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
         if (!x[i].isAssigned() || !y[i].isAssigned() ||
             x[i].getAssignedValue() != y[i].getAssignedValue()) {
           alpha = i;
-          propagateStatic(i, DomainDelta::empty());
+          propagateDynInt(i*4);
           return;
         }
         i++;
@@ -185,7 +188,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
       if (x[i].getMin() < y[i].getMax()) {
         beta = i + 1;
         if (!(x[i].getMax() < y[i].getMin()))
-          propagateStatic(i, DomainDelta::empty());
+          propagateDynInt(i*4);
         return;
       }
       i--;
@@ -193,8 +196,8 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     getState().setFailed(true);
   }
 
-  virtual void propagateStatic(DomainInt i_in, DomainDelta) {
-    const SysInt i = checked_cast<SysInt>(i_in);
+  virtual void propagateDynInt(SysInt i_in) {
+    const SysInt i = checked_cast<SysInt>(i_in)/4;
     PROP_INFO_ADDONE(Lex);
     if (F) {
       return;
@@ -330,6 +333,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    setup_triggers();
     SysInt i, n = x.size();
     for (i = 0; i < n; i++) {
       if (!x[i].isAssigned())
@@ -372,7 +376,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
       }
       if (alpha >= beta)
         getState().setFailed(true);
-      propagateStatic((SysInt)alpha, DomainDelta::empty()); // initial propagation, if necessary.
+      propagateDynInt((SysInt)alpha*4); // initial propagation, if necessary.
     } else {
       if (Less)
         getState().setFailed(true);
