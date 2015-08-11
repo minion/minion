@@ -77,15 +77,13 @@ struct PowConstraint : public AbstractConstraint {
 
   virtual SysInt dynamic_trigger_count() { return 6; }
 
-  virtual triggerCollection setup_internal() {
+  void setup_triggers() {
     moveTriggerInt(var1, 3, LowerBound);
     moveTriggerInt(var2, 4, LowerBound);
     moveTriggerInt(var3, 5, LowerBound);
     moveTriggerInt(var1, 0, UpperBound);
     moveTriggerInt(var2, 1, UpperBound);
     moveTriggerInt(var3, 2, UpperBound);
-
-    return triggerCollection{};
   }
 
   inline SysInt roundup(double x) {
@@ -168,6 +166,7 @@ struct PowConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    setup_triggers();
     for (int i = 0; i < 6; ++i)
       propagateDynInt(i);
   }
