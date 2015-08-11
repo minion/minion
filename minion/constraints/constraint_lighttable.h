@@ -137,16 +137,17 @@ struct LightTableConstraint : public AbstractConstraint {
       FAIL_EXIT();
     }
   }
-
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
-      t.push_back(make_trigger(vars[i], Trigger(this, i), DomainChanged));
-    }
-    return t;
+  virtual SysInt dynamic_trigger_count() {
+    return vars.size();
   }
 
-  virtual void propagateStatic(DomainInt changed_var, DomainDelta) {
+  void setup_triggers() {
+    for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+      moveTriggerInt(vars[i], i, DomainChanged);
+    }
+  }
+
+  virtual void propagateDynInt(SysInt changed_var) {
     // Propagate to all vars except the one that changed.
     for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
       if (i != changed_var) {
@@ -174,6 +175,7 @@ struct LightTableConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    setup_triggers();
     for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
       propagate_var(i);
     }
