@@ -540,17 +540,18 @@ struct MDDC : public AbstractConstraint {
     }
   }
 
-  // Set up triggers.
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    SysInt array_size = vars.size();
-    for (SysInt i = 0; i < array_size; ++i) {
-      t.push_back(make_trigger(vars[i], Trigger(this, i), DomainChanged));
+  virtual SysInt dynamic_trigger_count() {
+    return vars.size();
+  }
+
+  void setup_triggers() {
+    for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+      moveTriggerInt(vars[i], i, DomainChanged);
     }
-    return t;
   }
 
   virtual void full_propagate() {
+    setup_triggers();
     // Just propagate.
     do_prop();
   }
@@ -624,7 +625,7 @@ struct MDDC : public AbstractConstraint {
 
   virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
 
-  virtual void propagateStatic(DomainInt prop_var, DomainDelta) {
+  virtual void propagateDynInt(SysInt prop_var) {
     if (!constraint_locked) {
       constraint_locked = true;
       getQueue().pushSpecialTrigger(this);
