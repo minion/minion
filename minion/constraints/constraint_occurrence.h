@@ -348,16 +348,12 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   ConstantOccurrenceEqualConstraint(const VarArray &_var_array, const Val &_value,
                                     DomainInt _val_count_min, DomainInt _val_count_max)
       : occurrences_count(), not_occurrences_count(), var_array(_var_array),
-        val_count_min(_val_count_min), val_count_max(_val_count_max), value(_value) {}
+        val_count_min(_val_count_min), val_count_max(_val_count_max), value(_value) {
+          occurrences_count = 0;
+          not_occurrences_count = 0;
+        }
 
   virtual SysInt dynamic_trigger_count() { return var_array.size(); }
-
-  virtual triggerCollection setup_internal() {
-    occurrences_count = 0;
-    not_occurrences_count = 0;
-
-    return triggerCollection{};
-  }
 
   void trigger_setup() {
     for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
