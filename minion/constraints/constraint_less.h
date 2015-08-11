@@ -55,17 +55,14 @@ struct LeqConstraint : public AbstractConstraint {
 
   LeqConstraint(VarRef1 _x, VarRef2 _y, Offset _o) : x(_x), y(_y), offset(_o) {}
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    t.push_back(make_trigger(x, Trigger(this, 0), LowerBound));
-    t.push_back(make_trigger(y, Trigger(this, 1), UpperBound));
-    return t;
+  virtual SysInt dynamic_trigger_count() {
+    return 2;
   }
 
   // Needs to be at end of file
   virtual AbstractConstraint *reverse_constraint();
 
-  virtual void propagateStatic(DomainInt prop_val, DomainDelta) {
+  virtual void propagateDynInt(SysInt prop_val) {
     PROP_INFO_ADDONE(BinaryLeq);
     if (checked_cast<SysInt>(prop_val)) { // y changed
       x.setMax(y.getMax() + offset);
@@ -75,8 +72,11 @@ struct LeqConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
-    propagateStatic(0, DomainDelta::empty());
-    propagateStatic(1, DomainDelta::empty());
+    moveTriggerInt(x, 0, LowerBound);
+    moveTriggerInt(y, 1, UpperBound);
+
+    propagateDynInt(0);
+    propagateDynInt(1);
   }
 
   virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
