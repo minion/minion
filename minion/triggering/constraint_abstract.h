@@ -101,9 +101,9 @@ public:
   virtual Con_TrigRef _parent_map_Con_TrigRef(SysInt child, SysInt trigger) { INTERNAL_ERROR("?"); }
 
   void restoreTriggerOnBacktrack(SysInt trigger) {
-
     Con_TrigRef t;
 
+    // XXX ?
     if (parent == nullptr) {
       t = parent->_parent_map_Con_TrigRef(childpos, trigger);
     } else {
@@ -298,6 +298,7 @@ public:
   template <typename Var>
   void moveTriggerInt(Var &v, DomainInt t, TrigType type, DomainInt pos = NoDomainValue,
                       TrigOp op = TO_Default) {
+    D_ASSERT(t >= 0 && t < dynamic_trigger_count_with_children());
     if (parent != nullptr) {
       Trig_ConRef trig = parent->_parent_map_Trig_ConRef(childpos, checked_cast<SysInt>(t));
       v.addDynamicTrigger(trig, type, pos, op);
