@@ -137,6 +137,7 @@ struct LightTableConstraint : public AbstractConstraint {
       FAIL_EXIT();
     }
   }
+  
   virtual SysInt dynamic_trigger_count() {
     return vars.size();
   }
