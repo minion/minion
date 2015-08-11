@@ -65,17 +65,18 @@ struct NeqConstraint : public AbstractConstraint {
 
   NeqConstraint(const VarArray &_var_array) : var_array(_var_array) {}
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    SysInt array_size = var_array.size();
-    for (SysInt i = 0; i < array_size; ++i)
-      t.push_back(make_trigger(var_array[i], Trigger(this, i), Assigned));
-    return t;
+  virtual SysInt dynamic_trigger_count() {
+    return var_array.size();
+  }
+
+  void setup_triggers() {
+    for (SysInt i = 0; i < var_array.size(); ++i)
+      moveTriggerInt(var_array[i], i, Assigned);
   }
 
   virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
 
-  virtual void propagateStatic(DomainInt prop_val_in, DomainDelta) {
+  virtual void propagateDynInt(SysInt prop_val_in) {
     const SysInt prop_val = checked_cast<SysInt>(prop_val_in);
     PROP_INFO_ADDONE(ArrayNeq);
     DomainInt remove_val = var_array[prop_val].getAssignedValue();
@@ -95,6 +96,7 @@ struct NeqConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    setup_triggers();
     SysInt array_size = var_array.size();
     for (SysInt i = 0; i < array_size; ++i)
       if (var_array[i].isAssigned()) {
