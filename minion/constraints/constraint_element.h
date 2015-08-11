@@ -125,21 +125,25 @@ struct ElementConstraint : public AbstractConstraint {
   ElementConstraint(const VarArray &_var_array, const Index &_indexvar, const Result &_resultvar)
       : var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar) {}
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
+  virtual SysInt dynamic_trigger_count() {
+    return var_array.size() + 2;
+  }
+
+
+  void setup_triggers() {
     SysInt array_size = var_array.size();
     DomainInt loop_start = std::max(DomainInt(0), indexvar.getInitialMin());
     DomainInt loop_max = std::min(DomainInt(array_size), indexvar.getInitialMax() + 1);
     for (DomainInt i = loop_start; i < loop_max; ++i)
-      t.push_back(make_trigger(var_array[checked_cast<SysInt>(i)], Trigger(this, i), Assigned));
+      moveTriggerInt(var_array[checked_cast<SysInt>(i)], i, Assigned);
 
-    t.push_back(make_trigger(indexvar, Trigger(this, -1), Assigned));
-    t.push_back(make_trigger(resultvar, Trigger(this, -2), Assigned));
-    return t;
+    moveTriggerInt(indexvar, array_size, Assigned);
+    moveTriggerInt(resultvar, array_size + 1, Assigned);
   }
 
-  virtual void propagateStatic(DomainInt prop_val, DomainDelta) {
+  virtual void propagateDynInt(SysInt prop_val) {
     PROP_INFO_ADDONE(NonGACElement);
+    SysInt var_size = var_array.size();
     if (indexvar.isAssigned()) {
       SysInt index = checked_cast<SysInt>(indexvar.getAssignedValue());
       if (index < 0 || index >= (SysInt)var_array.size()) {
@@ -161,7 +165,7 @@ struct ElementConstraint : public AbstractConstraint {
       resultvar.setMax(val_max);
       var_array[index].setMax(val_max);
     } else {
-      if (prop_val >= 0) {
+      if (prop_val < var_size) {
         DomainInt assigned_val = var_array[checked_cast<SysInt>(prop_val)].getAssignedValue();
         if (indexvar.inDomain(prop_val) &&
             !resultvar.inDomain(assigned_val)) // perhaps the check if prop_val
@@ -179,7 +183,7 @@ struct ElementConstraint : public AbstractConstraint {
         }
 
       } else {
-        D_ASSERT(prop_val == -2);
+        D_ASSERT(prop_val == var_size + 1);
         DomainInt assigned_val = resultvar.getAssignedValue();
         SysInt array_size = var_array.size();
         for (SysInt i = 0; i < array_size; ++i) {
@@ -200,6 +204,7 @@ struct ElementConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    setup_triggers();
     if (indexvar.isAssigned()) {
       SysInt index = checked_cast<SysInt>(indexvar.getAssignedValue());
       if (!undef_maps_zero) {
