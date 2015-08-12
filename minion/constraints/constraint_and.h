@@ -46,18 +46,20 @@ struct AndConstraint : public AbstractConstraint {
     CHECK(var3.getInitialMax() == 1, "The 'and' constraint works only Booleans");
   }
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    t.push_back(make_trigger(var1, Trigger(this, 1), LowerBound));
-    t.push_back(make_trigger(var2, Trigger(this, 2), LowerBound));
-    t.push_back(make_trigger(var3, Trigger(this, 3), LowerBound));
-    t.push_back(make_trigger(var1, Trigger(this, -1), UpperBound));
-    t.push_back(make_trigger(var2, Trigger(this, -2), UpperBound));
-    t.push_back(make_trigger(var3, Trigger(this, -3), UpperBound));
-    return t;
+  virtual SysInt dynamic_trigger_count() {
+    return 6;
   }
 
-  virtual void propagateStatic(DomainInt i, DomainDelta) {
+  void setup_triggers() {
+    moveTriggerInt(var1, 1, LowerBound);
+    moveTriggerInt(var2, 2, LowerBound);
+    moveTriggerInt(var3, 3, LowerBound);
+    moveTriggerInt(var1, 4, UpperBound);
+    moveTriggerInt(var2, 5, UpperBound);
+    moveTriggerInt(var3, 6, UpperBound);
+  }
+
+  virtual void propagateDynInt(SysInt i) {
     PROP_INFO_ADDONE(And);
     switch (checked_cast<SysInt>(i)) {
     case 1:
@@ -83,10 +85,10 @@ struct AndConstraint : public AbstractConstraint {
       var2.propagateAssign(true);
       break;
 
-    case -1:
-    case -2: var3.propagateAssign(false); break;
+    case 4:
+    case 5: var3.propagateAssign(false); break;
 
-    case -3:
+    case 6:
       if (var1.isAssignedValue(true))
         var2.propagateAssign(false);
       else {
