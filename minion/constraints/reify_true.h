@@ -72,6 +72,13 @@ struct reify_true : public ParentConstraint {
 
   virtual SysInt dynamic_trigger_count() {
     if (DoWatchAssignment)
+      return child_constraints[0]->get_vars_singleton()->size() * 2 + 1;
+    else
+      return 1;
+  }
+
+  SysInt reify_var_trigger() {
+    if (DoWatchAssignment)
       return child_constraints[0]->get_vars_singleton()->size() * 2;
     else
       return 0;
@@ -108,12 +115,6 @@ struct reify_true : public ParentConstraint {
     return vec;
   }
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection triggers;
-    triggers.push_back(make_trigger(rar_var, Trigger(this, -1), LowerBound));
-    return triggers;
-  }
-
   virtual void special_check() {
     D_ASSERT(constraint_locked);
     P("Special Check!");
@@ -128,21 +129,23 @@ struct reify_true : public ParentConstraint {
     constraint_locked = false;
   }
 
+  void reify_var_pruned() {
+    if (!rar_var.isAssigned() || rar_var.getAssignedValue() == 0)
+      return;
+    D_ASSERT(rar_var.getAssignedValue() == 1);
+    P("rarvar assigned to 1- Do full propagate");
+    constraint_locked = true;
+    getQueue().pushSpecialTrigger(this);
+  }
+
   virtual void propagateStatic(DomainInt i, DomainDelta domain) {
     PROP_INFO_ADDONE(ReifyTrue);
     P("Static propagate start");
     if (constraint_locked)
       return;
 
-    if (i == -1) {
-      if (!rar_var.isAssigned() || rar_var.getAssignedValue() == 0)
-        return;
-      D_ASSERT(rar_var.getAssignedValue() == 1);
-      P("rarvar assigned to 1- Do full propagate");
-      constraint_locked = true;
-      getQueue().pushSpecialTrigger(this);
-      return;
-    }
+    if(i == -1)
+      abort();
 
     if (full_propagate_called) {
       P("Already doing static full propagate");
@@ -156,16 +159,25 @@ struct reify_true : public ParentConstraint {
 
   virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     PROP_INFO_ADDONE(ReifyTrue);
+
     P("Dynamic prop start");
     if (constraint_locked)
       return;
 
     const SysInt dt = 0;
 
+    if(trig == reify_var_trigger()) {
+      reify_var_pruned();
+      return;
+    }
+
     if (DoWatchAssignment && trig >= dt &&
         trig < dt + dynamic_trigger_count()) { // Lost assignment, but don't
                                                // replace when rar_var=0
       P("Triggered on an assignment watch");
+      if(trig == dt + dynamic_trigger_count() - 1)
+        abort();
+
       if (!full_propagate_called && !rar_var.isAssigned()) {
         bool flag;
         GET_ASSIGNMENT(assignment, child_constraints[0]);
@@ -213,6 +225,9 @@ struct reify_true : public ParentConstraint {
     P(child_constraints[0]->constraint_name());
     D_ASSERT(rar_var.getMin() >= 0);
     D_ASSERT(rar_var.getMax() <= 1);
+
+    moveTriggerInt(rar_var, reify_var_trigger(), LowerBound);
+
     if (rar_var.isAssigned() && rar_var.getAssignedValue() == 1) {
       child_constraints[0]->full_propagate();
       full_propagate_called = true;
@@ -221,8 +236,8 @@ struct reify_true : public ParentConstraint {
 
     const SysInt dt = 0;
     SysInt dt_count = dynamic_trigger_count();
-    // Clean up triggers
-    for (SysInt i = 0; i < dt_count; ++i)
+    // Clean up triggers (skip the one watching the reification variable)
+    for (SysInt i = 0; i < dt_count - 1; ++i)
       releaseTriggerInt(i);
 
     if (DoWatchAssignment && !rar_var.isAssigned()) // don't place when rar_var=0
