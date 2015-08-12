@@ -136,7 +136,7 @@ public:
 
         if (!is_root_node || it->constraint->full_propagate_done) {
           CON_INFO_ADDONE(StaticTrigger);
-          it->propagateStatic(data_val);
+          it->propagateStatic(DomainDelta(data_val));
         }
 
 #ifdef WDEG
