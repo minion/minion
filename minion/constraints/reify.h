@@ -141,8 +141,7 @@ struct reify : public ParentConstraint {
   }
 
   virtual SysInt dynamic_trigger_count() {
-    return child_constraints[0]->get_vars_singleton()->size() * 2 +
-           child_constraints[1]->get_vars_singleton()->size() * 2; // *2 for each child constraint.
+    return dtcount + 1; // *2 for each child constraint.
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
@@ -177,6 +176,7 @@ struct reify : public ParentConstraint {
       return false;
   }
 
+
   virtual vector<AnyVarRef> get_vars() {
     // Push both sets of vars, then reify var.
     vector<AnyVarRef> vec0 = *child_constraints[0]->get_vars_singleton();
@@ -190,13 +190,13 @@ struct reify : public ParentConstraint {
     c.push_back(reify_var);
     return c;
   }
-
+/*
   virtual triggerCollection setup_internal() {
     triggerCollection triggers;
     triggers.push_back(make_trigger(reify_var, Trigger(this, -1000000000), Assigned));
     return triggers;
   }
-
+*/
   virtual void special_check() {
     D_ASSERT(constraint_locked);
     P("Special Check!");
@@ -217,6 +217,22 @@ struct reify : public ParentConstraint {
     constraint_locked = false;
   }
 
+  void reify_var_assigned() {
+    if (!full_propagate_called) {
+      P("reifyvar assigned - Do full propagate");
+#ifdef NODETRICK
+      if (reifysetnode == getState().getNodeCount()) {
+        numeric_limits<unsigned long long> ull; // I hope the compiler will get rid fo this..
+        reifysetnode = ull.max();               // avoid this happening more than once.
+        return;
+      }
+#endif
+
+      constraint_locked = true;
+      getQueue().pushSpecialTrigger(this);
+    }
+  }
+
   virtual void propagateStatic(DomainInt i, DomainDelta domain) {
     PROP_INFO_ADDONE(Reify);
     P("Static propagate start");
@@ -224,19 +240,8 @@ struct reify : public ParentConstraint {
       return;
 
     if (i == -1000000000) {
-      if (!full_propagate_called) {
-        P("reifyvar assigned - Do full propagate");
-#ifdef NODETRICK
-        if (reifysetnode == getState().getNodeCount()) {
-          numeric_limits<unsigned long long> ull; // I hope the compiler will get rid fo this..
-          reifysetnode = ull.max();               // avoid this happening more than once.
-          return;
-        }
-#endif
-
-        constraint_locked = true;
-        getQueue().pushSpecialTrigger(this);
-      }
+      abort();
+      reify_var_assigned();
       return;
     }
 
@@ -317,6 +322,9 @@ struct reify : public ParentConstraint {
         watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), c0vars * 2,
                          dtcount);
         return;
+      } else if (trig == _dt + dtcount) {
+        reify_var_assigned();
+        return;
       } else {
         P("Remove unused trigger");
         // This is an optimisation. Remove a trigger from stage 2.
@@ -375,6 +383,9 @@ struct reify : public ParentConstraint {
     D_ASSERT(reify_var.getMax() <= 1);
     if (getState().isFailed())
       return;
+
+    moveTriggerInt(reify_var, dtcount, Assigned);
+
 
     if (reify_var.isAssigned()) {
       if (reify_var.getAssignedValue() == 1) {

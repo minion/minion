@@ -52,20 +52,18 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     }
     accumulator += checked_cast<SysInt>((DomainInt)abs(var_sum));
     CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
-  }
-
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    SysInt array_size = var_array.size();
 
     count = 0;
+  }
 
-    for (SysInt i = 0; i < array_size; ++i)
-      if (VarToCount)
-        t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
-      else
-        t.push_back(make_trigger(var_array[i], Trigger(this, i), UpperBound));
-    return t;
+  virtual SysInt dynamic_trigger_count() {
+    return var_array.size();
+  }
+
+  void setup_triggers() {
+    for (SysInt i = 0; i < (SysInt)var_array.size(); i++) {
+      moveTriggerInt(var_array[i], i, VarToCount?LowerBound:UpperBound);
+    }
   }
 
   virtual AbstractConstraint *reverse_constraint() {
@@ -99,7 +97,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
       getState().setFailed(true);
   }
 
-  virtual void propagateStatic(DomainInt i, DomainDelta) {
+  virtual void propagateDynInt(SysInt i, DomainDelta) {
     PROP_INFO_ADDONE(BoolSum);
     D_ASSERT(var_array[checked_cast<SysInt>(i)].getAssignedValue() == 0 ||
              var_array[checked_cast<SysInt>(i)].getAssignedValue() == 1);
