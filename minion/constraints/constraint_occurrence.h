@@ -544,15 +544,12 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
   OccurrenceEqualConstraint(const VarArray &_var_array, const Val &_value,
                             const ValCount &_val_count)
       : occurrences_count(), not_occurrences_count(), var_array(_var_array), val_count(_val_count),
-        value(_value) {}
+        value(_value) {
+          occurrences_count = 0;
+          not_occurrences_count = 0;
+        }
 
   virtual SysInt dynamic_trigger_count() { return var_array.size() + 2; }
-
-  virtual triggerCollection setup_internal() {
-    occurrences_count = 0;
-    not_occurrences_count = 0;
-    return triggerCollection{};
-  }
 
   void occurrence_limit_reached() {
     D_ASSERT(val_count.getMax() <= occurrences_count);
