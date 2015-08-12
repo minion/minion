@@ -51,18 +51,18 @@ struct AndConstraint : public AbstractConstraint {
   }
 
   void setup_triggers() {
-    moveTriggerInt(var1, 1, LowerBound);
-    moveTriggerInt(var2, 2, LowerBound);
-    moveTriggerInt(var3, 3, LowerBound);
-    moveTriggerInt(var1, 4, UpperBound);
-    moveTriggerInt(var2, 5, UpperBound);
-    moveTriggerInt(var3, 6, UpperBound);
+    moveTriggerInt(var1, 0, LowerBound);
+    moveTriggerInt(var2, 1, LowerBound);
+    moveTriggerInt(var3, 2, LowerBound);
+    moveTriggerInt(var1, 3, UpperBound);
+    moveTriggerInt(var2, 4, UpperBound);
+    moveTriggerInt(var3, 5, UpperBound);
   }
 
   virtual void propagateDynInt(SysInt i) {
     PROP_INFO_ADDONE(And);
     switch (checked_cast<SysInt>(i)) {
-    case 1:
+    case 0:
       if (var2.isAssignedValue(true))
         var3.propagateAssign(true);
       else {
@@ -71,7 +71,7 @@ struct AndConstraint : public AbstractConstraint {
       }
       break;
 
-    case 2:
+    case 1:
       if (var1.isAssignedValue(true))
         var3.propagateAssign(true);
       else {
@@ -80,15 +80,15 @@ struct AndConstraint : public AbstractConstraint {
       }
       break;
 
-    case 3:
+    case 2:
       var1.propagateAssign(true);
       var2.propagateAssign(true);
       break;
 
-    case 4:
-    case 5: var3.propagateAssign(false); break;
+    case 3:
+    case 4: var3.propagateAssign(false); break;
 
-    case 6:
+    case 5:
       if (var1.isAssignedValue(true))
         var2.propagateAssign(false);
       else {
@@ -100,6 +100,7 @@ struct AndConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    setup_triggers();
     if (var1.isAssignedValue(false) || var2.isAssignedValue(false))
       var3.propagateAssign(false);
 
