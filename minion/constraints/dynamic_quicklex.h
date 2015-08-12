@@ -132,7 +132,7 @@ struct QuickLexDynamic : public AbstractConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     SysInt a = alpha;
 
     if (0 == dt) { // X triggered

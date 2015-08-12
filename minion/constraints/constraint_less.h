@@ -62,7 +62,7 @@ struct LeqConstraint : public AbstractConstraint {
   // Needs to be at end of file
   virtual AbstractConstraint *reverse_constraint();
 
-  virtual void propagateDynInt(SysInt prop_val) {
+  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(BinaryLeq);
     if (checked_cast<SysInt>(prop_val)) { // y changed
       x.setMax(y.getMax() + offset);
@@ -75,8 +75,8 @@ struct LeqConstraint : public AbstractConstraint {
     moveTriggerInt(x, 0, LowerBound);
     moveTriggerInt(y, 1, UpperBound);
 
-    propagateDynInt(0);
-    propagateDynInt(1);
+    propagateDynInt(0, DomainDelta::empty());
+    propagateDynInt(1, DomainDelta::empty());
   }
 
   virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {

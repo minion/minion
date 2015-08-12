@@ -166,7 +166,7 @@ struct VecCountDynamic : public AbstractConstraint {
     Operator::propagate_from_var2(var_array1[index], var_array2[index]);
   }
 
-  virtual void propagateDynInt(SysInt trigger_activated) {
+  virtual void propagateDynInt(SysInt trigger_activated, DomainDelta) {
     PROP_INFO_ADDONE(DynVecNeq);
     SysInt triggerpair = trigger_activated / Operator::dynamic_trigger_count();
     D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);

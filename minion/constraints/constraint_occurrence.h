@@ -148,7 +148,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt trig) {
+  virtual void propagateDynInt(SysInt trig, DomainDelta) {
     if (trig == 2) {
       propagateValCount();
       return;
@@ -393,7 +393,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
       getState().setFailed(true);
   }
 
-  virtual void propagateDynInt(SysInt in) {
+  virtual void propagateDynInt(SysInt in, DomainDelta) {
     const SysInt i = checked_cast<SysInt>(in);
     PROP_INFO_ADDONE(OccEqual);
     D_ASSERT(i >= 0);
@@ -581,7 +581,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     val_count.setMax(static_cast<SysInt>(var_array.size()) - occs);
   }
 
-  virtual void propagateDynInt(SysInt i) {
+  virtual void propagateDynInt(SysInt i, DomainDelta) {
     PROP_INFO_ADDONE(OccEqual);
     if (i >= var_array.size()) { // val_count changed
       if (occurrences_count == val_count.getMax())

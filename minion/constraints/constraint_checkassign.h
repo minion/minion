@@ -45,7 +45,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
     return new CheckAssignConstraint<OriginalConstraint, !negate>(originalcon);
   }
 
-  virtual void propagateDynInt(SysInt prop_val) {
+  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(CheckAssign);
     if (check_unsat(prop_val, DomainDelta::empty()))
       getState().setFailed(true);

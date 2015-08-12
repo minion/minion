@@ -59,7 +59,7 @@ struct AndConstraint : public AbstractConstraint {
     moveTriggerInt(var3, 5, UpperBound);
   }
 
-  virtual void propagateDynInt(SysInt i) {
+  virtual void propagateDynInt(SysInt i, DomainDelta) {
     PROP_INFO_ADDONE(And);
     switch (checked_cast<SysInt>(i)) {
     case 0:

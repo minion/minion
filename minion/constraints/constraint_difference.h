@@ -76,7 +76,7 @@ struct DifferenceConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt) {
+  virtual void propagateDynInt(SysInt, DomainDelta) {
     PROP_INFO_ADDONE(Difference);
 
     DomainInt var1_min = var1.getMin();
@@ -126,11 +126,11 @@ struct DifferenceConstraint : public AbstractConstraint {
     moveTriggerInt(var3, 4, LowerBound);
     moveTriggerInt(var3, 5, UpperBound);
   }
-  
+
   virtual void full_propagate() {
     trigger_setup();
     var3.setMin(0);
-    propagateDynInt(0);
+    propagateDynInt(0, DomainDelta::empty());
   }
 
   virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {

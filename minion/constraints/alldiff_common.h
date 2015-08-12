@@ -281,7 +281,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     }
   }
 
-  virtual void propagateDynInt(SysInt trig) {
+  virtual void propagateDynInt(SysInt trig, DomainDelta) {
 #if UseIncGraph
     if (trig >= 0 && trig < numvars * numvals) // does this trigger belong to incgraph?
     {

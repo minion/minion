@@ -115,7 +115,7 @@ struct GACEqualConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt pos) {
+  virtual void propagateDynInt(SysInt pos, DomainDelta) {
     if (pos < dvar2) {
       DomainInt val = pos + var1.getInitialMin();
       D_ASSERT(!var1.inDomain(val));

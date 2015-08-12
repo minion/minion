@@ -53,7 +53,7 @@ struct WatchLessConstraint : public AbstractConstraint {
     var1.setMax(var2.getMax() - 1);
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchNEQ);
 
     D_ASSERT(dt == 0 || dt == 1);

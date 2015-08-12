@@ -625,7 +625,7 @@ struct MDDC : public AbstractConstraint {
 
   virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
 
-  virtual void propagateDynInt(SysInt prop_var) {
+  virtual void propagateDynInt(SysInt prop_var, DomainDelta) {
     if (!constraint_locked) {
       constraint_locked = true;
       getQueue().pushSpecialTrigger(this);

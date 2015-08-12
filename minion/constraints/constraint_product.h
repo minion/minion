@@ -106,7 +106,7 @@ struct ProductConstraint : public AbstractConstraint {
     return x / y;
   }
 
-  virtual void propagateDynInt(SysInt) {
+  virtual void propagateDynInt(SysInt, DomainDelta) {
     PROP_INFO_ADDONE(Product);
     DomainInt var1_min = var1.getMin();
     DomainInt var1_max = var1.getMax();
@@ -162,7 +162,7 @@ struct ProductConstraint : public AbstractConstraint {
 
   virtual void full_propagate() {
     setup_triggers();
-    propagateDynInt(0);
+    propagateDynInt(0, DomainDelta::empty());
   }
 
   virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {

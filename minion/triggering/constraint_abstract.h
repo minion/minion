@@ -141,7 +141,7 @@ public:
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate
    */
-  virtual void propagateDynInt(SysInt) {
+  virtual void propagateDynInt(SysInt, DomainDelta) {
     D_FATAL_ERROR("Fatal error in 'Dynamic Propagate' in " + extended_name());
   }
 
@@ -350,11 +350,11 @@ public:
     return _dynamic_trigger_to_constraint[checked_cast<SysInt>(p)];
   }
 
-  void passDynTriggerToChild(SysInt trig) {
+  void passDynTriggerToChild(SysInt trig, DomainDelta dd) {
     SysInt child = getChildDynamicTrigger(trig);
     SysInt offset = _dynamic_trigger_child_offset[child];
     D_ASSERT(trig >= offset);
-    child_constraints[child]->propagateDynInt(trig - offset);
+    child_constraints[child]->propagateDynInt(trig - offset, dd);
   }
 
   Trig_ConRef _parent_map_Trig_ConRef(SysInt child, SysInt trigger) {

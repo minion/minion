@@ -137,7 +137,7 @@ struct LightTableConstraint : public AbstractConstraint {
       FAIL_EXIT();
     }
   }
-  
+
   virtual SysInt dynamic_trigger_count() {
     return vars.size();
   }
@@ -148,7 +148,7 @@ struct LightTableConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt changed_var) {
+  virtual void propagateDynInt(SysInt changed_var, DomainDelta) {
     // Propagate to all vars except the one that changed.
     for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
       if (i != changed_var) {

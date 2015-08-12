@@ -62,7 +62,7 @@ struct WatchInSetConstraint : public AbstractConstraint {
     if (var.isBound()) {
       // May as well pass DomainRemoval
       moveTriggerInt(var, 0, DomainChanged);
-      propagateDynInt(0);
+      propagateDynInt(0, DomainDelta::empty());
     } else {
       for (SysInt i = 0; i < (SysInt)vals.size() - 1; ++i)
         for (DomainInt pos = vals[i] + 1; pos < vals[i + 1]; ++pos)
@@ -70,7 +70,7 @@ struct WatchInSetConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchInSet);
     // If we are in here, we have a bounds variable.
     D_ASSERT(var.isBound());

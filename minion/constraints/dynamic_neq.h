@@ -59,7 +59,7 @@ struct WatchNeqConstraint : public AbstractConstraint {
     moveTriggerInt(var2, 1, Assigned);
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchNEQ);
 
     D_ASSERT(dt == 0 || dt == 1);

@@ -63,7 +63,7 @@ struct Check_Assign : public AbstractConstraint {
 
   virtual vector<AnyVarRef> get_vars() { return child->get_vars(); }
 
-  virtual void propagateDynInt(SysInt) {
+  virtual void propagateDynInt(SysInt, DomainDelta) {
     SysInt size = child->get_vars_singleton()->size();
     vector<AnyVarRef> *vars = child->get_vars_singleton();
 
@@ -82,7 +82,7 @@ struct Check_Assign : public AbstractConstraint {
       getState().setFailed(true);
   }
 
-  virtual void full_propagate() { propagateDynInt(0); }
+  virtual void full_propagate() { propagateDynInt(0, DomainDelta::empty()); }
 };
 
 inline AbstractConstraint *checkAssignCon(AbstractConstraint *c) { return new Check_Assign(c); }

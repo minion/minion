@@ -60,7 +60,7 @@ struct WatchNotLiteralConstraint : public AbstractConstraint {
       var.removeFromDomain(val);
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchInRange);
     if (var.isBound()) {
       if (var.getMin() == val)
@@ -118,7 +118,7 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint {
 
   virtual void full_propagate() { var.removeFromDomain(val); }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchInRange);
     var.removeFromDomain(val);
   }

@@ -364,7 +364,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt pos) {
+  virtual void propagateDynInt(SysInt pos, DomainDelta) {
     PROP_INFO_ADDONE(DynElement);
     UnsignedSysInt array_size = var_array.size();
     UnsignedSysInt result_support_triggers =

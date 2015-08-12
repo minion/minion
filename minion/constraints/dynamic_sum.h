@@ -202,7 +202,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
   //
   BOOL check_consistency() { return true; }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(DynSum);
     D_ASSERT(check_consistency());
     SysInt propval = triggerInfo(dt);

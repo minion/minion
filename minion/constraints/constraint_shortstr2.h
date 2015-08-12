@@ -395,7 +395,7 @@ struct STR : public AbstractConstraint {
 
   virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
 
-  virtual void propagateDynInt(SysInt prop_var) {
+  virtual void propagateDynInt(SysInt prop_var, DomainDelta) {
     sval.insert(prop_var);
 
     if (!constraint_locked) {

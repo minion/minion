@@ -123,7 +123,7 @@ struct LexLeqConstraint : public AbstractConstraint {
       if (!x[i].isAssigned() || !y[i].isAssigned() ||
           x[i].getAssignedValue() != y[i].getAssignedValue()) {
         alpha = i;
-        propagateDynInt(i*4);
+        propagateDynInt(i*4, DomainDelta::empty());
       } else
         updateAlpha(i + 1);
     } else {
@@ -131,7 +131,7 @@ struct LexLeqConstraint : public AbstractConstraint {
         if (!x[i].isAssigned() || !y[i].isAssigned() ||
             x[i].getAssignedValue() != y[i].getAssignedValue()) {
           alpha = i;
-          propagateDynInt(i*4);
+          propagateDynInt(i*4, DomainDelta::empty());
           return;
         }
         i++;
@@ -148,7 +148,7 @@ struct LexLeqConstraint : public AbstractConstraint {
       if (x[i].getMin() < y[i].getMax()) {
         beta = i + 1;
         if (!(x[i].getMax() < y[i].getMin()))
-          propagateDynInt(i*4);
+          propagateDynInt(i*4, DomainDelta::empty());
         return;
       }
       i--;
@@ -156,7 +156,7 @@ struct LexLeqConstraint : public AbstractConstraint {
     getState().setFailed(true);
   }
 
-  virtual void propagateDynInt(SysInt i_in) {
+  virtual void propagateDynInt(SysInt i_in, DomainDelta) {
     const SysInt i = i_in / 4;
     PROP_INFO_ADDONE(Lex);
     if (F) {
@@ -257,7 +257,7 @@ struct LexLeqConstraint : public AbstractConstraint {
       }
       if (alpha >= beta)
         getState().setFailed(true);
-      propagateDynInt((SysInt)alpha*4); // initial propagation, if necessary.
+      propagateDynInt((SysInt)alpha*4, DomainDelta::empty()); // initial propagation, if necessary.
     } else {
       if (Less)
         getState().setFailed(true);

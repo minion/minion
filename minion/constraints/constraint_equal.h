@@ -151,7 +151,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt i) {
+  virtual void propagateDynInt(SysInt i, DomainDelta) {
     PROP_INFO_ADDONE(ReifyEqual);
     switch (checked_cast<SysInt>(i)) {
     case 0:
@@ -340,7 +340,7 @@ struct NeqConstraintBinary : public AbstractConstraint {
 
   virtual SysInt dynamic_trigger_count() { return 6; }
 
-  virtual void propagateDynInt(SysInt prop_val) {
+  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(BinaryNeq);
     if (prop_val == 1) {
       DomainInt remove_val = var1.getAssignedValue();
@@ -523,10 +523,10 @@ struct EqualConstraint : public AbstractConstraint {
   virtual void full_propagate() {
     trigger_setup();
     for(int i = 0; i < 4; ++i)
-      propagateDynInt(i);
+      propagateDynInt(i, DomainDelta::empty());
   }
 
-  virtual void propagateDynInt(SysInt i) {
+  virtual void propagateDynInt(SysInt i, DomainDelta) {
     PROP_INFO_ADDONE(Equal);
     switch (checked_cast<SysInt>(i)) {
     case 0: var2.setMax(var1.getMax()); return;

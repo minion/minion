@@ -353,7 +353,7 @@ struct VecNeqDynamic : public AbstractConstraint {
     Operator::propagate_from_var2(var_array1[index], var_array2[index]);
   }
 
-  virtual void propagateDynInt(SysInt trigger_activated) {
+  virtual void propagateDynInt(SysInt trigger_activated, DomainDelta) {
     PROP_INFO_ADDONE(DynVecNeq);
     P("VecNeq prop");
 

@@ -342,7 +342,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     }
   }
 
-  virtual void propagateDynInt(SysInt trig) {
+  virtual void propagateDynInt(SysInt trig, DomainDelta) {
 #if defined(CAPBOUNDSCACHE) || UseIncGraph
     SysInt dtstart = 0;
 #endif

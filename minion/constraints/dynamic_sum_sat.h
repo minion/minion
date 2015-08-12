@@ -77,7 +77,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
     return;
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(DynSumSat);
     SysInt var_size = var_array.size();
 

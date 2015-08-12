@@ -145,7 +145,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     return new Dynamic_OR(con);
   }
 
-  virtual void propagateDynInt(SysInt trig) {
+  virtual void propagateDynInt(SysInt trig, DomainDelta) {
     if (trig < (SysInt)var_array.size()) {
       // One of the value has been pruned somewhere
       // Need to propagate.

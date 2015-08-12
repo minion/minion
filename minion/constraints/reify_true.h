@@ -154,7 +154,7 @@ struct reify_true : public ParentConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt trig) {
+  virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     PROP_INFO_ADDONE(ReifyTrue);
     P("Dynamic prop start");
     if (constraint_locked)
@@ -186,7 +186,7 @@ struct reify_true : public ParentConstraint {
     if (full_propagate_called) {
       P("Pass triggers to children");
       D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
-      passDynTriggerToChild(trig);
+      passDynTriggerToChild(trig, dd);
       // child_constraints[0]->propagateDynInt(trig);
     } else {
       P("Remove unused trigger");

@@ -116,7 +116,7 @@ struct PowConstraint : public AbstractConstraint {
     return exp(log(checked_cast<double>(z)) / checked_cast<double>(y));
   }
 
-  virtual void propagateDynInt(SysInt flag) {
+  virtual void propagateDynInt(SysInt flag, DomainDelta) {
     PROP_INFO_ADDONE(Pow);
     switch (checked_cast<SysInt>(flag)) {
     case 3: {
@@ -168,7 +168,7 @@ struct PowConstraint : public AbstractConstraint {
   virtual void full_propagate() {
     setup_triggers();
     for (int i = 0; i < 6; ++i)
-      propagateDynInt(i);
+      propagateDynInt(i, DomainDelta::empty());
   }
 
   virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {

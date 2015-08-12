@@ -55,7 +55,7 @@ struct Trig_ConRef {
 
   Trig_ConRef(AbstractConstraint *_con, SysInt _pos) : con(_con), conListPos(_pos) {}
 
-  void propagate();
+  void propagate(DomainDelta);
 
   bool empty() const { return con == nullptr; }
 

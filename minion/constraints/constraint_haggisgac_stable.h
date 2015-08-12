@@ -693,7 +693,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
     }
   }
 
-  virtual void propagateDynInt(SysInt lit) {
+  virtual void propagateDynInt(SysInt lit, DomainDelta) {
 
     //  cout << "Propagate called: var= " << var << "val = " << val << endl;
     // printStructures();

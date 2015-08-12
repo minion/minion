@@ -95,7 +95,7 @@ struct Forward_Checking : public AbstractConstraint {
     return;
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     SysInt size = child->get_vars_singleton()->size();
     vector<AnyVarRef> *vars = child->get_vars_singleton();
 

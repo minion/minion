@@ -75,14 +75,14 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
 
     if (var.isBound()) {
       moveTriggerInt(var, 0, DomainChanged);
-      propagateDynInt(0);
+      propagateDynInt(0, DomainDelta::empty());
     } else {
       for (DomainInt i = range_min; i <= range_max; ++i)
         var.removeFromDomain(i);
     }
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchNotInRange);
     D_ASSERT(var.isBound());
 

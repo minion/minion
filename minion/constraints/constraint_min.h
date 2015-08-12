@@ -103,7 +103,7 @@ struct MinConstraint : public AbstractConstraint {
     moveTriggerInt(min_var, v_size * 2 + 1, UpperBound);
   }
 
-  virtual void propagateDynInt(SysInt prop_val) {
+  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(Min);
     SysInt v_size = var_array.size();
     if (prop_val <= v_size) { // Lower Bound Changed
@@ -158,7 +158,7 @@ struct MinConstraint : public AbstractConstraint {
       getState().setFailed(true);
     } else {
       for (SysInt i = 0; i < (array_size+1) * 2; ++i) {
-        propagateDynInt(i);
+        propagateDynInt(i, DomainDelta::empty());
       }
     }
   }

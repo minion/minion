@@ -95,7 +95,7 @@ public:
       dynamic_trigger_list.queuePop();
 
       DynamicTriggerList &dtl = *(dte.event());
-
+      DomainDelta delta = dte.data;
       SysInt pos = 0;
 
       while (pos < dtl.size()) {
@@ -105,7 +105,7 @@ public:
         }
 
         if (!dtl[pos].empty() && (!is_root_node || dtl[pos].con->full_propagate_done)) {
-          dtl[pos].propagate();
+          dtl[pos].propagate(delta);
         }
 
 #ifdef WDEG

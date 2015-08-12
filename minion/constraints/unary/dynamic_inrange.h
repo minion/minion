@@ -60,7 +60,7 @@ struct WatchInRangeConstraint : public AbstractConstraint {
     var.setMax(range_max);
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchInRange);
     D_FATAL_ERROR("Propagation is never called for 'in range'");
   }

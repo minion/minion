@@ -143,7 +143,7 @@ struct Dynamic_OR : public ParentConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt trig) {
+  virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     // PROP_INFO_ADDONE(WatchedOr);
     P("Prop");
     P("Current: " << watched_constraint[0] << " . " << watched_constraint[1]);
@@ -212,7 +212,7 @@ struct Dynamic_OR : public ParentConstraint {
 
     if (full_propagate_called && getChildDynamicTrigger(trig) == propagated_constraint) {
       P("Propagating child");
-      passDynTriggerToChild(trig);
+      passDynTriggerToChild(trig, dd);
       // child_constraints[propagated_constraint]->propagateDynInt(trig);
     } else {
       P("Clean old trigger");

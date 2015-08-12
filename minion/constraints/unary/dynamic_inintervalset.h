@@ -72,7 +72,7 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     if (var.isBound()) {
       // May as well pass DomainRemoval
       moveTriggerInt(var, 0, DomainChanged);
-      propagateDynInt(0);
+      propagateDynInt(0, DomainDelta::empty());
     } else {
       // Prune everything between intervals.
       for (SysInt i = 0; i < (SysInt)intervals.size() - 1; ++i)
@@ -81,7 +81,7 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchInIntervalSet);
     // If we are in here, we have a bounds variable.
     D_ASSERT(var.isBound());

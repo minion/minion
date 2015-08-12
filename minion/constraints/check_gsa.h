@@ -62,7 +62,7 @@ struct Check_GSA : public AbstractConstraint {
 
   virtual vector<AnyVarRef> get_vars() { return child->get_vars(); }
 
-  virtual void propagateDynInt(SysInt) {
+  virtual void propagateDynInt(SysInt, DomainDelta) {
     bool flag = false;
     GET_ASSIGNMENT(assignment, child);
     if (!flag) {
@@ -84,7 +84,7 @@ struct Check_GSA : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() { propagateDynInt(0); }
+  virtual void full_propagate() { propagateDynInt(0, DomainDelta::empty()); }
 };
 
 AbstractConstraint *checkGSACon(AbstractConstraint *c) { return new Check_GSA(c); }

@@ -141,7 +141,7 @@ struct ElementConstraint : public AbstractConstraint {
     moveTriggerInt(resultvar, array_size + 1, Assigned);
   }
 
-  virtual void propagateDynInt(SysInt prop_val) {
+  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(NonGACElement);
     SysInt var_size = var_array.size();
     if (indexvar.isAssigned()) {

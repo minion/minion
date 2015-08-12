@@ -262,7 +262,7 @@ struct reify : public ParentConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt trig) {
+  virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     PROP_INFO_ADDONE(Reify);
     P("Dynamic prop start");
     if (constraint_locked)
@@ -337,7 +337,7 @@ struct reify : public ParentConstraint {
         releaseTriggerInt(trig);
         return;
       }
-      passDynTriggerToChild(trig);
+      passDynTriggerToChild(trig, dd);
       // child_constraints[getChildDynamicTrigger(trig)]->propagateDynInt(trig);
     }
   }

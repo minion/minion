@@ -56,14 +56,14 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
   virtual void full_propagate() {
     if (var.isBound()) {
       moveTriggerInt(var, 0, DomainChanged);
-      propagateDynInt(0);
+      propagateDynInt(0, DomainDelta::empty());
     } else {
       for (SysInt i = 0; i < (SysInt)vals.size(); ++i)
         var.removeFromDomain(vals[i]);
     }
   }
 
-  virtual void propagateDynInt(SysInt dt) {
+  virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchInSet);
     // If we are in here, we have a bounds variable.
     D_ASSERT(var.isBound());

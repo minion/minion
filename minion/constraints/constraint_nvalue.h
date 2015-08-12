@@ -65,7 +65,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
     return vars.size() + 1;
   }
 
-  virtual void propagateDynInt(SysInt flag) { full_propagate(); }
+  virtual void propagateDynInt(SysInt flag, DomainDelta) { full_propagate(); }
 
   virtual void full_propagate() {
     trigger_setup();
@@ -154,7 +154,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
   virtual SysInt dynamic_trigger_count() {
     return vars.size() + 1;
   }
-  
+
   void trigger_setup() {
     for (unsigned i = 0; i < vars.size(); ++i) {
       moveTriggerInt(vars[i], i, Assigned);
@@ -163,7 +163,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
     moveTriggerInt(result, vars.size(), LowerBound);
   }
 
-  virtual void propagateDynInt(SysInt flag)
+  virtual void propagateDynInt(SysInt flag, DomainDelta)
   {
     propagateImpl();
   }

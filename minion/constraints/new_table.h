@@ -211,7 +211,7 @@ struct NewTableConstraint : public AbstractConstraint {
     return checked_cast<SysInt>(data->getLiteralCount() * ((SysInt)vars.size() - 1));
   }
 
-  virtual void propagateDynInt(SysInt trigger_pos) {
+  virtual void propagateDynInt(SysInt trigger_pos, DomainDelta) {
     PROP_INFO_ADDONE(DynGACTable);
 
     SysInt propagated_literal = trigger_pos / ((SysInt)vars.size() - 1);

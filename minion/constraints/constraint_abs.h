@@ -61,7 +61,7 @@ struct AbsConstraint : public AbstractConstraint {
     trigger_setup();
     var1.setMin(0);
     for (SysInt i = 0; i < 4 && !getState().isFailed(); ++i)
-      propagateDynInt(i);
+      propagateDynInt(i, DomainDelta::empty());
   }
 
   // Assume values passed in in order.
@@ -87,7 +87,7 @@ struct AbsConstraint : public AbstractConstraint {
       return x;
   }
 
-  virtual void propagateDynInt(SysInt i) {
+  virtual void propagateDynInt(SysInt i, DomainDelta) {
     // Assume this in the algorithm.
     D_ASSERT(var1.getMin() >= 0);
 
