@@ -86,15 +86,16 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     }
   }
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
+  virtual SysInt dynamic_trigger_count() {
+    return var_array.size() + 1;
+  }
 
-    SysInt array_size = var_array.size();
-    for (SysInt i = 0; i < array_size; ++i) {
-      t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
+  void setup_triggers() {
+    for (SysInt i = 0; i < (SysInt)var_array.size(); i++) {
+      moveTriggerInt(var_array[i], i, LowerBound);
     }
-    t.push_back(make_trigger(var_sum, Trigger(this, -1), UpperBound));
-    return t;
+    moveTriggerInt(var_sum, var_array.size(), UpperBound);
+
   }
 
   DomainInt get_real_min_sum() {
@@ -104,11 +105,11 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     return min_sum;
   }
 
-  virtual void propagateStatic(DomainInt prop_val, DomainDelta domain_change) {
+  virtual void propagateDynInt(SysInt prop_val, DomainDelta domain_change) {
     P("Prop: " << prop_val);
     PROP_INFO_ADDONE(FullSum);
     DomainInt sum = var_array_min_sum;
-    if (prop_val != -1) { // One of the array changed
+    if (prop_val != var_array.size()) { // One of the array changed
       DomainInt change = var_array[checked_cast<SysInt>(prop_val)].getDomainChange(domain_change);
       P(" Change: " << change);
       D_ASSERT(change >= 0);
@@ -135,6 +136,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
 
   virtual void full_propagate() {
     P("Full Prop");
+    setup_triggers();
     DomainInt min_sum = 0;
     DomainInt max_diff = 0;
     for (typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it) {
@@ -146,7 +148,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     D_ASSERT(min_sum == get_real_min_sum());
     max_looseness = max_diff;
     if (!var_array.empty())
-      propagateStatic(0, DomainDelta::empty());
+      propagateDynInt(0, DomainDelta::empty());
     else
       var_sum.setMin(0);
   }
