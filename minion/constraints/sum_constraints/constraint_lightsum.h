@@ -56,16 +56,15 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     }
   }
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
+  virtual SysInt dynamic_trigger_count() {
+    return var_array.size() + 1;
+  }
 
-    SysInt array_size = var_array.size();
-    for (SysInt i = 0; i < array_size; ++i) {
-      t.push_back(make_trigger(var_array[i], Trigger(this, i), LowerBound));
+  void setup_triggers() {
+    for (SysInt i = 0; i < (SysInt)var_array.size(); i++) {
+      moveTriggerInt(var_array[i], i, LowerBound);
     }
-
-    t.push_back(make_trigger(var_sum, Trigger(this, -1), UpperBound));
-    return t;
+    moveTriggerInt(var_sum, var_array.size(), UpperBound);
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
@@ -94,13 +93,13 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void propagateStatic(DomainInt prop_val, DomainDelta) {
+  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(LightSum);
     DomainInt min_sum = 0;
     for (UnsignedSysInt i = 0; i < size; ++i)
       min_sum += var_array[i].getMin();
 
-    if (prop_val >= 0) {
+    if (prop_val != var_array.size()) {
       var_sum.setMin(min_sum);
     }
 
@@ -110,8 +109,8 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
-    propagateStatic(-1, DomainDelta::empty());
-    propagateStatic(0, DomainDelta::empty());
+    propagateDynInt(var_array.size(), DomainDelta::empty());
+    propagateDynInt(0, DomainDelta::empty());
   }
 
   virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
