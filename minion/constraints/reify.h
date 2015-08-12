@@ -190,13 +190,7 @@ struct reify : public ParentConstraint {
     c.push_back(reify_var);
     return c;
   }
-/*
-  virtual triggerCollection setup_internal() {
-    triggerCollection triggers;
-    triggers.push_back(make_trigger(reify_var, Trigger(this, -1000000000), Assigned));
-    return triggers;
-  }
-*/
+
   virtual void special_check() {
     D_ASSERT(constraint_locked);
     P("Special Check!");
